@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Slices 1 a 3 code complete y probados en WordPress Playground (runtime 13cb164, sin push ni deploy). Pendientes: Slice 4 (fotos al bucket, deploy y apply en vivo, con autorización) y Slice 5 (diseño del admin)`
+- Status real: `Slices 1 a 3 code complete y probados en WordPress Playground (runtime f9c7bce, sin push ni deploy). Slice 4: 51 fotos subidas y verificadas en el bucket; faltan deploy del plugin y apply en vivo (con autorización). Slice 5: diseño del admin`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `TASK-2040 (sólo el Slice 2 de esta task, que valida contra el esquema site-nav.v1)`
@@ -407,6 +407,26 @@ el carril de deploy acotado.
 `contacto-op`) quedan como están. Lo decidió el operador («Déjalas así; ya las aprobé en el canvas»), según transmitió la
 sesión del menú. La excepción vale sólo para estas fotos del menú; no cambia la regla de vestuario para piezas nuevas.
 
+**Fotos subidas (2026-10-22, autorizado por el operador en esta sesión):** 51 objetos en
+`gs://efeonce-group-axis-public-media/site-nav/v1/<slug>-<recorte>.webp`: 20 `mm`, 28 `op` y 3 `card`. El prefijo
+`site-nav/` estaba vacío y se subió con `--no-clobber`. Ninguna otra sesión estaba trabajando en AXIS (ListAgents). Son,
+byte por byte, los archivos del canvas v68 (los mismos de `apps/lab/public/site-nav/v1/` en AXIS). Los tres `hero-*`
+del Lab son sólo de la demo y no se subieron.
+
+Cinco tienen una medida distinta a la nominal y se subieron tal cual, porque son las aprobadas en el canvas y la regla
+es no reescalar:
+
+| Foto | Medida real | Medida nominal |
+|---|---|---|
+| `glitch-card` | 880×472 | 880×496 |
+| `manzanitas-card` | 880×472 | 880×496 |
+| `engine-op` | 830×900 | 996×1080 (misma proporción, menos resolución) |
+| `nosotros-op` | 1120×1400 | 996×1080 |
+| `portafolio-op` | 1120×1400 | 996×1080 |
+
+El panel las encuadra con `object-fit: cover`. Si alguna se vuelve a recortar, se sube como archivo nuevo
+(`.v2`) y nunca se sobrescribe.
+
 **Decisiones:** directorio `eo-site-nav`, prefijo `EOSN_`, text domain `eo-site-nav`, comandos `wp eo-nav`, REST
 `eo/v1/site-nav`. Respaldo del documento en el runtime: `manifests/site-nav/efeoncepro.com.json`.
 
@@ -550,8 +570,9 @@ Modelo del documento, reglas, plugin, REST y fotos:
 - [x] Recursos resuelve lo último por formato en el servidor y cae al destacado fijo si la fuente falla. Evidencia:
   Playground (tipo de Glitch desde el título, hora de Santiago, invalidación al publicar/editar/recategorizar, fuente
   caída, resultado válido contra el esquema). Reglas por formato en la arquitectura, §Datos dinámicos.
-- [ ] Las fotos del documento responden 200 desde `site-nav/v1/` con `Cache-Control: public, max-age=31536000,
-  immutable`, y todas tienen alt.
+- [x] Las fotos del documento responden 200 desde `site-nav/v1/` con `Cache-Control: public, max-age=31536000,
+  immutable`, y todas tienen alt. Evidencia 2026-10-22: las 51 URL dan 200, con esa cabecera, `image/webp` y los mismos
+  bytes que el original (curl de cada una). El alt lo exige el esquema y el documento de ejemplo valida.
 - [ ] El documento inicial refleja el contenido aprobado del canvas, con los pendientes de «Por confirmar» resueltos o
   explícitamente diferidos.
 - [ ] La franja de Recursos apunta a la suscripción del blog (misma lista que Glitch) y no existe formulario ni lista
