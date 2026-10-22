@@ -89,7 +89,17 @@ newsletter Marketing con Manzanitas del LinkedIn de Julio (evergreen: cómo se h
 edición invita a Glitch, porque su audiencia es de LinkedIn. No se crea un segundo correo de Marketing con
 Manzanitas. Detalle en la [estrategia de love brand §8.2](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22).
 
-**9. La línea «IA con contexto».** Nombre aprobado para la serie de implementación de IA empresarial: Gemini
+**9. YouTube a fondo.** Series por fase (IA con contexto mensual en el piloto, Shorts semanales; explicadores «Con
+manzanitas» en Q2; serie de personalidad trimestral; en vivo trimestral en YouTube y LinkedIn Live), anatomía fija
+del tutorial, búsqueda validada antes de grabar, canal con el nombre Efeonce y playlists por serie. Detalle en la
+[estrategia §8.3](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#83-youtube-el-amor-desde-la-utilidad-operador-2026-10-22).
+
+**10. Camino a conversión.** Todo termina en las landings de servicio con su oferta de entrada, pero cada canal tiene
+su paso siguiente y sólo LinkedIn lleva directo a la landing. IA con contexto y nube no tienen landing al 2026-10-22:
+es pendiente antes del 4-ene-2027. Detalle y landings medidas en la
+[estrategia §8.4](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22).
+
+**11. La línea «IA con contexto».** Nombre aprobado para la serie de implementación de IA empresarial: Gemini
 Enterprise, Claude Enterprise, ChatGPT Enterprise, agentes propios y de plataforma, y la nube donde corren. Línea
 de servicio **Engine** (la familia técnica es *Agent Systems & Platforms* de la marca de producto Wave).
 

@@ -230,6 +230,64 @@ experiencia para buscadores e IA.
 - **No hay un segundo correo de Marketing con Manzanitas.** Dos correos de la misma marca compiten por la misma
   bandeja. Si hiciera falta, lo evergreen entra a Glitch como sección.
 
+### 8.3 YouTube: el amor desde la utilidad `[operador, 2026-10-22]`
+
+**Trabajo:** el segundo buscador y la profundidad de Marketing con Manzanitas. Gana afecto porque sirve y porque las
+caras se repiten. Su fan es el marketer que busca un «cómo» y, en IA con contexto, el equipo de TI y transformación.
+
+| Serie | Qué es | Cuándo |
+|---|---|---|
+| **IA con contexto** | tutoriales de 8 a 12 min (Gemini, Claude o ChatGPT Enterprise; agentes en HubSpot; aparecer en ChatGPT) | piloto feb–mar 2027: 1 al mes |
+| **Manzanitas en corto** | Shorts de 30 a 60 s cortados de los talking heads, que llevan al tutorial | desde feb: 1 por semana |
+| **Con manzanitas** | explicadores de 5 a 8 min sobre búsquedas «qué es» (AEO, programmatic, RevOps) | Q2, si el piloto pasa |
+| **El estudio por dentro** | serie de personalidad: cómo trabaja el equipo | trimestral, cuando haya capacidad |
+| **En vivo** | el encuentro trimestral, en YouTube y LinkedIn Live; después queda como video | desde marzo |
+
+**Anatomía de un tutorial:** (1) los primeros 30 segundos dicen la promesa y muestran el resultado, sin intro ni logo
+antes; (2) una cara conocida y la pantalla real; (3) capítulos y una cartela de La órbita por capítulo; (4) cierre de
+marca del registro Manzanitas y pantalla final al siguiente video; (5) descripción en orden fijo: artículo del blog →
+Glitch → herramienta → landing del servicio; (6) comentario fijado con una pregunta; las mejores respuestas se vuelven
+el siguiente tutorial («Tú preguntas»).
+
+- **Título y miniatura:** el título es la búsqueda dicha como la diría una persona, nunca clickbait; la miniatura es
+  Escena 16:9 del registro Manzanitas con el logo abajo a la izquierda; cada video sale con dos miniaturas en la prueba
+  A/B de YouTube.
+- **El canal:** se llama Efeonce (la masterbrand es la única que se construye); playlists por serie; tráiler corto
+  para quien llega por primera vez.
+- **Búsqueda validada antes de grabar** (DataForSEO y Google Trends). Un video sin búsqueda detrás no se graba.
+- **Producción:** de la grabación mensual con Julio; cada tutorial rinde el video, 3 o 4 Shorts, el artículo del blog
+  con la transcripción (texto canónico) y un enlace en Glitch o en el newsletter.
+- **Comunidad:** mismo día y hora de estreno, respuesta a todo comentario, posts de comunidad para elegir el próximo
+  tutorial y los en vivo.
+- **Medición:** CTR de impresiones (miniatura), retención a 30 s y porcentaje visto (contenido), espectadores
+  recurrentes y suscriptores por video (love brand), tráfico desde búsqueda de YouTube y clics a blog, Glitch y
+  landings (puente). Decisión al 31-mar-2027: abrir con cadencia, seguir en piloto o pausar. Metas después del
+  primer video.
+- **Nunca:** subir reels tal cual, webinars sin editar, videos sin búsqueda detrás ni miniaturas engañosas.
+
+### 8.4 El camino a conversión: cada canal tiene su paso siguiente `[operador, 2026-10-22]`
+
+Todo termina en las **landings de servicio con su oferta de entrada** (los diagnósticos de AEO, RevOps, performance
+y creative velocity) y, en oportunidades seleccionadas, en la venta con demostración contextual. Pero ningún canal
+salta peldaños:
+
+| Desde | Paso natural | Llega a la landing… |
+|---|---|---|
+| Instagram · Threads | seguir → Glitch · LinkedIn de Julio | rara vez directo; sólo por la bio, sin vender |
+| YouTube | artículo del blog · Glitch | desde la descripción, como cuarto enlace |
+| Blog | Glitch → herramienta | al final del artículo, con el diagnóstico |
+| Newsletters | artículo · herramienta | cuando la edición trata ese servicio |
+| **LinkedIn** | **landing con diagnóstico** | **directo: es el canal de conversión** |
+
+La conversión no es el final: en el bow-tie (`11_hubspot-bowtie.md`), el cliente vuelve a la escalera como embajador
+(peldaño 6) y como caso.
+
+**Landings por serie (medido en efeoncepro.com el 2026-10-22):** medios `/servicios/agencia-de-medios/` y performance
+`/servicios/performance-marketing/` (con formulario de diagnóstico); SEO/AEO `/servicios/posicionamiento-seo/` y
+`/aeo-2/` + Brand Visibility Grader; HubSpot `/servicios-contratar-hubspot/` (`/servicios/hubspot/` redirige a un
+artículo de blog de 2024); producción creativa `/agencia-creativa/` y `/agencia-creativa-v2/` (dos versiones vivas);
+web `/desarrollo-sitios-web/`. **IA con contexto y nube no tienen landing** (`/partnership/` sólo muestra logos).
+
 ---
 
 ## 9. Mecánicas de comunidad
@@ -312,3 +370,7 @@ El love brand se mide en tres planos. Clasificación según `efeonce-brand-studi
 2. **Baseline de noviembre–diciembre** en Metricool por red.
 3. **Confirmar las recomendaciones** de las secciones 7, 9 y 13 con el operador.
 4. **Prueba de reconocimiento** de los activos de amor (La órbita, caras, códigos) antes de depender de ellos en pauta.
+5. **Landing de IA con contexto** antes del 4-ene-2027, cuando abre su serie: sin ella, LinkedIn, el primer tutorial y
+   el blog no tienen dónde convertir. Lo mismo para nube. Requiere task propia del sitio público.
+6. **Higiene de landings:** decidir cuál de las dos landings de agencia creativa queda y corregir la redirección de
+   `/servicios/hubspot/`.
