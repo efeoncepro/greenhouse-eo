@@ -306,7 +306,7 @@ matching o atribución de una reserva real; no se fabricaron bookings para produ
 La [navegación global del sitio](public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#agendador) (Propuesta, EPIC-055)
 suma un consumidor del agendador: el botón «Agenda tu diagnóstico» del encabezado de `efeoncepro.com`. Usa el
 contrato vigente (`<greenhouse-cta>` + `open_meeting_scheduler`); no cambia schemas, state machine ni medición del
-agendador. Al implementarlo en [TASK-2042](../tasks/to-do/TASK-2042-site-nav-wordpress-rollout.md):
+agendador. Al implementarlo en [TASK-2042](../tasks/in-progress/TASK-2042-site-nav-wordpress-rollout.md):
 `cta-location` `menu_header|menu_mega|menu_onepage`; el menú cierra su panel y suelta su bloqueo de scroll **antes**
 de abrir el diálogo, para que el `<dialog>` nativo siga siendo el único dueño de scroll lock y foco; el lanzador queda
 montado para devolver el foco. Superficie de Growth CTA propia del encabezado global, con su binding y allowlist de

@@ -32,6 +32,10 @@ cierre.
 
 `main` local del runtime trae WIP ajeno: no tocarlo.
 
+**TASK-2042 en curso (2026-10-22):** intake hecho; discovery del enganche del encabezado de Ohio, la superficie del
+agendador y la medición. Ninguna escritura en WordPress sin autorización del operador; piloto con su go. La sesión
+«Rediseño de Menú» es contralora de fidelidad: medirá el piloto con `getComputedStyle` contra el Lab.
+
 ## 2026-10-22 — Redes Efeonce: love brand y canales v2
 
 Estrategia social y editorial registrada: [PDR-020 rev. 2.0](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -21,10 +21,10 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Wireframe y flujo del host escritos; adaptador, interruptor, superficie del agendador y medición sin construir`
+- Status real: `En curso desde 2026-10-22: intake y discovery (TASK-2040 publicada; TASK-2041 con documento en vivo)`
 - Rank: `TBD`
 - Domain: `content`
-- Blocked by: `TASK-2041`
+- Blocked by: `none`
 - Branch: `Greenhouse develop para docs y scripts de Growth; el codigo del sitio vive en efeonce-public-site-runtime con release acotado por SSH; sin worktrees`
 
 ## Summary

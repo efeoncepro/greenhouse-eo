@@ -60,7 +60,7 @@ Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live 
 **Planned, not built** (architecture proposed 2026-10-18). The «Agenda tu diagnóstico» button in the global header of
 `efeoncepro.com` will open this scheduler through `<greenhouse-cta>` with the `open_meeting_scheduler` action; there
 will be no other booking path. When implementing it in
-[TASK-2042](../../../docs/tasks/to-do/TASK-2042-site-nav-wordpress-rollout.md):
+[TASK-2042](../../../docs/tasks/in-progress/TASK-2042-site-nav-wordpress-rollout.md):
 
 - `cta-location` per entry point: `menu_header`, `menu_mega` or `menu_onepage`, to measure by entry point.
 - The menu closes its panel (mega or onepage) and releases its scroll lock **before** opening the dialog, so the native
