@@ -54,3 +54,16 @@ El **medio es el mensaje**: la landing debe *probar* craft técnico, no describi
 - No lidera con "somos ágiles/rápidos" sin la prueba medible.
 - No migra a Astro ni cambia de host. El candidato 2026-07-07 queda en WP/Elementor modular por override explícito del operador; una variante code-custom futura requeriría nueva decisión de ejecución.
 - No genera logos de operating-entity por IA.
+
+## Delta 2026-10-22 — dos versiones vivas y rol en el camino a conversión
+
+- **Dos URLs vivas.** Medido el 2026-10-22: responden `/agencia-creativa/` (página `249582`, publicada el
+  2026-10-15, ver [README](../README.md)) y `/agencia-creativa-v2/` (candidata del 2026-07-07). Decidir cuál queda
+  es pendiente de higiene registrado en el [roadmap](../PRODUCT_ROADMAP.md) y en la
+  [estrategia de love brand §14](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#14-pendientes).
+  El posicionamiento de este PDR no cambia.
+- **Destino de la serie de producción creativa.** Con
+  [PDR-020 revisión 2.0](PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias),
+  esta landing es donde termina la serie de producción creativa de los canales propios: LinkedIn lleva directo; el
+  Instagram de Efeonce (marca agencia) no la empuja salvo por la bio y sin vender
+  ([§8.4](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22)).

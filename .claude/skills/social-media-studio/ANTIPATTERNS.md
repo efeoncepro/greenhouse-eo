@@ -19,6 +19,11 @@
   el proceso es la prueba. ✅ Behind the Build con los tropiezos adentro y aprendizaje transferible.
 - ❌ **Casos de éxito en Instagram.** Su señal es el reenvío privado y una métrica B2B no se manda
   por DM. ✅ Caso completo en el blog (canonical) + corte en LinkedIn.
+- ❌ **Vender en Instagram o Threads de Efeonce** (precios, «contrátanos», formularios de servicio) o
+  tratarlos como canal de leads. ✅ Son marca agencia: hacen fans; cada pieza declara pilar emocional
+  y peldaño de la escalera del fan, y su paso siguiente es seguir, Glitch o el LinkedIn de Julio. Sólo
+  LinkedIn lleva directo a la landing ([estrategia de love brand](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md)
+  §8.4 y §10).
 - ❌ **Calendarizar un caso de cliente antes de tener su autorización.** ✅ La aprobación del cliente
   fija la cadencia de esa franquicia, no el calendario editorial.
 - ❌ **Tratar toda pieza social como teaser o todo post como cluster node.** ✅ Una pieza sólo
@@ -41,6 +46,10 @@
   engagement proactivo + golden hour + construir relaciones.
 - ❌ **Ignorar el dark social.** Si no diseñas contenido "DM-able", pierdes el word-of-mouth
   que no aparece en tus reportes. ✅ Piezas útiles/entretenidas pensadas para reenviar 1-a-1.
+- ❌ **Decir «comunidad» sin mecanismo, inflar números con sorteos o pedir engagement con trampas**
+  («comenta SÍ»). ✅ En Efeonce, la comunidad son mecanismos: responder cada comentario con sustancia,
+  reconocer, rituales con día fijo que se sostienen tres meses y participación real (estrategia de love
+  brand §9–§10). No se abre un espacio propio sin masa crítica.
 - ❌ **Responder una crisis a la defensiva o en caliente.** ✅ Protocolo, tono, escalamiento
   y timing (ver `templates/community-response-matrix.md`).
 

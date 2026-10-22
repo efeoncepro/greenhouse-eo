@@ -214,14 +214,27 @@ capability dentro del sistema, no presentarse como agencia suelta.
 
 ## Next
 
-- **Sistema editorial de los canales propios** (PDR-020, `Accepted` rev 1.2): un motor editorial
- compartido con un **rol por canal** (blog el activo · LinkedIn el comprador · YouTube la profundidad ·
- Instagram craft y cultura · Threads conversación viva · Glitch la propiedad), **catálogo propio de
+- **Sistema editorial de los canales propios** (PDR-020, `Accepted` rev 2.0 del 2026-10-22): un motor editorial
+ compartido con **tres familias** — marca agencia (Instagram y Threads: love brand y comunidad, sin conversión
+ directa), conexión B2B (LinkedIn de Efeonce y de Julio) y Marketing con Manzanitas (blog, newsletter en el
+ LinkedIn de Julio y YouTube) —, Glitch como único correo, X sólo para escuchar, **catálogo propio de
  formatos por canal** y franquicias con **canal-hogar** que viajan como corte, nunca como copia. Los
- territorios se heredan de PDR-019; el vocero de talking head es Julio Reyes. **No autoriza producción,
- apertura de cuentas ni cambios en el sitio:** quedan siete decisiones pendientes, de las cuales tres
- (canonical de video, inventario de tools/webinars y naming visible) son compartidas con `TASK-1802` y
- lo siguen bloqueando.
+ territorios se heredan de PDR-019; el vocero de talking head es Julio Reyes. La revisión 2.0 cerró canonical
+ de video (vive en YouTube; el blog lo incrusta con transcripción), secuencia de apertura y cadencia. **No
+ autoriza producción, apertura de cuentas ni cambios en el sitio:** siguen abiertos el inventario de
+ tools/webinars y el naming visible (compartidos con `TASK-1802`, que lo siguen bloqueando) y cuántos territorios
+ se abren. Estrategia hermana: [Love Brand & Community](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
+- **Brechas de conversión de los canales propios** (medidas en efeoncepro.com el 2026-10-22,
+ [estrategia de love brand §8.4 y §14](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22)).
+ Cada canal termina en una landing de servicio con su oferta de entrada; tres destinos no están listos:
+ - **IA con contexto** (línea Engine) y **nube** no tienen landing (`/partnership/` sólo muestra logos). Debe
+   existir antes del 4-ene-2027, cuando abre la serie; requiere task propia del sitio público.
+ - **Agencia creativa duplicada:** `/agencia-creativa/` (página `249582`) y `/agencia-creativa-v2/` siguen vivas;
+   decidir cuál queda.
+ - **`/servicios/hubspot/`** redirige a un artículo de blog de 2024; la landing vigente es
+   `/servicios-contratar-hubspot/`. Corregir la redirección (ver PDR-006/PDR-013).
+ - La **medición del puente** fan → conversación («¿cómo nos conociste?» y fuente del primer contacto en HubSpot)
+   no existe; requiere task propia (`greenhouse-growth-forms` + HubSpot).
 - **Territorio editorial “Creative Workflows”** (PDR-014, Pillar V4 publicada; satélites siguientes): la
  Pillar educativa en Marketing con Manzanitas define la categoría desde la
  tesis **“un sistema de decisiones creativas humanas vuelto ejecutable”** y se

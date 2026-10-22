@@ -192,6 +192,14 @@ aprobada (el vlog embebido ya lo estaba con el motion).
   apertura) también están aprobados y el taller los entrega con el motion (§12).
   Subtítulos siempre (Poppins 600, blanco sobre navy 78 %, una palabra en el acento). Imagen de las fuentes embebida o
   licenciada, **nunca descargada**; en navy, con bytes en el borde y crédito.
+- **Distribución (delta 2026-10-22,
+  [PDR-020](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)):** el kit sigue
+  aprobado, pero dónde se publica cada formato lo fija PDR-020. La casa de Glitch es el correo y su archivo el blog;
+  en Threads entra sólo como gancho el día de la edición (la noticia más fuerte en una frase y la invitación a
+  suscribirse) y en LinkedIn como lectura de una noticia. Instagram es marca agencia, TikTok no es canal de Efeonce y
+  YouTube pertenece a Marketing con Manzanitas: **publicar el reel o el vlog de Glitch en esos canales (incluido el
+  alojamiento del vlog que se incrusta en el blog) queda pendiente de decisión del operador**; no lo programes por
+  defecto.
 - **Reel = overlays ENCIMA de la toma del host** (decisión del operador: el host está en cámara todo el tiempo).
   Pantalla completa sólo la portada del reel y la tarjeta final.
 

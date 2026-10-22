@@ -37,6 +37,7 @@ Efeonce.** Cárgalo antes de proponer formato, calendario o distribución en can
 | **Instagram** | **marca agencia: love brand y comunidad de fans** | detrás de la pieza (proceso con tropiezos) · oficio en 30 segundos · el equipo · talking head de tendencia · trendjacking · **seasonalities (la temporada vista desde el oficio)** · partners en reel. **NO lleva casos de éxito ni documentos de servicio; no persigue conversión directa** |
 | **Threads** | marca agencia: la voz en texto y el oído de la comunidad (cuenta Efeonce) | reacción rápida · opinión corta · hilo en bruto · pregunta abierta · **el gancho de Glitch** el día de la edición. **Experimento desde feb-2027, revisión 31-mar** |
 | **X** | sólo escucha | no se publica; se sigue a los laboratorios de IA para alimentar Threads e IA con contexto |
+| **Glitch (email)** | la propiedad: newsletter canónico y único correo de Efeonce | la edición semanal (+ Glitch Flash) |
 
 **Tres familias (PDR-020 revisión 2.0, 2026-10-22):** marca agencia (Instagram, Threads) · conexión B2B (LinkedIn
 página y Julio) · Marketing con Manzanitas (blog, newsletter, YouTube). Instagram hace fans a las personas de las
@@ -48,7 +49,6 @@ de la escalera del fan que mueve y su mecanismo; responder cada comentario con s
 **LinkedIn recibe al fan** (§8.1 de esa estrategia): la página construye respeto y Julio confianza; la cultura entra a
 LinkedIn sólo con argumento; Julio sostiene 15 minutos diarios de comentarios y respuestas; el equipo comparte con su
 propia voz (voluntario); los encuentros trimestrales también por LinkedIn Live.
-| **Glitch (email)** | la propiedad | la edición semanal |
 
 **Franquicias con canal-hogar** (nacen en uno, viajan como corte con trabajo propio, nunca como copia):
 Behind the Build → Instagram · Versus → YouTube + Blog · Educativo → LinkedIn · Glitch → email ·

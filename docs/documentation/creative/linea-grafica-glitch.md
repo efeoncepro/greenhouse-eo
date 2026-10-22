@@ -1,9 +1,9 @@
 # Línea gráfica de Glitch — sub-línea de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.13
+> **Version:** 1.14
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (v1.13: el Glitch Flash ya tiene plantilla automática —se compone
+> **Ultima actualizacion:** 2026-10-22 por Claude (v1.14: Glitch es el newsletter canónico y el único correo de Efeonce; en redes sólo va a Threads como gancho y a LinkedIn, según PDR-020 rev 2.0) · 2026-09-28 por Claude (v1.13: el Glitch Flash ya tiene plantilla automática —se compone
 > con el mismo comando que la edición— y sus valores viven en AXIS; la etiqueta «La noticia» ya está en las plantillas;
 > la manzana, el verde y los cinco íconos ya están en AXIS desde el 2026-09-27; pendientes al día. v1.12: Glitch tiene dos formatos, la edición semanal y el Glitch
 > Flash; chip «La noticia» en la portada y frase del narrador que cambia en cada edición; v1.11: las piezas estáticas ya se componen solas desde los datos
@@ -36,6 +36,17 @@ La idea en una frase: **la noticia pregunta, el narrador responde.** Es la misma
 pregunta, la esfera responde») llevada a un magazine.
 
 > Detalle técnico: [norma §0 a §2](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#0-en-una-frase)
+
+**Glitch es el newsletter de Efeonce** (decisión del operador, 2026-10-22): el newsletter canónico y el **único correo**
+de la marca. Su casa es el correo y su archivo, el blog (`/glitch/`). En redes, Glitch va sólo a **Threads**, con la
+noticia más fuerte en una frase el día de la edición y la invitación a suscribirse, y a **LinkedIn**, con la lectura de
+una noticia. El newsletter Marketing con Manzanitas del LinkedIn de Julio cierra cada edición invitando a Glitch, para
+que quien lo lee allí pase a ser audiencia propia. Instagram pasó a ser un canal de marca agencia y no recibe Glitch; el
+reel y el vlog (más abajo) no tienen hoy un canal asignado: se publican sólo si el operador lo decide.
+
+> Detalle técnico: [delta 2026-10-22 de la norma](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) ·
+> [sistema de canales y love brand](../social/sistema-de-canales-y-love-brand.md) ·
+> [estrategia de love brand §8.2](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22)
 
 ## Qué toma de La órbita y qué es propio
 

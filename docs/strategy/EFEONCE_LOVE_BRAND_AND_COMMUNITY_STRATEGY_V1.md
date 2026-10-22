@@ -322,7 +322,8 @@ web `/desarrollo-sitios-web/`. **IA con contexto y nube no tienen landing** (`/p
 
 ## 11. Cómo se mide
 
-El love brand se mide en tres planos. Clasificación según `efeonce-brand-studio`: **controla** (lo hacemos),
+El love brand se mide en tres planos (canal, comunidad y puente a negocio), más dos controles de apoyo (talento y
+disciplina). Clasificación según `efeonce-brand-studio`: **controla** (lo hacemos),
 **influye** (lo movemos) y **monitorea** (lo observamos).
 
 | Plano | Métrica | Fuente | Clase |

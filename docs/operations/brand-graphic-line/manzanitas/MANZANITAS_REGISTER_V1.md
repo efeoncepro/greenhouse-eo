@@ -37,6 +37,23 @@
 > **Los números de esta norma son referencia humana: si difieren del token, gana el token** (§14).
 > **Hermana, no se mezcla:** [sub-línea de Glitch](../glitch/GLITCH_GRAPHIC_LINE_V1.md)
 
+> **Delta 2026-10-22 — Marketing con Manzanitas como familia de canales (decisión del operador).** Este registro dice
+> cómo se ve una pieza de MCM; dónde se publica lo decide
+> [`PDR-020` rev 2.0](../../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias).
+> MCM es ahora una de las tres familias de canales propios: **blog, newsletter quincenal en el LinkedIn de Julio y
+> YouTube**. Lo que cambia para este registro:
+>
+> - **YouTube:** la miniatura (Escena 16:9, logo abajo a la izquierda) y el cierre (logo + eslogan debajo) de §5.7 son
+>   los que pide la anatomía del tutorial de la
+>   [estrategia de love brand §8.3](../../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#83-youtube-el-amor-desde-la-utilidad-operador-2026-10-22);
+>   cada video sale con dos miniaturas para la prueba A/B de YouTube.
+> - **Newsletter del LinkedIn de Julio:** todavía no tiene pieza propia en este registro ni en el token. **[pendiente]**
+>   No se improvisa: la pieza se decide con el operador antes de la primera edición.
+> - **Instagram ya no lleva carruseles de temas de servicio** (pasó a marca agencia). El carrusel MCM se entrega como documento de
+>   LinkedIn (§8.3, §14.5); la story queda como norma gráfica sin canal-hogar asignado hasta que el operador decida.
+> - MCM y Glitch siguen sin mezclarse (§1.2): el newsletter de LinkedIn invita a suscribirse a Glitch con un enlace en
+>   el texto, nunca con elementos de la sub-línea de Glitch.
+
 **Convenciones.** Salvo que se indique otra cosa, cada regla de esta norma es **decisión del operador** (aprobada el
 2026-09-28) y cada número es **medido en el canvas v39** sobre una lámina de 1080 × 1350 px. Tres marcas señalan lo
 demás: **[criterio]** es orientación de oficio que se deriva de las reglas aprobadas (no es una decisión nueva);

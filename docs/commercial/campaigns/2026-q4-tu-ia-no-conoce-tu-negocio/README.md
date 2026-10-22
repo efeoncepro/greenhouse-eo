@@ -61,6 +61,14 @@ estado de la landing, pruebas disponibles y ventanas reales. Glitch puede selecc
 edición semanal con lectura propia; YouTube se abre sólo según PDR-020 y la decisión de canonical. Seasonalities y
 trendjacking conservan sus líneas independientes.
 
+**Delta 2026-10-22 — canales propios v2.** [PDR-020 revisión 2.0](../../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias)
+cerró la decisión de canonical (el video vive en YouTube y el blog lo incrusta con transcripción) y la secuencia:
+YouTube entra como piloto en febrero de 2027. Instagram y Threads son marca agencia: el Behind the Build de la fila 3
+muestra oficio, sin CTA de venta. Sólo LinkedIn lleva directo a la landing; blog, YouTube y newsletters pasan antes
+por Glitch o una herramienta ([estrategia de love brand §8.4](../../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22)).
+La landing neutral de esta oferta sigue como dependencia (punto 2 de «Dependencias antes de ejecutar»); la serie
+«IA con contexto» tampoco tiene landing al 2026-10-22.
+
 ## Sistema creativo y de pruebas
 
 - **Material principal:** documentos de trabajo auténticos recompuestos para lectura móvil: work chart, ficha de

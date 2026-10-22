@@ -359,6 +359,12 @@ acción, en las piezas nuevas).
 - **El CTA expresa el DESTINO de la etapa, no el ángulo de la pieza.** Varias piezas de la misma etapa del
   embudo convergen en **una sola acción** y lo que cambia entre ellas es el fraseo. Si dos piezas de la misma
   etapa llevan a destinos distintos, la etapa está partida en dos campañas. Ver §9 del mismo canon.
+- **En orgánico de los canales propios de Efeonce, el destino lo fija el canal** (operador, 2026-10-22;
+  [estrategia de love brand §8.4](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) +
+  [PDR-020](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)): Instagram y Threads
+  nunca llevan CTA de venta, precio ni formulario de servicio (su paso es seguir, Glitch o el LinkedIn de Julio);
+  YouTube y el blog llevan antes a Glitch o a una herramienta; **sólo LinkedIn lleva directo a la landing con
+  diagnóstico**. La pauta pagada sigue su propio brief.
 - **Escala tipográfica en horizontal.** En 16:9 el texto se veía perdido, pero la causa **no** es el tamaño de
   fuente respecto de su columna: medido, 4:5 da **968 px** de columna y 16:9 da **901 px** — casi la misma
   columna en un lienzo del doble de ancho. 🔴 **Escalar por ancho de LIENZO es un error**: aplana la jerarquía

@@ -90,6 +90,15 @@ PILLAR: Data study "Estado del AEO en Chile 2026" (blog + PDF)
 
 Un data study se convierte en **8–10 activos** con una fracción del esfuerzo de producir 8 piezas originales.
 
+> ⚠️ **Canales propios de Efeonce (PDR-020, revisión 2.0, 2026-10-22):** el mapa de arriba es genérico; en Efeonce
+> se lee por familia. **Glitch** es el único correo (actualidad); lo evergreen va al **newsletter Marketing con
+> Manzanitas** del LinkedIn de Julio, que invita a Glitch; no se crea otro correo. **Threads** recibe la opinión o la
+> lectura en una frase, no el resumen; **X no se publica** (sólo escucha). **Instagram** es marca agencia: entra
+> sólo si hay un corte de oficio, proceso o equipo, nunca el dato B2B ni el documento de servicio. **YouTube**
+> recibe un tutorial sólo si hay búsqueda validada. Canon:
+> [PDR-020](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) y
+> [estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §8.2–§8.4.
+
 ### Implicación de Studio Credits
 
 Atomizar no significa multiplicar créditos por el número de piezas. Un pillar puede alimentar newsletter,

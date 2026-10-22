@@ -19,3 +19,16 @@ Cada fila debe incluir `métrica`, `definición`, `denominador`, `baseline`, `ta
 - No atribuir causalidad comercial sin diseño de medición.
 - Conectar memoria → confianza → experiencia → activación → negocio.
 - Marcar benchmarks externos como `as-of`, con fuente y confianza.
+
+## Aplicación: love brand de Efeonce (operador, 2026-10-22)
+
+La marca agencia de Efeonce (Instagram y Threads, más el aporte de YouTube y del newsletter de Marketing con
+Manzanitas) se mide con esta misma clasificación controla/influye/monitorea en los planos de canal, comunidad,
+**puente a negocio**, talento y disciplina
+([estrategia §11](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md)).
+
+- El **puente** («¿cómo nos conociste?» en formularios y diagnósticos, fuente del primer contacto en HubSpot,
+  búsquedas de marca, menciones en primeras reuniones) es obligatorio y al 2026-10-22 **no está implementado**: sin
+  él, el love brand queda como opinión.
+- Baseline en noviembre y diciembre de 2026 antes de fijar metas; nunca se declara éxito por seguidores ni por volumen
+  de posts.

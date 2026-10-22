@@ -258,7 +258,7 @@ Kortex y Verk, fuera por ahora. Operar con
   **Qué decide `design-studio`:** composición, lente, foto y QA de píxeles; los valores salen de los tokens
   `efeonceGraphicLine` de AXIS, **nunca** HEX/px transcritos.
 - **Marcas editoriales con reglas propias** (arquitectura): Glitch (magazine semanal) tiene su sub-línea
-  (`efeonce-graphic-line` → `references/glitch.md`) y Marketing con Manzanitas, la marca editorial evergreen del blog,
+  (`efeonce-graphic-line` → `references/glitch.md`) y Marketing con Manzanitas, la marca editorial evergreen de Efeonce (blog, newsletter del LinkedIn de Julio y YouTube; el canal de cada pieza lo decide PDR-020),
   su **registro Marketing con Manzanitas** (aprobado por el operador el 2026-09-28 sobre el
   [canvas v39](https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG)): norma
   [`MANZANITAS_REGISTER_V1.md`](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md),

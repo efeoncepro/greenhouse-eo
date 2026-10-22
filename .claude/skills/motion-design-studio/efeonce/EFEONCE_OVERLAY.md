@@ -155,6 +155,13 @@ Dónde entra el motion:
 - **`efeoncepro.com`**: hero video de las landings de servicio (ej. `/aeo-2/`), spots.
 - **El grader** es la costura top→bottom: un explainer cinematográfico del grader es pieza social-nativa que
   demuestra expertise. Motion + `social-media-studio` lo llevan a cada red (formato por red allá).
+- **Canales propios** (rol por familia en
+  [PDR-020](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)): en **YouTube**
+  (Marketing con Manzanitas) el tutorial «IA con contexto» tiene anatomía fija —promesa y resultado en los primeros
+  30 s sin intro ni logo antes, cara conocida y pantalla real, capítulos con cartela de La órbita, cierre de marca del
+  registro Manzanitas— y los Shorts se cortan de los talking heads; nunca subir reels tal cual ni webinars sin editar
+  ([estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §8.3). En
+  **Instagram** (marca agencia, love brand) el motion muestra oficio, proceso y equipo; no vende.
 
 ## Coherencia con las skills hermanas
 

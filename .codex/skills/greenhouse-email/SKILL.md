@@ -226,6 +226,14 @@ excepción, `application` al contrato `efeonce.email-modules` `0.2.0` (publicado
 agenda; nunca quita módulos por su cuenta. Adopción: TASK-1944. Detalle en
 [references/footer-presentation.md](references/footer-presentation.md) §«Módulos canónicos».
 
+## Correo editorial de Efeonce (operador, 2026-10-22)
+
+**Glitch es el newsletter canónico y el único correo de Efeonce** (hoy no está en el catálogo de correos de
+Greenhouse). Marketing con Manzanitas vive como newsletter quincenal en el LinkedIn de Julio y **no tiene correo
+propio**: no crees un template, tipo ni broadcast de Manzanitas; si hiciera falta, lo evergreen entra a Glitch como
+sección. Canon: [PDR-020, delta 2026-10-22](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)
++ [estrategia de love brand §8.2](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
+
 ## Verificación mínima
 
 Selecciona gates proporcionales al diff:

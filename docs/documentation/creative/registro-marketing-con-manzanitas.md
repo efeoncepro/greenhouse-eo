@@ -1,9 +1,9 @@
 # Registro Marketing con Manzanitas — registro complementario de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-28 por Claude
-> **Ultima actualizacion:** 2026-09-29 por Claude (TASK-1939) (1.4: la ropa del equipo la decide la línea; 1.3: las diez decisiones resueltas: el texto de cierre que cambia con cada pieza, el equipo real en las fotos y los íconos de republicar y enviar; AXIS `v0.3.29`. 1.2: cómo se componen hoy las piezas, decisiones del operador del 2026-09-29 y el eslogan debajo del logo)
+> **Ultima actualizacion:** 2026-10-22 por Claude (1.5: Marketing con Manzanitas como familia de canales —blog, newsletter del LinkedIn de Julio y YouTube— según PDR-020 rev 2.0) · 2026-09-29 por Claude (TASK-1939) (1.4: la ropa del equipo la decide la línea; 1.3: las diez decisiones resueltas: el texto de cierre que cambia con cada pieza, el equipo real en las fotos y los íconos de republicar y enviar; AXIS `v0.3.29`. 1.2: cómo se componen hoy las piezas, decisiones del operador del 2026-09-29 y el eslogan debajo del logo)
 > **Documentacion tecnica:** [ADR del registro Marketing con Manzanitas](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md) · [Norma del registro](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
 > **Manual de uso:** [Componer piezas de Marketing con Manzanitas](../../manual-de-uso/creative/componer-piezas-de-marketing-con-manzanitas.md)
 
@@ -32,6 +32,16 @@ escena, respuesta y cine). Son cosas distintas: el registro Manzanitas es un reg
 > [ADR](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md) · canvas «Marketing con Manzanitas · Línea v1»,
 > versión 39 ([claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG](https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG), privado) ·
 > skill `efeonce-graphic-line` (`criteria.md` §3.4 y §8, `ledger.md` del 2026-09-28)
+
+**Desde el 2026-10-22, MCM es también una familia de canales.** Vive en tres lugares: el **blog** (la casa, donde todo
+llega), el **newsletter quincenal en el LinkedIn de Julio** (una idea explicada a fondo, que siempre invita a
+suscribirse a Glitch) y **YouTube** (tutoriales y Shorts, con la miniatura y el cierre de este registro). Instagram ya
+no lleva carruseles de temas de servicio: pasó a ser un canal de marca agencia. La pieza gráfica del newsletter de
+LinkedIn todavía no está definida en el registro.
+
+> Detalle técnico: [delta 2026-10-22 de la norma](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) ·
+> [sistema de canales y love brand](../social/sistema-de-canales-y-love-brand.md) ·
+> [PDR-020, delta 2026-10-22](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias)
 
 ## Cómo se relaciona con La órbita y con Glitch
 

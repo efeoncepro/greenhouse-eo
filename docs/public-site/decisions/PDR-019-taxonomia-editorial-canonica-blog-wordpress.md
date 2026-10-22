@@ -81,6 +81,12 @@ de categoría ni de la categoría primaria de un post.
   **todos los canales propios** y prohíbe crear una taxonomía social paralela. Consecuencia directa:
   `Agentes` se trata como sub-territorio de `Inteligencia Artificial`, y promoverlo a raíz exige el
   protocolo de migración de URL de este PDR. El foco editorial vigente es **AEO + Inteligencia Artificial**.
+- **Delta 2026-10-22 — sin cambio de taxonomía.** La
+  [revisión 2.0 de PDR-020](PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias)
+  no agrega categorías. La categoría `Glitch` sigue siendo el archivo en el blog del newsletter canónico (Glitch es
+  el único correo de Efeonce). Los artículos de cada tutorial de YouTube y las series nuevas, como «IA con
+  contexto», se archivan en los territorios existentes: una serie o franquicia no es territorio (PDR-020, capa 2), y
+  no se crean categorías por canal ni por serie.
 
 ## Alternativas descartadas
 

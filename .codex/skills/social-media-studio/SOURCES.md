@@ -87,9 +87,10 @@ no coinciden en zonas seguras exactas)**
   ventana de decisión de ~30 min; las **respuestas pesan más que los likes** y la **profundidad del hilo**
   (gente respondiéndose entre sí) extiende distribución; la frescura se pondera fuerte y For You es
   recommendation-driven con seguidores como señal débil. Efeonce **no tiene evidencia propia** de esta
-  red (PDR-020 la abre como experimento con criterio de salida).
+  red (PDR-020 la abre como experimento de marca agencia desde feb-2027, con revisión el 31-mar-2027).
 - **Cadencia óptima (referencial)**: IG 3–5 feed + 2–4 Reels/sem · LinkedIn 2–3/sem ·
   TikTok 5–10/sem · FB/X 1–2/día · YouTube 1–2 long-form/sem + 3–5 Shorts.
+  La cadencia de los canales propios de Efeonce no sale de aquí: la fija PDR-020, Delta 2026-10-22 §6.
 - **Formato IG**: carruseles +109% engagement por persona alcanzada vs Reels; Reels 2,25×
   más alcance que foto única → elegir por objetivo (engagement vs alcance).
 - **Social search**: varias plataformas ofrecen búsqueda, recomendación y analytics propios;

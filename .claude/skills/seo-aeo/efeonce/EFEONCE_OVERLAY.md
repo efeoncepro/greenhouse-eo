@@ -95,6 +95,14 @@
   entrada, estructura citable, enlaces internos al territorio de `PDR-019` — no el texto optimizado para
   dwell en feed. Copiar canibaliza el único activo que se cita. Si el tema no da para esa versión con
   trabajo propio, **se queda sólo en LinkedIn**.
+- **Blog y video de Efeonce (operador, 2026-10-22).** El blog es la casa donde todo llega: cada artículo lleva
+  **autor real** (Julio o alguien del equipo) con su ficha y `Person`, y sus invitaciones van en orden fijo:
+  **primero Glitch, después una herramienta, al final el diagnóstico**. El video vive en YouTube y el blog lo
+  incrusta **dentro de un artículo que responde la misma pregunta, con la transcripción**: el texto que se cita es
+  el del blog. **Ningún video se graba sin búsqueda validada antes** (DataForSEO y Google Trends); el título es la
+  búsqueda dicha como la diría una persona. Canon:
+  [estrategia de love brand §8.2–§8.3](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) +
+  [PDR-020, delta 2026-10-22](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md).
 - **NUNCA** exponer la marca/nomenclatura del portal interno (Greenhouse, "EO",
   Nexa, etc.) en copy SEO público salvo decisión GTM explícita.
 - **NUNCA** publicar salida del AI Content Factory sin pasar information gain +

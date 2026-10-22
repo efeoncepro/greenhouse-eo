@@ -446,6 +446,19 @@ anécdota de Julio.
 **Bloqueo:** texto “correcto” pero sin autoría, hook basado en cifra no verificada, first-person inventada,
 running motif decorativo o CTA que promete una capacidad inexistente.
 
+> **Delta 2026-10-22 — autor real y orden de las invitaciones (decisión del operador).** Canon:
+> [`PDR-020` rev 2.0, punto 8](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias)
+> y [estrategia de love brand §8.2](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22).
+>
+> - **Autor real.** Cada artículo lleva como byline a una persona real (Julio o alguien del equipo) con su ficha de
+>   autor (§11.4). La fila «sin byline personal» del router de la Fase 3 decide la **voz** (Efeonce), no exime de
+>   firmar con una persona; un usuario técnico o de integración nunca queda como autor.
+> - **Orden fijo de las invitaciones:** primero suscribirse a **Glitch** (el newsletter canónico y único correo de
+>   Efeonce), después probar una **herramienta** y al final el **diagnóstico** de la landing del servicio. Pedir el
+>   diagnóstico antes de entregar valor es bloqueo.
+> - **Artículo de un tutorial de YouTube:** el video vive en YouTube y el blog lo incrusta en el artículo que responde
+>   la misma pregunta, con la transcripción como texto canónico.
+
 ### Fase 5. Construir la `GutenbergArticleSpec`
 
 **Objetivo:** separar libertad semántica de ensamblado determinista.

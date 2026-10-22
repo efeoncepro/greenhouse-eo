@@ -48,6 +48,16 @@ y módulo paid media. Propuesta19/10/2026; no hay instalación ni conexión veri
 
 > **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
 
+> **Canales propios de Efeonce — sistema v2 (operador, 2026-10-22).** Tres familias con trabajos distintos:
+> **marca agencia** (Instagram y Threads: love brand y comunidad de fans; nunca venden), **conexión B2B** (LinkedIn
+> Efeonce = credibilidad; LinkedIn de Julio = confianza) y **Marketing con Manzanitas** (blog, newsletter quincenal en
+> el LinkedIn de Julio y YouTube en piloto). **Glitch es el newsletter canónico y el único correo de Efeonce**; el
+> newsletter de LinkedIn invita a Glitch y no existe un segundo correo de Manzanitas. X sólo escucha. Cada canal tiene
+> su paso siguiente y **sólo LinkedIn lleva directo a la landing de servicio**. Antes de planificar calendario,
+> cadencia o mix de los canales propios de Efeonce, cargar
+> [PDR-020, delta 2026-10-22](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) y la
+> [estrategia de love brand](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
+
 > **Qué es esto.** Una skill de dos manos: **(1) conocimiento experto** del marketing
 > digital por **canales, craft y campañas** al estado del arte 2026, y **(2) capacidad
 > de ejecución** (planear una campaña integrada, estructurar una cuenta de paid media,

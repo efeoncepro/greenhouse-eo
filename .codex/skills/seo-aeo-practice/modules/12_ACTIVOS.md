@@ -278,7 +278,7 @@ SI NO CIERRA        Ebooks + Glitch    → nurturing                        [a c
 | **La landing de AEO** *(`/aeo-2/`)* | **Paid + inbound** | **La puerta del Grader.** El destino de LinkedIn / retargeting Meta / Google al dolor | El form |
 | 🔴 **La landing de SEO** | **Paid + inbound** | 🔴🔴 **HOY NO SIRVE: los leads no llegan al CRM** *(`deliveryMode=disabled`)* | 🔴 **Arreglar antes de pautear** |
 | **Los 2 ebooks** *(«El fin de la web» · «Surround Discovery»)* | 🎯 **Nurturing — el que NO está listo** | **El "ahora no" no se pierde: se nutre.** Y el ebook mantiene la conversación viva 6 meses | **El email** |
-| **Blog + Glitch** | **Autoridad, de fondo** | Sostiene todo lo demás. **Una agencia de AEO invisible no tiene argumento** | — |
+| **Blog + Glitch** | **Autoridad y audiencia propia, de fondo** | Sostiene todo lo demás. **Una agencia de AEO invisible no tiene argumento.** El blog invita en orden fijo: **Glitch → herramienta (el Grader) → diagnóstico**; pedir el diagnóstico antes de entregar valor rompe el Why. Glitch es el único correo de Efeonce *(canon: [estrategia de love brand §8.2 y §8.4](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md))* | **La suscripción a Glitch**, primero |
 | **El portal / `/aeo`** | 🎯 **El cierre y la retención** | *"Vas a poder entrar cualquier día y ver qué hicimos y qué se movió — **sin pedirme un reporte y sin creerme nada**"*. 🔴 **Solo AEO. NO prometas la capa de SEO** | — |
 | **El deck de SKY** | **La propuesta** | **La estructura** *(diagnóstico → dónde NO ayudamos → el terreno → el método → la inversión)*. → `templates/propuesta-tipo.md` | — |
 | **El cotizador** | **La propuesta** | 🔴 **Piso 45%.** Ninguna cotización sale sin pasar por él | — |

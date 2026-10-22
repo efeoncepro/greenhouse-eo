@@ -101,7 +101,9 @@ like es un reflejo barato; un save/send es una decisión. Deja de perseguir vani
   bruto. **Responde dentro de la primera media hora** (es la ventana que decide). No publiques acá lo que
   necesita producción: el costo debe ser casi nulo porque la vida útil es corta.
 - ⚠️ **Efeonce no tiene evidencia propia de esta red todavía** (PDR-020 la abre como experimento con criterio
-  de salida). Trata estas señales como hipótesis a validar contra analítica propia, no como línea base.
+  de salida: desde feb-2027, revisión el 31-mar-2027). Trata estas señales como hipótesis a validar contra
+  analítica propia, no como línea base. En Efeonce, Threads es marca agencia (la voz en texto y el oído de la
+  comunidad) y Glitch entra sólo como gancho el día de la edición; X no se publica, sólo se escucha.
 
 ### Facebook / X / emergentes
 - **FB/X**: alcance orgánico bajo; sirven para comunidad existente, grupos, y amplificación.

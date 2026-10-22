@@ -55,7 +55,8 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   página `249582` en `/agencia-creativa/`, quince widgets compilados desde el canvas aprobado y el diagnóstico
   creativo de Growth Forms; publicada el 2026-10-15. [Funcionamiento](../documentation/public-site/agencia-creativa.md),
   [operación](../manual-de-uso/public-site/operar-agencia-creativa.md) y [evidencia del rollout](../audits/public-site/2026-10-15-agencia-creativa-elementor-rollout.md).
-  Contenido de clientes, cifra Sky, Yoast y primer envío real siguen pendientes.
+  Contenido de clientes, cifra Sky, Yoast y primer envío real siguen pendientes. Al 2026-10-22 también responde
+  `/agencia-creativa-v2/` (candidata del 2026-07-07): decidir cuál queda es pendiente del [roadmap](PRODUCT_ROADMAP.md).
 
 - **[Agencia de Medios vigente — Elementor](decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md)** —
   página `251981` en `/servicios/agencia-de-medios/`, dieciséis widgets compilados desde el canvas aprobado y el
@@ -130,7 +131,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 - [PDR-017 — Content Engineering como territorio editorial y doctrina de experiencia](decisions/PDR-017-content-engineering-territorio-editorial.md)
 - [PDR-018 — Pillar + Cluster Experience federada: arquitectura editorial, social search, conversión y runtime](decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md)
 - [PDR-019 — Taxonomía editorial canónica del blog WordPress](decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md)
-- [PDR-020 — Canales propios de Efeonce: un motor editorial, cinco roles de canal](decisions/PDR-020-canales-propios-sistema-editorial.md)
+- [PDR-020 — Canales propios de Efeonce: un motor editorial, cinco roles de canal](decisions/PDR-020-canales-propios-sistema-editorial.md) — **revisión 2.0 (2026-10-22):** tres familias (marca agencia: Instagram y Threads · conexión B2B: LinkedIn · Marketing con Manzanitas: blog, newsletter de LinkedIn y YouTube); Glitch es el único correo; sólo LinkedIn lleva directo a la landing. Estrategia hermana: [Love Brand & Community Strategy](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md); brechas de landing en el [roadmap](PRODUCT_ROADMAP.md).
 - [PDR-021 — Landing Trade Marketing & BTL](decisions/PDR-021-landing-trade-marketing-btl-posicionamiento.md) — posición en el medio entre plataformas que detectan y agencias que ejecutan; término cabeza `trade marketing`, no el modificador `agencia de`. Brief: [Channel & Commerce Landing SEO/AEO Brief V1](CHANNEL_COMMERCE_LANDING_SEO_AEO_BRIEF_V1.md). Ejecución: `TASK-1860`.
 - [PDR-022 — Landing Performance Marketing](decisions/PDR-022-landing-performance-marketing-posicionamiento.md) — spoke de demand capture en `/servicios/performance-marketing/` (página `251997`, **publicada e indexable el 2026-10-17**) que retiró con 301 la legacy `/servicio-gestion-campanas-publicitarias/` (ahora `private`); convive con PDR-025 sin compartir términos de cabecera. Brief: [Performance Landing SEO/AEO Brief V1](PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1.md). Ejecución: `TASK-1865`.
 - [PDR-023 — Landing ASO](decisions/PDR-023-landing-aso-posicionamiento.md) — tercera superficie del grupo `Visibilidad` junto a SEO y AEO; página de expansión y citabilidad en español, no de captura (`aso` es ambiguo y `app store optimization` casi no se busca en español); publicación por fases atada a la extensión Search & App Visibility. Brief: [ASO Landing SEO/AEO Brief V1](ASO_LANDING_SEO_AEO_BRIEF_V1.md). Ejecución: `TASK-1862`.

@@ -50,6 +50,10 @@ Un **pilar** es un tema recurrente que conecta lo que *tú* sabes con lo que tu 
 > `docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md`. **NUNCA crear una taxonomía
 > social paralela.** El "antes/después de marca" en carrusel quedó **descartado** por PDR-020: es el
 > portafolio estático, que optimiza la métrica de vanidad que la propia doctrina declara demotada.
+> En la familia **marca agencia** (Instagram, Threads) cada pieza declara además su **pilar emocional**
+> (orgullo de oficio, generosidad, cercanía, optimismo con criterio) y el peldaño de la escalera del fan que
+> mueve. Es otro eje, no una taxonomía nueva: ordena el trabajo emocional, no el archivo
+> ([estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §3 y §8).
 
 | Pilar | Trabajo | Formato típico | Señal objetivo |
 |---|---|---|---|

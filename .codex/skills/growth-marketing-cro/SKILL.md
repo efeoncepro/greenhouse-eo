@@ -290,6 +290,17 @@ No sumes impresiones, alcance, apariciones o views entre plataformas como si com
 intención. Reporta cada métrica con fuente, ventana y contrato; conecta downstream progress mediante UTMs, eventos,
 referrals, IDs de campaña o evidencia CRM cuando exista. Alcance correlacionado no demuestra conversión ni ingreso.
 
+**Caso Efeonce — canales propios (operador, 2026-10-22).** Cada canal tiene su paso siguiente y ninguno salta
+peldaños: Instagram y Threads → seguir, Glitch o el LinkedIn de Julio (nunca un formulario de servicio); YouTube →
+artículo del blog y Glitch; blog → primero Glitch, después una herramienta, al final el diagnóstico; newsletters →
+artículo o herramienta; **sólo LinkedIn lleva directo a la landing con diagnóstico**. Instagram y Threads no se
+evalúan por conversión directa: su prueba es el **puente fan → conversación** («¿cómo nos conociste?» en formularios
+y diagnósticos, fuente del primer contacto en HubSpot, búsquedas de marca), que **todavía no está implementado**
+(requiere task propia con `greenhouse-growth-forms` + HubSpot): no lo reportes como medido. IA con contexto y nube no
+tienen landing al 2026-10-22. Canon:
+[estrategia de love brand §8.4 y §11](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) +
+[PDR-020, delta 2026-10-22](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md).
+
 ---
 
 ## 7. Voz, idioma y entrega

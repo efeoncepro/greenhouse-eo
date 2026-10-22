@@ -64,6 +64,14 @@ creencias contra el status quo de la industria (`../modules/04`).
 | UI de cara al cliente (Dashboard/360) | profesional, cálido sin ser blando, transparente | conciso; dato primero |
 | Emails del sistema | un partner que está de tu lado pero no te dice que sí a todo | 2–4 oraciones |
 | Landing / marketing | conciso, con filo; cada frase compite por su lugar | 1–2 oraciones |
+| LinkedIn página (conexión B2B) | respeto: oficio, evidencia y criterio; la cultura entra sólo con argumento | post extenso o documento nativo |
+| Instagram y Threads (marca agencia) | cercano, curioso, honesto con los tropiezos, humor observacional suave; nunca vende (ni precios ni «contrátanos») | corto; una idea por pieza |
+| Glitch (correo semanal) | el equipo editorial de Glitch: lo que pasó y qué significa, con punto de vista | la edición y su lectura |
+
+Rol, catálogo y paso siguiente de cada canal propio:
+[PDR-020](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md). Personalidad en
+público y lo que nunca se hace en marca agencia:
+[estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §5 y §10.
 
 **Patrón mental:** ¿estoy *instruyendo* (UI interna), *demostrando con datos* (UI cliente), o
 *condensando con filo* (marketing)? La respuesta define el tono.

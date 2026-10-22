@@ -40,11 +40,15 @@ sin número: «NO ESPERA AL LUNES» + «FLASH»), lanzado en producción el 2026
 `axis-ui-contracts` 0.3.22) y compuesto en local con `pnpm glitch:compose` y un manifiesto `edition.kind: "flash"`
 ([glitch.md §14](references/glitch.md)); la ruta productiva (TASK-1921) todavía sólo conoce la edición semanal. **Nunca** uses
 la manzana, el verde Glitch, la falla en bytes, Guttery ni la cabecera «EDICIÓN #N» en una pieza de Efeonce, y nunca
-dos esferas en una pieza (manzana + lente u órbita).
+dos esferas en una pieza (manzana + lente u órbita). En qué canal se publica cada formato de Glitch (único correo de
+Efeonce; en Threads sólo como gancho) lo decide
+[PDR-020, delta 2026-10-22](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md), no esta
+skill ([glitch.md §6](references/glitch.md)).
 
 ### Marketing con Manzanitas: sub-línea de La órbita, sólo para Manzanitas
 
-Marketing con Manzanitas (MCM, la marca editorial evergreen del blog) es una **sub-línea dentro del sistema de La órbita,
+Marketing con Manzanitas (MCM, la marca editorial evergreen de Efeonce: blog, newsletter del LinkedIn de Julio y
+YouTube, según [PDR-020](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)) es una **sub-línea dentro del sistema de La órbita,
 igual que Glitch** (operador, 2026-09-29: «no sustituye a la orbita es una sublinea dentro del design system de la orbita
 igual que glitch»; los documentos anteriores la llaman «registro complementario»: es lo mismo). Estable en AXIS desde `v0.3.37` (token
 `canonical`, contrato `stable`). Aprobada completa por el

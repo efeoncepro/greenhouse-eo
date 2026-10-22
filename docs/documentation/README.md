@@ -69,13 +69,13 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   fondo y energía, el acento por línea de servicio, la voz del eslogan, el sonido de las animaciones del logo, qué se
   usa en cada caso y pendientes (licencias, prueba de reconocimiento); Glitch tiene su sonido y su música propios, aparte.
 - [Línea gráfica de Glitch — sub-línea de La órbita](creative/linea-grafica-glitch.md) — **sólo para Glitch**, el
-  magazine semanal (no es la línea de Efeonce): qué toma de La órbita y qué es propio (manzana, verde, bytes, Guttery,
+  magazine semanal y el único correo de Efeonce (no es la línea de Efeonce): qué toma de La órbita y qué es propio (manzana, verde, bytes, Guttery,
   cabecera «EDICIÓN #N»), portada A/B/C con regla de rotación, carrusel de LinkedIn, el **Glitch Flash** (segundo
   formato desde el 2026-09-28: una noticia puntual, sin número, cabecera «NO ESPERA AL LUNES» + «FLASH»), video y motion
   aprobados (apertura, tarjeta final, kit de gráficos y la transición de la manzana en bytes, exclusiva de Glitch), qué está
   aprobado y qué es propuesta, reglas que nunca se rompen y pendientes. Incluye su sonido y su música (aprobados, sólo de Glitch) y el porqué de la música.
 - [Registro Marketing con Manzanitas — registro complementario de La órbita](creative/registro-marketing-con-manzanitas.md) —
-  **sólo para Marketing con Manzanitas**, la marca editorial del blog (complementa La órbita, no la reemplaza, y no se
+  **sólo para Marketing con Manzanitas**, la marca editorial del blog, el newsletter del LinkedIn de Julio y YouTube (complementa La órbita, no la reemplaza, y no se
   mezcla con Glitch): qué hereda de La órbita, los acentos por la línea del tema con un solo selector, la cabecera con la
   manzana en contorno, los formatos Pizarra, Escena, Lente y Recreo, la mano «Desliza» en su sitio fijo, la firma y el
   eslogan, la contraportada «A a escala» con una sola conversión, los nueve gráficos (qué pregunta responde cada uno y
@@ -94,6 +94,9 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   [manual](../manual-de-uso/creative/producir-spot-animado.md).
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
+- [Sistema de canales propios y love brand](social/sistema-de-canales-y-love-brand.md) — las tres familias de canales
+  de Efeonce (marca agencia, conexión B2B y Marketing con Manzanitas), qué hace cada canal, Glitch como único correo,
+  la escalera del fan y el paso siguiente de cada canal hacia la conversión. Vigente desde el 2026-10-22.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar
   influencer marketing, UGC, partnerships, whitelisting, derechos, aprobaciones y medición.
 

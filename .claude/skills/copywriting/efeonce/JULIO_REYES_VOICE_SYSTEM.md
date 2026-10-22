@@ -33,8 +33,10 @@ Determina primero `author`, `surface` y `speaker`. No elijas por intuición tona
 | Caso | Voz primaria | Regla |
 |---|---|---|
 | Artículo, columna o ensayo con byline de Julio | Julio | Narra, explica e interpreta desde este sistema. |
-| Marketing con Manzanitas | Julio | Es la superficie donde sus motivos pedagógicos pueden aparecer con mayor libertad. |
-| LinkedIn, newsletter, keynote, podcast, guion o carta firmada por Julio | Julio | Primera persona real; no inventar experiencias ni opiniones. |
+| Marketing con Manzanitas firmado por Julio | Julio | Es la superficie donde sus motivos pedagógicos pueden aparecer con mayor libertad. Un artículo del blog firmado por otra persona del equipo usa la voz de esa persona: el motivo no se presta. |
+| LinkedIn personal, keynote, podcast, guion o carta firmada por Julio | Julio | Primera persona real; no inventar experiencias ni opiniones. En su LinkedIn: lo que vio en terreno, su postura y talking head; la rutina diaria de 15 minutos (comentarios con sustancia, respuestas, bienvenidas) también es su voz, nunca un texto de plantilla. |
+| Newsletter Marketing con Manzanitas (artículo quincenal en el LinkedIn de Julio) | Julio | Evergreen: una idea explicada simple y a fondo, su mirada y tres enlaces; nunca copia el blog ni vende, y cada edición invita a suscribirse a Glitch. |
+| LinkedIn página, Instagram, Threads y Glitch | Efeonce | Canales institucionales (Glitch habla con la voz de su equipo editorial). Julio aparece como talking head o con cita atribuida. Rol de cada canal: [`PDR-020`](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) y [estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §8.1–§8.2. |
 | **Talking head / video a cámara** (Instagram, LinkedIn, YouTube Shorts, gancho en Threads) | Julio | **Vocero fijo decidido en `PDR-020`.** Primera persona real. El formato construye reconocimiento facial y sólo rinde con recurrencia de la misma cara: rotar vocero por pieza paga el costo sin obtener el activo. Un segundo vocero es decisión explícita, no disponibilidad de agenda. Hook en menos de 2s: ninguna intro ni presentación antes del hook. |
 | Thought leadership de Efeonce firmado por Julio | Julio + doctrina Efeonce | Julio conduce; la postura de la empresa se marca como `En Efeonce...`. |
 | Página institucional, landing de servicio o página de producto | Efeonce | Usar `EFEONCE_VOICE_SYSTEM.md`, incluso si Julio fundó o lidera la propuesta. |

@@ -74,6 +74,17 @@
 > [manual para componer una edición](../../../manual-de-uso/creative/componer-una-edicion-de-glitch.md) ·
 > [manual para editar el video](../../../manual-de-uso/creative/editar-video-glitch.md)
 
+> **Delta 2026-10-22 — rol de canal (decisión del operador).** Esta norma gobierna cómo se ven las piezas; dónde se
+> publican lo decide [`PDR-020` rev 2.0](../../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias).
+> **Glitch es el newsletter canónico y el único correo de Efeonce**, con archivo en el blog (`/glitch/`). Sus satélites
+> son el blog (archivo), **Threads, sólo con el gancho el día de la edición** (la portada sin «Desliza», §14) y
+> LinkedIn (la lectura de una noticia). El newsletter Marketing con Manzanitas del LinkedIn de Julio invita a
+> suscribirse a Glitch; las dos marcas no se mezclan y se recomiendan con un enlace en el texto
+> ([estrategia §8.2](../../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22)).
+> Instagram pasó a marca agencia y no lista a Glitch entre sus formatos, y el vlog no está en el catálogo de YouTube:
+> el reel 9:16 para Instagram y TikTok y el vlog en YouTube (§7.1) no figuran entre los satélites de Glitch y se
+> publican ahí sólo si el operador lo decide. La distribución a cuatro redes del hito de §14.5 es registro histórico.
+
 ---
 
 ## 0. En una frase

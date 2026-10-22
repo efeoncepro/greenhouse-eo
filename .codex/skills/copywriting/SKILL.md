@@ -266,7 +266,11 @@ capacidad y derechos no se esconden dentro de ella. Fuentes:
 - **Router de voz:** copy institucional, producto, UI, propuestas y piezas sin byline personal
   usan Efeonce (`efeonce/EFEONCE_VOICE_SYSTEM.md`). Piezas firmadas o habladas por Julio usan
   su voz (`efeonce/JULIO_REYES_VOICE_SYSTEM.md`). En híbridos, Julio narra y la doctrina se
-  atribuye como `En Efeonce...`; nunca mezclar speakers de forma invisible.
+  atribuye como `En Efeonce...`; nunca mezclar speakers de forma invisible. En los canales propios,
+  LinkedIn página, Instagram, Threads y Glitch hablan como Efeonce; el LinkedIn de Julio, su newsletter
+  Marketing con Manzanitas y el talking head, como Julio (rol de cada canal en
+  [PDR-020](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) y la
+  [estrategia de love brand](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md)).
 - **Running motif personal:** `con manzanitas` / `te lo explico con manitas` pertenece a Julio;
   no usarlo en copy institucional ni en textos de otros autores. Cuando se activa en copy visible,
   lleva exactamente `🍏🍏🍏` antes de la puntuación. El wording final de superficies de producto

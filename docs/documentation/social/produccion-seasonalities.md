@@ -20,6 +20,20 @@ conserva las decisiones y parámetros reales; el [manual](../../manual-de-uso/so
 explica cómo repetir el trabajo. El [protocolo de agentes](../../operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md)
 enruta las skills.
 
+## Lugar en el sistema de canales (2026-10-22)
+
+Las seasonalities siguen siendo una **línea permanente** de Efeonce. Su canal-hogar es **Instagram**, que desde el
+2026-10-22 es un canal de **marca agencia**: su trabajo es el love brand y la comunidad, no vender. Por eso cada
+temporada se cuenta como una demostración de oficio y nunca como saludo. LinkedIn sólo recibe el argumento profesional
+detrás de la metáfora, cuando un comprador puede leer esa disciplina; nunca la misma pieza con otro texto.
+
+Estado de la temporada de fin de año: **Navidad 2026 se rehace desde cero** (la pieza aprobada el 16 de octubre no se
+usa) y **Año Nuevo quedó archivada sin producir**, conservando su dirección creativa.
+
+> Detalle técnico: [sistema de canales y love brand](sistema-de-canales-y-love-brand.md) ·
+> [PDR-020 §4.4 y delta 2026-10-22](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#44-seasonalities-la-temporada-vista-desde-el-oficio) ·
+> [plan de seasonalities, delta 2026-10-22](../../audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
+
 ## Referencia cultural y planificación
 
 El [calendario de seasonalities preparado por Metricool en Notion](../../../.codex/skills/social-media-studio/references/seasonality-reference-calendar.md)

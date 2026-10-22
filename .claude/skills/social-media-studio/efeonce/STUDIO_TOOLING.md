@@ -33,7 +33,7 @@ Consultar el primero no crea compromisos ni estados en los otros dos.
 | **Copy fino** | `copywriting` | pulir caption/hook/guion (esta skill da la estructura) |
 | **Programar** | **Metricool** MCP | mejor hora, crear post programado, ver calendario |
 | **Medir** | **Metricool** MCP + `../modules/09` | analítica nativa por red |
-| **Capturar lead** | `growth-marketing-cro` + `greenhouse-growth-forms` | grader/newsletter como destino |
+| **Capturar lead** | `growth-marketing-cro` + `greenhouse-growth-forms` | grader o Glitch (el único correo de Efeonce) como destino; el paso siguiente depende del canal y sólo LinkedIn lleva directo a la landing ([estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §8.4) |
 | **Publicar nodo owned (long-form/blog/landing)** | `efeonce-public-site-wordpress` | la pieza owned relacionada; social puede distribuirla o aportar un nodo platform-native autónomo |
 
 ## Metricool MCP — endpoints canónicos

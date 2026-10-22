@@ -16,6 +16,13 @@ El contenido participa en ese motion como `Content-to-Capability Loop`: Glitch d
 autoridad canónica, YouTube demuestra el mecanismo, los servicios transfieren criterio y los productos convierten
 ese aprendizaje en capacidad. Canon: [`Efeonce Content-to-Capability Loop V1`](../strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md).
 
+Los canales propios se ordenan en tres familias (2026-10-22): **marca agencia** (Instagram y Threads) construye love
+brand y comunidad de fans dentro de las empresas, sin conversión directa; **conexión B2B** (LinkedIn de Efeonce y de
+Julio) abre la conversación de negocio y es el único canal que lleva directo a la landing; **Marketing con Manzanitas**
+(blog, newsletter en el LinkedIn de Julio y YouTube) educa y vuelve propia a la audiencia vía Glitch. Todo termina en
+las landings de servicio con su oferta de entrada. Canon: [PDR-020](../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias)
+y [estrategia de love brand §8.4](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22).
+
 ## Posicionamiento
 
 **Categoría de mercado:** *AI-enabled marketing and growth systems company.* En lenguaje comercial: **Integrated Growth Partner**. **ASaaS** describe el modelo de delivery y monetización; **Growth Operating System** describe la visión de largo plazo. No somos una "AI agency" ni un proveedor de servicios sueltos. Combinamos personas, product services, plataformas y agentes. "Agencia de marketing digital" se conserva como término de captura de demanda, no como categoría estratégica. La propuesta se construye sobre tres conceptos propietarios:

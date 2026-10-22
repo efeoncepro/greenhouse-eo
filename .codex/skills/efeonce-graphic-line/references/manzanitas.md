@@ -40,7 +40,10 @@
 > todavía no compone MCM.
 
 **Nombre canónico:** «registro Marketing con Manzanitas» (abreviado «registro MCM» o «registro Manzanitas»). MCM es la
-marca editorial evergreen del blog de Efeonce: marketing explicado simple.
+marca editorial evergreen de Efeonce: marketing explicado simple, en el blog, el newsletter quincenal del LinkedIn de
+Julio y YouTube (familia de canales de
+[PDR-020, delta 2026-10-22](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)).
+Qué canal publica cada pieza lo decide PDR-020, no este registro.
 
 ## 0. Alcance — decide esto primero
 
@@ -221,6 +224,10 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
 - **Miniatura de YouTube:** Escena 16:9 (1280 × 720 en el canvas), cabecera de MCM arriba a la izquierda y el logo de
   Efeonce abajo a la izquierda (tablero `Escena-youtube`). Sin eslogan. El **cierre del video** sí lo lleva
   (`YouTube-cierre`).
+- **Un tutorial (operador, 2026-10-22):** cada video sale con **dos miniaturas** para la prueba A/B de YouTube; el
+  título es la búsqueda dicha como la diría una persona, nunca clickbait; capítulos con una cartela de La órbita por
+  capítulo y cierre de marca de este registro. Anatomía completa en la
+  [estrategia de love brand §8.3](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
 - **Pódcast (1:1):** la cabecera del programa en grande (**420 px**), porque la portada se ve a 160 px (ahí queda en
   62 px). Sin eslogan.
 

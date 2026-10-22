@@ -182,3 +182,24 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
 - Notion conserva el calendario visible y los placeholders numerados; Greenhouse opera el pipeline agéntico y WordPress recibe el draft gobernado.
 - La autonomía V1 termina en WordPress `private`. Publicar exige autorización humana explícita.
 - Arquitectura y fuentes de verdad: `docs/architecture/GREENHOUSE_GLITCH_AGENTIC_EDITORIAL_PIPELINE_DECISION_V1.md`.
+
+## Delta 2026-10-22 — canales propios en la capa de adquisición
+
+El layering no cambia. [PDR-020 revisión 2.0](PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias)
+precisa qué hace cada canal dentro de la capa 1 y cómo llega a la capa 2:
+
+- **«YouTube · canales sociales» ya no es un solo bloque.** Instagram y Threads son **marca agencia**: love brand y
+  comunidad de fans, sin conversión directa ni formularios. LinkedIn es **conexión B2B** y el único canal que salta
+  directo a una landing de la capa 2. Blog, newsletter del LinkedIn de Julio y YouTube forman la familia
+  **Marketing con Manzanitas**. X sólo se usa para escuchar.
+- **Glitch es el newsletter canónico y el único correo de Efeonce**; su archivo sigue en el blog (`/glitch/`). El
+  newsletter Marketing con Manzanitas del LinkedIn de Julio es audiencia arrendada que invita a Glitch.
+- **Marketing con Manzanitas y Glitch son marcas editoriales hermanas** (Manzanitas explica *cómo*; Glitch cuenta
+  *qué pasó*), cada una con su línea gráfica y sin mezclarse
+  ([estrategia de love brand §8.2](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22)).
+  Esto ajusta la jerarquía `Think → Marketing con Manzanitas → Glitch` del diagrama: compartir el blog como archivo
+  no hace de Glitch una sección de Manzanitas.
+- **Video canónico en YouTube, texto canónico en el blog** (el artículo incrusta el video con su transcripción).
+- La costura hacia la capa 2 sigue siendo el diagnóstico y las herramientas: cada canal tiene su paso siguiente
+  ([estrategia de love brand §8.4](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22)).
+- El naming visible Think / Marketing con Manzanitas sigue pendiente (decisión 6 de PDR-020).

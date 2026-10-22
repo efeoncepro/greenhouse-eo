@@ -525,6 +525,12 @@ Do not expose HubSpot `formGuid`, portal id, property names or mappings to the b
 this. The browser still gets only the Greenhouse render contract; HubSpot form definition changes are
 server-side destination hygiene.
 
+**Pendiente: «¿cómo nos conociste?» (operador, 2026-10-22).** La
+[estrategia de love brand](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) (§11 y §14.1)
+exige medir el puente fan → conversación con ese campo en formularios y diagnósticos y una propiedad de fuente de
+primer contacto en HubSpot. Hoy no existe: no lo declares implementado. Requiere task propia; cuando se haga, entra
+como nueva versión de cada formulario y por el camino de arriba (propiedad, `fieldGroups`, `fieldMapping` y smoke).
+
 ---
 
 ## Security & PII

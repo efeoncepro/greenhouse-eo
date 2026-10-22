@@ -254,6 +254,12 @@ para el negocio. Canon, mapa a servicios y reglas: [`EFEONCE_AI_CONTEXT_NARRATIV
   partner de ambos y el ángulo es provider-fit.
 - **Entrada:** evaluación RevOps, chequeo de salud de datos, Radiografía AEO, taller de equipo agéntico o Creative
   Diagnostic; la expansión sigue el §4 del canon.
+- **Inbound desde canales propios (operador, 2026-10-22):** sólo LinkedIn lleva directo a la landing de servicio con
+  su diagnóstico; Instagram, Threads, YouTube y el blog llevan antes a Glitch, a una herramienta o al LinkedIn de
+  Julio. En la primera reunión, pregunta cómo nos conoció el contacto y anota si mencionó Instagram o YouTube: es
+  parte de la medición del puente fan → conversación, que en formularios y HubSpot todavía no existe. La línea «IA con
+  contexto» (Engine) y nube no tienen landing al 2026-10-22. Canon:
+  [estrategia de love brand §8.4 y §11](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
 
 ## Hard rules (Greenhouse-specific commercial)
 
