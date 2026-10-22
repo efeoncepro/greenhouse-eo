@@ -112,7 +112,9 @@ Comparar archivos en destino. No afirmar sincronización remota ni permisos a pa
 10. Guardar PROGRAMACION.md y evidencia saneada con IDs/enlaces. Reportar programado, no publicado.
 
 **Posts de imagen (desde 2026-09-16):** subir y publicar **PNG**. Carrusel de Instagram: URLs en orden y un texto
-alternativo por imagen. Documento de LinkedIn: las mismas imágenes con `publishImagesAsPDF` y título del documento.
+alternativo por imagen. LinkedIn: **nunca el carrusel de Instagram** (decisión del operador, 2026-10-22); puede usar el visual clave como
+imagen única con su argumento propio. Un documento de LinkedIn (`publishImagesAsPDF` + título) se arma sólo con
+láminas hechas para LinkedIn.
 Para corregir un post programado se envía el contenido completo: el ID cambia y el UUID se mantiene.
 [Caso Viva México y previa 18](../../operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).
 

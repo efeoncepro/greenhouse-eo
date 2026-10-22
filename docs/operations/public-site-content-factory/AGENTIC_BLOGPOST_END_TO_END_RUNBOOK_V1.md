@@ -370,9 +370,13 @@ Aplicar el router `author + surface + speaker`:
 | Artículo con byline de Julio                              | Julio                      | Observa, narra e interpreta; no inventar primera persona.                   |
 | Marketing con Manzanitas                                  | Julio                      | Puede usar sus motivos pedagógicos cuando cumplen una función real.         |
 | Thought leadership Efeonce firmado por Julio              | Julio + doctrina atribuida | Julio conduce; la postura organizacional se introduce como `En Efeonce...`. |
-| Artículo institucional, multi-autor o sin byline personal | Efeonce                    | Profesional-directo, prueba sobre hype, sin intimidad prestada.             |
+| Artículo institucional o multi-autor (con autor real)     | Efeonce                    | Profesional-directo, prueba sobre hype, sin intimidad prestada.             |
 | Superficie institucional aunque Julio sea fundador        | Efeonce                    | La superficie prevalece sobre familiaridad tonal.                           |
 | Autor/speaker incierto                                    | Bloqueado                  | No imitar a Julio como “voz humana genérica”.                               |
+
+**Autor real siempre (operador, 2026-10-22; PDR-020 delta punto 12):** todo artículo del blog lleva como autora a una
+persona (Julio o alguien del equipo) con su ficha, también cuando la voz es institucional. No se publica con byline
+«Efeonce» ni sin byline; en un artículo multi-autor firman las personas. La voz sigue el router; la firma, no.
 
 Para voz Julio, cargar el sistema vigente
 [`JULIO_REYES_VOICE_SYSTEM.md`](../../../.codex/skills/copywriting/efeonce/JULIO_REYES_VOICE_SYSTEM.md). Para voz

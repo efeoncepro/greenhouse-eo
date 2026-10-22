@@ -123,7 +123,7 @@ Hay tres conceptos distintos que el canon anterior mezclaba:
 | Concepto | Trabajo | Estado vigente |
 |---|---|---|
 | **Think, producto de contenido** | Demand generation, nurturing, autoridad, blog, newsletter, tools y lead magnets | Es la capa editorial descrita por PDR-003 |
-| **Marketing con Manzanitas** | Marca editorial flagship dentro de Think | Publica artículos, Pillars y series como Glitch |
+| **Marketing con Manzanitas** | Marca editorial visible del hub (Think es nombre interno, 2026-10-22) | Publica artículos y Pillars; Glitch es marca hermana con archivo en el mismo blog |
 | **`think.efeoncepro.com`** | Runtime Astro actual para experiencias enfocadas, tools, reportes y muestras | No es el destino automático de toda guía o Pillar |
 
 Por tanto:

@@ -142,8 +142,8 @@ Los catálogos por canal están en PDR-020; esta sección dice qué trabajo emoc
 **Threads:** la voz de la agencia en texto (opinión, la noticia en una frase, pregunta abierta, aprendizaje en bruto
 y el gancho de Glitch). Su trabajo emocional es la cercanía; también sirve para escuchar.
 
-**YouTube:** gana afecto desde la utilidad. Los tutoriales «IA con contexto» los presentan caras que se repiten, con
-un formato reconocible. `[recomendación]` Cuando haya capacidad, una serie de personalidad trimestral («El estudio
+**YouTube:** gana afecto desde la utilidad. Los tutoriales «IA con contexto» los presenta Julio, la cara del piloto,
+con un formato reconocible; en episodios de especialidad entra alguien del equipo como invitado. `[recomendación]` Cuando haya capacidad, una serie de personalidad trimestral («El estudio
 por dentro»), sin abandonar el rol de segundo buscador.
 
 **Newsletter Marketing con Manzanitas:** la relación más íntima: la idea a fondo y la mirada de Julio para quien ya
@@ -229,6 +229,14 @@ experiencia para buscadores e IA.
   enlace en el texto.
 - **No hay un segundo correo de Marketing con Manzanitas.** Dos correos de la misma marca compiten por la misma
   bandeja. Si hiciera falta, lo evergreen entra a Glitch como sección.
+- **El público ve «Marketing con Manzanitas».** «Think» es el nombre interno del hub y el dominio de herramientas
+  (`think.efeoncepro.com`); nunca va como logo, encabezado ni nombre de canal. En la web Glitch sigue dentro del blog,
+  pero como marca es hermana de Manzanitas, no una sección suya (PDR-020, delta punto 12, 2026-10-22).
+- **Formatos de Manzanitas y Glitch fuera de su casa** `[operador, 2026-10-22]`: la story de Manzanitas va en stories
+  de Instagram (nunca en el feed), máximo una por semana, como generosidad y con enlace al blog o a la suscripción a
+  Glitch. El reel y el vlog de Glitch quedan en pausa hasta que el piloto de YouTube pruebe el ritmo. El pódcast no
+  tiene canal por ahora; si se produce, va a YouTube en video, bajo Manzanitas. En los destacados de Instagram,
+  «07 Podcast» se retira y «01 Glitch» se reorienta a la suscripción.
 
 ### 8.3 YouTube: el amor desde la utilidad `[operador, 2026-10-22]`
 
@@ -244,7 +252,8 @@ caras se repiten. Su fan es el marketer que busca un «cómo» y, en IA con cont
 | **En vivo** | el encuentro trimestral, en YouTube y LinkedIn Live; después queda como video | desde marzo |
 
 **Anatomía de un tutorial:** (1) los primeros 30 segundos dicen la promesa y muestran el resultado, sin intro ni logo
-antes; (2) una cara conocida y la pantalla real; (3) capítulos y una cartela de La órbita por capítulo; (4) cierre de
+antes; (2) la cara de Julio (o un invitado del equipo que Julio presenta, en episodios de especialidad, siempre voluntario)
+y la pantalla real; (3) capítulos y una cartela de La órbita por capítulo; (4) cierre de
 marca del registro Manzanitas y pantalla final al siguiente video; (5) descripción en orden fijo: artículo del blog →
 Glitch → herramienta → landing del servicio; (6) comentario fijado con una pregunta; las mejores respuestas se vuelven
 el siguiente tutorial («Tú preguntas»).
@@ -285,7 +294,7 @@ La conversión no es el final: en el bow-tie (`11_hubspot-bowtie.md`), el client
 **Landings por serie (medido en efeoncepro.com el 2026-10-22):** medios `/servicios/agencia-de-medios/` y performance
 `/servicios/performance-marketing/` (con formulario de diagnóstico); SEO/AEO `/servicios/posicionamiento-seo/` y
 `/aeo-2/` + Brand Visibility Grader; HubSpot `/servicios-contratar-hubspot/` (`/servicios/hubspot/` redirige a un
-artículo de blog de 2024); producción creativa `/agencia-creativa/` y `/agencia-creativa-v2/` (dos versiones vivas);
+artículo de blog de 2024; los posts enlazan a la landing actual hasta que exista el pillar de PDR-013); producción creativa `/agencia-creativa/` y `/agencia-creativa-v2/` (dos versiones vivas);
 web `/desarrollo-sitios-web/`. **IA con contexto y nube no tienen landing** (`/partnership/` sólo muestra logos).
 
 ---
@@ -301,7 +310,7 @@ web `/desarrollo-sitios-web/`. **IA con contexto y nube no tienen landing** (`/p
 5. **Encuentros.** `[recomendación]` Un en vivo por trimestre y un workshop abierto por semestre; presencia en
    eventos del rubro con el equipo como protagonista.
 6. **Pertenencia.** `[recomendación]` Merch como premio a la participación (no sorteo de seguidores) y acceso
-   anticipado a herramientas en beta (Grader, Think).
+   anticipado a herramientas en beta (Grader, Radiografía AEO).
 7. **Espacio propio sólo con masa crítica.** No se abre un grupo, Discord o comunidad cerrada hasta que la
    participación recurrente lo justifique; abrirlo vacío daña la marca. `[recomendación]`
 
@@ -373,5 +382,6 @@ disciplina). Clasificación según `efeonce-brand-studio`: **controla** (lo hace
 4. **Prueba de reconocimiento** de los activos de amor (La órbita, caras, códigos) antes de depender de ellos en pauta.
 5. **Landing de IA con contexto** antes del 4-ene-2027, cuando abre su serie: sin ella, LinkedIn, el primer tutorial y
    el blog no tienen dónde convertir. Lo mismo para nube. Requiere task propia del sitio público.
-6. **Higiene de landings:** decidir cuál de las dos landings de agencia creativa queda y corregir la redirección de
-   `/servicios/hubspot/`.
+6. **Higiene de landings:** decidir cuál de las dos landings de agencia creativa queda y reemplazar la redirección de
+   `/servicios/hubspot/` por una 302 temporal hacia `/servicios-contratar-hubspot/` hasta que se publique el pillar de
+   PDR-013 (cambio en producción del sitio: requiere autorización).

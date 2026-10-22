@@ -25,10 +25,11 @@ EJE A — SUPERFICIES front-of-house  (mapeadas al BOW-TIE: adquisición → exp
 
   ── LADO IZQUIERDO: ADQUISICIÓN (un continuo por etapa de funnel) ──
 
-  1. Demand GEN + nurturing (top-of-funnel)  =  THINK (producto/hub de contenido · web + email)
-       ├─ Marketing con Manzanitas   (BLOG · marca editorial flagship)
-       │      └─ Glitch              (sección de noticias: blogpost + newsletter
-       │                              semanal — IA, Marketing, Negocios)
+  1. Demand GEN + nurturing (top-of-funnel)  =  THINK (hub de contenido · nombre interno · web + email)
+       ├─ Marketing con Manzanitas   (marca editorial visible · blog, newsletter del
+       │                              LinkedIn de Julio y YouTube · explica cómo)
+       ├─ Glitch                     (marca hermana · newsletter canónico por correo,
+       │                              archivo en el blog · cuenta qué pasó)
        ├─ AI Visibility Grader       (tool / lead magnet)
        ├─ Ebooks · Webinars · Podcast (lead magnets / thought leadership)
        ├─ YouTube · canales sociales (distribución y confianza)
@@ -89,10 +90,10 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   networking y memoria. Greenhouse es el command center que vuelve esa experiencia
   visible y acumulable; no sustituye YouTube, sociales, webinars, podcast, ebooks
   ni sesiones de comunidad.
-- **Think es EL producto/hub de contenido** (destino de marca, no host obligatorio), con jerarquía de propiedades:
-  `Think (hub) → Marketing con Manzanitas (blog · marca editorial flagship) →
-  Glitch (sección de noticias: blogpost + newsletter semanal, IA/Marketing/
-  Negocios)`, más tools/lead magnets como hermanos del blog (grader, ebooks,
+- **Think es EL producto/hub de contenido** (destino de marca, no host obligatorio; desde 2026-10-22 es nombre
+  interno y el público ve Marketing con Manzanitas), con propiedades hermanas:
+  `Think (hub) → Marketing con Manzanitas (marca editorial visible) · Glitch (newsletter de noticias, marca
+  hermana con archivo en el blog)`, más tools/lead magnets como hermanos (grader, ebooks,
   webinars, podcast). YouTube y canales sociales son distribución/relación del
   mismo sistema editorial, no capas rivales. El bloque Gutenberg
   `efeoncepro/glitch-drop` (TASK-1337) es solo el
@@ -202,4 +203,7 @@ precisa qué hace cada canal dentro de la capa 1 y cómo llega a la capa 2:
 - **Video canónico en YouTube, texto canónico en el blog** (el artículo incrusta el video con su transcripción).
 - La costura hacia la capa 2 sigue siendo el diagnóstico y las herramientas: cada canal tiene su paso siguiente
   ([estrategia de love brand §8.4](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22)).
-- El naming visible Think / Marketing con Manzanitas sigue pendiente (decisión 6 de PDR-020).
+- **Confirmado por el operador el 2026-10-22** ([PDR-020, delta punto 12](PDR-020-canales-propios-sistema-editorial.md)):
+  Manzanitas y Glitch son hermanas y el diagrama de arriba ya lo refleja; en la web Glitch sigue dentro del blog.
+- **Naming visible resuelto:** el público ve Marketing con Manzanitas. Think es el nombre interno del hub y el dominio
+  de herramientas (`think.efeoncepro.com`); nunca va como logo, encabezado ni nombre de canal.

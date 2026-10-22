@@ -83,7 +83,8 @@ El asset fuente y su procedencia viven en `src/assets/fonts/BricolageGrotesque-V
 - **Canal-hogar: Instagram** (PDR-020 §4.4 — el contenido estacional es línea propia permanente). **LinkedIn
   recibe el argumento profesional desarrollado detrás de la metáfora**, no la misma pieza con otro caption, y
   sólo cuando la disciplina es legible para un comprador. Si no hay argumento propio, la pieza se queda en
-  Instagram. Transcreación para Estados Unidos cuando corresponda.
+  Instagram. **Puede compartir el visual clave, nunca el carrusel** (operador, 2026-10-22; PDR-020 delta punto 12):
+  en LinkedIn va como imagen única con su argumento propio. Transcreación para Estados Unidos cuando corresponda.
 - **Pilar emocional y peldaño** de la escalera del fan: Instagram es marca agencia (love brand, sin conversión
   directa) y la seasonality ancla por defecto en *orgullo de oficio*; declarar también el mecanismo y la señal
   ([estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §3, §7 y §8).

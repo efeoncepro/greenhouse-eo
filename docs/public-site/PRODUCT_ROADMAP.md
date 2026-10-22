@@ -222,8 +222,8 @@ capability dentro del sistema, no presentarse como agencia suelta.
  territorios se heredan de PDR-019; el vocero de talking head es Julio Reyes. La revisión 2.0 cerró canonical
  de video (vive en YouTube; el blog lo incrusta con transcripción), secuencia de apertura y cadencia. **No
  autoriza producción, apertura de cuentas ni cambios en el sitio:** siguen abiertos el inventario de
- tools/webinars y el naming visible (compartidos con `TASK-1802`, que lo siguen bloqueando) y cuántos territorios
- se abren. Estrategia hermana: [Love Brand & Community](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
+ tools/webinars (compartido con `TASK-1802`, que lo sigue bloqueando) y cuántos territorios se abren. El naming
+ visible se cerró el 2026-10-22 (delta, punto 12): el público ve Marketing con Manzanitas y Think es nombre interno. Estrategia hermana: [Love Brand & Community](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
 - **Brechas de conversión de los canales propios** (medidas en efeoncepro.com el 2026-10-22,
  [estrategia de love brand §8.4 y §14](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22)).
  Cada canal termina en una landing de servicio con su oferta de entrada; tres destinos no están listos:
@@ -232,7 +232,8 @@ capability dentro del sistema, no presentarse como agencia suelta.
  - **Agencia creativa duplicada:** `/agencia-creativa/` (página `249582`) y `/agencia-creativa-v2/` siguen vivas;
    decidir cuál queda.
  - **`/servicios/hubspot/`** redirige a un artículo de blog de 2024; la landing vigente es
-   `/servicios-contratar-hubspot/`. Corregir la redirección (ver PDR-006/PDR-013).
+   `/servicios-contratar-hubspot/`. Decidido 2026-10-22: 302 temporal hacia la landing vigente hasta publicar el
+   pillar de PDR-013, que aplica el 301 definitivo (cambio en producción, con autorización).
  - La **medición del puente** fan → conversación («¿cómo nos conociste?» y fuente del primer contacto en HubSpot)
    no existe; requiere task propia (`greenhouse-growth-forms` + HubSpot).
 - **Territorio editorial “Creative Workflows”** (PDR-014, Pillar V4 publicada; satélites siguientes): la

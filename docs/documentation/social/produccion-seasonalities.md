@@ -102,7 +102,8 @@ rechazó por no conectar. No usa bandera, escudo ni himno por la ley mexicana de
 estática de alto impacto muestra el 17 convertido en 18, con colores corporativos y banderines de fonda.
 
 Aprendizajes para el equipo: las imágenes sociales se publican en PNG; las personas del equipo aparecen sólo con su
-consentimiento; un documento de LinkedIn puede armarse con las mismas imágenes del carrusel; y cuando se pide alto
+consentimiento; LinkedIn nunca repite el carrusel de Instagram, aunque puede usar el visual clave como imagen única con su propio
+argumento (decisión del 2026-10-22); y cuando se pide alto
 impacto, la respuesta es luz, cámara, material y acción, no más elementos.
 
 > Detalle técnico: [bitácora del caso](../../operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).

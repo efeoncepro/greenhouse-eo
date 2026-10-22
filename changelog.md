@@ -11,6 +11,15 @@
   dentro de las empresas, pilares anclados al Why, escalera del fan, mecánicas y medición del puente a negocio.
   Contexto `09`/`10`/índice y skills de marca, social y contenido conectados (espejos sincronizados).
 
+## 2026-10-22 — Canales Efeonce: seis decisiones del operador
+
+- [PDR-020, delta punto 12](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md): Glitch y
+  Marketing con Manzanitas son marcas hermanas; el público ve Manzanitas y Think queda interno (cierra la decisión 6 y
+  el naming de TASK-1802); 302 temporal pendiente para `/servicios/hubspot/`; seasonalities comparten visual clave,
+  nunca carrusel; story de Manzanitas en stories de Instagram; reel y vlog de Glitch en pausa; pódcast sin canal;
+  tutoriales de YouTube con Julio. PDR-003, PDR-018, estrategia, normas, manuales y skills alineados.
+- Calendario de Notion: se retiró la opción `Twitter 🐦` de `Plataforma` (ninguna fila vigente la usaba).
+
 ## 2026-10-22 — Kibernum: outreach y segmentación comprobados
 
 - Contact/Company/Primary y seis membresías activas del contacto verificados; correo con firma gráfica/CCO y brochure 360° completo, EMAIL SENT e InMail publicados. Referencias espejo incorporan el caso; sin nueva automatización ni permisos. [Registro y límites](docs/commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md).
@@ -655,15 +664,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 
 - Studio `7e081d0` + `11ec7fa` sin push. Medido en producción: navegación congelada 0,36–1,4 s y RSC del mes 226 KB (la bandeja lateral pesaba ~150 KB). Lecturas en paralelo, catálogo en memoria, bandeja recortada (8 + «Ver las N restantes»), estado pendiente visible, hoja provisional y prefetch de períodos vecinos; local: render −30/−45 % y mes vecino sin petición.
 - Motion desde `axisMotion` aprobado en el canvas «v3.6»: View Transitions de mes y vista, FLIP al filtrar, entradas y salidas con origen, arrastrar para cerrar, check/halo/aviso con Deshacer; alternativa reducida por momento. [Contrato](docs/ui/motion/TASK-2002-marketing-studio-activations-calendar-motion.md). Deploy con señal del operador.
-
-## 2026-10-05 — Efeonce Factory: vía comercial On-Demand
-
-- Decisión explícita del operador: Factory convierte capacidad disponible en encargos con margen y caja adicional;
-  vía transversal: web, contenido, audiovisual, medios y más; campaña y kit son ejemplos opcionales.
-  Entradas: licitaciones públicas/privadas, prospección fría y paid media; costo, conversión y cobro por entrada.
-  [ADR aceptado](docs/architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md), modelo de negocio/fichas e
-  índices/contexto/skills Codex–Claude conectados. Economics y capacidad por encargo pendientes; sin runtime o envío.
-- [HubSpot verificado](docs/commercial/tenders/FACTORY_HUBSPOT_CHANGESET_2026-10-05.md): cinco nuevas en preparación,
-  veinte vencidas a perdido; registros/forecast actualizados. Corrección del operador: tres Factory On-Demand,
-  ISP diseño y UNAP bajo Efeonce por operación continua. Modelo V1.3/delta aceptado. UNAP sin amount; deriva de bucket anotada.
-- Priorización corregida a fit, sin cupo por horas libres; 14 fichas adicionales revisadas y ocho borradores técnicos específicos, con matrices y economía pendiente. [Cola y fuentes](docs/commercial/tenders/LICITALAB_PRIORITY_QUEUE_2026-10-05.md). Sin nuevas altas CRM ni ofertas presentadas en este corte.

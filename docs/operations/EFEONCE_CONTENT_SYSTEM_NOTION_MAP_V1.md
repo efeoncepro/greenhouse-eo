@@ -18,11 +18,12 @@ y LinkedIn Julio · Marketing con Manzanitas: blog, newsletter en el LinkedIn de
 - **Los dos newsletters.** `Newsletter 📰` es una sola opción y no distingue **Glitch** (correo, el newsletter
   canónico y único correo de Efeonce) del **newsletter Marketing con Manzanitas** (artículo quincenal en el LinkedIn
   de Julio, que invita a Glitch).
-- **X como escucha.** X no publica: alimenta Threads y la serie IA con contexto. La opción `Twitter` de
-  `Plataforma` sugiere un destino que el sistema ya no tiene.
+- **X como escucha.** X no publica: alimenta Threads y la serie IA con contexto. La opción `Twitter 🐦` de
+  `Plataforma` **se retiró del Calendario vigente el 2026-10-22** (autorizado por el operador; ninguna fila vigente
+  la usaba, verificado antes del cambio). El Calendario anterior la conserva como histórico.
 
-Se suman a las brechas de §5.2. Ninguna propiedad, opción ni fila de Notion cambió por este delta: cualquier
-ajuste sigue la regla de autorización de §6. Estrategia: [love brand y comunidad](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
+Se suman a las brechas de §5.2. El único cambio aplicado en Notion es el retiro de `Twitter 🐦` (2026-10-22, con
+autorización del operador); cualquier otro ajuste sigue la regla de autorización de §6. Estrategia: [love brand y comunidad](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
 
 ## 1. Las tres bases y cómo se encadenan
 
@@ -96,7 +97,7 @@ archivarse bajo el territorio *Inteligencia Artificial*. Una pieza bien formada 
 ## 4. Schema vigente del Calendario (lo que ya existe)
 
 - **Canal** (select): Social Media · Blog · Email Marketing · Paid Media · Video
-- **Plataforma** (multi): Twitter · LinkedIn 💼 · **LinkedIn Julio 👤** · Instagram · **Threads 🧵** ·
+- **Plataforma** (multi): LinkedIn 💼 · **LinkedIn Julio 👤** · Instagram · **Threads 🧵** ·
   TikTok · YouTube · Facebook · Reddit · Meta ads · Google Ads · Blog 📰 · Newsletter 📰
 - **Tipo de pieza** (select): Carrusel · Reel/Short · Post estático · Video largo · Infografía/Guía ·
   Historia · Blogpost · Newsletter · Meme · **Portafolio**

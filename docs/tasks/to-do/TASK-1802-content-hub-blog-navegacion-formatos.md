@@ -5,8 +5,11 @@
 - PDR-020 decisión 1 (dónde vive canónicamente un video) quedó **cerrada**: el video vive en YouTube y el blog lo
   incrusta dentro de un artículo que responde la misma pregunta, con transcripción; el texto que se cita es el del
   blog — cerrado por la revisión 2.0 de `PDR-020` (sesión de planificación social del operador). Siguen abiertas la
-  decisión 2 (inventario de tools y webinars) y la 6 (naming visible). Marketing con Manzanitas queda confirmado como
-  familia editorial de blog, newsletter de LinkedIn y YouTube.
+  decisión 2 (inventario de tools y webinars). Marketing con Manzanitas queda confirmado como familia editorial de
+  blog, newsletter de LinkedIn y YouTube.
+- PDR-020 decisión 6 (naming visible) quedó **cerrada**: el público ve Marketing con Manzanitas y Think es nombre
+  interno del hub y dominio de herramientas; Glitch es marca hermana que conserva su archivo dentro del blog —
+  cerrado por el punto 12 del delta de `PDR-020` (decisión del operador, 2026-10-22).
 
 ## Avance acotado — etapa 1 local, 20/10/2026
 
@@ -88,10 +91,10 @@ El operador rechazó el candidato inicial por falta de impacto de agencia y sele
 - Motion: `docs/ui/motion/TASK-1802-content-hub-blog-navegacion-formatos-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-019`
-- Status real: `Dirección y arquitectura funcional contratadas; naming, inventario multiformato y bindings por verificar`
+- Status real: `Dirección y arquitectura funcional contratadas; naming resuelto (2026-10-22); inventario multiformato y bindings por verificar`
 - Rank: `TBD`
 - Domain: `public-site|content|growth|ui|seo`
-- Blocked by: `inventario canónico de Tools/Videos/Webinars incl. casos de éxito (PDR-020 decisión 2), canonical de video YouTube-vs-blog (PDR-020 decisión 1) y decisión de naming visible Think/Marketing con Manzanitas (PDR-020 decisión 6)`
+- Blocked by: `inventario canónico de Tools/Videos/Webinars incl. casos de éxito (PDR-020 decisión 2)`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -188,7 +191,7 @@ Reglas obligatorias:
 - Taxonomía editorial aplicada por PDR-019 y los artículos reales publicados.
 - Inventario verificable de Tools, Videos, Webinars, guías y otros recursos con URL canónica y owner.
 - `TASK-1337` sólo para el bloque semántico de Glitch dentro de posts; el hub no espera su cierre para listar Glitch.
-- Decisión editorial del operador sobre el nombre visible `Think` / `Marketing con Manzanitas`.
+- ~~Decisión editorial del operador sobre el nombre visible `Think` / `Marketing con Manzanitas`~~ resuelta 2026-10-22: visible Marketing con Manzanitas; Think interno.
 
 ### Blocks / Impacts
 
@@ -318,7 +321,7 @@ Reglas obligatorias:
 - 2026-08-31: se conservan descansos editoriales full-bleed y banda de suscripción como patrones, no como template.
 - 2026-08-31: archivo/paginación visibles son navegación primaria; búsqueda es complementaria.
 - 2026-08-31: Elementor trae artículos reales desde WordPress; hardcodear cards viola el contrato.
-- Pending: naming visible Think/Marketing con Manzanitas y fuente federada de recursos.
+- 2026-10-22: naming visible resuelto (Marketing con Manzanitas; Think interno). Pending: fuente federada de recursos.
 
 ### Visual verification
 

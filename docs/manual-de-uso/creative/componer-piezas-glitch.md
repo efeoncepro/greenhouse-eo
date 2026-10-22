@@ -49,9 +49,9 @@ animados del video** se generan desde el repo taller y están **aprobados** (202
 
 **Dónde va cada pieza (desde 2026-10-22).** Glitch es el newsletter canónico y el **único correo** de Efeonce; su
 archivo es el blog. En redes va sólo a **Threads** (la portada sin «Desliza», con la noticia más fuerte en una frase y
-la invitación a suscribirse, el día de la edición) y a **LinkedIn** (el carrusel o la lectura de una noticia).
-Instagram ya no recibe Glitch, y el reel y el vlog no tienen hoy un canal asignado: no los programes sin una decisión
-del operador. Detalle: [delta 2026-10-22 de la norma](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) ·
+la invitación a suscribirse, el día de la edición) y a **LinkedIn** (la lectura de una noticia, con su lámina interior
+suelta; el carrusel completo no se publica). Instagram ya no recibe Glitch, y el reel y el vlog están **en pausa**
+(decisión del operador, 2026-10-22): no se graban ni se programan. Detalle: [delta 2026-10-22 de la norma](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) ·
 [sistema de canales](../../documentation/social/sistema-de-canales-y-love-brand.md).
 
 ## Antes de empezar

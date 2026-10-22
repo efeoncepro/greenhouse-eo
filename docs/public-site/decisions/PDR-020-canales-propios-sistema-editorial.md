@@ -10,7 +10,7 @@
 > **tres familias** (marca agencia · conexión B2B · Marketing con Manzanitas); Instagram y Threads pasan a
 > **marca agencia** con objetivo de **love brand y comunidad**; YouTube y el newsletter de LinkedIn de Julio se
 > suman a la familia Marketing con Manzanitas; Glitch entra a Threads sólo como gancho; X queda como canal de
-> escucha. Cierra las decisiones pendientes 1, 4 y 5. Detalle en [Delta 2026-10-22](#delta-2026-10-22--sistema-de-canales-v2-tres-familias).
+> escucha. Cierra las decisiones pendientes 1, 4, 5 y 6 (esta última en el punto 12 del delta). Detalle en [Delta 2026-10-22](#delta-2026-10-22--sistema-de-canales-v2-tres-familias).
 > **Ámbito:** Canales propios de marca Efeonce — Blog (Marketing con Manzanitas), LinkedIn (página y Julio),
 > newsletter Marketing con Manzanitas en el LinkedIn de Julio, YouTube, Instagram, Threads y Glitch
 > (newsletter por correo). X sólo como escucha. No cubre canales de cliente ni paid social.
@@ -102,6 +102,36 @@ es pendiente antes del 4-ene-2027. Detalle y landings medidas en la
 **11. La línea «IA con contexto».** Nombre aprobado para la serie de implementación de IA empresarial: Gemini
 Enterprise, Claude Enterprise, ChatGPT Enterprise, agentes propios y de plataforma, y la nube donde corren. Línea
 de servicio **Engine** (la familia técnica es *Agent Systems & Platforms* de la marca de producto Wave).
+
+**12. Seis decisiones del operador sobre las contradicciones del barrido (2026-10-22).**
+
+- **Glitch y Marketing con Manzanitas son marcas hermanas.** En la web Glitch sigue dentro del blog (misma URL,
+  categoría raíz de PDR-019, sin migración); como marca no depende de Manzanitas. Glitch es el único correo de
+  Efeonce, tiene línea gráfica y cadencia propias y vive en Threads. Corrige el árbol de PDR-003.
+- **El público ve «Marketing con Manzanitas»; «Think» es nombre interno.** Think nombra el hub de contenidos y el
+  dominio de herramientas (`think.efeoncepro.com`, Radiografía AEO); nunca va como logo, encabezado ni nombre de
+  canal. Cierra la decisión pendiente 6 y la de naming de `TASK-1802`.
+- **`/servicios/hubspot/` no se contradice con PDR-013: es una redirección vieja.** Hoy apunta a un artículo de
+  2024. Mientras no exista el pillar de PDR-013, los posts enlazan a `/servicios-contratar-hubspot/` y la
+  redirección vieja se reemplaza por una **302 temporal** hacia esa landing (cambio en producción del sitio, con
+  autorización). Al publicarse el pillar se aplica el 301 de PDR-013.
+- **Seasonalities: se comparte el visual clave, nunca el carrusel.** Para piezas de marca y de servicio Instagram
+  y LinkedIn llevan cortes propios (§4.4). En una seasonality la celebración es la misma, así que LinkedIn puede
+  usar el visual clave, pero como imagen única con su argumento propio.
+- **Formatos sin canal, decididos uno por uno:**
+  - Reel y vlog de Glitch: **en pausa** hasta que el piloto de YouTube pruebe que el ritmo se sostiene. Glitch vive
+    socialmente en Threads y por correo.
+  - Story de Marketing con Manzanitas: **sí, en stories de Instagram** (nunca en el feed), máximo una por semana,
+    como pilar de generosidad, con sticker de enlace al blog o a la suscripción a Glitch.
+  - Pódcast: **sin canal por ahora.** Si se produce, va a YouTube en video y bajo Marketing con Manzanitas.
+  - Destacados de Instagram: «07 Podcast» se retira hasta que exista el pódcast; «01 Glitch» se queda y se
+    reorienta a la suscripción, que es el paso siguiente desde Instagram.
+- **Presentador de los tutoriales de YouTube: Julio es la cara del piloto.** En episodios de especialidad (SEO,
+  paid, HubSpot) entra alguien del equipo como invitado y Julio lo presenta; la participación es voluntaria, como
+  la voz del equipo en LinkedIn.
+- **Menores:** cada artículo lleva una persona como autora, también los de voz institucional; la opción `Twitter`
+  sale del Calendario de Notion; las imágenes sociales van siempre en PNG; LinkedIn lleva de Glitch la lectura de
+  una noticia, no el carrusel de la edición.
 
 ## Contexto
 
@@ -410,8 +440,8 @@ de Contenidos** — mapeadas en `docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_M
   y Webinars"*. Abrir YouTube **genera ese inventario**, pero exige decidir **antes de producir** si el
   canonical de un video es YouTube o el blog. Producir primero y ordenar después es deuda editorial garantizada.
   **Decidido el 2026-10-22:** el video vive en YouTube y el blog lo incrusta en su artículo (delta, punto 6).
-- **El naming visible sigue pendiente** (Think vs Marketing con Manzanitas, declarado en TASK-1802). Abrir
-  canales sin resolverlo obliga a renombrar en seis lugares después.
+- **El naming visible quedó resuelto el 2026-10-22** (delta, punto 12): el público ve Marketing con Manzanitas y
+  Think queda como nombre interno; ningún canal se abre con el nombre Think.
 - **Threads queda como experimento con criterio de salida**, no como compromiso de cadencia: sin documentación
   previa en el repo y siendo la plataforma más volátil del set, se abre con ventana y condición de cierre
   escritas. Su mecánica debe incorporarse a `01_PLATFORM_MECHANICS.md` cuando exista evidencia propia.
@@ -443,7 +473,7 @@ de Contenidos** — mapeadas en `docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_M
 | 3 | **Cuántos territorios se abren** — la recomendación es **dos** (AEO + Inteligencia Artificial/Agentes) | calendario y cadencia |
 | 4 | ~~**Secuencia de apertura de canales**~~ **Cerrada 2026-10-22:** enero núcleo (LinkedIn, Instagram, blog, newsletter); febrero Threads y YouTube | — |
 | 5 | ~~**Cadencia comprometida por canal**~~ **Cerrada 2026-10-22** (ver delta, punto 6); se revisa contra capacidad real al 31-mar-2027 | — |
-| 6 | **Naming visible** Think / Marketing con Manzanitas | heredada de `TASK-1802` |
+| 6 | ~~**Naming visible** Think / Marketing con Manzanitas~~ **Cerrada 2026-10-22:** el público ve Marketing con Manzanitas; Think es nombre interno del hub y dominio de herramientas (delta, punto 12) | — |
 
 
 Recomendación de arranque registrada en sesión: partir por **Instagram (proceso + talking head)**,

@@ -42,7 +42,9 @@ de la marca. Su casa es el correo y su archivo, el blog (`/glitch/`). En redes, 
 noticia más fuerte en una frase el día de la edición y la invitación a suscribirse, y a **LinkedIn**, con la lectura de
 una noticia. El newsletter Marketing con Manzanitas del LinkedIn de Julio cierra cada edición invitando a Glitch, para
 que quien lo lee allí pase a ser audiencia propia. Instagram pasó a ser un canal de marca agencia y no recibe Glitch; el
-reel y el vlog (más abajo) no tienen hoy un canal asignado: se publican sólo si el operador lo decide.
+reel y el vlog (más abajo) están **en pausa** desde el 2026-10-22, por decisión del operador, hasta que el piloto de
+YouTube pruebe que el ritmo se sostiene. En LinkedIn no se publica el carrusel completo: va la lectura de una noticia,
+con su lámina interior suelta como imagen.
 
 > Detalle técnico: [delta 2026-10-22 de la norma](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) ·
 > [sistema de canales y love brand](../social/sistema-de-canales-y-love-brand.md) ·
@@ -95,6 +97,9 @@ La portada tiene partes que se repiten cada semana (la cabecera, la falla en byt
 **Regla de rotación:** nunca se repite la misma plantilla dos semanas seguidas, y la elige el contenido, no el gusto.
 
 ### El carrusel de LinkedIn
+
+Se sigue componiendo como parte de la edición, pero desde el 2026-10-22 **no se publica completo en LinkedIn**: ahí va
+una sola noticia con su lámina interior.
 
 Después de la portada vienen las láminas interiores, una por noticia: la foto en navy que se desarma en bytes, la
 noticia, el Glitch Drop con la opinión del narrador cerrada con la manzana, y un avance de «n de 8». La primera noticia

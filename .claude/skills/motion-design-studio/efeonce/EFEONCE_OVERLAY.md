@@ -158,7 +158,8 @@ Dónde entra el motion:
 - **Canales propios** (rol por familia en
   [PDR-020](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)): en **YouTube**
   (Marketing con Manzanitas) el tutorial «IA con contexto» tiene anatomía fija —promesa y resultado en los primeros
-  30 s sin intro ni logo antes, cara conocida y pantalla real, capítulos con cartela de La órbita, cierre de marca del
+  30 s sin intro ni logo antes, Julio a cámara (en episodios de especialidad, un invitado del equipo que Julio presenta;
+  operador, 2026-10-22) y pantalla real, capítulos con cartela de La órbita, cierre de marca del
   registro Manzanitas— y los Shorts se cortan de los talking heads; nunca subir reels tal cual ni webinars sin editar
   ([estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §8.3). En
   **Instagram** (marca agencia, love brand) el motion muestra oficio, proceso y equipo; no vende.

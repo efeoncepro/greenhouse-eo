@@ -47,10 +47,14 @@
 >   los que pide la anatomía del tutorial de la
 >   [estrategia de love brand §8.3](../../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#83-youtube-el-amor-desde-la-utilidad-operador-2026-10-22);
 >   cada video sale con dos miniaturas para la prueba A/B de YouTube.
-> - **Newsletter del LinkedIn de Julio:** todavía no tiene pieza propia en este registro ni en el token. **[pendiente]**
->   No se improvisa: la pieza se decide con el operador antes de la primera edición.
+> - **Newsletter del LinkedIn de Julio:** pieza agregada el 2026-10-22 en §5.7 (portada de la edición, 1920 × 1080).
+>   Se compone con las reglas de la miniatura de YouTube; el token y el Composer todavía no la tienen como plantilla
+>   propia. **[pendiente: plantilla en AXIS]**
 > - **Instagram ya no lleva carruseles de temas de servicio** (pasó a marca agencia). El carrusel MCM se entrega como documento de
->   LinkedIn (§8.3, §14.5); la story queda como norma gráfica sin canal-hogar asignado hasta que el operador decida.
+>   LinkedIn (§8.3, §14.5). **La story va en stories de Instagram** (nunca en el feed), máximo una por semana, como
+>   generosidad y con enlace al blog o a la suscripción a Glitch (operador, 2026-10-22; PDR-020 delta punto 12).
+> - **Pódcast:** sin canal por ahora. Si se produce, va a YouTube en video y la portada 1:1 de §5.7 queda para las
+>   plataformas de audio que se sumen (operador, 2026-10-22).
 > - MCM y Glitch siguen sin mezclarse (§1.2): el newsletter de LinkedIn invita a suscribirse a Glitch con un enlace en
 >   el texto, nunca con elementos de la sub-línea de Glitch.
 
@@ -330,7 +334,14 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
   cierre de YouTube del canvas v39 tenía el eslogan encima del logo, a 64 px: quedó superado** por la regla del
   2026-09-29, que es posterior y dice «siempre debajo».
 - **Portada de pódcast (1:1):** la cabecera del programa en grande (**420 px**), porque la portada se ve a 160 px. Sin
-  eslogan.
+  eslogan. *Sin canal al 2026-10-22: se usa sólo si el pódcast se produce.*
+- **Portada de la edición del newsletter de LinkedIn (1920 × 1080, 16:9)** (operador, 2026-10-22): la misma
+  composición que la miniatura de YouTube (Escena 16:9 con la voz en su reserva y el logo de Efeonce abajo a la
+  izquierda, sin eslogan), con el título de la edición como voz. Es la imagen que encabeza cada artículo quincenal del
+  LinkedIn de Julio. Nunca lleva elementos de Glitch, aunque el texto invite a suscribirse a Glitch (§1.2). Mientras no
+  exista plantilla en AXIS, se compone desde la miniatura de YouTube cambiando el lienzo a 1920 × 1080 y se revisa que
+  la voz quede dentro del 80 % central (LinkedIn recorta la portada en la vista previa del feed). **[recomendación:
+  el recorte central]**
 
 ### 5.8 Qué lleva cada pieza
 

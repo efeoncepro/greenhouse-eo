@@ -1,7 +1,7 @@
 # Sistema de canales propios y love brand de Efeonce
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-22 por Claude
 > **Ultima actualizacion:** 2026-10-22 por Claude
 > **Documentacion tecnica:** [Efeonce Love Brand & Community Strategy V1](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) ·
@@ -85,6 +85,25 @@ enlace en el texto.
 > Detalle técnico: [estrategia §8.2](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22) ·
 > [línea gráfica de Glitch](../creative/linea-grafica-glitch.md) ·
 > [registro Marketing con Manzanitas](../creative/registro-marketing-con-manzanitas.md)
+
+## Decisiones del 2026-10-22 sobre formatos y nombres
+
+El operador resolvió seis dudas que dejó el ordenamiento de canales:
+
+| Tema | Qué se decidió |
+|---|---|
+| **Glitch y Marketing con Manzanitas** | Son marcas hermanas. En la web Glitch sigue dentro del blog, pero no es una sección de Manzanitas. |
+| **El nombre que ve el público** | Marketing con Manzanitas. «Think» es el nombre interno del hub y del dominio de herramientas; nunca va como logo ni nombre de canal. |
+| **La landing de HubSpot** | Los posts enlazan a `/servicios-contratar-hubspot/`. La dirección `/servicios/hubspot/` pasará a apuntar ahí de forma temporal hasta que se publique el hub de HubSpot. |
+| **Seasonalities en LinkedIn** | Pueden usar el visual clave como imagen única con su propio argumento; el carrusel de Instagram nunca se repite. |
+| **Formatos sin canal** | La story de Manzanitas va en stories de Instagram, una por semana como máximo. El reel y el vlog de Glitch quedan en pausa. El pódcast no tiene canal por ahora. De los destacados de Instagram se retira «Podcast» y «Glitch» invita a suscribirse. |
+| **Tutoriales de YouTube** | Los presenta Julio; en episodios de especialidad entra alguien del equipo como invitado, siempre de forma voluntaria. |
+
+También quedó fijado que cada artículo del blog lleva a una persona como autora, que las imágenes sociales van en PNG y
+que, de Glitch, LinkedIn publica la lectura de una noticia y no el carrusel de la edición.
+
+> Detalle técnico: [PDR-020, delta punto 12](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) ·
+> [PDR-003](../../public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md).
 
 ## Los fans y la escalera
 

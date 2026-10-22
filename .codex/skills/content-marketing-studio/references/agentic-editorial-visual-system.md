@@ -305,7 +305,8 @@ Entregables recomendados por asset informativo **raster**:
 - master PNG original en sRGB;
 - body WebP a `1600px` o `1440px` de ancho, manteniendo proporción útil;
 - fallback WebP de `1200px` cuando el runtime lo necesite;
-- JPEG social cuando la plataforma/CMS tenga mejor compatibilidad que WebP;
+- derivado social en **PNG** (regla de `social-media-studio`: imágenes sociales siempre en PNG); JPEG sólo si la
+  plataforma rechaza el PNG y ese rechazo quedó observado, nunca por costumbre;
 - para hero: crop `16:9` y OG dedicado `1200×630` o equivalente de alta resolución `1440×757`;
 - width/height, MIME, peso, hash y relación master→derivado en manifest.
 

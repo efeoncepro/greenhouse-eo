@@ -37,10 +37,12 @@ bytes. Si algo rompe la línea de Glitch, el comando **no entrega nada** y te di
 
 Lo que **no** hace:
 
-- **No publica.** Subir el carrusel a LinkedIn (Metricool) o el post a WordPress queda fuera del comando: lo hace una
-  persona, con su confirmación. Desde el 2026-10-22, las salidas van al correo de Glitch (el único de Efeonce), al blog,
+- **No publica.** Subir una lámina a LinkedIn (Metricool) o el post a WordPress queda fuera del comando: lo hace una
+  persona, con su confirmación. En LinkedIn va la lectura de una noticia con su lámina interior suelta; el carrusel
+  completo no se publica allí (2026-10-22). Desde el 2026-10-22, las salidas van al correo de Glitch (el único de Efeonce), al blog,
   a LinkedIn y a **Threads** (la pieza `threads`, sólo el día de la edición); Instagram ya no recibe Glitch y la
-  portada del reel y la miniatura del vlog no tienen hoy un canal asignado
+  portada del reel y la miniatura del vlog quedan sin uso mientras el reel y el vlog estén en pausa (decisión del
+  operador, 2026-10-22)
   ([delta de la norma](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)).
 - **No anima.** Los overlays son **cuadros fijos**; los `.mov` animados, el sonido y la música salen del repo taller
   ([Producir el motion, el sonido y la música de Glitch](./producir-motion-glitch.md)).

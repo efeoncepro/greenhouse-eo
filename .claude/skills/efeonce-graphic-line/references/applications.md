@@ -406,9 +406,10 @@ vale en toda aplicación:
   círculo); un destacado con Nexa usa otro nombre y otra destacada. Sus robots no se copian como receta.
 - **Destacados y el rol de Instagram (delta 2026-10-22):** Instagram pasó a ser **marca agencia** (love brand y
   comunidad; [PDR-020](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)). Las
-  portadas siguen aprobadas, pero **01 Glitch** y **07 Podcast** quedan por revisar con el operador: Instagram no
-  está entre los canales de Glitch y Efeonce no tiene canal de pódcast. No publiques historias nuevas en esos dos
-  destacados sin esa decisión.
+  portadas siguen aprobadas. **Decidido por el operador el 2026-10-22** (PDR-020, delta punto 12): **07 Podcast se
+  retira** hasta que exista el pódcast (si se produce, va a YouTube en video, bajo Manzanitas); **01 Glitch se queda y
+  se reorienta a la suscripción**, que es el paso siguiente desde Instagram: sus historias invitan a suscribirse, no
+  resumen ediciones.
 - **Cómo funciona un destacado** (operador, 2026-10-01): para **cambiar** la portada de un destacado existente basta la
   imagen de portada; para **crearlo** hay que publicar primero una historia 9:16 **completa** y agregarla. Instagram
   toma la portada del **círculo central** (franja y 420–1500 de 1920). Una historia con bandas lisas arriba y abajo no

@@ -49,6 +49,12 @@ de la escalera del fan que mueve y su mecanismo; responder cada comentario con s
 **LinkedIn recibe al fan** (§8.1 de esa estrategia): la página construye respeto y Julio confianza; la cultura entra a
 LinkedIn sólo con argumento; Julio sostiene 15 minutos diarios de comentarios y respuestas; el equipo comparte con su
 propia voz (voluntario); los encuentros trimestrales también por LinkedIn Live.
+**Decisiones del 2026-10-22 (PDR-020, delta punto 12):** la story de Marketing con Manzanitas va en **stories de
+Instagram** (nunca en el feed), máximo una por semana, como generosidad y con enlace al blog o a la suscripción a
+Glitch; el **reel y el vlog de Glitch están en pausa**; el **pódcast no tiene canal**; en los destacados, «07 Podcast»
+se retira y «01 Glitch» se reorienta a la suscripción; de Glitch, LinkedIn lleva la lectura de una noticia, nunca el
+carrusel; en una seasonality LinkedIn puede usar el visual clave, nunca el carrusel; los tutoriales de YouTube los
+presenta Julio, con invitados del equipo en episodios de especialidad.
 
 **Franquicias con canal-hogar** (nacen en uno, viajan como corte con trabajo propio, nunca como copia):
 Behind the Build → Instagram · Versus → YouTube + Blog · Educativo → LinkedIn · Glitch → email ·
