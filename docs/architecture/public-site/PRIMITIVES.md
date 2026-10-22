@@ -140,6 +140,17 @@ hasta TASK-2042; el plugin del documento es TASK-2041. Exports, decisiones del L
   - WordPress: el plugin «EO Navegación» (TASK-2041) guarda el documento único y el adaptador de `ohio-child`
     (TASK-2042) lo pinta con el interruptor `eo_site_nav_enabled` (`off`/`pilot`/`on`) y respaldo a Ohio;
   - Think: envoltura Astro, como follow-up cuando se pida.
+- **Contrato con el host** (cualquier sitio, WordPress y Think incluidos; desde AXIS primitives 0.7.2, TASK-2042):
+  - El host **no estiliza dentro de `.axis-site-nav`**. Si una medida difiere del Lab, se corrige en AXIS
+    (`packages/primitives/src/site-nav-css.ts`), nunca con CSS del sitio.
+  - Las únicas entradas del host son dos variables: `--axis-site-nav-offset` (una barra encima de la página, como la
+    del admin de WordPress) y `--axis-site-nav-z` (apilamiento).
+  - El menú se aísla solo: cada regla lleva peso de id (`:not(#axis-site-nav-isolation)`) y la raíz devuelve a sus
+    valores por defecto lo que un tema aplica a todos los elementos: tipo heredado, enlaces y su hover, botones,
+    listas, `li`, alineación de imágenes y corte de palabras. No agrega valores de diseño. Una prueba de navegador de
+    AXIS inyecta una hoja hostil copiada de Ohio y exige estilos, medidas y posiciones idénticas.
+  - El host sí carga las fuentes: Bricolage Grotesque (opsz, wght 200–800; el menú no usa el eje de ancho) y
+    Poppins 300–700.
 - **Receta de vidrio** (aprobada el 2026-10-18; una sola para cápsula, botón «Agenda tu diagnóstico» y hamburguesa; en
   AXIS vive en `axisSiteNav.glass`, nunca valores a mano en el sitio):
 
