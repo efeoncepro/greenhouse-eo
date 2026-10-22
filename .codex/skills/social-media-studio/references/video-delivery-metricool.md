@@ -237,7 +237,16 @@ son evidencia de esa corrida, no valores por defecto.
    versionados `…-v1.{mp4,jpg}` y HTTP 200 por URL antes de programar. Con `gcloud` vencido,
    `pnpm gcloud:auth:playwright -- --force`.
 4. **Menciones en el texto** con los IDs de la tabla de la sección «Menciones» (Google, Google Cloud, Ingram Micro).
-5. **Desvío a no repetir:** las portadas se subieron en JPG sin un rechazo observado. Por la regla dura de §3, la
+5. **`videoThumbnailUrl` aceptado no significa portada publicada** (caso ChatGPT Ads, 22-10-2026). Metricool aceptó la
+   portada PNG en los cuatro posts y la devolvió en el readback. Aun así, el operador vio el Reel de Instagram sin
+   portada: Instagram mostró el cuadro 0, que era casi negro porque el video abría con un fundido. En LinkedIn también
+   faltó, aunque allí pesa menos. Reglas:
+   - El **cuadro 0 del video tiene que funcionar como portada** (hook ya visible, sin fundido desde negro). Así, si la red
+     ignora la portada, el feed no queda vacío.
+   - **Revisa la portada en la cuenta publicada** apenas salga el post. El `PENDING` y el readback no la prueban.
+   - Si falta en un Reel ya publicado, se cambia desde la app de Instagram (editar el Reel → portada) con el PNG de la
+     pieza. Hacerlo es tarea del operador; borrar y republicar sólo se hace con su aprobación.
+6. **Desvío a no repetir:** las portadas se subieron en JPG sin un rechazo observado. Por la regla dura de §3, la
    próxima vez van en PNG (el PNG 4:5 del caso pesaba 1,29 MB, bajo el límite de 2 MB de LinkedIn).
 
 **Specs de portada de video** *(as-of 2026-10-19; guías de terceros, ni Meta ni LinkedIn las confirmaron
