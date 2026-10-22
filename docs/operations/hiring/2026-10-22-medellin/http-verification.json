@@ -1,0 +1,50 @@
+[
+  {
+    "url": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0678",
+    "status": 200,
+    "public_id_present": true,
+    "client_name_leaked": false,
+    "has_job_posting": true,
+    "has_semisenior": true
+  },
+  {
+    "url": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0678/apply",
+    "status": 200,
+    "public_id_present": true,
+    "client_name_leaked": false,
+    "has_job_posting": false,
+    "has_semisenior": true
+  },
+  {
+    "url": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0679",
+    "status": 200,
+    "public_id_present": true,
+    "client_name_leaked": false,
+    "has_job_posting": true,
+    "has_semisenior": true
+  },
+  {
+    "url": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0679/apply",
+    "status": 200,
+    "public_id_present": true,
+    "client_name_leaked": false,
+    "has_job_posting": false,
+    "has_semisenior": true
+  },
+  {
+    "url": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0680",
+    "status": 200,
+    "public_id_present": true,
+    "client_name_leaked": false,
+    "has_job_posting": true,
+    "has_semisenior": true
+  },
+  {
+    "url": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0680/apply",
+    "status": 200,
+    "public_id_present": true,
+    "client_name_leaked": false,
+    "has_job_posting": false,
+    "has_semisenior": true
+  }
+]

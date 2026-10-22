@@ -1,0 +1,27 @@
+{
+  "status": "local_onedrive_folder_written_readback_verified",
+  "checked_at": "2026-10-22T19:11:41.504905-03:00",
+  "cloud_remote_sync_verified": false,
+  "proposal_created": false,
+  "copies": [
+    {
+      "source": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/BRIEF-COMERCIAL-VIGENTE.md",
+      "target": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/13. Agencia Digital 2027/00 - Base comercial interna/BRIEF-COMERCIAL-VIGENTE.md",
+      "sha256": "c8e11f12b41e748bffa209da42596385b3be381bd10bd94b54e3e9867f37334b",
+      "exact_copy": false,
+      "difference": "Only research links expanded to canonical absolute local paths; figures/text preserved"
+    },
+    {
+      "source": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/BASE-COMERCIAL-CONSOLIDADA-2026-10-22.json",
+      "target": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/13. Agencia Digital 2027/00 - Base comercial interna/BASE-COMERCIAL-CONSOLIDADA-2026-10-22.json",
+      "sha256": "cc5966dcb7e4a62e1dcb268929eb7e2e5769885cca7e29b79e4c5eeb6e2a5b9b",
+      "exact_copy": true
+    },
+    {
+      "source": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/CRM-BASE-COMERCIAL-2026-10-22.json",
+      "target": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/13. Agencia Digital 2027/00 - Base comercial interna/CRM-BASE-COMERCIAL-2026-10-22.json",
+      "sha256": "6bbddc6a61e1221e6bb74f0568c83f6fd844504414545288ebd509d7e952e51f",
+      "exact_copy": true
+    }
+  ]
+}

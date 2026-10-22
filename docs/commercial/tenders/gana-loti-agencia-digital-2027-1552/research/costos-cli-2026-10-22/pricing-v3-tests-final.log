@@ -1,0 +1,12 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 pricing:v3:test /Users/jreye/Documents/greenhouse-eo
+> vitest run src/lib/finance/pricing-v3/__tests__
+
+
+ RUN  v4.1.0 /Users/jreye/Documents/greenhouse-eo
+
+
+ Test Files  37 passed (37)
+      Tests  1860 passed | 3 skipped (1863)
+   Start at  18:52:22
+   Duration  91.45s (transform 3.81s, setup 11.03s, import 48.71s, tests 414.00s, environment 3ms)

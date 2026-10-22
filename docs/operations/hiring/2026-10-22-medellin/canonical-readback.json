@@ -1,0 +1,275 @@
+[
+  {
+    "checkedAt": "2026-10-22T18:07:03.589Z",
+    "demandPublicId": "EO-TDM-0682",
+    "openingPublicId": "EO-OPN-0678",
+    "source": "efeonce-medellin-2027-trafficker-digital-20261022",
+    "status": "active",
+    "publicationStatus": "published",
+    "visibility": "public_listed",
+    "seniority": "Semi-senior",
+    "requestedSeats": 1,
+    "ownerUserId": "user-efeonce-admin-julio-reyes",
+    "workMode": "hybrid",
+    "city": "Medellín",
+    "country": "CO",
+    "eligibleCountries": [
+      "CO"
+    ],
+    "contentVersion": 2,
+    "content": {
+      "version": 2,
+      "promise": "Convierte inversión en medios y datos de campaña en decisiones que el equipo pueda ejecutar y explicar.",
+      "intro": "Buscamos un perfil Semi-senior que combine operación de pauta, criterio analítico y orden de medición. Trabajarás dedicado a un importante cliente en Medellín, con el respaldo de nuestros equipos de estrategia, creatividad y datos. Tu contribución se verá en campañas bien implementadas, aprendizajes claros y decisiones sustentadas.",
+      "outcomes": [
+        "Mantener campañas con objetivos, audiencias, inversión y criterios de optimización documentados.",
+        "Contar con medición revisada, eventos trazables y alertas claras sobre límites o inconsistencias de los datos.",
+        "Traducir el seguimiento de campañas en ajustes priorizados y recomendaciones comprensibles para el cliente.",
+        "Dejar pruebas, resultados y aprendizajes reutilizables para el siguiente ciclo de inversión."
+      ],
+      "workItems": [
+        "Planear, implementar y optimizar campañas de pauta digital con objetivos e inversión acordados.",
+        "Organizar audiencias, segmentaciones, pruebas y seguimiento del presupuesto.",
+        "Revisar embudos y eventos con GA4, Google Tag Manager y píxeles de plataformas publicitarias.",
+        "Construir y mantener dashboards y reportes con resultados, contexto, riesgos y próximos pasos.",
+        "Coordinar necesidades de piezas y medición con creatividad, contenido y equipos técnicos.",
+        "Documentar cambios, hipótesis y aprendizajes; comunicar alertas antes de que comprometan la operación."
+      ],
+      "essentials": [
+        "Experiencia práctica implementando y optimizando campañas en plataformas de pauta digital, como Meta Ads o Google Ads.",
+        "Capacidad de explicar cómo definiste audiencias, distribuiste inversión y decidiste ajustes.",
+        "Manejo práctico de GA4 y Google Tag Manager para revisar eventos y recorridos de conversión.",
+        "Lectura crítica de resultados: distinguir métricas, atribución, limitaciones y decisiones posibles.",
+        "Comunicación clara y documentación ordenada para trabajar con especialistas y cliente.",
+        "Disponibilidad para la modalidad híbrida en Medellín y dedicación completa al proyecto."
+      ],
+      "preferred": [
+        "Experiencia con varias líneas de producto, audiencias o marcas en una misma operación.",
+        "Experiencia construyendo dashboards y coordinando implementaciones de medición.",
+        "Trabajo previo en agencia o en colaboración directa con equipos de marketing."
+      ],
+      "learnables": [
+        "Método de documentación y seguimiento de Efeonce.",
+        "Contexto de las marcas, audiencias y restricciones del proyecto.",
+        "Flujos de colaboración con creatividad, contenido y datos."
+      ],
+      "evidenceAsk": "Comparte un caso existente de pauta: objetivo, tu responsabilidad, audiencias, decisión de optimización y resultado observado. Incluye una captura o dashboard anonimizado si puedes compartirlo. Nos interesa tu criterio, también cuando el resultado fue distinto de lo esperado.",
+      "workModel": "Dedicación completa a un importante cliente de Colombia, con base en Medellín: dos días presenciales en sus instalaciones y tres remotos por semana. Búsqueda anticipada para un proyecto previsto para 2027; la incorporación y su fecha dependen de su activación y de un acuerdo entre las partes. Vinculación por la vía internacional habitual de Efeonce, con pago directo de Efeonce; las condiciones y los beneficios aplicables se formalizan en el acuerdo correspondiente a Colombia. La remuneración se conversa con transparencia durante el proceso.",
+      "collaboration": {
+        "team": "Marketing Digital del cliente y equipos de estrategia, creatividad, medios y datos de Efeonce; colaboración multicultural y entre países.",
+        "reportsTo": "Responsable del proyecto en Efeonce, en coordinación con Marketing Digital del cliente.",
+        "language": "Español para la operación, la documentación y la comunicación con el cliente.",
+        "timezoneOverlap": "Horario de Colombia (America/Bogota, UTC-5); coordinación con los equipos de Efeonce en otros países.",
+        "workingRhythm": "Planificación, seguimiento y optimización continua; reuniones acordadas y documentación de decisiones."
+      },
+      "process": {
+        "steps": [
+          {
+            "title": "Postulación y revisión inicial",
+            "body": "Revisamos tu perfil, tu disponibilidad para trabajar en Medellín y una muestra o caso existente que puedas compartir sin información confidencial."
+          },
+          {
+            "title": "Conversación estructurada",
+            "body": "Conversamos sobre tu experiencia, las decisiones que has tomado y cómo colaboras con equipos y clientes. Aclaramos modalidad, expectativas y remuneración."
+          },
+          {
+            "title": "Revisión de un caso de tu trabajo",
+            "body": "Profundizamos en una muestra existente y en tu contribución concreta. Puedes anonimizar clientes y resultados; no te pedimos trabajo utilizable ni una campaña gratuita para el cliente."
+          },
+          {
+            "title": "Alineación final y respuesta",
+            "body": "Revisamos alcance, condiciones, disponibilidad y los siguientes pasos. Cualquier incorporación queda condicionada a la activación del proyecto 2027 y al acuerdo final."
+          }
+        ],
+        "expectedTiming": "Esperamos darte una definición o actualización del proceso en tres a cuatro semanas, sujeto a disponibilidad mutua. Ese plazo no es una fecha de incorporación al proyecto.",
+        "responseCommitment": "Te comunicaremos los avances y la decisión final, incluso si no continuamos; si cambia el plazo, te informaremos.",
+        "accommodationPath": "Puedes solicitar una adaptación o ajuste razonable al responder a la persona de Efeonce que te contacte durante el proceso."
+      },
+      "benefits": [],
+      "compensation": null,
+      "additionalSections": []
+    }
+  },
+  {
+    "checkedAt": "2026-10-22T18:07:03.842Z",
+    "demandPublicId": "EO-TDM-0683",
+    "openingPublicId": "EO-OPN-0679",
+    "source": "efeonce-medellin-2027-content-creator-20261022",
+    "status": "active",
+    "publicationStatus": "published",
+    "visibility": "public_listed",
+    "seniority": "Semi-senior",
+    "requestedSeats": 1,
+    "ownerUserId": "user-efeonce-admin-julio-reyes",
+    "workMode": "hybrid",
+    "city": "Medellín",
+    "country": "CO",
+    "eligibleCountries": [
+      "CO"
+    ],
+    "contentVersion": 2,
+    "content": {
+      "version": 2,
+      "promise": "Transforma ideas, tendencias y momentos reales en contenido social con una intención clara y una voz reconocible.",
+      "intro": "Buscamos un Content Creator Semi-senior para un importante cliente de Colombia. Tu foco será idear, escribir y capturar contenido en Medellín, trabajando de cerca con Marketing Digital del cliente y con el respaldo creativo y de producción de Efeonce. Queremos conocer la mirada y las decisiones detrás de las piezas que haces.",
+      "outcomes": [
+        "Construir propuestas de contenido que conecten objetivos, audiencia, mensaje y formato.",
+        "Sostener un flujo ordenado de conceptos, guiones, copies y capturas que facilite producir y aprobar a tiempo.",
+        "Conservar coherencia de voz y criterio de marca al adaptar ideas a Reels, historias y otras piezas sociales.",
+        "Convertir el feedback y las señales de desempeño en aprendizajes concretos para la siguiente parrilla."
+      ],
+      "workItems": [
+        "Proponer ideas, conceptos, guiones y copies para los canales sociales asignados.",
+        "Investigar tendencias y seleccionar las que tengan una razón clara para la marca y la audiencia.",
+        "Planear y realizar captura audiovisual y coberturas según el calendario y las necesidades acordadas.",
+        "Preparar briefs y materiales para colaborar con diseño, edición y producción.",
+        "Participar en la organización de parrillas y revisiones de contenido con Marketing Digital del cliente.",
+        "Incorporar feedback, revisar calidad y dejar referencias y aprendizajes reutilizables."
+      ],
+      "essentials": [
+        "Portafolio o muestras existentes de contenido social que permitan reconocer tu contribución.",
+        "Buena escritura en español y capacidad de adaptar voz, idea y estructura a cada formato.",
+        "Experiencia convirtiendo una idea en concepto, guion, copy y una propuesta de captura viable.",
+        "Capacidad práctica para capturar contenido audiovisual y explicar decisiones de encuadre, ritmo y narrativa.",
+        "Organización de entregas y colaboración con diseño, edición y equipos de marketing.",
+        "Disponibilidad para la modalidad híbrida en Medellín y dedicación completa al proyecto."
+      ],
+      "preferred": [
+        "Experiencia en coberturas o contenido realizado cerca de la operación del cliente.",
+        "Conocimiento de tendencias, códigos y formatos de las plataformas sociales.",
+        "Capacidad de leer resultados de contenido para proponer ajustes."
+      ],
+      "learnables": [
+        "Voz y contexto de las marcas del proyecto.",
+        "Métodos de brief, revisión y documentación de Efeonce.",
+        "Uso responsable de herramientas de IA dentro de los flujos aprobados del equipo."
+      ],
+      "evidenceAsk": "Comparte entre tres y cinco piezas existentes, o un portafolio breve, e identifica qué hiciste tú. Elige una y explica la idea, la audiencia, una decisión creativa y lo que aprendiste. Puedes anonimizar clientes y datos; no necesitas producir contenido nuevo para postular.",
+      "workModel": "Dedicación completa a un importante cliente de Colombia, con base en Medellín: dos días presenciales en sus instalaciones y tres remotos por semana. Búsqueda anticipada para un proyecto previsto para 2027; la incorporación y su fecha dependen de su activación y de un acuerdo entre las partes. Vinculación por la vía internacional habitual de Efeonce, con pago directo de Efeonce; las condiciones y los beneficios aplicables se formalizan en el acuerdo correspondiente a Colombia. La remuneración se conversa con transparencia durante el proceso.",
+      "collaboration": {
+        "team": "Marketing Digital del cliente y equipos de estrategia, creatividad, medios y datos de Efeonce; colaboración multicultural y entre países.",
+        "reportsTo": "Administración operativa de Marketing Digital del cliente, con respaldo y seguimiento de Efeonce.",
+        "language": "Español para la operación, la documentación y la comunicación con el cliente.",
+        "timezoneOverlap": "Horario de Colombia (America/Bogota, UTC-5); coordinación con los equipos de Efeonce en otros países.",
+        "workingRhythm": "Planificación editorial y revisiones acordadas; captura y coberturas coordinadas con el cliente, con documentación para diseño y producción."
+      },
+      "process": {
+        "steps": [
+          {
+            "title": "Postulación y revisión inicial",
+            "body": "Revisamos tu perfil, tu disponibilidad para trabajar en Medellín y una muestra o caso existente que puedas compartir sin información confidencial."
+          },
+          {
+            "title": "Conversación estructurada",
+            "body": "Conversamos sobre tu experiencia, las decisiones que has tomado y cómo colaboras con equipos y clientes. Aclaramos modalidad, expectativas y remuneración."
+          },
+          {
+            "title": "Revisión de un caso de tu trabajo",
+            "body": "Profundizamos en una muestra existente y en tu contribución concreta. Puedes anonimizar clientes y resultados; no te pedimos trabajo utilizable ni una campaña gratuita para el cliente."
+          },
+          {
+            "title": "Alineación final y respuesta",
+            "body": "Revisamos alcance, condiciones, disponibilidad y los siguientes pasos. Cualquier incorporación queda condicionada a la activación del proyecto 2027 y al acuerdo final."
+          }
+        ],
+        "expectedTiming": "Esperamos darte una definición o actualización del proceso en tres a cuatro semanas, sujeto a disponibilidad mutua. Ese plazo no es una fecha de incorporación al proyecto.",
+        "responseCommitment": "Te comunicaremos los avances y la decisión final, incluso si no continuamos; si cambia el plazo, te informaremos.",
+        "accommodationPath": "Puedes solicitar una adaptación o ajuste razonable al responder a la persona de Efeonce que te contacte durante el proceso."
+      },
+      "benefits": [],
+      "compensation": null,
+      "additionalSections": []
+    }
+  },
+  {
+    "checkedAt": "2026-10-22T18:07:04.099Z",
+    "demandPublicId": "EO-TDM-0684",
+    "openingPublicId": "EO-OPN-0680",
+    "source": "efeonce-medellin-2027-email-marketing-sms-20261022",
+    "status": "active",
+    "publicationStatus": "published",
+    "visibility": "public_listed",
+    "seniority": "Semi-senior",
+    "requestedSeats": 1,
+    "ownerUserId": "user-efeonce-admin-julio-reyes",
+    "workMode": "hybrid",
+    "city": "Medellín",
+    "country": "CO",
+    "eligibleCountries": [
+      "CO"
+    ],
+    "contentVersion": 2,
+    "content": {
+      "version": 2,
+      "promise": "Diseña comunicaciones relevantes y convierte los datos de contacto y de campaña en relaciones mejor cuidadas.",
+      "intro": "Buscamos un perfil Semi-senior para operar Email Marketing y SMS de un importante cliente en Medellín. Combinarás segmentación, automatizaciones, contenido y análisis con una operación cuidadosa de las bases. Tendrás dedicación al proyecto y colaboración con Marketing Digital del cliente y nuestros equipos de estrategia, creatividad y datos.",
+      "outcomes": [
+        "Mantener bases y segmentos organizados con criterios documentados de calidad y uso autorizado.",
+        "Operar campañas y automatizaciones con revisión previa, destinatarios correctos y seguimiento de entregabilidad.",
+        "Proponer mejoras sustentadas en resultados, comportamiento de las audiencias y objetivos de comunicación.",
+        "Dejar una memoria clara de calendarios, pruebas y aprendizajes que facilite continuidad y colaboración."
+      ],
+      "workItems": [
+        "Organizar, limpiar y segmentar bases de contacto según criterios autorizados y necesidades del proyecto.",
+        "Configurar y operar campañas de email y SMS, con revisión de audiencias, mensajes, enlaces y programación.",
+        "Desarrollar asuntos, cuerpos de email y copies SMS en colaboración con los equipos de marca y creatividad.",
+        "Construir y ajustar automatizaciones y recorridos de lead nurturing.",
+        "Monitorear entregabilidad, resultados e incidencias y proponer pruebas y ajustes.",
+        "Documentar campañas y aprendizajes; coordinar reportes y atender la operación dentro de la jornada acordada."
+      ],
+      "essentials": [
+        "Experiencia práctica operando campañas de email marketing y SMS en herramientas de automatización o plataformas de envío.",
+        "Capacidad de explicar criterios de segmentación, limpieza y uso autorizado de bases de contacto.",
+        "Manejo de automatizaciones o recorridos de nurturing y de los controles previos al envío.",
+        "Comprensión de entregabilidad y análisis de campañas para decidir qué mejorar.",
+        "Escritura clara en español, atención al detalle y documentación de cambios.",
+        "Disponibilidad para dedicación completa e híbrida en Medellín, incluyendo sábados hasta mediodía dentro de la jornada semanal."
+      ],
+      "preferred": [
+        "Experiencia con operaciones de varias marcas o bases de contacto de volumen relevante.",
+        "Conocimientos de pruebas de asuntos, contenidos y recorridos de comunicación.",
+        "Experiencia trabajando con diseño, analítica y equipos comerciales o de marketing."
+      ],
+      "learnables": [
+        "Plataformas específicas y criterios de contacto del proyecto.",
+        "Contexto de las marcas y su calendario de comunicaciones.",
+        "Métodos de QA, reporte y documentación de Efeonce."
+      ],
+      "evidenceAsk": "Comparte un caso existente de email o SMS: objetivo, segmento, flujo, controles antes del envío, tu contribución y aprendizaje. Puedes mostrar un esquema o resultados anonimizados. No compartas bases de contactos ni información personal de destinatarios.",
+      "workModel": "Dedicación completa a un importante cliente de Colombia, con base en Medellín: dos días presenciales en sus instalaciones y tres remotos por semana. Búsqueda anticipada para un proyecto previsto para 2027; la incorporación y su fecha dependen de su activación y de un acuerdo entre las partes. Vinculación por la vía internacional habitual de Efeonce, con pago directo de Efeonce; las condiciones y los beneficios aplicables se formalizan en el acuerdo correspondiente a Colombia. La remuneración se conversa con transparencia durante el proceso. El horario incluye disponibilidad los sábados hasta mediodía, dentro de la jornada semanal.",
+      "collaboration": {
+        "team": "Marketing Digital del cliente y equipos de estrategia, creatividad, medios y datos de Efeonce; colaboración multicultural y entre países.",
+        "reportsTo": "Responsable del proyecto en Efeonce, en coordinación con Marketing Digital del cliente.",
+        "language": "Español para la operación, la documentación y la comunicación con el cliente.",
+        "timezoneOverlap": "Horario de Colombia (America/Bogota, UTC-5); coordinación con los equipos de Efeonce en otros países.",
+        "workingRhythm": "Operación de lunes a viernes y disponibilidad los sábados hasta mediodía, dentro de la jornada semanal; distribución concreta acordada antes de la incorporación."
+      },
+      "process": {
+        "steps": [
+          {
+            "title": "Postulación y revisión inicial",
+            "body": "Revisamos tu perfil, tu disponibilidad para trabajar en Medellín y una muestra o caso existente que puedas compartir sin información confidencial."
+          },
+          {
+            "title": "Conversación estructurada",
+            "body": "Conversamos sobre tu experiencia, las decisiones que has tomado y cómo colaboras con equipos y clientes. Aclaramos modalidad, expectativas y remuneración."
+          },
+          {
+            "title": "Revisión de un caso de tu trabajo",
+            "body": "Profundizamos en una muestra existente y en tu contribución concreta. Puedes anonimizar clientes y resultados; no te pedimos trabajo utilizable ni una campaña gratuita para el cliente."
+          },
+          {
+            "title": "Alineación final y respuesta",
+            "body": "Revisamos alcance, condiciones, disponibilidad y los siguientes pasos. Cualquier incorporación queda condicionada a la activación del proyecto 2027 y al acuerdo final."
+          }
+        ],
+        "expectedTiming": "Esperamos darte una definición o actualización del proceso en tres a cuatro semanas, sujeto a disponibilidad mutua. Ese plazo no es una fecha de incorporación al proyecto.",
+        "responseCommitment": "Te comunicaremos los avances y la decisión final, incluso si no continuamos; si cambia el plazo, te informaremos.",
+        "accommodationPath": "Puedes solicitar una adaptación o ajuste razonable al responder a la persona de Efeonce que te contacte durante el proceso."
+      },
+      "benefits": [],
+      "compensation": null,
+      "additionalSections": []
+    }
+  }
+]

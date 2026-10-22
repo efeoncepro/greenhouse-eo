@@ -1,16 +1,16 @@
 {
   "schemaVersion": "pricing-v3-current/1",
-  "updatedAt": "2026-10-11",
-  "reason": "Catalog v11: each offer declares the commercial unit it is sold as (record kind offer). No price, cost, factor or policy changes.",
+  "updatedAt": "2026-10-22",
+  "reason": "Julio22Oct2026:canonical additions of missing Trafficker,EmailSMS,DigitalStrategist and public Awario reference; estimated salary costs; retain existingFX,policies and all previous versions; no proposal or payroll approval.",
   "catalog": {
-    "path": "data/pricing/v3-operating/catalog.review-v11.json",
-    "version": "operating-review-2026-10-11-v11",
-    "digest": "238a60d6eb514f6e15f8c4b7582b7a075222ce4bd02a55ac10e09d7abec3a702"
+    "path": "data/pricing/v3-operating/catalog.review-v13.json",
+    "version": "operating-review-2026-10-22-v13",
+    "digest": "1b3ab1c9634cd4afecfe0cd14a13aab4a71a463cc60f7b702d9a91f73a419779"
   },
   "policy": {
-    "path": "data/pricing/v3-operating/resources.review-v11.json",
-    "version": "operating-review-2026-10-11-v11",
-    "digest": "7ed8b92752fa4818fb2de53655e1a5275ce72bc556df9f41f1129d98ae810406"
+    "path": "data/pricing/v3-operating/resources.review-v12.json",
+    "version": "operating-review-2026-10-22-v12",
+    "digest": "a21dc3ca7bed51d7b2b0e5c0a4d496ad0545f8b4ccf2991af2384a6f08dfb3d6"
   },
   "credits": {
     "path": "data/pricing/v3-resources/ai-credits.review-v1.json",

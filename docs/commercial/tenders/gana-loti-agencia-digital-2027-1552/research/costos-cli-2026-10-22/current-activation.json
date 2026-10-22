@@ -1,0 +1,26 @@
+{
+  "updated": true,
+  "binding": false,
+  "replaced": "9805578d6c107c8c798785593ce8e2cea3f11edaa03824a630663e22d13ab0e0",
+  "pointerDigest": "eed345445399dc9c0259be429bc02d30f1e1ab5ff70a9a25a92798e628d70cc4",
+  "pointer": {
+    "schemaVersion": "pricing-v3-current/1",
+    "updatedAt": "2026-10-22",
+    "reason": "Julio22Oct2026:canonical additions of missing Trafficker,EmailSMS,DigitalStrategist and public Awario reference; estimated salary costs; retain existingFX,policies and all previous versions; no proposal or payroll approval.",
+    "catalog": {
+      "path": "data/pricing/v3-operating/catalog.review-v13.json",
+      "version": "operating-review-2026-10-22-v13",
+      "digest": "1b3ab1c9634cd4afecfe0cd14a13aab4a71a463cc60f7b702d9a91f73a419779"
+    },
+    "policy": {
+      "path": "data/pricing/v3-operating/resources.review-v12.json",
+      "version": "operating-review-2026-10-22-v12",
+      "digest": "a21dc3ca7bed51d7b2b0e5c0a4d496ad0545f8b4ccf2991af2384a6f08dfb3d6"
+    },
+    "credits": {
+      "path": "data/pricing/v3-resources/ai-credits.review-v1.json",
+      "version": "operator-screenshots-2026-10-09-v1",
+      "digest": "6886757643bada2b11cc41df2fa9f62a0edc3587ee00da48cbe2443d05f0cc2d"
+    }
+  }
+}

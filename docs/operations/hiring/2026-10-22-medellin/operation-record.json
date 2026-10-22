@@ -1,0 +1,117 @@
+{
+  "checked_at": "2026-10-22T15:10:32.956216-03:00",
+  "user_authorization": {
+    "creation": "Revisa como se crean esas vacantes en Hiring... crealas bien armadas y estructuradas y luego ajustas las publicaciones para que tengan los links",
+    "seniority": "Semi-senior para los tres",
+    "engagement": "Sí, hazlo: vía internacional habitual de Efeonce para Colombia",
+    "scope_correction": "No es necesario modificar en Instagram, pero en LinkedIn empresa y personal sí"
+  },
+  "workflow": "Hiring vacancy publication operator: dryRun -> publish; canonical writers, no SQL writes; production-shared database",
+  "actor_user_id": "user-efeonce-admin-julio-reyes",
+  "owner_user_id": "user-efeonce-admin-julio-reyes",
+  "openings": [
+    {
+      "slug": "trafficker-digital",
+      "openingId": "opng-66014d23-49aa-4cac-8d71-e20f9e90101b",
+      "openingPublicId": "EO-OPN-0678",
+      "demandId": "tdmn-2c0f0b74-a7a2-4855-9c9b-6d59e2f5e988",
+      "demandPublicId": "EO-TDM-0682",
+      "detailUrl": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0678",
+      "applyUrl": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0678/apply",
+      "status": "published"
+    },
+    {
+      "slug": "content-creator",
+      "openingId": "opng-7f6f5250-e06d-4445-a9db-38c7dbb30103",
+      "openingPublicId": "EO-OPN-0679",
+      "demandId": "tdmn-a886dd99-8f63-45b0-9808-47b4f9553d59",
+      "demandPublicId": "EO-TDM-0683",
+      "detailUrl": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0679",
+      "applyUrl": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0679/apply",
+      "status": "published"
+    },
+    {
+      "slug": "email-marketing-sms",
+      "openingId": "opng-0771288c-34f0-4ce6-99d4-4a98ccb63dc2",
+      "openingPublicId": "EO-OPN-0680",
+      "demandId": "tdmn-056382d4-6cb1-4768-add0-65253c99c25f",
+      "demandPublicId": "EO-TDM-0684",
+      "detailUrl": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0680",
+      "applyUrl": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0680/apply",
+      "status": "published"
+    }
+  ],
+  "social_edits": [
+    {
+      "channel": "linkedin_personal",
+      "post_url": "https://www.linkedin.com/feed/update/urn:li:share:7519092415484469248/",
+      "state": "edited_and_independently_reloaded",
+      "change": "CTA por DM reemplazado por Semi-senior y tres enlaces Careers; conservadas mención y colaboración Efeonce añadidas manualmente",
+      "shortlinks": [
+        "https://lnkd.in/dzS56d54",
+        "https://lnkd.in/d9v-EPr9",
+        "https://lnkd.in/djd9H_na"
+      ]
+    },
+    {
+      "channel": "linkedin_company",
+      "post_url": "https://www.linkedin.com/feed/update/urn:li:share:7519092409843052544/",
+      "state": "edited_and_independently_reloaded",
+      "change": "CTA por DM reemplazado por Semi-senior y tres enlaces Careers",
+      "shortlinks": [
+        "https://lnkd.in/dKfcu4Zm",
+        "https://lnkd.in/d6uaH7Yx",
+        "https://lnkd.in/d8X6UPpJ"
+      ],
+      "shortlink_destinations_verified": [
+        "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0678",
+        "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0679",
+        "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0680"
+      ],
+      "screenshot_private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/hiring/linkedin-empresa-enlaces.jpg"
+    }
+  ],
+  "instagram": {
+    "state": "unchanged",
+    "reason": "Instrucción posterior del operador antes de guardar ningún cambio. Editor Meta cerrado; sin update ni nuevo post."
+  },
+  "validation": {
+    "dry_runs": 3,
+    "public_http_200": 6,
+    "canonical_readback": 3,
+    "public_content_version": 2,
+    "one_seat_each": true,
+    "work_mode": "hybrid",
+    "city": "Medellín",
+    "country": "CO",
+    "no_client_name_in_pages": true,
+    "compensation_warning": "public_compensation_band_not_set: se usa fallback de conversación transparente; ningún importe inventado",
+    "candidate_test_submission": "not_performed; no candidato sintético ni solicitud ficticia creada",
+    "no_auto_assessment_assignment": true
+  },
+  "other_actions": {
+    "new_crm_writes": 0,
+    "emails": 0,
+    "direct_messages": 0,
+    "ads_spend": 0,
+    "tasks_created": 0,
+    "commit_push": false
+  },
+  "source_separation_correction": {
+    "at": "2026-10-22T17:48:59.157148-03:00",
+    "operator_fact": "Una licitación anterior de Grupo Réditos se perdió; no usarla para guiar la nueva.",
+    "historical_process_id": "not_identified_by_operator",
+    "current_authority": "RFP Agencia Digital2027 WX-202610221154228770.xlsx, GRD-1552, intento13",
+    "role_sources": {
+      "Trafficker": "Requisitos técnicos C10; Formato C12",
+      "Content Creator": "Requisitos técnicos C11; Formato C12",
+      "Email/SMS": "Requisitos técnicos C12; Formato C12",
+      "dedication_and_location": "Requisitos técnicos C16:C17; Formato C12"
+    },
+    "seniority_and_engagement": "Confirmación expresa de Julio en esta conversación",
+    "benefits_and_editorial_structure": "Canon de Talento Efeonce, no una propuesta licitatoria anterior",
+    "previous_bid_used_as_template": false,
+    "scope_changes": false,
+    "crm_mutations": 0
+  }
+}

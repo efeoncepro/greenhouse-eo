@@ -1124,3 +1124,8 @@ Importes en CLP, con `--current`. Las corridas «sobre una copia» no están ver
 - `pnpm pricing:v3:test`: 33 archivos y 1.640 pruebas.
 
 Evidencia fechada. No se agregó ningún archivo a esta carpeta; `operational-gaps.json` es el único que cambió.
+
+
+## Actualización del 22/10/2026
+
+Vigentes: catálogo v13, recursos v12 y créditos v1, verificados con `current show`. Se añadieron ECG-033 Trafficker, ECG-034 Email/SMS y ECG-035 Digital Strategist con costos CO estimados; Content Creator ECG-028 se conserva. Awario Pro entra como referencia pública y la plataforma Email/SMS permanece pendiente. Sin cambios de políticas comerciales ni FX original. [Cálculo y límites](../../../docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md).

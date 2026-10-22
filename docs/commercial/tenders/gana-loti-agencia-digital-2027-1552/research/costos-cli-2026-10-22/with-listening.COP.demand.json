@@ -1,0 +1,309 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-22",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "engagementForm": "on_going",
+    "accountId": "gana-loti-grd1552-internal-cost-only",
+    "offerMarketCountry": "CO",
+    "outputCurrency": "COP",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "design",
+        "profile": "ECG-003",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.75"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-with-listening-v1",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "video",
+        "profile": "ECG-018",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.75"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-with-listening-v1",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "creative",
+        "profile": "ECG-001",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.2"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-with-listening-v1",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "strategy",
+        "profile": "ECG-035",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.2"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-with-listening-v1",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "account",
+        "profile": "ECG-016",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.15"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-with-listening-v1",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "listening",
+        "profile": "ECG-004",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.1"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-with-listening-v1",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "work": [
+    {
+      "lineId": "design",
+      "assigneeIds": [
+        "planned-design-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "video",
+      "assigneeIds": [
+        "planned-video-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "creative",
+      "assigneeIds": [
+        "planned-creative-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "strategy",
+      "assigneeIds": [
+        "planned-strategy-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "account",
+      "assigneeIds": [
+        "planned-account-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "listening",
+      "assigneeIds": [
+        "planned-listening-1"
+      ],
+      "tasks": [
+        "social-listening"
+      ],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodId": 1,
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "6",
+      "serviceShare": "0.358333333333333333",
+      "driver": {
+        "unit": "planned-person-fte",
+        "totalUnits": "6",
+        "allocatedUnits": "2.15"
+      },
+      "reason": "One named seat per planned person; this job bears the stated FTE share of those seats. Remaining work capacity is a planning assumption, not sold or assigned capacity.",
+      "evidence": {
+        "reference": "estimate:GRD1552-resource-allocation-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodId": 1,
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "6",
+      "serviceShare": "0.358333333333333333",
+      "driver": {
+        "unit": "planned-person-fte",
+        "totalUnits": "6",
+        "allocatedUnits": "2.15"
+      },
+      "reason": "One named seat per planned person; this job bears the stated FTE share of those seats. Remaining work capacity is a planning assumption, not sold or assigned capacity.",
+      "evidence": {
+        "reference": "estimate:GRD1552-resource-allocation-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodId": 1,
+      "toolId": "adobe",
+      "priceId": "current",
+      "quantity": "1",
+      "seatCapacity": 3,
+      "serviceShare": "1",
+      "driver": {
+        "unit": "package",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Full3seat package at catalog price without discount,2planned design/video users. Package has spare capacity; idleSeats applies only to per-seat prices, so none declared. No license sharing or arbitrary divisor.",
+      "evidence": {
+        "reference": "estimate:GRD1552-resource-allocation-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodId": 1,
+      "toolId": "awario-pro",
+      "priceId": "public-monthly",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "dedicated-account-package",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "One full AwarioPro package for both buyer brands and competitor topics; monthly billing, not purchased; coverage and volume remain to validate.",
+      "evidence": {
+        "reference": "estimate:GRD1552-resource-allocation-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodId": 1,
+      "toolId": "frame-io",
+      "priceId": "historical",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "account-package",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Video recipe requires Frame.io. Current plan price is pending; choose full historicalUSD75package as explicit estimated reference, no original project divisor or free-license assumption.",
+      "evidence": {
+        "reference": "estimate:GRD1552-frameio-historical-full-package-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": [
+    "fx:CLP:USD"
+  ]
+}

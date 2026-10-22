@@ -1,0 +1,145 @@
+{
+  "status": "created_verified_stable",
+  "portal_id": 48713323,
+  "deal_id": 66560488750,
+  "deal_url": "https://app.hubspot.com/contacts/48713323/record/0-3/66560488750?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch",
+  "authorization": {
+    "operator": "Julio Reyes",
+    "instruction": "Crea el deal",
+    "date": "2026-10-22",
+    "scope": "Alta de GRD-1552, intento13, con Company34264439413 Primary y pendientes documentados en HOLD; sin importe ni fechas de cierre. Sin cambio del proceso de Programática GRD-1541."
+  },
+  "prewrite_primary_checked_at": "2026-10-22 17:15:10 UTC",
+  "payload": {
+    "confirmationStatus": "CONFIRMED",
+    "createRequest": {
+      "objects": [
+        {
+          "objectType": "DEAL",
+          "associations": [
+            {
+              "targetObjectType": "COMPANY",
+              "targetObjectId": 34264439413,
+              "labels": [
+                "Primary"
+              ]
+            }
+          ],
+          "properties": {
+            "dealname": "Gana y Loti | CO | Agencia digital 2027 | GRD-1552",
+            "pipeline": "default",
+            "dealstage": "appointmentscheduled",
+            "hubspot_owner_id": "75788512",
+            "dealtype": "newbusiness",
+            "pipeline_bucket": "Strategic Bets",
+            "modalidad_de_venta": "Licitación",
+            "canal_de_adqusicion": "WherEX",
+            "linea_de_servicio": "efeonce_digital",
+            "servicios_especificos": "agencia_creativa;produccion_audiovisual;social_media_content;performance_paid_media;seo_aeo;email_marketing_automation;data_analytics;research_estrategia",
+            "id_de_licitacion": "GRD-1552",
+            "ficha_de_licitacion": "https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=information",
+            "gh_idempotency_key": "hubspot-private-tender:wherex:GRD-1552",
+            "description": "ALTA ADMINISTRATIVA AUTORIZADA: Julio reiteró «Crea el deal» el 22/10/2026 después de conocer las discrepancias y la propuesta de seguimiento en HOLD. Excepción exclusiva para registrar este intento 13; no valida los hechos pendientes ni autoriza presentación, envíos, gasto o negocio compartido.\n\nINVITACIÓN RECIBIDA / INVESTIGACIÓN INCOMPLETA - HOLD. Intento 13 con Grupo Réditos, según instrucción de Julio del 22/10/2026. Esta compra es Agencia Digital 2027 para GANA y LOTI, Wherex LIC-1552 / GRD-1552, compra 425489, oferta en borrador 7578948. NO es Programática GRD-1541 (intento 12, Deal 66065702426) y no acredita propuesta presentada.\n\nComprador: Grupo Réditos; invitación identifica Réditos Empresariales S.A.; ficha de facturación muestra REDIAPUESTAS S.A.S., NIT 901716185. Mantener Company de relación Grupo Reditos 34264439413; entidad contratante por confirmar, sin nueva Company inferida.\n\nVigencia prevista: enero 2027 a enero 2028, indicada como un año; sin fechas exactas de firma/inicio/fin ni contrato firmado verificado. Publicación visible 22/10/2026 13:55 sin zona; invitación recibida 22/10/2026 16:55:31Z. Plazo: correo 30/10/2026 14:00 Colombia COT (UTC-5); interfaz 30/10/2026 18:00 sin zona. Contradicción sin resolver: no persistir fecha de cierre de licitación ni closedate. Ronda de preguntas abierta hasta 30/10, sin hora publicada.\n\nAlcance: estrategia digital, social media/contenidos, pauta/SEO-SEM, diseño/audiovisual, Email y SMS, analítica/tracking, Social Listening y crisis, informes sector/tendencias. Comentarios de ficha añaden TV/radio regional y publicidad exterior. Tres perfiles 100% dedicados (Trafficker, Content Creator y Contactabilidad), dos días presenciales por semana en Medellín y tres remotos; Content Creator bajo administración directa del comprador. Capacidad, disponibilidad y economía no validadas.\n\nPresupuesto RFP Formato!H9: '$40.000.000 mensuales máximo'; alcance de medios, licencias, herramientas e impuestos pendiente; no es precio Efeonce ni importe total del Deal. No trasladar COP30M medios ni feeCOP4,5M de GRD-1541.\n\nEntregables: hasta 125 piezas/mes (75 GANA,50 LOTI), 60 emails y 60 copiesSMS/mes, gestión hasta7M SMS y2M emails/mes,24 parrillas/año, informes semanales/mensuales y12 SocialListening. Inconsistencias a aclarar: Formato C12 contempla8 conceptos/año frente a10+C2 campañas macro en C13/Requisitos técnicos; C13 dice30 posts/historias pero desglose20+15=35 cada uno.\n\nCuatro obligatorios: Cámara Comercio<=30d;2 certificados de contratos similares; económica modulable con inclusiones y cumplimiento de todos los entregables;RUT completo. RFP exige hoja Requisitos técnicos con cumplimiento,valores y página de PDF. Declaración conflicto de interés disponible sin diligenciar ni firmar; línea ética leída. Sin responsable individual identificado; no asociar contactos históricos como autoridad de esta compra.\n\nCONTROL ADJUDICACIÓN/CONTRATO: revisadas ficha primaria, preguntas/anuncios (0), los3 adjuntos generales íntegros y borrador de oferta. Proveedor seleccionado,acto de adjudicación,OC/OS,contrato,fecha de firma y ejecución real: no encontrados en material accesible, no prueba de inexistencia. No hay contrato contractual disponible que leer. HOLD por calendario contradictorio y entidad contratante pendiente; sin recomendación de postular, sin GO, sin envíos ni Deal compartido.\n\nFuentes: OneDrive Alineación/4. Comercial/Licitaciones/Grupo Reditos/13. Agencia Digital 2027/425489.zip (RFP Agencia Digital2027 WX-202610221154228770.xlsx,todas las hojas;DOCX conflicto;PDF líneaética). Ficha https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=information. Revisión 2026-10-22 17:10:00 UTC. Expediente docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/README.md.\n\nREVALIDACIÓN PREVIA AL ALTA: 2026-10-22 17:15:10 UTC; ficha primaria GRD-1552 / oferta7578948 sigue Editando, misma descripción, facturación y plazo contradictorio. Sin cambio factual que resuelva el HOLD.",
+            "hs_next_step": "HOLD administrativo: aclarar comprador contractual y hora de cierre (correo30/10 14:00COT vs UI18:00 sin zona); conciliar8/10 conceptos y30/35 piezas; Julio/Operaciones revisar3 perfiles100% dedicados y presencia Medellín antes de decidir GO. No hay envío autorizado.",
+            "closedate": ""
+          }
+        }
+      ]
+    },
+    "updateRequest": null
+  },
+  "result": {
+    "createResults": {
+      "results": [
+        {
+          "objectType": "DEAL",
+          "objectId": 66560488750,
+          "object": {
+            "id": 66560488750,
+            "properties": {},
+            "createdAt": "2026-10-22T17:15:11.487Z",
+            "updatedAt": "2026-10-22T17:15:11.487Z",
+            "archived": false,
+            "url": "https://app.hubspot.com/contacts/48713323/record/0-3/66560488750?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=manage_crm_objects",
+            "displayName": "Gana y Loti | CO | Agencia digital 2027 | GRD-1552"
+          },
+          "associationResult": {
+            "results": [
+              {
+                "fromObjectId": 66560488750,
+                "fromObjectType": "DEAL",
+                "toObjectId": 34264439413,
+                "toObjectType": "COMPANY",
+                "labels": [
+                  "Primary"
+                ]
+              }
+            ],
+            "summary": {
+              "successful": 1,
+              "failed": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "summary": {
+        "totalProcessed": 1,
+        "created": 1,
+        "failed": 0
+      }
+    }
+  },
+  "first_readback": {
+    "id": 66560488750,
+    "properties": {
+      "dealname": "Gana y Loti | CO | Agencia digital 2027 | GRD-1552",
+      "linea_de_servicio": "efeonce_digital",
+      "pipeline_bucket": "Strategic Bets",
+      "description": "ALTA ADMINISTRATIVA AUTORIZADA: Julio reiteró «Crea el deal» el 22/10/2026 después de conocer las discrepancias y la propuesta de seguimiento en HOLD. Excepción exclusiva para registrar este intento 13; no valida los hechos pendientes ni autoriza presentación, envíos, gasto o negocio compartido.\n\nINVITACIÓN RECIBIDA / INVESTIGACIÓN INCOMPLETA - HOLD. Intento 13 con Grupo Réditos, según instrucción de Julio del 22/10/2026. Esta compra es Agencia Digital 2027 para GANA y LOTI, Wherex LIC-1552 / GRD-1552, compra 425489, oferta en borrador 7578948. NO es Programática GRD-1541 (intento 12, Deal 66065702426) y no acredita propuesta presentada.\n\nComprador: Grupo Réditos; invitación identifica Réditos Empresariales S.A.; ficha de facturación muestra REDIAPUESTAS S.A.S., NIT 901716185. Mantener Company de relación Grupo Reditos 34264439413; entidad contratante por confirmar, sin nueva Company inferida.\n\nVigencia prevista: enero 2027 a enero 2028, indicada como un año; sin fechas exactas de firma/inicio/fin ni contrato firmado verificado. Publicación visible 22/10/2026 13:55 sin zona; invitación recibida 22/10/2026 16:55:31Z. Plazo: correo 30/10/2026 14:00 Colombia COT (UTC-5); interfaz 30/10/2026 18:00 sin zona. Contradicción sin resolver: no persistir fecha de cierre de licitación ni closedate. Ronda de preguntas abierta hasta 30/10, sin hora publicada.\n\nAlcance: estrategia digital, social media/contenidos, pauta/SEO-SEM, diseño/audiovisual, Email y SMS, analítica/tracking, Social Listening y crisis, informes sector/tendencias. Comentarios de ficha añaden TV/radio regional y publicidad exterior. Tres perfiles 100% dedicados (Trafficker, Content Creator y Contactabilidad), dos días presenciales por semana en Medellín y tres remotos; Content Creator bajo administración directa del comprador. Capacidad, disponibilidad y economía no validadas.\n\nPresupuesto RFP Formato!H9: '$40.000.000 mensuales máximo'; alcance de medios, licencias, herramientas e impuestos pendiente; no es precio Efeonce ni importe total del Deal. No trasladar COP30M medios ni feeCOP4,5M de GRD-1541.\n\nEntregables: hasta 125 piezas/mes (75 GANA,50 LOTI), 60 emails y 60 copiesSMS/mes, gestión hasta7M SMS y2M emails/mes,24 parrillas/año, informes semanales/mensuales y12 SocialListening. Inconsistencias a aclarar: Formato C12 contempla8 conceptos/año frente a10+C2 campañas macro en C13/Requisitos técnicos; C13 dice30 posts/historias pero desglose20+15=35 cada uno.\n\nCuatro obligatorios: Cámara Comercio<=30d;2 certificados de contratos similares; económica modulable con inclusiones y cumplimiento de todos los entregables;RUT completo. RFP exige hoja Requisitos técnicos con cumplimiento,valores y página de PDF. Declaración conflicto de interés disponible sin diligenciar ni firmar; línea ética leída. Sin responsable individual identificado; no asociar contactos históricos como autoridad de esta compra.\n\nCONTROL ADJUDICACIÓN/CONTRATO: revisadas ficha primaria, preguntas/anuncios (0), los3 adjuntos generales íntegros y borrador de oferta. Proveedor seleccionado,acto de adjudicación,OC/OS,contrato,fecha de firma y ejecución real: no encontrados en material accesible, no prueba de inexistencia. No hay contrato contractual disponible que leer. HOLD por calendario contradictorio y entidad contratante pendiente; sin recomendación de postular, sin GO, sin envíos ni Deal compartido.\n\nFuentes: OneDrive Alineación/4. Comercial/Licitaciones/Grupo Reditos/13. Agencia Digital 2027/425489.zip (RFP Agencia Digital2027 WX-202610221154228770.xlsx,todas las hojas;DOCX conflicto;PDF líneaética). Ficha https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=information. Revisión 2026-10-22 17:10:00 UTC. Expediente docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/README.md.\n\nREVALIDACIÓN PREVIA AL ALTA: 2026-10-22 17:15:10 UTC; ficha primaria GRD-1552 / oferta7578948 sigue Editando, misma descripción, facturación y plazo contradictorio. Sin cambio factual que resuelva el HOLD.",
+      "modalidad_de_venta": "Licitación",
+      "id_de_licitacion": "GRD-1552",
+      "gh_idempotency_key": "hubspot-private-tender:wherex:GRD-1552",
+      "servicios_especificos": "agencia_creativa;produccion_audiovisual;social_media_content;performance_paid_media;seo_aeo;email_marketing_automation;data_analytics;research_estrategia",
+      "pipeline": "default",
+      "hs_next_step": "HOLD administrativo: aclarar comprador contractual y hora de cierre (correo30/10 14:00COT vs UI18:00 sin zona); conciliar8/10 conceptos y30/35 piezas; Julio/Operaciones revisar3 perfiles100% dedicados y presencia Medellín antes de decidir GO. No hay envío autorizado.",
+      "canal_de_adqusicion": "WherEX",
+      "hubspot_owner_id": "75788512",
+      "dealstage": "appointmentscheduled",
+      "dealtype": "newbusiness"
+    },
+    "archived": false,
+    "url": "https://app.hubspot.com/contacts/48713323/record/0-3/66560488750?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch",
+    "displayName": "Gana y Loti | CO | Agencia digital 2027 | GRD-1552"
+  },
+  "company_primary": {
+    "id": 34264439413,
+    "label": "Primary",
+    "type_id": 5,
+    "verified_by": "HubSpot Agent CLI OAuth, portal48713323"
+  },
+  "programmatic": {
+    "id": 66065702426,
+    "reference": "GRD-1541",
+    "attempt": 12,
+    "mutation": false
+  },
+  "warnings": [
+    "Workflow catalog no accesible403; readback posterior se registra por separado",
+    "El HOLD factual permanece; alta administrativa autorizada no equivale a postulación o GO"
+  ],
+  "paid_credits": 0,
+  "outbound_messages": 0,
+  "second_readback": {
+    "checked_at": "2026-10-22T14:16:28.489028-03:00",
+    "result": "Propiedades contrastadas sin diferencias frente al payload; Primary34264439413 type5 estable",
+    "empty_fields": [
+      "amount",
+      "deal_currency_code",
+      "closedate",
+      "fecha_de_cierre_de_licitacion",
+      "presupuesto_de_la_licitacion"
+    ],
+    "scope": "Misma identidad y portal; ningún cambio en workflows o permisos"
+  }
+}

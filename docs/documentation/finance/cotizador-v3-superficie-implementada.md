@@ -2149,3 +2149,8 @@ motor 1.4 (2026-10-11); lo que de ellos sigue sin modelarse —cuándo se le pag
 allá del trabajo, una comisión sobre lo que el cliente paga directo, una lista de precios de proveedores recurrentes
 y la reserva de un servicio On-Going ganado en licitación con multas— está en
 [qué no está modelado](#qué-no-está-modelado). [Handoff de promoción](cotizador-v3-promocion-canonica.md).
+
+
+## Catálogo local actualizado el 22/10/2026
+
+`--current` usa catálogo v13 y policy v12: tres perfiles nuevos con costos específicos CO estimados, Awario Pro público y plataforma Email/SMS pendiente. Se conserva Content Creator. No cambian motor, schema, márgenes, factores o tasas originales; no hubo importación a plataforma. [Evidencia y límites](../../commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md).

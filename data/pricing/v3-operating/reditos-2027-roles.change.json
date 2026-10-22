@@ -1,0 +1,551 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "reditos-2027-three-specialists-2026-10-22-with-derived-inverse-fx",
+  "baseDigest": "238a60d6eb514f6e15f8c4b7582b7a075222ce4bd02a55ac10e09d7abec3a702",
+  "nextVersion": "operating-review-2026-10-22-v12",
+  "actor": "operator-request:Julio;agent-preparation",
+  "reason": "Add actual missing Trafficker mid, Email/SMS mid and Digital Strategist with estimated CO recruitment target costs. Preserve Content CreatorECG028 and all existing policyvalues; optional reciprocal FX is mechanical, not spot. Preview only, no compensation approval.",
+  "changes": [
+    {
+      "operation": "add",
+      "recordId": "profile:ECG-033",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "profile:ECG-033",
+        "revision": 1,
+        "kind": "profile",
+        "source": {
+          "reference": "estimate:reditos-2027-local-recruitment-benchmark:2026-10-22;user:role-addition-authorized-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Distinct semi-senior role requested by operator; no equivalence to broad Paid Media Manager or Marketing Automation Specialist. Existing base specialist tier1 reused; historical tier label is not operational or commercial approval.",
+        "value": {
+          "profileId": "ECG-033",
+          "label": "Trafficker Digital Semi-senior",
+          "seniorityCode": "mid",
+          "tierCode": "historical-tier-1",
+          "requiredCoverages": [
+            "human_salary"
+          ],
+          "aliases": [
+            "trafficker digital semi-senior",
+            "digital trafficker mid"
+          ],
+          "defaultKitId": "managed-service-core"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "cost:ECG-033:CO",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "cost:ECG-033:CO",
+        "revision": 1,
+        "kind": "cost",
+        "source": {
+          "reference": "estimate:reditos-2027-local-recruitment-benchmark:2026-10-22;user:role-addition-authorized-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Estimated gross monthly recruitment target from prior case benchmark, not CEO-approved compensation, payroll, fully loaded cost, or accepted offer. Benefits, taxes/charges, software and absence coverage not included; not assumed zero.",
+        "value": {
+          "profileId": "ECG-033",
+          "seniorityCode": "mid",
+          "localization": {
+            "kind": "specific",
+            "country": "CO"
+          },
+          "currency": "COP",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "3500000"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "fee:ECG-033",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "fee:ECG-033",
+        "revision": 1,
+        "kind": "resource",
+        "source": {
+          "reference": "estimate:reditos-2027-local-recruitment-benchmark:2026-10-22;user:role-addition-authorized-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Explicit historical generic platform fee inherited as an estimate from existing per-profile fee49USD. Not a current provider quote or waived fee.",
+        "value": {
+          "amount": "49",
+          "currency": "USD",
+          "resourceId": "fee:ECG-033",
+          "label": "Historical generic platform fee reference — ECG-033",
+          "kind": "platform_fee",
+          "unit": "month",
+          "scope": "person",
+          "covers": [
+            "platform_fee"
+          ]
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-033:creative-managed-service",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "pricing:ECG-033:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13;mechanical-extension:new-role-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Existing Creative managed-service objective and floor45% extended unchanged to the new role. No staffing or SEO commercial policy is introduced.",
+        "value": {
+          "profileId": "ECG-033",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "profile:ECG-034",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "profile:ECG-034",
+        "revision": 1,
+        "kind": "profile",
+        "source": {
+          "reference": "estimate:reditos-2027-local-recruitment-benchmark:2026-10-22;user:role-addition-authorized-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Distinct semi-senior role requested by operator; no equivalence to broad Paid Media Manager or Marketing Automation Specialist. Existing base specialist tier1 reused; historical tier label is not operational or commercial approval.",
+        "value": {
+          "profileId": "ECG-034",
+          "label": "Especialista Email y SMS Semi-senior",
+          "seniorityCode": "mid",
+          "tierCode": "historical-tier-1",
+          "requiredCoverages": [
+            "human_salary"
+          ],
+          "aliases": [
+            "email sms semi-senior",
+            "email marketing sms mid"
+          ],
+          "defaultKitId": "managed-service-core"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "cost:ECG-034:CO",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "cost:ECG-034:CO",
+        "revision": 1,
+        "kind": "cost",
+        "source": {
+          "reference": "estimate:reditos-2027-local-recruitment-benchmark:2026-10-22;user:role-addition-authorized-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Estimated gross monthly recruitment target from prior case benchmark, not CEO-approved compensation, payroll, fully loaded cost, or accepted offer. Benefits, taxes/charges, software and absence coverage not included; not assumed zero.",
+        "value": {
+          "profileId": "ECG-034",
+          "seniorityCode": "mid",
+          "localization": {
+            "kind": "specific",
+            "country": "CO"
+          },
+          "currency": "COP",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "3500000"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "fee:ECG-034",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "fee:ECG-034",
+        "revision": 1,
+        "kind": "resource",
+        "source": {
+          "reference": "estimate:reditos-2027-local-recruitment-benchmark:2026-10-22;user:role-addition-authorized-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Explicit historical generic platform fee inherited as an estimate from existing per-profile fee49USD. Not a current provider quote or waived fee.",
+        "value": {
+          "amount": "49",
+          "currency": "USD",
+          "resourceId": "fee:ECG-034",
+          "label": "Historical generic platform fee reference — ECG-034",
+          "kind": "platform_fee",
+          "unit": "month",
+          "scope": "person",
+          "covers": [
+            "platform_fee"
+          ]
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-034:creative-managed-service",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "pricing:ECG-034:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13;mechanical-extension:new-role-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Existing Creative managed-service objective and floor45% extended unchanged to the new role. No staffing or SEO commercial policy is introduced.",
+        "value": {
+          "profileId": "ECG-034",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "fx:COP:USD",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "fx:COP:USD",
+        "revision": 1,
+        "kind": "fx",
+        "source": {
+          "reference": "derived-reciprocal:policy:ceo-quote-fx-2026-10-10:USD-COP3650;precision18:2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Mechanical reciprocal of existing quote policy USD→COP3650, represented at18decimal places:1/3650≈0.000273972602739726. Does not change3650 or claim a new observed market rate; reciprocal representation pending operator review.",
+        "value": {
+          "from": "COP",
+          "to": "USD",
+          "rate": "0.000273972602739726"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-033",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "pricing:ECG-033",
+        "revision": 1,
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11;mechanical-extension:new-role-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Existing unchanged policy for base specialist historical-tier-1 extended to this new role. No new margin, floor, or discount. Whether a given engagement belongs to this offer must follow actual business.",
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-033",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-033:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "pricing:ECG-033:seo-aeo-managed-service",
+        "revision": 1,
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13;mechanical-extension:new-role-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Existing unchanged policy for base specialist historical-tier-1 extended to this new role. No new margin, floor, or discount. Whether a given engagement belongs to this offer must follow actual business.",
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-033",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-034",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "pricing:ECG-034",
+        "revision": 1,
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11;mechanical-extension:new-role-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Existing unchanged policy for base specialist historical-tier-1 extended to this new role. No new margin, floor, or discount. Whether a given engagement belongs to this offer must follow actual business.",
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-034",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-034:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "pricing:ECG-034:seo-aeo-managed-service",
+        "revision": 1,
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13;mechanical-extension:new-role-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Existing unchanged policy for base specialist historical-tier-1 extended to this new role. No new margin, floor, or discount. Whether a given engagement belongs to this offer must follow actual business.",
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-034",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "profile:ECG-035",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "profile:ECG-035",
+        "revision": 1,
+        "kind": "profile",
+        "source": {
+          "reference": "estimate:reditos-2027-cost-review:2026-10-22:strategy-benchmark",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Distinct role: digital ecosystem/business strategy, sector and trend research, competitive benchmarks, priorities and integrated measurement. Not Creative Operations Lead or Content Manager. Historical tier2 reused; this is no compensation or commercial approval. Full research reference: estimate:reditos-2027-case-cost-review:2026-10-22;research:Contravia3.7MM-and-MarketingSero3-4.5MM;user:role-additions-authorized",
+        "value": {
+          "profileId": "ECG-035",
+          "label": "Digital Strategist",
+          "seniorityCode": "mid",
+          "tierCode": "historical-tier-2",
+          "requiredCoverages": [
+            "human_salary"
+          ],
+          "aliases": [
+            "estratega digital",
+            "digital strategist semi-senior"
+          ],
+          "defaultKitId": "managed-service-core"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "cost:ECG-035:CO",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "cost:ECG-035:CO",
+        "revision": 1,
+        "kind": "cost",
+        "source": {
+          "reference": "estimate:reditos-2027-cost-review:2026-10-22:strategy-benchmark",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Estimated full-time gross monthly recruitment target COP4.500.000, based on case market references. Not approved salary, payroll, or fully loaded cost. Benefits/charges/tools/coverage unknown, not zero. Full research reference: estimate:reditos-2027-case-cost-review:2026-10-22;research:Contravia3.7MM-and-MarketingSero3-4.5MM;user:role-additions-authorized",
+        "value": {
+          "profileId": "ECG-035",
+          "seniorityCode": "mid",
+          "localization": {
+            "kind": "specific",
+            "country": "CO"
+          },
+          "currency": "COP",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "4500000"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "fee:ECG-035",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "fee:ECG-035",
+        "revision": 1,
+        "kind": "resource",
+        "source": {
+          "reference": "estimate:reditos-2027-cost-review:2026-10-22:strategy-benchmark",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Explicit inherited49USD historical platform fee estimate, not current provider quote. Full research reference: estimate:reditos-2027-case-cost-review:2026-10-22;research:Contravia3.7MM-and-MarketingSero3-4.5MM;user:role-additions-authorized",
+        "value": {
+          "amount": "49",
+          "currency": "USD",
+          "resourceId": "fee:ECG-035",
+          "label": "Historical generic platform fee reference — ECG-035",
+          "kind": "platform_fee",
+          "unit": "month",
+          "scope": "person",
+          "covers": [
+            "platform_fee"
+          ]
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-035",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "pricing:ECG-035",
+        "revision": 1,
+        "kind": "pricing",
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11;mechanical-extension:DigitalStrategist-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Unchanged existing historical-tier-2 policy extended to Digital Strategist. Staffing target30%floor25%, Creative45%floor45%, SEO55%floor45%; no new policy value.",
+        "value": {
+          "profileId": "ECG-035",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-035:creative-managed-service",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "pricing:ECG-035:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13;mechanical-extension:DigitalStrategist-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Unchanged existing historical-tier-2 policy extended to Digital Strategist. Staffing target30%floor25%, Creative45%floor45%, SEO55%floor45%; no new policy value.",
+        "value": {
+          "profileId": "ECG-035",
+          "tierCode": "historical-tier-2",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-035:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "pricing:ECG-035:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13;mechanical-extension:DigitalStrategist-2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Unchanged existing historical-tier-2 policy extended to Digital Strategist. Staffing target30%floor25%, Creative45%floor45%, SEO55%floor45%; no new policy value.",
+        "value": {
+          "profileId": "ECG-035",
+          "tierCode": "historical-tier-2",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        }
+      }
+    }
+  ]
+}

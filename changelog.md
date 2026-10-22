@@ -2,6 +2,8 @@
 
 ## 2026-10-22 — Cotizador CLI: perfiles y recursos de referencia
 
+- Réditos GRD-1552: rango interno COP36–38M / USD9.863,01–10.410,96 mensuales documentado y Deal valorado en COP456M / USD124.931,51 por 12 meses al escenario principal; sin propuesta ni cambio de etapa. [Base y evidencia](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/BRIEF-COMERCIAL-VIGENTE.md).
+
 - Mantenimiento versionado: tres perfiles faltantes, costos CO estimados y referencia Awario, conservando políticas y controles. [Evidencia](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md). Sin cambios de motor ni publicación a plataforma.
 
 

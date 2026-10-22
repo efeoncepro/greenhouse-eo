@@ -122,3 +122,27 @@ Sin Leads, Deals ni envíos; la fila de búsqueda conserva su estado original an
 ### 21/10/2026 — Seguimientos expresamente autorizados
 
 14 enviados y 14 EMAIL SENT comprobados en HubSpot; 13 firmas gráficas y Pierre Fabre textual anterior a la corrección. Momentum excluido; secuencias del contacto regional y Teva preservadas. Sin otras altas CRM ni créditos. [Informe](../follow-up-agent/runs/2026-10-21-seguimientos-enviados.md) · [Controles redactados](queries/2026-10-21-seguimientos-enviados.json).
+
+- 2026-10-22 14:13 — Réditos, intento13 Agencia Digital2027 LIC1552: bases y duplicados verificados; HOLD calendario/entidad, alta preparada sin ejecutar; excepción administrativa pendiente. [Reporte](runs/2026-10-22-1413-reditos-digital-2027.md) · [Consultas](queries/2026-10-22-1413-reditos-digital-2027.json) · [Expediente](../tenders/gana-loti-agencia-digital-2027-1552/README.md).
+
+- 2026-10-22T14:15:56.264225-03:00 — Resolución Réditos: Julio confirmó «Crea el deal». Deal66560488750 creado y leído, intento13 GRD-1552, Company34264439413 Primary; HOLD administrativo y campos de importe/cierre vacíos. Intento12 Programática sin cambios. [Recibo](../tenders/gana-loti-agencia-digital-2027-1552/research/CRM-ALTA-VERIFICADA-2026-10-22.json).
+
+- 2026-10-22T14:18:50.056827-03:00 — Réditos intento13: Julio confirma capturaWherex, cierre30/10/2026 a las18:00; registrado America/Santiago en fecha_de_cierre_de_licitacion y leído de vuelta. Sin cierre comercial ni cambio de Programática. [Recibo](../tenders/gana-loti-agencia-digital-2027-1552/research/CRM-CIERRE-2026-10-22.json).
+
+- 2026-10-22T14:27:39.657881-03:00 — Réditos intento13: revisión íntegra de bases, comentarios Excel, condicionesWherex y respaldos. Julio eligeBerel+SKY; cero cargados no es bloqueo. [Requisitos y preparación](../tenders/gana-loti-agencia-digital-2027-1552/research/REQUISITOS-PARA-POSTULAR-2026-10-22.md). Sin CRMwrite ni envíos.
+
+- 2026-10-22T14:33:50.972824-03:00 — Pedido puntual de Julio: [borrador LinkedIn para tres perfiles Medellín](../tenders/gana-loti-agencia-digital-2027-1552/research/LINKEDIN-TALENTO-MEDELLIN-2026-10-22.md), cliente anonimizado, skillTalent aplicada, beneficios verificados. Sólo redacción; sin publicación, ATS, CRM o mensajes.
+
+- 2026-10-22 14:50 Santiago — Por instrucción expresa de Julio, [anuncio de talento Medellín publicado en los tres canales](../../operations/hiring/2026-10-22-talento-medellin-publicacion.md); ampliación del [registro Réditos 1413](runs/2026-10-22-1413-reditos-digital-2027.md). Tres publicaciones verificadas, sin nuevas altas Hiring/CRM.
+
+- 2026-10-22 15:10 Santiago — [Tres vacantes Hiring publicadas y enlaces incorporados en ambos LinkedIn](../../operations/hiring/2026-10-22-medellin/README.md). Semi-senior, CO/Medellín, un cupo cada una. Instagram sin cambios por instrucción posterior; sin duplicados, nuevos contactos/Deals, envíos ni gasto.
+
+- 2026-10-22T17:58:15.110945-03:00 — [Revisión de anteriores Réditos y recuperación de respaldos](../tenders/gana-loti-agencia-digital-2027-1552/research/REVISION-ANTERIORES-Y-RESPALDOS-2026-10-22.md): documentos inventariados y diferencias verificadas; ofertas perdidas no son guía de2027. Sin cambios externos.
+
+- 22/10/2026 — GRD-1552: [alcance del presupuesto40MM, evidencia del Excel original](../tenders/gana-loti-agencia-digital-2027-1552/research/ALCANCE-PRESUPUESTO-40MM-2026-10-22.md). SocialListening a proveer por agencia; pago de pauta y consumos Email/SMS no asignado expresamente.
+
+- 22/10/2026 — GRD-1552: [costos sobrios de tres perfiles Medellín](../tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-TRES-PERFILES-MEDELLIN-2026-10-22.md); remuneración objetivo9,8M,totalestimado12,2MCOP/mes. Propuesta detenida por Julio; ninguna banda publicada.
+
+- 22/10/2026 — GRD-1552: [costos del resto por CLI y mantenimiento canónico de perfiles](../tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md). COP 12.699.026 / USD 3.479,19 mensuales adicionales; inicial COP 2.295.742 / USD 628,97. Propuesta detenida.
+
+- 2026-10-22T19:11:22.557524-03:00 — GRD-1552: [base comercial vigente](../tenders/gana-loti-agencia-digital-2027-1552/BRIEF-COMERCIAL-VIGENTE.md), rango COP36–38M / USD9.863,01–10.410,96 mensuales; Deal COP456M / USD124.931,51 total12meses, escenario38M. Dos readbacks; propuesta detenida, HOLD contractual, Programática intacta.

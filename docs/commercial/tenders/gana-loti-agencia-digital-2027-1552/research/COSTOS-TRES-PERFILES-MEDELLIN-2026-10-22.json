@@ -1,0 +1,84 @@
+{
+  "checked_at": "2026-10-22T18:37:22-03:00",
+  "currency": "COP",
+  "roles": [
+    {
+      "role": "Trafficker Digital",
+      "level": "Semi-senior",
+      "low": 3200000,
+      "target": 3500000,
+      "high": 3800000
+    },
+    {
+      "role": "Content Creator",
+      "level": "Semi-senior",
+      "low": 2500000,
+      "target": 2800000,
+      "high": 3000000
+    },
+    {
+      "role": "Email y SMS",
+      "level": "Semi-senior",
+      "low": 3200000,
+      "target": 3500000,
+      "high": 3800000
+    }
+  ],
+  "monthly_gross_compensation": 9800000,
+  "fx_reference_USDCOP": 3191.47,
+  "fx_date": "2026-10-22",
+  "fx_is_finance_yearly_policy_rate": false,
+  "benefits_first_year_usd_per_person": {
+    "connectivity_monthly": 50,
+    "learning_annual": 500,
+    "mental_health_annual": 300,
+    "equipment_on_joining": 400
+  },
+  "benefit_wallets_monthly_all_three_COP": 1436161.5,
+  "coverage_assumption_percent": 10,
+  "coverage_monthly_COP": 980000,
+  "estimated_monthly_total_COP": 12216161.5,
+  "estimated_year_total_COP": 146593938,
+  "route_assumption": "Vía internacional habitual de pago directo ya indicada por Julio; bruto contractual, no neto garantizado; no inferir vínculo laboral o tratamiento tributario aprobados",
+  "contracting_note": "El pago directo no resuelve clasificación. Dedicación exclusiva y administración del comprador ameritan revisión al formalizar; no se autorizan contratos, nómina ni tasas. Si cambia la ruta a laboral/EOR recalcular costos obligatorios y proveedor.",
+  "coverage_note": "Supuesto de gestión, no costo confirmado ni porcentaje legal. Unas25jornadas planificables de vacaciones, días flotantes, bienestar, aprendizaje y mudanza sobre260 equivalen aprox9,6%, redondeado10%. Los12pagos ya remuneran no disponibilidad; esta reserva sólo financia sustitución adicional, no paga dos veces vacaciones. Festivos, eventos vitales y coberturas efectivas requieren planificación; no garantiza capacidad disponible.",
+  "not_included": [
+    "producción gráfica/edición del paquete125entregables",
+    "dirección/estrategia de cuenta",
+    "Social Listening",
+    "plataformas y consumos de pauta/Email/SMS",
+    "overhead corporativo no asignado",
+    "comisiones de pago/FX no cotizadas",
+    "eventual contratación laboral o EOR y obligaciones no verificadas"
+  ],
+  "status": "estimación interna, no propuesta, no banda aprobada en Hiring",
+  "discovery_queries": [
+    "Medellín trafficker digital salario 2026 3.000.000 4.000.000 empleo",
+    "Medellín creador contenido audiovisual salario 2026 2.500.000 3.000.000",
+    "Medellín analista email marketing CRM automatización salario 2026 3.000.000 4.000.000",
+    "\"Medellín\" \"Trafficker\" \"$3.500.000\"",
+    "\"Medellín\" \"Trafficker\" \"$4.000.000\" 2026",
+    "\"Medellín\" \"email marketing\" \"Salario\" automatización CRM analista 2026",
+    "\"Medellín\" \"Analista CRM\" \"3.500.000\"",
+    "site.comfama.com \"Trafficker\" \"Salario\" Medellín",
+    "site.elempleo.com/co/ofertas-trabajo \"Medellín\" \"email\" \"automatización\" \"3,5\"",
+    "\"analista de CRM\" \"Medellín\" \"Salario\" marketing email",
+    "\"Trafficker\" \"Medellín\" \"3.500.000\" \"2026\"",
+    "\"Informe Inmobiliario\" \"Trafficker\" \"3.700.000\"",
+    "\"Medellín\" \"Trafficker\" \"3.000.000\" \"Google\" \"GTM\"",
+    "site.comfama.com \"Creador\" \"contenido\" \"Salario\" \"3.000.000\""
+  ],
+  "opened_urls": [
+    "https://www.magneto365.com/ec/empleos/analista-crm-1091182",
+    "https://manpowergroupcol.pandape.computrabajo.com/Detail/9776994",
+    "https://www.elempleo.com/co/ofertas-trabajo/auxiliar-de-produccion-de-contenido-1886758274",
+    "https://co.jobiglo.com/empleo-trafficker-digital-senior-j-6ac8b2ccbc98c12bd80ee1bc",
+    "https://co.linkedin.com/jobs/view/trafficker-digital-senior-at-informe-inmobiliario-4466355293",
+    "https://co.linkedin.com/jobs/view/creador-de-contenidos-digitales-at-master-viajes-sas-4467271619",
+    "https://www.dolar-colombia.net/en/2026-10-22"
+  ],
+  "blocked_sources": {
+    "https://manpowergroupcol.pandape.computrabajo.com/Detail/9776994": "Control antirobot, no usar como fuente decisiva"
+  },
+  "market_method": "Anuncios publicados no son distribución estadística ni prueba de aceptación de una oferta internacional. Rangos recomendados por funciones, no copia literal de salarios laborales."
+}

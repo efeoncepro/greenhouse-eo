@@ -1,0 +1,86 @@
+# GANA y LOTI — Agencia digital 2027 — GRD-1552
+
+## Base comercial vigente — decisión de Julio, 22/10/2026
+
+**Rango interno: COP 36–38 millones / USD 9.863,01–10.410,96 al mes.** Escenario principal para valoración CRM: **COP 38 millones / USD 10.410,96 mensuales**; importe del Deal para los **12 meses**: **COP 456.000.000 / USD 124.931,51**, moneda COP. Alternativa anual: COP 432.000.000 / USD 118.356,16. El techo comprador COP 40 millones / USD 10.958,90 no es el precio recomendado.
+
+Costo mensual consolidado: **COP 25.121.526 / USD 6.882,61**; contribución preliminar a 38 millones: COP 12.878.474 / USD 3.528,35, **33,89%**, antes de arranque y costos sin validar. **La propuesta sigue detenida**: el rango y la actualización del Deal no aprueban precio definitivo, preparación, emisión, presentación ni GO. Toda documentación futura debe leer la [base comercial vigente](BRIEF-COMERCIAL-VIGENTE.md), que distingue costos internos, alcance pendiente y documentos para el comprador. [Consolidación](research/BASE-COMERCIAL-CONSOLIDADA-2026-10-22.json) · [Recibo CRM](research/CRM-BASE-COMERCIAL-2026-10-22.json).
+
+## Estado al 22 de octubre de 2026
+
+Invitación recibida y bases leídas. **Intento 13 con Grupo Réditos**, según instrucción directa de Julio, corroborado por la carpeta `13. Agencia Digital 2027`. No acredita oferta presentada. **HOLD / investigación incompleta** por entidad contratante y verificación contractual pendientes. El plazo operativo fue confirmado por Julio según la captura de Wherex: **30/10/2026 a las18:00, registrado en America/Santiago**, sin afirmar que la captura rotule ese huso. **Deal [66560488750](https://app.hubspot.com/contacts/48713323/record/0-3/66560488750?utm_source=codex&utm_medium=ai_agent) creado el 22/10/2026 a las 14:15 Santiago**, tras la reiteración expresa de Julio «Crea el deal» después de informar las diferencias. Alta administrativa con HOLD documentado; no equivale a GO, postulación o hechos contractuales validados.
+
+- Nombre CRM verificado: **Gana y Loti ∣ CO ∣ Agencia digital 2027 ∣ GRD-1552** (separadores ASCII en payload).
+- [Company de relación Grupo Reditos 34264439413](https://app.hubspot.com/contacts/48713323/record/0-2/34264439413?utm_source=codex&utm_medium=ai_agent). Reutilizada como Primary, sin cambiar propiedades ni crear filial.
+- [Ficha primaria Wherex](https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=information): LIC-1552 / GRD-1552; compra425489; borrador7578948, estado **Editando**. Apertura inicial por Julio22/10 13:59 visible antes de esta revisión.
+- [Original en OneDrive](https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Grupo%20Reditos/13.%20Agencia%20Digital%202027/425489.zip). No se modifica ni reemplaza.
+- [Preparación y control contractual](research/CRM-ALTA-PROPUESTA-2026-10-22.json) · [Recibo del alta y verificación](research/CRM-ALTA-VERIFICADA-2026-10-22.json).
+
+**Proceso separado:** [Gana ∣ CO ∣ Programática omnicanal ∣ GRD-1541, Deal66065702426](https://app.hubspot.com/contacts/48713323/record/0-3/66065702426?utm_source=codex&utm_medium=ai_agent), **intento12**, oferta7543223. Se consultó en lectura; ninguna mutación. No trasladar su feeCOP4,5M/mes, presupuesto de mediosCOP30M/mes, proveedores ni evidencias de presentación al intento13.
+
+## Regla sobre licitaciones anteriores — corrección de Julio, 22/10/2026
+
+Julio informó que una licitación anterior del grupo se perdió y advirtió que no debe servir para guiar la nueva. No indicó en esta corrección el número de ese expediente: no atribuir la pérdida al intento12 de Programática ni modificar su estado por inferencia.
+
+Las bases de Agencia Digital2027, GRD-1552/intento13, son la autoridad para alcance, perfiles, dedicaciones, cantidades, requisitos, calendario y preparación de la oferta. Las bases y propuestas anteriores pueden revisarse para localizar documentos y antecedentes verificables; no sirven como guía, modelo, plantilla ni prueba de que el comprador repita o acepte condiciones. Toda coincidencia debe estar comprobada en el RFP actual. No trasladar solución, estrategia, precio, supuestos de cumplimiento ni criterios de éxito de la oferta perdida. Sí se permite recuperar respaldos reales, verificando su vigencia y pertinencia frente a las bases actuales.
+
+La revisión de requisitos y las tres vacantes ya publicadas se sustentaron en el RFP actual; los beneficios y la estructura editorial proceden del canon de Efeonce y el seniority/ruta de contratación de confirmaciones expresas de Julio. Esta corrección no altera vacantes, publicaciones ni CRM.
+
+## Qué compra el grupo
+
+Agencia integral para GANA (énfasis Antioquia) y LOTI (nacional/loti.com.co), durante un año, descrito como enero2027–enero2028. Estrategia digital, redes y contenidos, pauta/SEO-SEM, creatividad/diseño/audiovisual, contactabilidad Email/SMS, analítica/tracking, Social Listening y crisis; comentarios de ficha agregan televisión/radio regional y publicidad exterior. No prueba uso o interés HubSpot.
+
+Tres perfiles dedicados100%: Trafficker, Content Creator y Contactabilidad. Formato describe2días presenciales por semana en Medellín y3remotos; Content Creator bajo administración directa del comprador, otros dos coliderados. No hay compromiso de Efeonce sobre contratación, disponibilidad, precios ni resultados.
+
+RFP Formato!H9: **COP 40.000.000 / USD 10.958,90 mensuales máximo**. El formulario Wherex confirma COP y 12 meses, sin IVA en el total de oferta. Pago de medios/herramientas/consumos e impuestos del techo siguen pendientes. La instrucción inicial de no poblar `amount` queda superada exclusivamente por el mandato posterior de Julio: registrar COP 456.000.000 / USD 124.931,51 como valoración interna del escenario principal; no precio definitivo ni presupuesto comprador. Pago en ficha30días corridos desde recepción de factura. Presupuesto y autoridad de adjudicación individuales no verificados.
+
+## Calendario y control previo
+
+Revisadas ficha completa, centro de preguntas/anuncios y los3adjuntos generales. Invitación recibida22/10/2026 16:55:31UTC,13:55:31Santiago. Publicación visible22/10/2026 13:55, **sin zona explícita**, separada de recepción y fechas de emisión/actualización de plantilla2019/2024. No calcular demora exacta desde la hora de UI.
+
+**Plazo operativo vigente:** Julio confirmó la captura de Wherex N°1552, **30/10/2026 a las18:00**. Se registró en `fecha_de_cierre_de_licitacion` como `2026-10-30T21:00:00Z`, usando America/Santiago (UTC−3), zona del operador. La captura no rotula el huso; no se presenta como una verificación adicional del comprador. El correo previo14:00COT queda como antecedente histórico. La ronda de preguntas consta hasta30/10sin hora. `closedate` comercial permanece vacío. [Recibo y readback de actualización](research/CRM-CIERRE-2026-10-22.json).
+
+Invitación: comprador Réditos Empresariales S.A.; ficha de facturación: **REDIAPUESTAS S.A.S., NIT901716185**. Conservar ambas fuentes y confirmar quién contrata/factura antes de emitir oferta. Company de relación no prueba contraparte contractual.
+
+Proveedor seleccionado/adjudicado, resolución, orden de compra/servicio y contrato firmado: **no encontrados en el material accesible**, no se certifica inexistencia. Firma y ejecución real: **no verificadas**. Vigencia futura solicitada no es contrato celebrado. No se encontró documento contractual decisivo que leer; todos los adjuntos disponibles sí se leyeron. Cero preguntas y cero anuncios visibles no acreditan ausencia de contrato. Resultado: **HOLD**, sin recomendar postular ni gasto/negocio compartido. Fecha/hora exacta de revisión y hechos por campo en JSON.
+
+## Bases y preparación pendiente
+
+Original ZIP contiene: `RFP Agencia Digital 2027 WX-202610221154228770.xlsx` (Formato, Requisitos técnicos, Listas y Hoja3, lectura de todas las celdas no vacías), declaración de conflicto de intereses DOCX íntegra sin completar/firmar, y Línea Ética PDF íntegro1p. Los3coinciden con inventario de ficha.
+
+Cuatro documentos obligatorios: Cámara de Comercio actualizada<=30días;2certificaciones de contratos similares; económica modulable con inclusiones y cumplimiento de todos los entregables; RUT completo. Además, RFP requiere cumplimiento/valores y página de ofertaPDF por requisito técnico. La equivalencia de documentos chilenos no se hereda automáticamente de Programática.
+
+Volumen:125piezas/mes (75GANA+50LOTI); hasta60emails y60copiesSMS/mes, gestión hasta7MSMS y2Memails/mes;24parrillas/año; seguimiento semanal/mensual,12informesSocialListening,4sector+4tendencias+2benchmark,1protocolo crisis y diagnóstico inicial. El RFP presenta diferencias: C12hasta8conceptos/año frente a C13/requisitos10más2campañas macro; C13dice30posts/historias pero reparto20+15=35cada uno y C12también35. Corresponde al comprador aclararlas; no prometer un alcance resuelto.
+
+Julio/Operaciones deben decidir viabilidad de3perfiles dedicados y presencia en Medellín, experiencia con marcas antioqueñas/servicios especializados, producción, capacidad, estructura y margen. La investigación del agente ya separó procesos, leyó bases y verificó duplicados; la respuesta del comprador sobre calendario/contraparte sigue pendiente. No se identifica persona responsable con autoridad para este proceso; no se asocian contactos históricos por inferencia.
+
+## CRM y límites
+
+Portal48713323 y ownerJulio75788512 revalidados por MCP. DEAL read/write disponibles; pipeline `default`, entrada `appointmentscheduled` administrativa, sin reunión ni calificación inferidas. `Strategic Bets`/`newbusiness` coherente con intento12, sin asumir cliente ganado. Servicios multiselect verificados en metadata; nombre, descripción, próximo paso, fuenteWherEX, modalidadLicitación e ID propios preparados. Sin amount, cierrecomercial, datetime de licitación ni presupuesto numérico dudoso. Sin nuevos Contact/Company/Lead/Note, propiedades, envíos ni presentación. Siete Deals históricos asociados leídos; ninguno coincide con1552. Búsquedas por ID/nombre y llave idempotente resultaron0. No reintentar create sin búsqueda nueva tras outcome incierto.
+
+Julio confirmó expresamente el alta tras conocer el HOLD. Se ejecutó sólo este Deal y su asociación Primary con la Company existente. Primera lectura confirmó nombre, owner, etapa inicial administrativa, bucket Strategic Bets, newbusiness, referencia y servicios; amount, moneda, closedate y fecha de cierre de licitación no retornan valor. No hay reunión agendada ni propuesta presentada. Recibo conserva la autorización, payload y lecturas. Las diferencias del expediente siguen pendientes y no amplían el mandato.
+
+Segunda lectura (2026-10-22T14:16:28.489028-03:00): propiedades contrastadas sin diferencias frente al payload; asociación Primary34264439413 estable. Sin importe, moneda ni fechas de cierre retornadas. El catálogo de workflows sigue sin acceso403, sin ampliar permisos.
+
+Actualización del plazo confirmada por Julio y verificada en HubSpot: 2026-10-22T14:18:50.056827-03:00. Programática (intento12) no se modificó.
+
+## Revisión de requisitos para postular — 2026-10-22T14:27:39.657881-03:00
+
+[Análisis completo y preparación](research/REQUISITOS-PARA-POSTULAR-2026-10-22.md). Julio seleccionó **Berel y SKY** como las dos experiencias; ambos contratos localizados y alcance pertinente revisado, más carta SKY. Gobierno de Santiago queda como alternativa. Tener cero archivos cargados antes de postular es normal, no un pendiente ni bloqueo. Preparar técnica/económica y Excel, definir tres perfiles dedicados con presencia Medellín y precisar alcance presupuestario; preguntas concretas documentadas. Portal confirma12meses, selectorCOP, total sinIVA y límite20MB. Sin cambio CRM, archivos completados, firmas, consultas enviadas ni oferta presentada.
+
+## Borrador de captación de talento — 2026-10-22T14:33:50.972824-03:00
+
+Por pedido de Julio se aplicó greenhouse-talent-people-operator y se redactó un [anuncio personal para LinkedIn](research/LINKEDIN-TALENTO-MEDELLIN-2026-10-22.md), cliente anonimizado, tres perfiles y modalidadMedellín. [Evidencias y fundamento](research/LINKEDIN-TALENTO-FUNDAMENTO-2026-10-22.md). 2724 caracteres / 2729 unidadesUTF16. Beneficios del charter vigente, equipo multicultural y operación internacional sustentados; no se inventó headcount/salario. Proyecto previsto2027, sin promesa de adjudicación/inicio. No se publicó ni programó; no se crearon openings ATS ni se contactaron candidatos. Bandas, ruta contractual y proceso específico pendientes antes de publicación.
+
+## Difusión de talento — 22/10/2026
+
+Por instrucción expresa de Julio, anuncio de tres perfiles publicado en su LinkedIn, LinkedIn Efeonce e Instagram efeoncepro con la imagen We are Hiring, cliente anonimizado y proyecto previsto para 2027. [Publicaciones y comprobación](../../../operations/hiring/2026-10-22-talento-medellin-publicacion.md). Tres estados PUBLISHED; no acredita selección de personas ni adjudicación. Sin openings nuevos en Hiring.
+
+## Aclaración final y revisión de archivos anteriores — 2026-10-22T17:58:15.110945-03:00
+
+Julio permite revisar las bases y documentos presentados en procesos anteriores para recuperar antecedentes; reitera que, al haberse perdido, no son guía de la oferta nueva. Queda retirada la sugerencia del agente de aprovechar la «estructura útil» de la propuesta anterior. [Revisión realizada, documentos localizados y límites](research/REVISION-ANTERIORES-Y-RESPALDOS-2026-10-22.md). Fuente decisiva: RFP2027. Sin cambios externos.
+
+
+## Costos internos y propuesta detenida — 22/10/2026
+
+Por instrucción de Julio no se prepara propuesta. [Costo del resto por CLI](research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md): COP 12.699.026 / USD 3.479,19 mensuales adicionales; inicial COP 2.295.742 / USD 628,97. No incluye los tres dedicados. Estimación en revisión con FX de política 3.650 COP/USD, sin precio comercial aprobado. Catálogo local actualizado por vía canónica; sin cambios CRM, Hiring ni herramientas compradas.
