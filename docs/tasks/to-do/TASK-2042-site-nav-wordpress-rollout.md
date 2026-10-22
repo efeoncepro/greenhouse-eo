@@ -475,6 +475,8 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
 
 ## Acceptance Criteria
 
+- [ ] La evidencia visual de cierre se captura sin el aviso de depuración del Lab ni otros superpuestos: en 1280×720 tapaba «Ver todas las soluciones» y no dejaba ver su subrayado (pedido de la sesión del menú, contralora de fidelidad, 2026-10-22).
+
 - [ ] Con `eo_site_nav_enabled=off` el sitio sirve el encabezado de Ohio sin assets de AXIS.
 - [ ] Con `pilot`, sólo las páginas de la lista muestran el menú nuevo.
 - [ ] Con `on`, todo el sitio muestra el menú nuevo, y volver a `off` restaura Ohio (verificado al menos una vez en
