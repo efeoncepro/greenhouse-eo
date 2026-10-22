@@ -165,6 +165,35 @@ Cada peldaño tiene su mecanismo, su señal y su siguiente paso. Nadie sube por 
 | 6 · Embajador | nos recomienda o se suma | reconocimiento, merch de pertenencia, encuentros | menciones, etiquetas, postulaciones, referidos |
 | 7 · Conversación | su empresa nos busca | LinkedIn, la web, el diagnóstico | «¿cómo nos conociste?», primer contacto, menciones en reunión |
 
+### 8.1 LinkedIn: donde el fan se vuelve conversación `[operador, 2026-10-22]`
+
+Instagram hace fans; LinkedIn es el peldaño 7. Su trabajo es el **respeto** (oficio, evidencia, criterio) sin perder a
+las personas, y tiene que ser reconocible para el fan que llega desde Instagram: mismas caras, la órbita, la misma voz.
+
+| | LinkedIn Efeonce | LinkedIn de Julio |
+|---|---|---|
+| **Construye** | credibilidad: «saben lo que hacen» | relación: «confío en él» |
+| **Le habla a** | quien evalúa (comités, compras, equipos) | quien decide y conversa |
+| **Ancla** | respeto | confianza, el puente entre amor y respeto |
+| **Termina en** | un diagnóstico, una herramienta, la web | un mensaje directo, una reunión |
+
+- **LinkedIn Efeonce (3 por semana):** martes, el documento educativo de la serie de servicio; jueves, **la prueba con
+  personas** (caso como método, video corto del talking head o partner, mostrando al equipo que hizo el trabajo);
+  viernes, la pregunta y su respuesta en La órbita. **La cultura entra sólo con argumento:** «así revisamos una pieza
+  antes de que llegue al cliente» sí; «celebramos un cumpleaños» es Instagram.
+- **LinkedIn de Julio:** miércoles, lo que vio en terreno o su postura; viernes, talking head; newsletter Marketing con
+  Manzanitas cada dos jueves; y una **rutina diaria de 15 minutos**: comentar con sustancia en posts de compradores y
+  cuentas objetivo, responder todo comentario y mensaje, y dar una bienvenida personal a quien conecta después de
+  interactuar. Así el fan se vuelve conversación sin que nadie le venda.
+- **La voz del equipo:** perfiles del equipo al día y cada persona comparte las piezas con su propia mirada, nunca
+  con un texto copiado. **Voluntario**: si es obligatorio, se nota.
+- **Cruces:** la bio de Instagram ofrece un camino a la web o al LinkedIn de Julio sin vender; los encuentros
+  trimestrales se transmiten también por **LinkedIn Live**; la medición del puente muestra si un contacto que llega por
+  LinkedIn pasó antes por Instagram o YouTube.
+- **Medición:** Efeonce — tiempo de lectura, comentarios de cargos objetivo, clics a diagnósticos y herramientas, leads
+  con fuente LinkedIn. Julio — mensajes directos, reuniones que nacen de un post, comentarios de compradores y
+  suscriptores del newsletter. Puente — contactos de LinkedIn con paso previo por Instagram o YouTube.
+
 ---
 
 ## 9. Mecánicas de comunidad

@@ -77,6 +77,11 @@ de 2027 operan LinkedIn, Instagram, blog y newsletter; en febrero se suman Threa
 Efeonce 3 por semana, LinkedIn Julio 2 (1 en febrero) + newsletter quincenal, Instagram 3 + stories, Threads 4–5,
 blog 1, YouTube 1 tutorial al mes + 1 Short por semana.
 
+**8. LinkedIn recibe al fan.** LinkedIn Efeonce construye credibilidad (respeto) y el LinkedIn de Julio, relación
+(confianza). La cultura entra a LinkedIn sólo con argumento; Julio suma una rutina diaria de 15 minutos de comentarios
+y respuestas; el equipo comparte con su propia voz, de forma voluntaria; los encuentros trimestrales se transmiten
+también por LinkedIn Live. Detalle en la [estrategia de love brand §8.1](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#81-linkedin-donde-el-fan-se-vuelve-conversación-operador-2026-10-22).
+
 **7. La línea «IA con contexto».** Nombre aprobado para la serie de implementación de IA empresarial: Gemini
 Enterprise, Claude Enterprise, ChatGPT Enterprise, agentes propios y de plataforma, y la nube donde corren. Línea
 de servicio **Engine** (la familia técnica es *Agent Systems & Platforms* de la marca de producto Wave).

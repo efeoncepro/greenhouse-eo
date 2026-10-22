@@ -45,6 +45,9 @@ de primer contacto, «¿cómo nos conociste?», búsquedas de marca), no sólo e
 marca agencia**, cargar [`EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md`](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md):
 cada pieza declara su pilar emocional (orgullo de oficio, generosidad, cercanía, optimismo con criterio), el peldaño
 de la escalera del fan que mueve y su mecanismo; responder cada comentario con sustancia es parte del entregable.
+**LinkedIn recibe al fan** (§8.1 de esa estrategia): la página construye respeto y Julio confianza; la cultura entra a
+LinkedIn sólo con argumento; Julio sostiene 15 minutos diarios de comentarios y respuestas; el equipo comparte con su
+propia voz (voluntario); los encuentros trimestrales también por LinkedIn Live.
 | **Glitch (email)** | la propiedad | la edición semanal |
 
 **Franquicias con canal-hogar** (nacen en uno, viajan como corte con trabajo propio, nunca como copia):
