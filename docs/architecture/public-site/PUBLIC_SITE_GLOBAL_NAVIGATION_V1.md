@@ -346,9 +346,11 @@ Lo último de cada formato se resuelve **en el servidor del sitio**, al pintar e
   «Glitch #17: X» como `EDICIÓN 17 · 28 JUL`, y un post sin prefijo como `GLITCH · fecha`. El prefijo se quita del
   título que se pinta. El CTA del destacado sigue al tipo: «Leer el Flash», «Leer la edición» o «Leer en Glitch». El
   filtro `eo_site_nav_resource_edition` reemplaza al parser si Glitch pasa a subcategorías (`TASK-1337`).
-- **Fechas:** con `wp_date`, en la zona del sitio (America/Santiago) y con el mes abreviado en mayúsculas.
-- **Caché:** transient de 12 min. Se invalida al publicar, despublicar o editar un post publicado y al cambiarlo de
-  categoría.
+- **Fechas:** se toman del instante GMT del post y se muestran en `America/Santiago`, con la zona puesta explícitamente,
+  y con el mes abreviado en mayúsculas. efeoncepro.com no tiene zona horaria configurada (para WordPress, la hora local
+  es UTC), así que la zona del sitio no sirve. Ejemplo: un post de las 02:00 UTC del 28 es del 27 en Chile.
+- **Caché:** transient de 12 min. Se invalida al publicar, despublicar (papelera incluida), editar o borrar un post
+  publicado y al cambiarlo de categoría.
 - **Fallas:** si la fuente falla o viene vacía, se usa lo fijo del documento; una falla se recuerda 2 min. El menú
   nunca queda vacío ni bloquea la página. Los textos se recortan a los límites del esquema y los enlaces quedan
   relativos. El resultado sigue cumpliendo `site-nav.v1` (probado).
