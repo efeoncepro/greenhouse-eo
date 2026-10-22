@@ -79,7 +79,7 @@ Esta es la tabla más importante para un agente de producto: conecta cada moment
 | 7 | **Referral y evangelismo** | Captura de testimonios en momentos de impacto | Human-driven. El portal no interviene directamente. | — |
 | 8 | **Offboarding** | Cierre profesional con respeto | Se desactiva acceso. Se genera reporte final con datos históricos como entregable de cierre. | Admin (desactivar tenant) + Export |
 | T1 | **Stakeholder invisible** | Artefactos ejecutivos compartibles | Generados desde el portal con datos reales, legibles sin contexto adicional (un CFO/CEO los evalúa directo). | Inteligencia Financiera |
-| T2 | **Comunidad de clientes** | Aprendizaje + networking + benchmarks | Human-driven hoy: newsletter, blog, Think tools, YouTube, sociales, ebooks, webinars y futuro podcast. Futuro: comunidad/advisory, sesiones de clientes y benchmarks anónimos cross-tenant en el portal. | — (roadmap) |
+| T2 | **Comunidad de clientes** | Aprendizaje + networking + benchmarks | Human-driven hoy: newsletter, blog, Think tools, YouTube, sociales, ebooks, webinars y futuro podcast. Futuro: comunidad/advisory, sesiones de clientes y benchmarks anónimos cross-tenant en el portal. La comunidad pública de fans (marca agencia) y sus mecanismos viven en [`Love Brand & Community Strategy`](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md). | — (roadmap) |
 
 ---
 

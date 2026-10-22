@@ -208,6 +208,17 @@ distintivo medido; no sustituir atribución por un color sin evidencia. Una firm
 una aplicación física debe pertenecer al objeto y ninguna demuestra por sí sola pertinencia estratégica.
 No convertir una solicitud de pieza en un proyecto de branding completo si el encargo ya tiene marca y brief.
 
+### Love brand de la marca agencia **[operador, 2026-10-22]**
+
+Efeonce vende a empresas, pero detrás de cada empresa hay personas: Instagram y Threads (marca agencia) y, desde la
+utilidad, YouTube y el newsletter Marketing con Manzanitas, hacen fans a esas personas para que la conversación de
+negocio nazca después en LinkedIn o la web. Canon:
+[`EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md`](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
+Al decidir papel de marca en una pieza de marca agencia: (1) anclarla a un pilar emocional y su mecanismo —orgullo
+de oficio, generosidad, cercanía, optimismo con criterio sobre la IA—; (2) sumar amor sin restar respeto (un meme sin
+oficio resta respeto); (3) «comunidad» nunca sin mecanismo; (4) medir el puente fan → conversación, no sólo el canal;
+(5) personas reales sólo desde el roster y con consentimiento; nada de vender en Instagram o Threads.
+
 Para mecanismos, innovación y conexión emocional en creatividad social, cargar
 [social módulo 12](../social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md).
 Separar hipótesis de diseño de evidencia psicológica/neural y de resultados de audiencia; revisar memoria

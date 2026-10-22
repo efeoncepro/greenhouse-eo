@@ -44,7 +44,9 @@ plan que las aplica vive en el lienzo privado «Efeonce Social Nov 2026 – Q1 2
 **2. Instagram y YouTube construyen love brand.** Decisión del operador: «Efeonce vende a empresas, pero detrás de
 esas empresas hay personas». Instagram no persigue conversión directa: hace fans a las personas de las empresas
 para que la conversación de negocio nazca después en LinkedIn, la web u otro canal. YouTube suma afinidad desde la
-utilidad (tutoriales con caras recurrentes), sin abandonar su rol de segundo buscador.
+utilidad (tutoriales con caras recurrentes), sin abandonar su rol de segundo buscador. La estrategia completa
+(pilares, fans, activos, escalera, mecánicas, medición y gobierno) vive en
+[`Efeonce Love Brand & Community Strategy V1`](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
 
 - **[recomendación]** Medir el puente fan → conversación, no sólo el canal: pregunta «¿cómo nos conociste?» en
   formularios y diagnósticos, primer contacto por fuente en HubSpot, búsquedas de marca y tráfico directo, y

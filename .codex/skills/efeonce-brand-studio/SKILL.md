@@ -208,6 +208,17 @@ distintivo medido; no sustituir atribución por un color sin evidencia. Una firm
 una aplicación física debe pertenecer al objeto y ninguna demuestra por sí sola pertinencia estratégica.
 No convertir una solicitud de pieza en un proyecto de branding completo si el encargo ya tiene marca y brief.
 
+### Love brand de la marca agencia **[operador, 2026-10-22]**
+
+Efeonce vende a empresas, pero detrás de cada empresa hay personas: Instagram y Threads (marca agencia) y, desde la
+utilidad, YouTube y el newsletter Marketing con Manzanitas, hacen fans a esas personas para que la conversación de
+negocio nazca después en LinkedIn o la web. Canon:
+[`EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md`](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
+Al decidir papel de marca en una pieza de marca agencia: (1) anclarla a un pilar emocional y su mecanismo —orgullo
+de oficio, generosidad, cercanía, optimismo con criterio sobre la IA—; (2) sumar amor sin restar respeto (un meme sin
+oficio resta respeto); (3) «comunidad» nunca sin mecanismo; (4) medir el puente fan → conversación, no sólo el canal;
+(5) personas reales sólo desde el roster y con consentimiento; nada de vender en Instagram o Threads.
+
 Para mecanismos, innovación y conexión emocional en creatividad social, cargar
 [social módulo 12](../social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md).
 Separar hipótesis de diseño de evidencia psicológica/neural y de resultados de audiencia; revisar memoria
@@ -359,6 +370,10 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
     propuesta y «¿Conversamos? Cuando quieras.» en la de brochure; nunca el eslogan en la portada; `cover-classic` y
     `close-classic` retiradas para estos documentos (no están en el catálogo del composer). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6; resumen en
     [graphic-line-orbit.md](references/graphic-line-orbit.md) regla 11b.
+  - **Brochure oficial de la agencia** (aprobado 2026-10-16): «Agencia de Marketing 360°», 84 láminas y corta de 26;
+    es el documento por defecto para «¿qué hace Efeonce?». Armado, rutas y pendientes en `deck-studio`; el método de
+    los casos con piezas reales del cliente (componer lo exacto, el modelo sólo termina, logo como vinilo compuesto),
+    en `design-studio` → `references/efeonce-photographic-language.md` §«Caso de cliente con piezas reales».
   - **Brochure «Agencia de Medios»** (aprobado 2026-10-16): 65 láminas en la línea Voice; armado y pendientes en
     `deck-studio`. Dos reglas de marca que salen de él: **el logotipo de un tercero nunca se escribe con la tipografía de
     Efeonce** (va su logotipo oficial) y **ninguna pieza promete declarar ni traspasar rebates o comisiones de medios**.

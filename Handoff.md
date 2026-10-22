@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-10-22 — Redes Efeonce: love brand y canales v2
+
+Estrategia social y editorial registrada: [PDR-020 rev. 2.0](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)
+y [love brand y comunidad](docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md). Plan nov 2026–Q1 2027 y piezas
+en el lienzo privado `claude.ai/artifact/MWoecLSspdKw8ZRXKzPBBd`; nada programado en Metricool. Pendientes: medición
+del puente («¿cómo nos conociste?» + fuente de primer contacto, requiere task), baseline nov–dic, piezas de Instagram,
+Año Nuevo (MET-2338 archivada) y Navidad rehecha desde cero. fal sin saldo (A −0,29 / B −0,35 USD al 22-oct).
+
 ## 2026-10-22 — Kibernum: Growth Colombia, contacto y dos canales
 
 Contact `256968083769` / Company `53955357196` / Primary verificados; seis segmentos del contacto

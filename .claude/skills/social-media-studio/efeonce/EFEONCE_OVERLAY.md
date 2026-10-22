@@ -41,7 +41,10 @@ Efeonce.** Cárgalo antes de proponer formato, calendario o distribución en can
 **Tres familias (PDR-020 revisión 2.0, 2026-10-22):** marca agencia (Instagram, Threads) · conexión B2B (LinkedIn
 página y Julio) · Marketing con Manzanitas (blog, newsletter, YouTube). Instagram hace fans a las personas de las
 empresas; la conversación de negocio nace después en LinkedIn o la web. Medir el puente fan → conversación (fuente
-de primer contacto, «¿cómo nos conociste?», búsquedas de marca), no sólo el canal.
+de primer contacto, «¿cómo nos conociste?», búsquedas de marca), no sólo el canal. **Antes de idear o calendarizar
+marca agencia**, cargar [`EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md`](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md):
+cada pieza declara su pilar emocional (orgullo de oficio, generosidad, cercanía, optimismo con criterio), el peldaño
+de la escalera del fan que mueve y su mecanismo; responder cada comentario con sustancia es parte del entregable.
 | **Glitch (email)** | la propiedad | la edición semanal |
 
 **Franquicias con canal-hogar** (nacen en uno, viajan como corte con trabajo propio, nunca como copia):

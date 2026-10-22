@@ -2,6 +2,15 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-22 — Love brand de Efeonce y sistema de canales v2
+
+- [PDR-020 revisión 2.0](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md): tres familias (marca
+  agencia · conexión B2B · Marketing con Manzanitas), Threads con el gancho de Glitch, X sólo escucha, YouTube piloto,
+  newsletter en el LinkedIn de Julio e «IA con contexto»; cierra las decisiones 1, 4 y 5.
+- Nueva [estrategia de love brand y comunidad](docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md): fans
+  dentro de las empresas, pilares anclados al Why, escalera del fan, mecánicas y medición del puente a negocio.
+  Contexto `09`/`10`/índice y skills de marca, social y contenido conectados (espejos sincronizados).
+
 ## 2026-10-22 — Kibernum: outreach y segmentación comprobados
 
 - Contact/Company/Primary y seis membresías activas del contacto verificados; correo con firma gráfica/CCO y brochure 360° completo, EMAIL SENT e InMail publicados. Referencias espejo incorporan el caso; sin nueva automatización ni permisos. [Registro y límites](docs/commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md).

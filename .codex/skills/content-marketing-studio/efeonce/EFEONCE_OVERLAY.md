@@ -115,7 +115,7 @@ Reglas que gobiernan la atomización a canales propios:
 
 - **Metricool** está conectado (MCP, 10 marcas) y **sí programa posts** (`createScheduledPost`; gotcha `dayOfWeek 1=lun..7=dom`). La ejecución social es de `social-media-studio`.
 - **Redes sociales de Efeonce** y su calendario → `social-media-studio` + **PDR-020** (rol y catálogo por canal) + landing de redes (TASK-1351). Threads es canal nuevo, abierto como experimento con criterio de salida.
-- **Revisión 2.0 de PDR-020 (2026-10-22):** tres familias — marca agencia (Instagram, Threads: love brand y comunidad, sin conversión directa), conexión B2B (LinkedIn página y Julio) y **Marketing con Manzanitas** (blog, **newsletter quincenal en el LinkedIn de Julio** y YouTube). Glitch llega a Threads sólo como gancho; X es escucha. Un átomo del pillar se reparte por familia, nunca como copia.
+- **Revisión 2.0 de PDR-020 (2026-10-22):** tres familias — marca agencia (Instagram, Threads: love brand y comunidad, sin conversión directa), conexión B2B (LinkedIn página y Julio) y **Marketing con Manzanitas** (blog, **newsletter quincenal en el LinkedIn de Julio** y YouTube). Glitch llega a Threads sólo como gancho; X es escucha. Un átomo del pillar se reparte por familia, nunca como copia. Instagram, Threads, YouTube y el newsletter suman al **love brand** (fans dentro de las empresas, sin conversión directa): [`EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md`](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
 - **Cluster federado:** una pieza social sólo entra al registry como nodo cuando resuelve un JTBD autónomo y
   declara roles, relación y progreso; de lo contrario conserva su rol honesto de activation asset.
 
