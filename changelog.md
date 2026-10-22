@@ -19,6 +19,9 @@
   nunca carrusel; story de Manzanitas en stories de Instagram; reel y vlog de Glitch en pausa; pódcast sin canal;
   tutoriales de YouTube con Julio. PDR-003, PDR-018, estrategia, normas, manuales y skills alineados.
 - Calendario de Notion: se retiró la opción `Twitter 🐦` de `Plataforma` (ninguna fila vigente la usaba).
+- Sitio público (producción): `/servicios/hubspot/` pasa de un 301 adivinado por WordPress (a un post de 2024) a una
+  **302 temporal** de Yoast hacia `/servicios-contratar-hubspot/`; respaldo `_gh_hubspot_302_before_20261022`, purga de
+  caché y verificación en vivo de las variantes con y sin barra y con UTM. Rollback en la referencia de la landing.
 
 ## 2026-10-22 — Kibernum: outreach y segmentación comprobados
 

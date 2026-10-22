@@ -216,7 +216,7 @@ TASK-1812 conservan las implementaciones por proveedor. El comentario de 2026-09
 acotado a futuros productos Agentforce; no describe la oferta transversal ahora registrada.
 
 Readback HTTP 2026-09-19: Home, `/servicios-contratar-hubspot/` y `/aeo-2/` responden `200`;
-`/servicios/hubspot/` redirige a un artículo antiguo; `/servicios/hubspot/agentes/`,
+`/servicios/hubspot/` redirigía a un artículo antiguo (desde el 2026-10-22, 302 temporal a `/servicios-contratar-hubspot/`); `/servicios/hubspot/agentes/`,
 `/servicios/salesforce/` y la ruta propuesta `/servicios/equipos-humano-agente/` responden `404`.
 No hubo escritura WordPress ni autorización de publicación, redirects o pauta.
 

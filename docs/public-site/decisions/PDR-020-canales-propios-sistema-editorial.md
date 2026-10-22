@@ -113,8 +113,9 @@ de servicio **Engine** (la familia técnica es *Agent Systems & Platforms* de la
   canal. Cierra la decisión pendiente 6 y la de naming de `TASK-1802`.
 - **`/servicios/hubspot/` no se contradice con PDR-013: es una redirección vieja.** Hoy apunta a un artículo de
   2024. Mientras no exista el pillar de PDR-013, los posts enlazan a `/servicios-contratar-hubspot/` y la
-  redirección vieja se reemplaza por una **302 temporal** hacia esa landing (cambio en producción del sitio, con
-  autorización). Al publicarse el pillar se aplica el 301 de PDR-013.
+  redirección vieja se reemplaza por una **302 temporal** hacia esa landing. **Aplicada el 2026-10-22** con
+  autorización del operador, respaldo y verificación en vivo. Al publicarse el pillar se borra la 302 y se aplica el
+  301 de PDR-013.
 - **Seasonalities: se comparte el visual clave, nunca el carrusel.** Para piezas de marca y de servicio Instagram
   y LinkedIn llevan cortes propios (§4.4). En una seasonality la celebración es la misma, así que LinkedIn puede
   usar el visual clave, pero como imagen única con su argumento propio.

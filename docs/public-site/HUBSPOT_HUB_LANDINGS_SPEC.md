@@ -171,7 +171,8 @@ puerta anónima. **Meter una licencia de vendor dentro del engine cost-plus cont
 > ([oferta V2](../services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md) §2–§3 y §6). La honestidad sobre
 > estado, costo y límites se queda como prueba del servicio, no como producto de la página. El Customer Agent de
 > ANAM está **activo y en producción** (confirmado por el operador). La URL padre está por decidir: el Pillar vive
-> en `/servicios-contratar-hubspot/` y `/servicios/hubspot/` hoy redirige a un post antiguo. Ejecución: TASK-1403.
+> en `/servicios-contratar-hubspot/` y `/servicios/hubspot/` redirigía a un post antiguo (desde el 2026-10-22 lleva con una 302 temporal a
+> `/servicios-contratar-hubspot/`; PDR-020, delta punto 12). Ejecución: TASK-1403.
 
 | | |
 |---|---|

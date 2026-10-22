@@ -293,8 +293,8 @@ La conversión no es el final: en el bow-tie (`11_hubspot-bowtie.md`), el client
 
 **Landings por serie (medido en efeoncepro.com el 2026-10-22):** medios `/servicios/agencia-de-medios/` y performance
 `/servicios/performance-marketing/` (con formulario de diagnóstico); SEO/AEO `/servicios/posicionamiento-seo/` y
-`/aeo-2/` + Brand Visibility Grader; HubSpot `/servicios-contratar-hubspot/` (`/servicios/hubspot/` redirige a un
-artículo de blog de 2024; los posts enlazan a la landing actual hasta que exista el pillar de PDR-013); producción creativa `/agencia-creativa/` y `/agencia-creativa-v2/` (dos versiones vivas);
+`/aeo-2/` + Brand Visibility Grader; HubSpot `/servicios-contratar-hubspot/` (`/servicios/hubspot/` lleva ahí con una 302
+temporal desde el 2026-10-22, hasta que exista el pillar de PDR-013; con caché de Kinsta la redirección no conserva los UTM, así que los posts enlazan directo a `/servicios-contratar-hubspot/` con sus UTM); producción creativa `/agencia-creativa/` y `/agencia-creativa-v2/` (dos versiones vivas);
 web `/desarrollo-sitios-web/`. **IA con contexto y nube no tienen landing** (`/partnership/` sólo muestra logos).
 
 ---
@@ -384,4 +384,5 @@ disciplina). Clasificación según `efeonce-brand-studio`: **controla** (lo hace
    el blog no tienen dónde convertir. Lo mismo para nube. Requiere task propia del sitio público.
 6. **Higiene de landings:** decidir cuál de las dos landings de agencia creativa queda y reemplazar la redirección de
    `/servicios/hubspot/` por una 302 temporal hacia `/servicios-contratar-hubspot/` hasta que se publique el pillar de
-   PDR-013 (cambio en producción del sitio: requiere autorización).
+   PDR-013. **La 302 quedó aplicada el 2026-10-22** con autorización del operador (Yoast, respaldo y rollback en la
+   referencia de la landing de HubSpot); falta decidir la landing de agencia creativa.

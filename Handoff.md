@@ -13,8 +13,9 @@ Barrido por subagentes aplicado a context, public-site (PDR-003/004/005/018/019)
 jerarquía Glitch↔Manzanitas en PDR-003/018, naming Think/Manzanitas, redirección `/servicios/hubspot/` vs PDR-013,
 reutilizar imágenes del carrusel en LinkedIn (manual de seasonalities vs PDR-020 §4.4), canal del reel/vlog de Glitch,
 story de Manzanitas y pódcast, presentador de los tutoriales de YouTube. **Resueltas el mismo día** (PDR-020, delta punto
-12) y aplicadas a docs, skills y Notion (`Twitter 🐦` retirado del Calendario). Pendiente con autorización: la 302 de
-`/servicios/hubspot/` → `/servicios-contratar-hubspot/` en producción del sitio.
+12) y aplicadas a docs, skills y Notion (`Twitter 🐦` retirado del Calendario). La 302 de `/servicios/hubspot/` →
+`/servicios-contratar-hubspot/` quedó **aplicada y verificada en vivo** (Yoast, respaldo `_gh_hubspot_302_before_20261022`).
+Con caché la redirección no conserva UTM: los posts enlazan directo a la landing.
 
 ## 2026-10-22 — Kibernum: Growth Colombia, contacto y dos canales
 

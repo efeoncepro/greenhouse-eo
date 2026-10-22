@@ -60,8 +60,8 @@ pitch del período se anclan a un capítulo. Canon y reglas de uso:
 de entrada (diagnósticos de AEO, RevOps, performance y creative velocity), pero sólo LinkedIn lleva directo a la
 landing; Instagram, Threads, YouTube, el blog y los newsletters pasan antes por su paso natural (seguir, Glitch,
 herramienta). Brechas que afectan venta: **IA con contexto** (línea Engine) y **nube** no tienen landing, pendiente
-antes del 4-ene-2027; hay dos landings de agencia creativa vivas y `/servicios/hubspot/` redirige a un artículo de
-2024; la medición del puente fan → conversación todavía no existe. Canon:
+antes del 4-ene-2027; hay dos landings de agencia creativa vivas y `/servicios/hubspot/` lleva con una 302 temporal a
+`/servicios-contratar-hubspot/` (desde el 2026-10-22); la medición del puente fan → conversación todavía no existe. Canon:
 [estrategia de love brand §8.4 y §14](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22).
 
 ---

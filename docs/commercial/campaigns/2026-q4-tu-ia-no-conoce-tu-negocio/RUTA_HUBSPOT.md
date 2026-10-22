@@ -156,7 +156,7 @@ se suma como pipeline. La propiedad de campaña por capítulo en HubSpot requier
 1. ~~Revalidar el estado de partnership HubSpot~~ — **resuelto 2026-10-14** (Gold Solutions Partner, autorizado).
    Queda como rutina confirmar el perfil del directorio antes de cada vuelo. Sprocket 3D aprobado.
 2. **Construir el pillar y desbloquear `/precios/`**. Hoy el carril no tiene página que reparta: `/servicios/hubspot/`
-   redirige a un artículo de 2024 y `/servicios-contratar-hubspot/` sigue viva sin su 301.
+   redirigía a un artículo de 2024 (desde el 2026-10-22 lleva con una 302 temporal a la landing vigente) y `/servicios-contratar-hubspot/` sigue viva sin su 301.
 3. **Decidir el hueco de Revenue Lifecycle** (CDR-004 §10.1).
 4. **Autorizar o archivar el caso ANAM RevOps.** Hasta entonces no se cita afuera.
 5. **Volver a medir los códigos de respuesta antes de cada activación.** Una URL viva ayer no se asume viva hoy.

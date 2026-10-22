@@ -109,7 +109,7 @@ capability dentro del sistema, no presentarse como agencia suelta.
 
 - **PDR-006 — Landing "HubSpot" (Agentic Customer Platform + partnership)** (posicionamiento
  decidido) + **TASK-1352** (`complete` 2026-09-11: publicada en `/servicios-contratar-hubspot/`; la migración a
- `/servicios/hubspot/` no se hizo y esa ruta hoy redirige a un post antiguo): **reposiciona la página existente
+ `/servicios/hubspot/` no se hizo; desde el 2026-10-22 esa ruta lleva a la landing vigente con una 302 temporal): **reposiciona la página existente
  `/servicios-contratar-hubspot/`** (id `244079`) del relato "compra e implementa un CRM" al de
  **plataforma agéntica operada con software propio**. Ángulo teach-first ("HubSpot dejó de ser un
  CRM: hay que arquitecturarla, poblarla con datos limpios y gobernar a los agentes"); arco de las
@@ -231,9 +231,10 @@ capability dentro del sistema, no presentarse como agencia suelta.
    existir antes del 4-ene-2027, cuando abre la serie; requiere task propia del sitio público.
  - **Agencia creativa duplicada:** `/agencia-creativa/` (página `249582`) y `/agencia-creativa-v2/` siguen vivas;
    decidir cuál queda.
- - **`/servicios/hubspot/`** redirige a un artículo de blog de 2024; la landing vigente es
-   `/servicios-contratar-hubspot/`. Decidido 2026-10-22: 302 temporal hacia la landing vigente hasta publicar el
-   pillar de PDR-013, que aplica el 301 definitivo (cambio en producción, con autorización).
+ - **`/servicios/hubspot/`** redirigía (301 adivinado por WordPress) a un artículo de blog de 2024; la landing vigente
+   es `/servicios-contratar-hubspot/`. Decidido 2026-10-22: 302 temporal hacia la landing vigente hasta publicar el
+   pillar de PDR-013, que aplica el 301 definitivo. **Aplicada el 2026-10-22** (Yoast, 302 `plain`, respaldo
+   `_gh_hubspot_302_before_20261022`); al publicar el pillar se borra antes de aplicar el 301. Con caché de Kinsta la redirección no conserva los UTM, así que los posts enlazan directo a `/servicios-contratar-hubspot/` con sus UTM.
  - La **medición del puente** fan → conversación («¿cómo nos conociste?» y fuente del primer contacto en HubSpot)
    no existe; requiere task propia (`greenhouse-growth-forms` + HubSpot).
 - **Territorio editorial “Creative Workflows”** (PDR-014, Pillar V4 publicada; satélites siguientes): la
