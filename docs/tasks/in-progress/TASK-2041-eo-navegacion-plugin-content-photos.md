@@ -448,6 +448,20 @@ El panel las encuadra con `object-fit: cover`. Si alguna se vuelve a recortar, s
 - **Rollback:** `wp plugin deactivate eo-site-nav` y borrar `wp-content/plugins/eo-site-nav/` (los 10 archivos eran
   nuevos).
 
+**Pendientes de contenido antes del `apply` (nota «Por confirmar», 2026-10-22).** Respuestas del operador
+transmitidas textualmente por la sesión del menú:
+
+| Punto | Decisión | Estado |
+|---|---|---|
+| Orden de los servicios por línea | «Como en el canvas» (Inbound en Revenue) | Resuelto |
+| Frases por línea en el menú («Tu squad», «Visible», «Crecer»…) | «Sí, se quedan» | Resuelto |
+| URL del canal de YouTube | «Te la escribo». Mientras tanto, el documento no lleva YouTube | **Pendiente**: bloquea el `apply` |
+| Lecturas sugeridas | «Usar posts reales». La sesión del menú propone un post publicado por servicio y el operador aprueba la lista | **Pendiente**: bloquea el `apply` |
+
+Ya resueltos antes: las respuestas por servicio (aprobadas el 17-10), Influencer y Performance con la lectura de su
+línea, y las dos esferas como excepción. El `apply` no se hace hasta tener YouTube y la lista de lecturas, porque
+publica la copia por la REST aunque el sitio todavía no pinte el menú.
+
 **Decisiones:** directorio `eo-site-nav`, prefijo `EOSN_`, text domain `eo-site-nav`, comandos `wp eo-nav`, REST
 `eo/v1/site-nav`. Respaldo del documento en el runtime: `manifests/site-nav/efeoncepro.com.json`.
 
