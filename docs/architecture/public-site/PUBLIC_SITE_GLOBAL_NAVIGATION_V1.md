@@ -380,9 +380,10 @@ validación. Una herramienta de Greenhouse o MCP podrá llamar a esa misma puert
   | `mm` | 880×472 | panel del mega |
   | `card` | 880×496 | tarjeta del mega |
   | `op` | 996×1080 | onepage escritorio |
-  | `op-s` | por definir | onepage de tableta horizontal |
 
-  Todos en webp. Tableta vertical y teléfono no llevan foto.
+  Todos en webp. La tableta horizontal usa el mismo `op` encuadrado con `object-position: 62% 50%`, como el tablero
+  Tableta1024 del canvas; no hay recorte propio (`op-s` se retiró el 2026-10-22: nadie lo pintaba). Tableta vertical y
+  teléfono no llevan foto.
 - **Carga:** las fotos se precargan al abrir el panel, nunca al cargar la página. La foto anterior se queda hasta que la
   nueva cargó.
 - **Quién sube:** agentes u operadores con credenciales de GCP. El plugin no sube a GCP.

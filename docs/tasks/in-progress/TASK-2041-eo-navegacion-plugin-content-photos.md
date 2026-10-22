@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Arquitectura y wireframe escritos; plugin, documento y fotos sin construir; nada subido al bucket`
+- Status real: `En curso desde 2026-10-22: discovery y plan; nada construido ni subido. Esquema site-nav.v1 code complete en AXIS (TASK-2040), release pendiente`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `TASK-2040 (sólo el Slice 2 de esta task, que valida contra el esquema site-nav.v1)`
@@ -118,8 +118,8 @@ Reglas obligatorias:
 
 - `docs/ui/wireframes/TASK-2041-eo-navegacion-admin.md`
 - `docs/ui/flows/TASK-2041-eo-navegacion-editing-flow.md`
-- En `efeonce-public-site-runtime`: `wp-content/plugins/<eo-site-nav>/` [nombre de directorio a fijar en el discovery]
-- Exportación de respaldo del documento en el repo del runtime [ruta a fijar en el discovery]
+- En `efeonce-public-site-runtime`: `wp-content/plugins/eo-site-nav/`
+- Exportación de respaldo del documento en el repo del runtime: `manifests/site-nav/efeoncepro.com.json`
 - `gs://efeonce-group-axis-public-media/site-nav/v1/` (objetos)
 
 ## Current Repo State
@@ -139,7 +139,8 @@ Reglas obligatorias:
 
 - No existe el plugin, el tipo de contenido, la validación, el admin, los comandos `wp eo-nav` ni la REST pública.
 - No existe el documento `site-nav.v1` del sitio.
-- No existe la carpeta `site-nav/` en el bucket ni el recorte para tableta horizontal (`op-s`).
+- No existe la carpeta `site-nav/` en el bucket. La tableta horizontal usa el recorte `op` con `object-position`, como el
+  canvas: no hace falta un recorte `op-s` (retirado el 2026-10-22).
 - Quedan pendientes de contenido de la nota «Por confirmar»: orden de servicios, respuestas por línea, URL de YouTube,
   títulos de lecturas y lectura propia de Influencer y Performance.
 - **Resuelto (operador, 2026-10-20):** la franja «suscribirse a Glitch» de Recursos apunta a la suscripción del blog,
@@ -362,6 +363,43 @@ Reglas obligatorias:
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
 
+## Discovery y plan (2026-10-22)
+
+Revisado con la sesión «Rediseño de Menú», autora del canvas y de esta task.
+
+**Auditoría:**
+- Runtime vigente: `/Users/jreye/Documents/efeonce-public-site-runtime` en `main` (el directorio `-develop` es un
+  worktree de `develop` del mismo repo). `main` local tiene WIP ajeno y está 5 adelante y 1 atrás de `origin`: el plugin
+  es un directorio nuevo y no toca ese WIP.
+- Plugins propios con prefijo `eo-`; ninguno usa `eo/v1`, `ETag` ni una capability propia: `eo_manage_site_nav` es la
+  primera. Patrón de CPT privado con revisiones: `eo-headless-content/includes/class-eoh-cpt.php`. Patrón de WP-CLI:
+  `greenhouse-wp-bridge` (`WP_CLI::add_command`, una función por subcomando).
+- Sin Composer ni librería de JSON Schema: la validación PHP interpreta el mismo `site-nav.v1.schema.json` (el mismo
+  subconjunto que el validador de AXIS) y se prueba contra casos generados desde AXIS para que ambos lados coincidan.
+- Pruebas del runtime: scripts `php tests/<x>.test.php` sin runner. PHP 8.5 local; WordPress Playground disponible para
+  probar WP-CLI y REST de punta a punta sin tocar producción.
+- Deploy: no hay carril para el plugin. Se copia el patrón acotado de Creativa (paquete con `previousSha256`, lista de
+  rutas permitidas, respaldo, OPcache, purga) y se agrega `wp-content/plugins/eo-site-nav` a `TARGETS` de
+  `export-live-code-baseline.ts`.
+- Purga desde el admin: ningún plugin purga Kinsta desde una petición web; se diseña en el Slice 1 (verificar en vivo qué
+  expone el MU de Kinsta) y WP-CLI usa `kinsta cache purge --all` como el resto del carril.
+- Bucket: no existe script con caché inmutable; se escribe uno con guarda contra sobrescritura.
+- Fotos: las 51 del documento son los recortes finales del canvas v68 (2× del tamaño en pantalla). `op-s` se retiró.
+
+**Decisiones:** directorio `eo-site-nav`, prefijo `EOSN_`, text domain `eo-site-nav`, comandos `wp eo-nav`, REST
+`eo/v1/site-nav`. Respaldo del documento en el runtime: `manifests/site-nav/efeoncepro.com.json`.
+
+**Plan por slices** (sin escrituras en producción hasta autorización explícita del operador):
+1. Plugin y servicio de guardado, local, con pruebas PHP (validar, idempotencia por hash, conflicto por revisión base,
+   revisión con autor y mensaje, copia publicada con `ETag`, purga).
+2. Esquema vendorizado con versión y hash, validador PHP con paridad contra AXIS, y `wp eo-nav`
+   `export|validate|apply|revisions|restore`. Verificación en WordPress Playground.
+3. REST `GET /wp-json/eo/v1/site-nav` (`ETag`, `304`, caché corta, `404` sin documento) y datos dinámicos de Recursos
+   (transient de 10 a 15 min, respaldo al destacado fijo).
+4. Fotos y documento inicial: hoja de contacto revisada por la sesión del menú; subida al bucket y `apply` en vivo sólo
+   con autorización del operador y los pendientes de contenido resueltos o diferidos por escrito.
+5. Pantalla del admin: dirección visual aprobada por el operador antes de construir (`UI ready: no` hasta entonces).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      "Que construyo exactamente, slice por slice?"
@@ -394,7 +432,8 @@ Reglas obligatorias:
 
 ### Slice 4 — Fotos y documento inicial
 
-- Recortes faltantes: `card`, `op-s` y los de las 17 fotos sin archivo local, bajados del canvas.
+- Recortes: los finales del canvas v68 (`mm` 880×472, `op` 996×1080 y `card` 880×496), bajados del artifact; un recorte
+  que falte se corta de la fuente grande en `ai-generations`, nunca se reescala ni se regenera.
 - Subida a `gs://efeonce-group-axis-public-media/site-nav/v1/` con nombres `<slug>-<recorte>.webp`,
   `Cache-Control: public, max-age=31536000, immutable` y `Content-Type` correcto. Coordinada con quien esté tocando AXIS.
 - Documento inicial con el contenido del canvas y los pendientes de «Por confirmar» resueltos con el operador. Se aplica
@@ -523,5 +562,5 @@ Modelo del documento, reglas, plugin, REST y fotos:
 
 ## Open Questions
 
-- Nombre del directorio del plugin y del texto de dominio.
+- ~~Nombre del directorio del plugin y del texto de dominio~~: resuelto 2026-10-22, `eo-site-nav` (ver Discovery y plan).
 - Pendientes de contenido de la nota «Por confirmar» del canvas (se resuelven con el operador en el Slice 4).
