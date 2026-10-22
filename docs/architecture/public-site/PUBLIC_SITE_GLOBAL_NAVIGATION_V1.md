@@ -107,7 +107,10 @@ Las flechas avisan qué abre algo; Inicio y Contacto son enlaces directos.
   - Izquierda: formatos (Glitch, Marketing con Manzanitas, Herramientas, Guías descargables).
   - Centro: lo último de ese formato.
   - Derecha: un destacado.
-- **Franja inferior:** invita a suscribirse a Glitch.
+- **Franja inferior:** invita a suscribirse a Glitch y lleva a **la suscripción del blog**, que es la misma lista que
+  Glitch (decisión del operador, 2026-10-20; se recibe Glitch cada lunes). El menú no tiene formulario ni lista propia:
+  su destino es un enlace del documento (`subscribe.href` del panel editorial) y lo fija `TASK-2041`. Fuente de la
+  decisión: `TASK-1802` (Delta 2026-10-20).
 - **Glitch** se nombra con su logo oficial negativo de AXIS. El resto de su línea gráfica no entra al menú.
 - **Esfera:** una sola por panel, en el acento de Growth.
 - **Contenido dinámico:** el centro y el destacado se alimentan de los últimos posts (§Datos dinámicos).
@@ -282,7 +285,7 @@ indica la intención; el esquema definitivo se fija en la tarea del contrato:
     { "id": "recursos", "label": "Recursos", "panel": "editorial", "formats": [
       { "id": "glitch", "label": "Glitch", "brandMark": "glitch-negative", "source": { "kind": "wp-category", "ref": "glitch" },
         "featured": { "title": "…", "href": "…", "photo": { "mm": "…", "alt": "…" } } }
-    ] },
+    ], "subscribe": { "label": "…", "href": "…" /* la suscripción del blog: misma lista que Glitch */ } },
     { "id": "contacto", "label": "Contacto", "href": "/contacto/" }
   ],
   "onepage": { "footer": { "social": [ /* redes */ ], "legal": [ /* enlaces */ ] } },

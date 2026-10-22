@@ -142,6 +142,12 @@ Reglas obligatorias:
 - No existe la carpeta `site-nav/` en el bucket ni el recorte para tableta horizontal (`op-s`).
 - Quedan pendientes de contenido de la nota «Por confirmar»: orden de servicios, respuestas por línea, URL de YouTube,
   títulos de lecturas y lectura propia de Influencer y Performance.
+- **Resuelto (operador, 2026-10-20):** la franja «suscribirse a Glitch» de Recursos apunta a la suscripción del blog,
+  que es la misma lista que Glitch. No se crea formulario ni lista propia del menú. El documento la guarda en
+  `subscribe.href` del panel editorial. Hoy esa suscripción es el formulario CF7 de `/blog`; su reemplazo por el Growth
+  Form `efeonce-blog-subscription` sigue sin publicar (auditoría `2026-10-20-blog-growth-form-preparation.md`). El
+  enlace apunta al bloque de suscripción del blog y no cambia cuando cambie el formulario. Fuente: `TASK-1802`, Delta
+  2026-10-20.
 
 ## Modular Placement Contract
 
@@ -482,6 +488,8 @@ Modelo del documento, reglas, plugin, REST y fotos:
   immutable`, y todas tienen alt.
 - [ ] El documento inicial refleja el contenido aprobado del canvas, con los pendientes de «Por confirmar» resueltos o
   explícitamente diferidos.
+- [ ] La franja de Recursos apunta a la suscripción del blog (misma lista que Glitch) y no existe formulario ni lista
+  propia del menú.
 - [ ] La pantalla del admin y WP-CLI llaman al mismo servicio de guardado (sin lógica duplicada).
 - [ ] Se capturó y se miró la evidencia de la pantalla del admin y el scorecard cumple el umbral.
 - [ ] `UI ready` se mantuvo en `no` hasta tener el diseño de la pantalla aprobado, el mapping, el plan de captura y el
