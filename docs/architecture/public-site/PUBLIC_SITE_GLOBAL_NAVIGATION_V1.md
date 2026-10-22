@@ -486,8 +486,20 @@ Eventos que emite el primitive y empuja el adaptador al `dataLayer`:
 | `site_nav_click` | Clic en un destino; lleva `target_type` (`logo`, `primary`, `line`, `service`, `case`, `reading`, `dropdown`, `format`, `resource`, `featured`, `strip`, `onepage`, `social`, `legal` o `cta`) y `target`. |
 | `site_nav_cta` | Intención de agendar; lleva `cta_location` (`menu_header`, `menu_mega` o `menu_onepage`). El primitive cierra lo abierto, suelta el scroll y despacha además el evento DOM cancelable `axis-site-nav:cta`, que el sitio usa para abrir su agendador. |
 
-Los nombres finales y su alta en GTM y GA4 se cierran en la tarea del adaptador, con la skill de medición. No se envía
-PII.
+En efeoncepro.com el adaptador (`TASK-2042`) los empuja con la convención del sitio, `gh_<objeto>_<acción>` en pasado:
+
+| Evento del primitive | En el `dataLayer` | Parámetros que pasan |
+|---|---|---|
+| `site_nav_open` | `gh_site_nav_opened` | `panel` |
+| `site_nav_line_view` | `gh_site_nav_line_viewed` | `line` |
+| `site_nav_click` | `gh_site_nav_clicked` | `target_type`, `target` |
+| `site_nav_cta` | No se empuja | — |
+
+`site_nav_cta` queda fuera porque el mismo clic ya llega como `gh_site_nav_clicked` con `target_type: cta` y el punto de
+entrada en `target`, y el agendador que abre emite su propia familia `greenhouse_cta_*`; empujarlo contaría el clic dos
+veces y reviviría el rail legado `gh_cta_clicked`. Sólo pasan esas claves, con 100 caracteres como máximo: ids y
+etiquetas del menú, nunca lo que escribe un visitante. Ningún evento del menú es key event. El alta en GTM y GA4 pasa
+por la skill de medición, con confirmación humana antes de publicar el contenedor.
 
 ## Adaptador WordPress
 

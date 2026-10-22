@@ -16,17 +16,21 @@ nativo del sitio y se pueda apagar en un paso.
    - Si la página no aplica, sale el encabezado de Ohio y termina el flujo.
 2. **Documento.** Lee el documento publicado del plugin (`TASK-2041`).
    - Si falta o no valida, sale Ohio y queda registro en el log.
-3. **Estado inicial.** Elige `top` en páginas con hero oscuro a sangre y `fixed` en blog, post, 404, archivo y páginas
-   claras. Aplica el inventario de variantes de Ohio.
+3. **Estado inicial.** Sale del inventario de Ohio (2026-10-22): la página con el espaciador de cabecera de Ohio
+   (`page_header_add_cap`) arranca `fixed` y sólida; la que no lo tiene arranca `top` sobre su hero, en tono oscuro salvo
+   las seis páginas de hero claro del inventario. El filtro `eo_site_nav_page_profile` permite corregir una página.
 4. **Contexto.** Resuelve «Estás aquí» con `context.matchers` contra la ruta actual.
 5. **Datos dinámicos.** Resuelve el centro y el destacado de Recursos desde WordPress o Think, con caché corta. Si
    falla, usa el destacado fijo.
 6. **Render.** Pinta el HTML del primitive; encola el CSS y el JS de AXIS con versión fijada y el renderer de Growth CTA.
-7. **Agendador (N7).** El hueco del CTA se llena con `<greenhouse-cta>` de la superficie del encabezado global, con
-   `cta-location` `menu_header`, `menu_mega` o `menu_onepage`.
+7. **Agendador (N7).** Un solo `<greenhouse-cta>` de la superficie del encabezado global, montado una vez por página;
+   el evento cancelable `axis-site-nav:cta` lo abre desde la cabecera, el mega o el onepage. El punto de entrada se mide
+   en `gh_site_nav_clicked` (`target_type: cta`, `target` `menu_header`, `menu_mega` o `menu_onepage`), porque el
+   renderer lee `cta-location` al montar y no al hacer clic.
    - El primitive cierra el panel y suelta el scroll.
    - El renderer abre el diálogo con la piel compartida y devuelve el foco al lanzador.
-8. **Medición.** Los eventos del primitive pasan al `dataLayer`; GTM los envía a GA4.
+8. **Medición.** El módulo del anfitrión empuja `gh_site_nav_opened`, `gh_site_nav_line_viewed` y
+   `gh_site_nav_clicked` al `dataLayer`; GTM los envía a GA4. `site_nav_cta` no se empuja.
 
 ## Recovery Branches del host
 
@@ -36,7 +40,8 @@ nativo del sitio y se pueda apagar en un paso.
 | Página fuera del piloto | Ohio en esa página. |
 | Documento inválido | Ohio + log; nunca una cabecera vacía. |
 | Superficie del agendador ausente o clave inválida | Enlace a `/agenda/`. |
-| Barra de admin (usuario logueado) | La cabecera fija se desplaza bajo la barra. |
+| Barra de admin (usuario logueado) | `--axis-site-nav-offset` toma el alto de la barra y toda la parte fija baja esa medida. |
+| Plugin inactivo o error al renderizar | Ohio + log; el menú se prepara antes de imprimir nada. |
 | Cambio del documento o del interruptor | Purga de Kinsta; el siguiente request pinta lo nuevo. |
 
 ## Focus and Navigation
@@ -61,3 +66,6 @@ Se hereda del flujo maestro. Lo propio del host:
 | El respaldo es Ohio | La navegación nunca desaparece por un error de datos o de despliegue. |
 | Estado inicial por tipo de página | El vidrio necesita un fondo oscuro detrás; sobre páginas claras arranca sólido. |
 | Superficie del agendador propia del encabezado | Medición separada de las landings y una allowlist que cubre todo el sitio. |
+| La aislación de estilos vive en AXIS, no en el tema | El piloto mostró estilos de Ohio dentro del menú (hover rojo, cierre rojo, filas 4 px más altas). Corregirlo en el tema habría sido una copia de valores; AXIS 0.7.2 da a cada regla peso de id y restablece lo que un tema aplica a todo, con una prueba que inyecta una hoja hostil. |
+| El adaptador carga las fuentes del menú | Cada página de Ohio carga un juego distinto (la home no tiene Bricolage ni Poppins 300). Se pide el juego del Lab sin el eje de ancho, que el menú no usa: así el archivo de Bricolage es el que ya cargan las landings. |
+| `site_nav_cta` no se empuja | El clic ya viaja en `gh_site_nav_clicked` y el agendador emite `greenhouse_cta_*`; un tercer evento contaría dos veces y reviviría `gh_cta_clicked`. |

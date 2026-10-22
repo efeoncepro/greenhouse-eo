@@ -63,7 +63,9 @@ o documentada como excepción.
 - **Agendador:** `<greenhouse-cta>` con la superficie del encabezado global, la clave fuera del repo y `cta-location` por
   punto de entrada. La piel del diálogo de `scripts/public-website/inbound-source/page.css` pasa a una primitive
   compartida del sitio.
-- **Medición:** `site_nav_open`, `site_nav_line_view` y `site_nav_click` al `dataLayer`, con su alta en GTM y GA4.
+- **Medición:** `gh_site_nav_opened`, `gh_site_nav_line_viewed` y `gh_site_nav_clicked` al `dataLayer` (desde
+  `site_nav_open`, `site_nav_line_view` y `site_nav_click` del primitive), con su alta en GTM y GA4. `site_nav_cta` no
+  se empuja: el clic del CTA ya viaja en `gh_site_nav_clicked` y el agendador emite `greenhouse_cta_*`.
 - **Doctrina:** se actualizan `references/native-navigation.md` y `runtime-and-discovery.md` de la skill
   `efeonce-public-site-wordpress` (`.claude` y `.codex`).
 

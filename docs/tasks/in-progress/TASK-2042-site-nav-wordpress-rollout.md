@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `En curso desde 2026-10-22: intake y discovery (TASK-2040 publicada; TASK-2041 con documento en vivo)`
+- Status real: `Slices 1 y 2 code complete en local (runtime 5ca3637 + 1b26063, AXIS 42b7f5e sin publicar); sin escrituras en producción. Pendiente: publicar AXIS primitives 0.7.2, Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -140,10 +140,13 @@ Reglas obligatorias:
 
 ### Gap
 
-- No hay adaptador ni interruptor; el punto exacto de enganche del encabezado de Ohio no está confirmado.
+- ~~No hay adaptador ni interruptor; el punto exacto de enganche del encabezado de Ohio no está confirmado.~~ Cerrado
+  2026-10-22: Ohio llama `get_template_part('parts/headers/header', 'style-N')` desde `header.php`; el tema hijo
+  sobrescribe `header-style-1..8.php` y el adaptador vive en `ohio-child/inc/site-nav.php` (local, sin desplegar).
 - No hay superficie del agendador para todo el sitio; hoy cada CTA está atado a una landing.
 - La piel elegante del diálogo está con alcance de una landing.
-- No existen los eventos `site_nav_*` en GTM ni GA4.
+- No existen en GTM ni GA4 los eventos del menú (`gh_site_nav_opened`, `gh_site_nav_line_viewed`,
+  `gh_site_nav_clicked`); el módulo del anfitrión ya los empuja al `dataLayer` en local.
 - La doctrina del sitio todavía dice conservar el encabezado de Ohio.
 
 ## Modular Placement Contract
@@ -281,7 +284,8 @@ Reglas obligatorias:
 - Contrato existente a respetar: Growth CTA con la acción `open_meeting_scheduler` y `cta-location`; arquitectura del
   agendador (`GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md`)
 - Contrato nuevo o modificado: CTA y superficie del encabezado global, publicados con un script en el patrón de
-  `scripts/growth/publish-inbound-meeting-cta.ts`; eventos `site_nav_open`, `site_nav_line_view` y `site_nav_click`
+  `scripts/growth/publish-inbound-meeting-cta.ts`; eventos `gh_site_nav_opened`, `gh_site_nav_line_viewed` y
+  `gh_site_nav_clicked` (desde `site_nav_open`, `site_nav_line_view` y `site_nav_click` del primitive)
 - Backward compatibility: `compatible` (los CTA de las landings no cambian)
 - Full API parity: la superficie se publica por el script gobernado de Growth, no a mano
 
@@ -356,11 +360,27 @@ Reglas obligatorias:
 
 ### Slice 1 — Inventario y enganche
 
+> Avance 2026-10-22: hecho. Enganche en `parts/headers/header-style-N.php` (Ohio 3.7.0, sin plantillas de cabecera de
+> Elementor Pro). Variantes vivas: global `style3`; por página `style1` ×7, `style4`, `style3` y `style6` (sólo
+> `/blog/` #18456, excluida mientras `TASK-1802` la rediseña). Estado inicial: con el espaciador de Ohio
+> (`page_header_add_cap`) → `fixed`/claro; sin él → `top`, oscuro salvo seis páginas de hero claro (251078, 242261,
+> 223787, 223841, 21460, 19820). El logo fijo de ACF no aplica: el menú usa los logos de AXIS.
+
 - Confirmar el punto de enganche del encabezado de Ohio y cómo apagarlo por página.
 - Inventario de variantes de encabezado (metas de Ohio, logo fijo de ACF, plantillas especiales: blog, Glitch, 404 y
   archivos), mapeadas a un estado del primitive o a una excepción documentada.
 
 ### Slice 2 — Adaptador con interruptor
+
+> Avance 2026-10-22: code complete en local. Port PHP del render idéntico byte a byte a AXIS (12 casos,
+> `tests/eo-site-nav-render.test.php`); adaptador con interruptor, respaldo a Ohio ante plugin ausente, documento
+> ausente o inválido y error de render (registrado en el log); assets fijados en
+> `ohio-child/assets/vendor/axis/site-nav/0.7.2/` con `VERSION.json` (sha256) por `scripts/vendor-axis-site-nav.mjs`;
+> fuentes del menú cargadas por el adaptador; barra del admin con `--axis-site-nav-offset`. El piloto en Playground
+> encontró estilos de Ohio dentro del menú y se corrigieron en AXIS (aislación, isla de 63 px, offset): primitives
+> 0.7.2 local, con prueba de anfitrión hostil; la comparación de estilos calculados Lab vs WordPress da cero
+> diferencias en escritorio (reposo, panel abierto, hover) y en el onepage de 390 px. Antes de desplegar: publicar
+> AXIS 0.7.2 y volver a copiar desde el paquete publicado.
 
 - Override del encabezado en `ohio-child`:
   - opciones `eo_site_nav_enabled` (`off`/`pilot`/`on`) y `eo_site_nav_pilot_pages`;
@@ -380,8 +400,12 @@ Reglas obligatorias:
 
 ### Slice 4 — Medición
 
-- Eventos `site_nav_open`, `site_nav_line_view` y `site_nav_click` al `dataLayer`, con alta en GTM y GA4 por la skill de
-  medición, sin PII.
+- Eventos `gh_site_nav_opened`, `gh_site_nav_line_viewed` y `gh_site_nav_clicked` al `dataLayer` (desde
+  `site_nav_open`, `site_nav_line_view` y `site_nav_click` del primitive), con alta en GTM y GA4 por la skill de
+  medición, sin PII. `site_nav_cta` no se empuja: el clic ya viaja en `gh_site_nav_clicked` con `target_type: cta` y el
+  agendador emite `greenhouse_cta_*`.
+- Avance 2026-10-22: el empuje al `dataLayer` está hecho en local (`ohio-child/assets/js/site-nav-host.js`); falta el
+  alta en GTM y GA4, que se publica con confirmación humana.
 
 ### Slice 5 — Piloto
 
@@ -477,16 +501,23 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
 
 - [ ] La evidencia visual de cierre se captura sin el aviso de depuración del Lab ni otros superpuestos: en 1280×720 tapaba «Ver todas las soluciones» y no dejaba ver su subrayado (pedido de la sesión del menú, contralora de fidelidad, 2026-10-22).
 
-- [ ] Con `eo_site_nav_enabled=off` el sitio sirve el encabezado de Ohio sin assets de AXIS.
-- [ ] Con `pilot`, sólo las páginas de la lista muestran el menú nuevo.
+- [x] Con `eo_site_nav_enabled=off` el sitio sirve el encabezado de Ohio sin assets de AXIS. Evidencia (Playground local con Ohio 3.7.0 real, el plugin `eo-site-nav` y `ohio-child`, 2026-10-22): sin
+  `data-axis-site-nav` ni `site-nav.css`, con `#site-navigation` de Ohio. Falta repetirlo en producción en el Slice 5.
+- [x] Con `pilot`, sólo las páginas de la lista muestran el menú nuevo. Evidencia (Playground local con Ohio 3.7.0 real, el plugin `eo-site-nav` y `ohio-child`, 2026-10-22): la página de la lista
+  pinta el menú y la otra conserva Ohio.
 - [ ] Con `on`, todo el sitio muestra el menú nuevo, y volver a `off` restaura Ohio (verificado al menos una vez en
   producción).
-- [ ] Un documento inválido o ausente deja el encabezado de Ohio y registra el error.
-- [ ] Cada variante de encabezado de Ohio quedó mapeada a un estado del primitive o documentada como excepción.
-- [ ] Los enlaces del menú están en el HTML de servidor (`curl` sin JS).
+- [x] Un documento inválido o ausente deja el encabezado de Ohio y registra el error. Evidencia (Playground local con Ohio 3.7.0 real, el plugin `eo-site-nav` y `ohio-child`, 2026-10-22): documento
+  guardado con `javascript:` saltándose el servicio de guardado → Ohio y `[eo-site-nav] render failed, keeping Ohio:
+  INVALID_FORMAT /header/cta/fallbackHref`; plugin sin cargar → Ohio y su línea de log.
+- [ ] Cada variante de encabezado de Ohio quedó mapeada a un estado del primitive o documentada como excepción. Sin
+  tildar: el mapeo está en el código (Slice 1), pero Glitch, 404 y archivos caen en la regla del espaciador sin captura
+  todavía; se verifican en el piloto.
+- [x] Los enlaces del menú están en el HTML de servidor (`curl` sin JS). Evidencia (Playground local con Ohio 3.7.0 real, el plugin `eo-site-nav` y `ohio-child`, 2026-10-22): 104 enlaces dentro de la
+  cabecera servida por `curl`.
 - [ ] «Agenda tu diagnóstico» abre el agendador desde la cabecera, el mega y el onepage, cierra el panel antes y
   devuelve el foco al cerrar.
-- [ ] Los eventos `site_nav_*` llegan a GA4 sin PII.
+- [ ] Los eventos del menú (`gh_site_nav_*`) llegan a GA4 sin PII. Sin tildar: falta el alta en GTM y GA4.
 - [ ] Sin scroll horizontal en los viewports del plan y Core Web Vitals sin regresión frente a la medición previa.
 - [ ] Se capturó y se miró la evidencia desktop y 390 px del piloto y de los tipos de página, y el scorecard cumple el
   umbral.

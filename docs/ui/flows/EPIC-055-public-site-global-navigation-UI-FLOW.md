@@ -96,13 +96,18 @@ El menú se comporta igual en `efeoncepro.com` y en cualquier sitio que lo adopt
 
 ## Measurement
 
-| Evento | Dónde |
-|---|---|
-| `site_nav_open` (`panel`) | N2, N5 |
-| `site_nav_line_view` (`line`) | N3 |
-| `site_nav_click` (`target_type`, `target`) | N4, N6, N7 |
+| Evento del primitive | En el `dataLayer` de efeoncepro.com | Dónde |
+|---|---|---|
+| `site_nav_open` (`panel`) | `gh_site_nav_opened` | N2, N5 |
+| `site_nav_line_view` (`line`) | `gh_site_nav_line_viewed` | N3 |
+| `site_nav_click` (`target_type`, `target`) | `gh_site_nav_clicked` | N4, N6, N7 |
+| `site_nav_cta` (`cta_location`) | No se empuja | N7 |
 
-Sin PII. Los nombres finales se cierran en `TASK-2042` con la skill de medición.
+Sin PII. Los nombres del sitio siguen la convención `gh_<objeto>_<acción>` en pasado (`TASK-2042`, 2026-10-22). El
+clic en «Agenda tu diagnóstico» ya viaja como `gh_site_nav_clicked` con `target_type: cta` y el punto de entrada en
+`target` (`menu_header`, `menu_mega` o `menu_onepage`); el agendador que abre emite su propia familia
+`greenhouse_cta_*`. Por eso `site_nav_cta` no se empuja: contaría el clic dos veces y reviviría el rail legado
+`gh_cta_clicked`.
 
 ## GVC Scenario Plan
 
