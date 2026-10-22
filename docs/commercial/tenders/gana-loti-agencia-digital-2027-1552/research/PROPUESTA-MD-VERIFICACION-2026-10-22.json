@@ -1,0 +1,41 @@
+{
+  "checked_at": "2026-10-22T20:52:58.092313-03:00",
+  "scope": "Markdown preparation and source/projection consistency; no runtime or visual PDF validation",
+  "account_id": "GRD-1552",
+  "authorization": "User explicitly requested proposal in MD for later Claude Design; replaces preparation pause only",
+  "status": "draft_prepared_for_review_and_design_not_ready_to_issue",
+  "checks": {
+    "slides_sequential_1_to_28": true,
+    "requirements_C9_to_C17_located": true,
+    "source_projection_identical_sections": true,
+    "production_75_50_125": true,
+    "money_COP_USD_rounding": true,
+    "no_internal_cost_or_margin_values_in_design_MD": true,
+    "no_individual_emails_in_design_MD": true,
+    "local_links_resolve": true,
+    "onedrive_local_copy_hash_matches": true,
+    "explicit_paragraph_spacing_no_trailing_whitespace": true,
+    "design_prompt_file_present": true
+  },
+  "sources": {
+    "technical_sha256": "e44c2074db1e2cc07112586d4069206b86cf2a597a98b64bba0a9d3a1a7bc169",
+    "economic_sha256": "09689e620f192a247b569453669917c0b6f3a65fc86a87b0c394006a9f3db360",
+    "design_MD_sha256": "216a1b8e1f66c1b56d9986f4ca6e134603da0abb2a5b02ea1b3cc3afb35f5d77",
+    "RFP_xlsx_sha256": "5b35a47fa917071bbd151966e45253abe277d4a59f264f0f10d810773c3e16c1",
+    "RFP_zip_sha256": "ea8e819335cd5977c9038cf956704580f66fdfdc76cf1c24d30d184b27fc092f"
+  },
+  "private_reviews": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/proposal-md-2026-10-22-2040",
+  "onedrive_copy": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/13. Agencia Digital 2027/01 - Propuesta en desarrollo/PROPUESTA-GANA-LOTI-2027-PARA-CLAUDE-DESIGN.md",
+  "cloud_sync_confirmed": false,
+  "not_done": [
+    "visual assets",
+    "deck composition",
+    "PDF",
+    "final economic allocation/fiscal decision",
+    "compliance evidence completed",
+    "portal read/revalidation",
+    "CRM change",
+    "send/sign/upload/submission",
+    "commit/push"
+  ]
+}

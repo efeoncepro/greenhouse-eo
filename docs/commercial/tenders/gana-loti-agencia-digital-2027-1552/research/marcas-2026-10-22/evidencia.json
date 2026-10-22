@@ -1,0 +1,819 @@
+{
+  "reviewed_at": "2026-10-22T20:24:15.879419-03:00",
+  "account_id": "GRD-1552",
+  "attempt": 13,
+  "kind": "brand_and_competitive_desk_research",
+  "search_queries_executed": 97,
+  "search_counts": {
+    "principal": 16,
+    "gana": 17,
+    "loti": 36,
+    "peers": 28
+  },
+  "scope": "97 searches are executions, not unique independent sources or a daily tender radar",
+  "private_archive": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/brands-2026-10-22-2024",
+  "method": {
+    "skills": [
+      "research-benchmark-operator",
+      "efeonce-brand-studio",
+      "creative-practice"
+    ],
+    "deep_research_harness": "not available in catalog; not executed",
+    "delegation": "three previously authorized subagents plus principal verification",
+    "limits": [
+      "no consumer interviews",
+      "no first party analytics",
+      "no transaction or registration",
+      "social blocks",
+      "LOTI indexed content not current rendered UI",
+      "same publisher sources not independent triangulation"
+    ]
+  },
+  "gana": {
+    "checked_at": "2026-10-22T23:19:39.620823+00:00",
+    "decision": "Refine GANA brand strategy for GRD1552; no formal proposal or win claim",
+    "sources": [
+      {
+        "id": "G1",
+        "url": "https://www.gruporeditos.com/quienes-somos/historia/",
+        "access": "opened web success",
+        "published_at_or_date_scope": "undated page; historical2006/2014/2015 narrative",
+        "observations": "GANA identifies commercial/technological network; GrupoRéditos is group, not interchangeable legal tender entity",
+        "confidence": "medium; corporate self-description"
+      },
+      {
+        "id": "G2",
+        "url": "https://www.gruporeditos.com/servicios-de-red/",
+        "access": "opened web success",
+        "published_at_or_date_scope": "undated public page",
+        "observations": "Positions GANA as solutions on the go; giros,recargas,pagos,seguros,juegos;125municipalities;counts ofproducts/contactpoints not revalidated",
+        "confidence": "medium; corporate self-description"
+      },
+      {
+        "id": "G3",
+        "url": "https://www.gruporeditos.com/gana-celebra-20-anos-impulsando-el-desarrollo-el-empleo-y-la-salud-en-antioquia/",
+        "access": "opened web success; later rawHTTP500",
+        "published_at_or_date_scope": "page21Apr2026; body20Apr2026",
+        "observations": "20years, territorial services, social/development/health narrative alreadyused",
+        "confidence": "medium; same corporate origin, not independent validation"
+      },
+      {
+        "id": "G4",
+        "url": "https://cerca.gana.com.co/",
+        "access": "opened web success",
+        "published_at_or_date_scope": "access22Oct2026, not publication date",
+        "observations": "Existing educational blog, payout territories, products,giro,points; official navigation to transactional site",
+        "confidence": "medium; direct visible observation"
+      },
+      {
+        "id": "G5",
+        "url": "https://cerca.gana.com.co/puntos-de-venta-gana/",
+        "access": "opened web success; sampled zones",
+        "published_at_or_date_scope": "undated; access22Oct2026",
+        "observations": "Already has store/zone/municipality schedule list; schedule subjecttochange",
+        "confidence": "medium; not census or availabilitytest"
+      },
+      {
+        "id": "G6",
+        "url": "https://cerca.gana.com.co/gana-supera-los-5-427-millones-en-premios-durante-la-semana-en-antioquia/",
+        "access": "opened web;HTTP200;image viewed",
+        "published_at_or_date_scope": "published2026-10-20T14:52:56Z; period12–18Oct2026",
+        "observations": "Existing prizes-by-municipality content; multipleproducts;image aspiration and green GANA signature",
+        "confidence": "medium; brand claims, not independent payout audit"
+      },
+      {
+        "id": "G7",
+        "url": "https://cerca.gana.com.co/chance-goleador-conoce-como-jugar-cuanto-cuesta-y-como-ganar/",
+        "access": "opened web;HTTP200;image viewed",
+        "published_at_or_date_scope": "published2026-08-25T12:44:47Z",
+        "observations": "Product integrates chance numbers and six scorers; Mon–Fri participation and weekend football; Saturday applies nextweek; explaineralreadyexists",
+        "confidence": "medium; self-description; availability not purchase-tested"
+      },
+      {
+        "id": "G8",
+        "url": "https://cerca.gana.com.co/placa_millonaria/",
+        "access": "opened web;HTTP200",
+        "published_at_or_date_scope": "published2025-08-22T20:38:20Z;modified2025-10-24T13:46:31Z",
+        "observations": "Letters/numbers tiedtopersonalmeaning; physical point instruction;receipt-registration promotion page linked; no proofpromotionstillactive",
+        "confidence": "medium; oldercontent,campaignvaliditypending"
+      },
+      {
+        "id": "G9",
+        "url": "https://cerca.gana.com.co/aprende-a-jugar-quinta/",
+        "access": "opened web;HTTP200",
+        "published_at_or_date_scope": "published2025-06-10T15:02:17Z;modified2025-06-11T15:40:36Z",
+        "observations": "Explainer saysphysicalexclusive; old statement cannotcertify current2026availability",
+        "confidence": "medium for historical statement; low for current exclusivity"
+      },
+      {
+        "id": "G10",
+        "url": "https://cerca.gana.com.co/como-saber-si-tengo-un-giro-en-gana/",
+        "access": "opened web;HTTP200",
+        "published_at_or_date_scope": "published2024-07-04T14:30:07Z;modified2024-07-17T18:31:52Z",
+        "observations": "Useful servicecontentalreadyexists; confirmation requirespointanddocument accordingtopage",
+        "confidence": "medium historical/currentpage; exactworkflowrevalidate"
+      },
+      {
+        "id": "G11",
+        "url": "https://cerca.gana.com.co/adulto-mayor/",
+        "access": "opened web;HTTP200;image viewed",
+        "published_at_or_date_scope": "published2026-09-01T15:25:26Z",
+        "observations": "Ganaservicios paymentchannel,documents/rules; visualpublicservice differentfromaspirationalgame",
+        "confidence": "medium; primarypublication,noteligibilityadvice"
+      },
+      {
+        "id": "G12",
+        "url": "https://cerca.gana.com.co/https-ganapp-gana-com-co/",
+        "access": "opened web;HTTP200",
+        "published_at_or_date_scope": "published2021-08-12T15:21:01Z;modified2026-10-22T21:54:30Z",
+        "observations": "Pagecurrentlydescribes renewedexperience games/results/statistics/credits/coupons;modificationnotlaunchdate",
+        "confidence": "medium"
+      },
+      {
+        "id": "G13",
+        "url": "https://cerca.gana.com.co/guia-para-apuestas-seguras-como-identificar-posibles-estafas/",
+        "access": "opened web success",
+        "published_at_or_date_scope": "publication not verified",
+        "observations": "Safety/responsibleplaycontent alreadyexists",
+        "confidence": "medium; not legalvalidation"
+      },
+      {
+        "id": "G14",
+        "url": "https://loteriademedellin.com.co/wp-content/uploads/2026/01/Comunicado-de-Prensa-17-VENTAS-2025-1.pdf",
+        "access": "opened PDF; relevantpage read",
+        "published_at_or_date_scope": "7Jan2026,reporting2025",
+        "observations": "Independent publicentity identifies RediapuestasSAS IPI operation under GANAbrand; no proofthissupplierRFPcontractentity",
+        "confidence": "high for limited relation claim"
+      },
+      {
+        "id": "G15",
+        "url": "https://www.epm.com.co/content/dam/epm/clientes-y-usuarios/energia/hogar/energia-prepago/cartilla-energia-prepago-agosto-2025.pdf",
+        "access": "opened PDF;relevantpages6/9/11",
+        "published_at_or_date_scope": "filenameAug2025; access22Oct2026",
+        "observations": "Independent serviceprovider listsGANAas energy-prepaid traditionalchannel",
+        "confidence": "high for documentedservice link; notcurrenteverypoint"
+      }
+    ],
+    "excluded_sources": [
+      {
+        "url": "https://gana-antioquia.com/",
+        "reason": "ThirdpartySEOguide; notofficial; no counts adopted"
+      },
+      {
+        "url": "https://www.gana.cloud/",
+        "reason": "Differententity/software; wrongGANAexcluded"
+      },
+      {
+        "url": "https://www.webganagana.com.co/quienes-somos/",
+        "reason": "TolimaGanaGana/SEAPTO; differentbrandexcluded"
+      },
+      {
+        "url": "https://socialauditor.io/profile/laredgana",
+        "reason": "Scraper/metricsnotprimary; no estimatesorposts adopted"
+      },
+      {
+        "url": "https://imginn.com/tagged/laredgana/",
+        "reason": "Scraper; excluded"
+      }
+    ],
+    "blocked": [
+      {
+        "url": "https://www.instagram.com/laredgana/",
+        "reason": "fetcherror; no scrapingfallback"
+      },
+      {
+        "url": "https://www.facebook.com/LaRedGANA",
+        "reason": "throttled; officialURLverifiedviaGANAfooter; postsnotread"
+      },
+      {
+        "url": "https://www.youtube.com/user/apuestasgana",
+        "reason": "throttled; officialURLverifiedviaGANAfooter; videosnotread"
+      },
+      {
+        "url": "https://twitter.com/LaRedGana",
+        "reason": "403; officialURLverifiedviaGANAfooter; postsnotread"
+      },
+      {
+        "url": "https://www.gruporeditos.com/juegos/",
+        "reason": "notaccessible; guessedpathnotcited"
+      },
+      {
+        "url": "https://www.gruporeditos.com/wp-content/uploads/2024/09/Informe-Gestion-Grupo-Reditos-2024-1-sitio-web.pdf",
+        "reason": "timeout2attempts; indexedleadMijito/Rigo nottreatedasfullread"
+      },
+      {
+        "url": "https://www.gruporeditos.com/ecommerce-awards-reconocio-el-sitio-web-de-gana-como-uno-de-los-mejores-digital-commerce-de-colombia/",
+        "reason": "timeout2attempts; notusedproof"
+      }
+    ],
+    "independence": "Brand and holding sources share origin. EPM and Lotería are independent primary sources but triangulate limited identity/service links, not campaign effectiveness or audience outcomes.",
+    "scope_limits": [
+      "No socialpost/feedmetrics reviewed dueaccesslimits.",
+      "No purchases,registration,PII,paid enrichment orclientanalytics.",
+      "No inferenceconversionlosses,untappedaudiences,marketingabsence,agencywinnerorcauseofloss.",
+      "No assumedall80productsinsupplierRFPscope; RFPcurrentgoverns."
+    ],
+    "mutations": {
+      "repo": 0,
+      "crm": 0,
+      "outbound": 0,
+      "paid": 0,
+      "formal_proposal": 0
+    },
+    "completed_at": "2026-10-22T20:21:01.647677-03:00",
+    "conclusions": [
+      {
+        "kind": "observation",
+        "claim": "La cercanía territorial y la utilidad cotidiana ya forman parte de la marca y de sus contenidos públicos.",
+        "sources": [
+          "G1",
+          "G2",
+          "G3",
+          "G4",
+          "G5",
+          "G10",
+          "G15"
+        ],
+        "confidence": "medium; corporate self-description and visible assets, independent service corroboration limited"
+      },
+      {
+        "kind": "observation",
+        "claim": "Existen pedagogía de producto, localizador, premios por municipio y contenidos de servicios; no venderlos como nuevas capacidades.",
+        "sources": [
+          "G4",
+          "G5",
+          "G6",
+          "G7",
+          "G8",
+          "G9",
+          "G10",
+          "G11"
+        ],
+        "confidence": "medium; directly observed on brand channels"
+      },
+      {
+        "kind": "hypothesis",
+        "claim": "Diferenciar la operación mediante el siguiente paso correcto por intención, producto, canal y momento, con condiciones y fuente verificadas.",
+        "sources": [
+          "G7",
+          "G8",
+          "G9",
+          "G10",
+          "G15"
+        ],
+        "confidence": "medium as product/channel pattern, low as incremental opportunity; buyer validation needed"
+      },
+      {
+        "kind": "limitation",
+        "claim": "No se probaron pérdidas de conversión, carencias de segmentación, ausencia de automatización ni públicos desatendidos.",
+        "sources": [],
+        "confidence": "no claim made"
+      }
+    ],
+    "qa_example": {
+      "url": "https://cerca.gana.com.co/gana-supera-los-5-427-millones-en-premios-durante-la-semana-en-antioquia/",
+      "article_headline_COP": 5427000000,
+      "image_headline_COP": 5439000000,
+      "USD_reference": {
+        "article": 1486849.32,
+        "image": 1490136.99,
+        "COP_per_USD": 3650
+      },
+      "finding": "One directly observed mismatch between article headline and its public banner. Not extrapolated to channel performance, management quality or error rate."
+    },
+    "harness_limitation": "deep-research not present in current skill catalog; parent consolidates commissioned multi-agent work."
+  },
+  "loti": {
+    "as_of": "2026-10-22T23:18:22Z",
+    "scope": "LOTI research para elegir estrategiaGRD1552; sólolectura",
+    "sources": [
+      {
+        "id": "L01",
+        "url": "https://loti.com.co/",
+        "other_url": "https://www.loti.com.co/",
+        "access": "primary_search_index;open_timeout_or_JS_shell;parentChromeWAF",
+        "published_at": null,
+        "facts": [
+          "Oferta multi-loterías, número favorito, sorteo/serie/fracciones, resultados y navegación de ayuda",
+          "Índicewww muestra cupónFORTUNA29 y mensaje20% desde2fracciones;fecha/vigencia noverificables"
+        ],
+        "brand_promises": [
+          "Preferencia personal, facilidad y oportunidad de premio"
+        ],
+        "not_proven": [
+          "Flujo operativo actual",
+          "Cupón vigente",
+          "Problema de conversión",
+          "Estadoactual planpremios"
+        ],
+        "confidence": "media sobre contenido indexado; baja sobre vigencia transaccional"
+      },
+      {
+        "id": "L02",
+        "url": "https://loti.com.co/productos",
+        "access": "primary_search_index;open_JS_shell_or_timeout",
+        "published_at": null,
+        "facts": [
+          "Describe distribución electrónica,enlínea,física y digital de diversas loterías",
+          "Distingue loteros tradicionales y compraweb"
+        ],
+        "brand_promises": [
+          "Red líder,seguridad,comodidad,cobertura",
+          "Loterías favoritas en un lugar"
+        ],
+        "confidence": "media contenidoindexado; no auditoría ranking/seguridad"
+      },
+      {
+        "id": "L03",
+        "url": "https://loti.com.co/terminos-y-condiciones",
+        "access": "primary_search_index;open_JS_shell",
+        "published_at": null,
+        "facts": [
+          "Declara propietario LOTERÍAS Y SERVICIOS COLOMBIA S.A.S.",
+          "Registro mayor de edad; confirmacióntransacción; premios convalidaciones",
+          "Textoindexado dice OKI dejóestar disponible, y promocionales especiales en ajustes",
+          "Contiene referencias a ambienteprueba; puede ser legado, no diagnóstico actual"
+        ],
+        "not_proven": [
+          "Requisitosvigentes completos",
+          "Pagos actuales",
+          "Vigenciacampañaspremios",
+          "Representaciónjurídica compradorGRD1552"
+        ],
+        "confidence": "media contenidoindexado; vigente porconfirmar"
+      },
+      {
+        "id": "L04",
+        "url": "https://loti.com.co/contacto/1",
+        "access": "primary_search_index;open_JS_shell",
+        "published_at": null,
+        "facts": [
+          "FAQ ya incluye definiciónlotería, compra, resultados, confirmaciónemail y preguntasdepago",
+          "FAQpublica referenciasaPlaceToPay y CuentaOKI que requieren contrasteconT&C"
+        ],
+        "not_proven": [
+          "Vigenciadepasarela/certificaciones",
+          "DisponibilidadactualOKI",
+          "Funcionalidadformularios"
+        ],
+        "confidence": "media como antecedente publicado; actual no verificado"
+      },
+      {
+        "id": "L05",
+        "url": "https://loti.com.co/puntos-gana",
+        "access": "primary_search_index",
+        "published_at": null,
+        "facts": [
+          "Lista cómojugar,pagopremios,cupones,bonos,resultados"
+        ],
+        "not_proven": [
+          "Programa realPuntosGana vigente desdeURL",
+          "Contenido de reglas de cupón"
+        ],
+        "confidence": "media sólo navegaciónindexada"
+      },
+      {
+        "id": "L06",
+        "url": "https://www.gruporeditos.com/loticolombia-amplia-su-red-con-apertura-de-oficina-en-la-ciudad-de-popayan/",
+        "access": "full_html_read",
+        "published_at": "2019-08-05",
+        "facts": [
+          "Identifica Loticolombia filialGrupoRéditos y distribución física/digital/nacional conlotero"
+        ],
+        "not_proven": [
+          "Escalared2026",
+          "Datos/composición2026"
+        ],
+        "confidence": "alta como antecedente corporativohistórico"
+      },
+      {
+        "id": "L07",
+        "url": "https://www.gruporeditos.com/quienes-somos/negocios-del-grupo/",
+        "access": "full_html_read",
+        "published_at": null,
+        "facts": [
+          "Clasifica distribución/logística de lotería como negocio delgrupo",
+          "Texto incluye proyección2022 y variantesSA/SAS; usar sólo mapanegocio,no certificadolegalactual"
+        ],
+        "confidence": "alta lectura; actualizaciónindeterminada"
+      },
+      {
+        "id": "L08",
+        "url": "https://www.gruporeditos.com/loticolombia-representa-mas-el-50-en-ventas-de-loteria-en-antioquia/",
+        "access": "full_html_read",
+        "published_at": "2019-04-04",
+        "facts": [
+          "Reconoce filial y distribución, continuidad física+digital en2018/2019"
+        ],
+        "not_proven": [
+          "Participaciónactual",
+          "Eficaciaagencia",
+          "Preferenciaactualaudiencias"
+        ],
+        "confidence": "alta histórico"
+      },
+      {
+        "id": "L09",
+        "url": "https://www.instagram.com/loticolombia_sa/",
+        "access": "open_throttled",
+        "published_at": null,
+        "facts": [],
+        "not_proven": [
+          "Oficialidadactualperfil",
+          "Campañas/posts/fechas/identidadvisual"
+        ],
+        "confidence": "no verificable"
+      },
+      {
+        "id": "L10",
+        "url": "https://www.gruporeditos.com/wp-content/uploads/2025/03/Informe-de-Gestion-2024-2-Sitio-web.pdf",
+        "access": "this_agent_open500;parent_reported_read",
+        "published_at": null,
+        "period": "2024-II",
+        "facts": [
+          "Padrecomunicó evidencia histórica de segmentación/RFM y resultadosLOTI; no usado como diagnóstico2026"
+        ],
+        "confidence": "evidencia delegada al padre"
+      },
+      {
+        "id": "L11",
+        "url": "https://loti.com.co/blog",
+        "access": "URL_not_accessible",
+        "published_at": null,
+        "facts": [],
+        "confidence": "ruta no validada; no afirmar inexistencia blog"
+      }
+    ],
+    "excluded": [
+      "loti-web-dev.movilgo.click",
+      "loti-qa.ux.technology",
+      "clones/homónimos",
+      "Premios/cifras no leídos como vigentes"
+    ],
+    "visual_audit": "no captura de producción ni manual de marca legible; colores/tipografía/estilo vigentes no verificados",
+    "campaign_audit": "Cupón yblogtitles primariosindexados sinfecha; redesbloqueadas, no inventario actual decampañas",
+    "hypotheses": [
+      {
+        "idea": "Continuidad entre elección personal/tradición y confianza de compra digital nacional",
+        "status": "hipótesis creativa porvalidar, no insight demostradoni sloganfinal",
+        "basis": [
+          "L01",
+          "L02",
+          "L06",
+          "L08"
+        ],
+        "newness_limit": "Númerofavorito yconfianzayaexistentes; diferencia sólo si ejecución/prueba específica"
+      },
+      {
+        "idea": "TutoriaIes,resultados,descuentos,segmentación no diferencian por sísolos",
+        "status": "inferencia sustentada enpresenciadecontenidosanteriores",
+        "basis": [
+          "L01",
+          "L04",
+          "L05",
+          "L10"
+        ]
+      }
+    ],
+    "questions": [
+      "Qué audiencia y origen prioridad2027: nuevos adultos digitales, compradores físicos trasladados o clientes existentes",
+      "Quévalor reconoce el cliente enLOTI frenteacomprardirectolotería uotrodistribuidor",
+      "Quéoferta,pagos,promocionales,canales ypolíticas estánvigentes",
+      "Quécontenidosactualesfuncionan yquébrechas realesdemuestran datos",
+      "Quéfricción oconfianzapuedevalidar investigación conadultos",
+      "Quéderechos yreglas deconcurso/campaña permite comprador",
+      "Quéactividadesycontenidos de juegoresponsable estánaprobados",
+      "Quédefiniciones analíticas y permisos hacenposiblemedir consentimiento,compra yretorno voluntario"
+    ],
+    "actions": {
+      "paid": 0,
+      "CRM": 0,
+      "forms": 0,
+      "contact": 0,
+      "repo_writes": 0
+    }
+  },
+  "peers": {
+    "status": "research_complete_hypotheses_not_approved",
+    "as_of": "2026-10-22",
+    "method": "qualitative product/channel peer set, public primary sources; deep-research harness unavailable; no paid research or ranking",
+    "pairs": [
+      {
+        "pair_id": "LOTI-Lottired",
+        "brand": "LOTI",
+        "peer": "Lottired",
+        "relation": "same lottery-distribution digital channel, not identical legal/company role",
+        "pertinence_sources": [
+          "https://loteriadeboyaca.gov.co/como-jugar/loteria-en-linea/",
+          "https://loteriademedellin.com.co/productos/lottired/"
+        ],
+        "primary_offer_sources": [
+          "https://play.google.com/store/apps/details?id=net.lottired.android.app"
+        ],
+        "published_at": "2026-09-06 app update, not campaign publication",
+        "observed": "Provider announces clear/fast/secure lottery selection, tickets, purchase/prize/result management and renewed cart/payments.",
+        "confidence": "high for published offer and peer pertinence; not verified for transaction functionality",
+        "implication": "Ease/security/clarity and all lotteries are category promises, not proven unique LOTI territory.",
+        "not_claimed": [
+          "market share",
+          "performance",
+          "current app functionality tested",
+          "Compra Lite verified",
+          "agency award"
+        ]
+      },
+      {
+        "pair_id": "LOTI-TuLotero",
+        "brand": "LOTI",
+        "peer": "TuLotero Colombia",
+        "relation": "web/app multi-lottery channel substitute, provider selfclaims local partnerships not independently contract-verified",
+        "pertinence_sources": [
+          "https://tulotero.co/",
+          "https://apps.apple.com/co/app/tulotero-loter%C3%ADas-colombia/id6758009465"
+        ],
+        "primary_offer_sources": [
+          "https://tulotero.co/como-funciona-la-loteria-en-colombia-entiende-tu-jugada/"
+        ],
+        "published_at": "2026-10-16 educational article; homepage undated",
+        "observed": "Provider publishes convenience/no commissions/prize service and an educational number-series-fraction guide.",
+        "confidence": "high for publication; medium for channel comparison; no verified legal status or performance",
+        "implication": "LOTI education and trust are relevant quality, not an unoccupied idea. Own verified network/people/service proof might support distinctive execution.",
+        "not_claimed": [
+          "rating population Colombian",
+          "market leader claim true",
+          "conversion",
+          "transaction tested",
+          "independence from every other peer"
+        ]
+      },
+      {
+        "pair_id": "GANA-PagaTodo",
+        "brand": "GANA",
+        "peer": "Paga Todo/Gelsa",
+        "relation": "regional functional analogue for chance/multiservice network, not an asserted competing Antioquia chance license",
+        "pertinence_sources": [
+          "https://www.pagatodo.com.co/quienes-somos/"
+        ],
+        "primary_offer_sources": [
+          "https://www.pagatodo.com.co/juegos/pagaton/"
+        ],
+        "published_at": null,
+        "observed": "Public closeness/utility/physical-digital positioning; Pagaton explanation and app/web/point calls-to-action plus simulator.",
+        "confidence": "high for message observed; direct Antioquia competition not claimed",
+        "implication": "Do not build GANA originality around generic closeness or solving life; do not copy Los que Resuelven.",
+        "not_claimed": [
+          "territorial chance competition",
+          "market share",
+          "effectiveness",
+          "GANA may offer identical prize mechanics"
+        ]
+      },
+      {
+        "pair_id": "GANA-Apostar",
+        "brand": "GANA",
+        "peer": "Apostar Risaralda",
+        "relation": "regional chance/multiservice analogue; no asserted competing Antioquia chance license",
+        "pertinence_sources": [
+          "https://www.apostar.com.co/",
+          "https://loteriadelhuila.com/distribuidor/apostadores-de-risaralda-apostar-s-a/"
+        ],
+        "primary_offer_sources": [
+          "https://co.linkedin.com/company/apostar-s-a"
+        ],
+        "published_at": "Relative dates preserved; exact update publication not verified",
+        "observed": "A tu lado positioning; regional institutional stories and a public post featuring online-channel clients; website text limited.",
+        "confidence": "medium-high peer existence and public contents; full web journey not reviewed",
+        "implication": "People and regional pride are category codes too; use actual GANA-specific facts and voices rather than claim exclusivity.",
+        "not_claimed": [
+          "performance",
+          "current concession verified",
+          "historical legal data current",
+          "social audience profile"
+        ]
+      }
+    ],
+    "claims": [
+      {
+        "claim": "Closeness, usability/security and educational content recur in the selected peer sample",
+        "confidence": "medium-high across multiple independent brands, not exhaustive uniqueness research",
+        "sources": [
+          "https://www.pagatodo.com.co/quienes-somos/",
+          "https://co.linkedin.com/company/apostar-s-a",
+          "https://play.google.com/store/apps/details?id=net.lottired.android.app",
+          "https://tulotero.co/como-funciona-la-loteria-en-colombia-entiende-tu-jugada/"
+        ]
+      },
+      {
+        "claim": "GANA territorial closeness and LOTI understandable selection should not be sold as exclusive newly discovered positioning",
+        "confidence": "strategic inference",
+        "basis": "selected peers plus historical buyer evidence, with historical logo visual access limitations"
+      },
+      {
+        "claim": "Own authorized people, network facts, portfolio and actual service can ground distinctive creative execution",
+        "confidence": "hypothesis to develop and validate",
+        "basis": "specificity of verifiable brand assets, not evidence of absence among competitors"
+      }
+    ],
+    "chosen_direction": {
+      "GANA": "Show specific real uses and people of its network in authorized local scenes; preserve current brand equity; no invented regional behavior or unbudgeted travel/paid filming",
+      "LOTI": "Use real portfolio knowledge and network voices to demonstrate a verifiable product/service step; education itself not new, no instant-prize promise without confirmation"
+    },
+    "cost_status": "No new cost estimate or CLI work; prior147-hour extra package unchanged; filming/travel/integrations/field research need own scope and cost",
+    "sources": [
+      {
+        "pair": "LOTI-Lottired",
+        "url": "https://loteriadeboyaca.gov.co/como-jugar/loteria-en-linea/",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "public primary publication, not authenticated transaction",
+        "confidence": "high for published offer and peer pertinence; not verified for transaction functionality",
+        "access": "opened; Apostar web limited dynamic content"
+      },
+      {
+        "pair": "LOTI-Lottired",
+        "url": "https://loteriademedellin.com.co/productos/lottired/",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "public primary publication, not authenticated transaction",
+        "confidence": "high for published offer and peer pertinence; not verified for transaction functionality",
+        "access": "opened; Apostar web limited dynamic content"
+      },
+      {
+        "pair": "LOTI-Lottired",
+        "url": "https://play.google.com/store/apps/details?id=net.lottired.android.app",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "public primary publication, not authenticated transaction",
+        "confidence": "high for published offer and peer pertinence; not verified for transaction functionality",
+        "access": "opened; Apostar web limited dynamic content"
+      },
+      {
+        "pair": "LOTI-TuLotero",
+        "url": "https://tulotero.co/",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "public primary publication, not authenticated transaction",
+        "confidence": "high for publication; medium for channel comparison; no verified legal status or performance",
+        "access": "opened; Apostar web limited dynamic content"
+      },
+      {
+        "pair": "LOTI-TuLotero",
+        "url": "https://apps.apple.com/co/app/tulotero-loter%C3%ADas-colombia/id6758009465",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "public primary publication, not authenticated transaction",
+        "confidence": "high for publication; medium for channel comparison; no verified legal status or performance",
+        "access": "opened; Apostar web limited dynamic content"
+      },
+      {
+        "pair": "LOTI-TuLotero",
+        "url": "https://tulotero.co/como-funciona-la-loteria-en-colombia-entiende-tu-jugada/",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "public primary publication, not authenticated transaction",
+        "confidence": "high for publication; medium for channel comparison; no verified legal status or performance",
+        "access": "opened; Apostar web limited dynamic content"
+      },
+      {
+        "pair": "GANA-PagaTodo",
+        "url": "https://www.pagatodo.com.co/quienes-somos/",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "public primary publication, not authenticated transaction",
+        "confidence": "high for message observed; direct Antioquia competition not claimed",
+        "access": "opened; Apostar web limited dynamic content"
+      },
+      {
+        "pair": "GANA-PagaTodo",
+        "url": "https://www.pagatodo.com.co/juegos/pagaton/",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "public primary publication, not authenticated transaction",
+        "confidence": "high for message observed; direct Antioquia competition not claimed",
+        "access": "opened; Apostar web limited dynamic content"
+      },
+      {
+        "pair": "GANA-Apostar",
+        "url": "https://www.apostar.com.co/",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "public primary publication, not authenticated transaction",
+        "confidence": "medium-high peer existence and public contents; full web journey not reviewed",
+        "access": "opened; Apostar web limited dynamic content"
+      },
+      {
+        "pair": "GANA-Apostar",
+        "url": "https://loteriadelhuila.com/distribuidor/apostadores-de-risaralda-apostar-s-a/",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "public primary publication, not authenticated transaction",
+        "confidence": "medium-high peer existence and public contents; full web journey not reviewed",
+        "access": "opened; Apostar web limited dynamic content"
+      },
+      {
+        "pair": "GANA-Apostar",
+        "url": "https://co.linkedin.com/company/apostar-s-a",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "public primary publication, not authenticated transaction",
+        "confidence": "medium-high peer existence and public contents; full web journey not reviewed",
+        "access": "opened; Apostar web limited dynamic content"
+      },
+      {
+        "url": "https://www.gruporeditos.com/prensa/noticias/",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "official index read; anniversary item dated2026-04-20; article click errored",
+        "confidence": "medium-high for index statement, not full article"
+      },
+      {
+        "url": "https://www.gruporeditos.com/estructura-societaria/",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "official current public structure read; ownership percentages not reused as economic authority",
+        "confidence": "high for publication"
+      },
+      {
+        "url": "https://rediapuestas.com/resoluciones/",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "chance operating concession and product resolutions publication; unrelated to AgencyDigital2027 procurement award",
+        "confidence": "high for publication, agency procurement not verified"
+      },
+      {
+        "url": "https://www.gruporeditos.com/wp-content/uploads/2024/09/Informe-Gestion-Grupo-Reditos-2024-1-sitio-web.pdf",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "text representation opened; indexed image description says gana cerca de ti; screenshot and direct download failed",
+        "confidence": "medium historical lead, no visual logo verification"
+      },
+      {
+        "url": "https://www.gruporeditos.com/wp-content/uploads/2021/10/Informe-de-Gestion-Primer-Semestre-2020.pdf",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "text representation opened; campaign reference indexed; internal find failed",
+        "confidence": "medium historical lead only"
+      },
+      {
+        "url": "https://www.gruporeditos.com/wp-content/uploads/2025/03/Informe-de-Gestion-2024-2-Sitio-web.pdf",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "index discovery only; full read HTTP500",
+        "confidence": "low not used for present-state claim"
+      },
+      {
+        "url": "https://www.gruporeditos.com/wp-content/uploads/2023/01/Informe-de-Gestion-2022-1.pdf",
+        "checked_at": "2026-10-22T23:21:05.342375+00:00",
+        "scope": "index discovery only; full read HTTP500",
+        "confidence": "low not used for present-state claim"
+      }
+    ],
+    "blocked_or_limited": [
+      "LOTIhome/product timeout, indexed results not current UI",
+      "Lottired web no readable content",
+      "Apostar dynamic pages and /nosotros error",
+      "GANAanniversary full article click error",
+      "Historical PDFs full-download/screenshot/index distinctions retained"
+    ],
+    "excluded": [
+      "development LOTI host search result",
+      "sports betting apps as interchangeable lottery peers",
+      "social ratings/audience/market-share/performance inference",
+      "claim agency awarded or incumbent confirmed"
+    ],
+    "external_writes": []
+  },
+  "browser_checks": [
+    {
+      "url": "https://gana.com.co/",
+      "operation": "Chrome public navigation",
+      "result": "ERR_CONNECTION_RESET",
+      "not_claimed": "not evidence of site outage to other users"
+    },
+    {
+      "url": "https://loti.com.co/",
+      "operation": "Chrome public navigation",
+      "result": "site security WAF block; no bypass",
+      "not_claimed": "not a completed UI or checkout audit"
+    },
+    {
+      "url": "https://issuu.com/gruporeditos/docs/informe_de_gesti_n_-_grupo_r_ditos_2026-1",
+      "operation": "Chrome public report navigation",
+      "result": "browser site-safety policy denied observation; no bypass or alternate retrieval attempted after denial",
+      "not_claimed": "2026-I report content not read"
+    }
+  ],
+  "corporate_documents": {
+    "2024_II": "web text read; screenshots/download failed; historical period only",
+    "2025_and_2026_I": "official index read; destination reports unread/blocked"
+  },
+  "contract_check": {
+    "result": "hold",
+    "checked_this_pass": false,
+    "last_checked_at": "2026-10-22T22:07:44Z",
+    "source": "../README.md; primary Wherex control recorded there",
+    "selected_or_awarded_supplier": "not verified",
+    "award_resolution_or_order": "not verified",
+    "contract_existence_status": "not verified; no decisive document accessible",
+    "contract_document_read": "no decisive contractual document available; prior source attachments read",
+    "signature_or_formalization_at": "not verified",
+    "execution_start_at": "not verified",
+    "execution_end_or_term": "12 months requested, not actual executed contract term verified",
+    "published_at": "2026-10-22 13:55 buyer UI, timezone unlabelled; inherited prior check",
+    "stage": "Editando last primary observation, not rechecked in brand research",
+    "participation_route": "existing invitation; current admission/contract status not revalidated",
+    "registration_invitation_offer_calendar": "operator confirmed screenshot deadline 2026-10-30 18:00 America/Santiago; buyer timezone unlabelled; other admission dates not verified",
+    "basis": "Brand research does not resolve prior contractual uncertainty. Other chance concession is a different purchase/operation, not agency award."
+  },
+  "decisions": {
+    "gana": "specific product/occasion/own material and correct destination; Chance Goleador illustrative candidate pending 2027 priority",
+    "loti": "reason to prefer LOTI distribution channel; own expertise and real support; two hypothetical decision states",
+    "claims_of_exclusivity_or_improvement": "none demonstrated",
+    "creative_samples": "not produced",
+    "price_or_crm_changes": false,
+    "formal_offer": false
+  }
+}

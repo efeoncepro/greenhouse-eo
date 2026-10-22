@@ -1,6 +1,6 @@
 # Base comercial vigente — GANA y LOTI, Agencia Digital 2027
 
-**Decisión de Julio, 22/10/2026.** Trabajar con **COP 36–38 millones mensuales / USD 9.863,01–10.410,96** para GRD-1552, intento 13. Usar **COP 38 millones / USD 10.410,96 al mes como escenario principal de valoración interna** y COP 36 millones / USD 9.863,01 como alternativa más agresiva. No es precio definitivo ni autorización para preparar, emitir o presentar una propuesta. Se conserva la instrucción de mantenerla detenida.
+**Decisión de Julio, 22/10/2026.** Trabajar con **COP 36–38 millones mensuales / USD 9.863,01–10.410,96** para GRD-1552, intento 13. Usar **COP 38 millones / USD 10.410,96 al mes como escenario principal de valoración interna** y COP 36 millones / USD 9.863,01 como alternativa más agresiva. El precio definitivo y la emisión/presentación siguen pendientes. **Autorización posterior de Julio, 22/10/2026: preparar la propuesta en Markdown para Claude Design.** La pausa de redacción queda superada; se prepara un borrador con el escenario principal y los extras descritos, sin autorizar envío, firma, carga o presentación.
 
 Esta es la referencia del caso para toda documentación futura. No se trasladan precios, estrategia, solución o condiciones de propuestas anteriores perdidas ni de Programática GRD-1541, intento 12.
 
@@ -44,12 +44,12 @@ Fórmula: `(ingreso neto considerado − costo estimado) / ingreso neto consider
 
 Preparación inicial única estimada: **COP 2.295.742 / USD 628,97**. Si se distribuye internamente entre doce meses, el costo equivalente es **COP 25.312.838 / USD 6.935,02 mensuales** y el margen queda **33,39% al escenario de 38 millones** o **29,69% al de 36 millones**. No se aprobó un cobro de arranque adicional ni pago anticipado.
 
-## Qué debe resolverse antes de preparar o emitir la oferta
+## Qué debe resolverse antes de emitir la oferta
 
 - **Agente / investigación:** confirmar quién paga pauta, licencias/plataforma y consumos Email/SMS; tratamiento de impuestos; alcance de Listening y precio actual Frame.io; diferencias de 8/10 conceptos y 30/35 posts/historias. Las lecturas no acreditan exclusiones aceptadas por el comprador.
 - **Operaciones / Finance y Julio:** validar personas, capacidad compartida, cargas/beneficios no cubiertos de los nuevos perfiles, overhead y comisiones. La ruta internacional estimada no prueba costo laboral/EOR ni exención de obligaciones. No considerar los pendientes como cero.
 - **Comprador:** aclarar entidad contractual frente a facturación REDIAPUESTAS y expediente de adjudicación/contrato. El control sigue **HOLD**, no prueba compra disponible. La ficha leída conserva Editando y los tres adjuntos conocidos; no hay contrato decisivo disponible que permita verificar adjudicación, firma o ejecución. Ausencia en la ficha no prueba inexistencia.
-- **Julio:** elegir importe final, aprobar alcance económico y autorizar preparación/emisión cuando corresponda. Documentar el rango y el valor del Deal no levanta la instrucción «sin hacer propuesta todavía».
+- **Julio:** elegir importe final, aprobar alcance económico y autorizar preparación/emisión cuando corresponda. El mandato posterior de preparar el MD levanta la pausa de redacción; no aprueba por sí solo la económica definitiva ni la presentación.
 
 ## Reglas para los documentos que se preparen después
 
@@ -58,10 +58,26 @@ Preparación inicial única estimada: **COP 2.295.742 / USD 628,97**. Si se dist
 3. El precio elegido y el alcance deben volver a calcularse/revisarse por la vía canónica antes de una económica. No digitar cifras manuales en documentos emitidos desde V3 ni presentar esta suma como cotización congelada o precio aprobado.
 4. Costos, márgenes, alternativa interna y reservas pertenecen al expediente interno; no copiarlos al documento del comprador. No inventar descuentos, cobros iniciales, condiciones fiscales ni exclusiones de medios/consumos.
 5. Mantener Berel y SKY como los dos contratos de experiencia elegidos por Julio; no exigir cartas adicionales. Preservar el resto de requisitos y el plazo operativo ya documentados.
-6. No emitir, cargar, enviar ni presentar por este mandato. No hay documento de propuesta preparado, cambio de etapa ni GO inferidos.
+6. No emitir, cargar, enviar ni presentar por este mandato. La autorización posterior permite un borrador MD; no implica cambio de etapa ni GO.
 
 ## Evidencia y continuidad
 
 [Consolidación numérica y método](research/BASE-COMERCIAL-CONSOLIDADA-2026-10-22.json) · [Costos de tres personas](research/COSTOS-TRES-PERFILES-MEDELLIN-2026-10-22.md) · [Costos del resto por CLI](research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md) · [Alcance del techo según bases](research/ALCANCE-PRESUPUESTO-40MM-2026-10-22.md).
 
-Copia interna del brief y la consolidación en OneDrive, carpeta `13. Agencia Digital 2027/00 - Base comercial interna/`. Originales del comprador, contratos de experiencia y borrador Wherex preservados. No se creó ni publicó una propuesta.
+Copia interna del brief y la consolidación en OneDrive, carpeta `13. Agencia Digital 2027/00 - Base comercial interna/`. Originales del comprador, contratos de experiencia y borrador Wherex preservados. La preparación posterior del MD se registra abajo; no se publicó ni presentó una oferta.
+
+
+## Hipótesis estratégica posterior — no modifica esta base
+
+El [análisis de diferenciación](research/ESTRATEGIA-DIFERENCIACION-2026-10-22.md) propone evaluar extras con costo mensual equivalente COP 418.270 / USD 114,59. Son alternativas no aceptadas, no compromisos. El rango, el importe del Deal y la instrucción de no preparar propuesta permanecen vigentes. Elegir dirección no aprueba precio, capacidad o extras; cualquier futura preparación debe distinguir base obligatoria, alcance adicional realmente elegido y pendientes de admisibilidad/costo.
+
+
+**Corrección de dirección tras lectura completa de la oferta anterior:** [comparación y reformulación](research/COMPARACION-PROPUESTA-ANTERIOR-Y-REFORMULACION-2026-10-22.md). La tesis integrada/local-regional y los extras repiten argumentos históricos; no bastan como diferenciación. Se recomiendan elecciones creativas y demostraciones específicas por marca, todavía sin piezas preparadas, ampliación de alcance o aprobación de extras. Las cifras y permisos de este brief no cambian.
+
+
+**Profundización posterior de marcas:** [investigación GANA/LOTI](research/INVESTIGACION-MARCAS-Y-DIRECCION-2026-10-22.md). Cercanía y comprensión/confianza son prácticas existentes, no diferenciadores nuevos por sí solos. Direcciones y muestras recomendadas son internas y pendientes de materializar/validar; no añaden funcionalidades, viajes, producción o investigación a la base costeada.
+
+
+## Propuesta Markdown autorizada — 22/10/2026
+
+Julio pidió preparar el MD para luego diseñar con Claude Design. [Guion completo](PROPUESTA-GANA-LOTI-2027-PARA-CLAUDE-DESIGN.md), [técnica](oferta-tecnica.md), [económica de borrador](oferta-economica.md) y [control interno](CONTROL-PROPUESTA-INTERNO.md). Se utiliza COP38M / USD10.410,96 al mes y COP456M / USD124.931,51 por doce meses; extras como contenido propuesto, sin costo/compromiso nuevo por fuera de su alcance estudiado. Precio final, capacidad, costos pendientes, desglose modulable y controles de emisión continúan por resolver. CRM intacto.

@@ -146,3 +146,11 @@ Sin Leads, Deals ni envíos; la fila de búsqueda conserva su estado original an
 - 22/10/2026 — GRD-1552: [costos del resto por CLI y mantenimiento canónico de perfiles](../tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md). COP 12.699.026 / USD 3.479,19 mensuales adicionales; inicial COP 2.295.742 / USD 628,97. Propuesta detenida.
 
 - 2026-10-22T19:11:22.557524-03:00 — GRD-1552: [base comercial vigente](../tenders/gana-loti-agencia-digital-2027-1552/BRIEF-COMERCIAL-VIGENTE.md), rango COP36–38M / USD9.863,01–10.410,96 mensuales; Deal COP456M / USD124.931,51 total12meses, escenario38M. Dos readbacks; propuesta detenida, HOLD contractual, Programática intacta.
+
+- 2026-10-22T19:46:52.321663-03:00 — Réditos GRD-1552: [estrategia con subagentes, competencia y extras medidos](../tenders/gana-loti-agencia-digital-2027-1552/research/ESTRATEGIA-DIFERENCIACION-2026-10-22.md). No ganador anterior verificado; ruta recomendada operación local/regional y dos planes, extras no aceptados. [Corrida](runs/2026-10-22-1945-reditos-estrategia.md). Sin propuesta/CRM/envíos/commit.
+
+- 2026-10-22T20:05:53.077680-03:00 — GRD-1552: comparación completa de la propuesta anterior de 84 páginas y reformulación; la ruta inicial repetía integración, equipo y extras. [Reporte](runs/2026-10-22-2005-reditos-comparacion-anterior.md) · [Consultas](queries/2026-10-22-2005-reditos-comparacion-anterior.json). Sin nueva candidata, propuesta, CRM o envíos.
+
+- 2026-10-22T20:24:15.879419-03:00 — GRD-1552: investigación profunda GANA/LOTI con tres subagentes, 97 búsquedas y cuatro pares cualitativos. Cercanía y pedagogía ya trabajadas; dirección refinada y límites de acceso documentados. [Informe](runs/2026-10-22-2024-reditos-investigacion-marcas.md) · [Consultas](queries/2026-10-22-2024-reditos-investigacion-marcas.json). Sin nuevas convocatorias, propuesta o CRM.
+
+- 2026-10-22T20:40:54.165801-03:00 — GRD-1552: Julio autoriza preparar propuestaMD para Claude Design; borrador28bloques y anexos, fuentes técnica/económica y control interno separados. [Corrida](runs/2026-10-22-2040-reditos-propuesta-md.md) · [Operaciones](queries/2026-10-22-2040-reditos-propuesta-md.json). Sin emisión, presentación o CRM.

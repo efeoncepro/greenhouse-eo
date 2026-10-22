@@ -1,13 +1,22 @@
 # changelog.md
 
+[Historial interno](docs/changelog/internal/README.md).
+
 ## 2026-10-22 — Cotizador CLI: perfiles y recursos de referencia
+
+- Réditos: [propuesta Markdown para Claude Design](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/PROPUESTA-GANA-LOTI-2027-PARA-CLAUDE-DESIGN.md) preparada por autorización posterior; narrativa, conceptos, alcances e inversión de borrador, con control interno separado. Sin emisión/envío.
+
+- Réditos: [investigación de marcas y pares](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/INVESTIGACION-MARCAS-Y-DIRECCION-2026-10-22.md) afina la dirección comercial; fuentes, fechas y límites de acceso conservados. Sin oferta o cambio de precio.
+
+- Réditos: comparación completa de la propuesta anterior (84 páginas) corrige la diferenciación recomendada; integración y extra mile ya estaban ofrecidos. [Hallazgos y reformulación](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COMPARACION-PROPUESTA-ANTERIOR-Y-REFORMULACION-2026-10-22.md).
+
+- Réditos: investigación de competencia y estrategia con tres subagentes; hipótesis de extras costeada por CLI, sin nuevo precio o compromiso. [Análisis para elegir dirección](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/ESTRATEGIA-DIFERENCIACION-2026-10-22.md).
 
 - Réditos GRD-1552: rango interno COP36–38M / USD9.863,01–10.410,96 mensuales documentado y Deal valorado en COP456M / USD124.931,51 por 12 meses al escenario principal; sin propuesta ni cambio de etapa. [Base y evidencia](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/BRIEF-COMERCIAL-VIGENTE.md).
 
 - Mantenimiento versionado: tres perfiles faltantes, costos CO estimados y referencia Awario, conservando políticas y controles. [Evidencia](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md). Sin cambios de motor ni publicación a plataforma.
 
 
-[Historial interno](docs/changelog/internal/README.md).
 
 ## 2026-10-22 — Navegación global del sitio: mecanismo en AXIS (TASK-2040)
 

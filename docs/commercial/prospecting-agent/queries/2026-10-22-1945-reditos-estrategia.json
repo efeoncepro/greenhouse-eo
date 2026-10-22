@@ -1,0 +1,107 @@
+{
+  "run_at": "2026-10-22T19:45:08.838385-03:00",
+  "type": "focused_internal_bid_strategy",
+  "case": "GRD-1552",
+  "attempt": 13,
+  "country": "CO",
+  "services": [
+    "creative",
+    "media",
+    "digital_strategy",
+    "contactability",
+    "social_listening"
+  ],
+  "scope": "Historical competitor research and current RFP analysis explicitly requested; not a new 20-cell discovery run or tender recommendation",
+  "calendar_week_start": "2026-10-19T00:00:00-03:00",
+  "parent_queries": [
+    {
+      "query": "site.gruporeditos.com Gana Loti transformación digital 2026 estrategia",
+      "filters": null
+    },
+    {
+      "query": "Gana Loti sitio oficial Grupo Réditos Colombia marcas",
+      "filters": null
+    },
+    {
+      "query": "site:gruporeditos.com \"Gana celebra 20 años\"",
+      "filters": null
+    },
+    {
+      "query": "site:gruporeditos.com \"Ecommerce Awards reconoció\" Gana",
+      "filters": null
+    },
+    {
+      "query": "site:loti.com.co \"juego responsable\"",
+      "filters": null
+    }
+  ],
+  "parent_sources_read_or_blocked": [
+    {
+      "url": "https://www.gruporeditos.com/",
+      "result": "timeout on direct open; search index available"
+    },
+    {
+      "url": "https://loti.com.co/",
+      "result": "JS-only shell, no full public content read"
+    },
+    {
+      "url": "https://gana.com.co/",
+      "result": "timeout"
+    },
+    {
+      "url": "https://www.gruporeditos.com/ecommerce-awards-reconocio-el-sitio-web-de-gana-como-uno-de-los-mejores-digital-commerce-de-colombia/",
+      "result": "full primary article read; published2024-06-06; maturity evidence, not award of agency contract"
+    },
+    {
+      "url": "https://btodigital.com/portafolio/gana/",
+      "result": "full provider case read; no service dates or award proof"
+    },
+    {
+      "url": "https://gana.com.co/pru/public/manuales/MANUAL%20DE%20POL%C3%8DTICAS%20DE%20TRATAMIENTO%20Y%20PROTECCI%C3%93N%20DE%20DATOS%20PERSONALES%20GRUPO%20R%C3%89DITOS.docx.pdf",
+      "result": "browser net::ERR_CONNECTION_CLOSED; indexed excerpt only, full read blocked"
+    }
+  ],
+  "delegated_sources": "docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/estrategia-2026-10-22-1945/competitors-sources.json",
+  "base_review": "docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/estrategia-2026-10-22-1945/bases-requirements.json",
+  "simulation_summary": "docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/estrategia-2026-10-22-1945/extras-summary.json",
+  "subagents": [
+    "bases_diferenciacion",
+    "competidores_reditos",
+    "extra_mile_economia"
+  ],
+  "winner_previous_tender": "not_verified; no buyer award/contract read",
+  "procurement_control": {
+    "result": "HOLD retained",
+    "reference": "research/CRM-BASE-COMERCIAL-2026-10-22.json",
+    "last_contract_fiche_check": "2026-10-22T22:07:44Z",
+    "not_revalidated_this_strategy_run": true,
+    "award_supplier": "not_verified",
+    "award_act_order": "not_verified",
+    "contract_status": "not_verified",
+    "signature_at": "not_verified",
+    "execution_start_end": "not_verified",
+    "purpose": "strategy evaluation only, not recommendation to bid or new CRM admission"
+  },
+  "pii_queries": "no personal email/phone queries; source query list contains public brand/campaign names",
+  "private_evidence_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945",
+  "crm_writes": 0,
+  "paid_credits": 0,
+  "outbound_messages": 0,
+  "proposal_prepared": false,
+  "price_or_bonus_approved": false,
+  "tasks_created": 0,
+  "commit_push": false,
+  "report": "docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/ESTRATEGIA-DIFERENCIACION-2026-10-22.md",
+  "strategy_recommendation": {
+    "route": "Local Medellín plus regional delivery, two brand plans and limited extras",
+    "price_scenario_COP": 38000000,
+    "fx_COP_per_USD": 3650,
+    "monthly_extra_reserve_COP": "418270.33",
+    "monthly_extra_reserve_USD": "114.59",
+    "monthly_total_with_extras_COP": "25539796.33",
+    "monthly_total_with_extras_USD": "6997.20",
+    "margin_percent_at_38M": "32.79",
+    "margin_percent_at_36M": "29.06",
+    "approved": false
+  }
+}

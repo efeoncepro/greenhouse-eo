@@ -1,5 +1,7 @@
 # Revisión de licitaciones anteriores y recuperación de respaldos
 
+> **Ampliación posterior:** se completó OCR local de las 84 páginas de la presentación y revisión visual de toda ella en hojas de contacto, con ampliaciones decisivas. La limitación de lectura descrita al final corresponde a la primera revisión y queda superada por la [comparación completa y reformulación](COMPARACION-PROPUESTA-ANTERIOR-Y-REFORMULACION-2026-10-22.md). No cambia la prohibición de usar la oferta perdida como plantilla.
+
 **Conclusión: los expedientes anteriores sirven para localizar documentos y antecedentes verificables. No son guía, modelo, plantilla, benchmark de precio ni validación de la solución para Agencia Digital2027.** Julio reiteró que se perdieron; no hay feedback del comprador que permita diagnosticar aquí por qué. La propuesta nueva se construye desde las bases GRD-1552/intento13, capacidades actuales y decisiones específicas del operador.
 
 La expresión previa del agente «estructura útil de la propuesta anterior» queda retirada. Revisar o inventariar un cronograma, acuerdos de servicio o una oferta económica histórica no habilita adoptarlos como base. No se reutilizó ni modificó una oferta, vacante, publicación o Deal en esta revisión.

@@ -4,9 +4,11 @@
 
 **Rango interno: COP 36–38 millones / USD 9.863,01–10.410,96 al mes.** Escenario principal para valoración CRM: **COP 38 millones / USD 10.410,96 mensuales**; importe del Deal para los **12 meses**: **COP 456.000.000 / USD 124.931,51**, moneda COP. Alternativa anual: COP 432.000.000 / USD 118.356,16. El techo comprador COP 40 millones / USD 10.958,90 no es el precio recomendado.
 
-Costo mensual consolidado: **COP 25.121.526 / USD 6.882,61**; contribución preliminar a 38 millones: COP 12.878.474 / USD 3.528,35, **33,89%**, antes de arranque y costos sin validar. **La propuesta sigue detenida**: el rango y la actualización del Deal no aprueban precio definitivo, preparación, emisión, presentación ni GO. Toda documentación futura debe leer la [base comercial vigente](BRIEF-COMERCIAL-VIGENTE.md), que distingue costos internos, alcance pendiente y documentos para el comprador. [Consolidación](research/BASE-COMERCIAL-CONSOLIDADA-2026-10-22.json) · [Recibo CRM](research/CRM-BASE-COMERCIAL-2026-10-22.json).
+Costo mensual consolidado: **COP 25.121.526 / USD 6.882,61**; contribución preliminar a 38 millones: COP 12.878.474 / USD 3.528,35, **33,89%**, antes de arranque y costos sin validar. **Estado posterior: borrador Markdown autorizado y preparado para revisión/diseño**. El rango y la actualización del Deal no aprueban precio definitivo, emisión, presentación ni GO. Toda documentación futura debe leer la [base comercial vigente](BRIEF-COMERCIAL-VIGENTE.md), que distingue costos internos, alcance pendiente y documentos para el comprador. [Consolidación](research/BASE-COMERCIAL-CONSOLIDADA-2026-10-22.json) · [Recibo CRM](research/CRM-BASE-COMERCIAL-2026-10-22.json).
 
 ## Estado al 22 de octubre de 2026
+
+**Última instrucción:** Julio autorizó preparar la propuesta en MD para Claude Design. [Documento consolidado](PROPUESTA-GANA-LOTI-2027-PARA-CLAUDE-DESIGN.md) · [Control interno](CONTROL-PROPUESTA-INTERNO.md). La pausa de redacción queda superada; las referencias históricas a «sin propuesta» describen sus revisiones fechadas. No hay deck, PDF, oferta emitida/presentada ni cambio CRM.
 
 Invitación recibida y bases leídas. **Intento 13 con Grupo Réditos**, según instrucción directa de Julio, corroborado por la carpeta `13. Agencia Digital 2027`. No acredita oferta presentada. **HOLD / investigación incompleta** por entidad contratante y verificación contractual pendientes. El plazo operativo fue confirmado por Julio según la captura de Wherex: **30/10/2026 a las18:00, registrado en America/Santiago**, sin afirmar que la captura rotule ese huso. **Deal [66560488750](https://app.hubspot.com/contacts/48713323/record/0-3/66560488750?utm_source=codex&utm_medium=ai_agent) creado el 22/10/2026 a las 14:15 Santiago**, tras la reiteración expresa de Julio «Crea el deal» después de informar las diferencias. Alta administrativa con HOLD documentado; no equivale a GO, postulación o hechos contractuales validados.
 
@@ -84,3 +86,20 @@ Julio permite revisar las bases y documentos presentados en procesos anteriores 
 ## Costos internos y propuesta detenida — 22/10/2026
 
 Por instrucción de Julio no se prepara propuesta. [Costo del resto por CLI](research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md): COP 12.699.026 / USD 3.479,19 mensuales adicionales; inicial COP 2.295.742 / USD 628,97. No incluye los tres dedicados. Estimación en revisión con FX de política 3.650 COP/USD, sin precio comercial aprobado. Catálogo local actualizado por vía canónica; sin cambios CRM, Hiring ni herramientas compradas.
+
+
+## Dirección estratégica propuesta — 22/10/2026, pendiente de elección
+
+**Revisión posterior:** la lectura completa de la propuesta anterior demuestra repetición material en esa ruta. La [comparación y reformulación](research/COMPARACION-PROPUESTA-ANTERIOR-Y-REFORMULACION-2026-10-22.md) sustituye su recomendación de diferenciación: elecciones creativas distintas para GANA y LOTI, muestras específicas y capacidad comprobable. Integración y extras quedan como base/complemento. Sin propuesta formal o cambio comercial.
+
+[Análisis con tres subagentes](research/ESTRATEGIA-DIFERENCIACION-2026-10-22.md): operación Medellín + capacidad regional, dos planes por marca y extras acotados. No se confirmó ganador anterior; caso GANA de btodigital es autodeclarado y SM Digital queda como pista. Paquete estudiado: cinco variantes estáticas mensuales, una activación táctica anual y dos ejercicios de crisis, sin presentar la táctica como tercera macro. Reserva COP 418.270 / USD 114,59 al mes; costo equivalente con extras COP 25.539.796 / USD 6.997,20. A COP38M / USD10.410,96, margen preliminar32,79%; a COP36M / USD9.863,01,29,06%, antes de arranque y pendientes. Los extras no están aprobados ni incorporados al Deal o a la base comercial. C9 trayectoria antioqueña y C11 material de pauta requieren evidencia/alcance específico. Sin propuesta, GO, envíos ni nuevo commit.
+
+
+## Investigación de marcas — 22/10/2026
+
+La [investigación profunda GANA/LOTI y sus pares](research/INVESTIGACION-MARCAS-Y-DIRECCION-2026-10-22.md) afina la dirección: cercanía, utilidad y pedagogía ya existen; creatividad específica con portafolio/activos propios y razón para elegir cada marca. La lectura de GANA es más completa; LOTI tiene contenido indexado y bloqueo de UI/redes, sin checkout verificado. No se confirma exclusividad o resultado. Sin modificar base comercial, extras, Deal o propuesta detenida.
+
+
+## Borrador de propuesta preparado — 2026-10-22T20:40:54.165801-03:00
+
+[MD para Claude Design](PROPUESTA-GANA-LOTI-2027-PARA-CLAUDE-DESIGN.md): 28 bloques y anexos, derivados de técnica y económica separadas. Conceptos GANA «La previa tiene seis nombres» y LOTI «La elección lleva dos nombres»; alcances, roles, reportería, extras e inversión de borrador. Aún sin piezas visuales. [Verificación](research/PROPUESTA-MD-VERIFICACION-2026-10-22.json). Pendientes de admisibilidad, condiciones y producción en control interno. No listo para emitir; sin CRM, Wherex, pagos o envíos.

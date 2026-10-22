@@ -1,0 +1,538 @@
+{
+  "status": "internal_simulation_not_proposal",
+  "private_evidence_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945",
+  "artifacts": [
+    {
+      "name": "campaign-month.COP.increment.json",
+      "sha256": "75dc0aa247a790b27b2bd3f92185dfe6c6999a66eb2f56fd0ebd3bc483d1acc1",
+      "bytes": 7218,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.COP.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "five-static.dimensioned-brief.json",
+      "sha256": "bc0a841174e7409f4d92e581e1b1213db7e425c17ac75304c69120eaf221a7c5",
+      "bytes": 3914,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.dimensioned-brief.json",
+      "versioned": true
+    },
+    {
+      "name": "static-and-tactical-annualised.COP.demand.json",
+      "sha256": "d915ca5f8f02250c05606e98a8432cb586cec63cafa86b1bd9257a737933080b",
+      "bytes": 8996,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.COP.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "five-static.brief.json",
+      "sha256": "9ab2489141ec51c6c48bf42c66cd798c2f2423a151724c424ab0aee300cdae5f",
+      "bytes": 2436,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.brief.json",
+      "versioned": true
+    },
+    {
+      "name": "campaign-month.COP.summary.json",
+      "sha256": "e6f69b44bbc3ef2f20dcef12560bdb5ed1358745a6425928d67ecdee57e5dca2",
+      "bytes": 19533,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.COP.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "drill-month.dimensioned-brief.json",
+      "sha256": "f7cfd3353b694d8589a859b3db54a5e11a34c2cf04febcb6a0a0db32c7630bf6",
+      "bytes": 3916,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.dimensioned-brief.json",
+      "versioned": true
+    },
+    {
+      "name": "drill-month.COP.demand.json",
+      "sha256": "800b615e44d1f92b5935dfedc2308286f8f7f989276b3f5a3485463a0ab96eaa",
+      "bytes": 8883,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.COP.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "overlap-month.USD.summary.json",
+      "sha256": "f17725e267c9f68e57b078329cf410018896edcb84e7266565f8ba65199deb99",
+      "bytes": 19584,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.USD.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "drill-month.brief.json",
+      "sha256": "9ab2489141ec51c6c48bf42c66cd798c2f2423a151724c424ab0aee300cdae5f",
+      "bytes": 2436,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.brief.json",
+      "versioned": true
+    },
+    {
+      "name": "campaign-month.USD.increment.json",
+      "sha256": "1ba8e2061457130d2ddfde60f93c626921cd01a39e57d7e7b2e919a55b3e6f15",
+      "bytes": 7196,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.USD.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "static-and-tactical-annualised.USD.demand.json",
+      "sha256": "8f9193537e60d805702df8b9f597e61a3f289583b2b0a89038976cdd6bd50a8b",
+      "bytes": 8996,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.USD.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "overlap-month.COP.artifact.json",
+      "sha256": "e699f452066bc353fcc5bba8204d3f90ab4776ed01a47b90293309bd9746e538",
+      "bytes": 1320532,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.COP.artifact.json",
+      "versioned": false
+    },
+    {
+      "name": "drill-month.USD.artifact.json",
+      "sha256": "e0237c811415150dfcf10fb76a37065915caff646d2fa894e0e47fe4f512ca70",
+      "bytes": 1318497,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.USD.artifact.json",
+      "versioned": false
+    },
+    {
+      "name": "static-and-tactical-annualised.COP.artifact.json",
+      "sha256": "6413acb5e555084b666e50fd2b5b4266caed77ea4695793c9c84159ab59661e2",
+      "bytes": 1319520,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.COP.artifact.json",
+      "versioned": false
+    },
+    {
+      "name": "overlap-month.workload.json",
+      "sha256": "f6aadddb380f77006b4a5472606029cc4820474dec7427a4f6e6e48b9e4e315a",
+      "bytes": 10985,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.workload.json",
+      "versioned": true
+    },
+    {
+      "name": "static-and-tactical-annualised.USD.summary.json",
+      "sha256": "57c73edc825e011e22afdcefa9be66c2b34bc82384ce1f780e86c1440e44260c",
+      "bytes": 19513,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.USD.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "overlap-month.workload-result.json",
+      "sha256": "a50d30d3c19f11e030a638bb116adcc028115c3303be98802f74edf5725ac2d6",
+      "bytes": 8627,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.workload-result.json",
+      "versioned": true
+    },
+    {
+      "name": "drill-month.USD.demand.json",
+      "sha256": "8217e41ae32f47a11383be86164991381aa64167f40140a03fcbdd17db73771b",
+      "bytes": 8883,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.USD.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "three-extras-annualised.USD.increment.json",
+      "sha256": "4d49dd8b72d12b30c92a5bcd30f188f605434a07b95d8793dfe5939d753ce7de",
+      "bytes": 5946,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.USD.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "overlap-month.brief.json",
+      "sha256": "9ab2489141ec51c6c48bf42c66cd798c2f2423a151724c424ab0aee300cdae5f",
+      "bytes": 2436,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.brief.json",
+      "versioned": true
+    },
+    {
+      "name": "campaign-month.USD.artifact.json",
+      "sha256": "825bec5b8109a59d246cec355ccfffdcf39267f100cd91c513f6f163235bd58a",
+      "bytes": 1317948,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.USD.artifact.json",
+      "versioned": false
+    },
+    {
+      "name": "campaign-month.USD.demand.json",
+      "sha256": "f165c1cbc05a94d39bd11186b75eead41f5fc5bf9c94358ae16ad4a6f4e8e315",
+      "bytes": 8899,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.USD.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "drill-month.workload-result.json",
+      "sha256": "43490036ea4145c2ea6adad61266ebfa48c35081af75ae72fe476738a564219a",
+      "bytes": 8601,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.workload-result.json",
+      "versioned": true
+    },
+    {
+      "name": "three-extras-annualised.COP.summary.json",
+      "sha256": "bf547f8ac36b5b5ffd79c74e6a4135f9f95d02ea1ae47f7f58794144341a5055",
+      "bytes": 19527,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.COP.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "five-static.USD.artifact.json",
+      "sha256": "2c3d4ccc0088021794ab1db81cd7a8475b40d9df848108aa4b3e8368a2bb9ec8",
+      "bytes": 1319025,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.USD.artifact.json",
+      "versioned": false
+    },
+    {
+      "name": "three-extras-annualised.COP.artifact.json",
+      "sha256": "31952c78d281e89027b83aea1eeab39b9025eed01621dc9121f9be5c9feb28d1",
+      "bytes": 1319436,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.COP.artifact.json",
+      "versioned": false
+    },
+    {
+      "name": "static-and-tactical-annualised.dimensioned-brief.json",
+      "sha256": "2ae4397c9929f6d1a0810a538213682668320bdee9b43b648e2cfc5d93b69227",
+      "bytes": 4029,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.dimensioned-brief.json",
+      "versioned": true
+    },
+    {
+      "name": "assumptions.json",
+      "sha256": "482f56f80b75adfc1559a6b3efdd05af3bf9610a41638e5da76282686a4629c2",
+      "bytes": 961,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/assumptions.json",
+      "versioned": true
+    },
+    {
+      "name": "overlap-month.dimensioned-brief.json",
+      "sha256": "d183f456426fe3fa2182e31a0558e7a42472f77aac2aa73a6d73d62b66e274bb",
+      "bytes": 3927,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.dimensioned-brief.json",
+      "versioned": true
+    },
+    {
+      "name": "three-extras-annualised.dimensioned-brief.json",
+      "sha256": "89bfca1908eec4adacde5a846442da50f3544f76a09b1a3ee50de90f7aacfba5",
+      "bytes": 3987,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.dimensioned-brief.json",
+      "versioned": true
+    },
+    {
+      "name": "five-static.COP.summary.json",
+      "sha256": "6ef2b4c58b74c626d944e71ae826e2ed5914983130f9fdf72588c538c237a0d9",
+      "bytes": 19442,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.COP.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "three-extras-annualised.COP.increment.json",
+      "sha256": "d0a726e330bb149190c45ba4ec846ad7c8622393e8964edf026bd6f38a6c0c9f",
+      "bytes": 5962,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.COP.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "campaign-month.COP.demand.json",
+      "sha256": "cc08ed58e604c5ca70c188caec91328375112f58f3d1a169daf11c7367a36deb",
+      "bytes": 8899,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.COP.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "drill-month.COP.summary.json",
+      "sha256": "550eafc2f0cfb0e6b229b11094d84be79a4b75b838343ac57698cf85e7156dca",
+      "bytes": 19597,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.COP.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "static-and-tactical-annualised.workload.json",
+      "sha256": "735c6479fe1051caaaafbc854ecb8a0292a3044539001863ea8e13c184f76b9e",
+      "bytes": 10620,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.workload.json",
+      "versioned": true
+    },
+    {
+      "name": "drill-month.workload.json",
+      "sha256": "b6e1257ca18f6fbbdd4351111db41c3d703c67056819003d6f28dfad45fb9ada",
+      "bytes": 10969,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.workload.json",
+      "versioned": true
+    },
+    {
+      "name": "campaign-month.workload-result.json",
+      "sha256": "f51cc176561f3ab83b6dd50827fa788151eaaf0eb6b695fcfdafe72b8aec0bd8",
+      "bytes": 8634,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.workload-result.json",
+      "versioned": true
+    },
+    {
+      "name": "static-and-tactical-annualised.brief.json",
+      "sha256": "9ab2489141ec51c6c48bf42c66cd798c2f2423a151724c424ab0aee300cdae5f",
+      "bytes": 2436,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.brief.json",
+      "versioned": true
+    },
+    {
+      "name": "commands.json",
+      "sha256": "20e6bea1cb7b7f3b67b52b35f3aa721c12756a3e11d7138117b1e10dc1edca76",
+      "bytes": 16751,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/commands.json",
+      "versioned": true
+    },
+    {
+      "name": "three-extras-annualised.workload.json",
+      "sha256": "31f6bcc0685457620456327dbb3226b196be617e8bf09f0c8196bab76158ea5f",
+      "bytes": 11041,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.workload.json",
+      "versioned": true
+    },
+    {
+      "name": "campaign-month.USD.summary.json",
+      "sha256": "782e87c1e89b050dfc23b6351921e880cb58bcc42a021d3f295fbd2fb518079e",
+      "bytes": 19515,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.USD.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "overlap-month.USD.demand.json",
+      "sha256": "4a530f762f8b19c5ca260b2ae4c831d6982f9b40c4c3452bce372431e2d52621",
+      "bytes": 8894,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.USD.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "three-extras-annualised.COP.demand.json",
+      "sha256": "35cf116ccfb74beb5e176a422d34db0732aa072f87f64a442a2c943180e3df03",
+      "bytes": 8954,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.COP.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "overlap-month.USD.artifact.json",
+      "sha256": "0f4d473ccc619bf7ce54236700146990a9e2678ce47d7783757bef37ced870eb",
+      "bytes": 1319145,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.USD.artifact.json",
+      "versioned": false
+    },
+    {
+      "name": "overlap-month.COP.summary.json",
+      "sha256": "167f31edfd79f0bcb501a2904723f3ad838046722167cff8e2d6cea62ead1257",
+      "bytes": 19601,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.COP.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "five-static.USD.demand.json",
+      "sha256": "0eeb8732be706484efac7faef12fdc368ed9b1289aa5254efa831f1d51d2eac8",
+      "bytes": 8881,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.USD.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "five-static.COP.increment.json",
+      "sha256": "5984c029c3fa0c231b2f24e6e8ba06958e41860528c7f6bbecfd4dd5fad63ba1",
+      "bytes": 5336,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.COP.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "five-static.workload-result.json",
+      "sha256": "186a00663179932f87c99ff63f897a5ef7116aaa321ed98a5c76d0963ab2630c",
+      "bytes": 8595,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.workload-result.json",
+      "versioned": true
+    },
+    {
+      "name": "static-and-tactical-annualised.USD.artifact.json",
+      "sha256": "1de45e0c860d28c92c97c6687aa35aab241c7391a4715937d2d0014d41479233",
+      "bytes": 1318137,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.USD.artifact.json",
+      "versioned": false
+    },
+    {
+      "name": "drill-month.COP.artifact.json",
+      "sha256": "6982d6d5d4b2c603fe7704449ecf01b3b62956dd0c1e9d5a64a1e77b2da28321",
+      "bytes": 1319883,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.COP.artifact.json",
+      "versioned": false
+    },
+    {
+      "name": "static-and-tactical-annualised.USD.increment.json",
+      "sha256": "5a6a2eeac958e6a5c36a55c194e020c006d45555eb57b1cae2b0b76ca74b1707",
+      "bytes": 5946,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.USD.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "static-and-tactical-annualised.COP.summary.json",
+      "sha256": "c31c08d369e13e6d67da7a99bd4f70a0cd5d407430a778506ca3ab20296f359b",
+      "bytes": 19527,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.COP.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "overlap-month.COP.demand.json",
+      "sha256": "637687508e4834819908f320099161e7a4a02b4b6eaa940e7551190368c43b4a",
+      "bytes": 8894,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.COP.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "three-extras-annualised.USD.demand.json",
+      "sha256": "e01db4f0e237412d9473d4b2037ab6f38579ad8a32e0e3739ac7deaea5d274e7",
+      "bytes": 8954,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.USD.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "five-static.USD.increment.json",
+      "sha256": "c8d1312cb498c51f49d0e661a7fc76d57f7fa15c05217e87aa613c7f30538dc6",
+      "bytes": 5317,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.USD.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "current.json",
+      "sha256": "0790c8a3023da7d3f40884968d431fc73e00ce05affa22c56b921615988e6b3f",
+      "bytes": 2017,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/current.json",
+      "versioned": true
+    },
+    {
+      "name": "static-and-tactical-annualised.COP.increment.json",
+      "sha256": "d98cd03bda94a83080398268fb94111eb6d9608162c5454483210d269f306acb",
+      "bytes": 5962,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.COP.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "five-static.COP.demand.json",
+      "sha256": "ecb6a57c154adce3a401bb64ba6a338cda67dfe0240c9fd416de7e773713a22b",
+      "bytes": 8881,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.COP.demand.json",
+      "versioned": true
+    },
+    {
+      "name": "five-static.workload.json",
+      "sha256": "2ae078eb0f0d6e21ac6eb51dc53e631f91a5fdf31ebf3607107d16d124b2b73d",
+      "bytes": 9646,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.workload.json",
+      "versioned": true
+    },
+    {
+      "name": "campaign-month.USD.assessment.json",
+      "sha256": "649a4a6634e69d46858e663a1675bfc78a849ff7e33785161ed1f4e25fc2401a",
+      "bytes": 11087,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.USD.assessment.json",
+      "versioned": true
+    },
+    {
+      "name": "drill-month.COP.increment.json",
+      "sha256": "c1de6930d171d81bad9d2ad3514026cf3169d655048eab39aab1748d78243161",
+      "bytes": 6587,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.COP.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "three-extras-annualised.brief.json",
+      "sha256": "9ab2489141ec51c6c48bf42c66cd798c2f2423a151724c424ab0aee300cdae5f",
+      "bytes": 2436,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.brief.json",
+      "versioned": true
+    },
+    {
+      "name": "static-and-tactical-annualised.workload-result.json",
+      "sha256": "8e6135da043a57d54b4a6340579ce7379fe86d9b28c15b96706920f39012acd4",
+      "bytes": 8882,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/static-and-tactical-annualised.workload-result.json",
+      "versioned": true
+    },
+    {
+      "name": "campaign-month.dimensioned-brief.json",
+      "sha256": "44efdb2b6bd809ed009020bb2b5632f44d701dfe749104bf6100618a36fbeae9",
+      "bytes": 3932,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.dimensioned-brief.json",
+      "versioned": true
+    },
+    {
+      "name": "overlap-month.USD.increment.json",
+      "sha256": "339eaf3a444e8b703a4e87175c4954ad9439b7fe016e940d09944899b5c424f4",
+      "bytes": 7820,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.USD.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "three-extras-annualised.USD.summary.json",
+      "sha256": "e88d6b875b4bc1dac80ff0f8a105221218e0b0012714aafb98b6f6856d225d99",
+      "bytes": 19513,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.USD.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "drill-month.USD.summary.json",
+      "sha256": "9686bbbad457967837693660efb951c81529b4a8864bee293b22a9430db93b21",
+      "bytes": 19584,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.USD.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "campaign-month.workload.json",
+      "sha256": "8f769c1b5d73d8c54e53121f22dcf6b6144e7de7c1180600bf31524ac6f190f8",
+      "bytes": 10543,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.workload.json",
+      "versioned": true
+    },
+    {
+      "name": "drill-month.USD.increment.json",
+      "sha256": "563501752f0df3f7902c1472d3752da0c479dd841deb119899404ee188054130",
+      "bytes": 6572,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/drill-month.USD.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "campaign-month.COP.artifact.json",
+      "sha256": "af6337d7c49a858df4a6b9053876ed3e4dd4dbcb9c35f0531680ac8a942e3a73",
+      "bytes": 1319334,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.COP.artifact.json",
+      "versioned": false
+    },
+    {
+      "name": "three-extras-annualised.USD.artifact.json",
+      "sha256": "5860ea4a45eae243d64326114f90e20faff3ea61ae015bd21b32382c20a87f06",
+      "bytes": 1318053,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.USD.artifact.json",
+      "versioned": false
+    },
+    {
+      "name": "five-static.USD.summary.json",
+      "sha256": "092bc6465274723d4ce26269e51290c37ac8a1e146a093af2a560a56adc12591",
+      "bytes": 19583,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.USD.summary.json",
+      "versioned": true
+    },
+    {
+      "name": "campaign-month.brief.json",
+      "sha256": "9ab2489141ec51c6c48bf42c66cd798c2f2423a151724c424ab0aee300cdae5f",
+      "bytes": 2436,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/campaign-month.brief.json",
+      "versioned": true
+    },
+    {
+      "name": "three-extras-annualised.workload-result.json",
+      "sha256": "ec68133c9fac1c1d4c4bd8d8dba5c7322fb80bc87d489c51a2b363c62d6f61a3",
+      "bytes": 8792,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/three-extras-annualised.workload-result.json",
+      "versioned": true
+    },
+    {
+      "name": "overlap-month.COP.increment.json",
+      "sha256": "bffb4babc6e72e6743f45893acd394b3667a3c19e96cf085f10d36edf6f59f76",
+      "bytes": 7842,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/overlap-month.COP.increment.json",
+      "versioned": true
+    },
+    {
+      "name": "five-static.COP.artifact.json",
+      "sha256": "5ed469b0fa0973148f13fdde18e2c13aee5c700426eff1e6c9f9d9ab35997260",
+      "bytes": 1320255,
+      "private_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/strategy-2026-10-22-1945/extras/calculations-v2/five-static.COP.artifact.json",
+      "versioned": false
+    }
+  ]
+}

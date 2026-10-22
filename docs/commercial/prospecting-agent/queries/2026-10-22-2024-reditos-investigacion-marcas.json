@@ -1,0 +1,3488 @@
+{
+  "run_at": "2026-10-22T20:24:15.879419-03:00",
+  "run_type": "focused research explicitly requested by Julio; not daily discovery",
+  "account_id": "GRD-1552",
+  "attempt": 13,
+  "country": "Colombia",
+  "service_lines": [
+    "creative/content",
+    "media/digital marketing",
+    "agency strategy"
+  ],
+  "calendar_week_santiago": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-22T20:24:15.879419-03:00"
+  },
+  "freshness_policy_scope": "This is brand/history/category research, not discovery of new procurement calls; historical dates explicitly labelled, no new application recommendation",
+  "matrix_coverage_new": {
+    "cells": 0,
+    "total": 20,
+    "reason": "no daily 20-cell discovery performed in this focused follow-up"
+  },
+  "search_queries_executed": 97,
+  "principal_operations": [
+    {
+      "sequence": 1,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "search_query": [
+          {
+            "q": "site.gana.com.co productos servicios Gana Antioquia"
+          },
+          {
+            "q": "site.loti.com.co loterías quiénes somos"
+          },
+          {
+            "q": "site.gruporeditos.com Gana Loti 2026 estrategia digital"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 2,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "open": [
+          {
+            "source_url": "https://www.gruporeditos.com/"
+          },
+          {
+            "source_url": "https://www.gruporeditos.com/wp-content/uploads/2025/03/Informe-de-Gestion-2024-2-Sitio-web.pdf"
+          },
+          {
+            "source_url": "https://gana.com.co/"
+          },
+          {
+            "source_url": "https://loti.com.co/"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 3,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "search_query": [
+          {
+            "q": "site:gruporeditos.com \"Informe\" \"2025\" \"Loti\""
+          },
+          {
+            "q": "site:gruporeditos.com \"2026\" \"Gana\" marketing"
+          },
+          {
+            "q": "site:gruporeditos.com \"Loti\" \"campaña\""
+          },
+          {
+            "q": "site:loti.com.co \"blog\" \"2026\""
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 4,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "open": [
+          {
+            "source_url": "https://www.gruporeditos.com/"
+          },
+          {
+            "source_url": "https://www.gruporeditos.com/gana-celebra-20-anos-impulsando-el-desarrollo-el-empleo-y-la-salud-en-antioquia/"
+          },
+          {
+            "source_url": "https://www.loti.com.co/"
+          },
+          {
+            "source_url": "https://www.gruporeditos.com/?s=informes+de+gestion"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 5,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "search_query": [
+          {
+            "q": "site:gruporeditos.com \"informes de gestión\""
+          },
+          {
+            "q": "site:gruporeditos.com \"2025-2\" informe"
+          },
+          {
+            "q": "site:gruporeditos.com \"2025\" \"Gestión de Marketing\""
+          },
+          {
+            "q": "site:gruporeditos.com \"2025\" \"Loti.com.co\""
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 6,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "open": [
+          {
+            "source_url": "https://www.gruporeditos.com/informes-de-gestion/"
+          },
+          {
+            "source_url": "https://www.gruporeditos.com/informacion_asamblea_accionistas_1/"
+          }
+        ],
+        "search_query": [
+          {
+            "q": "site:gruporeditos.com/wp-content/uploads/2026/ \"Informe\" \"2026\""
+          },
+          {
+            "q": "site:gruporeditos.com/wp-content/uploads/2026/ \"2025\" \"Loti\""
+          },
+          {
+            "q": "site:gruporeditos.com \"Primer semestre 2026\" marketing"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 7,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "click": [
+          {
+            "id": 4,
+            "source_url": "https://issuu.com/gruporeditos/docs/informe_de_gesti_n_-_grupo_r_ditos_2026-1"
+          },
+          {
+            "id": 5,
+            "source_url": "https://issuu.com/gruporeditos/docs/informe_de_gesti_n_grupo_r_ditos_2025-1"
+          },
+          {
+            "id": 6,
+            "source_url": "https://issuu.com/gruporeditos/docs/informe_de_gesti_n_-_grupo_r_ditos_2025-2"
+          }
+        ],
+        "open": [
+          {
+            "lineno": 8,
+            "source_url": "https://www.gruporeditos.com/informacion_asamblea_accionistas_1/"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 8,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "screenshot": [
+          {
+            "pageno": 20,
+            "source_url": "https://www.gruporeditos.com/wp-content/uploads/2025/03/Informe-de-Gestion-2024-2-Sitio-web.pdf"
+          },
+          {
+            "pageno": 21,
+            "source_url": "https://www.gruporeditos.com/wp-content/uploads/2025/03/Informe-de-Gestion-2024-2-Sitio-web.pdf"
+          },
+          {
+            "pageno": 22,
+            "source_url": "https://www.gruporeditos.com/wp-content/uploads/2025/03/Informe-de-Gestion-2024-2-Sitio-web.pdf"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 9,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "open": [
+          {
+            "source_url": "https://cerca.gana.com.co/"
+          },
+          {
+            "source_url": "https://www.loti.com.co/terminos-y-condiciones"
+          },
+          {
+            "source_url": "https://loti.com.co/preguntas-frecuentes"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 10,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "click": [
+          {
+            "id": 4,
+            "source_url": "https://cerca.gana.com.co/placa_millonaria/"
+          },
+          {
+            "id": 28,
+            "source_url": "https://cerca.gana.com.co/chance-goleador-conoce-como-jugar-cuanto-cuesta-y-como-ganar/"
+          },
+          {
+            "id": 8,
+            "source_url": "https://cerca.gana.com.co/gana-supera-los-5-427-millones-en-premios-durante-la-semana-en-antioquia/"
+          },
+          {
+            "id": 2,
+            "source_url": "https://cerca.gana.com.co/https-ganapp-gana-com-co/"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 11,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "open": [
+          {
+            "source_url": "https://www.gruporeditos.com/empresas/"
+          },
+          {
+            "source_url": "https://www.gruporeditos.com/nuestros-negocios/"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 12,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "open": [
+          {
+            "source_url": "https://www.gruporeditos.com/quienes-somos/negocios-del-grupo/"
+          },
+          {
+            "source_url": "https://www.gruporeditos.com/loticolombia-amplia-su-red-con-apertura-de-oficina-en-la-ciudad-de-popayan/"
+          }
+        ]
+      }
+    },
+    {
+      "sequence": 13,
+      "executed_at": null,
+      "timestamp_precision": "occurred during this research turn; exact per-call timestamp not exposed",
+      "operations": {
+        "search_query": [
+          {
+            "q": "site:loti.com.co \"Productos\" \"loteros\""
+          },
+          {
+            "q": "site:loti.com.co \"Preguntas Frecuentes\" \"lotería\""
+          }
+        ]
+      }
+    }
+  ],
+  "gana_operations": {
+    "method": "Primary-source desk research. Raw HTTP metadata complements web reading; no social scraping. No deep-research harness available in current skill catalog; multi-agent research commissioned by parent.",
+    "events": [
+      {
+        "id": 1,
+        "search_query": [
+          {
+            "q": "site.gana.com.co Gana productos servicios 2026 Antioquia"
+          },
+          {
+            "q": "site.gruporeditos.com GANA 2026 campaña marca"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "open": [
+          "https://www.gana.com.co/",
+          "https://cerca.gana.com.co/",
+          "https://www.gruporeditos.com/gana-celebra-20-anos-impulsando-el-desarrollo-el-empleo-y-la-salud-en-antioquia/",
+          "https://www.gruporeditos.com/"
+        ]
+      },
+      {
+        "id": 3,
+        "search_query": [
+          {
+            "q": "site.gana.com.co productos servicios GANA 2026 \"cerca\""
+          },
+          {
+            "q": "site.gruporeditos.com Gana 2026 campaña \"20\" \"marca\""
+          },
+          {
+            "q": "site.cerca.gana.com.co OR site.cerca.gana.com.co \"2026\" \"Gana\""
+          },
+          {
+            "q": "Gana oficial gana.com.co Instagram Facebook YouTube Antioquia"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "click": [
+          [
+            "turn73view1",
+            2
+          ],
+          [
+            "turn73view1",
+            6
+          ],
+          [
+            "turn73view1",
+            8
+          ],
+          [
+            "turn73view1",
+            28
+          ],
+          [
+            "turn73view1",
+            64
+          ],
+          [
+            "turn73view1",
+            70
+          ]
+        ],
+        "search_query": [
+          {
+            "q": "Gana productos servicios campaña 2026",
+            "domains": [
+              "gruporeditos.com",
+              "gana.com.co"
+            ]
+          },
+          {
+            "q": "Gana marca campañas marketing digital 2025 2026",
+            "domains": [
+              "gruporeditos.com"
+            ]
+          },
+          {
+            "q": "laredgana",
+            "domains": [
+              "instagram.com",
+              "facebook.com",
+              "youtube.com"
+            ]
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "open": [
+          "turn80view2",
+          "turn80view3",
+          "turn80view4",
+          "turn80view5",
+          "turn80view0",
+          "https://www.gruporeditos.com/servicios-de-red/",
+          "https://www.gruporeditos.com/quienes-somos/historia/"
+        ]
+      },
+      {
+        "id": 6,
+        "search_query": [
+          {
+            "q": "\"laredgana\" Instagram Gana"
+          },
+          {
+            "q": "\"laredgana\" Facebook Gana"
+          },
+          {
+            "q": "\"Gana Cerca de Ti\" Youtube oficial"
+          },
+          {
+            "q": "\"Gana\" \"2026\" \"Feria\" site:gruporeditos.com"
+          }
+        ],
+        "click": [
+          [
+            "turn73view1",
+            4
+          ],
+          [
+            "turn73view1",
+            5
+          ],
+          [
+            "turn73view1",
+            18
+          ],
+          [
+            "turn73view1",
+            95
+          ]
+        ]
+      },
+      {
+        "id": 7,
+        "open": [
+          "https://www.instagram.com/laredgana/",
+          "https://www.facebook.com/laredgana/",
+          "https://www.youtube.com/@laredgana",
+          "turn86view0",
+          "turn86view1",
+          "turn86view2",
+          "https://loteriademedellin.com.co/wp-content/uploads/2026/01/Comunicado-de-Prensa-17-VENTAS-2025-1.pdf"
+        ]
+      },
+      {
+        "id": 8,
+        "search_query": [
+          {
+            "q": "Gana \"20 años\" campaña 2026",
+            "domains": [
+              "gruporeditos.com",
+              "gana.com.co"
+            ]
+          },
+          {
+            "q": "Gana \"Mijito\" campaña",
+            "domains": [
+              "gruporeditos.com",
+              "gana.com.co"
+            ]
+          },
+          {
+            "q": "Gana productos \"2026\" \"Billonario\"",
+            "domains": [
+              "gana.com.co"
+            ]
+          },
+          {
+            "q": "Gana \"Rigo\" \"campaña\"",
+            "domains": [
+              "gruporeditos.com",
+              "gana.com.co"
+            ]
+          }
+        ],
+        "open": [
+          "https://www.gruporeditos.com/juegos/",
+          "https://www.facebook.com/LaRedGANA",
+          "https://www.youtube.com/user/apuestasgana",
+          "https://twitter.com/LaRedGana",
+          {
+            "ref": "turn80view1",
+            "line": 10
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "find": [
+          [
+            "turn103view4",
+            "URABA"
+          ],
+          [
+            "turn103view4",
+            "SUROESTE"
+          ],
+          [
+            "turn103view4",
+            "MEDELLIN"
+          ],
+          [
+            "turn103view4",
+            "BAJO CAUCA"
+          ]
+        ],
+        "open": [
+          "https://www.gruporeditos.com/wp-content/uploads/2024/09/Informe-Gestion-Grupo-Reditos-2024-1-sitio-web.pdf",
+          "https://www.gruporeditos.com/ecommerce-awards-reconocio-el-sitio-web-de-gana-como-uno-de-los-mejores-digital-commerce-de-colombia/",
+          "https://www.epm.com.co/content/dam/epm/clientes-y-usuarios/energia/hogar/energia-prepago/cartilla-energia-prepago-agosto-2025.pdf"
+        ]
+      },
+      {
+        "id": 10,
+        "find": [
+          [
+            "turn106view2",
+            "Gana"
+          ],
+          [
+            "turn106view2",
+            "recaudo"
+          ],
+          [
+            "turn91view6",
+            "Rediapuestas"
+          ]
+        ],
+        "open": [
+          "https://www.gruporeditos.com/wp-content/uploads/2024/09/Informe-Gestion-Grupo-Reditos-2024-1-sitio-web.pdf",
+          "https://www.gruporeditos.com/ecommerce-awards-reconocio-el-sitio-web-de-gana-como-uno-de-los-mejores-digital-commerce-de-colombia/"
+        ]
+      },
+      {
+        "id": 11,
+        "screenshot": [
+          [
+            "turn106view2",
+            5
+          ],
+          [
+            "turn91view6",
+            0
+          ]
+        ]
+      }
+    ],
+    "search_queries_executed": 17,
+    "note": "Web references resolve through saved batch results, exact URLs are in evidence ledger and HTTP metadata."
+  },
+  "loti_searches": [
+    {
+      "sequence": 1,
+      "query": "site:loti.com.co LOTI Colombia loterías nosotros",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 2,
+      "query": "site:gruporeditos.com LOTI marca",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 3,
+      "query": "site:loti.com.co juego responsable",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 4,
+      "query": "site:loti.com.co promo campaña lotería",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 5,
+      "query": "site:loti.com.co \"Cómo jugar\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 6,
+      "query": "site:loti.com.co \"Cupones\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 7,
+      "query": "site:gruporeditos.com \"Loti\" \"2025\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 8,
+      "query": "site:gruporeditos.com \"Loti\" \"2026\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 9,
+      "query": "site:loti.com.co \"En Loti, están tus loterías favoritas\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 10,
+      "query": "site:loti.com.co \"Términos y Condiciones Cupones Loti Web\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 11,
+      "query": "site:loti.com.co \"juego responsable\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 12,
+      "query": "site:instagram.com \"loti.com.co\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 13,
+      "query": "\"Loticolombia\" \"Instagram\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 14,
+      "query": "\"Loti\" \"loti.com.co\" \"Facebook\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 15,
+      "query": "\"Loti\" \"loti.com.co\" \"cupones\" -site:loti-web-dev.movilgo.click -site:loti-qa.ux.technology",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 16,
+      "query": "\"Loti\" \"loti.com.co\" \"cómo jugar\" -site:loti-web-dev.movilgo.click -site:loti-qa.ux.technology",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 17,
+      "query": "site:instagram.com/loticolombia_sa",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 18,
+      "query": "site:facebook.com/loticolombia LOTI",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 19,
+      "query": "site:loti.com.co/blog",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 20,
+      "query": "site:loti.com.co \"Cupones Loti\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 21,
+      "query": "site:loti.com.co \"responsable\" \"mayor\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 22,
+      "query": "site:loticolombia.com \"juego responsable\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 23,
+      "query": "site:gruporeditos.com \"LOTI\" \"marca\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 24,
+      "query": "site:youtube.com \"Loticolombia\" \"Loti\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 25,
+      "query": "Loticolombia",
+      "filters": {
+        "domains": [
+          "instagram.com"
+        ]
+      },
+      "date_filter": null
+    },
+    {
+      "sequence": 26,
+      "query": "Loticolombia",
+      "filters": {
+        "domains": [
+          "youtube.com"
+        ]
+      },
+      "date_filter": null
+    },
+    {
+      "sequence": 27,
+      "query": "Loticolombia",
+      "filters": {
+        "domains": [
+          "facebook.com"
+        ]
+      },
+      "date_filter": null
+    },
+    {
+      "sequence": 28,
+      "query": "\"Loti\" \"loti.com.co\" campaña",
+      "filters": {
+        "domains": [
+          "gruporeditos.com",
+          "loti.com.co"
+        ]
+      },
+      "date_filter": null
+    },
+    {
+      "sequence": 29,
+      "query": "site:loti.com.co \"Nuestra Empresa\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 30,
+      "query": "site:loti.com.co \"Nuestra Red\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 31,
+      "query": "site:loti.com.co \"Preguntas Frecuentes\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 32,
+      "query": "site:loti.com.co \"Bonos promocionales\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 33,
+      "query": "site:gruporeditos.com \"Loticolombia amplía su Red\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 34,
+      "query": "site:gruporeditos.com \"Loticolombia representa\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 35,
+      "query": "site:loti.com.co \"Juego\" \"Responsable\"",
+      "filters": null,
+      "date_filter": null
+    },
+    {
+      "sequence": 36,
+      "query": "site:loti.com.co \"están tus loterías favoritas\"",
+      "filters": null,
+      "date_filter": null
+    }
+  ],
+  "loti_reads": [
+    {
+      "url": "https://loti.com.co/",
+      "result": "timeout"
+    },
+    {
+      "url": "https://loti.com.co/productos",
+      "result": "JS_shell"
+    },
+    {
+      "url": "https://loti.com.co/terminos-y-condiciones",
+      "result": "JS_shell"
+    },
+    {
+      "url": "https://loti.com.co/contacto/1",
+      "result": "JS_shell"
+    },
+    {
+      "url": "https://www.loti.com.co/",
+      "result": "JS_shell"
+    },
+    {
+      "url": "https://www.loti.com.co/productos",
+      "result": "timeout"
+    },
+    {
+      "url": "https://www.loti.com.co/terminos-y-condiciones",
+      "result": "JS_shell"
+    },
+    {
+      "url": "https://www.instagram.com/loticolombia_sa/",
+      "result": "fetch_throttled"
+    },
+    {
+      "url": "https://loti.com.co/blog",
+      "result": "URL_not_accessible"
+    },
+    {
+      "url": "https://www.gruporeditos.com/estructura-societaria/",
+      "result": "timeout"
+    },
+    {
+      "url": "https://loticolombia.com/",
+      "result": "URL_not_accessible"
+    },
+    {
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2025/03/Informe-de-Gestion-2024-2-Sitio-web.pdf",
+      "result": "500"
+    },
+    {
+      "url": "https://www.gruporeditos.com/loticolombia-amplia-su-red-con-apertura-de-oficina-en-la-ciudad-de-popayan/",
+      "result": "full_html"
+    },
+    {
+      "url": "https://www.gruporeditos.com/quienes-somos/negocios-del-grupo/",
+      "result": "full_html"
+    },
+    {
+      "url": "https://www.gruporeditos.com/loticolombia-representa-mas-el-50-en-ventas-de-loteria-en-antioquia/",
+      "result": "full_html"
+    }
+  ],
+  "peer_queries": [
+    {
+      "event_id": "WEB-01-search_query-001",
+      "operation": "search_query",
+      "input": {
+        "q": "site.loti.com.co loterías chance compra en línea"
+      },
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 1,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-01-search_query-002",
+      "operation": "search_query",
+      "input": {
+        "q": "site.gana.com.co Gana productos servicios Antioquia"
+      },
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 1,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-01-search_query-003",
+      "operation": "search_query",
+      "input": {
+        "q": "loterías Colombia comprar online Lottired Loti"
+      },
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 1,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-01-search_query-004",
+      "operation": "search_query",
+      "input": {
+        "q": "chance Antioquia operador Gana competencia Lotería de Medellín"
+      },
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 1,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-02-search_query-005",
+      "operation": "search_query",
+      "input": {
+        "q": "Lotol loterías online Colombia sitio oficial"
+      },
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 2,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-02-search_query-006",
+      "operation": "search_query",
+      "input": {
+        "q": "site.pagatodo.com.co nosotros servicios chance"
+      },
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 2,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-02-search_query-007",
+      "operation": "search_query",
+      "input": {
+        "q": "site.supergiros.com.co Reditos accionista"
+      },
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 2,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-02-search_query-008",
+      "operation": "search_query",
+      "input": {
+        "q": "site.gruporeditos.com Gana campaña cerca sueños"
+      },
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 2,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-02-open-009",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.lottired.net/"
+      },
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "filters": null,
+      "result_log_call": 2,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-02-open-010",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.loti.com.co/"
+      },
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "filters": null,
+      "result_log_call": 2,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-02-open-011",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.gana.com.co/"
+      },
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "filters": null,
+      "result_log_call": 2,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-03-search_query-012",
+      "operation": "search_query",
+      "input": {
+        "q": "site.tulotero.co loterías Colombia app"
+      },
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 3,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-03-search_query-013",
+      "operation": "search_query",
+      "input": {
+        "q": "site.apostar.com.co chance servicios Risaralda"
+      },
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 3,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-03-search_query-014",
+      "operation": "search_query",
+      "input": {
+        "q": "site.pagatodo.com.co nosotros Gelsa Bogotá Cundinamarca"
+      },
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 3,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-03-search_query-015",
+      "operation": "search_query",
+      "input": {
+        "q": "site.gruporeditos.com Gana campaña \"2026\""
+      },
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 3,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-03-open-016",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://loteriadeboyaca.gov.co/como-jugar/loteria-en-linea/"
+      },
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "filters": null,
+      "result_log_call": 3,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-03-open-017",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://loti.com.co/productos"
+      },
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "filters": null,
+      "result_log_call": 3,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-03-open-018",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.pagatodo.com.co/juegos/pagaton/"
+      },
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "filters": null,
+      "result_log_call": 3,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-03-open-019",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.gruporeditos.com/estructura-societaria/"
+      },
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "filters": null,
+      "result_log_call": 3,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-04-search_query-020",
+      "operation": "search_query",
+      "input": {
+        "q": "site.gruporeditos.com \"Gana\" \"campaña\""
+      },
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 4,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-04-search_query-021",
+      "operation": "search_query",
+      "input": {
+        "q": "site.gruporeditos.com \"Gana\" \"cerca\""
+      },
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 4,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-04-search_query-022",
+      "operation": "search_query",
+      "input": {
+        "q": "site.gruporeditos.com \"Loti\" \"campaña\""
+      },
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 4,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-04-search_query-023",
+      "operation": "search_query",
+      "input": {
+        "q": "site.lottired.net \"Compra Lite\""
+      },
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 4,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-04-open-024",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.pagatodo.com.co/quienes-somos/"
+      },
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "filters": null,
+      "result_log_call": 4,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-04-open-025",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.apostar.com.co/"
+      },
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "filters": null,
+      "result_log_call": 4,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-04-open-026",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://tulotero.co/"
+      },
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "filters": null,
+      "result_log_call": 4,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-04-open-027",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://apps.apple.com/co/app/tulotero-loter%C3%ADas-colombia/id6758009465"
+      },
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "filters": null,
+      "result_log_call": 4,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-05-search_query-028",
+      "operation": "search_query",
+      "input": {
+        "q": "site.loteriademedellin.com.co Lottired \"2026\" \"nueva\""
+      },
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 5,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-05-search_query-029",
+      "operation": "search_query",
+      "input": {
+        "q": "site.gruporeditos.com \"Gana celebra 20\""
+      },
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 5,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-05-search_query-030",
+      "operation": "search_query",
+      "input": {
+        "q": "site.gruporeditos.com \"Loticolombia\" \"digital\""
+      },
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 5,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-05-search_query-031",
+      "operation": "search_query",
+      "input": {
+        "q": "site.apostar.com.co \"Risaralda\" \"cerca\""
+      },
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 5,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-05-open-032",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.gruporeditos.com/wp-content/uploads/2025/03/Informe-de-Gestion-2024-2-Sitio-web.pdf"
+      },
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "filters": null,
+      "result_log_call": 5,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-05-open-033",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.gruporeditos.com/wp-content/uploads/2024/09/Informe-Gestion-Grupo-Reditos-2024-1-sitio-web.pdf"
+      },
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "filters": null,
+      "result_log_call": 5,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-05-open-034",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://loteriademedellin.com.co/productos/lottired/"
+      },
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "filters": null,
+      "result_log_call": 5,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-05-open-035",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.pagatodo.com.co/"
+      },
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "filters": null,
+      "result_log_call": 5,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-06-open-036",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.gruporeditos.com/prensa/noticias/"
+      },
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "filters": null,
+      "result_log_call": 6,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-06-open-037",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://play.google.com/store/apps/details?id=net.lottired.android.app"
+      },
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "filters": null,
+      "result_log_call": 6,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-06-open-038",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://rediapuestas.com/resoluciones/"
+      },
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "filters": null,
+      "result_log_call": 6,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-06-open-039",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.apostar.com.co/nosotros/"
+      },
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "filters": null,
+      "result_log_call": 6,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-06-find-040",
+      "operation": "find",
+      "input": {
+        "ref_id": "turn93view0",
+        "pattern": "soluciones"
+      },
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "filters": null,
+      "result_log_call": 6,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-06-find-041",
+      "operation": "find",
+      "input": {
+        "ref_id": "turn97view3",
+        "pattern": "sueño"
+      },
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "filters": null,
+      "result_log_call": 6,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-06-find-042",
+      "operation": "find",
+      "input": {
+        "ref_id": "turn93view2",
+        "pattern": "comisiones"
+      },
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "filters": null,
+      "result_log_call": 6,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-06-find-043",
+      "operation": "find",
+      "input": {
+        "ref_id": "turn97view1",
+        "pattern": "cerca de ti"
+      },
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "filters": null,
+      "result_log_call": 6,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-07-open-044",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://loteriadelhuila.com/distribuidor/apostadores-de-risaralda-apostar-s-a/"
+      },
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "filters": null,
+      "result_log_call": 7,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-07-click-045",
+      "operation": "click",
+      "input": {
+        "ref_id": "turn100view0",
+        "id": 5
+      },
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "filters": null,
+      "result_log_call": 7,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-07-click-046",
+      "operation": "click",
+      "input": {
+        "ref_id": "turn93view2",
+        "id": 5
+      },
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "filters": null,
+      "result_log_call": 7,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-07-click-047",
+      "operation": "click",
+      "input": {
+        "ref_id": "turn93view1",
+        "id": 2
+      },
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "filters": null,
+      "result_log_call": 7,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-07-click-048",
+      "operation": "click",
+      "input": {
+        "ref_id": "turn93view1",
+        "id": 4
+      },
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "filters": null,
+      "result_log_call": 7,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-07-find-049",
+      "operation": "find",
+      "input": {
+        "ref_id": "turn97view1",
+        "pattern": "Gana"
+      },
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "filters": null,
+      "result_log_call": 7,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-07-find-050",
+      "operation": "find",
+      "input": {
+        "ref_id": "turn88view2",
+        "pattern": "6 oportunidades"
+      },
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "filters": null,
+      "result_log_call": 7,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-08-search_query-051",
+      "operation": "search_query",
+      "input": {
+        "q": "site.play.google.com/store/apps Apostar Risaralda"
+      },
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 8,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-08-search_query-052",
+      "operation": "search_query",
+      "input": {
+        "q": "site.apostar.com.co \"somos\""
+      },
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 8,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-08-search_query-053",
+      "operation": "search_query",
+      "input": {
+        "q": "site.gruporeditos.com \"gana-celebra-20\""
+      },
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 8,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-08-search_query-054",
+      "operation": "search_query",
+      "input": {
+        "q": "site.loti.com.co \"En Loti\" \"favoritas\""
+      },
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 8,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-08-open-055",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://tulotero.co/como-funciona-la-loteria-en-colombia-entiende-tu-jugada/",
+        "lineno": 0
+      },
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "filters": null,
+      "result_log_call": 8,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-09-search_query-056",
+      "operation": "search_query",
+      "input": {
+        "q": "\"gana cerca de ti\" site.gruporeditos.com"
+      },
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 9,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-09-search_query-057",
+      "operation": "search_query",
+      "input": {
+        "q": "site.gruporeditos.com \"gana\" \"Contigo como nos necesites\""
+      },
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 9,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-09-search_query-058",
+      "operation": "search_query",
+      "input": {
+        "q": "site.pagatodo.com.co \"Somos los que Resuelven\""
+      },
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 9,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-09-search_query-059",
+      "operation": "search_query",
+      "input": {
+        "q": "site.loti.com.co \"favoritas\" \"fácil\""
+      },
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "filters": {
+        "domains": null,
+        "recency": null
+      },
+      "result_log_call": 9,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-09-open-060",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.gruporeditos.com/wp-content/uploads/2021/10/Informe-de-Gestion-Primer-Semestre-2020.pdf"
+      },
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "filters": null,
+      "result_log_call": 9,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-09-open-061",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://www.gruporeditos.com/wp-content/uploads/2023/01/Informe-de-Gestion-2022-1.pdf"
+      },
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "filters": null,
+      "result_log_call": 9,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-09-open-062",
+      "operation": "open",
+      "input": {
+        "ref_id": "https://co.linkedin.com/company/apostar-s-a"
+      },
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "filters": null,
+      "result_log_call": 9,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-10-find-063",
+      "operation": "find",
+      "input": {
+        "ref_id": "turn112view0",
+        "pattern": "Contigo"
+      },
+      "checked_at": "2026-10-22T23:18:25.910Z",
+      "filters": null,
+      "result_log_call": 10,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-10-find-064",
+      "operation": "find",
+      "input": {
+        "ref_id": "turn112view2",
+        "pattern": "sentido"
+      },
+      "checked_at": "2026-10-22T23:18:25.910Z",
+      "filters": null,
+      "result_log_call": 10,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-10-find-065",
+      "operation": "find",
+      "input": {
+        "ref_id": "turn109view0",
+        "pattern": "número"
+      },
+      "checked_at": "2026-10-22T23:18:25.910Z",
+      "filters": null,
+      "result_log_call": 10,
+      "PII_redacted": false
+    },
+    {
+      "event_id": "WEB-10-screenshot-066",
+      "operation": "screenshot",
+      "input": {
+        "ref_id": "turn97view1",
+        "pageno": 36
+      },
+      "checked_at": "2026-10-22T23:18:25.910Z",
+      "filters": null,
+      "result_log_call": 10,
+      "PII_redacted": false
+    }
+  ],
+  "peer_source_events": [
+    {
+      "call": 1,
+      "url": "https://rediapuestas.com/resoluciones/",
+      "title": "Resoluciones – Rediapuestas",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://loteriademedellin.com.co/wp-content/uploads/2026/01/Comunicado-de-Prensa-17-VENTAS-2025-1.pdf",
+      "title": "COMUNICADO DE PRENSA",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://www.pagatodo.com.co/resultados-loto-core/loterias/",
+      "title": "Loterías - Paga Todo",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://loteriadeboyaca.gov.co/como-jugar/loteria-en-linea/",
+      "title": "Lotería en Línea – Loteria de Boyaca",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://loteriademedellin.com.co/productos/lottired/",
+      "title": "Lottired - Loteria de Medellín",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://loteriademedellin.com.co/wp-content/uploads/2026/02/LP001-DE-2026-ESTUDIO-DEL-SECTOR-.pdf",
+      "title": "Lotería de Medellín — Gobernación de Antioquia, República de Colombia",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://loteriademedellin.com.co/sites/default/files/cm-02-2023_estudio_del_sector.pdf",
+      "title": "Microsoft Word - Estudio del Sector Chance 2023",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://www.loti.com.co/",
+      "title": "LotiColombia | Loterías Virtuales para el país",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://www.laprensaoriente.info/actualidad/lottired-renueva-su-plataforma-para-hacer-mas-facil-la-compra-de-loteria-en-colombia/",
+      "title": "Lottired renueva su plataforma para hacer más fácil la compra de lotería en Colombia - La Prensa Oriente",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://loteriasantander.gov.co/",
+      "title": "Lotería Santander - Compra tu billete ahora",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://loti.com.co/productos",
+      "title": "LotiColombia | Loterías Virtuales para el país",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://loti.com.co/terminos-y-condiciones",
+      "title": "LotiColombia | Loterías Virtuales para el país",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://admin.loteriadebogota.com/aprende-a-jugar-el-chance-y-conoce-cuando-es-legal/",
+      "title": "¿Cómo jugar el chance y cuando es legal? » Lotería de Bogotá",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://www.loteriaquindio.com.co/",
+      "title": "Lotería del Quindío | Lotería del Quindío",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://www.mioriente.info/asi-puede-comprar-loteria-en-linea-en-la-nueva-plataforma-lottired",
+      "title": "Mi Oriente | Noticias del Oriente Antioqueño",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://loteriademedellin.com.co/wp-content/uploads/2024/12/RENDICION-DE-CUENTAS-2024-FINAL-2611.pdf",
+      "title": "Diapositiva 1",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://www.camaramedellin.com.co/Portals/0/Documentos/ListadoGana%20Servicios%20Certificados.pdf",
+      "title": "Conoce los puntos Gana Servicios",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://gana.com.co/pru/public/manuales/gana_servicios.pdf",
+      "title": "<table id=\"e1\">",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://es.wikipedia.org/wiki/Chance_en_Colombia",
+      "title": "Chance en Colombia",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://es.wikipedia.org/wiki/Loter%C3%ADa_de_Medell%C3%ADn",
+      "title": "Lotería de Medellín",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://es.wikipedia.org/wiki/Loter%C3%ADa",
+      "title": "Lotería",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://www.reddit.com/r/Ticos/comments/1vo7phc/loter%C3%ADa_nacional_en_l%C3%ADnea/",
+      "title": "Lotería nacional en línea !",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://es.wikipedia.org/wiki/Baloto",
+      "title": "Baloto",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 1,
+      "url": "https://www.reddit.com/r/Colombia/comments/1x4xapd/se_ha_ganado_el_chance/",
+      "title": "Se ha. Ganado el chance?",
+      "checked_at": "2026-10-22T23:16:35.835Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2023/04/EEFF-Grupo-Reditos.pdf",
+      "title": "Cambios en la participación de propiedad en Subsidiarias",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.gruporeditos.com/estructura-societaria/",
+      "title": "Estructura Societaria | Grupo Réditos",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://loti.com.co/terminos-y-condiciones",
+      "title": "LotiColombia | Loterías Virtuales para el país",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.loteriasantander.gov.co/",
+      "title": "Lotería Santander - Compra tu billete ahora",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.coljuegos.gov.co/publicaciones/301841/juegosonline/index.php",
+      "title": "Operadores de Juegos Online Autorizados por Coljuegos",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.loti.com.co/",
+      "title": "LotiColombia | Loterías Virtuales para el país",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.pagatodo.com.co/juegos/pagaton/",
+      "title": "Pagatón - Paga Todo",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://compraonline.loteriadelmeta.gov.co/",
+      "title": "Lotería del Meta",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://fedelco.com.co/",
+      "title": "FEDELCO – Federacion de loterias de colombia",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://paguetodo.com/",
+      "title": "Paguetodo",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.lottive.com/documentos/Terminos_y_condiciones_LottiVe.pdf",
+      "title": "PLATAFORMA DE VENTA DE LOTERÍA DIGITAL EN LÍNEA",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://loteriadeltolima.com/canal-de-interaccion/",
+      "title": "Canal de Interacción para la participación ciudadana - Lotería del Tolima: Compra en Línea, Consulta Resultados y Gana Grandes Premios",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://institucional.loteriadebogota.com/estrenamos-pagina-web-compra-facil-en-la-loteria-de-bogota/",
+      "title": "¡Estrenamos página web! Compra fácil en la Lotería de Bogotá",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://cundinamarca.gov.co/wcm/connect/7e8e535d-211a-4771-ba80-a3c95f501cc3/COMO%2BCOMPRAR%2BLA%2BLOTERIA%2BDE%2BFORMA%2BVIRTUAL.pdf?CVID=n8pn7rt&MOD=AJPERES",
+      "title": "05",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://loterias.com.co/contactenos",
+      "title": "Contáctenos | Loterías Colombia",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://loteriadebogota.com/wp-content/uploads/INFORME-ENERO-2026-24-02-26.pdf",
+      "title": "<table id=\"e1\">",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.pagatodo.com.co/wp-content/uploads/2026/03/REV.-JUR-TERMINOS-Y-CONDICIONES-ESTE-SUENO-MERECE.pdf",
+      "title": "Nota: Los campos marcados con asterisco (*) son obligatorios, los demás son opcionales.",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.reddit.com/r/Colombia/comments/173btlv",
+      "title": "¿Cuál ha Sido su peor inversión, y cuánta plata perdió?",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.reddit.com/r/Bogota/comments/1bsubzz",
+      "title": "Soy accionista natural hagan sus preguntas?",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.lottired.net/",
+      "title": "Lottired",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 2,
+      "url": "https://www.gana.com.co/",
+      "title": "www.gana.com.co",
+      "checked_at": "2026-10-22T23:16:50.701Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://apps.apple.com/co/app/tulotero-loter%C3%ADas-colombia/id6758009465",
+      "title": "‎App TuLotero - Loterías Colombia - App Store",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://www.pagatodo.com.co/quienes-somos/",
+      "title": "Quienes Somos - Paga Todo",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://tulotero.co/?page_id=441",
+      "title": "TuLotero | La app para jugar todas las loterías de Colombia",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://www.apostar.com.co/",
+      "title": "Apostar - Red Transaccional en Risaralda | Recargas, Chance, BetPlay, Pagos",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://loteriadelrisaralda.com/wp-content/uploads/2025/01/INFORME-DE-GESTION-LOTERIA-DEL-RISARALDA-VIGENCIA-2024.pdf",
+      "title": "INFORME DE GESTION LOTERIA DEL",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://www.pagatodo.com.co/resultados-loto-core/loterias/",
+      "title": "Loterías - Paga Todo",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://loteriadebogota.com/wp-content/uploads/INFORME-ENERO-2026-24-02-26.pdf",
+      "title": "<table id=\"e1\">",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://www.pagatodo.com.co/",
+      "title": "Paga Todo: Giros, Pagos, Recaudos y Apuestas en Línea",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://63.201.109.208.host.secureserver.net/index.php/empresas-gelsa",
+      "title": "Gelsa | Nuestras Empresas",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://promopagatodo.com/appventas",
+      "title": "VENDE Y GANA COMISIONES",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://www.pagatodo.com.co/wp-content/uploads/2026/03/REV.-JUR-TERMINOS-Y-CONDICIONES-ESTE-SUENO-MERECE.pdf",
+      "title": "POBLACIÓN OBJETIVO",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://www.elpais.com.co/amp/informacion-comercial/tulotero-ya-esta-disponible-en-colombia-la-app-permite-jugar-loteria-desde-el-celular-1100.html",
+      "title": "TuLotero ya está disponible en Colombia, la app permite jugar lotería desde el celular",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://tulotero.es/terms_app.html",
+      "title": "Información legal",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://static.es.tulotero.net/faq/full/es_ES/full.html",
+      "title": "Preguntas frecuentes",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://loteriadelhuila.com/distribuidor/apostadores-de-risaralda-apostar-s-a/",
+      "title": "Apostadores de Risaralda - \"APOSTAR S.A\" - Lotería del Huila",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://loteriadelrisaralda.com/wp-content/uploads/2023/11/PRE-PLIEGOS-FORMULARIOS-CHANCE-2023-2028-c.pdf",
+      "title": "LOTERÍA DEL RISARALDA",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://cdn.aglty.io/scotiabank-colombia/Colpatria/pdf/personas/servicios/PUNTOS.pdf",
+      "title": "PAGATODO CL ESTACION GENERAL SANTANDER — AUTOPISTA SUR CARRERA 50 A BIS — BOGOTA — BOGOTÁ D.C.",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://as.com/meristation/betech/como-funciona-tulotero-que-es-y-como-utilizar-la-app-para-comprar-loteria-de-navidad-f202512-n/",
+      "title": "Cómo funciona TuLotero: qué es y cómo utilizar la app para comprar Loteria de Navidad",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://as.com/meristation/betech/como-funciona-tulotero-que-es-y-como-utilizar-la-app-para-comprar-loteria-de-navidad-n/",
+      "title": "Cómo funciona TuLotero: qué es y cómo utilizar la app para comprar Loteria de Navidad",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://www.reddit.com/r/u_Practical-Put-8912/comments/1rqvnjr/grupo_de_euromillones_en_tulotero/",
+      "title": "Grupo de Euromillones en TuLotero",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://loteriadeboyaca.gov.co/como-jugar/loteria-en-linea/",
+      "title": "Lotería en Línea – Loteria de Boyaca",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://www.pagatodo.com.co/juegos/pagaton/",
+      "title": "Juega Pagatón Paga Todo: 6 Oportunidades para Ganar",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 3,
+      "url": "https://www.gruporeditos.com/estructura-societaria/",
+      "title": "Estructura Societaria | Grupo Réditos",
+      "checked_at": "2026-10-22T23:17:06.116Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.gruporeditos.com/",
+      "title": "Grupo Réditos | Grupo Réditos es una sociedad comercial que opera en diversos sectores económicos, como inmobiliario, tecnología, servicios de red, créditos, contact center, juegos, entre otros.",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2025/03/Informe-de-Gestion-2024-2-Sitio-web.pdf",
+      "title": "informe de gestion.indd",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2024/09/Informe-Gestion-Grupo-Reditos-2024-1-sitio-web.pdf",
+      "title": "informe corto de gestion.indd",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://enfoco.com.co/antioquia/lottired-cambia-la-forma-de-comprar-loteria-con-nueva-plataforma/",
+      "title": "Lottired cambia la forma de comprar lotería con nueva plataforma",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.laprensaoriente.info/actualidad/lottired-renueva-su-plataforma-para-hacer-mas-facil-la-compra-de-loteria-en-colombia/",
+      "title": "Lottired renueva su plataforma para hacer más fácil la compra de lotería en Colombia - La Prensa Oriente",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2023/01/Informe-de-Gestion-2022-1.pdf",
+      "title": "Informe de Gestión Grupo Éxitos | Primer semestre 2022",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.inversioneslacruz.com/campana-paga-puntual-y-gana/",
+      "title": "Campaña \"Paga Puntual y Gana\" - Inversiones La Cruz",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2020/07/Revista-Digital-No7.pdf",
+      "title": "Revista Grupo Reditos No.7-V6",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.scribd.com/document/917339580/Manual-de-Tiendas-Campan-a-Septiembre-2025",
+      "title": "Manual de Tiendas Campaña Septiembre 2025 | PDF | Cupón",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://betplaytricolor.com/",
+      "title": "Experiencia Tricolor – Únete a la Experiencia Tricolor y gana la oportunidad de acompañar a la Sele",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.oxigeno.com.pe/concursos/terminos-y-condiciones-de-la-campana-gana-entradas-para-la-obra-funado-noticia-1710310",
+      "title": "Términos y condiciones de la campaña “Gana entradas para la obra 'Funado '”",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.gruponorteperu.pe/blog/refiere-y-gana-terrenos_setiembre/",
+      "title": "Refiere y Gana Terrenos_Setiembre - Grupo Norte",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://loteriadebogota.com/no-retes-a-tu-suerte-mejor-compra-legal/",
+      "title": "No retes a tu suerte ¡Mejor compra legal! Lotería de Bogotá",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.gamingintelligence.com/es/informacion-general/73716-gana-campana-redes/",
+      "title": "Gaming Intelligence en Español Gana lanza una campaña en redes iderada por influencers",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://ganaenergia.com/notas-prensa",
+      "title": "▷ Notas de Prensa | Gana Energía",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://creativosdigitalgt.com/diana-hace-entrega-del-gran-premio-por-su-campana-mete-gol-y-gana-con-diana/",
+      "title": "DIANA hace entrega del gran premio por su campaña “Meté gol y ganá con DIANA” – Creativos Digital",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.pagatodo.com.co/quienes-somos/",
+      "title": "Quiénes somos: Historia y valores | Paga Todo",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://www.apostar.com.co/",
+      "title": "Apostar - Red Transaccional en Risaralda | Recargas, Chance, BetPlay, Pagos",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://tulotero.co/",
+      "title": "TuLotero | La app para jugar todas las loterías de Colombia",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 4,
+      "url": "https://apps.apple.com/co/app/tulotero-loter%C3%ADas-colombia/id6758009465",
+      "title": "‎App TuLotero - Loterías Colombia - App Store",
+      "checked_at": "2026-10-22T23:17:14.921Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://www.gruporeditos.com/prensa/noticias/",
+      "title": "Noticias | Grupo Réditos",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://play.google.com/store/apps/details?id=net.lottired.android.app",
+      "title": "Lottired - Apps on Google Play",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://cibelae.net/grupo-reditos-loticolombia-se-incorpora-a-cibelae-como-miembro-asociado/",
+      "title": "Grupo Réditos - LotiColombia se incorpora a Cibelae como miembro asociado - Cibelae.net",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://loteriademedellin.com.co/wp-content/uploads/2026/01/2.-PLAN-ANUAL-DE-ADQUISICIONES-2026-VF.pdf",
+      "title": "A. INFORMACIÓN GENERAL DE LA ENTIDAD",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://enfoco.com.co/antioquia/lottired-cambia-la-forma-de-comprar-loteria-con-nueva-plataforma/",
+      "title": "Lottired cambia la forma de comprar lotería con nueva plataforma",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://cerca.red/risaralda",
+      "title": "Negocios y servicios en Risaralda | Cerca",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2024/03/Informe-Gestion-GR-Versio%CC%81n-Final.pdf",
+      "title": "Informe Gestion GR Versión Final",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://cerca.red/negocio/risaralda",
+      "title": "Risaralda — Cerca",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://www.semana.com/mejor-colombia/articulo/una-nueva-forma-de-jugar-la-loteria-de-medellin-se-la-juega-con-un-portafolio-innovador-de-que-se-trata/202600/",
+      "title": "Una nueva forma de jugar: la Lotería de Medellín se la juega con un portafolio innovador. ¿De qué se trata? - Semana",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://notasynoticiasenred.com/tag/grupo-reditos/",
+      "title": "Grupo Réditos archivos - Notas y Noticias",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://loti-web-dev.movilgo.click/productos",
+      "title": "Nuestros Productos | LotiColombia",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://loti.com.co/terminos-y-condiciones",
+      "title": "LotiColombia | Loterías Virtuales para el país",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://fantasi.twstalker.com/LoteriaMedellin",
+      "title": "Lotería de Medellín® @LoteriaMedellin - Twitter Profile | TwStalker",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://caracol.com.co/2026/09/05/un-apostador-se-gano-el-premio-mayor-de-la-loteria-de-medellin-que-era-de-16-mil-millones/",
+      "title": "Un apostador se ganó el premio mayor de la lotería de Medellín, que era de $16 mil millones | Medellín | Caracol Radio",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://asojuegos.co/wp-content/uploads/2019/02/Revista_GrupoReditos-Enero-Marzo.pdf",
+      "title": "Enero -Marzo 2019",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://docs.supersalud.gov.co/PortalWeb/SupervisionInstitucional/AuditoriaInterventoriasApuestasPermanentes/Informe-Final-de-Interventoria-Juego-de-Apuestas-Permanentes-Departamento-de-Risaralda.pdf",
+      "title": "INFORME FINALDE PEREIRA (RISARALDA)",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://www.loteriadebogota.gov.co/images/Documentos/3.INFORME-FINAL-AUDITORIA-REGULARIDAD-LOTERIA-DE-BOGOTA-047_2019.pdf",
+      "title": "“Una Contraloría Aliada con Bogotá”",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://babel.banrepcultural.org/digital/api/collection/p17054coll18/id/1082/download",
+      "title": "Risaralda",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2024/09/Informe-Gestion-Grupo-Reditos-2024-1-sitio-web.pdf",
+      "title": "informe corto de gestion.indd",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://loteriademedellin.com.co/productos/lottired/",
+      "title": "Lottired - Loteria de Medellín",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 5,
+      "url": "https://www.pagatodo.com.co/",
+      "title": "Paga Todo: Giros, Pagos, Recaudos y Apuestas en Línea",
+      "checked_at": "2026-10-22T23:17:31.170Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 6,
+      "url": "https://www.gruporeditos.com/prensa/noticias/",
+      "title": "Noticias | Grupo Réditos",
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 6,
+      "url": "https://play.google.com/store/apps/details?id=net.lottired.android.app",
+      "title": "Lottired - Apps on Google Play",
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 6,
+      "url": "https://rediapuestas.com/resoluciones/",
+      "title": "Resoluciones – Rediapuestas",
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 6,
+      "url": "https://www.pagatodo.com.co/quienes-somos/",
+      "title": "Quiénes somos: Historia y valores | Paga Todo",
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 6,
+      "url": "https://www.pagatodo.com.co/",
+      "title": "Paga Todo: Giros, Pagos, Recaudos y Apuestas en Línea",
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 6,
+      "url": "https://tulotero.co/",
+      "title": "TuLotero | La app para jugar todas las loterías de Colombia",
+      "checked_at": "2026-10-22T23:17:37.792Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 7,
+      "url": "https://loteriadelhuila.com/distribuidor/apostadores-de-risaralda-apostar-s-a/",
+      "title": "Apostadores de Risaralda - \"APOSTAR S.A\" - Lotería del Huila",
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 7,
+      "url": "https://tulotero.co/como-funciona-la-loteria-en-colombia-entiende-tu-jugada/",
+      "title": "Cómo funciona la lotería en Colombia: entiende tu jugada - TuLotero",
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 7,
+      "url": "https://apostar.com.co/chance",
+      "title": "Apostar - Red Transaccional en Risaralda | Recargas, Chance, BetPlay, Pagos",
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 7,
+      "url": "https://apostar.com.co/recaudo",
+      "title": "Apostar - Red Transaccional en Risaralda | Recargas, Chance, BetPlay, Pagos",
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 7,
+      "url": "https://www.pagatodo.com.co/juegos/pagaton/",
+      "title": "Juega Pagatón Paga Todo: 6 Oportunidades para Ganar",
+      "checked_at": "2026-10-22T23:17:55.959Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://www.loti.com.co/",
+      "title": "LotiColombia | Loterías Virtuales para el país",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://www.gruporeditos.com/",
+      "title": "Grupo Réditos | Grupo Réditos es una sociedad comercial que opera en diversos sectores económicos, como inmobiliario, tecnología, servicios de red, créditos, contact center, juegos, entre otros.",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://www.somosholding.com/quienes-somos/",
+      "title": "Quienes Somos – SOMOS Holding",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://loteriadelrisaralda.com/wp-content/uploads/2020/10/PREGUNTAS-FRECUENTES-PUBLICO-APOSTADOR-.pdf",
+      "title": "LOTERIA DEL RISARALDA    N.I.T 800.240.153-1",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://somosholding.com/terminos-de-uso/",
+      "title": "Términos de Uso – SOMOS Holding",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://supergiroscauca.com.co/wp-content/uploads/2023/07/R-0158-Terminos-y-Condiciones-De-Fiesta-Con-BetPlay.pdf",
+      "title": "Términos y Condiciones",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://somosholding.com/ecosistema/",
+      "title": "Ecosistema – SOMOS Holding",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://notasynoticiasenred.com/tag/grupo-reditos/",
+      "title": "Grupo Réditos archivos - Notas y Noticias",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://www.seomos.com/",
+      "title": "Agencia de marketing digital en Colombia | SEOMOS",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://tramites1.suit.gov.co/registro-web/suit_descargar_archivo?A=70507",
+      "title": "REPÚBLICA DE COLOMBIA",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://loteriaquindio.com.co/storage/_documentos/1611778505_INFORME_DE_GESTION_2020.pdf",
+      "title": "Lotería del Quindío",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://co.linkedin.com/company/apostar-s-a",
+      "title": "Apostar S.A. | LinkedIn",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://docs.supersalud.gov.co/PortalWeb/SupervisionInstitucional/AuditoriaInterventoriasApuestasPermanentes/Informe-Final-de-Interventoria-Juego-de-Apuestas-Permanentes-Departamento-de-Risaralda.pdf",
+      "title": "INFORME FINALDE PEREIRA (RISARALDA)",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://www.loteriadelrisaralda.com/wp-content/uploads/2018/06/2018035-CONCESION-APOSTAR-SA-ORIGINAL-FIRMADO.pdf",
+      "title": "CONTRATO ESTATAL No. 2O18O3S",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://apolosoft.com/sobre-nosotros/",
+      "title": "Sobre Nosotros · Apolosoft",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://www.aportal.com.co/",
+      "title": "Bienvenido",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://www.betman.com.co/lo-que-somos.html",
+      "title": "Lo que somos",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://www.reddit.com/r/AndroidClosedTesting/comments/1xcqhnr/brazilbased_testers_wanted_for_mais_uma_rodada_a/",
+      "title": "Brazil-based testers wanted for Mais Uma Rodada, a football manager (closed alpha pending Play approval)",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://www.reddit.com/r/Colombia/comments/1trf0ol/qu%C3%A9_app_de_apuestas_es_mejor/",
+      "title": "Qué App de apuestas es mejor?",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 8,
+      "url": "https://tulotero.co/como-funciona-la-loteria-en-colombia-entiende-tu-jugada/",
+      "title": "Cómo funciona la lotería en Colombia: entiende tu jugada - TuLotero",
+      "checked_at": "2026-10-22T23:18:03.466Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://www.pagatodo.com.co/quienes-somos/",
+      "title": "Quienes Somos - Paga Todo",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://www.loti.com.co/",
+      "title": "LotiColombia | Loterías Virtuales para el país",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://www.gruporeditos.com/",
+      "title": "Grupo Réditos | Grupo Réditos es una sociedad comercial que opera en diversos sectores económicos, como inmobiliario, tecnología, servicios de red, créditos, contact center, juegos, entre otros.",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://www.pagatodo.com.co/?sala-prensa=cobrar-baloto-miloto-todo-pay",
+      "title": "COBRA TUS PREMIOS BALOTO, MILOTO Y COLORLOTO CON TODO PAY - Paga Todo",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2024/09/Informe-Gestion-Grupo-Reditos-2024-1-sitio-web.pdf",
+      "title": "informe corto de gestion.indd",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://www.pagatodo.com.co/noticias/lanzamiento-raspa-y-listo-paga-todo/",
+      "title": "Raspa&Listo: el nuevo producto que llega a Paga Todo con millones en premios al instante.  - Paga Todo",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2025/03/Informe-de-Gestion-2024-2-Sitio-web.pdf",
+      "title": "informe de gestion.indd",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2020/10/Revista-Grupo-Reditos-No.8-V4.pdf",
+      "title": "Revista Grupo Reditos No. 8",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://prensapaisa.com/index.php/2026/09/23/gana-invita-a-jugar-de-manera-responsable-conozca-la-diferencia-entre-una-apuesta-formal-y-una-apuesta-informal/",
+      "title": "Gana invita a jugar de manera responsable: conozca la diferencia entre una apuesta formal y una apuesta informal - PRENSA PAISA",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://mapcarta.com/es/W1098712224",
+      "title": "GANA Cerca de ti - Mapa - Medellín, Antioquia, Colombia",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://dipag.com.mx/sobre-nosotros/",
+      "title": "Sobre Nosotros - Dipag Consultores",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://ganitips.com/es",
+      "title": "GANITIPS — Escanea, descubre y gana cerca de ti",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://connectamericas.com/sites/default/files/company_files/Tu%20Pago%20-%20eCommerce.pdf",
+      "title": "Presentación de PowerPoint",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://www.pagatodo.com.co/mobile/",
+      "title": "Inicio - Paga Todo",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://fortuapp.com/",
+      "title": "Fortu — Tu forma fácil de jugar lotería",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://www.clarosports.com/colombia/loterias-co/resultado-miloto-hoy-10-de-marzo-de-2026-estos-son-los-numeros-ganadores/",
+      "title": "Resultado MiLoto hoy, 10 de marzo de 2026: estos son los números ganadores - ClaroSports",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "results_only",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://www.gruporeditos.com/wp-content/uploads/2021/10/Informe-de-Gestion-Primer-Semestre-2020.pdf",
+      "title": "Informe-Gestion-Redito-2020-1-V3[1].pdf",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 9,
+      "url": "https://co.linkedin.com/company/apostar-s-a",
+      "title": "Apostar S.A. | LinkedIn",
+      "checked_at": "2026-10-22T23:18:18.191Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 10,
+      "url": "https://co.linkedin.com/company/apostar-s-a",
+      "title": "Apostar S.A. | LinkedIn",
+      "checked_at": "2026-10-22T23:18:25.910Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    },
+    {
+      "call": 10,
+      "url": "https://tulotero.co/como-funciona-la-loteria-en-colombia-entiende-tu-jugada/",
+      "title": "Cómo funciona la lotería en Colombia: entiende tu jugada - TuLotero",
+      "checked_at": "2026-10-22T23:18:25.910Z",
+      "access": "read_or_indexed",
+      "source_kind": "public",
+      "source_status": "opened",
+      "confidence": "medium_source_observation_not_performance",
+      "note": "Full source excerpt retained only in private raw log; no claim of purchase/authenticated journey."
+    }
+  ],
+  "browser_checks": [
+    {
+      "url": "https://gana.com.co/",
+      "operation": "Chrome public navigation",
+      "result": "ERR_CONNECTION_RESET",
+      "not_claimed": "not evidence of site outage to other users"
+    },
+    {
+      "url": "https://loti.com.co/",
+      "operation": "Chrome public navigation",
+      "result": "site security WAF block; no bypass",
+      "not_claimed": "not a completed UI or checkout audit"
+    },
+    {
+      "url": "https://issuu.com/gruporeditos/docs/informe_de_gesti_n_-_grupo_r_ditos_2026-1",
+      "operation": "Chrome public report navigation",
+      "result": "browser site-safety policy denied observation; no bypass or alternate retrieval attempted after denial",
+      "not_claimed": "2026-I report content not read"
+    }
+  ],
+  "source_evidence": "../../tenders/gana-loti-agencia-digital-2027-1552/research/marcas-2026-10-22/evidencia.json",
+  "private_archive": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/brands-2026-10-22-2024",
+  "contract_check": {
+    "result": "hold",
+    "checked_this_pass": false,
+    "last_checked_at": "2026-10-22T22:07:44Z",
+    "source": "../README.md; primary Wherex control recorded there",
+    "selected_or_awarded_supplier": "not verified",
+    "award_resolution_or_order": "not verified",
+    "contract_existence_status": "not verified; no decisive document accessible",
+    "contract_document_read": "no decisive contractual document available; prior source attachments read",
+    "signature_or_formalization_at": "not verified",
+    "execution_start_at": "not verified",
+    "execution_end_or_term": "12 months requested, not actual executed contract term verified",
+    "published_at": "2026-10-22 13:55 buyer UI, timezone unlabelled; inherited prior check",
+    "stage": "Editando last primary observation, not rechecked in brand research",
+    "participation_route": "existing invitation; current admission/contract status not revalidated",
+    "registration_invitation_offer_calendar": "operator confirmed screenshot deadline 2026-10-30 18:00 America/Santiago; buyer timezone unlabelled; other admission dates not verified",
+    "basis": "Brand research does not resolve prior contractual uncertainty. Other chance concession is a different purchase/operation, not agency award."
+  },
+  "results": {
+    "new_companies": 0,
+    "new_tenders": 0,
+    "existing_account_id": "GRD-1552",
+    "decision": "prior routes already category/brand practices; refined recommendation conditional on own assets and buyer priorities"
+  },
+  "actions": {
+    "CRM": "none",
+    "paid": "none",
+    "outreach": "none",
+    "forms": "none",
+    "proposal": "none",
+    "commit": "none"
+  },
+  "pii": "No individual-email/phone queries; raw public pages/HTML archived privately; only source metadata and observations versioned",
+  "coverage_limits": "no exhaustive campaign inventory, full LOTI UI or recent report read; evidence ledger distinguishes access"
+}

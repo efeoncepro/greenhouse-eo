@@ -1,0 +1,102 @@
+{
+  "created_at": "2026-10-22T20:05:53.077680-03:00",
+  "run_type": "focused user-directed historical comparison, not daily 20-cell discovery",
+  "account_id": "GRD-1552",
+  "attempt": 13,
+  "country": "Colombia",
+  "service": "Agencia digital integral",
+  "calendar_week_santiago": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-22T20:05:53.077680-03:00"
+  },
+  "discovery_queries": 0,
+  "country_service_cells_searched": 0,
+  "queries": [
+    {
+      "type": "local_file_inventory",
+      "query": "OneDrive Grupo Reditos/6. Agencia Digital; 13. Agencia Digital 2027",
+      "purpose": "identify actual historical proposal and current RFP"
+    },
+    {
+      "type": "pdf_native_and_local_ocr",
+      "query": "Propuesta Comercial - Agencia Digital 2.pdf, pages 1-84; pdftoppm JPEG 1920 + Apple Vision local accurate es-ES/en-US CPU revision2",
+      "source_sha256": "e7339973131a9ff1ec25998d690c8cdc3f6d2ee9a90f330cc76b210e0e227837",
+      "result": "84 nonempty OCR pages; all contact sheets reviewed; decisive pages enlarged",
+      "blocker_resolved": "initial Vision revision3 process stalled; stopped own process and completed local CPU revision2; no paid provider"
+    },
+    {
+      "type": "local_annex_review",
+      "query": "Cronograma H6p; SLA7p; Economic6p; old RFP answers H9:H17",
+      "result": "historical commitments compared; title-mismatched HubSpot DOCX excluded"
+    },
+    {
+      "type": "local_current_rfp_read",
+      "query": "Formato C10:C14; Requisitos técnicos C9:C17; current cells and comments",
+      "result": "buyer objectives and actual requirements govern revised direction"
+    },
+    {
+      "type": "local_strategy_comparison",
+      "query": "ESTRATEGIA-DIFERENCIACION-2026-10-22.md versus old proposal page evidence",
+      "result": "15 comparisons; recommendation corrected"
+    },
+    {
+      "type": "local_memory_lookup",
+      "query": "MEMORY.md: Reditos / GRD-1552 continuity",
+      "result": "participation/download distinguished from submission; refreshed from current case evidence"
+    },
+    {
+      "type": "local_repo_checks",
+      "query": "git status --short; focused case README/brief/history; documentation governor",
+      "result": "unrelated WIP preserved; no stage, commit or push"
+    }
+  ],
+  "sources_read": [
+    {
+      "source": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/6. Agencia Digital/Propuesta Comercial - Agencia Digital 2.pdf",
+      "sha256": "e7339973131a9ff1ec25998d690c8cdc3f6d2ee9a90f330cc76b210e0e227837",
+      "pages": 84,
+      "rendering": "pdftoppm JPEG scale1920 quality88",
+      "original_modified": false
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/6. Agencia Digital/Anexo H. Cronograma de Trabajo e Implementación del Servicio.pdf",
+      "sha256": "afb7724a7baf6065e2d7c34d742d242299b7063b096569fe5a4cf3e9a559c714",
+      "pages_read": 6
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/6. Agencia Digital/Propuesta Económica – Agencia Digital Integral Grupo Réditos.pdf",
+      "sha256": "c17f85a737a6f61c2ac3742c518cf6cfa0886a680b241b90424b99c17f0ebffa",
+      "pages_read": 6
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/6. Agencia Digital/SLA's Anexo.pdf",
+      "sha256": "4bad63f37c317ef2181249df42539401019304bde6a252e10aa33618bc1c41c4",
+      "pages_read": 7
+    },
+    {
+      "path": "current RFP source ZIP/XLSX",
+      "sha256": "5b35a47fa917071bbd151966e45253abe277d4a59f264f0f10d810773c3e16c1"
+    }
+  ],
+  "sources_blocked": [],
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/comparison-2026-10-22-2005",
+  "pii_redaction": "raw OCR, images and annex text contain individual footer/contact data; excluded from versionable files; no PII search queries executed",
+  "contract_check": {
+    "result": "HOLD",
+    "checked_this_pass": false,
+    "last_checked_at": "2026-10-22T22:07:44Z",
+    "source": "../README.md",
+    "award_order_contract_signature_execution": "not verified; no decisive contractual document available",
+    "participation_calendar": "operator confirmed screenshot 2026-10-30 18:00 America/Santiago; timezone not labelled by buyer",
+    "basis": "local historical comparison does not resolve prior contractual uncertainty"
+  },
+  "result": "no new candidate; existing GRD-1552 only; old strategy substantially overlaps lost proposal; new direction documented",
+  "actions": {
+    "crm": "none",
+    "outreach": "none",
+    "formal_proposal": "none",
+    "paid_enrichment": "none",
+    "commit": "none"
+  },
+  "not_exhaustive": true
+}
