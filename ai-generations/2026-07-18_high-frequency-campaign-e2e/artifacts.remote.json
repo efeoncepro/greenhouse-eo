@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-10-01T22:01:57.328Z",
+  "generatedAt": "2026-10-22T21:34:19.137Z",
   "run": "ai-generations/2026-07-18_high-frequency-campaign-e2e",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-18_high-frequency-campaign-e2e",

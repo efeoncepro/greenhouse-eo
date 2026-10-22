@@ -1,0 +1,29 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:34:54.667Z",
+  "run": "ai-generations/2026-10-02_experimento-luz-cine",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-02_experimento-luz-cine",
+  "totalBytes": 6273255,
+  "fileCount": 3,
+  "files": [
+    {
+      "path": "plates/LZ1-fuente-grande-al-frente.png",
+      "sizeBytes": 2064135,
+      "sha256": "e4eaaf3bffabfbd7ae00f93838c8a0868d2167f7bdf6044e04246bc6d89d50cc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_experimento-luz-cine/plates/LZ1-fuente-grande-al-frente.png"
+    },
+    {
+      "path": "plates/LZ2-fuente-grande-y-giro.png",
+      "sizeBytes": 2079781,
+      "sha256": "f5fee08de80c96cdf18b06a4e310e6019392f91aef0fb33e32e810c045d1ad1f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_experimento-luz-cine/plates/LZ2-fuente-grande-y-giro.png"
+    },
+    {
+      "path": "plates/LZ3-fuente-grande-y-referencias.png",
+      "sizeBytes": 2129339,
+      "sha256": "d9b17f74b75d2b2d9089328c1e6dca4cba65a432fbe9c520d7e201363d3da7bd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_experimento-luz-cine/plates/LZ3-fuente-grande-y-referencias.png"
+    }
+  ]
+}

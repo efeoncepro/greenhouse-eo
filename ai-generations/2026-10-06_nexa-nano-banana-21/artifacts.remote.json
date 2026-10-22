@@ -1,0 +1,29 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:41:22.306Z",
+  "run": "ai-generations/2026-10-06_nexa-nano-banana-21",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-06_nexa-nano-banana-21",
+  "totalBytes": 35307237,
+  "fileCount": 3,
+  "files": [
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 307352,
+      "sha256": "0555900a1f72cc588b815c3be6afe27d5cd91652a08b1ff8b45b34321a67c046",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_nexa-nano-banana-21/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/NB21-NEXA-CINE-v1.png",
+      "sizeBytes": 17693485,
+      "sha256": "c1bb715ba44795c5a3f4c60ed3be2d1c96a6a720ef766bd1c45134d9f55cb285",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_nexa-nano-banana-21/plates/NB21-NEXA-CINE-v1.png"
+    },
+    {
+      "path": "plates/NB21-NEXA-CINE-v2.png",
+      "sizeBytes": 17306400,
+      "sha256": "c9be423c85fdaa95f42a35f145fea959410efbb2fc28b6151110853a6e941b4d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_nexa-nano-banana-21/plates/NB21-NEXA-CINE-v2.png"
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 # Recuperar y archivar archivos de `ai-generations/` — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-01 por Claude
-> **Ultima actualizacion:** 2026-10-03 por Claude — descarga automática desde el canon, publicar una referencia nueva y archivar la exploración
+> **Ultima actualizacion:** 2026-10-22 por Claude — no mover carpetas fuera del checkout y qué hacer si el disco está lleno
 > **Modulo:** Creative · producción con IA (fotografía de marca, CTA, deck, superficies, motion y audio)
 > **Ruta en portal:** no aplica — se opera desde la terminal del repo `greenhouse-eo`
 > **Estado:** contrato vigente desde el 2026-10-01; comandos `ai-gen:*` operativos; descarga automática desde el canon en `foto:prompt`/`foto:generar` desde el 2026-10-03
@@ -183,6 +183,11 @@ Los pasos propios de cada tipo están en el [contrato, §8](../../operations/AI_
 - **No** reselles `assets.lock.json` para que un faltante «pase» el chequeo.
 - **No** edites un `artifacts.remote.json` a mano.
 - **No** archives ni borres con `gcloud storage cp/rm` o borrando carpetas: sólo con `pnpm ai-gen:archive`.
+  Eso incluye las secuencias de cuadros de un render (`frames/`, `*-frames/`): también salen con `ai-gen:archive`.
+- **No** muevas carpetas a OneDrive, iCloud u otro disco ni las dejes como enlace simbólico para liberar espacio:
+  saca de git los archivos versionados de la carpeta y ningún comando `ai-gen:*` sabe encontrarlas después. Si el
+  disco está lleno, sigue el orden del [contrato §9](../../operations/AI_GENERATIONS_STORAGE_V1.md#9-si-el-disco-está-lleno):
+  cachés fuera del repo, después `pnpm ai-gen:archive plan` y `apply`.
 - **No** borres nada de lo archivado en el bucket.
 - **No** subas nada de `ai-generations/` a `efeonce-creative-work`: ese bucket es de entregables del equipo.
 - **No** borres el original local de una referencia sellada aunque ya esté en el canon.

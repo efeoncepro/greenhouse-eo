@@ -1,0 +1,107 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:41:34.686Z",
+  "run": "ai-generations/2026-10-06_sika-hoja3",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-06_sika-hoja3",
+  "totalBytes": 21482094,
+  "fileCount": 16,
+  "files": [
+    {
+      "path": "car2-s.png",
+      "sizeBytes": 126251,
+      "sha256": "05657ad55c8dd8dfed248131c90dff8d3d839469cade8ae0caec95bb5dde73c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/car2-s.png"
+    },
+    {
+      "path": "car2.png",
+      "sizeBytes": 951411,
+      "sha256": "cde5601d9d31eee5e4f26d746657edd180137da2bcb48c9b7310632a1d1e2ff1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/car2.png"
+    },
+    {
+      "path": "car3.png",
+      "sizeBytes": 179515,
+      "sha256": "45ec179b41ca18544f205599abbf52c59c4658d7099b32c5539a5c969220279c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/car3.png"
+    },
+    {
+      "path": "cenefa.png",
+      "sizeBytes": 107447,
+      "sha256": "1e67834db1c6ce6e221829cc38b39929e66bbff0749494fc0b3fb6eca082617d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/cenefa.png"
+    },
+    {
+      "path": "check2.png",
+      "sizeBytes": 407537,
+      "sha256": "3b31530cfb2ab9eac16081e57e7c8cb1d79eae5871491a0b292b219128641d7a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/check2.png"
+    },
+    {
+      "path": "check3.png",
+      "sizeBytes": 896427,
+      "sha256": "3ec66afd3340d9165b287c64415d25d3fa75e1d3c4a4c54247db4c713252bf64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/check3.png"
+    },
+    {
+      "path": "escenas/flex-amplia.png",
+      "sizeBytes": 3179611,
+      "sha256": "44cfa6e8db16affda4aea74f0adfa7803e47e76f7dabda20f7abbd47f1410ce5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/escenas/flex-amplia.png"
+    },
+    {
+      "path": "escenas/flex-escena.png",
+      "sizeBytes": 2180698,
+      "sha256": "c2aa571820a0d0e8ba6511dcf1a64fa7c33b010a09b06014ece920c75f86edd5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/escenas/flex-escena.png"
+    },
+    {
+      "path": "escenas/ss1-amplia.png",
+      "sizeBytes": 3189498,
+      "sha256": "53c4cd262d027f995821cc11b78fe71fd6d92f46daa75c0e2c8da27ee7c0ca36",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/escenas/ss1-amplia.png"
+    },
+    {
+      "path": "escenas/ss1-escena.png",
+      "sizeBytes": 2255179,
+      "sha256": "ff58916ed3c4f8d393b335f4f4b962a0f00d6cf75d8e261df69493e17e9a257e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/escenas/ss1-escena.png"
+    },
+    {
+      "path": "escenas/stopper-escena.png",
+      "sizeBytes": 2633314,
+      "sha256": "e2a69e4fa50a9fce839f967a8e4a2e8ef43a8b78e0fffdd21e166dd26e058504",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/escenas/stopper-escena.png"
+    },
+    {
+      "path": "sheet.png",
+      "sizeBytes": 928116,
+      "sha256": "7ec99443f019b917bb334678fe2bc2b47a13b6729630f23b3325be8d9f9392d3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/sheet.png"
+    },
+    {
+      "path": "sikaflex-contacto.png",
+      "sizeBytes": 1042196,
+      "sha256": "f9dcd7ca5f08738c7eda4a97e1ba368186d3a3b93e464490aeb2d98ddc40a7ea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/sikaflex-contacto.png"
+    },
+    {
+      "path": "ss1.png",
+      "sizeBytes": 961499,
+      "sha256": "5f76b6748f0b10304433101079114e670707ad4331be8d49eb15f3a68db8c19a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/ss1.png"
+    },
+    {
+      "path": "ss3.png",
+      "sizeBytes": 1027665,
+      "sha256": "ad963e38ff10c4ea0a772256884300b813470da2e59dfe4af58a347f3f2b786d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/ss3.png"
+    },
+    {
+      "path": "stopper.png",
+      "sizeBytes": 1415730,
+      "sha256": "0096382aa0b909b9d775e084102603fa5a472447e01223dec4b0613a57ce332a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-hoja3/stopper.png"
+    }
+  ]
+}

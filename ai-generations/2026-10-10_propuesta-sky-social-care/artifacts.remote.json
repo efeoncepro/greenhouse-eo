@@ -1,0 +1,185 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:53:51.666Z",
+  "run": "ai-generations/2026-10-10_propuesta-sky-social-care",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-10_propuesta-sky-social-care",
+  "totalBytes": 19720535,
+  "fileCount": 29,
+  "files": [
+    {
+      "path": "assets/contraportada.jpg",
+      "sizeBytes": 92558,
+      "sha256": "add067a3ef8c1e24a83a65a98c863bd73268fcf0354f24c63f6561df95b5d063",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/contraportada.jpg"
+    },
+    {
+      "path": "assets/escalera-agentes.jpg",
+      "sizeBytes": 233672,
+      "sha256": "c940b1b019e5c531877689d3df595bce7490008e210deb138f07f2c479f4ae94",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/escalera-agentes.jpg"
+    },
+    {
+      "path": "assets/foto-campanas-accion.jpg",
+      "sizeBytes": 325296,
+      "sha256": "30504641d6104e7ea727509aa6cfa01779034a2d92382081d2543014f949a630",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/foto-campanas-accion.jpg"
+    },
+    {
+      "path": "assets/foto-campanas-equipo.jpg",
+      "sizeBytes": 343974,
+      "sha256": "c355321cba33c52e18f1720145c413d4f45dc1eb95a368981fc6318dc9b97be4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/foto-campanas-equipo.jpg"
+    },
+    {
+      "path": "assets/foto-campanas-mismo-punto.jpg",
+      "sizeBytes": 356503,
+      "sha256": "9664bc669294af4cf120bde277e5a99ec2b29e5f8c1c493968b2e9e21575c95c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/foto-campanas-mismo-punto.jpg"
+    },
+    {
+      "path": "assets/foto-contener.jpg",
+      "sizeBytes": 297221,
+      "sha256": "653894775ae5eed6b64971e6d51f1ccc9506975a575404c8b4e2635e703fd5db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/foto-contener.jpg"
+    },
+    {
+      "path": "assets/foto-empezar.jpg",
+      "sizeBytes": 296143,
+      "sha256": "669567996f59ee8da1ef5155482fca5d308d612069421503121a20e216f8c05f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/foto-empezar.jpg"
+    },
+    {
+      "path": "assets/foto-en-vivo.jpg",
+      "sizeBytes": 335471,
+      "sha256": "cf8dd529986e67e08d1a6df37a14b88a9369b11cad3f36f5526a776f1e63e7e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/foto-en-vivo.jpg"
+    },
+    {
+      "path": "assets/foto-equipo-conectado.jpg",
+      "sizeBytes": 345429,
+      "sha256": "c8dc5366a169166414a9650606112086fb3a52e6b92d4af00b282ca95a095faa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/foto-equipo-conectado.jpg"
+    },
+    {
+      "path": "assets/foto-medicion.jpg",
+      "sizeBytes": 123370,
+      "sha256": "9009df0b6c3799cd2420a3e577356ab26c67ecc5a0161e30a125d1a3f52dc1d1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/foto-medicion.jpg"
+    },
+    {
+      "path": "assets/foto-social-care.jpg",
+      "sizeBytes": 110416,
+      "sha256": "c814c1bebc7e1e4cce860ff048f6980a7feca6fdea86ec3d18d6b7ddf059c973",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/foto-social-care.jpg"
+    },
+    {
+      "path": "assets/isotipos/microsoft-copilot.png",
+      "sizeBytes": 35568,
+      "sha256": "e1ea71fbc3d64309a75859c3c12ce8a21f08cd5415acebbea8c18323c90bcf12",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/isotipos/microsoft-copilot.png"
+    },
+    {
+      "path": "assets/isotipos/sprout-social-recorte.png",
+      "sizeBytes": 17721,
+      "sha256": "3252abf66c59029a369aa423fcdaa99827dcb256456a639da0d9e9e1f4bc57dc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/isotipos/sprout-social-recorte.png"
+    },
+    {
+      "path": "assets/isotipos/sprout-social.png",
+      "sizeBytes": 6807,
+      "sha256": "249504215f966fbd528889c7991dbc2259be40c3d93506024b73e39643e1b17e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/isotipos/sprout-social.png"
+    },
+    {
+      "path": "assets/mascotas/clawd.png",
+      "sizeBytes": 160110,
+      "sha256": "71da567b032cdee510f594ba3222c70a6616c33707b8dd035814d4455af8d596",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/mascotas/clawd.png"
+    },
+    {
+      "path": "assets/mascotas/codex.png",
+      "sizeBytes": 106642,
+      "sha256": "45dbcb8dd30a6b37bf80de7dca5fa73cc0985b2a135f67635829db89574bfd0f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/mascotas/codex.png"
+    },
+    {
+      "path": "assets/mascotas/gigi.png",
+      "sizeBytes": 132183,
+      "sha256": "a677e52fc15b351fd84e62ef4d548b2bc39a028e69802d54101554e9130b15dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/mascotas/gigi.png"
+    },
+    {
+      "path": "assets/portada-equipo-hibrido.png",
+      "sizeBytes": 467259,
+      "sha256": "acc33874a8f842c56ddf41f661c810aec612aa32a4481cb2acb581cce9f8131a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/portada-equipo-hibrido.png"
+    },
+    {
+      "path": "assets/portada.jpg",
+      "sizeBytes": 169335,
+      "sha256": "34e322d0e9b760bb7b6325b6b2ad5b66d926b504ee2896aced338fde4b4c906b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/portada.jpg"
+    },
+    {
+      "path": "assets/spark-brand.png",
+      "sizeBytes": 440798,
+      "sha256": "f3a3d0ecbf08baddf53979aa25bbd4be6e210e5ec406f1f8cae0bd9602ecf905",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/spark-brand.png"
+    },
+    {
+      "path": "assets/sparks/spark-investigacion-01-heroe.png",
+      "sizeBytes": 180124,
+      "sha256": "4de5017dfe86c17056a080c944817cbffae91ac7c7e8b0de1ac581df1a078049",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/sparks/spark-investigacion-01-heroe.png"
+    },
+    {
+      "path": "assets/sparks/spark-reportes-01-heroe.png",
+      "sizeBytes": 171357,
+      "sha256": "682a4ad4bc74e3e353300b2984618bdf742a8a8ecac7bf156e8fa5b3b8612e52",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/sparks/spark-reportes-01-heroe.png"
+    },
+    {
+      "path": "assets/sparks/spark-servicio-01-heroe.png",
+      "sizeBytes": 183660,
+      "sha256": "de63b2e90989b1eeabb596dbd15aacf2144585c693bcae40d31b3b311b5fc631",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/assets/sparks/spark-servicio-01-heroe.png"
+    },
+    {
+      "path": "fotos/plates/SK10-campanas-equipo.png",
+      "sizeBytes": 4299348,
+      "sha256": "88f2edbaafdfae239513a740b0e78345a708cacc414a817bf811e98a34c798e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/fotos/plates/SK10-campanas-equipo.png"
+    },
+    {
+      "path": "fotos/plates/SK11-campanas-equipo-accion.png",
+      "sizeBytes": 4406950,
+      "sha256": "06d4382c748f7fd305c341e19cd512993d6b5c873dbcba1eb9d315225b269ec6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/fotos/plates/SK11-campanas-equipo-accion.png"
+    },
+    {
+      "path": "fotos/plates/SK12-campanas-equipo-mismo-punto.png",
+      "sizeBytes": 4688301,
+      "sha256": "624f83e1e0d5e2990241c9fa3cb82630f0b2aed77d1d80e27495a540bcba7faf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/fotos/plates/SK12-campanas-equipo-mismo-punto.png"
+    },
+    {
+      "path": "out/P01/01-deck-cover-proposal.png",
+      "sizeBytes": 458136,
+      "sha256": "77e30021c618e9420533b88c72ddbb13cb617d4356fda5c9761c39abd82d425f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/out/P01/01-deck-cover-proposal.png"
+    },
+    {
+      "path": "out/P02/01-deck-cover-proposal.png",
+      "sizeBytes": 468924,
+      "sha256": "5cb83ef62498e162460431d717f6f51cafe0f388b79f40b13a073aefa6399770",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/out/P02/01-deck-cover-proposal.png"
+    },
+    {
+      "path": "out/P03/01-deck-cover-proposal.png",
+      "sizeBytes": 467259,
+      "sha256": "acc33874a8f842c56ddf41f661c810aec612aa32a4481cb2acb581cce9f8131a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-10_propuesta-sky-social-care/out/P03/01-deck-cover-proposal.png"
+    }
+  ]
+}

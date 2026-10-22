@@ -1,9 +1,9 @@
 # Almacenamiento de `ai-generations/` — local, canon y archivo · V1
 
 > **Tipo de documento:** Contrato operativo (SSOT de dónde vive cada archivo de `ai-generations/`)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-10-01 por Claude
-> **Última actualización:** 2026-10-03 por Claude — `canon-sync` (los comandos de foto traen lo sellado del canon a demanda), canon ≠ archivo y el procedimiento para sumar una referencia nueva (§8)
+> **Última actualización:** 2026-10-22 por Claude — regla 7 (nunca mover carpetas fuera del checkout ni dejar enlaces) y §9 (qué hacer si el disco está lleno)
 > **Aplica a:** todo agente o persona que lea, componga, publique, archive o borre algo bajo `ai-generations/`
 > **Relacionados:** [Creative Workbench (ADR)](../architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md) ·
 > [Web Media Delivery Tooling](web-media-delivery-tooling.md) (`media:archive-ai-generation`) ·
@@ -169,6 +169,10 @@ renombra); si no calza, lo descarta y avisa. En la salida se ve `⇣ <ruta> (can
 5. **Si otra sesión puede estar escribiendo en la carpeta, no se archiva.** La regla de los 3 días lo cubre; no la
    esquives con `--folder` sobre una carpeta que alguien está usando.
 6. **No citar rutas de corridas en comentarios de código** (§2.1): eso las protege y las deja fuera del archivo.
+7. **NUNCA mover carpetas de `ai-generations/` fuera del checkout** (OneDrive, iCloud, disco externo) ni dejarlas
+   como enlace simbólico para liberar disco. Saca del árbol los archivos versionados (git los ve borrados y un commit
+   amplio los borraría del repo) y crea un cuarto lugar que `ai-gen:where` y `ai-gen:pull` no conocen. El único
+   camino para sacar algo del disco es `pnpm ai-gen:archive` (§9).
 
 Las salidas **nuevas** se siguen escribiendo en `ai-generations/<AAAA-MM-DD>_<slug>/` local, como hoy.
 
@@ -236,3 +240,23 @@ Por tipo de referencia:
 | **Persona nueva con proporción declarada** | `rostro: { largoAncho, tolerancia }` medido con `pnpm foto:rostro` sobre sus imágenes aprobadas casi frontales |
 
 Criterio de elección de la vista ya sumada: [Selección de referencias de marca](EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) §3.1.
+
+## 9. Si el disco está lleno
+
+Orden de limpieza cuando el operador avisa de poco espacio:
+
+1. **Cachés fuera del repo primero.** No tocan `ai-generations/` y se regeneran solas: `pnpm store prune`,
+   `npm cache clean --force`, `uv cache prune` (espera si hay procesos `uvx` vivos; no forzarla), cachés de apps
+   cerradas en `~/Library/Caches`, `.next`. Las capturas de GVC se purgan con `pnpm fe:capture:gc --apply`.
+2. **`pnpm ai-gen:archive plan`** y, con el visto bueno del operador, **`apply`**. Es lo único que saca binarios
+   de `ai-generations/` del disco, incluidas las secuencias de cuadros de un render (`frames/`, `*-frames/`) y los
+   masters pesados. Las carpetas protegidas y las de menos de 3 días se quedan.
+3. **Copias exactas → clones APFS.** Reemplazar un archivo idéntico por un clon (`cp -c`) libera el espacio
+   duplicado sin cambiar rutas ni contenido; es inocuo y no requiere archivar. `du` y el Finder siguen contando el
+   clon como copia: el ahorro se ve en el espacio libre del disco.
+
+**Caso fuente (2026-10-22).** Para liberar disco se borraron con `rm` las secuencias de cuadros de cuatro renders
+recientes y se movieron 81 carpetas de septiembre a OneDrive con un enlace simbólico. El movimiento sacó del árbol
+3.014 archivos versionados (git los marcó como borrados). Se revirtió: las carpetas volvieron, lo versionado se
+restauró desde git y la exploración salió del disco con `ai-gen:archive`. Las secuencias borradas no se pueden
+recuperar; sus videos finales están intactos.

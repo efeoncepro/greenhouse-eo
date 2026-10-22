@@ -1,0 +1,23 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:59:25.305Z",
+  "run": "ai-generations/2026-10-15_contacto-nexa-voz",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-15_contacto-nexa-voz",
+  "totalBytes": 1047481,
+  "fileCount": 2,
+  "files": [
+    {
+      "path": "nexa-contacto.mp3",
+      "sizeBytes": 618205,
+      "sha256": "a73e5438d8743e6a271679534466b572516f050b5c341a02324afd3fc571764c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_contacto-nexa-voz/nexa-contacto.mp3"
+    },
+    {
+      "path": "toma1-raw.mp3",
+      "sizeBytes": 429276,
+      "sha256": "51742386402cbe30ac5b350ddf4e33a0f30e3bb078afcd6f1e20c72ef7b9e8c2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_contacto-nexa-voz/toma1-raw.mp3"
+    }
+  ]
+}

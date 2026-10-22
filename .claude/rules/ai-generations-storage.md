@@ -20,7 +20,9 @@ lo protegido (derivado del lock, las recetas del deck y las citas en `src/**`/`s
 2. **NUNCA** regenerar, sustituir ni «aproximar» un plate, kit o referencia aprobada porque falta; **NUNCA** resellar
    `assets.lock.json` para tapar un faltante; **NUNCA** editar un `artifacts.remote.json` a mano.
 3. **NUNCA** archivar a mano (`gcloud storage cp/rm`) ni borrar carpetas de `ai-generations/` fuera de
-   `pnpm ai-gen:archive` (extiende `media:archive-ai-generation`); lo archivado nunca se borra.
+   `pnpm ai-gen:archive` (extiende `media:archive-ai-generation`); lo archivado nunca se borra. **NUNCA** moverlas
+   fuera del checkout (OneDrive, disco externo) ni dejarlas como enlace simbólico: saca lo versionado de git y crea un
+   lugar que `ai-gen:where` no conoce. Disco lleno → cachés fuera del repo, luego `ai-gen:archive plan|apply` (SSOT §9).
 4. Promover exploración a canónica = sellarla en el lock o citarla en la receta (eso la protege) **y** publicarla con
    `pnpm creative:assets:publish apply`. Citarla en un doc no basta. Al sumar una referencia: QA al 100 % → hogar
    canónico + catálogo → `foto:assets:lock` → `creative:assets:publish apply` → `vitest run scripts/foto` →

@@ -1,0 +1,95 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:55:15.857Z",
+  "run": "ai-generations/2026-10-12_iconos-flare-seedream5pro",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-12_iconos-flare-seedream5pro",
+  "totalBytes": 66597081,
+  "fileCount": 14,
+  "files": [
+    {
+      "path": "8-iconos-originales-png.zip",
+      "sizeBytes": 30234943,
+      "sha256": "da7f9c5094956685602c38c02bddbf55bcfc053fb4efa98877c04066b9b2dc54",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/8-iconos-originales-png.zip"
+    },
+    {
+      "path": "comparison.png",
+      "sizeBytes": 2919438,
+      "sha256": "b9c3c0bd8d43fa1e31fa649878e80a6f830df75d8167d829b3ded3c8bbf2497a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/comparison.png"
+    },
+    {
+      "path": "detail/flare-glass-native.png",
+      "sizeBytes": 375503,
+      "sha256": "a235eaabec643f51df2b3c0759c04abf286e3b705fe4633ecdc35e020a5a4ae6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/detail/flare-glass-native.png"
+    },
+    {
+      "path": "detail/flare-metal-native.png",
+      "sizeBytes": 158121,
+      "sha256": "1ea4eda6deaa9cd91740ebb3e37186ed7bb18c75feafbf8108773f8ea505b0d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/detail/flare-metal-native.png"
+    },
+    {
+      "path": "detail/seedream-glass-native.png",
+      "sizeBytes": 477255,
+      "sha256": "b36640aa97c5ee3694dbe3f053386c8880c3c55e3d53e486fc3a6730cc215e08",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/detail/seedream-glass-native.png"
+    },
+    {
+      "path": "detail/seedream-metal-native.png",
+      "sizeBytes": 360206,
+      "sha256": "865fcb0a9f3f2b0b1325d9ac2a3ad262436cfbcf51dec4d05200b41a5f306102",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/detail/seedream-metal-native.png"
+    },
+    {
+      "path": "flare/01-lupa.png",
+      "sizeBytes": 3068806,
+      "sha256": "34a8dfc846b97716bb4a2ca99654b31472d1fe8752914ad93188df33f95f6c13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/flare/01-lupa.png"
+    },
+    {
+      "path": "flare/02-grafico.png",
+      "sizeBytes": 3038720,
+      "sha256": "ad7cef5ef13261c1e2d5056fa9dce3c64c1ef0b658a5f8a1623a7eac42a36c47",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/flare/02-grafico.png"
+    },
+    {
+      "path": "flare/03-carpeta.png",
+      "sizeBytes": 3243817,
+      "sha256": "8bbd1b19898b846a1d56dbdb260873d92a476aaeb2de0f11f8fe9fa614613e33",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/flare/03-carpeta.png"
+    },
+    {
+      "path": "flare/04-escudo.png",
+      "sizeBytes": 3575175,
+      "sha256": "e24ddd51bc192d03cb069a117edac37efbb819a6b32db8c36af89e8aa6d8eb50",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/flare/04-escudo.png"
+    },
+    {
+      "path": "seedream/01-lupa.png",
+      "sizeBytes": 4884052,
+      "sha256": "d855f543c95ae6e572f87cb574507c92883c8c23d44b79ac0a03807c11e076dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/seedream/01-lupa.png"
+    },
+    {
+      "path": "seedream/02-grafico.png",
+      "sizeBytes": 4776092,
+      "sha256": "3e395775c0ac16bfacc1f1c4445ac6d243c11eb5331cace8cfeebab72350b884",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/seedream/02-grafico.png"
+    },
+    {
+      "path": "seedream/03-carpeta.png",
+      "sizeBytes": 4777793,
+      "sha256": "537d08d96b345c5127aba12a445467f93af5f3db1ec6a4497783bdc911d0e87b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/seedream/03-carpeta.png"
+    },
+    {
+      "path": "seedream/04-escudo.png",
+      "sizeBytes": 4707160,
+      "sha256": "95763e1a7b50453682ea9c0dc4d327d7022c44e060a04b839de4613dbf4c92b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-flare-seedream5pro/seedream/04-escudo.png"
+    }
+  ]
+}

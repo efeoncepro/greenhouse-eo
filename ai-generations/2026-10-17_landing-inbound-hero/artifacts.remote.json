@@ -1,0 +1,41 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T22:04:09.147Z",
+  "run": "ai-generations/2026-10-17_landing-inbound-hero",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-17_landing-inbound-hero",
+  "totalBytes": 18438610,
+  "fileCount": 5,
+  "files": [
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 317904,
+      "sha256": "0d8b07767cdb8ec34bcddc24ac20858d328cf4df606ad90985b327b98fb2f8e6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_landing-inbound-hero/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/IH1-la-ia-lee.png",
+      "sizeBytes": 4824604,
+      "sha256": "6b0c70b3fa171501bcbed4944e5cc2548c3adfd89766bdecb531615c0d84894d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_landing-inbound-hero/plates/IH1-la-ia-lee.png"
+    },
+    {
+      "path": "plates/IH1b-la-ia-lee.png",
+      "sizeBytes": 4410113,
+      "sha256": "f717af81675ae6b79ee7bff35e0ef0c63c57f1a8518f3c34a7c2be34cff47049",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_landing-inbound-hero/plates/IH1b-la-ia-lee.png"
+    },
+    {
+      "path": "plates/IH2-cine.png",
+      "sizeBytes": 4449393,
+      "sha256": "e94b2ab4dac637dea19d478a4d409836c8ab9b99ae34beb497ece1558ef36bf3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_landing-inbound-hero/plates/IH2-cine.png"
+    },
+    {
+      "path": "plates/IH2b-cine.png",
+      "sizeBytes": 4436596,
+      "sha256": "06e08ecc07ccf0c029f9f0f4a3904477213f4302cf51ffbe77850e161319bd0d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_landing-inbound-hero/plates/IH2b-cine.png"
+    }
+  ]
+}

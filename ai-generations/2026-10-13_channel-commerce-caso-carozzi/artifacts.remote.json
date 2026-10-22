@@ -1,0 +1,35 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:57:13.433Z",
+  "run": "ai-generations/2026-10-13_channel-commerce-caso-carozzi",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-13_channel-commerce-caso-carozzi",
+  "totalBytes": 740813,
+  "fileCount": 4,
+  "files": [
+    {
+      "path": "correo-enviado.png",
+      "sizeBytes": 149390,
+      "sha256": "02aaa82454c32f3e12fbe19e720eeabb2cede3fb87d69f589dfa9c0244caa5c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-13_channel-commerce-caso-carozzi/correo-enviado.png"
+    },
+    {
+      "path": "qa-page-1.png",
+      "sizeBytes": 176464,
+      "sha256": "89db2b7644e63c8e563967c0a000bc5b16855f282c07219b5c907feeceacb879",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-13_channel-commerce-caso-carozzi/qa-page-1.png"
+    },
+    {
+      "path": "qa-page-2.png",
+      "sizeBytes": 198149,
+      "sha256": "c69d1014558285164a4ea6f440f851bad55f39ff97f515e8839e065d342de867",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-13_channel-commerce-caso-carozzi/qa-page-2.png"
+    },
+    {
+      "path": "qa-page-3.png",
+      "sizeBytes": 216810,
+      "sha256": "fa4142d3d0e2319be1e05ffa781f1df8da10ce41a64b2ee96c175f859712a026",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-13_channel-commerce-caso-carozzi/qa-page-3.png"
+    }
+  ]
+}

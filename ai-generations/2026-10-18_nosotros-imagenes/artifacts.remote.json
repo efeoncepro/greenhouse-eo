@@ -1,0 +1,137 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T22:04:41.893Z",
+  "run": "ai-generations/2026-10-18_nosotros-imagenes",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-18_nosotros-imagenes",
+  "totalBytes": 437750,
+  "fileCount": 21,
+  "files": [
+    {
+      "path": "como-trabajamos-en-vivo-visual-2560.webp",
+      "sizeBytes": 157740,
+      "sha256": "bacc663421ec24e0826833cb4e7a161a11c3eccac2f3c785dcbf737bd02a5919",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/como-trabajamos-en-vivo-visual-2560.webp"
+    },
+    {
+      "path": "hero-orbita-cinco-lineas-con-rotulos-2560.webp",
+      "sizeBytes": 80616,
+      "sha256": "a5756f053d90047c81e89df487e1d8dccd0ce769a5c28d74714110120a006961",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/hero-orbita-cinco-lineas-con-rotulos-2560.webp"
+    },
+    {
+      "path": "hero-orbita-pura-sin-rotulos-2560.webp",
+      "sizeBytes": 47792,
+      "sha256": "50ec165961a016702149a79d194b4d01256505594635f9f539cb9f1f7796317b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/hero-orbita-pura-sin-rotulos-2560.webp"
+    },
+    {
+      "path": "partners-blanco/adobe-white.png",
+      "sizeBytes": 6222,
+      "sha256": "3a838a9da1733f7bb0dc211015f916feb70e3125b79269938694390fd4f5a3df",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-blanco/adobe-white.png"
+    },
+    {
+      "path": "partners-blanco/aws-white.png",
+      "sizeBytes": 8396,
+      "sha256": "9c05b52083885d9ac66727c052de0413bcea7d9332a9ce0017ad8384a90f59b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-blanco/aws-white.png"
+    },
+    {
+      "path": "partners-blanco/byteplus-white.png",
+      "sizeBytes": 7992,
+      "sha256": "dc1c10eda931ee79fe6405f06e831a3c82a0171b6515a7c746f284e22929d54c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-blanco/byteplus-white.png"
+    },
+    {
+      "path": "partners-blanco/claude-white.png",
+      "sizeBytes": 11053,
+      "sha256": "22b2430a656c507ee63ba07c26e0cce19660d48761e4b63ed28057aa0252a3bb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-blanco/claude-white.png"
+    },
+    {
+      "path": "partners-blanco/googlecloud-white.png",
+      "sizeBytes": 8741,
+      "sha256": "17acb352dda88e701667d69a13655c14b3b3d0b2c304df41e9668eb2d6f493dc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-blanco/googlecloud-white.png"
+    },
+    {
+      "path": "partners-blanco/hubspot-white.png",
+      "sizeBytes": 9551,
+      "sha256": "ddb4df61a26e1f087b9a2d93b4202d467defad06e39bfddb567d253c1c42d12c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-blanco/hubspot-white.png"
+    },
+    {
+      "path": "partners-blanco/microsoft-white.png",
+      "sizeBytes": 6716,
+      "sha256": "624cc8349300f3cbaffc76be6c5d8cbf7f111bc50088750ed049130b0670c721",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-blanco/microsoft-white.png"
+    },
+    {
+      "path": "partners-blanco/openai-white.png",
+      "sizeBytes": 11406,
+      "sha256": "d7baadd8814b27a190d90dadfc6e54b0b9964fe082dc172e6ca4daaef5b75be8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-blanco/openai-white.png"
+    },
+    {
+      "path": "partners-blanco/salesforce-white.png",
+      "sizeBytes": 4965,
+      "sha256": "50d992a7ecd6ade3dd880ea5fae68c06d191718b6a7eed8e1b091ced95632199",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-blanco/salesforce-white.png"
+    },
+    {
+      "path": "partners-navy/adobe-navy.png",
+      "sizeBytes": 6326,
+      "sha256": "e1c198a399d861b1dd215997a25eda52f82536f0c76bf5016f89dde2998955ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-navy/adobe-navy.png"
+    },
+    {
+      "path": "partners-navy/aws-navy.png",
+      "sizeBytes": 8536,
+      "sha256": "f73509183edb285c02ab335d0e5c2e140df7ee08d0c81c6000dccc913a43c995",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-navy/aws-navy.png"
+    },
+    {
+      "path": "partners-navy/byteplus-navy.png",
+      "sizeBytes": 8204,
+      "sha256": "cb1f73c61766713d2098c6d9d44107a02f655db047a56ea77249b43b053d1027",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-navy/byteplus-navy.png"
+    },
+    {
+      "path": "partners-navy/claude-navy.png",
+      "sizeBytes": 11237,
+      "sha256": "50d015127f41d57d15e088d24c1391ef08f9349a58d7db4ddb8bbf6d284dcad9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-navy/claude-navy.png"
+    },
+    {
+      "path": "partners-navy/googlecloud-navy.png",
+      "sizeBytes": 8867,
+      "sha256": "59e33c760f64c6cda4f736d8f414a2334b9557a5002bfbbcb7c31c219442056f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-navy/googlecloud-navy.png"
+    },
+    {
+      "path": "partners-navy/hubspot-navy.png",
+      "sizeBytes": 9802,
+      "sha256": "b613863b5f495a15262f2349368d65c778aeedf82cd0bd861d9517336cc8475c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-navy/hubspot-navy.png"
+    },
+    {
+      "path": "partners-navy/microsoft-navy.png",
+      "sizeBytes": 6856,
+      "sha256": "c7c008976724692328d211cd119f307da04c141c1e27b07340e674ed91339db2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-navy/microsoft-navy.png"
+    },
+    {
+      "path": "partners-navy/openai-navy.png",
+      "sizeBytes": 11640,
+      "sha256": "940a51053b15298f1040dd57f3ff8a78f5e639c8fd692a4c0f586ad94980db01",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-navy/openai-navy.png"
+    },
+    {
+      "path": "partners-navy/salesforce-navy.png",
+      "sizeBytes": 5092,
+      "sha256": "f7f7a07b2744f3dd20129542e6978b17bc51c624cdc65d5bd55039a6590cf708",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-18_nosotros-imagenes/partners-navy/salesforce-navy.png"
+    }
+  ]
+}

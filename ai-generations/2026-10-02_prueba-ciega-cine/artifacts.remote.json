@@ -1,0 +1,65 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:35:10.013Z",
+  "run": "ai-generations/2026-10-02_prueba-ciega-cine",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-02_prueba-ciega-cine",
+  "totalBytes": 11712146,
+  "fileCount": 9,
+  "files": [
+    {
+      "path": "A/plates/CC1-contenido-que-la-ia-cita.png",
+      "sizeBytes": 1230457,
+      "sha256": "813976b0da5ffdfd7129bab9f482ae50a1eca6fab2addc9f1ff736e3141fada9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine/A/plates/CC1-contenido-que-la-ia-cita.png"
+    },
+    {
+      "path": "A/plates/CC1b-contenido-que-la-ia-cita.png",
+      "sizeBytes": 1169440,
+      "sha256": "31e6c3dea913783ea4187cf6c870eaf68d37ddcfa40805153bdea2ab6fb3f969",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine/A/plates/CC1b-contenido-que-la-ia-cita.png"
+    },
+    {
+      "path": "A/plates/emblemas-al-100.jpg",
+      "sizeBytes": 136752,
+      "sha256": "962069e7438c9b7cba1c34715c860276b1b2e589648d868c1603a4ea61dc8ef7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine/A/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "B/plates/emblemas-al-100.jpg",
+      "sizeBytes": 255256,
+      "sha256": "3745cb91f9784ceed372e4b38bf3c0189c10c8b50fe07d37d0319a73e3fd422f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine/B/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "B/plates/RL1-lead-correcto.png",
+      "sizeBytes": 2090224,
+      "sha256": "e80ad0c683cb99d1aaa4c723ed049a109f7cc5fb6e4ec16974abaf4fd82f4981",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine/B/plates/RL1-lead-correcto.png"
+    },
+    {
+      "path": "B/plates/RL1b-lead-correcto.png",
+      "sizeBytes": 2081043,
+      "sha256": "b0bbd9f874420ae738aa9c7ca2e212822f27842382ea2512deaa44134c6fb97a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine/B/plates/RL1b-lead-correcto.png"
+    },
+    {
+      "path": "C/plates/AG1-nexa-agentes-916.png",
+      "sizeBytes": 2295706,
+      "sha256": "d1e42ac6345db26698f3880f9321b0d59a2717761260099616b38f3b2b03fc40",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine/C/plates/AG1-nexa-agentes-916.png"
+    },
+    {
+      "path": "C/plates/AG1b-nexa-agentes-916.png",
+      "sizeBytes": 2328095,
+      "sha256": "d43d3965806d433a8e8b17106f04f23d42f313355cc1d912934cc5a4da59e45b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine/C/plates/AG1b-nexa-agentes-916.png"
+    },
+    {
+      "path": "C/plates/emblemas-al-100.jpg",
+      "sizeBytes": 125173,
+      "sha256": "f795e33fe6bac3b1a1cc9ff715b859971c4d9db87af9c2ab2b24de010c697d28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine/C/plates/emblemas-al-100.jpg"
+    }
+  ]
+}

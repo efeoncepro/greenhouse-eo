@@ -1,0 +1,29 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:51:16.715Z",
+  "run": "ai-generations/2026-10-08_parapente-sunburst",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-08_parapente-sunburst",
+  "totalBytes": 26143904,
+  "fileCount": 3,
+  "files": [
+    {
+      "path": "parapente-sunburst-max.png",
+      "sizeBytes": 13966100,
+      "sha256": "fcdac563c814fe55953fd58b1614bc29fdf52281b01d8f7dcdef2292e9d494d1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_parapente-sunburst/parapente-sunburst-max.png"
+    },
+    {
+      "path": "qa-detalles-100.png",
+      "sizeBytes": 5112412,
+      "sha256": "56d9374d5d8748d33f2273be80e8de21ba6bc2c1bc871a2146f2d12316565189",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_parapente-sunburst/qa-detalles-100.png"
+    },
+    {
+      "path": "refs/original.png",
+      "sizeBytes": 7065392,
+      "sha256": "ef29cbc723b8eac6f4b658e8b58d575ffcc37135846b3f2995fd32f554e89b80",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_parapente-sunburst/refs/original.png"
+    }
+  ]
+}

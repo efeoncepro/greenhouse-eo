@@ -1,0 +1,83 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:54:32.808Z",
+  "run": "ai-generations/2026-10-12_iconos-clay-flare-seedream5pro",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-12_iconos-clay-flare-seedream5pro",
+  "totalBytes": 67032925,
+  "fileCount": 12,
+  "files": [
+    {
+      "path": "8-iconos-clay-originales-png.zip",
+      "sizeBytes": 30831564,
+      "sha256": "5c930cec88e3f8bd8bcd95a40ed3c158c013a7fb78d6aaa451a1165d5e4506ce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/8-iconos-clay-originales-png.zip"
+    },
+    {
+      "path": "comparison.png",
+      "sizeBytes": 2931009,
+      "sha256": "6381673b04cafc30e8cc263e95217aecd41aea2eddc982333d21004dd6ba9de8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/comparison.png"
+    },
+    {
+      "path": "detail/flare-clay-native.png",
+      "sizeBytes": 203837,
+      "sha256": "47217146e300429ae0f1da893377e766b42974d43d5e2eea9f01141a522873a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/detail/flare-clay-native.png"
+    },
+    {
+      "path": "detail/seedream-clay-native.png",
+      "sizeBytes": 359726,
+      "sha256": "aaef7906227a506369f495be3a819076add66eed7d2307f5c24a865c979defe2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/detail/seedream-clay-native.png"
+    },
+    {
+      "path": "flare/01-lupa.png",
+      "sizeBytes": 2911933,
+      "sha256": "45cf2886fe694163dc7e04143a8af3f5c1d2ff24ebde19f0c39b3c89dc3361f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/flare/01-lupa.png"
+    },
+    {
+      "path": "flare/02-grafico.png",
+      "sizeBytes": 3309851,
+      "sha256": "29d08b2d78b6d22aa389cbcb9811a78d5706a932b3989d734fbbc6a6acc1242a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/flare/02-grafico.png"
+    },
+    {
+      "path": "flare/03-carpeta.png",
+      "sizeBytes": 4273566,
+      "sha256": "3a15c7b5294132b8a4a02ddcc8634f89d401e504d43fc543012f358045c659c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/flare/03-carpeta.png"
+    },
+    {
+      "path": "flare/04-escudo.png",
+      "sizeBytes": 3603451,
+      "sha256": "4a0d3adf55f538d45993ba50bb2a5999bb9e6a7c2b1c7631b7dc3c1a25374a6e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/flare/04-escudo.png"
+    },
+    {
+      "path": "seedream/01-lupa.png",
+      "sizeBytes": 4534810,
+      "sha256": "14c475896011ee7d360947df3b580207245711a418e0aecbad76e1f801fec63f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/seedream/01-lupa.png"
+    },
+    {
+      "path": "seedream/02-grafico.png",
+      "sizeBytes": 4748829,
+      "sha256": "c4d6285f60977812c3a3938afbe93e0e0142f6b5611144c9b825c278f7a2c341",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/seedream/02-grafico.png"
+    },
+    {
+      "path": "seedream/03-carpeta.png",
+      "sizeBytes": 4493290,
+      "sha256": "de9e07639ba5181d4c8782fe65b6d7a6a68570e764149d47a5ba5c58d449114f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/seedream/03-carpeta.png"
+    },
+    {
+      "path": "seedream/04-escudo.png",
+      "sizeBytes": 4831059,
+      "sha256": "de2906818e2564642b291c3be7fc6b4afe2c05e982f328fdd740f770a81a2e49",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/seedream/04-escudo.png"
+    }
+  ]
+}

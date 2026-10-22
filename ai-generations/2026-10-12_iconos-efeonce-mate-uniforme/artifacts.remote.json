@@ -1,0 +1,317 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:55:03.039Z",
+  "run": "ai-generations/2026-10-12_iconos-efeonce-mate-uniforme",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-12_iconos-efeonce-mate-uniforme",
+  "totalBytes": 248762078,
+  "fileCount": 51,
+  "files": [
+    {
+      "path": "alpha/flare/binoculares.png",
+      "sizeBytes": 3093447,
+      "sha256": "901e1f241304af662707ea645788a1c892a029c020180b00abe0efce3e7ce033",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/flare/binoculares.png"
+    },
+    {
+      "path": "alpha/flare/iman.png",
+      "sizeBytes": 2894264,
+      "sha256": "324c52f20adf78dcaf356f08b0b23e172ab108bcd57e874e71d2835c04b99941",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/flare/iman.png"
+    },
+    {
+      "path": "alpha/flare/metronomo.png",
+      "sizeBytes": 2972455,
+      "sha256": "5f524cd3cd67df57d7fa30be9bf6133fb7560c21d6928c8afc61985074ddb525",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/flare/metronomo.png"
+    },
+    {
+      "path": "alpha/flare/sello-aprobacion.png",
+      "sizeBytes": 2874593,
+      "sha256": "fc442227d62db4a868ca2d74443af1b297c920fcbde9e1c27201d74cc40cdd04",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/flare/sello-aprobacion.png"
+    },
+    {
+      "path": "alpha/seedream-smooth-clean/binoculares.png",
+      "sizeBytes": 4411258,
+      "sha256": "5987f53fea4c9149aa38b68d91d3d2200f982d9b0c06605870c2b96dd08bbbaf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream-smooth-clean/binoculares.png"
+    },
+    {
+      "path": "alpha/seedream-smooth-clean/iman.png",
+      "sizeBytes": 6748362,
+      "sha256": "2e158dc67647bd3d78c2fa1a215182b87679760b7ec07160fa3f97905c618fd0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream-smooth-clean/iman.png"
+    },
+    {
+      "path": "alpha/seedream-smooth-clean/metronomo.png",
+      "sizeBytes": 7524490,
+      "sha256": "fd2a60d18348baa0204e2683d53011766e182994588bf3091a06307a8a8c2211",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream-smooth-clean/metronomo.png"
+    },
+    {
+      "path": "alpha/seedream-smooth-clean/sello-aprobacion.png",
+      "sizeBytes": 7012713,
+      "sha256": "8829947db2b59641b6fa59364e6956e0d70bc692e58a9e1fa0580990c7777a25",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream-smooth-clean/sello-aprobacion.png"
+    },
+    {
+      "path": "alpha/seedream-smooth/binoculares.png",
+      "sizeBytes": 4419979,
+      "sha256": "6097e049a6967f714b864a2d6bfcbefdf6024368ab54ed561e7ca98cef43f4d2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream-smooth/binoculares.png"
+    },
+    {
+      "path": "alpha/seedream-smooth/iman.png",
+      "sizeBytes": 6814408,
+      "sha256": "6591be984479f97e43338c4b7e9de616a4c824cc48dfa8906a75e0c3665ebb22",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream-smooth/iman.png"
+    },
+    {
+      "path": "alpha/seedream-smooth/metronomo.png",
+      "sizeBytes": 7804534,
+      "sha256": "a6ae4deb945e584e3cfc3521e30c0e0b15b1dd88914a1691ba1f80176f21d6df",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream-smooth/metronomo.png"
+    },
+    {
+      "path": "alpha/seedream-smooth/sello-aprobacion.png",
+      "sizeBytes": 7017055,
+      "sha256": "1f59f0cc143753792e68b4350f000079a231f7908d073782bcf16caf0bb6267f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream-smooth/sello-aprobacion.png"
+    },
+    {
+      "path": "alpha/seedream/binoculares.png",
+      "sizeBytes": 5271855,
+      "sha256": "eb08c453260988ce88403532a7cde0caa1b2b6f3c5701e26f2d730376c6a074d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream/binoculares.png"
+    },
+    {
+      "path": "alpha/seedream/iman.png",
+      "sizeBytes": 5345179,
+      "sha256": "7915dab9a3a24f499549979234780d3d86eb1184a4d46c6c979ca60eef9b5b15",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream/iman.png"
+    },
+    {
+      "path": "alpha/seedream/metronomo.png",
+      "sizeBytes": 6908065,
+      "sha256": "b1cbdac5a327643ff030c0c1f33a7bcf7c3a9f8a47ecebf59279cb76a06d6dbb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream/metronomo.png"
+    },
+    {
+      "path": "alpha/seedream/sello-aprobacion.png",
+      "sizeBytes": 5253761,
+      "sha256": "9c845e5eb369806c49610cc8dd94c76218d8ccd3e15edfb1aaa8bf4e397e7785",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/alpha/seedream/sello-aprobacion.png"
+    },
+    {
+      "path": "comparacion-transparente.png",
+      "sizeBytes": 713455,
+      "sha256": "78a14510184d9a64b22785bfeb94981fa592f9dc59dba93fdc1c3c34bc8c7ad0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/comparacion-transparente.png"
+    },
+    {
+      "path": "comparison-first-pass.png",
+      "sizeBytes": 2300563,
+      "sha256": "95a1697719be427bc8a8efa5b84958169ea870ffd732ea32e1b4f6c69f71e1c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/comparison-first-pass.png"
+    },
+    {
+      "path": "comparison.png",
+      "sizeBytes": 2340833,
+      "sha256": "547219a89439c95166abdef7eefb1c060380b18acdb4fa3e7db1c0137d7b56d7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/comparison.png"
+    },
+    {
+      "path": "detail/binoculares-surface-native.png",
+      "sizeBytes": 494101,
+      "sha256": "8109bb63854f8eaef85e9ab0cc4c3d2cea71d9a66159de5149ee72ef7965638c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/detail/binoculares-surface-native.png"
+    },
+    {
+      "path": "flare/binoculares.png",
+      "sizeBytes": 3081182,
+      "sha256": "2984f65b2d5acbd94db4773eb34634d038d71abff49bfdd8def691c73650b249",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flare/binoculares.png"
+    },
+    {
+      "path": "flare/iman.png",
+      "sizeBytes": 2886891,
+      "sha256": "35dfd6fd546a39cb78f9a2aa80c039e0133d476fc34048b369b0d77799e52969",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flare/iman.png"
+    },
+    {
+      "path": "flare/metronomo.png",
+      "sizeBytes": 2869825,
+      "sha256": "4c41cf7f570ffd5f915d4ab202918c38ef5e61c9996e204658c412309930129b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flare/metronomo.png"
+    },
+    {
+      "path": "flare/sello-aprobacion.png",
+      "sizeBytes": 2861680,
+      "sha256": "cc015932d57f0eb34101d9c701b42c75d2a54f638d1cf64e913128065dcc74fc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flare/sello-aprobacion.png"
+    },
+    {
+      "path": "flat/control/binoculares-control-oscuro.png",
+      "sizeBytes": 12591,
+      "sha256": "341cf9070d937f32c0e7e4fa05e535c5ea6e081075f1b9f51ad692d333f41c2d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/control/binoculares-control-oscuro.png"
+    },
+    {
+      "path": "flat/control/binoculares-control-papel.png",
+      "sizeBytes": 12699,
+      "sha256": "f27afcf2a4705e1d650a61d5839d1904dc6c1948b1de06ab184db88b561d55f6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/control/binoculares-control-papel.png"
+    },
+    {
+      "path": "flat/control/iman-control-oscuro.png",
+      "sizeBytes": 11867,
+      "sha256": "5511970abd384e577c55d14da679e88e1b4afd6bdcf79db00bd392dfd239be70",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/control/iman-control-oscuro.png"
+    },
+    {
+      "path": "flat/control/iman-control-papel.png",
+      "sizeBytes": 11934,
+      "sha256": "5c16a4f7f2c7437cc29f7593521add25e2a3db4539bc13d11960d451578bd70b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/control/iman-control-papel.png"
+    },
+    {
+      "path": "flat/control/metronomo-control-oscuro.png",
+      "sizeBytes": 13247,
+      "sha256": "a91875e35889c6a57eac9b80432570b6ac5b087968a72fe03dd26edcc139e063",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/control/metronomo-control-oscuro.png"
+    },
+    {
+      "path": "flat/control/metronomo-control-papel.png",
+      "sizeBytes": 13275,
+      "sha256": "f6aec558082fd09b708211a3b5b8baa6a481df0dbca2017a600a6c7324cf0268",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/control/metronomo-control-papel.png"
+    },
+    {
+      "path": "flat/control/sello-aprobacion-control-oscuro.png",
+      "sizeBytes": 11620,
+      "sha256": "a9546c1421608b63078a4583444fcfe38a324c0d1da64d2cd95acbdc2a46bfb7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/control/sello-aprobacion-control-oscuro.png"
+    },
+    {
+      "path": "flat/control/sello-aprobacion-control-papel.png",
+      "sizeBytes": 11667,
+      "sha256": "484b83475ca74160129d43596b1e88ab8bdb2199702c59ade12e3945d3a032b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/control/sello-aprobacion-control-papel.png"
+    },
+    {
+      "path": "flat/proposal.png",
+      "sizeBytes": 74749,
+      "sha256": "acf63b19eaf72f3ae9068a8dfb7bcd346a61b01ab8d19933ae9080238544549d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/proposal.png"
+    },
+    {
+      "path": "flat/sheet.png",
+      "sizeBytes": 3001762,
+      "sha256": "d6df280d90a61e616f805e51ac7fe80d1b87cca4d3dc0cffb3ae940ed9bde7ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/sheet.png"
+    },
+    {
+      "path": "iconos-efeonce-Flare.zip",
+      "sizeBytes": 21153953,
+      "sha256": "e54807027efc0e3437f4c82f03fa10f0c5b03ba24d07df0b88fc27f092f94bd0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/iconos-efeonce-Flare.zip"
+    },
+    {
+      "path": "iconos-efeonce-PNG.zip",
+      "sizeBytes": 85974156,
+      "sha256": "8f517d16adbc79beaeeed20a74f2fc9a12df5ba526d1040e78a3dda1387fb68c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/iconos-efeonce-PNG.zip"
+    },
+    {
+      "path": "references/binoculares.png",
+      "sizeBytes": 36522,
+      "sha256": "aca7fdc1692faa63809eaa60f514afa827da2c52842b1f901e631489a1d84d0f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/references/binoculares.png"
+    },
+    {
+      "path": "references/iman.png",
+      "sizeBytes": 34833,
+      "sha256": "2c7bc1ce0db0d9008609a31e9ac14782e91a47a5fe92d619ccf87d1004083f6a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/references/iman.png"
+    },
+    {
+      "path": "references/metronomo.png",
+      "sizeBytes": 36682,
+      "sha256": "11ccd0f4453122e43913b7443c31c3f486352a6d7659822e04784a4b9f73cbcf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/references/metronomo.png"
+    },
+    {
+      "path": "references/sello-aprobacion.png",
+      "sizeBytes": 34434,
+      "sha256": "ff7801001c408240bea3df73c5576aadf3fe0abda4b4b3913aa7b751b0aee9f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/references/sello-aprobacion.png"
+    },
+    {
+      "path": "seedream-smooth/binoculares.png",
+      "sizeBytes": 3170612,
+      "sha256": "71c0ad65d320ed2f0d8c6f48b6ebf041e36fe49ccf9e66d053cec35e1382c253",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream-smooth/binoculares.png"
+    },
+    {
+      "path": "seedream-smooth/iman.png",
+      "sizeBytes": 4652911,
+      "sha256": "20d2a61f28a8fcd54766c510194cf2c36bd5fd4e4512a3b85da39d605befa839",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream-smooth/iman.png"
+    },
+    {
+      "path": "seedream-smooth/metronomo.png",
+      "sizeBytes": 5146143,
+      "sha256": "3870763468b3f9e92ccd8269871c50543c9eae4c9e70749c7939f682ee21fee3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream-smooth/metronomo.png"
+    },
+    {
+      "path": "seedream-smooth/sello-aprobacion.png",
+      "sizeBytes": 4968089,
+      "sha256": "2011afc2e2060e4303edac771101367b273a8a788aeaf7c6ac94530b1b8def13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream-smooth/sello-aprobacion.png"
+    },
+    {
+      "path": "seedream/binoculares.png",
+      "sizeBytes": 3604646,
+      "sha256": "8c90d4f319e9db915c36e3cfd84f18dc87a8dcfeb8ca57ea78d2e5c07203e687",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream/binoculares.png"
+    },
+    {
+      "path": "seedream/iman.png",
+      "sizeBytes": 3651419,
+      "sha256": "04c003971a501d526c8c3d553d18d88ee64e54179779fef66907cb9886ba1b7f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream/iman.png"
+    },
+    {
+      "path": "seedream/metronomo.png",
+      "sizeBytes": 4338189,
+      "sha256": "fb0b4beb2f9976c2276f4a191703c90ac3fddd128babd393f2038e79df0fbe41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream/metronomo.png"
+    },
+    {
+      "path": "seedream/sello-aprobacion.png",
+      "sizeBytes": 3723365,
+      "sha256": "9920a02be53532f3049b9486ab97195d26cc79ccd3fe2280b25e29f7ac0e658f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream/sello-aprobacion.png"
+    },
+    {
+      "path": "transparencia-flare.png",
+      "sizeBytes": 330679,
+      "sha256": "68e9fe259b34c1f3c789ba952e8cbb82b7fa213de210988444ec46a25bb911b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/transparencia-flare.png"
+    },
+    {
+      "path": "transparencia-seedream-smooth-clean.png",
+      "sizeBytes": 382845,
+      "sha256": "e5920f4ad39e3a843aaab95d5e5cf0ddb98a07533b005a167fe75e921bdc63a6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/transparencia-seedream-smooth-clean.png"
+    },
+    {
+      "path": "transparencia-seedream-smooth.png",
+      "sizeBytes": 432241,
+      "sha256": "bcd8d9de766e76e81cba0307e4f14a456f9034255627bbdf21577fc73b5cd871",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/transparencia-seedream-smooth.png"
+    }
+  ]
+}

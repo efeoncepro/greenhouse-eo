@@ -1,0 +1,179 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T22:01:06.607Z",
+  "run": "ai-generations/2026-10-15_lp-agencia-creativa-rutas",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-15_lp-agencia-creativa-rutas",
+  "totalBytes": 56038582,
+  "fileCount": 28,
+  "files": [
+    {
+      "path": "brio/P1-hero.png",
+      "sizeBytes": 1803973,
+      "sha256": "2e3f91ddc92b839310cbb96d4655986c118d2fc5a498123eccecade992570b6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/brio/P1-hero.png"
+    },
+    {
+      "path": "brio/P1h.png",
+      "sizeBytes": 2270883,
+      "sha256": "efe89caf89f6231cb0cef1b0481810df6eaf43fcfe417e5b3443a06f18007564",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/brio/P1h.png"
+    },
+    {
+      "path": "brio/P1v.png",
+      "sizeBytes": 2322415,
+      "sha256": "d144986df91774bfc505f20a342395fb060df9c01270496d5e79ba9d7e7f6015",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/brio/P1v.png"
+    },
+    {
+      "path": "brio/P2-gente.png",
+      "sizeBytes": 2208245,
+      "sha256": "fc845122fce80aed862f3851b955896c24ac050426298966fee9a2a6518a94ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/brio/P2-gente.png"
+    },
+    {
+      "path": "brio/P3-fila.png",
+      "sizeBytes": 2722854,
+      "sha256": "1acac543310f5ce930a9f69d0a8aa335e877fa7581bd07cda713ad8e74ffabc0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/brio/P3-fila.png"
+    },
+    {
+      "path": "brio/P4-pack.png",
+      "sizeBytes": 1467256,
+      "sha256": "03117d5079daa836bf94a86f797ebd6b4a2372fb0aae07783f9bbb1c2dd33ddc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/brio/P4-pack.png"
+    },
+    {
+      "path": "brio/P5-calle.png",
+      "sizeBytes": 2523142,
+      "sha256": "1a4066a08c7b256807cd014a619e450f5af1ae0263f14124521e22adb49870f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/brio/P5-calle.png"
+    },
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 208370,
+      "sha256": "918a73e7e993cea9e3d328cfd6fb7b2ad44a1aa67e2f004d43ff4833e9f2bb86",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/R1-escala.png",
+      "sizeBytes": 1513839,
+      "sha256": "c358fadb156f46bc8aceea659fb4cbb240c13a9ddc5a8acc6d3edf152a5f1e44",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/plates/R1-escala.png"
+    },
+    {
+      "path": "plates/R1b-escala.png",
+      "sizeBytes": 1546777,
+      "sha256": "5cc9fa596205e88be99b568af240d233f7e31c8d177ccf91cf3221248fa601cc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/plates/R1b-escala.png"
+    },
+    {
+      "path": "plates/R2-marca.png",
+      "sizeBytes": 1898205,
+      "sha256": "99f163ca19faedc6883a954f1c1a0e220d5b64a0827904191ce84022862e66d2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/plates/R2-marca.png"
+    },
+    {
+      "path": "plates/R2b-marca.png",
+      "sizeBytes": 1892855,
+      "sha256": "00edca38ef19460e7a899a263caa6c5367e5a3771911d2fc67e21bf139bb9158",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/plates/R2b-marca.png"
+    },
+    {
+      "path": "plates/R3-contenido.png",
+      "sizeBytes": 1401854,
+      "sha256": "367edf1181811aef197339804524b281908c6aa8513452318058603454eb6e0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/plates/R3-contenido.png"
+    },
+    {
+      "path": "plates/R3b-contenido.png",
+      "sizeBytes": 1450181,
+      "sha256": "33b9372b172e29f339e42dbbac8fef10d8382da81a1789a9f7a62fca671490d0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/plates/R3b-contenido.png"
+    },
+    {
+      "path": "plates/R4-ia.png",
+      "sizeBytes": 1576987,
+      "sha256": "421a0d0cdd4082132a6fb6a1f83123df8c293642ab152b000381b81e9fb001db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/plates/R4-ia.png"
+    },
+    {
+      "path": "plates/R4b-ia.png",
+      "sizeBytes": 1728759,
+      "sha256": "220f0e1c0d5bd0c2d6b4b261bed5f3fe05caff6312caa99e829a35e4123d9cc8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/plates/R4b-ia.png"
+    },
+    {
+      "path": "plates/T2b-crea.png",
+      "sizeBytes": 1725092,
+      "sha256": "8ca9a15c650b72e819b153afd2e33bc390cc314da8c64062043c1c7d95b5b696",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/plates/T2b-crea.png"
+    },
+    {
+      "path": "sky/base.png",
+      "sizeBytes": 1691003,
+      "sha256": "2398a35f67fdf214a5358516e8fd47d27f6397c4b9bc7a2b0305942d458919c2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/base.png"
+    },
+    {
+      "path": "sky/edit.png",
+      "sizeBytes": 1776724,
+      "sha256": "e1371d3e91b25e1359b9cc50ae13bae1a76ac3e234369aca3cc6d17d6ce1c4e3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/edit.png"
+    },
+    {
+      "path": "sky/expand/expand-inputs/1211fe6283e9-canvas.png",
+      "sizeBytes": 4165082,
+      "sha256": "9dd431d97dca655eadc15c5282b4ad8be8d09b341db8d73ee79b67991cc65935",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/expand/expand-inputs/1211fe6283e9-canvas.png"
+    },
+    {
+      "path": "sky/expand/expand-inputs/1211fe6283e9-mask.png",
+      "sizeBytes": 5884,
+      "sha256": "3e5e228d552f5274c380a0397777ef6a2aab5c109de1f0d1c5a9d3b03c7ee4ce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/expand/expand-inputs/1211fe6283e9-mask.png"
+    },
+    {
+      "path": "sky/expand/inpaint/d3702ed6b0fb/candidate-1-diff.png",
+      "sizeBytes": 1264786,
+      "sha256": "d8af68d506db46d2f7f3a6bd3c1fe4a30c29aabd6bee9786e3e812f97895e1cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/expand/inpaint/d3702ed6b0fb/candidate-1-diff.png"
+    },
+    {
+      "path": "sky/expand/inpaint/d3702ed6b0fb/candidate-1-raw.png",
+      "sizeBytes": 1431469,
+      "sha256": "88bd147836aa3c40cc7491e34fdba25b7f5da6a3937f23f8221d3c8b2972221c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/expand/inpaint/d3702ed6b0fb/candidate-1-raw.png"
+    },
+    {
+      "path": "sky/expand/inpaint/d3702ed6b0fb/candidate-1.png",
+      "sizeBytes": 4854428,
+      "sha256": "ac5bc9585f350561690a07f24f08a2d09d6db559d35b95347c92016cfa4a53a5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/expand/inpaint/d3702ed6b0fb/candidate-1.png"
+    },
+    {
+      "path": "sky/expand/inpaint/d3702ed6b0fb/mask-preview.png",
+      "sizeBytes": 4004424,
+      "sha256": "50fa773ad628045f4da83868737b5ca51dddac0d5a722096afd515f2ee8d1d32",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/expand/inpaint/d3702ed6b0fb/mask-preview.png"
+    },
+    {
+      "path": "sky/expand/inpaint/d3702ed6b0fb/provider-input.png",
+      "sizeBytes": 2874404,
+      "sha256": "864f466737440de74bd3644ddd036f22060f8edd96e3c08b3ab77ae8e8f8ad75",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/expand/inpaint/d3702ed6b0fb/provider-input.png"
+    },
+    {
+      "path": "sky/expand/inpaint/d3702ed6b0fb/provider-mask.png",
+      "sizeBytes": 4260,
+      "sha256": "9d0d28af88babedb1a5c5d7ea141c70c1cb8f5435d3efbee5288b8fa77347a3c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/expand/inpaint/d3702ed6b0fb/provider-mask.png"
+    },
+    {
+      "path": "sky/wide-grad.png",
+      "sizeBytes": 3704431,
+      "sha256": "1605fb8e7a33a37159da5b9131c34b5abd29ebbf98f0b082e642bec565d86c75",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/wide-grad.png"
+    }
+  ]
+}
