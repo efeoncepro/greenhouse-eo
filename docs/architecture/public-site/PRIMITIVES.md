@@ -82,7 +82,7 @@ Do not copy private Greenhouse primitives directly into WordPress. Use their des
 | `LogoMarquee` | `canonical/widget` | `semantic-widget` | `eo-elementor-widgets`, widget `greenhouse_logo_marquee`; CSS `assets/css/logo-marquee.css` | AEO proof strip; Redes Sociales trust; Home trust via shared renderer | AEO doc `docs/documentation/public-site/aeo-landing-elementor.md`; [Home contract](AGENCY_ELEMENTOR_MODULES_V1.md); landing skill refs | Seven-logo strip, identical sets, fades, reduced-motion static state and phase checks; Home delegates rather than maintaining another logo list renderer |
 | `BrandProofAvatarGroup` | `canonical/pattern` | `landing-pattern` | `greenhouse_logo_marquee` shared `proofOnly` renderer (`brandProof.v1`, `.gh-brand-proof*`); legacy `.gh-aeo-brand-proof*` remains for AEO/About | Home hero; AEO `/aeo-2/`; About `/about-us-efeonce/` hero `abproof` | Contract below; Home native Media repeater, density/variant/a11y controls; AEO/About legacy contracts unchanged | AEO gate `public-website:verify-aeo-why-proof-meta`; Home [audit](../../audits/public-site/2026-08-30-home-visual-review.md) includes original hover restoration, reduced motion, overflow and untouched legacy consumers |
 | `PublicUtilityRecoverySurface` | `proposed/pattern` | `landing-pattern` | Future `ohio-child` shared partial; parent Ohio remains fallback until a scoped implementation is approved | 404 first; reusable recovery shell for no-results and empty archive states without forcing identical content | [Technical contract](PUBLIC_MISCELLANEOUS_SURFACES_V1.md); [functional behavior](../../documentation/public-site/public-miscellaneous-surfaces.md); [discovery evidence](../../audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md) | Implementation must prove HTTP/robots/canonical, `<main>` + heading hierarchy, keyboard/focus/reduced motion, 1440/390 overflow, empty query safety, cache readback, snapshot and rollback; no runtime implementation exists yet |
-| `SiteNav` | `proposed/pattern` — **planificada (TASK-2040, sin construir)**; owned by AXIS `efeonce.site-nav` | `host-adapter` | Planned: contract `efeonce.site-nav` + schema `site-nav.v1` and primitive in `@efeoncepro/axis-ui-primitives` (no package published yet); WordPress plugin «EO Navegación» (TASK-2041) as data source; adapter in `ohio-child` behind `eo_site_nav_enabled` off/pilot/on with Ohio fallback (TASK-2042) | None today: the global header is still Ohio's (menu term `61`). Planned: every page of `efeoncepro.com` after a pilot; Think as a later follow-up | Contract below («`SiteNav` Contract (planned)»); [architecture](PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md); [PDR-027](../../public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md) (Accepted 2026-10-18); [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md) | Nothing implemented: no AXIS contract, no package, no plugin, no bucket upload. Gates are declared per task in EPIC-055 |
+| `SiteNav` | `candidate/pattern` — **construido en AXIS (TASK-2040, 2026-10-22), sin publicar**; owned by AXIS `efeonce.site-nav` | `host-adapter` | AXIS: tokens `axisSiteNav`, contract `efeonce.site-nav` + schema `site-nav.v1` (`site-nav.v1.schema.json`), `@efeoncepro/axis-ui-primitives/site-nav` (`siteNavHtml`), `./site-nav.css`, `./site-nav.js` (`enhanceSiteNav`, no imports); reference fixture `packages/primitives/fixtures/site-nav/agencia-creativa.html` for the PHP port. WordPress plugin «EO Navegación» (TASK-2041) as data source; adapter in `ohio-child` behind `eo_site_nav_enabled` off/pilot/on with Ohio fallback (TASK-2042) | None in a site yet: the global header is still Ohio's (menu term `61`). AXIS Lab `/patterns/efeonce.site-nav/` + `/demos/site-nav/<contexto>-<cabecera>/` | Contract below («`SiteNav` Contract»); [architecture](PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md) §Implementación en AXIS; [PDR-027](../../public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md); [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md); AXIS `docs/quality/site-nav.md` | Lab 2026-10-22: Playwright suite green (8 viewports, keyboard, one panel, focus trap, no disc from top and island, reduced motion, island tone, contrast ≥ 4.5:1 on navy/black/glow, axe, touch, no-JS). Pending: package release + private install check, plugin (TASK-2041), site pilot (TASK-2042) |
 
 ## `EfeonceMention` Contract
 
@@ -117,18 +117,19 @@ the package CSS; never fork it.
   `mention.css` has the same sha256 as the WordPress byte copy.
 - A loader change can take ~1–2 min to show on web requests (PHP-FPM opcache) even though WP-CLI already sees it.
 
-## `SiteNav` Contract (planned)
+## `SiteNav` Contract
 
-**Planificada (TASK-2040, sin construir).** Nada de esto existe en runtime al 2026-10-18: el encabezado global sigue
-siendo el de Ohio y AXIS no tiene contrato ni primitive de navegación. Contrato técnico completo:
-[PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md](PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md) (Propuesta). Decisión:
+**Construido en AXIS (TASK-2040, 2026-10-22), sin publicar.** El encabezado global del sitio sigue siendo el de Ohio
+hasta TASK-2042; el plugin del documento es TASK-2041. Exports, decisiones del Lab y verificación:
+[arquitectura §Implementación en AXIS](PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md) y `docs/quality/site-nav.md` en AXIS. Contrato técnico completo:
+[PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md](PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md). Decisión:
 [PDR-027](../../public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md) (Accepted 2026-10-18). Programa:
 [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md).
 
 - **Qué es:** el mecanismo portable de la navegación global del sitio (cabecera con cápsula de vidrio, mega menús
   Soluciones y Recursos, desplegable Nosotros y onepage de la hamburguesa). Se escribe una vez en AXIS y cada sitio lo
   monta con un adaptador delgado, sin reescribir comportamiento ni contenido. Mismo precedente que `EfeonceMention`.
-- **Capas planificadas** (contrato `efeonce.site-nav` + esquema `site-nav.v1`, primitive en
+- **Capas** (contrato `efeonce.site-nav` + esquema `site-nav.v1`, primitive en
   `@efeoncepro/axis-ui-primitives`, Lab `/patterns/efeonce.site-nav/`):
   - render HTML de servidor como función pura a partir de un documento `site-nav.v1` válido;
   - `site-nav.css` con tokens AXIS, incluida la receta de vidrio;
@@ -140,7 +141,7 @@ siendo el de Ohio y AXIS no tiene contrato ni primitive de navegación. Contrato
     (TASK-2042) lo pinta con el interruptor `eo_site_nav_enabled` (`off`/`pilot`/`on`) y respaldo a Ohio;
   - Think: envoltura Astro, como follow-up cuando se pida.
 - **Receta de vidrio** (aprobada el 2026-10-18; una sola para cápsula, botón «Agenda tu diagnóstico» y hamburguesa; en
-  AXIS pasa a tokens, nunca valores a mano en el sitio):
+  AXIS vive en `axisSiteNav.glass`, nunca valores a mano en el sitio):
 
   ```css
   background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));

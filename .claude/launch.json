@@ -146,6 +146,16 @@
         "3102"
       ],
       "port": 3102
+    },
+    {
+      "name": "axis-lab-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "../axis-design-system",
+        "dev"
+      ],
+      "port": 4349
     }
   ]
 }

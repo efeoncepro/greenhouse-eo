@@ -1,12 +1,12 @@
 # Handoff
 
-## 2026-10-22 — TASK-2040 navegación global en AXIS: en curso
+## 2026-10-22 — TASK-2040 navegación global en AXIS: code complete, release pendiente
 
-`TASK-2040` pasó a `in-progress` en `develop`. El código vive en `axis-design-system` (main, sin push ni release
-hasta autorización del operador). Coordinado con la sesión «Rediseño de Menú», que no toca AXIS ni TASK-2041/2042.
-Decisiones tomadas: render de servidor como función pura de JS con fixtures HTML de referencia (el port PHP es de
-TASK-2042); tiempos de cabecera al bajar y subir y el cierre del panel al empezar el scroll se fijan en el Lab.
-Pendiente de anotar por la otra sesión: la franja de Glitch apunta a la misma suscripción del blog (2026-10-20).
+`axis-design-system` main tiene `8327593`, `0c8a230`, `5e97c59` y `19c711f` sin push: contrato `efeonce.site-nav`,
+esquema `site-nav.v1`, tokens `axisSiteNav`, render, CSS, JS, Lab y suite `playwright.site-nav.config.ts` (28 verdes).
+Revisado con la sesión «Rediseño de Menú». **Pendiente:** autorización del operador para push, CI y tag del release
+(tokens, contracts, registry, primitives); después, instalación privada y cierre de la task. La suite general
+`lab.spec.ts` ya fallaba antes y no corre en CI. Siguiente: TASK-2041 con la misma sesión.
 
 ## 2026-10-22 — Redes Efeonce: love brand y canales v2
 
@@ -246,25 +246,3 @@ ni se reutiliza. Corrección documental; no modifica PDF, documentos HubSpot ni 
 
 
 Historial de sesiones: [Handoff.archive.md](Handoff.archive.md).
-
-## 2026-10-17 — BytePlus: doce assets Active y ambas pruebas exitosas
-
-Usar sólo Google SSO `jreyes@efeoncepro.com` → **3004839361**, root `jreyes`. Julio prohibió volver a usar
-3003660328: sus 12 assets/6 grupos y KYC/Entry son históricos. Seedance 2.5, clave y tarjeta/Savings Plan están
-en la cuenta correcta; recuperación completada sin compras. KYC enviado con autorización
-expresa de Julio y **aprobado**, 17/10 16:57:32 UTC (13:57 Chile), verificado en consola y correo. Estado en el
-[ledger](docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md); [preflight obligatorio](docs/manual-de-uso/creative-studio/byteplus-directo.md#cuenta-obligatoria-antes-de-operar).
-Julio confirmó mecanismos/plan de incidentes: cuestionario completo (1 y 2=YES, 3=uso interno).
-Julio después ordenó «Firmala»: carta aceptada y correo verificado con su código; Entry activo 17:37 UTC,
-Billing mode Free. Julio habilitó acceso a archivos de Chrome; lote completo en cuenta correcta: **12 Active / 6 grupos**,
-38 assets/44 grupos disponibles. Antonio primero → referencia y primer cuadro `succeeded`, 480p/4s → resto en orden.
-Estado Active confirmado en respuestas ListAssets, cotejando GroupId/pares; UI `warehoused`. MP4 y recibos en
-`/Users/jreye/Documents/BytePlus-Asset-Service-2026-10-17/pruebas-antonio-cuenta-correcta-20261017T180127Z/`.
-Corrección enviada a Cloris/Alejandro con firma gráfica y CCO: 17/10 13:22 UTC; Enviados y HubSpot SENT
-`118790251018` verificados. Respuesta pendiente. WhatsApp entregado para copiar.
-Por orden de Julio, documentación y skills Codex/Claude sincronizan cuenta, autorización y recuperación de retratos;
-router y contexto enlazan el canon. ADR existente de media directa; sin cambio de integración ni promoción Globe.
-Estado operativo: lote y pruebas completados, sin compras/cambio de plan ni push. Ledger registrado en `45315b12f`;
-por orden posterior de Julio, cierre documental completo con subagentes y skills espejo. Factura de las dos generaciones
-sin conciliar; aprobación creativa final y publicación no forman parte de estas pruebas. El ledger conserva el detalle
-y las evidencias; no repetir cargas ni generaciones para validar documentación.

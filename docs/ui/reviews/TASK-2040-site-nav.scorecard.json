@@ -1,0 +1,28 @@
+{
+  "taskId": "TASK-2040",
+  "scenario": "axis-lab-site-nav",
+  "reviewedAt": "2026-10-22",
+  "reviewer": "claude-opus-5.5 (frames mirados en 1440, 1280, 1200, 1024, 834 y 390) + revisión de la sesión «Rediseño de Menú» contra el canvas v68",
+  "evidence": {
+    "desktop": "axis-design-system/docs/evidence/site-nav/1440-soluciones.webp",
+    "mobile": "axis-design-system/docs/evidence/site-nav/390-onepage.webp",
+    "dossier": "axis-design-system/docs/quality/site-nav.md"
+  },
+  "dimensions": {
+    "hierarchy": { "score": 4.6, "rationale": "Un protagonista por panel: titular Bricolage con esfera del acento, luego servicios y a la derecha foto, respuesta y caso, igual al tablero Main/Completo.", "evidence": "1440-soluciones.webp", "nextAction": "" },
+    "proportions": { "score": 4.5, "rationale": "Columnas 300/1fr/440 a 1440, 280/1fr/380 a 1280 y dos columnas a 1200 con panel de 560 px, como Mega1280 y Mega1200. El hueco inicial a 1200 se corrigió tras la revisión.", "evidence": "1200-dos-columnas.webp", "nextAction": "" },
+    "rhythm": { "score": 4.5, "rationale": "Cascadas de 40, 45 y 60 ms y separadores de 1 px en el onepage; las filas de líneas cerradas tenían 16 px de más (padding que no colapsa) y se corrigieron.", "evidence": "1440-onepage.webp", "nextAction": "" },
+    "density": { "score": 4.5, "rationale": "Hasta cinco servicios con descripción de una línea a 1440 y dos líneas a 1200; la columna central desplaza dentro del panel si el documento crece.", "evidence": "1440-servicio-con-foco.webp", "nextAction": "" },
+    "depth": { "score": 4.6, "rationale": "Una sola receta de vidrio en cápsula, botón y hamburguesa; panel navy con borde fino y fondo atenuado; la isla cambia de tono sin sombras extra.", "evidence": "1440-mega-desde-isla.webp", "nextAction": "" },
+    "surfaceEconomy": { "score": 4.5, "rationale": "Un panel abierto a la vez y nunca junto al onepage (prueba automatizada). Sin tarjetas dentro de tarjetas: sólo la marca «estás aquí» lleva borde interior.", "evidence": "1440-soluciones.webp", "nextAction": "" },
+    "visualImpact": { "score": 4.7, "rationale": "Foto por línea y por servicio, respuesta grande con esfera y el onepage que nace en círculo desde la hamburguesa con la curva navy sobre la foto.", "evidence": "1440-onepage.webp", "nextAction": "" },
+    "typography": { "score": 4.6, "rationale": "Poppins para navegar y Bricolage sólo en titulares y respuestas, con peso y tracking de la línea gráfica (axisSiteNav.type).", "evidence": "1440-recursos.webp", "nextAction": "" },
+    "color": { "score": 4.6, "rationale": "Acentos por línea desde efeonceGraphicLine; texto navy sobre el acento salvo Engine, que lleva blanco. Contraste sobre el vidrio medido ≥ 4,5:1 en navy, negro y navy con resplandor por la suite.", "evidence": "1440-isla-clara.webp", "nextAction": "Medir fotos claras reales en el piloto de TASK-2042 (peor punto del canvas: 4,3 sobre ámbar)." },
+    "iconography": { "score": 4.5, "rationale": "Trazo del catálogo AXIS a 22 px en el mega y 18 px en el onepage, en reposo; el foco agrega el anillo del acento sin esfera.", "evidence": "1440-servicio-con-foco.webp", "nextAction": "" },
+    "responsive": { "score": 4.6, "rationale": "Ocho viewports sin scroll horizontal (prueba automatizada); cápsula display:none bajo 1181; onepage con foto desde 1024, acordeón debajo, CTA al pie en el teléfono.", "evidence": "834-onepage.webp", "nextAction": "" },
+    "motion": { "score": 4.5, "rationale": "Cortina del panel, círculo del onepage que cierra a 0 px desde arriba y desde la isla, cascadas y movimiento reducido instantáneo; todo desde tokens.", "evidence": "1440-mega-desde-isla.webp", "nextAction": "Video corto del Lab y del piloto en TASK-2042 (contrato de motion §GVC / Micro Evidence)." },
+    "fidelity": { "score": 4.6, "rationale": "Revisado por la sesión que diseñó el canvas: mega 1440, Recursos con Glitch negativo y franja turquesa, onepage, isla clara y oscura coinciden; sus tres observaciones visuales quedaron corregidas.", "evidence": "1440-soluciones.webp", "nextAction": "" },
+    "genericTemplateResistance": { "score": 4.7, "rationale": "Mecanismo propio de La órbita: preguntas por línea, respuestas con esfera, fotos phygital y onepage con curva; nada de menú de plantilla.", "evidence": "1440-onepage.webp", "nextAction": "" }
+  },
+  "verdict": "pass"
+}

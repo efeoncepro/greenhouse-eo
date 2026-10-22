@@ -31,8 +31,8 @@ El motion explica de dónde viene cada cosa; no decora.
 
 | Momento | Movimiento | Duración y curva |
 |---|---|---|
-| Bajando | Sale hacia arriba | 300 ms `emphasizedAccelerate` (propuesto: el canvas no fija este tiempo; se confirma en el Lab) |
-| Subiendo | Entra la isla de vidrio desde arriba | 400 ms `emphasized` (propuesto: el canvas no fija este tiempo; se confirma en el Lab) |
+| Bajando | Sale hacia arriba | 300 ms `emphasizedAccelerate` (decidido en el Lab, `TASK-2040`) |
+| Subiendo | Entra la isla de vidrio desde arriba | 400 ms `emphasized` (decidido en el Lab, `TASK-2040`) |
 
 ### Mega menú y desplegable
 
@@ -70,7 +70,8 @@ El motion explica de dónde viene cada cosa; no decora.
 
 ## Tokens and Performance
 
-- Los tiempos y curvas salen de `axisMotion` en `axis-tokens`. El CSS del sitio no repite valores a mano.
+- Los tiempos y curvas salen de `axisSiteNav.motion` (curvas de `axisMotion`) en `axis-tokens`. El CSS del sitio no
+  repite valores a mano; el JS los lee de las variables CSS, en `ms` o `s`.
 - Sólo se animan `opacity`, `transform` y `clip-path`. Nada de `top`, `height` ni `filter` en bucle.
 - `will-change` sólo durante la transición, en el panel y en el círculo del onepage.
 - El acercamiento de 9 s de la foto se detiene cuando el onepage se cierra o la pestaña pasa a segundo plano.

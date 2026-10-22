@@ -80,6 +80,8 @@ esquema del contrato. `TASK-2042` depende de ambas.
     liviano.
   - Página del Lab y release del paquete.
   - Cubre cabecera, megas, desplegable, onepage, tableta, teléfono, teclado, foco, movimiento reducido y medición.
+  - **Estado 2026-10-22:** code complete en `axis-design-system` (sin push ni release). Release de paquetes pendiente
+    de autorización; con él `TASK-2041` fija la versión del esquema `site-nav.v1.schema.json`.
 - `TASK-2041` — **Contenido.**
   - Plugin «EO Navegación»: documento validado, revisiones, admin, WP-CLI `wp eo-nav` y REST pública.
   - Resolución de los datos dinámicos de Recursos.

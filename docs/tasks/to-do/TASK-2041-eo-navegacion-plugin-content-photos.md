@@ -144,7 +144,8 @@ Reglas obligatorias:
   títulos de lecturas y lectura propia de Influencer y Performance.
 - **Resuelto (operador, 2026-10-20):** la franja «suscribirse a Glitch» de Recursos apunta a la suscripción del blog,
   que es la misma lista que Glitch. No se crea formulario ni lista propia del menú. El documento la guarda en
-  `subscribe.href` del panel editorial. Hoy esa suscripción es el formulario CF7 de `/blog`; su reemplazo por el Growth
+  `strip.cta` del panel editorial (`action: "link"`, `fallbackHref`), campo fijado por el esquema `site-nav.v1`
+  (`TASK-2040`); hoy apunta a `/blog/`, hasta que `TASK-1802` publique un ancla estable. Hoy esa suscripción es el formulario CF7 de `/blog`; su reemplazo por el Growth
   Form `efeonce-blog-subscription` sigue sin publicar (auditoría `2026-10-20-blog-growth-form-preparation.md`). El
   enlace apunta al bloque de suscripción del blog y no cambia cuando cambie el formulario. Fuente: `TASK-1802`, Delta
   2026-10-20.

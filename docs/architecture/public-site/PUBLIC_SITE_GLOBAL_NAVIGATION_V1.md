@@ -1,6 +1,6 @@
 # Navegación global del sitio público V1
 
-Estado: **Propuesta · sin implementar**
+Estado: **Mecanismo AXIS construido (`TASK-2040`, 2026-10-22, sin publicar) · plugin y puesta en el sitio pendientes**
 
 Dueño: Sitio público / WordPress + AXIS
 
@@ -109,7 +109,9 @@ Las flechas avisan qué abre algo; Inicio y Contacto son enlaces directos.
   - Derecha: un destacado.
 - **Franja inferior:** invita a suscribirse a Glitch y lleva a **la suscripción del blog**, que es la misma lista que
   Glitch (decisión del operador, 2026-10-20; se recibe Glitch cada lunes). El menú no tiene formulario ni lista propia:
-  su destino es un enlace del documento (`subscribe.href` del panel editorial) y lo fija `TASK-2041`. Fuente de la
+  su destino es un enlace del documento: `strip.cta` del panel editorial, con `action: "link"` y `fallbackHref`.
+  Apunta a `/blog/` hasta que el hub del blog (`TASK-1802`) publique un ancla estable para su banda de suscripción; no
+  se inventa un `#id`. Lo fija `TASK-2041`. Fuente de la
   decisión: `TASK-1802` (Delta 2026-10-20).
 - **Glitch** se nombra con su logo oficial negativo de AXIS. El resto de su línea gráfica no entra al menú.
 - **Esfera:** una sola por panel, en el acento de Growth.
@@ -243,8 +245,9 @@ box-shadow: 0 10px 30px rgba(0,26,51,.10);
 
 **Cómo se decide el tono:** cada sección de la página declara `data-site-nav-tone="light|dark"`. El primitive mira qué
 sección queda bajo la línea media de la isla al hacer scroll y cambia el tono en 300 ms. Si una sección no lo declara,
-el primitive calcula la luminancia de su color de fondo (propuesto; se confirma en el Lab). En WordPress el adaptador
-(`TASK-2042`) marca las secciones de cada plantilla.
+el primitive mide la luminancia de su color de fondo: mayor a 0,5 es claro (decidido en el Lab, `TASK-2040`). Mide en
+la posición final de la isla y no en la de la cabecera mientras entra. En WordPress el adaptador (`TASK-2042`) marca las
+secciones de cada plantilla; la luminancia es sólo el respaldo.
 
 **En el teléfono** es la misma isla con márgenes de 12 px, que lleva el logo y la hamburguesa; el botón del agendador
 sigue al pie del onepage.
@@ -256,8 +259,10 @@ Demostración aprobada: video de la sesión del 2026-10-18, con la variante «C 
 
 ## Modelo de datos — documento `site-nav.v1`
 
-Un documento JSON por sitio. El esquema vive en el contrato de AXIS y el plugin lo valida antes de guardar. Esta forma
-indica la intención; el esquema definitivo se fija en la tarea del contrato:
+Un documento JSON por sitio. El esquema definitivo es `site-nav.v1.schema.json` (JSON Schema 2020-12), exportado por
+`@efeoncepro/axis-ui-contracts` como objeto (`siteNavJsonSchema`) y como archivo, para que el plugin valide lo mismo que
+AXIS (`TASK-2040`). `validateSiteNav` lo interpreta y agrega ids únicos y matchers que apuntan a algo real. El documento
+completo de ejemplo, con el contenido del canvas, es `siteNavExample`. Forma abreviada:
 
 ```jsonc
 {
@@ -265,31 +270,47 @@ indica la intención; el esquema definitivo se fija en la tarea del contrato:
   "site": "efeoncepro.com",
   "revision": 12,                        // la asigna el plugin
   "updatedAt": "2026-10-18T15:00:00Z",
+  "locale": "es-CL",
   "header": {
-    "logo": { "variant": "negative", "href": "/" },
+    "logo": { "label": "Efeonce", "href": "/" },
     "cta": { "label": "Agenda tu diagnóstico", "action": "open_meeting_scheduler", "fallbackHref": "/agenda/" }
   },
   "primary": [
-    { "id": "inicio", "label": "Inicio", "href": "/" },
-    { "id": "nosotros", "label": "Nosotros", "panel": "dropdown", "items": [ /* 3 destinos con descripción */ ] },
-    { "id": "soluciones", "label": "Soluciones", "panel": "lines", "lines": [
-      { "id": "growth", "label": "Growth", "accent": "growth", "answer": "…",
-        "photo": { "mm": "https://storage.googleapis.com/efeonce-group-axis-public-media/site-nav/v1/growth-mm.webp",
-                   "op": "…/growth-op.webp", "alt": "…" },
-        "case": { "label": "…", "href": "…" },
-        "services": [
-          { "id": "loop", "label": "Loop Marketing", "href": "…", "glyph": "loop", "answer": "Ciclo a ciclo",
-            "photo": { "mm": "…", "op": "…", "alt": "…" }, "reading": { "label": "…", "href": "…" } }
-        ] }
-    ] },
-    { "id": "recursos", "label": "Recursos", "panel": "editorial", "formats": [
-      { "id": "glitch", "label": "Glitch", "brandMark": "glitch-negative", "source": { "kind": "wp-category", "ref": "glitch" },
-        "featured": { "title": "…", "href": "…", "photo": { "mm": "…", "alt": "…" } } }
-    ], "subscribe": { "label": "…", "href": "…" /* la suscripción del blog: misma lista que Glitch */ } },
-    { "id": "contacto", "label": "Contacto", "href": "/contacto/" }
+    { "id": "inicio", "label": "Inicio", "href": "/", "onepage": { "show": false } },
+    { "id": "nosotros", "label": "Nosotros", "href": "/about-us-efeonce/", "panel": "dropdown",
+      "onepage": { "eyebrow": "¿QUIÉNES SOMOS?", "answer": "Crecer", "photo": { "op": "…", "alt": "…" } },
+      "items": [ { "id": "partners", "label": "Partners", "description": "…", "href": "/partnership/", "photo": { "op": "…", "alt": "…" } } ] },
+    { "id": "soluciones", "label": "Soluciones", "href": "/servicios/", "panel": "lines", "eyebrow": "¿QUÉ NECESITAS HOY?",
+      "lines": [
+        { "id": "growth", "label": "Growth", "question": "¿Lo medimos?", "accent": "growth", "answer": "Siempre",
+          "eyebrow": "GROWTH · EFEONCE", "title": "Crecer con método", "description": "…",
+          "photo": { "mm": "https://storage.googleapis.com/efeonce-group-axis-public-media/site-nav/v1/growth-mm.webp",
+                     "op": "…/growth-op.webp", "alt": "…" },
+          "case": { "kind": "PARA LEER", "title": "…", "meta": "…", "href": "…" },
+          "services": [
+            { "id": "loop-marketing", "label": "Loop Marketing", "description": "…", "href": "/landing-loop-marketing/",
+              "glyph": "medicion", "answer": "Ciclo a ciclo", "photo": { "mm": "…", "op": "…", "alt": "…" },
+              "reading": { "kind": "PARA LEER", "title": "…", "href": "…" } }
+          ] }
+      ],
+      "strip": { "text": "¿No sabes por dónde empezar?", "cta": { "label": "Agenda tu diagnóstico", "action": "open_meeting_scheduler", "fallbackHref": "/agenda/" },
+                 "links": [ { "label": "Ver todas las soluciones", "href": "/servicios/" } ] } },
+    { "id": "recursos", "label": "Recursos", "href": "/blog/", "panel": "editorial", "eyebrow": "¿QUÉ QUIERES LEER O USAR?",
+      "formats": [
+        { "id": "glitch", "label": "Glitch", "question": "IA y marketing, cada lunes", "href": "/glitch/", "brandMark": "glitch",
+          "eyebrow": "EL MAGAZINE SEMANAL", "title": "La semana, sin ruido", "description": "…",
+          "source": { "kind": "wp-category", "ref": "glitch" }, "items": [ { "meta": "FLASH · 28 SEP", "title": "…", "href": "…" } ],
+          "featured": { "kind": "LO ÚLTIMO", "title": "…", "excerpt": "…", "cta": "Leer el Flash", "href": "…", "photo": { "card": "…", "alt": "…" } } }
+      ],
+      // La suscripción del blog, misma lista que Glitch: sólo un enlace del documento.
+      "strip": { "text": "llega cada lunes a tu correo.", "brandMark": "glitch",
+                 "cta": { "label": "Suscríbete a Glitch", "action": "link", "fallbackHref": "/blog/" }, "links": [ { "label": "Ir al blog", "href": "/blog/" } ] } },
+    { "id": "contacto", "label": "Contacto", "href": "/contacto/",
+      "onepage": { "eyebrow": "¿HABLAMOS?", "answer": "Cuando quieras", "items": [ { "id": "agenda", "label": "Agenda una reunión", "description": "…", "href": "/agenda/" } ] } }
   ],
-  "onepage": { "footer": { "social": [ /* redes */ ], "legal": [ /* enlaces */ ] } },
-  "context": { "matchers": [ { "path": "/servicios/loop-marketing/", "line": "growth", "service": "loop" } ] }
+  "onepage": { "footer": { "social": [ { "network": "linkedin", "label": "Efeonce en LinkedIn", "href": "https://…" } ],
+                           "legal": [ { "label": "Privacidad", "href": "/politica-de-privacidad/" } ], "copyright": "© 2026 Efeonce Group SpA" } },
+  "context": { "matchers": [ { "path": "/agencia-creativa/", "line": "brand", "service": "agencia-creativa" } ] }
 }
 ```
 
@@ -303,6 +324,10 @@ Reglas del documento:
 - **Límites:** máximo dos niveles de profundidad en el onepage y un solo panel abierto. El esquema rechaza estructuras
   más profundas.
 - **Sin HTML libre en los textos.** El esquema sólo acepta texto plano y enlaces declarados.
+- **Enlaces seguros:** relativos al sitio, fragmento, `https` o `mailto`. Se rechazan `javascript:`, `//host` y `http`.
+- **Íconos:** `glyph` es un glifo de Trazo del catálogo de AXIS; uno desconocido es un error del documento.
+- **Paneles:** un primario sin `panel` es enlace directo; `lines`, `editorial` y `dropdown` son los únicos paneles. Los
+  hijos del onepage salen del panel (o de `onepage.items` en un enlace directo, como Contacto).
 
 ### Datos dinámicos (Recursos)
 
@@ -391,7 +416,8 @@ Eventos que emite el primitive y empuja el adaptador al `dataLayer`:
 |---|---|
 | `site_nav_open` | Se abre un panel; lleva `panel` (`soluciones`, `recursos`, `nosotros` u `onepage`). |
 | `site_nav_line_view` | Se ve una línea; lleva `line`. |
-| `site_nav_click` | Clic en un destino; lleva `target_type` (`service`, `case`, `reading`, `resource`, `diagnosis` o `contact`) y `target`. |
+| `site_nav_click` | Clic en un destino; lleva `target_type` (`logo`, `primary`, `line`, `service`, `case`, `reading`, `dropdown`, `format`, `resource`, `featured`, `strip`, `onepage`, `social`, `legal` o `cta`) y `target`. |
+| `site_nav_cta` | Intención de agendar; lleva `cta_location` (`menu_header`, `menu_mega` o `menu_onepage`). El primitive cierra lo abierto, suelta el scroll y despacha además el evento DOM cancelable `axis-site-nav:cta`, que el sitio usa para abrir su agendador. |
 
 Los nombres finales y su alta en GTM y GA4 se cierran en la tarea del adaptador, con la skill de medición. No se envía
 PII.
@@ -404,7 +430,9 @@ PII.
   `off` o fuera de la lista, el sitio sigue con el encabezado de Ohio sin cambios.
 - **Assets de AXIS:** copiados con versión fijada en `assets/vendor/axis/<versión>/`, según PDR-024; nunca `-latest`
   ni registry.
-- **Render:** en PHP, desde el documento. Los enlaces salen en el HTML del servidor; `site-nav.js` sólo mejora.
+- **Render:** port PHP de `siteNavHtml`, desde el documento, validado contra el fixture del paquete
+  (`packages/primitives/fixtures/site-nav/agencia-creativa.html`): una sola fuente de marcado (decidido en `TASK-2040`).
+  Los enlaces salen en el HTML del servidor; `site-nav.js` se copia tal cual (no importa nada) y sólo mejora.
 - **Variantes de Ohio por página:** encabezado transparente u oscuro y logo fijo, controlados por metas de Ohio y ACF.
   Se inventarían y cada una se resuelve con un estado del primitive (arriba o isla, en tono oscuro o claro) o se documenta como
   excepción.
@@ -422,6 +450,29 @@ PII.
   `astro:env/server`, como `GrowthCtaDock.astro`).
 - **Enlaces:** los relativos se resuelven contra `https://efeoncepro.com`, salvo los que el documento marque como
   propios de Think.
+
+## Implementación en AXIS (`TASK-2040`)
+
+Construido en `axis-design-system` (commits `8327593`, `0c8a230` y `5e97c59`, 2026-10-22); se publica con el próximo
+release de paquetes.
+
+| Pieza | Export |
+|---|---|
+| Tokens | `axisSiteNav` en `@efeoncepro/axis-tokens`: vidrio, isla en dos tonos, medidas, breakpoints y tiempos sobre `axisMotion`. |
+| Contrato y esquema | `AXIS_SITE_NAV_CONTRACT`, `siteNavJsonSchema`, `validateSiteNav`, `siteNavIssues`, `resolveSiteNavContext` y `siteNavExample` en `@efeoncepro/axis-ui-contracts`; archivo `site-nav.v1.schema.json`. |
+| Render | `siteNavHtml` y `siteNavLinks` en `@efeoncepro/axis-ui-primitives/site-nav`. |
+| Estilos | `@efeoncepro/axis-ui-primitives/site-nav.css`. |
+| Comportamiento | `enhanceSiteNav` y `createSiteNav` en `@efeoncepro/axis-ui-primitives/site-nav.js`. |
+| Lab | `/patterns/efeonce.site-nav/` y demos `/demos/site-nav/<contexto>-<cabecera>/`; suite `playwright.site-nav.config.ts`. |
+
+Decidido en el Lab:
+
+- La cabecera se oculta en 300 ms y vuelve como isla en 400 ms.
+- Con un mega abierto, un scroll de más de 48 px lo cierra.
+- El tono de la isla sigue `data-site-nav-tone`; si falta, la luminancia del fondo.
+- El JS lee los tiempos de las variables CSS en `ms` o `s`, porque un minificador puede reescribir `150ms` como `.15s`.
+
+Notas de verificación y límites: `docs/quality/site-nav.md` en AXIS.
 
 ## Invariantes
 

@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-055`
-- Status real: `En curso desde 2026-10-22: discovery hecho; contrato, tokens y primitive en construcción en axis-design-system`
+- Status real: `Code complete en axis-design-system main (8327593, 0c8a230, 5e97c59, 19c711f; sin push): contrato, esquema, tokens, primitive, Lab y suite verdes; falta release de paquetes con autorización del operador`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -382,23 +382,25 @@ hilos del canvas; se corrige el documento en el mismo commit.
 
 ## Acceptance Criteria
 
-- [ ] Existe el contrato `efeonce.site-nav` y el esquema `site-nav.v1` en JSON Schema, con documento de ejemplo válido.
-- [ ] Vidrio, alturas, logo y tiempos del menú son tokens de AXIS y el CSS del primitive no tiene esos valores como
-  literales.
-- [ ] El render de servidor produce todos los enlaces del documento en HTML sin JavaScript (prueba automatizada).
-- [ ] Un solo panel abierto a la vez; el mega y el onepage nunca coexisten (prueba automatizada).
-- [ ] El teclado cumple el flujo maestro (Tab, Enter o ↓, ↑ ↓, →, ←, Esc) y el foco se devuelve al disparador
-  (prueba automatizada).
-- [ ] El onepage es `role="dialog"` con `aria-modal="true"` y foco contenido; al cerrar no queda disco detrás de la
-  hamburguesa.
-- [ ] Con `prefers-reduced-motion: reduce` no hay desplazamientos.
-- [ ] `scrollWidth == clientWidth` en los ocho viewports.
-- [ ] El contraste del texto sobre el vidrio es ≥ 4,5:1 en navy, negro y navy con resplandor.
-- [ ] La página del Lab muestra el menú con los ajustes «Contexto» y «Cabecera».
-- [ ] Se capturó y se miró la evidencia desktop y 390 px, y el scorecard cumple el umbral.
-- [ ] El paquete se publicó con versión nueva y la instalación privada quedó verificada.
-- [ ] `UI ready` se mantuvo en `no` hasta completar mapping, plan de captura y decision log; si pasó a `yes`,
-  `pnpm task:lint --task TASK-2040` quedó sin hallazgos.
+- [x] Existe el contrato `efeonce.site-nav` y el esquema `site-nav.v1` en JSON Schema, con documento de ejemplo válido.
+  Evidencia: `packages/contracts/src/site-nav.ts`, `dist/site-nav.v1.schema.json`, `siteNavExample`; 8 pruebas en `site-nav.test.ts`.
+- [x] Vidrio, alturas, logo y tiempos del menú son tokens de AXIS y el CSS del primitive no tiene esos valores como
+  literales. Evidencia: grupo `axisSiteNav`; prueba de fuente sin HEX, `rgba`, `blur(` ni milisegundos en `site-nav-css.ts`.
+- [x] El render de servidor produce todos los enlaces del documento en HTML sin JavaScript (prueba automatizada).
+  Evidencia: `primitives/src/site-nav.test.ts` (todos los `siteNavLinks`) y e2e «without JavaScript…».
+- [x] Un solo panel abierto a la vez; el mega y el onepage nunca coexisten (prueba automatizada). Evidencia: e2e «intent…» y «the mega and the onepage never coexist…».
+- [x] El teclado cumple el flujo maestro (Tab, Enter o ↓, ↑ ↓, →, ←, Esc) y el foco se devuelve al disparador
+  (prueba automatizada). Evidencia: e2e «keyboard: Enter opens…».
+- [x] El onepage es `role="dialog"` con `aria-modal="true"` y foco contenido; al cerrar no queda disco detrás de la
+  hamburguesa. Evidencia: e2e con 60 Tab dentro del diálogo y `circle(0px…)` al cerrar, desde arriba y desde la isla.
+- [x] Con `prefers-reduced-motion: reduce` no hay desplazamientos. Evidencia: e2e «reduced motion…» (duración 0, sin transform ni círculo).
+- [x] `scrollWidth == clientWidth` en los ocho viewports. Evidencia: e2e «no horizontal scroll at …» cerrado y con el onepage abierto.
+- [x] El contraste del texto sobre el vidrio es ≥ 4,5:1 en navy, negro y navy con resplandor. Evidencia: e2e por píxel más claro bajo la cápsula; fotos claras quedan como QA del piloto (TASK-2042).
+- [x] La página del Lab muestra el menú con los ajustes «Contexto» y «Cabecera». Evidencia: `/patterns/efeonce.site-nav/` (captura `lab-patron.webp`).
+- [x] Se capturó y se miró la evidencia desktop y 390 px, y el scorecard cumple el umbral. Evidencia: AXIS `docs/evidence/site-nav/` (15 frames) y `docs/ui/reviews/TASK-2040-site-nav.scorecard.json` (promedio 4,6, piso 4,5); revisión de la sesión «Rediseño de Menú».
+- [ ] El paquete se publicó con versión nueva y la instalación privada quedó verificada. **Sin tildar:** el release exige push a `main` de AXIS, CI del mismo commit y tag; espera autorización del operador.
+- [x] `UI ready` se mantuvo en `no` hasta completar mapping, plan de captura y decision log; si pasó a `yes`,
+  `pnpm task:lint --task TASK-2040` quedó sin hallazgos. Se mantiene en `no`.
 
 ## Verification
 
@@ -426,7 +428,8 @@ hilos del canvas; se corrige el documento en el mismo commit.
 
 ## Open Questions
 
-- Nombre del grupo de tokens del menú y de los exports finales (se fijan en el discovery con la skill
-  `axis-design-system`).
-- Si el render de servidor se consume en WordPress como función JS en build o como plantilla PHP generada desde el
-  contrato; se decide aquí o en `TASK-2042`, con la opción documentada en la arquitectura.
+- ~~Nombre del grupo de tokens y exports~~: resuelto 2026-10-22. Grupo `axisSiteNav`; exports `./site-nav`,
+  `./site-nav.css` y `./site-nav.js` en primitives; esquema en contracts (arquitectura §Implementación en AXIS).
+- ~~Render en WordPress~~: resuelto 2026-10-22, de acuerdo con la sesión «Rediseño de Menú». `siteNavHtml` es la
+  única fuente de marcado; `TASK-2042` hace el port PHP y lo valida contra el fixture
+  `packages/primitives/fixtures/site-nav/agencia-creativa.html`.
