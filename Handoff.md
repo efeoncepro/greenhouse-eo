@@ -251,18 +251,3 @@ Estado operativo: lote y pruebas completados, sin compras/cambio de plan ni push
 por orden posterior de Julio, cierre documental completo con subagentes y skills espejo. Factura de las dos generaciones
 sin conciliar; aprobación creativa final y publicación no forman parte de estas pruebas. El ledger conserva el detalle
 y las evidencias; no repetir cargas ni generaciones para validar documentación.
-
-## 2026-10-16/17 — Landing HubSpot v2 publicada, dock móvil con agenda nativa y renderer CTA 1.3.1
-
-Live en https://efeoncepro.com/servicios-contratar-hubspot/ (página `244079`, OG `251991`): 14 widgets
-`greenhouse_hubspot_v2_*` por los 4 resultados de HubSpot, header/footer de Ohio, Service + FAQPage, Growth Form
-`efeonce-hubspot-scope` (direct a HubSpot). Dos rondas de QA desktop/390 corregidas (reveals scroll-driven que terminan
-en `entry`, comparación y tachado en móvil, fichas de agentes, cifras estáticas). Dock móvil: «Agendar reunión» = CTA
-`hubspot-discovery-meeting` (scheduler nativo, surface propia `csur-56a96b52…`, publicador
-`scripts/growth/publish-hubspot-meeting-cta.ts`, key 0600 en `.auth/`) + «Ir al formulario». Renderer CTA 1.3.1 corrige
-la cabecera del scheduler en móvil (`font` shorthand con `inherit`), commit `e7db7f558`.
-[Landing](.claude/skills/efeonce-public-site-wordpress/references/landings/hubspot-services.md) ·
-[Auditoría](docs/audits/public-site/2026-10-16-hubspot-v2-publication.md).
-Pendiente: release a producción del renderer 1.3.1 (hasta entonces el scheduler sigue partiendo «Cerrar agenda»),
-envío real del form, Rich Results/GSC, +90 vs +120 empresas, readback Gold. Fal sin saldo en ambas cuentas (A −0,29,
-B −0,35 USD); Higgsfield 3.690,6 créditos (Ultra).
