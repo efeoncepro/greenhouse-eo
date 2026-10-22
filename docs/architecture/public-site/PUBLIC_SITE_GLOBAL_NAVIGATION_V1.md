@@ -327,7 +327,10 @@ Reglas del documento:
 - **Enlaces seguros:** relativos al sitio, fragmento, `https` o `mailto`. Se rechazan `javascript:`, `//host` y `http`.
 - **Íconos:** `glyph` es un glifo de Trazo del catálogo de AXIS; uno desconocido es un error del documento.
 - **Paneles:** un primario sin `panel` es enlace directo; `lines`, `editorial` y `dropdown` son los únicos paneles. Los
-  hijos del onepage salen del panel (o de `onepage.items` en un enlace directo, como Contacto).
+  hijos del onepage salen del panel, o de `onepage.items` en un enlace directo, como Contacto. En un panel editorial,
+  `onepage.items` reemplaza a los formatos cuando el onepage dice otra cosa. Recursos lo usa: en el canvas sus hijos
+  llevan descripciones propias y el tercero es el Efeonce AI Visibility Report, no el formato «Herramientas».
+- **Marca de contexto:** «Estás aquí», con mayúscula inicial, como en todos los tableros del canvas.
 
 ### Datos dinámicos (Recursos)
 
