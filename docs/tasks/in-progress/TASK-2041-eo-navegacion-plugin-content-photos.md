@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `En curso desde 2026-10-22: discovery y plan; nada construido ni subido. Esquema site-nav.v1 code complete en AXIS (TASK-2040), release pendiente`
+- Status real: `Slices 1 a 3 code complete y probados en WordPress Playground (runtime 13cb164, sin push ni deploy). Pendientes: Slice 4 (fotos al bucket, deploy y apply en vivo, con autorización) y Slice 5 (diseño del admin)`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `TASK-2040 (sólo el Slice 2 de esta task, que valida contra el esquema site-nav.v1)`
@@ -386,6 +386,27 @@ Revisado con la sesión «Rediseño de Menú», autora del canvas y de esta task
 - Bucket: no existe script con caché inmutable; se escribe uno con guarda contra sobrescritura.
 - Fotos: las 51 del documento son los recortes finales del canvas v68 (2× del tamaño en pantalla). `op-s` se retiró.
 
+**Avance 2026-10-22 (Slices 1 a 3, local):** plugin en el runtime (`13cb164`, sin push). Servicio de guardado,
+`wp eo-nav`, REST y Recursos probados en WordPress Playground con `tests/playground/run-eo-site-nav.sh` (44 checks
+dentro de WordPress más WP-CLI real con el PHP local) y paridad del validador (35 casos). Qué es dinámico en Recursos,
+acordado con la sesión del menú:
+
+| Formato | Lista | Destacado |
+|---|---|---|
+| Glitch (`wp-category`) | Dinámica; tipo desde el prefijo del título | Dinámico (título, extracto, enlace, sello, CTA) |
+| Marketing con Manzanitas (`wp-post-type`) | Dinámica, sin categorías con formato propio | Fijo |
+| Herramientas (`think-feed`) | Fija | Fija: Think no tiene feed; pendiente del repo de Think |
+| Guías descargables | Fija | Fija |
+
+Hallazgos de la prueba: sin usuario, `get_posts` no devuelve el documento privado, y el adaptador pinta el menú a
+visitantes anónimos, así que la lectura va por consulta directa. La lista del blog repetía los posts de Glitch.
+Pendiente del Slice 4: agregar `wp-content/plugins/eo-site-nav` a `TARGETS` de `export-live-code-baseline.ts` y armar
+el carril de deploy acotado.
+
+**Excepción de fotos (2026-10-22):** las 9 fotos del polo solo (engine, web, seo y revenue en `mm` y `op`, más
+`contacto-op`) quedan como están. Lo decidió el operador («Déjalas así; ya las aprobé en el canvas»), según transmitió la
+sesión del menú. La excepción vale sólo para estas fotos del menú; no cambia la regla de vestuario para piezas nuevas.
+
 **Decisiones:** directorio `eo-site-nav`, prefijo `EOSN_`, text domain `eo-site-nav`, comandos `wp eo-nav`, REST
 `eo/v1/site-nav`. Respaldo del documento en el runtime: `manifests/site-nav/efeoncepro.com.json`.
 
@@ -516,14 +537,19 @@ Modelo del documento, reglas, plugin, REST y fotos:
 
 ## Acceptance Criteria
 
-- [ ] El plugin guarda un solo documento `site-nav.v1` por sitio en el tipo privado `eo_site_nav`, con revisiones
-  nativas.
+- [x] El plugin guarda un solo documento `site-nav.v1` por sitio en el tipo privado `eo_site_nav`, con revisiones
+  nativas. Evidencia: `tests/playground/run-eo-site-nav.sh` del runtime (44 checks + WP-CLI real), 2026-10-22.
 - [ ] Un documento que no pasa el esquema no se guarda, ni desde el admin ni desde WP-CLI (prueba automatizada).
-- [ ] `apply` con el mismo contenido no crea revisión nueva, y un guardado sobre una revisión base vieja da conflicto
-  visible (prueba automatizada).
+  Probado en el servicio y en WP-CLI (Playground). Sin tildar: la pantalla del admin (Slice 5) aún no existe.
+- [x] `apply` con el mismo contenido no crea revisión nueva, y un guardado sobre una revisión base vieja da conflicto
+  visible (prueba automatizada). Evidencia: Playground, servicio y `wp eo-nav apply` (409 legible, nada pisado).
 - [ ] `wp eo-nav export|validate|apply|revisions|restore` funcionan en vivo y `restore` crea una revisión nueva.
-- [ ] `GET /wp-json/eo/v1/site-nav` devuelve sólo el documento publicado, con `ETag`.
-- [ ] Recursos resuelve lo último por formato en el servidor y cae al destacado fijo si la fuente falla.
+  Probados con WP-CLI real contra un sitio de Playground. Sin tildar: falta en vivo (Slice 4, con autorización).
+- [x] `GET /wp-json/eo/v1/site-nav` devuelve sólo el documento publicado, con `ETag`. Evidencia: Playground (200 con
+  `ETag`, 304 con `If-None-Match`, 404 sin documento, sin escritura). En vivo se comprueba con el deploy.
+- [x] Recursos resuelve lo último por formato en el servidor y cae al destacado fijo si la fuente falla. Evidencia:
+  Playground (tipo de Glitch desde el título, hora de Santiago, invalidación al publicar/editar/recategorizar, fuente
+  caída, resultado válido contra el esquema). Reglas por formato en la arquitectura, §Datos dinámicos.
 - [ ] Las fotos del documento responden 200 desde `site-nav/v1/` con `Cache-Control: public, max-age=31536000,
   immutable`, y todas tienen alt.
 - [ ] El documento inicial refleja el contenido aprobado del canvas, con los pendientes de «Por confirmar» resueltos o

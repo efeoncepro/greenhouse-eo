@@ -115,7 +115,7 @@ Las flechas avisan qué abre algo; Inicio y Contacto son enlaces directos.
   decisión: `TASK-1802` (Delta 2026-10-20).
 - **Glitch** se nombra con su logo oficial negativo de AXIS. El resto de su línea gráfica no entra al menú.
 - **Esfera:** una sola por panel, en el acento de Growth.
-- **Contenido dinámico:** el centro y el destacado se alimentan de los últimos posts (§Datos dinámicos).
+- **Contenido dinámico:** según el formato, la lista y a veces el destacado siguen a los últimos posts (§Datos dinámicos).
 
 ### Desplegable «Nosotros»
 
@@ -331,14 +331,51 @@ Reglas del documento:
 
 ### Datos dinámicos (Recursos)
 
-El centro y el destacado de Recursos muestran lo último de cada formato. Se resuelven **en el servidor del sitio**, al
-pintar el menú, a partir de `source` (categoría de WordPress, o feed de Think para Glitch y las herramientas), con caché
-corta (transient de 10 a 15 min). Si la fuente falla, se usa el `featured` fijo del documento; el menú nunca queda vacío
-ni bloquea la página. El navegador no consulta la REST de WordPress.
+Lo último de cada formato se resuelve **en el servidor del sitio**, al pintar el menú, a partir de `source`. Lo hace
+`EOSN_Resources` del plugin (`TASK-2041`). Qué sigue a los posts, por formato (acordado con la sesión del menú el
+2026-10-22):
+
+| Formato | `source` | Lista (centro) | Destacado |
+|---|---|---|---|
+| Glitch | `wp-category` `glitch` | Dinámica | Dinámico: título, extracto, enlace, sello y CTA. Conserva el `kind` y la foto de marca del documento. |
+| Marketing con Manzanitas | `wp-post-type` `post` | Dinámica, sin las categorías que ya tienen formato propio (Glitch) | Fijo: presenta un formato evergreen con su foto de marca. |
+| Herramientas | `think-feed` `tools` | Fija | Fijo. Think no expone feed (verificado el 2026-10-22); queda pendiente en el repo de Think. |
+| Guías descargables | sin `source` | Fija | Fijo. |
+
+- **Tipo de edición de Glitch:** sale del prefijo del título. «Glitch Flash: X» se muestra como `FLASH · 28 SEP`,
+  «Glitch #17: X» como `EDICIÓN 17 · 28 JUL`, y un post sin prefijo como `GLITCH · fecha`. El prefijo se quita del
+  título que se pinta. El CTA del destacado sigue al tipo: «Leer el Flash», «Leer la edición» o «Leer en Glitch». El
+  filtro `eo_site_nav_resource_edition` reemplaza al parser si Glitch pasa a subcategorías (`TASK-1337`).
+- **Fechas:** con `wp_date`, en la zona del sitio (America/Santiago) y con el mes abreviado en mayúsculas.
+- **Caché:** transient de 12 min. Se invalida al publicar, despublicar o editar un post publicado y al cambiarlo de
+  categoría.
+- **Fallas:** si la fuente falla o viene vacía, se usa lo fijo del documento; una falla se recuerda 2 min. El menú
+  nunca queda vacío ni bloquea la página. Los textos se recortan a los límites del esquema y los enlaces quedan
+  relativos. El resultado sigue cumpliendo `site-nav.v1` (probado).
+- **Extensión:** `eo_site_nav_resolve_source` puede entregar cualquier fuente, por ejemplo un futuro feed de Think.
+- El navegador no consulta la REST de WordPress.
 
 ## Plugin «EO Navegación» (fuente de verdad)
 
-Plugin propio en `efeonce-public-site-runtime/wp-content/plugins/` (nombre de directorio por definir en la tarea).
+Plugin propio `efeonce-public-site-runtime/wp-content/plugins/eo-site-nav/` (`TASK-2041`, prefijo `EOSN_`). Slices
+1 a 3 construidos y probados en WordPress Playground el 2026-10-22, sin desplegar.
+
+- **Servicio de guardado (`EOSN_Store::save`):** es la única puerta de escritura. Sigue este orden:
+  1. permiso;
+  2. mensaje obligatorio;
+  3. validación;
+  4. idempotencia por hash del contenido (sin `revision` ni `updatedAt`);
+  5. conflicto si la revisión base del documento no es la vigente, revisado de nuevo bajo un bloqueo;
+  6. revisión nativa con autor y mensaje;
+  7. copia publicada con `ETag`;
+  8. purga.
+
+  El primer guardado de un sitio no compara la base porque no hay nada que pisar. Restaurar guarda el contenido de una
+  revisión como revisión nueva y nunca reescribe la historia. kses no toca el JSON.
+- **Lectura sin usuario:** el documento es privado, pero se lee sin sesión porque el adaptador pinta el menú a
+  visitantes anónimos.
+- **Purga:** usa el objeto de Kinsta que ve PHP. Si no está, el resultado lo dice y `wp eo-nav` corre
+  `kinsta cache purge --all`. Qué expone Kinsta desde una petición web se verifica en vivo en el Slice 4.
 
 - **Almacenamiento:** un tipo de contenido privado (`eo_site_nav`, no público, sin URL) con **revisiones nativas de
   WordPress**, una entrada por sitio. Las revisiones dan autor, fecha y vuelta atrás sin tabla propia.
@@ -356,9 +393,10 @@ Plugin propio en `efeonce-public-site-runtime/wp-content/plugins/` (nombre de di
   | `wp eo-nav revisions` / `wp eo-nav restore <revisión>` | Lista revisiones y vuelve a una anterior. |
 
   Los agentes los corren con `pnpm public-website:wpcli`, después de `pnpm public-website:ssh-check` y con la foto
-  previa del documento.
-- **Copia pública:** `GET /wp-json/eo/v1/site-nav`. Devuelve sólo el documento publicado, con `ETag` y
-  `Cache-Control` corto. Es la lectura para Think y otros sitios. La publicación adicional en el bucket de AXIS es una
+  previa del documento. Escribir exige `--user` con la capability, y `apply --dry-run` valida sin guardar. `export
+  --resolved` muestra Recursos como los vería el menú.
+- **Copia pública:** `GET /wp-json/eo/v1/site-nav` (`?site=` opcional). Devuelve sólo el documento publicado, con
+  `ETag`, `304` ante `If-None-Match`, `Cache-Control: public, max-age=300` y `404` si el sitio no tiene documento. Es la lectura para Think y otros sitios. La publicación adicional en el bucket de AXIS es una
   decisión abierta de PDR-027 (punto 3).
 - **Permisos:** escribir requiere `manage_options` o una capability propia (`eo_manage_site_nav`). La REST pública es de
   sólo lectura.
