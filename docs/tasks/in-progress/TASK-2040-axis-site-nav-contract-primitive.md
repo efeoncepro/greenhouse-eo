@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-055`
-- Status real: `Diseno aprobado en canvas (version 67); contrato, esquema y primitive sin construir`
+- Status real: `En curso desde 2026-10-22: discovery hecho; contrato, tokens y primitive en construcción en axis-design-system`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`

@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-10-22 — TASK-2040 navegación global en AXIS: en curso
+
+`TASK-2040` pasó a `in-progress` en `develop`. El código vive en `axis-design-system` (main, sin push ni release
+hasta autorización del operador). Coordinado con la sesión «Rediseño de Menú», que no toca AXIS ni TASK-2041/2042.
+Decisiones tomadas: render de servidor como función pura de JS con fixtures HTML de referencia (el port PHP es de
+TASK-2042); tiempos de cabecera al bajar y subir y el cierre del panel al empezar el scroll se fijan en el Lab.
+Pendiente de anotar por la otra sesión: la franja de Glitch apunta a la misma suscripción del blog (2026-10-20).
+
 ## 2026-10-22 — Redes Efeonce: love brand y canales v2
 
 Estrategia social y editorial registrada: [PDR-020 rev. 2.0](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)
