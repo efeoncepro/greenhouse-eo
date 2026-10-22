@@ -3,7 +3,7 @@
 > **Tipo:** Product Decision Record de plataforma del sitio público.
 > **Estado:** Accepted · 2026-10-18 · el operador decidió el alcance y el piloto el mismo día (§Decisiones del operador). Queda
 > abierta sólo la copia pública en el bucket, que se decide en la fase de Think.
-> **Ejecución:** [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md) con tres tasks: `TASK-2040`
+> **Ejecución:** [EPIC-055](../../epics/in-progress/EPIC-055-public-site-global-navigation.md) con tres tasks: `TASK-2040`
 > (mecanismo en AXIS), `TASK-2041` (plugin, contenido y fotos) y `TASK-2042` (puesta en el sitio). Las siete fases de
 > §Fases se reparten entre esas tres tasks.
 > **Arquitectura:** [Navegación global del sitio público V1](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md).

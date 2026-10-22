@@ -1,12 +1,25 @@
 # Handoff
 
-## 2026-10-22 — TASK-2040 navegación global en AXIS: code complete, release pendiente
+## 2026-10-22 — Navegación global (EPIC-055): TASK-2040 publicada, TASK-2041 a medio camino
 
-`axis-design-system` main tiene `8327593`, `0c8a230`, `5e97c59` y `19c711f` sin push: contrato `efeonce.site-nav`,
-esquema `site-nav.v1`, tokens `axisSiteNav`, render, CSS, JS, Lab y suite `playwright.site-nav.config.ts` (28 verdes).
-Revisado con la sesión «Rediseño de Menú». **Pendiente:** autorización del operador para push, CI y tag del release
-(tokens, contracts, registry, primitives); después, instalación privada y cierre de la task. La suite general
-`lab.spec.ts` ya fallaba antes y no corre en CI. Siguiente: TASK-2041 con la misma sesión.
+**TASK-2040 completa:** AXIS v0.7.7 (tokens 0.6.8, contracts 0.7.7, registry 0.7.4, primitives 0.7.0), con la
+instalación privada verificada. Antes del tag, la sesión «Rediseño de Menú» actuó como contralora de fidelidad con el
+canvas v68 y se corrigieron sus diferencias. Sigue de contralora en 2041 y 2042: mostrarle lo visible antes de cada
+cierre.
+
+**TASK-2041:**
+- Slices 1 a 3 en `efeonce-public-site-runtime` `main` (`13cb164` … `b0dd479`), **sin push**. Plugin `eo-site-nav`:
+  servicio de guardado, `wp eo-nav`, REST `eo/v1/site-nav` y Recursos dinámicos.
+- Verificado con `tests/playground/run-eo-site-nav.sh` (47 checks + WP-CLI real) y la paridad del validador.
+- 51 fotos subidas y verificadas en `site-nav/v1/` (autorizado por el operador).
+
+**Pendiente, con autorización del operador:**
+- Deploy del plugin por carril acotado; antes, agregar `eo-site-nav` a `TARGETS` de `export-live-code-baseline.ts`.
+- `apply` del documento inicial en vivo.
+- Verificar la purga de Kinsta desde PHP.
+- Diseño del admin (Slice 5).
+
+`main` local del runtime trae WIP ajeno: no tocarlo.
 
 ## 2026-10-22 — Redes Efeonce: love brand y canales v2
 

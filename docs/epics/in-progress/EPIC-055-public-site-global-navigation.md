@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Épica registrada el 2026-10-18. Diseño aprobado en el canvas (versión 67), PDR-027 Accepted (todo el sitio, piloto primero) y arquitectura escrita. 3 tasks hijas en to-do; ninguna empezada. Sin cambios en WordPress, AXIS ni el bucket.`
+- Status real: `En curso. TASK-2040 completa (AXIS v0.7.7, 2026-10-22). TASK-2041: slices 1 a 3 construidos y probados en local, y 51 fotos subidas y verificadas en el bucket; faltan deploy del plugin, apply en vivo y la pantalla del admin. TASK-2042 sin empezar. WordPress sin cambios`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Operador (alcance, piloto y go a todo el sitio) · Sitio público / WordPress (plugin y adaptador) · AXIS (contrato y primitive)`
@@ -80,13 +80,16 @@ esquema del contrato. `TASK-2042` depende de ambas.
     liviano.
   - Página del Lab y release del paquete.
   - Cubre cabecera, megas, desplegable, onepage, tableta, teléfono, teclado, foco, movimiento reducido y medición.
-  - **Estado 2026-10-22:** code complete en `axis-design-system` (sin push ni release). Release de paquetes pendiente
-    de autorización; con él `TASK-2041` fija la versión del esquema `site-nav.v1.schema.json`.
+  - **Estado 2026-10-22: completa.** Publicada en AXIS v0.7.7: `axis-tokens` 0.6.8, `axis-ui-contracts` 0.7.7,
+    `axis-ui-registry` 0.7.4 y `axis-ui-primitives` 0.7.0, con la instalación privada verificada. `TASK-2041` fija el
+    esquema de esa versión (sha256 `10a6a55…`).
 - `TASK-2041` — **Contenido.**
   - Plugin «EO Navegación»: documento validado, revisiones, admin, WP-CLI `wp eo-nav` y REST pública.
   - Resolución de los datos dinámicos de Recursos.
   - Fotos al bucket de AXIS en `site-nav/v1/`, coordinadas con quien esté tocando AXIS.
   - Carga del documento inicial con el contenido aprobado del canvas.
+  - **Estado 2026-10-22:** slices 1 a 3 en local (runtime, sin push). Fotos subidas y verificadas en `site-nav/v1/`.
+    Faltan el deploy del plugin, el `apply` en vivo y el diseño del admin.
 - `TASK-2042` — **Puesta en el sitio.**
   - Adaptador de encabezado en `ohio-child`, con interruptor `off`/`pilot`/`on`.
   - Inventario y resolución de las variantes de encabezado de Ohio.

@@ -1,6 +1,6 @@
 # EPIC-055 — Navegación global del sitio: flujo maestro
 
-> Flujo de programa de [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md). Lo usan `TASK-2040`
+> Flujo de programa de [EPIC-055](../../epics/in-progress/EPIC-055-public-site-global-navigation.md). Lo usan `TASK-2040`
 > (mecanismo) y `TASK-2042` (puesta en el sitio).
 >
 > - Fuente: notas «Cómo se comporta», «Accesible y medible», «Movimiento», «Cómo se construye» y «Agendar desde el menú»

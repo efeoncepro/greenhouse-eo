@@ -166,7 +166,7 @@ Canonical evidence:
 Use this when the user asks how to add a URL to the public-site menu. Do not
 mutate the menu during discovery.
 
-> Planned, nothing in runtime as of 2026-10-18: [EPIC-055](../../../../docs/epics/to-do/EPIC-055-public-site-global-navigation.md)
+> Planned, nothing in runtime as of 2026-10-18: [EPIC-055](../../../../docs/epics/in-progress/EPIC-055-public-site-global-navigation.md)
 > and [PDR-027](../../../../docs/public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md) (Accepted 2026-10-18)
 > replace this Ohio header (term 61 and its mega menu) with the portable `efeonce.site-nav` navigation,
 > behind a switch and a pilot (TASK-2042). Until that reaches `on`, the facts in this section and the next remain

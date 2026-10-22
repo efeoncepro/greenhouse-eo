@@ -6,7 +6,7 @@ Dueño: Sitio público / WordPress + AXIS
 
 Decisión: [PDR-027 — Navegación global del sitio, portable entre sitios](../../public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md)
 
-Programa: [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md)
+Programa: [EPIC-055](../../epics/in-progress/EPIC-055-public-site-global-navigation.md)
 
 Diseño aprobado: canvas «Mega menú efeoncepro.com» —
 [claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj](https://claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj), versión 67 al 2026-10-18.

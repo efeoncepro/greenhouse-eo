@@ -24,7 +24,7 @@
 - Status real: `Slices 1 a 3 code complete y probados en WordPress Playground (runtime f9c7bce, sin push ni deploy). Slice 4: 51 fotos subidas y verificadas en el bucket; faltan deploy del plugin y apply en vivo (con autorización). Slice 5: diseño del admin`
 - Rank: `TBD`
 - Domain: `content`
-- Blocked by: `TASK-2040 (sólo el Slice 2 de esta task, que valida contra el esquema site-nav.v1)`
+- Blocked by: `none`
 - Branch: `Greenhouse develop para docs; el codigo vive en efeonce-public-site-runtime con su contrato de rama y release acotado por SSH; sin worktrees`
 
 ## Summary

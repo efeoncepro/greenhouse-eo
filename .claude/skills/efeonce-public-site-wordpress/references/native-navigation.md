@@ -9,7 +9,7 @@ or introduce a second navigation component for a new landing.
 > on 2026-10-18: Ohio's header will be replaced site-wide by the portable navigation (`efeonce.site-nav`), pilot on one
 > page first. Architecture:
 > [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`](../../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md);
-> program: [EPIC-055](../../../../docs/epics/to-do/EPIC-055-public-site-global-navigation.md). Until TASK-2042 sets the
+> program: [EPIC-055](../../../../docs/epics/in-progress/EPIC-055-public-site-global-navigation.md). Until TASK-2042 sets the
 > `eo_site_nav_enabled` switch to `pilot`/`on` for a page, the rule above stands for that page: keep Ohio and make every
 > menu change on term 61 with this procedure. Where the new header is live, the rule is replaced **only for the global
 > header**: landings still never create their own navigation, and menu editing moves to the single document of the

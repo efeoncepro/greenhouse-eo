@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-055`
-- Status real: `Code complete en axis-design-system main (8327593, 0c8a230, 5e97c59, 19c711f; sin push): contrato, esquema, tokens, primitive, Lab y suite verdes; falta release de paquetes con autorización del operador`
+- Status real: `Completa el 2026-10-22: publicado en AXIS v0.7.7 (axis-tokens 0.6.8, axis-ui-contracts 0.7.7, axis-ui-registry 0.7.4, axis-ui-primitives 0.7.0) e instalación privada verificada. Sin consumidor en un sitio todavía: lo monta TASK-2042 con los datos de TASK-2041`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -398,9 +398,30 @@ hilos del canvas; se corrige el documento en el mismo commit.
 - [x] El contraste del texto sobre el vidrio es ≥ 4,5:1 en navy, negro y navy con resplandor. Evidencia: e2e por píxel más claro bajo la cápsula; fotos claras quedan como QA del piloto (TASK-2042).
 - [x] La página del Lab muestra el menú con los ajustes «Contexto» y «Cabecera». Evidencia: `/patterns/efeonce.site-nav/` (captura `lab-patron.webp`).
 - [x] Se capturó y se miró la evidencia desktop y 390 px, y el scorecard cumple el umbral. Evidencia: AXIS `docs/evidence/site-nav/` (15 frames) y `docs/ui/reviews/TASK-2040-site-nav.scorecard.json` (promedio 4,6, piso 4,5); revisión de la sesión «Rediseño de Menú».
-- [ ] El paquete se publicó con versión nueva y la instalación privada quedó verificada. **Sin tildar:** el release exige push a `main` de AXIS, CI del mismo commit y tag; espera autorización del operador.
+- [x] El paquete se publicó con versión nueva y la instalación privada quedó verificada. Evidencia 2026-10-22: tag
+  `v0.7.7` sobre `b23fcc0` con la CI del mismo commit en verde, y workflow «Release UI packages» en verde (pruebas de
+  navegador de publicación y publicación). En un directorio limpio, con el registro privado, se instalaron tokens 0.6.8,
+  contracts 0.7.7, registry 0.7.4 y primitives 0.7.0. `validateSiteNav` acepta el ejemplo y el render publicado es
+  idéntico al fixture. El CSS trae el subrayado de la franja, el JS existe y el hash del esquema es `10a6a55…`, el que
+  fija el plugin de TASK-2041.
 - [x] `UI ready` se mantuvo en `no` hasta completar mapping, plan de captura y decision log; si pasó a `yes`,
   `pnpm task:lint --task TASK-2040` quedó sin hallazgos. Se mantiene en `no`.
+
+## Cierre (2026-10-22)
+
+Antes del tag, la sesión «Rediseño de Menú» actuó como contralora de fidelidad con el canvas v68. Comparó el texto
+campo por campo y las medidas con `getComputedStyle`, y encontró diferencias que se corrigieron antes de publicar:
+
+- Enlaces de texto de la franja subrayados en reposo.
+- Hijos de Recursos en el onepage como en el canvas (`onepage.items` en paneles editoriales).
+- «Estás aquí» con mayúscula.
+- Pantallas de 700 a 799 de alto: titular de 36 px, franja de 56 y foto de 168.
+- Tableta: etiquetas de 40, líneas de 18 y sin respuesta en vertical.
+
+La CI encontró dos fallas de infraestructura, también corregidas: la suite de site-nav pedía el Chromium de Playwright,
+que el runner no instala (ahora usa el Chrome real, con una guarda), y la prueba de axe medía a mitad de una transición.
+La sesión del menú volvió a medir y dio el visto bueno antes del release. Commits de AXIS: `cfd4e4d`, `b787744`,
+`602f53f`, `cc8b3bc` y `b23fcc0`.
 
 ## Verification
 
@@ -410,15 +431,15 @@ hilos del canvas; se corrige el documento en el mismo commit.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] EPIC-055 actualizada con el estado de esta task y la versión publicada del paquete
-- [ ] `docs/architecture/public-site/PRIMITIVES.md` registra `efeonce.site-nav` con su versión
+- [x] EPIC-055 actualizada con el estado de esta task y la versión publicada del paquete
+- [x] `docs/architecture/public-site/PRIMITIVES.md` registra `efeonce.site-nav` con su versión
 
 ## Follow-ups
 

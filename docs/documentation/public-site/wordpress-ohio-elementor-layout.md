@@ -103,7 +103,7 @@ probar first paint/no-JS y revisar el CSS inicial emitido por Ohio.
 
 > **Delta 2026-10-18 — navegación nueva planificada.** Ya hay una navegación nueva diseñada para todo el sitio
 > (cabecera de vidrio, mega menús con fotos y menú a pantalla completa), planificada en
-> [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md) y propuesta en
+> [EPIC-055](../../epics/in-progress/EPIC-055-public-site-global-navigation.md) y propuesta en
 > [PDR-027](../../public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md). Si se aprueba y se construye,
 > reemplazará el encabezado de Ohio con un interruptor (apagado, piloto en una página, todo el sitio) y la opción de
 > volver a Ohio. **Hoy no hay nada de eso en el sitio:** el encabezado y el menú siguen siendo los de Ohio y todo lo

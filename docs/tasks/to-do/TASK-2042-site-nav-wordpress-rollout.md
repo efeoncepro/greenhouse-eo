@@ -24,7 +24,7 @@
 - Status real: `Wireframe y flujo del host escritos; adaptador, interruptor, superficie del agendador y medición sin construir`
 - Rank: `TBD`
 - Domain: `content`
-- Blocked by: `TASK-2040, TASK-2041`
+- Blocked by: `TASK-2041`
 - Branch: `Greenhouse develop para docs y scripts de Growth; el codigo del sitio vive en efeonce-public-site-runtime con release acotado por SSH; sin worktrees`
 
 ## Summary
