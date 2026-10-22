@@ -1,5 +1,9 @@
 # Handoff
 
+## 2026-10-22 — Cotizador local: perfiles y costos Réditos
+
+Catálogo v13 / recursos v12 / créditos v1 activos en CLI; tres perfiles nuevos estimados y Awario público. [Costo y evidencia](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md). Propuesta detenida; sin importación DB, commit o push. Suite: 1.860 aprobadas, tres omitidas.
+
 ## 2026-10-22 — Navegación global (EPIC-055): TASK-2040 publicada, TASK-2041 a medio camino
 
 **TASK-2040 completa:** AXIS v0.7.7 (tokens 0.6.8, contracts 0.7.7, registry 0.7.4, primitives 0.7.0), con la
@@ -17,8 +21,12 @@ cierre.
   `build-site-nav-plugin-package.cjs` + `deploy-site-nav-plugin-package.php`. Respaldo:
   `/tmp/eo-site-nav-before-20261022-210707.tar`. Rollback: `wp plugin deactivate eo-site-nav`.
 
+- **Documento del menú aplicado en vivo**: revisión 1 (`510ca5012d95`). La REST `eo/v1/site-nav` da 200 con ETag y
+  304. El sitio sigue con Ohio. Fuente: `manifests/site-nav/efeoncepro.com.json` en el runtime.
+- AXIS `v0.4.30` (brand-assets 0.4.30 con YouTube en negativo, primitives 0.7.1 con los íconos de redes alineados):
+  ver TASK-2041.
+
 **Pendiente, con autorización del operador:**
-- `apply` del documento inicial en vivo.
 - Verificar la purga de Kinsta desde PHP.
 - Diseño del admin (Slice 5).
 
@@ -252,13 +260,3 @@ Meta sin Lead hasta publicar políticas de medición (Performance, Medios, HubSp
 Server en el dataset `708931297255942` (stats con ~1 h de retraso). Form deduplica 60 min por email: QA con alias `+`.
 Search Console activo (el `invalid_grant` era del script: usar `getSearchConsoleConnection`); GA4 de Efeonce conectado
 por primera vez hoy, Berel/Sky intactos. Follow-ups: archivar contacto `+meta` en HubSpot, pedir indexación en GSC.
-
-## 2026-10-17 — Brochures aprobados: no recortar ni revalidar
-
-Julio ratificó aprobación comercial completa: los brochures no necesitan nada más. [Regla vigente](docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md), cargada por Codex/Claude y radar personal.
-El original de contenidos (57) está intacto; la copia Aloja (38), documento `357366114`, no está aprobada
-ni se reutiliza. Corrección documental; no modifica PDF, documentos HubSpot ni envía correos.
-[Antecedentes](docs/audits/commercial/2026-10-17-approved-brochures-correction.md).
-
-
-Historial de sesiones: [Handoff.archive.md](Handoff.archive.md).

@@ -1,5 +1,10 @@
 # changelog.md
 
+## 2026-10-22 — Cotizador CLI: perfiles y recursos de referencia
+
+- Mantenimiento versionado: tres perfiles faltantes, costos CO estimados y referencia Awario, conservando políticas y controles. [Evidencia](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md). Sin cambios de motor ni publicación a plataforma.
+
+
 [Historial interno](docs/changelog/internal/README.md).
 
 ## 2026-10-22 — Navegación global del sitio: mecanismo en AXIS (TASK-2040)
@@ -7,8 +12,8 @@
 - AXIS ya tiene `efeonce.site-nav`: esquema `site-nav.v1` (JSON Schema para el plugin), tokens `axisSiteNav`, render
   de servidor, `site-nav.css` y `site-nav.js` sin dependencias, demo y página del Lab y suite de navegador en el CI.
   Publicado en AXIS v0.7.7 (contracts 0.7.7, primitives 0.7.0), igualado al canvas en textos y medidas.
-- WordPress: plugin `eo-site-nav` (TASK-2041) activo en efeoncepro.com, todavía sin documento del menú: el sitio
-  conserva la cabecera de Ohio. Las fotos del menú ya
+- WordPress: plugin `eo-site-nav` (TASK-2041) activo, con el documento del menú aplicado (revisión 1) y su copia
+  pública en `/wp-json/eo/v1/site-nav`. El sitio conserva la cabecera de Ohio hasta TASK-2042. Las fotos del menú ya
   están en `storage.googleapis.com/efeonce-group-axis-public-media/site-nav/v1/`.
 - Decidido en el Lab: cabecera 300/400 ms, el mega se cierra con más de 48 px de scroll, tono de la isla por
   `data-site-nav-tone` con luminancia de respaldo; destinos `/servicios/`, `/blog/` y `/agenda/`.
@@ -668,9 +673,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 
 - Correcciones comunes de fechas, monto acordado, adjuntos por período/owner y reintentos atómicos; órdenes y cascade coherentes, sin parciales contractor. Revisiones adicionales cubren concurrencia, snapshot de tarifa y precisión de cantidades.
 - 333 pruebas focales, TypeScript/lint/build/workers y PostgreSQL local aislado PASS; suite global 18.014 PASS, un fallo ajeno de SVG AXIS y 48 skipped. [Auditoría](docs/audits/payroll/CONTRACTOR_FLOW_PRE_RELEASE_AUDIT_2026-10-05.md). Release, canary y recovery pendientes; sin push, deploy ni operaciones financieras reales.
-
-## 2026-10-05 — Efeonce Factory: su marca y la aplicación en Notion
-
-- Aprobada la ruta A: «Factory» en Poppins Bold con la órbita en su «o», esfera en Growth, la F en órbita como símbolo; terminaciones del anillo concéntricas a la esfera (única diferencia con la familia). ADR [`EFEONCE_FACTORY_MARK_DECISION_V1.md`](docs/architecture/EFEONCE_FACTORY_MARK_DECISION_V1.md).
-- `scripts/brand/build-factory-logos.mjs` genera 18 SVG; sellados en `axis-brand-assets` 0.4.22 (axis-design-system `dd82e11`, sin push ni publicar).
-- Portadas de Notion (Teamspace, Proyectos, Tareas, Sprints), avatar del teamspace y anuncio 16:9 sobre un estudio fuera de foco hecho con `pnpm foto:generar`; fichas en `ai-generations/2026-10-05_factory-notion-bokeh/` (las PNG no van a git).

@@ -363,8 +363,10 @@ Lo último de cada formato se resuelve **en el servidor del sitio**, al pintar e
 ## Plugin «EO Navegación» (fuente de verdad)
 
 Plugin propio `efeonce-public-site-runtime/wp-content/plugins/eo-site-nav/` (`TASK-2041`, prefijo `EOSN_`). Versión
-0.1.0, **activo en efeoncepro.com desde el 2026-10-22** y todavía sin documento: la REST responde `404 eosn_not_found` y
-el sitio sigue con la cabecera de Ohio. Se despliega con el carril acotado de abajo.
+0.1.0, **activo en efeoncepro.com desde el 2026-10-22**, con el documento del sitio en la revisión 1
+(`manifests/site-nav/efeoncepro.com.json` en el runtime, generado por `build-efeoncepro-document.mjs`). La REST pública
+ya lo sirve; el sitio sigue con la cabecera de Ohio hasta que TASK-2042 encienda el adaptador. Se despliega con el
+carril acotado de abajo.
 
 - **Deploy:**
   1. `pnpm public-website:export-live-code`, que incluye `eo-site-nav` en `TARGETS`.
@@ -414,7 +416,15 @@ el sitio sigue con la cabecera de Ohio. Se despliega con el carril acotado de ab
   previa del documento. Escribir exige `--user` con la capability, y `apply --dry-run` valida sin guardar. `export
   --resolved` muestra Recursos como los vería el menú.
 - **Copia pública:** `GET /wp-json/eo/v1/site-nav` (`?site=` opcional). Devuelve sólo el documento publicado, con
-  `ETag`, `304` ante `If-None-Match`, `Cache-Control: public, max-age=300` y `404` si el sitio no tiene documento. Es la lectura para Think y otros sitios. La publicación adicional en el bucket de AXIS es una
+  `ETag`, `304` ante `If-None-Match` y `404` si el sitio no tiene documento.
+- **Caché en efeoncepro.com (medida el 2026-10-22):**
+  - El plugin envía `Cache-Control: public, max-age=300`, pero el borde de Kinsta (Cloudflare, `ki-cache-type: Edge`)
+    lo reescribe como `public, max-age=0, s-maxage=86400` y guarda la copia hasta un día.
+  - Lo que la mantiene al día es la purga de cada guardado: `purge_complete_caches()` limpia la caché del sitio y la del
+    CDN, y el borde vuelve a pedir la REST al origen unos 40 s después. Medido en vivo: HIT con `age` creciente → `MISS`
+    a los 43 s → HIT con `age: 10`. Un consumidor (Think, otro sitio) ve un guardado en menos de un minuto.
+  - Kinsta omite esa purga si el autopurge del sitio está desactivado. Hoy está activo; el plugin debe pasar
+    `force` para no depender de eso (pendiente de TASK-2041). Es la lectura para Think y otros sitios. La publicación adicional en el bucket de AXIS es una
   decisión abierta de PDR-027 (punto 3).
 - **Permisos:** escribir requiere `manage_options` o una capability propia (`eo_manage_site_nav`). La REST pública es de
   sólo lectura.

@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Slices 1 a 3 code complete y probados. Slice 4: plugin 0.1.0 desplegado y activo en efeoncepro.com (2026-10-22, sin documento: sitio sin cambios) y 51 fotos en el bucket; falta el apply del documento inicial (con autorización). Slice 5: diseño del admin`
+- Status real: `Slices 1 a 4 en producción el 2026-10-22: plugin 0.1.0 activo, fotos en el bucket y documento de efeoncepro.com aplicado (revisión 1, REST pública con ETag). El sitio sigue con la cabecera de Ohio hasta TASK-2042. Slice 5: diseño del admin aprobado (dirección B con el árbol de A, 2026-10-22); falta construirlo`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -462,6 +462,34 @@ Ya resueltos antes: las respuestas por servicio (aprobadas el 17-10), Influencer
 línea, y las dos esferas como excepción. El `apply` no se hace hasta tener YouTube y la lista de lecturas, porque
 publica la copia por la REST aunque el sitio todavía no pinte el menú.
 
+**Documento aplicado en vivo (2026-10-22, autorizado por el operador: «aplica en vivo el documento del menú con wp
+eo-nav apply»):**
+
+- Revisión 1, hash `510ca5012d95`, con el mensaje «Documento inicial: contenido aprobado del canvas v68, lecturas
+  reales aprobadas por el operador y YouTube (TASK-2041)». La guardó el usuario de integración 12 con
+  `WP_CLI::run_command('eo-nav apply')`, que es el mismo servicio de guardado. `runcommand` con la ruta entre comillas
+  no leía el archivo, y en ese intento no se guardó nada.
+- La purga se hizo por el objeto de Kinsta que ve PHP (`Caché: kinsta`), así que el camino de purga del servicio
+  queda verificado desde CLI. Queda por verificar desde una petición web: lo hará la pantalla del admin.
+- La portada y `/agencia-creativa/` siguen con la cabecera de Ohio. La copia pública por REST ya está en vivo.
+- **Rollback:** no hay versión anterior que restaurar. Si hace falta, se aplica un documento corregido como revisión
+  2, o se desactiva el plugin.
+
+**Caché del borde y purga, medidas en vivo (2026-10-22; prueba autorizada por el operador: «Prueba sólo la purga…
+sin crear revisiones»):**
+
+- **Cabecera real de la REST:** `cache-control: public, max-age=0, s-maxage=86400`, con `x-kinsta-cache: HIT` y
+  `ki-cache-type: Edge`. El borde de Kinsta reescribe el `max-age=300` del plugin; sin pasar por la caché (`BYPASS`)
+  llega el `max-age=300` original. Lo detectó la sesión del menú: mi primera verificación había llegado al origen.
+- **Prueba:** sólo `EOSN_Cache::purge()` a las 21:41:30 UTC, sin revisiones (siguió habiendo 1).
+  - El borde sirvió la copia vieja hasta las 21:42:02 (`age` 276).
+  - Dio `MISS` a las 21:42:13 y volvió a guardar a las 21:42:33 (`age: 10`).
+  - Conclusión: la purga llega al borde en unos 40 s, así que un guardado es visible para Think u otro sitio en menos de
+    un minuto.
+- **Pendiente de código (va con el próximo deploy del plugin, Slice 5):** `purge_complete_caches()` de Kinsta no hace
+  nada si el autopurge está desactivado. Hoy está activo (`kinsta\kmp\is_autopurge_enabled() = true`), pero
+  `EOSN_Cache` lo reporta como hecho igual. Hay que pasar `force = true` y comprobar el resultado.
+
 **Decisiones:** directorio `eo-site-nav`, prefijo `EOSN_`, text domain `eo-site-nav`, comandos `wp eo-nav`, REST
 `eo/v1/site-nav`. Respaldo del documento en el runtime: `manifests/site-nav/efeoncepro.com.json`.
 
@@ -599,19 +627,30 @@ Modelo del documento, reglas, plugin, REST y fotos:
 - [x] `apply` con el mismo contenido no crea revisión nueva, y un guardado sobre una revisión base vieja da conflicto
   visible (prueba automatizada). Evidencia: Playground, servicio y `wp eo-nav apply` (409 legible, nada pisado).
 - [ ] `wp eo-nav export|validate|apply|revisions|restore` funcionan en vivo y `restore` crea una revisión nueva.
-  Probados con WP-CLI real contra un sitio de Playground. Sin tildar: falta en vivo (Slice 4, con autorización).
-- [x] `GET /wp-json/eo/v1/site-nav` devuelve sólo el documento publicado, con `ETag`. Evidencia: Playground (200 con
-  `ETag`, 304 con `If-None-Match`, 404 sin documento, sin escritura). En vivo se comprueba con el deploy.
+  En vivo: `apply` (revisión 1), `revisions` y `export` (sin documento, antes del apply). Los cinco subcomandos están
+  registrados. `restore` y su revisión nueva sólo se probaron en Playground: en vivo no se corre sin necesidad, porque
+  crearía una revisión. Sin tildar por eso.
+- [x] `GET /wp-json/eo/v1/site-nav` devuelve sólo el documento publicado, con `ETag`. Evidencia en vivo 2026-10-22:
+  404 `eosn_not_found` antes del apply, POST 404 y, después, 200 con la revisión 1, `Cache-Control: public,
+  max-age=300` y `ETag` (Kinsta la entrega débil, `W/`). Con `If-None-Match` responde 304, y el cuerpo es idéntico a
+  `manifests/site-nav/efeoncepro.com.json`.
 - [x] Recursos resuelve lo último por formato en el servidor y cae al destacado fijo si la fuente falla. Evidencia:
   Playground (tipo de Glitch desde el título, hora de Santiago, invalidación al publicar/editar/recategorizar, fuente
   caída, resultado válido contra el esquema). Reglas por formato en la arquitectura, §Datos dinámicos.
 - [x] Las fotos del documento responden 200 desde `site-nav/v1/` con `Cache-Control: public, max-age=31536000,
   immutable`, y todas tienen alt. Evidencia 2026-10-22: las 51 URL dan 200, con esa cabecera, `image/webp` y los mismos
   bytes que el original (curl de cada una). El alt lo exige el esquema y el documento de ejemplo valida.
-- [ ] El documento inicial refleja el contenido aprobado del canvas, con los pendientes de «Por confirmar» resueltos o
-  explícitamente diferidos.
-- [ ] La franja de Recursos apunta a la suscripción del blog (misma lista que Glitch) y no existe formulario ni lista
-  propia del menú.
+- [x] El documento inicial refleja el contenido aprobado del canvas, con los pendientes de «Por confirmar» resueltos o
+  explícitamente diferidos. Evidencia: la revisión 1 en vivo sale de `siteNavExample` 0.7.7 con las fotos del bucket,
+  YouTube y las 14 lecturas reales aprobadas. El título de ANAM se acortó para el menú, a pedido del operador. Los
+  cuatro pendientes quedaron resueltos (tabla de arriba), y la sesión del menú revisó la fidelidad antes del apply.
+- [x] La franja de Recursos apunta a la suscripción del blog (misma lista que Glitch) y no existe formulario ni lista
+  propia del menú. Evidencia: `strip.cta` es «Suscríbete a Glitch», con `action: link` y `fallbackHref: /blog/`. El
+  esquema no admite formularios.
+- [ ] `EOSN_Cache` llama a `purge_complete_caches( true )` y sólo reporta la purga como hecha si Kinsta respondió. Hoy
+  puede reportar `kinsta` aunque el autopurge esté desactivado y no haya purgado. Va con el deploy del Slice 5, con
+  prueba en Playground (autopurge simulado como apagado) y, en vivo, el borde renovado en menos de un minuto después de
+  un guardado desde el admin.
 - [ ] La pantalla del admin y WP-CLI llaman al mismo servicio de guardado (sin lógica duplicada).
 - [ ] Se capturó y se miró la evidencia de la pantalla del admin y el scorecard cumple el umbral.
 - [ ] `UI ready` se mantuvo en `no` hasta tener el diseño de la pantalla aprobado, el mapping, el plan de captura y el

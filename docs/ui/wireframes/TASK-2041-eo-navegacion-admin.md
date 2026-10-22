@@ -92,6 +92,33 @@ instancia local, con un usuario de prueba:
 - **Verificaciones:** el documento guardado es igual al exportado por `wp eo-nav export`; el error no guarda; la
   restauración crea una revisión nueva.
 
+## Direcciones propuestas (2026-10-22) — elegida: B con el árbol de A
+
+Tres maquetas sobre este wireframe, con el documento real de efeoncepro.com y el aspecto del admin de WordPress.
+Capturas en [`docs/ui/reviews/TASK-2041-admin-direcciones/`](../reviews/TASK-2041-admin-direcciones/).
+
+| Dirección | Qué es | A favor | En contra |
+|---|---|---|---|
+| A · WordPress nativo | Árbol a la izquierda e inspector del nodo; la vista previa se abre aparte | La más barata de construir y mantener (`@wordpress/components`); se ve como cualquier pantalla de Ajustes | Se edita sin ver el menú |
+| B · Vista previa en vivo | Árbol, editor angosto y, al lado, el menú pintado con el render de AXIS, más el historial | La que más confianza da a una persona no técnica: ve el resultado antes de guardar | La más cara: la vista previa se repinta en cada cambio |
+| C · Mapa del menú | Cada línea de Soluciones como tarjeta con foto y servicios; el editor se abre en un panel | Se edita viendo la forma real del mega | Natural para Soluciones, forzado para el pie, el contexto «Estás aquí» o Recursos |
+
+**Reglas de fidelidad para cualquier dirección** (revisión de la sesión del menú, 2026-10-22; las maquetas ya las
+cumplen):
+
+- Los colores de línea se leen de `axis-tokens` (`efeonceGraphicLine.lines[].accentOnDark`), como en el primitive; nunca
+  se escriben a mano. Una primera versión de las maquetas inventó Voice violeta y dejó Revenue sin color: son `#f83902`
+  y `#e86bd0`.
+- La ayuda de «Respuesta» dice dónde aparece: en la columna de la foto del mega menú y como palabra grande del onepage.
+- Los campos de texto largo (lectura sugerida, texto alternativo) crecen y nunca cortan el contenido.
+
+**Recomendación:** B, con el árbol y el lenguaje de A, porque el riesgo de esta pantalla es guardar algo que se ve mal
+y la vista previa al lado lo evita. Si el costo pesa, A con la vista previa en un panel lateral es la salida intermedia.
+**Decisión del operador (2026-10-22):** «Elijo la dirección B (vista previa en vivo) con el árbol de A para el admin».
+Se construye esa dirección: árbol de A, editor angosto, vista previa con el render de AXIS en 1440 y 390, historial con
+comparar y restaurar debajo, y las reglas de fidelidad de arriba. `UI ready` pasa a `yes` cuando el mapping de
+implementación y el plan de captura estén completos para esta dirección.
+
 ## Design Decision Log
 
 | Decisión | Por qué |
@@ -101,3 +128,4 @@ instancia local, con un usuario de prueba:
 | Mismo command que WP-CLI | Full API Parity: personas y agentes no pueden divergir. |
 | Conflicto visible | Personas y agentes editan el mismo documento; pisar en silencio rompe la confianza. |
 | Diseño visual por aprobar | No existe dirección aprobada para esta pantalla; no se inventa. |
+| Dirección B con el árbol de A (2026-10-22) | Elegida por el operador entre tres maquetas: la vista previa al lado, con el mismo render del sitio, evita guardar algo que se ve mal. |
