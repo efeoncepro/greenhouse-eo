@@ -362,8 +362,21 @@ Lo último de cada formato se resuelve **en el servidor del sitio**, al pintar e
 
 ## Plugin «EO Navegación» (fuente de verdad)
 
-Plugin propio `efeonce-public-site-runtime/wp-content/plugins/eo-site-nav/` (`TASK-2041`, prefijo `EOSN_`). Slices
-1 a 3 construidos y probados en WordPress Playground el 2026-10-22, sin desplegar.
+Plugin propio `efeonce-public-site-runtime/wp-content/plugins/eo-site-nav/` (`TASK-2041`, prefijo `EOSN_`). Versión
+0.1.0, **activo en efeoncepro.com desde el 2026-10-22** y todavía sin documento: la REST responde `404 eosn_not_found` y
+el sitio sigue con la cabecera de Ohio. Se despliega con el carril acotado de abajo.
+
+- **Deploy:**
+  1. `pnpm public-website:export-live-code`, que incluye `eo-site-nav` en `TARGETS`.
+  2. `node scripts/public-website/build-site-nav-plugin-package.cjs <baseline>`: empaqueta los archivos del plugin
+     versionados en git, con su sha256 y el del archivo vivo (`previousSha256`), y se niega si hay cambios sin commit.
+  3. `pnpm public-website:wpcli -- --eval-file scripts/public-website/deploy-site-nav-plugin-package.php --input-file
+     <zip> --input-file <manifest> --wp-user 12`.
+
+  El deploy valida la lista de rutas y los hashes, aborta si lo vivo cambió, respalda en un `.tar` del `/tmp` remoto,
+  escribe el archivo principal al final y activa. Antes de activar limpia la caché de la lista de plugins: WP-CLI la
+  lee al arrancar, y sin limpiarla la activación falla con «cabecera no válida» (pasó el 2026-10-22).
+  Rollback: `wp plugin deactivate eo-site-nav` y restaurar el `.tar`.
 
 - **Servicio de guardado (`EOSN_Store::save`):** es la única puerta de escritura. Sigue este orden:
   1. permiso;

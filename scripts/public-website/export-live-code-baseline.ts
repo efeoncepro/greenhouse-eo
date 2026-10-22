@@ -79,6 +79,11 @@ const TARGETS: Target[] = [
     required: false
   },
   {
+    label: 'EO site navigation plugin (TASK-2041)',
+    remotePath: 'wp-content/plugins/eo-site-nav',
+    required: false
+  },
+  {
     label: 'Ohio HubSpot form styler plugin',
     remotePath: 'wp-content/plugins/ohio-hubspot-form-styler',
     required: false

@@ -13,8 +13,11 @@ cierre.
 - Verificado con `tests/playground/run-eo-site-nav.sh` (47 checks + WP-CLI real) y la paridad del validador.
 - 51 fotos subidas y verificadas en `site-nav/v1/` (autorizado por el operador).
 
+- **Plugin desplegado y activo en producción** (0.1.0, sin documento; el sitio sigue con Ohio). Carril:
+  `build-site-nav-plugin-package.cjs` + `deploy-site-nav-plugin-package.php`. Respaldo:
+  `/tmp/eo-site-nav-before-20261022-210707.tar`. Rollback: `wp plugin deactivate eo-site-nav`.
+
 **Pendiente, con autorización del operador:**
-- Deploy del plugin por carril acotado; antes, agregar `eo-site-nav` a `TARGETS` de `export-live-code-baseline.ts`.
 - `apply` del documento inicial en vivo.
 - Verificar la purga de Kinsta desde PHP.
 - Diseño del admin (Slice 5).

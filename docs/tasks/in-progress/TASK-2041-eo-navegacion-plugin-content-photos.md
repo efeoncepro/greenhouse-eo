@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Slices 1 a 3 code complete y probados en WordPress Playground (runtime f9c7bce, sin push ni deploy). Slice 4: 51 fotos subidas y verificadas en el bucket; faltan deploy del plugin y apply en vivo (con autorización). Slice 5: diseño del admin`
+- Status real: `Slices 1 a 3 code complete y probados. Slice 4: plugin 0.1.0 desplegado y activo en efeoncepro.com (2026-10-22, sin documento: sitio sin cambios) y 51 fotos en el bucket; falta el apply del documento inicial (con autorización). Slice 5: diseño del admin`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -400,8 +400,7 @@ acordado con la sesión del menú:
 
 Hallazgos de la prueba: sin usuario, `get_posts` no devuelve el documento privado, y el adaptador pinta el menú a
 visitantes anónimos, así que la lectura va por consulta directa. La lista del blog repetía los posts de Glitch.
-Pendiente del Slice 4: agregar `wp-content/plugins/eo-site-nav` a `TARGETS` de `export-live-code-baseline.ts` y armar
-el carril de deploy acotado.
+El carril de deploy acotado ya existe: `eo-site-nav` está en `TARGETS` y hay scripts de armado y deploy.
 
 **Excepción de fotos (2026-10-22):** las 9 fotos del polo solo (engine, web, seo y revenue en `mm` y `op`, más
 `contacto-op`) quedan como están. Lo decidió el operador («Déjalas así; ya las aprobé en el canvas»), según transmitió la
@@ -426,6 +425,28 @@ es no reescalar:
 
 El panel las encuadra con `object-fit: cover`. Si alguna se vuelve a recortar, se sube como archivo nuevo
 (`.v2`) y nunca se sobrescribe.
+
+**Deploy del plugin (2026-10-22, autorizado por el operador «sin aplicar todavía el documento del menú»):**
+
+- **Comprobación previa en vivo (sólo lectura):** sin plugin, ruta `eo/v1`, tipo de contenido ni opciones `eosn_`.
+  Producción corre PHP 8.2 y WP 7.1.3. El objeto de purga de Kinsta (`Kinsta\KMP`) existe y `timezone_string` está
+  vacío.
+- **Ensayo:** el mismo paquete se desplegó primero en un WordPress desechable de Playground.
+- **Deploy:**
+  - Paquete de 10 archivos, todos nuevos, desde runtime `b0dd479`, con sha256 `33f97058…`.
+  - Respaldo en `/tmp/eo-site-nav-before-20261022-210707.tar`.
+  - La activación dentro del deploy falló con «cabecera no válida»: WP-CLI tenía en caché la lista de plugins de
+    antes de escribir los archivos. Se activó en un proceso aparte, limpiando esa caché, y el script ya la limpia.
+- **Verificado en vivo:**
+  - Los 10 archivos coinciden con el manifiesto; el plugin está activo; los administradores tienen
+    `eo_manage_site_nav`.
+  - La REST responde `404 eosn_not_found`, y POST da 404.
+  - `wp eo-nav` tiene sus 5 subcomandos; `revisions` y `export` responden sin documento.
+  - Recursos resuelve con los posts reales («FLASH · 28 SEP | Sonnet 5.5 roza a Opus… | Leer el Flash», ediciones 17,
+    16 y 15) y el blog sin Glitch. Las cachés temporales de la prueba se borraron.
+  - La portada y `/agencia-creativa/` siguen con la cabecera de Ohio y sin marcado del menú.
+- **Rollback:** `wp plugin deactivate eo-site-nav` y borrar `wp-content/plugins/eo-site-nav/` (los 10 archivos eran
+  nuevos).
 
 **Decisiones:** directorio `eo-site-nav`, prefijo `EOSN_`, text domain `eo-site-nav`, comandos `wp eo-nav`, REST
 `eo/v1/site-nav`. Respaldo del documento en el runtime: `manifests/site-nav/efeoncepro.com.json`.

@@ -7,7 +7,8 @@
 - AXIS ya tiene `efeonce.site-nav`: esquema `site-nav.v1` (JSON Schema para el plugin), tokens `axisSiteNav`, render
   de servidor, `site-nav.css` y `site-nav.js` sin dependencias, demo y página del Lab y suite de navegador en el CI.
   Publicado en AXIS v0.7.7 (contracts 0.7.7, primitives 0.7.0), igualado al canvas en textos y medidas.
-- WordPress: plugin `eo-site-nav` (TASK-2041) construido y probado en local; aún no desplegado. Las fotos del menú ya
+- WordPress: plugin `eo-site-nav` (TASK-2041) activo en efeoncepro.com, todavía sin documento del menú: el sitio
+  conserva la cabecera de Ohio. Las fotos del menú ya
   están en `storage.googleapis.com/efeonce-group-axis-public-media/site-nav/v1/`.
 - Decidido en el Lab: cabecera 300/400 ms, el mega se cierra con más de 48 px de scroll, tono de la isla por
   `data-site-nav-tone` con luminancia de respaldo; destinos `/servicios/`, `/blog/` y `/agenda/`.
