@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Slices 1 y 2 code complete en local (runtime 5ca3637 + 1b26063, AXIS 42b7f5e sin publicar); sin escrituras en producción. Pendiente: publicar AXIS primitives 0.7.2, Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
+- Status real: `Slices 1 y 2 code complete en local (runtime 5ca3637 + 1b26063 + archivos de AXIS publicado; AXIS primitives 0.7.8 publicado bajo `v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -375,12 +375,13 @@ Reglas obligatorias:
 > Avance 2026-10-22: code complete en local. Port PHP del render idéntico byte a byte a AXIS (12 casos,
 > `tests/eo-site-nav-render.test.php`); adaptador con interruptor, respaldo a Ohio ante plugin ausente, documento
 > ausente o inválido y error de render (registrado en el log); assets fijados en
-> `ohio-child/assets/vendor/axis/site-nav/0.7.2/` con `VERSION.json` (sha256) por `scripts/vendor-axis-site-nav.mjs`;
+> `ohio-child/assets/vendor/axis/site-nav/0.7.8/` con `VERSION.json` (sha256) por `scripts/vendor-axis-site-nav.mjs`;
 > fuentes del menú cargadas por el adaptador; barra del admin con `--axis-site-nav-offset`. El piloto en Playground
 > encontró estilos de Ohio dentro del menú y se corrigieron en AXIS (aislación, isla de 63 px, offset): primitives
-> 0.7.2 local, con prueba de anfitrión hostil; la comparación de estilos calculados Lab vs WordPress da cero
-> diferencias en escritorio (reposo, panel abierto, hover) y en el onepage de 390 px. Antes de desplegar: publicar
-> AXIS 0.7.2 y volver a copiar desde el paquete publicado.
+> 0.7.8, con prueba de anfitrión hostil; la comparación de estilos calculados Lab vs WordPress da cero
+> diferencias en escritorio (reposo, panel abierto, hover) y en el onepage de 390 px. Publicado como
+> primitives 0.7.8 (tag `v0.7.8`; `v0.7.2` ya existía) y copiado al tema desde el paquete publicado, byte a byte igual
+> a lo verificado.
 
 - Override del encabezado en `ohio-child`:
   - opciones `eo_site_nav_enabled` (`off`/`pilot`/`on`) y `eo_site_nav_pilot_pages`;

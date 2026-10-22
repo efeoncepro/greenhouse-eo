@@ -66,6 +66,6 @@ Se hereda del flujo maestro. Lo propio del host:
 | El respaldo es Ohio | La navegación nunca desaparece por un error de datos o de despliegue. |
 | Estado inicial por tipo de página | El vidrio necesita un fondo oscuro detrás; sobre páginas claras arranca sólido. |
 | Superficie del agendador propia del encabezado | Medición separada de las landings y una allowlist que cubre todo el sitio. |
-| La aislación de estilos vive en AXIS, no en el tema | El piloto mostró estilos de Ohio dentro del menú (hover rojo, cierre rojo, filas 4 px más altas). Corregirlo en el tema habría sido una copia de valores; AXIS 0.7.2 da a cada regla peso de id y restablece lo que un tema aplica a todo, con una prueba que inyecta una hoja hostil. |
+| La aislación de estilos vive en AXIS, no en el tema | El piloto mostró estilos de Ohio dentro del menú (hover rojo, cierre rojo, filas 4 px más altas). Corregirlo en el tema habría sido una copia de valores; AXIS primitives 0.7.8 da a cada regla peso de id y restablece lo que un tema aplica a todo, con una prueba que inyecta una hoja hostil. |
 | El adaptador carga las fuentes del menú | Cada página de Ohio carga un juego distinto (la home no tiene Bricolage ni Poppins 300). Se pide el juego del Lab sin el eje de ancho, que el menú no usa: así el archivo de Bricolage es el que ya cargan las landings. |
 | `site_nav_cta` no se empuja | El clic ya viaja en `gh_site_nav_clicked` y el agendador emite `greenhouse_cta_*`; un tercer evento contaría dos veces y reviviría `gh_cta_clicked`. |
