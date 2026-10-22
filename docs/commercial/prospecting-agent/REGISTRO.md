@@ -1,5 +1,11 @@
 # Registro de búsquedas comerciales
 
+**Kibernum, investigación focalizada22/10/2026:** Contact256968083769 creado con correo laboral verificado,
+Company53955357196 reutilizada/Primary; seis segmentos del contacto y Company187 verificados. Correo00:56Santiago
+con firma gráfica/CCO y brochure360 completo, EMAIL119266980893 SENT e InMail distinto enviados. Apollo1crédito,
+InMail1; nota119264638728 releída. Sin Lead/Deal/secuencia ni nuevoIDHSP. Esperar respuesta.
+[Expediente saneado](runs/2026-10-22-0056-kibernum-growth-colombia.md).
+
 **Agrocompra HSP-0036, envío ejecutado19/10 15:08–15:10 Santiago:** cuatro correos individuales con firma gráfica y brochureWeb original357053321, Apollo4créditos/4emailsverificados. Enviados y4EMAILSENT/asociaciones confirmados. Documents creó4Contactos yCompanyCNAgro de forma nativa; sin mutaciones manuales, Deal o secuencias. Esperar respuestas; disponibilidad contractualHOLD persiste. [Resultado](runs/2026-10-19-1513-agrocompra-envios.md) · [Consultas](queries/2026-10-19-1513-agrocompra-envios.json).
 
 **Agrocompra HSP-0036, autorización19/10 15:02:** Apollo y4envíos aprobados por Julio; ejecución pendiente del control factual de compra. Publicación y21comentarios releídos, sin calendario/contrato acreditados. OriginalServiciosWeb357053321 localizado;4mensajes completos con firma gráfica preparados enprivado.0créditos/0envíos/0CRM. [Estado](runs/2026-10-19-1502-agrocompra-envio-pendiente.md) · [Consultas](queries/2026-10-19-1502-agrocompra-envio-pendiente.json).

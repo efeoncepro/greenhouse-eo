@@ -256,3 +256,9 @@ Sin cambio de schema ni de segmentos. [Origen](../audits/commercial/2026-10-12-p
 Cambie la granularidad de cohortes, se requiera ingestión programada o sincronización cross-object, o un campo
 existente pase a representar exactamente estos hechos. Automatización de ingestión y cambios de canal requieren
 su propia autorización; esta decisión sólo configura clasificación y selección nativa activa.
+
+### Evidencia de aplicación sin cambio de decisión — 2026-10-22
+
+[Kibernum: intake focalizado y seis membresías del Contact verificadas](../commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md).
+Se reutilizó Company y se confirmaron Primary, industria/país y fecha de investigación en ambos objetos.
+No se cambiaron schema, filtros, cohortes históricas ni autoridad; encaje CRM separado de solicitud Growth.

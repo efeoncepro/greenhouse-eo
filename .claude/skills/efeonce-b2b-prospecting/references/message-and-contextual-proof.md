@@ -142,3 +142,12 @@ Si HubSpot exige un email para generar un enlace, usar un mecanismo real permiti
 atribución; nunca introducir un correo inventado del prospecto. Un enlace creado con email del remitente
 no identifica al visitante como destinatario. Verificar la conversación enviada y separar visitas del
 agente/escáner, visualizaciones, lectura humana y respuesta. [Caso completo](../../../../docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).
+
+## Aplicación con dos canales expresamente autorizados — 22/10/2026
+
+[Caso Kibernum](../../../../docs/commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md):
+correo robusto ligado a la señal y al contexto de contenido del comprador; InMail más breve con pregunta
+por prioridad, sobre la misma tesis. Compartir el documento original completo mediante enlace nativo del
+destinatario no exige copiar el correo en LinkedIn. Conciliar por separado Enviados/firma/CCO, EMAIL CRM
+SENT y conversación LinkedIn publicada; «Enviando» no cierra el último carril. Autorización de ambos canales
+para una persona no se extiende a colegas, secuencias o futuros toques; declarar el costo del InMail disponible.

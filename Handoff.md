@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-10-22 — Kibernum: Growth Colombia, contacto y dos canales
+
+Contact `256968083769` / Company `53955357196` / Primary verificados; seis segmentos del contacto
+(180/181/182/183/151/156) y Company 187 comprobados. Apollo: 1 crédito.
+Correo 22/10 00:56 Santiago con firma gráfica/CCO y brochure 360° completo; Outlook y EMAIL `119266980893`
+SENT verificados. InMail distinto enviado (1 crédito); nota `119264638728` releída. Esperar respuesta, sin Lead,
+Deal ni secuencia nuevos. [Evidencia y continuidad](docs/commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md).
+
 ## 2026-10-21 — Correos de Julio: firma gráfica siempre
 
 Mandato permanente: firma gráfica oficial en todo correo, incluidos respuestas, reenvíos y seguimientos manuales, programados o por secuencias. Texto plano deja de ser alternativa; si la herramienta no conserva la firma, mantener pendiente. [Política vigente](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Routers y referencias de skills alineados; no se enviaron correos ni se modificaron secuencias por registrar esta regla.
@@ -12,6 +20,21 @@ izipay: cuatro contactos/Primary y correos registrados; Iris, Ariana y Diego con
 Iris conserva correo inferido y excepción expresa; Programado no es enviado. Owner Julio / Commercial.
 [Registro, IDs y pendientes](docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).
 [Capacidad local corregida](docs/operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md); docs/skills espejo, sin nuevo envío.
+
+## 2026-10-21 — ANAM: voz activa, soporte y respuesta recibida
+
+Hallazgos y [correspondencia completa](docs/audits/ANAM_EMMA_VOICE_SOPORTE_Y_CORRESPONDENCIA_2026-10-21.md):
+correo de Julio enviado 18:20 con firma gráfica/CCO, Outlook y HubSpot EMAIL119253278227/SENT verificados.
+María Paz respondió 18:28 preguntando cómo habilitar recepción/disponibilidad; duda operativa de soporte,
+pendiente de contestar. Base oficial de instrucciones en el registro. Sin cambios en Emma.
+Solo ajustes menores; IVR, derivación por ejecutivo, separación funcional o migración de canales requieren
+evaluar viabilidad/alcance y eventual cotización. Espejos del caso actualizados; Kortex permanece hibernado.
+
+Base del 19/10: 600 con Emma primero, voz Lina, IA24/7 y humanos L–V09:00–18:00Santiago; sin menú IVR.
+Llamada real41s: ticket/transcripción y primera respuesta verificados; grabación disponible; handoff y buzón pendientes.
+Correo a Oscar/María Paz enviado con firma gráfica/CCO, EMAIL118930883467 SENT en Efeonce.
+Caso y skills espejo actualizados; [manual reutilizable](docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md)
+y [evidencia/pendientes](docs/audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md). Kortex hibernado.
 
 ## 2026-10-20 — Blog etapa 1: candidato local en develop
 
@@ -36,21 +59,6 @@ Google `.org`: Cloud/Workspace indirecto activo/Ingram, handshake completo; resp
 Microsoft `.com` 20/10: Verified, Authorized e Indirect Reseller Active; correo a Geraldine/CC Camila enviado17:21 con captura/firma, EMAIL119142026297 SENT. Respuesta comercial LOL pendiente; AWS SmartHub/Partner Central por verificar.
 [Registro y auditorías](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) · [manual y controles](docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md).
 [Directorio](docs/operations/EFEONCE_PARTNER_CONTACT_DIRECTORY_V1.md):27 personas,8 buzones, fuentes/rebotes; índice nominal en cuatro skills Codex/Claude. Antes de contactar, leer ficha e hilo; sin nuevos envíos en la consolidación del directorio.
-
-## 2026-10-21 — ANAM: voz activa, soporte y respuesta recibida
-
-Hallazgos y [correspondencia completa](docs/audits/ANAM_EMMA_VOICE_SOPORTE_Y_CORRESPONDENCIA_2026-10-21.md):
-correo de Julio enviado 18:20 con firma gráfica/CCO, Outlook y HubSpot EMAIL119253278227/SENT verificados.
-María Paz respondió 18:28 preguntando cómo habilitar recepción/disponibilidad; duda operativa de soporte,
-pendiente de contestar. Base oficial de instrucciones en el registro. Sin cambios en Emma.
-Solo ajustes menores; IVR, derivación por ejecutivo, separación funcional o migración de canales requieren
-evaluar viabilidad/alcance y eventual cotización. Espejos del caso actualizados; Kortex permanece hibernado.
-
-Base del 19/10: 600 con Emma primero, voz Lina, IA24/7 y humanos L–V09:00–18:00Santiago; sin menú IVR.
-Llamada real41s: ticket/transcripción y primera respuesta verificados; grabación disponible; handoff y buzón pendientes.
-Correo a Oscar/María Paz enviado con firma gráfica/CCO, EMAIL118930883467 SENT en Efeonce.
-Caso y skills espejo actualizados; [manual reutilizable](docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md)
-y [evidencia/pendientes](docs/audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md). Kortex hibernado.
 
 ## 2026-10-18 — Indecaucho: Katia contactada y un seguimiento programado
 
@@ -250,17 +258,3 @@ la cabecera del scheduler en móvil (`font` shorthand con `inherit`), commit `e7
 Pendiente: release a producción del renderer 1.3.1 (hasta entonces el scheduler sigue partiendo «Cerrar agenda»),
 envío real del form, Rich Results/GSC, +90 vs +120 empresas, readback Gold. Fal sin saldo en ambas cuentas (A −0,29,
 B −0,35 USD); Higgsfield 3.690,6 créditos (Ultra).
-
-## 2026-10-16 — Agencia de Medios: brochure canonizado y landing publicada
-
-Live en https://efeoncepro.com/servicios/agencia-de-medios/ (página `251981`, menú `251987`, OG `251986`), verificada a
-1440/390 sin overflow; widgets `greenhouse_medios_*` (repo del sitio `25135f7`, `874cf48`; respaldos
-`/tmp/eo-medios-widgets-before-*` en Kinsta). Formulario `efeonce-media-diagnostic` (`hubspot_pillar`, direct, commit
-`e7ae991f1`). Brochure con PDF vigente `c4697c7a…` en OneDrive. Rebates = margen de Efeonce, aplicado también a modelos
-y packs de medios. [Landing](.claude/skills/efeonce-public-site-wordpress/references/landings/agencia-de-medios.md) ·
-[PDR-025](docs/public-site/decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) ·
-[LEEME](ai-generations/2026-10-13_brochure-agencia-medios/LEEME.md).
-Pendiente: envío real del form (HubSpot + GA4 `generate_lead`), casilla de novedades sin suscripción HubSpot, Rich
-Results/GSC. Operador 2026-10-16: rebates nunca al cliente (regla vigente en todo); «programática secundaria de
-Medios» confirmada (PDR-025/022). Schema: cinco países + catálogo + `about`; sitio: Yoast «Efeonce», `og:locale`
-`es_LA` (mu-plugin). Commits locales, sin push.

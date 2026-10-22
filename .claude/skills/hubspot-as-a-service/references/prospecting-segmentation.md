@@ -330,3 +330,12 @@ of an email sent, read or delivered, an opportunity qualified, or a purchase inv
   [the follow-up register](../../../../docs/commercial/follow-up-agent/README.md), not in this skill. A connector
   that can read mail may still lack draft/send capability. A 403 remains a permission error until the affected
   operation is verified; reconnection alone does not prove it is repaired.
+
+## Caso de intake individual — Kibernum, 22/10/2026
+
+[Propiedades, asociaciones y seis membresías comprobadas](../../../../docs/commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md):
+Company existente con industria/país conservados, fecha de investigación en ambos objetos, Contact individual
+con email verificado, cargo y fit creativo/CRM sustentado. Primary se confirmó después del alta automática.
+Contact en 180/181/182/183/151/156; Company en187, sin tocar filtros, listas históricas o schema.
+Para responder al operador, presentar los valores realmente guardados y los nombres de los segmentos con
+membresía efectiva. Fit no es solicitud HubSpot. Este corte individual no actualiza totales de otros cortes.

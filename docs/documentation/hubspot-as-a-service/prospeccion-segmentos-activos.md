@@ -200,3 +200,11 @@ Diego y Emily ya cumplen las propiedades de 178; sus empresas, las de 179. No fu
 atributos ni forzar cargo/interés/industria. Fit y pertenencia no equivalen a oportunidad calificada.
 Los negocios previos se conservan por instrucción del operador; siguientes altas siguen lead → calificación
 → oportunidad. [Catálogo, conteos, verificación y diagnóstico de Prospecting Agent](../../audits/commercial/2026-10-08-prospecting-agent-active-segments.md).
+
+## Aplicación individual — 22/10/2026
+
+[Alta Kibernum y readback](../../commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md):
+un Contact nuevo y Company existente, fecha de investigación en ambos y Primary comprobada; tipo
+individual, fit creativo/CRM y cargo verificados. Pertenencia efectiva a 180/181/182/183/151/156 y Company187,
+sin cambio de reglas ni inscripción manual. Es un corte individual; los totales históricos permanecen fechados.
+La solicitud Growth para Colombia se conserva en nota, separada del fit CRM y del país Chile de la empresa.
