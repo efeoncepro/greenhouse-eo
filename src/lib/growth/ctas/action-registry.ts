@@ -142,6 +142,9 @@ const resolveNewContext = (navigationContext: CtaActionNavigationContext, optIn:
 const resolveOpenGrowthForm = async (
   policy: z.output<typeof ctaOpenGrowthFormPolicySchema>,
 ): Promise<CtaActionResolution> => {
+  // TASK-2044 — un encabezado de diálogo sin presentation=dialog es una policy incoherente.
+  if (policy.dialog && policy.presentation !== 'dialog') return { ok: false, reason: 'action_policy_invalid' }
+
   const formContract = await getPublishedRenderContractByRef(policy.formRef)
 
   if (!formContract) return { ok: false, reason: 'action_destination_unavailable' }
@@ -152,6 +155,10 @@ const resolveOpenGrowthForm = async (
       kind: 'open_growth_form',
       formSlug: formContract.form.slug,
       formKey: formContract.form.formKey,
+      // TASK-2044 — la presentación sólo se proyecta cuando es `dialog`: un CTA inline sigue igual.
+      ...(policy.presentation === 'dialog'
+        ? { presentation: 'dialog' as const, ...(policy.dialog ? { dialog: policy.dialog } : {}) }
+        : {}),
     },
   }
 }

@@ -32,6 +32,10 @@ export interface CtaRenderOpenGrowthFormActionMirror {
   kind: 'open_growth_form'
   formSlug: string
   formKey?: string
+  /** TASK-2044 — `dialog` abre el formulario en un diálogo modal; ausente = inline en la tarjeta. */
+  presentation?: 'inline' | 'dialog'
+  /** TASK-2044 — encabezado del diálogo (texto plano); sin `title` se usa el `headline` del CTA. */
+  dialog?: { eyebrow?: string; title?: string; lead?: string }
 }
 
 /** Kinds de la familia `navigate` (TASK-1431) — espejo de `CTA_NAVIGATE_ACTION_KINDS`. */
