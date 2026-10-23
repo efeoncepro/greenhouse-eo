@@ -280,11 +280,14 @@ the page that first used it.
 ## Site navigation (`efeonce.site-nav`) — published, live on efeoncepro.com since 2026-10-23
 
 Global site menu (header, mega menus, onepage, CTA slot) written once in AXIS and consumed by WordPress. Program
-EPIC-055 (TASK-2040 AXIS, TASK-2042 rollout); decision PDR-027. Live on every page of efeoncepro.com except `/blog/`.
+EPIC-055 (TASK-2040 AXIS, TASK-2041 plugin, TASK-2042 rollout); decision PDR-027. Live on every page of
+efeoncepro.com except `/blog/` (Ohio's header stays there, and everywhere if the theme switch goes `off`).
 
-**Current versions:** `@efeoncepro/axis-ui-contracts` **0.7.12** + `@efeoncepro/axis-ui-primitives` **0.7.13**
-(tags `v0.7.8`, `v0.7.9`, `v0.7.10`, `v0.7.12`, `v0.7.13`; the `v0.7.2` tag was already taken, so 0.7.8 is the first site-nav
-tag; `v0.7.11` stopped before publishing and is not a package). Pin 0.7.13 or later.
+**Current site-nav versions:** `@efeoncepro/axis-ui-contracts` **0.7.12** + `@efeoncepro/axis-ui-primitives`
+**0.7.13** — the version efeoncepro.com pins. Tags that changed the site-nav: `v0.7.8`, `v0.7.9`, `v0.7.10`, `v0.7.12`,
+`v0.7.13` (the `v0.7.2` tag was already taken, so 0.7.8 is the first site-nav tag; `v0.7.11` stopped before publishing
+and is **not a package** — never pin or vendor it). `v0.7.14` only adds the landing dock's stop marker; pin 0.7.13 or
+later.
 
 | Layer | Owns |
 | --- | --- |
@@ -305,14 +308,18 @@ Releases:
   resize (`--asn-op-r`, measured in the onepage box so the host offset keeps the centre on the hamburger); `150vmax`
   without JS. It fixed an uncovered corner past ~1500 px wide. The token `axisSiteNav.motion.onepage.radiusPx` (1720)
   stays as the 1440-board measure and is **no longer the radius**; never use it to size the circle.
-- **0.7.12 (primitives):** the island's tone reading. Without `data-site-nav-tone`, a background gradient decides by the
+- **0.7.12 (primitives; contracts 0.7.12 ship in the same tag):** the island's tone reading. Without `data-site-nav-tone`, a background gradient decides by the
   mean luminance of its opaque stops, a background image counts as dark, a color under 0.5 alpha does not decide, and
   fixed or sticky host chrome (theme bar, chat, cookie notice, the landing dock) is skipped. It fixed a light island
-  over the navy E-E-A-T gradient band of /servicios/posicionamiento-seo/ (verified live 2026-10-23).
+  over the navy E-E-A-T gradient band of /servicios/posicionamiento-seo/ (AXIS commit 5557642; verified live
+  2026-10-23).
 - **0.7.13 (primitives):** the island keeps its tone while a modal dialog (the meeting scheduler) is open: invisible
   elements are skipped (`checkVisibility` with visibility and opacity) and `<html>` as the first element under the island
-  returns null. Same guard as the landing dock. Verify tone live in a foreground browser (headless Playwright works):
-  a hidden browser pane runs the page in the background, without animation frames or scroll events.
+  returns null (keeps the tone). Without it, a host that paints `<html>` turned the island light behind the dialog and
+  after closing it. Same guard as the landing dock. Browser test «keeps its tone while a modal dialog in a hidden host
+  is open» in `apps/lab/src/test/e2e/site-nav.spec.ts` (fails without the guard); note in `docs/quality/site-nav.md`.
+  Verify tone live in a foreground browser (headless Playwright works): a hidden browser pane runs the page in the
+  background, without animation frames or scroll events, and the tone looks stuck.
 
 **Host contract** (AXIS `PRIMITIVES.md`):
 
@@ -327,10 +334,13 @@ Releases:
 Consumers (verified 2026-10-23):
 
 - **WordPress** (`efeonce-public-site-runtime`): plugin `eo-site-nav` renders with `EOSN_Render`, byte-identical to
-  `siteNavHtml` (17 parity cases at AXIS 0.7.13) plus a validator (35 parity cases); theme `ohio-child` pins the files in
-  `assets/vendor/axis/site-nav/0.7.13/` (`VERSION.json` with sha256, copied from the published package by
-  `scripts/vendor-axis-site-nav.mjs`) and the constant `EO_SITE_NAV_AXIS`. Bump procedure and operation:
-  `efeonce-public-site-wordpress` → `references/global-site-navigation.md`.
+  `siteNavHtml` (17 parity cases) plus a validator (35 parity cases), both against primitives 0.7.13 / contracts 0.7.12;
+  theme `ohio-child` pins the files in `assets/vendor/axis/site-nav/0.7.13/` (`VERSION.json` with sha256, copied from
+  the published package by `scripts/vendor-axis-site-nav.mjs`; live since 2026-10-23 04:28 UTC) and the constant
+  `EO_SITE_NAV_AXIS`. Bump procedure (npm pack of the published packages, vendor, parity, theme lane, purge) and
+  operation: `efeonce-public-site-wordpress` → `references/global-site-navigation.md` §AXIS version bump.
+- **Landing dock** (`efeonce.landing-dock`, below): reuses the island glass and the same tone reading; it skips
+  `[data-axis-site-nav]` when reading its own tone. Its plugin pins its own copy (0.7.14), independent of the menu's.
 
 Approved design: below 1440 a service description is one line with an ellipsis (canvas board Mega1280, confirmed by
 the fidelity session on 2026-10-23); at 1440 it must be whole.
@@ -339,4 +349,37 @@ Do not confuse it with `efeonce.surface-composition`: its `nav` field is **descr
 composed hero), not a running menu.
 
 Architecture: [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`](../../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md).
-Brand criteria: [graphic-line applications](../../efeonce-graphic-line/references/applications.md#a15-encabezado-y-navegación-del-sitio-web-diseño-aprobado-2026-10-18-implementación-planificada).
+Brand criteria: [graphic-line applications](../../efeonce-graphic-line/references/applications.md#a15-encabezado-y-navegación-del-sitio-web-diseño-aprobado-2026-10-18-en-vivo-desde-2026-10-23).
+
+## Landing dock (`efeonce.landing-dock`) — published, live on seven efeoncepro.com landings since 2026-10-23
+
+Glass bottom dock of the landings (TASK-2043, EPIC-055): one primitive replaces each landing's own dock. Approved in
+the canvas «Mega menú efeoncepro.com» v80, row «Dock inferior de las landings».
+
+| Layer | Owns |
+| --- | --- |
+| Tokens `axisLandingDock` (`packages/tokens/src/landing-dock.ts`, tokens 0.6.9) | Glass = the two island recipes of `axisSiteNav`; sizes (61/63 px, buttons 45 px, Poppins 15/600), desktop centered at 20 px, phone ≤768 px at 12 px + safe area, z-index 900 (under the menu), visibility and motion |
+| Contract `efeonce.landing-dock` 1.0.0 candidate (`packages/contracts/src/landing-dock.ts`, schema `landing-dock.v1`) | `label`, `line?`, `text?`, `presence?` (`all/desktop/phone`), 1–2 `actions` (`open_meeting_scheduler` or `link`). Errors `SCHEDULER_NOT_PRIMARY`, `NO_ACTION_FOR_WIDTH`; `cta-location` `landing_dock`; events `landing_dock_view/click/cta` |
+| Primitives `@efeoncepro/axis-ui-primitives/landing-dock` | `landingDockHtml`, `landingDockLinks`; `./landing-dock.css` (id-weight isolation `:not(#axis-landing-dock-isolation)`, visible without scripting, reduced motion without travel); `./landing-dock.js` (`enhanceLandingDock`, `createLandingDock`, no imports; options `start`, `end`, `stop`, `avoid`, `onEvent`; cancelable `axis-landing-dock:cta`). Port reference cases: `packages/primitives/fixtures/landing-dock/cases.json` (in the package) |
+| Lab | `/patterns/efeonce.landing-dock/`, `/demos/landing-dock/<social/influencers/hubspot/home/seo>/` (`?cookies=1`, `?stop=<selector>`); suite `apps/lab/src/test/e2e/landing-dock.spec.ts` in the `site-nav` lane |
+
+Releases: **0.7.12** (dock: contracts 0.7.12, tokens 0.6.9, registry 0.7.5 with capability `efeonce.landing-dock`,
+primitives 0.7.12); **0.7.13** (primitives: keeps its tone while the scheduler dialog is open, same guard in the
+site-nav island); **0.7.14** (primitives: `stop` marker hides it from that element to the end of the page).
+
+Behavior to preserve in any port: appears when the hero's bottom passes half the window; leaves 120 px before the end
+marker; hides while a menu panel/onepage is open or an `avoid` element (cookie banner) overlaps its place; tone from
+`data-landing-dock-tone`/`data-site-nav-tone`, else the first background with alpha ≥ 0.5 (image/video = dark),
+skipping fixed/sticky host chrome and invisible elements; on phone the buttons share width by label
+(`flex: 1 1 auto`), not by halves.
+
+Consumer: WordPress plugin `eo-landing-dock` (PHP port byte for byte, pinned copy `assets/vendor/axis/landing-dock/0.7.14/`);
+operation in `efeonce-public-site-wordpress` → `references/global-site-navigation.md` §Landing dock. AXIS doc:
+`docs/quality/landing-dock.md`.
+
+Release lessons (2026-10-23): `v0.7.11` did not publish because the agent lane's declared-exports test
+(`scripts/agent.test.mjs`) did not know the new modules — **a new export must be added there**; `scripts/ci-scope.mjs`
+maps the dock to the `site-nav` lane, which pulls the agent lane. CI `git diff --check` rejects a trailing blank line
+at the end of a README. `pnpm release:packages` tags the **HEAD of the shared checkout** when CI finishes (v0.7.13
+landed on another session's commit): nobody commits on AXIS `main` while it waits; if publication stops, rerun the
+workflow.

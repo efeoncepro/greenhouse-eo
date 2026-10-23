@@ -55,24 +55,31 @@ Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live 
 `SCHEDULER_COMPOSITION_DECISION_V1.md`, `GROWTH_CTA_COMPOSITION_DECISION_V1.md` and their
 `docs/quality/` dossiers. Greenhouse continuity: TASK-2007.
 
-## Planned consumer: global site header (EPIC-055 / TASK-2042)
+## Consumer: global site menu (EPIC-055 / TASK-2042) — live since 2026-10-23
 
-**Planned, not built** (architecture proposed 2026-10-18). The «Agenda tu diagnóstico» button in the global header of
-`efeoncepro.com` will open this scheduler through `<greenhouse-cta>` with the `open_meeting_scheduler` action; there
-will be no other booking path. When implementing it in
-[TASK-2042](../../../docs/tasks/in-progress/TASK-2042-site-nav-wordpress-rollout.md):
+«Agenda tu diagnóstico» in the global menu of `efeoncepro.com` (header, mega and onepage) opens the `discovery`
+scheduler through a hidden `<greenhouse-cta>` launcher; there is no other booking path from the menu.
 
-- `cta-location` per entry point: `menu_header`, `menu_mega` or `menu_onepage`, to measure by entry point.
-- The menu closes its panel (mega or onepage) and releases its scroll lock **before** opening the dialog, so the native
-  `<dialog>` is the only owner of scroll lock and focus; the launcher stays mounted so focus returns to it on close.
-- A Growth CTA surface **owned by the global header** (do not reuse a landing's surface), with its
-  `meeting_surface_binding` and an origin allowlist covering every page where the menu appears. Its key is secret:
-  never in docs, commits or messages.
-- The dialog skin (the scheduler of `/agencia-inbound-marketing/`) lives today with landing scope in
-  `scripts/public-website/inbound-source/page.css`; it moves to a shared site primitive, it is not copied.
-- Without JavaScript or without a surface, the button is a plain link to `/agenda/`.
+- CTA `site-nav-discovery-meeting` (`open_meeting_scheduler`, meeting surface `fhsf-efeonce-lead-gen-web`), WordPress
+  surface `csur-eb834d53-fd99-4f6b-9615-979e329e7d37` owned by the menu (allows only that CTA; origins efeoncepro.com
+  and www), `cta_location: site_nav`. The entry point is measured by the menu's `gh_site_nav_clicked`
+  (`target_type: cta`, `target: menu_header|menu_mega|menu_onepage`), not by separate cta-locations.
+- The key lives in Greenhouse `.auth/site-nav-meeting-cta-surface.json` (0600, gitignored) and in the WordPress option
+  `eo_site_nav_scheduler`. Re-running `scripts/growth/publish-site-nav-meeting-cta.ts` rotates it, and the option must
+  follow in the same session with `set-site-nav-scheduler.php`. Never write the key anywhere.
+- The dialog wears the shared site skin (`data-eo-meeting-skin="site"`, `ohio-child/assets/css/meeting-dialog.css`:
+  Inbound frame approved 2026-10-18 with the `/agenda/` palette); a landing's own CTA dialog keeps its own skin.
+- Without JavaScript, without a valid option, or with an empty launcher, the button is a plain link to `/agenda/`.
 
-Contract: [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md` §Agendador](../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#agendador).
+Rollout state and launcher details: `greenhouse-growth-ctas` §Estado de rollout. Operation:
+`efeonce-public-site-wordpress` → `references/global-site-navigation.md` §Scheduler CTA. Contract:
+[`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md` §Agendador](../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#agendador).
+
+Second consumer, same day: the landings' bottom dock (`efeonce.landing-dock`, TASK-2043), placement
+`cta-location="landing_dock"` through a hidden `<greenhouse-cta>` the dock's primary button activates. Redes Sociales
+and Home open this scheduler through the menu's CTA; Influencers, Inbound and HubSpot keep their own meeting CTA. The
+scheduler is only ever the dock's primary action. Operation: `efeonce-public-site-wordpress` →
+`references/global-site-navigation.md` §Landing dock.
 
 ## Inline host: `/agenda/` landing (2026-10-20)
 

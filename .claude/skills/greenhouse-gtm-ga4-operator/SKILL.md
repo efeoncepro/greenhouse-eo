@@ -242,6 +242,13 @@ Ante una tarea de medición, seguir este árbol; NO improvisar el camino:
    (`src/lib/growth/forms/contracts.ts`); CTA engine `greenhouse_cta_*`
    (`src/lib/growth/ctas/contracts.ts`); rail CTA legacy `gh_cta_clicked` (no renombrar); meetings
    `gh_meeting_step_reached|gh_meeting_booking_confirmed` (`src/lib/growth/meetings/contracts.ts`).
+   Cromo del sitio efeoncepro.com (lo emiten scripts del host WordPress, no Greenhouse): menú `gh_site_nav_opened`
+   (panel), `gh_site_nav_line_viewed` (línea) y `gh_site_nav_clicked` (`target_type`/`target`; el CTA viaja como
+   `target_type: cta`, `target: menu_header|menu_mega|menu_onepage`, y su agendador mide por `greenhouse_cta_*` con
+   `cta_location: site_nav`; `site_nav_cta` no se emite) desde `ohio-child/assets/js/site-nav-host.js`, y dock de
+   landings `gh_landing_dock_clicked` con `target_type`/`target` (`eo-landing-dock/assets/js/landing-dock-host.js`,
+   TASK-2043); **ambos aún sin registrar en GTM/GA4** (pendiente; publicar el container sólo con confirmación humana). El agendador abierto desde el dock mide por `greenhouse_cta_*` con
+   `cta_location: landing_dock` (reemplaza `inbound_mobile_dock` y `hubspot_mobile_dock`).
    Verificar el renderer y el dataLayer; GTM no inventa eventos ausentes.
 3. **¿Existe un evento recomendado GA4 que calce?** (lead → `generate_lead`; signup → `sign_up`). Sí → usar ese verbatim (hereda key events/predictivos). No → custom `gh_<object>_<action>`. Regla completa: doc `04`.
 4. **¿Ya hay un tag genérico que lo cubra?** Un solo GA4 Event tag + parámetro de identidad (`form_slug`) cubre N superficies — **reusar antes de crear**. Ver `TRACKING-PLAN.md`.

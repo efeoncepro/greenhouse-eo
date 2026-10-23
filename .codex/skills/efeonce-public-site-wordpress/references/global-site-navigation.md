@@ -28,6 +28,9 @@ Facts below verified 2026-10-23.
   redes sociales, medios, performance, inbound). It is the approved design (canvas board Mega1280: `white-space:
   nowrap; overflow: hidden; text-overflow: ellipsis`, confirmed by the fidelity session on 2026-10-23); at 1440 they
   must be whole, and `fit` only fails there.
+- AXIS pinned in the theme: primitives **0.7.13** (contracts 0.7.12), deployed 2026-10-23 04:28 UTC. 0.7.12 reads the
+  island tone under gradients and skips fixed host chrome (fixed a light island over the navy E-E-A-T band of
+  `/servicios/posicionamiento-seo/`); 0.7.13 keeps the tone while the scheduler dialog is open and after it closes.
 
 ## Source of truth
 
@@ -52,15 +55,15 @@ Source `scripts/public-website/site-nav/cli.ts` (Greenhouse). Working files live
 | `pull [--revision n] [--keep] [--mirror]` | Downloads the live document (or a revision) into the working copy; `--mirror` also writes the runtime mirror |
 | `show [selector]` | Prints a node |
 | `set <selector> <field[.sub]> <value>` / `unset <selector> <field[.sub]>` | Edits one field |
-| `glyphs` · `glyph service:<id> <name>` | Lists the Trazo catalog (60 glyphs) · sets a service icon |
-| `photo <selector> --file <path> --alt <text> [--slug] [--crops mm,op,card] [--position] [--dry-run]` | Crops and uploads a photo (see Photos) |
+| `glyphs [filter]` · `glyph service:<id> <name>` | Lists the Trazo catalog (60 glyphs) · sets a service icon |
+| `photo <selector> --file <path> --alt <text> [--slug] [--crops mm,op,card] [--position attention\|centre\|north] [--dry-run]` | Crops and uploads a photo (see Photos) |
 | `add <parent> services\|lines\|items\|formats --json '{…}' [--after <id>\|--first]` | Adds a child |
-| `remove <selector>` · `move <selector> …` | Removes or moves a node |
+| `remove <selector>` · `move <selector> --after <id>\|--before <id>\|--first\|--last` | Removes or moves a node |
 | `patch <ops.json>` | RFC 6902 `add` / `replace` / `remove` |
 | `check` | Plugin validator, links and photos answer, no HTML entities, card title length |
 | `fit` | Renders at 1440/1280/1200, walks every line, lists clamped text |
 | `diff` | Working copy vs base, by id |
-| `preview [--open soluciones] [--line growth]` | Desktop + phone screenshots |
+| `preview [--path /x/] [--open soluciones] [--line growth]` | Desktop + phone screenshots |
 | `apply --message "<why>" [--dry-run]` | Server dry run, then save against the base revision; a concurrent save is never overwritten; purges |
 | `verify [--path <p>]` | Checks the live page |
 | `revisions` · `restore <n> --message "<why>"` | Lists revisions · restores revision n |
@@ -127,6 +130,8 @@ All run over SSH/WP-CLI with an input file:
 - Renderer `https://greenhouse.efeoncepro.com/growth-cta/renderer-latest.js` loads on idle or when the visitor heads
   for the CTA (one copy on landings that already load it). If not ready the click waits up to 2.5 s; an empty launcher
   (`data-ghc-state="empty"`: paused, wrong origin) lets the link go to `/agenda/` at once.
+- `set-site-nav-scheduler.php` with invalid values (slug, `csur-…` surface, key) **empties** the option and fails: the
+  menu CTA then follows its fallback page (`/agenda/`) until a valid input is applied.
 - The dialog is marked `data-eo-meeting-skin="site"` and wears `ohio-child/assets/css/meeting-dialog.css` (Inbound frame
   approved 2026-10-18 with the `/agenda/` palette); a landing's own CTA dialog keeps its own skin.
 - **Key rotation:** re-running `scripts/growth/publish-site-nav-meeting-cta.ts` rotates the surface key (stored in
@@ -139,8 +144,8 @@ All run over SSH/WP-CLI with an input file:
 Runtime repo `efeonce-public-site-runtime` (branch `main`):
 
 - Plugin `eo-site-nav`: CPT + revisions, save service, REST, PHP renderer `EOSN_Render` byte-identical to AXIS
-  `siteNavHtml` (17 parity cases) and validator (35 parity cases). Playground suite
-  `tests/playground/run-eo-site-nav.sh` (49 checks).
+  `siteNavHtml` (17 parity cases) and validator (35 parity cases), both against AXIS 0.7.13 (contracts 0.7.12).
+  Playground suite `tests/playground/run-eo-site-nav.sh` (49 checks).
 - Theme adapter `ohio-child/inc/site-nav.php` + overrides `parts/headers/header-style-1..8.php`, `site-nav-host.css`
   (admin-bar offset only), `site-nav-host.js`, `meeting-dialog.css`, pinned AXIS files under
   `assets/vendor/axis/site-nav/<version>/`.
@@ -160,14 +165,49 @@ Initial header state: a dark hero without Ohio's spacer starts `top` (glass); a 
 
 ## AXIS version bump
 
-1. Fix or change in AXIS (contract + primitive + Lab), release and publish the packages.
-2. In the runtime repo, install the published packages and run
-   `node scripts/vendor-axis-site-nav.mjs --primitives <node_modules/@efeoncepro/axis-ui-primitives> --brand <node_modules/@efeoncepro/axis-brand-assets> --version <x.y.z> --source "<package + tag>"`.
-   It writes `assets/vendor/axis/site-nav/<x.y.z>/` with `VERSION.json` (sha256 per file). A local AXIS build is only
-   for work in progress; re-vendor from the published package before deploying.
-3. Set the theme constant `EO_SITE_NAV_AXIS` in `inc/site-nav.php` to the new version (today `0.7.13`).
-4. If the render changed, bring `EOSN_Render` and the validator to parity and run the Playground suite.
-5. Deploy through the theme lane (and the plugin lane if it changed), then `verify` and check live.
+Pinned today: `@efeoncepro/axis-ui-primitives` **0.7.13** (contracts 0.7.12, brand assets 0.4.30), folder
+`ohio-child/assets/vendor/axis/site-nav/0.7.13/`, live since 2026-10-23 04:28 UTC. Version history and what each one
+fixed: `axis-design-system` → `references/ui-primitives.md` §site-nav. The site never uses a «latest» AXIS and never a
+local build in production; a tag that stopped before publishing (`v0.7.11`) is not a package.
+
+1. **AXIS:** change contract + primitive + Lab with a browser test, release, and confirm the package is in GitHub
+   Packages (CI green on the tag).
+2. **Fetch the published packages** (neither repo has them installed). In a scratch dir, with a temporary `.npmrc`
+   that is `0600` and removed right after:
+
+   ```bash
+   umask 077; printf '@efeoncepro:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\n' "$(gh auth token)" > .npmrc
+   npm pack @efeoncepro/axis-ui-primitives@<x.y.z> @efeoncepro/axis-brand-assets@0.4.30
+   rm -f .npmrc
+   mkdir prim brand && tar -xzf efeoncepro-axis-ui-primitives-<x.y.z>.tgz -C prim && tar -xzf efeoncepro-axis-brand-assets-0.4.30.tgz -C brand
+   ```
+
+   Brand assets: the version the primitive release uses (0.4.30 today). Never print the token or leave the `.npmrc`
+   behind.
+3. **Vendor** in `efeonce-public-site-runtime`:
+   `node scripts/vendor-axis-site-nav.mjs --primitives <scratch>/prim/package --brand <scratch>/brand/package --version <x.y.z> --source "published @efeoncepro/axis-ui-primitives@<x.y.z> and @efeoncepro/axis-brand-assets@0.4.30 (GitHub Packages, tag v<x.y.z>)"`.
+   It writes `assets/vendor/axis/site-nav/<x.y.z>/` with `VERSION.json` (sha256 per file). Set `EO_SITE_NAV_AXIS` in
+   `inc/site-nav.php`, and `git rm` the previous version folder.
+4. **Parity:** `node tests/fixtures/site-nav/generate-render-data.mjs <axis-design-system checkout at the tag>`, then
+   `php tests/eo-site-nav-render.test.php` (17 cases) and `php tests/eo-site-nav-validator.test.php` (35 cases); if the
+   HTML changed, `EOSN_Render` follows (plugin lane) and the Playground suite runs. **Commit** in the runtime: the
+   package refuses uncommitted theme files.
+5. **Deploy the theme** from Greenhouse (operator's go):
+
+   ```bash
+   pnpm public-website:export-live-code -- --output tmp/public-site-code-baselines/site-nav
+   node scripts/public-website/build-site-nav-theme-package.cjs tmp/public-site-code-baselines/site-nav
+   pnpm public-website:wpcli -- --eval-file scripts/public-website/deploy-site-nav-theme-package.php \
+     --input-file tmp/site-nav-theme-release/package.zip --input-file tmp/site-nav-theme-release/manifest.json --wp-user 12
+   ```
+
+6. **Purge:** the deploy does not purge; run `set-site-nav-switch.php` with the current mode (`{"mode":"on"}`) — it
+   keeps the mode, purges and prints the previous value. Wait 1–2 min (opcache), then `verify` and look at a page at
+   1440 and 390 in a foreground browser (see Traps).
+
+**Relation to the landing dock:** the dock pins its own AXIS copy (primitives 0.7.14) inside the plugin
+`eo-landing-dock`; the menu's pin lives in the theme. Bumping one never moves the other. Both read the tone the same way
+(the dialog guard of 0.7.13 is shared) and the dock skips `[data-axis-site-nav]` when reading its own tone.
 
 ## Landing dock (`efeonce.landing-dock`, TASK-2043)
 
@@ -181,10 +221,22 @@ reuse the island glass of `axisSiteNav`; schema `landing-dock.v1`; `landingDockH
   untouched. Old and new never coexist.
 - Configs: `efeonce-public-site-runtime/manifests/landing-dock/<landing>.json` (no keys; the key is read from the live
   page on `on`). `pending` blocks `on`.
+- Plugin `eo-landing-dock` (its own plugin, not `eo-elementor-widgets`): `EOLD_Validator` (vendored schema), `EOLD_Render`
+  (byte port of `landingDockHtml`, 10 reference cases), `EOLD_Store` (meta, allowlist `EOLD_PAGES` + filter
+  `eo_landing_dock_pages`), `EOLD_Front` (paints in `wp_footer`, strips the legacy dock only when the meta exists),
+  `wp eo-dock list|get|validate|set|unset|snapshot`; `assets/js/landing-dock-host.js`; pinned AXIS copy
+  `assets/vendor/axis/landing-dock/<version>/` + `VERSION.json` (sha256), copied by `scripts/vendor-axis-landing-dock.mjs`.
+- **New landing:** use this dock, never a custom fixed bar. Add `manifests/landing-dock/<landing>.json` (document
+  `landing-dock.v1` + `start`/`end`/`stop`/`scheduler`/`legacy`) and add the page id to `EOLD_PAGES` (plugin release) or
+  the filter; then `snapshot` → `preview` → `on --confirm` with the operator's go. The scheduler only as the primary
+  action; every width where the dock exists keeps one action. Reference cases for any port:
+  `packages/primitives/fixtures/landing-dock/cases.json` (shipped in the primitives package).
 - Live on the seven landings since 2026-10-23 (AXIS primitives 0.7.14 pinned in the plugin).
-- CLI: `pnpm public-website:landing-dock status | preview <landing|all> | snapshot <landing> | on|off <landing> --confirm | verify <landing> | purge`.
-  `preview` injects the dock into the live page in a local Chrome (no write). `on` needs a snapshot from the last hour.
-- Plugin lane: `build-landing-dock-plugin-package.cjs` (refuses a local AXIS copy) → `deploy-landing-dock-plugin-package.php`.
+- CLI: `pnpm public-website:landing-dock status | preview <landing|all> [--with-cookies] | snapshot <landing> | on|off <landing> --confirm | verify <landing> | purge`.
+  `preview` injects the dock into the live page in a local Chrome (no write; declines cookies unless `--with-cookies`).
+  `on` needs a snapshot from the last hour, purges and verifies the served HTML. Output in `tmp/landing-dock/`.
+- Plugin lane: `build-landing-dock-plugin-package.cjs` (refuses a local AXIS copy) → `deploy-landing-dock-plugin-package.php`
+  (allowlist, hashes, drift guard, backup, main file last). `export-live-code-baseline.ts` includes the plugin and its vendor.
 - Copy is each landing's; a phone `shortLabel` is copy (operator). Presence (`desktop`/`phone`) keeps what each landing
   had until the operator decides otherwise.
 - Cookie banner: HubSpot's `#hs-eu-cookie-confirmation`; the dock hides only when it overlaps the dock's place.
@@ -193,7 +245,10 @@ reuse the island glass of `axisSiteNav`; schema `landing-dock.v1`; `landingDockH
 - After a plugin update run `purge`; one URL may need about a minute.
 - AXIS releases: nobody commits on AXIS `main` while `pnpm release:packages` waits for CI — it tags HEAD at the end
   (v0.7.13 landed on another session's commit on 2026-10-23).
-- Manual: `docs/manual-de-uso/public-site/operar-dock-de-landings.md`.
+- Social and Home open the menu's scheduler (`site-nav-discovery-meeting`); Influencers, Inbound and HubSpot keep their
+  own meeting CTA; SEO and Performance only link to their form.
+- Manual: `docs/manual-de-uso/public-site/operar-dock-de-landings.md`; architecture
+  `PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md` §Dock inferior de las landings; AXIS `docs/quality/landing-dock.md`.
 
 ## Hard rules
 
@@ -214,17 +269,26 @@ click travels as `gh_site_nav_clicked` with `target_type: cta`, `target: menu_he
 scheduler emits `greenhouse_cta_*`; `site_nav_cta` is not pushed. GTM/GA4 setup of `gh_site_nav_*` is still pending
 (human confirmation before publishing the container) — use `greenhouse-gtm-ga4-operator`.
 
+Dock: `landing-dock-host.js` pushes `gh_landing_dock_clicked` to the dataLayer (not yet registered in GTM/GA4); its
+meeting CTA uses `cta-location="landing_dock"`, which replaced `inbound_mobile_dock` and `hubspot_mobile_dock`.
+
 ## Traps
 
 - **Kinsta edge:** after a purge, the edge refreshes in about 40 s–2 min. A changed existing PHP file can take 1–2 min
   more (opcache). Do not conclude a deploy failed before that.
 - **zsh `path`:** in zsh `path` is tied to `PATH`; a loop variable named `path` clobbers it and every later command is
   «not found». Use another name (`p`, `url_path`).
+- **Hidden browser pane:** a collapsed or background browser pane (for example the desktop app's Browser pane) runs the
+  page in the background — no `requestAnimationFrame`, no scroll events — so the island tone does not update and the
+  scheduler's scroll lock looks stuck. Not a site defect: verify tone, scroll and the scheduler in a foreground browser
+  (headless Playwright works). Also, `window.scrollTo(0, y)` without `behavior: 'instant'` is smooth on this theme and
+  may not have moved after a short wait.
 - **Content filters:** never store or compare the document as rendered text; the escaped ASCII storage and the
   post-save hash exist because filters altered it.
 
 ## Pending
 
-GTM/GA4 for `gh_site_nav_*`; Core Web Vitals against the previous header; production check of switching to `off`;
-TASK-2041 admin (direction B, live preview + tree); the bottom glass dock for landings
-(separate task).
+GTM/GA4 for `gh_site_nav_*` and `gh_landing_dock_clicked`; Core Web Vitals against the previous header; production
+check of switching to `off`; TASK-2041 admin (direction B, live preview + tree); retire the seven legacy docks' code
+(still in each landing, stripped from the HTML by the plugin); one shared scheduler bridge for `site-nav-host.js` and
+`landing-dock-host.js`.

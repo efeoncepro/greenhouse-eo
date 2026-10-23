@@ -532,14 +532,17 @@ vale en toda aplicación:
 - **Es un mecanismo, no una plantilla:** usarla no convierte el aspecto de la landing Inbound en patrón de otras
   páginas (PDR-026).
 
-### A15. Encabezado y navegación del sitio web (diseño aprobado 2026-10-18, implementación planificada)
+### A15. Encabezado y navegación del sitio web (diseño aprobado 2026-10-18, en vivo desde 2026-10-23)
 
 - **Estado:** diseño **aprobado en canvas** («Mega menú efeoncepro.com»,
-  [versión 67](https://claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj)); implementación **planificada** en EPIC-055
-  (contrato y primitive en AXIS, TASK-2040; plugin «EO Navegación», TASK-2041; adaptador WordPress, TASK-2042). Nada
-  está en runtime: `efeoncepro.com` sigue con el encabezado de Ohio. Contrato técnico:
+  [versión 67](https://claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj)); **en vivo en todo `efeoncepro.com` desde el
+  2026-10-23** (EPIC-055: contrato y primitive en AXIS, TASK-2040; plugin «EO Navegación», TASK-2041; adaptador
+  WordPress, TASK-2042), con AXIS primitives 0.7.13. El encabezado de Ohio queda sólo en `/blog/` y si el interruptor
+  del tema se apaga. La sesión de fidelidad «Rediseño de Menú» lo midió en vivo y lo aprobó (1440 a 390). Contrato
+  técnico:
   [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`](../../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md)
-  (Propuesta) y PDR-027 (Accepted 2026-10-18).
+  y PDR-027 (Accepted 2026-10-18); operación en la skill `efeonce-public-site-wordpress` →
+  `references/global-site-navigation.md`.
 - **Composición de escritorio** («Opción 2», operador 2026-10-17): hamburguesa · logo · cápsula de vidrio (Inicio,
   Nosotros ▾, Soluciones ▾, Recursos ▾, Contacto) · botón «Agenda tu diagnóstico». La cápsula con sus mega menús
   convive con la hamburguesa, que abre el onepage a pantalla completa; abrir uno cierra el otro. Bajo 1.181 px queda
@@ -547,7 +550,9 @@ vale en toda aplicación:
 - **Cabecera en tres estados:** arriba transparente sobre el hero, 96 px; al bajar se oculta; al subir vuelve como una
   **isla de vidrio flotante** (12 px del borde, radio 24, 61 px) que cambia de tono: oscura sobre fotos y secciones
   oscuras, clara con logo y texto navy sobre secciones claras. Aprobada el 2026-10-18 en reemplazo de la barra navy
-  sólida («poco premium»). Recetas de los dos tonos en la arquitectura, §Isla de vidrio.
+  sólida («poco premium»). Recetas de los dos tonos en la arquitectura, §Isla de vidrio. El tono lo lee el primitive
+  (degradados por su luminancia media, imagen = oscuro, sin contar el chrome fijo del host; AXIS 0.7.12) y se conserva
+  con el agendador abierto (0.7.13).
 - **Logo:** 164 px arriba y 128 px dentro de la isla de la cabecera fija (arriba eran 148 px; se amplió el 2026-10-18 tras analizarlo a pedido
   del operador); 152 px en los tableros de 1280 y 1200.
 - **Una sola receta de vidrio** para cápsula, botón y hamburguesa (aprobada el 2026-10-18, probada sobre navy, negro,
@@ -560,8 +565,8 @@ vale en toda aplicación:
   box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255,.03), 0 8px 24px rgba(0,8,20,.24);
   ```
 
-  El botón usa el mismo material con relleno `.12→.04`, borde `.18` y canto `.34`. Estos valores pasan a tokens de
-  AXIS en TASK-2040; ningún CSS de sitio los repite a mano.
+  El botón usa el mismo material con relleno `.12→.04`, borde `.18` y canto `.34`. Estos valores viven en los tokens
+  `axisSiteNav` de AXIS (TASK-2040); ningún CSS de sitio los repite a mano.
 - **Estados del botón «Agenda tu diagnóstico»:** en vidrio, el hover lo ilumina, refuerza el canto y lo sube 1 px; al
   presionar escala a 98 %. En la isla oscura el botón es blanco y su hover pasa a `#cfe4fa`; en la isla clara es navy y su hover pasa a `#023c70`; en ambos sube 1 px. Foco `2px #72ded8`
   en ambos. Con movimiento reducido no se desplaza ni escala.
@@ -581,14 +586,22 @@ vale en toda aplicación:
   | Foto con cara | 8,2 | 13,5 |
   | Foto con indicador ámbar | 6,5 | 4,3 (promedio 6,1) |
 
-  El único caso bajo 4,5:1 es el peor píxel del botón sobre una foto con un indicador ámbar detrás; la QA del
-  piloto repite la medición sobre los heros reales.
+  El único caso bajo 4,5:1 es el peor píxel del botón sobre una foto con un indicador ámbar detrás. Repetir esta
+  medición sobre los heros reales del sitio sigue pendiente: se encendió en todo el sitio sin piloto y la revisión de
+  fidelidad midió tamaños, tipografía, íconos y estados, no este contraste.
 - **Error a no repetir:** el onepage cerrado dejaba su `clip-path: circle(24px)` navy detrás de la hamburguesa, un disco
   que rompía el vidrio. Cerrado debe medir 0 px.
 - **Cuándo no:** las landings no crean su propia navegación ni copian este vidrio; el encabezado global es uno solo y lo
   pinta el primitive de AXIS.
-- **Consumo y fronteras:** la API planificada vive en AXIS (skill `axis-design-system` → `references/ui-primitives.md`,
+- **Consumo y fronteras:** la API vive en AXIS (skill `axis-design-system` → `references/ui-primitives.md`,
   sección `efeonce.site-nav`); el agendador que abre el botón es Growth CTA (skill `greenhouse-growth-meetings`).
+- **Dock inferior de las landings (aprobado 2026-10-23, en vivo en siete landings; canvas «Mega menú efeoncepro.com»
+  v80, fila «Dock inferior de las landings»):** segunda pieza del cromo del sitio, AXIS `efeonce.landing-dock`. Usa el
+  **mismo vidrio de la isla** (sus dos recetas, oscura y clara; radio 24, 61 px) y los acentos de la línea: el botón
+  principal lleva el acento de la línea (`accentOnDark`, tinta `accentInk`: navy, blanca en Engine); sin línea (Inicio)
+  copia el botón del agendador de la isla. El secundario es el vidrio del botón del menú en oscuro, y transparente con
+  borde navy suave y texto navy en claro. Una landing nunca hace su dock propio ni copia este vidrio; operación:
+  skill `efeonce-public-site-wordpress` → `references/global-site-navigation.md` §Landing dock.
 
 ### A16. Anuncio de alianza / partnership (post + reel) (aprobado 2026-10-19)
 
@@ -1279,7 +1292,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Destacados de Instagram | — | mezcla de recursos, un color de luz por destacada, sin firma en el círculo; portada (cambiar) e historia completa 9:16 (crear) | A11 |
 | Escenario del login de Greenhouse (excepción en curso) | lente al canon (anillo 1,12, zoom, ancho/794); sin lente si la foto ya trae su órbita | foto de novedad, voz con anillo y esfera en el acento de la línea | A12 (`LoginLens.tsx`) |
 | Mención Efeonce en texto corrido | ninguna (el isotipo ya es órbita) | isotipo + etiqueta corta en la píldora de la línea; sólo destinos Efeonce, no CTA | `efeonce.mention` (AXIS) · A14 |
-| Encabezado y navegación del sitio web (planificado) | — | logo 164/140, cápsula de vidrio, botón «Agenda tu diagnóstico» y hamburguesa con una sola receta de vidrio | `efeonce.site-nav` (AXIS, planificado TASK-2040) · A15 |
+| Encabezado y navegación del sitio web (en vivo desde 2026-10-23) | — | logo 164/140, cápsula de vidrio, botón «Agenda tu diagnóstico» y hamburguesa con una sola receta de vidrio | `efeonce.site-nav` (AXIS primitives 0.7.13) · A15 |
 | Landing de servicio/agenda con el agendador nativo | órbita de retrato de Nexa en el hero | agendador real enmarcado, titulares con esfera (salvo el del hero), CTA `accent-growth`, firma del sitio | landing source-led + `<efeonce-meeting-scheduler>` · A17 |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Anuncio de alianza (post 4:5 + reel 9:16) | ninguna (la órbita fina sola no tiene punch) | fondo cine con horizonte bajo, íconos oficiales del partner en tres planos con acabado Sunburst, lockup «Efeonce \| Partner» con filete y fila de productos debajo; sin pregunta-respuesta | composición determinística + acabado `gpt-image-2.5-sunburst` · A16 |

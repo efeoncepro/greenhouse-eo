@@ -164,12 +164,23 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
 
 ## Estado de rollout (actualizar al cambiar)
 
+- **2026-10-23: placement `landing_dock`** (dock inferior compartido de siete landings de efeoncepro.com, AXIS
+  `efeonce.landing-dock`, plugin `eo-landing-dock`, TASK-2043). Mismo patrón de **lanzador oculto** que el menú: el
+  plugin imprime en `wp_footer` un `<greenhouse-cta cta-location="landing_dock" appearance="bare">` oculto y el botón
+  principal del dock lo activa (`landing-dock-host.js`). Redes Sociales e Inicio usan el CTA del menú
+  `site-nav-discovery-meeting` (misma página HubSpot `efeoncepro/agenda-discovery`; piel `site`), y su key sale de la
+  opción del menú en cada render. Influencers, Inbound y HubSpot conservan su CTA propio (`influencer-`, `inbound-`,
+  `hubspot-discovery-meeting`); `pnpm public-website:landing-dock on` copia la key desde el HTML vivo al meta del dock,
+  así que **rotar la key de esos CTA exige repetir `on`** después de republicar la landing. `landing_dock` reemplaza
+  `inbound_mobile_dock` y `hubspot_mobile_dock`. Operación: skill `efeonce-public-site-wordpress` →
+  `references/global-site-navigation.md` §Landing dock.
+
 - **2026-10-23: CTA `site-nav-discovery-meeting` publicado** (menú global de efeoncepro.com, EPIC-055/TASK-2042).
   `open_meeting_scheduler` → meeting surface `fhsf-efeonce-lead-gen-web`, scheduler `discovery`, rutas `/**`; surface
   WordPress `csur-eb834d53-fd99-4f6b-9615-979e329e7d37` que sólo permite ese CTA, orígenes efeoncepro.com y www;
   `cta_location: site_nav`. Lo publica `scripts/growth/publish-site-nav-meeting-cta.ts`; la key vive en Greenhouse
   `.auth/site-nav-meeting-cta-surface.json` (0600, gitignored). **Re-correr el publisher ROTA la key**: en la misma
-  sesión hay que actualizar la opción de WordPress con `set-site-nav-scheduler.php` (nunca imprime la key), o el CTA
+  sesión hay que actualizar la opción `eo_site_nav_scheduler` de WordPress (la otra copia de la key) con `set-site-nav-scheduler.php` (nunca imprime la key), o el CTA
   cae a `/agenda/`. Nunca escribir la key en docs, logs ni chat.
   - **Lanzador oculto:** el tema imprime un único `<greenhouse-cta>` oculto por página en `wp_footer` (sólo si la opción
     `eo_site_nav_scheduler` es válida); los botones del menú (cabecera, mega, onepage) lo activan. El renderer carga en

@@ -53,6 +53,10 @@ Landing state, public click evidence and scope: `landings/content-marketing.md` 
 
 ## Indexing checks for menu pages
 
+Since 2026-10-23 the destinations visitors see come from the live site-nav document: list them with
+`pnpm public-website:site-nav pull` + `show` (and `check`, which confirms links answer), not from Ohio's menu. The
+2026-08-31 procedure below is historical for Ohio's menu; its per-destination checks still apply.
+
 Resolve assigned menus and compare rendered navigation; exclude `#` group labels and external social
 links. Audit each unique internal destination for robots meta/HTTP headers, robots.txt, canonical, status
 and sitemap before changing anything. An indexing request for the menu does not authorize unblocking
