@@ -89,6 +89,13 @@ const TARGETS: Target[] = [
     required: false
   },
   {
+    label: 'EO landing dock plugin (TASK-2043)',
+    remotePath: 'wp-content/plugins/eo-landing-dock',
+    required: false,
+    // Its pinned AXIS files, like the theme's: the deploy drift guard needs them in the baseline.
+    includes: ['/assets/vendor/', '/assets/vendor/axis/***']
+  },
+  {
     label: 'Ohio HubSpot form styler plugin',
     remotePath: 'wp-content/plugins/ohio-hubspot-form-styler',
     required: false
