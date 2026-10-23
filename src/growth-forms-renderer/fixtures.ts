@@ -142,3 +142,45 @@ export const multiStepContractFixture = (): RenderContract =>
     ],
     consent: undefined,
   })
+
+/**
+ * TASK-2045 — Popup «Quiero ser partner» (canvas «Partners — Efeonce» v14): grilla 2×2 con ancho declarado,
+ * consentimiento compacto con el enlace en la frase y éxito con el glifo de La órbita y «Cerrar». Fixture de
+ * referencia del kit de formularios diseñados (TASK-2044); el copy es el del diseño aprobado.
+ */
+export const partnerApplicationContractFixture = (): RenderContract =>
+  staticContractFixture({
+    form: {
+      formId: 'form_partner_demo',
+      formKey: '00000000-0000-4000-8000-0000000000ef',
+      slug: 'efeonce-partner-application',
+      formVersionId: 'fv_partner_demo_1',
+      version: 1,
+      locale: 'es-CL',
+      formKind: 'contact',
+    },
+    fields: [
+      { key: 'fullName', type: 'text', label: 'Nombre y apellido', placeholder: 'Tu nombre', required: true, autocomplete: 'name', presentation: { width: 'half' } },
+      { key: 'email', type: 'email', label: 'Correo de trabajo', placeholder: 'tu@empresa.com', required: true, autocomplete: 'email', inputMode: 'email', presentation: { width: 'half' } },
+      { key: 'company', type: 'text', label: 'Empresa o plataforma', placeholder: 'Nombre de la plataforma', required: true, autocomplete: 'organization', presentation: { width: 'half' } },
+      { key: 'website', type: 'url', label: 'Sitio web', placeholder: 'https://', autocomplete: 'url', inputMode: 'url', presentation: { width: 'half' } },
+      { key: 'offer', type: 'textarea', label: '¿Qué ofreces y a quién le sirve?', placeholder: 'Tu tecnología, el problema que resuelve y el tipo de cliente', required: true, maxLength: 1500, presentation: { width: 'full' } },
+    ],
+    copy: { submit: 'Enviar propuesta →' },
+    consent: {
+      presentation: 'compact',
+      privacyUrl: 'https://efeoncepro.com/politica-de-privacidad/',
+      privacyLinkLabel: 'política de privacidad',
+      checkboxes: [
+        { key: 'privacy', label: 'Acepto que Efeonce use estos datos para responder mi propuesta, según su {privacyLink}.', required: true },
+      ],
+    },
+    successBehavior: {
+      kind: 'inline_message',
+      presentation: 'success_card',
+      icon: 'orbit',
+      title: 'Recibido.',
+      body: 'Gracias por escribirnos. Revisamos tu propuesta y te contactamos por correo.',
+      actions: [{ kind: 'dismiss', label: 'Cerrar' }],
+    },
+  })

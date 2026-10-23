@@ -15,6 +15,28 @@
  */
 export const RENDERER_STYLE_ID = 'greenhouse-form-styles'
 
+/** Tokens del esquema oscuro: los usa `prefers-color-scheme: dark` y el forzado `color-scheme="dark"`. */
+const DARK_TOKENS = `
+--ghf-fg: #e8ebf0;
+--ghf-muted: #9aa3b2;
+--ghf-bg: #11151c;
+--ghf-field-bg: #181d26;
+/* Border ≥3:1 vs dark field bg (WCAG 1.4.11). */
+--ghf-border: #6b7382;
+--ghf-border-strong: #8a93a3;
+--ghf-accent: #6c8cff;
+--ghf-accent-contrast: #0b0f16;
+--ghf-error: #ff8aa0;
+--ghf-error-bg: #2a151b;
+--ghf-success: #34d399;
+--ghf-celebration: #ffd166;
+--ghf-field-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+--ghf-field-shadow-focus: 0 0 0 4px rgba(108, 140, 255, 0.18);
+--ghf-action-shadow: 0 10px 24px rgba(0, 0, 0, 0.34);
+--ghf-action-shadow-hover: 0 14px 30px rgba(0, 0, 0, 0.42);
+--ghf-placeholder: #a9a9a9;
+`
+
 export const RENDERER_CSS = `
   greenhouse-form, .ghf-scope {
     --ghf-font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -38,6 +60,8 @@ export const RENDERER_CSS = `
     --ghf-field-shadow-focus: 0 0 0 4px rgba(37, 99, 235, 0.14);
     --ghf-action-shadow: 0 10px 24px rgba(16, 22, 43, 0.10);
     --ghf-action-shadow-hover: 0 14px 30px rgba(16, 22, 43, 0.14);
+    /* TASK-2045 — color del placeholder (antes era el del navegador; este es su valor habitual). */
+    --ghf-placeholder: #757575;
 
     display: block;
     container-type: inline-size;
@@ -70,24 +94,13 @@ export const RENDERER_CSS = `
 
   @media (prefers-color-scheme: dark) {
     greenhouse-form:not([data-color-scheme="light"]), .ghf-scope:not([data-color-scheme="light"]) {
-      --ghf-fg: #e8ebf0;
-      --ghf-muted: #9aa3b2;
-      --ghf-bg: #11151c;
-      --ghf-field-bg: #181d26;
-      /* Border ≥3:1 vs dark field bg (WCAG 1.4.11). */
-      --ghf-border: #6b7382;
-      --ghf-border-strong: #8a93a3;
-      --ghf-accent: #6c8cff;
-      --ghf-accent-contrast: #0b0f16;
-      --ghf-error: #ff8aa0;
-      --ghf-error-bg: #2a151b;
-      --ghf-success: #34d399;
-      --ghf-celebration: #ffd166;
-      --ghf-field-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
-      --ghf-field-shadow-focus: 0 0 0 4px rgba(108, 140, 255, 0.18);
-      --ghf-action-shadow: 0 10px 24px rgba(0, 0, 0, 0.34);
-      --ghf-action-shadow-hover: 0 14px 30px rgba(0, 0, 0, 0.42);
+${DARK_TOKENS}
     }
+  }
+
+  /* TASK-2045 — color-scheme="dark" fuerza el esquema oscuro aunque el sistema esté en claro. */
+  greenhouse-form[data-color-scheme="dark"], .ghf-scope[data-color-scheme="dark"] {
+${DARK_TOKENS}
   }
 
   /* TASK-1297 — appearance="bare" (chromeless): el renderer no dibuja card; este modo
@@ -107,7 +120,8 @@ export const RENDERER_CSS = `
   .ghf-fields {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--ghf-gap);
+    row-gap: var(--ghf-gap);
+    column-gap: var(--ghf-column-gap, var(--ghf-gap));
     transform-origin: 50% 0%;
     animation: ghf-step-surface-in 200ms cubic-bezier(0.2, 0, 0, 1);
   }
@@ -130,7 +144,7 @@ export const RENDERER_CSS = `
     .ghf-field--full { grid-column: 1 / -1; }
   }
 
-  .ghf-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; position: relative; z-index: 0; }
+  .ghf-field { display: flex; flex-direction: column; gap: var(--ghf-field-gap, 6px); min-width: 0; position: relative; z-index: 0; }
 
   /* Visible choices (radio): cards with a radio mark, tokenized. hubspot_pillar keeps its own chips/cards. */
   .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) .ghf-choice-group { display: grid; grid-template-columns: 1fr; gap: 8px; }
@@ -159,8 +173,8 @@ export const RENDERER_CSS = `
   @media (prefers-reduced-motion: reduce) { .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice { transition: none; } }
   .ghf-field:focus-within { z-index: 40; }
   .ghf-field[data-overlay-open="true"] { z-index: 80; }
-  [data-ghf-style-variant="diagnostic_premium"] .ghf-field { gap: 8px; }
-  .ghf-label { display: inline-flex; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 600; line-height: 1.3; color: var(--ghf-fg); }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-field { gap: var(--ghf-field-gap, 8px); }
+  .ghf-label { display: inline-flex; align-items: center; gap: 8px; font-size: var(--ghf-label-size, 0.875rem); font-weight: var(--ghf-label-weight, 600); line-height: 1.3; color: var(--ghf-label-color, var(--ghf-fg)); }
   .ghf-field-icon {
     display: inline-grid;
     place-items: center;
@@ -207,10 +221,10 @@ export const RENDERER_CSS = `
     color: var(--ghf-fg);
     background: var(--ghf-field-bg);
     border: 1px solid var(--ghf-border);
-    border-radius: var(--ghf-radius);
-    padding: 10px 12px;
+    border-radius: var(--ghf-field-radius, var(--ghf-radius));
+    padding: var(--ghf-field-padding, 10px 12px);
     width: 100%;
-    min-height: 44px;
+    min-height: var(--ghf-field-min-height, 44px);
     line-height: 1.4;
     box-shadow: var(--ghf-field-shadow);
     transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease, background-color 140ms ease;
@@ -219,12 +233,14 @@ export const RENDERER_CSS = `
   [data-ghf-style-variant="diagnostic_premium"] .ghf-textarea,
   [data-ghf-style-variant="diagnostic_premium"] .ghf-select,
   [data-ghf-style-variant="diagnostic_premium"] .ghf-file-input {
-    min-height: 52px;
-    padding: 14px 16px;
-    border-radius: var(--ghf-radius);
+    min-height: var(--ghf-field-min-height, 52px);
+    padding: var(--ghf-field-padding, 14px 16px);
+    border-radius: var(--ghf-field-radius, var(--ghf-radius));
   }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-select { padding-inline-end: 44px; }
   .ghf-textarea { min-height: 96px; resize: vertical; }
+  .ghf-input::placeholder,
+  .ghf-textarea::placeholder { color: var(--ghf-placeholder); opacity: 1; }
   .ghf-select { appearance: none; }
   .ghf-input:hover,
   .ghf-textarea:hover,
@@ -720,8 +736,8 @@ export const RENDERER_CSS = `
   }
   .ghf-btn {
     font: inherit; font-weight: 600;
-    min-height: 44px; padding: 10px 20px;
-    border-radius: var(--ghf-radius); border: 1px solid transparent;
+    min-height: var(--ghf-btn-min-height, 44px); padding: var(--ghf-btn-padding, 10px 20px);
+    border-radius: var(--ghf-btn-radius, var(--ghf-radius)); border: 1px solid transparent;
     cursor: pointer;
     background: var(--ghf-accent); color: var(--ghf-accent-contrast);
     box-shadow: var(--ghf-action-shadow);
@@ -732,9 +748,9 @@ export const RENDERER_CSS = `
     align-items: center;
     justify-content: center;
     gap: 10px;
-    min-height: 52px;
+    min-height: var(--ghf-btn-min-height, 52px);
     min-width: 0;
-    padding: 13px 26px;
+    padding: var(--ghf-btn-padding, 13px 26px);
     font-weight: 700;
     letter-spacing: 0 !important;
   }
@@ -802,6 +818,7 @@ export const RENDERER_CSS = `
   .ghf-scope .ghf-form .ghf-select,
   .ghf-scope .ghf-form .ghf-tag-input {
     font: inherit !important;
+    font-size: var(--ghf-field-font-size, 1em) !important;
     color: var(--ghf-fg) !important;
     background: var(--ghf-field-bg) !important;
     background-color: var(--ghf-field-bg) !important;
@@ -819,6 +836,7 @@ export const RENDERER_CSS = `
   .ghf-scope .ghf-form .ghf-textarea:focus-visible,
   .ghf-scope .ghf-form .ghf-select:focus-visible,
   .ghf-scope .ghf-form .ghf-tag-input:focus-within {
+    border-color: var(--ghf-field-focus-border, var(--ghf-border)) !important;
     box-shadow: var(--ghf-field-shadow-focus) !important;
   }
 

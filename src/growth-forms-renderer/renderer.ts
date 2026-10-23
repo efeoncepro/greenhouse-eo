@@ -670,7 +670,7 @@ export class FormRenderer {
     const label = this.fieldLabel(field)
 
     if (field.type !== 'checkbox' && field.type !== 'consent') {
-      const labelEl = el(this.doc, 'label', { class: 'ghf-label', for: fieldId })
+      const labelEl = el(this.doc, 'label', { class: 'ghf-label', for: fieldId, 'data-ghf-part': 'label' })
 
       if (field.presentation?.icon && !this.usesInlineControlIcons()) {
         // Label icons are inline SVGs. The text glyphs (`@`, `+`, `·`, `↗`…) rendered as broken words on
@@ -781,6 +781,10 @@ export class FormRenderer {
   }
 
   private fieldPrefersFullWidth(field: RendererFieldDefinition): boolean {
+    // TASK-2044/2045 — el ancho declarado manda sobre la heurística (`auto` o ausente = heurística).
+    if (field.presentation?.width === 'full') return true
+    if (field.presentation?.width === 'half') return false
+
     if (this.usesCareersStaticFidelity()) {
       if (field.key === 'firstName' || field.key === 'lastName') return false
       if (['email', 'tel', 'select', 'url', 'date', 'number'].includes(field.type)) return true
@@ -2331,6 +2335,8 @@ export class FormRenderer {
     const primary = el(this.doc, 'button', { type: 'submit', class: 'ghf-btn' })
 
     primary.dataset.ghfPrimary = 'true'
+    // TASK-2045 — hook estable de estilo para el anfitrión (`[data-ghf-part="submit"]`).
+    primary.dataset.ghfPart = 'submit'
     this.setPrimaryLabel(primary, submitLabel)
     primary.addEventListener('pointerdown', event => {
       // Avoid a pre-click blur validation layout shift moving the submit button under
