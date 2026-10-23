@@ -1,5 +1,12 @@
 # SKY · Cobertura y pendientes de la auditoría orgánica
 
+## Delta 2026-10-23
+
+- La [auditoría consolidada del 23-10](../../audits/growth/2026-10-23-sky-blog-seo-audit-consolidada.md)
+  avanza los frentes 01 a 06 (§9 de ese documento) sin cerrarlos: siguen pendientes la revisión de acciones
+  manuales y seguridad en la interfaz GSC, el registro de despliegue de TI y los datos de campo CWV.
+- Alerta: nueve posts de Perú vivos el 15-10 responden 404 el 23-10; hay que identificar quién retira contenido.
+
 Corte: 15-10-2026. Registro de cobertura del diagnóstico; no certifica nuevas comprobaciones ni cambios
 en producción. Se actualiza al incorporar evidencia. Los resultados numéricos y artefactos conservan su
 fuente en la [auditoría](../../audits/growth/2026-10-15-sky-organic-channel-audit.md).

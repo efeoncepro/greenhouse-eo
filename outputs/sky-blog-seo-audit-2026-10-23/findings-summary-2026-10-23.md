@@ -1,0 +1,14 @@
+# SKY blog — auditoría técnica (verificada 2026-10-23)
+- Redirecciones (110 artículos Wayback ≤2025-09-25): 103 mismo slug 200 (93,6%), 4 slug distinto relevante 200 (3,6%), 3 404 (2,7%). 106 = un 301; 4 = 301>301. 0 302/307, 0 meta refresh/JS.
+- Variantes http / apex / sin slash: 18/18 → 301>301>200. /BLOG/ mayúsculas y /es|es-cl|es-pe/blog/: 200 SPA "Sky" (soft-404 www).
+- /blog/page/2/ → /page/2/ cuyo canonical = /2/ (404).
+- /como-cambiar-un-vuelo-en-sky-pasos-y-condiciones/ 404 (3.433 sesiones pre); contenido vive en /cambiar-vuelo-sky/ sin 301.
+- Azure origin blog-sky-h0gfh8acecdrdtav.eastus2-01.azurewebsites.net: 200 GB y BR, canonical autorreferente, sin noindex/X-Robots-Tag, robots.txt 404, wp-sitemap.xml propio con URLs azure.
+- robots.txt blog = 404 nginx; robots.txt www = 200 text/html (SPA). sitemap_index www sólo flights.*; sin referencia al blog.
+- wp-sitemap: 1700 posts (+1 page, 14 layouts, 13 cat, 25 tags, 4 users). hola-mundo y layouts dentro.
+- Plantilla 15/15: sin meta description, sin JSON-LD, sin hreflang, sin autor, sin <time>/article:published_time, 0 loading=lazy, 0 webp; og:* sí. Pre-migración (archivo 12-09-2025): AIOSEO 4.7.9.1 + BlogPosting/BreadcrumbList/Person/Organization + meta description.
+- WP 7.1.3, Elementor 4.3.5, tema tripster(-child), trx_addons, trx_popup, Site Kit 1.190.0, W3 Total Cache (Redis), HubSpot leadin, elementor-mcp-composer + namespace mcp. Ningún plugin SEO.
+- Home: sin H1, 9 enlaces internos al blog (3 artículos). Categorías: paginación por AJAX "load more", sin <a> a /page/2/. BFS 130 páginas: 636/1700 posts alcanzados (37%), profundidad 1:3, 2:69, 3:366, 4:198.
+- Seguridad: sin spam en 1700 títulos REST; 0 enlaces externos ocultos; GB vs BR idénticos en 15 URLs. /wp-json/wp/v2/users expone 4 usuarios (administrador, leg_admin...). readme.html, wp-login.php públicos.
+- 61 familias de slug -N (135 posts), 13 pares de títulos idénticos.
+- PSI: 429 cuota diaria (sin key) — sin datos CrUX. Playwright lab (móvil 4x CPU, 1,6 Mbps): LCP 5,7–20,0 s, 1,2–2,1 MB, ~153 req (~100 terceros). Escritorio LCP 0,3–0,56 s.

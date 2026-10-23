@@ -1,0 +1,69 @@
+codigo,ciudad,pais,operacion,origenes_en_lista,articulos_total,articulos_destino,qué_hacer,alrededores_flag,ultimo_publicado,ultimo_modificado,ga4_pre28_ago_sep25,ga4_post28_oct25,gsc_clicks_nov_dic25,gsc_clicks_ago_sep26,gsc_impr_ago_sep26,top_url
+LIM,Lima,PE,SKY,62,45,30,17,7,2026-09-28,2026-09-28,1872,804,1740,634,102237,sky-lanza-nueva-ruta-en-peru-lima-talara
+CUZ,Cusco,PE,SKY,42,14,13,3,1,2026-06-13,2026-06-05,91,24,18,40,7439,como-llegar-a-muchu-picchu
+PIU,Piura,PE,SKY,34,13,13,8,1,2026-10-06,2026-09-22,298,70,105,53,17398,playas-de-piura
+JAU,Jauja,PE,SKY,32,12,12,9,0,2026-10-09,2026-10-05,257,117,213,106,25001,canon-de-shucto
+TCQ,Tacna,PE,SKY,46,12,12,9,0,2025-12-05,2025-12-10,368,86,143,145,31029,catedral-de-tacna
+TRU,Trujillo,PE,SKY,34,9,9,3,3,2026-10-11,2026-10-05,145,13,37,16,8819,trujillo-peru
+TPP,Tarapoto,PE,SKY,33,8,7,4,1,2026-06-10,2026-06-08,234,127,217,68,12208,mejor-fecha-para-viajar-a-tarapoto
+PEM,Puerto Maldonado,PE,SKY,31,7,7,3,1,2026-03-05,2026-03-02,0,0,3,49,11182,puerto-maldonado-2
+IQT,Iquitos,PE,SKY,32,6,4,1,1,2026-09-28,2026-09-21,36,10,7,10,2841,isla-de-los-monos
+CIX,Chiclayo,PE,SKY,23,6,3,1,0,2026-09-03,2026-09-04,191,33,121,19,4422,aerolinea-sky-inicia-vuelos-a-chiclayo-y-cajamarca
+TBP,Tumbes,PE,SKY,34,5,5,1,0,2026-10-01,2026-09-22,0,1,0,150,27500,punta-sal
+AQP,Arequipa,PE,SKY,32,5,3,2,0,2025-10-28,2026-01-12,60,14,9,6,3054,sky-inicio-vuelos-directos-entre-arequipa-y-cusco
+JUL,Juliaca,PE,SKY,32,4,3,1,0,2025-10-29,2025-10-27,89,38,51,5,4032,viaje-a-juliaca
+TYL,Talara,PE,SKY,24,4,4,2,0,2026-10-13,2026-10-05,230,78,103,61,6939,que-hacer-en-talara
+PCL,Pucallpa,PE,SKY,34,3,3,2,0,2025-12-05,2025-12-10,58,10,34,19,4460,lugares-turisticos-en-pucallpa
+CJA,Cajamarca,PE,SKY,25,3,2,1,0,2026-09-18,2026-09-15,0,0,0,59,1610,sky-suma-a-cajamarca-y-talara-a-su-red-de-destinos
+AYP,Ayacucho,PE,SKY,34,1,1,1,0,2021-12-22,2021-12-22,39,7,30,26,12597,como-llegar-a-ayacucho
+SCL,Santiago,CL,SKY,68,75,66,37,8,2026-10-07,2026-09-22,1819,788,3700,1331,269484,fiesta-final-de-diciembre
+PMC,Puerto Montt,CL,SKY,30,43,40,25,6,2026-10-01,2026-09-22,403,160,437,303,68758,como-llegar-ahornopiren
+ZCO,Temuco,CL,SKY,40,31,28,19,1,2026-08-30,2026-08-31,302,156,406,423,58964,se-puede-llegar-en-avion-a-pucon
+IQQ,Iquique,CL,SKY,40,19,18,14,0,2026-05-12,2026-05-11,237,91,174,306,46769,zofri-iquique
+CCP,Concepción,CL,SKY,44,17,17,9,1,2026-09-29,2026-09-22,61,22,39,72,40566,huascar
+MHC,Castro,CL,SKY,26,17,17,12,1,2026-06-11,2026-06-05,109,91,303,212,17044,aeropuerto-chiloe
+PNT,Puerto Natales,CL,SKY,27,17,15,10,0,2026-04-07,2026-04-07,382,157,306,80,15748,como-ir-de-puerto-natales-a-el-calafate
+CJC,Calama,CL,SKY,40,16,15,9,0,2026-06-24,2026-08-10,91,27,33,52,19746,tiempo-en-calama
+ZAL,Valdivia,CL,SKY,37,12,12,9,2,2026-08-23,2026-08-20,210,81,221,73,16133,aprende-donde-queda-lago-ranco-y-como-llegar-desde-osorno
+ARI,Arica,CL,SKY,46,11,11,8,1,2025-12-12,2026-01-12,112,26,36,42,11322,laguna-roja-en-chile-el-misterio-de-sus-aguas-color-sangre
+ZOS,Osorno,CL,SKY,37,11,11,8,0,2026-08-31,2026-08-28,96,26,48,54,10532,parques-y-atracciones-naturales-de-osorno
+PUQ,Punta Arenas,CL,SKY,28,11,10,5,2,2026-05-12,2026-05-11,101,38,50,21,5973,cerro-de-la-cruz
+BBA,Balmaceda,CL,SKY,26,11,11,5,0,2026-05-11,2026-05-05,237,116,292,107,19268,viajar-a-coyhaique
+ANF,Antofagasta,CL,SKY,38,10,10,7,0,2025-12-18,2026-01-19,171,65,227,86,20094,que-hacer-en-antofagasta
+CPO,Copiapó,CL,SKY,39,10,10,9,0,2026-06-16,2026-06-16,123,22,25,95,29464,desierto-florido
+LSC,La Serena,CL,SKY,39,7,6,6,1,2026-10-08,2026-10-05,16,9,15,3,3988,que-hacer-en-la-serena
+MIA,Miami,US,SKY,43,38,35,14,0,2026-08-24,2026-08-21,913,354,551,190,37018,cuanto-dinero-llevar-miami
+GIG,Rio de Janeiro,BR,SKY,36,37,37,30,4,2026-09-16,2026-09-09,1326,548,821,643,113664,ciudades-cercanas-rio-de-janeiro
+PUJ,Punta Cana,DO,SKY,39,34,34,15,2,2026-01-06,2026-01-19,1733,577,657,594,142336,como-ir-de-punta-cana-a-santo-domingo
+BUE,Buenos Aires,AR,SKY,35,33,30,11,4,2026-10-12,2026-10-05,1495,678,1214,557,78192,aeropuertos-en-buenos-aires
+MVD,Montevideo,UY,SKY,48,33,30,16,5,2026-10-12,2026-10-05,660,287,608,299,54838,punta-del-este-montevideo
+FLN,Florianopolis,BR,SKY,23,28,28,14,1,2026-09-15,2026-09-09,1711,329,799,534,114682,beto-carrero
+BRC,San Carlos de Bariloche,AR,SKY,16,21,20,12,1,2026-09-21,2026-09-21,350,96,147,74,15429,virgen-de-las-nieve
+MDZ,Mendoza,AR,SKY,27,19,19,9,1,2026-10-03,2026-09-22,389,68,178,112,25195,centros-comerciales-en-mendoza
+GRU,Sao Paulo,BR,SKY,39,17,17,7,2,2026-09-16,2026-09-09,282,25,63,382,91537,tiempo-de-chile-a-brasil
+POA,Porto Alegre,BR,SKY,8,15,15,10,0,2026-09-15,2026-09-09,87,22,63,46,11730,que-hacer-en-porto-alegre
+SSA,Salvador de Bahia,BR,SKY,10,14,14,12,0,2026-09-20,2026-09-15,496,179,361,170,19843,salvador-de-bahia
+FTE,El Calafate,AR,SKY,17,11,10,6,0,2026-09-24,2026-09-21,97,39,82,25,9085,el-fruto-del-calafate
+CNF,Belo Horizonte,BR,SKY,7,6,6,2,1,2025-12-20,2025-12-19,192,45,71,42,9883,ouro-preto
+BSB,Brasilia,BR,SKY,3,5,5,3,0,2026-07-23,2026-07-20,71,20,29,22,3873,catedral-brasilia
+BPS,Porto Seguro,BR,SKY,3,1,1,1,0,2025-10-04,2026-01-12,18,4,5,3,1560,porto-seguro
+CUN,Cancún,MX-Caribe,en lista de rutas; fuera del catálogo de aeropuertos,34,36,36,21,3,2025-11-12,2026-01-19,929,253,428,153,27414,comprar-recuerdos-cancun
+BOG,Bogotá,CO,en lista de rutas (SCL/AEP/EZE); fuera del catálogo,3,20,20,9,3,2024-06-26,2024-06-26,1607,117,276,102,24939,villa-de-leyva-desde-bogota
+AUA,Aruba,Caribe,en lista de rutas (sólo LIM); fuera del catálogo,1,13,12,6,0,2026-01-01,2026-01-12,1321,226,402,119,28483,sargazo-en-playa-del-carmen-que-saber-antes-de-viajar
+USH,Ushuaia,AR,interlínea,1,4,4,1,1,2026-07-23,2026-07-22,36,27,26,39,2515,viaje-a-ushuaia
+BHI,Bahía Blanca,AR,interlínea,1,0,0,0,0,,,0,0,0,0,0,
+COR,Cordoba,AR,interlínea,2,0,0,0,0,,,0,0,0,0,0,
+IGR,Puerto Iguazú,AR,interlínea,2,0,0,0,0,,,0,0,0,0,0,
+MDQ,Mar del Plata,AR,interlínea,1,0,0,0,0,,,0,0,0,0,0,
+NQN,Neuquén,AR,interlínea,1,0,0,0,0,,,0,0,0,0,0,
+ROS,Rosario,AR,interlínea,1,0,0,0,0,,,0,0,0,0,0,
+SLA,Salta,AR,interlínea,1,0,0,0,0,,,0,0,0,0,0,
+BEL,Belém,BR,interlínea,3,0,0,0,0,,,0,0,0,0,0,
+CWB,Curitiba,BR,interlínea,3,0,0,0,0,,,0,0,0,0,0,
+FOR,Fortaleza,BR,interlínea,3,0,0,0,0,,,0,0,0,0,0,
+GYN,Goiânia,BR,interlínea,3,0,0,0,0,,,0,0,0,0,0,
+IGU,Foz do Iguaçu,BR,interlínea,3,0,0,0,0,,,0,0,0,0,0,
+MCZ,Maceió,BR,interlínea,3,0,0,0,0,,,0,0,0,0,0,
+NAT,Natal,BR,interlínea,3,0,0,0,0,,,0,0,0,0,0,
+REC,Recife,BR,interlínea,3,0,0,0,0,,,0,0,0,0,0,
+VIX,Vitória,BR,interlínea,3,0,0,0,0,,,0,0,0,0,0,
