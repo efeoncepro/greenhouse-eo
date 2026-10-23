@@ -345,7 +345,7 @@ export class FormRenderer {
 
     form.appendChild(this.renderActions())
 
-    const summary = el(this.doc, 'p', { class: 'ghf-summary', role: 'alert', 'aria-live': 'assertive' })
+    const summary = el(this.doc, 'p', { class: 'ghf-summary', role: 'alert', 'aria-live': 'assertive', 'data-ghf-part': 'summary' })
 
     summary.dataset.ghfSummary = 'true'
     form.appendChild(summary)
@@ -705,9 +705,9 @@ export class FormRenderer {
 
       labelEl.appendChild(el(this.doc, 'span', {}, label))
 
-      if (required) labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-required', 'aria-hidden': 'true' }, '*'))
+      if (required) labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-required', 'aria-hidden': 'true', 'data-ghf-part': 'required-mark' }, '*'))
       else if (!this.labelAlreadyMarksOptional(label))
-        labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-optional' }, '(opcional)'))
+        labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-optional', 'data-ghf-part': 'optional-mark' }, '(opcional)'))
       wrap.appendChild(labelEl)
     }
 
@@ -2431,10 +2431,10 @@ export class FormRenderer {
     }
 
     // Hint vivo de "campos pendientes / listo para enviar" (TASK-1256 Slice 1d).
-    const wrapper = el(this.doc, 'div', { class: 'ghf-actions-wrap' })
+    const wrapper = el(this.doc, 'div', { class: 'ghf-actions-wrap', 'data-ghf-part': 'actions' })
 
     wrapper.appendChild(actions)
-    const readiness = el(this.doc, 'p', { class: 'ghf-readiness', 'aria-live': 'polite' })
+    const readiness = el(this.doc, 'p', { class: 'ghf-readiness', 'aria-live': 'polite', 'data-ghf-part': 'readiness' })
 
     readiness.dataset.ghfReadiness = 'true'
     if (isLast) wrapper.appendChild(readiness)
@@ -2455,7 +2455,7 @@ export class FormRenderer {
 
     if (trimmed.endsWith('→')) {
       button.appendChild(el(this.doc, 'span', { class: 'ghf-btn-label' }, trimmed.slice(0, -1).trim()))
-      button.appendChild(el(this.doc, 'span', { class: 'ghf-btn-arrow', 'aria-hidden': 'true' }, '→'))
+      button.appendChild(el(this.doc, 'span', { class: 'ghf-btn-arrow', 'aria-hidden': 'true', 'data-ghf-part': 'submit-arrow' }, '→'))
 
       return
     }
@@ -3078,7 +3078,7 @@ export class FormRenderer {
 
     mark?.appendChild(icon === 'orbit' ? this.buildOrbitMarkGraphic() : this.buildSuccessMarkGraphic())
 
-    const content = el(this.doc, 'div', { class: 'ghf-success-card__content' })
+    const content = el(this.doc, 'div', { class: 'ghf-success-card__content', 'data-ghf-part': 'success-content' })
 
     content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__title', 'data-ghf-part': 'success-title' }, title))
     content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__body', 'data-ghf-part': 'success-body' }, body))
@@ -3098,7 +3098,8 @@ export class FormRenderer {
     if (actions.length > 0) {
       const actionRow = el(this.doc, 'div', {
         class: 'ghf-success-card__actions',
-        'data-capture': 'growth-form-success-actions'
+        'data-capture': 'growth-form-success-actions',
+        'data-ghf-part': 'success-actions'
       })
 
       for (const action of actions) {

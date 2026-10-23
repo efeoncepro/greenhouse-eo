@@ -15,6 +15,7 @@ import { lockDocumentScroll, unlockDocumentScroll } from './meeting-action'
 
 export const FORM_DIALOG_SHEET_QUERY = '(max-width: 760px)'
 const GROWTH_FORM_DISMISS_EVENT = 'ghf:dismiss'
+const SUCCESS_SELECTOR = '[data-ghf-part="success-card"], .ghf-status--success'
 const FIELD_SELECTOR = '.ghf-form input:not([type="hidden"]):not([tabindex="-1"]), .ghf-form textarea, .ghf-form select'
 
 export interface FormDialogHeader {
@@ -41,6 +42,7 @@ export class FormDialogController {
   private mounted: Promise<boolean> | null = null
   private media: MediaQueryList | null = null
   private observer: MutationObserver | null = null
+  private successObserver: MutationObserver | null = null
   private scrollLocked = false
   private disposed = false
 
@@ -91,6 +93,8 @@ export class FormDialogController {
     if (this.disposed) return
     this.disposed = true
     this.observer?.disconnect()
+    this.successObserver?.disconnect()
+    this.successObserver = null
     this.media?.removeEventListener('change', this.syncSheet)
     if (this.dialog?.open) this.close()
     this.handleClosed(false)
@@ -162,6 +166,9 @@ export class FormDialogController {
     slot.className = 'ghc-form-dialog-stage'
     slot.setAttribute('data-capture', 'growth-form')
     slot.addEventListener(GROWTH_FORM_DISMISS_EVENT, () => this.close())
+    // Con el éxito a la vista, el encabezado del diálogo se retira (la tarjeta de éxito es el contenido).
+    this.successObserver = new MutationObserver(() => this.syncSuccess())
+    this.successObserver.observe(slot, { childList: true, subtree: true })
     card.append(close, head, slot)
     dialog.appendChild(card)
 
@@ -232,6 +239,12 @@ export class FormDialogController {
       }
     })
     this.observer.observe(slot, { childList: true, subtree: true })
+  }
+
+  private syncSuccess(): void {
+    const success = Boolean(this.slot?.querySelector(SUCCESS_SELECTOR))
+
+    this.dialog?.toggleAttribute('data-success', success)
   }
 
   private readonly syncSheet = (): void => {

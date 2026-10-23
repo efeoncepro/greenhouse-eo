@@ -174,7 +174,7 @@ ${DARK_TOKENS}
   .ghf-field:focus-within { z-index: 40; }
   .ghf-field[data-overlay-open="true"] { z-index: 80; }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-field { gap: var(--ghf-field-gap, 8px); }
-  .ghf-label { display: inline-flex; align-items: center; gap: 8px; font-size: var(--ghf-label-size, 0.875rem); font-weight: var(--ghf-label-weight, 600); line-height: 1.3; color: var(--ghf-label-color, var(--ghf-fg)); }
+  .ghf-label { display: inline-flex; align-items: center; gap: 8px; font-size: var(--ghf-label-size, 0.875rem); font-weight: var(--ghf-label-weight, 600); line-height: var(--ghf-label-line-height, 1.3); color: var(--ghf-label-color, var(--ghf-fg)); }
   .ghf-field-icon {
     display: inline-grid;
     place-items: center;
@@ -743,7 +743,7 @@ ${DARK_TOKENS}
     flex: none;
     inline-size: var(--ghf-consent-box, 18px);
     block-size: var(--ghf-consent-box, 18px);
-    margin: 1px 0 0;
+    margin: 1px 0 0 4px;
     opacity: 1;
     appearance: auto;
     accent-color: var(--ghf-consent-accent, var(--ghf-accent));

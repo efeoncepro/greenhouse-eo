@@ -33,7 +33,7 @@ const makeController = (mountForm = vi.fn(async (slot: HTMLElement) => (fakeForm
   const controller = new FormDialogController({
     doc: document,
     copy: resolveCtaSystemCopy(),
-    header: { eyebrow: '¿Eres una plataforma?', title: 'Sumémonos.', lead: '<b>Cuéntanos</b> qué ofreces.' },
+    header: { eyebrow: '¿Eres una plataforma?', title: 'Sumémonos', lead: '<b>Cuéntanos</b> qué ofreces.' },
     mountForm,
   })
 
@@ -80,7 +80,7 @@ describe('FormDialogController', () => {
     const title = dialog.querySelector('[data-ghcta-dialog-title]')!
 
     expect(dialog.querySelector('[data-ghcta-dialog-eyebrow]')?.textContent).toBe('¿Eres una plataforma?')
-    expect(title.textContent).toBe('Sumémonos.')
+    expect(title.textContent).toBe('Sumémonos')
     expect(dialog.getAttribute('aria-labelledby')).toBe(title.id)
     expect(dialog.querySelector('[data-ghcta-dialog-lead] b')).toBeNull()
     expect(dialog.querySelector('[data-ghcta-dialog-close]')?.getAttribute('aria-label')).toBe('Cerrar')
@@ -162,7 +162,7 @@ describe('CtaRenderer · presentation dialog', () => {
 
     expect(root.querySelector('.ghc-form-slot')).toBeNull()
     expect(dialogEl().querySelector('greenhouse-form')).not.toBeNull()
-    expect(dialogEl().querySelector('[data-ghcta-dialog-title]')?.textContent).toBe('Sumémonos.')
+    expect(dialogEl().querySelector('[data-ghcta-dialog-title]')?.textContent).toBe('Sumémonos')
 
     for (const event of [RENDERER_GTM_EVENTS.clicked, RENDERER_GTM_EVENTS.formOpened]) {
       expect(emitted.find(e => e.event === event)?.payload).toMatchObject({ activation_mode: 'dialog' })
@@ -190,5 +190,21 @@ describe('CtaRenderer · presentation dialog', () => {
 
     expect(root.querySelector('.ghc-primary')?.hasAttribute('aria-haspopup')).toBe(false)
     expect(emitted[0]?.payload).not.toHaveProperty('activation_mode')
+  })
+})
+
+describe('FormDialogController · éxito', () => {
+  it('retira el encabezado del diálogo cuando el formulario muestra su éxito', async () => {
+    const { controller, invoker } = makeController()
+
+    await controller.open(invoker)
+    expect(dialogEl().hasAttribute('data-success')).toBe(false)
+
+    const card = document.createElement('section')
+
+    card.setAttribute('data-ghf-part', 'success-card')
+    dialogEl().querySelector('.ghf-root')!.replaceChildren(card)
+    await vi.waitFor(() => expect(dialogEl().hasAttribute('data-success')).toBe(true))
+    controller.dispose()
   })
 })

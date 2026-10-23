@@ -164,7 +164,7 @@ export const partnerApplicationContractFixture = (): RenderContract =>
       { key: 'email', type: 'email', label: 'Correo de trabajo', placeholder: 'tu@empresa.com', required: true, autocomplete: 'email', inputMode: 'email', presentation: { width: 'half' } },
       { key: 'company', type: 'text', label: 'Empresa o plataforma', placeholder: 'Nombre de la plataforma', required: true, autocomplete: 'organization', presentation: { width: 'half' } },
       { key: 'website', type: 'url', label: 'Sitio web', placeholder: 'https://', autocomplete: 'url', inputMode: 'url', presentation: { width: 'half' } },
-      { key: 'offer', type: 'textarea', label: '¿Qué ofreces y a quién le sirve?', placeholder: 'Tu tecnología, el problema que resuelve y el tipo de cliente', required: true, maxLength: 1500, presentation: { width: 'full' } },
+      { key: 'offer', type: 'textarea', label: '¿Qué ofreces y a quién le sirve?', placeholder: 'Tu tecnología, el problema que resuelve y el tipo de cliente', required: true, presentation: { width: 'full' } },
     ],
     copy: { submit: 'Enviar propuesta →' },
     consent: {
@@ -179,8 +179,10 @@ export const partnerApplicationContractFixture = (): RenderContract =>
       kind: 'inline_message',
       presentation: 'success_card',
       icon: 'orbit',
-      title: 'Recibido.',
+      title: 'Recibido',
       body: 'Gracias por escribirnos. Revisamos tu propuesta y te contactamos por correo.',
+      // `steps: []` explícito: sin él la tarjeta muestra los pasos por defecto del diccionario.
+      steps: [],
       actions: [{ kind: 'dismiss', label: 'Cerrar' }],
     },
   })

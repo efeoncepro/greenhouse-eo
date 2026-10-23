@@ -84,7 +84,8 @@ export const CTA_FIXTURES: Record<string, { label: string; build: () => CtaRende
           presentation: 'dialog',
           dialog: {
             eyebrow: '¿Eres una plataforma?',
-            title: 'Sumémonos.',
+            // El punto final es el punto turquesa de la piel de Partners (La órbita), no texto.
+            title: 'Sumémonos',
             lead: 'Cuéntanos qué tecnología ofreces y a quién le sirve. Revisamos cada propuesta con el equipo de la línea que corresponda.',
           },
         },

@@ -664,7 +664,9 @@ dialog.ghc-form-surface:not([open])::backdrop { opacity: 0; }
 }
 .ghc-form-dialog-close:hover { border-color: var(--ghcta-dialog-close-hover, currentColor); }
 .ghc-form-dialog-close:focus-visible { outline: 2px solid var(--ghcta-dialog-focus, currentColor); outline-offset: 2px; }
-.ghc-form-dialog-header { display: grid; gap: 8px; margin: 0 0 28px; padding-inline-end: 48px; }
+.ghc-form-dialog-header { display: grid; gap: 8px; margin: 0 0 28px; }
+/* Sólo la primera línea comparte fila con el botón de cerrar (44 px + aire). */
+.ghc-form-dialog-header > :first-child { padding-inline-end: 48px; }
 .ghc-form-dialog-eyebrow,
 .ghc-form-dialog-title,
 .ghc-form-dialog-lead { margin: 0; font-family: inherit; letter-spacing: normal; text-transform: none; }
@@ -673,6 +675,7 @@ dialog.ghc-form-surface:not([open])::backdrop { opacity: 0; }
 .ghc-form-dialog-title:focus { outline: none; }
 .ghc-form-dialog-lead { max-width: 460px; margin-top: 6px; font-size: .9375rem; font-weight: 300; line-height: 1.55; }
 .ghc-form-dialog-stage { min-width: 0; }
+dialog.ghc-form-surface[data-success] .ghc-form-dialog-header { display: none; }
 dialog.ghc-form-surface[data-sheet] {
   width: calc(100vw - 24px);
   max-height: calc(100dvh - 12px);
