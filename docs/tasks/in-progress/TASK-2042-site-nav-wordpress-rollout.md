@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ con Ohio), agendador nativo en vivo desde la cabecera, el mega y el onepage, documento en revisión 4 y edición gobernada por pnpm public-website:site-nav; AXIS 0.7.12 en el tema desde 04:07 UTC (tono de la isla bajo degradados). Pendiente: alta GTM/GA4, Core Web Vitals, prueba de vuelta a off en producción`
+- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ con Ohio), agendador nativo en vivo desde la cabecera, el mega y el onepage, documento en revisión 4 y edición gobernada por pnpm public-website:site-nav; AXIS primitives 0.7.13 en el tema desde 04:28 UTC (tono de la isla bajo degradados y con el agendador abierto). Pendiente: alta GTM/GA4, Core Web Vitals, prueba de vuelta a off en producción`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -452,6 +452,11 @@ Reglas obligatorias:
 >   E-E-A-T navy de `/servicios/posicionamiento-seo/` la isla quedaba clara. Vendorizado desde el paquete publicado
 >   (runtime `e6c388d`), paridad 17 + 35 contra 0.7.12, desplegado y purgado a las 04:07 UTC; verificado en vivo a
 >   1440: isla `fixed` con tono `dark` sobre la franja y `light` sobre las secciones claras, sin errores de consola.
+> - **Tono con el agendador abierto** (encontrado por el dock): AXIS primitives 0.7.13 (`b9123ee`) salta elementos no
+>   visibles y conserva el tono si lo primero bajo la isla es `<html>`. Runtime `aadfdc9`, paridad 17 + 35, desplegado a
+>   las 04:28 UTC. Verificado en vivo con Playwright: `dark` sobre la franja con el agendador abierto, tras cerrar con el
+>   botón y con Escape y tras volver a hacer scroll, también con `<html>` pintado de blanco; el bloqueo de scroll se
+>   libera al cerrar; sin errores de página.
 > - **Loop Marketing → Inbound**: el servicio abre `/agencia-inbound-marketing/` y `/landing-loop-marketing/` responde
 >   301 (Yoast Premium, `create-yoast-redirect.php`, página en noindex). Revisión 3 del documento.
 > - **Edición gobernada**: `pnpm public-website:site-nav` (pull, show, set, glyph, photo, add/move/remove, patch,

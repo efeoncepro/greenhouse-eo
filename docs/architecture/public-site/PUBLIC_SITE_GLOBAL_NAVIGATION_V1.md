@@ -2,7 +2,7 @@
 
 Estado: **En producción en todo `efeoncepro.com` desde el 2026-10-23 00:09 UTC** (`eo_site_nav_enabled=on`), salvo
 `/blog/` (#18456), que conserva la cabecera de Ohio porque esa página es de `TASK-1802`. AXIS
-`@efeoncepro/axis-ui-primitives` 0.7.12 y `@efeoncepro/axis-ui-contracts` 0.7.12 publicados (0.7.12 en el tema desde 04:07 UTC); plugin «EO Navegación»
+`@efeoncepro/axis-ui-primitives` 0.7.13 y `@efeoncepro/axis-ui-contracts` 0.7.12 publicados (primitives 0.7.13 en el tema desde 04:28 UTC); plugin «EO Navegación»
 activo con el documento en la revisión 4; agendador nativo en vivo. Pendientes en §Pendientes.
 
 Encendido: el operador decidió prenderlo en todo el sitio sin piloto de una página. El barrido del 2026-10-23 cubrió 52
@@ -652,7 +652,7 @@ Adaptador del tema `ohio-child`, archivo `inc/site-nav.php` (`TASK-2042`).
 - **Estado inicial:** hero oscuro sin espaciador → `top` en vidrio; espaciador de Ohio o hero claro
   (`EO_SITE_NAV_LIGHT_HERO_PAGES`) → `fixed` como isla clara sólida (§Cabecera).
 - **Assets sólo donde se pinta el menú:**
-  - archivos de AXIS con versión fijada en `assets/vendor/axis/site-nav/0.7.12/`, con un `VERSION.json` que lleva el
+  - archivos de AXIS con versión fijada en `assets/vendor/axis/site-nav/0.7.13/`, con un `VERSION.json` que lleva el
     sha256 de cada archivo, copiados del paquete publicado por `scripts/vendor-axis-site-nav.mjs` (PDR-024; nunca
     `-latest` ni registry);
   - las fuentes del menú;
@@ -720,7 +720,8 @@ Packages. Versiones que importan al sitio:
 | primitives 0.7.8 (`v0.7.8`; el tag `v0.7.2` ya estaba tomado) | Isla de escritorio de 61 px + borde (63) con ítems sueltos y botón del agendador de 45 px; desplazamiento del anfitrión `--axis-site-nav-offset`; aislamiento del anfitrión con prueba de hoja hostil (§Adaptador WordPress). |
 | contracts 0.7.9 + primitives 0.7.9 (`v0.7.9`) | «Estás aquí» desde el `href` del servicio, regla de host y export `siteNavLocalPath` (§Reglas del documento). |
 | primitives 0.7.10 (`v0.7.10`) | Radio del círculo del onepage hasta la esquina más lejana (§Motion). |
-| primitives/contracts 0.7.12 (`v0.7.12`; el tag `v0.7.11` se detuvo antes de publicar) | Lectura del tono de la isla: un degradado decide por la luminancia media de sus paradas opacas, una imagen de fondo cuenta como oscura, un color con alfa menor a 0,5 no decide y el chrome fijo o sticky del anfitrión (barra del tema, chat, aviso de cookies, el dock de landings) se salta. Corrige la isla clara sobre la franja E-E-A-T navy de `/servicios/posicionamiento-seo/`, verificado en vivo. Es la versión copiada en `ohio-child` desde el 2026-10-23 04:07 UTC. |
+| primitives/contracts 0.7.12 (`v0.7.12`; el tag `v0.7.11` se detuvo antes de publicar) | Lectura del tono de la isla: un degradado decide por la luminancia media de sus paradas opacas, una imagen de fondo cuenta como oscura, un color con alfa menor a 0,5 no decide y el chrome fijo o sticky del anfitrión (barra del tema, chat, aviso de cookies, el dock de landings) se salta. Corrige la isla clara sobre la franja E-E-A-T navy de `/servicios/posicionamiento-seo/`, verificado en vivo. Copiada en `ohio-child` de 04:07 a 04:28 UTC del 2026-10-23. |
+| primitives 0.7.13 (`v0.7.13`) | La isla conserva su tono con un diálogo modal abierto (el agendador): se saltan los elementos no visibles (`checkVisibility`) y, si lo primero bajo la isla es `<html>`, el tono no cambia; en un anfitrión que pinte `<html>` la isla se volvía clara detrás del diálogo y después de cerrarlo. Misma guarda que el dock. Verificado en vivo con Playwright: oscura sobre la franja E-E-A-T con el agendador abierto, al cerrar con el botón y con Escape, también con `<html>` pintado de blanco; el bloqueo de scroll se libera al cerrar. Es la versión copiada en `ohio-child` desde el 2026-10-23 04:28 UTC. |
 
 | Pieza | Export |
 |---|---|
@@ -735,7 +736,7 @@ Decidido en el Lab:
 
 - La cabecera se oculta en 300 ms y vuelve como isla en 400 ms.
 - Con un mega abierto, un scroll de más de 48 px lo cierra.
-- El tono de la isla sigue `data-site-nav-tone`; si falta, la luminancia del fondo (color o degradado; una imagen cuenta como oscura) del primer elemento bajo la línea media que no sea chrome fijo del anfitrión (0.7.12).
+- El tono de la isla sigue `data-site-nav-tone`; si falta, la luminancia del fondo (color o degradado; una imagen cuenta como oscura) del primer elemento visible bajo la línea media que no sea chrome fijo del anfitrión (0.7.12); si lo primero es `<html>` (un diálogo modal dejó la página inerte), conserva el tono (0.7.13).
 - El JS lee los tiempos de las variables CSS en `ms` o `s`, porque un minificador puede reescribir `150ms` como `.15s`.
 
 Notas de verificación y límites: `docs/quality/site-nav.md` en AXIS. Contrato del anfitrión:
@@ -800,7 +801,7 @@ de la página (contenido, datos de Elementor y meta del dock).
 
 | Paso | Qué se verifica | Estado | Vuelta atrás |
 |---|---|---|---|
-| Contrato y primitive publicados en AXIS | Lab, pruebas de teclado y foco, 390 px y contraste. | Hecho: 0.7.8 a 0.7.12. | Versión anterior del paquete. |
+| Contrato y primitive publicados en AXIS | Lab, pruebas de teclado y foco, 390 px y contraste. | Hecho: 0.7.8 a 0.7.13. | Versión anterior del paquete. |
 | Plugin desplegado (`off`) | Documento inicial validado, revisiones, REST pública, WP-CLI. | Hecho 2026-10-22. | Desactivar el plugin. |
 | Fotos en el bucket | Lectura pública, caché inmutable, alt. | En uso en el menú vivo. | Nada que revertir: objetos nuevos e inmutables. |
 | Piloto (`pilot`, una página) | Desktop y 390 px, sin scroll horizontal, agendador abre y devuelve foco, eventos en `dataLayer`, Core Web Vitals sin regresión. | Omitido por decisión del operador. | Interruptor a `off`. |
