@@ -1,0 +1,19 @@
+/* Host layer: what the canvas got from its own document (its wrapper div and body) and the WordPress theme does not give. */
+.gh-nosotros{font-family:'Poppins',system-ui,sans-serif;background:#001a33;color:#ffffff;width:100%;overflow-x:clip;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box}
+.gh-nosotros *,.gh-nosotros *::before,.gh-nosotros *::after{box-sizing:border-box}
+.gh-nosotros section{margin:0}
+/* Ohio skins headings, paragraphs, lists and buttons globally; the canvas sets what it needs inline. */
+.gh-nosotros :is(h1,h2,h3,h4,h5,h6){font-family:inherit;color:inherit;text-transform:none;letter-spacing:inherit;margin:0;font-weight:inherit;line-height:inherit}
+.gh-nosotros :is(p,ul,ol,li,figure,figcaption,blockquote,summary,details){font-family:inherit;color:inherit;letter-spacing:inherit}
+.gh-nosotros :is(ul,ol){list-style:none}
+.gh-nosotros li::before{content:none}
+.gh-nosotros blockquote{border:0;padding:0;quotes:none;font-style:normal}
+.gh-nosotros blockquote::before,.gh-nosotros blockquote::after{content:none}
+.gh-nosotros a{text-decoration-thickness:1px;box-shadow:none}
+.gh-nosotros a::after,.gh-nosotros a::before{content:none}
+.gh-nosotros img{max-width:100%}
+.gh-nosotros :is(a,summary):focus-visible{outline:2px solid currentColor;outline-offset:3px}
+/* The paper section keeps its own ink (Ohio can recolor light sections). */
+.gh-nosotros .paper{color:#001a33}
+/* Editor switch «Animaciones» off. */
+.gh-nosotros[data-motion="no"] *{animation:none !important;transition:none !important}

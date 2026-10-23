@@ -17,7 +17,7 @@ section with a negative margin needs `display:flow-root` on its own section, or 
 section background rises with the card (fixed live 2026-10-20). Rail: `compile-agenda-elementor-source.cjs` →
 `build-agenda-elementor-package.cjs <live baseline>` → `deploy-agenda-elementor-package.php` → hash-guarded
 `publish-agenda-elementor-page.php` → `rollback-agenda-elementor-page.php`; both core gates include `agenda`. Each is a
-reference for mechanisms and lessons, not a layout to copy (`references/landing-workflow.md` §Start from the landing's need).
+Seventh (Nosotros `/about-us-efeonce/`, 2026-10-23, replaced in place, preview → replace): `references/landings/about-us-efeonce.md`. reference for mechanisms and lessons, not a layout to copy (`references/landing-workflow.md` §Start from the landing's need).
 
 ## Shared source-led core (2026-10-17)
 
