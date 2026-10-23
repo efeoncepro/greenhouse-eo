@@ -416,9 +416,20 @@ export type ConsentDisplay = z.infer<typeof consentDisplaySchema>
 export const SUCCESS_PRESENTATIONS = ['inline_message', 'success_card'] as const
 export type SuccessPresentation = (typeof SUCCESS_PRESENTATIONS)[number]
 
-/** Kinds de acción permitidos en V1 (browser-safe). */
-export const SUCCESS_ACTION_KINDS = ['external_link', 'download', 'asset_access', 'schedule'] as const
+/**
+ * Kinds de acción permitidos (browser-safe). `dismiss` (TASK-2044) cierra la superficie que contiene
+ * al formulario (p. ej. el diálogo de un Growth CTA): no navega, no lleva `href` y el renderer emite
+ * un evento para que el anfitrión cierre. Un renderer anterior la omite (filtra acciones sin `href`).
+ */
+export const SUCCESS_ACTION_KINDS = ['external_link', 'download', 'asset_access', 'schedule', 'dismiss'] as const
 export type SuccessActionKind = (typeof SUCCESS_ACTION_KINDS)[number]
+
+/**
+ * TASK-2044 — Ícono del estado de éxito. `celebration` (default, igual que omitirlo) es el actual;
+ * `orbit` es el glifo de La órbita (arco con la esfera); `none` no dibuja ícono.
+ */
+export const SUCCESS_ICONS = ['celebration', 'orbit', 'none'] as const
+export type SuccessIcon = (typeof SUCCESS_ICONS)[number]
 
 /** Kinds de reward para lead magnets / gated resources. `none` = sin reward. */
 export const SUCCESS_REWARD_KINDS = ['none', 'ebook', 'guide', 'template', 'report_preview', 'surprise'] as const
@@ -460,14 +471,18 @@ export const successCardHrefSchema = z.string().trim().max(SUCCESS_HREF_MAX).ref
   message: 'href debe ser https (o path same-origin `/`); sin javascript:/data:/non-https externa'
 })
 
-export const successCardActionSchema = z.object({
-  kind: z.enum(SUCCESS_ACTION_KINDS),
-  label: z.string().max(80).optional(),
-  labelCopyRef: z.string().max(120).optional(),
-  href: successCardHrefSchema.optional(),
-  target: z.enum(['_self', '_blank']).optional(),
-  telemetryKey: z.string().max(80).optional()
-})
+export const successCardActionSchema = z
+  .object({
+    kind: z.enum(SUCCESS_ACTION_KINDS),
+    label: z.string().max(80).optional(),
+    labelCopyRef: z.string().max(120).optional(),
+    href: successCardHrefSchema.optional(),
+    target: z.enum(['_self', '_blank']).optional(),
+    telemetryKey: z.string().max(80).optional()
+  })
+  .refine(action => action.kind !== 'dismiss' || (action.href === undefined && action.target === undefined), {
+    message: 'una acción dismiss no navega: sin href ni target'
+  })
 export type SuccessCardAction = z.infer<typeof successCardActionSchema>
 
 export const successCardRewardSchema = z.object({
@@ -550,6 +565,7 @@ export const successBehaviorSchema = z.object({
   // `asset_access` y esto está presente, el renderer emite `download_url` en el evento accepted.
   assetDownload: assetDownloadBehaviorSchema.optional(),
   presentation: z.enum(SUCCESS_PRESENTATIONS).optional(),
+  icon: z.enum(SUCCESS_ICONS).optional(),
   message: z.string().max(2000).optional(),
   messageCopyRef: z.string().optional(),
   // Success card estructurada (browser-safe) — TASK-1319.

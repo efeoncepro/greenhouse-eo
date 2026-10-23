@@ -168,7 +168,9 @@ export type RendererSuccessKind = 'inline_message' | 'redirect' | 'asset_access'
 // Success card capability (TASK-1319) — espejo de tipos browser-safe. La SoT
 // (`successBehaviorSchema`) valida/acota; acá vive sólo el shape que el renderer consume.
 export type RendererSuccessPresentation = 'inline_message' | 'success_card'
-export type RendererSuccessActionKind = 'external_link' | 'download' | 'asset_access' | 'schedule'
+// TASK-2044 — `dismiss` cierra la superficie anfitriona (sin `href`); `RendererSuccessIcon` elige el ícono.
+export type RendererSuccessActionKind = 'external_link' | 'download' | 'asset_access' | 'schedule' | 'dismiss'
+export type RendererSuccessIcon = 'celebration' | 'orbit' | 'none'
 export type RendererSuccessRewardKind = 'none' | 'ebook' | 'guide' | 'template' | 'report_preview' | 'surprise'
 
 export interface RendererSuccessCardAction {
@@ -209,6 +211,7 @@ export interface RendererAssetDownloadBehavior {
 export interface RendererSuccessBehavior {
   kind: RendererSuccessKind
   presentation?: RendererSuccessPresentation
+  icon?: RendererSuccessIcon
   message?: string
   messageCopyRef?: string
   title?: string

@@ -133,3 +133,39 @@ describe('TASK-2044 · consentimiento compacto con enlace en la frase', () => {
     expect(result.ok).toBe(false)
   })
 })
+
+describe('TASK-2044 · cierre e ícono del éxito', () => {
+  const card = (extra: Record<string, unknown>) => ({
+    success_behavior_json: { kind: 'inline_message', presentation: 'success_card', title: 'Recibido.', ...extra }
+  })
+
+  it('dismiss sin href e icon orbit viajan al contrato', () => {
+    const result = compile(card({ icon: 'orbit', actions: [{ kind: 'dismiss', label: 'Cerrar' }] }))
+
+    expect(result.blockingReasons).toEqual([])
+    expect(result.renderContract?.successBehavior).toMatchObject({
+      icon: 'orbit',
+      actions: [{ kind: 'dismiss', label: 'Cerrar' }]
+    })
+  })
+
+  it('icon none es válido y omitirlo deja el éxito como hoy', () => {
+    expect(compile(card({ icon: 'none' })).blockingReasons).toEqual([])
+    expect(compile().renderContract?.successBehavior).toEqual({ kind: 'inline_message', message: 'Gracias' })
+  })
+
+  it('dismiss con href o target se rechaza', () => {
+    expect(compile(card({ actions: [{ kind: 'dismiss', label: 'Cerrar', href: '/agenda/' }] })).ok).toBe(false)
+    expect(compile(card({ actions: [{ kind: 'dismiss', label: 'Cerrar', target: '_blank' }] })).ok).toBe(false)
+  })
+
+  it('las acciones existentes conservan su contrato', () => {
+    const result = compile(card({ actions: [{ kind: 'schedule', label: 'Agenda', href: 'https://efeoncepro.com/agenda/' }] }))
+
+    expect(result.blockingReasons).toEqual([])
+  })
+
+  it('un ícono desconocido invalida el éxito', () => {
+    expect(compile(card({ icon: 'confetti' })).warnings.map(w => w.code)).toContain('success_behavior_invalid')
+  })
+})
