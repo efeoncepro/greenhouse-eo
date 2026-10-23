@@ -86,9 +86,15 @@ export class TurnstileTokenClient {
   private api: TurnstileApi | null = null
   private pending: { resolve: (token: string) => void; reject: (error: Error) => void; timeout: ReturnType<typeof setTimeout> } | null = null
 
+  /**
+   * @param mountTarget TASK-2045 — dónde se monta el contenedor del widget. El renderer pasa el padre
+   * estable de su root para que el widget viva junto al formulario: dentro de un `<dialog>` modal, un
+   * contenedor en `document.body` quedaría inerte. Sin target (o desconectado) cae a `document.body`.
+   */
   constructor(
     private readonly doc: Document,
     private readonly config: RendererCaptchaSecurity,
+    private readonly mountTarget?: () => Element | null,
   ) {}
 
   async execute(): Promise<string> {
@@ -161,7 +167,9 @@ export class TurnstileTokenClient {
     container.style.overflow = 'hidden'
     container.style.clipPath = 'inset(50%)'
 
-    ;(this.doc.body ?? this.doc.documentElement).appendChild(container)
+    const target = this.mountTarget?.()
+
+    ;(target?.isConnected ? target : this.doc.body ?? this.doc.documentElement).appendChild(container)
     this.container = container
 
     return container

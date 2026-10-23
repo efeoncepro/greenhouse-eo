@@ -2924,7 +2924,8 @@ export class FormRenderer {
       throw new Error('captcha_provider_unsupported')
     }
 
-    this.turnstile ??= new TurnstileTokenClient(this.doc, captcha)
+    // TASK-2045 — el widget vive junto al formulario (padre estable del root, que se redibuja en cada render).
+    this.turnstile ??= new TurnstileTokenClient(this.doc, captcha, () => this.opts.root.parentElement)
 
     return this.turnstile.execute()
   }

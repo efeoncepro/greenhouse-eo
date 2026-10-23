@@ -1442,6 +1442,28 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(turnstile.reset).toHaveBeenCalledWith('widget-1')
   })
 
+  it('TASK-2045 — monta el widget junto al formulario, no en body (sirve dentro de un <dialog> modal)', async () => {
+    const turnstile = installTurnstile()
+    const fetchImpl = okFetch()
+    const host = document.createElement('section')
+    const root = document.createElement('div')
+
+    host.id = 'form-host'
+    host.appendChild(root)
+    document.body.appendChild(host)
+    new FormRenderer({ root, contract: captchaContract(), api, fetchImpl, doc: document }).mount()
+    fillCaptchaContract(root)
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+    await vi.waitFor(() => expect(turnstile.render).toHaveBeenCalledTimes(1))
+
+    // El verificador real es Turnstile interactivo dentro de un dialog modal en un navegador; acá se
+    // fija dónde vive el contenedor: fuera del root (que se redibuja) y dentro del anfitrión.
+    const container = turnstile.render.mock.calls[0]![0] as HTMLElement
+
+    expect(container.parentElement).toBe(host)
+    expect(root.contains(container)).toBe(false)
+  })
+
   it('does not POST when Turnstile token acquisition fails', async () => {
     installTurnstile('error')
     const fetchImpl = okFetch()
