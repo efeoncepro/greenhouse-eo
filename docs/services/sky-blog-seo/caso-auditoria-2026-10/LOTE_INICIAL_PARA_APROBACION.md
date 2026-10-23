@@ -29,7 +29,9 @@ por el equipo no se duplicaron ni se modificaron:
 - **Optimizaciones:** O1 Equipaje de mano, O13 Valdivia, O16 Paraty, O18 Máncora, O21 Tarapoto, O23 Cajamarca y
   O25 Cusco.
 
-En estas 12 conviene sumar a su ficha la URL que deben reutilizar. Las fechas cargadas son tentativas: los
+En estas 12 conviene sumar a su ficha la URL que deben reutilizar. Las 40 piezas llevan la propiedad «Trabajo SEO»,
+creada para esto: Nuevo (15), Optimizar URL existente (23) y Restaurar y reescribir (2: Ayacucho, y Cusco sobre
+`/viajes-cusco/`). Las fechas cargadas son tentativas: los
 temas de servicio y temporada del 2 al 10 de noviembre, Perú del 12 al 26 de noviembre, los internacionales y
 Titicaca y Candelaria en diciembre, y el Carnaval de Cajamarca el 7 de enero de 2027.
 
