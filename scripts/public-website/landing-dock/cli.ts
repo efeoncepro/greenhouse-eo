@@ -78,7 +78,7 @@ function resolveConfig(m: Json): Json {
     const tags = [...html.matchAll(/<greenhouse-cta\b[^>]*>/g)].map(t => attributes(t[0]))
     const live = tags.find(a => a.cta === config.scheduler.cta && a.surface === config.scheduler.surface && a['embed-key'])
 
-    if (!live) fail(`The live page has no <greenhouse-cta> «${config.scheduler.cta}» on surface ${config.scheduler.surface} outside the dock to take the key from. If the landing's only launcher was its old dock (HubSpot), run \`off\`, then \`on\` again (with the dock off, the old dock's launcher is back in the HTML).`)
+    if (!live) return fail(`The live page has no <greenhouse-cta> «${config.scheduler.cta}» on surface ${config.scheduler.surface} outside the dock to take the key from. If the landing's only launcher was its old dock (HubSpot), run \`off\`, then \`on\` again (with the dock off, the old dock's launcher is back in the HTML).`)
     config.scheduler.key = live['embed-key']
   }
 
