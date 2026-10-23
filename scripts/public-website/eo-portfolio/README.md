@@ -6,6 +6,7 @@ Scripts y evidencia de la limpieza del tipo `ohio_portfolio` en `efeoncepro.com`
 | Archivo | Qué hace |
 |---|---|
 | `inventory-ohio-portfolio.php` | Slice 1. Sólo lee: inventario y foto completa de las entradas `ohio_portfolio`, sonda de la API de redirects de Yoast y redirects existentes bajo `/project/`. |
+| `retire-ohio-demos.php` | Slice 2. Con la allowlist como entrada: 410 por Yoast para cada `/project/<slug>/` demo, demo a borrador (nunca se borra) y comentarios y pings cerrados en las 59. `dryRun` por defecto; aborta sin escribir si la allowlist no calza con el sitio, si un post cambió desde la foto o si un origen ya redirige a otro lado. |
 | `gsc-project-urls.ts` | Slice 1. Sólo lee: clics e impresiones de Search Console bajo `/project/` y `/portfolio-category/` (16 meses). |
 | `allowlist-2026-10-23.json` | Lista versionada por ID: 15 reales y 44 demo, con `post_modified` de la foto. Es la entrada de los Slices 2 y 3. |
 | `snapshots/ohio-portfolio-2026-10-23.json.gz` | Foto previa para rollback (estado, comentarios, contenido y todos los metadatos de las 59 entradas). |
@@ -68,3 +69,16 @@ distinguen por ID; nunca por texto.
   filas duplicadas). Los Slices 2 y 3 restauran desde ella sólo los IDs que tocaron.
 - Los redirects 410 que cree el Slice 2 quedan listados en su salida; el rollback los borra con
   `WPSEO_Redirect_Manager::delete_redirects`, sin restaurar la opción entera de Yoast.
+
+## Slice 2 — `dryRun` del 2026-10-23
+
+- Entrada: la allowlist con `"dryRun": true`. Salida en `evidence/retire-ohio-demos-dryrun-2026-10-23.json`.
+- Resultado: la allowlist calza exactamente con las 59 entradas vivas, ningún post cambió desde la foto y ningún origen
+  demo choca con un redirect existente. Plan: **44 redirects 410 a crear, 44 demos a borrador, comentarios a cerrar en
+  las 59** (los pings ya estaban cerrados). Las 15 reales no cambian de estado.
+- Línea base HTTP antes de aplicar: las 59 URLs `/project/<slug>/` responden 200 y `ohio_portfolio-sitemap.xml` lista 59
+  URLs (`evidence/http-baseline-2026-10-23.csv`).
+- Aplicar: la misma entrada con `"dryRun": false`, después del OK del operador y de la revisión de enlaces externos en
+  Search Console. Si una aplicación queda a medias, cerrar comentarios cambia el `post_modified` de las reales: antes de
+  reintentar, regenerar la allowlist desde un inventario nuevo (el script trata como hechos los demos ya en borrador y los
+  410 ya creados).

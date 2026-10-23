@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `Slice 1 hecho en lo automatizable (2026-10-23): inventario, allowlist por ID y foto previa versionados; Search Console por API sin tráfico en demos. Falta revisar enlaces externos en la interfaz de Search Console antes del Slice 2. Sin cambios en el sitio`
+- Status real: `Slice 1 hecho en lo automatizable (2026-10-23): inventario, allowlist por ID y foto previa versionados; Search Console por API sin tráfico en demos. Slice 2 escrito y probado en dryRun en producción (44 × 410, 44 a borrador, comentarios cerrados en 59; sin conflictos ni drift). Falta: revisión de enlaces externos en Search Console (operador) y OK para aplicar. Sin cambios en el sitio`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -108,6 +108,8 @@ Reglas obligatorias:
 - `scripts/public-website/eo-portfolio/allowlist-2026-10-23.json` (nuevo)
 - `scripts/public-website/eo-portfolio/snapshots/ohio-portfolio-2026-10-23.json.gz` (nuevo)
 - `scripts/public-website/eo-portfolio/evidence/gsc-project-urls-2026-10-23.json` (nuevo)
+- `scripts/public-website/eo-portfolio/evidence/retire-ohio-demos-dryrun-2026-10-23.json` (nuevo)
+- `scripts/public-website/eo-portfolio/evidence/http-baseline-2026-10-23.csv` (nuevo)
 - `docs/issues/open/ISSUE-183-portfolio-ohio-demo-entries-indexed.md`
 
 ## Current Repo State
@@ -209,6 +211,15 @@ Reglas obligatorias:
 - [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
 - [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
 - [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+
+## Delta 2026-10-23 — Slice 2 en dryRun
+
+- `retire-ohio-demos.php` escrito y corrido en producción con `dryRun: true` (sólo lectura). La allowlist calza con las 59
+  entradas, ningún post cambió desde la foto y ningún origen demo tiene redirect previo. Plan: 44 redirects 410, 44
+  demos a borrador y comentarios cerrados en las 59 (pings ya cerrados). Evidencia:
+  `evidence/retire-ohio-demos-dryrun-2026-10-23.json`.
+- Línea base HTTP: 59 URLs `/project/<slug>/` en 200 y sitemap con 59 URLs (`evidence/http-baseline-2026-10-23.csv`).
+- Para aplicar falta la revisión de enlaces externos en Search Console (la hace el operador) y su OK.
 
 ## Delta 2026-10-23 — Slice 1 (inventario, foto previa y Search Console)
 
