@@ -28,7 +28,10 @@
 - Live 2026-10-23: deploy backups on Kinsta `/tmp/eo-nosotros-widgets-before-20261023-135655.tar` and `-135848.tar`;
   replace snapshot `_gh_nosotros_v2_before_20261023_140005`; Elementor data hash `a7ca0770…`; 1440 and 390 px overflow 0,
   no broken images, no console errors. QA preview `252030` (`/nosotros-preview-20261023/`) left `private`.
-- Pending: Yoast meta description still carries the old positioning («…problema de arquitectura…»); bottom dock: none.
+- SEO 2026-10-23: meta description = «No te entregamos crecimiento: lo construimos contigo y te dejamos más capaz de
+  sostenerlo. Estrategia, creatividad, medios, datos y tecnología.» (`configure-nosotros-seo.php`, snapshot option
+  `_gh_nosotros_seo_before_20261023_141826`). OG and Twitter descriptions still old (OG: «…problema de arquitectura…»;
+  Twitter: copy of an ads page) — pending operator decision. Bottom dock: none.
 
 ## Before 2026-10-23 (history; replaced)
 
