@@ -58,7 +58,7 @@ porque es urgente y de bajo riesgo.
 
 ## Child Tasks
 
-- `TASK-2046` — [Limpieza de los demos de Ohio](../../tasks/to-do/TASK-2046-eo-portfolio-ohio-demo-cleanup.md): 44 demos a 410 y restos de Envato fuera de las entradas reales. Remedia ISSUE-183. Sin dependencias; va primero.
+- `TASK-2046` — [Limpieza de los demos de Ohio](../../tasks/in-progress/TASK-2046-eo-portfolio-ohio-demo-cleanup.md): 44 demos a 410 y restos de Envato fuera de las entradas reales. Remedia ISSUE-183. Sin dependencias; va primero.
 - `TASK-2047` — [Plugin y contenido](../../tasks/to-do/TASK-2047-eo-portfolio-plugin-content.md): tipo `eo_project`, documento validado, compuerta de cliente, tres puertas. Puede correr en paralelo con TASK-2046.
 - `TASK-2048` — [Portada y entrada](../../tasks/to-do/TASK-2048-eo-portfolio-index-entry-templates.md): plantillas del servidor sobre AXIS y el reproductor. Bloqueada por TASK-2047 y por la aprobación del diseño.
 - `TASK-2049` — [Migración y salida a producción](../../tasks/to-do/TASK-2049-eo-portfolio-migration-rollout.md): 15 entradas, 301, video al bucket, Ohio Portfolio desactivado a los 30 días. Bloqueada por TASK-2047 y TASK-2048.

@@ -71,3 +71,10 @@ open — remediación planificada en `TASK-2046`; sin cambios aplicados todavía
 - `TASK-2046` — limpieza de los demos (remedia este issue).
 - `PDR-028`, `EPIC-056`, `TASK-2047`…`TASK-2049`.
 - `docs/public-site/LA_ORBITA_SITE_MIGRATION_PLAN_V1.md` §Oleada 5.
+
+## Delta 2026-10-23 — inventario de TASK-2046
+
+- Confirmado por WP-CLI: 59 entradas `ohio_portfolio`, 15 reales y 44 demo, todas publicadas con comentarios abiertos.
+- Search Console (16 meses): las 44 URLs demo suman 0 clics y 81 impresiones.
+- Hallazgo adicional: `cms.efeoncepro.com` también está indexado con URLs `/project/` (`contact-ver3`,
+  `beebot-social-media`). Es un segundo host del mismo WordPress; se revisa aparte (canonical o redirección del host).

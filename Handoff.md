@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-10-23 — EO Portfolio: programa creado y TASK-2046 Slice 1 (sólo lectura)
+
+[PDR-028](docs/public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md), EPIC-056, ISSUE-183 y
+TASK-2046…2049 creados (`658e828fe`). TASK-2046 en curso: inventario por WP-CLI de las 59 entradas `ohio_portfolio`
+(15 reales, 44 demo), allowlist por ID y foto previa versionadas en `scripts/public-website/eo-portfolio/`; Yoast
+Premium 27.7 acepta 410; Search Console por API: demos 0 clics. **Sin cambios en el sitio.** Pendiente antes del
+Slice 2: revisar enlaces externos de las URLs demo en la interfaz de Search Console y el OK del operador al `dryRun`.
+Hallazgos: 12 entradas reales con metadatos duplicados (afecta el Slice 3) y `cms.efeoncepro.com` indexado (ISSUE-183).
+
 ## 2026-10-23 — Partners en vivo y contrato de formularios diseñados (TASK-2044)
 
 `/partnership/` (248003) reemplazada por 6 widgets compilados del canvas Partners v14 (snapshot
@@ -213,14 +222,3 @@ implementado localmente; corrección aplicada vía CLI canónica.53 tests/ESLint
 Primera recepción/atribución y ruta histórica propia Grader sin certificar; no fabricar leads/replays.
 [Publicación y evidencia](docs/audits/growth/2026-10-18-commercial-forms-policy-publication.md),
 [manual de corrección](docs/manual-de-uso/growth/corregir-clasificacion-comercial.md) e [historial](Handoff.archive.md).
-
-## 2026-10-18 — Medición: cierre documental y alcance comercial
-
-Arquitectura/ADRs, runtime/tracking, manuales OAuth/CLI/Ads, índices y cuatro pares de skills
-Codex/Claude conciliados con el cierre publicado: Web6/Server10, EC ON, ER5 READY del mainEC y
-tracing HubSpot/Meta configurados. Primera identidad/recibo/recepción/atribución sigue sin verificar.
-Nueva cobertura solicitada **sólo forms comerciales**: catálogo16forms+1agenda, sóloPerformance/Discovery
-Ads activos;12 propuestas DRY_RUN sin aplicar. Lead Gen Web sigue lead_magnet; Grader/Contacto
-requieren revisar intención. Sin inscripción automática ni nuevos eventos/acciones/puja/deploy/GTM.
-[Inventario y siguiente paso](docs/audits/growth/2026-10-18-commercial-forms-measurement-coverage.md),
-[activación](docs/audits/growth/2026-10-18-google-ads-activation.md) e [historial](Handoff.archive.md).

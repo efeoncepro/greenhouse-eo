@@ -1,5 +1,19 @@
 # TASK-2049 — EO Portfolio: migración y salida a producción
 
+## Delta 2026-10-23 — insumos del inventario de TASK-2046
+
+- IDs de las 15 entradas reales: 223615 `social-media-nutribait`, 223616 `fivest-branding`, 223617 `pabellotogo-design`,
+  223618 `motogas-social-media`, 223619 `dmark-social-media`, 223620 `lifestyle-app-elementor` (Eusari),
+  223623 `ssilva-campaign`, 223787 `bighouse-design`, 223841 `beebot-social-media`, 246154 `sky-airlines-propuesta`,
+  246155 `flick-identity`, 246156 `ghamadent-design`, 248334 `gobierno-de-santiago`, 248347 `marca-chile`,
+  248783 `bresler` (`scripts/public-website/eo-portfolio/allowlist-2026-10-23.json`).
+- Ya existen 12 redirects 301 de slugs viejos hacia entradas reales (lista en `scripts/public-website/eo-portfolio/README.md`).
+  Al crear los 301 a `/portafolio/<slug>/`, reencadenar también esos orígenes para que no queden dos saltos.
+- Tráfico a proteger con los 301 (Search Console, 16 meses): 18 clics y 2.431 impresiones; las de más impresiones son
+  `lifestyle-app-elementor` (643), `fivest-branding` (554) y `motogas-social-media` (387).
+- 12 de las 15 entradas tienen metadatos de Ohio duplicados en dos o tres filas: el export del Slice 1 de esta task debe
+  leer todas las filas y elegir la que se sirve, no la primera por defecto.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

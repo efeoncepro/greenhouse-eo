@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `Diseño; auditoría del 2026-10-23 hecha, sin cambios aplicados`
+- Status real: `Slice 1 hecho en lo automatizable (2026-10-23): inventario, allowlist por ID y foto previa versionados; Search Console por API sin tráfico en demos. Falta revisar enlaces externos en la interfaz de Search Console antes del Slice 2. Sin cambios en el sitio`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -104,6 +104,10 @@ Reglas obligatorias:
 - `scripts/public-website/eo-portfolio/retire-ohio-demos.php` (nuevo)
 - `scripts/public-website/eo-portfolio/clean-ohio-real-entries.php` (nuevo)
 - `scripts/public-website/eo-portfolio/README.md` (nuevo)
+- `scripts/public-website/eo-portfolio/gsc-project-urls.ts` (nuevo, lectura de Search Console)
+- `scripts/public-website/eo-portfolio/allowlist-2026-10-23.json` (nuevo)
+- `scripts/public-website/eo-portfolio/snapshots/ohio-portfolio-2026-10-23.json.gz` (nuevo)
+- `scripts/public-website/eo-portfolio/evidence/gsc-project-urls-2026-10-23.json` (nuevo)
 - `docs/issues/open/ISSUE-183-portfolio-ohio-demo-entries-indexed.md`
 
 ## Current Repo State
@@ -205,6 +209,26 @@ Reglas obligatorias:
 - [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
 - [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
 - [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+
+## Delta 2026-10-23 — Slice 1 (inventario, foto previa y Search Console)
+
+- **Inventario y foto:** `inventory-ohio-portfolio.php` corrió en producción por WP-CLI (`--wp-user 12`) a las 22:46 UTC,
+  sólo lectura. 59 entradas, todas `publish` y con comentarios abiertos. Foto completa para rollback en
+  `scripts/public-website/eo-portfolio/snapshots/ohio-portfolio-2026-10-23.json.gz` (sha256 del JSON
+  `42fc18f89688dc155d6b04d71be8fe1ccddb8be7a8f91c872562c6997609745f`).
+- **Allowlist por ID:** `allowlist-2026-10-23.json`, 15 reales y 44 demo; criterio y lista en
+  `scripts/public-website/eo-portfolio/README.md`.
+- **Yoast:** Premium 27.7 con `WPSEO_Redirect_Manager` y tipo 410 disponibles. El Slice 2 usa la API de Yoast.
+- **Redirects existentes:** 12 redirects 301 bajo `/project/` desde slugs viejos de demos hacia entradas reales; ninguno
+  sale de un slug demo actual, así que no chocan con los 410. No se tocan; los reencadena `TASK-2049`.
+- **Metadatos duplicados:** 12 de las 15 entradas reales tienen el set de Ohio y `_elementor_data` en dos filas (tres en
+  `ssilva-campaign`). El Slice 3 debe limpiar el bloque del demo en todas las filas y comparar cada una con la foto.
+- **Search Console por API** (2025-06-23 a 2026-10-23): las 44 URLs demo suman 0 clics y 81 impresiones; el 410 no
+  pierde tráfico. Las 15 reales suman 18 clics y 2.431 impresiones (dato para los 301 de `TASK-2049`). Evidencia en
+  `evidence/gsc-project-urls-2026-10-23.json`. **Pendiente antes del Slice 2:** revisar en la interfaz de Search
+  Console si alguna URL demo tiene enlaces externos (la API no los expone).
+- **Hallazgo fuera de alcance:** `cms.efeoncepro.com` aparece indexado con URLs `/project/`; es un segundo host del
+  mismo WordPress. Registrado en ISSUE-183 para revisión aparte.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -335,7 +359,7 @@ Entrada de cada script (JSON por `--input-file`):
 
 ## Acceptance Criteria
 
-- [ ] La allowlist versionada tiene exactamente 15 IDs reales y 44 IDs demo, y suma las 59 entradas del inventario.
+- [x] La allowlist versionada tiene exactamente 15 IDs reales y 44 IDs demo, y suma las 59 entradas del inventario. (`allowlist-2026-10-23.json`, 2026-10-23)
 - [ ] Las 44 entradas demo están en borrador y ninguna fue borrada.
 - [ ] `curl -sI` de cada `/project/<slug>/` demo responde `410`.
 - [ ] `https://efeoncepro.com/ohio_portfolio-sitemap.xml` no lista ningún slug demo.
@@ -343,7 +367,7 @@ Entrada de cada script (JSON por `--input-file`):
       `colabrio.ams3.cdn.digitaloceanspaces.com`.
 - [ ] Los 59 posts `ohio_portfolio` tienen comentarios y pings cerrados.
 - [ ] La foto previa y la salida de cada script quedaron enlazadas en la task.
-- [ ] La revisión de Search Console de las URLs demo quedó registrada antes del Slice 2.
+- [ ] La revisión de Search Console de las URLs demo quedó registrada antes del Slice 2. (Parcial: clics e impresiones por API registrados; los enlaces externos sólo se ven en la interfaz y siguen pendientes.)
 
 ## Verification
 
@@ -372,5 +396,5 @@ Entrada de cada script (JSON por `--input-file`):
 
 ## Open Questions
 
-- ¿La versión instalada de Yoast Premium acepta redirects 410 por API, o hace falta la regla en un mu-plugin?
+- ~~¿La versión instalada de Yoast Premium acepta redirects 410 por API, o hace falta la regla en un mu-plugin?~~ Resuelta el 2026-10-23: Yoast SEO Premium 27.7 acepta 410 (`WPSEO_Redirect_Types`); no hace falta el mu-plugin.
 - ¿Las categorías de `ohio_portfolio_category` que quedan vacías se marcan `noindex` ahora o esperan a `TASK-2049`?
