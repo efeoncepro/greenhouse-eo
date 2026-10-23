@@ -329,7 +329,7 @@ rm tmp/site-nav/scheduler.json
 ### 11. Actualizar AXIS en el sitio
 
 El sitio nunca usa una versión «latest» de AXIS: dibuja con archivos copiados y fijados en el tema. Hoy está fijado en
-`@efeoncepro/axis-ui-primitives` **0.7.10** (contratos 0.7.9).
+`@efeoncepro/axis-ui-primitives` **0.7.12** (contratos 0.7.12).
 
 1. **Publicar en AXIS.** El cambio se hace en el repo `axis-design-system` y se publica en GitHub Packages con su tag
    (`v0.7.x`). Nunca vendorices un build local para producción.
@@ -341,11 +341,11 @@ El sitio nunca usa una versión «latest» de AXIS: dibuja con archivos copiados
    node scripts/vendor-axis-site-nav.mjs \
      --primitives <carpeta>/node_modules/@efeoncepro/axis-ui-primitives \
      --brand <carpeta>/node_modules/@efeoncepro/axis-brand-assets \
-     --version 0.7.11 \
-     --source "published @efeoncepro/axis-ui-primitives@0.7.11 and @efeoncepro/axis-brand-assets@<versión> (GitHub Packages, tag v0.7.11)"
+     --version 0.7.13 \
+     --source "published @efeoncepro/axis-ui-primitives@0.7.13 and @efeoncepro/axis-brand-assets@<versión> (GitHub Packages, tag v0.7.13)"
    ```
 
-   El `--source` sigue la forma del que quedó registrado para 0.7.10 (con brand assets 0.4.30).
+   El `--source` sigue la forma del que quedó registrado para 0.7.12 (con brand assets 0.4.30). Un tag que no llegó a publicar (como `v0.7.11`) no existe como paquete: se vendoriza la versión que sí está en el registro.
 
    Copia `site-nav.css`, `site-nav.js` y los SVG de marca a
    `wp-content/themes/ohio-child/assets/vendor/axis/site-nav/<versión>/` y escribe `VERSION.json` con el sha256 de
@@ -464,6 +464,6 @@ pnpm public-website:wpcli -- --eval-file scripts/public-website/create-yoast-red
   `wp eo-nav validate|apply|export|revisions|restore`), adaptador `wp-content/themes/ohio-child/inc/site-nav.php`,
   `scripts/vendor-axis-site-nav.mjs`, espejo `manifests/site-nav/efeoncepro.com.json`, suite
   `tests/playground/run-eo-site-nav.sh`.
-- AXIS: `@efeoncepro/axis-ui-primitives` (0.7.10 en vivo), `@efeoncepro/axis-ui-contracts` (0.7.9),
+- AXIS: `@efeoncepro/axis-ui-primitives` (0.7.12 en vivo), `@efeoncepro/axis-ui-contracts` (0.7.12),
   `@efeoncepro/axis-brand-assets`; contrato `efeonce.site-nav`; contrato del host en `PRIMITIVES.md` de AXIS.
 - Programa: EPIC-055 · TASK-2040 · TASK-2041 · TASK-2042.

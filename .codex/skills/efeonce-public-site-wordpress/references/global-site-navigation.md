@@ -165,7 +165,7 @@ Initial header state: a dark hero without Ohio's spacer starts `top` (glass); a 
    `node scripts/vendor-axis-site-nav.mjs --primitives <node_modules/@efeoncepro/axis-ui-primitives> --brand <node_modules/@efeoncepro/axis-brand-assets> --version <x.y.z> --source "<package + tag>"`.
    It writes `assets/vendor/axis/site-nav/<x.y.z>/` with `VERSION.json` (sha256 per file). A local AXIS build is only
    for work in progress; re-vendor from the published package before deploying.
-3. Set the theme constant `EO_SITE_NAV_AXIS` in `inc/site-nav.php` to the new version (today `0.7.10`).
+3. Set the theme constant `EO_SITE_NAV_AXIS` in `inc/site-nav.php` to the new version (today `0.7.12`).
 4. If the render changed, bring `EOSN_Render` and the validator to parity and run the Playground suite.
 5. Deploy through the theme lane (and the plugin lane if it changed), then `verify` and check live.
 

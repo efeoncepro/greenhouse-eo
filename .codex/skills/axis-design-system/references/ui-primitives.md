@@ -282,9 +282,9 @@ the page that first used it.
 Global site menu (header, mega menus, onepage, CTA slot) written once in AXIS and consumed by WordPress. Program
 EPIC-055 (TASK-2040 AXIS, TASK-2042 rollout); decision PDR-027. Live on every page of efeoncepro.com except `/blog/`.
 
-**Current versions:** `@efeoncepro/axis-ui-contracts` **0.7.9** + `@efeoncepro/axis-ui-primitives` **0.7.10**
-(tags `v0.7.8`, `v0.7.9`, `v0.7.10`; the `v0.7.2` tag was already taken, so 0.7.8 is the first site-nav tag). Pin
-0.7.10 or later.
+**Current versions:** `@efeoncepro/axis-ui-contracts` **0.7.12** + `@efeoncepro/axis-ui-primitives` **0.7.12**
+(tags `v0.7.8`, `v0.7.9`, `v0.7.10`, `v0.7.12`; the `v0.7.2` tag was already taken, so 0.7.8 is the first site-nav
+tag; `v0.7.11` stopped before publishing and is not a package). Pin 0.7.12 or later.
 
 | Layer | Owns |
 | --- | --- |
@@ -305,6 +305,10 @@ Releases:
   resize (`--asn-op-r`, measured in the onepage box so the host offset keeps the centre on the hamburger); `150vmax`
   without JS. It fixed an uncovered corner past ~1500 px wide. The token `axisSiteNav.motion.onepage.radiusPx` (1720)
   stays as the 1440-board measure and is **no longer the radius**; never use it to size the circle.
+- **0.7.12 (primitives):** the island's tone reading. Without `data-site-nav-tone`, a background gradient decides by the
+  mean luminance of its opaque stops, a background image counts as dark, a color under 0.5 alpha does not decide, and
+  fixed or sticky host chrome (theme bar, chat, cookie notice, the landing dock) is skipped. It fixed a light island
+  over the navy E-E-A-T gradient band of /servicios/posicionamiento-seo/ (verified live 2026-10-23).
 
 **Host contract** (AXIS `PRIMITIVES.md`):
 
@@ -319,8 +323,8 @@ Releases:
 Consumers (verified 2026-10-23):
 
 - **WordPress** (`efeonce-public-site-runtime`): plugin `eo-site-nav` renders with `EOSN_Render`, byte-identical to
-  `siteNavHtml` (17 parity cases at AXIS 0.7.9) plus a validator (35 parity cases); theme `ohio-child` pins the files in
-  `assets/vendor/axis/site-nav/0.7.10/` (`VERSION.json` with sha256, copied from the published package by
+  `siteNavHtml` (17 parity cases at AXIS 0.7.12) plus a validator (35 parity cases); theme `ohio-child` pins the files in
+  `assets/vendor/axis/site-nav/0.7.12/` (`VERSION.json` with sha256, copied from the published package by
   `scripts/vendor-axis-site-nav.mjs`) and the constant `EO_SITE_NAV_AXIS`. Bump procedure and operation:
   `efeonce-public-site-wordpress` → `references/global-site-navigation.md`.
 

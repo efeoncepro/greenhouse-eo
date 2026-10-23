@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ con Ohio), agendador nativo en vivo desde la cabecera, el mega y el onepage, documento en revisión 4 y edición gobernada por pnpm public-website:site-nav. Pendiente: alta GTM/GA4, Core Web Vitals, prueba de vuelta a off en producción`v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
+- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ con Ohio), agendador nativo en vivo desde la cabecera, el mega y el onepage, documento en revisión 4 y edición gobernada por pnpm public-website:site-nav; AXIS 0.7.12 en el tema desde 04:07 UTC (tono de la isla bajo degradados). Pendiente: alta GTM/GA4, Core Web Vitals, prueba de vuelta a off en producción`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -448,6 +448,10 @@ Reglas obligatorias:
 
 > Avance 2026-10-23 (después del `on`):
 > - **Corte del onepage en pantallas anchas** corregido en AXIS primitives 0.7.10 (radio a la esquina más lejana).
+> - **Tono de la isla** corregido en AXIS 0.7.12 (degradados, velos y chrome fijo del anfitrión): sobre la franja
+>   E-E-A-T navy de `/servicios/posicionamiento-seo/` la isla quedaba clara. Vendorizado desde el paquete publicado
+>   (runtime `e6c388d`), paridad 17 + 35 contra 0.7.12, desplegado y purgado a las 04:07 UTC; verificado en vivo a
+>   1440: isla `fixed` con tono `dark` sobre la franja y `light` sobre las secciones claras, sin errores de consola.
 > - **Loop Marketing → Inbound**: el servicio abre `/agencia-inbound-marketing/` y `/landing-loop-marketing/` responde
 >   301 (Yoast Premium, `create-yoast-redirect.php`, página en noindex). Revisión 3 del documento.
 > - **Edición gobernada**: `pnpm public-website:site-nav` (pull, show, set, glyph, photo, add/move/remove, patch,
