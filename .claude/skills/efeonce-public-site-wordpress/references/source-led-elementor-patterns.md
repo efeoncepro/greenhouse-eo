@@ -18,6 +18,7 @@ section background rises with the card (fixed live 2026-10-20). Rail: `compile-a
 `build-agenda-elementor-package.cjs <live baseline>` → `deploy-agenda-elementor-package.php` → hash-guarded
 `publish-agenda-elementor-page.php` → `rollback-agenda-elementor-page.php`; both core gates include `agenda`. Each is a
 Seventh (Nosotros `/about-us-efeonce/`, 2026-10-23, replaced in place, preview → replace): `references/landings/about-us-efeonce.md`. reference for mechanisms and lessons, not a layout to copy (`references/landing-workflow.md` §Start from the landing's need).
+Eighth (Partners `/partnership/`, 2026-10-23, preview → replace): `references/landings/partnership.md`. Lesson: measure the preview against the canvas with animations frozen and diff computed styles element by element; Ohio leaks body `line-height:1.6`/`16.4px`/tracking and theme classes (`.tag`, margins on `.bento`/`.steps`) that the scoped canvas CSS does not reset.
 
 ## Shared source-led core (2026-10-17)
 

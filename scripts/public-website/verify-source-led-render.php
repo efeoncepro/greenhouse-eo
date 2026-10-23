@@ -62,6 +62,7 @@ namespace {
 		'inbound'     => array( 'base' => 'EO_Inbound_Landing_Base_Widget', 'file' => 'class-eo-inbound-landing-widgets.php' ),
 		'agenda'      => array( 'base' => 'EO_Agenda_Landing_Base_Widget', 'file' => 'class-eo-agenda-landing-widgets.php' ),
 		'nosotros'    => array( 'base' => 'EO_Nosotros_Landing_Base_Widget', 'file' => 'class-eo-nosotros-landing-widgets.php' ),
+		'partners'    => array( 'base' => 'EO_Partners_Landing_Base_Widget', 'file' => 'class-eo-partners-landing-widgets.php' ),
 	);
 	$out = array();
 	foreach ( $landings as $landing => $cfg ) {
