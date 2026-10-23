@@ -106,7 +106,7 @@ esquema del contrato. `TASK-2042` depende de ambas.
     operador); `/blog/` (#18456) conserva Ohio porque es de `TASK-1802`. Barrida de 52 páginas publicadas y 3 posts de
     Glitch a 1440 y 390 sin fallas del menú; sesión de fidelidad aprobada en vivo. Agendador nativo en la cabecera, el
     mega y el onepage, con la piel `meeting-dialog.css`. AXIS primitives 0.7.13 copiado en `ohio-child`. Doctrina,
-    documentación funcional y manual actualizados. Faltan el alta GTM/GA4 de `gh_site_nav_*`, Core Web Vitals frente
+    documentación funcional y manual actualizados. Medición en GTM (versión 9) y GA4 desde el mismo día. Faltan Core Web Vitals frente
     al encabezado anterior y probar la vuelta a `off` en producción.
 
 - `TASK-2043` — **Dock inferior de las landings** (agregada 2026-10-23).
@@ -155,8 +155,9 @@ task nueva sólo se crea si el trabajo no cabe en ninguna de las tres.
 - [x] «Agenda tu diagnóstico» abre el agendador nativo desde la cabecera, el mega y el onepage, y devuelve el foco al
   cerrar. Evidencia en producción (2026-10-23): cabecera y mega a 1440, onepage a 390 (pantalla completa), Escape y el
   botón de cierre devuelven el foco; `greenhouse_cta_clicked` con `cta_location: site_nav` (`TASK-2042`).
-- [ ] Los eventos de medición llegan a GA4 sin PII. Sin tildar: `gh_site_nav_*` llega al `dataLayer` en vivo, pero falta
-  el alta en GTM y GA4 (la publicación del contenedor requiere confirmación humana).
+- [x] Los eventos de medición llegan a GA4 sin PII. Evidencia (2026-10-23): `gh_site_nav_opened`, `gh_site_nav_line_viewed`,
+  `gh_site_nav_clicked` y `gh_landing_dock_clicked` en GA4 Tiempo real tras una visita simulada que acepta sólo analítica
+  (GTM versiones 8 y 9); los parámetros son ids y etiquetas del menú y del dock.
 - [x] La doctrina `native-navigation.md`, la documentación funcional y el manual del sitio reflejan el nuevo modelo.
   Evidencia: `native-navigation.md` y `runtime-and-discovery.md` (`.claude` y `.codex`),
   [documentación funcional](../../documentation/public-site/navegacion-global-del-sitio.md) y

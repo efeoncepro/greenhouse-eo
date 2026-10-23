@@ -662,8 +662,12 @@ veces y reviviría el rail legado `gh_cta_clicked`. Sólo pasan esas claves, con
 etiquetas del menú, nunca lo que escribe un visitante. Ningún evento del menú es key event.
 
 Estado (2026-10-23): en producción se verificó `gh_site_nav_opened` en el `dataLayer` en el barrido de 55 URL, y
-`gh_site_nav_clicked` en la prueba del agendador. El agendador emite `greenhouse_cta_*` con `cta_location: site_nav`. **Falta el alta en GTM y GA4**
-de `gh_site_nav_*`, que pasa por la skill de medición con confirmación humana antes de publicar el contenedor. Registro:
+`gh_site_nav_clicked` en la prueba del agendador. El agendador emite `greenhouse_cta_*` con `cta_location: site_nav`. Alta en
+GTM (versión 9, 2026-10-23, `scripts/gtm/build-site-nav-events-workspace.ts`: tres tags, tres triggers y los DLVs `panel` y
+`line`, más los `target*` del dock) y en GA4 (dimensiones de evento `panel`, `line`, `target_type` y `target`). Verificado
+con una visita simulada que acepta sólo analítica en el banner: los tres eventos en GA4 Tiempo real, con la página del
+clic en `page_location`. Un clic en una entrada normal lleva `target_type` y el id de la entrada (`dropdown:partners`,
+`featured:blog`, `case:brand`), no su URL. Registro:
 [TRACKING-PLAN.md §CTAs](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md#ctas).
 
 ## Adaptador WordPress
@@ -921,7 +925,6 @@ de adoptar el diálogo mirando el DOM; un módulo compartido entre el tema y el 
 
 ## Pendientes
 
-- Alta en GTM y GA4 de `gh_site_nav_*`, con confirmación humana antes de publicar el contenedor.
 - Medir Core Web Vitals contra la cabecera anterior.
 - Comprobar en producción la vuelta a `off` (sólo se probó en Playground).
 - Admin de `TASK-2041` (dirección B con vista previa en vivo y el árbol de la dirección A).

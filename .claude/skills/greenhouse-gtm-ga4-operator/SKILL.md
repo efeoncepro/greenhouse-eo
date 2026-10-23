@@ -249,7 +249,7 @@ Ante una tarea de medición, seguir este árbol; NO improvisar el camino:
    landings `gh_landing_dock_clicked` con `target_type`/`target` (`eo-landing-dock/assets/js/landing-dock-host.js`,
    TASK-2043) con además `target_label` y `target_url`. El dock **sí está registrado** (GTM versión 8, 2026-10-23,
    `scripts/gtm/build-landing-dock-events-workspace.ts`; dimensiones GA4 `target_type`/`target`/`target_label`/`target_url`);
-   `gh_site_nav_*` **sigue sin registrar** (reusar los mismos `DLV - target*`; publicar sólo con confirmación humana). El agendador abierto desde el dock mide por `greenhouse_cta_*` con
+   `gh_site_nav_*` también (GTM versión 9, `scripts/gtm/build-site-nav-events-workspace.ts`; dimensiones `panel`/`line`). Verificar con visita simulada: ver LEARNINGS 2026-10-23 (service worker + agente de usuario). El agendador abierto desde el dock mide por `greenhouse_cta_*` con
    `cta_location: landing_dock` (reemplaza `inbound_mobile_dock` y `hubspot_mobile_dock`).
    Verificar el renderer y el dataLayer; GTM no inventa eventos ausentes.
 3. **¿Existe un evento recomendado GA4 que calce?** (lead → `generate_lead`; signup → `sign_up`). Sí → usar ese verbatim (hereda key events/predictivos). No → custom `gh_<object>_<action>`. Regla completa: doc `04`.

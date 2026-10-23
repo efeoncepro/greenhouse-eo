@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ con Ohio), agendador nativo en vivo desde la cabecera, el mega y el onepage, documento en revisión 4 y edición gobernada por pnpm public-website:site-nav; AXIS primitives 0.7.13 en el tema desde 04:28 UTC (tono de la isla bajo degradados y con el agendador abierto). Pendiente: alta GTM/GA4, Core Web Vitals, prueba de vuelta a off en producción`
+- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ con Ohio), agendador nativo en vivo desde la cabecera, el mega y el onepage, documento en revisión 4 y edición gobernada por pnpm public-website:site-nav; AXIS primitives 0.7.13 en el tema desde 04:28 UTC (tono de la isla bajo degradados y con el agendador abierto). Medición en GTM (versión 9) y GA4 desde 2026-10-23. Pendiente: Core Web Vitals, prueba de vuelta a off en producción`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -641,7 +641,10 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
   devuelve el foco al cerrar. Evidencia (producción, 2026-10-23): diálogo con la piel del sitio desde la cabecera y el
   mega a 1440 y desde el onepage a 390 (pantalla completa); Escape y el botón de cierre devuelven el foco a «Agenda tu
   diagnóstico» o a la hamburguesa; `greenhouse_cta_clicked` con `cta_location: site_nav`.
-- [ ] Los eventos del menú (`gh_site_nav_*`) llegan a GA4 sin PII. Sin tildar: falta el alta en GTM y GA4.
+- [x] Los eventos del menú (`gh_site_nav_*`) llegan a GA4 sin PII. Evidencia (2026-10-23): GTM versión 9
+  (`scripts/gtm/build-site-nav-events-workspace.ts`) y dimensiones `panel`, `line`, `target_type`, `target` en GA4; una
+  visita simulada que acepta sólo analítica dejó `gh_site_nav_opened`, `gh_site_nav_line_viewed` y `gh_site_nav_clicked`
+  en GA4 Tiempo real.
 - [ ] Sin scroll horizontal en los viewports del plan y Core Web Vitals sin regresión frente a la medición previa. Sin
   tildar: ningún elemento del menú se sale (barrida 2026-10-23), pero cinco páginas antiguas o de demo tienen scroll
   horizontal propio de Elementor (`/home-2/`, `/demo-landing-2024/`, `/partnership/`, `/landing-loop-marketing/`,

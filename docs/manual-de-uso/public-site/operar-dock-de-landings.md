@@ -138,7 +138,10 @@ aparte con `cta_location: landing_dock`; el clic nunca es una conversión.
 2. Ver que el hit salga: en las herramientas de red, la petición `/g/collect` al servidor de tagging con
    `en=gh_landing_dock_clicked` y los cuatro `ep.target*`. Con las cookies rechazadas sale como `gcs=G100` y no se
    reenvía a GA4: es lo esperado.
-3. En GA4 Tiempo real, el evento aparece sólo con visitas que aceptaron analítica.
+3. En GA4 Tiempo real, el evento aparece sólo con visitas que aceptaron analítica. Para probarlo sin esperar tráfico,
+   una visita simulada que acepta sólo analítica en el banner sirve; la receta (service worker y agente de usuario)
+   está en [LEARNINGS de medición](../../reference/measurement-gtm-ga4/LEARNINGS.md). La página del clic llega sola
+   como `page_location`.
 4. Si se cambia un parámetro, regenera el tag con `scripts/gtm/build-landing-dock-events-workspace.ts` (sin `--publish`
    arma y compila el workspace; con `--publish` versiona, publica y actualiza el snapshot) y commitea el snapshot.
 

@@ -266,8 +266,9 @@ reuse the island glass of `axisSiteNav`; schema `landing-dock.v1`; `landingDockH
 
 `gh_site_nav_opened` (panel), `gh_site_nav_line_viewed` (line), `gh_site_nav_clicked` (`target_type`, `target`). The CTA
 click travels as `gh_site_nav_clicked` with `target_type: cta`, `target: menu_header|menu_mega|menu_onepage`; the
-scheduler emits `greenhouse_cta_*`; `site_nav_cta` is not pushed. GTM/GA4 setup of `gh_site_nav_*` is still pending
-(human confirmation before publishing the container) — use `greenhouse-gtm-ga4-operator`.
+scheduler emits `greenhouse_cta_*`; `site_nav_cta` is not pushed. Registered in GTM (version 9,
+`scripts/gtm/build-site-nav-events-workspace.ts`) and GA4 (dimensions `panel`, `line`, `target_type`, `target`) on
+2026-10-23; changes go through `greenhouse-gtm-ga4-operator`.
 
 Dock: `landing-dock-host.js` pushes `gh_landing_dock_clicked` with `target_type` (cta|link), `target`
 (primary|secondary), `target_label` (full label, never the phone's short one) and `target_url` (path + hash, no query),
@@ -291,7 +292,7 @@ meeting CTA uses `cta-location="landing_dock"`, which replaced `inbound_mobile_d
 
 ## Pending
 
-GTM/GA4 for `gh_site_nav_*` (the `DLV - target*` variables already exist); Core Web Vitals against the previous header; production
+Core Web Vitals against the previous header; production
 check of switching to `off`; TASK-2041 admin (direction B, live preview + tree); retire the seven legacy docks' code
 (still in each landing, stripped from the HTML by the plugin); one shared scheduler bridge for `site-nav-host.js` and
 `landing-dock-host.js`.

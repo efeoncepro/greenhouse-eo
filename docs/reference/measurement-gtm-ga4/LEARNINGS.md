@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-10-23 — verificar con una visita simulada: el service worker y el agente de usuario
+
+Alta de `gh_site_nav_*` (GTM versión 9) y `gh_landing_dock_clicked` (versión 8) verificada en GA4 Tiempo real con una
+visita simulada en Playwright, sin esperar tráfico real.
+
+- **Aceptar sólo analítica en el banner de HubSpot:** «Configurar» (`#hs-eu-cookie-settings-button`), activar
+  `#hs-category-toggle-analytics` y «Guardar configuración» (`#hs-modal-save-settings`). Publicidad queda denegada, así
+  que no sale ningún PageView a Meta; los hits van con `gcs=G101` y el servidor los reenvía a GA4.
+- **Después del primer hit, GA4 envía por un service worker.** El `page_view` sale de la página; el resto sale desde
+  el iframe `/_/service_worker/…/sw_iframe.html` del servidor de tagging. `page.on('request')` no lo ve: escuchar con
+  `context.on('request')` (`request.serviceWorker()` lo identifica). Sin eso parece que los eventos no se envían.
+- **GA4 filtra como bot lo que sale del service worker con `HeadlessChrome`.** `newContext({ userAgent })` sólo cambia
+  la página; el service worker conserva el agente de usuario del navegador sin ventana y sus hits llegan al servidor
+  pero nunca a Tiempo real. Lanzar con `args: ['--user-agent=…']` además del contexto.
+- **La página del clic ya viaja en cada hit** (`dl`, en GA4 `page_location`): no hace falta un parámetro propio.
+- No enviar formularios ni agendar en estas visitas: abrir el agendador y cerrarlo con Escape basta para
+  `greenhouse_cta_clicked`.
+
 ## 2026-10-23 — clic del dock de las landings: qué botón, no sólo cuál posición
 
 [TRACKING-PLAN fila `landing_dock`](TRACKING-PLAN.md) · [arquitectura](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043).
