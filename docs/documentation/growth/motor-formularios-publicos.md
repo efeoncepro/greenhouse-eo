@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.1
+> **Version:** 2.2
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-10-15 por Claude (opciones visibles en cualquier estilo, enlace de privacidad legible, íconos de etiqueta; TASK-2038)
+> **Ultima actualizacion:** 2026-10-23 por Claude (formularios diseñados en canvas, TASK-2044)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -223,6 +223,15 @@ separada. El contrato visual reusable vive en
 La piel no duplica la logica: el host aporta chrome, marca y layout; Growth Forms conserva campos, valores,
 seleccion, validacion, consentimiento, Turnstile, destino y success. Si los iconos por opcion se reutilizan en otra
 landing, deben pasar al contrato browser-safe del renderer, no copiarse como CSS o JavaScript por etiqueta.
+
+## Formularios diseñados en canvas — TASK-2044
+
+Un formulario diseñado (columnas, casilla compacta con el enlace a la política dentro de la frase, «Recibido.» con un
+botón «Cerrar» y el arco de La órbita) se declara en el contrato del formulario, sin CSS de la landing. Todo es
+opcional: un formulario que no lo declara se ve igual que antes. El dibujo de estas opciones llega con TASK-2045.
+
+> Detalle técnico: [contrato de runtime](../../architecture/growth-public-forms-runtime-contract.md) ·
+> `src/lib/growth/forms/contracts.ts` · `src/lib/growth/forms/policy-compiler.ts`
 
 ## Que NO hace (todavia)
 

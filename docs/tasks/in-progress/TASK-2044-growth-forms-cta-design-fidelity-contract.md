@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `Diseno; análisis del 2026-10-23 con tres subagentes y verificación de código (sesión «Rediseño landing Nosotros»)`
+- Status real: `Code complete 2026-10-23 (Slices 1–5, commits 0864b7c04…36aa21309 + docs). Rollout pendiente: diff del contrato público en staging tras el próximo deploy de develop; sin push por instrucción del operador (no release a main)`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms`
 - Blocked by: `none`
@@ -115,7 +115,7 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - **TASK-2045** (renderer y diálogo) consume todo este contrato; queda bloqueada hasta que esta cierre.
-- **TASK-1320** (tarjeta de éxito, `in-progress`): la acción `dismiss` y `presentation.icon` se suman a su contrato; recibe Delta.
+- **TASK-1320** (tarjeta de éxito, `in-progress`): la acción `dismiss` y `successBehavior.icon` se suman a su contrato; recibe Delta.
 - **TASK-2038** (renderer en AXIS, `to-do`): los tipos copiados del renderer viajan con el port; recibe Delta.
 - **TASK-2039** (señales de la landing → formulario): no se pisan; ambos agregan campos opcionales al contrato.
 - La landing Partners (`/partnership/`) es el primer consumidor; su despliegue no es parte de esta task.
@@ -178,7 +178,7 @@ Reglas obligatorias:
 - Contrato nuevo o modificado:
   - `fieldPresentationSchema.width`: `'auto' | 'half' | 'full'` (default `auto` = heurística actual)
   - consentimiento: `presentation: 'tile' | 'compact'` (default `tile`) y casilla con `label` que admite un único marcador `{privacyLink}`, reemplazado por un enlace a `privacyUrl` con el texto `privacyLinkLabel` declarado; si el marcador está, el párrafo de enlace aparte se omite
-  - éxito: acción `kind: 'dismiss'` (sin `href`, emite evento) y `presentation.icon: 'celebration' | 'orbit' | 'none'` (default `celebration`; `orbit` es el glifo de La órbita)
+  - éxito: acción `kind: 'dismiss'` (sin `href`, emite evento) y `icon: 'celebration' | 'orbit' | 'none'` (default `celebration`; `orbit` es el glifo de La órbita)
   - CTA: `open_growth_form.presentation: 'inline' | 'dialog'` (default `inline`) y, sólo con `dialog`, un encabezado opcional `dialog: { eyebrow?, title?, lead? }` (texto plano; sin él se usa el titular del CTA), proyectados al navegador junto a `formSlug`/`formKey`
 - Backward compatibility: `compatible` (todo opcional, defaults iguales al render actual)
 - Full API parity: los campos nuevos se escriben por las mismas vías gobernadas que ya existen (admin de formularios, `authorDraftForm` de los scripts, comando de CTA); no nace una vía de escritura nueva ni lógica en la UI
@@ -258,7 +258,7 @@ Reglas obligatorias:
 
 ### Slice 3 — Cierre del éxito
 
-- `SUCCESS_ACTION_KINDS` suma `dismiss` (sin `href`); `success_card.presentation.icon` (`celebration|orbit|none`).
+- `SUCCESS_ACTION_KINDS` suma `dismiss` (sin `href`); `successBehavior.icon` (`celebration|orbit|none`).
 - Pruebas: `dismiss` con `href` se rechaza; las acciones existentes siguen exigiendo `href`.
 
 ### Slice 4 — Presentación `dialog` del CTA
@@ -366,13 +366,13 @@ N/A — repo-only change; ningún proveedor externo cambia en esta task.
 
 ## Acceptance Criteria
 
-- [ ] `fieldPresentationSchema.width` (`auto|half|full`) existe en el servidor, en la proyección pública y en el tipo del renderer, con prueba.
-- [ ] El consentimiento admite `presentation: 'compact'` y un único `{privacyLink}`; HTML, marcadores desconocidos o dobles se rechazan al compilar, con prueba.
-- [ ] `dismiss` existe como acción de éxito sin `href` y `success_card` admite `icon: 'orbit'` y `icon: 'none'`, con prueba.
-- [ ] `open_growth_form` admite `presentation: 'dialog'` y su encabezado, ambos llegan al navegador y la prueba de paridad servidor ↔ renderer pasa.
-- [ ] El contrato público de `efeonce-media-diagnostic`, `efeonce-inbound-diagnostic` y `efeonce-hubspot-scope` es idéntico antes y después en staging.
-- [ ] `docs/architecture/growth-public-forms-runtime-contract.md` tiene la sección del kit de diseño con el mapeo del popup de Partners.
-- [ ] TASK-1320, TASK-2038 y TASK-2045 tienen su Delta.
+- [x] `fieldPresentationSchema.width` (`auto|half|full`) existe en el servidor, en la proyección pública y en el tipo del renderer, con prueba. Evidencia: `design-fidelity-contract.test.ts` §ancho.
+- [x] El consentimiento admite `presentation: 'compact'` y un único `{privacyLink}`; HTML, marcadores desconocidos o dobles se rechazan al compilar, con prueba. Evidencia: `design-fidelity-contract.test.ts` §consentimiento (también `consent_display_invalid` y `privacyUrl` obligatoria).
+- [x] `dismiss` existe como acción de éxito sin `href` y el éxito admite `icon: 'orbit'` y `icon: 'none'` (campo `successBehavior.icon`: `presentation` ya era un enum), con prueba. Evidencia: `design-fidelity-contract.test.ts` §cierre e ícono.
+- [x] `open_growth_form` admite `presentation: 'dialog'` y su encabezado, ambos llegan al navegador y la prueba de paridad servidor ↔ renderer pasa. Evidencia: `action-registry.test.ts` §presentación dialog + `renderer-contract-parity.test.ts` + `pnpm typecheck` verde.
+- [ ] El contrato público de `efeonce-media-diagnostic`, `efeonce-inbound-diagnostic` y `efeonce-hubspot-scope` es idéntico antes y después en staging. **Sin verificar:** requiere deploy de develop (sin push por instrucción del operador). Cubierto en local por los tests «sin el campo proyecta igual que hoy».
+- [x] `docs/architecture/growth-public-forms-runtime-contract.md` tiene la sección del kit de diseño con el mapeo del popup de Partners (§Formularios diseñados en canvas).
+- [x] TASK-1320, TASK-2038 y TASK-2045 tienen su Delta (TASK-1320 y TASK-2045 corregidos a `successBehavior.icon`).
 
 ## Verification
 

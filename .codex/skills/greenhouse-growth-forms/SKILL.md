@@ -603,6 +603,15 @@ bundle) in a test browser before publishing a version. The renderer only reaches
 release until TASK-2038 moves it to AXIS. Host checklist: `efeonce-public-site-wordpress`
 `references/growth-forms-wordpress.md` §Canvas-designed forms.
 
+**Design-fidelity fields (TASK-2044, contract code complete 2026-10-23; render pending TASK-2045).** Declare a canvas
+design instead of styling it: `fields[].presentation.width` (`auto|half|full`), `consent.presentation` (`tile|compact`)
++ `consent.privacyLinkLabel` + one `{privacyLink}` marker in a checkbox `label` (compiler blocks HTML, other markers,
+repeats and a missing `privacyUrl`), `successBehavior.icon` (`celebration|orbit|none`) and success action
+`kind: 'dismiss'` (no `href`/`target`). In a Growth CTA, `open_growth_form` takes `presentation: 'dialog'` + optional
+`dialog: { eyebrow, title, lead }`. Absent = today's contract. The live renderer ignores them gracefully **except**
+`{privacyLink}`, which an old renderer shows literally: never publish the marker before the TASK-2045 renderer is in
+production. Full table: `docs/architecture/growth-public-forms-runtime-contract.md` §Formularios diseñados en canvas.
+
 Catalog selector needs `GREENHOUSE_GROWTH_CATALOG_SURFACE_ID` + `GREENHOUSE_GROWTH_CATALOG_EMBED_KEY`
 in `wp-config.php`; embed key minted with `pnpm growth:forms:embed-key --surface-id <id>` (shown once).
 

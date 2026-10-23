@@ -1,9 +1,9 @@
 # Motor de CTAs y Popups — `growth.cta`
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-10-17 por Claude (CTAs y superficies por landing; renderer 1.3.1)
+> **Ultima actualizacion:** 2026-10-23 por Claude (formulario en diálogo, TASK-2044)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio:** `greenhouse-growth-ctas` (Claude + Codex; se actualiza con cada cambio del motor)
 
@@ -74,6 +74,15 @@ La superficie de gobernanza vive en el **menú Growth** (junto a AEO y Forms), v
   motivo obligatorio y auditoría visible (quién, cuándo, por qué).
 
 > Detalle técnico: `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md` §28.
+
+## Formulario en un diálogo — TASK-2044
+
+La acción «abrir formulario» puede presentar el formulario en un diálogo (popup) que el visitante abre con el botón,
+con su propio encabezado. No es un popup que aparece solo: no tiene tope de frecuencia ni reglas de interrupción. Hasta
+que el renderer de TASK-2045 llegue a producción, el formulario se sigue abriendo dentro de la tarjeta.
+
+> Detalle técnico: [arquitectura §30](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md) ·
+> `src/lib/growth/ctas/contracts.ts` · `src/lib/growth/ctas/action-registry.ts`
 
 ## Quién puede operarlo
 

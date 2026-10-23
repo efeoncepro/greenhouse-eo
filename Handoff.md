@@ -1,5 +1,17 @@
 # Handoff
 
+## 2026-10-23 — Partners en vivo y contrato de formularios diseñados (TASK-2044)
+
+`/partnership/` (248003) reemplazada por 6 widgets compilados del canvas Partners v14 (snapshot
+`_gh_partners_v2_before_20261023_220804`, preview 252038 privada, SEO/OG con adjunto 252045);
+[referencia](.claude/skills/efeonce-public-site-wordpress/references/landings/partnership.md). «Quiero ser partner»
+lleva a `/agenda/` hasta TASK-2045; el formulario HubSpot «Lead Gean - Partnership» ya no está en la página.
+TASK-2044 code complete en local (`0864b7c04`…`36aa21309`): ancho por campo, consentimiento `compact` + `{privacyLink}`,
+`successBehavior.icon` y `dismiss`, CTA `open_growth_form` en `dialog`. **Rollout pendiente:** diff del contrato
+público en staging tras deploy. **No publicar `{privacyLink}`** antes del renderer de TASK-2045 (el actual lo muestra
+literal). Arreglado de paso el typecheck de `scripts/public-website/landing-dock/cli.ts`. **Sin push ni release a main**
+(instrucción del operador). Próximo paso: TASK-2045.
+
 ## 2026-10-23 — Mattis: propuesta Markdown y método conciliado
 
 [Expediente GRD-1555](docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md): caso MD principal,
@@ -212,15 +224,3 @@ Ads activos;12 propuestas DRY_RUN sin aplicar. Lead Gen Web sigue lead_magnet; G
 requieren revisar intención. Sin inscripción automática ni nuevos eventos/acciones/puja/deploy/GTM.
 [Inventario y siguiente paso](docs/audits/growth/2026-10-18-commercial-forms-measurement-coverage.md),
 [activación](docs/audits/growth/2026-10-18-google-ads-activation.md) e [historial](Handoff.archive.md).
-
-## 2026-10-18 — Activación Ads y trazabilidad de conversiones
-
-Cuenta6862539491: EC ON, GTMWeb6/Server10 publicados, bridge compatible WordPress/Think y policies
-Performance/Discovery rev2. HubSpot marker/config y captura Meta activos. Flag Production true;
-companion ER5 READY del mismo mainEC liberado, alias exacto, health200 y watchdogok6/6 sin drift.
-Canarios admin/public/negativos PASS, consentimiento hosts12/12 y SDKlive4/4 sin envíos comerciales.
-Primera ocurrencia, identidad nativa y recepción/atribución siguen pendientes: cero nuevas ocurrencias
-20:35–20:44Z. TASK-2034 parcial. Sin replay ni cambio de campañas/OAuth/IAM. WIP ajeno preservado.
-[Auditoría/evidencia](docs/audits/growth/2026-10-18-google-ads-activation.md),
-[arquitectura](docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md),
-[tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md) e [historial](Handoff.archive.md).

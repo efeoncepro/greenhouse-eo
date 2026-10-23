@@ -1008,3 +1008,20 @@ el run `29854833210`; el piloto `/agenda/` sigue aislado y no autoriza promoció
   surface propia `Efeonce HubSpot landing (WordPress)` (`csur-56a96b52-44ca-43d8-a61f-8c365c211487`), reducido a botón
   dentro de un dock móvil por CSS del host. Patrón operativo de un CTA y una surface por landing:
   `docs/manual-de-uso/growth/operar-motor-cta.md`.
+
+## 30. Delta 2026-10-23 — TASK-2044: `open_growth_form` en diálogo (contrato, code complete)
+
+- **Qué:** `ctaOpenGrowthFormPolicySchema` suma `presentation: 'inline' | 'dialog'` (default `inline`) y un encabezado
+  opcional `dialog: { eyebrow?, title?, lead? }` (texto plano, `.strict()`). El resolver del registry proyecta
+  `presentation` y `dialog` al navegador **sólo** cuando la presentación es `dialog`: un CTA `inline` (o sin el campo)
+  tiene la misma proyección que antes. Un encabezado sin `presentation: 'dialog'` es `action_policy_invalid` (la regla
+  vive en el resolver porque `z.discriminatedUnion` exige `ZodObject` sin `.refine`).
+- **Por qué no `popup_modal`:** la colocación `popup_modal` es interruptiva (aparece sola, con tope de frecuencia y
+  restricciones móviles) y sigue sin implementar. `dialog` es una **presentación de la acción**, abierta por el
+  visitante: no pasa por suppression ni por el claim interruptivo. El estado `form_expanded` de §17 sigue siendo el de
+  `inline`; `dialog` es su variante modal.
+- **Render:** pendiente en TASK-2045 (`<dialog>` nativo, formulario montado al abrir, foco, Escape, scroll lock,
+  hoja inferior en teléfono). El renderer publicado hoy ignora `presentation` y despliega el formulario inline.
+- **Paridad:** espejo `CtaRenderOpenGrowthFormActionMirror` actualizado; `renderer-contract-parity.test.ts` lo vigila.
+  Tests: `src/lib/growth/ctas/__tests__/action-registry.test.ts` (inline idéntico, dialog con y sin encabezado,
+  encabezado sin dialog, presentación desconocida, campos extra).

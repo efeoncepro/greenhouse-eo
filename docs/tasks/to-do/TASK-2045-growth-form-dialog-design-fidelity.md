@@ -24,10 +24,14 @@
 - Status real: `Diseno; contrato en TASK-2044; diseño de referencia aprobado en el canvas de Partners v14 (2026-10-23)`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms|ui`
-- Blocked by: `TASK-2044`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-10-23
+
+- TASK-2044 dejó el contrato code complete en `develop` (local): `presentation.width`, `consent.presentation` + `privacyLinkLabel` + `{privacyLink}`, `successBehavior.icon` (no `presentation.icon`: `presentation` ya era un enum) y acción `dismiss`; CTA `open_growth_form.presentation` + `dialog`. Ya no bloquea.
 
 ## Summary
 

@@ -164,6 +164,36 @@ release de producción de Greenhouse, porque `renderer-latest.js` se construye e
   `[data-icon]` e inyecta texto heredado; con glifos de texto salían palabras como «user ID». Los íconos
   de control conservan `data-icon`. El host no debe reintroducir íconos por CSS sobre la etiqueta.
 
+## Formularios diseñados en canvas: lo que el contrato admite (TASK-2044)
+
+Un diseño de canvas se declara en el contrato; nunca se reproduce con CSS de la landing. Todos los campos son
+opcionales y su ausencia deja el contrato público exactamente como antes (los formularios vivos no cambian de
+veredicto ni de render). Contrato en `src/lib/growth/forms/contracts.ts` y `src/lib/growth/ctas/contracts.ts`;
+validación en `policy-compiler.ts` y en el Action Registry del CTA.
+
+| Lo que pide el diseño | Campo de contrato | Validación |
+|---|---|---|
+| Campo en media columna o fila completa | `fields[].presentation.width`: `auto` (default) · `half` · `full` | enum estricto; un valor desconocido invalida el campo (`fields_invalid`) |
+| Casilla de consentimiento compacta | `consent.presentation`: `tile` (default) · `compact` (en `copy_refs_json`) | si no valida y la versión declara `presentation`/`privacyLinkLabel` → `consent_display_invalid` (bloquea) |
+| Enlace a la política dentro de la frase | `checkboxes[].label` con un único `{privacyLink}` + `consent.privacyLinkLabel` (texto del enlace, máx. 80) | `consent_marker_unknown`, `consent_marker_repeated`, `consent_marker_html`, `consent_marker_without_privacy_url` (todos bloquean); casillas sin llaves no se evalúan |
+| «Cerrar» en la tarjeta de éxito | `successBehavior.actions[]` con `kind: 'dismiss'` | sin `href` ni `target`; si los trae, el éxito no valida |
+| Ícono del éxito | `successBehavior.icon`: `celebration` (default) · `orbit` (glifo de La órbita) · `none` | enum estricto (`success_behavior_invalid`) |
+| Formulario en un popup al pulsar un botón | CTA `open_growth_form` con `presentation: 'dialog'` y `dialog: { eyebrow?, title?, lead? }` | encabezado estricto, texto plano; un encabezado sin `dialog` → `action_policy_invalid` |
+
+Ejemplo de referencia (popup «Quiero ser partner», canvas «Partners — Efeonce» v14): Nombre y apellido, Correo de
+trabajo, Empresa o plataforma y Sitio web con `width: 'half'`; «¿Qué ofreces y a quién le sirve?» con `width: 'full'`;
+consentimiento `compact` con «Acepto que Efeonce use estos datos para responder mi propuesta, según su {privacyLink}.» y
+`privacyLinkLabel: 'política de privacidad'`; éxito `success_card` con `icon: 'orbit'`, título «Recibido.» y acción
+`dismiss` «Cerrar»; CTA con `presentation: 'dialog'` y encabezado «¿Eres una plataforma?» · «Sumémonos.» · bajada. El
+anillo del eyebrow, el punto del título y la flecha del botón son piel de la landing (tokens y hooks de TASK-2045), no
+contrato. No se admite: HTML del autor, otros marcadores, anchos en columnas distintas de dos, ni la colocación
+interruptiva `popup_modal` (sigue sin implementar).
+
+**Render (TASK-2045, pendiente).** El renderer publicado hoy ignora `width` (usa la heurística), `consent.presentation`
+e `icon`, y omite `dismiss` (filtra acciones sin `href`); el CTA publicado hoy abre `dialog` como `inline`. Ninguno
+rompe. **Excepción:** un renderer anterior muestra `{privacyLink}` literal en la casilla. No publicar una versión con el
+marcador hasta que el renderer de TASK-2045 esté en producción (llega con un release de Greenhouse a `main`).
+
 ## Content Marketing: presentación, host y distribución del renderer
 
 Registro del rollout del 2026-08-31; para operar después, relee el contrato público y el ledger

@@ -164,6 +164,12 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
 
 ## Estado de rollout (actualizar al cambiar)
 
+- **2026-10-23: `open_growth_form` en diálogo — contrato code complete (TASK-2044), render pendiente (TASK-2045).**
+  Policy `presentation: 'inline' | 'dialog'` + encabezado `dialog: { eyebrow?, title?, lead? }` (texto plano,
+  estricto). Sólo `dialog` se proyecta al navegador; un encabezado sin `dialog` es `action_policy_invalid` (regla en el
+  resolver: la unión discriminada no admite `.refine`). **No es `popup_modal`**: es abierto por el visitante, sin
+  suppression ni claim interruptivo. El renderer publicado lo abre inline hasta TASK-2045. Arch §30.
+
 - **2026-10-23: placement `landing_dock`** (dock inferior compartido de siete landings de efeoncepro.com, AXIS
   `efeonce.landing-dock`, plugin `eo-landing-dock`, TASK-2043). Mismo patrón de **lanzador oculto** que el menú: el
   plugin imprime en `wp_footer` un `<greenhouse-cta cta-location="landing_dock" appearance="bare">` oculto y el botón

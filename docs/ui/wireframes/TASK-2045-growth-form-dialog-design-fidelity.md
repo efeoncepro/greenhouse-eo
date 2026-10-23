@@ -92,7 +92,7 @@
 | Placeholder | campo del formulario | «Tu nombre», «tu@empresa.com», «Nombre de la plataforma», «https://», «Tu tecnología, el problema que resuelve y el tipo de cliente» | color por `--ghf-placeholder` |
 | Consentimiento | casilla con `{privacyLink}` y `privacyLinkLabel` | «Acepto que Efeonce use estos datos para responder mi propuesta, según su {privacyLink}.» → «política de privacidad» | `presentation: 'compact'` |
 | Botón | `submitLabel` del formulario | «Enviar propuesta» | flecha por hook de la landing |
-| Éxito: ícono | `success_card.presentation.icon` | `orbit` (arco de La órbita) | `none` y `celebration` también válidos |
+| Éxito: ícono | `successBehavior.icon` | `orbit` (arco de La órbita) | `none` y `celebration` también válidos |
 | Éxito: título y cuerpo | `success_card` | «Recibido.» · «Gracias por escribirnos. Revisamos tu propuesta y te contactamos por correo.» | |
 | Éxito: acción | `success_card.actions[]` con `kind: 'dismiss'` | «Cerrar» | cierra el diálogo |
 | Cerrar (×) | microcopy del renderer del CTA (`copy.ts`) | aria-label «Cerrar» | 44 × 44 px |
