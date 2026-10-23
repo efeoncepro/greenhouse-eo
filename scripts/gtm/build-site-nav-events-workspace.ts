@@ -7,8 +7,9 @@
  * se detiene tras el preview (propose→confirm→execute: el publish es la única mutación live).
  *
  * Los empuja `ohio-child/assets/js/site-nav-host.js`: `gh_site_nav_opened` (`panel`), `gh_site_nav_line_viewed`
- * (`line`) y `gh_site_nav_clicked` (`target_type`, `target`; el CTA llega con `target_type: cta` y
- * `target: menu_header|menu_mega|menu_onepage`). Ninguno es key event: el agendador mide por `greenhouse_cta_*` con
+ * (`line`) y `gh_site_nav_clicked` (`target_type`, `target`, `target_label`, `target_url`; el CTA llega con
+ * `target_type: cta` y `target: menu_header|menu_mega|menu_onepage`). Un tag que ya existe con otros parámetros se
+ * actualiza en el workspace (PUT con su fingerprint), así una corrida nueva lleva el container al mapa de arriba. Ninguno es key event: el agendador mide por `greenhouse_cta_*` con
  * `cta_location: site_nav` y la conversión es `generate_lead`. Spec: TRACKING-PLAN fila `site-nav-discovery-meeting`.
  *
  * Uso: npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/gtm/build-site-nav-events-workspace.ts [--publish]
@@ -32,7 +33,7 @@ const SCOPES = [
 const EVENT_PARAMS: Record<string, readonly string[]> = {
   gh_site_nav_opened: ['panel'],
   gh_site_nav_line_viewed: ['line'],
-  gh_site_nav_clicked: ['target_type', 'target'],
+  gh_site_nav_clicked: ['target_type', 'target', 'target_label', 'target_url'],
 }
 
 const CTA_EVENTS = Object.keys(EVENT_PARAMS)
@@ -95,7 +96,7 @@ const main = async () => {
   void token
   const existingVariables = new Set((await rawList('variables')).map(v => String(v.name)))
   const existingTriggers = new Map((await rawList('triggers')).map(t => [String(t.name), String(t.triggerId)]))
-  const existingTags = new Set((await rawList('tags')).map(t => String(t.name)))
+  const existingTags = new Map((await rawList('tags')).map(t => [String(t.name), t]))
 
   for (const param of CTA_PARAMS) {
     if (existingVariables.has(`DLV - ${param}`)) {
@@ -137,8 +138,46 @@ const main = async () => {
       triggerId = trigger.triggerId
     }
 
-    if (existingTags.has(`GA4 event - ${eventName}`)) {
-      console.log(`tag: GA4 event - ${eventName} [ya existe]`)
+    const eventSettingsTable = {
+      type: 'list',
+      key: 'eventSettingsTable',
+      list: EVENT_PARAMS[eventName].map(param => ({
+        type: 'map',
+        map: [
+          { type: 'template', key: 'parameter', value: param },
+          { type: 'template', key: 'parameterValue', value: `{{DLV - ${param}}}` },
+        ],
+      })),
+    }
+
+    const existingTag = existingTags.get(`GA4 event - ${eventName}`) as
+      | { tagId: string; parameter: Array<{ key: string }> }
+      | undefined
+
+    if (existingTag) {
+      const current = existingTag.parameter.find(param => param.key === 'eventSettingsTable')
+
+      if (JSON.stringify(current) === JSON.stringify(eventSettingsTable)) {
+        console.log(`tag: GA4 event - ${eventName} [ya existe]`)
+        continue
+      }
+
+      const { token: accessToken } = await impersonated.getAccessToken()
+
+      const res = await fetch(
+        `https://www.googleapis.com/tagmanager/v2/accounts/${ACCOUNT_ID}/containers/${CONTAINER_ID}/workspaces/${workspace.workspaceId}/tags/${existingTag.tagId}`,
+        {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...existingTag,
+            parameter: [...existingTag.parameter.filter(param => param.key !== 'eventSettingsTable'), eventSettingsTable],
+          }),
+        },
+      )
+
+      if (!res.ok) throw new Error(`update tag ${eventName} failed (${res.status})`)
+      console.log(`tag: GA4 event - ${eventName} [actualizado: ${EVENT_PARAMS[eventName].join(', ')}]`)
       continue
     }
 
@@ -149,17 +188,7 @@ const main = async () => {
         { type: 'boolean', key: 'sendEcommerceData', value: 'false' },
         { type: 'template', key: 'eventName', value: eventName },
         { type: 'template', key: 'measurementIdOverride', value: MEASUREMENT_ID },
-        {
-          type: 'list',
-          key: 'eventSettingsTable',
-          list: EVENT_PARAMS[eventName].map(param => ({
-            type: 'map',
-            map: [
-              { type: 'template', key: 'parameter', value: param },
-              { type: 'template', key: 'parameterValue', value: `{{DLV - ${param}}}` },
-            ],
-          })),
-        },
+        eventSettingsTable,
       ],
       firingTriggerId: [triggerId],
     })
@@ -182,8 +211,8 @@ const main = async () => {
   }
 
   const version = await client.createVersion(ACCOUNT_ID, CONTAINER_ID, workspace.workspaceId, {
-    name: 'TASK-2042 gh_site_nav_* events',
-    notes: 'Menú global → GA4 (3 tags + 3 triggers + DLVs panel y line; reusa target*). TRACKING-PLAN fila site-nav-discovery-meeting.',
+    name: 'TASK-2042 gh_site_nav_* events (label + url)',
+    notes: 'Menú global → GA4: gh_site_nav_clicked suma target_label y target_url (DLVs del dock). TRACKING-PLAN fila site-nav-discovery-meeting.',
   })
 
   if (!version.containerVersionId || version.compilerError) {

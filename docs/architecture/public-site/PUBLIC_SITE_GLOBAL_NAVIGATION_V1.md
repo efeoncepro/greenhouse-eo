@@ -653,7 +653,7 @@ En efeoncepro.com el adaptador (`TASK-2042`) los empuja con la convención del s
 |---|---|---|
 | `site_nav_open` | `gh_site_nav_opened` | `panel` |
 | `site_nav_line_view` | `gh_site_nav_line_viewed` | `line` |
-| `site_nav_click` | `gh_site_nav_clicked` | `target_type`, `target` |
+| `site_nav_click` | `gh_site_nav_clicked` | `target_type`, `target`, más `target_label` y `target_url` que agrega el host |
 | `site_nav_cta` | No se empuja | — |
 
 `site_nav_cta` queda fuera porque el mismo clic ya llega como `gh_site_nav_clicked` con `target_type: cta` y el punto de
@@ -666,8 +666,10 @@ Estado (2026-10-23): en producción se verificó `gh_site_nav_opened` en el `dat
 GTM (versión 9, 2026-10-23, `scripts/gtm/build-site-nav-events-workspace.ts`: tres tags, tres triggers y los DLVs `panel` y
 `line`, más los `target*` del dock) y en GA4 (dimensiones de evento `panel`, `line`, `target_type` y `target`). Verificado
 con una visita simulada que acepta sólo analítica en el banner: los tres eventos en GA4 Tiempo real, con la página del
-clic en `page_location`. Un clic en una entrada normal lleva `target_type` y el id de la entrada (`dropdown:partners`,
-`featured:blog`, `case:brand`), no su URL. Registro:
+clic en `page_location`. Desde la versión 10 (mismo día), el host suma a `gh_site_nav_clicked` el nombre de la entrada
+(`target_label`: el nombre visible o el accesible del logo y las redes, nunca la descripción ni el antetítulo) y su
+destino (`target_url`: ruta y ancla en el sitio, dirección completa si es externa, sin query), leídos con un listener de
+clic en captura antes del handler del menú; las 98 entradas tienen nombre. Registro:
 [TRACKING-PLAN.md §CTAs](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md#ctas).
 
 ## Adaptador WordPress

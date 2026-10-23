@@ -1,5 +1,5 @@
 {
-  "name": "TASK-2042 gh_site_nav_* events",
+  "name": "TASK-2042 gh_site_nav_* events (label + url)",
   "tags": [
     {
       "name": "Efeonce Ads - confirmed conversion transport",
@@ -558,6 +558,36 @@
                   "type": "template",
                   "key": "parameterValue",
                   "value": "{{DLV - target}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "target_label"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - target_label}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "target_url"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - target_url}}"
                 }
               ]
             }

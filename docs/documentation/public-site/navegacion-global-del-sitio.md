@@ -1,7 +1,7 @@
 # Navegación global del sitio — Menú de efeoncepro.com
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-23 por Claude
 > **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Navegación global del sitio público V1](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md) ·
@@ -132,11 +132,12 @@ El menú deja tres señales para analítica:
 |---|---|
 | Panel abierto | Alguien abre Soluciones, Recursos, Nosotros o el menú completo. |
 | Línea vista | Alguien pasa por una línea de servicio. |
-| Clic | Alguien elige un destino del menú; dice qué tipo de destino fue y cuál. |
+| Clic | Alguien elige un destino del menú; dice qué tipo de destino fue, su nombre tal como se lee («Quiénes somos», «Agenda tu diagnóstico») y adónde lleva. |
 
 El clic en «Agenda tu diagnóstico» se cuenta como un clic más y dice desde dónde vino (cabecera, panel o menú
 completo). El agendador que abre mide por su cuenta si la persona agenda. Ninguna de estas señales cuenta como
-conversión, y ninguna lleva datos personales.
+conversión, y ninguna lleva datos personales. Las señales llegan a Google Analytics desde el 2026-10-23, junto con la
+página donde ocurrieron.
 
 > Detalle técnico: eventos `gh_site_nav_opened`, `gh_site_nav_line_viewed` y `gh_site_nav_clicked`; CTA
 > `site-nav-discovery-meeting` con `cta_location: site_nav`. Ver

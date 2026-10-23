@@ -1,7 +1,7 @@
 # Operar la navegación global del sitio
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-23 por Claude
 > **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Navegación global del sitio público](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md)
@@ -511,7 +511,7 @@ primitives 0.7.14): se actualiza con su [manual](operar-dock-de-landings.md#desp
 | `eosn_storage_altered` (500) «El sitio alteró el documento al guardarlo; revisa los filtros de contenido.» | El documento leído de vuelta no tiene el mismo hash: algún filtro de contenido lo modificó. Es un problema del sitio, no de tu edición. |
 | `[eo-site-nav] …` en el log de PHP | El adaptador no pudo pintar el menú y dejó el header de Ohio (plugin inactivo, sin documento o error de render). La página sigue funcionando. |
 | `data-ghc-state="empty"` en el lanzador | El CTA del agendador no está disponible (pausado u origen no permitido). El botón lleva a `/agenda/`. |
-| `gh_site_nav_opened`, `gh_site_nav_line_viewed`, `gh_site_nav_clicked` en el dataLayer | Medición del menú: panel abierto, línea vista, clic (con `target_type` y `target`; el botón del agendador va como `target_type: cta` con `target` `menu_header`, `menu_mega` o `menu_onepage`). No existe un evento `site_nav_cta` aparte. La configuración en GTM/GA4 está pendiente y publicar el contenedor requiere confirmación humana. |
+| `gh_site_nav_opened`, `gh_site_nav_line_viewed`, `gh_site_nav_clicked` en el dataLayer | Medición del menú: panel abierto, línea vista, clic (con `target_type`, `target`, `target_label` y `target_url`; el botón del agendador va como `target_type: cta` con `target` `menu_header`, `menu_mega` o `menu_onepage`). No existe un evento `site_nav_cta` aparte. Llegan a GA4 desde el 2026-10-23 (GTM versiones 9 y 10); para probarlo, una visita simulada que acepta sólo analítica (receta en LEARNINGS de medición). |
 | `site_nav_switch_set` con `previous` | El interruptor cambió; `previous` es el valor para revertir. |
 | `site_nav_theme_installed` con `purge: run set-site-nav-switch.php to purge` | El tema se desplegó con el menú prendido; falta purgar. |
 

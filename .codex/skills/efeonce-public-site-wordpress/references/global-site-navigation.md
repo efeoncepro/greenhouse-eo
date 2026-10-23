@@ -266,7 +266,10 @@ reuse the island glass of `axisSiteNav`; schema `landing-dock.v1`; `landingDockH
 
 `gh_site_nav_opened` (panel), `gh_site_nav_line_viewed` (line), `gh_site_nav_clicked` (`target_type`, `target`). The CTA
 click travels as `gh_site_nav_clicked` with `target_type: cta`, `target: menu_header|menu_mega|menu_onepage`; the
-scheduler emits `greenhouse_cta_*`; `site_nav_cta` is not pushed. Registered in GTM (version 9,
+scheduler emits `greenhouse_cta_*`; `site_nav_cta` is not pushed. The host adds `target_label` (entry name or the
+accessible name of the logo/social icons, never description or eyebrow) and `target_url` (path + hash, full address if
+external, no query) to every `gh_site_nav_clicked` through a capture-phase click listener. Registered in GTM (version 9,
+labels and URLs since version 10,
 `scripts/gtm/build-site-nav-events-workspace.ts`) and GA4 (dimensions `panel`, `line`, `target_type`, `target`) on
 2026-10-23; changes go through `greenhouse-gtm-ga4-operator`.
 

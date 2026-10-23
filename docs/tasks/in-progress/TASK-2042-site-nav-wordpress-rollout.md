@@ -644,7 +644,7 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
 - [x] Los eventos del menú (`gh_site_nav_*`) llegan a GA4 sin PII. Evidencia (2026-10-23): GTM versión 9
   (`scripts/gtm/build-site-nav-events-workspace.ts`) y dimensiones `panel`, `line`, `target_type`, `target` en GA4; una
   visita simulada que acepta sólo analítica dejó `gh_site_nav_opened`, `gh_site_nav_line_viewed` y `gh_site_nav_clicked`
-  en GA4 Tiempo real.
+  en GA4 Tiempo real. Versión 10: el clic suma `target_label` y `target_url` (runtime `a27c37e`, tema desplegado).
 - [ ] Sin scroll horizontal en los viewports del plan y Core Web Vitals sin regresión frente a la medición previa. Sin
   tildar: ningún elemento del menú se sale (barrida 2026-10-23), pero cinco páginas antiguas o de demo tienen scroll
   horizontal propio de Elementor (`/home-2/`, `/demo-landing-2024/`, `/partnership/`, `/landing-loop-marketing/`,
