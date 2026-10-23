@@ -177,7 +177,7 @@ async function preview(names: string[]) {
         return { removed, start: !!document.querySelector(start || '[data-landing-dock-start]'), end: end ? document.querySelectorAll(end).length : 0 }
       }, { dock, css, legacy: config.legacy || [], start: config.start, end: config.end })
 
-      await page.addScriptTag({ type: 'module', content: `${js}\nenhanceLandingDock(document, ${JSON.stringify({ start: config.start, end: config.end, avoid: AVOID })})\ndocument.addEventListener('axis-landing-dock:cta', e => { e.preventDefault(); window.__dockIntent = e.detail.location })` })
+      await page.addScriptTag({ type: 'module', content: `${js}\nenhanceLandingDock(document, ${JSON.stringify({ start: config.start, end: config.end, stop: config.stop, avoid: AVOID })})\ndocument.addEventListener('axis-landing-dock:cta', e => { e.preventDefault(); window.__dockIntent = e.detail.location })` })
       await page.waitForTimeout(400)
       const states: Json[] = []
       const total = await page.evaluate(() => document.documentElement.scrollHeight)
