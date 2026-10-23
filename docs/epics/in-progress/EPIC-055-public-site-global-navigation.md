@@ -104,8 +104,8 @@ esquema del contrato. `TASK-2042` depende de ambas.
   - Migración de los siete docks (Redes Sociales, Influencers, Inicio, SEO, Inbound, HubSpot y Performance), con
     snapshot y vuelta atrás por página.
   - No cabe en las tres hijas: es cromo de las landings, no del encabezado; la aprobó el operador en el canvas v80.
-  - **Estado 2026-10-23:** primitive construida en local (AXIS `bc263f1`) y en revisión de fidelidad; sin release ni
-    escrituras en producción.
+  - **Estado 2026-10-23: completa.** AXIS v0.7.12–v0.7.14 (primitives 0.7.14) y plugin `eo-landing-dock` en vivo;
+    las siete landings usan el dock, cada una aprobada en vivo por la sesión de fidelidad.
 
 **Regla de la épica:** lo que aparezca durante el trabajo entra como slice o criterio en la task cuya frontera toca. Una
 task nueva sólo se crea si el trabajo no cabe en ninguna de las tres.

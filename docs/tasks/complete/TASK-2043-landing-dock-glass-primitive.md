@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2043-landing-dock-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Code complete, rollout pendiente. AXIS: primitive construida y probada (commits bc263f1…2d4f031, sin publicar; 25 pruebas de navegador). Sitio: plugin eo-landing-dock (runtime 1de3f9e, 6230b39) con port PHP 10/10, Playground on/off y documentos de las siete landings; CLI pnpm public-website:landing-dock con preview sobre las landings reales (sin escrituras) verde en las siete. Pendiente: visto bueno de fidelidad, decisiones del operador (escritorio para todas; etiquetas cortas de Influencers), release de AXIS, despliegue del plugin y on por landing; sin escrituras en producción`
+- Status real: `En vivo en las siete landings desde 2026-10-23 (Inbound 04:07 UTC … Influencers 04:47 UTC), cada una con snapshot y aprobada en vivo por la sesión de fidelidad. AXIS v0.7.12–v0.7.14 (primitives 0.7.14, contracts 0.7.12, tokens 0.6.9, registry 0.7.5); plugin eo-landing-dock con la copia 0.7.14. Follow-ups: retiro del código de los docks viejos, puente de agendador compartido y GTM de gh_landing_dock_clicked`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -115,7 +115,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/in-progress/TASK-2043-landing-dock-glass-primitive.md`
+- `docs/tasks/complete/TASK-2043-landing-dock-glass-primitive.md`
 - `docs/ui/wireframes/TASK-2043-landing-dock.md`
 - `docs/ui/flows/TASK-2043-landing-dock-flow.md`
 - `docs/ui/motion/TASK-2043-landing-dock-motion.md`
@@ -327,10 +327,10 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime evidence (HTML servido, agendador, un solo dock) is listed and captured.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime evidence (HTML servido, agendador, un solo dock) is listed and captured. Evidencia: `pnpm public-website:landing-dock verify|status` y Playwright en vivo por landing (abajo).
 
 ## Hybrid Execution Justification
 
@@ -468,19 +468,49 @@ Regiones, medidas, estados, copy por landing y decisiones:
 - [x] En el Lab: barra 63 con borde, botones de 45, centrado a 20 px en escritorio; a 12 px y botones iguales en
   teléfono; oculto sobre el hero, cerca del final, con el menú abierto y con el banner de cookies; tono sobre claro,
   navy y foto; hoja hostil sin efecto; axe limpio. Evidencia: `landing-dock.spec.ts`, 25 pruebas verdes con site-nav.
-- [ ] La sesión «Rediseño de Menú» aprobó la paridad del Lab a 1440 y 390.
-- [ ] AXIS publicado con versión nueva e instalación privada verificada.
+- [x] La sesión «Rediseño de Menú» aprobó la paridad del Lab a 1440 y 390 (2026-10-23, tras tres correcciones: Influencers con un botón en teléfono, tono sobre gradientes y presencia de hoy).
+- [x] AXIS publicado con versión nueva e instalación privada verificada. Evidencia: v0.7.12 (contracts 0.7.12, tokens 0.6.9, registry 0.7.5, primitives 0.7.12), v0.7.13 y v0.7.14 en GitHub Packages; paquetes bajados con `npm pack` y vendorizados con sha256 en `VERSION.json`. `v0.7.11` se detuvo antes de publicar (prueba de exports del carril de agentes).
 - [x] El plugin pinta el dock desde el documento de cada página con el port PHP validado contra `cases.json`. Evidencia:
   `tests/eo-landing-dock.test.php` (10 casos byte a byte, esquema, config y retiro del dock viejo sobre el marcado real
   de las siete landings) y Playground: con el meta, dock nuevo y sin `nav.mbar`; sin el meta, vuelve el viejo.
-- [ ] Las siete landings usan el dock en vivo, con su copy de hoy y sin dock viejo en el DOM.
-- [ ] En las landings que agendan, el dock abre el agendador nativo con `cta-location="landing_dock"`.
-- [ ] Paridad en vivo aprobada por la sesión de fidelidad en las siete landings.
-- [ ] Arquitectura, documentación funcional, manual y skill del sitio actualizados. Escritos el 2026-10-23
-  (§Dock inferior de las landings, `dock-de-landings.md`, `operar-dock-de-landings.md`, referencia de la skill); se
-  cierran con el estado real tras el rollout.
-- [ ] `UI ready` se mantuvo en `no` hasta completar mapping, plan de captura y decision log; si pasó a `yes`,
+- [x] Las siete landings usan el dock en vivo, con su copy de hoy y sin dock viejo en el DOM. Evidencia: `status` = 7 `on`; `verify` por landing = 1 dock, 0 viejos.
+- [x] En las landings que agendan, el dock abre el agendador nativo con `cta-location="landing_dock"`. Evidencia: Playwright en vivo abrió el diálogo en Inbound, HubSpot, Redes Sociales e Influencers; Inicio sirve el lanzador `landing_dock`.
+- [x] Paridad en vivo aprobada por la sesión de fidelidad en las siete landings (una por una, 2026-10-23).
+- [x] Arquitectura, documentación funcional, manual y skill del sitio actualizados (§Dock inferior de las landings,
+  `dock-de-landings.md` 1.1, `operar-dock-de-landings.md` 1.1, referencia de la skill espejada, `PRIMITIVES.md`).
+- [x] `UI ready` se mantuvo en `no` hasta completar mapping, plan de captura y decision log; si pasó a `yes`,
   `pnpm task:lint --task TASK-2043` quedó sin hallazgos.
+
+## Cierre (2026-10-23)
+
+### Las siete landings en vivo
+
+| Landing | Página | Presencia | Acciones (principal · secundaria) | Agendador | Parada | Dock viejo retirado |
+|---|---|---|---|---|---|---|
+| Redes Sociales | 251300 | escritorio | «Reunión» · «Auditoría» → `#auditoria` (texto «¿Listo para crecer en social?») | menú (`site-nav-discovery-meeting`) | — | `div#ghrs-sticky` |
+| Influencers | 251627 | ambos (teléfono: sólo la principal) | «Agenda una reunión» · «Cuéntanos tu campaña» → `#conversion` (antetítulo «Siguiente paso») | propio (`influencer-discovery-meeting`) | `#conversion` | `div#sticky-cta` |
+| Inicio | 251731 | teléfono | «Agenda una reunión» (sin línea) | menú (`site-nav-discovery-meeting`) | — | `div[data-sticky-cta]` |
+| SEO | 251078 | teléfono | «Diagnostica tu visibilidad» → `#grader` | — | `#grader` | `div.mcta` |
+| Inbound | 242601 | teléfono | «Agenda una reunión» · «Diagnóstico» → `#diagnostico` | propio (`inbound-discovery-meeting`) | — | `nav.mbar` |
+| Servicios HubSpot | 244079 | teléfono | «Agendar reunión» · «Ir al formulario» → `#agenda-form` | propio (`hubspot-discovery-meeting`) | — | `nav.mdock` |
+| Performance | 251997 | teléfono | «Agenda un diagnóstico» → `#diagnostico` | — | `#diagnostico` | `nav.mbar` |
+
+Todas sirven AXIS primitives 0.7.14 desde el plugin `eo-landing-dock`; el agendador del dock mide
+`cta-location="landing_dock"`. Vuelta atrás por página: `pnpm public-website:landing-dock off <landing> --confirm`
+(borra el meta `_eo_landing_dock`, purga y verifica que el dock viejo volvió); el snapshot previo de cada página está en
+`greenhouse-eo/tmp/landing-dock/snapshots/`. Global: desactivar el plugin.
+
+### Cómo se llegó
+
+- **Releases de AXIS:** `v0.7.11` no publicó (la prueba de exports declarados del carril de agentes no conocía
+  `landing-dock`; la CI del dock corría sólo el carril site-nav, ahora arrastra el de agentes). `v0.7.12` publicó el
+  dock. `v0.7.13` corrigió el tono con el agendador abierto (diálogo modal en shadow root) y llevó la guarda equivalente
+  de la isla del menú. `v0.7.14` agregó el marcador de parada pedido por fidelidad para SEO.
+- **Hallazgos en vivo corregidos:** tono sobre gradientes/velos/cromo fijo de Ohio (SEO), tono tras el agendador
+  (Inbound/HubSpot), botones repartidos por etiqueta en teléfono, banner de cookies por superposición y la copia de
+  AXIS del plugin fuera de git (excepción en `.gitignore`); la línea base en vivo ahora incluye el plugin.
+- **Orden de encendido:** Inbound, HubSpot, Performance, Inicio, Redes Sociales, SEO e Influencers; snapshots en
+  `greenhouse-eo/tmp/landing-dock/snapshots/`.
 
 ## Verification
 
@@ -491,15 +521,15 @@ Regiones, medidas, estados, copy por landing y decisiones:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] EPIC-055 actualizada con el estado de esta task y la versión publicada del paquete
-- [ ] `docs/architecture/public-site/PRIMITIVES.md` registra `efeonce.landing-dock` con su versión
+- [x] EPIC-055 actualizada con el estado de esta task y la versión publicada del paquete
+- [x] `docs/architecture/public-site/PRIMITIVES.md` registra `efeonce.landing-dock` con su versión
 
 ## Follow-ups
 

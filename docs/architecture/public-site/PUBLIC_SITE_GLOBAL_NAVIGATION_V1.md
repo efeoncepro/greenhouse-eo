@@ -760,10 +760,36 @@ en las landings».
 | Sitio | Plugin `eo-landing-dock` | Meta `_eo_landing_dock` por página: con él pinta el dock (port PHP byte a byte igual a AXIS), un lanzador `<greenhouse-cta cta-location="landing_dock">` oculto y retira del HTML el dock viejo; sin él, la página queda como estaba. `wp eo-dock`. |
 | Operación | `pnpm public-website:landing-dock` | `preview` sobre la landing real sin escribir, `snapshot`, `on`/`off` con `--confirm`, `verify`, `status`. |
 
+**Estado (2026-10-23).** En vivo en las siete landings: AXIS `v0.7.12` a `v0.7.14` (primitives 0.7.14, contracts
+0.7.12, tokens 0.6.9, registry 0.7.5) y plugin `eo-landing-dock` con la copia 0.7.14. Encendidas una por una con
+snapshot y aprobadas en vivo por la sesión de fidelidad: Inbound (04:07 UTC), HubSpot, Performance, Inicio, Redes
+Sociales, SEO e Influencers (04:47 UTC). Presencia de hoy por decisión del operador («Dejar como hoy») e Influencers con un
+solo botón en teléfono («Un solo botón»).
+
+**Las siete landings.**
+
+| Landing | Página | Presencia | Acciones (principal · secundaria) | Agendador | Parada | Dock viejo retirado |
+|---|---|---|---|---|---|---|
+| Redes Sociales | 251300 | escritorio | «Reunión» · «Auditoría» → `#auditoria` (texto «¿Listo para crecer en social?») | menú (`site-nav-discovery-meeting`) | — | `div#ghrs-sticky` |
+| Influencers | 251627 | ambos (teléfono: sólo la principal) | «Agenda una reunión» · «Cuéntanos tu campaña» → `#conversion` (antetítulo «Siguiente paso») | propio (`influencer-discovery-meeting`) | `#conversion` | `div#sticky-cta` |
+| Inicio | 251731 | teléfono | «Agenda una reunión» (sin línea) | menú (`site-nav-discovery-meeting`) | — | `div[data-sticky-cta]` |
+| SEO | 251078 | teléfono | «Diagnostica tu visibilidad» → `#grader` | — | `#grader` | `div.mcta` |
+| Inbound | 242601 | teléfono | «Agenda una reunión» · «Diagnóstico» → `#diagnostico` | propio (`inbound-discovery-meeting`) | — | `nav.mbar` |
+| Servicios HubSpot | 244079 | teléfono | «Agendar reunión» · «Ir al formulario» → `#agenda-form` | propio (`hubspot-discovery-meeting`) | — | `nav.mdock` |
+| Performance | 251997 | teléfono | «Agenda un diagnóstico» → `#diagnostico` | — | `#diagnostico` | `nav.mbar` |
+
+Todas sirven AXIS primitives 0.7.14 desde el plugin `eo-landing-dock`; el agendador del dock mide
+`cta-location="landing_dock"`. Vuelta atrás por página: `pnpm public-website:landing-dock off <landing> --confirm`
+(borra el meta `_eo_landing_dock`, purga y verifica que el dock viejo volvió); el snapshot previo de cada página está en
+`greenhouse-eo/tmp/landing-dock/snapshots/`. Global: desactivar el plugin.
+
 **Comportamiento.** Aparece cuando el fondo del hero queda sobre la mitad de la ventana; se retira a 120 px del
-formulario o CTA final, con un panel o el onepage del menú abiertos y cuando el banner de cookies de HubSpot
+formulario o CTA final; un marcador de parada (`stop`) lo deja oculto desde el destino de su botón hasta el final
+(SEO `#grader`, Performance `#diagnostico`, Influencers `#conversion`; Inicio e Inbound sin parada, como sus docks
+anteriores); con un panel o el onepage del menú abiertos y cuando el banner de cookies de HubSpot
 (`#hs-eu-cookie-confirmation`) se superpone con su lugar. El tono sigue lo que tiene detrás (`data-site-nav-tone`,
-luminancia; foto = oscuro). Escritorio: centrado a 20 px; teléfono (≤ 768 px): a 12 px de los bordes, sin texto, con
+fondo al menos medio opaco, paradas de gradiente; foto = oscuro), salta el cromo fijo del anfitrión y conserva su tono
+mientras un diálogo modal (el agendador) deja la página inerte. Escritorio: centrado a 20 px; teléfono (≤ 768 px): a 12 px de los bordes, sin texto, con
 los botones repartidos según su etiqueta. `presence` deja el dock sólo en escritorio o sólo en teléfono.
 
 **Agendador.** El primitive no lo abre: emite `axis-landing-dock:cta` y el script del plugin abre el `<greenhouse-cta>`

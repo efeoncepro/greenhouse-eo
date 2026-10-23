@@ -1,5 +1,18 @@
 # Handoff
 
+## 2026-10-23 — Dock de vidrio de las landings (TASK-2043, EPIC-055): en vivo en las siete
+
+Primitive AXIS `efeonce.landing-dock` publicada (v0.7.12–v0.7.14: primitives 0.7.14, contracts 0.7.12, tokens 0.6.9,
+registry 0.7.5) y plugin `eo-landing-dock` desplegado. Las siete landings (Inbound, HubSpot, Performance, Inicio, Redes
+Sociales, SEO e Influencers) usan el dock en vivo, cada una con snapshot previo y aprobada en vivo por la sesión de
+fidelidad «Rediseño de Menú». Vuelta atrás por landing: `pnpm public-website:landing-dock off <landing> --confirm`.
+Decisiones del operador: presencia de hoy y un solo botón en teléfono para Influencers. Lecciones: la CI de AXIS
+corre el carril de agentes para módulos nuevos; `release:packages` etiqueta el HEAD del checkout compartido (v0.7.13
+quedó en un commit de otra sesión: nadie commitea en AXIS `main` mientras espera); la línea base en vivo debe incluir
+el plugin. Follow-ups: retirar el código de los docks viejos, puente de agendador compartido, GTM de
+`gh_landing_dock_clicked`. [Task](docs/tasks/complete/TASK-2043-landing-dock-glass-primitive.md) ·
+[manual](docs/manual-de-uso/public-site/operar-dock-de-landings.md).
+
 ## 2026-10-22 — Fundación Luz: contacto y dos acercamientos verificados
 
 Contact257217550764 / Company59806188192 / Primary y nota119334575454 leídos; dirección inferida admitida por
@@ -219,45 +232,3 @@ independiente `eo_footer_compat_20261018`; cache WordPress/Kinsta purgada y read
 `/servicios-contratar-hubspot/` verificadas a 1440/390: layout intacto, cero overflow, nueve partners,
 un Careers, newsletter presente y cero errores de consola. La alerta de cPanel puede permanecer visible hasta
 su siguiente corrida; no silenciarla manualmente. [Evidencia](docs/audits/public-site/2026-10-14-footer-composition-v2.md#compatibilidad-del-bootstrap-2026-10-18).
-
-## 2026-10-17 — Google Ads: acceso API de lectura probado y arquitectura adoptada
-
-Checkpoint18/10:499 tests y32 escenarios Chromium aislados PASS; API cuenta686/drafts verificada.
-[Paquete previo al release](docs/operations/releases/google-ads-2026-10-18/README.md) con propuestas,
-assets/hashes y rollback. Hosts/protocolo real/EC/CI pendientes; release general BLOCK. Sin activación.
-
-Revisión18/10:1.445 archivos de89d70ec13 inventariados; CI/build PASS; Deep corregido localmente, revalidación remota pendiente.
-Schema HubSpot/Meta autorizado y aplicado, worker existente recuperado200; dos submissions
-delivered al ledger sin destinos directos. [Auditoría](docs/audits/releases/2026-10-18-candidate-89d70ec13-review.md).
-Sin deploy/GTM; hosts/EC/Preview y autorización del lote pendientes.
-
-OAuth `jreyes@efeoncepro.com` verificado; Cloud siempre `julio.reyes@efeonce.org` / `efeonce-group`.
-API v26 PASS para **`6862539491`**, vía `login-customer-id: 9531478329` (directo 403); CLP,
-America/Santiago, owner de conversiones propio. Cuenta nueva según operador; tracking
-`NOT_CONVERSION_TRACKED`, dos acciones GA4 `HIDDEN` no primarias; campañas/goals consultados sin filas.
-[Auditoría](docs/audits/growth/2026-10-17-google-ads-api-discovery.md),
-[ADR](docs/architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md),
-[arquitectura](docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md) y
-[manual](docs/manual-de-uso/growth/conectar-google-ads-con-agentes.md).
-Unidad posterior autorizada y alcance ampliado por el operador: **CLI local de lectura y gestión**
-`pnpm google-ads`, diez create/update por plan/hash/validateOnly/journal/readback. Campañas/grupos PAUSED;
-sin activación, eliminación, creatividades o ingesta. Lecturas reales del catálogo PASS; ninguna mutación Ads.
-OAuth del proyecto guardado como **Efeonce** con sus páginas públicas. Mismos clients/callbacks/scopes;
-grant Ads propio en Secret Manager `efeonce-google-ads-agent-oauth`, con principal verificado en Google.
-Regresión real GA4/GSC Efeonce y auth health/providers PASS; **verificación Google de marca/scopes pendiente**.
-[Cierre operativo](docs/audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md).
-Pendiente Growth/Platform: conexión de producto por organización/API/MCP, pruebas proveedor de escrituras
-con payload real autorizado, y luego captura/consentimiento/binding/rollout de conversiones. Sin publish GTM,
-CRM writes, acciones/campañas nuevas, migraciones, cambios IAM o deploy. Credenciales/recibos fuera de Git.
-
-Delta posterior autorizado — **Ads online Forms/Meetings implementado localmente** (TASK-2034).
-Dos acciones WEBPAGE secundarias creadas y verificadas en6862539491: lead7852486523/agenda7852487186,
-ONE_PER_CLICK, valor0CLP de medición. No campañas/pujas ni conversiones enviadas.
-GTM API: Web workspace8 y Server12 con tags nativos Ads/Linker y exclusión bridge del forwarder18;
-ambos quick_preview compilerError=false, live Web5/Server9. Flag Ads nuevo default OFF; policies intactas.
-[Contrato y activación](docs/manual-de-uso/growth/activar-conversiones-google-ads.md) ·
-[evidencia y gates pendientes](docs/audits/growth/2026-10-17-google-ads-online-conversions.md).
-Código con recibo postcommit, consent granular/GPC, IDs30d, EC web reservado y dedupe; Meta/UPD separados.
-Tag Assistant Web negativo PASS; EC OFF; términos de clientes aceptados y guardados por instrucción expresa posterior (UI reabierta).
-Faltan QA funcional positivo/EC, release coordinado backend/bundles/bridge WP/Think,
-confirmación/publicación GTM y opt-in policy/flag, y primera ocurrencia real. No declarar medición activa.

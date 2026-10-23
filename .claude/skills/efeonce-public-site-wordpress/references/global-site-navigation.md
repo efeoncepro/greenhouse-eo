@@ -181,12 +181,18 @@ reuse the island glass of `axisSiteNav`; schema `landing-dock.v1`; `landingDockH
   untouched. Old and new never coexist.
 - Configs: `efeonce-public-site-runtime/manifests/landing-dock/<landing>.json` (no keys; the key is read from the live
   page on `on`). `pending` blocks `on`.
-- CLI: `pnpm public-website:landing-dock status | preview <landing|all> | snapshot <landing> | on|off <landing> --confirm | verify <landing>`.
+- Live on the seven landings since 2026-10-23 (AXIS primitives 0.7.14 pinned in the plugin).
+- CLI: `pnpm public-website:landing-dock status | preview <landing|all> | snapshot <landing> | on|off <landing> --confirm | verify <landing> | purge`.
   `preview` injects the dock into the live page in a local Chrome (no write). `on` needs a snapshot from the last hour.
 - Plugin lane: `build-landing-dock-plugin-package.cjs` (refuses a local AXIS copy) → `deploy-landing-dock-plugin-package.php`.
 - Copy is each landing's; a phone `shortLabel` is copy (operator). Presence (`desktop`/`phone`) keeps what each landing
   had until the operator decides otherwise.
 - Cookie banner: HubSpot's `#hs-eu-cookie-confirmation`; the dock hides only when it overlaps the dock's place.
+- `stop` (per page): hidden from that element to the end of the page — SEO `#grader`, Performance `#diagnostico`,
+  Influencers `#conversion`. Home and Inbound have none (their old docks came back).
+- After a plugin update run `purge`; one URL may need about a minute.
+- AXIS releases: nobody commits on AXIS `main` while `pnpm release:packages` waits for CI — it tags HEAD at the end
+  (v0.7.13 landed on another session's commit on 2026-10-23).
 - Manual: `docs/manual-de-uso/public-site/operar-dock-de-landings.md`.
 
 ## Hard rules

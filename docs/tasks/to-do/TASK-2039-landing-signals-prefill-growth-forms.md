@@ -6,7 +6,7 @@
 - El dock de teléfono de Inbound pasa al dock compartido `efeonce.landing-dock` (TASK-2043): al migrarlo, su lanzador del
   agendador mide `cta-location="landing_dock"` en lugar de `inbound_mobile_dock`. `inbound_hero` e `inbound_closing` no
   cambian. Cualquier comparación de placements de esta task debe leer `landing_dock` desde la fecha de la migración
-  (registrada en TASK-2043).
+  (Inbound migró el 2026-10-23 a las 04:07 UTC).
 
 ## Delta 2026-10-18
 

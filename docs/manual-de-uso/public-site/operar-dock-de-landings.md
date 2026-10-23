@@ -1,7 +1,7 @@
 # Operar el dock de las landings
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-23 por Claude
 > **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Navegación global del sitio público §Dock inferior de las landings](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043)
@@ -15,7 +15,8 @@ la barra fija abajo con el siguiente paso de cada landing (agendar o ir al formu
 dock antiguo en el mismo momento; apagarlo lo devuelve.
 
 Landings con dock: Redes Sociales (`social`), Influencers (`influencers`), Inicio (`home`), SEO (`seo`), Inbound
-(`inbound`), Servicios HubSpot (`hubspot`) y Performance (`performance`).
+(`inbound`), Servicios HubSpot (`hubspot`) y Performance (`performance`). **Las siete están en `on` desde el
+2026-10-23** (AXIS primitives 0.7.14 fijado en el plugin).
 
 ## Antes de empezar
 
@@ -70,11 +71,26 @@ la guarda, purga la caché y verifica el HTML servido: un dock nuevo, ninguno vi
 Después, abre la landing en un teléfono y en escritorio: el dock aparece tras el hero, cambia de tono con las secciones,
 se retira al llegar al formulario y su botón de agendar abre el agendador.
 
+### Marcador de parada
+
+`stop` en el archivo de la landing deja el dock oculto desde ese elemento hasta el final de la página. Se usa cuando el
+botón del dock lleva ahí (SEO `#grader`, Performance `#diagnostico`, Influencers `#conversion`): pasado el destino, el
+botón mandaría a la persona hacia arriba. Inicio e Inbound no lo usan porque sus docks anteriores reaparecían.
+
 ### 5. Verificar en cualquier momento
 
 ```bash
 pnpm public-website:landing-dock verify inbound
 ```
+
+### Purgar la caché
+
+```bash
+pnpm public-website:landing-dock purge
+```
+
+Después de actualizar el plugin, las landings encendidas sirven los archivos nuevos de AXIS sólo cuando la caché de
+página se purga. Una URL puede tardar alrededor de un minuto en reflejarlo.
 
 ### 6. Apagar (vuelta atrás)
 
@@ -90,10 +106,12 @@ Borra el meta, purga y verifica que el dock antiguo volvió y el nuevo no está.
 2. Copia fijada de AXIS desde el paquete publicado (nunca un build local):
    `node scripts/vendor-axis-landing-dock.mjs --primitives node_modules/@efeoncepro/axis-ui-primitives --contracts node_modules/@efeoncepro/axis-ui-contracts --version <versión> --source "@efeoncepro/axis-ui-primitives@<versión>"`,
    y `EOLD_AXIS` en `eo-landing-dock.php` con esa versión. Commit en el runtime.
-3. En Greenhouse: `pnpm public-website:export-live-code` y
+3. En Greenhouse: `pnpm public-website:export-live-code` (la línea base incluye el plugin y su copia de AXIS) y
    `node scripts/public-website/build-landing-dock-plugin-package.cjs <baseline>` (rechaza una copia local de AXIS).
 4. Con visto bueno del operador: `deploy-landing-dock-plugin-package.php` por `pnpm public-website:wpcli` con el ZIP y
-   el manifiesto. Sin documentos, ninguna landing cambia.
+   el manifiesto. Sin documentos, ninguna landing cambia. Después, `pnpm public-website:landing-dock purge`.
+5. Al publicar AXIS con `pnpm release:packages`, nadie debe commitear en el `main` de AXIS mientras el script espera la
+   CI: el script etiqueta el HEAD al terminar (el 2026-10-23 el tag `v0.7.13` quedó en un commit de otra sesión).
 
 ## Qué significan los estados
 
@@ -101,8 +119,8 @@ Borra el meta, purga y verifica que el dock antiguo volvió y el nuevo no está.
 |---|---|
 | `on` | La landing pinta el dock compartido y su dock antiguo no está en el HTML. |
 | `off` | La landing muestra su dock antiguo, como antes de TASK-2043. |
-| `pending` en el archivo | Falta una decisión (por ejemplo, etiquetas cortas de teléfono); no se puede encender. |
-| `presence: desktop` / `phone` | El dock sólo existe de un lado del corte de 768 px, como la landing lo tenía. |
+| `pending` en el archivo | Falta una decisión; no se puede encender. Ninguna landing lo tiene hoy. |
+| `presence: desktop` / `phone` | El dock (o un botón) sólo existe de un lado del corte de 768 px. Influencers deja «Cuéntanos tu campaña» sólo en escritorio. |
 
 ## Qué no hacer
 
@@ -125,6 +143,6 @@ Borra el meta, purga y verifica que el dock antiguo volvió y el nuevo no está.
 ## Referencias técnicas
 
 - Arquitectura: [§Dock inferior de las landings](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043).
-- Task: [TASK-2043](../../tasks/in-progress/TASK-2043-landing-dock-glass-primitive.md).
+- Task: [TASK-2043](../../tasks/complete/TASK-2043-landing-dock-glass-primitive.md).
 - CLI: `scripts/public-website/landing-dock/cli.ts`; plugin: `efeonce-public-site-runtime/wp-content/plugins/eo-landing-dock/`.
 - AXIS: `docs/quality/landing-dock.md`.

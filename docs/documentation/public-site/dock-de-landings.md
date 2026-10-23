@@ -1,14 +1,15 @@
 # Dock de las landings — Barra inferior de efeoncepro.com
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-23 por Claude
 > **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Navegación global del sitio público §Dock inferior de las landings](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043)
 
 ## Qué es
 
-Es la barra de vidrio que aparece abajo mientras alguien lee una landing de `efeoncepro.com`, con el siguiente paso de
+Es la barra de vidrio que aparece abajo mientras alguien lee una landing de `efeoncepro.com` (activa en las siete
+landings desde el 23 de octubre de 2026), con el siguiente paso de
 esa landing: agendar una reunión o ir al formulario. Antes cada landing tenía su propia barra, con siete estilos
 distintos; ahora todas usan la misma, del mismo vidrio que el menú de arriba.
 
@@ -25,7 +26,8 @@ distintos; ahora todas usan la misma, del mismo vidrio que el menú de arriba.
 - **El botón principal** lleva el color de la línea de servicio de la landing (por ejemplo naranja en Brand, rosado en
   HubSpot, azul en SEO). En el inicio, que no es de una línea, es blanco o navy como el botón del menú.
 - **Se aparta** cuando llega el formulario o el cierre de la página, cuando se abre el menú y cuando el aviso de
-  cookies ocupa su lugar.
+  cookies ocupa su lugar. En SEO, Performance e Influencers, una vez que se llega al destino de su botón, no vuelve
+  hasta el final de la página.
 - **Agendar** abre el agendador de reuniones dentro de la misma página.
 
 ## Qué landing tiene qué
@@ -33,15 +35,15 @@ distintos; ahora todas usan la misma, del mismo vidrio que el menú de arriba.
 | Landing | Dónde se ve | Botones |
 |---|---|---|
 | Redes Sociales | Escritorio | «Reunión» (agenda) y «Auditoría» |
-| Influencers | Escritorio y teléfono | «Agenda una reunión» y «Cuéntanos tu campaña» |
+| Influencers | Escritorio y teléfono | «Agenda una reunión» y «Cuéntanos tu campaña» (en el teléfono, sólo «Agenda una reunión») |
 | Inicio | Teléfono | «Agenda una reunión» |
 | SEO | Teléfono | «Diagnostica tu visibilidad» |
 | Inbound | Teléfono | «Agenda una reunión» y «Diagnóstico» |
 | Servicios HubSpot | Teléfono | «Agendar reunión» e «Ir al formulario» |
 | Performance | Teléfono | «Agenda un diagnóstico» |
 
-Los textos son los que cada landing ya tenía. Si el dock aparece en escritorio en las landings que hoy sólo lo tienen
-en teléfono es una decisión pendiente del operador.
+Los textos son los que cada landing ya tenía. Cada landing conserva dónde tenía su barra (decisión del operador, 23 de
+octubre de 2026).
 
 ## Reglas
 
