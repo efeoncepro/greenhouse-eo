@@ -12,6 +12,7 @@
  *   on <landing> --confirm      stores the config live (needs a snapshot of the last hour), purges, verifies the HTML
  *   off <landing> --confirm     deletes the config live (the legacy dock comes back), purges, verifies the HTML
  *   verify <landing>            checks the served HTML: one dock (or none) and no legacy dock while it is on
+ *   purge                       purges the page cache (after a plugin update, so the landings serve the new AXIS files)
  *
  * `on` and `off` write production: they need the operator's go.
  * Manual: docs/manual-de-uso/public-site/operar-dock-de-landings.md
@@ -229,6 +230,10 @@ async function main() {
       break
     }
 
+    case 'purge':
+      console.log(remote({ command: 'purge' }))
+      break
+
     case 'verify': {
       const m = manifest(landing)
 
@@ -273,7 +278,7 @@ async function main() {
     }
 
     default:
-      console.log('Usage: pnpm public-website:landing-dock <status | preview <landing|all> | snapshot <landing> | on|off <landing> --confirm | verify <landing>>')
+      console.log('Usage: pnpm public-website:landing-dock <status | preview <landing|all> | snapshot <landing> | on|off <landing> --confirm | verify <landing> | purge>')
       console.log(`Landings: ${existsSync(MANIFESTS) ? landings().join(', ') : '(runtime repo not found)'}`)
   }
 }
