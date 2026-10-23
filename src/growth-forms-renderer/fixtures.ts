@@ -160,11 +160,11 @@ export const partnerApplicationContractFixture = (): RenderContract =>
       formKind: 'contact',
     },
     fields: [
-      { key: 'fullName', type: 'text', label: 'Nombre y apellido', placeholder: 'Tu nombre', required: true, autocomplete: 'name', presentation: { width: 'half' } },
-      { key: 'email', type: 'email', label: 'Correo de trabajo', placeholder: 'tu@empresa.com', required: true, autocomplete: 'email', inputMode: 'email', presentation: { width: 'half' } },
-      { key: 'company', type: 'text', label: 'Empresa o plataforma', placeholder: 'Nombre de la plataforma', required: true, autocomplete: 'organization', presentation: { width: 'half' } },
-      { key: 'website', type: 'url', label: 'Sitio web', placeholder: 'https://', autocomplete: 'url', inputMode: 'url', presentation: { width: 'half' } },
-      { key: 'offer', type: 'textarea', label: '¿Qué ofreces y a quién le sirve?', placeholder: 'Tu tecnología, el problema que resuelve y el tipo de cliente', required: true, presentation: { width: 'full' } },
+      { key: 'fullName', type: 'text', label: 'Nombre y apellido', placeholder: 'Tu nombre', required: true, autocomplete: 'name', presentation: { width: 'half', icon: 'user' } },
+      { key: 'email', type: 'email', label: 'Correo de trabajo', placeholder: 'tu@empresa.com', required: true, autocomplete: 'email', inputMode: 'email', presentation: { width: 'half', icon: 'mail' } },
+      { key: 'company', type: 'text', label: 'Empresa o plataforma', placeholder: 'Nombre de la plataforma', required: true, autocomplete: 'organization', presentation: { width: 'half', icon: 'briefcase' } },
+      { key: 'website', type: 'url', label: 'Sitio web', placeholder: 'https://', autocomplete: 'url', inputMode: 'url', presentation: { width: 'half', icon: 'globe' } },
+      { key: 'offer', type: 'textarea', label: '¿Qué ofreces y a quién le sirve?', placeholder: 'Tu tecnología, el problema que resuelve y el tipo de cliente', required: true, presentation: { width: 'full', icon: 'message' } },
     ],
     copy: { submit: 'Enviar propuesta →' },
     consent: {
