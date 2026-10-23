@@ -23,6 +23,9 @@ canonical docs or WordPress runtime inspection.
 | Agenda | `https://efeoncepro.com/agenda/` | `251583` | publish + index (since 2026-10-20) | `landings/agenda.md` | Rediseño 2026-10-20 («La órbita»): 4 widgets `greenhouse_agenda_*` (hero con Nexa en órbita de retrato, cómo es la reunión, preguntas, cierre) compilados por `compile-agenda-elementor-source.cjs` desde `agenda-source/` + el agendador REAL en su propio widget HTML entre hero y «cómo» (`<efeonce-meeting-scheduler>` `fhsf-efeonce-lead-gen-web`/`discovery`, `activation-mode=page`, `max-recipe=command`, acento Growth por `--gh-meeting-*`); header/footer Ohio globales (metas `page_*` copiadas de `251997`); indexable por decisión del operador 2026-10-20 (`configure-agenda-seo.php`, OG `252024`, snapshot SEO `_gh_agenda_seo_before_20261020_165619`); fuera de menús; snapshot de página `_gh_agenda_v2_before_20261020_163500` |
 | Content Marketing / Content Ops | `https://efeoncepro.com/servicio-marketing-de-contenidos/` | `242603` | publish + index eligible | `landings/content-marketing.md` | Trece widgets semánticos; export aprobado preservado; Ohio nativo; Growth Forms con variante propia, host preservado y SEO Service conectado. Menú existente `242917`: Soluciones → Crecimiento Multicanal → Content Marketing; operación en `references/native-navigation.md`. Ver auditoría para contraste y smoke de conversión pendientes. |
 
+Shared bottom dock (TASK-2043, live 2026-10-23): Redes Sociales, Influencers, Home, Posicionamiento SEO, Inbound,
+HubSpot Services and Performance — `global-site-navigation.md` §Landing dock; each landing file has the detail.
+
 ## Institutional contact and operating coverage
 
 For Contacto reconstruction and shared contact/coverage copy, load
@@ -34,6 +37,7 @@ WordPress publication and delivery verification remain separate from this docume
 ## Registration Rules
 
 - Add a registry row before the second meaningful change to any landing.
+- If a landing has the shared bottom dock, note it (config `manifests/landing-dock/<landing>.json`, page id in `EOLD_PAGES`).
 - Create a landing file under `references/landings/` before the page accumulates special widgets, forms, hashes, or rollback risks.
 - If a landing has a discarded predecessor, record the retired id and status.
 - If a landing has a live form, record slug, surface, API base, captcha policy, and verification gate in the landing file.

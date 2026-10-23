@@ -1,5 +1,7 @@
 # Home — Claude Design / Elementor
 
+> **Delta 2026-10-23 — shared dock (TASK-2043).** The bottom dock is AXIS `efeonce.landing-dock` painted by plugin `eo-landing-dock` (config `manifests/landing-dock/home.json`): phone; «Agenda una reunión» (no line; menu scheduler `site-nav-discovery-meeting`); no stop. The legacy dock `div[data-sticky-cta]` is stripped from the HTML while the dock is on (`off` brings it back); anything below describing the legacy dock is history and rollback context. Operate: `global-site-navigation.md` §Landing dock.
+
 ## Recorded runtime identity — checkpoint 2026-08-31
 
 These are recorded deployment facts, not a substitute for current CMS readback. Verify identity,

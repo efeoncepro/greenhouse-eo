@@ -206,6 +206,13 @@ Ohio or other pages. Two rules keep that scoping honest:
 
 ## Scroll-driven reveals and mobile docks
 
+> **Delta 2026-10-23 (TASK-2043):** the per-landing mobile docks below are superseded. The seven landings now use the
+> shared AXIS `efeonce.landing-dock` painted by plugin `eo-landing-dock`, which strips the legacy dock (`nav.mbar`,
+> `nav.mdock`, `div.mcta`, `#ghrs-sticky`, `#sticky-cta`, `[data-sticky-cta]`) from the HTML while its config is on;
+> the legacy code still sits in each landing until its retirement task. A new landing never builds its own dock:
+> `global-site-navigation.md` §Landing dock. The reveal bullets and the hidden-pane trap still apply; the dock bullets
+> are history and rollback context (`off` brings the legacy dock back).
+
 - A reveal bound to the scroll (`animation-timeline: view()`) must **finish when the element is fully in view**:
   end its range at `entry 70%`–`entry 100%`, never at `cover N%`. A range that ends at `cover 35–60%` keeps
   cards, titles and bars mid-animation (offset, faded) while the visitor is reading them (HubSpot v2,

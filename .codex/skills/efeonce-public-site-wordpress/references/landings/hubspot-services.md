@@ -1,5 +1,7 @@
 # Landing: HubSpot Services
 
+> **Delta 2026-10-23 — dock compartido (TASK-2043).** El dock inferior es el AXIS `efeonce.landing-dock` pintado por el plugin `eo-landing-dock` (config `manifests/landing-dock/hubspot.json`): teléfono; «Agendar reunión» (CTA propio `hubspot-discovery-meeting`) · «Ir al formulario» → `#agenda-form`; sin parada; `cta-location=landing_dock` reemplaza `hubspot_mobile_dock`. El dock viejo `nav.mdock` se quita del HTML mientras el dock está activo (`off` lo devuelve); lo que abajo describe el dock viejo es historia y contexto de rollback. Operar: `global-site-navigation.md` §Landing dock.
+
 > **Delta 2026-10-16 (noche) — correcciones post-publicación, detalle del dock y renderer CTA 1.3.1.** Complementa los
 > dos deltas siguientes (no los repite).
 > - **Correcciones de implementación** (en la fuente `hubspot-v2-source/` y el compilador): el compilador
