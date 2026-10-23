@@ -184,7 +184,10 @@ autora así: `{ "kind": "open_growth_form", "formRef": "<slug o form_key>", "pre
 "eyebrow": "¿Eres una plataforma?", "title": "Sumémonos.", "lead": "…" } }`. El encabezado es opcional (sin `title` se
 usa el titular del CTA) y sólo vale con `presentation: "dialog"`; si no, la publicación falla con
 `action_policy_invalid`. Esto **no** es la colocación interruptiva `popup_modal`: el diálogo sólo se abre cuando el
-visitante pulsa el botón. Hasta que el renderer de TASK-2045 esté en producción, el CTA abre el formulario inline.
+visitante pulsa el botón. Renderer `1.4.0` (TASK-2045): el formulario se monta al abrir, Escape y el velo cierran
+salvo mientras envía, «Cerrar» del éxito cierra el diálogo y el foco vuelve al botón. La piel del diálogo va en el CSS
+del anfitrión con los tokens `--ghcta-dialog-*` (tabla en el contrato de runtime de formularios). Hasta el próximo
+release a `main`, el CTA publicado abre el formulario inline.
 
 ## Qué no hacer
 

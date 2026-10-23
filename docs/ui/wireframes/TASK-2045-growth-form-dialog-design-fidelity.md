@@ -147,6 +147,11 @@ markup de la landing.
   axe sin violaciones en abierto y en éxito.
 - Marcadores `data-capture`: `growth-cta-dialog`, `growth-form`.
 
+**Evidencia ejecutada (2026-10-23):** harness local con los renderers reales y la piel de Partners
+(`docs/ui/reviews/TASK-2045/`: capturas canvas vs renderer a 1440 y 390, dossier con medidas, axe y movimiento
+reducido). GVC del portal no aplica: la superficie no es una ruta `(dashboard)`; `ui:visual-gate` queda BLOCK por esa
+razón y `ui:quality` en PASS (scorecard `docs/ui/reviews/TASK-2045-growth-form-dialog.scorecard.json`).
+
 ## Design Decision Log
 
 | Decisión | Alternativas | Por qué |

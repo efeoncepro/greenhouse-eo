@@ -1020,8 +1020,13 @@ el run `29854833210`; el piloto `/agenda/` sigue aislado y no autoriza promoció
   restricciones móviles) y sigue sin implementar. `dialog` es una **presentación de la acción**, abierta por el
   visitante: no pasa por suppression ni por el claim interruptivo. El estado `form_expanded` de §17 sigue siendo el de
   `inline`; `dialog` es su variante modal.
-- **Render:** pendiente en TASK-2045 (`<dialog>` nativo, formulario montado al abrir, foco, Escape, scroll lock,
-  hoja inferior en teléfono). El renderer publicado hoy ignora `presentation` y despliega el formulario inline.
+- **Render (TASK-2045, code complete, renderer `1.4.0`):** `src/growth-cta-renderer/dialog.ts`
+  (`FormDialogController`): `<dialog>` nativo con `showModal()`, formulario montado al abrir y conservado entre cierres,
+  scroll lock compartido con el agendador (`lockDocumentScroll`), foco al primer campo y retorno al botón, Escape y velo
+  bloqueados mientras el formulario envía (`data-ghf-busy`), `ghf:dismiss` cierra, `data-sheet` bajo 760 px,
+  `data-success` retira el encabezado, motion con `@starting-style` + `allow-discrete` (reducido: sólo opacidad).
+  Telemetría: `activation_mode: 'dialog'` en la allowlist (mismo vocabulario que el agendador). Llega a los hosts con el
+  próximo release a `main`; hasta entonces el renderer publicado abre el formulario inline.
 - **Paridad:** espejo `CtaRenderOpenGrowthFormActionMirror` actualizado; `renderer-contract-parity.test.ts` lo vigila.
   Tests: `src/lib/growth/ctas/__tests__/action-registry.test.ts` (inline idéntico, dialog con y sin encabezado,
   encabezado sin dialog, presentación desconocida, campos extra).

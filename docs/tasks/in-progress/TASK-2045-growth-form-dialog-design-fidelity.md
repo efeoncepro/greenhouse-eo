@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2045-growth-form-dialog-design-fidelity-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno; contrato en TASK-2044; diseño de referencia aprobado en el canvas de Partners v14 (2026-10-23)`
+- Status real: `Code complete 2026-10-23 (Slices 1–5: ff9d693fc, beb64af35, b828c9270, 50e2a24c9, 5080b47d0). Rollout pendiente: Slice 6 (publicación de los renderers con el próximo release a main — no autorizado por el operador), Turnstile interactivo real dentro del diálogo y snapshot visual de los formularios vivos`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms|ui`
 - Blocked by: `none`
@@ -406,19 +406,19 @@ El wireframe, el flujo y el motion de esta task son la especificación; en resum
 
 ## Acceptance Criteria
 
-- [ ] `<greenhouse-form color-scheme="dark">` aplica el bloque oscuro; sin el atributo el render es idéntico al actual.
-- [ ] Un campo con `width: 'half'` ocupa media columna en el modo de dos columnas y la fila completa bajo 520 px.
-- [ ] Los tokens nuevos existen con defaults iguales al render actual, comprobado con el snapshot de los tres formularios vivos.
-- [ ] El consentimiento `compact` muestra el enlace dentro de la frase, creado sin `innerHTML`, y no muestra el párrafo de enlace aparte.
-- [ ] La tarjeta de éxito muestra el glifo de la órbita con `icon: 'orbit'` y «Cerrar» (`dismiss`) cierra el diálogo sin navegar.
-- [ ] El widget de Turnstile queda dentro del formulario y funciona dentro de un `<dialog>` modal.
-- [ ] Un CTA con `presentation: 'dialog'` abre un `<dialog>` modal con el encabezado del contrato; Escape, × y el velo lo cierran salvo durante el envío; el foco vuelve al botón.
-- [ ] `<greenhouse-form>` no existe en el DOM y no hay `gh_form_viewed` antes de abrir; los eventos llevan `presentation=dialog`.
-- [ ] El fixture «partners-dialog» queda a ≤ 2 px del canvas v14 en alto de campo, radios, paddings y separaciones a 1440 y 390.
-- [ ] `UI ready` permanece `no` hasta que implementation mapping, GVC scenario plan y design decision log estén completos; si queda en `yes`, `pnpm task:lint --task TASK-2045` pasa sin hallazgos.
-- [ ] axe sin violaciones en abierto, validación y éxito; `scrollWidth == clientWidth` en los cuatro viewports.
-- [ ] Movimiento reducido: sin desplazamiento ni escala.
-- [ ] El kit de tokens y hooks está documentado con el ejemplo de Partners.
+- [x] `<greenhouse-form color-scheme="dark">` aplica el bloque oscuro; sin el atributo el render es idéntico al actual. Evidencia: `design-fidelity.test.ts` + harness.
+- [x] Un campo con `width: 'half'` ocupa media columna en el modo de dos columnas y la fila completa bajo 520 px. Evidencia: test + harness a 1440 (265 px) y 390 (324 px, una columna).
+- [ ] Los tokens nuevos existen con defaults iguales al render actual, comprobado con el snapshot de los tres formularios vivos. **Parcial:** los fallbacks iguales a los valores previos están fijados por test; el snapshot de los formularios vivos requiere el bundle publicado (Slice 6). Única diferencia por defecto conocida: el placeholder pasa del color del navegador a `#757575` (su valor habitual en Chrome).
+- [x] El consentimiento `compact` muestra el enlace dentro de la frase, creado sin `innerHTML`, y no muestra el párrafo de enlace aparte. Evidencia: `design-fidelity.test.ts` (incluye texto con HTML que no se interpreta).
+- [x] La tarjeta de éxito muestra el glifo de la órbita con `icon: 'orbit'` y «Cerrar» (`dismiss`) cierra el diálogo sin navegar. Evidencia: tests + harness (`success-1440.png`).
+- [ ] El widget de Turnstile queda dentro del formulario y funciona dentro de un `<dialog>` modal. **Parcial:** el contenedor se monta junto al formulario (test en `renderer.test.ts`); el desafío interactivo real dentro del diálogo no se probó (requiere sitekey real en un host; coordinación con TASK-1750).
+- [x] Un CTA con `presentation: 'dialog'` abre un `<dialog>` modal con el encabezado del contrato; Escape, × y el velo lo cierran salvo durante el envío; el foco vuelve al botón. Evidencia: `dialog.test.ts` + harness.
+- [x] `<greenhouse-form>` no existe en el DOM y no hay `gh_form_viewed` antes de abrir; los eventos llevan la presentación (`activation_mode: 'dialog'`, el vocabulario ya usado por el agendador). Evidencia: `dialog.test.ts`; DLV/dimensión GA4 pendientes (TRACKING-PLAN).
+- [x] El fixture «partners-dialog» queda a ≤ 2 px del canvas v14 en alto de campo, radios, paddings y separaciones a 1440 y 390. Evidencia: `docs/ui/reviews/TASK-2045/review-dossier.md` (Δ 0 px; 2 px en el ancho del botón).
+- [x] `UI ready` permanece `no` hasta que implementation mapping, GVC scenario plan y design decision log estén completos; si queda en `yes`, `pnpm task:lint --task TASK-2045` pasa sin hallazgos. (Queda `no`: el escenario GVC del portal no aplica a una superficie pública.)
+- [ ] axe sin violaciones en abierto, validación y éxito; `scrollWidth == clientWidth` en los cuatro viewports. **Parcial:** axe 0 violaciones en abierto y validación, y `scrollWidth == clientWidth` en 1440 y 390; faltan el estado de éxito con axe y los viewports 1024 y 360.
+- [x] Movimiento reducido: sin desplazamiento ni escala. Evidencia: Playwright con `reducedMotion: reduce` → `transform: none` en 1440 y 390.
+- [x] El kit de tokens y hooks está documentado con el ejemplo de Partners (contrato de runtime + `partner-dialog-skin.css` + manuales).
 
 ## Verification
 

@@ -373,7 +373,11 @@ landing: se declara en una versión nueva del formulario.
 4. Compila la versión: el compilador bloquea HTML en la casilla, marcadores repetidos o desconocidos y la falta de
    `privacyUrl`.
 
-**Qué no hacer:** no publiques una versión con `{privacyLink}` mientras el renderer de TASK-2045 no esté en
+5. Para no mostrar los pasos por defecto en la tarjeta de éxito, declara `steps: []`.
+6. La piel va en el CSS del anfitrión con tokens `--ghf-*` y hooks `data-ghf-part` (tabla en el contrato de runtime;
+   ejemplo: `scripts/public-website/partners-source/partner-dialog-skin.css`).
+
+**Qué no hacer:** no publiques una versión con `{privacyLink}` mientras el renderer de TASK-2045 (`1.1.0`) no esté en
 producción: el renderer actual muestra el marcador tal cual. `width`, `compact`, `icon` y `dismiss` sí se pueden
 publicar antes (el renderer actual los ignora sin romper). Tabla completa:
 [contrato de runtime](../../architecture/growth-public-forms-runtime-contract.md#formularios-diseñados-en-canvas-lo-que-el-contrato-admite-task-2044).

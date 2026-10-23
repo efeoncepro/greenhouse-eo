@@ -19,7 +19,11 @@ TASK-2044 code complete en local (`0864b7c04`…`36aa21309`): ancho por campo, c
 `successBehavior.icon` y `dismiss`, CTA `open_growth_form` en `dialog`. **Rollout pendiente:** diff del contrato
 público en staging tras deploy. **No publicar `{privacyLink}`** antes del renderer de TASK-2045 (el actual lo muestra
 literal). Arreglado de paso el typecheck de `scripts/public-website/landing-dock/cli.ts`. **Sin push ni release a main**
-(instrucción del operador). Próximo paso: TASK-2045.
+(instrucción del operador). TASK-2045 code complete (`ff9d693fc`…`5080b47d0`): renderers formularios `1.1.0` y CTA
+`1.4.0` (diálogo `open_growth_form`, tokens/hooks, Turnstile junto al form); popup de Partners medido a 0–2 px del canvas
+con renderers reales (`docs/ui/reviews/TASK-2045/`, piel en `partners-source/partner-dialog-skin.css`). **Pendiente:**
+release a `main` de los renderers (no autorizado), Turnstile interactivo real en el diálogo, DLV/GA4 de
+`activation_mode`, y para activar el popup en `/partnership/`: formulario gobernado + destino HubSpot + CTA publicado.
 
 ## 2026-10-23 — Mattis: propuesta Markdown y método conciliado
 

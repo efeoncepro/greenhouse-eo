@@ -189,10 +189,29 @@ anillo del eyebrow, el punto del título y la flecha del botón son piel de la l
 contrato. No se admite: HTML del autor, otros marcadores, anchos en columnas distintas de dos, ni la colocación
 interruptiva `popup_modal` (sigue sin implementar).
 
-**Render (TASK-2045, pendiente).** El renderer publicado hoy ignora `width` (usa la heurística), `consent.presentation`
-e `icon`, y omite `dismiss` (filtra acciones sin `href`); el CTA publicado hoy abre `dialog` como `inline`. Ninguno
-rompe. **Excepción:** un renderer anterior muestra `{privacyLink}` literal en la casilla. No publicar una versión con el
-marcador hasta que el renderer de TASK-2045 esté en producción (llega con un release de Greenhouse a `main`).
+**Render (TASK-2045, code complete 2026-10-23; renderers formularios `1.1.0` y CTA `1.4.0`).** Llega a los hosts con
+el próximo release de Greenhouse a `main` (el `prebuild` construye `renderer-latest.js`). Hasta entonces el renderer
+publicado ignora `width`, `consent.presentation` e `icon`, omite `dismiss` y el CTA abre `dialog` inline; ninguno rompe.
+**Excepción:** el renderer anterior muestra `{privacyLink}` literal: no publicar una versión con el marcador antes del
+release.
+
+Piel del anfitrión (sólo tokens y hooks; nunca selectores internos):
+
+| Para | Tokens / hooks |
+|---|---|
+| Esquema | `color-scheme="dark"` (fuerza los tokens oscuros; `light` sigue igual) |
+| Campos | `--ghf-field-min-height`, `--ghf-field-padding`, `--ghf-field-radius`, `--ghf-field-font-size`, `--ghf-field-gap`, `--ghf-field-focus-border`, `--ghf-placeholder` |
+| Etiquetas | `--ghf-label-size`, `--ghf-label-weight`, `--ghf-label-line-height`, `--ghf-label-color`; hooks `required-mark`, `optional-mark` |
+| Grilla | `--ghf-gap` (filas), `--ghf-column-gap` |
+| Botón | `--ghf-btn-radius`, `--ghf-btn-min-height`, `--ghf-btn-padding`; ghost: `--ghf-btn-ghost-bg/-fg/-border`; hooks `submit`, `submit-arrow` (un copy terminado en «→» dibuja la flecha) |
+| Consentimiento compacto | `--ghf-consent-box`, `--ghf-consent-accent`, `--ghf-consent-size`, `--ghf-consent-color`, `--ghf-consent-link`; hooks `consent`, `consent-link` |
+| Éxito | `--ghf-orbit`; hooks `success-card`, `success-mark`, `success-content`, `success-title`, `success-body`, `success-actions`, `success-action`. `steps: []` explícito oculta los pasos por defecto |
+| Pie | hooks `actions`, `readiness`, `summary` (los avisos vacíos siguen en el DOM por `aria-live`) |
+| Diálogo del CTA | `--ghcta-dialog-surface/-fg/-border/-radius/-radius-sheet/-shadow/-backdrop/-blur/-padding/-padding-sheet/-max-width/-close-border/-close-hover/-focus` y motion `--ghcta-dialog-enter-duration/-exit-duration/-ease-enter/-ease-exit`; hooks `data-ghcta-dialog-eyebrow/-title/-lead/-close`; `data-sheet` bajo 760 px y `data-success` cuando el formulario muestra el éxito |
+
+Hooks de formulario = atributo `data-ghf-part`. Eventos: `ghf:dismiss` (DOM, independiente de la telemetría) y
+`data-ghf-busy` en el root mientras envía. Ejemplo completo: `scripts/public-website/partners-source/partner-dialog-skin.css`
+(evidencia en `docs/ui/reviews/TASK-2045/`).
 
 ## Content Marketing: presentación, host y distribución del renderer
 

@@ -1,0 +1,28 @@
+{
+  "task": "TASK-2045",
+  "surface": "public.growth-cta.form-dialog",
+  "verdict": "pass-local",
+  "reviewedAt": "2026-10-23",
+  "reviewer": "claude-opus-5-5 (frames mirados: desktop 1440 y mobile 390, canvas Partners v14 vs renderers reales)",
+  "evidence": {
+    "desktop": "docs/ui/reviews/TASK-2045/dialog-1440.png",
+    "mobile": "docs/ui/reviews/TASK-2045/dialog-390.png",
+    "dossier": "docs/ui/reviews/TASK-2045/review-dossier.md"
+  },
+  "dimensions": {
+    "hierarchy": { "score": 4.7, "rationale": "Pregunta suave (eyebrow) → titular Bricolage 48 px → bajada → campos → casilla → botón blanco: el mismo orden y peso del canvas, sin elementos de sistema que compitan (marcas de obligatorio ocultadas por la piel).", "evidence": "docs/ui/reviews/TASK-2045/dialog-1440.png" },
+    "proportions": { "score": 4.7, "rationale": "Tarjeta 640 × 728 y grilla 2 × 2 con campos de 265 × 49, textarea 550 × 96: idénticos al canvas medidos con getBoundingClientRect (Δ 0 px salvo 2 px de ancho del botón).", "evidence": "docs/ui/reviews/TASK-2045/review-dossier.md" },
+    "rhythm": { "score": 4.6, "rationale": "Separaciones 8/14/28 del encabezado, 18 × 20 de la grilla, 20 antes de la casilla y 24 antes del botón, reproducidas con tokens y hooks; los avisos vacíos ya no suman aire al pie.", "evidence": "docs/ui/reviews/TASK-2045/review-dossier.md" },
+    "density": { "score": 4.5, "rationale": "Cinco campos y una casilla en un primer pliegue de 1440 × 900 sin apretar; en 390 la hoja hace scroll interno y conserva los 48 px de alto de campo.", "evidence": "docs/ui/reviews/TASK-2045/dialog-390.png" },
+    "depth": { "score": 4.6, "rationale": "Un solo plano elevado (la tarjeta sobre el velo con blur); los campos son superficies translúcidas sin sombra propia, así que no hay card-on-card.", "evidence": "docs/ui/reviews/TASK-2045/dialog-1440.png" },
+    "surfaceEconomy": { "score": 4.7, "rationale": "Una superficie contenida (la tarjeta del diálogo); el formulario va bare dentro y el éxito reemplaza el contenido sin abrir otra tarjeta.", "evidence": "docs/ui/reviews/TASK-2045/success-1440.png" },
+    "visualImpact": { "score": 4.6, "rationale": "Momento dominante propio de La órbita: el «Sumémonos.» con el punto turquesa y, al enviar, el arco de la órbita que se dibuja una vez sobre «Recibido.».", "evidence": "docs/ui/reviews/TASK-2045/success-1440.png" },
+    "typography": { "score": 4.6, "rationale": "Bricolage para titulares y Poppins para el resto, en los tamaños del canvas (48/18/15/13/16) vía tokens --ghf-label-* y hooks; sin font shorthand con inherit en el diálogo.", "evidence": "docs/ui/reviews/TASK-2045/dialog-1440.png" },
+    "color": { "score": 4.6, "rationale": "Paleta del canvas declarada como tokens (navy #001a33, agua #36c8bf, tinta #cfe4fa); placeholder al 45 % y foco agua con halo de 3 px sobre fondo oscuro.", "evidence": "docs/ui/reviews/TASK-2045/dialog-1440.png" },
+    "iconography": { "score": 4.5, "rationale": "Íconos mínimos y con función: × de dos trazos en botón de 44 px, flecha del botón como glifo del copy y el glifo de la órbita en el éxito; anillo del eyebrow por la piel.", "evidence": "docs/ui/reviews/TASK-2045/success-1440.png" },
+    "responsive": { "score": 4.6, "rationale": "Bajo 760 px el diálogo pasa a hoja inferior con radio 24/24/6/6, una columna por container query y scroll interno; scrollWidth == clientWidth en 390.", "evidence": "docs/ui/reviews/TASK-2045/dialog-390.png" },
+    "motion": { "score": 4.5, "rationale": "Entrada 450 ms emphasized desde translateY(32px) scale(.97) y salida 250 ms con @starting-style + allow-discrete; con movimiento reducido sólo opacidad; arco del éxito dibujado una vez.", "evidence": "docs/ui/motion/TASK-2045-growth-form-dialog-design-fidelity-motion.md" },
+    "fidelity": { "score": 4.8, "rationale": "Medido contra el canvas aprobado: 0 px de diferencia en tarjeta, título, etiquetas, campos, casilla y cerrar; 2 px en el ancho del botón por el glifo de flecha.", "evidence": "docs/ui/reviews/TASK-2045/review-dossier.md" },
+    "genericTemplateResistance": { "score": 4.6, "rationale": "No es un modal de librería: forma de tarjeta con la esquina casi recta de La órbita, punto turquesa, órbita en el éxito y casilla compacta con el enlace dentro de la frase.", "evidence": "docs/ui/reviews/TASK-2045/dialog-1440.png" }
+  }
+}
