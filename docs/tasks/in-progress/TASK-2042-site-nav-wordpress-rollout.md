@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Slices 1 y 2 en producción con el interruptor en off desde 2026-10-22 23:55 UTC (plugin eo-site-nav + adaptador de ohio-child, runtime 27c3b0c, AXIS primitives 0.7.8); el sitio sigue con el encabezado de Ohio. Slice 3: superficie y CTA del agendador publicados en Growth. Pendiente: montar el agendador en el adaptador, Slice 4 (alta GTM/GA4) y piloto en una página con autorización`v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
+- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio (eo_site_nav_enabled=on) desde 2026-10-23 00:09 UTC, por decisión del operador sin pasar por el piloto de una página; /blog/ sigue con Ohio. Barrida de 55 URLs × 2 anchos sin fallas atribuibles al menú. Pendiente: montar el agendador nativo (hoy el CTA lleva a /agenda/), alta GTM/GA4, prueba de vuelta a off en producción, Core Web Vitals y documentación`v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -437,6 +437,19 @@ Reglas obligatorias:
 
 ### Slice 6 — Todo el sitio y documentación
 
+> Avance 2026-10-23: `on` aplicado con el go del operador («prenderlo para ver si todo está ok y haz las pruebas con
+> todas las landing»), sin piloto previo. Interruptor por `scripts/public-website/set-site-nav-switch.php` (exige
+> plugin activo, adaptador cargado y documento publicado; purga completa de Kinsta). Barrida de las 52 páginas
+> publicadas y 3 posts de Glitch en 1440×900 y 390×844: todas 200 con el menú nuevo y sin el de Ohio (salvo
+> `/blog/`, excluida), el panel o el onepage abren y emiten `gh_site_nav_opened`. Lo que marcó la barrida y no es del
+> menú: recursos 404 dentro de páginas viejas (formularios de HubSpot borrados, un ícono de iconify, imágenes de
+> `uploads` que ya no existen) y scroll horizontal por contenedores de Elementor en cinco páginas antiguas o de demo
+> (`/home-2/`, `/demo-landing-2024/`, `/partnership/`, `/landing-loop-marketing/`, `/home-2-2/`); ningún elemento del
+> menú se sale. Falla del menú encontrada y corregida en vivo: en las páginas de hero claro el estado `top` dejaba el
+> vidrio oscuro y el logo blanco sobre fondo claro (ilegible en `/servicios/posicionamiento-seo/`); ahora arrancan con
+> la isla clara fija, como dice el flujo (runtime 05cd089). Una medición de luminosidad del hero en todas las páginas
+> `top` coincidió exacto con la lista del inventario.
+
 - Con el go del operador, `on`.
 - Captura de Home, una landing con «Estás aquí», un post, Glitch y 404.
 - Actualización de la doctrina: `native-navigation.md` y `runtime-and-discovery.md` de la skill del sitio, en `.claude`
@@ -530,7 +543,8 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
 - [x] Con `pilot`, sólo las páginas de la lista muestran el menú nuevo. Evidencia (Playground local con Ohio 3.7.0 real, el plugin `eo-site-nav` y `ohio-child`, 2026-10-22): la página de la lista
   pinta el menú y la otra conserva Ohio.
 - [ ] Con `on`, todo el sitio muestra el menú nuevo, y volver a `off` restaura Ohio (verificado al menos una vez en
-  producción).
+  producción). Sin tildar: `on` verificado en producción el 2026-10-23 (55 URLs × 2 anchos); la vuelta a `off` sólo
+  está probada en Playground.
 - [x] Un documento inválido o ausente deja el encabezado de Ohio y registra el error. Evidencia (Playground local con Ohio 3.7.0 real, el plugin `eo-site-nav` y `ohio-child`, 2026-10-22): documento
   guardado con `javascript:` saltándose el servicio de guardado → Ohio y `[eo-site-nav] render failed, keeping Ohio:
   INVALID_FORMAT /header/cta/fallbackHref`; plugin sin cargar → Ohio y su línea de log.

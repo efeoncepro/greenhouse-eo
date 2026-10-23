@@ -2,8 +2,10 @@
 /**
  * Guarded scoped deployment of the global site navigation adapter in ohio-child (contract
  * eo-site-nav-theme-release.v1, TASK-2042): allowlist, package hashes, previous-SHA drift guard, backup tar,
- * functions.php written last, opcache invalidation. It never turns the menu on: the switch `eo_site_nav_enabled` is
- * created as `off` when absent and the deploy refuses if it is set to anything else.
+ * functions.php written last, opcache invalidation. It never changes the switch: `eo_site_nav_enabled` is created as
+ * `off` when absent and otherwise left as found (an update with the menu on is a code fix; the switch would not protect
+ * the site from a broken PHP file anyway, since functions.php requires the adapter in every mode). Changing the switch
+ * is `set-site-nav-switch.php`, which also purges the caches; run it after an update with the menu on.
  * Inputs: package.zip and manifest.json from build-site-nav-theme-package.cjs.
  * Rollback: restore the printed tar over wp-content/themes/ohio-child and delete the created paths it lists
  * (functions.php first, so the theme stops requiring inc/site-nav.php).
@@ -19,7 +21,6 @@ foreach ( range( 1, 8 ) as $n ) {
 	if ( ! file_exists( get_template_directory() . '/parts/headers/header-style-' . $n . '.php' ) ) { WP_CLI::error( 'Ohio header part missing: header-style-' . $n . '.php' ); }
 }
 $mode = get_option( 'eo_site_nav_enabled', null );
-if ( null !== $mode && 'off' !== $mode ) { WP_CLI::error( 'eo_site_nav_enabled is "' . $mode . '"; this deploy only ships with the switch off.' ); }
 
 $zip = new ZipArchive();
 if ( true !== $zip->open( $args[0] ) ) { WP_CLI::error( 'Invalid ZIP.' ); }
@@ -68,6 +69,7 @@ echo wp_json_encode(
 		'files'   => count( $files ),
 		'created' => count( $created ),
 		'switch'  => get_option( 'eo_site_nav_enabled' ),
+		'purge'   => 'off' === get_option( 'eo_site_nav_enabled' ) ? 'not needed' : 'run set-site-nav-switch.php to purge',
 		'pilot'   => get_option( 'eo_site_nav_pilot_pages' ),
 		'axis'    => $manifest['axis'] ?? null,
 		'runtime' => $manifest['runtimeCommit'] ?? null,

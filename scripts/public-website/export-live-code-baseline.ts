@@ -34,6 +34,8 @@ type Target = {
   remotePath: string
   required: boolean
   kind?: 'directory' | 'file'
+  /** rsync patterns, relative to the target root, kept even though EXCLUDE_PATTERNS would drop them. */
+  includes?: string[]
 }
 
 type ManifestFile = {
@@ -46,7 +48,10 @@ const TARGETS: Target[] = [
   {
     label: 'ohio-child theme',
     remotePath: 'wp-content/themes/ohio-child',
-    required: true
+    required: true,
+    // Pinned AXIS files the theme serves (TASK-2042): versioned in the runtime repo, so the baseline must see them for
+    // the deploy drift guard, even though `vendor/` is excluded everywhere else.
+    includes: ['/assets/vendor/', '/assets/vendor/axis/***']
   },
   {
     label: 'EO headless content plugin',
@@ -271,6 +276,7 @@ const main = () => {
     const rsyncArgs = [
       '-az',
       ...(targetKind === 'directory' ? ['--delete'] : []),
+      ...(target.includes ?? []).flatMap(pattern => ['--include', pattern]),
       ...EXCLUDE_PATTERNS.flatMap(pattern => ['--exclude', pattern]),
       '-e',
       rsyncShell,
