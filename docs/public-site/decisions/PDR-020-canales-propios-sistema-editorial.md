@@ -344,6 +344,9 @@ una con su superficie y su trabajo.
 - **No hay superficie `/casos` en el sitio y este PDR no la crea.** Hoy los casos viven como bloque de prueba
   en landings y como pieza editorial en el blog. Si se decide un índice agregador, es decisión de producto
   aparte y depende del inventario de la decisión pendiente 2.
+  **Delta 2026-10-23:** esa decisión aparte es [PDR-028](PDR-028-portafolio-de-proyectos-eo-portfolio.md): el
+  índice agregador vive en `/portafolio/`, enlaza al caso canónico del blog y lleva la compuerta de aprobación del
+  cliente como regla del sistema.
 
 ### 4.4 Seasonalities: la temporada vista desde el oficio
 

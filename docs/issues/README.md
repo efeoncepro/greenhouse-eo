@@ -64,12 +64,13 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-183`
+`ISSUE-184`
 
 ## Open
 
 | ID          | Título                                                                                                                       | Ambiente             | Detectado  | Estado |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
+| `ISSUE-183` | [El portafolio público indexa 44 entradas demo del tema Ohio](open/ISSUE-183-portfolio-ohio-demo-entries-indexed.md) | producción (efeoncepro.com) | 2026-10-23 | open — remediación en `TASK-2046`; programa `EPIC-056` / PDR-028 |
 | `ISSUE-182` | [La captura diaria de rankings pierde keywords por timeout y no lo avisa](open/ISSUE-182-seo-rank-capture-partial-days-silent.md) | producción (ops-worker) | 2026-10-12 | open — code complete, rollout pendiente: segunda pasada `ops-seo-rank-capture-retry` y aviso de parciales salen con el próximo deploy del worker. Recuperación del 12-oct pendiente del operador. |
 | `ISSUE-181` | [El regrade recurrente AEO reclama mercados que el contrato no declara](open/ISSUE-181-aeo-regrade-claims-markets-outside-contract.md) | producción (ops-worker) | 2026-10-12 | open — dato aplicado (Sky declara 7 mercados); fix de scheduler y command code complete, rollout pendiente. Cierre: `failed=0` el 2026-10-13. |
 | `ISSUE-179` | [El composer contractor envía un período localizado como fecha SQL](open/ISSUE-179-contractor-submission-localized-period-date.md) | producción | 2026-10-05 | open — A01–A09 corregidos localmente para todos los contractors bajo TASK-2009/2010; 333 tests, diez casos SQL, lint, TypeScript y GVC premium PASS. Release, canary integral y recuperación histórica pendientes; sin push/deploy. |
