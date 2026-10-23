@@ -1,0 +1,50 @@
+[
+ {
+  "width": 1440,
+  "slug": "efeonce-media-diagnostic",
+  "size": "640x1231",
+  "diffPixels": 0
+ },
+ {
+  "width": 1440,
+  "slug": "efeonce-inbound-diagnostic",
+  "size": "640x634",
+  "diffPixels": 0
+ },
+ {
+  "width": 1440,
+  "slug": "efeonce-hubspot-scope",
+  "size": "640x441",
+  "diffPixels": 0
+ },
+ {
+  "width": 1440,
+  "slug": "efeonce-aeo-diagnostic",
+  "size": "640x754",
+  "diffPixels": 0
+ },
+ {
+  "width": 390,
+  "slug": "efeonce-media-diagnostic",
+  "size": "342x1749",
+  "diffPixels": 0
+ },
+ {
+  "width": 390,
+  "slug": "efeonce-inbound-diagnostic",
+  "size": "342x783",
+  "diffPixels": 0
+ },
+ {
+  "width": 390,
+  "slug": "efeonce-hubspot-scope",
+  "size": "342x441",
+  "diffPixels": 0
+ },
+ {
+  "width": 390,
+  "slug": "efeonce-aeo-diagnostic",
+  "size": "342x947",
+  "diffPixels": 0
+ }
+]

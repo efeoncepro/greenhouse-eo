@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `Code complete 2026-10-23 (Slices 1–5, commits 0864b7c04…36aa21309 + docs). Rollout pendiente: diff del contrato público en staging tras el próximo deploy de develop; sin push por instrucción del operador (no release a main)`
+- Status real: `Code complete 2026-10-23; contrato verificado idéntico contra producción para 4 formularios vivos; primer consumidor publicado (formulario efeonce-partner-application + CTA partners-become-partner). Rollout pendiente: llega a los runtimes con el push de develop y el release a main (no autorizado aún)`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms`
 - Blocked by: `none`
@@ -370,7 +370,7 @@ N/A — repo-only change; ningún proveedor externo cambia en esta task.
 - [x] El consentimiento admite `presentation: 'compact'` y un único `{privacyLink}`; HTML, marcadores desconocidos o dobles se rechazan al compilar, con prueba. Evidencia: `design-fidelity-contract.test.ts` §consentimiento (también `consent_display_invalid` y `privacyUrl` obligatoria).
 - [x] `dismiss` existe como acción de éxito sin `href` y el éxito admite `icon: 'orbit'` y `icon: 'none'` (campo `successBehavior.icon`: `presentation` ya era un enum), con prueba. Evidencia: `design-fidelity-contract.test.ts` §cierre e ícono.
 - [x] `open_growth_form` admite `presentation: 'dialog'` y su encabezado, ambos llegan al navegador y la prueba de paridad servidor ↔ renderer pasa. Evidencia: `action-registry.test.ts` §presentación dialog + `renderer-contract-parity.test.ts` + `pnpm typecheck` verde.
-- [ ] El contrato público de `efeonce-media-diagnostic`, `efeonce-inbound-diagnostic` y `efeonce-hubspot-scope` es idéntico antes y después en staging. **Sin verificar:** requiere deploy de develop (sin push por instrucción del operador). Cubierto en local por los tests «sin el campo proyecta igual que hoy».
+- [x] El contrato público de `efeonce-media-diagnostic`, `efeonce-inbound-diagnostic` y `efeonce-hubspot-scope` es idéntico antes y después. Evidencia (2026-10-23): el contrato que compila el código nuevo contra la instancia es idéntico byte a byte al que sirve hoy producción para esos tres y `efeonce-aeo-diagnostic` (`docs/ui/reviews/TASK-2045/live-forms-contract-diff.json`). Sin staging: `develop` lleva 174 commits locales de varias sesiones y su push queda a decisión del operador.
 - [x] `docs/architecture/growth-public-forms-runtime-contract.md` tiene la sección del kit de diseño con el mapeo del popup de Partners (§Formularios diseñados en canvas).
 - [x] TASK-1320, TASK-2038 y TASK-2045 tienen su Delta (TASK-1320 y TASK-2045 corregidos a `successBehavior.icon`).
 

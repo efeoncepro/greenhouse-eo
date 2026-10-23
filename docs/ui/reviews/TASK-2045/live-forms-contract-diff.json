@@ -1,0 +1,38 @@
+{
+ "efeonce-media-diagnostic": {
+  "identical": true,
+  "prodVersion": 2,
+  "localVersion": 2,
+  "bytes": [
+   5110,
+   5110
+  ]
+ },
+ "efeonce-inbound-diagnostic": {
+  "identical": true,
+  "prodVersion": 2,
+  "localVersion": 2,
+  "bytes": [
+   5127,
+   5127
+  ]
+ },
+ "efeonce-hubspot-scope": {
+  "identical": true,
+  "prodVersion": 4,
+  "localVersion": 4,
+  "bytes": [
+   5254,
+   5254
+  ]
+ },
+ "efeonce-aeo-diagnostic": {
+  "identical": true,
+  "prodVersion": 17,
+  "localVersion": 17,
+  "bytes": [
+   3500,
+   3500
+  ]
+ }
+}

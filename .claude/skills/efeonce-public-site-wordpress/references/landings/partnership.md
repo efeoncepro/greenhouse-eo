@@ -26,10 +26,21 @@
 - Page tree: 6 containers, one `greenhouse_partners_*` widget each: hero · verdad · ecosistema · banda · como · cierre.
   Repeaters: marquesina (9 logos), servicios (5), partners (10 tiles), pasos (3). `assets/js/partners-landing.js` only
   clones the logo set for the marquee loop.
-- «Quiero ser partner»: the approved popup is the target (a governed Growth Form in a Growth CTA dialog, TASK-2044 →
-  TASK-2045). Until then the button links to `/agenda/` — the same destination the previous page's button had. The
-  previous page embedded the HubSpot form «Lead Gean - Partnership» (`4c0066df-9a0f-4199-b0f7-d09e376a9f22`); it is no
-  longer on the page.
+- «Quiero ser partner»: the approved popup is a governed Growth Form in a Growth CTA dialog (TASK-2044/2045). Until the
+  renderers (forms 1.1.0, CTA 1.4.0) reach `main`, the button links to `/agenda/` — the previous page's destination.
+  Ready since 2026-10-23: Growth Form `efeonce-partner-application` (form key `eb5c108d-05fc-427b-82b0-4bb161fdbac7`,
+  v2 with HubSpot `direct` to «Lead Gean - Partnership» `4c0066df-…`, smoke 200/200, surface `fhsf-efeonce-partners`;
+  `scripts/growth/publish-partner-application-form.ts`) and Growth CTA `partners-become-partner` (`open_growth_form` +
+  `presentation: 'dialog'`, WordPress surface `csur-5638aab5-d53c-402a-836b-a0a72ce2c7a4`, key in
+  `.auth/partners-cta-surface.json` 0600; `scripts/growth/publish-partners-become-partner-cta.ts` — re-running ROTATES
+  the key). Skin: `scripts/public-website/partners-source/partner-dialog-skin.css` (tokens/hooks only; evidence
+  `docs/ui/reviews/TASK-2045/`).
+- Activation after the release (in order): verify `renderer-latest.js` carries `ghf:dismiss` and the CTA bundle
+  `ghc-form-surface`; replace the `/agenda/` link in `partners-source/Main.dc.html` with the CTA launcher
+  (`<greenhouse-cta appearance="bare" cta-location="partners_close" surface=… embed-key=…>`, key from the `.auth` file,
+  never in git) + load both bundles and the skin; recompile → package → deploy → publish (preview first); smoke a real
+  submission in the dialog (Turnstile interactive, HubSpot attempt `succeeded`); then GTM DLV + GA4 dimension
+  `activation_mode` (preview + confirmation).
 - Fidelity: section and card heights equal to the canvas at 1440 and 390 (animations frozen, computed-style diff). Ohio
   collisions fixed in `host.css`: body `line-height:1.6`, `16.4px` and tracking (root reset to the browser defaults),
   Ohio's post `.tag` pill, and a 16px top margin on `.bento`/`.steps`.

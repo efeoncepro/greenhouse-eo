@@ -23,7 +23,11 @@ literal). Arreglado de paso el typecheck de `scripts/public-website/landing-dock
 `1.4.0` (diálogo `open_growth_form`, tokens/hooks, Turnstile junto al form); popup de Partners medido a 0–2 px del canvas
 con renderers reales (`docs/ui/reviews/TASK-2045/`, piel en `partners-source/partner-dialog-skin.css`). **Pendiente:**
 release a `main` de los renderers (no autorizado), Turnstile interactivo real en el diálogo, DLV/GA4 de
-`activation_mode`, y para activar el popup en `/partnership/`: formulario gobernado + destino HubSpot + CTA publicado.
+`activation_mode`. Hecho después (2026-10-23): formulario `efeonce-partner-application` publicado (v2, HubSpot directo
+«Lead Gean - Partnership», smoke 200/200) y CTA `partners-become-partner` publicado (key en `.auth` 0600); contratos de
+los 4 formularios vivos idénticos a producción y 0 px de diferencia con el renderer nuevo; axe limpio en 4 viewports.
+**Push a `develop` no hecho:** son 174 commits locales de varias sesiones (decisión del operador). Activar el popup =
+runbook en `references/landings/partnership.md`, después del release.
 
 ## 2026-10-23 — Mattis: propuesta Markdown y método conciliado
 
