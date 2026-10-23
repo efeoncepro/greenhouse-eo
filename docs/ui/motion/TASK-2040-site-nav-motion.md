@@ -52,7 +52,7 @@ El motion explica de dónde viene cada cosa; no decora.
 
 | Momento | Movimiento | Duración y curva |
 |---|---|---|
-| Abrir | `clip-path: circle(0 → 1720px at <centro de la hamburguesa>)`; la página detrás retrocede a 97 % | 800 ms `emphasized` (750 ms en teléfono) |
+| Abrir | `clip-path: circle(0 → R at <centro de la hamburguesa>)`, con R = distancia del centro a la esquina más lejana de la ventana (calculada al abrir y al redimensionar; 1618 px a 1440×900, 2124 px a 1920×1080; sin JS, `150vmax`). Antes decía 1720 px fijos, medidos en el tablero de 1440: pasado ~1500 px de ancho dejaba una esquina sin cubrir (corregido en AXIS primitives 0.7.10, 2026-10-23); la página detrás retrocede a 97 % | 800 ms `emphasized` (750 ms en teléfono) |
 | Cascada | Logo y botón a los 260 ms; ítems cada 60 ms; líneas cada 45 ms; foto revelada de derecha a izquierda; respuesta al final (680 ms) | `emphasized` |
 | Cerrar | El contenido sale junto en 150 ms; el círculo vuelve a **0 px** | 550 ms `emphasizedAccelerate` con retardo de 120 ms |
 | Foto nueva | Entra en 600 ms y se acerca 4 % en 9 s. Nunca se aleja | `emphasized` / lineal |

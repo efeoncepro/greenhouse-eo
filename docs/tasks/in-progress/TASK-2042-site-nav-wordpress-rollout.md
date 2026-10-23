@@ -463,6 +463,21 @@ Reglas obligatorias:
 >   misma regla. Publicado con primitives 0.7.9 bajo `v0.7.9`. El port PHP se igualó con 17 casos de paridad byte a
 >   byte y el plugin se desplegó (respaldo `/tmp/eo-site-nav-before-20261023-004705.tar`). En vivo, los 14 servicios
 >   con página en efeoncepro.com marcan el suyo, y Contacto y la home no marcan nada. El documento del menú no cambió.
+> - **Círculo del onepage en pantallas anchas (corregido 2026-10-23).** El operador vio en vivo una cuña sin cubrir
+>   abajo a la derecha. El radio abierto era fijo (1720 px, medido en el tablero de 1440), y pasado ~1500 px de ancho
+>   dejaba ver la página de atrás; a 1920 también se cortaba arriba a la derecha. AXIS primitives 0.7.10 (`v0.7.10`) lo
+>   calcula al abrir y al redimensionar, hasta la esquina más lejana de la caja del onepage (`150vmax` sin JS). Tema
+>   desplegado con los archivos publicados (respaldo `/tmp/ohio-child-site-nav-before-20261023-012503.tar`). En vivo,
+>   las cuatro esquinas quedan dentro a 1440, 1920, 2000 y 2560 (radios de 1620 a 2859 px). La carpeta `0.7.8` quedó en
+>   el servidor sin uso.
+> - **Lecturas con posts reales y títulos que caben (revisión 2 del documento, 2026-10-23).** Las tarjetas de línea de
+>   Growth, Engine y Voice apuntan a sus posts reales; Brand y Revenue siguen con sus casos. De 16 títulos de lectura, 10
+>   se cortaban en la tarjeta (dos líneas a 1280–1440, una a 1200). Con el go del operador («Si tienes que recortar
+>   títulos sin perder su esencia hazlo») se acortaron con las palabras del propio post; el título publicado queda
+>   anotado en `build-efeoncepro-document.mjs`. Los 14 títulos del documento caben en vivo a 1440, 1366, 1280 y 1200.
+>   Aplicado con el script nuevo `scripts/public-website/apply-site-nav-document.php` (mismo servicio de guardado, con
+>   revisión base y prueba en seco): revisión 2, hash `78dc961c0b74`. Vuelta atrás: aplicar el documento de la
+>   revisión 1 como revisión nueva.
 > - **Elementos flotantes de Ohio** (barra lateral con el selector Light/Dark, z 4, y botón de búsqueda, z 50): quedan
 >   bajo el velo (1000) y el panel (1002), atenuados como el resto de la página; no es un problema de apilamiento.
 >   Quitarlos con el menú nuevo es una decisión de producto aparte.
