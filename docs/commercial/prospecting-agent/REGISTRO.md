@@ -1,5 +1,11 @@
 # Registro de búsquedas comerciales
 
+**Fundación Luz, investigación focalizada22/10/2026:** Contact257217550764 / Company59806188192 / Primary y
+nota119334575454 verificados. Dirección inferida admitida y usada por excepción expresa informada de Julio;
+correo22:18:35Santiago con firma gráfica/CCO/brochure original, EMAIL119337620506SENT e InMail21:37 enviados.
+InMail1crédito; sin Apollo ejecutado, Lead/Deal/secuencia, nuevoIDHSP ni membresías efectivas acreditadas.
+Esperar respuesta; entrega/lectura no confirmadas. [Expediente saneado](runs/2026-10-22-fundacion-luz-mariana.md).
+
 **Kibernum, investigación focalizada22/10/2026:** Contact256968083769 creado con correo laboral verificado,
 Company53955357196 reutilizada/Primary; seis segmentos del contacto y Company187 verificados. Correo00:56Santiago
 con firma gráfica/CCO y brochure360 completo, EMAIL119266980893 SENT e InMail distinto enviados. Apollo1crédito,

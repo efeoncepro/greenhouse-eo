@@ -28,8 +28,11 @@ no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/r
    vínculos confirmados/hipotéticos; para cada brecha, riesgo, owner/ruta y siguiente validación. Un rol
    crítico sin email permanece en investigación. No exigir champion ni comité completo antes de conversar.
 4. Evaluar atribución, empleo y calidad de correo por separado. Revelación/enriquecimiento pagado requiere
-   alcance explícito; no reiterar resultado vacío ni completar direcciones por patrón. Dirección general,
-   personal o incierta no permite alta individual. Si faltan datos, entregar estado parcial y menor chequeo útil.
+   alcance explícito; no reiterar resultado vacío ni tratar un patrón como verificación. Dirección general,
+   personal o incierta no cumple la admisión normal. Si Julio pide investigar un patrón, presentar la candidata
+   como inferida y sus límites antes de actuar; una excepción expresa e informada se conserva por persona,
+   dirección y acciones autorizadas, sin promover la calidad a `verified`. Si faltan datos o permiso,
+   entregar estado parcial y menor chequeo útil.
 5. Preparar un account brief y apertura/prueba según relación. Releer último mandato, validar claim/capacidad
    y graduar costo de preventa. Preparar preguntas de discovery sin convertir borrador en comunicación realizada.
 6. Para registro pedido/autorizado, pasar a HubSpot con changeset revisable, dedupe y valores reales. Ejecutar
@@ -208,3 +211,18 @@ por rebote. Correos/cuerpos privados en CRM y expediente; IDs, estados y fechas 
   dirección afectada, cero inscritos verificado y diagnóstico privado; no reintentar para comprobar.
 - La asociación Company puede existir aunque el reader omita `associatedcompanyid`: verificar etiqueta
   Principal en el registro, no crear otra Company ni afirmar herencia sectorial sin evidencia.
+
+## Aplicación: Fundación Luz, candidata inferida y envío único — 22/10/2026
+
+[Expediente Mariana](../../commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md):
+búsqueda pública de PR/campaña, tres adyacentes investigados sin contactar y tres fuentes del patrón
+inicial + apellido. El patrón no verificó la casilla; Julio conoció la incertidumbre y autorizó el alta
+y un correo a esa candidata. La nota conserva la excepción **inferida / no verificada**; `individual_email`
+es tipo de contacto, no estado técnico. La consulta Apollo ofrecida no llegó a ejecutarse ni autoriza
+reportar consumo de enriquecimiento.
+
+Se verificaron Contact/Company/Primary/nota, InMail, copia enviada de Outlook con firma gráfica/CCO y
+EMAIL `SENT` asociado. Cada canal usó su enlace sobre el brochure original; un enlace generado al correo
+del remitente no atribuye las vistas a la prospecta. Entrega, respuesta y membresía efectiva en segmentos
+siguen sin acreditar. Esperar respuesta no crea secuencia ni permiso de otro envío; rebote o negativa
+detienen la casilla afectada y exigen revisar el alcance antes de continuar.

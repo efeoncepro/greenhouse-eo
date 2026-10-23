@@ -69,6 +69,11 @@ Use the shared [buying-group method](../../efeonce-b2b-prospecting/references/bu
    person.** Keep the exact returned address, source, research date and validation status. Never infer an address
    from a pattern; do not substitute personal or shared mailboxes. Presence and provider verification do not
    guarantee delivery; preserve and resolve conflicting validation before treating the channel as actionable.
+   This is the general admission rule. The existing [informed individual exception](../../efeonce-b2b-prospecting/references/contact-quality-and-enrichment.md#patrón-solicitado-y-excepción-individual-explícita)
+   requires explicit approval for that person/address and the specific actions after disclosing uncertainty.
+   Keep the address inferred and its quality pending in a source note; `individual_email` describes the
+   person/channel, not verified mailbox quality. [Fundación Luz](../../../../docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md)
+   applies Contact + email approval without sequence enrollment or a schema/filter change.
 3. Apollo `emails: []` stops admission of that person, not account research. Keep the target's identity, source
    and need in the research manifest or a Company note; continue seeking adjacent contacts. A shared mailbox
    may be documented only as a secondary account route, not the person's email or a substitute for admission.

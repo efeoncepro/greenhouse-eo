@@ -64,10 +64,17 @@ Si el operador pide seguir el patrón, separar candidato de evidencia: devolver 
 que nosotros construimos no la verifica cuando sólo la repite con `match_confidence=none`, sin estado de
 email ni atributos independientes. No gastar en variantes equivalentes ni usar el envío como verificador.
 
-Si el operador, informado de esa incertidumbre, autoriza expresamente alta, envío y secuencia para esa
-persona/dirección, ejecutar ese alcance sin pedir el mismo permiso otra vez. Registrar la excepción con
-fuente/fecha, dirección inferida y calidad pendiente; no etiquetarla `verified`. Usar los campos vigentes
+Si el operador, informado de esa incertidumbre, autoriza expresamente alguna de las acciones (alta, envío
+o secuencia) para esa persona/dirección, ejecutar sólo las autorizadas sin pedir el mismo permiso otra vez.
+Registrar la excepción con fuente/fecha, dirección inferida y calidad pendiente; no etiquetarla `verified`. Usar los campos vigentes
 del portal y una nota que distinga identidad profesional conocida de atribución de correo pendiente.
 El permiso sólo de envío no se amplía a CRM o secuencia, y la excepción individual no cambia la admisión
 normal de otros contactos. Ausencia de rebote o visualización del brochure tampoco verifica identidad.
 [Aplicación izipay](../../../../docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).
+
+[Aplicación Fundación Luz — 22/10/2026](../../../../docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md):
+tres ejemplos públicos del patrón inicial + apellido sustentaron una candidata, sin verificar la casilla
+ni su atribución a Mariana. Julio autorizó expresamente crear el Contact y enviar a esa dirección después
+de conocer la incertidumbre; no autorizó una secuencia. La nota CRM conserva los ejemplos y la excepción;
+la documentación versionada conserva el método y el enlace al caso, sin direcciones reales. La consulta
+Apollo ofrecida quedó sin ejecutar: no atribuirle enriquecimiento ni consumo de créditos a la búsqueda pública.

@@ -151,3 +151,12 @@ por prioridad, sobre la misma tesis. Compartir el documento original completo me
 destinatario no exige copiar el correo en LinkedIn. Conciliar por separado Enviados/firma/CCO, EMAIL CRM
 SENT y conversación LinkedIn publicada; «Enviando» no cierra el último carril. Autorización de ambos canales
 para una persona no se extiende a colegas, secuencias o futuros toques; declarar el costo del InMail disponible.
+
+[Aplicación Fundación Luz](../../../../docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md):
+InMail y correo robusto respondieron a la misma solicitud pública de PR y campaña, con aportes y extensión
+adaptados al canal. Al faltar correo atribuible, el primer enlace del brochure original se emitió al correo
+real del remitente y se compartió por LinkedIn sin solicitar email al visitante. Tras la excepción individual
+autorizada, el email llevó un enlace propio emitido a la dirección candidata. Conservar ambas atribuciones
+por separado: ninguna visita identifica por sí sola a Mariana ni verifica la casilla, recepción o lectura.
+El envío por email conserva el readback de firma gráfica, CCO y EMAIL SENT; un permiso puntual para ambos
+canales no programa seguimiento.

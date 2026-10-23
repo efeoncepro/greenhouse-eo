@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-10-22 — Fundación Luz: contacto y dos acercamientos verificados
+
+Contact257217550764 / Company59806188192 / Primary y nota119334575454 leídos; dirección inferida admitida por
+excepción expresa informada de Julio, sin etiquetarla verificada. InMail21:37Santiago (1crédito) y correo22:18:35
+con firma gráfica/CCO/brochure original; Enviados y EMAIL119337620506SENT asociados verificados. Sin Apollo
+ejecutado, Lead/Deal/secuencia ni membresías comprobadas. Esperar respuesta; entrega/lectura no acreditadas.
+[Expediente y límites](docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md). Docs/skills espejo
+concilian la excepción vigente y separan atribución de enlaces por canal; no conceden nuevos permisos.
+
 ## 2026-10-22 — Cotizador local: perfiles y costos Réditos
 
 Catálogo v13 / recursos v12 / créditos v1 activos en CLI; tres perfiles nuevos estimados y Awario público. [Costo y evidencia](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md). Propuesta detenida; sin importación DB, commit o push. Suite: 1.860 aprobadas, tres omitidas.
@@ -252,23 +261,3 @@ Código con recibo postcommit, consent granular/GPC, IDs30d, EC web reservado y 
 Tag Assistant Web negativo PASS; EC OFF; términos de clientes aceptados y guardados por instrucción expresa posterior (UI reabierta).
 Faltan QA funcional positivo/EC, release coordinado backend/bundles/bridge WP/Think,
 confirmación/publicación GTM y opt-in policy/flag, y primera ocurrencia real. No declarar medición activa.
-
-## 2026-10-17 — Landing Performance Marketing publicada y legacy retirada (TASK-1865)
-
-Live en https://efeoncepro.com/servicios/performance-marketing/ (página `251997`, OG `252002`): 10 widgets
-`greenhouse_performance_*` compilados del canvas aprobado, Service + FAQPage (6), Growth Form
-`efeonce-performance-diagnostic` (direct a «Lead Gen - Performance Marketing»). Legacy `242862` privada con 301 plano
-en Yoast (3 cadenas repuntadas), ítem de menú `242915` reapuntado. QA en vivo 1440/390 sin overflow.
-[Landing](.claude/skills/efeonce-public-site-wordpress/references/landings/performance-marketing.md) ·
-[Task](docs/tasks/in-progress/TASK-1865-landing-performance-marketing.md).
-Pendiente: envío real del form, GA4 `generate_lead`, Rich Results/GSC, GVC 1536/890, triple documentación, extraer el
-núcleo común source-led (hoy clonado de Medios). Runtime: commit propio en `efeonce-public-site-runtime` (sin push).
-Docs sincronizados (mismo día): funcional `docs/documentation/public-site/performance-marketing.md`, manual
-`docs/manual-de-uso/public-site/operar-performance-marketing.md`, PRIMITIVES, contrato de forms, TRACKING-PLAN
-(fila pendiente), servicios, PDR-022/021/025, briefs, EPIC-047, TASK-1860 (ancla `#plataformas`) y skill
-`efeonce-public-site-wordpress` (lecciones del carril). El `?utm_` en el 301 lo conserva el mu-plugin passthrough, no Yoast.
-**Cierre 2026-10-17 (tarde):** TASK-1865 `complete`. Envíos reales del operador: HubSpot `delivered`, GA4 `generate_lead`;
-Meta sin Lead hasta publicar políticas de medición (Performance, Medios, HubSpot scope; 12/18 publicadas) y luego 1 `Lead`
-Server en el dataset `708931297255942` (stats con ~1 h de retraso). Form deduplica 60 min por email: QA con alias `+`.
-Search Console activo (el `invalid_grant` era del script: usar `getSearchConsoleConnection`); GA4 de Efeonce conectado
-por primera vez hoy, Berel/Sky intactos. Follow-ups: archivar contacto `+meta` en HubSpot, pedir indexación en GSC.

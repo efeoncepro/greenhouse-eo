@@ -2,6 +2,11 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-22 — Fundación Luz: excepción individual y outreach documentados
+
+- [Expediente de Mariana](docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md): alta/Primary/nota y envío Outlook con firma gráfica/CCO, EMAIL SENT e InMail verificados; dirección inferida por excepción expresa, sin entrega confirmada ni secuencia.
+- Arquitectura, documentación funcional, manual y referencias espejo concilian la excepción ya vigente; calidad de casilla, permisos por acción y atribución de enlaces separados. Sin schema, filtros, automatizaciones o nuevas comunicaciones por este cierre.
+
 ## 2026-10-22 — Cotizador CLI: perfiles y recursos de referencia
 
 - Réditos: [propuesta Markdown para Claude Design](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/PROPUESTA-GANA-LOTI-2027-PARA-CLAUDE-DESIGN.md) preparada por autorización posterior; narrativa, conceptos, alcances e inversión de borrador, con control interno separado. Sin emisión/envío.
@@ -15,8 +20,6 @@
 - Réditos GRD-1552: rango interno COP36–38M / USD9.863,01–10.410,96 mensuales documentado y Deal valorado en COP456M / USD124.931,51 por 12 meses al escenario principal; sin propuesta ni cambio de etapa. [Base y evidencia](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/BRIEF-COMERCIAL-VIGENTE.md).
 
 - Mantenimiento versionado: tres perfiles faltantes, costos CO estimados y referencia Awario, conservando políticas y controles. [Evidencia](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md). Sin cambios de motor ni publicación a plataforma.
-
-
 
 ## 2026-10-22 — Navegación global del sitio: mecanismo en AXIS (TASK-2040)
 
@@ -679,8 +682,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - Alta autorizada [Sika México LIC-1164](docs/commercial/tenders/sika-mexico-campana-creativa-1164/README.md): empresa México, contacto y deal asociados con nota; Primary corregida tras automatización por dominio. Cohorte 81/81, 19 ACTIVE; 63 individuales y 51 creativos, nuevo 177 Química y materiales con una empresa. Conjuntos exactos y registro OneDrive; sin propuesta enviada.
 - Corte inicial histórico: portal `48713323`, 15 segmentos globales conservados y 18 nuevos activos, con pertenencia obligatoria al lote antes de industria, país, tamaño o cargo. Lectura completa confirma conjuntos exactos y cero registros ajenos. 80 cuentas investigadas, 79 contactos nuevos; 61 individuales con email para preparación, no aprobación de envío.
 - Runbook Agent CLI/MCP, manual de cohortes, método de intención y skills HubSpot/licitaciones espejadas: `IN_LIST(list = ...)`, fit ≠ solicitud ≠ vigencia, persona ≠ buzón compartido, correo disponible ≠ envío validado. [Auditoría, pendientes y estrategia](docs/audits/commercial/2026-10-06-prospeccion-segmentacion-hubspot.md). El corte inicial no creó schemas ni envió outreach. Corrección posterior: cuatro definiciones creadas por Agent CLI, 160 registros con propiedades y 18 ACTIVE migrados en el mismo ID; incorporación automática verificada (62 individuales, Retail 11, roles 32, creativo 50, CRM 26), 15 reglas globales preservadas. Regla en skills: alta completa sólo con propiedades y membresía efectiva. [Decisión](docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md).
-
-## 2026-10-05 — Contractors: integridad de envíos y pagos (ISSUE-179, TASK-2009/2010)
-
-- Correcciones comunes de fechas, monto acordado, adjuntos por período/owner y reintentos atómicos; órdenes y cascade coherentes, sin parciales contractor. Revisiones adicionales cubren concurrencia, snapshot de tarifa y precisión de cantidades.
-- 333 pruebas focales, TypeScript/lint/build/workers y PostgreSQL local aislado PASS; suite global 18.014 PASS, un fallo ajeno de SVG AXIS y 48 skipped. [Auditoría](docs/audits/payroll/CONTRACTOR_FLOW_PRE_RELEASE_AUDIT_2026-10-05.md). Release, canary y recovery pendientes; sin push, deploy ni operaciones financieras reales.
