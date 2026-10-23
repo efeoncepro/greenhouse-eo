@@ -19,6 +19,20 @@ Fecha: 23-10-2026. Estado: **propuesta para aprobar con Natalia**; nada redactad
   desde fuentes oficiales.
 - Las reseñas describen la promesa del artículo; los datos se verifican al redactar, como exige el playbook.
 
+## Registro en el Content Hub (Notion)
+
+El 23-10-2026 se cargaron en el Content Hub de SKY las 28 piezas que no existían, con estado «Idea», fecha tentativa
+y una ficha con reseña, búsqueda principal, URL a optimizar y verificaciones previas. Las 12 que ya estaban cargadas
+por el equipo no se duplicaron ni se modificaron:
+
+- **Nuevos:** N7 Retablos, N9 Chiclayo, N13 Mal de altura, N14 Curanto y N15 Copacabana.
+- **Optimizaciones:** O1 Equipaje de mano, O13 Valdivia, O16 Paraty, O18 Máncora, O21 Tarapoto, O23 Cajamarca y
+  O25 Cusco.
+
+En estas 12 conviene sumar a su ficha la URL que deben reutilizar. Las fechas cargadas son tentativas: los
+temas de servicio y temporada del 2 al 10 de noviembre, Perú del 12 al 26 de noviembre, los internacionales y
+Titicaca y Candelaria en diciembre, y el Carnaval de Cajamarca el 7 de enero de 2027.
+
 ## 15 artículos nuevos
 
 | # | Título | Reseña | Búsqueda principal (mensual) | Ruta | Origen |
