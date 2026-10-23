@@ -132,7 +132,7 @@ Los catálogos por canal están en PDR-020; esta sección dice qué trabajo emoc
 | Detrás de la pieza | orgullo de oficio | mostrar cómo se hizo algo, con sus tropiezos y lo que aprendimos |
 | Oficio en 30 segundos | generosidad | una decisión creativa explicada que se guarda |
 | El equipo | cercanía | personas, rituales y estudio; employer brand |
-| Seasonalities | orgullo de oficio | la temporada vista desde una disciplina de la casa |
+| Seasonalities | orgullo de oficio | la temporada vista desde una disciplina de la casa, **sólo cuando es emocional o cultural**: la seasonality no tiene canal fijo y va al canal donde tiene fit (PDR-020, delta 2026-10-23) |
 | Trendjacking | cercanía | estar en la conversación con criterio, dentro de la ventana |
 | Partners en reel | respeto | el ecosistema con el que trabajamos |
 | **La pregunta de la semana** `[recomendación]` | cercanía | stories con pregunta o encuesta; la respuesta vuelve como pieza |

@@ -80,13 +80,19 @@ El asset fuente y su procedencia viven en `src/assets/fonts/BricolageGrotesque-V
 - Objetivo, mercado, audiencia, concepto elegido y emoción o idea que debe quedar.
 - Guion por slide/segundo, textos en pieza y giro visual; distinguir obligatorio de opcional.
 - Dirección de arte, continuidad entre escenas, recursos vigentes de marca y referencias.
-- **Canal-hogar: Instagram** (PDR-020 §4.4 — el contenido estacional es línea propia permanente). **LinkedIn
-  recibe el argumento profesional desarrollado detrás de la metáfora**, no la misma pieza con otro caption, y
-  sólo cuando la disciplina es legible para un comprador. Si no hay argumento propio, la pieza se queda en
-  Instagram. **Puede compartir el visual clave, nunca el carrusel** (operador, 2026-10-22; PDR-020 delta punto 12):
+- 🔴 **Canal por fit, no por defecto** (operador, 2026-10-23; PDR-020 delta 2026-10-23, que reemplaza el
+  canal-hogar fijo de §4.4). Antes de idear, prueba de fit por canal y registro en el brief de elegidos y
+  descartados con su razón:
+  - **Instagram**: la temporada es emocional o cultural y se celebra desde el oficio o el equipo.
+  - **LinkedIn Efeonce**: tiene consecuencia de negocio para el comprador (cambia cómo compra su cliente, lo
+    regula, mueve una métrica de marketing) y hay un argumento profesional propio.
+  - **LinkedIn de Julio**: Julio tiene una opinión propia sobre la temporada.
+  - **Ninguno**: no conecta con una disciplina de la casa → no se publica; no se rellena calendario.
+  Una temporada puede pasar en varios canales; cada uno recibe su pieza o su argumento, nunca la misma pieza con
+  otro caption. **Puede compartir el visual clave, nunca el carrusel** (operador, 2026-10-22; PDR-020 delta punto 12):
   en LinkedIn va como imagen única con su argumento propio. Transcreación para Estados Unidos cuando corresponda.
-- **Pilar emocional y peldaño** de la escalera del fan: Instagram es marca agencia (love brand, sin conversión
-  directa) y la seasonality ancla por defecto en *orgullo de oficio*; declarar también el mecanismo y la señal
+- **Pilar emocional y peldaño** de la escalera del fan: si la seasonality va a Instagram (marca agencia: love brand,
+  sin conversión directa), ancla por defecto en *orgullo de oficio*; declarar también el mecanismo y la señal
   ([estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §3, §7 y §8).
 - Entregables editables y exportaciones, portada, ALT/descripción, sonido, créditos y procedencia.
 - Responsable, primer corte, entrega completa, margen de ajustes y fecha real de publicación.

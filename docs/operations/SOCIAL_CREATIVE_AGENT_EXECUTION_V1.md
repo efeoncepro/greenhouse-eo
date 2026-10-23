@@ -97,7 +97,10 @@ Antes de gastar en renders, dejar localizables:
 2. Audiencia/mercado, objetivo, ventana y por qué participar.
 3. Observación, tensión, mecanismo, idea elegida y vínculo de marca; alternativas sólo si el concepto sigue abierto.
 4. Papel de marca y modalidad de atribución; un objeto corporativo no es obligatorio.
-5. Canal, formato, recorrido de lectura, copy fijo, referencias por rol y elementos protegidos.
+5. Canal, formato, recorrido de lectura, copy fijo, referencias por rol y elementos protegidos. **En una seasonality de
+   Efeonce, el canal sale de la prueba de fit** (Instagram si es emocional o cultural; LinkedIn de Efeonce si tiene
+   consecuencia de negocio para el comprador; LinkedIn de Julio si hay una opinión propia; ninguno si no conecta con un
+   oficio): registrar canales elegidos y descartados con su razón ([PDR-020, delta 2026-10-23](../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-23--seasonalities-por-fit-de-canal)).
 6. Ruta de producción, defecto que resuelve cada operación y condición de descarte.
 7. Cinco revisiones: estratégica, creativa, cultural/contextual, marca y producción.
 8. Artefactos, versión, decisiones pendientes y alcance de autorización.

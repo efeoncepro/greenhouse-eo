@@ -20,12 +20,25 @@ conserva las decisiones y parámetros reales; el [manual](../../manual-de-uso/so
 explica cómo repetir el trabajo. El [protocolo de agentes](../../operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md)
 enruta las skills.
 
-## Lugar en el sistema de canales (2026-10-22)
+## Lugar en el sistema de canales (2026-10-23)
 
-Las seasonalities siguen siendo una **línea permanente** de Efeonce. Su canal-hogar es **Instagram**, que desde el
-2026-10-22 es un canal de **marca agencia**: su trabajo es el love brand y la comunidad, no vender. Por eso cada
-temporada se cuenta como una demostración de oficio y nunca como saludo. LinkedIn sólo recibe el argumento profesional
-detrás de la metáfora, cuando un comprador puede leer esa disciplina; nunca la misma pieza con otro texto.
+Las seasonalities siguen siendo una **línea permanente** de Efeonce, pero **ninguna red es su destino por defecto**:
+desde el 2026-10-23 cada temporada se publica **sólo en el canal donde tiene fit**. Antes de idear se responde una
+pregunta por canal:
+
+| Canal | La seasonality va ahí cuando… |
+|---|---|
+| **Instagram** (marca agencia) | la temporada es emocional o cultural y se puede celebrar desde el oficio o el equipo |
+| **LinkedIn de Efeonce** | la temporada tiene consecuencia de negocio para el comprador y hay un argumento profesional propio |
+| **LinkedIn de Julio** | Julio tiene una opinión propia sobre la temporada |
+| **Ninguno** | la temporada no conecta con una disciplina de la casa: no se publica |
+
+Una temporada puede ir a más de un canal si pasa la prueba en cada uno, y cada canal recibe su pieza o su argumento;
+nunca la misma pieza con otro texto. En todos los casos se cuenta como demostración de oficio, nunca como saludo.
+Ejemplos del plan de noviembre y diciembre: Día de Muertos y Velitas en Instagram; Black Friday y la Ley 21.719 en
+LinkedIn; el Día de la Usabilidad en ambos.
+
+> Detalle técnico: [PDR-020, delta 2026-10-23](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-23--seasonalities-por-fit-de-canal)
 
 Estado de la temporada de fin de año: **Navidad 2026 se rehace desde cero** (la pieza aprobada el 16 de octubre no se
 usa) y **Año Nuevo quedó archivada sin producir**, conservando su dirección creativa.

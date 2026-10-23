@@ -37,9 +37,17 @@ Usar las skills de Social, Design, Typography, Copy, Motion y Audio según el tr
 Si el plugin Creative Production está disponible y fue solicitado, leer sus skills de intake/produce;
 los módulos locales conservan el aprendizaje estable, no se editan los archivos del plugin en caché.
 
-**Red de destino (desde 2026-10-22).** Una seasonality nace en **Instagram**, que es canal de marca agencia: su trabajo
-es que la gente quiera a Efeonce, no vender, así que nunca lleva precios, «contrátanos» ni formularios. A LinkedIn sólo
-va el argumento profesional detrás de la metáfora, con trabajo propio; si no lo hay, la pieza se queda en Instagram.
+**Red de destino (desde 2026-10-23): por fit, no por defecto.** Antes de idear, pasar la prueba de fit y anotar el
+resultado en el brief:
+
+1. ¿La temporada es emocional o cultural y se puede celebrar desde el oficio o el equipo? → **Instagram** (marca
+   agencia: nunca precios, «contrátanos» ni formularios).
+2. ¿Tiene consecuencia de negocio para el comprador y hay un argumento profesional propio? → **LinkedIn de Efeonce**.
+3. ¿Julio tiene una opinión propia sobre ella? → **LinkedIn de Julio**.
+4. ¿Ninguna de las tres? → **no se publica**. No se rellena el calendario.
+
+Si pasa en más de un canal, cada uno lleva su pieza o su argumento propio. Anotar también los canales descartados y
+por qué ([PDR-020, delta 2026-10-23](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-23--seasonalities-por-fit-de-canal)).
 Antes de producir fin de año, confirmar el estado vigente: Navidad 2026 (MET-2337) se rehace desde cero y su video
 aprobado no se usa; Año Nuevo (MET-2338) quedó archivada sin producir.
 [Sistema de canales](../../documentation/social/sistema-de-canales-y-love-brand.md) ·

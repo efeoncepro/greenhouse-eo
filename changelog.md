@@ -2,6 +2,14 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-23 — Seasonalities por fit de canal (PDR-020 revisión 2.1)
+
+- Decisión del operador: las seasonalities dejan de tener Instagram como canal-hogar fijo; cada temporada va sólo al
+  canal donde tiene fit (Instagram si es emocional o cultural, LinkedIn de Efeonce si tiene consecuencia de negocio para
+  el comprador, LinkedIn de Julio si hay una opinión propia, ninguno si no conecta con un oficio). Delta en PDR-020;
+  alineados la estrategia de love brand, el protocolo social, la documentación, el manual y la skill de social (con su
+  espejo en `.codex`).
+
 ## 2026-10-23 — Navegación global en producción en todo efeoncepro.com (TASK-2042)
 
 - El menú nuevo (AXIS `efeonce.site-nav`) reemplaza la cabecera de Ohio en todo el sitio desde las 00:09 UTC, salvo
@@ -665,9 +673,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - [Política de stack Rooms](docs/architecture/rooms/EFEONCE_ROOMS_STACK_BASELINE_V1.md): últimas estables compatibles, baseline fechado y gate R01 para TS7/tooling, plugins ESLint10, Node LTS y consumidor AXIS. ADR/arquitectura/epic enlazados; sin instalación ni build conjunto verificado.
 - Alcance precisado por el operador: perfiles creativo y SEO/AEO de primera clase, combinables. Modelo de bloques/evidencia, continuidad nativa X-ray, experiencia y criterios de EPIC-052 actualizados; creatividad es el primer recorrido, no el límite de V1. Sin migración de Think/X-ray ni runtime nuevo.
 - ADR de marca con addendum, manuales, criterios/aplicación/QA y skill Codex/Claude sincronizados. Corrección documental; sin cambios de paquetes, implementación, publicación ni despliegue.
-
-## 2026-10-06 — Nano Banana 2.1 en CLI local
-
-- `pnpm ai:nano` usa `gemini-nano-banana-2.1` directo por Google `global`: generación/edición/fusión, sesiones privadas, contexto video/PDF, búsqueda web/imagen, 1K–4K, 14 ratios y thinking. Expone `generateContent`, `streamGenerateContent` y `countTokens`; Batch/Interactions remoto/máscaras no implementados.
-- 29 tests nuevos, TypeScript y canaries reales 1K + edición/stream/búsqueda 2K PASS; [evidencia y límites](docs/audits/ai-tooling/2026-10-06-nano-banana-2-1-cli.md). Manual, ADR embebido y skills espejo sincronizados. Sin push/deploy; runtime y Globe independientes.
-- Nexa cine 4K/`high`, ocho referencias: V2 5504×3072, reservas 4/4 y revisión `APROBABLE`; [prueba y comparación con NX7d/Sunburst](docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md). Preferencia cinematográfica por Sunburst en estas imágenes; Nano destaca en resolución/reservas. No es A/B controlado. Canon, manuales y skills espejo actualizados; OpenAI/GPT Image 2 sigue default de `ai:image`, sin publicar la prueba.

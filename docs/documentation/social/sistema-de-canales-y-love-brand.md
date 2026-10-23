@@ -1,9 +1,9 @@
 # Sistema de canales propios y love brand de Efeonce
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-22 por Claude
-> **Ultima actualizacion:** 2026-10-22 por Claude
+> **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Efeonce Love Brand & Community Strategy V1](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) ·
 > [PDR-020 — canales propios, delta 2026-10-22](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias)
 
@@ -56,8 +56,11 @@ Threads y la serie de YouTube.
 | **YouTube** | El segundo buscador y la profundidad; afecto desde la utilidad | tutoriales «IA con contexto» sobre búsquedas reales y Shorts que llevan a ellos | videos sin una búsqueda detrás, reels subidos tal cual ni miniaturas engañosas |
 | **Glitch** (correo) | La audiencia propia: la lista es nuestra | la edición semanal: lo que pasó y qué significa | — |
 
-Las **seasonalities** siguen siendo una línea permanente y su canal-hogar es Instagram: cada temporada se cuenta como
-una demostración de oficio, nunca como saludo.
+Las **seasonalities** siguen siendo una línea permanente, pero desde el 2026-10-23 **no tienen canal fijo**: cada
+temporada va sólo al canal donde tiene fit (Instagram si es emocional o cultural, LinkedIn de Efeonce si tiene
+consecuencia de negocio para el comprador, LinkedIn de Julio si hay una opinión propia, ninguno si no conecta con un
+oficio). Siempre se cuenta como una demostración de oficio, nunca como saludo
+([PDR-020, delta 2026-10-23](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-23--seasonalities-por-fit-de-canal)).
 
 > Detalle técnico: [PDR-020 §4 Catálogo propio por canal](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#4-catálogo-propio-por-canal-las-franquicias-tienen-canal-hogar) ·
 > [estrategia §7 y §8.1](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#81-linkedin-donde-el-fan-se-vuelve-conversación-operador-2026-10-22) ·

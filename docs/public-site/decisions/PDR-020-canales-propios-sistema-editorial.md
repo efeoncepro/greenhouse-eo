@@ -11,6 +11,9 @@
 > **marca agencia** con objetivo de **love brand y comunidad**; YouTube y el newsletter de LinkedIn de Julio se
 > suman a la familia Marketing con Manzanitas; Glitch entra a Threads sólo como gancho; X queda como canal de
 > escucha. Cierra las decisiones pendientes 1, 4, 5 y 6 (esta última en el punto 12 del delta). Detalle en [Delta 2026-10-22](#delta-2026-10-22--sistema-de-canales-v2-tres-familias).
+> **Revisión 2.1 (2026-10-23, decisión del operador):** las seasonalities dejan de tener canal-hogar fijo: cada
+> temporada se publica **sólo en el canal donde tiene fit**, según la prueba de fit por canal. Detalle en
+> [Delta 2026-10-23](#delta-2026-10-23--seasonalities-por-fit-de-canal).
 > **Ámbito:** Canales propios de marca Efeonce — Blog (Marketing con Manzanitas), LinkedIn (página y Julio),
 > newsletter Marketing con Manzanitas en el LinkedIn de Julio, YouTube, Instagram, Threads y Glitch
 > (newsletter por correo). X sólo como escucha. No cubre canales de cliente ni paid social.
@@ -26,6 +29,33 @@
 > [PDR-018](PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md) (Pillar/Cluster y host),
 > `docs/context/09_marca-agencia.md` (masterbrand y voz), `docs/context/15_panorama-competitivo-benchmark-industria.md`
 > (baseline competitivo), `TASK-1802` (Content Hub `/blog`).
+
+## Delta 2026-10-23 — seasonalities por fit de canal
+
+**Decisión del operador:** «no todos los seasonalities publicarlos en IG, sino segmentarlos por el canal donde tengan
+mejor fit». Reemplaza el canal-hogar fijo de §4.4 (Instagram) y la idea de LinkedIn como satélite opcional. Se
+conservan la definición de seasonality, la regla «nunca un saludo» y el punto 12 del delta 2026-10-22.
+
+**Regla:** ninguna red es destino por defecto. Antes de idear una seasonality se pasa la **prueba de fit** y la pieza
+sale **sólo** en los canales que la pasan. Si ninguno la pasa, la temporada no se publica: no se rellena el calendario.
+
+| Canal | Tiene fit cuando… | Ejemplo (plan nov–dic 2026) |
+|---|---|---|
+| **Instagram** (marca agencia) | la temporada es **emocional o cultural** y se puede celebrar **desde el oficio o el equipo**; la pieza es visual antes que argumental | Día de Muertos, Día de las Velitas (CO), Navidad y Año Nuevo del equipo |
+| **LinkedIn Efeonce** (conexión B2B) | la temporada tiene **consecuencia de negocio para el comprador** (cambia cómo compra su cliente, lo regula, mueve una métrica de marketing) y hay un **argumento profesional propio** | Black Friday y Cyber, entrada en vigencia de la Ley 21.719, Día de la Usabilidad (sitios y apps que venden) |
+| **LinkedIn de Julio** | Julio tiene una **opinión propia** sobre la temporada (lo que vio en terreno, una postura) | cierre de año: lo aprendido de la IA en 2026 |
+| **Threads** (desde febrero de 2027) | cabe una **lectura rápida en texto** sobre la temporada, sin pieza visual | — |
+| **Ninguno** | no conecta con una disciplina de la casa | la mayoría de los «días de…» de calendario |
+
+- **Una temporada puede tener fit en más de un canal**; cada canal recibe su pieza o su argumento propio. Sigue
+  vigente el punto 12 del delta 2026-10-22: el visual clave puede ir a LinkedIn como imagen única con argumento
+  propio, nunca el carrusel ni la misma pieza con otro caption.
+- **El brief registra la prueba:** canal(es) elegidos con su razón y los descartados con la suya. «Lo publicamos
+  en todos lados» no es una razón.
+- **La métrica sigue al canal:** en Instagram, envíos y guardados; en LinkedIn, la conversación del comprador
+  (comentarios de calidad, guardados, visitas al perfil). Nunca seguidores ni volumen de posts.
+- **El plan 2026–2027 se relee con esta prueba** antes de producir cada pieza; las piezas ya programadas no se
+  despublican por esta regla.
 
 ## Delta 2026-10-22 — sistema de canales v2: tres familias
 
@@ -239,7 +269,7 @@ El sistema distingue dos cosas:
 | **Versus** | YouTube + Blog (data study) | Instagram: el resultado visual · LinkedIn: el veredicto y qué implica |
 | **Glitch** | Glitch (email) | Blog: archivo · Threads: el gancho el día de la edición, con invitación a suscribirse · LinkedIn: la lectura de una noticia |
 | **Trendjacking** | Threads + Instagram | — reactivo; no se despieza a canales lentos |
-| **Seasonalities** | Instagram | LinkedIn: el argumento profesional detrás de la metáfora, sólo cuando la disciplina es legible para un comprador (ver capa 4.4) |
+| **Seasonalities** | por fit (delta 2026-10-23) | cada temporada va sólo al canal donde tiene fit: Instagram si es emocional o cultural, LinkedIn si tiene consecuencia de negocio (ver capa 4.4) |
 | **Casos de Éxito** | Blog (canonical) | LinkedIn: el corte que circula · sales enablement: la versión en video · landings: el dato citable |
 | **Educativo** | LinkedIn | Blog: la versión que responde a búsqueda (ver capa 4.1) |
 
@@ -342,10 +372,10 @@ retícula editorial que empieza a bailar (diseño editorial).
 
 | Atributo | Valor |
 |---|---|
-| **Canal-hogar** | Instagram — es craft y cultura, y la pieza es visual antes que argumental |
-| **Satélite** | LinkedIn, **sólo** cuando la disciplina de la metáfora es legible para un comprador |
-| **Qué recibe el satélite** | **el argumento profesional detrás de la metáfora**, desarrollado — nunca la misma pieza con otro caption |
-| **Métrica** | sends + saves (que la pieza se reenvíe). **Nunca seguidores ni volumen de posts** |
+| **Canal** | **por fit, no fijo** (delta 2026-10-23): Instagram cuando la temporada es emocional o cultural; LinkedIn Efeonce cuando tiene consecuencia de negocio para el comprador; LinkedIn de Julio cuando hay una opinión propia; ninguno si no conecta con un oficio |
+| **Varios canales** | sólo cuando la temporada pasa la prueba en cada uno |
+| **Qué recibe LinkedIn** | **el argumento profesional detrás de la metáfora**, desarrollado — nunca la misma pieza con otro caption |
+| **Métrica** | la del canal: en Instagram, sends + saves (que la pieza se reenvíe); en LinkedIn, la conversación del comprador. **Nunca seguidores ni volumen de posts** |
 | **Trabajo** | afinidad de marca por demostración de oficio |
 | **Unidad de planificación** | la ventana de la temporada, por mercado |
 
@@ -361,6 +391,8 @@ distintos.
   El estándar es el del plan vigente: una metáfora que sólo Efeonce podría firmar.
 - **NUNCA tratar una seasonality como una fecha.** Se planifica por ventana y por mercado; la fecha de
   publicación es un hito dentro de la temporada, no la temporada.
+- **NUNCA publicar una seasonality en un canal sin pasar la prueba de fit** (delta 2026-10-23); si ningún canal la
+  pasa, no se publica.
 - **NUNCA publicar la misma pieza en Instagram y LinkedIn con caption distinto.** LinkedIn recibe el
   argumento desarrollado o no recibe nada.
 - **El plan 2026–2027 sigue vigente** (`docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md`):

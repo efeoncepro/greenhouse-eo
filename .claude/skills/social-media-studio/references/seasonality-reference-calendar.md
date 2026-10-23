@@ -56,8 +56,10 @@ de cualquier escritura autorizada. Estos IDs son localizadores, no permisos.
 8. Programar únicamente con versión, cuenta, red y fecha autorizadas; comprobar resultado en Metricool.
    No programar a partir de la mera presencia de una efeméride en el referente.
 
-Para Efeonce, Instagram puede demostrar oficio mediante una metáfora; LinkedIn necesita un argumento
-profesional propio, no duplicación con otro caption. Para clientes mandan su estrategia, comunidad,
+Para Efeonce, cada seasonality va sólo al canal donde tiene fit (PDR-020, delta 2026-10-23; prueba en
+`efeonce/SEASONAL_CONTENT.md`): Instagram puede demostrar oficio mediante una metáfora si la temporada es emocional o
+cultural; LinkedIn necesita consecuencia de negocio para el comprador y un argumento profesional propio, no
+duplicación con otro caption; si ningún canal tiene fit, no se publica. Para clientes mandan su estrategia, comunidad,
 territorio de marca y alcance de servicio. No transferir automáticamente la voz ni los activos de Efeonce.
 Fechas de derechos, duelo, salud o comunidades requieren una contribución pertinente y voces respetadas;
 no convertirlas en un saludo promocional ni afirmar compromisos no existentes.
