@@ -2,6 +2,16 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-23 — Auditoría SEO del Blog SKY e informe A4 premium para auditorías
+
+- Auditoría consolidada del Blog SKY (GSC/GA4 al 21-10, Semrush CL/PE, SERP en vivo, 1.700 publicaciones): sin
+  penalización, caída en tres etapas, plugin SEO perdido en la migración, copia indexable en Azure y 9 artículos de
+  Perú despublicados después del 15-10. Informe de 23 páginas generado (no enviado) y correos en borrador.
+  [Caso](docs/services/sky-blog-seo/caso-auditoria-2026-10/README.md).
+- Catálogo `insights-report`: plantillas `report-findings` y `report-scenarios`, `productLabel`, etapas/hitos/rótulos
+  en la tendencia, guarda del pie en todas las páginas en papel y `pnpm report:compose`. Gate visual Insights a 0 px
+  con los dos frames nuevos declarados (BASELINE_DELTAS ab); páginas aprobadas dentro del 1 %.
+
 ## 2026-10-23 — Medición del menú global y del dock de las landings (TASK-2042/2043)
 
 - GTM web publicado en la versión 10: `gh_landing_dock_clicked` (v8), `gh_site_nav_opened`, `gh_site_nav_line_viewed`
@@ -660,7 +670,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 ## 2026-10-07 — Prospecting Agent: voz de Julio y enlace de reunión
 
 - [Manual](docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md), ADR, snapshot exacto y skills Codex/Claude: contexto, una capacidad, invitación con agenda y alternativa de respuesta; guardar/aprobar/readback. Configuración de 7.969 caracteres verificada en HubSpot: añade enlace institucional en la primera mención de Efeonce y conserva agenda; QA del último borrador pendiente, sin envío.
-
-## 2026-10-07 — Firma Efeonce en HubSpot: instalación por HTML
-
-- [Manual](docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md#instalar-la-firma-en-hubspot) y skills HubSpot/línea gráfica (Codex y Claude): recuperar HTML aprobado, comprobar imágenes y pegar código fuente en HTML; fallo observado del pegado en Simple. Firma de Julio guardada y preview verificada; recepción no probada.

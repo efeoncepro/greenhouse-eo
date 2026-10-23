@@ -1,5 +1,17 @@
 # Handoff
 
+## 2026-10-23 — Auditoría SEO del Blog SKY: informe listo, envío pendiente de Julio
+
+Informe A4 de 23 páginas «Por qué cayó el tráfico y cómo recuperarlo» generado y revisado página por página
+(`outputs/sky-blog-seo-audit-2026-10-23/informe/`; copia para adjuntar en OneDrive › Alineación › 1. Clientes
+(Interno) › Sky - SEO-AEO › Auditoría SEO 2026-10). **Nada enviado a SKY:** los dos correos están en borrador en
+[`caso-auditoria-2026-10/correos/`](docs/services/sky-blog-seo/caso-auditoria-2026-10/README.md) y salen por Outlook web
+con firma gráfica y CCO HubSpot. Urgente para SKY: nueve artículos de Perú despublicados entre el 15 y el 23-10
+(restaurables desde la papelera 30 días) y la propiedad GSC de `www.skyairline.com`, que vence entre nov-2026 y
+ene-2027. El renderer ganó capacidades en `001683d83` (`pnpm report:compose`; regenerar con
+`pnpm exec tsx scripts/seo/sky-blog-audit-report.ts`). El logo de SKY adjunto a la organización es generado por IA:
+usar `ai-generations/2026-09-23_cmp003-sky-hangar/refs/sky-official.svg`. **Sin push.**
+
 ## 2026-10-23 — Medición del menú global y del dock de las landings (TASK-2042/2043)
 
 GTM web `GTM-NGHPGRLZ` publicado en la versión 10: la 8 suma `gh_landing_dock_clicked`, la 9 los
@@ -215,11 +227,3 @@ aditivas aplicadas y verificadas; sin replay manual ni certificación de entrega
 Ads **OFF**, GTM sin publicar: hosts/Preview/políticas por fuente/EC conservan su rollout pendiente.
 [Auditoría y límites](docs/audits/releases/2026-10-18-full-develop-production-release.md),
 [tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md) y [historial](Handoff.archive.md).
-
-## 2026-10-18 — Shared deal HubSpot: liderazgo Partner
-
-Automatización del radar actualizada y leída de vuelta: control adjudicación/contrato/fechas previo a recomendar, créditos o Deal; adjudicada=descartar, evidencia pendiente=HOLD. MismoID/09:00Santiago/permisos. [Evidencia](docs/commercial/prospecting-agent/runs/2026-10-18-1128-control-adjudicacion-automatizacion.md).
-
-**RECTIFICACIÓN:** Esenttia5600218590 ya adjudicadaDACARTEC(firma10Oct/inicio15Oct). Julio cerróDeal10:32; sinsync. No pendiente de admisión/POI; llamada nativa anulada. Mala calificación del agente. [Cierre corregido](docs/commercial/prospecting-agent/runs/2026-10-18-1036-esenttia-adjudicada-rectificacion.md).
-
-Julio pidió aprender el flujo; [procedimiento](docs/manual-de-uso/hubspot/convertir-negocio-compartido.md) y skills actualizados. Esenttia66218288550 convertido10:08GMT-3 con liderazgoPartner, fecha local31/12/2026 y declaración confirmadas. TarjetaHubSpot muestra30/12: agente debe conciliar, sin falsear cierre local. Admisión/POI pendientes; no repetir consulta ni contactar automáticamente. [Evidencia](docs/commercial/prospecting-agent/runs/2026-10-18-1002-esenttia-shared-deal.md).

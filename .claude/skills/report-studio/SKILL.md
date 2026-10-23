@@ -73,6 +73,8 @@ Usa la ruta apropiada de [producción](references/pdf-production.md). Mantén te
 
 En Efeonce aplica el overlay desde el inicio: URL bubble oficial, contacto y logos. No entregues el HTML como sustituto del PDF acordado.
 
+Un informe Efeonce A4 se compone sobre el catálogo premium `insights-report` con `pnpm report:compose <plan.json>`, desde un plan JSON de intención generado por script y con su `productLabel`; no se maqueta HTML a mano para imitarlo. Para auditorías hay hallazgos con severidad, escenarios contra el año anterior y tendencia con etapas e hitos. Si la guarda del pie detiene el render, se acorta el copy, nunca se toca la plantilla ni el baseline ([overlay](references/efeonce-overlay.md)).
+
 ### 6. Verificar e iterar
 
 Verifica el **archivo exportado** con [QA](references/quality-and-delivery.md). Usa `scripts/check_pdf.py` con un manifiesto adaptado si el destino es PDF. La salida automatizada es un preflight, no una certificación visual ni PDF/UA.

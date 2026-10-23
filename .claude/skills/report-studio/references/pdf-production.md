@@ -11,6 +11,7 @@ Consulta de fuentes: 2026-09-04. Este módulo prescribe un flujo de trabajo; no 
 - Archivo a largo plazo: PDF/A requiere un flujo y validación específicos; no nace de guardar como PDF.
 - Accesibilidad: PDF/UA requiere validación contra la versión aplicable y controles humanos; `tagged: true` no basta.
 - PDF digital RGB y archivo de imprenta son entregables distintos. No convertir colores de marca a CMYK por costumbre.
+- Informe Efeonce A4 (auditoría, diagnóstico, resultados): el carril es el Artifact Composer, no HTML propio. Un plan JSON de intención se compone con `pnpm report:compose` sobre el catálogo `insights-report`, que ya resuelve retícula, pie, folios, fuentes incrustadas y la guarda que impide que el cuerpo cubra el pie (ver [overlay](efeonce-overlay.md)). Las secciones 3–5 aplican cuando el formato no tiene catálogo.
 
 ## 2. Contrato de producción
 

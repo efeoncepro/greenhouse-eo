@@ -4,13 +4,18 @@ Estado: marco operativo interno aprobado para preparación por Julio el 15-10-20
 las cantidades finales y las metas numéricas siguen sujetos a su fuente firmada y a la auditoría. Inicio
 acordado en reunión: 01-11-2026; kickoff operativo: 02-11-2026 a las 10:00, Chile. No se verificó el calendario.
 
+Estado al 23-10-2026: auditoría consolidada entregable e informe A4 para SKY generado y revisado; correos
+redactados; **nada enviado a SKY**. El expediente del encargo vive en [`caso-auditoria-2026-10/`](caso-auditoria-2026-10/README.md)
+y sus cifras salen sólo de [HECHOS.md](caso-auditoria-2026-10/HECHOS.md).
+
 ## Resultado y alcance
 
 La [matriz de cobertura y pendientes](COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md) distingue el
 diagnóstico base entregado de la auditoría integral todavía parcial: migración, indexación/seguridad,
 calidad editorial, competencia/SERP, enlaces externos, experiencia móvil y medición comercial.
-El primer lote está preparado; implementación y resultados siguen pendientes. El alcance auditado es
-el blog y su prefijo histórico; todo el SEO de SKY y reservas requieren una delimitación adicional.
+El 23-10 los frentes 01 a 06 avanzaron sin cerrarse. El primer lote está preparado y reordenado;
+implementación y resultados siguen pendientes. El alcance auditado es el blog y su prefijo histórico;
+todo el SEO de SKY y reservas requieren una delimitación adicional.
 
 Operar la recuperación y el crecimiento orgánico de `blog.skyairline.com` con diagnóstico técnico,
 priorización editorial, optimización del contenido existente y medición trazable. El servicio busca que
@@ -19,10 +24,11 @@ visitas relevantes y acciones observables hacia la oferta de vuelos.
 
 La reunión del 15 de octubre registra una caída histórica declarada por el cliente de aproximadamente
 80.000 a 40.000 visitas después de una migración motivada por problemas de seguridad, alrededor de agosto
-de 2025. La [auditoría del 15-10](../../audits/growth/2026-10-15-sky-organic-channel-audit.md) confirma
-una baja de sesiones orgánicas de 58,1% alrededor del traslado y observa la transición del prefijo
-`www.skyairline.com/blog/` al subdominio el 26–27 de septiembre de 2025. La unidad exacta de las cifras
-de Pilar y el registro técnico de despliegue siguen pendientes. No hay penalización de Google confirmada.
+de 2025. La [auditoría del 15-10](../../audits/growth/2026-10-15-sky-organic-channel-audit.md) observó la
+transición del prefijo `www.skyairline.com/blog/` al subdominio el 26–27 de septiembre de 2025. La
+[auditoría consolidada del 23-10](../../audits/growth/2026-10-23-sky-blog-seo-audit-consolidada.md) corrige
+la lectura: GA4 confirma el «80k→40k» de Pilar (sep-25 75.506 → oct-25 42.585 sesiones Organic Search),
+y el registro técnico de despliegue sigue pendiente.
 
 Pilar espera una recuperación importante durante los tres primeros meses. Julio comprometió una auditoría
 para el martes 20 de octubre o antes y preparar el indicador de equivalencia publicitaria. No comprometió
@@ -41,6 +47,25 @@ Las cantidades mensuales, extensión de artículos, newsletter, producción visu
 del blog se confirman en el anexo y su calendario aprobado. Las propuestas comerciales son antecedentes;
 este documento no convierte sus cantidades o precios en condiciones firmadas. No incluye compra de medios,
 reconstrucción de infraestructura, migración nueva o intervención del motor de reservas por inferencia.
+
+## Diagnóstico vigente (23-10-2026)
+
+- **Sin evidencia de penalización.** Las URL antiguas redirigen 1:1 con 301 (muestra de 110: 93,6 % mismo
+  slug, 3,6 % equivalente, 2,7 % a 404; cero 302 y cero a la home). Falta revisar acciones manuales y
+  seguridad en la interfaz GSC.
+- **Tres etapas, no una:** deterioro previo (mar–sep 2025, coincide con AI Overviews y publicación masiva),
+  migración (26–27/09/2025) y caída posterior (quiebre de posición hacia el 20-04-2026 y escalón desde el
+  15-10-2026 en búsquedas de marca de equipaje). Octubre 2026 va −35,6 % interanual: no está estabilizado.
+- **Causa técnica nombrada:** el plugin SEO (All in One SEO) no se migró; 0 de 1.700 artículos con meta
+  description, JSON-LD o autor. Se suman la copia indexable en Azure, la falta de sitemap/robots, el 37 %
+  de posts alcanzables por enlaces y las hipótesis de subdominio vs. subcarpeta, AI Overviews y volumen.
+- **Alerta Perú:** nueve artículos de Perú vivos el 15-10 respondían 404 el 23-10, mientras aparecían 12
+  posts nuevos. Alguien con acceso al WordPress retira y publica; el detalle está en HECHOS.
+- **Escenarios nov-26 a ene-27:** sin intervenir, base y estructural, como estimación de Efeonce y no
+  compromiso. El valor publicitario se presenta como rango (US$ 6–16 mil/mes hoy; 28–45 mil antes de migrar).
+
+El informe A4 (23 páginas) se regenera con `pnpm exec tsx scripts/seo/sky-blog-audit-report.ts` y
+`pnpm report:compose`, usando el logo oficial negativo de SKY; el detalle está en el [caso](caso-auditoria-2026-10/README.md).
 
 ## Fuentes de verdad
 
@@ -75,6 +100,8 @@ usuarios conserva contenido, autoría y acceso de recuperación. El dueño técn
 El [primer lote de recuperación preparado el 15-10](PLAN_RECUPERACION_PRIMER_LOTE_2026-10-15.md) concreta
 veinte URLs priorizadas, diez del primer lote, con fichas, metadatos propuestos, manifiestos técnicos y
 seguimiento. Es preparación revisable: la implementación y sus resultados conservan su estado propio.
+Desde el 23-10 el lote se reordena: primero las palancas de todo el sitio y lo estacional antes del 15-11;
+ver el Delta del plan y el backlog editorial de 30 piezas en `outputs/sky-blog-seo-audit-2026-10-23/`.
 
 | Momento | Trabajo y criterio de salida |
 | --- | --- |
@@ -106,6 +133,9 @@ Organización: `org-b9977f96-f7ef-4afb-bb26-7355d78c981f`. Host exacto: `blog.sk
   No equiparar 38.332 sesiones de todos los canales con tráfico orgánico ni con los 28.718 clics GSC.
 - Comparar meses completos, mismo host/propiedad/tipo y métricas compatibles; revisar estacionalidad y fechas
   de la migración. La cifra histórica declarada por el cliente todavía no es una meta calibrada.
+- **La recuperación se mide contra el mismo mes del año anterior** (nov-25 44,0k · dic-25 49,5k · ene-26
+  67,9k sesiones Organic Search), nunca contra septiembre: enero sube por temporada aunque no se haga nada.
+  Los escenarios del [caso](caso-auditoria-2026-10/HECHOS.md) usan esa referencia.
 
 El cuadro mensual incluye clics, impresiones, CTR y posición GSC; sesiones Organic Search de GA4 sobre el
 alcance definido; páginas recuperadas/afectadas; resultados por marca/sin marca y país. Las acciones hacia
@@ -125,18 +155,23 @@ Cambios de alcance, metas o método se registran con fecha, motivo y aprobador. 
 histórica de Insights ni modificar un baseline silenciosamente. Registrar cambio de metodología antes de
 comparar series DataForSEO de distintas fórmulas ETV.
 
-## Pendientes al 15-10-2026
+## Pendientes al 23-10-2026
 
 Los siete frentes de investigación, responsables propuestos y checks de cierre se mantienen en la
-[matriz de cobertura](COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md). Las dependencias comerciales y
-de operación siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
+[matriz de cobertura](COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md). Los pendientes del encargo del 23-10
+(envío del correo formal con el PDF, restauración de los nueve artículos de Perú, export de la propiedad GSC
+`www.skyairline.com`, acciones manuales y seguridad, acceso a WordPress, logo de SKY en Greenhouse y
+validación de escenarios en el kickoff) tienen dueño y condición de cierre en la
+[tabla del caso](caso-auditoria-2026-10/README.md#pendientes). Las dependencias comerciales y de operación
+siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
 
 - Anexo firmado y cantidades finales.
 - Acceso WordPress autenticado y registros técnicos de migración. Inventario público completado: 1.697
   posts, todos rastreados; incluye demo y duplicados, no equivale a piezas editoriales únicas.
-- Registro de despliegue y cambios históricos de medición. Julio no dispone del GSC anterior; no bloquea
-  profundizar con GA4, GSC actual, archivo y cohortes. La auditoría enlaza el complemento con regresiones
-  verificadas y desagregación de canales; atribución causal completa todavía no disponible.
+- Registro de despliegue y cambios históricos de medición. Julio no dispone del GSC anterior; GSC conserva
+  16 meses, así que los datos de jul–sep 2025 de la propiedad `www` o de dominio se pierden entre noviembre
+  de 2026 y enero de 2027: pedir a SKY el acceso y exportarlos ahora. Mientras tanto se avanza con GA4,
+  GSC actual, archivo y cohortes; atribución causal completa todavía no disponible.
 - Último informe del proveedor anterior y prioridades de rutas confirmadas por SKY.
 - Definición y validación del tráfico orgánico de entrada GA4 por host en informes automáticos.
 - Validación con SKY de nombres, lectura y cadencia del indicador monetario.
@@ -150,4 +185,10 @@ de operación siguientes conservan su seguimiento propio; preparar documentos no
 - [Verificación GA4](../../audits/growth/2026-10-15-sky-ga4-connection-verification.md).
 - [Verificación GSC y Excel](../../audits/growth/2026-10-15-sky-search-console-connection-verification.md).
 - [Auditoría orgánica, migración e inventario](../../audits/growth/2026-10-15-sky-organic-channel-audit.md).
+- [Auditoría consolidada del 23-10](../../audits/growth/2026-10-23-sky-blog-seo-audit-consolidada.md), que
+  corrige y amplía la anterior (§6).
+- [Caso de auditoría y entrega, octubre 2026](caso-auditoria-2026-10/README.md) y sus
+  [hechos verificados](caso-auditoria-2026-10/HECHOS.md).
+- Informe A4 y tablas de apoyo: `outputs/sky-blog-seo-audit-2026-10-23/`; generador del plan:
+  [`scripts/seo/sky-blog-audit-report.ts`](../../../scripts/seo/sky-blog-audit-report.ts).
 - [Expediente comercial antecedente](../../commercial/tenders/sky-blog-2026/README.md).

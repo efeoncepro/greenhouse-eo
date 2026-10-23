@@ -1,5 +1,26 @@
 # SKY · Primer lote de recuperación orgánica
 
+## Delta 2026-10-23
+
+La [auditoría consolidada del 23-10](../../audits/growth/2026-10-23-sky-blog-seo-audit-consolidada.md)
+(§6.7 y §7) concluye que este lote es editorialmente razonable pero tiene poca palanca. Se reordena así;
+el contenido histórico de abajo se conserva como corte del 15-10. Nada se aplicó todavía.
+
+1. **Primero, palancas de todo el sitio** (mueven las 1.700 URL): reinstalar el plugin SEO con metas,
+   schema y autores; cerrar la copia indexable del origen Azure; robots.txt real y sitemap enviado en GSC;
+   301 de los 404 con tráfico.
+2. **La URL larga de cambio de vuelo** (`/como-cambiar-un-vuelo-en-sky-pasos-y-condiciones/`) se resuelve
+   con un 301 inmediato a `/cambiar-vuelo-sky/`, que tiene su mismo H1; deja de ser una decisión abierta.
+3. **Contenidos de temporada antes del 15-11** (Año Nuevo en Santiago, cenas de Navidad chilena y peruana)
+   y consolidación del clúster de equipaje y check-in con datos del Centro de Ayuda. El metadato propuesto
+   para cabina debe incluir «equipaje de mano» y «bolso».
+4. **Bajan de prioridad como recuperación:** Trujillo (6 clics en ago–sep), Destinos de verano (29) y
+   SKY Plus (página nueva en crecimiento). Pueden seguir como trabajo editorial, no como recuperación.
+
+El nuevo backlog editorial de 30 piezas para noviembre–enero está en
+`outputs/sky-blog-seo-audit-2026-10-23/SKY-backlog-editorial-nov-ene.csv`. La aprobación de títulos y
+sinopsis por SKY y el acceso a WordPress siguen siendo condición para ejecutar.
+
 La [matriz de cobertura](COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md) mantiene abiertos siete frentes
 del diagnóstico integral. Este documento concreta el lote de implementación; ambos avances se registran
 por separado, sin convertir un lote preparado en una auditoría integral cerrada.

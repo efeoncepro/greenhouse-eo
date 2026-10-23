@@ -3,9 +3,26 @@
 ## Delta 2026-10-23
 
 - La [auditoría consolidada del 23-10](../../audits/growth/2026-10-23-sky-blog-seo-audit-consolidada.md)
-  avanza los frentes 01 a 06 (§9 de ese documento) sin cerrarlos: siguen pendientes la revisión de acciones
-  manuales y seguridad en la interfaz GSC, el registro de despliegue de TI y los datos de campo CWV.
-- Alerta: nueve posts de Perú vivos el 15-10 responden 404 el 23-10; hay que identificar quién retira contenido.
+  avanza los frentes 01 a 06 y aporta una primera lectura del 07 (§9 de ese documento). **Ningún check de
+  cierre se marca:** cada frente sigue con una pieza de evidencia exigida que no existe todavía. Cifras y
+  corte en [HECHOS.md](caso-auditoria-2026-10/HECHOS.md); expediente en el [caso](caso-auditoria-2026-10/README.md).
+- Alerta: nueve posts de Perú vivos el 15-10 responden 404 el 23-10 sin redirección, y aparecieron 12 posts
+  nuevos en el mismo lapso; hay que identificar quién retira contenido y restaurarlos.
+- Cambia el criterio sobre el GSC anterior (§ Orden y trabajo): sigue sin bloquear el diagnóstico, pero ya
+  no es sólo un límite histórico. GSC conserva 16 meses y los datos de jul–sep 2025 de la propiedad `www` o
+  de dominio vencen entre noviembre de 2026 y enero de 2027; pedir el acceso a SKY y exportarlos es urgente.
+- Ningún cambio se aplicó al CMS, redirecciones, Azure, GTM ni conexiones; implementación y resultados de
+  recuperación siguen sin observarse.
+
+| Frente | Avance del 23-10 | Sigue abierto |
+| --- | --- | --- |
+| SKY-AUD-01 | Cronología en tres etapas (previa, migración, posterior) con GA4 mensual; capa SEO perdida demostrada con archivo (AIOSEO 4.7.9.1 el 12-09-2025, nada hoy); redirecciones 1:1 en muestra de 110. | Registro de despliegue de TI, backups y reglas de redirección; último reporte del proveedor; export de la propiedad GSC `www` antes de que venza (nov-2026 a ene-2027). |
+| SKY-AUD-02 | Copia indexable en Azure, robots.txt 404, sitemaps no enviados, canonical roto en `/page/2/` y 37 % de posts alcanzables por enlaces; 1.662 páginas con impresiones en septiembre. | Acciones manuales, problemas de seguridad, informe de páginas y CWV en la interfaz GSC, con captura fechada. |
+| SKY-AUD-03 | Clasificación de 1.697 posts, 41 grupos canibalizados con 217 artículos, cobertura de rutas de Perú (17 destinos operados) y backlog de 30 piezas. | Contraste con Content Hub y revisión editorial declarada por cohorte; decisiones de consolidación aprobadas por SKY. |
+| SKY-AUD-04 | Seis SERP en vivo (CL, 23-10) y series Semrush CL/PE; el blog fuera del top 10 para «sky equipaje». | Panel documentado de consultas de viajeros por país y dispositivo, con brecha de intención por URL. |
+| SKY-AUD-05 | Subdominio con 262 dominios de referencia frente a 7.316 del dominio raíz. | Listado priorizado de enlaces externos con estado HTTP actual y acción. |
+| SKY-AUD-06 | Laboratorio móvil por plantilla (LCP 5,7–20 s). | Datos de campo (PSI con cuota agotada; informe CWV de GSC pendiente). |
+| SKY-AUD-07 | Clics del blog hacia `skyairline.com` proporcionales al tráfico (39,6k ene-26 → 13,2k sep-26). | Eventos, consentimiento y cadena hasta reservas; sin acceso a conversiones. |
 
 Corte: 15-10-2026. Registro de cobertura del diagnóstico; no certifica nuevas comprobaciones ni cambios
 en producción. Se actualiza al incorporar evidencia. Los resultados numéricos y artefactos conservan su
