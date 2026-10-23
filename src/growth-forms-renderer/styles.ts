@@ -728,6 +728,38 @@ ${DARK_TOKENS}
   }
   .ghf-check a { color: var(--ghf-accent); }
 
+  /* TASK-2045 — consentimiento compacto: casilla nativa (accent-color), sin tarjeta, enlace dentro de la frase. */
+  .ghf-check.ghf-check--compact,
+  .ghf-check.ghf-check--compact:hover {
+    min-height: 0;
+    gap: 10px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .ghf-check.ghf-check--compact input {
+    position: static;
+    flex: none;
+    inline-size: var(--ghf-consent-box, 18px);
+    block-size: var(--ghf-consent-box, 18px);
+    margin: 1px 0 0;
+    opacity: 1;
+    appearance: auto;
+    accent-color: var(--ghf-consent-accent, var(--ghf-accent));
+  }
+  .ghf-check.ghf-check--compact input:focus-visible { outline: 2px solid var(--ghf-focus); outline-offset: 2px; }
+  .ghf-check.ghf-check--compact span {
+    min-height: 0;
+    padding-inline-start: 0;
+    font-size: var(--ghf-consent-size, 0.8125rem);
+    line-height: 1.5;
+    color: var(--ghf-consent-color, var(--ghf-muted));
+  }
+  .ghf-check.ghf-check--compact span::before,
+  .ghf-check.ghf-check--compact span::after { content: none; display: none; }
+  .ghf-check.ghf-check--compact a { color: var(--ghf-consent-link, var(--ghf-accent)); text-decoration: underline; text-underline-offset: 2px; }
+
   .ghf-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-actions {
     width: min(100%, 560px);
@@ -896,10 +928,13 @@ ${DARK_TOKENS}
   }
 
   greenhouse-form .ghf-form .ghf-btn--ghost,
-  .ghf-scope .ghf-form .ghf-btn--ghost {
-    background: transparent !important;
-    color: var(--ghf-fg) !important;
-    border-color: var(--ghf-border-strong) !important;
+  greenhouse-form .ghf-success-card .ghf-btn--ghost,
+  .ghf-scope .ghf-form .ghf-btn--ghost,
+  .ghf-scope .ghf-success-card .ghf-btn--ghost {
+    background: var(--ghf-btn-ghost-bg, transparent) !important;
+    color: var(--ghf-btn-ghost-fg, var(--ghf-fg)) !important;
+    border-color: var(--ghf-btn-ghost-border, var(--ghf-border-strong)) !important;
+    box-shadow: none !important;
   }
   greenhouse-form .ghf-form .ghf-btn--skip,
   .ghf-scope .ghf-form .ghf-btn--skip {
@@ -1201,6 +1236,20 @@ ${DARK_TOKENS}
   .ghf-success-card__party-popper-confetti-warm {
     fill: var(--ghf-celebration);
   }
+  /* TASK-2045 — glifo de La órbita en el éxito: el arco se dibuja una vez (sin bucle). */
+  .ghf-orbit-mark { inline-size: 100%; block-size: 100%; overflow: visible; }
+  .ghf-orbit-mark__ring { stroke: var(--ghf-orbit, var(--ghf-accent)); stroke-opacity: 0.25; stroke-width: 1.5; }
+  .ghf-orbit-mark__arc {
+    stroke: var(--ghf-orbit, var(--ghf-accent));
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-dasharray: 1 1;
+    animation: ghf-orbit-draw 600ms cubic-bezier(0.2, 0, 0, 1) 120ms both;
+  }
+  .ghf-orbit-mark__sphere { fill: var(--ghf-orbit, var(--ghf-accent)); }
+  @keyframes ghf-orbit-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) { .ghf-orbit-mark__arc { animation: none; } }
+
   .ghf-success-card__content {
     display: grid;
     justify-items: center;

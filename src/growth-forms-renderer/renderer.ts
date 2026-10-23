@@ -15,6 +15,7 @@ import { emitGoogleAdsConversion } from '../growth-google-ads-conversion/convers
 import type {
   PublicSubmitOutcome,
   RenderContract,
+  RendererConsentDisplay,
   RendererFieldDefinition,
   RendererSuccessBehavior,
   RendererSuccessCardAction,
@@ -71,6 +72,15 @@ export interface FormRendererOptions {
 
 /** Atributo que excluye un <form> de la captura de formularios no-HubSpot de HubSpot. */
 export const HUBSPOT_DO_NOT_COLLECT_ATTRIBUTE = 'data-hs-do-not-collect'
+
+/** TASK-2044 — Único marcador del enlace a la política en una casilla (espejo de `CONSENT_PRIVACY_LINK_MARKER`). */
+export const CONSENT_PRIVACY_LINK_MARKER = '{privacyLink}'
+
+/**
+ * TASK-2045 — Evento DOM que pide al anfitrión cerrar la superficie que contiene al formulario (acción
+ * de éxito `dismiss`). No es telemetría: se emite aunque la política de telemetría esté apagada.
+ */
+export const GROWTH_FORM_DISMISS_EVENT = 'ghf:dismiss'
 
 const el = <K extends keyof HTMLElementTagNameMap>(
   doc: Document,
@@ -2261,6 +2271,49 @@ export class FormRenderer {
     })
   }
 
+  /**
+   * TASK-2045 — El estado de envío también se publica en el root (`data-ghf-busy`): un anfitrión que
+   * contiene el formulario (p. ej. el diálogo de un Growth CTA) no debe cerrarse mientras se envía.
+   */
+  private setSubmitting(value: boolean): void {
+    this.submitting = value
+    this.opts.root.toggleAttribute('data-ghf-busy', value)
+  }
+
+  /**
+   * TASK-2044/2045 — Texto de una casilla de consentimiento. Un único `{privacyLink}` se reemplaza por
+   * un enlace a `privacyUrl` construido con DOM (nunca HTML del autor); el texto del enlace es
+   * `privacyLinkLabel` o el del diccionario del locale.
+   */
+  private buildConsentText(text: string, consent: RendererConsentDisplay): HTMLElement {
+    const span = el(this.doc, 'span', {})
+    const markerAt = text.indexOf(CONSENT_PRIVACY_LINK_MARKER)
+
+    if (markerAt < 0) {
+      span.textContent = text
+
+      return span
+    }
+
+    const linkLabel = consent.privacyLinkLabel ?? this.copy.privacyLinkLabel
+    const before = text.slice(0, markerAt)
+    const after = text.slice(markerAt + CONSENT_PRIVACY_LINK_MARKER.length).replaceAll(CONSENT_PRIVACY_LINK_MARKER, '')
+
+    span.append(this.doc.createTextNode(before))
+
+    if (consent.privacyUrl) {
+      span.appendChild(
+        el(this.doc, 'a', { href: consent.privacyUrl, target: '_blank', rel: 'noopener noreferrer', 'data-ghf-part': 'consent-link' }, linkLabel)
+      )
+    } else {
+      span.append(this.doc.createTextNode(linkLabel))
+    }
+
+    span.append(this.doc.createTextNode(after))
+
+    return span
+  }
+
   private renderConsent(): HTMLElement | null {
     const consent = this.contract.consent
 
@@ -2272,13 +2325,19 @@ export class FormRenderer {
       return null
     }
 
-    const wrap = el(this.doc, 'div', { class: 'ghf-field ghf-field--full' })
+    // TASK-2045 — `compact`: casilla nativa compacta (sin tarjeta); `tile` (o ausente) = la de siempre.
+    const compact = consent.presentation === 'compact'
+
+    const wrap = el(this.doc, 'div', {
+      class: `ghf-field ghf-field--full${compact ? ' ghf-consent--compact' : ''}`,
+      'data-ghf-part': 'consent'
+    })
 
     if (consent.noticeText) wrap.appendChild(el(this.doc, 'p', { class: 'ghf-help' }, consent.noticeText))
 
     for (const box of consent.checkboxes) {
       const id = `${this.instanceId}-consent-${box.key}`
-      const label = el(this.doc, 'label', { class: 'ghf-check', for: id })
+      const label = el(this.doc, 'label', { class: compact ? 'ghf-check ghf-check--compact' : 'ghf-check', for: id })
       const cb = el(this.doc, 'input', { id, type: 'checkbox', name: `consent_${box.key}` })
 
       cb.dataset.ghfConsent = box.key
@@ -2291,11 +2350,14 @@ export class FormRenderer {
         this.patchErrorSummary()
       })
       label.appendChild(cb)
-      label.appendChild(el(this.doc, 'span', {}, box.label ?? box.copyRef ?? 'Acepto'))
+      label.appendChild(this.buildConsentText(box.label ?? box.copyRef ?? 'Acepto', consent))
       wrap.appendChild(label)
     }
 
-    if (consent.privacyUrl) {
+    // El enlace aparte sólo cuando ninguna casilla lo lleva dentro de la frase.
+    const linkInline = consent.checkboxes.some(box => (box.label ?? '').includes(CONSENT_PRIVACY_LINK_MARKER))
+
+    if (consent.privacyUrl && !linkInline) {
       const p = el(this.doc, 'p', { class: 'ghf-help' })
 
       const a = el(
@@ -2776,7 +2838,7 @@ export class FormRenderer {
       .filter(([, checked]) => checked)
       .map(([key]) => key)
 
-    this.submitting = true
+    this.setSubmitting(true)
     this.renderForm()
 
     let captchaToken: string | undefined
@@ -2784,7 +2846,7 @@ export class FormRenderer {
     try {
       captchaToken = await this.resolveCaptchaToken()
     } catch {
-      this.submitting = false
+      this.setSubmitting(false)
       this.telemetry.emit('gh_form_submission_rejected', { reason_class: 'captcha_failed' })
       this.renderForm()
       this.setSummary(this.submitErrorMessage('captcha_failed'))
@@ -2814,7 +2876,7 @@ export class FormRenderer {
       this.fetchImpl
     )
 
-    this.submitting = false
+    this.setSubmitting(false)
     this.turnstile?.reset()
 
     if (result.outcome === 'accepted') {
@@ -2987,32 +3049,38 @@ export class FormRenderer {
     const body = this.resolveContractCopy(behavior.body, behavior.bodyCopyRef, this.copy.successCardBody)
     const steps = this.resolveSuccessSteps(behavior.steps)
 
+    // `dismiss` (TASK-2044) no navega: se dibuja sin `href`; el resto sigue exigiendo `href`.
     const actions = (behavior.actions ?? [])
       .slice(0, 2)
-      .filter(action => this.successActionLabel(action) && action.href)
+      .filter(action => this.successActionLabel(action) && (action.href || action.kind === 'dismiss'))
 
     const reward = this.buildSuccessReward(behavior.reward)
     const support = this.resolveContractCopy(behavior.supportingNote, behavior.supportingNoteCopyRef)
+
+    const icon = behavior.icon ?? 'celebration'
 
     const card = el(this.doc, 'section', {
       class: 'ghf-success-card',
       role: 'status',
       'aria-live': 'polite',
       tabindex: '-1',
-      'data-capture': 'growth-form-success-card'
+      'data-capture': 'growth-form-success-card',
+      'data-ghf-part': 'success-card',
+      'data-icon': icon
     })
 
     if (steps.length > 0) card.dataset.hasSteps = 'true'
     if (actions.length > 0) card.dataset.hasActions = 'true'
 
-    const mark = el(this.doc, 'span', { class: 'ghf-success-card__mark', 'aria-hidden': 'true' })
+    // TASK-2045 — `celebration` (default) es el de siempre; `orbit`, el glifo de La órbita; `none`, sin ícono.
+    const mark = icon === 'none' ? null : el(this.doc, 'span', { class: 'ghf-success-card__mark', 'aria-hidden': 'true', 'data-ghf-part': 'success-mark' })
 
-    mark.appendChild(this.buildSuccessMarkGraphic())
+    mark?.appendChild(icon === 'orbit' ? this.buildOrbitMarkGraphic() : this.buildSuccessMarkGraphic())
 
     const content = el(this.doc, 'div', { class: 'ghf-success-card__content' })
 
-    content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__title' }, title))
-    content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__body' }, body))
+    content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__title', 'data-ghf-part': 'success-title' }, title))
+    content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__body', 'data-ghf-part': 'success-body' }, body))
 
     if (steps.length > 0) {
       const list = el(this.doc, 'ol', { class: 'ghf-success-card__steps' })
@@ -3041,9 +3109,44 @@ export class FormRenderer {
 
     if (support) content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__support' }, support))
 
-    card.append(mark, content)
+    if (mark) card.append(mark)
+    card.append(content)
 
     return card
+  }
+
+  /** TASK-2045 — Glifo de La órbita: anillo fino, arco y esfera en la punta (color `--ghf-orbit`). */
+  private buildOrbitMarkGraphic(): SVGSVGElement {
+    const ns = 'http://www.w3.org/2000/svg'
+    const svg = this.doc.createElementNS(ns, 'svg')
+
+    svg.setAttribute('viewBox', '0 0 72 72')
+    svg.setAttribute('fill', 'none')
+    svg.setAttribute('focusable', 'false')
+    svg.setAttribute('class', 'ghf-orbit-mark')
+
+    const ring = this.doc.createElementNS(ns, 'circle')
+
+    ring.setAttribute('class', 'ghf-orbit-mark__ring')
+    ring.setAttribute('cx', '36')
+    ring.setAttribute('cy', '36')
+    ring.setAttribute('r', '30')
+
+    const arc = this.doc.createElementNS(ns, 'path')
+
+    arc.setAttribute('class', 'ghf-orbit-mark__arc')
+    arc.setAttribute('d', 'M 36 6 A 30 30 0 1 1 6 36')
+    arc.setAttribute('pathLength', '1')
+
+    const sphere = this.doc.createElementNS(ns, 'circle')
+
+    sphere.setAttribute('class', 'ghf-orbit-mark__sphere')
+    sphere.setAttribute('cx', '6')
+    sphere.setAttribute('cy', '36')
+    sphere.setAttribute('r', '4')
+    svg.append(ring, arc, sphere)
+
+    return svg
   }
 
   private buildSuccessMarkGraphic(): HTMLElement {
@@ -3138,8 +3241,10 @@ export class FormRenderer {
     action: RendererSuccessCardAction,
     className: string,
     rewardKind?: string
-  ): HTMLAnchorElement {
+  ): HTMLElement {
     const label = this.successActionLabel(action) ?? ''
+
+    if (action.kind === 'dismiss') return this.buildDismissAction(label, className)
 
     const anchor = el(this.doc, 'a', {
       class: `ghf-btn ${className}`,
@@ -3167,6 +3272,27 @@ export class FormRenderer {
     })
 
     return anchor
+  }
+
+  /**
+   * TASK-2044/2045 — «Cerrar» de la tarjeta de éxito. No navega: emite `ghf:dismiss` (DOM, bubbles +
+   * composed) para que el anfitrión cierre su superficie, independiente de la política de telemetría,
+   * y registra el clic con el evento de acción de éxito existente.
+   */
+  private buildDismissAction(label: string, className: string): HTMLButtonElement {
+    const button = el(this.doc, 'button', {
+      type: 'button',
+      class: `ghf-btn ghf-btn--ghost ${className}`,
+      'data-ghf-part': 'success-action'
+    })
+
+    button.appendChild(el(this.doc, 'span', { class: 'ghf-success-card__action-label' }, label))
+    button.addEventListener('click', () => {
+      this.telemetry.emit('gh_form_success_action_clicked', { action_kind: 'dismiss' })
+      this.opts.root.dispatchEvent(new CustomEvent(GROWTH_FORM_DISMISS_EVENT, { bubbles: true, composed: true }))
+    })
+
+    return button
   }
 
   private buildCalendarIcon(): HTMLElement {
