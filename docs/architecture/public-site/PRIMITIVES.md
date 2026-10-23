@@ -140,7 +140,7 @@ hasta TASK-2042; el plugin del documento es TASK-2041. Exports, decisiones del L
   - WordPress: el plugin «EO Navegación» (TASK-2041) guarda el documento único y el adaptador de `ohio-child`
     (TASK-2042) lo pinta con el interruptor `eo_site_nav_enabled` (`off`/`pilot`/`on`) y respaldo a Ohio;
   - Think: envoltura Astro, como follow-up cuando se pida.
-- **Contrato con el host** (cualquier sitio, WordPress y Think incluidos; desde AXIS primitives 0.7.8, publicado bajo `v0.7.8` el 2026-10-22, TASK-2042):
+- **Contrato con el host** (cualquier sitio, WordPress y Think incluidos; desde AXIS primitives 0.7.8, publicado bajo `v0.7.8` el 2026-10-22, TASK-2042; «Estás aquí» desde el enlace del servicio en contracts y primitives 0.7.9, bajo `v0.7.9`, 2026-10-23):
   - El host **no estiliza dentro de `.axis-site-nav`**. Si una medida difiere del Lab, se corrige en AXIS
     (`packages/primitives/src/site-nav-css.ts`), nunca con CSS del sitio.
   - Las únicas entradas del host son dos variables: `--axis-site-nav-offset` (una barra encima de la página, como la

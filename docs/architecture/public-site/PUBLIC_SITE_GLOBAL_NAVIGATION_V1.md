@@ -320,7 +320,12 @@ Reglas del documento:
   resuelve contra su origen o el de `efeoncepro.com`.
 - **Fotos con URL absoluta** del bucket de AXIS o de la biblioteca de WordPress. Cada foto con sus recortes y su texto
   alternativo, que es obligatorio.
-- **`context.matchers`** dice en qué ruta se marca «Estás aquí»; es dato, no lógica.
+- **«Estás aquí» sale del enlace del servicio** (AXIS contracts 0.7.9, 2026-10-23): la página cuyo `href` de servicio es
+  la misma ruta en el sitio (relativa, o `https` en `site` o `www.` + `site`) marca ese servicio y su línea, sin
+  declararlo. Un servicio nuevo se marca apenas existe. Otro host (`think.efeoncepro.com`) nunca marca una página del
+  sitio, y dos servicios en la misma URL no marcan nada. `aria-current="page"` sigue la misma regla de host.
+- **`context.matchers`** queda para las excepciones: una página que no es el enlace de un servicio, o que debe marcar
+  otra cosa. Cuando existe, gana. Es dato, no lógica.
 - **Límites:** máximo dos niveles de profundidad en el onepage y un solo panel abierto. El esquema rechaza estructuras
   más profundas.
 - **Sin HTML libre en los textos.** El esquema sólo acepta texto plano y enlaces declarados.

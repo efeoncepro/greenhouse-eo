@@ -457,11 +457,12 @@ Reglas obligatorias:
 >   `data-site-nav-tone` es la corrección para una sección donde la luminancia se equivoque, no un requisito por
 >   plantilla. La barrida sólo miró el primer pliegue; el tono al hacer scroll se verificó en las tres páginas de la
 >   revisión.
-> - **«Estás aquí» marca 5 de 15 servicios.** `context.matchers` cubre agencia-creativa, aeo-2, hubspot, inbound y
->   loop; los otros 10 servicios con página en efeoncepro.com no se marcan. Los 15 apuntan a URLs distintas (sin
->   ambigüedad). Decisión pendiente del operador: completar los matchers en el documento (cambio de datos) o que el
->   contrato derive la marca del `href` del servicio cuando no hay matcher (cambio de AXIS contracts, del port PHP y
->   del plugin; comparar el host exacto, porque `think.efeoncepro.com` no es el sitio).
+> - **«Estás aquí» desde el enlace del servicio (resuelto 2026-10-23).** Sólo marcaban las 5 páginas con matcher. El
+>   operador eligió lo robusto y escalable: AXIS contracts 0.7.9 deriva la marca del `href` del servicio cuando no hay
+>   matcher (host exacto; otro host nunca marca; dos servicios en una URL no marcan nada), y `aria-current` sigue la
+>   misma regla. Publicado con primitives 0.7.9 bajo `v0.7.9`. El port PHP se igualó con 17 casos de paridad byte a
+>   byte y el plugin se desplegó (respaldo `/tmp/eo-site-nav-before-20261023-004705.tar`). En vivo, los 14 servicios
+>   con página en efeoncepro.com marcan el suyo, y Contacto y la home no marcan nada. El documento del menú no cambió.
 > - **Elementos flotantes de Ohio** (barra lateral con el selector Light/Dark, z 4, y botón de búsqueda, z 50): quedan
 >   bajo el velo (1000) y el panel (1002), atenuados como el resto de la página; no es un problema de apilamiento.
 >   Quitarlos con el menú nuevo es una decisión de producto aparte.

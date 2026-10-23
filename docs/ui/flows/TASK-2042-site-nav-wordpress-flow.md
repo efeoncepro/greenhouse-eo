@@ -19,7 +19,8 @@ nativo del sitio y se pueda apagar en un paso.
 3. **Estado inicial.** Sale del inventario de Ohio (2026-10-22): la página con el espaciador de cabecera de Ohio
    (`page_header_add_cap`) arranca `fixed` y sólida; la que no lo tiene arranca `top` sobre su hero, en tono oscuro salvo
    las seis páginas de hero claro del inventario. El filtro `eo_site_nav_page_profile` permite corregir una página.
-4. **Contexto.** Resuelve «Estás aquí» con `context.matchers` contra la ruta actual.
+4. **Contexto.** Resuelve «Estás aquí» contra la ruta actual: el servicio cuyo enlace es esa página, o el matcher de
+   `context.matchers` cuando hay una excepción.
 5. **Datos dinámicos.** Resuelve el centro y el destacado de Recursos desde WordPress o Think, con caché corta. Si
    falla, usa el destacado fijo.
 6. **Render.** Pinta el HTML del primitive; encola el CSS y el JS de AXIS con versión fijada y el renderer de Growth CTA.
