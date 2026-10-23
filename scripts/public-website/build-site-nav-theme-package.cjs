@@ -19,7 +19,7 @@ if (!baseline) throw new Error('Pass exported live code baseline directory.')
 const sha = content => crypto.createHash('sha256').update(content).digest('hex')
 
 // Same allowlist as the deploy script: the adapter, its header overrides, its host assets and the pinned AXIS files.
-const SCOPE = /^(functions\.php|inc\/site-nav\.php|parts\/headers\/header-style-[1-8]\.php|assets\/css\/site-nav-host\.css|assets\/js\/site-nav-host\.js|assets\/vendor\/axis\/site-nav\/\d+\.\d+\.\d+\/(VERSION\.json|site-nav\.(css|js)|brand\/[a-z0-9-]+\.svg))$/
+const SCOPE = /^(functions\.php|inc\/site-nav\.php|parts\/headers\/header-style-[1-8]\.php|assets\/css\/(site-nav-host|meeting-dialog)\.css|assets\/js\/site-nav-host\.js|assets\/vendor\/axis\/site-nav\/\d+\.\d+\.\d+\/(VERSION\.json|site-nav\.(css|js)|brand\/[a-z0-9-]+\.svg))$/
 const version = (fs.readFileSync(path.join(theme, 'inc/site-nav.php'), 'utf8').match(/const EO_SITE_NAV_AXIS = '(\d+\.\d+\.\d+)'/) || [])[1]
 
 if (!version) throw new Error('EO_SITE_NAV_AXIS not found in inc/site-nav.php.')

@@ -25,7 +25,7 @@ $mode = get_option( 'eo_site_nav_enabled', null );
 $zip = new ZipArchive();
 if ( true !== $zip->open( $args[0] ) ) { WP_CLI::error( 'Invalid ZIP.' ); }
 $root    = get_stylesheet_directory() . '/';
-$allowed = '#^(functions\.php|inc/site-nav\.php|parts/headers/header-style-[1-8]\.php|assets/css/site-nav-host\.css|assets/js/site-nav-host\.js|assets/vendor/axis/site-nav/\d+\.\d+\.\d+/(VERSION\.json|site-nav\.(css|js)|brand/[a-z0-9-]+\.svg))$#';
+$allowed = '#^(functions\.php|inc/site-nav\.php|parts/headers/header-style-[1-8]\.php|assets/css/(site-nav-host|meeting-dialog)\.css|assets/js/site-nav-host\.js|assets/vendor/axis/site-nav/\d+\.\d+\.\d+/(VERSION\.json|site-nav\.(css|js)|brand/[a-z0-9-]+\.svg))$#';
 $main    = 'functions.php';
 $files   = array();
 foreach ( $manifest['files'] as $entry ) {
