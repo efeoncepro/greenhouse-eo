@@ -70,6 +70,7 @@ Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [pol
 ¿En qué estás?
 ├─ Arrancar un deal (workspace/carpeta canónica: bases/research/ofertas/deck/manifiesto)  `pnpm tender:new <slug>` → TENDER_WORKSPACE_TEMPLATE.md
 ├─ Construir la propuesta COMPLETA end-to-end (director de orquesta) . bid-construction-playbook.md
+├─ Entregar MD para Claude Design u otro diseño posterior .... propuesta-tecnica-economica.md → «Handoff editorial»
 ├─ Marco legal / norma / inhabilidades / recursos (Chile) ...... chile-publico-marco-legal.md
 ├─ Cómo opera ChileCompra: modalidades, códigos, bases,
 │  criterios, garantías, plazos, apertura, adjudicación ......... chile-publico-operativo.md
@@ -166,9 +167,16 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 9. **Creative Studio se cotiza por capas, no por una falsa tarifa por pieza.** Si el bid incluye producción generativa, separa acceso/gobernanza, capacidad humana, Studio Credits, implementación/IP y derechos/licencias/pass-through. El precio total exigido por las bases puede consolidarse hacia afuera, pero la hoja económica interna conserva las cinco líneas y su margen.
 
 10. **El deal vive en un workspace canónico (el "DSR interno").** Arráncalo con `pnpm tender:new <slug>`: carpeta con `bases/` (RFP) · `research/` (investigación 🔒) · `oferta-tecnica.md` (fuente + ledger de evidencia) · `deck-plan.json` · `artifact-manifest.json` (piezas vivas por enlace) · `anexos/` · `*-INTERNO`. El discriminador que manda es **audiencia**: `research/` + `*-INTERNO` **nunca** cruzan al cliente. Las fuentes son archivos git (NO `proposal_assets`); el aggregate `Proposal` referencia la carpeta por `proposal_id`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`.
-    10 bis. **El PDF local no cierra el deal.** Todo workspace con deck debe conservar `proposal-studio.json` y pasar `pnpm tender:canonical-gate <slug>` con `status=verified`. El gate exige `proposalId`, render job gobernado completado, PDF/previews versionados en `proposal_assets` y verificación autenticada en Proposal Studio. `pnpm deck:compose` es taller/exploración; `.captures/` nunca es evidencia suficiente de cierre. El schema y la secuencia viven en `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`.
+    10 bis. **El PDF local no cierra el deal.** Cuando el encargo incluye cierre canónico de un deck en Proposal Studio, el workspace debe conservar `proposal-studio.json` y pasar `pnpm tender:canonical-gate <slug>` con `status=verified`. El gate exige `proposalId`, render job gobernado completado, PDF/previews versionados en `proposal_assets` y verificación autenticada en Proposal Studio. `pnpm deck:compose` es taller/exploración; `.captures/` nunca es evidencia suficiente de cierre. El schema y la secuencia viven en `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`. Un handoff editorial en Markdown para diseño posterior se declara como tal: no obliga a crear deck/render/Proposal ni acredita ese cierre. No inventar IDs o evidencias para aprobarlo.
 
 ### Reglas generales aprendidas para la propuesta y el deck
+
+**Formato y etapa elegidos por el operador.** Si pide Markdown como insumo para Claude Design,
+entregar la narrativa completa y sus anexos en MD, con la investigación y controles internos separados.
+No forzar PDF, deck, Composer ni alta en Proposal Studio para completar ese encargo. El formato exigido
+por el comprador se cumple al preparar la presentación formal. Contrato de handoff y QA:
+`propuesta-tecnica-economica.md` → «Handoff editorial»; procedimiento:
+[Construir una licitación](../../../docs/manual-de-uso/comercial/construir-una-licitacion.md).
 
 10. **Separa la fuente y gobernanza técnica/económica; no impongas separación física.** Según las bases y
     la etapa, el paquete puede ser técnico solo, económico solo, separado, combinado o mixto. Todo monto

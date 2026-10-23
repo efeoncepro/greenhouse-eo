@@ -1,0 +1,112 @@
+WORKBOOK RFP Agencia Proyecto Inmobiliario-202610231543352470.xlsx SHEETS ['Formato', 'Requisitos técnicos', 'Listas', 'Hoja3']
+
+SHEET Formato state=visible rows=15 cols=15
+B1=Requerimiento de Propuesta
+  RFP
+ | G1=Código :  | I1=F-LO-5 | I1 COMMENT=Ingresar el código del formato (generado por el aplicativo administrador de la documentación del SGI) 
+G2=Versión: | I2=3 | I2 COMMENT=Ingresar el número de versión del formato
+G3=Fecha Emisión: | I3=2019-10-17 00:00:00 | I3 COMMENT=
+Ingresar fecha de emisión (creación) del formato 
+G4=Fecha Actualización: | I4=2024-03-21 00:00:00 | I4 COMMENT=
+Ingresar fecha de actualización del formato
+A5=Tener en cuenta: 
+Para el tema de servicios especializados y vencimientos de servicios, suministros y contratos, 
+las solicitudes se deben montar de manera anticipada con 90 días calendario  a la fecha requerida (ver procedimiento P-LO-9)
+A6=Fecha solicitud: (dd/mm/aaaa) | A6 COMMENT=Ingrese la fecha en que realiza la solicitud. Ejemplo: DD/MM/AAAA
+A7=Proceso solicitante: | A7 COMMENT=Identifique el proceso o equipo de trabajo al cual pertenece. Ejemplo: Mercadeo, Compras | C7=Mattis Inmobiliaria
+A8=Nombre del Servicio especializado o tecnologico requerido | A8 COMMENT=Identifique la solicitud que realiza. Ejemplo: Consultoría para gestionar estudios de mercado. | C8=Agencia de publicidad
+A9=Objetivo
+Identifique el por qué requiere de este servicio, el valor agregado, su impacto | C9=Contratar una agencia especializada que apoye a Mattis Inmobiliaria en el desarrollo y ejecución de la estrategia de branding y mercadeo de un proyecto inmobiliario que será promocionado por Mattis, debido a que la capacidad operativa actual del equipo interno no permite atender integralmente el alcance y volumen de actividades requeridas. 
+A10=Alcance
+(Identifique el público al cual estará dirigida la solicitud, si es para todo el Grupo o que filiales; duración en tiempo requerido) | C10=El servicio estará dirigido a Mattis Inmobiliaria, como filial responsable de la promoción y comercialización del proyecto inmobiliario, y comprenderá el apoyo especializado en las actividades de branding, marketing y generación de contenidos requeridas para su posicionamiento y comercialización. La prestación del servicio se estima por un período de 12 meses, de acuerdo con el horizonte de ejecución definido para el proyecto, acompañando las diferentes etapas de implementación de la estrategia.
+A11=Descripción de la necesidad 
+(Redacte de forma clara y precisa qué necesita y cantidades) | C11=Se requiere contratar el apoyo de una agencia especializada para el desarrollo y ejecución de las actividades de branding y mercadeo contempladas para el proyecto inmobiliario, incluyendo la creación y desarrollo de la identidad de marca, manual de identidad, piezas y contenidos para medios digitales, producción audiovisual, diseño gráfico y demás actividades necesarias para su posicionamiento y promoción. El servicio tendrá una duración estimada de 12 meses, de acuerdo con el alcance y cronograma definido para el proyecto.
+A12=Entregables
+Identifique qué entregables desea. | A12 COMMENT=Identifique qué entregables desea. Ejemplo: formación, archivos en excel con macros que realice conteos XXXXX; documento con metodología para XXXx | C12=Desarrollo de la identidad de marca y sus lineamientos de aplicación; manual de identidad; piezas y contenidos gráficos para medios digitales; producción y edición de contenido audiovisual; material comercial y promocional del proyecto; apoyo en la implementación de la estrategia de marketing y branding; y demás piezas o recursos requeridos durante la ejecución del proyecto, de acuerdo con el cronograma y las necesidades de comercialización definidas por Mattis.
+A13=Observaciones adicionales:  | C13=Desde Mattis no se cuenta con un presupuesto definido para este servicio. Se solicita a la agencia proponente presentar una propuesta económica de acuerdo con el alcance y los entregables requeridos, detallando los servicios, cantidades, tiempos y costos asociados.
+A14=Requisitos para presentación de propuesta (Este campo no debe ser eliminado ni modificado)
+A15=1. El proceso solicitante debe diligenciar los campos contenidos en las hojas  Formato y Requisitos técnicos, según las anotaciones contenidos en cada  ítem. 
+
+2. El oferente debe diligenciar en la hoja de requisitos técnicos, su cumplimiento y valores, adicional indicar en la hoja de requisitos técnicos la página de su oferta en PDF donde explica cada item solicitado.
+
+3. Estimado oferente tener en cuenta que toda la presentación de su propuesta incluido este formato hace parte integral de la orden de compra y/o contrato.
+
+SHEET Requisitos técnicos state=visible rows=1048533 cols=16
+C1=REQUISITOS TÉCNICOS
+A5=REQUISITOS HABILITANTES | A5 COMMENT=Aquellos componentes o características que indiscutiblemente debe cumplir la propuesta del proveedor; la ausencia de alguno de éstos requisitos dejará fuera de convocatoria al proponente. Ejemplo: tipo de sofware, tipo de capacidad, integración con, entre otros.
+
+Si en alguno de los requisitos habilitantes el proponente puede tener un cumplimiento parcial y no total, es importante que indique si es funcional para la necesidad, asi no sea la mejor propuesta o no cumpla al 100% y haga una descripción del mismo; si la parcialidad no alcanza a satisfacer la necesidad basica del requisito, debe marcarse como no cumple. | P5=CUMPLE
+A6=Diligenciar por proceso solicitante | E6=Diligenciar por oferente
+A7=No. | B7=Componente / Caracteristica
+(Insertar items de los componentes técnicos según necesidad) | B7 COMMENT=Indique nombre de los componentes o caracteristicas. Ejemplo: tipo de sofware, tipo de capacidad, integración con, entre otros.
+
+Puede insertar los componentes o características que considere necesario para el servicio | C7=Criterios
+ (Ejemplo de lo que se puede requerir) | D7=Descripción del Componente/Característica
+ | D7 COMMENT=Describa de forma detallada el componente o caracteristica y cómo impacta en la funcionalidad del servicio y o producto, indicar si se aplica para lo requerido según la necesidad. | E7=Cumple /No cumple  | G7=Especificar en la oferta en que página está dando cumplimiento al componente.
+ | H7=Observacion adicional  | P7=NO CUMPLE
+E8=Si | F8=No
+A9=1 | B9=COMPATIBILIDAD | C9=Capacidad para integrarse
+A10=2 | B10=TECNICO | C10==IFERROR(VLOOKUP('Requisitos técnicos'!B10,Tabla1[#All],2,FALSE),"")
+A11=3 | B11=TECNICO | C11==IFERROR(VLOOKUP('Requisitos técnicos'!B11,Tabla1[#All],2,FALSE),"")
+A12=8 | B12=GARANTÍA | C12==IFERROR(VLOOKUP('Requisitos técnicos'!B12,Tabla1[#All],2,FALSE),"")
+A13=9 | B13=SERVICIO | C13==IFERROR(VLOOKUP('Requisitos técnicos'!B13,Tabla1[#All],2,FALSE),"")
+A14=11 | C14==IFERROR(VLOOKUP('Requisitos técnicos'!B14,Tabla1[#All],2,FALSE),"")
+A15=12 | C15==IFERROR(VLOOKUP('Requisitos técnicos'!B15,Tabla1[#All],2,FALSE),"")
+A16=14 | B16=TECNICO1 | C16==IFERROR(VLOOKUP('Requisitos técnicos'!B16,Tabla1[#All],2,FALSE),"")
+A17=15
+A18=16
+A19=17
+A20=18
+A21=19
+A23=REQUISITOS NO HABILITANTES | A23 COMMENT=Aquellos componentes o características adicionales e ideales, más no obligatorias que podría tener la propuesta del proveedor. Ejemplo: mayor capacidad, integraciones adicionales, entre otros.
+A24=No. | B24=Componente / Caracteristica
+(Insertar items de los componentes técnicos según necesidad) | B24 COMMENT=Indique nombre de los componentes o caracteristicas. Ejemplo: tipo de sofware, tipo de capacidad, integración con, entre otros.
+
+Puede insertar los componentes o características que considere necesario para el servicio | C24=Criterios
+ (Ejemplo de lo que se puede requerir) | D24=Descripción del Componente/Característica
+ | D24 COMMENT=Describa de forma detallada el componente o caracteristica y cómo impacta en la funcionalidad del servicio y o producto, indicar si se aplica para lo requerido según la necesidad. | E24=Cumple /No cumple  | G24=Indicar como cumple y si envia oferta en pdf en que página esta explicado  
+ | H24=Observacion adicional  | I24=Peso (%) (deben sumar todos los requisitos habilitantes 100%) (campo para proceso solicitante) | I24 COMMENT=El experto del proceso debe asignar el peso requerido a cada requisito no habilitante, según su importancia y/o relevancia y que al sumar el total de los mismos sea el 100%.  Este peso debe ser numérico y entero.
+E25=Si | F25=No
+A26=1
+A27=2
+A28=3
+A29=4
+A30=5
+A31=6
+A32=7
+A33=8
+A34=9
+A35=10
+A36=PONDERACION | I36==SUM(I25:I35)
+B1048532=CUMPLE
+B1048533=NO CUMPLE
+
+SHEET Listas state=hidden rows=14 cols=8
+C1=Item | D1=criterio
+C2=CONFIGURACIÓN, IMPLEMENTACIÓN Y/O PUESTA PUNTO. | D2=Si se requiere  implementación.
+Se requiere cronograma de la implementación.
+ | F2=SI | H2=CAMBIO DE PARTNER/PROVEEDOR
+C3=GARANTÍA | D3=Respaldo de tiempo ofrecido por los proponentes  producto o servicio.
+Servicio postventa, también aplica  la ubicación fisica del proveedor para la gestión de la garantía. | F3=NO | H3=CAMBIOS EN EL ALCANCE
+C4=COBERTURA | D4= Si se requiere el servicio o actividad en la misma ciudad o  por qué otro medio se puede gestionar.
+Ubicación y recorrido geolocalización de la actividad.
+C5=SOPORTE TECNICO  | D5=Debe detallar : Servicios profesionales que se requieran para ejecutar el servicio solicitado, se debe especificar el tipo de soporte, nivel 1,2 o 3.
+Adicionalmente si se requiere horas de ingeniería.
+C6=MARCA | D6=Percepción de la mejor marca en la categoría de proudcto o servicio ofrecida.
+C7=COMPATIBILIDAD | D7=Coincidencia entre lo que ofrece el oferente con relación a los sistemas y recursos de la organización.
+Medios de integración.
+C8=CAPACITACIÓN | D8=Acompañamiento, capacitación, gestión del conocimiento, servicio postventa, entre otros, que ofrece los oferentes.
+C9=SERVICIO | D9=Disponibilidad de atención, personal calificado, ubicación fisica de las instalaciones del proveedor,  consultores, asesores. Cumplimiento de ANS.
+C10=METODOLOGÍA | D10=Enfoque al cumplimiento de los objetivos y resultados esperados que más se ajusten al alcance de la necesidad.
+C11=TECNICO | D11=Requiere un demo o muestra previa.
+C12=ADMINISTRACIÓN | D12=Requiere administracion del recurso,servicio,hardware.
+C13=VISITA TECNICA | D13=Requiere visita de inspección al lugar de ejecución.
+C14=OTROS ÍTEMS  | D14=Otros aspectos que no estén descritos en las demas componentes.
+
+SHEET Hoja3 state=hidden rows=8 cols=3
+B4=1 | C4=¿Porqué?
+B5=2 | C5=¿Porqué?
+B6=3 | C6=¿Porqué?
+B7=4 | C7=¿Porqué?
+B8=5 | C8=¿Porqué?
+EMBEDDED: ['xl/drawings/vmlDrawing2.vml', 'xl/drawings/_rels/drawing1.xml.rels', 'xl/drawings/_rels/drawing2.xml.rels', 'xl/drawings/drawing2.xml', 'xl/drawings/vmlDrawing1.vml', 'xl/drawings/drawing1.xml']

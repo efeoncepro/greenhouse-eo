@@ -15,6 +15,15 @@ Aplica a todos los informes y documentos escritos emitidos por Efeonce, para cli
 
 Resuelve estos paths desde la raíz del repositorio, no desde esta carpeta. Si trabajas fuera del repo, solicita o localiza el paquete institucional autorizado; no inventes sustitutos.
 
+## Fuente Markdown y documento diseñado
+
+Una solicitud explícita de Markdown como entrega principal conserva el contenido, la evidencia y la
+identidad del emisor sin simular paginación, membrete ni pies en cada bloque. No exige producir un PDF
+adicional. El contrato de páginas y el catálogo A4 de este módulo se aplican cuando se encarga ese
+formato diseñado. Una fuente para Claude Design u otro diseñador puede llevar notas de producción
+claramente separadas; esas notas y los archivos de control interno no son el cuerpo del documento
+emitido para el lector. El [barrido de fugas](quality-and-delivery.md#barrido-de-fugas) respeta esta frontera.
+
 ## Contrato obligatorio
 
 **Formato:** el pie completo aplica a informes escritos. En decks y presentaciones el pie lleva como máximo la URL bubble oficial, sin dirección, teléfonos, separador ni folio, incluso si el destino es PDF A4 horizontal. Usa Deck Studio para ese formato.

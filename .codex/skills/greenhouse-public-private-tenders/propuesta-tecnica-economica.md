@@ -54,6 +54,44 @@ investigación (INTERNO) → oferta-tecnica.md (ledger + narrativa + mapa) → d
 exigen planilla; ver §Oferta económica); la **administrativa** con `compliance-riesgo-integridad.md`.
 No las metas en el `.md` técnico.
 
+## Handoff editorial en Markdown para Claude Design
+
+Cuando el operador pide MD para diseñar después, ése es el entregable de esta etapa. Construir la
+propuesta sustantiva antes del diseño: comprensión del negocio, argumento, alcance, entregables,
+calendario, operación, perfiles, medición, inversión y condiciones, además de los anexos requeridos.
+Un índice de láminas o un prompt genérico no reemplaza esa propuesta. Mantener la técnica, económica
+y controles como fuentes revisables; un MD maestro puede reunir el relato dirigido al comprador sin
+mezclar en él costos, márgenes, negociación ni investigación interna.
+
+El procedimiento, nombres de artefactos y verificación viven en
+[Construir una licitación](../../../docs/manual-de-uso/comercial/construir-una-licitacion.md).
+La elección de MD no elimina requisitos de las bases: PDF/planilla, paginación, firmas y anexos se
+resuelven al preparar la presentación formal. Las referencias a página se completan con páginas
+reales después de diseñar; nunca se inventan para llenar la matriz. No activar Composer ni crear
+una Proposal como condición de este handoff; tampoco marcar render, gate o presentación verificados.
+
+Aplicar estos controles al contenido que recibe diseño:
+
+- **Requisito, propuesta y pendiente distinguibles.** A cada obligación del RFP le corresponde su
+  fuente exacta; cantidades, cadencias, formatos, límites y revisiones propuestos por Efeonce se
+  rotulan como propuesta propia. Definir unidades y sumar fases/ciclos una sola vez. Una matriz vacía,
+  lista oculta o ejemplo de una plantilla no agrega requisitos al proyecto.
+- **Precio con estado y procedencia.** El monto preliminar proviene de la cotización congelada V3 y
+  conserva moneda, base fiscal, alcance y condiciones coherentes en todos los MD. Su existencia no
+  aprueba el precio ni confirma capacidad, impuestos, caja o GO. El procedimiento económico pertenece
+  a `efeonce-pricing-operator`; la cotización interna no viaja al comprador.
+- **Proyecto sin inventar.** Si faltan nombre, producto, ubicación, audiencia, presupuesto o fecha,
+  mantener la dependencia y el mecanismo para resolverla. Proyectos públicos de la misma cuenta,
+  ofertas históricas y contenidos de demostración no describen automáticamente la nueva licitación.
+- **Fuentes y derechos antes de maquetar.** Claims con fuente y fecha; hipótesis identificadas y
+  salvedades que cambian alcance visibles en el texto comercial. Logo original con procedencia y
+  recursos autorizados; no fabricar renders del proyecto, equipo asignado, resultados ni casos.
+  Las notas de diseño no pueden borrar límites, carácter preliminar o condiciones económicas.
+
+Caso de aplicación: [Mattis GRD-1555](../../../docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md),
+23/10/2026. Sus cantidades, precio y perfiles son un escenario de ese expediente, no un estándar ni
+una tarifa para otros compradores.
+
 ## Oferta técnica — anatomía que puntúa
 
 Modela cada sección **hacia el criterio ponderado que la evalúa** (lee primero la tabla de ponderaciones en `chile-publico-operativo.md`).
@@ -76,8 +114,9 @@ Modela cada sección **hacia el criterio ponderado que la evalúa** (lee primero
 **Primero, lo que mandan las bases.** Si exigen SU planilla o formato (a veces un Excel específico), se
 usa ese: un precio correcto en formato equivocado puede ser inadmisible.
 
-**Si no lo exigen, la económica que ve el comprador se compone con la plantilla A4 de Efeonce.** Es el
-documento con la marca, la portada, el alcance, la inversión y las condiciones ya resueltos y verificados:
+**Si no lo exigen y se está emitiendo el documento formal, la económica que ve el comprador se compone con la plantilla A4 de Efeonce.** Para el handoff MD previo al diseño, conservar el texto económico y su fuente V3 sin forzar ese render (véase «Handoff editorial»).
+
+La plantilla formal resuelve la marca, portada, alcance, inversión y condiciones:
 
 ```sh
 node scripts/documents/render-cotizacion-a4.mjs --data <caso>/cotizacion/cotizacion.json --out <caso>/cotizacion/<carpeta nueva>

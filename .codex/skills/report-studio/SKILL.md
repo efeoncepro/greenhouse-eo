@@ -15,6 +15,24 @@ El entregable es el formato pedido por el usuario, no la tecnología intermedia.
 
 **No implica autorización** para publicar, enviar correos, subir documentos a terceros ni hacer nuevas compras de datos. Preparar y guardar localmente es distinto de distribuir. No conviertas una carencia de datos en una solicitud rutinaria de permiso: avanza con lo disponible y pregunta sólo por un dato imprescindible.
 
+## Markdown como entrega principal y fuente para diseño
+
+Si el usuario pide un caso de negocio en MD y deja la propuesta visual para Claude Design u otra
+herramienta, el **Markdown completo es la entrega principal**. No impongas PDF, Composer ni Proposal
+Studio para cerrar ese encargo. Conserva el caso como soporte de decisión y construye la propuesta
+comercial mediante [Deck Studio](../deck-studio/SKILL.md#cuando-el-usuario-pide-markdown-para-diseñar-después)
+y el [manual comercial](../../../docs/manual-de-uso/comercial/construir-una-licitacion.md#preparación-en-markdown-para-diseño-externo).
+
+El master contiene narrativa y texto listo para usar; las notas de diseño y el control interno van
+separados del cuerpo para el comprador. Mantén ledger, fuentes, anexos, versión y vínculos entre las
+piezas. Copia los importes del snapshot V3 sin recalcularlos en el documento; Pricing conserva la
+autoridad del cálculo y de la cotización formal. Un MD preparado para diseño no acredita aprobación
+comercial, maquetación verificada, emisión, sincronización ni envío.
+
+En esta ruta, los pasos de dirección visual, composición y QA de páginas aplican al archivo diseñado
+cuando se solicite. Para cerrar el MD verifica cobertura, fuentes, cifras, enlaces y coherencia del
+paquete. Conserva las exigencias de formato de las bases para la presentación posterior.
+
 ## Fuentes y módulos
 
 Carga según la decisión pendiente, no todo el paquete por defecto:
@@ -77,9 +95,9 @@ Un informe Efeonce A4 se compone sobre el catálogo premium `insights-report` co
 
 ### 6. Verificar e iterar
 
-Verifica el **archivo exportado** con [QA](references/quality-and-delivery.md). Usa `scripts/check_pdf.py` con un manifiesto adaptado si el destino es PDF. La salida automatizada es un preflight, no una certificación visual ni PDF/UA.
+Verifica el **archivo del formato acordado** con [QA](references/quality-and-delivery.md). Usa `scripts/check_pdf.py` con un manifiesto adaptado si el destino es PDF. La salida automatizada es un preflight, no una certificación visual ni PDF/UA.
 
-Inspecciona todas las páginas. Revisa las más densas a tamaño de lectura, y valida contenido, pies y navegación en todas. Encarga revisión independiente cuando lo pida el usuario o el informe lo justifique y esté autorizada. Un hallazgo accionable exige corregir, regenerar y revisar la región afectada; si cambia la paginación, vuelve a comprobar índice y páginas completas.
+Cuando se entregue un documento paginado, inspecciona todas las páginas. Revisa las más densas a tamaño de lectura, y valida contenido, pies y navegación en todas. Encarga revisión independiente cuando lo pida el usuario o el informe lo justifique y esté autorizada. Un hallazgo accionable exige corregir, regenerar y revisar la región afectada; si cambia la paginación, vuelve a comprobar índice y páginas completas.
 
 ### 7. Cerrar con estado preciso
 
@@ -108,9 +126,10 @@ Para resumir una auditoría o informe en un deck para directorio, cargar `docs/o
 Si los importes vienen del prototipo local V3, cargar
 [contrato operativo](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
 `compose preview` devuelve una simulación redactada local; `explain` y artifact contienen costos/márgenes y son
-internos. Report Studio no completa faltantes económicos ni cambia estado por maquetar PDF. Preservar moneda,
+internos. Report Studio no completa faltantes económicos ni cambia estado por redactar un MD o maquetar PDF. Preservar moneda,
 neto/impuestos/plazo, fuente/snapshot y la marca de simulación hasta aprobación y emisión por el canal aplicable.
-El documento de cotización que recibe el cliente no se maqueta a mano desde el preview: `compose document` emite los
+Un resumen editorial MD para diseño puede citar fielmente esos importes y su estado, sin convertirse en
+una cotización emitida. El documento formal de cotización que recibe el cliente no se maqueta a mano desde el preview: `compose document` emite los
 datos (versión 2) de la plantilla A4 desde la cotización congelada y su generador compone el PDF
 ([pasos](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#6-el-documento-para-el-cliente)).
 Nunca digitar ni editar una cifra en su brief o en los datos emitidos: se cambia la cotización y se vuelve a correr.

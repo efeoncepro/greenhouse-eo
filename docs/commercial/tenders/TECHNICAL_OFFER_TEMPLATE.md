@@ -27,6 +27,13 @@
 ════════════════════════════════════════════════════════════════════════════════
 -->
 
+<!-- Si el operador pide MD para Claude Design, este archivo sigue siendo fuente de alcance.
+El master de presentación contiene texto completo por bloque y notas de diseño separadas;
+no exige render/Proposal Studio para entregar el insumo. Requisitos de formato y aprobación
+siguen pendientes antes de presentar. Procedimiento:
+../../manual-de-uso/comercial/construir-una-licitacion.md#preparación-en-markdown-para-diseño-externo.
+-->
+
 # Oferta Técnica — <Servicio> · <Cliente>
 
 > **Licitación:** <ID / portal / Wherex-Mercado Público> · **Cierre:** <fecha> ·
@@ -49,6 +56,8 @@
 |---|---|---|---|---|---|
 | `E1` | <qué afirma> | <número> | <https://… o «Bases §X» o «run EO-GRUN-000NN»> | <YYYY-MM> | client_facing |
 | `E2` | … | | | | |
+
+Clasificar además cada entrada como requisito del RFP, hecho investigado, supuesto/propuesta propia o decisión pendiente. Una cantidad propuesta puede citar su brief/cálculo interno y versión: no se atribuye al comprador ni se presenta como dato investigado. Identificar proyecto, marca y sociedad por separado; no completar datos del proyecto con ejemplos públicos.
 
 > **Prohibido:** confundir una *prevalencia* con un *lift*; convertir un dato de
 > mercado en prueba del producto; citar un estudio sin poder linkearlo. Una cifra

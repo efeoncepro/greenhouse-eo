@@ -1,0 +1,854 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-23",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "engagementForm": "on_demand",
+    "accountId": "mattis-grd-1555",
+    "offerMarketCountry": "CO",
+    "outputCurrency": "COP",
+    "periods": 12,
+    "lines": [
+      {
+        "lineId": "m1-strategy",
+        "profile": "ECG-035",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.39"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-m1-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          1
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "m1-art",
+        "profile": "ECG-005",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.26"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-m1-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          1
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "m1-design",
+        "profile": "ECG-002",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.45"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-m1-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          1
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "m1-copy",
+        "profile": "ECG-011",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.26"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-m1-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          1
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "m1-pm",
+        "profile": "ECG-016",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.2"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-m1-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          1
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "m2-strategy",
+        "profile": "ECG-035",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.07"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-m2-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          2
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "m2-art",
+        "profile": "ECG-005",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.2"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-m2-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          2
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "m2-design",
+        "profile": "ECG-002",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.77"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-m2-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          2
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "m2-copy",
+        "profile": "ECG-011",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.32"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-m2-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          2
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "m2-motion",
+        "profile": "ECG-018",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.13"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-m2-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          2
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "m2-pm",
+        "profile": "ECG-016",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.2"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-m2-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          2
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "cycle-strategy",
+        "profile": "ECG-035",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.04"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-cycle-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "cycle-art",
+        "profile": "ECG-005",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.07"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-cycle-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "cycle-design",
+        "profile": "ECG-002",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.3"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-cycle-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "cycle-copy",
+        "profile": "ECG-011",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.15"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-cycle-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "cycle-motion",
+        "profile": "ECG-018",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.13"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-cycle-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "choices": []
+      },
+      {
+        "lineId": "cycle-pm",
+        "profile": "ECG-016",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.12"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:mattis-cycle-v1",
+          "effectiveFrom": "2026-10-23",
+          "effectiveUntil": "2026-10-30",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "activePeriods": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "work": [
+    {
+      "lineId": "m1-strategy",
+      "assigneeIds": [
+        "planned-m1-strategy-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "m1-art",
+      "assigneeIds": [
+        "planned-m1-art-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "m1-design",
+      "assigneeIds": [
+        "planned-m1-design-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "m1-copy",
+      "assigneeIds": [
+        "planned-m1-copy-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "m1-pm",
+      "assigneeIds": [
+        "planned-m1-pm-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "m2-strategy",
+      "assigneeIds": [
+        "planned-m2-strategy-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "m2-art",
+      "assigneeIds": [
+        "planned-m2-art-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "m2-design",
+      "assigneeIds": [
+        "planned-m2-design-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "m2-copy",
+      "assigneeIds": [
+        "planned-m2-copy-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "m2-motion",
+      "assigneeIds": [
+        "planned-m2-motion-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "m2-pm",
+      "assigneeIds": [
+        "planned-m2-pm-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "cycle-strategy",
+      "assigneeIds": [
+        "planned-cycle-strategy-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "cycle-art",
+      "assigneeIds": [
+        "planned-cycle-art-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "cycle-design",
+      "assigneeIds": [
+        "planned-cycle-design-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "cycle-copy",
+      "assigneeIds": [
+        "planned-cycle-copy-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "cycle-motion",
+      "assigneeIds": [
+        "planned-cycle-motion-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "cycle-pm",
+      "assigneeIds": [
+        "planned-cycle-pm-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodIds": [
+        1
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "5",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "planned-named-seats",
+        "totalUnits": "5",
+        "allocatedUnits": "5"
+      },
+      "reason": "Hipótesis conservadora: costo completo por asiento planificado en cada fase; sin suponer cartera ni usuarios asignados.",
+      "evidence": {
+        "reference": "mattis:hypothesis-tools-full-allocation-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "5",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "planned-named-seats",
+        "totalUnits": "5",
+        "allocatedUnits": "5"
+      },
+      "reason": "Hipótesis conservadora: costo completo por asiento planificado en cada fase; sin suponer cartera ni usuarios asignados.",
+      "evidence": {
+        "reference": "mattis:hypothesis-tools-full-allocation-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        2
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "6",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "planned-named-seats",
+        "totalUnits": "6",
+        "allocatedUnits": "6"
+      },
+      "reason": "Hipótesis conservadora: costo completo por asiento planificado en cada fase; sin suponer cartera ni usuarios asignados.",
+      "evidence": {
+        "reference": "mattis:hypothesis-tools-full-allocation-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        2
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "6",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "planned-named-seats",
+        "totalUnits": "6",
+        "allocatedUnits": "6"
+      },
+      "reason": "Hipótesis conservadora: costo completo por asiento planificado en cada fase; sin suponer cartera ni usuarios asignados.",
+      "evidence": {
+        "reference": "mattis:hypothesis-tools-full-allocation-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "6",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "planned-named-seats",
+        "totalUnits": "6",
+        "allocatedUnits": "6"
+      },
+      "reason": "Hipótesis conservadora: costo completo por asiento planificado en cada fase; sin suponer cartera ni usuarios asignados.",
+      "evidence": {
+        "reference": "mattis:hypothesis-tools-full-allocation-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "6",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "planned-named-seats",
+        "totalUnits": "6",
+        "allocatedUnits": "6"
+      },
+      "reason": "Hipótesis conservadora: costo completo por asiento planificado en cada fase; sin suponer cartera ni usuarios asignados.",
+      "evidence": {
+        "reference": "mattis:hypothesis-tools-full-allocation-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "adobe",
+      "priceId": "current",
+      "quantity": "1",
+      "seatCapacity": 3,
+      "serviceShare": "1",
+      "driver": {
+        "unit": "planned-package",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Un paquete completo de tres asientos para arte, diseño y edición. En M1 edición todavía no activa; se mantiene el paquete completo.",
+      "evidence": {
+        "reference": "mattis:hypothesis-tools-full-allocation-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "frame-io",
+      "priceId": "historical",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "planned-package",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Referencia histórica para revisión audiovisual. Costo completo conservador; requiere cotización y plan vigente.",
+      "evidence": {
+        "reference": "mattis:hypothesis-tools-full-allocation-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": [
+    "fx:CLP:USD"
+  ]
+}

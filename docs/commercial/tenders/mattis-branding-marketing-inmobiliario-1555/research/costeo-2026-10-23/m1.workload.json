@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "mattis-m1-v1",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "125",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "mattis:hypothesis-capacity-125-productive-180-scheduled",
+      "effectiveFrom": "2026-10-23",
+      "effectiveUntil": "2026-10-30",
+      "status": "estimated"
+    }
+  },
+  "drivers": [],
+  "fixedWork": [
+    {
+      "workId": "m1-strategy",
+      "label": "Estrategia: bloque de m1, incluye revisiones y QA",
+      "hoursPerMonth": "48",
+      "source": {
+        "reference": "mattis:scope-estimate-m1-strategy-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "m1-art",
+      "label": "Dirección de arte: bloque de m1, incluye revisiones y QA",
+      "hoursPerMonth": "32",
+      "source": {
+        "reference": "mattis:scope-estimate-m1-art-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "m1-design",
+      "label": "Diseño senior: bloque de m1, incluye revisiones y QA",
+      "hoursPerMonth": "56",
+      "source": {
+        "reference": "mattis:scope-estimate-m1-design-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "m1-copy",
+      "label": "Redacción: bloque de m1, incluye revisiones y QA",
+      "hoursPerMonth": "32",
+      "source": {
+        "reference": "mattis:scope-estimate-m1-copy-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "m1-pm",
+      "label": "Gestión y calidad: bloque de m1, incluye revisiones y QA",
+      "hoursPerMonth": "24",
+      "source": {
+        "reference": "mattis:scope-estimate-m1-pm-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "m1-strategy",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "m1-strategy",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "m1-art",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "m1-art",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "m1-design",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "m1-design",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "m1-copy",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "m1-copy",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "m1-pm",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "m1-pm",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.01"
+  }
+}

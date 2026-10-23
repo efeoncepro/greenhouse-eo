@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "mattis-m2-v1",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "125",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "mattis:hypothesis-capacity-125-productive-180-scheduled",
+      "effectiveFrom": "2026-10-23",
+      "effectiveUntil": "2026-10-30",
+      "status": "estimated"
+    }
+  },
+  "drivers": [],
+  "fixedWork": [
+    {
+      "workId": "m2-strategy",
+      "label": "Estrategia: bloque de m2, incluye revisiones y QA",
+      "hoursPerMonth": "8",
+      "source": {
+        "reference": "mattis:scope-estimate-m2-strategy-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "m2-art",
+      "label": "Dirección de arte: bloque de m2, incluye revisiones y QA",
+      "hoursPerMonth": "24",
+      "source": {
+        "reference": "mattis:scope-estimate-m2-art-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "m2-design",
+      "label": "Diseño senior: bloque de m2, incluye revisiones y QA",
+      "hoursPerMonth": "96",
+      "source": {
+        "reference": "mattis:scope-estimate-m2-design-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "m2-copy",
+      "label": "Redacción: bloque de m2, incluye revisiones y QA",
+      "hoursPerMonth": "40",
+      "source": {
+        "reference": "mattis:scope-estimate-m2-copy-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "m2-motion",
+      "label": "Edición y motion: bloque de m2, incluye revisiones y QA",
+      "hoursPerMonth": "16",
+      "source": {
+        "reference": "mattis:scope-estimate-m2-motion-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "m2-pm",
+      "label": "Gestión y calidad: bloque de m2, incluye revisiones y QA",
+      "hoursPerMonth": "24",
+      "source": {
+        "reference": "mattis:scope-estimate-m2-pm-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "m2-strategy",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "m2-strategy",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "m2-art",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "m2-art",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "m2-design",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "m2-design",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "m2-copy",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "m2-copy",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "m2-motion",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "m2-motion",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "m2-pm",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "m2-pm",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.01"
+  }
+}

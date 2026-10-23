@@ -18,6 +18,19 @@ Este módulo gobierna el archivo que recibirá el lector. Una captura del HTML, 
 | Accesibilidad | ¿Qué se verificó realmente? | Semántica, orden, contraste y prueba asistiva | Declaración de conformidad no sustentada |
 | Reproducción | ¿Puede regenerarse? | Scripts, datos, versiones y hashes | Fuente perdida o exportación acumulativa |
 
+## Cuando el archivo acordado es Markdown
+
+Revisa el MD completo: estructura y texto sustantivo, cobertura del encargo, fuentes y fechas,
+clase de afirmación, enlaces, unidades, totales y coherencia con sus anexos. Si contiene un resumen
+V3, compáralo con la versión/snapshot fuente sin recalcularlo ni cambiar el precio desde el texto.
+Comprueba que el cuerpo destinado al cliente no incorpore notas de diseño, costos internos ni deliberaciones
+del operador. El master puede conservar instrucciones para el diseñador en un bloque separado y los
+controles del operador en otro archivo.
+
+La evidencia de cierre es de contenido y formato MD. No ejecutes un preflight PDF ni exijas pie,
+folios, tipografía incrustada o capturas de páginas inexistentes. Registra «MD preparado para diseño»;
+la revisión visual del exportado queda pendiente de esa etapa y no bloquea cerrar la redacción.
+
 ## Preflight automatizado
 
 Usa `python scripts/check_pdf.py informe.pdf --manifest manifiesto.json --output qa.json`.
@@ -51,7 +64,9 @@ Este respaldo no prueba destinos de enlaces, conteos exactos ni orden de unidade
 
 ## Barrido de fugas
 
-Todo documento, para cliente o para el equipo, sale sin rastros del proceso de producción. Extrae el texto del PDF final y busca:
+El cuerpo del documento emitido para cliente o equipo sale sin rastros del proceso de producción. Las
+notas separadas de un master para diseño y los archivos de control interno sí pueden registrar herramientas
+y rutas: no se copian al cuerpo para el lector. Si el destino es PDF, extrae su texto final y busca:
 
 - Códigos de trabajo interno (`TASK-`, `EPIC-`, `MINI-`, `ADR`, `PDR`) y códigos de hitos propios del modelo (por ejemplo, G1–G6).
 - Rutas de archivo, extensiones `.md` y marcadores como `[verificar]`.

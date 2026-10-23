@@ -46,8 +46,14 @@ docs/commercial/tenders/<slug>/
 ```
 
 El discriminador que manda es **audiencia**: `research/` + `*-INTERNO.md` = 🔒 nunca cruzan al
-cliente; raíz (ofertas, deck, xlsx) + el PDF de `cotizacion/v<N>/` + `anexos/` = ➡️ van al cliente. El
+cliente; ofertas, deck, xlsx, PDF de `cotizacion/v<N>/` y anexos son candidatos de entrega sólo con audiencia y aprobación confirmadas. Estar en raíz no basta. El
 sufijo `-INTERNO` es convención load-bearing: un archivo así **jamás** se sube al portal del comprador.
+
+## Preparación MD para Claude Design u otro destino elegido
+
+Cuando el operador pide un insumo Markdown para diseño externo, conservar un master completo, anexos y control interno. `deck-plan.json`, render jobs y PDF no son prerequisitos de esa entrega de trabajo. `proposal-studio.json` conserva `workshop_only`, sin IDs o verificación inventados; `sourcePlans` nombra sólo archivos existentes. La exportación y el registro canónico se resuelven cuando el alcance los requiere, sin declarar una `Proposal` emitida por tener un MD.
+
+La ubicación en raíz no promueve audiencia: un caso de negocio, master con notas o borrador de inversión puede seguir siendo interno. Al comprador sólo se entrega el contenido presentable aprobado para ese proceso; controles, costos, márgenes y fuentes crudas se conservan aparte. Un PDF obligatorio en las bases sigue siendo requisito de presentación. [Procedimiento](../../manual-de-uso/comercial/construir-una-licitacion.md#preparación-en-markdown-para-diseño-externo).
 
 ## El manifiesto de artefactos (`artifact-manifest.json`)
 

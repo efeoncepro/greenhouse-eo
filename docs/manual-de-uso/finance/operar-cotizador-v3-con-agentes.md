@@ -479,6 +479,10 @@ Cómo leer `gaps` de `compose assess`:
 - Los bloqueos de una cotización que no calculó conservan el `path` con que la cotización los reportó, uno por
   periodo: ésos no se pliegan.
 
+### Resumen editorial MD antes de emitir
+
+Si se pidió una propuesta Markdown para Claude Design, el cuadro de inversión puede transcribir exactamente los netos del artefacto calculado, conciliando fases y plazo. No alterar importes manualmente ni inferir impuestos; conservar estado preliminar. Costos, margen, hipótesis y evaluación permanecen internos. Ese insumo no es cotización emitida y no requiere PDF; la emisión posterior conserva el paso 5 y sus gates. [Preparación del master](../comercial/construir-una-licitacion.md#preparación-en-markdown-para-diseño-externo).
+
 ### Paso 5 — Producir el documento
 
 1. `compose document --input <artefacto> --out <brief>` devuelve exit 2. Sin `--brief`, `--out` guarda **sólo el

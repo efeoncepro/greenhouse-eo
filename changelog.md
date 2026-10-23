@@ -2,6 +2,12 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-23 — Mattis: preparación Markdown y continuidad comercial
+
+- Caso MD principal y propuesta de 23 bloques para Claude Design con anexos y simulación V3, sin aprobación ni envío.
+- Skills espejo de licitaciones, deck, informe y pricing; manuales, invariantes y plantillas concilian fuente editorial,
+  formato de presentación y costo objetivo vigente. [Auditoría](docs/audits/commercial/2026-10-23-mattis-markdown-docs-skills.md).
+
 ## 2026-10-23 — Auditoría SEO del Blog SKY e informe A4 premium para auditorías
 
 - Auditoría consolidada del Blog SKY (GSC/GA4 al 21-10, Semrush CL/PE, SERP en vivo, 1.700 publicaciones): sin
@@ -666,7 +672,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - [Consolidación comercial y skills](docs/audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md): revisión LicitaLAB amplia, altas Diego/Emily y segmentos con evidencia; UTEM con originales/anexos firmados y datos corporativos confirmados. Tres subagentes sincronizaron documentos, seguimiento y 11 pares de skills. Manuales corrigen contacto previo, firma autorizada, leads y reutilización. Sin nuevos envíos ni postulación.
 
 - [Contrato y registro](docs/commercial/follow-up-agent/README.md): heartbeat Codex activo L–V 09:00/16:00 Chile, revisión de 251 registros y 41 abiertos, proyecto comercial con 23 tareas y tres borradores de texto en Notion. ADR de autonomía acotada; sin cambios CRM ni envíos. Outlook devolvió 403 al guardar borrador; primera corrida programada aún no observada.
-
-## 2026-10-07 — Prospecting Agent: voz de Julio y enlace de reunión
-
-- [Manual](docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md), ADR, snapshot exacto y skills Codex/Claude: contexto, una capacidad, invitación con agenda y alternativa de respuesta; guardar/aprobar/readback. Configuración de 7.969 caracteres verificada en HubSpot: añade enlace institucional en la primera mención de Efeonce y conserva agenda; QA del último borrador pendiente, sin envío.

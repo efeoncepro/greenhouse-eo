@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-10-23 — Mattis: propuesta Markdown y método conciliado
+
+[Expediente GRD-1555](docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md): caso MD principal,
+master de 23 bloques para Claude Design y anexos; copias en carpeta 14. Simulación COP 190.150.000 netos, no aprobada;
+proyecto, elegibilidad, capacidad e impuestos pendientes. Sin envío ni nueva mutación CRM.
+Tres subagentes conciliaron continuidad y skills; método/manuales/plantillas distinguen preparación MD, diseño y emisión,
+y usan costo objetivo V3. [Auditoría y validación](docs/audits/commercial/2026-10-23-mattis-markdown-docs-skills.md).
+Sin cambio runtime; commit local autorizado por Julio, sin push. Próximo paso: diseño con Claude Design y validación comercial antes de presentar.
+
 ## 2026-10-23 — Auditoría SEO del Blog SKY: informe listo, envío pendiente de Julio
 
 Informe A4 de 23 páginas «Por qué cayó el tráfico y cómo recuperarlo» generado y revisado página por página
@@ -215,15 +224,3 @@ Primera ocurrencia, identidad nativa y recepción/atribución siguen pendientes:
 [Auditoría/evidencia](docs/audits/growth/2026-10-18-google-ads-activation.md),
 [arquitectura](docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md),
 [tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md) e [historial](Handoff.archive.md).
-
-## 2026-10-18 — Release completo de develop a producción
-
-Todo el candidato develop `77763331c` promovido a main `ec317c928` por PR #256: 1.583 archivos,
-árbol completo idéntico, sin exclusiones ni WIP ajeno. Orquestador `39159325900` SUCCESS;
-manifest `ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b` **released**, health HTTP 200,
-watchdog ok (6/6, drift 0, datos faltantes 0). CI/Deep/smoke verdes y canarios del contrato PASS.
-Excepción auditada de batch autorizada por Julio; los demás gates pasaron. Dos expansiones SQL
-aditivas aplicadas y verificadas; sin replay manual ni certificación de entrega a proveedores.
-Ads **OFF**, GTM sin publicar: hosts/Preview/políticas por fuente/EC conservan su rollout pendiente.
-[Auditoría y límites](docs/audits/releases/2026-10-18-full-develop-production-release.md),
-[tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md) y [historial](Handoff.archive.md).

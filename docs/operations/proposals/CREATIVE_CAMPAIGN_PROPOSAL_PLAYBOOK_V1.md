@@ -1,5 +1,7 @@
 # Propuesta de campaña creativa para un cliente — playbook de punta a punta (V1)
 
+> **Preparación en formato elegido:** si el operador pide caso/propuesta en MD para diseñar en Claude Design, aplicar el [procedimiento Markdown](../../manual-de-uso/comercial/construir-una-licitacion.md#preparación-en-markdown-para-diseño-externo). Este playbook describe también paquetes ya producidos: sus renders/exports no son requisito de la entrega editorial previa. Mantener requisitos del comprador, precio preliminar y aprobación separados.
+
 > **Tipo de documento:** Playbook operativo (para agentes y personas)
 > **Versión:** 1.0
 > **Creado:** 2026-10-12 por Claude, con Julio Reyes

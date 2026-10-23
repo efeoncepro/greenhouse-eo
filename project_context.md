@@ -12,7 +12,7 @@ Marca → ejecución escalable: [dirección y límites](docs/architecture/EFEONC
 
 CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
-[CRM/TA](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); [V3](data/pricing/README.md).
+[CRM/TA](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); [V3](data/pricing/README.md). [MD](docs/manual-de-uso/comercial/construir-una-licitacion.md).
 
 ## Documentación
 
@@ -21,7 +21,7 @@ CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 CRM: provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
 [CRM humano-agente](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md): modelo aprobado; evidencia y límites comerciales en el canon.
 
-Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
+Next.js 16/MUI 7/Vuexy/TS · `Handoff.md` · historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
 [Prospección y capacidad local](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
@@ -300,4 +300,4 @@ corregir router o canon antes de usar memoria histórica.
 
 - Snapshot íntegro del contexto anterior: [índice 2026-07-19](docs/operations/agent-context-history/2026-07-19/README.md).
 - Los snapshots no gobiernan comportamiento vigente ni se editan.
-- `project_context.md` no acepta secciones `## Delta YYYY-MM-DD`; los cambios históricos van a changelog, tasks/issues/ADRs o archivo, según ownership.
+- `project_context.md`: sin `## Delta YYYY-MM-DD`; historia en changelog, tasks/issues/ADRs o archivo según ownership.

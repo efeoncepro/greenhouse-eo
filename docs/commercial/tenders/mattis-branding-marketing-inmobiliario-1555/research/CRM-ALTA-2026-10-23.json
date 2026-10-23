@@ -1,0 +1,75 @@
+{
+  "portalId": 48713323,
+  "dealId": 66672959873,
+  "authorizedBy": "Julio Reyes; solicitud directa de crear el Deal tras leer el RFP, 23/10/2026",
+  "route": "HubSpot MCP directo",
+  "properties": {
+    "dealname": "Mattis | CO | Branding y marketing inmobiliario | GRD-1555",
+    "pipeline": "default",
+    "dealstage": "appointmentscheduled",
+    "hubspot_owner_id": "75788512",
+    "dealtype": "newbusiness",
+    "pipeline_bucket": "Strategic Bets",
+    "modalidad_de_venta": "Licitación",
+    "canal_de_adqusicion": "WherEX",
+    "linea_de_servicio": "wave",
+    "servicios_especificos": "agencia_creativa;produccion_audiovisual;social_media_content;research_estrategia",
+    "id_de_licitacion": "GRD-1555",
+    "gh_idempotency_key": "hubspot-private-tender:wherex:GRD-1555",
+    "ficha_de_licitacion": "https://system.wherex.com/secured/supplier_user/proposal/get/7586459",
+    "hs_next_step": "Julio: confirmar zona del cierre 30/10 18:00, contraparte/elegibilidad y volúmenes del brief; dimensionar costos/margen y decidir GO.",
+    "closedate": "",
+    "fecha_de_cierre_de_licitacion": "",
+    "description": "Alta expresamente solicitada por Julio el 23/10/2026 tras lectura íntegra del RFP. Entrada administrativa en etapa inicial; no acredita cita, GO, presupuesto, calificación completa ni oferta presentada.\n\nPROCESO: GRD-1555 / Wherex N°1555; oferta 7586459. Carpeta 14: Agencia digital Spot - Mattis. Alcance de Mattis Inmobiliaria (filial de Grupo Réditos), Colombia. “Spot” es denominación del encargo/carpeta; no se limita a un spot audiovisual: el RFP estima 12 meses.\n\nNECESIDAD: apoyar desarrollo y ejecución de branding y mercadeo de un proyecto inmobiliario que Mattis promocionará/comercializará, por insuficiente capacidad operativa interna. Proyecto sin nombre ni ubicación precisados. Incluye identidad de marca y lineamientos, manual de identidad, piezas y contenidos digitales, producción y edición audiovisual, diseño gráfico, material comercial/promocional y apoyo de implementación. Se solicitan servicios, cantidades, tiempos y costos desglosados. No se fijan volúmenes, formatos, revisiones, pauta, entregas mensuales, fecha de inicio ni KPIs.\n\nECONOMÍA: Mattis declara no contar con presupuesto definido (Formato C13). Sin amount ni precio aprobado; moneda contractual, impuestos, costos/capacidad/margen y GO pendientes. Duración estimada 12 meses, no contrato aceptado. Pago según captura: 30 días corridos desde recepción de factura.\n\nCALENDARIO (captura aportada, sin lectura live de portal): publicación 23/10/2026 17:44; recepción ofertas 30/10/2026 18:00. La captura no rotula zona horaria; fecha_de_cierre_de_licitacion queda sin datetime hasta confirmación. Closedate comercial sin evidencia y vacío. Oferta “Editando”, primera apertura por Julio 23/10 18:03; no comprobante de presentación.\n\nREQUISITOS: captura exige Cámara de Comercio, RUT completo y Estructura de la campaña (formato con ítems a desarrollar). RFP Formato A15 exige completar cumplimiento y valores en Requisitos técnicos y referenciar páginas del PDF para cada ítem; indica que toda la propuesta, incluido el formato, integra orden de compra/contrato. Matriz técnica contiene categorías genéricas y descripciones D9:D21 vacías; no habilitantes sin detalle/pesos. “TECNICO1” carece de correspondencia en Listas. No declarar cumplimiento automático de categorías o listas de ejemplo. Anexos: declaración de conflicto de interés para diligenciar/firmar por representante autorizado y folleto Línea Ética; ambos leídos, sin completar ni firmar.\n\nIDENTIDAD: Company Grupo Reditos 34264439413 reutilizada como cuenta del holding; NO equivale a entidad facturadora. Captura identifica COMPAÑÍA DE SERVICIOS INMOBILIARIOS Y EMPRESARIALES S.A.S., RUT 9005549987, Calle 50 No 51-65; giro mostrado “Apuestas” (dato del portal que requiere conciliación, no clasificación inferida de Mattis). RFP identifica Mattis Inmobiliaria. Contraparte, elegibilidad de Efeonce/facturación internacional y responsable comprador pendientes. Sin contactos atribuidos por inferencia.\n\nFUENTE: 425935.zip de carpeta 14, RFP Agencia Proyecto Inmobiliario-202610231543352470.xlsx (4 hojas: Formato, Requisitos técnicos, Listas y Hoja3; últimas 2 ocultas), comentarios/fórmulas/listas revisados; única imagen = logo Grupo Réditos. SHA256 RFP 31d3e14385341b7f0b6a13941d106e8760a941e42458749e702b44a09516d821. Captura del usuario 23/10/2026. Lectura completa del RFP y anexos, no confirmación live de Wherex.\n\nSIGUIENTE PASO: Julio: confirmar zona del cierre, identidad/elegibilidad/contrato y brief (proyecto, volúmenes, canales, responsabilidades y cronograma); después dimensionar costo/margen y decidir GO. GRD-1552 y GRD-1541 son procesos separados."
+  },
+  "create": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"createResults\":{\"results\":[{\"objectType\":\"DEAL\",\"objectId\":66672959873,\"object\":{\"id\":66672959873,\"properties\":{},\"createdAt\":\"2026-10-23T21:07:52.330Z\",\"updatedAt\":\"2026-10-23T21:07:52.330Z\",\"archived\":false,\"url\":\"https://app.hubspot.com/contacts/48713323/record/0-3/66672959873?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=manage_crm_objects\",\"displayName\":\"Mattis | CO | Branding y marketing inmobiliario | GRD-1555\"},\"associationResult\":{\"results\":[{\"fromObjectId\":66672959873,\"fromObjectType\":\"DEAL\",\"toObjectId\":34264439413,\"toObjectType\":\"COMPANY\",\"labels\":[\"Primary\"]}],\"summary\":{\"successful\":1,\"failed\":0,\"total\":1}}}],\"summary\":{\"totalProcessed\":1,\"created\":1,\"failed\":0}}}"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "firstReadback": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"objects\":[{\"id\":66672959873,\"properties\":{\"dealname\":\"Mattis | CO | Branding y marketing inmobiliario | GRD-1555\",\"linea_de_servicio\":\"wave\",\"pipeline_bucket\":\"Strategic Bets\",\"description\":\"Alta expresamente solicitada por Julio el 23/10/2026 tras lectura íntegra del RFP. Entrada administrativa en etapa inicial; no acredita cita, GO, presupuesto, calificación completa ni oferta presentada.\\n\\nPROCESO: GRD-1555 / Wherex N°1555; oferta 7586459. Carpeta 14: Agencia digital Spot - Mattis. Alcance de Mattis Inmobiliaria (filial de Grupo Réditos), Colombia. “Spot” es denominación del encargo/carpeta; no se limita a un spot audiovisual: el RFP estima 12 meses.\\n\\nNECESIDAD: apoyar desarrollo y ejecución de branding y mercadeo de un proyecto inmobiliario que Mattis promocionará/comercializará, por insuficiente capacidad operativa interna. Proyecto sin nombre ni ubicación precisados. Incluye identidad de marca y lineamientos, manual de identidad, piezas y contenidos digitales, producción y edición audiovisual, diseño gráfico, material comercial/promocional y apoyo de implementación. Se solicitan servicios, cantidades, tiempos y costos desglosados. No se fijan volúmenes, formatos, revisiones, pauta, entregas mensuales, fecha de inicio ni KPIs.\\n\\nECONOMÍA: Mattis declara no contar con presupuesto definido (Formato C13). Sin amount ni precio aprobado; moneda contractual, impuestos, costos/capacidad/margen y GO pendientes. Duración estimada 12 meses, no contrato aceptado. Pago según captura: 30 días corridos desde recepción de factura.\\n\\nCALENDARIO (captura aportada, sin lectura live de portal): publicación 23/10/2026 17:44; recepción ofertas 30/10/2026 18:00. La captura no rotula zona horaria; fecha_de_cierre_de_licitacion queda sin datetime hasta confirmación. Closedate comercial sin evidencia y vacío. Oferta “Editando”, primera apertura por Julio 23/10 18:03; no comprobante de presentación.\\n\\nREQUISITOS: captura exige Cámara de Comercio, RUT completo y Estructura de la campaña (formato con ítems a desarrollar). RFP Formato A15 exige completar cumplimiento y valores en Requisitos técnicos y referenciar páginas del PDF para cada ítem; indica que toda la propuesta, incluido el formato, integra orden de compra/contrato. Matriz técnica contiene categorías genéricas y descripciones D9:D21 vacías; no habilitantes sin detalle/pesos. “TECNICO1” carece de correspondencia en Listas. No declarar cumplimiento automático de categorías o listas de ejemplo. Anexos: declaración de conflicto de interés para diligenciar/firmar por representante autorizado y folleto Línea Ética; ambos leídos, sin completar ni firmar.\\n\\nIDENTIDAD: Company Grupo Reditos 34264439413 reutilizada como cuenta del holding; NO equivale a entidad facturadora. Captura identifica COMPAÑÍA DE SERVICIOS INMOBILIARIOS Y EMPRESARIALES S.A.S., RUT 9005549987, Calle 50 No 51-65; giro mostrado “Apuestas” (dato del portal que requiere conciliación, no clasificación inferida de Mattis). RFP identifica Mattis Inmobiliaria. Contraparte, elegibilidad de Efeonce/facturación internacional y responsable comprador pendientes. Sin contactos atribuidos por inferencia.\\n\\nFUENTE: 425935.zip de carpeta 14, RFP Agencia Proyecto Inmobiliario-202610231543352470.xlsx (4 hojas: Formato, Requisitos técnicos, Listas y Hoja3; últimas 2 ocultas), comentarios/fórmulas/listas revisados; única imagen = logo Grupo Réditos. SHA256 RFP 31d3e14385341b7f0b6a13941d106e8760a941e42458749e702b44a09516d821. Captura del usuario 23/10/2026. Lectura completa del RFP y anexos, no confirmación live de Wherex.\\n\\nSIGUIENTE PASO: Julio: confirmar zona del cierre, identidad/elegibilidad/contrato y brief (proyecto, volúmenes, canales, responsabilidades y cronograma); después dimensionar costo/margen y decidir GO. GRD-1552 y GRD-1541 son procesos separados.\",\"modalidad_de_venta\":\"Licitación\",\"ficha_de_licitacion\":\"https://system.wherex.com/secured/supplier_user/proposal/get/7586459\",\"id_de_licitacion\":\"GRD-1555\",\"gh_idempotency_key\":\"hubspot-private-tender:wherex:GRD-1555\",\"servicios_especificos\":\"agencia_creativa;produccion_audiovisual;social_media_content;research_estrategia\",\"pipeline\":\"default\",\"hs_next_step\":\"Julio: confirmar zona del cierre 30/10 18:00, contraparte/elegibilidad y volúmenes del brief; dimensionar costos/margen y decidir GO.\",\"canal_de_adqusicion\":\"WherEX\",\"hubspot_owner_id\":\"75788512\",\"dealstage\":\"appointmentscheduled\",\"dealtype\":\"newbusiness\"},\"archived\":false,\"url\":\"https://app.hubspot.com/contacts/48713323/record/0-3/66672959873?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch\",\"displayName\":\"Mattis | CO | Branding y marketing inmobiliario | GRD-1555\"}],\"notFound\":[]}"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  },
+  "secondReadback": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"objects\":[{\"id\":66672959873,\"properties\":{\"pipeline\":\"default\",\"dealname\":\"Mattis | CO | Branding y marketing inmobiliario | GRD-1555\",\"hubspot_owner_id\":\"75788512\",\"pipeline_bucket\":\"Strategic Bets\",\"dealstage\":\"appointmentscheduled\",\"id_de_licitacion\":\"GRD-1555\",\"gh_idempotency_key\":\"hubspot-private-tender:wherex:GRD-1555\",\"dealtype\":\"newbusiness\"},\"archived\":false,\"url\":\"https://app.hubspot.com/contacts/48713323/record/0-3/66672959873?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch\",\"displayName\":\"Mattis | CO | Branding y marketing inmobiliario | GRD-1555\"}],\"notFound\":[]}"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  },
+  "companyAssociationReadback": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"results\":[{\"id\":66672959873,\"properties\":{\"hs_object_id\":\"66672959873\",\"dealname\":\"Mattis | CO | Branding y marketing inmobiliario | GRD-1555\",\"createdate\":\"2026-10-23T21:07:52.330Z\",\"hs_lastmodifieddate\":\"2026-10-23T21:09:01.504Z\",\"pipeline_bucket\":\"Strategic Bets\",\"dealtype\":\"newbusiness\"},\"displayName\":\"Mattis | CO | Branding y marketing inmobiliario | GRD-1555\"}],\"total\":1,\"urlTemplate\":\"https://app.hubspot.com/contacts/48713323/record/0-3/{id}?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=search\",\"offset\":1}"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  },
+  "verification": "Dos lecturas estables; Primary reportada exitosa al crear; búsqueda por compañía + ID devuelve exactamente el Deal; sin amount, moneda ni fechas devueltos."
+}
