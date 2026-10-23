@@ -1,5 +1,9 @@
 # TASK-2038 — Renderer de Growth Forms en AXIS
 
+## Delta 2026-10-23
+
+- TASK-2044 agrega campos de presentación al contrato (ancho por campo, consentimiento `compact`, éxito `dismiss` e `icon`) y TASK-2045 cambia el renderer (esquema oscuro, tokens nuevos, Turnstile dentro del formulario). El port a AXIS debe llevarlos; si esta task cierra antes, TASK-2045 se hace sobre el código en AXIS.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -1,5 +1,9 @@
 # TASK-1320 — Growth Forms Success Card — Renderer (ui-ux)
 
+## Delta 2026-10-23
+
+- TASK-2044 suma a la tarjeta de éxito la acción `dismiss` (sin `href`) y `presentation.icon` (`celebration/orbit/none`); TASK-2045 los renderiza para cerrar el diálogo del CTA. No cambian el render por defecto de esta task.
+
 ## Delta 2026-07-02 — bloqueante TASK-1319 resuelto (contrato listo)
 
 TASK-1319 quedó **complete**: el contrato ya expone la success-card metadata en código.
