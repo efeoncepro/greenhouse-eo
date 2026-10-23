@@ -645,6 +645,8 @@ export const CTA_TELEMETRY_ALLOWED_PAYLOAD_KEYS = [
   'renderer_version',
   'contract_version',
   'page_uri',
+  // TASK-2045 — `dialog` cuando open_growth_form abre en diálogo (mismo vocabulario que el agendador).
+  'activation_mode',
 ] as const
 export type CtaTelemetryAllowedPayloadKey = (typeof CTA_TELEMETRY_ALLOWED_PAYLOAD_KEYS)[number]
 

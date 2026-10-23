@@ -584,6 +584,109 @@ dialog.ghc-meeting-surface[data-full-screen] .ghc-meeting-stage {
 @keyframes ghc-meeting-backdrop { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ghc-meeting-spin { to { transform: rotate(1turn); } }
 
+/* ── TASK-2045 · open_growth_form en diálogo ─────────────────────────────
+   Vive en <body> (fuera del CTA): sus defaults son neutros y el anfitrión lo viste con tokens
+   --ghcta-dialog-* y hooks data-ghcta-dialog-*. Entra con @starting-style y sale con
+   transition-behavior: allow-discrete; sin soporte, abre y cierra sin animación. Longhands de font
+   (nunca inherit dentro del shorthand). Nunca la colocación interruptiva popup_modal. */
+dialog.ghc-form-surface {
+  box-sizing: border-box;
+  width: min(var(--ghcta-dialog-max-width, 640px), calc(100vw - 48px));
+  max-width: none;
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  padding: 0;
+  overflow: visible;
+  color: var(--ghcta-dialog-fg, #172033);
+  background: transparent;
+  border: 0;
+  font-family: inherit;
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--ghcta-dialog-exit-duration, 250ms) var(--ghcta-dialog-ease-exit, cubic-bezier(.3, 0, .8, .15)),
+    transform var(--ghcta-dialog-exit-duration, 250ms) var(--ghcta-dialog-ease-exit, cubic-bezier(.3, 0, .8, .15)),
+    overlay var(--ghcta-dialog-exit-duration, 250ms) allow-discrete,
+    display var(--ghcta-dialog-exit-duration, 250ms) allow-discrete;
+}
+dialog.ghc-form-surface:not([open]) { opacity: 0; transform: translateY(16px) scale(.98); }
+dialog.ghc-form-surface[open] {
+  transition:
+    opacity var(--ghcta-dialog-enter-duration, 450ms) var(--ghcta-dialog-ease-enter, cubic-bezier(.2, 0, 0, 1)),
+    transform var(--ghcta-dialog-enter-duration, 450ms) var(--ghcta-dialog-ease-enter, cubic-bezier(.2, 0, 0, 1)),
+    overlay var(--ghcta-dialog-enter-duration, 450ms) allow-discrete,
+    display var(--ghcta-dialog-enter-duration, 450ms) allow-discrete;
+}
+@starting-style {
+  dialog.ghc-form-surface[open] { opacity: 0; transform: translateY(32px) scale(.97); }
+}
+dialog.ghc-form-surface::backdrop {
+  background: var(--ghcta-dialog-backdrop, rgba(6, 24, 43, .72));
+  backdrop-filter: blur(var(--ghcta-dialog-blur, 10px));
+  opacity: 1;
+  transition: opacity 200ms cubic-bezier(.4, 0, .2, 1), overlay 200ms allow-discrete, display 200ms allow-discrete;
+}
+dialog.ghc-form-surface:not([open])::backdrop { opacity: 0; }
+@starting-style {
+  dialog.ghc-form-surface[open]::backdrop { opacity: 0; }
+}
+.ghc-form-dialog-card {
+  position: relative;
+  box-sizing: border-box;
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: var(--ghcta-dialog-padding, 44px 44px 40px);
+  color: var(--ghcta-dialog-fg, #172033);
+  background: var(--ghcta-dialog-surface, #ffffff);
+  border: var(--ghcta-dialog-border, 1px solid rgba(23, 32, 51, .12));
+  border-radius: var(--ghcta-dialog-radius, 28px 28px 28px 6px);
+  box-shadow: var(--ghcta-dialog-shadow, 0 40px 120px rgba(0, 0, 0, .35));
+}
+.ghc-form-dialog-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: var(--ghcta-dialog-close-border, 1px solid color-mix(in srgb, currentColor 25%, transparent));
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 150ms cubic-bezier(.4, 0, .2, 1);
+}
+.ghc-form-dialog-close:hover { border-color: var(--ghcta-dialog-close-hover, currentColor); }
+.ghc-form-dialog-close:focus-visible { outline: 2px solid var(--ghcta-dialog-focus, currentColor); outline-offset: 2px; }
+.ghc-form-dialog-header { display: grid; gap: 8px; margin: 0 0 28px; padding-inline-end: 48px; }
+.ghc-form-dialog-eyebrow,
+.ghc-form-dialog-title,
+.ghc-form-dialog-lead { margin: 0; font-family: inherit; letter-spacing: normal; text-transform: none; }
+.ghc-form-dialog-eyebrow { font-size: 1.125rem; font-weight: 300; line-height: 1.3; }
+.ghc-form-dialog-title { font-size: 2rem; font-weight: 700; line-height: 1.05; color: inherit; }
+.ghc-form-dialog-title:focus { outline: none; }
+.ghc-form-dialog-lead { max-width: 460px; margin-top: 6px; font-size: .9375rem; font-weight: 300; line-height: 1.55; }
+.ghc-form-dialog-stage { min-width: 0; }
+dialog.ghc-form-surface[data-sheet] {
+  width: calc(100vw - 24px);
+  max-height: calc(100dvh - 12px);
+  margin: auto auto 12px;
+}
+dialog.ghc-form-surface[data-sheet] .ghc-form-dialog-card {
+  max-height: calc(100dvh - 24px);
+  padding: var(--ghcta-dialog-padding-sheet, 32px 20px 28px);
+  border-radius: var(--ghcta-dialog-radius-sheet, 24px 24px 6px 6px);
+}
+@starting-style {
+  dialog.ghc-form-surface[data-sheet][open] { transform: translateY(48px); }
+}
+
 /* ── Reduced motion: estado final directo, cero transform/animación ──── */
 @media (prefers-reduced-motion: reduce) {
   :is(greenhouse-cta, .ghc-scope) .ghc-card { animation: none; }
@@ -592,6 +695,10 @@ dialog.ghc-meeting-surface[data-full-screen] .ghc-meeting-stage {
   /* Slide-in: sin travel — aparece/desaparece en estado final (semántica intacta). */
   :is(greenhouse-cta, .ghc-scope).ghc-slidein { transition: none; translate: none; }
   dialog.ghc-meeting-surface, dialog.ghc-meeting-surface::backdrop, .ghc-meeting-loading::before { animation: none; }
+  /* TASK-2045 — el diálogo del formulario: sólo opacidad, sin desplazamiento ni escala. */
+  dialog.ghc-form-surface, dialog.ghc-form-surface:not([open]), dialog.ghc-form-surface[open] { transform: none; transition-duration: 150ms; }
+  @starting-style { dialog.ghc-form-surface[open], dialog.ghc-form-surface[data-sheet][open] { transform: none; } }
+  .ghc-form-dialog-close { transition: none; }
   .ghc-meeting-close { transition: none; }
 }
 

@@ -7,6 +7,7 @@ const MEETING_DEFINE_TIMEOUT_MS = 10_000
 const MOBILE_QUERY = '(max-width: 639px)'
 
 const bundleLoads = new WeakMap<Document, Map<string, Promise<boolean>>>()
+// Compartido con el diálogo del formulario (TASK-2045): un solo contador por documento.
 const scrollLocks = new WeakMap<Document, { count: number; previousOverflow: string }>()
 
 const ensureMeetingBundle = (doc: Document): Promise<boolean> => {
@@ -52,7 +53,7 @@ const ensureMeetingBundle = (doc: Document): Promise<boolean> => {
   return load
 }
 
-const lockDocumentScroll = (doc: Document): void => {
+export const lockDocumentScroll = (doc: Document): void => {
   const current = scrollLocks.get(doc)
 
   if (current) {
@@ -65,7 +66,7 @@ const lockDocumentScroll = (doc: Document): void => {
   doc.documentElement.style.overflow = 'hidden'
 }
 
-const unlockDocumentScroll = (doc: Document): void => {
+export const unlockDocumentScroll = (doc: Document): void => {
   const current = scrollLocks.get(doc)
 
   if (!current) return

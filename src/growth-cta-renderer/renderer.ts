@@ -10,12 +10,17 @@
  * (clicked/dismissed/form_opened/form_submitted) van al ledger de conversión.
  */
 import { isExternalNavigateHref, isSafeNavigateHref, resolveActionFamily } from './action'
-import type { CtaRenderContractMirror, CtaRenderNavigateActionMirror } from './contract'
+import type {
+  CtaRenderContractMirror,
+  CtaRenderNavigateActionMirror,
+  CtaRenderOpenGrowthFormActionMirror,
+} from './contract'
 import type { CtaSystemCopy } from './copy'
 import type { TelemetryEmitter } from './telemetry'
 import { RENDERER_GTM_EVENTS } from './telemetry'
 import { RENDERER_CONTRACT_VERSION, RENDERER_VERSION } from './version'
 import { attachDisclosureFocus, type DisclosureFocusHandle } from './disclosure-focus'
+import { FormDialogController } from './dialog'
 
 /**
  * TASK-1431 — recovery acotado de una navegación same-context que no descargó la
@@ -110,6 +115,8 @@ export class CtaRenderer {
 
     if (contract.cta.campaignSlug) payload.campaign_slug = contract.cta.campaignSlug
     if (ctaLocation) payload.cta_location = ctaLocation
+    // TASK-2045 — mismo vocabulario que el agendador (`activation_mode`): el form abre en diálogo.
+    if (this.formAction()?.presentation === 'dialog') payload.activation_mode = 'dialog'
     if (pageUri) payload.page_uri = pageUri
 
     return payload
@@ -251,7 +258,7 @@ export class CtaRenderer {
   private navigateRestoreTimer: ReturnType<typeof setTimeout> | null = null
 
   /** Narrow del action de form (la familia growth_form es la única que lo usa). */
-  private formAction(): { formSlug: string; formKey?: string } | null {
+  private formAction(): CtaRenderOpenGrowthFormActionMirror | null {
     const action = this.options.contract.action
 
     return action.kind === 'open_growth_form' ? action : null
@@ -263,6 +270,7 @@ export class CtaRenderer {
     primary.type = 'button'
     primary.className = 'ghc-primary'
     primary.textContent = label
+    if (this.formAction()?.presentation === 'dialog') primary.setAttribute('aria-haspopup', 'dialog')
     primary.addEventListener('click', () => void this.handlePrimary(primary, card))
 
     return primary
@@ -455,6 +463,12 @@ export class CtaRenderer {
     this.options.telemetry.emit(RENDERER_GTM_EVENTS.clicked, this.basePayload())
     this.options.onIngest('clicked')
 
+    if (this.formAction()?.presentation === 'dialog') {
+      await this.openFormDialog(primary)
+
+      return
+    }
+
     primary.disabled = true
 
     const slot = this.doc.createElement('div')
@@ -557,6 +571,51 @@ export class CtaRenderer {
     this.options.root.dataset.ghcState = 'visible'
   }
 
+  // ─── Presentación dialog de open_growth_form (TASK-2045) ────────────────────
+
+  private formDialog: FormDialogController | null = null
+  private formDialogPending = false
+
+  /**
+   * Abre el formulario en un diálogo modal abierto por el visitante. El controller monta el formulario
+   * la primera vez y lo conserva entre cierres (lo escrito sobrevive a un Escape accidental). Un
+   * fallo de carga cierra el diálogo y deja el CTA usable (fail-closed, mismo `form_handoff_failed`).
+   */
+  private async openFormDialog(primary: HTMLButtonElement): Promise<void> {
+    const action = this.formAction()
+
+    if (!action || this.formDialogPending) return
+
+    this.formDialog ??= new FormDialogController({
+      doc: this.doc,
+      copy: this.options.copy,
+      header: {
+        eyebrow: action.dialog?.eyebrow,
+        title: action.dialog?.title ?? this.options.contract.content.headline,
+        lead: action.dialog?.lead,
+      },
+      mountForm: slot => this.options.onPrimary(slot),
+    })
+
+    this.formDialogPending = true
+
+    const opened = await this.formDialog.open(primary)
+
+    this.formDialogPending = false
+
+    if (this.destroyed) return
+
+    if (!opened) {
+      this.options.telemetry.emit(RENDERER_GTM_EVENTS.error, { ...this.basePayload(), reason_class: 'form_handoff_failed' })
+      this.options.onIngest('error', { reason: 'form_handoff_failed' })
+
+      return
+    }
+
+    this.options.telemetry.emit(RENDERER_GTM_EVENTS.formOpened, { ...this.basePayload(), form_slug: action.formSlug })
+    this.options.onIngest('form_opened')
+  }
+
   /** El módulo element/action llama esto cuando el form acepta la submission. */
   notifyFormSubmitted(formSubmissionId?: string): void {
     const payload = { ...this.basePayload(), form_slug: this.formAction()?.formSlug ?? '' } as Record<string, string | number | boolean>
@@ -604,6 +663,8 @@ export class CtaRenderer {
     this.destroyed = true
     this.disclosure?.release()
     this.disclosure = null
+    this.formDialog?.dispose()
+    this.formDialog = null
 
     if (this.navigateRestoreTimer !== null) {
       clearTimeout(this.navigateRestoreTimer)

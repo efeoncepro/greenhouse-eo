@@ -4,8 +4,13 @@
  * `RENDERER_VERSION` versiona el comportamiento del bundle; `CONTRACT_VERSION`
  * (espejo de la SoT `src/lib/growth/forms/contracts.ts`) versiona la forma del
  * payload. Arch §19.2: el wrapper de cada host pinea un canal (`preview|beta|stable`).
+ *
+ * `1.1.0` (2026-10-23, TASK-2045): kit de formularios diseñados — `color-scheme="dark"`, ancho declarado,
+ * tokens de campo/etiqueta/placeholder/botón, consentimiento compacto con `{privacyLink}`, éxito con
+ * `icon` y acción `dismiss` (`ghf:dismiss`), `data-ghf-busy` y Turnstile junto al formulario. Primer bump
+ * desde el núcleo: el valor viaja en la telemetría y separa el antes del después.
  */
-export const RENDERER_VERSION = '1.0.0-preview.1'
+export const RENDERER_VERSION = '1.1.0'
 
 /** Debe ser idéntico a `CONTRACT_VERSION` de la SoT (parity test lo verifica). */
 export const RENDERER_CONTRACT_VERSION = 'greenhouse-growth-public-forms.v1'
