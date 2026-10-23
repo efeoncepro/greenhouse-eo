@@ -149,6 +149,16 @@ export type FieldPresentationIcon = (typeof FIELD_PRESENTATION_ICONS)[number]
 export const FIELD_PRESENTATION_CONTROLS = ['country_select', 'premium_select'] as const
 export type FieldPresentationControl = (typeof FIELD_PRESENTATION_CONTROLS)[number]
 
+/**
+ * TASK-2044 — Ancho del campo en el modo de dos columnas (`presentation.width`).
+ *   - `auto` (default, igual que omitirlo): el renderer decide como siempre (heurística por tipo).
+ *   - `half`: media columna; colapsa a fila completa cuando el contenedor es de una columna.
+ *   - `full`: fila completa.
+ * Es presentación pura: no cambia valor, validación ni orden del campo.
+ */
+export const FIELD_PRESENTATION_WIDTHS = ['auto', 'half', 'full'] as const
+export type FieldPresentationWidth = (typeof FIELD_PRESENTATION_WIDTHS)[number]
+
 export const FILE_UPLOAD_STORAGE_CONTEXTS = ['hiring_application_cv_draft'] as const
 export type FileUploadStorageContext = (typeof FILE_UPLOAD_STORAGE_CONTEXTS)[number]
 
@@ -173,7 +183,8 @@ export type FileUploadPolicy = z.infer<typeof fileUploadPolicySchema>
 export const fieldPresentationSchema = z
   .object({
     icon: z.enum(FIELD_PRESENTATION_ICONS).optional(),
-    control: z.enum(FIELD_PRESENTATION_CONTROLS).optional()
+    control: z.enum(FIELD_PRESENTATION_CONTROLS).optional(),
+    width: z.enum(FIELD_PRESENTATION_WIDTHS).optional()
   })
   .strict()
 export type FieldPresentation = z.infer<typeof fieldPresentationSchema>

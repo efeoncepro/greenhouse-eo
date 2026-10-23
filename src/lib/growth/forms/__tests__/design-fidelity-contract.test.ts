@@ -1,0 +1,78 @@
+/**
+ * TASK-2044 — Contrato de fidelidad de diseño: campos opcionales de presentación para que un
+ * formulario diseñado en canvas se declare tal cual. Cada campo nuevo es opcional y su ausencia
+ * reproduce el contrato de hoy (los formularios publicados no cambian de veredicto ni de render).
+ */
+import { describe, expect, it } from 'vitest'
+
+import { compileFormVersion } from '../policy-compiler'
+import type { FormDefinitionRow, FormVersionRow } from '../store'
+
+const definition: FormDefinitionRow = {
+  form_id: 'fdef-1',
+  form_key: '00000000-0000-4000-8000-000000000001',
+  slug: 'test-form',
+  name: 'Test',
+  form_kind: 'lead_magnet',
+  purpose: 'test',
+  risk_profile: 'low',
+  owner_team: null,
+  status: 'active',
+  default_locale: 'es-CL',
+  created_by: null,
+  created_at: new Date(),
+  updated_at: new Date()
+}
+
+const version = (overrides: Partial<FormVersionRow> = {}): FormVersionRow => ({
+  form_version_id: 'fver-1',
+  form_id: 'fdef-1',
+  version: 1,
+  status: 'review',
+  locale: 'es-CL',
+  field_schema_json: [{ key: 'email', type: 'email', required: true }],
+  validation_schema_json: {},
+  copy_refs_json: {},
+  style_variant: null,
+  ui_policy_json: { composition: 'static' },
+  success_behavior_json: { kind: 'inline_message', message: 'Gracias' },
+  consent_policy_version: 'v1',
+  data_classification_json: {},
+  destination_policy_json: { allow: true },
+  analytics_policy_json: { enabled: true },
+  retention_policy_json: { days: 90 },
+  commercial_handoff_policy_json: {},
+  published_at: null,
+  created_at: new Date(),
+  ...overrides
+})
+
+const compile = (overrides: Partial<FormVersionRow> = {}) =>
+  compileFormVersion(definition, version(overrides), [], { forPublication: true })
+
+describe('TASK-2044 · ancho por campo', () => {
+  it('un campo sin width proyecta exactamente igual que hoy', () => {
+    const result = compile()
+
+    expect(result.renderContract?.fields[0]).toEqual({ key: 'email', type: 'email', required: true })
+  })
+
+  it('half y full viajan al contrato público', () => {
+    const result = compile({
+      field_schema_json: [
+        { key: 'name', type: 'text', presentation: { width: 'half' } },
+        { key: 'email', type: 'email', required: true, presentation: { width: 'half', icon: 'mail' } },
+        { key: 'pitch', type: 'textarea', presentation: { width: 'full' } }
+      ]
+    })
+
+    expect(result.blockingReasons).toEqual([])
+    expect(result.renderContract?.fields.map(field => field.presentation?.width)).toEqual(['half', 'half', 'full'])
+  })
+
+  it('un ancho desconocido invalida el campo y bloquea la publicación', () => {
+    const result = compile({ field_schema_json: [{ key: 'email', type: 'email', presentation: { width: 'third' } }] })
+
+    expect(result.warnings.map(warning => warning.code)).toContain('fields_invalid')
+  })
+})

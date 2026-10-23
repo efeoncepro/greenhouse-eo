@@ -106,6 +106,11 @@ export interface RendererFieldPresentation {
    * `select` en cualquier variante. Un valor desconocido se ignora (control por defecto de la variante).
    */
   control?: 'country_select' | 'premium_select'
+  /**
+   * TASK-2044 — ancho en el modo de dos columnas: `auto` (o ausente) = heurística por tipo, `half` = media
+   * columna (fila completa en una columna), `full` = fila completa.
+   */
+  width?: 'auto' | 'half' | 'full'
 }
 
 export interface RendererFieldDefinition {
