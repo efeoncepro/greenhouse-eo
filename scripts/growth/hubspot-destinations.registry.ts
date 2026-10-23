@@ -323,4 +323,20 @@ export const HUBSPOT_DESTINATION_SPECS: HubSpotDestinationSpec[] = [
       select('role', 'gh_form_inbound_rol', 'Cargo (Inbound)', 'Rango de cargo de la persona que pide el diagnóstico de inbound.'),
     ],
   },
+  {
+    // Popup «Quiero ser partner» de /partnership/ (2026-10-23). Reusa el formulario HubSpot de la página
+    // anterior para conservar la fuente de las propuestas de partners en el CRM.
+    formKey: 'eb5c108d-05fc-427b-82b0-4bb161fdbac7',
+    slug: 'efeonce-partner-application',
+    pageUrl: 'https://efeoncepro.com/partnership/',
+    hubspotForm: { id: '4c0066df-9a0f-4199-b0f7-d09e376a9f22', name: 'Lead Gean - Partnership' },
+    fields: [
+      FIRST_NAME,
+      LAST_NAME,
+      EMAIL,
+      COMPANY,
+      WEBSITE,
+      existing('offer', 'message', 'Qué ofrece y a quién le sirve'),
+    ],
+  },
 ]
