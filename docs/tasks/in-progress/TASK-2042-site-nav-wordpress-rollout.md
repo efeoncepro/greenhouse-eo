@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ con Ohio), agendador nativo en vivo desde la cabecera, el mega y el onepage, documento en revisión 4 y edición gobernada por pnpm public-website:site-nav. Pendiente: alta GTM/GA4, Core Web Vitals, prueba de vuelta a off en producción, decisión de diseño de las descripciones cortadas a 1280`v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
+- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ con Ohio), agendador nativo en vivo desde la cabecera, el mega y el onepage, documento en revisión 4 y edición gobernada por pnpm public-website:site-nav. Pendiente: alta GTM/GA4, Core Web Vitals, prueba de vuelta a off en producción`v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`

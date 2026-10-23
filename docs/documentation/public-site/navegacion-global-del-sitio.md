@@ -128,8 +128,8 @@ conversión, y ninguna lleva datos personales.
 - **Velocidad:** falta medir la velocidad de carga contra el menú anterior.
 - **Apagar en el sitio real:** la vuelta al menú anterior sólo se probó en un entorno de prueba.
 - **Pantalla de edición en WordPress:** todavía no existe; por ahora se edita con la herramienta de Greenhouse.
-- **Textos cortados en 1280 px:** en ese ancho, cinco descripciones de servicio se cortan con puntos suspensivos. Es
-  una decisión de diseño pendiente.
+- **Textos cortados en 1280 px:** en ese ancho, las descripciones de servicio largas se cortan en una línea con puntos
+  suspensivos. Es el diseño aprobado (tablero Mega1280 del canvas, confirmado el 2026-10-23); en 1440 se ven completas.
 - **Barra inferior para landings:** una barra de vidrio al pie de las landings ya fue aprobada, pero es un trabajo
   aparte.
 - **Loop Marketing:** su landing no está optimizada, así que el servicio lleva a la página de Inbound, y la dirección

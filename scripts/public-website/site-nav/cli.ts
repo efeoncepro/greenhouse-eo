@@ -696,14 +696,26 @@ const commands: Record<string, (args: string[]) => void | Promise<void>> = {
 
     await browser.close()
 
+    // Approved design (canvas board Mega1280, confirmed by the fidelity session on 2026-10-23): a service description is
+    // one line with an ellipsis below 1440 and must be whole at 1440. Resource titles in Recursos are replaced live by
+    // the latest posts and clamp by design: they are reported, not failed.
+    let errors = 0
+
     for (const [entry, widths] of cut) {
       const [text, where] = entry.split('\u0000')
+      const at = [...widths]
+      const label = `cut at ${at.join('/')}: «${text}» (${text.length} chars, ${where})`
 
-      console.log(`✗ cut at ${[...widths].join('/')}: «${text}» (${text.length} chars, ${where}) — shorten it keeping its words`)
+      if (where.includes('axis-site-nav__desc') && !at.includes(1440)) console.log(`· ${label} — by design below 1440 (Mega1280)`)
+      else if (where.includes('axis-site-nav__resource-title')) console.log(`! ${label} — fallback title; live posts replace it`)
+      else {
+        console.log(`✗ ${label} — shorten it keeping its words`)
+        errors++
+      }
     }
 
-    console.log(cut.size ? `✗ fit: ${cut.size} texts are cut` : '✓ fit: every panel text fits at 1440, 1280 and 1200')
-    if (cut.size) process.exit(1)
+    console.log(errors ? `✗ fit: ${errors} texts are cut` : '✓ fit: every text that must fit does, at 1440, 1280 and 1200')
+    if (errors) process.exit(1)
   },
 
   apply(args) {

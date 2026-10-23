@@ -406,7 +406,9 @@ pnpm public-website:wpcli -- --eval-file scripts/public-website/create-yoast-red
 | --- | --- |
 | Número de revisión | Cada `apply` o `restore` crea la siguiente. `pull` imprime la que bajaste; `verify` la que sirve el sitio. Historia actual: 1 inicial · 2 posts reales y títulos de lectura acortados · 3 Loop Marketing → Inbound · 4 «Surround Discovery™» en vez de la entidad HTML. |
 | `✓` / `✗` / `!` en `check` | `✗` es error (esquema, entidad HTML, enlace o foto que no responde 200) y bloquea; `!` es aviso (enlace que redirige, título de tarjeta de más de 65 caracteres). La última línea resume errores y avisos. |
-| `✗ cut at 1280/1200: «…»` en `fit` | Ese texto se recorta a esos anchos. Acórtalo conservando sus palabras. `✓ fit: every panel text fits…` es el estado sano. |
+| `✗ cut at …: «…»` en `fit` | Ese texto se recorta donde no debe. Acórtalo conservando sus palabras. `✓ fit: every text that must fit does…` es el estado sano. |
+| `· cut at 1280: «…» … by design below 1440 (Mega1280)` | Una descripción de servicio en una línea con puntos suspensivos bajo 1440: es el diseño aprobado. Sólo es error si se corta a 1440. |
+| `! cut at …: «…» … fallback title` | Título fijo de Recursos: en vivo lo reemplazan los posts más recientes. Es un aviso, no un error. |
 | `Válido. Se guardaría como la revisión N (dry run, nada se guardó).` | El dry run de `apply` pasó. |
 | `REST serves revision X, expected Y` en `verify` | El borde todavía sirve la revisión anterior, o alguien publicó otra. Espera y repite; si persiste, haz `pull`. |
 | `eosn_conflict` (409) «Alguien guardó mientras editabas; no se pisó nada.» | Otra persona o sesión publicó después de tu `pull`. Nada se perdió. |
@@ -441,7 +443,7 @@ pnpm public-website:wpcli -- --eval-file scripts/public-website/create-yoast-red
 | Un título de tarjeta se ve cortado | Pasa de 65 caracteres o `fit` lo marca. Acórtalo conservando sus palabras y repite `check` y `fit`. |
 | `photo` avisa que la imagen es más chica que el recorte | La agrandaría y se vería blanda. Busca una fuente de al menos 880×472 (`mm`), 996×1080 (`op`) o 880×496 (`card`). |
 | `apply` falla con `eosn_conflict` | Alguien guardó después de tu `pull`. Guarda tu `diff`, corre `pull`, rehaz el cambio sobre la revisión nueva, `check` y vuelve a aplicar. |
-| A 1280 se cortan cinco descripciones de servicio (contenidos, redes sociales, medios, performance, inbound) | Pasa igual en el Lab de AXIS y en vivo. Es una decisión de diseño pendiente para la sesión de fidelidad, no un error de contenido: no lo «arregles» acortando sin decisión. |
+| A 1280 se cortan cinco descripciones de servicio (contenidos, redes sociales, medios, performance, inbound) | Es el diseño aprobado: el tablero Mega1280 del canvas recorta las descripciones a una línea con puntos suspensivos (confirmado por la sesión de fidelidad el 2026-10-23). En 1440 deben verse completas; `fit` sólo lo marca como error a 1440. |
 | Una página con hero claro arranca con el logo blanco ilegible | Las páginas con hero claro deben estar en `EO_SITE_NAV_LIGHT_HERO_PAGES` del adaptador (hoy 251078, 242261, 223787, 223841, 21460, 19820) para arrancar con la isla clara. Agregar una es un cambio del tema (carril del paso 11). |
 | `check` marca `«…» answers 000` | El enlace no respondió en 20 segundos. Repite; si persiste, revisa la página. |
 | `pull` falla con «Unexpected remote output» | Problema de SSH o WP-CLI. Corre `pnpm public-website:ssh-check`. |

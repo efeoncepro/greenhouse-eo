@@ -324,8 +324,8 @@ Consumers (verified 2026-10-23):
   `scripts/vendor-axis-site-nav.mjs`) and the constant `EO_SITE_NAV_AXIS`. Bump procedure and operation:
   `efeonce-public-site-wordpress` → `references/global-site-navigation.md`.
 
-Known, not changed: at 1280 five service descriptions end in an ellipsis in the Lab and live alike (contenidos, redes
-sociales, medios, performance, inbound) — a design question for the fidelity session.
+Approved design: below 1440 a service description is one line with an ellipsis (canvas board Mega1280, confirmed by
+the fidelity session on 2026-10-23); at 1440 it must be whole.
 
 Do not confuse it with `efeonce.surface-composition`: its `nav` field is **descriptive** (a header drawn inside a
 composed hero), not a running menu.

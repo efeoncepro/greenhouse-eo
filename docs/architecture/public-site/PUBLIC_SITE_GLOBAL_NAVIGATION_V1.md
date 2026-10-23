@@ -777,7 +777,7 @@ fidelidad.
 - Medir Core Web Vitals contra la cabecera anterior.
 - Comprobar en producción la vuelta a `off` (sólo se probó en Playground).
 - Admin de `TASK-2041` (dirección B con vista previa en vivo y el árbol de la dirección A).
-- Corte de descripciones en 1280 px: pregunta de diseño para la sesión de fidelidad.
+- Corte de descripciones en 1280 px: **aceptado** como diseño aprobado (tablero Mega1280 del canvas: `white-space: nowrap; overflow: hidden; text-overflow: ellipsis`; confirmado por la sesión de fidelidad el 2026-10-23). En 1440 van completas; `fit` sólo falla a 1440.
 - El dock inferior de vidrio para landings, aprobado por el operador y transmitido por la sesión de fidelidad, es una task
   aparte.
 - Destino de la copia pública: REST de WordPress sola, o también en el bucket (PDR-027, punto abierto 3).

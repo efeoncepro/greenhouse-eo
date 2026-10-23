@@ -24,9 +24,10 @@ Facts below verified 2026-10-23.
   every card title fits at 1440/1366/1280/1200.
 - Fidelity («Rediseño de Menú») measured live and approved at 1440, 1280, 1200, 1024, 834, 390; onepage circle at
   1440–2560; «Estás aquí» on 10 service pages.
-- Known and unchanged: at 1280 five service descriptions end in an ellipsis, in the Lab and live alike (contenidos,
-  redes sociales, medios, performance, inbound). It is a design question for the fidelity session, not a bug to patch
-  in the host.
+- Accepted design: at 1280 five service descriptions end in an ellipsis, in the Lab and live alike (contenidos,
+  redes sociales, medios, performance, inbound). It is the approved design (canvas board Mega1280: `white-space:
+  nowrap; overflow: hidden; text-overflow: ellipsis`, confirmed by the fidelity session on 2026-10-23); at 1440 they
+  must be whole, and `fit` only fails there.
 
 ## Source of truth
 
@@ -199,5 +200,5 @@ scheduler emits `greenhouse_cta_*`; `site_nav_cta` is not pushed. GTM/GA4 setup 
 ## Pending
 
 GTM/GA4 for `gh_site_nav_*`; Core Web Vitals against the previous header; production check of switching to `off`;
-TASK-2041 admin (direction B, live preview + tree); the 1280 description cut; the bottom glass dock for landings
+TASK-2041 admin (direction B, live preview + tree); the bottom glass dock for landings
 (separate task).
