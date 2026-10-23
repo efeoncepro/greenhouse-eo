@@ -153,6 +153,13 @@ export interface RendererConsentDisplay {
   noticeText?: string
   noticeCopyRef?: string
   privacyUrl?: string
+  /**
+   * TASK-2044 — `tile` (o ausente) = tarjeta con el enlace aparte; `compact` = casilla compacta. Un `label`
+   * de casilla puede traer una vez `{privacyLink}`: el renderer lo reemplaza por un enlace a `privacyUrl`
+   * con el texto `privacyLinkLabel` (o el del diccionario) y omite el párrafo de enlace aparte.
+   */
+  presentation?: 'tile' | 'compact'
+  privacyLinkLabel?: string
   checkboxes?: RendererConsentCheckbox[]
 }
 

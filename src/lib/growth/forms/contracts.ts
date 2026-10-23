@@ -367,11 +367,29 @@ export const sanitizeRenderCopy = (raw: unknown): Record<string, string> => {
   return out
 }
 
+/**
+ * TASK-2044 — Presentación del consentimiento.
+ *   - `tile` (default, igual que omitirlo): tarjeta con el texto y el enlace a la política en un párrafo aparte.
+ *   - `compact`: casilla compacta; el enlace a la política va dentro de la frase de la casilla.
+ */
+export const CONSENT_PRESENTATIONS = ['tile', 'compact'] as const
+export type ConsentPresentation = (typeof CONSENT_PRESENTATIONS)[number]
+
+/**
+ * TASK-2044 — Único marcador admitido en el `label` de una casilla de consentimiento. El renderer lo
+ * reemplaza por un enlace a `privacyUrl` con el texto `privacyLinkLabel` (o el del diccionario del
+ * locale). Nunca HTML del autor: el enlace lo construye el renderer con DOM.
+ */
+export const CONSENT_PRIVACY_LINK_MARKER = '{privacyLink}'
+export const CONSENT_PRIVACY_LINK_LABEL_MAX = 80
+
 export const consentDisplaySchema = z.object({
   consentPolicyVersion: z.string().optional(),
   noticeText: z.string().max(4000).optional(),
   noticeCopyRef: z.string().optional(),
   privacyUrl: z.string().url().optional(),
+  presentation: z.enum(CONSENT_PRESENTATIONS).optional(),
+  privacyLinkLabel: z.string().min(1).max(CONSENT_PRIVACY_LINK_LABEL_MAX).optional(),
   checkboxes: z
     .array(
       z.object({

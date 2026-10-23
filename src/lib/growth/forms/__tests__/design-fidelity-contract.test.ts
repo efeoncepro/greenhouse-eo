@@ -76,3 +76,60 @@ describe('TASK-2044 · ancho por campo', () => {
     expect(result.warnings.map(warning => warning.code)).toContain('fields_invalid')
   })
 })
+
+const consentCopy = (label: string, extra: Record<string, unknown> = {}) => ({
+  copy_refs_json: {
+    privacyUrl: 'https://efeoncepro.com/politica-de-privacidad/',
+    checkboxes: [{ key: 'privacy', label, required: true }],
+    ...extra
+  }
+})
+
+describe('TASK-2044 · consentimiento compacto con enlace en la frase', () => {
+  it('compact + un {privacyLink} + privacyUrl compila y viaja al contrato', () => {
+    const result = compile(
+      consentCopy('Acepto que Efeonce use estos datos para responder mi propuesta, según su {privacyLink}.', {
+        presentation: 'compact',
+        privacyLinkLabel: 'política de privacidad'
+      })
+    )
+
+    expect(result.blockingReasons).toEqual([])
+    expect(result.renderContract?.consent).toMatchObject({
+      presentation: 'compact',
+      privacyLinkLabel: 'política de privacidad',
+      privacyUrl: 'https://efeoncepro.com/politica-de-privacidad/'
+    })
+  })
+
+  it('una casilla sin llaves no cambia de veredicto', () => {
+    expect(compile(consentCopy('Acepto la política de privacidad.')).blockingReasons).toEqual([])
+  })
+
+  it('rechaza HTML junto al marcador', () => {
+    const codes = compile(consentCopy('Acepto según su <a href="x">{privacyLink}</a>.')).warnings.map(w => w.code)
+
+    expect(codes).toContain('consent_marker_html')
+  })
+
+  it('rechaza el marcador repetido y marcadores desconocidos', () => {
+    const codes = compile(consentCopy('{privacyLink} y {privacyLink} y {terms}')).warnings.map(w => w.code)
+
+    expect(codes).toEqual(expect.arrayContaining(['consent_marker_repeated', 'consent_marker_unknown']))
+  })
+
+  it('exige privacyUrl cuando hay marcador', () => {
+    const result = compile({ copy_refs_json: { checkboxes: [{ key: 'privacy', label: 'Según su {privacyLink}.' }] } })
+
+    expect(result.warnings.map(w => w.code)).toContain('consent_marker_without_privacy_url')
+    expect(result.ok).toBe(false)
+  })
+
+  it('una presentación de consentimiento desconocida bloquea en vez de publicar sin casilla', () => {
+    const result = compile(consentCopy('Acepto.', { presentation: 'banner' }))
+
+    expect(result.renderContract?.consent).toBeUndefined()
+    expect(result.warnings.map(w => w.code)).toContain('consent_display_invalid')
+    expect(result.ok).toBe(false)
+  })
+})

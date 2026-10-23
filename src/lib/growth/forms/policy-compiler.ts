@@ -16,6 +16,8 @@ import {
   type FieldDefinition,
   type RenderContract,
   type SubmissionContract,
+  CONSENT_PRIVACY_LINK_MARKER,
+  type ConsentDisplay,
   consentDisplaySchema,
   destinationPlanEntrySchema,
   fieldDefinitionSchema,
@@ -123,6 +125,47 @@ const validatePresentationControls = (fields: FieldDefinition[]): CompileWarning
     }))
 
 /**
+ * TASK-2044 — El marcador `{privacyLink}` del consentimiento: como máximo uno por casilla, sin otros
+ * marcadores, sin HTML junto a él y con `privacyUrl` declarada. Las casillas sin llaves no se evalúan,
+ * así que ninguna versión existente cambia de veredicto.
+ */
+const CONSENT_TOKEN_PATTERN = /\{[A-Za-z][A-Za-z0-9_]*\}/g
+
+const validateConsentPrivacyLink = (consent: ConsentDisplay | null): CompileWarning[] => {
+  if (!consent) return []
+
+  const warnings: CompileWarning[] = []
+
+  for (const checkbox of consent.checkboxes) {
+    const label = checkbox.label ?? ''
+    const tokens = label.match(CONSENT_TOKEN_PATTERN) ?? []
+
+    if (tokens.length === 0) continue
+
+    const block = (code: string, message: string) =>
+      warnings.push({ code, dimension: 'consent', message: `casilla ${checkbox.key}: ${message}`, blocking: true })
+
+    if (tokens.some(token => token !== CONSENT_PRIVACY_LINK_MARKER)) {
+      block('consent_marker_unknown', `sólo se admite el marcador ${CONSENT_PRIVACY_LINK_MARKER}`)
+    }
+
+    if (tokens.filter(token => token === CONSENT_PRIVACY_LINK_MARKER).length > 1) {
+      block('consent_marker_repeated', `el marcador ${CONSENT_PRIVACY_LINK_MARKER} va una sola vez`)
+    }
+
+    if (/[<>]/.test(label)) {
+      block('consent_marker_html', 'una casilla con marcador no admite HTML; el enlace lo construye el renderer')
+    }
+
+    if (!consent.privacyUrl) {
+      block('consent_marker_without_privacy_url', `${CONSENT_PRIVACY_LINK_MARKER} exige privacyUrl`)
+    }
+  }
+
+  return warnings
+}
+
+/**
  * Compila la versión. `forPublication=true` aplica el gate completo (errores
  * bloquean). `forPublication=false` (preview/draft) compila best-effort y reporta
  * warnings sin bloquear el render.
@@ -203,6 +246,21 @@ export const compileFormVersion = (
     consentPolicyVersion: version.consent_policy_version ?? undefined,
     ...asObject(version.copy_refs_json),
   })
+
+  validateConsentPrivacyLink(consentDisplay.success ? consentDisplay.data : null).forEach(addWarning)
+
+  // Un consentimiento que no parsea queda fuera del contrato. Si la versión declara los campos de
+  // presentación de TASK-2044, ese descarte silencioso dejaría el formulario sin casilla: se bloquea.
+  const consentCopyRefs = asObject(version.copy_refs_json)
+
+  if (!consentDisplay.success && ('presentation' in consentCopyRefs || 'privacyLinkLabel' in consentCopyRefs)) {
+    addWarning({
+      code: 'consent_display_invalid',
+      dimension: 'consent',
+      message: 'el consentimiento declarado no valida el contrato (presentation/privacyLinkLabel)',
+      blocking: true,
+    })
+  }
 
   // — Composición —
   const composition = (typeof uiPolicy.composition === 'string' ? uiPolicy.composition : 'static') as CompositionMode
