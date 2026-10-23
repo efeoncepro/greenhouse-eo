@@ -30,6 +30,8 @@ de la empresa Sky Airlines (`30825221458`).
 | Tablas de apoyo | `outputs/sky-blog-seo-audit-2026-10-23/` (clasificación de 1.697 posts, backlog editorial, canibalización, cobertura de rutas, redirecciones) | Commit `ac2372eed` |
 | Correo a Natalia (artículos de Perú) | [correos/01-natalia-articulos-peru.md](correos/01-natalia-articulos-peru.md) | Borrador; puede omitirse si sale el correo formal |
 | Correo formal a Nicolá, Pilar y Natalia | [correos/02-entrega-auditoria.md](correos/02-entrega-auditoria.md) | Borrador con el PDF adjunto |
+| Perú: demanda e intención por destino | [PERU_PRIMER_LOTE.md](PERU_PRIMER_LOTE.md) | Base del lote (Semrush PE) |
+| Lote inicial: 15 nuevos + 25 optimizaciones | [LOTE_INICIAL_PARA_APROBACION.md](LOTE_INICIAL_PARA_APROBACION.md) | Propuesta para aprobar con Natalia; reemplaza a `PERU_TITULOS_PARA_APROBACION.md` |
 | Página ejecutiva (borrador previo) | Artifact privado «Auditoría Blog SKY» | Superada por el PDF |
 
 ## Decisiones tomadas en el caso

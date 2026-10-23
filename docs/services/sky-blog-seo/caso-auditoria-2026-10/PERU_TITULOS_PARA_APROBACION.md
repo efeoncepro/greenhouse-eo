@@ -1,5 +1,8 @@
 # Caso SKY · Perú: títulos y reseñas para aprobación de Natalia
 
+> **Superado el 23-10-2026** por [LOTE_INICIAL_PARA_APROBACION.md](LOTE_INICIAL_PARA_APROBACION.md) (15 nuevos +
+> 25 optimizaciones). Se conserva como antecedente de las fichas de Perú.
+
 Fecha: 23-10-2026. Estado: **propuesta para aprobar**; nada redactado ni publicado. Base:
 [PERU_PRIMER_LOTE.md](PERU_PRIMER_LOTE.md) (demanda e intención en Semrush PE), el inventario del blog y las ideas
 de Perú que el equipo ya cargó en el Content Hub para noviembre. Volúmenes: búsquedas mensuales en Perú (Semrush).
