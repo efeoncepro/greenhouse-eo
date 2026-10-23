@@ -1,5 +1,16 @@
 # TASK-1803 — Landing Branding Studio: la marca como sistema de decisión
 
+## Delta 2026-10-23
+
+- La cabecera de `efeoncepro.com` ya no es la de Ohio: desde el 2026-10-23 00:09 UTC todas las páginas, salvo `/blog/`,
+  muestran el menú global AXIS `efeonce.site-nav` (`TASK-2042`). Donde esta task dice «chrome Ohio nativo», «menú Ohio
+  público» o que la ubicación se decide con `native-navigation.md`, ahora aplica el menú global. El pie no cambió.
+- Que Branding vuelva al menú es un servicio nuevo en la línea Brand del documento del menú (hoy: Agencia Creativa,
+  Producción Creativa, Content Marketing, Redes Sociales e Influencer Marketing). Se agrega con
+  `pnpm public-website:site-nav add …` y `apply` con el go del operador
+  ([manual](../../manual-de-uso/public-site/operar-navegacion-global.md)), nunca con los ítems del término 61 de Ohio.
+  «Estás aquí» se marca solo desde el `href` del servicio.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

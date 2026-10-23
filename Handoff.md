@@ -1,5 +1,25 @@
 # Handoff
 
+## 2026-10-23 — Navegación global (EPIC-055): en producción en todo el sitio (TASK-2042)
+
+Menú nuevo encendido en todo `efeoncepro.com` desde las 00:09 UTC por decisión del operador, sin piloto; `/blog/`
+(#18456) conserva Ohio (lo lleva TASK-1802). Vuelta atrás: `set-site-nav-switch.php` con `{"mode":"off"}`. En el tema:
+AXIS primitives 0.7.13 (runtime `aadfdc9`); documento del menú en la revisión 4; agendador nativo en vivo; Loop Marketing
+→ Inbound (301). Edición: `pnpm public-website:site-nav` (las escrituras en producción piden el visto bueno del
+operador). La sesión «Rediseño de Menú» sigue de contralora de fidelidad.
+
+**Sin push:** los commits de Greenhouse `develop` y del runtime `main` de TASK-2041/2042 esperan la autorización del
+operador. AXIS está publicado hasta v0.7.14.
+
+**Pendiente:** alta GTM/GA4 de `gh_site_nav_*` (confirmación humana antes de publicar el contenedor), Core Web Vitals
+contra la cabecera anterior, prueba de vuelta a `off` en producción y el admin de TASK-2041 (dirección B).
+
+**Trampa al verificar en vivo:** con el panel del navegador oculto la página corre en segundo plano (sin
+`requestAnimationFrame` ni eventos de scroll): el tono de la isla no se actualiza y el bloqueo de scroll del agendador
+parece pegado. Verificar con un navegador en primer plano (Playwright headless sirve).
+[TASK-2042](docs/tasks/in-progress/TASK-2042-site-nav-wordpress-rollout.md) ·
+[manual](docs/manual-de-uso/public-site/operar-navegacion-global.md).
+
 ## 2026-10-23 — Dock de vidrio de las landings (TASK-2043, EPIC-055): en vivo en las siete
 
 Primitive AXIS `efeonce.landing-dock` publicada (v0.7.12–v0.7.14: primitives 0.7.14, contracts 0.7.12, tokens 0.6.9,
@@ -33,38 +53,6 @@ Revisión completa posterior: [84 páginas y dirección reformulada](docs/commer
 Profundización: [GANA/LOTI y cuatro pares](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/INVESTIGACION-MARCAS-Y-DIRECCION-2026-10-22.md); cercanía/pedagogía ya existen. 97 consultas, fuentes y bloqueos registrados; LOTI sin UI/checkout verificados e informes recientes inaccesibles. Direcciones aún sin muestras creativas; sin cambios de costo/CRM/propuesta.
 
 Mandato posterior: Julio autorizó preparar el MD. [Propuesta para Claude Design](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/PROPUESTA-GANA-LOTI-2027-PARA-CLAUDE-DESIGN.md) redactada: 28 bloques y anexos; técnica/económica separadas. Pausa de redacción superada, emisión/presentación aún pendientes. Sin deck/PDF/CRM/envíos.
-
-## 2026-10-22 — Navegación global (EPIC-055): TASK-2040 publicada, TASK-2041 a medio camino
-
-**TASK-2040 completa:** AXIS v0.7.7 (tokens 0.6.8, contracts 0.7.7, registry 0.7.4, primitives 0.7.0), con la
-instalación privada verificada. Antes del tag, la sesión «Rediseño de Menú» actuó como contralora de fidelidad con el
-canvas v68 y se corrigieron sus diferencias. Sigue de contralora en 2041 y 2042: mostrarle lo visible antes de cada
-cierre.
-
-**TASK-2041:**
-- Slices 1 a 3 en `efeonce-public-site-runtime` `main` (`13cb164` … `b0dd479`), **sin push**. Plugin `eo-site-nav`:
-  servicio de guardado, `wp eo-nav`, REST `eo/v1/site-nav` y Recursos dinámicos.
-- Verificado con `tests/playground/run-eo-site-nav.sh` (47 checks + WP-CLI real) y la paridad del validador.
-- 51 fotos subidas y verificadas en `site-nav/v1/` (autorizado por el operador).
-
-- **Plugin desplegado y activo en producción** (0.1.0, sin documento; el sitio sigue con Ohio). Carril:
-  `build-site-nav-plugin-package.cjs` + `deploy-site-nav-plugin-package.php`. Respaldo:
-  `/tmp/eo-site-nav-before-20261022-210707.tar`. Rollback: `wp plugin deactivate eo-site-nav`.
-
-- **Documento del menú aplicado en vivo**: revisión 1 (`510ca5012d95`). La REST `eo/v1/site-nav` da 200 con ETag y
-  304. El sitio sigue con Ohio. Fuente: `manifests/site-nav/efeoncepro.com.json` en el runtime.
-- AXIS `v0.4.30` (brand-assets 0.4.30 con YouTube en negativo, primitives 0.7.1 con los íconos de redes alineados):
-  ver TASK-2041.
-
-**Pendiente, con autorización del operador:**
-- Verificar la purga de Kinsta desde PHP.
-- Diseño del admin (Slice 5).
-
-`main` local del runtime trae WIP ajeno: no tocarlo.
-
-**TASK-2042 en curso (2026-10-22):** intake hecho; discovery del enganche del encabezado de Ohio, la superficie del
-agendador y la medición. Ninguna escritura en WordPress sin autorización del operador; piloto con su go. La sesión
-«Rediseño de Menú» es contralora de fidelidad: medirá el piloto con `getComputedStyle` contra el Lab.
 
 ## 2026-10-22 — Redes Efeonce: love brand y canales v2
 

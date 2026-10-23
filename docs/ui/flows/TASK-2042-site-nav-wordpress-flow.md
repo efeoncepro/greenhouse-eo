@@ -34,8 +34,12 @@ nativo del sitio y se pueda apagar en un paso.
 5. **Datos dinámicos.** Resuelve el centro y el destacado de Recursos desde WordPress o Think, con caché corta. Si
    falla, usa el destacado fijo.
 6. **Render.** La parte de cabecera de Ohio (`header-style-1..8`, sobrescritas) imprime el HTML ya preparado. Sólo en
-   esas páginas se encolan los archivos de AXIS fijados en `assets/vendor/axis/site-nav/0.7.10/`, las fuentes del menú,
-   `site-nav-host.css` (sólo el desplazamiento por la barra de admin) y `site-nav-host.js`.
+   esas páginas se encolan los archivos de AXIS fijados en `assets/vendor/axis/site-nav/0.7.13/` (primitives 0.7.13,
+   contracts 0.7.12; `EO_SITE_NAV_AXIS`), las fuentes del menú, `site-nav-host.css` (sólo el desplazamiento por la
+   barra de admin), `site-nav-host.js` y `meeting-dialog.css`.
+   - **Tono de la isla:** el tema no marca secciones con `data-site-nav-tone`; la isla lee el fondo de lo que tiene
+     debajo (degradados por sus paradas opacas, fotos como oscuras), se salta el chrome fijo del tema y el dock de
+     landings, y conserva su tono mientras el agendador está abierto (arquitectura §Isla de vidrio).
 7. **Agendador (N7).** Un solo `<greenhouse-cta>` oculto, impreso en `wp_footer` cuando la opción
    `eo_site_nav_scheduler` tiene un `{cta, surface, key}` válido (CTA `site-nav-discovery-meeting`). El evento
    cancelable `axis-site-nav:cta` lo abre desde la cabecera, el mega o el onepage. El lanzador lleva
@@ -83,6 +87,11 @@ Se hereda del flujo maestro. Lo propio del host:
   recursos 404 de páginas antiguas y desborde de Elementor en cinco páginas antiguas o de demo.
 - **Fidelidad (sesión «Rediseño de Menú»):** 1440, 1280, 1200, 1024, 834 y 390; círculo del onepage en 1440, 1680,
   1920, 2000 y 2560; «Estás aquí» en 10 páginas de servicio.
+- **Tono de la isla (AXIS 0.7.12 y 0.7.13, en vivo desde 04:28 UTC del 2026-10-23):** Playwright headless a 1440 en
+  `/servicios/posicionamiento-seo/`: isla `fixed` y oscura sobre la franja E-E-A-T con el agendador abierto, al cerrar
+  con «Cerrar agenda» y con Escape, y al volver a hacer scroll, también con `<html>` pintado de blanco; el bloqueo de
+  scroll del agendador se libera al cerrar; sin errores en la página. Verificar siempre en un navegador en primer
+  plano: un panel oculto no corre `requestAnimationFrame` ni eventos de scroll.
 - **Pendiente:** Core Web Vitals contra la cabecera anterior.
 
 ## Design Decision Log
@@ -95,6 +104,7 @@ Se hereda del flujo maestro. Lo propio del host:
 | La aislación de estilos vive en AXIS, no en el tema | El piloto mostró estilos de Ohio dentro del menú (hover rojo, cierre rojo, filas 4 px más altas). Corregirlo en el tema habría sido una copia de valores; AXIS primitives 0.7.8 da a cada regla peso de id y restablece lo que un tema aplica a todo, con una prueba que inyecta una hoja hostil. |
 | El adaptador carga las fuentes del menú | Cada página de Ohio carga un juego distinto (la home no tiene Bricolage ni Poppins 300). Se pide el juego del Lab sin el eje de ancho, que el menú no usa: así el archivo de Bricolage es el que ya cargan las landings. |
 | Hero claro arranca como isla clara | Sobre un hero claro la barra de vidrio deja ilegible el logo blanco (`/servicios/posicionamiento-seo/`, 2026-10-23). |
+| El tema no marca el tono de sus secciones | La lectura del fondo vive en AXIS y vale para cualquier anfitrión: la isla clara sobre la franja E-E-A-T navy se corrigió en AXIS 0.7.12, no con marcas en el tema. |
 | Un solo lanzador oculto en `wp_footer` | El renderer lee `cta-location` al montar, no al hacer clic; el punto de entrada viaja en `gh_site_nav_clicked`. |
 | Piel del diálogo propia del sitio con peso `:root` | Le gana a la piel de la landing donde se abre; el CTA propio de esa landing conserva la suya. |
 | `site_nav_cta` no se empuja | El clic ya viaja en `gh_site_nav_clicked` y el agendador emite `greenhouse_cta_*`; un tercer evento contaría dos veces y reviviría `gh_cta_clicked`. |

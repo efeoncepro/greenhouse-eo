@@ -66,7 +66,14 @@ El motion explica de dónde viene cada cosa; no decora.
 | Hamburguesa, presionar | Baja a 94 % | 200 ms |
 | Botón del agendador en vidrio | Al pasar el mouse se ilumina el vidrio, se intensifica el canto y sube 1 px. Al presionar, 98 % | 250 ms `standard` / 200 ms `emphasized` |
 | Botón del agendador en la isla | Oscura: blanco que pasa a `#cfe4fa`; clara: navy que pasa a `#023c70`. Sube 1 px | 250 ms `standard` |
-| Cambio de tono de la isla | Fondo, borde, sombra, texto, logo y botón cruzan de tono al cambiar la sección bajo la isla | 300 ms `emphasized` |
+| Cambio de tono de la isla | Fondo, borde, sombra, texto, logo y botón cruzan de tono cuando cambia lo que la isla tiene debajo | 300 ms `emphasized` |
+
+**Cuándo cambia el tono** (AXIS primitives 0.7.13). Se evalúa al hacer scroll y al mostrarse la isla, en la línea media
+de su posición final (no donde está la cabecera mientras entra). Decide `data-site-nav-tone` o, si falta, el fondo:
+degradado por la luminancia media de sus paradas opacas, foto como oscura, color sólo con alfa de al menos 0,5. Se
+salta el chrome fijo o sticky del anfitrión (incluido el dock de landings) y lo que no se ve. Si nada decide, o si un
+diálogo modal dejó la página inerte (el agendador abierto), **no hay transición**: la isla conserva su tono, también al
+cerrar el diálogo. Regla completa: arquitectura §Isla de vidrio.
 
 ## Tokens and Performance
 
@@ -89,13 +96,16 @@ Con `prefers-reduced-motion: reduce`:
 
 ## GVC / Micro Evidence
 
-- Video corto del Lab (`TASK-2040`) y de la página piloto (`TASK-2042`):
+- Video corto del Lab (`TASK-2040`) y de una página real del sitio (`TASK-2042`; el piloto de una página se omitió y
+  el menú está en `on` desde el 2026-10-23):
   1. abrir Soluciones;
   2. cambiar de línea y poner foco en un servicio;
   3. abrir y cerrar el onepage;
   4. hacer scroll abajo y arriba.
 - Misma secuencia con movimiento reducido activado, que debe mostrar cambios instantáneos.
 - Verificar que al cerrar el onepage no queda ningún disco detrás de la hamburguesa.
+- Verificar el cambio de tono de la isla en un navegador en primer plano (Playwright headless sirve): un panel de
+  navegador oculto no corre `requestAnimationFrame` ni eventos de scroll y la isla no cambia de tono.
 
 ## Design Decision Log
 

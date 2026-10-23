@@ -277,11 +277,30 @@ border: 1px solid rgba(0,26,51,.08);
 box-shadow: 0 10px 30px rgba(0,26,51,.10);
 ```
 
-**Cómo se decide el tono:** cada sección de la página declara `data-site-nav-tone="light|dark"`. El primitive mira qué
-sección queda bajo la línea media de la isla al hacer scroll y cambia el tono en 300 ms. Si una sección no lo declara,
-el primitive mide la luminancia de su color de fondo: mayor a 0,5 es claro (decidido en el Lab, `TASK-2040`). Mide en
-la posición final de la isla y no en la de la cabecera mientras entra. En WordPress el adaptador (`TASK-2042`) marca las
-secciones de cada plantilla; la luminancia es sólo el respaldo.
+**Cómo se decide el tono** (AXIS primitives 0.7.13). Al hacer scroll, el primitive mira el primer elemento de la página
+bajo la línea media de la isla, en la posición final de la isla y no en la de la cabecera mientras entra, y cambia el
+tono en 300 ms:
+
+1. **Se salta** lo que no es la página: el propio menú, el chrome fijo o sticky del anfitrión (barra del tema, chat,
+   aviso de cookies, el dock de landings) y los elementos que no se ven (`checkVisibility` con visibilidad y opacidad).
+2. **Si lo primero es `<html>`**, un diálogo modal (el agendador) dejó la página inerte: la isla **conserva su tono**.
+   Sin esta guarda, un anfitrión que pinta `<html>` volvía clara la isla detrás del diálogo y después de cerrarlo.
+3. **`data-site-nav-tone="light|dark"`** en el elemento o un ancestro decide, si existe.
+4. **Si no, el fondo**, subiendo por los ancestros hasta que uno decida:
+   - un degradado decide por la luminancia media de sus paradas opacas;
+   - una imagen de fondo cuenta como oscura;
+   - un color decide sólo si tiene alfa de al menos 0,5: un velo de 5 % de blanco sobre navy sigue siendo navy;
+   - luminancia mayor a 0,5 es claro.
+
+Si nada decide, el tono no cambia. En efeoncepro.com el adaptador no marca secciones con `data-site-nav-tone`: el tono
+sale del fondo. La lectura de degradados y chrome fijo (0.7.12) corrigió la isla clara sobre la franja E-E-A-T navy de
+`/servicios/posicionamiento-seo/`, que encontró la sesión de fidelidad; la guarda del diálogo (0.7.13) la encontró la
+sesión del dock. El dock de landings (`TASK-2043`) lee su tono de la misma forma (§Dock inferior de las landings).
+
+**Cómo verificarlo:** en un navegador en primer plano (Playwright headless sirve). Un panel del navegador oculto, como
+el panel Browser de la app de escritorio colapsado, corre la página en segundo plano, sin `requestAnimationFrame` ni
+eventos de scroll: el tono no se actualiza y el bloqueo de scroll del agendador parece trabado. No es un defecto del
+sitio. En este tema, `window.scrollTo(0, y)` sin `behavior: 'instant'` es suave y puede no moverse en una espera corta.
 
 **Medidas publicadas (AXIS primitives 0.7.8):** la isla de escritorio mide 61 px más el borde (63 px), con los ítems
 sueltos, sin cápsula propia dentro de la isla, y el botón del agendador de 45 px.
@@ -416,7 +435,8 @@ Lo último de cada formato se resuelve **en el servidor del sitio**, al pintar e
 Plugin propio `efeonce-public-site-runtime/wp-content/plugins/eo-site-nav/` (`TASK-2041`, prefijo `EOSN_`), **activo
 en efeoncepro.com desde el 2026-10-22**. Contiene el tipo de contenido privado con revisiones nativas, el servicio de
 guardado, la REST `eo/v1/site-nav`, el validador (35 casos de paridad con AXIS) y el render PHP `EOSN_Render`, idéntico
-byte a byte a `siteNavHtml` de AXIS 0.7.9 (17 casos de paridad). Su suite de Playground
+byte a byte a `siteNavHtml` (17 casos de paridad). Ambas paridades corren contra la versión de AXIS copiada en el tema:
+hoy primitives 0.7.13 con contracts 0.7.12. Su suite de Playground
 (`tests/playground/run-eo-site-nav.sh`) corre 49 verificaciones. Se despliega con el carril acotado de abajo.
 
 **El documento vivo es la fuente de verdad.** Revisión vigente: 4.
@@ -503,10 +523,11 @@ de los dos se edita para cambiar el menú (§Edición gobernada).
     CDN, y el borde vuelve a pedir la REST al origen unos 40 s después. Medido en vivo: HIT con `age` creciente → `MISS`
     a los 43 s → HIT con `age: 10`. Un consumidor (Think, otro sitio) ve un guardado en menos de un minuto.
   - Kinsta omite esa purga si el autopurge del sitio está desactivado. Hoy está activo; el plugin debe pasar
-    `force` para no depender de eso (pendiente de TASK-2041). Es la lectura para Think y otros sitios. La publicación adicional en el bucket de AXIS es una
-  decisión abierta de PDR-027 (punto 3).
+    `force` para no depender de eso (pendiente de TASK-2041).
   - El borde de Kinsta se refresca entre unos 40 s y 2 min después de la purga. Un archivo PHP que ya existía y cambió
     puede tardar 1 a 2 min más por OPcache.
+  - La REST es la lectura para Think y otros sitios. Publicarla además en el bucket de AXIS es una decisión abierta de
+    PDR-027 (punto 3).
 - **Permisos:** escribir requiere `manage_options` o una capability propia (`eo_manage_site_nav`). La REST pública es de
   sólo lectura.
 
@@ -599,13 +620,21 @@ carril SSH/WP-CLI es `apply-site-nav-document.php` (entrada: documento + `{baseR
   flotando sobre la página difuminada y un solo botón redondo para cerrar, con la paleta de `/agenda/` (acento
   `#36c8bf`, Growth). Lleva peso `:root` para ganarle a la piel de una landing; el diálogo del CTA propio de una landing
   conserva la suya.
+- **Isla con el diálogo abierto:** la isla conserva su tono mientras el diálogo está abierto y después de cerrarlo
+  (AXIS primitives 0.7.13, §Isla de vidrio). Verificado en vivo con Playwright a 1440 en
+  `/servicios/posicionamiento-seo/`: isla `fixed` y oscura sobre la franja E-E-A-T con el agendador abierto, al cerrar
+  con «Cerrar agenda» y con Escape, también con `<html>` pintado de blanco; el bloqueo de scroll del agendador
+  (`overflow: hidden` en `<html>`) se libera al cerrar.
 - **Verificado en vivo:** cabecera, mega y onepage de teléfono (pantalla completa); Escape y cerrar;
   `gh_site_nav_clicked` más `greenhouse_cta_clicked` y `greenhouse_cta_action_started` con `cta_location: site_nav`; sin
   errores en la página.
-- **Respaldo:** sin JavaScript, sin superficie o con el lanzador vacío, el botón es un enlace normal a `/agenda/`.
-  **Delta 2026-10-20:** `/agenda/` ya no es el piloto aislado `noindex`: es la landing rediseñada con «La órbita»,
-  indexable, que monta el mismo agendador nativo en línea. Queda fuera de los menús por decisión del operador; este
-  botón será el que la enlace. Detalle: [landing Agenda](../../documentation/public-site/agenda.md).
+- **Otro consumidor del mismo CTA:** el dock de landings (`TASK-2043`) de Inicio y Redes Sociales declara
+  `scheduler.source: "site_nav"`: lee la misma opción `eo_site_nav_scheduler`, monta su propio lanzador con
+  `cta-location="landing_dock"` y usa la misma piel del diálogo. Rotar la clave con `set-site-nav-scheduler.php` cubre
+  también esos docks.
+- **Respaldo:** sin JavaScript, sin superficie o con el lanzador vacío, el botón es un enlace normal a `/agenda/`, la
+  landing de agenda con «La órbita», indexable, que monta el mismo agendador nativo en línea y queda fuera de los menús
+  por decisión del operador. Detalle: [landing Agenda](../../documentation/public-site/agenda.md).
 
 ## Medición
 
@@ -659,8 +688,8 @@ Adaptador del tema `ohio-child`, archivo `inc/site-nav.php` (`TASK-2042`).
   - `site-nav-host.css`, que sólo desplaza la cabecera bajo la barra de admin;
   - el módulo del anfitrión `site-nav-host.js`;
   - `meeting-dialog.css`, la piel del diálogo del agendador (§Agendador).
-- **Render:** el de `EOSN_Render` del plugin, idéntico a `siteNavHtml` (17 casos de paridad). Los enlaces salen en el
-  HTML del servidor; `site-nav.js` se copia tal cual (no importa nada) y sólo mejora.
+- **Render:** el de `EOSN_Render` del plugin, idéntico a `siteNavHtml` de la versión copiada (17 casos de paridad contra
+  primitives 0.7.13 y contracts 0.7.12). Los enlaces salen en el HTML del servidor; `site-nav.js` se copia tal cual (no importa nada) y sólo mejora.
 - **Contrato del anfitrión** (AXIS, [PRIMITIVES.md](PRIMITIVES.md)): el anfitrión nunca estiliza dentro de
   `.axis-site-nav`. Sus únicas entradas son `--axis-site-nav-offset` y `--axis-site-nav-z`. El anfitrión carga las
   fuentes: Bricolage Grotesque con ejes `opsz` y `wght` 200–800 (el menú no usa el eje de ancho) y Poppins 300–700.
@@ -681,8 +710,9 @@ Todos van por SSH/WP-CLI con archivos de entrada, sha256, guarda de deriva y res
 | Carril | Scripts | Notas |
 |---|---|---|
 | Plugin | `build-site-nav-plugin-package.cjs` + `deploy-site-nav-plugin-package.php` | §Plugin. |
+| Plugin del dock | `build-landing-dock-plugin-package.cjs` + `deploy-landing-dock-plugin-package.php` | `eo-landing-dock`; §Dock inferior de las landings. |
 | Tema | `build-site-nav-theme-package.cjs` + `deploy-site-nav-theme-package.php` | Lista permitida: `functions.php`, `inc/site-nav.php`, `header-style-1..8`, `site-nav-host.css`, `meeting-dialog.css`, `site-nav-host.js` y los archivos de AXIS copiados. Exige las 8 partes de cabecera de Ohio. Nunca cambia el interruptor; si no existe, lo crea en `off`. |
-| Línea base | `export-live-code-baseline.ts` | Conserva `assets/vendor/axis/**` de `ohio-child` para que la guarda de deriva vea los archivos fijados. |
+| Línea base | `export-live-code-baseline.ts` | Conserva `assets/vendor/axis/**` de `ohio-child` para que la guarda de deriva vea los archivos fijados. Incluye el plugin `eo-landing-dock` y su copia de AXIS. |
 | Interruptor | `set-site-nav-switch.php` | Entrada `{"mode":"on"\|"pilot"\|"off","pilot":[ids]}`. Se niega a `on` sin plugin, adaptador y documento. Purga Kinsta e imprime el valor anterior. |
 | Agendador | `set-site-nav-scheduler.php` | §Agendador. |
 | Documento | `apply-site-nav-document.php` | §Edición gobernada. |
@@ -690,6 +720,25 @@ Todos van por SSH/WP-CLI con archivos de entrada, sha256, guarda de deriva y res
 
 **Rollback:** `set-site-nav-switch.php` con `{"mode":"off"}` devuelve el encabezado de Ohio en todo el sitio. Probado
 sólo en Playground; falta comprobarlo en producción.
+
+### Subir la versión de AXIS en el tema
+
+Ningún repo tiene los paquetes de AXIS instalados; la copia se hace desde el paquete publicado. Receta usada para
+0.7.12 y 0.7.13:
+
+1. `npm pack @efeoncepro/axis-ui-primitives@<v> @efeoncepro/axis-brand-assets@0.4.30`, con un `.npmrc` temporal (0600)
+   armado desde `gh auth token` y borrado apenas termina.
+2. En el runtime: `node scripts/vendor-axis-site-nav.mjs --primitives <pkg> --brand <pkg> --version <v> --source "…"`,
+   que deja la carpeta `assets/vendor/axis/site-nav/<v>/` con su `VERSION.json` (sha256 de cada archivo).
+3. Cambiar `EO_SITE_NAV_AXIS` en `inc/site-nav.php` y `git rm` la carpeta anterior.
+4. Regenerar los datos de paridad con `node tests/fixtures/site-nav/generate-render-data.mjs <checkout de AXIS en el
+   tag>`, correr las dos pruebas de paridad PHP (render y validador) y hacer commit.
+5. `pnpm public-website:export-live-code` → `build-site-nav-theme-package.cjs <línea base>` →
+   `deploy-site-nav-theme-package.php` (archivos de entrada `package.zip` y `manifest.json`).
+6. `set-site-nav-switch.php` con `{"mode":"on"}` para purgar: conserva el modo e imprime el valor anterior.
+
+El dock de las landings fija su propia copia de AXIS en el plugin `eo-landing-dock` (hoy primitives 0.7.14, contratos
+0.7.12), independiente de la del tema; se sube con `scripts/vendor-axis-landing-dock.mjs` (§Dock inferior de las landings).
 
 ### Redirecciones (Loop Marketing → Inbound)
 
@@ -736,15 +785,17 @@ Decidido en el Lab:
 
 - La cabecera se oculta en 300 ms y vuelve como isla en 400 ms.
 - Con un mega abierto, un scroll de más de 48 px lo cierra.
-- El tono de la isla sigue `data-site-nav-tone`; si falta, la luminancia del fondo (color o degradado; una imagen cuenta como oscura) del primer elemento visible bajo la línea media que no sea chrome fijo del anfitrión (0.7.12); si lo primero es `<html>` (un diálogo modal dejó la página inerte), conserva el tono (0.7.13).
+- El tono de la isla sigue `data-site-nav-tone` y, si falta, el fondo de lo que tiene debajo (§Isla de vidrio, regla
+  completa de 0.7.12 y 0.7.13).
 - El JS lee los tiempos de las variables CSS en `ms` o `s`, porque un minificador puede reescribir `150ms` como `.15s`.
 
 Notas de verificación y límites: `docs/quality/site-nav.md` en AXIS. Contrato del anfitrión:
 [PRIMITIVES.md](PRIMITIVES.md).
 
-Conocido y sin cambiar: en 1280 px cinco descripciones de servicio (contenidos, redes sociales, medios, performance e
-inbound) se cortan con puntos suspensivos, igual en el Lab que en vivo. Es una pregunta de diseño para la sesión de
-fidelidad.
+Diseño aprobado, no defecto: bajo 1440 px la descripción de un servicio ocupa una línea con puntos suspensivos (en
+1280 se cortan contenidos, redes sociales, medios, performance e inbound, igual en el Lab que en vivo); en 1440 debe ir
+completa. Es el tablero Mega1280 del canvas, confirmado por la sesión de fidelidad el 2026-10-23. `site-nav fit` lista
+esos cortes de 1280 como esperados y sólo falla en 1440.
 
 ## Dock inferior de las landings (`TASK-2043`)
 
@@ -752,6 +803,12 @@ El segundo cromo del sitio: la barra de vidrio fija abajo que acompaña la lectu
 Reemplaza los siete docks que cada landing dibujaba por su cuenta. Lo aprobó el operador en el canvas (versión 80, fila
 «Dock inferior de las landings»): «Apruebo el dock en vidrio; pásaselo a la sesión del menú para construirlo en AXIS y
 en las landings».
+
+**Relación con el menú.** El dock se salta el menú (`[data-axis-site-nav]`) al leer su propio tono y los dos leen el
+tono de la misma forma (§Isla de vidrio). El dock se retira mientras un panel o el onepage del menú están abiertos. En
+Inicio y Redes Sociales abre el agendador del menú (§Agendador). Funcionamiento y operación del dock:
+[Dock de las landings](../../documentation/public-site/dock-de-landings.md) y
+[Operar el dock de las landings](../../manual-de-uso/public-site/operar-dock-de-landings.md).
 
 | Capa | Dónde | Qué hace |
 |---|---|---|
@@ -779,9 +836,8 @@ solo botón en teléfono («Un solo botón»).
 | Performance | 251997 | teléfono | «Agenda un diagnóstico» → `#diagnostico` | — | `#diagnostico` | `nav.mbar` |
 
 Todas sirven AXIS primitives 0.7.14 desde el plugin `eo-landing-dock`; el agendador del dock mide
-`cta-location="landing_dock"`. Vuelta atrás por página: `pnpm public-website:landing-dock off <landing> --confirm`
-(borra el meta `_eo_landing_dock`, purga y verifica que el dock viejo volvió); el snapshot previo de cada página está en
-`greenhouse-eo/tmp/landing-dock/snapshots/`. Global: desactivar el plugin.
+`cta-location="landing_dock"`. La vuelta atrás, por landing o global, está en el párrafo «Vuelta atrás» de esta
+sección.
 
 **Comportamiento.** Aparece cuando el fondo del hero queda sobre la mitad de la ventana; se retira a 120 px del
 formulario o CTA final; un marcador de parada (`stop`) lo deja oculto desde el destino de su botón hasta el final
@@ -805,7 +861,30 @@ HTML en vivo al aplicar).
 
 **Vuelta atrás.** Por landing: `pnpm public-website:landing-dock off <landing> --confirm` (borra el meta, purga y
 verifica que el dock viejo volvió). Global: desactivar el plugin. Antes de encender una landing se guarda un snapshot
-de la página (contenido, datos de Elementor y meta del dock).
+de la página (contenido, datos de Elementor y meta del dock) en `greenhouse-eo/tmp/landing-dock/snapshots/`.
+
+**Despliegue del plugin.** `node scripts/public-website/build-landing-dock-plugin-package.cjs <baseline>` (la línea base
+de `export-live-code` incluye el plugin y su copia de AXIS; el armado rechaza una copia local de AXIS) y
+`deploy-landing-dock-plugin-package.php` por `pnpm public-website:wpcli`: lista de rutas permitidas, hashes, guarda de
+deriva, respaldo `.tar`, archivo principal al final y activación. El deploy nunca escribe la config de un dock: sin meta
+`_eo_landing_dock` ninguna página cambia. Después, `pnpm public-website:landing-dock purge` (una URL puede tardar
+cerca de un minuto). La copia de AXIS vive en `assets/vendor/axis/landing-dock/<versión>/` con `VERSION.json` (sha256),
+copiada del paquete publicado por `scripts/vendor-axis-landing-dock.mjs`; el `.gitignore` del runtime tiene una
+excepción para ese directorio.
+
+**Medición.** El primitive emite `landing_dock_view`, `landing_dock_click` y `landing_dock_cta`; `landing-dock-host.js`
+empuja sólo el clic, como `gh_landing_dock_clicked` con `target_type` y `target` (40 caracteres como máximo). El
+agendador que abre emite `greenhouse_cta_*` con `cta_location: landing_dock`, que reemplaza `inbound_mobile_dock` y
+`hubspot_mobile_dock`. Falta el alta de `gh_landing_dock_clicked` en GTM y GA4 (con confirmación humana antes de
+publicar el contenedor). Registro: [TRACKING-PLAN.md §CTAs](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md#ctas).
+
+**Landing nueva.** Un dock en otra landing usa este mismo dock: un archivo `manifests/landing-dock/<landing>.json` en el
+runtime y el alta de la página en la lista permitida del plugin (`EOLD_PAGES`, filtrable con `eo_landing_dock_pages`),
+nunca un dock propio.
+
+**Pendientes del dock.** Retirar el código de los siete docks antiguos (hoy sólo se quitan del HTML mientras el nuevo
+está encendido); un puente del agendador compartido entre `site-nav-host.js` y `landing-dock-host.js`; alta de
+`gh_landing_dock_clicked` en GTM y GA4.
 
 ## Invariantes
 
@@ -840,16 +919,16 @@ de la página (contenido, datos de Elementor y meta del dock).
 - Medir Core Web Vitals contra la cabecera anterior.
 - Comprobar en producción la vuelta a `off` (sólo se probó en Playground).
 - Admin de `TASK-2041` (dirección B con vista previa en vivo y el árbol de la dirección A).
-- Corte de descripciones en 1280 px: **aceptado** como diseño aprobado (tablero Mega1280 del canvas: `white-space: nowrap; overflow: hidden; text-overflow: ellipsis`; confirmado por la sesión de fidelidad el 2026-10-23). En 1440 van completas; `fit` sólo falla a 1440.
-- El dock inferior de vidrio para landings: `TASK-2043` (ver §Dock inferior de las landings).
 - Destino de la copia pública: REST de WordPress sola, o también en el bucket (PDR-027, punto abierto 3).
 - Orden de los servicios por línea (Inbound quedó en Revenue).
 - Si las respuestas aprobadas por línea («Tu squad», «Visible»…) viven también en el menú.
 - URL real del canal de YouTube: hoy el sitio apunta a `facebook.com/colabrio`, un resto del tema.
 - Influencer y Performance no tienen lectura propia en el blog y muestran la de su línea.
 
-Resueltos: el alcance en todo el sitio (PDR-027, 2026-10-18) y el encendido sin piloto (operador, 2026-10-23). Las
-tarjetas de línea de Growth, Engine y Voice usan posts reales; 10 de los 16 títulos de lectura que la tarjeta cortaba se
+Resueltos: el alcance en todo el sitio (PDR-027, 2026-10-18) y el encendido sin piloto (operador, 2026-10-23). El
+corte de descripciones bajo 1440 px es el diseño aprobado (tablero Mega1280: `white-space: nowrap; overflow: hidden;
+text-overflow: ellipsis`; §Implementación en AXIS). El dock inferior de las landings quedó en vivo con `TASK-2043`
+(§Dock inferior de las landings). Las tarjetas de línea de Growth, Engine y Voice usan posts reales; 10 de los 16 títulos de lectura que la tarjeta cortaba se
 acortaron con las palabras del propio post, y todos los títulos de tarjeta caben en 1440, 1366, 1280 y 1200.
 
 ## Referencias

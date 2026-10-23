@@ -1,5 +1,20 @@
 # TASK-1802 — Content Hub Efeonce: `/blog` navegable y multiformato
 
+## Delta 2026-10-23
+
+- El menú global de PDR-027 está en producción en todo `efeoncepro.com` desde el 2026-10-23 00:09 UTC
+  (`eo_site_nav_enabled=on`, sin piloto). `/blog/` (#18456) es la única página excluida y conserva el header-6 de Ohio
+  mientras esta task la rediseña: la exclusión es la constante `EO_SITE_NAV_EXCLUDED_PAGES` de
+  `ohio-child/inc/site-nav.php`. Al publicar el hub hay que quitar #18456 de esa lista con un despliegue del tema
+  (carril `build-site-nav-theme-package.cjs` + `deploy-site-nav-theme-package.php`); el «sin fecha» del Delta
+  2026-10-20 ya no aplica — cerrado por `TASK-2042`.
+- El tono de la isla se decide por la luminancia de lo que hay debajo (AXIS primitives 0.7.13 en el tema). Ninguna
+  plantilla del sitio marca `data-site-nav-tone`; se usa sólo para corregir una sección donde la luminancia se equivoque.
+  Marcar cada sección del hub sigue siendo válido, pero ya no es obligatorio — cambio de `TASK-2042`.
+- La franja de Recursos del menú apunta a `/blog/` (`strip.cta`, «Suscríbete a Glitch»). Si el hub publica un ancla
+  estable para la suscripción, se cambia en el documento del menú con `pnpm public-website:site-nav`
+  ([manual](../../manual-de-uso/public-site/operar-navegacion-global.md)), nunca en el menú de Ohio.
+
 ## Delta 2026-10-22
 
 - PDR-020 decisión 1 (dónde vive canónicamente un video) quedó **cerrada**: el video vive en YouTube y el blog lo

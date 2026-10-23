@@ -301,24 +301,44 @@ Discovery es la agenda, no un tipo de campaña Ads. El envío online depende del
 los reintentos backend Meta/UPD. Configuración y canarios negativos no acreditan recepción,
 matching o atribución de una reserva real; no se fabricaron bookings para producir evidencia.
 
-## Delta 2026-10-18 — consumidor planificado: encabezado global del sitio
+## Consumidor: menú global del sitio (`cta_location: site_nav`)
 
-La [navegación global del sitio](public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#agendador) (Propuesta, EPIC-055)
-suma un consumidor del agendador: el botón «Agenda tu diagnóstico» del encabezado de `efeoncepro.com`. Usa el
-contrato vigente (`<greenhouse-cta>` + `open_meeting_scheduler`); no cambia schemas, state machine ni medición del
-agendador. Al implementarlo en [TASK-2042](../tasks/in-progress/TASK-2042-site-nav-wordpress-rollout.md):
-`cta-location` `menu_header|menu_mega|menu_onepage`; el menú cierra su panel y suelta su bloqueo de scroll **antes**
-de abrir el diálogo, para que el `<dialog>` nativo siga siendo el único dueño de scroll lock y foco; el lanzador queda
-montado para devolver el foco. Superficie de Growth CTA propia del encabezado global, con su binding y allowlist de
-origen para todas las páginas del menú; su clave nunca va a documentos, commits ni mensajes. La piel del diálogo sube
-desde `scripts/public-website/inbound-source/page.css` (alcance de landing) a una primitive compartida del sitio.
-Sin JS o sin superficie, enlace a `/agenda/`. **Planificado: nada de esto está implementado ni publicado.**
+La [navegación global del sitio](public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#agendador) (EPIC-055,
+[TASK-2042](../tasks/in-progress/TASK-2042-site-nav-wordpress-rollout.md)) es un consumidor del agendador **en vivo en
+todo `efeoncepro.com` desde el 2026-10-23**: el botón «Agenda tu diagnóstico» de la cabecera, la franja del mega menú y
+el pie del onepage. Usa el contrato vigente (`<greenhouse-cta>` + `open_meeting_scheduler`) y no cambia schemas, state
+machine, binding ni medición del agendador.
+
+- **CTA y superficie** (publicados con `scripts/growth/publish-site-nav-meeting-cta.ts`): CTA
+  `site-nav-discovery-meeting` (`open_meeting_scheduler`, surface de reuniones `fhsf-efeonce-lead-gen-web`, scheduler
+  `discovery`, rutas `/**`) y surface WordPress `csur-eb834d53-fd99-4f6b-9615-979e329e7d37`, que sólo admite ese CTA,
+  con orígenes `efeoncepro.com` y `www.efeoncepro.com`.
+- **Clave:** vive en Greenhouse en `.auth/site-nav-meeting-cta-surface.json` (0600, fuera de git) y en la opción
+  `eo_site_nav_scheduler` de WordPress; nunca va a documentos, commits ni mensajes. Volver a correr el publicador la
+  rota, y la opción debe seguirla con `set-site-nav-scheduler.php` (entrada `{cta, surface, key}` o `{"clear":true}`;
+  nunca imprime la clave y purga).
+- **Montaje:** un solo `<greenhouse-cta>` oculto por página, con `cta_location: site_nav`, porque el renderer lee
+  `cta-location` al montar y no al hacer clic. El punto de entrada (`menu_header`, `menu_mega` o `menu_onepage`) viaja
+  en el evento del menú `gh_site_nav_clicked`. El renderer se carga en ocio o cuando el visitante se dirige al CTA; si
+  no está listo, el clic espera hasta 2,5 s; con el lanzador vacío (`data-ghc-state="empty"`) el enlace va a
+  `/agenda/`.
+- **Diálogo:** el menú cierra su panel y suelta su bloqueo de scroll **antes** de abrir el diálogo, para que el
+  `<dialog>` nativo sea el único dueño de scroll lock y foco. El diálogo lleva la piel del sitio
+  (`data-eo-meeting-skin="site"`, `ohio-child/assets/css/meeting-dialog.css`): el marco aprobado para Inbound el
+  2026-10-18 con la paleta de `/agenda/`, con peso `:root` para ganarle a la piel de una landing; el CTA propio de una
+  landing conserva la suya. Al cerrar, el foco vuelve al control que lo abrió o a uno visible.
+- **Medición:** la familia `greenhouse_cta_*` con `cta_location: site_nav` (verificado en vivo:
+  `greenhouse_cta_clicked` y `greenhouse_cta_action_started`). La conversión sigue siendo la del contrato
+  `gh_meeting_*`.
+- **También lo abre el dock de landings** (TASK-2043) en Inicio y Redes Sociales, con su propio lanzador y
+  `cta-location="landing_dock"`, leyendo la misma opción de WordPress.
+- **Respaldo:** sin JS, sin superficie o con el lanzador vacío, enlace a `/agenda/`.
 
 ## Delta 2026-10-20 — `/agenda/` deja de ser un piloto aislado: landing indexable con el mismo agendador
 
 `/agenda/` (WordPress page 251583) es ahora la landing de agenda rediseñada con la línea gráfica «La órbita»,
 indexable (`index, follow`, título y OG propios, en `page-sitemap.xml`) y fuera de menús por decisión del operador; el
-botón «Agenda tu diagnóstico» del encabezado global (TASK-2042, delta anterior) la enlazará. La landing monta en línea
+botón «Agenda tu diagnóstico» del menú global (TASK-2042, sección anterior) la enlaza como respaldo. La landing monta en línea
 el **mismo** host del piloto, sin cambios de comportamiento: `<efeonce-meeting-scheduler>` con surface
 `fhsf-efeonce-lead-gen-web`, scheduler `discovery`, placement `agenda_pilot`, `activation-mode="page"` y receta máxima
 `command`, cargado por el loader de `efeonce-public-renderers`. No usa `efeonce-discovery-30` ni el lanzador
@@ -329,3 +349,22 @@ el **mismo** host del piloto, sin cambios de comportamiento: `<efeonce-meeting-s
 de producción; la composición AXIS aprobada del agendador sigue pendiente de adopción (TASK-2007). **No hubo booking
 controlado**: el operador lo difirió («no por ahora»), así que sigue abierto como gate separado del estado vigente del
 rollout. Contrato de la landing: skill `efeonce-public-site-wordpress` → `references/landings/agenda.md`.
+
+## Delta 2026-10-23 — consumidor: dock inferior de las landings de efeoncepro.com
+
+El [dock inferior de las landings](public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043)
+(`TASK-2043`, en vivo desde el 2026-10-23 en siete landings) suma un consumidor del agendador con el contrato vigente
+(`<greenhouse-cta>` + `open_meeting_scheduler`); no cambia schemas, state machine, binding, DTOs ni medición del
+agendador. El plugin `eo-landing-dock` imprime un lanzador `<greenhouse-cta cta-location="landing_dock">` oculto; el
+primitive AXIS `efeonce.landing-dock` no abre el agendador: emite `axis-landing-dock:cta` y el script del plugin abre
+ese lanzador (sin JS o sin lanzador, el botón sigue su enlace).
+
+- Inbound, Servicios HubSpot e Influencers usan su propio CTA (`inbound-discovery-meeting`, `hubspot-discovery-meeting`,
+  `influencer-discovery-meeting`); Redes Sociales e Inicio usan el del menú (`site-nav-discovery-meeting`), que agenda
+  con la misma página de HubSpot `efeoncepro/agenda-discovery` (scheduler `discovery`) que tenían. SEO y Performance no
+  agendan: su botón es un enlace al formulario.
+- Placement: `cta-location="landing_dock"` reemplaza `inbound_mobile_dock` y `hubspot_mobile_dock` desde que el dock se
+  encendió en cada página. La conversión sigue siendo el receipt `gh_meeting_*`, nunca el clic.
+- La clave de la superficie nunca entra a un repositorio: el comando `pnpm public-website:landing-dock on` la lee del
+  HTML en vivo al aplicar y la guarda en el meta de la página.
+- Pendiente: un puente del agendador compartido entre `site-nav-host.js` y `landing-dock-host.js`.

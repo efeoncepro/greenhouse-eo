@@ -1,5 +1,13 @@
 # TASK-1345 — Landing publica: desarrollo de sitios web
 
+## Delta 2026-10-23
+
+- La página `250816` (`/desarrollo-sitios-web/`) ya no muestra el encabezado de Ohio: desde el 2026-10-23 00:09 UTC el
+  sitio usa el menú global AXIS `efeonce.site-nav` (`TASK-2042`). Donde esta task dice que el header queda gobernado
+  por metas Ohio y tema, ahora la meta del espaciador de Ohio sólo decide el estado inicial del menú (`top` o `fixed`).
+  El servicio «Diseño y desarrollo web» (línea Engine) enlaza a esta página y marca «Estás aquí» desde su `href`. Los
+  sondeos de `#masthead` de las verificaciones de julio son históricos.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

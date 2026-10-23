@@ -119,9 +119,13 @@ Reglas obligatorias:
 
 - `docs/ui/wireframes/TASK-2042-site-nav-wordpress-host.md`
 - `docs/ui/flows/TASK-2042-site-nav-wordpress-flow.md`
-- En `efeonce-public-site-runtime`: override de encabezado y carga de assets en `wp-content/themes/ohio-child/` [rutas
-  exactas en el discovery]; `ohio-child/assets/vendor/axis/<versión>/`
-- Script de publicación de la superficie del agendador del encabezado en `scripts/growth/` [nombre en el discovery]
+- En `efeonce-public-site-runtime`, tema `wp-content/themes/ohio-child/`: `inc/site-nav.php` (adaptador),
+  `parts/headers/header-style-1..8.php` (overrides), `assets/css/site-nav-host.css`, `assets/css/meeting-dialog.css`,
+  `assets/js/site-nav-host.js` y `assets/vendor/axis/site-nav/<versión>/` (hoy `0.7.13`); carril de despliegue
+  `build-site-nav-theme-package.cjs` + `deploy-site-nav-theme-package.php`
+- En Greenhouse: `scripts/growth/publish-site-nav-meeting-cta.ts` (CTA y superficie del agendador),
+  `scripts/public-website/set-site-nav-switch.php` (interruptor), `scripts/public-website/set-site-nav-scheduler.php`
+  (opción del agendador) y `scripts/public-website/create-yoast-redirect.php` (redirecciones del menú)
 - `.claude/skills/efeonce-public-site-wordpress/references/native-navigation.md` y su espejo en `.codex`
 - `docs/documentation/public-site/` y `docs/manual-de-uso/public-site/` (documentación funcional y manual de la
   navegación)
@@ -143,11 +147,14 @@ Reglas obligatorias:
 - ~~No hay adaptador ni interruptor; el punto exacto de enganche del encabezado de Ohio no está confirmado.~~ Cerrado
   2026-10-22: Ohio llama `get_template_part('parts/headers/header', 'style-N')` desde `header.php`; el tema hijo
   sobrescribe `header-style-1..8.php` y el adaptador vive en `ohio-child/inc/site-nav.php` (local, sin desplegar).
-- No hay superficie del agendador para todo el sitio; hoy cada CTA está atado a una landing.
-- La piel elegante del diálogo está con alcance de una landing.
+- ~~No hay superficie del agendador para todo el sitio.~~ Cerrado 2026-10-22: CTA `site-nav-discovery-meeting` y
+  superficie WordPress propia del menú, publicados por `scripts/growth/publish-site-nav-meeting-cta.ts`.
+- ~~La piel elegante del diálogo está con alcance de una landing.~~ Cerrado 2026-10-23: piel compartida
+  `ohio-child/assets/css/meeting-dialog.css` (`data-eo-meeting-skin="site"`).
 - No existen en GTM ni GA4 los eventos del menú (`gh_site_nav_opened`, `gh_site_nav_line_viewed`,
-  `gh_site_nav_clicked`); el módulo del anfitrión ya los empuja al `dataLayer` en local.
-- La doctrina del sitio todavía dice conservar el encabezado de Ohio.
+  `gh_site_nav_clicked`); el módulo del anfitrión ya los empuja al `dataLayer` en producción.
+- ~~La doctrina del sitio todavía dice conservar el encabezado de Ohio.~~ Cerrado 2026-10-23: `native-navigation.md`
+  y `runtime-and-discovery.md` describen el menú global y dejan Ohio sólo para `/blog/` y el respaldo.
 
 ## Modular Placement Contract
 
@@ -253,7 +260,8 @@ Reglas obligatorias:
   (no soporta el diseño)
 - Why this pattern: se mide en una página real y se apaga en un paso
 - Reuse / extend / new primitive: reuse del primitive; extend de la piel del agendador a primitive compartida del sitio
-- Open risks: punto de enganche de Ohio por confirmar; variantes por página no inventariadas; Core Web Vitals
+- Open risks: Core Web Vitals sin medir frente al encabezado anterior; la vuelta a `off` sólo está probada en
+  Playground. El enganche de Ohio y el inventario de variantes quedaron resueltos en el Slice 1
 
 ### Visual verification
 
@@ -328,10 +336,15 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime evidence (HTML servido, agendador, eventos) is listed and captured.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. Evidencia: CTA
+  `site-nav-discovery-meeting`, superficie `csur-eb834d53-…`, opciones `eo_site_nav_enabled` y `eo_site_nav_scheduler`
+  y scripts de §Files owned.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. Evidencia: §Data model
+  and invariants; republicar el CTA rota la clave y la opción de WordPress se actualiza con `set-site-nav-scheduler.php`.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. Evidencia: §Migration, backfill and
+  rollout y §Rollback plan per slice (interruptor a `off` con `set-site-nav-switch.php`).
+- [ ] Runtime evidence (HTML servido, agendador, eventos) is listed and captured. Sin tildar: HTML servido y agendador
+  verificados en producción (Slices 3 y 6); los eventos llegan al `dataLayer`, pero falta verlos en GA4 DebugView.
 
 ## Hybrid Execution Justification
 
@@ -381,7 +394,8 @@ Reglas obligatorias:
 > 0.7.8, con prueba de anfitrión hostil; la comparación de estilos calculados Lab vs WordPress da cero
 > diferencias en escritorio (reposo, panel abierto, hover) y en el onepage de 390 px. Publicado como
 > primitives 0.7.8 (tag `v0.7.8`; `v0.7.2` ya existía) y copiado al tema desde el paquete publicado, byte a byte igual
-> a lo verificado.
+> a lo verificado. La versión fijada en el tema subió después a 0.7.10, 0.7.12 y 0.7.13 (Slice 6); hoy
+> `EO_SITE_NAV_AXIS='0.7.13'`, con paridad del render (17 casos) y del validador (35 casos).
 
 - Override del encabezado en `ohio-child`:
   - opciones `eo_site_nav_enabled` (`off`/`pilot`/`on`) y `eo_site_nav_pilot_pages`;
@@ -400,9 +414,8 @@ Reglas obligatorias:
 > `discovery`, rutas `/**`) y superficie WordPress `csur-eb834d53-fd99-4f6b-9615-979e329e7d37` que sólo permite ese CTA,
 > con allowlist `efeoncepro.com` y `www`. La clave quedó en `.auth/site-nav-meeting-cta-surface.json` (0600, ignorado);
 > volver a correr el script la rota. Verificado contra el endpoint público de producción: 200 con el CTA y el agendador
-> `discovery` en `/`, `/agencia-inbound-marketing/` y `/contacto/`; 403 desde un origen ajeno. Falta: montar un solo
-> `<greenhouse-cta>` en el adaptador con la clave como opción de WordPress (WP-CLI, sin pasar por el repo), cargar el
-> renderer y llevar la piel del diálogo de Inbound a una primitive compartida del sitio.
+> `discovery` en `/`, `/agencia-inbound-marketing/` y `/contacto/`; 403 desde un origen ajeno. Lo que faltaba
+> (montaje del `<greenhouse-cta>`, carga del renderer y piel compartida del diálogo) quedó en vivo el 2026-10-23, abajo.
 
 - Superficie y CTA del encabezado global publicados con el script gobernado de Growth, con allowlist de origen para
   todo el sitio.
@@ -424,8 +437,9 @@ Reglas obligatorias:
   `site_nav_open`, `site_nav_line_view` y `site_nav_click` del primitive), con alta en GTM y GA4 por la skill de
   medición, sin PII. `site_nav_cta` no se empuja: el clic ya viaja en `gh_site_nav_clicked` con `target_type: cta` y el
   agendador emite `greenhouse_cta_*`.
-- Avance 2026-10-22: el empuje al `dataLayer` está hecho en local (`ohio-child/assets/js/site-nav-host.js`); falta el
-  alta en GTM y GA4, que se publica con confirmación humana.
+- Avance 2026-10-23: el empuje al `dataLayer` (`ohio-child/assets/js/site-nav-host.js`) está en producción; la barrida
+  vio llegar `gh_site_nav_opened` en todas las páginas y el agendador emite `greenhouse_cta_*` con
+  `cta_location: site_nav`. Falta el alta en GTM y GA4, que se publica con confirmación humana.
 
 ### Slice 5 — Piloto
 
@@ -438,6 +452,10 @@ Reglas obligatorias:
 > creó `eo_site_nav_enabled=off` y `eo_site_nav_pilot_pages=[]`. Sonda de sólo lectura en producción: el render pinta
 > el documento vivo (100 enlaces) y el REST responde 200. Vuelta atrás: restaurar los tar y borrar las rutas creadas
 > que listan.
+>
+> Avance 2026-10-23: el piloto de una página no se hizo. El operador decidió pasar directo a `on` (Slice 6). Del
+> slice siguen pendientes la prueba de vuelta a `off` en producción y la medición de Core Web Vitals frente al
+> encabezado anterior.
 
 - Release acotado por SSH con el interruptor en `off`; luego `pilot` en la página elegida con el operador.
 - Captura y revisión en los viewports del plan.
@@ -445,28 +463,6 @@ Reglas obligatorias:
 - Core Web Vitals frente a la medición previa.
 
 ### Slice 6 — Todo el sitio y documentación
-
-> Avance 2026-10-23 (después del `on`):
-> - **Corte del onepage en pantallas anchas** corregido en AXIS primitives 0.7.10 (radio a la esquina más lejana).
-> - **Tono de la isla** corregido en AXIS 0.7.12 (degradados, velos y chrome fijo del anfitrión): sobre la franja
->   E-E-A-T navy de `/servicios/posicionamiento-seo/` la isla quedaba clara. Vendorizado desde el paquete publicado
->   (runtime `e6c388d`), paridad 17 + 35 contra 0.7.12, desplegado y purgado a las 04:07 UTC; verificado en vivo a
->   1440: isla `fixed` con tono `dark` sobre la franja y `light` sobre las secciones claras, sin errores de consola.
-> - **Tono con el agendador abierto** (encontrado por el dock): AXIS primitives 0.7.13 (`b9123ee`) salta elementos no
->   visibles y conserva el tono si lo primero bajo la isla es `<html>`. Runtime `aadfdc9`, paridad 17 + 35, desplegado a
->   las 04:28 UTC. Verificado en vivo con Playwright: `dark` sobre la franja con el agendador abierto, tras cerrar con el
->   botón y con Escape y tras volver a hacer scroll, también con `<html>` pintado de blanco; el bloqueo de scroll se
->   libera al cerrar; sin errores de página.
-> - **Loop Marketing → Inbound**: el servicio abre `/agencia-inbound-marketing/` y `/landing-loop-marketing/` responde
->   301 (Yoast Premium, `create-yoast-redirect.php`, página en noindex). Revisión 3 del documento.
-> - **Edición gobernada**: `pnpm public-website:site-nav` (pull, show, set, glyph, photo, add/move/remove, patch,
->   check, fit, preview, diff, apply, verify, revisions, restore). El documento vivo es la fuente de verdad; el generador
->   queda sólo de arranque. Primer uso real: revisión 4 («Surround Discovery™»).
-> - **Plugin** (desplegado): las revisiones se numeran por ID aunque un filtro del sitio altere el contenido (la 2 y la 3
->   habían quedado sin número; reparadas), y el JSON se guarda en ASCII escapado para que `wp_encode_emoji` no convierta
->   «™» en una entidad que se pintaba literal. Playground: 49 comprobaciones.
-> - **Documentación**: arquitectura, doc funcional, manual (`docs/manual-de-uso/public-site/operar-navegacion-global.md`)
->   y skills actualizados por subagentes el 2026-10-23.
 
 > Avance 2026-10-23: `on` aplicado con el go del operador («prenderlo para ver si todo está ok y haz las pruebas con
 > todas las landing»), sin piloto previo. Interruptor por `scripts/public-website/set-site-nav-switch.php` (exige
@@ -516,6 +512,27 @@ Reglas obligatorias:
 >   ícono roto.
 > - **Enlaces del menú**: los 52 responden 200 (LinkedIn devuelve 999 a robots).
 
+> Avance 2026-10-23 (después de la revisión de fidelidad; el corte del onepage ya está arriba):
+> - **Tono de la isla** corregido en AXIS 0.7.12 (degradados, velos y chrome fijo del anfitrión): sobre la franja
+>   E-E-A-T navy de `/servicios/posicionamiento-seo/` la isla quedaba clara. Vendorizado desde el paquete publicado
+>   (runtime `e6c388d`), paridad 17 + 35 contra 0.7.12, desplegado y purgado a las 04:07 UTC; verificado en vivo a
+>   1440: isla `fixed` con tono `dark` sobre la franja y `light` sobre las secciones claras, sin errores de consola.
+> - **Tono con el agendador abierto** (encontrado por el dock): AXIS primitives 0.7.13 (`b9123ee`) salta elementos no
+>   visibles y conserva el tono si lo primero bajo la isla es `<html>`. Runtime `aadfdc9`, paridad 17 + 35, desplegado a
+>   las 04:28 UTC. Verificado en vivo con Playwright: `dark` sobre la franja con el agendador abierto, tras cerrar con el
+>   botón y con Escape y tras volver a hacer scroll, también con `<html>` pintado de blanco; el bloqueo de scroll se
+>   libera al cerrar; sin errores de página.
+> - **Loop Marketing → Inbound**: el servicio abre `/agencia-inbound-marketing/` y `/landing-loop-marketing/` responde
+>   301 (Yoast Premium, `create-yoast-redirect.php`, página en noindex). Revisión 3 del documento.
+> - **Edición gobernada**: `pnpm public-website:site-nav` (pull, show, set, glyph, photo, add/move/remove, patch,
+>   check, fit, preview, diff, apply, verify, revisions, restore). El documento vivo es la fuente de verdad; el generador
+>   queda sólo de arranque. Primer uso real: revisión 4 («Surround Discovery™»).
+> - **Plugin** (desplegado): las revisiones se numeran por ID aunque un filtro del sitio altere el contenido (la 2 y la 3
+>   habían quedado sin número; reparadas), y el JSON se guarda en ASCII escapado para que `wp_encode_emoji` no convierta
+>   «™» en una entidad que se pintaba literal. Playground: 49 comprobaciones.
+> - **Documentación**: arquitectura, doc funcional, manual (`docs/manual-de-uso/public-site/operar-navegacion-global.md`)
+>   y skills actualizados por subagentes el 2026-10-23.
+
 - Con el go del operador, `on`.
 - Captura de Home, una landing con «Estás aquí», un post, Glitch y 404.
 - Actualización de la doctrina: `native-navigation.md` y `runtime-and-discovery.md` de la skill del sitio, en `.claude`
@@ -560,7 +577,8 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
 - Opción `eo_site_nav_enabled` (`off` por defecto tras el despliegue).
   - `pilot`: limita a `eo_site_nav_pilot_pages`.
   - `on`: aplica a todo el sitio.
-  - Vuelta atrás: `wp option update eo_site_nav_enabled off` + purga de Kinsta.
+  - Vuelta atrás: `scripts/public-website/set-site-nav-switch.php` con `{"mode":"off"}` (imprime el valor anterior y
+    purga Kinsta). Estado actual: `on` desde 2026-10-23 00:09 UTC.
 
 ### Rollback plan per slice
 
@@ -599,7 +617,7 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
 
 ## Acceptance Criteria
 
-- [ ] La evidencia visual de cierre se captura sin el aviso de depuración del Lab ni otros superpuestos: en 1280×720 tapaba «Ver todas las soluciones» y no dejaba ver su subrayado (pedido de la sesión del menú, contralora de fidelidad, 2026-10-22).
+- [ ] La evidencia visual de cierre se captura sin el aviso de depuración del Lab ni otros superpuestos: en 1280×720 tapaba «Ver todas las soluciones» y no dejaba ver su subrayado (pedido de la sesión del menú, contralora de fidelidad, 2026-10-22). Sin tildar: la captura de cierre y el scorecard todavía no se hicieron.
 
 - [x] Con `eo_site_nav_enabled=off` el sitio sirve el encabezado de Ohio sin assets de AXIS. Evidencia (Playground local con Ohio 3.7.0 real, el plugin `eo-site-nav` y `ohio-child`, 2026-10-22): sin
   `data-axis-site-nav` ni `site-nav.css`, con `#site-navigation` de Ohio. En producción con el interruptor en `off` (2026-10-22, tras el
@@ -615,8 +633,8 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
   guardado con `javascript:` saltándose el servicio de guardado → Ohio y `[eo-site-nav] render failed, keeping Ohio:
   INVALID_FORMAT /header/cta/fallbackHref`; plugin sin cargar → Ohio y su línea de log.
 - [ ] Cada variante de encabezado de Ohio quedó mapeada a un estado del primitive o documentada como excepción. Sin
-  tildar: el mapeo está en el código (Slice 1), pero Glitch, 404 y archivos caen en la regla del espaciador sin captura
-  todavía; se verifican en el piloto.
+  tildar: el mapeo está en el código (Slice 1) y la barrida del 2026-10-23 cubrió las 52 páginas publicadas y 3 posts
+  de Glitch (`/blog/` es la excepción documentada), pero el 404 y los archivos no se capturaron con el menú nuevo.
 - [x] Los enlaces del menú están en el HTML de servidor (`curl` sin JS). Evidencia (Playground local con Ohio 3.7.0 real, el plugin `eo-site-nav` y `ohio-child`, 2026-10-22): 104 enlaces dentro de la
   cabecera servida por `curl`.
 - [x] «Agenda tu diagnóstico» abre el agendador desde la cabecera, el mega y el onepage, cierra el panel antes y
@@ -624,10 +642,17 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
   mega a 1440 y desde el onepage a 390 (pantalla completa); Escape y el botón de cierre devuelven el foco a «Agenda tu
   diagnóstico» o a la hamburguesa; `greenhouse_cta_clicked` con `cta_location: site_nav`.
 - [ ] Los eventos del menú (`gh_site_nav_*`) llegan a GA4 sin PII. Sin tildar: falta el alta en GTM y GA4.
-- [ ] Sin scroll horizontal en los viewports del plan y Core Web Vitals sin regresión frente a la medición previa.
+- [ ] Sin scroll horizontal en los viewports del plan y Core Web Vitals sin regresión frente a la medición previa. Sin
+  tildar: ningún elemento del menú se sale (barrida 2026-10-23), pero cinco páginas antiguas o de demo tienen scroll
+  horizontal propio de Elementor (`/home-2/`, `/demo-landing-2024/`, `/partnership/`, `/landing-loop-marketing/`,
+  `/home-2-2/`), y Core Web Vitals no se midió.
 - [ ] Se capturó y se miró la evidencia desktop y 390 px del piloto y de los tipos de página, y el scorecard cumple el
-  umbral.
-- [ ] La doctrina de la skill del sitio, la documentación funcional y el manual reflejan el nuevo modelo.
+  umbral. Sin tildar: no hubo piloto; la barrida y la sesión de fidelidad miraron las páginas en vivo, pero el
+  scorecard `docs/ui/reviews/TASK-2042-site-nav-wordpress-host.scorecard.json` no existe todavía.
+- [x] La doctrina de la skill del sitio, la documentación funcional y el manual reflejan el nuevo modelo. Evidencia
+  (2026-10-23): `native-navigation.md` y `runtime-and-discovery.md` en `.claude` y `.codex`,
+  `docs/documentation/public-site/navegacion-global-del-sitio.md` y
+  `docs/manual-de-uso/public-site/operar-navegacion-global.md`.
 - [ ] `UI ready` se mantuvo en `no` hasta completar el inventario, el mapping, el plan de captura y el decision log.
 
 ## Verification
@@ -651,11 +676,16 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
 ## Follow-ups
 
 - Adaptador de Think (EPIC-055).
+- Elementos flotantes de Ohio (selector Light/Dark y botón de búsqueda) bajo el menú nuevo: quitarlos es una decisión de
+  producto aparte.
+- Hallazgos de la barrida que no son del menú: recursos 404 dentro de páginas viejas (formularios de HubSpot borrados,
+  un ícono de iconify, imágenes de `uploads`) y scroll horizontal de Elementor en cinco páginas antiguas o de demo.
+- `/blog/` (#18456) sale de `EO_SITE_NAV_EXCLUDED_PAGES` cuando `TASK-1802` publique el hub.
 - Lo que surja dentro de la frontera de la puesta en el sitio entra como slice o criterio de esta task (regla de
   EPIC-055).
 
 ## Open Questions
 
-- Página piloto (la elige el operador en el Slice 5).
-- Si la superficie del agendador del encabezado reutiliza el CTA `inbound-discovery-meeting` o publica uno propio; la
-  arquitectura recomienda uno propio para medir por separado.
+- ~~Página piloto~~: resuelto 2026-10-23, sin piloto; el operador pasó directo a `on`.
+- ~~Si la superficie del agendador reutiliza `inbound-discovery-meeting`~~: resuelto 2026-10-22, CTA propio
+  `site-nav-discovery-meeting` para medir por separado.

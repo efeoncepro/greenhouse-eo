@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `En curso. TASK-2040 completa (AXIS v0.7.7, 2026-10-22). TASK-2041: slices 1 a 3 construidos y probados en local, y 51 fotos subidas y verificadas en el bucket; faltan deploy del plugin, apply en vivo y la pantalla del admin. TASK-2042 sin empezar. WordPress sin cambios`
+- Status real: `Menú nuevo en producción en todo efeoncepro.com desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ conserva Ohio por TASK-1802), con el agendador nativo y AXIS primitives 0.7.13 en el tema. TASK-2040 y TASK-2043 completas. TASK-2041 en curso: plugin, REST, fotos y documento en vivo (revisión 4), edición por pnpm public-website:site-nav; falta la pantalla del admin. TASK-2042 en curso: falta el alta GTM/GA4, Core Web Vitals y probar la vuelta a off en producción`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Operador (alcance, piloto y go a todo el sitio) · Sitio público / WordPress (plugin y adaptador) · AXIS (contrato y primitive)`
@@ -57,6 +57,8 @@ Cada una absorbe lo que surja dentro de su frontera, en vez de abrir tasks nueva
   atrás.
 - Cualquier sitio nuevo (Think primero) puede usar el mismo menú con un adaptador delgado y su propia superficie de
   agendador.
+- Las landings comparten un solo dock inferior de vidrio (`efeonce.landing-dock`, `TASK-2043`) en lugar de un dock
+  propio por landing; una landing nueva lo usa con su archivo `manifests/landing-dock/<landing>.json`.
 
 ## Architecture Alignment
 
@@ -88,8 +90,11 @@ esquema del contrato. `TASK-2042` depende de ambas.
   - Resolución de los datos dinámicos de Recursos.
   - Fotos al bucket de AXIS en `site-nav/v1/`, coordinadas con quien esté tocando AXIS.
   - Carga del documento inicial con el contenido aprobado del canvas.
-  - **Estado 2026-10-22:** slices 1 a 3 en local (runtime, sin push). Fotos subidas y verificadas en `site-nav/v1/`.
-    Faltan el deploy del plugin, el `apply` en vivo y el diseño del admin.
+  - **Estado 2026-10-23:** slices 1 a 4 en producción. Plugin `eo-site-nav` activo, REST `eo/v1/site-nav` con
+    `ETag`, 51 fotos en `site-nav/v1/` y documento en la revisión 4. El guardado se endureció en vivo: las revisiones
+    se ubican por ID, el JSON se guarda en ASCII escapado y se relee tras guardar. El menú se edita con
+    `pnpm public-website:site-nav` (Greenhouse), sobre el mismo servicio de guardado. Falta la pantalla del admin
+    (Slice 5, dirección B aprobada).
 - `TASK-2042` — **Puesta en el sitio.**
   - Adaptador de encabezado en `ohio-child`, con interruptor `off`/`pilot`/`on`.
   - Inventario y resolución de las variantes de encabezado de Ohio.
@@ -97,6 +102,12 @@ esquema del contrato. `TASK-2042` depende de ambas.
   - Eventos de medición.
   - Piloto en una página y después todo el sitio.
   - Actualización de la doctrina de navegación y de la documentación funcional y el manual.
+  - **Estado 2026-10-23:** `on` en todo el sitio desde las 00:09 UTC, sin piloto de una página (decisión del
+    operador); `/blog/` (#18456) conserva Ohio porque es de `TASK-1802`. Barrida de 52 páginas publicadas y 3 posts de
+    Glitch a 1440 y 390 sin fallas del menú; sesión de fidelidad aprobada en vivo. Agendador nativo en la cabecera, el
+    mega y el onepage, con la piel `meeting-dialog.css`. AXIS primitives 0.7.13 copiado en `ohio-child`. Doctrina,
+    documentación funcional y manual actualizados. Faltan el alta GTM/GA4 de `gh_site_nav_*`, Core Web Vitals frente
+    al encabezado anterior y probar la vuelta a `off` en producción.
 
 - `TASK-2043` — **Dock inferior de las landings** (agregada 2026-10-23).
   - Primitive `efeonce.landing-dock` en AXIS con el vidrio de la isla del menú, esquema `landing-dock.v1` y Lab.
@@ -106,6 +117,8 @@ esquema del contrato. `TASK-2042` depende de ambas.
   - No cabe en las tres hijas: es cromo de las landings, no del encabezado; la aprobó el operador en el canvas v80.
   - **Estado 2026-10-23: completa.** AXIS v0.7.12–v0.7.14 (primitives 0.7.14) y plugin `eo-landing-dock` en vivo;
     las siete landings usan el dock, cada una aprobada en vivo por la sesión de fidelidad.
+    [Funcionamiento](../../documentation/public-site/dock-de-landings.md) y
+    [operación](../../manual-de-uso/public-site/operar-dock-de-landings.md).
 
 **Regla de la épica:** lo que aparezca durante el trabajo entra como slice o criterio en la task cuya frontera toca. Una
 task nueva sólo se crea si el trabajo no cabe en ninguna de las tres.
@@ -115,8 +128,9 @@ task nueva sólo se crea si el trabajo no cabe en ninguna de las tres.
 - Canvas «Mega menú efeoncepro.com»: [claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj](https://claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj) (versión 67).
 - Fotos del menú producidas el 2026-10-18 en `ai-generations/2026-10-18_menu-sitio/` (fichas, compuestas y `web/`).
 - `EfeonceMention` (contrato `efeonce.mention`): primer mecanismo portable del sitio.
-- Agendador elegante de `/agencia-inbound-marketing/` (`scripts/public-website/inbound-source/page.css`): piel que
-  `TASK-2042` sube a primitive compartida.
+- Agendador elegante de `/agencia-inbound-marketing/` (`scripts/public-website/inbound-source/page.css`): su marco
+  pasó a la piel compartida del sitio `ohio-child/assets/css/meeting-dialog.css` (`TASK-2042`), con la paleta de
+  `/agenda/`.
 - `TASK-1510`: agendador nativo portable, dueño del agendador, no del menú.
 - `EPIC-035`: Efeonce Embed Runtime, distribución de Forms, CTAs y Meetings.
 - `EPIC-047`: portafolio de landings; sus landings heredan el encabezado nuevo.
@@ -125,17 +139,31 @@ task nueva sólo se crea si el trabajo no cabe en ninguna de las tres.
 
 ## Exit Criteria
 
-- [ ] El contrato `efeonce.site-nav` y su primitive están publicados en AXIS con versión fijada y página en el Lab.
+- [x] El contrato `efeonce.site-nav` y su primitive están publicados en AXIS con versión fijada y página en el Lab.
+  Evidencia: `TASK-2040` completa (AXIS v0.7.7); el tema usa primitives 0.7.13 fijado en
+  `ohio-child/assets/vendor/axis/site-nav/0.7.13/` con `VERSION.json` (sha256).
 - [ ] El plugin guarda el menú como un documento `site-nav.v1` validado, con revisiones, admin, WP-CLI y REST pública
-  de sólo lectura.
-- [ ] Las fotos del menú se sirven desde `site-nav/v1/` del bucket de AXIS, con caché inmutable y texto alternativo en
-  cada una.
+  de sólo lectura. Sin tildar: documento, revisiones, WP-CLI y REST están en vivo (`TASK-2041`), pero la pantalla del
+  admin no está construida.
+- [x] Las fotos del menú se sirven desde `site-nav/v1/` del bucket de AXIS, con caché inmutable y texto alternativo en
+  cada una. Evidencia: las 51 URL responden 200 con `Cache-Control: public, max-age=31536000, immutable`; el esquema
+  exige el alt (`TASK-2041`, 2026-10-22).
 - [ ] `efeoncepro.com` sirve la navegación nueva en todo el sitio con el interruptor en `on`. Volver a `off` devuelve el
-  encabezado de Ohio, verificado al menos una vez.
-- [ ] «Agenda tu diagnóstico» abre el agendador nativo desde la cabecera, el mega y el onepage, y devuelve el foco al
-  cerrar.
-- [ ] Los eventos de medición llegan a GA4 sin PII.
-- [ ] La doctrina `native-navigation.md`, la documentación funcional y el manual del sitio reflejan el nuevo modelo.
+  encabezado de Ohio, verificado al menos una vez. Sin tildar: `on` verificado en producción el 2026-10-23 (52 páginas
+  publicadas y 3 posts de Glitch, a 1440 y 390; `/blog/` excluida a propósito), pero la vuelta a `off` sólo se probó en
+  Playground.
+- [x] «Agenda tu diagnóstico» abre el agendador nativo desde la cabecera, el mega y el onepage, y devuelve el foco al
+  cerrar. Evidencia en producción (2026-10-23): cabecera y mega a 1440, onepage a 390 (pantalla completa), Escape y el
+  botón de cierre devuelven el foco; `greenhouse_cta_clicked` con `cta_location: site_nav` (`TASK-2042`).
+- [ ] Los eventos de medición llegan a GA4 sin PII. Sin tildar: `gh_site_nav_*` llega al `dataLayer` en vivo, pero falta
+  el alta en GTM y GA4 (la publicación del contenedor requiere confirmación humana).
+- [x] La doctrina `native-navigation.md`, la documentación funcional y el manual del sitio reflejan el nuevo modelo.
+  Evidencia: `native-navigation.md` y `runtime-and-discovery.md` (`.claude` y `.codex`),
+  [documentación funcional](../../documentation/public-site/navegacion-global-del-sitio.md) y
+  [manual](../../manual-de-uso/public-site/operar-navegacion-global.md), 2026-10-23.
+- [x] Las siete landings con dock usan el dock compartido `efeonce.landing-dock`, con su dock antiguo fuera del HTML y
+  vuelta atrás por página. Evidencia: `TASK-2043` completa (2026-10-23), AXIS v0.7.12–v0.7.14 y plugin
+  `eo-landing-dock` con primitives 0.7.14; cada landing aprobada en vivo por la sesión de fidelidad.
 
 ## Non-goals
 
@@ -144,23 +172,20 @@ task nueva sólo se crea si el trabajo no cabe en ninguna de las tres.
 - Cambiar el contenido de las páginas o landings.
 - El adaptador de Think: queda como follow-up de esta épica y se crea cuando el operador lo pida.
 - Cloud CDN con dominio propio para las fotos; se evalúa sólo si aparece una necesidad medida.
-- Integración Greenhouse/MCP para editar el menú: la puerta WP-CLI ya da paridad a los agentes; la herramienta MCP es
-  follow-up.
+- Herramienta MCP para editar el menú: los agentes ya tienen paridad con `pnpm public-website:site-nav` (Greenhouse),
+  que llama al mismo servicio de guardado por WP-CLI; la herramienta MCP es follow-up.
 
 ## Follow-ups
 
 - Adaptador Think: envoltura Astro que lee la copia pública y monta su propio agendador. Requiere la superficie de
   Growth CTA de Think.
 - Publicar también la copia pública en el bucket de AXIS (PDR-027, punto abierto 3).
+- Dock de las landings (`TASK-2043`): retirar el código de los siete docks antiguos, un puente del agendador compartido
+  entre `site-nav-host.js` y `landing-dock-host.js`, y el alta de `gh_landing_dock_clicked` en GTM y GA4.
 
 ## Open Questions
 
 - ~~Alcance en todo el sitio y piloto primero~~: decididos por el operador el 2026-10-18 (PDR-027, Accepted).
-- Pendientes de contenido de la nota «Por confirmar» del canvas:
-  - Orden de servicios por línea.
-  - Respuestas por línea.
-  - URL de YouTube.
-  - Títulos de lecturas.
-  - Lectura propia de Influencer y Performance.
-
-  Se resuelven dentro de `TASK-2041` al cargar el documento inicial.
+- ~~Pendientes de contenido de la nota «Por confirmar» del canvas~~ (orden de servicios, respuestas por línea, URL de
+  YouTube, títulos de lecturas y lectura de Influencer y Performance): resueltos con el operador en `TASK-2041` antes
+  del documento inicial (revisión 1, 2026-10-22).

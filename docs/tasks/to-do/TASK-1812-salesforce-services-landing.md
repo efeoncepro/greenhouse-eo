@@ -1,5 +1,15 @@
 # TASK-1812 — Landing pública de servicios Salesforce: universo conectado
 
+## Delta 2026-10-23
+
+- La cabecera de `efeoncepro.com` ya no es la de Ohio: desde el 2026-10-23 00:09 UTC todas las páginas, salvo `/blog/`,
+  muestran el menú global AXIS `efeonce.site-nav` (`TASK-2042`). Donde esta task dice «Ohio gobierna el rail público» u
+  «Ohio chrome», ahora aplica el menú global; el pie no cambió.
+- El enlace de la landing en el menú es un servicio del documento del menú (hoy no hay servicio de Salesforce). Se
+  agrega con `pnpm public-website:site-nav add …` y `apply` con el go del operador
+  ([manual](../../manual-de-uso/public-site/operar-navegacion-global.md)), nunca con los ítems del menú de Ohio.
+  «Estás aquí» se marca solo desde el `href` del servicio.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

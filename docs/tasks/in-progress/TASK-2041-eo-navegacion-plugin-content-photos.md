@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Slices 1 a 4 en producción el 2026-10-22: plugin 0.1.0 activo, fotos en el bucket y documento de efeoncepro.com aplicado (revisión 1, REST pública con ETag). El sitio sigue con la cabecera de Ohio hasta TASK-2042. Slice 5: diseño del admin aprobado (dirección B con el árbol de A, 2026-10-22); falta construirlo`
+- Status real: `Slices 1 a 4 en producción: plugin eo-site-nav activo, REST pública con ETag, 51 fotos en el bucket y documento de efeoncepro.com en la revisión 4; el adaptador de TASK-2042 lo pinta en todo el sitio desde 2026-10-23 00:09 UTC. Guardado endurecido en vivo el 2026-10-23 (revisiones por ID, JSON en ASCII escapado, relectura tras guardar). Hoy se edita con pnpm public-website:site-nav (Greenhouse), sobre el mismo servicio de guardado. Slice 5: diseño del admin aprobado (dirección B con el árbol de A, 2026-10-22); falta construirlo, junto con la purga forzada de EOSN_Cache`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -137,12 +137,13 @@ Reglas obligatorias:
 
 ### Gap
 
-- No existe el plugin, el tipo de contenido, la validación, el admin, los comandos `wp eo-nav` ni la REST pública.
-- No existe el documento `site-nav.v1` del sitio.
-- No existe la carpeta `site-nav/` en el bucket. La tableta horizontal usa el recorte `op` con `object-position`, como el
-  canvas: no hace falta un recorte `op-s` (retirado el 2026-10-22).
-- Quedan pendientes de contenido de la nota «Por confirmar»: orden de servicios, respuestas por línea, URL de YouTube,
-  títulos de lecturas y lectura propia de Influencer y Performance.
+- ~~No existe el plugin, el tipo de contenido, la validación, los comandos `wp eo-nav` ni la REST pública.~~ En
+  producción desde el 2026-10-22. Sigue faltando la pantalla del admin (Slice 5).
+- ~~No existe el documento `site-nav.v1` del sitio.~~ Aplicado el 2026-10-22 (revisión 1); hoy en la revisión 4.
+- ~~No existe la carpeta `site-nav/` en el bucket.~~ 51 objetos subidos el 2026-10-22. La tableta horizontal usa el
+  recorte `op` con `object-position`, como el canvas: no hace falta un recorte `op-s` (retirado el 2026-10-22).
+- ~~Pendientes de contenido de la nota «Por confirmar»~~: resueltos con el operador antes del `apply` inicial (tabla
+  de §Discovery y plan).
 - **Resuelto (operador, 2026-10-20):** la franja «suscribirse a Glitch» de Recursos apunta a la suscripción del blog,
   que es la misma lista que Glitch. No se crea formulario ni lista propia del menú. El documento la guarda en
   `strip.cta` del panel editorial (`action: "link"`, `fallbackHref`), campo fijado por el esquema `site-nav.v1`
@@ -310,15 +311,17 @@ Reglas obligatorias:
 ### Migration, backfill and rollout
 
 - Migration posture: `additive` (tipo de contenido nuevo; nada existente se modifica)
-- Default state: plugin activo con documento cargado, pero sin consumidor hasta que `TASK-2042` prenda el interruptor
+- Default state: plugin activo con documento cargado; desde el 2026-10-23 lo consume el adaptador de `TASK-2042` en
+  todo el sitio (`eo_site_nav_enabled=on`)
 - Backfill plan:
   1. `wp eo-nav validate --file` en local;
   2. `apply` en vivo con mensaje;
   3. `export` para verificar igualdad.
 
   Fotos: subida a `site-nav/v1/` con `Cache-Control` inmutable; verificación por `curl -I` de cada URL del documento.
-- Rollback path: desactivar el plugin (el sitio sigue con Ohio porque `TASK-2042` aún no consume); restaurar una
-  revisión; las fotos no se revierten (objetos nuevos inmutables, sin efecto si nadie los usa)
+- Rollback path: restaurar una revisión (`site-nav restore <n> --message`); desactivar el plugin hace que el adaptador
+  de `TASK-2042` vuelva al encabezado de Ohio; las fotos no se revierten (objetos nuevos inmutables, sin efecto si
+  nadie los usa)
 - External coordination: coordinar la subida al bucket con cualquier sesión que esté tocando AXIS; confirmar con el
   operador los pendientes de contenido antes del `apply` inicial
 
@@ -455,12 +458,12 @@ transmitidas textualmente por la sesión del menú:
 |---|---|---|
 | Orden de los servicios por línea | «Como en el canvas» (Inbound en Revenue) | Resuelto |
 | Frases por línea en el menú («Tu squad», «Visible», «Crecer»…) | «Sí, se quedan» | Resuelto |
-| URL del canal de YouTube | «Te la escribo». Mientras tanto, el documento no lleva YouTube | **Pendiente**: bloquea el `apply` |
-| Lecturas sugeridas | «Usar posts reales». La sesión del menú propone un post publicado por servicio y el operador aprueba la lista | **Pendiente**: bloquea el `apply` |
+| URL del canal de YouTube | «Te la escribo». El operador la entregó antes del `apply` y va en la revisión 1 | Resuelto |
+| Lecturas sugeridas | «Usar posts reales». La sesión del menú propuso un post publicado por servicio y el operador aprobó la lista (14 lecturas) | Resuelto |
 
 Ya resueltos antes: las respuestas por servicio (aprobadas el 17-10), Influencer y Performance con la lectura de su
-línea, y las dos esferas como excepción. El `apply` no se hace hasta tener YouTube y la lista de lecturas, porque
-publica la copia por la REST aunque el sitio todavía no pinte el menú.
+línea, y las dos esferas como excepción. El `apply` esperó a tener YouTube y la lista de lecturas, porque publica la
+copia por la REST aunque el sitio todavía no pintara el menú.
 
 **Documento aplicado en vivo (2026-10-22, autorizado por el operador: «aplica en vivo el documento del menú con wp
 eo-nav apply»):**
@@ -486,9 +489,44 @@ sin crear revisiones»):**
   - Dio `MISS` a las 21:42:13 y volvió a guardar a las 21:42:33 (`age: 10`).
   - Conclusión: la purga llega al borde en unos 40 s, así que un guardado es visible para Think u otro sitio en menos de
     un minuto.
-- **Pendiente de código (va con el próximo deploy del plugin, Slice 5):** `purge_complete_caches()` de Kinsta no hace
-  nada si el autopurge está desactivado. Hoy está activo (`kinsta\kmp\is_autopurge_enabled() = true`), pero
-  `EOSN_Cache` lo reporta como hecho igual. Hay que pasar `force = true` y comprobar el resultado.
+- **Pendiente de código (sigue abierto al 2026-10-23; va con el Slice 5):** `purge_complete_caches()` de Kinsta no
+  hace nada si el autopurge está desactivado. Hoy está activo (`kinsta\kmp\is_autopurge_enabled() = true`), pero
+  `EOSN_Cache` lo reporta como hecho igual. Hay que pasar `force = true` y comprobar el resultado. Los despliegues del
+  2026-10-23 no lo cambiaron: los guardados en vivo siguen purgando por este mismo camino, con el autopurge activo.
+
+**Guardado endurecido y edición gobernada (2026-10-23, con el menú ya en vivo por `TASK-2042`):**
+
+- **Revisiones por ID** (runtime `34bad94`): la revisión nativa de un guardado se buscaba comparando su contenido con
+  el JSON recién escrito. En efeoncepro.com un filtro de contenido alteraba lo guardado, la comparación fallaba y las
+  revisiones 2 y 3 quedaron sin número, invisibles para `revisions` y `restore`. Ahora la revisión es la más nueva
+  creada durante ese guardado, por ID. En producción, las dos se repararon con
+  `scripts/public-website/site-nav/repair-revision-meta.php` (sólo metadatos, de un solo uso).
+- **JSON en ASCII escapado** (runtime `5feb055`): `wp_encode_emoji` guardaba «™» como `&#x2122;` y el menú pintaba la
+  entidad literal. `post_content` lleva ahora el JSON con los caracteres no ASCII y `& < > ' "` escapados, así que
+  ningún filtro encuentra qué cambiar. «Sin cambios» compara con el documento realmente guardado, y después de guardar
+  el documento se relee y debe dar el mismo hash; si no, el guardado falla con `eosn_storage_altered`.
+- **Pruebas:** `tests/playground/run-eo-site-nav.sh` sube a 49 comprobaciones, con filtros que imitan los del sitio (el
+  código anterior falla, el nuevo pasa). La paridad del render (17 casos) y del validador (35 casos) se mantiene contra
+  AXIS 0.7.13 (contracts 0.7.12).
+- **Revisiones en vivo:**
+  1. Documento inicial.
+  2. Posts reales en las tarjetas de línea y títulos de lectura acortados.
+  3. Loop Marketing abre `/agencia-inbound-marketing/`.
+  4. «Surround Discovery™» en lugar de la entidad HTML. Fue el primer uso real de la CLI de abajo.
+
+  La 2 se aplicó con `scripts/public-website/apply-site-nav-document.php`, que usa el mismo servicio de guardado, con
+  revisión base y prueba en seco; la CLI de abajo llama a ese mismo script.
+- **Edición gobernada:** `pnpm public-website:site-nav` (`scripts/public-website/site-nav/cli.ts`, Greenhouse) es hoy
+  el camino para editar el menú. Hace pull, show, set/unset, glyphs, photo (sube recortes a `site-nav/v1/` con
+  `--no-clobber` y caché inmutable; un nombre que ya existe se sube como `.vN`), add/remove/move, patch (RFC 6902),
+  check, fit, diff, preview, apply, verify, revisions y restore.
+  - `apply` hace primero la prueba en seco del servidor y después guarda contra la revisión base: un guardado
+    concurrente nunca se pisa.
+  - Las escrituras en producción (subir fotos, `apply`, `restore`) piden el go del operador.
+  - El documento vivo es la fuente de verdad. `manifests/site-nav/build-efeoncepro-document.mjs` queda sólo de arranque
+    (se niega a correr sin `--bootstrap`), y `manifests/site-nav/efeoncepro.com.json` es el espejo
+    (`site-nav pull --mirror`).
+  - Manual: `docs/manual-de-uso/public-site/operar-navegacion-global.md`.
 
 **Decisiones:** directorio `eo-site-nav`, prefijo `EOSN_`, text domain `eo-site-nav`, comandos `wp eo-nav`, REST
 `eo/v1/site-nav`. Respaldo del documento en el runtime: `manifests/site-nav/efeoncepro.com.json`.
@@ -554,7 +592,8 @@ sin crear revisiones»):**
 - Montar el menú en el sitio, el interruptor y las variantes de Ohio: `TASK-2042`.
 - Superficie del agendador: `TASK-2042`.
 - Publicar la copia pública en el bucket (PDR-027, punto abierto 3).
-- Herramienta de Greenhouse o MCP para editar el menú (follow-up de EPIC-055).
+- Herramienta MCP para editar el menú (follow-up de EPIC-055). La CLI de Greenhouse `pnpm public-website:site-nav` se
+  construyó dentro de `TASK-2042`.
 - Cloud CDN con dominio propio.
 
 ## Detailed Spec
@@ -583,14 +622,14 @@ Modelo del documento, reglas, plugin, REST y fotos:
 
 ### Feature flags / cutover
 
-- Sin flag propio: el plugin no tiene consumidor hasta que `TASK-2042` prenda `eo_site_nav_enabled`. Es additive, sin
-  impacto visible en producción mientras el interruptor esté en `off`.
+- Sin flag propio: el consumidor es el interruptor `eo_site_nav_enabled` de `TASK-2042`, en `on` desde el 2026-10-23.
+  Desde entonces cada guardado del documento cambia el menú visible de todo el sitio, salvo `/blog/`.
 
 ### Rollback plan per slice
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 1 | Desactivar el plugin (sin consumidor, sin efecto visible) | < 10 min | si |
+| Slice 1 | Desactivar el plugin (el adaptador vuelve al encabezado de Ohio) | < 10 min | si |
 | Slice 2 | Igual que Slice 1 | < 10 min | si |
 | Slice 3 | Desactivar el endpoint o el plugin | < 10 min | si |
 | Slice 4 | Restaurar una revisión anterior del documento; las fotos quedan como objetos sin uso | < 10 min | si |
@@ -627,9 +666,10 @@ Modelo del documento, reglas, plugin, REST y fotos:
 - [x] `apply` con el mismo contenido no crea revisión nueva, y un guardado sobre una revisión base vieja da conflicto
   visible (prueba automatizada). Evidencia: Playground, servicio y `wp eo-nav apply` (409 legible, nada pisado).
 - [ ] `wp eo-nav export|validate|apply|revisions|restore` funcionan en vivo y `restore` crea una revisión nueva.
-  En vivo: `apply` (revisión 1), `revisions` y `export` (sin documento, antes del apply). Los cinco subcomandos están
-  registrados. `restore` y su revisión nueva sólo se probaron en Playground: en vivo no se corre sin necesidad, porque
-  crearía una revisión. Sin tildar por eso.
+  En vivo: `apply` (revisión 1 y, por el mismo servicio de guardado, las revisiones 2 a 4), `revisions` (las cuatro
+  con número tras la reparación del 2026-10-23) y `export`. Los cinco subcomandos están registrados. `restore` y su
+  revisión nueva sólo se probaron en Playground: en vivo no se corre sin necesidad, porque crearía una revisión. Sin
+  tildar por eso.
 - [x] `GET /wp-json/eo/v1/site-nav` devuelve sólo el documento publicado, con `ETag`. Evidencia en vivo 2026-10-22:
   404 `eosn_not_found` antes del apply, POST 404 y, después, 200 con la revisión 1, `Cache-Control: public,
   max-age=300` y `ETag` (Kinsta la entrega débil, `W/`). Con `If-None-Match` responde 304, y el cuerpo es idéntico a
@@ -671,17 +711,21 @@ Modelo del documento, reglas, plugin, REST y fotos:
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] Skill `efeonce-public-site-wordpress` (`.claude` y `.codex`) documenta el plugin y los comandos `wp eo-nav`
-- [ ] Manual de uso para editar el menú desde el admin y por WP-CLI en `docs/manual-de-uso/public-site/`
-- [ ] EPIC-055 actualizada con el estado de esta task
+- [x] Skill `efeonce-public-site-wordpress` (`.claude` y `.codex`) documenta el plugin y los comandos `wp eo-nav`
+  (`references/global-site-navigation.md` y `runtime-and-discovery.md`, 2026-10-23)
+- [ ] Manual de uso para editar el menú desde el admin y por WP-CLI en `docs/manual-de-uso/public-site/`. Sin tildar:
+  `operar-navegacion-global.md` cubre la CLI de Greenhouse sobre WP-CLI; la parte del admin espera al Slice 5
+- [x] EPIC-055 actualizada con el estado de esta task (2026-10-23)
 
 ## Follow-ups
 
-- Herramienta de Greenhouse o MCP que llame a la puerta de WP-CLI (EPIC-055).
+- Herramienta MCP que llame a la misma puerta (EPIC-055). La CLI de Greenhouse `pnpm public-website:site-nav` ya existe
+  y es el camino actual.
 - Copia pública también en el bucket de AXIS si se decide (PDR-027, punto abierto 3).
 - Lo que surja dentro de la frontera del contenido entra como slice o criterio de esta task (regla de EPIC-055).
 
 ## Open Questions
 
 - ~~Nombre del directorio del plugin y del texto de dominio~~: resuelto 2026-10-22, `eo-site-nav` (ver Discovery y plan).
-- Pendientes de contenido de la nota «Por confirmar» del canvas (se resuelven con el operador en el Slice 4).
+- ~~Pendientes de contenido de la nota «Por confirmar» del canvas~~: resueltos con el operador en el Slice 4
+  (2026-10-22).

@@ -89,10 +89,22 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   reemplazado en el mismo lugar el 2026-10-20 con «La órbita» (canvas «Landing Agendar — Efeonce»): cuatro widgets
   `greenhouse_agenda_*` compilados sobre el núcleo común y el agendador nativo real del piloto `TASK-1510` en un widget
   HTML propio, sin cambios de comportamiento. Indexable desde el 2026-10-20 y fuera de los menús por decisión del
-  operador (la enlazará el botón «Agenda tu diagnóstico» del header de `EPIC-055`). [Funcionamiento](../documentation/public-site/agenda.md),
+  operador; el botón «Agenda tu diagnóstico» del menú global abre el agendador nativo y usa `/agenda/` como respaldo. [Funcionamiento](../documentation/public-site/agenda.md),
   [operación](../manual-de-uso/public-site/operar-agenda.md) y skill `efeonce-public-site-wordpress`
   (`references/landings/agenda.md`). Sin reserva controlada (decisión del operador); composición AXIS del agendador
   pendiente (`TASK-2007`).
+
+- **[Navegación global vigente — menú de todo el sitio](../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md)** —
+  menú AXIS `efeonce.site-nav` en todas las páginas de `efeoncepro.com` desde el 2026-10-23 00:09 UTC, sin piloto
+  (`/blog/` conserva Ohio por `TASK-1802`). El contenido vive en un solo documento del plugin «EO Navegación» (revisión
+  4) y se edita con `pnpm public-website:site-nav`; «Agenda tu diagnóstico» abre el agendador nativo desde la
+  cabecera, el mega y el onepage. Vuelta atrás: interruptor `eo_site_nav_enabled` a `off`.
+  [Funcionamiento](../documentation/public-site/navegacion-global-del-sitio.md),
+  [operación](../manual-de-uso/public-site/operar-navegacion-global.md) y
+  [PDR-027](decisions/PDR-027-navegacion-global-del-sitio-portable.md); ejecución en `EPIC-055`. El dock inferior de las
+  siete landings es aparte: [funcionamiento](../documentation/public-site/dock-de-landings.md) y
+  [operación](../manual-de-uso/public-site/operar-dock-de-landings.md). Faltan el alta GTM/GA4 de `gh_site_nav_*`,
+  Core Web Vitals y probar la vuelta a `off` en producción.
 
 - **[HubSpot vigente — Elementor](../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md)** — página
   `244079` en `/servicios-contratar-hubspot/`, once widgets nativos y Growth Forms. Diseño aprobado con
@@ -138,7 +150,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 - [PDR-024 — AXIS en el sitio público: composición agéntica](decisions/PDR-024-axis-en-el-sitio-publico-composicion-agentica.md) — el sitio consume AXIS como versión fija incluida en `eo-elementor-widgets` y encolada sólo donde se usa (los packages son privados: nada de registry ni `-latest`); los agentes componen intents validados y el SVG se sirve en el HTML del servidor; AXIS es capa gráfica y de valores, nunca de texto ni de layout. Brecha previa: `tokens.css` no emite rampas, superficies ni tipografía. Ejecución: task por crear.
 - [PDR-025 — Landing Agencia de Medios](decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) — «agencia de medios» como categoría y frase clave, separada de Performance (sin dominios comunes en el top 10 chileno; «performance marketing» fuera de title, H1 y slug); slug `/servicios/agencia-de-medios/`; claims permitidos y prohibidos (tecnología ≠ alianza, sin promesa de rebates, sin caso Sky). Publicada el 2026-10-16. Brief: [Agencia de Medios Landing SEO/AEO Brief V1](AGENCIA_DE_MEDIOS_LANDING_SEO_AEO_BRIEF_V1.md).
 - [PDR-026 — Cada landing deriva su patrón de diseño de su necesidad](decisions/PDR-026-cada-landing-deriva-su-patron-de-diseno.md) — doctrina aceptada el 2026-10-18 con Inbound Marketing como caso fuente: ninguna landing es plantilla ni «el estilo» del sitio; lo reutilizable son mecanismos (núcleo del compilador y sus guardas, carril de paquete/deploy/publicación/rollback, lanzador de reunión de la base común, `EfeonceMention` —de AXIS `efeonce.mention` desde el 2026-10-18—, Growth Forms y Growth CTA), que cada landing viste con su propio diseño.
-- [PDR-027 — Navegación global del sitio, portable entre sitios](decisions/PDR-027-navegacion-global-del-sitio-portable.md) — **Accepted** el 2026-10-18: la navegación aprobada en canvas (cápsula de vidrio con mega menús, onepage, cabecera fija y agendador) se construye como mecanismo de AXIS (`efeonce.site-nav`), con el contenido en un solo documento del plugin «EO Navegación» (admin y `wp eo-nav` para agentes) y fotos en el bucket público de AXIS; cada sitio la monta con un adaptador delgado. El operador decidió reemplazar el encabezado de Ohio en todo el sitio, con piloto en una página primero; queda abierta la copia pública en el bucket. Arquitectura: [Navegación global del sitio público V1](../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md). Ejecución: `EPIC-055` (`TASK-2040`…`TASK-2042`).
+- [PDR-027 — Navegación global del sitio, portable entre sitios](decisions/PDR-027-navegacion-global-del-sitio-portable.md) — **Accepted** el 2026-10-18: la navegación aprobada en canvas (cápsula de vidrio con mega menús, onepage, cabecera fija y agendador) se construye como mecanismo de AXIS (`efeonce.site-nav`), con el contenido en un solo documento del plugin «EO Navegación» (admin y `wp eo-nav` para agentes) y fotos en el bucket público de AXIS; cada sitio la monta con un adaptador delgado. El operador decidió reemplazar el encabezado de Ohio en todo el sitio; el 2026-10-23 lo encendió directo, sin el piloto de una página, y está en producción desde las 00:09 UTC (`/blog/` conserva Ohio por `TASK-1802`). Queda abierta la copia pública en el bucket. Arquitectura: [Navegación global del sitio público V1](../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md). Ejecución: `EPIC-055` (`TASK-2040`…`TASK-2043`).
 - **[Content Engineering Pillar Brief V1](CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md)** — foundation brief de la futura masterpiece: tesis, audiencia, arco, primitives de comprensión/decisión, SEO/AEO, medición, distribución y gates de publicación.
 - **[Creative Workflows Pillar + Cluster Brief V1](CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md)** — brief maestro de audiencia, tesis, arquitectura editorial, prioridades, enlaces, medición y atomización.
 - **[Web agéntica Pillar + Cluster Brief V1](WEB_AGENTICA_PILLAR_CLUSTER_BRIEF_V1.md)** — contrato editorial de la pillar que soporta `/desarrollo-sitios-web/`: definición citable, recorrido, cluster, enlaces, visuales, medición y gate de publicación.

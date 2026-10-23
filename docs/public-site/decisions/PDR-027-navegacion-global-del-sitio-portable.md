@@ -79,7 +79,7 @@ El contenido del menú es un solo documento de datos con una sola fuente de verd
 
 | Capa | Qué es | Dónde vive |
 |---|---|---|
-| **Mecanismo** | Cápsula, mega menús, onepage, cabecera fija, vidrio, motion, teclado, foco, movimiento reducido y estados de tableta y móvil. HTML que se renderiza en el servidor, CSS y JS liviano, sin React. | AXIS: contrato nuevo (nombre propuesto `efeonce.site-nav`), primitive en `@efeoncepro/axis-ui-primitives`, página en el Lab. |
+| **Mecanismo** | Cápsula, mega menús, onepage, cabecera fija, vidrio, motion, teclado, foco, movimiento reducido y estados de tableta y móvil. HTML que se renderiza en el servidor, CSS y JS liviano, sin React. | AXIS: contrato nuevo `efeonce.site-nav`, primitive en `@efeoncepro/axis-ui-primitives`, página en el Lab. |
 | **Contenido** | Un documento de navegación con ítems, líneas, servicios, hijos, descripción, fotos por recorte, texto alternativo e intención del CTA. Lo valida el esquema del contrato. | Plugin propio de WordPress (§2), con copia pública para otros sitios. |
 | **Adaptador** | Pieza de cada sitio que lee el documento, pinta el mecanismo y conecta el CTA de su propia superficie. | WordPress: parte del tema `ohio-child` o plugin del runtime. Think: envoltura Astro, cuando se pida. |
 
@@ -212,6 +212,11 @@ Reparto en tasks (EPIC-055):
 | `TASK-2042` | F5 y F6 |
 
 F7 queda como follow-up de la épica.
+
+Estado al 2026-10-23: F1 y F2 completas (`TASK-2040`, AXIS v0.7.7; el sitio usa primitives 0.7.13). F3 y F4 en
+producción salvo la pantalla del admin: hoy el menú se edita con `pnpm public-website:site-nav`, sobre el mismo servicio
+de guardado (`TASK-2041`). F5 se hizo sin piloto de una página y F6 está en producción; faltan el alta GTM/GA4, Core Web
+Vitals y probar la vuelta a `off` en producción (`TASK-2042`). F7 sigue sin pedirse.
 
 ## Consecuencias
 

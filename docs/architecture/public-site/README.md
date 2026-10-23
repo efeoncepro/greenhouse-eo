@@ -23,6 +23,12 @@ Use this folder when a reusable public landing component, Elementor widget, host
   404, búsqueda, no-results y archivos; separa recovery, search, editorial archives y chrome global sin
   confundir composición visual con HTTP/SEO. Aún no implementado.
 - [Navegación global del sitio público V1](PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md) — navegación portable
-  `efeonce.site-nav` que reemplazaría el encabezado de Ohio: contrato y primitive en AXIS, documento único en el
-  plugin «EO Navegación», adaptador con interruptor y piloto en `ohio-child`, y Think más adelante. Propuesta según
-  PDR-027 (Accepted 2026-10-18) y EPIC-055; aún no implementada.
+  `efeonce.site-nav` que reemplaza el encabezado de Ohio: contrato y primitive en AXIS (el tema fija primitives
+  0.7.13), documento único en el plugin «EO Navegación» editado con `pnpm public-website:site-nav`, adaptador con
+  interruptor en `ohio-child` y agendador nativo; Think más adelante. En producción en todo `efeoncepro.com` desde el
+  2026-10-23 00:09 UTC, sin piloto (`/blog/` conserva Ohio). Incluye el dock inferior de las landings (`TASK-2043`).
+  PDR-027 (Accepted 2026-10-18) y EPIC-055. Funcionamiento:
+  [navegación global](../../documentation/public-site/navegacion-global-del-sitio.md) y
+  [dock de landings](../../documentation/public-site/dock-de-landings.md); operación:
+  [navegación global](../../manual-de-uso/public-site/operar-navegacion-global.md) y
+  [dock de landings](../../manual-de-uso/public-site/operar-dock-de-landings.md).

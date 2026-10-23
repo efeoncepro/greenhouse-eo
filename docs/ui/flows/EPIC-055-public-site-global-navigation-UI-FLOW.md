@@ -61,8 +61,10 @@ El menú se comporta igual en `efeoncepro.com` y en cualquier sitio que lo adopt
       página difuminada y un solo botón redondo para cerrar;
    5. Escape o el botón cierran, y el foco vuelve al control que lo abrió o, si ya no se ve, a uno visible.
 8. **Scroll.** Al bajar, la cabecera se oculta (estado «Bajando»). Al subir, vuelve como isla de vidrio flotante
-   (estado «Subiendo»), en tono oscuro o claro según la sección que tiene debajo, y cambia de tono al cruzar de una
-   sección a otra. Si hay un panel abierto y el scroll se mueve más de 48 px, se cierra (decidido en el Lab, `TASK-2040`).
+   (estado «Subiendo»), en tono oscuro o claro según lo que tiene debajo, y cambia de tono al cruzar de una sección a
+   otra. El tono sale de `data-site-nav-tone` o del fondo (degradados por sus paradas opacas, fotos como oscuras), se
+   salta el chrome fijo del sitio y se conserva mientras el agendador está abierto (AXIS primitives 0.7.13; regla
+   completa en la arquitectura §Isla de vidrio). Si hay un panel abierto y el scroll se mueve más de 48 px, se cierra (decidido en el Lab, `TASK-2040`).
 
 9. **D1–D4 · Dock de la landing** (`TASK-2043`, flujo en [`TASK-2043-landing-dock-flow.md`](TASK-2043-landing-dock-flow.md)).
    En una landing, el dock de vidrio sube tras el hero con el siguiente paso de esa landing, se retira cerca del
@@ -81,6 +83,7 @@ El menú se comporta igual en `efeoncepro.com` y en cualquier sitio que lo adopt
 | Agendador sin JavaScript o sin superficie | El botón es un enlace a `/agenda/`. |
 | Lanzador vacío (`data-ghc-state="empty"`: CTA pausado, origen equivocado) | El enlace va de inmediato a `/agenda/`. |
 | Renderer del agendador todavía cargando | El clic espera hasta 2,5 s a que esté listo. |
+| Agendador abierto sobre la página | La isla conserva su tono detrás del diálogo y al cerrarlo (la página queda inerte; AXIS primitives 0.7.13). |
 | JavaScript del menú que falla | La cápsula y el onepage siguen siendo enlaces en el HTML: el sitio navega igual, sin paneles. |
 | Documento del menú inválido o ausente (en el sitio) | El adaptador no pinta el menú nuevo y deja el encabezado de Ohio (`TASK-2042`). |
 
@@ -145,7 +148,9 @@ clic en «Agenda tu diagnóstico» ya viaja como `gh_site_nav_clicked` con `targ
   fidelidad midió 1440, 1280, 1200, 1024, 834 y 390; el círculo del onepage en 1440, 1680, 1920, 2000 y 2560; y «Estás
   aquí» en 10 páginas de servicio.
 - **Verificaciones comunes:** sin scroll horizontal; foco visible y devuelto; agendador que abre y devuelve el foco;
-  eventos en `dataLayer`.
+  eventos en `dataLayer`. Siempre en un navegador en primer plano (Playwright headless sirve): un panel de navegador
+  oculto corre la página en segundo plano, sin `requestAnimationFrame` ni eventos de scroll, y el tono de la isla no se
+  actualiza.
 
 ## Design Decision Log
 
@@ -156,5 +161,7 @@ clic en «Agenda tu diagnóstico» ya viaja como `gh_site_nav_clicked` con `targ
 | Un solo lanzador oculto con `cta_location: site_nav` | El renderer lee `cta-location` al montar, no al hacer clic; el punto de entrada viaja en `gh_site_nav_clicked`. |
 | Radio del onepage calculado en JS | Un radio fijo (1720 px, la medida del tablero de 1440) dejaba una esquina sin cubrir sobre unos 1.500 px de ancho. |
 | Hero claro arranca como isla clara | Sobre un hero claro la barra de vidrio deja el logo blanco ilegible. |
+| El tono de la isla lee el fondo, no sólo marcas | efeoncepro.com no marca sus secciones; un degradado navy (franja E-E-A-T de `/servicios/posicionamiento-seo/`) dejaba la isla clara antes de 0.7.12. |
+| El tono se conserva con un diálogo modal | Un anfitrión que pinta `<html>` volvía clara la isla detrás del agendador y al cerrarlo (0.7.13; misma guarda que el dock). |
 | Disparadores con destino real sin JavaScript | Los destinos existen para buscadores y lectores aunque falle el JS (PDR-027, invariante SEO). |
 | Edición de personas y agentes sobre el mismo command | Full API Parity: dos clientes del mismo primitive, nunca dos implementaciones. |
