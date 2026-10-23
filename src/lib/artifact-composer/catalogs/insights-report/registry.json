@@ -29,7 +29,9 @@
     "report-figure-waffle",
     "report-figure-donut",
     "report-figure-stacked",
-    "report-figure-stat"
+    "report-figure-stat",
+    "report-findings",
+    "report-scenarios"
   ],
   "templates": [
     {
@@ -291,6 +293,32 @@
       ],
       "prototype": "report-figure-stat.html",
       "slotsRef": "report-figure-stat.slots.json"
+    },
+    {
+      "name": "ReportFindingsPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-findings"
+      ],
+      "prototype": "report-findings.html",
+      "slotsRef": "report-findings.slots.json"
+    },
+    {
+      "name": "ReportScenariosPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-scenarios"
+      ],
+      "prototype": "report-scenarios.html",
+      "slotsRef": "report-scenarios.slots.json"
     }
   ],
   "selector": {
@@ -315,7 +343,9 @@
       "report-figure-waffle": "ReportFigureWafflePage",
       "report-figure-donut": "ReportFigureDonutPage",
       "report-figure-stacked": "ReportFigureStackedPage",
-      "report-figure-stat": "ReportFigureStatPage"
+      "report-figure-stat": "ReportFigureStatPage",
+      "report-findings": "ReportFindingsPage",
+      "report-scenarios": "ReportScenariosPage"
     },
     "disambiguation": [
       "el índice real deriva de la primera página de cada sección del plan físico; nunca se calcula desde el título ni se pagina después del render.",

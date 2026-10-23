@@ -4,6 +4,7 @@
   "contentType": "report-chapter",
   "slots": {
     "chapterLabel": "Capítulo 02",
+    "productLabel": "Insights",
     "chapterNumeral": "02",
     "runningLabel": "Informe de agosto 2026",
     "chapterTitle": "Motores de respuesta",

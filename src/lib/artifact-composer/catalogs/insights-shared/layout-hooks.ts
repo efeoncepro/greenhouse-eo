@@ -93,3 +93,60 @@ export const narrativeDropCapHook: CatalogLayoutHook = async page => {
     if (lines >= 3) body.classList.add('has-dropcap')
   })
 }
+
+/**
+ * Guarda del pie en las páginas en papel (`.paper-foot`): ningún bloque del cuerpo puede terminar sobre el pie.
+ *
+ * `assertSlideFitsCanvas` mide lo que se sale del LIENZO; un panel de cierre que crece hasta montarse sobre el pie
+ * sigue dentro del lienzo y pasaba en silencio: el PDF mostraba el logo y el folio dentro del panel (caso fuente:
+ * páginas de comparación con cinco métricas, 2026-10-23). Antes sólo la cascada lo vigilaba en su hook. Una página
+ * sin pie (portadas, aperturas, contraportada) no tiene nada que vigilar.
+ */
+export const PAPER_FOOT_CLEARANCE_PX = 4
+
+export const paperFootClearanceHook: CatalogLayoutHook = async (page, slide) => {
+  const collisions = await page.evaluate(clearance => {
+    const foot = document.querySelector('.paper-foot')
+    const sheet = foot?.parentElement
+
+    if (!foot || !sheet) return []
+
+    const top = foot.getBoundingClientRect().top
+    const out: string[] = []
+
+    for (const child of Array.from(sheet.children)) {
+      if (child === foot || child.classList.contains('chapter-tab') || child.classList.contains('grow')) continue
+
+      const style = getComputedStyle(child)
+
+      if (style.position === 'absolute' || style.position === 'fixed' || style.display === 'none') continue
+
+      const rect = child.getBoundingClientRect()
+
+      if (rect.height > 0 && rect.bottom > top - clearance) {
+        out.push(`«${(child.getAttribute('data-slot') ?? child.className).toString().split(' ')[0]}» termina ${Math.round(rect.bottom - top + clearance)} px sobre el pie`)
+      }
+    }
+
+    return out
+  }, PAPER_FOOT_CLEARANCE_PX)
+
+  if (collisions.length > 0) {
+    throw new Error(`La página «${slide.slideId}» no cabe: ${collisions.join('; ')}. Acorta el copy; el pie nunca se cubre.`)
+  }
+}
+
+/** Corre el hook propio de cada plantilla y después la guarda del pie. */
+export const withPaperFootGuard = (
+  hooks: Readonly<Record<string, CatalogLayoutHook>>,
+  templateNames: readonly string[]
+): Record<string, CatalogLayoutHook> =>
+  Object.fromEntries(
+    templateNames.map(name => [
+      name,
+      async (page, slide, deckPlan) => {
+        await hooks[name]?.(page, slide, deckPlan)
+        await paperFootClearanceHook(page, slide, deckPlan)
+      }
+    ])
+  )

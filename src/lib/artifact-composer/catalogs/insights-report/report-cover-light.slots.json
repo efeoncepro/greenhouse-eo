@@ -18,6 +18,18 @@
         "overflow": "reject"
       }
     },
+    "productLabel": {
+      "selector": "[data-slot='productLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 24,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Producto o servicio que emite el informe, junto al logo («Insights», «SEO»). Lo declara el mapper del informe; nunca se infiere.",
+      "example": "Insights"
+    },
     "scopeLabel": {
       "selector": "[data-slot='scopeLabel']",
       "type": "string",

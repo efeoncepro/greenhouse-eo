@@ -283,9 +283,21 @@
         "fillBetween": {
           "type": "boolean",
           "required": false
+        },
+        "bands": {
+          "type": "array",
+          "required": false
+        },
+        "events": {
+          "type": "array",
+          "required": false
+        },
+        "pointLabels": {
+          "type": "array",
+          "required": false
         }
       },
-      "notes": "Franja, rótulo inicial, diferencia final y área entre principal y referencia. Sólo si el plan los declara.",
+      "notes": "Franja, rótulo inicial, diferencia final y área entre principal y referencia; para series largas, etapas (`bands`, tono `alert` opcional), hitos verticales (`events`) y rótulos sobre puntos de la principal (`pointLabels`). Sólo si el plan los declara.",
       "example": {
         "startLabel": "1",
         "fillBetween": false

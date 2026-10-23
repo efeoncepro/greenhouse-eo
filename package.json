@@ -360,6 +360,7 @@
     "pricing:workbook:test": "node --test scripts/commercial/__tests__/pricing-workbook.test.mjs",
     "economica:build": "node scripts/commercial/build-economic-offer-xlsx.mjs",
     "deck:compose": "tsx scripts/commercial/compose-tender-deck.ts",
+    "report:compose": "tsx scripts/artifact-composer/compose-report.ts",
     "composer:visual-gate": "tsx scripts/artifact-composer/visual-gate.ts",
     "insights:canvas-fidelity": "tsx scripts/insights/canvas-fidelity.ts",
     "seo:content-scope": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/seo/set-content-scope.ts",

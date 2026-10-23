@@ -57,6 +57,19 @@ export const tableRankEffects = (index: number, slots: Record<string, unknown>):
   return effects
 }
 
+/** Severidad de un hallazgo (auditorías): el rol decide el tono de la marca y la etiqueta; nunca un color libre. */
+export const SEVERITY_VALUES = ['critical', 'high', 'medium', 'low'] as const
+
+const SEVERITY_TONE_GROUP = SEVERITY_VALUES.map(value => `finding--${value}`)
+
+/** Rol de un escenario: el mismo que pinta su columna en la figura (base = actual, estructural = oportunidad). */
+export const SCENARIO_ROLE_VALUES = ['low', 'base', 'high'] as const
+
+const SCENARIO_TONE_GROUP = SCENARIO_ROLE_VALUES.map(value => `scenario--${value}`)
+
+const toneOf = (values: readonly string[], prefix: string, group: string[]) => (value: string): FieldEffect[] | null =>
+  values.includes(value) ? [{ selector: ':self', toneClass: `${prefix}--${value}`, toneGroup: group }] : null
+
 export const insightsReportResolvers: ResolverRegistry = {
   /** Resolvers editoriales compartidos (TASK-1889): canal, ordinal, número, puntos, semanas, cierre. */
   ...insightsEditorialResolvers('report'),
@@ -72,6 +85,14 @@ export const insightsReportResolvers: ResolverRegistry = {
   'report-table-bar': {
     known: ['<derivado de valueA y barScaleMax>'],
     build: (_value, ctx) => tableBarEffects(ctx.item, ctx.slots)
+  },
+  'report-severity': {
+    known: [...SEVERITY_VALUES],
+    build: value => toneOf(SEVERITY_VALUES, 'finding', SEVERITY_TONE_GROUP)(value)
+  },
+  'report-scenario-role': {
+    known: [...SCENARIO_ROLE_VALUES],
+    build: value => toneOf(SCENARIO_ROLE_VALUES, 'scenario', SCENARIO_TONE_GROUP)(value)
   },
 
 }

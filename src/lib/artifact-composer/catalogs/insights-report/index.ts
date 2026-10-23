@@ -27,10 +27,12 @@ import { axisPackDir } from '../../brand-packs/axis'
 import { makeColumnsHook, makeLinesHook } from '../insights-shared/figure-hooks'
 import { REPORT_COLUMNS_BOX, REPORT_LINES_BOX } from '../insights-shared/figure-svg'
 import { makeDonutHook, REPORT_DONUT_BOX } from '../insights-shared/figure-donut'
+import { makeScenariosHook, REPORT_SCENARIOS_BOX } from '../insights-shared/figure-scenarios'
 import { makeStackedHook, REPORT_STACKED_BOX } from '../insights-shared/figure-stacked'
 import { makeWaffleHook, REPORT_WAFFLE_BOX } from '../insights-shared/figure-waffle'
 import { makeWaterfallHook, REPORT_WATERFALL_BOX } from '../insights-shared/figure-waterfall'
-import { chapterNumeralHook, coverSatellitesHook, narrativeDropCapHook } from '../insights-shared/layout-hooks'
+import { chapterNumeralHook, coverSatellitesHook, narrativeDropCapHook, withPaperFootGuard } from '../insights-shared/layout-hooks'
+import registry from './registry.json'
 import { insightsReportResolvers } from './resolvers'
 
 export const insightsReportCatalogDir = path.dirname(fileURLToPath(import.meta.url))
@@ -41,17 +43,22 @@ export const insightsReportCatalog: ArtifactCatalog = {
   templatesDir: insightsReportCatalogDir,
   outputTarget: 'pdf-merged',
   resolvers: insightsReportResolvers,
-  layoutHooks: {
-    ReportChapterPage: chapterNumeralHook,
-    ReportCoverLightPage: coverSatellitesHook,
-    ReportNarrativePage: narrativeDropCapHook,
-    ReportFigureColumnsPage: makeColumnsHook(REPORT_COLUMNS_BOX),
-    ReportFigureTrendPage: makeLinesHook(REPORT_LINES_BOX),
-    ReportFigureWaterfallPage: makeWaterfallHook(REPORT_WATERFALL_BOX),
-    ReportFigureWafflePage: makeWaffleHook(REPORT_WAFFLE_BOX),
-    ReportFigureDonutPage: makeDonutHook(REPORT_DONUT_BOX),
-    ReportFigureStackedPage: makeStackedHook(REPORT_STACKED_BOX)
-  },
+  // Cada plantilla corre su hook y, si tiene pie en papel, la guarda que impide que el cuerpo se monte sobre él.
+  layoutHooks: withPaperFootGuard(
+    {
+      ReportChapterPage: chapterNumeralHook,
+      ReportCoverLightPage: coverSatellitesHook,
+      ReportNarrativePage: narrativeDropCapHook,
+      ReportFigureColumnsPage: makeColumnsHook(REPORT_COLUMNS_BOX),
+      ReportFigureTrendPage: makeLinesHook(REPORT_LINES_BOX),
+      ReportFigureWaterfallPage: makeWaterfallHook(REPORT_WATERFALL_BOX),
+      ReportFigureWafflePage: makeWaffleHook(REPORT_WAFFLE_BOX),
+      ReportFigureDonutPage: makeDonutHook(REPORT_DONUT_BOX),
+      ReportFigureStackedPage: makeStackedHook(REPORT_STACKED_BOX),
+      ReportScenariosPage: makeScenariosHook(REPORT_SCENARIOS_BOX)
+    },
+    registry.templates.map(template => template.name)
+  ),
   brand: {
     packName: 'axis',
     compiledFiles: ['report-tokens.css', 'report-fonts.css'],
