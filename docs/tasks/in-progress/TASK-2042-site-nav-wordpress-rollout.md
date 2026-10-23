@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Slices 1 y 2 en producción con el interruptor en off desde 2026-10-22 23:55 UTC (plugin eo-site-nav + adaptador de ohio-child, runtime 27c3b0c, AXIS primitives 0.7.8); el sitio sigue con el encabezado de Ohio. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto en una página con autorización`v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
+- Status real: `Slices 1 y 2 en producción con el interruptor en off desde 2026-10-22 23:55 UTC (plugin eo-site-nav + adaptador de ohio-child, runtime 27c3b0c, AXIS primitives 0.7.8); el sitio sigue con el encabezado de Ohio. Slice 3: superficie y CTA del agendador publicados en Growth. Pendiente: montar el agendador en el adaptador, Slice 4 (alta GTM/GA4) y piloto en una página con autorización`v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -393,6 +393,16 @@ Reglas obligatorias:
 - Convivencia con la barra del admin.
 
 ### Slice 3 — Agendador
+
+> Avance 2026-10-22: superficie y CTA publicados en Growth con autorización del operador, por
+> `scripts/growth/publish-site-nav-meeting-cta.ts` (borrador → revisión → publicación): CTA
+> `site-nav-discovery-meeting` (`open_meeting_scheduler`, superficie de reuniones `fhsf-efeonce-lead-gen-web`,
+> `discovery`, rutas `/**`) y superficie WordPress `csur-eb834d53-fd99-4f6b-9615-979e329e7d37` que sólo permite ese CTA,
+> con allowlist `efeoncepro.com` y `www`. La clave quedó en `.auth/site-nav-meeting-cta-surface.json` (0600, ignorado);
+> volver a correr el script la rota. Verificado contra el endpoint público de producción: 200 con el CTA y el agendador
+> `discovery` en `/`, `/agencia-inbound-marketing/` y `/contacto/`; 403 desde un origen ajeno. Falta: montar un solo
+> `<greenhouse-cta>` en el adaptador con la clave como opción de WordPress (WP-CLI, sin pasar por el repo), cargar el
+> renderer y llevar la piel del diálogo de Inbound a una primitive compartida del sitio.
 
 - Superficie y CTA del encabezado global publicados con el script gobernado de Growth, con allowlist de origen para
   todo el sitio.
