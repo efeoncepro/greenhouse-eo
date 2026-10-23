@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-10-23 — clic del dock de las landings: qué botón, no sólo cuál posición
+
+[TRACKING-PLAN fila `landing_dock`](TRACKING-PLAN.md) · [arquitectura](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043).
+
+- **`primary`/`secondary` no basta para un reporte.** Cada landing tiene sus propios botones; la posición sola obliga a
+  cruzar con la página para saber qué se clicó. El evento lleva además el texto completo (`target_label`) y el destino
+  (`target_url`, ruta + ancla, sin query para no arrastrar ids de campaña).
+- **Leer el botón antes de que el primitive emita.** El primitive de AXIS emite sólo `target_type` y `target`; el host
+  guarda el botón con un listener de clic en **captura** sobre el documento, que corre antes del handler del dock.
+- **Un banner sin responder es consentimiento denegado, no ausencia de hit.** Con las cookies rechazadas el clic sale
+  igual al servidor de tagging como `gcs=G100` con todos los `ep.*` y el forwarding no lo pasa a GA4. Sirve para
+  verificar tag y parámetros sin aceptar cookies; la llegada a GA4 Tiempo real necesita una visita que acepte analítica.
+- **Un 500 al crear una variable no deja basura.** El primer `POST` de `DLV - target_url` devolvió 500 sin crearla; el
+  script es idempotente (reusa el workspace y salta lo existente) y la segunda corrida la creó. Leer el workspace
+  (`status`: 6 cambios, 0 conflictos) antes de publicar.
+
 ## 2026-10-17 — primer Lead comercial consentido: cómo se prueba de verdad
 
 [Evidencia](10-growth-lead-matching-runtime.md#primera-conversión-comercial-consentida--performance-2026-10-17) ·

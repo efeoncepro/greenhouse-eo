@@ -873,18 +873,24 @@ copiada del paquete publicado por `scripts/vendor-axis-landing-dock.mjs`; el `.g
 excepción para ese directorio.
 
 **Medición.** El primitive emite `landing_dock_view`, `landing_dock_click` y `landing_dock_cta`; `landing-dock-host.js`
-empuja sólo el clic, como `gh_landing_dock_clicked` con `target_type` y `target` (40 caracteres como máximo). El
-agendador que abre emite `greenhouse_cta_*` con `cta_location: landing_dock`, que reemplaza `inbound_mobile_dock` y
-`hubspot_mobile_dock`. Falta el alta de `gh_landing_dock_clicked` en GTM y GA4 (con confirmación humana antes de
-publicar el contenedor). Registro: [TRACKING-PLAN.md §CTAs](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md#ctas).
+empuja sólo el clic, como `gh_landing_dock_clicked` con `target_type` (`cta`/`link`) y `target` (`primary`/`secondary`),
+40 caracteres como máximo, más `target_label` (la etiqueta completa, nunca la corta del teléfono) y `target_url` (ruta
+y ancla, sin query), 100 como máximo. Un listener de clic en fase de captura en el documento guarda el botón antes de
+que el primitive emita. El agendador que abre emite `greenhouse_cta_*` con `cta_location: landing_dock`, que reemplaza
+`inbound_mobile_dock` y `hubspot_mobile_dock`. Alta en GTM (versión 8, 2026-10-23,
+`scripts/gtm/build-landing-dock-events-workspace.ts`: un tag, un trigger y los DLVs `target*`, que también sirven a
+`gh_site_nav_clicked`) y en GA4 (cuatro dimensiones de evento). Con el banner de cookies sin responder, el hit sale al
+servidor de tagging como `gcs=G100` y no se reenvía a GA4. Registro:
+[TRACKING-PLAN.md §CTAs](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md#ctas).
 
 **Landing nueva.** Un dock en otra landing usa este mismo dock: un archivo `manifests/landing-dock/<landing>.json` en el
 runtime y el alta de la página en la lista permitida del plugin (`EOLD_PAGES`, filtrable con `eo_landing_dock_pages`),
 nunca un dock propio.
 
-**Pendientes del dock.** Retirar el código de los siete docks antiguos (hoy sólo se quitan del HTML mientras el nuevo
-está encendido); un puente del agendador compartido entre `site-nav-host.js` y `landing-dock-host.js`; alta de
-`gh_landing_dock_clicked` en GTM y GA4.
+**Pendientes del dock.** Retirar el código de los siete docks antiguos, no antes del 2026-11-06 (hoy sólo se quitan del
+HTML mientras el nuevo está encendido, y `off` los devuelve). Que el renderer de CTAs (`src/growth-cta-renderer/`)
+exponga la apertura del agendador con piel y foco de retorno, para que `site-nav-host.js` y `landing-dock-host.js` dejen
+de adoptar el diálogo mirando el DOM; un módulo compartido entre el tema y el plugin sólo movería la copia.
 
 ## Invariantes
 

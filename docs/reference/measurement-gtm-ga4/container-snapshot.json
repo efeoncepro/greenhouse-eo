@@ -1,5 +1,5 @@
 {
-  "name": "Blog Glitch subscription sign_up 2026-10-20",
+  "name": "TASK-2043 gh_landing_dock_clicked",
   "tags": [
     {
       "name": "Efeonce Ads - confirmed conversion transport",
@@ -420,6 +420,99 @@
       ],
       "firingTriggerId": [
         "11"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    },
+    {
+      "name": "GA4 event - gh_landing_dock_clicked",
+      "type": "gaawe",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "sendEcommerceData",
+          "value": "false"
+        },
+        {
+          "type": "list",
+          "key": "eventSettingsTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "target_type"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - target_type}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "target"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - target}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "target_label"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - target_label}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "target_url"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - target_url}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "template",
+          "key": "eventName",
+          "value": "gh_landing_dock_clicked"
+        },
+        {
+          "type": "template",
+          "key": "measurementIdOverride",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "87"
       ],
       "consentSettings": {
         "consentStatus": "notSet"
@@ -1725,6 +1818,27 @@
       ]
     },
     {
+      "name": "CE - gh_landing_dock_clicked",
+      "type": "customEvent",
+      "customEventFilter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{_event}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "gh_landing_dock_clicked"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "CE - gh_meeting_booking_confirmed",
       "type": "customEvent",
       "customEventFilter": [
@@ -2571,6 +2685,90 @@
           "type": "template",
           "key": "name",
           "value": "surface_id"
+        }
+      ]
+    },
+    {
+      "name": "DLV - target",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "target"
+        }
+      ]
+    },
+    {
+      "name": "DLV - target_label",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "target_label"
+        }
+      ]
+    },
+    {
+      "name": "DLV - target_type",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "target_type"
+        }
+      ]
+    },
+    {
+      "name": "DLV - target_url",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "target_url"
         }
       ]
     },

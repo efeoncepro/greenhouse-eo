@@ -1,7 +1,7 @@
 # Operar el dock de las landings
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-23 por Claude
 > **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Navegación global del sitio público §Dock inferior de las landings](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043)
@@ -122,7 +122,25 @@ Borra el meta, purga y verifica que el dock antiguo volvió y el nuevo no está.
 4. Con visto bueno del operador: `deploy-landing-dock-plugin-package.php` por `pnpm public-website:wpcli` con el ZIP y
    el manifiesto. Sin documentos, ninguna landing cambia. Después, `pnpm public-website:landing-dock purge`.
 5. Al publicar AXIS con `pnpm release:packages`, nadie debe commitear en el `main` de AXIS mientras el script espera la
-   CI: el script etiqueta el HEAD al terminar (el 2026-10-23 el tag `v0.7.13` quedó en un commit de otra sesión).
+   CI. Desde el 2026-10-23 el script etiqueta el commit cuya CI verificó (antes etiquetaba el HEAD del momento, y el tag
+   `v0.7.13` quedó en un commit de otra sesión); si la publicación se detiene, se relanza el workflow.
+
+## Revisar la medición del dock
+
+Cada clic en el dock llega a GA4 como `gh_landing_dock_clicked` (GTM versión 8, desde el 2026-10-23) con cuatro
+dimensiones de evento: `target_type` (`cta` abre el agendador, `link` es un enlace), `target` (`primary` o
+`secondary`), `target_label` (texto completo del botón) y `target_url` (ruta y ancla). Para saber qué botón funciona
+mejor en una landing, filtra por la página y desglosa por `target_label`. Las reuniones agendadas desde el dock se miden
+aparte con `cta_location: landing_dock`; el clic nunca es una conversión.
+
+1. Comprobar en vivo: abre la landing en una ventana privada, responde el banner de cookies, haz clic en un botón del
+   dock y busca en la consola `dataLayer.filter(e => e.event === 'gh_landing_dock_clicked')`.
+2. Ver que el hit salga: en las herramientas de red, la petición `/g/collect` al servidor de tagging con
+   `en=gh_landing_dock_clicked` y los cuatro `ep.target*`. Con las cookies rechazadas sale como `gcs=G100` y no se
+   reenvía a GA4: es lo esperado.
+3. En GA4 Tiempo real, el evento aparece sólo con visitas que aceptaron analítica.
+4. Si se cambia un parámetro, regenera el tag con `scripts/gtm/build-landing-dock-events-workspace.ts` (sin `--publish`
+   arma y compila el workspace; con `--publish` versiona, publica y actualiza el snapshot) y commitea el snapshot.
 
 ## Qué significan los estados
 
@@ -150,6 +168,7 @@ Borra el meta, purga y verifica que el dock antiguo volvió y el nuevo no está.
 | El botón de agendar lleva a `/agenda/` | El renderer no respondió en 2,5 s o la superficie no tiene CTA elegible | Revisa el CTA en Growth; el enlace de respaldo funciona igual. |
 | El dock no aparece en escritorio | La landing tiene `presence: phone` | Es lo esperado; cambiarlo es decisión del operador. |
 | El dock no aparece en un teléfono nuevo | El banner de cookies está abierto y se superpone | Aparece al aceptar o rechazar las cookies. |
+| En escritorio, Redes Sociales no muestra el dock a un visitante nuevo | El banner de cookies ocupa la esquina inferior derecha y se superpone con el lugar del dock | Es lo esperado: aparece al responder el banner. |
 | En teléfono no se ve el interruptor claro/oscuro de Ohio | El dock lo cubre mientras está visible (el dock viejo de HubSpot lo apartaba) | Es lo esperado: el interruptor vuelve a verse cuando el dock se retira. |
 | `on` falla con «no <greenhouse-cta> … outside the dock» | La única fuente de la clave era el dock viejo (HubSpot) | `off` y después `on`. |
 

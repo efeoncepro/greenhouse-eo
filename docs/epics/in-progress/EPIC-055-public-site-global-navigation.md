@@ -180,8 +180,10 @@ task nueva sólo se crea si el trabajo no cabe en ninguna de las tres.
 - Adaptador Think: envoltura Astro que lee la copia pública y monta su propio agendador. Requiere la superficie de
   Growth CTA de Think.
 - Publicar también la copia pública en el bucket de AXIS (PDR-027, punto abierto 3).
-- Dock de las landings (`TASK-2043`): retirar el código de los siete docks antiguos, un puente del agendador compartido
-  entre `site-nav-host.js` y `landing-dock-host.js`, y el alta de `gh_landing_dock_clicked` en GTM y GA4.
+- Dock de las landings (`TASK-2043`): retirar el código de los siete docks antiguos (no antes del 2026-11-06) y que el
+  renderer de CTAs exponga la apertura del agendador con piel y foco de retorno, para que `site-nav-host.js` y
+  `landing-dock-host.js` dejen de adoptar el diálogo por su cuenta. `gh_landing_dock_clicked` ya está en GTM (versión 8)
+  y GA4 desde el 2026-10-23, con `target_type`, `target`, `target_label` y `target_url`.
 
 ## Open Questions
 

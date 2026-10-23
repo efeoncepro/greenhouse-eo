@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2043-landing-dock-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `En vivo en las siete landings desde 2026-10-23 (Inbound 04:07 UTC … Influencers 04:47 UTC), cada una con snapshot y aprobada en vivo por la sesión de fidelidad. AXIS v0.7.12–v0.7.14 (primitives 0.7.14, contracts 0.7.12, tokens 0.6.9, registry 0.7.5); plugin eo-landing-dock con la copia 0.7.14. Follow-ups: retiro del código de los docks viejos, puente de agendador compartido y GTM de gh_landing_dock_clicked`
+- Status real: `En vivo en las siete landings desde 2026-10-23 (Inbound 04:07 UTC … Influencers 04:47 UTC), cada una con snapshot y aprobada en vivo por la sesión de fidelidad. AXIS v0.7.12–v0.7.14 (primitives 0.7.14, contracts 0.7.12, tokens 0.6.9, registry 0.7.5); plugin eo-landing-dock con la copia 0.7.14. gh_landing_dock_clicked en GTM (versión 8) y GA4 desde 2026-10-23, con target_label y target_url. Follow-ups: retiro del código de los docks viejos (no antes del 2026-11-06) y apertura del agendador expuesta por el renderer de CTAs`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -536,10 +536,14 @@ Todas sirven AXIS primitives 0.7.14 desde el plugin `eo-landing-dock`; el agenda
 - Dock en escritorio para las landings que hoy sólo lo tienen en teléfono, si el operador lo decide (cambio de
   `presence` por documento, sin código).
 - Admin del documento del dock, si aparece necesidad de edición por personas.
-- Retirar del código de cada landing su dock antiguo (plantillas, CSS y JS inertes) una vez aprobadas las siete; hasta
-  entonces el plugin lo quita del HTML y lo devuelve con `off`.
-- Mover el puente del agendador de `site-nav-host.js` y `landing-dock-host.js` a un módulo compartido del sitio.
-- Alta de `gh_landing_dock_clicked` en GTM y GA4.
+- Retirar del código de cada landing su dock antiguo (plantillas, CSS y JS inertes), **no antes del 2026-11-06** (dos
+  semanas de observación); hasta entonces el plugin lo quita del HTML y lo devuelve con `off`, que es el rollback.
+- Puente del agendador: `site-nav-host.js` y `landing-dock-host.js` adoptan el diálogo del renderer de CTAs mirando el
+  DOM (piel del sitio, foco de vuelta). El arreglo de fondo es que el renderer (`src/growth-cta-renderer/`) exponga una
+  apertura con piel y foco de retorno; entonces ambos hosts dejan su copia. Tarea propia, no un módulo compartido más.
+- ~~Alta de `gh_landing_dock_clicked` en GTM y GA4~~ — hecho 2026-10-23: el evento suma `target_label` y `target_url`
+  (runtime `3801bc4`, plugin desplegado), GTM versión 8 (`scripts/gtm/build-landing-dock-events-workspace.ts`) y cuatro
+  dimensiones de evento en GA4. Hit `/g/collect` con los cuatro parámetros verificado en vivo.
 
 ## Open Questions
 
