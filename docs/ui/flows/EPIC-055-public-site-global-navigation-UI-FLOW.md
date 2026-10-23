@@ -30,6 +30,7 @@ El menú se comporta igual en `efeoncepro.com` y en cualquier sitio que lo adopt
 | Editor (persona) | Admin del plugin «EO Navegación» (`TASK-2041`, pendiente de construir) | E1 |
 | Agente u operador | `pnpm public-website:site-nav` (Greenhouse); por debajo, el servicio de guardado del plugin | E2 |
 | Otro sitio (Think) | Lee la copia pública del documento | E3 |
+| Visitante de una landing | Dock inferior de vidrio (`efeonce.landing-dock`, `TASK-2043`) | D1–D4 |
 
 ## Happy Path
 
@@ -62,6 +63,11 @@ El menú se comporta igual en `efeoncepro.com` y en cualquier sitio que lo adopt
 8. **Scroll.** Al bajar, la cabecera se oculta (estado «Bajando»). Al subir, vuelve como isla de vidrio flotante
    (estado «Subiendo»), en tono oscuro o claro según la sección que tiene debajo, y cambia de tono al cruzar de una
    sección a otra. Si hay un panel abierto y el scroll se mueve más de 48 px, se cierra (decidido en el Lab, `TASK-2040`).
+
+9. **D1–D4 · Dock de la landing** (`TASK-2043`, flujo en [`TASK-2043-landing-dock-flow.md`](TASK-2043-landing-dock-flow.md)).
+   En una landing, el dock de vidrio sube tras el hero con el siguiente paso de esa landing, se retira cerca del
+   formulario o del CTA final, mientras el banner de cookies está a la vista y **siempre que un mega o el onepage estén
+   abiertos** (el menú manda). Su botón de agendar abre el mismo agendador nativo con `cta-location="landing_dock"`.
 
 ## Recovery Branches
 

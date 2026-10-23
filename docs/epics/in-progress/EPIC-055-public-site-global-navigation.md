@@ -98,6 +98,15 @@ esquema del contrato. `TASK-2042` depende de ambas.
   - Piloto en una página y después todo el sitio.
   - Actualización de la doctrina de navegación y de la documentación funcional y el manual.
 
+- `TASK-2043` — **Dock inferior de las landings** (agregada 2026-10-23).
+  - Primitive `efeonce.landing-dock` en AXIS con el vidrio de la isla del menú, esquema `landing-dock.v1` y Lab.
+  - Módulo único del dock en el plugin de landings, con el agendador nativo (`cta-location="landing_dock"`).
+  - Migración de los siete docks (Redes Sociales, Influencers, Inicio, SEO, Inbound, HubSpot y Performance), con
+    snapshot y vuelta atrás por página.
+  - No cabe en las tres hijas: es cromo de las landings, no del encabezado; la aprobó el operador en el canvas v80.
+  - **Estado 2026-10-23:** primitive construida en local (AXIS `bc263f1`) y en revisión de fidelidad; sin release ni
+    escrituras en producción.
+
 **Regla de la épica:** lo que aparezca durante el trabajo entra como slice o criterio en la task cuya frontera toca. Una
 task nueva sólo se crea si el trabajo no cabe en ninguna de las tres.
 

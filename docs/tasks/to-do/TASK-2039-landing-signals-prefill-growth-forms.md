@@ -1,5 +1,13 @@
 # TASK-2039 — Landings que alimentan su formulario (señales de la página → Growth Form)
 
+
+## Delta 2026-10-23
+
+- El dock de teléfono de Inbound pasa al dock compartido `efeonce.landing-dock` (TASK-2043): al migrarlo, su lanzador del
+  agendador mide `cta-location="landing_dock"` en lugar de `inbound_mobile_dock`. `inbound_hero` e `inbound_closing` no
+  cambian. Cualquier comparación de placements de esta task debe leer `landing_dock` desde la fecha de la migración
+  (registrada en TASK-2043).
+
 ## Delta 2026-10-18
 
 - La landing de inbound quedó en producción con el formulario `efeonce-inbound-diagnostic` (form key `70dc185f…`, HubSpot
