@@ -1,7 +1,7 @@
 # Dock de las landings — Barra inferior de efeoncepro.com
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-23 por Claude
 > **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Navegación global del sitio público §Dock inferior de las landings](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043)
@@ -50,6 +50,9 @@ octubre de 2026).
 - Una sola barra por página: cuando la nueva está encendida, la antigua de esa landing no aparece.
 - Cada landing se enciende y se apaga por separado, y apagarla devuelve su barra antigua.
 - Las reuniones agendadas desde la barra se miden aparte como `landing_dock`.
+- Cada clic en la barra llega a la página como la señal `gh_landing_dock_clicked` (qué botón y hacia dónde, sin datos
+  personales). Falta darla de alta en Google Tag Manager y Google Analytics para verla en los reportes; se hará con
+  confirmación humana antes de publicar.
 
 > Detalle técnico: cómo se enciende, revisa y apaga, en el
 > [manual de operación](../../manual-de-uso/public-site/operar-dock-de-landings.md).

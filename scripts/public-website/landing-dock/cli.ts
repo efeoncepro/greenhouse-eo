@@ -73,10 +73,12 @@ function resolveConfig(m: Json): Json {
   const config = JSON.parse(JSON.stringify(m.config))
 
   if (config.scheduler?.source === 'cta') {
-    const tags = [...fetchLive(m.path).matchAll(/<greenhouse-cta\b[^>]*>/g)].map(t => attributes(t[0]))
+    // Never the dock's own launcher: it holds the key stored by the last `on`, which may be stale after a rotation.
+    const html = fetchLive(m.path).replace(/<div class="eo-landing-dock-scheduler"[\s\S]*?<\/div>/g, '')
+    const tags = [...html.matchAll(/<greenhouse-cta\b[^>]*>/g)].map(t => attributes(t[0]))
     const live = tags.find(a => a.cta === config.scheduler.cta && a.surface === config.scheduler.surface && a['embed-key'])
 
-    if (!live) fail(`The live page has no <greenhouse-cta> «${config.scheduler.cta}» on surface ${config.scheduler.surface} to take the key from.`)
+    if (!live) fail(`The live page has no <greenhouse-cta> «${config.scheduler.cta}» on surface ${config.scheduler.surface} outside the dock to take the key from. If the landing's only launcher was its old dock (HubSpot), run \`off\`, then \`on\` again (with the dock off, the old dock's launcher is back in the HTML).`)
     config.scheduler.key = live['embed-key']
   }
 

@@ -1,7 +1,7 @@
 # Operar el dock de las landings
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-23 por Claude
 > **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Navegación global del sitio público §Dock inferior de las landings](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043)
@@ -92,6 +92,17 @@ pnpm public-website:landing-dock purge
 Después de actualizar el plugin, las landings encendidas sirven los archivos nuevos de AXIS sólo cuando la caché de
 página se purga. Una URL puede tardar alrededor de un minuto en reflejarlo.
 
+### Rotar la clave de un CTA propio (Inbound, HubSpot, Influencers)
+
+El dock guarda en su meta la clave de la superficie que leyó del HTML en vivo al encenderse; rotar la clave del CTA y
+republicar la landing no la actualiza. Después de rotar:
+
+1. `pnpm public-website:landing-dock snapshot <landing>` y `off <landing> --confirm` (vuelve el dock viejo con su
+   lanzador, que ya trae la clave nueva).
+2. `on <landing> --confirm`: lee la clave nueva de los lanzadores de la página, nunca del lanzador del propio dock.
+   En HubSpot el único lanzador era el del dock viejo, por eso hace falta el `off` previo; en Inbound también sirven
+   los del hero y el cierre.
+
 ### 6. Apagar (vuelta atrás)
 
 ```bash
@@ -139,6 +150,8 @@ Borra el meta, purga y verifica que el dock antiguo volvió y el nuevo no está.
 | El botón de agendar lleva a `/agenda/` | El renderer no respondió en 2,5 s o la superficie no tiene CTA elegible | Revisa el CTA en Growth; el enlace de respaldo funciona igual. |
 | El dock no aparece en escritorio | La landing tiene `presence: phone` | Es lo esperado; cambiarlo es decisión del operador. |
 | El dock no aparece en un teléfono nuevo | El banner de cookies está abierto y se superpone | Aparece al aceptar o rechazar las cookies. |
+| En teléfono no se ve el interruptor claro/oscuro de Ohio | El dock lo cubre mientras está visible (el dock viejo de HubSpot lo apartaba) | Es lo esperado: el interruptor vuelve a verse cuando el dock se retira. |
+| `on` falla con «no <greenhouse-cta> … outside the dock» | La única fuente de la clave era el dock viejo (HubSpot) | `off` y después `on`. |
 
 ## Referencias técnicas
 

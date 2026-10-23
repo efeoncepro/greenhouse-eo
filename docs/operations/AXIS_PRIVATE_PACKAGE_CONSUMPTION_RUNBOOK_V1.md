@@ -1,6 +1,29 @@
 # AXIS Private Package Consumption Runbook V1
 
-## Corte vigente — Mención Efeonce: `v0.7.5` y primitives `0.6.9` (2026-10-18)
+## Corte vigente — Dock de las landings: `v0.7.12` a `v0.7.14` y primitives `0.7.14` (2026-10-23)
+
+El dock inferior de vidrio de las landings de efeoncepro.com (`TASK-2043`, `EPIC-055`) es una primitive de AXIS,
+`efeonce.landing-dock`, que reemplaza los siete docks propios de cada landing.
+
+| Entrega | Evidencia / estado |
+| --- | --- |
+| Tag `v0.7.11` | **No publicó.** La prueba de exports declarados del carril de agentes (`scripts/agent.test.mjs`) no conocía los módulos nuevos del dock |
+| Tag `v0.7.12` | `axis-tokens` `0.6.9` (`axisLandingDock`), `axis-ui-contracts` `0.7.12` (contrato `efeonce.landing-dock` 1.0.0 `candidate`, esquema `landing-dock.v1`), `axis-ui-registry` `0.7.5` (capacidad `efeonce.landing-dock`), `axis-ui-primitives` `0.7.12` (`./landing-dock`, `./landing-dock.css`, `./landing-dock.js`) |
+| Tag `v0.7.13` | `axis-ui-primitives` `0.7.13`: el dock conserva su tono con el agendador abierto (página inerte), con la guarda equivalente en la isla de site-nav |
+| Tag `v0.7.14` | `axis-ui-primitives` `0.7.14`: marcador de parada (`stop`) |
+| WordPress (`eo-landing-dock`) | Copia fijada en `wp-content/plugins/eo-landing-dock/assets/vendor/axis/landing-dock/0.7.14/` (`landing-dock.css`, `landing-dock.js`, `landing-dock.v1.schema.json`) con `VERSION.json` (sha256; primitives 0.7.14 + contracts 0.7.12, «GitHub Packages, tag v0.7.14»), copiada del paquete publicado por `scripts/vendor-axis-landing-dock.mjs`; el `.gitignore` del runtime tiene excepción para ese vendor. En vivo en las siete landings desde 2026-10-23. El tema `ohio-child` sigue con su propia copia de site-nav (primitives 0.7.13) |
+| Greenhouse | Sin adopción de paquete: opera el dock con `pnpm public-website:landing-dock` y empaqueta el plugin con `build-landing-dock-plugin-package.cjs`, que rechaza una copia local de AXIS |
+
+- **Lección (`v0.7.11`):** un export nuevo de primitives exige actualizar la prueba de exports declarados del carril de
+  agentes antes del tag; si no, el release no publica.
+- **Lección (CI):** `git diff --check` del CI rechaza una línea en blanco al final de un README.
+- **Lección (tag en checkout compartido):** `release:packages` etiqueta el HEAD del checkout cuando termina de esperar la
+  CI; `v0.7.13` quedó en un commit de otra sesión. Nadie commitea en AXIS `main` mientras el script espera; si la
+  publicación se detiene, se relanza el workflow.
+- Operación: [Operar el dock de las landings](../manual-de-uso/public-site/operar-dock-de-landings.md). Doc de calidad en
+  AXIS: `docs/quality/landing-dock.md`.
+
+## Corte — Mención Efeonce: `v0.7.5` y primitives `0.6.9` (2026-10-18)
 
 La «Mención Efeonce» (enlace en línea a un servicio o producto Efeonce, con el isotipo delante y una pastilla en el
 acento de la línea) nació en el sitio público como `a.eo-mention` y el mismo día pasó a AXIS como `efeonce.mention`.

@@ -4,6 +4,19 @@
  ZONE 0 — IDENTITY & TRIAGE
  ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-23 — el dock inferior es el compartido de AXIS
+
+El 2026-10-23 las siete landings de efeoncepro.com con barra fija abajo pasaron a un solo dock compartido: AXIS
+`efeonce.landing-dock` (esquema `landing-dock.v1`), pintado en WordPress por el plugin `eo-landing-dock` (`TASK-2043`,
+`EPIC-055`). La línea «CTA sticky/visible» del contrato móvil se cumple con ese dock. Esta landing no construye un dock ni un CTA fijo propio: declara el suyo en
+`efeonce-public-site-runtime/manifests/landing-dock/<landing>.json` (copy, presencia, acciones, marcadores de inicio,
+final y parada, agendador) y da de alta su página en la lista permitida del plugin (`EOLD_PAGES`, filtrable con
+`eo_landing_dock_pages`). Se revisa con `pnpm public-website:landing-dock preview <landing>` y se enciende con
+`snapshot` + `on <landing> --confirm`; el botón de reunión mide `cta-location="landing_dock"`. El diseño, el motion y
+la accesibilidad del dock son de AXIS, no de la landing. Ver
+[Operar el dock de las landings](../../manual-de-uso/public-site/operar-dock-de-landings.md) y
+[arquitectura §Dock inferior de las landings](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043).
+
 ## Delta 2026-09-11 — la v2 ya no es `noindex`: dos URLs indexables compiten
 
 Verificado por HTTP (HTML público servido): `/agencia-creativa-v2/` responde `meta robots` `index, follow` y

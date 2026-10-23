@@ -1,9 +1,9 @@
 # Operar la landing Performance Marketing
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-17 por Claude
-> **Ultima actualizacion:** 2026-10-17 por Claude
+> **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Registro de primitives (`PerformanceLandingModules`)](../../architecture/public-site/PRIMITIVES.md#registry) ·
 > [contrato runtime del formulario](../../architecture/growth-public-forms-runtime-contract.md#diagnóstico-de-pauta-performance-marketing)
 > **Documentacion funcional:** [performance-marketing.md](../../documentation/public-site/performance-marketing.md)
@@ -140,7 +140,9 @@ Por el wrapper de WP-CLI, pásalo **como archivo** (ver [Problemas comunes](#pro
 - Los diez módulos inicializados; pestañas de plataformas y órbita del autodiagnóstico funcionando.
 - Un solo `h1`, canonical propio, `index, follow`, OG/Twitter y los bloques `Service` y `FAQPage`.
 - El formulario visible con sus 26 campos.
-- En móvil, la barra «Agenda un diagnóstico» aparece tras el hero y se oculta al llegar al formulario.
+- En móvil, la barra «Agenda un diagnóstico» aparece tras el hero, se oculta al llegar al formulario y no vuelve
+  pasado `#diagnostico`. Desde el 2026-10-23 es el dock compartido: se revisa con
+  `pnpm public-website:landing-dock verify performance` ([manual del dock](operar-dock-de-landings.md)).
 - Header, footer y landings hermanas (`/servicios/agencia-de-medios/`, `/servicios-contratar-hubspot/`,
   `/agencia-creativa/`) respondiendo 200.
 
@@ -204,7 +206,8 @@ opción, toma antes un snapshot del estado actual y purga Kinsta al final.
   de empaquetar, confirma con `diff` que el loader del checkout es igual al vivo. Al commitear en el runtime, mete
   sólo tu hunk (por ejemplo con `git hash-object -w` + `git update-index --cacheinfo`), no el archivo entero con el
   WIP ajeno.
-- **La barra móvil o una animación «no aparece» (`opacity:0`).** En un panel de navegador oculto,
+- **La barra móvil o una animación «no aparece» (`opacity:0`).** (La barra propia `.mbar` sólo se sirve con el dock
+  compartido apagado.) En un panel de navegador oculto,
   `getComputedStyle` de las animaciones ligadas al scroll puede devolver un cuadro viejo. Fuerza un recálculo o toma
   una captura antes de concluir que está roto.
 - **Un enlace con `?utm_` a la dirección antigua llega sin parámetros.** La query sobrevive al 301 gracias al

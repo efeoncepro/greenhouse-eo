@@ -1,9 +1,9 @@
 # Landing Performance Marketing — Módulos editables en Elementor
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-17 por Claude
-> **Ultima actualizacion:** 2026-10-17 por Claude
+> **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Registro de primitives del sitio público (`PerformanceLandingModules`)](../../architecture/public-site/PRIMITIVES.md#registry) ·
 > [contrato runtime del formulario](../../architecture/growth-public-forms-runtime-contract.md#diagnóstico-de-pauta-performance-marketing) ·
 > [decisión de posicionamiento PDR-022](../../public-site/decisions/PDR-022-landing-performance-marketing-posicionamiento.md)
@@ -50,13 +50,17 @@ La página tiene diez secciones, una por módulo:
 
 El contenido exacto de cada sección se lee en la página o en el editor; esta tabla sólo ordena los módulos.
 
-En el teléfono aparece una barra fija abajo con el botón «Agenda un diagnóstico». Se muestra después de pasar el
-hero y se esconde sola al llegar al formulario, para no tapar lo que la persona está llenando.
+En el teléfono aparece una barra fija abajo con el botón «Agenda un diagnóstico», que lleva al formulario. Se muestra
+después de pasar el hero y se esconde al llegar al formulario, para no tapar lo que la persona está llenando; pasado el
+formulario no vuelve. Desde el 2026-10-23 es el [dock compartido de las landings](dock-de-landings.md).
 
 > Detalle técnico: diez widgets nativos `greenhouse_performance_{hero,confianza,problema,solucion,plataformas,creatividad,autodiagnostico,recibes,condiciones,diagnostico}`
 > del plugin `eo-elementor-widgets`, uno por contenedor; las pestañas y la órbita las maneja
-> `assets/js/performance-landing.js`. La barra móvil (`.mbar`) usa animación ligada al scroll; detalle en la
-> [entrada del registro de primitives](../../architecture/public-site/PRIMITIVES.md#registry).
+> `assets/js/performance-landing.js`. La barra móvil es AXIS `efeonce.landing-dock`, pintado por el plugin
+> `eo-landing-dock` (manifiesto `manifests/landing-dock/performance.json`, parada en `#diagnostico`); la barra propia
+> (`nav.mbar`, con animación ligada al scroll; ver la
+> [entrada del registro de primitives](../../architecture/public-site/PRIMITIVES.md#registry)) sólo vuelve si el dock se
+> apaga ([manual del dock](../../manual-de-uso/public-site/operar-dock-de-landings.md)).
 
 ## Qué se puede editar y qué no
 

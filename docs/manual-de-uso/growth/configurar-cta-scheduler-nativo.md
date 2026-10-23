@@ -40,6 +40,14 @@ scheduler nativo en full-screen y la conversión sigue siendo el receipt `gh_mee
 surface/key, el hueco debe caer a un enlace a `/agenda/`, que desde el 2026-10-20 es la landing de agenda indexable
 (monta el mismo agendador en línea; ya no es sólo el piloto).
 
+**Delta 2026-10-23 — docks de las landings de efeoncepro.com.** Ese caso fuente es el dock propio anterior. Desde el
+2026-10-23 las siete landings usan el dock compartido AXIS `efeonce.landing-dock` (TASK-2043): el plugin
+`eo-landing-dock` imprime un lanzador `<greenhouse-cta cta-location="landing_dock">` oculto y el botón del dock lo abre;
+no se reduce el card a botón. Un dock nuevo en una landing de efeoncepro.com usa ese dock con su archivo
+`manifests/landing-dock/<landing>.json` y su alta en la lista de páginas permitidas del plugin (hoy
+7 páginas), no este patrón. Ver
+[Operar el dock de las landings](../public-site/operar-dock-de-landings.md).
+
 ## Problemas comunes
 
 | Síntoma | Causa | Qué hacer |
