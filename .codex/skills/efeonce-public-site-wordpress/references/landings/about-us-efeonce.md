@@ -30,8 +30,8 @@
   no broken images, no console errors. QA preview `252030` (`/nosotros-preview-20261023/`) left `private`.
 - SEO 2026-10-23: meta description = «No te entregamos crecimiento: lo construimos contigo y te dejamos más capaz de
   sostenerlo. Estrategia, creatividad, medios, datos y tecnología.» (`configure-nosotros-seo.php`, snapshot option
-  `_gh_nosotros_seo_before_20261023_141826`). OG and Twitter descriptions still old (OG: «…problema de arquitectura…»;
-  Twitter: copy of an ads page) — pending operator decision. Bottom dock: none.
+  `_gh_nosotros_seo_before_20261023_141826`). OG and Twitter descriptions set to the same text
+  (`configure-nosotros-social-seo.php`, snapshot option `_gh_nosotros_social_before_20261023_142121`). Bottom dock: none.
 
 ## Before 2026-10-23 (history; replaced)
 
