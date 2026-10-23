@@ -744,6 +744,41 @@ Conocido y sin cambiar: en 1280 px cinco descripciones de servicio (contenidos, 
 inbound) se cortan con puntos suspensivos, igual en el Lab que en vivo. Es una pregunta de diseño para la sesión de
 fidelidad.
 
+## Dock inferior de las landings (`TASK-2043`)
+
+El segundo cromo del sitio: la barra de vidrio fija abajo que acompaña la lectura de una landing con su siguiente paso.
+Reemplaza los siete docks que cada landing dibujaba por su cuenta. Lo aprobó el operador en el canvas (versión 80, fila
+«Dock inferior de las landings»): «Apruebo el dock en vidrio; pásaselo a la sesión del menú para construirlo en AXIS y
+en las landings».
+
+| Capa | Dónde | Qué hace |
+|---|---|---|
+| Mecanismo | AXIS: tokens `axisLandingDock`, contrato `efeonce.landing-dock`, esquema `landing-dock.v1`, `@efeoncepro/axis-ui-primitives/landing-dock` (`landingDockHtml`), `./landing-dock.css`, `./landing-dock.js` | Render de servidor, CSS aislado con peso de id y JS sin dependencias. Vidrio = las dos recetas de la isla (`axisSiteNav.island`). |
+| Documento | `efeonce-public-site-runtime/manifests/landing-dock/<landing>.json` | Documento `landing-dock.v1` con el copy de la landing, marcadores de inicio y final, agendador y dock viejo que reemplaza. Sin claves. |
+| Sitio | Plugin `eo-landing-dock` | Meta `_eo_landing_dock` por página: con él pinta el dock (port PHP byte a byte igual a AXIS), un lanzador `<greenhouse-cta cta-location="landing_dock">` oculto y retira del HTML el dock viejo; sin él, la página queda como estaba. `wp eo-dock`. |
+| Operación | `pnpm public-website:landing-dock` | `preview` sobre la landing real sin escribir, `snapshot`, `on`/`off` con `--confirm`, `verify`, `status`. |
+
+**Comportamiento.** Aparece cuando el fondo del hero queda sobre la mitad de la ventana; se retira a 120 px del
+formulario o CTA final, con un panel o el onepage del menú abiertos y cuando el banner de cookies de HubSpot
+(`#hs-eu-cookie-confirmation`) se superpone con su lugar. El tono sigue lo que tiene detrás (`data-site-nav-tone`,
+luminancia; foto = oscuro). Escritorio: centrado a 20 px; teléfono (≤ 768 px): a 12 px de los bordes, sin texto, con
+los botones repartidos según su etiqueta. `presence` deja el dock sólo en escritorio o sólo en teléfono.
+
+**Agendador.** El primitive no lo abre: emite `axis-landing-dock:cta` y el script del plugin abre el `<greenhouse-cta>`
+oculto. Inbound, HubSpot e Influencers usan su propio CTA de reunión; Redes Sociales e Inicio el del menú
+(`site-nav-discovery-meeting`), que agenda con la misma página de HubSpot (`efeoncepro/agenda-discovery`, scheduler
+`discovery`) que tenían. Todos miden `cta-location="landing_dock"`. SEO y Performance siguen como enlaces a su
+formulario porque no agendan.
+
+**Invariantes del dock.** Un dock por página; el viejo y el nuevo nunca conviven (el viejo sólo se quita mientras el
+nuevo está encendido); el copy es el de cada landing y una etiqueta corta de teléfono es copy (operador); ningún valor
+de diseño del dock vive en el plugin ni en el tema; la clave de una superficie nunca entra a un repositorio (se lee del
+HTML en vivo al aplicar).
+
+**Vuelta atrás.** Por landing: `pnpm public-website:landing-dock off <landing> --confirm` (borra el meta, purga y
+verifica que el dock viejo volvió). Global: desactivar el plugin. Antes de encender una landing se guarda un snapshot
+de la página (contenido, datos de Elementor y meta del dock).
+
 ## Invariantes
 
 1. **Una sola fuente de verdad del menú:** el documento vivo del plugin. Ningún otro archivo editable compite con él:
@@ -778,8 +813,7 @@ fidelidad.
 - Comprobar en producción la vuelta a `off` (sólo se probó en Playground).
 - Admin de `TASK-2041` (dirección B con vista previa en vivo y el árbol de la dirección A).
 - Corte de descripciones en 1280 px: **aceptado** como diseño aprobado (tablero Mega1280 del canvas: `white-space: nowrap; overflow: hidden; text-overflow: ellipsis`; confirmado por la sesión de fidelidad el 2026-10-23). En 1440 van completas; `fit` sólo falla a 1440.
-- El dock inferior de vidrio para landings, aprobado por el operador y transmitido por la sesión de fidelidad, es una task
-  aparte.
+- El dock inferior de vidrio para landings: `TASK-2043` (ver §Dock inferior de las landings).
 - Destino de la copia pública: REST de WordPress sola, o también en el bucket (PDR-027, punto abierto 3).
 - Orden de los servicios por línea (Inbound quedó en Revenue).
 - Si las respuestas aprobadas por línea («Tu squad», «Visible»…) viven también en el menú.

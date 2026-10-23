@@ -169,6 +169,26 @@ Initial header state: a dark hero without Ohio's spacer starts `top` (glass); a 
 4. If the render changed, bring `EOSN_Render` and the validator to parity and run the Playground suite.
 5. Deploy through the theme lane (and the plugin lane if it changed), then `verify` and check live.
 
+## Landing dock (`efeonce.landing-dock`, TASK-2043)
+
+The glass bottom dock of the landings, the second piece of site chrome. One AXIS primitive (tokens `axisLandingDock`
+reuse the island glass of `axisSiteNav`; schema `landing-dock.v1`; `landingDockHtml`, `landing-dock.css`,
+`landing-dock.js`) consumed by the plugin `eo-landing-dock`, never re-implemented per landing.
+
+- Per page: meta `_eo_landing_dock` = document + `start`/`end` selectors + `scheduler` (`site_nav` or the landing's own
+  CTA `{cta, surface, key}`) + `legacy` (`{tag, attr}` of the old dock). With it the plugin paints the dock, prints a
+  hidden `<greenhouse-cta cta-location="landing_dock">` and strips the old dock from the HTML; without it the page is
+  untouched. Old and new never coexist.
+- Configs: `efeonce-public-site-runtime/manifests/landing-dock/<landing>.json` (no keys; the key is read from the live
+  page on `on`). `pending` blocks `on`.
+- CLI: `pnpm public-website:landing-dock status | preview <landing|all> | snapshot <landing> | on|off <landing> --confirm | verify <landing>`.
+  `preview` injects the dock into the live page in a local Chrome (no write). `on` needs a snapshot from the last hour.
+- Plugin lane: `build-landing-dock-plugin-package.cjs` (refuses a local AXIS copy) → `deploy-landing-dock-plugin-package.php`.
+- Copy is each landing's; a phone `shortLabel` is copy (operator). Presence (`desktop`/`phone`) keeps what each landing
+  had until the operator decides otherwise.
+- Cookie banner: HubSpot's `#hs-eu-cookie-confirmation`; the dock hides only when it overlaps the dock's place.
+- Manual: `docs/manual-de-uso/public-site/operar-dock-de-landings.md`.
+
 ## Hard rules
 
 - The host **never styles inside `.axis-site-nav`**. Its only inputs are `--axis-site-nav-offset` and

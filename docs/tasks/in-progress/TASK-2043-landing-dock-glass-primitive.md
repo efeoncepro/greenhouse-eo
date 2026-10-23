@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2043-landing-dock-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Slice 1 hecho en local: primitive en AXIS (commit bc263f1, sin publicar) con demo del Lab y 25 pruebas de navegador verdes; demo enviada a la sesión «Rediseño de Menú» para medir paridad. Pendiente: visto bueno de fidelidad, decisiones del operador (escritorio para todas, etiquetas cortas de Influencers), release de AXIS, módulo del sitio y migración landing por landing; sin escrituras en producción`
+- Status real: `Code complete, rollout pendiente. AXIS: primitive construida y probada (commits bc263f1…2d4f031, sin publicar; 25 pruebas de navegador). Sitio: plugin eo-landing-dock (runtime 1de3f9e, 6230b39) con port PHP 10/10, Playground on/off y documentos de las siete landings; CLI pnpm public-website:landing-dock con preview sobre las landings reales (sin escrituras) verde en las siete. Pendiente: visto bueno de fidelidad, decisiones del operador (escritorio para todas; etiquetas cortas de Influencers), release de AXIS, despliegue del plugin y on por landing; sin escrituras en producción`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -123,8 +123,12 @@ Reglas obligatorias:
   `packages/primitives/fixtures/landing-dock/`, `packages/contracts/scripts/emit-landing-dock-schema.mjs`,
   `apps/lab/src/{components/LandingDockReference.astro,data/landing-dock-demo.ts,scripts/landing-dock-*.ts,pages/demos/landing-dock/,test/e2e/landing-dock.spec.ts}`,
   `docs/quality/landing-dock.md`
-- En `efeonce-public-site-runtime`: el módulo del dock del plugin `eo-elementor-widgets` y su copia fijada de AXIS
-  (rutas finales en el Slice 2) [verificar].
+- En `efeonce-public-site-runtime`: plugin `wp-content/plugins/eo-landing-dock/` (con su copia fijada de AXIS),
+  `manifests/landing-dock/`, `scripts/vendor-axis-landing-dock.mjs`, `tests/eo-landing-dock.test.php`,
+  `tests/fixtures/landing-dock/` y `tests/playground/*landing-dock*`.
+- En `greenhouse-eo`: `scripts/public-website/landing-dock/`, `scripts/public-website/build-landing-dock-plugin-package.cjs`,
+  `scripts/public-website/deploy-landing-dock-plugin-package.php`, `docs/manual-de-uso/public-site/operar-dock-de-landings.md`
+  y `docs/documentation/public-site/dock-de-landings.md`.
 
 ## Current Repo State
 
@@ -287,7 +291,7 @@ Reglas obligatorias:
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: meta de página `_eo_landing_dock` [verificar nombre final en el Slice 2]
+- Entidades/tablas/views afectadas: meta de página `_eo_landing_dock` (plugin `eo-landing-dock`)
 - Invariantes que no se pueden romper:
   - un documento inválido nunca se pinta;
   - una página nunca tiene el dock viejo y el nuevo;
@@ -466,11 +470,15 @@ Regiones, medidas, estados, copy por landing y decisiones:
   navy y foto; hoja hostil sin efecto; axe limpio. Evidencia: `landing-dock.spec.ts`, 25 pruebas verdes con site-nav.
 - [ ] La sesión «Rediseño de Menú» aprobó la paridad del Lab a 1440 y 390.
 - [ ] AXIS publicado con versión nueva e instalación privada verificada.
-- [ ] El plugin pinta el dock desde el documento de cada página con el port PHP validado contra `cases.json`.
+- [x] El plugin pinta el dock desde el documento de cada página con el port PHP validado contra `cases.json`. Evidencia:
+  `tests/eo-landing-dock.test.php` (10 casos byte a byte, esquema, config y retiro del dock viejo sobre el marcado real
+  de las siete landings) y Playground: con el meta, dock nuevo y sin `nav.mbar`; sin el meta, vuelve el viejo.
 - [ ] Las siete landings usan el dock en vivo, con su copy de hoy y sin dock viejo en el DOM.
 - [ ] En las landings que agendan, el dock abre el agendador nativo con `cta-location="landing_dock"`.
 - [ ] Paridad en vivo aprobada por la sesión de fidelidad en las siete landings.
-- [ ] Arquitectura, documentación funcional, manual y skill del sitio actualizados.
+- [ ] Arquitectura, documentación funcional, manual y skill del sitio actualizados. Escritos el 2026-10-23
+  (§Dock inferior de las landings, `dock-de-landings.md`, `operar-dock-de-landings.md`, referencia de la skill); se
+  cierran con el estado real tras el rollout.
 - [ ] `UI ready` se mantuvo en `no` hasta completar mapping, plan de captura y decision log; si pasó a `yes`,
   `pnpm task:lint --task TASK-2043` quedó sin hallazgos.
 
@@ -498,6 +506,10 @@ Regiones, medidas, estados, copy por landing y decisiones:
 - Dock en escritorio para las landings que hoy sólo lo tienen en teléfono, si el operador lo decide (cambio de
   `presence` por documento, sin código).
 - Admin del documento del dock, si aparece necesidad de edición por personas.
+- Retirar del código de cada landing su dock antiguo (plantillas, CSS y JS inertes) una vez aprobadas las siete; hasta
+  entonces el plugin lo quita del HTML y lo devuelve con `off`.
+- Mover el puente del agendador de `site-nav-host.js` y `landing-dock-host.js` a un módulo compartido del sitio.
+- Alta de `gh_landing_dock_clicked` en GTM y GA4.
 
 ## Open Questions
 
@@ -505,4 +517,6 @@ Regiones, medidas, estados, copy por landing y decisiones:
   (2026-10-23); mientras tanto se conserva la presencia de hoy.
 - ¿Etiquetas cortas de teléfono para Influencers («Reunión» / «Tu campaña»)? Consultado al operador; no se aplican hasta
   su respuesta.
-- ¿Qué banner de cookies usa el sitio y con qué selector? Se mide en vivo en el Slice 2.
+- ~~¿Qué banner de cookies usa el sitio?~~ Resuelto 2026-10-23: el de HubSpot (`#hs-eu-cookie-confirmation`, con la
+  piel de `eo-measurement-consent`). El dock se aparta sólo si se superpone con su lugar (en escritorio la tarjeta va
+  abajo a la derecha y no lo tapa).
