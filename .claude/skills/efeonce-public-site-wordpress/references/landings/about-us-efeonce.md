@@ -31,7 +31,11 @@
 - SEO 2026-10-23: meta description = «No te entregamos crecimiento: lo construimos contigo y te dejamos más capaz de
   sostenerlo. Estrategia, creatividad, medios, datos y tecnología.» (`configure-nosotros-seo.php`, snapshot option
   `_gh_nosotros_seo_before_20261023_141826`). OG and Twitter descriptions set to the same text
-  (`configure-nosotros-social-seo.php`, snapshot option `_gh_nosotros_social_before_20261023_142121`). Bottom dock: none.
+  (`configure-nosotros-social-seo.php`, snapshot option `_gh_nosotros_social_before_20261023_142121`).
+- OG 2026-10-23: `nosotros-source/og/og.html` → `og-nosotros.png` (1200×630, hero photo + «Lo construimos contigo», no
+  signature because the logo is in the photo) → `configure-nosotros-og.php`: new attachment `252037`, OG/Twitter image
+  and title «Nosotros: lo construimos contigo | Efeonce»; featured image `249769` untouched; snapshot option
+  `_gh_nosotros_og_before_20261023_144636` (previous OG image `250188`). Bottom dock: none.
 
 ## Before 2026-10-23 (history; replaced)
 
