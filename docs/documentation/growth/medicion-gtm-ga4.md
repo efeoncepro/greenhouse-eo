@@ -5,9 +5,9 @@ Server9 estricto, IP/UA original, atribución consentida y external_id SHA256; o
 políticas por API/panel/CLI. [Release PR255/main9690efad](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md)
 y [manual de agentes](../../manual-de-uso/growth/configurar-medicion-conversiones.md). Meta Test Events
 Server/website8/9 claves según mapping real; no prueba de EMQ ni conversión comercial.
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-07 por Claude
-> **Ultima actualizacion:** 2026-10-16 por Claude
+> **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [docs/reference/measurement-gtm-ga4/](../../reference/measurement-gtm-ga4/) · [Tracking Engine §19](../../architecture/GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md) · ADR [GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1](../../architecture/GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1.md)
 
 # Medición del sitio público (GTM + GA4)
@@ -31,6 +31,24 @@ Checkpoint del release2559e9242: Web6/Server10 publicados, EC ON y13 Forms comer
 Grader incluido y Contacto general excluido. El navegador procesa el recibo y los tags nativos de
 servidor envían la conversión; no hay retry backend de ese canal. Configuración, recepción y
 atribución se verifican por separado. La primera evidencia real Ads sigue sin verificar.
+
+## Menú global y dock de las landings
+
+Desde el 2026-10-23, GA4 recibe cómo se usa el menú de `efeoncepro.com` y la barra inferior de las landings:
+
+- **Menú:** qué panel se abre (`gh_site_nav_opened`), qué línea de servicio se mira (`gh_site_nav_line_viewed`) y en qué
+  entrada se hace clic (`gh_site_nav_clicked`), con el nombre visible de la entrada y su destino.
+- **Dock de las landings:** qué botón se pulsa (`gh_landing_dock_clicked`), con su texto completo y su destino.
+- La página donde ocurrió el clic llega sola en cada evento. No se envían datos personales.
+- Ninguno de estos clics es una conversión: la conversión sigue siendo `generate_lead`, al enviar un formulario o
+  confirmar una reserva. Si el clic abre el agendador, este mide aparte con `cta_location: site_nav` o `landing_dock`.
+- Se ven de inmediato en GA4 Tiempo real; los informes estándar pueden tardar hasta 24 horas. Sin consentimiento de
+  analítica en el banner, el clic no llega a GA4.
+
+> Detalle técnico: GTM web versiones 8 a 10 y seis dimensiones de evento en GA4 —
+> [convención de eventos](../../reference/measurement-gtm-ga4/04-greenhouse-gh-event-convention.md),
+> [registro](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md#ctas) y
+> [arquitectura del menú y el dock](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md).
 
 ## Configuración escalable y operación por agentes
 

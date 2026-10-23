@@ -52,12 +52,15 @@ gh_form_success_action_clicked
 | Descarga | `gh_file_downloaded` | `file_id`, `file_kind` |
 | Búsqueda | `gh_search_submitted`, `gh_search_results_viewed` | `results_count`, `filters_applied` |
 | Lead | `gh_lead_captured`, `gh_demo_requested` | `lead_source`, `plan`, `correlation_id` |
+| **Menú global de `efeoncepro.com`** (AXIS `efeonce.site-nav`, TASK-2042; host `ohio-child/assets/js/site-nav-host.js`) | `gh_site_nav_opened`, `gh_site_nav_line_viewed`, `gh_site_nav_clicked` (GTM web versiones 9 y 10, 2026-10-23) | `panel` (`nosotros`, `soluciones`, `recursos`, `onepage`…), `line` (`brand`, `engine`, `growth`, `revenue-hubspot`, `voice`), y en el clic `target_type`, `target` (id de la entrada; el CTA va como `cta` + `menu_header`/`menu_mega`/`menu_onepage`), `target_label` y `target_url`. `site_nav_cta` no se empuja. |
+| **Dock de las landings** (AXIS `efeonce.landing-dock`, TASK-2043; host `eo-landing-dock/assets/js/landing-dock-host.js`) | `gh_landing_dock_clicked` (GTM web versión 8, 2026-10-23) | `target_type` (`cta` abre el agendador, `link`), `target` (`primary`/`secondary`), `target_label` (etiqueta completa, ≤100), `target_url` (ruta + ancla, sin query; dirección completa si es externa, ≤100) |
 
 Reglas de extensión:
 - `*_location` es la válvula anti-explosión de posición (`hero`/`nav`/`footer`/`pricing`) → **un** `gh_cta_clicked`, nunca `gh_hero_cta_clicked`.
 - `*_kind` (bajo `form_kind`) para variantes low-cardinality → nunca un evento nuevo por variante.
 - `surface_id`, `page_uri`, `correlation_id`, `utm_*` viven en el **allowlist base** compartido por todos los eventos; sólo los keys realmente propios se suman por familia.
 - Duplicar el split intent/outcome (`_accepted`/`_rejected`) **solo si hay outcome de servidor real** (no en clicks de pura navegación).
+- Menú y dock: ningún evento es key event (la conversión sigue siendo `generate_lead`, por formulario o reserva) y la página del clic no lleva parámetro propio: viaja en cada hit (`dl` → `page_location`). El agendador que abren mide `greenhouse_cta_*` con `cta_location: site_nav | landing_dock`.
 
 ---
 

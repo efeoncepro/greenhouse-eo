@@ -156,7 +156,7 @@ no es prerrequisito de UPD. Respetar la restricción shared workspace antes del 
 Verificado 2026-10-13: hosting del mismo `GTM-K2X4ZTTK` recuperado en `efeonce-group`,
 tagging + preview min 0/max 1, 1CPU/512MiB, instance-based; `/healthy` 200 y Preview funcional.
 En ese corte histórico GTM Web **5**/Server **6** estaban publicados; el readback 14/10 posterior
-fijó Server 9 y el checkpoint 18/10 de esta skill fija Web 6/Server 10. HubSpot categoría opt-in y
+fijó Server 9 y el checkpoint 18/10 fijó Web 6/Server 10; al 23/10 Web está en **10** y Server sigue en 10. HubSpot categoría opt-in y
 routing WP/Think activos. Test Events Server procesados y PageView real completó ambos destinos.
 Primera conversión comercial y reconciliación pendientes en ese corte; esto no autoriza replay.
 Ver estado/URLs en la auditoría.
@@ -330,6 +330,11 @@ Estrategia de deployment: **build agéntico primario + capa delgada** (ADR `GREE
 - **`pnpm gtm:snapshot`** — exporta el config live de los DOS containers (web `container-snapshot.json` + servidor `server-container-snapshot.json`, en `docs/reference/measurement-gtm-ga4/`) con secretos tapados por huella sha256. **Correr tras cada publish** y commitear (el publish por script ya lo hace). `pnpm gtm:snapshot --check` = drift live vs commiteado, exit 1; lo corre a diario `.github/workflows/gtm-drift.yml`. Detalle abajo.
 - **`pnpm measurement:smoke`** — verifica EN VIVO que la medición funciona en los hosts/eventos clave (Playwright `/g/collect`: page_view en efeoncepro.com + think, generate_lead en submit). Atrapa regresiones (Site Kit, drift, consent).
 - **`pnpm growth:forms-tracking-audit`** — forms published+active de la DB vs `TRACKING-PLAN.md`; lista los live sin fila (drift del registro).
+- **Cromo del sitio** — `scripts/gtm/build-landing-dock-events-workspace.ts` (dock) y `scripts/gtm/build-site-nav-events-workspace.ts`
+  (menú; actualiza con PUT+fingerprint un tag existente si cambian sus parámetros): sin `--publish` arman y compilan el
+  workspace (quick_preview); con `--publish` versionan, publican y reescriben ambos snapshots. Verificar con visita
+  simulada en Playwright (banner HubSpot sólo analítica; GA4 envía por service worker → `context.on('request')`;
+  `--user-agent` sin `HeadlessChrome` o GA4 lo filtra como bot): receta en LEARNINGS 2026-10-23.
 
 ### Drift de los dos containers (verificado 2026-10-16)
 
@@ -451,7 +456,8 @@ Exigir los cuatro permisos Google explícitos y GPC sin veto. Hashes sólo en el
 ni mezclar UPD/Meta. GCLID/GBRAID/WBRAID se observan con consentimiento; no se generan ni se disparan.
 El circuito online sigue dependiendo del navegador y no tiene retries backend.
 
-Checkpoint fechado 18/10: Web **6** / Server **10** publicados, Server primero; EC efectiva ON en
+Checkpoint fechado 18/10: Web **6** / Server **10** publicados, Server primero (Web siguió: 7 sign_up Glitch 20/10,
+8 dock, 9–10 menú el 23/10; Server sin cambios); EC efectiva ON en
 **6862539491**, bridge compatible publicado en WordPress/Think y flag Production true con companion
 READY del mismo main liberado. Cobertura ampliada22:57Z:13 formularios comerciales y Discovery
 (reserva) con Ads publicado. Son fuentes del sitio, no tipos de campaña Ads. Ambas acciones

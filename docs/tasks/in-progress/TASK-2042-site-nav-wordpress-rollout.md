@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ con Ohio), agendador nativo en vivo desde la cabecera, el mega y el onepage, documento en revisión 4 y edición gobernada por pnpm public-website:site-nav; AXIS primitives 0.7.13 en el tema desde 04:28 UTC (tono de la isla bajo degradados y con el agendador abierto). Medición en GTM (versión 9) y GA4 desde 2026-10-23. Pendiente: Core Web Vitals, prueba de vuelta a off en producción`
+- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ con Ohio), agendador nativo en vivo desde la cabecera, el mega y el onepage, documento en revisión 4 y edición gobernada por pnpm public-website:site-nav; AXIS primitives 0.7.13 en el tema desde 04:28 UTC (tono de la isla bajo degradados y con el agendador abierto). Medición en GTM (versiones 9 y 10) y GA4 desde 2026-10-23. Pendiente: Core Web Vitals, prueba de vuelta a off en producción`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -151,8 +151,9 @@ Reglas obligatorias:
   superficie WordPress propia del menú, publicados por `scripts/growth/publish-site-nav-meeting-cta.ts`.
 - ~~La piel elegante del diálogo está con alcance de una landing.~~ Cerrado 2026-10-23: piel compartida
   `ohio-child/assets/css/meeting-dialog.css` (`data-eo-meeting-skin="site"`).
-- No existen en GTM ni GA4 los eventos del menú (`gh_site_nav_opened`, `gh_site_nav_line_viewed`,
-  `gh_site_nav_clicked`); el módulo del anfitrión ya los empuja al `dataLayer` en producción.
+- ~~No existen en GTM ni GA4 los eventos del menú (`gh_site_nav_opened`, `gh_site_nav_line_viewed`,
+  `gh_site_nav_clicked`).~~ Cerrado 2026-10-23: GTM versiones 9 y 10 y dimensiones de evento en GA4, verificados en
+  GA4 Tiempo real con una visita simulada.
 - ~~La doctrina del sitio todavía dice conservar el encabezado de Ohio.~~ Cerrado 2026-10-23: `native-navigation.md`
   y `runtime-and-discovery.md` describen el menú global y dejan Ohio sólo para `/blog/` y el respaldo.
 
@@ -439,7 +440,9 @@ Reglas obligatorias:
   agendador emite `greenhouse_cta_*`.
 - Avance 2026-10-23: el empuje al `dataLayer` (`ohio-child/assets/js/site-nav-host.js`) está en producción; la barrida
   vio llegar `gh_site_nav_opened` en todas las páginas y el agendador emite `greenhouse_cta_*` con
-  `cta_location: site_nav`. Falta el alta en GTM y GA4, que se publica con confirmación humana.
+  `cta_location: site_nav`. Alta hecha el mismo día con `scripts/gtm/build-site-nav-events-workspace.ts`: GTM versión 9
+  (tres tags, tres triggers y los DLVs `panel` y `line`) y versión 10 (el clic suma `target_label` y `target_url`),
+  más las dimensiones de evento en GA4; los tres eventos llegaron a GA4 Tiempo real en una visita simulada.
 
 ### Slice 5 — Piloto
 

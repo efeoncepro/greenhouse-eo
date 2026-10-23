@@ -215,8 +215,8 @@ F7 queda como follow-up de la épica.
 
 Estado al 2026-10-23: F1 y F2 completas (`TASK-2040`, AXIS v0.7.7; el sitio usa primitives 0.7.13). F3 y F4 en
 producción salvo la pantalla del admin: hoy el menú se edita con `pnpm public-website:site-nav`, sobre el mismo servicio
-de guardado (`TASK-2041`). F5 se hizo sin piloto de una página y F6 está en producción; faltan el alta GTM/GA4, Core Web
-Vitals y probar la vuelta a `off` en producción (`TASK-2042`). F7 sigue sin pedirse.
+de guardado (`TASK-2041`). F5 se hizo sin piloto de una página y F6 está en producción, con la medición en GTM y GA4 desde el mismo día;
+faltan Core Web Vitals y probar la vuelta a `off` en producción (`TASK-2042`). F7 sigue sin pedirse.
 
 ## Consecuencias
 

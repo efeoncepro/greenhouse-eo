@@ -98,6 +98,11 @@ await page.click('#submit')
 await hit  // throws if the tag never sent
 ```
 
+En `efeoncepro.com`, después del primer hit GA4 envía por un service worker del servidor de tagging: escuchar con
+`context.on('request')` (no `page.on`) y lanzar el navegador con `args: ['--user-agent=…']`, porque GA4 filtra como
+bot lo que el service worker envía con `HeadlessChrome`. Receta completa con el banner de HubSpot:
+[LEARNINGS 2026-10-23](LEARNINGS.md).
+
 ### 3.3 The GA4 realtime / DebugView loop
 Enter GTM Preview (enables `debug_mode`) → do the action → watch **DebugView** (event name, all `ep.*` params, no red flags) → cross-check **Realtime** (5–10 min lag; DebugView is the fast loop) → only then version + publish. Greenhouse fast loop: `scripts/ga4/realtime-events.ts 486264460`.
 

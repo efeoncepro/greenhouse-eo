@@ -1,5 +1,18 @@
 # Handoff
 
+## 2026-10-23 — Medición del menú global y del dock de las landings (TASK-2042/2043)
+
+GTM web `GTM-NGHPGRLZ` publicado en la versión 10: la 8 suma `gh_landing_dock_clicked`, la 9 los
+`gh_site_nav_opened|line_viewed|clicked` y la 10 `target_label` y `target_url` en el clic del menú (hosts en runtime
+`3801bc4` y `a27c37e`, desplegados). Scripts `scripts/gtm/build-landing-dock-events-workspace.ts` y
+`build-site-nav-events-workspace.ts` (`--publish` versiona, publica y reescribe los snapshots). GA4 `486264460`: seis
+dimensiones de evento (`target_type`, `target`, `target_label`, `target_url`, `panel`, `line`; 15/50). Servidor
+`GTM-K2X4ZTTK` sin cambios. Ninguno es key event. Verificado en GA4 Tiempo real con una visita simulada que acepta
+sólo analítica; trampas: el service worker (`context.on('request')`) y `HeadlessChrome` (lanzar con `--user-agent`).
+**Sin push:** `a35bc5a9f`, `807180a8b`, `9c24746a5` y `dc18cf45d` en `develop`.
+[LEARNINGS](docs/reference/measurement-gtm-ga4/LEARNINGS.md) ·
+[TRACKING-PLAN](docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md#ctas).
+
 ## 2026-10-23 — Navegación global (EPIC-055): en producción en todo el sitio (TASK-2042)
 
 Menú nuevo encendido en todo `efeoncepro.com` desde las 00:09 UTC por decisión del operador, sin piloto; `/blog/`
@@ -11,8 +24,7 @@ operador). La sesión «Rediseño de Menú» sigue de contralora de fidelidad.
 **Sin push:** los commits de Greenhouse `develop` y del runtime `main` de TASK-2041/2042 esperan la autorización del
 operador. AXIS está publicado hasta v0.7.14.
 
-**Pendiente:** alta GTM/GA4 de `gh_site_nav_*` (confirmación humana antes de publicar el contenedor), Core Web Vitals
-contra la cabecera anterior, prueba de vuelta a `off` en producción y el admin de TASK-2041 (dirección B).
+**Pendiente:** Core Web Vitals contra la cabecera anterior (la medición GTM/GA4 quedó hecha: entrada de arriba), prueba de vuelta a `off` en producción y el admin de TASK-2041 (dirección B).
 
 **Trampa al verificar en vivo:** con el panel del navegador oculto la página corre en segundo plano (sin
 `requestAnimationFrame` ni eventos de scroll): el tono de la isla no se actualiza y el bloqueo de scroll del agendador
@@ -29,8 +41,8 @@ fidelidad «Rediseño de Menú». Vuelta atrás por landing: `pnpm public-websit
 Decisiones del operador: presencia de hoy y un solo botón en teléfono para Influencers. Lecciones: la CI de AXIS
 corre el carril de agentes para módulos nuevos; `release:packages` etiqueta el HEAD del checkout compartido (v0.7.13
 quedó en un commit de otra sesión: nadie commitea en AXIS `main` mientras espera); la línea base en vivo debe incluir
-el plugin. Follow-ups: retirar el código de los docks viejos, puente de agendador compartido, GTM de
-`gh_landing_dock_clicked`. [Task](docs/tasks/complete/TASK-2043-landing-dock-glass-primitive.md) ·
+el plugin. Follow-ups: retirar el código de los docks viejos (no antes del 2026-11-06) y puente de agendador
+compartido; `gh_landing_dock_clicked` ya está en GTM y GA4. [Task](docs/tasks/complete/TASK-2043-landing-dock-glass-primitive.md) ·
 [manual](docs/manual-de-uso/public-site/operar-dock-de-landings.md).
 
 ## 2026-10-22 — Fundación Luz: contacto y dos acercamientos verificados
@@ -211,12 +223,3 @@ Automatización del radar actualizada y leída de vuelta: control adjudicación/
 **RECTIFICACIÓN:** Esenttia5600218590 ya adjudicadaDACARTEC(firma10Oct/inicio15Oct). Julio cerróDeal10:32; sinsync. No pendiente de admisión/POI; llamada nativa anulada. Mala calificación del agente. [Cierre corregido](docs/commercial/prospecting-agent/runs/2026-10-18-1036-esenttia-adjudicada-rectificacion.md).
 
 Julio pidió aprender el flujo; [procedimiento](docs/manual-de-uso/hubspot/convertir-negocio-compartido.md) y skills actualizados. Esenttia66218288550 convertido10:08GMT-3 con liderazgoPartner, fecha local31/12/2026 y declaración confirmadas. TarjetaHubSpot muestra30/12: agente debe conciliar, sin falsear cierre local. Admisión/POI pendientes; no repetir consulta ni contactar automáticamente. [Evidencia](docs/commercial/prospecting-agent/runs/2026-10-18-1002-esenttia-shared-deal.md).
-
-## 2026-10-18 — Footer público compatible sin cambio visual
-
-Publicado en WordPress el ajuste mínimo de `widget_block[34]`: el bootstrap ya localiza
-`data-eo-footer-partners="v2"` y asciende a `#colophon`, sin `:has()` en `querySelector`. Snapshot/rollback
-independiente `eo_footer_compat_20261018`; cache WordPress/Kinsta purgada y readback PASS. Home y
-`/servicios-contratar-hubspot/` verificadas a 1440/390: layout intacto, cero overflow, nueve partners,
-un Careers, newsletter presente y cero errores de consola. La alerta de cPanel puede permanecer visible hasta
-su siguiente corrida; no silenciarla manualmente. [Evidencia](docs/audits/public-site/2026-10-14-footer-composition-v2.md#compatibilidad-del-bootstrap-2026-10-18).

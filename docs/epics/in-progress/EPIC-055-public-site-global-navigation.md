@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Menú nuevo en producción en todo efeoncepro.com desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ conserva Ohio por TASK-1802), con el agendador nativo y AXIS primitives 0.7.13 en el tema. TASK-2040 y TASK-2043 completas. TASK-2041 en curso: plugin, REST, fotos y documento en vivo (revisión 4), edición por pnpm public-website:site-nav; falta la pantalla del admin. TASK-2042 en curso: falta el alta GTM/GA4, Core Web Vitals y probar la vuelta a off en producción`
+- Status real: `Menú nuevo en producción en todo efeoncepro.com desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ conserva Ohio por TASK-1802), con el agendador nativo y AXIS primitives 0.7.13 en el tema. TASK-2040 y TASK-2043 completas. TASK-2041 en curso: plugin, REST, fotos y documento en vivo (revisión 4), edición por pnpm public-website:site-nav; falta la pantalla del admin. TASK-2042 en curso: medición en GTM (versiones 9 y 10) y GA4 hecha; faltan Core Web Vitals y probar la vuelta a off en producción`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Operador (alcance, piloto y go a todo el sitio) · Sitio público / WordPress (plugin y adaptador) · AXIS (contrato y primitive)`
@@ -106,7 +106,7 @@ esquema del contrato. `TASK-2042` depende de ambas.
     operador); `/blog/` (#18456) conserva Ohio porque es de `TASK-1802`. Barrida de 52 páginas publicadas y 3 posts de
     Glitch a 1440 y 390 sin fallas del menú; sesión de fidelidad aprobada en vivo. Agendador nativo en la cabecera, el
     mega y el onepage, con la piel `meeting-dialog.css`. AXIS primitives 0.7.13 copiado en `ohio-child`. Doctrina,
-    documentación funcional y manual actualizados. Medición en GTM (versión 9) y GA4 desde el mismo día. Faltan Core Web Vitals frente
+    documentación funcional y manual actualizados. Medición en GTM (versiones 9 y 10) y GA4 desde el mismo día. Faltan Core Web Vitals frente
     al encabezado anterior y probar la vuelta a `off` en producción.
 
 - `TASK-2043` — **Dock inferior de las landings** (agregada 2026-10-23).

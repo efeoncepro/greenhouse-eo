@@ -78,7 +78,9 @@ Rollout state and launcher details: `greenhouse-growth-ctas` §Estado de rollout
 Second consumer, same day: the landings' bottom dock (`efeonce.landing-dock`, TASK-2043), placement
 `cta-location="landing_dock"` through a hidden `<greenhouse-cta>` the dock's primary button activates. Redes Sociales
 and Home open this scheduler through the menu's CTA; Influencers, Inbound and HubSpot keep their own meeting CTA. The
-scheduler is only ever the dock's primary action. Operation: `efeonce-public-site-wordpress` →
+scheduler is only ever the dock's primary action. The entry point is measured by the dock's `gh_landing_dock_clicked`
+(`target_type: cta`, `target: primary`); the scheduler itself keeps `greenhouse_cta_*` with `cta_location: landing_dock`.
+Neither click is a key event: the conversion stays `generate_lead` on a confirmed booking. Operation: `efeonce-public-site-wordpress` →
 `references/global-site-navigation.md` §Landing dock.
 
 ## Inline host: `/agenda/` landing (2026-10-20)

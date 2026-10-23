@@ -68,8 +68,8 @@ sticky del tema y el dock de landings, y conserva su tono mientras el agendador 
   la clave nunca entra al repo. Lleva `cta_location: site_nav` y el punto de entrada viaja en `gh_site_nav_clicked`.
   La piel del diálogo es `ohio-child/assets/css/meeting-dialog.css` (`data-eo-meeting-skin="site"`, peso `:root`).
 - **Medición:** `gh_site_nav_opened`, `gh_site_nav_line_viewed` y `gh_site_nav_clicked` al `dataLayer` (desde
-  `site_nav_open`, `site_nav_line_view` y `site_nav_click` del primitive). Su alta en GTM y GA4 está pendiente y pasa
-  por confirmación humana antes de publicar el contenedor. `site_nav_cta` no se empuja: el clic del CTA ya viaja en `gh_site_nav_clicked` y el agendador emite `greenhouse_cta_*`.
+  `site_nav_open`, `site_nav_line_view` y `site_nav_click` del primitive). Alta en GTM (versión 9; la
+  versión 10 suma `target_label` y `target_url` al clic) y GA4 el 2026-10-23. `site_nav_cta` no se empuja: el clic del CTA ya viaja en `gh_site_nav_clicked` y el agendador emite `greenhouse_cta_*`.
 - **Doctrina:** se actualizan `references/native-navigation.md` y `runtime-and-discovery.md` de la skill
   `efeonce-public-site-wordpress` (`.claude` y `.codex`).
 

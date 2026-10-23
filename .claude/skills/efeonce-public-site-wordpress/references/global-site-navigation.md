@@ -268,16 +268,22 @@ reuse the island glass of `axisSiteNav`; schema `landing-dock.v1`; `landingDockH
 click travels as `gh_site_nav_clicked` with `target_type: cta`, `target: menu_header|menu_mega|menu_onepage`; the
 scheduler emits `greenhouse_cta_*`; `site_nav_cta` is not pushed. The host adds `target_label` (entry name or the
 accessible name of the logo/social icons, never description or eyebrow) and `target_url` (path + hash, full address if
-external, no query) to every `gh_site_nav_clicked` through a capture-phase click listener. Registered in GTM (version 9,
+external, no query) to every `gh_site_nav_clicked` through a capture-phase click listener (runtime `a27c37e`, theme
+`ohio-child`; all 98 menu entries have a name). Registered in GTM (version 9,
 labels and URLs since version 10,
-`scripts/gtm/build-site-nav-events-workspace.ts`) and GA4 (dimensions `panel`, `line`, `target_type`, `target`) on
-2026-10-23; changes go through `greenhouse-gtm-ga4-operator`.
+`scripts/gtm/build-site-nav-events-workspace.ts`) and GA4 (dimensions `panel`, `line`, `target_type`, `target`,
+`target_label`, `target_url`) on 2026-10-23; changes go through `greenhouse-gtm-ga4-operator`.
 
 Dock: `landing-dock-host.js` pushes `gh_landing_dock_clicked` with `target_type` (cta|link), `target`
 (primary|secondary), `target_label` (full label, never the phone's short one) and `target_url` (path + hash, no query),
-read through a capture-phase click listener that runs before the dock's own handler. Registered in GTM (version 8,
+read through a capture-phase click listener that runs before the dock's own handler (the AXIS primitive only emits
+`target_type` and `target`; runtime `3801bc4`). Registered in GTM (version 8,
 `scripts/gtm/build-landing-dock-events-workspace.ts`) and GA4 (four event dimensions) on 2026-10-23. Its
 meeting CTA uses `cta-location="landing_dock"`, which replaced `inbound_mobile_dock` and `hubspot_mobile_dock`.
+
+Neither the menu nor the dock emits a key event: the conversion stays `generate_lead` (form or booking). The page of the
+click travels with every hit (`page_location`); no PII. Verification recipe (simulated visit: HubSpot banner analytics
+only, service worker requests, `--user-agent`): `docs/reference/measurement-gtm-ga4/LEARNINGS.md` (2026-10-23).
 
 ## Traps
 
@@ -297,5 +303,7 @@ meeting CTA uses `cta-location="landing_dock"`, which replaced `inbound_mobile_d
 
 Core Web Vitals against the previous header; production
 check of switching to `off`; TASK-2041 admin (direction B, live preview + tree); retire the seven legacy docks' code
-(still in each landing, stripped from the HTML by the plugin); one shared scheduler bridge for `site-nav-host.js` and
-`landing-dock-host.js`.
+(still in each landing, stripped from the HTML by the plugin; not before 2026-11-06, `off` is the rollback until then);
+the CTA renderer (`src/growth-cta-renderer/`) should expose opening the scheduler with skin and return focus, so
+`site-nav-host.js` and `landing-dock-host.js` stop adopting the dialog through the DOM (its own task; a module shared
+between theme and plugin was discarded because it would only move the copy).

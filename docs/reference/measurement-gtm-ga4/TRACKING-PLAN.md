@@ -8,6 +8,9 @@ Recepción/atribución real Ads aún sin verificar; no fabricar envíos para cam
 LinkedIn permanece **planned / no implementado**, no tagged: [discovery y fuentes](11-linkedin-insight-tag-conversions-api.md).
 Sin Partner ID/cuenta/reglas verificados ni política LinkedIn; no hereda las13 Forms/Discovery de Google.
 
+Delta 23/10: web `GTM-NGHPGRLZ` publicado en la versión 10 (8 = dock de las landings, 9 y 10 = menú global; filas
+`site-nav-discovery-meeting` y `landing_dock`); Server sin cambios en su versión 10.
+
 Delta14/10: [corrección de contexto Lead](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md):
 Server9 estricto, IP/UA original, atribución consentida y external_id SHA256; operación de
 políticas por API/panel/CLI. [Release PR255/main9690efad](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md)

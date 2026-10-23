@@ -129,7 +129,7 @@ POST /v1beta/properties/486264460/accessBindings
 { "user": "greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com",
   "roles": ["predefinedRoles/editor"] }
 ```
-> Efeonce's SA is currently **Viewer**. To register custom dimensions / key events via the Admin API it needs **`predefinedRoles/editor`** on the property — upgrade in GA4 (Property Access Management) or via `accessBindings.patch` from an admin identity. Batch variants: `batchCreate/batchGet/batchUpdate/batchDelete`.
+> Verified 2026-10-23: `greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com`, impersonated with scope `analytics.edit`, created and patched custom dimensions on `486264460` (so it holds at least editor there). Historical note: an earlier Efeonce SA was **Viewer**; to register custom dimensions / key events via the Admin API an identity needs **`predefinedRoles/editor`** on the property — upgrade in GA4 (Property Access Management) or via `accessBindings.patch` from an admin identity. Batch variants: `batchCreate/batchGet/batchUpdate/batchDelete`.
 
 ---
 
@@ -153,6 +153,11 @@ Prefer recommended names over invented ones. Attach `value`+`currency` so lead v
 | `cta_location` | EVENT | Which CTA drove it (`hero`, `sticky_footer`…) |
 
 Fire as event params on `generate_lead`. Register only what you'll report on (budget 50). `parameterName` ≤40 chars, `snake_case`, identical to what the tag emits.
+
+**Registradas en `486264460` el 2026-10-23 (menú global y dock de las landings):** `target_type` («Tipo de destino del
+clic»), `target` («Destino del clic»), `target_label` («Texto del clic»), `target_url` («URL de destino del clic»),
+`panel` («Panel del menú») y `line` («Línea de servicio vista»), todas de evento. Total de dimensiones de evento: 15/50.
+Los informes estándar pueden tardar hasta 24 h; Tiempo real las muestra de inmediato.
 
 ### 6.3 Property config checklist
 | Setting | Recommendation |

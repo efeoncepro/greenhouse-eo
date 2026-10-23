@@ -374,6 +374,8 @@ skipping fixed/sticky host chrome and invisible elements; on phone the buttons s
 (`flex: 1 1 auto`), not by halves.
 
 Consumer: WordPress plugin `eo-landing-dock` (PHP port byte for byte, pinned copy `assets/vendor/axis/landing-dock/0.7.14/`);
+the primitive's click only carries `target_type` and `target`; the site's `landing-dock-host.js` pushes
+`gh_landing_dock_clicked` and adds `target_label`/`target_url` on top (site measurement, not a primitive change);
 operation in `efeonce-public-site-wordpress` → `references/global-site-navigation.md` §Landing dock. AXIS doc:
 `docs/quality/landing-dock.md`.
 

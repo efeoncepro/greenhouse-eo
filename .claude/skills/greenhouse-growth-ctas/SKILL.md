@@ -172,7 +172,9 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   opción del menú en cada render. Influencers, Inbound y HubSpot conservan su CTA propio (`influencer-`, `inbound-`,
   `hubspot-discovery-meeting`); `pnpm public-website:landing-dock on` copia la key desde el HTML vivo al meta del dock,
   así que **rotar la key de esos CTA exige repetir `on`** después de republicar la landing. `landing_dock` reemplaza
-  `inbound_mobile_dock` y `hubspot_mobile_dock`. Operación: skill `efeonce-public-site-wordpress` →
+  `inbound_mobile_dock` y `hubspot_mobile_dock`. El clic del dock se mide aparte con `gh_landing_dock_clicked`
+  (GTM web versión 8; el del menú, `gh_site_nav_clicked`, versiones 9–10); el agendador sigue midiendo
+  `greenhouse_cta_*` con `cta_location: landing_dock | site_nav`. Operación: skill `efeonce-public-site-wordpress` →
   `references/global-site-navigation.md` §Landing dock.
 
 - **2026-10-23: CTA `site-nav-discovery-meeting` publicado** (menú global de efeoncepro.com, EPIC-055/TASK-2042).

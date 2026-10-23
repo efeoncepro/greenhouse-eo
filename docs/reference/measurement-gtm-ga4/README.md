@@ -12,6 +12,12 @@ Primera recepción comercial real, matching y atribución siguen sin verificar; 
 ni reservas ficticias. Los cortes anteriores se conservan como historia; para operar leer el runtime10
 y los manuales vigentes. No reejecutar los planes privados históricos de publicación/corrección.
 
+Delta 23/10/2026: el contenedor web `GTM-NGHPGRLZ` está publicado en la **versión 10** (la 7 era «Blog Glitch
+subscription sign_up 2026-10-20»; la 8 suma `gh_landing_dock_clicked`, la 9 los `gh_site_nav_*` del menú global y la
+10 `target_label` y `target_url` en el clic del menú). El servidor `GTM-K2X4ZTTK` sigue en su versión 10 del
+2026-10-18: la numeración de los dos contenedores es independiente. GA4 suma seis dimensiones de evento (15/50).
+Ninguno de estos eventos es key event. [Registro](TRACKING-PLAN.md#ctas) y [aprendizajes](LEARNINGS.md).
+
 
 > **Referencia canónica de medición.** Una sola copia, leída por Claude, Codex, humanos y Nexa. Las skills (`growth-marketing-cro`, `greenhouse-growth-forms`, `digital-marketing`, `efeonce-public-site-wordpress`) apuntan aquí — no duplican.
 > Documentación oficial de Google Tag Manager + GA4 + best practice de taxonomía de eventos, más la house style de Greenhouse aterrizada al runtime real.
@@ -59,6 +65,10 @@ Estado 2026-10-16 (commits `e791942ea` y `5d28dda76` en `develop`, sin push al c
   `scripts/gtm/snapshot-lib.ts` + `scripts/gtm/__tests__/snapshot-lib.test.ts`; entrypoint
   `scripts/gtm/snapshot.ts`.
 - `scripts/gtm/build-cta-events-workspace.ts --publish` reescribe ambos snapshots tras publicar.
+- `scripts/gtm/build-landing-dock-events-workspace.ts` (dock de las landings, versión 8) y
+  `scripts/gtm/build-site-nav-events-workspace.ts` (menú global, versiones 9 y 10) siguen el mismo patrón: sin
+  `--publish` arman y compilan el workspace (quick_preview); con `--publish` versionan, publican y reescriben ambos
+  snapshots. El del menú actualiza un tag existente (PUT con fingerprint) cuando cambian sus parámetros.
 - **Chequeo diario**: `.github/workflows/gtm-drift.yml` (12:00 UTC + `workflow_dispatch`) corre
   `--check` y **falla si hay drift**; la falla es la alerta. Clasificación tooling, no
   async-critical. Se autentica por WIF directamente como `greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com`

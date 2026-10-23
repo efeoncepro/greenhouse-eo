@@ -103,8 +103,8 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   [operación](../manual-de-uso/public-site/operar-navegacion-global.md) y
   [PDR-027](decisions/PDR-027-navegacion-global-del-sitio-portable.md); ejecución en `EPIC-055`. El dock inferior de las
   siete landings es aparte: [funcionamiento](../documentation/public-site/dock-de-landings.md) y
-  [operación](../manual-de-uso/public-site/operar-dock-de-landings.md). Faltan el alta GTM/GA4 de `gh_site_nav_*`,
-  Core Web Vitals y probar la vuelta a `off` en producción.
+  [operación](../manual-de-uso/public-site/operar-dock-de-landings.md). El menú y el dock se miden en GTM (versión
+  10) y GA4 desde el 2026-10-23; faltan Core Web Vitals y probar la vuelta a `off` en producción.
 
 - **[HubSpot vigente — Elementor](../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md)** — página
   `244079` en `/servicios-contratar-hubspot/`, once widgets nativos y Growth Forms. Diseño aprobado con
