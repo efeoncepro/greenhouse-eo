@@ -449,6 +449,25 @@ Reglas obligatorias:
 > vidrio oscuro y el logo blanco sobre fondo claro (ilegible en `/servicios/posicionamiento-seo/`); ahora arrancan con
 > la isla clara fija, como dice el flujo (runtime 05cd089). Una medición de luminosidad del hero en todas las páginas
 > `top` coincidió exacto con la lista del inventario.
+>
+> Revisión en vivo de la sesión de fidelidad (2026-10-23): medidas, tipografía, íconos, isla y estados coinciden con
+> el Lab y el canvas en 1440, 1280, 1200, 1024, 834 y 390. Decisiones y hallazgos que quedan escritos:
+> - **Tono de la isla: luminancia, sin marcar secciones.** Ninguna plantilla tiene `data-site-nav-tone`; el primitive
+>   decide el tono por la luminancia de lo que hay debajo, y salió correcto en las páginas muestreadas. Se queda así:
+>   `data-site-nav-tone` es la corrección para una sección donde la luminancia se equivoque, no un requisito por
+>   plantilla. La barrida sólo miró el primer pliegue; el tono al hacer scroll se verificó en las tres páginas de la
+>   revisión.
+> - **«Estás aquí» marca 5 de 15 servicios.** `context.matchers` cubre agencia-creativa, aeo-2, hubspot, inbound y
+>   loop; los otros 10 servicios con página en efeoncepro.com no se marcan. Los 15 apuntan a URLs distintas (sin
+>   ambigüedad). Decisión pendiente del operador: completar los matchers en el documento (cambio de datos) o que el
+>   contrato derive la marca del `href` del servicio cuando no hay matcher (cambio de AXIS contracts, del port PHP y
+>   del plugin; comparar el host exacto, porque `think.efeoncepro.com` no es el sitio).
+> - **Elementos flotantes de Ohio** (barra lateral con el selector Light/Dark, z 4, y botón de búsqueda, z 50): quedan
+>   bajo el velo (1000) y el panel (1002), atenuados como el resto de la página; no es un problema de apilamiento.
+>   Quitarlos con el menú nuevo es una decisión de producto aparte.
+> - **Imagen de relevo de la foto**: el espacio sin `src` tiene opacidad 0 en Chrome y WebKit; no se ve ni muestra
+>   ícono roto.
+> - **Enlaces del menú**: los 52 responden 200 (LinkedIn devuelve 999 a robots).
 
 - Con el go del operador, `on`.
 - Captura de Home, una landing con «Estás aquí», un post, Glitch y 404.
