@@ -164,6 +164,25 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
 
 ## Estado de rollout (actualizar al cambiar)
 
+- **2026-10-23: CTA `site-nav-discovery-meeting` publicado** (menú global de efeoncepro.com, EPIC-055/TASK-2042).
+  `open_meeting_scheduler` → meeting surface `fhsf-efeonce-lead-gen-web`, scheduler `discovery`, rutas `/**`; surface
+  WordPress `csur-eb834d53-fd99-4f6b-9615-979e329e7d37` que sólo permite ese CTA, orígenes efeoncepro.com y www;
+  `cta_location: site_nav`. Lo publica `scripts/growth/publish-site-nav-meeting-cta.ts`; la key vive en Greenhouse
+  `.auth/site-nav-meeting-cta-surface.json` (0600, gitignored). **Re-correr el publisher ROTA la key**: en la misma
+  sesión hay que actualizar la opción de WordPress con `set-site-nav-scheduler.php` (nunca imprime la key), o el CTA
+  cae a `/agenda/`. Nunca escribir la key en docs, logs ni chat.
+  - **Lanzador oculto:** el tema imprime un único `<greenhouse-cta>` oculto por página en `wp_footer` (sólo si la opción
+    `eo_site_nav_scheduler` es válida); los botones del menú (cabecera, mega, onepage) lo activan. El renderer carga en
+    idle o cuando el visitante va hacia el CTA (una sola copia en landings que ya lo cargan); si no está listo, el clic
+    espera hasta 2,5 s; un lanzador vacío (`data-ghc-state="empty"`: pausado, origen incorrecto) deja ir el link a
+    `/agenda/` de inmediato. El foco vuelve al control que lo abrió, o a uno visible.
+  - **Piel del diálogo con scope:** el diálogo se marca `data-eo-meeting-skin="site"` y viste
+    `ohio-child/assets/css/meeting-dialog.css` (marco aprobado para Inbound el 2026-10-18 con la paleta de `/agenda/`);
+    peso `:root` para quedar sobre la piel de una landing; el diálogo del CTA propio de una landing conserva su piel.
+  - Verificado live: cabecera, mega, onepage móvil (pantalla completa), Escape/cierre, `gh_site_nav_clicked` +
+    `greenhouse_cta_clicked`/`greenhouse_cta_action_started` con `cta_location: site_nav`, sin errores de página.
+    Operación del menú: skill `efeonce-public-site-wordpress` → `references/global-site-navigation.md`.
+
 - **2026-10-18: CTA `inbound-discovery-meeting` publicado** (landing `/agencia-inbound-marketing/`, surface propia).
   Primer consumidor del lanzador de reunión genérico de la base source-led (`<gh-meeting-cta location="…">` →
   `<greenhouse-cta appearance="bare" cta-location="…">`). Un mismo CTA se renderiza desde **tres placements** de la

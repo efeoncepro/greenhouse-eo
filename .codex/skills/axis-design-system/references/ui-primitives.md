@@ -277,30 +277,58 @@ Consumers (verified 2026-10-18):
 AXIS owns the mention; a landing or product never forks its CSS. The mention is a mechanism, not a template for
 the page that first used it.
 
-## Site navigation (`efeonce.site-nav`) — PLANNED, not built (TASK-2040)
+## Site navigation (`efeonce.site-nav`) — published, live on efeoncepro.com since 2026-10-23
 
-**Status as of 2026-10-18: it does not exist.** AXIS has no navigation contract, schema, primitive, tokens or Lab page
-today. What follows is the approved design and the plan in [TASK-2040](../../../../docs/tasks/to-do/TASK-2040-axis-site-nav-contract-primitive.md)
-(program EPIC-055, decision PDR-027 Accepted on 2026-10-18). Never cite exports, versions or the Lab route as available
-until there is a published release and a package readback.
+Global site menu (header, mega menus, onepage, CTA slot) written once in AXIS and consumed by WordPress. Program
+EPIC-055 (TASK-2040 AXIS, TASK-2042 rollout); decision PDR-027. Live on every page of efeoncepro.com except `/blog/`.
 
-What it will be:
+**Current versions:** `@efeoncepro/axis-ui-contracts` **0.7.9** + `@efeoncepro/axis-ui-primitives` **0.7.10**
+(tags `v0.7.8`, `v0.7.9`, `v0.7.10`; the `v0.7.2` tag was already taken, so 0.7.8 is the first site-nav tag). Pin
+0.7.10 or later.
 
-| Layer (planned) | Responsibility |
+| Layer | Owns |
 | --- | --- |
-| Contract `efeonce.site-nav` + schema `site-nav.v1` (JSON Schema) | Structure of the menu document, states, ARIA roles, emitted events (`site_nav_open`, `site_nav_line_view`, `site_nav_click`) and consumed tokens. Holds no content and knows nothing about WordPress. |
-| Tokens | Single glass recipe (capsule, «Agenda tu diagnóstico» button and hamburger), header height 96 and the fixed-state glass island (61 px, 12 px from the edge, dark and light tones), logo 164/128 and menu timings in `axisMotion`. Today they are literals in the canvas. |
-| Primitive in `@efeoncepro/axis-ui-primitives` | Server-side HTML render (pure function: links ship in the HTML), `site-nav.css` with the glass recipe from tokens, and a lightweight framework-free `site-nav.js` as progressive enhancement (hover intent, keyboard, focus, scroll, onepage, reduced motion). It fetches nothing and does not know the scheduler: it only exposes the CTA slot. |
-| Lab | `/patterns/efeonce.site-nav/` with a sample document and «Contexto» / «Cabecera» controls. |
+| Contract `efeonce.site-nav` (`packages/contracts/src/site-nav.ts`) | Document schema, validation, context matchers, «Estás aquí» and current-page derivation; export `siteNavLocalPath(site, href)` (0.7.9) |
+| Primitives (`packages/primitives/src/site-nav*.ts`) | `siteNavHtml` (server-side render, links ship in the HTML), `siteNavLinks`, `siteNavCss`, browser `createSiteNav` / `enhanceSiteNav` (framework-free progressive enhancement); it fetches nothing and only exposes the CTA slot |
+| Tokens | `axisSiteNav` (includes `motion.onepage.radiusPx`, see 0.7.10) |
+| Lab | `/patterns/efeonce.site-nav/` |
 
-Why it lives in AXIS and not in the theme: it is written once and consumed by WordPress (adapter in `ohio-child`,
-TASK-2042) and, when requested, by Think through a thin wrapper. The public site does not allow React, so the render is
-server-side and the JS uses no framework. The precedent is `efeonce.mention` (above): born on a landing, promoted to
-AXIS, and each site pins the version and consumes it without forking its CSS.
+Releases:
+
+- **0.7.8:** desktop island 61 px + border (63) with loose items and a 45 px scheduler button; host offset
+  `--axis-site-nav-offset`; host isolation (see the host contract).
+- **0.7.9 (contracts + primitives):** «Estás aquí» is derived from the service's own `href` when no context matcher
+  matches — root-relative, or https on `doc.site` or `www.` + site. Another host (e.g. think.efeoncepro.com) never
+  marks a page of the site; two services sharing a URL mark nothing; a matcher wins and stays only for exceptions.
+  `aria-current="page"` follows the same host rule, and the page path may come absolute. New export `siteNavLocalPath`.
+- **0.7.10 (primitives):** the onepage circle grows to the farthest corner of the window, computed in JS on open and
+  resize (`--asn-op-r`, measured in the onepage box so the host offset keeps the centre on the hamburger); `150vmax`
+  without JS. It fixed an uncovered corner past ~1500 px wide. The token `axisSiteNav.motion.onepage.radiusPx` (1720)
+  stays as the 1440-board measure and is **no longer the radius**; never use it to size the circle.
+
+**Host contract** (AXIS `PRIMITIVES.md`):
+
+- The host **never styles inside `.axis-site-nav`**. Its only inputs are `--axis-site-nav-offset` and
+  `--axis-site-nav-z`. Any visual fix goes to AXIS and reaches the host by a version bump.
+- The host loads the fonts: Bricolage Grotesque opsz/wght 200–800 (the menu does not use the width axis) and Poppins
+  300–700.
+- Isolation: every rule carries `:not(#axis-site-nav-isolation)` (id weight) and the root restores browser defaults for
+  inherited type, links and hover, buttons, lists, `li` margins, image `vertical-align`, `overflow-wrap`/`word-break`.
+  A browser test runs it against a hostile host sheet copied from Ohio.
+
+Consumers (verified 2026-10-23):
+
+- **WordPress** (`efeonce-public-site-runtime`): plugin `eo-site-nav` renders with `EOSN_Render`, byte-identical to
+  `siteNavHtml` (17 parity cases at AXIS 0.7.9) plus a validator (35 parity cases); theme `ohio-child` pins the files in
+  `assets/vendor/axis/site-nav/0.7.10/` (`VERSION.json` with sha256, copied from the published package by
+  `scripts/vendor-axis-site-nav.mjs`) and the constant `EO_SITE_NAV_AXIS`. Bump procedure and operation:
+  `efeonce-public-site-wordpress` → `references/global-site-navigation.md`.
+
+Known, not changed: at 1280 five service descriptions end in an ellipsis in the Lab and live alike (contenidos, redes
+sociales, medios, performance, inbound) — a design question for the fidelity session.
 
 Do not confuse it with `efeonce.surface-composition`: its `nav` field is **descriptive** (a header drawn inside a
-composed hero), not a running menu. It is neither a base nor a substitute for site-nav.
+composed hero), not a running menu.
 
-Visual source: canvas «Mega menú efeoncepro.com», version 67. Behavior, glass recipe and data model:
-[`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`](../../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md)
-(proposed, not implemented). Brand criteria: [graphic-line applications](../../efeonce-graphic-line/references/applications.md#a15-encabezado-y-navegación-del-sitio-web-diseño-aprobado-2026-10-18-implementación-planificada).
+Architecture: [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`](../../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md).
+Brand criteria: [graphic-line applications](../../efeonce-graphic-line/references/applications.md#a15-encabezado-y-navegación-del-sitio-web-diseño-aprobado-2026-10-18-implementación-planificada).

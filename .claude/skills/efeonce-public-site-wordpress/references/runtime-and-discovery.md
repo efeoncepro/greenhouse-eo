@@ -8,7 +8,7 @@ Use this reference for public-site inventory, bridge inspection, runtime repo bi
 - Hosting: Kinsta.
 - WordPress path observed via SSH/WP-CLI: `/www/efeoncegroup_752/public`.
 - Active theme: `ohio-child`; parent theme: `ohio`.
-- Important plugins: Elementor/Elementor Pro, Yoast SEO/Premium, HubSpot/Leadin, `eo-headless-content`, `eo-vibe-coding-api`, `greenhouse-wp-bridge`, `eo-elementor-widgets`.
+- Important plugins: Elementor/Elementor Pro, Yoast SEO/Premium, HubSpot/Leadin, `eo-headless-content`, `eo-vibe-coding-api`, `greenhouse-wp-bridge`, `eo-elementor-widgets`, `eo-site-nav` («EO Navegación», global menu document; see `global-site-navigation.md`).
 - REST advertises `wp/v2`, `wp-abilities/v1`, and application passwords.
 - Authenticated discovery resolved the integration account as `Greenhouse INTEGRATION` (`greenhouse-integration`, display `Greenhouse`); observed role was `administrator`, so reduce privileges before production bridge rollout.
 - Authenticated WP Abilities discovery returned 33 abilities.
@@ -166,11 +166,10 @@ Canonical evidence:
 Use this when the user asks how to add a URL to the public-site menu. Do not
 mutate the menu during discovery.
 
-> Planned, nothing in runtime as of 2026-10-18: [EPIC-055](../../../../docs/epics/in-progress/EPIC-055-public-site-global-navigation.md)
-> and [PDR-027](../../../../docs/public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md) (Accepted 2026-10-18)
-> replace this Ohio header (term 61 and its mega menu) with the portable `efeonce.site-nav` navigation,
-> behind a switch and a pilot (TASK-2042). Until that reaches `on`, the facts in this section and the next remain
-> the source for operating the menu. See `native-navigation.md`.
+> Since 2026-10-23 the global menu is the AXIS `efeonce.site-nav` on every page except `/blog/` (#18456)
+> (`eo_site_nav_enabled=on`, EPIC-055). The facts in this section and the next describe Ohio's menu, which now only
+> renders on `/blog/` and as the adapter's fallback. Operate the global menu with `global-site-navigation.md`; Ohio's
+> menu with `native-navigation.md`.
 
 - WordPress uses the classic menu model here, not a block-theme
   `wp_navigation` source of truth.
@@ -394,7 +393,26 @@ It tracks governed live code candidates:
 - `eo-headless-content`;
 - `eo-vibe-coding-api`;
 - `greenhouse-wp-bridge`;
-- `eo-elementor-widgets`.
+- `eo-elementor-widgets`;
+- `eo-site-nav`.
+
+Global site navigation code (EPIC-055, 2026-10-23):
+
+- Plugin `eo-site-nav`: private CPT with native revisions, save service `wp eo-nav validate|apply|export|revisions|restore`,
+  REST `eo/v1/site-nav`, PHP renderer `EOSN_Render` (parity with AXIS `siteNavHtml`) and validator; Playground suite
+  `tests/playground/run-eo-site-nav.sh`.
+- `ohio-child` adapter: `inc/site-nav.php` (switch `eo_site_nav_enabled` off|pilot|on + `eo_site_nav_pilot_pages`,
+  `/blog/` excluded, constant `EO_SITE_NAV_AXIS`, light-hero list `EO_SITE_NAV_LIGHT_HERO_PAGES`, scheduler option
+  `eo_site_nav_scheduler`), overrides `parts/headers/header-style-1..8.php` (menu or Ohio's part; Ohio on any failure,
+  logged `[eo-site-nav] …`), `assets/css/site-nav-host.css`, `assets/css/meeting-dialog.css`, `site-nav-host.js`, pinned
+  AXIS files `assets/vendor/axis/site-nav/<version>/` (copied by `scripts/vendor-axis-site-nav.mjs`).
+- Mirror `manifests/site-nav/efeoncepro.com.json`; `manifests/site-nav/build-efeoncepro-document.mjs` is bootstrap only.
+- Deploy lanes (Greenhouse `scripts/public-website/`, SSH/WP-CLI with input files, sha256, drift guard, backup tar):
+  plugin `build-site-nav-plugin-package.cjs` + `deploy-site-nav-plugin-package.php`; theme
+  `build-site-nav-theme-package.cjs` + `deploy-site-nav-theme-package.php` (allowlisted files; never changes the switch).
+  `export-live-code-baseline.ts` keeps ohio-child `assets/vendor/axis/**` so the drift guard sees the pinned files.
+- Operation scripts: `set-site-nav-switch.php`, `set-site-nav-scheduler.php`, `apply-site-nav-document.php`,
+  `create-yoast-redirect.php`, `site-nav/repair-revision-meta.php` (one-off). Details: `global-site-navigation.md`.
 
 Do not use `efeonce-web` as the live public-site source unless an ADR changes the runtime.
 
@@ -410,6 +428,7 @@ pnpm public-website:export-live-code
 pnpm public-website:diff-runtime
 pnpm public-website:runtime-status
 pnpm public-website:deploy-dry-run
+pnpm public-website:site-nav pull   # global menu document (read-only); see global-site-navigation.md
 ```
 
 Kinsta has two independent access lanes: SSH/WP-CLI and the Kinsta API. An absent API token never
@@ -492,6 +511,8 @@ Pipe secrets through stdin. Do not pass secrets as command args or write them to
 - When using WP-CLI remotely, prefer the wrapper:
   `pnpm public-website:wpcli -- --eval-file ./tmp/<script>.php --wp-user 12`.
 - Use `wp kinsta cache purge --all` after live WordPress mutations.
+- After a purge the Kinsta edge refreshes in about 40 s–2 min; a changed existing PHP file can take 1–2 min more
+  (opcache). Wait before concluding a deploy failed (measured 2026-10-23, global menu rollout).
 
 ## Identidad SEO del sitio (2026-10-16)
 

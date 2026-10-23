@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio (eo_site_nav_enabled=on) desde 2026-10-23 00:09 UTC, por decisión del operador sin pasar por el piloto de una página; /blog/ sigue con Ohio. Barrida de 55 URLs × 2 anchos sin fallas atribuibles al menú. Pendiente: montar el agendador nativo (hoy el CTA lleva a /agenda/), alta GTM/GA4, prueba de vuelta a off en producción, Core Web Vitals y documentación`v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
+- Status real: `Menú nuevo EN PRODUCCIÓN en todo el sitio desde 2026-10-23 00:09 UTC (sin piloto, decisión del operador; /blog/ con Ohio), agendador nativo en vivo desde la cabecera, el mega y el onepage, documento en revisión 4 y edición gobernada por pnpm public-website:site-nav. Pendiente: alta GTM/GA4, Core Web Vitals, prueba de vuelta a off en producción, decisión de diseño de las descripciones cortadas a 1280`v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -409,6 +409,15 @@ Reglas obligatorias:
 - `<greenhouse-cta>` en los tres puntos de entrada con `cta-location` `menu_header`, `menu_mega` y `menu_onepage`.
 - La piel elegante del diálogo pasa de la landing de Inbound a una primitive compartida del sitio.
 
+> Avance 2026-10-23 (agendador en vivo): un solo `<greenhouse-cta>` oculto por página, impreso por el adaptador cuando
+> la opción `eo_site_nav_scheduler` tiene CTA, superficie y clave válidas (`set-site-nav-scheduler.php`, la clave nunca
+> pasa por la línea de comandos ni por la salida). El renderer se carga cuando la página queda libre o cuando el
+> visitante se acerca al CTA; si aún no está listo, el clic espera hasta 2,5 s; si el lanzador quedó vacío, el enlace va a
+> `/agenda/`. El diálogo que abre lleva `data-eo-meeting-skin="site"` y la piel `meeting-dialog.css` (marco aprobado para
+> Inbound, paleta de `/agenda/`); en una landing con su propio CTA, cada diálogo conserva su piel. Verificado en vivo:
+> cabecera, mega y onepage de teléfono (pantalla completa), Escape y cierre devuelven el foco, `gh_site_nav_clicked` y
+> `greenhouse_cta_*` con `cta_location: site_nav`, sin errores de página. Commit runtime `7fa24b0`.
+
 ### Slice 4 — Medición
 
 - Eventos `gh_site_nav_opened`, `gh_site_nav_line_viewed` y `gh_site_nav_clicked` al `dataLayer` (desde
@@ -436,6 +445,19 @@ Reglas obligatorias:
 - Core Web Vitals frente a la medición previa.
 
 ### Slice 6 — Todo el sitio y documentación
+
+> Avance 2026-10-23 (después del `on`):
+> - **Corte del onepage en pantallas anchas** corregido en AXIS primitives 0.7.10 (radio a la esquina más lejana).
+> - **Loop Marketing → Inbound**: el servicio abre `/agencia-inbound-marketing/` y `/landing-loop-marketing/` responde
+>   301 (Yoast Premium, `create-yoast-redirect.php`, página en noindex). Revisión 3 del documento.
+> - **Edición gobernada**: `pnpm public-website:site-nav` (pull, show, set, glyph, photo, add/move/remove, patch,
+>   check, fit, preview, diff, apply, verify, revisions, restore). El documento vivo es la fuente de verdad; el generador
+>   queda sólo de arranque. Primer uso real: revisión 4 («Surround Discovery™»).
+> - **Plugin** (desplegado): las revisiones se numeran por ID aunque un filtro del sitio altere el contenido (la 2 y la 3
+>   habían quedado sin número; reparadas), y el JSON se guarda en ASCII escapado para que `wp_encode_emoji` no convierta
+>   «™» en una entidad que se pintaba literal. Playground: 49 comprobaciones.
+> - **Documentación**: arquitectura, doc funcional, manual (`docs/manual-de-uso/public-site/operar-navegacion-global.md`)
+>   y skills actualizados por subagentes el 2026-10-23.
 
 > Avance 2026-10-23: `on` aplicado con el go del operador («prenderlo para ver si todo está ok y haz las pruebas con
 > todas las landing»), sin piloto previo. Interruptor por `scripts/public-website/set-site-nav-switch.php` (exige
@@ -588,8 +610,10 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
   todavía; se verifican en el piloto.
 - [x] Los enlaces del menú están en el HTML de servidor (`curl` sin JS). Evidencia (Playground local con Ohio 3.7.0 real, el plugin `eo-site-nav` y `ohio-child`, 2026-10-22): 104 enlaces dentro de la
   cabecera servida por `curl`.
-- [ ] «Agenda tu diagnóstico» abre el agendador desde la cabecera, el mega y el onepage, cierra el panel antes y
-  devuelve el foco al cerrar.
+- [x] «Agenda tu diagnóstico» abre el agendador desde la cabecera, el mega y el onepage, cierra el panel antes y
+  devuelve el foco al cerrar. Evidencia (producción, 2026-10-23): diálogo con la piel del sitio desde la cabecera y el
+  mega a 1440 y desde el onepage a 390 (pantalla completa); Escape y el botón de cierre devuelven el foco a «Agenda tu
+  diagnóstico» o a la hamburguesa; `greenhouse_cta_clicked` con `cta_location: site_nav`.
 - [ ] Los eventos del menú (`gh_site_nav_*`) llegan a GA4 sin PII. Sin tildar: falta el alta en GTM y GA4.
 - [ ] Sin scroll horizontal en los viewports del plan y Core Web Vitals sin regresión frente a la medición previa.
 - [ ] Se capturó y se miró la evidencia desktop y 390 px del piloto y de los tipos de página, y el scorecard cumple el
