@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2052-axis-blog-v3-primitives-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Code complete en AXIS local (Slices 1–3 + versiones preparadas del Slice 4, commits 5bdfa91, e8382ba, c0209bd, ba70438 en main local, sin push); publicación v0.7.15, instalación privada, vendorización y fila del ledger de la línea gráfica pendientes`
 - Rank: `TBD`
 - Domain: `ui|design-system`
 - Blocked by: `none`
@@ -302,13 +302,13 @@ con `pathLength=100` y keyframes explícitos por capa (`0→-100`, `-12→-112`,
 
 ## Acceptance Criteria
 
-- [ ] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
-- [ ] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2052`.
-- [ ] Se declaro `Wireframe` y `Motion` y los archivos existen.
-- [ ] La matriz de botones del Lab coincide con `Botones.dc.html` (≤ 1 % por matriz).
-- [ ] Segmentado y buscador funcionan sin JS y con JS, con foco visible y movimiento reducido.
-- [ ] La excepción del aura está en el ledger, acotada al foco del buscador web.
-- [ ] Los paquetes se publicaron y la instalación privada se verificó.
+- [x] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
+- [x] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2052`.
+- [x] Se declaro `Wireframe` y `Motion` y los archivos existen.
+- [x] La matriz de botones del Lab coincide con `Botones.dc.html` (≤ 1 % por matriz). Evidencia 2026-10-24: 22 estados (Growth, Engine y Glitch xl en reposo/hover/foco/presionado, cargando, deshabilitado, neutro y navy md) contra el CSS del canvas con los valores finales de Portada-v3; máximo 0,017 %.
+- [x] Segmentado y buscador funcionan sin JS y con JS, con foco visible y movimiento reducido. Evidencia: `forms-segmented.spec.ts` 16/16 y `forms-search-beam.spec.ts` 20/20 en Chromium, Firefox, WebKit y WebKit móvil; fidelidad contra el canvas 0 % (segmentado 5 estados, buscador 7 estados).
+- [ ] La excepción del aura está en el ledger, acotada al foco del buscador web. Pendiente: quedó registrada en AXIS (`axisSearchField.beam.exception`, README de primitives y la página del Lab); la fila de `.claude/skills/efeonce-graphic-line/references/ledger.md` no se escribió porque esta sesión sólo podía tocar el archivo de la task.
+- [ ] Los paquetes se publicaron y la instalación privada se verificó. Pendiente: versiones preparadas (tokens 0.6.10, contracts 0.7.13, registry 0.7.6, primitives 0.7.15) y tarball de primitives empaquetado localmente con sus 29 exports presentes; falta push a `main`, CI verde y `pnpm release:packages 0.7.15` con autorización del operador.
 
 ## Verification
 
