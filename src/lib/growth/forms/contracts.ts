@@ -321,6 +321,12 @@ export const fieldDefinitionSchema = z.object({
   dataClass: z.enum(FIELD_DATA_CLASSES).optional(),
   uploadPolicy: fileUploadPolicySchema.optional(),
   presentation: fieldPresentationSchema.optional(),
+  /**
+   * TASK-2053 — Valor fijo de un campo `hidden` (p.ej. la identificación pública de un evento). Es
+   * browser-safe (viaja en el contrato) y el servidor lo IMPONE al aceptar el envío: lo que mande el
+   * navegador para ese campo se descarta. El compiler lo bloquea en campos que no son `hidden`.
+   */
+  staticValue: z.string().min(1).max(200).optional(),
   autocomplete: z.string().max(40).optional(),
   inputMode: z.string().max(20).optional(),
   // Validador declarativo (catálogo CURADO, anti-ReDoS): el admin elige de
@@ -719,6 +725,65 @@ export const resolveEmailPolicy = (validationSchemaJson: unknown): EmailPolicy =
   return parsed.success ? parsed.data : { mode: 'off', field: 'email' }
 }
 
+// ─── event_registration — TASK-2053 — cupos y lista de espera (server-only) ────
+
+/**
+ * Qué pasa con un envío cuando las reservas confirmadas ya llenaron el cupo.
+ *  - `waitlist` (default): se acepta igual y queda en lista de espera; ningún envío se pierde.
+ *  - `reject`: se rechaza con el outcome `capacity_full` (no se persiste).
+ */
+export const EVENT_OVER_CAPACITY_POLICIES = ['waitlist', 'reject'] as const
+export type EventOverCapacityPolicy = (typeof EVENT_OVER_CAPACITY_POLICIES)[number]
+
+export const REGISTRATION_STATUSES = ['confirmed', 'waitlisted'] as const
+export type RegistrationStatus = (typeof REGISTRATION_STATUSES)[number]
+
+export const REGISTRATIONS_COUNT_DEFAULT_THRESHOLD = 25
+
+/**
+ * Política de reserva de un formulario `event_registration`. Vive en
+ * `form_version.ui_policy_json.eventRegistration` y NO cruza al render contract: cupo, umbral y la
+ * decisión de mostrar el conteo son del servidor. El estado de cada reserva se escribe en el campo
+ * `statusField` de `normalized_fields_json` (sin columnas nuevas); el destino lo recibe sólo si su
+ * mapping lo declara.
+ */
+export const eventRegistrationPolicySchema = z
+  .object({
+    capacity: z.number().int().positive().max(100_000).optional(),
+    overCapacity: z.enum(EVENT_OVER_CAPACITY_POLICIES).default('waitlist'),
+    statusField: z
+      .string()
+      .regex(/^[A-Za-z][A-Za-z0-9_]{0,79}$/)
+      .default('registration_status'),
+    showRegistrationsCount: z.boolean().default(false),
+    registrationsCountThreshold: z.number().int().min(1).max(100_000).default(REGISTRATIONS_COUNT_DEFAULT_THRESHOLD)
+  })
+  .strict()
+export type EventRegistrationPolicy = z.infer<typeof eventRegistrationPolicySchema>
+
+/**
+ * Resuelve la política de reserva. `null` cuando el formulario no es `event_registration` o no la
+ * declara (comportamiento de hoy). Una política que no parsea también degrada a `null`: el compiler
+ * ya bloquea su publicación, así que en runtime sólo puede venir de una versión legacy.
+ */
+export const resolveEventRegistrationPolicy = (
+  formKind: string,
+  uiPolicyJson: unknown
+): EventRegistrationPolicy | null => {
+  if (formKind !== 'event_registration') return null
+
+  const raw =
+    uiPolicyJson && typeof uiPolicyJson === 'object'
+      ? (uiPolicyJson as Record<string, unknown>).eventRegistration
+      : undefined
+
+  if (raw === undefined || raw === null) return null
+
+  const parsed = eventRegistrationPolicySchema.safeParse(raw)
+
+  return parsed.success ? parsed.data : null
+}
+
 // ─── destination_plan — server-only (router de destinos) ──────────────────────
 
 export const destinationPlanEntrySchema = z.object({
@@ -779,6 +844,8 @@ export const PUBLIC_SUBMIT_OUTCOMES = [
   'captcha_failed',
   'form_not_published',
   'disabled',
+  // TASK-2053 — formulario de evento con el cupo lleno y política `overCapacity: 'reject'`.
+  'capacity_full',
   // TASK-1255 — fail-closed: el motor no pudo procesar de forma segura (p.ej. cifrado de
   // PII habilitado pero la key no está disponible). NUNCA se persiste PII en claro creyendo
   // cifrarla; se rechaza el submit y se reintenta al resolver la causa.
@@ -790,6 +857,8 @@ export interface PublicSubmitResult {
   outcome: PublicSubmitOutcome
   submissionId?: string
   reason?: string
+  /** TASK-2053 — sólo en formularios de evento con política de reserva. */
+  registrationStatus?: RegistrationStatus
   googleAdsConversion?: GoogleAdsConversionReceipt
 }
 

@@ -1,0 +1,14 @@
+{
+  "slug": "webinar-aeo-chatgpt-2026-11-12",
+  "name": "Webinar · Cómo aparecer en las respuestas de ChatGPT (12 nov 2026)",
+  "eventKey": "webinar-aeo-chatgpt-2026-11-12",
+  "eventDateLabel": "12 de noviembre",
+  "capacity": 500,
+  "overCapacity": "waitlist",
+  "showRegistrationsCount": true,
+  "surfaceId": "fhsf-blog-portada",
+  "surfaceName": "Portada del blog (efeoncepro.com/blog/)",
+  "origins": ["https://efeoncepro.com"],
+  "privacyUrl": "https://efeoncepro.com/politica-de-privacidad/",
+  "consentPolicyVersion": "efeonce-events-2026-10"
+}

@@ -103,6 +103,7 @@ const esCL: RendererSystemCopy = {
     surface_unauthorized: 'Este formulario no está disponible desde esta página.',
     form_not_published: 'Este formulario no está disponible.',
     disabled: 'Este formulario no está disponible.',
+    capacity_full: 'Ya no quedan cupos para este evento.',
     error: 'No pudimos procesar tus datos de forma segura. Intenta de nuevo más tarde.'
   },
   formRegionAria: 'Formulario',
@@ -200,6 +201,7 @@ const enUS: RendererSystemCopy = {
     surface_unauthorized: 'This form is not available from this page.',
     form_not_published: 'This form is not available.',
     disabled: 'This form is not available.',
+    capacity_full: 'There are no seats left for this event.',
     error: 'We couldn’t process your data safely. Please try again later.'
   },
   formRegionAria: 'Form',

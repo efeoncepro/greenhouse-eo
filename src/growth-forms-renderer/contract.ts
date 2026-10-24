@@ -129,6 +129,8 @@ export interface RendererFieldDefinition {
   dataClass?: RendererFieldDataClass
   uploadPolicy?: RendererFileUploadPolicy
   presentation?: RendererFieldPresentation
+  /** TASK-2053 — valor fijo de un campo `hidden`; el servidor lo impone al aceptar el envío. */
+  staticValue?: string
   /** Token WHATWG (`email`, `name`, `tel`, `organization`, …). Lo declara el contract. */
   autocomplete?: string
   /** `email | tel | numeric | decimal | url | text`. Lo declara el contract. */
@@ -311,12 +313,17 @@ export type PublicSubmitOutcome =
   | 'captcha_failed'
   | 'form_not_published'
   | 'disabled'
+  | 'capacity_full'
   | 'error'
+
+/** TASK-2053 — estado de una reserva por evento (espejo de `REGISTRATION_STATUSES`). */
+export type RendererRegistrationStatus = 'confirmed' | 'waitlisted'
 
 export interface PublicSubmitResult {
   outcome: PublicSubmitOutcome
   submissionId?: string
   reason?: string
+  registrationStatus?: RendererRegistrationStatus
   /** Dedicated Ads channel; must never be spread into ordinary telemetry. */
   googleAdsConversion?: GoogleAdsConversionReceipt
 }

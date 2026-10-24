@@ -23,6 +23,7 @@ import {
   type SuccessBehavior,
   FORM_PRESENTATIONS,
   consentDisplaySchema,
+  eventRegistrationPolicySchema,
   inlinePillDisplaySchema,
   destinationPlanEntrySchema,
   fieldDefinitionSchema,
@@ -128,6 +129,47 @@ const validatePresentationControls = (fields: FieldDefinition[]): CompileWarning
       message: `campo ${field.key}: presentation.control=premium_select sólo aplica a type=select`,
       blocking: true,
     }))
+
+/** TASK-2053 — `staticValue` sólo tiene sentido en un campo `hidden` (el servidor lo impone). */
+const validateStaticValues = (fields: FieldDefinition[]): CompileWarning[] =>
+  fields
+    .filter(field => field.staticValue !== undefined && field.type !== 'hidden')
+    .map(field => ({
+      code: 'static_value_not_hidden',
+      dimension: 'fields' as const,
+      message: `campo ${field.key}: staticValue sólo aplica a type=hidden`,
+      blocking: true,
+    }))
+
+/**
+ * TASK-2053 — Política de reserva (`ui_policy.eventRegistration`). Sólo en formularios
+ * `event_registration`; sin la clave no se evalúa nada (ninguna versión existente cambia de veredicto).
+ */
+const validateEventRegistration = (formKind: string, uiPolicy: Record<string, unknown>, fields: FieldDefinition[]): CompileWarning[] => {
+  if (!('eventRegistration' in uiPolicy)) return []
+
+  const block = (code: string, message: string): CompileWarning => ({ code, dimension: 'policy', message, blocking: true })
+
+  if (formKind !== 'event_registration') {
+    return [block('event_registration_wrong_kind', 'ui_policy.eventRegistration sólo aplica a form_kind=event_registration')]
+  }
+
+  const parsed = eventRegistrationPolicySchema.safeParse(uiPolicy.eventRegistration)
+
+  if (!parsed.success) {
+    return [block('event_registration_invalid', 'ui_policy.eventRegistration no valida el contrato (cupo, política, campo de estado, umbral)')]
+  }
+
+  if (fields.some(field => field.key === parsed.data.statusField)) {
+    return [block('event_registration_status_field_taken', `el campo de estado ${parsed.data.statusField} lo escribe el servidor; no puede declararse en el formulario`)]
+  }
+
+  if (!fields.some(field => field.type === 'email')) {
+    return [block('event_registration_without_email', 'una reserva se cuenta por correo: el formulario debe tener un campo type=email')]
+  }
+
+  return []
+}
 
 /**
  * TASK-2044 — El marcador `{privacyLink}` del consentimiento: como máximo uno por casilla, sin otros
@@ -348,6 +390,10 @@ export const compileFormVersion = (
 
   // — Controles de presentación (premium_select sólo en select) —
   validatePresentationControls(fields).forEach(addWarning)
+
+  // — Valores fijos y política de reserva por evento (TASK-2053) —
+  validateStaticValues(fields).forEach(addWarning)
+  validateEventRegistration(definition.form_kind, uiPolicy, fields).forEach(addWarning)
 
   // — Consent display (browser-safe) —
   const consentDisplay = consentDisplaySchema.safeParse({

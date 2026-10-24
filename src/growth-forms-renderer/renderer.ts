@@ -206,6 +206,11 @@ export class FormRenderer {
       }
     }
 
+    // TASK-2053 — el valor fijo de un campo oculto gana sobre `initial-values` (el servidor lo impone igual).
+    for (const field of this.contract.fields) {
+      if (field.type === 'hidden' && field.staticValue !== undefined) this.values[field.key] = field.staticValue
+    }
+
     // Restaura un borrador PII-safe (sin cédula/consent) si existe (TASK-1256 Slice 1d).
     try {
       if (this.restoreDraft()) this.draftRestored = true

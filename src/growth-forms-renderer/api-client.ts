@@ -220,10 +220,14 @@ export const submitPublicForm = async (
   const googleAdsConversion = response.ok && outcome === 'accepted'
     ? parseGoogleAdsConversionReceipt(parsed.googleAdsConversion, 'commercial_lead') : undefined
 
+  const registrationStatus =
+    parsed.registrationStatus === 'confirmed' || parsed.registrationStatus === 'waitlisted' ? parsed.registrationStatus : undefined
+
   return {
     outcome,
     submissionId: parsed.submissionId,
     reason: parsed.reason ?? (typeof parsed.message === 'string' ? parsed.message : undefined),
+    ...(registrationStatus ? { registrationStatus } : {}),
     ...(googleAdsConversion ? { googleAdsConversion } : {}),
   }
 }
