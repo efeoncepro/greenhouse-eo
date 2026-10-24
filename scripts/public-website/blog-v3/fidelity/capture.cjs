@@ -80,7 +80,7 @@ async function captureSections(browser, url, board, outDir, { site = false } = {
   }
 
   const tagged = await page.locator('[data-capture^="blog-"]').count()
-  const rootSel = (site ? '#eobh ' : '') + (board === 'Movil-v3' ? '.m3' : '.v3')
+  const rootSel = site ? { 'Portada-v3': '#eobh .eobh-d > .v3', 'Tablet-v3': '#eobh .eobh-t > .v3', 'Movil-v3': '#eobh .eobh-m > .m3' }[board] : board === 'Movil-v3' ? '.m3' : '.v3'
   const results = []
 
   for (const [i, name] of spec.sections.entries()) {
@@ -120,6 +120,8 @@ async function main() {
         'Portada-v3': JSON.parse(fs.readFileSync(path.join(SRC, 'fixture.json'), 'utf8')),
         'Movil-v3': JSON.parse(fs.readFileSync(path.join(SRC, 'fixture.mobile.json'), 'utf8')),
       }
+
+      fixtures['Tablet-v3'] = fixtures['Portada-v3']
 
       const pages = Object.fromEntries(Object.keys(BOARDS).map(b => [b, boardPage(b, { bound: mode === 'bound', data: fixtures[b] })]))
       const server = await serve(pages)

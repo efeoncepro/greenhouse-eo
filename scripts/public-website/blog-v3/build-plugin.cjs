@@ -18,11 +18,12 @@ const { RUNTIME_DIR } = require('./lib/render-node.cjs')
 
 const SRC = path.join(__dirname, 'source')
 const OUT = path.join(RUNTIME_DIR, 'wp-content/plugins/eo-blog-home/assets/generated')
-const BOARDS = { 'Portada-v3': 'portada', 'Movil-v3': 'movil' }
+const BOARDS = { 'Portada-v3': 'portada', 'Tablet-v3': 'tablet', 'Movil-v3': 'movil' }
 
 const IMG = path.join(OUT, '..', 'img')
-const SCOPE = { portada: '#eobh .eobh-d', movil: '#eobh .eobh-m' }
-const FIXTURES = { portada: 'fixture.json', movil: 'fixture.mobile.json' }
+const SCOPE = { portada: '#eobh .eobh-d', tablet: '#eobh .eobh-t', movil: '#eobh .eobh-m' }
+// The tablet board renders the desktop data contract: no fixture of its own.
+const FIXTURES = { portada: 'fixture.json', tablet: null, movil: 'fixture.mobile.json' }
 
 // Host reset: the references were captured against the browser's own element styles, so inside the page every HTML
 // element goes back to them (`all: revert`), above Ohio's element rules (ID specificity) and below the canvas rules
@@ -89,6 +90,11 @@ for (const [board, slug] of Object.entries(BOARDS)) {
   cssParts.push(`/* ${board} (sha ${sha}) */\n` + scopeCss(parsed.css, slug))
 
   // Example content: canvas blob URLs become plugin images.
+  if (!FIXTURES[slug]) {
+    manifest[slug] = { board, sha }
+    continue
+  }
+
   let fixture = fs.readFileSync(path.join(SRC, FIXTURES[slug]), 'utf8')
 
   for (const a of Object.values(assets)) fixture = fixture.split('/_blob/' + a.id).join('%%img%%/' + a.file)

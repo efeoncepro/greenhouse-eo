@@ -23,8 +23,23 @@ function rep(text, from, to, times = 1) {
   return typeof from === 'string' ? text.split(from).join(to) : text.replace(from, typeof to === 'string' ? to.replace(/\$(?![1-9&])/g, '$$$$') : to)
 }
 
+/**
+ * Deviations every board shares (README of the direction):
+ * - The page carries one H1 of its own (eo-blog-home, outside the boards): the boards' own H1 goes away (desktop/tablet
+ *   screen-reader H1) or becomes a block with the browser's H1 metrics (mobile logo), so the pixels do not move.
+ * - Focus returns to a button of the board itself: `document.querySelector` in the logic is scoped to the board root
+ *   (three boards live on one page; the first match could be a hidden one).
+ */
+function deviateShared(src) {
+  src = rep(src, /document\.querySelector\(/, '(this.__root || document).querySelector(', 2)
+
+  return src
+}
+
 /** Allowed deviations, applied identically to the reference and to the bound template (README of the direction). */
 function deviate(src) {
+  src = deviateShared(src)
+  src = rep(src, /\n\s*<h1 class="sr">Marketing con Manzanitas, el blog de Efeonce<\/h1>/, '')
   // 1. Canonical site header: the mock navigation island goes away (the MCM logo under it stays).
   src = rep(src, /\n\s*<nav aria-label="Navegación global del sitio \(heredada\)"[\s\S]*?<\/nav>/, '')
   // 1b. Canonical footer: the mock footer goes away.
@@ -167,6 +182,10 @@ function bindLogic(src) {
 /* ---------- Mobile board (Movil-v3) ---------- */
 
 function deviateMobile(src) {
+  src = deviateShared(src)
+  src = rep(src, '<h1 style="margin: 32px 0 0;"><img src="/_blob/eb05ce3c01b77fd65e104a791d93784b" alt="Marketing con Manzanitas, el blog de Efeonce"', '<div class="eobh-h1" style="margin: 32px 0 0;"><img src="/_blob/eb05ce3c01b77fd65e104a791d93784b" alt=""')
+  src = rep(src, /(<div class="eobh-h1"[^\n]*?)<\/h1>/, '$1</div>')
+  src = rep(src, '\n</style>', '\n.eobh-h1{display:block;font-size:2em;font-weight:bold}\n</style>')
   // 1. Canonical site header and footer replace the mock ones. The mock navigation island marked the slot the fixed
   //    canonical bar occupies on mobile, so it becomes an empty spacer of the same height (the MCM logo keeps its
   //    canvas position under the bar instead of sliding beneath it).
@@ -291,9 +310,21 @@ function buildBoard(name, dev, markup, logic) {
   console.log(`bound ${name}:`, bound.length, 'bytes; reference:', deviated.length, 'bytes')
 }
 
+/* ---------- Tablet board (Tablet-v3, generated from the desktop canvas by make-tablet.cjs) ---------- */
+
+const { makeTablet, toTablet, toDesktop } = require('./make-tablet.cjs')
+
+// Same deviations and bindings as desktop (same data contract), applied under the desktop ids and mapped back.
+const deviateTablet = src => toTablet(deviate(toDesktop(src)))
+const bindMarkupTablet = src => toTablet(bindMarkup(toDesktop(src)))
+const bindLogicTablet = src => toTablet(bindLogic(toDesktop(src)))
+
 if (require.main === module) {
+  ensureSource('Portada-v3')
+  fs.writeFileSync(path.join(SRC, 'Tablet-v3.dc.html'), makeTablet())
   buildBoard('Portada-v3', deviate, bindMarkup, bindLogic)
+  buildBoard('Tablet-v3', deviateTablet, bindMarkupTablet, bindLogicTablet)
   buildBoard('Movil-v3', deviateMobile, bindMarkupMobile, bindLogicMobile)
 }
 
-module.exports = { deviate, bindMarkup, bindLogic, deviateMobile, bindMarkupMobile, bindLogicMobile }
+module.exports = { deviate, bindMarkup, bindLogic, deviateMobile, bindMarkupMobile, bindLogicMobile, deviateTablet, bindMarkupTablet, bindLogicTablet }

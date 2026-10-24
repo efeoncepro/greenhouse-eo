@@ -14,6 +14,6 @@ require $plugin . '/includes/class-eobh-view.php';
 
 $ast  = json_decode( file_get_contents( $plugin . '/assets/generated/' . $board . '.ast.json' ), true );
 $data = json_decode( file_get_contents( $data_file ), true );
-$vals = 'portada' === $board ? EOBH_View::desktop( $data, (int) $now ) : EOBH_View::mobile( $data, (int) $now );
+$vals = 'movil' === $board ? EOBH_View::mobile( $data, (int) $now ) : EOBH_View::desktop( $data, (int) $now );
 
 echo EOBH_Template::render( $ast, $vals );

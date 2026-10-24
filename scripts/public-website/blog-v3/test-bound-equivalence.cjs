@@ -15,6 +15,9 @@ const fixtures = {
   'Movil-v3': JSON.parse(fs.readFileSync(path.join(SRC, 'fixture.mobile.json'), 'utf8')),
 }
 
+// The tablet board consumes the desktop data contract.
+fixtures['Tablet-v3'] = fixtures['Portada-v3']
+
 const norm = s => s.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim()
 
 let failed = 0

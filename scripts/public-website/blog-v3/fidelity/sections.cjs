@@ -5,6 +5,7 @@
  */
 const BOARDS = {
   'Portada-v3': { viewport: { width: 1440, height: 900 }, sections: ['blog-hero', 'blog-ask', 'blog-glitch', 'blog-events', 'blog-rail', 'blog-topics', 'blog-archive', 'blog-subscribe'] },
+  'Tablet-v3': { viewport: { width: 820, height: 1180 }, sections: ['blog-hero', 'blog-ask', 'blog-glitch', 'blog-events', 'blog-rail', 'blog-topics', 'blog-archive', 'blog-subscribe'] },
   'Movil-v3': { viewport: { width: 390, height: 844 }, sections: ['blog-masthead', 'blog-hero', 'blog-ask', 'blog-glitch', 'blog-events', 'blog-rail', 'blog-topics', 'blog-archive', 'blog-subscribe'] },
 }
 

@@ -1,7 +1,7 @@
 {
   "mode": "reference",
   "url": null,
-  "capturedAt": "2026-10-24T03:40:06.113Z",
+  "capturedAt": "2026-10-24T05:14:59.025Z",
   "report": {
     "Portada-v3": [
       {
@@ -35,6 +35,40 @@
       {
         "name": "blog-subscribe",
         "file": "Portada-v3--07-blog-subscribe.png"
+      }
+    ],
+    "Tablet-v3": [
+      {
+        "name": "blog-hero",
+        "file": "Tablet-v3--00-blog-hero.png"
+      },
+      {
+        "name": "blog-ask",
+        "file": "Tablet-v3--01-blog-ask.png"
+      },
+      {
+        "name": "blog-glitch",
+        "file": "Tablet-v3--02-blog-glitch.png"
+      },
+      {
+        "name": "blog-events",
+        "file": "Tablet-v3--03-blog-events.png"
+      },
+      {
+        "name": "blog-rail",
+        "file": "Tablet-v3--04-blog-rail.png"
+      },
+      {
+        "name": "blog-topics",
+        "file": "Tablet-v3--05-blog-topics.png"
+      },
+      {
+        "name": "blog-archive",
+        "file": "Tablet-v3--06-blog-archive.png"
+      },
+      {
+        "name": "blog-subscribe",
+        "file": "Tablet-v3--07-blog-subscribe.png"
       }
     ],
     "Movil-v3": [

@@ -30,6 +30,7 @@ const variants = {
 
 const CASES = [
   ['Portada-v3', 'portada', 'fixture.json'],
+  ['Tablet-v3', 'tablet', 'fixture.json'],
   ['Movil-v3', 'movil', 'fixture.mobile.json'],
 ]
 

@@ -13,7 +13,7 @@ const url = process.argv[2] || 'http://127.0.0.1:8844/blog/'
   const browser = await chromium.launch()
   let total = 0
 
-  for (const [name, viewport] of [['desktop', { width: 1440, height: 900 }], ['mobile', { width: 390, height: 844 }]]) {
+  for (const [name, viewport] of [['desktop', { width: 1440, height: 900 }], ['tablet', { width: 820, height: 1180 }], ['mobile', { width: 390, height: 844 }]]) {
     const page = await (await browser.newContext({ viewport })).newPage()
 
     await page.goto(url, { waitUntil: 'load' })
