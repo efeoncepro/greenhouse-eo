@@ -64,6 +64,7 @@ Read the minimal set:
 | Historical layout incident or older public page | `references/layout-incidents.md` |
 | Runtime discovery, bridge inspection, repo binding, Kinsta/WP inventory | `references/runtime-and-discovery.md` |
 | 404, search/no-results, category/tag/author/date archives, impossible pagination or empty taxonomy | `references/miscellaneous-surfaces.md` + `references/runtime-and-discovery.md`; add the SEO technical module when robots, canonical, schema, or indexability changes |
+| Blog home `/blog/` (portada v3, live 2026-10-24): slider, pins, formats, resources, events, author photo, deploy, verify — `pnpm public-website:blog-home` | `references/blog-home-operation.md` + `docs/manual-de-uso/public-site/operar-portada-blog-por-cli.md` |
 | Demo 35 / future blog home | `references/landing-workflow.md` + `references/elementor-mutation.md` + `references/landings/demo35-blog-magazine.md` |
 | AEO `/aeo-2/` | `references/landings/aeo.md` |
 | Agencia Creativa `/agencia-creativa/` | `references/landings/agencia-creativa.md` |

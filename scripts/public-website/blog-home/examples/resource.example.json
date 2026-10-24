@@ -1,0 +1,17 @@
+{
+  "title": "Efeonce AEO Assessment",
+  "status": "publish",
+  "meta": {
+    "kind": "diagnostico",
+    "url": "https://efeoncepro.com/aeo-2/",
+    "territory": "aeo",
+    "brand": "Efeonce | AEO",
+    "hero_light": "¿Te ve",
+    "hero_bold": "la IA?",
+    "dek": "Mide cómo aparece tu marca en ChatGPT, Gemini y Perplexity con el Efeonce AEO Assessment.",
+    "meta": "Efeonce AEO Assessment",
+    "order": 0,
+    "placements": ["hero", "rail"],
+    "reviewed_at": "2026-10-24"
+  }
+}

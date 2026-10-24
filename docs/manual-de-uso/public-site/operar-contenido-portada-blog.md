@@ -57,6 +57,10 @@ los últimos 180 días el recurso deja de mostrarse.
 
 ## Paso a paso para el operador (producción)
 
+> Desde el 2026-10-24 la operación diaria y los despliegues van por `pnpm public-website:blog-home` (ver
+> [Operar la portada del blog por CLI](operar-portada-blog-por-cli.md)). Los pasos de abajo describen el despliegue
+> inicial y siguen valiendo como referencia de lo que el CLI hace por dentro.
+
 1. **Paquete** (no escribe en el sitio):
    `pnpm public-website:export-live-code -- --output tmp/public-site-code-baselines/<nombre>` y
    `node scripts/public-website/build-blog-v3-content-model-package.cjs tmp/public-site-code-baselines/<nombre>`.
