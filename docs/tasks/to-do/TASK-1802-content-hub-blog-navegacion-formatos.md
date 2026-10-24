@@ -1,5 +1,15 @@
 # TASK-1802 — Content Hub Efeonce: `/blog` navegable y multiformato
 
+## Delta 2026-10-24
+
+- **La dirección visual del hub cambia:** el operador aprobó el canvas «Portada Blog Efeonce» v3
+  (`https://claude.ai/artifact/SmmJZC39UTJ9m6PD5x7tui`, copia en `docs/ui/visual-directions/TASK-2051-blog-portada-v3/`)
+  y pidió implementarlo en alta fidelidad. La opción 2 de Product Design de la etapa 1 queda reemplazada; de la etapa 1
+  sólo se reutilizan consultas.
+- La implementación se partió en TASK-2050 (modelo de contenido, incluye `eo_format` y eventos), TASK-2051 (portada),
+  TASK-2052 (primitives AXIS), TASK-2053 y TASK-2054 (formularios en línea). Esta task conserva el programa
+  multiformato: inventario de tools y webinars (PDR-020 decisión 2), búsqueda, filtros y colecciones.
+
 ## Delta 2026-10-23
 
 - El menú global de PDR-027 está en producción en todo `efeoncepro.com` desde el 2026-10-23 00:09 UTC
