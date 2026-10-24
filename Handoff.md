@@ -2,35 +2,32 @@
 
 [Historial](Handoff.archive.md).
 
-## 2026-10-24 — Portada del blog v3: revisión en vivo; TASK-2050/2052/2053/2054 code complete
+## 2026-10-24 — Portada del blog v3: revisión en vivo con datos reales; falta el corte de `/blog/`
 
-**En vivo** (pedido del operador): plugin `eo-blog-home` (runtime `162375a`) y `https://efeoncepro.com/blog-v3-revision/`
-(252046, noindex, sin enlaces; rollback `wp post delete 252046`) con escritorio, tablet nuevo (canvas v68) y móvil;
-25/25 secciones ≤ 1 % en vivo, axe 0, sin desborde, un H1. Contenido de ejemplo y formularios simulados. **`/blog/`
-sin cambiar.** Code complete en local, sin publicar: TASK-2050 (runtime `b00fa2f`…`57d4455`, PDR-029 *Proposed*),
-TASK-2053/2054 (Greenhouse `8b1bd8c2e`…`69f032cd4`, 509 pruebas), TASK-2052 (AXIS `5bdfa91`…`ba70438`).
+**En vivo** (pedido del operador): plugin `eo-blog-home` y `https://efeoncepro.com/blog-v3-revision/` (252046, noindex,
+sin enlaces; rollback `wp post delete 252046`) con escritorio, tablet y móvil, **ya con datos reales**: modelo de
+contenido `efeonce-editorial-blocks` 0.2.0 desplegado (runtime `d690227`), PDR-029 *Accepted* (con el formato
+Novedad, que entra al slider sólo si se fija), 44 entradas con formato (ledger en `blog-v3/ledger/`), recursos guía
+252050 y diagnóstico 252054 (adjuntos 252052/252053/252056) y `eo_content_model_enabled = 1`. La entrada 249387 tiene
+título partido y arte del canvas (adjunto 252057, `blog-v3/set-hero-art.php`). Slider: El fin de la web · I Know Kung
+Fu · Glitch Flash Sonnet · Guía Web agéntica · AEO Assessment. Sin evento real: la sección de eventos queda oculta.
+Verificado en vivo: sin desborde de 320 a 1920, un H1, axe 0 en los tres tableros. **`/blog/` sin cambiar.**
+Code complete sin publicar: TASK-2053/2054 (Greenhouse `8b1bd8c2e`…`69f032cd4`) y TASK-2052 (AXIS `5bdfa91`…`ba70438`).
 
-**Runbook, en este orden y con aprobación del operador en cada paso:**
+**Pendiente, con aprobación del operador en cada paso:**
 
-1. Aprobar PDR-029 (`docs/public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md`).
-2. Modelo de contenido: export de línea base → `build-blog-v3-content-model-package.cjs` → deploy dry-run y apply
-   (`deploy-blog-v3-content-model-package.php`, opción `eo_content_model_enabled` en 0) → `verify-content-model.php`.
-   Manual: `docs/manual-de-uso/public-site/operar-contenido-portada-blog.md` (comandos exactos).
-3. Backfill de formatos: dry-run, revisar (propone 7 Ediciones, 1 Flash, 2 Notas, 2 Casos, 3 Guías, 29 Artículos),
-   apply por lotes con ledger. Cargar recursos (`eo_resource`: newsletter, guía, diagnóstico) y el primer evento real.
-4. Encender `eo_content_model_enabled = 1` y revisar `/blog-v3-revision/` con datos reales (si falta una diapositiva,
-   tema o año, el adaptador vuelve al ejemplo completo y lo deja en el log).
-5. Release de Greenhouse a `main` (renderer 1.2.0 con `inline_pill`) y publicación del formulario de Glitch y del
-   evento (`growth:forms:publish-event-registration`); luego cambiar las acciones de los formularios de la portada.
-6. AXIS v0.7.15: push de `main`, CI verde, `release:packages 0.7.15`, readback y vendorización (hoy la portada usa los
-   valores del canvas; la vendorización no cambia píxeles).
-7. Corte de `/blog/`: `blog-v3/publish-blog-home-page.php` + paquete de `ohio-child` (`EO_SITE_NAV_EXCLUDED_PAGES`
+1. Corte de `/blog/`: `blog-v3/publish-blog-home-page.php` + paquete de `ohio-child` (`EO_SITE_NAV_EXCLUDED_PAGES`
    vacío, runtime `df11a21`) juntos; papelera para 252046.
+2. Release de Greenhouse a `main` (renderer 1.2.0 con `inline_pill`) y publicación del formulario de Glitch y del
+   evento (`growth:forms:publish-event-registration`); luego cambiar las acciones de los formularios de la portada.
+3. Cargar el primer evento real (la sección aparece sola) y medir la purga de `/blog/` en Kinsta.
+4. AXIS v0.7.15: push de `main`, CI verde, `release:packages 0.7.15`, readback y vendorización.
 
-Notas: re-exportar la línea base antes de cada despliegue (el exportador ya incluye `eo-blog-home` y
-`efeonce-editorial-blocks`); un PHP nuevo tarda 1–2 min en llegar a PHP-FPM. Rendimiento con el perfil móvil de
-Lighthouse: hero a 3,4–3,8 s, comparable al sitio; el banner de cookies es el LCP en móvil (10–17 s), seguimiento de
-sitio. La entrada 249766 tiene categoría primaria Yoast 204, que no existe (hallazgo de TASK-2050).
+Notas: el despliegue del modelo se niega con la opción encendida (apagar → desplegar → encender, scripts
+`set-content-model-flag.php`); re-exportar la línea base antes de cada despliegue; un PHP nuevo tarda 1–2 min en
+llegar a PHP-FPM. Diapositiva de una entrada sin `_eo_hero_image`: el adaptador pone velo de lectura y la bajada se corta
+en 2 líneas. Rendimiento móvil: hero a 3,4–3,8 s; el banner de cookies es el LCP (10–17 s), seguimiento de sitio. La
+entrada 249766 tiene categoría primaria Yoast 204, que no existe.
 
 ## 2026-10-24 — Nosotros: fidelidad, rieles de Ohio, mapa y wordmark HubSpot (en vivo)
 

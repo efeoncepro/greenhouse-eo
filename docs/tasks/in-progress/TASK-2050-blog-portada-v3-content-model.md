@@ -28,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Code complete en local (2026-10-24): modelo en efeonce-editorial-blocks 0.2.0 (runtime b00fa2f…57d4455), 148 checks PHP, 62 checks en Playground, panel del editor probado en navegador y ensayo del despliegue y del backfill; rollout pendiente: PDR-029 Proposed, sin deploy, sin backfill, opción eo_content_model_enabled en 0`
+- Status real: `En vivo desde 2026-10-24: efeonce-editorial-blocks 0.2.0 desplegado (runtime d690227), 44 entradas con formato (ledger en 5 lotes), recursos guía 252050 y diagnóstico 252054 cargados, eo_content_model_enabled = 1; la portada se ve con datos reales sólo en /blog-v3-revision/ (/blog/ sin corte). Pendiente: evento real, medición de purga en Kinsta y corte de /blog/`
 - Rank: `TBD`
 - Domain: `public-site|content`
 - Blocked by: `Aprobación del operador de PDR-029 y del dry-run del backfill (rollout)`
@@ -345,8 +345,8 @@ lectura cubren la paridad programática para agentes.
 
 ## Acceptance Criteria
 
-- [ ] PDR-029 existe, está aprobado por el operador y registrado en el índice de decisiones del sitio público.
-- [ ] `eo_format` está registrada y las 44 entradas publicadas tienen exactamente un formato, con ledger del apply.
+- [x] PDR-029 existe, está aprobado por el operador y registrado en el índice de decisiones del sitio público. (Accepted el 2026-10-24; fila en `docs/public-site/README.md`.)
+- [x] `eo_format` está registrada y las 44 entradas publicadas tienen exactamente un formato, con ledger del apply. (Apply en vivo el 2026-10-24, `scripts/public-website/blog-v3/ledger/2026-10-24-batch-{1..5}.json`; `verify-content-model.php` sin hallazgos.)
 - [x] El reader `featured` devuelve el shape del canvas y respeta el orden Glitch → herramienta → diagnóstico. (Prueba PHP: claves de cada diapositiva = las del documento de ejemplo; Playground: `art, caso, flash, guia, diag`.)
 - [ ] Un evento de prueba produce `Event` válido en Rich Results Test y un `.ics` que abre en Google y Apple Calendar sin enlace privado.
 - [x] Al pasar `start + duración`, el evento deja de ser «próximo» sin intervención manual. (Prueba PHP de estados; en Playground un evento que terminó hace 5 minutos no es próximo y la purga de su fin queda programada.)
