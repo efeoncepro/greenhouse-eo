@@ -1,9 +1,9 @@
 # PDR-029 — Modelo de contenido de la portada del blog
 
 > **Tipo:** Product Decision Record de plataforma del sitio público.
-> **Estado:** Proposed · 2026-10-24 · escrito por el agente que implementa `TASK-2050`; espera la aprobación del
-> operador. El código existe en local (code complete, sin desplegar) para que la decisión se revise contra algo que
-> funciona; nada se activa en producción sin esta aprobación.
+> **Estado:** Accepted · 2026-10-24 · aprobado por el operador («Apruebo», sesión «Portada del blog v3»), escrito por
+> el agente que implementa `TASK-2050`. El backfill de formatos sobre entradas publicadas y la carga de recursos y
+> eventos reales siguen pidiendo su visto bueno con el dry-run a la vista.
 > **Ejecución:** [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-content-model.md) (este modelo) y
 > [TASK-2051](../../tasks/in-progress/TASK-2051-blog-portada-v3-high-fidelity.md) (la portada que lo consume).
 > **Diseño:** canvas «Portada Blog Efeonce», página «v3 · alto impacto», versión 67
