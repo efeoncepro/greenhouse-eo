@@ -183,8 +183,8 @@ a{color:#ffffff}
 .eyb__bar{width:28px;height:5px;border-radius:3px;flex:none}
 .ah{position:relative;background:#001a33;color:#ffffff;padding:168px 0 104px;overflow:hidden}
 .ah__g{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:48px 72px;align-items:end;margin-top:56px}
-.ah__t{margin:16px 0 0;font-size:184px;line-height:.84;font-weight:760;letter-spacing:-.06em;text-wrap:balance;overflow-wrap:anywhere}
-.ah__t--m{font-size:132px;line-height:.88;letter-spacing:-.05em}
+.ah__t{margin:16px 0 0;font-size:calc(min(184px,12.8vw)*var(--ah-fit,1));line-height:.84;font-weight:760;letter-spacing:-.06em;text-wrap:balance;overflow-wrap:anywhere}
+.ah__t--m{font-size:calc(min(132px,9.2vw)*var(--ah-fit,1));line-height:.88;letter-spacing:-.05em}
 .ah__d{margin:36px 0 0;max-width:620px;font-size:20px;line-height:1.55;color:#cfe4fa}
 .ah__side{display:flex;flex-direction:column;gap:28px;width:100%;max-width:520px;justify-self:end}
 .ah__n{display:flex;align-items:baseline;gap:14px;margin:0;color:#ffffff}
@@ -315,8 +315,8 @@ a{color:#ffffff}
 .eyb{font-size:12px}
 .ah{padding:104px 0 56px}
 .ah__g{grid-template-columns:minmax(0,1fr);gap:36px;margin-top:32px;align-items:start}
-.ah__t{margin-top:12px;font-size:76px;line-height:.86;letter-spacing:-.055em}
-.ah__t--m{font-size:60px;line-height:.9;letter-spacing:-.045em}
+.ah__t{margin-top:12px;font-size:calc(min(76px,19.5vw)*var(--ah-fit,1));line-height:.86;letter-spacing:-.055em}
+.ah__t--m{font-size:calc(min(60px,15.4vw)*var(--ah-fit,1));line-height:.9;letter-spacing:-.045em}
 .ah__d{margin-top:20px;font-size:16px}
 .ah__side{gap:20px;max-width:none;justify-self:stretch}
 .ah__n .idea{font-size:120px}
@@ -385,6 +385,23 @@ a{color:#ffffff}
 .gc__t{font-size:24px}
 }
 
+
+@media (min-width:768px) and (max-width:1099.98px){
+.w{padding:0 32px}
+.ah__t{font-size:calc(13vw*var(--ah-fit,1))}
+.ah__t--m{font-size:calc(9.5vw*var(--ah-fit,1))}
+.ah__g,.ah__g--f{grid-template-columns:minmax(0,1fr);align-items:start}
+.ah--f{padding-bottom:72px}
+.hc{margin-bottom:0;max-width:600px}
+.ah__side{justify-self:start}
+.fb--f .fb__in{max-width:none}
+.yg{grid-template-columns:minmax(0,3fr) minmax(0,9fr);gap:40px}
+.yg__n{font-size:88px}
+.arch-row--x{grid-template-columns:90px minmax(0,1fr) 180px}
+.rw__t{font-size:26px}
+.mt__g{grid-template-columns:minmax(0,1fr)}
+.ot__t{font-size:60px}
+}
 </style>
 </helmet>
 <div class="v3 arc" style="position: relative;">

@@ -189,6 +189,17 @@
       ],
       "port": 9418,
       "url": "http://127.0.0.1:9418"
+    },
+    {
+      "name": "blog-archive-preview",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "scripts/public-website/blog-archive/preview/serve.cjs",
+        "--port",
+        "8845"
+      ],
+      "port": 8845,
+      "url": "http://127.0.0.1:8845"
     }
   ]
 }

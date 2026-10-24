@@ -52,6 +52,34 @@ function deviateCss(css) {
   // 3. The author without a profile photo shows initials in the photo's circle (as the home's author circle).
   out = rep(out, '.au__r{margin:', '.au__ph--i{display:grid;place-items:center;background:#023c70;color:#ffffff;font-family:\'Bricolage Grotesque\',sans-serif;font-size:48px;font-weight:700}\n.au__r{margin:')
 
+  // 8. Fluid type (no board between 768 and 1099, nor between 1100 and 1439): the H1 follows the viewport up to the
+  // canvas size and shrinks with `--ah-fit` (set by the data for a name whose longest word would not fit its column).
+  // At 1440 and 390 the computed sizes are the canvas ones: min(184px, 12.8vw) = 184px, 76px × 1.
+  out = rep(out, '.ah__t{margin:16px 0 0;font-size:184px;', '.ah__t{margin:16px 0 0;font-size:calc(min(184px,12.8vw)*var(--ah-fit,1));')
+  out = rep(out, '.ah__t--m{font-size:132px;', '.ah__t--m{font-size:calc(min(132px,9.2vw)*var(--ah-fit,1));')
+  // Below 390 (no board) the phone sizes follow the viewport too: min(76px, 19.5vw) and min(60px, 15.4vw) are the
+  // canvas sizes at 390.
+  out = rep(out, '.ah__t{margin-top:12px;font-size:76px;', '.ah__t{margin-top:12px;font-size:calc(min(76px,19.5vw)*var(--ah-fit,1));')
+  out = rep(out, '.ah__t--m{font-size:60px;', '.ah__t--m{font-size:calc(min(60px,15.4vw)*var(--ah-fit,1));')
+  out += `
+@media (min-width:768px) and (max-width:1099.98px){
+.w{padding:0 32px}
+.ah__t{font-size:calc(13vw*var(--ah-fit,1))}
+.ah__t--m{font-size:calc(9.5vw*var(--ah-fit,1))}
+.ah__g,.ah__g--f{grid-template-columns:minmax(0,1fr);align-items:start}
+.ah--f{padding-bottom:72px}
+.hc{margin-bottom:0;max-width:600px}
+.ah__side{justify-self:start}
+.fb--f .fb__in{max-width:none}
+.yg{grid-template-columns:minmax(0,3fr) minmax(0,9fr);gap:40px}
+.yg__n{font-size:88px}
+.arch-row--x{grid-template-columns:90px minmax(0,1fr) 180px}
+.rw__t{font-size:26px}
+.mt__g{grid-template-columns:minmax(0,1fr)}
+.ot__t{font-size:60px}
+}
+`
+
   return out
 }
 
