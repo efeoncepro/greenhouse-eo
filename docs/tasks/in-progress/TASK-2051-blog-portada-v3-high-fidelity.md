@@ -31,7 +31,7 @@
 - Motion: `docs/ui/motion/TASK-2051-blog-portada-v3-high-fidelity-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Publicada para revisión en https://efeoncepro.com/blog-v3-revision/ (2026-10-24, noindex, contenido de ejemplo); /blog/ sin cambiar hasta aprobación; contenido real depende de TASK-2050 y formularios reales de TASK-2053/2054`
+- Status real: `En producción en /blog/ desde 2026-10-24 (corte 08:13Z, snapshot _gh_blog_home_v3_before_20261024_081327) con datos reales, menú canónico, foto del autor y operación por pnpm public-website:blog-home; la suscripción real a Glitch espera el release de Greenhouse (consentBy submission) y la publicación del formulario píldora; sin ella la portada no muestra suscripción`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `TASK-2050 (sólo eventos, formatos y fijadas; las demás secciones avanzan antes)`
@@ -369,7 +369,7 @@ Efeonce en línea (no como archivo aparte).
 - [x] Se declaro `Flow` y `Motion` y los archivos existen.
 - [x] Cada sección pasa el gate de fidelidad (≤ 1 % de píxeles distintos) a 1440 y 390 contra las referencias del canvas. Evidencia 2026-10-24 en el sitio en vivo (`/blog-v3-revision/`, `fidelity/capture.cjs url` + `compare.cjs`): 25/25 secciones con tablet incluida; la mayor diferencia es la cuenta regresiva, que corre con la hora real (0,86 % en móvil).
 - [x] El operador aprobó la hoja lado a lado de cada sección. Aprobada el 2026-10-24 («Apruebo sí»); la hoja (https://claude.ai/artifact/VZELsJUCwxjvEj999eHCVB) ahora compara contra el sitio en vivo e incluye tablet.
-- [ ] `/blog/` muestra el header AXIS y el footer de `ohio-child`; la exclusión de 18456 ya no existe. Código listo (runtime `df11a21`: exclusión vacía; `publish-blog-home-page.php`); falta desplegar con aprobación.
+- [x] `/blog/` muestra el header AXIS y el footer de `ohio-child`; la exclusión de 18456 ya no existe. Desplegado el 2026-10-24 (paquete del tema `78331ff5…`, corte de la página; `verify` en vivo: plantilla, un H1, menú canónico, indexable).
 - [x] Sin scroll horizontal de página a 1440, 1024, 390 y 320. Medido en vivo de 1920 a 320 px (17 anchos, tres tableros): 0 px de desborde.
 - [ ] Un solo H1; grafo Yoast sin piezas duplicadas; axe sin violaciones serias. Un solo H1 verificado en vivo y en la prueba del runtime; axe WCAG 2.2 AA 0 violaciones en vivo en escritorio, tablet y móvil. Pendiente: grafo Yoast de /blog/ (se verifica en el corte).
 - [ ] LCP ≤ 2,5 s, INP ≤ 200 ms y CLS ≤ 0,1 en la medición de laboratorio de 390 y 1440. Medido en vivo con el perfil móvil de Lighthouse (150 ms, 1,6 Mbps, CPU ×4): la imagen del hero se pinta a 3,8 s en móvil, 3,4 s en tablet y 3,6–5,0 s en escritorio; CLS ≤ 0,05; INP 128–248 ms. No cumple 2,5 s: el sitio ya tarda 2,8–3,9 s en el primer pintado con ese perfil (`/agenda/`, `/blog/`: 1,4 MB de scripts) y en móvil el LCP lo toma el banner de cookies del sitio (10–17 s). Seguimiento de sitio, fuera de esta task.
