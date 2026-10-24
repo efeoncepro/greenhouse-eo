@@ -50,6 +50,7 @@ async function page() {
   if (body.length !== 1) throw new Error('Shell without a single Elementor page body: ' + SHELL_URL)
 
   const manifest = JSON.parse(fs.readFileSync(path.join(PLUGIN, 'assets/generated/manifest.json'), 'utf8'))
+
   const env = SUBSCRIBE
     ? { ...process.env, EOBH_PREVIEW_SUBSCRIBE_KEY: SUBSCRIBE, EOBH_PREVIEW_SUBSCRIBE_SURFACE: 'fhsf-efeonce-blog-subscription', EOBH_PREVIEW_SUBSCRIBE_BASE: `http://127.0.0.1:${PORT}/__ghf` }
     : process.env
