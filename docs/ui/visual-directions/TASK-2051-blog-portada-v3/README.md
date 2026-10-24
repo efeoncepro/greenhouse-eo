@@ -11,7 +11,7 @@
 | Archivo | Qué es |
 |---|---|
 | `fuente-canvas-2026-10-24.tar.gz` | Copia congelada de los tableros: `Portada-v3.dc.html` (escritorio 1440), `Movil-v3.dc.html` (390), `Botones.dc.html` (sistema de botones y estados), `Arquitectura.dc.html` (mecánica WordPress) y `canvas.json`. Empaquetado para que Tailwind no escanee el marcado (ver `reference_tailwind_scans_markdown`). |
-| `referencias/` | Se crea en el Slice 1 de TASK-2051: una captura PNG por sección, a 1440 y 390, con los datos de ejemplo del diseño. Son la línea base del gate de fidelidad. |
+| `referencias/` | Línea base del gate (Slice 1 de TASK-2051, 2026-10-24): un PNG por sección del tablero de escritorio (8, a 1440) y del móvil (9, a 390, incluida la cabecera con el logo MCM), con los datos de ejemplo del diseño y el reloj congelado el 24 oct 2026 12:00 UTC. `capture.json` dice cómo y cuándo se capturó. |
 
 Para abrir la fuente: `tar -xzf fuente-canvas-2026-10-24.tar.gz -C <carpeta temporal>` (nunca dentro de `src/`).
 
@@ -30,6 +30,9 @@ el sitio sólo se reutiliza infraestructura (consultas, formularios, despliegue,
    del carrusel no anuncia en autoplay; movimiento reducido sin autoplay, barrido ni paralaje.
 4. Comportamiento sin JavaScript de cada componente (primera diapositiva servida, búsqueda GET, scroll-snap, fecha
    absoluta en la cuenta regresiva).
+5. Raíz fluida del tablero móvil: el canvas fijaba la mesa de trabajo en `390 × 6400 px` con `overflow: hidden`,
+   que recortaba todo lo que pasaba de 6400 px (el contenido mide unos 8 560 px desde que se sumaron los eventos).
+   La raíz toma el ancho de la ventana y su alto natural; a 390 px el resultado es el mismo píxel a píxel.
 
 Cualquier otra diferencia es un defecto del gate.
 
@@ -40,6 +43,25 @@ Cualquier otra diferencia es un defecto del gate.
   por sección; secciones con animación se capturan en el estado final (o con movimiento reducido).
 - Hoja lado a lado por sección para aprobación del operador.
 - Sin scroll horizontal de página (`scrollWidth === clientWidth`) a 1440, 1024, 390 y 320.
+
+### Cómo se generan y se comparan (código en `scripts/public-website/blog-v3/`)
+
+1. `node bind-canvas.cjs` aplica los desvíos de la lista a cada tablero (`*.reference.dc.html`) y convierte cada
+   dato en una consulta (`*.bound.dc.html`). Cada reemplazo declara cuántas veces debe calzar: si el canvas cambia,
+   falla en vez de enlazar lo que no es.
+2. `node build-fixture.cjs` escribe `fixture.json` y `fixture.mobile.json`: los datos de ejemplo del canvas con la
+   forma del contrato de datos (los literales se leen del canvas, no se retipean).
+3. `node test-bound-equivalence.cjs`: la plantilla enlazada con el fixture rinde el mismo HTML que el canvas
+   (escritorio y móvil).
+4. `node fidelity/capture.cjs reference <dir>` captura las referencias con el runtime de producción
+   (`dc-runtime.js`); `capture.cjs bound <dir>` hace lo mismo con la plantilla enlazada y `capture.cjs url <dir> <url>
+   <tablero>` con una página real (preview local o WordPress).
+5. `node fidelity/compare.cjs <referencias> <candidata>` aplica el presupuesto de 1 % por sección y deja un
+   `*.diff.png` por sección distinta. Autocomprobación del 2026-10-24: plantilla enlazada contra referencias,
+   17/17 secciones con 0,000 %.
+
+Las referencias se renderizan con el runtime de plantilla propio de la implementación, no con el del editor del
+canvas: el HTML que produce es el del canvas (prueba 3), y las capturas se miraron contra el canvas publicado.
 
 ## Secciones (orden del canvas)
 

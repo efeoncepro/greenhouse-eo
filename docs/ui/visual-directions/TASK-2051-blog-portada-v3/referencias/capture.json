@@ -1,0 +1,79 @@
+{
+  "mode": "reference",
+  "url": null,
+  "capturedAt": "2026-10-24T03:18:35.911Z",
+  "report": {
+    "Portada-v3": [
+      {
+        "name": "blog-hero",
+        "file": "Portada-v3--00-blog-hero.png"
+      },
+      {
+        "name": "blog-ask",
+        "file": "Portada-v3--01-blog-ask.png"
+      },
+      {
+        "name": "blog-glitch",
+        "file": "Portada-v3--02-blog-glitch.png"
+      },
+      {
+        "name": "blog-events",
+        "file": "Portada-v3--03-blog-events.png"
+      },
+      {
+        "name": "blog-rail",
+        "file": "Portada-v3--04-blog-rail.png"
+      },
+      {
+        "name": "blog-topics",
+        "file": "Portada-v3--05-blog-topics.png"
+      },
+      {
+        "name": "blog-archive",
+        "file": "Portada-v3--06-blog-archive.png"
+      },
+      {
+        "name": "blog-subscribe",
+        "file": "Portada-v3--07-blog-subscribe.png"
+      }
+    ],
+    "Movil-v3": [
+      {
+        "name": "blog-masthead",
+        "file": "Movil-v3--00-blog-masthead.png"
+      },
+      {
+        "name": "blog-hero",
+        "file": "Movil-v3--01-blog-hero.png"
+      },
+      {
+        "name": "blog-ask",
+        "file": "Movil-v3--02-blog-ask.png"
+      },
+      {
+        "name": "blog-glitch",
+        "file": "Movil-v3--03-blog-glitch.png"
+      },
+      {
+        "name": "blog-events",
+        "file": "Movil-v3--04-blog-events.png"
+      },
+      {
+        "name": "blog-rail",
+        "file": "Movil-v3--05-blog-rail.png"
+      },
+      {
+        "name": "blog-topics",
+        "file": "Movil-v3--06-blog-topics.png"
+      },
+      {
+        "name": "blog-archive",
+        "file": "Movil-v3--07-blog-archive.png"
+      },
+      {
+        "name": "blog-subscribe",
+        "file": "Movil-v3--08-blog-subscribe.png"
+      }
+    ]
+  }
+}

@@ -3,6 +3,9 @@
 @import 'tailwindcss/utilities.css' layer(utilities) important;
 @plugin 'tailwindcss-logical';
 
+/* TASK-2051: the blog v3 binder carries the public-site canvas markup as text; it is not portal UI. */
+@source not '../../scripts/public-website/blog-v3';
+
 @theme {
   --radius-none: 0px;
   --radius-xs: var(--mui-shape-customBorderRadius-xs);
