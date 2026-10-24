@@ -19,7 +19,7 @@
 - Wireframe: `docs/ui/wireframes/TASK-2055-blog-archive-v3-template.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Dirección D aprobada por el operador en el canvas (v75, 2026-10-24) y discovery hecho con tres subagentes (runtime, datos/SEO, pipeline). Sin código ni cambios en vivo. Antes de empezar: decidir las cuatro preguntas abiertas.`
+- Status real: `Code complete local (2026-10-24), sin cambios en vivo. Runtime 21d7cad + 85612b7 (eo-blog-home: plantilla, búsqueda, 404 de autores, robots; editorial-blocks: EO_Archive_Adapter); Greenhouse 41c2ac963 + 473fc121b + 07ca13cc1 (pipeline, gates, preview). Evidencia local: equivalencia 6/6, paridad PHP 36/36, gate 44/44 ≤ 1 % en el shell real (máx. 0,518 %, sólo el header canónico), sin desborde ni palabras cortadas de 320 a 1920, axe 0 en 6 vistas × 3 anchos, pruebas del runtime verdes (archivo 59, modelo de contenido 184, portada 27). Falta: aprobación de las descripciones de los temas (docs/ui/visual-directions/TASK-2055-blog-archive-v3/descripciones-temas.md), turno con la sesión de Analytics, despliegue con el flag en preview, gate contra producción, encendido y matriz HTTP en vivo, documentación y skill.`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `none`
@@ -409,11 +409,11 @@ Reglas obligatorias:
 - [x] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
 - [ ] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2055`.
 - [x] Se declaro `Wireframe: docs/ui/wireframes/TASK-2055-blog-archive-v3-template.md` y el archivo existe.
-- [ ] Cada sección de las seis vistas pasa el gate (≤ 1 % de píxeles distintos) a 1440 y 390 contra las referencias del canvas D.
-- [ ] La plantilla enlazada con el fixture rinde el mismo HTML que el canvas y PHP = navegador byte a byte.
+- [ ] Cada sección de las seis vistas pasa el gate (≤ 1 % de píxeles distintos) a 1440 y 390 contra las referencias del canvas D. Local (preview con el shell real de /blog/, 2026-10-24): 44/44, máximo 0,518 % (la diferencia es sólo el header canónico); falta la corrida contra producción.
+- [x] La plantilla enlazada con el fixture rinde el mismo HTML que el canvas y PHP = navegador byte a byte. `test-bound-equivalence.cjs` 6/6 vistas; `test-php-parity.cjs` 36/36 casos (2026-10-24).
 - [ ] En vivo, ninguna de las cuatro vistas muestra el recuadro de demo, la barra lateral de demo, Dark/Light, el riel ni texto en inglés.
-- [ ] Sin scroll horizontal de 320 a 1920, incluidos `/category/glitch/` y `/tag/inbound/`.
-- [ ] Un solo H1, `<main id="main">`, axe WCAG 2.2 AA sin violaciones en las seis vistas.
+- [ ] Sin scroll horizontal de 320 a 1920, incluidos `/category/glitch/` y `/tag/inbound/`. Local: 0 px en 6 vistas × 8 anchos y ninguna palabra del H1 cortada (`fidelity/overflow.cjs`); falta en vivo.
+- [ ] Un solo H1, `<main id="main">`, axe WCAG 2.2 AA sin violaciones en las seis vistas. Local: un H1 y axe 0 en 6 vistas × 3 anchos; falta en vivo.
 - [ ] La búsqueda sólo devuelve entradas publicadas; `/?s=` muestra el estado vacío sin listar páginas.
 - [ ] La matriz HTTP/robots/canonical/schema del Detailed Spec se cumple en vivo para cada vista.
 - [ ] `/author/greenhouse-integration/` responde 404 y no queda ningún enlace a él.

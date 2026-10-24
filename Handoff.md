@@ -10,7 +10,11 @@ Dirección D «Órbita + Índice» aprobada por el operador en el canvas «Porta
 (coordinar turno con la sesión de Analytics), búsqueda limitada a entradas, 404 para autores sin publicaciones, robots
 por vista. Decisiones del operador: descripciones de los seis temas con ≥ 4 publicaciones (redacta Claude, aprueba el
 operador), corregir el `sameAs` de su perfil (hoy `instagram`/`linkedin` = cesargrowth) con su visto bueno. Sin cambios en
-vivo todavía.
+vivo todavía. **Code complete local** (runtime `21d7cad`, `85612b7`; Greenhouse `41c2ac963`, `473fc121b`, `07ca13cc1`):
+equivalencia 6/6, paridad PHP 36/36, gate 44/44 ≤ 1 % en el shell real, sin desborde 320–1920, axe 0. El `sameAs`
+cesargrowth es la cuenta real del operador (sin corrección). Pendiente: aprobar las descripciones
+(`docs/ui/visual-directions/TASK-2055-blog-archive-v3/descripciones-temas.md`), turno con Analytics, despliegue con
+`eo_blog_archive_enabled = preview` y luego `1`. Preview local: `node scripts/public-website/blog-archive/preview/serve.cjs`.
 
 ## 2026-10-24 — Partners: popup «Quiero ser partner» en vivo tras el release (TASK-2044/2045)
 
