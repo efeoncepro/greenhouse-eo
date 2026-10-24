@@ -174,3 +174,18 @@ real: los tres artículos ya se enlazan entre sí desde hoy.
 
 - Grupo de búsquedas: topic cluster(s) · página pilar · pillar page · contenido pilar · cluster de contenidos · seo y marketing de contenidos.
 - Search Console a las 4, 8 y 12 semanas contra los 90 días previos; meta: primeras impresiones sostenidas y primeros clics en España y México.
+
+## 8. Registro de publicación (2026-10-24)
+
+- **Estado:** publicado (aprobado por Julio Reyes). Post `245154`, misma URL, autor Julio, categorías `96`/`106`, etiquetas
+  y marca de contenido esencial de Yoast sin cambios. Escritura con guardas a las 10:08:51 UTC; respaldo local
+  `tmp/seo-inbound-marketing-post-245154-before-v1-20261024T100824Z.json` y opción `_gh_post_refresh_245154_20261024_100851`.
+- **Portada e imagen social:** adjunto `252069`, `wp-content/uploads/2024/08/topic-clusters-contenido-pilar-portada-2026.jpg`
+  (2400 × 1260), Sophia (elenco, engine) ordenando un cluster de tarjetas de luz; «¿Qué le falta a tu blog para rankear?» /
+  «Orden.»; firma 18,3:1. Ficha `ai-generations/2026-10-24_portadas-blog/fichas/MCB-TC1-169.json` (una revisión de
+  `cine-reviewer`, correcciones aplicadas). Respaldo de la portada anterior: `_gh_cover_refresh_245154_20261024_101153`.
+- **Pilar de inbound:** el enlace a esta URL pasó a decir «cómo ordenar tu SEO con topic clusters» (escritura con guardas,
+  opción `_gh_post_refresh_244765_20261024_100910`).
+- **QA anónimo:** 200; title, descripción, canonical, `index, follow`; `BlogPosting` con `dateModified` nuevo, `ImageObject`
+  con la portada nueva, `FAQPage` 5; 4 menciones; índice de 9 anclas válidas; 20 enlaces con 200.
+- **Pendiente:** diagrama de topic cluster nuevo para el cuerpo (el anterior lleva «efeonce.cl»); Search Console a las 4, 8 y 12 semanas.
