@@ -61,6 +61,7 @@ const NOVE_ICON = '<sc-if value="{{ s.fNove }}" hint-placeholder-val="{{ false }
 // image is not composed for the slider, so it gets a reading scrim on the copy side (only when the data asks for it:
 // never for slider art such as the canvas images), and the dek keeps the canvas two lines.
 const SCRIM = '<sc-if value="{{ s.scrim }}" hint-placeholder-val="{{ false }}"><span class="hs-scrim" aria-hidden="true"></span></sc-if>'
+
 const REAL_CONTENT_CSS = `
 /* Contenido real (2026-10-24): velo de lectura para imágenes editoriales y bajada en dos líneas */
 .hs-scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,26,51,.94) 0%,rgba(0,26,51,.82) 28%,rgba(0,26,51,.4) 50%,rgba(0,26,51,0) 68%),linear-gradient(0deg,rgba(0,26,51,.72) 0%,rgba(0,26,51,0) 36%)}
