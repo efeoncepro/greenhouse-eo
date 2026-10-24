@@ -24,6 +24,7 @@ const livePlugin = path.join(baseline, 'code/wp-content/plugins/efeonce-editoria
 if (!fs.existsSync(path.join(livePlugin, 'efeonce-editorial-blocks.php'))) {
   throw new Error(`The baseline has no efeonce-editorial-blocks (looked in ${livePlugin}). Export the live code first.`)
 }
+
 const sha = content => crypto.createHash('sha256').update(content).digest('hex')
 
 // The package is exactly what the plugin directory holds in git: no stray local files reach production.
@@ -31,6 +32,7 @@ const relativeFiles = cp.execFileSync('git', ['ls-files', '--', '.'], { cwd: plu
 const dirty = cp.execFileSync('git', ['status', '--porcelain', '--', '.'], { cwd: plugin, encoding: 'utf8' }).trim()
 
 if (dirty) throw new Error(`Plugin has uncommitted changes; commit them before packaging:\n${dirty}`)
+
 for (const required of ['efeonce-editorial-blocks.php', 'includes/content-model/bootstrap.php']) {
   if (!relativeFiles.includes(required)) throw new Error(`Missing ${required}.`)
 }
@@ -43,6 +45,7 @@ const files = relativeFiles.map(relative => {
 
 // Live files the package does not carry would stay behind silently: list them so the operator decides.
 const liveOnly = []
+
 const walk = dir => {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name)
