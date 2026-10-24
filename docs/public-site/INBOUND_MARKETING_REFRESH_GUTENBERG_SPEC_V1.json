@@ -59,7 +59,18 @@
     },
     {
      "kind": "paragraph",
-     "text": "Dicho de otro modo: el inbound no es una táctica ni un canal. Es un orden de prioridades. Primero entender qué necesita tu cliente ideal; después crear lo que lo ayuda; recién al final, pedirle algo."
+     "text": [
+      {
+       "text": "Dicho de otro modo: el inbound no es una táctica ni un canal. Es un orden de prioridades. Primero entender qué necesita tu "
+      },
+      {
+       "text": "cliente ideal",
+       "href": "https://efeoncepro.com/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/"
+      },
+      {
+       "text": "; después crear lo que lo ayuda; recién al final, pedirle algo."
+      }
+     ]
     }
    ]
   },
@@ -152,7 +163,27 @@
        "strong": true
       },
       {
-       "text": " Una estrategia madura combina las dos con un mismo mensaje."
+       "text": " Por eso trabajamos el "
+      },
+      {
+       "text": "performance marketing",
+       "href": "https://efeoncepro.com/servicios/performance-marketing/",
+       "mention": {
+        "line": "voice"
+       }
+      },
+      {
+       "text": " y el "
+      },
+      {
+       "text": "marketing de contenidos",
+       "href": "https://efeoncepro.com/servicio-marketing-de-contenidos/",
+       "mention": {
+        "line": "brand"
+       }
+      },
+      {
+       "text": " como un mismo ciclo, con un mismo mensaje."
       }
      ]
     },
@@ -208,7 +239,14 @@
        "href": "https://blog.hubspot.com/marketing/our-flywheel"
       },
       {
-       "text": ": los clientes satisfechos no son el final, son la fuerza que impulsa el siguiente giro, porque recomiendan, vuelven y atraen a otros."
+       "text": ": los clientes satisfechos no son el final, son la fuerza que impulsa el siguiente giro, porque recomiendan, vuelven y atraen a otros. Qué pasa cuando esa experiencia falla lo contamos en "
+      },
+      {
+       "text": "Yo solo quería cambiar mis lentes",
+       "href": "https://efeoncepro.com/inbound/como-alinear-marketing-con-experiencia-del-cliente/"
+      },
+      {
+       "text": "."
       }
      ]
     },
@@ -249,7 +287,14 @@
         "strong": true
        },
        {
-        "text": " definir con claridad quién eres, tu punto de vista y tu voz, para que todo lo que produzcas (también con IA) suene a tu marca."
+        "text": " definir con claridad quién eres, tu punto de vista y tu voz, para que todo lo que produzcas (también con IA) suene a tu marca. Lo desarrollamos en "
+       },
+       {
+        "text": "Express en Loop Marketing: POV, voz y buyer persona",
+        "href": "https://efeoncepro.com/loop-marketing/express-voz-marca-ia-loop-marketing/"
+       },
+       {
+        "text": "."
        }
       ],
       [
@@ -296,11 +341,18 @@
        "href": "https://efeoncepro.com/loop-marketing/que-es-loop-marketing/"
       },
       {
-       "text": " y en "
+       "text": ", en "
       },
       {
        "text": "Cómo aplicar Loop Marketing",
        "href": "https://efeoncepro.com/loop-marketing/como-aplicar-loop-marketing/"
+      },
+      {
+       "text": " y en "
+      },
+      {
+       "text": "cómo ejecutarlo con las herramientas de HubSpot",
+       "href": "https://efeoncepro.com/loop-marketing/ejecutar-loop-marketing-hubspot/"
       },
       {
        "text": "."
@@ -387,7 +439,17 @@
         "strong": true
        },
        {
-        "text": " Si la IA arma la respuesta, la pregunta es si usa tu contenido, te cita y menciona tu marca. A eso se le llama AEO (Answer Engine Optimization). Lo explicamos en "
+        "text": " Si la IA arma la respuesta, la pregunta es si usa tu contenido, te cita y menciona tu marca. A eso se le llama "
+       },
+       {
+        "text": "AEO",
+        "href": "https://efeoncepro.com/aeo-2/",
+        "mention": {
+         "line": "engine"
+        }
+       },
+       {
+        "text": " (Answer Engine Optimization). Lo explicamos en "
        },
        {
         "text": "El 80% de lo que cita la IA no existe en Google",
@@ -403,7 +465,14 @@
         "strong": true
        },
        {
-        "text": " Respuestas directas al inicio de cada sección, datos con fuente, definiciones claras y una postura propia. Lo genérico se resume; lo distintivo se cita."
+        "text": " Respuestas directas al inicio de cada sección, datos con fuente, definiciones claras y una postura propia. Lo genérico se resume; lo distintivo se cita. Cómo se trabaja en la práctica: "
+       },
+       {
+        "text": "SEO + AEO: optimización para buscadores y motores de respuesta",
+        "href": "https://efeoncepro.com/loop-marketing/seo-aeo-optimizacion-ia-2025/"
+       },
+       {
+        "text": "."
        }
       ]
      ]
@@ -411,6 +480,21 @@
     {
      "kind": "paragraph",
      "text": "Hasta aquí podemos decir algo con seguridad: el inbound que sólo se mide en visitas al blog va a mostrar números cada vez más bajos, aunque esté funcionando. La medición también tiene que cambiar."
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Y hay un paso más: los agentes de IA ya no sólo leen tu sitio, empiezan a usarlo para comparar, cotizar o agendar. Cómo prepararte está en "
+      },
+      {
+       "text": "el fin de la web «solo para humanos»",
+       "href": "https://efeoncepro.com/aeo/web-agentica-agentes-ia/"
+      },
+      {
+       "text": "."
+      }
+     ]
     }
    ]
   },
@@ -465,6 +549,13 @@
         "text": " Guías, comparativas, herramientas, casos. Respuesta directa primero, profundidad después. Más ideas en "
        },
        {
+        "text": "estrategia de contenidos que genera resultados",
+        "href": "https://efeoncepro.com/inbound/estrategia-de-contenidos/"
+       },
+       {
+        "text": " y en "
+       },
+       {
         "text": "cómo generar más leads con marketing de contenidos",
         "href": "https://efeoncepro.com/inbound/genera-leads-con-marketing-de-contenidos/"
        },
@@ -478,7 +569,34 @@
         "strong": true
        },
        {
-        "text": " SEO para Google, AEO para las respuestas de IA, redes y newsletter para quienes ya te siguen, y pauta para acelerar. Ver "
+        "text": " "
+       },
+       {
+        "text": "Posicionamiento SEO",
+        "href": "https://efeoncepro.com/servicios/posicionamiento-seo/",
+        "mention": {
+         "line": "engine"
+        }
+       },
+       {
+        "text": " para Google, "
+       },
+       {
+        "text": "AEO",
+        "href": "https://efeoncepro.com/aeo-2/",
+        "mention": {
+         "line": "engine"
+        }
+       },
+       {
+        "text": " para las respuestas de IA, redes y newsletter para quienes ya te siguen, y pauta para acelerar. Tu cliente ya no busca sólo en Google: "
+       },
+       {
+        "text": "busca también en video, redes y marketplaces",
+        "href": "https://efeoncepro.com/aeo/surround-discovery-seo-google-video-marketplace/"
+       },
+       {
+        "text": ". Ver también "
        },
        {
         "text": "el impacto del SEO en inbound",
@@ -494,7 +612,14 @@
         "strong": true
        },
        {
-        "text": " Una herramienta, una plantilla, un diagnóstico o una suscripción. Conecta cada formulario a tu CRM para que nada se pierda."
+        "text": " Una herramienta, una plantilla, un diagnóstico o una suscripción. Conecta cada formulario a tu CRM para que nada se pierda, y trata tu sitio como un producto que se mejora con datos: así lo explicamos en "
+       },
+       {
+        "text": "Growth-Driven Design",
+        "href": "https://efeoncepro.com/design/diseno-web/sitios-web-que-generan-resultados/"
+       },
+       {
+        "text": "."
        }
       ],
       [
@@ -503,7 +628,14 @@
         "strong": true
        },
        {
-        "text": " Visitas, sí, pero también menciones y citas en IA, contactos de calidad, oportunidades y ventas. Revisa cada mes qué funcionó y corrige."
+        "text": " Visitas, sí, pero también menciones y citas en IA, contactos de calidad, oportunidades y ventas. Revisa cada mes qué funcionó y corrige. Un buen punto de partida: "
+       },
+       {
+        "text": "medir tus formularios de HubSpot en GA4",
+        "href": "https://efeoncepro.com/hubspot/como-rastrear-formularios-hubspot-en-ga4-paso-a-paso/"
+       },
+       {
+        "text": "."
        }
       ]
      ]
@@ -596,7 +728,24 @@
         "strong": true
        },
        {
-        "text": " HubSpot (la plataforma de quienes crearon la metodología) o Salesforce, para conectar contenido, formularios, correos y ventas."
+        "text": " "
+       },
+       {
+        "text": "HubSpot",
+        "href": "https://efeoncepro.com/servicios-contratar-hubspot/",
+        "mention": {
+         "line": "revenue-hubspot"
+        }
+       },
+       {
+        "text": " (la plataforma de quienes crearon la metodología) o Salesforce, para conectar contenido, formularios, correos y ventas. Si ya lo tienes, estos son "
+       },
+       {
+        "text": "5 pasos para transformar tu CRM en motor de crecimiento",
+        "href": "https://efeoncepro.com/hubspot/5-pasos-para-transformar-tu-crm-en-motor-de-crecimiento/"
+       },
+       {
+        "text": "."
        }
       ],
       [
@@ -623,7 +772,17 @@
         "strong": true
        },
        {
-        "text": " un panel de preguntas que tu cliente le haría a ChatGPT, Gemini o Perplexity, revisado cada mes, para saber si tu marca aparece y cómo la describen."
+        "text": " un panel de preguntas que tu cliente le haría a ChatGPT, Gemini o Perplexity, revisado cada mes, para saber si tu marca aparece y cómo la describen. El "
+       },
+       {
+        "text": "Efeonce AI Visibility Report",
+        "href": "https://think.efeoncepro.com/brand-visibility",
+        "mention": {
+         "line": "growth"
+        }
+       },
+       {
+        "text": " te da una primera lectura gratis."
        }
       ]
      ]
@@ -688,7 +847,18 @@
        "answer": [
         {
          "kind": "paragraph",
-         "text": "No es obligatorio, pero necesitas algún CRM que conecte tu contenido y tus formularios con ventas. Sin esa conexión no sabes qué contenido genera negocio."
+         "text": [
+          {
+           "text": "No es obligatorio, pero necesitas algún CRM que conecte tu contenido y tus formularios con ventas. Sin esa conexión no sabes qué contenido genera negocio. Si usas HubSpot, aquí explicamos cómo "
+          },
+          {
+           "text": "crear un pipeline de ventas que convierte",
+           "href": "https://efeoncepro.com/hubspot/crea-un-pipeline-de-ventas-que-convierte-guia-paso-a-paso/"
+          },
+          {
+           "text": "."
+          }
+         ]
         }
        ]
       }
@@ -721,14 +891,17 @@
       ],
       [
        {
-        "text": "Revisa cómo te ven hoy los buscadores y la IA con las herramientas gratuitas de "
+        "text": "Revisa cómo te describen hoy los asistentes de IA con el "
        },
        {
-        "text": "Efeonce Think",
-        "href": "https://think.efeoncepro.com/"
+        "text": "Efeonce AI Visibility Report",
+        "href": "https://think.efeoncepro.com/brand-visibility",
+        "mention": {
+         "line": "growth"
+        }
        },
        {
-        "text": "."
+        "text": ", gratuito."
        }
       ]
      ]

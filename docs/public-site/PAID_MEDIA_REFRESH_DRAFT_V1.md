@@ -284,3 +284,23 @@ versión final.
 - **Meta a 12 semanas:** indexación y primeras impresiones sostenidas en «paid media» y «qué es paid media» en
   Chile y México. Es una hipótesis, no una promesa.
 - **GA4:** sesiones con interacción en la URL y clics hacia la landing de performance marketing.
+
+## 8. Spec y mapa de enlaces internos (2026-10-24)
+
+La fuente editable final es [`PAID_MEDIA_REFRESH_GUTENBERG_SPEC_V1.json`](PAID_MEDIA_REFRESH_GUTENBERG_SPEC_V1.json)
+(validación `pass`, 0 hallazgos, 54 bloques). Sobre el borrador de §3 agrega, por pedido del autor, enlaces al blog y
+menciones AXIS a las landings (mismo criterio de líneas que el refresh de inbound §9), la ilustración del Messy Middle
+(`244955`, 520 px) y el recuadro «SEM y PPC no son lo mismo» como bloque desplegable abierto.
+
+| Sección | Enlace nuevo |
+|---|---|
+| Qué es | mención agencia de medios |
+| Paid, owned, earned | menciones marketing de contenidos, posicionamiento SEO y AEO · `/inbound/que-es-inbound-marketing/` |
+| Tipos | menciones redes sociales y marketing de influencers |
+| Por qué se necesitan | mención sitio web (`/desarrollo-sitios-web/`) · Growth-Driven Design · mención performance marketing · `/loop-marketing/que-es-loop-marketing/` |
+| Qué cambió | mención AEO · `/aeo/donde-cita-la-ia/` · `/marketing-digital/ley-21719-impacto-marketing-go-to-market/` |
+| Pasos | ICP · `/inbound/estrategia-de-contenidos/` · mención HubSpot · 5 pasos CRM · formularios HubSpot en GA4 |
+| Errores | `/marketing-digital/contratar-agencia-de-marketing/` |
+| Cierre | mención Efeonce AI Visibility Report · CTA con menciones performance marketing y planificación de medios |
+
+Total: 18 enlaces únicos + 13 menciones; todos 200 al 2026-10-24.

@@ -326,3 +326,25 @@ sobre marketing, búsqueda e IA. Suscríbete aquí.
   válidas; 20 enlaces del artículo responden 200; sin desborde horizontal a 1440 px ni a 375 px; consola sin errores.
 - **Pendiente:** suscripción a Glitch se enlaza al archivo `/category/glitch/` porque el formulario de suscripción
   del blog aún no está publicado; reemplazarlo cuando exista. Observar Search Console a las 4, 8 y 12 semanas (§7).
+
+## 9. Mapa de enlaces internos (V2 de la spec, 2026-10-24 — pendiente de publicar)
+
+Pedido del autor: conectar el artículo con el blog y las landings (en especial SEO y AEO). Las landings van como
+**mención de servicio** AXIS `efeonce.mention` (pill + isotipo, color de la línea del menú: Engine para SEO/AEO/web,
+Voice para performance/medios, Brand para contenido/redes/influencers, Revenue para HubSpot, Growth para el AI
+Visibility Report); los artículos, como enlace normal. Content Factory emite la mención desde 2026-10-24
+(`mention` en el segmento de texto; sólo https en efeoncepro.com/efeonce.org).
+
+| Sección | Enlace nuevo |
+|---|---|
+| Qué es | cliente ideal → `/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/` |
+| Inbound vs outbound | mención performance marketing · mención marketing de contenidos |
+| Flywheel | `/inbound/como-alinear-marketing-con-experiencia-del-cliente/` |
+| Loop | `/loop-marketing/express-voz-marca-ia-loop-marketing/` · `/loop-marketing/ejecutar-loop-marketing-hubspot/` |
+| Búsqueda con IA | mención AEO (`/aeo-2/`) · `/loop-marketing/seo-aeo-optimizacion-ia-2025/` · `/aeo/web-agentica-agentes-ia/` |
+| Pasos | `/inbound/estrategia-de-contenidos/` · menciones posicionamiento SEO y AEO · `/aeo/surround-discovery-seo-google-video-marketplace/` · `/design/diseno-web/sitios-web-que-generan-resultados/` · `/hubspot/como-rastrear-formularios-hubspot-en-ga4-paso-a-paso/` |
+| Herramientas | mención HubSpot · `/hubspot/5-pasos-para-transformar-tu-crm-en-motor-de-crecimiento/` · mención Efeonce AI Visibility Report |
+| FAQ HubSpot | `/hubspot/crea-un-pipeline-de-ventas-que-convierte-guia-paso-a-paso/` |
+| Cierre | la herramienta pasa de Think genérico al Efeonce AI Visibility Report |
+
+Total: 26 enlaces únicos + 8 menciones; todos 200 al 2026-10-24; validación `pass`, 0 hallazgos, 61 bloques.

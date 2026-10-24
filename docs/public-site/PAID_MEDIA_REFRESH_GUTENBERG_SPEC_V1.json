@@ -1,0 +1,906 @@
+{
+ "title": "Qué es paid media y cómo combinarlo con el inbound marketing",
+ "slug": "inbound-marketing-paid-media",
+ "excerpt": "Qué es paid media, sus tipos (SEM, PPC, social ads, display) y cómo combinarlo con contenido e inbound para que cada peso invertido rinda más.",
+ "seo": {
+  "title": "Qué es paid media y cómo combinarlo con inbound | Efeonce",
+  "description": "Qué es paid media, sus tipos (SEM, PPC, social ads, display) y cómo combinarlo con contenido e inbound para que cada peso invertido rinda más.",
+  "canonicalUrl": "https://efeoncepro.com/marketing-digital/inbound-marketing-paid-media/",
+  "inLanguage": "es-CL",
+  "indexPolicy": "index"
+ },
+ "intro": [
+  "Haz un ejercicio mental: pausa todas tus campañas pagadas durante una semana. ¿Qué pasa con tus contactos y tus ventas?",
+  [
+   {
+    "text": "Si la respuesta es «caen casi a cero», tu publicidad no es una estrategia. "
+   },
+   {
+    "text": "Es un grifo",
+    "strong": true
+   },
+   {
+    "text": ": mientras pagas, sale agua; cuando dejas de pagar, se corta. Y el problema no es la publicidad. Es que todo lo que pasa después del clic depende de ella."
+   }
+  ],
+  "Mi lectura es que el paid media rinde de verdad cuando no trabaja solo. Vamos por partes."
+ ],
+ "tableOfContents": true,
+ "sections": [
+  {
+   "heading": "¿Qué es paid media?",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Paid media son todos los espacios donde una marca paga por aparecer: anuncios en buscadores, en redes sociales, en sitios y aplicaciones, en video y en plataformas de comercio.",
+       "strong": true
+      },
+      {
+       "text": " Su gran ventaja es la velocidad y el control: decides a quién le hablas, cuándo y con qué mensaje, y empiezas a recibir visitas el mismo día. Su límite también es claro: se detiene cuando se detiene la inversión."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "En español se le llama también medios pagados o publicidad pagada. En la práctica, cuando alguien dice «hacemos paid media», habla de planificar, comprar y optimizar esos espacios para lograr un objetivo de negocio. Es lo que hace una "
+      },
+      {
+       "text": "agencia de medios",
+       "href": "https://efeoncepro.com/servicios/agencia-de-medios/",
+       "mention": {
+        "line": "voice"
+       }
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Paid, owned y earned media: las tres formas de aparecer",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "El paid media se entiende mejor junto a sus dos vecinos:"
+    },
+    {
+     "kind": "table",
+     "style": "stripes",
+     "caption": "Paid, owned y earned media: qué es cada uno y qué aporta.",
+     "headers": [
+      "Tipo",
+      "Qué es",
+      "Ejemplos",
+      "Fortaleza",
+      "Límite"
+     ],
+     "rows": [
+      [
+       "Paid (pagado)",
+       "Espacios por los que pagas",
+       "Google Ads, Meta Ads, LinkedIn Ads, display, video",
+       "Velocidad y control",
+       "Se corta al dejar de pagar"
+      ],
+      [
+       "Owned (propio)",
+       "Canales que controlas",
+       "Sitio web, blog, newsletter, app",
+       "Se acumula y es tuyo",
+       "Tarda en crecer"
+      ],
+      [
+       "Earned (ganado)",
+       "Lo que otros dicen de ti",
+       "Prensa, menciones, reseñas, recomendaciones, citas en respuestas de IA",
+       "Máxima credibilidad",
+       "No lo controlas"
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "El inbound marketing vive sobre todo en lo propio y lo ganado: el "
+      },
+      {
+       "text": "marketing de contenidos",
+       "href": "https://efeoncepro.com/servicio-marketing-de-contenidos/",
+       "mention": {
+        "line": "brand"
+       }
+      },
+      {
+       "text": " construye lo propio, y el "
+      },
+      {
+       "text": "posicionamiento SEO",
+       "href": "https://efeoncepro.com/servicios/posicionamiento-seo/",
+       "mention": {
+        "line": "engine"
+       }
+      },
+      {
+       "text": " y el "
+      },
+      {
+       "text": "AEO",
+       "href": "https://efeoncepro.com/aeo-2/",
+       "mention": {
+        "line": "engine"
+       }
+      },
+      {
+       "text": " hacen que buscadores e IA te encuentren y te citen. El paid media acelera ambos: lleva gente a tu contenido y le da alcance a lo que ya funciona. Si quieres el marco completo del inbound, está aquí: "
+      },
+      {
+       "text": "qué es el inbound marketing y cómo funciona en 2026",
+       "href": "https://efeoncepro.com/inbound/que-es-inbound-marketing/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Tipos de paid media",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Publicidad en buscadores (SEM).",
+        "strong": true
+       },
+       {
+        "text": " Anuncios en Google o Bing que aparecen cuando alguien busca algo. Es el canal de mayor intención: la persona ya está pidiendo una respuesta."
+       }
+      ],
+      [
+       {
+        "text": "Social ads.",
+        "strong": true
+       },
+       {
+        "text": " Anuncios en Meta (Facebook e Instagram), LinkedIn, TikTok o YouTube. Funcionan por segmentación de audiencias más que por búsqueda: llegas a quien todavía no te busca. Rinden más cuando la marca ya tiene "
+       },
+       {
+        "text": "redes sociales",
+        "href": "https://efeoncepro.com/servicios/redes-sociales/",
+        "mention": {
+         "line": "brand"
+        }
+       },
+       {
+        "text": " activas que respalden el anuncio."
+       }
+      ],
+      [
+       {
+        "text": "Display y programática.",
+        "strong": true
+       },
+       {
+        "text": " Banners y formatos en sitios y aplicaciones, comprados por subasta automatizada. Útiles para alcance y recordación."
+       }
+      ],
+      [
+       {
+        "text": "Video.",
+        "strong": true
+       },
+       {
+        "text": " YouTube, plataformas de streaming y video en redes. Sirven para contar más en pocos segundos."
+       }
+      ],
+      [
+       {
+        "text": "Retargeting.",
+        "strong": true
+       },
+       {
+        "text": " Anuncios a personas que ya visitaron tu sitio o interactuaron con tu marca."
+       }
+      ],
+      [
+       {
+        "text": "Retail media y marketplaces.",
+        "strong": true
+       },
+       {
+        "text": " Anuncios dentro de Mercado Libre, Amazon u otras tiendas, justo donde se compra."
+       }
+      ],
+      [
+       {
+        "text": "Contenido patrocinado e influencers pagados.",
+        "strong": true
+       },
+       {
+        "text": " Cuando pagas para que un medio o un creador hable de ti. Lo trabajamos como "
+       },
+       {
+        "text": "marketing de influencers",
+        "href": "https://efeoncepro.com/servicios/agencia-de-influencers/",
+        "mention": {
+         "line": "brand"
+        }
+       },
+       {
+        "text": ", con derechos y medición."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "details",
+     "summary": "SEM y PPC no son lo mismo",
+     "open": true,
+     "blocks": [
+      {
+       "kind": "paragraph",
+       "text": [
+        {
+         "text": "Se usan como sinónimos, pero no lo son. "
+        },
+        {
+         "text": "SEM",
+         "strong": true
+        },
+        {
+         "text": " (search engine marketing) es el canal: la publicidad en buscadores. "
+        },
+        {
+         "text": "PPC",
+         "strong": true
+        },
+        {
+         "text": " (pay per click, pago por clic) es una forma de cobro: pagas sólo cuando alguien hace clic. La mayoría de las campañas de SEM se cobran por clic, pero también se cobra por clic en redes o en display. Dicho de otro modo: SEM es dónde apareces; PPC es cómo pagas."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Por qué el paid media necesita al inbound (y al revés)",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Te lo explico con manzanitas 🍏🍏🍏: el anuncio es la invitación a una fiesta; el contenido es la fiesta. Puedes mandar mil invitaciones, pero si la gente llega y no hay nada, se va y no vuelve. Y una fiesta buenísima sin invitaciones tarda años en llenarse."
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Hay una razón técnica, además de la intuitiva. Google evalúa cada anuncio de búsqueda con un "
+      },
+      {
+       "text": "nivel de calidad",
+       "href": "https://support.google.com/google-ads/answer/6167118"
+      },
+      {
+       "text": " que considera tres cosas: el porcentaje de clics esperado, la relevancia del anuncio y "
+      },
+      {
+       "text": "la experiencia de la página de destino",
+       "strong": true
+      },
+      {
+       "text": ". Una página que responde bien a lo que la persona buscó no sólo convierte más: también es la que la plataforma prefiere mostrar. Por eso el "
+      },
+      {
+       "text": "sitio web",
+       "href": "https://efeoncepro.com/desarrollo-sitios-web/",
+       "mention": {
+        "line": "engine"
+       }
+      },
+      {
+       "text": " es parte de la campaña, y conviene mejorarlo con datos como explicamos en "
+      },
+      {
+       "text": "Growth-Driven Design",
+       "href": "https://efeoncepro.com/design/diseno-web/sitios-web-que-generan-resultados/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Y hay una razón de comportamiento. Google describió en su estudio "
+      },
+      {
+       "text": "Decoding Decisions: The Messy Middle of Purchase Behavior",
+       "href": "https://thinkwithgoogle.com/_qs/documents/9998/Decoding_Decisions_The_Messy_Middle_of_Purchase_Behavior.pdf"
+      },
+      {
+       "text": " (2020) que las personas no compran en línea recta: exploran y evalúan en bucle antes de decidir. Un anuncio puede ponerte en la lista; lo que te hace ganar la evaluación son las comparativas, los casos y las respuestas honestas."
+      }
+     ]
+    },
+    {
+     "kind": "image",
+     "mediaId": 244955,
+     "url": "https://efeoncepro.com/wp-content/uploads/2024/08/messy-middle.svg",
+     "alt": "Diagrama del Messy Middle: un detonante lleva a un bucle entre exploración y evaluación, dentro de la exposición a la marca, que termina en la compra y la experiencia.",
+     "width": 520,
+     "height": 520,
+     "caption": "El Messy Middle según Google: la publicidad puede ponerte en la lista; el contenido gana la evaluación. Ilustración Efeonce."
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "En Efeonce lo pensamos así: "
+      },
+      {
+       "text": "la publicidad compra la primera mirada; el contenido gana la decisión.",
+       "strong": true
+      },
+      {
+       "text": " Por eso no separamos «la agencia que hace pauta» de «la que hace contenido»: el "
+      },
+      {
+       "text": "performance marketing",
+       "href": "https://efeoncepro.com/servicios/performance-marketing/",
+       "mention": {
+        "line": "voice"
+       }
+      },
+      {
+       "text": " y el contenido son el mismo ciclo, el que describimos en "
+      },
+      {
+       "text": "¿Qué es Loop Marketing?",
+       "href": "https://efeoncepro.com/loop-marketing/que-es-loop-marketing/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Qué cambió en paid media entre 2024 y 2026",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "1. Las campañas se volvieron automáticas.",
+       "strong": true
+      },
+      {
+       "text": " Google ofrece "
+      },
+      {
+       "text": "Performance Max",
+       "href": "https://support.google.com/google-ads/answer/10724817"
+      },
+      {
+       "text": ", un solo tipo de campaña que reparte el presupuesto entre búsqueda, YouTube, display, Discover, Gmail y Maps. En mayo de 2025 presentó "
+      },
+      {
+       "text": "AI Max para campañas de búsqueda",
+       "href": "https://blog.google/products/ads-commerce/google-ai-max-for-search-campaigns/"
+      },
+      {
+       "text": ", que usa IA para encontrar búsquedas relevantes más allá de tus palabras clave y adaptar los textos de los anuncios. Meta avanzó en la misma dirección con "
+      },
+      {
+       "text": "Meta Advantage+",
+       "href": "https://www.facebook.com/business/ads/meta-advantage-plus"
+      },
+      {
+       "text": "."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "¿Qué significa? Que la máquina decide cada vez más dónde y a quién mostrar el anuncio. Lo que tú controlas es la calidad de lo que le das: creatividades, páginas de destino, contenido y, sobre todo, datos de conversión reales. Si la plataforma aprende de formularios basura, optimiza hacia más formularios basura."
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "2. Los anuncios llegaron a las respuestas de IA.",
+       "strong": true
+      },
+      {
+       "text": " En Google Marketing Live 2025, Google anunció que "
+      },
+      {
+       "text": "amplía los anuncios dentro de AI Overviews y prueba anuncios en AI Mode",
+       "href": "https://support.google.com/google-ads/answer/16290177"
+      },
+      {
+       "text": ". Al momento del anuncio, AI Overviews con anuncios estaba disponible en inglés en algunos países y AI Mode sólo en pruebas en Estados Unidos; conviene revisar la disponibilidad en tu mercado antes de planificar en torno a eso. Mientras tanto, aparecer de forma orgánica en esas respuestas es trabajo de "
+      },
+      {
+       "text": "AEO",
+       "href": "https://efeoncepro.com/aeo-2/",
+       "mention": {
+        "line": "engine"
+       }
+      },
+      {
+       "text": ": por qué importa está en "
+      },
+      {
+       "text": "El 80% de lo que cita la IA no existe en Google",
+       "href": "https://efeoncepro.com/aeo/donde-cita-la-ia/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "3. Las cookies de terceros no desaparecieron.",
+       "strong": true
+      },
+      {
+       "text": " En una versión anterior de este artículo dijimos que desaparecerían en 2024. No pasó: en abril de 2025 Google "
+      },
+      {
+       "text": "decidió mantenerlas en Chrome",
+       "href": "https://privacysandbox.com/news/privacy-sandbox-next-steps/"
+      },
+      {
+       "text": " y dejar que cada persona las administre desde su configuración. Aun así, depender sólo de ellas sigue siendo frágil: los datos propios (tus contactos, tu CRM, tus conversiones) son la base más estable para segmentar y medir. En Chile, además, la nueva ley de datos personales cambia cómo se pueden usar: lo analizamos en "
+      },
+      {
+       "text": "la Ley 21.719 obliga a rediseñar el marketing",
+       "href": "https://efeoncepro.com/marketing-digital/ley-21719-impacto-marketing-go-to-market/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Cómo combinar paid media e inbound paso a paso",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "ordered": true,
+     "items": [
+      [
+       {
+        "text": "Parte por el cliente ideal, no por la plataforma.",
+        "strong": true
+       },
+       {
+        "text": " Define a quién quieres atraer y qué necesita saber antes de comprarte. Aquí está el método: "
+       },
+       {
+        "text": "cliente ideal B2B: ICP, buyer persona, IPP y JTBD",
+        "href": "https://efeoncepro.com/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Ten un destino que responda antes de pagar por tráfico.",
+        "strong": true
+       },
+       {
+        "text": " Cada campaña debe llevar a una página que resuelva exactamente lo que el anuncio promete. Mandar todo al home es pagar por visitas que se pierden."
+       }
+      ],
+      [
+       {
+        "text": "Usa la pauta para distribuir tu mejor contenido.",
+        "strong": true
+       },
+       {
+        "text": " Si una guía o una herramienta ya convierte de forma orgánica, ponle presupuesto. Es la manera más segura de invertir: amplificas algo que ya demostró valor. Cómo construir ese contenido: "
+       },
+       {
+        "text": "estrategia de contenidos que genera resultados",
+        "href": "https://efeoncepro.com/inbound/estrategia-de-contenidos/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Haz retargeting con contenido de evaluación.",
+        "strong": true
+       },
+       {
+        "text": " A quien ya te visitó no le insistas con «compra ahora»: muéstrale el caso, la comparativa o la respuesta a la objeción que le falta."
+       }
+      ],
+      [
+       {
+        "text": "Conecta las conversiones a tu CRM y devuélveselas a las plataformas.",
+        "strong": true
+       },
+       {
+        "text": " Así optimizan hacia contactos que realmente se convierten en ventas, no hacia cualquier formulario. Si usas "
+       },
+       {
+        "text": "HubSpot",
+        "href": "https://efeoncepro.com/servicios-contratar-hubspot/",
+        "mention": {
+         "line": "revenue-hubspot"
+        }
+       },
+       {
+        "text": ", estos son "
+       },
+       {
+        "text": "5 pasos para transformar tu CRM en motor de crecimiento",
+        "href": "https://efeoncepro.com/hubspot/5-pasos-para-transformar-tu-crm-en-motor-de-crecimiento/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Mide el ciclo completo.",
+        "strong": true
+       },
+       {
+        "text": " No te quedes en el costo por clic: mira costo por oportunidad, por venta y lo que pasa con tu tráfico orgánico y directo cuando la pauta sube o baja. Un buen comienzo es "
+       },
+       {
+        "text": "medir tus formularios de HubSpot en GA4",
+        "href": "https://efeoncepro.com/hubspot/como-rastrear-formularios-hubspot-en-ga4-paso-a-paso/"
+       },
+       {
+        "text": "."
+       }
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Ejemplos de paid media combinado con inbound",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Estos son ejemplos de tácticas, no casos de clientes:"
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Software B2B:",
+        "strong": true
+       },
+       {
+        "text": " una guía descargable sobre un problema del sector, promovida en LinkedIn a cargos específicos. Quien la descarga recibe después un caso de estudio por correo y un retargeting con una demo."
+       }
+      ],
+      [
+       {
+        "text": "E-commerce:",
+        "strong": true
+       },
+       {
+        "text": " campañas de búsqueda para las consultas de comparación («X vs Y», «mejor X para…») que llevan a una página comparativa honesta, en vez de a la ficha de producto."
+       }
+      ],
+      [
+       {
+        "text": "Servicio local o profesional:",
+        "strong": true
+       },
+       {
+        "text": " anuncios en búsqueda para la intención de contratar, y contenido orgánico para las preguntas previas. La pauta captura la demanda; el contenido la crea."
+       }
+      ],
+      [
+       {
+        "text": "Marca de consumo:",
+        "strong": true
+       },
+       {
+        "text": " pauta en video para el lanzamiento y, en paralelo, contenido de respuesta a las preguntas que el lanzamiento genera, para que quien busque después te encuentre a ti."
+       }
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Errores frecuentes en paid media",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "items": [
+      "Llevar todas las campañas a la página de inicio.",
+      "Medir el éxito sólo por costo por clic o por cantidad de formularios.",
+      "Apagar el contenido «porque la pauta funciona», hasta el día en que sube el costo por clic.",
+      "Usar la misma creatividad para todos los canales y todas las etapas.",
+      "Alimentar las campañas automáticas con conversiones que no significan negocio."
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Si estás evaluando a quién encargarle esto, te puede servir "
+      },
+      {
+       "text": "¿es hora de contratar una agencia de marketing?",
+       "href": "https://efeoncepro.com/marketing-digital/contratar-agencia-de-marketing/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Preguntas frecuentes sobre paid media",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "faq",
+     "schema": {
+      "enabled": true,
+      "name": "Preguntas frecuentes sobre paid media",
+      "canonicalUrl": "https://efeoncepro.com/marketing-digital/inbound-marketing-paid-media/",
+      "inLanguage": "es-CL"
+     },
+     "items": [
+      {
+       "question": "¿Qué es paid media en marketing?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Es todo espacio publicitario por el que una marca paga para aparecer: anuncios en buscadores, redes sociales, sitios, video y marketplaces. Se diferencia de los medios propios (tu sitio, tu newsletter) y de los ganados (lo que otros dicen de ti)."
+        }
+       ]
+      },
+      {
+       "question": "¿Cuál es la diferencia entre SEM y PPC?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "SEM es el canal: publicidad en buscadores como Google o Bing. PPC es un modelo de cobro: pagas por cada clic. La mayoría de las campañas de SEM usan PPC, pero el pago por clic también existe en redes sociales y display."
+        }
+       ]
+      },
+      {
+       "question": "¿Qué conviene más, paid media o inbound marketing?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "No compiten. El paid media da velocidad y control; el inbound construye un activo que se acumula. Lo más eficiente suele ser usar la pauta para amplificar el contenido que ya funciona y para capturar la demanda que el contenido genera."
+        }
+       ]
+      },
+      {
+       "question": "¿Cuánto debería invertir en paid media?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Depende de tu objetivo, tu margen y cuánto vale un cliente para ti. Antes de definir un monto, asegúrate de poder medir cuánto cuesta conseguir una oportunidad y una venta; sin eso, cualquier presupuesto es una apuesta."
+        }
+       ]
+      },
+      {
+       "question": "¿Desaparecieron las cookies de terceros?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "No. En abril de 2025 Google decidió mantenerlas en Chrome. Aun así, conviene construir la segmentación y la medición sobre datos propios, que son más estables y respetan mejor la privacidad."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "En resumen",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "El paid media es la forma más rápida de aparecer frente a tu cliente, pero no decide sola el resultado. Lo que pasa después del clic —la página, el contenido, el seguimiento y los datos que vuelven a la plataforma— es lo que convierte la inversión en negocio. Con campañas cada vez más automáticas, esa es tu ventaja."
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Si quieres seguir esta conversación, lee "
+       },
+       {
+        "text": "Glitch",
+        "href": "https://efeoncepro.com/category/glitch/"
+       },
+       {
+        "text": ": cada lunes, una idea sobre IA, marketing y negocios."
+       }
+      ],
+      [
+       {
+        "text": "Revisa cómo te describen hoy los asistentes de IA con el "
+       },
+       {
+        "text": "Efeonce AI Visibility Report",
+        "href": "https://think.efeoncepro.com/brand-visibility",
+        "mention": {
+         "line": "growth"
+        }
+       },
+       {
+        "text": ", gratuito."
+       }
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Fuentes y nota de actualización",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Google Ads Help. "
+       },
+       {
+        "text": "About Quality Score for Search campaigns",
+        "href": "https://support.google.com/google-ads/answer/6167118"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Google Ads Help. "
+       },
+       {
+        "text": "About Performance Max campaigns",
+        "href": "https://support.google.com/google-ads/answer/10724817"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Google (2025). "
+       },
+       {
+        "text": "Introducing AI Max for Search campaigns",
+        "href": "https://blog.google/products/ads-commerce/google-ai-max-for-search-campaigns/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Meta for Business. "
+       },
+       {
+        "text": "Meta Advantage+",
+        "href": "https://www.facebook.com/business/ads/meta-advantage-plus"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Google Ads Help. "
+       },
+       {
+        "text": "Google Marketing Live 2025: Your roundup of announcements",
+        "href": "https://support.google.com/google-ads/answer/16290177"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Privacy Sandbox (2025). "
+       },
+       {
+        "text": "Next steps for Privacy Sandbox and tracking protections in Chrome",
+        "href": "https://privacysandbox.com/news/privacy-sandbox-next-steps/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Google (2020). "
+       },
+       {
+        "text": "Decoding Decisions: The Messy Middle of Purchase Behavior",
+        "href": "https://thinkwithgoogle.com/_qs/documents/9998/Decoding_Decisions_The_Messy_Middle_of_Purchase_Behavior.pdf"
+       },
+       {
+        "text": "."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Este artículo se publicó en octubre de 2024 y se reescribió en octubre de 2026: se reenfocó en qué es el paid media, se corrigió el dato sobre las cookies de terceros y se retiraron cifras sin fuente verificable. Lo desarrolló Julio Reyes con apoyo de IA en investigación, estructura y edición; Julio definió la tesis y aprobó la versión final."
+    }
+   ]
+  }
+ ],
+ "cta": {
+  "text": [
+   {
+    "text": "Y si quieres revisar tus campañas, conoce cómo trabajamos el "
+   },
+   {
+    "text": "performance marketing",
+    "href": "https://efeoncepro.com/servicios/performance-marketing/",
+    "mention": {
+     "line": "voice"
+    }
+   },
+   {
+    "text": " y la "
+   },
+   {
+    "text": "planificación de medios",
+    "href": "https://efeoncepro.com/servicios/agencia-de-medios/",
+    "mention": {
+     "line": "voice"
+    }
+   },
+   {
+    "text": "."
+   }
+  ]
+ }
+}
