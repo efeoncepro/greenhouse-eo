@@ -1,5 +1,12 @@
 # TASK-2051 — Portada del blog v3 en alta fidelidad
 
+## Delta 2026-10-24 (TASK-2055)
+
+- La plantilla «Archivo del blog» (búsqueda, temas, etiquetas, autores) se implementa en TASK-2055 dentro de
+  `eo-blog-home` (segunda plantilla con `template_include` detrás de `eo_blog_archive_enabled`), reutilizando
+  `EOBH_Template`, `HOST_RESET` y los gates de `scripts/public-website/blog-v3/`. Cambios a esas piezas compartidas
+  deben correr ambos gates.
+
 ## Delta 2026-10-24
 
 - Formularios en línea de Glitch y del webinar disponibles en el renderer (`presentation: 'inline_pill'`, renderer

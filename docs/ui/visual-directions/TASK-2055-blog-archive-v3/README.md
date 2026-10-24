@@ -1,7 +1,6 @@
 # Archivo del blog v3 — direcciones visuales (TASK-2055)
 
-> Estado: **dirección D (Órbita + Índice) en revisión del operador** (2026-10-24). Sin aprobar todavía; no se escribe código
-> de la plantilla hasta que el operador elija y apruebe el canvas final.
+> Estado: **dirección D (Órbita + Índice) APROBADA por el operador** (2026-10-24, canvas v75: «Bien, me parece todo»). Implementación: TASK-2055.
 
 ## Dónde verlas
 
@@ -73,5 +72,4 @@ Decisiones tomadas con el operador en esta ronda:
 - «Mientras tanto, para empezar» y no «lo más leído»: no medimos lecturas por entrada en el sitio.
 
 Revisión visual local (renderizador del gate de la portada + Playwright): 12 tableros sin desborde
-(`scrollWidth === clientWidth`) y sin imágenes rotas. Pendiente: aprobación del operador del canvas D antes de
-escribir la plantilla.
+(`scrollWidth === clientWidth`) y sin imágenes rotas. Aprobada el 2026-10-24; implementación en TASK-2055.

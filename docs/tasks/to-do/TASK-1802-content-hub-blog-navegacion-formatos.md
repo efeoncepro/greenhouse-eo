@@ -1,5 +1,10 @@
 # TASK-1802 — Content Hub Efeonce: `/blog` navegable y multiformato
 
+## Delta 2026-10-24 (TASK-2055)
+
+- Búsqueda, categorías, etiquetas y autores tienen dueño: TASK-2055 («Archivo del blog v3», dirección D aprobada en el
+  canvas de la portada). Esta task conserva el resto del programa multiformato (inventario de tools y webinars, colecciones).
+
 ## Delta 2026-10-24
 
 - **La dirección visual del hub cambia:** el operador aprobó el canvas «Portada Blog Efeonce» v3
