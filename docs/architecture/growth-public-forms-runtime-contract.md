@@ -402,6 +402,55 @@ suscripción (`data-subscribe="off"`), nunca un éxito simulado.
   evento ↔ Eventos de marketing ↔ posible webinar de Teams queda pendiente de diseño (RESEARCH-013,
   `docs/research/RESEARCH-013-annexes/`). No lanzar eventos reales con el flujo actual.
 
+### Delta 2026-10-24 — límites actuales y diseño objetivo (webinar de Teams)
+
+No cambia el contrato vigente de arriba. Fuente única del pendiente:
+[RESEARCH-013 §Backlog canónico](../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos);
+diseño en el [anexo D](../research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md) y diagnóstico del
+conector Teams↔HubSpot en el [anexo C](../research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md).
+
+**Límites del runtime actual (verificado):**
+
+- La reserva solo conoce `confirmed`/`waitlisted` dentro de `normalized_fields_json`: **no hay cancelación ni paso
+  desde la lista de espera** (promoción).
+- El evento no es una entidad: vive en `ui_policy_json.eventRegistration` de la versión (duplicado en metadatos de
+  WordPress).
+- `eventRegistration.joinUrl` es **uno fijo y compartido por evento**.
+- A HubSpot solo viajan `email`, `ef_event_key` (se sobrescribe) y `ef_greenhouse_submission_id`; no se usa el objeto
+  Eventos de marketing (0-54) y el token no tiene sus scopes (403 `MISSING_SCOPES`).
+- La corrección de correos (`ACCEPTED_SUBMISSION_STATUSES`, commit `2a971d768`) y la de la píldora (`a5b028461`) están
+  **solo en local, sin release**; el operador decidió no hacer release por ahora (todo sale en un solo release cuando lo
+  decida). Hasta entonces los correos de la reserva no operan en producción.
+
+**Diseño objetivo — diseño, no implementado:**
+
+- **Decisiones cerradas:** la sesión es un **webinar de Teams** (app Eventos), no una reunión normal; tenant M365
+  Business (inscripción básica, sin lista de espera ni aprobación en Teams, hasta 1.000 asistentes). Greenhouse es
+  dueño de la reserva, el cupo y la lista de espera; la espera no se registra en HubSpot.
+- **Inscripción en el webinar por Microsoft Graph** (diseño, no implementado): al confirmar o promover, una proyección
+  del ops-worker inscribe a la persona con `POST /solutions/virtualEvents/webinars/{id}/registrations`, de forma
+  idempotente, con un principal dedicado: app de Entra «Greenhouse Webinars» (single-tenant) con
+  `VirtualEventRegistration-Anon.ReadWrite.All`, `VirtualEvent.Read.All` y `OnlineMeetingArtifact.Read.All`, y su
+  AppId agregado a la application access policy `MY-APP-POLICY`.
+- **`joinWebUrl` personal por inscrito** (diseño, no implementado), leído de `registrations/{id}/sessions` y
+  server-only, reemplaza el `joinUrl` fijo; el lanzador recibe y valida el id del webinar y deja de pedir `joinUrl`.
+- **Ledger de transiciones** (diseño, no implementado): entidad `greenhouse_growth.growth_event` + ledger append-only
+  (`confirmed`, `waitlisted`, `promoted`, `cancelled`, `attended`) con instante, id de inscripción en Teams y
+  `joinWebUrl`; enlace firmado «ya no puedo ir», promoción FIFO bajo el mismo lock, correo «ya tienes cupo» y evento
+  outbox `growth.events.registration_changed`.
+- **Asistencia** (diseño, no implementado): del informe de asistencia por sesión del webinar
+  (`…/webinars/{id}/sessions/{sessionId}/attendanceReports`), transición `attended` con entrada y salida.
+- **Eventos de marketing de HubSpot, una sola fuente por evento** (diseño, no implementado): mientras el conector
+  nativo Teams↔HubSpot siga roto (ticket de soporte #50018204746), Greenhouse crea el evento por la API `2026-09` y
+  escribe `REGISTERED`/`CANCELLED`/`ATTENDED`; si el soporte lo arregla, el conector lo hace y Greenhouse deja de
+  escribir ese evento (switch por evento).
+- **Cancelar en Teams** por aplicación exige RSC por chat del evento: **fuera de la fase 1**. Quien cancela libera el
+  cupo en Greenhouse, pero su inscripción en Teams queda viva (el organizador puede cancelarla a mano).
+- **Flags propuestos (no existen en código):** `GROWTH_EVENT_HUBSPOT_PARTICIPATION_ENABLED` y
+  `GROWTH_EVENT_TEAMS_REGISTRATION_ENABLED` (nombre propuesto), ambos solo en el ops-worker (`deploy.sh` + ledger).
+- Lo que sigue abierto (quién manda la confirmación con el enlace, nombre y apellido en la píldora, cancelación en
+  Teams, diseño final de los correos): RESEARCH-013 §Decisiones abiertas.
+
 ## Content Marketing: presentación, host y distribución del renderer
 
 Registro del rollout del 2026-08-31; para operar después, relee el contrato público y el ledger

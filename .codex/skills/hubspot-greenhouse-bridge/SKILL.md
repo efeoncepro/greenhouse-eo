@@ -49,6 +49,49 @@ HubSpot owns commercial lifecycle truth. Sending qualification, opportunities or
 to Google Ads is still future work; neither this bridge nor the active online Forms/Meetings channel
 implements that sender. Do not mutate CRM stages, contacts or click IDs to manufacture attribution.
 
+## HubSpot Marketing Events + conector de webinars de Teams (2026-10-24)
+
+Estado y backlog: [RESEARCH-013](../../../docs/research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos)
+(objeto en el anexo B, conector en el [anexo C](../../../docs/research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md),
+diseño en el [anexo D](../../../docs/research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md)). Los eventos
+son **webinars de Teams** (seminario web de la app Eventos), nunca reunión normal.
+
+**Marketing Events (objeto 0-54) desde Greenhouse**
+
+- El token del project app «Efeonce Data Platform» (appId 33235280) **no** tiene `crm.objects.marketing_events.*`:
+  están como **opcionales** en
+  `services/hubspot_greenhouse_integration/hubspot-app/hubspot-bigquery/src/app/app-hsmeta.json` → la API responde
+  403 `MISSING_SCOPES`.
+- Reinstalación **autorizada por el operador** («Sí, solo Eventos»), sin ejecutar al 2026-10-24: pasarlos a
+  `requiredScopes` → `hs project upload --account=48713323` → reinstalar (super admin) → introspeccionar el token
+  (precedente PDR-009: el token estático ganó el scope sin rotar; si cambió, rotar `hubspot-access-token`) →
+  actualizar el snapshot `docs/operations/hubspot-app-manifest/`.
+- API `/marketing/marketing-events/2026-09`; operar siempre por `objectId`; participación escribible
+  REGISTERED/ATTENDED/CANCELLED. El objeto no tiene cupo ni espera: la espera **no** se registra en HubSpot.
+- El objeto está en **todos los planes**, pero un evento solo aparece en el índice **con al menos un inscrito**.
+- Una sola fuente por evento: el conector Teams si funciona; si no, Greenhouse por API (switch por evento).
+
+**Diagnóstico del conector «Microsoft Teams (Nivel de administrador)»** (app id
+`0493df14-0cd5-4c89-b413-e0b9b90bbb17`; ticket #50018204746 derivado a agente humano)
+
+- Síntoma verificado: no ve **ningún** webinar del portal 48713323 aun con consentimiento de administrador en Entra
+  (`VirtualEvent.Read.All`, `OnlineMeetingArtifact.Read.All`, `VirtualEventRegistration-Anon.ReadWrite.All`), la
+  política de Teams `MY-APP-POLICY` (Global + por usuario a jreyes desde 2026-10-24 14:09) y sign-ins exitosos cada
+  hora. «Sincronizar ahora» no hace nada; la acción de workflow «Agregar contacto al webinario de Microsoft Teams»
+  dice «No se encontraron webinars»; Eventos de marketing en 0.
+- Revisar, en este orden: (1) en vivo, la lista de Webinars en la configuración de la app en HubSpot + el desplegable
+  de esa acción de workflow en un borrador; (2) `az ad sp show --id 0493df14-0cd5-4c89-b413-e0b9b90bbb17` y sus
+  `appRoleAssignments`; (3) `auditLogs/signIns` del service principal; (4) Teams PowerShell
+  `Get-CsApplicationAccessPolicy` y `Get-CsOnlineUser` (política efectiva del organizador).
+- PowerShell local: `brew install powershell` + `Install-Module MicrosoftTeams -Scope CurrentUser`; el login por
+  device code se puede completar en la sesión de Chrome del operador. El clasificador del modo automático bloquea
+  `Grant-CsApplicationAccessPolicy` salvo autorización explícita del operador (es reversible con `-PolicyName $null`).
+- «Editar cuenta conectada → Cambiar cuenta conectada» **solo reasigna** la cuenta de Teams, no reautoriza. La única
+  otra opción es desinstalar: **no hacerlo** (rompe la bandeja de conversaciones, el registro de llamadas y los
+  enlaces de reunión). Reconectar solo si lo recomienda el soporte, con captura previa de la configuración.
+- La Forms API no inscribe en Teams (solo trae `goToWebinarWebinarKey` para GoToWebinar); la automatización de
+  webinars de Teams vive en el módulo de formulario de una página HubSpot.
+
 ## HubSpot Developer Platform 2026.09 (verified 2026-09-16)
 
 Developer Platform Projects version `2026.09` is generally available with an 18-month support window. Set

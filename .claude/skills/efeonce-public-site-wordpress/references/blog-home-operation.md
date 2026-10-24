@@ -70,12 +70,25 @@ logo needs Growth Forms renderer 1.3.0 released in Greenhouse; until then the la
   reservations reach HubSpot, but emails do not send in production until the accepted-status fix
   (`ACCEPTED_SUBMISSION_STATUSES`) is released to the `ops-worker`, and the HubSpot Marketing Events / Teams webinar
   integration is pending design (RESEARCH-013).
+- **Events — state and backlog (2026-10-24).** Single source of what is pending:
+  [RESEARCH-013 §Backlog canónico](../../../../docs/research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos).
+  - Sessions are **Teams webinars** (seminario web, Events app), never a normal meeting. Greenhouse owns reservation,
+    seat and waitlist; Teams will get the registration by Graph and give each person a private link (target design,
+    [annex D](../../../../docs/research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md)). The HubSpot ↔
+    Teams connector sees no webinar (ticket #50018204746,
+    [annex C](../../../../docs/research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md)).
+  - Unreleased fixes waiting for the single release: emails `2a971d768`, pill autofill + «¡Listo!» `a5b028461`.
+  - Test webinars to cancel or unpublish (operator): «La IA no conoce tu negocio» (24-oct) and «La IA y la busqueda»
+    (26-oct). Re-verify end to end with `prueba-e2e-eventos-2026-10-24` (surface `fhsf-efeonce-blog-events`), then
+    deprecate it. Only then launch real events.
+  - Glitch subscription: verified 2026-10-24; **no welcome email yet** (and it still uses the generic «Marketing
+    Information» subscription type) — both in the backlog.
 - Template changes are not edits to WordPress: they go through `scripts/public-website/blog-v3/` (bind-canvas →
   make-tablet → build-plugin → equivalence + PHP parity + pixel gate ≤1 %), are committed in the runtime and shipped
   with `deploy home`. Deviations from the canvas are listed in
   `docs/ui/visual-directions/TASK-2051-blog-portada-v3/README.md`.
 - A new PHP file reaches PHP-FPM 1–2 min after a deploy.
-- Open items (2026-10-24): human submit confirmed in HubSpot, operator's visual OK on the bottom pill, first real event
+- Open items (2026-10-24): operator's visual OK on the bottom pill, first real event
   (events section hidden until then; blocked: email fix release + HubSpot Marketing Events redesign, RESEARCH-013; the
   2026-10-24 end-to-end test proved reservations + HubSpot and found the email bug), purge timing measured on Kinsta, trash of review page 252046 pending the
   operator.

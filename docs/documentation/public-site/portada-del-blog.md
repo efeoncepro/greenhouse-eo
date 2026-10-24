@@ -1,7 +1,7 @@
 # Portada del blog — Marketing con Manzanitas en efeoncepro.com/blog/
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-24 por Claude
 > **Ultima actualizacion:** 2026-10-24 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) ·
@@ -79,9 +79,13 @@ foto: se prefieren las iniciales. Las diapositivas de Glitch no llevan foto de a
   registrado nada. Esta regla nació el mismo día del corte, cuando los formularios de ejemplo del diseño respondieron
   «¡Listo!» durante unos 40 minutos sin guardar los datos.
 
-Estado al 2026-10-24: conectada y verificada en los tres tamaños, sin un envío de prueba. Falta que una persona se
-suscriba de verdad y confirmar en HubSpot que el contacto quedó suscrito. La píldora del final reemplaza el campo con
-casilla del diseño original y espera el visto bueno visual del operador.
+Estado al 2026-10-24: conectada y verificada en los tres tamaños, y **probada con una suscripción real**: el contacto
+quedó suscrito (SUBSCRIBED) en HubSpot. Todavía falta:
+
+- un **correo de bienvenida** a Glitch (hoy no se manda ninguno);
+- decidir si Glitch tiene su **propio tipo de suscripción** en HubSpot (hoy usa «Marketing Information», que es
+  genérico);
+- el visto bueno visual del operador a la píldora del final, que reemplaza el campo con casilla del diseño original.
 
 > Detalle técnico: [runtime V1 §4](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
 
@@ -93,9 +97,16 @@ casilla del diseño original y espera el visto bueno visual del operador.
 - El enlace privado de la sala (Zoom, Teams, Meet) nunca se guarda en el evento.
 - Las grabaciones de webinars son entradas con formato Grabación y aparecen en «Grabaciones para ver cuando quieras».
 - **Sin un evento próximo, la sección de eventos no se muestra.** Así está hoy: todavía no hay un evento real cargado.
-- **Estado (2026-10-24): todavía no se lanzan eventos reales.** Las reservas funcionan y llegan a HubSpot, pero los
-  correos de confirmación y recordatorio no salen hasta un release con la corrección de un defecto, y la conexión con
-  el objeto Eventos de marketing de HubSpot (y un posible webinar de Teams) está en diseño (RESEARCH-013).
+- **Estado (2026-10-24): todavía no se lanzan eventos reales.** Las reservas funcionan y llegan a HubSpot, y Greenhouse
+  lleva el cupo y la lista de espera. Los correos de confirmación y recordatorio están corregidos en local pero no
+  salen hasta el próximo release.
+- La sesión será un **webinar de Teams** (seminario web de la app Eventos). Lo que viene, todavía sin construir: cada
+  persona confirmada queda inscrita en el webinar con su enlace personal, se lee la asistencia y el evento aparece en
+  Eventos de marketing de HubSpot. El conector nativo de Teams con HubSpot no funciona hoy (caso abierto con el soporte
+  de HubSpot).
+- El pendiente completo está en el
+  [backlog de RESEARCH-013](../../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos);
+  cómo operarlo, en el [manual para lanzar un evento](../../manual-de-uso/public-site/lanzar-evento-o-webinar.md).
 
 > Detalle técnico: [PDR-029 §3](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md).
 
@@ -128,8 +139,8 @@ diagnóstico.
 
 ## Pendientes
 
-- Primer envío real de suscripción y confirmación en HubSpot.
+- Correo de bienvenida a Glitch y decisión sobre su tipo de suscripción propio en HubSpot.
 - Visto bueno del operador a la suscripción del final.
-- Primer evento real (después del release de los correos y del diseño con HubSpot, RESEARCH-013).
+- Primer evento real (después del release que cierre el backlog de RESEARCH-013).
 - Medir en el hosting que la portada se actualiza en menos de dos minutos.
 - Decidir si se elimina la página de revisión `/blog-v3-revision/` (no indexada).

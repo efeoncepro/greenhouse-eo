@@ -88,12 +88,15 @@ Desconectar: `subscription off --apply`.
 real); «¡Listo!» quedaba corrido por la grilla de `.ghf-inline-msg`. Gate `inline-pill.scenario.mjs` dentro de
 presupuesto. **El operador decidió no hacer release por ahora** (~3 h cada uno): correos (`2a971d768`) y píldora esperan
 al próximo release que él decida.
-**Eventos/webinars (2026-10-24):** el operador eligió Teams (seminario web) + el formulario de HubSpot conectado al
-webinar. La integración Teams→HubSpot no sincroniza ningún webinar (0 eventos de marketing) aunque Entra, la política
-de Teams y los ajustes de HubSpot están bien; diagnóstico, hipótesis y borrador del caso al soporte en
-`docs/research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md`. La task de integración se crea recién cuando
-HubSpot liste el webinar y se pruebe el envío de Greenhouse al formulario conectado. Webinars de prueba publicados en
-Teams: «La IA no conoce tu negocio» (24-oct) y «La IA y la busqueda» (26-oct); cancelarlos al terminar.
+**Eventos/webinars (2026-10-24):** las sesiones son **webinars de Teams** (no reuniones). El conector Teams↔HubSpot no
+lee ningún webinar aunque Entra, la política de Teams (`MY-APP-POLICY`, ahora también asignada a jreyes) y los ajustes
+de HubSpot están bien; ticket de soporte **#50018204746** derivado a agente humano (anexo C). Diseño alternativo sin
+costo: Greenhouse dueño de la reserva e inscripción en el webinar por Graph (app Entra dedicada), asistencia por sesión
+y Marketing Events por API solo mientras el conector esté roto (anexo D). **Backlog canónico** para cerrar el módulo:
+`docs/research/RESEARCH-013-events-webinars-hubspot-teams.md` § «Backlog canónico». Pendiente del operador: quién manda
+la confirmación con el enlace (Greenhouse o Teams). Webinars de prueba publicados en Teams: «La IA no conoce tu negocio»
+(24-oct) y «La IA y la busqueda» (26-oct); cancelarlos al terminar. PowerShell 7.6.8 + módulo MicrosoftTeams 8.0.0
+instalados en el Mac del operador (`brew`, `Install-Module -Scope CurrentUser`).
 
 **AXIS v0.7.15 publicado** (CI `dc7c721`, primitives 0.7.15; la prueba del haz del buscador ya no compite con el
 runner). Sin evento real cargado: la sección de eventos queda oculta hasta el primero (`blog-home event`).

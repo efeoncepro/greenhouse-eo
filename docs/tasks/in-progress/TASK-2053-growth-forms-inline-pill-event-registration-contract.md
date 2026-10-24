@@ -55,6 +55,24 @@ asset (`src/app/api/public/growth/forms/**`): no existe forma gobernada de obten
      ZONE 1 — CONTEXT & CONSTRAINTS
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-24
+
+- **Plataforma decidida: webinar de Teams** (app Eventos, tenant M365 Business), no reunión normal. Greenhouse sigue
+  siendo dueño de la reserva, el cupo y la lista de espera; la espera no se registra en HubSpot.
+- **El conector nativo Teams↔HubSpot está roto:** HubSpot no lee ningún webinar del tenant y Eventos de marketing
+  sigue en 0. Caso abierto con soporte (ticket #50018204746, derivado a agente humano). Diagnóstico:
+  [anexo C](../../research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md).
+- **Diseño con Greenhouse como dueño de la inscripción:**
+  [anexo D](../../research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md) (inscripción en el webinar por
+  Graph con app de Entra dedicada, `joinWebUrl` personal, ledger de transiciones, asistencia por informe del webinar,
+  Eventos de marketing con una sola fuente por evento). Diseño, no implementado; sale en tasks `backend-data` nuevas,
+  no en esta.
+- **Pendiente canónico del módulo de eventos:**
+  [RESEARCH-013 §Backlog canónico](../../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos).
+- **Correcciones solo en local, sin release:** correos de reserva (`2a971d768`, `ACCEPTED_SUBMISSION_STATUSES`) y
+  píldora (`a5b028461`). El operador decidió no hacer release por ahora; hasta entonces los correos no salen en
+  producción.
+
 ## Architecture Alignment
 
 Revisar y respetar:

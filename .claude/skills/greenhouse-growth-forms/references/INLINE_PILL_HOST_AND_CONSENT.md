@@ -6,7 +6,9 @@ píldora en un anfitrión que tiene plantilla propia. Caso fuente: suscripción 
 `docs/architecture/growth-public-forms-runtime-contract.md` §Formulario en línea y reserva por evento.
 
 Estado (2026-10-24): en producción desde el release `40b330175855` (renderer `1.2.0` + consentimiento por el acto).
-**Pendiente:** un envío real hecho por una persona y el primer formulario de evento real.
+Suscripción a Glitch verificada (2026-10-24); **sin correo de bienvenida** todavía (backlog de Glitch en RESEARCH-013).
+**Pendiente:** el primer formulario de evento real (bloqueado por el backlog de
+[RESEARCH-013](../../../../docs/research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos)).
 
 ## Contrato en una línea
 
@@ -103,6 +105,13 @@ Piel real: `efeonce-public-site-runtime` → `wp-content/plugins/eo-blog-home/as
 - **Turnstile y navegadores automatizados:** el envío desde el navegador integrado de Claude no salió (sin token, sin
   `POST /submit`). Es el comportamiento correcto; **no eludir la verificación**. La prueba de envío la hace una persona y
   se confirma en HubSpot (contacto suscrito al tipo `535702717`).
+- **Autocompletado de Chrome:** `:-internal-autofill-selected` pinta fondo claro y texto negro con `!important` de
+  agente de usuario, que gana al `!important` propio (reproducido con `Autofill.trigger` en Chrome real). Solución
+  (`a5b028461`, `src/growth-forms-renderer/styles.ts`): en `:is(:-webkit-autofill,:autofill)` usar
+  `-webkit-text-fill-color` + `caret-color` y retener el fondo con
+  `background-color 0s linear 600000s` en la transición. Sin release al 2026-10-24.
+- **«¡Listo!» descentrado:** el texto oculto aportaba ancho a la grilla de `.ghf-inline-msg` (el canvas tenía el mismo
+  defecto; desvío deliberado). Mismo commit; `inline-pill.scenario.mjs` verde en los 5 estados a 1440 y 390.
 
 ## Verificar sin exponer
 

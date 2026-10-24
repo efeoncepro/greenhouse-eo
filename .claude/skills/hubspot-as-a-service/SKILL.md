@@ -207,6 +207,12 @@ For Fall 2026 / UNBOUND 2026 product changes, read [`HUBSPOT_FALL_2026_UNBOUND_R
 
 Do not conflate portal IDs, OAuth apps, CLI profiles, private-app tokens, Kortex OAuth, or the Greenhouse bridge.
 
+Webinars de Teams y Eventos de marketing: el objeto Eventos de marketing y la sincronización con Teams están en todos
+los planes, pero un evento solo aparece en el índice con al menos un inscrito; la inscripción a Teams desde HubSpot vive
+en el módulo de formulario de una página HubSpot o en la acción de workflow, no en la Forms API. Checklist de
+diagnóstico del conector (portal Efeonce 48713323, caso 2026-10-24): `hubspot-greenhouse-bridge` §HubSpot Marketing
+Events + [RESEARCH-013 anexo C](../../../docs/research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md).
+
 ## Kortex deep-hibernation boundary
 
 Before routing any HubSpot work through Kortex, read the current state in

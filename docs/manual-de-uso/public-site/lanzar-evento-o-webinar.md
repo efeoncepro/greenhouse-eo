@@ -1,22 +1,100 @@
 # Lanzar un evento o webinar
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-24 por Claude (sesión «Portada del blog v3»)
-> **Ultima actualizacion:** 2026-10-24 por Claude (estado tras la prueba de punta a punta)
+> **Ultima actualizacion:** 2026-10-24 por Claude (sesión = webinar de Teams, conector de HubSpot caído, diseño futuro)
 > **Documentacion tecnica:** [BLOG_HOME_RUNTIME_V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) ·
-> [Contrato de Growth Forms](../../architecture/growth-public-forms-runtime-contract.md)
+> [Contrato de Growth Forms](../../architecture/growth-public-forms-runtime-contract.md) ·
+> [RESEARCH-013](../../research/RESEARCH-013-events-webinars-hubspot-teams.md) (decisiones y backlog)
 
-> **Estado (2026-10-24): no lances eventos reales todavía.**
->
-> - **Reservas:** funcionan y llegan a HubSpot (probado con el evento de prueba `prueba-e2e-eventos-2026-10-24`).
-> - **Correos:** hoy **no salen en producción**. La prueba destapó un defecto (el correo exigía un estado de la reserva
->   que ya había cambiado); está corregido en el código, pero falta un release para que llegue al `ops-worker`.
-> - **HubSpot:** hoy cada reserva es sólo un envío al formulario «Reserva de eventos | Blog Efeonce» con la propiedad
->   «Último Evento Reservado» (se sobrescribe en cada reserva). No viaja si quedó confirmada o en lista de espera ni se
->   usa el objeto **Eventos de marketing** de HubSpot.
-> - **En diseño:** la integración evento ↔ HubSpot (objeto Eventos de marketing) ↔ posible webinar de Teams, en la
->   investigación RESEARCH-013 (`docs/research/RESEARCH-013-annexes/`). Se define antes del próximo release.
+> **Estado (2026-10-24): no lances eventos reales todavía.** El pendiente completo está en un solo lugar: el
+> [backlog de RESEARCH-013](../../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos).
+> Los eventos reales se lanzan recién después del release que lo cierre y de una prueba de punta a punta.
+
+## Estado actual
+
+### Qué funciona hoy
+
+- **El lanzador** publica el formulario de reserva, el destino en HubSpot, el evento en WordPress y la sección de
+  `/blog/` (ver «Paso a paso»).
+- **Reservas:** funcionan y llegan a HubSpot (probado con el evento de prueba `prueba-e2e-eventos-2026-10-24`).
+  Greenhouse lleva el **cupo** y la **lista de espera**.
+- **HubSpot:** cada reserva es sólo un envío al formulario «Reserva de eventos | Blog Efeonce» con la propiedad
+  «Último Evento Reservado» (se sobrescribe en cada reserva). No viaja si quedó confirmada o en lista de espera ni se
+  usa el objeto **Eventos de marketing** de HubSpot.
+
+### Qué falta
+
+- **Correos:** hoy **no salen en producción**. El defecto (el correo exigía un estado de la reserva que ya había
+  cambiado) está corregido en el código local, **sin release**.
+- **Píldora:** el autocompletado y el «¡Listo!» centrado están corregidos en local, **sin release**.
+- **El diseño final no está construido:** inscribir a cada persona confirmada en el webinar de Teams con su enlace
+  personal, leer la asistencia, escribir el Evento de marketing en HubSpot, el enlace «ya no puedo ir» y el paso
+  automático desde la lista de espera (ver «Cómo se verá cuando esté terminado»).
+- **Decisiones abiertas:** quién manda la confirmación con el enlace (Greenhouse o Teams), si la píldora pide nombre y
+  apellido (Teams los exige para inscribir; hoy sólo pide correo), cómo se cancela en Teams y el diseño final de los
+  correos.
+- Todo sale en **un solo release**, cuando el operador lo decida.
+
+### La sesión es un webinar de Teams
+
+La sesión se hace como **seminario web (webinar) de la app Eventos de Teams**, no como una reunión normal. El webinar
+trae sus propios roles (presentadores y asistentes sin micrófono ni cámara), preguntas y respuestas, página del evento,
+correos e informe de asistencia.
+
+El tenant de Efeonce es Microsoft 365 **Business**: inscripción básica, hasta 1.000 asistentes, **sin lista de espera ni
+aprobación en Teams**. Por eso el cupo y la lista de espera los lleva Greenhouse.
+
+Cómo se crea hoy:
+
+1. En Teams, abre **Eventos** → **Crear evento** → **Seminario web**.
+2. Completa los datos del webinar y **publícalo**.
+3. Si es una prueba, ponle el prefijo `prueba-` al nombre y ocúltalo de la app Eventos para que no lo vea nadie más.
+
+Con el flujo de hoy, el lanzador pide un enlace fijo de la sala (`joinUrl`), el mismo para todas las personas. En el
+diseño final recibirá el id del webinar y cada persona tendrá su propio enlace.
+
+**Webinars de prueba por cancelar o despublicar** (pendiente del operador): «La IA no conoce tu negocio» (24-oct) y
+«La IA y la busqueda» (26-oct).
+
+### El conector de Teams en HubSpot no funciona
+
+- La app «Microsoft Teams (Nivel de administrador)» está conectada en HubSpot desde el 2026-08-06, con la
+  sincronización de webinars activada. Aun así **HubSpot no lee ningún webinar de Teams**: los dos webinars nuevos no
+  aparecen, «Sincronizar ahora» no crea nada y Eventos de marketing sigue en 0.
+- Del lado de Microsoft está todo en orden: permisos con consentimiento de administrador, política de acceso de Teams
+  asignada también al organizador (2026-10-24 14:09) e inicios de sesión de la app sin error. No lo resolvió.
+- Hay un caso abierto con el soporte de HubSpot: **ticket #50018204746**, derivado a un agente humano.
+- Mientras siga roto, el diseño final hace que Greenhouse escriba el Evento de marketing por la API. Si el soporte lo
+  arregla, el conector toma ese evento y Greenhouse deja de escribirlo: **una sola fuente por evento**, para no duplicar.
+
+**Qué no hacer con el conector:**
+
+- **No desinstales la app de Teams en HubSpot.** Es la única forma de reautorizarla, y no se hace por iniciativa propia.
+- **Reconéctala sólo si el soporte lo recomienda**, en horario tranquilo y después de capturar (pantallazos) toda su
+  configuración.
+
+> Detalle: [anexo C — diagnóstico del conector](../../research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md).
+
+## Cómo se verá cuando esté terminado (futuro)
+
+> **Nada de esto está construido todavía.** Es el diseño acordado; el detalle está en el
+> [anexo D](../../research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md) y el avance en el
+> [backlog](../../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos).
+
+1. **Creas y publicas el webinar en Teams**, como hoy.
+2. **Lanzas el evento con el lanzador**, que recibe el id del webinar (ya no un enlace) y comprueba que esté publicado,
+   con la fecha correcta y sin aprobación manual.
+3. **Greenhouse crea el Evento de marketing en HubSpot** (mientras el conector siga caído).
+4. **Alguien reserva en `/blog/`.** Si hay cupo, Greenhouse lo **inscribe en el webinar** y la persona recibe su
+   **enlace personal**. Si el cupo está lleno, queda en lista de espera: no se inscribe en Teams ni aparece en HubSpot.
+5. **Si alguien avisa «ya no puedo ir»** desde su correo, se libera el cupo; la primera persona de la espera queda
+   confirmada, se inscribe en el webinar y recibe un correo «ya tienes cupo».
+6. **Al terminar la sesión**, Greenhouse lee el informe de asistencia del webinar y marca quién asistió (con hora de
+   entrada y salida). En HubSpot cada persona queda como inscrita, cancelada o asistente del evento.
+
+Costo nuevo: ninguno (Teams, Microsoft Graph y la API de HubSpot ya están incluidos).
 
 ## Para qué sirve
 
@@ -36,8 +114,8 @@ Publicar un evento o webinar de Efeonce con reserva real en un solo paso, sin de
 - El visto bueno del operador: lanzar publica en el sitio y escribe en HubSpot.
 - `pnpm public-website:ssh-check` en verde y credenciales locales de Greenhouse (`.env.local`).
 - Los datos del evento: título, bajada, descripción, fecha y hora, duración, modalidad (en línea, presencial o
-  híbrido), speakers, **tres** aprendizajes, agenda, cupo (opcional), **enlace privado de la sala** (Zoom, Meet,
-  Teams…) y **arte clave** (imagen; obligatoria para el bloque grande de la portada).
+  híbrido), speakers, **tres** aprendizajes, agenda, cupo (opcional), **enlace privado de la sala** (el del webinar
+  de Teams, ver «La sesión es un webinar de Teams») y **arte clave** (imagen; obligatoria para el bloque grande de la portada).
 
 ## Paso a paso
 

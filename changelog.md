@@ -2,6 +2,14 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-24 — Módulo de eventos: webinar de Teams, diseño y backlog
+
+- Decidido: la sesión es un webinar de Teams y Greenhouse es dueño de la reserva, el cupo y la lista de espera. El
+  conector nativo Teams↔HubSpot no sincroniza (ticket de soporte #50018204746). Diseño con inscripción por Graph,
+  `joinWebUrl` personal, ledger de transiciones y Eventos de marketing con una sola fuente por evento: diseño, no
+  implementado. Correcciones de correos (`2a971d768`) y píldora (`a5b028461`) solo en local, sin release.
+  [Backlog canónico](docs/research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos).
+
 ## 2026-10-24 — Archivo de Glitch con su propia piel (TASK-2056)
   `/category/glitch/` y `/glitch/`: wordmark, última edición y último Flash, muletilla «sin anestesia.», falla en bytes,
   placas #N/FLASH por fila, filtro Ediciones/Flash/Notas y suscripción con la píldora de la portada (blanca). Renderer
@@ -633,12 +641,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
   portal la automatización que creaba un Lead por cada contacto en etapa `Lead` (2.222 de 2.251). Tras corregir: 20 de 20 sin fallos críticos y ruido de 1,55 a 0,60.
   [Evidencia y límites](docs/audits/commercial/2026-10-12-prospecting-claude-blind-differential.md).
   Sin runtime, créditos, CRM ni envíos.
-
-## 2026-10-12 — SEO/AEO: referencia de categoría y representación fiel
-
-- [Método de categoría](docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md) aceptado:
-  descubrimiento non-brand, representación y consideración con pruebas, sin garantizar liderazgo.
-  ADR/index, manual/plan, contexto, modelo SV360 y cuatro skills Codex/Claude alineados; oferta, prueba,
-  briefs y revisión distinguen entregas controlables, resultados observados y negocio. Se corrigen
-  promesas históricas de citación/recovery paid. [Cierre](docs/audits/seo/2026-10-12-category-leadership-docs-skills.md).
-  Sin cambios de runtime, scoring, precios o publicación.

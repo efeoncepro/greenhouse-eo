@@ -672,6 +672,41 @@ waitlist notice (no link); the `ops-worker` route `/growth/events/reminders` (Cl
 manual: `docs/manual-de-uso/public-site/lanzar-evento-o-webinar.md`. A test event uses a `prueba-` slug with
 `--skip-wordpress` and is deprecated afterwards.
 
+#### Eventos y webinars — estado y backlog (2026-10-24)
+
+Fuente única del pendiente: [RESEARCH-013 §Backlog canónico](../../../docs/research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos)
+(diseño en el [anexo D](../../../docs/research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md), conector
+en el [anexo C](../../../docs/research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md)). **No lanzar eventos
+reales hasta cerrar ese backlog**; todo sale en **un solo release** (~3 h cada uno) cuando el operador lo decida.
+
+- **Hoy:** reserva, cupo y lista de espera en Greenhouse (`event_registration`, lock por formulario) → copia al
+  formulario HubSpot compartido con `ef_event_key` (se sobrescribe). El evento no es entidad (vive en
+  `ui_policy_json.eventRegistration`); solo `confirmed`/`waitlisted`, sin cancelación ni promoción; `joinUrl` fijo por
+  evento. Sin release: correos con reservas `delivered` (`2a971d768`) y píldora (`a5b028461`).
+- **Decidido:** la sesión es un **webinar de Teams** (seminario web de la app Eventos), **nunca** se baja a reunión
+  normal. Tenant M365 Business: sin espera ni aprobación en Teams → **Greenhouse es dueño de la reserva, el cupo y la
+  espera**; la espera no va a HubSpot. Una sola fuente por Evento de marketing: el conector Teams↔HubSpot si funciona,
+  si no Greenhouse por API (switch por evento).
+- **Brecha que no se cierra desde el formulario:** la Forms API de HubSpot solo trae campo de contexto para
+  GoToWebinar (`goToWebinarWebinarKey`), ninguno para Teams; la «Form automation» de webinars de Teams vive en el
+  **módulo de formulario de la página HubSpot**, no en el formulario. Un envío de Greenhouse por API **no** inscribe
+  en Teams.
+- **Diseño objetivo (anexo D):** tabla `growth_event` + ledger append-only (`confirmed`, `waitlisted`, `promoted`,
+  `cancelled`, `attended`) con id de inscripción en Teams y `joinWebUrl` personal (server-only); enlace firmado «ya no
+  puedo ir» + promoción FIFO bajo el mismo lock; inscripción por Graph
+  `POST /solutions/virtualEvents/webinars/{id}/registrations` (permiso de aplicación
+  `VirtualEventRegistration-Anon.ReadWrite.All`, principal dedicado «Greenhouse Webinars»); asistencia por
+  `…/webinars/{id}/sessions/{sid}/attendanceReports`; HubSpot Marketing Events por API `2026-09` solo en el ops-worker
+  (flag `GROWTH_EVENT_HUBSPOT_PARTICIPATION_ENABLED`). Cancelar en Teams por aplicación exige RSC
+  `VirtualEventRegistration-Anon.ReadWrite.Chat`: fuera de la fase 1.
+- **Abierto:** quién manda la confirmación con el enlace (Greenhouse o Teams), nombre y apellido en la píldora (Teams
+  los exige), cancelación en Teams, diseño final de correos, bienvenida y tipo de suscripción propio de Glitch.
+- **Lección de la píldora (autocompletado):** Chrome pinta `:-internal-autofill-selected` con `!important` de agente
+  de usuario (fondo claro, texto negro), que gana a cualquier `!important` propio. Se corrige con
+  `-webkit-text-fill-color` + `caret-color` y reteniendo el fondo con una transición de retardo enorme
+  (`background-color 0s linear 600000s`); y el texto oculto de «¡Listo!» no debe aportar ancho a la grilla de
+  `.ghf-inline-msg`. Detalle: `references/INLINE_PILL_HOST_AND_CONSENT.md` §Trampas.
+
 Catalog selector needs `GREENHOUSE_GROWTH_CATALOG_SURFACE_ID` + `GREENHOUSE_GROWTH_CATALOG_EMBED_KEY`
 in `wp-config.php`; embed key minted with `pnpm growth:forms:embed-key --surface-id <id>` (shown once).
 
