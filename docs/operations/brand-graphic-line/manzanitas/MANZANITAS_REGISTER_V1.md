@@ -325,7 +325,8 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
 - **Blog y banner:** la foto se genera en **16:9** y se lleva a **1,9:1 (1200 × 630)**. La voz va en el lado oscuro de
   la foto y la firma **puede ir abajo a la izquierda**, cerrando la columna del texto. Sin eslogan.
 - **Portada de artículo del blog: variante centrada** (operador, 2026-10-24). La imagen destacada de un artículo
-  también se ve recortada en cuadrado: la vista previa de WhatsApp y las tarjetas del blog toman el centro de la
+  también se ve recortada en cuadrado: la vista previa compacta de WhatsApp y cualquier tarjeta cuadrada (como el
+  archivo del blog de Ohio, reemplazado el 2026-10-24 por el archivo v3, que no muestra la imagen) toman el centro de la
   imagen. El banner de blog pone cabecera, voz y firma en x 72 y ese recorte perdía la manzana, casi toda la voz y la
   firma. Por eso, en la portada de un artículo:
   - **El texto vive en el cuadrado central** (x 285–915 de 1200): cabecera, voz y respuesta en **x 312**, la columna

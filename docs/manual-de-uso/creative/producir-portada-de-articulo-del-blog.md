@@ -20,8 +20,8 @@ imagen también es la que se muestra cuando alguien comparte el artículo en Lin
 las zonas seguras, la foto, la composición, la exportación, la subida con guardas y el QA en vivo.
 
 **Por qué existe esta variante.** El banner de blog aprobado pone la cabecera, la voz y la firma en x 72. Pero la
-misma imagen se ve recortada en cuadrado en la vista previa de WhatsApp y en las tarjetas del archivo del blog, y ese
-recorte toma el centro. Con el banner, el recorte perdía la manzana, casi toda la pregunta y la firma. La variante
+misma imagen se ve recortada en cuadrado en la vista previa compacta de WhatsApp y en cualquier tarjeta cuadrada (así
+la mostraba el archivo del blog de Ohio hasta el 2026-10-24), y ese recorte toma el centro. Con el banner, el recorte perdía la manzana, casi toda la pregunta y la firma. La variante
 centrada pone todo el texto dentro del cuadrado central, para que se lea igual en el formato ancho y en el cuadrado.
 La aprobó el operador el 2026-10-24.
 
@@ -49,7 +49,8 @@ El lienzo es de **1200 × 630** (1,9:1) y se entrega al doble. Cada superficie m
 | Superficie | Qué muestra | Consecuencia |
 |---|---|---|
 | Open Graph en LinkedIn y Facebook | la imagen completa, 1,9:1 | se ve todo |
-| Vista previa de WhatsApp y tarjetas del archivo del blog | **el cuadrado central, x 285–915** (en el archivo, una tarjeta de 304 × 304, medida el 2026-10-24) | el texto tiene que estar entero dentro del cuadrado |
+| Vista previa compacta de WhatsApp y cualquier tarjeta cuadrada | **el cuadrado central, x 285–915** | el texto tiene que estar entero dentro del cuadrado |
+| Archivo del blog (temas, etiquetas, autores, búsqueda) | desde el 2026-10-24 (archivo v3, TASK-2055) es una lista de texto y **no muestra la imagen**. El archivo de Ohio anterior la mostraba en tarjetas cuadradas de 304 × 304 | hoy no aplica; el recorte cuadrado se mantiene por WhatsApp y por cualquier tarjeta futura |
 | Tarjeta grande de X | 2:1, así que puede recortar unos 15 px arriba y abajo | nada importante en los 15 px de cada borde. Fuente: el validador de X citado en 2020; no lo medimos |
 | Portada del blog (slider y rail) | no usa esta imagen: usa su propio arte o el `hero` del post | no aplica, salvo que el post tenga `hero` |
 
@@ -202,7 +203,8 @@ Anota el adjunto nuevo y el nombre de la opción de respaldo que imprime.
   `primaryImageOfPage` del schema también, y no queda ninguna referencia al archivo anterior.
 - **Archivo:** el sha256 del archivo publicado es igual al local.
 - **Portada del blog:** `pnpm public-website:blog-home verify --browser` en verde.
-- **Recorte real:** abre el archivo de la categoría del post (por ejemplo `/inbound/`) y mira su tarjeta cuadrada.
+- **Recorte real:** el archivo v3 del blog ya no muestra la imagen. Revisa el recorte cuadrado en el archivo
+  `-recorte-movil.png` del paso 6 y, si puedes, compartiendo el enlace en WhatsApp.
 - **Redes:** X y LinkedIn guardan en caché la tarjeta anterior. Para refrescarla, usa el Post Inspector de LinkedIn y
   vuelve a compartir el enlace en X.
 

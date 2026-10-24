@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="Inter, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
   <title id="t">Zonas seguras de la portada de artículo del blog de Marketing con Manzanitas</title>
-  <desc id="d">Lienzo de 1200 por 630. El cuadrado central, de x 285 a x 915, es lo que muestran el recorte cuadrado de WhatsApp y las tarjetas del blog. La columna de texto va de x 312 a x 782 y de y 50 a y 341. La cara del sujeto cae entre x 795 y x 900. La tarjeta de X puede recortar 15 píxeles arriba y abajo. Abajo va el lecho, la mesa en sombra.</desc>
+  <desc id="d">Lienzo de 1200 por 630. El cuadrado central, de x 285 a x 915, es lo que muestran la vista previa compacta de WhatsApp y cualquier tarjeta cuadrada. La columna de texto va de x 312 a x 782 y de y 50 a y 341. La cara del sujeto cae entre x 795 y x 900. La tarjeta de X puede recortar 15 píxeles arriba y abajo. Abajo va el lecho, la mesa en sombra.</desc>
   <defs>
     <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <line x1="0" y1="0" x2="0" y2="10" stroke="#f83902" stroke-width="3" opacity="0.55"/>
@@ -21,7 +21,7 @@
   <!-- Cuadrado central -->
   <rect x="285" y="1" width="630" height="628" fill="none" stroke="#36c8bf" stroke-width="3" stroke-dasharray="14 10"/>
   <text x="300" y="456" fill="#36c8bf" font-size="17" font-weight="600">Recorte cuadrado: x 285–915</text>
-  <text x="300" y="478" fill="#36c8bf" font-size="15">WhatsApp y tarjetas del blog (304 × 304)</text>
+  <text x="300" y="478" fill="#36c8bf" font-size="15">WhatsApp y cualquier tarjeta cuadrada</text>
   <!-- Columna de texto -->
   <rect x="312" y="50" width="470" height="291" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-width="2"/>
   <rect x="312" y="50" width="180" height="81" fill="#e86bd0" fill-opacity="0.35"/>

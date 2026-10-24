@@ -224,7 +224,8 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
 - **Blog y banner:** la foto se genera en 16:9 y se lleva a 1,9:1 (1200 × 630). La voz va en el lado oscuro; la firma
   puede ir abajo a la izquierda, cerrando la columna del texto. Sin eslogan.
 - **Portada de artículo del blog: variante centrada** (operador, 2026-10-24; norma §5.6). La destacada también se ve
-  recortada en cuadrado (vista previa de WhatsApp, tarjetas del blog), y ese recorte toma el centro (x 285–915 de
+  recortada en cuadrado (vista previa compacta de WhatsApp, cualquier tarjeta cuadrada; el archivo v3 del blog ya no la
+  muestra), y ese recorte toma el centro (x 285–915 de
   1200). Por eso:
   - cabecera, voz y respuesta en **x 312**, dentro de la columna x 312–782 e y 50–341;
   - el sujeto en el tercio derecho, pedido un poco más a la derecha porque el modelo lo corre unos 15 puntos al centro;
