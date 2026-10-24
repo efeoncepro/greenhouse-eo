@@ -14,6 +14,9 @@ const path = require('node:path')
 
 const SRC = path.join(__dirname, 'source')
 const assets = JSON.parse(fs.readFileSync(path.join(SRC, 'assets.json'), 'utf8'))
+const railV2 = require('./lib/rail-v2.cjs')
+
+Object.assign(assets, railV2.RAIL_ASSETS)
 
 function rep(text, from, to, times = 1) {
   const n = typeof from === 'string' ? text.split(from).length - 1 : [...text.matchAll(new RegExp(from.source, from.flags.includes('g') ? from.flags : from.flags + 'g'))].length
@@ -21,6 +24,23 @@ function rep(text, from, to, times = 1) {
   if (n !== times) throw new Error(`Expected ${times} match(es), found ${n}: ${String(from).slice(0, 90)}`)
 
   return typeof from === 'string' ? text.split(from).join(to) : text.replace(from, typeof to === 'string' ? to.replace(/\$(?![1-9&])/g, '$$$$') : to)
+}
+
+/**
+ * Approved redesign of «Para leer con calma» (operator, 2026-10-24, canvas version 93; lib/rail-v2.cjs): the v1 cards
+ * of the frozen canvas give way to the v2 card template, its CSS and its hover logic. Applied to the reference and to
+ * the bound template alike; the reference renders the v2 canvas cards as literals (`rail:` below), the bound template
+ * reads them from data, so the equivalence test still proves the rest of the board and the parity test proves the cards.
+ */
+const RAIL_LITERAL = 'rail: ' + JSON.stringify(railV2.FIXTURE(key => '/_blob/' + assets[key].id)) + ','
+
+function deviateRail(src, { open, cards }) {
+  src = rep(src, '\n</style>', '\n' + railV2.CSS + '\n</style>')
+  src = rep(src, cards, '\n    ' + railV2.TEMPLATE + '\n')
+  src = rep(src, open.from, open.to)
+  src = rep(src, '\n      evSpk: [', '\n      ' + railV2.LOGIC + '\n      ' + RAIL_LITERAL + '\n      evSpk: [')
+
+  return src
 }
 
 /**
@@ -47,11 +67,15 @@ function deviate(src) {
   // 3. Invisible a11y fixes: the giant year does not announce; slide labels read the short title.
   src = rep(src, '<p class="idea" aria-live="polite" style="margin: 12px 0 0; font-size: 184px;', '<p class="idea" style="margin: 12px 0 0; font-size: 184px;')
   src = rep(src, "aria: (i + 1) + ' de ' + n + ': ' + x.label,", "aria: (i + 1) + ' de ' + n + ': ' + x.short,")
+  // 4. «Para leer con calma» v2 (see deviateRail); the rail's step reads the new card class.
+  src = deviateRail(src, {
+    open: { from: '<div class="rail" id="v3-rail" role="list" onScroll="{{ onRail }}">', to: '<div class="rail" id="v3-rail" role="list" onScroll="{{ onRail }}">' },
+    cards: /(?<=<div class="rail" id="v3-rail" role="list" onScroll="\{\{ onRail \}\}">)\n[\s\S]*?\n(?=  <\/div>\n<\/section>)/,
+  })
+  src = rep(src, "const card = el.querySelector('.card');", "const card = el.querySelector('.rc');")
 
   return src
 }
-
-const CARD_ARROW = '<svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>'
 
 // Extension approved by the operator on 2026-10-24: the «Novedad» format (Efeonce announcements) gets a megaphone in
 // the slider chip, drawn in the same stroke as the five canvas glyphs. It never renders for the canvas fixture.
@@ -161,41 +185,7 @@ function bindMarkup(src) {
   src = rep(src, '<a href="#" class="lnk evt" style="--lc: {{ e.c }};">', '<a href="{{ e.href }}" class="lnk evt" style="--lc: {{ e.c }};">')
   src = rep(src, '<a href="#" class="lnk evr__c">', '<a href="{{ r.href }}" class="lnk evr__c">')
 
-  // Reading rail: four card variants fed by data, markup unchanged.
-  const railStart = src.indexOf('<div class="rail" id="v3-rail" role="list" onScroll="{{ onRail }}">')
-  const railEnd = src.indexOf('  </div>\n</section>', railStart)
-
-  if (railStart < 0 || railEnd < 0) throw new Error('Rail not found')
-
-  const rail = `<div class="rail" id="v3-rail" role="list" onScroll="{{ onRail }}">
-    <sc-for list="{{ rail }}" as="c" hint-placeholder-count="6">
-    <sc-if value="{{ c.isPhoto }}" hint-placeholder-val="{{ true }}"><a href="{{ c.href }}" role="listitem" class="lnk card" style="background: #001a33; color: #ffffff;">${CARD_ARROW}
-      <img src="{{ c.img }}" alt="" style="width: 100%; height: 330px; object-fit: cover; display: block;">
-      <div style="padding: 32px; display: flex; flex-direction: column; flex: 1;">
-        <span style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #cfe4fa;"><span style="width: 28px; height: 5px; border-radius: 3px; background: {{ c.accent }};"></span>{{ c.kicker }}</span>
-        <span class="idea u" style="margin-top: 16px; font-size: 34px; line-height: 1; font-weight: 760; letter-spacing: -0.035em;">{{ c.title }}</span>
-        <sc-if value="{{ c.minutesLabel }}" hint-placeholder-val="{{ true }}"><span style="margin-top: auto; font-size: 14px; color: #cfe4fa;">{{ c.minutesLabel }}</span></sc-if>
-      </div>
-    </a></sc-if>
-    <sc-if value="{{ c.isMinutes }}" hint-placeholder-val="{{ false }}"><a href="{{ c.href }}" role="listitem" class="lnk card" style="{{ c.style }}">${CARD_ARROW}
-      <span style="{{ c.kickerStyle }}"><span style="width: 28px; height: 5px; border-radius: 3px; background: {{ c.accent }};"></span>{{ c.kicker }}</span>
-      <span class="idea" style="font-size: 240px; line-height: 0.8; font-weight: 760; letter-spacing: -0.07em;">{{ c.minutes }}<span style="font-size: 28px; letter-spacing: 0; font-weight: 500;"> min</span></span>
-      <span class="idea u" style="font-size: 32px; line-height: 1.02; font-weight: 740; letter-spacing: -0.03em;">{{ c.title }}</span>
-    </a></sc-if>
-    <sc-if value="{{ c.isDownload }}" hint-placeholder-val="{{ false }}"><a href="{{ c.href }}" role="listitem" class="lnk card" style="background: #023c70; color: #ffffff; padding: 36px; justify-content: space-between;">${CARD_ARROW}
-      <span style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe4fa;">{{ c.kicker }}</span>
-      <img src="{{ c.img }}" alt="" style="width: 70%; aspect-ratio: 3/4; object-fit: cover; border-radius: 14px; align-self: center;">
-      <span class="idea u" style="font-size: 32px; line-height: 1.02; font-weight: 740; letter-spacing: -0.03em;">{{ c.title }}</span>
-    </a></sc-if>
-    <sc-if value="{{ c.isDiag }}" hint-placeholder-val="{{ false }}"><a href="{{ c.href }}" role="listitem" class="lnk card" style="background: #091951; color: #ffffff; padding: 36px; justify-content: space-between;">${CARD_ARROW}
-      <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe4fa;">{{ c.kicker }}</span><img src="{{ c.img }}" alt="{{ c.imgAlt }}" style="height: 26px; width: auto;"></div>
-      <span class="idea" style="font-size: 104px; line-height: 0.86; font-weight: 760; letter-spacing: -0.055em;">{{ c.title }}</span>
-      <span class="u" style="font-size: 16px; font-weight: 600;">{{ c.sub }}</span>
-    </a></sc-if>
-    </sc-for>
-`
-
-  src = src.slice(0, railStart) + rail + src.slice(railEnd)
+  // Reading rail: the v2 card template (deviateRail) already reads `rail` from data.
 
   // Topics: real totals, latest link and source line.
   src = rep(src, '<span class="nl__n">44</span>', '<span class="nl__n">{{ totalPosts }}</span>')
@@ -216,6 +206,7 @@ function bindMarkup(src) {
 }
 
 function bindLogic(src) {
+  src = rep(src, '\n      ' + RAIL_LITERAL, '')
   src = rep(src, "fFlash: x.fmt === 'flash',", "fFlash: x.fmt === 'flash', fNove: x.fmt === 'nove', hasPhoto: !!x.authorPhoto, noPhoto: !x.authorPhoto,")
 
   src = rep(src, '  renderVals() {\n    const S = [', '  renderVals() {\n    const D = this.props.data;\n    const S0 = [')
@@ -251,6 +242,11 @@ function deviateMobile(src) {
   src = rep(src, '<div style="position: relative; width: 358px; height: 358px; margin-top: 32px;">', '<div data-fluid="orbit" style="position: relative; width: 358px; height: 358px; margin-top: 32px;">')
   // 4. Invisible a11y fix: the giant year does not announce.
   src = rep(src, '<p class="idea" aria-live="polite" style="margin: 8px 0 0; font-size: 140px;', '<p class="idea" style="margin: 8px 0 0; font-size: 140px;')
+  // 5. «Para leer con calma» v2 (see deviateRail), at the mobile scale (`rc-m`).
+  src = deviateRail(src, {
+    open: { from: '<div class="scroller" role="list" style="padding: 0 16px 8px;">', to: '<div class="scroller rc-m" role="list" style="padding: 0 16px 8px;">' },
+    cards: /\n    <a href="#" role="listitem" class="lnk" style="flex: none; width: 300px; height: 440px; border-radius: 26px; overflow: hidden;[\s\S]*?Hacer el diagnóstico<\/span><\/a>\n/,
+  })
 
   return src
 }
@@ -300,13 +296,7 @@ function bindMarkupMobile(src) {
   src = rep(src, '<a href="#" class="lnk evr__c">', '<a href="{{ r.href }}" class="lnk evr__c">')
   src = rep(src, '<a href="#" class="nl nl--light live"><span class="roll"><span class="roll__in"><span>Ver todos los eventos</span><span aria-hidden="true">Ver todos los eventos</span></span></span><span class="nl__n">4</span>', '<a href="{{ ev.allHref }}" class="nl nl--light live"><span class="roll"><span class="roll__in"><span>Ver todos los eventos</span><span aria-hidden="true">Ver todos los eventos</span></span></span><span class="nl__n">{{ ev.total }}</span>')
 
-  // Reading rail: three card variants fed by data.
-  src = rep(
-    src,
-    /\n    <a href="#" role="listitem" class="lnk" style="flex: none; width: 300px; height: 440px; border-radius: 26px; overflow: hidden;[\s\S]*?Hacer el diagnóstico<\/span><\/a>/,
-    `
-    <sc-for list="{{ rail }}" as="c" hint-placeholder-count="3"><sc-if value="{{ c.isPhoto }}" hint-placeholder-val="{{ true }}"><a href="{{ c.href }}" role="listitem" class="lnk" style="flex: none; width: 300px; height: 440px; border-radius: 26px; overflow: hidden; background: #001a33; color: #ffffff; scroll-snap-align: start; display: flex; flex-direction: column;"><img src="{{ c.img }}" alt="" style="width: 100%; height: 220px; object-fit: cover; display: block;"><div style="padding: 22px;"><span style="font-size: 12px; color: #cfe4fa;">{{ c.kicker }}</span><span class="idea" style="display: block; margin-top: 10px; font-size: 26px; line-height: 1; font-weight: 760; letter-spacing: -0.03em;">{{ c.title }}</span></div></a></sc-if><sc-if value="{{ c.isMinutes }}" hint-placeholder-val="{{ false }}"><a href="{{ c.href }}" role="listitem" class="lnk" style="flex: none; width: 300px; height: 440px; border-radius: 26px; {{ c.tone }} padding: 26px; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: space-between;"><span style="font-size: 12px;">{{ c.kicker }}</span><span class="idea" style="font-size: 160px; line-height: 0.8; font-weight: 760; letter-spacing: -0.07em;">{{ c.minutes }}<span style="font-size: 22px; font-weight: 500; letter-spacing: 0;"> min</span></span><span class="idea" style="font-size: 24px; line-height: 1.02; font-weight: 740;">{{ c.title }}</span></a></sc-if><sc-if value="{{ c.isDiag }}" hint-placeholder-val="{{ false }}"><a href="{{ c.href }}" role="listitem" class="lnk" style="flex: none; width: 300px; height: 440px; border-radius: 26px; background: #091951; color: #ffffff; padding: 26px; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: space-between;"><img src="{{ c.img }}" alt="{{ c.imgAlt }}" style="height: 22px; width: auto; align-self: flex-start;"><span class="idea" style="font-size: 72px; line-height: 0.86; font-weight: 760; letter-spacing: -0.055em;">{{ c.title }}</span><span style="font-size: 15px; font-weight: 600; text-decoration: underline;">{{ c.sub }}</span></a></sc-if></sc-for>`
-  )
+  // Reading rail: the v2 card template (deviateRail) already reads `rail` from data.
 
   // Topics.
   src = rep(src, '>Fuente: blog de Efeonce, 44 publicaciones al 23 oct 2026</p>', '>{{ act.source }}</p>')
@@ -328,6 +318,7 @@ function bindMarkupMobile(src) {
 }
 
 function bindLogicMobile(src) {
+  src = rep(src, '\n      ' + RAIL_LITERAL, '')
   src = rep(src, '  renderVals() {\n    const S = [', '  renderVals() {\n    const D = this.props.data;\n    const S0 = [')
   src = rep(src, /const S0 = \[[\s\S]*?\n    \];\n/, 'const S = D.slides;\n')
   src = rep(src, /const T = \[[\s\S]*?\n    \];\n/, 'const T = D.topics;\n')

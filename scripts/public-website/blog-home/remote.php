@@ -178,6 +178,24 @@ switch ( $op ) {
 		$out( $plan + array( 'applied' => true ) );
 		break;
 
+	case 'client':
+	case 'reviewed':
+		// Rail cards (TASK-2051 v2): the client of a case (`_eo_client`, its logo on the card) and the editor's «última
+		// revisión» (`_eo_reviewed_at`, the «Actualizado» badge for 30 days). `off` clears it.
+		$id    = $find( $in['post'] ?? '' );
+		$raw   = trim( (string) ( $in['value'] ?? '' ) );
+		$key   = 'client' === $op ? EO_Home_Pins::CLIENT_META : EO_Home_Pins::REVIEWED_META;
+		$value = 'off' === $raw ? '' : ( 'client' === $op ? EO_Home_Pins::sanitize_client( $raw ) : EO_Home_Pins::sanitize_day( $raw ) );
+		if ( 'off' !== $raw && '' === $value ) { WP_CLI::error( 'client' === $op ? 'Unknown client. Valid: ' . implode( ', ', array_keys( EO_Home_Adapter::RAIL_CLIENTS ) ) . ', off' : 'Expected AAAA-MM-DD or off.' ); }
+		$plan = array( 'op' => $op, 'post' => $id, 'title' => get_the_title( $id ), 'before' => (string) get_post_meta( $id, $key, true ), 'after' => $value );
+		if ( ! $apply ) { $out( $plan + array( 'applied' => false ) ); break; }
+		if ( '' === $value ) { delete_post_meta( $id, $key ); } else { update_post_meta( $id, $key, $value ); }
+		clean_post_cache( $id );
+		if ( (string) get_post_meta( $id, $key, true ) !== $value ) { WP_CLI::error( 'Readback failed.' ); }
+		$finish( $op );
+		$out( $plan + array( 'applied' => true ) );
+		break;
+
 	case 'hero':
 		$id     = $find( $in['post'] ?? '' );
 		$keys   = array( '_eo_hero_light', '_eo_hero_bold', '_eo_hero_image' );

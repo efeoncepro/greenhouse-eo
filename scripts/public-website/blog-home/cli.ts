@@ -17,7 +17,7 @@ const TMP = join(ROOT, 'tmp/blog-home')
 const SITE = 'https://efeoncepro.com'
 const REMOTE = 'scripts/public-website/blog-home/remote.php'
 const VALUE_FLAGS = ['until', 'light', 'bold', 'attachment', 'image', 'alt', 'snapshot', 'surface']
-const FORMATS = ['articulo', 'caso', 'guia', 'grabacion', 'glitch-edicion', 'glitch-flash', 'glitch-nota', 'novedad']
+const FORMATS = ['articulo', 'caso', 'guia', 'grabacion', 'podcast', 'glitch-edicion', 'glitch-flash', 'glitch-nota', 'novedad']
 const LINES = ['growth', 'brand', 'engine', 'voice', 'revenue-hubspot', 'revenue-salesforce']
 
 type Json = Record<string, any>
@@ -193,6 +193,8 @@ Write (plan unless --apply; every apply is ledgered and purges /blog/):
   unpin <post>
   format <post> <${FORMATS.join('|')}>
   line <post> <${LINES.join('|')}|off>   the post's service line when its category does not say it
+  client <post> <anam|off>             the client of a case: its logo on the rail card
+  reviewed <post> <AAAA-MM-DD|off>      the editor's last substantive review: «Actualizado» on the rail for 30 days
   hero <post> [--light t] [--bold t] [--attachment id | --image file --alt text] [--clear]
   resource <file.json> [--image file --alt text]   create/update a resource (see manual for the shape)
   review <resource id>           mark a resource reviewed today (it hides after 180 days)
@@ -239,6 +241,16 @@ const main = () => {
 
     case 'line': {
       const result = remote({ op: 'line', post: pos[0] ?? fail('line needs a post.'), line: pos[1] ?? fail(`line needs one of: ${LINES.join(', ')}, off`), apply })
+
+      print(result)
+
+      return plannedNote(result)
+    }
+
+    case 'client':
+
+    case 'reviewed': {
+      const result = remote({ op: command, post: pos[0] ?? fail(`${command} needs a post.`), value: pos[1] ?? fail(command === 'client' ? 'client needs a client key (anam) or off.' : 'reviewed needs AAAA-MM-DD or off.'), apply })
 
       print(result)
 

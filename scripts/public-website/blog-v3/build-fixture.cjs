@@ -9,6 +9,9 @@ const vm = require('node:vm')
 
 const SRC = path.join(__dirname, 'source')
 const assets = JSON.parse(fs.readFileSync(path.join(SRC, 'assets.json'), 'utf8'))
+const railV2 = require('./lib/rail-v2.cjs')
+
+Object.assign(assets, railV2.RAIL_ASSETS)
 const reference = fs.readFileSync(path.join(SRC, 'Portada-v3.reference.dc.html'), 'utf8')
 const logic = reference.slice(reference.indexOf('<script type="text/x-dc"'))
 
@@ -80,14 +83,8 @@ const fixture = {
     upcoming: literal(/evNext: (\[[\s\S]*?\n      \]),/).map(e => ({ ...e, href: '#' })),
     recordings: literal(/evRec: (\[[\s\S]*?\n      \]),/).map(r => ({ ...r, href: '#' })),
   },
-  rail: [
-    { isPhoto: true, href: '#', img: blob('railCrm'), accent: '#e86bd0', kicker: 'Caso · HubSpot', title: 'Lo que aprendimos diseñando el Customer Agent de ANAM', minutesLabel: '28 min de lectura' },
-    { isMinutes: true, href: '#', style: 'background: #ffffff; border: 1px solid rgba(2,60,112,0.12); padding: 36px; justify-content: space-between;', kickerStyle: 'display: flex; align-items: center; gap: 10px; font-size: 14px;', accent: '#8e1b82', kicker: 'Caso · HubSpot', minutes: '21', title: 'Un dashboard no arregla un proceso comercial' },
-    { isMinutes: true, href: '#', style: 'background: #023c70; color: #ffffff; padding: 36px; justify-content: space-between;', kickerStyle: 'display: flex; align-items: center; gap: 10px; font-size: 14px; color: #cfe4fa;', accent: '#36c8bf', kicker: 'Guía · Loop Marketing', minutes: '31', title: 'Cómo ejecutar Loop Marketing en tu empresa' },
-    { isPhoto: true, href: '#', img: blob('railDesign'), accent: '#ff6500', kicker: 'Diseño', title: 'Creative Workflows: escalar la creatividad sin automatizar el criterio', minutesLabel: '' },
-    { isDownload: true, href: '#', img: blob('railGuideCover'), kicker: 'Guía descargable', title: 'Web agéntica: tu sitio, listo para la IA' },
-    { isDiag: true, href: '#', img: blob('efeonceAeoLogo'), imgAlt: 'Efeonce AEO', kicker: 'Diagnóstico', title: '¿Te ve la IA?', sub: 'Mídelo con el Efeonce AEO Assessment' },
-  ],
+  // «Para leer con calma» v2 (lib/rail-v2.cjs): the same cards on every board.
+  rail: railV2.FIXTURE(blob),
 }
 
 // Glitch back-issue cells: positional styles of the canvas (first, middle, last).
@@ -151,11 +148,7 @@ const mobile = {
     upcoming: mLiteral(/evNext: (\[[\s\S]*?\n      \]),/).map(e => ({ ...e, href: '#' })),
     recordings: mLiteral(/evRec: (\[[\s\S]*?\n      \]),/).map(r => ({ ...r, href: '#' })),
   },
-  rail: [
-    { isPhoto: true, href: '#', img: blob('railCrm'), kicker: 'Caso · HubSpot · 28 min', title: 'Lo que aprendimos diseñando el Customer Agent de ANAM' },
-    { isMinutes: true, href: '#', tone: 'background: #ffffff; color: #023c70; border: 1px solid rgba(2,60,112,0.12);', kicker: 'Caso · HubSpot', minutes: '21', title: 'Un dashboard no arregla un proceso comercial' },
-    { isDiag: true, href: '#', img: blob('efeonceAeoLogo'), imgAlt: 'Efeonce AEO', title: '¿Te ve la IA?', sub: 'Hacer el diagnóstico' },
-  ],
+  rail: railV2.FIXTURE(blob),
 }
 
 fs.writeFileSync(path.join(SRC, 'fixture.mobile.json'), JSON.stringify(mobile, null, 2) + '\n')
