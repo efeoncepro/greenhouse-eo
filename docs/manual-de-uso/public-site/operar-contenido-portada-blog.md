@@ -1,7 +1,7 @@
 # Operar el contenido de la portada del blog
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-24 por Claude
 > **Ultima actualizacion:** 2026-10-24 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) · [PDR-029 — Modelo de contenido de la portada del blog](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md) · [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-content-model.md)
@@ -44,13 +44,19 @@ lugar reservado: una entrada fijada ocupa uno de los lugares restantes.
 
 El riel muestra las cuatro lecturas largas más recientes (12 minutos o más, sin Glitch, Novedades ni grabaciones),
 los recursos marcados para el riel y, si hay, el próximo evento como una entrada de webinar. Cada tarjeta se arma sola
-con la entrada; en el panel **Portada del blog** decides dos datos más:
+con la entrada; en el panel **Portada del blog** decides cuatro datos más:
 
 - **Cliente del caso** (sólo con formato Caso): el cliente del caso; la tarjeta muestra su logo en lugar de la foto.
   Sólo aparecen clientes con logo cargado (hoy, ANAM). Un cliente nuevo lo agrega el equipo técnico.
 - **Última revisión** (`AAAA-MM-DD`): la fecha de una revisión de fondo que hiciste tú (datos, enlaces, conclusiones).
   No es la fecha de modificación de WordPress: corregir una coma no cuenta. Enciende «Actualizado» por 30 días, sólo
   en entradas publicadas hace más de 60; el pie de la tarjeta dice «Actualizado <fecha>».
+- **Imagen de la tarjeta del riel**: una imagen propia para la tarjeta de foto, distinta de la destacada. La tarjeta
+  es vertical (440 × 600; 304 × 540 en móvil) y recorta la destacada horizontal; úsala cuando la destacada trae texto
+  incrustado (las portadas de Manzanitas): sube la placa sin texto. La destacada no cambia y sigue siendo la imagen
+  que se ve al compartir (OG). Vacío = la destacada.
+- **Punto focal de la tarjeta** (`x% y%`, de 0 a 100): hacia dónde se mueve el recorte. Vacío = centro. Una cara a
+  ≈71 % del ancho de la placa necesita ≈84 %; `84% 30%` funciona en escritorio, tablet y móvil.
 
 **Podcast.** Formato **Podcast** y, en el mismo panel, **Duración del episodio** (`32:10`). Un episodio entra al riel
 como una onda aunque dure menos de 12 minutos; su botón dice «Escuchar el episodio».
@@ -163,6 +169,8 @@ los últimos 180 días el recurso deja de mostrarse.
 
 - No escribir a mano el contador de reservas ni las insignias de cupos: lo entrega TASK-2053 o queda oculto.
 - No usar **Última revisión** para una corrección menor: «Actualizado» promete una revisión de fondo.
+- No cambiar la destacada para arreglar el recorte de la tarjeta: la destacada es la imagen OG. Usar **Imagen de la
+  tarjeta del riel** y **Punto focal de la tarjeta**.
 - No guardar enlaces privados de webinars en ningún campo del evento.
 - No usar «Fijar arriba» (sticky) de WordPress: la portada no lo lee.
 - No aplicar el backfill sin revisar el dry-run ni con un `expect_sha256` viejo (el script lo rechaza).
@@ -178,6 +186,7 @@ los últimos 180 días el recurso deja de mostrarse.
 | La portada tarda en actualizarse | Ventana de 60 s o caché de 5 min | Esperar hasta 2 minutos; revisar `eo_cm_purge_log`. |
 | Un caso no muestra el logo del cliente | Sin **Cliente del caso**, o el formato no es Caso | Elegir el cliente en el panel; si no está en la lista, pedir su logo al equipo técnico. |
 | No sale «Actualizado» | La entrada tiene 60 días o menos, o la revisión tiene más de 30 | Es lo esperado: «Nuevo» o nada. |
+| La tarjeta de foto corta el texto de la portada o deja fuera la cara | La destacada tiene texto incrustado y se recorta al centro | Cargar **Imagen de la tarjeta del riel** sin texto y ajustar **Punto focal de la tarjeta** hacia el sujeto. |
 | Un podcast no aparece en el riel | Le falta el formato Podcast, o es de Glitch o Novedades | Cambiar el formato a Podcast. |
 | El autor sale con iniciales | No tiene foto subida en su perfil (Gravatar no cuenta) | Subir la foto en el perfil de WordPress. |
 | No se ve la suscripción a Glitch | No hay formulario conectado (`data-subscribe="off"`) | Conectarlo por CLI con un formulario publicado. |

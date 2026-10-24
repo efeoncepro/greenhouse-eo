@@ -2,6 +2,15 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-24 — Imagen y punto focal propios de la tarjeta de foto del riel (TASK-2051)
+
+- La tarjeta de foto de «Para leer con calma» (vertical) recortaba al centro la destacada horizontal y cortaba el
+  encabezado incrustado de las portadas de Manzanitas. En vivo desde hoy (`efeonce-editorial-blocks` 0.4.5,
+  `EO_CM_VERSION` 0.2.2, runtime 6578773): metas `_eo_card_image` y `_eo_card_focus` («Imagen de la tarjeta del riel»
+  y «Punto focal de la tarjeta» en el panel) → `img`/`pos` del adaptador; la destacada sigue siendo la OG. Comando
+  `card` (Greenhouse e60f5045c) y `preview/serve.cjs --rail`. `verify --browser` en vivo: 0 px en 8 anchos; ninguna
+  entrada las usa todavía. [Manual CLI §2c](docs/manual-de-uso/public-site/operar-portada-blog-por-cli.md).
+
 ## 2026-10-24 — Tarjetas v2 de «Para leer con calma» en producción (TASK-2051, desvío 14)
 
 - El riel de `/blog/` usa las tarjetas aprobadas en el canvas (versión 93) desde las 21:12 UTC: una sola plantilla
@@ -632,12 +641,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
   la regla vigente y el lector de membresía que funciona con OAuth de usuario.
   [Decisión](docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md) ·
   [snapshot](docs/operations/HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json).
-
-## 2026-10-12 — Cotizador V3: la CLI lee y escribe a través de un puerto de almacenamiento
-
-- `TASK-2024` (fase 1 de `EPIC-053`): fuentes, puntero y artefactos de `pnpm pricing:v3` pasan por
-  `PricingV3Storage`, con un adaptador de archivos (el modo local de siempre) y uno en memoria. Ninguna salida,
-  código de salida, error ni archivo de la CLI cambió: lo prueba una línea base de 107 comandos capturada antes
-  del cambio. Quien cambie a propósito lo que un comando responde debe volver a capturarla y revisar el diff.
-  `pnpm pricing:v3:test` suma esa línea base, una batería de conformidad sobre los 48 artefactos congelados y una
-  guarda de imports del motor. [Contrato](docs/architecture/GREENHOUSE_PRICING_V3_STORAGE_PORT_V1.md).

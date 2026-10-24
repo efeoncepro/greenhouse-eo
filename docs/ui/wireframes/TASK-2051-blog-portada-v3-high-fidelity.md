@@ -87,7 +87,7 @@ En producción desde el 2026-10-24 21:12 UTC. Una sola plantilla de tarjeta para
 
 | Tarjeta | Cuándo | Centro | Pie |
 |---|---|---|---|
-| Foto a sangre (navy / azul alternados) | entrada con imagen destacada; guía o herramienta con imagen de escena | la imagen recortada al centro (`object-position: center`), texto sobre un velo abajo | autor con foto o iniciales, fecha, minutos |
+| Foto a sangre (navy / azul alternados) | entrada con imagen destacada; guía o herramienta con imagen de escena | la imagen propia de la tarjeta (`_eo_card_image`) o, si no hay, la destacada; recorte al punto focal `_eo_card_focus` (`object-position`, vacío = centro); texto sobre un velo abajo | autor con foto o iniciales, fecha, minutos |
 | Cliente (papel) | caso con «Cliente del caso» (`_eo_client`; hoy `anam`) | logo del cliente | autor, fecha, minutos |
 | Pregunta (tinta) | recurso `diagnostico` | la pregunta (las dos líneas del slider) | logo de Efeonce AEO, «3 motores de IA» |
 | Entrada de webinar | el próximo evento publicado, hasta que termina | día, mes, día de semana y hora en su zona; «Faltan N días» / «Mañana» / «Hoy» / «En vivo ahora» | primer speaker (o «Equipo de Efeonce»), duración |
@@ -156,3 +156,6 @@ la insignia, la onda queda quieta; sólo cambian luz y color. axe 0 en los tres 
 - **Delta 2026-10-24 (tarjetas v2):** el riel v1 del canvas congelado se reemplaza por la plantilla v2 aprobada
   (canvas versión 93) en los tres tableros; las insignias de cupos y lecturas esperan su lector (filtro
   `eo_home_rail_signals`).
+  Sub-delta 2026-10-24 (0.4.5): la tarjeta de foto acepta imagen propia y punto focal, para portadas con texto
+  incrustado (Manzanitas); la destacada sigue siendo la OG. Un solo foco «84% 30%» sirve en los tres tableros para una
+  cara a ≈71 % de la placa.

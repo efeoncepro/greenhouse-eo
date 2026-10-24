@@ -218,6 +218,21 @@ Runtime: [«Para leer con calma» v2](../../architecture/public-site/BLOG_HOME_R
 - **Firma de las guías:** una guía publicada en `think.efeoncepro.com` firma con el logo de Efeonce Think; las demás,
   con el logo negativo de Efeonce.
 
+### Sub-delta 2026-10-24 — imagen y punto focal de la tarjeta de foto
+
+En producción desde el 2026-10-24 (`efeonce-editorial-blocks` 0.4.5, `EO_CM_VERSION` 0.2.2). La tarjeta de foto es
+vertical (440 × 600; 304 × 540 en móvil) y recortaba al centro la destacada horizontal: en las portadas de Manzanitas,
+con el encabezado incrustado, cortaba el texto, dejaba la cara fuera y montaba el título de la tarjeta sobre el de la
+portada. §2 suma dos metas (en `EO_Home_Pins`, editables por REST y en el panel «Portada del blog»):
+
+| Meta | Campo del panel | Qué guarda |
+|---|---|---|
+| `_eo_card_image` | Imagen de la tarjeta del riel | Id de adjunto con la imagen propia de la tarjeta. Vacío = la destacada. La destacada sigue siendo la imagen OG. |
+| `_eo_card_focus` | Punto focal de la tarjeta | «x% y%» (0–100, un decimal como máximo; lo valida `EO_Home_Pins::sanitize_focus`). Vacío = centro. |
+
+El adaptador las entrega como `img` y `pos` (`object-position` del recorte). Operación: `pnpm public-website:blog-home
+card` ([manual CLI §2c](../../manual-de-uso/public-site/operar-portada-blog-por-cli.md)).
+
 ## Consecuencias
 
 - La portada se mantiene sola: publicar es suficiente para que aparezca, y lo que vence sale sin intervención.

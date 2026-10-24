@@ -232,8 +232,15 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
   - el rail «Para leer con calma» v2 (en producción desde 2026-10-24) **ya no es 4:3**: la destacada llena una tarjeta
     vertical de 440 × 600 (móvil 304 × 540), recortada al centro, con el título sobre el ~45 % inferior. Del
     1200 × 630 sólo se ve x ≈ 369–831 (móvil ≈ 423–777): la cabecera en x 312 y un sujeto en el tercio derecho
-    quedan fuera, y lo que caiga abajo queda bajo el texto. Lo que deba leerse en el rail va al centro y arriba;
-    cómo se concilia con la variante centrada lo decide el operador (hasta entonces, revisa también ese recorte);
+    quedan fuera, y lo que caiga abajo queda bajo el texto. **Resuelto (operador, 2026-10-24; editorial-blocks
+    0.4.5):** la portada no se toca —sigue siendo la destacada y la imagen Open Graph— y la tarjeta lleva imagen y
+    punto focal propios (metas `_eo_card_image` / `_eo_card_focus`): el plate sin texto
+    (`ai-generations/2026-10-24_portadas-blog/plates/MCB-*-169.png`) + foco. Con la cara en x ≈ 71 % del plate, el
+    foco ideal es ≈ 84 % (escritorio) y ≈ 81 % (móvil); `«84% 30%»` sirve en todos los tableros. Comando:
+    `pnpm public-website:blog-home card <post> --image <plate> --alt "<texto>" --focus "84% 30%"` (plan sin
+    `--apply`; ledger y readback; falla si la destacada cambió); revisa con
+    `node scripts/public-website/blog-v3/preview/serve.cjs --rail <cards.json>`. Nunca cambies la destacada para
+    arreglar el rail;
   - el sujeto en el tercio derecho, pedido un poco más a la derecha porque el modelo lo corre unos 15 puntos al centro;
   - **sin bajada y sin firma**: la cabecera identifica la pieza y la prenda ya lleva la marca, así que el logo sobra
     (el banner que sale del sitio sí firma);

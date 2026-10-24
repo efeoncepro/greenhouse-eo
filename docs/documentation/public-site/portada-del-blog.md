@@ -1,7 +1,7 @@
 # Portada del blog — Marketing con Manzanitas en efeoncepro.com/blog/
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-10-24 por Claude
 > **Ultima actualizacion:** 2026-10-24 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) ·
@@ -36,6 +36,10 @@ respalda: «Nuevo» (publicada hace 14 días o menos), «Actualizado» (el edito
 últimos 30 días; el pie dice la fecha), «Gratis» (guías, diagnóstico y eventos sin costo) y «En vivo» (mientras ocurre
 un evento). «Más leído», «Tendencia», «Últimos cupos» y «Lista de espera» ya están diseñadas pero todavía no se
 encienden: esperan la lectura de visitas y de reservas. Un caso con cliente asignado muestra el logo del cliente.
+
+La tarjeta de foto es vertical y recorta la imagen destacada, que es horizontal. Cuando la destacada trae texto
+encima (como las portadas de Manzanitas), el editor puede darle a la tarjeta una imagen propia sin texto y elegir hacia
+dónde se centra el recorte; la destacada no cambia y sigue siendo la que se ve al compartir la entrada.
 
 > Detalle técnico: [runtime V1 § «Para leer con calma» v2](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
 

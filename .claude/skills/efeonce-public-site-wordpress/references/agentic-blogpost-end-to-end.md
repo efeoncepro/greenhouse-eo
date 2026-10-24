@@ -205,7 +205,11 @@ Assign featured and social media deliberately:
 - verify format, dimensions, aspect ratio, ALT/caption, and anonymous delivery;
 - check the featured image in the `/blog/` rail crop too: the «Para leer con calma» v2 card (2026-10-24) fills a
   portrait 440×600 card (mobile 304×540), cropped at center, with the title over the bottom ~45 % scrim, so the
-  subject must sit in the central/upper area (cover rules: `efeonce-graphic-line` `references/manzanitas.md` §4.5);
+  subject must sit in the central/upper area (cover rules: `efeonce-graphic-line` `references/manzanitas.md` §4.5).
+  If the cover has baked-in text (Manzanitas) or the subject falls outside the crop, do not change the featured
+  image (it stays the OG image): set the card's own image/focal point with
+  `pnpm public-website:blog-home card <post> [--attachment id | --image file --alt text] [--focus "x% y%"]`
+  (metas `_eo_card_image` / `_eo_card_focus`; plan unless `--apply`; see `blog-home-operation.md`);
 - preserve source masters and derivative lineage outside the post body.
 
 For direct SVG infographics, load the governed SVG lane in `content-factory-gutenberg.md` and the SEO contract
