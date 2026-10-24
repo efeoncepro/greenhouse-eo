@@ -20,3 +20,14 @@
    16px top margin on «.bento» and «.steps». */
 .gh-partners .tag{padding:0;background:none;border-radius:0;line-height:normal;min-height:0;height:auto;vertical-align:baseline}
 .gh-partners :is(.bento,.steps){margin-top:0}
+/* «Quiero ser partner» = Growth CTA launcher (appearance bare) dressed as the canvas `.btn.btn-o`; the renderer contains
+   its inline size, so it needs an explicit width. Same recipe as Inbound's meeting launcher. */
+.partner-cta{margin-top:8px}
+.partner-cta greenhouse-cta{display:flex;width:209px;max-width:100%;--gh-cta-reserve:54px} /* = the canvas button's own width; fit-content collapses to 0 under the renderer's inline-size containment */
+.partner-cta greenhouse-cta .ghc-card{display:flex!important;gap:0!important;width:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;animation:none!important}
+.partner-cta greenhouse-cta :is(.ghc-content,.ghc-dismiss){display:none!important}
+.partner-cta greenhouse-cta .ghc-actions{width:100%;margin:0!important;padding:0!important}
+.partner-cta greenhouse-cta .ghc-primary{width:100%}
+.partner-cta :is(greenhouse-cta .ghc-primary,.gh-partners-meeting-fallback){display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;border:1px solid rgba(255,255,255,.5)!important;border-radius:999px!important;font-family:'Poppins',sans-serif;font-size:16px;font-weight:500;line-height:normal;letter-spacing:normal;text-transform:none;white-space:nowrap;text-decoration:none!important;color:#ffffff!important;background:rgba(0,26,51,.35)!important;backdrop-filter:blur(6px);box-shadow:none!important;box-sizing:border-box;cursor:pointer;transition:transform 200ms cubic-bezier(.2,0,0,1)}
+.partner-cta :is(greenhouse-cta .ghc-primary,.gh-partners-meeting-fallback):hover{transform:translateY(-2px)}
+.partner-cta greenhouse-cta .ghc-primary :is(svg,.ghc-arrow){display:none!important}
