@@ -319,6 +319,54 @@ switch ( $op ) {
 		$out( array( 'op' => $op, 'before' => $before, 'after' => $after, 'applied' => true ) );
 		break;
 
+	case 'archive':
+		// «Archivo del blog» (TASK-2055): eo_blog_archive_enabled '0' (Ohio), 'preview' (only ?eoba_preview=<token>), '1'.
+		$want = (string) ( $in['value'] ?? '' );
+		if ( ! in_array( $want, array( '0', 'preview', '1' ), true ) ) { WP_CLI::error( 'archive needs 0, preview or 1.' ); }
+		if ( ! class_exists( 'EOBH_Archive' ) || ! class_exists( 'EO_Archive_Adapter' ) ) { WP_CLI::error( 'EOBH_Archive or EO_Archive_Adapter is missing: deploy eo-blog-home and the content model first.' ); }
+		$before = array( 'value' => (string) get_option( 'eo_blog_archive_enabled', '0' ), 'token' => '' !== (string) get_option( 'eo_blog_archive_preview_token', '' ) );
+		if ( ! $apply ) { $out( array( 'op' => 'archive', 'before' => $before, 'after' => array( 'value' => $want ), 'applied' => false ) ); break; }
+		if ( 'preview' === $want && '' === (string) get_option( 'eo_blog_archive_preview_token', '' ) ) {
+			update_option( 'eo_blog_archive_preview_token', wp_generate_password( 20, false ), false );
+		}
+		update_option( 'eo_blog_archive_enabled', $want, true );
+		if ( (string) get_option( 'eo_blog_archive_enabled' ) !== $want ) { WP_CLI::error( 'Readback failed.' ); }
+		// Public archives change only when the template goes on for everyone or back off: then the whole page cache goes.
+		if ( '1' === $want || '1' === $before['value'] ) {
+			WP_CLI::runcommand( 'cache flush', array( 'return' => true ) );
+			WP_CLI::runcommand( 'kinsta cache purge --all', array( 'return' => true ) );
+		}
+		$token = (string) get_option( 'eo_blog_archive_preview_token', '' );
+		$out( array( 'op' => 'archive', 'before' => $before, 'after' => array( 'value' => $want ), 'applied' => true, 'preview' => 'preview' === $want ? array( 'query' => 'eoba_preview=' . $token, 'example' => home_url( '/category/hubspot/?eoba_preview=' . $token ) ) : null ) );
+		break;
+
+	case 'topic-descriptions':
+		// Category descriptions (TASK-2055): the text under a topic's title and its meta description; with ≥ 4 posts the
+		// topic becomes indexable. `descriptions`: { slug: text }. `before` holds the previous texts (the rollback).
+		$want = (array) ( $in['descriptions'] ?? array() );
+		if ( ! $want ) { WP_CLI::error( 'topic-descriptions needs { "descriptions": { "slug": "text" } }.' ); }
+		$before = array();
+		foreach ( $want as $slug => $text ) {
+			$term = get_term_by( 'slug', (string) $slug, 'category' );
+			if ( ! $term ) { WP_CLI::error( "No category «{$slug}»." ); }
+			if ( mb_strlen( (string) $text ) > 200 ) { WP_CLI::error( "Description of «{$slug}» is longer than 200 characters." ); }
+			$before[ $slug ] = (string) $term->description;
+		}
+		if ( ! $apply ) { $out( array( 'op' => $op, 'before' => $before, 'after' => $want, 'applied' => false ) ); break; }
+		$after = array();
+		foreach ( $want as $slug => $text ) {
+			$term = get_term_by( 'slug', (string) $slug, 'category' );
+			$r    = wp_update_term( (int) $term->term_id, 'category', array( 'description' => (string) $text ) );
+			if ( is_wp_error( $r ) ) { WP_CLI::error( $r->get_error_message() ); }
+			clean_term_cache( (int) $term->term_id, 'category' );
+			$after[ $slug ] = (string) get_term( (int) $term->term_id, 'category' )->description;
+			if ( $after[ $slug ] !== (string) $text ) { WP_CLI::error( "Readback failed for «{$slug}»." ); }
+		}
+		WP_CLI::runcommand( 'cache flush', array( 'return' => true ) );
+		WP_CLI::runcommand( 'kinsta cache purge --all', array( 'return' => true ) );
+		$out( array( 'op' => $op, 'before' => $before, 'after' => $after, 'applied' => true ) );
+		break;
+
 	case 'purge':
 		if ( ! $apply ) { $out( array( 'op' => 'purge', 'pages' => EO_Cache_Purge::pages(), 'applied' => false ) ); break; }
 		$finish( 'manual' );

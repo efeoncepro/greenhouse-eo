@@ -1,6 +1,6 @@
 # Descripciones de los temas del blog — propuesta (TASK-2055)
 
-> Estado: **propuesta, pendiente de aprobación del operador** (2026-10-24). Redacción de Claude por decisión del
+> Estado: **APROBADAS por el operador** (2026-10-24: «Apruebo las seis descripciones tal como están»). Redacción de Claude por decisión del
 > operador. Se cargan como descripción de la categoría en WordPress antes de encender la plantilla nueva. Con la
 > descripción y al menos 4 publicaciones el tema queda indexable; sin ella, `noindex, follow`.
 > Uso: texto bajo el título del tema y meta description del archivo. Escritas desde los títulos reales de cada tema

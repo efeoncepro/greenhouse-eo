@@ -201,6 +201,8 @@ Write (plan unless --apply; every apply is ledgered and purges /blog/):
   subscription <form-key|off> [--surface id]  connect the real Glitch subscription (published inline_pill form)
   flag <0|1>                     content model off (example content) / on (real data)
   purge                          purge /blog/ now
+  archive <0|preview|1>          «Archivo del blog» (TASK-2055): Ohio / only ?eoba_preview=<token> / everyone
+  topic-descriptions <file.json> category descriptions { "descriptions": { "slug": "text" } } (indexing of topics)
 
 Deploy and page (production; --apply needs the operator's go):
   deploy <home|content-model>    export live baseline, build the guarded package, dry run; --apply installs it
@@ -295,6 +297,22 @@ const main = () => {
 
     case 'subscription': {
       const result = remote({ op: 'subscription', form_key: pos[0] ?? fail('subscription needs a Growth Form key or off.'), surface: flag(args, 'surface'), apply })
+
+      print(result)
+
+      return plannedNote(result)
+    }
+
+    case 'archive': {
+      const result = remote({ op: 'archive', value: pos[0] ?? fail('archive needs 0, preview or 1.'), apply })
+
+      print(result)
+
+      return plannedNote(result)
+    }
+
+    case 'topic-descriptions': {
+      const result = remote({ op: 'topic-descriptions', descriptions: readJsonFile(pos[0], 'descriptions').descriptions, apply })
 
       print(result)
 
