@@ -1,6 +1,6 @@
 # Refresh — ¿Qué es el inbound marketing? (borrador V1)
 
-> **Estado:** borrador para revisión del autor. No publicado.
+> **Estado:** **publicado 2026-10-24** (aprobado por Julio Reyes). Ver §8 «Registro de publicación».
 > **URL (se conserva):** https://efeoncepro.com/inbound/que-es-inbound-marketing/
 > **Autor / voz:** Julio Reyes (byline existente) · voz Julio, con doctrina marcada como «En Efeonce…».
 > **Creado:** 2026-10-24 · **Base:** auditoría de la versión publicada el 2024-07-21 (última edición 2024-08-13).
@@ -306,3 +306,23 @@ sobre marketing, búsqueda e IA. Suscríbete aquí.
   subir la búsqueda principal desde la posición ~45 hacia el top 20. Es una hipótesis, no una promesa.
 - **IA:** panel de 5–10 preguntas en ChatGPT, Gemini y Perplexity; registrar si citan o mencionan a Efeonce.
 - **GA4:** sesiones con interacción en la URL y clics hacia Glitch, Think y la página de agencia.
+
+## 8. Registro de publicación (2026-10-24)
+
+- **Post:** WordPress `244765`, misma URL, autor Julio Reyes (user `1`), categoría `96` y etiquetas sin cambios.
+- **Fuente editable:** [`INBOUND_MARKETING_REFRESH_GUTENBERG_SPEC_V1.json`](INBOUND_MARKETING_REFRESH_GUTENBERG_SPEC_V1.json);
+  validación Content Factory `pass`, 0 hallazgos, 60 bloques.
+- **Escrito:** `post_title`, `post_content`, `post_excerpt`, `_yoast_wpseo_title`, `_yoast_wpseo_metadesc` y
+  tiempo de lectura (10 min). Se conservan imagen destacada y OG (`244847`, texto aún válido).
+- **Dos escrituras con guardas** (hash + `post_modified_gmt` + título Yoast): la segunda redujo las ilustraciones
+  SVG de 1.112 px a 520 px de ancho. Contenido guardado = payload salvo `🍏` → `&#x1f34f;` (equivalencia probada).
+- **Respaldo:** local `tmp/que-es-inbound-marketing-post-244765-before-v1-20261024T081621Z.json` (gitignored) y
+  opciones de servidor `_gh_inbound_refresh_20261024_081739` (estado original) y
+  `_gh_inbound_refresh_v2_20261024_081923` (primera versión). WordPress además guarda revisiones.
+- **Rollback:** `pnpm public-website:wpcli -- --eval-file ./tmp/inb-244765-rollback.php --wp-user 12 -- _gh_inbound_refresh_20261024_081739`
+  (restaura título, contenido, extracto y meta Yoast del estado original; purga caché).
+- **QA en vivo (anónimo):** 200; title, descripción, canonical y `index, follow` correctos; `BlogPosting` con
+  `headline` y `dateModified` nuevos, `Person` Julio Reyes, `FAQPage` con 5 preguntas; 1 H1; índice con 10 anclas
+  válidas; 20 enlaces del artículo responden 200; sin desborde horizontal a 1440 px ni a 375 px; consola sin errores.
+- **Pendiente:** suscripción a Glitch se enlaza al archivo `/category/glitch/` porque el formulario de suscripción
+  del blog aún no está publicado; reemplazarlo cuando exista. Observar Search Console a las 4, 8 y 12 semanas (§7).
