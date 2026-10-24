@@ -14,6 +14,8 @@ import { emitGoogleAdsConversion } from '../growth-google-ads-conversion/convers
  */
 import type {
   PublicSubmitOutcome,
+  PublicSubmitResult,
+  RendererRegistrationStatus,
   RenderContract,
   RendererConsentDisplay,
   RendererFieldDefinition,
@@ -35,7 +37,22 @@ import {
 } from './mask'
 import { resolveSystemCopy, type RendererSystemCopy } from './copy'
 import { validateField, validateFields, type FieldErrors } from './validation'
-import { createTelemetryEmitter, type TelemetryEmitter, type TelemetryPayload } from './telemetry'
+import {
+  createTelemetryEmitter,
+  dispatchGrowthFormSuccess,
+  GROWTH_FORM_SUCCESS_EVENT,
+  type GrowthFormSuccessDetail,
+  type TelemetryEmitter,
+  type TelemetryPayload
+} from './telemetry'
+import {
+  applyInlinePillState,
+  buildInlinePill,
+  setInlinePillError,
+  type InlinePillLabels,
+  type InlinePillRefs,
+  type InlinePillState
+} from './inline-pill'
 import { submitPublicForm, verifyPublicEmail, type RendererApiConfig } from './api-client'
 import { RENDERER_VERSION } from './version'
 import { TurnstileTokenClient } from './turnstile'
@@ -130,6 +147,19 @@ export class FormRenderer {
   private readonly touched = new Set<string>()
   private currentStep = 0
   private submitting = false
+  /** TASK-2054 — el formulario ya confirmó (por envío propio o de otra instancia del mismo formulario). */
+  private succeeded = false
+  private successListener: ((event: Event) => void) | null = null
+
+  // ─── Presentación inline_pill (TASK-2054) ────────────────────────────────────
+  private inlineRefs: InlinePillRefs | null = null
+  private inlineState: InlinePillState = 'idle'
+  private inlineRegistration: RendererRegistrationStatus | undefined
+  private readonly inlineTimers = new Set<ReturnType<typeof setTimeout>>()
+  /** Del canvas: el campo aparece a los 200 ms y el foco entra a los 260; el éxito queda 1,4 s. */
+  private static readonly INLINE_FOCUS_DELAY_MS = 260
+  private static readonly INLINE_RESTORE_FOCUS_DELAY_MS = 60
+  private static readonly INLINE_SUCCESS_HOLD_MS = 1400
   private started = false
   private destroyed = false
 
@@ -252,12 +282,23 @@ export class FormRenderer {
 
     if (this.opts.colorScheme) this.opts.root.setAttribute('data-color-scheme', this.opts.colorScheme)
     if (this.contract.styleVariant) this.opts.root.setAttribute('data-ghf-style-variant', this.contract.styleVariant)
+    if (this.isInlinePill()) this.opts.root.setAttribute('data-ghf-presentation', 'inline_pill')
+
+    // TASK-2054 — otra instancia del mismo formulario que confirma lleva a ésta a su estado final.
+    this.successListener = event => this.onPeerSuccess(event)
+    this.doc.addEventListener(GROWTH_FORM_SUCCESS_EVENT, this.successListener)
+
     this.telemetry.emit('gh_form_viewed', {})
     this.renderForm()
   }
 
   destroy(): void {
     this.destroyed = true
+    if (this.successListener) this.doc.removeEventListener(GROWTH_FORM_SUCCESS_EVENT, this.successListener)
+    this.successListener = null
+    for (const timer of this.inlineTimers) clearTimeout(timer)
+    this.inlineTimers.clear()
+    this.inlineRefs = null
     for (const timer of this.verifyTimers.values()) clearTimeout(timer)
     this.verifyTimers.clear()
     for (const timer of this.statusTimers.values()) clearTimeout(timer)
@@ -270,6 +311,13 @@ export class FormRenderer {
 
   private renderForm(): void {
     if (this.destroyed) return
+
+    if (this.isInlinePill()) {
+      this.renderInlinePill()
+
+      return
+    }
+
     const root = this.opts.root
 
     root.replaceChildren()
@@ -2899,7 +2947,9 @@ export class FormRenderer {
         ...this.buildAssetDownloadHandoff(result.submissionId)
       })
       this.clearDraft() // enviado OK → el borrador ya no aplica.
+      this.succeeded = true
       this.renderSuccess()
+      this.announceSuccess(result)
 
       return
     }
@@ -3375,6 +3425,292 @@ export class FormRenderer {
 
   private focusPrimary(): void {
     this.opts.root.querySelector<HTMLElement>('[data-ghf-primary]')?.focus?.()
+  }
+
+  // ─── Presentación inline_pill (TASK-2054) ───────────────────────────────────
+
+  private isInlinePill(): boolean {
+    return this.contract.presentation === 'inline_pill'
+  }
+
+  private inlineEmailField(): RendererFieldDefinition | undefined {
+    return this.contract.fields.find(field => field.type === 'email')
+  }
+
+  private inlineLabels(): InlinePillLabels {
+    const kind = this.contract.form.formKind
+    const defaults = this.copy.inlinePill.byKind[kind] ?? this.copy.inlinePill.fallback
+    const declared = this.contract.inlinePill ?? {}
+    const emailField = this.inlineEmailField()
+    const openLabel = declared.openLabel ?? defaults.openLabel
+
+    const emailLabel =
+      this.resolveContractCopy(emailField?.label, emailField?.copyRef) ?? this.copy.inlinePill.emailLabel
+
+    return {
+      openLabel,
+      submitLabel: declared.submitLabel ?? defaults.submitLabel,
+      successLabel: declared.successLabel ?? defaults.successLabel,
+      doneLabel: declared.doneLabel ?? defaults.doneLabel,
+      emailLabel,
+      note: declared.note ?? this.contract.consent?.noticeText,
+      formAriaLabel: openLabel
+    }
+  }
+
+  private inlineResultLabels(): { success: string; done: string } {
+    const labels = this.inlineLabels()
+
+    if (this.inlineRegistration === 'waitlisted') {
+      return {
+        success: this.contract.inlinePill?.waitlistSuccessLabel ?? this.copy.inlinePill.waitlistSuccessLabel,
+        done: this.contract.inlinePill?.waitlistDoneLabel ?? this.copy.inlinePill.waitlistDoneLabel
+      }
+    }
+
+    return { success: labels.successLabel, done: labels.doneLabel }
+  }
+
+  /** Construye la píldora UNA vez: las transiciones del canvas necesitan los mismos nodos entre estados. */
+  private renderInlinePill(): void {
+    const root = this.opts.root
+
+    if (this.inlineRefs && root.contains(this.inlineRefs.wrap)) return
+
+    const labels = this.inlineLabels()
+    const emailField = this.inlineEmailField()
+    const consent = this.contract.consent
+
+    const refs = buildInlinePill({
+      doc: this.doc,
+      instanceId: this.instanceId,
+      kind: this.contract.form.formKind === 'event_registration' ? 'event' : 'subscribe',
+      labels,
+      placeholder: emailField?.placeholder,
+      autocomplete: emailField?.autocomplete,
+      buildNote: consent && labels.note?.includes(CONSENT_PRIVACY_LINK_MARKER) ? note => this.buildConsentText(note, consent) : undefined,
+      retryLabel: this.copy.retry
+    })
+
+    refs.openButton.addEventListener('click', () => this.openInline())
+
+    refs.input.addEventListener('input', () => {
+      if (emailField) this.values[emailField.key] = refs.input.value
+      this.maybeStart()
+      if (!refs.error.hidden) setInlinePillError(refs, null)
+    })
+
+    refs.input.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || this.inlineState !== 'open') return
+      if (refs.input.value.trim() !== '') return
+      event.preventDefault()
+      this.closeInline()
+    })
+
+    refs.form.addEventListener('submit', event => {
+      event.preventDefault()
+      void this.submitInline()
+    })
+
+    refs.retryButton.addEventListener('click', () => {
+      refs.input.focus({ preventScroll: true })
+      void this.submitInline()
+    })
+
+    root.replaceChildren(refs.wrap)
+    this.inlineRefs = refs
+
+    if (emailField && typeof this.values[emailField.key] === 'string') refs.input.value = String(this.values[emailField.key])
+
+    this.setInlineState(this.succeeded ? 'done' : 'idle')
+  }
+
+  private setInlineState(state: InlinePillState): void {
+    const refs = this.inlineRefs
+
+    this.inlineState = state
+    if (!refs) return
+
+    if (state === 'success' || state === 'done') {
+      const result = this.inlineResultLabels()
+
+      refs.successText.textContent = result.success
+      refs.doneText.textContent = result.done
+      refs.pill.toggleAttribute('data-ghf-inline-waitlisted', this.inlineRegistration === 'waitlisted')
+    }
+
+    applyInlinePillState(refs, state)
+  }
+
+  private scheduleInline(callback: () => void, delayMs: number): void {
+    const timer = setTimeout(() => {
+      this.inlineTimers.delete(timer)
+      if (!this.destroyed) callback()
+    }, delayMs)
+
+    this.inlineTimers.add(timer)
+  }
+
+  private openInline(): void {
+    if (this.inlineState !== 'idle' || !this.inlineRefs) return
+    const refs = this.inlineRefs
+
+    this.setInlineState('open')
+    this.scheduleInline(() => refs.input.focus({ preventScroll: true }), FormRenderer.INLINE_FOCUS_DELAY_MS)
+  }
+
+  private closeInline(): void {
+    const refs = this.inlineRefs
+
+    if (!refs) return
+    setInlinePillError(refs, null)
+    this.setInlineState('idle')
+    this.scheduleInline(() => refs.openButton.focus({ preventScroll: true }), FormRenderer.INLINE_RESTORE_FOCUS_DELAY_MS)
+  }
+
+  /** Mismo envío que el formulario estándar (validación, consentimiento, captcha, API pública, telemetría). */
+  private async submitInline(): Promise<void> {
+    const refs = this.inlineRefs
+    const emailField = this.inlineEmailField()
+
+    if (!refs || !emailField || this.submitting || this.inlineState !== 'open') return
+
+    this.values[emailField.key] = refs.input.value
+    this.touched.add(emailField.key)
+
+    const fieldError = this.validateRendererField(emailField) ?? this.validateConsent()
+
+    if (fieldError) {
+      this.telemetry.emit('gh_form_field_validation_failed', { reason_class: emailField.type })
+      setInlinePillError(refs, fieldError)
+      refs.input.focus({ preventScroll: true })
+
+      return
+    }
+
+    setInlinePillError(refs, null)
+    const honeypot = refs.honeypot.value
+
+    this.setSubmitting(true)
+    this.setInlineState('loading')
+
+    // Gate corporativo (UX; la autoridad es el servidor): el veredicto llega mientras gira el loader.
+    if (this.isEmailGated(emailField) && !this.emailVerifyDisabled) {
+      const verdict = await verifyPublicEmail(this.api, refs.input.value.trim(), this.fetchImpl)
+
+      if (verdict.outcome === 'disabled') this.emailVerifyDisabled = true
+
+      if (verdict.outcome === 'ok' && (verdict.reasonCode === 'email_not_corporate' || verdict.reasonCode === 'email_disposable')) {
+        this.setSubmitting(false)
+        this.setInlineState('open')
+        setInlinePillError(refs, verdict.reasonCode === 'email_disposable' ? this.copy.errors.disposable : this.copy.errors.corporate)
+        refs.input.focus({ preventScroll: true })
+
+        return
+      }
+    }
+
+    let captchaToken: string | undefined
+
+    try {
+      captchaToken = await this.resolveCaptchaToken()
+    } catch {
+      this.setSubmitting(false)
+      this.telemetry.emit('gh_form_submission_rejected', { reason_class: 'captcha_failed' })
+      this.failInline(this.submitErrorMessage('captcha_failed'), false)
+
+      return
+    }
+
+    this.telemetry.emit('gh_form_submitted', {})
+
+    const result = await submitPublicForm(
+      this.api,
+      {
+        fields: this.collectFieldValues(),
+        files: {},
+        consent: this.contract.consent ? (this.contract.consent.checkboxes ?? []).length === 0 : true,
+        consentCheckboxes: [],
+        honeypot,
+        pageUri: this.pageContext.pageUri,
+        pageName: this.pageContext.pageName,
+        referrer: this.pageContext.referrer,
+        formVersionId: this.contract.form.formVersionId,
+        captchaToken
+      },
+      this.fetchImpl
+    )
+
+    this.setSubmitting(false)
+    this.turnstile?.reset()
+    if (this.destroyed) return
+
+    if (result.outcome === 'accepted') {
+      emitGoogleAdsConversion(result.googleAdsConversion, 'commercial_lead')
+      this.telemetry.emit('gh_form_submission_accepted', {
+        ...(result.submissionId ? { correlation_id: result.submissionId } : {}),
+        success_behavior: this.contract.successBehavior.kind,
+        ...this.buildTokenizedReportHandoff(result.submissionId),
+        ...this.buildAssetDownloadHandoff(result.submissionId)
+      })
+      this.succeeded = true
+      this.inlineRegistration = result.registrationStatus
+      this.setInlineState('success')
+      refs.ok.focus({ preventScroll: true })
+      this.scheduleInline(() => this.setInlineState('done'), FormRenderer.INLINE_SUCCESS_HOLD_MS)
+      this.announceSuccess(result)
+
+      return
+    }
+
+    this.telemetry.emit('gh_form_submission_rejected', { reason_class: result.outcome })
+
+    const networkError = result.reason === 'network_error'
+    const retryable = networkError || result.outcome === 'rate_limited' || result.outcome === 'error'
+
+    this.failInline(networkError ? this.copy.submitError : this.submitErrorMessage(result.outcome), retryable)
+  }
+
+  private failInline(message: string, retry: boolean): void {
+    const refs = this.inlineRefs
+
+    if (!refs) return
+    this.setInlineState('open')
+    setInlinePillError(refs, message, { retry, fieldInvalid: false })
+    refs.input.focus({ preventScroll: true })
+  }
+
+  /** Avisa el éxito a las demás instancias del mismo formulario en la página (evento DOM, sin PII). */
+  private announceSuccess(result: PublicSubmitResult): void {
+    const detail: GrowthFormSuccessDetail = {
+      formKey: this.contract.form.formKey,
+      formSlug: this.contract.form.slug,
+      instanceId: this.instanceId,
+      ...(result.registrationStatus ? { registrationStatus: result.registrationStatus } : {})
+    }
+
+    dispatchGrowthFormSuccess(this.opts.root, detail)
+  }
+
+  private onPeerSuccess(event: Event): void {
+    const detail = (event as CustomEvent<GrowthFormSuccessDetail>).detail
+
+    if (this.destroyed || this.succeeded || !detail) return
+    if (detail.instanceId === this.instanceId || detail.formKey !== this.contract.form.formKey) return
+
+    this.succeeded = true
+
+    if (this.isInlinePill()) {
+      for (const timer of this.inlineTimers) clearTimeout(timer)
+      this.inlineTimers.clear()
+      this.inlineRegistration = detail.registrationStatus
+      if (this.inlineRefs) setInlinePillError(this.inlineRefs, null)
+      this.setInlineState('done')
+
+      return
+    }
+
+    if (!this.submitting) this.renderSuccess()
   }
 
   private focusStepHeading(): void {

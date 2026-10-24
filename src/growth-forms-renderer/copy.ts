@@ -85,6 +85,18 @@ export interface RendererSystemCopy {
     consentRequired: string
   }
   submitByKind: Record<RendererFormKind, string>
+  /**
+   * TASK-2054 — Etiquetas por defecto de la presentación `inline_pill` (las del contrato ganan). Los
+   * defaults de `subscribe` y `event_registration` son los del canvas aprobado de la portada del blog v3.
+   */
+  inlinePill: {
+    byKind: Partial<Record<RendererFormKind, { openLabel: string; submitLabel: string; successLabel: string; doneLabel: string }>>
+    fallback: { openLabel: string; submitLabel: string; successLabel: string; doneLabel: string }
+    waitlistSuccessLabel: string
+    waitlistDoneLabel: string
+    /** Etiqueta accesible del campo de correo cuando el contrato no trae `label`. */
+    emailLabel: string
+  }
 }
 
 const esCL: RendererSystemCopy = {
@@ -182,6 +194,21 @@ const esCL: RendererSystemCopy = {
     survey: 'Enviar respuestas',
     preference: 'Guardar preferencias',
     application: 'Enviar postulación'
+  },
+  inlinePill: {
+    byKind: {
+      subscribe: { openLabel: 'Suscribirme', submitLabel: 'Suscribirme', successLabel: '¡Listo!', doneLabel: 'Ya estás suscrito' },
+      event_registration: {
+        openLabel: 'Reservar mi lugar',
+        submitLabel: 'Reservar',
+        successLabel: '¡Lugar reservado!',
+        doneLabel: 'Te esperamos'
+      }
+    },
+    fallback: { openLabel: 'Dejar mi correo', submitLabel: 'Enviar', successLabel: '¡Listo!', doneLabel: 'Recibimos tu correo' },
+    waitlistSuccessLabel: '¡Estás en la lista!',
+    waitlistDoneLabel: 'Te avisamos si se libera un lugar',
+    emailLabel: 'Tu correo de trabajo'
   }
 }
 
@@ -279,6 +306,21 @@ const enUS: RendererSystemCopy = {
     survey: 'Send answers',
     preference: 'Save preferences',
     application: 'Send application'
+  },
+  inlinePill: {
+    byKind: {
+      subscribe: { openLabel: 'Subscribe', submitLabel: 'Subscribe', successLabel: 'Done!', doneLabel: 'You’re subscribed' },
+      event_registration: {
+        openLabel: 'Reserve my spot',
+        submitLabel: 'Reserve',
+        successLabel: 'Spot reserved!',
+        doneLabel: 'See you there'
+      }
+    },
+    fallback: { openLabel: 'Leave my email', submitLabel: 'Send', successLabel: 'Done!', doneLabel: 'We got your email' },
+    waitlistSuccessLabel: 'You’re on the list!',
+    waitlistDoneLabel: 'We’ll let you know if a spot opens up',
+    emailLabel: 'Your work email'
   }
 }
 

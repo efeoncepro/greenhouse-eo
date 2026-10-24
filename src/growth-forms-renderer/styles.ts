@@ -1829,13 +1829,196 @@ const PILLAR_CSS = `
 @media(prefers-reduced-motion:reduce){[data-ghf-style-variant="hubspot_pillar"] label.ghf-choice{transition:none}}
 `
 
+/**
+ * TASK-2054 — Presentación `inline_pill` (contrato de TASK-2053). Reproduce `.gxs` del canvas aprobado de
+ * la portada del blog v3 (2026-10-24): valores como tokens `--ghf-inline-*` con el default del canvas
+ * (Glitch); el anfitrión declara el tono (`--ghf-inline-tone`, `--ghf-inline-on-tone` y, para hover y
+ * active exactos, `--ghf-inline-tone-hover/-active`). Los anchos por estado tienen default por tipo de
+ * formulario (suscripción 252 → 480 → 304; evento 236 → 470 → 360). Bajo 480 px de contenedor la píldora
+ * ocupa todo el ancho en todos los estados (tablero móvil del canvas). Sin contorno interno del campo:
+ * el foco lo marca la píldora. Sólo se animan ancho, color, `transform`, `opacity` y `stroke-dashoffset`.
+ */
+const INLINE_PILL_CSS = `
+:is(greenhouse-form,.ghf-scope) .ghf-inline{
+  --ghf-inline-font-resolved:var(--ghf-inline-font,var(--ghf-font));
+  --ghf-inline-tone-resolved:var(--ghf-inline-tone,#6ec207);
+  --ghf-inline-on-tone-resolved:var(--ghf-inline-on-tone,#001a33);
+  --ghf-inline-ease-resolved:var(--ghf-inline-ease,cubic-bezier(0.2,0,0,1));
+  --ghf-inline-spring-resolved:var(--ghf-inline-spring,cubic-bezier(0.34,1.56,0.64,1));
+  --ghf-inline-morph-resolved:var(--ghf-inline-duration-morph,520ms);
+  --ghf-inline-w-idle:var(--ghf-inline-width-idle,252px);
+  --ghf-inline-w-open:var(--ghf-inline-width-open,480px);
+  --ghf-inline-w-done:var(--ghf-inline-width-done,304px);
+  --ghf-inline-done-alpha:55%;
+  --ghf-inline-align-resolved:var(--ghf-inline-align,flex-end);
+  --ghf-inline-note-align-resolved:var(--ghf-inline-note-align,right);
+  display:flex;flex-direction:column;align-items:var(--ghf-inline-align-resolved);
+  font-family:var(--ghf-inline-font-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline[data-ghf-inline-kind="event"]{
+  --ghf-inline-w-idle:var(--ghf-inline-width-idle,236px);
+  --ghf-inline-w-open:var(--ghf-inline-width-open,470px);
+  --ghf-inline-w-done:var(--ghf-inline-width-done,360px);
+  --ghf-inline-done-alpha:60%;
+  --ghf-inline-align-resolved:var(--ghf-inline-align,flex-start);
+  --ghf-inline-note-align-resolved:var(--ghf-inline-note-align,left);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill{
+  position:relative;width:var(--ghf-inline-w-idle);max-width:100%;height:var(--ghf-inline-height,52px);margin:0;
+  border-radius:999px;border:1px solid transparent;background:transparent;
+  transition:width var(--ghf-inline-morph-resolved) var(--ghf-inline-ease-resolved),background-color 320ms var(--ghf-inline-ease-resolved),border-color 320ms var(--ghf-inline-ease-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill:is([data-ghf-inline-state="open"],[data-ghf-inline-state="loading"]){
+  width:var(--ghf-inline-w-open);background:var(--ghf-inline-open-bg,rgba(255,255,255,.06));
+  border-color:var(--ghf-inline-open-border,color-mix(in srgb,var(--ghf-inline-tone-resolved) 60%,transparent));
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="open"]:focus-within{border-color:var(--ghf-inline-focus-border,var(--ghf-inline-tone-resolved))}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-invalid="true"]{border-color:var(--ghf-inline-error-fg,#ff8aa0)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="success"]{
+  width:var(--ghf-inline-w-open);background:var(--ghf-inline-tone-resolved);border-color:var(--ghf-inline-tone-resolved);
+  animation:ghf-inline-pop var(--ghf-inline-morph-resolved) var(--ghf-inline-ease-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"]{
+  width:var(--ghf-inline-w-done);background:transparent;
+  border-color:var(--ghf-inline-done-border,color-mix(in srgb,var(--ghf-inline-tone-resolved) var(--ghf-inline-done-alpha),transparent));
+}
+@keyframes ghf-inline-pop{0%{transform:scale(1)}40%{transform:scale(var(--ghf-inline-pulse-scale,1.035))}100%{transform:scale(1)}}
+
+/* Botón de apertura y botón de envío: botón AXIS del canvas (texto que rueda, flecha que avanza). */
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send){
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  margin:0;border:0!important;border-radius:999px!important;box-shadow:none!important;
+  background:var(--ghf-inline-tone-resolved)!important;color:var(--ghf-inline-on-tone-resolved)!important;
+  font-family:var(--ghf-inline-font-resolved)!important;font-weight:600!important;line-height:1.4!important;
+  letter-spacing:.005em!important;text-transform:none!important;text-decoration:none;white-space:nowrap;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-open{
+  position:absolute;inset:-1px;width:calc(100% + 2px);min-height:var(--ghf-inline-height,52px);
+  padding:0 1.25rem 0 1.5rem!important;gap:.75rem;font-size:15px!important;
+  transition:opacity 180ms var(--ghf-inline-ease-resolved),transform 450ms var(--ghf-inline-spring-resolved),background-color 150ms;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill:not([data-ghf-inline-state="idle"]) .ghf-inline-open{opacity:0;pointer-events:none;transform:scale(.96)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-send{
+  flex:none;max-width:60%;min-height:var(--ghf-inline-send-height,42px);padding:0 .875rem 0 1.125rem!important;font-size:14px!important;
+  transition:background-color 150ms cubic-bezier(0.4,0,0.2,1),transform 450ms var(--ghf-inline-spring-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-send-content{display:inline-flex;align-items:center;gap:.5rem;min-width:0;max-width:100%}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):active{transform:scale(.95);transition-duration:90ms;background:var(--ghf-inline-tone-active,color-mix(in srgb,var(--ghf-inline-tone-resolved) 62%,#ffffff))!important}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):focus-visible{outline:2px solid var(--ghf-inline-focus-ring,#ffffff);outline-offset:3px}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-roll{display:inline-block;min-width:0;height:1.4em;overflow:hidden;line-height:1.4;vertical-align:top}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-roll-in{display:flex;flex-direction:column;transition:transform 320ms var(--ghf-inline-ease-resolved)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-roll-in>span{overflow:hidden;text-overflow:ellipsis}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-arrow{flex:none;overflow:visible;transition:transform 340ms var(--ghf-inline-ease-resolved)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-arrow-stem{stroke-dasharray:.5 2;transition:stroke-dasharray 360ms var(--ghf-inline-ease-resolved)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):focus-visible .ghf-inline-roll-in{transform:translateY(-50%)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):focus-visible .ghf-inline-arrow{transform:translateX(3px)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):is(:focus-visible,:active) .ghf-inline-arrow-stem{stroke-dasharray:1 2}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):active .ghf-inline-arrow{transform:translateX(5px)}
+@media (hover:hover){
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):hover{background:var(--ghf-inline-tone-hover,color-mix(in srgb,var(--ghf-inline-tone-resolved) 80%,#ffffff))!important}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):hover .ghf-inline-roll-in{transform:translateY(-50%)}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):hover .ghf-inline-arrow{transform:translateX(3px)}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):hover .ghf-inline-arrow-stem{stroke-dasharray:1 2}
+}
+
+/* Loader de la órbita en el botón de envío. */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-spin{display:none;position:absolute;inset:0;margin:auto;width:24px;height:24px}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-spin g{transform-origin:center;transform-box:view-box;animation:ghf-inline-rot 1200ms linear infinite}
+@keyframes ghf-inline-rot{to{transform:rotate(360deg)}}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="loading"] .ghf-inline-send-content{visibility:hidden}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="loading"] .ghf-inline-spin{display:block}
+
+/* Campo: aparece 200 ms después de que la píldora empieza a estirarse. */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-form{
+  position:absolute;inset:0;display:flex;align-items:center;gap:8px;margin:0;padding:0 4px 0 22px;
+  opacity:0;visibility:hidden;transition:opacity 220ms var(--ghf-inline-ease-resolved),visibility 0s linear 220ms;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill:is([data-ghf-inline-state="open"],[data-ghf-inline-state="loading"]) .ghf-inline-form{
+  opacity:1;visibility:visible;
+  transition:opacity 260ms var(--ghf-inline-ease-resolved) var(--ghf-inline-field-delay,200ms),visibility 0s;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-input{
+  flex:1;min-width:0;height:44px!important;margin:0!important;padding:0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;outline:none!important;
+  color:var(--ghf-inline-field-fg,#ffffff)!important;font:400 16px var(--ghf-inline-font-resolved)!important;
+  letter-spacing:normal!important;text-transform:none!important;-webkit-appearance:none;appearance:none;
+  transition:opacity 220ms var(--ghf-inline-ease-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-input::placeholder{color:var(--ghf-inline-placeholder,rgba(207,228,250,.6));opacity:1}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-input:is(:focus,:focus-visible){outline:none!important;box-shadow:none!important}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="loading"] .ghf-inline-input{opacity:.55}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-honeypot{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+
+/* Confirmación: relleno del tono + check que se dibuja; a los 1,4 s, el texto final. */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-ok{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;
+  opacity:0;visibility:hidden;outline:none;color:var(--ghf-inline-on-tone-resolved);
+  font:600 15px/1.4 var(--ghf-inline-font-resolved);
+  transition:opacity 220ms var(--ghf-inline-ease-resolved),visibility 0s linear 220ms,color 300ms var(--ghf-inline-ease-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill:is([data-ghf-inline-state="success"],[data-ghf-inline-state="done"]) .ghf-inline-ok{
+  opacity:1;visibility:visible;transition:opacity 220ms var(--ghf-inline-ease-resolved),visibility 0s;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-check{flex:none}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-check path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--ghf-inline-check-duration,420ms) var(--ghf-inline-ease-resolved) var(--ghf-inline-check-delay,140ms)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill:is([data-ghf-inline-state="success"],[data-ghf-inline-state="done"]) .ghf-inline-check path{stroke-dashoffset:0}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-ok{color:var(--ghf-inline-done-fg,#ffffff)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-check{color:var(--ghf-inline-tone-resolved)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-msg{display:grid;min-width:0}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-msg>span{grid-area:1/1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity 260ms var(--ghf-inline-ease-resolved),transform 360ms var(--ghf-inline-ease-resolved)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-t2{opacity:0;transform:translateY(8px)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-t1{opacity:0;transform:translateY(-8px)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-t2{opacity:1;transform:none}
+
+/* Nota legal: sólo con el campo abierto. Errores: bajo la píldora. */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-note{
+  margin:12px 0 0;max-width:var(--ghf-inline-w-open);text-align:var(--ghf-inline-note-align-resolved);
+  font:400 12px/1.5 var(--ghf-inline-font-resolved);color:var(--ghf-inline-note-fg,#cfe4fa);
+  opacity:0;transform:translateY(-4px);transition:opacity 220ms var(--ghf-inline-ease-resolved),transform 300ms var(--ghf-inline-ease-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline:has(.ghf-inline-pill:is([data-ghf-inline-state="open"],[data-ghf-inline-state="loading"])) .ghf-inline-note{
+  opacity:.8;transform:none;transition-delay:var(--ghf-inline-note-delay,260ms);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-note a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-error{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:var(--ghf-inline-align-resolved);gap:4px 12px;
+  margin:10px 0 0;max-width:var(--ghf-inline-w-open);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-error[hidden]{display:none}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-error-text{margin:0;font:500 13px/1.45 var(--ghf-inline-font-resolved);color:var(--ghf-inline-error-fg,#ff8aa0);text-align:var(--ghf-inline-note-align-resolved)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-retry{
+  min-height:32px;margin:0;padding:0 12px!important;border:1px solid currentColor!important;border-radius:999px!important;
+  background:transparent!important;box-shadow:none!important;color:var(--ghf-inline-done-fg,#ffffff)!important;
+  font:600 13px/1 var(--ghf-inline-font-resolved)!important;letter-spacing:normal!important;text-transform:none!important;cursor:pointer;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-retry[hidden]{display:none}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-retry:focus-visible{outline:2px solid var(--ghf-inline-focus-ring,#ffffff);outline-offset:2px}
+
+/* Tablero móvil del canvas: ancho completo en todos los estados, nota alineada a la izquierda. */
+@container (max-width: 479.98px){
+  :is(greenhouse-form,.ghf-scope) .ghf-inline{align-items:stretch}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-pill,
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-pill:not([data-ghf-inline-state="idle"]){width:100%}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-form{padding-left:18px}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-note,
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-error-text{text-align:left;max-width:none}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-error{justify-content:flex-start;max-width:none}
+}
+
+@media (prefers-reduced-motion: reduce){
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-pill,.ghf-inline-open,.ghf-inline-send,.ghf-inline-form,.ghf-inline-input,.ghf-inline-ok,.ghf-inline-check path,.ghf-inline-msg>span,.ghf-inline-note,.ghf-inline-roll-in,.ghf-inline-arrow,.ghf-inline-arrow-stem){transition:none!important;animation:none!important}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):is(:hover,:focus-visible) .ghf-inline-roll-in{transform:none}
+}
+`
+
 /** Inyecta el CSS una sola vez en el documento host (idempotente). */
 export const ensureStylesInjected = (doc: Document = document): void => {
   if (doc.getElementById(RENDERER_STYLE_ID)) return
   const style = doc.createElement('style')
 
   style.id = RENDERER_STYLE_ID
-  style.textContent = RENDERER_CSS + PILLAR_CSS + CONTENT_MARKETING_CSS
+  style.textContent = RENDERER_CSS + PILLAR_CSS + CONTENT_MARKETING_CSS + INLINE_PILL_CSS
   doc.head.appendChild(style)
 }
 

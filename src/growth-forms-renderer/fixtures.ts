@@ -186,3 +186,73 @@ export const partnerApplicationContractFixture = (): RenderContract =>
       actions: [{ kind: 'dismiss', label: 'Cerrar' }],
     },
   })
+
+/**
+ * TASK-2054 — Formulario en línea de Glitch (canvas de la portada del blog v3, bloque `.gxs`): un campo
+ * de correo, aviso sin casillas y las etiquetas del canvas.
+ */
+export const glitchInlinePillContractFixture = (over: Partial<RenderContract> = {}): RenderContract =>
+  staticContractFixture({
+    form: {
+      formId: 'fdef-glitch-newsletter',
+      formKey: '00000000-0000-4000-8000-000000002054',
+      slug: 'glitch-newsletter',
+      formVersionId: 'fver-glitch-1',
+      version: 1,
+      locale: 'es-CL',
+      formKind: 'subscribe'
+    },
+    fields: [
+      { key: 'email', type: 'email', label: 'Tu correo de trabajo', placeholder: 'tu@empresa.com', required: true, autocomplete: 'email' }
+    ],
+    consent: {
+      consentPolicyVersion: 'glitch-2026-10',
+      noticeText: 'Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.',
+      privacyUrl: 'https://efeoncepro.com/politica-de-privacidad/',
+      checkboxes: []
+    },
+    presentation: 'inline_pill',
+    inlinePill: {
+      openLabel: 'Suscríbete a Glitch',
+      submitLabel: 'Suscribirme',
+      successLabel: '¡Listo!',
+      doneLabel: 'Ya estás suscrito a Glitch',
+      note: 'Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.'
+    },
+    successBehavior: { kind: 'inline_message', message: 'Ya estás suscrito a Glitch' },
+    ...over
+  })
+
+/** TASK-2054 — Reserva del webinar (canvas, bloque `.gxs--ev` dentro de `.evx`). */
+export const eventInlinePillContractFixture = (over: Partial<RenderContract> = {}): RenderContract =>
+  staticContractFixture({
+    form: {
+      formId: 'fdef-webinar-aeo-2026-11-12',
+      formKey: '00000000-0000-4000-8000-000000002055',
+      slug: 'webinar-aeo-chatgpt-2026-11-12',
+      formVersionId: 'fver-webinar-1',
+      version: 1,
+      locale: 'es-CL',
+      formKind: 'event_registration'
+    },
+    fields: [
+      { key: 'email', type: 'email', label: 'Tu correo de trabajo', placeholder: 'tu@empresa.com', required: true, autocomplete: 'email' },
+      { key: 'event_key', type: 'hidden', staticValue: 'webinar-aeo-chatgpt-2026-11-12' }
+    ],
+    consent: {
+      consentPolicyVersion: 'efeonce-events-2026-10',
+      noticeText: 'Te enviamos el enlace y un recordatorio el mismo día.',
+      privacyUrl: 'https://efeoncepro.com/politica-de-privacidad/',
+      checkboxes: []
+    },
+    presentation: 'inline_pill',
+    inlinePill: {
+      openLabel: 'Reservar mi lugar',
+      submitLabel: 'Reservar',
+      successLabel: '¡Lugar reservado!',
+      doneLabel: 'Te esperamos el 12 de noviembre',
+      note: 'Te enviamos el enlace y un recordatorio el mismo día.'
+    },
+    successBehavior: { kind: 'inline_message', message: 'Te esperamos el 12 de noviembre' },
+    ...over
+  })
