@@ -59,6 +59,13 @@ export type GutenbergFaqItem = {
 
 export type GutenbergFaqSchemaOptions = {
   enabled?: boolean
+  /**
+   * Who writes the FAQPage schema. `inline` (default until the plugin is live everywhere): a governed `core/html`
+   * JSON-LD block. `plugin`: no JSON-LD in the content; efeonce-editorial-blocks ≥ 0.3.0 builds the FAQ schema from the
+   * styled `core/details` blocks and joins it to the Yoast graph. A post with an inline FAQPage keeps it: the plugin
+   * skips it, so the two never stack.
+   */
+  source?: 'inline' | 'plugin'
   name?: string
   canonicalUrl?: string
   id?: string
@@ -81,7 +88,7 @@ export const GUTENBERG_BUTTONS_MAX_ITEMS = 3
 export type GutenbergArticleBlock =
   | { kind: 'paragraph'; text: GutenbergRichText }
   | { kind: 'list'; items: GutenbergRichText[]; ordered?: boolean }
-  | { kind: 'details'; summary: string; blocks: GutenbergArticleBlock[]; open?: boolean }
+  | { kind: 'details'; summary: string; blocks: GutenbergArticleBlock[]; open?: boolean; className?: string }
   | { kind: 'faq'; items: GutenbergFaqItem[]; schema?: GutenbergFaqSchemaOptions }
   | {
       kind: 'table'
@@ -267,13 +274,24 @@ const detailsBlock = (
     throw new Error('content_factory_article_details_blocks_required')
   }
 
-  const attrs = block.open ? { summary: block.summary, showContent: true } : { summary: block.summary }
+  const className = block.className?.trim()
+
+  if (className !== undefined && !/^[a-z0-9-]+(?: [a-z0-9-]+)*$/.test(className)) {
+    throw new Error('content_factory_article_details_class_invalid')
+  }
+
+  const attrs: Record<string, unknown> = { summary: block.summary }
+
+  if (block.open) attrs.showContent = true
+  if (className) attrs.className = className
+
   const open = block.open ? ' open' : ''
+  const classes = className ? `wp-block-details ${className}` : 'wp-block-details'
   const children = block.blocks.map(child => renderArticleBlock(child, context)).join('\n')
 
   return [
     `<!-- wp:details ${JSON.stringify(attrs)} -->`,
-    `<details class="wp-block-details"${open}><summary>${escapeGutenbergHtml(block.summary)}</summary>`,
+    `<details class="${classes}"${open}><summary>${escapeGutenbergHtml(block.summary)}</summary>`,
     children,
     '</details>',
     '<!-- /wp:details -->'
@@ -351,6 +369,9 @@ const renderFaqJsonLdBlock = (
   return jsonLdScriptBlock(faqPage)
 }
 
+/** Block style of a FAQ question (efeonce-editorial-blocks «Pregunta frecuente»): design + automatic schema. */
+export const FAQ_DETAILS_CLASS_NAME = 'is-style-efeonce-faq'
+
 const faqBlock = (
   block: Extract<GutenbergArticleBlock, { kind: 'faq' }>,
   context: { canonicalUrl?: string; inLanguage?: string }
@@ -359,7 +380,17 @@ const faqBlock = (
     throw new Error('content_factory_article_faq_items_required')
   }
 
+  const seenQuestions = new Set<string>()
+
   for (const [index, item] of block.items.entries()) {
+    const normalizedQuestion = normalizePlainText(item.question).toLowerCase()
+
+    if (normalizedQuestion && seenQuestions.has(normalizedQuestion)) {
+      throw new Error(`content_factory_article_faq_question_duplicated:${index}`)
+    }
+
+    seenQuestions.add(normalizedQuestion)
+
     if (!item.question.trim()) {
       throw new Error(`content_factory_article_faq_question_required:${index}`)
     }
@@ -374,10 +405,15 @@ const faqBlock = (
   }
 
   const details = block.items
-    .map(item => detailsBlock({ kind: 'details', summary: item.question, blocks: item.answer, open: item.open }, context))
+    .map(item =>
+      detailsBlock(
+        { kind: 'details', summary: item.question, blocks: item.answer, open: item.open, className: FAQ_DETAILS_CLASS_NAME },
+        context
+      )
+    )
     .join('\n\n')
 
-  if (block.schema?.enabled === false) return details
+  if (block.schema?.enabled === false || block.schema?.source === 'plugin') return details
 
   return [details, renderFaqJsonLdBlock(block, context)].join('\n\n')
 }
