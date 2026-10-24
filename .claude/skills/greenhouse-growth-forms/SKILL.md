@@ -414,6 +414,7 @@ Two engine capabilities added 2026-07 (TASK-1319/1320/1321) live in the companio
 | `[formSlug]/submit` | POST | accept a submission (validate + captcha + email policy + rate limit + PII encrypt) |
 | `[formSlug]/verify-email` | POST | reactive corporate-email check (debounced; 404 ⇒ non-blocking) |
 | `catalog` | GET | governed form catalog for the editor selector (server-side embed key) |
+| `[formSlug]/registrations-count` | GET | TASK-2053 — `{ count, display, shown }`: confirmed event registrations, floored to the ten, only above the threshold; 10-min cache + per-IP rate limit |
 
 - CORS/origin/surface are governed by `form_host_surface`. Browser-supplied ids never define
   authorization. Errors are **sanitized** (no SQL/stack/secret/PII).
@@ -616,6 +617,23 @@ Host skin = tokens (`--ghf-field-*`, `--ghf-label-*`, `--ghf-btn-*`, `--ghf-cons
 hides default success steps; `dismiss` emits DOM `ghf:dismiss` (telemetry-independent); `data-ghf-busy` while
 submitting; Turnstile mounts next to the form (works inside a modal `<dialog>`). Worked example + evidence:
 `scripts/public-website/partners-source/partner-dialog-skin.css`, `docs/ui/reviews/TASK-2045/`.
+
+**Inline pill + event registration (TASK-2053 contract + TASK-2054 render, code complete 2026-10-24; renderer `1.2.0`,
+ships with the next `main` release).** `ui_policy.presentation: 'inline_pill'` + optional `ui_policy.inlinePill` labels
+draws the blog-v3 canvas pill (button → email field + send → orbit loader → fill + check → final text). Only one
+required visible `email` (+ `hidden`), notice consent without checkboxes, `static`, no `redirect`/`success_card` — the
+compiler blocks the rest. `fields[].staticValue` (hidden only) is enforced server-side (`applyStaticFieldValues`): the
+event identity, never host-injected. `ui_policy.eventRegistration` (server-only, `event_registration` kind) gives
+capacity + `waitlist|reject`; the seat is decided inside the submit transaction under `pg_advisory_xact_lock`
+(distinct email hashes, waitlisted excluded); `reject` → outcome `capacity_full` (409); responses carry
+`registrationStatus`. Publish with `pnpm growth:forms:publish-event-registration -- --config <json>` (dry-run first).
+Host = tokens `--ghf-inline-*` (tone/on-tone/hover/active) + `data-ghf-part="inline-*"` hooks; give `<greenhouse-form>`
+its column width (≥ 480 px for desktop widths). DOM event `ghf:success` syncs instances of the same `formKey`.
+**Never** publish an `inline_pill` version on a page before the renderer release (old renderer draws the standard form).
+Visual gate: `node scripts/growth/forms/fixtures/inline-pill.scenario.mjs` (canvas literal vs real element, ≤ 1 %;
+standard forms 0 px against a baseline rev). Lesson: measure the canvas's COMPUTED styles — its `button{font:inherit}`
+reset beats `.ab`, so the approved open button renders 16 px/400, not the declared 15/600. Full table:
+`docs/architecture/growth-public-forms-runtime-contract.md` §Formulario en línea.
 
 Catalog selector needs `GREENHOUSE_GROWTH_CATALOG_SURFACE_ID` + `GREENHOUSE_GROWTH_CATALOG_EMBED_KEY`
 in `wp-config.php`; embed key minted with `pnpm growth:forms:embed-key --surface-id <id>` (shown once).

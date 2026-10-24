@@ -1,5 +1,15 @@
 # TASK-2051 — Portada del blog v3 en alta fidelidad
 
+## Delta 2026-10-24
+
+- Formularios en línea de Glitch y del webinar disponibles en el renderer (`presentation: 'inline_pill'`, renderer
+  `1.2.0`) y conteo público `GET /api/public/growth/forms/{formRef}/registrations-count` → `{ count, display, shown }`
+  — code complete en develop (local) por TASK-2053/TASK-2054; llegan a los hosts con el próximo release a `main`.
+  Embed, tokens y piel de referencia: `growth-public-forms-runtime-contract.md` §Formulario en línea y
+  `scripts/growth/forms/fixtures/inline-pill-host-skin.css`. El anfitrión da a `<greenhouse-form>` el ancho de su
+  columna (≥ 480 px para los anchos del canvas) y compone la nota del evento (en el canvas es absoluta).
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

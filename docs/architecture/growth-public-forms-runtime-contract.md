@@ -213,6 +213,92 @@ Hooks de formulario = atributo `data-ghf-part`. Eventos: `ghf:dismiss` (DOM, ind
 `data-ghf-busy` en el root mientras envía. Ejemplo completo: `scripts/public-website/partners-source/partner-dialog-skin.css`
 (evidencia en `docs/ui/reviews/TASK-2045/`).
 
+## Formulario en línea y reserva por evento (TASK-2053/2054)
+
+Code complete en local (2026-10-24); llega a los hosts con el próximo release de Greenhouse a `main` (renderer `1.2.0`).
+Hasta entonces el renderer publicado ignora `presentation` y dibuja el formulario estándar de un campo: no publicar una
+versión `inline_pill` en una página antes del release.
+
+### Contrato (`ui_policy_json` de la versión)
+
+| Clave | Valores | Cruza al navegador | Validación |
+|---|---|---|---|
+| `presentation` | `inline_pill` (ausente o `standard` = estándar) | sí (`renderContract.presentation`) | otro valor → `presentation_unknown` |
+| `inlinePill.openLabel` · `submitLabel` · `successLabel` · `doneLabel` · `waitlistSuccessLabel` · `waitlistDoneLabel` | texto ≤ 80, sin HTML ni llaves; opcionales | sí (`renderContract.inlinePill`) | `inline_pill_labels_invalid`, `inline_pill_label_markup` |
+| `inlinePill.note` | texto ≤ 280; admite un `{privacyLink}` (exige `privacyUrl`) | sí | `inline_pill_note_*` |
+| forma del formulario | exactamente un campo visible `email` requerido + campos `hidden`; consentimiento sin casillas; `composition: 'static'`; éxito sin `redirect` ni `success_card` | — | `inline_pill_fields`, `inline_pill_consent_checkboxes`, `inline_pill_composition`, `inline_pill_success_behavior` |
+| `fields[].staticValue` | ≤ 200, sólo en `type: 'hidden'` | sí; el servidor lo impone al aceptar | `static_value_not_hidden` |
+| `eventRegistration.capacity` | entero 1–100 000; ausente = sin cupo | **no** | `event_registration_invalid` |
+| `eventRegistration.overCapacity` | `waitlist` (default) · `reject` | no | ídem |
+| `eventRegistration.statusField` | default `registration_status`; no puede ser un campo declarado | no | `event_registration_status_field_taken` |
+| `eventRegistration.showRegistrationsCount` | `false` (default) · `true` | no | ídem |
+| `eventRegistration.registrationsCountThreshold` | default 25 | no | ídem |
+
+`eventRegistration` sólo en `form_kind: 'event_registration'` (`event_registration_wrong_kind`) y con un campo `email`.
+Etiquetas por defecto del renderer (es-CL): suscripción «Suscribirme» / «Suscribirme» / «¡Listo!» / «Ya estás suscrito»;
+evento «Reservar mi lugar» / «Reservar» / «¡Lugar reservado!» / «Te esperamos»; lista de espera «¡Estás en la lista!» /
+«Te avisamos si se libera un lugar». La nota cae en `consent.noticeText` si `inlinePill.note` falta.
+
+Publicar un evento: `pnpm growth:forms:publish-event-registration -- --config <json> [--apply] [--force]` (dry-run por
+defecto con el compiler real; ejemplo `scripts/growth/forms/examples/webinar-aeo-2026-11-12.json`). No crea destinos:
+el destino HubSpot de cada evento va por el registry de destinos.
+
+### Envío y lista de espera
+
+`POST …/submit` sin cambios de forma. Con política de reserva la respuesta suma `registrationStatus: 'confirmed' |
+'waitlisted'`; con el cupo lleno y `reject` responde `409 { outcome: 'capacity_full' }` y no persiste nada (queda una
+fila `rejected` con `rejection_reason_class = capacity_full`). El cupo se decide en la transacción del envío con un lock
+por formulario; un correo ya confirmado no ocupa otro cupo.
+
+### Conteo público
+
+`GET /api/public/growth/forms/{slug|formKey}/registrations-count`
+
+```json
+{ "count": 310, "display": "310", "shown": true }
+```
+
+Bajo el umbral, sin `showRegistrationsCount` o en un formulario que no es de evento: `{ "count": null, "display": null,
+"shown": false }`. `count` y `display` van redondeados hacia abajo a la decena (312 → 310; `display` con separador de
+miles es-CL). Errores: `404 growth_form_not_found` (inexistente o API pública apagada), `429 rate_limited` con
+`Retry-After` (30 lecturas por minuto por IP y por instancia), `500 internal_error`. `Cache-Control: public,
+max-age=600`; el reader cachea 10 min por `formRef`. Sin sesión, CORS de los orígenes gobernados.
+
+### Embed y piel del anfitrión
+
+```html
+<greenhouse-form class="eo-inline-pill eo-inline-pill--glitch"
+  form-key="<form_key>" surface="<fhsf-…>" locale="es-CL" color-scheme="dark" appearance="bare">
+  <a href="#suscripcion">Suscríbete a Glitch</a> <!-- sin JS: enlace a la suscripción de abajo -->
+</greenhouse-form>
+<script src="https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js" defer></script>
+```
+
+El anfitrión le da a `<greenhouse-form>` el ancho de su columna (con `container-type: inline-size`, un elemento
+dimensionado por su contenido colapsa): desde 480 px la píldora usa los anchos del canvas; con menos ocupa todo el ancho.
+Piel de referencia: `scripts/growth/forms/fixtures/inline-pill-host-skin.css`.
+
+| Para | Tokens (default = canvas) |
+|---|---|
+| Tono | `--ghf-inline-tone` (#6ec207), `--ghf-inline-on-tone` (#001a33), `--ghf-inline-tone-hover`, `--ghf-inline-tone-active` (default `color-mix` del tono; declararlos para el valor exacto) |
+| Tipografía | `--ghf-inline-font` (default `--ghf-font`) |
+| Anchos | `--ghf-inline-width-idle/-open/-done` (suscripción 252/480/304; evento 236/470/360) |
+| Alto | `--ghf-inline-height` (52px), `--ghf-inline-send-height` (42px) |
+| Superficies | `--ghf-inline-open-bg`, `--ghf-inline-open-border`, `--ghf-inline-focus-border`, `--ghf-inline-done-border`, `--ghf-inline-done-fg`, `--ghf-inline-field-fg`, `--ghf-inline-placeholder`, `--ghf-inline-note-fg`, `--ghf-inline-error-fg`, `--ghf-inline-focus-ring` |
+| Alineación | `--ghf-inline-align` (suscripción `flex-end`, evento `flex-start`), `--ghf-inline-note-align` |
+| Movimiento | `--ghf-inline-duration-morph` (520ms), `--ghf-inline-ease` (cubic-bezier(0.2,0,0,1)), `--ghf-inline-spring`, `--ghf-inline-field-delay` (200ms), `--ghf-inline-check-duration` (420ms), `--ghf-inline-check-delay` (140ms), `--ghf-inline-note-delay` (260ms), `--ghf-inline-pulse-scale` (1.035) |
+
+Hooks `data-ghf-part`: `inline`, `inline-pill` (con `data-ghf-inline-state = idle|open|loading|success|done`,
+`data-ghf-inline-invalid`, `data-ghf-inline-waitlisted`), `inline-open`, `inline-input`, `inline-send`, `inline-ok`,
+`inline-note`, `inline-error`, `inline-retry`; el root lleva `data-ghf-presentation="inline_pill"` y `data-ghf-busy`
+mientras envía. Evento DOM `ghf:success` (`detail: { formKey, formSlug, instanceId, registrationStatus? }`, sin PII):
+otra instancia del mismo `formKey` en la página pasa a «listo» sin reenviar; también lo escucha un formulario estándar.
+
+Teclado: Enter abre y el foco entra al campo a los 260 ms; Esc con el campo vacío cierra y devuelve el foco al botón; tras
+el éxito el foco va al mensaje. Errores en línea bajo la píldora; «Reintentar» sólo ante red, `rate_limited` o `error`.
+Movimiento reducido: sin estiramiento, pulso ni dibujo. Gate visual: `node scripts/growth/forms/fixtures/inline-pill.scenario.mjs`
+(evidencia en `docs/ui/reviews/TASK-2054-growth-form-inline-pill-renderer/`).
+
 ## Content Marketing: presentación, host y distribución del renderer
 
 Registro del rollout del 2026-08-31; para operar después, relee el contrato público y el ledger

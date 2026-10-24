@@ -21,10 +21,10 @@
 - Motion: `docs/ui/motion/TASK-2054-growth-form-inline-pill-renderer-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `En implementación local (Slice 1)`
+- Status real: `Code complete en local (Slices 1–3, 2026-10-24; renderer 1.2.0); rollout pendiente: release de Greenhouse a main y uso en la portada (TASK-2051)`
 - Rank: `TBD`
 - Domain: `growth|forms|ui`
-- Blocked by: `TASK-2053 (Slice 1)`
+- Blocked by: `none` (TASK-2053 Slice 1 code complete en develop 2026-10-24)
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -287,12 +287,12 @@ Valores en el wireframe y el motion doc; son los del canvas (`.gxs`, `.gxs--ev`)
 
 ## Acceptance Criteria
 
-- [ ] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
-- [ ] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2054`.
-- [ ] Se declaro `Wireframe` y `Motion` y los archivos existen.
-- [ ] Los cinco estados coinciden con el canvas (≤ 1 %) a 1440 y 390.
-- [ ] Formularios vivos con 0 px de diferencia.
-- [ ] Teclado y movimiento reducido según el contrato.
+- [x] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
+- [x] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2054`. — permanece `no`.
+- [x] Se declaro `Wireframe` y `Motion` y los archivos existen.
+- [x] Los cinco estados coinciden con el canvas (≤ 1 %) a 1440 y 390. — 20/20, máximo 0,498 % (`docs/ui/reviews/TASK-2054-growth-form-inline-pill-renderer/`, gate `scripts/growth/forms/fixtures/inline-pill.scenario.mjs`).
+- [x] Formularios vivos con 0 px de diferencia. — renderer de `a0ccb79a4` vs actual: 18/18 en 0 px (5 fixtures + 4 contratos públicos vivos leídos por GET, a 1440 y 390).
+- [x] Teclado y movimiento reducido según el contrato. — Tab/Enter/foco al campo/Esc/foco de vuelta/foco al mensaje y `transition-duration: 0s` con `reduce` (reporte del gate) + `inline-pill.test.ts`.
 
 ## Verification
 
@@ -302,13 +302,13 @@ Valores en el wireframe y el motion doc; son los del canvas (`.gxs`, `.gxs--ev`)
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] la skill `greenhouse-growth-forms` documenta la presentación nueva
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla) — `in-progress`: queda el release.
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre — lo sincroniza la sesión principal (el índice aún apunta a `to-do/`).
+- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes — lo actualiza la sesión principal.
+- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible — no: el changelog está en su techo de 60 entradas (`docs:context-check:strict` falla con una más) y la rotación la hace la sesión principal; texto sugerido en el reporte de la sesión.
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas — Delta en TASK-2051 y TASK-2038.
+- [x] la skill `greenhouse-growth-forms` documenta la presentación nueva — `.claude/` y `.codex/` (espejo idéntico).
 
 ## Follow-ups
 

@@ -1,5 +1,12 @@
 # TASK-2050 — Portada del blog v3: modelo de contenido en WordPress
 
+## Delta 2026-10-24
+
+- Cada evento puede tener su formulario de reserva (`event_registration`, `form_key` propio, `event_key` fijo como campo
+  oculto con `staticValue`, cupo y lista de espera) publicado con `pnpm growth:forms:publish-event-registration` —
+  code complete por TASK-2053; el modelo de contenido referencia ese `form_key`.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
