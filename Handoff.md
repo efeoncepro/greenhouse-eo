@@ -2,6 +2,15 @@
 
 [Historial](Handoff.archive.md).
 
+## 2026-10-24 — Portada del blog: tarjetas v2 de «Para leer con calma» (TASK-2051) en producción
+Desde 21:12 UTC el riel usa las tarjetas aprobadas (canvas versión 93): foto a sangre, logo del cliente ANAM, pregunta
+del diagnóstico, guía firmada por Efeonce Think, insignias con regla y dato real, autor, fecha y hover líquido
+(runtime `e9124fa` + `7bfbd40` + `9fec02d`, `efeonce-editorial-blocks` 0.4.4; Greenhouse `aa96207ac`). Gates en
+vivo: desborde 0 px en 8 anchos, un H1, axe 0 en los tres tableros; local: equivalencia, paridad 27 casos, píxeles 25/25.
+Datos: `client 251432 anam --apply` (ledger). Webinar (próximo evento) y podcast (formato nuevo) tienen soporte sin
+contenido. **Pendiente:** lectores para «Últimos cupos»/«Lista de espera» (reservas Growth Forms) y «Más leído»/
+«Tendencia» (GA4), por el filtro `eo_home_rail_signals`. Sin push en ningún repo.
+
 ## 2026-10-24 — Archivo del blog: variante Glitch (TASK-2056) en producción
 `/category/glitch/` y `/glitch/` sirven la variante Glitch aprobada en el canvas (versión 79) desde ~19:50 UTC: wordmark,
 «EDICIÓN #17» y «FLASH», muletilla en Guttery, falla en bytes, placas por fila, filtro Ediciones/Flash/Notas y banner de
@@ -282,18 +291,3 @@ izipay: cuatro contactos/Primary y correos registrados; Iris, Ariana y Diego con
 Iris conserva correo inferido y excepción expresa; Programado no es enviado. Owner Julio / Commercial.
 [Registro, IDs y pendientes](docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).
 [Capacidad local corregida](docs/operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md); docs/skills espejo, sin nuevo envío.
-
-## 2026-10-21 — ANAM: voz activa, soporte y respuesta recibida
-
-Hallazgos y [correspondencia completa](docs/audits/ANAM_EMMA_VOICE_SOPORTE_Y_CORRESPONDENCIA_2026-10-21.md):
-correo de Julio enviado 18:20 con firma gráfica/CCO, Outlook y HubSpot EMAIL119253278227/SENT verificados.
-María Paz respondió 18:28 preguntando cómo habilitar recepción/disponibilidad; duda operativa de soporte,
-pendiente de contestar. Base oficial de instrucciones en el registro. Sin cambios en Emma.
-Solo ajustes menores; IVR, derivación por ejecutivo, separación funcional o migración de canales requieren
-evaluar viabilidad/alcance y eventual cotización. Espejos del caso actualizados; Kortex permanece hibernado.
-
-Base del 19/10: 600 con Emma primero, voz Lina, IA24/7 y humanos L–V09:00–18:00Santiago; sin menú IVR.
-Llamada real41s: ticket/transcripción y primera respuesta verificados; grabación disponible; handoff y buzón pendientes.
-Correo a Oscar/María Paz enviado con firma gráfica/CCO, EMAIL118930883467 SENT en Efeonce.
-Caso y skills espejo actualizados; [manual reutilizable](docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md)
-y [evidencia/pendientes](docs/audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md). Kortex hibernado.

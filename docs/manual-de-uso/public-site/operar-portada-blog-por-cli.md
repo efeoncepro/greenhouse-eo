@@ -97,6 +97,23 @@ Gravatar de respaldo se descarta a propósito. No hay comando para esto: la foto
 del autor ([Operar el contenido de la portada](operar-contenido-portada-blog.md#foto-de-perfil-del-autor)). Para
 comprobarla después: `purge --apply` y `verify --browser`, o mira el slider en vivo.
 
+### 2c. Tarjetas de «Para leer con calma»
+
+Cada tarjeta se arma sola con la entrada (imagen, tema, autor, fecha, minutos y bajada). Dos datos los decides tú:
+
+```bash
+pnpm public-website:blog-home client <id|slug> anam          # el caso muestra el logo del cliente (off lo quita)
+pnpm public-website:blog-home reviewed <id|slug> 2026-10-20  # «Actualizado» por 30 días (off lo quita)
+```
+
+- `client` sólo acepta clientes con logo cargado (hoy `anam`). Un cliente nuevo es código: su logo en
+  `RAIL_ASSETS` de `lib/rail-v2.cjs` y una fila en `EO_Home_Adapter::RAIL_CLIENTS`.
+- `reviewed` es la revisión de fondo que hiciste tú, no la fecha de modificación de WordPress. Sólo enciende
+  «Actualizado» en entradas de más de 60 días.
+- Los dos campos también están en el panel «Portada del blog» del editor («Última revisión» y «Cliente del caso»).
+- Un webinar aparece solo como entrada al final del riel cuando hay un evento próximo; un episodio aparece como onda
+  con `format <post> podcast` (su duración: «Duración del episodio» en el panel).
+
 ### 3. Recursos (guía, herramienta, diagnóstico, newsletter)
 
 ```bash

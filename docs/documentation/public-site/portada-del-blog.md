@@ -1,7 +1,7 @@
 # Portada del blog — Marketing con Manzanitas en efeoncepro.com/blog/
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-24 por Claude
 > **Ultima actualizacion:** 2026-10-24 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) ·
@@ -26,12 +26,20 @@ Tiene tres versiones del mismo diseño: escritorio (desde 1100 px de ancho), tab
 | Pregúntale al blog | Un buscador con preguntas sugeridas | La búsqueda del sitio |
 | Glitch | La manzana en bytes, la última edición, el último Flash y la suscripción | Las entradas de Glitch y el formulario de suscripción |
 | Eventos y webinars | El próximo evento con cuenta regresiva, aprendizajes, agenda, próximos y grabaciones | Los eventos cargados en WordPress |
-| Para leer con calma | Un riel de lecturas largas y recursos | Entradas y recursos marcados para el riel |
+| Para leer con calma | Un riel de tarjetas de la misma familia: lecturas largas, casos, guías, el diagnóstico, el próximo webinar y episodios de podcast, con autor, fecha, tema e insignia | Entradas, recursos marcados para el riel y el próximo evento |
 | ¿De qué escribimos más? | Una órbita con los temas del blog y cuánto se escribe de cada uno | Las categorías de las entradas publicadas |
 | Archivo por año | Todo el archivo, filtrable por año y tema | Todas las entradas publicadas |
 | Suscripción del final | La suscripción a Glitch | El mismo formulario de suscripción |
 
-Cada entrada tiene un **formato** (Artículo, Caso, Guía, Grabación, Novedad o las tres variantes de Glitch) que decide
+Las tarjetas de «Para leer con calma» llevan como máximo **una insignia**, y sólo cuando hay un dato real que la
+respalda: «Nuevo» (publicada hace 14 días o menos), «Actualizado» (el editor marcó una revisión de fondo en los
+últimos 30 días; el pie dice la fecha), «Gratis» (guías, diagnóstico y eventos sin costo) y «En vivo» (mientras ocurre
+un evento). «Más leído», «Tendencia», «Últimos cupos» y «Lista de espera» ya están diseñadas pero todavía no se
+encienden: esperan la lectura de visitas y de reservas. Un caso con cliente asignado muestra el logo del cliente.
+
+> Detalle técnico: [runtime V1 § «Para leer con calma» v2](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
+
+Cada entrada tiene un **formato** (Artículo, Caso, Guía, Grabación, Podcast, Novedad o las tres variantes de Glitch) que decide
 su ícono y el texto del botón. El formato es distinto de la categoría y no cambia la URL de la entrada.
 
 > Detalle técnico: [PDR-029 §1](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md) y

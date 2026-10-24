@@ -1,5 +1,13 @@
 # TASK-2051 — Portada del blog v3 en alta fidelidad
 
+
+## Delta 2026-10-24 (tarjetas v2)
+
+- Rediseño de «Para leer con calma» aprobado por el operador (canvas versión 93) y desplegado: `lib/rail-v2.cjs`
+  (desvío 14), adaptador `EO_Home_Adapter::rail()`, metas `_eo_reviewed_at` / `_eo_client` con panel y comandos
+  `client` / `reviewed`, formato Podcast, el próximo evento como entrada, `dc-runtime.js` conserva las variables del
+  hover. Gates locales y en vivo verdes. Pendiente: lector de cupos (Growth Forms, TASK-2053) y de lecturas (GA4) para
+  encender «Últimos cupos», «Lista de espera», «Más leído» y «Tendencia».
 ## Delta 2026-10-24 (TASK-2055)
 
 - La plantilla «Archivo del blog» (búsqueda, temas, etiquetas, autores) se implementa en TASK-2055 dentro de
@@ -38,7 +46,7 @@
 - Motion: `docs/ui/motion/TASK-2051-blog-portada-v3-high-fidelity-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `En producción en /blog/ desde 2026-10-24 08:13Z con datos reales, menú canónico, foto del autor y suscripción real a Glitch (Growth Form efeonce-blog-subscription conectado con subscription --apply, verificado en vivo en los tres tableros, sin envío de prueba); operación por pnpm public-website:blog-home; contrato en docs/architecture/public-site/BLOG_HOME_RUNTIME_V1.md. Falta: un envío real de una persona confirmado en HubSpot (tipo 535702717), visto bueno del operador a la píldora del pie, grafo Yoast de /blog/, búsqueda GET sin JS verificada en vivo y LCP de laboratorio`
+- Status real: `En producción en /blog/ desde 2026-10-24 08:13Z con datos reales, menú canónico, foto del autor y suscripción real a Glitch (Growth Form efeonce-blog-subscription conectado con subscription --apply, verificado en vivo en los tres tableros, sin envío de prueba); operación por pnpm public-website:blog-home; contrato en docs/architecture/public-site/BLOG_HOME_RUNTIME_V1.md. Tarjetas v2 de «Para leer con calma» (canvas versión 93, desvío 14) en producción desde 2026-10-24 21:12Z: runtime 9fec02d, efeonce-editorial-blocks 0.4.4, gates verdes en vivo (desborde 0 px en 8 anchos, axe 0 en tres tableros) y caso ANAM con su logo; webinar y podcast con soporte y sin contenido todavía; insignias de cupos y lecturas esperan su lector (filtro eo_home_rail_signals). Falta: un envío real de una persona confirmado en HubSpot (tipo 535702717), visto bueno del operador a la píldora del pie, grafo Yoast de /blog/, búsqueda GET sin JS verificada en vivo y LCP de laboratorio`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `TASK-2050 (sólo eventos, formatos y fijadas; las demás secciones avanzan antes)`

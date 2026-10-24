@@ -84,7 +84,35 @@ defecto del gate.
 | 4 | Comportamiento sin JavaScript | 11 | Velo de lectura, bajada en 2 líneas, megáfono de Novedad |
 | 5 | Raíz fluida del tablero móvil | 12 | Foto del autor |
 | 6 | Espaciador de 56 px en lugar de la isla móvil | 13 | Suscripción real a Glitch (también en el pie) |
-| 7 | Órbita de temas fluida bajo 390 px | | |
+| 7 | Órbita de temas fluida bajo 390 px | 14 | Tarjetas v2 de «Para leer con calma» |
+
+### «Para leer con calma» v2 (desvío 14)
+
+El riel usa una sola plantilla de tarjeta para todos los formatos y tableros: `scripts/public-website/blog-v3/lib/rail-v2.cjs`
+(plantilla, CSS con clases `rc-*`, fixture de la versión 93 del canvas y la lógica del hover). `bind-canvas.cjs` la
+aplica con `deviateRail()` a la referencia y a la plantilla ligada, así que la equivalencia sigue probando el resto del
+tablero y la paridad PHP↔navegador prueba las tarjetas. Imágenes y logos nuevos: `RAIL_ASSETS` del módulo (se suman a
+`assets.json` en `bind-canvas`, `build-fixture`, `build-plugin` y `fidelity/capture`).
+
+| Tarjeta | Cuándo | Datos |
+|---|---|---|
+| Foto a sangre (navy / azul alternados) | entrada con imagen destacada; guía o herramienta con imagen | `img`, tema, autor, fecha, minutos |
+| Cliente (papel) | caso con `_eo_client` conocido (`EO_Home_Adapter::RAIL_CLIENTS`) | logo del cliente desde los activos del plugin |
+| Pregunta (tinta) | recurso `diagnostico` | las dos líneas del slider son la pregunta |
+| Entrada de webinar | el próximo evento (`events.next`) hasta que termina | día, mes, día de semana y hora en su zona, «Faltan N días» |
+| Onda de podcast | entrada con formato `podcast` (sin mínimo de minutos) | `_eo_video_duration` o minutos |
+| Tipográfica (papel) | entrada sin imagen ni cliente | tema, título, bajada, pie |
+
+Insignias (una por tarjeta, gana el menor rango; `EO_Home_Adapter::RAIL_BADGES`, con texto en inglés para un locale
+futuro): 1 «En vivo» (reloj del evento) · 2 «Últimos cupos» / «Lista de espera» · 3 «Más leído» · 4 «Tendencia» ·
+5 «Nuevo» (≤ 14 días) · 6 «Actualizado» (`_eo_reviewed_at` ≤ 30 días en una entrada de más de 60; el pie muestra
+«Actualizado <fecha>») · 7 «Gratis» (recursos y eventos gratis). Cupos y lecturas no tienen lector todavía: llegan
+por el filtro `eo_home_rail_signals` (id de entrada → `top`/`trend`; `event:<id>` → `seats`/`wait`) y nada más los
+enciende. La guía publicada en `think.efeoncepro.com` firma con el logo de Efeonce Think; otra guía, con el de Efeonce.
+
+El hover fija `--px/--py/--rx/--ry` en el `style` de la tarjeta; `dc-runtime.js` (`syncAttrs`) sólo reescribe un
+`style` renderizado cuando cambia su valor de plantilla, así que el repintado de cada segundo ya no lo borra (también
+corrige el botón magnético).
 
 ## 3. Modelo de contenido y adaptador
 

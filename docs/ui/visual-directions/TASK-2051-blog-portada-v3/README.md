@@ -57,6 +57,10 @@ el sitio sólo se reutiliza infraestructura (consultas, formularios, despliegue,
     con la forma de la píldora en reposo y el aviso reservando su lugar: el gate sin JavaScript da 0,016 / 0,027 /
     0,061 % en la sección Glitch; las tres secciones del pie difieren por este desvío.
     Datos reales sin formulario publicado no muestran suscripción: nunca un «¡Listo!» simulado.
+14. Tarjetas v2 de «Para leer con calma» (operador, 2026-10-24, canvas versión 93; sección «Tarjetas v2» abajo): el
+    riel v1 del canvas congelado se reemplaza por la plantilla v2 en los tres tableros (`lib/rail-v2.cjs`, aplicada a
+    la referencia y a la plantilla ligada). Ajuste propio: el riel arranca alineado con el título (`scroll-padding`),
+    porque el snap dejaba la primera tarjeta pegada al borde.
 
 ## Tablero de tablet (768–1099 px), 2026-10-24
 
@@ -134,7 +138,7 @@ Los archivos del tablero viven en el almacén del artifact (`/_blob/<id>`); se b
 | `1063184040c6121be1f86602803b0f55` | Logo Glitch monocromo navy (derivado de `glitch-logo-positive.svg`) |
 | `72025ed97a7ce0c610ec355f78efed74`, `83245a45d586a61636aa1ac2deff2ab6`, `eb05ce3c01b77fd65e104a791d93784b`, `fa4c472324f79c4861f97234d274662a` | Logos (Glitch negativo, Efeonce positivo, MCM negativo, Efeonce AEO) |
 
-## Tarjetas v2 de «Para leer con calma» — APROBADA (2026-10-24, canvas versión 93)
+## Tarjetas v2 de «Para leer con calma» — EN PRODUCCIÓN (2026-10-24, canvas versión 93)
 
 Pedido del operador: mantener la grilla mezclada (artículo, caso, guía, diagnóstico, webinar y podcast como una sola
 familia) y subirle el nivel a cada tarjeta con autor, fecha, tema e imagen. Página «Para leer con calma · v2 (tarjetas)»
@@ -160,3 +164,7 @@ del canvas: hoja de la familia (1920, con una fila en estado hover) y la secció
   «Gratis»/Free (tipo de recurso). Sin dato confiable, no hay badge.
 - Webinar y podcast son ejemplos de formato. Aprobada por el operador el 2026-10-24 («Sí, hazlo... y queda aprobado»);
   implementación en TASK-2051.
+- **En producción desde 2026-10-24 21:12 UTC** (runtime `9fec02d`, desvío 14): plantilla, CSS, fixture y hover en
+  `scripts/public-website/blog-v3/lib/rail-v2.cjs`; datos en `EO_Home_Adapter::rail()`. Webinar y podcast tienen
+  soporte desde ya: el próximo evento publicado entra al riel como entrada y una entrada con formato Podcast como onda.
+  «Últimos cupos», «Lista de espera», «Más leído» y «Tendencia» esperan su lector (filtro `eo_home_rail_signals`).

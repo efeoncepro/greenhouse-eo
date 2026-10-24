@@ -26,7 +26,7 @@ logo needs Growth Forms renderer 1.3.0 released in Greenhouse; until then the la
   the `load` event (site third parties can hold it for minutes), then 8 widths 320–1920 + axe on the three boards.
   Each width bypasses the Kinsta cache, so the site sometimes drops one connection: only a `page.goto` network failure
   is retried (5 s, then 15 s, shown as `… reintento`); a missing `#eobh` or a failed check is never retried.
-- Write (plan unless `--apply`; operator's go in production): `pin/unpin`, `format`, `hero`, `resource <json>`,
+- Write (plan unless `--apply`; operator's go in production): `pin/unpin`, `format`, `line`, `client`, `reviewed`, `hero`, `resource <json>`,
   `review`, `event <json>`, `retire`, `subscription <key|off> [--surface]`, `flag`, `purge`. Every apply prints `before` (its rollback), reads back, purges
   /blog/ and appends to `scripts/public-website/blog-home/ledger/<YYYY-MM>.jsonl` — commit the ledger.
 - Deploy: `deploy home|content-model [--apply]` (exports the live baseline first; content-model toggles the flag
@@ -61,6 +61,15 @@ logo needs Growth Forms renderer 1.3.0 released in Greenhouse; until then the la
   (GET-only local proxy `/__ghf/`; no submit possible).
 - End-to-end proof needs a human submit: Turnstile rejects the automated browser (no token, no `POST /submit`). Never
   try to bypass it; confirm the contact in HubSpot instead. Rollback: `subscription off --apply`.
+- «Para leer con calma» v2 (deviation 14, live 2026-10-24): one card template for every format in
+  `scripts/public-website/blog-v3/lib/rail-v2.cjs` (template, `rc-*` CSS, fixture, hover), applied by `deviateRail()` in
+  `bind-canvas.cjs` to reference and bound template; data from `EO_Home_Adapter::rail()`. Never edit the card in the
+  generated plugin files: change the module, rerun bind → fixture → equivalence → build → parity. Webinar ticket = the
+  next event until it ends; podcast wave = format `podcast`. One badge per card from a real rule
+  (`RAIL_BADGES`); seats/wait/top/trend only through the `eo_home_rail_signals` filter (no reader yet). Client logo:
+  `client <post> anam`; «Actualizado»: `reviewed <post> <AAAA-MM-DD>` (the editor's review, never post_modified).
+  The hover writes CSS vars on `style`; `dc-runtime.js` keeps them (it rewrites a rendered `style` only when its
+  template value changes) — do not revert that or the once-a-second repaint wipes the light and tilt.
 - Resources hide after 180 days without `review`. Events never store private meeting links (the CLI refuses them).
 - Events with real reservation: never create them by hand. `pnpm events:launch -- --brief <json> [--apply]` publishes the
   Greenhouse form, the HubSpot destination and the WordPress event with its `form_key` in one go; the portada shows the
