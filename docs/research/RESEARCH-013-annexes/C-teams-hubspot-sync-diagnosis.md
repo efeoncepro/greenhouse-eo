@@ -9,7 +9,7 @@
 - Plataforma: **Teams**, como **seminario web** (webinar) del Events app. Tenant Microsoft 365 **Business** (funciones
   básicas: sin lista de espera ni aprobación en Teams; el cupo y la espera siguen en Greenhouse).
 - HubSpot: el operador reporta Marketing Hub **Starter/Free**; la UI de Landing pages ofrece «Plataforma de Clientes
-  Starter», o sea, el plan de contenido es el gratuito [V]. Sin workflows.
+  Starter», o sea, el plan de contenido es el gratuito [V]. **Corrección:** el portal sí tiene workflows publicados (ver tabla) [V].
 - Camino preferido por el operador: **el formulario de HubSpot conectado al webinar inscribe en Teams**, y la app de
   Teams en HubSpot crea el Evento de marketing con inscritos y asistencia. Greenhouse no reemplaza ese camino.
 - La espera no se registra en HubSpot; una persona entra sólo cuando Greenhouse le confirma cupo.

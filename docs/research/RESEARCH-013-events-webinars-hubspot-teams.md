@@ -4,7 +4,8 @@
 > investigación · **Anexos:** [A — HubSpot y webinars de Teams](RESEARCH-013-annexes/A-hubspot-teams-webinars.md) ·
 > [B — objeto Eventos de marketing](RESEARCH-013-annexes/B-hubspot-marketing-events-object.md) ·
 > [C — diagnóstico: webinars de Teams que no llegan a HubSpot](RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md)
-> (decisiones del operador y estado al 2026-10-24)
+> (decisiones del operador y estado al 2026-10-24) ·
+> [D — discovery: eventos con Greenhouse como dueño](RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md)
 
 ## Por qué existe
 
