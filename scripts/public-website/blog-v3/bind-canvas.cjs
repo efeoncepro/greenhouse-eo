@@ -62,10 +62,15 @@ const NOVE_ICON = '<sc-if value="{{ s.fNove }}" hint-placeholder-val="{{ false }
 // never for slider art such as the canvas images), and the dek keeps the canvas two lines.
 const SCRIM = '<sc-if value="{{ s.scrim }}" hint-placeholder-val="{{ false }}"><span class="hs-scrim" aria-hidden="true"></span></sc-if>'
 
+// Approved deviation (operator, 2026-10-24): the author circle shows the author's own WordPress profile photo when the
+// profile has one, and the canvas initials otherwise (always for the canvas fixture, which has no photo).
+const AUTHOR_AVATAR = '<span class="hs-av" aria-hidden="true"><sc-if value="{{ s.hasPhoto }}" hint-placeholder-val="{{ false }}"><img class="hs-av__img" src="{{ s.authorPhoto }}" alt="" width="32" height="32" loading="lazy" decoding="async"></sc-if><sc-if value="{{ s.noPhoto }}" hint-placeholder-val="{{ true }}">{{ s.authorInitials }}</sc-if></span>'
+
 const REAL_CONTENT_CSS = `
 /* Contenido real (2026-10-24): velo de lectura para imágenes editoriales y bajada en dos líneas */
 .hs-scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,26,51,.94) 0%,rgba(0,26,51,.82) 28%,rgba(0,26,51,.4) 50%,rgba(0,26,51,0) 68%),linear-gradient(0deg,rgba(0,26,51,.72) 0%,rgba(0,26,51,0) 36%)}
 .hs-copy p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hs-av{overflow:hidden}.hs-av__img{display:block;width:100%;height:100%;object-fit:cover;border-radius:999px}
 `
 
 function bindMarkup(src) {
@@ -90,7 +95,7 @@ function bindMarkup(src) {
   src = rep(src, '<a href="#" class="lnk" tabindex="{{ s.tab }}" aria-label="{{ s.titleFull }}">', '<a href="{{ s.href }}" class="lnk" tabindex="{{ s.tab }}" aria-label="{{ s.titleFull }}">')
   src = rep(src, '<a href="#" class="ab ab--engine ab--xl live" tabindex="{{ s.tab }}">', '<a href="{{ s.href }}" class="ab ab--engine ab--xl live" tabindex="{{ s.tab }}">')
   src = rep(src, '<a href="#" class="rl live" tabindex="{{ s.tab }}">', '<a href="{{ s.href }}" class="rl live" tabindex="{{ s.tab }}">')
-  src = rep(src, '<span class="hs-av" aria-hidden="true">[AA]</span><span>Por <strong style="color: #ffffff; font-weight: 500;">[Autor real]</strong></span>', '<span class="hs-av" aria-hidden="true">{{ s.authorInitials }}</span><span>Por <strong style="color: #ffffff; font-weight: 500;">{{ s.authorName }}</strong></span>')
+  src = rep(src, '<span class="hs-av" aria-hidden="true">[AA]</span><span>Por <strong style="color: #ffffff; font-weight: 500;">[Autor real]</strong></span>', AUTHOR_AVATAR + '<span>Por <strong style="color: #ffffff; font-weight: 500;">{{ s.authorName }}</strong></span>')
 
   // Ask the blog: GET search without JavaScript, real result links.
   src = rep(src, '<form role="search" action="#" class="sf"', '<form role="search" action="{{ searchAction }}" method="{{ searchMethod }}" class="sf"')
@@ -183,7 +188,7 @@ function bindMarkup(src) {
 }
 
 function bindLogic(src) {
-  src = rep(src, "fFlash: x.fmt === 'flash',", "fFlash: x.fmt === 'flash', fNove: x.fmt === 'nove',")
+  src = rep(src, "fFlash: x.fmt === 'flash',", "fFlash: x.fmt === 'flash', fNove: x.fmt === 'nove', hasPhoto: !!x.authorPhoto, noPhoto: !x.authorPhoto,")
 
   src = rep(src, '  renderVals() {\n    const S = [', '  renderVals() {\n    const D = this.props.data;\n    const S0 = [')
   src = rep(src, /const S0 = \[[\s\S]*?\n    \];\n/, 'const S = D.slides;\n')
