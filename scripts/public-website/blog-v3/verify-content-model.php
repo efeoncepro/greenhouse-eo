@@ -72,5 +72,5 @@ $report['purge_log']        = array_slice( (array) get_option( 'eo_cm_purge_log'
 $report['cache_ver']        = (int) get_option( 'eo_cm_cache_ver', 1 );
 $routes                     = rest_get_server()->get_routes();
 $report['rest']             = array_values( array_filter( array_keys( $routes ), static fn( $r ) => 0 === strpos( $r, '/eo/v1/home' ) || 0 === strpos( $r, '/eo/v1/events' ) ) );
-$report['ok']               = $report['types']['eo_event'] && $report['types']['eo_resource'] && 7 === count( $report['terms'] ) && 6 === count( $report['post_meta'] ) && ! $multi && count( $report['rest'] ) >= 5;
+$report['ok']               = $report['types']['eo_event'] && $report['types']['eo_resource'] && count( EO_Format_Taxonomy::TERMS ) === count( $report['terms'] ) && 6 === count( $report['post_meta'] ) && ! $multi && count( $report['rest'] ) >= 5;
 echo wp_json_encode( $report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . PHP_EOL;
