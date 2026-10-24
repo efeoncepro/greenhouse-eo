@@ -13,7 +13,7 @@ const { loadRuntime, RUNTIME_DIR } = require('../blog-v3/lib/render-node.cjs')
 const PLUGIN = path.join(RUNTIME_DIR, 'wp-content/plugins/eo-blog-home')
 const GEN = path.join(PLUGIN, 'assets/generated')
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'eoba-parity-'))
-const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia']
+const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia', 'tema-glitch']
 
 const variants = {
   base: d => d,

@@ -126,7 +126,11 @@
             "glitch": false,
             "plain": true,
             "label": "Caso",
-            "min": 13
+            "min": 13,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           }
         ]
       },
@@ -147,7 +151,11 @@
             "glitch": false,
             "plain": true,
             "label": "Guía",
-            "min": 21
+            "min": 21,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           }
         ]
       },
@@ -168,7 +176,11 @@
             "glitch": false,
             "plain": true,
             "label": "Artículo",
-            "min": 9
+            "min": 9,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -183,7 +195,11 @@
             "glitch": false,
             "plain": true,
             "label": "Guía",
-            "min": 15
+            "min": 15,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -198,7 +214,11 @@
             "glitch": false,
             "plain": true,
             "label": "Artículo",
-            "min": 6
+            "min": 6,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -213,7 +233,11 @@
             "glitch": false,
             "plain": true,
             "label": "Guía",
-            "min": 5
+            "min": 5,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -228,7 +252,11 @@
             "glitch": false,
             "plain": true,
             "label": "Novedad",
-            "min": 5
+            "min": 5,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -243,7 +271,11 @@
             "glitch": false,
             "plain": true,
             "label": "Novedad",
-            "min": 11
+            "min": 11,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -258,7 +290,11 @@
             "glitch": false,
             "plain": true,
             "label": "Artículo",
-            "min": 21
+            "min": 21,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           }
         ]
       }
@@ -366,5 +402,7 @@
         "barStyle": "background: #36c8bf;"
       }
     ]
-  }
+  },
+  "rootCls": "v3 arc",
+  "gl": null
 }

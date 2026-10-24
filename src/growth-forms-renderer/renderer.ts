@@ -75,6 +75,8 @@ export interface FormRendererOptions {
   doc?: Document
   /** Fuerza el esquema de color (si no, hereda `prefers-color-scheme`). */
   colorScheme?: 'light' | 'dark'
+  /** TASK-2056 — Logo que reemplaza la palabra final del rótulo de la píldora (lo declara el anfitrión). */
+  inlineLabelLogo?: { src: string; text: string }
   /**
    * `true` cuando el core se monta DENTRO de un host `<greenhouse-form>` (custom element).
    * En ese caso el host ES el scope: declara los tokens `--ghf-*`, `container-type`,
@@ -3486,6 +3488,7 @@ export class FormRenderer {
       instanceId: this.instanceId,
       kind: this.contract.form.formKind === 'event_registration' ? 'event' : 'subscribe',
       labels,
+      labelLogo: this.opts.inlineLabelLogo,
       placeholder: emailField?.placeholder,
       autocomplete: emailField?.autocomplete,
       buildNote: consent && labels.note?.includes(CONSENT_PRIVACY_LINK_MARKER) ? note => this.buildConsentText(note, consent) : undefined,

@@ -9,7 +9,7 @@ const path = require('node:path')
 const { renderBoard } = require('../blog-v3/lib/render-node.cjs')
 
 const SRC = path.join(__dirname, 'source')
-const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia']
+const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia', 'tema-glitch']
 
 const norm = s => s.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim()
 

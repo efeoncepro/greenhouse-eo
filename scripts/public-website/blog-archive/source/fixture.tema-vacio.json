@@ -154,5 +154,7 @@
         "barStyle": "background: #36c8bf;"
       }
     ]
-  }
+  },
+  "rootCls": "v3 arc",
+  "gl": null
 }

@@ -137,7 +137,11 @@
             "glitch": true,
             "plain": false,
             "label": "Edición",
-            "min": 13
+            "min": 13,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -152,7 +156,11 @@
             "glitch": true,
             "plain": false,
             "label": "Edición",
-            "min": 13
+            "min": 13,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -167,7 +175,11 @@
             "glitch": false,
             "plain": true,
             "label": "AEO · Artículo",
-            "min": 22
+            "min": 22,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -182,7 +194,11 @@
             "glitch": false,
             "plain": true,
             "label": "Inteligencia Artificial · Artículo",
-            "min": 8
+            "min": 8,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -197,7 +213,11 @@
             "glitch": false,
             "plain": true,
             "label": "HubSpot · Caso",
-            "min": 18
+            "min": 18,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -212,7 +232,11 @@
             "glitch": false,
             "plain": true,
             "label": "HubSpot · Caso",
-            "min": 13
+            "min": 13,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -227,7 +251,11 @@
             "glitch": false,
             "plain": true,
             "label": "Diseño · Artículo",
-            "min": 24
+            "min": 24,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -242,7 +270,11 @@
             "glitch": true,
             "plain": false,
             "label": "Edición",
-            "min": 15
+            "min": 15,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           },
           {
             "url": "#",
@@ -257,7 +289,11 @@
             "glitch": true,
             "plain": false,
             "label": "Nota",
-            "min": 6
+            "min": 6,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
           }
         ]
       }
@@ -393,5 +429,7 @@
         "barStyle": "background: #36c8bf;"
       }
     ]
-  }
+  },
+  "rootCls": "v3 arc",
+  "gl": null
 }

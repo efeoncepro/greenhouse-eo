@@ -1912,6 +1912,9 @@ const INLINE_PILL_CSS = `
 :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):focus-visible{outline:2px solid var(--ghf-inline-focus-ring,#ffffff);outline-offset:3px}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-roll{display:inline-block;min-width:0;height:1.4em;overflow:hidden;line-height:1.4;vertical-align:top}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-roll-in{display:flex;flex-direction:column;transition:transform 320ms var(--ghf-inline-ease-resolved)}
+/* TASK-2056 — logo en el rótulo (declarado por el anfitrión): alto relativo al texto, alineado a su línea base. */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-roll-in > span:has(> .ghf-inline-logo){display:inline-flex;align-items:center;gap:.32em}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-logo{display:block;height:var(--ghf-inline-logo-height,1.3em);width:auto;margin:0;padding:0;border:0}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-roll-in>span{overflow:hidden;text-overflow:ellipsis}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-arrow{flex:none;overflow:visible;transition:transform 340ms var(--ghf-inline-ease-resolved)}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-arrow-stem{stroke-dasharray:.5 2;transition:stroke-dasharray 360ms var(--ghf-inline-ease-resolved)}

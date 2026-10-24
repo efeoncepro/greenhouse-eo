@@ -8,7 +8,7 @@ const fs = require('node:fs')
 
 const { chromium } = require('playwright')
 
-const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia']
+const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia', 'tema-glitch']
 const WIDTHS = [320, 360, 390, 768, 1024, 1100, 1440, 1920]
 
 ;(async () => {

@@ -16,7 +16,10 @@ const path = require('node:path')
 const postcss = require('postcss')
 
 const SRC = path.join(__dirname, 'source')
-const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia']
+const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia', 'tema-glitch']
+// TASK-2056 — the Glitch variant of the topic view: its canvas CSS is the D CSS plus the `.gl` rules (checked as an exact
+// prefix), and its fonts link adds Bricolage's width axis; the bound template takes both (a superset for the D views).
+const VARIANT = 'tema-glitch'
 
 function rep(text, from, to, times = 1) {
   const n = typeof from === 'string' ? text.split(from).length - 1 : [...text.matchAll(new RegExp(from.source, from.flags.includes('g') ? from.flags : from.flags + 'g'))].length
@@ -90,9 +93,9 @@ function deviate(src) {
   src = rep(src, /\n<footer style="background: #f7f8f6; padding: 64px 16px 72px;">[\s\S]*?<\/footer>/, '')
   // 6. One markup for both widths: the `.mob` root class of the 390 board goes (the media query does its job).
   // (5. The page's <main id="main"> is opened by the plugin's page template around the board, as Ohio's page.php does.)
-  src = rep(src, /<div class="v3 arc( mob)?" style="position: relative;">/, '<div class="v3 arc" style="position: relative;">')
+  src = rep(src, /<div class="v3 arc( gl)?( mob)?" style="position: relative;">/, '<div class="v3 arc$1" style="position: relative;">')
   // 5. Ids prefixed (the site header may use `q`).
-  for (const id of ['q', 'ot-h', 'mt-h']) {
+  for (const id of ['q', 'ot-h', 'mt-h', 'gl-sub-h']) {
     const n = count(src, `id="${id}"`)
 
     if (n > 1) throw new Error('Duplicated id ' + id)
@@ -104,6 +107,8 @@ function deviate(src) {
   src = src.split('<span class="segc__ind" aria-hidden="true"></span>').join('<span class="segc__ind" aria-hidden="true" style="transform: translateX(0%);"></span>')
   src = src.split('aria-pressed="true"').join('aria-current="page"').split(' aria-pressed="false"').join('')
   if (src.includes('aria-pressed')) throw new Error('aria-pressed left on a link')
+  // 5. TASK-2056: an aria-label on a plain <span> is not exposed (axe aria-prohibited-attr); «#17» reads as is.
+  src = src.replace(/<span class="(gl-b|gl-mh__n gl-mh__n--e)" aria-label="[^"]*">/g, '<span class="$1">')
   // 7. Performance without pixel change: the section-front image loads first; the Glitch card image lazily.
   src = src.replace(/(<span class="hc__img[^"]*"><img src="[^"]+" alt="")>/g, '$1 fetchpriority="high">')
   src = src.replace(/(<span class="fc__img"><img src="[^"]+" alt="")>/g, '$1 loading="lazy" decoding="async">')
@@ -120,12 +125,14 @@ function splitBoard(src) {
 }
 
 let sharedCss = null
+let rawShared = null
+let boundCss = null
 let shell = null
 
 for (const view of VIEWS) {
   const desk = fs.readFileSync(path.join(SRC, `Archivo-D-${view}-1440.dc.html`), 'utf8')
   const mob = fs.readFileSync(path.join(SRC, `Archivo-D-${view}-390.dc.html`), 'utf8')
-  const strip = s => s.replace(/<title>[^<]*<\/title>/, '').replace(/"\$preview":\{[^}]*\}/, '').replace('<div class="v3 arc mob"', '<div class="v3 arc"')
+  const strip = s => s.replace(/<title>[^<]*<\/title>/, '').replace(/"\$preview":\{[^}]*\}/, '').replace(/<div class="v3 arc( gl)? mob"/, '<div class="v3 arc$1"')
 
   if (strip(desk) !== strip(mob)) throw new Error(`${view}: the 1440 and 390 boards differ beyond the .mob root class`)
 
@@ -133,12 +140,17 @@ for (const view of VIEWS) {
   parts.body = deviate(parts.body + '</x-dc>').replace(/<\/x-dc>$/, '')
   const css = deviateCss(parts.css)
 
-  if (sharedCss === null) sharedCss = css
-  else if (sharedCss !== css) throw new Error(`${view}: the canvas CSS differs between views`)
+  if (view === VARIANT) {
+    if (!parts.css.startsWith(rawShared)) throw new Error(`${view}: the variant CSS must extend the D CSS (exact prefix)`)
+    boundCss = css
+    shell = parts
+  } else if (sharedCss === null) {
+    sharedCss = css
+    rawShared = parts.css
+  } else if (sharedCss !== css) throw new Error(`${view}: the canvas CSS differs between views`)
 
   const out = parts.head + parts.helmet.replace(parts.css, css) + parts.body + parts.tail
   fs.writeFileSync(path.join(SRC, `Archivo-${view}.reference.dc.html`), out)
-  if (!shell) shell = parts
   console.log(`reference ${view}`)
 }
 
@@ -149,7 +161,7 @@ class Component extends DCLogic {
   renderVals() { return this.props.data; }
 }
 </script>`
-const bound = shell.head.replace(/<title>[^<]*<\/title>/, '<title>Archivo del blog · plantilla enlazada</title>') + shell.helmet.replace(shell.css, sharedCss) + '\n' + body + '</x-dc>\n' + logic + '\n</body>\n</html>\n'
+const bound = shell.head.replace(/<title>[^<]*<\/title>/, '<title>Archivo del blog · plantilla enlazada</title>') + shell.helmet.replace(shell.css, boundCss) + '\n' + body + '</x-dc>\n' + logic + '\n</body>\n</html>\n'
 
 fs.writeFileSync(path.join(SRC, 'Archivo.bound.dc.html'), bound)
 console.log('bound template → source/Archivo.bound.dc.html')

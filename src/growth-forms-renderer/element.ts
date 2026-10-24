@@ -15,6 +15,7 @@ import type { RenderContract } from './contract'
 import { ContractLoadError, fetchRenderContract, type RendererApiConfig } from './api-client'
 import { resolveSystemCopy } from './copy'
 import { ensureStylesInjected } from './styles'
+import { resolveInlineLabelLogo } from './inline-pill'
 import { FormRenderer } from './renderer'
 import { RENDERER_VERSION } from './version'
 
@@ -43,7 +44,9 @@ export class GreenhouseFormElement extends HTMLElement {
     'base-url',
     'embed-key',
     'appearance',
-    'initial-values'
+    'initial-values',
+    'inline-label-logo',
+    'inline-label-logo-text'
   ]
 
   private internals: ElementInternals | null = null
@@ -113,6 +116,15 @@ export class GreenhouseFormElement extends HTMLElement {
     }
   }
 
+  /**
+   * TASK-2056 — Logo del rótulo de la píldora `inline_pill`, declarado por el anfitrión: `inline-label-logo` (URL
+   * https o relativa a la raíz) reemplaza la palabra `inline-label-logo-text` al final del rótulo. Sin los dos,
+   * o con otra URL, no hay logo.
+   */
+  private inlineLabelLogo(): { src: string; text: string } | undefined {
+    return resolveInlineLabelLogo(this.getAttribute('inline-label-logo'), this.getAttribute('inline-label-logo-text'))
+  }
+
   private async load(): Promise<void> {
     const doc = this.ownerDocument
 
@@ -165,6 +177,7 @@ export class GreenhouseFormElement extends HTMLElement {
       pageContext: this.pageContext(),
       initialValues: this.initialValues(),
       colorScheme: this.forcedColorScheme(),
+      inlineLabelLogo: this.inlineLabelLogo(),
       doc,
       // El custom element ES el scope (declara tokens + container-type + box-sizing vía
       // el selector `greenhouse-form`). El wrapper interno NO lleva `.ghf-scope` para no

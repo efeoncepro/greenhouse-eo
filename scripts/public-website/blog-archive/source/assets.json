@@ -34,5 +34,13 @@
   "authorJulio": {
     "id": "9a8e2f558646ef115b46fdbc23b1ed5b",
     "file": "9a8e2f558646ef115b46fdbc23b1ed5b.png"
+  },
+  "glitchFlashTrail": {
+    "id": "3b6e8663a0a14cda3ae78bca5e9226e7",
+    "file": "3b6e8663a0a14cda3ae78bca5e9226e7.svg"
+  },
+  "gutteryFont": {
+    "id": "37b72c0a4e1e0035ebc657f51be0d02a",
+    "file": "37b72c0a4e1e0035ebc657f51be0d02a.ttf"
   }
 }

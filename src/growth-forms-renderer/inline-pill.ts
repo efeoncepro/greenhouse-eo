@@ -65,13 +65,48 @@ const htmlEl = <K extends keyof HTMLElementTagNameMap>(
   return node
 }
 
+/** Logo que reemplaza la palabra final de un rótulo (TASK-2056): `src` lo declara el anfitrión. */
+export interface InlinePillLabelLogo {
+  src: string
+  text: string
+}
+
+/** Valida el logo que declara el anfitrión: URL https o relativa a la raíz (nunca `//host`, `data:` ni otro esquema). */
+export const resolveInlineLabelLogo = (src: string | null, text: string | null): InlinePillLabelLogo | undefined => {
+  const s = (src ?? '').trim()
+  const t = (text ?? '').trim()
+
+  if (!s || !t || !/^(https:\/\/|\/(?!\/))/.test(s)) return undefined
+
+  return { src: s, text: t }
+}
+
+/**
+ * Una copia del rótulo: texto plano o, con logo y si el rótulo termina en su palabra, el texto previo + el logo.
+ * El logo de la copia visible lleva la palabra como `alt` (el nombre accesible sigue completo); la decorativa, vacío.
+ */
+const rollCopy = (doc: Document, label: string, decorative: boolean, logo?: InlinePillLabelLogo): HTMLElement => {
+  const copy = htmlEl(doc, 'span', decorative ? { 'aria-hidden': 'true' } : {})
+
+  if (!logo || !label.endsWith(logo.text)) {
+    copy.textContent = label
+
+    return copy
+  }
+
+  copy.appendChild(doc.createTextNode(label.slice(0, label.length - logo.text.length)))
+  copy.appendChild(htmlEl(doc, 'img', { class: 'ghf-inline-logo', src: logo.src, alt: decorative ? '' : logo.text, 'data-ghf-part': 'inline-logo' }))
+
+  return copy
+}
+
 /** Texto que «rueda» al pasar el puntero (botón AXIS): dos copias, la segunda decorativa. */
-const roll = (doc: Document, label: string): HTMLElement => {
+const roll = (doc: Document, label: string, logo?: InlinePillLabelLogo): HTMLElement => {
   const outer = htmlEl(doc, 'span', { class: 'ghf-inline-roll' })
   const inner = htmlEl(doc, 'span', { class: 'ghf-inline-roll-in' })
 
-  inner.appendChild(htmlEl(doc, 'span', {}, label))
-  inner.appendChild(htmlEl(doc, 'span', { 'aria-hidden': 'true' }, label))
+  inner.appendChild(rollCopy(doc, label, false, logo))
+  inner.appendChild(rollCopy(doc, label, true, logo))
   outer.appendChild(inner)
 
   return outer
@@ -142,6 +177,8 @@ export interface BuildInlinePillOptions {
   instanceId: string
   kind: 'subscribe' | 'event'
   labels: InlinePillLabels
+  /** TASK-2056 — Logo en el rótulo del botón de apertura (sólo ahí: envío y estados siguen en texto). */
+  labelLogo?: InlinePillLabelLogo
   placeholder?: string
   autocomplete?: string
   /** Construye el texto de la nota (puede traer el enlace a la política); sin él, texto plano. */
@@ -166,7 +203,7 @@ export const buildInlinePill = (opts: BuildInlinePillOptions): InlinePillRefs =>
     'aria-controls': inputId
   })
 
-  openButton.appendChild(roll(doc, labels.openLabel))
+  openButton.appendChild(roll(doc, labels.openLabel, opts.labelLogo))
   openButton.appendChild(arrow(doc))
 
   // `data-hs-do-not-collect` antes de insertar el nodo (HubSpot lo evalúa al descubrirlo): la entrega

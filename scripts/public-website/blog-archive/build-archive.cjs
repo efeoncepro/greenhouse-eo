@@ -22,13 +22,14 @@ const PLUGIN = path.join(RUNTIME_DIR, 'wp-content/plugins/eo-blog-home')
 const OUT = path.join(PLUGIN, 'assets/generated')
 const IMG = path.join(PLUGIN, 'assets/img')
 const SCOPE = '#eoba'
-const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia']
+const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia', 'tema-glitch']
 
 // Same host reset as the blog home (blog-v3/build-plugin.cjs HOST_RESET), under #eoba: Ohio's element rules do not reach
-// the archive; the canvas rules (rewritten under the same ID) win over the reset.
+// the archive; the canvas rules (rewritten under the same ID) win over the reset. The Growth Forms renderer owns
+// everything inside <greenhouse-form> (the Glitch subscription, TASK-2056): the reset never reaches it.
 const HOST_RESET = `${SCOPE}{all:initial;display:block}
-${SCOPE} :is(h1,h2,h3,h4,h5,h6,p,a,ul,ol,li,dl,dt,dd,button,input,textarea,select,label,form,fieldset,figure,figcaption,blockquote,span,div,section,article,nav,header,footer,strong,em,b,i,small,time,mark,table,tr,td,th){all:revert}
-${SCOPE} :is(img,svg){margin:revert;padding:revert;border:revert;border-radius:revert;box-shadow:revert;outline:revert;max-width:revert;max-height:revert;min-width:revert;min-height:revert;vertical-align:revert;float:revert;opacity:revert;filter:revert;transform:revert;transition:revert;object-fit:revert;object-position:revert}
+${SCOPE} :is(h1,h2,h3,h4,h5,h6,p,a,ul,ol,li,dl,dt,dd,button,input,textarea,select,label,form,fieldset,figure,figcaption,blockquote,span,div,section,article,nav,header,footer,strong,em,b,i,small,time,mark,table,tr,td,th):not(greenhouse-form *){all:revert}
+${SCOPE} :is(img,svg):not(greenhouse-form *){margin:revert;padding:revert;border:revert;border-radius:revert;box-shadow:revert;outline:revert;max-width:revert;max-height:revert;min-width:revert;min-height:revert;vertical-align:revert;float:revert;opacity:revert;filter:revert;transform:revert;transition:revert;object-fit:revert;object-position:revert}
 `
 
 /** Rewrites the canvas CSS under #eoba and gives its keyframes archive-unique names (blog-v3/build-plugin.cjs scopeCss). */
@@ -68,7 +69,15 @@ if (parsed.css.includes('.mob ')) throw new Error('The .mob rules must be remove
 fs.mkdirSync(OUT, { recursive: true })
 fs.mkdirSync(IMG, { recursive: true })
 fs.writeFileSync(path.join(OUT, 'archive.ast.json'), JSON.stringify(parsed.ast))
-fs.writeFileSync(path.join(OUT, 'archive.css'), `${head}\n` + scopeCss(parsed.css))
+const assetsById = JSON.parse(fs.readFileSync(path.join(SRC, 'assets.json'), 'utf8'))
+const isFont = f => /\.(ttf|woff2?)$/.test(f)
+let scopedCss = scopeCss(parsed.css)
+
+// TASK-2056 — fonts the canvas served from its asset store (Guttery, only the Glitch narrator's lines) are served by the
+// plugin from assets/fonts/, relative to assets/generated/archive.css.
+for (const a of Object.values(assetsById)) if (isFont(a.file)) scopedCss = scopedCss.split('/_blob/' + a.id).join('../fonts/' + a.file)
+if (scopedCss.includes('/_blob/')) throw new Error('Unmapped asset in the archive CSS')
+fs.writeFileSync(path.join(OUT, 'archive.css'), `${head}\n` + scopedCss)
 fs.writeFileSync(path.join(OUT, 'archive-base.css'), `${head}\n` + HOST_RESET)
 
 const assets = JSON.parse(fs.readFileSync(path.join(SRC, 'assets.json'), 'utf8'))
@@ -81,7 +90,8 @@ for (const view of VIEWS) {
   fs.writeFileSync(path.join(OUT, `fixture.archive-${view}.json`), fixture)
 }
 
-for (const a of Object.values(assets)) fs.copyFileSync(path.join(SRC, 'assets', a.file), path.join(IMG, a.file))
+fs.mkdirSync(path.join(PLUGIN, 'assets/fonts'), { recursive: true })
+for (const a of Object.values(assets)) fs.copyFileSync(path.join(SRC, 'assets', a.file), path.join(isFont(a.file) ? path.join(PLUGIN, 'assets/fonts') : IMG, a.file))
 
 const fonts = parsed.fontLinks.find(h => h.includes('/css2'))
 

@@ -8,7 +8,8 @@
  *
  * In `url` mode JavaScript is off (the archive ships none) and the site chrome that floats over the content (every
  * fixed or sticky element outside #eoba) is hidden: the canonical header and footer are an allowed deviation.
- * Sections: header.ah, section.fb, section.al, section.mt, section.ot of the board root (`.v3.arc`), by name.
+ * Sections: header.ah, section.fb, section.al, section.gl-sub (Glitch variant), section.mt, section.ot of the board root
+ * (`.v3.arc`), by name.
  */
 const fs = require('node:fs')
 const http = require('node:http')
@@ -19,18 +20,19 @@ const { chromium } = require('playwright')
 const { renderBoard } = require('../../blog-v3/lib/render-node.cjs')
 
 const SRC = path.join(__dirname, '..', 'source')
-const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia']
+const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia', 'tema-glitch']
 const WIDTHS = { 1440: { width: 1440, height: 900 }, 390: { width: 390, height: 844 } }
 const SECTIONS = [
   ['archive-head', ':scope > header.ah'],
   ['archive-filter', ':scope > section.fb'],
   ['archive-list', ':scope > section.al'],
+  ['archive-subscribe', ':scope > section.gl-sub'],
   ['archive-meanwhile', ':scope > section.mt'],
   ['archive-topics', ':scope > section.ot'],
 ]
 const assets = JSON.parse(fs.readFileSync(path.join(SRC, 'assets.json'), 'utf8'))
 const byId = Object.fromEntries(Object.values(assets).map(a => [a.id, a.file]))
-const TYPES = { svg: 'image/svg+xml', webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg' }
+const TYPES = { svg: 'image/svg+xml', webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg', ttf: 'font/ttf' }
 
 function standalone(file, data) {
   const r = renderBoard(file, data ? { data } : {})

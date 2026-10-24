@@ -10,6 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { RendererApiConfig } from '../api-client'
 import type { RenderContract } from '../contract'
 import { eventInlinePillContractFixture, glitchInlinePillContractFixture, staticContractFixture } from '../fixtures'
+import { resolveInlineLabelLogo } from '../inline-pill'
 import { FormRenderer } from '../renderer'
 import { GROWTH_FORM_SUCCESS_EVENT } from '../telemetry'
 
@@ -29,7 +30,11 @@ const fetchStub = (...responses: FetchResponse[]) => {
   })
 }
 
-const mount = (contract: RenderContract = glitchInlinePillContractFixture(), fetchImpl = fetchStub(), extra: { initialValues?: Record<string, string> } = {}) => {
+const mount = (
+  contract: RenderContract = glitchInlinePillContractFixture(),
+  fetchImpl = fetchStub(),
+  extra: { initialValues?: Record<string, string>; inlineLabelLogo?: { src: string; text: string } } = {}
+) => {
   const root = document.createElement('div')
 
   document.body.appendChild(root)
@@ -300,5 +305,48 @@ describe('TASK-2054 · instancias del mismo formulario', () => {
     await flush()
 
     expect(b.root.childElementCount).toBe(0)
+  })
+})
+
+describe('TASK-2056 · logo en el rótulo', () => {
+  const logo = { src: 'https://efeoncepro.com/glitch.svg', text: 'Glitch' }
+
+  it('reemplaza la palabra final por el logo y conserva el nombre accesible completo', () => {
+    const { root } = mount(glitchInlinePillContractFixture(), fetchStub(), { inlineLabelLogo: logo })
+    const open = q<HTMLButtonElement>(root, 'inline-open')
+    const [visible, decorative] = Array.from(open.querySelectorAll('.ghf-inline-roll-in > span'))
+
+    expect(visible.textContent).toBe('Suscríbete a ')
+    expect(visible.querySelector('img')!.getAttribute('src')).toBe(logo.src)
+    expect(visible.querySelector('img')!.getAttribute('alt')).toBe('Glitch')
+    expect(decorative.getAttribute('aria-hidden')).toBe('true')
+    expect(decorative.querySelector('img')!.getAttribute('alt')).toBe('')
+  })
+
+  it('sin logo, o si el rótulo no termina en su palabra, el rótulo sigue en texto', () => {
+    const plain = mount().root
+    const other = mount(glitchInlinePillContractFixture(), fetchStub(), { inlineLabelLogo: { src: logo.src, text: 'Otra' } }).root
+
+    for (const root of [plain, other]) {
+      expect(q(root, 'inline-open').querySelector('img')).toBeNull()
+      expect(q(root, 'inline-open').textContent).toContain('Suscríbete a Glitch')
+    }
+  })
+
+  it('sólo acepta un logo https o relativo a la raíz, con su palabra', () => {
+    expect(resolveInlineLabelLogo(' https://efeoncepro.com/g.svg ', 'Glitch')).toEqual({ src: 'https://efeoncepro.com/g.svg', text: 'Glitch' })
+    expect(resolveInlineLabelLogo('/wp-content/g.svg', 'Glitch')).toEqual({ src: '/wp-content/g.svg', text: 'Glitch' })
+
+    for (const [src, text] of [['//evil.test/g.svg', 'Glitch'], ['http://efeoncepro.com/g.svg', 'Glitch'], ['data:image/svg+xml,<svg/>', 'Glitch'], ['javascript:alert(1)', 'Glitch'], ['https://efeoncepro.com/g.svg', ''], [null, null]]) {
+      expect(resolveInlineLabelLogo(src, text)).toBeUndefined()
+    }
+  })
+
+  it('el logo vive sólo en el botón de apertura: el envío y los estados siguen en texto', async () => {
+    const { root } = mount(glitchInlinePillContractFixture(), fetchStub(), { inlineLabelLogo: logo })
+
+    await openAndType(root, 'ana@empresa.com')
+    expect(root.querySelectorAll('[data-ghf-part="inline-logo"]')).toHaveLength(2)
+    expect(q(root, 'inline-send').querySelector('img')).toBeNull()
   })
 })

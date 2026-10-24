@@ -120,7 +120,11 @@
         "glitch": false,
         "plain": true,
         "label": "Inbound Marketing · Artículo",
-        "min": 12
+        "min": 12,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
       },
       {
         "url": "#",
@@ -145,7 +149,11 @@
         "glitch": false,
         "plain": true,
         "label": "Inbound Marketing · Artículo",
-        "min": 12
+        "min": 12,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
       },
       {
         "url": "#",
@@ -160,7 +168,11 @@
         "glitch": false,
         "plain": true,
         "label": "Loop Marketing · Artículo",
-        "min": 23
+        "min": 23,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
       },
       {
         "url": "#",
@@ -175,7 +187,11 @@
         "glitch": false,
         "plain": true,
         "label": "Marketing Digital · Artículo",
-        "min": 21
+        "min": 21,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
       },
       {
         "url": "#",
@@ -190,7 +206,11 @@
         "glitch": false,
         "plain": true,
         "label": "Inteligencia Artificial · Artículo",
-        "min": 15
+        "min": 15,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
       },
       {
         "url": "#",
@@ -205,7 +225,11 @@
         "glitch": false,
         "plain": true,
         "label": "Growth · Artículo",
-        "min": 19
+        "min": 19,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
       },
       {
         "url": "#",
@@ -220,7 +244,11 @@
         "glitch": false,
         "plain": true,
         "label": "HubSpot · Guía",
-        "min": 21
+        "min": 21,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
       },
       {
         "url": "#",
@@ -235,7 +263,11 @@
         "glitch": false,
         "plain": true,
         "label": "Loop Marketing · Artículo",
-        "min": 20
+        "min": 20,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
       },
       {
         "url": "#",
@@ -250,7 +282,11 @@
         "glitch": false,
         "plain": true,
         "label": "Marketing Digital · Guía",
-        "min": 20
+        "min": 20,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
       }
     ],
     "pager": {
@@ -362,5 +398,7 @@
         "barStyle": "background: #36c8bf;"
       }
     ]
-  }
+  },
+  "rootCls": "v3 arc",
+  "gl": null
 }

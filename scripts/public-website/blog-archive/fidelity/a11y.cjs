@@ -9,7 +9,7 @@ const fs = require('node:fs')
 const { AxeBuilder } = require('@axe-core/playwright')
 const { chromium } = require('playwright')
 
-const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia']
+const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia', 'tema-glitch']
 
 ;(async () => {
   const mapArg = process.argv.indexOf('--urls')
@@ -35,6 +35,6 @@ const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-
     }
   }
   await browser.close()
-  console.log(total ? `✗ ${total} violations` : '✓ axe WCAG 2.2 AA: 0 violations in 6 views × 3 widths')
+  console.log(total ? `✗ ${total} violations` : `✓ axe WCAG 2.2 AA: 0 violations in ${VIEWS.length} views × 3 widths`)
   process.exit(total ? 1 : 0)
 })()

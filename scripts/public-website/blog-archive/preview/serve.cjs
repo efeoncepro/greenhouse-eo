@@ -7,7 +7,7 @@
  * classes and serves the plugin assets locally. Public static files of the live site are proxied with GET only.
  *
  *   node preview/serve.cjs [--port 8845] [--shell https://efeoncepro.com/blog/]
- *   → http://127.0.0.1:8845/<tema|etiqueta|autor|busqueda|tema-vacio|busqueda-vacia>/
+ *   → http://127.0.0.1:8845/<tema|etiqueta|autor|busqueda|tema-vacio|busqueda-vacia|tema-glitch>/
  */
 const { execFileSync } = require('node:child_process')
 const fs = require('node:fs')
@@ -28,8 +28,8 @@ const PORT = Number(arg('port', 8845))
 const SHELL_URL = arg('shell', 'https://efeoncepro.com/blog/')
 const PLUGIN = path.join(RUNTIME_DIR, 'wp-content/plugins/eo-blog-home')
 const LOCAL = '/wp-content/plugins/eo-blog-home/'
-const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia']
-const TYPES = { '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png' }
+const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia', 'tema-glitch']
+const TYPES = { '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.ttf': 'font/ttf' }
 // Same as EOBH_Archive::body_class(): Ohio's demo chrome classes go, eoba-page comes.
 const DROP = ['with-switcher', 'with-mobile-switcher', 'with-headline', 'with-breadcrumbs', 'custom-cursor', 'with-fixed-search']
 const GUARD = `var __f=window.fetch.bind(window);window.fetch=function(i,o){o=o||{};var m=(o.method||(i&&i.method)||'GET').toUpperCase();if(['GET','HEAD','OPTIONS'].indexOf(m)<0){return Promise.reject(new Error('Preview: writes disabled'))}return __f(i,o)};document.addEventListener('submit',function(e){e.preventDefault()},true);navigator.sendBeacon=function(){return false};`
