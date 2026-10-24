@@ -2,6 +2,17 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-24 — Tarjetas v2 de «Para leer con calma» en producción (TASK-2051, desvío 14)
+
+- El riel de `/blog/` usa las tarjetas aprobadas en el canvas (versión 93) desde las 21:12 UTC: una sola plantilla
+  (`lib/rail-v2.cjs`) para foto a sangre, cliente (ANAM), pregunta, entrada de webinar con «Faltan N días», onda de
+  podcast y tipográfica; una insignia como máximo y sólo con dato real (En vivo, Nuevo, Actualizado, Gratis; cupos y
+  lecturas esperan su lector por el filtro `eo_home_rail_signals`).
+- Modelo de contenido (`efeonce-editorial-blocks` 0.4.4, `EO_CM_VERSION` 0.2.1): formato Podcast, metas
+  `_eo_reviewed_at` («Última revisión») y `_eo_client` («Cliente del caso») con panel y comandos `client`/`reviewed`;
+  `dc-runtime.js` ya no borra el hover al repintar. Gates en vivo: desborde 0 px de 320 a 1920, un H1, axe 0.
+  [Runtime](docs/architecture/public-site/BLOG_HOME_RUNTIME_V1.md) · [PDR-029](docs/public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md).
+
 ## 2026-10-24 — Módulo de eventos: webinar de Teams, diseño y backlog
 
 - Decidido: la sesión es un webinar de Teams y Greenhouse es dueño de la reserva, el cupo y la lista de espera. El
@@ -630,14 +641,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
   del cambio. Quien cambie a propósito lo que un comando responde debe volver a capturarla y revisar el diff.
   `pnpm pricing:v3:test` suma esa línea base, una batería de conformidad sobre los 48 artefactos congelados y una
   guarda de imports del motor. [Contrato](docs/architecture/GREENHOUSE_PRICING_V3_STORAGE_PORT_V1.md).
-
-## 2026-10-12 — Prospección B2B: respuesta proporcional tras un diferencial ciego bajo Claude
-
-- Diez escenarios con y sin la skill, calificados a ciegas: la skill evita el alta de contactos sin correo,
-  pero respondía 74 % más largo. Se agrega proporcionalidad al método, veinte decisiones que cierran
-  ambigüedades (D2 y D6 aprobadas por el operador; D3 modificada: registrar contactos cubre crear la Company
-  verificada), módulo de sesión Claude y evals v7 con 49 escenarios. En HubSpot: fecha de investigación =
-  verificación, encaje de adyacentes por función propia y Lead sólo tras interacción real; apagada en el
-  portal la automatización que creaba un Lead por cada contacto en etapa `Lead` (2.222 de 2.251). Tras corregir: 20 de 20 sin fallos críticos y ruido de 1,55 a 0,60.
-  [Evidencia y límites](docs/audits/commercial/2026-10-12-prospecting-claude-blind-differential.md).
-  Sin runtime, créditos, CRM ni envíos.

@@ -1,5 +1,12 @@
 # TASK-2053 — Growth Forms: contrato de formulario en línea, reserva por evento y conteo de reservas
 
+## Delta 2026-10-24
+
+- Las tarjetas v2 de «Para leer con calma» (TASK-2051, en producción) ya tienen diseñadas las insignias «Últimos
+  cupos» y «Lista de espera» de la tarjeta del webinar, pero no se encienden: esperan un estado público de cupos de
+  esta task. Se enchufa por el filtro de WordPress `eo_home_rail_signals` (`event:<id>` → `seats` / `wait`); nada más
+  las enciende y nunca se escriben a mano.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

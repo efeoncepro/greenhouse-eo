@@ -6,7 +6,9 @@
 > eventos reales siguen pidiendo su visto bueno con el dry-run a la vista.
 > **Vigencia:** en producción desde el 2026-10-24: `efeonce-editorial-blocks` 0.2.0 en vivo, 44 entradas con formato,
 > recursos 252050 (guía) y 252054 (diagnóstico), `eo_content_model_enabled = 1` y `/blog/` (18456) cortado a la portada
-> v3 a las 08:13 UTC (snapshot `_gh_blog_home_v3_before_20261024_081327`). Sin evento real cargado todavía. Contrato de
+> v3 a las 08:13 UTC (snapshot `_gh_blog_home_v3_before_20261024_081327`). Sin evento real cargado todavía. Tarjetas
+v2 del riel, formato Podcast y metas `_eo_reviewed_at` / `_eo_client` desde las 21:12 UTC (plugin 0.4.4, ver el
+delta de las tarjetas v2). Contrato de
 > runtime: [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
 > **Ejecución:** [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-content-model.md) (este modelo) y
 > [TASK-2051](../../tasks/in-progress/TASK-2051-blog-portada-v3-high-fidelity.md) (la portada que lo consume).
@@ -173,6 +175,48 @@ Un lector por sección, con su orden, su vacío y su respaldo. La portada y el R
 
 Orden obligatorio: este PDR aprobado → paquete → backfill revisado → eventos y recursos reales cargados → opción
 encendida junto con la publicación de la portada de TASK-2051.
+
+## Delta 2026-10-24 — Tarjetas v2 de «Para leer con calma»
+
+Aprobado por el operador (canvas versión 93) y en producción desde el 2026-10-24 21:12 UTC:
+`efeonce-editorial-blocks` 0.4.4, modelo `EO_CM_VERSION` 0.2.1. Amplía §1, §2 y §5 sin cambiar lo anterior.
+Runtime: [«Para leer con calma» v2](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
+
+- **§1, formato nuevo `podcast`** («Podcast», botón «Escuchar el episodio»; `TERMS_VERSION` 3). Los formatos quedan:
+  Artículo, Caso, Guía, Grabación, Podcast, Novedad y Glitch Edición, Flash y Nota. La regla de inferencia de §1.1 no
+  lo asigna: el podcast se marca a mano.
+- **§2, dos metas de entrada nuevas** (registradas en `EO_Home_Pins`, editables por REST y en el panel «Portada del
+  blog»):
+
+  | Meta | Campo del panel | Qué guarda |
+  |---|---|---|
+  | `_eo_reviewed_at` | Última revisión | Fecha (`AAAA-MM-DD`) de la última revisión de fondo que hizo el editor. Nunca la fecha de modificación de WordPress. |
+  | `_eo_client` | Cliente del caso | Cliente con logo cargado (hoy sólo `anam`); sólo para el formato Caso. |
+
+  Un episodio de podcast reusa «Duración del episodio» (`_eo_video_duration`).
+- **§5, regla nueva del riel.** El riel suma, a las cuatro lecturas largas y los recursos `rail`, **el próximo evento
+  publicado hasta que termina** (`events.next`). Las entradas con formato `podcast` entran **sin el mínimo de 12
+  minutos**; las grabaciones no entran (tienen su bloque en Eventos). Una sola plantilla de tarjeta para todo; la
+  variante (foto, cliente, pregunta, entrada de webinar, onda, tipográfica) sale del dato, armada por
+  `EO_Home_Adapter::rail()`.
+- **Insignias como parte del contrato de contenido.** Como máximo una por tarjeta, gana el menor rango y cada una sale
+  de una regla con dato real; sin dato, no hay insignia:
+
+  | Rango | Insignia | Regla |
+  |---|---|---|
+  | 1 | En vivo | Reloj del evento (entre inicio y fin) |
+  | 2 | Últimos cupos / Lista de espera | Reservas de Growth Forms (TASK-2053). **Sin lector todavía** |
+  | 3 | Más leído | Lecturas de GA4. **Sin lector todavía** |
+  | 4 | Tendencia | Lecturas de GA4. **Sin lector todavía** |
+  | 5 | Nuevo | Publicada hace 14 días o menos |
+  | 6 | Actualizado | `_eo_reviewed_at` de los últimos 30 días en una entrada de más de 60; el pie dice «Actualizado <fecha>» |
+  | 7 | Gratis | Recursos y eventos gratis |
+
+  Textos en español e inglés en `EO_Home_Adapter::RAIL_BADGES`. Los lectores que faltan se enchufan por el filtro de
+  WordPress `eo_home_rail_signals` (id de entrada → `top`/`trend`; `event:<id>` → `seats`/`wait`); nada más los
+  enciende. Igual que el contador de §5, el estado de cupos nunca se escribe a mano.
+- **Firma de las guías:** una guía publicada en `think.efeoncepro.com` firma con el logo de Efeonce Think; las demás,
+  con el logo negativo de Efeonce.
 
 ## Consecuencias
 

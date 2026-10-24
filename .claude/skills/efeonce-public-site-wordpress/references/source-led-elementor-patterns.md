@@ -175,6 +175,9 @@ not ship the canvas runtime:
 - An SVG data meter → a server-drawn number field, not an image of a number.
 - Repeater rows whose markup differs → explicit layout variants. Name row field labels by role
   (what the field is in every row), never by the first row's copy.
+- The Claude Design canvas strips a `<style>` inside an inline SVG (paint with `fill`/`stroke` attributes) and drops
+  CSS custom properties written in inline `style` (move them to CSS rules, e.g. `nth-child` animation delays).
+  Blog rail v2, 2026-10-24.
 - Name template tokens so they cannot collide with schema field keys. The renderer substitutes a field's value
   into any `%%token%%` of the same name, so a token that matches a field is silently replaced by that field's
   value (HubSpot v2: the dock's Growth CTA slot is `%%meeting_launcher%%` for that reason).
@@ -313,6 +316,16 @@ Ohio or other pages. Two rules keep that scoping honest:
 - Reuse `EO_Logo_Marquee_Widget::render_marquee()` for trust strips and proof-only avatar groups.
   When replacing initials with logos, migrate hover selectors to the shared semantic avatar classes;
   retain lift/scale/halo/stacking and remove transforms under reduced motion. Verify existing consumers.
+
+## Card and badge craft (operator, blog rail v2, 2026-10-24)
+
+- Bigger is not more elegant: size by hierarchy, not volume.
+- Hover is liquid: cursor-following light, slight tilt, smooth ease `cubic-bezier(0.22,1,0.36,1)`, no bounce.
+- Show brand/client logos instead of naming them in words; real images, never placeholders.
+- Badges have punch (solid capsule, glow, glint, filled duotone icon), sit above the title so they never collide with
+  the CTA, use short labels that also work in English, and only appear when their datum exists.
+- An ambiguous label is wrong: «Revisado oct» → «Actualizado» badge + the date in the footer.
+- One family of cards across formats (photo, client, question, ticket, podcast, typographic) beats a section per format.
 
 ## Continuous rails
 

@@ -683,6 +683,10 @@ reales hasta cerrar ese backlog**; todo sale en **un solo release** (~3 h cada u
   formulario HubSpot compartido con `ef_event_key` (se sobrescribe). El evento no es entidad (vive en
   `ui_policy_json.eventRegistration`); solo `confirmed`/`waitlisted`, sin cancelación ni promoción; `joinUrl` fijo por
   evento. Sin release: correos con reservas `delivered` (`2a971d768`) y píldora (`a5b028461`).
+- **Cupos en la portada del blog:** las insignias «Últimos cupos» / «Lista de espera» del rail «Para leer con calma»
+  (en producción desde 2026-10-24) **no tienen lector**. Un lector de cupo entra sólo por el filtro WordPress
+  `eo_home_rail_signals` (`event:<id>` → `seats` / `wait`); nunca muestres la insignia sin su dato. Operación:
+  skill `efeonce-public-site-wordpress` → `references/blog-home-operation.md`.
 - **Decidido:** la sesión es un **webinar de Teams** (seminario web de la app Eventos), **nunca** se baja a reunión
   normal. Tenant M365 Business: sin espera ni aprobación en Teams → **Greenhouse es dueño de la reserva, el cupo y la
   espera**; la espera no va a HubSpot. Una sola fuente por Evento de marketing: el conector Teams↔HubSpot si funciona,

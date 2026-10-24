@@ -1,7 +1,7 @@
 # Operar el contenido de la portada del blog
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-24 por Claude
 > **Ultima actualizacion:** 2026-10-24 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) · [PDR-029 — Modelo de contenido de la portada del blog](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md) · [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-content-model.md)
@@ -10,7 +10,7 @@
 ## Para qué sirve
 
 Para mantener la portada del blog (`/blog/`) con contenido real sin tocar código: el formato de cada entrada, qué va
-fijado en el slider y hasta cuándo, los eventos (webinars y talleres) y los recursos (guía, herramienta, diagnóstico,
+fijado en el slider y hasta cuándo, las tarjetas de «Para leer con calma» (cliente, última revisión, podcast), los eventos (webinars y talleres) y los recursos (guía, herramienta, diagnóstico,
 Glitch), la foto del autor y la suscripción a Glitch. La portada se arma sola con eso y se refresca al publicar.
 Qué ve el visitante: [Portada del blog](../../documentation/public-site/portada-del-blog.md).
 
@@ -27,9 +27,9 @@ Qué ve el visitante: [Portada del blog](../../documentation/public-site/portada
 ### Formato de una entrada
 
 En el editor de la entrada, panel **Portada del blog** → **Formato**. Una sola opción: Artículo, Caso, Guía, Grabación,
-Novedad, Glitch Edición, Glitch Flash o Glitch Nota. Una **Novedad** (alianzas, anuncios de Efeonce) lleva un megáfono
+Podcast, Novedad, Glitch Edición, Glitch Flash o Glitch Nota. Una **Novedad** (alianzas, anuncios de Efeonce) lleva un megáfono
 en el chip y sólo entra al slider si se fija. Es distinto de la categoría y no cambia la URL. Si se publica sin formato,
-el plugin asigna uno por las reglas de PDR-029 §1.1.
+el plugin asigna uno por las reglas de PDR-029 §1.1 (nunca Podcast: ése se elige a mano).
 
 ### Fijar una entrada en el slider
 
@@ -39,6 +39,42 @@ destacada) una entrada no puede ser diapositiva. Sin imagen propia del slider, l
 velo de lectura del lado del texto y corta la bajada en dos líneas; si el arte se hizo para el slider, súbelo como
 **Imagen del slider** y el velo desaparece. Las tres invitaciones (Glitch, guía o herramienta, diagnóstico) tienen su
 lugar reservado: una entrada fijada ocupa uno de los lugares restantes.
+
+### Tarjetas de «Para leer con calma»
+
+El riel muestra las cuatro lecturas largas más recientes (12 minutos o más, sin Glitch, Novedades ni grabaciones),
+los recursos marcados para el riel y, si hay, el próximo evento como una entrada de webinar. Cada tarjeta se arma sola
+con la entrada; en el panel **Portada del blog** decides dos datos más:
+
+- **Cliente del caso** (sólo con formato Caso): el cliente del caso; la tarjeta muestra su logo en lugar de la foto.
+  Sólo aparecen clientes con logo cargado (hoy, ANAM). Un cliente nuevo lo agrega el equipo técnico.
+- **Última revisión** (`AAAA-MM-DD`): la fecha de una revisión de fondo que hiciste tú (datos, enlaces, conclusiones).
+  No es la fecha de modificación de WordPress: corregir una coma no cuenta. Enciende «Actualizado» por 30 días, sólo
+  en entradas publicadas hace más de 60; el pie de la tarjeta dice «Actualizado <fecha>».
+
+**Podcast.** Formato **Podcast** y, en el mismo panel, **Duración del episodio** (`32:10`). Un episodio entra al riel
+como una onda aunque dure menos de 12 minutos; su botón dice «Escuchar el episodio».
+
+**Insignias.** Cada tarjeta lleva como máximo una, y sólo con un dato real. Si caben varias, gana la de arriba:
+
+| Insignia | Qué la hace aparecer |
+|---|---|
+| En vivo | El evento está ocurriendo (entre su inicio y su fin). |
+| Últimos cupos / Lista de espera | Las reservas del evento. Todavía no se enciende: espera la lectura de reservas. |
+| Más leído / Tendencia | Las visitas de la entrada. Todavía no se encienden: esperan la lectura de visitas. |
+| Nuevo | Publicada hace 14 días o menos. |
+| Actualizado | **Última revisión** de los últimos 30 días en una entrada de más de 60 días. |
+| Gratis | Guías, diagnóstico y eventos sin costo. |
+
+Ninguna insignia se escribe a mano.
+
+**Cómo se recorta la imagen destacada.** La tarjeta con foto usa la imagen destacada de la entrada (no la imagen del
+slider) a sangre en un formato vertical de 440 × 600 en escritorio y 304 × 540 en el teléfono, recortada al centro:
+de una imagen ancha sólo se ve la franja del medio, de arriba abajo. El título, la bajada y el pie van encima, sobre un
+velo, en el 45 % de abajo; el formato va arriba a la izquierda y el botón arriba a la derecha. Lo importante de la
+imagen tiene que estar al centro y en la mitad de arriba. Cómo componer la portada para eso:
+[Producir la portada de un artículo del blog](../creative/producir-portada-de-articulo-del-blog.md#zonas-seguras).
+Una entrada sin imagen ni cliente sale como tarjeta tipográfica.
 
 ### Foto de perfil del autor
 
@@ -65,7 +101,8 @@ suscripción.
 ### Grabación de un webinar
 
 Formato **Grabación**, el video de YouTube incrustado con su transcripción en la entrada y **Duración del video**
-(`48:12`). Aparece en «Grabaciones para ver cuando quieras» y lleva marcado `VideoObject`.
+(`48:12`). Aparece en «Grabaciones para ver cuando quieras» (no en «Para leer con calma») y lleva marcado
+`VideoObject`.
 
 ### Crear un evento
 
@@ -75,6 +112,8 @@ zona horaria, duración, modalidad, sede, categoría, **arte clave** (obligatori
 (`HH:MM | tema`), `form_key` del Growth Form, estado y cupos. El enlace privado del webinar **no se escribe aquí**.
 
 El evento es «próximo» hasta inicio + duración; al terminar sale solo. El botón «Agregar al calendario» baja el `.ics`.
+Mientras es próximo también aparece al final de «Para leer con calma» como una entrada con la fecha y «Faltan N días»
+(«Mañana», «Hoy», «En vivo ahora»).
 
 ### Registrar un recurso
 
@@ -122,7 +161,8 @@ los últimos 180 días el recurso deja de mostrarse.
 
 ## Qué no hacer
 
-- No escribir a mano el contador de reservas: lo entrega TASK-2053 o queda oculto.
+- No escribir a mano el contador de reservas ni las insignias de cupos: lo entrega TASK-2053 o queda oculto.
+- No usar **Última revisión** para una corrección menor: «Actualizado» promete una revisión de fondo.
 - No guardar enlaces privados de webinars en ningún campo del evento.
 - No usar «Fijar arriba» (sticky) de WordPress: la portada no lo lee.
 - No aplicar el backfill sin revisar el dry-run ni con un `expect_sha256` viejo (el script lo rechaza).
@@ -136,6 +176,9 @@ los últimos 180 días el recurso deja de mostrarse.
 | Un evento no ocupa el bloque grande | Sin arte clave, cancelado o ya terminó | Cargar el arte clave o revisar las fechas. |
 | Una entrada fijada no aparece | Sin imagen o fijación vencida | Agregar imagen o mover la fecha. |
 | La portada tarda en actualizarse | Ventana de 60 s o caché de 5 min | Esperar hasta 2 minutos; revisar `eo_cm_purge_log`. |
+| Un caso no muestra el logo del cliente | Sin **Cliente del caso**, o el formato no es Caso | Elegir el cliente en el panel; si no está en la lista, pedir su logo al equipo técnico. |
+| No sale «Actualizado» | La entrada tiene 60 días o menos, o la revisión tiene más de 30 | Es lo esperado: «Nuevo» o nada. |
+| Un podcast no aparece en el riel | Le falta el formato Podcast, o es de Glitch o Novedades | Cambiar el formato a Podcast. |
 | El autor sale con iniciales | No tiene foto subida en su perfil (Gravatar no cuenta) | Subir la foto en el perfil de WordPress. |
 | No se ve la suscripción a Glitch | No hay formulario conectado (`data-subscribe="off"`) | Conectarlo por CLI con un formulario publicado. |
 | No se ve la sección de eventos | No hay un evento próximo | Crear el evento con arte clave y fecha futura. |

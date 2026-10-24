@@ -228,8 +228,12 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
   muestra), y ese recorte toma el centro (x 285–915 de
   1200). Por eso:
   - cabecera, voz y respuesta en **x 312**, dentro de la columna x 312–782 e y 50–341;
-  - el rail de `/blog/` recorta en 4:3 (x 180–1020) y contiene el cuadrado; el slider pinta su título encima, así que
-    ahí va como `hero` el plate sin texto;
+  - el slider de `/blog/` pinta su título encima, así que ahí va como `hero` el plate sin texto;
+  - el rail «Para leer con calma» v2 (en producción desde 2026-10-24) **ya no es 4:3**: la destacada llena una tarjeta
+    vertical de 440 × 600 (móvil 304 × 540), recortada al centro, con el título sobre el ~45 % inferior. Del
+    1200 × 630 sólo se ve x ≈ 369–831 (móvil ≈ 423–777): la cabecera en x 312 y un sujeto en el tercio derecho
+    quedan fuera, y lo que caiga abajo queda bajo el texto. Lo que deba leerse en el rail va al centro y arriba;
+    cómo se concilia con la variante centrada lo decide el operador (hasta entonces, revisa también ese recorte);
   - el sujeto en el tercio derecho, pedido un poco más a la derecha porque el modelo lo corre unos 15 puntos al centro;
   - **sin bajada y sin firma**: la cabecera identifica la pieza y la prenda ya lleva la marca, así que el logo sobra
     (el banner que sale del sitio sí firma);

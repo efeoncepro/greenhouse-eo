@@ -203,6 +203,9 @@ Assign featured and social media deliberately:
 - verify the featured attachment is the intended `primaryImageOfPage` and the
   Open Graph image;
 - verify format, dimensions, aspect ratio, ALT/caption, and anonymous delivery;
+- check the featured image in the `/blog/` rail crop too: the «Para leer con calma» v2 card (2026-10-24) fills a
+  portrait 440×600 card (mobile 304×540), cropped at center, with the title over the bottom ~45 % scrim, so the
+  subject must sit in the central/upper area (cover rules: `efeonce-graphic-line` `references/manzanitas.md` §4.5);
 - preserve source masters and derivative lineage outside the post body.
 
 For direct SVG infographics, load the governed SVG lane in `content-factory-gutenberg.md` and the SEO contract
