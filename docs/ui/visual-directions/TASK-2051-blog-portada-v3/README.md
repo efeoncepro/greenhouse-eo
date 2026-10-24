@@ -44,6 +44,16 @@ el sitio sólo se reutiliza infraestructura (consultas, formularios, despliegue,
    tableros en la página, `document.querySelector` podía devolver el botón de un tablero oculto.
 10. Rendimiento sin cambio de píxeles: imágenes bajo el hero con `loading="lazy"`, CSS por tablero con su media
     query, sólo se descarga la lógica del tablero visible y la primera diapositiva se precarga con prioridad alta.
+11. Contenido real (operador, 2026-10-24, visto en vivo): una entrada sin imagen propia del slider (`_eo_hero_image`)
+    lleva un velo de lectura del lado del texto y la bajada se corta en dos líneas; el formato **Novedad** lleva un
+    megáfono en el chip con el trazo de los cinco glifos del canvas.
+12. Foto del autor (operador, 2026-10-24): el círculo muestra la foto de perfil subida en WordPress
+    (`get_avatar_url`); sin foto, las iniciales del canvas. Un Gravatar de respaldo no la reemplaza.
+13. Suscripción real a Glitch (operador, 2026-10-24): con un Growth Form publicado (`inline_pill`, opción
+    `eo_blog_glitch_form_key`) la píldora del canvas es el renderer real dentro de `<greenhouse-form data-dc-keep>`
+    (TASK-2054: los cinco estados ≤ 1 % del canvas) y **la suscripción del final también usa esa píldora** en lugar
+    del campo con casilla del canvas, porque el consentimiento es el aviso bajo la píldora (aprobado por el operador).
+    Datos reales sin formulario publicado no muestran suscripción: nunca un «¡Listo!» simulado.
 
 ## Tablero de tablet (768–1099 px), 2026-10-24
 

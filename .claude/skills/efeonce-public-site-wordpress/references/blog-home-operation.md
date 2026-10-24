@@ -23,6 +23,9 @@ canonical site nav, `eo_content_model_enabled = 1`.
 - A post without `_eo_hero_image` gets a reading scrim and a two-line dek; slider art goes in via `hero --image`.
 - Author circle: the author's uploaded WordPress profile photo (`get_avatar_url`), initials when there is none; a
   Gravatar fallback never stands in.
+- Glitch subscription is real only with a published `inline_pill` Growth Form connected by `subscription <key> --apply`
+  (`pnpm growth:forms:publish-glitch-pill` publishes it); without one the home shows no subscription, never a
+  simulated «¡Listo!». HubSpot subscribes by the act under the notice (`consentBy: 'submission'`).
 - Resources hide after 180 days without `review`. Events never store private meeting links (the CLI refuses them).
 - Template changes are not edits to WordPress: they go through `scripts/public-website/blog-v3/` (bind-canvas →
   make-tablet → build-plugin → equivalence + PHP parity + pixel gate ≤1 %), are committed in the runtime and shipped

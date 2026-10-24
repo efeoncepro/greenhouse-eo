@@ -92,6 +92,21 @@ se guarda en el evento. Sin arte clave el evento no ocupa el bloque grande. La s
 hay un evento próximo y desaparece cuando termina (inicio + duración). `form_key` es el formulario de reserva de
 Growth Forms (`pnpm growth:forms:publish-event-registration`).
 
+### 4b. Suscripción real a Glitch
+
+```bash
+pnpm growth:forms:publish-glitch-pill                      # dry-run: compila la versión píldora en memoria
+pnpm growth:forms:publish-glitch-pill --apply              # borrador + destino HubSpot + revisión
+pnpm growth:forms:publish-glitch-pill --publish            # publica (exige que origin/main sirva el código)
+pnpm public-website:blog-home subscription 6bc62588-a4a0-4214-9501-13b0c2948c81 --apply   # conecta la portada
+pnpm public-website:blog-home subscription off --apply     # la desconecta
+```
+
+Con un formulario conectado, la píldora de Glitch y la suscripción del final son el renderer real de Growth Forms.
+Sin formulario no hay suscripción en la portada: nunca un «¡Listo!» simulado. La suscripción a Glitch en HubSpot
+nace del acto de suscribirse bajo el aviso (`consentBy: 'submission'`, aprobado el 2026-10-24): el servidor guarda el
+hash del aviso y el destino sólo suscribe si lo encuentra.
+
 ### 5. Verificar
 
 ```bash
@@ -134,6 +149,7 @@ El corte del 2026-10-24 dejó el snapshot `_gh_blog_home_v3_before_20261024_0813
 | `scrim: true` | Usa la imagen destacada con velo de lectura. |
 | `stale: true` | Recurso sin revisión reciente: no se muestra. |
 | `applied: false` | Fue un plan; nada cambió. |
+| `data-subscribe="off"` en `#eobh` | Datos reales sin formulario de Glitch conectado: la suscripción no se muestra. |
 
 ## Qué no hacer
 
