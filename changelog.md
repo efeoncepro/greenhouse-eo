@@ -2,6 +2,15 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-24 — Portada del blog v3: revisión en vivo y piezas listas
+
+- Portada nueva publicada para revisión en `efeoncepro.com/blog-v3-revision/` (noindex): plugin `eo-blog-home` con los
+  tableros de escritorio, tablet (nuevo) y móvil del canvas aprobado; 25/25 secciones ≤ 1 % en vivo. `/blog/` sin
+  cambiar hasta aprobación. [TASK-2051](docs/tasks/in-progress/TASK-2051-blog-portada-v3-high-fidelity.md).
+- Code complete en local, sin publicar: modelo de contenido (TASK-2050, PDR-029 Proposed), formulario en línea con
+  reservas por evento y conteo (TASK-2053/2054; llega con el próximo release a main) y primitives AXIS de botón,
+  segmentado y buscador con haz (TASK-2052, v0.7.15 preparada).
+
 ## 2026-10-24 — Sitio público: Nosotros y Partners rediseñados (source-led)
 
 - `/about-us-efeonce/` y `/partnership/` publicadas como widgets Elementor compilados desde los canvas aprobados de «La
@@ -661,7 +670,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - [CLI de pricing](docs/manual-de-uso/finance/consultar-excel-pricing-por-cli.md): Excel extraído con hash/celdas/fórmulas; búsqueda, auditoría, costos declarados, equipos y comparación de márgenes sin UI/DB. Escenarios hipotéticos; Excel/seeds y motor vigente intactos.
 
 - [Dirección regional aceptada](docs/architecture/EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md), [servicio](docs/services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md), modelo y activación documentados: modalidades, buying group, economics, formación, continuidad y matriz contractual. Talent Assurance, arquitectura objetivo y guardrails pasan a aceptados por aprobación del operador; policy e implementación pendientes. Índices, task/epic, documentación funcional/manual y skills espejo conciliados. Sin nuevo runtime, precios, contratos ni envíos.
-
-## 2026-10-08 — Cotizaciones documentales multimoneda y entrega Pibank
-
-- [Plantilla A4](docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): presentación ISO, precisión decimal, FX explícito con fecha/fuente y tratamiento fiscal independiente. [Cotización Pibank](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/README.md): USD/PEN de 19 páginas y archivos en raíz de carpeta comercial, con copia por hash y procedencia registrada. Tres subagentes actualizaron docs/skills y auditaron aislamiento; sin cambios al cotizador Greenhouse, envío o CRM.

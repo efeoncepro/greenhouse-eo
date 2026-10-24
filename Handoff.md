@@ -2,22 +2,35 @@
 
 [Historial](Handoff.archive.md).
 
-## 2026-10-24 — Portada del blog v3: publicada para revisión en vivo (TASK-2051)
+## 2026-10-24 — Portada del blog v3: revisión en vivo; TASK-2050/2052/2053/2054 code complete
 
-Canvas aprobado «Portada Blog Efeonce» v3 (`https://claude.ai/artifact/SmmJZC39UTJ9m6PD5x7tui`; v68 suma el tablero de
-tablet). Hoja aprobada por el operador. **En vivo**: plugin `eo-blog-home` (runtime `162375a`, despliegue acotado
-con respaldos en `/tmp/eo-blog-home-before-*.tar` del servidor) y página de revisión
-`https://efeoncepro.com/blog-v3-revision/` (252046, noindex, sin enlaces; rollback `wp post delete 252046`).
-**`/blog/` (18456) sin cambiar**: el corte es `blog-v3/publish-blog-home-page.php` + el paquete de `ohio-child` con
-`EO_SITE_NAV_EXCLUDED_PAGES` vacío (runtime `df11a21`), juntos y con aprobación.
+**En vivo** (pedido del operador): plugin `eo-blog-home` (runtime `162375a`) y `https://efeoncepro.com/blog-v3-revision/`
+(252046, noindex, sin enlaces; rollback `wp post delete 252046`) con escritorio, tablet nuevo (canvas v68) y móvil;
+25/25 secciones ≤ 1 % en vivo, axe 0, sin desborde, un H1. Contenido de ejemplo y formularios simulados. **`/blog/`
+sin cambiar.** Code complete en local, sin publicar: TASK-2050 (runtime `b00fa2f`…`57d4455`, PDR-029 *Proposed*),
+TASK-2053/2054 (Greenhouse `8b1bd8c2e`…`69f032cd4`, 509 pruebas), TASK-2052 (AXIS `5bdfa91`…`ba70438`).
 
-- Tres tableros: escritorio ≥ 1100, tablet 768–1099 (`make-tablet.cjs`, mismos datos y lógica que escritorio),
-  móvil < 768. Gate en vivo 25/25 ≤ 1 %, axe 0, sin desborde de 1920 a 320, un solo H1.
-- Rendimiento (perfil móvil de Lighthouse, en vivo): hero pintado a 3,8 s móvil / 3,4 s tablet / 3,6–5 s escritorio,
-  comparable al resto del sitio; en móvil el LCP lo toma el banner de cookies del sitio (10–17 s): seguimiento aparte.
-- Contenido de ejemplo del canvas y formularios simulados hasta TASK-2050 (lectores, filtro `eobh_data`) y
-  TASK-2053/2054 (formularios en línea). Al desplegar el plugin, re-exportar la línea base: el exportador ya
-  incluye `eo-blog-home`. Un PHP nuevo tarda 1–2 min en llegar a PHP-FPM.
+**Runbook, en este orden y con aprobación del operador en cada paso:**
+
+1. Aprobar PDR-029 (`docs/public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md`).
+2. Modelo de contenido: export de línea base → `build-blog-v3-content-model-package.cjs` → deploy dry-run y apply
+   (`deploy-blog-v3-content-model-package.php`, opción `eo_content_model_enabled` en 0) → `verify-content-model.php`.
+   Manual: `docs/manual-de-uso/public-site/operar-contenido-portada-blog.md` (comandos exactos).
+3. Backfill de formatos: dry-run, revisar (propone 7 Ediciones, 1 Flash, 2 Notas, 2 Casos, 3 Guías, 29 Artículos),
+   apply por lotes con ledger. Cargar recursos (`eo_resource`: newsletter, guía, diagnóstico) y el primer evento real.
+4. Encender `eo_content_model_enabled = 1` y revisar `/blog-v3-revision/` con datos reales (si falta una diapositiva,
+   tema o año, el adaptador vuelve al ejemplo completo y lo deja en el log).
+5. Release de Greenhouse a `main` (renderer 1.2.0 con `inline_pill`) y publicación del formulario de Glitch y del
+   evento (`growth:forms:publish-event-registration`); luego cambiar las acciones de los formularios de la portada.
+6. AXIS v0.7.15: push de `main`, CI verde, `release:packages 0.7.15`, readback y vendorización (hoy la portada usa los
+   valores del canvas; la vendorización no cambia píxeles).
+7. Corte de `/blog/`: `blog-v3/publish-blog-home-page.php` + paquete de `ohio-child` (`EO_SITE_NAV_EXCLUDED_PAGES`
+   vacío, runtime `df11a21`) juntos; papelera para 252046.
+
+Notas: re-exportar la línea base antes de cada despliegue (el exportador ya incluye `eo-blog-home` y
+`efeonce-editorial-blocks`); un PHP nuevo tarda 1–2 min en llegar a PHP-FPM. Rendimiento con el perfil móvil de
+Lighthouse: hero a 3,4–3,8 s, comparable al sitio; el banner de cookies es el LCP en móvil (10–17 s), seguimiento de
+sitio. La entrada 249766 tiene categoría primaria Yoast 204, que no existe (hallazgo de TASK-2050).
 
 ## 2026-10-24 — Nosotros: fidelidad, rieles de Ohio, mapa y wordmark HubSpot (en vivo)
 
