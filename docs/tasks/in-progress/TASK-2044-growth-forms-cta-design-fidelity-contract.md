@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `Code complete 2026-10-23; contrato verificado idéntico contra producción para 4 formularios vivos; primer consumidor publicado (formulario efeonce-partner-application + CTA partners-become-partner). Rollout pendiente: llega a los runtimes con el push de develop y el release a main (no autorizado aún)`
+- Status real: `Released 2026-10-24 (forms 1.2.0 / CTA 1.4.0 en producción); primer consumidor en vivo: popup «Quiero ser partner» en /partnership/ (diálogo verificado 1440/390). Pendiente para cerrar: smoke de envío real (Turnstile + HubSpot, requiere OK del operador) y GTM DLV + dimensión GA4 activation_mode.`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms`
 - Blocked by: `none`
