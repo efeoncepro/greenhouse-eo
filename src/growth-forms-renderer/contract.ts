@@ -259,6 +259,20 @@ export interface RendererTelemetryPolicy {
   fieldLevelAnalyticsDisabled?: boolean
 }
 
+/** TASK-2053 — Presentación del formulario completo (espejo de `FORM_PRESENTATIONS`). */
+export type RendererFormPresentation = 'inline_pill'
+
+/** TASK-2053 — Etiquetas de la píldora; las que falten salen del diccionario del locale. */
+export interface RendererInlinePillDisplay {
+  openLabel?: string
+  submitLabel?: string
+  successLabel?: string
+  doneLabel?: string
+  waitlistSuccessLabel?: string
+  waitlistDoneLabel?: string
+  note?: string
+}
+
 export interface RenderContract {
   contractVersion: string
   form: {
@@ -279,6 +293,8 @@ export interface RenderContract {
   consent?: RendererConsentDisplay
   successBehavior: RendererSuccessBehavior
   styleVariant?: string
+  presentation?: RendererFormPresentation
+  inlinePill?: RendererInlinePillDisplay
   surfacePolicy: RendererSurfacePolicy
   security?: RendererSecurity
   telemetryPolicy: RendererTelemetryPolicy

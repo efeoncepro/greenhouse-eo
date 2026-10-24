@@ -603,6 +603,39 @@ export const renderStepSchema = z.object({
 })
 export type RenderStep = z.infer<typeof renderStepSchema>
 
+/**
+ * TASK-2053 — Presentación del formulario completo (ortogonal a `styleVariant`, que tematiza).
+ *   - ausente (o `standard` en la versión): el formulario de siempre; el contrato no lleva la clave.
+ *   - `inline_pill`: un botón píldora que se estira en el campo de correo con su botón de envío y
+ *     confirma en el mismo lugar (portada del blog v3, canvas aprobado 2026-10-24). Sólo admite un
+ *     campo visible de correo (más campos ocultos) y un consentimiento de aviso, sin casillas.
+ */
+export const FORM_PRESENTATIONS = ['inline_pill'] as const
+export type FormPresentation = (typeof FORM_PRESENTATIONS)[number]
+
+export const INLINE_PILL_LABEL_MAX = 80
+export const INLINE_PILL_NOTE_MAX = 280
+
+const inlinePillLabel = z.string().trim().min(1).max(INLINE_PILL_LABEL_MAX)
+
+/**
+ * TASK-2053 — Etiquetas de la presentación en línea. Todas opcionales: el renderer usa las del
+ * diccionario de su locale según `formKind` cuando faltan. Cruzan al browser tal cual, así que son
+ * strings acotados y sin HTML (el compiler bloquea `<`/`>`). `note` admite un único `{privacyLink}`.
+ */
+export const inlinePillDisplaySchema = z
+  .object({
+    openLabel: inlinePillLabel.optional(),
+    submitLabel: inlinePillLabel.optional(),
+    successLabel: inlinePillLabel.optional(),
+    doneLabel: inlinePillLabel.optional(),
+    waitlistSuccessLabel: inlinePillLabel.optional(),
+    waitlistDoneLabel: inlinePillLabel.optional(),
+    note: z.string().trim().min(1).max(INLINE_PILL_NOTE_MAX).optional()
+  })
+  .strict()
+export type InlinePillDisplay = z.infer<typeof inlinePillDisplaySchema>
+
 export const renderContractSchema = z.object({
   contractVersion: z.literal(CONTRACT_VERSION),
   form: z.object({
@@ -623,6 +656,9 @@ export const renderContractSchema = z.object({
   consent: consentDisplaySchema.optional(),
   successBehavior: successBehaviorSchema,
   styleVariant: z.string().optional(),
+  /** TASK-2053 — ausente = presentación estándar (los contratos publicados no cambian). */
+  presentation: z.enum(FORM_PRESENTATIONS).optional(),
+  inlinePill: inlinePillDisplaySchema.optional(),
   surfacePolicy: z.object({
     surfaceId: z.string().optional(),
     allowedOrigins: z.array(z.string()).default([]),

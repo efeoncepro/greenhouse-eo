@@ -18,7 +18,12 @@ import {
   type SubmissionContract,
   CONSENT_PRIVACY_LINK_MARKER,
   type ConsentDisplay,
+  type FormPresentation,
+  type InlinePillDisplay,
+  type SuccessBehavior,
+  FORM_PRESENTATIONS,
   consentDisplaySchema,
+  inlinePillDisplaySchema,
   destinationPlanEntrySchema,
   fieldDefinitionSchema,
   renderSecuritySchema,
@@ -166,6 +171,109 @@ const validateConsentPrivacyLink = (consent: ConsentDisplay | null): CompileWarn
 }
 
 /**
+ * TASK-2053 — Presentación `inline_pill`. Se declara en `ui_policy.presentation` (+ `ui_policy.inlinePill`).
+ * Sin la clave (o con `standard`) el contrato no la lleva: ninguna versión existente cambia de contrato
+ * ni de veredicto. Con `inline_pill` la forma del formulario queda acotada a lo que la píldora sabe
+ * dibujar; todo lo demás bloquea en vez de degradar en silencio.
+ */
+interface ResolvedPresentation {
+  presentation?: FormPresentation
+  inlinePill?: InlinePillDisplay
+  warnings: CompileWarning[]
+}
+
+const presentationBlock = (code: string, message: string): CompileWarning => ({
+  code,
+  dimension: 'policy',
+  message,
+  blocking: true,
+})
+
+const validateInlinePillNote = (note: string | undefined, consent: ConsentDisplay | null): CompileWarning[] => {
+  if (!note) return []
+
+  const warnings: CompileWarning[] = []
+  const tokens: string[] = note.match(CONSENT_TOKEN_PATTERN) ?? []
+
+  if (/[<>]/.test(note)) warnings.push(presentationBlock('inline_pill_note_html', 'inlinePill.note no admite HTML'))
+
+  if (tokens.some(token => token !== CONSENT_PRIVACY_LINK_MARKER)) {
+    warnings.push(presentationBlock('inline_pill_note_marker_unknown', `inlinePill.note sólo admite ${CONSENT_PRIVACY_LINK_MARKER}`))
+  }
+
+  if (tokens.filter(token => token === CONSENT_PRIVACY_LINK_MARKER).length > 1) {
+    warnings.push(presentationBlock('inline_pill_note_marker_repeated', `${CONSENT_PRIVACY_LINK_MARKER} va una sola vez en inlinePill.note`))
+  }
+
+  if (tokens.includes(CONSENT_PRIVACY_LINK_MARKER) && !consent?.privacyUrl) {
+    warnings.push(presentationBlock('inline_pill_note_without_privacy_url', `${CONSENT_PRIVACY_LINK_MARKER} en inlinePill.note exige privacyUrl`))
+  }
+
+  return warnings
+}
+
+const resolvePresentation = (
+  uiPolicy: Record<string, unknown>,
+  context: {
+    fields: FieldDefinition[]
+    composition: CompositionMode
+    consent: ConsentDisplay | null
+    successBehavior: SuccessBehavior | null
+  },
+): ResolvedPresentation => {
+  const raw = uiPolicy.presentation
+
+  if (raw === undefined || raw === null || raw === 'standard') {
+    return 'inlinePill' in uiPolicy
+      ? { warnings: [presentationBlock('inline_pill_labels_without_presentation', 'ui_policy.inlinePill exige presentation=inline_pill')] }
+      : { warnings: [] }
+  }
+
+  if (typeof raw !== 'string' || !(FORM_PRESENTATIONS as readonly string[]).includes(raw)) {
+    return { warnings: [presentationBlock('presentation_unknown', 'ui_policy.presentation no es una presentación conocida')] }
+  }
+
+  const warnings: CompileWarning[] = []
+  const labels = inlinePillDisplaySchema.safeParse(uiPolicy.inlinePill ?? {})
+
+  if (!labels.success) {
+    warnings.push(presentationBlock('inline_pill_labels_invalid', 'ui_policy.inlinePill no valida el contrato (etiquetas acotadas, sin claves extra)'))
+  } else {
+    const labelValues = Object.entries(labels.data).filter(([key]) => key !== 'note').map(([, value]) => value)
+
+    if (labelValues.some(value => typeof value === 'string' && /[<>{}]/.test(value))) {
+      warnings.push(presentationBlock('inline_pill_label_markup', 'las etiquetas de inlinePill no admiten HTML ni marcadores'))
+    }
+
+    warnings.push(...validateInlinePillNote(labels.data.note, context.consent))
+  }
+
+  if (context.composition !== 'static') {
+    warnings.push(presentationBlock('inline_pill_composition', 'inline_pill sólo admite composition=static'))
+  }
+
+  const visible = context.fields.filter(field => field.type !== 'hidden')
+
+  if (visible.length !== 1 || visible[0].type !== 'email' || visible[0].required !== true) {
+    warnings.push(presentationBlock('inline_pill_fields', 'inline_pill exige exactamente un campo visible type=email requerido (más campos ocultos)'))
+  }
+
+  if (context.consent && context.consent.checkboxes.length > 0) {
+    warnings.push(presentationBlock('inline_pill_consent_checkboxes', 'inline_pill no dibuja casillas: el consentimiento va como aviso (inlinePill.note)'))
+  }
+
+  if (context.successBehavior?.kind === 'redirect' || context.successBehavior?.presentation === 'success_card') {
+    warnings.push(presentationBlock('inline_pill_success_behavior', 'inline_pill confirma en la píldora: no admite redirect ni success_card'))
+  }
+
+  return {
+    presentation: 'inline_pill',
+    ...(labels.success && Object.keys(labels.data).length > 0 ? { inlinePill: labels.data } : {}),
+    warnings,
+  }
+}
+
+/**
  * Compila la versión. `forPublication=true` aplica el gate completo (errores
  * bloquean). `forPublication=false` (preview/draft) compila best-effort y reporta
  * warnings sin bloquear el render.
@@ -310,6 +418,16 @@ export const compileFormVersion = (
     })
   }
 
+  // — Presentación del formulario (TASK-2053) —
+  const resolvedPresentation = resolvePresentation(uiPolicy, {
+    fields,
+    composition,
+    consent: consentDisplay.success ? consentDisplay.data : null,
+    successBehavior: successParsed.success ? successParsed.data : null,
+  })
+
+  resolvedPresentation.warnings.forEach(addWarning)
+
   // — Render contract (browser-safe) —
   const renderContract: RenderContract | null = successParsed.success
     ? {
@@ -334,6 +452,8 @@ export const compileFormVersion = (
         consent: consentDisplay.success ? consentDisplay.data : undefined,
         successBehavior: successParsed.data,
         styleVariant: version.style_variant ?? undefined,
+        ...(resolvedPresentation.presentation ? { presentation: resolvedPresentation.presentation } : {}),
+        ...(resolvedPresentation.inlinePill ? { inlinePill: resolvedPresentation.inlinePill } : {}),
         surfacePolicy: {
           allowedOrigins: [],
           rendererChannel: 'stable',

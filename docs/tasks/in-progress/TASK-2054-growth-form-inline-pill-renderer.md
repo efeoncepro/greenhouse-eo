@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2054-growth-form-inline-pill-renderer-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `En implementación local (Slice 1)`
 - Rank: `TBD`
 - Domain: `growth|forms|ui`
 - Blocked by: `TASK-2053 (Slice 1)`

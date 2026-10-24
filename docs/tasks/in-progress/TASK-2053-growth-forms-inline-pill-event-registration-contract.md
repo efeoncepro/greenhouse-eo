@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `En implementación local (Slice 1)`
 - Rank: `TBD`
 - Domain: `growth|forms|public-site`
 - Blocked by: `none`
