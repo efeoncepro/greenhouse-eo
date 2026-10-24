@@ -28,7 +28,7 @@ if ( true !== $zip->open( $args[0] ) ) { WP_CLI::error( 'Invalid ZIP.' ); }
 require_once ABSPATH . 'wp-admin/includes/plugin.php';
 if ( ! is_plugin_active( 'efeonce-editorial-blocks/efeonce-editorial-blocks.php' ) ) { WP_CLI::error( 'efeonce-editorial-blocks is not active on this site: this release only updates an active plugin.' ); }
 $root    = WP_PLUGIN_DIR . '/efeonce-editorial-blocks/';
-$allowed = '#^(efeonce-editorial-blocks\.php|readme\.txt|src/glitch-drop/(block\.json|index\.js|render\.php|style\.css|glitch-mark\.svg)|includes/content-model/(bootstrap\.php|class-eo-[a-z-]+\.php|assets/[a-z-]+\.js)|includes/faq/(class-eo-faq\.php|faq\.css|faq\.js))$#';
+$allowed = '#^(efeonce-editorial-blocks\.php|readme\.txt|src/glitch-drop/(block\.json|index\.js|render\.php|style\.css|glitch-mark\.svg)|includes/content-model/(bootstrap\.php|class-eo-[a-z-]+\.php|assets/[a-z-]+\.js)|includes/faq/(class-eo-faq\.php|faq\.css|faq\.js)|includes/editorial/(class-eo-editorial-styles\.php|editorial\.css|ohio-host\.css))$#';
 $main    = 'efeonce-editorial-blocks.php';
 $files   = array();
 foreach ( $manifest['files'] as $entry ) {

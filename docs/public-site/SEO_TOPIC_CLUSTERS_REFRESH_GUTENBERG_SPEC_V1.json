@@ -56,8 +56,12 @@
      ]
     },
     {
+     "kind": "pullquote",
+     "text": "Dejas de escribir por palabra clave y empiezas a escribir por tema."
+    },
+    {
      "kind": "paragraph",
-     "text": "Dicho de otro modo: dejas de escribir por palabra clave y empiezas a escribir por tema. La palabra clave sigue importando, pero como una pregunta dentro de un tema que quieres que te reconozcan."
+     "text": "La palabra clave sigue importando, pero como una pregunta dentro de un tema que quieres que te reconozcan."
     }
    ]
   },
@@ -295,7 +299,8 @@
         "text": " Agrupa en Search Console las búsquedas del cluster y míralas juntas: posiciones, impresiones y clics del tema completo. Suma las menciones y citas en asistentes de IA."
        }
       ]
-     ]
+     ],
+     "style": "steps"
     }
    ]
   },
@@ -358,7 +363,8 @@
         "text": "este mismo, para quien necesita ordenar su SEO por temas."
        }
       ]
-     ]
+     ],
+     "style": "box"
     },
     {
      "kind": "paragraph",
@@ -403,7 +409,8 @@
       "enabled": true,
       "name": "Preguntas frecuentes sobre topic clusters",
       "canonicalUrl": "https://efeoncepro.com/inbound/seo-inbound-marketing/",
-      "inLanguage": "es-CL"
+      "inLanguage": "es-CL",
+      "source": "plugin"
      },
      "items": [
       {
@@ -461,7 +468,11 @@
    "blocks": [
     {
      "kind": "paragraph",
-     "text": "Un topic cluster es la forma de decirle a Google, a la IA y a tu cliente que sabes de un tema: una página pilar que lo explica, artículos que responden cada pregunta y enlaces que los unen. No se trata de publicar más, sino de ordenar mejor lo que publicas."
+     "text": "Un topic cluster es la forma de decirle a Google, a la IA y a tu cliente que sabes de un tema: una página pilar que lo explica, artículos que responden cada pregunta y enlaces que los unen."
+    },
+    {
+     "kind": "pullquote",
+     "text": "No se trata de publicar más, sino de ordenar mejor lo que publicas."
     },
     {
      "kind": "list",
@@ -493,7 +504,8 @@
         "text": ", gratuito."
        }
       ]
-     ]
+     ],
+     "style": "box"
     }
    ]
   },

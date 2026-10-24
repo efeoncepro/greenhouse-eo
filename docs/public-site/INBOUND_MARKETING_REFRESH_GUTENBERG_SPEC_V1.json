@@ -58,10 +58,14 @@
      ]
     },
     {
+     "kind": "pullquote",
+     "text": "El inbound no es una táctica ni un canal. Es un orden de prioridades."
+    },
+    {
      "kind": "paragraph",
      "text": [
       {
-       "text": "Dicho de otro modo: el inbound no es una táctica ni un canal. Es un orden de prioridades. Primero entender qué necesita tu "
+       "text": "Primero entender qué necesita tu "
       },
       {
        "text": "cliente ideal",
@@ -150,7 +154,8 @@
      "alt": "Diagrama del Messy Middle: un detonante lleva a un bucle entre exploración y evaluación, dentro de la exposición a la marca, que termina en la compra y la experiencia.",
      "width": 520,
      "height": 520,
-     "caption": "El Messy Middle según Google: entre el detonante y la compra, las personas exploran y evalúan en bucle. Ilustración Efeonce."
+     "caption": "El Messy Middle según Google: entre el detonante y la compra, las personas exploran y evalúan en bucle. Ilustración Efeonce.",
+     "align": "center"
     },
     {
      "kind": "paragraph",
@@ -257,7 +262,8 @@
      "alt": "Flywheel de inbound marketing: atraer, interactuar y deleitar alrededor del crecimiento, que convierte desconocidos en prospectos, clientes y promotores.",
      "width": 520,
      "height": 520,
-     "caption": "El flywheel: los clientes satisfechos impulsan el siguiente giro. Ilustración Efeonce."
+     "caption": "El flywheel: los clientes satisfechos impulsan el siguiente giro. Ilustración Efeonce.",
+     "align": "center"
     },
     {
      "kind": "paragraph",
@@ -475,11 +481,20 @@
         "text": "."
        }
       ]
-     ]
+     ],
+     "style": "box"
     },
     {
      "kind": "paragraph",
-     "text": "Hasta aquí podemos decir algo con seguridad: el inbound que sólo se mide en visitas al blog va a mostrar números cada vez más bajos, aunque esté funcionando. La medición también tiene que cambiar."
+     "text": "Hasta aquí podemos decir algo con seguridad:"
+    },
+    {
+     "kind": "pullquote",
+     "text": "El inbound que sólo se mide en visitas al blog va a mostrar números cada vez más bajos, aunque esté funcionando."
+    },
+    {
+     "kind": "paragraph",
+     "text": "La medición también tiene que cambiar."
     },
     {
      "kind": "paragraph",
@@ -638,7 +653,8 @@
         "text": "."
        }
       ]
-     ]
+     ],
+     "style": "steps"
     }
    ]
   },
@@ -803,7 +819,8 @@
       "enabled": true,
       "name": "Preguntas frecuentes sobre inbound marketing",
       "canonicalUrl": "https://efeoncepro.com/inbound/que-es-inbound-marketing/",
-      "inLanguage": "es-CL"
+      "inLanguage": "es-CL",
+      "source": "plugin"
      },
      "items": [
       {
@@ -904,7 +921,8 @@
         "text": ", gratuito."
        }
       ]
-     ]
+     ],
+     "style": "box"
     }
    ]
   },

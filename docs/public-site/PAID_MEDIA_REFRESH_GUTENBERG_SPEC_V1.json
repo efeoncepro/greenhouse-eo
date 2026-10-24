@@ -345,20 +345,19 @@
      "alt": "Diagrama del Messy Middle: un detonante lleva a un bucle entre exploración y evaluación, dentro de la exposición a la marca, que termina en la compra y la experiencia.",
      "width": 520,
      "height": 520,
-     "caption": "El Messy Middle según Google: la publicidad puede ponerte en la lista; el contenido gana la evaluación. Ilustración Efeonce."
+     "caption": "El Messy Middle según Google: la publicidad puede ponerte en la lista; el contenido gana la evaluación. Ilustración Efeonce.",
+     "align": "center"
+    },
+    {
+     "kind": "pullquote",
+     "text": "La publicidad compra la primera mirada; el contenido gana la decisión.",
+     "cite": "Cómo lo pensamos en Efeonce"
     },
     {
      "kind": "paragraph",
      "text": [
       {
-       "text": "En Efeonce lo pensamos así: "
-      },
-      {
-       "text": "la publicidad compra la primera mirada; el contenido gana la decisión.",
-       "strong": true
-      },
-      {
-       "text": " Por eso no separamos «la agencia que hace pauta» de «la que hace contenido»: el "
+       "text": "Por eso, en Efeonce, no separamos «la agencia que hace pauta» de «la que hace contenido»: el "
       },
       {
        "text": "performance marketing",
@@ -420,7 +419,15 @@
     },
     {
      "kind": "paragraph",
-     "text": "¿Qué significa? Que la máquina decide cada vez más dónde y a quién mostrar el anuncio. Lo que tú controlas es la calidad de lo que le das: creatividades, páginas de destino, contenido y, sobre todo, datos de conversión reales. Si la plataforma aprende de formularios basura, optimiza hacia más formularios basura."
+     "text": "¿Qué significa? Que la máquina decide cada vez más dónde y a quién mostrar el anuncio."
+    },
+    {
+     "kind": "pullquote",
+     "text": "Lo que tú controlas es la calidad de lo que le das: creatividades, páginas de destino, contenido y datos de conversión reales."
+    },
+    {
+     "kind": "paragraph",
+     "text": "Si la plataforma aprende de formularios basura, optimiza hacia más formularios basura."
     },
     {
      "kind": "paragraph",
@@ -586,7 +593,8 @@
         "text": "."
        }
       ]
-     ]
+     ],
+     "style": "steps"
     }
    ]
   },
@@ -653,7 +661,8 @@
       "Apagar el contenido «porque la pauta funciona», hasta el día en que sube el costo por clic.",
       "Usar la misma creatividad para todos los canales y todas las etapas.",
       "Alimentar las campañas automáticas con conversiones que no significan negocio."
-     ]
+     ],
+     "style": "box"
     },
     {
      "kind": "paragraph",
@@ -682,7 +691,8 @@
       "enabled": true,
       "name": "Preguntas frecuentes sobre paid media",
       "canonicalUrl": "https://efeoncepro.com/marketing-digital/inbound-marketing-paid-media/",
-      "inLanguage": "es-CL"
+      "inLanguage": "es-CL",
+      "source": "plugin"
      },
      "items": [
       {
@@ -772,7 +782,8 @@
         "text": ", gratuito."
        }
       ]
-     ]
+     ],
+     "style": "box"
     }
    ]
   },

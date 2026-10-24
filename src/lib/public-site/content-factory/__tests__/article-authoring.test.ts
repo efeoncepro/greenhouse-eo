@@ -446,6 +446,51 @@ describe('authorGutenbergDraft', () => {
     expect(inlineContent).toContain('"@type": "FAQPage"')
   })
 
+  it('emits the Efeonce editorial styles for pullquotes, steps, boxes and centered images', () => {
+    const draft = authorGutenbergDraft({
+      ...kungFuSpec,
+      sections: [
+        {
+          heading: 'Composición editorial',
+          level: 2,
+          blocks: [
+            { kind: 'pullquote', text: 'La publicidad compra la primera mirada; el contenido gana la decisión.', cite: 'Efeonce' },
+            { kind: 'list', ordered: true, style: 'steps', items: ['Uno.', 'Dos.'] },
+            { kind: 'list', style: 'box', items: ['Glitch', 'AI Visibility Report'] },
+            {
+              kind: 'image',
+              mediaId: 244955,
+              url: 'https://efeoncepro.com/wp-content/uploads/2024/10/messy-middle.svg',
+              alt: 'Diagrama del Messy Middle',
+              width: 520,
+              height: 520,
+              align: 'center'
+            }
+          ]
+        },
+        ...kungFuSpec.sections
+      ]
+    })
+
+    const content = draft.draft.kind === 'gutenberg_post' ? draft.draft.postContent : ''
+
+    expect(content).toContain('<!-- wp:pullquote {"className":"is-style-efeonce-destacado"} -->')
+    expect(content).toContain('<figure class="wp-block-pullquote is-style-efeonce-destacado"><blockquote><p>')
+    expect(content).toContain('<cite>Efeonce</cite></blockquote>')
+    expect(content).toContain('<!-- wp:list {"ordered":true,"className":"is-style-efeonce-pasos"} -->\n<ol class="is-style-efeonce-pasos">')
+    expect(content).toContain('<!-- wp:list {"className":"is-style-efeonce-recuadro"} -->\n<ul class="is-style-efeonce-recuadro">')
+    expect(content).toContain('"linkDestination":"none","align":"center"} -->\n<figure class="wp-block-image aligncenter size-large">')
+    expect(validateGeneratedGutenbergDraft(draft).status).toBe('pass')
+
+    const steps = (ordered: boolean) =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [{ heading: 'Pasos', level: 2, blocks: [{ kind: 'list', ordered, style: 'steps', items: ['Uno.'] }] }, ...kungFuSpec.sections]
+      })
+
+    expect(() => steps(false)).toThrow('content_factory_article_list_steps_requires_ordered')
+  })
+
   it('rejects a FAQ that repeats a question', () => {
     expect(() =>
       authorGutenbergDraft({

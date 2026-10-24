@@ -87,7 +87,11 @@ export const GUTENBERG_BUTTONS_MAX_ITEMS = 3
 
 export type GutenbergArticleBlock =
   | { kind: 'paragraph'; text: GutenbergRichText }
-  | { kind: 'list'; items: GutenbergRichText[]; ordered?: boolean }
+  /**
+   * `style` = Efeonce editorial list styles (efeonce-editorial-blocks ≥ 0.4.0): `steps` («Pasos», numbered steps,
+   * ordered lists only) and `box` («Recuadro», a tinted panel for a short set worth seeing at once).
+   */
+  | { kind: 'list'; items: GutenbergRichText[]; ordered?: boolean; style?: 'steps' | 'box' }
   | { kind: 'details'; summary: string; blocks: GutenbergArticleBlock[]; open?: boolean; className?: string }
   | { kind: 'faq'; items: GutenbergFaqItem[]; schema?: GutenbergFaqSchemaOptions }
   | {
@@ -99,7 +103,8 @@ export type GutenbergArticleBlock =
       style?: 'stripes'
     }
   | { kind: 'quote'; text: string }
-  | { kind: 'pullquote'; text: string }
+  /** Rendered with the «Destacado Efeonce» style (efeonce-editorial-blocks ≥ 0.4.0); `cite` = optional source line. */
+  | { kind: 'pullquote'; text: string; cite?: string }
   | { kind: 'separator' }
   // Media requires a real WordPress asset — never invent ids/urls.
   | {
@@ -112,6 +117,8 @@ export type GutenbergArticleBlock =
       sizeSlug?: string
       caption?: GutenbergRichText
       linkDestination?: 'none' | 'media'
+      /** `center` for images narrower than the column (diagrams, square illustrations). */
+      align?: 'center'
       /** Optional art-directed sources. The fallback attachment remains the Gutenberg image owner. */
       sources?: Array<{ url: string; media: string; type?: 'image/webp' | 'image/jpeg' | 'image/png' }>
     }
@@ -216,12 +223,34 @@ const normalizePlainText = (value: string): string => value.replace(/\s+/g, ' ')
 const paragraphBlock = (text: GutenbergRichText): string =>
   ['<!-- wp:paragraph -->', `<p>${renderRichText(text)}</p>`, '<!-- /wp:paragraph -->'].join('\n')
 
-const listBlock = (items: GutenbergRichText[], ordered = false): string => {
+/** Efeonce editorial block styles registered by efeonce-editorial-blocks ≥ 0.4.0. */
+export const EDITORIAL_STYLE_CLASS = {
+  pullquote: 'is-style-efeonce-destacado',
+  steps: 'is-style-efeonce-pasos',
+  box: 'is-style-efeonce-recuadro'
+} as const
+
+const listBlock = (items: GutenbergRichText[], ordered = false, style?: 'steps' | 'box'): string => {
+  if (style === 'steps' && !ordered) {
+    throw new Error('content_factory_article_list_steps_requires_ordered')
+  }
+
+  if (style !== undefined && style !== 'steps' && style !== 'box') {
+    throw new Error('content_factory_article_list_style_invalid')
+  }
+
   const tag = ordered ? 'ol' : 'ul'
   const lis = items.map(item => `<li>${renderRichText(item)}</li>`).join('')
-  const attr = ordered ? ' {"ordered":true}' : ''
+  const className = style ? EDITORIAL_STYLE_CLASS[style] : undefined
+  const attrs: Record<string, unknown> = {}
 
-  return [`<!-- wp:list${attr} -->`, `<${tag}>${lis}</${tag}>`, '<!-- /wp:list -->'].join('\n')
+  if (ordered) attrs.ordered = true
+  if (className) attrs.className = className
+
+  const attr = Object.keys(attrs).length ? ` ${JSON.stringify(attrs)}` : ''
+  const open = className ? `<${tag} class="${className}">` : `<${tag}>`
+
+  return [`<!-- wp:list${attr} -->`, `${open}${lis}</${tag}>`, '<!-- /wp:list -->'].join('\n')
 }
 
 const tableBlock = (block: Extract<GutenbergArticleBlock, { kind: 'table' }>): string => {
@@ -425,12 +454,16 @@ const quoteBlock = (text: string): string =>
     '<!-- /wp:quote -->'
   ].join('\n')
 
-const pullquoteBlock = (text: string): string =>
-  [
-    '<!-- wp:pullquote -->',
-    `<figure class="wp-block-pullquote"><blockquote><p>${escapeGutenbergHtml(text)}</p></blockquote></figure>`,
+const pullquoteBlock = (text: string, cite?: string): string => {
+  const className = EDITORIAL_STYLE_CLASS.pullquote
+  const source = cite?.trim() ? `<cite>${escapeGutenbergHtml(cite.trim())}</cite>` : ''
+
+  return [
+    `<!-- wp:pullquote {"className":"${className}"} -->`,
+    `<figure class="wp-block-pullquote ${className}"><blockquote><p>${escapeGutenbergHtml(text)}</p>${source}</blockquote></figure>`,
     '<!-- /wp:pullquote -->'
   ].join('\n')
+}
 
 const separatorBlock = (): string =>
   [
@@ -479,9 +512,16 @@ const imageBlock = (block: Extract<GutenbergArticleBlock, { kind: 'image' }>): s
       ? `<a href="${escapeGutenbergHtml(block.url)}">${responsiveImage}</a>`
       : responsiveImage
 
+  if (block.align !== undefined && block.align !== 'center') {
+    throw new Error('content_factory_article_image_align_invalid')
+  }
+
+  const align = block.align === 'center' ? ',"align":"center"' : ''
+  const alignClass = block.align === 'center' ? ' aligncenter' : ''
+
   return [
-    `<!-- wp:image {"id":${block.mediaId},"sizeSlug":"${sizeSlug}","linkDestination":"${linkDestination}"} -->`,
-    `<figure class="wp-block-image size-${sizeSlug}">${media}${caption}</figure>`,
+    `<!-- wp:image {"id":${block.mediaId},"sizeSlug":"${sizeSlug}","linkDestination":"${linkDestination}"${align}} -->`,
+    `<figure class="wp-block-image${alignClass} size-${sizeSlug}">${media}${caption}</figure>`,
     '<!-- /wp:image -->'
   ].join('\n')
 }
@@ -594,7 +634,7 @@ const renderArticleBlock = (
     case 'paragraph':
       return paragraphBlock(block.text)
     case 'list':
-      return listBlock(block.items, block.ordered)
+      return listBlock(block.items, block.ordered, block.style)
     case 'details':
       return detailsBlock(block, context)
     case 'faq':
@@ -604,7 +644,7 @@ const renderArticleBlock = (
     case 'quote':
       return quoteBlock(block.text)
     case 'pullquote':
-      return pullquoteBlock(block.text)
+      return pullquoteBlock(block.text, block.cite)
     case 'separator':
       return separatorBlock()
     case 'image':
