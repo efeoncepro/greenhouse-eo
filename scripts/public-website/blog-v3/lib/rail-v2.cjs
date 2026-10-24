@@ -29,6 +29,12 @@ const RAIL_ASSETS = {
 }
 
 const CSS = `.rail{scroll-padding-left:max(0px,calc((100% - 1280px)/2))}
+/* Room for the hover lift, tilt and glow above and below: the rail scrolls sideways, which clips it vertically
+   (operator, 2026-10-24). The negative margins keep the layout where it was. */
+.rail:has(.rc){padding-top:48px;margin-top:-48px;padding-bottom:96px;margin-bottom:-72px}
+/* The canvas link rule (.v3 .lnk:hover{color:inherit}) would hand the section's navy to the text of dark cards. */
+.lnk.rc.rc--navy:is(:hover,:focus-visible,:active),.lnk.rc.rc--blue:is(:hover,:focus-visible,:active),.lnk.rc.rc--ink:is(:hover,:focus-visible,:active){color:#ffffff}
+.lnk.rc.rc--paper:is(:hover,:focus-visible,:active){color:#023c70}
 .rc{position:relative;flex:none;scroll-snap-align:start;width:440px;height:600px;border-radius:32px;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:transform 300ms cubic-bezier(0.2,0,0,1),box-shadow 300ms cubic-bezier(0.2,0,0,1)}
 .rc--navy{background:#001a33;color:#ffffff}
 .rc--blue{background:#023c70;color:#ffffff}
