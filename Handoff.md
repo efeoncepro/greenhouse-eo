@@ -2,19 +2,18 @@
 
 [Historial](Handoff.archive.md).
 
-## 2026-10-24 — Archivo del blog v3 (TASK-2055): en curso, local-first
+## 2026-10-24 — Archivo del blog v3 (TASK-2055): en producción
 
-Dirección D «Órbita + Índice» aprobada por el operador en el canvas «Portada Blog Efeonce» (v75; copia en
-`docs/ui/visual-directions/TASK-2055-blog-archive-v3/`). TASK-2055 en curso: plantilla en `eo-blog-home` con
-`template_include` detrás de `eo_blog_archive_enabled`, datos por `EO_Archive_Adapter` en `efeonce-editorial-blocks`
-(coordinar turno con la sesión de Analytics), búsqueda limitada a entradas, 404 para autores sin publicaciones, robots
-por vista. Decisiones del operador: descripciones de los seis temas con ≥ 4 publicaciones (redacta Claude, aprueba el
-operador), corregir el `sameAs` de su perfil (hoy `instagram`/`linkedin` = cesargrowth) con su visto bueno. Sin cambios en
-vivo todavía. **Code complete local** (runtime `21d7cad`, `85612b7`; Greenhouse `41c2ac963`, `473fc121b`, `07ca13cc1`):
-equivalencia 6/6, paridad PHP 36/36, gate 44/44 ≤ 1 % en el shell real, sin desborde 320–1920, axe 0. El `sameAs`
-cesargrowth es la cuenta real del operador (sin corrección). Pendiente: aprobar las descripciones
-(`docs/ui/visual-directions/TASK-2055-blog-archive-v3/descripciones-temas.md`), turno con Analytics, despliegue con
-`eo_blog_archive_enabled = preview` y luego `1`. Preview local: `node scripts/public-website/blog-archive/preview/serve.cjs`.
+**Búsqueda, temas, etiquetas y autores de efeoncepro.com sirven el «Archivo del blog» desde el 2026-10-24 ~18:20 UTC**
+(`eo_blog_archive_enabled = 1`): dirección D aprobada (canvas «Portada Blog Efeonce» v75), plantilla en `eo-blog-home`
+(`EOBH_Archive`, runtime `2c2cfbb`), datos por `EO_Archive_Adapter` (`efeonce-editorial-blocks`), seis descripciones de
+temas aprobadas y cargadas. Verificado en vivo: matriz HTTP/robots/canonical/schema, sin desborde ni palabras cortadas de
+320 a 1920, axe 0, `/blog/` verify verde, post con FAQ intacto. Rollback: `pnpm public-website:blog-home archive 0 --apply`.
+Contrato `docs/architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md`; manual `operar-archivo-del-blog.md`.
+Lección: el `header-cap` de 108 px de Ohio sólo existe en archivos (el preview local con el shell de /blog/ no lo ve):
+correr siempre el gate en producción con `archive preview`. Pendientes fuera de alcance: `/wp-json/wp/v2/users` y
+`?author=N`, 404 del sitio, «lecturas» vs «publicaciones» en la órbita. Cierre formal de la task pendiente de los gates
+de repo (`pnpm test`/`pnpm build`); el runtime no se empujó a su remoto (origin/main ya estaba divergido).
 
 ## 2026-10-24 — Partners: popup «Quiero ser partner» en vivo tras el release (TASK-2044/2045)
 
@@ -294,9 +293,3 @@ Glitch, temas, objetivos, recursos y formulario aprobado. Opción 2 de Product D
 No push, CMS write, merge, release, GTM ni envío real. Etapa 2 y validación productiva pendientes.
 Anotaciones del operador atendidas: cabecera limpia, temas centrados, categorías editoriales explícitas, recursos visuales y cierre Glitch protagonista. Runtime `a10c85e`;27 checks y capturas completas1440/390 en `.captures/2026-10-20-blog-annotations/`. Aceptación visual final pendiente; contrato Forms intacto.
 Segunda ronda (`3d9ee81` runtime): sin «Por Efeonce», temas con arte editorial propio y formulario integrado en el navy de Glitch. Evidencia `.captures/2026-10-20-blog-annotations-v2/`;27 checks, contraste/validación negativa local. Todo en develop, sin push/publicación; aceptación visual pendiente.
-
-## 2026-10-20 — Blog: preview en develop; publicación detenida
-
-Operador detuvo el release y pidió conservar el trabajo en develop y revisar diseño. No merge/release a main ni cutover WordPress.
-HubSpot Glitch creado y GTM Web7 ya publicado antes del stop; Forms review y CF7 live. No envío real.
-No retomar publicación sin nueva autorización. [Vista previa y estado](docs/audits/public-site/2026-10-20-blog-growth-form-preparation.md).

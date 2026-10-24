@@ -13,6 +13,8 @@ Ejecución: [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-conten
 [TASK-2051](../../tasks/in-progress/TASK-2051-blog-portada-v3-high-fidelity.md) (portada) · TASK-2053/TASK-2054
 (formulario en línea de Growth Forms)
 
+Segunda plantilla del mismo plugin: [Archivo del blog — runtime V1](BLOG_ARCHIVE_RUNTIME_V1.md) (búsqueda, temas, etiquetas y autores; TASK-2055, en producción desde 2026-10-24).
+
 Funcionamiento: [Portada del blog](../../documentation/public-site/portada-del-blog.md) · Operación:
 [por CLI](../../manual-de-uso/public-site/operar-portada-blog-por-cli.md) y
 [desde WordPress](../../manual-de-uso/public-site/operar-contenido-portada-blog.md)

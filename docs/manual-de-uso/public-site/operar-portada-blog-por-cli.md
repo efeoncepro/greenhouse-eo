@@ -209,6 +209,12 @@ Rollback por capa, del más chico al más grande: `subscription off --apply` (qu
 (vuelve el contenido de ejemplo) → restaurar el `.tar` que imprimió el `deploy` (código anterior) → `page rollback`
 (la página previa al corte).
 
+### Archivo del blog (búsqueda, temas, etiquetas y autores)
+
+El mismo CLI opera la plantilla del archivo (TASK-2055): `archive <0|preview|1> [--apply]` y
+`topic-descriptions <archivo.json> [--apply]`. Paso a paso, estados y problemas comunes en
+[Operar el Archivo del blog](operar-archivo-del-blog.md).
+
 ## Qué significan los estados
 
 | Señal | Significado |

@@ -5,6 +5,12 @@ content model of `efeonce-editorial-blocks` 0.2.0 (PDR-029). Three boards (deskt
 canonical site nav (`EO_SITE_NAV_EXCLUDED_PAGES` empty), `eo_content_model_enabled = 1`, cutover snapshot
 `_gh_blog_home_v3_before_20261024_081327`. Runtime contract: `docs/architecture/public-site/BLOG_HOME_RUNTIME_V1.md`.
 
+**Archive template (TASK-2055, live 2026-10-24):** the same plugin serves search/category/tag/author views with the
+«Archivo del blog» template (`EOBH_Archive`, flag `eo_blog_archive_enabled`, adapter `EO_Archive_Adapter`). CLI:
+`archive <0|preview|1>` and `topic-descriptions <file.json>`. Contract `docs/architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md`.
+A `deploy home` now also ships `templates/archive.php`, `assets/css/eoba-host.css` and `assets/generated/archive*` (allowlist
+extended); pipeline and gates in `scripts/public-website/blog-archive/`.
+
 ## Use the CLI, never ad hoc scripts
 
 `pnpm public-website:blog-home <command>` — manual `docs/manual-de-uso/public-site/operar-portada-blog-por-cli.md`.

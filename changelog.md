@@ -2,6 +2,18 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-24 — Archivo del blog v3 en producción (TASK-2055)
+
+- La búsqueda, los temas, las etiquetas y los autores de efeoncepro.com dejan la plantilla de demo de Ohio y usan el
+  «Archivo del blog» aprobado en el canvas de la portada (dirección D): cabecera de sección con la destacada montada,
+  filtro por formato, filas por año, paginación, otros temas y estados vacíos propios. Sin el recuadro «Hire us!», en
+  español, sin desborde de 320 a 1920.
+- Búsqueda sólo de publicaciones; búsqueda vacía sin inventario; Greenhouse y autores sin publicaciones dan 404; temas
+  indexables sólo con descripción y ≥ 4 publicaciones (seis descripciones aprobadas y cargadas); títulos «X - Blog de Efeonce».
+- Runtime: `eo-blog-home` (`EOBH_Archive`, flag `eo_blog_archive_enabled = 1`) + `EO_Archive_Adapter`; CLI `archive` y
+  `topic-descriptions`. Gates: equivalencia 6/6, paridad PHP 36/36, píxeles 44/44 ≤ 1 %, axe 0.
+  [Runtime](docs/architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md) · [manual](docs/manual-de-uso/public-site/operar-archivo-del-blog.md).
+
 ## 2026-10-24 — Prospección: cierre multicanal y skills conciliadas
 
 - Cinco casos del chat documentados con estados por persona/canal; cinco EMAIL `SENT` corroborados y secuencia sólo
@@ -652,15 +664,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - Cotizador V3 local, catálogo v7: la venta de una persona por dedicación (staff augmentation) pasa del recargo histórico sin piso a margen objetivo por nivel (30 %, 35 % o 40 %) con piso de 25 %, decididos por el CEO. El cotizador marca la línea que queda bajo ese piso. El piso de 45 % de los servicios gestionados no cambia. [Decisión](docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md).
 - Cotizador V3 local: un puntero (`data/pricing/v3-operating/current.json`) nombra el catálogo, la política y el catálogo de créditos vigentes, y `--current` los carga verificados; los comandos dejan de nombrar versiones a mano. El precio unitario de una herramienta deja de vencer y lleva una fecha de revisión que avisa sin bloquear (policy v6). El resumen informa avisos de la corrida (`runNotices`) y qué datos estimados concentran el costo (`estimateExposure`). El costo de personas queda declarado como costo objetivo, no nómina. Documentación, manuales y skills actualizados. [Manual](docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) · [decisión del puntero](docs/architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md).
 - Cotizador V3 local, motor 1.2: el país del cliente ajusta el precio de la parte humana y el país de la persona ajusta el costo; en los mercados con factor menor que 1 el piso de margen se lee sobre el precio del mercado base, y el margen real se informa siempre. Catálogo v5 con los sueldos del Excel declarados como referencia de Chile, factores de talento y de mercado, y España como país. Los contratos anteriores no cambian. [Decisión](docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md).
-
-## 2026-10-10 — Brochure de servicios web y Product Design 360 aprobados
-
-- Cotizador V3 local, motor 1.1: el precio pactado se declara directo y el motor calcula el descuento o el recargo; los precios se redondean hacia arriba por moneda según el catálogo, sin dejar una línea bajo su piso por redondeo. El contrato anterior no cambia y cada cotización guardada se sigue verificando con el motor que la firmó. Catálogo v4 con redondeo, tipos de cambio de cotización y sueldos confirmados. [Decisión](docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md).
-
-- Cotizador V3 local: la CLI reporta cada rechazo con su código desde un registro cerrado (`src/lib/finance/pricing-v3/errors.ts`), `compose prepare|quote` y `replay` imprimen un resumen derivado en vez del resultado completo, y `assess` informa las líneas que el motor marcó bajo el piso de su política. Sin cambios en kernel, códigos de salida ni artefactos congelados. [Delta del ADR](docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md). El precio acordado de SKY social care queda registrado como [excepción al piso de 45 %](docs/commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md).
-
-- Brochure [«Marketing de Contenidos»](ai-generations/2026-10-09_deck-contenidos/deck/LEEME.md) (línea Brand, 57 láminas + ruta corta de 21) aprobado y canonizado: fuente del canvas, PDF rasterizado, patrón «franjas de foto» y láminas a mano registradas en la [norma §4.6](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md); deltas 2026-10-10 en los modelos de [Social Media](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md) y [Media & Distribution](docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md), con las diferencias entre el deck y el modelo como decisiones abiertas.
-
-- [Product Design 360](docs/architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md): aprobada entera por el operador; ADR `Accepted`, [modelo](docs/business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) `Approved`, Wave con seis familias en portfolio, catálogo de servicios, context pack e índice de decisiones; G1–G6 pasan a validación posterior. Sin precios nuevos.
-
-- Brochure [«Servicios web y digitales»](ai-generations/2026-10-09_deck-web-nexa-spark/deck/LEEME.md) (línea Engine, 29 láminas) aprobado y canonizado: fuente del canvas, PDF rasterizado y render; `deck-studio`, [manual](docs/manual-de-uso/creative/componer-deck-con-recetas.md), doc funcional, norma §4.6 y [collateral de Wave](docs/services/wave/README.md). Pendientes de contenido antes de enviarlo a prospectos.

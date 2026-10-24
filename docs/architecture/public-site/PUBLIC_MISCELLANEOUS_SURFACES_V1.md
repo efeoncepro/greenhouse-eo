@@ -1,6 +1,6 @@
 # Public Site Miscellaneous Surfaces V1
 
-Status: **Proposed after live discovery · not implemented**
+Status: **Proposed after live discovery · slices 4–6 implemented for the blog (TASK-2055, live 2026-10-24); 404 (slices 2–3) not implemented**
 
 Owner: Public Site / WordPress
 
@@ -179,7 +179,7 @@ readback. Never full-deploy the runtime repository while `fullRepoDeploySafe=fal
 
 Observed live state of search/category/tag/author on 2026-10-24 (still Ohio's archive template, demo sidebar,
 English copy) and the proposed «Archivo del blog» v3 template: [audit](../../audits/public-site/2026-10-24-blog-search-archive-views.md).
-No task owns slices 4–6 yet.
+Slices 4–6 are owned and implemented by TASK-2055 as the «Archivo del blog» template of `eo-blog-home` (plugin + `template_include` + flag, not child-theme files): [BLOG_ARCHIVE_RUNTIME_V1](BLOG_ARCHIVE_RUNTIME_V1.md). The 404 remains without owner.
 
 1. Resolve or separately own P0 public-content/global-chrome issues.
 2. Persist 2–3 visual directions; accept the first fold for 404 desktop/390.

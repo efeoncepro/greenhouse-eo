@@ -62,7 +62,15 @@ sin barra lateral de demo. Alcance de la búsqueda: entradas y recursos del blog
 
 Recomendación: paso 1 ya (el texto de la demo daña la marca) y paso 2 en una sesión nueva, con su task propia.
 
-## Pendiente
+## Resuelto (2026-10-24, TASK-2055)
+
+Contención y rediseño salieron juntos: la plantilla «Archivo del blog» (dirección D aprobada) está en producción para
+búsqueda, temas, etiquetas y autores. Hallazgos 1–9 cerrados (sin recuadro ni barra lateral de demo, en español, sin la
+categoría del primer resultado sobre el H1, estados vacíos propios, categoría vacía `noindex`, sin desborde a 390,
+Greenhouse 404, sin switcher/riel/cursor). Hallazgo 10: el aire sobre el H1 en móvil es el del diseño; el banner de cookies
+es del sitio. Matriz y evidencia: [BLOG_ARCHIVE_RUNTIME_V1](../../architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md).
+
+## Pendiente (histórico)
 
 - **Decisión del operador (2026-10-24):** no contener por separado; la contención del paso 1 sale junto con el
   rediseño del paso 2, en una sesión nueva.
