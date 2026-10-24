@@ -1,7 +1,7 @@
 # Estilos editoriales del blog (bloques nativos de Gutenberg)
 
 > **Tipo de documento:** Contrato de diseño y uso
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-10-24 por Claude, a partir de la revisión del operador sobre los posts de inbound, paid media y topic clusters
 > **Código:** plugin `efeonce-editorial-blocks` 0.4.0, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`, commit `f9b0d4d`)
 > **Estado:** en producción desde el 2026-10-24 (§En producción)
@@ -29,13 +29,27 @@ La guía de recetas ya pedía bloques de enriquecimiento, pero Ohio no les daba 
 | Recuadro | `core/list` | `is-style-efeonce-recuadro` | Un conjunto corto que conviene ver de una vez: errores frecuentes, «tres cosas», las invitaciones del cierre (Glitch → herramienta, orden de PDR-020) y el mapa de un cluster | `{ "kind": "list", "style": "box" }` |
 | Imagen centrada | `core/image` | `aligncenter` (alineación de core) | Diagramas e ilustraciones más angostos que la columna | `{ "kind": "image", "align": "center" }` |
 
-**Diseño.**
+**Diseño** (desde 0.4.2, revisado con la skill `efeonce-graphic-line` el 2026-10-24).
 
-- Tinta del tema (`#111013`), acento azure de Efeonce (`#0375db`) y un panel claro (`#f3f6fa`).
-- En modo oscuro de Ohio (`body.dark-scheme`): blanco, azure claro (`#6cb4ff`) y un panel translúcido.
-- El Destacado abre con una línea que termina en la esfera de la órbita, va en DM Sans 600 de 24 a 34 px con ancho de
-  34 caracteres, y lleva la fuente opcional en mayúsculas chicas.
-- Los números de Pasos van en DM Sans con cifras tabulares.
+- **Colores sólo de `efeonceGraphicLine`:**
+  - navy `#023c70` para el texto sobre papel y blanco sobre oscuro;
+  - papel `#f7f8f6` para el Recuadro, y el oscuro de Efeonce `#001a33` en modo oscuro;
+  - el acento de la línea del tema del post.
+- **La línea del tema** la publica el plugin en cada post como `--eo-line-on-light` / `--eo-line-on-dark`. Usa la misma
+  regla y el mismo mapa que la portada (`EO_Home_Readers::topic_of` sobre `EO_CM_Util::TOPICS`), así que el artículo y
+  su tarjeta llevan el mismo color. Es la regla de Marketing con Manzanitas: el acento es el de la línea del tema. Sin
+  post (editor u otras páginas), el respaldo es Engine `#0375db`.
+- **El acento sólo va en gráfico (≥ 3:1) o en texto de 24 px o más.** Por eso:
+  - la pregunta de la FAQ queda en navy (blanco en oscuro), y el acento va en el anillo y la ×;
+  - el número de Pasos va a 28 px (24 px en el celular) en el acento, sin disco de fondo.
+- **Sin esferas de adorno.**
+  - El Destacado abre con una barra de 48 × 3 px en el acento, sin esfera. Va en DM Sans 600 de 24 a 34 px, con un
+    ancho de 34 caracteres y la fuente opcional en mayúsculas chicas.
+  - La viñeta del Recuadro es un guion corto en tinta.
+  - El anillo de la FAQ nunca se rellena.
+  - La esfera significa «lo decidido»: va una por pieza y nunca como viñeta.
+- **La tipografía sigue la del artículo de Ohio** (DM Sans e Inter). Pasar a Bricolage y Poppins queda para cuando se
+  migre la plantilla completa del artículo (decisión del operador, 2026-10-24).
 
 ## Ajustes de Ohio (`ohio-host.css`, sólo en el sitio)
 
@@ -53,8 +67,9 @@ Sólo neutralizan o completan lo que el tema le hace al marcado nativo:
 
 5. **Enlaces del artículo en modo oscuro** (0.4.1). Las opciones del tema fijan `--clb-color-link` en navy `#022a4e`
    sobre el propio enlace (`.page-content a:not(.-unlink):not(.tag)`, 0,3,1) y no tienen valor para oscuro, así que
-   quedaban a 1,3:1. Dentro del cuerpo del artículo y en oscuro, la variable pasa a azure claro `#6cb4ff` (8,7:1;
-   7,2:1 sobre el Recuadro) y `#a8d1ff` al pasar el mouse. El modo claro, las menciones y los botones no cambian.
+   quedaban a 1,3:1. Desde 0.4.2, dentro del cuerpo del artículo y en oscuro, los enlaces van en **blanco y
+   subrayados**: el acento no va en texto de menos de 24 px, así que el enlace se marca con el subrayado y no con el
+   color. En 0.4.1 eran azure claro `#6cb4ff`. El modo claro, las menciones y los botones no cambian.
 
 ## Reglas para quien escribe
 
@@ -116,3 +131,32 @@ se sirve como `?ver=0.4.1`.
 QA en vivo: en modo oscuro todos los enlaces normales del cuerpo pasan a `#6cb4ff` en los cuatro posts revisados,
 incluido uno no refrescado («Qué es Loop Marketing»). El modo claro sigue en `#022a4e`, las menciones quedan en blanco,
 no hay errores ni scroll horizontal, y `blog-home verify --browser` pasó con 14 de 14.
+
+**0.4.2 (2026-10-24, revisión con La órbita).** El operador pidió revisar los estilos con `efeonce-graphic-line` y
+aprobó los ajustes 1 a 6 viendo la vista previa:
+
+1. Recuadro sin esferas como viñeta.
+2. Destacado sin la línea con esfera.
+3. El acento fuera del texto chico.
+4. Colores de los tokens.
+5. El color del tema del post.
+6. El anillo de la FAQ sin relleno.
+
+Se coordinó con las sesiones de la portada y de correos y eventos, y se desplegó por `blog-home deploy content-model`.
+Los hashes en vivo son iguales al commit `710f0d1`, el flag volvió a 1 y el CSS se sirve como `?ver=0.4.2`.
+
+QA en vivo (claro y oscuro):
+
+- Los tres posts refrescados publican la línea Growth (`#0e8c82` / `#36c8bf`), un post de AEO publica Engine y uno de
+  HubSpot publica Revenue HubSpot.
+- La pregunta va en navy o blanco, y el anillo en el acento, sin relleno.
+- El número de Pasos va a 28 px en el acento, la barra del Destacado en el acento y la viñeta es un guion de 12 px.
+- Los enlaces en oscuro van en blanco subrayado.
+- Sin errores ni scroll horizontal.
+
+`blog-home verify --browser` pasó 7 de 8 anchos dos veces. El de 1920 falló las dos veces al abrir la página, con
+`ERR_CONNECTION_TIMED_OUT`, y verificado aparte con el mismo criterio pasa: una H1, el tablero de escritorio visible y
+sin scroll.
+
+**Pendiente (decisión del operador):** en el mapa de la portada, la línea de Inbound, Marketing Digital, SEO, IA y
+Novedades es provisional. Hoy los tres posts refrescados salen en Growth.
