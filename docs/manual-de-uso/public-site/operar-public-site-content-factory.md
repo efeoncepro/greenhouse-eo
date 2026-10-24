@@ -125,7 +125,9 @@ párrafos no se publica.
 4. **Para reemplazar el cuerpo de un post publicado** con su spec recompuesta, usa
    `scripts/public-website/blog-post-content-republish.php`: primero la simulación y después `apply`, con guardas de
    fecha de modificación, sha256 y preguntas frecuentes idénticas. Guarda un respaldo por post.
-5. **QA en vivo:** un solo `FAQPage`, el Destacado sin las líneas negras de Ohio, los Pasos y el Recuadro visibles en
+5. **Imágenes:** cuántas lleva el artículo y con qué medidas está en el
+   [inventario de imágenes por artículo](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+6. **QA en vivo:** un solo `FAQPage`, el Destacado sin las líneas negras de Ohio, los Pasos y el Recuadro visibles en
    modo claro y oscuro, y las imágenes centradas.
 
 ## Inspeccionar el sitio

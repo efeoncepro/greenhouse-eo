@@ -776,6 +776,9 @@ shasum -a 256 ai-generations/YYYY-MM-DD_<run>/masters/* ai-generations/YYYY-MM-D
 - proteger el centro óptico y probar miniatura/card;
 - no duplicar el featured dentro del body si Ohio ya lo renderiza.
 
+Cuántas imágenes lleva cada artículo, para qué posición y con qué medidas (plate, portada, `hero` del slider, card del
+rail, cuerpo y distribución): [inventario de imágenes por artículo](BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+
 Para portada/featured/hero/OG aplicar además el
 [Editorial Cover Key Visual Operating Model](EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md): tesis visual,
 divergencia estructural, provenance verificable del modelo cuando se exige, iteración single-change, punch a

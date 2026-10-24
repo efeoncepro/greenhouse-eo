@@ -145,6 +145,7 @@ La diferencia con otras capas de documentacion:
   y OG de Marketing con Manzanitas: zonas seguras por superficie (cuadrado central para WhatsApp y tarjetas cuadradas,
   banda de X), ficha cine con la cara en x 795–900, composición centrada sin firma, JPEG 2400 × 1260, subida con guardas y
   respaldo, QA en vivo y cómo volver atrás.
+  Cuántas imágenes lleva cada artículo y para qué posición: [inventario de imágenes por artículo](../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19. Desde el 2026-10-03 (v1.1): pedir personas del roster, del elenco y a

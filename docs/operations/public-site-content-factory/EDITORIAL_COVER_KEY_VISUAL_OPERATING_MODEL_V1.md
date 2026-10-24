@@ -268,7 +268,9 @@ Umbral: `42/50`; objetivo premium: `46/50`. Blockers duros invalidan sin importa
 ### Formatos mínimos
 
 - master PNG sRGB, sin recomprimir;
-- featured WebP `1600×900` o resolución aprobada por el runtime;
+- featured WebP `1600×900` o resolución aprobada por el runtime (para artículos de Marketing con Manzanitas, desde
+  2026-10-24 un solo JPEG `2400×1260` cubre destacada, OG y X, y el slider lleva su propio `hero` 2:1: ver el
+  [inventario de imágenes por artículo](BLOG_ARTICLE_IMAGE_INVENTORY_V1.md), con las medidas en vivo de cada posición);
 - OG JPEG `1440×756` o `1200×630`;
 - card/crop `1:1` cuando el archivo/índice lo use;
 - proof `160px` para punch;

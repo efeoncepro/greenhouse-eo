@@ -697,7 +697,8 @@ diseño se revisó con esta skill el 2026-10-24:
 - **Tipografía:** sigue la del artículo de Ohio (DM Sans e Inter) hasta que se migre la plantilla completa del
   artículo a Bricolage y Poppins (decisión del operador, 2026-10-24).
 
-La portada de cada artículo se rige por la variante centrada de Manzanitas (`manzanitas.md` §4.5).
+La portada de cada artículo se rige por la variante centrada de Manzanitas (`manzanitas.md` §4.5). Cuántas imágenes
+lleva un artículo y con qué medidas: `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
 Contrato: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` · FAQ: `docs/public-site/BLOG_FAQ_BLOCK_ANALYSIS_V1.md`.
 
 ## B. Presentaciones e informes

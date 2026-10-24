@@ -25,6 +25,10 @@ la mostraba el archivo del blog de Ohio hasta el 2026-10-24), y ese recorte toma
 centrada pone todo el texto dentro del cuadrado central, para que se lea igual en el formato ancho y en el cuadrado.
 La aprobó el operador el 2026-10-24.
 
+**Antes de empezar, mira el [inventario de imágenes por artículo](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md)**:
+dice cuántas imágenes lleva un artículo (plate, portada, `hero` del slider si entra al slider, cuerpo y distribución) y
+quién hace cada una. Este manual cubre la portada.
+
 Caso fuente: las portadas de *Qué es el inbound marketing*, *Qué es paid media* y *Topic clusters*, publicadas el
 2026-10-24. Carpeta de trabajo: `ai-generations/2026-10-24_portadas-blog/`.
 
