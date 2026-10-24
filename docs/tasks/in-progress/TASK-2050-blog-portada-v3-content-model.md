@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Code complete en local (2026-10-24): modelo en efeonce-editorial-blocks 0.2.0 (runtime b00fa2f…2dc7bcd), 148 checks PHP + 62 checks en Playground y ensayo del despliegue y del backfill; rollout pendiente: PDR-029 Proposed, sin deploy, sin backfill, opción eo_content_model_enabled en 0`
 - Rank: `TBD`
 - Domain: `public-site|content`
-- Blocked by: `none`
+- Blocked by: `Aprobación del operador de PDR-029 y del dry-run del backfill (rollout)`
 - Branch: `Runtime efeonce-public-site-runtime main (checkout /Users/jreye/Documents/efeonce-public-site-runtime); docs en Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -194,12 +194,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. (PDR-029 §1–§6 y el docblock de cada clase en `includes/content-model/`.)
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. (PDR-029; backfill idempotente por slug con `expect_sha256`; purgas con ventana de 60 s.)
+- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo. (No aplica: no hay tablas nuevas ni boundary test en el dominio WordPress; se deja sin tildar.)
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. (PDR-029 §7; ensayo `scripts/public-website/blog-v3/rehearse-content-model-deploy.sh`: deploy → verify → backfill apply → restore.)
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. (Evidencia local en Playground; la de producción queda pendiente con el rollout.)
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. (`WP_Error` con códigos `eo_*`; log de purgas; prueba de que el `.ics`, el marcado y la página no llevan el enlace privado.)
 
 ### Capability Definition of Done
 
@@ -211,6 +211,24 @@ lectura cubren la paridad programática para agentes.
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Discovery y plan (2026-10-24)
+
+- Inventario de sólo lectura del sitio vivo (WP-CLI remoto, sin escrituras): 44 entradas publicadas, 13 categorías,
+  un solo autor publicador (Julio Reyes), WordPress 7.1.3, PHP 8.2.35, Yoast 28.6, Kinsta con
+  `Kinsta\Cache_Purge::initiate_purge` y filtros `KinstaCache/purgeImmediate|purgeThrottled`, WP-Cron activo por
+  visita, sin caché de objetos persistente. `/blog/` es la página 18456 y todavía no tiene `[eo_blog_home]`.
+- Contrato de consumo: el plugin `eo-blog-home` (TASK-2051) pinta dos documentos (`portada`, `movil`; la tablet usa
+  el de escritorio) y acepta datos reales por el filtro `eobh_data`. La forma exacta es la de
+  `assets/generated/fixture.{portada,movil}.json`; las rutas que lee la plantilla salen de `*.ast.json`.
+- Plan ejecutado: PDR-029 → taxonomía y base (Slice 2) → fijación y panel (Slice 3) → evento, `.ics` y marcado
+  (Slice 4) → recursos, readers, REST y adaptador `eobh_data` (Slice 5) → purgas y pruebas (Slice 6) → paquete,
+  verificador, backfill y ensayo en Playground.
+- Desvíos respecto de la spec, registrados en PDR-029: «próximo» = hasta inicio + duración (criterio de aceptación,
+  no `start_utc > now`); sin evento próximo la sección no se pinta (el canvas no tiene disposición para «grabación en
+  el bloque grande»; el reader deja `featured_recording`); el bloque grande exige arte clave; los recursos se
+  muestran sólo con revisión de los últimos 180 días; la regla de tamaños sale del largo de la línea más larga y la
+  posición móvil (`left`) del aspecto del banner.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -322,11 +340,11 @@ lectura cubren la paridad programática para agentes.
 
 - [ ] PDR-029 existe, está aprobado por el operador y registrado en el índice de decisiones del sitio público.
 - [ ] `eo_format` está registrada y las 44 entradas publicadas tienen exactamente un formato, con ledger del apply.
-- [ ] El reader `featured` devuelve el shape del canvas y respeta el orden Glitch → herramienta → diagnóstico.
+- [x] El reader `featured` devuelve el shape del canvas y respeta el orden Glitch → herramienta → diagnóstico. (Prueba PHP: claves de cada diapositiva = las del documento de ejemplo; Playground: `art, caso, flash, guia, diag`.)
 - [ ] Un evento de prueba produce `Event` válido en Rich Results Test y un `.ics` que abre en Google y Apple Calendar sin enlace privado.
-- [ ] Al pasar `start + duración`, el evento deja de ser «próximo» sin intervención manual.
-- [ ] Publicar o actualizar una entrada, evento o recurso purga `/blog/` en menos de 2 minutos (medido).
-- [ ] Todos los readers responden por REST de sólo lectura con los mismos datos que usa la portada.
+- [x] Al pasar `start + duración`, el evento deja de ser «próximo» sin intervención manual. (Prueba PHP de estados; en Playground un evento que terminó hace 5 minutos no es próximo y la purga de su fin queda programada.)
+- [ ] Publicar o actualizar una entrada, evento o recurso purga `/blog/` en menos de 2 minutos (medido). (Medido sólo en Playground con Kinsta simulado: 0,1 s la primera purga y 67 s la agrupada; falta medirlo en Kinsta.)
+- [x] Todos los readers responden por REST de sólo lectura con los mismos datos que usa la portada. (Playground: `/wp-json/eo/v1/home/board/portada` idéntico al documento embebido en `/blog/`; cada reader responde 200.)
 
 ## Verification
 

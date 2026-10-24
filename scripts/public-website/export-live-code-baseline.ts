@@ -101,6 +101,11 @@ const TARGETS: Target[] = [
     required: false
   },
   {
+    label: 'Efeonce editorial blocks + blog home content model (TASK-1337, TASK-2050)',
+    remotePath: 'wp-content/plugins/efeonce-editorial-blocks',
+    required: false
+  },
+  {
     label: 'Ohio HubSpot form styler plugin',
     remotePath: 'wp-content/plugins/ohio-hubspot-form-styler',
     required: false
