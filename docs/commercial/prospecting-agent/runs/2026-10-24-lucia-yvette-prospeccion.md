@@ -79,3 +79,8 @@ Este cierre es documental. No alteró calidad retrospectiva, no generó otra com
 el estado comercial. Cualquier respuesta, negativa o rebote exige conciliar historial antes de una nueva
 acción; los próximos permisos no se presumen por el envío anterior. El commit del mandato debe incluir
 sólo los archivos/hunks propios y conservar el WIP concurrente.
+
+**Mandato posterior del mismo día:** Julio pidió secuencias para ambas. Se crearon dos con dos correos
+personalizados y firma gráfica. Tras la excepción expresa al CCO, ambas quedaron **Programado 1 / En curso 0 /
+Error 0**, 29/10 10:00 y 05/11 10:05 Perú, con registro nativo. Todavía no enviadas.
+[Autorización, calendario guardado y límites](../../follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md).

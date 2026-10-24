@@ -14,6 +14,10 @@
   manuales y dos skills espejo distinguen patrón, validación técnica y atribución inferida con excepción
   individual. Resultado inválido descartado, costos/permisos separados y persistencia del correo comprobada;
   tres escenarios sintéticos adicionales. [Controles](docs/audits/commercial/2026-10-24-lucia-yvette-docs-skills.md).
+- [Secuencias de Lucía y Yvette](docs/commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md):
+  dos pasos por persona programados para 29/10 10:00 y 05/11 10:05 Perú, firma gráfica y registro nativo con
+  excepción expresa al CCO. Skills espejo documentan ese alcance, calendario persistido y lector CLI fallido
+  sin repetir la inscripción; fixtures v14 con 70 casos. Programado no acredita envío o entrega.
 
 ## 2026-10-24 — Portada del blog v3: revisión en vivo y piezas listas
 

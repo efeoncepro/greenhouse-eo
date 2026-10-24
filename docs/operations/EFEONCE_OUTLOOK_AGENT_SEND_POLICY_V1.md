@@ -174,6 +174,16 @@ laborales y desinscripción por respuesta. No duplicar firma ni afirmar CCO en u
 Este caso usa registro nativo CRM y conserva el alcance separado de la política CCO para envíos por Outlook;
 no concede autorización general de futuros mensajes ni sustituye el readback de un envío real.
 
+### Excepción expresa al CCO de dos secuencias — 24/10/2026
+
+En [Lucía y Yvette](../commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md), Julio pidió CCO
+y la inscripción revisada no ofrecía ese campo. Se conservaron ambas preparadas sin activar hasta recibir:
+**«Activar en HubSpot con registro nativo, autorizando la excepción al CCO»**. La excepción cubre únicamente
+esas dos secuencias y sus dos pasos por persona; conserva firma gráfica, destinatarios y reglas de parada.
+No autoriza afirmar CCO configurado, aplicar la excepción a otro envío o modificar preferencias globales.
+Programado y firma renderizada no equivalen a correo enviado o firma entregada. La regla general de este
+documento permanece vigente para los demás correos.
+
 ### Persistencia de contenido enriquecido — observación del 24/10/2026
 
 En el [caso Disney](../commercial/prospecting-agent/runs/2026-10-24-disney-paola.md), el editor mostró el cuerpo

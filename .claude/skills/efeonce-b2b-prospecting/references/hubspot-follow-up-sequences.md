@@ -66,8 +66,14 @@ prueba. Comprobar firma global y, si existe, la específica del mailbox. Mantene
 la plantilla usa la predeterminada, no añadir otra copia. HTML configurado, preview renderizado y firma
 entregada son evidencias distintas; un iframe blob vacío no acredita ni refuta el envío de la firma.
 
-Registro nativo HubSpot y CCO Outlook tienen carriles distintos. En esta ruta usar logging/asociación
-nativos; no afirmar CCO si la pantalla no lo expone. Para Outlook directo conservar la
+Registro nativo HubSpot y CCO Outlook tienen carriles distintos; no afirmar CCO si la pantalla no lo
+expone. Si el mandato exige expresamente CCO y la inscripción no permite configurarlo, terminar la
+preparación concreta y verificable, conservar las secuencias sin inscribir y explicar la limitación.
+El registro nativo no sustituye ese requisito por decisión del agente. Una instrucción posterior explícita
+puede autorizar registro nativo con excepción al CCO para el lote nombrado: reutilizarla y activar sólo
+ese alcance, sin volver a pedirla ni convertirla en una excepción general. Mantener firma gráfica,
+reglas de parada y evidencia por persona; no añadir reglas globales del mailbox, cambiar de plataforma
+o duplicar correos para resolverlo. Para los demás envíos conserva la
 [política de firma/CCO](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 ## Ejecutar en HubSpot
@@ -160,3 +166,24 @@ repetir el envío. [Caso verificado](../../../../docs/commercial/follow-up-agent
   final y Programado por persona. Total inscritos verifica cantidad, no sustituye ese estado.
 
 [Registro del lote y Laura sin inscripción por rebote](../../../../docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).
+
+## Inscripción guardada y lector fallido — aplicación 24/10/2026
+
+En [Lucía y Yvette](../../../../docs/commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md),
+el mandato posterior resolvió el CCO con una excepción acotada; cada destinataria conserva dos plantillas
+propias, brochure nativo explicado, firma oficial y segundo paso como respuesta al primero de su secuencia.
+Las fechas de ese caso no son un valor por defecto para otras personas.
+
+- Reabrir **Editar** de la inscripción programada para leer las fechas/horas y zona persistidas de todos
+  los pasos; salir con **Cancelar** si sólo se leyó. La ventana general y la fila con día de inicio no
+  sustituyen ese calendario. Una etiqueta de ciudad se evalúa por su desfase y reglas estacionales.
+- `RESPONSE_DECODE_FAILED` del lector CLI de inscripciones es un error de lectura, no prueba de alta
+  fallida ni motivo para reintentar Iniciar. Conciliar en la UI autenticada y, como corroboración distinta,
+  leer `hs_sequences_is_enrolled`, `hs_sequences_enrolled_count` y `hs_latest_sequence_enrolled` del Contact.
+  Esos campos no prueban calendario, firma, reglas de parada o entrega.
+- Esperar que «Procesando» llegue a un estado legible; comprobar persona/secuencia, Programado y errores.
+  Leer de nuevo las reglas Contact de respuesta a cualquier correo y reunión. No crear un scheduler o
+  seguimiento manual paralelo por un fallo del reader ni reinscribir por una vista todavía vacía.
+- Comprobar párrafos y firma en el correo renderizado, además del texto guardado. Un preview puede
+  generar nuevos enlaces para la misma destinataria sin implicar otra inscripción; no contar URLs
+  transitorias como envíos ni reutilizar tracking de otra persona. Cuerpos y enlaces reales quedan privados.

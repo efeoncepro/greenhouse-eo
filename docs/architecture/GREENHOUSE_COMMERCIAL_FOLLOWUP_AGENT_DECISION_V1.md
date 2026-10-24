@@ -57,6 +57,13 @@ Es una operación nativa de HubSpot sobre el mailbox conectado; no un nuevo work
 del heartbeat de preparación. No duplicar esos envíos desde el heartbeat. No extender destinatarios,
 mensajes o ciclos por inferencia; mantener la autoridad general anterior para las demás cuentas.
 
+Aplicación del 24/10: [Lucía y Yvette](../commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md)
+recibieron un mandato individual de dos seguimientos por persona. Tras explicar que la UI no exponía CCO,
+Julio autorizó expresamente registro nativo con excepción al CCO para esas dos secuencias. Se conservaron
+firma gráfica y parada por respuesta/reunión, y se comprobó calendario guardado y Programado por persona.
+Es una aplicación del mandato acotado, no una nueva autonomía recurrente, política general de CCO,
+capability API, cambio de schema o scheduler; el heartbeat no duplica esos pasos futuros.
+
 ## Continuidad de largo plazo aceptada — 2026-10-13
 
 Mandato explícito de Julio: aplicar y dejar como política el seguimiento de cuentas con proveedor actual.

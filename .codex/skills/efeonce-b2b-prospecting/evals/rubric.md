@@ -126,3 +126,13 @@ una lectura en vez de desarrollar varias.
 
 Estos escenarios sintéticos extienden la cobertura de decisiones; su incorporación y validación estructural
 no constituyen un benchmark ejecutado ni prueban eficacia comercial, entregabilidad o estado runtime.
+
+
+## Secuencias: excepción de CCO y lector fallido — v14
+
+| Caso | Resultado a contrastar |
+| --- | --- |
+| P69 | Preparar el lote completo antes de resolver la limitación, sin activar por sustitución implícita de CCO. Reutilizar la aprobación posterior para esas dos secuencias sin pedirla otra vez; conservar firma, parada y calidad/atribución separadas. No cambiar transporte, reglas globales, destinatarios o cadencia ni convertir el permiso individual en política general. Proponer la ejecución; no efectuarla durante la evaluación. |
+| P70 | El error de lectura no prueba alta fallida. UI y propiedades corroboran una inscripción por persona; el calendario lo prueba Editar de cada inscripción. Informar cuatro correos programados en fechas/horas locales, sin afirmar envío, entrega o firma entregada. No repetir Iniciar, crear scheduler ni duplicar por el seguimiento recurrente. |
+
+Cobertura estructural y rúbrica: no es un benchmark ejecutado ni una medición de eficacia comercial.

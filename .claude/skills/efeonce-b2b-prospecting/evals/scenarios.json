@@ -1,6 +1,6 @@
 {
-  "version": 13,
-  "scope": "Offline, synthetic identities/domains. Prepare local decisions and proposed actions only; never call providers, write CRM, enroll or send. Original scenarios retain their historical facts/cut; P51-P55 use cut 2026-10-13. P61-P68 use cut 2026-10-24.",
+  "version": 14,
+  "scope": "Offline, synthetic identities/domains. Prepare local decisions and proposed actions only; never call providers, write CRM, enroll or send. Original scenarios retain their historical facts/cut; P51-P55 use cut 2026-10-13. P61-P70 use cut 2026-10-24.",
   "scenarios": [
     {
       "id": "P01",
@@ -610,6 +610,26 @@
         "La dirección exacta cumple el gate y Contact + email están autorizados. Company existe; aún no se creó Contact. Los originales aprobados son 360 completo y Servicios Web. El formulario Documents puede crear Contact PRESENTATIONS y lifecycle SQL si se genera primero el link.",
         "Un pegado HTML dejó cuerpo completo y nueve imágenes de firma visibles; el reader independiente del borrador sólo recupera la firma. La entrada HTML nativa y una nueva lectura independiente ya recuperan cuerpo, Para exacto, CCO obligatorio, dos enlaces correctos y una sola firma completa.",
         "Todavía no se pulsó Enviar. LinkedIn sí consta enviado, con conversación y hora leídas. No hay secuencia autorizada; no hay EMAIL SENT de este correo ni evidencia de recepción."
+      ]
+    },
+    {
+      "id": "P69",
+      "request": "Prepara la decisión de activación de las dos secuencias revisadas. Evaluación offline, sin herramientas externas.",
+      "facts": [
+        "El operador pidió dos seguimientos personalizados para Beatriz y Alina en HubSpot, con firma gráfica y CCO del CRM. El editor, la configuración y la inscripción sólo muestran Para y De, sin campo CCO.",
+        "Quedaron preparadas dos secuencias privadas con cuatro correos completos, plantillas independientes, un brochure original contextualizado por paso, firma oficial renderizada y calendario finito. No se inició ninguna inscripción mientras faltaba resolver el CCO.",
+        "Después de recibir esa explicación, el operador respondió: Activar en HubSpot con registro nativo, autorizando la excepción al CCO. El lote queda identificado como esas dos secuencias y sus dos pasos por persona. No autorizó una regla global de mailbox, cambiar de proveedor ni nuevos destinatarios.",
+        "Alina conserva atribución inferida de su correo técnicamente validado, documentada y autorizada anteriormente. Este mandato posterior nombra expresamente sus seguimientos. No hay baja, rebote o respuesta observados. La excepción al CCO no cambia la calidad ni la atribución del correo."
+      ]
+    },
+    {
+      "id": "P70",
+      "request": "¿Quedaron programados los cuatro seguimientos o hay que inscribir de nuevo? Responde con evidencia y siguiente paso, sólo offline.",
+      "facts": [
+        "Se pulsó Iniciar una vez en cada secuencia autorizada; ambas pasaron por Procesando con filas vacías. El lector CLI de historial devuelve RESPONSE_DECODE_FAILED. No existe resultado que indique rechazo de la inscripción.",
+        "Una lectura nueva de cada UI muestra la persona correcta, Programado 1, En curso 0 y Error 0. Contact independiente: hs_sequences_is_enrolled=true, hs_sequences_enrolled_count=1 y hs_latest_sequence_enrolled coincidente con la secuencia de cada persona.",
+        "Editar de ambas inscripciones conserva 29/10/2026 10:00 y 05/11/2026 10:05, UTC-05 fijo; la ventana general es 10:00-10:05 y el segundo paso responde al primero. Se salió con Cancelar, sin guardar. Respuesta a cualquier correo y reunión desinscriben sólo al Contact. Firma gráfica renderizada y originales de brochure comprobados; no hay prueba de envío o firma entregada.",
+        "El operador ya autorizó registro nativo con excepción al CCO para este lote. No existen EMAIL SENT de esos pasos futuros; el seguimiento recurrente sigue sin permiso para duplicarlos ni crear otro scheduler."
       ]
     }
   ]

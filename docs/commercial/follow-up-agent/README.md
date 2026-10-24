@@ -1,5 +1,9 @@
 # Seguimiento comercial recurrente
 
+**Mandato focal 24/10:** [Lucía y Yvette](runs/2026-10-24-lucia-yvette-secuencias.md) tienen dos secuencias
+con dos pasos futuros por persona, Programado verificado y excepción expresa al CCO con registro nativo.
+Conservar firma gráfica y parada por respuesta/reunión; este agente no duplica esos correos ni amplía el lote.
+
 ## Continuidad del chat de prospección — corte 24/10/2026
 
 El [consolidado de cinco casos](../prospecting-agent/runs/2026-10-24-cierre-chat-prospeccion.md) complementa

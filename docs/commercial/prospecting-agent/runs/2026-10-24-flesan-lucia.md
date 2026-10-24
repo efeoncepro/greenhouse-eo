@@ -125,3 +125,10 @@ Julio / Commercial espera respuesta para confirmar proyectos, etapa comercial, m
 responsables y razón social del alcance. No hay siguiente acción programada por este expediente.
 Cualquier respuesta, negativa o rebote debe conciliarse antes de otro contacto. `SENT`, logging o vistas
 de Documents no acreditan entrega, lectura humana, respuesta o selección.
+
+## Mandato posterior: secuencia programada el 24/10
+
+Julio pidió seguimiento para Lucía y Yvette. Se creó la secuencia **318443153** con dos correos propios,
+brochures y firma gráfica. Tras autorizar Julio registro nativo con excepción expresa al CCO, quedó
+**Programado 1 / En curso 0 / Error 0**; fechas guardadas 29/10 10:00 y 05/11 10:05 Perú. No enviado todavía.
+[Autorización, calendario y readback](../../follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md).

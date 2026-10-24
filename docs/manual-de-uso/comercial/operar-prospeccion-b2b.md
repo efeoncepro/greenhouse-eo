@@ -133,6 +133,13 @@ los pasos e iniciar dentro del permiso. «Procesando» no es cierre: releer cont
 No duplicar desde el heartbeat, ampliar destinatarios ni reiniciar a quien respondió. El logging nativo CRM
 se distingue del CCO de Outlook. [Caso del 13/10](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
 
+Si Julio exige CCO y la UI no permite guardarlo, completar textos, documentos, firma y propuesta de calendario
+antes de resolver la limitación; conservar las secuencias sin inscribir. Una autorización posterior expresa
+de registro nativo con excepción al CCO se reutiliza sólo para el lote identificado, sin nueva confirmación ni
+regla global. [Aplicación Lucía/Yvette](../../commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md).
+Tras Programado, reabrir Editar para leer todos los pasos/horas y salir sin guardar. Si falla el reader CLI,
+conciliar UI y campos de inscripción del Contact; no repetir Iniciar por un error de decodificación.
+
 Brochure por defecto para presentar Efeonce completa: el oficial «Agencia de Marketing 360°» (2026-10-16);
 el de una línea cuando la necesidad corresponda, como Marketing de Contenidos para contenidos/UGC.
 Julio ratificó el 17-10-2026 que los brochures están aprobados y no necesitan nada más. Usarlos completos,

@@ -101,6 +101,12 @@ La versión del documento compartido y el cuerpo/calendario personalizados de in
 como evidencia separada de la plantilla y ventana generales. Firma configurada, preview renderizado y
 firma entregada no son equivalentes. [Caso web del 16/10](../../commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md).
 
+Si se exige CCO y el carril no lo expone, registro nativo no lo sustituye automáticamente. La preparación
+puede quedar completa sin inscripción hasta una elección explícita. En [Lucía/Yvette](../../commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md),
+Julio autorizó una excepción para dos secuencias; no cambia la política general. El calendario persistido,
+la UI Programado y los campos del Contact son comprobaciones complementarias; un reader fallido no
+justifica repetir la inscripción ni prueba que falte. No acreditar envío por la programación.
+
 ## Roles y continuidad
 
 Para radar de convocatorias, la [guía de primera entrada](../../commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md)

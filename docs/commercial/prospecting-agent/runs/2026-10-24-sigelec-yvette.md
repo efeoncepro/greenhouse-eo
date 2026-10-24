@@ -159,3 +159,10 @@ responsables, entidad compradora y correo preferido. No hay secuencia, scheduler
 programado por este expediente; tampoco gasto adicional pendiente de ejecutar. Cualquier respuesta,
 negativa o rebote debe conciliarse antes de otra acción. Despacho y registro no acreditan entrega,
 lectura humana, respuesta, reunión o selección.
+
+## Mandato posterior: secuencia programada el 24/10
+
+Julio pidió seguimiento para Yvette y Lucía. Se creó la secuencia **318421077** con dos correos propios,
+brochures y firma gráfica. Tras autorizar Julio registro nativo con excepción expresa al CCO, quedó
+**Programado 1 / En curso 0 / Error 0**; fechas guardadas 29/10 10:00 y 05/11 10:05 Perú. No enviado todavía.
+La atribución del correo sigue inferida. [Autorización y readback](../../follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md).

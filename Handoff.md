@@ -34,6 +34,8 @@ Mandato posterior: [dos secuencias programadas](docs/commercial/follow-up-agent/
 dos correos por persona y firma gráfica comprobada. Julio autorizó registro nativo con excepción al CCO para
 ambas: Programado1/EnCurso0/Error0,29Oct10:00 y05Nov10:05 Perú. Respuesta/reunión desinscribe al Contact;
 no duplicar por radar/Outlook. Calendario guardado releído; correos de seguimiento todavía no enviados.
+Método y skills espejo concilian la excepción individual y el reader CLI fallido sin repetir inscripciones;
+[cierre documental](docs/audits/commercial/2026-10-24-lucia-yvette-secuencias-docs-skills.md). No cambia el permiso del radar.
 
 ## 2026-10-24 — Portada del blog v3 en producción; operable por agentes
 
