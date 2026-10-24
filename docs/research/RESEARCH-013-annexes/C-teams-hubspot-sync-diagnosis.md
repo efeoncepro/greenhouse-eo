@@ -82,9 +82,21 @@
 > ¿Pueden revisar por qué la integración no descubre los webinars nuevos ni sincroniza inscritos? ¿Es necesario asignar
 > la política por usuario en lugar de Global, o reautorizar la app sin desinstalarla?
 
+## Respuesta del soporte (ticket #50018204746, 2026-10-24)
+
+- El asistente de IA de HubSpot repitió los requisitos documentados y pidió dos pruebas antes de derivar: que un webinar
+  de prueba nuevo aparezca en «Mis ajustes» y que «Sincronizar ahora» en un webinar antiguo cree un evento. Dijo que la
+  acción del workflow solo muestra webinars que el conector ya conoce y que, si ambas pruebas fallan, «encaja con un
+  posible problema del propio conector».
+- Resultado [V]: «La IA y la busqueda» (con un inscrito) no aparece; «Sincronizar ahora» en «WEBINAR | De vendedores
+  comunes…» no sincroniza y Eventos de marketing sigue en 0. La casilla «Sincronizar» de los webinars de 2024 está
+  deshabilitada.
+- El ticket se derivó a un agente humano (respuesta prometida en un día laborable) y se dejó en el ticket el resultado
+  de ambas pruebas.
+
 ## Siguiente paso
 
-- Esperar la respuesta del soporte de HubSpot (caso enviado; chat y teléfono cerrados el lunes 26-oct). Reconectar la
+- Esperar al agente humano del soporte de HubSpot (ticket #50018204746 derivado; chat y teléfono cerrados el lunes 26-oct). Reconectar la
   app sólo si el soporte lo recomienda, en horario tranquilo y con captura previa de toda su configuración.
 - Cuando HubSpot liste el webinar: marcar Sincronizar, probar el envío de Greenhouse al formulario conectado y recién ahí
   crear la task `backend-data` de la integración.
