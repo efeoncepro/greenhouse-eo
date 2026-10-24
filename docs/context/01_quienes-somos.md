@@ -6,7 +6,7 @@
 
 La razón de existir: una marca no debería coordinar 3–5 proveedores inconexos para estrategia, creatividad, medios, tecnología y medición. Efeonce elimina esa fragmentación. **Un solo interlocutor (Director de Cuenta), varias líneas coordinadas y sin pérdida de contexto entre equipos.**
 
-Operación legal: Efeonce Group SpA. Operamos en **Chile, Estados Unidos, Colombia, México y Perú**. Estados Unidos ya es un mercado operativo, confirmado por el operador el 2026-08-31; no es sólo expansión futura. Lista reusable: `EFEONCE_OPERATING_MARKETS` en `src/config/efeonce-brand.ts`. La cobertura comercial no implica oficina ni entidad legal en cada país. +10 años ejecutando en LATAM.
+Operación legal: Efeonce Group SpA. Fundada en **2008** (confirmado por el operador el 2026-10-24; es el `foundingDate` de los datos estructurados de la marca). Operamos en **Chile, Estados Unidos, Colombia, México y Perú**. Estados Unidos ya es un mercado operativo, confirmado por el operador el 2026-08-31; no es sólo expansión futura. Lista reusable: `EFEONCE_OPERATING_MARKETS` en `src/config/efeonce-brand.ts`. La cobertura comercial no implica oficina ni entidad legal en cada país. +10 años ejecutando en LATAM.
 
 Capacidad de producción y fabricación local desde octubre de 2026: México, Perú, Chile, Colombia y Ecuador,
 confirmada por Julio. Alcance y límites en el [registro operativo](../operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md);
