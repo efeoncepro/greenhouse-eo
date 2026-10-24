@@ -69,7 +69,7 @@ runner). Sin evento real cargado: la sección de eventos queda oculta hasta el p
 **Búsqueda y archivos del blog (2026-10-24, sin dueño):** búsqueda, categoría, etiqueta y autor siguen en la plantilla
 de archivo de Ohio, con el recuadro de demo «Hire us! We are WordPress specialists», textos en inglés, categoría vacía
 indexable y desborde a 390 en dos archivos. Diagnóstico y propuesta (contención en vivo + plantilla «Archivo del blog» v3):
-[auditoría](docs/audits/public-site/2026-10-24-blog-search-archive-views.md). Falta el visto bueno y la task.
+[auditoría](docs/audits/public-site/2026-10-24-blog-search-archive-views.md). Decisión: contención junto con el rediseño, en sesión nueva; falta la task.
 
 **Eventos y webinars: infraestructura desplegada, NO operativa.** El release `e593e3993bc3` llevó los correos de
 reserva (confirmación con `joinUrl` + `.ics`, lista de espera, recordatorio por `/growth/events/reminders` + Cloud

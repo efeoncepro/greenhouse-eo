@@ -64,5 +64,6 @@ Recomendación: paso 1 ya (el texto de la demo daña la marca) y paso 2 en una s
 
 ## Pendiente
 
-- Visto bueno del operador para el paso 1 (mutación en vivo).
-- Crear la task del paso 2 (reservar ID barriendo por dominio y superficie) y su canvas.
+- **Decisión del operador (2026-10-24):** no contener por separado; la contención del paso 1 sale junto con el
+  rediseño del paso 2, en una sesión nueva.
+- Crear la task (reservar ID barriendo por dominio y superficie) y su canvas.
