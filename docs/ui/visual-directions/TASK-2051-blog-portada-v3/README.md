@@ -11,7 +11,7 @@
 | Archivo | Qué es |
 |---|---|
 | `fuente-canvas-2026-10-24.tar.gz` | Copia congelada de los tableros: `Portada-v3.dc.html` (escritorio 1440), `Movil-v3.dc.html` (390), `Botones.dc.html` (sistema de botones y estados), `Arquitectura.dc.html` (mecánica WordPress) y `canvas.json`. Empaquetado para que Tailwind no escanee el marcado (ver `reference_tailwind_scans_markdown`). |
-| `referencias/` | Línea base del gate (Slice 1 de TASK-2051, 2026-10-24): un PNG por sección del tablero de escritorio (8, a 1440) y del móvil (9, a 390, incluida la cabecera con el logo MCM), con los datos de ejemplo del diseño y el reloj congelado el 24 oct 2026 12:00 UTC. `capture.json` dice cómo y cuándo se capturó. |
+| `referencias/` | Línea base del gate (TASK-2051, 2026-10-24): un PNG por sección del tablero de escritorio (8, a 1440), de tablet (8, a 820) y del móvil (9, a 390, incluida la cabecera con el logo MCM), con los datos de ejemplo del diseño y el reloj congelado el 24 oct 2026 12:00 UTC. `capture.json` dice cómo y cuándo se capturó. |
 
 Para abrir la fuente: `tar -xzf fuente-canvas-2026-10-24.tar.gz -C <carpeta temporal>` (nunca dentro de `src/`).
 
@@ -37,6 +37,21 @@ el sitio sólo se reutiliza infraestructura (consultas, formularios, despliegue,
    página y la isla de la maqueta marcaba ese lugar; sin el espaciador el logo MCM quedaba debajo de la barra.
 7. Bajo 390 px (sin diseño en el canvas) la órbita de temas del móvil escala al ancho disponible con las mismas
    proporciones; sin eso había 14 px de scroll horizontal a 360 y 54 px a 320.
+8. Un solo H1 por página: `eo-blog-home` pone el H1 «Marketing con Manzanitas, el blog de Efeonce» fuera de los
+   tableros; el H1 de lector de pantalla de escritorio/tablet se retira y el del logo móvil pasa a un bloque con
+   las mismas métricas del H1 del navegador (mismos píxeles). El `alt` del logo móvil queda vacío (el H1 ya lo dice).
+9. La lógica busca sus propios botones dentro de su tablero (`this.__root`), no en todo el documento: con tres
+   tableros en la página, `document.querySelector` podía devolver el botón de un tablero oculto.
+10. Rendimiento sin cambio de píxeles: imágenes bajo el hero con `loading="lazy"`, CSS por tablero con su media
+    query, sólo se descarga la lógica del tablero visible y la primera diapositiva se precarga con prioridad alta.
+
+## Tablero de tablet (768–1099 px), 2026-10-24
+
+Pedido por el operador («diseña uno de tablet»). Es el tablero de escritorio recompuesto con su propia capa de
+composición (`scripts/public-website/blog-v3/make-tablet.cjs`), generado desde el canvas congelado: mismos
+componentes, mismo contrato de datos (`portada`) y misma lógica. Referencia a 820 px (iPad vertical), fluido de 768
+a 1099. Publicado como tablero «v3 · tablet 820 (768–1099)» del canvas (versión 68). Escritorio desde 1100 px,
+móvil bajo 768.
 
 Cualquier otra diferencia es un defecto del gate.
 

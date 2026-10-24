@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2051-blog-portada-v3-high-fidelity-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Code complete en local (2026-10-24): plugin eo-blog-home con 17/17 secciones ≤ 1 % dentro del shell real; rollout pendiente de aprobación del operador y del contenido real (TASK-2050)`
+- Status real: `Publicada para revisión en https://efeoncepro.com/blog-v3-revision/ (2026-10-24, noindex, contenido de ejemplo); /blog/ sin cambiar hasta aprobación; contenido real depende de TASK-2050 y formularios reales de TASK-2053/2054`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `TASK-2050 (sólo eventos, formatos y fijadas; las demás secciones avanzan antes)`
@@ -357,12 +357,12 @@ Efeonce en línea (no como archivo aparte).
 - [ ] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2051`.
 - [x] Se declaro `Wireframe: docs/ui/wireframes/TASK-2051-blog-portada-v3-high-fidelity.md` y el archivo existe.
 - [x] Se declaro `Flow` y `Motion` y los archivos existen.
-- [x] Cada sección pasa el gate de fidelidad (≤ 1 % de píxeles distintos) a 1440 y 390 contra las referencias del canvas. Evidencia 2026-10-24: `fidelity/compare.cjs` sobre el render de WordPress dentro del shell real (`preview/serve.cjs`), 17/17 secciones, máximo 0,061 %.
-- [ ] El operador aprobó la hoja lado a lado de cada sección. Hoja publicada el 2026-10-24 (https://claude.ai/artifact/VZELsJUCwxjvEj999eHCVB); falta su aprobación.
+- [x] Cada sección pasa el gate de fidelidad (≤ 1 % de píxeles distintos) a 1440 y 390 contra las referencias del canvas. Evidencia 2026-10-24 en el sitio en vivo (`/blog-v3-revision/`, `fidelity/capture.cjs url` + `compare.cjs`): 25/25 secciones con tablet incluida; la mayor diferencia es la cuenta regresiva, que corre con la hora real (0,86 % en móvil).
+- [x] El operador aprobó la hoja lado a lado de cada sección. Aprobada el 2026-10-24 («Apruebo sí»); la hoja (https://claude.ai/artifact/VZELsJUCwxjvEj999eHCVB) ahora compara contra el sitio en vivo e incluye tablet.
 - [ ] `/blog/` muestra el header AXIS y el footer de `ohio-child`; la exclusión de 18456 ya no existe. Código listo (runtime `df11a21`: exclusión vacía; `publish-blog-home-page.php`); falta desplegar con aprobación.
-- [x] Sin scroll horizontal de página a 1440, 1024, 390 y 320. Medido en el shell real de 1920 a 320 px (16 anchos): 0 px de desborde.
-- [ ] Un solo H1; grafo Yoast sin piezas duplicadas; axe sin violaciones serias. axe WCAG 2.2 AA: 0 violaciones en escritorio y móvil (`fidelity/a11y.cjs`). Pendiente: el HTML lleva dos H1, uno por tablero; sólo uno es visible y accesible a la vez (el otro con `display:none`), pero el criterio pide uno solo. Yoast no verificado (requiere la página en WordPress).
-- [ ] LCP ≤ 2,5 s, INP ≤ 200 ms y CLS ≤ 0,1 en la medición de laboratorio de 390 y 1440. Sólo hay una medición local sin limitar la red (LCP 256 ms, CLS 0,001): no sustituye la de laboratorio con throttling.
+- [x] Sin scroll horizontal de página a 1440, 1024, 390 y 320. Medido en vivo de 1920 a 320 px (17 anchos, tres tableros): 0 px de desborde.
+- [ ] Un solo H1; grafo Yoast sin piezas duplicadas; axe sin violaciones serias. Un solo H1 verificado en vivo y en la prueba del runtime; axe WCAG 2.2 AA 0 violaciones en vivo en escritorio, tablet y móvil. Pendiente: grafo Yoast de /blog/ (se verifica en el corte).
+- [ ] LCP ≤ 2,5 s, INP ≤ 200 ms y CLS ≤ 0,1 en la medición de laboratorio de 390 y 1440. Medido en vivo con el perfil móvil de Lighthouse (150 ms, 1,6 Mbps, CPU ×4): la imagen del hero se pinta a 3,8 s en móvil, 3,4 s en tablet y 3,6–5,0 s en escritorio; CLS ≤ 0,05; INP 128–248 ms. No cumple 2,5 s: el sitio ya tarda 2,8–3,9 s en el primer pintado con ese perfil (`/agenda/`, `/blog/`: 1,4 MB de scripts) y en móvil el LCP lo toma el banner de cookies del sitio (10–17 s). Seguimiento de sitio, fuera de esta task.
 - [x] Movimiento reducido: sin autoplay, barrido, paralaje ni haz animado. Verificado 2026-10-24: la diapositiva no avanza en 9 s y no queda ninguna animación infinita activa, a 1440 y 390.
 - [ ] Sin JavaScript: primera diapositiva, búsqueda GET, riel y archivo funcionan. La primera diapositiva, el riel y el archivo se sirven sin JavaScript (las capturas del gate son sin JS). La búsqueda GET necesita la URL real de búsqueda que entrega TASK-2050.
 
@@ -400,6 +400,14 @@ Efeonce en línea (no como archivo aparte).
   Cambiarlo es un desvío de marcado invisible y se puede aplicar en `bind-canvas.cjs` a ambos tableros.
 
 ## Decisiones de implementación (2026-10-24)
+
+- Publicación para revisión pedida por el operador («que quede publicado en el sitio para revisar»): plugin
+  `eo-blog-home` instalado en vivo (runtime `162375a`) y página aparte `/blog-v3-revision/` (252046, noindex,
+  sin enlaces) con `create-blog-home-review-page.php`; `/blog/` no se tocó, porque mostraría al público el
+  contenido de ejemplo. Corte de `/blog/`: `publish-blog-home-page.php` + paquete del tema, con aprobación.
+- Integración medida en vivo: Ohio aplica 16 px de padding al contenedor y −16 px de margen al cuerpo Elementor,
+  no en todos los anchos; ambos van a cero sólo donde vive la portada (`eobh-host.css`).
+- Los formularios de la revisión son los del canvas: el envío es simulado y no guarda nada hasta TASK-2053/2054.
 
 - La portada vive en un plugin propio, `eo-blog-home`, y no en `eo-elementor-widgets/includes/blog-v3/` como
   decía el plan: el plugin compartido tiene trabajo sin commitear de otra sesión (su archivo principal incluido) y

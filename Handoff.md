@@ -2,25 +2,22 @@
 
 [Historial](Handoff.archive.md).
 
-## 2026-10-24 — Portada del blog v3: TASK-2051 code complete en local, rollout pendiente
+## 2026-10-24 — Portada del blog v3: publicada para revisión en vivo (TASK-2051)
 
-Canvas aprobado «Portada Blog Efeonce» v3 (`https://claude.ai/artifact/SmmJZC39UTJ9m6PD5x7tui`, v67); tasks
-TASK-2050…2054 (commit `8398d392e`). TASK-2051 implementada en local, **sin push ni escrituras en vivo**:
+Canvas aprobado «Portada Blog Efeonce» v3 (`https://claude.ai/artifact/SmmJZC39UTJ9m6PD5x7tui`; v68 suma el tablero de
+tablet). Hoja aprobada por el operador. **En vivo**: plugin `eo-blog-home` (runtime `162375a`, despliegue acotado
+con respaldos en `/tmp/eo-blog-home-before-*.tar` del servidor) y página de revisión
+`https://efeoncepro.com/blog-v3-revision/` (252046, noindex, sin enlaces; rollback `wp post delete 252046`).
+**`/blog/` (18456) sin cambiar**: el corte es `blog-v3/publish-blog-home-page.php` + el paquete de `ohio-child` con
+`EO_SITE_NAV_EXCLUDED_PAGES` vacío (runtime `df11a21`), juntos y con aprobación.
 
-- Plugin nuevo `eo-blog-home` en el runtime (commits `54939f6`, `df11a21` y `5346957`): render en servidor
-  del AST del canvas + `dc-runtime.js` con la lógica del canvas. Plugin propio porque `eo-elementor-widgets` tiene WIP
-  ajeno sin commit (incluido su archivo principal): no se tocó.
-- Gates en Greenhouse (`scripts/public-website/blog-v3/`): plantilla = canvas en HTML; PHP = primer render del
-  navegador byte a byte (6 casos); 17/17 secciones ≤ 1 % dentro del shell real (máx. 0,061 %); axe 0; sin scroll
-  horizontal de 1920 a 320; movimiento reducido sin autoplay. Hoja para el operador:
-  `https://claude.ai/artifact/VZELsJUCwxjvEj999eHCVB`.
-- Listo para desplegar con aprobación: `build-blog-home-plugin-package.cjs` + `deploy-blog-home-plugin-package.php`
-  (plugin), tema `ohio-child` con `EO_SITE_NAV_EXCLUDED_PAGES` vacío (runtime `df11a21`) y
-  `blog-v3/publish-blog-home-page.php` (corte de 18456, respaldo y rollback). Tema y corte van **juntos**.
-- Pendiente: aprobación de la hoja; contenido real (TASK-2050, PDR-029 por aprobar; hoy sirve el ejemplo del canvas);
-  decisión de tablet 768–1099 (interino: tablero móvil); dos H1 en el HTML (uno oculto); medición de laboratorio
-  con throttling; la parte Elementor del script de corte no se pudo ejercitar fuera de producción (Playground sin
-  Elementor/Ohio).
+- Tres tableros: escritorio ≥ 1100, tablet 768–1099 (`make-tablet.cjs`, mismos datos y lógica que escritorio),
+  móvil < 768. Gate en vivo 25/25 ≤ 1 %, axe 0, sin desborde de 1920 a 320, un solo H1.
+- Rendimiento (perfil móvil de Lighthouse, en vivo): hero pintado a 3,8 s móvil / 3,4 s tablet / 3,6–5 s escritorio,
+  comparable al resto del sitio; en móvil el LCP lo toma el banner de cookies del sitio (10–17 s): seguimiento aparte.
+- Contenido de ejemplo del canvas y formularios simulados hasta TASK-2050 (lectores, filtro `eobh_data`) y
+  TASK-2053/2054 (formularios en línea). Al desplegar el plugin, re-exportar la línea base: el exportador ya
+  incluye `eo-blog-home`. Un PHP nuevo tarda 1–2 min en llegar a PHP-FPM.
 
 ## 2026-10-24 — Nosotros: fidelidad, rieles de Ohio, mapa y wordmark HubSpot (en vivo)
 
