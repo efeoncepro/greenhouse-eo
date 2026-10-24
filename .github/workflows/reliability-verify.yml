@@ -84,7 +84,8 @@ jobs:
     name: Run affected smoke specs
     needs: detect
     if: ${{ needs.detect.outputs.specs != '' && needs.detect.outputs.specs_count != '0' }}
-    runs-on: ubuntu-latest
+    # Playwright 1.59.1 has no chromium build for Ubuntu 26.04 (same pin as ci.yml and ci-deep.yml).
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
       CI: true
