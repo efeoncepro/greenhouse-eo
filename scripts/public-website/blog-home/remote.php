@@ -228,6 +228,41 @@ switch ( $op ) {
 		$out( array_merge( $plan, array( 'after' => $after, 'applied' => true ) ) );
 		break;
 
+	case 'card':
+		// The rail card's own image (`_eo_card_image`; the featured image stays the OG image) and its focal point
+		// (`_eo_card_focus`, «70% 30%»): the portrait card crops a 16:9 cover at the center otherwise.
+		$id     = $find( $in['post'] ?? '' );
+		$keys   = array( EO_Home_Pins::CARD_IMAGE_META, EO_Home_Pins::CARD_FOCUS_META );
+		$before = $snapshot( $id, $keys );
+		$after  = ! empty( $in['clear'] ) ? array_fill_keys( $keys, null ) : array();
+		if ( isset( $in['focus'] ) ) {
+			$focus = 'off' === trim( (string) $in['focus'] ) ? '' : EO_Home_Pins::sanitize_focus( $in['focus'] );
+			if ( 'off' !== trim( (string) $in['focus'] ) && '' === $focus ) { WP_CLI::error( 'Expected --focus "x% y%" (0–100) or off.' ); }
+			$after[ EO_Home_Pins::CARD_FOCUS_META ] = $focus;
+		}
+		if ( isset( $in['attachment'] ) ) {
+			$att = (int) $in['attachment'];
+			if ( ! wp_attachment_is_image( $att ) ) { WP_CLI::error( "#{$att} is not an image attachment." ); }
+			$after[ EO_Home_Pins::CARD_IMAGE_META ] = $att;
+		}
+		$wants_image = ! empty( $in['image_file'] );
+		if ( $wants_image && empty( $in['alt'] ) ) { WP_CLI::error( 'An imported image needs --alt.' ); }
+		if ( ! $after && ! $wants_image ) { WP_CLI::error( 'Nothing to change: pass --attachment, --image, --focus or --clear.' ); }
+		$plan = array( 'op' => 'card', 'post' => $id, 'title' => get_the_title( $id ), 'featured_image' => (int) get_post_thumbnail_id( $id ), 'before' => $before, 'after' => $after + ( $wants_image ? array( EO_Home_Pins::CARD_IMAGE_META => '(imagen importada)' ) : array() ) );
+		if ( ! $apply ) { $out( $plan + array( 'applied' => false ) ); break; }
+		if ( $wants_image ) { $after[ EO_Home_Pins::CARD_IMAGE_META ] = $import( (string) $in['alt'] ); }
+		foreach ( $after as $key => $value ) {
+			if ( null === $value || '' === $value || 0 === $value ) { delete_post_meta( $id, $key ); } else { update_post_meta( $id, $key, $value ); }
+		}
+		clean_post_cache( $id );
+		foreach ( $after as $key => $value ) {
+			if ( (string) get_post_meta( $id, $key, true ) !== (string) ( $value ?: '' ) ) { WP_CLI::error( 'Readback failed: ' . $key ); }
+		}
+		if ( (int) get_post_thumbnail_id( $id ) !== $plan['featured_image'] ) { WP_CLI::error( 'The featured image changed: it must stay the OG image.' ); }
+		$finish( 'card' );
+		$out( array_merge( $plan, array( 'after' => $after, 'applied' => true ) ) );
+		break;
+
 	case 'resource-upsert':
 	case 'event-upsert':
 		$is_event = 'event-upsert' === $op;

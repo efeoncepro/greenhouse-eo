@@ -104,7 +104,15 @@ Cada tarjeta se arma sola con la entrada (imagen, tema, autor, fecha, minutos y 
 ```bash
 pnpm public-website:blog-home client <id|slug> anam          # el caso muestra el logo del cliente (off lo quita)
 pnpm public-website:blog-home reviewed <id|slug> 2026-10-20  # «Actualizado» por 30 días (off lo quita)
+pnpm public-website:blog-home card <id|slug> --image plate.png --alt "texto" --focus "84% 30%"  # imagen y punto focal de la tarjeta
 ```
+
+- La tarjeta de foto es vertical (440 × 600; 304 × 540 en móvil) y recorta la destacada horizontal al centro. Si la
+  destacada trae texto incrustado (las portadas de Manzanitas), dale a la tarjeta su propia imagen sin texto con
+  `card --image` (o `--attachment <id>`) y mueve el recorte con `--focus "x% y%"` hacia el sujeto. La destacada no se
+  toca: sigue siendo la imagen OG (el comando falla si cambiara). `--focus off` vuelve al centro; `--clear` quita las dos.
+- Para probar antes de escribir: `node scripts/public-website/blog-v3/preview/serve.cjs --rail <cards.json>` pinta el
+  riel con las tarjetas del archivo (contrato de `EO_Home_Adapter::rail()`).
 
 - `client` sólo acepta clientes con logo cargado (hoy `anam`). Un cliente nuevo es código: su logo en
   `RAIL_ASSETS` de `lib/rail-v2.cjs` y una fila en `EO_Home_Adapter::RAIL_CLIENTS`.

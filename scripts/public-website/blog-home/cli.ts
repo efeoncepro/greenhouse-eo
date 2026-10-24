@@ -16,7 +16,7 @@ const HERE = join(ROOT, 'scripts/public-website/blog-home')
 const TMP = join(ROOT, 'tmp/blog-home')
 const SITE = 'https://efeoncepro.com'
 const REMOTE = 'scripts/public-website/blog-home/remote.php'
-const VALUE_FLAGS = ['until', 'light', 'bold', 'attachment', 'image', 'alt', 'snapshot', 'surface']
+const VALUE_FLAGS = ['until', 'light', 'bold', 'attachment', 'image', 'alt', 'snapshot', 'surface', 'focus']
 const FORMATS = ['articulo', 'caso', 'guia', 'grabacion', 'podcast', 'glitch-edicion', 'glitch-flash', 'glitch-nota', 'novedad']
 const LINES = ['growth', 'brand', 'engine', 'voice', 'revenue-hubspot', 'revenue-salesforce']
 
@@ -196,6 +196,7 @@ Write (plan unless --apply; every apply is ledgered and purges /blog/):
   client <post> <anam|off>             the client of a case: its logo on the rail card
   reviewed <post> <AAAA-MM-DD|off>      the editor's last substantive review: «Actualizado» on the rail for 30 days
   hero <post> [--light t] [--bold t] [--attachment id | --image file --alt text] [--clear]
+  card <post> [--attachment id | --image file --alt text] [--focus "x% y%"|off] [--clear]   the rail card's own image and focal point (the featured image stays OG)
   resource <file.json> [--image file --alt text]   create/update a resource (see manual for the shape)
   review <resource id>           mark a resource reviewed today (it hides after 180 days)
   event <file.json> [--image file --alt text]      create/update an event (no private meeting links)
@@ -262,6 +263,21 @@ const main = () => {
       const payload: Json = { op: 'hero', post: pos[0] ?? fail('hero needs a post.'), apply }
 
       for (const name of ['light', 'bold', 'alt']) if (flag(args, name) !== undefined) payload[name] = flag(args, name)
+      if (flag(args, 'attachment')) payload.attachment = Number(flag(args, 'attachment'))
+      if (image) payload.image_file = true
+      if (has(args, 'clear')) payload.clear = true
+      const result = remote(payload, image)
+
+      print(result)
+
+      return plannedNote(result)
+    }
+
+    case 'card': {
+      const image = flag(args, 'image')
+      const payload: Json = { op: 'card', post: pos[0] ?? fail('card needs a post.'), apply }
+
+      for (const name of ['focus', 'alt']) if (flag(args, name) !== undefined) payload[name] = flag(args, name)
       if (flag(args, 'attachment')) payload.attachment = Number(flag(args, 'attachment'))
       if (image) payload.image_file = true
       if (has(args, 'clear')) payload.clear = true

@@ -96,7 +96,7 @@ tablero y la paridad PHP↔navegador prueba las tarjetas. Imágenes y logos nuev
 
 | Tarjeta | Cuándo | Datos |
 |---|---|---|
-| Foto a sangre (navy / azul alternados) | entrada con imagen destacada; guía o herramienta con imagen | `img`, tema, autor, fecha, minutos |
+| Foto a sangre (navy / azul alternados) | entrada con imagen destacada; guía o herramienta con imagen | `img` (`_eo_card_image` si existe; si no, la destacada, que sigue siendo la OG), `pos` = `_eo_card_focus` o `center`, tema, autor, fecha, minutos |
 | Cliente (papel) | caso con `_eo_client` conocido (`EO_Home_Adapter::RAIL_CLIENTS`) | logo del cliente desde los activos del plugin |
 | Pregunta (tinta) | recurso `diagnostico` | las dos líneas del slider son la pregunta |
 | Entrada de webinar | el próximo evento (`events.next`) hasta que termina | día, mes, día de semana y hora en su zona, «Faltan N días» |
