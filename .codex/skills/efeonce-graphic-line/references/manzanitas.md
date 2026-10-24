@@ -230,11 +230,13 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
   - el sujeto en el tercio derecho, pedido un poco más a la derecha porque el modelo lo corre unos 15 puntos al centro;
   - **sin bajada y sin firma**: la cabecera identifica la pieza y la prenda ya lleva la marca, así que el logo sobra
     (el banner que sale del sitio sí firma);
-  - la foto 16:9 se recorta a 1,9:1 anclada arriba;
+  - la foto 16:9 se recorta a 1,9:1 quitando la parte de arriba, para que el lecho quede entero;
   - se entrega en 2400 × 1260, JPEG calidad 88 con croma 4:4:4, y se aprueba junto a su recorte cuadrado.
   **Pendiente en AXIS:** todavía no es una pieza de `manzanitasRegister` ni la conoce la plantilla `blog-banner`. Hoy
   se compone con la maqueta `ai-generations/2026-10-24_portadas-blog/composicion/componer-centrada.cjs` y `FIRMA=0`.
-  Nunca la presentes como pieza de AXIS ni muevas sus posiciones a mano en otra copia.
+  Nunca la presentes como pieza de AXIS ni muevas sus posiciones a mano en otra copia. Paso a paso, zonas seguras por
+  superficie, subida con guardas (`scripts/public-website/blog-post-cover-apply.php`) y QA:
+  [manual](../../../../docs/manual-de-uso/creative/producir-portada-de-articulo-del-blog.md).
 
 ### 4.6 YouTube y pódcast
 

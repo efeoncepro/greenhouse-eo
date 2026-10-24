@@ -338,13 +338,16 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
     cabecera de Marketing con Manzanitas ya identifica la pieza, el artículo está en el sitio de Efeonce y la prenda
     del sujeto ya lleva la marca bordada. Este caso cumple la regla de La órbita de no repetir el logo cuando la marca
     ya está en la imagen. El banner que se comparte fuera del sitio conserva su firma.
-  - **La foto 16:9 se recorta a 1,9:1 anclada arriba**, para que la cabecera no choque con el borde.
+  - **La foto 16:9 se recorta a 1,9:1 quitando la parte de arriba**, para que el lecho quede entero abajo y la
+    cabecera caiga sobre el muro oscuro.
   - **Se entrega al doble** (2400 × 1260), en JPEG de calidad 88 con croma 4:4:4. Se revisan juntos la portada
     completa y su recorte cuadrado, y se aprueban los dos.
   - **Estado:** variante aprobada para el blog y **pendiente en AXIS**. No es todavía una pieza de
     `manzanitasRegister`, y la plantilla `blog-banner` del compositor no la conoce. Hoy se compone con la maqueta
     `ai-generations/2026-10-24_portadas-blog/composicion/componer-centrada.cjs` (con `FIRMA=0`), que copia la
     plantilla aprobada y cambia sólo las posiciones.
+  - **Cómo se hace de punta a punta** (zonas seguras por superficie, ficha cine, composición, exportación, subida con
+    guardas y QA en vivo): [manual de la portada de artículo](../../../manual-de-uso/creative/producir-portada-de-articulo-del-blog.md).
 
 ### 5.7 YouTube y pódcast
 

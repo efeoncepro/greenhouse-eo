@@ -183,7 +183,7 @@ formato y nadie mira al lente.
 | Pieza | Cómo va |
 |---|---|
 | **Story** | una sola pieza, Escena o Pizarra (nunca las dos). Con foto: la voz en la banda alta y la firma centrada sobre la mesa, dentro de la zona segura, que es la de AXIS: nada importante en el 13 % de arriba ni de abajo (decisión del 2026-09-29). La story de cierre siempre lleva su pregunta y su respuesta, con un texto propio de la pieza y la misma extensión que la contraportada |
-| **Blog y banner** | una sola pieza, Escena o Pizarra. La foto se genera en 16:9 y se lleva a 1,9:1 (1200 × 630); la voz va en el lado oscuro y la firma puede ir abajo a la izquierda, cerrando la columna del texto |
+| **Blog y banner** | una sola pieza, Escena o Pizarra. La foto se genera en 16:9 y se lleva a 1,9:1 (1200 × 630); la voz va en el lado oscuro y la firma puede ir abajo a la izquierda, cerrando la columna del texto. La **portada de un artículo** se ve también recortada en cuadrado (WhatsApp, tarjetas del blog), así que todo el texto va en el cuadrado central y no lleva firma (decisión del 2026-10-24; [manual](../../manual-de-uso/creative/producir-portada-de-articulo-del-blog.md)) |
 | **YouTube** | la miniatura es una Escena 16:9 con el logo abajo a la izquierda; el cierre del video lleva el logo con el eslogan debajo |
 | **Pódcast (1:1)** | la cabecera del programa en grande (420 px), porque la portada se ve a 160 px |
 

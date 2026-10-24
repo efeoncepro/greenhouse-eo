@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="Inter, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">Zonas seguras de la portada de artículo del blog de Marketing con Manzanitas</title>
+  <desc id="d">Lienzo de 1200 por 630. El cuadrado central, de x 285 a x 915, es lo que muestran el recorte cuadrado de WhatsApp y las tarjetas del blog. La columna de texto va de x 312 a x 782 y de y 50 a y 341. La cara del sujeto cae entre x 795 y x 900. La tarjeta de X puede recortar 15 píxeles arriba y abajo. Abajo va el lecho, la mesa en sombra.</desc>
+  <defs>
+    <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="10" stroke="#f83902" stroke-width="3" opacity="0.55"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#001a33"/>
+  <!-- Lecho -->
+  <rect x="0" y="470" width="1200" height="160" fill="#0b2741"/>
+  <text x="24" y="512" fill="#8fa3b8" font-size="16">Lecho: la mesa</text>
+  <text x="24" y="532" fill="#8fa3b8" font-size="16">en sombra, entera</text>
+  <text x="24" y="552" fill="#8fa3b8" font-size="16">abajo (la foto 16:9</text>
+  <text x="24" y="572" fill="#8fa3b8" font-size="16">pierde lo de arriba)</text>
+  <!-- Banda de X -->
+  <rect x="0" y="0" width="1200" height="15" fill="url(#hatch)"/>
+  <rect x="0" y="615" width="1200" height="15" fill="url(#hatch)"/>
+  <text x="935" y="44" fill="#ff8a66" font-size="16">X (2:1) puede recortar</text>
+  <text x="935" y="64" fill="#ff8a66" font-size="16">15 px arriba y abajo</text>
+  <!-- Cuadrado central -->
+  <rect x="285" y="1" width="630" height="628" fill="none" stroke="#36c8bf" stroke-width="3" stroke-dasharray="14 10"/>
+  <text x="300" y="456" fill="#36c8bf" font-size="17" font-weight="600">Recorte cuadrado: x 285–915</text>
+  <text x="300" y="478" fill="#36c8bf" font-size="15">WhatsApp y tarjetas del blog (304 × 304)</text>
+  <!-- Columna de texto -->
+  <rect x="312" y="50" width="470" height="291" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-width="2"/>
+  <rect x="312" y="50" width="180" height="81" fill="#e86bd0" fill-opacity="0.35"/>
+  <text x="322" y="96" fill="#ffffff" font-size="17" font-weight="600">Cabecera MCM</text>
+  <text x="322" y="116" fill="#ffffff" font-size="13">312, 50 → 492, 131</text>
+  <rect x="312" y="170" width="470" height="70" fill="#ffffff" fill-opacity="0.10"/>
+  <text x="322" y="200" fill="#ffffff" font-size="17" font-weight="600">Pregunta (voz)</text>
+  <text x="322" y="222" fill="#ffffff" font-size="13">desde 312, 170</text>
+  <rect x="312" y="250" width="470" height="91" fill="#ffffff" fill-opacity="0.18"/>
+  <text x="322" y="300" fill="#ffffff" font-size="30" font-weight="800">Respuesta.</text>
+  <text x="322" y="326" fill="#ffffff" font-size="13">312, 250 → 782, 341 · sin desborde</text>
+  <text x="312" y="368" fill="#ffffff" font-size="15">Columna de texto: x 312–782 · y 50–341 (27 px de aire al borde del cuadrado)</text>
+  <text x="312" y="390" fill="#8fa3b8" font-size="15">Sin bajada · sin firma · sin eslogan</text>
+  <!-- Sujeto -->
+  <rect x="795" y="70" width="105" height="130" rx="52" fill="none" stroke="#ffb020" stroke-width="3"/>
+  <text x="847" y="226" fill="#ffb020" font-size="15" text-anchor="middle">Cara</text>
+  <text x="847" y="246" fill="#ffb020" font-size="13" text-anchor="middle">x 795–900</text>
+  <text x="1176" y="300" fill="#ffb020" font-size="15" text-anchor="end">Cuerpo y</text>
+  <text x="1176" y="320" fill="#ffb020" font-size="15" text-anchor="end">fenómeno: tercio</text>
+  <text x="1176" y="340" fill="#ffb020" font-size="15" text-anchor="end">derecho</text>
+  <!-- Escala -->
+  <text x="24" y="44" fill="#8fa3b8" font-size="16">1200 × 630</text>
+  <text x="24" y="64" fill="#8fa3b8" font-size="16">entrega 2400 × 1260</text>
+</svg>

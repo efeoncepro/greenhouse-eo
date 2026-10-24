@@ -141,6 +141,10 @@ La diferencia con otras capas de documentacion:
   fuente o marcarlo «Ejemplo ilustrativo», láminas de texto denso, Escena y Lente, la contraportada con una sola
   conversión, checklist (acento, contraste, una esfera, «Desliza», firma, fuente), story, blog, YouTube y pódcast,
   estados y señales, problemas comunes y pendientes. Todavía sin comando: el registro en AXIS llega por una task aparte.
+- [Producir la portada de un artículo del blog](creative/producir-portada-de-articulo-del-blog.md) — imagen destacada
+  y OG de Marketing con Manzanitas: zonas seguras por superficie (cuadrado central para WhatsApp y tarjetas, banda de
+  X), ficha cine con la cara en x 795–900, composición centrada sin firma, JPEG 2400 × 1260, subida con guardas y
+  respaldo, QA en vivo y cómo volver atrás.
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19. Desde el 2026-10-03 (v1.1): pedir personas del roster, del elenco y a
