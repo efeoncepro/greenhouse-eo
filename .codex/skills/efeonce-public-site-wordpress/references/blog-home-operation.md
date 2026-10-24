@@ -48,11 +48,20 @@ canonical site nav (`EO_SITE_NAV_EXCLUDED_PAGES` empty), `eo_content_model_enabl
 - End-to-end proof needs a human submit: Turnstile rejects the automated browser (no token, no `POST /submit`). Never
   try to bypass it; confirm the contact in HubSpot instead. Rollback: `subscription off --apply`.
 - Resources hide after 180 days without `review`. Events never store private meeting links (the CLI refuses them).
+- Events with real reservation: never create them by hand. `pnpm events:launch -- --brief <json> [--apply]` publishes the
+  Greenhouse form, the HubSpot destination and the WordPress event with its `form_key` in one go; the portada shows the
+  event pill (state widths via `:has()`, 236/470/360 px, height 52) only when the event has a live `form_key`. The private
+  room link lives only in the form's server-only policy and in the emails. Manual:
+  `docs/manual-de-uso/public-site/lanzar-evento-o-webinar.md`. **State 2026-10-24: do not launch real events yet** —
+  reservations reach HubSpot, but emails do not send in production until the accepted-status fix
+  (`ACCEPTED_SUBMISSION_STATUSES`) is released to the `ops-worker`, and the HubSpot Marketing Events / Teams webinar
+  integration is pending design (RESEARCH-013).
 - Template changes are not edits to WordPress: they go through `scripts/public-website/blog-v3/` (bind-canvas →
   make-tablet → build-plugin → equivalence + PHP parity + pixel gate ≤1 %), are committed in the runtime and shipped
   with `deploy home`. Deviations from the canvas are listed in
   `docs/ui/visual-directions/TASK-2051-blog-portada-v3/README.md`.
 - A new PHP file reaches PHP-FPM 1–2 min after a deploy.
 - Open items (2026-10-24): human submit confirmed in HubSpot, operator's visual OK on the bottom pill, first real event
-  (events section hidden until then), purge timing measured on Kinsta, trash of review page 252046 pending the
+  (events section hidden until then; blocked: email fix release + HubSpot Marketing Events redesign, RESEARCH-013; the
+  2026-10-24 end-to-end test proved reservations + HubSpot and found the email bug), purge timing measured on Kinsta, trash of review page 252046 pending the
   operator.

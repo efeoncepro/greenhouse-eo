@@ -1,7 +1,7 @@
 # Portada del blog — Marketing con Manzanitas en efeoncepro.com/blog/
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-24 por Claude
 > **Ultima actualizacion:** 2026-10-24 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) ·
@@ -93,6 +93,9 @@ casilla del diseño original y espera el visto bueno visual del operador.
 - El enlace privado de la sala (Zoom, Teams, Meet) nunca se guarda en el evento.
 - Las grabaciones de webinars son entradas con formato Grabación y aparecen en «Grabaciones para ver cuando quieras».
 - **Sin un evento próximo, la sección de eventos no se muestra.** Así está hoy: todavía no hay un evento real cargado.
+- **Estado (2026-10-24): todavía no se lanzan eventos reales.** Las reservas funcionan y llegan a HubSpot, pero los
+  correos de confirmación y recordatorio no salen hasta un release con la corrección de un defecto, y la conexión con
+  el objeto Eventos de marketing de HubSpot (y un posible webinar de Teams) está en diseño (RESEARCH-013).
 
 > Detalle técnico: [PDR-029 §3](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md).
 
@@ -127,6 +130,6 @@ diagnóstico.
 
 - Primer envío real de suscripción y confirmación en HubSpot.
 - Visto bueno del operador a la suscripción del final.
-- Primer evento real.
+- Primer evento real (después del release de los correos y del diseño con HubSpot, RESEARCH-013).
 - Medir en el hosting que la portada se actualiza en menos de dos minutos.
 - Decidir si se elimina la página de revisión `/blog-v3-revision/` (no indexada).

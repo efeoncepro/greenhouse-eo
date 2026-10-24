@@ -18,3 +18,7 @@
 {"at":"2026-10-24T11:55:39.367Z","author":"Julio Reyes","op":"subscription","input":{"op":"subscription","form_key":"off"},"result":{"before":{"form_key":"6bc62588-a4a0-4214-9501-13b0c2948c81","surface":"fhsf-efeonce-blog-subscription"},"after":{"form_key":"","surface":""}}}
 {"at":"2026-10-24T12:02:40.416Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T12-02-08-736Z"}}
 {"at":"2026-10-24T12:06:41.957Z","author":"Julio Reyes","op":"subscription","input":{"op":"subscription","form_key":"6bc62588-a4a0-4214-9501-13b0c2948c81"},"result":{"before":{"form_key":"","surface":""},"after":{"form_key":"6bc62588-a4a0-4214-9501-13b0c2948c81","surface":"fhsf-efeonce-blog-subscription"}}}
+{"at":"2026-10-24T13:41:54.026Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T13:42:14.210Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T13:42:17.731Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T13-41-20-841Z","flag":"1"}}
+{"at":"2026-10-24T13:42:47.939Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T13-42-18-304Z"}}

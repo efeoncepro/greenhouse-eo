@@ -23,6 +23,9 @@
 - Code complete en local, sin publicar: modelo de contenido (TASK-2050, PDR-029 Proposed), formulario en línea con
   reservas por evento y conteo (TASK-2053/2054; llega con el próximo release a main) y primitives AXIS de botón,
   segmentado y buscador con haz (TASK-2052, v0.7.15 preparada).
+- Eventos del blog: correos de reserva desplegados (release `e593e3993bc3`), pero la prueba de punta a punta mostró que
+  no salen (filtro `accepted` contra envíos `delivered`); corrección local, pendiente de release. Integración con
+  HubSpot Eventos de marketing en diseño (RESEARCH-013); sin eventos reales hasta entonces.
 
 ## 2026-10-24 — Sitio público: Nosotros y Partners rediseñados (source-led)
 

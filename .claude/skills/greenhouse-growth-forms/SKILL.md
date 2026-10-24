@@ -647,6 +647,31 @@ standard forms 0 px against a baseline rev). Lesson: measure the canvas's COMPUT
 reset beats `.ab`, so the approved open button renders 16 px/400, not the declared 15/600. Full table:
 `docs/architecture/growth-public-forms-runtime-contract.md` §Formulario en línea.
 
+**Events and webinars end to end (2026-10-24, release `e593e3993bc3`, flag `GROWTH_EVENT_EMAILS_ENABLED` ON in the
+`ops-worker`). STATE: do NOT launch real events yet.** Reservations work and reach HubSpot (proven with test form
+`prueba-e2e-eventos-2026-10-24`), but **emails are NOT sent in production** until the fix release reaches the
+`ops-worker`: `event-emails.ts` required `submission.status === 'accepted'`, the dispatcher had already moved it to
+`delivered` (HubSpot answered first), so the consumer no-op'd; the reminder SQL `listDueEventReminderSubmissionIds` had
+the same filter. Fixed locally with `ACCEPTED_SUBMISSION_STATUSES` (store.ts) + test
+`event-emails-accepted-status.test.ts`. **Rule: any consumer/job that reads `form_submission` uses
+`ACCEPTED_SUBMISSION_STATUSES`, NEVER `status = 'accepted'`.** HubSpot today gets only a submission to the shared form
+with `ef_event_key` (overwritten) and `ef_greenhouse_submission_id` — no confirmed/waitlisted status, no native Marketing
+Events object (token lacks `crm.objects.marketing_events.*`, 403). The event ↔ HubSpot Marketing Events ↔ Teams webinar
+integration is being designed before the next release (RESEARCH-013, `docs/research/RESEARCH-013-annexes/`). One command launches any event: `pnpm events:launch -- --brief <json> [--apply]` (brief schema +
+example `scripts/growth/events/examples/webinar.example.json`). It ensures the HubSpot property `ef_event_key` + shared
+form «Reserva de eventos | Blog Efeonce», authors/publishes the `event_registration` form on surface
+`fhsf-efeonce-blog-events` (allowing the slug with `allowFormSlugOnSurface`, deprecating the previous version), creates
+or updates the WordPress event with its `form_key` through the blog-home CLI and verifies (public contract without
+`joinUrl`, `Event` JSON-LD, purge). `ui_policy.eventRegistration` now also carries `event` {title, startUtc, timezone,
+durationMin, modality, venue?, pageUrl}, `joinUrl` (https, server-only: it travels ONLY in emails) and
+`reminderMinutesBefore` (default 120). Emails (`src/lib/growth/forms/event-emails.ts`): the reactive consumer
+`growth_event_registration_email_from_submission` sends confirmation with joinUrl + `.ics` (`event-ics.ts`) or the
+waitlist notice (no link); the `ops-worker` route `/growth/events/reminders` (Cloud Scheduler
+`ops-growth-event-reminders`, `*/15`) sends the reminder to confirmed seats. Idempotent by `sourceEventId`
+(`event_reg_<id>`, `event_rem_<id>`). Email design is PROVISIONAL (`src/emails/EventRegistrationEmail.tsx`). Operator
+manual: `docs/manual-de-uso/public-site/lanzar-evento-o-webinar.md`. A test event uses a `prueba-` slug with
+`--skip-wordpress` and is deprecated afterwards.
+
 Catalog selector needs `GREENHOUSE_GROWTH_CATALOG_SURFACE_ID` + `GREENHOUSE_GROWTH_CATALOG_EMBED_KEY`
 in `wp-config.php`; embed key minted with `pnpm growth:forms:embed-key --surface-id <id>` (shown once).
 

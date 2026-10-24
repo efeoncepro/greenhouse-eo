@@ -51,9 +51,26 @@ bajo el aviso (`consentBy: 'submission'` + hash del aviso, aprobado por el opera
 renderer en los tres tableros, sobrevive al autoplay del slider, abre el campo, axe 0. **Pendiente:** un envío real de
 verificación (contacto suscrito al tipo 535702717) y el visto bueno visual de la píldora en el pie (desvío 13).
 Desconectar: `subscription off --apply`.
+**Defectos visuales de la píldora reportados por el operador (2026-10-24, sin corregir):** al elegir el correo autocompletado
+el campo se pinta claro (falta una regla `:-webkit-autofill` en `src/growth-forms-renderer/styles.ts`; causa probable) y
+«¡Listo!» queda descentrado (`.ghf-inline-msg` es una grilla que toma el ancho de «Ya estás suscrito»). El estado final
+sí se ve bien. Van al mismo release que la corrección de correos, con el gate `inline-pill.scenario.mjs`.
 
 **AXIS v0.7.15 publicado** (CI `dc7c721`, primitives 0.7.15; la prueba del haz del buscador ya no compite con el
 runner). Sin evento real cargado: la sección de eventos queda oculta hasta el primero (`blog-home event`).
+
+**Eventos y webinars: infraestructura desplegada, NO operativa.** El release `e593e3993bc3` llevó los correos de
+reserva (confirmación con `joinUrl` + `.ics`, lista de espera, recordatorio por `/growth/events/reminders` + Cloud
+Scheduler `ops-growth-event-reminders` `*/15`), `GROWTH_EVENT_EMAILS_ENABLED` ON en el ops-worker y el lanzador
+`pnpm events:launch -- --brief <json> [--apply] [--skip-wordpress]` (manual `lanzar-evento-o-webinar.md`). La prueba de
+punta a punta con `prueba-e2e-eventos-2026-10-24` (sin WordPress) dejó 2 reservas (confirmada + en espera), consentimiento
+con hash y HubSpot 200, pero **ningún correo salió**: consumer y recordatorio exigían `status='accepted'` y el dispatcher
+ya la había pasado a `delivered`. Corrección local (`ACCEPTED_SUBMISSION_STATUSES` en `event-emails.ts` + `store.ts`,
+prueba `event-emails-accepted-status.test.ts`, SQL contra PG real), **sin release**; un intento local sin
+`RESEND_API_KEY` dejó 3 filas `config_error` en `email_deliveries` (el job de reintentos no las toma: no salió ningún correo). HubSpot
+sólo recibe el envío + `ef_event_key`: sin objeto Marketing Events (token sin scopes, 403). **Decisión del operador:**
+diseñar Marketing Events y un posible webinar en Teams antes del próximo release; no lanzar eventos reales hasta entonces.
+El formulario de prueba sigue publicado para re-verificar y luego deprecarlo. Próximo paso: sesión nueva con RESEARCH-013.
 
 ## 2026-10-24 — Nosotros: fidelidad, rieles de Ohio, mapa y wordmark HubSpot (en vivo)
 

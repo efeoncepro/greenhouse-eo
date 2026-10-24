@@ -235,6 +235,9 @@ verificación (ver «Estado de verificación»).
 | `eventRegistration.statusField` | default `registration_status`; no puede ser un campo declarado | no | `event_registration_status_field_taken` |
 | `eventRegistration.showRegistrationsCount` | `false` (default) · `true` | no | ídem |
 | `eventRegistration.registrationsCountThreshold` | default 25 | no | ídem |
+| `eventRegistration.event` | `{ title, startUtc (ISO UTC), timezone (IANA), durationMin, modality: online·presencial·hibrido, venue?, pageUrl (https) }`, estricto | **no** | `event_registration_invalid` |
+| `eventRegistration.joinUrl` | https; enlace privado de la sala. Viaja SÓLO en los correos | **no** | ídem |
+| `eventRegistration.reminderMinutesBefore` | entero; default 120 | no | ídem |
 
 `eventRegistration` sólo en `form_kind: 'event_registration'` (`event_registration_wrong_kind`) y con un campo `email`.
 Etiquetas por defecto del renderer (es-CL): suscripción «Suscribirme» / «Suscribirme» / «¡Listo!» / «Ya estás suscrito»;
@@ -245,12 +248,31 @@ Publicar un evento: `pnpm growth:forms:publish-event-registration -- --config <j
 defecto con el compiler real; ejemplo `scripts/growth/forms/examples/webinar-aeo-2026-11-12.json`). No crea destinos:
 el destino HubSpot de cada evento va por el registry de destinos.
 
+Para un evento completo usar el lanzador, que compone todo lo anterior con el destino y WordPress:
+`pnpm events:launch -- --brief <json> [--apply]` (manual: `docs/manual-de-uso/public-site/lanzar-evento-o-webinar.md`).
+
 ### Envío y lista de espera
 
 `POST …/submit` sin cambios de forma. Con política de reserva la respuesta suma `registrationStatus: 'confirmed' |
 'waitlisted'`; con el cupo lleno y `reject` responde `409 { outcome: 'capacity_full' }` y no persiste nada (queda una
 fila `rejected` con `rejection_reason_class = capacity_full`). El cupo se decide en la transacción del envío con un lock
 por formulario; un correo ya confirmado no ocupa otro cupo.
+
+### Correos de la reserva (2026-10-24)
+
+Gateados por `GROWTH_EVENT_EMAILS_ENABLED` (se lee sólo en el `ops-worker`; declarado `:-true` en su `deploy.sh`).
+Todo sale de la política de la versión publicada; nada se hardcodea por evento (`src/lib/growth/forms/event-emails.ts`).
+
+| Correo | Disparo | Contenido | Idempotencia |
+|---|---|---|---|
+| Confirmación | consumer reactivo `growth_event_registration_email_from_submission` sobre `growth.forms.submission_accepted` | fecha y hora en la zona del evento, duración, modalidad, `joinUrl` y `.ics` adjunto (`event-ics.ts`, UID `<eventKey>@efeoncepro.com`) | `sourceEventId = event_reg_<submissionId>` |
+| Lista de espera | mismo consumer, `registration_status = waitlisted` | aviso sin enlace ni `.ics` | ídem |
+| Recordatorio | ruta `/growth/events/reminders` del `ops-worker`, Cloud Scheduler `ops-growth-event-reminders` `*/15` | confirmadas con `startUtc − reminderMinutesBefore ≤ now < startUtc` | `sourceEventId = event_rem_<submissionId>` |
+
+Tipos de correo `growth_event_registration` y `growth_event_reminder`; plantilla `src/emails/EventRegistrationEmail.tsx`
+con diseño **provisional**. Un formulario sin `eventRegistration.event` registra la reserva sin correo (no-op honesto).
+Regla: todo consumer o job que lea `form_submission` filtra con `ACCEPTED_SUBMISSION_STATUSES` (store), **nunca**
+`status = 'accepted'`: el dispatcher puede haber movido la reserva a `delivered` antes de que corra el consumer.
 
 ### Consentimiento por el acto de suscribirse (`consentBy: 'submission'`)
 
@@ -366,8 +388,19 @@ suscripción (`data-subscribe="off"`), nunca un éxito simulado.
 - **Pendiente:** un envío real. El envío desde el navegador automatizado de Claude no salió: Turnstile lo rechazó (sin
   token, sin `POST /submit`; misma configuración que AEO, que funciona con personas). No se intentó eludir la
   verificación. Falta que una persona se suscriba y confirmar en HubSpot el contacto suscrito al tipo `535702717`.
-- **Pendiente:** el formulario de reserva por evento espera un evento real (sin evento cargado, la portada oculta su
-  sección).
+- **Reserva por evento probada de punta a punta el 2026-10-24** con un evento de prueba (`prueba-e2e-eventos-2026-10-24`,
+  sin WordPress): dos reservas por el comando del servidor (confirmada + lista de espera), snapshot con hash del aviso,
+  HubSpot `succeeded` (HTTP 200) en ambas. La prueba destapó un defecto: el correo exigía `status = 'accepted'`, pero el
+  dispatcher ya la había movido a `delivered` antes de que corriera el consumer, así que el correo se saltó (y el SQL
+  del recordatorio tenía el mismo filtro). Corregido para usar `ACCEPTED_SUBMISSION_STATUSES` del store en ambos
+  caminos, con prueba de comportamiento `event-emails-accepted-status.test.ts`; el SQL se ejercitó contra PG real
+  (devuelve sólo la confirmada). La corrección necesita llegar al `ops-worker` por un release: **hasta entonces los
+  correos de la reserva no operan en producción**.
+- **HubSpot hoy:** cada reserva es sólo un envío al formulario compartido «Reserva de eventos | Blog Efeonce» con
+  `ef_event_key` (se sobrescribe) y `ef_greenhouse_submission_id`; el estado confirmada/lista de espera no viaja y no se
+  usa el objeto nativo Eventos de marketing (el token no tiene `crm.objects.marketing_events.*`, 403). La integración
+  evento ↔ Eventos de marketing ↔ posible webinar de Teams queda pendiente de diseño (RESEARCH-013,
+  `docs/research/RESEARCH-013-annexes/`). No lanzar eventos reales con el flujo actual.
 
 ## Content Marketing: presentación, host y distribución del renderer
 

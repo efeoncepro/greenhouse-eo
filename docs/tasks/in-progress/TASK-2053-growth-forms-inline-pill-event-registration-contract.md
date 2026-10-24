@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `En producción desde el release 40b330175855 (2026-10-24): contrato inline_pill + consentBy submission con hash del aviso; formulario de Glitch publicado (fver-e6850cc8) y en uso en /blog/; formulario de reserva por evento sin publicar hasta que exista un evento real; falta un envío real de verificación`
+- Status real: `En producción desde el release 40b330175855 (2026-10-24): contrato inline_pill + consentBy submission con hash del aviso; formulario de Glitch publicado (fver-e6850cc8) y en uso en /blog/; correos de reserva desplegados en el release e593e3993bc3 (flag ON en ops-worker) pero sin enviar: la prueba de punta a punta con prueba-e2e-eventos-2026-10-24 destapó que consumer y recordatorio exigían status accepted y el envío ya estaba en delivered; corrección local sin release; integración HubSpot Marketing Events en diseño (RESEARCH-013) antes del próximo release; sin eventos reales hasta entonces; falta un envío real de verificación de Glitch`
 - Rank: `TBD`
 - Domain: `growth|forms|public-site`
 - Blocked by: `none`
@@ -268,7 +268,7 @@ Los textos por defecto de la presentación en línea vienen del canvas: Glitch �
 - [x] Consentimiento por el acto de suscribirse (aprobado por el operador el 2026-10-24): el submit guarda `notice_text_hash` del `inlinePill.note`, el adaptador HubSpot suscribe con `consentBy: 'submission'` sólo si el hash existe y una entrada con `consentBy` y `checkboxKey` falla con `invalid_communications_mapping` sin POST. — `src/lib/growth/forms/__tests__/inline-pill-notice-hash.test.ts` + 3 casos en `destinations/hubspot/__tests__/adapter.test.ts`; en producción desde el release `40b330175855`.
 - [ ] Envío real de verificación de la suscripción a Glitch con el contacto suscrito al tipo `535702717` en HubSpot. — pendiente: el envío desde el navegador automatizado de Claude no salió porque Turnstile lo rechazó (sin token, sin `POST /submit`); no se eludió. Falta que una persona se suscriba.
 - [x] Un formulario de evento rechaza envíos sobre el cupo o los pasa a lista de espera según su política. — `event-registration.test.ts` + verificación SQL en PostgreSQL 16 local.
-- [ ] Formulario de reserva de un evento publicado y probado con un envío y el conteo actualizado. — pendiente: no hay un evento real cargado (la portada oculta la sección de eventos); el ejemplo `webinar-aeo-2026-11-12.json` no se publicó.
+- [ ] Formulario de reserva de un evento publicado y probado con un envío y el conteo actualizado. — pendiente: no hay un evento real cargado (la portada oculta la sección de eventos); el ejemplo `webinar-aeo-2026-11-12.json` no se publicó. Prueba del 2026-10-24 con el formulario `prueba-e2e-eventos-2026-10-24` (sin WordPress): 2 reservas (confirmada + en espera) y HubSpot 200, pero los correos no salieron (filtro `status='accepted'` contra envíos ya `delivered`); corrección local sin release. Sin eventos reales hasta diseñar la integración con HubSpot Marketing Events (RESEARCH-013).
 - [x] La ruta del conteo responde sin PII, redondeado, con umbral, caché y rate limit. — `registrations-count.test.ts` + `registrations-count-route.test.ts`.
 
 ## Verification
