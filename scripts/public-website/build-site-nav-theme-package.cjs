@@ -28,13 +28,16 @@ const relativeFiles = tracked.filter(f => SCOPE.test(f) && (!f.startsWith('asset
 const dirty = cp.execFileSync('git', ['status', '--porcelain', '--', ...relativeFiles], { cwd: theme, encoding: 'utf8' }).trim()
 
 if (dirty) throw new Error(`Theme files in scope have uncommitted changes; commit them before packaging:\n${dirty}`)
+
 for (const required of ['functions.php', 'inc/site-nav.php', `assets/vendor/axis/site-nav/${version}/VERSION.json`]) {
   if (!relativeFiles.includes(required)) throw new Error(`Missing in package: ${required}`)
 }
+
 if (relativeFiles.filter(f => f.startsWith('parts/headers/')).length !== 8) throw new Error('Expected the 8 header-style overrides.')
 
 // The vendored files must match their VERSION.json, which records the published package.
 const pinned = JSON.parse(fs.readFileSync(path.join(theme, `assets/vendor/axis/site-nav/${version}/VERSION.json`), 'utf8'))
+
 for (const [rel, digest] of Object.entries(pinned.files)) {
   if (sha(fs.readFileSync(path.join(theme, `assets/vendor/axis/site-nav/${version}`, rel))) !== digest) throw new Error(`Vendored file differs from VERSION.json: ${rel}`)
 }
