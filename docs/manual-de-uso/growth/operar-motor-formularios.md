@@ -1,7 +1,7 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.11 — 2026-10-23 (Claude, campos de fidelidad de diseño, TASK-2044)
+> **Version:** 1.12 — 2026-10-24 (Claude, publicar la píldora de Glitch y consentimiento por el acto de suscribirse, TASK-2053/2054)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
@@ -381,6 +381,55 @@ landing: se declara en una versión nueva del formulario.
 producción: el renderer actual muestra el marcador tal cual. `width`, `compact`, `icon` y `dismiss` sí se pueden
 publicar antes (el renderer actual los ignora sin romper). Tabla completa:
 [contrato de runtime](../../architecture/growth-public-forms-runtime-contract.md#formularios-diseñados-en-canvas-lo-que-el-contrato-admite-task-2044).
+
+## Publicar la suscripción a Glitch como píldora (TASK-2053/2054)
+
+Sirve para publicar (o volver a verificar) la versión `inline_pill` del formulario `efeonce-blog-subscription`, la que
+usa la portada del blog. La clave pública no cambia (`6bc62588-a4a0-4214-9501-13b0c2948c81`), así que la portada no
+necesita reconfigurarse al publicar una versión nueva.
+
+**Antes de empezar:** acceso a PostgreSQL con el perfil `ops` (el script lo aplica; levanta el proxy con `pnpm pg:connect` si corres local) y, para publicar, el release de Greenhouse en
+`main` con el consentimiento por el acto de suscribirse (está desde `40b330175855`, 2026-10-24).
+
+```bash
+pnpm growth:forms:publish-glitch-pill             # dry-run: compila en memoria, no escribe
+pnpm growth:forms:publish-glitch-pill --apply     # borrador + destino HubSpot + revisión
+pnpm growth:forms:publish-glitch-pill --publish   # lo anterior + publica
+```
+
+1. **Dry-run** (sin flags): compila la versión con el mismo compiler de la publicación y muestra `ok`, `blocking`, la
+   presentación y las etiquetas. Sólo lee la base; no escribe nada. Si `ok` es `false`, no sigas.
+2. **`--apply`**: crea el borrador con la política `efeonce-blog-glitch-subscription-pill-v1` (si no existe), le agrega
+   el destino HubSpot (form `8c7cf91b-a1c9-4cbe-9d8c-cac773692561`, suscripción `535702717` con `consentBy:
+   'submission'`) y lo deja en revisión. Es idempotente: si la versión o el destino ya existen, no los duplica.
+3. **`--publish`**: hace lo mismo y publica. Antes revisa que `origin/main` contenga el hash del aviso y `consentBy` en el
+   adaptador; si no, se niega («primero el release de Greenhouse»), porque publicar antes dejaría suscriptores sin
+   suscripción en HubSpot.
+4. Conecta (o confirma) la portada: `pnpm public-website:blog-home subscription <form_key> --apply`. Sin `--apply`
+   muestra el plan; con `off` desconecta (la portada deja de mostrar la suscripción, nunca simula un éxito).
+
+**Cómo funciona el consentimiento:** la píldora no tiene casillas. Al aceptar un envío, Greenhouse guarda la huella
+(`notice_text_hash`) del aviso de la versión publicada, y el destino HubSpot suscribe al tipo `535702717` sólo si esa
+huella existe. Lo aprobó el operador el 2026-10-24 y vale **sólo** para píldoras de suscripción con aviso
+(`inlinePill.note`). Una suscripción con casilla sigue exigiendo la casilla marcada.
+
+**Verificar:** la píldora en `/blog/` en escritorio, tablet y móvil (`pnpm public-website:blog-home verify --browser`).
+Para el envío real hace falta una persona: el captcha (Turnstile) rechaza navegadores automatizados. Después, en
+HubSpot, el contacto debe aparecer suscrito al tipo `535702717`. Al 2026-10-24 ese envío real está **pendiente**.
+
+**Qué no hacer:**
+
+- No declares en un destino una entrada de `communications` con `consentBy` **y** `checkboxKey` a la vez: es una
+  declaración mal formada y la entrega falla con `invalid_communications_mapping` sin enviar nada.
+- No uses `consentBy: 'submission'` en un formulario sin aviso ni en uno que no sea de suscripción: sin huella del aviso
+  no suscribe, y el alcance aprobado es sólo la píldora de suscripción.
+- No intentes eludir el captcha para "probar" el envío.
+
+**Problemas comunes:**
+
+- `--publish` dice que `origin/main` no sirve `consentBy`: falta el release de Greenhouse; publica después.
+- El envío se acepta pero el contacto no queda suscrito: revisa que la versión publicada tenga `inlinePill.note`
+  (sin aviso, `notice_text_hash` queda vacío) y el `form_destination_attempt` de la entrega.
 
 ## Referencias tecnicas
 

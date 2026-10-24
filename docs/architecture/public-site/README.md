@@ -17,6 +17,17 @@ Use this folder when a reusable public landing component, Elementor widget, host
   compilados desde el canvas aprobado, carril de release con preflight y diagnóstico Growth Forms; incluye
   incidente, rollback y pendientes.
 
+## Blog
+
+- [Portada del blog — runtime V1](BLOG_HOME_RUNTIME_V1.md) — `/blog/` (18456) en producción desde el 2026-10-24:
+  plugin `eo-blog-home` que renderiza en servidor el canvas aprobado como plantilla (tres tableros, desvíos 1–13),
+  modelo de contenido de `efeonce-editorial-blocks` 0.2.0 por el filtro `eobh_data` (PDR-029), suscripción real a
+  Glitch con Growth Forms (`inline_pill`, interruptor `data-subscribe`, `data-dc-keep`, reset del host que excluye
+  `<greenhouse-form>`), gates de fidelidad y paridad, CLI `pnpm public-website:blog-home` y rollback. Funcionamiento:
+  [portada del blog](../../documentation/public-site/portada-del-blog.md); operación:
+  [por CLI](../../manual-de-uso/public-site/operar-portada-blog-por-cli.md) y
+  [desde WordPress](../../manual-de-uso/public-site/operar-contenido-portada-blog.md).
+
 ## Shared surfaces
 
 - [Public Site Miscellaneous Surfaces V1](PUBLIC_MISCELLANEOUS_SURFACES_V1.md) — ownership propuesto para
@@ -26,7 +37,7 @@ Use this folder when a reusable public landing component, Elementor widget, host
   `efeonce.site-nav` que reemplaza el encabezado de Ohio: contrato y primitive en AXIS (el tema fija primitives
   0.7.13), documento único en el plugin «EO Navegación» editado con `pnpm public-website:site-nav`, adaptador con
   interruptor en `ohio-child` y agendador nativo; Think más adelante. En producción en todo `efeoncepro.com` desde el
-  2026-10-23 00:09 UTC, sin piloto (`/blog/` conserva Ohio). Incluye el dock inferior de las landings (`TASK-2043`).
+  2026-10-23 00:09 UTC, sin piloto; en `/blog/` desde el corte de la portada del 2026-10-24. Incluye el dock inferior de las landings (`TASK-2043`).
   PDR-027 (Accepted 2026-10-18) y EPIC-055. Funcionamiento:
   [navegación global](../../documentation/public-site/navegacion-global-del-sitio.md) y
   [dock de landings](../../documentation/public-site/dock-de-landings.md); operación:

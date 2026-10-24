@@ -263,9 +263,12 @@ Los textos por defecto de la presentación en línea vienen del canvas: Glitch �
 
 ## Acceptance Criteria
 
-- [ ] Los contratos de los formularios vivos quedan idénticos. — evidencia parcial: por construcción (sin `presentation` no se emiten claves nuevas; prueba de claves en `inline-pill-contract.test.ts`) y el render de 4 contratos públicos vivos quedó en 0 px; no se recompilaron las versiones reales de la base (no se leyó la base), así que queda sin tildar hasta comparar el GET de producción antes/después del release.
-- [x] Un formulario con `inline_pill` valida y entrega sus etiquetas. — `src/lib/growth/forms/__tests__/inline-pill-contract.test.ts`.
+- [ ] Los contratos de los formularios vivos quedan idénticos. — evidencia parcial: por construcción (sin `presentation` no se emiten claves nuevas; prueba de claves en `inline-pill-contract.test.ts`) y el render de 4 contratos públicos vivos quedó en 0 px; no se recompilaron las versiones reales de la base (no se leyó la base), así que queda sin tildar hasta comparar el GET de producción antes/después del release. El release `40b330175855` salió el 2026-10-24 sin que se hiciera esa comparación.
+- [x] Un formulario con `inline_pill` valida y entrega sus etiquetas. — `src/lib/growth/forms/__tests__/inline-pill-contract.test.ts`; en producción: `efeonce-blog-subscription` versión `fver-e6850cc8-4b39-40c7-9428-a148cfdd53bc` publicada con `pnpm growth:forms:publish-glitch-pill --publish` y servida en `/blog/`.
+- [x] Consentimiento por el acto de suscribirse (aprobado por el operador el 2026-10-24): el submit guarda `notice_text_hash` del `inlinePill.note`, el adaptador HubSpot suscribe con `consentBy: 'submission'` sólo si el hash existe y una entrada con `consentBy` y `checkboxKey` falla con `invalid_communications_mapping` sin POST. — `src/lib/growth/forms/__tests__/inline-pill-notice-hash.test.ts` + 3 casos en `destinations/hubspot/__tests__/adapter.test.ts`; en producción desde el release `40b330175855`.
+- [ ] Envío real de verificación de la suscripción a Glitch con el contacto suscrito al tipo `535702717` en HubSpot. — pendiente: el envío desde el navegador automatizado de Claude no salió porque Turnstile lo rechazó (sin token, sin `POST /submit`); no se eludió. Falta que una persona se suscriba.
 - [x] Un formulario de evento rechaza envíos sobre el cupo o los pasa a lista de espera según su política. — `event-registration.test.ts` + verificación SQL en PostgreSQL 16 local.
+- [ ] Formulario de reserva de un evento publicado y probado con un envío y el conteo actualizado. — pendiente: no hay un evento real cargado (la portada oculta la sección de eventos); el ejemplo `webinar-aeo-2026-11-12.json` no se publicó.
 - [x] La ruta del conteo responde sin PII, redondeado, con umbral, caché y rate limit. — `registrations-count.test.ts` + `registrations-count-route.test.ts`.
 
 ## Verification
@@ -275,7 +278,7 @@ Los textos por defecto de la presentación en línea vienen del canvas: Glitch �
 
 ## Closing Protocol
 
-- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla) — `in-progress`: queda rollout.
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla) — `in-progress`: el release salió (`40b330175855`); quedan el envío real de verificación y el primer formulario de evento real.
 - [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre — lo sincroniza la sesión principal (el índice aún apunta a `to-do/`).
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes — lo actualiza la sesión principal.

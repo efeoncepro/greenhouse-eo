@@ -538,6 +538,23 @@ vercel ls greenhouse-eo --environment=production --scope efeonce-7670142f
 holgado. El workflow cerró en 10m51s (`23:56:03Z`→`00:06:54Z`) con el manifest
 `released`.
 
+**Si CI o CI Deep salen rojos (verificado 2026-10-24, release `40b330175855`):**
+
+```bash
+# El log del paso Test se trunca: la suite que falló está en el artefacto o en el log completo del job.
+gh run download <run_id> -n test-observability -D /tmp/ci-obs      # CI Deep: -n deep-test-observability
+gh api repos/efeoncepro/greenhouse-eo/actions/jobs/<job_id>/logs | grep -n 'FAIL\|failed' | head
+```
+
+- Reintentar (`gh run rerun --failed`) sólo una falla identificable de entorno: runner, red o un flake con
+  `0 failed`. Un timeout que se repite en el reintento —sobre todo bajo coverage, que es como corre CI Deep— es
+  código: se corrige en `develop` (con la prueba corrida en local con `--coverage`) y sale en otro PR.
+- Un job que instala Playwright corre en `ubuntu-24.04`, nunca en `ubuntu-latest`: esa etiqueta ya resuelve a
+  Ubuntu 26.04 (visto el 2026-10-24) y Playwright 1.59.1 no trae Chromium para ella.
+- Ese día, cuatro rojos ajenos al release salieron en serie sobre 224 commits de cinco días de `develop`, y
+  cada uno costó una vuelta de CI (agente ~3h37m contra 16m26s de workflow). Antes de abrir el PR de un
+  `develop` acumulado, correr `pnpm test` completo en local; mejor aún, promover más seguido.
+
 #### Paso E — Aprobar los gates poleando `pending_deployments`, no `run.status`
 
 El entorno `production` se pide **dos veces** (§3 y gotcha #6 de la skill). Polea

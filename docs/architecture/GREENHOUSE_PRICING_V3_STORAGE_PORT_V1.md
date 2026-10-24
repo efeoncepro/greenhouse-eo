@@ -170,6 +170,12 @@ Sin `corpus`, la batería llena un almacén vacío a través del propio puerto, 
 tener algo. El caso 8 recorre el camino completo —puntero, fuentes, cálculo, artefacto congelado y lectura— con cada
 ejemplo del repositorio que tiene su artefacto al lado, y exige el archivo commiteado byte a byte.
 
+El corpus que siembra la batería es un conjunto de **cálculos**, no de archivos: se queda con la primera copia por
+ruta de cada `replayDigest`. Guardar dos copias del mismo cálculo es legítimo —una licitación conserva la cotización
+inicial y la final, con otros bytes y el mismo `replayDigest` (Mattis 1555: `quote-initial` y `quote`)— y un almacén
+la guarda una sola vez: la segunda escritura rechaza con `OUTPUT_EXISTS` (invariante 2). Hasta `571aabe89`
+(2026-10-24) la batería sembraba por archivo y ese caso la rompía; ya no.
+
 ### Cuándo se vuelve a capturar la línea base
 
 Sólo ante un cambio **deliberado** de lo que la CLI responde:

@@ -741,6 +741,29 @@ completed logs before cancelling/retrying. Its build then exhausted a 6 GiB over
 CI now inherits the canonical 8 GiB from `scripts/run-next-build.mjs`, with every gate intact.
 Require the new candidate build to pass; a successful develop push can skip the build.
 
+### Delta 2026-10-24 (release `40b330175855`) — cuatro rojos ajenos en serie, ~3h37m
+
+PR #259 (224 commits de cinco días de `develop`, sin migraciones) + PR #260; orquestador `40090589488`, workflow
+16m26s, gates aprobados en < 1 min. El tiempo se fue en cuatro rojos que no eran del release, uno detrás de otro
+(presupuesto de `CLAUDE.md`, batería de almacenamiento de pricing, runner sin Chromium, timeout bajo coverage). Fila
+completa en `PRODUCTION_RELEASE_TIMING_LEDGER.md`; forma operativa en el runbook (Paso D) y el playbook (anti-pattern #22).
+
+- **El log del paso Test se trunca y esconde la suite que falló.** Leer primero el artefacto `test-observability`
+  (`deep-test-observability` en CI Deep; `vitest.log`, `summary.md`) o el log completo del job: `gh api repos/efeoncepro/greenhouse-eo/actions/jobs/<job_id>/logs`.
+  Mismo principio que la sección de arriba: el veredicto está en los artefactos, no en la vista del paso.
+- **`ubuntu-latest` ya es Ubuntu 26.04 y Playwright 1.59.1 no trae Chromium para esa imagen.** Todo job que instale
+  Playwright fija `runs-on: ubuntu-24.04` (`ci.yml`, `ci-deep.yml` y, desde el 2026-10-24, `reliability-verify.yml`). Ese pin
+  cuenta como `ci_cd` y llevó el release a break-glass.
+- **Un timeout que se repite en el reintento bajo coverage es código, no entorno.** `pricing-v3-artifact-verdict`
+  pasaba los 15 s por defecto bajo instrumentación desde que creció su corpus; el reintento de CI Deep falló igual y
+  costó un segundo PR y otra vuelta de CI de `main` (~45 min). Antes de empujar, correr la prueba sospechosa con
+  `--coverage` en local; reintentar sólo fallas identificables de entorno (runner, red, flake con `0 failed`).
+- **Clasificador:** el dispatch del orquestador encadenado con otros comandos se bloqueó y pasó suelto. Es la regla
+  del gotcha #16 (Delta 2026-09-12), no una nueva.
+- **Cinco días de `develop` acumulado multiplican los rojos ajenos.** Cada uno costó una vuelta de CI completa y en
+  serie. Promover más seguido o, antes de abrir el PR, correr `pnpm test` completo en local sobre el `develop` que se
+  promueve (la misma barra de `TASK_CLOSING_QUALITY_GATE_V1.md`).
+
 ## What The Orchestrator Owns
 
 `production-release.yml` owns the production release lifecycle:

@@ -1,10 +1,11 @@
 # Operar la portada del blog por CLI
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-24 por Claude (sesión «Portada del blog v3»)
 > **Ultima actualizacion:** 2026-10-24 por Claude
-> **Documentacion tecnica:** [PDR-029](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md) ·
+> **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) ·
+> [PDR-029](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md) ·
 > [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-content-model.md) ·
 > [TASK-2051](../../tasks/in-progress/TASK-2051-blog-portada-v3-high-fidelity.md)
 
@@ -65,6 +66,18 @@ Formatos: `articulo`, `caso`, `guia`, `grabacion`, `novedad`, `glitch-edicion`, 
 Una entrada sin imagen propia del slider usa su imagen destacada con un **velo de lectura** a la izquierda. Si el arte
 fue hecho para el slider, cárgalo con `hero --image` y el velo desaparece.
 
+Orden de los cinco lugares: las tres invitaciones (Glitch, guía o herramienta, diagnóstico) tienen lugar reservado y
+una fijada nunca las desplaza; los lugares restantes son para las fijadas vigentes y, si sobran, para las entradas
+recientes con imagen. En pantalla van primero las entradas y después las invitaciones. `slider` muestra el motivo de
+cada una.
+
+### 2b. Foto del autor
+
+El círculo del autor usa la foto de perfil subida en WordPress (plugin One User Avatar); sin foto, las iniciales. Un
+Gravatar de respaldo se descarta a propósito. No hay comando para esto: la foto se sube en el perfil de WordPress
+del autor ([Operar el contenido de la portada](operar-contenido-portada-blog.md#foto-de-perfil-del-autor)). Para
+comprobarla después: `purge --apply` y `verify --browser`, o mira el slider en vivo.
+
 ### 3. Recursos (guía, herramienta, diagnóstico, newsletter)
 
 ```bash
@@ -98,21 +111,56 @@ Growth Forms (`pnpm growth:forms:publish-event-registration`).
 pnpm growth:forms:publish-glitch-pill                      # dry-run: compila la versión píldora en memoria
 pnpm growth:forms:publish-glitch-pill --apply              # borrador + destino HubSpot + revisión
 pnpm growth:forms:publish-glitch-pill --publish            # publica (exige que origin/main sirva el código)
+pnpm public-website:blog-home subscription 6bc62588-a4a0-4214-9501-13b0c2948c81            # plan: before/after
 pnpm public-website:blog-home subscription 6bc62588-a4a0-4214-9501-13b0c2948c81 --apply   # conecta la portada
-pnpm public-website:blog-home subscription off --apply     # la desconecta
+pnpm public-website:blog-home subscription off --apply     # la desconecta (borra las dos opciones)
 ```
+
+`subscription` escribe las opciones de WordPress `eo_blog_glitch_form_key` y `eo_blog_glitch_form_surface`; la
+superficie por defecto es `fhsf-efeonce-blog-subscription` y se cambia con `--surface <id>`. Sólo acepta una clave
+con forma de UUID o `off`. El formulario publicado hoy es `efeonce-blog-subscription` (destino HubSpot con subscription
+type `535702717`).
+
+Para probar la píldora real **antes** de conectarla en vivo, usa el preview local:
+
+```bash
+node scripts/public-website/blog-v3/preview/serve.cjs --subscribe 6bc62588-a4a0-4214-9501-13b0c2948c81
+```
+
+El preview lee el formulario publicado por un proxy local que sólo hace GET: ves la píldora real y sus estados sin
+exponerla en el sitio y sin que un envío sea posible.
+
+Después de conectarla, `verify --browser` y una mirada en vivo en los tres tamaños. Confirmar que funciona de punta a
+punta exige un envío **de una persona**: el navegador automatizado no pasa la verificación invisible (Turnstile), y no
+se intenta eludirla. El envío se confirma en HubSpot (contacto suscrito al tipo `535702717`).
 
 Con un formulario conectado, la píldora de Glitch y la suscripción del final son el renderer real de Growth Forms.
 Sin formulario no hay suscripción en la portada: nunca un «¡Listo!» simulado. La suscripción a Glitch en HubSpot
 nace del acto de suscribirse bajo el aviso (`consentBy: 'submission'`, aprobado el 2026-10-24): el servidor guarda el
 hash del aviso y el destino sólo suscribe si lo encuentra.
 
+### 4c. Flag y purga
+
+```bash
+pnpm public-website:blog-home flag 0 --apply    # contenido de ejemplo aprobado (rollback rápido, datos inertes)
+pnpm public-website:blog-home flag 1 --apply    # datos reales
+pnpm public-website:blog-home purge --apply     # purga /blog/ ahora
+```
+
+No enciendas el flag sin contenido real mínimo (una diapositiva, un tema y un año): el adaptador mostraría el ejemplo
+completo y dejaría `home adapter skipped` en el log de PHP.
+
 ### 5. Verificar
 
 ```bash
 pnpm public-website:blog-home verify            # HTTP + estado: plantilla, un H1, menú canónico, indexable, datos reales
 pnpm public-website:blog-home verify --browser  # además: 8 anchos de 320 a 1920 sin desborde y axe en los tres tableros
+pnpm public-website:blog-home verify --url https://efeoncepro.com/blog-v3-revision/   # otra página con la portada
 ```
+
+La parte HTTP busca la raíz `#eobh`, un solo H1, la barra del menú canónico, robots `index` y que no queden datos de
+ejemplo. La parte de navegador espera el selector `#eobh` y no el evento `load`: los terceros del sitio (etiquetas,
+chat) pueden retener ese evento varios minutos. Si `verify` falla, sale con código 1.
 
 ### 6. Desplegar código (operador)
 
@@ -138,6 +186,10 @@ pnpm public-website:blog-home page rollback --snapshot <opción> --apply # vuelv
 
 El corte del 2026-10-24 dejó el snapshot `_gh_blog_home_v3_before_20261024_081327`.
 
+Rollback por capa, del más chico al más grande: `subscription off --apply` (quita la suscripción) → `flag 0 --apply`
+(vuelve el contenido de ejemplo) → restaurar el `.tar` que imprimió el `deploy` (código anterior) → `page rollback`
+(la página previa al corte).
+
 ## Qué significan los estados
 
 | Señal | Significado |
@@ -150,6 +202,7 @@ El corte del 2026-10-24 dejó el snapshot `_gh_blog_home_v3_before_20261024_0813
 | `stale: true` | Recurso sin revisión reciente: no se muestra. |
 | `applied: false` | Fue un plan; nada cambió. |
 | `data-subscribe="off"` en `#eobh` | Datos reales sin formulario de Glitch conectado: la suscripción no se muestra. |
+| `<greenhouse-form data-dc-keep …>` en el HTML | Suscripción real conectada; el slider no toca ese elemento al animarse. |
 
 ## Qué no hacer
 
@@ -166,6 +219,10 @@ El corte del 2026-10-24 dejó el snapshot `_gh_blog_home_v3_before_20261024_0813
 | `The remote refused the operation` | Validación del lado de WordPress (slug inexistente, fecha pasada, enlace privado) | Leer el error impreso arriba y corregir el dato. |
 | La portada no cambia | Caché de 5 min o purga agrupada de 60 s | `purge --apply` y volver a mirar. |
 | El autor sale con iniciales | El perfil no tiene foto subida (un Gravatar no cuenta) | Subir la foto en el perfil de WordPress del autor. |
+| La portada no muestra suscripción | `data-subscribe="off"`: no hay formulario conectado | `subscription <clave> --apply` con un formulario `inline_pill` publicado. |
+| La píldora se ve aplastada o con texto doble | Un estilo del host alcanzó el interior de `<greenhouse-form>` | `subscription off --apply` de inmediato; el reset del host debe excluir `greenhouse-form *` (`build-plugin.cjs`). |
+| El formulario desaparece al cambiar la diapositiva | Falta `data-dc-keep` en `<greenhouse-form>` | Regenerar con `bind-canvas.cjs` y desplegar `deploy home`. |
+| `verify --browser` se queda esperando | La página no llegó a pintar `#eobh` en 30 s | Revisar que `/blog/` responda y que el shortcode siga en la página. |
 | `deploy` se niega por drift | Alguien cambió el plugin en Kinsta fuera del repo | Exportar, comparar y llevar el cambio al runtime antes de desplegar. |
 
 ## Referencias técnicas
@@ -173,5 +230,7 @@ El corte del 2026-10-24 dejó el snapshot `_gh_blog_home_v3_before_20261024_0813
 - CLI: `scripts/public-website/blog-home/cli.ts` · remoto: `remote.php` · navegador: `verify-browser.cjs` · ejemplos:
   `examples/`.
 - Plugins: `efeonce-public-site-runtime/wp-content/plugins/{efeonce-editorial-blocks,eo-blog-home}/`.
+- Suscripción: `scripts/growth/publish-glitch-inline-pill.ts` y
+  [contrato de Growth Forms](../../architecture/growth-public-forms-runtime-contract.md).
 - Pipeline de la plantilla y gates: `scripts/public-website/blog-v3/` y
   `docs/ui/visual-directions/TASK-2051-blog-portada-v3/README.md`.

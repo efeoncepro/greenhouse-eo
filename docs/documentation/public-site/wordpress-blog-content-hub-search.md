@@ -1,13 +1,22 @@
 # WordPress Blog, Content Hub and Search Contract
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-07-09 por Codex
-> **Ultima actualizacion:** 2026-08-31 por Codex
+> **Ultima actualizacion:** 2026-10-24 por Claude
 > **Modulo:** Public Site / WordPress / Ohio / Content Hub
 > **Runtime vigente:** `efeoncepro.com` en WordPress/Kinsta, tema activo
 > `ohio-child`, parent `ohio`
 > **Auditoria base:** `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`
+
+## Portada vigente de `/blog/` (desde 2026-10-24)
+
+La página `/blog/` (18456) ya no es la del Demo 35 ni la de la etapa 1: desde el 2026-10-24 sirve la portada v3
+(plugin `eo-blog-home` + modelo de contenido de PDR-029). Qué muestra y cómo se comporta:
+[Portada del blog](portada-del-blog.md); contrato técnico:
+[runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md). Este documento sigue siendo el contrato de las
+entradas, la taxonomía, los permalinks, el render de Ohio en cada entrada y la búsqueda; las secciones sobre Demo 35 y
+la etapa 1 quedan como historia.
 
 ## Preparación local — etapa 1, 20/10/2026
 

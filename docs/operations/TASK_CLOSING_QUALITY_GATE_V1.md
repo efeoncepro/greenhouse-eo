@@ -187,6 +187,20 @@ canal era el color de su propio run, que ya estaba rojo por otra causa.
   `conclusion=success`. Con `cancel-in-progress` activo, ese último run es el único que juzga el árbol
   que quedó.
 
+### Bug class — una prueba que recorre un corpus crece hasta pasar el timeout bajo coverage (2026-10-24)
+
+`testTimeout` de `vitest.config.ts` es 15 s, y CI Deep corre `pnpm test:coverage`: la instrumentación vuelve más
+lenta cada línea. `pricing-v3-artifact-verdict` recalcula cada composición del corpus de artefactos de pricing y,
+cuando el corpus sumó los catálogos Réditos 2027, superó los 15 s en CI Deep (`80a3fcfe7`). El reintento falló igual,
+porque no era el runner. Costó un segundo PR en pleno release (`PRODUCTION_RELEASE_TIMING_LEDGER.md`, fila
+2026-10-24).
+
+- **SIEMPRE** que una prueba recorra un corpus que crece con el uso (artefactos, fixtures, catálogos del repo),
+  declarar un timeout explícito en el `it(…, TIMEOUT)` en vez de heredar el de la config. Fix fuente: `203136f78`.
+- **SIEMPRE** que una prueba así cambie o crezca su corpus, correrla una vez con `--coverage` en local:
+  `pnpm vitest run --coverage <archivo>`. Sin coverage, el verde local no dice nada del presupuesto de CI Deep.
+- **NUNCA** leer un timeout que se repite en el reintento como falla del entorno: es código.
+
 ### Tests y validación
 
 > Movido verbatim desde `CLAUDE.md` el 2026-10-24 (presupuesto de tokens, TASK-1160). Los comandos siguen en la

@@ -11,9 +11,16 @@
 
 ## Delta 2026-10-24 — TASK-2053/2054: presentación `inline_pill`, reserva por evento y conteo público de reservas (§10.1, §19, §20)
 
-Code complete en `develop` (local), **rollout pendiente**: llega a los hosts con el próximo release de Greenhouse a
-`main` (el `prebuild` construye `renderer-latest.js`, renderer `1.2.0`). Ningún formulario publicado cambia: todo campo
-nuevo es opcional y su ausencia compila al contrato de antes.
+En producción desde el release `40b330175855` (2026-10-24; renderer `1.2.0` en `renderer-latest.js`). Ningún
+formulario publicado antes cambió: todo campo nuevo es opcional y su ausencia compila al contrato de antes. Primer uso
+real: la suscripción a Glitch de `/blog/` (`efeonce-blog-subscription`, versión píldora `fver-e6850cc8…`). Envío real de
+verificación y formulario de un evento real: pendientes.
+
+- **Consentimiento por el acto de suscribirse (aprobado por el operador el 2026-10-24).** En una píldora de suscripción
+  con aviso (`inlinePill.note`), el submit guarda el sha256 del aviso en `form_submission_consent_snapshot.notice_text_hash`
+  (`inlinePillNoticeHash`) y el destino HubSpot acepta `communications[]` con `consentBy: 'submission'`, que sólo
+  suscribe si ese hash existe. Una entrada con `consentBy` y `checkboxKey` a la vez es mal formada. Contrato y receta del
+  anfitrión: `docs/architecture/growth-public-forms-runtime-contract.md`.
 
 - **Presentación del formulario (§19).** `ui_policy.presentation: 'inline_pill'` (ausente o `standard` = la de siempre)
   + `ui_policy.inlinePill { openLabel, submitLabel, successLabel, doneLabel, waitlistSuccessLabel, waitlistDoneLabel,

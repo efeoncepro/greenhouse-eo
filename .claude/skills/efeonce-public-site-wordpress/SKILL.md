@@ -43,8 +43,8 @@ Read the minimal set:
 | New or unregistered landing | `references/landing-workflow.md` + `references/landing-registry.md` |
 | Home copy, comparison, FAQ emphasis or final editorial review | `references/home-editorial-maintenance.md` + `references/landings/home-claude-design-preview.md`; compose with `copywriting` and the typography skill |
 | Elementor mutation / page-scoped CSS | `references/elementor-mutation.md` |
-| Native Ohio navigation (now only `/blog/` and fallback), menu label/link or hierarchy | `references/native-navigation.md` + the destination landing reference |
-| Global site navigation (header, mega menus, onepage, menu CTA and native scheduler, switch/rollback, AXIS pin bump, `pnpm public-website:site-nav`, `wp eo-nav`) — EPIC-055; AXIS menu **live site-wide since 2026-10-23** (primitives 0.7.13); Ohio's header only on `/blog/` and when the switch is `off` | `references/global-site-navigation.md` + `docs/manual-de-uso/public-site/operar-navegacion-global.md`; architecture `docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md` |
+| Native Ohio navigation (now only the fallback when the global nav switch is `off`), menu label/link or hierarchy | `references/native-navigation.md` + the destination landing reference |
+| Global site navigation (header, mega menus, onepage, menu CTA and native scheduler, switch/rollback, AXIS pin bump, `pnpm public-website:site-nav`, `wp eo-nav`) — EPIC-055; AXIS menu **live site-wide since 2026-10-23** (primitives 0.7.13); on `/blog/` too since its 2026-10-24 cutover; Ohio's header only when the switch is `off` | `references/global-site-navigation.md` + `docs/manual-de-uso/public-site/operar-navegacion-global.md`; architecture `docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md` |
 | Landing bottom dock (`efeonce.landing-dock`, plugin `eo-landing-dock`, `pnpm public-website:landing-dock`, `wp eo-dock`) — live on seven landings since 2026-10-23; a new landing uses it via `manifests/landing-dock/<landing>.json` + `EOLD_PAGES`, never a custom dock | `references/global-site-navigation.md` §Landing dock + `docs/manual-de-uso/public-site/operar-dock-de-landings.md` |
 | Home/landing SEO, Yoast metadata, social previews or schema ownership | `../seo-aeo/references/home-landing-metadata-schema.md` + the landing reference; add `references/elementor-mutation.md` only for Elementor writes |
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
@@ -64,8 +64,8 @@ Read the minimal set:
 | Historical layout incident or older public page | `references/layout-incidents.md` |
 | Runtime discovery, bridge inspection, repo binding, Kinsta/WP inventory | `references/runtime-and-discovery.md` |
 | 404, search/no-results, category/tag/author/date archives, impossible pagination or empty taxonomy | `references/miscellaneous-surfaces.md` + `references/runtime-and-discovery.md`; add the SEO technical module when robots, canonical, schema, or indexability changes |
-| Blog home `/blog/` (portada v3, live 2026-10-24): slider, pins, formats, resources, events, author photo, deploy, verify — `pnpm public-website:blog-home` | `references/blog-home-operation.md` + `docs/manual-de-uso/public-site/operar-portada-blog-por-cli.md` |
-| Demo 35 / future blog home | `references/landing-workflow.md` + `references/elementor-mutation.md` + `references/landings/demo35-blog-magazine.md` |
+| Blog home `/blog/` (portada v3, live 2026-10-24): slider, pins, formats, resources, events, author photo, real Glitch subscription (`subscription`, `data-dc-keep`, host reset), deploy, verify — `pnpm public-website:blog-home` | `references/blog-home-operation.md` + `docs/manual-de-uso/public-site/operar-portada-blog-por-cli.md`; architecture `docs/architecture/public-site/BLOG_HOME_RUNTIME_V1.md` |
+| Demo 35 work copy (historical; `/blog/` is the portada v3) | `references/landing-workflow.md` + `references/elementor-mutation.md` + `references/landings/demo35-blog-magazine.md` |
 | AEO `/aeo-2/` | `references/landings/aeo.md` |
 | Agencia Creativa `/agencia-creativa/` | `references/landings/agencia-creativa.md` |
 | HubSpot services `/servicios-contratar-hubspot/` | `references/landings/hubspot-services.md` |
