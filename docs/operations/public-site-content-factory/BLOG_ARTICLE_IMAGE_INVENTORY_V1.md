@@ -1,7 +1,7 @@
 # Inventario de imágenes por artículo del blog
 
 > **Tipo de documento:** Norma operativa (inventario y especificación)
-> **Version:** 1.1 (márgenes de seguridad por imagen y superficie)
+> **Version:** 1.2 (márgenes de Open Graph por plataforma y `og:image:alt`)
 > **Creado:** 2026-10-24 por Claude, a pedido del operador («cuántas imágenes para todas las posiciones … y sus
 > características por cada artículo que se haga»)
 > **Alcance:** artículos de Marketing con Manzanitas en `efeoncepro.com/blog`. Glitch tiene sus propias piezas
@@ -54,6 +54,31 @@ sitio.
 | Bordes de arriba y abajo | nada importante en los **15 px** de cada borde | la tarjeta de X (2:1) puede cortarlos |
 | Cara | **x 795–900**, en el tercio de arriba | queda 15 px dentro del borde del cuadrado; si sale más a la derecha, la cara se corta en WhatsApp |
 | Lecho | abajo, a lo ancho | ahí no va nada del texto |
+
+### Open Graph: cómo muestra la portada cada plataforma
+
+![Cómo muestra cada plataforma la imagen Open Graph](../../manual-de-uso/creative/assets/og-por-plataforma.svg)
+
+La imagen Open Graph es la portada. Cada red la muestra distinto y ninguna, salvo WhatsApp, publica sus reglas: la
+tabla marca qué está verificado y qué viene de guías de terceros (consultadas el 2026-10-24).
+
+| Plataforma | Cómo la muestra | Margen que exige | Fuente |
+|---|---|---|---|
+| LinkedIn (post con enlace) | tarjeta grande 1,91:1, completa. Con una imagen de menos de 200 px de ancho cae a una miniatura chica a la izquierda | ninguno extra; algunas guías dicen que en el teléfono recorta al centro | guías de terceros |
+| Facebook | tarjeta grande 1,91:1, completa. Bajo unos 600 × 315 cae a una miniatura cuadrada | el cuadrado central si cae a miniatura | guías de terceros |
+| WhatsApp | vista grande horizontal, o compacta con **miniatura cuadrada central**. La compacta sale con imágenes chicas, pesadas o poco horizontales | **el cuadrado central, x 285–915** | límites oficiales de Meta: menos de 600 KB, al menos 300 px de ancho y proporción de hasta 4:1. Lo de grande o compacta, guías de terceros |
+| X | `summary_large_image` en 2:1 | **15 px arriba y abajo** | validador de X citado en 2020 |
+| iMessage, Slack, Teams, Telegram, Discord | la imagen casi completa; con imágenes chicas, una miniatura al costado. Telegram puede reemplazarla con su vista instantánea | el cuadrado central, por la miniatura | sin especificación publicada |
+
+**La zona segura que sirve para todas:** texto y cara dentro del **cuadrado central (x 285–915)** y nada importante en
+los **15 px de arriba y de abajo**. Es lo que ya cumple la portada centrada. Además:
+
+- **Peso:** JPEG de menos de **300 KB**. Sale la vista grande y queda lejos del límite de WhatsApp (600 KB). Las tres
+  portadas publicadas pesan entre 235 y 288 KB.
+- **Tamaño:** 2400 × 1260 supera cualquier mínimo de vista grande (LinkedIn 200 px de ancho, Facebook unos 600 × 315 y
+  WhatsApp 300 px).
+- **Comprobación:** las redes guardan la vista previa en caché. Revisa cada portada nueva con el depurador de Facebook,
+  el Post Inspector de LinkedIn y un chat de prueba en WhatsApp, y vuelve a compartir el enlace en X.
 
 ### Imagen del slider (2:1, se entrega a 2400 × 1200)
 
@@ -148,7 +173,7 @@ OG cuando el post no tiene una propia) y la imagen principal del schema (`primar
 | `og:image:type` | `image/jpeg` | JPEG a propósito: los lectores de enlaces no tratan el WebP de forma pareja |
 | `twitter:card` | `summary_large_image` | tarjeta grande |
 | `twitter:image` | **no se publica** | X usa la `og:image` cuando falta; el script sólo la escribe si el post ya tenía una propia |
-| `og:image:alt` | **no se publica** | la descripción vive en el `alt` del adjunto; Yoast no la saca como etiqueta. Falta menor: agregarla sería un cambio de configuración del sitio, no de la imagen |
+| `og:image:alt` y `twitter:image:alt` | **se agregan en `efeonce-editorial-blocks` 0.4.6** (runtime `20575b6`, hecho en local y simulado en vivo; espera el visto bueno del operador para desplegar) | toman el `alt` que Yoast ya resuelve para su `og:image` (Yoast 28.6 lo trae pero no lo imprime); si falta, el del adjunto, sólo cuando es ese mismo archivo. Una línea, 420 caracteres como máximo y nada si está vacío. El `alt` de la portada lo escribe `blog-post-cover-apply.php` |
 | Peso | 230–300 KB | muy por debajo del límite de cualquier red |
 
 Los lectores de enlaces y las redes guardan la imagen en caché: después de cambiar una portada, usa el Post Inspector
