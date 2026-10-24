@@ -1,5 +1,16 @@
 # Registro de decisiones y versiones
 
+### 2026-10-24 — Portada del blog v3: aura del buscador como excepción y piezas a AXIS
+
+El operador aprobó el canvas «Portada Blog Efeonce» v3 y pidió el haz del buscador «con más vida… de luminosidad o de
+portal de magia», con un ritmo consistente: anillo de luz + cometa que recorre el borde + aura. El **aura** (resplandor
+pulsante alrededor del campo con foco) es una **excepción aprobada**, acotada al foco del buscador web; no es un patrón
+de foco general ni se usa en otros campos. En AXIS vive como `axisSearchField.beam.exception` (TASK-2052,
+`efeonce.search-field` 0.1.0 candidate, preparado para v0.7.15 sin publicar). Lección medida: `var()` dentro de
+`@keyframes` no anima en Chromium; cada capa del haz lleva sus keyframes explícitos. Las otras dos piezas del canvas que
+pasan a AXIS: la píldora editorial (texto que rueda + flecha dibujada, tono `glitch` sólo en Glitch) y el segmentado
+con indicador que se desliza. Fuente congelada: `docs/ui/visual-directions/TASK-2051-blog-portada-v3/`.
+
 ### 2026-10-20 — Propuesta Assetplan: portada sin pregunta y la órbita completa en foto
 
 Operador, sobre la portada: «Pon Servicio Managed CRM, y quita estos textos». La portada de propuesta para un cliente va
