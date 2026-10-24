@@ -2,7 +2,9 @@
 
 > **Estado:** Active · **Fecha:** 2026-10-24 · **Autor:** Claude (sesión «Portada del blog v3»), con dos subagentes de
 > investigación · **Anexos:** [A — HubSpot y webinars de Teams](RESEARCH-013-annexes/A-hubspot-teams-webinars.md) ·
-> [B — objeto Eventos de marketing](RESEARCH-013-annexes/B-hubspot-marketing-events-object.md)
+> [B — objeto Eventos de marketing](RESEARCH-013-annexes/B-hubspot-marketing-events-object.md) ·
+> [C — diagnóstico: webinars de Teams que no llegan a HubSpot](RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md)
+> (decisiones del operador y estado al 2026-10-24)
 
 ## Por qué existe
 

@@ -58,10 +58,17 @@ renderer en los tres tableros, sobrevive al autoplay del slider, abre el campo, 
 («Marketing Information», genérico) con `CONSENT_WITH_NOTICE`. No sale correo de bienvenida: no hay ninguno configurado.
 **Pendiente:** visto bueno visual de la píldora en el pie (desvío 13); decidir bienvenida y tipo de suscripción propio.
 Desconectar: `subscription off --apply`.
-**Defectos visuales de la píldora reportados por el operador (2026-10-24, sin corregir):** al elegir el correo autocompletado
-el campo se pinta claro (falta una regla `:-webkit-autofill` en `src/growth-forms-renderer/styles.ts`; causa probable) y
-«¡Listo!» queda descentrado (`.ghf-inline-msg` es una grilla que toma el ancho de «Ya estás suscrito»). El estado final
-sí se ve bien. Van al mismo release que la corrección de correos, con el gate `inline-pill.scenario.mjs`.
+**Defectos visuales de la píldora: corregidos en local (`a5b028461`, sin push).** El autocompletado lo pintaba la regla
+`:-internal-autofill-selected` de Chrome (`!important` de agente de usuario; reproducido con `Autofill.trigger` en Chrome
+real); «¡Listo!» quedaba corrido por la grilla de `.ghf-inline-msg`. Gate `inline-pill.scenario.mjs` dentro de
+presupuesto. **El operador decidió no hacer release por ahora** (~3 h cada uno): correos (`2a971d768`) y píldora esperan
+al próximo release que él decida.
+**Eventos/webinars (2026-10-24):** el operador eligió Teams (seminario web) + el formulario de HubSpot conectado al
+webinar. La integración Teams→HubSpot no sincroniza ningún webinar (0 eventos de marketing) aunque Entra, la política
+de Teams y los ajustes de HubSpot están bien; diagnóstico, hipótesis y borrador del caso al soporte en
+`docs/research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md`. La task de integración se crea recién cuando
+HubSpot liste el webinar y se pruebe el envío de Greenhouse al formulario conectado. Webinars de prueba publicados en
+Teams: «La IA no conoce tu negocio» (24-oct) y «La IA y la busqueda» (26-oct); cancelarlos al terminar.
 
 **AXIS v0.7.15 publicado** (CI `dc7c721`, primitives 0.7.15; la prueba del haz del buscador ya no compite con el
 runner). Sin evento real cargado: la sección de eventos queda oculta hasta el primero (`blog-home event`).
