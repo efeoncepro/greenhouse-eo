@@ -14,7 +14,7 @@ if ( ( $manifest['contract'] ?? '' ) !== 'eo-blog-home-release.v1' ) { WP_CLI::e
 $zip = new ZipArchive();
 if ( true !== $zip->open( $args[0] ) ) { WP_CLI::error( 'Invalid ZIP.' ); }
 $root    = WP_PLUGIN_DIR . '/eo-blog-home/';
-$allowed = '#^(eo-blog-home\.php|includes/class-eobh-[a-z]+\.php|assets/js/(dc-runtime|boot)\.js|assets/css/eobh-host\.css|assets/generated/(portada|movil)\.(js|ast\.json)|assets/generated/(blog-home\.css|manifest\.json|fixture\.(portada|movil)\.json)|assets/img/[0-9a-f]{32}\.(svg|webp|png))$#';
+$allowed = '#^(eo-blog-home\.php|includes/class-eobh-[a-z]+\.php|assets/js/(dc-runtime|boot)\.js|assets/css/eobh-host\.css|assets/generated/(portada|tablet|movil)\.(js|ast\.json)|assets/generated/(blog-home\.css|manifest\.json|fixture\.(portada|movil)\.json)|assets/img/[0-9a-f]{32}\.(svg|webp|png))$#';
 $main    = 'eo-blog-home.php';
 $files   = array();
 foreach ( $manifest['files'] as $entry ) {
