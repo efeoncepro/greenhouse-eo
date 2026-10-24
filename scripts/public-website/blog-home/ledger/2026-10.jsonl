@@ -39,3 +39,4 @@
 {"at":"2026-10-24T18:05:05.586Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
 {"at":"2026-10-24T18:05:24.235Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
 {"at":"2026-10-24T18:05:26.212Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T18-04-42-989Z","flag":"1"}}
+{"at":"2026-10-24T18:07:54.482Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T18-07-22-288Z"}}
