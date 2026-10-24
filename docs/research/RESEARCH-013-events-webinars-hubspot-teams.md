@@ -72,18 +72,82 @@ Recomendación preliminar: **1 como base** (es lo que el release siguiente puede
 se necesitan en cualquier caso, y si Teams sincroniza su propio evento hay que evitar duplicados (decidir qué evento
 manda).
 
-## Decisiones pendientes del operador
+## Decisiones del operador (cerradas al 2026-10-24)
 
-1. Plataforma de las sesiones (Teams, Zoom, Meet) y plan de Microsoft 365 / tier de HubSpot.
-2. Autorizar la reinstalación del app de HubSpot con los scopes de Eventos de marketing (¿y `marketing.campaigns.*`?).
-3. Quién envía el enlace y los recordatorios: Greenhouse o Teams.
-4. Lista de espera: ¿se mantiene en Greenhouse y se registra en HubSpot sólo al confirmar?
-5. Asistencia: ¿se automatiza en esta etapa?
-6. Diseño final de los correos (hoy provisionales).
+1. **Plataforma: webinar de Teams** (seminario web de la app Eventos), no reunión normal. Tenant **M365 Business**:
+   inscripción básica, sin lista de espera ni aprobación en Teams; hasta 1.000 asistentes. Sin gasto nuevo: Teams se
+   queda (alternativas pagadas evaluadas: GoTo Webinar, Zoom Webinars, Livestorm).
+2. **Greenhouse es dueño de la reserva, el cupo y la lista de espera**; la espera no se registra en HubSpot.
+3. **Reinstalar el app de HubSpot con `crm.objects.marketing_events.read/write`: autorizado** («Sí, solo Eventos»).
+4. **Una sola fuente por Evento de marketing:** el conector Teams↔HubSpot si funciona; si no, Greenhouse por API.
+5. **Sin release por ahora** (~3 h cada uno): todo se acumula y sale en un solo release cuando el operador lo decida.
+6. El operador quiere que el agente ejecute (navegador, CLI); solo se le pide lo que exige su identidad.
 
-## Próximo paso
+## Decisiones abiertas
 
-Sesión nueva: cerrar estas decisiones, convertir la opción elegida en task(s) `backend-data` (destino o consumer de
-participación, flag `GROWTH_EVENT_HUBSPOT_PARTICIPATION_ENABLED` sólo en el ops-worker, backfill, señal de drift,
-rollback) y llevar en **un solo release** la corrección de correos más la integración. Re-verificar con el formulario de
-prueba `prueba-e2e-eventos-2026-10-24` y deprecarlo al terminar.
+- **Quién manda la confirmación con el enlace:** Greenhouse (marca propia + `joinWebUrl` personal, Teams en silencio)
+  o Teams.
+- **Nombre y apellido en la píldora:** Teams los exige para inscribir; hoy la píldora pide solo correo.
+- **Cancelación en Teams:** por aplicación solo con RSC por evento; ¿basta liberar el cupo en Greenhouse o se suma
+  permiso delegado del organizador?
+- **Diseño final de los correos** (hoy provisionales) y del correo de bienvenida de Glitch.
+- **Tipo de suscripción propio de Glitch** en HubSpot (hoy usa «Marketing Information», genérico).
+- Fuente del Evento de marketing para cada evento mientras el ticket #50018204746 siga abierto.
+
+## Backlog canónico para cerrar el módulo de eventos
+
+> Fuente única del pendiente. Las demás piezas (skills, manuales, contratos, Handoff) apuntan aquí. Detalle técnico:
+> [anexo D](RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md); diagnóstico del conector:
+> [anexo C](RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md).
+
+**A. Ya hecho, sin release**
+
+- [x] Correos de reserva salen con reservas ya entregadas (`2a971d768`, `ACCEPTED_SUBMISSION_STATUSES`).
+- [x] Píldora: autocompletado y «¡Listo!» centrado (`a5b028461`, gate `inline-pill.scenario.mjs` verde).
+- [x] Política de acceso de Teams `MY-APP-POLICY` asignada también a jreyes@efeoncepro.com (2026-10-24 14:09).
+- [x] Caso al soporte de HubSpot por el conector (#50018204746, derivado a agente humano).
+
+**B. Externo / del operador (con su OK)**
+
+- [ ] Respuesta del soporte de HubSpot; reconectar la app de Teams solo si lo recomiendan, con captura previa de su
+      configuración.
+- [ ] Pasar `crm.objects.marketing_events.read/write` a `requiredScopes`, `hs project upload`, reinstalar el app
+      «Efeonce Data Platform» e introspeccionar el token (precedente PDR-009: no rota). Actualizar el snapshot
+      `docs/operations/hubspot-app-manifest/`.
+- [ ] Crear la app de Entra dedicada «Greenhouse Webinars» (single-tenant) con `VirtualEventRegistration-Anon.ReadWrite.All`,
+      `VirtualEvent.Read.All` y `OnlineMeetingArtifact.Read.All`; consentimiento de administrador; secreto blob en
+      Secret Manager; agregar su AppId a `MY-APP-POLICY` (`Set-CsApplicationAccessPolicy -AppIds @{Add=…}`).
+      Coordinar con TASK-1769.
+- [ ] Cancelar o despublicar los webinars de prueba «La IA no conoce tu negocio» (24-oct) y «La IA y la busqueda» (26-oct).
+
+**C. Construcción (tasks por crear con greenhouse-task-planner, `backend-data` primero)**
+
+- [ ] **Evento y ciclo de vida:** tabla `growth_event` (id del webinar, organizador, `objectId` de HubSpot, fuente del
+      evento, estado); ledger append-only de transiciones (`confirmed`, `waitlisted`, `promoted`, `cancelled`,
+      `attended`) con instante, id de inscripción en Teams y `joinWebUrl` personal; enlace firmado «ya no puedo ir»;
+      promoción FIFO desde la espera bajo el mismo lock; correo «ya tienes cupo»; evento outbox
+      `growth.events.registration_changed`.
+- [ ] **Inscripción y asistencia en Teams por Graph:** cliente Graph (patrón token-cache del bot, principal dedicado);
+      proyección que inscribe al confirmar/promover (idempotente); lectura del informe de asistencia por sesión del
+      webinar y transición `attended` con entrada/salida; lanzador recibe el id del webinar y lo valida.
+- [ ] **HubSpot Marketing Events** (si la fuente es Greenhouse): cliente in-app API `2026-09`; upsert al lanzar y
+      `objectId` persistido; proyección `REGISTERED`/`CANCELLED`/`ATTENDED`; backfill `pnpm events:hubspot-sync`;
+      señal `growth.events.hubspot_participation_drift`; flag `GROWTH_EVENT_HUBSPOT_PARTICIPATION_ENABLED` solo en el
+      ops-worker (`deploy.sh` + ledger).
+- [ ] **Píldora (`ui-ux`):** pedir nombre y apellido si se decide; página de confirmación de cancelación.
+- [ ] **Glitch:** correo de bienvenida desde Greenhouse y tipo de suscripción propio (publicar versión nueva con
+      `pnpm growth:forms:publish-glitch-pill`).
+- [ ] Pruebas: smoke de SQL contra PG real, tests de clientes (classify), mapper, execute y lanzador; prueba real en un
+      webinar `prueba-`.
+
+**D. Release y verificación (un solo release, cuando el operador lo decida)**
+
+- [ ] Gates locales (`pnpm local:check`, `pnpm test`, build) y release con `greenhouse-production-release`.
+- [ ] Flags por runtime (ops-worker: `GROWTH_EVENT_EMAILS_ENABLED` ya ON; nuevo de HubSpot y de Teams en `deploy.sh`).
+- [ ] Re-verificación de punta a punta con `prueba-e2e-eventos-2026-10-24` (form_key
+      `517e06bf-9d37-4394-801b-2f4c9ac782e6`, superficie `fhsf-efeonce-blog-events`): confirmación con `.ics`,
+      inscripción en Teams con enlace personal, lista de espera, recordatorio, asistencia y Evento de marketing.
+      Después deprecar ese formulario.
+- [ ] Visto bueno visual de la píldora del pie (desvío 13) en vivo a 1440 y 390.
+- [ ] Mandar a la papelera la página de revisión 252046 cuando el operador lo confirme.
+- [ ] Recién entonces lanzar eventos reales.
