@@ -23,13 +23,14 @@
 | 1 | **Plate** (foto 16:9 sin texto) | siempre | 1 | agente de foto (`design-studio` + `pnpm foto:*`) |
 | 2 | **Portada** (destacada + OG + X) | siempre | 1 archivo | agente de composición (`efeonce-graphic-line`) desde el plate |
 | 3 | **Imagen del slider** (`hero`) | sólo si el post entra al slider de `/blog/` | 0 o 1 | se recorta del plate (sin foto nueva) |
-| 4 | **Imagen de la card del rail** | todavía **no existe la posición**: pendiente de TASK-2051 | 0 hoy | — |
+| 4 | **Imagen de la card del rail** | si el post entra al rail y su portada trae texto (todas las de Manzanitas). Hecho en local, **sin desplegar** (TASK-2051) | 0 o 1 | se usa el plate tal cual, con punto focal |
 | 5 | **Imágenes del cuerpo** (diagramas, infografías, capturas) | sólo si explican algo que el texto no puede | 0 a N (lo normal: 0 a 2) | agente de contenido (`content-marketing-studio` + infografías) |
 | 6 | Foto del autor | ya existe; no se hace por artículo | 0 | — |
 | 7 | **Piezas de distribución** (LinkedIn, YouTube, story) | según el plan de canales de esa semana, no por defecto | 0 a 4 | agente social (`social-media-studio`), con su propia norma |
 
 **Mínimo por artículo: 2 archivos** (el plate y la portada) y **1 subida** (la portada). Con slider: 3 archivos y 2
-subidas. Todo lo demás depende del contenido o del plan de canales.
+subidas. Con rail: el plate se sube como imagen de la tarjeta (sin archivo nuevo). Todo lo demás depende del contenido
+o del plan de canales.
 
 Siempre aprueba el operador antes de subir, y el agente que sube avisa antes a las sesiones del blog que estén
 trabajando.
@@ -73,7 +74,7 @@ OG cuando el post no tiene una propia) y la imagen principal del schema (`primar
 | Miniatura «Siguiente» del slider | 96 × 64 (1,5:1), centrada: x 127–1072 | ✓ |
 | Archivo del blog v3 (temas, etiquetas, autores, búsqueda) | lista de texto, **sin imagen** | no aplica |
 | Cabecera del artículo | Ohio **no muestra** la destacada | no aplica |
-| Cards v2 del rail | 440 × 600 y 361 × 492 → x 369–831; 304 × 540 en móvil → x 423–777, con el texto de la tarjeta encima | ✗ **choca**: ver §4 |
+| Cards v2 del rail | 440 × 600 y 361 × 492 → x 369–831; 304 × 540 en móvil → x 423–777, con el texto de la tarjeta encima | ✗ **choca**: la card lleva su propia imagen (§4) |
 | Slider sin `hero` | la destacada a sangre, anclada a la derecha, con el título del slider encima | ✗ **choca**: ver §3 |
 
 Google recomienda dar al schema del artículo varias proporciones (16:9, 4:3 y 1:1). Yoast publica una sola y no es
@@ -96,23 +97,30 @@ título cae encima del texto de la portada: **un post con portada de Manzanitas 
 
 Con la cara del plate en x 795–900 (66–75 %), el recorte del plate cumple sin recomponer.
 
-## 4. Imagen de la card del rail (pendiente)
+## 4. Imagen de la card del rail (hecha en local, sin desplegar)
 
 Las cards v2 de «Para leer con calma» usan hoy la **destacada** como foto a sangre vertical y le pintan encima la
 etiqueta de formato, el título, la bajada y el autor. Con la portada de Manzanitas, el recorte corta la cabecera, deja
 fuera la cara y superpone dos textos. Hoy no afecta a ningún post (los tres del caso fuente no están entre las cuatro
 lecturas más nuevas).
 
-**Encargado el 2026-10-24** a la sesión dueña del rail (TASK-2051): una imagen propia de la card por post, un punto
-focal (`pos` → `object-position`), o las dos cosas. Hasta que exista, **no se produce ninguna imagen para esta
-posición**; cuando exista, saldrá del plate:
+**Encargado y resuelto el 2026-10-24** por la sesión dueña del rail (TASK-2051; runtime `6578773`, Greenhouse
+`e60f5045c`): imagen propia de la card (`_eo_card_image`) y punto focal (`_eo_card_focus`, «x% y%» → `object-position`).
+**Todavía sin desplegar**: espera el visto bueno del operador. Hasta entonces, no se publica en el rail un post con
+portada de Manzanitas. Cuando esté en vivo:
 
-| Característica | Valor esperado (confirmar cuando la posición exista) |
+```bash
+pnpm public-website:blog-home card <post> --image <plate.png> --alt "<alt>" --focus "84% 30%"
+```
+
+| Característica | Valor |
 |---|---|
 | Lo que se ve | x 369–831 en escritorio y tablet; x 423–777 en el teléfono (sobre 1200 × 630) |
 | Texto | ninguno: la tarjeta pone el suyo |
 | Encuadre | la cara dentro de x 423–777 y en la mitad de arriba (y < 340); nada importante en los ~80 px de las esquinas de arriba (etiqueta y botón); la mitad de abajo pareja y oscura (el degradado y el título la tapan) |
-| Choque con el plate | la cara del plate cae en x 795–900, fuera de la franja: sin un punto focal hacia la derecha, la card necesita un recorte propio del plate |
+| Archivo | **el plate tal cual** (2560 × 1440), sin texto y sin recorte propio. La destacada no cambia y sigue siendo la OG |
+| Punto focal | con la cara al 71 % del plate, **84 % 30 %**: se ve del 49 % al 91 % del plate en escritorio y tablet, y del 57 % al 89 % en el teléfono. Si la cara cae en otro lugar, recalcula |
+| Subida | `blog-home card` (plan, estado anterior, ledger y lectura de vuelta) o el panel «Imagen de la tarjeta del riel» del editor |
 
 ## 5. Imágenes del cuerpo
 
@@ -148,7 +156,7 @@ norma y sus medidas. Este inventario no las reemplaza.
 | Portada y recorte del `hero` | agente de composición | `efeonce-graphic-line` (Manzanitas §4.5), `componer-centrada.cjs` |
 | Imágenes del cuerpo | agente de contenido | `content-marketing-studio`, infografías editoriales, Content Factory |
 | Aprobación | **el operador**, viendo la portada junto a sus recortes | — |
-| Subida, `hero` y QA en vivo | agente del sitio público, coordinado con las sesiones del blog | `efeonce-public-site-wordpress`, `blog-post-cover-apply.php`, `blog-home hero`, `blog-home verify --browser` |
+| Subida, `hero`, card y QA en vivo | agente del sitio público, coordinado con las sesiones del blog | `efeonce-public-site-wordpress`, `blog-post-cover-apply.php`, `blog-home hero`, `blog-home card`, `blog-home verify --browser` |
 | Piezas de distribución | agente social | `social-media-studio`, con la norma del canal |
 
 ## Fuera de alcance

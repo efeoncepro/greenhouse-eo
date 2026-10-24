@@ -78,11 +78,26 @@ La tarjeta de foto es vertical y recorta mucho más que cualquier otra superfici
 - la etiqueta de formato de la tarjeta cae sobre la cabecera, y el título de la tarjeta cae debajo de la respuesta.
 
 Hoy ninguno de los tres posts del caso fuente está en el rail, porque no están entre las cuatro lecturas más nuevas.
-**Mientras la tarjeta no tenga una imagen propia, no publiques en el rail un post con esta portada sin antes resolverlo
-con la sesión de la portada del blog.** El template ya acepta una posición de foto por tarjeta (`pos`, que va a
-`object-position`), pero el adaptador siempre la deja en `center`; una imagen o un punto focal propio de la tarjeta es
-un cambio del dueño de la portada (TASK-2051), no de este manual. Si se hace, la imagen de la tarjeta es el plate sin
-texto, encuadrado en la cara.
+**La solución: imagen y punto focal propios de la tarjeta** (TASK-2051; runtime `6578773`, Greenhouse `e60f5045c`).
+**Estado al 2026-10-24: hecho en local y probado, todavía sin desplegar** (espera el visto bueno del operador). Hasta
+que esté en vivo, no publiques en el rail un post con esta portada.
+
+Cuando esté en vivo, a un post con portada de Manzanitas dale a la tarjeta el plate sin texto y mueve el recorte hacia
+la cara. La destacada no cambia: sigue siendo la imagen OG, y el comando falla si fuera a cambiarla.
+
+```bash
+pnpm public-website:blog-home card <post> --image <plate.png> --alt "<alt>" --focus "84% 30%"
+```
+
+- `--focus "x% y%"` va a `object-position`. Con la cara en torno al 71 % del ancho del plate (x 795–900 sobre 1200),
+  **84 %** la deja dentro de la tarjeta en los tres anchos: se ve del 49 % al 91 % del plate en escritorio y tablet, y
+  del 57 % al 89 % en el teléfono. Si la cara quedó en otro lugar, recalcula.
+- `--attachment <id>` usa un adjunto que ya está en la biblioteca, `--focus off` vuelve al centro y `--clear` borra la
+  imagen de la tarjeta.
+- El comando muestra el plan y el estado anterior, deja registro en el ledger y lee de vuelta lo escrito. También se
+  puede cambiar desde el editor, en el panel de la portada: «Imagen de la tarjeta del riel» y «Punto focal de la
+  tarjeta».
+- QA: mira la tarjeta en 1440 y en 390. La cara tiene que quedar entera y el texto de la tarjeta, sobre fondo oscuro.
 
 Para que el sujeto sobreviva a la tarjeta (una portada sin texto incrustado, o el plate que vaya a la tarjeta):
 
