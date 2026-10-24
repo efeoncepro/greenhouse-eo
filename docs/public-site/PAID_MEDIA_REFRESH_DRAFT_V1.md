@@ -304,3 +304,18 @@ menciones AXIS a las landings (mismo criterio de líneas que el refresh de inbou
 | Cierre | mención Efeonce AI Visibility Report · CTA con menciones performance marketing y planificación de medios |
 
 Total: 18 enlaces únicos + 13 menciones; todos 200 al 2026-10-24.
+
+## 9. Registro de publicación (2026-10-24 08:53 UTC)
+
+- **Estado:** publicado (aprobado por Julio Reyes). Post `245605`, misma URL, autor Julio, categorías `96`/`17`
+  (primaria `17`), etiquetas e imagen destacada sin cambios.
+- **Escrito:** título, contenido (54 bloques), extracto, title y descripción Yoast, focus «paid media», tiempo de
+  lectura 10 min y descripciones Open Graph/Twitter (tenían texto propio del 2024).
+- **Respaldo:** local `tmp/inbound-marketing-paid-media-post-245605-before-v1-20261024T085228Z.json` y opción de
+  servidor `_gh_post_refresh_245605_20261024_085334`. Rollback: `tmp/post-refresh-rollback.php` con input
+  `{"id":245605,"option":"_gh_post_refresh_245605_20261024_085334"}`.
+- **QA anónimo:** 200; title, descripción, canonical, `index, follow`; `Article` con `dateModified` nuevo; `FAQPage`
+  5; 13 menciones pintadas; índice de 11 anclas válidas; 31 enlaces del artículo con 200; sin desborde en 375 px
+  (la tabla de 5 columnas se desplaza dentro de su figura); consola sin errores; sin «figital», «【» ni U+200B.
+- **Pendiente humano:** pedir a Google la revisión de la URL en Search Console (estaba «Rastreada: actualmente sin
+  indexar»). **Pendiente de diseño:** portada e imagen social en el formato antiguo.

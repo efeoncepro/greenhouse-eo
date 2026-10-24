@@ -348,3 +348,13 @@ Visibility Report); los artículos, como enlace normal. Content Factory emite la
 | Cierre | la herramienta pasa de Think genérico al Efeonce AI Visibility Report |
 
 Total: 26 enlaces únicos + 8 menciones; todos 200 al 2026-10-24; validación `pass`, 0 hallazgos, 61 bloques.
+
+## 10. Publicación de la V2 con enlaces (2026-10-24 08:53 UTC)
+
+- Escritura con guardas (`tmp/post-refresh-apply.php`): `saved`, `post_modified_gmt` `2026-10-24 08:53:23`.
+  Respaldo del estado previo en la opción `_gh_post_refresh_244765_20261024_085323`.
+- QA anónimo: 200, title/descripción/canonical/`index, follow`, `BlogPosting` con `dateModified` nuevo, `FAQPage` 5,
+  8 menciones pintadas (`axis-mention.css` cargado), índice de 10 anclas válidas, 37 enlaces del artículo con 200,
+  sin desborde a 1440 px, consola sin errores.
+- Rollback a la V1 de la mañana: `tmp/post-refresh-rollback.php` con input `{"id":244765,"option":"_gh_post_refresh_244765_20261024_085323"}`.
+- Pendiente: portada e imagen social siguen en el formato antiguo (se rehacen en la línea gráfica «La órbita»).
