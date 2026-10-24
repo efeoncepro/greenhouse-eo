@@ -96,6 +96,11 @@ const TARGETS: Target[] = [
     includes: ['/assets/vendor/', '/assets/vendor/axis/***']
   },
   {
+    label: 'EO blog home plugin (TASK-2051)',
+    remotePath: 'wp-content/plugins/eo-blog-home',
+    required: false
+  },
+  {
     label: 'Ohio HubSpot form styler plugin',
     remotePath: 'wp-content/plugins/ohio-hubspot-form-styler',
     required: false
