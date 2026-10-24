@@ -231,7 +231,7 @@ switch ( $op ) {
 	case 'card':
 		// The rail card's own image (`_eo_card_image`; the featured image stays the OG image) and its focal point
 		// (`_eo_card_focus`, «70% 30%»): the portrait card crops a 16:9 cover at the center otherwise.
-		$id     = $find( $in['post'] ?? '' );
+		$id     = $find( $in['post'] ?? '', ! empty( $in['resource'] ) ? EO_Resource_Registry::TYPE : 'post' );
 		$keys   = array( EO_Home_Pins::CARD_IMAGE_META, EO_Home_Pins::CARD_FOCUS_META );
 		$before = $snapshot( $id, $keys );
 		$after  = ! empty( $in['clear'] ) ? array_fill_keys( $keys, null ) : array();

@@ -196,7 +196,7 @@ Write (plan unless --apply; every apply is ledgered and purges /blog/):
   client <post> <anam|off>             the client of a case: its logo on the rail card
   reviewed <post> <AAAA-MM-DD|off>      the editor's last substantive review: «Actualizado» on the rail for 30 days
   hero <post> [--light t] [--bold t] [--attachment id | --image file --alt text] [--clear]
-  card <post> [--attachment id | --image file --alt text] [--focus "x% y%"|off] [--clear]   the rail card's own image and focal point (the featured image stays OG)
+  card <post> [--attachment id | --image file --alt text] [--focus "x% y%"|off] [--clear] [--resource]   the rail card's own image and focal point (the featured or scene image stays)
   resource <file.json> [--image file --alt text]   create/update a resource (see manual for the shape)
   review <resource id>           mark a resource reviewed today (it hides after 180 days)
   event <file.json> [--image file --alt text]      create/update an event (no private meeting links)
@@ -281,6 +281,7 @@ const main = () => {
       if (flag(args, 'attachment')) payload.attachment = Number(flag(args, 'attachment'))
       if (image) payload.image_file = true
       if (has(args, 'clear')) payload.clear = true
+      if (has(args, 'resource')) payload.resource = true
       const result = remote(payload, image)
 
       print(result)

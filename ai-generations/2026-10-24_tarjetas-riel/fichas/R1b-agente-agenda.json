@@ -1,0 +1,11 @@
+{
+  "id": "R1b-agente-agenda",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "manos",
+  "escena": "SCENE (a café in Santiago, late morning, the AI agent has just booked a meeting on a website for her): a woman's right hand holds a current flagship smartphone with thin even bezels, tilted toward the camera at chest height above a dark walnut café table; caught at the exact moment the assistant's confirmation lands, her thumb lifts off the glass. The phone screen is the brightest object in the frame and is the subject: a clean light-mode chat app in Spanish: at the top right her blue message bubble reading exactly «¿Me agendas una reunión?»; below it the assistant's answer as a large white confirmation card with a big blue check circle, the bold title reading exactly «Reunión agendada», a calendar row reading exactly «Jue 12 nov · 10:00», and a solid blue button with no text; a thin message bar at the bottom. These Spanish words are the only text on the screen; no English anywhere. Her thumb rests on the right edge of the phone frame, not over the card. A flat white cup with a little espresso foam sits out of focus behind the phone. Hard late-morning sun from a window at the left rakes across the hand and the table, one side of the fingers lit, the other in open shade; the café behind falls into soft dark blur with one cool window highlight high on the left. No laptop, no paper, no menu, nothing analog in focus. The phone and the hand sit in the upper middle of the frame, centred horizontally, filling about half the frame width. the screen throws a cool blue glow onto her fingertips and carries the brand blue in its check and button; one small orange accent: the woman's thin orange watch strap. 85mm lens at f/2, focus on the screen.",
+  "lecho": {
+    "objeto": "the near edge of the dark walnut café table, out of focus",
+    "tono": "DARK walnut in shadow, matte"
+  }
+}
