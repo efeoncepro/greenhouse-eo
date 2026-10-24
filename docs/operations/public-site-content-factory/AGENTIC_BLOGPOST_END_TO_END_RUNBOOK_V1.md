@@ -496,6 +496,11 @@ Bloques autorables por el primitive actual:
 - `image` con media real, caption opcional y `linkDestination: none|media`;
 - `embed` YouTube con URL aprobada.
 
+**Estilos editoriales obligatorios (2026-10-24).** `pullquote` sale siempre como Destacado Efeonce (uno o dos por
+post); `list` acepta `style: "steps"` (Pasos, sólo ordenada) y `style: "box"` (Recuadro, 2–6 ítems); `image` acepta
+`align: "center"`; `faq` emite cada pregunta con el estilo «Pregunta frecuente» y `schema.source: "plugin"` por
+defecto. El acento sale de la línea del tema del post. Contrato: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md`.
+
 Reglas duras:
 
 - el título de WordPress es el único H1; el cuerpo comienza en H2;
@@ -915,7 +920,9 @@ Preferir el graph de Yoast. Verificar salida renderizada, no sólo metas:
 - `Person` author.
 
 No duplicar `Organization`, `Article` o breadcrumbs con JSON-LD manual. `FAQPage` sólo si las preguntas y
-respuestas son visibles, la política vigente lo justifica y no duplica otro owner.
+respuestas son visibles, la política vigente lo justifica y no duplica otro owner. En el blog lo genera el plugin
+`efeonce-editorial-blocks` desde los bloques «Pregunta frecuente» (unido al nodo `WebPage` de Yoast): no se escribe
+a mano, y un post con un `FAQPage` incrustado antiguo lo conserva sin duplicarlo.
 
 **Gate:** matriz metadata completa, autor correcto, claims/Who-How-Why/IA visibles y schema esperado en preview/readback.
 

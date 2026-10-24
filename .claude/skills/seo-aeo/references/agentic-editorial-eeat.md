@@ -284,7 +284,11 @@ Usar el tipo que corresponda al contenido visible e incluir, cuando apliquen:
 
 Validar JSON-LD parseable y el grafo final, no solo el objeto de la spec. No
 prometer rich results. `FAQPage` solo si preguntas y respuestas son visibles y
-la feature sigue siendo pertinente al publicar.
+la feature sigue siendo pertinente al publicar. En el blog de Efeonce (desde
+2026-10-24) el `FAQPage` lo genera el plugin `efeonce-editorial-blocks` desde
+los bloques «Pregunta frecuente» visibles, con un `Question` por bloque y su
+ancla `faq-<slug>`: no se escribe JSON-LD a mano y QA verifica que haya uno
+solo (`docs/public-site/BLOG_FAQ_BLOCK_ANALYSIS_V1.md`).
 
 ### Open Graph y Twitter/X
 

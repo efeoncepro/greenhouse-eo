@@ -99,6 +99,35 @@ privado**. La publicacion siempre es una decision humana final; el operador pued
 - Post `status=publish` + HTTP 200 anonimo no basta: canonical, robots, schema, OG, media,
   links y render deben pasar antes de cerrar.
 
+## Estilos editoriales y preguntas frecuentes
+
+Desde el 2026-10-24 todo post nuevo o refrescado usa los estilos Efeonce sobre bloques nativos (contrato:
+[`BLOG_EDITORIAL_BLOCK_STYLES_V1.md`](../../public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md)). Un post hecho sólo de
+párrafos no se publica.
+
+1. **En la spec del artículo**, usa:
+   - `{ "kind": "pullquote", "text": "…", "cite": "…" }`: sale siempre como Destacado. Pon uno o dos por post y saca la
+     oración del párrafo de al lado.
+   - `{ "kind": "list", "ordered": true, "style": "steps", "items": [...] }` para un paso a paso (Pasos).
+   - `{ "kind": "list", "style": "box", "items": [...] }` para 2 a 6 ítems cortos (Recuadro): errores frecuentes, el
+     mapa de un cluster o las invitaciones del cierre (Glitch → herramienta).
+   - `{ "kind": "image", …, "align": "center" }` para diagramas e imágenes cuadradas.
+   - `{ "kind": "faq", "items": [{ "question", "answer" }] }` para las preguntas frecuentes. No agregues JSON-LD: el
+     plugin arma el `FAQPage` desde los bloques visibles. Dos preguntas iguales hacen fallar el render
+     (`content_factory_article_faq_question_duplicated`).
+2. **En el editor de WordPress**, los mismos estilos aparecen en el panel «Estilos» del bloque: «Destacado Efeonce» en
+   la cita destacada, «Pasos» y «Recuadro» en la lista, «Pregunta frecuente» en el desplegable. Elegir «Pregunta
+   frecuente» ya suma esa pregunta al schema.
+3. **El color** de los estilos es el de la línea del tema del post. Si el tema no corresponde a la línea de la
+   categoría (Paid Media es Voice; HubSpot es Revenue), fíjalo con
+   `pnpm public-website:blog-home line <post> <línea>` ([manual](operar-portada-blog-por-cli.md)). Nunca cambies la
+   categoría principal: cambia la URL.
+4. **Para reemplazar el cuerpo de un post publicado** con su spec recompuesta, usa
+   `scripts/public-website/blog-post-content-republish.php`: primero la simulación y después `apply`, con guardas de
+   fecha de modificación, sha256 y preguntas frecuentes idénticas. Guarda un respaldo por post.
+5. **QA en vivo:** un solo `FAQPage`, el Destacado sin las líneas negras de Ohio, los Pasos y el Recuadro visibles en
+   modo claro y oscuro, y las imágenes centradas.
+
 ## Inspeccionar el sitio
 
 1. Ejecuta discovery read-only si necesitas inventario.

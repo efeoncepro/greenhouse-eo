@@ -680,6 +680,26 @@ vale en toda aplicación:
 - **Producción y publicación:** skill `efeonce-public-site-wordpress` → `references/landings/agenda.md`; el agendador
   y su contrato, skill `greenhouse-growth-meetings`.
 
+### A18. Bloques del artículo del blog (en producción desde 2026-10-24)
+
+Los posts del blog (WordPress con el tema Ohio) usan cuatro estilos Efeonce sobre bloques nativos de Gutenberg:
+Destacado (cita destacada), Pasos (lista ordenada), Recuadro (lista corta) y Pregunta frecuente (desplegable). Su
+diseño se revisó con esta skill el 2026-10-24:
+
+- **El acento es el de la línea del tema del post**, igual que en Marketing con Manzanitas y en la tarjeta del post en
+  la portada del blog. Sale de un mismo resolvedor (`EO_CM_Util::line_of()`); cuando el tema no coincide con su
+  categoría, el post lleva `_eo_line`.
+- **El acento sólo va en un gráfico (≥ 3:1) o en un texto de 24 px o más.** La pregunta de la FAQ queda en navy y el
+  acento va en su anillo, que nunca se rellena; el número de Pasos va a 28 px en el acento, sin disco; el Destacado
+  abre con una barra de 48 × 3 px.
+- **Ninguna esfera como adorno ni como viñeta.** La viñeta del Recuadro es un guion corto en tinta.
+- **Color:** sólo de `efeonceGraphicLine`: navy `#023c70` sobre papel `#f7f8f6`, blanco sobre `#001a33` en oscuro.
+- **Tipografía:** sigue la del artículo de Ohio (DM Sans e Inter) hasta que se migre la plantilla completa del
+  artículo a Bricolage y Poppins (decisión del operador, 2026-10-24).
+
+La portada de cada artículo se rige por la variante centrada de Manzanitas (`manzanitas.md` §4.5).
+Contrato: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` · FAQ: `docs/public-site/BLOG_FAQ_BLOCK_ANALYSIS_V1.md`.
+
 ## B. Presentaciones e informes
 
 ### B1. Deck 16:9 (portada, sección, contenido, cierre)

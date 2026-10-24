@@ -52,16 +52,43 @@ El lienzo es de **1200 × 630** (1,9:1) y se entrega al doble. Cada superficie m
 | Vista previa compacta de WhatsApp y cualquier tarjeta cuadrada | **el cuadrado central, x 285–915** | el texto tiene que estar entero dentro del cuadrado |
 | Archivo del blog (temas, etiquetas, autores, búsqueda) | desde el 2026-10-24 (archivo v3, TASK-2055) es una lista de texto y **no muestra la imagen**. El archivo de Ohio anterior la mostraba en tarjetas cuadradas de 304 × 304 | hoy no aplica; el recorte cuadrado se mantiene por WhatsApp y por cualquier tarjeta futura |
 | Tarjeta grande de X | 2:1, así que puede recortar unos 15 px arriba y abajo | nada importante en los 15 px de cada borde. Fuente: el validador de X citado en 2020; no lo medimos |
-| Rail «Para leer con calma» de `/blog/`, escritorio (1440 y 1920) | tarjeta de 440 × 600 con la foto arriba en **440 × 330 (4:3)**, `object-fit: cover` centrado: en el lienzo de 1200 × 630 se ve **x 180–1020** | el cuadrado central cabe entero adentro, con 132 px de aire a cada lado de la columna de texto |
-| Rail, tablet (768 y 1024) | tarjeta de 361 × 492 con la foto en **361 × 271 (4:3)**: mismo recorte, x 180–1020 | igual que en escritorio |
-| Rail, móvil (390) | tarjeta de 300 × 440 con la foto en **300 × 220 (1,36:1)**: se ve x 170–1030 | igual; el texto se lee más chico, así que la respuesta de una palabra es la que se lee |
+| Rail «Para leer con calma» v2 de `/blog/`, escritorio (1440 y 1920) | **tarjeta de foto a sangre de 440 × 600** (vertical, 0,73:1), `object-fit: cover` centrado: en el lienzo de 1200 × 630 se ve **x 369–831**. Encima van la etiqueta de formato arriba, y el título, la bajada y el autor desde y 383, sobre un degradado navy que tapa el 46 % de abajo | **choca**: corta la cabecera y el inicio de la pregunta, deja fuera la cara y pinta su propio texto encima. Ver «Las cards v2 del rail», abajo |
+| Rail v2, tablet (768 y 1024) | tarjeta de **361 × 492** (0,73:1): mismo recorte, x 369–831 | igual que en escritorio |
+| Rail v2, móvil (390) | tarjeta de **304 × 540** (0,56:1): se ve **x 423–777** | el recorte más estrecho de todos |
 | Slider de `/blog/` | usa el `hero` del post si existe; si no, la destacada a sangre, anclada a la derecha (`object-position: 100% 50%`) y con su propio título encima, a la izquierda | **el título del slider choca con el texto de la portada.** Si un post con esta portada entra al slider, ponle como `hero` el plate sin texto (paso 10) |
 
-Medidas en vivo del 2026-10-24, con el adaptador de la portada (`EO_Home_Adapter::rail()`). En escritorio, el rail
-sólo pone foto en la primera y la cuarta tarjeta; en móvil, sólo en la primera. Las demás son tarjetas de minutos de
-lectura, sin imagen. **La restricción que manda es el cuadrado central:** todos los demás recortes lo contienen.
+Medidas en vivo del 2026-10-24 con las cards v2 del rail (TASK-2051, `efeonce-editorial-blocks` 0.4.4,
+`EO_Home_Adapter::rail()`). El rail toma las cuatro lecturas largas más nuevas y después los recursos. **Todo post con
+imagen destacada sale como tarjeta de foto a sangre**, salvo los casos con logo de cliente (tarjeta de papel con el
+logo) y los podcast (tarjeta con la onda). Una entrada sin imagen sale como tarjeta tipográfica. **Para el resto de
+las superficies manda el cuadrado central**; el rail v2 es la excepción y tiene su propia regla (abajo).
 
-Las medidas, en píxeles del lienzo de 1200 × 630:
+### Las cards v2 del rail
+
+La tarjeta de foto es vertical y recorta mucho más que cualquier otra superficie: de 1200 × 630 deja ver x 369–831
+(x 423–777 en móvil) y le pinta encima su propio texto. Una portada con el texto incrustado **no sirve** ahí:
+
+- la cabecera de Manzanitas (x 312–492) y el inicio de la pregunta quedan cortados, y en móvil también el final de la
+  respuesta (x 782);
+- la cara (x 795–900) queda fuera del recorte;
+- la etiqueta de formato de la tarjeta cae sobre la cabecera, y el título de la tarjeta cae debajo de la respuesta.
+
+Hoy ninguno de los tres posts del caso fuente está en el rail, porque no están entre las cuatro lecturas más nuevas.
+**Mientras la tarjeta no tenga una imagen propia, no publiques en el rail un post con esta portada sin antes resolverlo
+con la sesión de la portada del blog.** El template ya acepta una posición de foto por tarjeta (`pos`, que va a
+`object-position`), pero el adaptador siempre la deja en `center`; una imagen o un punto focal propio de la tarjeta es
+un cambio del dueño de la portada (TASK-2051), no de este manual. Si se hace, la imagen de la tarjeta es el plate sin
+texto, encuadrado en la cara.
+
+Para que el sujeto sobreviva a la tarjeta (una portada sin texto incrustado, o el plate que vaya a la tarjeta):
+
+| Qué | Dónde, en el lienzo de 1200 × 630 | Por qué |
+|---|---|---|
+| Cara y gesto | **x 423–777**, en la mitad de arriba (**y < 340**) | es la franja que se ve también en el teléfono, sin texto encima |
+| Esquinas de arriba de la franja | nada importante en los ~80 px de cada lado | ahí caen la etiqueta del formato (izquierda) y el botón (derecha) |
+| Mitad de abajo | tono parejo y oscuro (mesa, suelo, sombra) | el degradado y el texto de la tarjeta la tapan; un detalle ahí compite con el título |
+
+Medidas, en píxeles del lienzo de 1200 × 630, para el resto de las superficies:
 
 | Elemento | Dónde va | Regla |
 |---|---|---|
@@ -211,7 +238,8 @@ Anota el adjunto nuevo y el nombre de la opción de respaldo que imprime.
   `primaryImageOfPage` del schema también, y no queda ninguna referencia al archivo anterior.
 - **Archivo:** el sha256 del archivo publicado es igual al local.
 - **Portada del blog:** `pnpm public-website:blog-home verify --browser` en verde.
-- **Rail de la portada:** si el post entra al rail, mira su tarjeta en 1440 y en 390 (`?qa=1` evita la caché).
+- **Rail de la portada:** si el post entra al rail, mira su tarjeta en 1440 y en 390 (`?qa=1` evita la caché). Con
+  las cards v2, una portada con texto incrustado no pasa: ver «Las cards v2 del rail».
 - **Recorte real:** el archivo v3 del blog ya no muestra la imagen. Revisa el recorte cuadrado en el archivo
   `-recorte-movil.png` del paso 6 y, si puedes, compartiendo el enlace en WhatsApp.
 - **Redes:** X y LinkedIn guardan en caché la tarjeta anterior. Para refrescarla, usa el Post Inspector de LinkedIn y

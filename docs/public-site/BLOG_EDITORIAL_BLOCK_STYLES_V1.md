@@ -1,9 +1,10 @@
 # Estilos editoriales del blog (bloques nativos de Gutenberg)
 
 > **Tipo de documento:** Contrato de diseño y uso
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-10-24 por Claude, a partir de la revisión del operador sobre los posts de inbound, paid media y topic clusters
-> **Código:** plugin `efeonce-editorial-blocks` 0.4.0, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`, commit `f9b0d4d`)
+> **Código:** plugin `efeonce-editorial-blocks`, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`). Estilos desde 0.4.0 (`f9b0d4d`); diseño vigente 0.4.2 (`710f0d1`); línea por post 0.4.3 (`cab3864`). Las versiones posteriores del plugin (0.4.4, cards v2 del rail de la portada) no cambian estos estilos
+> **Documentación funcional:** [recetas de autoría Gutenberg](../documentation/public-site/gutenberg-post-authoring-recipes.md) · **Manual:** [operar la Content Factory](../manual-de-uso/public-site/operar-public-site-content-factory.md#estilos-editoriales-y-preguntas-frecuentes)
 > **Estado:** en producción desde el 2026-10-24 (§En producción)
 > **Relacionado:** [preguntas frecuentes](BLOG_FAQ_BLOCK_ANALYSIS_V1.md) · `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
 
@@ -25,7 +26,7 @@ La guía de recetas ya pedía bloques de enriquecimiento, pero Ohio no les daba 
 | Estilo | Bloque | Clase | Uso | Content Factory |
 |---|---|---|---|---|
 | Destacado Efeonce | `core/pullquote` | `is-style-efeonce-destacado` | La frase en la que se apoya una sección. Una o dos por post, nunca seguidas, y sin repetir la oración que tiene al lado (se saca del párrafo) | `{ "kind": "pullquote", "text", "cite"? }` (siempre con el estilo) |
-| Pasos | `core/list` ordenada | `is-style-efeonce-pasos` | Las secciones «paso a paso»: número en círculo, líneas entre pasos, el arranque en negrita | `{ "kind": "list", "ordered": true, "style": "steps" }` |
+| Pasos | `core/list` ordenada | `is-style-efeonce-pasos` | Las secciones «paso a paso»: número grande (28 px, 24 px en el celular) en el acento de la línea, sin disco; líneas entre pasos y el arranque en negrita | `{ "kind": "list", "ordered": true, "style": "steps" }` |
 | Recuadro | `core/list` | `is-style-efeonce-recuadro` | Un conjunto corto que conviene ver de una vez: errores frecuentes, «tres cosas», las invitaciones del cierre (Glitch → herramienta, orden de PDR-020) y el mapa de un cluster | `{ "kind": "list", "style": "box" }` |
 | Imagen centrada | `core/image` | `aligncenter` (alineación de core) | Diagramas e ilustraciones más angostos que la columna | `{ "kind": "image", "align": "center" }` |
 

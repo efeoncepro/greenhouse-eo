@@ -8,6 +8,25 @@ agent should understand the editorial outline, the native block dialect and the
 legacy block debt before preparing any `post_draft_gutenberg` or
 `refresh_existing_gutenberg_post` artifact.
 
+## Efeonce editorial styles (since 2026-10-24)
+
+Ohio barely styles native blocks, so a post made only of paragraphs and lists looks unstyled. Since 2026-10-24 the
+plugin `efeonce-editorial-blocks` registers four Efeonce styles on native blocks. They are not new blocks: an editor
+can pick them in the block's «Styles» panel, and Content Factory emits them from the article spec.
+
+| Style | Native block | When to use it | In the spec |
+|---|---|---|---|
+| Destacado Efeonce | `core/pullquote` | the sentence a section rests on; 1–2 per post, never next to the sentence it repeats | `{ "kind": "pullquote", "text", "cite"? }` |
+| Pasos | ordered `core/list` | a step-by-step section | `{ "kind": "list", "ordered": true, "style": "steps" }` |
+| Recuadro | `core/list` | 2–6 short items seen at once: common mistakes, «three things», the closing invitations (Glitch → tool, PDR-020 order), a cluster map | `{ "kind": "list", "style": "box" }` |
+| Pregunta frecuente | `core/details` | each question of the FAQ section; the plugin builds the `FAQPage` schema from these blocks, so the post carries no hand-written JSON-LD | `{ "kind": "faq", "items": [...] }` (default `schema.source: "plugin"`) |
+
+Diagrams and square images go centered (`{ "kind": "image", "align": "center" }`). The accent color of every style is
+the **line of the post's topic** (Paid Media → Voice, HubSpot → Revenue, SEO → Engine), the same color as its card on
+the blog home; a post whose line differs from its category's is set with `pnpm public-website:blog-home line`. Rules,
+design and production record: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` (FAQ:
+`docs/public-site/BLOG_FAQ_BLOCK_ANALYSIS_V1.md`). How to operate it: `docs/manual-de-uso/public-site/operar-public-site-content-factory.md`.
+
 ## Live Runtime Findings
 
 Read-only WP-CLI inspection on 2026-06-14 sampled the six latest published
@@ -101,8 +120,8 @@ Recommended enrichment:
   Contract: `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
 - `core/quote` for actual quotes, strong principles outside the Glitch format,
   or temporary POV fallback when no custom block is available.
-- `core/pullquote` for a short, high-signal editorial callout when the source
-  post already uses highlighted claims or stats.
+- `core/pullquote` for a short, high-signal editorial callout, always with the
+  Destacado Efeonce style (see «Efeonce editorial styles» above).
 - `core/details` for compact FAQ/disclosure moments inside a section when the
   summary must remain visible and the full answer should stay in HTML without a
   custom block.

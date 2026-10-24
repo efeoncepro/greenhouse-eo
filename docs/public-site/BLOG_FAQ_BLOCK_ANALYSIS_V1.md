@@ -71,6 +71,12 @@ respuesta encuentren pares pregunta/respuesta limpios. El diseño sirve a la pri
 
 ### 3.1 Diseño (superficie clara del blog)
 
+> **Diseño vigente (0.4.2, 2026-10-24):** esta tabla es la propuesta original. Tras la revisión con La órbita, la
+> pregunta va en DM Sans 600 y en navy (blanco en oscuro), nunca en el acento, porque el acento sólo va en gráfico o en
+> texto de 24 px o más. El anillo del indicador toma el acento de la línea del tema del post (`--eo-line-on-light` /
+> `--eo-line-on-dark`) y **nunca se rellena**. Detalle en
+> [`BLOG_EDITORIAL_BLOCK_STYLES_V1.md`](BLOG_EDITORIAL_BLOCK_STYLES_V1.md) §Diseño.
+
 | Decisión | Valor propuesto | Por qué |
 |---|---|---|
 | Contenedor | Sin tarjeta; líneas de 1 px arriba de la primera pregunta y debajo de cada una | La sección es parte del artículo; una tarjeta la vuelve un widget y suma card-on-card |
