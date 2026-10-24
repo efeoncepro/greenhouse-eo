@@ -312,6 +312,7 @@
     "public-website:verify-aeo-why-proof-meta": "tsx scripts/public-website/verify-aeo-why-proof-meta.ts",
     "public-website:wpcli": "tsx scripts/public-website/wpcli-remote.ts",
     "public-website:site-nav": "tsx scripts/public-website/site-nav/cli.ts",
+    "public-website:blog-home": "tsx scripts/public-website/blog-home/cli.ts",
     "public-website:landing-dock": "tsx scripts/public-website/landing-dock/cli.ts",
     "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
     "ai:image": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts",
