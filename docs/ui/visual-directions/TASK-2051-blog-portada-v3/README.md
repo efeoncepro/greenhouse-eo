@@ -134,12 +134,12 @@ Los archivos del tablero viven en el almacén del artifact (`/_blob/<id>`); se b
 | `1063184040c6121be1f86602803b0f55` | Logo Glitch monocromo navy (derivado de `glitch-logo-positive.svg`) |
 | `72025ed97a7ce0c610ec355f78efed74`, `83245a45d586a61636aa1ac2deff2ab6`, `eb05ce3c01b77fd65e104a791d93784b`, `fa4c472324f79c4861f97234d274662a` | Logos (Glitch negativo, Efeonce positivo, MCM negativo, Efeonce AEO) |
 
-## Tarjetas v2 de «Para leer con calma» — PROPUESTA (2026-10-24, canvas versión 90)
+## Tarjetas v2 de «Para leer con calma» — APROBADA (2026-10-24, canvas versión 93)
 
 Pedido del operador: mantener la grilla mezclada (artículo, caso, guía, diagnóstico, webinar y podcast como una sola
 familia) y subirle el nivel a cada tarjeta con autor, fecha, tema e imagen. Página «Para leer con calma · v2 (tarjetas)»
 del canvas: hoja de la familia (1920, con una fila en estado hover) y la sección a 1440 y 390. Generador y tableros en
-`tarjetas-v2-2026-10-24.tar.gz` (empaquetado porque Tailwind escanea el repo); captura en `referencias/tarjetas-v2-familia.jpg`.
+`tarjetas-v2-2026-10-24.tar.gz` (empaquetado porque Tailwind escanea el repo); capturas en `referencias/tarjetas-v2-familia.jpg` y `referencias/tarjetas-v2-hover.jpg`.
 
 - **Anatomía común:** ícono del formato en el color de su tema (reemplaza el guion), título, bajada de dos líneas y un pie
   con filete: quién y cuándo a la izquierda (foto del autor o la marca), la cifra del formato a la derecha.
@@ -152,4 +152,11 @@ del canvas: hoja de la familia (1920, con una fila en estado hover) y la secció
   el centro; la onda del podcast viaja como audio con una franja de reproducción. Movimiento reducido: sólo luz y color.
 - **Lecciones del canvas:** el canvas descarta la hoja `<style>` interna de los SVG (usar colores como atributos) y las
   variables CSS en estilos en línea (usar reglas CSS).
-- Webinar y podcast son ejemplos de formato. Implementación: TASK-2051, sujeta a aprobación del operador.
+- **Badges (una por tarjeta, sobre el título; ES/EN):** cápsula sólida con brillo y destello, ícono relleno de dos tonos.
+  Prioridad cuando aplican varias: «En vivo»/Live (evento en curso) › «Últimos cupos»/Last seats y «Lista de espera»/Waitlist
+  (conteo de reservas de Growth Forms, TASK-2053) › «Más leído»/Most read (GA4, top 3 de 30 días) › «Tendencia»/Trending
+  (GA4, alza semanal fuerte) › «Nuevo»/New (publicado hace ≤14 días) › «Actualizado»/Updated (campo «última revisión» que
+  marca el editor, nunca la fecha de modificación de WordPress; la fecha va en el pie: «Actualizado 20 oct 2026») ›
+  «Gratis»/Free (tipo de recurso). Sin dato confiable, no hay badge.
+- Webinar y podcast son ejemplos de formato. Aprobada por el operador el 2026-10-24 («Sí, hazlo... y queda aprobado»);
+  implementación en TASK-2051.
