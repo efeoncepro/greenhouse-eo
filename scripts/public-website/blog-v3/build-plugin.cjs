@@ -35,9 +35,11 @@ const FIXTURES = { portada: 'fixture.json', tablet: null, movil: 'fixture.mobile
 // <img> and a 16 px top margin on an image after a heading).
 // The root starts from initial values, so nothing inherited from the theme's <body> (line height, letter spacing,
 // font smoothing) reaches the boards: that is the context the references were captured in.
+// The Growth Forms renderer owns everything inside <greenhouse-form>: the host reset never reaches it (2026-10-24,
+// the ID-specific revert was wiping the inline pill's own styles in production).
 const HOST_RESET = `#eobh{all:initial;display:block}
-#eobh :is(h1,h2,h3,h4,h5,h6,p,a,ul,ol,li,dl,dt,dd,button,input,textarea,select,label,form,fieldset,figure,figcaption,blockquote,span,div,section,article,nav,header,footer,strong,em,b,i,small,time,mark,table,tr,td,th){all:revert}
-#eobh :is(img,svg){margin:revert;padding:revert;border:revert;border-radius:revert;box-shadow:revert;outline:revert;max-width:revert;max-height:revert;min-width:revert;min-height:revert;vertical-align:revert;float:revert;opacity:revert;filter:revert;transform:revert;transition:revert;object-fit:revert;object-position:revert}
+#eobh :is(h1,h2,h3,h4,h5,h6,p,a,ul,ol,li,dl,dt,dd,button,input,textarea,select,label,form,fieldset,figure,figcaption,blockquote,span,div,section,article,nav,header,footer,strong,em,b,i,small,time,mark,table,tr,td,th):not(greenhouse-form *){all:revert}
+#eobh :is(img,svg):not(greenhouse-form *){margin:revert;padding:revert;border:revert;border-radius:revert;box-shadow:revert;outline:revert;max-width:revert;max-height:revert;min-width:revert;min-height:revert;vertical-align:revert;float:revert;opacity:revert;filter:revert;transform:revert;transition:revert;object-fit:revert;object-position:revert}
 `
 
 /** Rewrites one board's canvas CSS under its scope and gives its keyframes board-unique names. */

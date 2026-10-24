@@ -1025,3 +1025,56 @@ export const countDeadLetterAttempts = async (): Promise<number> => {
 
 return Number(rows[0]?.n ?? 0)
 }
+
+/**
+ * 2026-10-24 — Reservas confirmadas de eventos cuyo recordatorio ya corresponde en `now`: inicio aún futuro y dentro
+ * de los `reminderMinutesBefore` minutos de la política (120 por defecto). Las de lista de espera no reciben
+ * recordatorio. El envío es idempotente aguas abajo (`sourceEventId` por reserva), así que repetir la consulta en cada
+ * vuelta del job no duplica correos.
+ */
+export const listDueEventReminderSubmissionIds = async (now: Date, limit = 500): Promise<string[]> => {
+  const rows = await query<{ submission_id: string }>(
+    `SELECT s.submission_id
+       FROM greenhouse_growth.form_submission s
+       JOIN greenhouse_growth.form_definition d ON d.form_id = s.form_id
+       JOIN greenhouse_growth.form_version v ON v.form_version_id = s.form_version_id
+      WHERE d.form_kind = 'event_registration'
+        AND s.status = 'accepted'
+        AND v.ui_policy_json #>> '{eventRegistration,event,startUtc}' IS NOT NULL
+        AND (v.ui_policy_json #>> '{eventRegistration,event,startUtc}')::timestamptz > $1
+        AND (v.ui_policy_json #>> '{eventRegistration,event,startUtc}')::timestamptz
+            - make_interval(mins => COALESCE((v.ui_policy_json #>> '{eventRegistration,reminderMinutesBefore}')::int, 120)) <= $1
+        AND COALESCE(
+              s.normalized_fields_json ->> COALESCE(v.ui_policy_json #>> '{eventRegistration,statusField}', 'registration_status'),
+              'confirmed'
+            ) <> 'waitlisted'
+      ORDER BY s.created_at
+      LIMIT $2`,
+    [now.toISOString(), limit]
+  )
+
+  return rows.map(row => row.submission_id)
+}
+
+/**
+ * 2026-10-24 — Agrega un slug a los formularios permitidos de una superficie (idempotente). Una superficie sirve a
+ * varios formularios (cada evento publica el suyo por la misma superficie de la portada): sin esto el segundo evento
+ * no podía cargarse. Devuelve la lista resultante.
+ */
+export const allowFormSlugOnSurface = async (surfaceId: string, slug: string): Promise<string[]> => {
+  const rows = await query<{ allowed_form_slugs_json: unknown }>(
+    `UPDATE greenhouse_growth.form_host_surface
+        SET allowed_form_slugs_json = CASE
+              WHEN COALESCE(allowed_form_slugs_json, '[]'::jsonb) ? $2 THEN allowed_form_slugs_json
+              ELSE COALESCE(allowed_form_slugs_json, '[]'::jsonb) || to_jsonb($2::text)
+            END,
+            updated_at = now()
+      WHERE surface_id = $1
+      RETURNING allowed_form_slugs_json`,
+    [surfaceId, slug]
+  )
+
+  if (!rows[0]) throw new Error(`Superficie ${surfaceId} no encontrada`)
+
+  return (rows[0].allowed_form_slugs_json as string[]) ?? []
+}

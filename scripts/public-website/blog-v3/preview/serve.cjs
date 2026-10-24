@@ -6,7 +6,11 @@
  * container), replaces its Elementor body with the eo-blog-home server render (PHP CLI, same code as WordPress) and
  * serves the plugin assets locally. Public static files of the live site are proxied with GET only.
  *
- *   node preview/serve.cjs [--port 8843] [--shell https://efeoncepro.com/agenda/] [--now <ms>]
+ *   node preview/serve.cjs [--port 8843] [--shell https://efeoncepro.com/agenda/] [--now <ms>] [--subscribe <formKey>] [--event-form <formKey>]
+ *
+ * --subscribe (Glitch) and --event-form (the event's reservation) connect real published forms: the published Growth Form is read from Greenhouse through a
+ * local GET-only proxy (/__ghf/, sent with the site origin), so the renderer works without CORS and nothing can be
+ * submitted (the preview refuses every write).
  */
 const { execFileSync } = require('node:child_process')
 const fs = require('node:fs')
@@ -26,6 +30,9 @@ const arg = (name, fallback) => {
 const PORT = Number(arg('port', 8843))
 const SHELL_URL = arg('shell', 'https://efeoncepro.com/agenda/')
 const NOW = arg('now', '')
+const SUBSCRIBE = arg('subscribe', '')
+const EVENT_FORM = arg('event-form', '')
+const PROXY = Boolean(SUBSCRIBE || EVENT_FORM)
 const PLUGIN = path.join(RUNTIME_DIR, 'wp-content/plugins/eo-blog-home')
 const LOCAL = '/wp-content/plugins/eo-blog-home/'
 const TYPES = { '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png' }
@@ -45,7 +52,19 @@ async function page() {
   if (body.length !== 1) throw new Error('Shell without a single Elementor page body: ' + SHELL_URL)
 
   const manifest = JSON.parse(fs.readFileSync(path.join(PLUGIN, 'assets/generated/manifest.json'), 'utf8'))
-  const markup = execFileSync('php', [path.join(__dirname, '../fidelity/php-page.php'), PLUGIN, LOCAL + 'assets/img', ...(NOW ? [NOW] : [])], { encoding: 'utf8', maxBuffer: 64 << 20 })
+
+  const env = PROXY
+    ? {
+        ...process.env,
+        EOBH_PREVIEW_SUBSCRIBE_KEY: SUBSCRIBE,
+        EOBH_PREVIEW_SUBSCRIBE_SURFACE: 'fhsf-efeonce-blog-subscription',
+        EOBH_PREVIEW_EVENT_FORM_KEY: EVENT_FORM,
+        EOBH_PREVIEW_EVENT_FORM_SURFACE: 'fhsf-efeonce-blog-events',
+        EOBH_PREVIEW_SUBSCRIBE_BASE: `http://127.0.0.1:${PORT}/__ghf`
+      }
+    : process.env
+
+  const markup = execFileSync('php', [path.join(__dirname, '../fidelity/php-page.php'), PLUGIN, LOCAL + 'assets/img', ...(NOW ? [NOW] : [])], { encoding: 'utf8', maxBuffer: 64 << 20, env })
 
   body.replaceWith(markup)
   $('script').each((_, e) => {
@@ -67,6 +86,7 @@ async function page() {
   $('body').append(
     `<script defer src="${LOCAL}assets/js/dc-runtime.js"></script><script>window.EoBlogV3Src=${JSON.stringify(Object.fromEntries(Object.keys(media).map(b => [b, LOCAL + 'assets/generated/' + b + '.js'])))}</script><script defer src="${LOCAL}assets/js/boot.js"></script>`
   )
+  if (PROXY) $('body').append(`<script defer src="/__ghf/growth-forms/renderer-latest.js"></script>`)
   $('title').text('Blog — preview local TASK-2051')
 
   return $.html()
@@ -83,6 +103,16 @@ http
         res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
 
         return res.end(await page())
+      }
+
+      // --subscribe: GET-only proxy to Greenhouse (renderer bundle + public form contract), sent with the site origin.
+      if (PROXY && url.pathname.startsWith('/__ghf/')) {
+        const target = 'https://greenhouse.efeoncepro.com' + url.pathname.slice('/__ghf'.length) + url.search
+        const upstream = await fetch(target, { headers: { origin: 'https://efeoncepro.com', accept: req.headers.accept || '*/*' } })
+
+        res.writeHead(upstream.status, { 'content-type': upstream.headers.get('content-type') || 'application/octet-stream', 'cache-control': 'no-store' })
+
+        return res.end(Buffer.from(await upstream.arrayBuffer()))
       }
 
       if (url.pathname.startsWith(LOCAL)) {

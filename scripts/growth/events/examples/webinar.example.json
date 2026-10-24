@@ -1,0 +1,29 @@
+{
+  "slug": "webinar-aeo-chatgpt-2026-11-12",
+  "title": "Cómo aparecer en las respuestas de ChatGPT",
+  "excerpt": "45 minutos con el equipo de Efeonce | AEO: qué miran los motores de respuesta, cómo medir tu visibilidad y qué cambiar en tu sitio esta misma semana.",
+  "content": "<p>Un webinar práctico para entender cómo deciden ChatGPT, Gemini y Perplexity qué marcas citar, cómo medir dónde estás hoy y qué ajustes de tu sitio se notan primero.</p>",
+  "startUtc": "2026-11-12T13:00:00Z",
+  "timezone": "America/Santiago",
+  "durationMin": 45,
+  "modality": "online",
+  "territory": "aeo",
+  "paid": false,
+  "capacity": 500,
+  "overCapacity": "waitlist",
+  "speakers": [{ "user_id": 1, "role": "Managing & GTM Director", "org": "Efeonce" }],
+  "takeaways": [
+    { "t": "Qué miran los motores", "d": "Las señales que usan ChatGPT, Gemini y Perplexity para elegir fuentes." },
+    { "t": "Cómo medir", "d": "Tu visibilidad en respuestas, con un método repetible." },
+    { "t": "Qué cambiar", "d": "Los ajustes de sitio que se notan esta misma semana." }
+  ],
+  "agenda": [
+    { "h": "10:00", "t": "Cómo responden los motores" },
+    { "h": "10:20", "t": "Medir tu visibilidad" },
+    { "h": "10:35", "t": "Preguntas" }
+  ],
+  "joinUrl": "https://us02web.zoom.us/j/00000000000?pwd=ejemplo",
+  "reminderMinutesBefore": 120,
+  "keyArt": "scripts/growth/events/examples/arte-clave-ejemplo.webp",
+  "keyArtAlt": "Una mano humana y una mano robótica tocan la interfaz de un sitio web: el webinar de Efeonce | AEO."
+}

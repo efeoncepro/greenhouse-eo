@@ -188,6 +188,7 @@
     "growth:forms:publish-careers-application": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/publish-careers-application-form.ts",
     "growth:forms:publish-ebook": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/publish-ebook-form.ts",
     "growth:forms:publish-glitch-pill": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/publish-glitch-inline-pill.ts",
+    "events:launch": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/events/launch-event.ts",
     "growth:forms:publish-event-registration": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/forms/publish-event-registration-form.ts",
     "growth:forms:activate-grader-premium-intake": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-grader-premium-intake-contract.ts",
     "growth:forms:verify-aeo-full-name-destination-contract": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/verify-aeo-full-name-destination-contract.ts",

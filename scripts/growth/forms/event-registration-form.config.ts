@@ -9,6 +9,8 @@
  */
 import { z } from 'zod'
 
+import { eventRegistrationEventSchema } from '@/lib/growth/forms/contracts'
+
 import { STANDARD_EBOOK_UI_POLICY } from '../ebook-forms.registry'
 
 const labelSchema = z.string().trim().min(1).max(80)
@@ -31,6 +33,11 @@ export const eventRegistrationFormConfigSchema = z
     origins: z.array(z.string().url()).min(1),
     privacyUrl: z.string().url(),
     consentPolicyVersion: z.string().trim().min(1).max(80),
+    /** 2026-10-24 — Datos del evento para sus correos (confirmación, lista de espera, recordatorio) y su `.ics`. */
+    event: eventRegistrationEventSchema.optional(),
+    /** Enlace privado de la sala (Zoom, Meet, Teams…): sólo viaja en los correos, nunca al navegador ni a WordPress. */
+    joinUrl: z.string().url().optional(),
+    reminderMinutesBefore: z.number().int().min(15).max(1440).optional(),
     labels: z
       .object({
         openLabel: labelSchema.default('Reservar mi lugar'),
@@ -38,7 +45,9 @@ export const eventRegistrationFormConfigSchema = z
         successLabel: labelSchema.default('¡Lugar reservado!'),
         waitlistSuccessLabel: labelSchema.default('Quedaste en lista de espera'),
         waitlistDoneLabel: labelSchema.default('Te avisamos si se libera un lugar'),
-        note: z.string().trim().min(1).max(280).default('Te enviamos el enlace y un recordatorio el mismo día.')
+        // Cierto sólo con los correos del evento activos (GROWTH_EVENT_EMAILS_ENABLED + `event` + `joinUrl`): la
+        // confirmación lleva el enlace de la sala y el recordatorio sale antes del inicio.
+        note: z.string().trim().min(1).max(280).default('Te enviamos el enlace y un recordatorio antes del evento.')
       })
       .default({})
   })
@@ -87,6 +96,9 @@ export const buildEventRegistrationVersion = (config: EventRegistrationFormConfi
       note: config.labels.note
     },
     eventRegistration: {
+      ...(config.event ? { event: config.event } : {}),
+      ...(config.joinUrl ? { joinUrl: config.joinUrl } : {}),
+      ...(config.reminderMinutesBefore !== undefined ? { reminderMinutesBefore: config.reminderMinutesBefore } : {}),
       ...(config.capacity !== undefined ? { capacity: config.capacity } : {}),
       overCapacity: config.overCapacity,
       showRegistrationsCount: config.showRegistrationsCount,
@@ -101,7 +113,7 @@ export const buildEventRegistrationVersion = (config: EventRegistrationFormConfi
     mode: 'greenhouse_only',
     engineDestinations: false,
     rationale:
-      'Reserva capturada en Greenhouse. El destino HubSpot de cada evento se agrega por el registry de destinos; confirmación y recordatorios siguen en HubSpot.'
+      'Reserva capturada en Greenhouse. Confirmación, lista de espera y recordatorio los envía Greenhouse (growth_event_registration / growth_event_reminder); el contacto llega a HubSpot por el formulario compartido de reservas de eventos.'
   },
   retentionPolicy: {
     scope: 'prospect_lead_pii',

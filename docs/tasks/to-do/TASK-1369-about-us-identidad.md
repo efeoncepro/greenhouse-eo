@@ -90,7 +90,7 @@ Reglas obligatorias:
 ### Depends on
 
 - Página Nosotros source-led publicada (2026-10-23) — hecho.
-- Datos de entidad confirmados por el operador: año de fundación **2008** (confirmado 2026-10-24, registrado en
+- Datos de entidad confirmados por el operador: año de fundación **2018** (confirmado 2026-10-24, registrado en
   `docs/context/01_quienes-somos.md`); faltan los perfiles públicos (`sameAs`) del liderazgo.
 
 ### Blocks / Impacts
@@ -203,7 +203,7 @@ Contenido público en WordPress, aditivo salvo el reslug. El riesgo real es SEO 
 
 ### Out-of-band coordination required
 
-- Operador: año de fundación confirmado (2008); falta confirmar los perfiles públicos del liderazgo antes de Slice 1 y
+- Operador: año de fundación confirmado (2018); falta confirmar los perfiles públicos del liderazgo antes de Slice 1 y
   aprobar el momento del reslug.
 
 <!-- ═══════════════════════════════════════════════════════════

@@ -18,8 +18,10 @@ const board = w => (w >= 1100 ? '.eobh-d' : w >= 768 ? '.eobh-t' : '.eobh-m')
   for (const width of WIDTHS) {
     const page = await (await browser.newContext({ viewport: { width, height: 900 } })).newPage()
 
-    await page.goto(`${url}${url.includes('?') ? '&' : '?'}vb=${Date.now()}`, { waitUntil: 'load', timeout: 90000 })
-    await page.waitForTimeout(1500)
+    // The page's own third parties (tag manager, chat) can hold the load event for minutes: wait for the home itself.
+    await page.goto(`${url}${url.includes('?') ? '&' : '?'}vb=${Date.now()}`, { waitUntil: 'domcontentloaded', timeout: 90000 })
+    await page.waitForSelector('#eobh', { timeout: 30000 })
+    await page.waitForTimeout(2500)
 
     const r = await page.evaluate(sel => {
       const el = document.querySelector(`#eobh ${sel}`)

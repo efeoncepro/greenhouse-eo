@@ -10,12 +10,19 @@
  * `_gh_partners_v2_before_<UTC>` (JSON) before writing; Ohio page_* metas are copied from Performance (251997).
  * The featured image is read before Document::save() and restored/verified after it (an empty page-settings payload
  * deletes it). Rollback (replace): rollback-partners-elementor-page.php with the snapshot key, purge Kinsta.
+ * Optional third input <cta.json> (the 0600 file written by scripts/growth/publish-partners-become-partner-cta.ts:
+ * { surfaceId, embedKey }) arms «Quiero ser partner» in «cierre» with the governed Growth CTA; without it the button
+ * degrades to /agenda/. The key is written into the widget settings only, never into git or logs.
  */
 if ( ! defined( 'ABSPATH' ) || ! class_exists( 'WP_CLI' ) ) { exit; }
-if ( count( $args ?? array() ) !== 2 ) { WP_CLI::error( 'Expected: <page-custom.css> <spec.json>.' ); }
+if ( ! in_array( count( $args ?? array() ), array( 2, 3 ), true ) ) { WP_CLI::error( 'Expected: <page-custom.css> <spec.json> [<cta.json>].' ); }
 $template = trim( (string) file_get_contents( $args[0] ) );
 $spec     = json_decode( (string) file_get_contents( $args[1] ), true );
 $mode     = (string) ( $spec['mode'] ?? '' );
+$cta      = isset( $args[2] ) ? json_decode( (string) file_get_contents( $args[2] ), true ) : array();
+$cta_surface = (string) ( $cta['surfaceId'] ?? '' );
+$cta_key     = (string) ( $cta['embedKey'] ?? '' );
+if ( isset( $args[2] ) && ( ! preg_match( '/^csur-[0-9a-f-]{36}$/', $cta_surface ) || strlen( $cta_key ) < 20 ) ) { WP_CLI::error( 'Invalid partner CTA surface or key.' ); }
 if ( ! in_array( $mode, array( 'preview', 'replace' ), true ) ) { WP_CLI::error( 'Unknown mode.' ); }
 if ( false === strpos( $template, '__ID__' ) || preg_match( '/<\/?(script|style)/i', $template ) ) { WP_CLI::error( 'Unexpected custom CSS input.' ); }
 
@@ -29,7 +36,7 @@ foreach ( array_keys( $modules ) as $module ) {
 	if ( ! isset( $widgets[ 'greenhouse_partners_' . $module ] ) ) { WP_CLI::error( 'Widget absent: greenhouse_partners_' . $module ); }
 	try {
 		$widgets[ 'greenhouse_partners_' . $module ]->get_controls();
-		$probe = EO_Partners_Landing_Base_Widget::render_module( $module, array(), 'preflight' );
+		$probe = EO_Partners_Landing_Base_Widget::render_module( $module, array( 'meeting_surface' => $cta_surface, 'meeting_embed_key' => $cta_key ), 'preflight' );
 		if ( '' === $probe || preg_match( '/%%[^%\s]+%%/', $probe ) ) { WP_CLI::error( 'Render preflight failed: ' . $module ); }
 	} catch ( \Throwable $e ) {
 		WP_CLI::error( 'Control preflight failed for ' . $module . ': ' . $e->getMessage() );
@@ -72,7 +79,9 @@ update_post_meta( $id, '_wp_page_template', 'default' );
 $zero     = array( 'unit' => 'px', 'top' => '0', 'right' => '0', 'bottom' => '0', 'left' => '0', 'isLinked' => true );
 $elements = array();
 foreach ( $modules as $module => $title ) {
-	$scheme     = in_array( $module, $light, true ) ? 'clb__light_section' : 'clb__dark_section';
+	$scheme          = in_array( $module, $light, true ) ? 'clb__light_section' : 'clb__dark_section';
+	$widget_settings = array( '_title' => $title, '_margin' => $zero, '_padding' => $zero );
+	if ( 'cierre' === $module && '' !== $cta_key ) { $widget_settings += array( 'meeting_surface' => $cta_surface, 'meeting_embed_key' => $cta_key ); }
 	$elements[] = array(
 		'id' => substr( md5( 'partners-section-' . $module ), 0, 7 ), 'elType' => 'container', 'isInner' => false,
 		'settings' => array(
@@ -81,7 +90,7 @@ foreach ( $modules as $module => $title ) {
 			'padding' => $zero, 'margin' => $zero,
 			'css_classes' => 'gh-partners-section ' . $scheme,
 		),
-		'elements' => array( array( 'id' => substr( md5( 'partners-widget-' . $module ), 0, 7 ), 'elType' => 'widget', 'widgetType' => 'greenhouse_partners_' . $module, 'settings' => array( '_title' => $title, '_margin' => $zero, '_padding' => $zero ), 'elements' => array() ) ),
+		'elements' => array( array( 'id' => substr( md5( 'partners-widget-' . $module ), 0, 7 ), 'elType' => 'widget', 'widgetType' => 'greenhouse_partners_' . $module, 'settings' => $widget_settings, 'elements' => array() ) ),
 	);
 }
 $document = \Elementor\Plugin::$instance->documents->get( $id, false );

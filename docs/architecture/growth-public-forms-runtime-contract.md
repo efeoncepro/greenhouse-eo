@@ -215,9 +215,10 @@ Hooks de formulario = atributo `data-ghf-part`. Eventos: `ghf:dismiss` (DOM, ind
 
 ## Formulario en línea y reserva por evento (TASK-2053/2054)
 
-Code complete en local (2026-10-24); llega a los hosts con el próximo release de Greenhouse a `main` (renderer `1.2.0`).
-Hasta entonces el renderer publicado ignora `presentation` y dibuja el formulario estándar de un campo: no publicar una
-versión `inline_pill` en una página antes del release.
+En producción desde el release `40b330175855` (2026-10-24, renderer `1.2.0`, más el consentimiento por el acto de
+suscribirse). Primer uso real: la suscripción a Glitch de la portada del blog (`/blog/`, ver «Suscripción a Glitch»
+abajo). El formulario de reserva por evento no tiene todavía un evento real publicado. Falta un envío real de
+verificación (ver «Estado de verificación»).
 
 ### Contrato (`ui_policy_json` de la versión)
 
@@ -250,6 +251,28 @@ el destino HubSpot de cada evento va por el registry de destinos.
 fila `rejected` con `rejection_reason_class = capacity_full`). El cupo se decide en la transacción del envío con un lock
 por formulario; un correo ya confirmado no ocupa otro cupo.
 
+### Consentimiento por el acto de suscribirse (`consentBy: 'submission'`)
+
+Aprobado por el operador el 2026-10-24. En una presentación `inline_pill` de **suscripción** con aviso visible, enviar
+el correo bajo ese aviso **es** el consentimiento: la píldora no tiene casillas (el compiler las bloquea), así que el
+aviso es lo único que el visitante ve y acepta.
+
+- **Evidencia (servidor).** Al aceptar el envío, `submitForm` guarda en
+  `form_submission_consent_snapshot.notice_text_hash` el sha256 del `ui_policy.inlinePill.note` de la versión publicada
+  (`inlinePillNoticeHash`, `src/lib/growth/forms/hash.ts`; recorta espacios). Si la versión no es `inline_pill` o no
+  declara `note`, el hash es `null`. El navegador no puede escribirlo.
+- **Destino HubSpot.** `mapping_json.communications[]` admite dos formas, excluyentes:
+  `{ checkboxKey, subscriptionTypeId, text }` (casilla marcada, igual que antes) y
+  `{ consentBy: 'submission', subscriptionTypeId, text }` (`text` = el aviso tal como se ve, sin el marcador). La
+  entrada `consentBy` sólo suscribe si el snapshot tiene `notice_text_hash`; sin hash envía `communications: []`.
+- **Mal formada.** Una entrada con `consentBy` **y** `checkboxKey` a la vez (o cualquier entrada inválida) hace fallar
+  la entrega con `invalid_communications_mapping` (`retryable: false`) antes del POST: nunca se adivina la intención.
+- **Alcance.** Sólo píldoras de suscripción con `inlinePill.note`. Una suscripción con casilla (formulario estándar)
+  sigue exigiendo la casilla marcada; una casilla de procesamiento nunca autoriza publicidad.
+
+Pruebas: `src/lib/growth/forms/destinations/hubspot/__tests__/adapter.test.ts` (con hash suscribe, sin hash no, entrada
+con ambas fuentes → `invalid_communications_mapping` sin `fetch`) y `src/lib/growth/forms/__tests__/inline-pill-notice-hash.test.ts`.
+
 ### Conteo público
 
 `GET /api/public/growth/forms/{slug|formKey}/registrations-count`
@@ -267,16 +290,33 @@ max-age=600`; el reader cachea 10 min por `formRef`. Sin sesión, CORS de los or
 ### Embed y piel del anfitrión
 
 ```html
-<greenhouse-form class="eo-inline-pill eo-inline-pill--glitch"
+<greenhouse-form data-dc-keep class="eo-inline-pill eo-inline-pill--glitch"
   form-key="<form_key>" surface="<fhsf-…>" locale="es-CL" color-scheme="dark" appearance="bare">
-  <a href="#suscripcion">Suscríbete a Glitch</a> <!-- sin JS: enlace a la suscripción de abajo -->
+  <!-- respaldo: visible sin JS y hasta que el renderer monta; el renderer lo reemplaza -->
+  <a href="<url de respaldo>" class="ghf-fallback">Suscríbete a Glitch</a>
+  <p class="gxs__note" aria-hidden="true">Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.</p>
 </greenhouse-form>
 <script src="https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js" defer></script>
 ```
 
-El anfitrión le da a `<greenhouse-form>` el ancho de su columna (con `container-type: inline-size`, un elemento
-dimensionado por su contenido colapsa): desde 480 px la píldora usa los anchos del canvas; con menos ocupa todo el ancho.
-Piel de referencia: `scripts/growth/forms/fixtures/inline-pill-host-skin.css`.
+Reglas del anfitrión (verificadas en la portada del blog, 2026-10-24):
+
+- **El renderer es dueño de todo lo que hay dentro de `<greenhouse-form>`.** El anfitrión no resetea ni estila
+  descendientes: un reset con especificidad de ID (`#host :is(...) {all:revert}`) anuló los estilos del renderer
+  (texto duplicado, píldora aplastada). Si el anfitrión necesita un reset, lo excluye con `:not(greenhouse-form *)`.
+- **Si el anfitrión re-renderiza su DOM** (morph, plantillas, autoplay), el elemento debe quedar opaco para ese
+  motor (en la portada, `data-dc-keep`): sin eso, el autoplay del slider borraba el formulario ya montado.
+- **Ancho.** El anfitrión le da a `<greenhouse-form>` `display: block` y el ancho de su columna (con `container-type:
+  inline-size`, un elemento dimensionado por su contenido colapsa; una columna flex que encoge, también). Desde 480 px
+  la píldora usa los anchos del canvas; con menos ocupa todo el ancho.
+- **Respaldo.** Un hijo enlace (`a.ghf-fallback`) con la forma de la píldora en reposo + el aviso reservando su lugar
+  evita el salto visual antes de que cargue el renderer y deja una salida sin JavaScript; al montar, el renderer
+  reemplaza los hijos.
+- **Alineación** sólo por tokens públicos (`--ghf-inline-align`, `--ghf-inline-note-align`), nunca con selectores
+  internos.
+
+Piel de referencia: `scripts/growth/forms/fixtures/inline-pill-host-skin.css`; piel real de la portada:
+`efeonce-public-site-runtime` → `wp-content/plugins/eo-blog-home/assets/css/eobh-host.css`.
 
 | Para | Tokens (default = canvas) |
 |---|---|
@@ -298,6 +338,35 @@ Teclado: Enter abre y el foco entra al campo a los 260 ms; Esc con el campo vac�
 el éxito el foco va al mensaje. Errores en línea bajo la píldora; «Reintentar» sólo ante red, `rate_limited` o `error`.
 Movimiento reducido: sin estiramiento, pulso ni dibujo. Gate visual: `node scripts/growth/forms/fixtures/inline-pill.scenario.mjs`
 (evidencia en `docs/ui/reviews/TASK-2054-growth-form-inline-pill-renderer/`).
+
+### Suscripción a Glitch (portada del blog)
+
+| Identidad | Valor |
+|---|---|
+| Slug / form key | `efeonce-blog-subscription` / `6bc62588-a4a0-4214-9501-13b0c2948c81` (misma clave que la versión anterior) |
+| Versión publicada | `fver-e6850cc8-4b39-40c7-9428-a148cfdd53bc` · política `efeonce-blog-glitch-subscription-pill-v1` |
+| Superficie | `fhsf-efeonce-blog-subscription` |
+| Destino | HubSpot form `8c7cf91b-a1c9-4cbe-9d8c-cac773692561`, `communications: [{ consentBy: 'submission', subscriptionTypeId: 535702717, … }]` |
+| Etiquetas | «Suscríbete a Glitch» / «Suscribirme» / «¡Listo!» / «Ya estás suscrito a Glitch» |
+| Aviso | «Al suscribirte aceptas la {privacyLink}. Te das de baja cuando quieras.» (`privacyUrl` `https://efeoncepro.com/politica-de-privacidad/`) |
+| Seguridad | Turnstile invisible al enviar (misma site key que AEO) |
+| Publicador | `pnpm growth:forms:publish-glitch-pill` (`scripts/growth/publish-glitch-inline-pill.ts`) |
+
+El publicador corre en dry-run por defecto (compila en memoria con el compiler de publicación, sin tocar la base);
+`--apply` crea el borrador, su destino HubSpot y lo deja en revisión; `--publish` además publica y se niega si
+`origin/main` todavía no sirve el hash del aviso y `consentBy` (publicar antes dejaría suscriptores sin suscripción).
+La portada se conecta con `pnpm public-website:blog-home subscription <form_key> --apply` (opciones WordPress
+`eo_blog_glitch_form_key` y `eo_blog_glitch_form_surface`); sin formulario conectado la portada no muestra la
+suscripción (`data-subscribe="off"`), nunca un éxito simulado.
+
+### Estado de verificación
+
+- Verificado en vivo: la píldora renderiza en los tres tableros de `/blog/` (escritorio, tablet, móvil) sin desborde.
+- **Pendiente:** un envío real. El envío desde el navegador automatizado de Claude no salió: Turnstile lo rechazó (sin
+  token, sin `POST /submit`; misma configuración que AEO, que funciona con personas). No se intentó eludir la
+  verificación. Falta que una persona se suscriba y confirmar en HubSpot el contacto suscrito al tipo `535702717`.
+- **Pendiente:** el formulario de reserva por evento espera un evento real (sin evento cargado, la portada oculta su
+  sección).
 
 ## Content Marketing: presentación, host y distribución del renderer
 

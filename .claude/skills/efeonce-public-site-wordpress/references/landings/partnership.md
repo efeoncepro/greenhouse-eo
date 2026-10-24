@@ -35,12 +35,19 @@
   `.auth/partners-cta-surface.json` 0600; `scripts/growth/publish-partners-become-partner-cta.ts` — re-running ROTATES
   the key). Skin: `scripts/public-website/partners-source/partner-dialog-skin.css` (tokens/hooks only; evidence
   `docs/ui/reviews/TASK-2045/`).
-- Activation after the release (in order): verify `renderer-latest.js` carries `ghf:dismiss` and the CTA bundle
-  `ghc-form-surface`; replace the `/agenda/` link in `partners-source/Main.dc.html` with the CTA launcher
-  (`<greenhouse-cta appearance="bare" cta-location="partners_close" surface=… embed-key=…>`, key from the `.auth` file,
-  never in git) + load both bundles and the skin; recompile → package → deploy → publish (preview first); smoke a real
-  submission in the dialog (Turnstile interactive, HubSpot attempt `succeeded`); then GTM DLV + GA4 dimension
-  `activation_mode` (preview + confirmation).
+- Popup live 2026-10-24 (after the release that shipped forms 1.2.0 / CTA 1.4.0): «Quiero ser partner» in «cierre» is
+  the shared source-led launcher (`<gh-meeting-cta location="partners_close">`, rewritten by
+  `compile-partners-elementor-source.cjs`; meeting option `cta: partners-become-partner`, fallback `/agenda/` labelled
+  «Quiero ser partner»). The publisher takes an optional third input, `.auth/partners-cta-surface.json`, and writes
+  `meeting_surface`/`meeting_embed_key` into the «cierre» widget settings only (snapshot
+  `_gh_partners_v2_before_20261024_122057`). The dialog lives in `<body>`, outside the scope: the compiler turns
+  `partner-dialog-skin.css` into the unscoped page layer `page.css` (`body:has(.gh-partners) …`). The launcher needs
+  an explicit width (209px = canvas button) because `fit-content` collapses to 0 under the renderer's inline-size
+  containment. Verified live 1440/390: dialog «Sumémonos», 5 fields + consent, Escape closes, dataLayer
+  `greenhouse_cta_viewed/clicked/form_opened` with `activation_mode: dialog`. Pending: a real submission smoke
+  (Turnstile + HubSpot attempt, needs operator OK because it creates a CRM record) and the GTM DLV + GA4 dimension
+  `activation_mode` (preview + confirmation). Observed: closing the dialog with the first field focused fires
+  `gh_form_field_validation_failed` (blur validation) — inflates that metric; renderer follow-up.
 - Fidelity: section and card heights equal to the canvas at 1440 and 390 (animations frozen, computed-style diff;
   `../source-led-elementor-patterns.md` §Ohio host fidelity). Ohio collisions fixed in `host.css`: body
   `line-height:1.6`, `16.4px` and tracking (root reset to the browser defaults), Ohio's post `.tag` pill, and a 16px top

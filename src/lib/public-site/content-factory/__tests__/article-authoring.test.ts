@@ -383,7 +383,7 @@ describe('authorGutenbergDraft', () => {
       mainEntity: Array<{ name: string; acceptedAnswer: { text: string } }>
     }
 
-    expect(postContent).toContain('<!-- wp:details {"summary":"¿Un Creative Workflow reemplaza a los creativos?"} -->')
+    expect(postContent).toContain('<!-- wp:details {"summary":"¿Un Creative Workflow reemplaza a los creativos?","className":"is-style-efeonce-faq"} -->')
     expect(postContent).toContain('<!-- wp:html -->')
     expect(faqPage['@type']).toBe('FAQPage')
     expect(faqPage['@id']).toBe('https://efeoncepro.com/creative/creative-workflows/#faq')
@@ -403,6 +403,67 @@ describe('authorGutenbergDraft', () => {
       expect.arrayContaining(['core/details', 'core/html'])
     )
     expect(validation.status).toBe('pass')
+  })
+
+  it('leaves the FAQ schema to the plugin when schema.source is plugin', () => {
+    const faq = (source?: 'inline' | 'plugin') =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        seo: { ...kungFuSpec.seo, canonicalUrl: 'https://efeoncepro.com/creative/creative-workflows/' },
+        sections: [
+          {
+            heading: 'Preguntas frecuentes',
+            level: 2,
+            blocks: [
+              {
+                kind: 'faq',
+                schema: source ? { source } : undefined,
+                items: [
+                  { question: '¿Uno?', answer: [{ kind: 'paragraph', text: 'Sí.' }] },
+                  { question: '¿Dos?', answer: [{ kind: 'paragraph', text: 'También.' }] }
+                ]
+              }
+            ]
+          },
+          ...kungFuSpec.sections
+        ]
+      })
+
+    const plugin = faq('plugin')
+    const content = plugin.draft.kind === 'gutenberg_post' ? plugin.draft.postContent : ''
+
+    expect(content).not.toContain('application/ld+json')
+    expect(content.match(/is-style-efeonce-faq/g)).toHaveLength(4)
+    expect(plugin.draft.kind === 'gutenberg_post' && plugin.draft.observedBlocks).not.toContain('core/html')
+    expect(validateGeneratedGutenbergDraft(plugin).status).toBe('pass')
+
+    const inline = faq()
+    const inlineContent = inline.draft.kind === 'gutenberg_post' ? inline.draft.postContent : ''
+
+    expect(inlineContent).toContain('"@type": "FAQPage"')
+  })
+
+  it('rejects a FAQ that repeats a question', () => {
+    expect(() =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [
+          {
+            heading: 'Preguntas frecuentes',
+            level: 2,
+            blocks: [
+              {
+                kind: 'faq',
+                items: [
+                  { question: '¿Uno?', answer: [{ kind: 'paragraph', text: 'Sí.' }] },
+                  { question: ' ¿uno? ', answer: [{ kind: 'paragraph', text: 'Otra vez.' }] }
+                ]
+              }
+            ]
+          }
+        ]
+      })
+    ).toThrow('content_factory_article_faq_question_duplicated:1')
   })
 
   it('rejects malformed tables before Gutenberg markup is assembled', () => {

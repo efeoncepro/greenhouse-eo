@@ -4,6 +4,10 @@
 > **Estado:** Accepted · 2026-10-24 · aprobado por el operador («Apruebo», sesión «Portada del blog v3»), escrito por
 > el agente que implementa `TASK-2050`. El backfill de formatos sobre entradas publicadas y la carga de recursos y
 > eventos reales siguen pidiendo su visto bueno con el dry-run a la vista.
+> **Vigencia:** en producción desde el 2026-10-24: `efeonce-editorial-blocks` 0.2.0 en vivo, 44 entradas con formato,
+> recursos 252050 (guía) y 252054 (diagnóstico), `eo_content_model_enabled = 1` y `/blog/` (18456) cortado a la portada
+> v3 a las 08:13 UTC (snapshot `_gh_blog_home_v3_before_20261024_081327`). Sin evento real cargado todavía. Contrato de
+> runtime: [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
 > **Ejecución:** [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-content-model.md) (este modelo) y
 > [TASK-2051](../../tasks/in-progress/TASK-2051-blog-portada-v3-high-fidelity.md) (la portada que lo consume).
 > **Diseño:** canvas «Portada Blog Efeonce», página «v3 · alto impacto», versión 67
@@ -190,7 +194,9 @@ encendida junto con la publicación de la portada de TASK-2051.
 
 ## Pendientes del operador
 
-1. Aprobar este PDR (pasa a `Accepted`).
-2. Revisar el dry-run del backfill de formato (las 44 entradas) antes del apply.
-3. Cargar el inventario real de herramientas y webinars (PDR-020, decisión pendiente 2) y los speakers reales.
+1. ~~Aprobar este PDR (pasa a `Accepted`).~~ Hecho el 2026-10-24.
+2. ~~Revisar el dry-run del backfill de formato (las 44 entradas) antes del apply.~~ Aplicado el 2026-10-24 en cinco
+   lotes (`scripts/public-website/blog-v3/ledger/`).
+3. Cargar el inventario real de herramientas y webinars (PDR-020, decisión pendiente 2) y los speakers reales. Hasta
+   hoy: la guía 252050 y el diagnóstico 252054; ningún evento.
 4. Confirmar «Grabación» como nombre visible y los colores provisorios.

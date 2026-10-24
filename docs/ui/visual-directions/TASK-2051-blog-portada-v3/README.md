@@ -52,7 +52,10 @@ el sitio sólo se reutiliza infraestructura (consultas, formularios, despliegue,
 13. Suscripción real a Glitch (operador, 2026-10-24): con un Growth Form publicado (`inline_pill`, opción
     `eo_blog_glitch_form_key`) la píldora del canvas es el renderer real dentro de `<greenhouse-form data-dc-keep>`
     (TASK-2054: los cinco estados ≤ 1 % del canvas) y **la suscripción del final también usa esa píldora** en lugar
-    del campo con casilla del canvas, porque el consentimiento es el aviso bajo la píldora (aprobado por el operador).
+    del campo con casilla del canvas, porque el consentimiento es el aviso bajo la píldora (consentimiento aprobado por
+    el operador; la píldora en el pie, pendiente de su visto bueno visual). Antes de que cargue el renderer, un enlace
+    con la forma de la píldora en reposo y el aviso reservando su lugar: el gate sin JavaScript da 0,016 / 0,027 /
+    0,061 % en la sección Glitch; las tres secciones del pie difieren por este desvío.
     Datos reales sin formulario publicado no muestran suscripción: nunca un «¡Listo!» simulado.
 
 ## Tablero de tablet (768–1099 px), 2026-10-24

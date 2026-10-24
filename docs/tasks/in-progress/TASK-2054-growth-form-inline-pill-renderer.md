@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2054-growth-form-inline-pill-renderer-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Code complete en local (Slices 1–3, 2026-10-24; renderer 1.2.0); rollout pendiente: release de Greenhouse a main y uso en la portada (TASK-2051)`
+- Status real: `En producción desde el release 40b330175855 (2026-10-24): renderer inline_pill sirviendo la suscripción a Glitch en /blog/ en los tres tableros (verificado en vivo, sin envío de prueba)`
 - Rank: `TBD`
 - Domain: `growth|forms|ui`
 - Blocked by: `none` (TASK-2053 Slice 1 code complete en develop 2026-10-24)
@@ -293,6 +293,8 @@ Valores en el wireframe y el motion doc; son los del canvas (`.gxs`, `.gxs--ev`)
 - [x] Los cinco estados coinciden con el canvas (≤ 1 %) a 1440 y 390. — 20/20, máximo 0,498 % (`docs/ui/reviews/TASK-2054-growth-form-inline-pill-renderer/`, gate `scripts/growth/forms/fixtures/inline-pill.scenario.mjs`).
 - [x] Formularios vivos con 0 px de diferencia. — renderer de `a0ccb79a4` vs actual: 18/18 en 0 px (5 fixtures + 4 contratos públicos vivos leídos por GET, a 1440 y 390).
 - [x] Teclado y movimiento reducido según el contrato. — Tab/Enter/foco al campo/Esc/foco de vuelta/foco al mensaje y `transition-duration: 0s` con `reduce` (reporte del gate) + `inline-pill.test.ts`.
+- [x] El renderer `1.2.0` llega a producción y sirve una píldora real en un anfitrión. — release `40b330175855` (2026-10-24); suscripción a Glitch en `/blog/` (sección Glitch y pie) verificada en vivo en los tres tableros: sin desborde de 320 a 1920 px y axe WCAG 2.2 AA con 0 violaciones; reglas de anfitrión (`data-dc-keep`, reset con `:not(greenhouse-form *)`, ancho explícito, tokens `--ghf-inline-align`/`--ghf-inline-note-align`, enlace `a.ghf-fallback`) documentadas en el contrato de runtime y en `incrustar-formulario-wordpress-astro.md`.
+- [ ] Envío real desde la píldora en producción (estados enviando → éxito → listo con el servidor real). — pendiente: Turnstile rechazó el navegador automatizado de Claude (sin token, sin `POST /submit`) y no se eludió; falta un envío hecho por una persona.
 
 ## Verification
 
@@ -302,13 +304,13 @@ Valores en el wireframe y el motion doc; son los del canvas (`.gxs`, `.gxs--ev`)
 
 ## Closing Protocol
 
-- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla) — `in-progress`: queda el release.
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla) — `in-progress`: el release salió (`40b330175855`); queda el envío real de verificación.
 - [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre — lo sincroniza la sesión principal (el índice aún apunta a `to-do/`).
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes — lo actualiza la sesión principal.
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible — no: el changelog está en su techo de 60 entradas (`docs:context-check:strict` falla con una más) y la rotación la hace la sesión principal; texto sugerido en el reporte de la sesión.
 - [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas — Delta en TASK-2051 y TASK-2038.
-- [x] la skill `greenhouse-growth-forms` documenta la presentación nueva — `.claude/` y `.codex/` (espejo idéntico).
+- [x] la skill `greenhouse-growth-forms` documenta la presentación nueva — `.claude/` y `.codex/` (espejo idéntico). El 2026-10-24 se sumó en `.claude/` la referencia `references/INLINE_PILL_HOST_AND_CONSENT.md` (anfitrión, consentimiento por el acto y publicador); el espejo `.codex/` queda a cargo de la sesión principal.
 
 ## Follow-ups
 

@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2045-growth-form-dialog-design-fidelity-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Code complete 2026-10-23 (Slices 1–5). Formularios vivos sin cambio (0 px) y contratos idénticos; popup medido a 0–2 px del canvas; axe limpio en 4 viewports. Consumidor publicado: formulario efeonce-partner-application (HubSpot directo, smoke 200/200) + CTA partners-become-partner. Rollout pendiente: Slice 6 (renderers a main — no autorizado), Turnstile interactivo real en el diálogo, embeber el CTA en /partnership/ y DLV/GA4 de activation_mode con ese release`
+- Status real: `Released 2026-10-24 (forms 1.2.0 / CTA 1.4.0 en producción). Popup «Quiero ser partner» en vivo en /partnership/: diálogo «Sumémonos» con 5 campos + consentimiento, Escape cierra, dataLayer greenhouse_cta_* con activation_mode dialog (1440/390). Pendiente: smoke de envío real (requiere OK del operador: crea un registro en HubSpot), GTM DLV + dimensión GA4 activation_mode (preview + confirmación) y GVC formal; observado: cerrar con el primer campo enfocado dispara gh_form_field_validation_failed.`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms|ui`
 - Blocked by: `none`

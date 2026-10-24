@@ -1,7 +1,7 @@
 # Navegación global del sitio público V1
 
-Estado: **En producción en todo `efeoncepro.com` desde el 2026-10-23 00:09 UTC** (`eo_site_nav_enabled=on`), salvo
-`/blog/` (#18456), que conserva la cabecera de Ohio porque esa página es de `TASK-1802`. AXIS
+Estado: **En producción en todo `efeoncepro.com` desde el 2026-10-23 00:09 UTC** (`eo_site_nav_enabled=on`), , y en
+`/blog/` (#18456) desde el 2026-10-24 (corte de la portada v3, `EO_SITE_NAV_EXCLUDED_PAGES` vacío). AXIS
 `@efeoncepro/axis-ui-primitives` 0.7.13 y `@efeoncepro/axis-ui-contracts` 0.7.12 publicados (primitives 0.7.13 en el tema desde 04:28 UTC); plugin «EO Navegación»
 activo con el documento en la revisión 4; agendador nativo en vivo. Pendientes en §Pendientes.
 
@@ -682,8 +682,8 @@ Adaptador del tema `ohio-child`, archivo `inc/site-nav.php` (`TASK-2042`).
   (plugin ausente, documento ausente o inválido, error de render) queda el encabezado de Ohio y se registra en el log
   como `[eo-site-nav] …`. Nunca sale una cabecera vacía.
 - **Interruptor:** opción `eo_site_nav_enabled` (`off` / `pilot` / `on`) más `eo_site_nav_pilot_pages` para el piloto.
-  En `off` o fuera de la lista, el sitio sigue con el encabezado de Ohio sin cambios. `/blog/` (#18456) está excluida
-  siempre. Hoy: `on`.
+  En `off` o fuera de la lista, el sitio sigue con el encabezado de Ohio sin cambios. Desde el 2026-10-24
+  no hay páginas excluidas (`EO_SITE_NAV_EXCLUDED_PAGES` vacío; `/blog/` dejó de estarlo con su portada v3). Hoy: `on`.
 - **Estado inicial:** hero oscuro sin espaciador → `top` en vidrio; espaciador de Ohio o hero claro
   (`EO_SITE_NAV_LIGHT_HERO_PAGES`) → `fixed` como isla clara sólida (§Cabecera).
 - **Assets sólo donde se pinta el menú:**
@@ -922,7 +922,7 @@ de adoptar el diálogo mirando el DOM; un módulo compartido entre el tema y el 
 | Plugin desplegado (`off`) | Documento inicial validado, revisiones, REST pública, WP-CLI. | Hecho 2026-10-22. | Desactivar el plugin. |
 | Fotos en el bucket | Lectura pública, caché inmutable, alt. | En uso en el menú vivo. | Nada que revertir: objetos nuevos e inmutables. |
 | Piloto (`pilot`, una página) | Desktop y 390 px, sin scroll horizontal, agendador abre y devuelve foco, eventos en `dataLayer`, Core Web Vitals sin regresión. | Omitido por decisión del operador. | Interruptor a `off`. |
-| Todo el sitio (`on`) | Variantes de Ohio resueltas, landings, Glitch, 404, archivo. | Hecho 2026-10-23 00:09 UTC; barrido de 55 URL. `/blog/` excluida. | Interruptor a `off` + purga de Kinsta (probado sólo en Playground). |
+| Todo el sitio (`on`) | Variantes de Ohio resueltas, landings, Glitch, 404, archivo. | Hecho 2026-10-23 00:09 UTC; barrido de 55 URL. `/blog/` se sumó el 2026-10-24 con su portada v3. | Interruptor a `off` + purga de Kinsta (probado sólo en Playground). |
 | Agendador nativo | Abre desde cabecera, mega y onepage; Escape; foco; eventos. | Hecho 2026-10-23. | Opción `eo_site_nav_scheduler` con `{"clear":true}`: el botón vuelve a ser enlace a `/agenda/`. |
 
 ## Pendientes
