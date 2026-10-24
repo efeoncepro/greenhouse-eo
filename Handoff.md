@@ -2,6 +2,16 @@
 
 [Historial](Handoff.archive.md).
 
+## 2026-10-24 — Archivo del blog v3 (TASK-2055): en curso, local-first
+
+Dirección D «Órbita + Índice» aprobada por el operador en el canvas «Portada Blog Efeonce» (v75; copia en
+`docs/ui/visual-directions/TASK-2055-blog-archive-v3/`). TASK-2055 en curso: plantilla en `eo-blog-home` con
+`template_include` detrás de `eo_blog_archive_enabled`, datos por `EO_Archive_Adapter` en `efeonce-editorial-blocks`
+(coordinar turno con la sesión de Analytics), búsqueda limitada a entradas, 404 para autores sin publicaciones, robots
+por vista. Decisiones del operador: descripciones de los seis temas con ≥ 4 publicaciones (redacta Claude, aprueba el
+operador), corregir el `sameAs` de su perfil (hoy `instagram`/`linkedin` = cesargrowth) con su visto bueno. Sin cambios en
+vivo todavía.
+
 ## 2026-10-24 — Partners: popup «Quiero ser partner» en vivo tras el release (TASK-2044/2045)
 
 El release a `main` llevó los renderers formularios `1.2.0` y CTA `1.4.0`. En `/partnership/` (248003, módulo
