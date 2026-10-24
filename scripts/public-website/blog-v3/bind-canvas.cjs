@@ -64,7 +64,7 @@ const SCRIM = '<sc-if value="{{ s.scrim }}" hint-placeholder-val="{{ false }}"><
 
 // Approved deviation (operator, 2026-10-24): the author circle shows the author's own WordPress profile photo when the
 // profile has one, and the canvas initials otherwise (always for the canvas fixture, which has no photo).
-const AUTHOR_AVATAR = '<span class="hs-av" aria-hidden="true"><sc-if value="{{ s.hasPhoto }}" hint-placeholder-val="{{ false }}"><img class="hs-av__img" src="{{ s.authorPhoto }}" alt="" width="32" height="32" loading="lazy" decoding="async"></sc-if><sc-if value="{{ s.noPhoto }}" hint-placeholder-val="{{ true }}">{{ s.authorInitials }}</sc-if></span>'
+const AUTHOR_AVATAR = '<span class="hs-av" aria-hidden="true"><sc-if value="{{ s.hasPhoto }}" hint-placeholder-val="{{ false }}"><img class="hs-av__img" src="{{ s.authorPhoto }}" alt="" width="32" height="32" decoding="async"></sc-if><sc-if value="{{ s.noPhoto }}" hint-placeholder-val="{{ true }}">{{ s.authorInitials }}</sc-if></span>'
 
 const REAL_CONTENT_CSS = `
 /* Contenido real (2026-10-24): velo de lectura para imágenes editoriales y bajada en dos líneas */
