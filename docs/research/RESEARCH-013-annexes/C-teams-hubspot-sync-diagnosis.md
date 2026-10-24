@@ -45,6 +45,8 @@
 | Permisos de la app HubSpot (`0493df14-0cd5-4c89-b413-e0b9b90bbb17`) en Entra | `VirtualEvent.Read.All`, `OnlineMeetingArtifact.Read.All`, `VirtualEventRegistration-Anon.ReadWrite.All` y 13 más, con consentimiento de administrador | `az` appRoleAssignments [V] |
 | Application access policy de Teams | `Tag:MY-APP-POLICY` y `Global` con el AppId de HubSpot; **jreyes sin política propia** (hereda Global) | `Get-CsApplicationAccessPolicy` / `Get-CsOnlineUser` [V] |
 | Sign-ins de la app HubSpot | Cada hora, sin error (última 16:02Z) | `auditLogs/signIns` [V] |
+| Workflows en el portal | Disponibles (hay workflows de contacto publicados); la app de Teams ofrece «Agregar contacto al webinario de Microsoft Teams» | UI [V] |
+| Esa acción, en un borrador creado y borrado para la prueba | «No se encontraron webinars. Inténtalo en 5 minutos»: HubSpot no lee **ningún** webinar de Teams | UI [V] |
 | El token de Greenhouse lee Eventos de marketing | No: 403 `MISSING_SCOPES` (`crm.objects.marketing_events.read`) | API [V] |
 
 ## Hipótesis abiertas
