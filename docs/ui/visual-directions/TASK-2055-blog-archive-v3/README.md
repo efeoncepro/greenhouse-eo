@@ -45,7 +45,7 @@ Copia congelada: `direcciones-2026-10-24.tar.gz` (los tres tableros `Archivo-{A,
 Recomendación aceptada por el operador: **cabecera oscura de B + una pieza destacada + filas de A + cierre «Otros
 temas» en navy** (la página empieza y termina oscura, el contenido claro al medio, como el ritmo de la portada). De C
 sólo queda el buscador para la vista de búsqueda. Página «Archivo del blog · D · Órbita + Índice» del canvas
-(versión 74), seis vistas a 1440 y 390; capturas de revisión en `capturas/`.
+(versión 75), seis vistas a 1440 y 390; capturas de revisión en `capturas/`.
 
 | Vista | Cabecera | Destacada | Lista |
 |---|---|---|---|
@@ -58,6 +58,7 @@ sólo queda el buscador para la vista de búsqueda. Página «Archivo del blog �
 
 Decisiones tomadas con el operador en esta ronda:
 
+- **Portada de sección** (3.er comentario del operador, «¿cómo la mejorarías?», v75): la publicación destacada sube a la cabecera como tarjeta blanca montada sobre el borde navy/blanco (imagen 16:9 o 4:3 según la portada), las cifras quedan en una fila bajo la descripción, el filtro de formato va alineado a la izquierda bajo el texto y desaparece la banda «Lo más reciente». Descripción de HubSpot propuesta (pendiente de aprobación como texto de WordPress): «Cómo usamos HubSpot para ordenar ventas, marketing y servicio: casos reales, guías paso a paso y lo que aprendimos implementándolo.»
 - **Cabecera tipográfica con ficha corta** (2.º comentario del operador sobre B, «no me gusta cómo se ve»): sin número gigante ni chips en la cabecera; ficha de dos cifras con filetes (valores del bloque de eventos de la portada) y filtro por formato en una barra propia con `.segc` (en móvil, chips deslizables). No se usa un anillo decorativo: la línea gráfica prohíbe la órbita como adorno.
 - **Sin porcentaje del tema** (comentario del operador sobre B): en una página de tema no le dice nada al lector. Se
   reemplaza por la cantidad, la fecha de lo último y el desglose por formato, que además filtra.
