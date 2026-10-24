@@ -1,7 +1,7 @@
 # Operar el Archivo del blog (búsqueda, temas, etiquetas y autores)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-24 por Claude (TASK-2055)
 > **Documentacion tecnica:** [BLOG_ARCHIVE_RUNTIME_V1](../../architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md) ·
 > **Funcional:** [Archivo del blog](../../documentation/public-site/archivo-del-blog.md)
@@ -64,6 +64,13 @@ node scripts/public-website/blog-archive/fidelity/a11y.cjs --urls tmp/task-2055/
 
 El archivo de URL es un JSON `{ "tema": "https://efeoncepro.com/category/hubspot/", … }` con las seis vistas.
 
+### La página de Glitch (TASK-2056)
+
+`/category/glitch/` y `/glitch/` tienen su propia piel. No se configura nada: el número de la edición sale del título
+publicado («Glitch #18: …»), así que una edición nueva debe publicarse con ese formato. La suscripción usa el mismo
+formulario de `/blog/` (`pnpm public-website:blog-home subscription <clave>`); si se desconecta, el recuadro desaparece.
+El logo dentro del botón aparece cuando el renderer de Growth Forms 1.3.0 está en producción en Greenhouse.
+
 ## Qué significan los estados
 
 | Valor de `eo_blog_archive_enabled` | Qué ve el visitante |
@@ -85,6 +92,7 @@ El archivo de URL es un JSON `{ "tema": "https://efeoncepro.com/category/hubspot
 |---|---|---|
 | Justo después de encender, algunas páginas siguen con Ohio | La purga de Kinsta todavía se propaga | Esperar 1–2 minutos y volver a pedir la página |
 | Una vista vuelve a Ohio con el flag en `1` | El adaptador falló (queda `eo-content-model: archive adapter failed` en el log) | Revisar el log de PHP; el resto del sitio no se afecta |
+| Una edición sale sin su placa #N en Glitch | El título no empieza con «Glitch #N:» | Corregir el título en WordPress |
 | Franja blanca sobre la cabecera | El `header-cap` de Ohio volvió a mostrarse (cambio del tema) | Revisar `assets/css/eoba-host.css` |
 | Un tema no aparece en Google | Le falta descripción o tiene menos de 4 publicaciones | Escribir la descripción con el comando de arriba |
 

@@ -51,6 +51,26 @@ Comunes: migas en español, filtro por formato (`?formato=articulo|guia|caso|nov
 `update_meta_cache`. Destacada ancha (16:9) si la imagen mide ≥ 1,4 de proporción; si no, 4:3. El H1 se achica con
 `--ah-fit` cuando la palabra más larga no cabe (`EO_Archive_Adapter::fit`, 11 letras a 184 px, 16 a 132 px).
 
+### 2.1 Variante Glitch del tema (TASK-2056, en vivo desde el 2026-10-24 ~19:50 UTC)
+
+`/category/glitch/` (y `/glitch/`, la misma consulta con canonical a `/category/glitch/`) usa la misma vista `tema` con
+la piel de Glitch (canvas «Tema · Glitch (variante)», versión 79). El adaptador la activa por término
+(`EO_Archive_Adapter::GLITCH_TERM`) con un bloque `gl` del documento; la plantilla es la misma (bloques `sc-if`).
+
+| Pieza | Dato |
+|---|---|
+| Título | wordmark negativo de Glitch dentro del H1 (`alt="Glitch"`) |
+| Muletilla | si la descripción termina en «, sin anestesia.», esa frase va en Guttery (`assets/fonts/`, sólo aquí) |
+| Cabecera | «EDICIÓN #N» = el mayor número «Glitch #N» publicado (formato `glitch-edicion`) y su fecha; «FLASH» = el último `glitch-flash` |
+| Borde | falla en bytes estática (SVG en la plantilla) al pie del bloque navy |
+| Filas | placa `#N` tal como se publicó (`#02`) y título sin el prefijo; Flash con la estela; notas sin placa |
+| Filtro | Ediciones / Flash / Notas (`?formato=edicion|flash|nota`, en `EOBH_Archive::FORMAT_FILTER`) |
+| Suscripción | banner con la píldora real (`<greenhouse-form inline_pill>`, el mismo formulario de `/blog/`), blanca, con `inline-label-logo`; sin `eo_blog_glitch_form_key` no se pinta. `EOBH_Archive::enqueue()` carga `renderer-latest.js` sólo entonces |
+
+El logo dentro de la píldora llega con el renderer **1.3.0** (Greenhouse, `src/growth-forms-renderer`): hasta su release
+a producción, la píldora muestra «Suscríbete a Glitch» en texto. El CSS de la variante es un superconjunto del de D
+(`bind-archive.cjs` exige el prefijo exacto); el reset del host excluye `greenhouse-form *` (como la portada).
+
 ## 3. Reglas de WordPress (EOBH_Archive)
 
 - **Flag `eo_blog_archive_enabled`:** `0` (por defecto: Ohio), `preview` (sólo `?eoba_preview=<eo_blog_archive_preview_token>`,
@@ -77,7 +97,9 @@ Comunes: migas en español, filtro por formato (`?formato=articulo|guia|caso|nov
 `main#main` abierto por la plantilla de página. 6. Sin las reglas `.mob` (iguales a la media query). 7. `fetchpriority`
 en la destacada, `lazy` en la tarjeta de Glitch. 8. Tipografía fluida: el H1 sigue la ventana hasta el tamaño del canvas
 (`min(184px,12.8vw)`, `min(76px,19.5vw)` en teléfono) y un bloque 768–1099 a una columna. 9. Iniciales cuando el autor no
-tiene foto. Cualquier otra diferencia es un defecto del gate.
+tiene foto. 10. (TASK-2056) La píldora del banner Glitch es el componente real; con el formulario conectado el banner se
+parte en mitades desde 1100 px para que la píldora en reposo abrace su rótulo. 11. Guttery servida desde el plugin.
+12. El número de edición sale del título publicado. Cualquier otra diferencia es un defecto del gate.
 
 ## 5. Gates
 
@@ -88,7 +110,8 @@ tiene foto. Cualquier otra diferencia es un defecto del gate.
 | Píxeles | `fidelity/capture.cjs` + `blog-v3/fidelity/compare.cjs` | 44/44 secciones ≤ 1 % en el shell real (máx. 0,518 %, sólo el header) |
 | Desborde y H1 | `fidelity/overflow.cjs` | 0 px, un H1, ninguna palabra cortada, 6 vistas × 8 anchos (local, preview y vivo) |
 | Accesibilidad | `fidelity/a11y.cjs` | axe WCAG 2.2 AA 0 en 6 vistas × 3 anchos (local, preview y vivo) |
-| Runtime | `php tests/eo-blog-archive.test.php` | 59 checks; `eo-content-model` 184 y `eo-blog-home` 27 siguen verdes |
+| Runtime | `php tests/eo-blog-archive.test.php` | 86 checks (con la variante Glitch); `eo-content-model` 184 y `eo-blog-home` 27 siguen verdes |
+| Variante Glitch (2026-10-24) | los mismos | equivalencia 7/7, PHP 42/42, píxeles 54/54 a 0 %; en vivo desborde 0 y axe 0 en 7 vistas; contra el canvas 7/10 secciones ≤ 1 % (banner: píldora real; otros temas: datos reales) |
 
 Preview local: `node scripts/public-website/blog-archive/preview/serve.cjs` (o `blog-archive-preview` en
 `.claude/launch.json`) → `http://127.0.0.1:8845/<vista>/`. **Limitación medida:** usa el shell de `/blog/`, que no tiene el
@@ -122,7 +145,7 @@ CLI `pnpm public-website:blog-home` (mismo carril que la portada):
 |---|---|
 | Plantilla nueva | `archive 0 --apply` (vuelve Ohio para todos, con purga) |
 | Descripciones | `topic-descriptions` con el `before` del ledger (estaban vacías) |
-| Código de `eo-blog-home` | restaurar `/tmp/eo-blog-home-before-20261024-182009.tar` en Kinsta |
+| Código de `eo-blog-home` | restaurar `/tmp/eo-blog-home-before-20261024-195129.tar` en Kinsta (estado previo a TASK-2056; el anterior a TASK-2055 es `/tmp/eo-blog-home-before-20261024-182009.tar`) |
 | Adaptador | restaurar el `.tar` del deploy de `content-model` |
 
 ## 8. Pendientes

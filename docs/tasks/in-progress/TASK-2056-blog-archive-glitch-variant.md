@@ -19,7 +19,7 @@
 - Wireframe: `docs/ui/wireframes/TASK-2056-blog-archive-glitch-variant.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseño aprobado por el operador el 2026-10-24 («implementemos Glitch así», canvas versión 79). Implementación local-first en curso; nada en vivo.`
+- Status real: `En producción desde el 2026-10-24 ~19:50 UTC (runtime 9a19d46; Greenhouse db64920a2): /category/glitch/ y /glitch/ con la variante, píldora real con texto. Verificado en vivo: 200, un H1, canonical, index, desborde 0 y axe 0 en 7 vistas, /blog/ verify verde. Falta: release de Greenhouse a producción para el logo en la píldora (renderer 1.3.0, en develop sin push).`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `none`
@@ -347,12 +347,12 @@ estela + FLASH; nota → sin placa. Filtro con las cuentas de esos tres subforma
 - [x] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
 - [ ] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2056`.
 - [x] Se declaro `Wireframe: docs/ui/wireframes/TASK-2056-blog-archive-glitch-variant.md` y el archivo existe.
-- [ ] La vista `tema-glitch` pasa el gate (≤ 1 % por sección) a 1440 y 390 contra los tableros de la versión 79.
-- [ ] Equivalencia y paridad PHP verdes en las siete vistas; las seis anteriores sin cambio de píxeles.
-- [ ] Sin scroll horizontal de 320 a 1920 en `/category/glitch/` y `/glitch/`; un H1; axe 0.
-- [ ] La píldora real suscribe con el formulario de Glitch; sin formulario conectado no hay banner.
-- [ ] El renderer muestra el logo en el rótulo con el atributo y no cambia nada sin él (prueba unitaria).
-- [ ] Documentación actualizada (runtime, funcional, manual, skill).
+- [x] La vista `tema-glitch` pasa el gate (≤ 1 % por sección) a 1440 y 390 contra los tableros de la versión 79. Plantilla + fixture: 10/10 a 0 % (2026-10-24). En vivo 7/10: el banner difiere por la píldora real (desvío 10) y «Otros temas» por los datos reales.
+- [x] Equivalencia y paridad PHP verdes en las siete vistas; las seis anteriores sin cambio de píxeles.
+- [x] Sin scroll horizontal de 320 a 1920 en `/category/glitch/` y `/glitch/`; un H1; axe 0.
+- [ ] La píldora real suscribe con el formulario de Glitch; sin formulario conectado no hay banner. Montada en vivo con el formulario de `/blog/` (verificado que el renderer la monta); el «sin banner» está probado en PHP. Sin envío real de prueba.
+- [x] El renderer muestra el logo en el rótulo con el atributo y no cambia nada sin él (prueba unitaria).
+- [x] Documentación actualizada (runtime, funcional, manual, skill).
 
 ## Verification
 

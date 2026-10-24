@@ -2,6 +2,15 @@
 
 [Historial](Handoff.archive.md).
 
+## 2026-10-24 — Archivo del blog: variante Glitch (TASK-2056) en producción
+`/category/glitch/` y `/glitch/` sirven la variante Glitch aprobada en el canvas (versión 79) desde ~19:50 UTC: wordmark,
+«EDICIÓN #17» y «FLASH», muletilla en Guttery, falla en bytes, placas por fila, filtro Ediciones/Flash/Notas y banner de
+suscripción con la píldora real blanca (runtime `9a19d46`, Greenhouse `db64920a2`). Verificado en vivo (200, un H1,
+canonical, index, desborde 0, axe 0 en 7 vistas, `/blog/` verify verde). **Pendiente:** el logo dentro de la píldora
+necesita el renderer de Growth Forms 1.3.0 en producción (commit en develop, sin push ni release). **Pedido del
+operador para después:** no le gusta la grilla «Para leer con calma» de la portada (tarjetas tipográficas sin foto
+alternadas con tarjetas con foto); es un cambio de diseño de TASK-2051 que se dibuja primero en el canvas.
+
 ## 2026-10-24 — Archivo del blog v3 (TASK-2055): en producción, task cerrada
 
 **Búsqueda, temas, etiquetas y autores de efeoncepro.com sirven el «Archivo del blog» desde el 2026-10-24 ~18:20 UTC**
@@ -285,12 +294,3 @@ Llamada real41s: ticket/transcripción y primera respuesta verificados; grabaci�
 Correo a Oscar/María Paz enviado con firma gráfica/CCO, EMAIL118930883467 SENT en Efeonce.
 Caso y skills espejo actualizados; [manual reutilizable](docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md)
 y [evidencia/pendientes](docs/audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md). Kortex hibernado.
-
-## 2026-10-20 — Blog etapa 1: candidato local en develop
-
-Implementación y preview autorizadas, publicación no autorizada. Runtime aislado en
-`../efeonce-public-site-runtime-develop` (`develop`); Greenhouse en `develop`. Consultas dinámicas,
-Glitch, temas, objetivos, recursos y formulario aprobado. Opción 2 de Product Design elegida e implementada: portada navy y arte protagonista; [QA](scripts/public-website/blog-phase1/design-qa.md). [Contrato, evidencia y pendientes](scripts/public-website/blog-phase1/README.md).
-No push, CMS write, merge, release, GTM ni envío real. Etapa 2 y validación productiva pendientes.
-Anotaciones del operador atendidas: cabecera limpia, temas centrados, categorías editoriales explícitas, recursos visuales y cierre Glitch protagonista. Runtime `a10c85e`;27 checks y capturas completas1440/390 en `.captures/2026-10-20-blog-annotations/`. Aceptación visual final pendiente; contrato Forms intacto.
-Segunda ronda (`3d9ee81` runtime): sin «Por Efeonce», temas con arte editorial propio y formulario integrado en el navy de Glitch. Evidencia `.captures/2026-10-20-blog-annotations-v2/`;27 checks, contraste/validación negativa local. Todo en develop, sin push/publicación; aceptación visual pendiente.

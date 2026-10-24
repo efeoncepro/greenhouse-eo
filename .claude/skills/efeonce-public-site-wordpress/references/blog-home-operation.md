@@ -10,6 +10,12 @@ canonical site nav (`EO_SITE_NAV_EXCLUDED_PAGES` empty), `eo_content_model_enabl
 `archive <0|preview|1>` and `topic-descriptions <file.json>`. Contract `docs/architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md`.
 A `deploy home` now also ships `templates/archive.php`, `assets/css/eoba-host.css` and `assets/generated/archive*` (allowlist
 extended); pipeline and gates in `scripts/public-website/blog-archive/`.
+**Glitch variant (TASK-2056, live 2026-10-24):** `/category/glitch/` (= `/glitch/`) gets the Glitch skin from the same
+template (`gl` block of `EO_Archive_Adapter`: wordmark H1, «EDICIÓN #N» from the highest published «Glitch #N» title,
+latest Flash, Guttery narrator line, byte edge, row plates, `?formato=edicion|flash|nota`, subscription band with the
+real white `inline_pill` + `inline-label-logo`, only when `eo_blog_glitch_form_key` is set). Deploy order: `deploy
+content-model` BEFORE `deploy home` (the new template needs `rootCls`); full purge with `archive 1 --apply`. The pill
+logo needs Growth Forms renderer 1.3.0 released in Greenhouse; until then the label is text.
 
 ## Use the CLI, never ad hoc scripts
 

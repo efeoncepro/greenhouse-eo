@@ -45,3 +45,8 @@
 {"at":"2026-10-24T18:15:29.038Z","author":"Julio Reyes","op":"archive","input":{"op":"archive","value":"1"},"result":{"before":{"value":"preview","token":true},"after":{"value":"1"}}}
 {"at":"2026-10-24T18:20:30.278Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T18-18-59-131Z"}}
 {"at":"2026-10-24T18:20:42.314Z","author":"Julio Reyes","op":"archive","input":{"op":"archive","value":"1"},"result":{"before":{"value":"1","token":true},"after":{"value":"1"}}}
+{"at":"2026-10-24T19:50:50.061Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T19:51:06.742Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T19:51:08.831Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T19-50-26-619Z","flag":"1"}}
+{"at":"2026-10-24T19:51:46.821Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T19-51-16-687Z"}}
+{"at":"2026-10-24T19:52:12.728Z","author":"Julio Reyes","op":"archive","input":{"op":"archive","value":"1"},"result":{"before":{"value":"1","token":true},"after":{"value":"1"}}}
