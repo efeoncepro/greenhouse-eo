@@ -132,6 +132,20 @@ El contrato completo está en PDR-029 §1–§7; lo que importa para el runtime:
   recientes) y después las invitaciones. Una Novedad sólo entra fijada; el «sticky» de WordPress no se lee.
 - **Velo y bajada (desvío 11).** Una entrada sin `_eo_hero_image` usa su imagen destacada con velo de lectura del lado
   del texto y la bajada se corta en dos líneas; con imagen propia del slider no hay velo (`scrim: false`).
+- **Campos de imagen (medidos en vivo el 2026-10-24).** Una entrada nueva entra sola al slider
+  (`EO_Home_Readers::build_featured`: las más nuevas con imagen, ni Glitch ni Novedad) y, con 12 minutos o más (o
+  pódcast, sin Glitch ni Novedades), al riel (`EO_Home_Readers::rail`, las cuatro más nuevas). La destacada de un post
+  de Marketing con Manzanitas trae texto, así que los dos lugares tienen su campo propio:
+
+  | Meta | Superficie | Contrato | Sin el campo |
+  |---|---|---|---|
+  | `_eo_hero_image` (adjunto) | diapositiva del slider y miniatura «Siguiente» (96 × 64) | WebP 2:1, 2400 × 1200, sin texto. Escritorio 1440/1920 × 900 con `object-fit: cover`, `object-position: 100% 50%` y ~10 % de margen por el parallax; en 390, franja de 390 × 300 que muestra x 42–100 % con el título debajo. Visible en todos los anchos x 42–96 % · y 7–93 %; tapan el título (x 29–65 % · y 31–61 % en 1440; x 19–54 % en 1920), «Siguiente» (x 75–92 % · y 68–77 %) y la tira (desde y 86 %) | la destacada con velo (`scrim: true`); la miniatura «Siguiente» usa la destacada |
+  | `_eo_card_image` (adjunto) | tarjeta de foto del riel: 440 × 600 escritorio, 361 × 492 tablet, 304 × 540 teléfono, `cover` | el plate PNG 2560 × 1440 tal cual, sin texto; etiqueta y flecha en y 5–8 %, degradado desde y 36 % (sólido bajo 70 %), título desde y 64 % | la destacada (que sigue siendo la OG) |
+  | `_eo_card_focus` (`"x% y%"`) | `pos` de la tarjeta → `object-position` | con la cara del plate al 71 %, `84% 30%`: se ve x 49–91 % del plate (x 57–89 % en el teléfono) | `center` |
+
+  La destacada (y la OG de Yoast) se escribe aparte con `scripts/public-website/blog-post-cover-apply.php`; ningún
+  comando de la portada la cambia (`card` falla si cambiara). Inventario completo y diagramas de zonas seguras:
+  [BLOG_ARTICLE_IMAGE_INVENTORY_V1](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 - **Foto del autor (desvío 12).** `EO_Home_Readers::author_photo()` usa `get_avatar_url($user, size 96)`, que sirve la
   foto subida con el plugin One User Avatar, y descarta cualquier URL de `gravatar.com`: sin foto propia la plantilla
   muestra las iniciales del canvas. Las diapositivas de Glitch no llevan foto.
@@ -242,7 +256,7 @@ puerta de escritura para agentes y operadores; pasa por las metas, taxonomías y
   evento `load`, que terceros del sitio pueden retener minutos) y mide desborde y axe.
 - Escrituras: plan sin `--apply`; cada apply imprime `before`, lee de vuelta, resetea readers, purga `/blog/` y agrega
   una línea al ledger `scripts/public-website/blog-home/ledger/<AAAA-MM>.jsonl`. Comandos: `pin --until`, `unpin`,
-  `format`, `hero`, `resource <json>`, `review`, `event <json>` (rechaza enlaces de Zoom, Teams o Meet),
+  `format`, `line`, `client`, `reviewed`, `hero`, `card` (imagen y punto focal de la tarjeta), `resource <json>`, `review`, `event <json>` (rechaza enlaces de Zoom, Teams o Meet),
   `retire resource|event`, `subscription <clave|off> [--surface]`, `flag 0|1`, `purge`.
 - Despliegue: `deploy home|content-model [--apply]` exporta la línea base viva y arma un paquete guardado (se niega si
   alguien cambió esos archivos en Kinsta); `content-model` apaga el flag, despliega, lo restaura y corre

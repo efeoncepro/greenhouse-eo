@@ -771,13 +771,28 @@ shasum -a 256 ai-generations/YYYY-MM-DD_<run>/masters/* ai-generations/YYYY-MM-D
 - cuerpo raster: WebP optimizado con dimensiones conocidas;
 - cuerpo vectorial: SVG directo cuando el contrato determinístico demuestra seguridad, autonomía, legibilidad y
   ventaja de entrega; source editable y delivery saneado permanecen separados;
-- featured/OG: derivado `1200×630` o cercano a `1.91:1`;
-- preferir JPEG/PNG social si el ecosistema de previews no trata el WebP de forma consistente;
-- proteger el centro óptico y probar miniatura/card;
-- no duplicar el featured dentro del body si Ohio ya lo renderiza.
+- featured/OG: un raster 1,91:1 (lienzo 1200 × 630). En los artículos de Marketing con Manzanitas es **un JPEG de
+  2400 × 1260 de menos de 300 KB** (no WebP: los lectores de enlaces no lo tratan de forma pareja), con el texto y la
+  cara dentro del cuadrado central x 285–915 y nada importante en los 15 px de arriba y de abajo;
+- probar la portada en su recorte cuadrado (WhatsApp y «Te puede interesar» al pie de cada artículo) además de la
+  vista completa;
+- Ohio no muestra la destacada en la cabecera del artículo: no duplicarla en el cuerpo para «que se vea».
 
-Cuántas imágenes lleva cada artículo, para qué posición y con qué medidas (plate, portada, `hero` del slider, card del
-rail, cuerpo y distribución): [inventario de imágenes por artículo](BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+**Set por artículo nuevo de Marketing con Manzanitas (inventario v1.4, medido en vivo el 2026-10-24).** Un artículo
+nuevo entra solo al slider de `/blog/` y al riel «Para leer con calma» (si dura 12 minutos o más), así que lleva
+**3 archivos y 3 subidas**, cada una con su `alt`:
+
+| Archivo | Medidas | Se sube como | Comando |
+|---|---|---|---|
+| Plate (foto sin texto) | PNG 16:9, 2560 × 1440 | imagen de la tarjeta del riel, con punto focal | `pnpm public-website:blog-home card <post> --image <plate> --alt "…" --focus "84% 30%"` |
+| Portada | JPEG 2400 × 1260, menos de 300 KB | destacada + Open Graph de Yoast | `scripts/public-website/blog-post-cover-apply.php` (simulación → `apply`) |
+| Imagen del slider | WebP 2:1, 2400 × 1200, recortada del plate, sin texto | `hero` del slider | `pnpm public-website:blog-home hero <post> --light "…" --bold "…" --image <webp> --alt "…"` |
+
+Los dos comandos `blog-home` sin `--apply` sólo muestran el plan; `--apply` va con el visto bueno del operador. Un
+artículo de menos de 12 minutos no entra al riel y se ahorra la tarjeta. Las imágenes del cuerpo son de 0 a 2, sólo si
+explican algo. Márgenes de cada superficie, Open Graph por plataforma y quién hace cada pieza:
+[inventario de imágenes por artículo](BLOG_ARTICLE_IMAGE_INVENTORY_V1.md); la portada paso a paso:
+[producir la portada de un artículo](../../manual-de-uso/creative/producir-portada-de-articulo-del-blog.md).
 
 Para portada/featured/hero/OG aplicar además el
 [Editorial Cover Key Visual Operating Model](EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md): tesis visual,
@@ -1099,9 +1114,13 @@ Una captura `fullPage` puede ocultar overflow horizontal. Medir `scrollWidth`; n
 
 - `og:type=article`;
 - `og:title`, `og:description`, `og:url`, locale y site name;
-- `og:image` pública `200`, MIME y dimensiones esperados;
-- Twitter `summary_large_image`;
-- image URL no depende de auth y no es un fallback global accidental.
+- `og:image` pública `200`, MIME y dimensiones esperados (en Manzanitas: la portada, 2400 × 1260, `image/jpeg`);
+- Twitter `summary_large_image`; sin `twitter:image` propio, X usa la `og:image`;
+- `og:title` es el título del post, no el título SEO de Yoast;
+- `og:image:alt` y `twitter:image:alt` salen del `alt` de la portada con `efeonce-editorial-blocks` 0.4.6, construido
+  y simulado en vivo pero todavía sin desplegar (espera el visto bueno del operador): hasta entonces no aparecen;
+- image URL no depende de auth y no es un fallback global accidental;
+- refrescar la caché con el depurador de Facebook, el Post Inspector de LinkedIn y un chat de prueba en WhatsApp.
 
 #### 14.5 Schema y author entity
 

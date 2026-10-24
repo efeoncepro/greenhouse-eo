@@ -61,7 +61,7 @@ en 1440 y 390, `blog-home verify --browser`, y los depuradores de cada red para 
 | 1 | **Plate** (foto 16:9 sin texto) | siempre | 1 | agente de foto (`design-studio` + `pnpm foto:*`) |
 | 2 | **Portada** (destacada + OG + X) | siempre | 1 archivo | agente de composición (`efeonce-graphic-line`) desde el plate |
 | 3 | **Imagen del slider** (`hero`) | si el post entra al slider de `/blog/`: **todo artículo nuevo entra solo** (salvo Glitch y Novedad) | 1 en un artículo nuevo | se recorta del plate (sin foto nueva) |
-| 4 | **Imagen de la card del rail** | si el post entra al rail: **todo artículo nuevo de 12 minutos o más entra solo**, y su portada trae texto. En producción desde el 2026-10-24 (TASK-2051, 0.4.5) | 0 o 1 | se usa el plate tal cual, con punto focal |
+| 4 | **Imagen de la card del rail** | si el post entra al rail: **todo artículo nuevo de 12 minutos o más entra solo**. Obligatoria, porque la portada de Manzanitas trae texto. En producción desde el 2026-10-24 (TASK-2051, 0.4.5) | 1 en un artículo nuevo | se usa el plate tal cual, con punto focal |
 | 5 | **Imágenes del cuerpo** (diagramas, infografías, capturas) | sólo si explican algo que el texto no puede | 0 a N (lo normal: 0 a 2) | agente de contenido (`content-marketing-studio` + infografías) |
 | 6 | Foto del autor | ya existe; no se hace por artículo | 0 | — |
 | 7 | **Piezas de distribución** (LinkedIn, YouTube, story) | según el plan de canales de esa semana, no por defecto | 0 a 4 | agente social (`social-media-studio`), con su propia norma |
@@ -253,10 +253,11 @@ Con la cara del plate en torno al 71 %, el recorte del plate cumple sin recompon
 
 ## 4. Imagen de la card del rail
 
-Las cards v2 de «Para leer con calma» usan hoy la **destacada** como foto a sangre vertical y le pintan encima la
-etiqueta de formato, el título, la bajada y el autor. Con la portada de Manzanitas, el recorte corta la cabecera, deja
-fuera la cara y superpone dos textos. Hoy no afecta a ningún post (los tres del caso fuente no están entre las cuatro
-lecturas más nuevas).
+Sin imagen propia, las cards v2 de «Para leer con calma» usan la **destacada** como foto a sangre vertical, centrada
+(x 369–831 sobre 1200 × 630; x 423–777 en el teléfono), y le pintan encima la etiqueta de formato, el título, la bajada
+y el autor. Con la portada de Manzanitas, ese recorte corta la cabecera, deja fuera la cara y superpone dos textos:
+por eso la card lleva el plate con punto focal. Los tres posts del caso fuente no están hoy entre las cuatro lecturas
+más nuevas.
 
 **Encargado y resuelto el 2026-10-24** por la sesión dueña del rail (TASK-2051; runtime `6578773`, Greenhouse
 `e60f5045c`): imagen propia de la card (`_eo_card_image`) y punto focal (`_eo_card_focus`, «x% y%» → `object-position`).
@@ -270,9 +271,9 @@ pnpm public-website:blog-home card <post> --image <plate.png> --alt "<alt>" --fo
 
 | Característica | Valor |
 |---|---|
-| Lo que se ve | x 369–831 en escritorio y tablet; x 423–777 en el teléfono (sobre 1200 × 630) |
+| Lo que se ve | con el punto focal 84 %: **x 49–91 % del plate** en escritorio (440 × 600) y tablet (361 × 492); **x 57–89 %** en el teléfono (304 × 540); todo el alto |
 | Texto | ninguno: la tarjeta pone el suyo |
-| Encuadre | la cara dentro de x 423–777 y en la mitad de arriba (y < 340); nada importante en los ~80 px de las esquinas de arriba (etiqueta y botón); la mitad de abajo pareja y oscura (el degradado y el título la tapan) |
+| Encuadre | **cara en x 60–86 % · y 10–40 % del plate**; nada importante en las esquinas de arriba (etiqueta y flecha, y 5–8 %); la mitad de abajo pareja y oscura (el degradado empieza en y 36 % y el título va desde y 64 %) |
 | Archivo | **el plate tal cual** (2560 × 1440), sin texto y sin recorte propio. La destacada no cambia y sigue siendo la OG |
 | Punto focal | con la cara al 71 % del plate, **84 % 30 %**: se ve del 49 % al 91 % del plate en escritorio y tablet, y del 57 % al 89 % en el teléfono. Si la cara cae en otro lugar, recalcula |
 | Subida | `blog-home card` (plan, estado anterior, ledger y lectura de vuelta) o el panel «Imagen de la tarjeta del riel» del editor |
@@ -299,7 +300,7 @@ norma y sus medidas. Este inventario no las reemplaza.
 | Pieza | Cuándo | Medidas y norma |
 |---|---|---|
 | Post de LinkedIn con el enlace | si el artículo se empuja en LinkedIn (página de Efeonce o Julio) | 1200 × 627, nativa, nunca recortada de un 16:9 (`efeonce-graphic-line` → `applications.md` §A5). Todavía **sin camino fotográfico canónico** |
-| Edición del newsletter Marketing con Manzanitas (LinkedIn de Julio) | quincenal, no por artículo; enlaza al artículo | **sin pieza en el registro**: no se improvisa, se le pide al operador ([estrategia §8.2](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md)) |
+| Portada de la edición del newsletter Marketing con Manzanitas (LinkedIn de Julio) | quincenal, no por artículo; enlaza al artículo | 1920 × 1080 (16:9): la composición de la miniatura de YouTube con el título de la edición como voz, logo abajo a la izquierda, sin eslogan; la voz dentro del 80 % central, porque LinkedIn la recorta en el feed (norma de Manzanitas §5.7, desde 2026-10-22) |
 | Miniaturas de YouTube | si el artículo acompaña un tutorial | **dos** miniaturas Escena 16:9 (1280 × 720) para la prueba A/B, logo abajo a la izquierda, sin eslogan; cierre de YouTube aparte (norma de Manzanitas §5.7) |
 | Story de Instagram | máximo una por semana, como generosidad | 1080 × 1920, zona segura del 87 %, enlace al blog o a Glitch (norma §5.6) |
 

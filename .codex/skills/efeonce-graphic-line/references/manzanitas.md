@@ -7,7 +7,8 @@
 > («Marketing con Manzanitas · Línea v1», https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG; los tableros `Grafico-*` y
 > `Texto-*` se leyeron en su fuente, con la lógica `renderVals()` de cada lámina) · inventarios de hechos de las sesiones
 > del 2026-09-28 y del 2026-09-29 · [ledger.md](ledger.md) (filas del 2026-09-28 y del 2026-09-29) ·
-> [criteria.md](criteria.md) §3.4 y §8.
+> [criteria.md](criteria.md) §3.4 y §8. · **Delta 2026-10-24:** §4.5 (las tres imágenes de un artículo nuevo del blog) y
+> §14 alineados con el [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md) v1.4, medido en vivo ese día.
 >
 > **Estado: APROBADO por el operador (2026-09-28)** sobre la versión 39 del canvas: «Me encantan, queda aprobada toda
 > la línea gráfica». Cubre los formatos Pizarra, Escena, Lente y Recreo; la cabecera y la firma; la contraportada A;
@@ -224,29 +225,44 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
 - **Blog y banner:** la foto se genera en 16:9 y se lleva a 1,9:1 (1200 × 630). La voz va en el lado oscuro; la firma
   puede ir abajo a la izquierda, cerrando la columna del texto. Sin eslogan.
 - **Portada de artículo del blog: variante centrada** (operador, 2026-10-24; norma §5.6). La destacada también se ve
-  recortada en cuadrado (vista previa compacta de WhatsApp, cualquier tarjeta cuadrada; el archivo v3 del blog ya no la
-  muestra), y ese recorte toma el centro (x 285–915 de
-  1200). Por eso:
-  - cabecera, voz y respuesta en **x 312**, dentro de la columna x 312–782 e y 50–341;
-  - el slider de `/blog/` pinta su título encima, así que ahí va como `hero` el plate sin texto;
-  - el rail «Para leer con calma» v2 (en producción desde 2026-10-24) **ya no es 4:3**: la destacada llena una tarjeta
-    vertical de 440 × 600 (móvil 304 × 540), recortada al centro, con el título sobre el ~45 % inferior. Del
-    1200 × 630 sólo se ve x ≈ 369–831 (móvil ≈ 423–777): la cabecera en x 312 y un sujeto en el tercio derecho
-    quedan fuera, y lo que caiga abajo queda bajo el texto. **Resuelto (operador, 2026-10-24; editorial-blocks
-    0.4.5):** la portada no se toca —sigue siendo la destacada y la imagen Open Graph— y la tarjeta lleva imagen y
-    punto focal propios (metas `_eo_card_image` / `_eo_card_focus`): el plate sin texto
-    (`ai-generations/2026-10-24_portadas-blog/plates/MCB-*-169.png`) + foco. Con la cara en x ≈ 71 % del plate, el
-    foco ideal es ≈ 84 % (escritorio) y ≈ 81 % (móvil); `«84% 30%»` sirve en todos los tableros. Comando:
-    `pnpm public-website:blog-home card <post> --image <plate> --alt "<texto>" --focus "84% 30%"` (plan sin
-    `--apply`; ledger y readback; falla si la destacada cambió); revisa con
-    `node scripts/public-website/blog-v3/preview/serve.cjs --rail <cards.json>`. Nunca cambies la destacada para
-    arreglar el rail;
-  - el sujeto en el tercio derecho, pedido un poco más a la derecha porque el modelo lo corre unos 15 puntos al centro;
+  recortada en cuadrado, y ese recorte toma el centro (x 285–915 de 1200): la vista previa compacta de WhatsApp, la
+  miniatura de iMessage, Slack, Teams o Telegram, y «Te puede interesar», los relacionados al pie de cada artículo
+  (cuadrado de 339 × 339; 326 × 326 en el teléfono). El archivo v3 del blog es una lista de texto y no la muestra. Por
+  eso:
+  - cabecera, voz y respuesta en **x 312**, dentro de la columna x 312–782 e y 50–341; nada importante en los 15 px de
+    arriba y de abajo (la tarjeta grande de X, 2:1, puede cortarlos);
+  - la cara en **x 795–900**, dentro del borde del cuadrado; en el plate, x 68–75 % · y 10–40 %, pedida en torno al
+    85 % porque el modelo la corre unos 15 puntos al centro, con el 64 % izquierdo en oscuridad calma;
   - **sin bajada y sin firma**: la cabecera identifica la pieza y la prenda ya lleva la marca, así que el logo sobra
     (el banner que sale del sitio sí firma);
   - la foto 16:9 se recorta a 1,9:1 quitando la parte de arriba, para que el lecho quede entero;
-  - se entrega en 2400 × 1260, JPEG calidad 88 con croma 4:4:4, y se aprueba junto a su recorte cuadrado.
-  **Pendiente en AXIS:** todavía no es una pieza de `manzanitasRegister` ni la conoce la plantilla `blog-banner`. Hoy
+  - se entrega en 2400 × 1260, JPEG calidad 88 con croma 4:4:4 y **menos de 300 KB**.
+
+  **Un artículo nuevo lleva tres imágenes y tres subidas.** Entra solo al slider de `/blog/` y, si se lee en 12
+  minutos o más, al rail «Para leer con calma»; los dos pintan su propio texto encima, así que la portada no les sirve:
+  1. **plate** (PNG 16:9, 2560 × 1440, sin texto) → imagen de la tarjeta del rail, con punto focal (metas
+     `_eo_card_image` / `_eo_card_focus`; TASK-2051, en producción desde el 2026-10-24, editorial-blocks 0.4.5). La
+     tarjeta mide 440 × 600 (tablet 361 × 492, teléfono 304 × 540); con el foco «84% 30%» deja ver x 49–91 % del plate
+     (57–89 % en el teléfono), con la etiqueta y la flecha arriba (y 5–8 %), el degradado desde y 36 % (sólido bajo
+     y 70 %) y el título desde y 64 %. Comando:
+     `pnpm public-website:blog-home card <post> --image <plate> --alt "<texto>" --focus "84% 30%"` (plan sin
+     `--apply`; ledger y readback; falla si la destacada cambió); revisa con
+     `node scripts/public-website/blog-v3/preview/serve.cjs --rail <cards.json>`. Nunca cambies la destacada para
+     arreglar el rail;
+  2. **portada** (esta variante) → destacada e imagen Open Graph;
+  3. **imagen del slider** (WebP 2:1, 2400 × 1200, recortada del plate, sin texto) → `hero`
+     (`blog-home hero <post> --image <archivo.webp> --alt "…"`). Se ve x 42–96 % · y 7–93 % en todos los anchos (el
+     teléfono muestra sólo la parte derecha, x 42–100 %, con el título debajo); en escritorio el título tapa
+     x 29–65 % · y 31–61 %, «Siguiente» x 75–92 % · y 68–77 % y la tira desde y 86 %. La cara va en x 68–92 % ·
+     y 10–64 %. La miniatura «Siguiente» (96 × 64) usa esta imagen cuando existe.
+
+  El operador aprueba viendo juntas la portada, su recorte cuadrado, la imagen del slider y la tarjeta (1440 y 390).
+  `og:image:alt` y `twitter:image:alt` salen del `alt` de la portada con editorial-blocks 0.4.6, construido y simulado
+  en vivo el 2026-10-24 y **sin desplegar todavía** (espera el visto bueno del operador). Márgenes por superficie y
+  diagramas: [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+
+  **La portada está pendiente en AXIS:** todavía no es una pieza de `manzanitasRegister` ni la conoce la plantilla
+  `blog-banner`. Hoy
   se compone con la maqueta `ai-generations/2026-10-24_portadas-blog/composicion/componer-centrada.cjs` y `FIRMA=0`.
   Nunca la presentes como pieza de AXIS ni muevas sus posiciones a mano en otra copia. Paso a paso, zonas seguras por
   superficie, subida con guardas (`scripts/public-website/blog-post-cover-apply.php`) y QA:
@@ -950,6 +966,12 @@ el acento; §10.1). Los carruseles de ejemplo del Composer y las identidades del
 
 ## 14. Lecciones de esta sesión (no las repitas)
 
+- **Una portada no sirve para todas las superficies** (2026-10-24). El slider y la tarjeta del rail pintan su propio
+  texto encima: si les das la portada con texto, chocan dos textos y la cara queda fuera. Cada superficie que pone
+  texto lleva una imagen sin texto (el plate o su recorte), y la portada queda para la destacada y Open Graph.
+- **Los márgenes se miden en vivo, no se recuerdan** (2026-10-24). La tarjeta del rail dejó de ser 4:3 de un día para
+  otro; los números de §4.5 valen para la portada del blog v3 y las cards v2. Si cambian, vuelve a medir antes de
+  producir ([inventario](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md)).
 - **Un banner pensado para el ancho completo pierde el texto en el recorte cuadrado** (2026-10-24). Antes de entregar
   una imagen destacada, mira su recorte central: el banner en x 72 perdía la manzana, la voz y la firma. Y no firmes
   por costumbre: si la cabecera y la prenda ya dicen la marca, el logo sobra (el operador lo pidió sacar).

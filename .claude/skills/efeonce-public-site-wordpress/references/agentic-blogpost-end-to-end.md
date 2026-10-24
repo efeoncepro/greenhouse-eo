@@ -203,13 +203,26 @@ Assign featured and social media deliberately:
 - verify the featured attachment is the intended `primaryImageOfPage` and the
   Open Graph image;
 - verify format, dimensions, aspect ratio, ALT/caption, and anonymous delivery;
-- check the featured image in the `/blog/` rail crop too: the «Para leer con calma» v2 card (2026-10-24) fills a
-  portrait 440×600 card (mobile 304×540), cropped at center, with the title over the bottom ~45 % scrim, so the
-  subject must sit in the central/upper area (cover rules: `efeonce-graphic-line` `references/manzanitas.md` §4.5).
-  If the cover has baked-in text (Manzanitas) or the subject falls outside the crop, do not change the featured
-  image (it stays the OG image): set the card's own image/focal point with
-  `pnpm public-website:blog-home card <post> [--attachment id | --image file --alt text] [--focus "x% y%"]`
-  (metas `_eo_card_image` / `_eo_card_focus`; plan unless `--apply`; see `blog-home-operation.md`);
+- a new Marketing con Manzanitas post enters the `/blog/` slider and the «Para leer con calma» rail **on its own**
+  (newest posts with image, not Glitch/Novedad; rail = the 4 newest reads ≥ 12 min or podcast), so publishing ships
+  **three uploads**, each with its `alt`, all planned without `--apply` and applied only with the operator's go:
+  1. **cover** = featured + Yoast OG (+ X fallback, schema `primaryImageOfPage`, the square «Te puede interesar»
+     related-posts thumbnail): one JPEG 2400 × 1260 (canvas 1200 × 630) < 300 KB, text inside the central square
+     x 285–915, uploaded with `scripts/public-website/blog-post-cover-apply.php` (dry run → apply, guards, snapshot);
+  2. **slider `hero`** (`_eo_hero_image`): WebP 2:1 2400 × 1200 cropped from the textless plate, with
+     `pnpm public-website:blog-home hero <post> --light "…" --bold "…" --image <webp> --alt "…"`. Without it the
+     slider title falls over the cover's baked-in text;
+  3. **rail card** (`_eo_card_image` / `_eo_card_focus`, live 0.4.5): the plate PNG 2560 × 1440 as is, with
+     `pnpm public-website:blog-home card <post> --image <plate> --alt "…" --focus "84% 30%"`. The featured image
+     never changes for the card (it stays the OG image). A post under 12 minutes skips this upload;
+- sizes, safe zones per surface (cover, slider, card, plate) and OG per platform live in
+  `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`; cover craft in
+  `docs/manual-de-uso/creative/producir-portada-de-articulo-del-blog.md`; command detail in `blog-home-operation.md`;
+- live QA after the uploads: `og:image` 2400 × 1260 `image/jpeg`, `twitter:card` `summary_large_image` (no
+  `twitter:image`: X falls back to `og:image`), the card and the slider at 1440 and 390,
+  `pnpm public-website:blog-home verify --browser`, and each network's debugger to refresh its cache.
+  `og:image:alt` / `twitter:image:alt` come from `efeonce-editorial-blocks` 0.4.6, built and simulated live but
+  **not deployed yet** (waits for the operator's go): until then, do not expect them in the HTML;
 - preserve source masters and derivative lineage outside the post body.
 
 For direct SVG infographics, load the governed SVG lane in `content-factory-gutenberg.md` and the SEO contract

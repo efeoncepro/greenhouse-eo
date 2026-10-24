@@ -1,6 +1,6 @@
 # SEO y accesibilidad para imágenes editoriales y SVG
 
-> **As-of:** 2026-09-24.
+> **As-of:** 2026-10-24 (imagen social por plataforma agregada).
 > **Carga cuando:** un artículo use infografías, diagramas, `<picture>`, SVG directo, featured u Open Graph.
 
 ## Decisión rápida
@@ -56,6 +56,37 @@ preferir una sección/anchor con descripción, fuente, permisos y canonical sobr
 - No sacrificar tipo, contraste o estructura por unos pocos KB.
 - Mantener raster coherente en `BlogPosting.image`/`ImageObject`, `og:image`, Twitter y featured.
 - No duplicar schema manual si Yoast es owner del graph.
+
+## Imagen social (Open Graph) por plataforma
+
+Una sola imagen OG sirve a todas las redes, pero cada una la muestra distinto y casi ninguna publica sus reglas.
+Diseñar para la intersección:
+
+| Superficie | Cómo la muestra | Margen | Fuente |
+|---|---|---|---|
+| LinkedIn, Facebook | tarjeta grande 1,91:1 completa; con imágenes chicas cae a miniatura (cuadrada en Facebook) | el cuadrado central si cae a miniatura | guías de terceros |
+| WhatsApp | vista grande, o compacta con miniatura cuadrada central (imágenes chicas, pesadas o poco horizontales) | el cuadrado central | Meta (oficial): < 600 KB, ≥ 300 px de ancho, proporción ≤ 4:1 |
+| X | `summary_large_image` 2:1; si falta `twitter:image`, usa `og:image` | ~15 px arriba y abajo (sobre 1200 × 630) | validador de X citado en 2020 |
+| iMessage, Slack, Teams, Telegram | casi completa; miniatura al costado con imágenes chicas | el cuadrado central | sin especificación publicada |
+| Google y Discover | imagen grande con `max-image-preview:large` y ≥ 1200 px de ancho | — | Google Search Central |
+
+Reglas que valen para todas:
+
+- Raster **JPEG** (los lectores de enlaces no tratan WebP de forma pareja), de **menos de 300 KB**: sale la vista
+  grande y queda lejos del límite de WhatsApp.
+- Texto y sujeto dentro del **cuadrado central**; nada importante en los bordes de arriba y abajo.
+- `og:image:alt` / `twitter:image:alt` describen la imagen y repiten su texto; un alt vacío no se imprime.
+- `og:title` puede no ser el título SEO (en Yoast sale del título del post): leer cada etiqueta en vivo.
+- Las redes guardan la vista previa en caché: tras cambiar la imagen, refrescar con el depurador de Facebook, el Post
+  Inspector de LinkedIn y un chat de prueba en WhatsApp.
+
+**Overlay Efeonce (blog Marketing con Manzanitas, medido en vivo el 2026-10-24):** la portada es un JPEG
+2400 × 1260 (lienzo 1200 × 630) que cubre destacada, `og:image`, la tarjeta de X (sin `twitter:image` propio),
+`primaryImageOfPage` y la miniatura cuadrada de «Te puede interesar» al pie de cada artículo (339 × 339; 326 × 326
+en el teléfono, centrada: el mismo cuadrado x 285–915 que WhatsApp). `og:image:alt` y `twitter:image:alt` salen
+del `alt` de la portada con `efeonce-editorial-blocks` 0.4.6, construido y simulado en vivo pero **todavía sin
+desplegar** (espera el visto bueno del operador). Medidas, zonas seguras y QA:
+`docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
 
 ## QA post-publicación
 

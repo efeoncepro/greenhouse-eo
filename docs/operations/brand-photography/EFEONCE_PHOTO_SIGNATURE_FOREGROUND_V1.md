@@ -1,9 +1,9 @@
 # Firma fotográfica Efeonce V1 — primer plano planeado y logo
 
 > **Tipo de documento:** Especificación técnica y funcional de marca
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-28 por Claude — en portada de blog y banner la firma puede ir fuera del centro ([delta 2026-09-28](#delta-2026-09-28--banner-y-portada-de-blog-la-firma-no-tiene-que-ir-al-centro)). Antes: regla de la firma de piezas gráficas: logo centrado; burbuja URL sólo con el logo ya en la imagen ([§5.1](#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26))
+> **Última actualización:** 2026-10-24 por Claude — la portada de artículo del blog va sin firma, y la imagen del slider y la foto de la tarjeta del rail van sin texto ni firma ([delta 2026-10-24](#delta-2026-10-24--la-portada-de-artículo-del-blog-va-sin-firma)). 2026-09-28: en portada de blog y banner la firma puede ir fuera del centro ([delta 2026-09-28](#delta-2026-09-28--banner-y-portada-de-blog-la-firma-no-tiene-que-ir-al-centro)). Antes: regla de la firma de piezas gráficas: logo centrado; burbuja URL sólo con el logo ya en la imagen ([§5.1](#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26))
 > **Estado:** Aprobado por el operador el 2026-09-19 (con pendientes en §8)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Marca en escena (regla previa)](../../../.claude/skills/social-media-studio/references/brand-in-scene.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · Scripts `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/{medir.mjs,componer.mjs}`
 
@@ -355,3 +355,9 @@ sujeto ya lleva la marca bordada y el artículo vive en el sitio de Efeonce. As�
 cuando la marca ya está en la imagen. El banner que se comparte fuera del sitio conserva la firma del delta anterior.
 Posiciones y entrega de la variante centrada: `docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md`
 §5.6.
+
+Un artículo nuevo lleva otras dos imágenes, y **ninguna firma**: la **imagen del slider** (el plate recortado a 2:1,
+WebP 2400 × 1200) y la **foto de la tarjeta del rail** (el plate tal cual, con el punto focal «84% 30%»). Las dos son
+el plate sin texto, como nace todo plate, y el sitio pinta encima su propio título. Sus márgenes, y los de la portada
+en cada superficie, están en el
+[inventario de imágenes por artículo](../public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).

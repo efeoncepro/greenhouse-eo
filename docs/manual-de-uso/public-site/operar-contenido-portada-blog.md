@@ -1,7 +1,7 @@
 # Operar el contenido de la portada del blog
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-10-24 por Claude
 > **Ultima actualizacion:** 2026-10-24 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) · [PDR-029 — Modelo de contenido de la portada del blog](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md) · [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-content-model.md)
@@ -40,6 +40,15 @@ velo de lectura del lado del texto y corta la bajada en dos líneas; si el arte 
 **Imagen del slider** y el velo desaparece. Las tres invitaciones (Glitch, guía o herramienta, diagnóstico) tienen su
 lugar reservado: una entrada fijada ocupa uno de los lugares restantes.
 
+Un artículo nuevo no necesita fijarse para entrar: el slider llena sus lugares de entradas con las más nuevas que
+tienen imagen y no son Glitch ni Novedad. Como la portada de Marketing con Manzanitas trae texto, **todo artículo nuevo
+necesita su Imagen del slider**, o el título del slider cae encima del texto de la portada:
+
+- **Imagen del slider:** WebP 2:1 de 2400 × 1200, recortada de la placa (la foto sin texto), **sin texto** (el slider
+  pone su título). Se ve en todos los anchos entre x 42–96 % · y 7–93 %; la cara va en x 68–92 % · y 10–64 %, a la
+  derecha del título, y la mitad izquierda oscura y calma. En el teléfono sólo se ve la parte derecha, con el título
+  debajo. La miniatura «Siguiente» usa esta imagen cuando existe.
+
 ### Tarjetas de «Para leer con calma»
 
 El riel muestra las cuatro lecturas largas más recientes (12 minutos o más, sin Glitch, Novedades ni grabaciones),
@@ -52,9 +61,10 @@ con la entrada; en el panel **Portada del blog** decides cuatro datos más:
   No es la fecha de modificación de WordPress: corregir una coma no cuenta. Enciende «Actualizado» por 30 días, sólo
   en entradas publicadas hace más de 60; el pie de la tarjeta dice «Actualizado <fecha>».
 - **Imagen de la tarjeta del riel**: una imagen propia para la tarjeta de foto, distinta de la destacada. La tarjeta
-  es vertical (440 × 600; 304 × 540 en móvil) y recorta la destacada horizontal; úsala cuando la destacada trae texto
-  incrustado (las portadas de Manzanitas): sube la placa sin texto. La destacada no cambia y sigue siendo la imagen
-  que se ve al compartir (OG). Vacío = la destacada.
+  es vertical (440 × 600 en escritorio, 361 × 492 en tablet y 304 × 540 en el teléfono) y recorta la destacada
+  horizontal; úsala cuando la destacada trae texto incrustado (las portadas de Manzanitas, o sea todo artículo nuevo
+  de 12 minutos o más, que entra solo al riel): sube la placa sin texto tal cual (PNG 16:9, 2560 × 1440). La destacada
+  no cambia y sigue siendo la imagen que se ve al compartir (OG). Vacío = la destacada.
 - **Punto focal de la tarjeta** (`x% y%`, de 0 a 100): hacia dónde se mueve el recorte. Vacío = centro. Una cara a
   ≈71 % del ancho de la placa necesita ≈84 %; `84% 30%` funciona en escritorio, tablet y móvil.
 
@@ -74,12 +84,13 @@ como una onda aunque dure menos de 12 minutos; su botón dice «Escuchar el epis
 
 Ninguna insignia se escribe a mano.
 
-**Cómo se recorta la imagen destacada.** La tarjeta con foto usa la imagen destacada de la entrada (no la imagen del
-slider) a sangre en un formato vertical de 440 × 600 en escritorio y 304 × 540 en el teléfono, recortada al centro:
-de una imagen ancha sólo se ve la franja del medio, de arriba abajo. El título, la bajada y el pie van encima, sobre un
-velo, en el 45 % de abajo; el formato va arriba a la izquierda y el botón arriba a la derecha. Lo importante de la
-imagen tiene que estar al centro y en la mitad de arriba. Cómo componer la portada para eso:
-[Producir la portada de un artículo del blog](../creative/producir-portada-de-articulo-del-blog.md#zonas-seguras).
+**Cómo se recorta la imagen de la tarjeta.** La tarjeta con foto usa su **Imagen de la tarjeta del riel** si la
+tiene y, si no, la imagen destacada (nunca la imagen del slider), a sangre en formato vertical y recortada al centro o
+hacia el punto focal: de una imagen ancha sólo se ve una franja, de arriba abajo. Encima van el formato (arriba a la
+izquierda) y la flecha (arriba a la derecha), entre el 5 % y el 8 % del alto; un degradado desde el 36 % del alto,
+sólido bajo el 70 %, y el título desde el 64 %. Con la placa y el foco `84% 30%`, la cara va en x 60–86 % · y 10–40 %
+de lo que se ve, y la mitad de abajo pareja y oscura. Medidas y diagramas de todas las imágenes de un artículo:
+[inventario de imágenes por artículo](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 Una entrada sin imagen ni cliente sale como tarjeta tipográfica.
 
 ### Foto de perfil del autor

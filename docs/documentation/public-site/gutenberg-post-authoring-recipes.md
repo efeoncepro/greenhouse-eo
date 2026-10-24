@@ -41,6 +41,14 @@ render is owned by Ohio parent templates plus `global_blog_*` options. When a
 new or refreshed article is meant to support the content hub, review category,
 tags, featured image, excerpt and search/archive impact before publishing.
 
+Images are not part of the Gutenberg body contract except for body figures. A new Marketing con Manzanitas post
+enters the `/blog/` slider and the «Para leer con calma» rail on its own, so it ships three images outside the body:
+the cover (one JPEG 2400 × 1260 under 300 KB: featured image + Yoast Open Graph, uploaded with
+`scripts/public-website/blog-post-cover-apply.php`), the slider `hero` (WebP 2:1, `pnpm public-website:blog-home hero`)
+and the rail card image (the textless plate with focus `"84% 30%"`, `pnpm public-website:blog-home card`). Ohio does
+not show the featured image in the article header, so never repeat it in the body. Sizes, safe zones and who makes
+each piece: `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
+
 Runtime note 2026-07-15: the live WordPress runtime for `efeoncepro.com` registers
 both `core/details` and `core/accordion` alongside `yoast/faq-block`. For compact
 editorial FAQs inside a long article, prefer `core/details` first: it saves native

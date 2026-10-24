@@ -1,9 +1,9 @@
 # Registro Marketing con Manzanitas — registro complementario de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-28 por Claude
-> **Ultima actualizacion:** 2026-10-22 por Claude (1.5: Marketing con Manzanitas como familia de canales —blog, newsletter del LinkedIn de Julio y YouTube— según PDR-020 rev 2.0) · 2026-09-29 por Claude (TASK-1939) (1.4: la ropa del equipo la decide la línea; 1.3: las diez decisiones resueltas: el texto de cierre que cambia con cada pieza, el equipo real en las fotos y los íconos de republicar y enviar; AXIS `v0.3.29`. 1.2: cómo se componen hoy las piezas, decisiones del operador del 2026-09-29 y el eslogan debajo del logo)
+> **Ultima actualizacion:** 2026-10-24 por Claude (1.6: qué imágenes lleva un artículo nuevo del blog) · 2026-10-22 por Claude (1.5: Marketing con Manzanitas como familia de canales —blog, newsletter del LinkedIn de Julio y YouTube— según PDR-020 rev 2.0) · 2026-09-29 por Claude (TASK-1939) (1.4: la ropa del equipo la decide la línea; 1.3: las diez decisiones resueltas: el texto de cierre que cambia con cada pieza, el equipo real en las fotos y los íconos de republicar y enviar; AXIS `v0.3.29`. 1.2: cómo se componen hoy las piezas, decisiones del operador del 2026-09-29 y el eslogan debajo del logo)
 > **Documentacion tecnica:** [ADR del registro Marketing con Manzanitas](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md) · [Norma del registro](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
 > **Manual de uso:** [Componer piezas de Marketing con Manzanitas](../../manual-de-uso/creative/componer-piezas-de-marketing-con-manzanitas.md)
 
@@ -183,7 +183,7 @@ formato y nadie mira al lente.
 | Pieza | Cómo va |
 |---|---|
 | **Story** | una sola pieza, Escena o Pizarra (nunca las dos). Con foto: la voz en la banda alta y la firma centrada sobre la mesa, dentro de la zona segura, que es la de AXIS: nada importante en el 13 % de arriba ni de abajo (decisión del 2026-09-29). La story de cierre siempre lleva su pregunta y su respuesta, con un texto propio de la pieza y la misma extensión que la contraportada |
-| **Blog y banner** | una sola pieza, Escena o Pizarra. La foto se genera en 16:9 y se lleva a 1,9:1 (1200 × 630); la voz va en el lado oscuro y la firma puede ir abajo a la izquierda, cerrando la columna del texto. La **portada de un artículo** se ve también recortada en cuadrado (la vista previa compacta de WhatsApp), así que todo el texto va en el cuadrado central y no lleva firma (decisión del 2026-10-24; [manual](../../manual-de-uso/creative/producir-portada-de-articulo-del-blog.md)) |
+| **Blog y banner** | una sola pieza, Escena o Pizarra. La foto se genera en 16:9 y se lleva a 1,9:1 (1200 × 630); la voz va en el lado oscuro y la firma puede ir abajo a la izquierda, cerrando la columna del texto. La **portada de un artículo** se ve también recortada en cuadrado (la vista previa compacta de WhatsApp y «Te puede interesar», los artículos relacionados al pie de cada post), así que todo el texto va en el cuadrado central y no lleva firma (decisión del 2026-10-24; [manual](../../manual-de-uso/creative/producir-portada-de-articulo-del-blog.md)). Un artículo nuevo aparece solo en la portada del blog: en el carrusel de arriba y, si es una lectura larga, en «Para leer con calma». Esos dos lugares ponen su propio título encima de la imagen, así que llevan la foto **sin texto**, con la persona hacia la derecha. Por eso cada artículo nuevo lleva **tres imágenes**: la foto sola, la portada con texto y un recorte ancho de la foto para el carrusel ([qué imagen va en cada lugar](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md)) |
 | **YouTube** | la miniatura es una Escena 16:9 con el logo abajo a la izquierda; el cierre del video lleva el logo con el eslogan debajo |
 | **Pódcast (1:1)** | la cabecera del programa en grande (420 px), porque la portada se ve a 160 px |
 

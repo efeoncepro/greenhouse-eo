@@ -268,9 +268,12 @@ Umbral: `42/50`; objetivo premium: `46/50`. Blockers duros invalidan sin importa
 ### Formatos mínimos
 
 - master PNG sRGB, sin recomprimir;
-- featured WebP `1600×900` o resolución aprobada por el runtime (para artículos de Marketing con Manzanitas, desde
-  2026-10-24 un solo JPEG `2400×1260` cubre destacada, OG y X, y el slider lleva su propio `hero` 2:1: ver el
-  [inventario de imágenes por artículo](BLOG_ARTICLE_IMAGE_INVENTORY_V1.md), con las medidas en vivo de cada posición);
+- featured WebP `1600×900` o resolución aprobada por el runtime. **Para artículos de Marketing con Manzanitas, desde
+  el 2026-10-24 manda el [inventario de imágenes por artículo](BLOG_ARTICLE_IMAGE_INVENTORY_V1.md)**, con las medidas
+  en vivo de cada posición. Un artículo nuevo lleva tres archivos y tres subidas: la portada, JPEG `2400×1260` de
+  menos de 300 KB, que cubre destacada, OG, X y el cuadrado de «Te puede interesar»; el `hero` del slider, WebP 2:1
+  `2400×1200` recortado del plate y sin texto; y la imagen de la tarjeta del rail, que es el plate `2560×1440` tal cual
+  con punto focal `84% 30%`;
 - OG JPEG `1440×756` o `1200×630`;
 - card/crop `1:1` cuando el archivo/índice lo use;
 - proof `160px` para punch;

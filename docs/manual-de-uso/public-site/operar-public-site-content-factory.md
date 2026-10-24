@@ -1,9 +1,9 @@
 # Operar Public Site y Content Factory
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 3.0
+> **Version:** 3.1
 > **Creado:** 2026-06-15 por Codex
-> **Ultima actualizacion:** 2026-07-15 por Codex (primer ciclo agentic end to end publicado)
+> **Ultima actualizacion:** 2026-10-24 por Claude (imágenes por artículo: set de 3 archivos y 3 subidas)
 > **Modulo:** Public Site / Content Factory / Astro binding
 > **Comandos/API:** `pnpm public-website:content-factory:{ideate,author,run,validate,plan}`, `pnpm public-website:*`, `GET /api/admin/public-site/binding`
 > **Documentacion relacionada:** `docs/operations/public-site-content-factory/AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md`, `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`, `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`, `docs/documentation/public-site/wordpress-blog-content-hub-search.md`, `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
@@ -73,7 +73,9 @@ privado**. La publicacion siempre es una decision humana final; el operador pued
 5. **Completar el gate privado:** antes de publicar, confirma categoria, slug/permalink,
    tags solo si aportan una taxonomia real, featured/OG, ALT/captions, excerpt, meta title,
    meta description, canonical, robots, schema, CTA, links, fuentes, permisos de casos y
-   entidad del autor. Haz readback autenticado y revisa desktop/mobile.
+   entidad del autor. Haz readback autenticado y revisa desktop/mobile. Las imágenes del
+   artículo (portada, slider y tarjeta del riel) se preparan y aprueban en este paso:
+   ver «Imágenes» más abajo.
 
 6. **Autorizar la publicacion:** la instruccion debe ser explicita para la version y URL
    concretas. `validation=pass`, `--send`, "me gusta" o una revision parcial no equivalen
@@ -125,8 +127,21 @@ párrafos no se publica.
 4. **Para reemplazar el cuerpo de un post publicado** con su spec recompuesta, usa
    `scripts/public-website/blog-post-content-republish.php`: primero la simulación y después `apply`, con guardas de
    fecha de modificación, sha256 y preguntas frecuentes idénticas. Guarda un respaldo por post.
-5. **Imágenes:** cuántas lleva el artículo y con qué medidas está en el
-   [inventario de imágenes por artículo](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+5. **Imágenes:** un artículo nuevo de Marketing con Manzanitas entra solo al slider de `/blog/` y, si dura 12 minutos
+   o más, al riel «Para leer con calma». Por eso lleva **3 archivos y 3 subidas**, cada una con su `alt`:
+   - **Plate** (foto sin texto, PNG 16:9 de 2560 × 1440) → imagen de la tarjeta del riel:
+     `pnpm public-website:blog-home card <post> --image <plate> --alt "…" --focus "84% 30%"`.
+   - **Portada** (JPEG de 2400 × 1260, menos de 300 KB, texto dentro del cuadrado central) → imagen destacada y Open
+     Graph, con `scripts/public-website/blog-post-cover-apply.php` (simulación → `apply`). Es la misma imagen que se ve al
+     compartir el enlace, en la tarjeta de X y, en cuadrado, en «Te puede interesar» al pie de cada artículo.
+   - **Imagen del slider** (WebP 2:1 de 2400 × 1200, recortada del plate, sin texto) →
+     `pnpm public-website:blog-home hero <post> --light "…" --bold "…" --image <webp> --alt "…"`.
+
+   Los comandos `blog-home` sin `--apply` sólo muestran el plan; `--apply` va con el visto bueno del operador, que
+   aprueba viendo juntas la portada, su recorte cuadrado, la imagen del slider y la tarjeta. En el cuerpo, de 0 a 2
+   imágenes y sólo si explican algo (SVG directo para infografías). Márgenes, diagramas y QA en vivo: el
+   [inventario de imágenes por artículo](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md);
+   la portada paso a paso: [producir la portada de un artículo](../creative/producir-portada-de-articulo-del-blog.md).
 6. **QA en vivo:** un solo `FAQPage`, el Destacado sin las líneas negras de Ohio, los Pasos y el Recuadro visibles en
    modo claro y oscuro, y las imágenes centradas.
 

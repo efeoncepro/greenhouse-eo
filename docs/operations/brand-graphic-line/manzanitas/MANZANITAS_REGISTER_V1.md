@@ -6,9 +6,12 @@
 > dice. El registro suma reglas, estilos y piezas propias sólo para piezas de MCM.
 >
 > **Tipo de documento:** Norma operativa de marca (registro complementario de la línea gráfica)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-28 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-29 por Claude (TASK-1939) (1.3: las tres decisiones que quedaban abiertas, resueltas
+> **Última actualización:** 2026-10-24 por Claude (1.4: la portada de artículo del blog y las otras dos imágenes de un
+> artículo nuevo, la del slider y la de la tarjeta del rail, alineadas con el
+> [inventario de imágenes por artículo](../../public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md) v1.4:
+> §5.6, §5.8, §7.1 y §12) · 2026-09-29 por Claude (TASK-1939) (1.3: las tres decisiones que quedaban abiertas, resueltas
 > esa misma tarde: el texto de cierre que cambia con el contexto (§8.1), el equipo real en las fotos cine (§5.3) y los
 > Trazo `republicar` y `enviar` (§8.3); AXIS `v0.3.29` con el eslogan desde el token (§7.2) y los hallazgos de TASK-1939
 > cerrados (§14.5). 1.2: decisiones del operador del 2026-09-29 en §13; regla del eslogan de los cierres en §7.2;
@@ -325,31 +328,42 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
 - **Blog y banner:** la foto se genera en **16:9** y se lleva a **1,9:1 (1200 × 630)**. La voz va en el lado oscuro de
   la foto y la firma **puede ir abajo a la izquierda**, cerrando la columna del texto. Sin eslogan.
 - **Portada de artículo del blog: variante centrada** (operador, 2026-10-24). La imagen destacada de un artículo
-  también se ve recortada en cuadrado: la vista previa compacta de WhatsApp y cualquier tarjeta cuadrada (como el
-  archivo del blog de Ohio, reemplazado el 2026-10-24 por el archivo v3, que no muestra la imagen) toman el centro de la
-  imagen. El banner de blog pone cabecera, voz y firma en x 72 y ese recorte perdía la manzana, casi toda la voz y la
+  también se ve recortada en cuadrado, y ese recorte toma el centro de la imagen: la vista previa compacta de WhatsApp,
+  la miniatura de iMessage, Slack, Teams o Telegram y «Te puede interesar», los relacionados al pie de cada artículo
+  (cuadrado de 339 × 339; 326 × 326 en el teléfono). El banner de blog pone cabecera, voz y firma en x 72 y ese recorte perdía la manzana, casi toda la voz y la
   firma. Por eso, en la portada de un artículo:
   - **El texto vive en el cuadrado central** (x 285–915 de 1200): cabecera, voz y respuesta en **x 312**, la columna
     de texto entre **x 312 y x 782** (470 px de ancho, 27 px de aire al borde izquierdo del cuadrado) y entre
     **y 50 y y 341**. Medidas de las portadas publicadas: cabecera 312, 50 → 492, 131; voz 312, 170 → 782, 341;
     respuesta 312, 250 → 782, 341, sin desborde.
-  - **El rail «Para leer con calma» v2 de la portada del blog** (2026-10-24) pone la destacada como tarjeta de foto a
-    sangre vertical (440 × 600; 304 × 540 en móvil) y le pinta encima su propio texto. Deja ver sólo x 369–831 del
-    lienzo (x 423–777 en móvil), así que corta la cabecera y deja fuera la cara: **esta portada no sirve como foto
-    de esa tarjeta**. La tarjeta lleva su propia imagen, el plate sin texto, con un punto focal hacia la cara
-    (`blog-home card <post> --image <plate> --focus "84% 30%"`; TASK-2051, en producción desde el
-    2026-10-24). El slider también choca: lleva como `hero` el plate sin texto. Inventario completo de imágenes por
-    artículo: `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
-  - **El sujeto va en el tercio derecho**, fuera de la columna de texto. Pídelo un poco más a la derecha de lo que lo
-    quieres: los sujetos de las dos primeras salieron unos 15 puntos más al centro de lo pedido.
+  - **Nada importante en los 15 px de arriba y de abajo:** la tarjeta grande de X (2:1) puede cortarlos.
+  - **Un artículo nuevo lleva tres imágenes y tres subidas, no una.** Entra solo al slider de `/blog/` (salvo Glitch y
+    Novedad) y, si se lee en 12 minutos o más, al rail «Para leer con calma». Los dos pintan su propio texto encima de
+    la imagen, así que esta portada no les sirve:
+    1. **El plate** (PNG 16:9, 2560 × 1440, sin texto) se sube como imagen de la tarjeta del rail, con el punto focal
+       «84% 30%» (`blog-home card <post> --image <plate> --focus "84% 30%"`; TASK-2051, en producción desde el
+       2026-10-24, `efeonce-editorial-blocks` 0.4.5). La tarjeta (440 × 600; 361 × 492 en tablet; 304 × 540 en el
+       teléfono) dejaría ver de la portada sólo x 369–831 (x 423–777 en el teléfono): cortaría la cabecera y dejaría
+       fuera la cara.
+    2. **La portada** (esta variante) se sube como destacada e imagen Open Graph.
+    3. **La imagen del slider** (WebP 2:1, 2400 × 1200, recortada del plate, sin texto) se sube como `hero`: el slider
+       pone su título encima, a la izquierda.
+
+    Los márgenes de cada imagen, superficie por superficie, con sus diagramas:
+    [inventario de imágenes por artículo](../../public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+  - **El sujeto va en el tercio derecho**, fuera de la columna de texto: la cara en **x 795–900** del lienzo, dentro
+    del borde del cuadrado. En el plate eso es la cara en x 68–75 % y y 10–40 %, con el 64 % izquierdo en oscuridad
+    calma. Pídela en torno al 85 % del ancho: los sujetos de las dos primeras salieron unos 15 puntos más al centro de
+    lo pedido.
   - **Sin bajada y sin firma.** La pregunta y su respuesta bastan. La portada **no lleva el logo de Efeonce**: la
     cabecera de Marketing con Manzanitas ya identifica la pieza, el artículo está en el sitio de Efeonce y la prenda
     del sujeto ya lleva la marca bordada. Este caso cumple la regla de La órbita de no repetir el logo cuando la marca
     ya está en la imagen. El banner que se comparte fuera del sitio conserva su firma.
   - **La foto 16:9 se recorta a 1,9:1 quitando la parte de arriba**, para que el lecho quede entero abajo y la
     cabecera caiga sobre el muro oscuro.
-  - **Se entrega al doble** (2400 × 1260), en JPEG de calidad 88 con croma 4:4:4. Se revisan juntos la portada
-    completa y su recorte cuadrado, y se aprueban los dos.
+  - **Se entrega al doble** (2400 × 1260), en JPEG de calidad 88 con croma 4:4:4 y **menos de 300 KB**. El operador
+    aprueba viendo juntas la portada completa, su recorte cuadrado, la imagen del slider y la tarjeta (1440 y
+    390 px).
   - **Estado:** variante aprobada para el blog y **pendiente en AXIS**. No es todavía una pieza de
     `manzanitasRegister`, y la plantilla `blog-banner` del compositor no la conoce. Hoy se compone con la maqueta
     `ai-generations/2026-10-24_portadas-blog/composicion/componer-centrada.cjs` (con `FIRMA=0`), que copia la
@@ -388,6 +402,7 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
 | Story | con manzana | **no** | centrada sobre la mesa, en la zona segura (87 %) | sólo en la story de cierre, debajo del logo |
 | Blog y banner | con manzana | no aplica | logo, puede ir abajo a la izquierda | no |
 | Portada de artículo del blog (variante centrada, §5.6) | con manzana, en x 312 | no aplica | **no lleva** | no |
+| Imagen del slider y foto de la tarjeta del rail (el plate, §5.6) | no lleva: van sin texto | no aplica | **no lleva** | no |
 | Miniatura de YouTube | con manzana | no aplica | logo abajo a la izquierda | no |
 | Cierre de YouTube | no lleva | no aplica | bloque logo 260 px + eslogan debajo | **sí** |
 | Portada de pódcast | cabecera del programa a 420 px | no aplica | — | no |
@@ -439,8 +454,8 @@ en cualquier otra lámina la mano va en reposo.
   a **97 px** del borde inferior. Vale en Pizarra, Escena y Lente; la Lente del sistema firma ahí.
 - En la **Escena**, la firma queda **dentro de la mesa** (el lecho nativo, §5.3).
 - El logo va centrado abajo, como manda La órbita; en blog y banner puede ir abajo a la izquierda, y la portada de
-  artículo del blog no lo lleva (§5.6). La
-  miniatura de YouTube lleva el logo abajo a la izquierda (§5.7).
+  artículo del blog no lo lleva, como tampoco la imagen del slider ni la foto de la tarjeta del rail, que van sin
+  texto (§5.6). La miniatura de YouTube lleva el logo abajo a la izquierda (§5.7).
 
 ### 7.2 El eslogan sólo cierra
 
@@ -956,8 +971,12 @@ Revisa cada pieza sobre los **píxeles finales**, no sobre la paleta teórica.
 
 - [ ] Story y blog: una sola pieza, Escena o Pizarra; la story, dentro de la zona segura del 87 %.
 - [ ] Blog y banner en 1200 × 630, generados en 16:9; voz en el lado oscuro.
-- [ ] Portada de artículo: texto dentro de x 312–782, sujeto en el tercio derecho, sin firma; revisa el recorte
-      cuadrado central (x 285–915) junto a la portada completa.
+- [ ] Portada de artículo: texto dentro de x 312–782 · y 50–341, cara en x 795–900, sin firma, nada importante en
+      los 15 px de arriba y de abajo, JPEG de menos de 300 KB; revisa el recorte cuadrado central (x 285–915) junto a
+      la portada completa.
+- [ ] Artículo nuevo: lleva también la imagen del slider (WebP 2:1 sin texto, recortada del plate) y, si se lee en
+      12 minutos o más, la foto de la tarjeta del rail (el plate con el foco «84% 30%»). El operador ve las cuatro
+      juntas, en 1440 y 390 px, antes de subir.
 - [ ] Miniatura de YouTube con el logo abajo a la izquierda; pódcast con la cabecera a 420 px; ninguno con eslogan.
 - [ ] Revisa la lámina en un teléfono de 390 px antes de entregar.
 

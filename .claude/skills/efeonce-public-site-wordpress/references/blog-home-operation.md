@@ -38,6 +38,19 @@ logo needs Growth Forms renderer 1.3.0 released in Greenhouse; until then the la
 - Slider order: pins → Glitch (newsletter resource, else latest edition/Flash) → guide/tool → diagnostic → recent
   `auto_slide_candidate` posts up to five. A **Novedad** only enters when pinned. WordPress «sticky» is ignored.
 - A post without `_eo_hero_image` gets a reading scrim and a two-line dek; slider art goes in via `hero --image`.
+- A new post enters on its own: the slider fills its post places with the newest posts with image that are not
+  Glitch/Novedad (`EO_Home_Readers::build_featured`), and the rail takes the 4 newest reads ≥ 12 min or podcast, not
+  Glitch/Novedades (`EO_Home_Readers::rail`). So a new Manzanitas post needs, at publish time, its `hero` **and** its
+  `card` (without them the slider title and the card text fall over the cover's baked-in text):
+  - `hero`: WebP 2:1 2400 × 1200 cropped from the plate, no text; desktop 1440/1920 × 900 `object-fit: cover`,
+    `object-position: 100% 50%`, ~10 % parallax overscan; phone 390 shows x 42–100 % in a 390 × 300 band with the
+    title below. Visible in every width x 42–96 % · y 7–93 %; face x 68–92 % · y 10–64 % (clear of the title
+    x 29–65 % · y 31–61 %, «Siguiente» x 75–92 % · y 68–77 % and the strip from y 86 %). The «Siguiente» 96 × 64
+    thumbnail uses the `hero` when it exists.
+  - `card`: the plate PNG 2560 × 1440 as is, focus `"84% 30%"` (shows x 49–91 % of the plate, 57–89 % on the phone);
+    face x 60–86 % · y 10–40 %, below the chip/arrow (y 5–8 %) and above the gradient (from y 36 %, solid under 70 %,
+    title from y 64 %). A post under 12 minutes does not enter the rail and skips it.
+  Full set (plate, cover, hero, card, body) and diagrams: `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
 - Slider places: the three invitations (Glitch → guide/tool → diagnostic) are reserved and never cut by pins; pins,
   then recent candidates, fill the rest; on screen posts come first, invitations after.
 - Author circle: the author's uploaded WordPress profile photo (`get_avatar_url`, One User Avatar;
@@ -68,7 +81,7 @@ logo needs Growth Forms renderer 1.3.0 released in Greenhouse; until then the la
   next event until it ends; podcast wave = format `podcast`. One badge per card from a real rule
   (`RAIL_BADGES`); seats/wait/top/trend only through the `eo_home_rail_signals` filter (no reader yet). Client logo:
   `client <post> anam`; «Actualizado»: `reviewed <post> <AAAA-MM-DD>` (the editor's review, never post_modified).
-  Photo card crop: portrait 440×600 / 304×540 at `pos` — a cover with baked-in text (Manzanitas) gets its own card
+  Photo card crop: portrait 440×600 (tablet 361×492, phone 304×540) at `pos` — a cover with baked-in text (Manzanitas) gets its own card
   image and focal point with `card <post> --image plate.png --alt … --focus "84% 30%"` (`_eo_card_image`,
   `_eo_card_focus`); the featured image stays the OG image. Try it first with `preview/serve.cjs --rail <cards.json>`.
   The hover writes CSS vars on `style`; `dc-runtime.js` keeps them (it rewrites a rendered `style` only when its

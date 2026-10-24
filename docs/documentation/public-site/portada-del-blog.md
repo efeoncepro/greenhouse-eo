@@ -1,7 +1,7 @@
 # Portada del blog — Marketing con Manzanitas en efeoncepro.com/blog/
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-10-24 por Claude
 > **Ultima actualizacion:** 2026-10-24 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) ·
@@ -67,6 +67,25 @@ Hoy el slider muestra dos entradas recientes, el último Flash de Glitch, la gu�
 
 > Detalle técnico: [runtime V1 §3](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) y el manual
 > [por CLI](../../manual-de-uso/public-site/operar-portada-blog-por-cli.md).
+
+## Qué imagen usa cada parte
+
+Un artículo nuevo de Marketing con Manzanitas aparece solo en el slider y, si dura 12 minutos o más, en «Para leer
+con calma». Su portada lleva texto encima, así que no sirve para todo: cada lugar usa la imagen que le corresponde.
+
+| Lugar | Qué imagen usa |
+|---|---|
+| Slider | Su **imagen del slider**: una versión ancha de la foto, sin texto, porque el slider pone su propio título. Sin ella usa la portada con un velo, y el título del slider choca con el texto de la portada |
+| Miniatura «Siguiente» del slider | La imagen del slider si existe; si no, la portada |
+| Tarjeta de «Para leer con calma» | Su **imagen de la tarjeta**: la foto sin texto, recortada hacia la cara. Sin ella usa la portada, y el recorte corta el texto y deja fuera la cara |
+| Al compartir el enlace (LinkedIn, Facebook, WhatsApp, X y otras) y en Google | La **portada** completa; en WhatsApp a veces sólo su cuadrado central |
+| «Te puede interesar», al pie de cada artículo | La **portada**, en cuadrado |
+| Cabecera del artículo, páginas de archivo del blog (temas, etiquetas, autores y búsqueda), temas de la órbita y tarjetas del menú del sitio | Ninguna imagen del artículo (el menú usa fotos propias) |
+
+Por eso cada artículo nuevo lleva tres imágenes: la foto sin texto, la portada y la imagen del slider.
+
+> Detalle técnico: [inventario de imágenes por artículo](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md) y
+> [runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
 
 ## La foto del autor
 

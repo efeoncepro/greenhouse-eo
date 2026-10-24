@@ -1,7 +1,7 @@
 # Operar la portada del blog por CLI
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-24 por Claude (sesión «Portada del blog v3»)
 > **Ultima actualizacion:** 2026-10-24 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) ·
@@ -85,6 +85,29 @@ Formatos: `articulo`, `caso`, `guia`, `grabacion`, `novedad`, `glitch-edicion`, 
 Una entrada sin imagen propia del slider usa su imagen destacada con un **velo de lectura** a la izquierda. Si el arte
 fue hecho para el slider, cárgalo con `hero --image` y el velo desaparece.
 
+**Un artículo nuevo entra solo al slider y al riel.** El slider llena sus lugares de entradas con las más nuevas que
+tienen imagen y no son Glitch ni Novedad; el riel toma las cuatro lecturas más nuevas de 12 minutos o más (o pódcast)
+que no son Glitch ni Novedades. Por eso, al publicar un artículo de Marketing con Manzanitas, su imagen del slider y la
+de su tarjeta **son obligatorias**: sin ellas, el título del slider y el texto de la tarjeta caen encima del texto de
+la portada.
+
+| Imagen | Archivo | Comando | Márgenes (lo importante va adentro) |
+|---|---|---|---|
+| Imagen del slider (`hero`) | WebP 2:1, 2400 × 1200, recortada del plate, **sin texto** (el slider pone su título) | `hero <post> --light "…" --bold "…" --image <archivo.webp> --alt "…"` | se ve en todos los anchos **x 42–96 % · y 7–93 %**; cara en **x 68–92 % · y 10–64 %**; mitad izquierda oscura y calma |
+| Imagen de la tarjeta | el plate tal cual (PNG 16:9, 2560 × 1440), sin texto | `card <post> --image <plate.png> --alt "…" --focus "84% 30%"` | con ese foco se ve x 49–91 % del plate (x 57–89 % en el teléfono); cara en **x 60–86 % · y 10–40 %**; mitad de abajo pareja y oscura |
+
+Cómo se muestra la imagen del slider: en escritorio (1440 y 1920 × 900) cubre la diapositiva anclada a la derecha
+(`object-position: 100% 50%`), con un 10 % de margen por el parallax; el título la tapa en x 29–65 % · y 31–61 % (en
+1920, x 19–54 %), «Siguiente» en x 75–92 % · y 68–77 % y la tira de diapositivas desde y 86 %. En el teléfono (390) se
+ve sólo su parte derecha (x 42–100 %) en una franja de 390 × 300, con el título debajo. La miniatura «Siguiente»
+(96 × 64) usa la imagen del slider cuando existe.
+
+Un artículo de menos de 12 minutos no entra al riel y se ahorra la tarjeta; uno de Glitch o una Novedad no entra solo
+al slider. La portada del artículo (destacada y Open Graph) no se sube con este comando: va con
+`scripts/public-website/blog-post-cover-apply.php`
+([producir la portada](../creative/producir-portada-de-articulo-del-blog.md)). Medidas completas, diagramas de zonas
+seguras y QA en vivo: [inventario de imágenes por artículo](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+
 Orden de los cinco lugares: las tres invitaciones (Glitch, guía o herramienta, diagnóstico) tienen lugar reservado y
 una fijada nunca las desplaza; los lugares restantes son para las fijadas vigentes y, si sobran, para las entradas
 recientes con imagen. En pantalla van primero las entradas y después las invitaciones. `slider` muestra el motivo de
@@ -99,7 +122,7 @@ comprobarla después: `purge --apply` y `verify --browser`, o mira el slider en 
 
 ### 2c. Tarjetas de «Para leer con calma»
 
-Cada tarjeta se arma sola con la entrada (imagen, tema, autor, fecha, minutos y bajada). Dos datos los decides tú:
+Cada tarjeta se arma sola con la entrada (imagen, tema, autor, fecha, minutos y bajada). Tres datos los decides tú:
 
 ```bash
 pnpm public-website:blog-home client <id|slug> anam          # el caso muestra el logo del cliente (off lo quita)
@@ -107,9 +130,12 @@ pnpm public-website:blog-home reviewed <id|slug> 2026-10-20  # «Actualizado» p
 pnpm public-website:blog-home card <id|slug> --image plate.png --alt "texto" --focus "84% 30%"  # imagen y punto focal de la tarjeta
 ```
 
-- La tarjeta de foto es vertical (440 × 600; 304 × 540 en móvil) y recorta la destacada horizontal al centro. Si la
-  destacada trae texto incrustado (las portadas de Manzanitas), dale a la tarjeta su propia imagen sin texto con
-  `card --image` (o `--attachment <id>`) y mueve el recorte con `--focus "x% y%"` hacia el sujeto. La destacada no se
+- La tarjeta de foto es vertical (440 × 600 en escritorio, 361 × 492 en tablet y 304 × 540 en el teléfono) y
+  recorta la destacada horizontal al centro. Encima pinta la etiqueta de formato y la flecha (arriba, y 5–8 %), un
+  degradado desde y 36 % (sólido bajo y 70 %) y el título desde y 64 %. Si la destacada trae texto incrustado (las
+  portadas de Manzanitas, o sea todo artículo nuevo), dale a la tarjeta su propia imagen sin texto con `card --image`
+  (el plate; o `--attachment <id>`) y mueve el recorte con `--focus "x% y%"` hacia el sujeto: con la cara del plate en
+  torno al 71 %, `"84% 30%"`; si cae en otro lugar, recalcula. La destacada no se
   toca: sigue siendo la imagen OG (el comando falla si cambiara). `--focus off` vuelve al centro; `--clear` quita las dos.
 - Para probar antes de escribir: `node scripts/public-website/blog-v3/preview/serve.cjs --rail <cards.json>` pinta el
   riel con las tarjetas del archivo (contrato de `EO_Home_Adapter::rail()`).

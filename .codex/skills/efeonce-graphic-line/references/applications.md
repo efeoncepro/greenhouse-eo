@@ -697,8 +697,21 @@ diseño se revisó con esta skill el 2026-10-24:
 - **Tipografía:** sigue la del artículo de Ohio (DM Sans e Inter) hasta que se migre la plantilla completa del
   artículo a Bricolage y Poppins (decisión del operador, 2026-10-24).
 
-La portada de cada artículo se rige por la variante centrada de Manzanitas (`manzanitas.md` §4.5). Cuántas imágenes
-lleva un artículo y con qué medidas: `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
+**Imágenes de un artículo nuevo (medidas en vivo el 2026-10-24).** Un artículo nuevo entra solo al slider de
+`/blog/` y, si se lee en 12 minutos o más, al rail «Para leer con calma». Lleva **tres archivos y tres subidas**:
+
+- **Plate** (PNG 16:9, 2560 × 1440, sin texto): cara en x 68–75 % · y 10–40 %, el 64 % izquierdo oscuro, la mitad de
+  abajo pareja y el 7 % de arriba y de abajo libre. Se sube como foto de la tarjeta del rail con el foco «84% 30%»
+  (`blog-home card`, en producción desde el 2026-10-24).
+- **Portada** (JPEG 2400 × 1260, menos de 300 KB): la variante centrada de Manzanitas (`manzanitas.md` §4.5), con el
+  texto y la cara dentro del cuadrado central x 285–915, 15 px libres arriba y abajo y sin firma. Es la destacada y la
+  imagen Open Graph, y también el cuadrado de «Te puede interesar» al pie de cada artículo.
+- **Imagen del slider** (WebP 2:1, 2400 × 1200, recortada del plate, sin texto): se sube como `hero`; el slider pone
+  su título encima.
+
+La cabecera del artículo no muestra la destacada, y el archivo v3 del blog es una lista de texto. Las imágenes del
+cuerpo (de 0 a 2) sólo van si explican algo: las infografías en SVG, legibles a 390 px. Márgenes por superficie y
+diagramas: [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 Contrato: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` · FAQ: `docs/public-site/BLOG_FAQ_BLOCK_ANALYSIS_V1.md`.
 
 ## B. Presentaciones e informes
