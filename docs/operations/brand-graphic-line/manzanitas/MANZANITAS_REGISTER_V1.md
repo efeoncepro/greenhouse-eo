@@ -324,6 +324,27 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
   texto de cierre que **cambia con el contexto** y cabe en su extensión normalizada (decisión 5, 2026-09-29; §8.1).
 - **Blog y banner:** la foto se genera en **16:9** y se lleva a **1,9:1 (1200 × 630)**. La voz va en el lado oscuro de
   la foto y la firma **puede ir abajo a la izquierda**, cerrando la columna del texto. Sin eslogan.
+- **Portada de artículo del blog: variante centrada** (operador, 2026-10-24). La imagen destacada de un artículo
+  también se ve recortada en cuadrado: la vista previa de WhatsApp y las tarjetas del blog toman el centro de la
+  imagen. El banner de blog pone cabecera, voz y firma en x 72 y ese recorte perdía la manzana, casi toda la voz y la
+  firma. Por eso, en la portada de un artículo:
+  - **El texto vive en el cuadrado central** (x 285–915 de 1200): cabecera, voz y respuesta en **x 312**, la columna
+    de texto entre **x 312 y x 782** (470 px de ancho, 27 px de aire al borde izquierdo del cuadrado) y entre
+    **y 50 y y 341**. Medidas de las portadas publicadas: cabecera 312, 50 → 492, 131; voz 312, 170 → 782, 341;
+    respuesta 312, 250 → 782, 341, sin desborde.
+  - **El sujeto va en el tercio derecho**, fuera de la columna de texto. Pídelo un poco más a la derecha de lo que lo
+    quieres: los sujetos de las dos primeras salieron unos 15 puntos más al centro de lo pedido.
+  - **Sin bajada y sin firma.** La pregunta y su respuesta bastan. La portada **no lleva el logo de Efeonce**: la
+    cabecera de Marketing con Manzanitas ya identifica la pieza, el artículo está en el sitio de Efeonce y la prenda
+    del sujeto ya lleva la marca bordada. Este caso cumple la regla de La órbita de no repetir el logo cuando la marca
+    ya está en la imagen. El banner que se comparte fuera del sitio conserva su firma.
+  - **La foto 16:9 se recorta a 1,9:1 anclada arriba**, para que la cabecera no choque con el borde.
+  - **Se entrega al doble** (2400 × 1260), en JPEG de calidad 88 con croma 4:4:4. Se revisan juntos la portada
+    completa y su recorte cuadrado, y se aprueban los dos.
+  - **Estado:** variante aprobada para el blog y **pendiente en AXIS**. No es todavía una pieza de
+    `manzanitasRegister`, y la plantilla `blog-banner` del compositor no la conoce. Hoy se compone con la maqueta
+    `ai-generations/2026-10-24_portadas-blog/composicion/componer-centrada.cjs` (con `FIRMA=0`), que copia la
+    plantilla aprobada y cambia sólo las posiciones.
 
 ### 5.7 YouTube y pódcast
 
@@ -355,6 +376,7 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
 | Contraportada (cierre del carrusel) | sin manzana | **no** | bloque logo 400 px + eslogan debajo, termina en y 1253 | **sí** |
 | Story | con manzana | **no** | centrada sobre la mesa, en la zona segura (87 %) | sólo en la story de cierre, debajo del logo |
 | Blog y banner | con manzana | no aplica | logo, puede ir abajo a la izquierda | no |
+| Portada de artículo del blog (variante centrada, §5.6) | con manzana, en x 312 | no aplica | **no lleva** | no |
 | Miniatura de YouTube | con manzana | no aplica | logo abajo a la izquierda | no |
 | Cierre de YouTube | no lleva | no aplica | bloque logo 260 px + eslogan debajo | **sí** |
 | Portada de pódcast | cabecera del programa a 420 px | no aplica | — | no |
@@ -405,7 +427,8 @@ en cualquier otra lámina la mano va en reposo.
 - **Una sola altura de firma en todo el carrusel:** el logo de Efeonce arriba en **y 1202** (de 1350), **216 × 51 px**,
   a **97 px** del borde inferior. Vale en Pizarra, Escena y Lente; la Lente del sistema firma ahí.
 - En la **Escena**, la firma queda **dentro de la mesa** (el lecho nativo, §5.3).
-- El logo va centrado abajo, como manda La órbita; en blog y banner puede ir abajo a la izquierda (§5.6). La
+- El logo va centrado abajo, como manda La órbita; en blog y banner puede ir abajo a la izquierda, y la portada de
+  artículo del blog no lo lleva (§5.6). La
   miniatura de YouTube lleva el logo abajo a la izquierda (§5.7).
 
 ### 7.2 El eslogan sólo cierra
@@ -922,6 +945,8 @@ Revisa cada pieza sobre los **píxeles finales**, no sobre la paleta teórica.
 
 - [ ] Story y blog: una sola pieza, Escena o Pizarra; la story, dentro de la zona segura del 87 %.
 - [ ] Blog y banner en 1200 × 630, generados en 16:9; voz en el lado oscuro.
+- [ ] Portada de artículo: texto dentro de x 312–782, sujeto en el tercio derecho, sin firma; revisa el recorte
+      cuadrado central (x 285–915) junto a la portada completa.
 - [ ] Miniatura de YouTube con el logo abajo a la izquierda; pódcast con la cabecera a 420 px; ninguno con eslogan.
 - [ ] Revisa la lámina en un teléfono de 390 px antes de entregar.
 

@@ -38,6 +38,21 @@ Opciones de servidor con el estado previo: `_gh_cover_refresh_244765_20261024_09
 y `_gh_cover_refresh_245605_20261024_093925` (destacada `245724`, OG `245730`). Restaurar = volver a poner esos IDs y
 URLs en `_thumbnail_id`, `_yoast_wpseo_opengraph-image` e `-image-id`, reindexar Yoast y purgar caché.
 
+## Sin logo (2026-10-24, tarde)
+
+El operador pidió quitar el logo de Efeonce de las tres portadas. `componer-centrada.cjs` acepta `FIRMA=0`, que borra
+la firma antes del render. Las nuevas portadas están en `final-sin-logo/` (con su `-recorte-movil.png`) y la hoja de
+revisión es `portadas-sin-logo-revision.png`. **Se suben sólo con aprobación.** Las guardas esperan como destacadas
+actuales `252065` (inbound, post 244765), `252066` (paid media, 245605) y `252069` (topic clusters, 245154); el respaldo
+de topic clusters es `_gh_cover_refresh_245154_20261024_101153`. La variante quedó documentada en
+`docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md` §5.6 y en la skill `efeonce-graphic-line`
+(`references/manzanitas.md` §4.5).
+
+```bash
+ESCALA=2 FIRMA=0 node composicion/componer-centrada.cjs plates/MCB-INB1-169.png revenue-hubspot \
+  "¿Qué es el inbound marketing en 2026?" "Ayudar" final-sin-logo/portada-inbound.png
+```
+
 ## Pendiente
 
 - **Formalizar la variante centrada en AXIS** (pieza nueva o regla de zona segura del banner de blog) y en la plantilla

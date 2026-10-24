@@ -372,6 +372,10 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   mejor*». Caso `MC5g` (1200×630): abajo a la izquierda, alineada con la columna del texto (margen 72, ancho 25 % del
   lado corto), sobre la madera oscura vacía de la mesa, **19:1**; así cierra la columna de lectura y no compite con el
   sujeto. Sigue valiendo todo lo demás: dentro de la materia del lecho, con aire, nunca sobre el sujeto.
+  **Delta 2026-10-24 — la portada de artículo del blog va sin firma** (operador: el logo en las portadas «no quedó
+  bien»): la cabecera de Manzanitas y la marca bordada en la prenda ya identifican la pieza. El texto va en el cuadrado
+  central (x 312–782), donde sobrevive al recorte de la vista previa. El banner que se comparte fuera del sitio
+  conserva su firma. Norma: `MANZANITAS_REGISTER_V1.md` §5.6.
 - 🔴 **La técnica de aplicación de marca la decide la TELA, no la costumbre del kit** **[operador, 2026-09-21]**:
   «*esa tela se borda no se estampa*». **Softshell y chaquetas técnicas → bordado** (la serigrafía sobre tela
   técnica se agrieta y se despega) · **piqué → bordado** (ya lo era) · **algodón afelpado del hoodie → abierto**,

@@ -223,6 +223,18 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
   extensión (decidido el 2026-09-29; §7).
 - **Blog y banner:** la foto se genera en 16:9 y se lleva a 1,9:1 (1200 × 630). La voz va en el lado oscuro; la firma
   puede ir abajo a la izquierda, cerrando la columna del texto. Sin eslogan.
+- **Portada de artículo del blog: variante centrada** (operador, 2026-10-24; norma §5.6). La destacada también se ve
+  recortada en cuadrado (vista previa de WhatsApp, tarjetas del blog), y ese recorte toma el centro (x 285–915 de
+  1200). Por eso:
+  - cabecera, voz y respuesta en **x 312**, dentro de la columna x 312–782 e y 50–341;
+  - el sujeto en el tercio derecho, pedido un poco más a la derecha porque el modelo lo corre unos 15 puntos al centro;
+  - **sin bajada y sin firma**: la cabecera identifica la pieza y la prenda ya lleva la marca, así que el logo sobra
+    (el banner que sale del sitio sí firma);
+  - la foto 16:9 se recorta a 1,9:1 anclada arriba;
+  - se entrega en 2400 × 1260, JPEG calidad 88 con croma 4:4:4, y se aprueba junto a su recorte cuadrado.
+  **Pendiente en AXIS:** todavía no es una pieza de `manzanitasRegister` ni la conoce la plantilla `blog-banner`. Hoy
+  se compone con la maqueta `ai-generations/2026-10-24_portadas-blog/composicion/componer-centrada.cjs` y `FIRMA=0`.
+  Nunca la presentes como pieza de AXIS ni muevas sus posiciones a mano en otra copia.
 
 ### 4.6 YouTube y pódcast
 
@@ -922,6 +934,9 @@ el acento; §10.1). Los carruseles de ejemplo del Composer y las identidades del
 
 ## 14. Lecciones de esta sesión (no las repitas)
 
+- **Un banner pensado para el ancho completo pierde el texto en el recorte cuadrado** (2026-10-24). Antes de entregar
+  una imagen destacada, mira su recorte central: el banner en x 72 perdía la manzana, la voz y la firma. Y no firmes
+  por costumbre: si la cabecera y la prenda ya dicen la marca, el logo sobra (el operador lo pidió sacar).
 - **La manzana completa y legible.** Un recorte de sólo hoja + tallo se leyó como «orejas de conejo». Puede sangrar un
   borde, pero los dos lóbulos, la hendidura, la hoja y el tallo tienen que leerse.
 - **El acento nunca es superficie.** La contraportada C (acento a sangre) se rechazó por saturación y porque el logo

@@ -2,7 +2,8 @@
  * Maqueta de la variante «banner de blog centrado» (candidata, sin aprobar) para revisar el recorte móvil.
  * Copia el catálogo manzanitas a un directorio temporal, cambia sólo la x de cabecera, voz y firma
  * (72 → 312 px, el 26 % del ancho, dentro del cuadrado central 285–915) y renderiza 1200×630 con Playwright.
- * ESCALA=2 renderiza a 2400×1260 (entrega final).
+ * ESCALA=2 renderiza a 2400×1260 (entrega final). FIRMA=0 compone sin el logo de Efeonce (decisión del operador del
+ * 2026-10-24 para las portadas del blog: la cabecera de Manzanitas identifica la pieza y la marca ya está en la ropa).
  * Uso: node componer-centrada.cjs <plate.png> <linea> <pregunta> <respuesta> <salida.png>
  */
 const fs = require('node:fs'); const path = require('node:path'); const os = require('node:os')
@@ -29,7 +30,8 @@ const X = 312
   fs.writeFileSync(path.join(tmp, 'centrada.html'), html)
   const browser = await chromium.launch(); const scale = Number(process.env.ESCALA || 1); const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: scale })
   await page.goto('file://' + path.join(tmp, 'centrada.html')); await page.waitForTimeout(500)
-  const boxes = await page.evaluate(() => Object.fromEntries(['.mcm-masthead', '.mcm-voice', '.mcm-signature', '.mcm-a'].map(s => { const r = document.querySelector(s).getBoundingClientRect(); return [s, [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)]] })))
+  if (process.env.FIRMA === '0') await page.evaluate(() => document.querySelector('.mcm-signature')?.remove())
+  const boxes = await page.evaluate(() => Object.fromEntries(['.mcm-masthead', '.mcm-voice', '.mcm-signature', '.mcm-a'].map(s => { const e = document.querySelector(s); if (!e) return [s, null]; const r = e.getBoundingClientRect(); return [s, [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)]] })))
   const overflow = await page.evaluate(() => { const a = document.querySelector('.mcm-a [data-slot-field="answer"]'); return a.scrollWidth - a.clientWidth })
   await page.screenshot({ path: out }); await browser.close()
   const crop = out.replace(/\.png$/, '-recorte-movil.png')

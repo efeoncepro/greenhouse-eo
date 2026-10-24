@@ -346,3 +346,12 @@ no compite con el sujeto. Caso: portada de blog de Marketing con Manzanitas (`MC
 ancho 25 % del lado corto (157 px), sobre la madera oscura vacía de la mesa donde trabaja el sujeto, **19:1**. No
 cambia el resto de §5: dentro de la materia calma del lecho, con aire sobre su borde, nunca sobre el sujeto, contraste
 ≥ 4,5:1 medido bajo la caja real. En piezas verticales y cuadradas la firma sigue centrada.
+
+## Delta 2026-10-24 — la portada de artículo del blog va sin firma
+
+El operador pidió quitar el logo de Efeonce de las portadas de artículo de Marketing con Manzanitas («no quedó bien»).
+En la **imagen destacada de un artículo** no hay firma: la cabecera de Manzanitas identifica la pieza, la prenda del
+sujeto ya lleva la marca bordada y el artículo vive en el sitio de Efeonce. Así se cumple la regla de no repetir el logo
+cuando la marca ya está en la imagen. El banner que se comparte fuera del sitio conserva la firma del delta anterior.
+Posiciones y entrega de la variante centrada: `docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md`
+§5.6.
