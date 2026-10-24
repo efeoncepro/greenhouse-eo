@@ -138,6 +138,21 @@ firma oficial por la vía aprobada y el CCO de registro que esa política define
 operador lo necesita para corregir o preparar ese envío), comprobados antes; Enviados y actividad CRM después
 cuando haya acceso. La política no se extiende a otro remitente ni concede autorización de envío.
 
+## Persistencia del borrador HTML de Julio
+
+El cuerpo completo visible en Outlook no acredita que se haya guardado. Antes del envío autorizado, leer
+independientemente el borrador concreto: Para, CC/CCO, cuerpo completo, cada enlace individual de los
+brochures pedidos y una sola firma gráfica oficial con sus recursos. Si el editor muestra el cuerpo pero
+la lectura sólo devuelve la firma, corregir mediante la entrada HTML nativa autorizada del editor y volver
+a leer; no dar por guardado el mensaje por el DOM visible ni por simular una pulsación. No fija un selector
+o una vía de automatización universal: manda el estado persistido del mensaje real.
+
+Después del envío, localizar la copia nueva de Enviados —su ID puede diferir del borrador— y comprobar ese
+mismo contenido y destinatarios. Leer aparte la actividad EMAIL `SENT` y sus asociaciones en CRM. Si el DM o
+InMail ya consta enviado, esperar o resolver el correo no autoriza repetir LinkedIn. Ver aplicaciones de
+[Lucía](../../../../docs/commercial/prospecting-agent/runs/2026-10-24-flesan-lucia.md) y
+[Yvette](../../../../docs/commercial/prospecting-agent/runs/2026-10-24-sigelec-yvette.md).
+
 ## Fuentes, vigencia y límites
 
 Consulta de documentos públicos: **2026-10-11**. Método Efeonce: gates/owners de este bundle y política Outlook.

@@ -268,3 +268,18 @@ su propia autorización; esta decisión sólo configura clasificación y selecci
 [Kibernum: intake focalizado y seis membresías del Contact verificadas](../commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md).
 Se reutilizó Company y se confirmaron Primary, industria/país y fecha de investigación en ambos objetos.
 No se cambiaron schema, filtros, cohortes históricas ni autoridad; encaje CRM separado de solicitud Growth.
+
+### Aplicación documental 24/10/2026 — calidad técnica y atribución
+
+El [caso Yvette / Sigelec](../commercial/prospecting-agent/runs/2026-10-24-sigelec-yvette.md) aplica la excepción
+individual existente después de una comprobación técnica favorable. En las aplicaciones anteriores,
+«calidad pendiente» describía el dato aún no comprobado; no obliga a borrar una comprobación posterior.
+Conservar **atribución inferida** y el resultado técnico efectivamente obtenido como hechos separados,
+con fuente, fecha y proveedor. Un patrón más `validated` no confirma la identidad del titular.
+
+Julio autorizó expresamente Contact y envío a la candidata informada después del resultado técnico;
+la aprobación previa de créditos o validación no cubría esas acciones por sí sola. La excepción no se
+extiende a otra dirección, persona, reintento, secuencia o admisión general. El
+[caso Lucía / Flesan](../commercial/prospecting-agent/runs/2026-10-24-flesan-lucia.md) conserva el carril de
+dirección laboral aportada por proveedor y contrastada con identidad/empleo. No se cambia schema, filtros,
+cohortes, autoridad de CRM/envío ni el significado de `individual_email`.

@@ -291,3 +291,17 @@ permisos por persona/canal, dos originales de brochure cuando se pidieron, persi
 EMAIL/LinkedIn/inscripción independientes y límites OAuth por comando. Se concilia el pendiente antiguo del
 brochure creativo con la aprobación íntegra del 17/10. No cambia admisión, ICP, fuente de verdad, schema,
 APIs, scheduler, política de envío o autoridad de futuras acciones. No se introduce una decisión arquitectónica nueva.
+
+## Aplicación del método: Lucía y Yvette — 24/10/2026
+
+El operador pidió consolidar [ambos casos](../commercial/prospecting-agent/runs/2026-10-24-lucia-yvette-prospeccion.md)
+con subagentes, docs/skills y commit. Se precisa el método existente: resultados asíncronos y costos reales
+distintos de su aceptación; entradas duplicadas del proveedor distintas de personas/contactos; candidata
+inferida por patrón distinta de atribución; verificación técnica con su proveedor real distinta de identidad.
+La excepción individual de Yvette se autorizó después de comunicar esas dimensiones y no se generaliza.
+
+El [manual](../manual-de-uso/comercial/operar-prospeccion-b2b.md#inferir-una-candidata-y-comprobarla-sin-atribuirla-por-el-patrón)
+y los módulos progresivos conservan el descarte de la candidata inválida, la validación única de la nueva,
+los permisos por operación y los readbacks de los dos canales. Brochures originales, firma/CCO, privacidad
+de recibos y ausencia de secuencias nuevas se mantienen. Es documentación explicativa y evidencia de una
+aplicación, sin nueva decisión arquitectónica, autonomía, schema, endpoint ni scheduler.

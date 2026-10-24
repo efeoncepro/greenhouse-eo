@@ -48,6 +48,9 @@ externos y el comprador de sus propias declaraciones. Resuelve contradicciones s
 - **No crees un Contact/Lead de prospección sin correo corporativo individual verificado y atribuible a esa
   persona.** Si falta, conserva la señal en investigación o nota de Company y busca personas adyacentes.
   No inventes direcciones, uses un buzón general como correo individual ni rellenes una cuota con desconocidos.
+  Una candidata por patrón se mantiene en investigación: calidad técnica y atribución se evalúan por separado;
+  aplicar sólo la [excepción individual informada](references/contact-quality-and-enrichment.md#patrón-solicitado-y-excepción-individual-explícita)
+  expresamente autorizada, sin convertirla en permiso general ni alterar el gate.
 - **La industria y el país se registran en la empresa, en cada alta.** Los segmentos agrupan por atributos
   comunes y los contactos heredan la industria de su empresa principal: una empresa sin industria deja fuera a
   todos sus contactos. No delimites un segmento con una lista de IDs ni con un campo llenado a mano por persona.

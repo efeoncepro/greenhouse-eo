@@ -40,6 +40,20 @@ individual verificado no hay nueva alta Contact/Lead; señal del objetivo perman
 Company autorizada. La cobertura parcial se entrega con brechas, sin rellenar datos ni gasto ilimitado.
 El historial sin correo permanece histórico, sin borrado o migración automática.
 
+### Inferencia, comprobación técnica y atribución
+
+Cuando el operador solicita inferir una dirección, ejemplos públicos de la empresa pueden sustentar una
+candidata; no confirman su titular. La comprobación técnica de esa casilla es una operación separada, con
+su alcance/costo aprobados, estado normalizado y proveedor real. Una dirección extrapolada con veredicto
+inválido se descarta, sin usar el envío como prueba ni enumerar alternativas automáticamente.
+
+Si la candidata pasa la comprobación técnica pero sigue sin atribución directa a la persona, la
+[excepción informada individual](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#aplicación-documental-24102026--calidad-técnica-y-atribución)
+conserva ambas dimensiones y requiere autorización de las acciones concretas. No se registra calidad
+técnica pendiente cuando ya se obtuvo un resultado favorable, ni se convierte ese resultado en identidad
+confirmada. [Lucía y Yvette](../../commercial/prospecting-agent/runs/2026-10-24-lucia-yvette-prospeccion.md)
+ilustran el carril normal y la excepción de atribución, con registros y envíos verificados por separado.
+
 ## ABM y ABS
 
 El [módulo compartido](../../../.codex/skills/efeonce-b2b-prospecting/references/abm-and-abs.md) conecta ABM

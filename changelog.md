@@ -10,6 +10,10 @@
   persistencia HTML, efectos de Documents y readbacks separados. Collateral creativo aplica la aprobación íntegra
   del 17/10. Cinco escenarios sintéticos añadidos; sin nuevas comunicaciones ni cambios runtime.
   [Auditoría y límites](docs/audits/commercial/2026-10-24-chat-prospeccion-docs-skills.md).
+- [Lucía y Yvette](docs/commercial/prospecting-agent/runs/2026-10-24-lucia-yvette-prospeccion.md): expedientes,
+  manuales y dos skills espejo distinguen patrón, validación técnica y atribución inferida con excepción
+  individual. Resultado inválido descartado, costos/permisos separados y persistencia del correo comprobada;
+  tres escenarios sintéticos adicionales. [Controles](docs/audits/commercial/2026-10-24-lucia-yvette-docs-skills.md).
 
 ## 2026-10-24 — Portada del blog v3: revisión en vivo y piezas listas
 

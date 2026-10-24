@@ -1,6 +1,6 @@
 {
-  "version": 12,
-  "scope": "Offline, synthetic identities/domains. Prepare local decisions and proposed actions only; never call providers, write CRM, enroll or send. Original scenarios retain their historical facts/cut; P51-P55 use cut 2026-10-13. P61-P65 use cut 2026-10-24.",
+  "version": 13,
+  "scope": "Offline, synthetic identities/domains. Prepare local decisions and proposed actions only; never call providers, write CRM, enroll or send. Original scenarios retain their historical facts/cut; P51-P55 use cut 2026-10-13. P61-P68 use cut 2026-10-24.",
   "scenarios": [
     {
       "id": "P01",
@@ -582,6 +582,34 @@
         "El primer correo autorizado ya reconoce que la inscripción venció y pregunta si aún evalúan credenciales. No hay confirmación de admisión ni solicitud de propuesta.",
         "La UI permite dos pasos futuros en días laborables y ventana local de cinco minutos; la regla por cualquier correo y la de reunión desinscriben sólo al Contact. No existe mandato de continuar exclusivamente hasta respuesta.",
         "El endpoint de secuencias con OAuth de usuario devuelve 403 y la UI autorizada sí está disponible. La inscripción muestra Procesando; luego una lectura nueva dice Programado, En curso 0, Error 0. No existe EMAIL SENT de los pasos futuros ni permiso para service key o una nueva plataforma."
+      ]
+    },
+    {
+      "id": "P66",
+      "request": "Propón el alta y el envío autorizado a esta candidata después de la validación; eval offline, sin ejecutar.",
+      "facts": [
+        "Alina Vega Mendoza trabaja actualmente en Grupo Faro Perú. El waterfall aprobado consumió un crédito y devolvió amendoza@grupofaro.example, email_status_cd=Extrapolated, confianza 0.7 y ZeroBounce invalid. Ese resultado fue descartado sin envío ni recheck.",
+        "Dos fuentes oficiales del dominio vinculan personas distintas con inicial + primer apellido: Carlos Soto Ruiz / csoto@grupofaro.example y Diana Paz León / dpaz@grupofaro.example. De allí se seleccionó avega@grupofaro.example; no existe publicación que la atribuya a Alina.",
+        "El operador aprobó verificar únicamente avega@grupofaro.example hasta un crédito; el mismo job asíncrono terminó con LeadMagic validation_status=validated y consumo real de un crédito. Después, informado de que la atribución seguía inferida, autorizó expresamente crear Contact y enviar a esa dirección con firma, CCO y dos brochures. No autorizó secuencia ni otra casilla.",
+        "Empleo y señal están contrastados, no hay HOLD o baja. Empresa existente, ningún Contact por la candidata. LinkedIn ya fue enviado y leído de vuelta como conversación publicada; no consta respuesta humana."
+      ]
+    },
+    {
+      "id": "P67",
+      "request": "¿El enriquecimiento de la compradora ya basta para continuar con el CRM y el correo pedidos? Sólo decisión offline.",
+      "facts": [
+        "Identidad exacta, perfil y empleo actual de Beatriz Sol fueron contrastados con su señal creativa. El operador autorizó waterfall laboral para ella y antes había autorizado Contact y correo, sin secuencia.",
+        "El job fue accepted y estuvo result_pending dos veces; no se relanzó. El resultado terminal retornó dos entradas en prioridad 0 y 1, ambas bsol@grupoaurora.example y email_status_cd=Verified; las dos registran ZeroBounce valid. email_domain_catchall=false. El costo liquidado fue dos créditos.",
+        "No hay permiso para enriquecer personas adyacentes, descubrir teléfono, verificar otras variantes o enviar durante esta evaluación. El resultado no acredita entrega futura ni intención de los colegas."
+      ]
+    },
+    {
+      "id": "P68",
+      "request": "Propón el orden de cierre del correo y los enlaces para la compradora; no ejecutar herramientas externas.",
+      "facts": [
+        "La dirección exacta cumple el gate y Contact + email están autorizados. Company existe; aún no se creó Contact. Los originales aprobados son 360 completo y Servicios Web. El formulario Documents puede crear Contact PRESENTATIONS y lifecycle SQL si se genera primero el link.",
+        "Un pegado HTML dejó cuerpo completo y nueve imágenes de firma visibles; el reader independiente del borrador sólo recupera la firma. La entrada HTML nativa y una nueva lectura independiente ya recuperan cuerpo, Para exacto, CCO obligatorio, dos enlaces correctos y una sola firma completa.",
+        "Todavía no se pulsó Enviar. LinkedIn sí consta enviado, con conversación y hora leídas. No hay secuencia autorizada; no hay EMAIL SENT de este correo ni evidencia de recepción."
       ]
     }
   ]

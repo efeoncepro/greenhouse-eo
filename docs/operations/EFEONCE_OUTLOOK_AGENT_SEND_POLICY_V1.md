@@ -185,6 +185,12 @@ Una sugerencia de Viva Insights o un botón deshabilitado no prueba programació
 resultado real antes de otra acción. No repetir el envío por un borrador obsoleto ni sustituir la firma gráfica.
 El InMail se comprueba en su conversación; la actividad EMAIL no cierra por sí sola ese canal.
 
+Los casos [Lucía / Flesan](../commercial/prospecting-agent/runs/2026-10-24-flesan-lucia.md) y
+[Yvette / Sigelec](../commercial/prospecting-agent/runs/2026-10-24-sigelec-yvette.md) añaden evidencia de la misma
+regla: corregir el cuerpo visible que no persistió, releer el borrador completo y después el ID nuevo de
+Enviados, con ambos enlaces de Documents, una firma gráfica y Para/CCO exactos. En Yvette, la excepción
+de atribución de correo autorizó ese destinatario y envío; no modifica esta política ni prueba entrega.
+
 ## Evidencia, alternativas y límites
 
 El 2026-10-08 se verificó en Enviados el correo a Dianesty sobre diseñador senior: salió desde Outlook con los dos enlaces, pero con cierre simple y sin BCC. El operador pidió esta corrección permanente. El contrato aplica a futuros envíos; no reenvía ni registra retroactivamente ese correo sin mandato específico.

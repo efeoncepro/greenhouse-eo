@@ -24,6 +24,12 @@ secuencia desde el seguimiento recurrente. Revisiones internas de Mariana
 de nuevas acciones; el envío histórico no valida la casilla. Sin nuevas comunicaciones, créditos o mutaciones
 CRM en este cierre. Docs, cuatro skills espejo y escenarios conciliados; [auditoría](docs/audits/commercial/2026-10-24-chat-prospeccion-docs-skills.md).
 
+[Lucía/Flesan y Yvette/Sigelec](docs/commercial/prospecting-agent/runs/2026-10-24-lucia-yvette-prospeccion.md)
+añaden dos casos con Contact/Primary/segmentos, Enviados, EMAIL `SENT` e InMail comprobados por separado.
+Yvette: primer resultado inválido descartado; patrón inicial + primer apellido y LeadMagic `validated` para
+otra candidata; atribución aún inferida, alta/envío por excepción expresa. Sin secuencias nuevas. Docs y dos
+skills espejo actualizadas, tres escenarios sintéticos; [controles y límites](docs/audits/commercial/2026-10-24-lucia-yvette-docs-skills.md).
+
 ## 2026-10-24 — Portada del blog v3 en producción; operable por agentes
 
 **`/blog/` (18456) sirve la portada v3 desde el 2026-10-24 08:13Z** con datos reales, menú canónico (paquete del tema

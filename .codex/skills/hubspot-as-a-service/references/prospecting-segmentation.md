@@ -67,12 +67,14 @@ Use the shared [buying-group method](../../efeonce-b2b-prospecting/references/bu
    does not prove reporting lines, personal relationships or willingness to introduce the target.
 2. **Do not create a prospect Contact/Lead without a verified individual corporate email attributable to that
    person.** Keep the exact returned address, source, research date and validation status. Never infer an address
-   from a pattern; do not substitute personal or shared mailboxes. Presence and provider verification do not
+   from a pattern and treat it as attributed; candidate inference and its bounded validation remain research
+   under the linked method. Do not substitute personal or shared mailboxes. Presence and provider verification do not
    guarantee delivery; preserve and resolve conflicting validation before treating the channel as actionable.
    This is the general admission rule. The existing [informed individual exception](../../efeonce-b2b-prospecting/references/contact-quality-and-enrichment.md#patrón-solicitado-y-excepción-individual-explícita)
    requires explicit approval for that person/address and the specific actions after disclosing uncertainty.
-   Keep the address inferred and its quality pending in a source note; `individual_email` describes the
-   person/channel, not verified mailbox quality. [Fundación Luz](../../../../docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md)
+   Keep attribution inferred and retain the actual technical quality in a source note: favorable validation
+   does not establish ownership, and pending attribution does not erase a completed technical check.
+   `individual_email` describes the person/channel, not verified mailbox quality or attributed ownership. [Fundación Luz](../../../../docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md)
    applies Contact + email approval without sequence enrollment or a schema/filter change.
 3. Apollo `emails: []` stops admission of that person, not account research. Keep the target's identity, source
    and need in the research manifest or a Company note; continue seeking adjacent contacts. A shared mailbox
@@ -93,6 +95,11 @@ Use the shared [buying-group method](../../efeonce-b2b-prospecting/references/bu
    creating that person. A first conversation does not require a confirmed champion or the entire committee.
 
 ### Native Documents side effects and parent geography
+
+Create/reuse and independently read back the authorized Contact before generating recipient-specific
+Documents links. The address must have passed normal admission or the informed individual exception; a
+link form is not a bypass. Then create each original brochure link for that exact recipient, preserving
+its attribution and avoiding recipient-view visits by the agent as a self-check.
 
 Generating a recipient link in Documents can create an email-only Contact with a `PRESENTATIONS` origin
 and a lifecycle such as SQL. Dedupe the exact address again before creating, then complete the authorized
@@ -359,3 +366,15 @@ con email verificado, cargo y fit creativo/CRM sustentado. Primary se confirmó 
 Contact en 180/181/182/183/151/156; Company en187, sin tocar filtros, listas históricas o schema.
 Para responder al operador, presentar los valores realmente guardados y los nombres de los segmentos con
 membresía efectiva. Fit no es solicitud HubSpot. Este corte individual no actualiza totales de otros cortes.
+
+
+## Two individual intakes — 24/10/2026
+
+[Lucía / Flesan](../../../../docs/commercial/prospecting-agent/runs/2026-10-24-flesan-lucia.md) used a verified
+work email and separately reconciled current identity/employment. [Yvette / Sigelec](../../../../docs/commercial/prospecting-agent/runs/2026-10-24-sigelec-yvette.md)
+used a new pattern candidate after discarding an invalid enrichment result: LeadMagic validated that
+candidate technically, while the operator explicitly approved Contact + email with ownership still inferred.
+Keep that distinction in the source note, not a fabricated verification property or a new schema. Both
+intakes read back Contact, Primary Company, evidence-backed properties and effective segments; neither
+permission inherited a sequence from another person in the chat. Receipts, real email and recipient links
+remain in the private CRM dossier.

@@ -254,3 +254,38 @@ cuerpos y enlaces individuales viven en CRM/Outlook. Cada persona conserva su pr
 
 La auditoría del 24/10 confirmó las cinco actividades EMAIL `SENT`, incluida Huelquén, antes pendiente de
 readback. No amplía permisos de envío, créditos, inscripciones, cambios de lifecycle o automatizaciones.
+
+## Inferir una candidata y comprobarla sin atribuirla por el patrón
+
+Aplicación fechada: [Lucía / Flesan y Yvette / Sigelec](../../commercial/prospecting-agent/runs/2026-10-24-lucia-yvette-prospeccion.md).
+El recorrido de Yvette se ejecutó a petición expresa del operador; no sustituye la admisión general ni
+autoriza búsquedas de variantes por defecto.
+
+1. Buscar ejemplos exactos publicados por la empresa o fuentes primarias que vinculen persona y dirección.
+   Separar dominios de grupo, marcas y entidades; anotar fuente y fecha. Los buzones generales no prueban
+   una convención de direcciones individuales.
+2. Si el operador pidió inferir, formular una candidata sustentada en esos ejemplos y en el nombre público
+   de la persona. Comprobar qué apellido usa la convención: no tomar automáticamente el último apellido de
+   un resultado enriquecido. Un patrón consistente sigue siendo inferencia, no atribución comprobada.
+3. No reutilizar una candidata anterior con veredicto `invalid` ni revalidarla por haber obtenido otra.
+   En Yvette, el waterfall retornó una dirección extrapolada que se descartó; el patrón sustentó una distinta.
+4. Para la candidata seleccionada, verificar herramienta, campos y costo actuales; obtener aprobación
+   específica antes del gasto. Una validación de una dirección no es un buscador ni autoriza enumerar
+   variantes. Conservar request/record ID en el expediente privado y recuperar el resultado asíncrono.
+5. Registrar el estado normalizado y el proveedor que realmente respondió. `validated` de LeadMagic
+   acredita la comprobación técnica declarada; no se rebautiza como verificación de ZeroBounce ni como
+   confirmación de titular. `not_validated` no significa por sí solo `invalid`.
+6. Si la atribución sigue inferida, informar esa incertidumbre y resolver la autorización individual para
+   alta y envío. En Yvette se aprobaron ambos expresamente después de conocer el resultado; no una secuencia.
+   La nota conserva **atribución inferida / calidad técnica validada**, sin degradar el resultado técnico a
+   pendiente ni presentar la identidad como confirmada. El permiso de validación solo no cubre estas escrituras.
+7. Tras la autorización, deduplicar y crear/reutilizar Contact con Primary Company, campos y nota de evidencia.
+   Generar los enlaces de los originales de Documents después del alta para evitar un Contact automático
+   previo al gate. Leer propiedades y membresías efectivas; lifecycle no prueba calificación.
+8. Comprobar el borrador persistido, ambos enlaces, Para y CCO, cuerpo y firma gráfica; enviar una vez y
+   leer la copia nueva de Enviados y el EMAIL `SENT` asociado por separado. No repetir el InMail ya enviado.
+
+Lucía siguió el carril de dirección laboral aportada y verificada por el proveedor, con identidad/empleo
+contrastados. El waterfall devolvió dos entradas de la misma dirección: se conservaron posiciones y estados,
+sin contarlas como dos personas o dos contactos. En ambos casos, costo real, LinkedIn, email y registro CRM
+conservan recibos separados; `SENT` no acredita entrega, lectura ni respuesta.

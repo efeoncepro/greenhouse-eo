@@ -1,5 +1,14 @@
 # Registro de búsquedas comerciales
 
+## 24/10/2026 — Lucía y Yvette: inferencia, validación y cierre documental
+
+[Dos casos conciliados](runs/2026-10-24-lucia-yvette-prospeccion.md): Lucía/Flesan con resultado laboral
+`Verified` y ZeroBounce `valid`; Yvette/Sigelec con primer resultado inválido descartado, candidata distinta
+por inicial + primer apellido, LeadMagic `validated` y atribución inferida admitida por excepción expresa.
+Contact/Primary/segmentos y EMAIL `SENT` verificados; Enviados y LinkedIn con evidencias separadas. Cuatro
+créditos de proveedor y dos de InMail históricos, sin nuevo gasto, comunicación o secuencia en este cierre.
+[Auditoría documental](../../audits/commercial/2026-10-24-lucia-yvette-docs-skills.md).
+
 ## 24/10/2026 — Cierre documental del chat: cinco prospectos
 
 [Cierre consolidado](runs/2026-10-24-cierre-chat-prospeccion.md): Fundación Luz, Arcor, Huelquén Montessori,
