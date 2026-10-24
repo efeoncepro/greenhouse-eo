@@ -56,8 +56,17 @@ async function page() {
   })
   $('noscript').remove()
   $('head').prepend(`<script>${GUARD}</script>`)
-  $('head').append(`<link rel="stylesheet" href="${manifest.fonts}"><link rel="stylesheet" href="${LOCAL}assets/generated/blog-home.css"><link rel="stylesheet" href="${LOCAL}assets/css/eobh-host.css">`)
-  $('body').append(['assets/js/dc-runtime.js', 'assets/generated/portada.js', 'assets/generated/movil.js', 'assets/js/boot.js'].map(f => `<script defer src="${LOCAL}${f}"></script>`).join(''))
+  // Same assets and media queries as EOBH_Front::enqueue().
+  const media = { portada: '(min-width: 1100px)', tablet: '(min-width: 768px) and (max-width: 1099.98px)', movil: '(max-width: 767.98px)' }
+
+  $('head').append(
+    `<link rel="stylesheet" href="${manifest.fonts}"><link rel="stylesheet" href="${LOCAL}assets/generated/blog-home-base.css">` +
+      Object.entries(media).map(([b, m]) => `<link rel="stylesheet" href="${LOCAL}assets/generated/${b}.css" media="${m}">`).join('') +
+      `<link rel="stylesheet" href="${LOCAL}assets/css/eobh-host.css">`
+  )
+  $('body').append(
+    `<script defer src="${LOCAL}assets/js/dc-runtime.js"></script><script>window.EoBlogV3Src=${JSON.stringify(Object.fromEntries(Object.keys(media).map(b => [b, LOCAL + 'assets/generated/' + b + '.js'])))}</script><script defer src="${LOCAL}assets/js/boot.js"></script>`
+  )
   $('title').text('Blog — preview local TASK-2051')
 
   return $.html()

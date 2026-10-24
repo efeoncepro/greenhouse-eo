@@ -8,7 +8,8 @@ const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
 
-const { renderBoard, FROZEN_NOW, RUNTIME_DIR } = require('./lib/render-node.cjs')
+const { parseDcFile } = require('./lib/dc-template.cjs')
+const { loadRuntime, loadComponent, FROZEN_NOW, RUNTIME_DIR } = require('./lib/render-node.cjs')
 
 const PLUGIN = path.join(RUNTIME_DIR, 'wp-content/plugins/eo-blog-home')
 const SRC = path.join(__dirname, 'source')
@@ -43,7 +44,11 @@ for (const [board, slug, fixture] of CASES) for (const [variant, make] of Object
 
   fs.writeFileSync(file, JSON.stringify(data))
 
-  const js = renderBoard(path.join(SRC, `${board}.bound.dc.html`), { data }).html
+  // The browser side renders the AST the plugin ships (with its build transforms) with the board's canvas logic.
+  const runtime = loadRuntime()
+  const Component = loadComponent(parseDcFile(fs.readFileSync(path.join(SRC, `${board}.bound.dc.html`), 'utf8')).logic, runtime)
+  const ast = JSON.parse(fs.readFileSync(path.join(PLUGIN, 'assets/generated', `${slug}.ast.json`), 'utf8'))
+  const js = runtime.renderToString(Component, ast, { data })
 
   cases.push({ name: `${slug}-${variant}`, board: slug, now: FROZEN_NOW, data, html: js })
   const php = execFileSync('php', [path.join(__dirname, 'fidelity/php-render.php'), PLUGIN, slug, file, String(FROZEN_NOW)], { encoding: 'utf8', maxBuffer: 64 << 20 })

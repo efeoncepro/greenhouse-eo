@@ -94,6 +94,10 @@ async function captureSections(browser, url, board, outDir, { site = false } = {
 
     if (process.env.CAPTURE_DEBUG) console.error('section', board, name)
     await loc.scrollIntoViewIfNeeded()
+    // Lazy images below the hero: wait until the section's images are decoded before the shot.
+    await loc.evaluate(el => Promise.all([...el.querySelectorAll('img')].map(i => { i.loading = 'eager'; 
+
+return i.decode().catch(() => {}) })))
     await loc.screenshot({ path: file, animations: 'disabled', caret: 'hide' })
     results.push({ name, file: path.basename(file) })
   }
