@@ -29,6 +29,9 @@ $meta = array(
 	'page_social_links_visibility' => '0',
 	'page_sidebar_position'        => 'without',
 	'page_add_top_padding'         => '0',
+	'page_add_wrapper'             => '0',
+	'page_breadcrumbs_visibility'  => '0',
+	'page_header_title_visibility' => '0',
 );
 $keys = array_merge( array_keys( $meta ), array( '_elementor_data', '_elementor_page_settings', '_elementor_edit_mode' ) );
 
