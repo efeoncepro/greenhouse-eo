@@ -333,6 +333,10 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
     de texto entre **x 312 y x 782** (470 px de ancho, 27 px de aire al borde izquierdo del cuadrado) y entre
     **y 50 y y 341**. Medidas de las portadas publicadas: cabecera 312, 50 → 492, 131; voz 312, 170 → 782, 341;
     respuesta 312, 250 → 782, 341, sin desborde.
+  - **El rail «Para leer con calma» de la portada del blog** muestra la foto en 4:3 (440 × 330 en escritorio, 300 ×
+    220 en móvil; x 180–1020 del lienzo): contiene el cuadrado central, así que no agrega una restricción. El slider
+    sí choca: pinta su propio título sobre la imagen, así que un post con esta portada lleva como `hero` el plate sin
+    texto.
   - **El sujeto va en el tercio derecho**, fuera de la columna de texto. Pídelo un poco más a la derecha de lo que lo
     quieres: los sujetos de las dos primeras salieron unos 15 puntos más al centro de lo pedido.
   - **Sin bajada y sin firma.** La pregunta y su respuesta bastan. La portada **no lleva el logo de Efeonce**: la

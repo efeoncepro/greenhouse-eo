@@ -52,7 +52,14 @@ El lienzo es de **1200 × 630** (1,9:1) y se entrega al doble. Cada superficie m
 | Vista previa compacta de WhatsApp y cualquier tarjeta cuadrada | **el cuadrado central, x 285–915** | el texto tiene que estar entero dentro del cuadrado |
 | Archivo del blog (temas, etiquetas, autores, búsqueda) | desde el 2026-10-24 (archivo v3, TASK-2055) es una lista de texto y **no muestra la imagen**. El archivo de Ohio anterior la mostraba en tarjetas cuadradas de 304 × 304 | hoy no aplica; el recorte cuadrado se mantiene por WhatsApp y por cualquier tarjeta futura |
 | Tarjeta grande de X | 2:1, así que puede recortar unos 15 px arriba y abajo | nada importante en los 15 px de cada borde. Fuente: el validador de X citado en 2020; no lo medimos |
-| Portada del blog (slider y rail) | no usa esta imagen: usa su propio arte o el `hero` del post | no aplica, salvo que el post tenga `hero` |
+| Rail «Para leer con calma» de `/blog/`, escritorio (1440 y 1920) | tarjeta de 440 × 600 con la foto arriba en **440 × 330 (4:3)**, `object-fit: cover` centrado: en el lienzo de 1200 × 630 se ve **x 180–1020** | el cuadrado central cabe entero adentro, con 132 px de aire a cada lado de la columna de texto |
+| Rail, tablet (768 y 1024) | tarjeta de 361 × 492 con la foto en **361 × 271 (4:3)**: mismo recorte, x 180–1020 | igual que en escritorio |
+| Rail, móvil (390) | tarjeta de 300 × 440 con la foto en **300 × 220 (1,36:1)**: se ve x 170–1030 | igual; el texto se lee más chico, así que la respuesta de una palabra es la que se lee |
+| Slider de `/blog/` | usa el `hero` del post si existe; si no, la destacada a sangre, anclada a la derecha (`object-position: 100% 50%`) y con su propio título encima, a la izquierda | **el título del slider choca con el texto de la portada.** Si un post con esta portada entra al slider, ponle como `hero` el plate sin texto (paso 10) |
+
+Medidas en vivo del 2026-10-24, con el adaptador de la portada (`EO_Home_Adapter::rail()`). En escritorio, el rail
+sólo pone foto en la primera y la cuarta tarjeta; en móvil, sólo en la primera. Las demás son tarjetas de minutos de
+lectura, sin imagen. **La restricción que manda es el cuadrado central:** todos los demás recortes lo contienen.
 
 Las medidas, en píxeles del lienzo de 1200 × 630:
 
@@ -170,7 +177,8 @@ El archivo de metadatos (por ejemplo `tmp/cover-<post>.json`) lleva:
 Antes de escribir en el sitio, lista las sesiones activas y avísales a las que trabajan en el blog: la subida purga
 toda la caché de Kinsta. Espera su confirmación de que no tienen un despliegue o un QA en curso. Pregúntale también a
 la sesión de la portada del blog si el post tiene `hero` propio (`pnpm public-website:blog-home slider`): si lo tiene,
-el slider no tomará la portada nueva hasta cambiar ese `hero`.
+el slider no tomará la portada nueva hasta cambiar ese `hero`. Si no lo tiene y el post entra al slider, ponle como
+`hero` el plate sin texto: el slider pinta su propio título sobre la imagen.
 
 ### Paso 11 · Simula la subida
 
@@ -203,6 +211,7 @@ Anota el adjunto nuevo y el nombre de la opción de respaldo que imprime.
   `primaryImageOfPage` del schema también, y no queda ninguna referencia al archivo anterior.
 - **Archivo:** el sha256 del archivo publicado es igual al local.
 - **Portada del blog:** `pnpm public-website:blog-home verify --browser` en verde.
+- **Rail de la portada:** si el post entra al rail, mira su tarjeta en 1440 y en 390 (`?qa=1` evita la caché).
 - **Recorte real:** el archivo v3 del blog ya no muestra la imagen. Revisa el recorte cuadrado en el archivo
   `-recorte-movil.png` del paso 6 y, si puedes, compartiendo el enlace en WhatsApp.
 - **Redes:** X y LinkedIn guardan en caché la tarjeta anterior. Para refrescarla, usa el Post Inspector de LinkedIn y
