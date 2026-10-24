@@ -1,17 +1,18 @@
 # Operar el contenido de la portada del blog
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-24 por Claude
 > **Ultima actualizacion:** 2026-10-24 por Claude
-> **Documentacion tecnica:** [PDR-029 — Modelo de contenido de la portada del blog](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md) · [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-content-model.md)
-> **Estado:** code complete en local; nada está desplegado. Los pasos marcados «producción» necesitan la aprobación del operador.
+> **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) · [PDR-029 — Modelo de contenido de la portada del blog](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md) · [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-content-model.md)
+> **Estado:** en producción en `/blog/` desde el 2026-10-24 con datos reales (`eo_content_model_enabled = 1`). Los pasos marcados «producción» necesitan la aprobación del operador.
 
 ## Para qué sirve
 
 Para mantener la portada del blog (`/blog/`) con contenido real sin tocar código: el formato de cada entrada, qué va
 fijado en el slider y hasta cuándo, los eventos (webinars y talleres) y los recursos (guía, herramienta, diagnóstico,
-Glitch). La portada se arma sola con eso y se refresca al publicar.
+Glitch), la foto del autor y la suscripción a Glitch. La portada se arma sola con eso y se refresca al publicar.
+Qué ve el visitante: [Portada del blog](../../documentation/public-site/portada-del-blog.md).
 
 ## Antes de empezar
 
@@ -26,14 +27,40 @@ Glitch). La portada se arma sola con eso y se refresca al publicar.
 ### Formato de una entrada
 
 En el editor de la entrada, panel **Portada del blog** → **Formato**. Una sola opción: Artículo, Caso, Guía, Grabación,
-Glitch Edición, Glitch Flash o Glitch Nota. Es distinto de la categoría y no cambia la URL. Si se publica sin formato,
+Novedad, Glitch Edición, Glitch Flash o Glitch Nota. Una **Novedad** (alianzas, anuncios de Efeonce) lleva un megáfono
+en el chip y sólo entra al slider si se fija. Es distinto de la categoría y no cambia la URL. Si se publica sin formato,
 el plugin asigna uno por las reglas de PDR-029 §1.1.
 
 ### Fijar una entrada en el slider
 
 Mismo panel → **Fijar en la portada hasta (UTC)**. La entrada fijada aparece primero hasta esa fecha y sale sola al
 vencer. Opcional: **Título del slider** en dos líneas (liviana y fuerte) e **Imagen del slider**. Sin imagen (propia o
-destacada) una entrada no puede ser diapositiva.
+destacada) una entrada no puede ser diapositiva. Sin imagen propia del slider, la portada usa la imagen destacada con un
+velo de lectura del lado del texto y corta la bajada en dos líneas; si el arte se hizo para el slider, súbelo como
+**Imagen del slider** y el velo desaparece. Las tres invitaciones (Glitch, guía o herramienta, diagnóstico) tienen su
+lugar reservado: una entrada fijada ocupa uno de los lugares restantes.
+
+### Foto de perfil del autor
+
+El círculo del autor en el slider muestra la foto de perfil que la persona tiene subida en WordPress (plugin One User
+Avatar), no la de Gravatar.
+
+1. En el escritorio de WordPress, **Usuarios** → el perfil del autor (o **Perfil** si eres tú).
+2. En la sección del avatar que agrega One User Avatar, elige la imagen desde la biblioteca de medios (una foto
+   cuadrada, con la cara centrada).
+3. Guarda con **Actualizar perfil**. La portada la toma en la próxima purga (o pide `purge --apply` por CLI).
+
+Sin foto subida, el slider muestra las iniciales del autor. Una imagen de Gravatar (incluida la silueta genérica) no
+reemplaza las iniciales, a propósito. Las diapositivas de Glitch no llevan foto.
+
+### Suscripción a Glitch
+
+La píldora de la sección Glitch y la del final de la portada son el formulario real de Growth Forms; no se editan desde
+WordPress. Textos, aviso y destino en HubSpot viven en el formulario publicado (`efeonce-blog-subscription`); la portada
+sólo guarda cuál está conectado (opciones `eo_blog_glitch_form_key` y `eo_blog_glitch_form_surface`). Conectar,
+cambiar o desconectar se hace por CLI (`subscription`, ver
+[Operar la portada del blog por CLI](operar-portada-blog-por-cli.md)). Sin formulario conectado la portada no muestra
+suscripción.
 
 ### Grabación de un webinar
 
@@ -79,7 +106,9 @@ los últimos 180 días el recurso deja de mostrarse.
    `proposal_sha256` revisado y aplicar por lotes de 10 guardando cada salida en
    `scripts/public-website/blog-v3/ledger/`.
 7. **Cargar** eventos, recursos y fijadas reales.
-8. **Encender** `eo_content_model_enabled = 1` junto con la publicación de la portada de TASK-2051.
+8. **Encender** `eo_content_model_enabled = 1` junto con la publicación de la portada de TASK-2051. Hecho el
+   2026-10-24: 44 entradas con formato (ledger en `scripts/public-website/blog-v3/ledger/`), recursos 252050 (guía) y
+   252054 (diagnóstico), corte de `/blog/` con snapshot `_gh_blog_home_v3_before_20261024_081327`.
 
 ## Qué significan los estados
 
@@ -107,9 +136,13 @@ los últimos 180 días el recurso deja de mostrarse.
 | Un evento no ocupa el bloque grande | Sin arte clave, cancelado o ya terminó | Cargar el arte clave o revisar las fechas. |
 | Una entrada fijada no aparece | Sin imagen o fijación vencida | Agregar imagen o mover la fecha. |
 | La portada tarda en actualizarse | Ventana de 60 s o caché de 5 min | Esperar hasta 2 minutos; revisar `eo_cm_purge_log`. |
+| El autor sale con iniciales | No tiene foto subida en su perfil (Gravatar no cuenta) | Subir la foto en el perfil de WordPress. |
+| No se ve la suscripción a Glitch | No hay formulario conectado (`data-subscribe="off"`) | Conectarlo por CLI con un formulario publicado. |
+| No se ve la sección de eventos | No hay un evento próximo | Crear el evento con arte clave y fecha futura. |
 
 ## Rollback
 
+- Suscripción: `pnpm public-website:blog-home subscription off --apply`.
 - Rápido y sin tocar archivos: opción `eo_content_model_enabled = 0`.
 - Formatos: `backfill-format.php` en modo `restore` con el ledger del apply.
 - Código: restaurar el `.tar` que imprimió el despliegue.

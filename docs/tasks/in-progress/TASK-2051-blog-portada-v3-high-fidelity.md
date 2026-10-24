@@ -31,7 +31,7 @@
 - Motion: `docs/ui/motion/TASK-2051-blog-portada-v3-high-fidelity-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `En producción en /blog/ desde 2026-10-24 (corte 08:13Z, snapshot _gh_blog_home_v3_before_20261024_081327) con datos reales, menú canónico, foto del autor y operación por pnpm public-website:blog-home; la suscripción real a Glitch espera el release de Greenhouse (consentBy submission) y la publicación del formulario píldora; sin ella la portada no muestra suscripción`
+- Status real: `En producción en /blog/ desde 2026-10-24 08:13Z con datos reales, menú canónico, foto del autor y suscripción real a Glitch (Growth Form efeonce-blog-subscription conectado con subscription --apply, verificado en vivo en los tres tableros, sin envío de prueba); operación por pnpm public-website:blog-home; contrato en docs/architecture/public-site/BLOG_HOME_RUNTIME_V1.md. Falta: un envío real de una persona confirmado en HubSpot (tipo 535702717), visto bueno del operador a la píldora del pie, grafo Yoast de /blog/, búsqueda GET sin JS verificada en vivo y LCP de laboratorio`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `TASK-2050 (sólo eventos, formatos y fijadas; las demás secciones avanzan antes)`
@@ -371,10 +371,13 @@ Efeonce en línea (no como archivo aparte).
 - [x] El operador aprobó la hoja lado a lado de cada sección. Aprobada el 2026-10-24 («Apruebo sí»); la hoja (https://claude.ai/artifact/VZELsJUCwxjvEj999eHCVB) ahora compara contra el sitio en vivo e incluye tablet.
 - [x] `/blog/` muestra el header AXIS y el footer de `ohio-child`; la exclusión de 18456 ya no existe. Desplegado el 2026-10-24 (paquete del tema `78331ff5…`, corte de la página; `verify` en vivo: plantilla, un H1, menú canónico, indexable).
 - [x] Sin scroll horizontal de página a 1440, 1024, 390 y 320. Medido en vivo de 1920 a 320 px (17 anchos, tres tableros): 0 px de desborde.
-- [ ] Un solo H1; grafo Yoast sin piezas duplicadas; axe sin violaciones serias. Un solo H1 verificado en vivo y en la prueba del runtime; axe WCAG 2.2 AA 0 violaciones en vivo en escritorio, tablet y móvil. Pendiente: grafo Yoast de /blog/ (se verifica en el corte).
+- [ ] Un solo H1; grafo Yoast sin piezas duplicadas; axe sin violaciones serias. Un solo H1 verificado en vivo y en la prueba del runtime; axe WCAG 2.2 AA 0 violaciones en vivo en escritorio, tablet y móvil. Verificado también después del corte: robots `index` y canonical `/blog/`. Pendiente: revisar el grafo Yoast de /blog/ (piezas duplicadas).
 - [ ] LCP ≤ 2,5 s, INP ≤ 200 ms y CLS ≤ 0,1 en la medición de laboratorio de 390 y 1440. Medido en vivo con el perfil móvil de Lighthouse (150 ms, 1,6 Mbps, CPU ×4): la imagen del hero se pinta a 3,8 s en móvil, 3,4 s en tablet y 3,6–5,0 s en escritorio; CLS ≤ 0,05; INP 128–248 ms. No cumple 2,5 s: el sitio ya tarda 2,8–3,9 s en el primer pintado con ese perfil (`/agenda/`, `/blog/`: 1,4 MB de scripts) y en móvil el LCP lo toma el banner de cookies del sitio (10–17 s). Seguimiento de sitio, fuera de esta task.
 - [x] Movimiento reducido: sin autoplay, barrido, paralaje ni haz animado. Verificado 2026-10-24: la diapositiva no avanza en 9 s y no queda ninguna animación infinita activa, a 1440 y 390.
-- [ ] Sin JavaScript: primera diapositiva, búsqueda GET, riel y archivo funcionan. La primera diapositiva, el riel y el archivo se sirven sin JavaScript (las capturas del gate son sin JS). La búsqueda GET necesita la URL real de búsqueda que entrega TASK-2050.
+- [x] Con datos reales y sin formulario de Glitch conectado no se muestra ninguna suscripción (nunca un éxito simulado). Verificado en vivo el 2026-10-24 tras el corte: raíz `#eobh` con `data-subscribe="off"` y las suscripciones ocultas, hasta conectar el formulario real.
+- [ ] La suscripción a Glitch registra de verdad: un envío real crea el contacto suscrito al tipo `535702717` en HubSpot. (Píldora conectada y verificada en vivo en tres tableros; gate sin JS de la sección Glitch 0,016 / 0,027 / 0,061 %. El envío desde el navegador automatizado no salió porque Turnstile lo rechazó, sin intentar eludirlo: falta el envío de una persona.)
+- [ ] El operador aprobó la píldora en el pie (desvío 13). (Pendiente de su visto bueno visual; las tres secciones del pie difieren del canvas por este desvío.)
+- [ ] Sin JavaScript: primera diapositiva, búsqueda GET, riel y archivo funcionan. La primera diapositiva, el riel y el archivo se sirven sin JavaScript (las capturas del gate son sin JS). TASK-2050 ya entrega la URL de búsqueda (formulario GET con `s` en el adaptador); falta verificarla en vivo sin JavaScript.
 
 ## Verification
 
@@ -391,7 +394,7 @@ Efeonce en línea (no como archivo aparte).
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] el registro de landings de la skill `efeonce-public-site-wordpress` incluye la portada v3
+- [x] el registro de landings de la skill `efeonce-public-site-wordpress` incluye la portada v3 (fila de `/blog/` 18456 en `.claude/skills/efeonce-public-site-wordpress/references/landing-registry.md`, 2026-10-24)
 
 ## Follow-ups
 
@@ -418,6 +421,11 @@ Efeonce en línea (no como archivo aparte).
 - Integración medida en vivo: Ohio aplica 16 px de padding al contenedor y −16 px de margen al cuerpo Elementor,
   no en todos los anchos; ambos van a cero sólo donde vive la portada (`eobh-host.css`).
 - Los formularios de la revisión son los del canvas: el envío es simulado y no guarda nada hasta TASK-2053/2054.
+- Suscripción real (2026-10-24, tras ~40 min de «¡Listo!» simulado en `/blog/`): sin formulario conectado la raíz
+  lleva `data-subscribe="off"`; con `eo_blog_glitch_form_key` la píldora y el pie son `<greenhouse-form data-dc-keep>`
+  con el renderer de Greenhouse. `data-dc-keep` evita que el morph del slider borre el formulario, y el reset del host
+  excluye `greenhouse-form *` (`build-plugin.cjs` `HOST_RESET`) porque anulaba los estilos del renderer. Detalle:
+  `docs/architecture/public-site/BLOG_HOME_RUNTIME_V1.md` §4–§5.
 
 - La portada vive en un plugin propio, `eo-blog-home`, y no en `eo-elementor-widgets/includes/blog-v3/` como
   decía el plan: el plugin compartido tiene trabajo sin commitear de otra sesión (su archivo principal incluido) y

@@ -680,6 +680,31 @@ redirección ni encadenamiento; las esperas van aparte y en background (`gh pr c
 `gh run watch <id> --exit-status`); y un flip de Production bloqueado se delega de inmediato al operador o a
 Codex, sin gastar intentos en variantes.
 
+### 22. Reintentar un rojo determinístico como si fuera del entorno, leyendo sólo el log truncado
+
+**Release 2026-10-24, `40b330175855`** (PR #259 + PR #260, orquestador `40090589488`): 224 commits de cinco días de
+`develop` y cuatro rojos ajenos al release en serie; agente ~3h37m contra 16m26s de workflow. Dos de esos rojos
+tenían la misma forma de diagnóstico:
+
+- **El log del paso Test se trunca.** La suite que falló no aparece en la vista del paso; está en el artefacto
+  `test-observability` / `deep-test-observability` (`vitest.log`, `summary.md`) o en
+  `gh api repos/efeoncepro/greenhouse-eo/actions/jobs/<job_id>/logs`.
+- **El reintento no distingue entorno de código; lo hace la repetición.** CI Deep de `80a3fcfe7` cayó por
+  `pricing-v3-artifact-verdict`, que bajo coverage pasaba los 15 s por defecto desde que creció su corpus. El
+  reintento falló igual: era determinístico. El fix fue darle el timeout explícito que ya usaba el archivo, y costó
+  un segundo PR y otra vuelta de CI de `main` (~45 min).
+- **Un runner que cambió de imagen sí es entorno, pero no se arregla reintentando.** `ubuntu-latest` resolvía ya a
+  Ubuntu 26.04, sin Chromium para Playwright 1.59.1; `reliability-verify.yml` pasó a `ubuntu-24.04` como `ci.yml` y
+  `ci-deep.yml`, y ese pin llevó el release a break-glass por `ci_cd`.
+
+Complementa al #14 (rojo determinístico porque el test afirma la forma vieja de un contrato): aquí el test tenía
+razón y lo que faltaba era presupuesto de tiempo.
+
+**Regla:** leer la suite que falló en el artefacto antes de decidir; reintentar sólo una falla identificable de
+entorno; un timeout que se repite bajo coverage se corre en local con `--coverage`, se corrige en `develop` y sale en
+otro PR. Y antes de abrir el PR de un `develop` acumulado varios días, correr `pnpm test` completo en local: cada rojo
+ajeno que se cuela cuesta una vuelta de CI completa, y se pagan en serie.
+
 ## Caso positivo 2026-08-06 — el release que no generó incidente
 
 Hasta esta versión, este playbook sólo documentaba incidentes. Eso deja un sesgo:

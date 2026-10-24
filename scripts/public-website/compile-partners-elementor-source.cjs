@@ -13,6 +13,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const cheerio = require('cheerio')
+const postcss = require('postcss')
 
 const { compileSourceLedLanding } = require('./lib/source-led-compiler.cjs')
 
@@ -42,6 +43,23 @@ $('.svc > .svc-item').attr('data-gh-repeat', 'servicios')
 $('.bento > .tile').attr('data-gh-repeat', 'partners')
 $('.steps > .step').attr('data-gh-repeat', 'pasos')
 
+// «Sumémonos»: «Quiero ser partner» opens the governed Growth CTA `partners-become-partner` (open_growth_form,
+// presentation dialog; TASK-2045). The launcher is the shared native one; without key it degrades to /agenda/.
+const partnerButton = $('a.btn-o').filter((_, el) => $(el).text().trim() === 'Quiero ser partner')
+
+if (partnerButton.length !== 1) throw new Error('«Quiero ser partner» button not found')
+partnerButton.replaceWith('<div class="partner-cta"><gh-meeting-cta location="partners_close"></gh-meeting-cta></div>')
+
+// The dialog lives in <body> (top layer), outside the landing scope: its skin ships as the unscoped page layer,
+// guarded by :has so it only applies on this page.
+const skin = postcss.parse(fs.readFileSync(path.join(sourceDir, 'partner-dialog-skin.css'), 'utf8'))
+
+skin.walkRules(rule => {
+  for (let p = rule.parent; p; p = p.parent) if (p.type === 'atrule' && /keyframes/.test(p.name)) return
+  rule.selectors = rule.selectors.map(sel => 'body:has(.gh-partners) ' + sel)
+})
+fs.writeFileSync(path.join(sourceDir, 'page.css'), '/* Generated from partner-dialog-skin.css by compile-partners-elementor-source.cjs. Do not edit by hand. */\n' + skin.toString().trim() + '\n')
+
 const sections = $('#__root > section')
 
 if (sections.length !== MODULES.length) throw new Error(`Expected ${MODULES.length} sections, found ${sections.length}`)
@@ -56,6 +74,8 @@ const result = compileSourceLedLanding({
   modules: MODULES,
   tabCss: [],
   repeatLabels: { marquesina: 'Logos', servicios: 'Lo que hacemos', partners: 'Partners', pasos: 'Pasos' },
+  meeting: { module: 'cierre', cta: 'partners-become-partner', location: 'partners_close', fallbackUrl: 'https://efeoncepro.com/agenda/', fallbackLabel: 'Quiero ser partner' },
+  pageLayer: true,
 })
 
 console.log(JSON.stringify(result, null, 2))

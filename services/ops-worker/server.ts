@@ -131,6 +131,7 @@ import { drainPendingGraderRuns, recoverStuckRunningRuns } from '@/lib/growth/ai
 import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
 import { handleRecurringRegradeBatch } from '@/lib/growth/ai-visibility/regrade'
 import { dispatchPendingSubmissions } from '@/lib/growth/forms/dispatch'
+import { sendDueEventReminders } from '@/lib/growth/forms/event-emails'
 import { dispatchMeasurementConversionsSafely } from '@/lib/growth/measurement/dispatch'
 import { runGscDailySnapshotBatch } from '@/lib/growth/seo/gsc-daily-batch'
 import { runRankCaptureBatch } from '@/lib/growth/seo/rank-capture-batch'
@@ -1878,6 +1879,26 @@ const handleGrowthGraderRegrade = async (req: IncomingMessage, res: ServerRespon
   }
 }
 
+// ─── /growth/events/reminders ───────────────────────────────────────────────
+//
+// 2026-10-24 — Recordatorio de las reservas de eventos y webinars: cada vuelta envía a las reservas confirmadas cuyo
+// evento empieza dentro de `reminderMinutesBefore` (política del formulario, 120 por defecto). Idempotente por reserva
+// en la capa de entrega. Con GROWTH_EVENT_EMAILS_ENABLED OFF es no-op (cero queries).
+const handleGrowthEventReminders = async (_req: IncomingMessage, res: ServerResponse) => {
+  try {
+    const summary = await sendDueEventReminders()
+
+    if (summary.due) console.log(`[ops-worker] /growth/events/reminders — due=${summary.due}`)
+    json(res, 200, summary)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown event reminders error'
+
+    console.error('[ops-worker] /growth/events/reminders failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_growth_event_reminders' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /growth/forms/dispatch ─────────────────────────────────────────────────
 //
 // TASK-1229 — Motor Growth Forms: entrega async de submissions aceptadas. El submit
@@ -3373,6 +3394,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/growth/grader/regrade') {
       await handleGrowthGraderRegrade(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/growth/events/reminders') {
+      await handleGrowthEventReminders(req, res)
 
       return
     }

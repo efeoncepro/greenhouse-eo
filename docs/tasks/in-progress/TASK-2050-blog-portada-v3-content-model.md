@@ -28,10 +28,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `En vivo desde 2026-10-24: efeonce-editorial-blocks 0.2.0 desplegado (runtime d690227), 44 entradas con formato (ledger en 5 lotes), recursos guía 252050 y diagnóstico 252054 cargados, eo_content_model_enabled = 1; la portada se ve con datos reales sólo en /blog-v3-revision/ (/blog/ sin corte). Pendiente: evento real, medición de purga en Kinsta y corte de /blog/`
+- Status real: `En producción desde 2026-10-24: efeonce-editorial-blocks 0.2.0 desplegado (runtime d690227), 44 entradas con formato (ledger en 5 lotes), recursos guía 252050 y diagnóstico 252054, eo_content_model_enabled = 1 y /blog/ cortado a la portada v3 a las 08:13Z (snapshot _gh_blog_home_v3_before_20261024_081327) con datos reales; foto del autor (author_photo) y opciones de la suscripción a Glitch en el adaptador. Pendiente: primer evento real (Event + .ics) y medir la purga de /blog/ en Kinsta`
 - Rank: `TBD`
 - Domain: `public-site|content`
-- Blocked by: `Aprobación del operador de PDR-029 y del dry-run del backfill (rollout)`
+- Blocked by: `Contenido del operador: primer evento real para probar Event y el .ics`
 - Branch: `Runtime efeonce-public-site-runtime main (checkout /Users/jreye/Documents/efeonce-public-site-runtime); docs en Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -205,7 +205,7 @@ Reglas obligatorias:
 - [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. (PDR-029; backfill idempotente por slug con `expect_sha256`; purgas con ventana de 60 s.)
 - [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo. (No aplica: no hay tablas nuevas ni boundary test en el dominio WordPress; se deja sin tildar.)
 - [x] Migration/backfill/rollback posture is explicit and proportional to risk. (PDR-029 §7; ensayo `scripts/public-website/blog-v3/rehearse-content-model-deploy.sh`: deploy → verify → backfill apply → restore.)
-- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. (Evidencia local en Playground; la de producción queda pendiente con el rollout.)
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. (Evidencia local en Playground y en producción del 2026-10-24: ledger del backfill en `scripts/public-website/blog-v3/ledger/`, `verify-content-model.php` sin hallazgos, `pnpm public-website:blog-home status` con flag 1 y `verify --browser` en `/blog/`.)
 - [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. (`WP_Error` con códigos `eo_*`; log de purgas; prueba de que el `.ics`, el marcado y la página no llevan el enlace privado.)
 
 ### Capability Definition of Done
@@ -348,9 +348,9 @@ lectura cubren la paridad programática para agentes.
 - [x] PDR-029 existe, está aprobado por el operador y registrado en el índice de decisiones del sitio público. (Accepted el 2026-10-24; fila en `docs/public-site/README.md`.)
 - [x] `eo_format` está registrada y las 44 entradas publicadas tienen exactamente un formato, con ledger del apply. (Apply en vivo el 2026-10-24, `scripts/public-website/blog-v3/ledger/2026-10-24-batch-{1..5}.json`; `verify-content-model.php` sin hallazgos.)
 - [x] El reader `featured` devuelve el shape del canvas y respeta el orden Glitch → herramienta → diagnóstico. (Prueba PHP: claves de cada diapositiva = las del documento de ejemplo; Playground: `art, caso, flash, guia, diag`.)
-- [ ] Un evento de prueba produce `Event` válido en Rich Results Test y un `.ics` que abre en Google y Apple Calendar sin enlace privado.
+- [ ] Un evento de prueba produce `Event` válido en Rich Results Test y un `.ics` que abre en Google y Apple Calendar sin enlace privado. (Sin evento real al 2026-10-24: la sección de eventos está oculta en `/blog/`; espera el primer evento del operador.)
 - [x] Al pasar `start + duración`, el evento deja de ser «próximo» sin intervención manual. (Prueba PHP de estados; en Playground un evento que terminó hace 5 minutos no es próximo y la purga de su fin queda programada.)
-- [ ] Publicar o actualizar una entrada, evento o recurso purga `/blog/` en menos de 2 minutos (medido). (Medido sólo en Playground con Kinsta simulado: 0,1 s la primera purga y 67 s la agrupada; falta medirlo en Kinsta.)
+- [ ] Publicar o actualizar una entrada, evento o recurso purga `/blog/` en menos de 2 minutos (medido). (Medido sólo en Playground con Kinsta simulado: 0,1 s la primera purga y 67 s la agrupada; falta medirlo en Kinsta, ahora que `/blog/` sirve la portada.)
 - [x] Todos los readers responden por REST de sólo lectura con los mismos datos que usa la portada. (Playground: `/wp-json/eo/v1/home/board/portada` idéntico al documento embebido en `/blog/`; cada reader responde 200.)
 
 ## Verification

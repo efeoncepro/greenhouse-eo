@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.10 — 2026-10-24 (Claude, formulario en línea `inline_pill`, reservas por evento y conteo público)
+> **Version:** 1.11 — 2026-10-24 (Claude, receta de la píldora `inline_pill` en un anfitrión con plantilla propia, portada del blog)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -317,8 +317,7 @@ El catálogo del selector (`InsertableFormCatalogEntryVm.formKey`) ya lo expone.
 ## Formulario en línea (píldora) y reservas por evento
 
 **Antes de empezar:** el formulario debe estar publicado con la presentación `inline_pill` (un solo campo de correo,
-consentimiento como aviso) y el renderer `1.2.0` en producción (llega con el release de Greenhouse a `main`; antes, la
-página vería el formulario estándar).
+consentimiento como aviso). El renderer `1.2.0` está en producción desde el release `40b330175855` (2026-10-24).
 
 1. **Publicar el formulario del evento** (uno por evento): copiar `scripts/growth/forms/examples/webinar-aeo-2026-11-12.json`,
    ajustar `slug`, `eventKey`, `eventDateLabel`, `capacity`, `overCapacity` (`waitlist` o `reject`),
@@ -328,7 +327,8 @@ página vería el formulario estándar).
    de destinos.
 2. **Incrustar:** `<greenhouse-form class="eo-inline-pill eo-inline-pill--event" form-key="<form_key>" surface="<surface>"
    locale="es-CL" color-scheme="dark" appearance="bare">` con un enlace de respaldo adentro (sin JavaScript se ve el
-   enlace). Darle al elemento el ancho de su columna (480 px o más para el diseño de escritorio).
+   enlace). Darle al elemento el ancho de su columna (480 px o más para el diseño de escritorio). Si el anfitrión tiene
+   plantilla propia, seguir la receta de abajo.
 3. **Color:** sólo tokens (`--ghf-inline-tone`, `--ghf-inline-on-tone` y, para el hover exacto,
    `--ghf-inline-tone-hover/-active`). Piel de referencia: `scripts/growth/forms/fixtures/inline-pill-host-skin.css`.
 4. **Conteo de reservas (opcional):** leer `GET https://greenhouse.efeoncepro.com/api/public/growth/forms/<form_key>/registrations-count`
@@ -342,6 +342,45 @@ quedan cupos para este evento.» bajo la píldora, sin «Reintentar».
 **Qué no hacer:** no copiar la animación en CSS de la página (vive en el renderer); no poner casillas de consentimiento
 (la píldora no las dibuja y el contrato no publica); no inyectar `event_key` desde la página (el servidor lo impone);
 no mostrar el conteo si `shown` es `false`.
+
+### Receta: incrustar la píldora en un anfitrión con plantilla propia
+
+Caso fuente: la portada del blog (`/blog/`, plugin `eo-blog-home`, 2026-10-24), que tiene su propio runtime de
+plantilla, un reset de estilos y columnas flex. Cada paso corrige un problema que se vio en vivo.
+
+1. **Cargar el renderer una vez por página**, desde Greenhouse, nunca copiado al sitio. En WordPress:
+   `wp_enqueue_script( 'gh-growth-forms-renderer-latest', '<origen de Greenhouse>/growth-forms/renderer-latest.js', … )`
+   (en la portada lo hace `includes/class-eobh-front.php`). Si la página ya lo carga otro widget, reusar el mismo handle.
+2. **Proteger el elemento del runtime del anfitrión.** Si la plantilla re-renderiza su DOM (morph, autoplay de un
+   slider, plantillas reactivas), marcar `<greenhouse-form>` para que ese motor no lo toque. En la portada es
+   `data-dc-keep`: sin él, el autoplay del slider borraba el formulario ya renderizado.
+3. **No resetear ni estilar dentro del formulario.** Todo lo que hay dentro de `<greenhouse-form>` es del renderer. Si
+   el anfitrión tiene un reset del tipo `#raiz :is(h1,…,button,input,…) { all: revert }`, excluir el formulario con
+   `:not(greenhouse-form *)`. En la portada, el reset con especificidad de ID anuló los estilos del renderer (texto
+   duplicado, píldora aplastada) y hubo que desconectar la suscripción en minutos.
+4. **Darle ancho al elemento.** `display: block` y un ancho explícito: en una columna flex que encoge a su contenido, el
+   formulario colapsa. En la portada: 480 px (el ancho abierto del canvas, `max-width: 100%`) en escritorio, ancho
+   completo en móvil, y ancho de columna en el pie.
+5. **Alinear con tokens, no con selectores internos.** La suscripción se alinea a la derecha por defecto; para la
+   izquierda, en el contenedor: `--ghf-inline-align: flex-start; --ghf-inline-note-align: left;` (así queda el tablero
+   de tablet de la portada).
+6. **Poner un respaldo hijo.** Un `<a class="ghf-fallback" href="…">` con la forma de la píldora en reposo y, si el
+   diseño lo lleva, el aviso (`aria-hidden="true"`) reservando su lugar. Se ve sin JavaScript y mientras carga el
+   renderer, sin salto visual; al montar, el renderer reemplaza los hijos.
+7. **Tono con tokens:** `--ghf-inline-tone`, `--ghf-inline-on-tone`, `--ghf-inline-tone-hover`,
+   `--ghf-inline-tone-active` (Glitch: `#6ec207`, `#8bd13a`, `#a6dd68`, sobre `#001a33`); tipografía con `--ghf-font`.
+8. **Verificar** en los anchos reales del anfitrión (sin desborde de 320 a 1920 px) y con el formulario real antes de
+   publicar. La portada lo prueba sin exponerlo con
+   `node scripts/public-website/blog-v3/preview/serve.cjs --subscribe <form_key>` (proxy local de sólo lectura, sin
+   envíos posibles).
+
+Piel completa de referencia: `efeonce-public-site-runtime` →
+`wp-content/plugins/eo-blog-home/assets/css/eobh-host.css`. Para conectar la suscripción de la portada se usa
+`pnpm public-website:blog-home subscription <form_key> --apply`; publicar la versión de Glitch está en
+[operar-motor-formularios.md](./operar-motor-formularios.md#publicar-la-suscripción-a-glitch-como-píldora-task-20532054).
+
+**Envío real:** el captcha (Turnstile) rechaza navegadores automatizados, así que la prueba de envío la hace una persona.
+No intentes eludirlo. Al 2026-10-24 el primer envío real de la suscripción a Glitch está pendiente.
 
 ## Que significan los estados (lo que vera el visitante)
 

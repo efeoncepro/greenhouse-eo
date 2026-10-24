@@ -162,6 +162,44 @@ It replaces the `efeonce-performance-brief` named in TASK-1865's original contra
 Both are pending a first real browser submission (Turnstile blocks automation) and the GA4 `generate_lead`
 check; Performance also lacks its TRACKING-PLAN row.
 
+## Inline pill (`inline_pill`) in a host with its own template
+
+Live since release `40b330175855` (2026-10-24, renderer `1.2.0`). First case: the Glitch subscription on the blog
+home `/blog/` (plugin `eo-blog-home`; Glitch section + bottom subscription). Form `efeonce-blog-subscription`, key
+`6bc62588-a4a0-4214-9501-13b0c2948c81`, surface `fhsf-efeonce-blog-subscription`. Published from Greenhouse with
+`pnpm growth:forms:publish-glitch-pill` (dry-run / `--apply` / `--publish`, the last refuses until `origin/main` serves
+the consent code); connected to the page with `pnpm public-website:blog-home subscription <form_key> --apply`. Blog
+home operation: `references/blog-home-operation.md`.
+
+Consent: the pill has no checkboxes. For a **subscription** pill with a visible notice (`inlinePill.note`), subscribing
+under that notice **is** the consent (operator approval 2026-10-24): Greenhouse stores the notice hash and the HubSpot
+destination subscribes only with `consentBy: 'submission'` + that hash. Checkbox subscriptions are unchanged. WordPress
+never declares or fakes this; it lives in the form version and its destination.
+
+Host recipe (each rule fixed a live break on 2026-10-24):
+
+- Enqueue the renderer from Greenhouse with the shared handle `gh-growth-forms-renderer-latest`
+  (`<origin>/growth-forms/renderer-latest.js`), same handle as the Elementor widget, so a page loads it once.
+- If the host template re-renders its DOM (morph, slider autoplay), make the element opaque to it — `data-dc-keep` in
+  `eo-blog-home`; without it the autoplay erased the mounted form.
+- Never reset or style inside `<greenhouse-form>`. The host reset must exclude it (`:not(greenhouse-form *)`); an
+  ID-specific `all: revert` reset broke the renderer (duplicated text, squashed pill) and forced a disconnect.
+- Give the element `display: block` and an explicit width (480 px = canvas open width, `max-width: 100%`; full width
+  on phone). A shrinking flex column (`.gxw`) collapsed it.
+- Align with public tokens only: `--ghf-inline-align: flex-start; --ghf-inline-note-align: left` (tablet board).
+- Fallback child `a.ghf-fallback` in the idle pill's shape + the notice reserving its place: no layout jump, works
+  without JS; the renderer replaces the children when it mounts.
+- Without a real published form connected, show no subscription (`data-subscribe="off"`), never a simulated success —
+  the canvas forms only simulated a submit and `/blog/` said «¡Listo!» for ~40 min without registering anything.
+
+Host skin: `efeonce-public-site-runtime` → `wp-content/plugins/eo-blog-home/assets/css/eobh-host.css`. Preview with
+the real form and no possible submit: `node scripts/public-website/blog-v3/preview/serve.cjs --subscribe <formKey>`.
+Full recipe: `docs/manual-de-uso/growth/incrustar-formulario-wordpress-astro.md` §Receta; Greenhouse side:
+`greenhouse-growth-forms` → `references/INLINE_PILL_HOST_AND_CONSENT.md`.
+
+Pending (2026-10-24): a real submission by a person (Turnstile rejected the automated browser; do not bypass it) and
+the HubSpot check of the contact subscribed to type `535702717`.
+
 ## Verification
 
 For form work, verify:

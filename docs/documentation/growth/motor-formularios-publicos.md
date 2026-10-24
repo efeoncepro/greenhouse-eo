@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.3
+> **Version:** 2.4
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-10-24 por Claude (formulario en línea, reservas por evento y conteo, TASK-2053/2054)
+> **Ultima actualizacion:** 2026-10-24 por Claude (formulario en línea en producción, consentimiento por el acto de suscribirse y suscripción a Glitch, TASK-2053/2054)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -238,7 +238,7 @@ opcional: un formulario que no lo declara se ve igual que antes. El dibujo de es
 Un formulario de un solo correo puede mostrarse **en línea**: un botón que, al presionarlo, se estira y se convierte
 en el campo de correo con su botón de envío, muestra un cargador al enviar, confirma con un relleno y un check, y queda
 en un mensaje final («Ya estás suscrito a Glitch», «Te esperamos el 12 de noviembre»). Es lo que usa la portada del
-blog para suscribirse a Glitch y reservar un webinar, sin pop-ups.
+blog para suscribirse a Glitch, sin pop-ups, y lo que usará para reservar un webinar cuando haya un evento real.
 
 - Se declara en el contrato del formulario (presentación `inline_pill` y sus textos); el sitio sólo elige el color.
 - Si dos copias del mismo formulario están en la página, cuando una confirma la otra también queda confirmada.
@@ -249,8 +249,24 @@ blog para suscribirse a Glitch y reservar un webinar, sin pop-ups.
   nunca da el número exacto: se redondea a la decena, se cuenta una vez por correo y sólo aparece desde un mínimo
   (25 por defecto). Por debajo del mínimo no se muestra nada.
 
+**Consentimiento en la píldora de suscripción.** La píldora no tiene casillas: bajo ella se ve un aviso («Al
+suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.»). El operador aprobó el 2026-10-24 que,
+en una píldora de **suscripción** con ese aviso, suscribirse **es** el consentimiento. Greenhouse guarda como evidencia
+una huella del aviso que la persona vio, y HubSpot sólo recibe la suscripción si esa huella existe. Reglas:
+
+- Aplica sólo a píldoras de suscripción que muestran aviso. Si el formulario no tiene aviso, no se suscribe a nadie.
+- Un formulario de suscripción con casilla sigue igual: sin casilla marcada no hay suscripción.
+- Un destino que declare las dos cosas a la vez (casilla y acto de suscribirse) se considera mal configurado: la entrega
+  se detiene y no se envía nada a HubSpot.
+
+**En uso hoy.** Desde el 2026-10-24 la portada del blog (`/blog/`) suscribe a Glitch con la píldora, en la sección de
+Glitch y al pie. Si la portada no tiene un formulario real conectado, no muestra la suscripción (nunca un «¡Listo!» falso).
+Todavía falta comprobar un envío real hecho por una persona (el captcha bloquea al navegador automatizado, como debe), y
+no hay un evento real cargado para la reserva.
+
 > Detalle técnico: [contrato de runtime](../../architecture/growth-public-forms-runtime-contract.md#formulario-en-línea-y-reserva-por-evento-task-20532054) ·
-> `src/lib/growth/forms/contracts.ts` · `src/lib/growth/forms/readers.ts` · `src/growth-forms-renderer/inline-pill.ts`
+> `src/lib/growth/forms/contracts.ts` · `src/lib/growth/forms/readers.ts` · `src/growth-forms-renderer/inline-pill.ts` ·
+> consentimiento: `src/lib/growth/forms/hash.ts` (`inlinePillNoticeHash`) + `src/lib/growth/forms/destinations/hubspot/adapter.ts`
 
 ## Que NO hace (todavia)
 

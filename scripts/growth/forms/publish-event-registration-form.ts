@@ -23,6 +23,7 @@ import { authorDraftForm, deprecateForm, publishForm } from '@/lib/growth/forms/
 import { compileFormVersion } from '@/lib/growth/forms/policy-compiler'
 import type { FormDefinitionRow, FormVersionRow } from '@/lib/growth/forms/store'
 import {
+  allowFormSlugOnSurface,
   getFormDefinitionById,
   getHostSurfaceById,
   getPublishedVersionBySlug,
@@ -151,7 +152,9 @@ const main = async (): Promise<void> => {
     })
     console.log(`  surface creada: ${config.surfaceId}`)
   } else {
-    console.log(`  surface existente: ${config.surfaceId} (verifica que permita el slug ${config.slug})`)
+    // Una superficie sirve a varios eventos: sin el slug en su lista, el formulario de este evento no carga.
+    await allowFormSlugOnSurface(config.surfaceId, config.slug)
+    console.log(`  surface existente: ${config.surfaceId} (permite ${config.slug})`)
   }
 
   const { formId, formVersionId } = await authorDraftForm(draft)

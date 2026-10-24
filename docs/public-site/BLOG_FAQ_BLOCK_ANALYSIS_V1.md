@@ -1,10 +1,10 @@
 # Preguntas frecuentes del blog: diagnóstico y propuesta de bloque
 
 > **Tipo de documento:** Análisis y propuesta (no es decisión aceptada)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-10-24 por Claude (sesión de refresh del blog)
 > **Decisión vigente que toca:** [`CREATIVE_WORKFLOWS_FAQ_DISCLOSURE_DECISION_V1.md`](CREATIVE_WORKFLOWS_FAQ_DISCLOSURE_DECISION_V1.md) (2026-07-15)
-> **Estado:** pendiente de decisión del operador entre las opciones A y B (§5)
+> **Estado:** el operador eligió la opción A con schema automático (2026-10-24). Construida y probada en local (§7); sin desplegar
 
 ## 1. Respuesta corta
 
@@ -178,3 +178,37 @@ cuatro. En ese momento se enmienda el ADR de 2026-07-15 y se migra con las guard
 - Readback del schema en vivo: un solo `FAQPage`, conectado, con preguntas idénticas a los `summary`.
 - Prueba con VoiceOver: la pregunta se anuncia como botón con estado expandido/contraído.
 - Kinsta purgado y QA en los cuatro posts.
+
+## 7. Lo construido (2026-10-24)
+
+El operador eligió la opción A y pidió que el schema fuera automático. Se resolvió así: **las preguntas visibles son la
+única fuente**. El plugin lee los bloques en cada visita y arma el schema; nadie escribe ni mantiene un JSON-LD aparte.
+
+| Pieza | Dónde | Qué hace |
+|---|---|---|
+| Estilo «Pregunta frecuente» | `efeonce-editorial-blocks` 0.3.0, `includes/faq/` (repo `efeonce-public-site-runtime`, commit `e2bd1e4`) | `register_block_style('core/details', 'efeonce-faq')` + `faq.css` (claro, `.dark-scheme`, foco, movimiento reducido, `::details-content` donde existe) |
+| Ancla por pregunta | `render_block_core/details` | `id="faq-<slug>"` (o el ancla propia del bloque); `faq.js` abre la pregunta de un enlace `#faq-…` |
+| Schema automático | `wpseo_schema_graph_pieces` + `wpseo_schema_webpage` | El `WebPage` de Yoast suma `FAQPage` y `mainEntity`; un `Question` por bloque, respuesta = texto visible |
+| Guarda de transición | `EO_Faq::has_inline_faqpage` | Un post con FAQPage pegado lo conserva y no recibe nodos generados: nunca dos FAQPage |
+| Apagado | opción `eo_faq_schema_enabled` = 0 | Quita el schema generado; el estilo sigue |
+| Content Factory | `article-authoring.ts` | `kind: "faq"` emite el estilo siempre; `schema.source: "plugin"` omite el JSON-LD (default `inline` hasta el despliegue); rechaza preguntas repetidas |
+| Despliegue | `deploy-blog-v3-content-model-package.php` | Allowlist ampliada a `includes/faq/` |
+
+**Verificado:**
+
+- 21 pruebas puras (`php tests/eo-faq.test.php`).
+- 36 comprobaciones E2E en WordPress Playground con Yoast real (`tests/playground/run-eo-faq.sh` +
+  `node tests/playground/eo-faq.e2e.mjs`): cinco preguntas con estilo y ancla, un único `FAQPage`, cinco `Question`
+  en orden, respuestas idénticas al texto visible, `@id` igual al ancla, el `Article` sigue apuntando a la página, y el
+  post con JSON-LD pegado queda intacto.
+- 136 pruebas de Content Factory.
+- El CSS inyectado sólo en un navegador local sobre el post vivo de inbound, a 1280 y 390 px, en claro y oscuro
+  (Ohio real): se ve como la maqueta aprobada. Contraste del azul de pregunta abierta: 4,59:1 sobre blanco y 8,68:1
+  en oscuro.
+
+**Sin verificar:** el editor de WordPress con el estilo (se registra igual que cualquier estilo de bloque), VoiceOver y
+el despliegue real.
+
+**Para salir a producción** (requiere aprobación): desplegar el plugin 0.3.0 con el paquete gobernado, reescribir los
+cuatro posts con `schema.source: "plugin"` (sale el `core/html`, entra el estilo) con snapshot y guardas, cambiar el
+default de Content Factory a `plugin` y hacer QA en vivo del grafo y la vista.

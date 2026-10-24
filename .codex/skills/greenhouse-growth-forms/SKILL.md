@@ -56,6 +56,9 @@ React con mensajes explícitos; no introduce React ni ese control en el web comp
   **AEO grader-on-submit** capability of `/aeo-2/` → companion `references/SUCCESS_CARD_AND_GRADER_ON_SUBMIT.md`.
 - A host with its own DOM patcher, a consumer-pinned bundle, `initial-values` or the
   `content_marketing` presentation → `references/CONTENT_MARKETING_HOST_AND_RENDERER.md`.
+- The `inline_pill` presentation: consent by the act of subscribing (`consentBy: 'submission'` + notice hash), the
+  Glitch pill publisher (`pnpm growth:forms:publish-glitch-pill`) or embedding the pill in a host with its own
+  template/reset/flex columns → `references/INLINE_PILL_HOST_AND_CONSENT.md`.
 - Feature flags / rollout of the engine across environments.
 
 ---
@@ -618,8 +621,9 @@ hides default success steps; `dismiss` emits DOM `ghf:dismiss` (telemetry-indepe
 submitting; Turnstile mounts next to the form (works inside a modal `<dialog>`). Worked example + evidence:
 `scripts/public-website/partners-source/partner-dialog-skin.css`, `docs/ui/reviews/TASK-2045/`.
 
-**Inline pill + event registration (TASK-2053 contract + TASK-2054 render, code complete 2026-10-24; renderer `1.2.0`,
-ships with the next `main` release).** `ui_policy.presentation: 'inline_pill'` + optional `ui_policy.inlinePill` labels
+**Inline pill + event registration (TASK-2053 contract + TASK-2054 render; in production since release
+`40b330175855`, 2026-10-24, renderer `1.2.0`; first live use: Glitch subscription on `/blog/`; a real human submit and
+the first real event form are still pending).** `ui_policy.presentation: 'inline_pill'` + optional `ui_policy.inlinePill` labels
 draws the blog-v3 canvas pill (button → email field + send → orbit loader → fill + check → final text). Only one
 required visible `email` (+ `hidden`), notice consent without checkboxes, `static`, no `redirect`/`success_card` — the
 compiler blocks the rest. `fields[].staticValue` (hidden only) is enforced server-side (`applyStaticFieldValues`): the
@@ -629,7 +633,13 @@ capacity + `waitlist|reject`; the seat is decided inside the submit transaction 
 `registrationStatus`. Publish with `pnpm growth:forms:publish-event-registration -- --config <json>` (dry-run first).
 Host = tokens `--ghf-inline-*` (tone/on-tone/hover/active) + `data-ghf-part="inline-*"` hooks; give `<greenhouse-form>`
 its column width (≥ 480 px for desktop widths). DOM event `ghf:success` syncs instances of the same `formKey`.
-**Never** publish an `inline_pill` version on a page before the renderer release (old renderer draws the standard form).
+**Consent by the act (approved by the operator 2026-10-24):** a subscription pill with `inlinePill.note` stores
+`notice_text_hash` in the consent snapshot and a HubSpot `communications` entry `{ consentBy: 'submission',
+subscriptionTypeId, text }` subscribes only when that hash exists; checkbox subscriptions are unchanged; an entry with
+both `consentBy` and `checkboxKey` → `invalid_communications_mapping` (no POST). Host rules (never reset/style inside
+`<greenhouse-form>`, `data-dc-keep` against host morph, explicit width, `--ghf-inline-align`/`--ghf-inline-note-align`,
+`a.ghf-fallback` child) + publisher + live traps → `references/INLINE_PILL_HOST_AND_CONSENT.md`. Never test a real
+submit by bypassing Turnstile: a person submits.
 Visual gate: `node scripts/growth/forms/fixtures/inline-pill.scenario.mjs` (canvas literal vs real element, ≤ 1 %;
 standard forms 0 px against a baseline rev). Lesson: measure the canvas's COMPUTED styles — its `button{font:inherit}`
 reset beats `.ab`, so the approved open button renders 16 px/400, not the declared 15/600. Full table:
@@ -719,6 +729,7 @@ pnpm release:watchdog --json                                      # worker GIT_S
 
 - **Companion — Success Card + AEO grader-on-submit: `references/SUCCESS_CARD_AND_GRADER_ON_SUBMIT.md`**
 - **Editorial Premium Brief host recipe: `references/EDITORIAL_PREMIUM_BRIEF_STYLE.md`**
+- **Inline pill — consent by the act, Glitch publisher, host recipe: `references/INLINE_PILL_HOST_AND_CONSENT.md`**
 - Architecture: `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
 - Runtime contract: `docs/architecture/growth-public-forms-runtime-contract.md`
 - Functional: `docs/documentation/growth/motor-formularios-publicos.md`

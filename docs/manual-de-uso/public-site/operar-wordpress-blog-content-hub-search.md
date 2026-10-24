@@ -1,11 +1,16 @@
 # Operar WordPress Blog, Content Hub y Busqueda
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-07-09 por Codex
-> **Ultima actualizacion:** 2026-08-31 por Codex
+> **Ultima actualizacion:** 2026-10-24 por Claude
 > **Modulo:** Public Site / WordPress / Ohio / Content Hub
 > **Documentacion relacionada:** `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
+
+> **Portada de `/blog/`:** desde el 2026-10-24 la portada se opera con
+> [Operar la portada del blog por CLI](operar-portada-blog-por-cli.md) y
+> [Operar el contenido de la portada del blog](operar-contenido-portada-blog.md). La sección «Revisar o Preparar el
+> Layout Demo 35» de abajo es historia: la copia `251875` ya no es el camino hacia `/blog/`.
 
 ## Antes de Empezar
 

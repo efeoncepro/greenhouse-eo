@@ -2,15 +2,18 @@
 
 Live since 2026-10-24 (TASK-2050/2051): page 18456 renders the `eo-blog-home` plugin (`[eo_blog_home]`), fed by the
 content model of `efeonce-editorial-blocks` 0.2.0 (PDR-029). Three boards (desktop ≥1100, tablet 768–1099, mobile),
-canonical site nav, `eo_content_model_enabled = 1`.
+canonical site nav (`EO_SITE_NAV_EXCLUDED_PAGES` empty), `eo_content_model_enabled = 1`, cutover snapshot
+`_gh_blog_home_v3_before_20261024_081327`. Runtime contract: `docs/architecture/public-site/BLOG_HOME_RUNTIME_V1.md`.
 
 ## Use the CLI, never ad hoc scripts
 
 `pnpm public-website:blog-home <command>` — manual `docs/manual-de-uso/public-site/operar-portada-blog-por-cli.md`.
 
-- Read (always safe): `status`, `slider`, `post <id|slug>`, `verify [--browser]`.
+- Read (always safe): `status`, `slider`, `post <id|slug>`, `verify [--browser] [--url]`. HTTP verify checks `#eobh`,
+  one H1, canonical nav bar, robots `index`, no example data; `--browser` waits for the `#eobh` selector (30 s), never
+  the `load` event (site third parties can hold it for minutes), then 8 widths 320–1920 + axe on the three boards.
 - Write (plan unless `--apply`; operator's go in production): `pin/unpin`, `format`, `hero`, `resource <json>`,
-  `review`, `event <json>`, `retire`, `flag`, `purge`. Every apply prints `before` (its rollback), reads back, purges
+  `review`, `event <json>`, `retire`, `subscription <key|off> [--surface]`, `flag`, `purge`. Every apply prints `before` (its rollback), reads back, purges
   /blog/ and appends to `scripts/public-website/blog-home/ledger/<YYYY-MM>.jsonl` — commit the ledger.
 - Deploy: `deploy home|content-model [--apply]` (exports the live baseline first; content-model toggles the flag
   off → deploy → restore). Page: `page publish|rollback --snapshot <option>` (cutover snapshot
@@ -21,14 +24,35 @@ canonical site nav, `eo_content_model_enabled = 1`.
 - Slider order: pins → Glitch (newsletter resource, else latest edition/Flash) → guide/tool → diagnostic → recent
   `auto_slide_candidate` posts up to five. A **Novedad** only enters when pinned. WordPress «sticky» is ignored.
 - A post without `_eo_hero_image` gets a reading scrim and a two-line dek; slider art goes in via `hero --image`.
-- Author circle: the author's uploaded WordPress profile photo (`get_avatar_url`), initials when there is none; a
-  Gravatar fallback never stands in.
+- Slider places: the three invitations (Glitch → guide/tool → diagnostic) are reserved and never cut by pins; pins,
+  then recent candidates, fill the rest; on screen posts come first, invitations after.
+- Author circle: the author's uploaded WordPress profile photo (`get_avatar_url`, One User Avatar;
+  `EO_Home_Readers::author_photo`), initials when there is none; any `gravatar.com` URL is dropped. No CLI command:
+  the editor uploads it in the WP profile; then `purge --apply`.
 - Glitch subscription is real only with a published `inline_pill` Growth Form connected by `subscription <key> --apply`
-  (`pnpm growth:forms:publish-glitch-pill` publishes it); without one the home shows no subscription, never a
-  simulated «¡Listo!». HubSpot subscribes by the act under the notice (`consentBy: 'submission'`).
+  (options `eo_blog_glitch_form_key` / `eo_blog_glitch_form_surface`, default surface
+  `fhsf-efeonce-blog-subscription`; `pnpm growth:forms:publish-glitch-pill` publishes it). Live form:
+  `efeonce-blog-subscription`, key `6bc62588-a4a0-4214-9501-13b0c2948c81`, HubSpot subscription type `535702717`.
+  Without one the root carries `data-subscribe="off"` and the home shows no subscription, never a simulated
+  «¡Listo!» (that happened for ~40 min right after the cutover). HubSpot subscribes by the act under the notice
+  (`consentBy: 'submission'` + the notice hash in the consent snapshot).
+- The pill and the bottom subscription are `<greenhouse-form data-dc-keep class="eo-inline-pill eo-inline-pill--glitch">`
+  (deviation 13). `data-dc-keep` is load-bearing: without it the slider autoplay morph wipes the rendered form. The host
+  reset must keep `:not(greenhouse-form *)` (`build-plugin.cjs` HOST_RESET): an ID-specific `all:revert` reaching inside
+  broke the renderer (doubled text, squashed pill). Rule: never style inside an element another script paints.
+- Before the renderer (or without JS) the form shows `a.ghf-fallback` in the canvas idle-pill shape plus the
+  `.gxs__note` notice holding its place. Width: 480 px in `.gxw`; tablet left-aligned via `--ghf-inline-align` /
+  `--ghf-inline-note-align`; full width on mobile; column width at the bottom.
+- Try the real pill before connecting it live: `node scripts/public-website/blog-v3/preview/serve.cjs --subscribe <key>`
+  (GET-only local proxy `/__ghf/`; no submit possible).
+- End-to-end proof needs a human submit: Turnstile rejects the automated browser (no token, no `POST /submit`). Never
+  try to bypass it; confirm the contact in HubSpot instead. Rollback: `subscription off --apply`.
 - Resources hide after 180 days without `review`. Events never store private meeting links (the CLI refuses them).
 - Template changes are not edits to WordPress: they go through `scripts/public-website/blog-v3/` (bind-canvas →
   make-tablet → build-plugin → equivalence + PHP parity + pixel gate ≤1 %), are committed in the runtime and shipped
   with `deploy home`. Deviations from the canvas are listed in
   `docs/ui/visual-directions/TASK-2051-blog-portada-v3/README.md`.
 - A new PHP file reaches PHP-FPM 1–2 min after a deploy.
+- Open items (2026-10-24): human submit confirmed in HubSpot, operator's visual OK on the bottom pill, first real event
+  (events section hidden until then), purge timing measured on Kinsta, trash of review page 252046 pending the
+  operator.

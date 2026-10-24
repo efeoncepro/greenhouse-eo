@@ -1,5 +1,10 @@
 # Demo 35 Blog Magazine
 
+> **Historical (2026-10-24):** `/blog/` (`18456`) no longer comes from Demo 35. Since 2026-10-24 it serves the blog home
+> v3 (`eo-blog-home` + PDR-029 content model): load `references/blog-home-operation.md` and
+> `docs/architecture/public-site/BLOG_HOME_RUNTIME_V1.md` instead. Keep this file only for the protected source `225984`
+> and the work copy `251875`; do not plan a Demo 35 cutover.
+
 Operational reference for the WordPress blog home work surface. Structural
 baseline: `docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`.
 Applied taxonomy/work-copy evidence:
@@ -14,7 +19,7 @@ Applied taxonomy/work-copy evidence:
 - Work URL: `https://efeoncepro.com/demo35-blog-magazine-copia-trabajo/`.
 - Work markers: source `225984`, purpose `demo35-blog-home-work-copy-v1`.
 - It is a normal Elementor `page`, not the WordPress posts archive.
-- Current blog page: `18456`, canonical `https://efeoncepro.com/blog/`.
+- Current blog page: `18456`, canonical `https://efeoncepro.com/blog/` (portada v3 since 2026-10-24, not Demo 35).
 - Runtime observed 2026-08-22: WordPress `7.1`, Ohio `3.7.0`, Elementor
   `4.2.3`, Elementor Pro `4.2.2`, Ohio Extra `3.7.0`.
 - Keep `page_for_posts=0`. Assigning this page as the posts page makes

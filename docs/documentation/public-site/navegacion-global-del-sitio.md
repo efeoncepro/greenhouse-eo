@@ -12,8 +12,8 @@
 Es el menú que aparece arriba en todas las páginas de `efeoncepro.com`. Reemplazó al menú que traía el tema del sitio
 (Ohio) y está activo en todo el sitio desde el 23 de octubre de 2026.
 
-Hay una sola excepción: la página del blog (`/blog/`) sigue con el menú anterior, porque tiene su propio rediseño en
-curso.
+Desde el 2026-10-24 no hay excepciones: la página del blog (`/blog/`) también usa este menú, desde que se publicó su
+portada nueva.
 
 El mismo día se revisaron en vivo las 52 páginas publicadas y 3 posts de Glitch, en escritorio y teléfono: todas
 responden, todas muestran el menú nuevo y ninguna el anterior.

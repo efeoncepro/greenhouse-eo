@@ -1,0 +1,91 @@
+/* Generated from partner-dialog-skin.css by compile-partners-elementor-source.cjs. Do not edit by hand. */
+/*
+ * Piel del popup «Quiero ser partner» (canvas «Partners — Efeonce» v14) sobre los renderers de Growth CTA y
+ * Growth Forms (TASK-2045). Sólo tokens --ghcta-dialog-* / --ghf-* y hooks data-ghcta-dialog-* / data-ghf-part:
+ * ningún selector interno del renderer. Se carga en /partnership/ cuando el CTA del popup se active
+ * (follow-up de TASK-2045; requiere el formulario gobernado y el release de los renderers).
+ */
+body:has(.gh-partners) dialog.ghc-form-surface {
+  --ghcta-dialog-surface: #001a33;
+  --ghcta-dialog-fg: #ffffff;
+  --ghcta-dialog-border: 1px solid rgba(114, 222, 216, 0.28);
+  --ghcta-dialog-radius: 28px 28px 28px 6px;
+  --ghcta-dialog-shadow: 0 40px 120px rgba(0, 0, 0, 0.55);
+  --ghcta-dialog-backdrop: rgba(0, 8, 20, 0.72);
+  --ghcta-dialog-close-border: 1px solid rgba(207, 228, 250, 0.25);
+  --ghcta-dialog-close-hover: #72ded8;
+  --ghcta-dialog-focus: #72ded8;
+  font-family: 'Poppins', sans-serif;
+}
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghcta-dialog-eyebrow] { font-size: 18px; font-weight: 300; line-height: normal; color: #cfe4fa; }
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghcta-dialog-eyebrow]::before {
+  content: ""; display: inline-block; width: 0.62em; height: 0.62em; margin-right: 0.42em; border: 0.1em solid #36c8bf;
+  border-radius: 50%; box-sizing: border-box; vertical-align: -0.04em;
+}
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghcta-dialog-title] {
+  font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: 48px; line-height: 0.95; letter-spacing: -0.04em;
+}
+body:has(.gh-partners) dialog.ghc-form-surface :is([data-ghcta-dialog-title], [data-ghf-part="success-title"])::after {
+  content: ""; display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.04em; border-radius: 50%; background: #36c8bf;
+}
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghcta-dialog-lead] { font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa; }
+
+body:has(.gh-partners) dialog.ghc-form-surface greenhouse-form {
+  --ghf-font: 'Poppins', sans-serif;
+  --ghf-fg: #ffffff;
+  --ghf-muted: #cfe4fa;
+  --ghf-field-bg: rgba(207, 228, 250, 0.05);
+  --ghf-border: rgba(207, 228, 250, 0.22);
+  --ghf-border-strong: rgba(207, 228, 250, 0.4);
+  --ghf-field-radius: 12px;
+  --ghf-field-min-height: 48px;
+  --ghf-field-padding: 12px 14px;
+  --ghf-field-font-size: 15px;
+  --ghf-field-shadow: none;
+  --ghf-field-shadow-focus: 0 0 0 3px rgba(54, 200, 191, 0.18);
+  --ghf-field-focus-border: #36c8bf;
+  --ghf-focus: #72ded8;
+  --ghf-label-size: 13px;
+  --ghf-label-weight: 500;
+  --ghf-label-color: #cfe4fa;
+  --ghf-label-line-height: normal;
+  --ghf-placeholder: rgba(207, 228, 250, 0.45);
+  --ghf-gap: 18px;
+  --ghf-column-gap: 20px;
+  --ghf-field-gap: 8px;
+  --ghf-accent: #ffffff;
+  --ghf-accent-contrast: #001a33;
+  --ghf-btn-radius: 999px;
+  --ghf-btn-min-height: 54px;
+  --ghf-btn-padding: 0 30px;
+  --ghf-action-shadow: none;
+  --ghf-action-shadow-hover: none;
+  --ghf-consent-accent: #36c8bf;
+  --ghf-consent-size: 13px;
+  --ghf-consent-color: #cfe4fa;
+  --ghf-consent-link: #ffffff;
+  --ghf-orbit: #36c8bf;
+  --ghf-btn-ghost-border: rgba(255, 255, 255, 0.5);
+  --ghf-btn-ghost-fg: #ffffff;
+  --ghf-btn-ghost-bg: rgba(0, 26, 51, 0.35);
+}
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghf-part="submit"] { font-size: 16px; }
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghf-part="submit-arrow"] { margin-left: 10px; font-size: 18px; line-height: 1; }
+/* Separaciones del diseño: 20 px antes de la casilla y 24 px antes del botón (el formulario usa 18). */
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghf-part="consent"] { margin-top: 2px; }
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghf-part="actions"] { margin-top: 6px; }
+/* Avisos vacíos: siguen en el DOM (aria-live) pero no suman separación al pie. */
+body:has(.gh-partners) dialog.ghc-form-surface :is([data-ghf-part="readiness"], [data-ghf-part="summary"]):empty { margin: calc(-1 * var(--ghf-gap)) 0 0; }
+/* El diseño no marca obligatorios ni opcionales; el input conserva required para lectores de pantalla. */
+body:has(.gh-partners) dialog.ghc-form-surface :is([data-ghf-part="required-mark"], [data-ghf-part="optional-mark"]) { display: none; }
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghf-part="success-card"] {
+  justify-items: start; gap: 14px; max-width: none; padding: 24px 0 8px; border: 0; background: none; box-shadow: none; text-align: start;
+}
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghf-part="success-card"]::before { content: none; }
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghf-part="success-content"] { justify-items: start; gap: 14px; text-align: start; }
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghf-part="success-actions"] { justify-content: flex-start; margin-top: 8px; }
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghf-part="success-mark"] { width: 72px; height: 72px; }
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghf-part="success-title"] {
+  font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: 44px; line-height: 0.95; letter-spacing: -0.04em;
+}
+body:has(.gh-partners) dialog.ghc-form-surface [data-ghf-part="success-body"] { max-width: 420px; font-size: 16px; font-weight: 300; color: #cfe4fa; }

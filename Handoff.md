@@ -27,12 +27,13 @@ estado y motivo de cada diapositiva, fijar, título e imagen del slider, formato
 purga, despliegue de los dos plugins (con línea base viva y flag off→on) y verificación en navegador. Cada `--apply`
 queda en `scripts/public-website/blog-home/ledger/`.
 
-**Suscripción a Glitch:** los formularios del canvas simulaban el envío; en producción ya no se muestran sin un Growth
-Form real (`data-subscribe="off"`). Fix real en el release `80a3fcfe7` (PR #259): suscripción por el acto de
-suscribirse bajo el aviso de la píldora (`consentBy: 'submission'` + hash del aviso, aprobado por el operador el
-2026-10-24) y `pnpm growth:forms:publish-glitch-pill`. Pasos tras el release: `--publish`, luego
-`pnpm public-website:blog-home subscription 6bc62588-a4a0-4214-9501-13b0c2948c81 --apply` y verificar un envío real
-(contacto suscrito al tipo 535702717 en HubSpot). La suscripción del final usa la misma píldora (desvío 13).
+**Suscripción a Glitch: real y en vivo** desde el release `40b330175855` (orquestador `40090589488`, released): formulario
+`efeonce-blog-subscription` publicado como píldora (`fver-e6850cc8…`, `pnpm growth:forms:publish-glitch-pill`) y
+conectado con `pnpm public-website:blog-home subscription 6bc62588-… --apply`. HubSpot suscribe por el acto de enviar
+bajo el aviso (`consentBy: 'submission'` + hash del aviso, aprobado por el operador). Verificado en vivo sin envío:
+renderer en los tres tableros, sobrevive al autoplay del slider, abre el campo, axe 0. **Pendiente:** un envío real de
+verificación (contacto suscrito al tipo 535702717) y el visto bueno visual de la píldora en el pie (desvío 13).
+Desconectar: `subscription off --apply`.
 
 **AXIS v0.7.15 publicado** (CI `dc7c721`, primitives 0.7.15; la prueba del haz del buscador ya no compite con el
 runner). Sin evento real cargado: la sección de eventos queda oculta hasta el primero (`blog-home event`).
