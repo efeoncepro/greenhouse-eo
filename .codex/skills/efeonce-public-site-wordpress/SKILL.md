@@ -73,6 +73,7 @@ Read the minimal set:
 | Inbound Marketing `/agencia-inbound-marketing/` | `references/landings/inbound-marketing.md` + `references/source-led-elementor-patterns.md` |
 | Content Marketing / Content Ops `/servicio-marketing-de-contenidos/` | `references/landings/content-marketing.md` + `references/source-led-elementor-patterns.md` |
 | Agenda `/agenda/` (landing around the real native scheduler) | `references/landings/agenda.md` + `references/source-led-elementor-patterns.md` |
+| Nosotros `/about-us-efeonce/` or Partners `/partnership/` (canvas ports; Ohio fidelity, theme rails, parallax) | `references/landings/about-us-efeonce.md` or `references/landings/partnership.md` + `references/source-led-elementor-patterns.md` §Ohio host fidelity |
 
 If several domains apply, load the smallest union. Do not preload every reference.
 

@@ -41,9 +41,12 @@
   never in git) + load both bundles and the skin; recompile → package → deploy → publish (preview first); smoke a real
   submission in the dialog (Turnstile interactive, HubSpot attempt `succeeded`); then GTM DLV + GA4 dimension
   `activation_mode` (preview + confirmation).
-- Fidelity: section and card heights equal to the canvas at 1440 and 390 (animations frozen, computed-style diff). Ohio
-  collisions fixed in `host.css`: body `line-height:1.6`, `16.4px` and tracking (root reset to the browser defaults),
-  Ohio's post `.tag` pill, and a 16px top margin on `.bento`/`.steps`.
+- Fidelity: section and card heights equal to the canvas at 1440 and 390 (animations frozen, computed-style diff;
+  `../source-led-elementor-patterns.md` §Ohio host fidelity). Ohio collisions fixed in `host.css`: body
+  `line-height:1.6`, `16.4px` and tracking (root reset to the browser defaults), Ohio's post `.tag` pill, and a 16px top
+  margin on `.bento`/`.steps`.
+- Pending: the same Ohio rail collision as Nosotros between 1181 and 1320px (hero/`.wrap` text at 56px under the
+  Dark/Light switch); the operator chose not to fix it yet (2026-10-24). Recipe: §Ohio host fidelity → Theme rails.
 - Live 2026-10-23: deploy backups on Kinsta `/tmp/eo-partners-widgets-before-20261023-2200*.tar`; replace snapshot
   `_gh_partners_v2_before_20261023_220804`; Elementor data hash `8a0a3ebb…`; overflow 0, no broken images. QA preview
   `252038` (`/partners-preview-20261023/`) left `private`.

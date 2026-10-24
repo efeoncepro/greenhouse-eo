@@ -1,5 +1,17 @@
 # Handoff
 
+[Historial](Handoff.archive.md).
+
+## 2026-10-24 — Nosotros: fidelidad, rieles de Ohio, mapa y wordmark HubSpot (en vivo)
+
+`/about-us-efeonce/` (249770, source-led desde el 2026-10-23) corregida en vivo: capa del host fiel al canvas, texto
+despejado del switcher Dark/Light y «Follow Us» desde 1181 px (`--gh-rail`), mapa sin parallax (las etiquetas quedan
+sobre sus ciudades), hero anclado al riel izquierdo en pantallas anchas y wordmark oficial de HubSpot en las cifras.
+Commits `7b57a9589`, `1991fe21d`, `c90171c9e` + runtime `b5f7a25`, `4a2bfd2`, `f5d730e`; backups
+`/tmp/eo-nosotros-widgets-before-*.tar` en Kinsta. **Pendiente por decisión del operador:** el mismo choque de rieles en
+Partners entre 1181 y ~1320 px. **Sin push** (develop adelantado; varias sesiones). TASK-1322 y TASK-1369 llevan delta:
+1322 queda superseded, 1369 conserva sólo E-E-A-T (JSON-LD `Organization`/`Person`), captura del portal y reslug.
+
 ## 2026-10-23 — EO Portfolio: programa creado y TASK-2046 Slice 1 (sólo lectura)
 
 [PDR-028](docs/public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md), EPIC-056, ISSUE-183 y
@@ -219,14 +231,3 @@ Adquisición19/10: [taxonomía conceptual aceptada](docs/architecture/EFEONCE_CO
 Plan propio sin aplicar; consumers incompletos/workflows403. Sin cambio CRM, schema, fuentes nativas o histórico.
 UI19/10: legacy con Insignia/seis colores; selección única ofrece punto/insignia. API pública revisada no expone esos ajustes.
 [Contrato visual y QA](docs/manual-de-uso/hubspot/normalizar-origen-canales-adquisicion.md#presentación-humana-estilos-colores-y-alcance-de-la-api) documentado en ADR/funcional/skills espejo; estilos nuevos propuestos, cero writes.
-
-## 2026-10-18 — Ads publicado en todos los formularios comerciales validados
-
-API22:57Z:13 Forms comerciales y Discovery con Ads;12 altas adicionales, Grader comercial confirmado
-por Julio y Contacto general fueraAds. Lead Gen Web corregido por command/store Forms a quote_request,
-con key/slug/versión/destinos preservados y GET público verificado. Políticas por CAS/revisión/GET;
-Meta/UPD previos preservados. Sin GTM, puja, campaña o nuevo deploy. Nuevo API de clasificación sólo
-implementado localmente; corrección aplicada vía CLI canónica.53 tests/ESLint/tsc PASS.
-Primera recepción/atribución y ruta histórica propia Grader sin certificar; no fabricar leads/replays.
-[Publicación y evidencia](docs/audits/growth/2026-10-18-commercial-forms-policy-publication.md),
-[manual de corrección](docs/manual-de-uso/growth/corregir-clasificacion-comercial.md) e [historial](Handoff.archive.md).

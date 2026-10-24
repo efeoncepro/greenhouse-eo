@@ -2,6 +2,13 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-24 — Sitio público: Nosotros y Partners rediseñados (source-led)
+
+- `/about-us-efeonce/` y `/partnership/` publicadas como widgets Elementor compilados desde los canvas aprobados de «La
+  órbita» (11 y 6 módulos). Nosotros: fidelidad al canvas, rieles fijos de Ohio despejados, mapa sin parallax, hero
+  anclado a la izquierda y wordmark de HubSpot. Partners: «Quiero ser partner» sigue a `/agenda/` hasta el release de
+  los renderers de TASK-2044/2045. [Layout](docs/documentation/public-site/wordpress-ohio-elementor-layout.md#landing-nosotros-source-led-page_id-249770-desde-2026-10-23).
+
 ## 2026-10-23 — Mattis: preparación Markdown y continuidad comercial
 
 - Caso MD principal y propuesta de 23 bloques para Claude Design con anexos y simulación V3, sin aprobación ni envío.
@@ -658,17 +665,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 ## 2026-10-08 — Cotizaciones documentales multimoneda y entrega Pibank
 
 - [Plantilla A4](docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): presentación ISO, precisión decimal, FX explícito con fecha/fuente y tratamiento fiscal independiente. [Cotización Pibank](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/README.md): USD/PEN de 19 páginas y archivos en raíz de carpeta comercial, con copia por hash y procedencia registrada. Tres subagentes actualizaron docs/skills y auditaron aislamiento; sin cambios al cotizador Greenhouse, envío o CRM.
-
-## 2026-10-08 — Seguimiento comercial recurrente
-
-- [Outreach manual](docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md): tres correos conciliados en Outlook, tres notas HubSpot en seis contactos, tareas Notion reutilizadas/creada con borradores y cadencia finita. Skills Codex/Claude documentan evidencia, hilo único y avance por envío real. Sin secuencias ni emails enviados por el agente.
-
-- [Plantilla documental A4 para licitaciones](docs/commercial/templates/cotizacion-a4/README.md): HTML aprobado con slots/JSON, cálculo CLP de neto/IVA/total y PDF de cuatro páginas. Subagentes actualizaron docs y cinco pares de skills; routers distinguen preparación rápida de oferta y cotizador Greenhouse con registros/aprobación propios. Sin cambios runtime; paquete UTEM intacto.
-
-- [Política aceptada](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa + CCO `48713323@bcc.hubspot.com` en nuevos correos, respuestas y reenvíos autorizados; conector con firma en texto u Outlook UI con firma gráfica, ambas aprobadas. Prueba por conector verificada en Enviados; registro CRM sin verificar. Routers, manuales y skills sincronizados.
-
-- [UTEM presentada](docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md): Julio confirmó envío en Mercado Público; programa de tres meses por CLP4,8M netos /5,712M total. HubSpot Presentación de soluciones e importe neto verificados dos veces; Notion Enviada. Expediente, registros y skills Codex/Claude sincronizados. Costos/capacidad/panel y fuente Sky siguen como verificaciones internas pendientes; seguimiento de evaluación/resultado.
-
-- [Consolidación comercial y skills](docs/audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md): revisión LicitaLAB amplia, altas Diego/Emily y segmentos con evidencia; UTEM con originales/anexos firmados y datos corporativos confirmados. Tres subagentes sincronizaron documentos, seguimiento y 11 pares de skills. Manuales corrigen contacto previo, firma autorizada, leads y reutilización. Sin nuevos envíos ni postulación.
-
-- [Contrato y registro](docs/commercial/follow-up-agent/README.md): heartbeat Codex activo L–V 09:00/16:00 Chile, revisión de 251 registros y 41 abiertos, proyecto comercial con 23 tareas y tres borradores de texto en Notion. ADR de autonomía acotada; sin cambios CRM ni envíos. Outlook devolvió 403 al guardar borrador; primera corrida programada aún no observada.

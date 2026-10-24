@@ -1,5 +1,13 @@
 # TASK-1322 — About Us Copy Narrative Refresh
 
+## Delta 2026-10-24 — la página que esta task refrescaba ya no existe
+
+El 2026-10-23 `/about-us-efeonce/` se rediseñó por completo y se publicó como widgets source-led (`greenhouse_nosotros_*`);
+el hero `+90`/«Ver cómo operamos», las secciones `Qué hacemos`/`Infraestructura` y los fixes `body.page-id-249770` de
+`global-fixes.css` que esta task protegía ya no forman parte de la página. Todo su scope quedó superado: cerrar como
+superseded.
+
+
 ## Delta 2026-07-08 — superseded por TASK-1369
 
 Esta task era un **refresh de copy ligero** que mantenía el hero actual y no rediseñaba la página. Esa premisa quedó **obsoleta**: [PDR-010](../../public-site/decisions/PDR-010-home-es-el-pitch-agencia-se-pliega.md) movió el pitch a la Home y definió el About Us como página de **identidad**, y [PDR-011](../../public-site/decisions/PDR-011-about-us-identidad-golden-circle.md) lo reconstruye como **Golden Circle (Why→How→What)** liderando el **Why de marca** recién articulado (SSOT `docs/context/09_marca-agencia.md`) — lo que **cambia el hero** ("No te entregamos crecimiento. Lo construimos contigo."), no lo mantiene. El trabajo del About Us vive ahora en **[`TASK-1369`](TASK-1369-about-us-identidad.md)** (que absorbe el scope de copy de esta task). **Recomendación: cerrar esta task como superseded** (no ejecutar en paralelo — mismo archivo `/about-us-efeonce/`).

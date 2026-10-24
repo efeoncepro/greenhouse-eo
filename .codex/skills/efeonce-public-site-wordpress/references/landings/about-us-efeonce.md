@@ -37,20 +37,22 @@
   and title «Nosotros: lo construimos contigo | Efeonce»; featured image `249769` untouched; snapshot option
   `_gh_nosotros_og_before_20261023_144636` (previous OG image `250188`). Bottom dock: none.
 
-- Fidelity pass 2026-10-23 (same computed-style diff as Partners, live vs canvas, animations frozen): Ohio leaked body
-  `line-height:1.6`/`16.4px`/tracking, `ul:not(.-unlist) > li` margins, a 16px top margin on `.pgrid` and theme heading
-  sizes, and the old host layer forced `border-box` (canvas = content-box, 2 px off on bordered buttons). Fixed in
-  `nosotros-source/host.css`; after the deploy the diff has zero height differences at 1440 and only the inline-image
-  baseline gap (7 px, same black on both sides) under the hero photo at 390.
-
-- Theme rails 2026-10-23 (reported on «En cinco países» and the founder quote): from 1181px Ohio pins its Dark/Light
-  switch (left) and «Follow Us» (right) at `1.5vw + 56px` from each edge; the canvas had no rails, so full-bleed copy and
-  the `.wrap` below 1320px ran under them. `host.css` sets `--gh-rail: calc(1.5vw + 88px)` for `.wrap` (only while it is
-  narrower than the rail), `.mk-copy` (widened by the same amount so the title keeps one line), founder and brain copy.
-  The map image no longer has parallax: the city labels are fixed coordinates and the canvas animation (scale 1.16,
-  ±7%) moved the image under them. The hero copy is anchored to the left rail instead of centered in 1320px: centered, it
-  drifted onto the lit doorway and the passers-by on wide screens (the approved composition is the ~1280px one, text on
-  the dark wall). Partners has the same rail collision between 1181 and 1320px (pending).
+- Fidelity pass and follow-ups 2026-10-23/24 (method and generic recipes:
+  `../source-led-elementor-patterns.md` §Ohio host fidelity), all in `nosotros-source/host.css` unless noted:
+  - Ohio collisions reset (body type, `li` margins, `.pgrid` top margin, heading sizes, content-box); the diff then has
+    zero height differences at 1440 and only the inline-image baseline gap (7 px, black on both sides) under the hero
+    photo at 390.
+  - Theme rails (reported on «En cinco países» and the founder quote): `--gh-rail` on `.wrap`, `.mk-copy` (widened so
+    the title keeps one line), founder and brain copy; the hero copy anchored to the left rail instead of centered in
+    1320px (it drifted onto the lit doorway and the passers-by on wide screens).
+  - Map: no parallax on the «mercados» image, so the five city labels stay on their cities.
+  - Hero stats (`Main.dc.html`): the HubSpot stat shows the official full HubSpot wordmark in white (same asset as the
+    partners grid, `partner-hubspot.svg`, alt «HubSpot», `height:1em`, `filter: brightness(0) invert(1)`) instead of the
+    word. It added hero fields (renumbered `fNNN_*`); widget-only deploy was safe because `_elementor_data` stores no
+    field keys.
+  - Deploy backups on Kinsta `/tmp/eo-nosotros-widgets-before-20261024-002931.tar`, `-005050.tar`, `-010056.tar`;
+    greenhouse-eo commits `7b57a9589`, `1991fe21d`, `c90171c9e`; runtime commits `b5f7a25`, `4a2bfd2`, `f5d730e`.
+    Verified live at 1280, 1710 and 1920 px (and 390 for the stats).
 
 ## Before 2026-10-23 (history; replaced)
 

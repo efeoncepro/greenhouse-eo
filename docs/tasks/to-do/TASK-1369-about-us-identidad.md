@@ -1,5 +1,27 @@
 # TASK-1369 — About Us: página de identidad (Golden Circle)
 
+## Delta 2026-10-24 — la página ya se reconstruyó (rediseño source-led del 2026-10-23)
+
+El 2026-10-23 `/about-us-efeonce/` (249770) se rediseñó con la línea gráfica «La órbita» desde un canvas aprobado por el
+operador y se publicó como widgets Elementor source-led (`greenhouse_nosotros_*`, once módulos: hero, quees, marcas,
+porque, como, equipo, mercados, prueba, partners, founder, cierre; fuente `scripts/public-website/nosotros-source/`).
+Ajustes de fidelidad y layout en vivo el 2026-10-23/24 (rieles de Ohio, mapa sin parallax, hero anclado a la izquierda,
+wordmark de HubSpot). Frente a esta task:
+
+- **Cerrado:** h1 = el Why («No te entregamos crecimiento. Lo construimos contigo.»), arco Why→How→What («Nuestro
+  porqué», «Cómo lo hacemos», «Quiénes lo hacen»), dirección de arte del hero (recepción en larga exposición) y bloque de
+  equipo con personas reales y roles, prueba citable (Sky), founder con cita, cinco países y CTA «Agenda una reunión» +
+  «Únete al equipo». Los bloqueantes «bios reales» y «dirección de arte del hero» ya no aplican al primer fold ni al
+  equipo de liderazgo de cuenta.
+- **Invalidado:** la estructura de 11 secciones del wireframe y sus marcadores `data-capture` (la página usa
+  `about-hero/quees/marcas/why/brain/equipo/mercados/prueba/partners/founder/cierre`); el «Already exists» de la semilla
+  «se orquesta».
+- **Sigue abierto:** JSON-LD `Organization` + `Person` por líder (no lo agregó el rediseño; sólo se actualizó la meta
+  description y OG), imagen de captura real del portal en «lo ves en vivo», reslug `/nosotros` + 301 y GVC formal.
+
+Recomendación: recalibrar esta task al remanente (E-E-A-T + reslug) o cerrarla y abrir una task acotada.
+
+
 <!-- ═══════════════════════════════════════════════════════════
  ZONE 0 — IDENTITY & TRIAGE
  ═══════════════════════════════════════════════════════════ -->
