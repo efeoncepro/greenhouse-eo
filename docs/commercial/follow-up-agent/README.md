@@ -1,5 +1,16 @@
 # Seguimiento comercial recurrente
 
+## Continuidad del chat de prospección — corte 24/10/2026
+
+El [consolidado de cinco casos](../prospecting-agent/runs/2026-10-24-cierre-chat-prospeccion.md) complementa
+la cola existente. NIASA conserva una secuencia nativa inscrita, observada como Programado con pasos
+29/10 y 05/11 en zona de México; no duplicarla desde este agente. Arcor mantiene su revisión interna
+registrada por el radar separado y LinkedIn sin realizar en el chat. Las revisiones de Fundación Luz y
+Arcor existentes en `state.json` no se recrean. María José y Paola no heredan la secuencia de Liliana.
+Releer mensajes, rebotes, restricciones y estado nativo antes de proponer continuidad; este cierre
+no autoriza nuevos envíos, validaciones pagadas, tareas ni inscripciones.
+
+
 Owner: Julio Reyes / Commercial. Corte inicial: 2026-10-08, America/Santiago.
 Autorización: solicitud explícita del operador de alertas, borradores, tareas en Efeonce Comercial y registro en Markdown; frecuencia confirmada lunes a viernes 09:00 y 16:00.
 

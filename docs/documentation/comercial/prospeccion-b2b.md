@@ -129,3 +129,13 @@ revisión interna a seis meses, owner/TASK única en **HubSpot** y restricciones
 trabajo operativo/entregables; no duplica las tareas comerciales. El seguimiento recupera esa
 cola aunque cambie el mes del proyecto. Revisar, nutrir con permiso y recontactar autorizado son acciones
 distintas; la respuesta no crea opt-in ni oportunidad. [Caso Fabrimetal](../../commercial/follow-up-agent/runs/2026-10-13-fabrimetal-respuesta-parada.md).
+
+
+## Evidencia por persona y canal — cierre del 24/10/2026
+
+El [lote documentado del chat](../../commercial/prospecting-agent/runs/2026-10-24-cierre-chat-prospeccion.md)
+conserva cinco casos con permisos, calidad del correo y resultados independientes. Los cinco EMAIL `SENT`
+se corroboraron en CRM; LinkedIn tiene su propia evidencia y Arcor sigue sin ese envío. Sólo NIASA tiene
+secuencia autorizada e inscrita. Estados automáticos de lifecycle o Documents no acreditan calificación.
+La matriz global se distingue de la persona local; una dirección inferida o un catch-all conservan su
+incertidumbre aunque exista un envío. Reutilizar estos casos exige leer su corte y revalidar el dato pertinente.

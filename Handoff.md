@@ -2,6 +2,17 @@
 
 [Historial](Handoff.archive.md).
 
+## 2026-10-24 — Prospección del chat: documentación y continuidad por canal
+
+[Cinco casos y evidencias](docs/commercial/prospecting-agent/runs/2026-10-24-cierre-chat-prospeccion.md):
+Fundación Luz, Arcor, Huelquén, NIASA y Disney. Los cinco EMAIL `SENT` corroborados en CRM; Huelquén ya tiene
+logging. LinkedIn de Arcor sigue sin realizar. Sólo NIASA tiene secuencia, con pasos futuros observados
+29/10 y 05/11 en hora de México; comprobar el CCO de cada paso automático antes del disparo, sin duplicar la
+secuencia desde el seguimiento recurrente. Revisiones internas de Mariana
+27/10 e Ignacio 28/10 ya pertenecen al radar separado. Paola conserva catch-all pendiente de aclaración antes
+de nuevas acciones; el envío histórico no valida la casilla. Sin nuevas comunicaciones, créditos o mutaciones
+CRM en este cierre. Docs, cuatro skills espejo y escenarios conciliados; [auditoría](docs/audits/commercial/2026-10-24-chat-prospeccion-docs-skills.md).
+
 ## 2026-10-24 — Portada del blog v3: revisión en vivo con datos reales; falta el corte de `/blog/`
 
 **En vivo** (pedido del operador): plugin `eo-blog-home` y `https://efeoncepro.com/blog-v3-revision/` (252046, noindex,
@@ -231,11 +242,3 @@ Google `.org`: Cloud/Workspace indirecto activo/Ingram, handshake completo; resp
 Microsoft `.com` 20/10: Verified, Authorized e Indirect Reseller Active; correo a Geraldine/CC Camila enviado17:21 con captura/firma, EMAIL119142026297 SENT. Respuesta comercial LOL pendiente; AWS SmartHub/Partner Central por verificar.
 [Registro y auditorías](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) · [manual y controles](docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md).
 [Directorio](docs/operations/EFEONCE_PARTNER_CONTACT_DIRECTORY_V1.md):27 personas,8 buzones, fuentes/rebotes; índice nominal en cuatro skills Codex/Claude. Antes de contactar, leer ficha e hilo; sin nuevos envíos en la consolidación del directorio.
-
-## 2026-10-18 — Indecaucho: Katia contactada y un seguimiento programado
-
-Company59393386572/Contact255985568411/Primary/segmento180 verificados. Dos puentes Apollo investigados,
-sin correo utilizable ni alta;2 créditos. Primer Outlook21:06Chile con firma gráfica/CCO; EMAIL118844303672 SENT.
-Secuencia316810121: Programado1/Error0, único22Oct09:30Quito=11:30Chile, firma y deck360 íntegro;
-respuesta a cualquier email o reunión desinscribe. No duplicar, contactar puentes ni reinscribir.
-[Expediente y siguiente paso](docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).

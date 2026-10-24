@@ -174,6 +174,17 @@ laborales y desinscripción por respuesta. No duplicar firma ni afirmar CCO en u
 Este caso usa registro nativo CRM y conserva el alcance separado de la política CCO para envíos por Outlook;
 no concede autorización general de futuros mensajes ni sustituye el readback de un envío real.
 
+### Persistencia de contenido enriquecido — observación del 24/10/2026
+
+En el [caso Disney](../commercial/prospecting-agent/runs/2026-10-24-disney-paola.md), el editor mostró el cuerpo
+completo tras pegar HTML, pero la primera copia guardada conservó sólo la firma. Ver el texto en pantalla no
+acredita que el borrador se haya persistido: comprobar la copia guardada si se entrega como borrador y, tras
+el envío autorizado, abrir el ID nuevo de Enviados mediante lectura independiente. Verificar cuerpo completo,
+ambos enlaces de brochure cuando se solicitaron, landings, una firma nueva y destinatarios/CCO exactos.
+Una sugerencia de Viva Insights o un botón deshabilitado no prueba programación ni envío; reconciliar el
+resultado real antes de otra acción. No repetir el envío por un borrador obsoleto ni sustituir la firma gráfica.
+El InMail se comprueba en su conversación; la actividad EMAIL no cierra por sí sola ese canal.
+
 ## Evidencia, alternativas y límites
 
 El 2026-10-08 se verificó en Enviados el correo a Dianesty sobre diseñador senior: salió desde Outlook con los dos enlaces, pero con cierre simple y sin BCC. El operador pidió esta corrección permanente. El contrato aplica a futuros envíos; no reenvía ni registra retroactivamente ese correo sin mandato específico.

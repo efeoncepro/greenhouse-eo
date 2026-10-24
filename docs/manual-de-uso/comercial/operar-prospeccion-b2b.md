@@ -226,3 +226,31 @@ EMAIL `SENT` asociado. Cada canal usó su enlace sobre el brochure original; un 
 del remitente no atribuye las vistas a la prospecta. Entrega, respuesta y membresía efectiva en segmentos
 siguen sin acreditar. Esperar respuesta no crea secuencia ni permiso de otro envío; rebote o negativa
 detienen la casilla afectada y exigen revisar el alcance antes de continuar.
+
+
+## Aplicación: cierre multicanal del chat — 22–24/10/2026
+
+El [cierre consolidado](../../commercial/prospecting-agent/runs/2026-10-24-cierre-chat-prospeccion.md)
+reúne Fundación Luz, Arcor, Huelquén Montessori, NIASA y Disney. Es evidencia fechada; los datos de contacto,
+cuerpos y enlaces individuales viven en CRM/Outlook. Cada persona conserva su propio permiso y estado:
+
+- Identificar a la persona exacta de la captura antes de revelar o registrar datos. La sede de la Company
+  global se distingue del país de la persona y de la iniciativa; no alterar la matriz para representar una filial.
+- Conservar estado de correo, atribución y catch-all por separado. Un match alto o un verdict `allow` no
+  resuelve por sí solo la casilla individual. La aprobación de revelación estándar no cubre waterfall ni una
+  validación de pago adicional. Las excepciones informadas anteriores no se heredan a otra persona.
+- Preparar el correo desde su necesidad: cómo trabajaríamos, por qué encajamos, prueba autorizada y una
+  pregunta útil. Experiencia de agencia, antigüedad del partnership y disponibilidad del proyecto son hechos
+  separados. Tecnología compartida y economías de escala explican eficiencia sin prometer un precio no cotizado.
+- Si se piden varios brochures, compartir cada original completo con su enlace nativo propio y explicación.
+  La aprobación del material no se reabre; sí se comprueban documento, destinatario, enlaces y firma en el envío.
+- Leer el hilo enviado de LinkedIn aparte de Enviados/EMAIL. En Arcor ese canal quedó sin ejecutar; no cerrarlo
+  por haber enviado el correo ni activarlo como efecto de documentar. Un contacto creado por Documents no
+  acredita validación ni calificación. Conciliarlo antes de repetir un alta.
+- NIASA fue el único mandato de secuencia de este lote. Conservar textos finales, firma, fechas y zona de
+  inscripción, reglas de parada y estado por persona. Sus fechas futuras observadas no prueban ejecución.
+  Una convocatoria vencida sólo admite el acercamiento autorizado como consulta de consideración tardía,
+  sin afirmar recepción vigente de propuestas.
+
+La auditoría del 24/10 confirmó las cinco actividades EMAIL `SENT`, incluida Huelquén, antes pendiente de
+readback. No amplía permisos de envío, créditos, inscripciones, cambios de lifecycle o automatizaciones.

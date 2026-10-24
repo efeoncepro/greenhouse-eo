@@ -55,6 +55,18 @@ conservar párrafos/enlaces y destinatarios; sustituir la firma de texto por una
 Tras enviar, el ID de Enviados puede diferir del de Drafts y el enlace viejo puede mostrar contenido obsoleto.
 Conciliar con Elementos enviados antes de reintentar; no reenviar porque ese enlace siga pareciendo borrador.
 
+Un pegado HTML puede verse completo en el editor y dejar guardada sólo la firma. Después de editar,
+comprobar el cuerpo persistido del borrador por una lectura nueva cuando se vaya a conservar o reabrir;
+la captura del compose no basta para declararlo guardado. Antes de enviar, verificar el cuerpo final vivo,
+los enlaces nativos de cada brochure, destinatarios, una firma gráfica y CCO. Tras enviar, leer el mensaje
+concreto de Enviados y comprobar esos mismos elementos: no deducirlos de un borrador anterior.
+
+En Documentos, crear cada enlace sobre el original aprobado con el destinatario efectivo. Confirmar
+por lectura que no exige email al visitante y permite descarga cuando ése sea el alcance; un toggle
+accionado sin cambio visible no prueba su estado. No abrir el enlace de tracking para autoevaluarlo: una
+visita propia o del escáner puede contaminar la atribución. La página de éxito acredita creación del
+enlace, no envío, recepción ni lectura.
+
 Si `objects search --type emails` devuelve vacío con OAuth, no concluir ausencia de logging. Consultar
 `hubspot activities list --contact <id> --activity-type EMAIL --format json` y recuperar el EMAIL por ID;
 verificar SENT, remitente, destinatario y asociaciones. Es un fallback de lectura, sin crear duplicados ni

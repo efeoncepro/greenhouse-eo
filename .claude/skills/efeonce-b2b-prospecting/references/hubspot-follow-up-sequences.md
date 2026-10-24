@@ -83,7 +83,9 @@ nativos; no afirmar CCO si la pantalla no lo expone. Para Outlook directo conser
 4. Automatizar: comprobar **respuesta a cualquier correo → desinscribir el contacto**. Esta regla
    cubre una respuesta al primer mensaje de Outlook, no sólo a pasos de la secuencia. Si el mandato
    dice seguir hasta respuesta, desactivar la regla por reunión y no añadir ramas por aperturas/clics.
-   Verificar alcance Contact/Company; no desinscribir a toda la empresa por defecto.
+   Verificar alcance Contact/Company; no desinscribir a toda la empresa por defecto. Si el mandato no
+   pide continuar hasta respuesta exclusivamente, comprobar también la parada por reunión; no desactivarla
+   por copiar la configuración de otro caso. Releer ambas reglas guardadas y mantener bajas/rebotes.
 5. Seleccionar únicamente el contacto aprobado; comprobar Para y De, zona horaria, documento y firma.
    Para inicio futuro elegir **Enviar más tarde** antes de **Iniciar secuencia**. El primer paso ofrece
    Enviar ahora por defecto: guardar la secuencia no programa por sí solo el inicio deseado.
@@ -95,7 +97,8 @@ nativos; no afirmar CCO si la pantalla no lo expone. Para Outlook directo conser
    dentro del mandato vigente; ante resultado incierto, conciliar antes de pulsar otra vez.
 7. «Procesando inscripciones» es intermedio. Hacer lectura nueva de Inscripciones: contacto correcto,
    **Programado**, fecha de inicio y errores. Releer reglas guardadas de Automatizar. Conservar IDs y
-   evidencia privada del calendario; una fila «Total inscritos 1» por sí sola no prueba Programado.
+   evidencia privada del calendario; una fila «Total inscritos 1» por sí sola no prueba Programado,
+   ni Programado significa En curso o correo enviado.
 
 En UI esperar al selector **Seleccionar contactos** antes de escribir en su buscador: el buscador global
 es otro control. Si la vista angosta solapa nombres y botones, inspeccionar estado/layout y resolverlo;

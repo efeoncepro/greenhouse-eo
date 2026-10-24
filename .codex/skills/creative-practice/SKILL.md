@@ -33,9 +33,15 @@ El brochure aprobado de la línea es **«Agencia Creativa»** (27 láminas, 16:9
 `Alineación/4. Comercial/Brochures/2026/Agencia Creativa/Efeonce-Brochure-Agencia-Creativa.pdf`, canvas privado
 <https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs>). La v1 «Servicios Creativos» (15 láminas) **no es vigente**: no
 se manda. Recorre mapa de rutas → un capítulo por ruta → seis capacidades → quién trabaja → cómo se compra → prueba
-(caso SKY) → plan. Ficha y pendientes: [README de Creative Services](../../../docs/services/creative-services/README.md#collateral-comercial);
-armado y lecciones: `deck-studio`. **Antes de llevarlo a un prospecto**, verificar si las cifras y el testimonio del
-caso SKY requieren autorización del cliente (pendiente abierto).
+(caso SKY) → plan. Ficha: [README de Creative Services](../../../docs/services/creative-services/README.md#collateral-comercial);
+armado y lecciones: `deck-studio`. La [ratificación del 17/10/2026](../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md)
+autoriza usar íntegro el brochure aprobado, incluido su caso, sin reabrir validaciones ni recortarlo. Sustituye
+el pendiente histórico de esta sección; no autoriza nuevas cifras, testimonios o usos fuera del material aprobado.
+
+El brochure oficial de la agencia, «Agencia de Marketing 360°» (aprobado 2026-10-16; armado en `deck-studio`), incluye
+el caso Sky y, dentro de Brand, tres láminas de Channel & Commerce (activación, góndola auditada, BTL). Esas láminas
+respetan el estado `Proposed` de la línea: sin promesa de venta, cobertura ni precio, y la producción física la
+ejecutan proveedores; Efeonce opera y responde.
 
 **Cuando el comprador pide «staff augmentation»** (decisión del operador, 2026-10-06): no se le corrige la palabra ni
 se le venden perfiles sueltos. Se responde con la **lámina 19**, «Tu equipo, con talento de Efeonce adentro.»: talento

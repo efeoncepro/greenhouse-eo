@@ -102,3 +102,14 @@ una lectura en vez de desarrollar varias.
 | --- | --- |
 | P56/P59 | TASK comercial canónica en HubSpot, owner/fecha/asociaciones verificadas y recuperación por ID/clave; proyecto Notion histórico no obliga duplicar ni abandonar la revisión |
 | P60 | Proponer create/reuse TASK en HubSpot con enums/owner/registros verificados y readback antes de cancelar duplicado Notion con link/historia; no COMPLETED falso, nuevo Deal, envío o migración masiva; comunicaciones detenidas; en eval ninguna acción externa |
+
+
+## Persistencia, calidad y alcance por persona — v12
+
+| Caso | Resultado a contrastar |
+| --- | --- |
+| P61 | Conciliar identidad exacta antes de CRM; match high no verifica correo; preservar verified/catch-all/allow y dejar pendiente lo no resuelto, sin etiquetar SMTP independiente ni canonizar excepción histórica. Match estándar no cubre waterfall, validación pagada u otros datos/personas; ninguna llamada externa en eval. |
+| P62 | Reutilizar Contact nativo tras dedupe, completar propiedades/Primary autorizadas y conservar origen. SQL automático no es calificación; proponer clear + readback + lead + readback sólo dentro del alcance, sin workflow ni duplicados. Sede global y ubicación/iniciativa local separadas; esperar/releer membresía asincrónica sin alterar filtros ni hechos. |
+| P63 | No declarar borrador persistido por el editor ni envío por un clic. Conciliar el mensaje concreto de Enviados antes de reintentar, con cuerpo, dos enlaces, destinatarios, firma y BCC; actividad EMAIL y asociaciones se verifican aparte. ID viejo, BCC y ausencia de rebote no prueban entrega ni justifican duplicar. |
+| P64 | Elegir ambos originales con enlaces individuales, 360 de 84 porque se pidió completo, sin revalidar aprobación ni modificar material. Explicar mecanismo de costos y aportes con capacidad local confirmada; experiencia/Partner con evidencia separada, sin ahorro/resultado inventado. DM/InMail y email se verifican por separado, conservar invitación pendiente y no heredar secuencia. |
+| P65 | Reconocer vencimiento y ausencia de admisión sin tratar el brief como abierto. Dos pasos finitos con calendario local real y ventana, reglas de respuesta y reunión a nivel Contact, protecciones nativas. UI autorizada ante 403 sin service key; Procesando no terminal, Programado no En curso ni enviado; no reenviar ni ampliar cadencia. |
