@@ -58,7 +58,26 @@ pnpm public-website:blog-home hero <id|slug> --clear --apply
 
 # Formato (cambia ícono, CTA y en qué secciones aparece)
 pnpm public-website:blog-home format <id|slug> novedad --apply
+
+# Línea de servicio de una entrada cuando su categoría no la dice (color del artículo y de su tarjeta)
+pnpm public-website:blog-home line <id|slug> voice --apply
+pnpm public-website:blog-home line <id|slug> off --apply
 ```
+
+**Línea de una entrada.** El color de un artículo y de su tarjeta en la portada sale de la línea de su tema: el mapa
+de temas, decidido el 2026-10-24. Cuando la categoría no dice la línea, por ejemplo paid media, que está en Marketing
+Digital y es Voice, `line` le asigna una propia sin tocar la categoría ni la URL.
+
+- Valores: `growth`, `brand`, `engine`, `voice`, `revenue-hubspot`, `revenue-salesforce`, u `off` para volver al
+  color del tema.
+- Sin `--apply` muestra el plan, con `before` (el valor anterior) y `after`.
+- Con `--apply` escribe el meta `_eo_line`, comprueba que la URL no cambió, deja el registro en el ledger y purga
+  `/blog/` y el propio artículo.
+- Para deshacerlo, vuelve a correr `line` con el `before` del ledger.
+- En vivo desde el 2026-10-24: 245605 (paid media) en Voice y 245154 (topic clusters) en Engine.
+
+Nunca cambies la categoría principal de una entrada publicada para cambiarle el color: la categoría forma parte de la
+URL (`/%category%/%postname%/`).
 
 Formatos: `articulo`, `caso`, `guia`, `grabacion`, `novedad`, `glitch-edicion`, `glitch-flash`, `glitch-nota`. Una
 **Novedad** (alianzas, anuncios de Efeonce) sólo entra al slider si se fija.

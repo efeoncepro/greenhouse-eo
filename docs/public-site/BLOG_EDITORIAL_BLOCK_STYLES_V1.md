@@ -1,7 +1,7 @@
 # Estilos editoriales del blog (bloques nativos de Gutenberg)
 
 > **Tipo de documento:** Contrato de diseño y uso
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-10-24 por Claude, a partir de la revisión del operador sobre los posts de inbound, paid media y topic clusters
 > **Código:** plugin `efeonce-editorial-blocks` 0.4.0, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`, commit `f9b0d4d`)
 > **Estado:** en producción desde el 2026-10-24 (§En producción)
@@ -158,5 +158,33 @@ QA en vivo (claro y oscuro):
 `ERR_CONNECTION_TIMED_OUT`, y verificado aparte con el mismo criterio pasa: una H1, el tablero de escritorio visible y
 sin scroll.
 
-**Pendiente (decisión del operador):** en el mapa de la portada, la línea de Inbound, Marketing Digital, SEO, IA y
-Novedades es provisional. Hoy los tres posts refrescados salen en Growth.
+**0.4.3 (2026-10-24): línea por tema decidida y línea por post.**
+
+El operador decidió la línea de cada tema; el mapa `EO_CM_Util::TOPICS` usa sólo colores de línea del token:
+
+| Tema | Línea |
+|---|---|
+| AEO, SEO, IA | Engine |
+| HubSpot, Inbound | Revenue HubSpot (el menú del sitio pone Inbound en Revenue) |
+| Diseño, Diseño Web, Redes Sociales | Brand; sobre papel `#bb1954`, porque `#ff6500` daba 2,95:1 |
+| Loop, Growth, Marketing Digital, Novedades | Growth |
+
+Una entrada cuya categoría no dice su línea (paid media es Voice y vive en Marketing Digital) lleva el meta
+`_eo_line`. Se escribe sólo con `pnpm public-website:blog-home line <post> <línea|off>`, que muestra el plan, guarda
+`before` como rollback, deja registro en el ledger y purga. **Nunca** se cambia la categoría principal: es parte de la
+URL.
+
+Hay un solo resolvedor para el artículo y su tarjeta, `EO_CM_Util::line_of`:
+
+- el adapter de la portada lee el meta en `gather()` y lo aplica con `palette_for()`, que es pura;
+- se agregó `update_meta_cache` para que el meta de todos los posts salga en una sola consulta.
+
+Paridad PHP = navegador: 27/27. Se coordinó con las sesiones de la portada, de archivos y de correos y eventos.
+
+**QA en vivo:**
+
+- Artículos: paid media en Voice `#f83902`, topic clusters en Engine `#0375db`, inbound en Revenue HubSpot `#8e1b82`.
+- Tarjetas: hoy esos posts no están en el slider ni en el rail. Con `gather()` real y la línea simulada en un post
+  del rail, `map()` devuelve Voice sólo en la simulación.
+- Nombre del tema seleccionado en la banda `#001a33`: 28 px en escritorio y 24 px en tableta, es decir, texto grande.
+  Todos los acentos pasan 3:1 (el más bajo, Engine, 3,82:1). En el móvil va en navy sobre blanco.
