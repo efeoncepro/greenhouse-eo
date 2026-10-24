@@ -2,15 +2,25 @@
 
 [Historial](Handoff.archive.md).
 
-## 2026-10-24 — Portada del blog v3: tasks TASK-2050…2054 y arranque de TASK-2051
+## 2026-10-24 — Portada del blog v3: TASK-2051 code complete en local, rollout pendiente
 
-El operador aprobó el canvas «Portada Blog Efeonce» v3 (`https://claude.ai/artifact/SmmJZC39UTJ9m6PD5x7tui`, v67) y
-pidió implementarlo en alta fidelidad. Tasks creadas (commit `8398d392e`): modelo de contenido (2050), portada con gate
-de píxeles ≤ 1 % por sección (2051), primitives AXIS (2052), contrato y renderer del formulario en línea (2053/2054).
-Copia congelada del canvas en `docs/ui/visual-directions/TASK-2051-blog-portada-v3/`. TASK-2051 en `in-progress`
-(rama: runtime `main` + Greenhouse `develop`, sin worktrees); discovery hecho, **checkpoint del operador antes del
-Slice 1**. El runtime tiene WIP ajeno sin commit (logo marquee, creativa, content marketing, versión 0.12.0 del
-plugin): no se toca. Reusar `--gh-rail` de Nosotros para los rieles de Ohio. **Sin push.**
+Canvas aprobado «Portada Blog Efeonce» v3 (`https://claude.ai/artifact/SmmJZC39UTJ9m6PD5x7tui`, v67); tasks
+TASK-2050…2054 (commit `8398d392e`). TASK-2051 implementada en local, **sin push ni escrituras en vivo**:
+
+- Plugin nuevo `eo-blog-home` en el runtime (commits `54939f6`, `df11a21` y `5346957`): render en servidor
+  del AST del canvas + `dc-runtime.js` con la lógica del canvas. Plugin propio porque `eo-elementor-widgets` tiene WIP
+  ajeno sin commit (incluido su archivo principal): no se tocó.
+- Gates en Greenhouse (`scripts/public-website/blog-v3/`): plantilla = canvas en HTML; PHP = primer render del
+  navegador byte a byte (6 casos); 17/17 secciones ≤ 1 % dentro del shell real (máx. 0,061 %); axe 0; sin scroll
+  horizontal de 1920 a 320; movimiento reducido sin autoplay. Hoja para el operador:
+  `https://claude.ai/artifact/VZELsJUCwxjvEj999eHCVB`.
+- Listo para desplegar con aprobación: `build-blog-home-plugin-package.cjs` + `deploy-blog-home-plugin-package.php`
+  (plugin), tema `ohio-child` con `EO_SITE_NAV_EXCLUDED_PAGES` vacío (runtime `df11a21`) y
+  `blog-v3/publish-blog-home-page.php` (corte de 18456, respaldo y rollback). Tema y corte van **juntos**.
+- Pendiente: aprobación de la hoja; contenido real (TASK-2050, PDR-029 por aprobar; hoy sirve el ejemplo del canvas);
+  decisión de tablet 768–1099 (interino: tablero móvil); dos H1 en el HTML (uno oculto); medición de laboratorio
+  con throttling; la parte Elementor del script de corte no se pudo ejercitar fuera de producción (Playground sin
+  Elementor/Ohio).
 
 ## 2026-10-24 — Nosotros: fidelidad, rieles de Ohio, mapa y wordmark HubSpot (en vivo)
 

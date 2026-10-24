@@ -33,6 +33,10 @@ el sitio sólo se reutiliza infraestructura (consultas, formularios, despliegue,
 5. Raíz fluida del tablero móvil: el canvas fijaba la mesa de trabajo en `390 × 6400 px` con `overflow: hidden`,
    que recortaba todo lo que pasaba de 6400 px (el contenido mide unos 8 560 px desde que se sumaron los eventos).
    La raíz toma el ancho de la ventana y su alto natural; a 390 px el resultado es el mismo píxel a píxel.
+6. Isla de navegación del móvil → espaciador vacío de 56 px: el header canónico es una barra fija de 72 px sobre la
+   página y la isla de la maqueta marcaba ese lugar; sin el espaciador el logo MCM quedaba debajo de la barra.
+7. Bajo 390 px (sin diseño en el canvas) la órbita de temas del móvil escala al ancho disponible con las mismas
+   proporciones; sin eso había 14 px de scroll horizontal a 360 y 54 px a 320.
 
 Cualquier otra diferencia es un defecto del gate.
 
@@ -59,6 +63,11 @@ Cualquier otra diferencia es un defecto del gate.
 5. `node fidelity/compare.cjs <referencias> <candidata>` aplica el presupuesto de 1 % por sección y deja un
    `*.diff.png` por sección distinta. Autocomprobación del 2026-10-24: plantilla enlazada contra referencias,
    17/17 secciones con 0,000 %.
+
+Contra WordPress: `node build-plugin.cjs` (emite el plugin `eo-blog-home`), `node test-php-parity.cjs`
+(PHP = navegador, byte a byte), `node preview/serve.cjs --now 1792843200000` (la portada dentro del shell real del
+sitio) y `node fidelity/capture.cjs url <dir> http://127.0.0.1:8844/blog/`. Resultado del 2026-10-24: 17/17
+secciones, máximo 0,061 %. Accesibilidad: `node fidelity/a11y.cjs` (axe WCAG 2.2 AA), 0 violaciones.
 
 Las referencias se renderizan con el runtime de plantilla propio de la implementación, no con el del editor del
 canvas: el HTML que produce es el del canvas (prueba 3), y las capturas se miraron contra el canvas publicado.

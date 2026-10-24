@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2051-blog-portada-v3-high-fidelity-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Discovery y plan 2026-10-24; checkpoint del operador antes de Slice 1`
+- Status real: `Code complete en local (2026-10-24): plugin eo-blog-home con 17/17 secciones ≤ 1 % dentro del shell real; rollout pendiente de aprobación del operador y del contenido real (TASK-2050)`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `TASK-2050 (sólo eventos, formatos y fijadas; las demás secciones avanzan antes)`
@@ -353,18 +353,18 @@ Efeonce en línea (no como archivo aparte).
 
 ## Acceptance Criteria
 
-- [ ] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
+- [x] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
 - [ ] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2051`.
-- [ ] Se declaro `Wireframe: docs/ui/wireframes/TASK-2051-blog-portada-v3-high-fidelity.md` y el archivo existe.
-- [ ] Se declaro `Flow` y `Motion` y los archivos existen.
-- [ ] Cada sección pasa el gate de fidelidad (≤ 1 % de píxeles distintos) a 1440 y 390 contra las referencias del canvas.
-- [ ] El operador aprobó la hoja lado a lado de cada sección.
-- [ ] `/blog/` muestra el header AXIS y el footer de `ohio-child`; la exclusión de 18456 ya no existe.
-- [ ] Sin scroll horizontal de página a 1440, 1024, 390 y 320.
-- [ ] Un solo H1; grafo Yoast sin piezas duplicadas; axe sin violaciones serias.
-- [ ] LCP ≤ 2,5 s, INP ≤ 200 ms y CLS ≤ 0,1 en la medición de laboratorio de 390 y 1440.
-- [ ] Movimiento reducido: sin autoplay, barrido, paralaje ni haz animado.
-- [ ] Sin JavaScript: primera diapositiva, búsqueda GET, riel y archivo funcionan.
+- [x] Se declaro `Wireframe: docs/ui/wireframes/TASK-2051-blog-portada-v3-high-fidelity.md` y el archivo existe.
+- [x] Se declaro `Flow` y `Motion` y los archivos existen.
+- [x] Cada sección pasa el gate de fidelidad (≤ 1 % de píxeles distintos) a 1440 y 390 contra las referencias del canvas. Evidencia 2026-10-24: `fidelity/compare.cjs` sobre el render de WordPress dentro del shell real (`preview/serve.cjs`), 17/17 secciones, máximo 0,061 %.
+- [ ] El operador aprobó la hoja lado a lado de cada sección. Hoja publicada el 2026-10-24 (https://claude.ai/artifact/VZELsJUCwxjvEj999eHCVB); falta su aprobación.
+- [ ] `/blog/` muestra el header AXIS y el footer de `ohio-child`; la exclusión de 18456 ya no existe. Código listo (runtime `df11a21`: exclusión vacía; `publish-blog-home-page.php`); falta desplegar con aprobación.
+- [x] Sin scroll horizontal de página a 1440, 1024, 390 y 320. Medido en el shell real de 1920 a 320 px (16 anchos): 0 px de desborde.
+- [ ] Un solo H1; grafo Yoast sin piezas duplicadas; axe sin violaciones serias. axe WCAG 2.2 AA: 0 violaciones en escritorio y móvil (`fidelity/a11y.cjs`). Pendiente: el HTML lleva dos H1, uno por tablero; sólo uno es visible y accesible a la vez (el otro con `display:none`), pero el criterio pide uno solo. Yoast no verificado (requiere la página en WordPress).
+- [ ] LCP ≤ 2,5 s, INP ≤ 200 ms y CLS ≤ 0,1 en la medición de laboratorio de 390 y 1440. Sólo hay una medición local sin limitar la red (LCP 256 ms, CLS 0,001): no sustituye la de laboratorio con throttling.
+- [x] Movimiento reducido: sin autoplay, barrido, paralaje ni haz animado. Verificado 2026-10-24: la diapositiva no avanza en 9 s y no queda ninguna animación infinita activa, a 1440 y 390.
+- [ ] Sin JavaScript: primera diapositiva, búsqueda GET, riel y archivo funcionan. La primera diapositiva, el riel y el archivo se sirven sin JavaScript (las capturas del gate son sin JS). La búsqueda GET necesita la URL real de búsqueda que entrega TASK-2050.
 
 ## Verification
 
@@ -392,3 +392,21 @@ Efeonce en línea (no como archivo aparte).
 
 - ¿El slider respeta el orden PDR-020 (Glitch → herramienta → diagnóstico) o el orden del canvas? El reader de
   TASK-2050 aplica PDR-020; el diseño no cambia, sólo el orden de los datos.
+- Tablet (768 a 1099 px): el canvas sólo diseña 1440 y 390. Medido el 2026-10-24: el tablero de escritorio se
+  rompe bajo 1100 px (titulares sobre las imágenes) y el móvil estirado deja el hero en 390 px con el resto vacío.
+  Interino: tablero móvil bajo 1100 px. Decisión del operador: diseñar un tablero de tablet en el canvas o aceptar
+  el interino.
+- Dos H1 en el HTML (uno por tablero, sólo uno visible): ¿se acepta, o el tablero oculto pasa su H1 a otro nivel?
+  Cambiarlo es un desvío de marcado invisible y se puede aplicar en `bind-canvas.cjs` a ambos tableros.
+
+## Decisiones de implementación (2026-10-24)
+
+- La portada vive en un plugin propio, `eo-blog-home`, y no en `eo-elementor-widgets/includes/blog-v3/` como
+  decía el plan: el plugin compartido tiene trabajo sin commitear de otra sesión (su archivo principal incluido) y
+  un plugin propio tiene versión, paquete y rollback independientes (mismo patrón que `eo-landing-dock`).
+- La plantilla es el canvas mismo: `bind-canvas.cjs` → AST que renderizan PHP (`EOBH_Template`) y el navegador
+  (`dc-runtime.js`) con la lógica del canvas. Paridad PHP = primer render del navegador, byte a byte, en 6 casos.
+- Aislamiento del tema: raíz `#eobh` con `all: initial`, reset `all: revert` con especificidad de ID sobre los
+  elementos HTML, imágenes y SVG con sus propiedades de caja revertidas (sin tocar width/height/fill) y keyframes
+  con nombre propio por tablero.
+- Archivos generados en `assets/generated` (el `.gitignore` del runtime ignora toda carpeta `build/`).
