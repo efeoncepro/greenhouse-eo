@@ -66,6 +66,11 @@ sí se ve bien. Van al mismo release que la corrección de correos, con el gate 
 **AXIS v0.7.15 publicado** (CI `dc7c721`, primitives 0.7.15; la prueba del haz del buscador ya no compite con el
 runner). Sin evento real cargado: la sección de eventos queda oculta hasta el primero (`blog-home event`).
 
+**Búsqueda y archivos del blog (2026-10-24, sin dueño):** búsqueda, categoría, etiqueta y autor siguen en la plantilla
+de archivo de Ohio, con el recuadro de demo «Hire us! We are WordPress specialists», textos en inglés, categoría vacía
+indexable y desborde a 390 en dos archivos. Diagnóstico y propuesta (contención en vivo + plantilla «Archivo del blog» v3):
+[auditoría](docs/audits/public-site/2026-10-24-blog-search-archive-views.md). Falta el visto bueno y la task.
+
 **Eventos y webinars: infraestructura desplegada, NO operativa.** El release `e593e3993bc3` llevó los correos de
 reserva (confirmación con `joinUrl` + `.ics`, lista de espera, recordatorio por `/growth/events/reminders` + Cloud
 Scheduler `ops-growth-event-reminders` `*/15`), `GROWTH_EVENT_EMAILS_ENABLED` ON en el ops-worker y el lanzador
