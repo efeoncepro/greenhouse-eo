@@ -1,0 +1,167 @@
+{
+  "view": "busqueda-vacia",
+  "assets": {
+    "glitchNavy": "/_blob/1063184040c6121be1f86602803b0f55",
+    "glitchNeg": "/_blob/72025ed97a7ce0c610ec355f78efed74",
+    "spark": "/_blob/2def96f284c302de0cf9fa4736ed9d18"
+  },
+  "crumbs": [
+    {
+      "label": "Inicio",
+      "url": "#"
+    },
+    {
+      "label": "Blog",
+      "url": "#"
+    }
+  ],
+  "crumb": "Búsqueda",
+  "headCls": "ah",
+  "gridCls": "ah__g",
+  "gridStyle": "align-items: center;",
+  "eyebrow": "Búsqueda en el blog",
+  "eyebrowBar": "background: #36c8bf;",
+  "isAuthor": false,
+  "author": null,
+  "plainH1": true,
+  "h1": "Nada sobre «metaverso», todavía.",
+  "h1Cls": "idea ah__t ah__t--m",
+  "h1Style": null,
+  "desc": "Prueba con otra palabra o con una de las preguntas que más nos hacen.",
+  "search": {
+    "action": "#",
+    "value": "metaverso",
+    "label": "Buscar en el blog"
+  },
+  "suggestions": [
+    {
+      "url": "#",
+      "label": "Cómo aparecer en ChatGPT"
+    },
+    {
+      "url": "#",
+      "label": "Ordenar mi CRM en HubSpot"
+    },
+    {
+      "url": "#",
+      "label": "Qué es Loop Marketing"
+    },
+    {
+      "url": "#",
+      "label": "Escalar la producción creativa"
+    }
+  ],
+  "meta": null,
+  "hero": null,
+  "parent": null,
+  "spark": true,
+  "filter": null,
+  "list": null,
+  "meanwhile": {
+    "title": "Mientras tanto, para empezar",
+    "glitch": {
+      "url": "#",
+      "img": "/_blob/08933b6eae580530405a3ebace493378",
+      "title": "Glitch Flash: Sonnet 5.5 roza a Opus, a mitad de precio",
+      "min": 9,
+      "date": "28 sep 2026"
+    },
+    "guide": {
+      "url": "#",
+      "kicker": "Guía · Loop Marketing",
+      "bar": "background: #36c8bf;",
+      "title": "Cómo ejecutar Loop Marketing en tu empresa"
+    },
+    "article": {
+      "url": "#",
+      "kicker": "Artículo · AEO",
+      "bar": "background: #0375db;",
+      "title": "El fin de la web «solo para humanos»"
+    }
+  },
+  "topics": {
+    "eyebrow": "Explora por tema",
+    "title": "O busca por tema.",
+    "all": 44,
+    "allUrl": "#",
+    "items": [
+      {
+        "url": "#",
+        "name": "HubSpot",
+        "count": "12 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Glitch",
+        "count": "10 publicaciones",
+        "style": "--acc: #6ec207;",
+        "barStyle": "background: #6ec207;"
+      },
+      {
+        "url": "#",
+        "name": "Inbound Marketing",
+        "count": "10 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Marketing Digital",
+        "count": "6 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Loop Marketing",
+        "count": "5 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "AEO",
+        "count": "4 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Inteligencia Artificial",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Diseño",
+        "count": "2 publicaciones",
+        "style": "--acc: #ff6500;",
+        "barStyle": "background: #ff6500;"
+      },
+      {
+        "url": "#",
+        "name": "SEO",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Novedades Efeonce",
+        "count": "2 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Growth",
+        "count": "1 publicación",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      }
+    ]
+  }
+}

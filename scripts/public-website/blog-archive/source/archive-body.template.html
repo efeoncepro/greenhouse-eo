@@ -1,0 +1,145 @@
+<main id="main" class="v3 arc" style="position: relative;">
+<header class="{{ headCls }}" data-site-nav-tone="dark">
+  <div class="w">
+    <nav aria-label="Migas de pan"><ol class="crumb"><sc-for list="{{ crumbs }}" as="c" hint-placeholder-count="3"><li><a href="{{ c.url }}">{{ c.label }}</a></li></sc-for><li><span aria-current="page">{{ crumb }}</span></li></ol></nav>
+    <div class="{{ gridCls }}" style="{{ gridStyle }}">
+      <div>
+        <p class="eyb eyb--d"><span class="eyb__bar" style="{{ eyebrowBar }}"></span>{{ eyebrow }}</p>
+        <sc-if value="{{ isAuthor }}" hint-placeholder-val="{{ false }}">
+        <div class="au">
+          <sc-if value="{{ author.photo }}" hint-placeholder-val="{{ true }}"><img class="au__ph" src="{{ author.photo }}" alt="{{ author.name }}"></sc-if>
+          <sc-if value="{{ author.initials }}" hint-placeholder-val="{{ false }}"><span class="au__ph au__ph--i" aria-hidden="true">{{ author.initials }}</span></sc-if>
+          <div>
+            <h1 class="idea ah__t ah__t--m" style="margin: 0;">{{ author.name }}</h1>
+            <sc-if value="{{ author.role }}" hint-placeholder-val="{{ true }}"><p class="au__r">{{ author.role }}</p></sc-if>
+          </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ plainH1 }}" hint-placeholder-val="{{ true }}"><h1 class="{{ h1Cls }}" style="{{ h1Style }}">{{ h1 }}</h1></sc-if>
+        <sc-if value="{{ desc }}" hint-placeholder-val="{{ true }}"><p class="ah__d">{{ desc }}</p></sc-if>
+        <sc-if value="{{ search }}" hint-placeholder-val="{{ false }}">
+        <form role="search" action="{{ search.action }}" class="sf sfd">
+          <svg class="beamsvg" aria-hidden="true" focusable="false"><rect class="bm-t" pathLength="100"/><rect class="bm-m" pathLength="100"/><rect class="bm-h" pathLength="100"/></svg>
+          <label for="eoba-q" class="sr">{{ search.label }}</label>
+          <input id="eoba-q" type="search" name="s" value="{{ search.value }}" placeholder="Por ejemplo: cómo aparezco en ChatGPT">
+          <button type="submit" class="ab ab--navy live" style="min-height: 60px; padding: 0 1.25rem 0 1.5rem;"><span class="ab__c" style="display: inline-flex; align-items: center; gap: .5rem;"><span class="roll"><span class="roll__in"><span>Buscar</span><span aria-hidden="true">Buscar</span></span></span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a6 6 0 1 0 12 0a6 6 0 1 0 -12 0"/><path d="M20 20l-5.6 -5.6"/></g></svg></span></button>
+        </form>
+        </sc-if>
+        <sc-if value="{{ suggestions }}" hint-placeholder-val="{{ false }}">
+        <div class="chips" style="margin-top: 20px;">
+          <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="4"><a href="{{ s.url }}" class="chip chip--d live">{{ s.label }}</a></sc-for>
+        </div>
+        </sc-if>
+        <sc-if value="{{ meta }}" hint-placeholder-val="{{ true }}"><dl class="ah__meta ah__meta--row"><sc-for list="{{ meta }}" as="m" hint-placeholder-count="2"><div><dt>{{ m.k }}</dt><dd>{{ m.v }}</dd></div></sc-for></dl></sc-if>
+      </div>
+      <sc-if value="{{ hero }}" hint-placeholder-val="{{ true }}">
+      <a href="{{ hero.url }}" class="hc"><svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>
+        <span class="{{ hero.imgCls }}"><img src="{{ hero.img }}" alt="" fetchpriority="high"></span>
+        <span class="hc__b">
+          <span class="hc__l">{{ hero.label }}</span>
+          <span class="hc__k"><span style="{{ hero.bar }}"></span><sc-if value="{{ hero.glitch }}" hint-placeholder-val="{{ false }}"><img src="{{ assets.glitchNavy }}" alt="Glitch" width="56" height="15" style="display: inline-block; height: 15px; width: auto; vertical-align: -2px;"> <span>{{ hero.kind }}</span></sc-if><sc-if value="{{ hero.plain }}" hint-placeholder-val="{{ true }}"><span>{{ hero.kind }}</span></sc-if></span>
+          <span class="idea hc__t"><sc-for list="{{ hero.parts }}" as="p" hint-placeholder-count="1"><sc-if value="{{ p.hl }}" hint-placeholder-val="{{ false }}"><mark class="hl">{{ p.t }}</mark></sc-if><sc-if value="{{ p.pl }}" hint-placeholder-val="{{ true }}">{{ p.t }}</sc-if></sc-for></span>
+          <span class="hc__m"><span>{{ hero.min }} min de lectura · {{ hero.date }}</span><span class="nl nl--light live" style="margin: 0 0 0 auto;"><span class="roll"><span class="roll__in"><span>Leer</span><span aria-hidden="true">Leer</span></span></span><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></span></span>
+        </span>
+      </a>
+      </sc-if>
+      <sc-if value="{{ parent }}" hint-placeholder-val="{{ false }}">
+      <div class="ah__side">
+        <p class="ah__l" style="border-top: 0; padding-top: 0;">El tema que lo contiene</p>
+        <a href="{{ parent.url }}" class="nl nl--dark live" style="font-size: 20px;"><span class="roll"><span class="roll__in"><span>{{ parent.name }}</span><span aria-hidden="true">{{ parent.name }}</span></span></span><span class="nl__n">{{ parent.count }}</span><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></a>
+      </div>
+      </sc-if>
+      <sc-if value="{{ spark }}" hint-placeholder-val="{{ false }}">
+      <div class="ah__side" style="align-self: end;">
+        <img class="spark" src="{{ assets.spark }}" alt="El Spark de investigación de Efeonce, con su lupa">
+      </div>
+      </sc-if>
+    </div>
+  </div>
+</header>
+<sc-if value="{{ filter }}" hint-placeholder-val="{{ true }}">
+<section class="fb fb--f" aria-label="Filtrar por formato">
+  <div class="w"><div class="fb__in">
+    <span class="fb__l">Formato</span>
+    <div class="segc segc--n" role="group" aria-label="Formato" style="{{ filter.segStyle }}"><span class="segc__ind" aria-hidden="true" style="{{ filter.indStyle }}"></span><sc-for list="{{ filter.items }}" as="f" hint-placeholder-count="5"><a href="{{ f.url }}" class="segc__b" aria-current="{{ f.cur }}">{{ f.label }} <span style="font-weight: 400; opacity: 0.75;">{{ f.count }}</span></a></sc-for></div>
+    <div class="chips fb__m" role="group" aria-label="Formato">
+          <sc-for list="{{ filter.items }}" as="f" hint-placeholder-count="5"><a href="{{ f.url }}" class="{{ f.chipCls }}" aria-current="{{ f.cur }}">{{ f.label }} <span class="chip__n">{{ f.count }}</span></a></sc-for>
+    </div>
+  </div></div>
+</section>
+</sc-if>
+<sc-if value="{{ list }}" hint-placeholder-val="{{ true }}">
+<section class="al" aria-label="{{ list.label }}">
+  <div class="w">
+    <sc-if value="{{ list.groups }}" hint-placeholder-val="{{ true }}"><sc-for list="{{ list.groups }}" as="g" hint-placeholder-count="2">
+    <div class="yg">
+      <div class="yg__y"><p class="idea yg__n">{{ g.year }}</p><p class="yg__c">{{ g.caption }}</p></div>
+      <div class="rows">
+          <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="4"><a href="{{ r.url }}" class="lnk arch-row arch-row--x">
+            <span class="rw__d">{{ r.date }}</span>
+            <span class="idea u rw__t"><sc-for list="{{ r.parts }}" as="p" hint-placeholder-count="1"><sc-if value="{{ p.hl }}" hint-placeholder-val="{{ false }}"><mark class="hl">{{ p.t }}</mark></sc-if><sc-if value="{{ p.pl }}" hint-placeholder-val="{{ true }}">{{ p.t }}</sc-if></sc-for></span>
+            <span class="arch-k rw__k"><sc-if value="{{ r.glitch }}" hint-placeholder-val="{{ false }}"><span class="arch-gl"><img src="{{ assets.glitchNavy }}" alt="Glitch" width="56" height="15" style="display: inline-block; height: 15px; width: auto; vertical-align: -2px;"><span>{{ r.label }} <span class="rw__m">· {{ r.min }} min</span></span></span></sc-if><sc-if value="{{ r.plain }}" hint-placeholder-val="{{ true }}"><span>{{ r.label }} <span class="rw__m">· {{ r.min }} min</span></span></sc-if><svg class="arch-a" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M14 7l5 5l-5 5"/></g></svg></span>
+          </a></sc-for>
+      </div>
+    </div>
+    </sc-for></sc-if>
+    <sc-if value="{{ list.flat }}" hint-placeholder-val="{{ false }}">
+    <div class="rows" style="margin-top: 56px;">
+          <sc-for list="{{ list.flat }}" as="r" hint-placeholder-count="4"><a href="{{ r.url }}" class="lnk arch-row arch-row--x">
+            <span class="rw__d">{{ r.date }}</span>
+            <span class="idea u rw__t"><sc-for list="{{ r.parts }}" as="p" hint-placeholder-count="1"><sc-if value="{{ p.hl }}" hint-placeholder-val="{{ false }}"><mark class="hl">{{ p.t }}</mark></sc-if><sc-if value="{{ p.pl }}" hint-placeholder-val="{{ true }}">{{ p.t }}</sc-if></sc-for></span>
+            <span class="arch-k rw__k"><sc-if value="{{ r.glitch }}" hint-placeholder-val="{{ false }}"><span class="arch-gl"><img src="{{ assets.glitchNavy }}" alt="Glitch" width="56" height="15" style="display: inline-block; height: 15px; width: auto; vertical-align: -2px;"><span>{{ r.label }} <span class="rw__m">· {{ r.min }} min</span></span></span></sc-if><sc-if value="{{ r.plain }}" hint-placeholder-val="{{ true }}"><span>{{ r.label }} <span class="rw__m">· {{ r.min }} min</span></span></sc-if><svg class="arch-a" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M14 7l5 5l-5 5"/></g></svg></span>
+          </a></sc-for>
+    </div>
+    </sc-if>
+    <div class="pgw">
+      <span class="pgw__n">{{ list.pager.note }}</span>
+      <sc-if value="{{ list.pager.multi }}" hint-placeholder-val="{{ true }}"><nav aria-label="{{ list.pager.label }}"><ul class="pager"><sc-if value="{{ list.pager.prev }}" hint-placeholder-val="{{ false }}"><li><a href="{{ list.pager.prev }}" class="nl nl--light live nl--prev" style="margin: 0 8px 0 0;"><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="transform: scaleX(-1);"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg><span class="roll"><span class="roll__in"><span>Anterior</span><span aria-hidden="true">Anterior</span></span></span></a></li></sc-if><sc-for list="{{ list.pager.pages }}" as="pg" hint-placeholder-count="2"><sc-if value="{{ pg.gap }}" hint-placeholder-val="{{ false }}"><li><span class="pg pg--gap" aria-hidden="true">…</span></li></sc-if><sc-if value="{{ pg.num }}" hint-placeholder-val="{{ true }}"><li><a href="{{ pg.url }}" class="pg" aria-current="{{ pg.cur }}">{{ pg.n }}</a></li></sc-if></sc-for><sc-if value="{{ list.pager.next }}" hint-placeholder-val="{{ true }}"><li><a href="{{ list.pager.next }}" class="nl nl--light live" style="margin: 0 0 0 8px;"><span class="roll"><span class="roll__in"><span>Siguiente</span><span aria-hidden="true">Siguiente</span></span></span><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></a></li></sc-if></ul></nav></sc-if>
+    </div>
+  </div>
+</section>
+</sc-if>
+<sc-if value="{{ meanwhile }}" hint-placeholder-val="{{ false }}">
+<section class="mt" aria-labelledby="eoba-mt-h">
+  <div class="w">
+    <p id="eoba-mt-h" class="eyb"><span class="eyb__bar" style="background: #36c8bf;"></span>{{ meanwhile.title }}</p>
+    <div class="mt__g">
+      <a href="{{ meanwhile.glitch.url }}" class="fc fc--stack" style="margin-top: 0;"><svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>
+        <span class="fc__b">
+          <span>
+            <span class="fc__k"><span style="background: #6ec207;"></span><img src="{{ assets.glitchNeg }}" alt="Glitch" width="56" height="15" style="display: inline-block; height: 15px; width: auto; vertical-align: -2px;"> <span>Lo último de Glitch</span></span>
+            <span class="idea fc__t" style="display: block;">{{ meanwhile.glitch.title }}</span>
+          </span>
+          <span class="fc__m"><span>{{ meanwhile.glitch.min }} min de lectura · {{ meanwhile.glitch.date }}</span></span>
+        </span>
+        <span class="fc__img"><img src="{{ meanwhile.glitch.img }}" alt="" loading="lazy" decoding="async"></span>
+      </a>
+      <div class="mt__c">
+        <a href="{{ meanwhile.guide.url }}" class="gc" style="background: #023c70; color: #ffffff;"><svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>
+          <span class="fc__k"><span style="{{ meanwhile.guide.bar }}"></span>{{ meanwhile.guide.kicker }}</span>
+          <span class="idea gc__t">{{ meanwhile.guide.title }}</span>
+        </a>
+        <a href="{{ meanwhile.article.url }}" class="gc" style="background: #f7f8f6; color: #023c70;"><svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>
+          <span class="fc__k" style="color: #6d6777;"><span style="{{ meanwhile.article.bar }}"></span>{{ meanwhile.article.kicker }}</span>
+          <span class="idea gc__t">{{ meanwhile.article.title }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+</sc-if>
+<section class="ot" aria-labelledby="eoba-ot-h">
+  <div class="w">
+    <div class="ot__h">
+      <div>
+        <p class="eyb eyb--d">{{ topics.eyebrow }}</p>
+        <h2 id="eoba-ot-h" class="idea ot__t">{{ topics.title }}</h2>
+      </div>
+      <a href="{{ topics.allUrl }}" class="nl nl--dark live"><span class="roll"><span class="roll__in"><span>Todo el archivo</span><span aria-hidden="true">Todo el archivo</span></span></span><span class="nl__n">{{ topics.all }}</span><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></a>
+    </div>
+    <div class="ot__g">
+      <sc-for list="{{ topics.items }}" as="t" hint-placeholder-count="8"><a href="{{ t.url }}" class="lab2" style="{{ t.style }}"><span class="nm">{{ t.name }}</span><span class="ct">{{ t.count }}</span><span class="bar" style="{{ t.barStyle }}"></span></a></sc-for>
+    </div>
+  </div>
+</section>
+</main>

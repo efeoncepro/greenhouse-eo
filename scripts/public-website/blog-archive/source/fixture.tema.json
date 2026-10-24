@@ -1,0 +1,370 @@
+{
+  "view": "tema",
+  "assets": {
+    "glitchNavy": "/_blob/1063184040c6121be1f86602803b0f55",
+    "glitchNeg": "/_blob/72025ed97a7ce0c610ec355f78efed74",
+    "spark": "/_blob/2def96f284c302de0cf9fa4736ed9d18"
+  },
+  "crumbs": [
+    {
+      "label": "Inicio",
+      "url": "#"
+    },
+    {
+      "label": "Blog",
+      "url": "#"
+    },
+    {
+      "label": "Temas",
+      "url": "#"
+    }
+  ],
+  "crumb": "HubSpot",
+  "headCls": "ah ah--f",
+  "gridCls": "ah__g ah__g--f",
+  "gridStyle": null,
+  "eyebrow": "Tema",
+  "eyebrowBar": "background: #e86bd0;",
+  "isAuthor": false,
+  "author": null,
+  "plainH1": true,
+  "h1": "HubSpot",
+  "h1Cls": "idea ah__t",
+  "h1Style": "color: #e86bd0;",
+  "desc": "Cómo usamos HubSpot para ordenar ventas, marketing y servicio: casos reales, guías paso a paso y lo que aprendimos implementándolo.",
+  "search": null,
+  "suggestions": null,
+  "meta": [
+    {
+      "k": "publicaciones",
+      "v": "12"
+    },
+    {
+      "k": "la última",
+      "v": "17 jul 2026"
+    }
+  ],
+  "hero": {
+    "url": "#",
+    "img": "/_blob/99eaef2d43c6f807676e064585ec1c4d",
+    "imgCls": "hc__img",
+    "label": "Lo más reciente",
+    "bar": "background: #8e1b82;",
+    "glitch": false,
+    "plain": true,
+    "kind": "Caso · HubSpot",
+    "parts": [
+      {
+        "t": "¿Qué necesita una IA para atender bien a tus clientes? Lo que aprendimos diseñando el Customer Agent de ANAM",
+        "pl": true,
+        "hl": false
+      }
+    ],
+    "min": 18,
+    "date": "17 jul 2026"
+  },
+  "parent": null,
+  "spark": false,
+  "filter": {
+    "segStyle": "--n: 5;",
+    "indStyle": "transform: translateX(0%);",
+    "items": [
+      {
+        "label": "Todo",
+        "count": 12,
+        "url": "#",
+        "cur": "page",
+        "chipCls": "chip is-on live"
+      },
+      {
+        "label": "Artículos",
+        "count": 4,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      },
+      {
+        "label": "Guías",
+        "count": 4,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      },
+      {
+        "label": "Casos",
+        "count": 2,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      },
+      {
+        "label": "Novedades",
+        "count": 2,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      }
+    ]
+  },
+  "list": {
+    "label": "Todas las publicaciones de HubSpot",
+    "groups": [
+      {
+        "year": "2026",
+        "caption": "2 publicaciones en HubSpot",
+        "rows": [
+          {
+            "url": "#",
+            "date": "17 jul",
+            "parts": [
+              {
+                "t": "Un dashboard no arregla un proceso comercial: cómo construimos paneles confiables en HubSpot para ANAM",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Caso",
+            "min": 13
+          }
+        ]
+      },
+      {
+        "year": "2025",
+        "caption": "1 publicación en HubSpot",
+        "rows": [
+          {
+            "url": "#",
+            "date": "18 sep",
+            "parts": [
+              {
+                "t": "Cómo ejecutar Loop Marketing en tu empresa con las innovaciones de HubSpot 2025",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Guía",
+            "min": 21
+          }
+        ]
+      },
+      {
+        "year": "2024",
+        "caption": "9 publicaciones en HubSpot",
+        "rows": [
+          {
+            "url": "#",
+            "date": "26 nov",
+            "parts": [
+              {
+                "t": "De Excel a HubSpot en 5 Días: Organiza, Automatiza y Escala tus Ventas",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Artículo",
+            "min": 9
+          },
+          {
+            "url": "#",
+            "date": "24 nov",
+            "parts": [
+              {
+                "t": "Crea un Pipeline de Ventas que Convierte: Guía Paso a Paso",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Guía",
+            "min": 15
+          },
+          {
+            "url": "#",
+            "date": "24 nov",
+            "parts": [
+              {
+                "t": "5 Pasos para transformar tu CRM en el motor de crecimiento de tu Negocio",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Artículo",
+            "min": 6
+          },
+          {
+            "url": "#",
+            "date": "20 nov",
+            "parts": [
+              {
+                "t": "Cómo crear formularios con validación de RUT chileno en minutos",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Guía",
+            "min": 5
+          },
+          {
+            "url": "#",
+            "date": "21 oct",
+            "parts": [
+              {
+                "t": "¡Efeonce + Truora: La Alianza que Llevará tu Negocio a Otro Nivel!",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Novedad",
+            "min": 5
+          },
+          {
+            "url": "#",
+            "date": "20 oct",
+            "parts": [
+              {
+                "t": "Efeonce es HubSpot Solutions Partner: Potencia tu Crecimiento",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Novedad",
+            "min": 11
+          },
+          {
+            "url": "#",
+            "date": "17 ago",
+            "parts": [
+              {
+                "t": "HubSpot y el Desafío del Onboarding: Estrategias para un Inicio Exitoso",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Artículo",
+            "min": 21
+          }
+        ]
+      }
+    ],
+    "flat": null,
+    "pager": {
+      "note": "Mostrando 1–10 de 12 publicaciones",
+      "label": "Páginas del tema",
+      "multi": true,
+      "prev": null,
+      "next": "#",
+      "pages": [
+        {
+          "num": true,
+          "gap": false,
+          "n": 1,
+          "url": "#",
+          "cur": "page"
+        },
+        {
+          "num": true,
+          "gap": false,
+          "n": 2,
+          "url": "#",
+          "cur": null
+        }
+      ]
+    }
+  },
+  "meanwhile": null,
+  "topics": {
+    "eyebrow": "Explora por tema",
+    "title": "Otros temas del blog.",
+    "all": 44,
+    "allUrl": "#",
+    "items": [
+      {
+        "url": "#",
+        "name": "Glitch",
+        "count": "10 publicaciones",
+        "style": "--acc: #6ec207;",
+        "barStyle": "background: #6ec207;"
+      },
+      {
+        "url": "#",
+        "name": "Inbound Marketing",
+        "count": "10 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Marketing Digital",
+        "count": "6 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Loop Marketing",
+        "count": "5 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "AEO",
+        "count": "4 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Inteligencia Artificial",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Diseño",
+        "count": "2 publicaciones",
+        "style": "--acc: #ff6500;",
+        "barStyle": "background: #ff6500;"
+      },
+      {
+        "url": "#",
+        "name": "SEO",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Novedades Efeonce",
+        "count": "2 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Growth",
+        "count": "1 publicación",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      }
+    ]
+  }
+}

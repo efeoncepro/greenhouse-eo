@@ -138,7 +138,7 @@ Reglas obligatorias:
   y `elementor_library`.
 - Ninguna categoría tiene descripción; `/category/marketing-digital/social/` (0 entradas) es indexable.
 - `/author/greenhouse-integration/` responde 200; el usuario Greenhouse es autor de 12 páginas (incluida la Home).
-- `Person.sameAs` del autor `jreysgo` apunta a `instagram.com/cesargrowth` y `linkedin.com/in/cesargrowth`.
+- `Person.sameAs` del autor `jreysgo` (`instagram.com/cesargrowth`, `linkedin.com/in/cesargrowth`): confirmado por el operador el 2026-10-24 como sus cuentas reales; no requiere corrección.
 - El allowlist de `deploy-blog-home-plugin-package.php:17` no admite CSS ni assets generados nuevos.
 - Faltan en `index()`: id de autor, tags y dimensiones de imagen; faltan conteos por formato dentro de un término.
 - `EO_Cache_Purge` sólo purga `/blog/`.
@@ -370,7 +370,6 @@ Reglas obligatorias:
 | Marco de Ohio (rieles, padding, clases de body) distinto en páginas no Elementor | UI | medium | `eoba-host.css` medido en preview con el shell real | desborde o diferencia en `archive-head` |
 | Despliegue de `efeonce-editorial-blocks` choca con el de la sesión de Analytics | release | medium | aviso y turno explícito; `deploy content-model` apaga el flag del modelo un instante | drift en la línea base viva |
 | La implementación deriva del canvas | UI | medium | gate ≤ 1 % por sección + equivalencia de AST | `compare.cjs` en rojo |
-| `Person.sameAs` amplifica perfiles ajenos (`cesargrowth`) | SEO/marca | high si no se corrige | corregir el perfil de WordPress antes del corte | `sameAs` en el schema del autor |
 
 ### Feature flags / cutover
 
@@ -399,7 +398,6 @@ Reglas obligatorias:
 
 - Visto bueno del operador para cada `--apply` en producción y para el encendido.
 - Descripciones de los temas aprobadas por el operador.
-- Corrección del perfil de WordPress de Julio (`sameAs`).
 - Turno de despliegue con las sesiones que tocan `efeonce-editorial-blocks` y `eo-blog-home`.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -447,9 +445,9 @@ Reglas obligatorias:
 
 ## Open Questions
 
-1. **Descripciones de los temas:** ¿las redacto para los temas con ≥ 4 publicaciones (HubSpot, Glitch, Inbound
+1. **Descripciones de los temas** (decidido 2026-10-24: Claude las redacta, el operador aprueba): ¿las redacto para los temas con ≥ 4 publicaciones (HubSpot, Glitch, Inbound
    Marketing, Marketing Digital, Loop Marketing, AEO) y las apruebas antes del corte? Sin ellas, la regla deja todos los
    temas fuera de Google; la alternativa es indexar sólo por «≥ N» hasta tenerlas.
-2. **Autores sin publicaciones** (Daniela, Andrés): ¿404 igual que Greenhouse mientras no publiquen?
-3. **Perfil de Julio:** el `sameAs` apunta a cuentas «cesargrowth»; ¿lo corriges tú en WordPress o lo corrijo yo con tu visto bueno?
-4. **Plugin:** la plantilla vive en `eo-blog-home` (comparte render y reset de la portada) en lugar de un plugin nuevo; confirmar.
+2. **Autores sin publicaciones** (Daniela, Andrés): decidido 2026-10-24 — 404 igual que Greenhouse mientras no publiquen.
+3. **Perfil de Julio:** resuelto — «cesargrowth» es la cuenta real del operador (Instagram y LinkedIn); el `sameAs` queda como está.
+4. **Plugin:** decidido 2026-10-24 — la plantilla vive en `eo-blog-home`.

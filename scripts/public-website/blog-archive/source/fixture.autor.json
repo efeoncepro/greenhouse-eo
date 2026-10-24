@@ -1,0 +1,397 @@
+{
+  "view": "autor",
+  "assets": {
+    "glitchNavy": "/_blob/1063184040c6121be1f86602803b0f55",
+    "glitchNeg": "/_blob/72025ed97a7ce0c610ec355f78efed74",
+    "spark": "/_blob/2def96f284c302de0cf9fa4736ed9d18"
+  },
+  "crumbs": [
+    {
+      "label": "Inicio",
+      "url": "#"
+    },
+    {
+      "label": "Blog",
+      "url": "#"
+    },
+    {
+      "label": "Autores",
+      "url": "#"
+    }
+  ],
+  "crumb": "Julio Reyes",
+  "headCls": "ah ah--f",
+  "gridCls": "ah__g ah__g--f",
+  "gridStyle": null,
+  "eyebrow": "Autor",
+  "eyebrowBar": "background: #36c8bf;",
+  "isAuthor": true,
+  "author": {
+    "photo": "/_blob/9a8e2f558646ef115b46fdbc23b1ed5b",
+    "name": "Julio Reyes",
+    "role": "Fundador y Managing & GTM Director de Efeonce Group"
+  },
+  "plainH1": false,
+  "h1": null,
+  "h1Cls": "idea ah__t",
+  "h1Style": null,
+  "desc": "Más de 12 años diseñando sistemas de marketing, crecimiento y operaciones creativas para organizaciones en Latinoamérica. Escribe sobre Loop Marketing, IA aplicada, SEO/AEO, Creative Operations y diseño de sistemas donde tecnología, datos y criterio humano trabajan juntos.",
+  "search": null,
+  "suggestions": null,
+  "meta": [
+    {
+      "k": "publicaciones",
+      "v": "44"
+    },
+    {
+      "k": "la última",
+      "v": "28 sep 2026"
+    }
+  ],
+  "hero": {
+    "url": "#",
+    "img": "/_blob/08933b6eae580530405a3ebace493378",
+    "imgCls": "hc__img",
+    "label": "Lo último de Julio",
+    "bar": "background: #4f8c00;",
+    "glitch": true,
+    "plain": false,
+    "kind": "Flash",
+    "parts": [
+      {
+        "t": "Glitch Flash: Sonnet 5.5 roza a Opus, a mitad de precio",
+        "pl": true,
+        "hl": false
+      }
+    ],
+    "min": 9,
+    "date": "28 sep 2026"
+  },
+  "parent": null,
+  "spark": false,
+  "filter": {
+    "segStyle": "--n: 6;",
+    "indStyle": "transform: translateX(0%);",
+    "items": [
+      {
+        "label": "Todo",
+        "count": 44,
+        "url": "#",
+        "cur": "page",
+        "chipCls": "chip is-on live"
+      },
+      {
+        "label": "Artículos",
+        "count": 25,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      },
+      {
+        "label": "Glitch",
+        "count": 10,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      },
+      {
+        "label": "Guías",
+        "count": 5,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      },
+      {
+        "label": "Casos",
+        "count": 2,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      },
+      {
+        "label": "Novedades",
+        "count": 2,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      }
+    ]
+  },
+  "list": {
+    "label": "Publicaciones de Julio Reyes",
+    "groups": [
+      {
+        "year": "2026",
+        "caption": "22 publicaciones de Julio",
+        "rows": [
+          {
+            "url": "#",
+            "date": "28 jul",
+            "parts": [
+              {
+                "t": "Glitch #17: Agente rompe la jaula, la confianza reordena el frontier, la correa manda",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": true,
+            "plain": false,
+            "label": "Edición",
+            "min": 13
+          },
+          {
+            "url": "#",
+            "date": "21 jul",
+            "parts": [
+              {
+                "t": "Glitch #16: Open-weight que descargas, precio que miente, canal sin dueño",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": true,
+            "plain": false,
+            "label": "Edición",
+            "min": 13
+          },
+          {
+            "url": "#",
+            "date": "18 jul",
+            "parts": [
+              {
+                "t": "El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "AEO · Artículo",
+            "min": 22
+          },
+          {
+            "url": "#",
+            "date": "18 jul",
+            "parts": [
+              {
+                "t": "«I Know Kung Fu»: el momento Matrix de los Agent Skills",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Inteligencia Artificial · Artículo",
+            "min": 8
+          },
+          {
+            "url": "#",
+            "date": "17 jul",
+            "parts": [
+              {
+                "t": "¿Qué necesita una IA para atender bien a tus clientes? Lo que aprendimos diseñando el Customer Agent de ANAM",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "HubSpot · Caso",
+            "min": 18
+          },
+          {
+            "url": "#",
+            "date": "17 jul",
+            "parts": [
+              {
+                "t": "Un dashboard no arregla un proceso comercial: cómo construimos paneles confiables en HubSpot para ANAM",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "HubSpot · Caso",
+            "min": 13
+          },
+          {
+            "url": "#",
+            "date": "15 jul",
+            "parts": [
+              {
+                "t": "Creative Workflows: cómo escalar la creatividad sin automatizar el criterio",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Diseño · Artículo",
+            "min": 24
+          },
+          {
+            "url": "#",
+            "date": "14 jul",
+            "parts": [
+              {
+                "t": "Glitch #15: Token barato, criterio caro, y las capas que no controlas.",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": true,
+            "plain": false,
+            "label": "Edición",
+            "min": 15
+          },
+          {
+            "url": "#",
+            "date": "10 jul",
+            "parts": [
+              {
+                "t": "GPT-5.6 y ChatGPT Work: OpenAI ya no está lanzando modelos, está cambiando la forma de trabajar",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": true,
+            "plain": false,
+            "label": "Nota",
+            "min": 6
+          }
+        ]
+      }
+    ],
+    "flat": null,
+    "pager": {
+      "note": "Mostrando 1–10 de 44 publicaciones",
+      "label": "Páginas del autor",
+      "multi": true,
+      "prev": null,
+      "next": "#",
+      "pages": [
+        {
+          "num": true,
+          "gap": false,
+          "n": 1,
+          "url": "#",
+          "cur": "page"
+        },
+        {
+          "num": true,
+          "gap": false,
+          "n": 2,
+          "url": "#",
+          "cur": null
+        },
+        {
+          "num": true,
+          "gap": false,
+          "n": 3,
+          "url": "#",
+          "cur": null
+        },
+        {
+          "num": true,
+          "gap": false,
+          "n": 4,
+          "url": "#",
+          "cur": null
+        },
+        {
+          "num": true,
+          "gap": false,
+          "n": 5,
+          "url": "#",
+          "cur": null
+        }
+      ]
+    }
+  },
+  "meanwhile": null,
+  "topics": {
+    "eyebrow": "Escribe sobre",
+    "title": "Los temas de Julio.",
+    "all": 44,
+    "allUrl": "#",
+    "items": [
+      {
+        "url": "#",
+        "name": "HubSpot",
+        "count": "12 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Glitch",
+        "count": "10 publicaciones",
+        "style": "--acc: #6ec207;",
+        "barStyle": "background: #6ec207;"
+      },
+      {
+        "url": "#",
+        "name": "Inbound Marketing",
+        "count": "10 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Marketing Digital",
+        "count": "6 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Loop Marketing",
+        "count": "5 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "AEO",
+        "count": "4 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Inteligencia Artificial",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Diseño",
+        "count": "2 publicaciones",
+        "style": "--acc: #ff6500;",
+        "barStyle": "background: #ff6500;"
+      },
+      {
+        "url": "#",
+        "name": "SEO",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Novedades Efeonce",
+        "count": "2 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Growth",
+        "count": "1 publicación",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      }
+    ]
+  }
+}
