@@ -319,8 +319,8 @@ sobre marketing, búsqueda e IA. Suscríbete aquí.
 - **Respaldo:** local `tmp/que-es-inbound-marketing-post-244765-before-v1-20261024T081621Z.json` (gitignored) y
   opciones de servidor `_gh_inbound_refresh_20261024_081739` (estado original) y
   `_gh_inbound_refresh_v2_20261024_081923` (primera versión). WordPress además guarda revisiones.
-- **Rollback:** `pnpm public-website:wpcli -- --eval-file ./tmp/inb-244765-rollback.php --wp-user 12 -- _gh_inbound_refresh_20261024_081739`
-  (restaura título, contenido, extracto y meta Yoast del estado original; purga caché).
+- **Rollback:** `pnpm public-website:wpcli -- --eval-file ./tmp/inb-244765-rollback.php --wp-user 12`
+  (el script local apunta a `_gh_inbound_refresh_20261024_081739`; restaura título, contenido, extracto y meta Yoast del estado original y purga caché).
 - **QA en vivo (anónimo):** 200; title, descripción, canonical y `index, follow` correctos; `BlogPosting` con
   `headline` y `dateModified` nuevos, `Person` Julio Reyes, `FAQPage` con 5 preguntas; 1 H1; índice con 10 anclas
   válidas; 20 enlaces del artículo responden 200; sin desborde horizontal a 1440 px ni a 375 px; consola sin errores.
