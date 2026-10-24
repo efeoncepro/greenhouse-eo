@@ -23,7 +23,7 @@
 | 1 | **Plate** (foto 16:9 sin texto) | siempre | 1 | agente de foto (`design-studio` + `pnpm foto:*`) |
 | 2 | **Portada** (destacada + OG + X) | siempre | 1 archivo | agente de composición (`efeonce-graphic-line`) desde el plate |
 | 3 | **Imagen del slider** (`hero`) | sólo si el post entra al slider de `/blog/` | 0 o 1 | se recorta del plate (sin foto nueva) |
-| 4 | **Imagen de la card del rail** | si el post entra al rail y su portada trae texto (todas las de Manzanitas). Hecho en local, **sin desplegar** (TASK-2051) | 0 o 1 | se usa el plate tal cual, con punto focal |
+| 4 | **Imagen de la card del rail** | si el post entra al rail y su portada trae texto (todas las de Manzanitas). En producción desde el 2026-10-24 (TASK-2051, 0.4.5) | 0 o 1 | se usa el plate tal cual, con punto focal |
 | 5 | **Imágenes del cuerpo** (diagramas, infografías, capturas) | sólo si explican algo que el texto no puede | 0 a N (lo normal: 0 a 2) | agente de contenido (`content-marketing-studio` + infografías) |
 | 6 | Foto del autor | ya existe; no se hace por artículo | 0 | — |
 | 7 | **Piezas de distribución** (LinkedIn, YouTube, story) | según el plan de canales de esa semana, no por defecto | 0 a 4 | agente social (`social-media-studio`), con su propia norma |
@@ -139,6 +139,21 @@ OG cuando el post no tiene una propia) y la imagen principal del schema (`primar
 | Subida | `scripts/public-website/blog-post-cover-apply.php`: simulación → `apply` con guardas y respaldo |
 | Indexación | el post sale con `max-image-preview:large`: la portada puede salir grande en Google y Discover (pide ≥ 1200 px de ancho; cumple) |
 
+**Open Graph y X: lo que publica el artículo** (leído en vivo en el HTML de 245605, 2026-10-24):
+
+| Etiqueta | Valor | Nota |
+|---|---|---|
+| `og:image` | la portada (`…/que-es-paid-media-2026.jpg`) | la misma imagen que la destacada; la escribe `blog-post-cover-apply.php` en `_yoast_wpseo_opengraph-image` |
+| `og:image:width` / `og:image:height` | 2400 / 1260 | Yoast los lee del adjunto |
+| `og:image:type` | `image/jpeg` | JPEG a propósito: los lectores de enlaces no tratan el WebP de forma pareja |
+| `twitter:card` | `summary_large_image` | tarjeta grande |
+| `twitter:image` | **no se publica** | X usa la `og:image` cuando falta; el script sólo la escribe si el post ya tenía una propia |
+| `og:image:alt` | **no se publica** | la descripción vive en el `alt` del adjunto; Yoast no la saca como etiqueta. Falta menor: agregarla sería un cambio de configuración del sitio, no de la imagen |
+| Peso | 230–300 KB | muy por debajo del límite de cualquier red |
+
+Los lectores de enlaces y las redes guardan la imagen en caché: después de cambiar una portada, usa el Post Inspector
+de LinkedIn y el depurador de Facebook para refrescarla, y comparte de nuevo el enlace en X.
+
 **Dónde se ve y qué recorta** (sobre el lienzo de 1200 × 630):
 
 | Superficie | Qué se ve | Resultado con la portada centrada |
@@ -172,7 +187,7 @@ título cae encima del texto de la portada: **un post con portada de Manzanitas 
 
 Con la cara del plate en torno al 71 %, el recorte del plate cumple sin recomponer (si sale entre el 66 % y el 68 %, ver §Márgenes de seguridad, Plate).
 
-## 4. Imagen de la card del rail (hecha en local, sin desplegar)
+## 4. Imagen de la card del rail
 
 Las cards v2 de «Para leer con calma» usan hoy la **destacada** como foto a sangre vertical y le pintan encima la
 etiqueta de formato, el título, la bajada y el autor. Con la portada de Manzanitas, el recorte corta la cabecera, deja
@@ -181,8 +196,9 @@ lecturas más nuevas).
 
 **Encargado y resuelto el 2026-10-24** por la sesión dueña del rail (TASK-2051; runtime `6578773`, Greenhouse
 `e60f5045c`): imagen propia de la card (`_eo_card_image`) y punto focal (`_eo_card_focus`, «x% y%» → `object-position`).
-**Todavía sin desplegar**: espera el visto bueno del operador. Hasta entonces, no se publica en el rail un post con
-portada de Manzanitas. Cuando esté en vivo:
+**En producción desde el 2026-10-24** (`efeonce-editorial-blocks` 0.4.5). Ningún post la tiene aplicada todavía. A un
+post con portada de Manzanitas que entre al rail (sin `--apply` sólo muestra el plan; `--apply` con visto bueno del
+operador):
 
 ```bash
 pnpm public-website:blog-home card <post> --image <plate.png> --alt "<alt>" --focus "84% 30%"

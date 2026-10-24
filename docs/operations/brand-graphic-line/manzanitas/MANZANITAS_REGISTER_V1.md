@@ -337,8 +337,8 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
     sangre vertical (440 × 600; 304 × 540 en móvil) y le pinta encima su propio texto. Deja ver sólo x 369–831 del
     lienzo (x 423–777 en móvil), así que corta la cabecera y deja fuera la cara: **esta portada no sirve como foto
     de esa tarjeta**. La tarjeta lleva su propia imagen, el plate sin texto, con un punto focal hacia la cara
-    (`blog-home card <post> --image <plate> --focus "84% 30%"`; TASK-2051, hecho el 2026-10-24 y pendiente de
-    despliegue). El slider también choca: lleva como `hero` el plate sin texto. Inventario completo de imágenes por
+    (`blog-home card <post> --image <plate> --focus "84% 30%"`; TASK-2051, en producción desde el
+    2026-10-24). El slider también choca: lleva como `hero` el plate sin texto. Inventario completo de imágenes por
     artículo: `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
   - **El sujeto va en el tercio derecho**, fuera de la columna de texto. Pídelo un poco más a la derecha de lo que lo
     quieres: los sujetos de las dos primeras salieron unos 15 puntos más al centro de lo pedido.

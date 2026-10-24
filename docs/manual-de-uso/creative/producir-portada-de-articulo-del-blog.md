@@ -79,15 +79,18 @@ La tarjeta de foto es vertical y recorta mucho más que cualquier otra superfici
 
 Hoy ninguno de los tres posts del caso fuente está en el rail, porque no están entre las cuatro lecturas más nuevas.
 **La solución: imagen y punto focal propios de la tarjeta** (TASK-2051; runtime `6578773`, Greenhouse `e60f5045c`).
-**Estado al 2026-10-24: hecho en local y probado, todavía sin desplegar** (espera el visto bueno del operador). Hasta
-que esté en vivo, no publiques en el rail un post con esta portada.
+**En producción desde el 2026-10-24** (`efeonce-editorial-blocks` 0.4.5). Hoy ningún post tiene imagen ni punto
+focal de tarjeta: todas las tarjetas siguen con el recorte centrado hasta que se aplique uno.
 
-Cuando esté en vivo, a un post con portada de Manzanitas dale a la tarjeta el plate sin texto y mueve el recorte hacia
+A un post con portada de Manzanitas que entre al rail dale a la tarjeta el plate sin texto y mueve el recorte hacia
 la cara. La destacada no cambia: sigue siendo la imagen OG, y el comando falla si fuera a cambiarla.
 
 ```bash
-pnpm public-website:blog-home card <post> --image <plate.png> --alt "<alt>" --focus "84% 30%"
+pnpm public-website:blog-home card <post> --image <plate.png> --alt "<alt>" --focus "84% 30%"          # plan
+pnpm public-website:blog-home card <post> --image <plate.png> --alt "<alt>" --focus "84% 30%" --apply  # escribe
 ```
+
+Sin `--apply` sólo muestra el plan; en producción, `--apply` necesita el visto bueno del operador.
 
 - `--focus "x% y%"` va a `object-position`. Con la cara en torno al 71 % del ancho del plate (x 795–900 sobre 1200),
   **84 %** la deja dentro de la tarjeta en los tres anchos: se ve del 49 % al 91 % del plate en escritorio y tablet, y
