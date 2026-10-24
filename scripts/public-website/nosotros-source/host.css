@@ -33,6 +33,9 @@ body .gh-nosotros :is(ul,ol) > li{margin:0}
 .gh-nosotros .mk-copy{padding-left:var(--gh-rail) !important;width:calc(min(46%,640px) + var(--gh-rail) - 56px) !important}
 .gh-nosotros .founder > .copy{padding-left:var(--gh-rail) !important}
 .gh-nosotros .brain > .copy{padding-right:var(--gh-rail) !important}
+/* The hero copy sits on the dark wall at the left of the photo (approved composition at ~1280px). Centered in 1320px it
+   drifts onto the lit doorway and the passers-by on wide screens, so it stays anchored to the left rail. */
+.gh-nosotros .hero-copy{margin-left:0 !important;max-width:calc(1320px + var(--gh-rail) - 56px) !important;padding-left:var(--gh-rail) !important}
 }
 /* The map's city labels sit on fixed coordinates; the canvas parallax scaled the image under them (1.16) and moved it ±7%,
    so the labels drifted off their cities while scrolling. The map stays still. */

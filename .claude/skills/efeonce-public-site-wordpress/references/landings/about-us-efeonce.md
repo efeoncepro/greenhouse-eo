@@ -48,7 +48,9 @@
   the `.wrap` below 1320px ran under them. `host.css` sets `--gh-rail: calc(1.5vw + 88px)` for `.wrap` (only while it is
   narrower than the rail), `.mk-copy` (widened by the same amount so the title keeps one line), founder and brain copy.
   The map image no longer has parallax: the city labels are fixed coordinates and the canvas animation (scale 1.16,
-  ±7%) moved the image under them. Partners has the same rail collision between 1181 and 1320px (pending).
+  ±7%) moved the image under them. The hero copy is anchored to the left rail instead of centered in 1320px: centered, it
+  drifted onto the lit doorway and the passers-by on wide screens (the approved composition is the ~1280px one, text on
+  the dark wall). Partners has the same rail collision between 1181 and 1320px (pending).
 
 ## Before 2026-10-23 (history; replaced)
 
