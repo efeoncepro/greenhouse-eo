@@ -16,7 +16,7 @@ const HERE = join(ROOT, 'scripts/public-website/blog-home')
 const TMP = join(ROOT, 'tmp/blog-home')
 const SITE = 'https://efeoncepro.com'
 const REMOTE = 'scripts/public-website/blog-home/remote.php'
-const VALUE_FLAGS = ['until', 'light', 'bold', 'attachment', 'image', 'alt', 'snapshot']
+const VALUE_FLAGS = ['until', 'light', 'bold', 'attachment', 'image', 'alt', 'snapshot', 'surface']
 const FORMATS = ['articulo', 'caso', 'guia', 'grabacion', 'glitch-edicion', 'glitch-flash', 'glitch-nota', 'novedad']
 
 type Json = Record<string, any>
@@ -196,6 +196,7 @@ Write (plan unless --apply; every apply is ledgered and purges /blog/):
   review <resource id>           mark a resource reviewed today (it hides after 180 days)
   event <file.json> [--image file --alt text]      create/update an event (no private meeting links)
   retire <resource|event> <id>   resource → draft; event → cancelled
+  subscription <form-key|off> [--surface id]  connect the real Glitch subscription (published inline_pill form)
   flag <0|1>                     content model off (example content) / on (real data)
   purge                          purge /blog/ now
 
@@ -276,6 +277,14 @@ const main = () => {
 
     case 'flag': {
       const result = remote({ op: 'flag', value: pos[0] ?? fail('flag needs 0 or 1.'), apply })
+
+      print(result)
+
+      return plannedNote(result)
+    }
+
+    case 'subscription': {
+      const result = remote({ op: 'subscription', form_key: pos[0] ?? fail('subscription needs a Growth Form key or off.'), surface: flag(args, 'surface'), apply })
 
       print(result)
 

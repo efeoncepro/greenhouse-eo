@@ -29,6 +29,8 @@ const variants = {
   noEvent: d => ({ ...d, event: { ...d.event, show: false } }),
   // A pinned Efeonce announcement (format «Novedad», operator 2026-10-24) leads the slider.
   photo: d => ({ ...d, slides: [{ ...d.slides[0], authorName: 'Julio Reyes', authorInitials: 'JR', authorPhoto: 'https://efeoncepro.com/wp-content/uploads/2024/07/avatar-150x150.png' }, ...d.slides.slice(1)] }),
+  liveSub: d => ({ ...d, subscribe: { ...d.subscribe, live: true, formKey: '6bc62588-a4a0-4214-9501-13b0c2948c81', surface: 'fhsf-efeonce-blog-subscription', base: 'https://greenhouse.efeoncepro.com' } }),
+  noForm: d => ({ ...d, subscribe: { ...d.subscribe, live: false, formKey: '', surface: '', base: '' } }),
   novedad: d => ({ ...d, slides: [{ ...d.slides[0], fmt: 'nove', fmtLabel: 'Novedad', topic: 'Novedades', cta: 'Leer la novedad', scrim: true }, ...d.slides.slice(1)] }),
 }
 

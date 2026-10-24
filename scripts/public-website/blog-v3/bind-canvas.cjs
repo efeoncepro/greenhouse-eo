@@ -66,6 +66,22 @@ const SCRIM = '<sc-if value="{{ s.scrim }}" hint-placeholder-val="{{ false }}"><
 // profile has one, and the canvas initials otherwise (always for the canvas fixture, which has no photo).
 const AUTHOR_AVATAR = '<span class="hs-av" aria-hidden="true"><sc-if value="{{ s.hasPhoto }}" hint-placeholder-val="{{ false }}"><img class="hs-av__img" src="{{ s.authorPhoto }}" alt="" width="32" height="32" decoding="async"></sc-if><sc-if value="{{ s.noPhoto }}" hint-placeholder-val="{{ true }}">{{ s.authorInitials }}</sc-if></span>'
 
+// Real Glitch subscription (operator, 2026-10-24). With a published Growth Form (subscribe.live), the canvas' simulated
+// pill and the bottom subscription become the real renderer (`inline_pill`, TASK-2054) inside <greenhouse-form
+// data-dc-keep>, which the runtime's morph never touches. The canvas fixture has no `live` key and keeps the canvas
+// markup; real data without a form renders neither. The bottom section using the pill too is an approved deviation.
+const LIVE_PILL = '<sc-if value="{{ subLive }}" hint-placeholder-val="{{ false }}"><greenhouse-form data-dc-keep="" class="eo-inline-pill eo-inline-pill--glitch" form-key="{{ subKey }}" surface="{{ subSurface }}" base-url="{{ subBase }}" locale="es-CL" color-scheme="dark" appearance="bare"><a href="{{ subAction }}">Suscríbete a Glitch</a></greenhouse-form></sc-if>'
+const simOnly = block => '<sc-if value="{{ subSim }}" hint-placeholder-val="{{ true }}">' + block + '</sc-if>' + LIVE_PILL
+
+function bindSubscription(src) {
+  src = rep(src, /(<div class="gxs \{\{ gxCls \}\}">[\s\S]*?<p class="gxs__note"[^>]*>[^<]*<\/p>)/, m => simOnly(m))
+  src = rep(src, /(<form action="\{\{ subAction \}\}" aria-label="Suscripción a Glitch"[\s\S]*?<\/form>)/, m => simOnly(m))
+
+  return src
+}
+
+const SUB_LOGIC = "subSim: !D.subscribe || !('live' in D.subscribe), subLive: Boolean(D.subscribe && D.subscribe.live), subKey: (D.subscribe && D.subscribe.formKey) || '', subSurface: (D.subscribe && D.subscribe.surface) || '', subBase: (D.subscribe && D.subscribe.base) || '',"
+
 const REAL_CONTENT_CSS = `
 /* Contenido real (2026-10-24): velo de lectura para imágenes editoriales y bajada en dos líneas */
 .hs-scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,26,51,.94) 0%,rgba(0,26,51,.82) 28%,rgba(0,26,51,.4) 50%,rgba(0,26,51,0) 68%),linear-gradient(0deg,rgba(0,26,51,.72) 0%,rgba(0,26,51,0) 36%)}
@@ -183,6 +199,7 @@ function bindMarkup(src) {
 
   // Subscription.
   src = rep(src, '<form action="#" aria-label="Suscripción a Glitch"', '<form action="{{ subAction }}" aria-label="Suscripción a Glitch"')
+  src = bindSubscription(src)
 
   return src
 }
@@ -199,7 +216,7 @@ function bindLogic(src) {
   src = rep(src, "yearShift: (['2026', '2025', '2024', '2023'].indexOf(this.state.year) * 100) + '%',", "yearShift: (D.years.indexOf(this.state.year) * 100) + '%',")
   src = rep(src, "this.state = { topic: 'hubspot', year: '2026',", "this.state = { topic: props.data.topicDefault, year: props.data.years[0],")
   src = rep(src, "pct: Math.round((a.n / 44) * 100) + ' %', share: a.n + ' de 44' }", "pct: Math.round((a.n / D.total) * 100) + ' %', share: a.n + ' de ' + D.total, href: a.href, source: D.topicsSource }")
-  src = rep(src, /evSpk: \[[\s\S]*?\n      \],\n      evSeats: '312',\n      evLearn: \[[\s\S]*?\n      \],\n      evAgenda: \[[\s\S]*?\n      \],\n      evNext: \[[\s\S]*?\n      \],\n      evRec: \[[\s\S]*?\n      \],\n/, 'evSpk: D.event.speakers, evSeats: D.event.seats, evLearn: D.event.takeaways, evAgenda: D.event.agenda, evNext: D.event.upcoming, evRec: D.event.recordings,\n      ev: D.event, glitch: D.glitch, rail: D.rail, asset: D.assets, totalPosts: D.total, archiveTitle: D.archiveTitle, moreHref: Y[yr].moreHref,\n      searchAction: D.search.action, searchMethod: D.search.method, searchName: D.search.name, subAction: D.subscribe.action,\n')
+  src = rep(src, /evSpk: \[[\s\S]*?\n      \],\n      evSeats: '312',\n      evLearn: \[[\s\S]*?\n      \],\n      evAgenda: \[[\s\S]*?\n      \],\n      evNext: \[[\s\S]*?\n      \],\n      evRec: \[[\s\S]*?\n      \],\n/, 'evSpk: D.event.speakers, evSeats: D.event.seats, evLearn: D.event.takeaways, evAgenda: D.event.agenda, evNext: D.event.upcoming, evRec: D.event.recordings,\n      ev: D.event, glitch: D.glitch, rail: D.rail, asset: D.assets, totalPosts: D.total, archiveTitle: D.archiveTitle, moreHref: Y[yr].moreHref,\n      searchAction: D.search.action, searchMethod: D.search.method, searchName: D.search.name, subAction: D.subscribe.action, ' + SUB_LOGIC + '\n')
   src = rep(src, 'const at = Date.UTC(2026, 10, 12, 13, 0, 0);', 'const at = D.event.startMs;')
 
   return src
@@ -291,6 +308,7 @@ function bindMarkupMobile(src) {
 
   // Subscription.
   src = rep(src, '<form action="#" aria-label="Suscripción a Glitch"', '<form action="{{ subAction }}" aria-label="Suscripción a Glitch"')
+  src = bindSubscription(src)
 
   if (/href="#"/.test(src)) throw new Error('Unbound href="#" left in mobile markup: ' + src.match(/.{60}href="#".{60}/)[0])
 
@@ -306,7 +324,7 @@ function bindLogicMobile(src) {
   src = rep(src, "yearShift: (['2026', '2025', '2024', '2023'].indexOf(yr) * 100) + '%',", "yearShift: (D.years.indexOf(yr) * 100) + '%',")
   src = rep(src, "this.state = { topic: 'hubspot', year: '2026',", "this.state = { topic: props.data.topicDefault, year: props.data.years[0],")
   src = rep(src, "pct: Math.round((a.n / 44) * 100) + ' %', share: a.n + ' de 44 publicaciones' }", "pct: Math.round((a.n / D.total) * 100) + ' %', share: a.n + ' de ' + D.total + ' publicaciones', href: a.href, source: D.topicsSource }")
-  src = rep(src, /evSpk: \[[\s\S]*?\n      \],\n      evSeats: '312',\n      evLearn: \[[\s\S]*?\n      \],\n      evAgenda: \[[\s\S]*?\n      \],\n      evNext: \[[\s\S]*?\n      \],\n      evRec: \[[\s\S]*?\n      \],\n/, 'evSpk: D.event.speakers, evSeats: D.event.seats, evLearn: D.event.takeaways, evAgenda: D.event.agenda, evNext: D.event.upcoming, evRec: D.event.recordings,\n      ev: D.event, glitch: D.glitch, rail: D.rail, asset: D.assets, chips: D.chips, archiveTitle: D.archiveTitle, moreHref: Y[yr].moreHref,\n      searchAction: D.search.action, searchMethod: D.search.method, searchName: D.search.name, subAction: D.subscribe.action,\n')
+  src = rep(src, /evSpk: \[[\s\S]*?\n      \],\n      evSeats: '312',\n      evLearn: \[[\s\S]*?\n      \],\n      evAgenda: \[[\s\S]*?\n      \],\n      evNext: \[[\s\S]*?\n      \],\n      evRec: \[[\s\S]*?\n      \],\n/, 'evSpk: D.event.speakers, evSeats: D.event.seats, evLearn: D.event.takeaways, evAgenda: D.event.agenda, evNext: D.event.upcoming, evRec: D.event.recordings,\n      ev: D.event, glitch: D.glitch, rail: D.rail, asset: D.assets, chips: D.chips, archiveTitle: D.archiveTitle, moreHref: Y[yr].moreHref,\n      searchAction: D.search.action, searchMethod: D.search.method, searchName: D.search.name, subAction: D.subscribe.action, ' + SUB_LOGIC + '\n')
   src = rep(src, 'const at = Date.UTC(2026, 10, 12, 13, 0, 0);', 'const at = D.event.startMs;')
 
   return src

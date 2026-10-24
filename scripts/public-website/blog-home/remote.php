@@ -282,6 +282,25 @@ switch ( $op ) {
 		$out( array( 'op' => 'flag', 'before' => $before, 'after' => $want, 'applied' => true ) );
 		break;
 
+	case 'subscription':
+		// The real Glitch subscription of the home: a published Growth Form key (inline_pill) or 'off'.
+		$key     = (string) ( $in['form_key'] ?? '' );
+		$surface = (string) ( $in['surface'] ?? 'fhsf-efeonce-blog-subscription' );
+		if ( 'off' !== $key && ! preg_match( '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $key ) ) { WP_CLI::error( 'subscription needs a Growth Form key (UUID) or off.' ); }
+		$before = array( 'form_key' => (string) get_option( 'eo_blog_glitch_form_key', '' ), 'surface' => (string) get_option( 'eo_blog_glitch_form_surface', '' ) );
+		$after  = 'off' === $key ? array( 'form_key' => '', 'surface' => '' ) : array( 'form_key' => $key, 'surface' => $surface );
+		if ( ! $apply ) { $out( array( 'op' => $op, 'before' => $before, 'after' => $after, 'applied' => false ) ); break; }
+		if ( '' === $after['form_key'] ) {
+			delete_option( 'eo_blog_glitch_form_key' );
+			delete_option( 'eo_blog_glitch_form_surface' );
+		} else {
+			update_option( 'eo_blog_glitch_form_key', $after['form_key'], false );
+			update_option( 'eo_blog_glitch_form_surface', $after['surface'], false );
+		}
+		$finish( $op );
+		$out( array( 'op' => $op, 'before' => $before, 'after' => $after, 'applied' => true ) );
+		break;
+
 	case 'purge':
 		if ( ! $apply ) { $out( array( 'op' => 'purge', 'pages' => EO_Cache_Purge::pages(), 'applied' => false ) ); break; }
 		$finish( 'manual' );
