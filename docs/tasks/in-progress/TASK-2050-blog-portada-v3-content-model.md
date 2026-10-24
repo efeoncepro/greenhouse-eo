@@ -28,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Code complete en local (2026-10-24): modelo en efeonce-editorial-blocks 0.2.0 (runtime b00fa2f…2dc7bcd), 148 checks PHP + 62 checks en Playground y ensayo del despliegue y del backfill; rollout pendiente: PDR-029 Proposed, sin deploy, sin backfill, opción eo_content_model_enabled en 0`
+- Status real: `Code complete en local (2026-10-24): modelo en efeonce-editorial-blocks 0.2.0 (runtime b00fa2f…57d4455), 148 checks PHP, 62 checks en Playground, panel del editor probado en navegador y ensayo del despliegue y del backfill; rollout pendiente: PDR-029 Proposed, sin deploy, sin backfill, opción eo_content_model_enabled en 0`
 - Rank: `TBD`
 - Domain: `public-site|content`
 - Blocked by: `Aprobación del operador de PDR-029 y del dry-run del backfill (rollout)`
