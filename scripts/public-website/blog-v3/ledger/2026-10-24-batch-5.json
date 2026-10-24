@@ -1,0 +1,51 @@
+{
+    "contract": "eo-format-backfill-ledger.v1",
+    "mode": "apply",
+    "at": "2026-10-24T07:44:01+00:00",
+    "proposal_sha256": "e6ae85cc94bef9b1748d7291bf170764d15fb6d3ad55e2a50b33f512da986103",
+    "batch": 10,
+    "applied": 4,
+    "remaining": 0,
+    "entries": [
+        {
+            "id": 249387,
+            "slug": "web-agentica-agentes-ia",
+            "title": "El fin de la web “solo para humanos”: cómo preparar tu sitio para los agentes de IA",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 251563,
+            "slug": "glitch-costo-real-ia-tarea",
+            "title": "Glitch #16: Open-weight que descargas, precio que miente, canal sin dueño",
+            "before": [],
+            "after": [
+                "glitch-edicion"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 251605,
+            "slug": "glitch-17-modelo-commodity-control-escaso",
+            "title": "Glitch #17: Agente rompe la jaula, la confianza reordena el frontier, la correa manda",
+            "before": [],
+            "after": [
+                "glitch-edicion"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 251941,
+            "slug": "glitch-flash-claude-sonnet-5-5",
+            "title": "Glitch Flash: Sonnet 5.5 roza a Opus, a mitad de precio",
+            "before": [],
+            "after": [
+                "glitch-flash"
+            ],
+            "source": "rule"
+        }
+    ]
+}

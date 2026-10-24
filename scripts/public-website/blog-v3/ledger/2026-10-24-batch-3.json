@@ -1,0 +1,111 @@
+{
+    "contract": "eo-format-backfill-ledger.v1",
+    "mode": "apply",
+    "at": "2026-10-24T07:43:56+00:00",
+    "proposal_sha256": "e6ae85cc94bef9b1748d7291bf170764d15fb6d3ad55e2a50b33f512da986103",
+    "batch": 10,
+    "applied": 10,
+    "remaining": 14,
+    "entries": [
+        {
+            "id": 248483,
+            "slug": "como-aplicar-loop-marketing",
+            "title": "Cómo aplicar Loop Marketing: estrategia, etapas y conexión con el consumidor actual",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 248513,
+            "slug": "ejecutar-loop-marketing-hubspot",
+            "title": "Cómo ejecutar Loop Marketing en tu empresa con las innovaciones de HubSpot 2025",
+            "before": [],
+            "after": [
+                "guia"
+            ],
+            "source": "override"
+        },
+        {
+            "id": 249108,
+            "slug": "cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd",
+            "title": "5 pasos para definir a tu cliente ideal: ICP, Buyer Persona, IPP y Jobs to Be Done",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 249114,
+            "slug": "universal-commerce-protocol-marketing-b2b",
+            "title": "El Protocolo de Comercio Universal (UCP): cuando la IA se convierte en el nuevo punto de venta",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 249111,
+            "slug": "ley-21719-impacto-marketing-go-to-market",
+            "title": "La Ley 21.719 no regula datos: obliga a rediseñar el marketing y el Go-To-Market",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 249056,
+            "slug": "express-voz-marca-ia-loop-marketing",
+            "title": "Express en Loop Marketing: POV, voz única, buyer persona y Jobs-to-be-done",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 249383,
+            "slug": "donde-cita-la-ia",
+            "title": "El 80% de lo que cita la IA no existe en Google. ¿Dónde estás tú?",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 249768,
+            "slug": "surround-discovery-seo-google-video-marketplace",
+            "title": "Tu cliente ya no busca solo en Google. Tu estrategia SEO no debería hacerlo tampoco.",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 249766,
+            "slug": "glitch-02-noticias-ia-marketing-2026-03-03",
+            "title": "GLITCH #02: Tu semana en AI, marketing y tecnología — sin anestesia",
+            "before": [],
+            "after": [
+                "glitch-edicion"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 249764,
+            "slug": "creative-supply-chain",
+            "title": "La fábrica que nadie ve: el viaje real de una pieza creativa desde el brief hasta el resultado",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        }
+    ]
+}

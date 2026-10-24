@@ -1,0 +1,9 @@
+{
+  "mode": "apply",
+  "batch": 10,
+  "expect_sha256": "e6ae85cc94bef9b1748d7291bf170764d15fb6d3ad55e2a50b33f512da986103",
+  "overrides": {
+    "como-crear-formularios-con-validacion-de-rut": "guia",
+    "ejecutar-loop-marketing-hubspot": "guia"
+  }
+}
