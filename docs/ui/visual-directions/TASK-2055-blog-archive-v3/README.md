@@ -74,7 +74,7 @@ Decisiones tomadas con el operador en esta ronda:
 Revisión visual local (renderizador del gate de la portada + Playwright): 12 tableros sin desborde
 (`scrollWidth === clientWidth`) y sin imágenes rotas. Aprobada el 2026-10-24; implementación en TASK-2055.
 
-## Variante Glitch del tema — PROPUESTA (2026-10-24, canvas versión 78)
+## Variante Glitch del tema — PROPUESTA (2026-10-24, canvas versión 79)
 
 Pedido del operador: «solo en esta, el mismo diseño pero más Glitch, más sus elementos gráficos»; y luego «no te vayas a
 todo gigante, que gigante no es necesariamente elegante o premium». Sólo para `/category/glitch/` (= `/glitch/`, el
@@ -90,7 +90,7 @@ porque Tailwind escanea los archivos de texto del repo); capturas `capturas/vari
 | 3 | Muletilla | «sin anestesia.» en Guttery verde, rotada −4°, cerrando la descripción |
 | 4 | Falla en bytes | Celdas navy de 8 px que caen del borde inferior del bloque oscuro (60 px, determinista). **Uso nuevo de la falla: requiere el visto bueno del operador** |
 | 5 | Filas | Placa navy «#17» en la columna de fecha (el verde nunca va sobre blanco); el prefijo «Glitch #N:» sale del título porque la placa lo dice; las notas quedan sin placa. Filtro Ediciones 7 · Flash 1 · Notas 2 |
-| 6 | Suscripción | Banner navy tras la lista: «Ocho noticias cada lunes, / con punto de vista.» (contraste de pesos), muletilla «nos vemos el lunes.», textura de bytes verde en la esquina y la **misma píldora que se transforma de la portada** (verde, «Suscríbete a Glitch», versión 78): el mismo `<greenhouse-form>` `inline_pill` y el mismo formulario de suscripción a Glitch ya en producción en `/blog/`, con su aviso de privacidad; si el formulario no está conectado, el banner se oculta |
+| 6 | Suscripción | Banner navy tras la lista: «Ocho noticias cada lunes, / con punto de vista.» (contraste de pesos), muletilla «nos vemos el lunes.», textura de bytes verde en la esquina y la **misma píldora que se transforma de la portada**, en blanco con el logo: «Suscríbete a [logo de Glitch]» (versión 79, pedido del operador; en verde la manzana del logo desaparece). Implementarlo pide un rótulo con logo y tono blanco en el renderer `inline_pill`; si se aprueba, la portada se alinea igual. Es el mismo `<greenhouse-form>` `inline_pill` y el mismo formulario de suscripción a Glitch ya en producción en `/blog/`, con su aviso de privacidad; si el formulario no está conectado, el banner se oculta |
 
 Escala contenida tras el comentario del operador (versión 77): wordmark de 620 a 430 px, cifras de 84 a 52 px, titular
 del banner de 64 a 46 px, borde de bytes de 96 a 60 px. Revisión local: sin desborde a 1440 ni a 390, un H1, Guttery
