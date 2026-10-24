@@ -358,3 +358,11 @@ Total: 26 enlaces únicos + 8 menciones; todos 200 al 2026-10-24; validación `p
   sin desborde a 1440 px, consola sin errores.
 - Rollback a la V1 de la mañana: `tmp/post-refresh-rollback.php` con input `{"id":244765,"option":"_gh_post_refresh_244765_20261024_085323"}`.
 - Pendiente: portada e imagen social siguen en el formato antiguo (se rehacen en la línea gráfica «La órbita»).
+
+## Portada e imagen social nuevas (2026-10-24)
+
+Imagen destacada y Open Graph reemplazadas por la portada de Marketing con Manzanitas centrada para el recorte móvil
+(adjunto `252065`, `wp-content/uploads/2024/07/que-es-inbound-marketing-portada-2026.jpg`, 2400 × 1260). Verificado en vivo: `og:image` y la imagen principal del
+schema apuntan al archivo nuevo, 200 `image/jpeg`; las tarjetas del blog (recorte cuadrado) muestran la cabecera, la
+respuesta y la firma. Proceso, revisión, rollback y pendientes:
+[`ai-generations/2026-10-24_portadas-blog/LEEME.md`](../../ai-generations/2026-10-24_portadas-blog/LEEME.md).

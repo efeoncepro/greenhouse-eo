@@ -1,0 +1,16 @@
+{
+  "$comment": "Demo interna del banner de blog aprobado (layout actual) para medir el recorte cuadrado. Foto del canvas aprobado MC5g; no se publica.",
+  "contract": "efeonce.manzanitas-register",
+  "version": "0.3.0",
+  "register": "marketing-con-manzanitas",
+  "channel": "blog",
+  "topicLine": "revenue-hubspot",
+  "artifactId": "MCM-demo-blog-inbound",
+  "slides": [
+    {
+      "piece": "blog-banner-escena",
+      "voice": { "question": "¿Qué es el inbound marketing en 2026?", "answer": "Ayudar" },
+      "photo": { "register": "cine", "lightId": "sesion-1", "subject": "Nexa revisa evidencia sobre una mesa", "alt": "Nexa revisa tarjetas de evidencia sobre una mesa con luz cálida", "path": "../../2026-09-28_manzanitas-cine/plates/MC5g-169-blog-evidencia.png" }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "MCB-INB1-169",
+  "formato": "16:9",
+  "registro": "cine",
+  "alcance": "manzanitas",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "linea": "revenue-hubspot",
+  "identidad": [
+    {
+      "persona": "antonio",
+      "vista": "45-izq"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "llave": {
+    "fuente": "the single glowing glass card of azure-white light he offers in his hand",
+    "lado": "below and in front of his face, slightly toward frame-left",
+    "tamano": "a thin glass card the size of a sheet of paper",
+    "distancia": "about 40 cm from his face"
+  },
+  "fondo": "a row of large cold white-azure practical lights very far behind him, melted into round bokeh, all of them to the right of 72 % of the frame width",
+  "fenomeno": {
+    "que": "one glass card of azure-white light offered across the table toward us, the answer arriving before we ask",
+    "esServicio": "Inbound marketing: ayudar primero; la respuesta llega a quien la busca, antes de venderle"
+  },
+  "escena": "SCENE (cinematic still, Hollywood drama, a vast dark Efeonce meeting space at night with a thin haze, far behind him on the right, softly out of focus, the tall dark glass wall and the ceiling grid of the room recede into the darkness, giving the room its scale, a cool frame, natural warm-neutral skin): a MEDIUM-WIDE shot of Antonio, wearing the EFEONCE SOFTSHELL JACKET of the corporate uniform over a plain dark polo, SEATED at the far end of a long review table of matte oiled walnut with no reflections, about six metres long; we sit at its near end, in the client's seat, the camera at his seated eye level about six metres from him, 85mm f/2.8; the table runs away from the lens diagonally toward the right of the frame, so its far end, where he sits, is in the right quarter of the frame: he is small in the vast room, and from the top of his head to the tabletop he spans a little over half of the frame height. Near the lens the tabletop fills the whole width of the bottom of the frame; the left two thirds of the visible tabletop are bare, empty dark walnut. His right elbow, the one nearest the centre of the frame, is at about 76 % of the frame width, and his face at about 84 %; between the left edge of the frame and that elbow there is a wide band of empty darkness above the bare table. MOMENT, caught at the exact instant: he has just slid one thin glass card, the size of a sheet of paper, a short way across the table toward us and still rests two fingertips of his RIGHT hand on its far edge; his right forearm lies on the table, foreshortened, pointing straight at the lens, the elbow tucked against his side, so the card lies directly in front of his own chest, at about 80 % of the frame width; the card glows azure-white (#0375DB and cold white) and is the brightest element and the only key light, lighting his face from below; his other hand rests calm on the table. He looks straight into the lens with calm, assured warmth and a closed-mouth smile: he is giving the answer before being asked. The card is plain glass with NO text, NO symbols and NO marks. At one corner of the card sits ONE tiny point of magenta light (#E86BD0): the only accent in the frame; it lights nothing around it. The rest of the table is empty and dark: no other cards, no laptops, no papers, no mugs, no plants, no monitors, no lamps. Above the bare tabletop, the LEFT 64% of the frame is calm, deep dark space with only faint haze: no light and no objects, no bokeh, no beams; the far bokeh lights stay only behind him, to the right of 72 % of the frame width. The near half of the table is in deep shadow, outside every light. Enormous contrast, no readable text anywhere, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the near edge of the matte oiled walnut review table he is sitting at, spanning the whole width of the bottom of the frame, only a few centimetres in front of the lens, in deep shadow, outside every light, with no reflections",
+    "tono": "DARK walnut in deep shadow, near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark room above the bare walnut tabletop, empty all the way to his elbow",
+      "tinta": "blanca"
+    }
+  },
+  "nota": "Elenco ficticio (Antonio, línea revenue) en Marketing con Manzanitas: el caso 4 del §2 dice roster; precedente del operador en las fotos del menú del 2026-10-18 (Karo). Sin nombre en pantalla."
+}

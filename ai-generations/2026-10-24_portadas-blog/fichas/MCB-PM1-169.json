@@ -1,0 +1,42 @@
+{
+  "id": "MCB-PM1-169",
+  "formato": "16:9",
+  "registro": "cine",
+  "alcance": "manzanitas",
+  "impacto": true,
+  "linea": "voice",
+  "identidad": [
+    {
+      "persona": "isabella",
+      "vista": "45-izq"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-bomber-efeonce"
+    }
+  ],
+  "llave": {
+    "fuente": "a large cold azure-white glow from a person-height street screen standing beside us, about two metres to the left of the camera, out of frame",
+    "lado": "from about two metres left of the camera, at her eye height, raking across her face from frame-left",
+    "tamano": "a screen about the height of a person, soft-edged",
+    "distancia": "about six metres from her"
+  },
+  "fondo": "far down the avenue, 30 to 40 metres behind her and only on the right half of the frame, a few digital billboards and cold-white LED street lights melted into soft round and rectangular bokeh; what the billboards show is unreadable only because of distance and defocus — soft patches of cold white and pale grey — never blank flat panels, never large blue panels, no recognisable image, letters or logos",
+  "fenomeno": {
+    "que": "the glow of a screen from where we stand catches her as she walks by: it lights only her in the dark street, at the instant her eyes find us",
+    "esServicio": "Paid media compra la primera mirada: la luz elige a una persona y la detiene"
+  },
+  "escena": "SCENE (cinematic still, Hollywood thriller, a city sidewalk at night, just after blue hour: the sky above the buildings is near-black navy and gives no light, thin haze, a cool frame, natural warm-neutral skin): a MEDIUM-WIDE shot of Isabella, seen from about mid-thigh up,, wearing the EFEONCE BOMBER JACKET of the corporate uniform, WALKING along the sidewalk diagonally toward the left of the camera, caught mid-stride at the exact instant her eyes find us; her body is angled about 45 degrees toward frame-left and her head turns only slightly further toward the lens; camera about six metres from her, at about 1.1 m, the height of the railing, 85mm f/2; she is seen almost level, a hint from below. She stands in the right quarter of the frame: her near shoulder is at about 78% of the frame width and her face at about 86%; between the left edge of the frame and her body there is a wide band of empty darkness about three quarters of the frame wide. Above her head there is calm dark air, about a tenth of the frame height. The only key light is a large cold azure-white glow (#0375DB and cold white) coming from a person-height street screen standing beside us, about two metres left of the camera, out of frame, the screen that caught her eye; it lights only her — her face and the front of her jacket — while the sidewalk and the buildings around her stay dark; the far side of her face falls into shadow, no fill. She looks straight into the lens with a spontaneous, curious half-smile, as if something just caught her attention. Both arms hang relaxed at her sides in the rhythm of her stride, both hands visible, empty and relaxed, swinging slightly with her stride, above the soft out-of-focus railing at the bottom of the frame; no bag, no phone, nothing crosses her chest. Far behind her, just to the right of her head, at about 92 % of the frame width, ONE tiny pin-point of orange light (#F83902), smaller than any bokeh disc: the only accent in the frame; it lights nothing around it. Far down the avenue, 30 to 40 metres behind her and only on the right half of the frame, a few digital billboards and cold-white LED street lights melt into soft round and rectangular bokeh; what the billboards show is unreadable only because of distance and defocus — soft patches of cold white and pale grey — never blank flat panels, never large blue panels, no recognisable image, letters or logos. A thin haze only far down the avenue behind her, the air in front of her clear. The LEFT 64% of the frame is the dark, unlit facade of a closed building across the avenue, far behind her on the left, softly out of focus, near-black navy, with no lit windows: no lights, no bokeh, no objects, no people, no beams. No other people, no cars in focus, no readable signs, no logos of any other brand, no cars, no red tail lights, no traffic lights, no warm sodium lamps.",
+  "lecho": {
+    "objeto": "the flat, wide top cap of a black powder-coated steel pedestrian railing at the curb, the lens resting just above it a few centimetres behind its near edge, out of focus, slightly tilted so it rises a little toward the left-centre of the frame, in deep shadow, outside every light, flat matte with no sheen and no reflection of the sky or of the street lights",
+    "tono": "DARK matte metal in deep shadow, near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark, unlit facade of a closed building across the avenue, far behind her on the left, softly out of focus, near-black navy, with no lit windows",
+      "tinta": "blanca"
+    }
+  },
+  "nota": "Elenco ficticio en Manzanitas (Isabella, línea voice) por el precedente del operador del 2026-10-18 (fotos del menú: Nexa o el elenco, nunca Julio); nunca con su nombre en pantalla ni como equipo real."
+}
