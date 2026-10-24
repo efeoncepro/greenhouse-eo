@@ -740,6 +740,25 @@ export type RegistrationStatus = (typeof REGISTRATION_STATUSES)[number]
 
 export const REGISTRATIONS_COUNT_DEFAULT_THRESHOLD = 25
 
+export const EVENT_MODALITIES = ['online', 'presencial', 'hibrido'] as const
+
+/** Datos públicos del evento con los que se arman sus correos y su `.ics`. */
+export const eventRegistrationEventSchema = z
+  .object({
+    title: z.string().trim().min(1).max(200),
+    /** Inicio en UTC, ISO 8601 con zona (`2026-11-12T13:00:00Z`). */
+    startUtc: z.string().datetime({ offset: true }),
+    /** Zona IANA con la que se lee la hora (`America/Santiago`). */
+    timezone: z.string().trim().min(3).max(64),
+    durationMin: z.number().int().positive().max(1440),
+    modality: z.enum(EVENT_MODALITIES),
+    venue: z.string().trim().max(200).optional(),
+    /** Página pública del evento (`https://efeoncepro.com/eventos/<slug>/`). */
+    pageUrl: z.string().url()
+  })
+  .strict()
+export type EventRegistrationEvent = z.infer<typeof eventRegistrationEventSchema>
+
 /**
  * Política de reserva de un formulario `event_registration`. Vive en
  * `form_version.ui_policy_json.eventRegistration` y NO cruza al render contract: cupo, umbral y la
@@ -756,7 +775,19 @@ export const eventRegistrationPolicySchema = z
       .regex(/^[A-Za-z][A-Za-z0-9_]{0,79}$/)
       .default('registration_status'),
     showRegistrationsCount: z.boolean().default(false),
-    registrationsCountThreshold: z.number().int().min(1).max(100_000).default(REGISTRATIONS_COUNT_DEFAULT_THRESHOLD)
+    registrationsCountThreshold: z.number().int().min(1).max(100_000).default(REGISTRATIONS_COUNT_DEFAULT_THRESHOLD),
+    /**
+     * 2026-10-24 — Lo que necesitan los correos del evento (confirmación, lista de espera, recordatorio). Server-only
+     * como toda la política: nunca cruza al render contract, así que `joinUrl` (el enlace privado de la sala) no
+     * llega al navegador ni a WordPress. Sin `event` no hay correos.
+     */
+    event: eventRegistrationEventSchema.optional(),
+    joinUrl: z
+      .string()
+      .url()
+      .refine(url => url.startsWith('https://'), 'joinUrl debe ser https')
+      .optional(),
+    reminderMinutesBefore: z.number().int().min(15).max(1440).default(120)
   })
   .strict()
 export type EventRegistrationPolicy = z.infer<typeof eventRegistrationPolicySchema>

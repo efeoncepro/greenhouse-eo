@@ -27,6 +27,11 @@ export type EmailType =
   | 'contractor_remittance_paid'
   | 'ai_visibility_grader_report'
   | 'growth_ebook_delivery'
+  // Reservas de eventos y webinars de Efeonce (portada del blog). DOS tipos porque son momentos
+  // distintos del ciclo: la confirmación/lista de espera sale al reservar y el recordatorio lo
+  // dispara un agendamiento aparte; separarlos permite pausar uno sin silenciar el otro.
+  | 'growth_event_registration'
+  | 'growth_event_reminder'
   | 'hiring_application_received_internal'
   | 'hiring_application_confirmation'
   | 'hiring_assessment_assigned'
@@ -111,6 +116,8 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   insights_edition_delivery_attachment: 'transactional',
   ai_visibility_grader_report: 'transactional',
   growth_ebook_delivery: 'transactional',
+  growth_event_registration: 'transactional',
+  growth_event_reminder: 'transactional',
   // TASK-1689 — ciclo de vida de Hiring (consumers reactivos en ops-worker)
   hiring_application_received_internal: 'transactional',
   hiring_application_confirmation: 'transactional',
@@ -158,6 +165,31 @@ export interface EmailTemplateContext extends Record<string, unknown> {
   recipientEmail?: string
   recipientName?: string
   recipientUserId?: string
+}
+
+/** Variante del correo de reserva de eventos/webinars de Efeonce. */
+export type EventRegistrationEmailVariant = 'confirmed' | 'waitlisted' | 'reminder'
+
+/**
+ * Contexto de `growth_event_registration` y `growth_event_reminder`.
+ *
+ * - `joinUrl` es el enlace privado de la sala: sólo se renderiza en `confirmed` y `reminder`;
+ *   la lista de espera nunca lo muestra aunque venga.
+ * - `calendarNote` reemplaza la línea «adjuntamos el evento…» de `confirmed`; con cadena vacía
+ *   se omite. El `.ics` lo adjunta el consumer vía `attachments` del `sendEmail`.
+ * - En `growth_event_reminder` la plantilla fuerza `variant: 'reminder'`.
+ */
+export interface EventRegistrationEmailContext extends EmailTemplateContext {
+  variant: EventRegistrationEmailVariant
+  recipientName?: string
+  eventTitle: string
+  whenLabel: string
+  durationLabel: string
+  modalityLabel: string
+  joinUrl?: string
+  eventPageUrl: string
+  calendarNote?: string
+  locale?: 'es' | 'en'
 }
 
 export interface TokenSensitiveEmailSafeContext {
@@ -263,6 +295,9 @@ export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailT
   // TASK-1837 — la persona invitada a Efeonce ID es externa (cliente): conoce a Efeonce, no al portal.
   'external_access_invitation',
   'growth_ebook_delivery',
+  // Reservas de eventos/webinars: el inscrito es un prospecto público que conoce a Efeonce.
+  'growth_event_registration',
+  'growth_event_reminder',
   // TASK-1689 — candidate-facing hiring: el candidato es externo y conoce a Efeonce, no al
   // portal. Los avisos internos a People NO van acá: usan el sender plataforma.
   'hiring_application_confirmation',

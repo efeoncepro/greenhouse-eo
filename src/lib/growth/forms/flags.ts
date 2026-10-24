@@ -16,12 +16,18 @@ export const GROWTH_FORMS_EMAIL_VERIFICATION_FLAG = 'GROWTH_FORMS_EMAIL_VERIFICA
 export const GROWTH_FORMS_PII_ENCRYPTION_FLAG = 'GROWTH_FORMS_PII_ENCRYPTION_ENABLED'
 /** TASK-1375 — email de respaldo del ebook (consumer reactivo `growth_ebook_delivery`). ops-worker. */
 export const GROWTH_EBOOK_EMAIL_DELIVERY_FLAG = 'GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED'
+/** 2026-10-24 — correos de las reservas de eventos (confirmación, lista de espera, recordatorio). ops-worker. */
+export const GROWTH_EVENT_EMAILS_FLAG = 'GROWTH_EVENT_EMAILS_ENABLED'
 
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
 /** Kill switch del API público de forms. Default OFF. */
 export const isFormsPublicApiEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_PUBLIC_API_FLAG])
+
+/** Correos de las reservas de eventos. Default OFF → la reserva se registra, sin correo. */
+export const isEventEmailsEnabled = (env: EnvSource = process.env): boolean =>
+  isTrue(env[GROWTH_EVENT_EMAILS_FLAG])
 
 /** Kill switch del email de respaldo del ebook. Default OFF → sólo descarga on-screen. */
 export const isEbookEmailDeliveryEnabled = (env: EnvSource = process.env): boolean =>

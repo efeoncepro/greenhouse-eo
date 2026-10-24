@@ -28,4 +28,15 @@ if ( '' !== $sub_key ) {
 	}
 }
 
+// Preview of a real event reservation (serve.cjs --event-form): the keys the content-model adapter sets on the event.
+$ev_key = (string) getenv( 'EOBH_PREVIEW_EVENT_FORM_KEY' );
+if ( '' !== $ev_key ) {
+	foreach ( array( 'portada', 'movil' ) as $board ) {
+		$data[ $board ]['event'] = array_merge(
+			$data[ $board ]['event'],
+			array( 'formLive' => true, 'formKey' => $ev_key, 'formSurface' => (string) getenv( 'EOBH_PREVIEW_EVENT_FORM_SURFACE' ), 'formBase' => (string) getenv( 'EOBH_PREVIEW_SUBSCRIBE_BASE' ) )
+		);
+	}
+}
+
 echo EOBH_Front::markup( $data, $now );

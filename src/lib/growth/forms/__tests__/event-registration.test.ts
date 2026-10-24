@@ -138,7 +138,8 @@ describe('TASK-2053 · contrato de la reserva por evento', () => {
       overCapacity: 'waitlist',
       statusField: 'registration_status',
       showRegistrationsCount: false,
-      registrationsCountThreshold: 25
+      registrationsCountThreshold: 25,
+      reminderMinutesBefore: 120
     })
     expect(resolveEventRegistrationPolicy('subscribe', { eventRegistration: { capacity: 50 } })).toBeNull()
     expect(resolveEventRegistrationPolicy('event_registration', {})).toBeNull()

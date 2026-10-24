@@ -81,7 +81,16 @@ function bindSubscription(src) {
   return src
 }
 
-const SUB_LOGIC = "subSim: !D.subscribe || !('live' in D.subscribe), subLive: Boolean(D.subscribe && D.subscribe.live), subKey: (D.subscribe && D.subscribe.formKey) || '', subSurface: (D.subscribe && D.subscribe.surface) || '', subBase: (D.subscribe && D.subscribe.base) || '',"
+// Real event reservation (2026-10-24): an event with a published registration form (ev.formLive) gets the renderer's
+// event pill in place of the canvas' simulated one; an event without a form shows no reservation (the calendar link and
+// the event page stay); the canvas fixture has no `formLive` key and keeps its markup.
+const LIVE_EV = '<sc-if value="{{ evLive }}" hint-placeholder-val="{{ false }}"><greenhouse-form data-dc-keep="" class="eo-inline-pill eo-inline-pill--event" form-key="{{ ev.formKey }}" surface="{{ ev.formSurface }}" base-url="{{ ev.formBase }}" locale="es-CL" color-scheme="dark" appearance="bare"><a href="{{ ev.formAction }}" class="ghf-fallback ab ab--brand ab--xl live"><span>Reservar mi lugar</span><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></a><p class="gxs__note" aria-hidden="true">Reserva tu lugar en un paso.</p></greenhouse-form></sc-if>'
+
+function bindEventReservation(src) {
+  return rep(src, /(<div class="gxs gxs--ev \{\{ evCls \}\}">[\s\S]*?<p class="gxs__note"[^>]*>[^<]*<\/p>)/, m => '<sc-if value="{{ evSim }}" hint-placeholder-val="{{ true }}">' + m + '</sc-if>' + LIVE_EV)
+}
+
+const SUB_LOGIC = "evSim: !D.event || !('formLive' in D.event), evLive: Boolean(D.event && D.event.formLive), subSim: !D.subscribe || !('live' in D.subscribe), subLive: Boolean(D.subscribe && D.subscribe.live), subKey: (D.subscribe && D.subscribe.formKey) || '', subSurface: (D.subscribe && D.subscribe.surface) || '', subBase: (D.subscribe && D.subscribe.base) || '',"
 
 const REAL_CONTENT_CSS = `
 /* Contenido real (2026-10-24): velo de lectura para imágenes editoriales y bajada en dos líneas */
@@ -201,6 +210,7 @@ function bindMarkup(src) {
   // Subscription.
   src = rep(src, '<form action="#" aria-label="Suscripción a Glitch"', '<form action="{{ subAction }}" aria-label="Suscripción a Glitch"')
   src = bindSubscription(src)
+  src = bindEventReservation(src)
 
   return src
 }
@@ -310,6 +320,7 @@ function bindMarkupMobile(src) {
   // Subscription.
   src = rep(src, '<form action="#" aria-label="Suscripción a Glitch"', '<form action="{{ subAction }}" aria-label="Suscripción a Glitch"')
   src = bindSubscription(src)
+  src = bindEventReservation(src)
 
   if (/href="#"/.test(src)) throw new Error('Unbound href="#" left in mobile markup: ' + src.match(/.{60}href="#".{60}/)[0])
 

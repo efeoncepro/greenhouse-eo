@@ -446,6 +446,12 @@ ensure_secret_accessor_binding "${NOTION_KNOWLEDGE_TOKEN_SECRET_REF}:latest"
 # Rollback (<5min): `gcloud run services update ops-worker --update-env-vars GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=false`.
 GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED="${GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=${GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED}"
+# 2026-10-24 — Correos de las reservas de eventos (confirmación + lista de espera vía consumer reactivo; recordatorio
+# vía /growth/events/reminders). Sólo actúa sobre formularios event_registration que declaran
+# ui_policy.eventRegistration.event: sin eventos así es no-op. Rollback (<5min):
+# `gcloud run services update ops-worker --update-env-vars GROWTH_EVENT_EMAILS_ENABLED=false`.
+GROWTH_EVENT_EMAILS_ENABLED="${GROWTH_EVENT_EMAILS_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},GROWTH_EVENT_EMAILS_ENABLED=${GROWTH_EVENT_EMAILS_ENABLED}"
 
 # TASK-1689 — Emails transaccionales del ciclo de Hiring. Los 4 consumers reactivos
 # (hiring_application_created_emails / hiring_assessment_assigned_email /
@@ -1555,6 +1561,15 @@ upsert_scheduler_job \
   "/growth/forms/dispatch" \
   '{}'
 echo "  -> ops-growth-forms-dispatch: */2 * * * * (Growth Forms delivery, TASK-1229)"
+
+# 2026-10-24 — Recordatorio de las reservas de eventos y webinars (portada del blog). Cada 15 min envía a las reservas
+# confirmadas cuyo evento empieza dentro de `reminderMinutesBefore`. No-op con GROWTH_EVENT_EMAILS_ENABLED OFF.
+upsert_scheduler_job \
+  "ops-growth-event-reminders" \
+  "*/15 * * * *" \
+  "/growth/events/reminders" \
+  '{}'
+echo "  -> ops-growth-event-reminders: */15 * * * * (correos de recordatorio de eventos)"
 
 # SEO — materialización diaria de Google Search Console (TASK-1302).
 #

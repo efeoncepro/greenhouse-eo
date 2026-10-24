@@ -4,6 +4,7 @@ import AiVisibilityGraderReportEmail, {
   type AiVisibilityReportEmailInsight
 } from '@/emails/AiVisibilityGraderReportEmail'
 import EbookDeliveryEmail from '@/emails/EbookDeliveryEmail'
+import EventRegistrationEmail from '@/emails/EventRegistrationEmail'
 import ExternalAccessInvitationEmail from '@/emails/ExternalAccessInvitationEmail'
 import InvitationEmail from '@/emails/InvitationEmail'
 import LeaveRequestDecisionEmail from '@/emails/LeaveRequestDecisionEmail'
@@ -44,7 +45,9 @@ import type {
   EmailTemplateContext,
   EmailTemplateRenderResult,
   EmailTemplateResolver,
-  EmailType
+  EmailType,
+  EventRegistrationEmailContext,
+  EventRegistrationEmailVariant
 } from './types'
 
 type ResolverMap = Map<EmailType, EmailTemplateResolver<any>>
@@ -1898,6 +1901,161 @@ registerPreviewMeta('growth_ebook_delivery', {
     { key: 'bridgeUrl', label: 'URL del puente', type: 'text' },
     { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
   ]
+})
+
+// ── Reservas de eventos y webinars de Efeonce (portada del blog) ──────────────────────────
+// PROVISIONAL, pendiente de diseño: arma el flujo con el patrón del ebook.
+// Mismo patrón que el ebook: GENÉRICO (el contenido del evento lo pasa el consumer) y marca
+// Efeonce (agencia). `growth_event_registration` usa el variant del contexto (confirmed |
+// waitlisted); `growth_event_reminder` fuerza `reminder`. El `.ics` lo adjunta el consumer.
+
+const EVENT_REGISTRATION_VARIANTS: readonly EventRegistrationEmailVariant[] = ['confirmed', 'waitlisted', 'reminder']
+
+const normalizeEventVariant = (variant: unknown): EventRegistrationEmailVariant =>
+  EVENT_REGISTRATION_VARIANTS.includes(variant as EventRegistrationEmailVariant)
+    ? (variant as EventRegistrationEmailVariant)
+    : 'confirmed'
+
+const buildEventRegistrationSubject = (variant: EventRegistrationEmailVariant, title: string, isEn: boolean) => {
+  if (variant === 'waitlisted') {
+    return isEn ? `You're on the waitlist: ${title} — Efeonce` : `Quedaste en lista de espera: ${title} — Efeonce`
+  }
+
+  if (variant === 'reminder') {
+    return isEn ? `Starting soon: ${title} — Efeonce` : `Empieza pronto: ${title} — Efeonce`
+  }
+
+  return isEn ? `Your spot at «${title}» is reserved — Efeonce` : `Tu lugar en «${title}» está reservado — Efeonce`
+}
+
+const buildEventRegistrationPlainText = (
+  variant: EventRegistrationEmailVariant,
+  context: EventRegistrationEmailContext
+) => {
+  const isEn = context.locale === 'en'
+  const first = context.recipientName?.split(' ')[0]
+  const joinUrl = variant === 'waitlisted' ? undefined : context.joinUrl
+
+  const intro =
+    variant === 'waitlisted'
+      ? isEn
+        ? `«${context.eventTitle}» is full for now, but you're on the waitlist. If a spot opens up, we'll let you know.`
+        : `Por ahora «${context.eventTitle}» no tiene lugares disponibles, pero quedaste en la lista de espera. Si se libera un lugar, te avisamos.`
+      : variant === 'reminder'
+        ? isEn
+          ? `«${context.eventTitle}» starts soon.`
+          : `«${context.eventTitle}» empieza pronto.`
+        : isEn
+          ? `Your spot at «${context.eventTitle}» is reserved.`
+          : `Tu lugar en «${context.eventTitle}» está reservado.`
+
+  const calendarLine =
+    variant === 'confirmed'
+      ? (context.calendarNote ??
+        (isEn
+          ? 'The event is attached so you can add it to your calendar.'
+          : 'Adjuntamos el evento para que lo agregues a tu calendario.'))
+      : ''
+
+  return [
+    isEn ? (first ? `Hi ${first},` : 'Hi,') : first ? `Hola ${first},` : 'Hola,',
+    '',
+    intro,
+    '',
+    `${isEn ? 'When' : 'Cuándo'}: ${context.whenLabel}`,
+    `${isEn ? 'Duration' : 'Duración'}: ${context.durationLabel}`,
+    `${isEn ? 'Format' : 'Modalidad'}: ${context.modalityLabel}`,
+    '',
+    ...(joinUrl
+      ? [isEn ? 'Join the room:' : 'Entrar a la sala:', joinUrl]
+      : variant === 'confirmed'
+        ? [isEn ? "We'll send you the link before the event." : 'Te enviaremos el enlace antes del evento.']
+        : []),
+    calendarLine,
+    '',
+    isEn ? 'Event page:' : 'Página del evento:',
+    context.eventPageUrl,
+    '',
+    '— Efeonce · efeoncepro.com'
+  ]
+    .filter((line, index, lines) => line !== '' || (index > 0 && lines[index - 1] !== ''))
+    .join('\n')
+}
+
+const renderEventRegistration = (variant: EventRegistrationEmailVariant, context: EventRegistrationEmailContext) => {
+  const isEn = context.locale === 'en'
+
+  return {
+    subject: buildEventRegistrationSubject(variant, context.eventTitle, isEn),
+    react: EventRegistrationEmail({
+      variant,
+      recipientName: context.recipientName,
+      eventTitle: context.eventTitle,
+      whenLabel: context.whenLabel,
+      durationLabel: context.durationLabel,
+      modalityLabel: context.modalityLabel,
+      joinUrl: variant === 'waitlisted' ? undefined : context.joinUrl,
+      eventPageUrl: context.eventPageUrl,
+      calendarNote: context.calendarNote,
+      locale: context.locale ?? 'es'
+    }),
+    text: buildEventRegistrationPlainText(variant, context)
+  }
+}
+
+registerTemplate('growth_event_registration', (context: EventRegistrationEmailContext) =>
+  renderEventRegistration(normalizeEventVariant(context.variant), context)
+)
+
+// El variant del contexto se ignora: este tipo siempre es el recordatorio.
+registerTemplate('growth_event_reminder', (context: EventRegistrationEmailContext) =>
+  renderEventRegistration('reminder', { ...context, variant: 'reminder' })
+)
+
+const EVENT_REGISTRATION_PREVIEW_PROPS = {
+  recipientName: 'María González',
+  eventTitle: 'Cómo aparecer en las respuestas de ChatGPT',
+  whenLabel: 'jueves 12 de noviembre · 10:00 (Chile)',
+  durationLabel: '45 minutos',
+  modalityLabel: 'En línea',
+  joinUrl: 'https://efeoncepro.com/eventos/sala/preview',
+  eventPageUrl: 'https://efeoncepro.com/eventos/como-aparecer-en-chatgpt',
+  locale: 'es'
+}
+
+const EVENT_REGISTRATION_PREVIEW_SCHEMA = [
+  { key: 'recipientName', label: 'Nombre del inscrito', type: 'text' as const },
+  { key: 'eventTitle', label: 'Título del evento', type: 'text' as const },
+  { key: 'whenLabel', label: 'Cuándo', type: 'text' as const },
+  { key: 'durationLabel', label: 'Duración', type: 'text' as const },
+  { key: 'modalityLabel', label: 'Modalidad', type: 'text' as const },
+  { key: 'joinUrl', label: 'Enlace privado de la sala', type: 'text' as const },
+  { key: 'eventPageUrl', label: 'Página del evento', type: 'text' as const },
+  { key: 'calendarNote', label: 'Línea del calendario (vacía la omite)', type: 'text' as const },
+  { key: 'locale', label: 'Idioma', type: 'select' as const, options: ['es', 'en'] }
+]
+
+registerPreviewMeta('growth_event_registration', {
+  label: 'Reserva de evento o webinar (Efeonce)',
+  description:
+    'PROVISIONAL, pendiente de diseño. Confirmación de lugar o lista de espera para un evento/webinar de Efeonce: cuándo, duración, modalidad, enlace privado a la sala (sólo confirmado) y página del evento. El .ics lo adjunta el consumer. Marca Efeonce (agencia).',
+  domain: 'growth',
+  supportsLocale: true,
+  defaultProps: { ...EVENT_REGISTRATION_PREVIEW_PROPS, variant: 'confirmed' },
+  propsSchema: [
+    { key: 'variant', label: 'Variante', type: 'select', options: ['confirmed', 'waitlisted'] },
+    ...EVENT_REGISTRATION_PREVIEW_SCHEMA
+  ]
+})
+
+registerPreviewMeta('growth_event_reminder', {
+  label: 'Recordatorio de evento o webinar (Efeonce)',
+  description:
+    'PROVISIONAL, pendiente de diseño. Recordatorio previo a un evento/webinar de Efeonce con el botón para entrar a la sala (o a la página del evento si aún no hay enlace). Marca Efeonce (agencia).',
+  domain: 'growth',
+  supportsLocale: true,
+  defaultProps: EVENT_REGISTRATION_PREVIEW_PROPS,
+  propsSchema: EVENT_REGISTRATION_PREVIEW_SCHEMA
 })
 
 // ═══════════════════════════════════════════════════════════
