@@ -1,6 +1,8 @@
 /* Host layer: what the canvas got from its own document (its wrapper div and body) and the WordPress theme does not give. */
-.gh-nosotros{font-family:'Poppins',system-ui,sans-serif;background:#001a33;color:#ffffff;width:100%;overflow-x:clip;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box}
-.gh-nosotros *,.gh-nosotros *::before,.gh-nosotros *::after{box-sizing:border-box}
+/* Ohio gives body line-height 1.6, 16.4px and -0.01em tracking; the canvas inherits the browser defaults (normal, 16px, normal). */
+.gh-nosotros{font-size:16px;line-height:normal;letter-spacing:normal;font-family:'Poppins',system-ui,sans-serif;background:#001a33;color:#ffffff;width:100%;overflow-x:clip;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box}
+/* The canvas renders with the browser's content-box; Ohio and the old host layer forced border-box (2 px off on bordered buttons). */
+.gh-nosotros *,.gh-nosotros *::before,.gh-nosotros *::after{box-sizing:content-box}
 .gh-nosotros section{margin:0}
 /* Ohio skins headings, paragraphs, lists and buttons globally; the canvas sets what it needs inline. */
 .gh-nosotros :is(h1,h2,h3,h4,h5,h6){font-family:inherit;color:inherit;text-transform:none;letter-spacing:inherit;margin:0;font-weight:inherit;line-height:inherit}
@@ -17,3 +19,21 @@
 .gh-nosotros .paper{color:#001a33}
 /* Editor switch «Animaciones» off. */
 .gh-nosotros[data-motion="no"] *{animation:none !important;transition:none !important}
+/* Ohio collisions found by the computed-style diff against the canvas (2026-10-23, same method as Partners):
+   `ul:not(.-unlist) > li` margins, a 16px top margin on «.pgrid» and theme heading sizes (the canvas uses UA sizes). */
+body .gh-nosotros :is(ul,ol) > li{margin:0}
+.gh-nosotros .pgrid{margin-top:0}
+.gh-nosotros :is(h1,h2,h3,h4,h5,h6){font-size:revert;font-weight:revert}
+/* Ohio pins its Dark/Light switch (left) and «Follow Us» (right) at 1.5vw + 56px from each edge from 1181px up; the canvas
+   had no rails, so full-bleed copy (56–72px) and the .wrap below 1320px ran under them. Clear them by 32px (2026-10-23,
+   reported on «En cinco países» and the founder quote). */
+@media (min-width:1181px){
+.gh-nosotros{--gh-rail:calc(1.5vw + 88px)}
+.gh-nosotros .wrap{padding-left:max(56px,calc(var(--gh-rail) - max(0px,(100vw - 1320px) / 2)));padding-right:max(56px,calc(var(--gh-rail) - max(0px,(100vw - 1320px) / 2)))}
+.gh-nosotros .mk-copy{padding-left:var(--gh-rail) !important;width:calc(min(46%,640px) + var(--gh-rail) - 56px) !important}
+.gh-nosotros .founder > .copy{padding-left:var(--gh-rail) !important}
+.gh-nosotros .brain > .copy{padding-right:var(--gh-rail) !important}
+}
+/* The map's city labels sit on fixed coordinates; the canvas parallax scaled the image under them (1.16) and moved it ±7%,
+   so the labels drifted off their cities while scrolling. The map stays still. */
+.gh-nosotros [data-capture="about-mercados"] img.par{animation:none;transform:none}

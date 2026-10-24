@@ -37,6 +37,19 @@
   and title «Nosotros: lo construimos contigo | Efeonce»; featured image `249769` untouched; snapshot option
   `_gh_nosotros_og_before_20261023_144636` (previous OG image `250188`). Bottom dock: none.
 
+- Fidelity pass 2026-10-23 (same computed-style diff as Partners, live vs canvas, animations frozen): Ohio leaked body
+  `line-height:1.6`/`16.4px`/tracking, `ul:not(.-unlist) > li` margins, a 16px top margin on `.pgrid` and theme heading
+  sizes, and the old host layer forced `border-box` (canvas = content-box, 2 px off on bordered buttons). Fixed in
+  `nosotros-source/host.css`; after the deploy the diff has zero height differences at 1440 and only the inline-image
+  baseline gap (7 px, same black on both sides) under the hero photo at 390.
+
+- Theme rails 2026-10-23 (reported on «En cinco países» and the founder quote): from 1181px Ohio pins its Dark/Light
+  switch (left) and «Follow Us» (right) at `1.5vw + 56px` from each edge; the canvas had no rails, so full-bleed copy and
+  the `.wrap` below 1320px ran under them. `host.css` sets `--gh-rail: calc(1.5vw + 88px)` for `.wrap` (only while it is
+  narrower than the rail), `.mk-copy` (widened by the same amount so the title keeps one line), founder and brain copy.
+  The map image no longer has parallax: the city labels are fixed coordinates and the canvas animation (scale 1.16,
+  ±7%) moved the image under them. Partners has the same rail collision between 1181 and 1320px (pending).
+
 ## Before 2026-10-23 (history; replaced)
 
 
