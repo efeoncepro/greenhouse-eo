@@ -30,6 +30,11 @@ Yvette: primer resultado inválido descartado; patrón inicial + primer apellido
 otra candidata; atribución aún inferida, alta/envío por excepción expresa. Sin secuencias nuevas. Docs y dos
 skills espejo actualizadas, tres escenarios sintéticos; [controles y límites](docs/audits/commercial/2026-10-24-lucia-yvette-docs-skills.md).
 
+Mandato posterior: [dos secuencias programadas](docs/commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md),
+dos correos por persona y firma gráfica comprobada. Julio autorizó registro nativo con excepción al CCO para
+ambas: Programado1/EnCurso0/Error0,29Oct10:00 y05Nov10:05 Perú. Respuesta/reunión desinscribe al Contact;
+no duplicar por radar/Outlook. Calendario guardado releído; correos de seguimiento todavía no enviados.
+
 ## 2026-10-24 — Portada del blog v3 en producción; operable por agentes
 
 **`/blog/` (18456) sirve la portada v3 desde el 2026-10-24 08:13Z** con datos reales, menú canónico (paquete del tema
@@ -48,8 +53,10 @@ queda en `scripts/public-website/blog-home/ledger/`.
 `efeonce-blog-subscription` publicado como píldora (`fver-e6850cc8…`, `pnpm growth:forms:publish-glitch-pill`) y
 conectado con `pnpm public-website:blog-home subscription 6bc62588-… --apply`. HubSpot suscribe por el acto de enviar
 bajo el aviso (`consentBy: 'submission'` + hash del aviso, aprobado por el operador). Verificado en vivo sin envío:
-renderer en los tres tableros, sobrevive al autoplay del slider, abre el campo, axe 0. **Pendiente:** un envío real de
-verificación (contacto suscrito al tipo 535702717) y el visto bueno visual de la píldora en el pie (desvío 13).
+renderer en los tres tableros, sobrevive al autoplay del slider, abre el campo, axe 0. **Envío humano real verificado
+(2026-10-24 15:33Z, operador):** submission `delivered`, recibo HubSpot `verified`, contacto `SUBSCRIBED` al tipo 535702717
+(«Marketing Information», genérico) con `CONSENT_WITH_NOTICE`. No sale correo de bienvenida: no hay ninguno configurado.
+**Pendiente:** visto bueno visual de la píldora en el pie (desvío 13); decidir bienvenida y tipo de suscripción propio.
 Desconectar: `subscription off --apply`.
 **Defectos visuales de la píldora reportados por el operador (2026-10-24, sin corregir):** al elegir el correo autocompletado
 el campo se pinta claro (falta una regla `:-webkit-autofill` en `src/growth-forms-renderer/styles.ts`; causa probable) y
