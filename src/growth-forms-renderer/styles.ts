@@ -1837,6 +1837,9 @@ const PILLAR_CSS = `
  * formulario (suscripción 252 → 480 → 304; evento 236 → 470 → 360). Bajo 480 px de contenedor la píldora
  * ocupa todo el ancho en todos los estados (tablero móvil del canvas). Sin contorno interno del campo:
  * el foco lo marca la píldora. Sólo se animan ancho, color, `transform`, `opacity` y `stroke-dashoffset`.
+ * Tipografía = la que el canvas RINDE (medida con estilos computados, no la que declaran sus reglas): el
+ * reset `button{font:inherit}` del tablero gana a `.ab`, así que el botón de apertura se ve en 16 px/400 con
+ * interlineado normal; el de envío, 14 px/600; el campo conserva el padding nativo 1px 2px.
  */
 const INLINE_PILL_CSS = `
 :is(greenhouse-form,.ghf-scope) .ghf-inline{
@@ -1889,18 +1892,19 @@ const INLINE_PILL_CSS = `
   position:relative;display:inline-flex;align-items:center;justify-content:center;
   margin:0;border:0!important;border-radius:999px!important;box-shadow:none!important;
   background:var(--ghf-inline-tone-resolved)!important;color:var(--ghf-inline-on-tone-resolved)!important;
-  font-family:var(--ghf-inline-font-resolved)!important;font-weight:600!important;line-height:1.4!important;
+  font-family:var(--ghf-inline-font-resolved)!important;line-height:normal!important;
   letter-spacing:.005em!important;text-transform:none!important;text-decoration:none;white-space:nowrap;cursor:pointer;
   -webkit-appearance:none;appearance:none;
 }
 :is(greenhouse-form,.ghf-scope) .ghf-inline-open{
   position:absolute;inset:-1px;width:calc(100% + 2px);min-height:var(--ghf-inline-height,52px);
-  padding:0 1.25rem 0 1.5rem!important;gap:.75rem;font-size:15px!important;
+  padding:0 1.25rem 0 1.5rem!important;gap:.75rem;font-size:16px!important;font-weight:400!important;
   transition:opacity 180ms var(--ghf-inline-ease-resolved),transform 450ms var(--ghf-inline-spring-resolved),background-color 150ms;
 }
 :is(greenhouse-form,.ghf-scope) .ghf-inline-pill:not([data-ghf-inline-state="idle"]) .ghf-inline-open{opacity:0;pointer-events:none;transform:scale(.96)}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-send{
-  flex:none;max-width:60%;min-height:var(--ghf-inline-send-height,42px);padding:0 .875rem 0 1.125rem!important;font-size:14px!important;
+  flex:none;max-width:60%;min-height:var(--ghf-inline-send-height,42px);padding:0 .875rem 0 1.125rem!important;
+  font-size:14px!important;font-weight:600!important;letter-spacing:normal!important;
   transition:background-color 150ms cubic-bezier(0.4,0,0.2,1),transform 450ms var(--ghf-inline-spring-resolved);
 }
 :is(greenhouse-form,.ghf-scope) .ghf-inline-send-content{display:inline-flex;align-items:center;gap:.5rem;min-width:0;max-width:100%}
@@ -1939,7 +1943,7 @@ const INLINE_PILL_CSS = `
   transition:opacity 260ms var(--ghf-inline-ease-resolved) var(--ghf-inline-field-delay,200ms),visibility 0s;
 }
 :is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-input{
-  flex:1;min-width:0;height:44px!important;margin:0!important;padding:0!important;
+  flex:1;min-width:0;height:44px!important;margin:0!important;padding:1px 2px!important;
   border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;outline:none!important;
   color:var(--ghf-inline-field-fg,#ffffff)!important;font:400 16px var(--ghf-inline-font-resolved)!important;
   letter-spacing:normal!important;text-transform:none!important;-webkit-appearance:none;appearance:none;
@@ -1954,7 +1958,7 @@ const INLINE_PILL_CSS = `
 :is(greenhouse-form,.ghf-scope) .ghf-inline-ok{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;
   opacity:0;visibility:hidden;outline:none;color:var(--ghf-inline-on-tone-resolved);
-  font:600 15px/1.4 var(--ghf-inline-font-resolved);
+  font:600 15px/normal var(--ghf-inline-font-resolved);
   transition:opacity 220ms var(--ghf-inline-ease-resolved),visibility 0s linear 220ms,color 300ms var(--ghf-inline-ease-resolved);
 }
 :is(greenhouse-form,.ghf-scope) .ghf-inline-pill:is([data-ghf-inline-state="success"],[data-ghf-inline-state="done"]) .ghf-inline-ok{
@@ -1967,9 +1971,13 @@ const INLINE_PILL_CSS = `
 :is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-check{color:var(--ghf-inline-tone-resolved)}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-msg{display:grid;min-width:0}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-msg>span{grid-area:1/1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity 260ms var(--ghf-inline-ease-resolved),transform 360ms var(--ghf-inline-ease-resolved)}
-:is(greenhouse-form,.ghf-scope) .ghf-inline-t2{opacity:0;transform:translateY(8px)}
-:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-t1{opacity:0;transform:translateY(-8px)}
-:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-t2{opacity:1;transform:none}
+/* El texto que no se ve sale también del árbol accesible y del cálculo de contraste (visibility, con retraso para el fundido). */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-t2{opacity:0;visibility:hidden;transform:translateY(8px)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-t1{
+  opacity:0;visibility:hidden;transform:translateY(-8px);
+  transition:opacity 260ms var(--ghf-inline-ease-resolved),transform 360ms var(--ghf-inline-ease-resolved),visibility 0s linear 260ms;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-t2{opacity:1;visibility:visible;transform:none}
 
 /* Nota legal: sólo con el campo abierto. Errores: bajo la píldora. */
 :is(greenhouse-form,.ghf-scope) .ghf-inline-note{
