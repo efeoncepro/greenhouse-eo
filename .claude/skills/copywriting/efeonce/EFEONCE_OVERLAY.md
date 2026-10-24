@@ -11,10 +11,14 @@ habla; luego aplica la voz correcta, ubica el copy en su runtime y respeta las s
 
 ## Router de voz obligatorio
 
-- **Julio:** piezas con byline/speaker Julio, Marketing con Manzanitas, LinkedIn, keynote,
-  newsletter, podcast o thought leadership personal → `JULIO_REYES_VOICE_SYSTEM.md`.
+- **Julio:** piezas con byline/speaker Julio, Marketing con Manzanitas firmado por él, su LinkedIn
+  personal, el newsletter Marketing con Manzanitas de su LinkedIn, talking head, keynote, podcast o
+  thought leadership personal → `JULIO_REYES_VOICE_SYSTEM.md`.
 - **Efeonce:** landings, páginas institucionales, UI, producto, emails del sistema, propuestas,
-  políticas, documentación y artículos sin byline personal → `EFEONCE_VOICE_SYSTEM.md`. El emisor es
+  políticas, documentación, artículos sin byline personal, LinkedIn página, Instagram, Threads y Glitch
+  (equipo editorial de Glitch) → `EFEONCE_VOICE_SYSTEM.md`. Rol y paso siguiente de cada canal propio:
+  [PDR-020](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) +
+  [estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md). El emisor es
   **Efeonce**; los servicios se nombran con barra (**Efeonce | AEO**), nunca «Efeonce AEO» como marca
   (§Quién habla y cómo se nombran los servicios, delta 2026-10-03).
 - **Híbrido firmado por Julio:** Julio narra; hechos se atribuyen; la doctrina organizacional se

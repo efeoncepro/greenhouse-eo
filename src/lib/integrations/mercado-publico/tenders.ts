@@ -2,6 +2,8 @@ import { createHash } from 'node:crypto'
 
 import { resolveSecret, resolveSecretByRef } from '@/lib/secrets/secret-manager'
 
+import type { EnvSource } from '@/types/env-source'
+
 const API_BASE_URL = 'https://api.mercadopublico.cl/servicios/v1/publico'
 const PUBLIC_WEB_BASE_URL = 'https://www.mercadopublico.cl'
 const DEFAULT_TICKET_SECRET_REF = 'greenhouse-mercado-publico-ticket'
@@ -60,7 +62,7 @@ type MercadoPublicoClientOptions = {
   timeoutMs?: number
   retries?: number
   userAgent?: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 type ParsedForm = {

@@ -8,6 +8,8 @@ import { resolveMeetingPrivacyHasher, type MeetingPrivacyHasher } from './privac
 import { getMeetingSurfaceAuthority } from './store'
 import { canonicalizeMeetingTimezone, resolveMeetingTimezone } from './timezone'
 
+import type { EnvSource } from '@/types/env-source'
+
 const DEFAULT_SCHEDULER_KEY = 'discovery'
 const MAX_MONTH_OFFSET = 2
 const AVAILABILITY_TTL_MS = 60_000
@@ -38,7 +40,7 @@ export const readMeetingSchedulerConfig = async (input: {
   timezone?: string | null
   provider?: MeetingSchedulingProvider
   hasher?: MeetingPrivacyHasher
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }): Promise<MeetingSchedulerConfig | null> => {
   const schedulerKey = input.schedulerKey ?? DEFAULT_SCHEDULER_KEY
   const surface = await getMeetingSurfaceAuthority(input.surfaceId, schedulerKey)

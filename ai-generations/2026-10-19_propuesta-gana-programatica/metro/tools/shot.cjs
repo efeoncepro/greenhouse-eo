@@ -1,0 +1,2 @@
+const { chromium } = require('/Users/jreye/Documents/greenhouse-eo/node_modules/playwright');
+(async()=>{const [f,o,w,h]=process.argv.slice(2);const b=await chromium.launch();const p=await b.newPage({viewport:{width:+w,height:+h}});await p.goto('file://'+f);await p.waitForLoadState('networkidle');await p.evaluate(()=>document.fonts.ready);await p.waitForTimeout(600);await p.screenshot({path:o});await b.close()})();

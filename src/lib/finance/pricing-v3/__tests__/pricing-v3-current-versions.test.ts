@@ -181,7 +181,7 @@ describe('--current fills only the sources the caller did not name', () => {
   // A demand written for the versions the pointer names today. A demand is a dated input: one written for an older
   // policy can stop calculating when a profile recipe changes (it then asks for the allocation it lacks), which is
   // the quoter working, not this flag failing.
-  const demand = 'data/pricing/v3-operating/designer-on-demand.demand.json'
+  const demand = 'src/lib/finance/pricing-v3/__tests__/fixtures/current-designer-demand-2026-10-22.json'
   const olderCatalog = 'data/pricing/v3-operating/catalog.review-v3.json'
   const rest = ['--policy', pointer.policy.path, '--credits', pointer.credits.path]
 
@@ -190,11 +190,26 @@ describe('--current fills only the sources the caller did not name', () => {
   it('equals the same command with the three sources spelled out', () => {
     const explicit = cli('compose', 'prepare', '--catalog', pointer.catalog.path, ...rest, '--input', demand)
 
-    expect(read(demand).brief.quoteDate).toBe('2026-10-11')
+    expect(read(demand).brief.quoteDate).toBe('2026-10-22')
     expect(withPointer.status).toBe(3)
     expect(explicit.status).toBe(3)
     expect(withPointer.stdout).toBe(explicit.stdout)
     expect(JSON.parse(withPointer.stdout).totals).not.toBeNull()
+  })
+
+  it('keeps rejecting a demand dated before the current resource policy instead of backdating it', () => {
+    const historical = cli(
+      'compose',
+      'prepare',
+      '--current',
+      '--input',
+      'data/pricing/v3-operating/designer-on-demand.demand.json'
+    )
+
+    expect(historical.status).toBe(2)
+    expect(JSON.parse(historical.stdout).diagnostics).toContainEqual(
+      expect.objectContaining({ code: 'RESOURCE_POLICY_NOT_EFFECTIVE', path: 'policy.source' })
+    )
   })
 
   it('lets an explicit --catalog win', () => {

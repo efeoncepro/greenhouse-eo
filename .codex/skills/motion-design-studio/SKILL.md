@@ -119,6 +119,16 @@ El **orden de preproducción común a todo video** está en el companion de prep
 con mascotas/logos compuestos, usa `workflows/animated-2d-spot-composed-brand-assets.md`. Para un **reel de muestra para
 un cliente** (cuadros fijos → planos Seedance 2.5 → capa de motion con los elementos aprobados de su campaña → voz y
 música), usa `workflows/client-sample-reel-stills-to-clips-with-brand-motion-overlay.md` (validado 2026-10-12).
+Para **rampas de velocidad continuas, zoom lento sin saltos, story 9:16 desde tomas 3:4 y QA de movimiento medido**
+(criterio: 0 cuadros < 0,15), usa [lecciones §14](companions/video-lessons-and-failure-modes.md) (serie de anuncios de
+partners, 2026-10-21).
+
+**QA de sonido y animación antes de mostrar (desde 2026-10-21).** Toda pieza con audio o motion pasa primero por el
+control estándar, sin Gemini y sin costo: `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json
+--measure-only --out medicion.json` (mapa de eventos, sincronía ±42 ms y cues; código 2 si una cue no se confirma).
+Recién después, opcional, Gemini como segunda opinión de criterio y SIEMPRE con `--verify`: sus juicios se consideran,
+sus números se descartan si la medición no los respalda. Presets y flags en el
+[manual](../../../docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
 
 
 Para **cinematic ads, video de performance o híbridos foto-video**, carga

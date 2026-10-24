@@ -1,0 +1,30 @@
+{
+  "title": "Cómo aparecer en las respuestas de ChatGPT",
+  "slug": "como-aparecer-en-chatgpt",
+  "status": "publish",
+  "excerpt": "45 minutos con el equipo de Efeonce | AEO: qué miran los motores de respuesta, cómo medir tu visibilidad y qué cambiar en tu sitio esta misma semana.",
+  "content": "Descripción pública del evento. Nunca el enlace privado de la sala.",
+  "meta": {
+    "start_utc": "2026-11-12T13:00:00Z",
+    "tz": "America/Santiago",
+    "duration_min": 45,
+    "modality": "online",
+    "venue": "",
+    "territory": "aeo",
+    "form_key": "",
+    "status": "scheduled",
+    "paid": false,
+    "limited_seats": true,
+    "speakers": [{ "user_id": 1, "role": "Managing & GTM Director", "org": "Efeonce" }],
+    "takeaways": [
+      { "t": "Qué miran los motores", "d": "Las señales que usan ChatGPT, Gemini y Perplexity para elegir fuentes." },
+      { "t": "Cómo medir", "d": "Tu visibilidad en respuestas, con un método repetible." },
+      { "t": "Qué cambiar", "d": "Los ajustes de sitio que se notan esta misma semana." }
+    ],
+    "agenda": [
+      { "h": "10:00", "t": "Cómo responden los motores" },
+      { "h": "10:20", "t": "Medir tu visibilidad" },
+      { "h": "10:35", "t": "Preguntas" }
+    ]
+  }
+}

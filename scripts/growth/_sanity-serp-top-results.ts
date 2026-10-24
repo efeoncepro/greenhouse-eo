@@ -28,7 +28,7 @@ const ENV_ON = {
   ...process.env,
   GROWTH_SEO_ENABLED: 'true',
   GROWTH_SEO_SERP_TOP_RESULTS_ENABLED: 'true'
-} as NodeJS.ProcessEnv
+}
 
 let pass = 0
 let fail = 0

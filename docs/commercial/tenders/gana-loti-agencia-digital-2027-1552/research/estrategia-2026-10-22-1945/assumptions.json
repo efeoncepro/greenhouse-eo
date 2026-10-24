@@ -1,0 +1,39 @@
+{
+  "five-static": {
+    "design": "4.25",
+    "creative": "1"
+  },
+  "static-and-tactical-annualised": {
+    "design": "5.583333333333333333333333333",
+    "creative": "3.000000000000000000000000000",
+    "strategy": "1.333333333333333333333333333",
+    "account": "0.6666666666666666666666666666"
+  },
+  "three-extras-annualised": {
+    "design": "5.583333333333333333333333333",
+    "creative": "3.333333333333333333333333333",
+    "strategy": "1.666666666666666666666666666",
+    "account": "1.000000000000000000000000000",
+    "listening": "0.6666666666666666666666666668"
+  },
+  "campaign-month": {
+    "design": "20.25",
+    "creative": "25",
+    "strategy": "16",
+    "account": "8"
+  },
+  "drill-month": {
+    "design": "4.25",
+    "creative": "3",
+    "listening": "4",
+    "strategy": "2",
+    "account": "2"
+  },
+  "overlap-month": {
+    "design": "20.25",
+    "creative": "27",
+    "strategy": "18",
+    "account": "10",
+    "listening": "4"
+  }
+}

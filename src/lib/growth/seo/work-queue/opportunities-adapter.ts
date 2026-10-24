@@ -50,6 +50,8 @@ import { seoProvenance } from '../lens'
 import { readSeoWorkQueue } from './reader'
 import { getPriorityScoreConfig } from './score-versions'
 
+import type { EnvSource } from '@/types/env-source'
+
 const LENS_ORIGINS = ['gsc_striking_distance', 'consolidation'] as const
 
 /** Techo de la lente legacy, conservado para no cambiar cuántas filas ve el operador. */
@@ -66,7 +68,7 @@ export interface WorkQueueOpportunitiesResult {
 
 export const readKeywordOpportunitiesFromWorkQueue = async (
   seoTargetId: string,
-  options: { windowDays?: number; limit?: number; env?: NodeJS.ProcessEnv } = {}
+  options: { windowDays?: number; limit?: number; env?: EnvSource } = {}
 ): Promise<WorkQueueOpportunitiesResult | null> => {
   const config = getPriorityScoreConfig()
 

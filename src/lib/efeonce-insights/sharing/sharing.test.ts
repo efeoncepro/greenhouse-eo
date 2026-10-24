@@ -49,7 +49,7 @@ const infra = vi.hoisted(() => ({ withTx: vi.fn(async (fn: (client: unknown) => 
 vi.mock('@/lib/postgres/client', () => ({ withGreenhousePostgresTransaction: infra.withTx, runGreenhousePostgresQuery: infra.pgQuery }))
 vi.mock('@/lib/sync/publish-event', () => ({ publishOutboxEvent: infra.publish }))
 
-const ENV_ON = { INSIGHTS_SHARING_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv
+const ENV_ON = { INSIGHTS_SHARING_ENABLED: 'true' }
 const internalSubject = { userId: 'user-int', tenantType: 'efeonce_internal' as const, roleCodes: ['efeonce_account'], primaryRoleCode: 'efeonce_account', routeGroups: ['internal'], authorizedViews: [], memberId: 'mem-1' }
 const executiveSubject = { userId: 'user-exec', tenantType: 'client' as const, roleCodes: ['client_executive'], primaryRoleCode: 'client_executive', routeGroups: ['client'], authorizedViews: [] }
 const managerSubject = { userId: 'user-mgr', tenantType: 'client' as const, roleCodes: ['client_manager'], primaryRoleCode: 'client_manager', routeGroups: ['client'], authorizedViews: [] }
@@ -304,7 +304,7 @@ describe('createInsightShare / revokeInsightShare / readInsightShares', () => {
   it('flag OFF ⇒ sharing_disabled antes de tocar la base', async () => {
     const { createInsightShare } = await import('./commands')
 
-    await expect(createInsightShare({ ...scope, env: {} as NodeJS.ProcessEnv })).rejects.toMatchObject({ code: 'sharing_disabled' })
+    await expect(createInsightShare({ ...scope, env: {} })).rejects.toMatchObject({ code: 'sharing_disabled' })
     expect(stores.getInsightEditionById).not.toHaveBeenCalled()
   })
 
@@ -368,7 +368,7 @@ describe('createInsightShare / revokeInsightShare / readInsightShares', () => {
     shareStore.getInsightShareGrant.mockResolvedValue(grantRecord())
     shareStore.revokeInsightShareGrant.mockResolvedValue(grantRecord({ revokedAt: new Date().toISOString(), revokedByActorKind: 'member', revokeReason: 'manual' }))
 
-    const first = await revokeInsightShare({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', shareGrantId: 'ishr-1', env: {} as NodeJS.ProcessEnv })
+    const first = await revokeInsightShare({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', shareGrantId: 'ishr-1', env: {} })
 
     expect(first).toMatchObject({ idempotent: false, share: { status: 'revoked' } })
     expect(infra.publish).toHaveBeenCalledTimes(1)
@@ -433,7 +433,7 @@ describe('reader público por token', () => {
   it('flag OFF, token mal formado o desconocido ⇒ 404 sin tocar grants', async () => {
     const { resolveSharedInsightEdition } = await import('./public')
 
-    expect(await resolveSharedInsightEdition({ ...context, env: {} as NodeJS.ProcessEnv })).toEqual({ status: 'not_found' })
+    expect(await resolveSharedInsightEdition({ ...context, env: {} })).toEqual({ status: 'not_found' })
     expect(await resolveSharedInsightEdition({ ...context, token: 'isg_short' })).toEqual({ status: 'not_found' })
     expect(shareStore.resolveInsightShareGrantByDigest).not.toHaveBeenCalled()
 

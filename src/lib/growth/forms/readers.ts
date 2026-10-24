@@ -7,9 +7,10 @@
  */
 import 'server-only'
 
-import type { RenderContract } from './contracts'
+import { type RenderContract, resolveEventRegistrationPolicy } from './contracts'
 import { compileFormVersion } from './policy-compiler'
 import {
+  countConfirmedRegistrations,
   type FormDestinationAttemptRow,
   type FormDestinationRow,
   type FormHostSurfaceRow,
@@ -108,6 +109,102 @@ export const getPublishedRenderContractByRef = async (
   if (!slug) return null
 
   return getPublishedRenderContract(slug, options)
+}
+
+// ─── Conteo público de reservas (TASK-2053) ───────────────────────────────────
+
+/**
+ * Lo único que el conteo público expone: un número REDONDEADO hacia abajo a la decena y sólo cuando
+ * alcanza el umbral del evento. Nunca el número exacto, ni PII, ni identificadores. `shown=false`
+ * cubre tanto «el evento no muestra el conteo» como «todavía está bajo el umbral»: el cliente no
+ * puede distinguirlos (así una demanda baja no se revela).
+ */
+export interface RegistrationsCountVm {
+  count: number | null
+  display: string | null
+  shown: boolean
+}
+
+export const REGISTRATIONS_COUNT_HIDDEN: RegistrationsCountVm = Object.freeze({ count: null, display: null, shown: false })
+
+export const REGISTRATIONS_COUNT_CACHE_TTL_MS = 10 * 60 * 1000
+
+/** Redondeo hacia abajo a la decena + umbral sobre el valor redondeado (312 → «310»; 27 con umbral 25 → oculto). */
+export const presentRegistrationsCount = (confirmed: number, threshold: number): RegistrationsCountVm => {
+  const rounded = Math.floor(Math.max(0, confirmed) / 10) * 10
+
+  if (rounded < threshold) return REGISTRATIONS_COUNT_HIDDEN
+
+  return { count: rounded, display: rounded.toLocaleString('es-CL'), shown: true }
+}
+
+type CountCacheEntry = { value: RegistrationsCountVm | null; expiresAt: number }
+
+/** Un formulario inexistente se recuerda menos: si se publica, aparece en un minuto. */
+export const REGISTRATIONS_COUNT_MISS_TTL_MS = 60 * 1000
+
+/** Tope de la caché: el `formRef` viene de la URL pública, así que la caché no puede crecer sin límite. */
+export const REGISTRATIONS_COUNT_CACHE_MAX_ENTRIES = 500
+
+const registrationsCountCache = new Map<string, CountCacheEntry>()
+
+/** Sólo para pruebas: vacía la caché en memoria del conteo. */
+export const resetRegistrationsCountCache = (): void => registrationsCountCache.clear()
+
+const loadRegistrationsCount = async (ref: string): Promise<RegistrationsCountVm | null> => {
+  const slug = await resolveFormSlugFromRef(ref)
+
+  if (!slug) return null
+
+  const version = await getPublishedVersionBySlug(slug)
+
+  if (!version) return null
+
+  const definition = await getFormDefinitionById(version.form_id)
+
+  if (!definition || definition.status !== 'active') return null
+
+  const policy = resolveEventRegistrationPolicy(definition.form_kind, version.ui_policy_json)
+
+  if (!policy || !policy.showRegistrationsCount) return REGISTRATIONS_COUNT_HIDDEN
+
+  const confirmed = await countConfirmedRegistrations(definition.form_id, policy.statusField)
+
+  return presentRegistrationsCount(confirmed, policy.registrationsCountThreshold)
+}
+
+/**
+ * Reader canónico del conteo de reservas de un formulario de evento, por `formRef` (slug o
+ * form_key). `null` = formulario inexistente, inactivo o sin versión publicada (404). Caché en
+ * memoria por `formRef` de 10 min (1 min para un formulario inexistente): una ráfaga de lecturas no
+ * llega a PostgreSQL ni para resolver el formulario. Lo consumen la ruta pública, la portada del blog
+ * y los agentes por REST.
+ */
+export const countAcceptedRegistrations = async (
+  ref: string,
+  options: { now?: () => number } = {},
+): Promise<RegistrationsCountVm | null> => {
+  const now = options.now ?? Date.now
+  const cacheKey = ref.trim().toLowerCase()
+  const cached = registrationsCountCache.get(cacheKey)
+
+  if (cached && cached.expiresAt > now()) return cached.value
+
+  const value = await loadRegistrationsCount(ref)
+  const ttl = value === null ? REGISTRATIONS_COUNT_MISS_TTL_MS : REGISTRATIONS_COUNT_CACHE_TTL_MS
+
+  registrationsCountCache.delete(cacheKey)
+
+  if (registrationsCountCache.size >= REGISTRATIONS_COUNT_CACHE_MAX_ENTRIES) {
+    // Map conserva el orden de inserción: el primero es el más antiguo.
+    const oldest = registrationsCountCache.keys().next().value
+
+    if (oldest !== undefined) registrationsCountCache.delete(oldest)
+  }
+
+  registrationsCountCache.set(cacheKey, { value, expiresAt: now() + ttl })
+
+  return value
 }
 
 // ─── Admin readers ────────────────────────────────────────────────────────────

@@ -22,14 +22,14 @@ const CELLS: EtvEvaluationCell[] = [
   { subject: 'berel.com', locationCode: '2484', languageCode: 'es', familySlug: 'historical_rank_overview', period: { fromMonth: '2026-05', toMonth: '2026-08' } }
 ]
 
-const OFF_CONFIG = resolveEtvEvaluatorConfig({} as NodeJS.ProcessEnv)
+const OFF_CONFIG = resolveEtvEvaluatorConfig({})
 
 const ON_CONFIG = resolveEtvEvaluatorConfig({
   GROWTH_SEO_ETV_EVALUATOR_ENABLED: 'true',
   GROWTH_SEO_ETV_EVALUATOR_SUBJECT_ALLOWLIST: 'efeoncepro.com, www.berel.com',
   GROWTH_SEO_ETV_EVALUATOR_MAX_REQUESTS: '10',
   GROWTH_SEO_ETV_EVALUATOR_BUDGET_USD: '1'
-} as unknown as NodeJS.ProcessEnv)
+})
 
 describe('TASK-1805 — gate del evaluador', () => {
   it('default: OFF, allowlist vacía, 0 requests, USD 0 (fail-closed)', () => {
@@ -43,7 +43,7 @@ describe('TASK-1805 — gate del evaluador', () => {
 
 describe('TASK-1805 — plan y dry-run (cero llamadas por construcción)', () => {
   it('exact_ab planifica DOS requests por celda, forecast con precios Labs y providerCalls=0', () => {
-    const plan = planEtvEvaluation({ cells: CELLS, mode: 'exact_ab', config: ON_CONFIG, env: {} as NodeJS.ProcessEnv, now: BEFORE_CUTOFF })
+    const plan = planEtvEvaluation({ cells: CELLS, mode: 'exact_ab', config: ON_CONFIG, env: {}, now: BEFORE_CUTOFF })
 
     expect(plan.providerCalls).toBe(0)
     expect(plan.plannedRequests).toHaveLength(6)
@@ -65,7 +65,7 @@ describe('TASK-1805 — plan y dry-run (cero llamadas por construcción)', () =>
   })
 
   it('temporal_canary planifica sólo improved y lo DECLARA como no-paridad', () => {
-    const plan = planEtvEvaluation({ cells: CELLS, mode: 'temporal_canary', config: ON_CONFIG, env: {} as NodeJS.ProcessEnv, now: BEFORE_CUTOFF })
+    const plan = planEtvEvaluation({ cells: CELLS, mode: 'temporal_canary', config: ON_CONFIG, env: {}, now: BEFORE_CUTOFF })
 
     expect(plan.plannedRequests.every(planned => planned.methodology === 'improved_layout_clickstream_v2')).toBe(true)
     expect(plan.note).toContain('nunca describirla como paridad')
@@ -76,7 +76,7 @@ describe('TASK-1805 — plan y dry-run (cero llamadas por construcción)', () =>
       cells: [{ subject: 'intruso.cl', locationCode: '2152', languageCode: 'es', familySlug: 'domain_rank_overview' }],
       mode: 'exact_ab',
       config: ON_CONFIG,
-      env: {} as NodeJS.ProcessEnv,
+      env: {},
       now: BEFORE_CUTOFF
     })
 
@@ -86,7 +86,7 @@ describe('TASK-1805 — plan y dry-run (cero llamadas por construcción)', () =>
   })
 
   it('después del corte, la mitad legacy del A/B queda bloqueada por policy (no se envía un false que se ignora)', () => {
-    const plan = planEtvEvaluation({ cells: CELLS, mode: 'exact_ab', config: ON_CONFIG, env: {} as NodeJS.ProcessEnv, now: AFTER_CUTOFF })
+    const plan = planEtvEvaluation({ cells: CELLS, mode: 'exact_ab', config: ON_CONFIG, env: {}, now: AFTER_CUTOFF })
 
     const legacy = plan.plannedRequests.filter(planned => planned.methodology === 'legacy_static_v1')
 
@@ -95,7 +95,7 @@ describe('TASK-1805 — plan y dry-run (cero llamadas por construcción)', () =>
   })
 
   it('dry-run con gate OFF → wouldExecute=false y razones legibles; providerCalls=0 siempre', () => {
-    const plan = planEtvEvaluation({ cells: CELLS, mode: 'exact_ab', config: OFF_CONFIG, env: {} as NodeJS.ProcessEnv, now: BEFORE_CUTOFF })
+    const plan = planEtvEvaluation({ cells: CELLS, mode: 'exact_ab', config: OFF_CONFIG, env: {}, now: BEFORE_CUTOFF })
     const dry = dryRunEtvEvaluation(plan, OFF_CONFIG)
 
     expect(dry.providerCalls).toBe(0)
@@ -106,7 +106,7 @@ describe('TASK-1805 — plan y dry-run (cero llamadas por construcción)', () =>
   })
 
   it('dry-run con gate ON y caps holgados → wouldExecute=true, pero sigue siendo papel (providerCalls=0)', () => {
-    const plan = planEtvEvaluation({ cells: CELLS, mode: 'exact_ab', config: ON_CONFIG, env: {} as NodeJS.ProcessEnv, now: BEFORE_CUTOFF })
+    const plan = planEtvEvaluation({ cells: CELLS, mode: 'exact_ab', config: ON_CONFIG, env: {}, now: BEFORE_CUTOFF })
     const dry = dryRunEtvEvaluation(plan, ON_CONFIG)
 
     expect(dry.wouldExecute).toBe(true)
@@ -115,7 +115,7 @@ describe('TASK-1805 — plan y dry-run (cero llamadas por construcción)', () =>
 
   it('caps: forecast sobre el tope o requests sobre el máximo → no ejecutable', () => {
     const tight = { ...ON_CONFIG, maxRequests: 2, budgetUsd: 0.01 }
-    const plan = planEtvEvaluation({ cells: CELLS, mode: 'exact_ab', config: tight, env: {} as NodeJS.ProcessEnv, now: BEFORE_CUTOFF })
+    const plan = planEtvEvaluation({ cells: CELLS, mode: 'exact_ab', config: tight, env: {}, now: BEFORE_CUTOFF })
     const dry = dryRunEtvEvaluation(plan, tight)
 
     expect(plan.caps).toMatchObject({ exceedsRequests: true, exceedsBudget: true })

@@ -1,0 +1,49 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "role": "decision",
+  "recipe": "decision-provider-fit",
+  "voice": {
+    "eyebrow": "Alternativas consideradas",
+    "question": "¿Por qué Aircall?",
+    "answer": [
+      "Por el",
+      "celular"
+    ]
+  },
+  "body": "El ejecutivo trabaja desde su celular y el piloto parte **sin** tocar Salesforce.",
+  "note": "Si la región define Salesforce Voice, Aircall también se integra por esa vía.",
+  "verdicts": [
+    {
+      "glyph": "crm",
+      "title": "Salesforce",
+      "description": "Su marcador no opera en Chile y su telefonía es de escritorio."
+    },
+    {
+      "glyph": "llamada",
+      "title": "Aircall",
+      "description": "App en el celular con número de empresa y conector a Salesforce."
+    },
+    {
+      "glyph": "social",
+      "title": "Su número",
+      "description": "El contacto queda en el teléfono personal y se va con la persona."
+    },
+    {
+      "glyph": "seguridad",
+      "title": "No oficial",
+      "description": "Leen WhatsApp fuera del canal oficial: riesgo de bloqueo."
+    }
+  ],
+  "selectedVerdict": 2,
+  "selection": {
+    "target": "object",
+    "label": "Comercial",
+    "participantKind": "department"
+  },
+  "line": "revenue-salesforce"
+}

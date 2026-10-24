@@ -21,6 +21,10 @@ El precio aprobado y presentado gobierna la cotización; las recomendaciones ant
 
 Caso fechado: [UTEM, 08/10/2026](../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). El importe acordado no se convierte en rate card, mínimo sostenible comprobado ni margen validado.
 
+## Resumen editorial en MD para diseñar una propuesta
+
+Si el operador pide Markdown para Claude Design u otra herramienta, entregar el texto y cuadro económico preliminar con valores exactos del artefacto V3, conciliados por fase y plazo, sin ajustar cifras a mano ni crear una cotización emitida. Mantener impuestos pendientes, estado de revisión y costos/margen fuera del contenido del comprador. No es necesario generar un PDF para ese insumo; la emisión de «la cotización» conserva `compose document` y sus gates. [Procedimiento de preparación](../../../docs/manual-de-uso/comercial/construir-una-licitacion.md#preparación-en-markdown-para-diseño-externo).
+
 ## Elegir el carril: documento de licitación o sistema Greenhouse
 
 - **Oferta económica documental rápida:** ante licitación/Compra Ágil urgente, HTML para PDF y alcance/precio/condiciones ya aprobados, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Puede emitir una oferta formal para presentar. El ejemplo no autoriza copiar sus precios, alcance ni supuestos. La plantilla tiene dos versiones de datos: la **1** cotiza un único precio en cuatro páginas (`net` representa el programa completo y la división mensual sólo es referencial); la **2** cotiza varias líneas con precio y pagina su sección de inversión, sin reducir la tipografía.
@@ -99,6 +103,15 @@ ejecutarse. Caso Pibank (propuesta v13 enviada): base US$4.500/mes, compromiso i
 M3 y decisión en M6, renovación trimestral con aviso de 30 días, base sin recargo por la renovación corta; tres meses
 se descartó. La regla de forma (lámina «Cómo empezar») vive en `deck-studio`,
 `references/propuesta-tecnica-seo-sin-presentador.md`.
+
+## Descuento de entrada antes que bajar la base (delta 2026-10-20)
+
+Si el operador duda del precio de un servicio gestionado mensual («¿lo ves caro?, ¿bajamos?»), no rebajar la base:
+anclar el precio de lista, dar un descuento temporal y nombrado por un plazo inicial, y bajar el riesgo de entrada con
+condiciones (primer mes sin permanencia, bolsa ajustable con aviso, luego mes a mes, vigencia corta). Informar el
+margen estimado con y sin descuento frente al piso. Monto CRM = proyección del horizonte con el descuento aplicado;
+fecha de cierre = vigencia, no cierre pactado. Caso Assetplan (operación HubSpot, 40 UF/mes con −10 UF los meses 1–4):
+[patrón medido](references/general-pricing-patterns.md#patrón-medido-descuento-de-entrada-en-lugar-de-bajar-la-base-operación-crm-gestionada).
 
 ## Guardrails
 

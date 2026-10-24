@@ -74,6 +74,8 @@ verdict. Codex and Claude skill names are not assumed to match.
      checks.
    - Prefer existing scripts and canonical CLIs over ad-hoc probes.
    - UI evidence must come from GVC or an explained GVC blocker.
+   - Creative/media evidence (video, audio, animation) starts with `pnpm ai:listen ... --measure-only`;
+     exit code 2 blocks. See the creative row in `evidence-matrix.md`.
    - Runtime evidence must use the active runtime, not only mocks or local unit
      tests, when rollout behavior depends on env, flags, migrations, workers,
      webhooks, external systems, or deployed services.

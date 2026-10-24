@@ -39,10 +39,12 @@ prueba que ese consumidor lo envió. No se activa un segundo backend ni se impor
 
 El candidato incluye también la [API administrativa de clasificación](GROWTH_FORMS_COMMERCIAL_CLASSIFICATION_CORRECTION_V1.md).
 No modifica otra vez la clasificación de Web ni las políticas publicadas. Release por control plane;
-antes de su promoción no se considera servido el endpoint nuevo.
+endpoint y fachada servidos en main2559e9242, deployment4He READY. Canarios productivos de
+CORS/no-store/body/permisos/conflicto PASS, sin captación ficticia.
+[Cierre formal y evidencia](../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
 
-69 pruebas aisladas cubren fachada/receipt/prepare, transporte y clasificación; mocks de persistencia
-y proveedores, sin escribir leads. Validación productiva prevista: GET contrato/políticas, OPTIONS,
+Validación inicial:69 pruebas aisladas de fachada/receipt/prepare, transporte y clasificación; mocks de persistencia
+y proveedores, sin escribir leads. Validación productiva ejecutada en el release2559e9242: GET contrato/políticas, OPTIONS,
 JSON malformado antes de command, permisos y conflicto CAS de clasificación antes de UPDATE. Cero
 pruebas positivas de captación o replay. [Auditoría del release](../audits/growth/2026-10-18-grader-measurement-release.md).
 Recepción Ads/Meta, identidad HubSpot y atribución requieren la primera ocurrencia real; no se

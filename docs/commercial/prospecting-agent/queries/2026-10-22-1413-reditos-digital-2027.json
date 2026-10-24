@@ -1,0 +1,827 @@
+{
+  "run_at": "2026-10-22T14:13:03.032281-03:00",
+  "type": "operator_requested_focused_followup",
+  "country": "CO",
+  "services": [
+    "agencia creativa/contenidos/audiovisual",
+    "agencia de medios",
+    "SEO/SEM",
+    "Email/SMS y analítica"
+  ],
+  "calendar_week_start": "2026-10-19T00:00:00-03:00",
+  "coverage": "Continuación focal autorizada tras radar0904; no se repite matriz20celdas",
+  "queries": [
+    {
+      "tool": "SharePoint search",
+      "query": "\"Réditos\" \"2027\"",
+      "result": "0",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "SharePoint search",
+      "query": "\"Agencia Digital\"",
+      "result": "Históricos, no prueba de convocatoria2027",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "SharePoint search",
+      "query": "\"Grupo Reditos\"",
+      "result": "Históricos, carpeta requerida recuperada por listado",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "SharePoint list_folder_items",
+      "query": "Alineación/4. Comercial/Licitaciones/Grupo Reditos",
+      "result": "Carpetas12 Programmatic y13 Agencia Digital2027 separadas",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "SharePoint list_folder_items",
+      "query": "Alineación/4. Comercial/Licitaciones/Grupo Reditos/13. Agencia Digital 2027",
+      "result": "425489.zip,1archivo",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "SharePoint fetch",
+      "query": "425489.zip",
+      "result": "Metadata y raw disponibles; texto ZIP no extraíble por conector",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "Outlook search",
+      "query": "\"Agencia Digital\" received>=2026-10-21",
+      "result": "Invitación LIC1552 y2otros mensajes ajenos",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "Outlook fetch",
+      "query": "Wherex – Nueva Licitación de Grupo Reditos [Lic - 1552]",
+      "result": "GANA+LOTI, compra425489,cierre30Oct14:00COT",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "HubSpot MCP",
+      "query": "get_user_details",
+      "result": "Portal48713323,owner75788512,DEALread/write disponibles",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "HubSpot MCP",
+      "query": "get_crm_objects DEAL66065702426 y COMPANY34264439413",
+      "result": "Programática distinta; empresa existente",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "HubSpot MCP",
+      "query": "DEAL id_de_licitacion IN GRD-1552,LIC-1552,1552 OR dealname CONTAINS_TOKEN1552",
+      "result": "0",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "HubSpot MCP",
+      "query": "DEAL gh_idempotency_key EQ hubspot-private-tender:wherex:GRD-1552",
+      "result": "0",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "HubSpot MCP",
+      "query": "DEAL associatedWith COMPANY34264439413",
+      "result": "7, ninguno1552; no editados",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "HubSpot MCP",
+      "query": "discover GET_PIPELINES DEAL y GET_OBJECT_TYPES DEAL WRITE_GUIDANCE; search_properties DEAL; get_properties DEAL campos seleccionados",
+      "result": "Pipeline, etapa, opciones y permisos verificados",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "HubSpot CLI",
+      "query": "whoami; associations list --from deals:66065702426 --to companies",
+      "result": "Portal48713323, Primary Company34264439413 type5",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "HubSpot CLI",
+      "query": "workflows list --limit 25 --format json",
+      "result": "403 falta scope; no se amplió acceso",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "CUA Chrome",
+      "query": "Wherex compra425489 -> oferta7578948; ficha, preguntas, anuncios",
+      "result": "Editando, publicación22Oct13:55, cierre30Oct18 sin zona, facturaciónREDIAPUESTAS,0preguntas y0anuncios,3archivos y4requeridos",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    },
+    {
+      "tool": "Python readers",
+      "query": "425489.zip completo: XLSX todas celdas no vacías4hojas, DOCX párrafos/tablas, PDF1p",
+      "result": "Fuentes íntegras leídas; no contrato firmado en los3adjuntos disponibles",
+      "country": "CO",
+      "service": "agencia digital integral",
+      "filters": "Los explícitos en query; consultas internas sin filtro temporal"
+    }
+  ],
+  "procurement_control": {
+    "result": "HOLD",
+    "last_checked_at": "2026-10-22 17:10:00 UTC",
+    "primary_url": "https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=information",
+    "documents_read": [
+      "RFP Agencia Digital 2027 WX-202610221154228770.xlsx: Formato, Requisitos técnicos, Listas, Hoja3, todas las celdas no vacías",
+      "CONFLICTO DE INTERESES PROVEEDORES-202603251600454960.docx íntegro, no firmado",
+      "Linea Ética-202603111419050460.pdf 1p íntegra"
+    ],
+    "supplier_selected": "no encontrado, no prueba de inexistencia",
+    "award_act_or_order": "no encontrado, no prueba de inexistencia",
+    "contract": "no encontrado en los3adjuntos accesibles; no verificado en expediente externo",
+    "signature_at": "no verificado",
+    "execution_start_at": "previsto enero2027, no inicio real acreditado",
+    "execution_end_at": "previsto enero2028, sin día ni contrato formalizado",
+    "published_at": {
+      "raw": "22/10/2026 13:55",
+      "timezone": null
+    },
+    "first_seen_at": "2026-10-22T16:55:31Z",
+    "deadline_at": null,
+    "deadline_sources": [
+      {
+        "source": "invitación Wherex",
+        "raw": "30/10/2026 14:00 COT Colombia",
+        "normalized": "2026-10-30T14:00:00-05:00"
+      },
+      {
+        "source": "ficha Wherex",
+        "raw": "30/10/2026 18:00",
+        "timezone": null
+      }
+    ],
+    "stage": "Oferta Editando, ronda de preguntas abierta30Oct; oferta no enviada",
+    "reason": "Fuentes primarias discrepan en hora de cierre y razón social; no se considera resuelto por aprobación general de alta."
+  },
+  "crm_state": "created_administrative_HOLD_explicit_operator_confirmation",
+  "pii_queries": "Sin búsqueda por email individual; metadatos personales no copiados",
+  "private_evidence_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/source-integrity.json",
+  "paid_credits": 0,
+  "outbound_messages": 0,
+  "tasks_created": 0,
+  "deal_id": 66560488750,
+  "followup_actions": [
+    {
+      "tool": "Wherex Chrome",
+      "result": "Ficha1552 revalidada, misma etapa Editando y discrepancias; ver hora exacta en recibo"
+    },
+    {
+      "tool": "HubSpot get_user_details + dedupe",
+      "result": "Portal48713323;0registros1552 antes del alta"
+    },
+    {
+      "tool": "HubSpot manage_crm_objects",
+      "result": "Deal66560488750 creado y Company34264439413 Primary,1/1"
+    },
+    {
+      "tool": "HubSpot get_crm_objects + CLI associations list",
+      "result": "Primera lectura de propiedades y Primary verificada; amount/closedate/fecha licitación sin valor"
+    },
+    {
+      "tool": "HubSpot get_user_details/get_properties/get_crm_objects",
+      "result": "Portal48713323, campo datetime verificado, lectura previa"
+    },
+    {
+      "tool": "HubSpot manage_crm_objects",
+      "result": "Primer intento transporterror; lectura confirmó sin cambio; segundo update exitoso del mismoDeal66560488750"
+    },
+    {
+      "tool": "HubSpot get_crm_objects",
+      "result": "fecha_de_cierre_de_licitacion2026-10-30T21:00:00Z; descripción/siguiente paso coinciden; closedate vacío"
+    }
+  ],
+  "deadline_operator_confirmation": {
+    "at": "2026-10-22T14:18:50.056827-03:00",
+    "value": "2026-10-30T21:00:00Z",
+    "local": "2026-10-30T18:00:00-03:00",
+    "timezone": "America/Santiago",
+    "source": "CapturaWherex1552 aportada y confirmada porJulio",
+    "timezone_basis": "Zona del operador, no explícita en captura"
+  },
+  "bases_review": {
+    "checked_at": "2026-10-22T14:27:39.657881-03:00",
+    "operator_corrections": [
+      "Cero archivos cargados es normal antes de presentar, no un bloqueo",
+      "Usar Berel y SKY como dos experiencias; contratos disponibles"
+    ],
+    "country": "CO",
+    "services": [
+      "agencia digital integral",
+      "creatividad/contenidos",
+      "medios",
+      "SEO/SEM",
+      "Email/SMS",
+      "analítica"
+    ],
+    "queries": [
+      {
+        "tool": "SharePoint list_folder_items",
+        "query": "Alineación/4. Comercial/Licitaciones/Grupo Reditos/13. Agencia Digital 2027",
+        "result": "Un ZIP425489, mismos tres originales y hashes"
+      },
+      {
+        "tool": "Python openpyxl",
+        "query": "RFP completo4hojas, todas las celdas no vacías y comentarios",
+        "result": "Habilitantes C9:C17, comentarios A5/A23, obligaciones y cantidades. Hoja3 oculta leída; catálogo Listas no aplicado como requisitos"
+      },
+      {
+        "tool": "OneDrive local + pypdf",
+        "query": "Vigencia19Oct2026, estatuto05Ene2026, e-RUT17Feb2026 y otros estatutos para comparación de emisión",
+        "result": "Paquete básico disponible; renovación documental/equivalencia por comprador no inferidas"
+      },
+      {
+        "tool": "OneDrive local + pypdf/image",
+        "query": "Referencias SKY y Gobierno de Santiago del proceso anterior, sin modificarlas",
+        "result": "SKY carta1p leída; Gobierno1p escaneada inspeccionada visualmente, certificado04Feb2026 por enero2026; luego operador seleccionó Berel+SKY"
+      },
+      {
+        "tool": "Wherex CUA Chrome",
+        "query": "Oferta7578948 Información -> Siguiente Servicio -> Siguiente Condiciones/adjuntos",
+        "result": "Editando,12meses,COP,total sinIVA, pago30días, vigencia oferta vacía,20MB,cuatro obligatorios; sin editar ni enviar"
+      },
+      {
+        "tool": "SharePoint search",
+        "query": "Berel contrato",
+        "filters": "topn15, sin fecha",
+        "result": "Contrato firmado localizado en Workspace/Clientes/Berel y copias históricas de revisión"
+      },
+      {
+        "tool": "SharePoint search",
+        "query": "SKY contrato",
+        "filters": "topn15, sin fecha",
+        "result": "Contrato28p y DOCX administrativo; no confundir con propuestaSKY2027"
+      },
+      {
+        "tool": "SharePoint fetch",
+        "query": "Contrato de Prestacion de Servicios EFEONCE .pdf-firmado.pdf, Berel",
+        "result": "Cláusula primera páginas1–2: blog,SEO/AEO,contenido,gráficos,reportes; contrato no es certificado separado. PII/valores ajenos no incluidos en reporte"
+      },
+      {
+        "tool": "SharePoint fetch + lectura local",
+        "query": "Contrato-Sky-830c0de8-ff76-48a8-afe4-b897fb2b9eb9.pdf, Anexo1p16–19",
+        "result": "Diseño y creatividad, piezas/videos, equipo dedicado; no se infiere capacidad disponible o terminación. Contratos no cargados/compartidos"
+      }
+    ],
+    "result": "Análisis entregable y matriz de preparación; no se declara GO, admisibilidad o certificados adicionales no leídos",
+    "report": "docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/REQUISITOS-PARA-POSTULAR-2026-10-22.md",
+    "crm_write": false,
+    "outbound_messages": 0,
+    "paid_credits": 0
+  },
+  "talent_social_publication": {
+    "authorized": true,
+    "operator_request": "Publicalo con esa imagen en mi LinkedIn, en el LinkedIn de la empresa y en el instagram de la empresa",
+    "last_checked_at": "2026-10-22T14:50:00-03:00",
+    "status": "PUBLISHED",
+    "posts": [
+      403409594,
+      403409682,
+      403409758
+    ],
+    "record": "docs/operations/hiring/2026-10-22-talento-medellin-publicacion.json",
+    "ats_openings_created": 0,
+    "crm_writes": 0,
+    "queries": [
+      {
+        "source": "Metricool getBrandSettings",
+        "purpose": "Verificar Julio Reyes y Efeonce Group y sus conexiones",
+        "result": "Identidades y zona America/Santiago verificadas"
+      },
+      {
+        "source": "Metricool getScheduledPosts",
+        "brands": [
+          "5105024",
+          "3961547"
+        ],
+        "window": "2026-10-22/2026-10-23 America/Santiago, extendedRange=true; después 14:40–15:10",
+        "purpose": "Evitar duplicados y leer de vuelta estados",
+        "result": "Sin duplicados antes del alta; tres IDs PUBLISHED después de 14:48"
+      },
+      {
+        "source": "Metricool getAnalyticsAvailableMetrics",
+        "networks": [
+          "linkedin",
+          "instagram"
+        ],
+        "connector": "posts",
+        "purpose": "Descubrir lectura de posts publicados",
+        "result": "Schema disponible; no fue necesario consultar analítica porque la lectura del planner devolvió ID de red y permalink"
+      },
+      {
+        "source": "HTTP GET imagen GCS y tres copias Metricool",
+        "purpose": "Verificar contenido original y re-alojado",
+        "result": "HTTP200,1546775 bytes,SHA256 idéntico b0beba488dd31c00345bf4640d3fa842018f2b2f0cda565954df8a83a27e479c"
+      },
+      {
+        "source": "Páginas nativas de las tres publicaciones",
+        "purpose": "Comprobar autor y contenido final",
+        "result": "LinkedIn Julio y Efeonce: autores y texto; LinkedIn Efeonce: imagen visual; Instagram efeoncepro: imagen,alt,texto"
+      }
+    ]
+  },
+  "hiring_publication_followup": {
+    "authorization": "Usuario confirma tres Semi-senior y vía internacional Colombia; autoriza creación y ajuste de los LinkedIn",
+    "record": "docs/operations/hiring/2026-10-22-medellin/operation-record.json",
+    "queries_executed": [
+      "Lectura skills, manual Careers, arquitectura Hiring y operador/validator local",
+      "pg:doctor runtime: autenticación y conexión correctas",
+      "listHiringOpenings reader canónico, limit200:4 registros previos, sin duplicados híbridosMedellín",
+      "Tres pnpm hiring:publish-vacancy --dry-run: validated, único warning banda no fijada",
+      "Tres publish secuenciales con idempotencia: published",
+      "getHiringOpeningById/getTalentDemandById: tres pares y campos canónicos verificados",
+      "HTTP GET seis URLs detalle/apply:200; tres JobPosting y sin nombre de cliente",
+      "Lectura y edición nativa de ambos LinkedIn; recarga independiente confirma nivel y tres links",
+      "Tres lnkd.in de empresa leídos en navegador: destinos EO-OPN-0678/0679/0680",
+      "Instagram y Meta Business Suite leídos para editar; sin guardar por corrección posterior del usuario"
+    ],
+    "opening_ids": [
+      "EO-OPN-0678",
+      "EO-OPN-0679",
+      "EO-OPN-0680"
+    ],
+    "demand_ids": [
+      "EO-TDM-0682",
+      "EO-TDM-0683",
+      "EO-TDM-0684"
+    ],
+    "instagram": "unchanged_by_operator_instruction",
+    "paid_credits": 0,
+    "crm_mutations": 0,
+    "pii_handling": "Sin consultas de candidatos. Captura con perfil Julio en historial privado0600, no versionada."
+  },
+  "historical_bid_operator_correction": {
+    "at": "2026-10-22T17:48:59.157148-03:00",
+    "instruction": "Proceso anterior perdido: sólo antecedente histórico; no guiar la nueva con él.",
+    "prior_id": "not_identified",
+    "review_executed": [
+      "README caso GRD-1552",
+      "Requisitos para postular actual",
+      "Registro y briefs Hiring publicados"
+    ],
+    "result": "Perfiles y requisitos sustentados en bases2027. No revisión documental de la licitación anterior ni afirmación de requisitos idénticos.",
+    "mutations": "Sólo registro de fuente y decisión; ningún cambio CRM o externo"
+  },
+  "historical_document_review": {
+    "checked_at": "2026-10-22T17:58:15.110945-03:00",
+    "operator_clarification": "Se pueden revisar bases y documentos anteriores para recuperar respaldos. NO son guía de la nueva; se perdieron.",
+    "remote_queries": [
+      "SharePoint list Grupo Reditos top70",
+      "SharePoint list 6 Agencia Digital top60",
+      "SharePoint list 10 Credintegral top60",
+      "SharePoint list 8 Agencia Creativa top60"
+    ],
+    "local_reads": [
+      "4 XLSX completos con comentarios y hojas ocultas",
+      "7 DOCX párrafos/tablas",
+      "6 PDF texto extraíble",
+      "PPTX84 slides:12con texto,72sin texto",
+      "ZIP histórico:2PDFcomprimidos",
+      "Visual cronograma p3 y SLAs p4"
+    ],
+    "findings_report": "research/REVISION-ANTERIORES-Y-RESPALDOS-2026-10-22.md",
+    "coverage_limit": "No lectura visual integral de slides rasterizadas; no comprobante individual de envío de cada archivo.",
+    "private_evidence_path": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/historical-documents",
+    "pii": "Extracciones y capturas privadas0600; registro versionable sin correos/teléfonos/datos personales.",
+    "external_mutations": 0,
+    "paid_credits": 0
+  },
+  "document_readiness_berel_sky": {
+    "last_checked_at": "2026-10-22T18:02:42-03:00",
+    "scope": "Documentos aprovechables y pendientes para Agencia Digital 2027. Sin reutilizar la propuesta histórica como guía.",
+    "queries": [
+      {
+        "tool": "local filesystem rg --files",
+        "query": "Nombres exactos de contratos Berel y SKY, carta SKY y documentos corporativos",
+        "result": "Originales localizados; sin copiar o modificar"
+      },
+      {
+        "tool": "local pypdf",
+        "query": "Berel cláusula primera p1–2; SKY Anexo1 p16–19; carta SKY p1",
+        "result": "Contenido/diseño/SEO para Berel; creatividad y equipo dedicado para SKY; carta acredita agencia creativa2025. Conteo local actual SKY29p, distinto del conteo previo28p; no afecta localización de Anexo1."
+      },
+      {
+        "tool": "local pypdf",
+        "query": "Fechas de emisión de vigencia y estatuto; e-RUT; carta SKY",
+        "result": "Vigencia19Oct2026; estatuto05Ene2026; e-RUT disponible. No certificado separado Berel localizado en alcance revisado."
+      },
+      {
+        "tool": "repository read",
+        "query": "Requisitos2027, revisión históricos y companion de expediente",
+        "result": "Cuatro campos obligatorios Wherex; preparar técnicaPDF y Excel; conflicto; economía; acreditar Medellín/experienciaAntioquia y resolver cantidades/techo."
+      }
+    ],
+    "crm_write": false,
+    "outbound_messages": 0,
+    "paid_credits": 0,
+    "platform_uploads": 0
+  },
+  "experience_evidence_operator_correction": {
+    "at": "2026-10-22T18:09:34-03:00",
+    "instruction": "Los certificados de experiencia son los contratos, con eso tenemos.",
+    "result": "Usar contratos Berel y SKY; dos respaldos cubiertos según Julio; no pedir certificados adicionales",
+    "buyer_confirmation_inferred": false,
+    "external_mutations": false
+  },
+  "budget_40mm_primary_review": {
+    "last_checked_at": "2026-10-22T18:13:50-03:00",
+    "queries": [
+      {
+        "tool": "local zipfile+openpyxl",
+        "query": "Original425489.zip: todas las celdas pobladas/comentarios de cuatro hojas; búsqueda presupuesto,pauta,plataforma,licencia,envíos,SMS,email,provisión",
+        "result": "H9techo40MM; gestión de pauta/envíos; provisión SocialListening explícita; no asignación expresa de pago de medios o mensajería"
+      },
+      {
+        "tool": "local openpyxl",
+        "query": "Relectura FormatoF9,H9,C10,C12,C13,A17 y RequisitosC10,C12,C14,C17",
+        "result": "15comentarios sin aclaración económica adicional; mantener pregunta de pagador de pauta/mensajería"
+      }
+    ],
+    "report": "docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/ALCANCE-PRESUPUESTO-40MM-2026-10-22.md",
+    "crm_write": false,
+    "outbound_messages": 0,
+    "paid_credits": 0,
+    "source_modified": false
+  },
+  "programmatic_budget_context": {
+    "at": "2026-10-22T18:18:04-03:00",
+    "query": "RFP original programática1541, FormatoD9,C11,C17 y requisitosC15; registro económico20Oct",
+    "result": "30Mmensual y discriminación de honorarios/comisiones/tecnología. Medios como supuesto declarado oferta propia, no nueva aclaración comprador. Apoya separación40Mservicio integral; no prueba cobertura de toda pauta GANA/LOTI2027 ni consumosEmailSMS.",
+    "source_sha256": "452fc79b6d25e7c0c4904df9323ac911e0bb491a6faae77f03bd57e94c04fcc2",
+    "external_mutations": false
+  },
+  "medellin_person_cost_research": {
+    "at": "2026-10-22T18:37:22-03:00",
+    "scope": "Sólo presupuesto interno de tres perfiles; propuesta expresamente detenida",
+    "queries": [
+      {
+        "tool": "web.search",
+        "query": "Medellín trafficker digital salario 2026 3.000.000 4.000.000 empleo",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "Medellín creador contenido audiovisual salario 2026 2.500.000 3.000.000",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "Medellín analista email marketing CRM automatización salario 2026 3.000.000 4.000.000",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "\"Medellín\" \"Trafficker\" \"$3.500.000\"",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "\"Medellín\" \"Trafficker\" \"$4.000.000\" 2026",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "\"Medellín\" \"email marketing\" \"Salario\" automatización CRM analista 2026",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "\"Medellín\" \"Analista CRM\" \"3.500.000\"",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "site.comfama.com \"Trafficker\" \"Salario\" Medellín",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "site.elempleo.com/co/ofertas-trabajo \"Medellín\" \"email\" \"automatización\" \"3,5\"",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "\"analista de CRM\" \"Medellín\" \"Salario\" marketing email",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "\"Trafficker\" \"Medellín\" \"3.500.000\" \"2026\"",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "\"Informe Inmobiliario\" \"Trafficker\" \"3.700.000\"",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "\"Medellín\" \"Trafficker\" \"3.000.000\" \"Google\" \"GTM\"",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      },
+      {
+        "tool": "web.search",
+        "query": "site.comfama.com \"Creador\" \"contenido\" \"Salario\" \"3.000.000\"",
+        "country": "CO",
+        "service": "Talento/costos",
+        "filters": "sin filtro fecha"
+      }
+    ],
+    "opened_urls": [
+      "https://www.magneto365.com/ec/empleos/analista-crm-1091182",
+      "https://manpowergroupcol.pandape.computrabajo.com/Detail/9776994",
+      "https://www.elempleo.com/co/ofertas-trabajo/auxiliar-de-produccion-de-contenido-1886758274",
+      "https://co.jobiglo.com/empleo-trafficker-digital-senior-j-6ac8b2ccbc98c12bd80ee1bc",
+      "https://co.linkedin.com/jobs/view/trafficker-digital-senior-at-informe-inmobiliario-4466355293",
+      "https://co.linkedin.com/jobs/view/creador-de-contenidos-digitales-at-master-viajes-sas-4467271619",
+      "https://www.dolar-colombia.net/en/2026-10-22"
+    ],
+    "blocked_sources": [
+      "https://manpowergroupcol.pandape.computrabajo.com/Detail/9776994"
+    ],
+    "salary_recommendations": [
+      {
+        "role": "Trafficker Digital",
+        "level": "Semi-senior",
+        "low": 3200000,
+        "target": 3500000,
+        "high": 3800000
+      },
+      {
+        "role": "Content Creator",
+        "level": "Semi-senior",
+        "low": 2500000,
+        "target": 2800000,
+        "high": 3000000
+      },
+      {
+        "role": "Email y SMS",
+        "level": "Semi-senior",
+        "low": 3200000,
+        "target": 3500000,
+        "high": 3800000
+      }
+    ],
+    "monthly_compensation_COP": 9800000,
+    "monthly_estimated_people_cost_COP": 12216161.5,
+    "report": "docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-TRES-PERFILES-MEDELLIN-2026-10-22.md",
+    "approved_compensation": false,
+    "external_mutations": false,
+    "paid_tools": false
+  },
+  "rest_scope_canonical_costing": {
+    "at": "2026-10-22T18:56:46-03:00",
+    "operator_scope": "Costos sobrios del resto, COPyUSD, agregar perfiles faltantes vía canónica sin forzar; subagentes autorizados; sin propuesta",
+    "parent_web_queries": [
+      {
+        "query": "\"Medellín\" \"Estratega digital\" \"Salario\" 2026",
+        "filters": "sin filtro de fecha",
+        "country": "CO",
+        "line": "costos internos"
+      },
+      {
+        "query": "\"Medellín\" \"Estratega\" \"5.000.000\" marketing",
+        "filters": "sin filtro de fecha",
+        "country": "CO",
+        "line": "costos internos"
+      },
+      {
+        "query": "\"Medellín\" \"social listening\" \"salario\" analista",
+        "filters": "sin filtro de fecha",
+        "country": "CO",
+        "line": "costos internos"
+      },
+      {
+        "query": "\"estratega digital\" \"salario\" \"4.500.000\" Colombia",
+        "filters": "sin filtro de fecha",
+        "country": "CO",
+        "line": "costos internos"
+      },
+      {
+        "query": "\"estratega digital\" \"5.000.000\" Colombia 2026",
+        "filters": "sin filtro de fecha",
+        "country": "CO",
+        "line": "costos internos"
+      },
+      {
+        "query": "\"estratega digital\" \"Medellín\" \"4\" salario agencia",
+        "filters": "sin filtro de fecha",
+        "country": "CO",
+        "line": "costos internos"
+      }
+    ],
+    "parent_web_open": [
+      "https://awario.com/pricing/",
+      "https://www.magneto365.com/co/empleos/estratega-de-marketing-marketing-growth-desarrollo-comercial-1089867",
+      "https://co.linkedin.com/jobs/view/estratega-digita-traffiker-at-contrav%C3%ADa-4267268055"
+    ],
+    "subagent_query_logs": [
+      "docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/listening-query-events.json",
+      "docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/workload-queries-and-sources.json"
+    ],
+    "canonical_execution_steps": [
+      "pricing:v3 help",
+      "pricing:v3 current show",
+      "pricing:v3 catalog search --current --kind profile --date2026-10-22",
+      "pricing:v3 resources inspect --current --date2026-10-22 --queryadobe",
+      "catalog preview/apply red itos-2027-roles.change.json; catalogv12",
+      "resources preview/apply reditos-2027-resources.change.json; resourcesv12",
+      "catalog preview/apply reditos-2027-default-kits.change.json; catalogv13",
+      "compose workload production/with-strategy/with-listening/with-initial; productive125/scheduled180; --currentunsupported, correctedno-priceoperation",
+      "compose scaffold --current with-listening.dimensioned-brief",
+      "compose prepare/quote four scopedemands inUSD/COP, candidatev12/v13 then eightfinal--current",
+      "18 legacyquote impactchecks3newprofiles×3offers×2currencies;12calc6AIchoiceneedsinput; unsupported--policyflagremovedperhelp",
+      "compose prepare 033/034/035 profileintegration;034contactabilitypricepending",
+      "current set catalogv13/policyv12/creditsv1 with freshpointerdigest",
+      "compose increment strategy/listening/initial, eachUSD/COP;6replayvalidated",
+      "compose assess with-listeningUSD;23gapskept",
+      "pnpm pricing:v3:test (initial2datefailures, final1860passed3skipped); targetedparity145passed",
+      "prettiercheck/write newfixtureandtest; unrelatedGOLDENformattingreverted"
+    ],
+    "report": "docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md",
+    "result": {
+      "monthly_COP": "12699026",
+      "monthly_USD": "3479.19",
+      "initial_COP": "2295742",
+      "initial_USD": "628.97",
+      "fx_policy": "3650COP/USD",
+      "added_profiles": [
+        "ECG-033",
+        "ECG-034",
+        "ECG-035"
+      ],
+      "retained_existing": "ECG-028",
+      "catalog": "v13",
+      "resources": "v12",
+      "credits": "v1",
+      "validation": "37files1860passed3skipped"
+    },
+    "uncertainties": [
+      "newprofilecostsestimatedsalaryonly;benefits/chargesnotvalidated",
+      "248hestimatednotmeasured;notassignedcapacity",
+      "Awariocoverageandvolumeunvalidated",
+      "Frame.iohistorical;platformfeeestimated",
+      "EmailSMSplatformandconsumptionspending",
+      "noactualbuyercontractstatechangeverifiedinthiscostreview"
+    ],
+    "proposal_prepared": false,
+    "crm_writes": 0,
+    "ats_writes": 0,
+    "paid_tools": false,
+    "purchases": 0,
+    "outbound_messages": 0,
+    "commit_push_import_deploy": false
+  },
+  "commercial_basis_followup": {
+    "checked_at": "2026-10-22T19:11:22.557524-03:00",
+    "operator_instruction": "Documentar rango elegido en caso, importe del Deal y documentación futura; mantener propuesta detenida",
+    "working_range_monthly_COP": [
+      36000000,
+      38000000
+    ],
+    "main_scenario_monthly_COP": 38000000,
+    "deal_total_12_months_COP": 456000000,
+    "fx_COP_per_USD": 3650,
+    "monthly_cost_COP": 25121526,
+    "annual_range_COP": [
+      432000000,
+      456000000
+    ],
+    "crm_status": "updated_verified_stable_two_readbacks",
+    "crm_fields_updated": [
+      "amount",
+      "deal_currency_code",
+      "description",
+      "hs_next_step"
+    ],
+    "procurement_control": {
+      "result": "hold",
+      "last_checked_at": "2026-10-22T22:07:44Z",
+      "sources_read": [
+        "https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=information",
+        "https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=products"
+      ],
+      "published_at": {
+        "value": "2026-10-22T13:55:00",
+        "timezone": "not_shown"
+      },
+      "deadline_at": {
+        "visible": "2026-10-30T18:00:00",
+        "timezone": "not_shown",
+        "operational_from_operator": "2026-10-30T21:00:00Z America/Santiago"
+      },
+      "stage": "Editando",
+      "quantity": "12 Meses",
+      "currency": "COP",
+      "form_vat": "NO considera IVA",
+      "buyer_billing_entity": "REDIAPUESTAS S.A.S., NIT 901716185",
+      "selected_supplier": "not_verified; no field in material read",
+      "award_act_purchase_order": "not_verified",
+      "contract_status": "not_verified; no contract listed among 3 visible general attachments",
+      "signature_at": "not_verified",
+      "execution_start_at": "not_verified",
+      "execution_end_at": "not_verified",
+      "documents_read": "Prior full reading of RFP, conflict DOCX and Ethics PDF retained in case. This session re-read primary information and products; no new contractual document available.",
+      "blocked_or_missing": "Specific contract/award file absent from available fiche; absence does not prove nonexistence",
+      "basis": "Administrative valuation update explicitly requested, not new Deal or recommendation to bid; HOLD unchanged"
+    },
+    "queries_executed": [
+      {
+        "type": "primary_browser_read",
+        "country": "CO",
+        "service": "creative/digital/media",
+        "url": "https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=information",
+        "filters": null,
+        "result": "Editando; 12 Meses; COP; NO considera IVA; contrato no verificado, HOLD conservado"
+      },
+      {
+        "type": "primary_browser_read",
+        "country": "CO",
+        "service": "creative/digital/media",
+        "url": "https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=products",
+        "filters": null,
+        "result": "Editando; 12 Meses; COP; NO considera IVA; contrato no verificado, HOLD conservado"
+      }
+    ],
+    "blocked_sources": [
+      {
+        "tool": "HubSpot Agent CLI workflows list",
+        "status": 403,
+        "reason": "missing automation scope; no permission changes"
+      }
+    ],
+    "evidence": [
+      "../tenders/gana-loti-agencia-digital-2027-1552/BRIEF-COMERCIAL-VIGENTE.md",
+      "../tenders/gana-loti-agencia-digital-2027-1552/research/CRM-BASE-COMERCIAL-2026-10-22.json"
+    ],
+    "outbound_messages": 0,
+    "paid_credits": 0,
+    "new_tasks": 0,
+    "proposal_prepared": false,
+    "programmatic_unchanged": true
+  }
+}

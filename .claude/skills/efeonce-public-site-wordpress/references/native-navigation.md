@@ -1,20 +1,15 @@
 # Native public-site navigation
 
-Use for an authorized menu label, destination or hierarchy change. A landing publication alone does
-not prove it appears in navigation. Keep Ohio's existing menu rendering; do not replace global chrome
-or introduce a second navigation component for a new landing.
+> **The global menu is now the AXIS one (since 2026-10-23).** `eo_site_nav_enabled=on`: every page renders the
+> portable navigation (`efeonce.site-nav`) except `/blog/` (#18456), which keeps Ohio's header (TASK-1802 owns it).
+> To change the global menu, use [`global-site-navigation.md`](global-site-navigation.md) (`pnpm public-website:site-nav`,
+> one live document in the «EO Navegación» plugin), never Ohio's `nav_menu_item` posts. Ohio's menu (term 61) only
+> matters on `/blog/` and as the fallback the adapter prints when the plugin, the document or the render fails, or when
+> the switch goes `off`. Landings still never create their own navigation.
 
-> **Global header in transition (decided; nothing in runtime as of 2026-10-18).**
-> [PDR-027](../../../../docs/public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md) was **Accepted**
-> on 2026-10-18: Ohio's header will be replaced site-wide by the portable navigation (`efeonce.site-nav`), pilot on one
-> page first. Architecture:
-> [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`](../../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md);
-> program: [EPIC-055](../../../../docs/epics/to-do/EPIC-055-public-site-global-navigation.md). Until TASK-2042 sets the
-> `eo_site_nav_enabled` switch to `pilot`/`on` for a page, the rule above stands for that page: keep Ohio and make every
-> menu change on term 61 with this procedure. Where the new header is live, the rule is replaced **only for the global
-> header**: landings still never create their own navigation, and menu editing moves to the single document of the
-> «EO Navegación» plugin (`wp eo-nav export|validate|apply|revisions|restore`, TASK-2041) instead of Ohio's
-> `nav_menu_item` posts.
+Use this procedure only for an authorized change to Ohio's menu (what `/blog/` and the fallback show). A landing
+publication alone does not prove it appears in navigation. Do not introduce a second navigation component for a new
+landing.
 
 ## Discover and snapshot
 
@@ -57,6 +52,10 @@ Landing state, public click evidence and scope: `landings/content-marketing.md` 
 `docs/audits/public-site/2026-08-31-content-marketing-publication.md`.
 
 ## Indexing checks for menu pages
+
+Since 2026-10-23 the destinations visitors see come from the live site-nav document: list them with
+`pnpm public-website:site-nav pull` + `show` (and `check`, which confirms links answer), not from Ohio's menu. The
+2026-08-31 procedure below is historical for Ohio's menu; its per-destination checks still apply.
 
 Resolve assigned menus and compare rendered navigation; exclude `#` group labels and external social
 links. Audit each unique internal destination for robots meta/HTTP headers, robots.txt, canonical, status

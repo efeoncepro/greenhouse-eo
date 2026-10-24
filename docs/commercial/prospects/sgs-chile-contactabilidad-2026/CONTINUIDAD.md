@@ -1,8 +1,35 @@
 # Continuidad · SGS Chile · Trazabilidad comercial
 
-**Corte:** 13 de octubre de 2026 · **Uso interno** · **Responsable:** Julio Reyes.
+**Corte:** 19 de octubre de 2026 (sección 0; el resto es del 13-10) · **Uso interno** · **Responsable:** Julio Reyes.
 
 Nota de traspaso para que otra sesión (Codex u otra) retome el trabajo sin releer la conversación.
+
+## 0. Corte 19-10-2026 — propuesta técnica enviada (prevalece sobre las secciones siguientes)
+
+- **Enviada.** Julio envió el 19-10-2026, 18:17, la propuesta técnica en PDF (33 láminas) como respuesta al hilo
+  «Minuta y próximos pasos | SGS + Efeonce», para José Pedro y Bárbara, con María Inocencio y Mauricio Ampuero en el
+  hilo. Enlace: `https://hubs.ly/Q04BD_ds0`. Ofreció una revisión de 30 minutos y sumar a Ricardo y Mauricio.
+- **Dónde está:** canvas <https://claude.ai/artifact/2vcRRWEhgQ1cFZiu3QTZzv>; PDF en OneDrive
+  `Licitaciones/SGS Chile/Efeonce-Propuesta-Tecnica-Trazabilidad-Comercial-SGS-Chile.pdf`; fuente y scripts en
+  [`ai-generations/2026-10-19_propuesta-sgs-contactabilidad/`](../../../../ai-generations/2026-10-19_propuesta-sgs-contactabilidad/LEEME.md).
+- **Cambio de solución (Julio, 19-10):** el WhatsApp va por **WhatsApp Coexistence**: el ejecutivo conserva su app de
+  WhatsApp Business y su número, y cada mensaje enviado o recibido llega por la plataforma de Meta a la integración de
+  Efeonce, que crea la actividad en Salesforce sin guardar el texto. Aircall queda solo para llamadas. Reemplaza la
+  decisión 2 y la línea «WhatsApp» de la sección 3. Quien escriba hoy desde un WhatsApp personal recibe un número de empresa.
+- **Datos de Coexistence (Meta, documentación oficial, octubre 2026):** app 2.24.17 o superior; contactos y hasta 6
+  meses de historial se traen una vez al conectar, sin grupos; se apagan listas de difusión, mensajes temporales, de
+  una sola vez y ubicación en tiempo real; el teléfono principal debe abrir la app cada ~14 días; WhatsApp para Windows
+  no se registra; lo escrito desde la app no tiene costo de Meta. Aircall no documenta Coexistence (al activar WhatsApp
+  en un número ya usado, se pierde el historial).
+- **Fuera del deck:** «Quiénes somos» (Julio: ya tienen el brochure).
+- **HubSpot (19-10, readback hecho):** negocio [65472322064](https://app.hubspot.com/contacts/48713323/record/0-3/65472322064)
+  pasó de `qualifiedtobuy` a `presentationscheduled` (Presentación de soluciones) con próximo paso; nota 118936070300
+  asociada al negocio, la empresa y los cuatro contactos; el correo 118980702232 quedó registrado por el CCO y asociado
+  al negocio. El Lead 592968357167 sigue en Connected (no se tocó).
+- **Pendientes:** respuesta de SGS y reunión de revisión; los seis datos de la lámina 29 para cerrar los `[MONTO]`;
+  decidir quién habilita Coexistence (Efeonce como Tech Provider o socio de Meta); respuesta escrita de Aircall y
+  condiciones comerciales; autorización de uso del logo de Aircall; revisión legal de las condiciones de privacidad;
+  decisión de arquitectura de Insights para el panel.
 
 ## 1. Dónde está todo
 

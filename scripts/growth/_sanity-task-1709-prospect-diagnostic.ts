@@ -21,7 +21,7 @@ const ENV_ON = {
   ...process.env,
   GROWTH_SEO_ENABLED: 'true',
   GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED: 'true'
-} as NodeJS.ProcessEnv
+}
 
 const efeonceLedgerToday = async (): Promise<number> => {
   const rows = await runGreenhousePostgresQuery<{ total: number }>(
@@ -54,7 +54,7 @@ const main = async () => {
     rootDomain: DOMAIN,
     market: MARKET,
     actor: 'sanity:task-1709',
-    env: { ...process.env, GROWTH_SEO_ENABLED: 'true', GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED: 'false' } as NodeJS.ProcessEnv
+    env: { ...process.env, GROWTH_SEO_ENABLED: 'true', GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED: 'false' }
   })
 
   check('flag OFF → disabled', !disabled.ok && disabled.errorCode === 'disabled')
@@ -66,7 +66,7 @@ const main = async () => {
     rootDomain: DOMAIN,
     market: MARKET,
     actor: 'sanity:task-1709',
-    env: { ...ENV_ON, GROWTH_SEO_PROSPECT_DIAGNOSTIC_CEILING_USD: '0.01' } as NodeJS.ProcessEnv
+    env: { ...ENV_ON, GROWTH_SEO_PROSPECT_DIAGNOSTIC_CEILING_USD: '0.01' }
   })
 
   const ledgerAfterBlocked = await efeonceLedgerToday()

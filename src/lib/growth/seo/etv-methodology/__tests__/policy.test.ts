@@ -84,27 +84,27 @@ describe('TASK-1805 — matriz contractual de 14 familias', () => {
 
 describe('TASK-1805 — configuración cerrada', () => {
   it('ausente → legacy explícito con source=default (nunca provider default)', () => {
-    expect(resolveConfiguredEtvMethodology({} as NodeJS.ProcessEnv)).toMatchObject({
+    expect(resolveConfiguredEtvMethodology({})).toMatchObject({
       version: 'legacy_static_v1',
       source: 'default',
       envName: 'GROWTH_SEO_ETV_METHODOLOGY_VERSION'
     })
-    expect(resolveEtvReadMethodology({} as NodeJS.ProcessEnv)).toMatchObject({ version: 'legacy_static_v1', source: 'default' })
+    expect(resolveEtvReadMethodology({})).toMatchObject({ version: 'legacy_static_v1', source: 'default' })
   })
 
   it('valor válido → env; se normaliza espacios/mayúsculas', () => {
     expect(
-      resolveConfiguredEtvMethodology({ GROWTH_SEO_ETV_METHODOLOGY_VERSION: ' Improved_Layout_Clickstream_V2 ' } as unknown as NodeJS.ProcessEnv)
+      resolveConfiguredEtvMethodology({ GROWTH_SEO_ETV_METHODOLOGY_VERSION: ' Improved_Layout_Clickstream_V2 ' })
     ).toMatchObject({ version: 'improved_layout_clickstream_v2', source: 'env' })
   })
 
   it('valor fuera del vocabulario → falla cerrado (invalid_etv_methodology_config)', () => {
     expectPolicyError(
-      () => resolveConfiguredEtvMethodology({ GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved' } as unknown as NodeJS.ProcessEnv),
+      () => resolveConfiguredEtvMethodology({ GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved' }),
       'invalid_etv_methodology_config'
     )
     expectPolicyError(
-      () => resolveEtvReadMethodology({ GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION: 'unknown_methodology' } as unknown as NodeJS.ProcessEnv),
+      () => resolveEtvReadMethodology({ GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION: 'unknown_methodology' }),
       'invalid_etv_methodology_config'
     )
   })
@@ -112,7 +112,7 @@ describe('TASK-1805 — configuración cerrada', () => {
 
 describe('TASK-1805 — buildEtvMethodologyRequest (fail-closed, endpoint-aware)', () => {
   it('legacy explícito antes del corte → use_improved_etv:false, efectivo legacy, evidencia explicit_request', () => {
-    const request = buildEtvMethodologyRequest({ endpoint: DOMAIN_RANK_OVERVIEW, env: {} as NodeJS.ProcessEnv, now: BEFORE_CUTOFF })
+    const request = buildEtvMethodologyRequest({ endpoint: DOMAIN_RANK_OVERVIEW, env: {}, now: BEFORE_CUTOFF })
 
     expect(request).toMatchObject({
       familySlug: 'domain_rank_overview',
@@ -129,7 +129,7 @@ describe('TASK-1805 — buildEtvMethodologyRequest (fail-closed, endpoint-aware)
   })
 
   it('improved configurado → use_improved_etv:true en todos los endpoints consumidos', () => {
-    const env = { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved_layout_clickstream_v2' } as unknown as NodeJS.ProcessEnv
+    const env = { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved_layout_clickstream_v2' }
 
     for (const family of listEtvLabsFamilies('etv_consumed')) {
       const request = buildEtvMethodologyRequest({ endpoint: family.googleEndpoint, env, now: BEFORE_CUTOFF })
@@ -141,20 +141,20 @@ describe('TASK-1805 — buildEtvMethodologyRequest (fail-closed, endpoint-aware)
 
   it('legacy en o después del corte → legacy_requested_after_cutoff ANTES de la request', () => {
     expectPolicyError(
-      () => buildEtvMethodologyRequest({ endpoint: DOMAIN_RANK_OVERVIEW, env: {} as NodeJS.ProcessEnv, now: AT_CUTOFF }),
+      () => buildEtvMethodologyRequest({ endpoint: DOMAIN_RANK_OVERVIEW, env: {}, now: AT_CUTOFF }),
       'legacy_requested_after_cutoff'
     )
 
     // Un milisegundo antes sigue siendo legacy válido: el corte es un instante, no un día.
     expect(
-      buildEtvMethodologyRequest({ endpoint: DOMAIN_RANK_OVERVIEW, env: {} as NodeJS.ProcessEnv, now: ONE_MS_BEFORE_CUTOFF }).providerEffective
+      buildEtvMethodologyRequest({ endpoint: DOMAIN_RANK_OVERVIEW, env: {}, now: ONE_MS_BEFORE_CUTOFF }).providerEffective
     ).toBe('legacy_static_v1')
   })
 
   it('improved después del corte sigue siendo válido', () => {
     const request = buildEtvMethodologyRequest({
       endpoint: DOMAIN_RANK_OVERVIEW,
-      env: { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved_layout_clickstream_v2' } as unknown as NodeJS.ProcessEnv,
+      env: { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved_layout_clickstream_v2' },
       now: AT_CUTOFF
     })
 
@@ -164,7 +164,7 @@ describe('TASK-1805 — buildEtvMethodologyRequest (fail-closed, endpoint-aware)
   it('familias etv_ignored NO reciben el flag: lanza unsupported_etv_methodology', () => {
     for (const family of listEtvLabsFamilies('etv_ignored')) {
       expectPolicyError(
-        () => buildEtvMethodologyRequest({ endpoint: family.googleEndpoint, env: {} as NodeJS.ProcessEnv, now: BEFORE_CUTOFF }),
+        () => buildEtvMethodologyRequest({ endpoint: family.googleEndpoint, env: {}, now: BEFORE_CUTOFF }),
         'unsupported_etv_methodology'
       )
     }
@@ -173,7 +173,7 @@ describe('TASK-1805 — buildEtvMethodologyRequest (fail-closed, endpoint-aware)
   it('familias sin caller NO se habilitan desde la foundation: lanza y nombra la task dueña', () => {
     for (const family of listEtvLabsFamilies('provider_supported_not_enabled')) {
       try {
-        buildEtvMethodologyRequest({ endpoint: family.googleEndpoint, env: {} as NodeJS.ProcessEnv, now: BEFORE_CUTOFF })
+        buildEtvMethodologyRequest({ endpoint: family.googleEndpoint, env: {}, now: BEFORE_CUTOFF })
       } catch (error) {
         expect((error as EtvMethodologyPolicyError).code).toBe('unsupported_etv_methodology')
         expect((error as EtvMethodologyPolicyError).details.ownerTask).toBe(family.ownerTask)
@@ -186,11 +186,11 @@ describe('TASK-1805 — buildEtvMethodologyRequest (fail-closed, endpoint-aware)
 
   it('endpoint desconocido / no Labs → unsupported_etv_methodology', () => {
     expectPolicyError(
-      () => buildEtvMethodologyRequest({ endpoint: '/v3/serp/google/organic/live/advanced', env: {} as NodeJS.ProcessEnv, now: BEFORE_CUTOFF }),
+      () => buildEtvMethodologyRequest({ endpoint: '/v3/serp/google/organic/live/advanced', env: {}, now: BEFORE_CUTOFF }),
       'unsupported_etv_methodology'
     )
     expectPolicyError(
-      () => buildEtvMethodologyRequest({ endpoint: '/v3/dataforseo_labs/google/keyword_overview/live', env: {} as NodeJS.ProcessEnv, now: BEFORE_CUTOFF }),
+      () => buildEtvMethodologyRequest({ endpoint: '/v3/dataforseo_labs/google/keyword_overview/live', env: {}, now: BEFORE_CUTOFF }),
       'unsupported_etv_methodology'
     )
   })
@@ -200,7 +200,7 @@ describe('TASK-1805 — buildEtvMethodologyRequest (fail-closed, endpoint-aware)
       () =>
         buildEtvMethodologyRequest({
           endpoint: DOMAIN_RANK_OVERVIEW,
-          env: { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'true' } as unknown as NodeJS.ProcessEnv,
+          env: { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'true' },
           now: BEFORE_CUTOFF
         }),
       'invalid_etv_methodology_config'
@@ -210,7 +210,7 @@ describe('TASK-1805 — buildEtvMethodologyRequest (fail-closed, endpoint-aware)
   it('override interno (evaluador) manda sobre la config, sin tocar la config', () => {
     const request = buildEtvMethodologyRequest({
       endpoint: DOMAIN_RANK_OVERVIEW,
-      env: {} as NodeJS.ProcessEnv,
+      env: {},
       now: BEFORE_CUTOFF,
       methodologyOverride: 'improved_layout_clickstream_v2'
     })

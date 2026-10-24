@@ -20,6 +20,8 @@ import type { FormConsentSnapshotRow, FormDestinationRow, FormSubmissionRow } fr
 import { getHubSpotAccessToken } from '@/lib/hubspot/access-token'
 import { createHubSpotFormReceipt, HUBSPOT_SUBMISSION_ID_PROPERTY, type HubSpotFormReceipt } from './receipts'
 
+import type { EnvSource } from '@/types/env-source'
+
 export const HUBSPOT_FORMS_ADAPTER_KIND = 'hubspot_forms_secure_submit' as const
 export const HUBSPOT_FORMS_ADAPTER_VERSION = 'hsforms-v3-secure-submit' as const
 
@@ -37,7 +39,7 @@ export interface HubSpotDeliveryResult {
   retryable: boolean
 }
 
-interface HubSpotDestinationMapping {
+export interface HubSpotDestinationMapping {
   portalId?: string
   formGuid?: string
   /** greenhouse field key → HubSpot property name. */
@@ -46,6 +48,81 @@ interface HubSpotDestinationMapping {
   consentText?: string
   /** Technical property installed in the native form; populated only from the server-generated source ID. */
   submissionIdProperty?: string
+  /**
+   * Suscripciones HubSpot ligadas a casillas explícitas del consentimiento. El publisher
+   * resuelve `text` desde la etiqueta publicada: opcionales en formularios comerciales,
+   * requeridas sólo cuando suscribirse es el propósito del formulario. Una casilla de procesamiento/comunicaciones NUNCA autoriza
+   * publicidad: esto no toca `measurementContext` ni el matching publicitario.
+   */
+  communications?: HubSpotCommunicationMapping[]
+}
+
+/**
+ * Consentimiento → subscription type de HubSpot (communication preferences). Dos fuentes:
+ *   - `checkboxKey`: una casilla del consentimiento que el visitante marcó.
+ *   - `consentBy: 'submission'` (2026-10-24, aprobado por el operador): el acto de suscribirse bajo un aviso visible.
+ *     Sólo para presentaciones `inline_pill` de suscripción: la entrada aplica cuando el snapshot guarda el hash del
+ *     aviso (`notice_text_hash`), que el servidor escribe únicamente si la versión publicada declara ese aviso.
+ */
+export type HubSpotCommunicationMapping = {
+  /** ID del subscription type en HubSpot (`/communication-preferences/v3/definitions`). */
+  subscriptionTypeId: number
+  /** Texto exacto que el visitante vio (la casilla o el aviso). */
+  text: string
+} & ({ /** Key de la casilla en `copy_refs_json.checkboxes`. */ checkboxKey: string; consentBy?: undefined } | { consentBy: 'submission'; checkboxKey?: undefined })
+
+export interface HubSpotCommunicationConsent {
+  value: true
+  subscriptionTypeId: number
+  text: string
+}
+
+const isValidCommunication = (entry: unknown): entry is HubSpotCommunicationMapping => {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return false
+  const candidate = entry as Record<string, unknown>
+
+  const source =
+    candidate.consentBy === 'submission'
+      ? candidate.checkboxKey === undefined
+      : candidate.consentBy === undefined && typeof candidate.checkboxKey === 'string' && candidate.checkboxKey.trim().length > 0
+
+  return (
+    source &&
+    typeof candidate.subscriptionTypeId === 'number' &&
+    Number.isSafeInteger(candidate.subscriptionTypeId) &&
+    candidate.subscriptionTypeId > 0 &&
+    typeof candidate.text === 'string' &&
+    candidate.text.trim().length > 0
+  )
+}
+
+/** `true` si el mapping declara `communications` y alguna entrada es inválida. */
+export const hasInvalidCommunicationsMapping = (mapping: HubSpotDestinationMapping): boolean =>
+  mapping.communications !== undefined &&
+  (!Array.isArray(mapping.communications) || !mapping.communications.every(isValidCommunication))
+
+/**
+ * Suscripciones a enviar: las casillas declaradas en el destino que el visitante MARCÓ (`checkboxes_json` guarda las
+ * keys marcadas) y las de `consentBy: 'submission'` cuando el snapshot prueba que hubo aviso (`notice_text_hash`).
+ * Sin casilla marcada, sin aviso o sin declaración → `[]`.
+ */
+export const resolveHubSpotCommunications = (
+  consent: FormConsentSnapshotRow | null,
+  mapping: HubSpotDestinationMapping,
+): HubSpotCommunicationConsent[] => {
+  if (!consent || !Array.isArray(mapping.communications)) return []
+
+  const checked = new Set(
+    (Array.isArray(consent.checkboxes_json) ? consent.checkboxes_json : []).filter((key): key is string => typeof key === 'string'),
+  )
+
+  const seen = new Set<number>()
+
+  return mapping.communications
+    .filter(isValidCommunication)
+    .filter(entry => (entry.consentBy === 'submission' ? Boolean(consent.notice_text_hash) : checked.has(entry.checkboxKey)))
+    .filter(entry => (seen.has(entry.subscriptionTypeId) ? false : (seen.add(entry.subscriptionTypeId), true)))
+    .map(entry => ({ value: true as const, subscriptionTypeId: entry.subscriptionTypeId, text: entry.text }))
 }
 
 const asMapping = (raw: unknown): HubSpotDestinationMapping =>
@@ -101,7 +178,7 @@ export const buildSecureSubmitBody = (
       consent: {
         consentToProcess: true,
         text: mapping.consentText ?? `Consentimiento otorgado (policy ${consent.consent_policy_version}).`,
-        communications: [],
+        communications: resolveHubSpotCommunications(consent, mapping),
       },
     }
   }
@@ -113,7 +190,7 @@ export interface DeliverInput {
   submission: FormSubmissionRow
   consent: FormConsentSnapshotRow | null
   destination: FormDestinationRow
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 /**
@@ -143,6 +220,12 @@ export const deliverToHubSpotForms = async (input: DeliverInput): Promise<HubSpo
 
   if (mapping.submissionIdProperty !== undefined && !providerReceipt) {
     return { status: 'failed', errorClass: 'invalid_submission_id_mapping', retryable: false, httpStatus: null }
+  }
+
+  // Declaración server-side mal formada: fallar ANTES del POST no idempotente, en vez de entregar
+  // el lead perdiendo en silencio una suscripción que el visitante pidió.
+  if (hasInvalidCommunicationsMapping(mapping)) {
+    return { status: 'failed', errorClass: 'invalid_communications_mapping', retryable: false, httpStatus: null }
   }
 
   if (!Array.isArray(body.fields) || !(body.fields as Array<{ name: string }>).some(field => field.name !== HUBSPOT_SUBMISSION_ID_PROPERTY)) {

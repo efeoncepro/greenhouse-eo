@@ -117,3 +117,27 @@ export const createTelemetryEmitter = (
     },
   }
 }
+
+/**
+ * TASK-2054 — Evento DOM de éxito de un formulario. Burbujea desde el root del renderer y lo escucha
+ * cualquier otra instancia del mismo formulario en la página (`formKey`) para pasar a su estado final
+ * sin volver a enviar. No es telemetría: se emite aunque la política de telemetría esté apagada, y su
+ * `detail` sólo lleva identificadores públicos del formulario (nunca valores de campos ni PII).
+ */
+export const GROWTH_FORM_SUCCESS_EVENT = 'ghf:success'
+
+export interface GrowthFormSuccessDetail {
+  formKey: string
+  formSlug: string
+  instanceId: string
+  registrationStatus?: 'confirmed' | 'waitlisted'
+}
+
+export const dispatchGrowthFormSuccess = (root: HTMLElement, detail: GrowthFormSuccessDetail): void => {
+  const view = root.ownerDocument?.defaultView
+  const EventCtor = view?.CustomEvent ?? (typeof CustomEvent !== 'undefined' ? CustomEvent : null)
+
+  if (!EventCtor) return
+
+  root.dispatchEvent(new EventCtor<GrowthFormSuccessDetail>(GROWTH_FORM_SUCCESS_EVENT, { detail, bubbles: true, composed: true }))
+}

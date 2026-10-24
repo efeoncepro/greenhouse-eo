@@ -28,6 +28,8 @@ import {
 } from '@/lib/growth/public-submission'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import type { EnvSource } from '@/types/env-source'
+
 // Re-export de los tipos del core compartido: un solo nominal type para ambos consumers.
 export type { AbuseDecision, IntakeBlockOutcome, IntakeLimits }
 
@@ -47,7 +49,7 @@ export const hashIdentifier = (value: string | null): string | null => hashIdent
 /** Estimación conservadora del costo de un run público (`light`) para el budget pre-check. */
 export const ESTIMATED_PUBLIC_RUN_COST_USD = 0.1
 
-export const resolveIntakeLimits = (env: NodeJS.ProcessEnv = process.env): IntakeLimits => ({
+export const resolveIntakeLimits = (env: EnvSource = process.env): IntakeLimits => ({
   perEmailPerDay: Number(env.GROWTH_AI_VISIBILITY_PUBLIC_PER_EMAIL_PER_DAY) || 3,
   perIpPerDay: Number(env.GROWTH_AI_VISIBILITY_PUBLIC_PER_IP_PER_DAY) || 10,
   globalDailyBudgetUsd: Number(env.GROWTH_AI_VISIBILITY_PUBLIC_DAILY_BUDGET_USD) || 25,

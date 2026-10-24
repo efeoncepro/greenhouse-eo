@@ -1,11 +1,22 @@
 # Reference — Medición GTM + GA4 + Meta CAPI (Efeonce/Greenhouse)
 
-Checkpoint18/10: [activación publicada](../../audits/growth/2026-10-18-google-ads-activation.md),
-Web6/Server10, EC ON, Performance/Discovery y tracing HubSpot/Meta configurados; primera recepción y
-atribución pendientes. [Cobertura comercial](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md):
-12 propuestas dry-run validadas sin publicar; Lead Gen - Web requiere corrección canónica de tipo.
-Ebooks/careers/newsletter/support/tests quedan fuera de la ampliación solicitada. Los cortes16/10 y
-anteriores de este índice son historia; para operar leer el runtime10 y los manuales vigentes.
+Checkpoint 19/10/2026, 02:55 UTC (18/10 Chile): [release completo publicado](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md)
+en main `2559e9242`, manifest released, CI/Deep/smoke, health y watchdog verdes. La relectura conserva
+**13 Forms comerciales + Discovery**, Web **6** / Server **10** y EC ON. Grader es comercial; Contacto
+general, ebooks, careers, newsletter, soporte y fixtures quedan fuera de Ads. Lead Gen Web ya está
+corregido a quote_request; su API de mantenimiento auditada y la compatibilidad Grader están publicadas.
+[Políticas por fuente](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md),
+[clasificación](../../architecture/GROWTH_FORMS_COMMERCIAL_CLASSIFICATION_CORRECTION_V1.md) y
+[Grader](../../architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
+Primera recepción comercial real, matching y atribución siguen sin verificar; no se generaron leads
+ni reservas ficticias. Los cortes anteriores se conservan como historia; para operar leer el runtime10
+y los manuales vigentes. No reejecutar los planes privados históricos de publicación/corrección.
+
+Delta 23/10/2026: el contenedor web `GTM-NGHPGRLZ` está publicado en la **versión 10** (la 7 era «Blog Glitch
+subscription sign_up 2026-10-20»; la 8 suma `gh_landing_dock_clicked`, la 9 los `gh_site_nav_*` del menú global y la
+10 `target_label` y `target_url` en el clic del menú). El servidor `GTM-K2X4ZTTK` sigue en su versión 10 del
+2026-10-18: la numeración de los dos contenedores es independiente. GA4 suma seis dimensiones de evento (15/50).
+Ninguno de estos eventos es key event. [Registro](TRACKING-PLAN.md#ctas) y [aprendizajes](LEARNINGS.md).
 
 
 > **Referencia canónica de medición.** Una sola copia, leída por Claude, Codex, humanos y Nexa. Las skills (`growth-marketing-cro`, `greenhouse-growth-forms`, `digital-marketing`, `efeonce-public-site-wordpress`) apuntan aquí — no duplican.
@@ -19,7 +30,8 @@ Al instrumentar, medir, taggear o razonar sobre eventos/conversiones de cualquie
 
 | Doc | Qué cubre |
 |---|---|
-| [Arquitectura Google Ads](../../architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md) | Dirección aceptada 17/10/2026: Ads API, GTM web/server y CRM; identidad, consentimiento, emisor único y rollout. Acceso de operador probado a `6862539491`; integración de producto y conversiones pendientes. |
+| [LinkedIn: Insight Tag y CAPI](11-linkedin-insight-tag-conversions-api.md) | Discovery oficial19/10/2026: IDs, consentimiento, dedupe, templates y CRM. Propuesta; no instalado ni conexión de cuenta verificada. |
+| [Arquitectura Google Ads](../../architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md) | Ads API/CLI, GTM web/server y CRM; identidad, consentimiento y emisor único. Online publicado en `6862539491` para 13 Forms comerciales + Discovery; recepción/atribución real y conexión multiorganización conservan evidencia y gates propios. |
 | **[TRACKING-PLAN.md](TRACKING-PLAN.md)** | **Registro vivo OBLIGATORIO** de forms & CTAs con su estado de tagging. Leer antes de crear un form/CTA; registrar su fila al crearlo (taggeado o no). |
 | **[LEARNINGS.md](LEARNINGS.md)** | Build-log de aprendizajes reales operando GTM/GA4 en runtime (gotchas verificados). Leer antes de construir tags. |
 | `container-snapshot.json` | Snapshot normalizado del config live del container **web** `GTM-NGHPGRLZ` (cuenta `6291647045`, container `218104216`). Lo escribe `pnpm gtm:snapshot`; diff en git + drift detection. Estrategia: ADR `GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1`. |
@@ -53,6 +65,10 @@ Estado 2026-10-16 (commits `e791942ea` y `5d28dda76` en `develop`, sin push al c
   `scripts/gtm/snapshot-lib.ts` + `scripts/gtm/__tests__/snapshot-lib.test.ts`; entrypoint
   `scripts/gtm/snapshot.ts`.
 - `scripts/gtm/build-cta-events-workspace.ts --publish` reescribe ambos snapshots tras publicar.
+- `scripts/gtm/build-landing-dock-events-workspace.ts` (dock de las landings, versión 8) y
+  `scripts/gtm/build-site-nav-events-workspace.ts` (menú global, versiones 9 y 10) siguen el mismo patrón: sin
+  `--publish` arman y compilan el workspace (quick_preview); con `--publish` versionan, publican y reescriben ambos
+  snapshots. El del menú actualiza un tag existente (PUT con fingerprint) cuando cambian sus parámetros.
 - **Chequeo diario**: `.github/workflows/gtm-drift.yml` (12:00 UTC + `workflow_dispatch`) corre
   `--check` y **falla si hay drift**; la falla es la alerta. Clasificación tooling, no
   async-critical. Se autentica por WIF directamente como `greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com`
@@ -83,7 +99,7 @@ Pendiente decidido por el operador: el token Meta sigue literal en el tag servid
 Consentimiento HubSpot y sender publicado: [09-hubspot-consent.md](09-hubspot-consent.md);
 lectura funcional del [panel de cookies](../../documentation/growth/medicion-gtm-ga4.md#cookies-y-preferencias-del-visitante)
 y [manual de operación](../../manual-de-uso/growth/operar-consentimiento-cookies-publico.md).
-Estado verificado **14/10: Server9/Web5**, backend único de Lead, contexto original del visitante,
+Corte histórico **14/10: Server9/Web5** (versiones actuales en el checkpoint superior), backend único de Lead, contexto original del visitante,
 Google UPD y políticas administrables por API/panel/CLI en [contrato de runtime](10-growth-lead-matching-runtime.md).
 La [referencia API interna](../../api/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md) define discovery,
 dry-run, comandos, permisos y recuperación; el [manual de agentes](../../manual-de-uso/growth/configurar-medicion-conversiones.md)

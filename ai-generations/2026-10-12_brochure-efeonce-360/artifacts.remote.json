@@ -1,0 +1,881 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:54:10.790Z",
+  "run": "ai-generations/2026-10-12_brochure-efeonce-360",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-12_brochure-efeonce-360",
+  "totalBytes": 120827890,
+  "fileCount": 145,
+  "files": [
+    {
+      "path": "caso-anam/base-cine2.png",
+      "sizeBytes": 2841961,
+      "sha256": "1f8edaec7386aa057d66dfbab6b532995cabc9c02b17ae6c772a070e42e0c0f8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-anam/base-cine2.png"
+    },
+    {
+      "path": "caso-anam/base-v1.png",
+      "sizeBytes": 3035650,
+      "sha256": "b122a42892f4f84ef0ad787f3dfc6633fdeb78e82bc146c80992e79ecaa778af",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-anam/base-v1.png"
+    },
+    {
+      "path": "caso-anam/final-card.png",
+      "sizeBytes": 4859777,
+      "sha256": "f78e8115714685ce13e970e273f1e1d9c7b32532b63d2419032a7394b9422b39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-anam/final-card.png"
+    },
+    {
+      "path": "caso-anam/final-cine.png",
+      "sizeBytes": 4681842,
+      "sha256": "515ac3c9ec6de84a6fc7df7799049b02ea62789b1a0a0c3bdb0cdf4cd62bb461",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-anam/final-cine.png"
+    },
+    {
+      "path": "caso-berel/acabado-v1.png",
+      "sizeBytes": 3182940,
+      "sha256": "d9fee4c6bdf901fec795e7c4a0d06fa91b1b43d4a32671cca5f9e3415e7a5f8e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-berel/acabado-v1.png"
+    },
+    {
+      "path": "caso-berel/base-v1.png",
+      "sizeBytes": 2874241,
+      "sha256": "5ffe1189e8255ce10ca08817e2457746fa821af49dd68a5a620dd9181e3e78a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-berel/base-v1.png"
+    },
+    {
+      "path": "caso-berel/comp.png",
+      "sizeBytes": 4229328,
+      "sha256": "495e97f823c50fa3a48e410ef604136aa0cbd9f0117836b71a060160cfc082cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-berel/comp.png"
+    },
+    {
+      "path": "caso-berel/final.png",
+      "sizeBytes": 4444685,
+      "sha256": "3c47d4d5a81d0a248ba00539f08f79634913f3b44b97225af32565291c50cc1b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-berel/final.png"
+    },
+    {
+      "path": "caso-sky/acabado-cine.png",
+      "sizeBytes": 2678174,
+      "sha256": "7c46ba487c3a0a5fa65cfdec0bcc1959a74eee815abeceb3b96caadb47b9a392",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-sky/acabado-cine.png"
+    },
+    {
+      "path": "caso-sky/base-cine.png",
+      "sizeBytes": 2444724,
+      "sha256": "99817aaa52712629e893aca07d584678f909ce083a32bd9f3054fe7e1ff25ba9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-sky/base-cine.png"
+    },
+    {
+      "path": "caso-sky/comp-cine.png",
+      "sizeBytes": 4836183,
+      "sha256": "5a4cf1a2a9441753c22fd2bcdf0ea2a1bac4e97695816f8bd13f6748deda364e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-sky/comp-cine.png"
+    },
+    {
+      "path": "caso-sky/final-cine.png",
+      "sizeBytes": 4899041,
+      "sha256": "45d1575967d4dc7936acfdcd131c040cc90a9c6e34b79dce22aded738095b67b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/caso-sky/final-cine.png"
+    },
+    {
+      "path": "channel-commerce/brio-activacion-plaza-v1-lata-gigante.png",
+      "sizeBytes": 4740632,
+      "sha256": "796ec29c7fafce1dd20f5c74692646c26a36204271bb31a16f0e66ff8d49cc87",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/brio-activacion-plaza-v1-lata-gigante.png"
+    },
+    {
+      "path": "channel-commerce/brio-activacion-plaza.png",
+      "sizeBytes": 4874593,
+      "sha256": "c2df51c720cffab695ab382a8611776fd8bbd2a63f80d12e9c58bbd74ccc0cba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/brio-activacion-plaza.png"
+    },
+    {
+      "path": "channel-commerce/brio-gondola-auditoria.png",
+      "sizeBytes": 3095208,
+      "sha256": "084d0b41657d5ac8eba8d60ee722a79a5de5c37442631044907805fbe9e04f67",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/brio-gondola-auditoria.png"
+    },
+    {
+      "path": "channel-commerce/btl/b1-sala.png",
+      "sizeBytes": 1421152,
+      "sha256": "dada9c1afb2bc2c88b7138b1c5d3323d6c591a3dd88e7b504fb8f026a4e266d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/btl/b1-sala.png"
+    },
+    {
+      "path": "channel-commerce/btl/b2-impulso.png",
+      "sizeBytes": 1599696,
+      "sha256": "7ea723505ab588de77709aac9d29170b8edeee7c4278cdb2f0317c78ce0a36be",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/btl/b2-impulso.png"
+    },
+    {
+      "path": "channel-commerce/btl/b3-exhibicion.png",
+      "sizeBytes": 1445442,
+      "sha256": "4111ac49937c751c67f034b2b4c7db98f2549a3d5adfee700d53957c90415631",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/btl/b3-exhibicion.png"
+    },
+    {
+      "path": "channel-commerce/btl/b4-roadshow.png",
+      "sizeBytes": 1563754,
+      "sha256": "a4fdc7e53969fa21e1e24b9dcc91e9f15782cda66882da92e4f720225a347dc4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/btl/b4-roadshow.png"
+    },
+    {
+      "path": "channel-commerce/btl/b5-street.png",
+      "sizeBytes": 1460599,
+      "sha256": "79969fe9593405c467783dbf24f0d84aba428fcc64afbf843bc38be00bac7c8c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/btl/b5-street.png"
+    },
+    {
+      "path": "channel-commerce/btl/b6-popup.png",
+      "sizeBytes": 1394222,
+      "sha256": "7857dcb1d80b9ea5a8b252460058f9d15ea169f449186324042ff9083d244536",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/btl/b6-popup.png"
+    },
+    {
+      "path": "channel-commerce/btl/b7-patrocinio.png",
+      "sizeBytes": 1483887,
+      "sha256": "287ec4d67e8d80c6e8d5aa7b5c2829d0ce0e5871303178e51da1110b54a82015",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/btl/b7-patrocinio.png"
+    },
+    {
+      "path": "channel-commerce/btl/b8-feria.png",
+      "sizeBytes": 1430285,
+      "sha256": "7b2d8e04ea43d40b4827b5a7ca426113352b7c629ee9d038b9ce9764e8e70023",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/btl/b8-feria.png"
+    },
+    {
+      "path": "channel-commerce/btl/b9-canal.png",
+      "sizeBytes": 1549692,
+      "sha256": "c151f44279a8815fa0909a1dabc5f36a1c9959b5d80e2a0e384b9a538a948d84",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/btl/b9-canal.png"
+    },
+    {
+      "path": "growth-plate/HW1b-mismo-trabajo-sin-lanyard.png",
+      "sizeBytes": 2607461,
+      "sha256": "11668395e0562d7c3062b50367b1cd96f14d205d493a0855a16ef4f4ca94e512",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/growth-plate/HW1b-mismo-trabajo-sin-lanyard.png"
+    },
+    {
+      "path": "growth-plate/inpaint/de3eff6c887a/candidate-1-diff.png",
+      "sizeBytes": 127496,
+      "sha256": "3b18341cf1bff10d80748a13e62c7cecaa100197fa803f6fdaf459ce5b374c0b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/growth-plate/inpaint/de3eff6c887a/candidate-1-diff.png"
+    },
+    {
+      "path": "growth-plate/inpaint/de3eff6c887a/candidate-1.png",
+      "sizeBytes": 2607461,
+      "sha256": "11668395e0562d7c3062b50367b1cd96f14d205d493a0855a16ef4f4ca94e512",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/growth-plate/inpaint/de3eff6c887a/candidate-1.png"
+    },
+    {
+      "path": "growth-plate/inpaint/de3eff6c887a/mask-preview.png",
+      "sizeBytes": 2693310,
+      "sha256": "447c839f8a19b4bde481149da49f20c88169574c9762d0d2a6177b145c89e629",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/growth-plate/inpaint/de3eff6c887a/mask-preview.png"
+    },
+    {
+      "path": "intents/compuestas.jpg",
+      "sizeBytes": 432972,
+      "sha256": "d10579053ea0801be10e18731026b283a3a8e670d47765c335d45aa362f3b46f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/intents/compuestas.jpg"
+    },
+    {
+      "path": "intents/out/a01-portada/01-deck-cover-brochure.png",
+      "sizeBytes": 1390212,
+      "sha256": "9121984e01c3645f6728ee7a7fac7594249ada3fb8f5b99a6916758d2c3a0f48",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/intents/out/a01-portada/01-deck-cover-brochure.png"
+    },
+    {
+      "path": "intents/out/a03-mercado-ia/01-deck-decision-ai-market.png",
+      "sizeBytes": 941581,
+      "sha256": "b8d8fe73e04c692db49066bb89b3f43bfe1d82c841e3ad0c0541a0a7683c01f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/intents/out/a03-mercado-ia/01-deck-decision-ai-market.png"
+    },
+    {
+      "path": "intents/out/a07-growth/01-deck-proposal-cinematic.png",
+      "sizeBytes": 1330656,
+      "sha256": "47bec295ec8255754b0ceed29d3fafb289940b25dfc0fb9ff8fb8a55192a4652",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/intents/out/a07-growth/01-deck-proposal-cinematic.png"
+    },
+    {
+      "path": "intents/out/a14-voice/01-deck-proposal-cinematic.png",
+      "sizeBytes": 1451981,
+      "sha256": "86513c53943cfed917416db307bf313d4152e941e2ec39347185e674e6412aff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/intents/out/a14-voice/01-deck-proposal-cinematic.png"
+    },
+    {
+      "path": "intents/out/a21-medimos/01-deck-content-measure-formulas.png",
+      "sizeBytes": 801508,
+      "sha256": "237d9fa68b00a1620ac520195f7f0faba3ade687e4cdc10d416a90c9ed00d3d0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/intents/out/a21-medimos/01-deck-content-measure-formulas.png"
+    },
+    {
+      "path": "intents/out/a29-riesgo/01-deck-decision-risk.png",
+      "sizeBytes": 186739,
+      "sha256": "b6dd0170f3ff84a9994737dd174489104e6c964459b98aca86cc6f7ada7383b0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/intents/out/a29-riesgo/01-deck-decision-risk.png"
+    },
+    {
+      "path": "laminas-corto/01-Main-portada-que-gano-con-efeonce-crecimiento.jpg",
+      "sizeBytes": 341813,
+      "sha256": "9a94f50c9c8751c6c4925b5f02da228d3b9a0c59add0370dca5a9f5676f3acef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/01-Main-portada-que-gano-con-efeonce-crecimiento.jpg"
+    },
+    {
+      "path": "laminas-corto/02-V02-la-idea-tu-cliente-da-vueltas-alrededor-.jpg",
+      "sizeBytes": 224282,
+      "sha256": "df65c46b25b2a4530b887ebc6ff8fa780d6ba560b0608c0dda38b7fc7db4bb55",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/02-V02-la-idea-tu-cliente-da-vueltas-alrededor-.jpg"
+    },
+    {
+      "path": "laminas-corto/03-V03-por-que-360-hoy-cada-momento-lo-atiende-un-proveedor-diferente.jpg",
+      "sizeBytes": 262290,
+      "sha256": "76cd3025423e2ee03b65dee63cd24198233ee59a654917f6b1c0cdec96bb3623",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/03-V03-por-que-360-hoy-cada-momento-lo-atiende-un-proveedor-diferente.jpg"
+    },
+    {
+      "path": "laminas-corto/04-V04-cinco-momentos-un-equipo-una-vuelta-cinc.jpg",
+      "sizeBytes": 226756,
+      "sha256": "eff746034d9f02d7815f3e8c8aba9f72969f7e3e1e57603a3ca4196fa3238b6e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/04-V04-cinco-momentos-un-equipo-una-vuelta-cinc.jpg"
+    },
+    {
+      "path": "laminas-corto/05-IDX-indice-todo-el-recorrido.jpg",
+      "sizeBytes": 171478,
+      "sha256": "6c0fa85eddc46efa3af8b1f59fd04d9308aaf2a8caba3bebea41fff45682308f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/05-IDX-indice-todo-el-recorrido.jpg"
+    },
+    {
+      "path": "laminas-corto/06-QSM-quienes-somos-un-solo-equipo.jpg",
+      "sizeBytes": 361751,
+      "sha256": "5850a3a72405c25cfb7e63198f4921ff0e06f841f6c746db2de8cb56b09c212c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/06-QSM-quienes-somos-un-solo-equipo.jpg"
+    },
+    {
+      "path": "laminas-corto/07-C01-tramo-01-engine-te-encuentra-la-ia-ahora.jpg",
+      "sizeBytes": 405060,
+      "sha256": "c6cb7be678ecb4a49e529b2255c3308572e20521bd5531c973d72fb714022796",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/07-C01-tramo-01-engine-te-encuentra-la-ia-ahora.jpg"
+    },
+    {
+      "path": "laminas-corto/08-V06-engine-la-ia-ya-recomienda-a-tu-competen.jpg",
+      "sizeBytes": 260622,
+      "sha256": "0cc0e674849cea557716b3f6395e3e3f61e3fbbe1dba2ae0eb6d9c0785c1f4f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/08-V06-engine-la-ia-ya-recomienda-a-tu-competen.jpg"
+    },
+    {
+      "path": "laminas-corto/09-S28-caso-berel.jpg",
+      "sizeBytes": 603853,
+      "sha256": "5e9e218bcdda354534101a63515670f0f4c24d177cb4123f79e1f5d866fafc23",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/09-S28-caso-berel.jpg"
+    },
+    {
+      "path": "laminas-corto/10-C02-tramo-02-brand-quien-crea-mi-contenido-t.jpg",
+      "sizeBytes": 407763,
+      "sha256": "8985938d2755deadea764fd01214b30f03d360d6e1d537246ec5f7ac312cf1e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/10-C02-tramo-02-brand-quien-crea-mi-contenido-t.jpg"
+    },
+    {
+      "path": "laminas-corto/11-K13-brand-seis-capacidades-un-solo-equipo.jpg",
+      "sizeBytes": 317345,
+      "sha256": "e59d312c6dbf27ac89d2febb285a221ad07c7b5d045adc22b75d25bdd30ae7db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/11-K13-brand-seis-capacidades-un-solo-equipo.jpg"
+    },
+    {
+      "path": "laminas-corto/12-S27-caso-sky-lo-han-hecho-a-escala-si-con-sk.jpg",
+      "sizeBytes": 516367,
+      "sha256": "e111e758009c426ef0952f066c96b4d217459de18cca39502dec753a48f4a735",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/12-S27-caso-sky-lo-han-hecho-a-escala-si-con-sk.jpg"
+    },
+    {
+      "path": "laminas-corto/13-CC1-brand-channel-commerce-te-viven.jpg",
+      "sizeBytes": 641674,
+      "sha256": "00e20f0cbd2f7ba2dca5daf0ba4a056885b077997fafe38d46796ef4be307ad5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/13-CC1-brand-channel-commerce-te-viven.jpg"
+    },
+    {
+      "path": "laminas-corto/14-C03-tramo-03-voice-donde-invierto-donde-rind.jpg",
+      "sizeBytes": 325985,
+      "sha256": "302f3786afc5a43a1c1bf4c49f44033347b32b4386c8f62ea5e78254298f166d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/14-C03-tramo-03-voice-donde-invierto-donde-rind.jpg"
+    },
+    {
+      "path": "laminas-corto/15-D03-voice-todo-el-ciclo.jpg",
+      "sizeBytes": 235877,
+      "sha256": "06a67edae06a93775f7272199bb15d9520e9b5f393040e2addd768e56cdad04b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/15-D03-voice-todo-el-ciclo.jpg"
+    },
+    {
+      "path": "laminas-corto/16-C04-tramo-04-revenue-cuando-veo-mi-pipeline-.jpg",
+      "sizeBytes": 455563,
+      "sha256": "1709f67711c832c61c1f7d1aec401b5a9180f93fdbc6041a47c4c408f1bb10dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/16-C04-tramo-04-revenue-cuando-veo-mi-pipeline-.jpg"
+    },
+    {
+      "path": "laminas-corto/17-R19-revenue-sigo-llenando-el-crm-ya-no.jpg",
+      "sizeBytes": 334152,
+      "sha256": "e4fed00151448df2c22cec5422c8e65fd9c26056b26aba2397e255d04f1e8e49",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/17-R19-revenue-sigo-llenando-el-crm-ya-no.jpg"
+    },
+    {
+      "path": "laminas-corto/18-ANM-revenue-caso-anam-tiempo.jpg",
+      "sizeBytes": 412665,
+      "sha256": "fa65798b11c2238b7fe8ce91e50df0469c20068d71aa7eae81c8bc0c019cd9a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/18-ANM-revenue-caso-anam-tiempo.jpg"
+    },
+    {
+      "path": "laminas-corto/19-C05-tramo-05-growth-lo-medimos-siempre-plate.jpg",
+      "sizeBytes": 301428,
+      "sha256": "d336c1b58e1b99d9bf056a04e4189712faadeb07b674ef7d33e7a941956670a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/19-C05-tramo-05-growth-lo-medimos-siempre-plate.jpg"
+    },
+    {
+      "path": "laminas-corto/20-INSG-growth-insights-cada-dato-su-grafico.jpg",
+      "sizeBytes": 300255,
+      "sha256": "ff8fd34302a82d7e89fa3d8be87a5959e4a82325c4cf280a4eab3baf46174e38",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/20-INSG-growth-insights-cada-dato-su-grafico.jpg"
+    },
+    {
+      "path": "laminas-corto/21-V17-como-lo-vives-personas-con-nombre-con-agentes.jpg",
+      "sizeBytes": 244019,
+      "sha256": "18b4735012af09bf32f1a755b530bd4e89995592a88aa13ea28c4619949ae434",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/21-V17-como-lo-vives-personas-con-nombre-con-agentes.jpg"
+    },
+    {
+      "path": "laminas-corto/22-V18-como-lo-vives-trabajas-con-nosotros-en-vivo.jpg",
+      "sizeBytes": 247962,
+      "sha256": "cdcc004ab181d1ffde95aaa74c0a905c332f16d21ae75017bd1cba12864ace28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/22-V18-como-lo-vives-trabajas-con-nosotros-en-vivo.jpg"
+    },
+    {
+      "path": "laminas-corto/23-S25-con-quien-trabajan-90-empresas.jpg",
+      "sizeBytes": 250684,
+      "sha256": "03b95a2e990dba5d0fc8647546b363a6d67e80765d24e89ac94e1a2b4d6e2601",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/23-S25-con-quien-trabajan-90-empresas.jpg"
+    },
+    {
+      "path": "laminas-corto/24-S30-y-si-no-funciona-empiezas-chico.jpg",
+      "sizeBytes": 274923,
+      "sha256": "a45078ed68031a48a4db19048a462b1a3afbdb0bacc0b269db64cbb037937f27",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/24-S30-y-si-no-funciona-empiezas-chico.jpg"
+    },
+    {
+      "path": "laminas-corto/25-S32-empecemos.jpg",
+      "sizeBytes": 205156,
+      "sha256": "6b7258cc83d639726765eeca60377cd82e3ebebc463a1abc089f243295792727",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/25-S32-empecemos.jpg"
+    },
+    {
+      "path": "laminas-corto/26-S33-conversamos-cuando-quieras.jpg",
+      "sizeBytes": 143650,
+      "sha256": "c8187c4449a9892aaabe57c9b85d0125db7782d166734f04e899ddc5b518f939",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-corto/26-S33-conversamos-cuando-quieras.jpg"
+    },
+    {
+      "path": "laminas-v9/01-Main-portada-que-gano-con-efeonce-crecimiento.jpg",
+      "sizeBytes": 341813,
+      "sha256": "9a94f50c9c8751c6c4925b5f02da228d3b9a0c59add0370dca5a9f5676f3acef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/01-Main-portada-que-gano-con-efeonce-crecimiento.jpg"
+    },
+    {
+      "path": "laminas-v9/02-V02-la-idea-tu-cliente-da-vueltas-alrededor-.jpg",
+      "sizeBytes": 224282,
+      "sha256": "df65c46b25b2a4530b887ebc6ff8fa780d6ba560b0608c0dda38b7fc7db4bb55",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/02-V02-la-idea-tu-cliente-da-vueltas-alrededor-.jpg"
+    },
+    {
+      "path": "laminas-v9/03-V03-por-que-360-hoy-cada-momento-lo-atiende-un-proveedor-diferente.jpg",
+      "sizeBytes": 262290,
+      "sha256": "76cd3025423e2ee03b65dee63cd24198233ee59a654917f6b1c0cdec96bb3623",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/03-V03-por-que-360-hoy-cada-momento-lo-atiende-un-proveedor-diferente.jpg"
+    },
+    {
+      "path": "laminas-v9/04-V04-cinco-momentos-un-equipo-una-vuelta-cinc.jpg",
+      "sizeBytes": 226756,
+      "sha256": "eff746034d9f02d7815f3e8c8aba9f72969f7e3e1e57603a3ca4196fa3238b6e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/04-V04-cinco-momentos-un-equipo-una-vuelta-cinc.jpg"
+    },
+    {
+      "path": "laminas-v9/05-IDX-indice-todo-el-recorrido.jpg",
+      "sizeBytes": 171777,
+      "sha256": "942944ac308600017b86122b9c0bc6700129324db6e4390d88ad18af985c18dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/05-IDX-indice-todo-el-recorrido.jpg"
+    },
+    {
+      "path": "laminas-v9/06-QSM-quienes-somos-un-solo-equipo.jpg",
+      "sizeBytes": 361751,
+      "sha256": "5850a3a72405c25cfb7e63198f4921ff0e06f841f6c746db2de8cb56b09c212c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/06-QSM-quienes-somos-un-solo-equipo.jpg"
+    },
+    {
+      "path": "laminas-v9/07-C01-tramo-01-engine-te-encuentra-la-ia-ahora.jpg",
+      "sizeBytes": 405060,
+      "sha256": "c6cb7be678ecb4a49e529b2255c3308572e20521bd5531c973d72fb714022796",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/07-C01-tramo-01-engine-te-encuentra-la-ia-ahora.jpg"
+    },
+    {
+      "path": "laminas-v9/08-W05-engine-tu-capa-digital.jpg",
+      "sizeBytes": 364053,
+      "sha256": "63adb9988d39e9ab8b0dfc843ecb2ea1dc93ba02950d3105001092106da66122",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/08-W05-engine-tu-capa-digital.jpg"
+    },
+    {
+      "path": "laminas-v9/09-V06-engine-la-ia-ya-recomienda-a-tu-competen.jpg",
+      "sizeBytes": 260622,
+      "sha256": "0cc0e674849cea557716b3f6395e3e3f61e3fbbe1dba2ae0eb6d9c0785c1f4f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/09-V06-engine-la-ia-ya-recomienda-a-tu-competen.jpg"
+    },
+    {
+      "path": "laminas-v9/10-V07-engine-el-seo-termina-en-ingresos-no-en-.jpg",
+      "sizeBytes": 230010,
+      "sha256": "f85b01cd23776a23f9b2cbdd3fbf594c74139bcd6a03381b34f42c01e9d432b4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/10-V07-engine-el-seo-termina-en-ingresos-no-en-.jpg"
+    },
+    {
+      "path": "laminas-v9/11-Z06-engine-cuatro-piezas.jpg",
+      "sizeBytes": 202172,
+      "sha256": "dfc5db399c4558c3a6b77d6639b0dc60a734e29def47f6337c632b7de32a2380",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/11-Z06-engine-cuatro-piezas.jpg"
+    },
+    {
+      "path": "laminas-v9/12-Z08-engine-todo-esto.jpg",
+      "sizeBytes": 262704,
+      "sha256": "953e94d44b594d6377095b0b5250a863e6324f4414a34ee57284ba9f649501ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/12-Z08-engine-todo-esto.jpg"
+    },
+    {
+      "path": "laminas-v9/13-Z10-engine-porque-confia.jpg",
+      "sizeBytes": 241282,
+      "sha256": "97d3bc75bbe4070b8d56a7975a1eac9acb26d376a84df32c656a0d25947c9bcb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/13-Z10-engine-porque-confia.jpg"
+    },
+    {
+      "path": "laminas-v9/14-Z11-engine-entre-miles.jpg",
+      "sizeBytes": 361946,
+      "sha256": "a337211360ad112f9f0cb78f348f84508d2dea20959f4560bed0c79efb2bd41c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/14-Z11-engine-entre-miles.jpg"
+    },
+    {
+      "path": "laminas-v9/15-Z22-engine-el-mapa.jpg",
+      "sizeBytes": 245311,
+      "sha256": "fa9ec1dc9db04c659484ee706e8cfe47ddf9284b97cff6d18e9ddc02bdfefc68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/15-Z22-engine-el-mapa.jpg"
+    },
+    {
+      "path": "laminas-v9/16-W06-engine-una-web-tres-lectores.jpg",
+      "sizeBytes": 406585,
+      "sha256": "402e966d7e27036de8d9f818abaebbe032c76d4a2137dd7ea2a3038c011cb962",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/16-W06-engine-una-web-tres-lectores.jpg"
+    },
+    {
+      "path": "laminas-v9/17-WX-engine-web-experience-360.jpg",
+      "sizeBytes": 298731,
+      "sha256": "7c0fa46689568afc51783a525e866d4da48149cc6de9d25dbc8f0759336527a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/17-WX-engine-web-experience-360.jpg"
+    },
+    {
+      "path": "laminas-v9/18-W13-engine-tu-equipo-de-diseno-ampliado.jpg",
+      "sizeBytes": 375713,
+      "sha256": "294d053ed92058a87f0e43b965a7aa01c3812c8375d6aed6160e758ae59897e5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/18-W13-engine-tu-equipo-de-diseno-ampliado.jpg"
+    },
+    {
+      "path": "laminas-v9/19-W11-engine-agentes-que-trabajan-contigo.jpg",
+      "sizeBytes": 432096,
+      "sha256": "b5c824ebd69cf8f2330d00827e3c13112b24f58784f6cbd97d59c1a92cf38e75",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/19-W11-engine-agentes-que-trabajan-contigo.jpg"
+    },
+    {
+      "path": "laminas-v9/20-S28-caso-berel.jpg",
+      "sizeBytes": 603853,
+      "sha256": "5e9e218bcdda354534101a63515670f0f4c24d177cb4123f79e1f5d866fafc23",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/20-S28-caso-berel.jpg"
+    },
+    {
+      "path": "laminas-v9/21-C02-tramo-02-brand-quien-crea-mi-contenido-t.jpg",
+      "sizeBytes": 407763,
+      "sha256": "8985938d2755deadea764fd01214b30f03d360d6e1d537246ec5f7ac312cf1e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/21-C02-tramo-02-brand-quien-crea-mi-contenido-t.jpg"
+    },
+    {
+      "path": "laminas-v9/22-S08-brand-tu-equipo-dirige-nosotros-producim.jpg",
+      "sizeBytes": 416663,
+      "sha256": "97babb7241dd6a1b75914153d79e8d88e3e052b6bcbef9a858b6fa23a8dd616d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/22-S08-brand-tu-equipo-dirige-nosotros-producim.jpg"
+    },
+    {
+      "path": "laminas-v9/23-K13-brand-seis-capacidades-un-solo-equipo.jpg",
+      "sizeBytes": 317345,
+      "sha256": "e59d312c6dbf27ac89d2febb285a221ad07c7b5d045adc22b75d25bdd30ae7db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/23-K13-brand-seis-capacidades-un-solo-equipo.jpg"
+    },
+    {
+      "path": "laminas-v9/24-M04-brand-todo-lo-social-un-solo-squad.jpg",
+      "sizeBytes": 348358,
+      "sha256": "b78a31cf8ad67f5dde5c8fc809a9b4b6a0046029e8bea86d01a96f84ccb59cbf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/24-M04-brand-todo-lo-social-un-solo-squad.jpg"
+    },
+    {
+      "path": "laminas-v9/25-T12-brand-los-creadores-correctos.jpg",
+      "sizeBytes": 311292,
+      "sha256": "281ee4158dc3a3240d7a68f7d0a29dfc5878f36c1db975da8deb7da7d75b92dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/25-T12-brand-los-creadores-correctos.jpg"
+    },
+    {
+      "path": "laminas-v9/26-T33-brand-creadores-que-se-quedan.jpg",
+      "sizeBytes": 366274,
+      "sha256": "11e91140ed5d5352b214fe9d249816747c17baf2e411f14e69edbccd25f6495a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/26-T33-brand-creadores-que-se-quedan.jpg"
+    },
+    {
+      "path": "laminas-v9/27-M16-brand-de-ruido-a-senales.jpg",
+      "sizeBytes": 220652,
+      "sha256": "fba30df111e3fc6ab468d2896cab2602d5f53938976a189a58dfd26a48fcdaf9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/27-M16-brand-de-ruido-a-senales.jpg"
+    },
+    {
+      "path": "laminas-v9/28-M21-brand-personas-y-agentes.jpg",
+      "sizeBytes": 235131,
+      "sha256": "68521f2304ec492cac40d824ed525611485eefa8cbd32e1cd855685f42db7fda",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/28-M21-brand-personas-y-agentes.jpg"
+    },
+    {
+      "path": "laminas-v9/29-M34-brand-tus-ejecutivos-la-voz-de-tu-marca.jpg",
+      "sizeBytes": 332786,
+      "sha256": "232f8502af8719d950643a1b2a5133e99c6184f4e8c395a81be25dcaabbfe1ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/29-M34-brand-tus-ejecutivos-la-voz-de-tu-marca.jpg"
+    },
+    {
+      "path": "laminas-v9/30-K08-brand-la-aplica-cualquiera-sale-igual.jpg",
+      "sizeBytes": 198992,
+      "sha256": "4026d0ca8caf82f387bfd0d4b4257176572352b399c2456b7ac150d907627953",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/30-K08-brand-la-aplica-cualquiera-sale-igual.jpg"
+    },
+    {
+      "path": "laminas-v9/31-K05-brand-una-campana-50-piezas-una-sola-marca.jpg",
+      "sizeBytes": 427065,
+      "sha256": "1dd28b7e54b22349072863449ebf26765fbf271346c46c1b3d187bdb2fa18408",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/31-K05-brand-una-campana-50-piezas-una-sola-marca.jpg"
+    },
+    {
+      "path": "laminas-v9/32-ESC-brand-creatividad-a-escala.jpg",
+      "sizeBytes": 526765,
+      "sha256": "02c3f163a0ebee0563c39d6c8927f1fc25f4128931106a6b4f6e7e40234b6b16",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/32-ESC-brand-creatividad-a-escala.jpg"
+    },
+    {
+      "path": "laminas-v9/33-T16-brand-creative-studio.jpg",
+      "sizeBytes": 267386,
+      "sha256": "0d62216755a03f93af04428c49560ccf3822e617318a3789dc1237ad963c48a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/33-T16-brand-creative-studio.jpg"
+    },
+    {
+      "path": "laminas-v9/34-S27-caso-sky-lo-han-hecho-a-escala-si-con-sk.jpg",
+      "sizeBytes": 516367,
+      "sha256": "e111e758009c426ef0952f066c96b4d217459de18cca39502dec753a48f4a735",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/34-S27-caso-sky-lo-han-hecho-a-escala-si-con-sk.jpg"
+    },
+    {
+      "path": "laminas-v9/35-CC1-brand-channel-commerce-te-viven.jpg",
+      "sizeBytes": 641674,
+      "sha256": "00e20f0cbd2f7ba2dca5daf0ba4a056885b077997fafe38d46796ef4be307ad5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/35-CC1-brand-channel-commerce-te-viven.jpg"
+    },
+    {
+      "path": "laminas-v9/36-CC2-brand-trade-marketing-lo-sabes.jpg",
+      "sizeBytes": 611204,
+      "sha256": "0cd4f96a3e0cbb00856abd0b3ac4a293e4fb4a99f5a107a824063f1a4fa7d7dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/36-CC2-brand-trade-marketing-lo-sabes.jpg"
+    },
+    {
+      "path": "laminas-v9/37-CC3-brand-btl-medidas.jpg",
+      "sizeBytes": 760420,
+      "sha256": "7c0c02333b1c37293fb39171073f47ca9cbfec3a36ff78cccc99b1efcd878ae2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/37-CC3-brand-btl-medidas.jpg"
+    },
+    {
+      "path": "laminas-v9/38-C03-tramo-03-voice-donde-invierto-donde-rind.jpg",
+      "sizeBytes": 325985,
+      "sha256": "302f3786afc5a43a1c1bf4c49f44033347b32b4386c8f62ea5e78254298f166d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/38-C03-tramo-03-voice-donde-invierto-donde-rind.jpg"
+    },
+    {
+      "path": "laminas-v9/39-D03-voice-todo-el-ciclo.jpg",
+      "sizeBytes": 235877,
+      "sha256": "06a67edae06a93775f7272199bb15d9520e9b5f393040e2addd768e56cdad04b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/39-D03-voice-todo-el-ciclo.jpg"
+    },
+    {
+      "path": "laminas-v9/40-DQA-voice-las-justas.jpg",
+      "sizeBytes": 311040,
+      "sha256": "5a5e97738044fc84289fd57bd2316e1e9413b4a71a8231f4ca77b1bc8c0fe10f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/40-DQA-voice-las-justas.jpg"
+    },
+    {
+      "path": "laminas-v9/41-S15-voice-a-quien-le-llega-mi-pauta-a-tu-cliente.jpg",
+      "sizeBytes": 401560,
+      "sha256": "55f076054445e396a00998f2415264a09c5bbec8c27a2a09c5e664209fec3d76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/41-S15-voice-a-quien-le-llega-mi-pauta-a-tu-cliente.jpg"
+    },
+    {
+      "path": "laminas-v9/42-P06-voice-google-la-senal.jpg",
+      "sizeBytes": 348990,
+      "sha256": "947c44eaece74662b8fd6d40bce218de18540d5abb0be0ad86f4e1a76fa9bc88",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/42-P06-voice-google-la-senal.jpg"
+    },
+    {
+      "path": "laminas-v9/43-P08-voice-meta-la-pieza.jpg",
+      "sizeBytes": 348847,
+      "sha256": "b7fd1097877e9ac6d3645a2fbf75e01ade7ffb7674eaca68d6c12138026170b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/43-P08-voice-meta-la-pieza.jpg"
+    },
+    {
+      "path": "laminas-v9/44-P15-voice-tu-venta.jpg",
+      "sizeBytes": 250645,
+      "sha256": "6ff713b543144d80f318629ea7e82571305558c7da60493425976475cfbc2510",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/44-P15-voice-tu-venta.jpg"
+    },
+    {
+      "path": "laminas-v9/45-T24-voice-la-voz-de-un-creador-con-pauta.jpg",
+      "sizeBytes": 349118,
+      "sha256": "2ecb80bcd5482feabba62550703fabedeec71e1c23bdbe8596fbc999662b1bfa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/45-T24-voice-la-voz-de-un-creador-con-pauta.jpg"
+    },
+    {
+      "path": "laminas-v9/46-D06-voice-donde-mira.jpg",
+      "sizeBytes": 241273,
+      "sha256": "3b768d288d5c1f7eee81a71a05bc19c8331a4fdd949d96a72179faaad4b714d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/46-D06-voice-donde-mira.jpg"
+    },
+    {
+      "path": "laminas-v9/47-P30-voice-dooh-en-tu-ruta.jpg",
+      "sizeBytes": 509868,
+      "sha256": "8be788da7561e5b01792f8ab0b3f39c0322a6a8c6db62adf6548aa006d5fbac8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/47-P30-voice-dooh-en-tu-ruta.jpg"
+    },
+    {
+      "path": "laminas-v9/48-P31-voice-dooh-al-instante.jpg",
+      "sizeBytes": 333055,
+      "sha256": "824c2c9c12b8fa7a1c2ebcdaf6141e6d443b07e694ca45ec940eef4de7e84f27",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/48-P31-voice-dooh-al-instante.jpg"
+    },
+    {
+      "path": "laminas-v9/49-P35-voice-variantes.jpg",
+      "sizeBytes": 343193,
+      "sha256": "36a277f74d59bf880010880674bf095954b5bacd3204c6628fb0312b22547a11",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/49-P35-voice-variantes.jpg"
+    },
+    {
+      "path": "laminas-v9/50-P41-voice-asi.jpg",
+      "sizeBytes": 301343,
+      "sha256": "18f351f9d01ba121d70152264b83fb91b60f1d89e1d61953444a3cde24458c51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/50-P41-voice-asi.jpg"
+    },
+    {
+      "path": "laminas-v9/51-D08-voice-como-se-cobra-por-separado.jpg",
+      "sizeBytes": 271302,
+      "sha256": "7b00c2442f24dba1e8d0e273dcd06766b03f4ac1dfa778ab34235dcd71c6542b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/51-D08-voice-como-se-cobra-por-separado.jpg"
+    },
+    {
+      "path": "laminas-v9/52-D09-voice-con-evidencia.jpg",
+      "sizeBytes": 239678,
+      "sha256": "57bd3d219b1a46fdf48f6cd40f24f5acdcf66a2d430bbc01e7e6e3af05cbf049",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/52-D09-voice-con-evidencia.jpg"
+    },
+    {
+      "path": "laminas-v9/53-C04-tramo-04-revenue-cuando-veo-mi-pipeline-.jpg",
+      "sizeBytes": 455563,
+      "sha256": "1709f67711c832c61c1f7d1aec401b5a9180f93fdbc6041a47c4c408f1bb10dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/53-C04-tramo-04-revenue-cuando-veo-mi-pipeline-.jpg"
+    },
+    {
+      "path": "laminas-v9/54-X04-revenue-el-que-encaje.jpg",
+      "sizeBytes": 235795,
+      "sha256": "62234911f531353f2ce77a45575e0b06a193d56c2b69f7a8fdae96cd2653bd9f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/54-X04-revenue-el-que-encaje.jpg"
+    },
+    {
+      "path": "laminas-v9/55-R19-revenue-sigo-llenando-el-crm-ya-no.jpg",
+      "sizeBytes": 334152,
+      "sha256": "e4fed00151448df2c22cec5422c8e65fd9c26056b26aba2397e255d04f1e8e49",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/55-R19-revenue-sigo-llenando-el-crm-ya-no.jpg"
+    },
+    {
+      "path": "laminas-v9/56-H06-revenue-todo-el-ciclo-hubspot.jpg",
+      "sizeBytes": 243116,
+      "sha256": "9572a80221f4331f79346c89b37a4fc071f504c161883a8ea05796e68ddfdd03",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/56-H06-revenue-todo-el-ciclo-hubspot.jpg"
+    },
+    {
+      "path": "laminas-v9/57-X06-revenue-todo-el-ciclo-salesforce.jpg",
+      "sizeBytes": 313625,
+      "sha256": "b63068938134aa2aa5ff50b3356a6aa804bbac784c74acf271b133b1441434bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/57-X06-revenue-todo-el-ciclo-salesforce.jpg"
+    },
+    {
+      "path": "laminas-v9/58-X20-revenue-ordenado.jpg",
+      "sizeBytes": 424246,
+      "sha256": "1f36248b561213ac033c5ead68eb0df5dfcee89e3befafda36662a562de24ae6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/58-X20-revenue-ordenado.jpg"
+    },
+    {
+      "path": "laminas-v9/59-X10-revenue-segun-la-tarea.jpg",
+      "sizeBytes": 239964,
+      "sha256": "8c3c558b6a3e87c8ea05dda95288d3f98d7ac5b1d0e53cb7c7f3b34b266dad41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/59-X10-revenue-segun-la-tarea.jpg"
+    },
+    {
+      "path": "laminas-v9/60-H13-revenue-licencias-nunca.jpg",
+      "sizeBytes": 301320,
+      "sha256": "24e98ec922141d748d1340134861faf045c59309f877de39e050935ce63bf37a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/60-H13-revenue-licencias-nunca.jpg"
+    },
+    {
+      "path": "laminas-v9/61-H19-revenue-con-todo.jpg",
+      "sizeBytes": 295597,
+      "sha256": "6bb6d935811468b19c172c42a5f94bd23398bc67f271c856b10e5c81bdc4a22e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/61-H19-revenue-con-todo.jpg"
+    },
+    {
+      "path": "laminas-v9/62-ANM-revenue-caso-anam-tiempo.jpg",
+      "sizeBytes": 412665,
+      "sha256": "fa65798b11c2238b7fe8ce91e50df0469c20068d71aa7eae81c8bc0c019cd9a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/62-ANM-revenue-caso-anam-tiempo.jpg"
+    },
+    {
+      "path": "laminas-v9/63-C05-tramo-05-growth-lo-medimos-siempre-plate.jpg",
+      "sizeBytes": 301428,
+      "sha256": "d336c1b58e1b99d9bf056a04e4189712faadeb07b674ef7d33e7a941956670a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/63-C05-tramo-05-growth-lo-medimos-siempre-plate.jpg"
+    },
+    {
+      "path": "laminas-v9/64-MED-growth-medicion-si-se-miden-bien.jpg",
+      "sizeBytes": 244797,
+      "sha256": "795b82c342bdcb5c0346d3c2d460afae916a936f01fcb3c410ed224c02219ec9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/64-MED-growth-medicion-si-se-miden-bien.jpg"
+    },
+    {
+      "path": "laminas-v9/65-W10-growth-un-numero-en-el-que-confiar.jpg",
+      "sizeBytes": 227228,
+      "sha256": "3a9fce92e9598c5f6405a33da1aca3cec74f32a71c6a235bbda2c879f01e2b6a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/65-W10-growth-un-numero-en-el-que-confiar.jpg"
+    },
+    {
+      "path": "laminas-v9/66-V15-growth-cada-mes-ves-que-movio-el-negocio.jpg",
+      "sizeBytes": 252124,
+      "sha256": "000e17eb503af6453eea6479ca5d937102bdcd16b85ae587bf7fd4381911d73b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/66-V15-growth-cada-mes-ves-que-movio-el-negocio.jpg"
+    },
+    {
+      "path": "laminas-v9/67-V16-growth-la-lectura-te-llega-lista-y-empie.jpg",
+      "sizeBytes": 268556,
+      "sha256": "ab1131bd3414ffff7e316c84212c14ef23c97722d950032788e00683665696f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/67-V16-growth-la-lectura-te-llega-lista-y-empie.jpg"
+    },
+    {
+      "path": "laminas-v9/68-INSG-growth-insights-cada-dato-su-grafico.jpg",
+      "sizeBytes": 300255,
+      "sha256": "ff8fd34302a82d7e89fa3d8be87a5959e4a82325c4cf280a4eab3baf46174e38",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/68-INSG-growth-insights-cada-dato-su-grafico.jpg"
+    },
+    {
+      "path": "laminas-v9/69-Y23-growth-insights-ppt-del-comite-ya-esta.jpg",
+      "sizeBytes": 231484,
+      "sha256": "7daaf06c5527220c931be175a1106f13c1bef645019a600928c88cf6c5060ca0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/69-Y23-growth-insights-ppt-del-comite-ya-esta.jpg"
+    },
+    {
+      "path": "laminas-v9/70-T38-growth-marketing-studio.jpg",
+      "sizeBytes": 280149,
+      "sha256": "f2192151098b467218ee40ad486a6e149460654a4930675d342f750d18303ee0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/70-T38-growth-marketing-studio.jpg"
+    },
+    {
+      "path": "laminas-v9/71-EQP-como-lo-vives-este-equipo.jpg",
+      "sizeBytes": 324235,
+      "sha256": "eaa6d39a745d6089e8d9c6f2901ec2774cdbec74c26ee550aa86f0f093dbc1bf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/71-EQP-como-lo-vives-este-equipo.jpg"
+    },
+    {
+      "path": "laminas-v9/72-V17-como-lo-vives-personas-con-nombre-con-agentes.jpg",
+      "sizeBytes": 244019,
+      "sha256": "18b4735012af09bf32f1a755b530bd4e89995592a88aa13ea28c4619949ae434",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/72-V17-como-lo-vives-personas-con-nombre-con-agentes.jpg"
+    },
+    {
+      "path": "laminas-v9/73-CTG-como-lo-vives-contigo.jpg",
+      "sizeBytes": 280763,
+      "sha256": "904ebd06f11ee92206ef21867ba9bb0043d6144bd1466475948a502aaa0e766c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/73-CTG-como-lo-vives-contigo.jpg"
+    },
+    {
+      "path": "laminas-v9/74-PV1-como-lo-vives-movimiento-90-dias.jpg",
+      "sizeBytes": 187651,
+      "sha256": "cbf52ee99e3b5b6395ea2723752219e6ced721412636cb371f3e77a79d403857",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/74-PV1-como-lo-vives-movimiento-90-dias.jpg"
+    },
+    {
+      "path": "laminas-v9/75-V18-como-lo-vives-trabajas-con-nosotros-en-vivo.jpg",
+      "sizeBytes": 247962,
+      "sha256": "cdcc004ab181d1ffde95aaa74c0a905c332f16d21ae75017bd1cba12864ace28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/75-V18-como-lo-vives-trabajas-con-nosotros-en-vivo.jpg"
+    },
+    {
+      "path": "laminas-v9/76-MES-como-lo-vives-cada-mes-sabes-que-recibes.jpg",
+      "sizeBytes": 241821,
+      "sha256": "11f45bf3b78552909564d5872bbcf97072f50950c95dabec0ff4becc97d43056",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/76-MES-como-lo-vives-cada-mes-sabes-que-recibes.jpg"
+    },
+    {
+      "path": "laminas-v9/77-C10-como-lo-vives-pierdo-el-control-nunca.jpg",
+      "sizeBytes": 190458,
+      "sha256": "5673b3a80a192159094a77a934e2ce4b7e1b9d09f0c954da3133b1ef31592032",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/77-C10-como-lo-vives-pierdo-el-control-nunca.jpg"
+    },
+    {
+      "path": "laminas-v9/78-S25-con-quien-trabajan-90-empresas.jpg",
+      "sizeBytes": 250684,
+      "sha256": "03b95a2e990dba5d0fc8647546b363a6d67e80765d24e89ac94e1a2b4d6e2601",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/78-S25-con-quien-trabajan-90-empresas.jpg"
+    },
+    {
+      "path": "laminas-v9/79-PTN-la-prueba-construimos-con-los-grandes.jpg",
+      "sizeBytes": 241054,
+      "sha256": "0eb7cf68ff7324a876c7de9b6ce69fb722033478a825a77eb5483dfc4f3ca1c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/79-PTN-la-prueba-construimos-con-los-grandes.jpg"
+    },
+    {
+      "path": "laminas-v9/80-PAI-la-prueba-en-cinco-paises.jpg",
+      "sizeBytes": 347679,
+      "sha256": "0039974054e93480b0ef6e7b05345dcf66f14e581fa935f94f3f699026cdf54b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/80-PAI-la-prueba-en-cinco-paises.jpg"
+    },
+    {
+      "path": "laminas-v9/81-S29-compras-capacidad-no-horas.jpg",
+      "sizeBytes": 176595,
+      "sha256": "dc2701b8bb0daba71af917861c5594148543e01b5eeca7bf8e141d431ca351c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/81-S29-compras-capacidad-no-horas.jpg"
+    },
+    {
+      "path": "laminas-v9/82-S30-y-si-no-funciona-empiezas-chico.jpg",
+      "sizeBytes": 274923,
+      "sha256": "a45078ed68031a48a4db19048a462b1a3afbdb0bacc0b269db64cbb037937f27",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/82-S30-y-si-no-funciona-empiezas-chico.jpg"
+    },
+    {
+      "path": "laminas-v9/83-S32-empecemos.jpg",
+      "sizeBytes": 205156,
+      "sha256": "6b7258cc83d639726765eeca60377cd82e3ebebc463a1abc089f243295792727",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/83-S32-empecemos.jpg"
+    },
+    {
+      "path": "laminas-v9/84-S33-conversamos-cuando-quieras.jpg",
+      "sizeBytes": 143650,
+      "sha256": "c8187c4449a9892aaabe57c9b85d0125db7782d166734f04e899ddc5b518f939",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/84-S33-conversamos-cuando-quieras.jpg"
+    }
+  ]
+}

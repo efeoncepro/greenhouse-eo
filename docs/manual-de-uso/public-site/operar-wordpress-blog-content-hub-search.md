@@ -320,3 +320,10 @@ posts/categorías demo están terminadas. Sigue en este orden:
 5. implementar buscador editorial restringido a `post`;
 6. ejecutar QA visual, responsive, teclado, SEO, enlaces y medición;
 7. pedir aprobación para el cutover manteniendo una sola canónica `/blog/`.
+
+## Preview local de la etapa 1 — 20/10/2026
+
+El [paquete blog-phase1](../../../scripts/public-website/blog-phase1/README.md) genera el candidato
+y captura el blog completo dentro del shell Ohio, sin escribir WordPress. Consultar ahí los comandos,
+el worktree `develop` del runtime, los fixtures y el checklist pendiente. No ejecutar publicación,
+merge ni release: el operador sólo autorizó implementación local y vistas móvil/escritorio.

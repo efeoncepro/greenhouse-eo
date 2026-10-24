@@ -1,0 +1,56 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "light",
+  "use": "proposal",
+  "role": "decision",
+  "recipe": "decision-risk",
+  "line": "growth",
+  "voice": {
+    "eyebrow": "Riesgo controlado",
+    "question": "¿Y si no funciona?",
+    "answer": [
+      "Empiezan",
+      "chico"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 4
+  },
+  "body": "Cada riesgo tiene su cobertura escrita. Y el primer paso es un piloto acotado, no un contrato largo.",
+  "headers": {
+    "risk": "El riesgo",
+    "how": "Cómo lo cubrimos"
+  },
+  "risks": [
+    {
+      "risk": "Que sigan con su número",
+      "name": "Convivencia guiada",
+      "how": "Un periodo acordado en que ambos conviven, con apoyo semanal."
+    },
+    {
+      "risk": "Que se lea como control",
+      "name": "Cuentas, no personas",
+      "how": "El panel mide la cobertura de clientes, no evalúa a cada ejecutivo."
+    },
+    {
+      "risk": "Datos de clientes",
+      "name": "Contacto, no contenido",
+      "how": "Se guarda quién, cuándo y por qué canal; nunca la conversación."
+    },
+    {
+      "risk": "Que la región demore",
+      "name": "Valor desde Chile",
+      "how": "Las primeras etapas funcionan sin cambios en Salesforce."
+    }
+  ],
+  "selected": 1,
+  "selection": {
+    "target": "object",
+    "label": "SGS",
+    "participantKind": "role"
+  }
+}

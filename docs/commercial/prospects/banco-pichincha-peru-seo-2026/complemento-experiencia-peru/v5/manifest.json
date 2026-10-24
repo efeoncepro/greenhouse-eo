@@ -1,0 +1,155 @@
+{
+  "document": "Pibank-Complemento-experiencia-Peru-2026-10-21",
+  "createdAt": "2026-10-21T16:51:41.588Z",
+  "status": "draft_for_review",
+  "line": "engine",
+  "measureRenderer": {
+    "package": "@efeoncepro/axis-graphic-line",
+    "version": "0.17.0",
+    "from": "axis-design-system main, checkout local"
+  },
+  "data": {
+    "file": "data.json",
+    "sha256": "66959fc1f8c182d5cf35ba21e723f52ca4230efd78180432401d47c8c523c3f0",
+    "share": 0.2554937712660505,
+    "measure": {
+      "value": 0.2554937712660505,
+      "label": "26 %",
+      "source": "Google Search Console del Blog de SKY Airline · clics por país · octubre 2025 a septiembre 2026"
+    }
+  },
+  "hardcodedFacts": [
+    "SKY cliente desde 2025 (Agencia Creativa, ago-2025) y Blog SEO/AEO adjudicado el 23-09-2026: deal HubSpot 62535094842; operación completa desde 01-11-2026",
+    "Grader AEO de SKY en siete mercados con regrade mensual, Perú incluido: docs/tasks/to-do/TASK-1961-efeonce-insights-aeo-per-market.md",
+    "Piloto Trujillo en el primer lote: docs/services/sky-blog-seo/PLAN_RECUPERACION_PRIMER_LOTE_2026-10-15.md",
+    "BICE como antecedente de banca: ya declarado a Jesús el 19-10 (outreach/2026-10-19-respuesta-precisiones-jesus.md)"
+  ],
+  "assets": [
+    {
+      "file": "node_modules/@efeoncepro/axis-brand-assets/assets/efeonce-logo-positive.svg",
+      "source": "efeonce-logo-positive",
+      "sha256": "c647119e75eff0b13cab36c1485e2ff5a7b501125c43509ad6a4013ec2fdb49e"
+    },
+    {
+      "file": "node_modules/@efeoncepro/axis-brand-assets/assets/url-bubble-baked-light.svg",
+      "source": "url-bubble-baked-light",
+      "sha256": "12d726db31d0dad6b07723f3bf0289094216c8f5baf72d93e10af2e1e5d930b8"
+    },
+    {
+      "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/propuesta/assets/pibank-logo-inverso.svg",
+      "source": "Pibank, versión para fondo claro",
+      "sha256": "9fe7a6e92874f08529a16f56bdcc31cd525ba28195398c2da346f3d716a12c6c"
+    },
+    {
+      "file": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky-on-dark.svg",
+      "source": "SKY Airline, versión sobre oscuro (geometría oficial de skyairline.com)",
+      "sha256": "b016f4158dcf6a4235f9a8f3b0433f224bf3f74d6298fe168569aaf732f99231"
+    },
+    {
+      "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/complemento-experiencia-peru/assets/shot-lima-mobile.jpg",
+      "source": "blog.skyairline.com (shot-lima-mobile.jpg)",
+      "sha256": "7ebc4f7c70722de5a131c18cb47c12bc886e1f5622f887ad29ba78c90339ff7e"
+    },
+    {
+      "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/complemento-experiencia-peru/assets/shot-talara-desktop.jpg",
+      "source": "blog.skyairline.com (shot-talara-desktop.jpg)",
+      "sha256": "8a27791b03db0762a3d90967304626fe9eb413c6d2b69959c3c7a5a115a4aa51"
+    },
+    {
+      "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/complemento-experiencia-peru/assets/punta-sal-900.jpg",
+      "source": "blog.skyairline.com (punta-sal-900.jpg)",
+      "sha256": "d021b8d651f742a6c740d23f79e278d614db13935204ef933c1ac0c75b88ab55"
+    },
+    {
+      "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/complemento-experiencia-peru/assets/trujillo-900.jpg",
+      "source": "blog.skyairline.com (trujillo-900.jpg)",
+      "sha256": "b78fcacf2bc66b6e8f9fc039f8f1c33b4039eedaf12a703b1862642c53185ebe"
+    },
+    {
+      "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/complemento-experiencia-peru/assets/tarapoto-900.jpg",
+      "source": "blog.skyairline.com (tarapoto-900.jpg)",
+      "sha256": "b4e8c17b7849a9379487e2d4659797e991ddcca1ff0e4a54065ee814e0cbcbe9"
+    },
+    {
+      "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/complemento-experiencia-peru/assets/canon-shucto-900.jpg",
+      "source": "blog.skyairline.com (canon-shucto-900.jpg)",
+      "sha256": "30dab42305d6f7a3b3aa517de57396ab1417aa3333701863d693a9357c8eb4bc"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/bricolage-grotesque-variable.ttf",
+      "source": "axis-fonts",
+      "sha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-300.ttf",
+      "source": "axis-fonts",
+      "sha256": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-400.ttf",
+      "source": "axis-fonts",
+      "sha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-500.ttf",
+      "source": "axis-fonts",
+      "sha256": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-600.ttf",
+      "source": "axis-fonts",
+      "sha256": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-700.ttf",
+      "source": "axis-fonts",
+      "sha256": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    }
+  ],
+  "qa": {
+    "pages": [
+      {
+        "page": 1,
+        "gap": 93,
+        "overflow": false
+      },
+      {
+        "page": 2,
+        "gap": 142,
+        "overflow": false
+      },
+      {
+        "page": 3,
+        "gap": 146,
+        "overflow": false
+      },
+      {
+        "page": 4,
+        "gap": 167,
+        "overflow": false
+      }
+    ],
+    "coverCollisions": [],
+    "brokenImages": 0,
+    "fonts": [
+      "Bricolage Grotesque",
+      "Poppins"
+    ],
+    "textOverflow": [],
+    "errors": []
+  },
+  "outputs": [
+    {
+      "file": "Pibank-Complemento-experiencia-Peru-2026-10-21.html",
+      "sha256": "2f1d069e0ed63363b99ed74d730618477cc7fd33458bd6fb6b2670eb6b9bac98"
+    },
+    {
+      "file": "Pibank-Complemento-experiencia-Peru-2026-10-21.pdf",
+      "sha256": "6798475650a23a5b18de620d77b8085662b2e00b1894b799b0820e789ee2f099"
+    }
+  ],
+  "authority": {
+    "sent": false,
+    "skyDataShare": "pedido por Julio el 21-10 (clics, impresiones, crecimiento, visitas desde IA)"
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "1d1ece260b1f",
+  "key": "1d1ece260b1fe00fbc05b7feb806cd2e01428d844559d75ae02ea303762ed1e0",
+  "status": "completed",
+  "createdAt": "2026-10-20T11:36:26.176Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_propuesta-gana-programatica/metro/aguacatala.png",
+    "imageSha256": "d5a6f96a96c14a843878df92010cc6bc3149fb072c0725065649d7c1617b29a8",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_propuesta-gana-programatica/metro/mask-aguacatala.png",
+    "maskSha256": "e3fc9f72d0453aaef1edcbaccac635b3a5e8a2fabdec578fe18a311fb3fdcfb9",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2550,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Inside the masked area, add one landscape 16:9 digital LED advertising screen hanging from the steel roof structure of this Metro de Medellín station hall by two thin vertical steel cables, just below the blue welcome sign and above the turnstiles, facing the camera at the same angle as the welcome sign. Slim matte black bezel; the screen is turned on and shows a perfectly uniform, flat, pure white image with no content and no text (the content will be placed later). Keep the windows, columns, daylight and perspective of the photo consistent. Do not add people, signs or text.",
+    "providerPrompt": "Inside the masked area, add one landscape 16:9 digital LED advertising screen hanging from the steel roof structure of this Metro de Medellín station hall by two thin vertical steel cables, just below the blue welcome sign and above the turnstiles, facing the camera at the same angle as the welcome sign. Slim matte black bezel; the screen is turned on and shows a perfectly uniform, flat, pure white image with no content and no text (the content will be placed later). Keep the windows, columns, daylight and perspective of the photo consistent. Do not add people, signs or text."
+  },
+  "mask": {
+    "touchedFraction": 0.05718954248366013,
+    "editable": 560000,
+    "soft": 0,
+    "protected": 9232000
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2550
+    },
+    "target": {
+      "width": 2336,
+      "height": 1568
+    },
+    "aspectError": 0.01079774375503618,
+    "reason": "la zona con contexto ocupa 32 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0653,
+    "basis": "1 × salida 2336x1568 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 98.334,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 8.84,
+        "bestError": 8.84,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 9232000,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 560000,
+        "maxDelta": 255,
+        "meanDelta": 98.334,
+        "worst": {
+          "x": 2735,
+          "y": 1190
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 9232000,
+        "maxDelta": 228,
+        "meanDelta": 15.291,
+        "worst": {
+          "x": 2275,
+          "y": 1396
+        }
+      },
+      "outputUsd": 0.0653,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1665,
+        "input_tokens_details": {
+          "image_tokens": 1504,
+          "text_tokens": 161
+        },
+        "output_tokens": 2175,
+        "output_tokens_details": {
+          "image_tokens": 2175,
+          "text_tokens": 0
+        },
+        "total_tokens": 3840
+      },
+      "meta": {
+        "size": "2336x1568",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

@@ -15,11 +15,13 @@ import { authorPlanWithBoundedAi } from './ai-authoring'
 import { buildDeterministicPlan } from './deterministic-planner'
 import { validateEditorialPlan } from './plan-validation'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface AuthorEditorialPlanInput {
   snapshot: EvidenceSnapshotContentV1
   modules: InsightModule[]
   locale: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   /** TASK-1888 — contrato editorial v2; el caller lo lee del flag para decidir también la evidencia. */
   editorialV2?: boolean
   /** TASK-1888 — portada resuelta a sellar (sólo con v2). */

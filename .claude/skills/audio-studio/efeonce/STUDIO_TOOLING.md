@@ -104,6 +104,30 @@ que leen, no: si faltan en disco, `pnpm ai-gen:pull ai-generations/2026-09-26_br
     `awk 'BEGIN{printf "%.2f", …}'`.
   - **Sin escucha propia:** sincronía de voz, golpes y música las juzgó el operador. Receta completa:
     `motion-design-studio/workflows/client-sample-reel-stills-to-clips-with-brand-motion-overlay.md`.
+- **Delta 2026-10-21 (serie de anuncios «Efeonce | Partner», piezas de 8 s sin voz; caso fuente AWS):** método en
+  `docs/operations/social/2026-10-21-aws-partner-announcement-production-method.md` (§«Grilla» y §«Producción»);
+  fuentes en `ai-generations/2026-10-21_aws-partner/` (`audio-cues.json`, `audio/mezcla.sh`).
+  - **Grilla de la serie, 120 BPM** (tiempo = 0,5 s): golpe 1 en **2,0 s** con **silencio absoluto** de 1,75 a 2,0
+    (medido a −inf); golpe 2 en **4,0 s**; vacío de la mezcla de 4,6 a 4,98; pico del sting de Efeonce en **5,0 s**
+    (`ai-generations/2026-10-20_byteplus-partner/audio/efeonce-sting.wav`, pico en 0,59 s → el archivo entra en
+    4,41); el lockup firma en `T_SIGN` 4,65.
+  - **La música se alinea midiendo el drop, no por la duración pedida.** AWS eligió la pista B porque tenía el build
+    más fuerte y el drop en el segundo 10,0 exacto (pico de −1 dB), y se armó por tramos: build 0–1,75, silencio
+    absoluto 1,75–2,0, drop en 2,0 y reiniciado en 4,0.
+  - **ElevenLabs (flows de claude.ai) no entrega las duraciones pedidas:** varios SFX de «2 s» o «3 s» salieron de 1 s.
+    Medir onset y pico de cada archivo con `astats` (ventanas cortas; el caso usó 50 ms para silencios y golpes) antes de
+    ubicarlo en la grilla. Riser, aire y sub se sintetizaron con `aevalsrc` y `anoisesrc`.
+  - **Mezcla en dos pasos:** un grafo con **dos `amix`** produjo una salida de 0,11 s. Primero el bus con **un solo
+    `amix`** y el ducking por expresión de `volume`; después, en otra pasada, el sting.
+  - **Master:** medir con `loudnorm` → aplicar la ganancia hasta **−14 LUFS** → `alimiter`. AWS cerró en −14,1 LUFS y
+    −2,2 dBTP.
+  - **`pnpm ai:listen` (Gemini) sirve de criterio, no de medición:** su observación de que el cierre se sentía estático
+    era real y se aplicó; su pedido de «profundizar el silencio» no, porque el silencio medía −inf. Todo tiempo o
+    nivel que afirme se verifica con ffmpeg antes de actuar. Desde la v2 lo hace la propia CLI: `--verify` (silencio,
+    golpe, desfase) y `--cues audio-cues.json` (cada cue de la grilla medido sin depender del modelo); la mezcla se
+    pasa como WAV aparte porque el audio de un video le llega a 1 kbps mono.
+  - **zsh en las recetas:** `$R:a` y `$BG:s` son modificadores (ruta absoluta y sustitución), no texto: `r=$R:a=0.5`
+    se expandió a una ruta. Siempre `${VAR}` antes de `:`.
 - **Método «maqueta propia → re-grabación IA → sello propio encima»:** la estructura y el tiempo salen de una
   maqueta determinística propia (`rock.mjs`, `composer.mjs`, `dsp.mjs`); Stable Audio 2.5 audio-to-audio la
   re-graba (intensidad 0,7) conservando el tiempo; la esfera propia (campana La + golpe grave) se monta encima
@@ -142,7 +166,9 @@ recortar medios, nunca bajo el Drop): `EFEONCE_OVERLAY.md` §Glitch.
 
 **QA sin oído** (el agente no escucha): ebur128 (sonoridad), autocorrelación de ataques (tempo), balance espectral por
 bandas (medios 300 Hz–3 kHz ≥ ~35 %), juntura del bucle (transiente contra un tiempo fuerte normal) y sha256
-descargando del bucket. Cómo suena lo aprueba siempre el operador. Reglas en `EFEONCE_OVERLAY.md` §Glitch.
+descargando del bucket. `pnpm ai:listen` aporta una escucha de criterio, pero sus tiempos y niveles se contrastan con
+ffmpeg; `pnpm ai:listen --cues … --measure-only` mide la grilla sin Gemini en menos de 1 s (código 2 si una cue falla), y
+`--preset sync --verify` suma la opinión de Gemini (delta 2026-10-21). Cómo suena lo aprueba siempre el operador. Reglas en `EFEONCE_OVERLAY.md` §Glitch.
 
 ## Router de producción (elige la mano correcta)
 

@@ -1,16 +1,16 @@
 # Construcción de Licitaciones — Método Efeonce
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-07-11 por Claude (con Julio Reyes)
-> **Última actualización:** 2026-10-08 por Codex
+> **Última actualización:** 2026-10-23 por Codex
 > **Documentación técnica / método canónico:** skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md`
 
 ## Para qué sirve este documento
 
 Explica, en lenguaje simple, **cómo Efeonce construye una propuesta para una licitación** (pública o privada, tipo RFP/RFQ) de principio a fin. No es un instructivo paso a paso (eso está en el manual de uso); es la explicación de la lógica y por qué se hace así.
 
-La idea de fondo: **una buena propuesta no se improvisa ni se escribe de memoria.** Se arma sobre evidencia real —las bases, el contexto del negocio, datos de nómina, casos reales— y se apoya en el conocimiento experto de cada área (contenido, SEO, equipos, finanzas, redacción).
+La idea de fondo: **una buena propuesta no se improvisa ni se escribe de memoria.** Se arma sobre evidencia real —las bases, el contexto del negocio, costos objetivo vigentes y casos reales— y se apoya en el conocimiento experto de cada área (contenido, SEO, equipos, finanzas, redacción).
 
 ## El método en pocas palabras
 
@@ -28,10 +28,16 @@ Construir una licitación pasa por diez momentos encadenados. Cada uno produce a
 4. **Traer el contexto y los diferenciadores.** Qué hace fuerte a Efeonce en *esta* licitación, con casos reales y sin inventar cifras.
 5. **Definir el alcance con criterio experto.** Cuánto y cómo se entrega, apoyándose en las áreas que saben (por ejemplo, contenido y SEO deciden la cadencia de artículos, no un número al azar). Antes de dimensionar, se **analiza con datos el activo real del cliente** (su sitio o blog actual): casi nunca se parte de cero, y ese diagnóstico sirve como prueba en la propuesta y para elegir el mix correcto (contenido nuevo vs. optimizar lo que ya existe).
 6. **Diseñar el equipo (squad).** Qué roles, con qué seniority, cuánta dedicación, quién coordina y cómo se complementan. Al cliente se le muestran roles, no nombres.
-7. **Poner el precio.** Se calcula sobre el **costo real del equipo** (Efeonce conoce su nómina) más un margen sano. En licitaciones privadas, además, se cuida no cobrar de menos por el valor entregado.
+7. **Poner el precio.** V3 calcula desde costos objetivo vigentes, dedicación sustentada y costos completos, con política de precio/margen. Nómina, disponibilidad real y precio aprobado son datos distintos. La revisión conserva supuestos, exposición estimada, impuestos pendientes y autoridad comercial.
 8. **Escribir la propuesta técnica.** Redactar de forma clara y persuasiva, con cada afirmación respaldada por su mecanismo o una prueba, sin humo.
-9. **Armar la oferta económica y el paquete.** La planilla de precios en el formato pedido, revisar que todo lo obligatorio esté, y exportar a PDF.
+9. **Armar la oferta económica y el paquete.** Conservar fuentes y cifras conciliadas y preparar el formato pedido. El MD para diseño es una entrega de trabajo; el PDF/planilla y requisitos de presentación se verifican cuando se emiten.
 10. **Presentar con autorización.** La persona sube la oferta o autoriza al agente sobre el paquete concreto. Completar o firmar anexos con autorización no implica permiso para presentar. La evidencia de presentación es el comprobante y su lectura posterior.
+
+## Caso de negocio y propuesta en Markdown
+
+Cuando el operador elige MD para diseñar después en Claude Design, se entrega una propuesta sustantiva y completa en ese formato. El caso conserva el razonamiento interno; el master lleva texto listo por bloques, con instrucciones editoriales separadas y anexos técnico/económico. Una lista de láminas no sustituye la propuesta. Las cantidades propias se distinguen de las exigencias del RFP, y el precio preliminar se concilia con el artefacto V3 sin llevar costos o margen al comprador.
+
+Los estados siguen separados: investigación y MD preparados; diseño y revisión visual pendientes; aprobación, cotización emitida, registro gobernado y envío sólo con su evidencia. No se fuerza un render o alta en Proposal Studio para declarar entregado el insumo MD, ni se omite un formato obligatorio del comprador. [Procedimiento](../../manual-de-uso/comercial/construir-una-licitacion.md#preparación-en-markdown-para-diseño-externo). [Caso Mattis, fechado y preliminar](../../commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md).
 
 ## Desde el radar público de LicitaLAB hasta una candidata analizada
 

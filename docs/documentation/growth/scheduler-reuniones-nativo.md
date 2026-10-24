@@ -13,6 +13,11 @@ Growth CTA puede publicar dos comportamientos distintos:
 
 El CTA permanece compacto. En desktop abre un diálogo bounded y en móvil una superficie full-screen. Cerrar no borra el flujo: al reabrir se conserva la selección, el formulario y cualquier confirmación en curso durante la sesión del documento.
 
+Además del diálogo, el agendador puede vivir en línea dentro de una página. Desde el 2026-10-20, `/agenda/` es la
+landing de agenda del sitio, indexable y con la línea gráfica «La órbita»: monta el mismo agendador del piloto (misma
+surface, misma agenda y mismo comportamiento) y sólo lo enmarca y le ajusta colores con las variables del agendador.
+No usa el botón de Growth CTA y no cambió cómo se reserva ni cómo se mide.
+
 ## Reglas de confianza
 
 - La agenda no consulta disponibilidad por una simple impresión del CTA.
@@ -44,6 +49,27 @@ material cifrado a 48 h. La confirmación de transporte no acredita audiencia pu
 [release vigente y límites de Test Events](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
 La primera reserva comercial consentida y su conciliación con cada proveedor siguen pendientes
 de observar; las pruebas aisladas no crean bookings ni contactos comerciales.
+
+### Google Ads online y conversiones mejoradas
+
+La conversión Ads `meeting_booking` requiere una respuesta válida del proveedor, la transición
+persistida `provider_dispatched → succeeded` y la proyección de medición guardada. Sólo entonces
+la primera respuesta puede incluir el recibo dedicado `googleAdsConversion`; replay, apertura del
+calendario o un booking ambiguo no lo emiten. El recibo comercial de la reserva conserva su
+contrato independiente.
+
+La policy publicada debe corresponder al binding, surface y origen vigentes, con captura y Ads
+habilitados, los cuatro permisos Google explícitos y sin veto GPC. El navegador transporta
+`gh_ads_conversion` por GTM Web hacia el tag Ads de GTM Server; no deriva esta conversión del
+`generate_lead` genérico. Los hashes EC opcionales usan el canal reservado `user_data`, no dataLayer;
+GCLID/GBRAID/WBRAID se observan con consentimiento, nunca se fabrican. Este envío online depende
+del navegador y no usa los reintentos backend de Meta/UPD descritos arriba.
+
+El [cierre del release](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md)
+releyó Web6/Server10, Ads6862539491 y13 Forms comerciales+Discovery sin modificar esas políticas.
+Discovery es la agenda del sitio, no un tipo de campaña Ads. La recepción, matching y atribución de
+una reserva real no quedaron verificadas con esos canarios; no se crearon reservas ficticias.
+[Activación y verificación](../../manual-de-uso/growth/activar-conversiones-google-ads.md).
 
 ## Estados y adaptación
 

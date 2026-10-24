@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-10-01T21:59:52.831Z",
+  "generatedAt": "2026-10-22T21:34:01.011Z",
   "run": "ai-generations/2026-07-05_nexa-fallback-characters",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-05_nexa-fallback-characters",

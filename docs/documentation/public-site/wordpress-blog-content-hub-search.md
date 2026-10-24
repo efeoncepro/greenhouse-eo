@@ -9,6 +9,14 @@
 > `ohio-child`, parent `ohio`
 > **Auditoria base:** `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`
 
+## Preparación local — etapa 1, 20/10/2026
+
+Candidato en `develop`, sin publicar: consultas dinámicas, carril Glitch, temas no vacíos,
+objetivos con destinos reales, dos recursos y formulario aprobado. Novedades se oculta
+sin posts de los últimos 120 días; los archivos existentes se conservan. Búsqueda,
+filtros y colecciones quedan en etapa 2. [Contrato, estado y reproducción](../../../scripts/public-website/blog-phase1/README.md).
+El modelo vigente descrito abajo sigue siendo el productivo hasta un cutover autorizado.
+
 ## Para Que Sirve
 
 Este documento fija como funciona hoy el blog publico de Efeonce en WordPress y
@@ -351,3 +359,7 @@ no duplicar contenido indexado.
 - `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`
 - `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`
 - `docs/public-site/decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md`
+
+## Suscripción del blog — estado 20/10/2026
+
+Publicación detenida por el operador; el reemplazo por Growth Forms queda en develop y en revisión visual: un correo personal o corporativo y consentimiento explícito. El sitio continúa usando CF7. [Preparación, evidencia y bloqueos](../../audits/public-site/2026-10-20-blog-growth-form-preparation.md); no hay suscripción HubSpot ni medición GA4 certificadas todavía.

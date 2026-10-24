@@ -341,6 +341,25 @@ venga de un blog **no entra** nunca.
 Las cuatro limitaciones anteriores siguen abiertas: un entregable con texto chico, un sistema de personaje o un
 layout con jerarquía **sigue necesitando QA humano por pieza**. 2.5 no lo convierte en un paso automatizable.
 
+### Acabado Sunburst sobre una escena compuesta (caso Efeonce | Google, 2026-10-19)
+
+Receta aprobada por el operador para una pieza con elementos exactos (íconos oficiales de productos de un partner):
+fondo con **Flare** → íconos compuestos de forma determinística en capas de profundidad → pasada de **Sunburst** sobre
+la escena compuesta, pidiendo sólo luz y lente (rim light, material acrílico brillante, profundidad de campo, haze,
+aberración cromática, grano) con los íconos **idénticos** en silueta, color, rotación, tamaño y posición → texto, lockup
+y firma determinísticos al final. «Tienes que pedir el acabado a Sunburst porque no se ve bien así determinístico»
+(operador). Prompt de la corrida: `ai-generations/2026-10-19_google-partner-freeze/r5-cine/acabado.txt`.
+
+- 🔴 **El acabado puede borrar un trazo fino de identidad**: en la misma corrida Sunburst borró el contorno de tinta de
+  una mascota (Gigi). QA al 100 % contra la escena compuesta y **reponer componiendo** lo que cambió; no regenerar.
+- 🔴 **Pide el modelo explícito**: `pnpm ai:image` sin `--model` usa `gpt-image-2` (la carpeta `v1-gpt-image-2/` de la
+  corrida salió así y el operador esperaba 2.5).
+- 🔴 **Luz y título no comparten caja**: un núcleo de luz detrás de un logo blanco dio 1,3:1. Pedir la luz como
+  horizonte bajo y el centro oscuro, y medir el contraste bajo la caja del título antes de componer (final: 15–19:1).
+
+Método de dirección: `design-studio` → `modules/13_LAYOUT_DESIGN_AND_FINISHING.md`; pieza:
+`efeonce-graphic-line` → `references/applications.md` §A16.
+
 ### Patrones de prompt oficiales (guía vigente = abril 2026, escrita para `gpt-image-2`)
 
 ⚠️ Al 2026-09-08 **OpenAI no publicó guía de prompting para 2.5**: la del cookbook está fechada 2026-04-21 y
@@ -975,6 +994,10 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
 - 🔴 **Bloqueo por saldo:** un 403 **`User is locked. Reason: Exhausted balance`** (o `TOP_UP`) ocurre antes de encolar
   (sin costo). El CLI ya hace failover a la otra cuenta; si **todas** están bloqueadas, recargar en
   `fal.ai/dashboard/billing` lo hace una persona (el operador), nunca el agente. No reintentes en loop.
+- **Saldo y `pnpm ai:inpaint expand` (2026-10-19):** el expand corre Flux Fill por fal; con la cuenta `FAL_API_KEY_B`
+  en «User is locked. Exhausted balance» la corrida no salió. Mira `pnpm ai:fal --balance` antes de planear un expand.
+  Si el área nueva es fondo vacío (sin objetos que continuar), se puede extender de forma determinística (color por
+  columna + grano), como en el 9:16 del anuncio Efeonce | Google.
 - **Cuentas y saldo:** el CLI trabaja con dos cuentas de fal (`FAL_API_KEY`, `FAL_API_KEY_B`): usa la de más saldo y
   hace failover solo ante 403 `User is locked`. `pnpm ai:fal --balance` lista ambos saldos gratis; `--fal-account` fuerza
   una. Si todas están sin saldo, recarga una cuenta configurada (caso 2026-09-16: se recargó la B cuando el CLI sólo
@@ -1144,6 +1167,10 @@ deterministic and are composed after any generative finish.
    When the image contains channel iconography or marks, inspect every light/white
    interior (for example the LinkedIn “in” and YouTube play) after matting; a clean
    silhouette with erased logo details is a failed asset.
+   Para texto, logos y lockups, `pnpm ai:listen --file pieza.png --preset lockup` (Gemini) transcribe el
+   texto visible y opina sobre logos, bordes y contraste en teléfono. Es una segunda opinión de criterio, no una
+   medición: no reemplaza la revisión al 100 % ni la composición determinista. Ver
+   `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`.
 8. Refine with single-change follow-ups; restate invariants on every edit. In multi-model flows,
    carry `anchor_id`, parent asset, reference roles, precedence, locks, one delta, safe zones and
    acceptance criteria at every handoff; derive every ratio from the approved anchor using star topology,

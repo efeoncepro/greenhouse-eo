@@ -1,5 +1,7 @@
 # Landing: Influencer Marketing, Creators & UGC
 
+> **Delta 2026-10-23 — dock compartido (TASK-2043).** El dock inferior es el AXIS `efeonce.landing-dock` pintado por el plugin `eo-landing-dock` (config `manifests/landing-dock/influencers.json`): escritorio y teléfono (en teléfono sólo la principal); «Agenda una reunión» (CTA propio `influencer-discovery-meeting`) · «Cuéntanos tu campaña» → `#conversion`, antetítulo «Siguiente paso»; parada `#conversion`. El dock viejo `div#sticky-cta` se quita del HTML mientras el dock está activo (`off` lo devuelve); lo que abajo describe el dock viejo es historia y contexto de rollback. Operar: `global-site-navigation.md` §Landing dock.
+
 > **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-creator-influence-brief` v3 entrega en `direct` al formulario HubSpot «Lead Gen - Influencer Marketing» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
 
 - **Status:** published + index eligible; WordPress page `251627`, parent `/servicios/` page `251077`.

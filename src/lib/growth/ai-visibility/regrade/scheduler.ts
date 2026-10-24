@@ -20,6 +20,8 @@ import { resolveProviderPolicy } from '@/lib/growth/ai-visibility/policy'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
+import type { EnvSource } from '@/types/env-source'
+
 export const RECURRING_REGRADE_IDEMPOTENCY_PREFIX = 'growth-ai-visibility-regrade'
 
 export type RecurringRegradeCadence = 'weekly' | 'monthly' | 'quarterly'
@@ -223,7 +225,7 @@ const markProfileRegradeFailure = async (profileId: string): Promise<void> => {
 }
 
 export const handleRecurringRegradeBatch = async (
-  options: { batchSize?: number; env?: NodeJS.ProcessEnv; now?: Date } = {}
+  options: { batchSize?: number; env?: EnvSource; now?: Date } = {}
 ): Promise<HandleRecurringRegradeBatchResult> => {
   const env = options.env ?? process.env
   const config = resolveRecurringRegradeConfig(env)

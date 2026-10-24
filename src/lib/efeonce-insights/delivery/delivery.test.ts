@@ -64,7 +64,7 @@ const infra = vi.hoisted(() => ({ withTx: vi.fn(async (fn: (client: unknown) => 
 vi.mock('@/lib/postgres/client', () => ({ withGreenhousePostgresTransaction: infra.withTx, runGreenhousePostgresQuery: infra.pgQuery }))
 vi.mock('@/lib/sync/publish-event', () => ({ publishOutboxEvent: infra.publish }))
 
-const ENV_ON = { INSIGHTS_DELIVERY_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv
+const ENV_ON = { INSIGHTS_DELIVERY_ENABLED: 'true' }
 const internalSubject = { userId: 'user-int', tenantType: 'efeonce_internal' as const, roleCodes: ['efeonce_account'], primaryRoleCode: 'efeonce_account', routeGroups: ['internal'], authorizedViews: [], memberId: 'mem-1' }
 const opsSubject = { ...internalSubject, userId: 'user-ops', roleCodes: ['efeonce_operations'], primaryRoleCode: 'efeonce_operations' }
 const executiveSubject = { userId: 'user-exec', tenantType: 'client' as const, roleCodes: ['client_executive'], primaryRoleCode: 'client_executive', routeGroups: ['client'], authorizedViews: [] }
@@ -144,7 +144,7 @@ describe('requestInsightDelivery', () => {
   it('flag OFF ⇒ delivery_disabled; cliente ⇒ forbidden; operations ⇒ forbidden', async () => {
     const { requestInsightDelivery } = await import('./commands')
 
-    await expect(requestInsightDelivery({ ...scope, body: body(), env: {} as NodeJS.ProcessEnv })).rejects.toMatchObject({ code: 'delivery_disabled' })
+    await expect(requestInsightDelivery({ ...scope, body: body(), env: {} })).rejects.toMatchObject({ code: 'delivery_disabled' })
     await expect(requestInsightDelivery({ ...scope, subject: executiveSubject, actorOrganizationId: 'org-a', body: body() })).rejects.toMatchObject({ code: 'forbidden' })
     await expect(requestInsightDelivery({ ...scope, subject: opsSubject, body: body() })).rejects.toMatchObject({ code: 'forbidden' })
   })
@@ -212,7 +212,7 @@ describe('dispatchInsightDeliveryIntent', () => {
   it('flag OFF en el worker ⇒ no toca nada', async () => {
     const { dispatchInsightDeliveryIntent } = await import('./dispatch')
 
-    expect(await dispatchInsightDeliveryIntent('idlv-1', {} as NodeJS.ProcessEnv)).toMatchObject({ skipped: 'flag_off' })
+    expect(await dispatchInsightDeliveryIntent('idlv-1', {})).toMatchObject({ skipped: 'flag_off' })
     expect(delivery.getInsightDeliveryIntent).not.toHaveBeenCalled()
   })
 

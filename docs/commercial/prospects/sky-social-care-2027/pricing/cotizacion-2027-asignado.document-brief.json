@@ -1,0 +1,148 @@
+{
+ "schemaVersion": "pricing-v3-quote-document-brief/1",
+ "reference": "Social care 2027 · Oferta económica",
+ "supplier": {
+  "name": "Efeonce Group SpA",
+  "taxId": "RUT 77.357.182-1",
+  "contact": "Julio Reyes",
+  "email": "jreyes@efeoncepro.com",
+  "phone": "+56 9 3480 2860"
+ },
+ "buyer": {
+  "name": "SKY Airline",
+  "unit": "SKY Airline",
+  "taxId": "RUT por confirmar",
+  "logo": null
+ },
+ "cover": {
+  "label": "Oferta económica · Servicio gestionado",
+  "title": [
+   "Social care",
+   "2027."
+  ],
+  "subtitle": "Respuesta pública a los comentarios en las 13 cuentas de SKY, con un fee mensual fijo y el equipo reforzado en las campañas grandes."
+ },
+ "service": {
+  "name": "Servicio gestionado de social care 2027"
+ },
+ "scope": {
+  "title": [
+   "Un servicio completo,",
+   "todo incluido."
+  ],
+  "intro": "Hasta 1.300 conversaciones al mes. Lunes a viernes, de 09:00 a 18:00, y con el equipo reforzado en las campañas grandes.",
+  "rows": [
+   {
+    "title": "Cobertura",
+    "text": "Respuesta pública a comentarios de precio y destinos, consultas generales y reclamos en 13 cuentas de 5 mercados: 5 de Facebook, 5 de Instagram, 1 de TikTok, 1 de LinkedIn y 1 de X."
+   },
+   {
+    "title": "Equipo",
+    "text": "Especialista asignado, con respaldo y supervisión directa de Efeonce."
+   },
+   {
+    "title": "Horario y respuesta",
+    "text": "Lunes a viernes, de 09:00 a 18:00. Respuesta en 2 a 4 horas hábiles y alerta automática de lo crítico fuera de horario."
+   },
+   {
+    "title": "Campañas",
+    "text": "Refuerzo del equipo en Travel Sale, Cyber SKY, Black Friday y campañas especiales a demanda, hasta cinco semanas al año."
+   },
+   {
+    "title": "Tecnología",
+    "text": "Agentes de IA, base de conocimiento y plataforma. SKY no contrata ni instala nada."
+   },
+   {
+    "title": "Medición",
+    "text": "27 indicadores en Efeonce Insights."
+   },
+   {
+    "title": "Puesta en marcha",
+    "text": "Seis semanas de preparación, bonificadas."
+   }
+  ]
+ },
+ "schedule": {
+  "title": "Cómo se pone en marcha",
+  "note": "Contrato a 12 meses",
+  "phases": [
+   {
+    "label": "Seis semanas",
+    "title": "Preparación",
+    "text": "Accesos a las cuentas, base de conocimiento y configuración de la plataforma y los agentes."
+   },
+   {
+    "label": "Doce meses",
+    "title": "Operación",
+    "text": "Respuesta diaria en horario hábil e indicadores en Efeonce Insights."
+   },
+   {
+    "label": "Hasta cinco semanas al año",
+    "title": "Campañas",
+    "text": "Una persona más en Travel Sale, Cyber SKY, Black Friday y campañas especiales."
+   }
+  ]
+ },
+ "pricing": {
+  "title": [
+   "Un fee mensual fijo,",
+   "todo incluido."
+  ],
+  "intro": "Valores netos en pesos chilenos (CLP) para doce meses de servicio.",
+  "summary": "Doce meses · Pesos chilenos · IVA no incluido",
+  "taxNote": "Valores netos, más IVA. El refuerzo de campaña cubre hasta cinco semanas al año. Vigencia: 2027. Contrato a 12 meses."
+ },
+ "conditions": {
+  "title": [
+   "Supuestos",
+   "y condiciones."
+  ],
+  "rows": [
+   {
+    "title": "Plazo",
+    "text": "Contrato a 12 meses, con seis semanas de preparación antes de la operación."
+   },
+   {
+    "title": "Qué es una conversación",
+    "text": "Cada conversación es un comentario y su hilo. El servicio cubre hasta 1.300 conversaciones al mes."
+   },
+   {
+    "title": "Fuera del alcance",
+    "text": "Engagement y mensajes directos. X y los comentarios en anuncios entran si se cuenta con los accesos."
+   },
+   {
+    "title": "Reclamos",
+    "text": "Los reclamos se derivan; el caso de cada pasajero lo resuelve SKY."
+   },
+   {
+    "title": "Opcionales",
+    "text": "La cobertura extendida y las conversaciones adicionales se contratan por separado, con los valores indicados en la sección de inversión."
+   },
+   {
+    "title": "Facturación y pago",
+    "text": "Fee mensual fijo. La forma y el plazo de pago, el reajuste y la salida anticipada se acuerdan en el contrato."
+   }
+  ]
+ },
+ "lines": {
+  "fee": {
+   "label": "Servicio gestionado de social care",
+   "detail": "Fee mensual fijo, todo incluido"
+  }
+ },
+ "options": {
+  "extendida": {
+   "label": "Cobertura extendida",
+   "detail": "Noches, fines de semana y feriados.",
+   "unit": "al mes"
+  },
+  "bloque": {
+   "label": "Conversaciones adicionales",
+   "detail": "Sobre las 1.300 conversaciones mensuales incluidas.",
+   "unit": "por bloque de 200 conversaciones"
+  }
+ },
+ "optionsTexts": {
+  "title": "Opcionales"
+ }
+}

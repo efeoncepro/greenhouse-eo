@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-10-01T21:59:56.434Z",
+  "generatedAt": "2026-10-22T21:34:07.643Z",
   "run": "ai-generations/2026-07-05_task-1345-hero-interface",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-07-05_task-1345-hero-interface",

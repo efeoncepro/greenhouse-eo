@@ -1,4 +1,61 @@
-# Landing: About us
+# Landing: About us / Nosotros
+
+## Rediseño 2026-10-23 (vigente)
+
+- URL `https://efeoncepro.com/about-us-efeonce/`, `page_id` `249770` (destino de «Nosotros» en el menú global). Body
+  replaced in place 2026-10-23; slug, title SEO, canonical and featured image `249769` unchanged.
+- Need: a visitor who wants to know who Efeonce is before talking. The page carries the declared Why
+  (`docs/context/01_quienes-somos.md` §El Why: «No te entregamos crecimiento. Lo construimos contigo»), the four lines,
+  the team (+89), five markets, Sky proof and testimonials, partners and the founder; conversion = `/agenda/`.
+- Design: canvas «Nosotros — Efeonce» (`https://claude.ai/artifact/SPj7zAai7Q1ojyKpXogA5N`, La órbita), approved by the
+  operator 2026-10-23. Images: `ai-generations/2026-10-22_nosotros-landing/` (hero long exposure, team in formation,
+  markets, «un cerebro», founder). Sky figures only in «La prueba» (operator decision); testimonials are verbatim
+  excerpts already public on `experiencia.efeoncepro.com`.
+- Source and rail (shared source-led core): `scripts/public-website/nosotros-source/` (Main.dc.html without the drawn
+  header/footer, assets.json, host.css, page-custom.css) → `compile-nosotros-elementor-source.cjs` →
+  `build-nosotros-elementor-package.cjs <live baseline>` → `deploy-nosotros-elementor-package.php` (contract
+  `nosotros-elementor-release.v1`) → `publish-nosotros-elementor-page.php` (`preview` | `replace` with
+  `expectedDataSha`; restores `_thumbnail_id` after save) → `rollback-nosotros-elementor-page.php` `{ "snapshot": "…" }`.
+  Gates: `verify-source-led-compilers.cjs` and `verify-source-led-render.php` include `nosotros`.
+- Page tree: 11 containers, one `greenhouse_nosotros_*` widget each: hero · quees · marcas · porque · como (light) ·
+  equipo · mercados · prueba (light, paper) · partners · founder · cierre. Repeaters: clientes (7), partners (8),
+  equipo (5), cifras (4), testimonios (2). Logo rows compile one layout per logo (each keeps its approved height).
+- `assets/js/nosotros-landing.js` only clones the client-logo set for the marquee loop (not in the editor nor with
+  reduced motion). Links: meetings → `/agenda/` (no Growth CTA surface yet), careers →
+  `https://greenhouse.efeoncepro.com/public/careers`, founder → `https://www.linkedin.com/in/cesargrowth/` (from
+  Julio's own email signature).
+- The site's floating global navigation overlays the hero: the hero copy top padding is `clamp(152px,12vw,184px)`.
+- Live 2026-10-23: deploy backups on Kinsta `/tmp/eo-nosotros-widgets-before-20261023-135655.tar` and `-135848.tar`;
+  replace snapshot `_gh_nosotros_v2_before_20261023_140005`; Elementor data hash `a7ca0770…`; 1440 and 390 px overflow 0,
+  no broken images, no console errors. QA preview `252030` (`/nosotros-preview-20261023/`) left `private`.
+- SEO 2026-10-23: meta description = «No te entregamos crecimiento: lo construimos contigo y te dejamos más capaz de
+  sostenerlo. Estrategia, creatividad, medios, datos y tecnología.» (`configure-nosotros-seo.php`, snapshot option
+  `_gh_nosotros_seo_before_20261023_141826`). OG and Twitter descriptions set to the same text
+  (`configure-nosotros-social-seo.php`, snapshot option `_gh_nosotros_social_before_20261023_142121`).
+- OG 2026-10-23: `nosotros-source/og/og.html` → `og-nosotros.png` (1200×630, hero photo + «Lo construimos contigo», no
+  signature because the logo is in the photo) → `configure-nosotros-og.php`: new attachment `252037`, OG/Twitter image
+  and title «Nosotros: lo construimos contigo | Efeonce»; featured image `249769` untouched; snapshot option
+  `_gh_nosotros_og_before_20261023_144636` (previous OG image `250188`). Bottom dock: none.
+
+- Fidelity pass and follow-ups 2026-10-23/24 (method and generic recipes:
+  `../source-led-elementor-patterns.md` §Ohio host fidelity), all in `nosotros-source/host.css` unless noted:
+  - Ohio collisions reset (body type, `li` margins, `.pgrid` top margin, heading sizes, content-box); the diff then has
+    zero height differences at 1440 and only the inline-image baseline gap (7 px, black on both sides) under the hero
+    photo at 390.
+  - Theme rails (reported on «En cinco países» and the founder quote): `--gh-rail` on `.wrap`, `.mk-copy` (widened so
+    the title keeps one line), founder and brain copy; the hero copy anchored to the left rail instead of centered in
+    1320px (it drifted onto the lit doorway and the passers-by on wide screens).
+  - Map: no parallax on the «mercados» image, so the five city labels stay on their cities.
+  - Hero stats (`Main.dc.html`): the HubSpot stat shows the official full HubSpot wordmark in white (same asset as the
+    partners grid, `partner-hubspot.svg`, alt «HubSpot», `height:1em`, `filter: brightness(0) invert(1)`) instead of the
+    word. It added hero fields (renumbered `fNNN_*`); widget-only deploy was safe because `_elementor_data` stores no
+    field keys.
+  - Deploy backups on Kinsta `/tmp/eo-nosotros-widgets-before-20261024-002931.tar`, `-005050.tar`, `-010056.tar`;
+    greenhouse-eo commits `7b57a9589`, `1991fe21d`, `c90171c9e`; runtime commits `b5f7a25`, `4a2bfd2`, `f5d730e`.
+    Verified live at 1280, 1710 and 1920 px (and 390 for the stats).
+
+## Before 2026-10-23 (history; replaced)
+
 
 ## Identity
 

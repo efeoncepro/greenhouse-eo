@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "new-profiles-default-kit-neutrality-2026-10-22",
+  "baseDigest": "3e514964cfed391c3c7ac322c2ad3254b56674f8afdb58bcce98cc69f9c1fbc1",
+  "nextVersion": "operating-review-2026-10-22-v13",
+  "actor": "agent-review:operator-canonical-maintenance-request",
+  "reason": "Correct only3newprofiledefaultkitstogeneric-core, consistentwithhistoricalordinaryprofiles; managedserviceusestheexplicitmanaged-service-corekit. No cost, FX, rate, policy or resource changes.",
+  "changes": [
+    {
+      "operation": "replace",
+      "recordId": "profile:ECG-033",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "profile:ECG-033",
+        "revision": 2,
+        "source": {
+          "reference": "review:profile-default-kit-neutrality:2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Distinct semi-senior role requested by operator; no equivalence to broad Paid Media Manager or Marketing Automation Specialist. Existing base specialist tier1 reused; historical tier label is not operational or commercial approval. Default corrected to generic-core to preserve ordinary person-capacity provisions. A managed-service demand must explicitly select managed-service-core by actual business scope; no implicit provision waiver.",
+        "kind": "profile",
+        "value": {
+          "profileId": "ECG-033",
+          "label": "Trafficker Digital Semi-senior",
+          "seniorityCode": "mid",
+          "tierCode": "historical-tier-1",
+          "requiredCoverages": [
+            "human_salary"
+          ],
+          "aliases": [
+            "trafficker digital semi-senior",
+            "digital trafficker mid"
+          ],
+          "defaultKitId": "generic-core"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "profile:ECG-034",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "profile:ECG-034",
+        "revision": 2,
+        "source": {
+          "reference": "review:profile-default-kit-neutrality:2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Distinct semi-senior role requested by operator; no equivalence to broad Paid Media Manager or Marketing Automation Specialist. Existing base specialist tier1 reused; historical tier label is not operational or commercial approval. Default corrected to generic-core to preserve ordinary person-capacity provisions. A managed-service demand must explicitly select managed-service-core by actual business scope; no implicit provision waiver.",
+        "kind": "profile",
+        "value": {
+          "profileId": "ECG-034",
+          "label": "Especialista Email y SMS Semi-senior",
+          "seniorityCode": "mid",
+          "tierCode": "historical-tier-1",
+          "requiredCoverages": [
+            "human_salary"
+          ],
+          "aliases": [
+            "email sms semi-senior",
+            "email marketing sms mid"
+          ],
+          "defaultKitId": "generic-core"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "profile:ECG-035",
+      "effectiveFrom": "2026-10-22",
+      "record": {
+        "recordId": "profile:ECG-035",
+        "revision": 2,
+        "source": {
+          "reference": "review:profile-default-kit-neutrality:2026-10-22",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Distinct role: digital ecosystem/business strategy, sector and trend research, competitive benchmarks, priorities and integrated measurement. Not Creative Operations Lead or Content Manager. Historical tier2 reused; this is no compensation or commercial approval. Full research reference: estimate:reditos-2027-case-cost-review:2026-10-22;research:Contravia3.7MM-and-MarketingSero3-4.5MM;user:role-additions-authorized Default corrected to generic-core to preserve ordinary person-capacity provisions. A managed-service demand must explicitly select managed-service-core by actual business scope; no implicit provision waiver.",
+        "kind": "profile",
+        "value": {
+          "profileId": "ECG-035",
+          "label": "Digital Strategist",
+          "seniorityCode": "mid",
+          "tierCode": "historical-tier-2",
+          "requiredCoverages": [
+            "human_salary"
+          ],
+          "aliases": [
+            "estratega digital",
+            "digital strategist semi-senior"
+          ],
+          "defaultKitId": "generic-core"
+        }
+      }
+    }
+  ]
+}

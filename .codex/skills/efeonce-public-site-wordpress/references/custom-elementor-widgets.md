@@ -19,6 +19,9 @@ Do not create a new plugin for each widget. Add:
 
 The shared Elementor category is `Greenhouse`.
 
+Site chrome is not a widget: the global menu (`eo-site-nav`) and the landings' bottom dock (`eo-landing-dock`,
+TASK-2043) are their own plugins painting AXIS primitives; see `global-site-navigation.md`.
+
 ## Public-Site Primitives Registry
 
 Reusable public-site modules are canonized in:

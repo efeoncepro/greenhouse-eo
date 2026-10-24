@@ -1,0 +1,18 @@
+{
+  "document": "proposal",
+  "line": "voice",
+  "slides": [
+    { "recipeId": "cover-proposal-orbit", "purpose": "Portada sin foto con el logo de Gana dentro de la órbita" },
+    { "recipeId": "decision-agenda", "purpose": "Agenda: cinco capítulos de la propuesta" },
+    { "recipeId": "content-text", "purpose": "Nativa: lo que necesita Gana (RFP)" },
+    { "recipeId": "content-bullets", "purpose": "Nativa: modelo de servicio Efeonce + Basis" },
+    { "recipeId": "content-stack", "purpose": "Reutilizada del brochure Medios (aprobada): tecnología" },
+    { "recipeId": "decision-provider-fit", "purpose": "Nativa: Basis DSP, plataforma equivalente a DV360/TTD" },
+    { "recipeId": "content-service-lanes", "purpose": "Reutilizada del brochure Medios: mapa de formatos por objetivo" },
+    { "recipeId": "content-focus", "purpose": "Nativa: DOOH en Medellín para Gana" },
+    { "recipeId": "decision-plan", "purpose": "Plan de trabajo en tres tramos" },
+    { "recipeId": "decision-chart", "purpose": "Nativa: escenarios de inversión COP 30 M y COP 55 M" },
+    { "recipeId": "decision-risk", "purpose": "Nativa: matriz de cumplimiento de requisitos habilitantes" },
+    { "recipeId": "close-proposal-horizon", "purpose": "Contraportada con foto" }
+  ]
+}

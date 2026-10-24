@@ -9,6 +9,47 @@
 > Domain: `growth` (`GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`)
 > Runtime contract: `greenhouse-growth-public-forms.v1` (planned)
 
+## Delta 2026-10-24 — TASK-2053/2054: presentación `inline_pill`, reserva por evento y conteo público de reservas (§10.1, §19, §20)
+
+Code complete en `develop` (local), **rollout pendiente**: llega a los hosts con el próximo release de Greenhouse a
+`main` (el `prebuild` construye `renderer-latest.js`, renderer `1.2.0`). Ningún formulario publicado cambia: todo campo
+nuevo es opcional y su ausencia compila al contrato de antes.
+
+- **Presentación del formulario (§19).** `ui_policy.presentation: 'inline_pill'` (ausente o `standard` = la de siempre)
+  + `ui_policy.inlinePill { openLabel, submitLabel, successLabel, doneLabel, waitlistSuccessLabel, waitlistDoneLabel,
+  note }`, todas opcionales (el renderer usa el diccionario del locale por `formKind`). Cruzan al render contract como
+  `presentation` e `inlinePill`. El compiler bloquea lo que la píldora no sabe dibujar: más de un campo visible o un
+  correo no requerido (`inline_pill_fields`), casillas de consentimiento (`inline_pill_consent_checkboxes`; el
+  consentimiento va como aviso), `composition` distinta de `static`, `redirect`/`success_card`, HTML o marcadores en
+  etiquetas, y `note` con algo distinto de un único `{privacyLink}` (que exige `privacyUrl`).
+- **Valor fijo de campo oculto (§11).** `fields[].staticValue` (≤ 200, sólo `type: 'hidden'`, si no
+  `static_value_not_hidden`). Viaja en el contrato y `submitForm` lo IMPONE (`applyStaticFieldValues`): lo que mande el
+  navegador para ese campo se descarta. Es la identificación pública de cada evento (`event_key`).
+- **Reserva por evento (§10.1, server-only).** `ui_policy.eventRegistration { capacity?, overCapacity: 'waitlist' |
+  'reject' (default waitlist), statusField (default 'registration_status'), showRegistrationsCount (default false),
+  registrationsCountThreshold (default 25) }`, sólo en `form_kind = event_registration`
+  (`event_registration_wrong_kind`), no cruza al render contract. El cupo se decide DENTRO de la transacción del envío
+  (`persistAcceptedSubmission`) con `pg_advisory_xact_lock` por formulario: cuenta correos distintos
+  (`lead_email_hash`) de envíos aceptados no en lista de espera; un correo ya confirmado no ocupa otro cupo. `waitlist`
+  acepta y escribe `registration_status=waitlisted` en `normalized_fields_json` (sin columnas ni tablas nuevas; el
+  destino lo recibe sólo si su mapping lo declara); `reject` revierte y responde el outcome nuevo `capacity_full`
+  (HTTP 409). La respuesta del submit suma `registrationStatus`. Verificado contra PostgreSQL 16 local: 24 envíos
+  concurrentes con cupo 5 dejan 5 confirmados (sin el lock, 18).
+- **Conteo público (§20).** `GET /api/public/growth/forms/{formRef}/registrations-count` → `{ count, display, shown }`:
+  reservas confirmadas redondeadas hacia abajo a la decena, sólo con `showRegistrationsCount` y si el valor redondeado
+  alcanza el umbral; si no, `{ count: null, display: null, shown: false }` (sin distinguir causa). Reader canónico
+  `countAcceptedRegistrations(formRef)` con caché en memoria (10 min; 1 min para inexistentes; tope 500), CORS
+  gobernado, `Cache-Control: public, max-age=600`, rate limit por IP de dominio (30/min por instancia, sobre el WAF de
+  `/api/public/**`) y errores `canonicalErrorResponse` (`growth_form_not_found`, `rate_limited`, `internal_error`).
+- **Renderer (§19).** Rama `inline_pill` (`src/growth-forms-renderer/inline-pill.ts`): píldora que se estira en el campo
+  de correo, loader de la órbita, éxito con relleno y check, estado final más angosto; mismo envío, validación,
+  consentimiento, captcha y telemetría que el formulario estándar. Tokens `--ghf-inline-*` con default del canvas; el
+  anfitrión declara el tono. Evento DOM `ghf:success` (sin PII) que lleva a otras instancias del mismo `formKey` a su
+  estado final sin reenviar. Fidelidad contra el canvas: 20/20 estados ≤ 1 % y formularios estándar 0 px
+  (`docs/ui/reviews/TASK-2054-growth-form-inline-pill-renderer/`).
+
+Contrato de host y tabla de tokens: [runtime contract §Formulario en línea](growth-public-forms-runtime-contract.md#formulario-en-línea-y-reserva-por-evento-task-20532054).
+
 ## Delta 2026-10-15 — renderer: `radio` como tarjetas en toda variante, enlace de privacidad legible e íconos SVG de etiqueta (§19)
 
 Commit `ab622e958` en `src/growth-forms-renderer/**` (tests 83/83 del renderer y 167/167 del dominio forms):

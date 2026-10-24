@@ -1,0 +1,261 @@
+{
+  "contract": "efeonce-acquisition-taxonomy-plan.v1",
+  "status": "prepared_not_applied",
+  "executable": false,
+  "portalId": 48713323,
+  "asOfUtc": "2026-10-19T10:50:41.600135+00:00",
+  "scope": "active/non-archived records returned by objects list; no names/emails/amounts requested",
+  "deals": {
+    "total": 293,
+    "pages": 3,
+    "paginationComplete": true,
+    "missing": 118,
+    "populated": 175,
+    "multipleSelections": 2,
+    "selectionCounts": {
+      "WherEX": 24,
+      "Referidos": 10,
+      "Mercado público": 96,
+      "Prospección directa": 35,
+      "Partnership": 5,
+      "Marketing": 7
+    },
+    "combinations": [
+      {
+        "values": [
+          "Marketing"
+        ],
+        "count": 5
+      },
+      {
+        "values": [
+          "Marketing",
+          "Prospección directa"
+        ],
+        "count": 2
+      },
+      {
+        "values": [
+          "Mercado público"
+        ],
+        "count": 96
+      },
+      {
+        "values": [
+          "Partnership"
+        ],
+        "count": 5
+      },
+      {
+        "values": [
+          "Prospección directa"
+        ],
+        "count": 33
+      },
+      {
+        "values": [
+          "Referidos"
+        ],
+        "count": 10
+      },
+      {
+        "values": [
+          "WherEX"
+        ],
+        "count": 24
+      }
+    ]
+  },
+  "propertyDefinitionsRefreshed": {
+    "contacts": 472,
+    "deals": 252
+  },
+  "reports": {
+    "totalReturned": 86,
+    "reportedTotal": 86,
+    "paginationComplete": true,
+    "nonemptyConfig": 82,
+    "stringConfig": 0,
+    "exactNameReferencesInReturnedMetadata": {
+      "canal_de_adqusicion": [],
+      "prospect_source": [],
+      "hs_analytics_source": [],
+      "hs_analytics_latest_source": [],
+      "hs_object_source_label": []
+    },
+    "scopeLimit": "Exact literal match over returned list metadata/config; not proof of all saved report definition dependencies or indirect consumers."
+  },
+  "workflows": {
+    "status": "blocked",
+    "httpStatus": 403,
+    "reason": "missing required scopes; no reauthorization or privilege escalation attempted"
+  },
+  "dealSegments": {
+    "returned": 0,
+    "paginationComplete": true,
+    "limit": "Deal-owned lists only; does not cover association filters in Contact/Company lists"
+  },
+  "proposedSchema": [
+    {
+      "object": "deals",
+      "name": "ef_acquisition_origin",
+      "label": "Origen comercial",
+      "groupName": "dealinformation",
+      "type": "enumeration",
+      "fieldType": "select",
+      "expectedAbsent": true,
+      "defaultValue": null,
+      "options": [
+        {
+          "label": "Inbound",
+          "value": "inbound",
+          "displayOrder": 0,
+          "hidden": false
+        },
+        {
+          "label": "Prospección",
+          "value": "outbound",
+          "displayOrder": 1,
+          "hidden": false
+        },
+        {
+          "label": "Referido",
+          "value": "referral",
+          "displayOrder": 2,
+          "hidden": false
+        },
+        {
+          "label": "Partner",
+          "value": "partner",
+          "displayOrder": 3,
+          "hidden": false
+        },
+        {
+          "label": "Licitación",
+          "value": "tender",
+          "displayOrder": 4,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "object": "deals",
+      "name": "ef_acquisition_channel",
+      "label": "Canal de adquisición",
+      "groupName": "dealinformation",
+      "type": "enumeration",
+      "fieldType": "select",
+      "expectedAbsent": true,
+      "defaultValue": null,
+      "options": [
+        {
+          "label": "Búsqueda pagada",
+          "value": "paid_search",
+          "displayOrder": 0,
+          "hidden": false
+        },
+        {
+          "label": "Búsqueda orgánica",
+          "value": "organic_search",
+          "displayOrder": 1,
+          "hidden": false
+        },
+        {
+          "label": "Social pagado",
+          "value": "paid_social",
+          "displayOrder": 2,
+          "hidden": false
+        },
+        {
+          "label": "Social orgánico",
+          "value": "organic_social",
+          "displayOrder": 3,
+          "hidden": false
+        },
+        {
+          "label": "Email marketing",
+          "value": "email_marketing",
+          "displayOrder": 4,
+          "hidden": false
+        },
+        {
+          "label": "Email outbound",
+          "value": "outbound_email",
+          "displayOrder": 5,
+          "hidden": false
+        },
+        {
+          "label": "Email inbound",
+          "value": "inbound_email",
+          "displayOrder": 6,
+          "hidden": false
+        },
+        {
+          "label": "Referencia de IA",
+          "value": "ai_referral",
+          "displayOrder": 7,
+          "hidden": false
+        },
+        {
+          "label": "Referencia web",
+          "value": "web_referral",
+          "displayOrder": 8,
+          "hidden": false
+        },
+        {
+          "label": "Acceso web directo",
+          "value": "direct_web",
+          "displayOrder": 9,
+          "hidden": false
+        },
+        {
+          "label": "Teléfono",
+          "value": "phone",
+          "displayOrder": 10,
+          "hidden": false
+        },
+        {
+          "label": "Mensajería",
+          "value": "messaging",
+          "displayOrder": 11,
+          "hidden": false
+        },
+        {
+          "label": "Presencial",
+          "value": "in_person",
+          "displayOrder": 12,
+          "hidden": false
+        },
+        {
+          "label": "Plataforma de compras",
+          "value": "procurement_platform",
+          "displayOrder": 13,
+          "hidden": false
+        },
+        {
+          "label": "Otro canal documentado",
+          "value": "other",
+          "displayOrder": 14,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "object": "deals",
+      "name": "ef_acquisition_source",
+      "label": "Fuente de adquisición",
+      "groupName": "dealinformation",
+      "type": "string",
+      "fieldType": "text",
+      "expectedAbsent": true,
+      "defaultValue": null
+    }
+  ],
+  "mappingCandidateCount": 168,
+  "reviewRequiredCount": 125,
+  "allValuesRequireFreshReadAndApproval": true,
+  "rawRecordIdsIncluded": false,
+  "legacyPropertyWillRemainUnchanged": true,
+  "providerWrites": false,
+  "consumerCoverageComplete": false
+}

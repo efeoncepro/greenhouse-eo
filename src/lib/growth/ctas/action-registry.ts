@@ -34,6 +34,8 @@ import {
   ctaOpenThinkToolPolicySchema,
 } from './contracts'
 
+import type { EnvSource } from '@/types/env-source'
+
 // ─── Resultado canónico de resolución ─────────────────────────────────────────
 
 export type CtaActionResolution =
@@ -100,7 +102,7 @@ export const validateGovernedDestination = (
 /** Hub Think gobernado (repo `efeonce-think`): la policy guarda un PATH, jamás un host arbitrario. */
 const THINK_HUB_URL_DEFAULT = 'https://think.efeoncepro.com'
 
-export const resolveThinkHubBase = (env: NodeJS.ProcessEnv = process.env): string =>
+export const resolveThinkHubBase = (env: EnvSource = process.env): string =>
   (env.GROWTH_CTA_THINK_HUB_URL?.trim() || env.PUBLIC_GRADER_HUB_URL?.trim() || THINK_HUB_URL_DEFAULT).replace(
     /\/+$/,
     '',
@@ -113,7 +115,7 @@ export const resolveThinkHubBase = (env: NodeJS.ProcessEnv = process.env): strin
  */
 const BOOKING_HOST_PATTERN = /^meetings(-[a-z0-9]+)?\.hubspot\.com$/
 
-export const isGovernedBookingHost = (hostname: string, env: NodeJS.ProcessEnv = process.env): boolean => {
+export const isGovernedBookingHost = (hostname: string, env: EnvSource = process.env): boolean => {
   const normalized = hostname.toLowerCase()
 
   if (BOOKING_HOST_PATTERN.test(normalized)) return true
@@ -140,6 +142,9 @@ const resolveNewContext = (navigationContext: CtaActionNavigationContext, optIn:
 const resolveOpenGrowthForm = async (
   policy: z.output<typeof ctaOpenGrowthFormPolicySchema>,
 ): Promise<CtaActionResolution> => {
+  // TASK-2044 — un encabezado de diálogo sin presentation=dialog es una policy incoherente.
+  if (policy.dialog && policy.presentation !== 'dialog') return { ok: false, reason: 'action_policy_invalid' }
+
   const formContract = await getPublishedRenderContractByRef(policy.formRef)
 
   if (!formContract) return { ok: false, reason: 'action_destination_unavailable' }
@@ -150,6 +155,10 @@ const resolveOpenGrowthForm = async (
       kind: 'open_growth_form',
       formSlug: formContract.form.slug,
       formKey: formContract.form.formKey,
+      // TASK-2044 — la presentación sólo se proyecta cuando es `dialog`: un CTA inline sigue igual.
+      ...(policy.presentation === 'dialog'
+        ? { presentation: 'dialog' as const, ...(policy.dialog ? { dialog: policy.dialog } : {}) }
+        : {}),
     },
   }
 }

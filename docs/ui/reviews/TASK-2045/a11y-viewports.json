@@ -1,0 +1,42 @@
+{
+ "360": {
+  "axeOpen": [],
+  "axeSuccess": [],
+  "hasSuccess": true,
+  "scrollWidth": [
+   360,
+   360,
+   true
+  ]
+ },
+ "390": {
+  "axeOpen": [],
+  "axeSuccess": [],
+  "hasSuccess": true,
+  "scrollWidth": [
+   390,
+   390,
+   true
+  ]
+ },
+ "1024": {
+  "axeOpen": [],
+  "axeSuccess": [],
+  "hasSuccess": true,
+  "scrollWidth": [
+   1024,
+   1024,
+   false
+  ]
+ },
+ "1440": {
+  "axeOpen": [],
+  "axeSuccess": [],
+  "hasSuccess": true,
+  "scrollWidth": [
+   1440,
+   1440,
+   false
+  ]
+ }
+}

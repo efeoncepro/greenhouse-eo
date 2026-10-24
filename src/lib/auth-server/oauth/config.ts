@@ -5,6 +5,8 @@
 
 import { EFEONCE_MCP_RESOURCE_AUDIENCE } from './scopes'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type AuthServerOAuthConfig = {
   /** `issuer` publicado: IDÉNTICO al origen del well-known (RFC 8414 §3.3). */
   issuer: string
@@ -55,7 +57,7 @@ const parseOrigin = (value: string | undefined, fallback: string): string => {
   return url.pathname === '/' ? url.origin : `${url.origin}${url.pathname.replace(/\/$/, '')}`
 }
 
-export const readAuthServerOAuthConfig = (env: NodeJS.ProcessEnv = process.env): AuthServerOAuthConfig => {
+export const readAuthServerOAuthConfig = (env: EnvSource = process.env): AuthServerOAuthConfig => {
   const environmentId = env.AUTH_SERVER_ENVIRONMENT_ID?.trim() || 'efeonce-auth'
 
   if (!ENVIRONMENT_ID_PATTERN.test(environmentId)) {

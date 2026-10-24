@@ -75,6 +75,8 @@ import {
 import { resolveSeoEntitlement } from './entitlement'
 import { isSeoModuleEnabled } from './flags'
 
+import type { EnvSource } from '@/types/env-source'
+
 /**
  * Nombre del set por defecto de un target.
  *
@@ -103,7 +105,7 @@ const MAX_KEYWORD_LENGTH = 255
 /** Techo de tamaño del lote por llamada — acota el costo de UNA request. */
 const MAX_KEYWORDS_PER_CALL = 100
 
-export const resolveTrackedKeywordCapacity = (env: NodeJS.ProcessEnv = process.env): number => {
+export const resolveTrackedKeywordCapacity = (env: EnvSource = process.env): number => {
   const parsed = Number.parseInt(env[TRACKED_KEYWORDS_CAPACITY_ENV] ?? '', 10)
 
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_TRACKED_KEYWORDS_CAPACITY
@@ -156,7 +158,7 @@ export interface TrackKeywordsOptions {
    * keyword se está midiendo" — eso lo sigue diciendo `seo_keyword_set_members`.
    */
   discoveryProvenance?: { candidateId: string; runId: string }
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 interface TargetRow extends Record<string, unknown> {
@@ -597,7 +599,7 @@ export const untrackKeywords = async (
   seoTargetId: string,
   keywords: string[],
   actor: string,
-  options: { env?: NodeJS.ProcessEnv } = {}
+  options: { env?: EnvSource } = {}
 ): Promise<UntrackKeywordsResult> => {
   const env = options.env ?? process.env
 

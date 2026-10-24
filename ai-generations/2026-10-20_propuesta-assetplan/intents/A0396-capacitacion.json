@@ -1,0 +1,67 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-day-live-library",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Capacitación y adopción",
+    "question": "¿Cómo aprende mi equipo?",
+    "answer": [
+      "A su",
+      "ritmo"
+    ]
+  },
+  "body": "Tutoriales cortos grabados sobre **tu** HubSpot, por rol, para que el equipo resuelva solo lo de siempre.",
+  "library": {
+    "tool": "loom",
+    "kicker": "En Loom · sobre tu portal",
+    "title": "Tutoriales de Assetplan"
+  },
+  "dataOrigin": "illustrative",
+  "sampleMark": "Datos de muestra",
+  "videos": [
+    {
+      "icon": "sales",
+      "role": "Ventas",
+      "title": "Cómo registrar una visita",
+      "duration": "2:40"
+    },
+    {
+      "icon": "data",
+      "role": "IA",
+      "title": "Actualizar el CRM desde tu IA",
+      "duration": "3:10"
+    },
+    {
+      "icon": "revenue",
+      "role": "Líderes",
+      "title": "Leer el pipeline de tu equipo",
+      "duration": "3:30"
+    },
+    {
+      "icon": "service",
+      "role": "Todos",
+      "title": "Pedir ayuda en el canal",
+      "duration": "1:50"
+    }
+  ],
+  "stats": [
+    {
+      "value": "Por rol",
+      "label": "ventas, líderes y todo el equipo"
+    },
+    {
+      "value": "3 min",
+      "label": "duración promedio"
+    },
+    {
+      "value": "En vivo",
+      "label": "capacitaciones cuando sumas personas"
+    }
+  ]
+}

@@ -41,7 +41,7 @@ const ENV = {
   ...process.env,
   GROWTH_SEO_ENABLED: 'true',
   GROWTH_SEO_WORK_QUEUE_ENABLED: 'true'
-} as NodeJS.ProcessEnv
+}
 
 const main = async () => {
   const residue = await runGreenhousePostgresQuery<{

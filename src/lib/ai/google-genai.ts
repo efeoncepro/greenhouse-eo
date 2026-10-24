@@ -5,7 +5,16 @@ import { GoogleGenAI } from '@google/genai'
 import { resolveNexaModel } from '@/config/nexa-models'
 import { getGoogleAuthOptions, getGoogleProjectId } from '@/lib/google-credentials'
 
-let googleGenAIClient: GoogleGenAI | undefined
+import type { EnvSource } from '@/types/env-source'
+
+/**
+ * Versión de la API de Vertex. `v1` es la estable y el default de todos los consumidores. `v1beta1` expone campos que
+ * `v1` todavía rechaza: por ejemplo `Part.mediaProcessing: AGENTIC` (video agéntico de Gemini 3.8), que en `v1` da
+ * «Unknown name mediaProcessing» (verificado 2026-10-21, `pnpm ai:listen --agentic`).
+ */
+export type GoogleGenAIApiVersion = 'v1' | 'v1beta1'
+
+const googleGenAIClients = new Map<GoogleGenAIApiVersion, GoogleGenAI>()
 
 const getProjectId = () => {
   const projectId = getGoogleProjectId()
@@ -30,9 +39,13 @@ export const getGreenhouseAgentRuntimeConfig = () => ({
   model: getGreenhouseAgentModel()
 })
 
-export const getGoogleGenAIClient = async () => {
-  if (googleGenAIClient) {
-    return googleGenAIClient
+/** Cliente canónico de Gemini (Vertex). Una instancia por versión de API, con las mismas credenciales. */
+export const getGoogleGenAIClient = async (options: { apiVersion?: GoogleGenAIApiVersion } = {}) => {
+  const apiVersion = options.apiVersion ?? 'v1'
+  const cached = googleGenAIClients.get(apiVersion)
+
+  if (cached) {
+    return cached
   }
 
   const { projectId, location } = getGreenhouseAgentRuntimeConfig()
@@ -41,15 +54,17 @@ export const getGoogleGenAIClient = async () => {
   process.env.GOOGLE_CLOUD_PROJECT ||= projectId
   process.env.GOOGLE_CLOUD_LOCATION ||= location
 
-  googleGenAIClient = new GoogleGenAI({
+  const client = new GoogleGenAI({
     vertexai: true,
     project: projectId,
     location,
-    apiVersion: 'v1',
+    apiVersion,
     googleAuthOptions: getGoogleAuthOptions()
   })
 
-  return googleGenAIClient
+  googleGenAIClients.set(apiVersion, client)
+
+  return client
 }
 
 // ── Grounded search runner (TASK-1226 / modelo Gemini 3 TASK-1233) ────────────
@@ -64,7 +79,7 @@ export const getGoogleGenAIClient = async () => {
 export const GEMINI_GROUNDED_DEFAULT_MODEL = 'gemini-3-flash-preview'
 
 /** Resuelve el modelo de grounding: env override → default Gemini 3. */
-export const resolveGeminiGroundedModel = (env: NodeJS.ProcessEnv = process.env): string =>
+export const resolveGeminiGroundedModel = (env: EnvSource = process.env): string =>
   env.GREENHOUSE_GEMINI_GROUNDED_MODEL?.trim() || GEMINI_GROUNDED_DEFAULT_MODEL
 
 export interface GeminiGroundedCitation {

@@ -1,9 +1,9 @@
 # Operar la landing Servicios HubSpot (v2)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 2.0
+> **Version:** 2.1
 > **Creado:** 2026-08-31 por Codex
-> **Ultima actualizacion:** 2026-10-17 por Claude
+> **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** contrato v2 pendiente; detalle en el
 > [audit de publicación v2](../../audits/public-site/2026-10-16-hubspot-v2-publication.md). El
 > [contrato v1](../../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) es histórico.
@@ -14,6 +14,10 @@
 Para editar el contenido de [`/servicios-contratar-hubspot/`](https://efeoncepro.com/servicios-contratar-hubspot/)
 (página WordPress `244079`), cambiar su diseño de forma gobernada, desplegarlo, republicar la página, operar el
 botón «Agendar reunión» del dock móvil y revertir si algo sale mal.
+
+Desde el 2026-10-23 el dock móvil es el dock compartido de las landings (AXIS `efeonce.landing-dock`, plugin
+`eo-landing-dock`): se enciende, revisa y apaga con su [manual](operar-dock-de-landings.md). El dock propio de la v2
+(`nav.mdock`) sólo vuelve a servirse si el compartido se apaga; lo que este manual dice de él aplica en ese caso.
 
 Desde el 2026-10-16 la página es la **v2**: 14 widgets `greenhouse_hubspot_v2_*`. Los once widgets «HubSpot · …»
 de la v1 ya no están en esta página; lo que la v1 decía sobre paneles, timeline, licencias o iconografía no aplica.
@@ -41,7 +45,8 @@ de la v1 ya no están en esta página; lo que la v1 decía sobre paneles, timeli
 3. Edita textos, enlaces e imágenes desde los controles; las imágenes se eligen de la biblioteca de Media. En las
    listas (preguntas, resultados, agentes, etc.) agrega, quita o reordena filas. No hay campo para HTML.
 4. No dupliques anclas. `#agenda-form` (la card del formulario) y `#agenda` los usa el dock móvil: si cambian, el
-   botón «Ir al formulario» y el ocultamiento del dock dejan de funcionar.
+   botón «Ir al formulario» y el ocultamiento del dock dejan de funcionar. Con el dock compartido, además hay que
+   actualizar `manifests/landing-dock/hubspot.json` en el runtime y volver a `preview`.
 5. Guarda, purga la caché y revisa en 1440 y 390 px.
 
 **Ojo al recompilar:** el compilador numera los campos en orden (`fNNN_*`). Un cambio estructural en la fuente
@@ -126,7 +131,8 @@ pnpm public-website:wpcli -- --eval-file ./tmp/republish-hubspot-v2-page.php \
 
 «Agendar reunión» es el Growth CTA `hubspot-discovery-meeting` (`open_meeting_scheduler` con `meetingSurfaceId
 fhsf-efeonce-lead-gen-web` y `schedulerKey discovery`, placement `embedded`, style `minimal`, targeting
-`/servicios-contratar-hubspot/`, priority 180, `cta-location=hubspot_mobile_dock`). Tiene su propia surface,
+`/servicios-contratar-hubspot/`, priority 180). Con el dock compartido encendido el lanzador mide
+`cta-location=landing_dock`; con el dock propio, `hubspot_mobile_dock`. Tiene su propia surface,
 «Efeonce HubSpot landing (WordPress)» (`csur-56a96b52-44ca-43d8-a61f-8c365c211487`, origins `efeoncepro.com` y `www`).
 
 1. Levanta el proxy de Cloud SQL: `pnpm pg:connect`.
@@ -141,6 +147,11 @@ fhsf-efeonce-lead-gen-web` y `schedulerKey discovery`, placement `embedded`, sty
    permisos 0600 en `.auth/hubspot-v2-meeting-cta-surface.json`. **Ese archivo nunca va al repo.**
 3. **Re-correr el publicador rota el key.** El key anterior deja de valer, así que en el mismo momento republica la
    página con el tercer input (sección anterior). Si no lo haces, el dock queda apuntando a un key muerto.
+   Con el dock compartido encendido, el lanzador lo imprime `eo-landing-dock` con la clave que leyó de la página al
+   encenderlo y que guardó en su meta: la republicación no la cambia. Después de republicar, corre
+   `pnpm public-website:landing-dock snapshot hubspot`, `off hubspot --confirm` y `on hubspot --confirm` (el `off`
+   devuelve el lanzador del dock viejo, la única fuente de la clave en esta landing); ver «Rotar la clave de un CTA
+   propio» en el [manual del dock](operar-dock-de-landings.md). Confirma abriendo el agendador desde el dock.
 4. Verifica en vivo a 390 px (ver «Verificar»).
 
 No uses el CTA de contacto `contacto-discovery-meeting`: está targeteado sólo a `/contacto/` y no aparece en esta
@@ -161,11 +172,13 @@ cuando la página tiene el FAQ v2: no lo borres ni lo reactives.
 
 - 1440 y 390 px: `scrollWidth == clientWidth`, un solo `h1`, los 14 módulos en orden.
 - Haz scroll real hasta cada sección antes de medir: las animaciones están ligadas al scroll.
-- Dock a 390 px: oculto en el hero, visible a mitad de página (la barra inferior de Ohio se aparta), abre el agendador
-  nativo en pantalla completa, Escape lo cierra, se oculta en la agenda y en el footer. En desktop no existe.
+- Dock a 390 px: oculto en el hero, visible a mitad de página, abre el agendador nativo en pantalla completa, Escape
+  lo cierra, se retira al llegar a la agenda. En desktop no existe. Revisión del dock compartido:
+  `pnpm public-website:landing-dock verify hubspot`.
 - Formulario montado desde el contrato (no el texto alternativo), tres pasos.
 - JSON-LD con `Service` y `FAQPage`; header y footer de Ohio sin cambios.
-- La medición del dock es de la familia `greenhouse_cta_*` (se distingue por `cta_slug`). La conversión es la
+- La medición del dock es de la familia `greenhouse_cta_*` (se distingue por `cta_slug` y, desde el 2026-10-23,
+  `cta_location: landing_dock`); el clic en el dock empuja además `gh_landing_dock_clicked`. La conversión es la
   reserva confirmada por el servidor (`gh_meeting_*`), nunca el click. No hagas reservas de prueba.
 
 ## Rollback
@@ -214,8 +227,9 @@ Volver a la v1 es una decisión del operador, no una recuperación de rutina.
 - **En desktop las fichas laterales de agentes quedan tapadas.** Su ancho es `min(230px, calc(50% - 132px))`.
 - **El dock no aparece, o el botón «Agendar reunión» abre `/agenda/`.** Falta la surface o el key: republica con el
   tercer input; si rotaste el key, ese es el motivo.
-- **El dock no se oculta o la barra de Ohio no se aparta.** La regla está en `page.css` (el `timeline-scope` del body y la
-  barra). Si se movió a `host.css`, el compilador reescribió `body` y la regla no llega.
+- **El dock no se oculta o la barra de Ohio no se aparta** (dock propio `nav.mdock`). La regla está en `page.css` (el
+  `timeline-scope` del body y la barra). Si se movió a `host.css`, el compilador reescribió `body` y la regla no llega.
+  Con el dock compartido, revisa su [manual](operar-dock-de-landings.md#problemas-comunes).
 - **El botón del dock muestra el valor de un campo en vez del CTA.** Un token de plantilla con el mismo nombre que un
   campo del schema se reemplaza por el valor del campo. Por eso el token del dock se llama `meeting_launcher`.
 - **El card del CTA muestra texto o una X además del botón.** El host lo reduce al botón: oculta `.ghc-content` y

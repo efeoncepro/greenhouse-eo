@@ -144,6 +144,50 @@ describe('resolveRegisteredCtaAction (fachada resolveCtaAction delega acá)', ()
   })
 })
 
+describe('open_growth_form — presentación dialog (TASK-2044)', () => {
+  beforeEach(() => {
+    formsReadersMock.getPublishedRenderContractByRef.mockResolvedValue({
+      form: { slug: 'partner-application', formKey: 'fk-456' },
+    })
+  })
+
+  it('inline explícito proyecta igual que omitirlo (sin presentation en el browser)', async () => {
+    await expect(
+      resolveCtaAction({ kind: 'open_growth_form', formRef: 'partner-application', presentation: 'inline' }),
+    ).resolves.toEqual({
+      ok: true,
+      action: { kind: 'open_growth_form', formSlug: 'partner-application', formKey: 'fk-456' },
+    })
+  })
+
+  it('dialog proyecta la presentación y el encabezado', async () => {
+    const dialog = { eyebrow: '¿Eres una plataforma?', title: 'Sumémonos.', lead: 'Cuéntanos qué tecnología ofreces.' }
+
+    await expect(
+      resolveCtaAction({ kind: 'open_growth_form', formRef: 'partner-application', presentation: 'dialog', dialog }),
+    ).resolves.toEqual({
+      ok: true,
+      action: { kind: 'open_growth_form', formSlug: 'partner-application', formKey: 'fk-456', presentation: 'dialog', dialog },
+    })
+  })
+
+  it('dialog sin encabezado proyecta sólo la presentación', async () => {
+    await expect(
+      resolveCtaAction({ kind: 'open_growth_form', formRef: 'partner-application', presentation: 'dialog' }),
+    ).resolves.toMatchObject({ ok: true, action: { presentation: 'dialog' } })
+  })
+
+  it('encabezado sin presentation=dialog, presentación desconocida o campos extra ⇒ action_policy_invalid', async () => {
+    for (const policy of [
+      { kind: 'open_growth_form', formRef: 'partner-application', dialog: { title: 'Hola' } },
+      { kind: 'open_growth_form', formRef: 'partner-application', presentation: 'popup_modal' },
+      { kind: 'open_growth_form', formRef: 'partner-application', presentation: 'dialog', dialog: { html: '<b>x</b>' } },
+    ]) {
+      await expect(resolveCtaAction(policy)).resolves.toEqual({ ok: false, reason: 'action_policy_invalid' })
+    }
+  })
+})
+
 describe('link_url — navegación gobernada', () => {
   it('acepta path root-relative y https absoluta; default same-context', async () => {
     await expect(resolveCtaAction({ kind: 'link_url', url: '/servicios/aeo' })).resolves.toEqual({

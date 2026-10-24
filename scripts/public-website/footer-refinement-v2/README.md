@@ -11,6 +11,7 @@ El operador autoriza «hazlo todo» sobre la propuesta de cuatro columnas, tipog
 - CF7 conserva names `your-email`, `checkbox-101`, required y el texto/valor exacto del consentimiento. Sólo cambia markup, etiqueta accesible, autocomplete y ortografía «Suscribirme». No es activación de una nueva integración ni prueba de entrega.
 - Instagram corrige `instagram.com.com`; Spotify sin destino se retira. Los cuatro enlaces restantes reciben nombres accesibles y rel seguro. Los controles flotantes de `.elements-bar` se ocultan y quedan `inert` sólo mientras el footer intersecta el viewport; el menú conserva sus redes.
 - «Volver arriba» respeta reduced motion; privacidad conserva su URL y el botón nativo HubSpot de preferencias. El enlace heredado a términos devolvía 404 y no tenía página publicada: se retiró mediante `legal-link-fix.php` con guarda del snapshot; no se creó contenido legal. Padding móvil reserva espacio al CTA fijo existente.
+- El bootstrap JavaScript localiza primero el marcador `data-eo-footer-partners="v2"` y luego asciende con `closest('#colophon')`; no usa `:has()` en `querySelector`, para funcionar también en motores de monitoreo sin soporte de Selectors Level 4.
 
 ## Aplicación y reversión
 

@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Partners · Efeonce</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600&amp;display=swap">
+<style>
+body{margin:0;background:#001a33;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+::selection{background:#36c8bf;color:#001a33}
+a{color:#ffffff}a:hover{color:#cfe4fa}
+.wrap{width:100%;max-width:1320px;margin:0 auto;padding:0 56px;box-sizing:border-box}
+.lbl{display:inline-flex;align-items:center;gap:8px;width:fit-content;margin:0;padding:7px 14px 6px;border:1px solid color-mix(in srgb,currentColor 45%,transparent);border-radius:999px;background:transparent;font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;line-height:1.2;text-transform:uppercase;color:#cfe4fa}
+.dot{display:inline-block;width:.2em;height:.2em;border-radius:50%;background:#36c8bf;margin-left:.04em}
+.ringq{display:inline-block;width:.62em;height:.62em;border-radius:50%;border:.1em solid #36c8bf;box-sizing:border-box;margin-right:.42em;vertical-align:-.04em}
+.btn{display:inline-flex;align-items:center;min-height:54px;padding:0 30px;border-radius:999px;font-weight:600;font-size:16px;text-decoration:none;box-sizing:border-box;transition:transform 200ms cubic-bezier(.2,0,0,1)}
+.btn:hover{transform:translateY(-2px)}
+.btn-p{background:#ffffff;color:#001a33}.btn-p:hover{color:#001a33}
+.btn-o{border:1px solid rgba(255,255,255,.5);color:#ffffff;font-weight:500;background:rgba(0,26,51,.35);backdrop-filter:blur(6px)}
+.hero{position:relative;min-height:clamp(760px,60vw,920px);display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;background:#000}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:0% center}
+.hero-copy{position:relative;flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;padding-top:clamp(152px,12vw,184px);padding-bottom:64px}
+.mq{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.mq-track{display:flex;width:max-content;align-items:center;animation:mq 50s linear infinite}
+.mq-track > div{display:flex;align-items:center}
+.mq-track span{display:inline-flex;align-items:center;height:72px;padding:0 44px}
+.mq-track img{display:block;height:24px;width:auto;filter:brightness(0) invert(1);opacity:.82}
+@keyframes mq{to{transform:translateX(-50%)}}
+.pillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:80px}
+.pillar{padding:32px 40px 8px 0;border-top:1px solid rgba(207,228,250,.16)}
+.pillar + .pillar{padding-left:40px;border-left:1px solid rgba(207,228,250,.16)}
+.bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}
+.tile{position:relative;display:flex;flex-direction:column;gap:14px;padding:32px;border-radius:24px 24px 24px 4px;background:rgba(207,228,250,.04);border:1px solid rgba(207,228,250,.12);box-sizing:border-box;transition:border-color 200ms cubic-bezier(.4,0,.2,1),transform 200ms cubic-bezier(.2,0,0,1)}
+.tile:hover{border-color:rgba(114,222,216,.45);transform:translateY(-3px)}
+.s6{grid-column:span 6}.s4{grid-column:span 4}.s8{grid-column:span 8}
+.tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#cfe4fa}
+.tag i{display:inline-block;width:8px;height:8px;border-radius:50%}
+.tile .logo{display:block;align-self:flex-start;height:34px;width:auto;max-width:200px;object-fit:contain;filter:brightness(0) invert(1);margin:22px 0 10px}
+.tile .prog{margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:600;letter-spacing:-.02em;color:#ffffff}
+.tile .desc{margin:0;font-size:15px;line-height:1.55;font-weight:300;color:#cfe4fa}
+.chip{display:inline-flex;align-items:center;gap:6px;width:fit-content;padding:5px 12px 4px;border-radius:999px;border:1px solid rgba(207,228,250,.3);font-size:12px;font-weight:600;letter-spacing:.04em;color:#ffffff}
+.chip i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#36c8bf}
+.tile-big{min-height:380px}
+.tile-big .logo{height:52px;max-width:260px}
+.plate{display:inline-flex;align-items:center;justify-content:center;width:fit-content;padding:10px 14px;border-radius:14px;background:#ffffff;margin-top:auto}
+.band{position:relative;min-height:clamp(560px,46vw,720px);overflow:hidden;background:#000}
+.band img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 60%}
+.band-copy{position:relative;padding:clamp(72px,7vw,112px) 0}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.step{display:flex;flex-direction:column;gap:16px}
+.ring{position:relative;width:160px;height:160px}
+.ring svg{position:absolute;inset:0;width:100%;height:100%}
+.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:300;font-size:48px;letter-spacing:-.04em;color:#ffffff}
+.close-grid{display:flex;flex-wrap:wrap;gap:24px;align-items:stretch}
+.close-main{flex:999 1 560px;min-width:0;padding:40px 0}
+.close-side{flex:1 1 380px;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:40px;border-radius:24px 24px 24px 4px;background:rgba(207,228,250,.05);border:1px solid rgba(207,228,250,.14);box-sizing:border-box}
+.svc{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;margin-top:20px}
+.svc-item{display:flex;flex-direction:column;gap:12px;padding:28px 24px 8px 0;border-top:1px solid rgba(207,228,250,.16)}
+.svc-item + .svc-item{padding-left:24px;border-left:1px solid rgba(207,228,250,.16)}
+.svc-item b{font-family:'Bricolage Grotesque',sans-serif;font-weight:300;font-size:22px;letter-spacing:-.02em;color:#36c8bf}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+
+/* — Llegada del hero (tiempo, ease-emphasized) — */
+.hero-media{position:absolute;inset:0;overflow:hidden}
+@keyframes push{from{transform:scale(1.18);filter:brightness(.25)}to{transform:none;filter:none}}
+@keyframes linein{from{opacity:0;transform:translateY(42%);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
+@keyframes fadein{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes stripin{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:none}}
+@keyframes popin{0%{opacity:0;transform:scale(0)}70%{opacity:1;transform:scale(1.25)}100%{opacity:1;transform:none}}
+.hero-img{animation:push 2600ms cubic-bezier(.2,0,0,1) both}
+.h-line{animation:linein 1100ms cubic-bezier(.2,0,0,1) both}
+.h-in{animation:fadein 800ms cubic-bezier(.2,0,0,1) both}
+.h-1{animation-delay:200ms}.h-2{animation-delay:380ms}.h-3{animation-delay:560ms}.h-4{animation-delay:1000ms}.h-5{animation-delay:1200ms}
+.hero .dot{animation:popin 380ms cubic-bezier(.2,0,0,1) 1500ms both}
+.h-strip{animation:stripin 900ms cubic-bezier(.2,0,0,1) 1300ms both}
+.pmodal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,8,20,.72);backdrop-filter:blur(10px);animation:pmfade 300ms cubic-bezier(.4,0,.2,1) both}
+.pmodal-card{position:relative;width:min(640px,100%);max-height:calc(100vh - 48px);overflow:auto;box-sizing:border-box;padding:44px 44px 40px;border-radius:28px 28px 28px 6px;background:#001a33;border:1px solid rgba(114,222,216,.28);box-shadow:0 40px 120px rgba(0,0,0,.55);animation:pmrise 450ms cubic-bezier(.2,0,0,1) both}
+@keyframes pmfade{from{opacity:0}to{opacity:1}}
+@keyframes pmrise{from{opacity:0;transform:translateY(32px) scale(.97)}to{opacity:1;transform:none}}
+.pm-close{position:absolute;top:16px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(207,228,250,.25);background:transparent;color:#ffffff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pm-close:hover{border-color:#72ded8}
+.pgrid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px;margin-top:28px}
+.pf{display:flex;flex-direction:column;gap:8px;min-width:0}
+.pf-wide{grid-column:1 / -1}
+.pf label{font-size:13px;font-weight:500;color:#cfe4fa}
+.pf input,.pf textarea{width:100%;box-sizing:border-box;min-height:48px;padding:12px 14px;border-radius:12px;border:1px solid rgba(207,228,250,.22);background:rgba(207,228,250,.05);color:#ffffff;font:inherit;font-size:15px;outline:none;transition:border-color 150ms cubic-bezier(.4,0,.2,1)}
+.pf textarea{resize:vertical;min-height:96px}
+.pf input::placeholder,.pf textarea::placeholder{color:rgba(207,228,250,.45)}
+.pf input:focus,.pf textarea:focus{border-color:#36c8bf;box-shadow:0 0 0 3px rgba(54,200,191,.18)}
+.pconsent{display:flex;align-items:flex-start;gap:10px;margin-top:20px;font-size:13px;line-height:1.5;color:#cfe4fa}
+.pconsent input{width:18px;height:18px;margin-top:1px;accent-color:#36c8bf;flex:none}
+@media (max-width:760px){.pmodal{padding:12px;align-items:flex-end}.pmodal-card{padding:32px 20px 28px;border-radius:24px 24px 6px 6px}.pgrid2{grid-template-columns:1fr}}
+@supports (animation-timeline: view()){
+@keyframes rv{from{opacity:0;transform:translateY(48px)}to{opacity:1;transform:none}}
+@keyframes dim{from{opacity:.14}to{opacity:1}}
+@keyframes arcm{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.rv{animation:rv linear forwards;animation-timeline:view();animation-range:entry 0% entry 100%}
+.word{animation:dim linear forwards;animation-timeline:view();animation-range:entry 20% cover 45%}
+.arcm{stroke-dasharray:1 1;animation:arcm linear forwards;animation-timeline:view();animation-range:entry 20% entry 90%}
+
+/* — La página se arma al bajar (scroll-driven) — */
+@keyframes heroout{from{transform:none;filter:none}to{transform:translateY(16%) scale(1.1);filter:brightness(.35)}}
+@keyframes copyout{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-90px)}}
+@keyframes wordin{from{opacity:0;transform:translateY(60%) rotate(4deg);filter:blur(12px)}to{opacity:1;transform:none;filter:none}}
+@keyframes converge{from{opacity:0;letter-spacing:.6em;filter:blur(6px)}to{opacity:1;letter-spacing:-.045em;filter:none}}
+@keyframes snapin{from{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--r)) scale(.84)}to{opacity:1;transform:none}}
+@keyframes curtain{from{clip-path:inset(14% 10% 14% 10% round 48px)}to{clip-path:inset(0 0 0 0 round 0)}}
+@keyframes drift{from{transform:translateY(-8%) scale(1.25)}to{transform:translateY(6%) scale(1.08)}}
+@keyframes slider{from{opacity:0;transform:translateX(120px)}to{opacity:1;transform:none}}
+@keyframes svcin{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
+@keyframes sph{0%{opacity:0;transform:scale(0)}70%{opacity:1;transform:scale(1.4)}100%{opacity:1;transform:none}}
+.hero-media{animation:heroout linear both;animation-timeline:view();animation-range:exit 0% exit 100%}
+.hero-copy{animation:copyout linear both;animation-timeline:view();animation-range:exit 0% exit 55%}
+.w{display:inline-block;animation:wordin linear both;animation-timeline:view()}
+.w:nth-child(1){animation-range:entry 30% cover 30%}.w:nth-child(2){animation-range:entry 38% cover 33%}.w:nth-child(3){animation-range:entry 46% cover 36%}.w:nth-child(4){animation-range:entry 54% cover 39%}.w:nth-child(5){animation-range:entry 62% cover 42%}
+.conv{animation:converge linear both;animation-timeline:view();animation-range:entry 40% cover 45%}
+.snap{animation:snapin linear both;animation-timeline:view();animation-range:entry 0% cover 32%}
+.curtain{animation:curtain linear both;animation-timeline:view();animation-range:entry 0% cover 45%}
+.curtain img{animation:drift linear both;animation-timeline:view();animation-range:entry 0% exit 100%}
+.slide-r{animation:slider linear both;animation-timeline:view();animation-range:entry 10% cover 35%}
+.svc-item{animation:svcin linear both;animation-timeline:view()}
+.svc-item:nth-child(1){animation-range:entry 10% cover 25%}.svc-item:nth-child(2){animation-range:entry 20% cover 30%}.svc-item:nth-child(3){animation-range:entry 30% cover 35%}.svc-item:nth-child(4){animation-range:entry 40% cover 40%}.svc-item:nth-child(5){animation-range:entry 50% cover 45%}
+.step:nth-child(2) .arcm{animation-range:entry 40% cover 40%}.step:nth-child(3) .arcm{animation-range:entry 60% cover 50%}
+.psph{transform-box:fill-box;transform-origin:center;animation:sph linear both;animation-timeline:view();animation-range:entry 85% cover 45%}
+.step:nth-child(2) .psph{animation-range:cover 40% cover 50%}.step:nth-child(3) .psph{animation-range:cover 50% cover 58%}
+}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none !important;transition:none !important}}
+@media (max-width:980px){
+.s6,.s4,.s8{grid-column:span 12}
+.tile-big{min-height:0}
+}
+@media (max-width:1100px){
+.svc{grid-template-columns:repeat(2,minmax(0,1fr))}
+.svc-item,.svc-item + .svc-item{padding:24px 20px 8px 0;border-left:none}
+}
+@media (max-width:900px){
+.pillars,.steps{grid-template-columns:repeat(1,minmax(0,1fr))}
+.pillar + .pillar{padding-left:0;border-left:none}
+}
+@media (max-width:760px){
+.wrap{padding:0 16px}
+.hero{display:block;min-height:0}
+.hero-media{position:relative;inset:auto}
+.hero-img{position:relative;height:auto;aspect-ratio:4/3;object-position:74% center}
+.hero-copy{padding-top:32px;padding-bottom:32px}
+.band{min-height:0;display:flex;flex-direction:column}
+.band img{position:relative;height:auto;aspect-ratio:4/3;object-position:70% center}
+.band-copy{padding:40px 0 48px;background:#000814}
+.nav-links{display:none !important}
+.tile{padding:24px}
+.svc{grid-template-columns:repeat(1,minmax(0,1fr))}
+.close-side{padding:28px 24px}
+}
+</style>
+</helmet>
+
+
+<section class="hero" aria-labelledby="hero-title">
+<div class="hero-media"><img class="hero-img" src="/_blob/3f11b5a177aec488f38984acbc4bd4ae" alt="Vista cenital de una mesa negra con nueve dispositivos de trabajo conectados por cables de luz a un solo centro, donde dos manos enchufan el último cable."></div>
+<div class="wrap hero-copy">
+
+<p class="lbl h-in h-1" style="color: #ffffff;">Partners</p>
+<h1 id="hero-title" style="margin: 28px 0 0; max-width: 620px;"><span class="h-line h-2" style="display: block; font-family: 'Poppins', sans-serif; font-weight: 300; font-size: clamp(26px, 3vw, 44px); line-height: 1.15; letter-spacing: -0.01em; color: #cfe4fa;">Ya tienes las mejores plataformas.</span><span class="h-line h-3" style="display: block; margin-top: 10px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: clamp(52px, 6vw, 92px); line-height: 0.92; letter-spacing: -0.045em; color: #ffffff;">Hagamos que trabajen juntas<span class="dot" aria-hidden="true"></span></span></h1>
+<p class="h-in h-4" style="margin: 32px 0 0; max-width: 500px; font-size: 19px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Te asesoramos, las implementamos y creamos soluciones a la medida de tu negocio sobre ellas. La licencia es solo el comienzo.</p>
+<div class="h-in h-5" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px;">
+<a href="/agenda/" class="btn btn-p">Agenda una reunión<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 10px;"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+<a href="#ecosistema" class="btn btn-o">Ver los partners</a>
+</div>
+</div>
+
+<div class="h-strip" style="position: relative; border-top: 1px solid rgba(207,228,250,0.16); background: rgba(0,13,26,0.55); backdrop-filter: blur(8px);">
+<div class="wrap" style="display: flex; align-items: center; gap: 24px;">
+<p style="margin: 0; flex: none; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #cfe4fa;">Partners de</p>
+<div class="mq" style="flex: 1 1 auto; min-width: 0;">
+<div class="mq-track"><div><span><img src="/_blob/cf289546285c5e564769e6ccf4228f86" alt="HubSpot"></span><span><img src="/_blob/ac575fa63e68543dd17c74baf520f05d" alt="Salesforce" style="filter: none; height: 36px;"></span><span><img src="/_blob/899bf15e6372cd352817bc1a0ec384f7" alt="Google Cloud"></span><span><img src="/_blob/e35a5a3f0400e426f647727dacfb72a2" alt="Microsoft"></span><span><img src="/_blob/13ad2f603e73ed2699521d7f2dd529ab" alt="AWS" style="height: 30px;"></span><span><img src="/_blob/e34469e804f221575ff7e58956d51f28" alt="OpenAI"></span><span><img src="/_blob/505a3935f1836434b010a62db7ee8f04" alt="Claude"></span><span><img src="/_blob/75c0a79aaf34381a99003bce17285d2f" alt="BytePlus" style="height: 22px;"></span><span><img src="/_blob/b61fbc9e85c7dff87da33fe9baf662df" alt="Adobe"></span></div>
+</div>
+</div>
+</div>
+</section>
+
+<section aria-labelledby="verdad-title" style="padding: clamp(112px, 11vw, 168px) 0 120px; background: #000d1a;">
+<div class="wrap">
+<h2 id="verdad-title" style="margin: 0; max-width: 1100px; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(44px, 6.4vw, 104px); line-height: 0.98; letter-spacing: -0.045em;"><span style="display: block; font-weight: 300; color: #cfe4fa;"><span class="w">Comprar</span> <span class="w">la</span> <span class="w">licencia</span> <span class="w">es</span> <span class="w">fácil.</span></span><span class="conv" style="display: block; font-weight: 760; color: #ffffff;">Que todo converse, no<span class="dot pop" aria-hidden="true"></span></span></h2>
+<p class="rv" style="margin: 36px 0 0; max-width: 620px; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.55; font-weight: 300; color: #cfe4fa;">La mayoría de las empresas compra herramientas que nadie implementa, conecta ni hace rendir. Ese trabajo es el nuestro.</p>
+<p class="rv" style="margin: 88px 0 0; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #cfe4fa;">Lo que hacemos con cada plataforma</p>
+<div class="svc"><div class="svc-item rv"><b>01</b><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Asesoramos</p><p style="margin: 0; font-size: 15px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Qué plataforma, para qué y cómo: estrategia y arquitectura antes de invertir.</p></div><div class="svc-item rv"><b>02</b><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Implementamos</p><p style="margin: 0; font-size: 15px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Configuramos, migramos tus datos e integramos con lo que ya tienes.</p></div><div class="svc-item rv"><b>03</b><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Creamos soluciones</p><p style="margin: 0; font-size: 15px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Agentes, automatizaciones y desarrollos a medida sobre cada plataforma.</p></div><div class="svc-item rv"><b>04</b><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Operamos y enseñamos</p><p style="margin: 0; font-size: 15px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Operación continua y un equipo tuyo cada vez más capaz.</p></div><div class="svc-item rv"><b>05</b><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Licenciamos</p><p style="margin: 0; font-size: 15px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Cuando el programa lo permite, con el respaldo del fabricante.</p></div></div>
+</div>
+</section>
+
+<section id="ecosistema" aria-labelledby="eco-title" style="padding: 128px 0 128px; background: #001a33;">
+<div class="wrap">
+<p class="lbl rv"><span style="color: #36c8bf; font-variant-numeric: tabular-nums;">01</span>El ecosistema</p>
+<h2 id="eco-title" class="rv" style="margin: 24px 0 56px; max-width: 920px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -0.03em;"><span style="font-weight: 300; color: rgba(207,228,250,0.6);">Nueve partners.</span> Un solo equipo.</h2>
+<div class="bento">
+<div class="tile tile-big s6 snap" style="--dx: -140px; --dy: 70px; --r: -7deg;"><span class="tag"><i style="background: #36c8bf;" aria-hidden="true"></i>Growth · CRM y revenue</span><img class="logo" src="/_blob/cf289546285c5e564769e6ccf4228f86" alt="HubSpot"><p class="prog">Solutions Partner · Gold</p><p class="desc">Implementación, RevOps y agentes sobre HubSpot: marketing, ventas, servicio y datos en una sola plataforma.</p><div class="chips"><span class="chip"><i aria-hidden="true"></i>Consultoría</span><span class="chip"><i aria-hidden="true"></i>Implementación</span><span class="chip"><i aria-hidden="true"></i>Agentes y automatización</span></div><a class="plate" href="https://ecosystem.hubspot.com/marketplace/solutions/efeoncepro" aria-label="Ver a Efeonce en el directorio de partners de HubSpot" style="background: transparent; padding: 0;"><img src="/_blob/1de2296a44ed74eaad8305f96feb5e2b" alt="HubSpot Gold Solutions Partner" style="height: 112px; width: auto; display: block;"></a></div>
+<div class="tile tile-big s6 snap" style="--dx: 140px; --dy: 70px; --r: 7deg;"><span class="tag"><i style="background: #36c8bf;" aria-hidden="true"></i>Growth · CRM y revenue</span><img class="logo" src="/_blob/ac575fa63e68543dd17c74baf520f05d" alt="Salesforce" style="filter: none; height: 54px;"><p class="prog">Salesforce Partner</p><p class="desc">Sales y Service Cloud, Agentforce y Marketing Cloud, implementados y conectados con tu operación.</p><div class="chips"><span class="chip"><i aria-hidden="true"></i>Consultoría</span><span class="chip"><i aria-hidden="true"></i>Implementación</span><span class="chip"><i aria-hidden="true"></i>Soluciones a medida</span></div><span class="plate"><img src="/_blob/baedf258e251dcda11e2b2ef0accabc6" alt="Salesforce Partner" style="height: 44px; width: auto; display: block;"></span></div>
+<div class="tile s4 snap" style="--dx: -110px; --dy: 110px; --r: -5deg;"><span class="tag"><i style="background: #4e9df0;" aria-hidden="true"></i>Engine · Nube</span><img class="logo" src="/_blob/899bf15e6372cd352817bc1a0ec384f7" alt="Google Cloud"><p class="prog">Google Cloud Partner</p><p class="desc">Gemini Enterprise, Google Cloud y Google Workspace, de la licencia a la adopción.</p><div class="chips"><span class="chip"><i aria-hidden="true"></i>Consultoría</span><span class="chip"><i aria-hidden="true"></i>Licencias</span><span class="chip"><i aria-hidden="true"></i>Implementación</span></div></div>
+<div class="tile s4 snap" style="--dx: 0px; --dy: 140px; --r: 0deg;"><span class="tag"><i style="background: #4e9df0;" aria-hidden="true"></i>Engine · Nube</span><img class="logo" src="/_blob/e35a5a3f0400e426f647727dacfb72a2" alt="Microsoft"><p class="prog">AI Cloud Partner · CSP</p><p class="desc">Microsoft 365 y Azure para equipos que trabajan en Microsoft, de la licencia a la adopción.</p><div class="chips"><span class="chip"><i aria-hidden="true"></i>Licencias</span><span class="chip"><i aria-hidden="true"></i>Implementación</span><span class="chip"><i aria-hidden="true"></i>Soluciones a medida</span></div></div>
+<div class="tile s4 snap" style="--dx: 110px; --dy: 110px; --r: 5deg;"><span class="tag"><i style="background: #4e9df0;" aria-hidden="true"></i>Engine · Nube</span><img class="logo" src="/_blob/13ad2f603e73ed2699521d7f2dd529ab" alt="AWS" style="height: 42px;"><p class="prog">AWS Partner</p><p class="desc">Nube AWS para equipos AWS-first: infraestructura, datos y servicios de IA.</p><div class="chips"><span class="chip"><i aria-hidden="true"></i>Licencias</span><span class="chip"><i aria-hidden="true"></i>Arquitectura</span><span class="chip"><i aria-hidden="true"></i>Soluciones a medida</span></div></div>
+<div class="tile s4 snap" style="--dx: -110px; --dy: 110px; --r: -4deg;"><span class="tag"><i style="background: #4e9df0;" aria-hidden="true"></i>Engine · IA</span><img class="logo" src="/_blob/e34469e804f221575ff7e58956d51f28" alt="OpenAI"><p class="prog">OpenAI Partner Network</p><p class="desc">Agentes, automatización e integraciones con ChatGPT Enterprise, la API y Codex.</p><div class="chips"><span class="chip"><i aria-hidden="true"></i>Consultoría</span><span class="chip"><i aria-hidden="true"></i>Agentes</span><span class="chip"><i aria-hidden="true"></i>Integraciones</span></div></div>
+<div class="tile s4 snap" style="--dx: 0px; --dy: 140px; --r: 0deg;"><span class="tag"><i style="background: #4e9df0;" aria-hidden="true"></i>Engine · IA</span><img class="logo" src="/_blob/505a3935f1836434b010a62db7ee8f04" alt="Claude"><p class="prog">Claude Partner Network</p><p class="desc">Claude Enterprise y Team, conectores MCP y agentes en producción, con adopción en tu equipo.</p><div class="chips"><span class="chip"><i aria-hidden="true"></i>Consultoría</span><span class="chip"><i aria-hidden="true"></i>Agentes</span><span class="chip"><i aria-hidden="true"></i>Adopción</span></div></div>
+<div class="tile s4 snap" style="--dx: 110px; --dy: 110px; --r: 4deg;"><span class="tag"><i style="background: #4e9df0;" aria-hidden="true"></i>Engine · IA</span><img class="logo" src="/_blob/75c0a79aaf34381a99003bce17285d2f" alt="BytePlus" style="height: 30px;"><p class="prog">Partner BytePlus</p><p class="desc">Video e imagen generativa con Seedance y Seedream para producción creativa a escala.</p><div class="chips"><span class="chip"><i aria-hidden="true"></i>Soluciones</span><span class="chip"><i aria-hidden="true"></i>Producción creativa</span></div></div>
+<div class="tile s4 snap" style="--dx: -120px; --dy: 90px; --r: -5deg;"><span class="tag"><i style="background: #ff6500;" aria-hidden="true"></i>Brand · Creatividad</span><img class="logo" src="/_blob/b61fbc9e85c7dff87da33fe9baf662df" alt="Adobe"><p class="prog">Partner Connection · Reseller</p><p class="desc">Creative Cloud y flujos de producción creativa para equipos de marca y agencia.</p><div class="chips"><span class="chip"><i aria-hidden="true"></i>Consultoría</span><span class="chip"><i aria-hidden="true"></i>Flujos creativos</span></div></div>
+<div class="tile s8 snap" style="--dx: 120px; --dy: 90px; --r: 4deg; justify-content: center; background: rgba(54,200,191,0.06); border-color: rgba(114,222,216,0.28);"><p style="margin: 0; font-size: clamp(18px, 1.6vw, 22px); font-weight: 300; color: #cfe4fa;"><span class="ringq" aria-hidden="true"></span>¿Tu plataforma no está aquí?</p><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(30px, 3vw, 44px); line-height: 1.05; letter-spacing: -0.03em; color: #ffffff;">Partimos de lo que ya usas.</p><p style="margin: 0; max-width: 560px; font-size: 16px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Antes de proponerte cambiar una herramienta, la evaluamos contigo. A veces lo que falta no es otra plataforma, sino conectar las que tienes.</p></div>
+</div>
+</div>
+</section>
+
+<section class="band curtain" aria-labelledby="band-title">
+<img src="/_blob/8e305ea09800a252c4d2222c3376af02" alt="Una persona de espaldas conecta el último cable de fibra óptica en un rack de red; un haz de cables de luz cruza el cuadro en diagonal.">
+<div class="wrap band-copy">
+<p style="margin: 0; font-size: clamp(20px, 2vw, 28px); font-weight: 300; color: #cfe4fa;"><span class="ringq" aria-hidden="true"></span>¿Y después de la licencia?</p>
+<h2 id="band-title" class="conv" style="margin: 14px 0 0; max-width: 700px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: clamp(48px, 5.6vw, 92px); line-height: 0.94; letter-spacing: -0.045em; color: #ffffff;">Empieza el trabajo<span class="dot" aria-hidden="true"></span></h2>
+<p style="margin: 28px 0 0; max-width: 460px; font-size: 18px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Implementamos, integramos y operamos contigo. Y te dejamos más capaz de sostenerlo.</p>
+</div>
+</section>
+
+<section aria-labelledby="como-title" style="padding: 128px 0 120px; background: #001a33;">
+<div class="wrap">
+<p class="lbl rv"><span style="color: #36c8bf; font-variant-numeric: tabular-nums;">02</span>Cómo trabajamos</p>
+<h2 id="como-title" class="rv" style="margin: 24px 0 64px; max-width: 920px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -0.03em;"><span style="font-weight: 300; color: rgba(207,228,250,0.6);">Contigo,</span> de la decisión al resultado.</h2>
+<div class="steps">
+<div class="step rv"><div class="ring"><svg viewBox="0 0 160 160" aria-hidden="true"><circle cx="80" cy="80" r="68" fill="none" stroke="#72ded8" stroke-opacity="0.18" stroke-width="1.5"></circle><path class="arcm" pathLength="1" d="M 80 12 A 68 68 0 0 1 138.89 114" fill="none" stroke="#36c8bf" stroke-width="2.6" stroke-linecap="round"></path><circle cx="138.89" cy="114" r="5" fill="#36c8bf" class="psph"></circle></svg><b>01</b></div><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 600; letter-spacing: -0.02em;">Elegimos contigo</p><p style="margin: 0; max-width: 360px; font-size: 16px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Partimos de tu negocio, no de una plataforma. Si ya usas una, la aprovechamos; si falta otra, te decimos cuál y por qué.</p></div>
+<div class="step rv"><div class="ring"><svg viewBox="0 0 160 160" aria-hidden="true"><circle cx="80" cy="80" r="68" fill="none" stroke="#72ded8" stroke-opacity="0.18" stroke-width="1.5"></circle><path class="arcm" pathLength="1" d="M 80 12 A 68 68 0 1 1 21.11 114" fill="none" stroke="#36c8bf" stroke-width="2.6" stroke-linecap="round"></path><circle cx="21.11" cy="114" r="5" fill="#36c8bf" class="psph"></circle></svg><b>02</b></div><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 600; letter-spacing: -0.02em;">Conectamos</p><p style="margin: 0; max-width: 360px; font-size: 16px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Implementamos, integramos y migramos tus datos. Todo documentado, nada en una caja negra.</p></div>
+<div class="step rv"><div class="ring"><svg viewBox="0 0 160 160" aria-hidden="true"><circle cx="80" cy="80" r="68" fill="none" stroke="#72ded8" stroke-opacity="0.18" stroke-width="1.5"></circle><path class="arcm" pathLength="1" d="M 80 12 A 68 68 0 1 1 79.99 12" fill="none" stroke="#36c8bf" stroke-width="2.6" stroke-linecap="round"></path><circle cx="80" cy="12" r="5" fill="#36c8bf" class="psph"></circle></svg><b>03</b></div><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 600; letter-spacing: -0.02em;">Operamos y te enseñamos</p><p style="margin: 0; max-width: 360px; font-size: 16px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Operamos contigo y capacitamos a tu equipo, para que cada trimestre dependa menos de nosotros.</p></div>
+</div>
+</div>
+</section>
+
+<section id="agenda" aria-labelledby="cierre-title" style="padding: 112px 0 120px; background: #000d1a; border-top: 1px solid rgba(207,228,250,0.08);">
+<div class="wrap close-grid">
+<div class="close-main">
+<p class="rv" style="margin: 0; font-size: clamp(20px, 2vw, 28px); font-weight: 300; color: #cfe4fa;"><span class="ringq" aria-hidden="true"></span>¿Tu stack no conversa?</p>
+<h2 id="cierre-title" class="conv" style="margin: 14px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: clamp(56px, 7vw, 112px); line-height: 0.92; letter-spacing: -0.045em; color: #ffffff;">Conversemos<span class="dot" aria-hidden="true"></span></h2>
+<p class="rv" style="margin: 28px 0 0; max-width: 480px; font-size: 18px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">30 minutos para mirar las plataformas que ya usas y qué falta para que trabajen juntas.</p>
+<div class="rv" style="margin-top: 36px;"><a href="/agenda/" class="btn btn-p">Agenda una reunión<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 10px;"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a></div>
+</div>
+<div class="close-side slide-r">
+<p style="margin: 0; font-size: 18px; font-weight: 300; color: #cfe4fa;">¿Eres una plataforma?</p>
+<p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: 36px; line-height: 1.05; letter-spacing: -0.03em; color: #ffffff;">Sumémonos.</p>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Si tu tecnología encaja con lo que nuestros clientes necesitan, hablemos de cómo llevarla a más empresas en Latinoamérica.</p>
+<a href="/agenda/" class="btn btn-o" style="margin-top: 8px; width: fit-content;">Quiero ser partner</a>
+</div>
+</div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":5820}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { partner: 'closed' };
+}
+renderVals() {
+const partner = this.state.partner;
+return {
+partnerOpen: partner !== 'closed',
+partnerForm: partner === 'form',
+partnerSent: partner === 'sent',
+openPartner: () => this.setState({ partner: 'form' }),
+closePartner: () => this.setState({ partner: 'closed' }),
+submitPartner: () => this.setState({ partner: 'sent' })
+};
+}
+}
+</script>
+</body>
+</html>

@@ -64,6 +64,13 @@
 - **Instagram**: corto + CTA de reenvío (*«Mándaselo a quien lleva el marketing de tu marca»*).
 - **Threads**: conversacional, cierra con pregunta (*«¿En cuál apareces tú?»*).
 
+En canales propios de Efeonce (desde la revisión 2.0 de PDR-020, 2026-10-22) Instagram y Threads son marca agencia:
+su CTA es reenviar, guardar, comentar o seguir, nunca precios, «contrátanos» ni formularios; sólo LinkedIn lleva
+directo a la landing. Los casos de esta sección son anteriores a esa decisión: revisa cada CTA (por ejemplo el
+«Escríbenos por DM» del caso GTA VI) contra la
+[estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §8.4 y §10
+antes de reutilizarlo.
+
 Las versiones rechazadas de ese mismo post (caption que describe la imagen, calco forzado, hecho inventado
 sobre otra marca, jerga interna) están en `ANTIPATTERNS.md`. Caso fuente:
 [`2026-09-11-iphone-duo-trendjack.md`](../../../../docs/operations/social/2026-09-11-iphone-duo-trendjack.md).

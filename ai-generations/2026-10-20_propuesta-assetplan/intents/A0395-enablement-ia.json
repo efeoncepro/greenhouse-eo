@@ -1,0 +1,61 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-live-chat",
+  "voice": {
+    "eyebrow": "Enablement conversacional",
+    "question": "¿Con qué actualizo el CRM?",
+    "answer": [
+      "Con",
+      "tu IA"
+    ]
+  },
+  "body": "Conectamos HubSpot con **Claude**, ChatGPT, Microsoft Copilot o Gemini y capacitamos a tu equipo para usarlo.",
+  "note": "Ejemplo ilustrativo · según el conector disponible y tus licencias",
+  "chat": {
+    "connectionLabel": "Conectado a HubSpot",
+    "userPrompt": "Registra que visité el depto. de Ñuñoa y muévelo a visita realizada",
+    "answerIntro": "Encontré **3 negocios** tuyos con visita esta semana. **Depto. Ñuñoa** está en visita agendada:",
+    "records": [
+      {
+        "name": "Depto. Ñuñoa",
+        "stage": "Visita agendada",
+        "amount": "[MONTO]",
+        "atRisk": true
+      },
+      {
+        "name": "Casa La Reina",
+        "stage": "Evaluación",
+        "amount": "[MONTO]",
+        "atRisk": false
+      },
+      {
+        "name": "Oficina Providencia",
+        "stage": "Reserva",
+        "amount": "[MONTO]",
+        "atRisk": false
+      }
+    ],
+    "proposedAction": "Propongo mover Depto. Ñuñoa a visita realizada y crear la tarea de seguimiento en HubSpot"
+  },
+  "guarantees": [
+    {
+      "title": "Ve lo que tú ves",
+      "detail": "Respeta los permisos de tu portal."
+    },
+    {
+      "title": "Tú confirmas",
+      "detail": "Ningún cambio sin tu visto bueno."
+    },
+    {
+      "title": "En tu IA",
+      "detail": "Claude, ChatGPT, Copilot o Gemini."
+    }
+  ]
+}

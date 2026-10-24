@@ -479,6 +479,10 @@ Cómo leer `gaps` de `compose assess`:
 - Los bloqueos de una cotización que no calculó conservan el `path` con que la cotización los reportó, uno por
   periodo: ésos no se pliegan.
 
+### Resumen editorial MD antes de emitir
+
+Si se pidió una propuesta Markdown para Claude Design, el cuadro de inversión puede transcribir exactamente los netos del artefacto calculado, conciliando fases y plazo. No alterar importes manualmente ni inferir impuestos; conservar estado preliminar. Costos, margen, hipótesis y evaluación permanecen internos. Ese insumo no es cotización emitida y no requiere PDF; la emisión posterior conserva el paso 5 y sus gates. [Preparación del master](../comercial/construir-una-licitacion.md#preparación-en-markdown-para-diseño-externo).
+
 ### Paso 5 — Producir el documento
 
 1. `compose document --input <artefacto> --out <brief>` devuelve exit 2. Sin `--brief`, `--out` guarda **sólo el
@@ -4537,3 +4541,8 @@ acceso nominativo/compartido y evidencia/fecha. Primero registrar selección y c
 luego la asignación en demanda/portfolio. No inferir usuarios habilitados desde una factura ni sustituir un
 contrato desconocido por una referencia pública. Las facturas privadas y enlaces firmados no se copian al repo:
 registrar referencia, hash y hechos financieros mínimos. [Ledger de pendientes por owner](../../../data/pricing/v3-operating/operational-gaps.json).
+
+
+## Datos vigentes desde el 22/10/2026
+
+Consultar `current show`: catálogo v13, recursos v12, créditos v1. Los nuevos ECG-033/034/035 tienen costo CO estimado, no nómina aprobada. El default es `generic-core`; una demanda gestionada declara `managed-service-core`. Email/SMS no calcula completo sin resolver su plataforma. La nueva policy rige desde el 22/10: no cambiar fechas para hacer pasar una demanda histórica. `compose workload` no acepta `--current` porque no consulta precios; las operaciones monetarias sí lo usan. [Caso con entradas, incrementos y costos COP/USD](../../commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/).

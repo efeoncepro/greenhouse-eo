@@ -16,7 +16,15 @@ import {
   type FieldDefinition,
   type RenderContract,
   type SubmissionContract,
+  CONSENT_PRIVACY_LINK_MARKER,
+  type ConsentDisplay,
+  type FormPresentation,
+  type InlinePillDisplay,
+  type SuccessBehavior,
+  FORM_PRESENTATIONS,
   consentDisplaySchema,
+  eventRegistrationPolicySchema,
+  inlinePillDisplaySchema,
   destinationPlanEntrySchema,
   fieldDefinitionSchema,
   renderSecuritySchema,
@@ -108,6 +116,206 @@ const validateUploadFields = (fields: FieldDefinition[]): CompileWarning[] => {
 }
 
 /**
+ * `presentation.control: 'premium_select'` sólo tiene sentido en un `select` simple (listbox de una
+ * opción). Se valida sólo ese valor: `country_select` conserva su contrato previo y ninguna versión
+ * existente cambia de veredicto.
+ */
+const validatePresentationControls = (fields: FieldDefinition[]): CompileWarning[] =>
+  fields
+    .filter(field => field.presentation?.control === 'premium_select' && field.type !== 'select')
+    .map(field => ({
+      code: 'presentation_control_type_mismatch',
+      dimension: 'fields' as const,
+      message: `campo ${field.key}: presentation.control=premium_select sólo aplica a type=select`,
+      blocking: true,
+    }))
+
+/** TASK-2053 — `staticValue` sólo tiene sentido en un campo `hidden` (el servidor lo impone). */
+const validateStaticValues = (fields: FieldDefinition[]): CompileWarning[] =>
+  fields
+    .filter(field => field.staticValue !== undefined && field.type !== 'hidden')
+    .map(field => ({
+      code: 'static_value_not_hidden',
+      dimension: 'fields' as const,
+      message: `campo ${field.key}: staticValue sólo aplica a type=hidden`,
+      blocking: true,
+    }))
+
+/**
+ * TASK-2053 — Política de reserva (`ui_policy.eventRegistration`). Sólo en formularios
+ * `event_registration`; sin la clave no se evalúa nada (ninguna versión existente cambia de veredicto).
+ */
+const validateEventRegistration = (formKind: string, uiPolicy: Record<string, unknown>, fields: FieldDefinition[]): CompileWarning[] => {
+  if (!('eventRegistration' in uiPolicy)) return []
+
+  const block = (code: string, message: string): CompileWarning => ({ code, dimension: 'policy', message, blocking: true })
+
+  if (formKind !== 'event_registration') {
+    return [block('event_registration_wrong_kind', 'ui_policy.eventRegistration sólo aplica a form_kind=event_registration')]
+  }
+
+  const parsed = eventRegistrationPolicySchema.safeParse(uiPolicy.eventRegistration)
+
+  if (!parsed.success) {
+    return [block('event_registration_invalid', 'ui_policy.eventRegistration no valida el contrato (cupo, política, campo de estado, umbral)')]
+  }
+
+  if (fields.some(field => field.key === parsed.data.statusField)) {
+    return [block('event_registration_status_field_taken', `el campo de estado ${parsed.data.statusField} lo escribe el servidor; no puede declararse en el formulario`)]
+  }
+
+  if (!fields.some(field => field.type === 'email')) {
+    return [block('event_registration_without_email', 'una reserva se cuenta por correo: el formulario debe tener un campo type=email')]
+  }
+
+  return []
+}
+
+/**
+ * TASK-2044 — El marcador `{privacyLink}` del consentimiento: como máximo uno por casilla, sin otros
+ * marcadores, sin HTML junto a él y con `privacyUrl` declarada. Las casillas sin llaves no se evalúan,
+ * así que ninguna versión existente cambia de veredicto.
+ */
+const CONSENT_TOKEN_PATTERN = /\{[A-Za-z][A-Za-z0-9_]*\}/g
+
+const validateConsentPrivacyLink = (consent: ConsentDisplay | null): CompileWarning[] => {
+  if (!consent) return []
+
+  const warnings: CompileWarning[] = []
+
+  for (const checkbox of consent.checkboxes) {
+    const label = checkbox.label ?? ''
+    const tokens = label.match(CONSENT_TOKEN_PATTERN) ?? []
+
+    if (tokens.length === 0) continue
+
+    const block = (code: string, message: string) =>
+      warnings.push({ code, dimension: 'consent', message: `casilla ${checkbox.key}: ${message}`, blocking: true })
+
+    if (tokens.some(token => token !== CONSENT_PRIVACY_LINK_MARKER)) {
+      block('consent_marker_unknown', `sólo se admite el marcador ${CONSENT_PRIVACY_LINK_MARKER}`)
+    }
+
+    if (tokens.filter(token => token === CONSENT_PRIVACY_LINK_MARKER).length > 1) {
+      block('consent_marker_repeated', `el marcador ${CONSENT_PRIVACY_LINK_MARKER} va una sola vez`)
+    }
+
+    if (/[<>]/.test(label)) {
+      block('consent_marker_html', 'una casilla con marcador no admite HTML; el enlace lo construye el renderer')
+    }
+
+    if (!consent.privacyUrl) {
+      block('consent_marker_without_privacy_url', `${CONSENT_PRIVACY_LINK_MARKER} exige privacyUrl`)
+    }
+  }
+
+  return warnings
+}
+
+/**
+ * TASK-2053 — Presentación `inline_pill`. Se declara en `ui_policy.presentation` (+ `ui_policy.inlinePill`).
+ * Sin la clave (o con `standard`) el contrato no la lleva: ninguna versión existente cambia de contrato
+ * ni de veredicto. Con `inline_pill` la forma del formulario queda acotada a lo que la píldora sabe
+ * dibujar; todo lo demás bloquea en vez de degradar en silencio.
+ */
+interface ResolvedPresentation {
+  presentation?: FormPresentation
+  inlinePill?: InlinePillDisplay
+  warnings: CompileWarning[]
+}
+
+const presentationBlock = (code: string, message: string): CompileWarning => ({
+  code,
+  dimension: 'policy',
+  message,
+  blocking: true,
+})
+
+const validateInlinePillNote = (note: string | undefined, consent: ConsentDisplay | null): CompileWarning[] => {
+  if (!note) return []
+
+  const warnings: CompileWarning[] = []
+  const tokens: string[] = note.match(CONSENT_TOKEN_PATTERN) ?? []
+
+  if (/[<>]/.test(note)) warnings.push(presentationBlock('inline_pill_note_html', 'inlinePill.note no admite HTML'))
+
+  if (tokens.some(token => token !== CONSENT_PRIVACY_LINK_MARKER)) {
+    warnings.push(presentationBlock('inline_pill_note_marker_unknown', `inlinePill.note sólo admite ${CONSENT_PRIVACY_LINK_MARKER}`))
+  }
+
+  if (tokens.filter(token => token === CONSENT_PRIVACY_LINK_MARKER).length > 1) {
+    warnings.push(presentationBlock('inline_pill_note_marker_repeated', `${CONSENT_PRIVACY_LINK_MARKER} va una sola vez en inlinePill.note`))
+  }
+
+  if (tokens.includes(CONSENT_PRIVACY_LINK_MARKER) && !consent?.privacyUrl) {
+    warnings.push(presentationBlock('inline_pill_note_without_privacy_url', `${CONSENT_PRIVACY_LINK_MARKER} en inlinePill.note exige privacyUrl`))
+  }
+
+  return warnings
+}
+
+const resolvePresentation = (
+  uiPolicy: Record<string, unknown>,
+  context: {
+    fields: FieldDefinition[]
+    composition: CompositionMode
+    consent: ConsentDisplay | null
+    successBehavior: SuccessBehavior | null
+  },
+): ResolvedPresentation => {
+  const raw = uiPolicy.presentation
+
+  if (raw === undefined || raw === null || raw === 'standard') {
+    return 'inlinePill' in uiPolicy
+      ? { warnings: [presentationBlock('inline_pill_labels_without_presentation', 'ui_policy.inlinePill exige presentation=inline_pill')] }
+      : { warnings: [] }
+  }
+
+  if (typeof raw !== 'string' || !(FORM_PRESENTATIONS as readonly string[]).includes(raw)) {
+    return { warnings: [presentationBlock('presentation_unknown', 'ui_policy.presentation no es una presentación conocida')] }
+  }
+
+  const warnings: CompileWarning[] = []
+  const labels = inlinePillDisplaySchema.safeParse(uiPolicy.inlinePill ?? {})
+
+  if (!labels.success) {
+    warnings.push(presentationBlock('inline_pill_labels_invalid', 'ui_policy.inlinePill no valida el contrato (etiquetas acotadas, sin claves extra)'))
+  } else {
+    const labelValues = Object.entries(labels.data).filter(([key]) => key !== 'note').map(([, value]) => value)
+
+    if (labelValues.some(value => typeof value === 'string' && /[<>{}]/.test(value))) {
+      warnings.push(presentationBlock('inline_pill_label_markup', 'las etiquetas de inlinePill no admiten HTML ni marcadores'))
+    }
+
+    warnings.push(...validateInlinePillNote(labels.data.note, context.consent))
+  }
+
+  if (context.composition !== 'static') {
+    warnings.push(presentationBlock('inline_pill_composition', 'inline_pill sólo admite composition=static'))
+  }
+
+  const visible = context.fields.filter(field => field.type !== 'hidden')
+
+  if (visible.length !== 1 || visible[0].type !== 'email' || visible[0].required !== true) {
+    warnings.push(presentationBlock('inline_pill_fields', 'inline_pill exige exactamente un campo visible type=email requerido (más campos ocultos)'))
+  }
+
+  if (context.consent && context.consent.checkboxes.length > 0) {
+    warnings.push(presentationBlock('inline_pill_consent_checkboxes', 'inline_pill no dibuja casillas: el consentimiento va como aviso (inlinePill.note)'))
+  }
+
+  if (context.successBehavior?.kind === 'redirect' || context.successBehavior?.presentation === 'success_card') {
+    warnings.push(presentationBlock('inline_pill_success_behavior', 'inline_pill confirma en la píldora: no admite redirect ni success_card'))
+  }
+
+  return {
+    presentation: 'inline_pill',
+    ...(labels.success && Object.keys(labels.data).length > 0 ? { inlinePill: labels.data } : {}),
+    warnings,
+  }
+}
+
+/**
  * Compila la versión. `forPublication=true` aplica el gate completo (errores
  * bloquean). `forPublication=false` (preview/draft) compila best-effort y reporta
  * warnings sin bloquear el render.
@@ -180,11 +388,33 @@ export const compileFormVersion = (
   // — Upload policy (solo si hay campos de archivo) —
   validateUploadFields(fields).forEach(addWarning)
 
+  // — Controles de presentación (premium_select sólo en select) —
+  validatePresentationControls(fields).forEach(addWarning)
+
+  // — Valores fijos y política de reserva por evento (TASK-2053) —
+  validateStaticValues(fields).forEach(addWarning)
+  validateEventRegistration(definition.form_kind, uiPolicy, fields).forEach(addWarning)
+
   // — Consent display (browser-safe) —
   const consentDisplay = consentDisplaySchema.safeParse({
     consentPolicyVersion: version.consent_policy_version ?? undefined,
     ...asObject(version.copy_refs_json),
   })
+
+  validateConsentPrivacyLink(consentDisplay.success ? consentDisplay.data : null).forEach(addWarning)
+
+  // Un consentimiento que no parsea queda fuera del contrato. Si la versión declara los campos de
+  // presentación de TASK-2044, ese descarte silencioso dejaría el formulario sin casilla: se bloquea.
+  const consentCopyRefs = asObject(version.copy_refs_json)
+
+  if (!consentDisplay.success && ('presentation' in consentCopyRefs || 'privacyLinkLabel' in consentCopyRefs)) {
+    addWarning({
+      code: 'consent_display_invalid',
+      dimension: 'consent',
+      message: 'el consentimiento declarado no valida el contrato (presentation/privacyLinkLabel)',
+      blocking: true,
+    })
+  }
 
   // — Composición —
   const composition = (typeof uiPolicy.composition === 'string' ? uiPolicy.composition : 'static') as CompositionMode
@@ -234,6 +464,16 @@ export const compileFormVersion = (
     })
   }
 
+  // — Presentación del formulario (TASK-2053) —
+  const resolvedPresentation = resolvePresentation(uiPolicy, {
+    fields,
+    composition,
+    consent: consentDisplay.success ? consentDisplay.data : null,
+    successBehavior: successParsed.success ? successParsed.data : null,
+  })
+
+  resolvedPresentation.warnings.forEach(addWarning)
+
   // — Render contract (browser-safe) —
   const renderContract: RenderContract | null = successParsed.success
     ? {
@@ -258,6 +498,8 @@ export const compileFormVersion = (
         consent: consentDisplay.success ? consentDisplay.data : undefined,
         successBehavior: successParsed.data,
         styleVariant: version.style_variant ?? undefined,
+        ...(resolvedPresentation.presentation ? { presentation: resolvedPresentation.presentation } : {}),
+        ...(resolvedPresentation.inlinePill ? { inlinePill: resolvedPresentation.inlinePill } : {}),
         surfacePolicy: {
           allowedOrigins: [],
           rendererChannel: 'stable',

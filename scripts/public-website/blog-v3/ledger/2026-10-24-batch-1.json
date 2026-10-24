@@ -1,0 +1,111 @@
+{
+    "contract": "eo-format-backfill-ledger.v1",
+    "mode": "apply",
+    "at": "2026-10-24T07:43:50+00:00",
+    "proposal_sha256": "e6ae85cc94bef9b1748d7291bf170764d15fb6d3ad55e2a50b33f512da986103",
+    "batch": 10,
+    "applied": 10,
+    "remaining": 34,
+    "entries": [
+        {
+            "id": 242919,
+            "slug": "maas-revoluciona-tu-marketing-digital",
+            "title": "MaaS: Revoluciona Tu Marketing Digital",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 244765,
+            "slug": "que-es-inbound-marketing",
+            "title": "Inbound Marketing: Qué es y cómo transforma tu estrategia figital",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 244883,
+            "slug": "genera-leads-con-marketing-de-contenidos",
+            "title": "De Invisible a Irresistible: Genera +Leads con Marketing de Contenidos",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 245047,
+            "slug": "estrategia-de-contenidos",
+            "title": "De la Idea a la Ejecución: Estrategia de Contenidos que Generan Resultados",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 245091,
+            "slug": "sitios-web-que-generan-resultados",
+            "title": "Growth-Driven Design: Sitios Web que Generan Resultados",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 245154,
+            "slug": "seo-inbound-marketing",
+            "title": "Más allá de las Keywords: El Impacto del SEO en Estrategias Inbound",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 245190,
+            "slug": "hubspot-marketing-ventas",
+            "title": "HubSpot: Potenciando Marketing y Ventas para un Crecimiento Sostenible",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 245245,
+            "slug": "como-rastrear-formularios-hubspot-en-ga4-paso-a-paso",
+            "title": "Cómo Rastrear y Medir Formularios de HubSpot en GA4: Guía Paso a Paso",
+            "before": [],
+            "after": [
+                "guia"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 245290,
+            "slug": "hubspot-onboarding-exitoso",
+            "title": "HubSpot y el Desafío del Onboarding: Estrategias para un Inicio Exitoso",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 245717,
+            "slug": "somos-hubspot-solutions-partner",
+            "title": "Efeonce es HubSpot Solutions Partner: Potencia tu Crecimiento",
+            "before": [],
+            "after": [
+                "novedad"
+            ],
+            "source": "rule"
+        }
+    ]
+}

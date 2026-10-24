@@ -1,0 +1,149 @@
+{
+  "document": "Pibank-Anexo-ahorrista-peruano-2026-10-19",
+  "createdAt": "2026-10-19T20:31:01.479Z",
+  "status": "draft_for_review",
+  "line": "engine",
+  "measureRenderer": {
+    "package": "@efeoncepro/axis-graphic-line",
+    "version": "0.17.0",
+    "from": "axis-design-system main, checkout local"
+  },
+  "data": {
+    "demandFamilies": 33,
+    "demandMonthly": 66030,
+    "buckets": {
+      "rival": 42180,
+      "learn": 10180,
+      "own": 7070,
+      "alt": 6600
+    },
+    "aiMode": {
+      "queries": [
+        "mejor cuenta de ahorros Perú",
+        "cuenta de ahorros alto interés Perú",
+        "depósito a plazo fijo Perú"
+      ],
+      "cited": {
+        "bank": 5,
+        "compare": 6,
+        "media": 2,
+        "social": 7,
+        "regulator": 1
+      },
+      "citedTotal": 21,
+      "notBank": 16,
+      "pichinchaCites": 4,
+      "pibankCites": 0
+    },
+    "measure": {
+      "value": 0.7619047619047619,
+      "label": "76 %",
+      "source": "Google AI Mode vía DataForSEO · Perú · 3 consultas de ahorro · 28-09-2026 · 21 fuentes únicas"
+    }
+  },
+  "hardcodedFacts": [
+    "Tasas publicadas Pibank/Interbank/Scotiabank/Efectibank consultadas el 06-10-2026: research/PIBANK-DEMAND-2026-10-06.md §5",
+    "Posiciones SERP del 06-10-2026: research/PIBANK-DEMAND-2026-10-06.md §4",
+    "APEIM 2025 A/B 10,4% hogares Perú y 21% Lima: reconstruccion-2027/demanda-audiencia-2026-10-08/README.md §16.3"
+  ],
+  "sources": [
+    {
+      "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/demanda-audiencia-2026-10-08/panel.csv",
+      "sha256": "510b4fc102dbd8fd2c4e4de40c9af03f21b30dddc8d98205787cf485f2d4e355"
+    },
+    {
+      "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pichincha-ai-mode-results.json",
+      "sha256": "95c7bd2b3be15681eeb9b202b0f8c2d6dfe7a7d5cba8e2f1fce533d63642ec3e"
+    }
+  ],
+  "assets": [
+    {
+      "file": "node_modules/@efeoncepro/axis-brand-assets/assets/efeonce-logo-positive.svg",
+      "source": "efeonce-logo-positive",
+      "sha256": "c647119e75eff0b13cab36c1485e2ff5a7b501125c43509ad6a4013ec2fdb49e"
+    },
+    {
+      "file": "node_modules/@efeoncepro/axis-brand-assets/assets/url-bubble-baked-light.svg",
+      "source": "url-bubble-baked-light",
+      "sha256": "12d726db31d0dad6b07723f3bf0289094216c8f5baf72d93e10af2e1e5d930b8"
+    },
+    {
+      "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/propuesta/assets/pibank-logo-inverso.svg",
+      "source": "Pibank, versión para fondo claro (archivo «inverso» del sitio oficial)",
+      "sha256": "9fe7a6e92874f08529a16f56bdcc31cd525ba28195398c2da346f3d716a12c6c"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/bricolage-grotesque-variable.ttf",
+      "source": "axis-fonts",
+      "sha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-300.ttf",
+      "source": "axis-fonts",
+      "sha256": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-400.ttf",
+      "source": "axis-fonts",
+      "sha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-500.ttf",
+      "source": "axis-fonts",
+      "sha256": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-600.ttf",
+      "source": "axis-fonts",
+      "sha256": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-700.ttf",
+      "source": "axis-fonts",
+      "sha256": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    }
+  ],
+  "qa": {
+    "pages": [
+      {
+        "page": 1,
+        "gap": 30,
+        "overflow": false,
+        "height": 1123
+      },
+      {
+        "page": 2,
+        "gap": 99,
+        "overflow": false,
+        "height": 1123
+      },
+      {
+        "page": 3,
+        "gap": 31,
+        "overflow": false,
+        "height": 1123
+      }
+    ],
+    "brokenImages": 0,
+    "fonts": [
+      "Bricolage Grotesque",
+      "Poppins"
+    ],
+    "textOverflow": [],
+    "errors": []
+  },
+  "outputs": [
+    {
+      "file": "Pibank-Anexo-ahorrista-peruano-2026-10-19.html",
+      "sha256": "5e2dcf1bbad46bf5b27b9dde6a8abc0edd3f2ba4018fade3bb75958a9f72b9c9"
+    },
+    {
+      "file": "Pibank-Anexo-ahorrista-peruano-2026-10-19.pdf",
+      "sha256": "0715de8fd1e8cb95f602a10f16307c4102a92bf5558161cee9054d26d84e47b1"
+    }
+  ],
+  "authority": {
+    "sent": false,
+    "clientApproved": false
+  }
+}

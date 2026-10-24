@@ -5,6 +5,8 @@
  * (`--set-env-vars` es destructivo: lo que no esté declarado ahí desaparece en el siguiente deploy).
  * Nada acá contiene secretos.
  */
+import type { EnvSource } from '@/types/env-source'
+
 
 export type AuthServerPersonAuthConfig = {
   /** Flag de la superficie de personas; OFF ⇒ `/auth/*` y `/m/*` responden 404. */
@@ -68,7 +70,7 @@ export const AUTH_SERVER_PERSON_AUTH_DEFAULTS = {
 const parseFlag = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
 export const readAuthServerPersonAuthConfig = (
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): AuthServerPersonAuthConfig => ({
   personAuthEnabled: parseFlag(env.AUTH_SERVER_PERSON_AUTH_ENABLED),
   ...AUTH_SERVER_PERSON_AUTH_DEFAULTS

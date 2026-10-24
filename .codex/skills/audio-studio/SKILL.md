@@ -206,6 +206,18 @@ se mueve o cambia; verificar márgenes inicial/final y no desplazar el foley int
 LUFS, true peak, ASR y hashes son evidencia técnica específica, nunca sustitutos de naturalidad o impacto.
 El template compartido de Motion es `templates/video-postproduction-review.md` en esa skill.
 
+Antes de mostrar al operador una mezcla montada sobre video, correr primero el control estándar sin Gemini:
+`pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json`
+(silencios, golpes, picos y sincronía ±42 ms; código 2 si una cue no se confirma). Gemini va después, opcional, como
+segunda opinión de criterio y siempre con `--verify`. Detalle en el
+[manual](../../../docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
+
+Si la música se acorta, **sólo se corta justo antes de un ataque**, en la salida y en la entrada; nunca a media nota,
+nunca arrancando a mitad de la toma y nunca con stop-time. El plan se arma y se verifica con
+`pnpm ai:audio-edits revisar --source toma.wav --plan plan.json --ajustar plan-ajustado.json --render musica.wav`
+(sale con 1 si un corte falla) antes de mezclar. Caso fuente: ChatGPT Ads, 2026-10-21; receta en el manual
+§«Cortar música sin que se oiga».
+
 ## Locución comercial y música para un video corto (2026-10-12)
 
 Locución para un mercado: voz **de ese país** y en registro de locutor, no coloquial; por el conector de claude.ai el

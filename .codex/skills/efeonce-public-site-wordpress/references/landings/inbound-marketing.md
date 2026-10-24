@@ -1,5 +1,7 @@
 # Landing: Inbound Marketing
 
+> **Delta 2026-10-23 — shared dock (TASK-2043).** The bottom dock is AXIS `efeonce.landing-dock` painted by plugin `eo-landing-dock` (config `manifests/landing-dock/inbound.json`): phone; «Agenda una reunión» (own CTA `inbound-discovery-meeting`) · «Diagnóstico» → `#diagnostico`; no stop; `cta-location=landing_dock` replaces `inbound_mobile_dock`. The legacy dock `nav.mbar` is stripped from the HTML while the dock is on (`off` brings it back); anything below describing the legacy dock is history and rollback context. Operate: `global-site-navigation.md` §Landing dock.
+
 > This landing's composition («La órbita», the «El loop.» hero, its 11 sections and their order, the light `vivo`
 > section, the loop graphic, «Arma tu primer ciclo», the meeting-dialog look, button skins, colors and type) answers
 > this landing's need. It is not a template or the site's style; only its mechanisms are reusable

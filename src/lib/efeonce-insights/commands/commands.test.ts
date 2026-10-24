@@ -63,7 +63,7 @@ const deliveryStore = vi.hoisted(() => ({
 
 vi.mock('../delivery/store', () => deliveryStore)
 
-const ENV_ON = { INSIGHTS_GENERATION_ENABLED: 'true', INSIGHTS_ISSUANCE_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv
+const ENV_ON = { INSIGHTS_GENERATION_ENABLED: 'true', INSIGHTS_ISSUANCE_ENABLED: 'true' }
 
 const internalSubject = { userId: 'user-int', tenantType: 'efeonce_internal' as const, roleCodes: ['efeonce_account'], primaryRoleCode: 'efeonce_account', routeGroups: ['internal'], authorizedViews: [], memberId: 'mem-1' }
 const opsSubject = { ...internalSubject, userId: 'user-ops', roleCodes: ['efeonce_operations'], primaryRoleCode: 'efeonce_operations', memberId: 'mem-2' }
@@ -126,7 +126,7 @@ describe('TASK-1845 — createInsightEdition', () => {
   it('flag OFF ⇒ generation_disabled sin tocar la base', async () => {
     const { createInsightEdition } = await import('./create-edition')
 
-    await expect(createInsightEdition({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', request: request(), env: {} as NodeJS.ProcessEnv })).rejects.toMatchObject({ code: 'generation_disabled' })
+    await expect(createInsightEdition({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', request: request(), env: {} })).rejects.toMatchObject({ code: 'generation_disabled' })
     expect(stores.insertInsightEdition).not.toHaveBeenCalled()
   })
 
@@ -215,7 +215,7 @@ describe('TASK-1845 — issue / withdraw / recover', () => {
     const { issueInsightEdition } = await import('./lifecycle')
 
     stores.getInsightEditionById.mockResolvedValue(edition({ state: 'ready_for_review' }))
-    await expect(issueInsightEdition({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1', reason: 'aprobado por el account', env: {} as NodeJS.ProcessEnv })).rejects.toMatchObject({ code: 'issuance_disabled' })
+    await expect(issueInsightEdition({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1', reason: 'aprobado por el account', env: {} })).rejects.toMatchObject({ code: 'issuance_disabled' })
     await expect(issueInsightEdition({ subject: opsSubject, actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1', reason: 'aprobado por ops', env: ENV_ON })).rejects.toMatchObject({ code: 'forbidden' })
     // Este test importa `./lifecycle` directo (sin el barrel que cablea el puerto real, TASK-1846):
     // el puerto queda en su estado no conectado y emitir sigue bloqueado con causa explícita.

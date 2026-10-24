@@ -17,7 +17,7 @@ describe('resolveWebhookBaseUrl', () => {
         env: {
           VERCEL_URL: 'greenhouse-lw2s5z5j5-efeonce-7670142f.vercel.app',
           NODE_ENV: 'test'
-        } as NodeJS.ProcessEnv
+        }
       })
     ).toBe('https://dev-greenhouse.efeoncepro.com')
   })

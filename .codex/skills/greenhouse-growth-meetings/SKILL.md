@@ -55,24 +55,43 @@ Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live 
 `SCHEDULER_COMPOSITION_DECISION_V1.md`, `GROWTH_CTA_COMPOSITION_DECISION_V1.md` and their
 `docs/quality/` dossiers. Greenhouse continuity: TASK-2007.
 
-## Planned consumer: global site header (EPIC-055 / TASK-2042)
+## Consumer: global site menu (EPIC-055 / TASK-2042) — live since 2026-10-23
 
-**Planned, not built** (architecture proposed 2026-10-18). The «Agenda tu diagnóstico» button in the global header of
-`efeoncepro.com` will open this scheduler through `<greenhouse-cta>` with the `open_meeting_scheduler` action; there
-will be no other booking path. When implementing it in
-[TASK-2042](../../../docs/tasks/to-do/TASK-2042-site-nav-wordpress-rollout.md):
+«Agenda tu diagnóstico» in the global menu of `efeoncepro.com` (header, mega and onepage) opens the `discovery`
+scheduler through a hidden `<greenhouse-cta>` launcher; there is no other booking path from the menu.
 
-- `cta-location` per entry point: `menu_header`, `menu_mega` or `menu_onepage`, to measure by entry point.
-- The menu closes its panel (mega or onepage) and releases its scroll lock **before** opening the dialog, so the native
-  `<dialog>` is the only owner of scroll lock and focus; the launcher stays mounted so focus returns to it on close.
-- A Growth CTA surface **owned by the global header** (do not reuse a landing's surface), with its
-  `meeting_surface_binding` and an origin allowlist covering every page where the menu appears. Its key is secret:
-  never in docs, commits or messages.
-- The dialog skin (the scheduler of `/agencia-inbound-marketing/`) lives today with landing scope in
-  `scripts/public-website/inbound-source/page.css`; it moves to a shared site primitive, it is not copied.
-- Without JavaScript or without a surface, the button is a plain link to `/agenda/`.
+- CTA `site-nav-discovery-meeting` (`open_meeting_scheduler`, meeting surface `fhsf-efeonce-lead-gen-web`), WordPress
+  surface `csur-eb834d53-fd99-4f6b-9615-979e329e7d37` owned by the menu (allows only that CTA; origins efeoncepro.com
+  and www), `cta_location: site_nav`. The entry point is measured by the menu's `gh_site_nav_clicked`
+  (`target_type: cta`, `target: menu_header|menu_mega|menu_onepage`), not by separate cta-locations.
+- The key lives in Greenhouse `.auth/site-nav-meeting-cta-surface.json` (0600, gitignored) and in the WordPress option
+  `eo_site_nav_scheduler`. Re-running `scripts/growth/publish-site-nav-meeting-cta.ts` rotates it, and the option must
+  follow in the same session with `set-site-nav-scheduler.php`. Never write the key anywhere.
+- The dialog wears the shared site skin (`data-eo-meeting-skin="site"`, `ohio-child/assets/css/meeting-dialog.css`:
+  Inbound frame approved 2026-10-18 with the `/agenda/` palette); a landing's own CTA dialog keeps its own skin.
+- Without JavaScript, without a valid option, or with an empty launcher, the button is a plain link to `/agenda/`.
 
-Contract: [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md` §Agendador](../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#agendador).
+Rollout state and launcher details: `greenhouse-growth-ctas` §Estado de rollout. Operation:
+`efeonce-public-site-wordpress` → `references/global-site-navigation.md` §Scheduler CTA. Contract:
+[`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md` §Agendador](../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#agendador).
+
+Second consumer, same day: the landings' bottom dock (`efeonce.landing-dock`, TASK-2043), placement
+`cta-location="landing_dock"` through a hidden `<greenhouse-cta>` the dock's primary button activates. Redes Sociales
+and Home open this scheduler through the menu's CTA; Influencers, Inbound and HubSpot keep their own meeting CTA. The
+scheduler is only ever the dock's primary action. The entry point is measured by the dock's `gh_landing_dock_clicked`
+(`target_type: cta`, `target: primary`); the scheduler itself keeps `greenhouse_cta_*` with `cta_location: landing_dock`.
+Neither click is a key event: the conversion stays `generate_lead` on a confirmed booking. Operation: `efeonce-public-site-wordpress` →
+`references/global-site-navigation.md` §Landing dock.
+
+## Inline host: `/agenda/` landing (2026-10-20)
+
+`/agenda/` (WordPress page 251583) is no longer an isolated pilot: it is an indexable «La órbita» landing that mounts
+the scheduler **inline** with the same pilot host, unchanged — `<efeonce-meeting-scheduler>` with surface
+`fhsf-efeonce-lead-gen-web`, scheduler `discovery`, placement `agenda_pilot`, `activation-mode="page"`,
+`max-recipe="command"` (no `<greenhouse-cta>`, no `efeonce-discovery-30`). The host only frames it and themes it
+through the `--gh-meeting-*` variables, page-scoped; renderer and contract did not change, and no controlled booking
+was made. Production still shows the current renderer: the AXIS composition remains pending adoption (TASK-2007).
+Landing contract: skill `efeonce-public-site-wordpress` → `references/landings/agenda.md`.
 
 ## Operating loop
 
@@ -245,13 +264,26 @@ Provider delivery and real commercial outcomes require their own readback; CLI s
 that evidence. Release proofs and pending real traffic/EMQ stay in the linked runtime/audit.
 
 
+## LinkedIn Ads — preparación propuesta19/10/2026
+
+Cargar [manual LinkedIn](../../../docs/manual-de-uso/growth/preparar-medicion-linkedin.md) y
+[arquitectura Proposed](../../../docs/architecture/GREENHOUSE_LINKEDIN_ADS_MEASUREMENT_ARCHITECTURE_V1.md).
+Sólo booking nuevo confirmado por proveedor y persistido; abrir agenda o escoger hora no convierte.
+No existen policy/destino/recibo/bridge LinkedIn en este motor; no transformar `googleAdsConversion`,
+`gh_ads_conversion` ni generate_lead genérico en permiso LinkedIn. Requiere cuenta/reglas/consentimiento
+propios y eventId durable del hecho compartido con CAPI si se adopta; duplicados/polling no reemiten.
+La cobertura Google no inscribe LinkedIn. No crear leads/reservas ficticios ni publicar al documentar.
+
 ## Google Ads online y EC — contrato y checkpoint 18-10-2026
 
 Cargar [contrato/activación](../../../docs/manual-de-uso/growth/activar-conversiones-google-ads.md),
 [arquitectura](../../../docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md)
 y [evidencia de activación](../../../docs/audits/growth/2026-10-18-google-ads-activation.md).
-Recibo Ads postcommit con UUID/key, nunca en dedupe/replay; policy opt-in y flag global default OFF.
-Exigir los cuatro permisos Google explícitos y GPC sin veto. Hashes sólo en el canal reservado
+Para `meeting_booking`, exigir respuesta válida del proveedor, transición durable
+`provider_dispatched → succeeded` y proyección de medición persistida antes de devolver
+`googleAdsConversion` con UUID/key; nunca en dedupe/replay. El recibo comercial de booking y el
+recibo Ads son contratos distintos. Exigir policy publicada para el binding vigente, flags de captura
+y Ads habilitados (default OFF), cuatro permisos Google explícitos y GPC sin veto. Hashes sólo en el canal reservado
 `user_data`, con memoria privada ≤10 s; nunca en dataLayer ni telemetría ordinaria. El evento dedicado
 `gh_ads_conversion` queda excluido del forwarding GA4. No derivar Ads del `generate_lead` genérico
 ni mezclar UPD/Meta. GCLID/GBRAID/WBRAID se observan con consentimiento; no se generan ni se disparan.
@@ -288,5 +320,8 @@ significa Ads habilitado. La revisión al publicar es hoy un paso del operador, 
 AI Grader tiene intención comercial confirmada por el operador. Contacto es general y queda fueraAds.
 Lead Gen Web corregido a quote_request por command/store Forms, preservando identidad y versión;
 no se exceptúa globalmente lead_magnet ni se publica el plan viejo. La API nueva de clasificación
-está preparada en código local, aún sin deploy; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
-La política configurada no certifica el intake histórico propio del Grader, recepción o atribución.
+está publicada y su auditoría API Platform comparte transacción con el UPDATE Forms; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
+El [release de cierre](../../../docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md)
+publicó main `2559e9242`: Grader y clasificación auditada servidos, CI/Deep/smoke y manifest released.
+Releyó Web6/Server10 y las14 fuentes sin nuevas publicaciones. La configuración y canarios
+negativos no certifican una reserva comercial real, recepción, matching o atribución Ads.

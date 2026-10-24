@@ -100,3 +100,20 @@ campañas. [Modelo vigente](../../business-models/media-distribution/PROGRAMMATI
 - `pnpm ops:lint --changed`: cero errores, 14 advertencias de paridad preexistentes en epics ajenos.
   El gate estricto de contexto se ejecuta tras la última edición y antes de commit; los cambios ajenos se excluyen,
   incluido el hunk BytePlus del índice compartido. Este cierre no acredita validación operativa del servicio.
+
+## Delta 2026-10-19/20 — propuesta de Basis y uso en la oferta Gana
+
+- **19-10-2026:** Juan Felipe Anaya (Country Sales Manager Colombia, Basis) envió «Basis - Propuesta Modelos
+  Hibrido EFEONCE 2026» (PDF y PPTX). Condiciones: tecnología DSP 5 % sobre medios; deals DOOH/PMP 20 % por deal;
+  implementación estimada 8 días; sin mínimo de inversión en plataforma; testigos de emisión DOOH; admite la
+  categoría apuestas a nivel de plataforma; equipo en Bogotá.
+- Para crear la cuenta y redactar el contrato pidió: razón social, dirección fiscal, sitio web, teléfono, contacto
+  de facturación y encargado de cuenta; formulario de crédito Bectran con referencias comerciales; RUT de no más de
+  30 días, datos bancarios, contacto de facturas y cédula del representante legal; facturación a 30 días.
+  **Pendiente de Efeonce; no está verificado que se haya enviado.**
+- **20-10-2026:** el operador declara partnership con Basis DSP; la oferta a Gana (GRD-1541) es conjunta
+  Efeonce · Basis DSP, y Efeonce presenta, presta el servicio y factura. No hay contrato firmado ni crédito
+  aprobado registrados. Las condiciones anteriores sostuvieron la oferta enviada en Wherex el 20-10-2026 a las
+  12:09 (Santiago); la excepción de precio quedó en el
+  [Pricing Pack §2.3](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md#23-calibración-del-tarifario-y-composición-integral).
+  Expediente: [Gana GRD-1541](../../commercial/tenders/gana-programatica-colombia-1541-2026/README.md).

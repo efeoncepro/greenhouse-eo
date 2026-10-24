@@ -37,6 +37,22 @@ Usar las skills de Social, Design, Typography, Copy, Motion y Audio según el tr
 Si el plugin Creative Production está disponible y fue solicitado, leer sus skills de intake/produce;
 los módulos locales conservan el aprendizaje estable, no se editan los archivos del plugin en caché.
 
+**Red de destino (desde 2026-10-23): por fit, no por defecto.** Antes de idear, pasar la prueba de fit y anotar el
+resultado en el brief:
+
+1. ¿La temporada es emocional o cultural y se puede celebrar desde el oficio o el equipo? → **Instagram** (marca
+   agencia: nunca precios, «contrátanos» ni formularios).
+2. ¿Tiene consecuencia de negocio para el comprador y hay un argumento profesional propio? → **LinkedIn de Efeonce**.
+3. ¿Julio tiene una opinión propia sobre ella? → **LinkedIn de Julio**.
+4. ¿Ninguna de las tres? → **no se publica**. No se rellena el calendario.
+
+Si pasa en más de un canal, cada uno lleva su pieza o su argumento propio. Anotar también los canales descartados y
+por qué ([PDR-020, delta 2026-10-23](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-23--seasonalities-por-fit-de-canal)).
+Antes de producir fin de año, confirmar el estado vigente: Navidad 2026 (MET-2337) se rehace desde cero y su video
+aprobado no se usa; Año Nuevo (MET-2338) quedó archivada sin producir.
+[Sistema de canales](../../documentation/social/sistema-de-canales-y-love-brand.md) ·
+[plan, delta 2026-10-22](../../audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
+
 ## 2. Preparar la escena y sus referencias
 
 Separar referencias de forma cultural, materiales, iluminación y encuadre; registrar fuentes y
@@ -78,7 +94,10 @@ Inspeccionar lienzo y previews de recorte, sin asumir que todos los clientes de 
 
 Decodificar MP4 completo, comprobar duración/resolución/fps/códecs/audio, extraer muestras del export
 y revisar transiciones y cierre. Escuchar cuando esté disponible; diferenciar escucha del usuario,
-medición y revisión del agente. Los contact sheets no sustituyen revisión temporal completa.
+medición y revisión del agente. Los contact sheets no sustituyen revisión temporal completa. La medición
+estándar de un video con sonido o animación es `pnpm ai:listen --measure-only` (sincronía, silencios, cortes,
+cuadros quietos y grilla con `--cues`, sin costo), antes de mostrarlo; Gemini es segunda opinión y siempre con
+`--verify`. Ver [escuchar y mirar media](../ai-tooling/escuchar-y-mirar-media-con-gemini.md).
 
 ## 6. Guardar el paquete final
 
@@ -101,7 +120,9 @@ Comparar archivos en destino. No afirmar sincronización remota ni permisos a pa
 10. Guardar PROGRAMACION.md y evidencia saneada con IDs/enlaces. Reportar programado, no publicado.
 
 **Posts de imagen (desde 2026-09-16):** subir y publicar **PNG**. Carrusel de Instagram: URLs en orden y un texto
-alternativo por imagen. Documento de LinkedIn: las mismas imágenes con `publishImagesAsPDF` y título del documento.
+alternativo por imagen. LinkedIn: **nunca el carrusel de Instagram** (decisión del operador, 2026-10-22); puede usar el visual clave como
+imagen única con su argumento propio. Un documento de LinkedIn (`publishImagesAsPDF` + título) se arma sólo con
+láminas hechas para LinkedIn.
 Para corregir un post programado se envía el contenido completo: el ID cambia y el UUID se mantiene.
 [Caso Viva México y previa 18](../../operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).
 

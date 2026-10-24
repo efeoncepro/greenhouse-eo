@@ -1,0 +1,84 @@
+{
+  "run_id": "2026-10-18-1036-esenttia-adjudicada-rectificacion",
+  "at": "2026-10-18T10:36:40.544924-03:00",
+  "timezone": "America/Santiago",
+  "week_window": {
+    "from": "2026-10-12T00:00:00-03:00",
+    "to": "2026-10-18T10:36:40.544924-03:00"
+  },
+  "country": "Colombia",
+  "line": "CRM/HubSpot",
+  "opportunity_ids": [
+    "HSP-0034"
+  ],
+  "queries": [
+    {
+      "id": "R001",
+      "kind": "web.open",
+      "query": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11064557",
+      "result": "web connector inaccessible; no bypass"
+    },
+    {
+      "id": "R002",
+      "kind": "web.open",
+      "query": "datos.gov.co/jbjy-vk9h exact portfolioCO1.BDOS.11022494",
+      "result": "web connector inaccessible"
+    },
+    {
+      "id": "R003",
+      "kind": "web.search",
+      "query": "\"5600218590\" \"DACARTEC\"",
+      "result": "aggregator shows open; not decisive"
+    },
+    {
+      "id": "R004",
+      "kind": "web.search",
+      "query": "\"CO1.REQ.11210476\" adjudicado",
+      "result": "no superior evidence to buyer"
+    },
+    {
+      "id": "R005",
+      "kind": "CUA read",
+      "query": "operator SECOP tab1698376472 exact notice",
+      "result": "awarded supplierDACARTEC, publicityyes, signed10Oct, start15Oct, execution14Oct2027, published15Oct09:01:12Bogota"
+    },
+    {
+      "id": "R006",
+      "kind": "CUA/CLI read",
+      "query": "Deal66218288550 and task118818223962 exact IDs",
+      "result": "operator already closedlost10:32; no sharedsync; native strategy call task still pending"
+    },
+    {
+      "id": "R007",
+      "kind": "CLI schema and preview",
+      "query": "Deal closed_lost_reason, task status/subject/body; dry-run and digest",
+      "result": "schema verified; first apply blocked by digest_required, executedfalse; normal preview/digest used subsequently"
+    },
+    {
+      "id": "R008",
+      "kind": "CLI write/readback",
+      "query": "correct Deal description/reason only; preserve operator stage/time",
+      "result": "verified; no reopening"
+    },
+    {
+      "id": "R009",
+      "kind": "CLI write/readback",
+      "query": "annul native task with ANULADA title, cancellationbody and COMPLETED administrative disposition",
+      "result": "verified; no call performed"
+    },
+    {
+      "id": "R010",
+      "kind": "local continuity",
+      "query": "correct HSP0034, reports, registries and qualification gate",
+      "result": "historical evidence preserved; other33opportunities untouched"
+    }
+  ],
+  "blocked_sources": [
+    "web connector SECOP and exact contract dataset; buyerUI independently readable"
+  ],
+  "scope": "operator-triggered factual correction of erroneous prospect qualification",
+  "crm": "operatorclosedlost retained; description/reasoncorrected; nativecalltaskannulled",
+  "new_outreach": false,
+  "new_enrichment": false,
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/shared-deal-2026-10-18-esenttia"
+}

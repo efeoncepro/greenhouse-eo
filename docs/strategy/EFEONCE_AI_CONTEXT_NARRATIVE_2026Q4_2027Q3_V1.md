@@ -221,9 +221,18 @@ exista una nueva SKU conjunta. Cada oferta conserva su alcance, estado comercial
 |---|---|---|---|---|
 | 1 | Historias de negocios cerrados por WhatsApp; serie «El criterio de tu mejor vendedor» | LinkedIn Ads a gerencia; Meta con anuncios que abren chat de WhatsApp | Autodiagnóstico de contexto | 25 % |
 | 2 | Carrusel «El mismo cliente, tres versiones» | Retargeting a quienes interactuaron con 1 y 4 | Chequeo de salud de datos | 15 % |
-| 3 | Índice mensual de qué dicen los asistentes de IA sobre una categoría | Search y Microsoft Ads; ChatGPT Ads sólo en mercados habilitados (hoy no Chile) | Radiografía AEO | 20 % |
+| 3 | Índice mensual de qué dicen los asistentes de IA sobre una categoría | Search y Microsoft Ads; ChatGPT Ads (Chile habilitado desde el 21-10-2026) | Radiografía AEO | 20 % |
 | 4 | Serie «Así trabaja un equipo humano-agente»: un proceso, ficha de rol, excepción, supervisor y medición; variante de marketing con brief, claims y autoridad de publicación; contraste de proveedores sólo cuando ayuda a elegir | LinkedIn por job a operaciones, revenue, servicio **o CMO/Marketing Ops**; retargeting sólo con audiencia y consentimiento elegibles | Landing neutral del servicio verificada → conversación de fit → Blueprint o primer equipo; CMO puede entrar antes por AEO/campaña | 25 % orientativo, sin autorización de gasto |
 | 5 | «Del output a la pieza»: build completo, descartes diagnosticados y Behind the Build; comparación con/sin contexto rotulada como demostración | Meta/Instagram y LinkedIn a marketing | Sprint «Campaña en 5 días» · Creative Diagnostic · Kit de contexto de marca para IA | 15 % |
+
+**Canales propios (delta 2026-10-22).** El orgánico de esta tabla sigue el sistema de
+[PDR-020 revisión 2.0](../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias):
+Instagram y Threads son marca agencia (oficio, cultura, love brand) y no llevan precios, «contrátanos» ni
+formularios; sólo LinkedIn lleva directo a la landing; YouTube, el blog y los newsletters pasan antes por Glitch o
+una herramienta ([estrategia de love brand §8.4](EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22)).
+La pauta en Meta/Instagram de la columna «Pagado» es paid social y queda fuera de esa regla. La serie «IA con
+contexto» (línea Engine; LinkedIn, YouTube y blog) todavía no tiene landing donde convertir; es pendiente antes del
+4-ene-2027.
 
 Piezas ya existentes en el calendario de contenidos de Notion que encajan: capítulo 3 («60 % de búsquedas sin clic»,
 «4 métodos para saber si la IA te recomienda», «Share of AI Voice»); capítulo 4 («Los 3 roles humanos del equipo

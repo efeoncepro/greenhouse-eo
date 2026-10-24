@@ -25,6 +25,8 @@ import { createProbeRegistry } from './registry'
 import { createProbeFetcher, resolveSubjectSite } from './safe-fetch'
 import { getProbeResults, upsertProbeResults } from './store'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface GatherRunProbesResult {
   results: ProbeResult[]
   /** Razón cuando no se ejecutó nada (flag off, sin website, etc.). null si corrió. */
@@ -37,7 +39,7 @@ export interface GatherRunProbesOptions {
   /** fetch inyectable para tests. Default global fetch (vía createProbeFetcher). */
   fetchImpl?: typeof fetch
   /** Override de env para resolver flags en tests. Default process.env. */
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 /** Env var canónica de la API key del Google Knowledge Graph (resuelve `..._SECRET_REF`). */
@@ -49,7 +51,7 @@ interface BuildEntityContextInput {
   market: string
   locale: string
   fetchImpl?: typeof fetch
-  env: NodeJS.ProcessEnv
+  env: EnvSource
 }
 
 /**

@@ -231,7 +231,7 @@ describe('TASK-1845 — autoría IA acotada', () => {
   it('con el flag apagado el plan es determinista y no se llama al modelo', async () => {
     const { authorEditorialPlan } = await import('./author-plan')
     const { generateStructuredGemini } = await import('@/lib/ai/google-genai')
-    const authored = await authorEditorialPlan({ snapshot, modules: ['seo'], locale: 'es-CL', env: {} as NodeJS.ProcessEnv })
+    const authored = await authorEditorialPlan({ snapshot, modules: ['seo'], locale: 'es-CL', env: {} })
 
     expect(authored.provenance.mode).toBe('deterministic')
     expect(generateStructuredGemini).not.toHaveBeenCalled()

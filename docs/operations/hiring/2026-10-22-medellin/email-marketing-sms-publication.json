@@ -1,0 +1,166 @@
+{
+  "outcome": "published",
+  "mode": "publish",
+  "demandId": "tdmn-056382d4-6cb1-4768-add0-65253c99c25f",
+  "demandPublicId": "EO-TDM-0684",
+  "openingId": "opng-0771288c-34f0-4ce6-99d4-4a98ccb63dc2",
+  "openingPublicId": "EO-OPN-0680",
+  "status": "published",
+  "detailUrl": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0680",
+  "applyUrl": "https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0680/apply",
+  "warnings": [
+    "public_compensation_band_not_set"
+  ],
+  "timings": [
+    {
+      "step": "lookup_existing_opening",
+      "durationMs": 125
+    },
+    {
+      "step": "create_talent_demand",
+      "durationMs": 505
+    },
+    {
+      "step": "create_hiring_opening",
+      "durationMs": 617
+    },
+    {
+      "step": "update_public_opening_projection",
+      "durationMs": 520
+    },
+    {
+      "step": "publish_opening",
+      "durationMs": 638
+    }
+  ],
+  "preview": {
+    "demand": {
+      "stakeholderType": "internal",
+      "engagementType": "on_going",
+      "fulfillmentMode": "internal_hire",
+      "demandOrigin": "prospect_request",
+      "requestedRole": "Especialista en Email Marketing y SMS",
+      "requestedSeats": 1,
+      "requestedSkills": [
+        "Email marketing",
+        "SMS",
+        "Segmentación",
+        "Automatización",
+        "Entregabilidad",
+        "Analítica"
+      ],
+      "priority": "high",
+      "ownerUserId": "user-efeonce-admin-julio-reyes",
+      "notes": "publication_source_ref=efeonce-medellin-2027-email-marketing-sms-20261022"
+    },
+    "opening": {
+      "demandId": "<created-demand-id>",
+      "internalTitle": "Especialista en Email Marketing y SMS",
+      "seniority": "Semi-senior",
+      "requestedSeats": 1,
+      "ownerUserId": "user-efeonce-admin-julio-reyes"
+    },
+    "publicOpening": {
+      "publicTitle": "Especialista en Email Marketing y SMS",
+      "publicSummary": "Diseña comunicaciones relevantes y convierte los datos de contacto y de campaña en relaciones mejor cuidadas.",
+      "publicDescription": "Buscamos un perfil Semi-senior para operar Email Marketing y SMS de un importante cliente en Medellín. Combinarás segmentación, automatizaciones, contenido y análisis con una operación cuidadosa de las bases. Tendrás dedicación al proyecto y colaboración con Marketing Digital del cliente y nuestros equipos de estrategia, creatividad y datos.\n\n- Organizar, limpiar y segmentar bases de contacto según criterios autorizados y necesidades del proyecto.\n- Configurar y operar campañas de email y SMS, con revisión de audiencias, mensajes, enlaces y programación.\n- Desarrollar asuntos, cuerpos de email y copies SMS en colaboración con los equipos de marca y creatividad.\n- Construir y ajustar automatizaciones y recorridos de lead nurturing.\n- Monitorear entregabilidad, resultados e incidencias y proponer pruebas y ajustes.\n- Documentar campañas y aprendizajes; coordinar reportes y atender la operación dentro de la jornada acordada.",
+      "publicRequirements": "Experiencia práctica operando campañas de email marketing y SMS en herramientas de automatización o plataformas de envío.\nCapacidad de explicar criterios de segmentación, limpieza y uso autorizado de bases de contacto.\nManejo de automatizaciones o recorridos de nurturing y de los controles previos al envío.\nComprensión de entregabilidad y análisis de campañas para decidir qué mejorar.\nEscritura clara en español, atención al detalle y documentación de cambios.\nDisponibilidad para dedicación completa e híbrida en Medellín, incluyendo sábados hasta mediodía dentro de la jornada semanal.",
+      "publicNiceToHave": "Experiencia con operaciones de varias marcas o bases de contacto de volumen relevante.\nConocimientos de pruebas de asuntos, contenidos y recorridos de comunicación.\nExperiencia trabajando con diseño, analítica y equipos comerciales o de marketing.",
+      "publicWorkMode": "hybrid",
+      "publicHiringRegion": "Colombia",
+      "publicCity": "Medellín",
+      "publicCountry": "CO",
+      "publicOfficeLocation": "Medellín, Colombia — instalaciones del cliente",
+      "publicArea": "Marketing",
+      "publicSkillTags": [
+        "Email marketing",
+        "SMS",
+        "Segmentación",
+        "Automatización",
+        "Entregabilidad",
+        "Analítica"
+      ],
+      "publicLocationMode": "Medellín, Colombia — instalaciones del cliente",
+      "publicEmploymentMode": "Jornada completa",
+      "publicSeniority": "Semi-senior",
+      "publicProcessNotes": "Postulación y revisión inicial: Revisamos tu perfil, tu disponibilidad para trabajar en Medellín y una muestra o caso existente que puedas compartir sin información confidencial.\nConversación estructurada: Conversamos sobre tu experiencia, las decisiones que has tomado y cómo colaboras con equipos y clientes. Aclaramos modalidad, expectativas y remuneración.\nRevisión de un caso de tu trabajo: Profundizamos en una muestra existente y en tu contribución concreta. Puedes anonimizar clientes y resultados; no te pedimos trabajo utilizable ni una campaña gratuita para el cliente.\nAlineación final y respuesta: Revisamos alcance, condiciones, disponibilidad y los siguientes pasos. Cualquier incorporación queda condicionada a la activación del proyecto 2027 y al acuerdo final.\nEsperamos darte una definición o actualización del proceso en tres a cuatro semanas, sujeto a disponibilidad mutua. Ese plazo no es una fecha de incorporación al proyecto.\nTe comunicaremos los avances y la decisión final, incluso si no continuamos; si cambia el plazo, te informaremos.\nPuedes solicitar una adaptación o ajuste razonable al responder a la persona de Efeonce que te contacte durante el proceso.",
+      "publicCompensationBand": null,
+      "publicationSourceRef": "efeonce-medellin-2027-email-marketing-sms-20261022",
+      "publicContent": {
+        "version": 2,
+        "promise": "Diseña comunicaciones relevantes y convierte los datos de contacto y de campaña en relaciones mejor cuidadas.",
+        "intro": "Buscamos un perfil Semi-senior para operar Email Marketing y SMS de un importante cliente en Medellín. Combinarás segmentación, automatizaciones, contenido y análisis con una operación cuidadosa de las bases. Tendrás dedicación al proyecto y colaboración con Marketing Digital del cliente y nuestros equipos de estrategia, creatividad y datos.",
+        "outcomes": [
+          "Mantener bases y segmentos organizados con criterios documentados de calidad y uso autorizado.",
+          "Operar campañas y automatizaciones con revisión previa, destinatarios correctos y seguimiento de entregabilidad.",
+          "Proponer mejoras sustentadas en resultados, comportamiento de las audiencias y objetivos de comunicación.",
+          "Dejar una memoria clara de calendarios, pruebas y aprendizajes que facilite continuidad y colaboración."
+        ],
+        "workItems": [
+          "Organizar, limpiar y segmentar bases de contacto según criterios autorizados y necesidades del proyecto.",
+          "Configurar y operar campañas de email y SMS, con revisión de audiencias, mensajes, enlaces y programación.",
+          "Desarrollar asuntos, cuerpos de email y copies SMS en colaboración con los equipos de marca y creatividad.",
+          "Construir y ajustar automatizaciones y recorridos de lead nurturing.",
+          "Monitorear entregabilidad, resultados e incidencias y proponer pruebas y ajustes.",
+          "Documentar campañas y aprendizajes; coordinar reportes y atender la operación dentro de la jornada acordada."
+        ],
+        "essentials": [
+          "Experiencia práctica operando campañas de email marketing y SMS en herramientas de automatización o plataformas de envío.",
+          "Capacidad de explicar criterios de segmentación, limpieza y uso autorizado de bases de contacto.",
+          "Manejo de automatizaciones o recorridos de nurturing y de los controles previos al envío.",
+          "Comprensión de entregabilidad y análisis de campañas para decidir qué mejorar.",
+          "Escritura clara en español, atención al detalle y documentación de cambios.",
+          "Disponibilidad para dedicación completa e híbrida en Medellín, incluyendo sábados hasta mediodía dentro de la jornada semanal."
+        ],
+        "preferred": [
+          "Experiencia con operaciones de varias marcas o bases de contacto de volumen relevante.",
+          "Conocimientos de pruebas de asuntos, contenidos y recorridos de comunicación.",
+          "Experiencia trabajando con diseño, analítica y equipos comerciales o de marketing."
+        ],
+        "learnables": [
+          "Plataformas específicas y criterios de contacto del proyecto.",
+          "Contexto de las marcas y su calendario de comunicaciones.",
+          "Métodos de QA, reporte y documentación de Efeonce."
+        ],
+        "evidenceAsk": "Comparte un caso existente de email o SMS: objetivo, segmento, flujo, controles antes del envío, tu contribución y aprendizaje. Puedes mostrar un esquema o resultados anonimizados. No compartas bases de contactos ni información personal de destinatarios.",
+        "workModel": "Dedicación completa a un importante cliente de Colombia, con base en Medellín: dos días presenciales en sus instalaciones y tres remotos por semana. Búsqueda anticipada para un proyecto previsto para 2027; la incorporación y su fecha dependen de su activación y de un acuerdo entre las partes. Vinculación por la vía internacional habitual de Efeonce, con pago directo de Efeonce; las condiciones y los beneficios aplicables se formalizan en el acuerdo correspondiente a Colombia. La remuneración se conversa con transparencia durante el proceso. El horario incluye disponibilidad los sábados hasta mediodía, dentro de la jornada semanal.",
+        "collaboration": {
+          "team": "Marketing Digital del cliente y equipos de estrategia, creatividad, medios y datos de Efeonce; colaboración multicultural y entre países.",
+          "reportsTo": "Responsable del proyecto en Efeonce, en coordinación con Marketing Digital del cliente.",
+          "language": "Español para la operación, la documentación y la comunicación con el cliente.",
+          "timezoneOverlap": "Horario de Colombia (America/Bogota, UTC-5); coordinación con los equipos de Efeonce en otros países.",
+          "workingRhythm": "Operación de lunes a viernes y disponibilidad los sábados hasta mediodía, dentro de la jornada semanal; distribución concreta acordada antes de la incorporación."
+        },
+        "process": {
+          "steps": [
+            {
+              "title": "Postulación y revisión inicial",
+              "body": "Revisamos tu perfil, tu disponibilidad para trabajar en Medellín y una muestra o caso existente que puedas compartir sin información confidencial."
+            },
+            {
+              "title": "Conversación estructurada",
+              "body": "Conversamos sobre tu experiencia, las decisiones que has tomado y cómo colaboras con equipos y clientes. Aclaramos modalidad, expectativas y remuneración."
+            },
+            {
+              "title": "Revisión de un caso de tu trabajo",
+              "body": "Profundizamos en una muestra existente y en tu contribución concreta. Puedes anonimizar clientes y resultados; no te pedimos trabajo utilizable ni una campaña gratuita para el cliente."
+            },
+            {
+              "title": "Alineación final y respuesta",
+              "body": "Revisamos alcance, condiciones, disponibilidad y los siguientes pasos. Cualquier incorporación queda condicionada a la activación del proyecto 2027 y al acuerdo final."
+            }
+          ],
+          "expectedTiming": "Esperamos darte una definición o actualización del proceso en tres a cuatro semanas, sujeto a disponibilidad mutua. Ese plazo no es una fecha de incorporación al proyecto.",
+          "responseCommitment": "Te comunicaremos los avances y la decisión final, incluso si no continuamos; si cambia el plazo, te informaremos.",
+          "accommodationPath": "Puedes solicitar una adaptación o ajuste razonable al responder a la persona de Efeonce que te contacte durante el proceso."
+        },
+        "benefits": [],
+        "compensation": null,
+        "additionalSections": []
+      },
+      "publicRemoteEligibleCountries": [
+        "CO"
+      ]
+    }
+  }
+}

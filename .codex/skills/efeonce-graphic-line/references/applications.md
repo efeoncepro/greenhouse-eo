@@ -404,6 +404,12 @@ vale en toda aplicación:
   los Sparks oficiales son los del kit ([`SPARKS_V1.md`](../../../../docs/operations/brand-characters/SPARKS_V1.md),
   TASK-1941). **Decisión del operador (2026-10-02): la destacada «Agents» aprobada se queda** (sin Nexa ni texto en el
   círculo); un destacado con Nexa usa otro nombre y otra destacada. Sus robots no se copian como receta.
+- **Destacados y el rol de Instagram (delta 2026-10-22):** Instagram pasó a ser **marca agencia** (love brand y
+  comunidad; [PDR-020](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)). Las
+  portadas siguen aprobadas. **Decidido por el operador el 2026-10-22** (PDR-020, delta punto 12): **07 Podcast se
+  retira** hasta que exista el pódcast (si se produce, va a YouTube en video, bajo Manzanitas); **01 Glitch se queda y
+  se reorienta a la suscripción**, que es el paso siguiente desde Instagram: sus historias invitan a suscribirse, no
+  resumen ediciones.
 - **Cómo funciona un destacado** (operador, 2026-10-01): para **cambiar** la portada de un destacado existente basta la
   imagen de portada; para **crearlo** hay que publicar primero una historia 9:16 **completa** y agregarla. Instagram
   toma la portada del **círculo central** (franja y 420–1500 de 1920). Una historia con bandas lisas arriba y abajo no
@@ -526,14 +532,17 @@ vale en toda aplicación:
 - **Es un mecanismo, no una plantilla:** usarla no convierte el aspecto de la landing Inbound en patrón de otras
   páginas (PDR-026).
 
-### A15. Encabezado y navegación del sitio web (diseño aprobado 2026-10-18, implementación planificada)
+### A15. Encabezado y navegación del sitio web (diseño aprobado 2026-10-18, en vivo desde 2026-10-23)
 
 - **Estado:** diseño **aprobado en canvas** («Mega menú efeoncepro.com»,
-  [versión 67](https://claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj)); implementación **planificada** en EPIC-055
-  (contrato y primitive en AXIS, TASK-2040; plugin «EO Navegación», TASK-2041; adaptador WordPress, TASK-2042). Nada
-  está en runtime: `efeoncepro.com` sigue con el encabezado de Ohio. Contrato técnico:
+  [versión 67](https://claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj)); **en vivo en todo `efeoncepro.com` desde el
+  2026-10-23** (EPIC-055: contrato y primitive en AXIS, TASK-2040; plugin «EO Navegación», TASK-2041; adaptador
+  WordPress, TASK-2042), con AXIS primitives 0.7.13. El encabezado de Ohio queda sólo en `/blog/` y si el interruptor
+  del tema se apaga. La sesión de fidelidad «Rediseño de Menú» lo midió en vivo y lo aprobó (1440 a 390). Contrato
+  técnico:
   [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`](../../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md)
-  (Propuesta) y PDR-027 (Accepted 2026-10-18).
+  y PDR-027 (Accepted 2026-10-18); operación en la skill `efeonce-public-site-wordpress` →
+  `references/global-site-navigation.md`.
 - **Composición de escritorio** («Opción 2», operador 2026-10-17): hamburguesa · logo · cápsula de vidrio (Inicio,
   Nosotros ▾, Soluciones ▾, Recursos ▾, Contacto) · botón «Agenda tu diagnóstico». La cápsula con sus mega menús
   convive con la hamburguesa, que abre el onepage a pantalla completa; abrir uno cierra el otro. Bajo 1.181 px queda
@@ -541,7 +550,9 @@ vale en toda aplicación:
 - **Cabecera en tres estados:** arriba transparente sobre el hero, 96 px; al bajar se oculta; al subir vuelve como una
   **isla de vidrio flotante** (12 px del borde, radio 24, 61 px) que cambia de tono: oscura sobre fotos y secciones
   oscuras, clara con logo y texto navy sobre secciones claras. Aprobada el 2026-10-18 en reemplazo de la barra navy
-  sólida («poco premium»). Recetas de los dos tonos en la arquitectura, §Isla de vidrio.
+  sólida («poco premium»). Recetas de los dos tonos en la arquitectura, §Isla de vidrio. El tono lo lee el primitive
+  (degradados por su luminancia media, imagen = oscuro, sin contar el chrome fijo del host; AXIS 0.7.12) y se conserva
+  con el agendador abierto (0.7.13).
 - **Logo:** 164 px arriba y 128 px dentro de la isla de la cabecera fija (arriba eran 148 px; se amplió el 2026-10-18 tras analizarlo a pedido
   del operador); 152 px en los tableros de 1280 y 1200.
 - **Una sola receta de vidrio** para cápsula, botón y hamburguesa (aprobada el 2026-10-18, probada sobre navy, negro,
@@ -554,8 +565,8 @@ vale en toda aplicación:
   box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255,.03), 0 8px 24px rgba(0,8,20,.24);
   ```
 
-  El botón usa el mismo material con relleno `.12→.04`, borde `.18` y canto `.34`. Estos valores pasan a tokens de
-  AXIS en TASK-2040; ningún CSS de sitio los repite a mano.
+  El botón usa el mismo material con relleno `.12→.04`, borde `.18` y canto `.34`. Estos valores viven en los tokens
+  `axisSiteNav` de AXIS (TASK-2040); ningún CSS de sitio los repite a mano.
 - **Estados del botón «Agenda tu diagnóstico»:** en vidrio, el hover lo ilumina, refuerza el canto y lo sube 1 px; al
   presionar escala a 98 %. En la isla oscura el botón es blanco y su hover pasa a `#cfe4fa`; en la isla clara es navy y su hover pasa a `#023c70`; en ambos sube 1 px. Foco `2px #72ded8`
   en ambos. Con movimiento reducido no se desplaza ni escala.
@@ -575,14 +586,99 @@ vale en toda aplicación:
   | Foto con cara | 8,2 | 13,5 |
   | Foto con indicador ámbar | 6,5 | 4,3 (promedio 6,1) |
 
-  El único caso bajo 4,5:1 es el peor píxel del botón sobre una foto con un indicador ámbar detrás; la QA del
-  piloto repite la medición sobre los heros reales.
+  El único caso bajo 4,5:1 es el peor píxel del botón sobre una foto con un indicador ámbar detrás. Repetir esta
+  medición sobre los heros reales del sitio sigue pendiente: se encendió en todo el sitio sin piloto y la revisión de
+  fidelidad midió tamaños, tipografía, íconos y estados, no este contraste.
 - **Error a no repetir:** el onepage cerrado dejaba su `clip-path: circle(24px)` navy detrás de la hamburguesa, un disco
   que rompía el vidrio. Cerrado debe medir 0 px.
 - **Cuándo no:** las landings no crean su propia navegación ni copian este vidrio; el encabezado global es uno solo y lo
   pinta el primitive de AXIS.
-- **Consumo y fronteras:** la API planificada vive en AXIS (skill `axis-design-system` → `references/ui-primitives.md`,
+- **Consumo y fronteras:** la API vive en AXIS (skill `axis-design-system` → `references/ui-primitives.md`,
   sección `efeonce.site-nav`); el agendador que abre el botón es Growth CTA (skill `greenhouse-growth-meetings`).
+- **Dock inferior de las landings (aprobado 2026-10-23, en vivo en siete landings; canvas «Mega menú efeoncepro.com»
+  v80, fila «Dock inferior de las landings»):** segunda pieza del cromo del sitio, AXIS `efeonce.landing-dock`. Usa el
+  **mismo vidrio de la isla** (sus dos recetas, oscura y clara; radio 24, 61 px) y los acentos de la línea: el botón
+  principal lleva el acento de la línea (`accentOnDark`, tinta `accentInk`: navy, blanca en Engine); sin línea (Inicio)
+  copia el botón del agendador de la isla. El secundario es el vidrio del botón del menú en oscuro, y transparente con
+  borde navy suave y texto navy en claro. Una landing nunca hace su dock propio ni copia este vidrio; operación:
+  skill `efeonce-public-site-wordpress` → `references/global-site-navigation.md` §Landing dock.
+
+### A16. Anuncio de alianza / partnership (post + reel) (aprobado 2026-10-19)
+
+> Verificado contra: la corrida aprobada `ai-generations/2026-10-19_google-partner-freeze/` (`r5-cine/`, `export/`) y
+> greenhouse-eo `develop` en `cb9a8e666` — 2026-10-19. Caso fuente: «Efeonce | Google — Oficialmente partners».
+> Criterio: [criteria.md](criteria.md), «Anuncios de alianza»; decisiones: [ledger.md](ledger.md) (2026-10-19).
+
+- **Para qué:** anunciar una alianza oficial con un partner (programa de partners real, registrado).
+- **Lienzo:** post 4:5 **1080×1350** y reel/story 9:16 **1080×1920**; video MP4 de 9,3 s a 30 fps por formato, con
+  portadas (LinkedIn 4:5, reel de Instagram 9:16).
+- **Va (de atrás hacia adelante):**
+  1. **Fondo** generado: espacio de cine azul `#001a33` **vacío**, una línea de luz anamórfica como **horizonte bajo**
+     (≈ 60–64 % del alto) y el **centro oscuro** reservado al título.
+  2. **Íconos oficiales de los productos del partner**, compuestos en tres planos: cerca, grandes con blur 24 px; medio,
+     nítidos; lejos, chicos y teñidos a navy (brightness .5, saturate .35, opacidad .6).
+  3. **Acabado generativo** sobre esa escena compuesta (sólo luz y lente; los íconos quedan idénticos).
+  4. **Lockup** «Efeonce | Google» con **filete vertical**, los dos logos completos y en blanco; eyebrow
+     «OFICIALMENTE PARTNERS» (Poppins 600, tracking .14em); y **justo debajo**, la fila de productos (Gemini, Google
+     Cloud, Google Workspace) pequeña en gris azulado claro `#b4c6da`, nunca más ancha que el lockup, con Gemini y
+     Google Cloud por sobre Workspace. Esta capa es determinística: nunca pasa por el modelo.
+- **Órbita:** ninguna. La órbita fina sola «le falta muchísimo punch» (operador).
+- **Voz:** sin pregunta-respuesta: el lockup y el eyebrow dicen lo que es.
+- **Animación:** los íconos parten chicos desde el punto de fuga del horizonte y vuelan a su lugar escalonados (lejos →
+  medio → cerca), se congelan con golpe de obturador (flash 0,28), sacudida de cámara y crossfade al cuadro con el
+  acabado; luego entran lockup, eyebrow y fila. Loop de 10 s; el export es de 9,3 s.
+- **Cómo se produce:**
+  1. Fondo con `pnpm ai:image --model gpt-image-2.5-flare` (pedir el modelo explícito: el default del CLI es
+     `gpt-image-2`).
+  2. Componer los íconos en tres planos de forma determinística.
+  3. Acabado con `--model gpt-image-2.5-sunburst` pasando la escena compuesta: material acrílico brillante, rim light,
+     profundidad de campo, haze, aberración cromática y grano, «íconos idénticos» (prompt de la corrida:
+     `r5-cine/acabado.txt`). Decisión del operador: «tienes que pedir el acabado a Sunburst porque no se ve bien así
+     determinístico».
+  4. Comparar al 100 % cada ícono contra la escena compuesta; lo que el acabado cambió se repone componiendo.
+  5. Medir el contraste bajo la caja del lockup **antes** de componer (final: 15–19:1 de media).
+  6. Componer lockup, eyebrow y fila. Para el video: animación en HTML, captura cuadro a cuadro con Playwright
+     (`document.getAnimations()`, pausa + `currentTime`) y `ffmpeg` libx264 crf 16.
+- **Formato 9:16 desde el 4:5:** si `pnpm ai:inpaint expand` no está disponible (fal sin saldo), el fondo vacío se
+  extiende de forma determinística (color por columna + grano). Sólo sirve con un fondo sin objetos que continuar.
+- **Logos de terceros usados** (procedencia; antes de pauta pagada, reemplazar las reproducciones por archivos
+  oficiales del portal de partners): wordmark Google, OneDrive `Alineación/7. Branding & Diseño/04. Logos &
+  Partnership/Logos/Google_2015_logo.svg`; Workspace y Looker, `…/02. Herramientas/Google_Workspace_Logo.svg` y
+  `Looker.svg` (isotipo extraído quitando el texto gris); Gemini isotipo/logotipo, `@efeoncepro/axis-brand-assets`
+  `tools/`; Google Cloud, `Workspace/Portafolio/03 DDSoft/Recursos}/google-cloud-1.svg` (completo; no recortar
+  `google_cloud_logo.svg` a mano); Gmail, Drive, Meet, Calendar, Cloud Run y Cloud Functions, `@iconify-json/logos`
+  (CC0, reproducciones fieles, no archivos de Google); Docs/Sheets/Slides 2020, SVG de Wikimedia Commons
+  (reproducciones). Variantes para oscuro: texto gris o negro de los wordmarks pasado a blanco; fila en gris monocromo.
+- **Nunca:** «×» en el lockup · un logo a color y el otro en blanco · la fila de productos al pie (dos focos) ·
+  tipografía que imita el logo del partner · esferas 3D en sus colores · objetos de oficina de banco de imágenes ·
+  mascota de consumo del partner en un anuncio B2B · contenido generado dentro de pantallas · luz detrás del logo
+  blanco.
+- **Archivos:** `ai-generations/2026-10-19_google-partner-freeze/export/` (MP4, PNG y portadas); canvas con las cinco
+  rondas: [artifact](https://claude.ai/artifact/ETWw3CfFq7QPCVLHq7GssH). Publicación y copy social: skill
+  `social-media-studio`.
+
+### A17. Landing web de servicio o de agenda con el agendador nativo (aprobada 2026-10-20)
+
+> Verificado contra: la landing publicada `efeoncepro.com/agenda/` (WordPress page 251583) y greenhouse-eo `develop`
+> en `17bf00f2a` — 2026-10-20. Criterio: [criteria.md](criteria.md), «Landing de agenda», «Titulares de landing» y «CTA
+> de landing: sin verde lima»; decisiones: [ledger.md](ledger.md) (2026-10-20).
+
+- **Para qué:** una landing cuyo trabajo es que la persona reserve. La landing **enmarca el agendador real**
+  (`<efeonce-meeting-scheduler>` de Growth Meetings), nunca uno dibujado: el canvas de diseño deja el hueco y la
+  composición se resuelve alrededor del componente vivo.
+- **Va:** hero oscuro (`#001a33`) con la **órbita de retrato de Nexa** (pieza `portrait`, Nexa con aire dentro de su
+  órbita) y el par de voz de la landing; el agendador montado bajo el hero (puede montarse sobre su borde), tematizado
+  sólo con sus variables `--gh-meeting-*` en el acento de la línea; secciones en papel («Cómo es la reunión», preguntas)
+  y un cierre oscuro con la llamada a elegir horario.
+- **Titulares:** cada H1/H2 en Bricolage cierra con la **esfera** en el acento de la línea, **salvo el del hero**, que
+  lleva punto tipeado porque la órbita de retrato ya pone la esfera en esa pieza.
+- **CTA:** en `accent-growth` con texto `ground`; nunca el lima `cta-growth` (`#7ed600`).
+- **Firma:** no lleva eslogan suelto ni logo propio; firman la cabecera y el footer globales del sitio.
+- **Copy:** sólo hechos verificables del servicio (duración, canal de la reunión); nada que el agendador no haga.
+- **Nunca:** un agendador dibujado en el canvas como si fuera el producto · el eslogan como titular · una navegación
+  propia de la landing (A15).
+- **Producción y publicación:** skill `efeonce-public-site-wordpress` → `references/landings/agenda.md`; el agendador
+  y su contrato, skill `greenhouse-growth-meetings`.
 
 ## B. Presentaciones e informes
 
@@ -652,6 +748,17 @@ vale en toda aplicación:
 - **Cómo se produce:** catálogos del Artifact Composer (`src/lib/artifact-composer/catalogs/insights-report/`), render
   en el `artifact-worker`; informes que no son Insights, skill `report-studio`.
 - **Fuente:** L 5.1, L 7.1, L 7.2; M §1.3; `EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` (Delta 2026-09-25).
+- **Anexo comercial A4 fuera de Insights (2026-10-19, caso Pibank):** documento breve de lectura de mercado que acompaña
+  una propuesta. La portada lleva **una** órbita de medida sobre un dato con fuente (el número dentro del anillo, la
+  frase y la fuente al lado) y las interiores no llevan órbita. Pregunta Poppins Light + respuesta Bricolage con su
+  esfera (`answerHtml`, el texto sin punto final). Barras y tablas en navy, con el acento sólo en la serie que se
+  destaca. Pie completo en las tres páginas. Renderer de referencia:
+  `docs/commercial/prospects/banco-pichincha-peru-seo-2026/anexo-ahorrista-peruano/render.mjs`. Dos trampas:
+  (1) `measureSvg` **se dibuja a escala de página** (794 × 1123, la base de la órbita) y se posiciona en coordenadas de
+  página; en un lienzo chico de 300 px el trazo canónico casi desaparece. (2) Greenhouse fija `axis-graphic-line` 0.11.0,
+  que **no pinta el camino recorrido** (regla del 2026-09-29, contrato de la órbita 0.5.0). Hasta que TASK-2014 suba el
+  juego AXIS, ese anexo importó `measureSvg` del build de AXIS main (0.17.0, checkout hermano) y lo registró en su
+  manifiesto. Es una solución local del documento, nunca un `file:` en `package.json`.
 
 ### B3b. Marca de producto de Efeonce Insights — dónde se aplica (2026-09-28)
 
@@ -1185,8 +1292,10 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Destacados de Instagram | — | mezcla de recursos, un color de luz por destacada, sin firma en el círculo; portada (cambiar) e historia completa 9:16 (crear) | A11 |
 | Escenario del login de Greenhouse (excepción en curso) | lente al canon (anillo 1,12, zoom, ancho/794); sin lente si la foto ya trae su órbita | foto de novedad, voz con anillo y esfera en el acento de la línea | A12 (`LoginLens.tsx`) |
 | Mención Efeonce en texto corrido | ninguna (el isotipo ya es órbita) | isotipo + etiqueta corta en la píldora de la línea; sólo destinos Efeonce, no CTA | `efeonce.mention` (AXIS) · A14 |
-| Encabezado y navegación del sitio web (planificado) | — | logo 164/140, cápsula de vidrio, botón «Agenda tu diagnóstico» y hamburguesa con una sola receta de vidrio | `efeonce.site-nav` (AXIS, planificado TASK-2040) · A15 |
+| Encabezado y navegación del sitio web (en vivo desde 2026-10-23) | — | logo 164/140, cápsula de vidrio, botón «Agenda tu diagnóstico» y hamburguesa con una sola receta de vidrio | `efeonce.site-nav` (AXIS primitives 0.7.13) · A15 |
+| Landing de servicio/agenda con el agendador nativo | órbita de retrato de Nexa en el hero | agendador real enmarcado, titulares con esfera (salvo el del hero), CTA `accent-growth`, firma del sitio | landing source-led + `<efeonce-meeting-scheduler>` · A17 |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
+| Anuncio de alianza (post 4:5 + reel 9:16) | ninguna (la órbita fina sola no tiene punch) | fondo cine con horizonte bajo, íconos oficiales del partner en tres planos con acabado Sunburst, lockup «Efeonce \| Partner» con filete y fila de productos debajo; sin pregunta-respuesta | composición determinística + acabado `gpt-image-2.5-sunburst` · A16 |
 | Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |
 | Objeto de Plastilina en volumen (portada, KV, social de un objeto, escenario, merch) | la que pida la pieza (combinación con la órbita sesgada, por decidir) | un objeto protagonista, desde 160 px, voz y firma | `volumeIconUrl(glyph)` |
 | Fila de íconos (deck, lámina, servicios) | ninguna propia | una voz, 48–56 px, responde uno solo o ninguno | `resolveIcon` + `auditIconGroup` |

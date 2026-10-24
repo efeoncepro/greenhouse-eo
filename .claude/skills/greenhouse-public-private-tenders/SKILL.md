@@ -19,7 +19,7 @@ registros existentes sólo cambian nombre dentro del mandato expreso, con antes/
 
 ## Envíos desde el Outlook de Julio
 
-Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
+Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma gráfica oficial siempre y CCO `48713323@bcc.hubspot.com`, incluidos correos nuevos, respuestas, reenvíos y seguimientos manuales, programados o por secuencias (Julio, 21/10/2026). Usar Outlook UI o transporte HTML autorizado que conserve la firma; texto plano no es alternativa. Si la herramienta no la preserva, dejar el correo pendiente sin enviarlo. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
 
 
 > **Skill de dominio (método + conocimiento), NO un módulo runtime.** Esta skill es el "cerebro" reutilizable del ciclo de licitación. Hay DOS runtimes que alimenta: (a) el **discovery público** (ingesta Mercado Público, `public_tenders*`) del programa **RESEARCH-007** (TASK-673/675–687), y (b) el **Proposal Studio SHIPPED** (TASK-1392/1393/1391 + 1412/1413/1415, 2026-07-12→16): aggregate `Proposal` + Artifact Composer + render pipeline gobernado + versionado derivado de artefactos + superficie de portal para ver/descargar (`/admin/commercial/proposals`) + **motor de chapter-authors** (TASK-1415: autoría agéntica de láminas servicio-agnóstica, propose→confirm, flag OFF — `proposals/authoring/**`) — su manual de uso/evolución es el companion **`proposal-studio-runtime.md`**. Esta skill _alimenta y opera_ esos módulos; **no los reimplementa**. Si te piden construir/extender runtime, carga también `arch-architect` (overlay Greenhouse) y `greenhouse-backend`.
@@ -70,6 +70,7 @@ Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [pol
 ¿En qué estás?
 ├─ Arrancar un deal (workspace/carpeta canónica: bases/research/ofertas/deck/manifiesto)  `pnpm tender:new <slug>` → TENDER_WORKSPACE_TEMPLATE.md
 ├─ Construir la propuesta COMPLETA end-to-end (director de orquesta) . bid-construction-playbook.md
+├─ Entregar MD para Claude Design u otro diseño posterior .... propuesta-tecnica-economica.md → «Handoff editorial»
 ├─ Marco legal / norma / inhabilidades / recursos (Chile) ...... chile-publico-marco-legal.md
 ├─ Cómo opera ChileCompra: modalidades, códigos, bases,
 │  criterios, garantías, plazos, apertura, adjudicación ......... chile-publico-operativo.md
@@ -166,9 +167,16 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 9. **Creative Studio se cotiza por capas, no por una falsa tarifa por pieza.** Si el bid incluye producción generativa, separa acceso/gobernanza, capacidad humana, Studio Credits, implementación/IP y derechos/licencias/pass-through. El precio total exigido por las bases puede consolidarse hacia afuera, pero la hoja económica interna conserva las cinco líneas y su margen.
 
 10. **El deal vive en un workspace canónico (el "DSR interno").** Arráncalo con `pnpm tender:new <slug>`: carpeta con `bases/` (RFP) · `research/` (investigación 🔒) · `oferta-tecnica.md` (fuente + ledger de evidencia) · `deck-plan.json` · `artifact-manifest.json` (piezas vivas por enlace) · `anexos/` · `*-INTERNO`. El discriminador que manda es **audiencia**: `research/` + `*-INTERNO` **nunca** cruzan al cliente. Las fuentes son archivos git (NO `proposal_assets`); el aggregate `Proposal` referencia la carpeta por `proposal_id`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`.
-    10 bis. **El PDF local no cierra el deal.** Todo workspace con deck debe conservar `proposal-studio.json` y pasar `pnpm tender:canonical-gate <slug>` con `status=verified`. El gate exige `proposalId`, render job gobernado completado, PDF/previews versionados en `proposal_assets` y verificación autenticada en Proposal Studio. `pnpm deck:compose` es taller/exploración; `.captures/` nunca es evidencia suficiente de cierre. El schema y la secuencia viven en `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`.
+    10 bis. **El PDF local no cierra el deal.** Cuando el encargo incluye cierre canónico de un deck en Proposal Studio, el workspace debe conservar `proposal-studio.json` y pasar `pnpm tender:canonical-gate <slug>` con `status=verified`. El gate exige `proposalId`, render job gobernado completado, PDF/previews versionados en `proposal_assets` y verificación autenticada en Proposal Studio. `pnpm deck:compose` es taller/exploración; `.captures/` nunca es evidencia suficiente de cierre. El schema y la secuencia viven en `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`. Un handoff editorial en Markdown para diseño posterior se declara como tal: no obliga a crear deck/render/Proposal ni acredita ese cierre. No inventar IDs o evidencias para aprobarlo.
 
 ### Reglas generales aprendidas para la propuesta y el deck
+
+**Formato y etapa elegidos por el operador.** Si pide Markdown como insumo para Claude Design,
+entregar la narrativa completa y sus anexos en MD, con la investigación y controles internos separados.
+No forzar PDF, deck, Composer ni alta en Proposal Studio para completar ese encargo. El formato exigido
+por el comprador se cumple al preparar la presentación formal. Contrato de handoff y QA:
+`propuesta-tecnica-economica.md` → «Handoff editorial»; procedimiento:
+[Construir una licitación](../../../docs/manual-de-uso/comercial/construir-una-licitacion.md).
 
 10. **Separa la fuente y gobernanza técnica/económica; no impongas separación física.** Según las bases y
     la etapa, el paquete puede ser técnico solo, económico solo, separado, combinado o mixto. Todo monto
@@ -267,6 +275,12 @@ Si la propuesta técnica de una licitación SEO/AEO se lee **sin presentador** (
 alternativa aprobada el 2026-10-07 (caso fuente: Pibank 2027) y pasar su checklist «Antes de entregar» antes de
 enviarla: [propuesta-tecnica-seo-sin-presentador.md](../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md).
 No reemplaza al brochure ni a la propuesta compuesta con las recetas de La órbita.
+Cuando el comprador, después de recibir la propuesta, pide precisiones (impuestos o retenciones para un cliente
+fuera de Chile, costos extra, herramientas AEO aparte, referencias locales), cargar
+[precisiones-post-propuesta.md](precisiones-post-propuesta.md) (caso fuente: Pibank, 19-10-2026). Ahí están la
+respuesta tributaria Chile–Perú ya investigada con sus fuentes, el riesgo de establecimiento permanente si hay equipo en
+el país del cliente, el anexo de lectura de mercado como sustituto de una referencia (**nunca inventar una**) y el
+límite de sólo lectura del conector de Outlook.
 Para presentar la agencia completa, el brochure oficial es «Agencia de Marketing 360°» (aprobado 2026-10-16; skill
 `deck-studio`); su lámina del caso ANAM es la prueba visual de una implementación HubSpot. Sus cifras de ANAM y el
 «12 meses» de Berel siguen pendientes antes de entregarlo afuera.

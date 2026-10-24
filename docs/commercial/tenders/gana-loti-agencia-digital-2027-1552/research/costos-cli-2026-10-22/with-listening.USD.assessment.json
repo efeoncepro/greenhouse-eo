@@ -1,0 +1,310 @@
+{
+  "calculationStatus": "calculated",
+  "commercialStatus": "requires_review",
+  "binding": false,
+  "gapOccurrences": 23,
+  "gaps": [
+    {
+      "code": "COMMERCIAL_APPROVAL_REQUIRED",
+      "path": "quote",
+      "owner": "Commercial/Finance",
+      "action": "Review scope, complete costs, terms and the selling policy before issuing a quote."
+    },
+    {
+      "code": "HUMAN_COST_EVIDENCE_REQUIRED",
+      "path": "strategy",
+      "owner": "People/Finance",
+      "action": "Validate localized compensation and its cost coverages; the historical value remains a reference."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "tools.notion",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "ALLOCATION_EVIDENCE_REQUIRED",
+      "path": "tools.notion",
+      "owner": "Operations",
+      "action": "The evidence of the allocation of this tool is not confirmed. Confirm the plan held, its seats and the share this account carries against the invoice or the console of the supplier before issuing.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "tools.microsoft-365",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "ALLOCATION_EVIDENCE_REQUIRED",
+      "path": "tools.microsoft-365",
+      "owner": "Operations",
+      "action": "The evidence of the allocation of this tool is not confirmed. Confirm the plan held, its seats and the share this account carries against the invoice or the console of the supplier before issuing.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "tools.adobe",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "ALLOCATION_EVIDENCE_REQUIRED",
+      "path": "tools.adobe",
+      "owner": "Operations",
+      "action": "The evidence of the allocation of this tool is not confirmed. Confirm the plan held, its seats and the share this account carries against the invoice or the console of the supplier before issuing.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "tools.frame-io",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "tools.frame-io",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "ALLOCATION_EVIDENCE_REQUIRED",
+      "path": "tools.frame-io",
+      "owner": "Operations",
+      "action": "The evidence of the allocation of this tool is not confirmed. Confirm the plan held, its seats and the share this account carries against the invoice or the console of the supplier before issuing.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "tools.awario-pro",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "tools.awario-pro",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "ALLOCATION_EVIDENCE_REQUIRED",
+      "path": "tools.awario-pro",
+      "owner": "Operations",
+      "action": "The evidence of the allocation of this tool is not confirmed. Confirm the plan held, its seats and the share this account carries against the invoice or the console of the supplier before issuing.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "USER_ASSIGNMENT_REQUIRED",
+      "path": "work.assigneeIds",
+      "owner": "Operations",
+      "action": "6 of the people the tools of this quote are attributed to are planning slots (ids that start with planned-): nobody is assigned to them yet. A slot stays as it is until a specific person is assigned; then replace it with a stable anonymous id and confirm the licensed access of that person to each tool."
+    },
+    {
+      "code": "DEDICATION_EVIDENCE_REVIEW",
+      "path": "lines.design.dedicationEvidence",
+      "owner": "Practice/Operations",
+      "action": "The dedication of this line is an estimate, and the cost it governs is counted as estimated. Confirm the volumes and hours behind it before issuing; a dedication that turns out higher is cost the price does not cover."
+    },
+    {
+      "code": "DEDICATION_EVIDENCE_REVIEW",
+      "path": "lines.video.dedicationEvidence",
+      "owner": "Practice/Operations",
+      "action": "The dedication of this line is an estimate, and the cost it governs is counted as estimated. Confirm the volumes and hours behind it before issuing; a dedication that turns out higher is cost the price does not cover."
+    },
+    {
+      "code": "DEDICATION_EVIDENCE_REVIEW",
+      "path": "lines.creative.dedicationEvidence",
+      "owner": "Practice/Operations",
+      "action": "The dedication of this line is an estimate, and the cost it governs is counted as estimated. Confirm the volumes and hours behind it before issuing; a dedication that turns out higher is cost the price does not cover."
+    },
+    {
+      "code": "DEDICATION_EVIDENCE_REVIEW",
+      "path": "lines.strategy.dedicationEvidence",
+      "owner": "Practice/Operations",
+      "action": "The dedication of this line is an estimate, and the cost it governs is counted as estimated. Confirm the volumes and hours behind it before issuing; a dedication that turns out higher is cost the price does not cover."
+    },
+    {
+      "code": "DEDICATION_EVIDENCE_REVIEW",
+      "path": "lines.account.dedicationEvidence",
+      "owner": "Practice/Operations",
+      "action": "The dedication of this line is an estimate, and the cost it governs is counted as estimated. Confirm the volumes and hours behind it before issuing; a dedication that turns out higher is cost the price does not cover."
+    },
+    {
+      "code": "DEDICATION_EVIDENCE_REVIEW",
+      "path": "lines.listening.dedicationEvidence",
+      "owner": "Practice/Operations",
+      "action": "The dedication of this line is an estimate, and the cost it governs is counted as estimated. Confirm the volumes and hours behind it before issuing; a dedication that turns out higher is cost the price does not cover."
+    },
+    {
+      "code": "TAX_AND_ENTITY_REQUIRED",
+      "path": "quote",
+      "owner": "Finance",
+      "action": "Resolve contractual entity, currency and applicable tax treatment."
+    },
+    {
+      "code": "SERVICE_SCOPE_AND_DELIVERY_REQUIRED",
+      "path": "commercialUnit",
+      "owner": "Practice/Commercial",
+      "action": "Validate deliverables, acceptance, capacity, responsibilities, limits and continuity; internal role cost is not a service contract."
+    }
+  ],
+  "costEvidencePriority": {
+    "currency": "USD",
+    "estimatedCost": "3070.58",
+    "confirmedCost": "408.61",
+    "estimatedShareOfCost": "0.882556",
+    "dedicationNotEvidenced": {
+      "lineIds": [],
+      "cost": "0.00",
+      "shareOfCost": "0.000000"
+    },
+    "confirmFirst": [
+      {
+        "kind": "dedication",
+        "id": "video",
+        "label": "Video Editor/Motion Graphics Designer",
+        "lineIds": [
+          "video"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "1080.00",
+        "shareOfCost": "0.310417",
+        "marginRateLostIfTenPctHigher": "0.018337"
+      },
+      {
+        "kind": "dedication",
+        "id": "design",
+        "label": "Creative Designer",
+        "lineIds": [
+          "design"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "591.00",
+        "shareOfCost": "0.169867",
+        "marginRateLostIfTenPctHigher": "0.010034"
+      },
+      {
+        "kind": "dedication",
+        "id": "creative",
+        "label": "Creative Operations Lead",
+        "lineIds": [
+          "creative"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "304.00",
+        "shareOfCost": "0.087377",
+        "marginRateLostIfTenPctHigher": "0.005162"
+      },
+      {
+        "kind": "dedication",
+        "id": "account",
+        "label": "Project Manager/Account Manager",
+        "lineIds": [
+          "account"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "255.00",
+        "shareOfCost": "0.073293",
+        "marginRateLostIfTenPctHigher": "0.004330"
+      },
+      {
+        "kind": "dedication",
+        "id": "strategy",
+        "label": "Digital Strategist",
+        "lineIds": [
+          "strategy"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "246.58",
+        "shareOfCost": "0.070873",
+        "marginRateLostIfTenPctHigher": "0.004187"
+      }
+    ]
+  },
+  "margin": {
+    "modeledRate": "0.40930560271646859083191850594227504244482173174872665534804753820033955857385399",
+    "approved": false,
+    "pricingPolicies": [
+      {
+        "offerId": "creative-managed-service",
+        "engagementCode": "monthly",
+        "method": "target_margin",
+        "rate": "0.45",
+        "basis": "all_costs",
+        "minimumMargin": "0.45",
+        "sourceStatus": "estimated",
+        "lineIds": [
+          "design",
+          "video",
+          "creative",
+          "strategy",
+          "account",
+          "listening"
+        ]
+      }
+    ],
+    "belowPolicyFloor": false,
+    "policyFloor": {
+      "source": "kernel:MARGIN_BELOW_FLOOR",
+      "marketFactor": {
+        "country": "CO",
+        "factor": "0.90",
+        "floorBasis": "base_market",
+        "recordId": "market:CO",
+        "revision": 2,
+        "sourceStatus": "confirmed"
+      },
+      "engagementForm": {
+        "form": "on_going",
+        "priceRatio": "1",
+        "scope": "general",
+        "offerId": null,
+        "recordId": "engagement:on_going",
+        "revision": 1,
+        "sourceStatus": "confirmed"
+      },
+      "linesBelowFloor": []
+    }
+  }
+}

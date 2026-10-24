@@ -1,0 +1,69 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-day-live-approval",
+  "voice": {
+    "eyebrow": "Tu día a día con Efeonce",
+    "question": "¿Dónde pido ayuda?",
+    "answer": [
+      "En tu",
+      "canal"
+    ]
+  },
+  "body": "Tu equipo pide en su **canal** de Teams o Slack, lo ordenamos en Notion y lo resolvemos en HubSpot.",
+  "note": "Ejemplo ilustrativo · usamos el canal que ya tengas: Teams o Slack",
+  "channel": {
+    "tool": "teams",
+    "name": "Assetplan · Soporte HubSpot"
+  },
+  "agent": {
+    "icon": "sales",
+    "name": "Efeonce · Soporte",
+    "badge": "Sales Hub"
+  },
+  "message": "Solicitud **#18** de Ventas: nueva etapa en el pipeline de arriendos. Ya está probada y lista para tu revisión.",
+  "evidenceChips": [
+    "Ficha en Notion",
+    "Video en Loom"
+  ],
+  "actions": [
+    "Aprobar",
+    "Comentar",
+    "Rechazar"
+  ],
+  "executed": {
+    "icon": "sales",
+    "title": "Publicado en Sales Hub",
+    "text": "Etapa activa, equipo avisado y registro en Notion de quién aprobó y cuándo."
+  },
+  "loop": [
+    {
+      "title": "Pides",
+      "detail": "En Teams o Slack"
+    },
+    {
+      "title": "Priorizamos",
+      "detail": "En Notion"
+    },
+    {
+      "title": "Resolvemos",
+      "detail": "En HubSpot"
+    },
+    {
+      "title": "Queda registrado",
+      "detail": "Cambios y horas"
+    }
+  ],
+  "currentLoopStep": 1,
+  "selection": {
+    "target": "object",
+    "label": "Assetplan",
+    "participantKind": "department"
+  }
+}

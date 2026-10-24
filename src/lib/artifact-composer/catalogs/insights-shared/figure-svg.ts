@@ -344,6 +344,18 @@ export interface LineAnnotationsInput {
   endDelta?: string | null
   /** Sombrea el área entre la principal y la referencia donde ambas tienen dato. */
   fillBetween?: boolean
+  /**
+   * Varias franjas sobre el eje X (etapas de una serie larga). `tone: 'alert'` marca la etapa que explica la
+   * lectura (sombreado de oportunidad, nunca un color sin rol). No se superponen y conviven con `band`.
+   */
+  bands?: ReadonlyArray<{ from: number; to: number; label: string; tone?: 'neutral' | 'alert' }> | null
+  /** Hitos verticales sobre un punto del eje («Migración»): una línea fina y su rótulo arriba. */
+  events?: ReadonlyArray<{ index: number; label: string }> | null
+  /**
+   * Rótulos sobre puntos de la línea principal («208k»). Un índice sin dato en la principal falla cerrado:
+   * nunca se rotula un valor que la línea no dibuja.
+   */
+  pointLabels?: ReadonlyArray<{ index: number; label: string; placement?: 'above' | 'below' }> | null
 }
 
 export interface LinesBox {
@@ -488,6 +500,26 @@ export const lineChartSvg = (
     out.push(`<text class="fig-band-label" x="${n(x(from) + 8)}" y="${box.plotTop + o.bandLabelDy}" font-size="${box.fonts.label}">${esc(label.toUpperCase())}</text>`)
   }
 
+  const stageBands = annotations.bands ?? []
+
+  stageBands.forEach((band, k) => {
+    if (!(band.from >= 0 && band.to > band.from && band.to < count)) throw new FigureDataError(`Líneas: la etapa «${band.label}» apunta fuera del eje.`)
+
+    if (k > 0 && band.from < stageBands[k - 1]!.to) throw new FigureDataError('Líneas: dos etapas se superponen sobre el eje.')
+
+    const tone = band.tone === 'alert' ? ' fig-band--alert' : ''
+
+    out.push(`<rect class="fig-band fig-stage${tone}" x="${n(x(band.from))}" y="${box.plotTop}" width="${n(x(band.to) - x(band.from))}" height="${plotHeight}"></rect>`)
+    out.push(`<text class="fig-band-label fig-stage-label${tone}" x="${n(x(band.from) + 8)}" y="${box.plotTop + o.bandLabelDy}" font-size="${box.fonts.label}">${esc(band.label.toUpperCase())}</text>`)
+  })
+
+  for (const event of annotations.events ?? []) {
+    if (!(event.index >= 0 && event.index < count)) throw new FigureDataError(`Líneas: el hito «${event.label}» apunta fuera del eje.`)
+
+    out.push(`<line class="fig-event" x1="${n(x(event.index))}" x2="${n(x(event.index))}" y1="${box.plotTop}" y2="${box.plotBottom}"></line>`)
+    out.push(`<text class="fig-event-label" x="${n(x(event.index) - 6)}" y="${box.plotTop + o.bandLabelDy}" text-anchor="end" font-size="${box.fonts.label}">${esc(event.label.toUpperCase())}</text>`)
+  }
+
   const ticks: string[] = []
 
   for (let value = top; value >= 0; value -= step) {
@@ -547,6 +579,17 @@ export const lineChartSvg = (
 
   if (annotations.endDelta && primaryEnd && referenceEnd) {
     labels.push(`<text class="fig-end-delta" x="${n(primaryEnd.x - 24)}" y="${n((primaryEnd.y + referenceEnd.y) / 2 + 6)}" text-anchor="end" font-size="${box.fonts.delta}">${esc(annotations.endDelta)}</text>`)
+  }
+
+  for (const point of annotations.pointLabels ?? []) {
+    const hit = primary?.points.find(p => p.i === point.index)
+
+    if (!hit) throw new FigureDataError(`Líneas: el rótulo «${point.label}» nombra un punto sin dato en la línea principal.`)
+
+    const below = point.placement === 'below'
+
+    labels.push(`<circle class="fig-point-dot" cx="${n(hit.x)}" cy="${n(hit.y)}" r="${o.radii.start}"></circle>`)
+    labels.push(`<text class="fig-point" x="${n(hit.x)}" y="${n(below ? hit.y + o.startDy + 7 : hit.y - o.startDy)}" text-anchor="middle" font-size="${box.fonts.start}">${esc(point.label)}</text>`)
   }
 
   if (annotations.startLabel && primaryStart) {

@@ -1,0 +1,322 @@
+- iframe
+- banner:
+  - link "HubSpot logo":
+    - /url: /reports-dashboard/48713323
+    - img "HubSpot logo"
+  - searchbox "Buscar en HubSpot"
+  - button "Abrir el asistente de Breeze":
+    - generic: Asistente de Breeze
+  - navigation "Global toolbar":
+    - menu:
+      - menuitem "Pruebas gratuitas":
+        - link "Pruebas gratuitas":
+          - /url: /trial-picker/48713323
+          - img "Pruebas gratuitas"
+      - button "Crear nuevo":
+      - menuitem "Llamadas":
+        - button "Llamadas":
+          - img "Llamadas"
+      - menuitem "Mercado":
+        - button "Mercado":
+      - menuitem "Ayuda":
+        - button "Ayuda":
+          - img "Ayuda"
+      - menuitem "Configuración":
+        - link "Configuración":
+          - /url: /user-preferences/48713323?eschref=%2Fsequences%2F48713323%2Fsequence%2F316811076%2Fedit
+      - menuitem "Notificaciones":
+        - button "Notificaciones":
+      - menuitem "Ver perfil y más":
+        - button "Ver perfil y más":
+          - img "Julio Reyes Rangel"
+          - generic: Efeonce Group
+- button "Desplazarse hacia arriba":
+- navigation:
+  - menu:
+    - menuitem:
+    - separator
+    - menuitem:
+    - menuitem:
+    - menuitem:
+    - menuitem:
+- button "Gestionar navegación":
+- button:
+- button "Desplazarse hacia abajo":
+- iframe
+- iframe
+- region "Sección de la página":
+  - navigation:
+    - link "Volver a todas las secuencias":
+      - /url: /sequences/48713323/?q=Antalis&page=1
+      - generic: Volver a todas las secuencias
+  - banner:
+    - heading "Glasstech | Juan Pablo Quevedo | Conversación HubSpot | 5 correos" [level=1]:
+      - textbox: Glasstech | Juan Pablo Quevedo | Conversación HubSpot | 5 correos
+    - strong: "Propietario:"
+    - text: Julio Reyes Rangel
+    - button "Acciones":
+      - generic: Acciones
+    - button "Inscribir contactos":
+      - generic: Inscribir contactos
+  - navigation:
+    - link "Rendimiento":
+      - /url: /sequences/48713323/sequence/316811076?q=Antalis&page=1
+      - text: Rendimiento
+    - link "Inscripciones":
+      - /url: /sequences/48713323/sequence/316811076/enrollments?q=Antalis&page=1
+      - text: Inscripciones
+    - link "Pasos":
+      - /url: /sequences/48713323/sequence/316811076/edit?q=Antalis&page=1
+      - text: Pasos
+    - link "Configuración":
+      - /url: /sequences/48713323/sequence/316811076/settings?q=Antalis&page=1
+      - text: Configuración
+    - link "Automatizar":
+      - /url: /sequences/48713323/sequence/316811076/automation?q=Antalis&page=1
+      - text: Automatizar
+- region "Sección de la página":
+  - main:
+    - list:
+      - paragraph: Total de pasos
+      - generic: "5"
+      - paragraph: Días para completar
+      - generic: "23"
+      - paragraph: Pasos automatizados
+      - generic: 100%
+      - paragraph:
+        - text: Criterios de exclusión
+      - generic: "2"
+    - button "Contraer paso" [expanded]:
+    - generic: 1. Correo automátizado - Día 1
+    - button "Agregar prueba A/B":
+      - generic: Agregar prueba A/B
+    - button "Acciones":
+      - generic: Acciones
+    - generic: Versión A
+    - generic: Glasstech | Juan Pablo | 01 | Apertura
+    - button "Editar correo":
+    - button "Más acciones":
+    - separator
+    - generic: "Asunto:"
+    - paragraph: Una idea para el seguimiento de proyectos en Glasstech
+    - separator
+    - paragraph: Hola Juan Pablo, ¿cómo estás?
+    - paragraph
+    - paragraph: Estuve mirando lo que hacen en Glasstech y me quedé pensando en cómo siguen una cotización cuando empieza a pasar entre sucursal, ingeniería e instalación. Ahí, un «¿en qué quedó esto?» puede tener varios destinatarios.
+    - paragraph
+    - paragraph:
+      - text: Soy Julio Reyes, de
+      - link "Efeonce":
+        - /url: https://efeoncepro.com/
+      - text: ". Trabajamos con HubSpot y quería proponerte algo puntual: revisar cómo dejar a mano lo que falta resolver en cada proyecto y quién toma el siguiente paso."
+    - paragraph
+    - paragraph: "Armé un ejemplo con dos situaciones: una cotización de sucursal y un proyecto que necesita revisión técnica. Me gustaría conocer tu mirada y ver si hay algo que les resulte útil."
+    - paragraph
+    - paragraph: Si te interesa, te lo comparto por aquí y me dices qué te parece.
+    - paragraph
+    - paragraph: Un saludo,
+    - button:
+      - generic: Ver más
+    - separator
+    - strong: "0"
+    - generic: Envíos
+    - strong: 0%
+    - generic: Aperturas
+    - strong: 0%
+    - generic: Clics
+    - strong: 0%
+    - generic: Respuestas
+    - strong: 0%
+    - generic: Reuniones
+    - paragraph: "|"
+    - button:
+    - 'button "Retraso: 4 días laborables"':
+      - generic: "Retraso: 4 días laborables"
+    - paragraph: ↓
+    - button "Contraer paso" [expanded]:
+    - generic: 2. Correo automátizado - Día 5
+    - button "Agregar prueba A/B":
+      - generic: Agregar prueba A/B
+    - button "Acciones":
+      - generic: Acciones
+    - generic: Versión A
+    - generic: Glasstech | Juan Pablo | 02 | Dos recorridos
+    - button "Editar correo":
+    - button "Más acciones":
+    - separator
+    - generic: "Asunto:"
+    - paragraph: Una idea para el seguimiento de proyectos en Glasstech
+    - generic: RESPUESTA
+    - separator
+    - paragraph: Hola Juan Pablo,
+    - paragraph
+    - paragraph: "Te dejo los dos casos que mencionaba, como ejemplo para conversar:"
+    - paragraph
+    - paragraph: "En una cotización de sucursal: quién la lleva, qué se cotizó y cuál es el próximo contacto con el cliente."
+    - paragraph
+    - paragraph: "En un proyecto con revisión técnica: además, qué debe resolver Ingeniería, quién lo valida y qué compromiso puede asumir Comercial."
+    - paragraph
+    - paragraph: La idea sería acordar qué información conviene tener a mano en HubSpot y qué necesita un tratamiento distinto en cada recorrido.
+    - paragraph
+    - paragraph: "También te comparto nuestro brochure de servicios HubSpot para que veas cómo abordamos este trabajo:"
+    - paragraph
+    - paragraph:
+      - generic: Ver brochure de servicios HubSpot
+    - paragraph
+    - paragraph: ¿Qué cambiarías en estos dos casos?
+    - paragraph
+    - paragraph: Un saludo,
+    - button:
+      - generic: Ver más
+    - separator
+    - strong: "0"
+    - generic: Envíos
+    - strong: 0%
+    - generic: Aperturas
+    - strong: 0%
+    - generic: Clics
+    - strong: 0%
+    - generic: Respuestas
+    - strong: 0%
+    - generic: Reuniones
+    - paragraph: "|"
+    - button:
+    - 'button "Retraso: 5 días laborables"':
+      - generic: "Retraso: 5 días laborables"
+    - paragraph: ↓
+    - button "Contraer paso" [expanded]:
+    - generic: 3. Correo automátizado - Día 10
+    - button "Agregar prueba A/B":
+      - generic: Agregar prueba A/B
+    - button "Acciones":
+      - generic: Acciones
+    - generic: Versión A
+    - generic: Glasstech | Juan Pablo | 03 | Criterio de seguimiento
+    - button "Editar correo":
+    - button "Más acciones":
+    - separator
+    - generic: "Asunto:"
+    - paragraph: Una idea para el seguimiento de proyectos en Glasstech
+    - generic: RESPUESTA (2)
+    - separator
+    - paragraph: Hola Juan Pablo,
+    - paragraph
+    - paragraph: "Se me quedó un criterio sencillo para mirar el seguimiento: tomar unas pocas cotizaciones en curso y comprobar si cada una tiene una próxima decisión, alguien que la tome y una fecha acordada."
+    - paragraph
+    - paragraph: Eso permite conversar sobre casos concretos. Por ejemplo, una puede estar esperando al cliente; otra, una validación técnica. Lo útil es que el equipo pueda distinguirlas al revisar qué hacer después.
+    - paragraph
+    - paragraph: Ese criterio puede convertirse en una vista de trabajo en HubSpot, con la información que ustedes consideren necesaria.
+    - paragraph
+    - paragraph: ¿Es así como suelen revisar las cotizaciones entre sucursales?
+    - paragraph
+    - paragraph: Un saludo,
+    - button:
+      - generic: Ver más
+    - separator
+    - strong: "0"
+    - generic: Envíos
+    - strong: 0%
+    - generic: Aperturas
+    - strong: 0%
+    - generic: Clics
+    - strong: 0%
+    - generic: Respuestas
+    - strong: 0%
+    - generic: Reuniones
+    - paragraph: "|"
+    - button:
+    - 'button "Retraso: 6 días laborables"':
+      - generic: "Retraso: 6 días laborables"
+    - paragraph: ↓
+    - button "Contraer paso" [expanded]:
+    - generic: 4. Correo automátizado - Día 16
+    - button "Agregar prueba A/B":
+      - generic: Agregar prueba A/B
+    - button "Acciones":
+      - generic: Acciones
+    - generic: Versión A
+    - generic: Glasstech | Juan Pablo | 04 | Trabajo acotado
+    - button "Editar correo":
+    - button "Más acciones":
+    - separator
+    - generic: "Asunto:"
+    - paragraph: Una idea para el seguimiento de proyectos en Glasstech
+    - generic: RESPUESTA (3)
+    - separator
+    - paragraph: Hola Juan Pablo,
+    - paragraph
+    - paragraph: "Si esta idea les sirve, propondría empezar por un solo recorrido: desde la cotización hasta su revisión técnica o siguiente conversación con el cliente."
+    - paragraph
+    - paragraph: El trabajo sería acordar responsables y datos necesarios, configurarlo en HubSpot y probarlo con quienes lo usan. Así podrían evaluar si facilita el seguimiento antes de decidir sobre otras sucursales o procesos.
+    - paragraph
+    - paragraph: "En el brochure puedes ver nuestros servicios HubSpot; te lo dejo como referencia para ubicar ese trabajo:"
+    - paragraph
+    - paragraph:
+      - generic: Ver brochure de servicios HubSpot
+    - paragraph
+    - paragraph: ¿Hay algún recorrido concreto que te interesaría revisar primero?
+    - paragraph
+    - paragraph: Un saludo,
+    - button:
+      - generic: Ver más
+    - separator
+    - strong: "0"
+    - generic: Envíos
+    - strong: 0%
+    - generic: Aperturas
+    - strong: 0%
+    - generic: Clics
+    - strong: 0%
+    - generic: Respuestas
+    - strong: 0%
+    - generic: Reuniones
+    - paragraph: "|"
+    - button:
+    - 'button "Retraso: 7 días laborables"':
+      - generic: "Retraso: 7 días laborables"
+    - paragraph: ↓
+    - button "Contraer paso" [expanded]:
+    - generic: 5. Correo automátizado - Día 23
+    - button "Agregar prueba A/B":
+      - generic: Agregar prueba A/B
+    - button "Acciones":
+      - generic: Acciones
+    - generic: Versión A
+    - generic: Glasstech | Juan Pablo | 05 | Cierre
+    - button "Editar correo":
+    - button "Más acciones":
+    - separator
+    - generic: "Asunto:"
+    - paragraph: Una idea para el seguimiento de proyectos en Glasstech
+    - generic: RESPUESTA (4)
+    - separator
+    - paragraph: Hola Juan Pablo,
+    - paragraph
+    - paragraph: Con este correo cierro los mensajes sobre la idea de seguimiento entre sucursales.
+    - paragraph
+    - paragraph: "Te dejo una pregunta para cuando les resulte útil revisar el tema: ¿qué debería poder resolver un ejecutivo al abrir una cotización, sin tener que reconstruir toda la conversación?"
+    - paragraph
+    - paragraph: Si más adelante quieren trabajar ese recorrido en HubSpot, podemos retomarlo desde un caso concreto y ver juntos qué merece la pena hacer.
+    - paragraph
+    - paragraph: Gracias por leerme.
+    - paragraph
+    - paragraph: Un saludo,
+    - button:
+      - generic: Ver más
+    - separator
+    - strong: "0"
+    - generic: Envíos
+    - strong: 0%
+    - generic: Aperturas
+    - strong: 0%
+    - generic: Clics
+    - strong: 0%
+    - generic: Respuestas
+    - strong: 0%
+    - generic: Reuniones
+    - paragraph: "|"
+    - button:
+    - paragraph: ↓
+    - generic: Completado
+- complementary
+- button

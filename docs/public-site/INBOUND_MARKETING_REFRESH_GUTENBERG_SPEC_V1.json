@@ -1,0 +1,1012 @@
+{
+ "title": "Qué es el inbound marketing y cómo funciona en 2026",
+ "slug": "que-es-inbound-marketing",
+ "excerpt": "El inbound marketing atrae clientes con contenido útil en vez de interrumpirlos. Qué es, cómo funciona hoy, qué cambió con la búsqueda con IA, ejemplos y pasos para aplicarlo.",
+ "seo": {
+  "title": "Qué es el inbound marketing y cómo funciona en 2026 | Efeonce",
+  "description": "El inbound marketing atrae clientes con contenido útil en vez de interrumpirlos. Cómo funciona hoy, qué cambió con la búsqueda con IA, ejemplos y pasos para aplicarlo.",
+  "canonicalUrl": "https://efeoncepro.com/inbound/que-es-inbound-marketing/",
+  "inLanguage": "es-CL",
+  "indexPolicy": "index"
+ },
+ "intro": [
+  "Haz la prueba: busca en Google «qué es inbound marketing». Antes de cualquier enlace, probablemente aparece una respuesta armada por la IA de Google, con la definición lista. Lees dos líneas y cierras la pestaña.",
+  [
+   {
+    "text": "Ahí hay algo que no calza. El inbound marketing nació con una promesa muy concreta: "
+   },
+   {
+    "text": "que te encuentren",
+    "strong": true
+   },
+   {
+    "text": ". Que, en vez de perseguir a tu cliente con publicidad, tu cliente llegue a ti porque buscó algo y tu contenido le respondió. Pero si la respuesta ya está en el buscador, ¿a dónde llega ese cliente?"
+   }
+  ],
+  "Mi lectura es que el inbound no murió. Cambió el lugar donde ocurre. Vamos por partes."
+ ],
+ "tableOfContents": true,
+ "sections": [
+  {
+   "heading": "¿Qué es el inbound marketing?",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "El inbound marketing es una forma de atraer clientes ofreciéndoles contenido y experiencias útiles en el momento en que buscan resolver algo, en lugar de interrumpirlos con publicidad.",
+       "strong": true
+      },
+      {
+       "text": " Su lógica es ayudar primero y vender después: ganarte la atención con valor, convertirla en una relación y acompañar a esa persona hasta que decida comprar, y también después."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "El término lo popularizaron Brian Halligan y Dharmesh Shah, fundadores de HubSpot, en su libro "
+      },
+      {
+       "text": "Inbound Marketing: Get Found Using Google, Social Media, and Blogs"
+      },
+      {
+       "text": " (Wiley, 2009). La idea partía de una observación simple: la gente había aprendido a ignorar el correo masivo, los avisos y las llamadas en frío, y había empezado a buscar por su cuenta antes de hablar con un vendedor."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Dicho de otro modo: el inbound no es una táctica ni un canal. Es un orden de prioridades. Primero entender qué necesita tu "
+      },
+      {
+       "text": "cliente ideal",
+       "href": "https://efeoncepro.com/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/"
+      },
+      {
+       "text": "; después crear lo que lo ayuda; recién al final, pedirle algo."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Inbound vs. outbound: no se trata de elegir uno",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "El outbound es el marketing que sale a buscar: publicidad, prospección en frío, ferias, medios pagados. El inbound es el que se deja encontrar. La diferencia práctica está en quién inicia la conversación."
+    },
+    {
+     "kind": "table",
+     "headers": [
+      "",
+      "Inbound",
+      "Outbound"
+     ],
+     "rows": [
+      [
+       "Quién inicia",
+       "El cliente, cuando busca o pregunta",
+       "La marca, cuando decide salir a hablar"
+      ],
+      [
+       "Qué ofrece",
+       "Respuestas, guías, herramientas, ejemplos",
+       "Mensajes, ofertas, recordación"
+      ],
+      [
+       "Cómo crece",
+       "Se acumula: el contenido sigue trabajando",
+       "Se detiene cuando se detiene la inversión"
+      ],
+      [
+       "Riesgo típico",
+       "Lento al inicio",
+       "Caro y fácil de ignorar"
+      ]
+     ],
+     "caption": "Diferencias prácticas entre inbound y outbound marketing.",
+     "style": "stripes"
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "La pregunta «¿dejo de hacer publicidad?» suele estar mal planteada. Google describió en su estudio "
+      },
+      {
+       "text": "Decoding Decisions: The Messy Middle of Purchase Behavior",
+       "href": "https://thinkwithgoogle.com/_qs/documents/9998/Decoding_Decisions_The_Messy_Middle_of_Purchase_Behavior.pdf"
+      },
+      {
+       "text": " (2020) que las personas no avanzan en línea recta hacia la compra: se mueven en bucle entre "
+      },
+      {
+       "text": "explorar",
+       "strong": true
+      },
+      {
+       "text": " opciones y "
+      },
+      {
+       "text": "evaluarlas",
+       "strong": true
+      },
+      {
+       "text": ", una y otra vez, hasta decidir."
+      }
+     ]
+    },
+    {
+     "kind": "image",
+     "mediaId": 244955,
+     "url": "https://efeoncepro.com/wp-content/uploads/2024/08/messy-middle.svg",
+     "alt": "Diagrama del Messy Middle: un detonante lleva a un bucle entre exploración y evaluación, dentro de la exposición a la marca, que termina en la compra y la experiencia.",
+     "width": 520,
+     "height": 520,
+     "caption": "El Messy Middle según Google: entre el detonante y la compra, las personas exploran y evalúan en bucle. Ilustración Efeonce."
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "En ese ir y venir, el inbound y el outbound hacen trabajos distintos. La publicidad te pone en la lista de opciones cuando alguien todavía no te conoce. El contenido te ayuda a ganar la evaluación: comparativas, casos, respuestas honestas a las objeciones. En Efeonce lo pensamos así: "
+      },
+      {
+       "text": "la publicidad compra la primera mirada; el contenido gana la decisión.",
+       "strong": true
+      },
+      {
+       "text": " Por eso trabajamos el "
+      },
+      {
+       "text": "performance marketing",
+       "href": "https://efeoncepro.com/servicios/performance-marketing/",
+       "mention": {
+        "line": "voice"
+       }
+      },
+      {
+       "text": " y el "
+      },
+      {
+       "text": "marketing de contenidos",
+       "href": "https://efeoncepro.com/servicio-marketing-de-contenidos/",
+       "mention": {
+        "line": "brand"
+       }
+      },
+      {
+       "text": " como un mismo ciclo, con un mismo mensaje."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Si quieres profundizar en cómo se combinan, aquí lo explicamos con SEM y PPC: "
+      },
+      {
+       "text": "inbound marketing y paid media",
+       "href": "https://efeoncepro.com/marketing-digital/inbound-marketing-paid-media/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Cómo funciona: del embudo al flywheel y al loop",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "El inbound se ha explicado con tres modelos distintos. Conviene conocerlos porque cada uno corrige un problema del anterior."
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "1. El embudo (Atraer, Convertir, Cerrar, Deleitar).",
+       "strong": true
+      },
+      {
+       "text": " Es el modelo clásico: atraes visitantes con contenido, los conviertes en contactos con una oferta de valor, los cierras como clientes y luego los deleitas. Su problema es que trata al cliente como el final del proceso."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "2. El flywheel (Atraer, Interactuar, Deleitar).",
+       "strong": true
+      },
+      {
+       "text": " En su keynote de INBOUND 2018, Brian Halligan propuso "
+      },
+      {
+       "text": "retirar el embudo y reemplazarlo por un volante de inercia",
+       "href": "https://blog.hubspot.com/marketing/our-flywheel"
+      },
+      {
+       "text": ": los clientes satisfechos no son el final, son la fuerza que impulsa el siguiente giro, porque recomiendan, vuelven y atraen a otros. Qué pasa cuando esa experiencia falla lo contamos en "
+      },
+      {
+       "text": "Yo solo quería cambiar mis lentes",
+       "href": "https://efeoncepro.com/inbound/como-alinear-marketing-con-experiencia-del-cliente/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    },
+    {
+     "kind": "image",
+     "mediaId": 244952,
+     "url": "https://efeoncepro.com/wp-content/uploads/2024/08/flywheel.svg",
+     "alt": "Flywheel de inbound marketing: atraer, interactuar y deleitar alrededor del crecimiento, que convierte desconocidos en prospectos, clientes y promotores.",
+     "width": 520,
+     "height": 520,
+     "caption": "El flywheel: los clientes satisfechos impulsan el siguiente giro. Ilustración Efeonce."
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "3. El loop (Express, Tailor, Amplify, Evolve).",
+       "strong": true
+      },
+      {
+       "text": " En INBOUND 2025, HubSpot presentó "
+      },
+      {
+       "text": "Loop Marketing",
+       "href": "https://www.hubspot.com/loop"
+      },
+      {
+       "text": " como su marco para la era de la IA. Son cuatro etapas que se repiten:"
+      }
+     ]
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Express:",
+        "strong": true
+       },
+       {
+        "text": " definir con claridad quién eres, tu punto de vista y tu voz, para que todo lo que produzcas (también con IA) suene a tu marca. Lo desarrollamos en "
+       },
+       {
+        "text": "Express en Loop Marketing: POV, voz y buyer persona",
+        "href": "https://efeoncepro.com/loop-marketing/express-voz-marca-ia-loop-marketing/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Tailor:",
+        "strong": true
+       },
+       {
+        "text": " adaptar el mensaje a cada persona y contexto usando datos."
+       }
+      ],
+      [
+       {
+        "text": "Amplify:",
+        "strong": true
+       },
+       {
+        "text": " distribuir en todos los lugares donde tu cliente busca, incluidas las respuestas de IA."
+       }
+      ],
+      [
+       {
+        "text": "Evolve:",
+        "strong": true
+       },
+       {
+        "text": " medir, aprender y ajustar rápido."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Vamos con manzanitas 🍏🍏🍏: el embudo es un tobogán, entras arriba y sales abajo. El flywheel es una rueda que gira más rápido mientras más clientes contentos la empujan. El loop es esa misma rueda, pero con un volante: en cada vuelta miras el camino y corriges la dirección."
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "El loop no reemplaza la idea del inbound; la vuelve operativa para un entorno donde los canales cambian cada trimestre. Lo explicamos en detalle en "
+      },
+      {
+       "text": "¿Qué es Loop Marketing?",
+       "href": "https://efeoncepro.com/loop-marketing/que-es-loop-marketing/"
+      },
+      {
+       "text": ", en "
+      },
+      {
+       "text": "Cómo aplicar Loop Marketing",
+       "href": "https://efeoncepro.com/loop-marketing/como-aplicar-loop-marketing/"
+      },
+      {
+       "text": " y en "
+      },
+      {
+       "text": "cómo ejecutarlo con las herramientas de HubSpot",
+       "href": "https://efeoncepro.com/loop-marketing/ejecutar-loop-marketing-hubspot/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Qué cambió con la búsqueda con IA",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Este es el cambio más grande desde que se inventó el inbound, y vale la pena mirarlo con números."
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Según el "
+       },
+       {
+        "text": "estudio de SparkToro con datos de clickstream de Datos (2024)",
+        "href": "https://sparktoro.com/blog/2024-zero-click-search-study-for-every-1000-us-google-searches-only-374-clicks-go-to-the-open-web-in-the-eu-its-360/"
+       },
+       {
+        "text": ", "
+       },
+       {
+        "text": "el 58,5% de las búsquedas en Google en Estados Unidos y el 59,7% en la Unión Europea terminaron sin un clic",
+        "strong": true
+       },
+       {
+        "text": " a ningún sitio."
+       }
+      ],
+      [
+       {
+        "text": "Un "
+       },
+       {
+        "text": "análisis de Pew Research Center (2025)",
+        "href": "https://www.pewresearch.org/short-reads/2025/07/22/google-users-are-less-likely-to-click-on-links-when-an-ai-summary-appears-in-the-results/"
+       },
+       {
+        "text": " sobre la navegación de 900 adultos en Estados Unidos encontró que, cuando la búsqueda mostraba un resumen generado con IA, "
+       },
+       {
+        "text": "las personas hicieron clic en un resultado en el 8% de las visitas, frente al 15% cuando no había resumen",
+        "strong": true
+       },
+       {
+        "text": ". Sólo en el 1% de las visitas hicieron clic en un enlace dentro del propio resumen."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Una aclaración honesta: ambos estudios miden Estados Unidos y Europa. Hasta donde pudimos revisar, no hay una medición pública equivalente para Latinoamérica, así que la cifra exacta puede ser distinta aquí. La dirección, en cambio, es la misma en cualquier buscador que responda directamente."
+    },
+    {
+     "kind": "paragraph",
+     "text": "¿Qué significa para el inbound? Tres cosas:"
+    },
+    {
+     "kind": "list",
+     "ordered": true,
+     "items": [
+      [
+       {
+        "text": "Ya no basta con atraer visitas.",
+        "strong": true
+       },
+       {
+        "text": " Una parte creciente de tu audiencia te va a «leer» a través de la respuesta de un buscador o de un asistente como ChatGPT, Gemini o Perplexity, sin entrar a tu sitio."
+       }
+      ],
+      [
+       {
+        "text": "Ser la fuente importa tanto como rankear.",
+        "strong": true
+       },
+       {
+        "text": " Si la IA arma la respuesta, la pregunta es si usa tu contenido, te cita y menciona tu marca. A eso se le llama "
+       },
+       {
+        "text": "AEO",
+        "href": "https://efeoncepro.com/aeo-2/",
+        "mention": {
+         "line": "engine"
+        }
+       },
+       {
+        "text": " (Answer Engine Optimization). Lo explicamos en "
+       },
+       {
+        "text": "El 80% de lo que cita la IA no existe en Google",
+        "href": "https://efeoncepro.com/aeo/donde-cita-la-ia/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "El contenido tiene que ser fácil de citar.",
+        "strong": true
+       },
+       {
+        "text": " Respuestas directas al inicio de cada sección, datos con fuente, definiciones claras y una postura propia. Lo genérico se resume; lo distintivo se cita. Cómo se trabaja en la práctica: "
+       },
+       {
+        "text": "SEO + AEO: optimización para buscadores y motores de respuesta",
+        "href": "https://efeoncepro.com/loop-marketing/seo-aeo-optimizacion-ia-2025/"
+       },
+       {
+        "text": "."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Hasta aquí podemos decir algo con seguridad: el inbound que sólo se mide en visitas al blog va a mostrar números cada vez más bajos, aunque esté funcionando. La medición también tiene que cambiar."
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Y hay un paso más: los agentes de IA ya no sólo leen tu sitio, empiezan a usarlo para comparar, cotizar o agendar. Cómo prepararte está en "
+      },
+      {
+       "text": "el fin de la web «solo para humanos»",
+       "href": "https://efeoncepro.com/aeo/web-agentica-agentes-ia/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Cómo implementar una estrategia de inbound marketing paso a paso",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "ordered": true,
+     "items": [
+      [
+       {
+        "text": "Define a quién quieres atraer.",
+        "strong": true
+       },
+       {
+        "text": " No «empresas medianas»: el perfil exacto de cliente ideal, quién decide, qué problema tiene y qué intenta lograr. Aquí está el método completo: "
+       },
+       {
+        "text": "cliente ideal B2B: ICP, buyer persona, IPP y JTBD",
+        "href": "https://efeoncepro.com/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Escucha cómo pregunta.",
+        "strong": true
+       },
+       {
+        "text": " Revisa qué busca en Google, qué le pregunta a la IA y qué le preguntan a tu equipo comercial. Las preguntas reales son tu pauta editorial."
+       }
+      ],
+      [
+       {
+        "text": "Fija tu punto de vista.",
+        "strong": true
+       },
+       {
+        "text": " Antes de producir, decide qué piensas tú distinto del resto. Sin eso, tu contenido se parece al de todos y la IA no tiene razón para citarte."
+       }
+      ],
+      [
+       {
+        "text": "Crea contenido que responda y que se pueda citar.",
+        "strong": true
+       },
+       {
+        "text": " Guías, comparativas, herramientas, casos. Respuesta directa primero, profundidad después. Más ideas en "
+       },
+       {
+        "text": "estrategia de contenidos que genera resultados",
+        "href": "https://efeoncepro.com/inbound/estrategia-de-contenidos/"
+       },
+       {
+        "text": " y en "
+       },
+       {
+        "text": "cómo generar más leads con marketing de contenidos",
+        "href": "https://efeoncepro.com/inbound/genera-leads-con-marketing-de-contenidos/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Hazte encontrar en todas partes.",
+        "strong": true
+       },
+       {
+        "text": " "
+       },
+       {
+        "text": "Posicionamiento SEO",
+        "href": "https://efeoncepro.com/servicios/posicionamiento-seo/",
+        "mention": {
+         "line": "engine"
+        }
+       },
+       {
+        "text": " para Google, "
+       },
+       {
+        "text": "AEO",
+        "href": "https://efeoncepro.com/aeo-2/",
+        "mention": {
+         "line": "engine"
+        }
+       },
+       {
+        "text": " para las respuestas de IA, redes y newsletter para quienes ya te siguen, y pauta para acelerar. Tu cliente ya no busca sólo en Google: "
+       },
+       {
+        "text": "busca también en video, redes y marketplaces",
+        "href": "https://efeoncepro.com/aeo/surround-discovery-seo-google-video-marketplace/"
+       },
+       {
+        "text": ". Ver también "
+       },
+       {
+        "text": "el impacto del SEO en inbound",
+        "href": "https://efeoncepro.com/inbound/seo-inbound-marketing/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Convierte con algo de valor real.",
+        "strong": true
+       },
+       {
+        "text": " Una herramienta, una plantilla, un diagnóstico o una suscripción. Conecta cada formulario a tu CRM para que nada se pierda, y trata tu sitio como un producto que se mejora con datos: así lo explicamos en "
+       },
+       {
+        "text": "Growth-Driven Design",
+        "href": "https://efeoncepro.com/design/diseno-web/sitios-web-que-generan-resultados/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Mide todo el ciclo y ajusta.",
+        "strong": true
+       },
+       {
+        "text": " Visitas, sí, pero también menciones y citas en IA, contactos de calidad, oportunidades y ventas. Revisa cada mes qué funcionó y corrige. Un buen punto de partida: "
+       },
+       {
+        "text": "medir tus formularios de HubSpot en GA4",
+        "href": "https://efeoncepro.com/hubspot/como-rastrear-formularios-hubspot-en-ga4-paso-a-paso/"
+       },
+       {
+        "text": "."
+       }
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Ejemplos de inbound marketing",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Estos son ejemplos de tácticas, no casos de clientes:"
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Una empresa de software B2B",
+        "strong": true
+       },
+       {
+        "text": " publica una guía comparativa honesta entre su producto y las alternativas, incluyendo cuándo no conviene elegirlo. Gana la etapa de evaluación del Messy Middle."
+       }
+      ],
+      [
+       {
+        "text": "Una empresa industrial",
+        "strong": true
+       },
+       {
+        "text": " ofrece una calculadora en su sitio para estimar materiales o costos. La herramienta responde una pregunta frecuente y captura contactos con intención real."
+       }
+      ],
+      [
+       {
+        "text": "Una consultora o un servicio profesional",
+        "strong": true
+       },
+       {
+        "text": " envía un newsletter con una idea útil por edición. Construye confianza durante los meses que tarda una decisión de compra B2B."
+       }
+      ],
+      [
+       {
+        "text": "Una marca de consumo",
+        "strong": true
+       },
+       {
+        "text": " responde en su blog y en video las preguntas que sus clientes hacen antes de comprar. Esas respuestas son las que después aparecen en Google y en los asistentes de IA."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "En Efeonce aplicamos lo mismo con lo nuestro: publicamos "
+      },
+      {
+       "text": "Glitch",
+       "href": "https://efeoncepro.com/category/glitch/"
+      },
+      {
+       "text": ", nuestro newsletter, y dejamos en "
+      },
+      {
+       "text": "Efeonce Think",
+       "href": "https://think.efeoncepro.com/"
+      },
+      {
+       "text": " herramientas gratuitas para medir visibilidad."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Herramientas para hacer inbound marketing",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "CRM y automatización:",
+        "strong": true
+       },
+       {
+        "text": " "
+       },
+       {
+        "text": "HubSpot",
+        "href": "https://efeoncepro.com/servicios-contratar-hubspot/",
+        "mention": {
+         "line": "revenue-hubspot"
+        }
+       },
+       {
+        "text": " (la plataforma de quienes crearon la metodología) o Salesforce, para conectar contenido, formularios, correos y ventas. Si ya lo tienes, estos son "
+       },
+       {
+        "text": "5 pasos para transformar tu CRM en motor de crecimiento",
+        "href": "https://efeoncepro.com/hubspot/5-pasos-para-transformar-tu-crm-en-motor-de-crecimiento/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Analítica:",
+        "strong": true
+       },
+       {
+        "text": " Google Analytics 4 y Google Search Console, para saber qué atrae y qué convierte."
+       }
+      ],
+      [
+       {
+        "text": "SEO e investigación:",
+        "strong": true
+       },
+       {
+        "text": " Semrush o herramientas similares, para entender qué busca tu cliente y cómo compites."
+       }
+      ],
+      [
+       {
+        "text": "Visibilidad en IA:",
+        "strong": true
+       },
+       {
+        "text": " un panel de preguntas que tu cliente le haría a ChatGPT, Gemini o Perplexity, revisado cada mes, para saber si tu marca aparece y cómo la describen. El "
+       },
+       {
+        "text": "Efeonce AI Visibility Report",
+        "href": "https://think.efeoncepro.com/brand-visibility",
+        "mention": {
+         "line": "growth"
+        }
+       },
+       {
+        "text": " te da una primera lectura gratis."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "La herramienta no hace la estrategia. Primero el orden de prioridades del inbound; después, el software."
+    }
+   ]
+  },
+  {
+   "heading": "Preguntas frecuentes sobre inbound marketing",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "faq",
+     "schema": {
+      "enabled": true,
+      "name": "Preguntas frecuentes sobre inbound marketing",
+      "canonicalUrl": "https://efeoncepro.com/inbound/que-es-inbound-marketing/",
+      "inLanguage": "es-CL"
+     },
+     "items": [
+      {
+       "question": "¿El inbound marketing está muerto?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "No. Lo que perdió fuerza es la versión que sólo buscaba visitas al blog. La idea central —ayudar antes de vender— importa más cuando las respuestas las arma una IA, porque sólo cita a quien realmente ayuda."
+        }
+       ]
+      },
+      {
+       "question": "¿Cuál es la diferencia entre inbound marketing y Loop Marketing?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "El inbound es la filosofía: atraer con valor en vez de interrumpir. Loop Marketing es el marco operativo que HubSpot presentó en 2025 para aplicar esa filosofía con IA, en cuatro etapas: Express, Tailor, Amplify y Evolve."
+        }
+       ]
+      },
+      {
+       "question": "¿Cuánto tarda el inbound marketing en dar resultados?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Depende del punto de partida, la competencia y la constancia. Es una estrategia que se acumula: piensa en meses, no en semanas, y mide avances intermedios (posiciones, menciones, contactos) antes que ventas."
+        }
+       ]
+      },
+      {
+       "question": "¿El inbound marketing sirve para B2B y B2C?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Sí. En B2B suele pesar más porque las decisiones son largas y con varias personas involucradas; en B2C, porque el cliente investiga y compara antes de comprar."
+        }
+       ]
+      },
+      {
+       "question": "¿Necesito HubSpot para hacer inbound marketing?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": [
+          {
+           "text": "No es obligatorio, pero necesitas algún CRM que conecte tu contenido y tus formularios con ventas. Sin esa conexión no sabes qué contenido genera negocio. Si usas HubSpot, aquí explicamos cómo "
+          },
+          {
+           "text": "crear un pipeline de ventas que convierte",
+           "href": "https://efeoncepro.com/hubspot/crea-un-pipeline-de-ventas-que-convierte-guia-paso-a-paso/"
+          },
+          {
+           "text": "."
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "En resumen",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "El inbound marketing sigue siendo atraer con valor en vez de interrumpir. Lo que cambió es el camino: tu cliente ya no sólo llega a tu sitio, también te encuentra dentro de una respuesta. Por eso el inbound de hoy se construye con un punto de vista propio, contenido que se puede citar y una medición que mira el ciclo completo."
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Si quieres seguir esta conversación, lee "
+       },
+       {
+        "text": "Glitch",
+        "href": "https://efeoncepro.com/category/glitch/"
+       },
+       {
+        "text": ": cada lunes, una idea sobre IA, marketing y negocios."
+       }
+      ],
+      [
+       {
+        "text": "Revisa cómo te describen hoy los asistentes de IA con el "
+       },
+       {
+        "text": "Efeonce AI Visibility Report",
+        "href": "https://think.efeoncepro.com/brand-visibility",
+        "mention": {
+         "line": "growth"
+        }
+       },
+       {
+        "text": ", gratuito."
+       }
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Fuentes y nota de actualización",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Halligan, B. y Shah, D. (2009). "
+       },
+       {
+        "text": "Inbound Marketing: Get Found Using Google, Social Media, and Blogs"
+       },
+       {
+        "text": ". Wiley."
+       }
+      ],
+      [
+       {
+        "text": "Google (2020). "
+       },
+       {
+        "text": "Decoding Decisions: The Messy Middle of Purchase Behavior",
+        "href": "https://thinkwithgoogle.com/_qs/documents/9998/Decoding_Decisions_The_Messy_Middle_of_Purchase_Behavior.pdf"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "HubSpot. "
+       },
+       {
+        "text": "How the Flywheel Killed HubSpot's Funnel",
+        "href": "https://blog.hubspot.com/marketing/our-flywheel"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "HubSpot. "
+       },
+       {
+        "text": "Loop Marketing",
+        "href": "https://www.hubspot.com/loop"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "SparkToro (2024). "
+       },
+       {
+        "text": "2024 Zero-Click Search Study",
+        "href": "https://sparktoro.com/blog/2024-zero-click-search-study-for-every-1000-us-google-searches-only-374-clicks-go-to-the-open-web-in-the-eu-its-360/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Pew Research Center (2025). "
+       },
+       {
+        "text": "Do people click on links in Google AI summaries?",
+        "href": "https://www.pewresearch.org/short-reads/2025/07/22/google-users-are-less-likely-to-click-on-links-when-an-ai-summary-appears-in-the-results/"
+       },
+       {
+        "text": "."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Este artículo se publicó en julio de 2024 y se reescribió en octubre de 2026 para incorporar el flywheel, Loop Marketing y el efecto de la búsqueda con IA. Lo desarrolló Julio Reyes con apoyo de IA en investigación, estructura y edición; Julio definió la tesis y aprobó la versión final."
+    }
+   ]
+  }
+ ],
+ "cta": {
+  "text": [
+   {
+    "text": "Y si quieres armar o revisar tu estrategia, "
+   },
+   {
+    "text": "conoce cómo trabajamos como agencia de inbound marketing",
+    "href": "https://efeoncepro.com/agencia-inbound-marketing/"
+   },
+   {
+    "text": "."
+   }
+  ]
+ }
+}

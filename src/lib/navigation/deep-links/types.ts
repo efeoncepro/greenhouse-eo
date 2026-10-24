@@ -1,3 +1,5 @@
+import type { EnvSource } from '@/types/env-source'
+
 export type GreenhouseDeepLinkKind =
   | 'home'
   | 'ops_health'
@@ -61,7 +63,7 @@ export type GreenhouseDeepLinkAccessContext = {
 
 export type GreenhouseDeepLinkResolutionContext = {
   baseUrl?: string | null
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   portalHomePath?: string | null
   access?: GreenhouseDeepLinkAccessContext | null
 }

@@ -1,0 +1,377 @@
+{
+  "as_of": "2026-10-22T22:42:09Z",
+  "scope": "GANA/LOTI/Grupo Réditos; inteligencia histórica para GRD1552 intento13, no programáticaGRD1541",
+  "search_count": 28,
+  "query_log": [
+    {
+      "sequence": 1,
+      "query": "\"Gana\" \"Grupo Réditos\" \"agencia\" publicidad",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 2,
+      "query": "\"Gana\" \"agencia digital\" Colombia portafolio",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 3,
+      "query": "\"Grupo Réditos\" \"agencia\" campaña",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 4,
+      "query": "\"LOTI\" \"agencia\" publicidad Colombia",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 5,
+      "query": "\"GANA\" \"agencia\" \"portafolio\" Colombia",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 6,
+      "query": "\"Grupo Réditos\" \"agencia digital\" -empleo",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 7,
+      "query": "\"Gana\" \"LOTI\" \"agencia\" -empleo",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 8,
+      "query": "\"Gana\" \"btodigital\"",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 9,
+      "query": "\"Gana\" \"Réditos\" \"agencia\" publicidad -site:scribd.com -empleo -site:btodigital.com",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 10,
+      "query": "\"Loticolombia\" \"agencia\" publicidad",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 11,
+      "query": "\"Gana\" \"agencia\" \"campaña\" \"Medellín\"",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 12,
+      "query": "site:gruporeditos.com btodigital OR \"agencia digital\" OR \"agencia de publicidad\"",
+      "filters": null,
+      "purpose": "discovery_first_pass"
+    },
+    {
+      "sequence": 13,
+      "query": "\"Gana\" \"SM Digital\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 14,
+      "query": "site:smdigital.com.co \"Gana\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 15,
+      "query": "site:gruporeditos.com \"SM DIGITAL\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 16,
+      "query": "site:linkedin.com \"GANA\" \"SMDigital\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 17,
+      "query": "site:gana.com.co \"SM DIGITAL\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 18,
+      "query": "site:gruporeditos.com \"BTO\" \"DIGITAL\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 19,
+      "query": "\"Gana cerca de ti\" \"agencia\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 20,
+      "query": "\"GANA\" \"agencia digital\" \"2025\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 21,
+      "query": "\"Grupo Réditos\" \"agencia\" \"adjudicación\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 22,
+      "query": "\"Gana\" \"BTO DIGITAL\" \"SM DIGITAL\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 23,
+      "query": "\"Grupo Réditos\" \"licitación\" \"agencia digital\" ganadora",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 24,
+      "query": "site:gruporeditos.com \"POLÍTICA DE TRATAMIENTO\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 25,
+      "query": "\"SM DIGITAL\" \"GANA\" \"2018\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 26,
+      "query": "\"BTO DIGITAL\" \"GANA\" \"2024\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 27,
+      "query": "\"GANA\" \"licitación\" \"agencia\" \"2026\" -dinero -energía",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    },
+    {
+      "sequence": 28,
+      "query": "\"Gana\" \"campaña con Rigo\"",
+      "filters": null,
+      "purpose": "followup_observed_leads_or_buyer_confirmation"
+    }
+  ],
+  "sources": [
+    {
+      "id": "C01",
+      "url": "https://btodigital.com/portafolio/gana/",
+      "type": "agency_first_party_case",
+      "access": "read_full",
+      "facts": [
+        "Marca GANA, Antioquia, juegos y servicios",
+        "Declara pauta redes y Google SEM, SEO, inbound, blog, consultoría y corrección técnica",
+        "Resultados declarados cualitativos; sin período, baseline ni atribución auditables"
+      ],
+      "published_at": null,
+      "claim_level": "Proveedor histórico autodeclarado; no ganador confirmado ni vigencia actual",
+      "confidence": "alta sobre existencia de caso; media sobre alcance histórico; no verificada vigencia"
+    },
+    {
+      "id": "C02",
+      "url": "https://btodigital.com/guia-de-pauta-digital/",
+      "type": "agency_first_party_article",
+      "access": "read_full",
+      "facts": [
+        "Incluye GANA entre casos de pauta localizada Antioquia",
+        "No identifica expediente, adjudicación, contrato ni fechas de servicio"
+      ],
+      "published_at": null,
+      "claim_level": "Corroboración autodeclarada, no independiente de C01",
+      "confidence": "media"
+    },
+    {
+      "id": "C03",
+      "url": "https://gana.com.co/pru/public/manuales/MANUAL%20DE%20POL%C3%8DTICAS%20DE%20TRATAMIENTO%20Y%20PROTECCI%C3%93N%20DE%20DATOS%20PERSONALES%20GRUPO%20R%C3%89DITOS.docx.pdf",
+      "type": "buyer_first_party_document_indexed",
+      "access": "search_index_only_document_read_blocked",
+      "failures": [
+        "web502",
+        "webtimeout",
+        "www host inaccessible",
+        "urllib TLS unexpected EOF",
+        "parent Chrome net::ERR_CONNECTION_CLOSED"
+      ],
+      "facts": [
+        "Texto indexado nombra SM DIGITAL para monitoreo reputacional marca GANA",
+        "Texto indexado nombra BTO DIGITAL para pauta e inbound",
+        "Texto indexado nombra E-goi y Masiv en correo/SMS"
+      ],
+      "published_at": null,
+      "claim_level": "Evidencia primaria indexada con lectura íntegra pendiente; no confirma adjudicatario de anterior licitación ni contratos vigentes",
+      "confidence": "media como pista, no suficiente para confirmación contractual"
+    },
+    {
+      "id": "C04",
+      "url": "https://www.gruporeditos.com/politicadedatos/",
+      "type": "buyer_first_party_current_html",
+      "access": "read_full",
+      "facts": [
+        "Política versión2 remite al RNBD/SIC para listado actualizado de encargados",
+        "No contiene SM DIGITAL ni BTO al buscar texto",
+        "No se prueba contradicción contractual: podrían diferir fecha/versión"
+      ],
+      "published_at": null,
+      "claim_level": "No confirma ni refuta vigencia de proveedores PDF",
+      "confidence": "alta sobre contenido abierto"
+    },
+    {
+      "id": "C05",
+      "url": "https://smdigital.com.co/articulo/el-monitoreo-de-marca-como-aliado/",
+      "type": "agency_first_party_article_indexed",
+      "access": "search_index_only_open403",
+      "facts": [
+        "Texto indexado explica crisis con ejemplos específicos GANA (filas, medios, influencers)",
+        "Declara equipo de monitoreo/reputación",
+        "No es prueba de contrato, desempeño actual ni adjudicación"
+      ],
+      "published_at": null,
+      "claim_level": "Conocimiento de categoría y GANA autodeclarado",
+      "confidence": "media"
+    },
+    {
+      "id": "C06",
+      "url": "https://smdigital.com.co/nuestro-trabajo-sm/chocafest/",
+      "type": "agency_first_party_case_indexed",
+      "access": "search_index_only_timeout",
+      "facts": [
+        "Caso integra4marcas, contenido, giveaway y landing",
+        "Declara107% KPIalcance y224participantes, sin auditoría independiente"
+      ],
+      "published_at": null,
+      "claim_level": "Referencia de capacidad de SM en otra cuenta; no de GANA",
+      "confidence": "media"
+    },
+    {
+      "id": "C07",
+      "url": "https://www.behance.net/miltontobon",
+      "type": "individual_professional_public_portfolio",
+      "access": "read_full_profile_project403",
+      "project_url": "https://www.behance.net/gallery/191544071/Conceptualizacion-Campana-con-Rigo-Gana-cerca-de-ti",
+      "facts": [
+        "Perfil se identifica con SM Digital y muestra título de campañaRigo-GANA",
+        "Proyecto no legible403; afiliación profesional no acredita que ese trabajo fuese deSM"
+      ],
+      "published_at": null,
+      "claim_level": "Pista creativa; atribución agencia, fecha y contrato no verificados",
+      "confidence": "baja para atribución contractual"
+    },
+    {
+      "id": "C08",
+      "url": "https://www.gruporeditos.com/ecommerce-awards-reconocio-el-sitio-web-de-gana-como-uno-de-los-mejores-digital-commerce-de-colombia/",
+      "type": "buyer_first_party_article",
+      "access": "parent_agent_read_full; this_subagent_open_timeout",
+      "published_at": "2024-06-06",
+      "facts": [
+        "El padre verificó anuncio comprador sobre reconocimiento ecommerceGANA; documento no atribuye ganador licitación digital anterior"
+      ],
+      "claim_level": "Madurez digital previa; no empezar desdecero ni adjudicar mérito a agencia sinfuente",
+      "confidence": "evidencia delegada padre"
+    }
+  ],
+  "read_operations": [
+    {
+      "url": "https://btodigital.com/portafolio/",
+      "operation": "open twice then clickGANA",
+      "result": "read_full"
+    },
+    {
+      "url": "https://btodigital.com/portafolio/gana/",
+      "operation": "click then open",
+      "result": "read_full"
+    },
+    {
+      "url": "https://btodigital.com/guia-de-pauta-digital/",
+      "operation": "open",
+      "result": "read_full"
+    },
+    {
+      "url": "https://gana.com.co/pru/public/manuales/MANUAL%20DE%20POL%C3%8DTICAS%20DE%20TRATAMIENTO%20Y%20PROTECCI%C3%93N%20DE%20DATOS%20PERSONALES%20GRUPO%20R%C3%89DITOS.docx.pdf",
+      "operation": "open3times; wwwhost once; urllibonce",
+      "result": "blocked as loggedC03"
+    },
+    {
+      "url": "https://smdigital.com.co/articulo/el-monitoreo-de-marca-como-aliado/",
+      "operation": "open",
+      "result": "403"
+    },
+    {
+      "url": "https://smdigital.com.co/nuestro-trabajo-sm/chocafest/",
+      "operation": "open",
+      "result": "timeout"
+    },
+    {
+      "url": "https://smdigital.com.co/",
+      "operation": "open",
+      "result": "timeout"
+    },
+    {
+      "url": "https://www.gruporeditos.com/politicadedatos/",
+      "operation": "open;findSM;findBTO",
+      "result": "full;zero_matches_not_proof_of_no_relationship"
+    },
+    {
+      "url": "https://www.behance.net/miltontobon",
+      "operation": "open",
+      "result": "read_full"
+    },
+    {
+      "url": "https://www.behance.net/gallery/191544071/Conceptualizacion-Campana-con-Rigo-Gana-cerca-de-ti",
+      "operation": "click",
+      "result": "403"
+    },
+    {
+      "url": "https://www.gruporeditos.com/ecommerce-awards-reconocio-el-sitio-web-de-gana-como-uno-de-los-mejores-digital-commerce-de-colombia/",
+      "operation": "open",
+      "result": "timeout;parentindependentlyreadfull"
+    }
+  ],
+  "winner_confirmation": {
+    "result": "not_verified",
+    "buyer_award_act": null,
+    "previous_tender_id": null,
+    "contract": null,
+    "service_start_end": null,
+    "reason": "No acto, orden ni contrato encontrado/leído que vincule una agencia al proceso anterior; portfolio y política de datos no sustituyen expediente"
+  },
+  "rejected_false_matches": [
+    "Agencias de puntos de ventaGANA",
+    "Lotería de Medellín compra publicitaria: comprador distinto, LOTI proveedor/distribuidor",
+    "Premios genéricos agencias que ganan premios",
+    "BTO España UTE geoespacial: homónimo/entidad distinta",
+    "Vacantes y currículos no demandaB2B ni contrato"
+  ],
+  "actions": {
+    "outbound": 0,
+    "CRM_writes": 0,
+    "paid": 0,
+    "commit": 0
+  },
+  "memory_used": {
+    "path": "MEMORY.md",
+    "ranges": [
+      "1052-1104"
+    ],
+    "use": "evitar confusiónGRD1541 vsGRD1552; hechos web revalidados"
+  }
+}

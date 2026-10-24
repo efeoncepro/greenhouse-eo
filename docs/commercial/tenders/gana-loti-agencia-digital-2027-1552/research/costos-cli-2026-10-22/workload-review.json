@@ -1,0 +1,86 @@
+{
+  "status": "internal_estimate_not_observed",
+  "monthly_fte_denominator": 125,
+  "basis": "125productive hours own simulation assumption;180scheduled historical catalog",
+  "rows": [
+    {
+      "function": "design",
+      "hours_month": 90,
+      "range_low": 75,
+      "range_high": 105,
+      "candidate_profile": "ECG-003",
+      "fte": 0.72
+    },
+    {
+      "function": "video_motion",
+      "hours_month": 90,
+      "range_low": 75,
+      "range_high": 105,
+      "candidate_profile": "ECG-018",
+      "fte": 0.72
+    },
+    {
+      "function": "creative_direction",
+      "hours_month": 18,
+      "range_low": 16,
+      "range_high": 22,
+      "candidate_profile": "ECG-001",
+      "fte": 0.144
+    },
+    {
+      "function": "strategy_analysis",
+      "hours_month": 24,
+      "range_low": 20,
+      "range_high": 32,
+      "candidate_profile": null,
+      "fte": 0.192,
+      "required_function": "Senior Digital Strategist; no verified catalog match"
+    },
+    {
+      "function": "account",
+      "hours_month": 14,
+      "range_low": 13,
+      "range_high": 17,
+      "candidate_profile": "ECG-016",
+      "fte": 0.112
+    },
+    {
+      "function": "listening_analysis",
+      "hours_month": 12,
+      "range_low": 12,
+      "range_high": 32,
+      "candidate_profile": "ECG-004",
+      "fte": 0.096
+    }
+  ],
+  "monthly_total_hours": 248,
+  "components_hours": {
+    "production_125": 188,
+    "strategy_governance": 48,
+    "listening_human": 12
+  },
+  "setup_hours": {
+    "strategic_diagnosis": 40,
+    "crisis_protocol": 12,
+    "production_system": 14
+  },
+  "notes": [
+    "No 60 new email templates assumed",
+    "No duplicate copy/capture/media/CRM operations",
+    "10 concepts plus2macro sensitivity, discrepancy8/10unresolved",
+    "No24x7human availability assumed",
+    "No proven productivity or actual team availability",
+    "Listening12h counted once, analyst10 senior2",
+    "CreativeOpsLead canon describes creative direction/QA; do not force strategic architecture match"
+  ],
+  "scheduled_hours_reference": 180,
+  "productive_hours_assumption": 125,
+  "person_allocation_hours": {
+    "ECG-003": 90,
+    "ECG-018": 90,
+    "ECG-001": 20,
+    "Senior Digital Strategist not catalog-matched": 24,
+    "ECG-016": 14,
+    "ECG-004": 10
+  }
+}

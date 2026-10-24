@@ -493,6 +493,19 @@ body { background: var(--axis-report-role-navy); }
 
 .fig-xlabels { fill: var(--axis-report-role-paperAccent); }
 
+/* Etapas, hitos y rótulos de punto de una serie larga (auditorías): el tono `alert` es oportunidad, no un color libre. */
+.fig-band--alert { fill: var(--axis-report-role-dataOpportunityOnPaper); fill-opacity: 0.07; }
+
+.fig-stage-label.fig-band--alert { fill: var(--axis-report-role-dataOpportunityOnPaper); fill-opacity: 1; }
+
+.fig-event { stroke: var(--axis-report-role-deltaWorseOnPaper); stroke-width: 1.2; stroke-dasharray: 3 3; }
+
+.fig-event-label { font-family: var(--axis-report-type-display); font-weight: 700; letter-spacing: 1.4px; fill: var(--axis-report-role-deltaWorseOnPaper); }
+
+.fig-point-dot { fill: var(--axis-report-role-paper); stroke: var(--axis-report-role-dataCurrentOnPaper); stroke-width: 1.8; }
+
+.fig-point { font-family: var(--axis-report-type-display); font-weight: 700; font-variant-numeric: tabular-nums; fill: var(--axis-report-role-paperInk); }
+
 /* Muestras de línea de la leyenda: el mismo trazo que en la figura. */
 .line-swatch { display: block; flex-shrink: 0; }
 

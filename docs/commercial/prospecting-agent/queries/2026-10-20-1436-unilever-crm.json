@@ -1,0 +1,174 @@
+{
+  "run_at": "2026-10-20T14:36:50.990415-03:00",
+  "timezone": "America/Santiago",
+  "scope": "HSP-0040 approved enrichment and contact intake only",
+  "country": "México",
+  "service": "creative",
+  "weekly_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-20T14:36:50.990415-03:00"
+  },
+  "discovery_queries": 0,
+  "queries": [
+    {
+      "tool": "apollo_mixed_people_api_search",
+      "query": "3 LinkedIn exactos [PII redactada]",
+      "result": "3 coincidencias; gratuito",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "apollo_users_api_profile",
+      "query": "include_credit_usage=true",
+      "result": "balance leído para lote autorizado; no datos personales versionados",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "apollo_people_bulk_match",
+      "query": "3 IDs exactos actuales [redactados], reveal_personal_emails=false, reveal_phone_number=false",
+      "result": "3 emails verified; 3 créditos",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_get_user_details",
+      "query": "USER_INFORMATION/TOOL_INFORMATION",
+      "result": "48713323, owner75788512, Contact y Company write disponibles",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_search_crm_objects",
+      "query": "CONTACT emails IN [3 direcciones redactadas]",
+      "result": "total0",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_search_crm_objects",
+      "query": "COMPANY query Unilever",
+      "result": "total1,53984479513",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_get_properties",
+      "query": "CONTACT campos del changeset",
+      "result": "15 definiciones y enums leídos",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_get_properties",
+      "query": "COMPANY efeonce_prospecting_researched_on",
+      "result": "date",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_discover_hubspot_schema",
+      "query": "CONTACT COMPANY LEAD",
+      "result": "lectura/escritura Contact Company; Lead no autorizado para crear",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "CLI whoami",
+      "query": "sin secretos",
+      "result": "OAuth48713323",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "CLI segments get",
+      "query": "180,181,182,187 --format json",
+      "result": "ACTIVE, expresiones completas leídas",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "CLI associations labels-list",
+      "query": "contacts → companies",
+      "result": "bloqueado OAuth; sin bypass",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_manage_crm_objects",
+      "query": "crear3Contact [PII privada], asociarCompany53984479513; fechaCompany20Oct",
+      "result": "3 creados,1Companyactualizada",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_get_crm_objects",
+      "query": "3Contact [IDs en reporte] +Company",
+      "result": "emails/cargos/fit/date/owner/lifecycle leídos; enriquecimiento nativo de ciudades detectado",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_search_crm_objects",
+      "query": "LEAD asociados a3Contact",
+      "result": "total0",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "CLI associations list",
+      "query": "cada Contact → companies",
+      "result": "Primary53984479513; type1y279; meta.nextnull",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_search_crm_objects",
+      "query": "3Contact AND ilsListIds IN180/181/182",
+      "result": "total0 temprano; no se afirma ausencia permanente",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_manage_crm_objects",
+      "query": "vaciar city/state en objetivo y puente Marca",
+      "result": "2 updates exitosos",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "hubspot_get_crm_objects",
+      "query": "3Contact lectura independiente final",
+      "result": "ciudades sin respaldo vacías; otros campos correctos",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "CLI objects search",
+      "query": "cada ilsListIds180/181/182 AND IDs3Contact",
+      "result": "2/3 iniciales; recalculación pendiente",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "CLI objects search",
+      "query": "ilsListIds187 AND Company53984479513",
+      "result": "0 inicial; recalculación pendiente",
+      "pii": "redacted where applicable; exact input in private changeset"
+    },
+    {
+      "tool": "CLI objects search",
+      "query": "3 scoped Contact IDs AND each native list180/181/182; Company AND187",
+      "result": "3/3 in each Contact segment;1/1Company;nextnull; no global totals asserted",
+      "pii": "IDs/recordlinks in report; no individual PII versioned"
+    },
+    {
+      "tool": "hubspot_get_crm_objects",
+      "query": "final3Contact reread [PII private]",
+      "result": "emails/roles/fit/date stable; cities removed remain empty"
+    },
+    {
+      "tool": "hubspot_search_crm_objects",
+      "query": "LEAD associated with3Contact final",
+      "result": "total0"
+    }
+  ],
+  "sources_read": [
+    "Apollo exact identity search and enrichment",
+    "HubSpot live properties/schema/records",
+    "CLI active segment definitions and associations",
+    "current skill/manual/inventory references"
+  ],
+  "blocked": [
+    "CLI association labels catalog requires different auth; no bypass",
+    "full automation catalog not exposed by current MCP"
+  ],
+  "approvals": {
+    "enrichment": "explicit3people",
+    "CRM": "explicitContactintake",
+    "outreach": false,
+    "Deal": false
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1426-denis-unilever/enrichment-crm-readback.json",
+  "final_checked_at": "2026-10-20T14:37:30.677231-03:00"
+}

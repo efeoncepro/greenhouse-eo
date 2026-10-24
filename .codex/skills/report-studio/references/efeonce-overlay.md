@@ -15,6 +15,15 @@ Aplica a todos los informes y documentos escritos emitidos por Efeonce, para cli
 
 Resuelve estos paths desde la raíz del repositorio, no desde esta carpeta. Si trabajas fuera del repo, solicita o localiza el paquete institucional autorizado; no inventes sustitutos.
 
+## Fuente Markdown y documento diseñado
+
+Una solicitud explícita de Markdown como entrega principal conserva el contenido, la evidencia y la
+identidad del emisor sin simular paginación, membrete ni pies en cada bloque. No exige producir un PDF
+adicional. El contrato de páginas y el catálogo A4 de este módulo se aplican cuando se encarga ese
+formato diseñado. Una fuente para Claude Design u otro diseñador puede llevar notas de producción
+claramente separadas; esas notas y los archivos de control interno no son el cuerpo del documento
+emitido para el lector. El [barrido de fugas](quality-and-delivery.md#barrido-de-fugas) respeta esta frontera.
+
 ## Contrato obligatorio
 
 **Formato:** el pie completo aplica a informes escritos. En decks y presentaciones el pie lleva como máximo la URL bubble oficial, sin dirección, teléfonos, separador ni folio, incluso si el destino es PDF A4 horizontal. Usa Deck Studio para ese formato.
@@ -34,6 +43,9 @@ El operador aprobó página por página el diseño de los informes de Efeonce In
 - Dirección, tokens y anti-patrones: `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`; páginas de referencia a tamaño nativo en su carpeta `paginas/`.
 - Reglas reutilizables (navy manda en papel, teal sólo sobre navy, roles de color de datos, oportunidad nunca sólo por el coral en papel, portadas, logo del cliente, contraportada y pie): estándar de informes, sección «Delta 2026-09-25».
 - Ya es plantilla construida: los catálogos `insights-report` (A4) e `insights-deck` (16:9) del Artifact Composer lo implementan en producción desde 2026-09-26, sólo en su versión aprobada (el legado se retiró). Dentro del Composer, la fidelidad se mide página por página contra las referencias (≤ 1 % de píxeles distintos; una excepción exige aprobación del operador). Fuera del Composer, reprodúcelo con los tokens y assets reales; no copies los datos de ejemplo de las páginas de referencia.
+- **Un informe Efeonce A4 se compone con el catálogo, no a mano** (desde 2026-10-23). Auditorías, diagnósticos y cualquier informe que no salga del pipeline de Insights se arman como un plan JSON de intención (`contentType` + `slots` por página; nunca se elige plantilla) y se componen con `pnpm report:compose <plan.json> [--out <dir>] [--asset org-logo:<id>=<logo.svg|png>]` sobre `insights-report`. El plan declara `productLabel` en portada y aperturas (por ejemplo «SEO»; «Insights» sólo en Insights). Lo deriva un script generador versionado (contacto desde `src/config/efeonce-brand.ts`, folios, índice y referencias «p. NN» calculados del orden), nunca cifras ni folios escritos a mano. Referencia viva: `scripts/seo/sky-blog-audit-report.ts` (auditoría SEO del Blog SKY, 23 páginas). Manual: `docs/manual-de-uso/insights/componer-un-informe-a4-premium-desde-un-plan.md`.
+- **Plantillas para auditorías:** `report-findings` (hasta 6 hallazgos con severidad `critical`/`high`/`medium`/`low` y su `severityLabel` de texto, evidencia, responsable y aviso urgente opcional), `report-scenarios` (2–4 períodos × 1–3 escenarios `low`/`base`/`high` contra la referencia observada del año anterior; las tarjetas repiten los roles de la figura en el mismo orden) y `report-figure-trend` con etapas (`bands`, tono `alert`), hitos (`events`) y rótulos de punto (`pointLabels`). Además las de siempre: portadas, índice, resumen, capítulo, narrativa, figuras, tabla, plan, límites y contraportada.
+- **La guarda del pie falla cerrado.** Si un bloque del cuerpo termina sobre el pie, el render se detiene y nombra página y bloque. Se corrige acortando el copy o partiendo la página; nunca reduciendo tipografía, editando la plantilla ni tocando el baseline del gate visual.
 - Variaciones en tablas y figuras: el triángulo sigue al valor (▲ subió, ▼ bajó) y el tono dice si el cambio es mejor o peor para esa métrica (una posición que sube empeora; una tasa donde menor es mejor que baja mejora). La dirección de la métrica sale del dato, nunca se adivina: sin dirección conocida, tono neutro.
 
 ## Línea gráfica «La órbita» y la burbuja de URL (canónica desde 2026-09-25)

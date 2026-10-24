@@ -1,9 +1,13 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.23
+> **Versión:** 1.24
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-16 por Claude (1.23: el brochure «Agencia de Medios» aprobado por el operador — 65 láminas en Voice, mixto (portada y voz con foto por receta, el resto nativo), sin recetas nuevas ni `approvedUses`; índice enlazado, logotipos oficiales de terceros y sin promesa de rebates; de él sale la landing pública. Antes, el mismo día, 1.22: el brochure oficial «Agencia de Marketing 360°» aprobado por el operador — 84 láminas y corta de 26, armadas en el canvas, sin recetas nuevas; logos de clientes autorizados para ese brochure. Antes, 2026-10-15, 1.21: el caso Sky canónico para todos los decks, uso aprobado de `decision-case`. Antes, 2026-10-10, 1.20: el deck Marketing de Contenidos aprobado por el operador — 57 láminas, línea Brand, 14 de receta y 43 a mano; sección «El deck Marketing de Contenidos». Antes, el mismo día, 1.19: la lámina de equipo «Expertos multidisciplinarios» con «+85», variante a mano de `content-team`. Antes, el mismo día, 1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
+> **Última actualización:** 2026-10-20 por Claude (1.24: la propuesta Assetplan — 22 láminas en `revenue-hubspot` con
+> `pnpm brand:compose`, sin recetas nuevas; `content-live-chat` sirve para HubSpot con el isotipo correcto; precedente de
+> montos reales en `content-pricing` live por excepción del operador; portada de propuesta sin pregunta a mano con las
+> medidas de `cover-proposal` · `orbit-decision` hasta TASK-2014; enlace a la agenda en el PDF de próximos pasos. Antes,
+> 2026-10-16, 1.23: el brochure «Agencia de Medios» aprobado por el operador — 65 láminas en Voice, mixto (portada y voz con foto por receta, el resto nativo), sin recetas nuevas ni `approvedUses`; índice enlazado, logotipos oficiales de terceros y sin promesa de rebates; de él sale la landing pública. Antes, el mismo día, 1.22: el brochure oficial «Agencia de Marketing 360°» aprobado por el operador — 84 láminas y corta de 26, armadas en el canvas, sin recetas nuevas; logos de clientes autorizados para ese brochure. Antes, 2026-10-15, 1.21: el caso Sky canónico para todos los decks, uso aprobado de `decision-case`. Antes, 2026-10-10, 1.20: el deck Marketing de Contenidos aprobado por el operador — 57 láminas, línea Brand, 14 de receta y 43 a mano; sección «El deck Marketing de Contenidos». Antes, el mismo día, 1.19: la lámina de equipo «Expertos multidisciplinarios» con «+85», variante a mano de `content-team`. Antes, el mismo día, 1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
 > cuadrado, resuelto en la receta; fila en «Abiertos de las nueve SEO/AEO».
 > Antes, 2026-10-06, 1.13: el brochure Agencia Creativa aprobado por el operador — 27
 > láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
@@ -514,6 +518,57 @@ PDF vigente en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Medi
 - Recorrido, reglas y cautelas: [norma, delta 2026-10-16](../EFEONCE_SURFACE_COMPOSITION_V1.md). La landing pública
   que sale de este brochure (recompuesta para web, no láminas incrustadas): delta 2026-10-16 (c) de la misma norma.
 
+## La propuesta Assetplan (2026-10-20)
+
+Propuesta comercial de **22 láminas** (línea `revenue-hubspot`, servicio Managed CRM), compuesta con
+`pnpm brand:compose` desde los intents de `ai-generations/2026-10-20_propuesta-assetplan/intents/` y validada con
+`pnpm brand:deck-plan -- --plan plan.json` (0 avisos). La portada la aprobó el operador («Apruebo») y la contraportada
+quedó en la opción B (BR3h v3). Se envió al cliente el 2026-10-20. Cada ajuste fuera de receta está en el `LEEME.md` de
+la corrida. No promueve recetas nuevas ni registra `approvedUses`.
+
+- **Portada sin pregunta (a mano, aprobada).** Una portada de propuesta no lleva voz pregunta-respuesta
+  ([criteria](../../../../.claude/skills/efeonce-graphic-line/references/criteria.md), caso SGS). AXIS ya tiene la
+  composición: `cover-proposal` · layout `orbit-decision` (publicada en AXIS v0.7.6: `axis-ui-contracts` 0.7.6 /
+  `axis-tokens` 0.6.6, commit `9e72d38`): titular de decisión con su esfera, eyebrow y evidencia, sin pregunta ni anillo. Greenhouse fija
+  `axis-tokens` 0.3.41 / `axis-ui-contracts` 0.3.40 y no la ve hasta
+  [TASK-2014](../../../tasks/to-do/TASK-2014-axis-packages-adoption-and-report-projection-retirement.md). Mientras
+  tanto, A01 se compuso con la receta `cover-proposal` (`orbit`) y la hoja de la corrida
+  `portada-orbit-decision.css`, que oculta la pregunta y aplica las medidas del token: titular «Servicio / Managed CRM»
+  en Bricolage 760, 92 px / 0,95, desde y 458, con la esfera `#e86bd0` de 0,2 em; eyebrow como chip en 404–446;
+  evidencia en y 667, 28 px / 1,3, ancho 724. La **referencia aprobada** de `orbit-decision` es esta A01
+  (`cover-proposal-orbit-decision-assetplan`, commit AXIS `e1d392c`, sale con `axis-tokens` 0.6.7), con la nota de que
+  su eyebrow como chip de contorno es una variante pedida por el operador sólo para este deck. El script `quitar-pregunta-portada.mjs` de la propuesta SGS no se usa: es el
+  parche que el operador no quiere.
+- **`content-live-chat` sirve para HubSpot.** El chip «Conectado a…» tenía fijo el logo de Salesforce; el operador lo
+  rechazó en este deck («no forces nada, sino consigues la receta haz una nueva, no parches»). Desde `c0e435b38` el
+  logo de la plataforma sigue a la línea con `productPartnerOf(line)`: `revenue-hubspot` usa
+  `public/images/logos/axis/hubspot-isotype.svg` y las demás `public/images/logos/partners/salesforce.com_logo.svg`; el
+  wordmark Claudeforce (`platformMark`) fuera de Salesforce se rechaza con `invalid-intent`. El `useWhen` de la receta
+  en el JSON todavía cita sólo el caso Salesforce; el índice de abajo se regenera desde ahí.
+- **Precio a la vista = `content-pricing` live, no una cifra suelta.** Mostrar la inversión con `content-focus` (una
+  cifra sobre foto) fue rechazado: «no se detalla bien ni el precio real ni la oferta… agarra alguna adecuada de
+  pricing». La lámina A078 se compuso con `content-pricing` layout `live` (líneas con monto, total, CTA «Aprobar
+  propuesta», chips laterales) y, por **excepción explícita del operador**, con los montos de la cotización formal: el
+  builder y la plantilla siguen imprimiendo `[MONTO]` y el script de la corrida sólo reemplaza el marcador
+  (`render-eyebrow-chip.ts --montos`, antes `render-pricing-real.ts`), y falla si queda un `[MONTO]` sin reemplazar.
+- **Próximos pasos con enlace en el PDF.** A pedido del operador, la tarjeta de agenda de `decision-next-steps` lleva a
+  `https://efeoncepro.com/agenda/`. El compositor no emite anotaciones de enlace: se agregó una anotación URI con
+  pdf-lib al armar el PDF (`pdf-sprocket.mjs`, constante `LINKS`) y un `<a>` sobre la tarjeta en el canvas. Mismo
+  patrón que el índice enlazado del brochure 360.
+- **Capas a mano registradas:** la insignia HubSpot Solutions Partner Gold en el equipo y la contraportada, porque
+  `partnerMark` en `close-proposal-horizon` sólo va con `sloganBlock` (el contrato: «La insignia de partner de la
+  contraportada va sólo con el eslogan en bloque»); el logo oficial de Efeonce en lugar de la palabra «Efeonce» del
+  rótulo de `decision-difference`, que no tiene slot de logo; el sprocket 3D de HubSpot en el alcance; la lámina del
+  caso ANAM del brochure 360° como imagen.
+- **Eyebrow como chip de contorno sin relleno:** pedido del operador sólo para esta propuesta, hecho clonando el
+  catálogo `graphic-line-deck` en una carpeta temporal (`render-eyebrow-chip.ts`); el catálogo del repo no cambió y no
+  es estándar de la línea mientras el operador no lo apruebe para todos los decks.
+- **Voz:** la respuesta de `section-cine` `team` sobre el elenco ficticio no señala a las personas de la foto («Este
+  equipo» fue rechazado: son personajes generados con IA); quedó «Expertos.» con «**Multidisciplinarios** en CRM,
+  desarrollo, integraciones y datos, con una contraparte.» (la respuesta admite 16 caracteres: «multidisciplinarios»
+  no cabe). La pregunta de `decision-platform-coexistence` en tres líneas quedaba pegada a la respuesta gigante: se
+  acortó a «¿Y mis otros sistemas?». La pregunta va en una o dos líneas.
+
 ## Anatomía de una receta (campos del JSON)
 
 | Campo | Para qué |
@@ -689,7 +744,7 @@ La plantilla aplica la norma sobre la referencia aprobada. Donde la referencia y
 | Cifras sin fuente visible | clientes (+127 %, +180 %), por qué elegirnos, «quiénes somos», prueba de Sky (`content-focus`) | **fuentes visibles:** toda cifra llega por `figures` del contrato, con valor, rótulo y fuente obligatoria, y la lámina imprime «Fuente: …». Una cifra sin fuente la rechaza AXIS. El foco, que imprimía «Datos de muestra», ahora cita el caso publicado de Sky |
 | Logo chico en secciones de cine | `section-cine-services`, `section-cine-team` | **sin logo en láminas interiores con foto:** la plantilla retira el logo que venía de cuando eran portadas y el eyebrow vuelve al margen |
 | Degradado sobre el plate (velo) | `section-cine-about`, `section-cine-purpose` | **sin velo:** la plantilla no pinta capa de degradado sobre la foto (regla `no-scrim` en AXIS) |
-| Montos | cotización (`content-pricing*`) | **montos como marcador:** la plantilla imprime siempre `[MONTO]`; el intent no trae montos |
+| Montos | cotización (`content-pricing*`) | **montos como marcador:** la plantilla imprime siempre `[MONTO]`; el intent no trae montos. **Precedente 2026-10-20 (propuesta Assetplan):** con excepción explícita del operador, documentada en el `LEEME.md` de la corrida, `content-pricing` live llevó los montos de la cotización formal con el builder y la plantilla canónicos y un script de la corrida que sólo reemplaza el marcador; cuando el precio tiene que verse, la receta es `content-pricing` live, nunca una cifra suelta en `content-focus` (ver «La propuesta Assetplan») |
 | Dirección de contacto | próximos pasos (`decision-next-steps`) | **contacto desde `EFEONCE_CONTACT`**, nunca desde el intent |
 | Sin burbuja URL en el pie | partners (`content-partners`) | **burbuja URL** en el pie |
 
@@ -711,6 +766,7 @@ La aprobación visual de las seis familias de TASK-1928 y de la portada con sele
 | Pendiente | Dónde | Estado |
 |---|---|---|
 | Logo dentro de la órbita en el cierre | contraportadas | **sin resolver**: ninguna contraportada aprobada lo lleva así; las aprobadas ponen el logo arriba de la columna (norma §6, fila 17) |
+| Portada de propuesta sin pregunta | `cover-proposal` (`cover-proposal-orbit`, `-dawn`) | **abierto en Greenhouse:** los layouts `orbit` y `dawn` exigen `voice.question`. AXIS v0.7.6 publicada (`axis-ui-contracts` 0.7.6 / `axis-tokens` 0.6.6, commit `9e72d38`) suma `orbit-decision` (referencia aprobada `cover-proposal-orbit-decision-assetplan`), sin pregunta ni anillo; entra con [TASK-2014](../../../tasks/to-do/TASK-2014-axis-packages-adoption-and-report-projection-retirement.md). Hasta entonces, la portada se arma a mano con las medidas del token (caso Assetplan, «La propuesta Assetplan»), nunca retirando la pregunta con un script |
 | Isotipo sin registro de procedencia | plates `b` (NX6b, CR2b, WB1b, RV1b, BR2b…); HW1, T2, T3, H2, LN4 y CR4 sin isotipo compuesto (en `CR4` el bordado ya era el oficial y la `b` de `foto:isotipo` traía un parche: registro cine §16.7) | pasar por `pnpm foto:emblema` (y `foto:isotipo` si difiere) antes de publicar |
 | Plate repetido | P1 en lente, sangre, contenido con foto y hoja de contactos | regla de uso: no repetirlo en un mismo deck. **Resuelto el 2026-09-28** el caso de `cover-brochure-line-brand`, que repetía `CR2b` con `proposal-cinematic-creative`: la portada tiene su plate propio, `CR4` ([registro cine §16.7](../../brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto)) |
 
@@ -1153,7 +1209,7 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 100 recetas · aprob
 | `content-season-launches` | Lo nuevo de la temporada · los lanzamientos del evento con su estado anunciado y la fecha de corte | `deck.content-season-launches` | proposal, brochure, pitch | En las semanas que siguen a un evento de la plataforma (en la aprobada, Dreamforce 2026), mientras el ledger de lanzamientos esté vigente. | En un brochure evergreen: es una lámina de temporada y envejece con la fecha de corte. | `content-service-lanes` | `eyebrow` ≤51, `question` ≤44, `answer` ≤8, `evidence` ≤179, `asOf`, `note` ≤115, `launches` ≤69, (+1 opcional) |
 | `content-day-release-cycle` | El ciclo del release · sandbox, pruebas, tu aprobación y producción, con el video que lo explica | `deck.content-day-release-cycle` | proposal, brochure, pitch | Día a día de una práctica de plataforma (implementación y operación) donde el cliente aprueba releases. | La cuenta no tiene un ciclo de releases (servicios sin plataforma): usar content-day-tools. | `content-day-tools`, `content-day-live-progress` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `releaseKicker` ≤53, `releaseTitle` ≤39, `releaseIcon`, `currentStep`, `videoDuration` ≤5, `presenterInitials` ≤2, `videoCaption` ≤40, `approveCta` ≤22, `tools` ≤36 |
 | `content-day-live-library` | Adopción a su ritmo · la biblioteca de tutoriales en video por rol, grabados sobre la org del cliente | `deck.content-day-live-library` | proposal, brochure, pitch | Fase de activación y adopción de una implementación. | La cuenta no graba tutoriales ni usa Loom: sin la herramienta, los tutoriales van sin marca. | `content-day-live-console` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `libraryKicker` ≤58, `libraryTitle` ≤43, `videos` ≤55, `stats` ≤66, (+1 opcional) |
-| `content-live-chat` | El CRM en una conversación · la consulta con datos vivos y la acción que el ejecutivo confirma | `deck.content-live-chat` | proposal, brochure, pitch | Propuesta del servicio de Enablement conversacional (en la aprobada, Salesforce en Claude, «Claudeforce»). | Sin la autorización de uso de marca de Anthropic archivada (la de Salesforce está declarada por el operador desde el 2026-09-29): el logotipo del asistente y el wordmark Claudeforce se omiten, y la composición sin esas marcas no tiene lámina aprobada. | `method-agent-supervisor` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `note` ≤115, `connectionLabel` ≤30, `userPrompt` ≤127, `answerIntro` ≤177, `records` ≤25, `proposedAction` ≤139, `guarantees` ≤57, (+2 opcionales) |
+| `content-live-chat` | El CRM en una conversación · la consulta con datos vivos y la acción que el ejecutivo confirma | `deck.content-live-chat` | proposal, brochure, pitch | Propuesta del servicio de Enablement conversacional (en la aprobada, Salesforce en Claude, «Claudeforce»; en una propuesta `revenue-hubspot` el chip lleva el isotipo de HubSpot, sin Claudeforce — Assetplan 2026-10-20). | Sin la autorización de uso de marca de Anthropic archivada (la de Salesforce está declarada por el operador desde el 2026-09-29): el logotipo del asistente y el wordmark Claudeforce se omiten, y la composición sin esas marcas no tiene lámina aprobada. | `method-agent-supervisor` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `note` ≤115, `connectionLabel` ≤30, `userPrompt` ≤127, `answerIntro` ≤177, `records` ≤25, `proposedAction` ≤139, `guarantees` ≤57, (+2 opcionales) |
 | `content-measure-formulas` | Qué medimos · cinco métricas con su fórmula, su fuente y su dueño, sin cifras de promesa | `deck.content-measure-formulas` | proposal, brochure, pitch | Propuesta o brochure donde el cliente pregunta cómo se sabrá si funciona. | Ya hay resultados medidos con fuente: usar content-measure o decision-chart. | `content-measure`, `decision-chart` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `note` ≤115, `metrics` ≤58 |
 | `content-day-live-console` | Lo operamos · la consola de operación gestionada abierta: tres cifras del mes, cuatro controles y la revisión trimestral | `deck.content-day-live-console` | proposal, brochure, pitch, qbr | Propuesta o brochure que vende la operación gestionada de una plataforma (el on-going después del proyecto). | La cuenta se opera con el panel de Greenhouse y la reunión de Teams: usar content-day-live-results. | `content-day-live-results`, `content-measure-formulas` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `panelTitle` ≤48, `panelSubtitle` ≤77, `metrics` ≤30, `checks` ≤77, `reviewKicker` ≤71, `reviewTitle` ≤69, `reviewCta` ≤14, (+2 opcionales) |
 | `content-day-live-approval` | Donde trabajas · el agente propone en el canal del equipo, la supervisora aprueba y el cambio queda ejecutado y registrado | `deck.content-day-live-approval` | proposal, brochure, pitch | Vivir la supervisión de un agente (el «vívelo» de method-agent-supervisor). | La aprobación es de piezas visuales en Notion y Frame.io: usar content-day-live-progress. | `content-day-live-progress`, `method-agent-supervisor` | `eyebrow` ≤51, `question` ≤44, `answer` ≤16, `evidence` ≤179, `note` ≤115, `channelIcon`, `channel` ≤69, `agentName` ≤56, `agentBadge` ≤16, `agentMessage` ≤146, `evidenceChips` ≤41, `actions` ≤14, `executedTitle` ≤39, `executedText` ≤123, `loop` ≤30, `currentLoopStep`, (+2 opcionales) |

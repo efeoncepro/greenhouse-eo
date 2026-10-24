@@ -7,8 +7,8 @@ import {
   resolveRunCategory
 } from '../category-guard'
 
-const GUARD_ON = { GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv
-const GUARD_OFF = {} as unknown as NodeJS.ProcessEnv
+const GUARD_ON = { GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED: 'true' }
+const GUARD_OFF = {}
 
 describe('growth/ai-visibility — category guard', () => {
   it('usa el nodo resuelto del perfil + su label (portal/operador)', () => {

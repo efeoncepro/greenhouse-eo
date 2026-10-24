@@ -12,20 +12,22 @@ Marca → ejecución escalable: [dirección y límites](docs/architecture/EFEONC
 
 CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
-[CRM/TA](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); [V3](data/pricing/README.md).
+[CRM/TA](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); [V3](data/pricing/README.md). [MD](docs/manual-de-uso/comercial/construir-una-licitacion.md).
 
 ## Documentación
 
-[Ads/Grader](docs/documentation/growth/google-ads-measurement.md): GTM6/10;13 forms+agenda.
+[Medición](docs/reference/measurement-gtm-ga4/README.md)
+[CRM/UI](docs/manual-de-uso/hubspot/normalizar-origen-canales-adquisicion.md)
 CRM: provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
-[Transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md): aprobada y probada comercialmente por el operador; pruebas publicables, pricing y elegibilidad de cada capacidad requieren verificación.
+[CRM humano-agente](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md): modelo aprobado; evidencia y límites comerciales en el canon.
 
-Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
+Next.js 16/MUI 7/Vuexy/TS · `Handoff.md` · historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-[Prospección, secuencias y brochures aprobados](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
+[Prospección y capacidad local](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
 [CRM](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md).
-Outlook de Julio: [envíos](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
+[Outlook](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma gráfica siempre.
+[Customer Agent: llamadas](docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md).
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 
@@ -298,4 +300,4 @@ corregir router o canon antes de usar memoria histórica.
 
 - Snapshot íntegro del contexto anterior: [índice 2026-07-19](docs/operations/agent-context-history/2026-07-19/README.md).
 - Los snapshots no gobiernan comportamiento vigente ni se editan.
-- `project_context.md` no acepta secciones `## Delta YYYY-MM-DD`; los cambios históricos van a changelog, tasks/issues/ADRs o archivo, según ownership.
+- `project_context.md`: sin `## Delta YYYY-MM-DD`; historia en changelog, tasks/issues/ADRs o archivo según ownership.

@@ -57,6 +57,8 @@ El comité de compra corporativo suele puntuar con dimensiones parecidas a estas
 
 En privado, **referencias verificables** y **casos del mismo sector** pesan muchísimo más que en público. La relación y la confianza son criterio real, no ruido.
 
+**Experiencia en una oferta conjunta (Gana GRD-1541, 20/10/2026).** Cuando la experiencia que pide el comprador es del partner (programática con Basis DSP, en el caso), sus clientes se presentan como «clientes de la alianza Efeonce · <partner>», nunca como experiencia propia de Efeonce sola, y sólo con la evidencia que el partner entregó. Si el partner no entrega certificados, se cargan referencias reales de Efeonce aunque sean de otra disciplina y se avisa el riesgo; nunca se inventan casos, nombres ni certificaciones. Detalle del caso: `platform-bids-and-administrative-package.md` → «Experiencia certificada».
+
 ## Negociación y BAFO — donde el público no llega
 
 - **BAFO (Best And Final Offer):** el comprador pide a los finalistas su mejor oferta final. Trátalo con estrategia: no dispares tu mejor número antes del BAFO, y en el BAFO concede **con reciprocidad** (regla ASaaS: nunca descuento sin concesión recíproca documentada — más volumen, plazo más largo, caso público, pago más rápido).

@@ -88,6 +88,11 @@ It also owns the Efeonce mention (`efeonce.mention`, published 2026-10-18: primi
 Think wrapper) and the rule for CSS that embeds a data URI: ship it unquoted and percent-encoded, and build the
 consumer against the local AXIS `dist` before releasing. Release flow: `pnpm release:packages <version>`
 ([agent consumption](references/agent-consumption.md#incremental-publication-correction--2026-10-07)).
+It also owns the efeoncepro.com site chrome, live since 2026-10-23: the global menu `efeonce.site-nav` and the
+landings' glass bottom dock `efeonce.landing-dock` (primitives 0.7.14, exports `./landing-dock`, `./landing-dock.css`,
+`./landing-dock.js`; WordPress plugin `eo-landing-dock`). A new export must also enter the agent lane's declared-exports
+test (`scripts/agent.test.mjs`) or the release stops (as `v0.7.11` did). Details and release lessons:
+[UI primitives](references/ui-primitives.md) §Site navigation and §Landing dock.
 
 ### Tokens, contracts or registry
 

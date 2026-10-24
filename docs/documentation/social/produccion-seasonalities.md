@@ -20,6 +20,33 @@ conserva las decisiones y parámetros reales; el [manual](../../manual-de-uso/so
 explica cómo repetir el trabajo. El [protocolo de agentes](../../operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md)
 enruta las skills.
 
+## Lugar en el sistema de canales (2026-10-23)
+
+Las seasonalities siguen siendo una **línea permanente** de Efeonce, pero **ninguna red es su destino por defecto**:
+desde el 2026-10-23 cada temporada se publica **sólo en el canal donde tiene fit**. Antes de idear se responde una
+pregunta por canal:
+
+| Canal | La seasonality va ahí cuando… |
+|---|---|
+| **Instagram** (marca agencia) | la temporada es emocional o cultural y se puede celebrar desde el oficio o el equipo |
+| **LinkedIn de Efeonce** | la temporada tiene consecuencia de negocio para el comprador y hay un argumento profesional propio |
+| **LinkedIn de Julio** | Julio tiene una opinión propia sobre la temporada |
+| **Ninguno** | la temporada no conecta con una disciplina de la casa: no se publica |
+
+Una temporada puede ir a más de un canal si pasa la prueba en cada uno, y cada canal recibe su pieza o su argumento;
+nunca la misma pieza con otro texto. En todos los casos se cuenta como demostración de oficio, nunca como saludo.
+Ejemplos del plan de noviembre y diciembre: Día de Muertos y Velitas en Instagram; Black Friday y la Ley 21.719 en
+LinkedIn; el Día de la Usabilidad en ambos.
+
+> Detalle técnico: [PDR-020, delta 2026-10-23](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-23--seasonalities-por-fit-de-canal)
+
+Estado de la temporada de fin de año: **Navidad 2026 se rehace desde cero** (la pieza aprobada el 16 de octubre no se
+usa) y **Año Nuevo quedó archivada sin producir**, conservando su dirección creativa.
+
+> Detalle técnico: [sistema de canales y love brand](sistema-de-canales-y-love-brand.md) ·
+> [PDR-020 §4.4 y delta 2026-10-22](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#44-seasonalities-la-temporada-vista-desde-el-oficio) ·
+> [plan de seasonalities, delta 2026-10-22](../../audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
+
 ## Referencia cultural y planificación
 
 El [calendario de seasonalities preparado por Metricool en Notion](../../../.codex/skills/social-media-studio/references/seasonality-reference-calendar.md)
@@ -88,7 +115,8 @@ rechazó por no conectar. No usa bandera, escudo ni himno por la ley mexicana de
 estática de alto impacto muestra el 17 convertido en 18, con colores corporativos y banderines de fonda.
 
 Aprendizajes para el equipo: las imágenes sociales se publican en PNG; las personas del equipo aparecen sólo con su
-consentimiento; un documento de LinkedIn puede armarse con las mismas imágenes del carrusel; y cuando se pide alto
+consentimiento; LinkedIn nunca repite el carrusel de Instagram, aunque puede usar el visual clave como imagen única con su propio
+argumento (decisión del 2026-10-22); y cuando se pide alto
 impacto, la respuesta es luz, cámara, material y acción, no más elementos.
 
 > Detalle técnico: [bitácora del caso](../../operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).

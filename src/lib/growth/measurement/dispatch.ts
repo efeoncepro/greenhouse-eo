@@ -8,6 +8,8 @@ import { measurementPolicyAllowsDelivery } from './policy-store'
 import { assertMetaReceiptStorageReady, claimMeasurementDeliveries, expireMeasurementDeliveries, finishMeasurementDelivery } from './store'
 import { META_RECEIPT_HEADER, META_ATTEMPT_HEADER, META_ATTEMPT_NUMBER_HEADER, metaReceiptContextSchema, metaReceiptObservation, type MetaReceiptContext } from './meta-receipt'
 
+import type { EnvSource } from '@/types/env-source'
+
 const TAGGING_ORIGIN = 'https://efeonce-gtm-tagging-183008134038.us-central1.run.app'
 const MEASUREMENT_ID = 'G-KYPPY57M14'
 
@@ -62,7 +64,7 @@ export const sendMeasurementPayload = async (
   }
 }
 
-export const dispatchMeasurementConversions = async (limit = 50, env: NodeJS.ProcessEnv = process.env) => {
+export const dispatchMeasurementConversions = async (limit = 50, env: EnvSource = process.env) => {
   const destinations: MeasurementDestination[] = []
 
   if (env.GROWTH_MEASUREMENT_META_ENABLED === 'true') destinations.push('meta')
@@ -140,7 +142,7 @@ export const dispatchMeasurementConversions = async (limit = 50, env: NodeJS.Pro
 }
 
 /** Measurement outages must never change the commercial dispatcher response. */
-export const dispatchMeasurementConversionsSafely = async (limit = 50, env: NodeJS.ProcessEnv = process.env) => {
+export const dispatchMeasurementConversionsSafely = async (limit = 50, env: EnvSource = process.env) => {
   try {
     return await dispatchMeasurementConversions(limit, env)
   } catch {

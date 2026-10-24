@@ -6,7 +6,7 @@ import {
   readGreenhouseGlobeClientConfig
 } from './client'
 
-const asEnv = (value: Record<string, string>) => value as unknown as NodeJS.ProcessEnv
+const asEnv = (value: Record<string, string>) => value
 
 describe('Greenhouse Globe client bridge', () => {
   it('uses ambient ADC locally and calls the exact configured audience through the Globe SDK', async () => {

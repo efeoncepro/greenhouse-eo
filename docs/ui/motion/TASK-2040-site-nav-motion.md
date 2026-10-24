@@ -31,8 +31,8 @@ El motion explica de dónde viene cada cosa; no decora.
 
 | Momento | Movimiento | Duración y curva |
 |---|---|---|
-| Bajando | Sale hacia arriba | 300 ms `emphasizedAccelerate` (propuesto: el canvas no fija este tiempo; se confirma en el Lab) |
-| Subiendo | Entra la isla de vidrio desde arriba | 400 ms `emphasized` (propuesto: el canvas no fija este tiempo; se confirma en el Lab) |
+| Bajando | Sale hacia arriba | 300 ms `emphasizedAccelerate` (decidido en el Lab, `TASK-2040`) |
+| Subiendo | Entra la isla de vidrio desde arriba | 400 ms `emphasized` (decidido en el Lab, `TASK-2040`) |
 
 ### Mega menú y desplegable
 
@@ -52,7 +52,7 @@ El motion explica de dónde viene cada cosa; no decora.
 
 | Momento | Movimiento | Duración y curva |
 |---|---|---|
-| Abrir | `clip-path: circle(0 → 1720px at <centro de la hamburguesa>)`; la página detrás retrocede a 97 % | 800 ms `emphasized` (750 ms en teléfono) |
+| Abrir | `clip-path: circle(0 → R at <centro de la hamburguesa>)`, con R = distancia del centro a la esquina más lejana de la ventana (calculada al abrir y al redimensionar; 1618 px a 1440×900, 2124 px a 1920×1080; sin JS, `150vmax`). Antes decía 1720 px fijos, medidos en el tablero de 1440: pasado ~1500 px de ancho dejaba una esquina sin cubrir (corregido en AXIS primitives 0.7.10, 2026-10-23); la página detrás retrocede a 97 % | 800 ms `emphasized` (750 ms en teléfono) |
 | Cascada | Logo y botón a los 260 ms; ítems cada 60 ms; líneas cada 45 ms; foto revelada de derecha a izquierda; respuesta al final (680 ms) | `emphasized` |
 | Cerrar | El contenido sale junto en 150 ms; el círculo vuelve a **0 px** | 550 ms `emphasizedAccelerate` con retardo de 120 ms |
 | Foto nueva | Entra en 600 ms y se acerca 4 % en 9 s. Nunca se aleja | `emphasized` / lineal |
@@ -66,11 +66,19 @@ El motion explica de dónde viene cada cosa; no decora.
 | Hamburguesa, presionar | Baja a 94 % | 200 ms |
 | Botón del agendador en vidrio | Al pasar el mouse se ilumina el vidrio, se intensifica el canto y sube 1 px. Al presionar, 98 % | 250 ms `standard` / 200 ms `emphasized` |
 | Botón del agendador en la isla | Oscura: blanco que pasa a `#cfe4fa`; clara: navy que pasa a `#023c70`. Sube 1 px | 250 ms `standard` |
-| Cambio de tono de la isla | Fondo, borde, sombra, texto, logo y botón cruzan de tono al cambiar la sección bajo la isla | 300 ms `emphasized` |
+| Cambio de tono de la isla | Fondo, borde, sombra, texto, logo y botón cruzan de tono cuando cambia lo que la isla tiene debajo | 300 ms `emphasized` |
+
+**Cuándo cambia el tono** (AXIS primitives 0.7.13). Se evalúa al hacer scroll y al mostrarse la isla, en la línea media
+de su posición final (no donde está la cabecera mientras entra). Decide `data-site-nav-tone` o, si falta, el fondo:
+degradado por la luminancia media de sus paradas opacas, foto como oscura, color sólo con alfa de al menos 0,5. Se
+salta el chrome fijo o sticky del anfitrión (incluido el dock de landings) y lo que no se ve. Si nada decide, o si un
+diálogo modal dejó la página inerte (el agendador abierto), **no hay transición**: la isla conserva su tono, también al
+cerrar el diálogo. Regla completa: arquitectura §Isla de vidrio.
 
 ## Tokens and Performance
 
-- Los tiempos y curvas salen de `axisMotion` en `axis-tokens`. El CSS del sitio no repite valores a mano.
+- Los tiempos y curvas salen de `axisSiteNav.motion` (curvas de `axisMotion`) en `axis-tokens`. El CSS del sitio no
+  repite valores a mano; el JS los lee de las variables CSS, en `ms` o `s`.
 - Sólo se animan `opacity`, `transform` y `clip-path`. Nada de `top`, `height` ni `filter` en bucle.
 - `will-change` sólo durante la transición, en el panel y en el círculo del onepage.
 - El acercamiento de 9 s de la foto se detiene cuando el onepage se cierra o la pestaña pasa a segundo plano.
@@ -88,13 +96,16 @@ Con `prefers-reduced-motion: reduce`:
 
 ## GVC / Micro Evidence
 
-- Video corto del Lab (`TASK-2040`) y de la página piloto (`TASK-2042`):
+- Video corto del Lab (`TASK-2040`) y de una página real del sitio (`TASK-2042`; el piloto de una página se omitió y
+  el menú está en `on` desde el 2026-10-23):
   1. abrir Soluciones;
   2. cambiar de línea y poner foco en un servicio;
   3. abrir y cerrar el onepage;
   4. hacer scroll abajo y arriba.
 - Misma secuencia con movimiento reducido activado, que debe mostrar cambios instantáneos.
 - Verificar que al cerrar el onepage no queda ningún disco detrás de la hamburguesa.
+- Verificar el cambio de tono de la isla en un navegador en primer plano (Playwright headless sirve): un panel de
+  navegador oculto no corre `requestAnimationFrame` ni eventos de scroll y la isla no cambia de tono.
 
 ## Design Decision Log
 

@@ -21,7 +21,7 @@ sitio, sin conocer el sitio ni pedir datos a la red.
 | N5 · Abrir onepage | Círculo desde la hamburguesa, bloqueo de scroll y cierre de cualquier mega abierto. | Evento `site_nav_open` (`panel: onepage`). |
 | N6 · Recorrer onepage | Dos niveles, foco contenido y Esc o X para cerrar. | Evento `site_nav_click`. |
 | N7 · Agendar | Al activar el hueco del CTA, cierra el panel y suelta el scroll **antes** de que el sitio abra el diálogo. | Evento de intención del CTA con `cta-location`; el diálogo lo abre el `<greenhouse-cta>` del sitio. |
-| N8 · Scroll | Oculta la cabecera al bajar y la muestra fija al subir; cierra el panel si el scroll empieza con uno abierto (propuesto). | — |
+| N8 · Scroll | Oculta la cabecera al bajar y la muestra fija al subir; cierra el panel abierto si el scroll se mueve más de 48 px (decidido en el Lab). | — |
 
 ## Recovery Branches del mecanismo
 

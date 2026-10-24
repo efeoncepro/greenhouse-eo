@@ -1,9 +1,9 @@
 # Public Site WordPress — Layout Ohio + Elementor
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.1
+> **Version:** 1.3
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-10-18 por Claude (Opus 5.5)
+> **Ultima actualizacion:** 2026-10-24 por Claude (Opus 5.5) (rieles fijos de Ohio; Nosotros y Partners source-led)
 > **Dominio:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime:** WordPress en Kinsta, theme `ohio-child` sobre `ohio`, Elementor / Elementor Pro
@@ -16,7 +16,7 @@
 Este documento captura el contrato vigente para diagnosticar y corregir problemas de layout en el sitio publico de Efeonce cuando se combinan:
 
 - WordPress como runtime publico.
-- Theme Ohio con header/sidebar fijo.
+- Theme Ohio con header/sidebar fijo (desde 2026-10-23 el header de todas las páginas salvo `/blog/` es la navegación global AXIS; ver la sección del menú principal).
 - Elementor como builder de paginas y secciones full-width.
 - Kinsta como hosting/cache.
 
@@ -37,6 +37,12 @@ Las secciones Elementor full-width deben alinearse visualmente con el contenido 
 El hero del home y sus fondos/motion no son parte de este contrato de `/blog`; cualquier cambio al hero debe tratarse como ajuste separado y validarse visualmente aparte.
 
 ## Playbook: variantes de header Ohio
+
+> Desde 2026-10-23 este playbook aplica sólo donde Ohio sigue pintando su header: `/blog/`, todo el sitio si el
+> interruptor `eo_site_nav_enabled` está en `off`, o una página donde el menú global no pudo pintarse. En el resto del sitio el header es la navegación global y su estado
+> inicial (vidrio sobre hero oscuro, isla clara sobre hero claro o con spacer de Ohio) lo decide el adaptador
+> `ohio-child/inc/site-nav.php`, no las metas `page_header_*`. Ver
+> [Navegación global del sitio](./navegacion-global-del-sitio.md).
 
 Antes de tocar un header del Public Site, no partir desde el screenshot. Primero
 identificar el tipo real que Ohio esta renderizando:
@@ -101,13 +107,15 @@ probar first paint/no-JS y revisar el CSS inicial emitido por Ohio.
 
 ## Contrato: menu principal WordPress/Ohio
 
-> **Delta 2026-10-18 — navegación nueva planificada.** Ya hay una navegación nueva diseñada para todo el sitio
-> (cabecera de vidrio, mega menús con fotos y menú a pantalla completa), planificada en
-> [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md) y propuesta en
-> [PDR-027](../../public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md). Si se aprueba y se construye,
-> reemplazará el encabezado de Ohio con un interruptor (apagado, piloto en una página, todo el sitio) y la opción de
-> volver a Ohio. **Hoy no hay nada de eso en el sitio:** el encabezado y el menú siguen siendo los de Ohio y todo lo
-> que describe esta sección sigue vigente.
+> **Delta 2026-10-23 — el header del sitio ya es la navegación global.** Desde el 2026-10-23 00:09 UTC el encabezado
+> de todas las páginas es el menú global AXIS (`efeonce.site-nav`, interruptor `eo_site_nav_enabled=on`): el adaptador
+> del tema `ohio-child` reemplaza las partes `header-style-1..8` de Ohio. El header y el menú de Ohio que describe esta
+> sección **sólo se ven en `/blog/`** (página `18456`, excluida mientras TASK-1802 rediseña el blog), **cuando el
+> interruptor está en `off`** (rollback) o en `pilot` fuera de las páginas piloto, y en una página donde el menú global
+> no puede pintarse (plugin inactivo, sin documento o error de render). El menú global no se edita en el `nav_menu` de
+> WordPress sino en su propio documento: ver
+> [Navegación global del sitio](./navegacion-global-del-sitio.md) y el manual
+> [Operar la navegación global](../../manual-de-uso/public-site/operar-navegacion-global.md).
 
 > Detalle técnico: [Navegación global del sitio público V1](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md).
 
@@ -764,7 +772,62 @@ Para mobile `390px`:
 - no tapa campos, CTAs ni consentimiento;
 - `scrollWidth == clientWidth`.
 
+## Rieles fijos de Ohio: switcher Dark/Light y «Follow Us»
+
+Desde **1181 px** de ancho, Ohio fija dos barras verticales: a la izquierda el switcher Dark/Light
+(`.elements-bar.left`) y a la derecha los iconos sociales con «Follow Us» (`.elements-bar.right`). Cada una ocupa
+unos 56 px y queda a `1.5vw` del borde, así que su borde interior está a **`1.5vw + 56px`** (≈75 px a 1280, ≈82 px
+a 1710). Por debajo de 1181 px dejan de ser rieles laterales. El buscador global (`.search-global`) va fijo abajo a
+la izquierda.
+
+Todo contenido que empiece más cerca del borde que ese valor pasa por debajo de la barra al hacer scroll. Los
+canvas de diseño no dibujan estos rieles, así que una landing fiel al canvas puede chocar con ellos aunque el diff de
+estilos dé cero diferencias:
+
+- copy full-bleed con padding fijo (56–72 px) en secciones de imagen a sangre;
+- contenedores centrados con `max-width` cuando el viewport es apenas mayor que ese máximo (un `.wrap` de 1320 px
+  deja el texto a 56 px entre 1181 y ~1320 px).
+
+Regla de las landings source-led: definir un riel en la capa del host y despejar las barras por 32 px, sólo desde
+1181 px. Nosotros usa `--gh-rail: calc(1.5vw + 88px)` (ver «Landing Nosotros source-led»). Para comprobarlo, medir en
+el navegador el `getBoundingClientRect().right` de `.elements-bar.left` contra el borde izquierdo del texto, a 1280,
+1440 y 1710 px, haciendo scroll hasta cada sección (las secciones fuera de pantalla pueden no reportar geometría).
+
+## Landing Nosotros source-led (page_id 249770, desde 2026-10-23)
+
+El 2026-10-23 `/about-us-efeonce/` se rediseñó con la línea gráfica «La órbita» y se publicó como widgets Elementor
+source-led (`greenhouse_nosotros_*`, once módulos: hero, quees, marcas, porque, como, equipo, mercados, prueba,
+partners, founder, cierre). Reemplaza la composición Ohio descrita en las tres secciones siguientes, que quedan
+como historia. Fuente y compilador: `scripts/public-website/nosotros-source/` en greenhouse-eo; runtime en
+`eo-elementor-widgets` (`assets/css/nosotros-landing.css`, `includes/nosotros/**`).
+
+Ajustes de layout aplicados en `nosotros-source/host.css` el 2026-10-23/24:
+
+- **Fidelidad al canvas:** Ohio filtraba `line-height:1.6`, `16.4px` y tracking del body, márgenes de
+  `ul:not(.-unlist) > li`, un margen superior de 16 px en `.pgrid` y tamaños de encabezado; la capa anterior además
+  forzaba `border-box` (el canvas usa `content-box`). Se resetean en el host.
+- **Rieles:** desde 1181 px, `--gh-rail` despeja el switcher y «Follow Us» en el `.wrap` (sólo mientras es más angosto
+  que el riel), el copy del mapa (`.mk-copy`, ensanchado lo mismo para que «En cinco países.» siga en una línea), la
+  cita del founder y la columna de «Cómo lo hacemos».
+- **Mapa sin parallax:** las etiquetas de las cinco ciudades están en coordenadas fijas; el parallax del canvas
+  (escala 1,16 y ±7 %) movía la imagen debajo y México y Perú quedaban lejos de su ciudad. La imagen del mapa queda
+  quieta.
+- **Hero anclado a la izquierda:** centrado en 1320 px, el texto se iba sobre la puerta iluminada y las personas en
+  movimiento en pantallas anchas; queda en el riel izquierdo, sobre el muro oscuro, como en la composición aprobada
+  (~1280 px).
+- **Cifras del hero:** «HubSpot / Solutions Partner» muestra el wordmark oficial completo de HubSpot en blanco (el
+  mismo asset del bloque de partners), a 1em de alto, con `alt="HubSpot"`.
+
+Verificado en vivo a 1280, 1440, 1710, 1920 y 390 px. Commits greenhouse-eo `7b57a9589`, `1991fe21d`, `c90171c9e`;
+runtime `b5f7a25`, `4a2bfd2`, `f5d730e`. Backups de deploy en Kinsta `/tmp/eo-nosotros-widgets-before-*.tar`.
+
+**Partners** (`/partnership/`, page_id 248003, source-led desde 2026-10-23) usa el mismo `.wrap` de 1320 px y tiene
+el mismo choque con el switcher entre 1181 y ~1320 px; queda pendiente por decisión del operador (2026-10-24).
+
 ## Hero About us (page_id 249770)
+
+> Historia: composición anterior al rediseño source-led del 2026-10-23. Los selectores de esta sección y de las dos
+> siguientes ya no existen en la página.
 
 La pagina `/about-us-efeonce/` usa un hero Elementor/Ohio full-bleed con fondo
 azul y proof de marcas. El copy vigente se ajusto en vivo el 2026-07-03 para

@@ -1,0 +1,359 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:53:26.476Z",
+  "run": "ai-generations/2026-10-09_deck-web-nexa-spark",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-09_deck-web-nexa-spark",
+  "totalBytes": 44895229,
+  "fileCount": 58,
+  "files": [
+    {
+      "path": "deck/blobs/061d10d4fe127170bd1622892e430bef.png",
+      "sizeBytes": 1767573,
+      "sha256": "39d17b87ce13c5706d0409a922fd9dcf27fd6a2e81176e9473830f7ebda50f0e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/061d10d4fe127170bd1622892e430bef.png"
+    },
+    {
+      "path": "deck/blobs/0ff50febae29647ca3754f0bcc31ba62.jpg",
+      "sizeBytes": 26668,
+      "sha256": "df26229f79bcb03584604db4b1036b8f30c5e5512a98fc2530b4797a94e2b34f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/0ff50febae29647ca3754f0bcc31ba62.jpg"
+    },
+    {
+      "path": "deck/blobs/17fb24332476cc99083f023e5fbca187.jpg",
+      "sizeBytes": 229979,
+      "sha256": "9f933aad2adb7e1f6dd6ae24d6ab2269aaca54eb7053d03a9e429217fe3a04ba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/17fb24332476cc99083f023e5fbca187.jpg"
+    },
+    {
+      "path": "deck/blobs/2cb570ce5501ea2399cd13468ec49cae.jpg",
+      "sizeBytes": 269419,
+      "sha256": "65db5ae0b49a34fc4cb8adf6fcfcc94d8c50f92ff530988fd46617aa5c2fb9ae",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/2cb570ce5501ea2399cd13468ec49cae.jpg"
+    },
+    {
+      "path": "deck/blobs/53b87f6c7bc4d75f1c9da2488ec3654d.jpg",
+      "sizeBytes": 30149,
+      "sha256": "96fffd4d75da0589c1661cfe6593573414465688ac2b8a78fd21d30905612925",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/53b87f6c7bc4d75f1c9da2488ec3654d.jpg"
+    },
+    {
+      "path": "deck/blobs/6f8ef21cca7803130c16de8a65b43905.png",
+      "sizeBytes": 2019705,
+      "sha256": "5f15d3b9e7c2a58693b542d8defc6c65cf89a6efbbf78a057b4ebc7647015644",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/6f8ef21cca7803130c16de8a65b43905.png"
+    },
+    {
+      "path": "deck/blobs/701ea3d7af62a858f53bf1a318bcb9af.jpg",
+      "sizeBytes": 29920,
+      "sha256": "412e2d4e141339e77c38639268d1aced3a7c0173ebfcd5e5553ba384704672a5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/701ea3d7af62a858f53bf1a318bcb9af.jpg"
+    },
+    {
+      "path": "deck/blobs/7e39c6d7ce829992ea9ae5a33dda209c.jpg",
+      "sizeBytes": 27933,
+      "sha256": "c653034cc4645ebb8d44538745cfd1940ac337d1fe714763a4c89ebd30b4748e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/7e39c6d7ce829992ea9ae5a33dda209c.jpg"
+    },
+    {
+      "path": "deck/blobs/875eebdd391b048f35f8293bb3ad1a10.jpg",
+      "sizeBytes": 34002,
+      "sha256": "798b72c0f64569b22f7568a93703c7adc0e255ef774a651c45e2a869571c0f36",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/875eebdd391b048f35f8293bb3ad1a10.jpg"
+    },
+    {
+      "path": "deck/blobs/9b0048edecb212aea22cc2055ed073e0.png",
+      "sizeBytes": 2071738,
+      "sha256": "fce98e994302475605fb8c6f89235ea676d25cf64943328d4dce150f14c29ddc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/9b0048edecb212aea22cc2055ed073e0.png"
+    },
+    {
+      "path": "deck/blobs/a1bfacad2e0d3c0eef997fb870662feb.png",
+      "sizeBytes": 2470549,
+      "sha256": "081fec725863e6430ba1e2b7ca2210810f9ef7cae1689ad923f603f7c52e231c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/a1bfacad2e0d3c0eef997fb870662feb.png"
+    },
+    {
+      "path": "deck/blobs/ca86c93a18a1792ab2a6b9de237933cc.jpg",
+      "sizeBytes": 263209,
+      "sha256": "8b2ceef841aaece7020e6995160c2eac18a39b7f7f6f48ac864554a4016c50cd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/ca86c93a18a1792ab2a6b9de237933cc.jpg"
+    },
+    {
+      "path": "deck/blobs/d125e146ab4b9c0a29db028304cae79a.jpg",
+      "sizeBytes": 28985,
+      "sha256": "0727798b4030e4f296b4b469177a0ce983afe1c903df2c181d4a011b11cb29b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/d125e146ab4b9c0a29db028304cae79a.jpg"
+    },
+    {
+      "path": "deck/blobs/dca3769a56530bffca6a1184fedaca2d.png",
+      "sizeBytes": 1403260,
+      "sha256": "ede61d0f4e1e24a4ea1efaea59940effd19f04b0e11ba09603bc7e8217d0390a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/dca3769a56530bffca6a1184fedaca2d.png"
+    },
+    {
+      "path": "deck/blobs/e5aa18a2ddad9853c8382b69410c9f9c.jpg",
+      "sizeBytes": 286639,
+      "sha256": "f3fe4ac32d7bbe1323a675c63ccd17a1237d4404f7eb0fe41c3d309ac2ef9689",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/e5aa18a2ddad9853c8382b69410c9f9c.jpg"
+    },
+    {
+      "path": "deck/blobs/f67b164e7b46fd6679aa76952492efe2.png",
+      "sizeBytes": 1241952,
+      "sha256": "bcd8e7cc1c210eff24272cf4119f5c3bab141c3ad8df8b042d00418c4981381e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/f67b164e7b46fd6679aa76952492efe2.png"
+    },
+    {
+      "path": "deck/blobs/f70ded30311e74b798c26b129048b85f.jpg",
+      "sizeBytes": 262362,
+      "sha256": "0fc676aa4aa350270d7fffc89404352977c961c76db216f09ff81a48bda93046",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/f70ded30311e74b798c26b129048b85f.jpg"
+    },
+    {
+      "path": "deck/blobs/f981d1eae648eb51ba03697541fd1bd0.jpg",
+      "sizeBytes": 331277,
+      "sha256": "03f208371a48f366ac0a3a9493c54ebd81bc3c661d6c02b52a912eda9f869f38",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/f981d1eae648eb51ba03697541fd1bd0.jpg"
+    },
+    {
+      "path": "deck/blobs/ff8bec0361adfed04d75b2b26a2ae97f.jpg",
+      "sizeBytes": 198622,
+      "sha256": "a38068a3062733cd0a6f5947eeea90c3c411017ade4642b86db611b588566e73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/blobs/ff8bec0361adfed04d75b2b26a2ae97f.jpg"
+    },
+    {
+      "path": "deck/out/01.jpg",
+      "sizeBytes": 670763,
+      "sha256": "e68c099303b42d4cc73e6124d40909029804d60200499653dcb960e3a826c9ae",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/01.jpg"
+    },
+    {
+      "path": "deck/out/02.jpg",
+      "sizeBytes": 534068,
+      "sha256": "00a307c76198db05eed19f07d02829a07e5c6ffa374a59f22bdbb3125f4aa79d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/02.jpg"
+    },
+    {
+      "path": "deck/out/03.jpg",
+      "sizeBytes": 421412,
+      "sha256": "37915ca51da1569c36c6036e9019afb60cc85a5fd5f9d38770a7716cd78278ac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/03.jpg"
+    },
+    {
+      "path": "deck/out/04.jpg",
+      "sizeBytes": 388931,
+      "sha256": "53ec0d864a6883275503878f2ec0e54279ff34a1dd615403b3bee3e1fd1f5bf7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/04.jpg"
+    },
+    {
+      "path": "deck/out/05.jpg",
+      "sizeBytes": 664593,
+      "sha256": "73bb3c5636578a892ee9ffbaf7f63184598165ae52b511fe4f7576f4db6f3c0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/05.jpg"
+    },
+    {
+      "path": "deck/out/06.jpg",
+      "sizeBytes": 703701,
+      "sha256": "cc5da27815e01596a3ddb1ab6099bf45084861bba367e78d78426a24c9422b3e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/06.jpg"
+    },
+    {
+      "path": "deck/out/07.jpg",
+      "sizeBytes": 387119,
+      "sha256": "fb1d6ce473bccf1a1dc2feb3ba2afce6630b3721bbb1e4a9120e5b59e109e757",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/07.jpg"
+    },
+    {
+      "path": "deck/out/08.jpg",
+      "sizeBytes": 428135,
+      "sha256": "08a669bb06af040c709ee5f9e02d1decfb34767aaedfc366b172ad076b0a830d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/08.jpg"
+    },
+    {
+      "path": "deck/out/09.jpg",
+      "sizeBytes": 947466,
+      "sha256": "205892cd52b99f3ddabf9edfc2a96948783497716f0692db0cf399ece3e64c5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/09.jpg"
+    },
+    {
+      "path": "deck/out/10.jpg",
+      "sizeBytes": 405572,
+      "sha256": "d5927e33f71dd7da2a3140d3d60156cbd47e40dfac5f87f9db7159c51100dc0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/10.jpg"
+    },
+    {
+      "path": "deck/out/11.jpg",
+      "sizeBytes": 814883,
+      "sha256": "92e868fa7079bf9f6b74954e1185218efcc824e4c18018beef73a462f1bd0ab6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/11.jpg"
+    },
+    {
+      "path": "deck/out/12.jpg",
+      "sizeBytes": 822752,
+      "sha256": "bc991974f34d34d45c8c0ad096d50fbd5b28c69c1042fc7f39d0663c6524e057",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/12.jpg"
+    },
+    {
+      "path": "deck/out/13.jpg",
+      "sizeBytes": 652502,
+      "sha256": "fc32fa0694491f1dd66c26ba6c3c0a3430ea061dcd9ce2c059952c1b59373bed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/13.jpg"
+    },
+    {
+      "path": "deck/out/14.jpg",
+      "sizeBytes": 632037,
+      "sha256": "d9768f396a93022aba428addc5856a56a8b8dc93e54b075f536092a606fb6d01",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/14.jpg"
+    },
+    {
+      "path": "deck/out/15.jpg",
+      "sizeBytes": 473990,
+      "sha256": "baf928591ec24a35779971196b0b00fba0766215ee3b1b3b4504696366dadcdf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/15.jpg"
+    },
+    {
+      "path": "deck/out/16.jpg",
+      "sizeBytes": 385903,
+      "sha256": "10b5d3d048ce077935fb1feee471acafc97f710bd9e8cc53c794ecc3cecf1001",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/16.jpg"
+    },
+    {
+      "path": "deck/out/17.jpg",
+      "sizeBytes": 569070,
+      "sha256": "0544a6556c30a4297c59e2bf3a4e2abb73cded2691d24715b1be015bc1f413a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/17.jpg"
+    },
+    {
+      "path": "deck/out/18.jpg",
+      "sizeBytes": 443910,
+      "sha256": "f90cffae7f158f68523a219bd9806a1ccc3516b4af86e0dad54dd2f54d5ba94a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/18.jpg"
+    },
+    {
+      "path": "deck/out/19.jpg",
+      "sizeBytes": 381889,
+      "sha256": "ec4573b87ec88bf5a7bcda9f5d6e860a678c87760f898f0c0c5b731a318a2fd7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/19.jpg"
+    },
+    {
+      "path": "deck/out/20.jpg",
+      "sizeBytes": 345882,
+      "sha256": "4ad91a3d892bbac8ab21099221e637b0233cf7ff5b1c9e1d0b83d33165e230a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/20.jpg"
+    },
+    {
+      "path": "deck/out/21.jpg",
+      "sizeBytes": 707084,
+      "sha256": "1338781c332f7b4f9771462f396cab128f4b3e624f7fa463d314550d668cf1e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/21.jpg"
+    },
+    {
+      "path": "deck/out/22.jpg",
+      "sizeBytes": 474805,
+      "sha256": "341f5d9e4474803264774f4f169065e445bdfe90986970804c65cee3b9fefb8c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/22.jpg"
+    },
+    {
+      "path": "deck/out/23.jpg",
+      "sizeBytes": 351329,
+      "sha256": "ea02aaa59dda9992dec6a0462a3229a4eabcc26a0a6b728caa05edeadc9962f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/23.jpg"
+    },
+    {
+      "path": "deck/out/24.jpg",
+      "sizeBytes": 479711,
+      "sha256": "1a1f86497f732462cd4eb4f3af0cd3e814d712ecad57689b7267afa2b760dda6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/24.jpg"
+    },
+    {
+      "path": "deck/out/25.jpg",
+      "sizeBytes": 328282,
+      "sha256": "26a89e3fe0532608a29cd846214f92017f9a83c7fe47e2a61999dcd7233c3f6e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/25.jpg"
+    },
+    {
+      "path": "deck/out/26.jpg",
+      "sizeBytes": 402398,
+      "sha256": "2a4554fc40cfa3282c8ebd1b0c4385ef197cb5d91d0625b7fad8651a96346b78",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/26.jpg"
+    },
+    {
+      "path": "deck/out/27.jpg",
+      "sizeBytes": 429432,
+      "sha256": "93f06482ed7a0c9a8c397b67ec70561801abbae286badfe2fc4145a05545a923",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/27.jpg"
+    },
+    {
+      "path": "deck/out/28.jpg",
+      "sizeBytes": 398987,
+      "sha256": "5ce42c2ebf667512828ae9f67dbcff8ecaffef48483d4875a228ffeed8767940",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/28.jpg"
+    },
+    {
+      "path": "deck/out/29.jpg",
+      "sizeBytes": 219719,
+      "sha256": "e452148065d19658da855d59e22c2c8372594069e655c6911ca13d943bf8518d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/deck/out/29.jpg"
+    },
+    {
+      "path": "plates/AU1-sistemas-conectados.png",
+      "sizeBytes": 2470549,
+      "sha256": "081fec725863e6430ba1e2b7ca2210810f9ef7cae1689ad923f603f7c52e231c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/plates/AU1-sistemas-conectados.png"
+    },
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 96442,
+      "sha256": "31d9839fffd4217f606c13f14bc3e0dc61f4136c616e47effba1bdeebac163f2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/NS1-nexa-spark-recorte.png",
+      "sizeBytes": 1854969,
+      "sha256": "01b42f180f46b50e93f8c7e8c19b87a31aca5a16baee769f17b6ef4fe4686526",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/plates/NS1-nexa-spark-recorte.png"
+    },
+    {
+      "path": "plates/NS2-nexa-cine-spark-hombro.png",
+      "sizeBytes": 2148436,
+      "sha256": "444f6b1441a9dd13929b68a4e7556a78177695d2b9d3340d3aaab3e3a8329afc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/plates/NS2-nexa-cine-spark-hombro.png"
+    },
+    {
+      "path": "plates/PD1-diseno-explotado.png",
+      "sizeBytes": 2019705,
+      "sha256": "5f15d3b9e7c2a58693b542d8defc6c65cf89a6efbbf78a057b4ebc7647015644",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/plates/PD1-diseno-explotado.png"
+    },
+    {
+      "path": "plates/SP1-spark-hacia-camara.png",
+      "sizeBytes": 1321931,
+      "sha256": "ce45ef93975c91a0570221ebf3357d5e06108e3d2ed3e801414d4785bda429de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/plates/SP1-spark-hacia-camara.png"
+    },
+    {
+      "path": "plates/SP2-spark-warp.png",
+      "sizeBytes": 1880360,
+      "sha256": "0605923620157c26256c957888e35854fde610e7466b0efe96ae3d4e8456abf3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/plates/SP2-spark-warp.png"
+    },
+    {
+      "path": "plates/SP3-spark-warp-sutil.png",
+      "sizeBytes": 1403260,
+      "sha256": "ede61d0f4e1e24a4ea1efaea59940effd19f04b0e11ba09603bc7e8217d0390a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/plates/SP3-spark-warp-sutil.png"
+    },
+    {
+      "path": "plates/UI1-interfaz-spark.png",
+      "sizeBytes": 1767573,
+      "sha256": "39d17b87ce13c5706d0409a922fd9dcf27fd6a2e81176e9473830f7ebda50f0e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/plates/UI1-interfaz-spark.png"
+    },
+    {
+      "path": "plates/WB2-web-tres-lectores.png",
+      "sizeBytes": 2071738,
+      "sha256": "fce98e994302475605fb8c6f89235ea676d25cf64943328d4dce150f14c29ddc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-09_deck-web-nexa-spark/plates/WB2-web-tres-lectores.png"
+    }
+  ]
+}

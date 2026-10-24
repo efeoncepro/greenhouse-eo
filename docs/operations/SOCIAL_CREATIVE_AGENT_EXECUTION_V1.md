@@ -97,7 +97,10 @@ Antes de gastar en renders, dejar localizables:
 2. Audiencia/mercado, objetivo, ventana y por qué participar.
 3. Observación, tensión, mecanismo, idea elegida y vínculo de marca; alternativas sólo si el concepto sigue abierto.
 4. Papel de marca y modalidad de atribución; un objeto corporativo no es obligatorio.
-5. Canal, formato, recorrido de lectura, copy fijo, referencias por rol y elementos protegidos.
+5. Canal, formato, recorrido de lectura, copy fijo, referencias por rol y elementos protegidos. **En una seasonality de
+   Efeonce, el canal sale de la prueba de fit** (Instagram si es emocional o cultural; LinkedIn de Efeonce si tiene
+   consecuencia de negocio para el comprador; LinkedIn de Julio si hay una opinión propia; ninguno si no conecta con un
+   oficio): registrar canales elegidos y descartados con su razón ([PDR-020, delta 2026-10-23](../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-23--seasonalities-por-fit-de-canal)).
 6. Ruta de producción, defecto que resuelve cada operación y condición de descarte.
 7. Cinco revisiones: estratégica, creativa, cultural/contextual, marca y producción.
 8. Artefactos, versión, decisiones pendientes y alcance de autorización.
@@ -151,7 +154,10 @@ source of truth runtime, autonomía, allowlists, presupuesto, compiler ni derech
 
 Social mantiene el ownership y carga el [workflow audiovisual](../../.codex/skills/motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md)
 (espejo Claude). Extiende este protocolo a storyboard/contact sheet, keyframes, preflight, generación,
-marca exacta, audio, revisión temporal y entrega. Un render es candidato, no aprobación. La ejecución
+marca exacta, audio, revisión temporal y entrega. Un render es candidato, no aprobación. La revisión temporal
+de una pieza con sonido o animación empieza con `pnpm ai:listen --measure-only` (ffmpeg, sin costo: sincronía,
+silencios, cortes, cuadros quietos y grilla con `--cues`) antes de mostrarla al operador; Gemini es segunda
+opinión opcional y siempre con `--verify` ([manual](../manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md)). La ejecución
 Seedance 2.5 del 2026-09-12 conserva limitaciones y hashes en el workflow. Este aprendizaje artesanal
 no modifica compiler, autoridad MCP ni runtime del contrato multimodal. ADR de referencia:
 `GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md` (Proposed; no implica aprobación del proveedor).

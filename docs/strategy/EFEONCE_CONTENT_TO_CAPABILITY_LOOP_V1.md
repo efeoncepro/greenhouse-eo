@@ -3,7 +3,23 @@
 > **Estado:** Proposed operating contract — validación y productización progresiva pendientes
 > **Owner:** Efeonce Strategy + Content + Product + Customer Experience
 > **Fecha:** 2026-07-28
-> **Canon relacionado:** [Operator-First Product & Growth Contract](EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md) · [Operator Pain & Journey Failure Map](EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md)
+> **Canon relacionado:** [Operator-First Product & Growth Contract](EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md) · [Operator Pain & Journey Failure Map](EFEONCE_OPERATOR_PAIN_AND_JOURNEY_FAILURE_MAP_V1.md) · [Love Brand & Community Strategy](EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md)
+
+## Delta 2026-10-22 — canales propios v2
+
+[PDR-020 revisión 2.0](../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias)
+y la [estrategia de love brand §8.2–§8.4](EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22)
+precisan cómo se publican estas superficies; el loop de capacidad no cambia:
+
+- **Glitch** conserva su trabajo interno de discovery y, hacia afuera, es el **newsletter canónico y el único correo**
+  de Efeonce. El newsletter Marketing con Manzanitas del LinkedIn de Julio es una puerta de entrada que invita a
+  Glitch; no hay un segundo correo de Marketing con Manzanitas.
+- **Blog:** su siguiente paso sigue un orden fijo: primero Glitch, después una herramienta y al final el diagnóstico.
+  Recibe el artículo de cada tutorial de YouTube con la transcripción: **el texto canónico vive en el blog**.
+- **YouTube:** **el video canónico vive en YouTube** y el blog lo incrusta; además de demostrar el mecanismo, suma
+  afinidad desde la utilidad (marca Marketing con Manzanitas).
+- **Instagram y Threads** son marca agencia (love brand y comunidad): no entran a este loop como superficies de
+  capacidad ni llevan a la venta.
 
 ## 1. Propósito
 

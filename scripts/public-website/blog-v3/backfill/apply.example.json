@@ -1,0 +1,6 @@
+{
+  "mode": "apply",
+  "batch": 10,
+  "expect_sha256": "<proposal_sha256 del dry-run revisado>",
+  "overrides": {}
+}

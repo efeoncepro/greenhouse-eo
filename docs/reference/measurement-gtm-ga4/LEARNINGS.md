@@ -4,6 +4,40 @@
 
 ---
 
+## 2026-10-23 — verificar con una visita simulada: el service worker y el agente de usuario
+
+Alta de `gh_site_nav_*` (GTM versión 9) y `gh_landing_dock_clicked` (versión 8) verificada en GA4 Tiempo real con una
+visita simulada en Playwright, sin esperar tráfico real.
+
+- **Aceptar sólo analítica en el banner de HubSpot:** «Configurar» (`#hs-eu-cookie-settings-button`), activar
+  `#hs-category-toggle-analytics` y «Guardar configuración» (`#hs-modal-save-settings`). Publicidad queda denegada, así
+  que no sale ningún PageView a Meta; los hits van con `gcs=G101` y el servidor los reenvía a GA4.
+- **Después del primer hit, GA4 envía por un service worker.** El `page_view` sale de la página; el resto sale desde
+  el iframe `/_/service_worker/…/sw_iframe.html` del servidor de tagging. `page.on('request')` no lo ve: escuchar con
+  `context.on('request')` (`request.serviceWorker()` lo identifica). Sin eso parece que los eventos no se envían.
+- **GA4 filtra como bot lo que sale del service worker con `HeadlessChrome`.** `newContext({ userAgent })` sólo cambia
+  la página; el service worker conserva el agente de usuario del navegador sin ventana y sus hits llegan al servidor
+  pero nunca a Tiempo real. Lanzar con `args: ['--user-agent=…']` además del contexto.
+- **La página del clic ya viaja en cada hit** (`dl`, en GA4 `page_location`): no hace falta un parámetro propio.
+- No enviar formularios ni agendar en estas visitas: abrir el agendador y cerrarlo con Escape basta para
+  `greenhouse_cta_clicked`.
+
+## 2026-10-23 — clic del dock de las landings: qué botón, no sólo cuál posición
+
+[TRACKING-PLAN fila `landing_dock`](TRACKING-PLAN.md) · [arquitectura](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043).
+
+- **`primary`/`secondary` no basta para un reporte.** Cada landing tiene sus propios botones; la posición sola obliga a
+  cruzar con la página para saber qué se clicó. El evento lleva además el texto completo (`target_label`) y el destino
+  (`target_url`, ruta + ancla, sin query para no arrastrar ids de campaña).
+- **Leer el botón antes de que el primitive emita.** El primitive de AXIS emite sólo `target_type` y `target`; el host
+  guarda el botón con un listener de clic en **captura** sobre el documento, que corre antes del handler del dock.
+- **Un banner sin responder es consentimiento denegado, no ausencia de hit.** Con las cookies rechazadas el clic sale
+  igual al servidor de tagging como `gcs=G100` con todos los `ep.*` y el forwarding no lo pasa a GA4. Sirve para
+  verificar tag y parámetros sin aceptar cookies; la llegada a GA4 Tiempo real necesita una visita que acepte analítica.
+- **Un 500 al crear una variable no deja basura.** El primer `POST` de `DLV - target_url` devolvió 500 sin crearla; el
+  script es idempotente (reusa el workspace y salta lo existente) y la segunda corrida la creó. Leer el workspace
+  (`status`: 6 cambios, 0 conflictos) antes de publicar.
+
 ## 2026-10-17 — primer Lead comercial consentido: cómo se prueba de verdad
 
 [Evidencia](10-growth-lead-matching-runtime.md#primera-conversión-comercial-consentida--performance-2026-10-17) ·

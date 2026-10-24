@@ -1,0 +1,341 @@
+{
+  "version": 1,
+  "observedAt": "2026-10-19T02:54:15.764037+00:00",
+  "candidate": "81f6ba525376c91110a55f8cf7343326bd22811d",
+  "main": "2559e924207f5120232593e7e79b0f031cab6dc9",
+  "fullDevelopTreeSha": "17cbf2d233b4ae70ffe852a2ac631c06e79f7866",
+  "treeEqualityVerified": true,
+  "filesChanged": 128,
+  "pr": 257,
+  "release": {
+    "id": "2559e924207f-567833aa-c03b-483f-b4b4-55ad2aec512b",
+    "state": "released",
+    "attempt": 1,
+    "startedAt": "2026-10-19T02:39:59.970Z",
+    "completedAt": "2026-10-19T02:51:39.621Z",
+    "workflowRunId": 39190761785,
+    "workflowConclusion": "success",
+    "workerRevisionPayloadPersisted": false,
+    "postHealthPayloadPersisted": false,
+    "workflowRunsPersisted": false
+  },
+  "preflight": {
+    "ready": true,
+    "allChecksOk": true,
+    "overridesUsed": false
+  },
+  "ci": {
+    "developPush": 39185794267,
+    "developPr": 39185798009,
+    "main": 39188181495,
+    "deep": 39188181478,
+    "stagingSmoke": 39186265352,
+    "productionSmoke": 39188786401,
+    "allSuccess": true
+  },
+  "deployment": {
+    "id": "dpl_4HeNDmdSmyRa673gi78YFNfmqBLY",
+    "projectId": "prj_d9v6gihlDq4k1EXazPvzWhSU0qbl",
+    "state": "READY",
+    "target": "production",
+    "sha": "2559e924207f5120232593e7e79b0f031cab6dc9",
+    "branch": "main",
+    "createdAt": 1792375436101,
+    "env": {
+      "representation": "key_names_array",
+      "present": true,
+      "value": "unverified"
+    },
+    "buildEnv": {
+      "representation": "key_names_array",
+      "present": true,
+      "value": "unverified"
+    }
+  },
+  "alias": {
+    "host": "greenhouse.efeoncepro.com",
+    "deploymentId": "dpl_4HeNDmdSmyRa673gi78YFNfmqBLY"
+  },
+  "configurationProof": true,
+  "frozenFlagBooleanDirectlyObserved": false,
+  "canaries": {
+    "at": "2026-10-19T02:11:30.423Z",
+    "allPassed": true,
+    "checks": [
+      {
+        "check": "canonicalInternalAgentSession",
+        "passed": true
+      },
+      {
+        "check": "legacyCors_allowed",
+        "http": 204,
+        "passed": true
+      },
+      {
+        "check": "legacyCors_unknown",
+        "http": 204,
+        "passed": true
+      },
+      {
+        "check": "legacyRejectsBeforeIntake_malformed",
+        "http": 400,
+        "noStore": true,
+        "passed": true
+      },
+      {
+        "check": "legacyRejectsBeforeIntake_null",
+        "http": 400,
+        "noStore": true,
+        "passed": true
+      },
+      {
+        "check": "legacyRejectsBeforeIntake_array",
+        "http": 400,
+        "noStore": true,
+        "passed": true
+      },
+      {
+        "check": "classificationRequiresSession",
+        "http": 401,
+        "passed": true
+      },
+      {
+        "check": "classificationStrictSchema",
+        "http": 400,
+        "code": "growth_form_invalid_input",
+        "passed": true
+      },
+      {
+        "check": "classificationRejectsObsoletePreconditions",
+        "http": 409,
+        "code": "growth_form_classification_conflict",
+        "note": "Current kind quote_request already rejects from lead_magnet; fingerprint branch covered in unit tests.",
+        "passed": true
+      },
+      {
+        "check": "definitionVersionsDestinationsAndAuditCountUnchanged",
+        "metadataSha256": "4a5bb8a9aab3a26481a871002c555093c7c277b09d4df825483c98a7752c523c",
+        "auditCount": "0",
+        "passed": true
+      },
+      {
+        "check": "portableGraderVersion8Preserved",
+        "passed": true,
+        "http": 200
+      },
+      {
+        "check": "health",
+        "http": 200,
+        "passed": true
+      }
+    ],
+    "businessEventsCreated": 0,
+    "positiveIntakePosts": 0,
+    "positiveClassificationWrites": 0,
+    "gtmPublished": false,
+    "adsReceptionVerified": false,
+    "attributionVerified": false
+  },
+  "policy": {
+    "forms": 13,
+    "meetings": 1,
+    "noncommercialAdsExcluded": true,
+    "destinationsPreserved": true,
+    "newPolicyWrites": 0
+  },
+  "gtm": {
+    "at": "2026-10-19T02:50:59.246Z",
+    "allPassed": true,
+    "method": "GET",
+    "writes": 0,
+    "cloudAccount": "julio.reyes@efeonce.org",
+    "observed": [
+      {
+        "key": "web",
+        "publicId": "GTM-NGHPGRLZ",
+        "version": "6",
+        "name": "Efeonce Ads consented online + scoped receipts 2026-10-18",
+        "tags": 11,
+        "triggers": 12,
+        "variables": 31
+      },
+      {
+        "key": "server",
+        "publicId": "GTM-K2X4ZTTK",
+        "version": "10",
+        "name": "Efeonce Ads consented online + scoped receipts 2026-10-18",
+        "tags": 5,
+        "triggers": 10,
+        "variables": 17
+      }
+    ]
+  },
+  "ads": {
+    "customerId": "6862539491",
+    "autoTagging": true,
+    "termsAccepted": true,
+    "effectiveEnablement": "ON",
+    "bindingsReady": true
+  },
+  "flags": {
+    "at": "2026-10-19T02:51:01.527Z",
+    "allPassed": true,
+    "method": "GET",
+    "writes": 0,
+    "rows": [
+      {
+        "flag": "GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED",
+        "target": "production",
+        "value": true,
+        "updatedAt": 1792355773538
+      },
+      {
+        "flag": "GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED",
+        "target": "production",
+        "value": true,
+        "updatedAt": 1782810271010
+      },
+      {
+        "flag": "GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED",
+        "target": "production",
+        "value": true,
+        "updatedAt": 1782810230829
+      }
+    ]
+  },
+  "resources": [
+    {
+      "name": "ops-worker",
+      "region": "us-east4",
+      "kind": "service",
+      "ready": "True",
+      "served": [
+        {
+          "revision": "ops-worker-00782-2qf",
+          "percent": 100,
+          "gitSha": "81f6ba525376c91110a55f8cf7343326bd22811d",
+          "image": "gcr.io/efeonce-group/ops-worker@sha256:1098135857675c809288417e1ea768265a9a386055a68ec31fe7036a09f7290e",
+          "imageDigest": "gcr.io/efeonce-group/ops-worker@sha256:1098135857675c809288417e1ea768265a9a386055a68ec31fe7036a09f7290e",
+          "ready": "True"
+        }
+      ]
+    },
+    {
+      "name": "commercial-cost-worker",
+      "region": "us-east4",
+      "kind": "service",
+      "ready": "True",
+      "served": [
+        {
+          "revision": "commercial-cost-worker-00701-gnw",
+          "percent": 100,
+          "gitSha": "2559e924207f5120232593e7e79b0f031cab6dc9",
+          "image": "gcr.io/efeonce-group/commercial-cost-worker@sha256:8990c5f2f97deb0b8ab89734d47fc3369aa6573928dddcbdaae7f0aed5644a3f",
+          "imageDigest": "gcr.io/efeonce-group/commercial-cost-worker@sha256:8990c5f2f97deb0b8ab89734d47fc3369aa6573928dddcbdaae7f0aed5644a3f",
+          "ready": "True"
+        }
+      ]
+    },
+    {
+      "name": "ico-batch-worker",
+      "region": "us-east4",
+      "kind": "service",
+      "ready": "True",
+      "served": [
+        {
+          "revision": "ico-batch-worker-00513-d6v",
+          "percent": 100,
+          "gitSha": "2559e924207f5120232593e7e79b0f031cab6dc9",
+          "image": "gcr.io/efeonce-group/ico-batch-worker@sha256:f6f38046941787faabd721daf7723ae15ef17671318ba063df2edd84a36d30b5",
+          "imageDigest": "gcr.io/efeonce-group/ico-batch-worker@sha256:f6f38046941787faabd721daf7723ae15ef17671318ba063df2edd84a36d30b5",
+          "ready": "True"
+        }
+      ]
+    },
+    {
+      "name": "hubspot-greenhouse-integration",
+      "region": "us-central1",
+      "kind": "service",
+      "ready": "True",
+      "served": [
+        {
+          "revision": "hubspot-greenhouse-integration-00201-thl",
+          "percent": 100,
+          "gitSha": "2559e924207f5120232593e7e79b0f031cab6dc9",
+          "image": "gcr.io/efeonce-group/hubspot-greenhouse-integration@sha256:bb1d08a81cc7104d2245e59763f68189ba9056d3cb32ca551dee29bdc821e6bd",
+          "imageDigest": "gcr.io/efeonce-group/hubspot-greenhouse-integration@sha256:bb1d08a81cc7104d2245e59763f68189ba9056d3cb32ca551dee29bdc821e6bd",
+          "ready": "True"
+        }
+      ]
+    },
+    {
+      "name": "auth-server",
+      "region": "us-east4",
+      "kind": "service",
+      "ready": "True",
+      "served": [
+        {
+          "revision": "auth-server-00160-lqp",
+          "percent": 100,
+          "gitSha": "81f6ba525376c91110a55f8cf7343326bd22811d",
+          "image": "gcr.io/efeonce-group/auth-server@sha256:eb92f6eae6103e33c5899477cf24c50e743a644549bba7296b0dd23b5d523e03",
+          "imageDigest": "gcr.io/efeonce-group/auth-server@sha256:eb92f6eae6103e33c5899477cf24c50e743a644549bba7296b0dd23b5d523e03",
+          "ready": "True"
+        }
+      ]
+    },
+    {
+      "name": "artifact-worker",
+      "region": "us-east4",
+      "kind": "job",
+      "ready": "True",
+      "gitSha": "81f6ba525376c91110a55f8cf7343326bd22811d",
+      "images": [
+        "us-east4-docker.pkg.dev/efeonce-group/cloud-run-source-deploy/artifact-worker:81f6ba525376c91110a55f8cf7343326bd22811d"
+      ]
+    }
+  ],
+  "artifactImageDigests": [
+    {
+      "phase": "baseline",
+      "image": "us-east4-docker.pkg.dev/efeonce-group/cloud-run-source-deploy/artifact-worker:77763331c3618ab774a061e6e6bec0b287be54ce",
+      "gitSha": "77763331c3618ab774a061e6e6bec0b287be54ce",
+      "digest": "sha256:bef8baca4156ba58fa9f3119492bd32ef28a3e9e5e2bae50d503a9ad24d0751c",
+      "fullyQualifiedDigest": "us-east4-docker.pkg.dev/efeonce-group/cloud-run-source-deploy/artifact-worker@sha256:bef8baca4156ba58fa9f3119492bd32ef28a3e9e5e2bae50d503a9ad24d0751c"
+    },
+    {
+      "phase": "final",
+      "image": "us-east4-docker.pkg.dev/efeonce-group/cloud-run-source-deploy/artifact-worker:81f6ba525376c91110a55f8cf7343326bd22811d",
+      "gitSha": "81f6ba525376c91110a55f8cf7343326bd22811d",
+      "digest": "sha256:a2bd4ed939bb8dc0c8cf11845662c5783a1a4e27ed8320588c06277ce2043c12",
+      "fullyQualifiedDigest": "us-east4-docker.pkg.dev/efeonce-group/cloud-run-source-deploy/artifact-worker@sha256:a2bd4ed939bb8dc0c8cf11845662c5783a1a4e27ed8320588c06277ce2043c12"
+    }
+  ],
+  "health": {
+    "at": "2026-10-19T02:52:53.534Z",
+    "method": "GET",
+    "httpStatus": 200,
+    "passed": true,
+    "businessEventsCreated": 0
+  },
+  "watchdog": {
+    "severity": "ok",
+    "workersChecked": 6,
+    "driftCount": 0,
+    "dataMissingCount": 0,
+    "teamsDispatched": false
+  },
+  "timing": {
+    "agentE2ECompleteFormallyMeasured": false,
+    "observedAnchor": "2026-10-19T01:25:11+00:00",
+    "observedLowerBoundSeconds": 5345,
+    "initialReadsNotInstrumented": true,
+    "workflowSeconds": 926,
+    "manifestSeconds": 700,
+    "runtimeGreenSeconds": 817
+  },
+  "positiveTestIntakes": 0,
+  "adsReceptionVerified": false,
+  "attributionVerified": false,
+  "noAdditionalWorktree": true
+}

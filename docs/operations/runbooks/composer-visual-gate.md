@@ -70,6 +70,13 @@ distintos por página contra `docs/ui/visual-directions/TASK-1889-efeonce-insigh
 `Deck-Agrupadas` es la única excepción aprobada por el operador, con techo 2,5 %; una excepción nueva
 exige su aprobación). Dossier: `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md`.
 
+Estado al 2026-10-23: el scope Insights tiene **39 frames a 0 px**; el último delta declarado es el **(ab)** del
+2026-10-23 (`ReportFindingsPage` y `ReportScenariosPage` nuevos; `productLabel` y la tendencia anotada no mueven frames
+porque sus `example` reproducen lo aprobado). `pnpm insights:canvas-fidelity` cerró en 30 páginas ≤ 1 % con
+`Deck-Agrupadas` en su excepción. La guarda del pie (`withPaperFootGuard`) corre al componer: si un probe o un plan
+monta un bloque sobre el pie, el render falla antes del diff; se acorta el copy del `example` o del plan, nunca se
+promueve el baseline para tapar la falla.
+
 ### Scope de La órbita (`graphic-line`, TASK-1919, TASK-1927 y TASK-1928)
 
 Los tres catálogos de la línea gráfica por superficie (`graphic-line-deck`, `graphic-line-stills` y

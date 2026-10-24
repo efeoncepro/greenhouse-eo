@@ -1,5 +1,9 @@
 # Conversiones Google Ads para Forms y agendas
 
+Checkpoint de release18/10 (19/10 02:11Z): main2559e9242 y deployment4He READY; fachada
+Grader y clasificación administrativa servidas, canarios negativos PASS sin leads ficticios.
+CI/Deep y cierre formal: [evidencia del release](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
+
 Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
 AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
 corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
@@ -118,9 +122,9 @@ soporte y pruebas no se incorporan. La reserva Discovery conserva `meeting_booki
 
 1. Releer por API el catálogo, fuente, propósito, clasificación, riesgo, versión y surface. Contrastar
    intención comercial con campos y recorrido; superar el gate técnico no la acredita.
-2. Conciliar discrepancias antes de preparar apply. Lead Gen - Web declara propósito comercial pero
-   sigue lead_magnet; AI Visibility Grader es diagnostic_intake pero declara propósito lead magnet.
-   No reclasificar ni activar por deducción. Un contacto mixto requiere condiciones comerciales explícitas.
+2. Conciliar discrepancias antes de preparar apply. Web ya fue corregido a quote_request y Julio
+   confirmó la intención comercial de AI Grader; Contacto general quedó fueraAds. Para fuentes nuevas,
+   no reclasificar ni activar por deducción: revisar intención con el operador y preservar identidad/versiones.
 3. Preparar la revisión de la política existente con `googleAds.conversionKey=commercial_lead`, EC,
    activationAt revisado y mapping válido, preservando Meta/UPD y demás configuración. No crear un
    segundo emisor ni una nueva etiqueta por formulario. La identidad nativa HubSpot se configura
@@ -132,8 +136,9 @@ soporte y pruebas no se incorporan. La reserva Discovery conserva `meeting_booki
    Guardar evidencia saneada de recepción; dejar atribución pendiente hasta disponer de evidencia Ads.
 
 El corte previo del18/10 contenía12 propuestas validadas sin publicar; fue sustituido por la
-publicación22:57Z de13 Forms y Discovery. Las advertencias siguientes describen la revisión previa de fuentes
-cuya intención sigue pendiente de revisión. No son 12 activaciones ni 12 conversiones certificadas.
+publicación22:57Z de13 Forms y Discovery. Web y Grader ya tienen la decisión comercial resuelta;
+Contacto general quedó fueraAds. Las propuestas previas son historia, no comandos para reejecutar.
+Publicación de configuración no certifica recepción ni atribución de conversiones.
 [Inventario y alcance actual](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
 Una nueva versión publicada exige revisar su política; la inscripción y control automáticos para
 formularios futuros **no están implementados**. Esta ampliación no modifica campañas, goals ni puja.

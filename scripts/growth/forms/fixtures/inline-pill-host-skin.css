@@ -1,0 +1,27 @@
+/*
+ * TASK-2054 — Piel de anfitrión de referencia para la presentación `inline_pill` (portada del blog v3).
+ * Sólo tokens públicos: el anfitrión declara la tipografía y el tono; los anchos, curvas y duraciones
+ * salen del renderer con el default del canvas. El anfitrión le da a <greenhouse-form> el ancho de su
+ * columna: con 480 px o más la píldora usa los anchos del canvas; con menos ocupa todo el ancho.
+ */
+greenhouse-form.eo-inline-pill {
+  --ghf-font: 'Poppins', system-ui, sans-serif;
+  display: block;
+  width: 100%;
+}
+
+/* Glitch (suscripción): verde Glitch sobre navy. */
+greenhouse-form.eo-inline-pill--glitch {
+  --ghf-inline-tone: #6ec207;
+  --ghf-inline-tone-hover: #8bd13a;
+  --ghf-inline-tone-active: #a6dd68;
+  --ghf-inline-on-tone: #001a33;
+}
+
+/* Eventos y webinars: turquesa de marca sobre navy. */
+greenhouse-form.eo-inline-pill--event {
+  --ghf-inline-tone: #36c8bf;
+  --ghf-inline-tone-hover: #73d5cd;
+  --ghf-inline-tone-active: #a1e1db;
+  --ghf-inline-on-tone: #001a33;
+}

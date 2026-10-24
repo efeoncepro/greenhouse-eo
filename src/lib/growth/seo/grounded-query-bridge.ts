@@ -42,6 +42,8 @@ import { isSeoModuleEnabled } from './flags'
 import { appendDiscoveryActionTx, type DiscoveryActionClient } from './keyword-discovery/queue'
 import { readKeywordDiscovery, type SeoDiscoveryCandidateView } from './keyword-discovery/reader'
 
+import type { EnvSource } from '@/types/env-source'
+
 // ─── Contratos ──────────────────────────────────────────────────────────────────────
 
 /** Códigos cerrados (spec TASK-1666 §Security and access). Sin prosa del proveedor ni SQL. */
@@ -74,7 +76,7 @@ export interface CreateGroundedQueryDraftInput {
   discoveryRunId: string
   candidateIds: string[]
   createdBy: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 export type GroundedQueryDraftResult =

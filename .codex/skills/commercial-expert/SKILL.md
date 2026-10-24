@@ -5,6 +5,33 @@ description: Ejecuta discovery, calificación, negociación, propuestas y seguim
 
 # Commercial Expert — entrada Codex
 
+
+## Partnerships, distribuidores y expedientes externos
+
+Para recuperar membresías, completar altas/crédito o preparar documentos para distribuidores, cargar el
+[manual de operación](../../../docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md) y el registro de partnerships. Cruzar cuenta, razón social/RUT e ID antes
+de registrar, formar o pedir un upgrade; no crear duplicados ni usar una membresía de otra empresa.
+Separar estado del programa, curso, distribución, Marketplace, crédito y capacidad de ordenar.
+Los formularios externos sólo llevan datos pertinentes: notas de búsqueda, pendientes y QA quedan en el
+expediente interno. No inventar datos ni aplicar la firma del correo como firma contractual. Revisar todas
+las páginas y la lista exacta de adjuntos; comprobar Enviados, archivos y CRM por separado.
+Los estados variables viven en el registro/auditoría; los correos y rutas de contacto viven en el
+[directorio de personas y equipos](../../../docs/operations/EFEONCE_PARTNER_CONTACT_DIRECTORY_V1.md).
+Leerlo antes de localizar destinatarios; contiene funciones, fuentes, fechas, reemplazos y rebotes.
+Índice nominal de recuperación (no implica cargo vigente ni autorización de envío):
+- Google/Ingram: Joelvis Sarmiento, Víctor Escárate, Nicolás Santibáñez, Cristian Faúndez;
+  Google for Education: Arthur Guedes y Carlos Jimenez.
+- Microsoft/LOL: Geraldine Vanessa Gonzalez Moreno, Camila Orellana, Reinel Bejarano,
+  Diana Jaimes y Daniela Sedlacek. Alta/crédito LOL: Lucia Gabriela Tovar.
+- AWS/LOL: José Manuel Quezada, Valentina Egaña, Macarena Hein, Víctor Ledezma y Jorge Noguera;
+  AWS directo: Julieth Vanessa Castillo y Daniel López.
+- Adobe/Nexsys: Jean Sánchez, Francisco Araya, Constanza Moya, Javiera Castro, José Orellana
+  y Vicente Ulloa. Adobe/Ingram: Melissa Danae Santos y Marco Seferino.
+No confundir ambos Víctor, ni Ingram con Nexsys. Cristian, Vicente y Marco tienen rebotes registrados;
+consultar la evidencia antes de reutilizarlos. María Berrios pertenece a una membresía ajena;
+Jose Menezes es fuente del anuncio, no contacto operativo acreditado. No copiar ni inferir sus correos.
+
+
 ## Nombres de negocios y leads Efeonce
 
 Antes de preparar o escribir `dealname` / `hs_lead_name`, aplicar la

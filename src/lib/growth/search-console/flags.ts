@@ -7,11 +7,13 @@
  * Google (scope sensible `webmasters.readonly`) + smoke en staging. Lectura pura de
  * env (testeable). Registrado en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
  */
+import type { EnvSource } from '@/types/env-source'
+
 
 export const GROWTH_SEARCH_CONSOLE_FLAG = 'GROWTH_SEARCH_CONSOLE_ENABLED'
 
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
 /** Kill switch del flujo Search Console. Default OFF. */
-export const isSearchConsoleEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isSearchConsoleEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_SEARCH_CONSOLE_FLAG])

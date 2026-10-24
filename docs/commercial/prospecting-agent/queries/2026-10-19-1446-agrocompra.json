@@ -1,0 +1,422 @@
+{
+  "run": "2026-10-19-1446-agrocompra",
+  "opportunity_id": "HSP-0036",
+  "timezone": "America/Santiago",
+  "primary_checked_at": "2026-10-19T14:46:18-03:00",
+  "time_precision": "Primary final read time recorded immediately after UI read; other queries ordered, exact per-call times not instrumented",
+  "weekly_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-19T14:46:18-03:00"
+  },
+  "scope": "User-requested focal deep account/person research, not a new 20-cell daily discovery run",
+  "country": "Chile",
+  "line": "web / product design / integrations",
+  "searches": [
+    {
+      "sequence": 1,
+      "method": "web search",
+      "query": "\"[TARGET NAME REDACTED]\" \"Agrocompra\"",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": true
+    },
+    {
+      "sequence": 2,
+      "method": "web search",
+      "query": "\"Agrocompra\" \"partner tecnológico\" \"B2B\"",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": false
+    },
+    {
+      "sequence": 3,
+      "method": "web search",
+      "query": "\"Agrocompra\" \"Buscamos un partner tecnológico\"",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": false
+    },
+    {
+      "sequence": 4,
+      "method": "web search",
+      "query": "\"Agrocompra\" \"[TARGET NAME REDACTED]\" \"plataformas\"",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": true
+    },
+    {
+      "sequence": 5,
+      "method": "web search",
+      "query": "Agrocompra Fertiamérica CNA Chile tamaño empleados",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": false
+    },
+    {
+      "sequence": 6,
+      "method": "web search",
+      "query": "\"[TARGET NAME REDACTED]\" \"partner\"",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": true
+    },
+    {
+      "sequence": 7,
+      "method": "web search",
+      "query": "site:linkedin.com/posts/ \"agrocompra\" \"UX/UI\"",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": false
+    },
+    {
+      "sequence": 8,
+      "method": "web search",
+      "query": "site:agrocompra.com términos condiciones Agrocompra SpA",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": false
+    },
+    {
+      "sequence": 9,
+      "method": "web search",
+      "query": "\"[TARGET FULL NAME REDACTED]\" LinkedIn",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": true
+    },
+    {
+      "sequence": 10,
+      "method": "web search",
+      "query": "\"Agrocompra\" \"queremos dar un paso más\"",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": false
+    },
+    {
+      "sequence": 11,
+      "method": "web search",
+      "query": "\"Agrocompra\" \"partner\" \"UX\"",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": false
+    },
+    {
+      "sequence": 12,
+      "method": "web search",
+      "query": "\"[TARGET NAME REDACTED]\" \"@cnagro.cl\"",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": true
+    },
+    {
+      "sequence": 13,
+      "method": "web search",
+      "query": "\"[TECHNICAL LEAD NAME REDACTED]\" CNA Agrocompra SAP",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": true
+    },
+    {
+      "sequence": 14,
+      "method": "web search",
+      "query": "site:cnagro.cl \"Agrocompra\" \"Fertiamérica\"",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": false
+    },
+    {
+      "sequence": 15,
+      "method": "web search",
+      "query": "site:fne.gob.cl CNA Nutrien Chile 2026 adquisición",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": false
+    },
+    {
+      "sequence": 16,
+      "method": "web search",
+      "query": "Agrocompra Mactec plataforma caso",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": false
+    },
+    {
+      "sequence": 17,
+      "method": "web search",
+      "query": "site:agrocompra.com \"partner\" tecnología",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": false
+    },
+    {
+      "sequence": 18,
+      "method": "web search",
+      "query": "\"[TARGET FULL NAME REDACTED]\" Agrocompra seleccionamos partner agencia",
+      "filters": "Unfiltered focused public search; no weekly publication claimed",
+      "pii_redacted": true
+    }
+  ],
+  "sources": [
+    {
+      "id": "agrocompra-buyer-post",
+      "url": "https://es.linkedin.com/posts/mariaceciliamoravergara_en-agrocompra-queremos-dar-un-paso-m%C3%A1s-y-activity-7516598217699155969-tmo8",
+      "type": "buyer_public_call",
+      "result": "Original read in public web and UI, 21 comments; 3 days relative; no calendar/contract verified",
+      "watch": true
+    },
+    {
+      "id": "agrocompra-platform",
+      "url": "https://agrocompra.com/",
+      "type": "buyer_website",
+      "result": "Catalog/format/volumes/quote/login/resources observed; no form submitted",
+      "watch": true
+    },
+    {
+      "id": "agrocompra-terms",
+      "url": "https://agrocompra.com/politica-de-privacidad",
+      "type": "buyer_terms",
+      "result": "All sections read. Platform operator vs goods seller; NOT development contract",
+      "watch": true
+    },
+    {
+      "id": "agrocompra-corporate",
+      "url": "https://cl.linkedin.com/company/agrocompra",
+      "type": "buyer_corporate",
+      "result": "2-10 band; existing product, technical leader and SAP announcement read",
+      "watch": true
+    },
+    {
+      "id": "cna-about-team",
+      "url": "https://cnagro.cl/acerca-de/",
+      "type": "group_primary",
+      "result": ">60 own-site collaborators and management roles; differs LinkedIn band",
+      "watch": true
+    },
+    {
+      "id": "fertiamerica-home",
+      "url": "https://fertiamerica.com/",
+      "type": "group_primary",
+      "result": "Agricultural distribution/product context read",
+      "watch": false
+    },
+    {
+      "id": "fertiamerica-about",
+      "url": "https://fertiamerica.com/nosotros/",
+      "type": "group_primary",
+      "result": "Company/business context read",
+      "watch": false
+    },
+    {
+      "id": "agrocompra-agenda",
+      "url": "https://agrocompra.com/agendar",
+      "type": "buyer_public_workflow",
+      "result": "Commercial/technical vendor appointment route; no booking",
+      "watch": false
+    },
+    {
+      "id": "cna-prior-platform-technical",
+      "url": "https://es.linkedin.com/posts/antonio-sazo-9a714326_innovaci%C3%B3n-agrotech-ecommerce-activity-7494081105944526849-ot2Q",
+      "type": "buyer_technical_declaration",
+      "result": "Prior built platform, B2B operating constraints, supplier collaboration comment",
+      "watch": true
+    },
+    {
+      "id": "mactec-cna-case",
+      "url": "https://www.mactec.ai/es/casos-de-exito",
+      "type": "supplier_case",
+      "result": "CNA case read, two portals and implementation; supplier claims not buyer current award or verified metrics",
+      "watch": true
+    },
+    {
+      "id": "agrocompra-acquisition-primary",
+      "url": "https://es.linkedin.com/posts/max-donoso-mujica-848b3453_como-co-fundador-de-agrocompra-estoy-muy-activity-7374049790378024960-fvrm",
+      "type": "founder_and_group_declaration",
+      "result": "Acquisition/relauch corroborated by group general manager; dates relative",
+      "watch": true
+    },
+    {
+      "id": "agrocompra-historical-closure",
+      "url": "https://es.linkedin.com/posts/agrocompra_estimada-comunidad-agrocompra-despu%C3%A9s-activity-7105520247993954305-kcgm",
+      "type": "historical_buyer_post",
+      "result": "Historical stop notice; not current status after relaunch; no current closure inferred",
+      "watch": false
+    },
+    {
+      "id": "cna-historical-product",
+      "url": "https://es.linkedin.com/posts/cnachile_unagrodistinto-smartblue-somoscna-activity-7353156570442002433-7CH7",
+      "type": "historical_group_post",
+      "result": "Professional identity links and product context; no demand for current project inferred",
+      "watch": false
+    },
+    {
+      "id": "cna-historical-technology",
+      "url": "https://cl.linkedin.com/posts/cnachile_nascent-nanotecnolog%C3%ADa-somoscnachile-activity-6904538665289424896-4IJe",
+      "type": "historical_group_post",
+      "result": "Historical comments/identity context only",
+      "watch": false
+    },
+    {
+      "id": "cna-historical-product2",
+      "url": "https://es.linkedin.com/posts/cnachile_smartblue-azul-unagrodistinto-activity-7262531603686469632-3GI7",
+      "type": "historical_group_post",
+      "result": "Professional roles/context; not current demand",
+      "watch": false
+    },
+    {
+      "id": "target-profile",
+      "url": "[PROFESSIONAL PROFILE URL REDACTED; private dossier]",
+      "type": "individual_professional_profile",
+      "result": "Web read failed, UI read succeeded; headline/About/current employer, invitation pending",
+      "watch": false
+    },
+    {
+      "id": "target-experience",
+      "url": "[PROFESSIONAL EXPERIENCE URL REDACTED; private dossier]",
+      "type": "individual_professional_experience",
+      "result": "UI read exact roles/month dates; current role Oct2026 confirmed",
+      "watch": false
+    },
+    {
+      "id": "target-contact-info",
+      "url": "[CONTACT INFO URL REDACTED]",
+      "type": "contact_overlay",
+      "result": "No individual professional email; personal information excluded and not retained",
+      "watch": false
+    },
+    {
+      "id": "technical-profile",
+      "url": "[PROFESSIONAL PROFILE URL REDACTED; private dossier]",
+      "type": "individual_professional_profile",
+      "result": "Web999 blocked; UI title read, public employer corroborated",
+      "watch": false
+    },
+    {
+      "id": "fne-acquisition-index",
+      "url": "https://www.fne.gob.cl/search/ultimas_actuaciones_resultados.php",
+      "type": "public_regulator_index",
+      "result": "Index initially read; subsequent read timed out400. Approval entry dated13Oct is corporate acquisition context only; not technology award",
+      "watch": false
+    },
+    {
+      "id": "fne-acquisition-resolution",
+      "url": "https://www.fne.gob.cl/resolucion-de-aprobacion-por-adquisicion-de-control-en-nutrien-ag-solutions-chile-s-a-por-parte-de-cna-chile-spa-y-fertiamerica-spa/",
+      "type": "public_regulator_document",
+      "result": "Search result only; direct read blocked; underlying resolution/PDF not read; no legal conclusion",
+      "watch": false
+    }
+  ],
+  "other_queries": [
+    {
+      "method": "Local ledger/repo/memory lookup",
+      "query": "Agrocompra / target name REDACTED / CNA / Fertiamérica",
+      "result": "No prior account evidence in checked local ledger/radar memory; no reconstructed approvals"
+    },
+    {
+      "method": "HubSpot get_user_details",
+      "result": "Julio identity and portal48713323, CONTACT/COMPANY available"
+    },
+    {
+      "method": "HubSpot COMPANY exact domain IN",
+      "query": "agrocompra.com, agrocompra.cl, fertiamerica.com, cnagro.cl",
+      "result": "0"
+    },
+    {
+      "method": "HubSpot CONTACT name query",
+      "query": "[TARGET NAME REDACTED]",
+      "pii_redacted": true,
+      "result": "0"
+    },
+    {
+      "method": "HubSpot COMPANY name queries",
+      "queries": [
+        "Agrocompra",
+        "Fertiamerica",
+        "CNA Chile"
+      ],
+      "result": "0 each"
+    },
+    {
+      "method": "HubSpot discover schema",
+      "query": "GET_OBJECT_TYPES COMPANY CONTACT",
+      "result": "read AVAILABLE, types confirmed before final absence caveat"
+    },
+    {
+      "method": "Outlook broad search",
+      "query": "agrocompra",
+      "result": "Unrelated ACP Agro results and pagination; no negative-complete account history inference"
+    },
+    {
+      "method": "Outlook exact-domain search",
+      "query": "\"agrocompra.com\"",
+      "result": "0; no more pages"
+    },
+    {
+      "method": "Apollo People API Search",
+      "query": "Exact target LinkedIn URL REDACTED",
+      "pii_redacted": true,
+      "result": "1 masked person, matching role/employer, has_email true; no address"
+    },
+    {
+      "method": "Apollo People API Search",
+      "query": "Domain cnagro.cl; TI/General/Marketing/Digital Business titles; similar titles; limit15",
+      "result": "4 masked people incl target/Marketing/General plus ambiguous additional person not used"
+    },
+    {
+      "method": "Apollo People API Search",
+      "query": "Exact technical lead LinkedIn URL REDACTED",
+      "pii_redacted": true,
+      "result": "1 masked person with TI title, employer CNA, has_email true; no address"
+    },
+    {
+      "method": "LinkedIn UI",
+      "query": "Author public activity, post menu Copy link, original post, chronological comments",
+      "result": "Signal recovered after search did not index it; 21 comments read; one author thank-you, no closure announcement observed"
+    },
+    {
+      "method": "LinkedIn UI",
+      "query": "Target profile, contact overlay, experience; technical lead profile",
+      "pii_redacted": true,
+      "result": "Current employment and start month confirmed; existing invite pending; personal contact data discarded"
+    },
+    {
+      "method": "Public site UI DOM",
+      "query": "Script src paths (query stripped), public catalog/login modal and agenda",
+      "result": "Next/Turbopack markers, Google/Meta scripts; no authenticated access, submit, booking or CRM inference"
+    }
+  ],
+  "procurement_control": {
+    "result": "hold",
+    "awardee": "not_verified",
+    "award_act_or_order": "not_found_in_read_surfaces; existence unverified",
+    "contract_status": "not_verified",
+    "signed_at": null,
+    "execution_start": null,
+    "execution_end": null,
+    "participation_route": "Buyer invites conversation in comments; proposal admission not verified",
+    "reception_calendar": "not_published",
+    "documents_read": [
+      "Original post and 21 comments",
+      "Platform terms sections1-9 (NOT technological-services contract)",
+      "Buyer technical prior-project post"
+    ],
+    "decisive_document": "not_available_in_read_surfaces",
+    "checked_at": "2026-10-19T14:46:18-03:00",
+    "rationale": "No primary calendar/current provider selection or contract supplied. Prior Mactec implementation distinct from new request."
+  },
+  "dates": {
+    "published_at": null,
+    "publication_precision": "3 days relative",
+    "first_seen_at": "2026-10-19",
+    "first_seen_precision": "day",
+    "last_checked_at": "2026-10-19T14:46:18-03:00",
+    "deadline_at": null,
+    "stage": "informal partner search, current procurement availability unverified",
+    "freshness_bucket": "fecha_no_confirmada",
+    "detection_lag_days": null
+  },
+  "approvals": {
+    "research": true,
+    "paid_enrichment": false,
+    "send": false,
+    "crm": false,
+    "fitflow_scope_transferred": false
+  },
+  "actions": {
+    "paid_credits": 0,
+    "emails": 0,
+    "comments": 0,
+    "invites": 0,
+    "crm_writes": 0,
+    "drafts": 1
+  },
+  "coverage": {
+    "discovery_searches": 18,
+    "apollo_free_person_searches": 3,
+    "comments_read": 21,
+    "cells": "Focal Chile × product/web/integrations only; daily20cells in0900 report"
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-19-agrocompra/evidence.json"
+}

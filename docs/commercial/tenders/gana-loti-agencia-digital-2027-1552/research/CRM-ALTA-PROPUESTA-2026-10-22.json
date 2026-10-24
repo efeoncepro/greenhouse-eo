@@ -1,0 +1,104 @@
+{
+  "prepared_at": "2026-10-22 17:10:00 UTC",
+  "status": "executed_administrative_exception_readback_verified",
+  "portal_id": 48713323,
+  "operator_instruction": "Crear Deal intento13 Agencia Digital2027; separar intento12 Programática. Autorización recibida22Oct2026. Gate factual previo18Oct impide ejecutar con contradicciones sin excepción concreta.",
+  "proposed_payload": {
+    "confirmationStatus": "CONFIRMED",
+    "createRequest": {
+      "objects": [
+        {
+          "objectType": "DEAL",
+          "associations": [
+            {
+              "targetObjectType": "COMPANY",
+              "targetObjectId": 34264439413,
+              "labels": [
+                "Primary"
+              ]
+            }
+          ],
+          "properties": {
+            "dealname": "Gana y Loti | CO | Agencia digital 2027 | GRD-1552",
+            "pipeline": "default",
+            "dealstage": "appointmentscheduled",
+            "hubspot_owner_id": "75788512",
+            "dealtype": "newbusiness",
+            "pipeline_bucket": "Strategic Bets",
+            "modalidad_de_venta": "Licitación",
+            "canal_de_adqusicion": "WherEX",
+            "linea_de_servicio": "efeonce_digital",
+            "servicios_especificos": "agencia_creativa;produccion_audiovisual;social_media_content;performance_paid_media;seo_aeo;email_marketing_automation;data_analytics;research_estrategia",
+            "id_de_licitacion": "GRD-1552",
+            "ficha_de_licitacion": "https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=information",
+            "gh_idempotency_key": "hubspot-private-tender:wherex:GRD-1552",
+            "description": "INVITACIÓN RECIBIDA / INVESTIGACIÓN INCOMPLETA - HOLD. Intento 13 con Grupo Réditos, según instrucción de Julio del 22/10/2026. Esta compra es Agencia Digital 2027 para GANA y LOTI, Wherex LIC-1552 / GRD-1552, compra 425489, oferta en borrador 7578948. NO es Programática GRD-1541 (intento 12, Deal 66065702426) y no acredita propuesta presentada.\n\nComprador: Grupo Réditos; invitación identifica Réditos Empresariales S.A.; ficha de facturación muestra REDIAPUESTAS S.A.S., NIT 901716185. Mantener Company de relación Grupo Reditos 34264439413; entidad contratante por confirmar, sin nueva Company inferida.\n\nVigencia prevista: enero 2027 a enero 2028, indicada como un año; sin fechas exactas de firma/inicio/fin ni contrato firmado verificado. Publicación visible 22/10/2026 13:55 sin zona; invitación recibida 22/10/2026 16:55:31Z. Plazo: correo 30/10/2026 14:00 Colombia COT (UTC-5); interfaz 30/10/2026 18:00 sin zona. Contradicción sin resolver: no persistir fecha de cierre de licitación ni closedate. Ronda de preguntas abierta hasta 30/10, sin hora publicada.\n\nAlcance: estrategia digital, social media/contenidos, pauta/SEO-SEM, diseño/audiovisual, Email y SMS, analítica/tracking, Social Listening y crisis, informes sector/tendencias. Comentarios de ficha añaden TV/radio regional y publicidad exterior. Tres perfiles 100% dedicados (Trafficker, Content Creator y Contactabilidad), dos días presenciales por semana en Medellín y tres remotos; Content Creator bajo administración directa del comprador. Capacidad, disponibilidad y economía no validadas.\n\nPresupuesto RFP Formato!H9: '$40.000.000 mensuales máximo'; alcance de medios, licencias, herramientas e impuestos pendiente; no es precio Efeonce ni importe total del Deal. No trasladar COP30M medios ni feeCOP4,5M de GRD-1541.\n\nEntregables: hasta 125 piezas/mes (75 GANA,50 LOTI), 60 emails y 60 copiesSMS/mes, gestión hasta7M SMS y2M emails/mes,24 parrillas/año, informes semanales/mensuales y12 SocialListening. Inconsistencias a aclarar: Formato C12 contempla8 conceptos/año frente a10+C2 campañas macro en C13/Requisitos técnicos; C13 dice30 posts/historias pero desglose20+15=35 cada uno.\n\nCuatro obligatorios: Cámara Comercio<=30d;2 certificados de contratos similares; económica modulable con inclusiones y cumplimiento de todos los entregables;RUT completo. RFP exige hoja Requisitos técnicos con cumplimiento,valores y página de PDF. Declaración conflicto de interés disponible sin diligenciar ni firmar; línea ética leída. Sin responsable individual identificado; no asociar contactos históricos como autoridad de esta compra.\n\nCONTROL ADJUDICACIÓN/CONTRATO: revisadas ficha primaria, preguntas/anuncios (0), los3 adjuntos generales íntegros y borrador de oferta. Proveedor seleccionado,acto de adjudicación,OC/OS,contrato,fecha de firma y ejecución real: no encontrados en material accesible, no prueba de inexistencia. No hay contrato contractual disponible que leer. HOLD por calendario contradictorio y entidad contratante pendiente; sin recomendación de postular, sin GO, sin envíos ni Deal compartido.\n\nFuentes: OneDrive Alineación/4. Comercial/Licitaciones/Grupo Reditos/13. Agencia Digital 2027/425489.zip (RFP Agencia Digital2027 WX-202610221154228770.xlsx,todas las hojas;DOCX conflicto;PDF líneaética). Ficha https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=information. Revisión 2026-10-22 17:10:00 UTC. Expediente docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/README.md.",
+            "hs_next_step": "HOLD administrativo: aclarar comprador contractual y hora de cierre (correo30/10 14:00COT vs UI18:00 sin zona); conciliar8/10 conceptos y30/35 piezas; Julio/Operaciones revisar3 perfiles100% dedicados y presencia Medellín antes de decidir GO. No hay envío autorizado."
+          }
+        }
+      ]
+    },
+    "updateRequest": null
+  },
+  "omitted": [
+    "amount",
+    "closedate",
+    "fecha_de_cierre_de_licitacion",
+    "presupuesto_de_la_licitacion",
+    "deal_currency_code"
+  ],
+  "dedupe": {
+    "tender_ids_total": 0,
+    "idempotency_key_total": 0,
+    "associated_deals_read": 7,
+    "existing_programmatic_deal": 66065702426
+  },
+  "procurement_control": {
+    "result": "HOLD",
+    "last_checked_at": "2026-10-22 17:10:00 UTC",
+    "primary_url": "https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=information",
+    "documents_read": [
+      "RFP Agencia Digital 2027 WX-202610221154228770.xlsx: Formato, Requisitos técnicos, Listas, Hoja3, todas las celdas no vacías",
+      "CONFLICTO DE INTERESES PROVEEDORES-202603251600454960.docx íntegro, no firmado",
+      "Linea Ética-202603111419050460.pdf 1p íntegra"
+    ],
+    "supplier_selected": "no encontrado, no prueba de inexistencia",
+    "award_act_or_order": "no encontrado, no prueba de inexistencia",
+    "contract": "no encontrado en los3adjuntos accesibles; no verificado en expediente externo",
+    "signature_at": "no verificado",
+    "execution_start_at": "previsto enero2027, no inicio real acreditado",
+    "execution_end_at": "previsto enero2028, sin día ni contrato formalizado",
+    "published_at": {
+      "raw": "22/10/2026 13:55",
+      "timezone": null
+    },
+    "first_seen_at": "2026-10-22T16:55:31Z",
+    "deadline_at": null,
+    "deadline_sources": [
+      {
+        "source": "invitación Wherex",
+        "raw": "30/10/2026 14:00 COT Colombia",
+        "normalized": "2026-10-30T14:00:00-05:00"
+      },
+      {
+        "source": "ficha Wherex",
+        "raw": "30/10/2026 18:00",
+        "timezone": null
+      }
+    ],
+    "stage": "Oferta Editando, ronda de preguntas abierta30Oct; oferta no enviada",
+    "reason": "Fuentes primarias discrepan en hora de cierre y razón social; no se considera resuelto por aprobación general de alta."
+  },
+  "native_automation_review": {
+    "workflow_listing": "403 missing scope; no se amplió acceso",
+    "existing_company_primary": "Company34264439413, Primary typeId5 verificado por CLI en Deal66065702426",
+    "write_attempted": true
+  },
+  "operator_confirmation": {
+    "instruction": "Crea el deal",
+    "date": "2026-10-22",
+    "scope": "Único Deal propuesto con HOLD explícito y Company Primary existente",
+    "receipt": "CRM-ALTA-VERIFICADA-2026-10-22.json"
+  },
+  "deal_id": 66560488750
+}

@@ -1,0 +1,72 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-next-steps",
+  "voice": {
+    "eyebrow": "Próximos pasos",
+    "question": "¿Y ahora qué sigue?",
+    "answer": [
+      "Hablemos"
+    ]
+  },
+  "body": "Adjuntamos la cotización formal: inversión y condiciones.",
+  "agenda": {
+    "kicker": "01 · Revisión · 30 min",
+    "title": "Revisemos la propuesta",
+    "descriptor": "30 min por videollamada · alcance, tiempos de respuesta y dudas",
+    "days": [
+      {
+        "weekday": "Mié",
+        "day": "21"
+      },
+      {
+        "weekday": "Jue",
+        "day": "22"
+      },
+      {
+        "weekday": "Vie",
+        "day": "23"
+      },
+      {
+        "weekday": "Lun",
+        "day": "26"
+      },
+      {
+        "weekday": "Mar",
+        "day": "27"
+      }
+    ],
+    "times": [
+      "09:30",
+      "11:30",
+      "15:00",
+      "17:00"
+    ],
+    "chosen": {
+      "day": 2,
+      "time": 2
+    },
+    "summary": "Jueves 22 · 11:30 · hora de Chile",
+    "cta": "Agenda la revisión"
+  },
+  "nextSteps": [
+    {
+      "number": "02",
+      "label": "Acuerdos",
+      "title": "Alcance",
+      "desc": "Tiempos de respuesta, inicio y accesos Partner."
+    },
+    {
+      "number": "03",
+      "label": "On-Going",
+      "title": "Primer ciclo",
+      "desc": "El canal al día desde el primer mes."
+    }
+  ]
+}

@@ -1,0 +1,245 @@
+{
+  "schemaVersion": "pricing-v3-quote-increment/1",
+  "binding": false,
+  "audience": "internal",
+  "base": {
+    "calculationId": "composition-32cfb4da7a70c3cb340231d1",
+    "replayDigest": "32cfb4da7a70c3cb340231d1f9d213d7403d8b53f3906c70564af4b154106948"
+  },
+  "withAddOn": {
+    "calculationId": "composition-8d3d0564889f5d6fe5573f8b",
+    "replayDigest": "8d3d0564889f5d6fe5573f8bd31693b9c38c692e20ac481fb6ccd96467ff493d"
+  },
+  "commercialUnit": "managed_service",
+  "currency": "COP",
+  "statement": "Internal reading: it holds cost and margin and is never shown to a client. The price, cost and margin of an add-on, read as the difference between two frozen quotes: the base, and the base with the add-on in it. Each figure is a frozen amount of one quote minus the same frozen amount of the other; nothing is recalculated. It is not a new price and it approves nothing.",
+  "basis": [
+    "increment = withAddOn - base, for net, cost and marginAmount, in each compared period and over them. The quote with the add-on holds each person as one line with the summed dedication, so a cost charged once per line (the platform fee, a part of the base tools) is in it once and is not part of the increment.",
+    "same_periods: the quote with the add-on has the periods of the base and each is compared with its own. totals is the difference between the totals of the two quotes.",
+    "comparable: both calculated; same currency, offer, commercial unit, account, tax treatment, form and code of engagement, market, quote date, mode and contingency declaration; same catalog, resource policy and credit catalog, by version and by content; the base contained in the quote with the add-on (its lines with their identity and at least their people and dedication, its third-party costs, its tools on their lines); a net that grows in every compared period.",
+    "costByComponentKind: frozen cost of the components by the kind the kernel gave each, at the output FX of each, rounded one by one for reading. An entry may miss by a unit; cost is the figure that adds up.",
+    "changed.tools: frozen cost of the components of each composed tool, read the same way, in the periods in which it moved."
+  ],
+  "versions": {
+    "catalog": "operating-review-2026-10-22-v13",
+    "policy": "operating-review-2026-10-22-v12",
+    "credits": "operator-screenshots-2026-10-09-v1"
+  },
+  "comparison": {
+    "mode": "same_periods",
+    "basePeriods": 1,
+    "withAddOnPeriods": 1,
+    "comparedPeriods": 1
+  },
+  "periods": [
+    {
+      "periodId": 1,
+      "basePeriodIds": [
+        1
+      ],
+      "base": {
+        "net": "21500000",
+        "cost": "12699026",
+        "marginAmount": "8800974",
+        "marginRateRoundedDown": "0.409347"
+      },
+      "withAddOn": {
+        "net": "25850000",
+        "cost": "15303000",
+        "marginAmount": "10547000",
+        "marginRateRoundedDown": "0.408007"
+      },
+      "increment": {
+        "net": "4350000",
+        "cost": "2603974",
+        "marginAmount": "1746026",
+        "marginRateRoundedDown": "0.401385"
+      }
+    }
+  ],
+  "totals": {
+    "comparedPeriods": 1,
+    "base": {
+      "net": "21500000",
+      "cost": "12699026",
+      "marginAmount": "8800974",
+      "marginRateRoundedDown": "0.409347"
+    },
+    "withAddOn": {
+      "net": "25850000",
+      "cost": "15303000",
+      "marginAmount": "10547000",
+      "marginRateRoundedDown": "0.408007"
+    },
+    "increment": {
+      "net": "4350000",
+      "cost": "2603974",
+      "marginAmount": "1746026",
+      "marginRateRoundedDown": "0.401385"
+    },
+    "costByComponentKind": [
+      {
+        "kind": "human",
+        "base": "9316900",
+        "withAddOn": "11843180",
+        "increment": "2526280"
+      },
+      {
+        "kind": "platform_fee",
+        "base": "1073100",
+        "withAddOn": "1073100",
+        "increment": "0"
+      },
+      {
+        "kind": "tool",
+        "base": "2309028",
+        "withAddOn": "2386719",
+        "increment": "77690"
+      }
+    ]
+  },
+  "netIncrementPerPeriod": "4350000",
+  "changed": {
+    "lines": [
+      {
+        "lineId": "design",
+        "profile": "ECG-003",
+        "change": "dedication_grew",
+        "periods": [
+          {
+            "periodIds": [
+              1
+            ],
+            "base": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.75"
+              }
+            },
+            "withAddOn": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.9"
+              }
+            },
+            "capacityIncrement": "0.15"
+          }
+        ]
+      },
+      {
+        "lineId": "creative",
+        "profile": "ECG-001",
+        "change": "dedication_grew",
+        "periods": [
+          {
+            "periodIds": [
+              1
+            ],
+            "base": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.2"
+              }
+            },
+            "withAddOn": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.4"
+              }
+            },
+            "capacityIncrement": "0.2"
+          }
+        ]
+      },
+      {
+        "lineId": "strategy",
+        "profile": "ECG-035",
+        "change": "dedication_grew",
+        "periods": [
+          {
+            "periodIds": [
+              1
+            ],
+            "base": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.2"
+              }
+            },
+            "withAddOn": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.35"
+              }
+            },
+            "capacityIncrement": "0.15"
+          }
+        ]
+      },
+      {
+        "lineId": "account",
+        "profile": "ECG-016",
+        "change": "dedication_grew",
+        "periods": [
+          {
+            "periodIds": [
+              1
+            ],
+            "base": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.15"
+              }
+            },
+            "withAddOn": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.2"
+              }
+            },
+            "capacityIncrement": "0.05"
+          }
+        ]
+      }
+    ],
+    "tools": [
+      {
+        "toolId": "notion",
+        "label": "Notion",
+        "periods": [
+          {
+            "periodIds": [
+              1
+            ],
+            "base": "188340",
+            "withAddOn": "236520",
+            "increment": "48180"
+          }
+        ]
+      },
+      {
+        "toolId": "microsoft-365",
+        "label": "Microsoft 365 Business Standard",
+        "periods": [
+          {
+            "periodIds": [
+              1
+            ],
+            "base": "115358",
+            "withAddOn": "144869",
+            "increment": "29510"
+          }
+        ]
+      }
+    ],
+    "thirdPartyCosts": []
+  }
+}

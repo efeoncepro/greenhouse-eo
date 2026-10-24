@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Nosotros · Efeonce</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,800;0,900;1,800;1,900&amp;display=swap">
+<style>
+body{margin:0;background:#001a33;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+a{transition:transform 200ms cubic-bezier(.2,0,0,1),background-color 200ms cubic-bezier(.4,0,.2,1),border-color 200ms cubic-bezier(.4,0,.2,1)}
+a[style*="border-radius: 999px"]:hover{transform:translateY(-2px)}
+a[style*="border-radius: 999px"]:focus-visible{outline:2px solid #36c8bf;outline-offset:3px}
+::selection{background:#36c8bf;color:#001a33}
+a{color:#ffffff}a:hover{color:#cfe4fa}
+.wrap{width:100%;max-width:1320px;margin:0 auto;padding:0 56px;box-sizing:border-box}
+.lbl{display:inline-flex;align-items:center;gap:8px;width:fit-content;margin:0;padding:7px 14px 6px;border:1px solid color-mix(in srgb,currentColor 45%,transparent);border-radius:999px;background:transparent;font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;line-height:1.2;text-transform:uppercase;color:#cfe4fa}
+.dot{display:inline-block;width:.2em;height:.2em;border-radius:50%;background:#36c8bf;margin-left:.04em}
+.ringq{display:inline-block;width:.62em;height:.62em;border-radius:50%;border:.1em solid #36c8bf;box-sizing:border-box;margin-right:.42em;vertical-align:-.04em}
+
+/* — Llegada del hero (ease-emphasized, golpe al final) — */
+@keyframes push{from{transform:scale(1.14)}to{transform:scale(1)}}
+@keyframes rise{from{transform:translateY(105%)}to{transform:none}}
+@keyframes fade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes sphere{0%{opacity:0;transform:scale(0)}70%{opacity:1;transform:scale(1.18)}100%{opacity:1;transform:none}}
+@keyframes cue{0%{transform:translateY(0);opacity:0}30%{opacity:1}100%{transform:translateY(22px);opacity:0}}
+.hero{position:relative;min-height:clamp(680px,56vw,860px);display:flex;align-items:flex-end;overflow:hidden;background:#000}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% center;animation:push 2600ms cubic-bezier(.2,0,0,1) both}
+.mask{display:block;overflow:hidden;padding-bottom:.06em}
+.mask > span{display:inline-block;animation:rise 1000ms cubic-bezier(.2,0,0,1) both}
+.m1 > span{animation-delay:350ms}.m2 > span{animation-delay:520ms}.m3 > span{animation-delay:690ms}
+.hero .dot{animation:sphere 300ms cubic-bezier(.2,0,0,1) 1600ms both}
+.f1{animation:fade 600ms cubic-bezier(.2,0,0,1) 1300ms both}.f2{animation:fade 600ms cubic-bezier(.2,0,0,1) 1500ms both}.f3{animation:fade 600ms cubic-bezier(.2,0,0,1) 1800ms both}
+.cue{animation:cue 1800ms cubic-bezier(.4,0,.2,1) 2400ms infinite both}
+
+/* — Scroll: reveal, palabras, parallax y la órbita que recorre — */
+@supports (animation-timeline: view()){
+@keyframes rv{from{opacity:0;transform:translateY(56px)}to{opacity:1;transform:none}}
+@keyframes rvx{from{opacity:.12;transform:translateX(-6%)}to{opacity:1;transform:none}}
+@keyframes par{from{transform:translateY(-7%) scale(1.16)}to{transform:translateY(7%) scale(1.16)}}
+@keyframes slide{from{transform:translateX(8%)}to{transform:translateX(-38%)}}
+@keyframes travel{from{transform:rotate(-316.8deg)}to{transform:none}}
+@keyframes draw{from{stroke-dashoffset:1105.84}to{stroke-dashoffset:0}}
+@keyframes dim{from{opacity:.14}to{opacity:1}}
+.rv{animation:rv linear forwards;animation-timeline:view();animation-range:entry 0% entry 100%}
+.rvx{animation:rvx linear forwards;animation-timeline:view();animation-range:entry 0% entry 100%}
+.par{animation:par linear forwards;animation-timeline:view();animation-range:cover 0% cover 100%}
+.slide{animation:slide linear forwards;animation-timeline:view();animation-range:cover 0% cover 100%}
+.travel{transform-origin:720px 720px;animation:travel linear forwards;animation-timeline:--meas;animation-range:entry 0% entry 100%}
+.draw{animation:draw linear forwards;animation-timeline:--meas;animation-range:entry 0% entry 100%}
+.meas{view-timeline:--meas}
+@keyframes o-ring{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+@keyframes o-arc{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes o-sph{0%{opacity:0;transform:scale(0)}70%{opacity:1;transform:scale(1.18)}100%{opacity:1;transform:none}}
+@keyframes o-halo{from{opacity:0}to{opacity:1}}
+.orb [data-axis-part="ring"]{transform-box:fill-box;transform-origin:center;animation:o-ring linear forwards;animation-timeline:--orb;animation-range:entry 0% entry 40%}
+.orb [data-axis-part="arc"]{stroke-dasharray:1 1;animation:o-arc linear forwards;animation-timeline:--orb;animation-range:entry 30% entry 80%}
+.orb [data-axis-part="sphere"]{transform-box:fill-box;transform-origin:center;animation:o-sph linear forwards;animation-timeline:--orb;animation-range:entry 80% entry 95%}
+.orb [data-axis-part="halo"]{animation:o-halo linear forwards;animation-timeline:--orb;animation-range:entry 60% entry 100%}
+.orb{view-timeline:--orb}
+@keyframes fillin{from{background-position:100% 0}to{background-position:0 0}}
+.fill{animation:fillin linear forwards;animation-timeline:view();animation-range:entry 0% entry 100%}
+@keyframes clipr{from{clip-path:inset(9% 7% 9% 7% round 28px)}to{clip-path:inset(0 0 0 0 round 0)}}
+.clipr{animation:clipr linear forwards;animation-timeline:view();animation-range:entry 0% entry 100%}
+@keyframes hair{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hair{transform-origin:left center;animation:hair linear forwards;animation-timeline:view();animation-range:entry 0% entry 100%}
+.word{animation:dim linear forwards;animation-timeline:view();animation-range:entry 0% entry 100%}
+}
+@media (prefers-reduced-motion: reduce){
+*,*::before,*::after{animation:none !important;transition:none !important}
+}
+
+.outline{font-weight:250 !important;color:rgba(207,228,250,.5)}
+.outline-a{font-weight:200 !important;color:#36c8bf}
+@keyframes mq{to{transform:translateX(-50%)}}
+.mq-track{display:flex;width:max-content;animation:mq 60s linear infinite}
+.fill{background-image:linear-gradient(90deg,#ffffff 50%,rgba(207,228,250,.16) 50%);background-size:200% 100%;background-position:0 0;-webkit-background-clip:text;background-clip:text;color:transparent}
+.bigrow{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:24px 64px;align-items:center;padding:40px 0;border-top:1px solid rgba(207,228,250,.18)}
+.belief{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px 48px;align-items:baseline;padding:48px 0;border-top:1px solid rgba(207,228,250,.18)}
+.partners-grid > div:nth-child(-n+4){border-top:none}
+.chapters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
+.split{display:flex;flex-wrap:wrap;gap:64px}
+.split > .grow{flex:999 1 520px;min-width:0}
+.split > .side{flex:1 1 380px;min-width:0}
+.beliefs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:72px}
+.pillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px}
+.brain{display:flex;flex-wrap:wrap;background:#001a33}
+.brain > .photo{flex:1 1 600px;min-height:760px;position:relative;overflow:hidden}
+.brain > .copy{flex:1 1 560px;min-width:0;position:relative;z-index:1;background:#f7f8f6;margin-left:calc(-1 * min(260px,16vw));border-top-left-radius:min(260px,16vw)}
+.founder{display:flex;flex-wrap:wrap;align-items:stretch;background:#000d1a}
+.founder > .photo{flex:1 1 600px;min-height:640px;position:relative;overflow:hidden}
+.founder > .copy{flex:1 1 600px;min-width:0;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;background:#000d1a;margin-right:calc(-1 * min(260px,16vw));border-top-right-radius:min(260px,16vw)}
+.mk-label{position:absolute;transform:translateY(-50%);padding:10px 16px;border-radius:12px;background:rgba(0,26,51,.72);border:1px solid rgba(54,200,191,.7);backdrop-filter:blur(6px);white-space:nowrap}
+.sticky-h{position:sticky;top:96px}
+@media (max-width:900px){
+.beliefs,.pillars,.stats{grid-template-columns:repeat(1,minmax(0,1fr))}
+.bigrow,.belief,.chapters{grid-template-columns:repeat(1,minmax(0,1fr))}
+.chapters > div{border-left:none !important}
+
+.pillars > div{border-left:none !important;border-top:1px solid rgba(207,228,250,.18);padding:40px 0 !important}
+.sticky-h{position:static}
+}
+@media (max-width:760px){
+.wrap{padding:0 16px}
+.hero{display:block;min-height:0}
+.hero-img{position:relative;height:72vw;object-position:72% center}
+.hero-copy{padding:32px 16px 72px !important}
+.brain > .photo{min-height:320px}
+.brain > .copy{margin-left:0;margin-top:-96px;border-top-left-radius:96px}
+.founder > .copy{order:2;margin-right:0;margin-top:-96px;border-top-right-radius:96px}
+.founder > .photo{order:1}
+.founder > .photo{min-height:440px}
+.mk-label{padding:4px 8px;border-radius:8px}
+.mk-label span{font-size:11px !important}
+.partners-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+.team-strip{margin-left:16px !important;width:calc(100% - 32px) !important;grid-template-columns:repeat(2,minmax(0,1fr)) !important;row-gap:22px;text-align:left !important}
+.team-cell{align-items:flex-start !important}
+.team-tick{display:none}
+.tq-grid{grid-template-columns:1fr !important}
+.tq{padding:28px 24px 24px !important}
+.mk-label{display:none !important}
+[data-capture="about-mercados"] > div{aspect-ratio:auto !important;min-height:0 !important;display:flex;flex-direction:column}
+[data-capture="about-mercados"] img{position:relative !important;inset:auto !important;height:auto !important;aspect-ratio:1/1;object-position:76% center !important;animation:none !important}
+.pgrid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+.pcell,.pcell + .pcell{padding:32px 16px 16px 0 !important;border-left:none !important}
+.pcell:nth-child(even){padding-left:16px !important;border-left:1px solid rgba(0,26,51,0.12) !important}
+.pcell:nth-child(n+3){border-top:1px solid rgba(0,26,51,0.12)}
+.pv{width:140px !important;height:140px !important}
+.pnum{font-size:44px !important}
+.pnum-in{font-size:36px !important}
+.hstats li{padding-right:20px !important;margin-right:20px !important}
+.hstats li:nth-child(2){border-right:none !important;margin-right:0 !important}
+.hstats li:nth-child(n+3){margin-top:4px}
+.hstats{display:grid !important;grid-template-columns:1fr 1fr}
+.hstats li{border-right:none !important;margin-right:0 !important}
+
+.team-media{aspect-ratio:auto !important;min-height:0 !important;display:flex;flex-direction:column}
+.team-head{position:relative !important;order:-1;padding:56px 16px 20px !important}
+.team-img{position:relative !important;inset:auto !important;height:auto !important;aspect-ratio:16/10}
+.team-copy{text-align:left !important;margin:0 !important}
+.team-copy-wrap{padding:32px 16px 48px !important}
+.mk-copy{position:relative !important;width:100% !important;padding:32px 16px !important;background:#000308}
+.nav-links{display:none !important}
+.cue{display:none}
+}
+.team-strip{list-style:none;margin:0 0 0 11.75%;padding:22px 0 0;width:76.5%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));text-align:center;position:relative}
+.team-strip::before{content:"";position:absolute;left:-8%;right:-8%;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(114,222,216,0.16) 12%,rgba(114,222,216,0.16) 88%,transparent)}
+.team-cell{display:flex;flex-direction:column;align-items:center;gap:4px;position:relative}
+.team-tick{position:absolute;top:-23px;width:7px;height:7px;border-radius:50%;background:#36c8bf;box-shadow:0 0 0 4px rgba(54,200,191,0.14)}
+.team-n{font-size:15px;font-weight:600;color:#fff;letter-spacing:-0.005em}
+.team-r{font-size:13px;font-weight:300;color:rgba(207,228,250,0.75)}
+.tq-block{margin-top:112px;padding-top:56px;border-top:1px solid rgba(207,228,250,0.12)}
+.tq-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:48px}
+.tq{position:relative;margin:0;padding:40px 40px 36px;border-radius:24px 24px 24px 4px;background:rgba(207,228,250,0.04);border:1px solid rgba(207,228,250,0.12)}
+.tq-mark{display:block;height:40px;margin-bottom:12px;font-family:'Bricolage Grotesque',sans-serif;font-weight:760;font-size:88px;line-height:.9;color:#36c8bf}
+.tq blockquote{margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:300;font-size:clamp(20px,1.9vw,26px);line-height:1.35;letter-spacing:-0.01em;color:#fff}
+.tq figcaption{margin-top:28px;font-size:14px;color:rgba(207,228,250,0.75);display:flex;flex-direction:column;gap:2px}
+.tq figcaption b{font-size:16px;font-weight:600;color:#fff}
+.pgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid rgba(0,26,51,0.12)}
+.pcell{padding:40px 32px 8px 0;display:flex;flex-direction:column}
+.pcell + .pcell{padding-left:32px;border-left:1px solid rgba(0,26,51,0.12)}
+.pv{position:relative;width:200px;height:200px;max-width:100%;display:flex;align-items:center;justify-content:flex-start}
+.pring{position:absolute;inset:0;width:100%;height:100%}
+.pnum{margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:clamp(52px,4.6vw,72px);line-height:.9;letter-spacing:-0.045em;color:#001a33;white-space:nowrap}
+.pnum span{font-size:.55em;letter-spacing:-0.02em;margin-left:.04em}
+.pnum-in{position:relative;width:100%;text-align:center;font-size:clamp(44px,3.6vw,56px)}
+.pk{margin:28px 0 8px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#001a33}
+.pd{margin:0;font-size:16px;line-height:1.5;font-weight:400;color:rgba(0,26,51,0.7)}
+.paper .lbl{color:#001a33}
+.hstats{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:16px 0}
+.hstats li{display:flex;flex-direction:column;gap:4px;padding:0 40px 0 0;margin-right:40px;border-right:1px solid rgba(207,228,250,0.22)}
+.hstats li:last-child{border-right:none;margin-right:0}
+.hstats b{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:clamp(26px,2.4vw,36px);line-height:1;letter-spacing:-0.03em;color:#fff}
+.hstats span{font-size:13px;color:#cfe4fa}
+.sign{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:88px;padding-top:40px;border-top:1px solid rgba(207,228,250,0.12);width:min(420px,100%)}
+.slogan{margin:0;font-family:'Poppins',sans-serif;font-size:17px;letter-spacing:.01em;color:rgba(207,228,250,0.7)}
+.slogan em{font-style:italic;font-weight:800}.slogan b{font-weight:800}.slogan strong em{font-weight:900}
+.mk-label{display:grid;grid-template-columns:auto auto;column-gap:12px;align-items:center}
+.mk-label > span{grid-column:2}
+.mk-sph{grid-column:1;grid-row:1 / 3;width:8px;height:8px;border-radius:50%;background:#36c8bf;box-shadow:0 0 0 4px rgba(54,200,191,0.18)}
+@supports (animation-timeline: view()){
+@keyframes parc{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes psph{0%{opacity:0;transform:scale(0)}70%{opacity:1;transform:scale(1.18)}100%{opacity:1;transform:none}}
+.parc{stroke-dasharray:1 1;animation:parc linear forwards;animation-timeline:view();animation-range:entry 20% entry 90%}
+.psph{transform-box:fill-box;transform-origin:center;animation:psph linear forwards;animation-timeline:view();animation-range:entry 85% entry 100%}
+}
+</style>
+</helmet>
+
+<svg aria-hidden="true" focusable="false" style="position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; opacity: 0.07; mix-blend-mode: overlay;"><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"></feTurbulence></filter><rect width="100%" height="100%" filter="url(#grain)"></rect></svg>
+
+
+<section class="hero" data-capture="about-hero" aria-labelledby="hero-title">
+<img class="hero-img" src="/_blob/be36c6f02fa880ff7e88a71e7a6467f8" alt="Recepción de Efeonce en larga exposición: el muro con el logo y el mesón permanecen nítidos mientras las personas pasan como estelas de luz.">
+<div class="hero-copy" style="position: relative; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(152px, 12vw, 184px) 56px 104px; box-sizing: border-box;">
+<p class="lbl f1" style="margin-bottom: 32px; color: #ffffff;">Nosotros</p>
+<h1 id="hero-title" style="margin: 0; max-width: max(46vw, 320px);">
+<span class="mask m1" style="font-family: 'Poppins', sans-serif; font-weight: 300; font-size: clamp(26px, 3vw, 44px); line-height: 1.15; letter-spacing: -0.01em; color: #cfe4fa;"><span>No te entregamos crecimiento.</span></span>
+<span class="mask m2" style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: clamp(56px, 6.4vw, 112px); line-height: 0.92; letter-spacing: -0.045em; color: #ffffff;"><span>Lo construimos</span></span>
+<span class="mask m3" style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: clamp(56px, 6.4vw, 112px); line-height: 0.94; letter-spacing: -0.045em; color: #ffffff;"><span>contigo<span class="dot" aria-hidden="true"></span></span></span>
+</h1>
+<div class="f2" style="display: flex; flex-direction: column; align-items: flex-start; gap: 32px; margin-top: 36px; max-width: max(46vw, 320px);">
+<p style="margin: 0; max-width: 480px; font-size: 19px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">Y te dejamos más capaz de sostenerlo. Con acceso a tu operación en vivo, no con un PDF el viernes.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px;">
+<a href="https://efeoncepro.com/agenda/" aria-label="Agenda una reunión con Efeonce" style="display: inline-flex; align-items: center; min-height: 54px; padding: 0 30px; border-radius: 999px; background: #ffffff; color: #001a33; font-weight: 600; font-size: 16px; text-decoration: none;">Agenda una reunión<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 10px;"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+<a href="#por-que" style="display: inline-flex; align-items: center; min-height: 54px; padding: 0 30px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.5); color: #ffffff; font-weight: 500; font-size: 16px; text-decoration: none;">Nuestro porqué</a>
+</div>
+</div>
+<div class="f3" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 40px; margin-top: 72px; padding-top: 24px; border-top: 1px solid rgba(207,228,250,0.22); font-size: 14px; color: #cfe4fa;">
+<ul class="hstats"><li><b>+10</b><span>años en Latinoamérica</span></li><li><b>5</b><span>países en operación</span></li><li><b>+120</b><span>empresas atendidas</span></li><li><b><img class="hs-logo" src="/_blob/12b1193529375b76236ffb25c64bdbc7" alt="HubSpot" style="display: block; height: 1em; width: auto; filter: brightness(0) invert(1);"></b><span>Solutions Partner</span></li></ul>
+<span aria-hidden="true" style="position: relative; width: 22px; height: 36px; border-radius: 12px; border: 1px solid rgba(207,228,250,0.5); display: inline-block;"><span class="cue" style="position: absolute; left: 9px; top: 7px; width: 3px; height: 7px; border-radius: 2px; background: #ffffff;"></span></span>
+</div>
+</div>
+</section>
+
+<section data-capture="about-quees" aria-labelledby="quees-title" style="padding: 120px 0 104px; background: #001a33;">
+<div class="wrap">
+<p class="rv" style="margin: 0; font-size: clamp(18px, 1.6vw, 22px); font-weight: 300; color: #cfe4fa;"><span class="ringq" aria-hidden="true"></span>¿Qué es Efeonce?</p>
+<h2 id="quees-title" class="rv" style="margin: 16px 0 0; max-width: 1000px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(40px, 4.6vw, 68px); line-height: 1.02; letter-spacing: -0.035em; color: #ffffff;">Tu equipo de crecimiento integrado<span class="dot" aria-hidden="true"></span></h2>
+<p class="rv" style="margin: 24px 0 0; max-width: 720px; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.5; font-weight: 300; color: rgba(207,228,250,0.8);">Estrategia, creatividad, medios, datos y tecnología, potenciados con IA y operando como uno solo.</p>
+</div>
+</section>
+
+<section data-capture="about-marcas" aria-label="Marcas que crecen con Efeonce" style="padding: 56px 0 64px; border-bottom: 1px solid rgba(207,228,250,0.12); overflow: hidden; background: #001a33;">
+<div class="wrap"><p class="lbl" style="margin-bottom: 28px;">Marcas que crecen con nosotros</p></div>
+<div style="overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);">
+<div class="mq-track" style="align-items: center;"><div style="display: flex; align-items: center;"><span style="display: inline-flex; align-items: center; height: 96px; padding: 0 56px;"><img src="/_blob/06bfe362d4e0c9c5bb4053ca1381d5dd" alt="Sky Airline" style="height: 48px; width: auto; display: block; filter: brightness(0) invert(1); opacity: 0.88;"></span><span style="display: inline-flex; align-items: center; height: 96px; padding: 0 56px;"><img src="/_blob/7fef274a1c07e600d40aa6f7d46ba7b1" alt="ANAM" style="height: 44px; width: auto; display: block; filter: brightness(0) invert(1); opacity: 0.88;"></span><span style="display: inline-flex; align-items: center; height: 96px; padding: 0 56px;"><img src="/_blob/1f9ca4a770ba0fa71eee517ddf000aa5" alt="Gobierno de Santiago" style="height: 50px; width: auto; display: block; filter: brightness(0) invert(1); opacity: 0.88;"></span><span style="display: inline-flex; align-items: center; height: 96px; padding: 0 56px;"><img src="/_blob/2c75abd939d5f93ecc6fb63872822c81" alt="Berel" style="height: 80px; width: auto; display: block; filter: brightness(0) invert(1); opacity: 0.88;"></span><span style="display: inline-flex; align-items: center; height: 96px; padding: 0 56px;"><img src="/_blob/1b31cb01ea8f208655cd5d735e038142" alt="Carozzi" style="height: 40px; width: auto; display: block; filter: brightness(0) invert(1); opacity: 0.88;"></span><span style="display: inline-flex; align-items: center; height: 96px; padding: 0 56px;"><img src="/_blob/988caef7e552f3c346924c4cb2ce94ed" alt="Bresler" style="height: 46px; width: auto; display: block; filter: brightness(0) invert(1); opacity: 0.88;"></span><span style="display: inline-flex; align-items: center; height: 96px; padding: 0 56px;"><img src="/_blob/3ee33377de40bbb670f46f13c8d734dd" alt="Marca Chile" style="height: 72px; width: auto; display: block; filter: brightness(0) invert(1); opacity: 0.88;"></span></div></div>
+</div>
+</section>
+
+
+
+
+
+<section id="por-que" data-capture="about-why" aria-labelledby="why-title" style="position: relative; padding: 140px 0 140px; background: #000d1a; overflow: hidden;">
+<div class="wrap" style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+<p class="lbl rv" style="color: #ffffff;"><span style="color: #36c8bf; font-variant-numeric: tabular-nums;">01</span>Nuestro porqué</p>
+<p class="rv" style="margin: 32px 0 0; font-size: clamp(20px, 2vw, 28px); font-weight: 300; color: #cfe4fa;">Lo que buscamos en cada cliente:</p>
+<h2 id="why-title" class="rv" style="margin: 12px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -0.03em; color: #ffffff;">Más capaz, <span style="font-weight: 250; color: rgba(207,228,250,0.6);">no más dependiente.</span></h2>
+</div>
+<div class="orb" style="position: relative; width: min(760px, 94vw); margin: 64px auto 0;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="380 380 680 680" role="img" aria-label="Órbita de Efeonce alrededor de la palabra contigo" style="display: block; width: 100%; height: auto; overflow: visible;"><defs><radialGradient id="why-halo" gradientUnits="userSpaceOnUse" cx="720" cy="720" r="558"><stop offset="0" stop-color="#36c8bf" stop-opacity="0.13"></stop><stop offset="0.6" stop-color="#36c8bf" stop-opacity="0.03"></stop><stop offset="1" stop-color="#36c8bf" stop-opacity="0"></stop></radialGradient></defs><rect data-axis-part="halo" x="0" y="0" width="1440" height="1440" fill="url(#why-halo)"></rect><circle data-axis-part="ring" cx="720" cy="720" r="300" fill="none" stroke="#72ded8" stroke-opacity="0.16" stroke-width="1.81"></circle><path data-axis-part="arc" pathLength="1" d="M 438.09 617.39 A 300 300 0 0 1 617.39 438.09" fill="none" stroke="#36c8bf" stroke-width="2.9" stroke-linecap="round"></path><circle data-axis-part="sphere" cx="617.39" cy="438.09" r="6.35" fill="#36c8bf"></circle></svg>
+<div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 22%;">
+<p class="rv" style="margin: 0; font-size: clamp(16px, 1.8vw, 24px); font-weight: 300; color: #cfe4fa;">El crecimiento se construye</p>
+<p class="rv" style="margin: 6px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: clamp(56px, 9.4vw, 132px); line-height: 0.9; letter-spacing: -0.05em; color: #ffffff;">contigo</p>
+</div>
+</div>
+<div class="wrap" style="margin-top: 88px;">
+<p class="rv" style="margin: 0 auto 56px; max-width: 760px; text-align: center; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.55; font-weight: 300; color: #cfe4fa;">El crecimiento no nace de los números ni de los entregables. Nace de cómo trabajamos juntos, y se sostiene en tres pilares.</p>
+<div class="pillars">
+<div class="rv" style="padding: 0 48px 0 0;">
+<p aria-hidden="true" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 200; font-size: 64px; line-height: 0.8; letter-spacing: -0.04em; color: #36c8bf;">1</p>
+<h3 style="margin: 24px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(26px, 2.4vw, 34px); line-height: 1.05; letter-spacing: -0.025em; color: #ffffff;">Co-creación</h3>
+<p style="margin: 16px 0 0; font-size: 18px; line-height: 1.5; font-weight: 300; color: #cfe4fa;">No recibes entregables. Operas con nosotros, en vivo.</p>
+<p style="margin: 32px 0 0; font-size: 15px; line-height: 1.55; color: #cfe4fa;"><span class="lbl" style="margin-right: 10px; color: #36c8bf;">La prueba</span>Entras a tu operación cuando quieras. No esperas el informe.</p>
+</div>
+<div class="rv" style="padding: 0 48px; border-left: 1px solid rgba(207,228,250,0.18);">
+<p aria-hidden="true" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 200; font-size: 64px; line-height: 0.8; letter-spacing: -0.04em; color: #36c8bf;">2</p>
+<h3 style="margin: 24px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(26px, 2.4vw, 34px); line-height: 1.05; letter-spacing: -0.025em; color: #ffffff;">Educación</h3>
+<p style="margin: 16px 0 0; font-size: 18px; line-height: 1.5; font-weight: 300; color: #cfe4fa;">Un experto que no te enseña, te vuelve dependiente. Preferimos hacerte mejor.</p>
+<p style="margin: 32px 0 0; font-size: 15px; line-height: 1.55; color: #cfe4fa;"><span class="lbl" style="margin-right: 10px; color: #36c8bf;">La prueba</span>Think, los diagnósticos abiertos y los frameworks que usamos contigo.</p>
+</div>
+<div class="rv" style="padding: 0 0 0 48px; border-left: 1px solid rgba(207,228,250,0.18);">
+<p aria-hidden="true" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 200; font-size: 64px; line-height: 0.8; letter-spacing: -0.04em; color: #36c8bf;">3</p>
+<h3 style="margin: 24px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(26px, 2.4vw, 34px); line-height: 1.05; letter-spacing: -0.025em; color: #ffffff;">Integralidad</h3>
+<p style="margin: 16px 0 0; font-size: 18px; line-height: 1.5; font-weight: 300; color: #cfe4fa;">El crecimiento no nace del gráfico que sube. Nace de la relación que compone, ciclo a ciclo.</p>
+<p style="margin: 32px 0 0; font-size: 15px; line-height: 1.55; color: #cfe4fa;"><span class="lbl" style="margin-right: 10px; color: #36c8bf;">La prueba</span>Lo aprendido queda guardado en tu operación. Ningún trimestre arranca de cero.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="como" data-capture="about-brain" aria-labelledby="brain-title" class="brain">
+<div class="photo"><img class="par" src="/_blob/099f4e6eb3b6d682686eb46f0ab13333" alt="Vista cenital de una mesa de trabajo: cuatro personas entran desde los cuatro bordes con un storyboard, un plan de medios, un dashboard y muestras de color, y todo converge en el mismo brief." style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%;"></div>
+<div class="copy" style="padding: 120px 72px 112px; box-sizing: border-box; background: #f7f8f6; color: #023c70;">
+<p class="lbl rv" style="color: #6d6777;"><span style="color: #0e8c82; font-variant-numeric: tabular-nums;">02</span>Cómo lo hacemos</p>
+<h2 id="brain-title" class="rv" style="margin: 24px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 3.4vw, 50px); line-height: 1.04; letter-spacing: -0.03em; color: #023c70;">Cuatro capacidades. Un solo cerebro.</h2>
+<p class="rv" style="margin: 28px 0 44px; max-width: 560px; font-size: 18px; line-height: 1.6; font-weight: 300; color: #6d6777;"><b style="font-weight: 600; color: #023c70;">Tu IA no conoce tu negocio. Nosotros le damos el contexto.</b> Estrategia, creatividad, medios, datos y tecnología operan como una sola operación: lo que aprende una, lo usa la siguiente.</p>
+<dl style="margin: 0;"><div class="rv" style="display: flex; gap: 24px; align-items: baseline; padding: 24px 0; border-top: 1px solid rgba(2,60,112,0.16);"><dt style="min-width: 160px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: clamp(22px, 2vw, 28px); line-height: 1.1; letter-spacing: -0.02em; color: #0e8c82; white-space: nowrap;"><span class="ringq" aria-hidden="true" style="border-color: #0e8c82;"></span>Growth</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5; color: #6d6777;"><b style="display: block; margin-bottom: 4px; font-size: 19px; font-weight: 600; color: #023c70;">Estrategia y crecimiento</b>Tu go-to-market, tu CRM y tu visibilidad en buscadores e IA, conectados. Orquesta a las otras tres.</dd></div><div class="rv" style="display: flex; gap: 24px; align-items: baseline; padding: 24px 0; border-top: 1px solid rgba(2,60,112,0.16);"><dt style="min-width: 160px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: clamp(22px, 2vw, 28px); line-height: 1.1; letter-spacing: -0.02em; color: #bb1954; white-space: nowrap;"><span class="ringq" aria-hidden="true" style="border-color: #bb1954;"></span>Brand</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5; color: #6d6777;"><b style="display: block; margin-bottom: 4px; font-size: 19px; font-weight: 600; color: #023c70;">Diseño y creatividad</b>Tu identidad y tu contenido, producidos con consistencia y a la escala que necesitas.</dd></div><div class="rv" style="display: flex; gap: 24px; align-items: baseline; padding: 24px 0; border-top: 1px solid rgba(2,60,112,0.16);"><dt style="min-width: 160px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: clamp(22px, 2vw, 28px); line-height: 1.1; letter-spacing: -0.02em; color: #f83902; white-space: nowrap;"><span class="ringq" aria-hidden="true" style="border-color: #f83902;"></span>Voice</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5; color: #6d6777;"><b style="display: block; margin-bottom: 4px; font-size: 19px; font-weight: 600; color: #023c70;">Medios y amplificación</b>Tu inversión en medios, PR e influencers, puesta donde rinde.</dd></div><div class="rv" style="display: flex; gap: 24px; align-items: baseline; padding: 24px 0; border-top: 1px solid rgba(2,60,112,0.16); border-bottom: 1px solid rgba(2,60,112,0.16);"><dt style="min-width: 160px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: clamp(22px, 2vw, 28px); line-height: 1.1; letter-spacing: -0.02em; color: #0375db; white-space: nowrap;"><span class="ringq" aria-hidden="true" style="border-color: #0375db;"></span>Engine</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5; color: #6d6777;"><b style="display: block; margin-bottom: 4px; font-size: 19px; font-weight: 600; color: #023c70;">Tecnología, infraestructura y medición</b>Tu web, tus datos y tu stack: licencias y nube de Microsoft, Google y AWS, IA generativa y software a medida, conectados y medibles.</dd></div></dl>
+</div>
+</section>
+
+<section data-capture="about-equipo" aria-labelledby="equipo-title" style="position: relative; background: #000814; overflow: hidden;">
+<div class="team-media" style="position: relative; width: 100%; aspect-ratio: 16 / 9; min-height: 560px; overflow: hidden;">
+<img class="team-img" src="/_blob/84839fc43c47528fceb13145b0920a5f" alt="Daniela, Andrés, Humberly, Valentina y Melkin, del equipo de Efeonce, al frente; detrás, el resto del equipo con el mismo uniforme, desenfocado, que representa a más de 89 profesionales." style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center bottom;">
+<div class="team-head" style="position: absolute; left: 0; right: 0; top: 0; padding-top: clamp(40px, 5vw, 80px); display: flex; flex-direction: column; align-items: center; text-align: center;">
+<p class="lbl rv" style="color: #ffffff;"><span style="color: #36c8bf; font-variant-numeric: tabular-nums;">03</span>Quiénes lo hacen</p>
+<h2 id="equipo-title" class="rv" style="margin: clamp(12px, 1.6vw, 24px) 0 0; display: flex; align-items: center; gap: clamp(16px, 2vw, 32px); flex-wrap: wrap; justify-content: center;"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: clamp(72px, 11vw, 176px); line-height: 0.85; letter-spacing: -0.055em; color: #ffffff;">+89</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(20px, 2.4vw, 36px); line-height: 1.08; letter-spacing: -0.02em; color: #ffffff; text-align: left;">expertos<br>multidisciplinarios<br><span style="font-weight: 300; color: rgba(207,228,250,0.8);">en toda LATAM</span></span></h2>
+</div>
+
+</div>
+<ul class="team-strip rv" aria-label="Quiénes lideran tu cuenta, de izquierda a derecha"><li class="team-cell"><span class="team-tick" aria-hidden="true"></span><span class="team-n">Daniela Ferreira</span><span class="team-r">Creative Operations Lead</span></li><li class="team-cell"><span class="team-tick" aria-hidden="true"></span><span class="team-n">Andrés Carlosama</span><span class="team-r">Senior Visual Designer</span></li><li class="team-cell"><span class="team-tick" aria-hidden="true"></span><span class="team-n">Humberly Henriquez</span><span class="team-r">Head of Finance</span></li><li class="team-cell"><span class="team-tick" aria-hidden="true"></span><span class="team-n">Valentina Hoyos</span><span class="team-r">Content Lead</span></li><li class="team-cell"><span class="team-tick" aria-hidden="true"></span><span class="team-n">Melkin Hernandez</span><span class="team-r">Senior Visual Designer</span></li></ul>
+<div class="wrap team-copy-wrap" style="padding: 48px 56px 64px;">
+<p class="rv team-copy" style="margin: 0 auto; max-width: 720px; text-align: center; font-size: 18px; line-height: 1.6; font-weight: 300; color: #cfe4fa;"><b style="font-weight: 600; color: #ffffff;">Ellos lideran tu cuenta.</b> Detrás, más de 89 especialistas en estrategia, creatividad, medios, datos y tecnología se suman según lo que tu crecimiento necesite.</p>
+</div>
+</section>
+
+
+
+
+
+
+
+<section data-capture="about-mercados" aria-labelledby="mk-title" style="position: relative; overflow: hidden; background: #000308;">
+<div style="position: relative; width: 100%; aspect-ratio: 16 / 9; min-height: 560px; overflow: hidden;">
+<img class="par" src="/_blob/487301d5a3f630c1573c6f8f91a453f7" alt="Las Américas de noche vistas desde la órbita al amanecer, con cinco ciudades unidas por arcos de luz: Ciudad de México, Miami, Bogotá, Lima y Santiago." style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% center;">
+<div class="mk-copy" style="position: absolute; left: 0; top: 0; bottom: 0; width: min(46%, 640px); display: flex; flex-direction: column; justify-content: center; padding: 56px; box-sizing: border-box;">
+<p class="rv" style="margin: 0 0 14px; font-size: clamp(18px, 1.6vw, 22px); font-weight: 300; color: #cfe4fa;"><span class="ringq" aria-hidden="true"></span>¿Dónde trabajamos?</p>
+<h2 id="mk-title" class="rv" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: clamp(48px, 5vw, 72px); line-height: 0.98; letter-spacing: -0.035em; color: #ffffff;">En cinco países<span class="dot" aria-hidden="true"></span></h2>
+<p class="rv" style="margin: 32px 0 0; max-width: 420px; font-size: 17px; line-height: 1.55; color: #cfe4fa;">Chile, Estados Unidos, Colombia, México y Perú. Nacimos en Latinoamérica. No nos quedamos ahí.</p>
+</div>
+<div class="mk-label rv" style="right: calc(35.9% + 18px); top: 31%;"><i class="mk-sph" aria-hidden="true"></i><span style="display: block; font-size: 18px; font-weight: 600; color: #ffffff;">México</span><span style="display: block; font-size: 13px; color: #cfe4fa;">Ciudad de México</span></div>
+<div class="mk-label rv" style="left: calc(74.4% + 18px); top: 22%;"><i class="mk-sph" aria-hidden="true"></i><span style="display: block; font-size: 18px; font-weight: 600; color: #ffffff;">EE. UU.</span><span style="display: block; font-size: 13px; color: #cfe4fa;">Miami</span></div>
+<div class="mk-label rv" style="left: calc(77% + 18px); top: 43.8%;"><i class="mk-sph" aria-hidden="true"></i><span style="display: block; font-size: 18px; font-weight: 600; color: #ffffff;">Colombia</span><span style="display: block; font-size: 13px; color: #cfe4fa;">Bogotá</span></div>
+<div class="mk-label rv" style="right: calc(28% + 18px); top: 59.3%;"><i class="mk-sph" aria-hidden="true"></i><span style="display: block; font-size: 18px; font-weight: 600; color: #ffffff;">Perú</span><span style="display: block; font-size: 13px; color: #cfe4fa;">Lima</span></div>
+<div class="mk-label rv" style="left: calc(77% + 18px); top: 76.8%;"><i class="mk-sph" aria-hidden="true"></i><span style="display: block; font-size: 18px; font-weight: 600; color: #ffffff;">Chile</span><span style="display: block; font-size: 13px; color: #cfe4fa;">Santiago</span></div>
+</div>
+</section>
+
+<section data-capture="about-prueba" aria-labelledby="prueba-title" class="paper" style="padding: 140px 0 120px; background: #f7f8f6; color: #001a33;">
+<div class="wrap">
+<p class="lbl rv" style="color: #001a33;"><span style="color: #0e8c82; font-variant-numeric: tabular-nums;">04</span>La prueba</p>
+<h2 id="prueba-title" class="rv" style="margin: 24px 0 72px; max-width: 900px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -0.03em; color: #001a33;"><span style="font-weight: 300; color: rgba(0,26,51,0.55);">Si no lo podemos medir,</span> no te lo vendemos como resultado.</h2>
+<div class="pgrid"><div class="pcell rv"><div class="pv"><svg viewBox="0 0 200 200" width="200" height="200" aria-hidden="true" class="pring"><circle cx="100" cy="100" r="84" fill="none" stroke="#001a33" stroke-opacity="0.12" stroke-width="1.5"/><path class="parc" pathLength="1" d="M 100 16 A 84 84 0 0 1 184.00 100.00" fill="none" stroke="#0e8c82" stroke-width="2.6" stroke-linecap="round"/><circle class="psph" cx="184.00" cy="100.00" r="5.5" fill="#0e8c82"/></svg><p class="pnum pnum-in">−25<span>%</span></p></div><p class="pk">Sky Airline</p><p class="pd">Menos tiempo de producción en 12 meses de operación creativa, en 5 mercados.</p></div><div class="pcell rv"><div class="pv"><svg viewBox="0 0 200 200" width="200" height="200" aria-hidden="true" class="pring"><circle cx="100" cy="100" r="84" fill="none" stroke="#001a33" stroke-opacity="0.12" stroke-width="1.5"/><path class="parc" pathLength="1" d="M 100 16 A 84 84 0 1 1 42.50 38.77" fill="none" stroke="#0e8c82" stroke-width="2.6" stroke-linecap="round"/><circle class="psph" cx="42.50" cy="38.77" r="5.5" fill="#0e8c82"/></svg><p class="pnum pnum-in">88<span>%</span></p></div><p class="pk">Sky Airline</p><p class="pd">Entregas a tiempo en 12 meses de operación.</p></div><div class="pcell rv"><div class="pv"><p class="pnum">10 min</p></div><p class="pk">Sky Airline · Travel Sale</p><p class="pd">27 piezas con precios nuevos, 9 de ellas videos, actualizadas en diez minutos.</p></div><div class="pcell rv"><div class="pv"><p class="pnum">+2.000</p></div><p class="pk">Sky Airline</p><p class="pd">Piezas aprobadas en 12 meses de operación creativa.</p></div></div>
+<p class="rv" style="margin: 48px 0 0; font-size: 14px; color: rgba(0,26,51,0.6);">Cifras del caso Sky Airline, 12 meses de operación creativa con Efeonce.</p>
+</div>
+</section>
+
+<section data-capture="about-partners" aria-labelledby="partners-title" style="padding: 112px 0 120px; border-top: 1px solid rgba(207,228,250,0.12);">
+<div class="wrap">
+<div class="split" style="gap: 48px 80px; align-items: flex-start;">
+<div class="side" style="flex: 1 1 320px;">
+<p class="lbl rv">Partners tecnológicos</p>
+<h2 id="partners-title" class="rv" style="margin: 20px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(28px, 2.6vw, 38px); line-height: 1.1; letter-spacing: -0.025em;">Trabajamos con las plataformas que ya usas.</h2>
+<p class="rv" style="margin: 16px 0 0; max-width: 380px; font-size: 16px; line-height: 1.6; font-weight: 300; color: #cfe4fa;">Implementamos, integramos y operamos tu stack, y comercializamos licencias cuando el programa lo permite.</p>
+</div>
+<div class="grow partners-grid" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));"><div style="display: flex; align-items: center; justify-content: center; min-height: 96px; border-top: 1px solid rgba(207,228,250,0.12);"><img src="/_blob/12b1193529375b76236ffb25c64bdbc7" alt="HubSpot" style="height: 30px; width: auto; max-width: 70%; display: block; filter: brightness(0) invert(1); opacity: 0.85;"></div><div style="display: flex; align-items: center; justify-content: center; min-height: 96px; border-top: 1px solid rgba(207,228,250,0.12);"><img src="/_blob/2ebbc36a879fdcee1a9e1e66bdb1925d" alt="Google Cloud" style="height: 26px; width: auto; max-width: 70%; display: block; filter: brightness(0) invert(1); opacity: 0.85;"></div><div style="display: flex; align-items: center; justify-content: center; min-height: 96px; border-top: 1px solid rgba(207,228,250,0.12);"><img src="/_blob/4381b43b16e230c5ae4f30c74173a872" alt="Microsoft" style="height: 28px; width: auto; max-width: 70%; display: block; filter: brightness(0) invert(1); opacity: 0.85;"></div><div style="display: flex; align-items: center; justify-content: center; min-height: 96px; border-top: 1px solid rgba(207,228,250,0.12);"><img src="/_blob/be7b53e170d4fc3cb2a5061cdbd9185c" alt="AWS" style="height: 34px; width: auto; max-width: 70%; display: block; filter: brightness(0) invert(1); opacity: 0.85;"></div><div style="display: flex; align-items: center; justify-content: center; min-height: 96px; border-top: 1px solid rgba(207,228,250,0.12);"><img src="/_blob/64d26eeef0af9801b982a88caa113c43" alt="Salesforce" style="height: 46px; width: auto; max-width: 70%; display: block; opacity: 0.85;"></div><div style="display: flex; align-items: center; justify-content: center; min-height: 96px; border-top: 1px solid rgba(207,228,250,0.12);"><img src="/_blob/ecd4063a349b768f772e8055c270b498" alt="Adobe" style="height: 26px; width: auto; max-width: 70%; display: block; filter: brightness(0) invert(1); opacity: 0.85;"></div><div style="display: flex; align-items: center; justify-content: center; min-height: 96px; border-top: 1px solid rgba(207,228,250,0.12);"><img src="/_blob/d9bb3f896a9ac16525bc7ca4109a26b4" alt="OpenAI" style="height: 28px; width: auto; max-width: 70%; display: block; filter: brightness(0) invert(1); opacity: 0.85;"></div><div style="display: flex; align-items: center; justify-content: center; min-height: 96px; border-top: 1px solid rgba(207,228,250,0.12);"><img src="/_blob/c776f6a6ba7ad03c063c61c26b85c2f4" alt="Claude" style="height: 26px; width: auto; max-width: 70%; display: block; filter: brightness(0) invert(1); opacity: 0.85;"></div></div>
+</div>
+<div class="tq-block">
+<p class="rv" style="margin: 0; font-size: clamp(18px, 1.6vw, 22px); font-weight: 300; color: #cfe4fa;"><span class="ringq" aria-hidden="true"></span>¿Cómo es trabajar con nosotros?</p>
+<h3 class="rv" style="margin: 14px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(30px, 3vw, 44px); line-height: 1.05; letter-spacing: -0.03em; color: #ffffff;">Lo dice el equipo de SKY Airline<span class="dot" aria-hidden="true"></span></h3>
+<div class="tq-grid"><figure class="tq rv"><span class="tq-mark" aria-hidden="true">“</span><blockquote>Nos han ayudado harto en las automatizaciones y en agilizar procesos. Hemos formado un muy bonito equipo, son personas super cálidas.</blockquote><figcaption><b>Constanza Rojas</b>Equipo de SKY Airline</figcaption></figure><figure class="tq rv"><span class="tq-mark" aria-hidden="true">“</span><blockquote>Hemos mejorado muchísimo en cuanto a las herramientas tecnológicas. Siento que hemos podido gracias a ellos agilizar mucho la carga de trabajo.</blockquote><figcaption><b>Adriana Contreras</b>Equipo de SKY Airline</figcaption></figure></div>
+<p class="rv" style="margin: 40px 0 0; font-size: 15px; color: #cfe4fa;">Su primer año completo con Efeonce, contado por ellos: <a href="https://experiencia.efeoncepro.com" target="_blank" rel="noopener" style="color: #ffffff; font-weight: 600;">experiencia.efeoncepro.com</a></p>
+</div>
+</div>
+</section>
+
+<section data-capture="about-founder" aria-labelledby="founder-title" class="founder">
+<div class="copy" style="padding: 96px 72px; box-sizing: border-box;">
+<p class="lbl rv"><span style="color: #36c8bf; font-variant-numeric: tabular-nums;">05</span>Quién lo dirige</p>
+<blockquote class="rv" style="margin: 36px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 300; font-size: clamp(22px, 2.1vw, 30px); line-height: 1.3; letter-spacing: -0.02em; color: #ffffff;"><span style="font-weight: 300; color: #cfe4fa;">«Siempre me incomodó lo mismo: el cliente pagaba, recibía y, al final del año, sabía lo mismo que al principio.</span> <span style="font-weight: 760; color: #ffffff;">Quise construir lo contrario.</span> <span style="font-weight: 300; color: #cfe4fa;">Trabajar codo a codo y que, un año después,</span> <span style="font-weight: 760; color: #36c8bf;">su equipo supiera más de su propio negocio.»</span></blockquote>
+<div class="rv" style="margin-top: 56px;">
+<h2 id="founder-title" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: clamp(26px, 2.2vw, 32px); line-height: 1; letter-spacing: -0.02em;">Julio Reyes<span class="dot" aria-hidden="true"></span></h2>
+<p style="margin: 14px 0 0; font-size: 15px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #cfe4fa;">Managing Director &amp; Founder</p>
+<p style="margin: 20px 0 0; max-width: 440px; font-size: 14px; line-height: 1.6; font-weight: 300; color: rgba(207,228,250,0.8);">Lleva más de diez años construyendo marketing integrado para grandes marcas latinoamericanas de banca, servicios financieros, retail y servicios. Hoy dirige la estrategia y el crecimiento comercial de Efeonce.</p>
+<a href="https://www.linkedin.com/in/cesargrowth/" aria-label="Conversemos en LinkedIn con Julio Reyes" style="display: inline-flex; align-items: center; gap: 12px; min-height: 52px; margin-top: 32px; padding: 0 26px 0 22px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.5); font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none;"><img src="/_blob/15dfdca34ded09b7d5351b907341fd7a" alt="" aria-hidden="true" style="width: 20px; height: 20px; display: block;">Conversemos</a>
+</div>
+</div>
+<div class="photo"><img class="par" src="/_blob/30b88ac4cd25742aeee9082077799edc" alt="Julio Reyes, Managing Director y Founder de Efeonce, hablando en el escenario de una conferencia." style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%;"></div>
+</section>
+
+<section id="agenda" data-capture="about-cierre" aria-labelledby="cierre-title" style="position: relative; padding: 120px 0 96px; text-align: center; border-top: 1px solid rgba(207,228,250,0.12); background: #001a33; overflow: hidden;">
+<div class="wrap" style="display: flex; flex-direction: column; align-items: center;">
+<div class="orb" style="position: relative; width: min(680px, 94vw);">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="380 380 680 680" aria-hidden="true" style="display: block; width: 100%; height: auto; overflow: visible;"><defs><radialGradient id="cierre-halo" gradientUnits="userSpaceOnUse" cx="720" cy="720" r="558"><stop offset="0" stop-color="#36c8bf" stop-opacity="0.12"></stop><stop offset="0.6" stop-color="#36c8bf" stop-opacity="0.03"></stop><stop offset="1" stop-color="#36c8bf" stop-opacity="0"></stop></radialGradient></defs><rect data-axis-part="halo" x="0" y="0" width="1440" height="1440" fill="url(#cierre-halo)"></rect><circle data-axis-part="ring" cx="720" cy="720" r="300" fill="none" stroke="#72ded8" stroke-opacity="0.16" stroke-width="1.81"></circle><path data-axis-part="arc" pathLength="1" d="M 870 460.19 A 300 300 0 0 1 1020 720" fill="none" stroke="#36c8bf" stroke-width="2.9" stroke-linecap="round"></path><circle data-axis-part="sphere" cx="1020" cy="720" r="6.35" fill="#36c8bf"></circle></svg>
+<div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18%;">
+<p class="rv" style="margin: 0; font-size: clamp(18px, 1.6vw, 22px); font-weight: 300; color: #cfe4fa;"><span class="ringq" aria-hidden="true"></span>¿Conversamos?</p>
+<h2 id="cierre-title" class="rv" style="margin: 14px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: clamp(44px, 6vw, 88px); line-height: 0.95; letter-spacing: -0.04em; color: #ffffff;">Cuando quieras<span class="dot" aria-hidden="true"></span></h2>
+<p class="rv" style="margin: 24px 0 0; max-width: 400px; font-size: 17px; line-height: 1.55; font-weight: 300; color: #cfe4fa;">30 minutos para entender tu negocio y mostrarte cómo trabajaríamos juntos. Sin compromiso.</p>
+</div>
+</div>
+<div class="rv" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px;">
+<a href="https://efeoncepro.com/agenda/" aria-label="Agenda una reunión con Efeonce" style="display: inline-flex; align-items: center; min-height: 56px; padding: 0 32px; border-radius: 999px; background: #ffffff; color: #001a33; font-weight: 600; font-size: 17px; text-decoration: none;">Agenda una reunión<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 10px;"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+<a href="https://greenhouse.efeoncepro.com/public/careers" style="display: inline-flex; align-items: center; min-height: 56px; padding: 0 32px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.5); color: #ffffff; font-weight: 500; font-size: 17px; text-decoration: none;">Únete al equipo</a>
+</div>
+<div class="sign rv"><img src="/_blob/9fb7bddd66ca75731716f30b6938cbef" alt="Efeonce" style="height: 44px; width: auto; display: block;"><p class="slogan" lang="en"><em>Empower</em> <b>your</b> <strong><em>Growth</em></strong></p></div>
+</div>
+</section>
+
+
+</x-dc>
+</body>
+</html>

@@ -1,7 +1,7 @@
 # Publicidad programática — Pricing Integrity Pack V1.4
 
 > **Estado:** `commercially_approved` — tarifario base y condiciones estándar aprobados por el operador
-> **Fecha / revisión:** V1.4 · 2026-10-12; calibración, operación directa acompañada y composición integral; tarifario aprobado 09-10 sin cambio · delta 2026-10-16: comisión/rebate como margen de Efeonce (§3.5)
+> **Fecha / revisión:** V1.4 · 2026-10-12; calibración, operación directa acompañada y composición integral; tarifario aprobado 09-10 sin cambio · delta 2026-10-16: comisión/rebate como margen de Efeonce (§3.5) · delta 2026-10-20: primera excepción al piso aplicada, licitación Gana GRD-1541 (§2.3)
 > **Alcance:** política comercial Efeonce; costos/margen observados, acuerdos externos y compra se comprueban por oportunidad
 > **Owner:** Media & Distribution + Commercial + Finance
 > **Modelo:** [Programmatic Media Operations](PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md)
@@ -168,6 +168,26 @@ La fórmula de piso `C / 0,55` alcanza **45% de margen**; para el objetivo de **
 `C / 0,45`, ambos contrastados con el mínimo comercial y redondeados hacia arriba. No presentar el objetivo como
 resultado de aplicar la fórmula de piso. Costear cada componente y medir después de servirlo; no compensar operación
 bajo piso con setup, mayor gasto de medios o rebate. Revisión tras dos campañas pagadas o 90 días conserva vigencia.
+
+#### Delta 2026-10-20 — primera excepción al piso aplicada: Gana (GRD-1541)
+
+Licitación Gana (Grupo Réditos, Colombia), oferta conjunta Efeonce · Basis DSP; Efeonce presenta, presta el
+servicio y factura. Presupuesto del comprador: **COP 30.000.000/mes**. La recomendación inicial del agente, nivel
+«Mensual ampliada» (USD 2.500 + setup 750, ≈ 33 % de la inversión), se descartó por precio.
+
+| Elemento | Decisión del operador |
+|---|---|
+| Fee de gestión | **COP 4.500.000/mes fijo** (≈ USD 1.125 a una referencia de ~COP 4.000/USD, sin congelar); implementación inicial incluida |
+| Razón | Antecedente de licitaciones de Grupo Réditos perdidas por precio |
+| Variación | No varía con la inversión; se revisa sólo por cambio de alcance |
+| Externos | Medios, plataforma DSP (5 %) e inventario premium (20 % por deal) al costo, sin recargo |
+| Costo propio | No medido. Con 45 % de margen el techo de costo sería ~COP 2,5 M/mes: viable sólo con dedicación parcial y el soporte operativo de Basis |
+| Benchmark usado | Fee de agencia 10–20 % de la inversión (research 2026-09-10) |
+| Vigencia | Sólo este proceso; no es referencia de precio para otros clientes. Revisar tras el primer período o 90 días |
+
+**Lección de forma:** en Wherex el precio se carga como una línea mensual. Se ofertó sólo el fee (COP 4,5 M) con un
+comentario que declara los costos externos al costo, para no sumar los medios del cliente al precio comparado.
+Expediente: [Gana GRD-1541](../../commercial/tenders/gana-programatica-colombia-1541-2026/README.md).
 
 ## 3. Estructura de una propuesta
 

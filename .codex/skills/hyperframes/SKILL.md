@@ -294,6 +294,10 @@ When no `visual-style.md` or animation direction is provided, follow [house-styl
 - [ ] Contrast warnings addressed (see Quality Checks below)
 - [ ] Layout issues addressed (see Quality Checks below)
 - [ ] Animation choreography verified (see Quality Checks below)
+- [ ] Si se renderizó a MP4 con sonido o animación (repo Greenhouse): antes de mostrarlo, control estándar sin Gemini
+      con `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json`;
+      Gemini va después, opcional y siempre con `--verify` (manual
+      `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`)
 
 ## Quality Checks
 

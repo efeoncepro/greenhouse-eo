@@ -1,0 +1,20 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "proposal",
+  "recipe": "decision-plan",
+  "line": "voice",
+  "theme": "dark",
+  "voice": { "eyebrow": "Plan de trabajo", "question": "¿Qué pasa al empezar?", "answer": ["Movimiento"] },
+  "body": "**90** días a la primera lectura completa, en tres tramos de 30. Desde la primera semana hay campañas en marcha.",
+  "horizon": 90,
+  "currentStop": 1,
+  "stops": [
+    { "range": "Días 1–30", "title": "Arranque", "desc": "Plan estratégico, plan por campaña, configuración del DSP, píxeles y audiencias." },
+    { "range": "Días 31–60", "title": "Optimización", "desc": "Activación omnicanal, ajustes semanales de pujas, audiencias y ubicaciones." },
+    { "range": "Días 61–90", "title": "Evidencia", "desc": "Informe ejecutivo, reporte de inversión, aprendizajes y plan del siguiente ciclo." }
+  ]
+}

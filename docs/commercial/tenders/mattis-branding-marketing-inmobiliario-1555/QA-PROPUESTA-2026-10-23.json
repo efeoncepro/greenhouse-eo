@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-23",
+  "status": "passed-documentary-checks",
+  "presentationRendered": false,
+  "blocks": 23,
+  "copyHashesIdentical": true,
+  "localLinksChecked": 19,
+  "priceAndPhaseTotalsMatchFrozenArtifact": true,
+  "quantities": {
+    "initialApplications": 8,
+    "masters": 80,
+    "adaptationsMaximum": 120,
+    "productionCycles": 10
+  },
+  "calculation": {
+    "replayDigest": "a0e7f40015dc3316ace328da195d442605a0b4bee283bf8a2004c39bcee9e7c2",
+    "status": "calculated",
+    "netCOP": "190150000",
+    "diagnostics": 0,
+    "commercialApproval": false,
+    "taxResolved": false
+  },
+  "documentationClosure": {
+    "warnings": 0
+  },
+  "externalSend": false,
+  "crmMutation": false,
+  "remoteSyncVerified": false
+}

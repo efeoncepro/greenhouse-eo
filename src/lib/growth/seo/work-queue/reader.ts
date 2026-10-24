@@ -62,6 +62,8 @@ import {
   type SeoWorkQueueVerb
 } from './contracts'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface SeoWorkQueueItemView {
   itemId: string
   rank: number
@@ -171,7 +173,7 @@ export interface ReadSeoWorkQueueOptions {
   scope?: SeoContentScopeFilter | null
   limit?: number
   cursor?: string | null
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 const MAX_LIMIT = 200

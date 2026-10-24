@@ -142,3 +142,117 @@ export const multiStepContractFixture = (): RenderContract =>
     ],
     consent: undefined,
   })
+
+/**
+ * TASK-2045 — Popup «Quiero ser partner» (canvas «Partners — Efeonce» v14): grilla 2×2 con ancho declarado,
+ * consentimiento compacto con el enlace en la frase y éxito con el glifo de La órbita y «Cerrar». Fixture de
+ * referencia del kit de formularios diseñados (TASK-2044); el copy es el del diseño aprobado.
+ */
+export const partnerApplicationContractFixture = (): RenderContract =>
+  staticContractFixture({
+    form: {
+      formId: 'form_partner_demo',
+      formKey: '00000000-0000-4000-8000-0000000000ef',
+      slug: 'efeonce-partner-application',
+      formVersionId: 'fv_partner_demo_1',
+      version: 1,
+      locale: 'es-CL',
+      formKind: 'contact',
+    },
+    fields: [
+      { key: 'fullName', type: 'text', label: 'Nombre y apellido', placeholder: 'Tu nombre', required: true, autocomplete: 'name', presentation: { width: 'half', icon: 'user' } },
+      { key: 'email', type: 'email', label: 'Correo de trabajo', placeholder: 'tu@empresa.com', required: true, autocomplete: 'email', inputMode: 'email', presentation: { width: 'half', icon: 'mail' } },
+      { key: 'company', type: 'text', label: 'Empresa o plataforma', placeholder: 'Nombre de la plataforma', required: true, autocomplete: 'organization', presentation: { width: 'half', icon: 'briefcase' } },
+      { key: 'website', type: 'url', label: 'Sitio web', placeholder: 'https://', autocomplete: 'url', inputMode: 'url', presentation: { width: 'half', icon: 'globe' } },
+      { key: 'offer', type: 'textarea', label: '¿Qué ofreces y a quién le sirve?', placeholder: 'Tu tecnología, el problema que resuelve y el tipo de cliente', required: true, presentation: { width: 'full', icon: 'message' } },
+    ],
+    copy: { submit: 'Enviar propuesta →' },
+    consent: {
+      presentation: 'compact',
+      privacyUrl: 'https://efeoncepro.com/politica-de-privacidad/',
+      privacyLinkLabel: 'política de privacidad',
+      checkboxes: [
+        { key: 'privacy', label: 'Acepto que Efeonce use estos datos para responder mi propuesta, según su {privacyLink}.', required: true },
+      ],
+    },
+    successBehavior: {
+      kind: 'inline_message',
+      presentation: 'success_card',
+      icon: 'orbit',
+      title: 'Recibido',
+      body: 'Gracias por escribirnos. Revisamos tu propuesta y te contactamos por correo.',
+      // `steps: []` explícito: sin él la tarjeta muestra los pasos por defecto del diccionario.
+      steps: [],
+      actions: [{ kind: 'dismiss', label: 'Cerrar' }],
+    },
+  })
+
+/**
+ * TASK-2054 — Formulario en línea de Glitch (canvas de la portada del blog v3, bloque `.gxs`): un campo
+ * de correo, aviso sin casillas y las etiquetas del canvas.
+ */
+export const glitchInlinePillContractFixture = (over: Partial<RenderContract> = {}): RenderContract =>
+  staticContractFixture({
+    form: {
+      formId: 'fdef-glitch-newsletter',
+      formKey: '00000000-0000-4000-8000-000000002054',
+      slug: 'glitch-newsletter',
+      formVersionId: 'fver-glitch-1',
+      version: 1,
+      locale: 'es-CL',
+      formKind: 'subscribe'
+    },
+    fields: [
+      { key: 'email', type: 'email', label: 'Tu correo de trabajo', placeholder: 'tu@empresa.com', required: true, autocomplete: 'email' }
+    ],
+    consent: {
+      consentPolicyVersion: 'glitch-2026-10',
+      noticeText: 'Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.',
+      privacyUrl: 'https://efeoncepro.com/politica-de-privacidad/',
+      checkboxes: []
+    },
+    presentation: 'inline_pill',
+    inlinePill: {
+      openLabel: 'Suscríbete a Glitch',
+      submitLabel: 'Suscribirme',
+      successLabel: '¡Listo!',
+      doneLabel: 'Ya estás suscrito a Glitch',
+      note: 'Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.'
+    },
+    successBehavior: { kind: 'inline_message', message: 'Ya estás suscrito a Glitch' },
+    ...over
+  })
+
+/** TASK-2054 — Reserva del webinar (canvas, bloque `.gxs--ev` dentro de `.evx`). */
+export const eventInlinePillContractFixture = (over: Partial<RenderContract> = {}): RenderContract =>
+  staticContractFixture({
+    form: {
+      formId: 'fdef-webinar-aeo-2026-11-12',
+      formKey: '00000000-0000-4000-8000-000000002055',
+      slug: 'webinar-aeo-chatgpt-2026-11-12',
+      formVersionId: 'fver-webinar-1',
+      version: 1,
+      locale: 'es-CL',
+      formKind: 'event_registration'
+    },
+    fields: [
+      { key: 'email', type: 'email', label: 'Tu correo de trabajo', placeholder: 'tu@empresa.com', required: true, autocomplete: 'email' },
+      { key: 'event_key', type: 'hidden', staticValue: 'webinar-aeo-chatgpt-2026-11-12' }
+    ],
+    consent: {
+      consentPolicyVersion: 'efeonce-events-2026-10',
+      noticeText: 'Te enviamos el enlace y un recordatorio el mismo día.',
+      privacyUrl: 'https://efeoncepro.com/politica-de-privacidad/',
+      checkboxes: []
+    },
+    presentation: 'inline_pill',
+    inlinePill: {
+      openLabel: 'Reservar mi lugar',
+      submitLabel: 'Reservar',
+      successLabel: '¡Lugar reservado!',
+      doneLabel: 'Te esperamos el 12 de noviembre',
+      note: 'Te enviamos el enlace y un recordatorio el mismo día.'
+    },
+    successBehavior: { kind: 'inline_message', message: 'Te esperamos el 12 de noviembre' },
+    ...over
+  })

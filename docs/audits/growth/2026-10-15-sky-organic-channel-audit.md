@@ -1,5 +1,11 @@
 # Auditoría del canal de búsqueda orgánica del Blog SKY
 
+> **Delta 2026-10-23:** la [auditoría consolidada del 23-10](2026-10-23-sky-blog-seo-audit-consolidada.md)
+> corrige y amplía este diagnóstico (§6 de ese documento): confirma el «80k→40k» con sep-25 → oct-25 en vez
+> de usar jul–ago como referencia, describe la caída en tres etapas, nombra como causa técnica el plugin SEO
+> no migrado y descarta la penalización con la evidencia disponible. Este documento se conserva como corte
+> del 15-10; para cifras vigentes usar la consolidada y los [hechos del caso](../../services/sky-blog-seo/caso-auditoria-2026-10/HECHOS.md).
+
 Fecha: 15-10-2026. Estado: diagnóstico base y entregables verificados; auditoría integral parcial y
 remediación pendiente. La [matriz de cobertura](../../services/sky-blog-seo/COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md)
 registra siete frentes abiertos con evidencia de cierre. Un plan de recuperación preparado no cierra esos frentes.

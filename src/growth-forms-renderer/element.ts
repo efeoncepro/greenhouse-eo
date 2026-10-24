@@ -64,7 +64,10 @@ export class GreenhouseFormElement extends HTMLElement {
     const copy = resolveSystemCopy(this.getAttribute('locale') ?? undefined)
 
     this.applyRegionSemantics(copy.formRegionAria)
-    if (this.getAttribute('color-scheme') === 'light') this.dataset.colorScheme = 'light'
+    // TASK-2045 — `light` y `dark` fuerzan el esquema; sin atributo hereda `prefers-color-scheme`.
+    const colorScheme = this.forcedColorScheme()
+
+    if (colorScheme) this.dataset.colorScheme = colorScheme
     // TASK-1297 — `appearance="bare"` (chromeless): el host neutraliza el fill del renderer
     // (`--ghf-bg: transparent`) sin escribir CSS scoped propio. Transversal a cualquier host.
     if (this.getAttribute('appearance') === 'bare') this.dataset.appearance = 'bare'
@@ -161,7 +164,7 @@ export class GreenhouseFormElement extends HTMLElement {
       locale: this.getAttribute('locale') ?? undefined,
       pageContext: this.pageContext(),
       initialValues: this.initialValues(),
-      colorScheme: this.getAttribute('color-scheme') === 'light' ? 'light' : undefined,
+      colorScheme: this.forcedColorScheme(),
       doc,
       // El custom element ES el scope (declara tokens + container-type + box-sizing vía
       // el selector `greenhouse-form`). El wrapper interno NO lleva `.ghf-scope` para no
@@ -169,6 +172,12 @@ export class GreenhouseFormElement extends HTMLElement {
       hosted: true
     })
     this.renderer.mount()
+  }
+
+  private forcedColorScheme(): 'light' | 'dark' | undefined {
+    const value = this.getAttribute('color-scheme')
+
+    return value === 'light' || value === 'dark' ? value : undefined
   }
 
   private pageContext(): { pageUri?: string; pageName?: string; referrer?: string } {

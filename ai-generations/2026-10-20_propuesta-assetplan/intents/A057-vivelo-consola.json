@@ -1,0 +1,70 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-day-live-console",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Vívelo · cada mes",
+    "question": "¿Cada cuánto revisamos?",
+    "answer": [
+      "Cada",
+      "mes"
+    ]
+  },
+  "body": "Cada mes revisamos contigo **solicitudes**, horas y prioridades en una reunión por Teams.",
+  "console": {
+    "icon": "data",
+    "title": "Operación HubSpot · este mes",
+    "subtitle": "Solicitudes · Proyectos · Agentes",
+    "sampleMark": "Datos de muestra",
+    "metrics": [
+      {
+        "value": "42",
+        "label": "Solicitudes resueltas",
+        "detail": "del canal comercial"
+      },
+      {
+        "value": "21 h",
+        "label": "De la bolsa",
+        "detail": "de 25 horas"
+      },
+      {
+        "value": "3",
+        "label": "Proyectos",
+        "detail": "con pruebas y aprobación"
+      }
+    ],
+    "checks": [
+      {
+        "label": "Calidad de datos · duplicados en contactos",
+        "status": "Bajo control",
+        "done": true
+      },
+      {
+        "label": "Permisos de usuarios del mes",
+        "status": "Revisados",
+        "done": true
+      },
+      {
+        "label": "Integración con WhatsApp",
+        "status": "Activa",
+        "done": true
+      },
+      {
+        "label": "Workflow de seguimiento de visitas",
+        "status": "En pruebas",
+        "done": false
+      }
+    ],
+    "review": {
+      "kicker": "Revisión mensual · Teams",
+      "title": "Consumo, avances y prioridades del próximo mes",
+      "cta": "Ver agenda"
+    }
+  }
+}

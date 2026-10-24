@@ -1,0 +1,63 @@
+{
+  "run_id": "2026-10-20-1030-assetplan-apollo",
+  "date_santiago": "2026-10-20T10:29:28-03:00",
+  "hsp_id": "HSP-0039",
+  "type": "operator_authorized_single_contact_enrichment",
+  "authorization": {
+    "status": "explicit_user_message",
+    "scope": "Target only; work email; single match; no bridges, personal email, phone, CRM or outreach",
+    "credits_limit": 1
+  },
+  "queries": [
+    {
+      "tool": "Apollo People API Search",
+      "query": "Exact LinkedIn URL of <TARGET>, redacted",
+      "pii_redacted": true,
+      "result": "One exact match, currentCRM Specialist atAssetplan; has_email=false"
+    },
+    {
+      "tool": "web.open",
+      "query": "Original public request URL redacted; privateevidence",
+      "pii_redacted": true,
+      "result": "Request still visible; no formalprocurement or buyerentity resolution inferred"
+    },
+    {
+      "tool": "Apollo people_match",
+      "query": "ExactsearchreturnedID + profile + name + employer domain; PII redacted",
+      "pii_redacted": true,
+      "reveal_personal_emails": false,
+      "reveal_phone_number": false,
+      "result": {
+        "matched": true,
+        "email_returned": false,
+        "email_status": "unavailable",
+        "employer": "Assetplan",
+        "title": "CRM Specialist",
+        "successful_match_cost_credits_by_tool_tariff": 1,
+        "provider_debit_field_returned": false
+      }
+    },
+    {
+      "tool": "Apollo feedback_log",
+      "query": "Generic insufficient-result feedback, noPII",
+      "result": "logged=true"
+    },
+    {
+      "tool": "web.search",
+      "query": "<TARGET> + @assetplan.cl",
+      "pii_redacted": true,
+      "result": "No attributable public work email located"
+    },
+    {
+      "tool": "web.search",
+      "query": "<TARGET> + correo contacto Assetplan",
+      "pii_redacted": true,
+      "result": "No attributable public work email located; unrelated/privatefamilyresults discarded"
+    }
+  ],
+  "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1030-assetplan-apollo-result.json",
+  "crm_writes": 0,
+  "outreach": 0,
+  "next_action": "No repeat equivalent paidlookup; targetemail lane remainspending. Primarypublic LinkedIn route retained.",
+  "privacy": "No individualemail/phone, rawApollo, personidentifyingURLs ortokens in versionedrecord"
+}

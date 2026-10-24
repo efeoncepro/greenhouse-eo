@@ -1,5 +1,9 @@
 # TASK-1750 — El desafío interactivo de Turnstile deja fuera a candidatos reales
 
+## Delta 2026-10-23
+
+- TASK-2045 (Slice 3) mueve el contenedor de Turnstile de `document.body` a dentro de `<greenhouse-form>` para que funcione en un `<dialog>` modal. La recuperación del desafío interactivo de esta task debe probarse también dentro del diálogo; coordinar el orden antes de tocar `turnstile.ts`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

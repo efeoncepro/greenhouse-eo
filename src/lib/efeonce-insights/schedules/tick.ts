@@ -51,6 +51,8 @@ import {
   transitionInsightSchedule
 } from './store'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface InsightSchedulesTickResult {
   skipped?: 'flag_off'
   schedules: number
@@ -121,7 +123,7 @@ const runOccurrence = async (
   schedule: InsightScheduleRecord,
   subject: TenantEntitlementSubject,
   period: { start: string; endExclusive: string },
-  env: NodeJS.ProcessEnv
+  env: EnvSource
 ): Promise<'generated' | 'failed' | 'noop'> => {
   const occurrence = await ensureInsightScheduleOccurrence({
     scheduleId: schedule.scheduleId,
@@ -189,7 +191,7 @@ const runOccurrence = async (
   }
 }
 
-export const runInsightSchedulesTick = async (env: NodeJS.ProcessEnv = process.env, now: Date = new Date()): Promise<InsightSchedulesTickResult> => {
+export const runInsightSchedulesTick = async (env: EnvSource = process.env, now: Date = new Date()): Promise<InsightSchedulesTickResult> => {
   const result: InsightSchedulesTickResult = { schedules: 0, generated: 0, failed: 0, paused: 0, retention: null }
 
   // La retención corre aunque la recurrencia esté apagada: es higiene del reader público, no producto.

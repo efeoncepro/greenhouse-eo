@@ -64,6 +64,34 @@ export const CTA_FIXTURES: Record<string, { label: string; build: () => CtaRende
       }),
   },
 
+  // ── TASK-2045 — open_growth_form en diálogo (popup «Quiero ser partner», canvas Partners v14) ──
+  partnerDialog: {
+    label: 'Formulario en diálogo (Quiero ser partner)',
+    build: () =>
+      base({
+        slug: 'partners-become-partner',
+        content: {
+          eyebrow: '¿Eres una plataforma?',
+          headline: 'Sumémonos.',
+          body: 'Si tu tecnología encaja con lo que nuestros clientes necesitan, hablemos de cómo llevarla a más empresas en Latinoamérica.',
+          ctaLabel: 'Quiero ser partner',
+          dismissLabel: 'Ahora no',
+        },
+        action: {
+          kind: 'open_growth_form',
+          formSlug: 'efeonce-partner-application',
+          formKey: '00000000-0000-4000-8000-0000000000ef',
+          presentation: 'dialog',
+          dialog: {
+            eyebrow: '¿Eres una plataforma?',
+            // El punto final es el punto turquesa de la piel de Partners (La órbita), no texto.
+            title: 'Sumémonos',
+            lead: 'Cuéntanos qué tecnología ofreces y a quién le sirve. Revisamos cada propuesta con el equipo de la línea que corresponda.',
+          },
+        },
+      }),
+  },
+
   // ── TASK-1429 — slide_in interruptivo (pairwise placement × appearance × contenido) ──
   slideIn: {
     label: 'Slide-in (interruptivo, default)',

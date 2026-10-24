@@ -71,7 +71,7 @@ describe('fuente del gasto del período', () => {
 })
 
 // Defaults: contracted 8 audits / USD 50; trial 1 / USD 2; pilot 2 / USD 10.
-const ENV = {} as NodeJS.ProcessEnv
+const ENV = {}
 
 beforeEach(() => {
   state.assignment = null
@@ -295,7 +295,7 @@ describe('enforceSeoRunEntitlement', () => {
     }
     state.spendUsedUsd = 3
 
-    const env = { GROWTH_SEO_TRIAL_MONTHLY_BUDGET_USD: '20' } as unknown as NodeJS.ProcessEnv
+    const env = { GROWTH_SEO_TRIAL_MONTHLY_BUDGET_USD: '20' }
     const e = await resolveSeoEntitlement('org-trial', env)
 
     expect(e.budgetCapUsd).toBe(20)

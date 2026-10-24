@@ -1,9 +1,9 @@
 # Componer piezas de Glitch — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (v1.7: estados al día —los valores de Glitch ya están en AXIS desde
+> **Ultima actualizacion:** 2026-10-22 por Claude (v1.8: dónde va cada pieza según PDR-020 rev 2.0 —Glitch es el único correo de Efeonce; en redes, Threads como gancho y LinkedIn—) · 2026-09-28 por Claude (v1.7: estados al día —los valores de Glitch ya están en AXIS desde
 > el 2026-09-27 y el Glitch Flash desde `v0.3.24`—; pendiente de la última frase fija del reel. v1.6: nota del Glitch Flash, chip «LA NOTICIA» y muletilla que
 > cambia por edición. v1.5: el blog completo y la lámina con lente quedaron aprobados;
 > la versión 1:1 del banner es una plantilla propia, el callout «DROP» v2 rige desde la #17 y la lente es una variante
@@ -46,6 +46,13 @@ está en [Componer una edición de Glitch](./componer-una-edicion-de-glitch.md).
 piezas nuevas. Los **gráficos
 animados del video** se generan desde el repo taller y están **aprobados** (2026-09-27): ver
 [Video y motion](#video-y-motion) y el manual [Editar el video de Glitch](./editar-video-glitch.md).
+
+**Dónde va cada pieza (desde 2026-10-22).** Glitch es el newsletter canónico y el **único correo** de Efeonce; su
+archivo es el blog. En redes va sólo a **Threads** (la portada sin «Desliza», con la noticia más fuerte en una frase y
+la invitación a suscribirse, el día de la edición) y a **LinkedIn** (la lectura de una noticia, con su lámina interior
+suelta; el carrusel completo no se publica). Instagram ya no recibe Glitch, y el reel y el vlog están **en pausa**
+(decisión del operador, 2026-10-22): no se graban ni se programan. Detalle: [delta 2026-10-22 de la norma](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) ·
+[sistema de canales](../../documentation/social/sistema-de-canales-y-love-brand.md).
 
 ## Antes de empezar
 

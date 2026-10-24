@@ -4,8 +4,9 @@ import { AGENCY_BRANDED_EMAIL_TYPES, CANDIDATE_REPLY_TO_EMAIL_TYPES, EMAIL_PRIOR
 
 import { isHiringCapacityFilledEmailEnabled, isHiringOpeningCapacityClosureEnabled } from './config'
 
-/** `ProcessEnv` trae índices requeridos; los tests sólo declaran las claves que ejercitan. */
-const env = (vars: Record<string, string> = {}): NodeJS.ProcessEnv => vars as NodeJS.ProcessEnv
+import type { EnvSource } from '@/types/env-source'
+
+const env = (vars: Record<string, string> = {}): EnvSource => vars
 
 /**
  * TASK-1762 Slice 4 — el correo de «sin selección» y sus tres frenos.

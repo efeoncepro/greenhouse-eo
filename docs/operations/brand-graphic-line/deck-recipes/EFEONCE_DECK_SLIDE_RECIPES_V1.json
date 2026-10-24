@@ -15991,7 +15991,7 @@
       "referenceSource": "ai-generations/2026-09-29_deck-salesforce/out/SF16-crm-en-claude.jpg",
       "communicates": "El equipo consulta y actualiza el CRM conversando con un asistente conectado, con sus permisos, y ninguna acción se ejecuta sin su confirmación.",
       "useWhen": [
-        "Propuesta del servicio de Enablement conversacional (en la aprobada, Salesforce en Claude, «Claudeforce»).",
+        "Propuesta del servicio de Enablement conversacional (en la aprobada, Salesforce en Claude, «Claudeforce»; en una propuesta `revenue-hubspot` el chip lleva el isotipo de HubSpot, sin Claudeforce — Assetplan 2026-10-20).",
         "Cuando el cliente pregunta cómo usar la IA con su CRM sin perder control."
       ],
       "avoidWhen": [

@@ -1,0 +1,203 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:42:30.454Z",
+  "run": "ai-generations/2026-10-07_deck-pibank-propuesta",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-07_deck-pibank-propuesta",
+  "totalBytes": 21486045,
+  "fileCount": 32,
+  "files": [
+    {
+      "path": "out/01-p01-deck-cover-proposal.png",
+      "sizeBytes": 455272,
+      "sha256": "424fdd9250b9d97a4a8a8976817969f3da22f3f90d2b7e71bca0710e0c2a279c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/01-p01-deck-cover-proposal.png"
+    },
+    {
+      "path": "out/02-p02-deck-decision-ai-market.png",
+      "sizeBytes": 934878,
+      "sha256": "516e0ae6f5476d5f00a90a6b9786044f497f4ef8307861893a6aa5ccce3b93ea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/02-p02-deck-decision-ai-market.png"
+    },
+    {
+      "path": "out/03-p03-deck-decision-ai-answer.png",
+      "sizeBytes": 757962,
+      "sha256": "ad3c157b91c9ec9230beec50ec88ea8c2d465a7a14bd24e1c31c7ca20400a56d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/03-p03-deck-decision-ai-answer.png"
+    },
+    {
+      "path": "out/04-p04-deck-content-bullets.png",
+      "sizeBytes": 138779,
+      "sha256": "3daa29e940f2025d29110f6874b0c47e8fb484fbf19a7c3bca88b92aed97bed3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/04-p04-deck-content-bullets.png"
+    },
+    {
+      "path": "out/05-p05-deck-decision-traffic-to-revenue.png",
+      "sizeBytes": 959519,
+      "sha256": "958151ed15926164d9e32f6b9dadc15ccda3417ab3bf8d93efb679740a3b8e19",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/05-p05-deck-decision-traffic-to-revenue.png"
+    },
+    {
+      "path": "out/06-p06-deck-section-split.png",
+      "sizeBytes": 879345,
+      "sha256": "c4373c268dbe148d124e6e77b59581627372b92a59ea51db2fbe353736f5c525",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/06-p06-deck-section-split.png"
+    },
+    {
+      "path": "out/07-p07-deck-content-bullets.png",
+      "sizeBytes": 124533,
+      "sha256": "767146a81af255f1f8c840ce78508af7d0313c5cf80f892403ebe07c5c9ef2c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/07-p07-deck-content-bullets.png"
+    },
+    {
+      "path": "out/08-p08-deck-proposal-service.png",
+      "sizeBytes": 458183,
+      "sha256": "c2f3a99b2f72bd51e53689712ebbaa123ebcb1c75607c9b792cce3c8eab7060a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/08-p08-deck-proposal-service.png"
+    },
+    {
+      "path": "out/09-p09-deck-proposal-service.png",
+      "sizeBytes": 329990,
+      "sha256": "f292a1c6efb20db6573c886487ecdeafdd00f3111df115e389494e50ff38685c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/09-p09-deck-proposal-service.png"
+    },
+    {
+      "path": "out/10-p10-deck-method-eeat.png",
+      "sizeBytes": 895159,
+      "sha256": "e8478e9c761828a7963ed2c596df11cfc866716285ec2390426b2a81ae1d455a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/10-p10-deck-method-eeat.png"
+    },
+    {
+      "path": "out/11-p11-deck-proposal-cinematic.png",
+      "sizeBytes": 1719223,
+      "sha256": "b020998c8241788c0dc805af25394250a95167b3ef2b63392e92321ba404da3c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/11-p11-deck-proposal-cinematic.png"
+    },
+    {
+      "path": "out/12-p12-deck-method-surround-cycle.png",
+      "sizeBytes": 967792,
+      "sha256": "bbfd4b9b1130c19ea04c8e2a943ee6ab3ecbc4650fd8e25db34c15096c71d428",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/12-p12-deck-method-surround-cycle.png"
+    },
+    {
+      "path": "out/13-p13-deck-content-team.png",
+      "sizeBytes": 1112035,
+      "sha256": "cf277608a123bceb33d97e835544d214840b3abb931f05161c1799bb7ebfbf69",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/13-p13-deck-content-team.png"
+    },
+    {
+      "path": "out/14-p14-deck-content-day.png",
+      "sizeBytes": 810788,
+      "sha256": "c6125dda3c0eed44421d2471387a31ac68544db1c259523c66fc5ff23e4d440b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/14-p14-deck-content-day.png"
+    },
+    {
+      "path": "out/15-p15-deck-content-day.png",
+      "sizeBytes": 716025,
+      "sha256": "3b4626766cb496a20b1ceadee80a3b5a977405c2041a5e7a3d70a09461fcb9a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/15-p15-deck-content-day.png"
+    },
+    {
+      "path": "out/16-p16-deck-content-measure-formulas.png",
+      "sizeBytes": 740243,
+      "sha256": "fc9554e711e9709541a34e4ba84e023aadbb5d224e7e7e0068a61d97ea09b196",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/16-p16-deck-content-measure-formulas.png"
+    },
+    {
+      "path": "out/17-p17-deck-content-industries.png",
+      "sizeBytes": 913770,
+      "sha256": "40a258b6db3e6f09a1dd4bb604069ffc3ec4bb05ea77f9b63775d7b4adae0674",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/17-p17-deck-content-industries.png"
+    },
+    {
+      "path": "out/18-p18-deck-content-markets.png",
+      "sizeBytes": 1710281,
+      "sha256": "da4b0a1d4266a41e981d1392ff7a80750fdd3a6fa44ead0012f3150561c82b4f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/18-p18-deck-content-markets.png"
+    },
+    {
+      "path": "out/19-p19-deck-decision-difference.png",
+      "sizeBytes": 855063,
+      "sha256": "152afa8be2be6d50ae3b4e647652addb66da473b2b03ddec16d50740078fb9e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/19-p19-deck-decision-difference.png"
+    },
+    {
+      "path": "out/20-p20-deck-decision-risk.png",
+      "sizeBytes": 185361,
+      "sha256": "2aeae8475b51d7cb3a0adb2021577028dd4f303b400f97971fa3858812e00efa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/20-p20-deck-decision-risk.png"
+    },
+    {
+      "path": "out/21-p21-deck-decision-plan.png",
+      "sizeBytes": 814428,
+      "sha256": "981071aa9d9bd77505757a8f66eab220e7e4060ba0556653c5b01e46318d8509",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/21-p21-deck-decision-plan.png"
+    },
+    {
+      "path": "out/22-p22-deck-decision-diagnosis-map.png",
+      "sizeBytes": 781455,
+      "sha256": "a6d1bd07c1e87425584806de46daed4a9880ffec66cf426109cde8dfaa2a706b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/22-p22-deck-decision-diagnosis-map.png"
+    },
+    {
+      "path": "out/23-p23-deck-close-proposal.png",
+      "sizeBytes": 1156019,
+      "sha256": "b2b849c31c6dc3778764626991403299d315cf1a03bc7138c70c29599c228beb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/out/23-p23-deck-close-proposal.png"
+    },
+    {
+      "path": "review/fix-1.jpg",
+      "sizeBytes": 196324,
+      "sha256": "be711bf6ac58b01667ceef034bab5967f10f6ef265ebe0197b5819f3b4521ab0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/review/fix-1.jpg"
+    },
+    {
+      "path": "review/sheet-1.jpg",
+      "sizeBytes": 196911,
+      "sha256": "e5854f0f0f654ab17b8c712e304ea80a7c43ec28e0b3c35c106d78c51eafa36f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/review/sheet-1.jpg"
+    },
+    {
+      "path": "review/sheet-2.jpg",
+      "sizeBytes": 208342,
+      "sha256": "c5536cb0d06ddd7ddbd0dd50c290f894a733ab5bf408204ef7217319a67733a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/review/sheet-2.jpg"
+    },
+    {
+      "path": "review/sheet-3.jpg",
+      "sizeBytes": 242754,
+      "sha256": "893b3ab2b247d973427a08fae233905b9f11932b465ba90de5df37974bbf84a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/review/sheet-3.jpg"
+    },
+    {
+      "path": "review/sheet-4.jpg",
+      "sizeBytes": 220360,
+      "sha256": "8d41a6e8001db342c8dfe0f1def7925bdf4adf3181a67265053ad589d98fc125",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/review/sheet-4.jpg"
+    },
+    {
+      "path": "review/sheet-5.jpg",
+      "sizeBytes": 240818,
+      "sha256": "eaf4732a268e72eff8beb7c98f48f66367aa7330207bd4581f9dfa6f71dc6433",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/review/sheet-5.jpg"
+    },
+    {
+      "path": "review/sheet-6.jpg",
+      "sizeBytes": 156534,
+      "sha256": "526c8090cb939cc93748b86a083335e70aaef83df890b107954d730d0a67d37b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/review/sheet-6.jpg"
+    },
+    {
+      "path": "tecnica-marco/01-p01-deck-cover-proposal.png",
+      "sizeBytes": 451880,
+      "sha256": "a3dea3e96af80a9109c2438c82ad8b71fd5887a927871f5b85eadc74fc26ca75",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/tecnica-marco/01-p01-deck-cover-proposal.png"
+    },
+    {
+      "path": "tecnica-marco/02-p02-deck-close-proposal.png",
+      "sizeBytes": 1156019,
+      "sha256": "b2b849c31c6dc3778764626991403299d315cf1a03bc7138c70c29599c228beb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_deck-pibank-propuesta/tecnica-marco/02-p02-deck-close-proposal.png"
+    }
+  ]
+}

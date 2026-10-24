@@ -7,8 +7,9 @@ description: >-
   (arquitectura narrativa — Minto/SCQ, Assertion-Evidence de Garner & Alley, la única
   evidencia experimental que existe sobre diseño de láminas; arquetipos de deck; densidad y
   carga cognitiva — Mayer/Sweller; storytelling de datos — Zelazny/Knaflic), y (2) la
-  ejecución (el deck se COMPONE desde un catálogo cerrado con el Artifact Composer, nunca se
-  dibuja freehand; evidencia trazable; entrega que no se rompe). Domain-free: sirve a
+  ejecución (en la ruta del Artifact Composer, el deck se COMPONE desde un catálogo cerrado,
+  nunca se dibuja freehand; también prepara el contenido Markdown cuando el usuario encarga
+  el diseño a otra herramienta; evidencia trazable; entrega que no se rompe). Domain-free: sirve a
   licitaciones, pitch de venta, QBR, board deck, readout de diagnóstico y webinar.
   Triggers: "deck", "láminas", "slides", "presentación", "pitch", "propuesta visual",
   "keynote", "QBR", "board deck", "armar el deck", "diseñar una presentación", "storyline",
@@ -37,6 +38,36 @@ description: >-
 ---
 
 > 🏆 **Hito 2026-09-23:** SKY Blog (Wherex) es la **primera licitación ganada** con el flujo agéntico de licitaciones —método de `greenhouse-public-private-tenders` + Artifact Composer, operado por el operador con un agente— y en una **cuenta de talla enterprise** (SKY Airline). No todo el mérito es del flujo (pesaron la relación, la ronda 2 y la negociación humana), pero es la primera validación en el mercado de lo construido. El deck de esa oferta se compuso con el método de esta skill y el Artifact Composer.
+
+## Cuando el usuario pide Markdown para diseñar después
+
+Si el usuario elige Markdown como entregable y encarga la propuesta visual a Claude Design u otra
+herramienta, entrega un **master sustantivo en MD**. La ruta editorial no requiere componer un PDF,
+crear una Proposal ni ejecutar un render job. Las reglas de Composer de esta skill gobiernan la
+ruta compuesta; no son una condición para cerrar la redacción solicitada. Canon de preparación:
+[manual comercial](../../../docs/manual-de-uso/comercial/construir-una-licitacion.md#preparación-en-markdown-para-diseño-externo).
+
+- El caso de negocio conserva la evidencia, las alternativas, los supuestos y las decisiones internas.
+  La propuesta desarrolla la oferta para el comprador; no basta con reenviar el caso ni con entregar
+  un índice de láminas.
+- Escribe por bloque el titular que afirma una conclusión y el texto listo para usar, con alcance,
+  cantidades y sus límites, calendario, método, responsabilidades, inversión y condiciones según
+  el encargo. Las cantidades ofrecidas se identifican como propuesta propia si el RFP no las fija.
+- Separa el texto para el cliente de las instrucciones de diseño y del control interno. Conserva
+  anexos técnicos/económicos y ledger trazable; costos, márgenes, riesgos de operación y pendientes
+  del operador quedan en el expediente interno. Las incertidumbres que cambian la decisión del
+  comprador sí aparecen en lenguaje claro en el texto comercial.
+- Si hay importes V3, vincula la versión/snapshot del cotizador y copia fielmente moneda, neto,
+  impuestos, plazo, cantidades y total. El diseñador no recalcula ni redondea: un cambio económico
+  vuelve a Pricing y se refleja en todas sus apariciones. Un resumen editorial no es una cotización
+  emitida; el documento formal se rige por `efeonce-pricing-operator`.
+- Verifica cobertura, consistencia entre master y anexos, aritmética, enlaces, procedencia de assets
+  y separación de audiencias. Declara «MD preparado para diseño»; no «deck revisado», «precio
+  aprobado» ni «presentado». Cuando haya diseño exportado, se revisará su archivo final.
+
+El formato que exige el comprador sigue siendo requisito de presentación. Entregar el MD de trabajo
+no cumple por sí solo un PDF, video o formulario obligatorio. Si se encarga después la emisión por
+Proposal Studio, se aplican sus gates de registro, render y comprobación del portal.
 
 ## Pie institucional de decks Efeonce
 
@@ -1291,7 +1322,7 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
 - **Separa el deck técnico del económico.** El técnico desarrolla el desafío, la solución, la
   metodología, el equipo y la evidencia; el económico permite comparar alcance, inversión y
   condiciones sin esconder el precio dentro de la narrativa técnica.
-- **Usa `PricingFull` para la oferta económica.** La lámina debe mostrar la opción recomendada, el
+- **En la ruta Composer, usa `PricingFull` para la oferta económica.** La lámina debe mostrar la opción recomendada, el
   desglose cotizado y las condiciones comerciales desde el snapshot aprobado de la cotización; no
   se reemplaza por una tabla improvisada ni por texto de otra plantilla.
 - **Haz visibles los valores fiscales.** Cada monto client-facing debe declarar explícitamente si es
@@ -1310,8 +1341,8 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
 - **Revisa visualmente todos los frames antes del cierre.** Inspecciona cada lámina exportada:
   recortes, jerarquía, legibilidad, captions, assets, firmas y consistencia. Los tests del Composer
   son necesarios, pero no sustituyen mirar todos los frames.
-- **Pasa el gate de Proposal Studio.** La revisión visual es necesaria, pero el cierre también debe
-  registrar la Proposal, el render job completado, el asset `deck` versionado y la comprobación
+- **Si se encarga la emisión por Proposal Studio, pasa su gate.** La revisión visual es necesaria,
+  pero ese cierre también debe registrar la Proposal, el render job completado, el asset `deck` versionado y la comprobación
   autenticada del portal. Si falta, el estado es `code complete, rollout pendiente` o bloqueado; no
   `complete`.
 

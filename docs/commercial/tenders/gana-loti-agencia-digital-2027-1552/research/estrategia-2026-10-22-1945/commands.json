@@ -1,0 +1,518 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "current",
+      "show"
+    ],
+    "exit_code": 0,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/current.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "workload",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.workload.json",
+      "--brief",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.brief.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.dimensioned-brief.json"
+    ],
+    "exit_code": 0,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.workload-result.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.COP.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.COP.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.COP.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.COP.increment.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.USD.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.USD.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.USD.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/five-static.USD.increment.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "workload",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.workload.json",
+      "--brief",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.brief.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.dimensioned-brief.json"
+    ],
+    "exit_code": 0,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.workload-result.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.COP.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.COP.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.COP.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.COP.increment.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.USD.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.USD.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.USD.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/static-and-tactical-annualised.USD.increment.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "workload",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.workload.json",
+      "--brief",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.brief.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.dimensioned-brief.json"
+    ],
+    "exit_code": 0,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.workload-result.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.COP.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.COP.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.COP.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.COP.increment.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.USD.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.USD.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.USD.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/three-extras-annualised.USD.increment.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "workload",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.workload.json",
+      "--brief",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.brief.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.dimensioned-brief.json"
+    ],
+    "exit_code": 0,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.workload-result.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.COP.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.COP.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.COP.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.COP.increment.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.USD.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.USD.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.USD.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/campaign-month.USD.increment.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "workload",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.workload.json",
+      "--brief",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.brief.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.dimensioned-brief.json"
+    ],
+    "exit_code": 0,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.workload-result.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.COP.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.COP.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.COP.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.COP.increment.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.USD.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.USD.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.USD.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/drill-month.USD.increment.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "workload",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.workload.json",
+      "--brief",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.brief.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.dimensioned-brief.json"
+    ],
+    "exit_code": 0,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.workload-result.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.COP.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.COP.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.COP.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.COP.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.COP.increment.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "quote",
+      "--current",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.USD.demand.json",
+      "--out",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.USD.summary.json",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pnpm",
+      "--silent",
+      "pricing:v3",
+      "compose",
+      "increment",
+      "--input",
+      "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.USD.artifact.json",
+      "--base",
+      "/Users/jreye/Documents/greenhouse-eo/docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/costos-cli-2026-10-22/with-listening.USD.artifact.json"
+    ],
+    "exit_code": 3,
+    "stdout": "/tmp/reditos-strategy-extras-20261022/calculations-v2/overlap-month.USD.increment.json",
+    "stderr": ""
+  }
+]

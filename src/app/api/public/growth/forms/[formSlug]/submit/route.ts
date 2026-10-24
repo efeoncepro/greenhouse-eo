@@ -33,6 +33,8 @@ const STATUS_BY_OUTCOME: Record<PublicSubmitOutcome, number> = {
   captcha_failed: 403,
   form_not_published: 404,
   disabled: 404,
+  // TASK-2053 — cupo lleno con política `reject` (estructural: reintentar no lo resuelve).
+  capacity_full: 409,
   error: 503,
 }
 
@@ -156,6 +158,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ for
 
     return NextResponse.json(
       { outcome: result.outcome, submissionId: result.submissionId, message: result.reason,
+        ...(result.registrationStatus ? { registrationStatus: result.registrationStatus } : {}),
         ...(result.googleAdsConversion ? { googleAdsConversion: result.googleAdsConversion } : {}) },
       { status: STATUS_BY_OUTCOME[result.outcome], headers: { ...headers, 'Cache-Control': 'private, no-store' } },
     )

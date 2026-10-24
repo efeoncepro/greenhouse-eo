@@ -219,11 +219,34 @@ export type CtaConsentState = (typeof CTA_CONSENT_STATES)[number]
 
 // ─── Server-side policies (persisten en cta_version; NUNCA cruzan al browser) ──
 
+/**
+ * TASK-2044 — Cómo se presenta el formulario al activar `open_growth_form`.
+ *   - `inline` (default, igual que omitirlo): se despliega dentro de la tarjeta del CTA, como hoy.
+ *   - `dialog`: diálogo modal abierto por el visitante. NO es la colocación interruptiva `popup_modal`:
+ *     no aparece solo, no hereda tope de frecuencia ni supresión móvil de intersticiales.
+ */
+export const CTA_GROWTH_FORM_PRESENTATIONS = ['inline', 'dialog'] as const
+export type CtaGrowthFormPresentation = (typeof CTA_GROWTH_FORM_PRESENTATIONS)[number]
+
+/** TASK-2044 — Encabezado del diálogo (texto plano, browser-safe). Sin `title` el renderer usa el `headline` del CTA. */
+export const ctaGrowthFormDialogHeaderSchema = z
+  .object({
+    eyebrow: z.string().min(1).max(80).optional(),
+    title: z.string().min(1).max(200).optional(),
+    lead: z.string().min(1).max(600).optional(),
+  })
+  .strict()
+export type CtaGrowthFormDialogHeader = z.infer<typeof ctaGrowthFormDialogHeaderSchema>
+
 /** Policy `open_growth_form` (server). `formRef` = slug o form_key del Growth Form; el CTA guarda SOLO la relación (arch §12: nunca copia schema/validación/consent). */
 export const ctaOpenGrowthFormPolicySchema = z.object({
   kind: z.literal('open_growth_form'),
   formRef: z.string().min(1).max(200),
+  presentation: z.enum(CTA_GROWTH_FORM_PRESENTATIONS).optional(),
+  dialog: ctaGrowthFormDialogHeaderSchema.optional(),
 })
+// Sin `.refine`: la unión discriminada exige ZodObject. «`dialog` sólo con presentation=dialog» lo
+// aplica el resolver del registry (`action_policy_invalid`), la misma puerta del publish gate y del render.
 export type CtaOpenGrowthFormPolicy = z.infer<typeof ctaOpenGrowthFormPolicySchema>
 
 /** Keys UTM permitidas (allowlist dura; también gobierna el campaign context de Think). */
@@ -436,6 +459,9 @@ export const ctaRenderOpenGrowthFormActionSchema = z.object({
   kind: z.literal('open_growth_form'),
   formSlug: z.string().min(1),
   formKey: z.string().optional(),
+  /** TASK-2044 — sólo viaja cuando es `dialog`; ausente = `inline` (proyección idéntica a la previa). */
+  presentation: z.enum(CTA_GROWTH_FORM_PRESENTATIONS).optional(),
+  dialog: ctaGrowthFormDialogHeaderSchema.optional(),
 })
 export type CtaRenderOpenGrowthFormAction = z.infer<typeof ctaRenderOpenGrowthFormActionSchema>
 
@@ -619,6 +645,8 @@ export const CTA_TELEMETRY_ALLOWED_PAYLOAD_KEYS = [
   'renderer_version',
   'contract_version',
   'page_uri',
+  // TASK-2045 — `dialog` cuando open_growth_form abre en diálogo (mismo vocabulario que el agendador).
+  'activation_mode',
 ] as const
 export type CtaTelemetryAllowedPayloadKey = (typeof CTA_TELEMETRY_ALLOWED_PAYLOAD_KEYS)[number]
 

@@ -1,0 +1,132 @@
+{
+  "status": "internal_commercial_working_basis_not_final_offer",
+  "updated_at": "2026-10-22T19:10:04.391210-03:00",
+  "case": "GRD-1552",
+  "attempt": 13,
+  "deal_id": 66560488750,
+  "authority": "Direct instruction Julio 22Oct2026: work with COP36-38M/month, document in case/Deal/future proposal docs; proposal remains stopped",
+  "fx_COP_per_USD": "3650",
+  "basis": "Consolidation of prior person-cost estimate and canonical CLI rest-scope costs; arithmetic, not a new integrated V3 quote or edited frozen artifact",
+  "monthly_persons": {
+    "gross": {
+      "COP": "9800000.00",
+      "USD": "2684.93"
+    },
+    "benefits_first_year_equivalent": {
+      "COP": "1642500.00",
+      "USD": "450.00"
+    },
+    "replacement_reserve": {
+      "COP": "980000.00",
+      "USD": "268.49"
+    },
+    "total": {
+      "COP": "12422500.00",
+      "USD": "3403.42"
+    }
+  },
+  "monthly_rest": {
+    "COP": "12699026.00",
+    "USD": "3479.19"
+  },
+  "monthly_total": {
+    "COP": "25121526.00",
+    "USD": "6882.61"
+  },
+  "initial_once": {
+    "COP": "2295742.00",
+    "USD": "628.97"
+  },
+  "total_monthly_with_initial_spread_over_12": {
+    "COP": "25312837.83",
+    "USD": "6935.02"
+  },
+  "main_crm_scenario_monthly_COP": "38000000",
+  "crm_amount_total_COP": "456000000",
+  "crm_currency": "COP",
+  "crm_duration_months": 12,
+  "working_range_monthly_COP": [
+    "36000000",
+    "38000000"
+  ],
+  "scenarios": [
+    {
+      "monthly_revenue": {
+        "COP": "36000000.00",
+        "USD": "9863.01"
+      },
+      "annual_revenue_12_months": {
+        "COP": "432000000.00",
+        "USD": "118356.16"
+      },
+      "monthly_contribution_before_initial_and_unverified_costs": {
+        "COP": "10878474.00",
+        "USD": "2980.40"
+      },
+      "margin_percent": "30.22",
+      "margin_percent_with_initial_spread_over_12": "29.69",
+      "discount_from_buyer_cap_percent": "10.00"
+    },
+    {
+      "monthly_revenue": {
+        "COP": "38000000.00",
+        "USD": "10410.96"
+      },
+      "annual_revenue_12_months": {
+        "COP": "456000000.00",
+        "USD": "124931.51"
+      },
+      "monthly_contribution_before_initial_and_unverified_costs": {
+        "COP": "12878474.00",
+        "USD": "3528.35"
+      },
+      "margin_percent": "33.89",
+      "margin_percent_with_initial_spread_over_12": "33.39",
+      "discount_from_buyer_cap_percent": "5.00"
+    },
+    {
+      "monthly_revenue": {
+        "COP": "40000000.00",
+        "USD": "10958.90"
+      },
+      "annual_revenue_12_months": {
+        "COP": "480000000.00",
+        "USD": "131506.85"
+      },
+      "monthly_contribution_before_initial_and_unverified_costs": {
+        "COP": "14878474.00",
+        "USD": "4076.29"
+      },
+      "margin_percent": "37.20",
+      "margin_percent_with_initial_spread_over_12": "36.72",
+      "discount_from_buyer_cap_percent": "0.00"
+    }
+  ],
+  "final_offer_price_approved": false,
+  "proposal_preparation_authorized": false,
+  "proposal_emission_authorized": false,
+  "buyer_vat_treatment": "Wherex form says NO considera IVA; contractual tax treatment/cap still unresolved",
+  "procurement_status": "HOLD; no new bid recommendation",
+  "future_document_rules": [
+    "Use this case-specific basis, not lost historical proposals or GRD-1541 Programmatic",
+    "COP is offer/planning base, USD internal reference at fixed3650",
+    "Show monthly fee and 12-month engagement total consistently; do not use buyer40Mcap as price",
+    "Do not disclose internal costs/margins or36M alternative as two buyer offers without a concrete approved choice",
+    "Final scope and price require review of payer for media/EmailSMS, taxes, costs and explicit authorization before preparation/emission",
+    "No add-on initial fee or payment schedule approved; initial is internal cost only"
+  ],
+  "pending_costs": [
+    "overhead not assigned",
+    "payment/FX fees not quoted",
+    "employment/EOR route charges not verified",
+    "new shared strategist benefits/charges not validated",
+    "payer/licence/usage of EmailSMS platform",
+    "payer/media budgets",
+    "Listening channel/volume coverage and Frame.io current price"
+  ],
+  "sources": [
+    "research/COSTOS-TRES-PERFILES-MEDELLIN-2026-10-22.json",
+    "research/costos-cli-2026-10-22/cost-summary.json",
+    "research/CRM-BASE-COMERCIAL-2026-10-22.json"
+  ]
+}

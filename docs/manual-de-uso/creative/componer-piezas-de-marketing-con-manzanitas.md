@@ -1,9 +1,9 @@
 # Componer piezas de Marketing con Manzanitas — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-28 por Claude
-> **Ultima actualizacion:** 2026-09-29 por Claude (TASK-1939) (1.4: el vestuario del equipo lo decide la línea de la pieza; 1.3: las diez decisiones resueltas; el texto de cierre que cambia con el contexto y su extensión normalizada; las personas del equipo en las fotos, con su roster y su vestuario; los íconos `republicar` y `enviar`; AXIS `v0.3.29`. 1.2: componer con el comando `pnpm manzanitas:compose`, decisiones del operador del 2026-09-29 y regla del eslogan de los cierres)
+> **Ultima actualizacion:** 2026-10-22 por Claude (1.5: dónde se publica cada pieza ahora que Marketing con Manzanitas es una familia de canales, PDR-020 rev 2.0) · 2026-09-29 por Claude (TASK-1939) (1.4: el vestuario del equipo lo decide la línea de la pieza; 1.3: las diez decisiones resueltas; el texto de cierre que cambia con el contexto y su extensión normalizada; las personas del equipo en las fotos, con su roster y su vestuario; los íconos `republicar` y `enviar`; AXIS `v0.3.29`. 1.2: componer con el comando `pnpm manzanitas:compose`, decisiones del operador del 2026-09-29 y regla del eslogan de los cierres)
 > **Modulo:** Creative · Marketing con Manzanitas (registro complementario de «La órbita»)
 > **Ruta en portal:** no aplica — las piezas se componen en el taller local con `pnpm manzanitas:compose` (catálogo `manzanitas` del Artifact Composer, TASK-1939) o en el canvas de la línea con los componentes del DS «Efeonce — La órbita»; la validación y los gráficos desde datos están en AXIS (`pnpm manzanitas:resolve`, `axis-graphic-line/charts`); la ruta productiva (API, worker y MCP) llega con TASK-1921
 > **Documentacion tecnica:** [ADR del registro](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md) · [Norma del registro](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
@@ -302,6 +302,13 @@ Componer no es publicar: publicar requiere la autorización del operador, y este
 | **Miniatura de YouTube** | Escena 16:9 | el logo abajo a la izquierda; sin eslogan (el eslogan va en el cierre del video) |
 | **Cierre de YouTube** | Pizarra 16:9 | el logo de Efeonce de 260 px con el eslogan **debajo** (regla del 2026-09-29; el cierre del canvas v39 lo tenía encima y quedó superado); con ese logo el eslogan queda en unos 14–15 px, así que la palabra de la línea va en blanco |
 | **Portada del pódcast** | 1:1 | la cabecera del programa en grande (420 px), porque la portada se ve a 160 px; sin eslogan |
+
+**Dónde se publica (desde 2026-10-22).** Marketing con Manzanitas es una familia de canales: **blog, newsletter
+quincenal en el LinkedIn de Julio y YouTube**. Para YouTube, prepara **dos miniaturas** de cada video para la prueba
+A/B y cierra con la pieza «Cierre de YouTube». El newsletter de LinkedIn todavía no tiene pieza en el registro: no la
+improvises, pídela al operador. Instagram ya no lleva carruseles de temas de servicio, y la story no tiene hoy un
+canal asignado. Detalle: [delta 2026-10-22 de la norma](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) ·
+[sistema de canales](../../documentation/social/sistema-de-canales-y-love-brand.md).
 
 ## Qué significan los estados y las señales
 

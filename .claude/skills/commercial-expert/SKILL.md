@@ -7,6 +7,33 @@ user-invocable: true
 argument-hint: "[area or specific question]"
 ---
 
+
+## Partnerships, distribuidores y expedientes externos
+
+Para recuperar membresías, completar altas/crédito o preparar documentos para distribuidores, cargar el
+[manual de operación](../../../docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md) y el registro de partnerships. Cruzar cuenta, razón social/RUT e ID antes
+de registrar, formar o pedir un upgrade; no crear duplicados ni usar una membresía de otra empresa.
+Separar estado del programa, curso, distribución, Marketplace, crédito y capacidad de ordenar.
+Los formularios externos sólo llevan datos pertinentes: notas de búsqueda, pendientes y QA quedan en el
+expediente interno. No inventar datos ni aplicar la firma del correo como firma contractual. Revisar todas
+las páginas y la lista exacta de adjuntos; comprobar Enviados, archivos y CRM por separado.
+Los estados variables viven en el registro/auditoría; los correos y rutas de contacto viven en el
+[directorio de personas y equipos](../../../docs/operations/EFEONCE_PARTNER_CONTACT_DIRECTORY_V1.md).
+Leerlo antes de localizar destinatarios; contiene funciones, fuentes, fechas, reemplazos y rebotes.
+Índice nominal de recuperación (no implica cargo vigente ni autorización de envío):
+- Google/Ingram: Joelvis Sarmiento, Víctor Escárate, Nicolás Santibáñez, Cristian Faúndez;
+  Google for Education: Arthur Guedes y Carlos Jimenez.
+- Microsoft/LOL: Geraldine Vanessa Gonzalez Moreno, Camila Orellana, Reinel Bejarano,
+  Diana Jaimes y Daniela Sedlacek. Alta/crédito LOL: Lucia Gabriela Tovar.
+- AWS/LOL: José Manuel Quezada, Valentina Egaña, Macarena Hein, Víctor Ledezma y Jorge Noguera;
+  AWS directo: Julieth Vanessa Castillo y Daniel López.
+- Adobe/Nexsys: Jean Sánchez, Francisco Araya, Constanza Moya, Javiera Castro, José Orellana
+  y Vicente Ulloa. Adobe/Ingram: Melissa Danae Santos y Marco Seferino.
+No confundir ambos Víctor, ni Ingram con Nexsys. Cristian, Vicente y Marco tienen rebotes registrados;
+consultar la evidencia antes de reutilizarlos. María Berrios pertenece a una membresía ajena;
+Jose Menezes es fuente del anuncio, no contacto operativo acreditado. No copiar ni inferir sus correos.
+
+
 ## Nombres de negocios y leads Efeonce
 
 Antes de preparar o escribir `dealname` / `hs_lead_name`, aplicar la
@@ -50,10 +77,10 @@ sin convertir método en autorización de envío, enrollment, cambios DNS o paus
 
 ## Envíos desde el Outlook de Julio
 
-Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
+Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma gráfica oficial siempre y CCO `48713323@bcc.hubspot.com`, incluidos correos nuevos, respuestas, reenvíos y seguimientos manuales, programados o por secuencias (Julio, 21/10/2026). Usar Outlook UI o transporte HTML autorizado que conserve la firma; texto plano no es alternativa. Si la herramienta no la preserva, dejar el correo pendiente sin enviarlo. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
 
 
-> **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
+> **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` (nombre interno del hub; el público ve *Marketing con Manzanitas*) = demand-gen + nurturing top-of-funnel [*Marketing con Manzanitas* (blog, newsletter del LinkedIn de Julio, YouTube) · *Glitch* (marca hermana: newsletter semanal IA/Marketing/Negocios por correo, archivo en el blog) + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
 
 This file **overrides** the global `commercial-expert` skill's defaults when working inside the `greenhouse-eo` repository. When there's a conflict, **this overlay wins**.
 
@@ -227,6 +254,12 @@ para el negocio. Canon, mapa a servicios y reglas: [`EFEONCE_AI_CONTEXT_NARRATIV
   partner de ambos y el ángulo es provider-fit.
 - **Entrada:** evaluación RevOps, chequeo de salud de datos, Radiografía AEO, taller de equipo agéntico o Creative
   Diagnostic; la expansión sigue el §4 del canon.
+- **Inbound desde canales propios (operador, 2026-10-22):** sólo LinkedIn lleva directo a la landing de servicio con
+  su diagnóstico; Instagram, Threads, YouTube y el blog llevan antes a Glitch, a una herramienta o al LinkedIn de
+  Julio. En la primera reunión, pregunta cómo nos conoció el contacto y anota si mencionó Instagram o YouTube: es
+  parte de la medición del puente fan → conversación, que en formularios y HubSpot todavía no existe. La línea «IA con
+  contexto» (Engine) y nube no tienen landing al 2026-10-22. Canon:
+  [estrategia de love brand §8.4 y §11](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
 
 ## Hard rules (Greenhouse-specific commercial)
 

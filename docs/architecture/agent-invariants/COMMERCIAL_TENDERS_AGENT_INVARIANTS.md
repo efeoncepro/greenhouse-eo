@@ -6,9 +6,9 @@ El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes
 no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
 
 > **Tipo:** Companion de invariantes (load-on-demand)
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-07-12 por Claude
-> **Última actualización:** 2026-10-12 por Claude (1.2: Delta 2026-10-12 — la plantilla A4 es la vía por defecto de la oferta económica que ve el comprador; el Excel de `economica:build` sólo cuando las bases exigen planilla. 1.1, 2026-09-28: TASK-1930, la evidencia de la `Proposal` liga los slots del deck «La órbita»; ningún deck usa evidencia `internal`)
+> **Última actualización:** 2026-10-23 por Codex (1.3: preparación editorial Markdown y costos objetivo V3; sin cambio runtime. 1.2: Delta 2026-10-12 — la plantilla A4 es la vía por defecto de la oferta económica que ve el comprador; el Excel de `economica:build` sólo cuando las bases exigen planilla. 1.1, 2026-09-28: TASK-1930, la evidencia de la `Proposal` liga los slots del deck «La órbita»; ningún deck usa evidencia `internal`)
 > **Cargar al tocar:** `src/lib/commercial/tenders/**` · `docs/architecture/tender-deck-composer-prototypes/**` · `scripts/commercial/compose-tender-deck.ts` · `src/lib/brand-surfaces/deck-recipes/bindings/**` (datos de la `Proposal` en el deck «La órbita») · cualquier oferta/deck/propuesta de licitación
 > **Contrato completo:** `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` (el deck) · `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (el aggregate; **leer su §0 — estado real**) · `docs/research/RESEARCH-007-commercial-public-tenders-module.md` (discovery público)
 > **Skills:** `greenhouse-public-private-tenders` (método) + `deck-studio` (argumento, composición y
@@ -29,6 +29,12 @@ Esta aclaración gobierna el trabajo del operador y los agentes; no modifica el 
 Método: [plataformas y expediente administrativo](../../../.codex/skills/greenhouse-public-private-tenders/platform-bids-and-administrative-package.md).
 Datos: [ficha corporativa](../../commercial/EFEONCE_DATOS_PARA_LICITACIONES.md).
 Continuidad y evidencia: [cierre de sesión](../../audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md).
+
+## Preparación editorial MD — aclaración de alcance 2026-10-23
+
+La entrega MD elegida por el operador es una fuente de trabajo: caso interno y propuesta completa para diseño externo, con límites, ledger y economía conciliada. No exige render ni alta de Proposal Studio para dar por entregado ese insumo y no acredita cotización emitida, GO o envío. Los formatos exigidos por el comprador y los gates del carril gobernado siguen vigentes al presentar. [Método operativo](../../manual-de-uso/comercial/construir-una-licitacion.md#preparación-en-markdown-para-diseño-externo).
+
+El RFP fija requisitos, no permisos del operador; matrices vacías no acreditan cumplimiento. Marca, sociedad, holding y proyecto son identidades distintas. Cantidades/costos propuestos se rotulan como propios, sin transformar el caso de un cliente en rate card o alcance estándar. V3 usa costo objetivo del catálogo vigente, no nómina, y conserva evidencia/estimaciones/aprobación separadas.
 
 ## Oferta económica documental rápida para licitación — 2026-10-08
 

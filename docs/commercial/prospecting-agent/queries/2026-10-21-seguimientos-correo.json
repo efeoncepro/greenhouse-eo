@@ -1,0 +1,1757 @@
+{
+  "schema_version": 1,
+  "run_id": "2026-10-21-seguimientos-correo",
+  "timezone": "America/Santiago",
+  "scope": "Revisión de correspondencia comercial desde2026-10-01, no nueva búsqueda de convocatorias ni ejecución de seguimientos",
+  "sources_read": [
+    {
+      "source": "Outlook",
+      "mailbox": "identidad laboral de Julio verificada",
+      "queries": [
+        {
+          "endpoint": "list_messages",
+          "folder": "sentitems",
+          "filter": "receivedDateTime ge2026-10-01T00:00:00Z",
+          "order": "receivedDateTime desc",
+          "pages": [
+            {
+              "skip": 0,
+              "count": 100
+            },
+            {
+              "skip": 100,
+              "count": 100
+            },
+            {
+              "skip": 200,
+              "count": 5
+            }
+          ],
+          "has_more": false
+        },
+        {
+          "endpoint": "list_messages",
+          "folder": "sentitems",
+          "filter": "sentDateTime ge2026-10-01T00:00:00Z",
+          "order": "sentDateTime desc",
+          "count": 100,
+          "note": "Primera lectura con orden no expuesto por proveedor; inventario definitivo por receivedDateTime"
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "izipay.pe",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "izipay.pe",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "izipay.pe",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "izipay.pe",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "odoo.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "assetplan.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "redsalud.cl",
+          "pii_redacted": true,
+          "count": null,
+          "has_more": null,
+          "error": "RATE_LIMITED",
+          "transient_failure": true
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "unilever.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "unilever.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "unilever.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "trytoku.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "sgs.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "sgs.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "sgs.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "sgs.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "pichincha.pe",
+          "pii_redacted": true,
+          "count": 2,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "cnagro.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "cnagro.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "cnagro.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "cnagro.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "fitflow.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "fitflow.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "fitflow.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "fitflow.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 1,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 1,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 6,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 14,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 2,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "pierre-fabre.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "pierre-fabre.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "indecaucho.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "aloja-host.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "laboratoriochile.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "continente.com.co",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "uniminuto.edu",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "station24.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "franquiciasperu.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "bivien.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "win.com.pe",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "besco.com.pe",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "evinka.tech",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "toyotadelbajio.com.mx",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "gruposcp.com",
+          "pii_redacted": true,
+          "count": 1,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "blancofinanciero.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "chazki.com",
+          "pii_redacted": true,
+          "count": 1,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "lagramaperu.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 4,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "tenpo.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skrental.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "iconstruye.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "aligntech.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "solidaria.com.co",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "lagramaperu.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "tecnipak.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "fracttal.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "forus.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "fabrimetal.cl",
+          "pii_redacted": true,
+          "count": 2,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "intursa.com.pe",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "alfinbanco.pe",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "ingimex.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "gruposcp.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "forus.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "momentumbrand.ai",
+          "pii_redacted": true,
+          "count": 2,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "ucsh.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "haulmer.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "underpizza.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "underpizza.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "forus.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "queplan.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "talana.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "construmart.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "torre.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "construmart.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "duemint.com",
+          "pii_redacted": true,
+          "count": 1,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "metalhsa.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "pjchile.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "olivosdelsur.com",
+          "pii_redacted": true,
+          "count": null,
+          "has_more": null,
+          "error": "RATE_LIMITED",
+          "transient_failure": true
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "yanbal.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "lotuspro.cl",
+          "pii_redacted": true,
+          "count": null,
+          "has_more": null,
+          "error": "RATE_LIMITED",
+          "transient_failure": true
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "lotuspro.cl",
+          "pii_redacted": true,
+          "count": null,
+          "has_more": null,
+          "error": "RATE_LIMITED",
+          "transient_failure": true
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "lotuspro.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "lotuspro.cl",
+          "pii_redacted": true,
+          "count": null,
+          "has_more": null,
+          "error": "RATE_LIMITED",
+          "transient_failure": true
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": null,
+          "has_more": null,
+          "error": "RATE_LIMITED",
+          "transient_failure": true
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": null,
+          "has_more": null,
+          "error": "RATE_LIMITED",
+          "transient_failure": true
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": null,
+          "has_more": null,
+          "error": "RATE_LIMITED",
+          "transient_failure": true
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": null,
+          "has_more": null,
+          "error": "RATE_LIMITED",
+          "transient_failure": true
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "redsalud.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "olivosdelsur.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "lotuspro.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "lotuspro.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "lotuspro.cl",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "from:[correo individual redactado] received>=2026-10-01",
+          "domain": "skyairline.com",
+          "pii_redacted": true,
+          "count": 0,
+          "has_more": false,
+          "error": null,
+          "transient_failure": false
+        },
+        {
+          "endpoint": "search_messages",
+          "queries": [
+            "Teva received>=2026-09-01",
+            "\"Pierre\" received>=2026-09-01",
+            "from:[Teva individual redactado] received>=2026-10-01",
+            "from:[Pierre individual redactado] received>=2026-10-01",
+            "pierre-fabre.com received>=2026-10-16",
+            "laboratoriochile.cl received>=2026-10-16"
+          ],
+          "pii_redacted": true
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "subject:Undeliverable received>=2026-10-01",
+          "count": 0
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "subject:No se pudo entregar received>=2026-10-01",
+          "count": 5
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "subject:No entregado received>=2026-10-01",
+          "count": 0
+        },
+        {
+          "endpoint": "list_messages",
+          "folder": "drafts",
+          "top": 50,
+          "order": "receivedDateTime desc",
+          "recent_since_oct1": 12,
+          "has_more_older": true,
+          "no_mutation": true
+        },
+        {
+          "endpoint": "list_messages",
+          "filter": "received>=2026-10-01 AND from IN [3direcciones individuales redactadas; Pibank/Momentum/SKY]",
+          "count": 5,
+          "has_more": false,
+          "pii_redacted": true
+        },
+        {
+          "endpoint": "list_messages",
+          "filter": "received>=2026-10-01 AND from IN [44direcciones de proveedores/clientes redactadas]",
+          "count": 76,
+          "has_more": false,
+          "pii_redacted": true
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "subject:Minuta y próximos pasos received>=2026-10-19",
+          "count": 1
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "subject:Propuesta Efeonce received>=2026-10-20",
+          "count": 5
+        },
+        {
+          "endpoint": "search_messages",
+          "query": "subject:Lotus received>=2026-10-14",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "source": "HubSpot",
+      "portal": 48713323,
+      "identity": "Julio Reyes",
+      "actions": [
+        "get_user_details",
+        "search_properties CONTACT prospecting_agent/optout/bounce/bad_address",
+        "search_crm_objects CONTACT email IN [92direcciones redactadas],92/92 sin paginación"
+      ],
+      "ui_reads": [
+        "16secuencias listado",
+        "316751032/enrollments",
+        "scheduled14filas"
+      ],
+      "sequence_enrolled_contacts": 14,
+      "prospecting_agent_in_progress": 12,
+      "prospecting_agent_errored": 9
+    },
+    {
+      "source": "Apollo",
+      "action": "emailer_campaigns_search",
+      "pages": 1,
+      "total": 6,
+      "active": 0,
+      "scheduled_counters": 0,
+      "enrichment_calls": 0
+    }
+  ],
+  "coverage": [
+    {
+      "account": "izipay",
+      "domain": "izipay.pe",
+      "last_outlook_copy_received_at": "2026-10-21T10:56:01Z",
+      "sent_messages": 4,
+      "action": "Esperar: tres contactos con secuencia para27/29/30Oct; contacto cuyo buzón fue dado de baja excluido. No otro correo hoy.",
+      "crm_contact_ids": [
+        "256741155649",
+        "256748000582",
+        "256738197623",
+        "256738112539"
+      ]
+    },
+    {
+      "account": "Odoo",
+      "domain": "odoo.com",
+      "last_outlook_copy_received_at": "2026-10-21T02:48:26Z",
+      "sent_messages": 1,
+      "action": "Correo enviado20Oct23:48Santiago. Esperar; ninguna urgencia ni nuevo contacto hoy.",
+      "crm_contact_ids": [
+        "256685164675"
+      ]
+    },
+    {
+      "account": "Assetplan",
+      "domain": "assetplan.cl",
+      "last_outlook_copy_received_at": "2026-10-20T21:11:31Z",
+      "sent_messages": 2,
+      "action": "Propuesta enviada20Oct18:11. Revisión interna existente23Oct; no reenviar hoy.",
+      "crm_contact_ids": [
+        "256447052473"
+      ]
+    },
+    {
+      "account": "RedSalud",
+      "domain": "redsalud.cl",
+      "last_outlook_copy_received_at": "2026-10-20T20:48:03Z",
+      "sent_messages": 4,
+      "action": "Agente de prospección IN_PROGRESS; último correo20Oct. Conservar carril, no duplicar manual.",
+      "crm_contact_ids": [
+        "253706281649"
+      ]
+    },
+    {
+      "account": "Unilever México",
+      "domain": "unilever.com",
+      "last_outlook_copy_received_at": "2026-10-20T19:00:11Z",
+      "sent_messages": 3,
+      "action": "Dos contactos activos en secuencia27Oct; uno rebotó UNKNOWN_USER y espera respuesta a InMail ya enviado. Sin reenvío.",
+      "crm_contact_ids": [
+        "256572112705",
+        "256562735712",
+        "256566833779"
+      ]
+    },
+    {
+      "account": "Toku",
+      "domain": "trytoku.com",
+      "last_outlook_copy_received_at": "2026-10-20T13:50:03Z",
+      "sent_messages": 4,
+      "action": "Agente IN_PROGRESS; último envío20Oct. No añadir correo manual.",
+      "crm_contact_ids": [
+        "253263104676"
+      ]
+    },
+    {
+      "account": "SGS",
+      "domain": "sgs.com",
+      "last_outlook_copy_received_at": "2026-10-19T21:17:43Z",
+      "sent_messages": 1,
+      "action": "Técnica enviada19Oct18:17. Revisión interna22Oct: seis datos para económica y reunión; sin aceptación confirmada.",
+      "crm_contact_ids": [
+        "251914811963",
+        "251877082753",
+        "251883896582",
+        "233937584014"
+      ]
+    },
+    {
+      "account": "Pibank Perú",
+      "domain": "pichincha.pe",
+      "last_outlook_copy_received_at": "2026-10-19T20:49:20Z",
+      "sent_messages": 2,
+      "action": "Respuesta humana19Oct pide precisiones hasta22Oct; contestadas19Oct17:49. Esperar; no volver a responder lo mismo.",
+      "crm_contact_ids": [
+        "251530718551"
+      ]
+    },
+    {
+      "account": "Agrocompra / CNA",
+      "domain": "cnagro.cl",
+      "last_outlook_copy_received_at": "2026-10-19T18:10:14Z",
+      "sent_messages": 4,
+      "action": "Cuatro envíos19Oct; sin respuesta encontrada. Revisión interna26Oct; coordinar una ruta, no repetir a cuatro personas.",
+      "crm_contact_ids": [
+        "256152435357",
+        "256144452275",
+        "256144330252",
+        "256145010952"
+      ]
+    },
+    {
+      "account": "Fitflow",
+      "domain": "fitflow.com",
+      "last_outlook_copy_received_at": "2026-10-19T15:53:31Z",
+      "sent_messages": 4,
+      "action": "Cuatro envíos19Oct; sin respuesta. Revisión interna23Oct; elegir una ruta coordinada, sin ampliar destinatarios.",
+      "crm_contact_ids": [
+        "256144626299",
+        "256152424223",
+        "256144999055",
+        "256144201116"
+      ]
+    },
+    {
+      "account": "SKY",
+      "domain": "skyairline.com",
+      "last_outlook_copy_received_at": "2026-10-19T13:57:23Z",
+      "sent_messages": 21,
+      "action": "Social Care revisado enviado19Oct10:48; adenda con antecedentes enviados19Oct10:57. Esperar definición/adenda; borradores viejos no se reenvían. Auditoría comprometida requiere conciliación separada.",
+      "crm_contact_ids": [
+        "254958233870",
+        "252633209210",
+        "252633209214",
+        "252633209216",
+        "252633209215",
+        "250366202273",
+        "250366202274",
+        "237487123497",
+        "227612509495",
+        "214043639119",
+        "157404441685",
+        "157404441684",
+        "139243510680",
+        "137362851211",
+        "136895469482"
+      ]
+    },
+    {
+      "account": "Pierre Fabre",
+      "domain": "pierre-fabre.com",
+      "last_outlook_copy_received_at": "2026-10-19T13:00:16Z",
+      "sent_messages": 1,
+      "action": "HSP-0015: credenciales19Oct10:00; sin respuesta. Proponer26Oct confirmación de recepción, sin programar. Separar solicitud interna del partner sobre CRM.",
+      "crm_contact_ids": [
+        "254011713292",
+        "254010206318"
+      ]
+    },
+    {
+      "account": "Indecaucho",
+      "domain": "indecaucho.com",
+      "last_outlook_copy_received_at": "2026-10-19T00:06:07Z",
+      "sent_messages": 1,
+      "action": "Un seguimiento ya programado22Oct09:30Quito (11:30Santiago); no duplicar.",
+      "crm_contact_ids": [
+        "255985568411"
+      ]
+    },
+    {
+      "account": "Aloja Host",
+      "domain": "aloja-host.com",
+      "last_outlook_copy_received_at": "2026-10-17T15:36:27Z",
+      "sent_messages": 2,
+      "action": "Dos correos17Oct; sin respuesta. Revisión26Oct. Usar original aprobado; excluir copia38láminas357366114.",
+      "crm_contact_ids": [
+        "255793944973"
+      ]
+    },
+    {
+      "account": "Laboratorio Chile / Teva",
+      "domain": "laboratoriochile.cl",
+      "last_outlook_copy_received_at": "2026-10-16T21:17:16Z",
+      "sent_messages": 2,
+      "action": "HSP-0027: dos correos16Oct; secuencia activa, siguiente22Oct10:30Santiago; no enviar tercero hoy.",
+      "crm_contact_ids": [
+        "254921490573"
+      ]
+    },
+    {
+      "account": "Continente",
+      "domain": "continente.com.co",
+      "last_outlook_copy_received_at": "2026-10-16T21:07:22Z",
+      "sent_messages": 1,
+      "action": "HSP-0018: correo16Oct; prospección futura, convocatoria histórica. Texto para26Oct con brochure íntegro mediante enlace, sin reactivar compra.",
+      "crm_contact_ids": [
+        "254187252266"
+      ]
+    },
+    {
+      "account": "UNIMINUTO",
+      "domain": "uniminuto.edu",
+      "last_outlook_copy_received_at": "2026-10-16T21:04:16Z",
+      "sent_messages": 1,
+      "action": "Correo16Oct; sin respuesta. Texto para revisión23Oct, corrigiendo material; vigencia del proceso desconocida.",
+      "crm_contact_ids": [
+        "254935102797"
+      ]
+    },
+    {
+      "account": "Station24",
+      "domain": "station24.com",
+      "last_outlook_copy_received_at": "2026-10-16T16:10:07Z",
+      "sent_messages": 2,
+      "action": "Secuencia activa; próximo22Oct10:15CST según UI. No duplicar.",
+      "crm_contact_ids": [
+        "253974262713"
+      ]
+    },
+    {
+      "account": "Pizza Hut / Delosi",
+      "domain": "franquiciasperu.com",
+      "last_outlook_copy_received_at": "2026-10-16T15:50:06Z",
+      "sent_messages": 2,
+      "action": "Secuencia activa; próximo22Oct10:55EST mostrado. No duplicar.",
+      "crm_contact_ids": [
+        "254300921352"
+      ]
+    },
+    {
+      "account": "Bivien",
+      "domain": "bivien.com",
+      "last_outlook_copy_received_at": "2026-10-16T15:40:04Z",
+      "sent_messages": 2,
+      "action": "Secuencia activa; próximo22Oct10:45EST mostrado. No duplicar.",
+      "crm_contact_ids": [
+        "254351743369"
+      ]
+    },
+    {
+      "account": "WIN Fitness Wear",
+      "domain": "win.com.pe",
+      "last_outlook_copy_received_at": "2026-10-16T15:30:13Z",
+      "sent_messages": 2,
+      "action": "Secuencia activa; próximo22Oct10:35EST mostrado. No duplicar.",
+      "crm_contact_ids": [
+        "253896560897"
+      ]
+    },
+    {
+      "account": "Besco",
+      "domain": "besco.com.pe",
+      "last_outlook_copy_received_at": "2026-10-16T15:20:11Z",
+      "sent_messages": 2,
+      "action": "Secuencia activa; próximo22Oct10:23EST mostrado. No duplicar.",
+      "crm_contact_ids": [
+        "254309319570"
+      ]
+    },
+    {
+      "account": "Evinka",
+      "domain": "evinka.tech",
+      "last_outlook_copy_received_at": "2026-10-16T15:10:03Z",
+      "sent_messages": 2,
+      "action": "Secuencia activa; próximo22Oct10:13EST mostrado. No duplicar.",
+      "crm_contact_ids": [
+        "254302284631"
+      ]
+    },
+    {
+      "account": "Toyota del Bajío / búsqueda web",
+      "domain": "toyotadelbajio.com.mx",
+      "last_outlook_copy_received_at": "2026-10-16T09:46:40Z",
+      "sent_messages": 1,
+      "action": "Secuencia activa; primer seguimiento hoy21Oct10:00CST mostrado, aún futuro al corte. No enviarlo manualmente.",
+      "crm_contact_ids": [
+        "255507604345"
+      ]
+    },
+    {
+      "account": "Socopur",
+      "domain": "gruposcp.com",
+      "last_outlook_copy_received_at": "2026-10-15T22:38:29Z",
+      "sent_messages": 5,
+      "action": "HSP-0017: comprador rechazó ingreso15Oct; agradecimiento posterior enviado. STOP para este proceso.",
+      "crm_contact_ids": [
+        "254644240130",
+        "254187252267"
+      ]
+    },
+    {
+      "account": "Blanco Financiero",
+      "domain": "blancofinanciero.com",
+      "last_outlook_copy_received_at": "2026-10-15T21:00:03Z",
+      "sent_messages": 3,
+      "action": "Agente IN_PROGRESS; tres correos, último15Oct. Revisar carril sin añadir cuarto manual.",
+      "crm_contact_ids": [
+        "253263101047"
+      ]
+    },
+    {
+      "account": "Chazki",
+      "domain": "chazki.com",
+      "last_outlook_copy_received_at": "2026-10-15T20:37:04Z",
+      "sent_messages": 3,
+      "action": "Autorespuesta08Oct no es conversación; tres enviados hasta15Oct y agente IN_PROGRESS. No usar colegas de OOO para ampliar contacto.",
+      "crm_contact_ids": [
+        "253263097763"
+      ]
+    },
+    {
+      "account": "La Grama",
+      "domain": "lagramaperu.com",
+      "last_outlook_copy_received_at": "2026-10-15T19:51:04Z",
+      "sent_messages": 6,
+      "action": "Dos contactos IN_PROGRESS; tres envíos a cada uno hasta14/15Oct. Un único plan de cuenta; no tercer interlocutor.",
+      "crm_contact_ids": [
+        "253240984609",
+        "252631280500"
+      ]
+    },
+    {
+      "account": "Tenpo",
+      "domain": "tenpo.cl",
+      "last_outlook_copy_received_at": "2026-10-15T17:57:03Z",
+      "sent_messages": 3,
+      "action": "Agente IN_PROGRESS; tres envíos, último15Oct. No duplicar.",
+      "crm_contact_ids": [
+        "253392938336"
+      ]
+    },
+    {
+      "account": "SK Rental",
+      "domain": "skrental.com",
+      "last_outlook_copy_received_at": "2026-10-15T17:56:04Z",
+      "sent_messages": 3,
+      "action": "Agente IN_PROGRESS; tres envíos, último15Oct. No duplicar.",
+      "crm_contact_ids": [
+        "253706273589"
+      ]
+    },
+    {
+      "account": "iConstruye",
+      "domain": "iconstruye.com",
+      "last_outlook_copy_received_at": "2026-10-15T17:46:04Z",
+      "sent_messages": 3,
+      "action": "Agente IN_PROGRESS; tres envíos, último15Oct. No duplicar.",
+      "crm_contact_ids": [
+        "253263102876"
+      ]
+    },
+    {
+      "account": "Align / partner por identificar",
+      "domain": "aligntech.com",
+      "last_outlook_copy_received_at": "2026-10-15T10:07:19Z",
+      "sent_messages": 1,
+      "action": "Correo15Oct; sin respuesta ni automatización activa en las propiedades leídas. Texto para22Oct; el comprador es un partner por identificar, no se atribuye a Align.",
+      "crm_contact_ids": [
+        "255247873398"
+      ]
+    },
+    {
+      "account": "Aseguradora Solidaria",
+      "domain": "solidaria.com.co",
+      "last_outlook_copy_received_at": "2026-10-14T23:22:43Z",
+      "sent_messages": 1,
+      "action": "Correo14Oct; sin respuesta ni automatización activa leída. Texto para22Oct sobre criterios/proyecto.",
+      "crm_contact_ids": [
+        "255100754245"
+      ]
+    },
+    {
+      "account": "Tecnipak",
+      "domain": "tecnipak.com",
+      "last_outlook_copy_received_at": "2026-10-14T13:41:04Z",
+      "sent_messages": 3,
+      "action": "Agente IN_PROGRESS; tres envíos, último14Oct. No duplicar.",
+      "crm_contact_ids": [
+        "253263108911"
+      ]
+    },
+    {
+      "account": "Fracttal",
+      "domain": "fracttal.com",
+      "last_outlook_copy_received_at": "2026-10-14T13:34:04Z",
+      "sent_messages": 3,
+      "action": "Agente IN_PROGRESS; tres envíos, último14Oct. No duplicar.",
+      "crm_contact_ids": [
+        "253706280536"
+      ]
+    },
+    {
+      "account": "Forus / Norseg / Columbia",
+      "domain": "forus.cl",
+      "last_outlook_copy_received_at": "2026-10-13T20:36:04Z",
+      "sent_messages": 4,
+      "action": "Tres rutas distintas: Norseg dos correos06/12Oct, hoy desinscrito; Columbia IN_PROGRESS; otra dirección UNKNOWN_USER/ERRORED. Investigar error y coordinar cuenta antes de nuevo envío.",
+      "crm_contact_ids": [
+        "253706281592",
+        "253384946460",
+        "215345891744"
+      ]
+    },
+    {
+      "account": "Fabrimetal",
+      "domain": "fabrimetal.cl",
+      "last_outlook_copy_received_at": "2026-10-13T14:41:20Z",
+      "sent_messages": 2,
+      "action": "Respondió13Oct: ya trabaja con agencia. UNENROLLED; comunicaciones detenidas; revisión interna13Abr2027 no es recontacto.",
+      "crm_contact_ids": [
+        "253263096621"
+      ]
+    },
+    {
+      "account": "INTURSA",
+      "domain": "intursa.com.pe",
+      "last_outlook_copy_received_at": "2026-10-13T13:28:54Z",
+      "sent_messages": 1,
+      "action": "Correo13Oct; sin respuesta. Relación para proyectos futuros: revisión27Oct, sin convocatoria vigente inferida.",
+      "crm_contact_ids": [
+        "254685594941"
+      ]
+    },
+    {
+      "account": "Alfin Banco",
+      "domain": "alfinbanco.pe",
+      "last_outlook_copy_received_at": "2026-10-13T13:28:37Z",
+      "sent_messages": 1,
+      "action": "Correo13Oct; sin respuesta. Relación futura: revisión27Oct y canal de proveedores, sin compra abierta inferida.",
+      "crm_contact_ids": [
+        "254680830337"
+      ]
+    },
+    {
+      "account": "INGIMEX",
+      "domain": "ingimex.cl",
+      "last_outlook_copy_received_at": "2026-10-13T12:41:39Z",
+      "sent_messages": 1,
+      "action": "HSP-0024 excepción de tamaño individual; correo13Oct, compra de septiembre cerrada. Revisión27Oct para relación futura, sin recuperación del concurso.",
+      "crm_contact_ids": [
+        "254675150874"
+      ]
+    },
+    {
+      "account": "Momentum",
+      "domain": "momentumbrand.ai",
+      "last_outlook_copy_received_at": "2026-10-12T12:03:04Z",
+      "sent_messages": 1,
+      "action": "Propuesta12Oct; respuesta13Oct «reviso y hablamos». Un seguimiento contextual para acordar primer encargo; preservar borradores previos.",
+      "crm_contact_ids": [
+        "246994012439"
+      ]
+    },
+    {
+      "account": "UCSH / entidad por confirmar",
+      "domain": "ucsh.cl",
+      "last_outlook_copy_received_at": "2026-10-09T23:51:39Z",
+      "sent_messages": 1,
+      "action": "Correo09Oct; sin respuesta. Seguimiento propuesto hoy para confirmar entidad, alcance e interlocución.",
+      "crm_contact_ids": [
+        "254068886277"
+      ]
+    },
+    {
+      "account": "Haulmer",
+      "domain": "haulmer.cl",
+      "last_outlook_copy_received_at": "2026-10-09T22:52:55Z",
+      "sent_messages": 1,
+      "action": "Correo09Oct; sin respuesta. Seguimiento propuesto hoy para dominios y alcance del diagnóstico.",
+      "crm_contact_ids": [
+        "254049641307"
+      ]
+    },
+    {
+      "account": "Under Pizza",
+      "domain": "underpizza.com",
+      "last_outlook_copy_received_at": "2026-10-08T21:00:06Z",
+      "sent_messages": 2,
+      "action": "Dos contactos ERRORED; sin respuesta. Diagnosticar causa antes de reintentar; no tratar error como falta de interés.",
+      "crm_contact_ids": [
+        "253263108946",
+        "215343902246"
+      ]
+    },
+    {
+      "account": "QuePlan",
+      "domain": "queplan.cl",
+      "last_outlook_copy_received_at": "2026-10-08T17:55:13Z",
+      "sent_messages": 1,
+      "action": "ERRORED; ausencia de respuesta no habilita nueva cadencia. Ver fallo previo y tamaño antes de retomar.",
+      "crm_contact_ids": [
+        "253395466615"
+      ]
+    },
+    {
+      "account": "Talana",
+      "domain": "talana.com",
+      "last_outlook_copy_received_at": "2026-10-08T17:51:02Z",
+      "sent_messages": 1,
+      "action": "ERRORED; investigar motivo y relevancia actual antes de reactivar.",
+      "crm_contact_ids": [
+        "253263099810"
+      ]
+    },
+    {
+      "account": "Construmart",
+      "domain": "construmart.cl",
+      "last_outlook_copy_received_at": "2026-10-08T17:50:03Z",
+      "sent_messages": 2,
+      "action": "Dos contactos ERRORED; revisar causa y coordinar un solo plan, sin duplicar envíos.",
+      "crm_contact_ids": [
+        "253263101347",
+        "253706278792"
+      ]
+    },
+    {
+      "account": "Torre / Village",
+      "domain": "torre.cl",
+      "last_outlook_copy_received_at": "2026-10-08T17:49:02Z",
+      "sent_messages": 1,
+      "action": "ERRORED; revisar bloqueo técnico antes de seguimiento.",
+      "crm_contact_ids": [
+        "253241080974"
+      ]
+    },
+    {
+      "account": "Duemint",
+      "domain": "duemint.com",
+      "last_outlook_copy_received_at": "2026-10-08T17:45:04Z",
+      "sent_messages": 1,
+      "action": "Sólo newsletter13Oct encontrada, no respuesta al acercamiento. UNENROLLED; evaluar pertinencia antes de insistir.",
+      "crm_contact_ids": [
+        "247289195048"
+      ]
+    },
+    {
+      "account": "Metalhsa",
+      "domain": "metalhsa.cl",
+      "last_outlook_copy_received_at": "2026-10-08T16:01:25Z",
+      "sent_messages": 1,
+      "action": "Correo08Oct; sin respuesta. Texto para22Oct retomando disposición previa, sin inventar necesidad.",
+      "crm_contact_ids": [
+        "250971957541"
+      ]
+    },
+    {
+      "account": "Papa Johns Chile",
+      "domain": "pjchile.com",
+      "last_outlook_copy_received_at": "2026-10-08T15:37:03Z",
+      "sent_messages": 1,
+      "action": "ERRORED; no respuesta reciente. Proceso anterior no es compra abierta; revisar fallo antes de recontactar.",
+      "crm_contact_ids": [
+        "126118549362"
+      ]
+    },
+    {
+      "account": "Olivos del Sur",
+      "domain": "olivosdelsur.com",
+      "last_outlook_copy_received_at": "2026-10-08T14:14:51Z",
+      "sent_messages": 1,
+      "action": "Correo08Oct; sin respuesta ni seguimiento posterior observado. Proponer un único seguimiento con marca/campaña y brief.",
+      "crm_contact_ids": [
+        "253263177790"
+      ]
+    },
+    {
+      "account": "Yanbal",
+      "domain": "yanbal.com",
+      "last_outlook_copy_received_at": "2026-10-08T14:13:06Z",
+      "sent_messages": 1,
+      "action": "Correo08Oct; sin respuesta ni seguimiento posterior observado. Proponer un único seguimiento sobre primer flujo creativo.",
+      "crm_contact_ids": [
+        "253779289495"
+      ]
+    },
+    {
+      "account": "Lotus",
+      "domain": "lotuspro.cl",
+      "last_outlook_copy_received_at": "2026-10-08T14:10:41Z",
+      "sent_messages": 1,
+      "action": "HSP-0007: correo08Oct a cuatro personas en un hilo, sin respuesta comprador encontrada. Partner pidió actualización20Oct. Conciliar resultados de reuniones y responder estado antes de mensaje genérico al comprador.",
+      "crm_contact_ids": [
+        "253804201609",
+        "253796596584",
+        "253804699495",
+        "253803331765"
+      ]
+    }
+  ],
+  "contract_control": {
+    "applies": "No nueva candidata de compra recomendada en esta revisión; no recomendación de postular, gasto o Deal",
+    "result": "No revalidación de expediente contractual; HOLD/STOP anteriores preservados",
+    "not_verified": [
+      "Adjudicatarios y contratos de convocatorias antiguas",
+      "Formularios y vigencia de postulaciones"
+    ],
+    "not_applicable": [
+      "Prospección futura sin compra abierta confirmada"
+    ]
+  },
+  "authority": {
+    "review_and_local_drafting": true,
+    "send_approval": false,
+    "new_automation_approval": false,
+    "crm_writes": 0,
+    "outlook_writes": 0,
+    "paid_enrichment": 0
+  },
+  "outputs": {
+    "report": "docs/commercial/follow-up-agent/runs/2026-10-21-revision-integral-correos.md",
+    "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-seguimientos-correo/evidencia-y-borradores.json",
+    "private_drafts": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-seguimientos-correo/BORRADORES-PARA-REVISION.md"
+  },
+  "limitations": [
+    "Ventana desde1Oct, no buzón histórico completo",
+    "Remitentes alternativos fuera de direcciones revisadas no agotados",
+    "No otras plataformas de mensajería ni anexos íntegros",
+    "IN_PROGRESS no garantiza fecha exacta futura",
+    "NDR prueba causa específica, ausencia deNDR no entrega",
+    "Brochure enlacepropio pendiente cuando no existe; contenido yaaprobado"
+  ]
+}

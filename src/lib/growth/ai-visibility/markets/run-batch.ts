@@ -28,6 +28,8 @@ import { isMarketCoveredByContract, parseIncludedMarkets } from './contract-cove
 import { GraderMarketConfigError } from './contracts'
 import { ensurePrimaryMarket, listProfileMarkets, marketQueries, snapshotMarket } from './store'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface RunBatchInput {
   organizationId: string
   markets: 'primary' | 'all_active' | string[]
@@ -35,7 +37,7 @@ export interface RunBatchInput {
   actor: string
   channel: 'operator' | 'portal' | 'recurring'
   idempotencyKey: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 export interface RunBatchResult {
   batchId: string

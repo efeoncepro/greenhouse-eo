@@ -43,9 +43,36 @@ argument-hint: "[qué escribir/afinar o pregunta de craft — ej: 'headline para
 
 # Copywriting — el craft de escribir para persuadir y narrar (2026)
 
+
+## Partnerships, distribuidores y expedientes externos
+
+Para recuperar membresías, completar altas/crédito o preparar documentos para distribuidores, cargar el
+[manual de operación](../../../docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md) y el registro de partnerships. Cruzar cuenta, razón social/RUT e ID antes
+de registrar, formar o pedir un upgrade; no crear duplicados ni usar una membresía de otra empresa.
+Separar estado del programa, curso, distribución, Marketplace, crédito y capacidad de ordenar.
+Los formularios externos sólo llevan datos pertinentes: notas de búsqueda, pendientes y QA quedan en el
+expediente interno. No inventar datos ni aplicar la firma del correo como firma contractual. Revisar todas
+las páginas y la lista exacta de adjuntos; comprobar Enviados, archivos y CRM por separado.
+Los estados variables viven en el registro/auditoría; los correos y rutas de contacto viven en el
+[directorio de personas y equipos](../../../docs/operations/EFEONCE_PARTNER_CONTACT_DIRECTORY_V1.md).
+Leerlo antes de localizar destinatarios; contiene funciones, fuentes, fechas, reemplazos y rebotes.
+Índice nominal de recuperación (no implica cargo vigente ni autorización de envío):
+- Google/Ingram: Joelvis Sarmiento, Víctor Escárate, Nicolás Santibáñez, Cristian Faúndez;
+  Google for Education: Arthur Guedes y Carlos Jimenez.
+- Microsoft/LOL: Geraldine Vanessa Gonzalez Moreno, Camila Orellana, Reinel Bejarano,
+  Diana Jaimes y Daniela Sedlacek. Alta/crédito LOL: Lucia Gabriela Tovar.
+- AWS/LOL: José Manuel Quezada, Valentina Egaña, Macarena Hein, Víctor Ledezma y Jorge Noguera;
+  AWS directo: Julieth Vanessa Castillo y Daniel López.
+- Adobe/Nexsys: Jean Sánchez, Francisco Araya, Constanza Moya, Javiera Castro, José Orellana
+  y Vicente Ulloa. Adobe/Ingram: Melissa Danae Santos y Marco Seferino.
+No confundir ambos Víctor, ni Ingram con Nexsys. Cristian, Vicente y Marco tienen rebotes registrados;
+consultar la evidencia antes de reutilizarlos. María Berrios pertenece a una membresía ajena;
+Jose Menezes es fuente del anuncio, no contacto operativo acreditado. No copiar ni inferir sus correos.
+
+
 ## Envíos desde el Outlook de Julio
 
-Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
+Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma gráfica oficial siempre y CCO `48713323@bcc.hubspot.com`, incluidos correos nuevos, respuestas, reenvíos y seguimientos manuales, programados o por secuencias (Julio, 21/10/2026). Usar Outlook UI o transporte HTML autorizado que conserve la firma; texto plano no es alternativa. Si la herramienta no la preserva, dejar el correo pendiente sin enviarlo. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
 
 
 > **Qué es esto.** Una skill de dos manos: **(1) conocimiento experto** del craft de
@@ -239,7 +266,11 @@ capacidad y derechos no se esconden dentro de ella. Fuentes:
 - **Router de voz:** copy institucional, producto, UI, propuestas y piezas sin byline personal
   usan Efeonce (`efeonce/EFEONCE_VOICE_SYSTEM.md`). Piezas firmadas o habladas por Julio usan
   su voz (`efeonce/JULIO_REYES_VOICE_SYSTEM.md`). En híbridos, Julio narra y la doctrina se
-  atribuye como `En Efeonce...`; nunca mezclar speakers de forma invisible.
+  atribuye como `En Efeonce...`; nunca mezclar speakers de forma invisible. En los canales propios,
+  LinkedIn página, Instagram, Threads y Glitch hablan como Efeonce; el LinkedIn de Julio, su newsletter
+  Marketing con Manzanitas y el talking head, como Julio (rol de cada canal en
+  [PDR-020](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) y la
+  [estrategia de love brand](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md)).
 - **Running motif personal:** `con manzanitas` / `te lo explico con manitas` pertenece a Julio;
   no usarlo en copy institucional ni en textos de otros autores. Cuando se activa en copy visible,
   lleva exactamente `🍏🍏🍏` antes de la puntuación. El wording final de superficies de producto

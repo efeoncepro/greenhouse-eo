@@ -1,0 +1,42 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "role": "content",
+  "recipe": "content-text",
+  "voice": {
+    "eyebrow": "Lo que pedimos decidir",
+    "question": "¿Qué les pedimos?",
+    "answer": [
+      "Poco"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 1
+  },
+  "body": "Un piloto en SGS Chile y habilitaciones acotadas y reversibles de la región.",
+  "points": [
+    {
+      "name": "Piloto",
+      "text": "un equipo comercial de Chile"
+    },
+    {
+      "name": "Región",
+      "text": "habilitaciones acotadas"
+    },
+    {
+      "name": "Efeonce",
+      "text": "diseña, construye y opera"
+    }
+  ],
+  "selection": {
+    "target": "answer",
+    "label": "SGS",
+    "participantKind": "role"
+  },
+  "line": "revenue-salesforce"
+}

@@ -1,0 +1,364 @@
+[
+  {
+    "type": "search_query",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "query": "site.brand24.com pricing individual team pro keywords mentions",
+    "filters": {
+      "domains": null,
+      "recency": null
+    },
+    "status": "completed"
+  },
+  {
+    "type": "search_query",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "query": "site.mention.com pricing social listening solo pro 2026",
+    "filters": {
+      "domains": null,
+      "recency": null
+    },
+    "status": "completed"
+  },
+  {
+    "type": "search_query",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "query": "site.metricool.com social media listening pricing",
+    "filters": {
+      "domains": null,
+      "recency": null
+    },
+    "status": "completed"
+  },
+  {
+    "type": "open",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://brand24.com/prices/",
+    "status": "read",
+    "document": "public pricing page",
+    "blocker": null
+  },
+  {
+    "type": "open",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/pricing/",
+    "status": "read",
+    "document": "public pricing page",
+    "blocker": null
+  },
+  {
+    "type": "open",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://www.mentionlytics.com/pricing/",
+    "status": "read",
+    "document": "public pricing page",
+    "blocker": null
+  },
+  {
+    "type": "open",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://mention.com/en/pricing/",
+    "status": "read",
+    "document": "public pricing page",
+    "blocker": null
+  },
+  {
+    "type": "search_query",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "query": "site.awario.com Facebook Instagram sources monitoring Instagram data",
+    "filters": {
+      "domains": null,
+      "recency": null
+    },
+    "status": "completed"
+  },
+  {
+    "type": "search_query",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "query": "site.awario.com historical data mentions alerts daily weekly email",
+    "filters": {
+      "domains": null,
+      "recency": null
+    },
+    "status": "completed"
+  },
+  {
+    "type": "search_query",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "query": "site.metricool.com social listening tool monitoring mentions",
+    "filters": {
+      "domains": null,
+      "recency": null
+    },
+    "status": "completed"
+  },
+  {
+    "type": "source_read_from_search_result",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/help/troubleshooting/ig-monitoring-limitations/",
+    "status": "read",
+    "note": "Read substantial primary-source content returned in search results; not separate open",
+    "blocker": null
+  },
+  {
+    "type": "source_read_from_search_result",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/help/mention-alert-settings/alert-settings-overview/",
+    "status": "read",
+    "note": "Read primary-source search-result content",
+    "blocker": null
+  },
+  {
+    "type": "source_read_from_search_result",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/help/getting-started/ig-monitoring/",
+    "status": "read",
+    "note": "Read primary-source search-result content",
+    "blocker": null
+  },
+  {
+    "type": "source_read_from_search_result",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/help/reports-exports/report-overview/",
+    "status": "read",
+    "note": "Read primary-source search-result content",
+    "blocker": null
+  },
+  {
+    "type": "source_read_from_search_result",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/help/dashboard/dashboard-overview/?_sm_nck=1",
+    "status": "read",
+    "note": "Read primary-source search-result content",
+    "blocker": null
+  },
+  {
+    "type": "source_read_from_search_result",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/instagram/",
+    "status": "read",
+    "note": "Read primary-source search-result content; generic historical claim not used to override specific limits",
+    "blocker": null
+  },
+  {
+    "type": "open",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/features/",
+    "status": "read",
+    "blocker": null
+  },
+  {
+    "type": "open",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/help/email-settings/",
+    "status": "blocked",
+    "blocker": "Internal Error: URL is not accessible via this tool"
+  },
+  {
+    "type": "open",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://metricool.com/social-listening/",
+    "status": "read",
+    "blocker": null
+  },
+  {
+    "type": "find",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://brand24.com/prices/",
+    "pattern": "Data storage",
+    "status": "completed_no_match",
+    "note": "No matching text; not proof absence"
+  },
+  {
+    "type": "find",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/pricing/",
+    "pattern": "How often",
+    "status": "completed_no_match",
+    "note": "No matching text; not proof absence"
+  },
+  {
+    "type": "click",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "ref_id": "https://awario.com/features/",
+    "link_id": 31,
+    "expected_target": "Slack integration",
+    "status": "blocked",
+    "blocker": "Unable to resolve click call due to invalid arguments; target not read"
+  },
+  {
+    "type": "search_query",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "query": "site.awario.com monitoring TikTok",
+    "filters": {
+      "domains": null,
+      "recency": null
+    },
+    "status": "completed"
+  },
+  {
+    "type": "search_query",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "query": "site.brand24.com help historical data 30 days",
+    "filters": {
+      "domains": null,
+      "recency": null
+    },
+    "status": "completed"
+  },
+  {
+    "type": "source_read_from_search_result",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://help.brand24.com/en/articles/5336549-does-brand24-collect-historical-data",
+    "status": "read",
+    "note": "Read primary-source search-result content; up30days initial sample, not full archive",
+    "blocker": null
+  },
+  {
+    "type": "source_read_from_search_result",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://brand24.com/first-steps/",
+    "status": "read",
+    "note": "Read primary-source search-result content; source coverage and policy limits",
+    "blocker": null
+  },
+  {
+    "type": "source_read_from_search_result",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://help.brand24.com/en/articles/9919507-period-comparison",
+    "status": "read",
+    "note": "Read primary-source search-result content; period comparison",
+    "blocker": null
+  },
+  {
+    "type": "source_read_from_search_result",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/help/",
+    "status": "read",
+    "note": "Read primary-source search-result content; docs navigation",
+    "blocker": null
+  },
+  {
+    "type": "source_read_from_search_result",
+    "country": "CO",
+    "service": "Social Listening",
+    "executed_at_date_santiago": "2026-10-22",
+    "exact_execution_time": "not_captured",
+    "pii_redacted": false,
+    "url": "https://awario.com/pricing/",
+    "status": "read",
+    "note": "Read repeat search-result content; historical retention/exportFAQ",
+    "blocker": null
+  }
+]

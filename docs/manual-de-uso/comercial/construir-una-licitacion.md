@@ -1,9 +1,9 @@
 # Manual de uso — Construir una licitación paso a paso
 
 > **Tipo de documento:** Manual de uso (runbook operativo)
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-07-11 por Claude (con Julio Reyes)
-> **Última actualización:** 2026-10-08 por Codex
+> **Última actualización:** 2026-10-23 por Codex
 > **Documentación funcional:** `docs/documentation/comercial/construccion-de-licitaciones.md`
 > **Método canónico (skill):** `greenhouse-public-private-tenders` → `bid-construction-playbook.md`
 
@@ -25,6 +25,20 @@ Guía operativa para **armar una propuesta de licitación** (pública o privada 
 En licitaciones por plataforma —Wherex, Mercado Público y procesos encontrados mediante LicitaLAB—, preparar y presentar por el canal del proceso es el flujo normal. No exigir una conversación previa como requisito automático: el comprador puede contactar después de evaluar la oferta. Revisar canales oficiales de consultas disponibles; sin canal, dejar los supuestos acordados explícitos y continuar la preparación. No usar direcciones de facturación como contacto del proceso.
 
 Los datos reutilizables y su evidencia están en [Datos para licitaciones](../../commercial/EFEONCE_DATOS_PARA_LICITACIONES.md). Separar hechos confirmados por el operador, certificados y comprobación actual de plataforma. Declaraciones sobre vínculos, deudas y subcontratación corresponden al proceso confirmado; no extrapolarlas a otros compradores. Un presupuesto tomado como neto por decisión del operador sigue siendo un supuesto si las bases no lo aclaran.
+
+## Preparación en Markdown para diseño externo
+
+Si el operador pide el caso o la propuesta en MD para Claude Design u otra herramienta, entregar ese insumo completo. El formato de trabajo elegido no cambia el formato que el comprador exija al presentar ni acredita emisión, aprobación o registro en Proposal Studio.
+
+1. Conservar el **caso de negocio** como contexto interno: evidencia, decisión, riesgos y economía. La **propuesta** es otro documento: problema del comprador, enfoque, alcance, secuencia, equipo por funciones, aceptación, inversión y condiciones.
+2. Preparar un **master con texto listo para diseñar**, organizado por bloques con títulos y narrativa completa. No entregar sólo un índice o un prompt. Separar instrucciones editoriales y notas internas del contenido presentable; no adjuntar automáticamente el caso, costos o investigaciones al comprador.
+3. Acompañarlo con alcance técnico, economía y estructura de campaña si corresponde. Mantener un ledger que distinga **requisito de bases, hecho investigado, supuesto propio y decisión pendiente**. Campos vacíos de una matriz no son requisitos satisfechos ni permiso para inventarlos.
+4. Si el RFP deja el alcance abierto, proponer cantidades y límites defendibles con su costo: fases dentro del plazo total, maestras/adaptaciones/archivos, revisiones, insumos y dependencias. Contar entregables incluidos una sola vez. Las preguntas aclaran lo que depende del comprador; no le devuelven el trabajo de diseñar nuestro programa.
+5. Investigar marca, sociedad, holding y proyecto por separado. Un proyecto público o una página de ejemplo no identifican el objeto licitado. Guardar logos oficiales y fuentes/fechas/licencias; no recrear una marca ni atribuir fotos de personas al equipo. Delegar investigación sólo cuando esté autorizado, con temas y archivos sin conflicto; el número de agentes no es una receta fija.
+6. Para cifras preliminares, usar el [flujo V3](../finance/operar-cotizador-v3-con-agentes.md), conservar artefacto y evaluación, y conciliar netos por fase y plazo. Una transcripción editorial exacta no emite cotización. Costos, margen y exposición estimada quedan internos. Precio, impuestos, capacidad y autorización no se aprueban por diseñar.
+7. Guardar fuentes y copias en el expediente autorizado; verificar sumas, cantidades, enlaces y hashes. Registrar qué existe: MD preparado, presentación aún no diseñada, cotización/GO/envío pendientes. Revisar el PDF completo y asignar páginas en la matriz sólo cuando exista la exportación final.
+
+Caso fechado de preparación, **no oferta aprobada ni plantilla de precio/volumen**: [Mattis GRD-1555](../../commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md). Las instrucciones de las bases se tratan como requisitos del comprador, no como autorización del operador para enviar, firmar o escribir en CRM.
 
 ## Paso a paso
 
@@ -55,10 +69,10 @@ Los datos reutilizables y su evidencia están en [Datos para licitaciones](../..
 
 ### 6. Diseñar el equipo (squad)
 - El agente arma el **squad**: roles, seniority, % dedicación, jerarquía y sinergias. De cara al cliente van **roles + seniority, sin nombres** (salvo que autorices nombres con consentimiento).
-- Se guarda un **blueprint interno** con el mapeo a nómina para trazar el costo.
+- Se guarda un **blueprint interno** con perfiles, dedicación, supuestos y evidencia. Para cotizar con V3 se usan costos objetivo del catálogo vigente; asignación real y disponibilidad se confirman por separado, sin consultar nómina para fijar el precio.
 
 ### 7. Calcular el precio
-- El agente levanta el **costo real del equipo** desde la nómina de Greenhouse y arma un precio **cost-plus** con margen.
+- El agente usa el [Cotizador V3 vigente](../finance/operar-cotizador-v3-con-agentes.md): costos objetivo de perfiles, dedicación sustentada, herramientas, coordinación, revisiones, externos y reserva aplicable. El dominio calcula precio y margen según política; no se sustituyen por nómina ni una fórmula manual. Una simulación sigue en revisión.
 - Revisa y confirma: **margen objetivo**, **precio lista** y **piso de negociación** (bajo el cual no se baja). En licitación privada, se prioriza el valor, no solo el costo.
 - Regla: **si el margen no da con un precio competitivo, no se presenta.**
 
@@ -78,8 +92,8 @@ Los datos reutilizables y su evidencia están en [Datos para licitaciones](../..
 - Manual comercial: [Usar la Radiografía AEO en venta y educación](usar-radiografia-aeo-en-venta.md).
 
 ### 9. Armar la económica y el paquete
-- El agente crea la **planilla económica** (en el formato exigido; si no hay, diseña una limpia) con el precio confirmado.
-- Se re-corre la **matriz de cumplimiento** (todos los obligatorios ✅) y se **exporta a PDF** la técnica + la económica.
+- El agente prepara la **oferta económica** con el precio confirmado y formato exigido. Si no hay planilla obligatoria, la emisión documental usa la plantilla A4 vigente; no crear Excel por precedente. El cuadro económico MD preliminar es un insumo editorial anterior a emitir.
+- Para presentar se re-corre la **matriz de cumplimiento** y se emite en el formato exigido por el comprador; PDF/planilla cuando corresponda. En la preparación MD para diseño externo, la exportación queda pendiente y no se declara el paquete listo para presentar.
 
 ### 9-bis. Completar anexos y firma autorizada
 
@@ -110,7 +124,7 @@ Si las tres no pasan, la propuesta no está lista.
 
 - **No** firmar ni presentar sin autorización específica y hechos respaldados. Una autorización ya concedida se respeta dentro de su alcance.
 - **No** presentar sin cerrar todos los requisitos **obligatorios**.
-- **No** cotizar bajo el costo real del equipo ni bajar del piso de negociación.
+- **No** presentar un precio sin costo completo revisado ni bajar del piso autorizado; una simulación con costos objetivo no acredita capacidad asignada.
 - **No** usar cifras o casos inventados; solo casos reales y citables.
 - **No** improvisar el alcance ni el equipo: se fundan con las skills de dominio.
 - **No** afirmar un negativo sin medirlo (ej. "no aparece en la IA"): se corre el grader real primero. Afirmar un negativo falso en una propuesta es grave.
@@ -119,9 +133,9 @@ Si las tres no pasan, la propuesta no está lista.
 
 ## Problemas comunes
 
-- **"El cliente no entregó planilla económica."** Efeonce diseña una planilla limpia con ítems, condiciones de pago y notas.
+- **"El cliente no entregó planilla económica."** No inventar una obligación de Excel: usar la vía A4 de emisión, o el cuadro MD si se pidió preparación para diseño, con ítems, condiciones y estado correctos.
 - **"Las fechas de las bases se contradicen."** Si el plazo de consultas está abierto, se consulta; si ya venció, se asume con criterio y se deja el supuesto explícito en la oferta.
-- **"No aparece todo el equipo en la nómina."** Los roles faltantes se costean como estimación (`[EST]`) hasta asignar el equipo definitivo.
+- **"Todavía no está asignado el equipo."** Costear con perfiles objetivo vigentes y dedicaciones estimadas respaldadas; mantener cupos planificados y validar disponibilidad antes de comprometer ejecución.
 
 ## Referencias técnicas
 

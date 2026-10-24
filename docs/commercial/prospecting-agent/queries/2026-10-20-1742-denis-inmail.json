@@ -1,0 +1,26 @@
+{
+  "run_at": "2026-10-20T17:42:38.904520-03:00",
+  "timezone": "America/Santiago",
+  "scope": "HSP-0040 solicitud LinkedIn autorizada; crédito InMail pendiente",
+  "queries": [
+    {
+      "tool": "tools discovery",
+      "query": "LinkedIn messaging/send tools",
+      "result": "ninguno disponible"
+    },
+    {
+      "tool": "LinkedIn UI",
+      "query": "perfil objetivo [PII redactada] > Enviar mensaje > compositor",
+      "result": "destinatario correcto, invitación pendiente; requiere 1 crédito InMail"
+    },
+    {
+      "tool": "LinkedIn UI",
+      "query": "rellenar asunto y mensaje solicitado [texto individual en dossier privado]",
+      "result": "preparado; no clic Enviar; cero crédito consumido"
+    }
+  ],
+  "credits": 0,
+  "sends": 0,
+  "crm_writes": 0,
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1426-denis-unilever/linkedin-correo-inmail-pendiente.json"
+}

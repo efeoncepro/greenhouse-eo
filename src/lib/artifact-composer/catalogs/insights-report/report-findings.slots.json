@@ -1,0 +1,334 @@
+{
+  "template": "ReportFindingsPage",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "Registro de hallazgos de una auditoría: severidad por rol, evidencia, responsable y aviso urgente opcional.",
+  "viewport": {
+    "width": 794,
+    "height": 1123
+  },
+  "slots": {
+    "clientName": {
+      "selector": "[data-slot='clientName']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 40,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Nombre del cliente en la cabecera. Sin cliente, la caja queda vacía y la página no se mueve; nunca un nombre inventado. El logo llega con la portada sellada de TASK-1888."
+    },
+    "runningSection": {
+      "selector": "[data-slot='runningSection']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Sección de la página («Resumen ejecutivo»)."
+    },
+    "runningPeriod": {
+      "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Período y comparación («Agosto 2026 · contra julio 2026»)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "heroFigure": {
+      "selector": "[data-slot='heroFigure']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 3,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Cuántos hallazgos trae la página o el registro (se cuenta, no se escribe)."
+    },
+    "heroText": {
+      "selector": "[data-slot='heroText']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 72,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 90,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 140,
+        "maxLines": 2,
+        "overflow": "reject"
+      }
+    },
+    "alert": {
+      "selector": "[data-slot='alert']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "title": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 90,
+          "maxLines": 2
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 260,
+          "maxLines": 4
+        },
+        "items": {
+          "type": "array",
+          "required": false,
+          "constraints": {
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "item": {
+            "type": "string",
+            "maxCharacters": 40
+          }
+        }
+      },
+      "notes": "Aviso de lo que no puede esperar (un daño en curso). Sin aviso, el bloque no se dibuja.",
+      "example": {
+        "label": "Urgente",
+        "title": "Nueve artículos se retiraron después del 15 de octubre",
+        "text": "Hoy responden error y no redirigen. Restaurarlos desde la papelera antes de que se vacíe.",
+        "items": [
+          "catedral-de-tacna",
+          "como-llegar-a-ayacucho"
+        ]
+      }
+    },
+    "columns": {
+      "selector": "[data-slot='columns']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "severity": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "maxLines": 1
+        },
+        "finding": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "owner": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 28,
+          "maxLines": 1
+        }
+      },
+      "notes": "Encabezados de la tabla de hallazgos, desde el copy."
+    },
+    "findings": {
+      "selector": "[data-slot='findings']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 6
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "severity": {
+            "type": "string",
+            "required": true,
+            "resolver": "report-severity",
+            "values": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "severityLabel": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 10,
+            "maxLines": 1
+          },
+          "title": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 70,
+            "maxLines": 2
+          },
+          "detail": {
+            "type": "rich-string",
+            "required": true,
+            "maxCharacters": 230,
+            "maxLines": 4,
+            "allowedTags": [
+              "strong"
+            ]
+          },
+          "evidence": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 20,
+            "maxLines": 1
+          },
+          "ownerLabel": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 16,
+            "maxLines": 1
+          },
+          "owner": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 2
+          }
+        }
+      },
+      "notes": "Hallazgos ordenados por severidad. La etiqueta de severidad viene del copy y siempre acompaña al tono."
+    },
+    "closing": {
+      "selector": "[data-slot='closing']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "string",
+            "required": true,
+            "resolver": "report-closing-icon",
+            "values": [
+              "measure",
+              "action"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 200,
+            "maxLines": 3
+          },
+          "signature": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 40,
+            "maxLines": 1
+          }
+        }
+      },
+      "notes": "Panel de cierre. Un plan v1 no lo trae: la página compone sin él."
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "footerContact": {
+      "selector": "[data-slot='footerContact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "address": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 72,
+          "maxLines": 1
+        },
+        "phone": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
+      },
+      "notes": "Desde EFEONCE_CONTACT (dirección de presentación y teléfono de Chile)."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
+    }
+  }
+}

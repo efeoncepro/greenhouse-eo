@@ -100,8 +100,17 @@ export interface RendererFileUploadPolicy {
 
 export interface RendererFieldPresentation {
   icon?: RendererFieldPresentationIcon
-  /** Opt-in de control especializado; conserva el valor y la semántica en el renderer. */
-  control?: 'country_select'
+  /**
+   * Opt-in de control especializado; conserva el valor y la semántica en el renderer.
+   * `country_select` = listbox premium con banderas; `premium_select` = listbox premium para cualquier
+   * `select` en cualquier variante. Un valor desconocido se ignora (control por defecto de la variante).
+   */
+  control?: 'country_select' | 'premium_select'
+  /**
+   * TASK-2044 — ancho en el modo de dos columnas: `auto` (o ausente) = heurística por tipo, `half` = media
+   * columna (fila completa en una columna), `full` = fila completa.
+   */
+  width?: 'auto' | 'half' | 'full'
 }
 
 export interface RendererFieldDefinition {
@@ -120,6 +129,8 @@ export interface RendererFieldDefinition {
   dataClass?: RendererFieldDataClass
   uploadPolicy?: RendererFileUploadPolicy
   presentation?: RendererFieldPresentation
+  /** TASK-2053 — valor fijo de un campo `hidden`; el servidor lo impone al aceptar el envío. */
+  staticValue?: string
   /** Token WHATWG (`email`, `name`, `tel`, `organization`, …). Lo declara el contract. */
   autocomplete?: string
   /** `email | tel | numeric | decimal | url | text`. Lo declara el contract. */
@@ -144,6 +155,13 @@ export interface RendererConsentDisplay {
   noticeText?: string
   noticeCopyRef?: string
   privacyUrl?: string
+  /**
+   * TASK-2044 — `tile` (o ausente) = tarjeta con el enlace aparte; `compact` = casilla compacta. Un `label`
+   * de casilla puede traer una vez `{privacyLink}`: el renderer lo reemplaza por un enlace a `privacyUrl`
+   * con el texto `privacyLinkLabel` (o el del diccionario) y omite el párrafo de enlace aparte.
+   */
+  presentation?: 'tile' | 'compact'
+  privacyLinkLabel?: string
   checkboxes?: RendererConsentCheckbox[]
 }
 
@@ -152,7 +170,9 @@ export type RendererSuccessKind = 'inline_message' | 'redirect' | 'asset_access'
 // Success card capability (TASK-1319) — espejo de tipos browser-safe. La SoT
 // (`successBehaviorSchema`) valida/acota; acá vive sólo el shape que el renderer consume.
 export type RendererSuccessPresentation = 'inline_message' | 'success_card'
-export type RendererSuccessActionKind = 'external_link' | 'download' | 'asset_access' | 'schedule'
+// TASK-2044 — `dismiss` cierra la superficie anfitriona (sin `href`); `RendererSuccessIcon` elige el ícono.
+export type RendererSuccessActionKind = 'external_link' | 'download' | 'asset_access' | 'schedule' | 'dismiss'
+export type RendererSuccessIcon = 'celebration' | 'orbit' | 'none'
 export type RendererSuccessRewardKind = 'none' | 'ebook' | 'guide' | 'template' | 'report_preview' | 'surprise'
 
 export interface RendererSuccessCardAction {
@@ -193,6 +213,7 @@ export interface RendererAssetDownloadBehavior {
 export interface RendererSuccessBehavior {
   kind: RendererSuccessKind
   presentation?: RendererSuccessPresentation
+  icon?: RendererSuccessIcon
   message?: string
   messageCopyRef?: string
   title?: string
@@ -240,6 +261,20 @@ export interface RendererTelemetryPolicy {
   fieldLevelAnalyticsDisabled?: boolean
 }
 
+/** TASK-2053 — Presentación del formulario completo (espejo de `FORM_PRESENTATIONS`). */
+export type RendererFormPresentation = 'inline_pill'
+
+/** TASK-2053 — Etiquetas de la píldora; las que falten salen del diccionario del locale. */
+export interface RendererInlinePillDisplay {
+  openLabel?: string
+  submitLabel?: string
+  successLabel?: string
+  doneLabel?: string
+  waitlistSuccessLabel?: string
+  waitlistDoneLabel?: string
+  note?: string
+}
+
 export interface RenderContract {
   contractVersion: string
   form: {
@@ -260,6 +295,8 @@ export interface RenderContract {
   consent?: RendererConsentDisplay
   successBehavior: RendererSuccessBehavior
   styleVariant?: string
+  presentation?: RendererFormPresentation
+  inlinePill?: RendererInlinePillDisplay
   surfacePolicy: RendererSurfacePolicy
   security?: RendererSecurity
   telemetryPolicy: RendererTelemetryPolicy
@@ -276,12 +313,17 @@ export type PublicSubmitOutcome =
   | 'captcha_failed'
   | 'form_not_published'
   | 'disabled'
+  | 'capacity_full'
   | 'error'
+
+/** TASK-2053 — estado de una reserva por evento (espejo de `REGISTRATION_STATUSES`). */
+export type RendererRegistrationStatus = 'confirmed' | 'waitlisted'
 
 export interface PublicSubmitResult {
   outcome: PublicSubmitOutcome
   submissionId?: string
   reason?: string
+  registrationStatus?: RendererRegistrationStatus
   /** Dedicated Ads channel; must never be spread into ordinary telemetry. */
   googleAdsConversion?: GoogleAdsConversionReceipt
 }

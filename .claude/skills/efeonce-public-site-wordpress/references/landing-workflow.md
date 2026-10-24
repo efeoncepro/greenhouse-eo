@@ -29,6 +29,8 @@ Reusable mechanisms are optional building blocks; each landing decides whether t
 - Native meeting launcher of the shared base (`<gh-meeting-cta>`): `references/source-led-elementor-patterns.md`.
 - Site-wide `EfeonceMention` (`a.axis-mention`, AXIS `efeonce.mention`) for links to Efeonce services: `docs/architecture/public-site/PRIMITIVES.md`.
 - Growth Forms / Growth CTA integration: `references/growth-forms-wordpress.md` and skill `greenhouse-growth-ctas`.
+- Bottom dock (fixed bar with the page's exits): the shared AXIS `efeonce.landing-dock` via plugin `eo-landing-dock`,
+  configured per page; never a custom dock. `references/global-site-navigation.md` §Landing dock.
 
 ## Standard Loop
 
@@ -125,6 +127,7 @@ Minimum landing file sections:
 - Do-not-touch surfaces and retired pages.
 - Section map with root ids/classes.
 - Special widgets/assets/forms.
+- Bottom dock: its `manifests/landing-dock/<landing>.json` (presence, actions, scheduler, `stop`) or «no dock».
 - Hero/featured-image/hash guardrails.
 - Required verification commands.
 - Known rollback path.

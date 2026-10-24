@@ -1,5 +1,13 @@
 # TASK-2014 — Adoptar los paquetes AXIS publicados y retirar la copia generada del informe AI Visibility
 
+## Delta 2026-10-20 — la adopción trae la portada de propuesta sin pregunta
+
+- AXIS `axis-tokens` 0.6.6 y `axis-ui-contracts` 0.7.6 (tag `v0.7.6`, commit `9e72d38`) suman `cover-proposal` ·
+  `orbit-decision`: la portada de propuesta en la voz de decisión, sin pregunta (TASK-2012, Slice 2). Al adoptar, el
+  builder `coverProposal` de `src/lib/brand-surfaces/recipes/frame.ts` necesita su plantilla (sin el nodo de la pregunta,
+  titular en el lugar de la pregunta) o el compositor responde `recipe-without-template`. Hasta entonces la portada de
+  Assetplan es una lámina a mano. — por TASK-2012
+
 ## Delta 2026-10-12 — los dependientes del pin 0.4.25 ya están regenerados
 
 - El pin actual (`axis-brand-assets` 0.4.25) quedó sin deriva: tokens de Manzanitas, vocabulario de canales de Insights

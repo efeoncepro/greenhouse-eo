@@ -1,0 +1,3992 @@
+{
+  "schema_version": 1,
+  "automation_id": "prospecci-n-hubspot-reporte-diario",
+  "run_id": "2026-10-20-0906",
+  "timezone": "America/Santiago",
+  "started_at": "2026-10-20T08:58:45-03:00",
+  "research_cutoff_at": "2026-10-20T09:09:14-03:00",
+  "recorded_at": "2026-10-20T09:12:08-03:00",
+  "week_start_local": "2026-10-19T00:00:00-03:00",
+  "week_end_local": "2026-10-20T09:09:14-03:00",
+  "first_pass_48h_intersection_start": "2026-10-19T00:00:00-03:00",
+  "overlap_read_start": "2026-10-16T09:11:02-03:00",
+  "overlap_caveat": "Lectura sin filtro y continuidad; fuentes bloqueadas no avanzan su corte exitoso.",
+  "discovery_metrics": {
+    "web_queries": 100,
+    "weekly_web_queries": 76,
+    "weekly_web_share": 0.76,
+    "additional_unfiltered_portal_discovery": 1,
+    "share_including_portal_discovery": 0.7524752475247525,
+    "cells_queried": 20,
+    "licitalab_visible_records": 164,
+    "licitalab_scope": "saved account universe, requested all; filters not independently certified in isolated session"
+  },
+  "queries": [
+    {
+      "id": "Q001",
+      "query": "Chile (\"SEO\" OR \"AEO\" OR \"posicionamiento\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "seo_aeo",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:58:45 UTC",
+      "result_batch": [
+        "Q001",
+        "Q002",
+        "Q003",
+        "Q004"
+      ],
+      "disposition": "Proveedores SEO/AEO, vacantes y falsos positivos de sigla AEO; ninguna nueva demanda verificada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q002",
+      "query": "Perú (\"SEO\" OR \"AEO\" OR \"posicionamiento\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "seo_aeo",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:58:45 UTC",
+      "result_batch": [
+        "Q001",
+        "Q002",
+        "Q003",
+        "Q004"
+      ],
+      "disposition": "Proveedores SEO/AEO, vacantes y falsos positivos de sigla AEO; ninguna nueva demanda verificada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q003",
+      "query": "Colombia (\"SEO\" OR \"AEO\" OR \"posicionamiento\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "seo_aeo",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:58:45 UTC",
+      "result_batch": [
+        "Q001",
+        "Q002",
+        "Q003",
+        "Q004"
+      ],
+      "disposition": "Proveedores SEO/AEO, vacantes y falsos positivos de sigla AEO; ninguna nueva demanda verificada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q004",
+      "query": "México (\"SEO\" OR \"AEO\" OR \"posicionamiento\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "seo_aeo",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:58:45 UTC",
+      "result_batch": [
+        "Q001",
+        "Q002",
+        "Q003",
+        "Q004"
+      ],
+      "disposition": "Proveedores SEO/AEO, vacantes y falsos positivos de sigla AEO; ninguna nueva demanda verificada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q005",
+      "query": "Chile (\"sitio web\" OR \"ecommerce\" OR \"desarrollo web\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "web",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:58:45 UTC",
+      "result_batch": [
+        "Q005",
+        "Q006",
+        "Q007",
+        "Q008"
+      ],
+      "disposition": "Proveedores web/ecommerce y conversación técnica; no compradores verificados.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q006",
+      "query": "Perú (\"sitio web\" OR \"ecommerce\" OR \"desarrollo web\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "web",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:58:45 UTC",
+      "result_batch": [
+        "Q005",
+        "Q006",
+        "Q007",
+        "Q008"
+      ],
+      "disposition": "Proveedores web/ecommerce y conversación técnica; no compradores verificados.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q007",
+      "query": "Colombia (\"sitio web\" OR \"ecommerce\" OR \"desarrollo web\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "web",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:58:45 UTC",
+      "result_batch": [
+        "Q005",
+        "Q006",
+        "Q007",
+        "Q008"
+      ],
+      "disposition": "Proveedores web/ecommerce y conversación técnica; no compradores verificados.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q008",
+      "query": "México (\"sitio web\" OR \"ecommerce\" OR \"desarrollo web\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "web",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:58:45 UTC",
+      "result_batch": [
+        "Q005",
+        "Q006",
+        "Q007",
+        "Q008"
+      ],
+      "disposition": "Proveedores web/ecommerce y conversación técnica; no compradores verificados.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q009",
+      "query": "Chile (\"agencia creativa\" OR \"contenidos\" OR \"audiovisual\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "creative",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q009",
+        "Q010",
+        "Q011",
+        "Q012"
+      ],
+      "disposition": "Producción audiovisual histórica, empleo y organismos culturales. Poder Judicial publica1Sep/cierra14Sep, no nueva semana.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q010",
+      "query": "Perú (\"agencia creativa\" OR \"contenidos\" OR \"audiovisual\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "creative",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q009",
+        "Q010",
+        "Q011",
+        "Q012"
+      ],
+      "disposition": "Producción audiovisual histórica, empleo y organismos culturales. Poder Judicial publica1Sep/cierra14Sep, no nueva semana.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q011",
+      "query": "Colombia (\"agencia creativa\" OR \"contenidos\" OR \"audiovisual\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "creative",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q009",
+        "Q010",
+        "Q011",
+        "Q012"
+      ],
+      "disposition": "Producción audiovisual histórica, empleo y organismos culturales. Poder Judicial publica1Sep/cierra14Sep, no nueva semana.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q012",
+      "query": "México (\"agencia creativa\" OR \"contenidos\" OR \"audiovisual\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "creative",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q009",
+        "Q010",
+        "Q011",
+        "Q012"
+      ],
+      "disposition": "Producción audiovisual histórica, empleo y organismos culturales. Poder Judicial publica1Sep/cierra14Sep, no nueva semana.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q013",
+      "query": "Chile (\"CRM\" OR \"HubSpot\" OR \"automatización comercial\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q013",
+        "Q014",
+        "Q015",
+        "Q016"
+      ],
+      "disposition": "TVN CRM anterior con fechas contradictorias; proveedores y vacantes. Sin nueva demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q014",
+      "query": "Perú (\"CRM\" OR \"HubSpot\" OR \"automatización comercial\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "crm_hubspot",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q013",
+        "Q014",
+        "Q015",
+        "Q016"
+      ],
+      "disposition": "TVN CRM anterior con fechas contradictorias; proveedores y vacantes. Sin nueva demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q015",
+      "query": "Colombia (\"CRM\" OR \"HubSpot\" OR \"automatización comercial\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q013",
+        "Q014",
+        "Q015",
+        "Q016"
+      ],
+      "disposition": "TVN CRM anterior con fechas contradictorias; proveedores y vacantes. Sin nueva demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q016",
+      "query": "México (\"CRM\" OR \"HubSpot\" OR \"automatización comercial\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "crm_hubspot",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q013",
+        "Q014",
+        "Q015",
+        "Q016"
+      ],
+      "disposition": "TVN CRM anterior con fechas contradictorias; proveedores y vacantes. Sin nueva demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q017",
+      "query": "Chile (\"agencia de medios\" OR \"programática\" OR \"paid media\" OR \"DOOH\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "media",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q017",
+        "Q018",
+        "Q019",
+        "Q020"
+      ],
+      "disposition": "Vacantes, agencias que venden y fuentes fuera de países; no compra B2B confirmada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q018",
+      "query": "Perú (\"agencia de medios\" OR \"programática\" OR \"paid media\" OR \"DOOH\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "media",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q017",
+        "Q018",
+        "Q019",
+        "Q020"
+      ],
+      "disposition": "Vacantes, agencias que venden y fuentes fuera de países; no compra B2B confirmada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q019",
+      "query": "Colombia (\"agencia de medios\" OR \"programática\" OR \"paid media\" OR \"DOOH\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "media",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q017",
+        "Q018",
+        "Q019",
+        "Q020"
+      ],
+      "disposition": "Vacantes, agencias que venden y fuentes fuera de países; no compra B2B confirmada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q020",
+      "query": "México (\"agencia de medios\" OR \"programática\" OR \"paid media\" OR \"DOOH\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "media",
+      "phase": 0,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 2
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q017",
+        "Q018",
+        "Q019",
+        "Q020"
+      ],
+      "disposition": "Vacantes, agencias que venden y fuentes fuera de países; no compra B2B confirmada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q021",
+      "query": "site:linkedin.com/posts Chile (\"SEO\" OR \"AEO\" OR \"posicionamiento\") (\"buscamos\" OR \"recomiendan\" OR \"selección\") after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "seo_aeo",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q021",
+        "Q022",
+        "Q023",
+        "Q024"
+      ],
+      "disposition": "Directorios de LinkedIn, sin publicación compradora concreta.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q022",
+      "query": "site:linkedin.com/posts Perú (\"SEO\" OR \"AEO\" OR \"posicionamiento\") (\"buscamos\" OR \"recomiendan\" OR \"selección\") after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "seo_aeo",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q021",
+        "Q022",
+        "Q023",
+        "Q024"
+      ],
+      "disposition": "Directorios de LinkedIn, sin publicación compradora concreta.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q023",
+      "query": "site:linkedin.com/posts Colombia (\"SEO\" OR \"AEO\" OR \"posicionamiento\") (\"buscamos\" OR \"recomiendan\" OR \"selección\") after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "seo_aeo",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q021",
+        "Q022",
+        "Q023",
+        "Q024"
+      ],
+      "disposition": "Directorios de LinkedIn, sin publicación compradora concreta.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q024",
+      "query": "site:linkedin.com/posts México (\"SEO\" OR \"AEO\" OR \"posicionamiento\") (\"buscamos\" OR \"recomiendan\" OR \"selección\") after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "seo_aeo",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q021",
+        "Q022",
+        "Q023",
+        "Q024"
+      ],
+      "disposition": "Directorios de LinkedIn, sin publicación compradora concreta.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q025",
+      "query": "site:linkedin.com/posts Chile (\"sitio web\" OR \"ecommerce\" OR \"desarrollo web\") (\"buscamos\" OR \"recomiendan\" OR \"selección\") after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "web",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q025",
+        "Q026",
+        "Q027",
+        "Q028"
+      ],
+      "disposition": "Directorios de artículos, sin publicación compradora concreta.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q026",
+      "query": "site:linkedin.com/posts Perú (\"sitio web\" OR \"ecommerce\" OR \"desarrollo web\") (\"buscamos\" OR \"recomiendan\" OR \"selección\") after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "web",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q025",
+        "Q026",
+        "Q027",
+        "Q028"
+      ],
+      "disposition": "Directorios de artículos, sin publicación compradora concreta.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q027",
+      "query": "site:linkedin.com/posts Colombia (\"sitio web\" OR \"ecommerce\" OR \"desarrollo web\") (\"buscamos\" OR \"recomiendan\" OR \"selección\") after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "web",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q025",
+        "Q026",
+        "Q027",
+        "Q028"
+      ],
+      "disposition": "Directorios de artículos, sin publicación compradora concreta.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q028",
+      "query": "site:linkedin.com/posts México (\"sitio web\" OR \"ecommerce\" OR \"desarrollo web\") (\"buscamos\" OR \"recomiendan\" OR \"selección\") after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "web",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "result_batch": [
+        "Q025",
+        "Q026",
+        "Q027",
+        "Q028"
+      ],
+      "disposition": "Directorios de artículos, sin publicación compradora concreta.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q029",
+      "query": "site:linkedin.com/posts/ \"Chile\" \"buscamos\" (\"creativa\" OR \"contenidos\" OR \"audiovisual\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "Chile",
+      "service_line": "creative",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q029",
+        "Q030",
+        "Q031",
+        "Q032"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q030",
+      "query": "site:linkedin.com/posts/ \"Perú\" \"buscamos\" (\"creativa\" OR \"contenidos\" OR \"audiovisual\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "Perú",
+      "service_line": "creative",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q029",
+        "Q030",
+        "Q031",
+        "Q032"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q031",
+      "query": "site:linkedin.com/posts/ \"Colombia\" \"buscamos\" (\"creativa\" OR \"contenidos\" OR \"audiovisual\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "Colombia",
+      "service_line": "creative",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q029",
+        "Q030",
+        "Q031",
+        "Q032"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q032",
+      "query": "site:linkedin.com/posts/ \"México\" \"buscamos\" (\"creativa\" OR \"contenidos\" OR \"audiovisual\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "México",
+      "service_line": "creative",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q029",
+        "Q030",
+        "Q031",
+        "Q032"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q033",
+      "query": "site:linkedin.com/posts/ \"Chile\" \"buscamos\" (\"CRM\" OR \"HubSpot\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q033",
+        "Q034",
+        "Q035",
+        "Q036"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q034",
+      "query": "site:linkedin.com/posts/ \"Perú\" \"buscamos\" (\"CRM\" OR \"HubSpot\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "Perú",
+      "service_line": "crm_hubspot",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q033",
+        "Q034",
+        "Q035",
+        "Q036"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q035",
+      "query": "site:linkedin.com/posts/ \"Colombia\" \"buscamos\" (\"CRM\" OR \"HubSpot\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q033",
+        "Q034",
+        "Q035",
+        "Q036"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q036",
+      "query": "site:linkedin.com/posts/ \"México\" \"buscamos\" (\"CRM\" OR \"HubSpot\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "México",
+      "service_line": "crm_hubspot",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q033",
+        "Q034",
+        "Q035",
+        "Q036"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q037",
+      "query": "site:linkedin.com/posts/ \"Chile\" \"buscamos\" (\"medios\" OR \"programática\" OR \"publicidad digital\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "Chile",
+      "service_line": "media",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q037",
+        "Q038",
+        "Q039",
+        "Q040"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q038",
+      "query": "site:linkedin.com/posts/ \"Perú\" \"buscamos\" (\"medios\" OR \"programática\" OR \"publicidad digital\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "Perú",
+      "service_line": "media",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q037",
+        "Q038",
+        "Q039",
+        "Q040"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q039",
+      "query": "site:linkedin.com/posts/ \"Colombia\" \"buscamos\" (\"medios\" OR \"programática\" OR \"publicidad digital\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "Colombia",
+      "service_line": "media",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q037",
+        "Q038",
+        "Q039",
+        "Q040"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q040",
+      "query": "site:linkedin.com/posts/ \"México\" \"buscamos\" (\"medios\" OR \"programática\" OR \"publicidad digital\") after:2026-10-18 before:2026-10-21 -site:linkedin.com/directory/",
+      "country": "México",
+      "service_line": "media",
+      "phase": 1,
+      "current_week_discovery": true,
+      "filters": {
+        "recency": 7
+      },
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q037",
+        "Q038",
+        "Q039",
+        "Q040"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q041",
+      "query": "(site:mercadopublico.cl) (\"SEO\" OR \"AEO\") (\"licitación\" OR \"convocatoria\" OR \"contratación\") after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "seo_aeo",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q041",
+        "Q042",
+        "Q043",
+        "Q044"
+      ],
+      "disposition": "Procesos españoles y siglas no relacionadas; fuera de cuatro mercados. Fichas chilenas históricas.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q042",
+      "query": "(site:gob.pe OR site:ungm.org) (\"SEO\" OR \"AEO\") (\"licitación\" OR \"convocatoria\" OR \"contratación\") after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "seo_aeo",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q041",
+        "Q042",
+        "Q043",
+        "Q044"
+      ],
+      "disposition": "Procesos españoles y siglas no relacionadas; fuera de cuatro mercados. Fichas chilenas históricas.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q043",
+      "query": "(site:gov.co OR site:com.co) (\"SEO\" OR \"AEO\") (\"licitación\" OR \"convocatoria\" OR \"contratación\") after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "seo_aeo",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q041",
+        "Q042",
+        "Q043",
+        "Q044"
+      ],
+      "disposition": "Procesos españoles y siglas no relacionadas; fuera de cuatro mercados. Fichas chilenas históricas.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q044",
+      "query": "(site:org.mx OR site:gob.mx) (\"SEO\" OR \"AEO\") (\"licitación\" OR \"convocatoria\" OR \"contratación\") after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "seo_aeo",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "result_batch": [
+        "Q041",
+        "Q042",
+        "Q043",
+        "Q044"
+      ],
+      "disposition": "Procesos españoles y siglas no relacionadas; fuera de cuatro mercados. Fichas chilenas históricas.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q045",
+      "query": "\"Chile\" \"desarrollo web\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "web",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q045",
+        "Q046",
+        "Q047",
+        "Q048"
+      ],
+      "disposition": "UNICEF Chile web anterior; agregadores y contratación profesional individual; sin nueva señal semanal validada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q046",
+      "query": "\"Perú\" \"desarrollo web\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "web",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q045",
+        "Q046",
+        "Q047",
+        "Q048"
+      ],
+      "disposition": "UNICEF Chile web anterior; agregadores y contratación profesional individual; sin nueva señal semanal validada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q047",
+      "query": "\"Colombia\" \"desarrollo web\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "web",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q045",
+        "Q046",
+        "Q047",
+        "Q048"
+      ],
+      "disposition": "UNICEF Chile web anterior; agregadores y contratación profesional individual; sin nueva señal semanal validada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q048",
+      "query": "\"México\" \"desarrollo web\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "web",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q045",
+        "Q046",
+        "Q047",
+        "Q048"
+      ],
+      "disposition": "UNICEF Chile web anterior; agregadores y contratación profesional individual; sin nueva señal semanal validada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q049",
+      "query": "\"Chile\" \"producción audiovisual\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "creative",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q049",
+        "Q050",
+        "Q051",
+        "Q052"
+      ],
+      "disposition": "Producción anterior, consultoríaHIseptiembre eILO octubre; sin publicación primaria19–20Oct verificada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q050",
+      "query": "\"Perú\" \"producción audiovisual\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "creative",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q049",
+        "Q050",
+        "Q051",
+        "Q052"
+      ],
+      "disposition": "Producción anterior, consultoríaHIseptiembre eILO octubre; sin publicación primaria19–20Oct verificada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q051",
+      "query": "\"Colombia\" \"producción audiovisual\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "creative",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q049",
+        "Q050",
+        "Q051",
+        "Q052"
+      ],
+      "disposition": "Producción anterior, consultoríaHIseptiembre eILO octubre; sin publicación primaria19–20Oct verificada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q052",
+      "query": "\"México\" \"producción audiovisual\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "creative",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q049",
+        "Q050",
+        "Q051",
+        "Q052"
+      ],
+      "disposition": "Producción anterior, consultoríaHIseptiembre eILO octubre; sin publicación primaria19–20Oct verificada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q053",
+      "query": "\"Chile\" \"CRM\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q053",
+        "Q054",
+        "Q055",
+        "Q056"
+      ],
+      "disposition": "Proveedores CRM, ICETEX histórico y soporte conocido; sin nueva compra semanal.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q054",
+      "query": "\"Perú\" \"CRM\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "crm_hubspot",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q053",
+        "Q054",
+        "Q055",
+        "Q056"
+      ],
+      "disposition": "Proveedores CRM, ICETEX histórico y soporte conocido; sin nueva compra semanal.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q055",
+      "query": "\"Colombia\" \"CRM\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q053",
+        "Q054",
+        "Q055",
+        "Q056"
+      ],
+      "disposition": "Proveedores CRM, ICETEX histórico y soporte conocido; sin nueva compra semanal.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q056",
+      "query": "\"México\" \"CRM\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "crm_hubspot",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q053",
+        "Q054",
+        "Q055",
+        "Q056"
+      ],
+      "disposition": "Proveedores CRM, ICETEX histórico y soporte conocido; sin nueva compra semanal.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q057",
+      "query": "\"Chile\" \"campañas publicitarias\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "media",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q057",
+        "Q058",
+        "Q059",
+        "Q060"
+      ],
+      "disposition": "JNTO histórico y contratos agregados ya asignados; no apertura nueva probada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q058",
+      "query": "\"Perú\" \"campañas publicitarias\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "media",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q057",
+        "Q058",
+        "Q059",
+        "Q060"
+      ],
+      "disposition": "JNTO histórico y contratos agregados ya asignados; no apertura nueva probada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q059",
+      "query": "\"Colombia\" \"campañas publicitarias\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "media",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q057",
+        "Q058",
+        "Q059",
+        "Q060"
+      ],
+      "disposition": "JNTO histórico y contratos agregados ya asignados; no apertura nueva probada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q060",
+      "query": "\"México\" \"campañas publicitarias\" licitación after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "media",
+      "phase": 2,
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q057",
+        "Q058",
+        "Q059",
+        "Q060"
+      ],
+      "disposition": "JNTO histórico y contratos agregados ya asignados; no apertura nueva probada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q061",
+      "query": "site:linkedin.com/posts \"Chile\" \"SEO\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Chile",
+      "service_line": "seo_aeo",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q061",
+        "Q062",
+        "Q063",
+        "Q064"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q062",
+      "query": "site:linkedin.com/posts \"Perú\" \"SEO\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Perú",
+      "service_line": "seo_aeo",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q061",
+        "Q062",
+        "Q063",
+        "Q064"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q063",
+      "query": "site:linkedin.com/posts \"Colombia\" \"SEO\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Colombia",
+      "service_line": "seo_aeo",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q061",
+        "Q062",
+        "Q063",
+        "Q064"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q064",
+      "query": "site:linkedin.com/posts \"México\" \"SEO\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "México",
+      "service_line": "seo_aeo",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "result_batch": [
+        "Q061",
+        "Q062",
+        "Q063",
+        "Q064"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q065",
+      "query": "site:linkedin.com/posts \"Chile\" \"desarrollo web\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Chile",
+      "service_line": "web",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q065",
+        "Q066",
+        "Q067",
+        "Q068"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q066",
+      "query": "site:linkedin.com/posts \"Perú\" \"desarrollo web\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Perú",
+      "service_line": "web",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q065",
+        "Q066",
+        "Q067",
+        "Q068"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q067",
+      "query": "site:linkedin.com/posts \"Colombia\" \"desarrollo web\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Colombia",
+      "service_line": "web",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q065",
+        "Q066",
+        "Q067",
+        "Q068"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q068",
+      "query": "site:linkedin.com/posts \"México\" \"desarrollo web\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "México",
+      "service_line": "web",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q065",
+        "Q066",
+        "Q067",
+        "Q068"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q069",
+      "query": "site:linkedin.com/posts \"Chile\" \"producción audiovisual\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Chile",
+      "service_line": "creative",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q069",
+        "Q070",
+        "Q071",
+        "Q072"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q070",
+      "query": "site:linkedin.com/posts \"Perú\" \"producción audiovisual\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Perú",
+      "service_line": "creative",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q069",
+        "Q070",
+        "Q071",
+        "Q072"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q071",
+      "query": "site:linkedin.com/posts \"Colombia\" \"producción audiovisual\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Colombia",
+      "service_line": "creative",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q069",
+        "Q070",
+        "Q071",
+        "Q072"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q072",
+      "query": "site:linkedin.com/posts \"México\" \"producción audiovisual\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "México",
+      "service_line": "creative",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q069",
+        "Q070",
+        "Q071",
+        "Q072"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q073",
+      "query": "site:linkedin.com/posts \"Chile\" \"CRM\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q073",
+        "Q074",
+        "Q075",
+        "Q076"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q074",
+      "query": "site:linkedin.com/posts \"Perú\" \"CRM\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Perú",
+      "service_line": "crm_hubspot",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q073",
+        "Q074",
+        "Q075",
+        "Q076"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q075",
+      "query": "site:linkedin.com/posts \"Colombia\" \"CRM\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q073",
+        "Q074",
+        "Q075",
+        "Q076"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q076",
+      "query": "site:linkedin.com/posts \"México\" \"CRM\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "México",
+      "service_line": "crm_hubspot",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q073",
+        "Q074",
+        "Q075",
+        "Q076"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q077",
+      "query": "site:linkedin.com/posts \"Chile\" \"campañas publicitarias\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Chile",
+      "service_line": "media",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q077",
+        "Q078",
+        "Q079",
+        "Q080"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q078",
+      "query": "site:linkedin.com/posts \"Perú\" \"campañas publicitarias\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Perú",
+      "service_line": "media",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q077",
+        "Q078",
+        "Q079",
+        "Q080"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q079",
+      "query": "site:linkedin.com/posts \"Colombia\" \"campañas publicitarias\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "Colombia",
+      "service_line": "media",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q077",
+        "Q078",
+        "Q079",
+        "Q080"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q080",
+      "query": "site:linkedin.com/posts \"México\" \"campañas publicitarias\" \"buscamos\" -empleo -vacante -hiring -site:linkedin.com/directory",
+      "country": "México",
+      "service_line": "media",
+      "phase": 3,
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "result_batch": [
+        "Q077",
+        "Q078",
+        "Q079",
+        "Q080"
+      ],
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q081",
+      "query": "\"Chile\" \"buscamos agencia\" after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q081",
+        "Q082",
+        "Q083",
+        "Q084"
+      ],
+      "disposition": "Agencias proveedoras, vacantes y agregador ANDO sin comprador identificado.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q082",
+      "query": "\"Perú\" \"buscamos agencia\" after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q081",
+        "Q082",
+        "Q083",
+        "Q084"
+      ],
+      "disposition": "Agencias proveedoras, vacantes y agregador ANDO sin comprador identificado.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q083",
+      "query": "\"Colombia\" \"buscamos agencia\" after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q081",
+        "Q082",
+        "Q083",
+        "Q084"
+      ],
+      "disposition": "Agencias proveedoras, vacantes y agregador ANDO sin comprador identificado.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q084",
+      "query": "\"México\" \"buscamos agencia\" after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q081",
+        "Q082",
+        "Q083",
+        "Q084"
+      ],
+      "disposition": "Agencias proveedoras, vacantes y agregador ANDO sin comprador identificado.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q085",
+      "query": "\"Chile\" \"HubSpot\" \"partner\" after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q085",
+        "Q086",
+        "Q087",
+        "Q088"
+      ],
+      "disposition": "Partners HubSpot/casos históricos; uso o venta de HubSpot no prueba demanda nueva.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q086",
+      "query": "\"Perú\" \"HubSpot\" \"partner\" after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "crm_hubspot",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q085",
+        "Q086",
+        "Q087",
+        "Q088"
+      ],
+      "disposition": "Partners HubSpot/casos históricos; uso o venta de HubSpot no prueba demanda nueva.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q087",
+      "query": "\"Colombia\" \"HubSpot\" \"partner\" after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q085",
+        "Q086",
+        "Q087",
+        "Q088"
+      ],
+      "disposition": "Partners HubSpot/casos históricos; uso o venta de HubSpot no prueba demanda nueva.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q088",
+      "query": "\"México\" \"HubSpot\" \"partner\" after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "crm_hubspot",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q085",
+        "Q086",
+        "Q087",
+        "Q088"
+      ],
+      "disposition": "Partners HubSpot/casos históricos; uso o venta de HubSpot no prueba demanda nueva.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q089",
+      "query": "\"Chile\" \"convocatoria\" \"agencia\" \"octubre 2026\" after:2026-10-18 before:2026-10-21",
+      "country": "Chile",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q089",
+        "Q090",
+        "Q091",
+        "Q092"
+      ],
+      "disposition": "Convocatorias laborales y fuentes fuera del objeto; no compra de agencia.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q090",
+      "query": "\"Perú\" \"convocatoria\" \"agencia\" \"octubre 2026\" after:2026-10-18 before:2026-10-21",
+      "country": "Perú",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q089",
+        "Q090",
+        "Q091",
+        "Q092"
+      ],
+      "disposition": "Convocatorias laborales y fuentes fuera del objeto; no compra de agencia.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q091",
+      "query": "\"Colombia\" \"convocatoria\" \"agencia\" \"octubre 2026\" after:2026-10-18 before:2026-10-21",
+      "country": "Colombia",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q089",
+        "Q090",
+        "Q091",
+        "Q092"
+      ],
+      "disposition": "Convocatorias laborales y fuentes fuera del objeto; no compra de agencia.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q092",
+      "query": "\"México\" \"convocatoria\" \"agencia\" \"octubre 2026\" after:2026-10-18 before:2026-10-21",
+      "country": "México",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q089",
+        "Q090",
+        "Q091",
+        "Q092"
+      ],
+      "disposition": "Convocatorias laborales y fuentes fuera del objeto; no compra de agencia.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q093",
+      "query": "\"Chile\" \"19 de octubre de 2026\" marketing licitación",
+      "country": "Chile",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q093",
+        "Q094",
+        "Q095",
+        "Q096"
+      ],
+      "disposition": "Agregadores actualizados19Oct, sincronización no publicación. No se califica contrato por fecha de rastreo.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q094",
+      "query": "\"Perú\" \"19 de octubre de 2026\" marketing licitación",
+      "country": "Perú",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q093",
+        "Q094",
+        "Q095",
+        "Q096"
+      ],
+      "disposition": "Agregadores actualizados19Oct, sincronización no publicación. No se califica contrato por fecha de rastreo.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q095",
+      "query": "\"Colombia\" \"19 de octubre de 2026\" marketing licitación",
+      "country": "Colombia",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q093",
+        "Q094",
+        "Q095",
+        "Q096"
+      ],
+      "disposition": "Agregadores actualizados19Oct, sincronización no publicación. No se califica contrato por fecha de rastreo.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q096",
+      "query": "\"México\" \"19 de octubre de 2026\" marketing licitación",
+      "country": "México",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": true,
+      "filters": {},
+      "publication_window": {
+        "start": "2026-10-19T00:00:00-03:00",
+        "end": "2026-10-20T09:09:14-03:00"
+      },
+      "unfiltered_overlap_intent": null,
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q093",
+        "Q094",
+        "Q095",
+        "Q096"
+      ],
+      "disposition": "Agregadores actualizados19Oct, sincronización no publicación. No se califica contrato por fecha de rastreo.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q097",
+      "query": "site:linkedin.com/posts \"buscamos agencia\" \"Chile\"",
+      "country": "Chile",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q097",
+        "Q098",
+        "Q099",
+        "Q100"
+      ],
+      "disposition": "Teva ya conocida; GestiónDiversa cerrada y publicaciones históricas de vivo/Autónoma/VickyForm; sin reapertura probada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q098",
+      "query": "site:linkedin.com/posts \"buscamos agencia\" \"Perú\"",
+      "country": "Perú",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q097",
+        "Q098",
+        "Q099",
+        "Q100"
+      ],
+      "disposition": "Teva ya conocida; GestiónDiversa cerrada y publicaciones históricas de vivo/Autónoma/VickyForm; sin reapertura probada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q099",
+      "query": "site:linkedin.com/posts \"buscamos agencia\" \"Colombia\"",
+      "country": "Colombia",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q097",
+        "Q098",
+        "Q099",
+        "Q100"
+      ],
+      "disposition": "Teva ya conocida; GestiónDiversa cerrada y publicaciones históricas de vivo/Autónoma/VickyForm; sin reapertura probada.",
+      "pii_redacted": false
+    },
+    {
+      "id": "Q100",
+      "query": "site:linkedin.com/posts \"buscamos agencia\" \"México\"",
+      "country": "México",
+      "service_line": "all",
+      "phase": "adaptive",
+      "current_week_discovery": false,
+      "filters": {},
+      "publication_window": null,
+      "unfiltered_overlap_intent": "2026-10-16T09:11:02-03:00",
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "result_batch": [
+        "Q097",
+        "Q098",
+        "Q099",
+        "Q100"
+      ],
+      "disposition": "Teva ya conocida; GestiónDiversa cerrada y publicaciones históricas de vivo/Autónoma/VickyForm; sin reapertura probada.",
+      "pii_redacted": false
+    }
+  ],
+  "query_batches": [
+    {
+      "query_ids": [
+        "Q001",
+        "Q002",
+        "Q003",
+        "Q004"
+      ],
+      "checked_at_utc": "2026-10-20 11:58:45 UTC",
+      "disposition": "Proveedores SEO/AEO, vacantes y falsos positivos de sigla AEO; ninguna nueva demanda verificada.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q005",
+        "Q006",
+        "Q007",
+        "Q008"
+      ],
+      "checked_at_utc": "2026-10-20 11:58:45 UTC",
+      "disposition": "Proveedores web/ecommerce y conversación técnica; no compradores verificados.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q017",
+        "Q018",
+        "Q019",
+        "Q020"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "disposition": "Vacantes, agencias que venden y fuentes fuera de países; no compra B2B confirmada.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q009",
+        "Q010",
+        "Q011",
+        "Q012"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "disposition": "Producción audiovisual histórica, empleo y organismos culturales. Poder Judicial publica1Sep/cierra14Sep, no nueva semana.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q021",
+        "Q022",
+        "Q023",
+        "Q024"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "disposition": "Directorios de LinkedIn, sin publicación compradora concreta.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q025",
+        "Q026",
+        "Q027",
+        "Q028"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "disposition": "Directorios de artículos, sin publicación compradora concreta.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q013",
+        "Q014",
+        "Q015",
+        "Q016"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:00 UTC",
+      "disposition": "TVN CRM anterior con fechas contradictorias; proveedores y vacantes. Sin nueva demanda.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q041",
+        "Q042",
+        "Q043",
+        "Q044"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "disposition": "Procesos españoles y siglas no relacionadas; fuera de cuatro mercados. Fichas chilenas históricas.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q029",
+        "Q030",
+        "Q031",
+        "Q032"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q037",
+        "Q038",
+        "Q039",
+        "Q040"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q033",
+        "Q034",
+        "Q035",
+        "Q036"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:19 UTC",
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q053",
+        "Q054",
+        "Q055",
+        "Q056"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "disposition": "Proveedores CRM, ICETEX histórico y soporte conocido; sin nueva compra semanal.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q061",
+        "Q062",
+        "Q063",
+        "Q064"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q049",
+        "Q050",
+        "Q051",
+        "Q052"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "disposition": "Producción anterior, consultoríaHIseptiembre eILO octubre; sin publicación primaria19–20Oct verificada.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q045",
+        "Q046",
+        "Q047",
+        "Q048"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "disposition": "UNICEF Chile web anterior; agregadores y contratación profesional individual; sin nueva señal semanal validada.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q057",
+        "Q058",
+        "Q059",
+        "Q060"
+      ],
+      "checked_at_utc": "2026-10-20 11:59:41 UTC",
+      "disposition": "JNTO histórico y contratos agregados ya asignados; no apertura nueva probada.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q065",
+        "Q066",
+        "Q067",
+        "Q068"
+      ],
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q073",
+        "Q074",
+        "Q075",
+        "Q076"
+      ],
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q077",
+        "Q078",
+        "Q079",
+        "Q080"
+      ],
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q069",
+        "Q070",
+        "Q071",
+        "Q072"
+      ],
+      "checked_at_utc": "2026-10-20 12:00:04 UTC",
+      "disposition": "Sin resultados del buscador; no demuestra ausencia de demanda.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q081",
+        "Q082",
+        "Q083",
+        "Q084"
+      ],
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "disposition": "Agencias proveedoras, vacantes y agregador ANDO sin comprador identificado.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q093",
+        "Q094",
+        "Q095",
+        "Q096"
+      ],
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "disposition": "Agregadores actualizados19Oct, sincronización no publicación. No se califica contrato por fecha de rastreo.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q085",
+        "Q086",
+        "Q087",
+        "Q088"
+      ],
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "disposition": "Partners HubSpot/casos históricos; uso o venta de HubSpot no prueba demanda nueva.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q097",
+        "Q098",
+        "Q099",
+        "Q100"
+      ],
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "disposition": "Teva ya conocida; GestiónDiversa cerrada y publicaciones históricas de vivo/Autónoma/VickyForm; sin reapertura probada.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    },
+    {
+      "query_ids": [
+        "Q089",
+        "Q090",
+        "Q091",
+        "Q092"
+      ],
+      "checked_at_utc": "2026-10-20 12:01:25 UTC",
+      "disposition": "Convocatorias laborales y fuentes fuera del objeto; no compra de agencia.",
+      "result_scope": "pooled_by_tool; no per-query attribution invented",
+      "raw_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json"
+    }
+  ],
+  "source_reads": [
+    {
+      "kind": "primary_read",
+      "checked_at_utc": "2026-10-20 12:00:25 UTC",
+      "request": {
+        "open": [
+          {
+            "ref_id": "https://iniciativaclimatica.org/bolsa-de-trabajo/"
+          },
+          {
+            "ref_id": "https://www.cempresarial.co/proveedores-convocatorias-vigentes.php"
+          },
+          {
+            "ref_id": "https://www.unicef.org/peru/licitaciones"
+          },
+          {
+            "ref_id": "https://www.tvn.cl/corporativo/licitaciones"
+          }
+        ],
+        "response_length": "long"
+      },
+      "evidence_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json",
+      "scope_note": "Resultado íntegro privado; estado y hechos sustentados en controles/reporte. No se atribuye lectura completa por tools/list."
+    },
+    {
+      "kind": "primary_read",
+      "checked_at_utc": "2026-10-20 12:00:51 UTC",
+      "request": {
+        "open": [
+          {
+            "ref_id": "https://www.unicef.org/peru/licitaciones",
+            "lineno": 25
+          },
+          {
+            "ref_id": "https://www.tvn.cl/corporativo/licitaciones",
+            "lineno": 20
+          },
+          {
+            "ref_id": "https://www.ungm.org/Public/Notice/317123"
+          },
+          {
+            "ref_id": "https://www.japan.travel/es/mx/aviso-de-licitacion-es/"
+          }
+        ],
+        "response_length": "long"
+      },
+      "evidence_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json",
+      "scope_note": "Resultado íntegro privado; estado y hechos sustentados en controles/reporte. No se atribuye lectura completa por tools/list."
+    },
+    {
+      "kind": "primary_find",
+      "checked_at_utc": "2026-10-20 12:01:36 UTC",
+      "request": {
+        "find": [
+          {
+            "ref_id": "turn21view3",
+            "pattern": "2026"
+          },
+          {
+            "ref_id": "turn21view3",
+            "pattern": "Fecha"
+          },
+          {
+            "ref_id": "turn21view3",
+            "pattern": "enero"
+          }
+        ],
+        "response_length": "short"
+      },
+      "evidence_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json",
+      "scope_note": "Resultado íntegro privado; estado y hechos sustentados en controles/reporte. No se atribuye lectura completa por tools/list."
+    },
+    {
+      "kind": "primary_read",
+      "checked_at_utc": "2026-10-20 12:03:42 UTC",
+      "request": {
+        "open": [
+          {
+            "ref_id": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=4037-69-LE26"
+          },
+          {
+            "ref_id": "https://www.mercadopublico.cl/Procurement/Modules/RFQ/Details.aspx?id=696704-105-COT26"
+          }
+        ],
+        "response_length": "short"
+      },
+      "evidence_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json",
+      "scope_note": "Resultado íntegro privado; estado y hechos sustentados en controles/reporte. No se atribuye lectura completa por tools/list."
+    },
+    {
+      "kind": "firmographic_validation",
+      "checked_at_utc": "2026-10-20 12:04:39 UTC",
+      "request": {
+        "search_query": [
+          {
+            "q": "site.munifresia.cl funcionarios dotación 2025 municipalidad Fresia"
+          },
+          {
+            "q": "site:munifresia.cl \"dotación\" \"2025\""
+          },
+          {
+            "q": "site:fiscaliadechile.cl \"Maule\" \"funcionarios\" \"2025\""
+          },
+          {
+            "q": "site:fiscaliadechile.cl \"2025\" \"dotación\""
+          }
+        ],
+        "response_length": "medium"
+      },
+      "evidence_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json",
+      "scope_note": "Resultado íntegro privado; estado y hechos sustentados en controles/reporte. No se atribuye lectura completa por tools/list."
+    },
+    {
+      "kind": "firmographic_primary",
+      "checked_at_utc": "2026-10-20 12:05:09 UTC",
+      "request": {
+        "open": [
+          {
+            "ref_id": "https://www.fiscaliadechile.cl/index.php/actualidad/noticias/nacionales/ministerio-publico-presenta-balance-2025-con-cifras-record-de"
+          },
+          {
+            "ref_id": "https://www.munifresia.cl/transparencia/descargas/MecanismoParticipacionCiudadana/CuentaPublica/2023/Cuenta_Publica_Muni_Fresia_2023.pdf"
+          }
+        ],
+        "response_length": "short"
+      },
+      "evidence_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json",
+      "scope_note": "Resultado íntegro privado; estado y hechos sustentados en controles/reporte. No se atribuye lectura completa por tools/list."
+    },
+    {
+      "kind": "primary_document_read",
+      "checked_at_utc": "2026-10-20 12:05:28 UTC",
+      "request": {
+        "click": [
+          {
+            "ref_id": "turn21view2",
+            "id": 4
+          },
+          {
+            "ref_id": "turn21view2",
+            "id": 5
+          },
+          {
+            "ref_id": "turn21view0",
+            "id": 12
+          }
+        ],
+        "response_length": "short"
+      },
+      "evidence_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json",
+      "scope_note": "Resultado íntegro privado; estado y hechos sustentados en controles/reporte. No se atribuye lectura completa por tools/list."
+    },
+    {
+      "kind": "primary_read",
+      "checked_at_utc": "2026-10-20 12:05:57 UTC",
+      "request": {
+        "open": [
+          {
+            "ref_id": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?qs=TTZUmUD108ZyTM4Oi++tHA%3D%3D"
+          }
+        ],
+        "response_length": "short"
+      },
+      "evidence_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-0906-evidence.json",
+      "scope_note": "Resultado íntegro privado; estado y hechos sustentados en controles/reporte. No se atribuye lectura completa por tools/list."
+    }
+  ],
+  "procurement_controls": [
+    {
+      "code": "4037-69-LE26",
+      "entity": "Ilustre Municipalidad de Fresia",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Lectura de ficha MCP y evidencia local de esta corrida; no certifica expediente oficial completo.",
+      "source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=4037-69-LE26",
+      "index_source": "LicitaLAB MCP findOpportunityTool",
+      "primary_source_read": false,
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": "2026-10-19T19:56:16.447Z",
+        "precision": "exact_timestamp_in_index",
+        "verification": "indice; pendiente contraste primario"
+      },
+      "participation": {
+        "status": "no_verificada_en_expediente_primario",
+        "stage": "recepción de ofertas según índice",
+        "deadline_at": "2026-10-30T13:00:00.000Z",
+        "deadline_local": "30-10-2026 10:00",
+        "timezone": "America/Santiago según conversión CLI",
+        "registration_or_invitation_at": null,
+        "questions_deadline_at": null,
+        "answers_at": null
+      },
+      "indexed_award_schedule": {
+        "value": "2026-11-30T15:14:00.000Z",
+        "meaning": "Campo del índice; fecha futura prevista, no adjudicación efectiva"
+      },
+      "contract_documents_read": [
+        {
+          "name": "BASES ADM Y TEC. .pdf",
+          "mode": "RAG status ok; extractos, no lectura íntegra",
+          "pages_observed": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            16
+          ],
+          "load_bearing_pages": [
+            1,
+            2,
+            3,
+            4,
+            7,
+            9,
+            11
+          ]
+        },
+        {
+          "name": "DA1973.pdf",
+          "mode": "RAG status ok; extracto",
+          "pages_observed": [
+            1
+          ]
+        }
+      ],
+      "blockers": [
+        "Ficha primaria inaccesible al lector; calendario completo/foro/actos actuales no comprobados.",
+        "Contrato vigente/adjudicatario/firma/ejecución efectivos no verificados; RAG de bases no acredita ausencia.",
+        "Dotación municipal50+ desconocida; cuenta pública primaria devolvió403."
+      ],
+      "rationale": "No recomendar postulación, créditos ni Deal sin expediente primario y calendario completo.",
+      "hsp_id": "HSP-0037",
+      "facts": [
+        "Decreto 1973 de19Oct aprueba bases y presupuesto; revocación histórica4037-63 no es adjudicación de4037-69.",
+        "12 meses desde acta de inicio tras migración; CLP9000000 impuestos incluidos.",
+        "Contrato futuro dentro de10 días hábiles de adjudicar; OC futura dentro del proceso descrito; no prueba estado efectivo.",
+        "Parcial subcontratación de apoyo permitida previa comunicación escrita; responsabilidad total del proveedor.",
+        "Datacenter en Chile TierIII o equivalente, SLA99,98%, soporte24x7; migración antes26Dic2026."
+      ]
+    },
+    {
+      "code": "696704-105-COT26",
+      "entity": "Ministerio Público — Fiscalía Regional del Maule",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Lectura de ficha MCP y evidencia local de esta corrida; no certifica expediente oficial completo.",
+      "source": null,
+      "index_source": "LicitaLAB MCP findOpportunityTool",
+      "primary_source_read": false,
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": "2026-10-19T13:47:55.993Z",
+        "precision": "exact_timestamp_in_index",
+        "verification": "indice; pendiente contraste primario"
+      },
+      "participation": {
+        "status": "no_verificada_en_expediente_primario",
+        "stage": "recepción de ofertas según índice",
+        "deadline_at": "2026-10-22T12:00:00.000Z",
+        "deadline_local": "22-10-2026 09:00",
+        "timezone": "America/Santiago según conversión CLI",
+        "registration_or_invitation_at": null,
+        "questions_deadline_at": null,
+        "answers_at": null
+      },
+      "indexed_award_schedule": {
+        "value": null,
+        "meaning": "Campo del índice; fecha futura prevista, no adjudicación efectiva"
+      },
+      "contract_documents_read": [
+        {
+          "name": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+          "mode": "RAG status ok; extractos de páginas1–8, no descarga íntegra",
+          "pages_observed": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
+        },
+        {
+          "name": "ANEXO N° 1.docx",
+          "mode": "RAG status ok; extractos, página no informada"
+        },
+        {
+          "name": "PODER SIMPLE ABONO CUENTA BANCARIA.DOC",
+          "mode": "RAG status ok; extracto de formulario vacío; sin datos bancarios guardados en repo"
+        }
+      ],
+      "blockers": [
+        "Estado efectivo de selección/acto/OC/contrato y firma/inicio/fin no verificado en fuente primaria.",
+        "Criterio de evaluación contradictorio sin aclaración vigente; no resolver por inferencia.",
+        "Operación/rodaje local, derechos y costo/margen sin acreditar."
+      ],
+      "rationale": "No recomendar postulación, créditos ni Deal sin expediente primario y calendario completo.",
+      "hsp_id": "HSP-0038",
+      "source_note": "No se obtuvo URL directa oficial verificable de la Compra Ágil. La ruta ensayada por código no fue accesible al lector; no se afirma caída del portal.",
+      "facts": [
+        "Seis cápsulas60–200segundos, FullHD, 16:9 y adaptación9:16 cuando se defina; producción en Maule.",
+        "CLP2000000 IVA incluido por todo;30días desde aceptación OC prevista y pago30días tras recepción conforme.",
+        "Equipamiento/profesionales, portafolio, cotización, declaración y poder simple requeridos.",
+        "Contradicción: páginas6–7 proponen ponderaciones25/35/10/30 y criterios por aprobar; página7 administrativa indica menor precio con100% de cumplimiento."
+      ]
+    },
+    {
+      "code": "1607-107-COT26",
+      "entity": "Superintendencia de Seguridad Social",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Lectura de ficha MCP y evidencia local de esta corrida; no certifica expediente oficial completo.",
+      "source": null,
+      "index_source": "LicitaLAB MCP findOpportunityTool",
+      "primary_source_read": false,
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": "2026-10-16T18:07:03.627Z",
+        "precision": "exact_timestamp_in_index",
+        "verification": "indice; pendiente contraste primario"
+      },
+      "participation": {
+        "status": "no_verificada_en_expediente_primario",
+        "stage": "recepción de ofertas según índice",
+        "deadline_at": "2026-10-21T18:00:00.000Z",
+        "deadline_local": "21-10-2026 15:00",
+        "timezone": "America/Santiago según conversión CLI",
+        "registration_or_invitation_at": null,
+        "questions_deadline_at": null,
+        "answers_at": null
+      },
+      "indexed_award_schedule": {
+        "value": null,
+        "meaning": "Campo del índice; fecha futura prevista, no adjudicación efectiva"
+      },
+      "contract_documents_read": [
+        {
+          "name": "Anexos web.docx",
+          "mode": "RAG status ok, extractos; página no informada"
+        },
+        {
+          "name": "Formulario Especificaciones Técnicas Diseño y Desarrollo de web c.docx",
+          "mode": "RAG status ok, extractos; página no informada"
+        }
+      ],
+      "blockers": [
+        "Selección/OC/firma/contrato y calendario primarios no verificados; fuera de nueva ventana semanal."
+      ],
+      "rationale": "No recomendar postulación, créditos ni Deal sin expediente primario y calendario completo.",
+      "facts": [
+        "Museo web centenario; CLP6900000; ejecución prevista octubre–diciembre2026, no inicio efectivo.",
+        "SUSESO aporta alojamiento; experiencia histórico/patrimonial se evalúa. Publicación indexada16Oct: anterior a semana."
+      ]
+    },
+    {
+      "code": "1572-14-COT26",
+      "entity": "JUNJI — Arica y Parinacota",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Lectura de ficha MCP y evidencia local de esta corrida; no certifica expediente oficial completo.",
+      "source": null,
+      "index_source": "LicitaLAB MCP findOpportunityTool",
+      "primary_source_read": false,
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": "2026-10-18T01:57:53.990Z",
+        "precision": "exact_timestamp_in_index",
+        "verification": "indice; pendiente contraste primario"
+      },
+      "participation": {
+        "status": "no_verificada_en_expediente_primario",
+        "stage": "recepción de ofertas según índice",
+        "deadline_at": "2026-10-21T15:00:00.000Z",
+        "deadline_local": "21-10-2026 12:00",
+        "timezone": "America/Santiago según conversión CLI",
+        "registration_or_invitation_at": null,
+        "questions_deadline_at": null,
+        "answers_at": null
+      },
+      "indexed_award_schedule": {
+        "value": null,
+        "meaning": "Campo del índice; fecha futura prevista, no adjudicación efectiva"
+      },
+      "contract_documents_read": [],
+      "blockers": [
+        "Lectura sólo de índice MCP; originales/actos/contrato vigentes no revalidados íntegramente."
+      ],
+      "rationale": "No recomendar postulación, créditos ni Deal sin expediente primario y calendario completo."
+    },
+    {
+      "code": "757-96-LR26",
+      "entity": "Subsecretaría de Salud Pública",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Lectura de ficha MCP y evidencia local de esta corrida; no certifica expediente oficial completo.",
+      "source": null,
+      "index_source": "LicitaLAB MCP findOpportunityTool",
+      "primary_source_read": false,
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": "2026-10-16T15:37:08.410Z",
+        "precision": "exact_timestamp_in_index",
+        "verification": "indice; pendiente contraste primario"
+      },
+      "participation": {
+        "status": "no_verificada_en_expediente_primario",
+        "stage": "recepción de ofertas según índice",
+        "deadline_at": "2026-11-16T18:00:00.000Z",
+        "deadline_local": "16-11-2026 15:00",
+        "timezone": "America/Santiago según conversión CLI",
+        "registration_or_invitation_at": null,
+        "questions_deadline_at": null,
+        "answers_at": null
+      },
+      "indexed_award_schedule": {
+        "value": "2026-11-30T21:00:00.000Z",
+        "meaning": "Campo del índice; fecha futura prevista, no adjudicación efectiva"
+      },
+      "contract_documents_read": [],
+      "blockers": [
+        "Lectura sólo de índice MCP; originales/actos/contrato vigentes no revalidados íntegramente."
+      ],
+      "rationale": "No recomendar postulación, créditos ni Deal sin expediente primario y calendario completo."
+    },
+    {
+      "code": "2268-168-COT26",
+      "entity": "CENABAST",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Lectura de ficha MCP y evidencia local de esta corrida; no certifica expediente oficial completo.",
+      "source": null,
+      "index_source": "LicitaLAB MCP findOpportunityTool",
+      "primary_source_read": false,
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": "2026-10-19T13:26:33.770Z",
+        "precision": "exact_timestamp_in_index",
+        "verification": "indice; pendiente contraste primario"
+      },
+      "participation": {
+        "status": "no_verificada_en_expediente_primario",
+        "stage": "recepción de ofertas según índice",
+        "deadline_at": "2026-10-21T15:00:00.000Z",
+        "deadline_local": "21-10-2026 12:00",
+        "timezone": "America/Santiago según conversión CLI",
+        "registration_or_invitation_at": null,
+        "questions_deadline_at": null,
+        "answers_at": null
+      },
+      "indexed_award_schedule": {
+        "value": null,
+        "meaning": "Campo del índice; fecha futura prevista, no adjudicación efectiva"
+      },
+      "contract_documents_read": [],
+      "blockers": [
+        "No se profundizó contratación por descarte de objeto; proveedor/contrato desconocidos."
+      ],
+      "rationale": "No recomendar postulación, créditos ni Deal sin expediente primario y calendario completo.",
+      "screen_disposition": "excluida_por_objeto_del_radar",
+      "facts": [
+        "Curso de marketing digital para4personas,4semanas, CLP300000; no agencia operando campañas."
+      ]
+    },
+    {
+      "code": "1422259-10-LE26",
+      "entity": "Corporación Regional de Desarrollo de Tarapacá",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Lectura de ficha MCP y evidencia local de esta corrida; no certifica expediente oficial completo.",
+      "source": null,
+      "index_source": "LicitaLAB MCP findOpportunityTool",
+      "primary_source_read": false,
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": "2026-10-13T16:54:47.420Z",
+        "precision": "exact_timestamp_in_index",
+        "verification": "indice; pendiente contraste primario"
+      },
+      "participation": {
+        "status": "no_verificada_en_expediente_primario",
+        "stage": "recepción de ofertas según índice",
+        "deadline_at": "2026-10-20T18:00:00.000Z",
+        "deadline_local": "20-10-2026 15:00",
+        "timezone": "America/Santiago según conversión CLI",
+        "registration_or_invitation_at": null,
+        "questions_deadline_at": null,
+        "answers_at": null
+      },
+      "indexed_award_schedule": {
+        "value": "2026-10-23T23:00:00.000Z",
+        "meaning": "Campo del índice; fecha futura prevista, no adjudicación efectiva"
+      },
+      "contract_documents_read": [],
+      "blockers": [
+        "Lectura sólo de índice MCP; originales/actos/contrato vigentes no revalidados íntegramente."
+      ],
+      "rationale": "No recomendar postulación, créditos ni Deal sin expediente primario y calendario completo."
+    },
+    {
+      "code": "761-24-LE26",
+      "entity": "SUBDERE",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Lectura de ficha MCP y evidencia local de esta corrida; no certifica expediente oficial completo.",
+      "source": null,
+      "index_source": "LicitaLAB MCP findOpportunityTool",
+      "primary_source_read": false,
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": "2026-10-09T22:29:05.497Z",
+        "precision": "exact_timestamp_in_index",
+        "verification": "indice; pendiente contraste primario"
+      },
+      "participation": {
+        "status": "no_verificada_en_expediente_primario",
+        "stage": "recepción de ofertas según índice",
+        "deadline_at": "2026-10-23T18:00:00.000Z",
+        "deadline_local": "23-10-2026 15:00",
+        "timezone": "America/Santiago según conversión CLI",
+        "registration_or_invitation_at": null,
+        "questions_deadline_at": null,
+        "answers_at": null
+      },
+      "indexed_award_schedule": {
+        "value": "2026-11-05T02:59:00.000Z",
+        "meaning": "Campo del índice; fecha futura prevista, no adjudicación efectiva"
+      },
+      "contract_documents_read": [],
+      "blockers": [
+        "Lectura sólo de índice MCP; originales/actos/contrato vigentes no revalidados íntegramente."
+      ],
+      "rationale": "No recomendar postulación, créditos ni Deal sin expediente primario y calendario completo."
+    },
+    {
+      "code": "519302-9-LE26",
+      "entity": "INAPI",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Lectura de ficha MCP y evidencia local de esta corrida; no certifica expediente oficial completo.",
+      "source": null,
+      "index_source": "LicitaLAB MCP findOpportunityTool",
+      "primary_source_read": false,
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": "2026-10-09T18:57:48.540Z",
+        "precision": "exact_timestamp_in_index",
+        "verification": "indice; pendiente contraste primario"
+      },
+      "participation": {
+        "status": "no_verificada_en_expediente_primario",
+        "stage": "recepción de ofertas según índice",
+        "deadline_at": "2026-11-02T19:00:00.000Z",
+        "deadline_local": "02-11-2026 16:00",
+        "timezone": "America/Santiago según conversión CLI",
+        "registration_or_invitation_at": null,
+        "questions_deadline_at": null,
+        "answers_at": null
+      },
+      "indexed_award_schedule": {
+        "value": "2026-11-16T21:00:00.000Z",
+        "meaning": "Campo del índice; fecha futura prevista, no adjudicación efectiva"
+      },
+      "contract_documents_read": [],
+      "blockers": [
+        "Lectura sólo de índice MCP; originales/actos/contrato vigentes no revalidados íntegramente."
+      ],
+      "rationale": "No recomendar postulación, créditos ni Deal sin expediente primario y calendario completo."
+    },
+    {
+      "code": "1138297-12-LE26",
+      "entity": "ProChile",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Ficha primaria reabierta20Oct y ficha MCP; bases03096/2026 siguen sin leer por bloqueo previo.",
+      "source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?qs=TTZUmUD108ZyTM4Oi++tHA%3D%3D",
+      "index_source": "LicitaLAB MCP findOpportunityTool",
+      "primary_source_read": true,
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": "2026-10-15T14:31:15.880Z",
+        "precision": "exact_timestamp_in_index",
+        "verification": "indice; pendiente contraste primario"
+      },
+      "participation": {
+        "status": "no_verificada_en_expediente_primario",
+        "stage": "recepción de ofertas según índice",
+        "deadline_at": "2026-10-26T18:01:00.000Z",
+        "deadline_local": "26-10-2026 15:01",
+        "timezone": "America/Santiago según conversión CLI",
+        "registration_or_invitation_at": null,
+        "questions_deadline_at": "2026-10-19T10:00:00",
+        "answers_at": "2026-10-21T18:00:00",
+        "timezone_note": "Ficha no declara zona literal; CLI convierte UTC aSantiago. No inventar zona del comprador."
+      },
+      "indexed_award_schedule": {
+        "value": "2026-11-06T21:00:00.000Z",
+        "meaning": "Campo del índice; fecha futura prevista, no adjudicación efectiva"
+      },
+      "contract_documents_read": [],
+      "blockers": [
+        "Bases03096 no leídas; control contractual efectivo pendiente. Preguntas19Oct ya transcurridas; no nuevas preguntas autorizadas."
+      ],
+      "rationale": "No recomendar postulación, créditos ni Deal sin expediente primario y calendario completo.",
+      "hsp_id": "HSP-0033"
+    },
+    {
+      "code": "GRD-1541",
+      "entity": "Gana / Réditos Empresariales",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Reconciliación de continuidad local y/o lectura limitada detallada en fundamento, no refresh primario implícito.",
+      "rationale": "Wherex en login; runner sin credencial. Bases previas y borrador local leídos. Conflicto20Oct14Colombia/18sinzona. Contrato/selección sin revalidar.",
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": null,
+        "verification": "no_verificado_en_esta_corrida"
+      },
+      "participation": {
+        "status": "no_revalidada"
+      },
+      "contract_documents_read": []
+    },
+    {
+      "code": "SKY-1547",
+      "entity": "SKY — gráfica Centro Deportivo USS",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Reconciliación de continuidad local y/o lectura limitada detallada en fundamento, no refresh primario implícito.",
+      "rationale": "Fuente privada actual bloqueada; evidencia seguimiento19Oct:21Oct16Chile. Proveedor físico/contrato no revalidados.",
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": null,
+        "verification": "no_verificado_en_esta_corrida"
+      },
+      "participation": {
+        "status": "no_revalidada"
+      },
+      "contract_documents_read": []
+    },
+    {
+      "code": "SMZ-113",
+      "entity": "Simoniz",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Reconciliación de continuidad local y/o lectura limitada detallada en fundamento, no refresh primario implícito.",
+      "rationale": "Continuidad de proceso RFI según seguimiento19Oct;30Oct14Colombia frente18UI sinzona; Wherex actual bloqueado.",
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": null,
+        "verification": "no_verificado_en_esta_corrida"
+      },
+      "participation": {
+        "status": "no_revalidada"
+      },
+      "contract_documents_read": []
+    },
+    {
+      "code": "PRIMAX-41",
+      "entity": "PRIMAX Colombia",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Reconciliación de continuidad local y/o lectura limitada detallada en fundamento, no refresh primario implícito.",
+      "rationale": "Invitación conocida19Oct en seguimiento independiente; bases/estado contractual y calendario discrepante no resueltos. No es hallazgo nuevo de este radar.",
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": null,
+        "verification": "no_verificado_en_esta_corrida"
+      },
+      "participation": {
+        "status": "no_revalidada"
+      },
+      "contract_documents_read": []
+    },
+    {
+      "code": "LRPS-2026-9206550",
+      "entity": "UNICEF Perú",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Reconciliación de continuidad local y/o lectura limitada detallada en fundamento, no refresh primario implícito.",
+      "rationale": "Primaria publicada6Oct, ofertas27Oct23:59GMT-5; solicitud y anexos devolvieron403. Expediente/condiciones contractuales no leídos.",
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": "2026-10-06",
+        "verification": "primary_day"
+      },
+      "participation": {
+        "status": "recepción según invitación; elegibilidad/contrato HOLD",
+        "deadline_at": "2026-10-27T23:59:00-05:00",
+        "stage": "ofertas"
+      },
+      "contract_documents_read": [],
+      "source": "https://www.ungm.org/Public/Notice/317123"
+    },
+    {
+      "code": "Pierre-Fabre-agencia-2027",
+      "entity": "Pierre Fabre Chile",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Reconciliación de continuidad local y/o lectura limitada detallada en fundamento, no refresh primario implícito.",
+      "rationale": "Primaria no reabierta hoy. Credenciales19Oct acreditadas; no nueva recomendación de compra ni contrato revalidado.",
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": null,
+        "verification": "no_verificado_en_esta_corrida"
+      },
+      "participation": {
+        "status": "no_revalidada"
+      },
+      "contract_documents_read": []
+    },
+    {
+      "code": "5600218590 / CO1.REQ.11210476",
+      "entity": "Esenttia",
+      "result": "adjudicada_descartada",
+      "last_checked_at": "2026-10-20T09:12:08-03:00",
+      "last_checked_scope": "Reconciliación de continuidad local y/o lectura limitada detallada en fundamento, no refresh primario implícito.",
+      "rationale": "Exclusión por fuente primaria18Oct: DACARTEC, firma10Oct e inicio15Oct. CRM closedlost releído20Oct. No nueva lectura externa ni reapertura.",
+      "selected_supplier": {
+        "status": "verificado_previamente",
+        "value": "DACARTEC",
+        "as_of": "2026-10-18"
+      },
+      "award_resolution_or_order": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "contract_status": {
+        "status": "verificado_previamente",
+        "value": "firmado; ejecución iniciada; no refresh externo20Oct"
+      },
+      "signed_at": {
+        "status": "verificado_previamente",
+        "value": "2026-10-10"
+      },
+      "execution_start_at": {
+        "status": "verificado_previamente",
+        "value": "2026-10-15"
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Ausencia de dato no prueba ausencia del acto o contrato."
+      },
+      "published_at": {
+        "value": null,
+        "verification": "no_verificado_en_esta_corrida"
+      },
+      "participation": {
+        "status": "no_revalidada"
+      },
+      "contract_documents_read": [],
+      "hsp_id": "HSP-0034",
+      "source": "docs/commercial/prospecting-agent/runs/2026-10-18-1036-esenttia-adjudicada-rectificacion.md",
+      "crm": {
+        "deal_id": 66218288550,
+        "dealstage": "closedlost",
+        "portal": 48713323,
+        "checked_today": true
+      }
+    }
+  ],
+  "additional_read_operations": {
+    "licitalab_opportunity_codes": [
+      "2268-168-COT26",
+      "1607-107-COT26",
+      "1572-14-COT26",
+      "696704-105-COT26",
+      "4037-69-LE26",
+      "757-96-LR26",
+      "1422259-10-LE26",
+      "761-24-LE26",
+      "519302-9-LE26",
+      "1138297-12-LE26"
+    ],
+    "licitalab_documents_codes": [
+      "4037-69-LE26",
+      "696704-105-COT26",
+      "1607-107-COT26"
+    ],
+    "licitalab_ask_docs_codes": [
+      "4037-69-LE26",
+      "696704-105-COT26",
+      "1607-107-COT26"
+    ],
+    "ask_docs_question": "Cita archivos y páginas exactas. Verifica proveedor adjudicado o seleccionado, resolución/acto de adjudicación y orden de compra; existencia/estado del contrato, fecha de firma/formalización, inicio/fin o plazo efectivo. Distingue lo no encontrado de no verificado, no supongas ausencia por campos vacíos. Describe publicación, calendario vigente completo (preguntas, respuestas, inscripción y ofertas con hora/zona), vía de participación, elegibilidad y restricciones de subcontratación. Lee documento contractual disponible y bases completas para requisitos, equipo/experiencia, entregables, garantías, pagos y presupuesto. Diferencia adjudicación prevista y efectiva.",
+    "outlook_searches": [
+      {
+        "query": "FITFLOW received>=2026-10-19",
+        "checked_at_utc": "2026-10-20 12:02:33 UTC",
+        "pii_redacted": false,
+        "result_storage": "private_only",
+        "result_summary": "Resultados conservados en evidencia privada; búsqueda acotada, no inventario de buzón"
+      },
+      {
+        "query": "Agrocompra received>=2026-10-19",
+        "checked_at_utc": "2026-10-20 12:02:33 UTC",
+        "pii_redacted": false,
+        "result_storage": "private_only",
+        "result_summary": "Resultados conservados en evidencia privada; búsqueda acotada, no inventario de buzón"
+      },
+      {
+        "query": "Basis received>=2026-10-19",
+        "checked_at_utc": "2026-10-20 12:02:33 UTC",
+        "pii_redacted": false,
+        "result_storage": "private_only",
+        "result_summary": "Transporte falló"
+      },
+      {
+        "query": "Basis received>=2026-10-19",
+        "checked_at_utc": "2026-10-20 12:03:00 UTC",
+        "pii_redacted": false,
+        "result_storage": "private_only",
+        "result_summary": "Resultados conservados en evidencia privada; búsqueda acotada, no inventario de buzón"
+      },
+      {
+        "query": "Pierre Fabre received>=2026-10-19",
+        "checked_at_utc": "2026-10-20 12:03:01 UTC",
+        "pii_redacted": false,
+        "result_storage": "private_only",
+        "result_summary": "Resultados conservados en evidencia privada; búsqueda acotada, no inventario de buzón"
+      }
+    ],
+    "hubspot": {
+      "portal": 48713323,
+      "user_id": 75788512,
+      "companies_read_by_id": 8,
+      "deals_read_by_id": 4,
+      "new_candidate_exact_codes_results": 0,
+      "new_candidate_domains_results": 0,
+      "new_company_name_searches": {
+        "Fresia": 0,
+        "Ministerio Público": 0
+      },
+      "schema_rechecked": [
+        "COMPANY",
+        "DEAL"
+      ],
+      "gana_fuzzy_pages": [
+        5,
+        4
+      ],
+      "write_operations": 0
+    },
+    "browser": {
+      "wherex": "Login visible; runner check-only sin credencial. No autenticación alternativa intentada.",
+      "licitalab": "Vista usuario Recomendadas sin chips activos visibles. ClickTodos mostró aviso de nuevo inicio de sesión/cierre; no lectura posterior confirmada. Runner aislado164 registros, requested all. No se afirma inventario nacional."
+    }
+  },
+  "new_accounts": [
+    {
+      "id": "HSP-0037",
+      "entity": "Ilustre Municipalidad de Fresia",
+      "state": "investigando",
+      "gate": "hold",
+      "size_status": "unknown"
+    },
+    {
+      "id": "HSP-0038",
+      "entity": "Ministerio Público — Fiscalía Regional del Maule",
+      "state": "investigando",
+      "gate": "hold",
+      "size_status": "4400+ national institution; Maule unknown"
+    }
+  ],
+  "results": {
+    "new_qualified_open": 0,
+    "new_indexed_current_week_holds": 2,
+    "new_hsp_ids": 2,
+    "crm_writes": 0,
+    "outreach": 0,
+    "paid_enrichment": 0,
+    "contract_readback_caveat": "RAG de bases/condiciones leído en extractos; no contrato firmado leído ni prueba de inexistencia de contrato."
+  },
+  "approvals": {
+    "new_batch_proposed": false,
+    "reason": "Evidencia y/o ICP insuficientes; no altas ficticias ni autorización por silencio."
+  },
+  "private_history": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/opportunities.json",
+  "watchlist": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/sources-watchlist.json"
+}

@@ -1,0 +1,30 @@
+{
+  "checked_at": "2026-10-22T18:56:01-03:00",
+  "current_consistent": true,
+  "full_suite": {
+    "command": "pnpm pricing:v3:test",
+    "files_passed": 37,
+    "tests_passed": 1860,
+    "tests_skipped": 3,
+    "tests_failed": 0
+  },
+  "prior_failures_resolved": "Current-source parity used a dated Oct11 fixture before resourcepolicy Oct22. Added separate valid Oct22 fixture and negative old-date regression. No backdating, weakening of gates or golden recapture.",
+  "canonical_eight_cost_runs": "calculated/requires_review",
+  "canonical_six_increments": "replay verified",
+  "catalog_impact_checks": {
+    "calculated": 12,
+    "needs_explicit_AI_selection_for_staffing": 6
+  },
+  "composition_role_checks": {
+    "ECG-033": "calculated",
+    "ECG-034": "needs_input:contactability-platform",
+    "ECG-035": "calculated"
+  },
+  "external_mutations": false,
+  "proposal_prepared": false,
+  "price_references": {
+    "Frame.io": "historical75USD full account package; current price pending",
+    "AwarioPro": "public149USD month, not purchased",
+    "FX": "policy3650COP/USD; original unchanged; reciprocal addedestimated"
+  }
+}

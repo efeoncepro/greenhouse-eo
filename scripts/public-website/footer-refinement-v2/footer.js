@@ -1,5 +1,5 @@
 (() => {
-  const footer = document.querySelector('#colophon:has([data-eo-footer-partners="v2"])');
+  const footer = document.querySelector('[data-eo-footer-partners="v2"]')?.closest('#colophon');
 
   if (!footer || footer.dataset.eoFooterReady) return;
   footer.dataset.eoFooterReady = 'true';

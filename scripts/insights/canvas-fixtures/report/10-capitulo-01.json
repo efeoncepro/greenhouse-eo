@@ -4,6 +4,7 @@
   "contentType": "report-chapter",
   "slots": {
     "chapterLabel": "Capítulo 01",
+    "productLabel": "Insights",
     "chapterNumeral": "01",
     "runningLabel": "Informe de agosto 2026",
     "chapterTitle": "Visibilidad orgánica",

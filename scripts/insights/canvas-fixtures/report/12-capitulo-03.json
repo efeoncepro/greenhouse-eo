@@ -4,6 +4,7 @@
   "contentType": "report-chapter",
   "slots": {
     "chapterLabel": "Capítulo 03",
+    "productLabel": "Insights",
     "chapterNumeral": "03",
     "runningLabel": "Informe de agosto 2026",
     "chapterTitle": "Del clic al negocio",

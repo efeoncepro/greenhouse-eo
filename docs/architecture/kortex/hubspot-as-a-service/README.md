@@ -8,7 +8,7 @@
 
 This Greenhouse directory is the source of truth for the managed-service method, ANAM client context, RevOps decisions, Customer Agent evidence and cross-platform handoff. It remains here so operators and agents have one visible, reviewable record.
 
-**Client boundary:** ANAM is an Efeonce client. Its HubSpot portal, CRM records and dashboards belong to that client engagement; they are not Greenhouse product/runtime capabilities or Efeonce business data. Greenhouse owns only the canonical documentation, decisions, QA and skills for the engagement. Kortex supplies the approved portal-scoped execution path.
+**Client boundary:** ANAM is an Efeonce client. Its HubSpot portal, CRM records and dashboards belong to that client engagement; they are not Greenhouse product/runtime capabilities or Efeonce business data. Greenhouse owns only the canonical documentation, decisions, QA and skills for the engagement. Portal execution must use an independently verified, portal-scoped lane. Kortex is hibernated; do not wake it for this service. Direct MCP, Agent CLI or authenticated UI access must be checked separately for the target portal.
 
 - Codex and Claude skills are owned by Greenhouse at `.codex/skills/hubspot-as-a-service/` and `.claude/skills/hubspot-as-a-service/`.
 - Customer Agent QA is owned by Greenhouse under `docs/audits/`.
@@ -44,6 +44,22 @@ intake -> inventory -> design -> propose -> approve -> dry-run/draft
 The service owns the business contract and evidence. Each underlying platform owner still controls its API, runtime and safety rules.
 
 ## ANAM implementation
+
+The [21 October voice/support follow-up](../../../audits/ANAM_EMMA_VOICE_SOPORTE_Y_CORRESPONDENCIA_2026-10-21.md)
+records the reviewed calls, shared-agent/channel distinction, minor support versus scope evaluation,
+Julio's sent reply (Outlook and HubSpot verified) and Maria Paz's new question about receiving calls.
+No configuration change was made. Her operating-support question remains unanswered; broader routing,
+IVR or channel redesign is not promised or authorized.
+
+Voice is active as of 2026-10-19 in ANAM, independently of the CMS/chat seam below. The
+[voice configuration and runtime evidence](../../../audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md)
+record the approved design: Emma first, AI reception at all hours, human transfer on business hours, no initial
+IVR menu. The first real call produced a ticket, recording and transcript; human transfer and voicemail
+still require their own tests. Voice routing belongs to the Calling channel, not the text handoff workflow.
+The [reusable operator manual](../../../manual-de-uso/hubspot/configurar-customer-agent-llamadas.md)
+owns the setup/QA procedure; this documents the existing native HubSpot configuration without introducing
+an API, integration or new Greenhouse runtime/architecture decision.
+
 
 The ANAM landing and Customer Agent are one experience with two deployment surfaces:
 

@@ -12,6 +12,15 @@
 > **Frontera:** decide qué es una Pillar, cómo se relaciona con su cluster y cómo elegir superficie/runtime.
 > No autoriza migraciones, nuevas rutas, Elementor writes, custom blocks, deploy ni publicación.
 
+> **Delta 2026-10-22 — canales propios v2.** Sin cambio de arquitectura. Con
+> [PDR-020 revisión 2.0](PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias)
+> y la [estrategia de love brand §8.2–§8.3](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22):
+> (1) el **siguiente paso** (§4, punto 9) tiene orden fijo en el blog: primero suscribirse a Glitch (el único correo),
+> después una herramienta y al final el diagnóstico; (2) un tutorial de YouTube puede ser nodo platform-native y su
+> **canonical de video vive en YouTube**, y su artículo del blog lo incrusta con la transcripción como texto canónico; (3) cada artículo
+> lleva autor real con su ficha; (4) Marketing con Manzanitas y Glitch son marcas editoriales hermanas, no serie una
+> de la otra (ajusta la fila «Marketing con Manzanitas» de §3).
+
 ## 0. La decisión, en una línea
 
 **Una Pillar de Efeonce nace como una Pillar Experience: hogar durable de un territorio de conocimiento que
@@ -114,7 +123,7 @@ Hay tres conceptos distintos que el canon anterior mezclaba:
 | Concepto | Trabajo | Estado vigente |
 |---|---|---|
 | **Think, producto de contenido** | Demand generation, nurturing, autoridad, blog, newsletter, tools y lead magnets | Es la capa editorial descrita por PDR-003 |
-| **Marketing con Manzanitas** | Marca editorial flagship dentro de Think | Publica artículos, Pillars y series como Glitch |
+| **Marketing con Manzanitas** | Marca editorial visible del hub (Think es nombre interno, 2026-10-22) | Publica artículos y Pillars; Glitch es marca hermana con archivo en el mismo blog |
 | **`think.efeoncepro.com`** | Runtime Astro actual para experiencias enfocadas, tools, reportes y muestras | No es el destino automático de toda guía o Pillar |
 
 Por tanto:

@@ -281,6 +281,13 @@ Lessons from the mention release (2026-10-18), now fixed in AXIS:
 - A failed publication run that published nothing leaves its tag: delete it (`git push origin :refs/tags/v<x>`) after
   confirming the version is absent from the registry, then rerun `pnpm release:packages <x>` on the new commit.
 
+Lessons from the landing-dock releases (2026-10-23, `v0.7.12`–`v0.7.14`):
+- **A new package export enters `scripts/agent.test.mjs`** (declared-exports test of the agent lane) in the same commit;
+  `v0.7.11` never published because it did not. Map new source/Lab/test paths in `scripts/ci-scope.mjs` to their lane.
+- CI `git diff --check` rejects a trailing blank line at the end of a README.
+- `pnpm release:packages` tags the **HEAD of the shared checkout** once CI finishes; `v0.7.13` landed on another
+  session's commit. Nobody commits on AXIS `main` while it waits; if publication stops, rerun the workflow.
+
 `ci-release-plan.mjs` compares the full diff from a verified successful ancestor release. Only unchanged
 families inherit its validation; affected families need exact-SHA CI plus identical build digest, or run.
 Version-only package JSON changes retain scope; dependencies, exports, scripts, lockfile, shared code,

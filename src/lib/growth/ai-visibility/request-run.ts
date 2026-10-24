@@ -5,6 +5,8 @@ import type { AeoTier } from './entitlement'
 import { GraderMarketConfigError } from './markets/contracts'
 import { requestRunBatchInternal } from './markets/run-batch'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type RequestRunBlockedReason =
   | 'disabled'
   | 'not_entitled'
@@ -48,7 +50,7 @@ const requestSingle = async (input: {
   requestedBy: string
   marketId?: string
   idempotencyKey?: string | null
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   channel: 'operator' | 'portal'
 }): Promise<RequestRunResult> => {
   try {
@@ -88,7 +90,7 @@ export const requestGraderRunForOrganization = (input: {
   requestedBy: string
   marketId?: string
   idempotencyKey?: string | null
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }): Promise<RequestRunResult> => requestSingle({ ...input, channel: 'portal' })
 
 /** Operator capability is required by the existing route; arbitrary subject organizations are supported. */
@@ -97,6 +99,6 @@ export const requestGraderRunAsOperator = (input: {
   requestedBy: string
   marketId?: string
   idempotencyKey?: string | null
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }): Promise<RequestRunResult> =>
   requestSingle({ ...input, organizationId: input.subjectOrganizationId, channel: 'operator' })

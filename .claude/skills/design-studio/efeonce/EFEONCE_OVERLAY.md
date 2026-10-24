@@ -93,6 +93,12 @@ Dónde entra el diseño:
 - **`efeoncepro.com`** (WordPress/Kinsta → Astro): hero/banner/OG de las landings de servicio (ej. `/aeo-2/`).
 - **El grader** es la costura top→bottom: un KV que muestra el resultado del grader es pieza social-nativa
   y demuestra expertise. Diseño + `social-media-studio` lo llevan a cada red.
+- **Canales propios** (rol por familia en
+  [PDR-020](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)): **Instagram** es
+  marca agencia (love brand): oficio, proceso y equipo, nunca casos B2B ni documentos de servicio; la miniatura de
+  **YouTube** es Escena 16:9 del registro Manzanitas con el logo abajo a la izquierda, sin clickbait, y cada video
+  sale con dos miniaturas para la prueba A/B
+  ([estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §7 y §8.3).
 
 ## Coherencia con las skills hermanas
 

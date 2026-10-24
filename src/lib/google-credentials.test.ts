@@ -11,14 +11,14 @@ import {
   shouldUseWorkloadIdentity
 } from '@/lib/google-credentials'
 
-const asEnv = (value: Record<string, string>) => value as unknown as NodeJS.ProcessEnv
+const asEnv = (value: Record<string, string>) => value
 
 describe('google credentials helpers', () => {
   it('parses service account credentials from raw env json', () => {
     const credentials = getGoogleCredentials({
       GOOGLE_APPLICATION_CREDENTIALS_JSON:
         '{"project_id":"efeonce-group","client_email":"runtime@example.com","private_key":"-----BEGIN PRIVATE KEY-----\\\\nabc\\\\n-----END PRIVATE KEY-----"}'
-    } as unknown as NodeJS.ProcessEnv)
+    })
 
     expect(credentials?.project_id).toBe('efeonce-group')
     expect(credentials?.client_email).toBe('runtime@example.com')
@@ -29,7 +29,7 @@ describe('google credentials helpers', () => {
     const credentials = getGoogleCredentials({
       GOOGLE_APPLICATION_CREDENTIALS_JSON:
         '{"project_id":"efeonce-group","client_email":"runtime@example.com","private_key":"-----BEGIN PRIVATE KEY-----abc-----END PRIVATE KEY-----"}'
-    } as unknown as NodeJS.ProcessEnv)
+    })
 
     expect(credentials?.private_key).toBe('-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----\n')
   })
@@ -42,7 +42,7 @@ describe('google credentials helpers', () => {
 
     const credentials = getGoogleCredentials({
       GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64: payload
-    } as unknown as NodeJS.ProcessEnv)
+    })
 
     expect(credentials?.project_id).toBe('efeonce-group')
     expect(credentials?.private_key).toBe('-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----\n')
@@ -199,12 +199,12 @@ describe('google credentials helpers', () => {
       getGoogleProjectId({
         GOOGLE_APPLICATION_CREDENTIALS_JSON:
           '{"project_id":"efeonce-group","client_email":"runtime@example.com","private_key":"key"}'
-      } as unknown as NodeJS.ProcessEnv)
+      })
     ).toBe('efeonce-group')
   })
 
   it('throws when project id cannot be resolved from env or credentials', () => {
-    expect(() => getGoogleProjectId({} as NodeJS.ProcessEnv)).toThrow(
+    expect(() => getGoogleProjectId({})).toThrow(
       'Missing GCP_PROJECT or GOOGLE_CLOUD_PROJECT environment variable'
     )
   })

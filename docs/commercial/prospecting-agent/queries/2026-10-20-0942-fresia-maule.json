@@ -1,0 +1,935 @@
+{
+  "run_id": "2026-10-20-0942-fresia-maule",
+  "type": "operator_requested_focused_primary_procurement_validation",
+  "date_santiago": "2026-10-20T09:42:08.788926-03:00",
+  "window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-20T09:42:08.788926-03:00",
+    "type": "calendar_week_santiago"
+  },
+  "scope": [
+    "HSP-0037",
+    "HSP-0038"
+  ],
+  "discovery": false,
+  "coverage": "Dos procesos solicitados; no nuevo barrido20celdas",
+  "queries": [
+    {
+      "id": "Q001",
+      "kind": "web_search",
+      "query": "\"4037-69-LE26\"; \"696704-105-COT26\"",
+      "source": "web search",
+      "result": "Sin resultado primario exacto útil; resultados irrelevantes descartados",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {}
+    },
+    {
+      "id": "Q002",
+      "kind": "browser_primary",
+      "query": "Abrir ficha4037-69-LE26, leer calendario, condiciones, botones adjudicación/OC",
+      "source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=4037-69-LE26",
+      "result": "Ficha accesible, calendario futuro; adjudicación/OC deshabilitados; eso solo no prueba inexistencia",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {}
+    },
+    {
+      "id": "Q003",
+      "kind": "browser_primary",
+      "query": "Ver adjuntos Fresia",
+      "source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=4037-69-LE26",
+      "result": "Inventario primarioDA1973.pdf355KB19Oct16:46:43 yBASES3332KB16:46:27 leído; CAPTCHA de descarga conjunta no resuelto",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {}
+    },
+    {
+      "id": "Q004",
+      "kind": "browser_primary",
+      "query": "Ver Anexo BASES ADM Y TEC. .pdf",
+      "source": "Mercado Público / Attachment (parámetroenc omitido)",
+      "result": "upstream request timeout; noPDF original leído",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "shared_primary_validation",
+      "filters": {}
+    },
+    {
+      "id": "Q005",
+      "kind": "browser_primary",
+      "query": "Historial4037-69-LE26",
+      "source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=4037-69-LE26",
+      "result": "Guardada16:24:02, enviada16:47:35, guardada16:49:02, enviada16:55:39, autorizada16:55:59, Publicada19Oct16:56:16; sin transición a adjudicada en lo leído",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {}
+    },
+    {
+      "id": "Q006",
+      "kind": "browser_primary",
+      "query": "Home → CompraÁgil buscador",
+      "source": "https://buscador.mercadopublico.cl/compra-agil",
+      "result": "Cargando sin campos operativos; no se ejecutó búsqueda por código",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "shared_primary_validation",
+      "filters": {}
+    },
+    {
+      "id": "Q007",
+      "kind": "browser_primary",
+      "query": "Resumen-cotizacion696704-105-COT26",
+      "source": "https://compra-agil.mercadopublico.cl/resumen-cotizacion/696704-105-COT26",
+      "result": "Redirección aHome; sin detalle de compra",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "creative",
+      "filters": {}
+    },
+    {
+      "id": "Q008",
+      "kind": "browser_primary",
+      "query": "Contratos porIDlicitación4037-69-LE26",
+      "source": "https://www.mercadopublico.cl/Contratos/Ciudadania",
+      "result": "Sin resultados; no prueba ausencia de contrato",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {}
+    },
+    {
+      "id": "Q009",
+      "kind": "browser_primary",
+      "query": "Contratos porIDlicitación696704-105-COT26",
+      "source": "https://www.mercadopublico.cl/Contratos/Ciudadania",
+      "result": "Sin resultados; coberturaCOT del campo no acreditada, no prueba ausencia",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "creative",
+      "filters": {}
+    },
+    {
+      "id": "Q010",
+      "kind": "browser_primary",
+      "query": "Ver Anexo DA1973.pdf",
+      "source": "Mercado Público / Attachment (parámetroenc omitido)",
+      "result": "ERR_BLOCKED_BY_CLIENT; noPDF original leído",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "shared_primary_validation",
+      "filters": {}
+    },
+    {
+      "id": "Q011",
+      "kind": "official_api",
+      "query": "fresia-api {}",
+      "source": "https://api.mercadopublico.cl",
+      "result": {
+        "http_status": 200,
+        "count": 1,
+        "error": null,
+        "evidence_file": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-focused-fresia-api.json"
+      },
+      "checked_at": "2026-10-20T12:32:44.583929+00:00",
+      "time_precision": "exact_persisted_api_response",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {}
+    },
+    {
+      "id": "Q012",
+      "kind": "official_api",
+      "query": "maule-api-list {}",
+      "source": "https://api2.mercadopublico.cl/v2/compra-agil/696704-105-COT26",
+      "result": {
+        "http_status": 504,
+        "count": null,
+        "error": "HTTPError",
+        "evidence_file": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-focused-maule-api-list.json"
+      },
+      "checked_at": "2026-10-20T12:35:30.470175+00:00",
+      "time_precision": "exact_persisted_api_response",
+      "market": "Chile",
+      "service_line": "creative",
+      "filters": {}
+    },
+    {
+      "id": "Q013",
+      "kind": "official_api",
+      "query": "buyers {}",
+      "source": "https://api.mercadopublico.cl",
+      "result": {
+        "http_status": 200,
+        "count": 899,
+        "error": null,
+        "evidence_file": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-focused-buyers.json"
+      },
+      "checked_at": "2026-10-20T12:36:31.576239+00:00",
+      "time_precision": "exact_persisted_api_response",
+      "market": "Chile",
+      "service_line": "shared_primary_validation",
+      "filters": {}
+    },
+    {
+      "id": "Q014",
+      "kind": "official_api",
+      "query": "fresia-oc-19102026 {\"fecha\": \"19102026\", \"CodigoOrganismo\": \"119651\"}",
+      "source": "https://api.mercadopublico.cl",
+      "result": {
+        "http_status": 200,
+        "count": 9,
+        "error": null,
+        "evidence_file": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-focused-fresia-oc-19102026.json"
+      },
+      "checked_at": "2026-10-20T12:36:31.604745+00:00",
+      "time_precision": "exact_persisted_api_response",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {}
+    },
+    {
+      "id": "Q015",
+      "kind": "official_api",
+      "query": "fresia-oc-20102026 {\"fecha\": \"20102026\", \"CodigoOrganismo\": \"119651\"}",
+      "source": "https://api.mercadopublico.cl",
+      "result": {
+        "http_status": 200,
+        "count": 0,
+        "error": null,
+        "evidence_file": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-focused-fresia-oc-20102026.json"
+      },
+      "checked_at": "2026-10-20T12:36:31.551890+00:00",
+      "time_precision": "exact_persisted_api_response",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {}
+    },
+    {
+      "id": "Q016",
+      "kind": "official_api",
+      "query": "maule-oc-19102026 {\"fecha\": \"19102026\", \"CodigoOrganismo\": \"224060\"}",
+      "source": "https://api.mercadopublico.cl",
+      "result": {
+        "http_status": 200,
+        "count": 26,
+        "error": null,
+        "evidence_file": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-focused-maule-oc-19102026.json"
+      },
+      "checked_at": "2026-10-20T12:37:00.580699+00:00",
+      "time_precision": "exact_persisted_api_response",
+      "market": "Chile",
+      "service_line": "creative",
+      "filters": {}
+    },
+    {
+      "id": "Q017",
+      "kind": "official_api",
+      "query": "maule-oc-20102026 {\"fecha\": \"20102026\", \"CodigoOrganismo\": \"224060\"}",
+      "source": "https://api.mercadopublico.cl",
+      "result": {
+        "http_status": 200,
+        "count": 1,
+        "error": null,
+        "evidence_file": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-focused-maule-oc-20102026.json"
+      },
+      "checked_at": "2026-10-20T12:37:00.516671+00:00",
+      "time_precision": "exact_persisted_api_response",
+      "market": "Chile",
+      "service_line": "creative",
+      "filters": {}
+    },
+    {
+      "id": "Q018",
+      "kind": "official_api",
+      "query": "GET /v2/compra-agil/696704-105-COT26 primerintento",
+      "source": "https://api2.mercadopublico.cl/v2/compra-agil/696704-105-COT26",
+      "result": "HTTP504; respuesta sin expediente",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "creative",
+      "filters": {}
+    },
+    {
+      "id": "Q019",
+      "kind": "official_api",
+      "query": "GET /v2/compra-agil/696704-105-COT26 reintento único",
+      "source": "https://api2.mercadopublico.cl/v2/compra-agil/696704-105-COT26",
+      "result": "HTTP504; circuito de reintentos detenido tras listado también504",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "creative",
+      "filters": {}
+    },
+    {
+      "id": "Q020",
+      "kind": "licitalab_api",
+      "query": "documents 4037-69-LE26",
+      "source": "LicitaLAB MCP listOpportunityDocumentsTool",
+      "result": {
+        "total": 2,
+        "documents": [
+          "BASES ADM Y TEC. .pdf",
+          "DA1973.pdf"
+        ]
+      },
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {
+        "no_login": true
+      }
+    },
+    {
+      "id": "Q021",
+      "kind": "licitalab_api",
+      "query": "documents 696704-105-COT26",
+      "source": "LicitaLAB MCP listOpportunityDocumentsTool",
+      "result": {
+        "total": 3,
+        "documents": [
+          "ANEXO N° 1.docx",
+          "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+          "PODER SIMPLE ABONO CUENTA BANCARIA.DOC"
+        ]
+      },
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "creative",
+      "filters": {
+        "no_login": true
+      }
+    },
+    {
+      "id": "Q022",
+      "kind": "licitalab_api",
+      "query": "ask-docs 4037-69-LE26 Transcribe los pasajes del Decreto Alcaldicio 1973 y de las bases que individualicen adjudicatario o proveedor seleccionado, contrato firmado, fecha de firma, acta de inicio o una orden de compra ya emitida. Distingue hechos consumados de condiciones futuras y del proceso anterior 4037-63-LE26. Incluye documento y página.",
+      "source": "LicitaLAB MCP getOpportunityDocumentTool",
+      "result": {
+        "code": "4037-69-LE26",
+        "query": "Transcribe los pasajes del Decreto Alcaldicio 1973 y de las bases que individualicen adjudicatario o proveedor seleccionado, contrato firmado, fecha de firma, acta de inicio o una orden de compra ya emitida. Distingue hechos consumados de condiciones futuras y del proceso anterior 4037-63-LE26. Incluye documento y página.",
+        "status": "ok",
+        "documents_read": [
+          {
+            "filename": "DA1973.pdf",
+            "page": 1
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 4
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 9
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 1
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 6
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 11
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 8
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 10
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 7
+          },
+          {
+            "filename": "DA1973.pdf",
+            "page": 2
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 4
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 15
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 9
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 5
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 13
+          }
+        ]
+      },
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {
+        "no_login": true
+      }
+    },
+    {
+      "id": "Q023",
+      "kind": "licitalab_api",
+      "query": "ask-docs 4037-69-LE26 Transcribe las cláusulas de presentación de ofertas, calendario, requisitos de admisibilidad y anexos; especialmente páginas 14 y 15 de las bases y disposiciones sobre contrato, adjudicación y orden de compra.",
+      "source": "LicitaLAB MCP getOpportunityDocumentTool",
+      "result": {
+        "code": "4037-69-LE26",
+        "query": "Transcribe las cláusulas de presentación de ofertas, calendario, requisitos de admisibilidad y anexos; especialmente páginas 14 y 15 de las bases y disposiciones sobre contrato, adjudicación y orden de compra.",
+        "status": "ok",
+        "documents_read": [
+          {
+            "filename": "DA1973.pdf",
+            "page": 1
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 4
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 9
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 11
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 5
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 6
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 7
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 8
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 16
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 1
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 15
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 2
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 10
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 4
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 12
+          },
+          {
+            "filename": "BASES ADM Y TEC. .pdf",
+            "page": 13
+          }
+        ]
+      },
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {
+        "no_login": true
+      }
+    },
+    {
+      "id": "Q024",
+      "kind": "licitalab_api",
+      "query": "ask-docs 696704-105-COT26 Transcribe textualmente los criterios de evaluación de páginas 6 y 7 y las condiciones administrativas de selección por menor precio de las especificaciones técnicas. ¿La tabla ponderada es propuesta, borrador o regla aprobada? ¿Hay aclaración o documento posterior que resuelva la contradicción? Señala documento y página.",
+      "source": "LicitaLAB MCP getOpportunityDocumentTool",
+      "result": {
+        "code": "696704-105-COT26",
+        "query": "Transcribe textualmente los criterios de evaluación de páginas 6 y 7 y las condiciones administrativas de selección por menor precio de las especificaciones técnicas. ¿La tabla ponderada es propuesta, borrador o regla aprobada? ¿Hay aclaración o documento posterior que resuelva la contradicción? Señala documento y página.",
+        "status": "ok",
+        "documents_read": [
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 5
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 1
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 6
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 7
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 2
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 4
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 3
+          },
+          {
+            "filename": "ANEXO N° 1.docx",
+            "page": null
+          },
+          {
+            "filename": "PODER SIMPLE ABONO CUENTA BANCARIA.DOC",
+            "page": null
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 8
+          },
+          {
+            "filename": "ANEXO N° 1.docx",
+            "page": null
+          }
+        ]
+      },
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "creative",
+      "filters": {
+        "no_login": true
+      }
+    },
+    {
+      "id": "Q025",
+      "kind": "licitalab_api",
+      "query": "ask-docs 696704-105-COT26 Transcribe pasajes que acrediten proveedor seleccionado, adjudicación, orden de compra emitida o aceptada, contrato firmado y fecha de inicio o ejecución real. Distingue condiciones futuras. Transcribe calendario y vía para presentar cotización, requisitos de admisibilidad y limitaciones de participación o subcontratación.",
+      "source": "LicitaLAB MCP getOpportunityDocumentTool",
+      "result": {
+        "code": "696704-105-COT26",
+        "query": "Transcribe pasajes que acrediten proveedor seleccionado, adjudicación, orden de compra emitida o aceptada, contrato firmado y fecha de inicio o ejecución real. Distingue condiciones futuras. Transcribe calendario y vía para presentar cotización, requisitos de admisibilidad y limitaciones de participación o subcontratación.",
+        "status": "ok",
+        "documents_read": [
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 5
+          },
+          {
+            "filename": "ANEXO N° 1.docx",
+            "page": null
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 7
+          },
+          {
+            "filename": "ANEXO N° 1.docx",
+            "page": null
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 6
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 4
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 1
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 2
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 3
+          },
+          {
+            "filename": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+            "page": 8
+          }
+        ]
+      },
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "creative",
+      "filters": {
+        "no_login": true
+      }
+    },
+    {
+      "id": "Q026",
+      "kind": "licitalab_api",
+      "query": "opportunity 4037-69-LE26",
+      "source": "LicitaLAB MCP findOpportunityTool",
+      "result": "Publicada; fechas índice sin cambios; no datos que resuelvan contrato o selección",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "web",
+      "filters": {
+        "no_login": true
+      }
+    },
+    {
+      "id": "Q027",
+      "kind": "licitalab_api",
+      "query": "opportunity 696704-105-COT26",
+      "source": "LicitaLAB MCP findOpportunityTool",
+      "result": "Publicada; fechas índice sin cambios; no datos que resuelvan contrato o selección",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "creative",
+      "filters": {
+        "no_login": true
+      }
+    },
+    {
+      "id": "Q028",
+      "kind": "official_documentation_read",
+      "query": "https://www.chilecompra.cl/api/",
+      "source": "https://www.chilecompra.cl/api/",
+      "result": "API general",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "shared_primary_validation",
+      "filters": {}
+    },
+    {
+      "id": "Q029",
+      "kind": "official_documentation_read",
+      "query": "https://www.chilecompra.cl/wp-content/uploads/2026/05/Documentacion_API_Compra_Agil-2-1.pdf",
+      "source": "https://www.chilecompra.cl/wp-content/uploads/2026/05/Documentacion_API_Compra_Agil-2-1.pdf",
+      "result": "Detalle/estado/convocatoria y OC porid; null no evidencia de ausencia",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "shared_primary_validation",
+      "filters": {}
+    },
+    {
+      "id": "Q030",
+      "kind": "official_documentation_read",
+      "query": "https://api.mercadopublico.cl/documentos/Documentaci%C3%B3n%20API%20Mercado%20Publico%20-%20Licitaciones.pdf",
+      "source": "https://api.mercadopublico.cl/documentos/Documentaci%C3%B3n%20API%20Mercado%20Publico%20-%20Licitaciones.pdf",
+      "result": "Contrato2 significa formalizaOC, no contrato existente; acto adjudicación separado",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "shared_primary_validation",
+      "filters": {}
+    },
+    {
+      "id": "Q031",
+      "kind": "official_documentation_read",
+      "query": "https://api.mercadopublico.cl/modules/OC_Consultas.aspx",
+      "source": "https://api.mercadopublico.cl/modules/OC_Consultas.aspx",
+      "result": "Lector inaccesible",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "shared_primary_validation",
+      "filters": {}
+    },
+    {
+      "id": "Q032",
+      "kind": "official_documentation_read",
+      "query": "https://api.mercadopublico.cl/documentos/Documentaci%C3%B3n%20API%20de%20Mercado%20P%C3%BAblico%20-%20%C3%93rdenes%20de%20Compra.pdf",
+      "source": "https://api.mercadopublico.cl/documentos/Documentaci%C3%B3n%20API%20de%20Mercado%20P%C3%BAblico%20-%20%C3%93rdenes%20de%20Compra.pdf",
+      "result": "Diccionario deOC leído; preferir ruta plural validada repo",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "shared_primary_validation",
+      "filters": {}
+    },
+    {
+      "id": "Q033",
+      "kind": "web_search",
+      "query": "site:api.mercadopublico.cl ordenesdecompra CodigoOrganismo fecha consulta API",
+      "source": "web search",
+      "result": "PDFdiccionarioOC localizado; sólo documentación técnica, no evidencia de compra",
+      "checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "time_precision": "end_of_research_control; execution within09:24–09:38Santiago",
+      "market": "Chile",
+      "service_line": "shared_primary_validation",
+      "filters": {}
+    }
+  ],
+  "procurement_controls": [
+    {
+      "hsp_id": "HSP-0037",
+      "code": "4037-69-LE26",
+      "entity": "Ilustre Municipalidad de Fresia",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=4037-69-LE26",
+      "primary_source_read": true,
+      "last_checked_scope": "API oficial v1 09:32:44, ficha e historial primarios; registro público de contratos y OC 19–20/10. Documentos contractuales leídos como extractos RAG, originales bloqueados.",
+      "selected_supplier": {
+        "status": "no_encontrado",
+        "value": null,
+        "note": "Adjudicacion=null en cabecera e ítem de API; historial termina Publicada19/10 16:56:16. No equivale a certificado de inexistencia de adjudicación."
+      },
+      "award_resolution_or_order": {
+        "status": "no_encontrado",
+        "value": null,
+        "note": "Sin acto en campos de API ni historial leído. DA1973 aprueba bases, no adjudica. OC organismo119651:9 el19/10 y0 el20/10; ningún nombre corresponde a hosting/4037-69. Listados resumidos, no búsqueda exhaustiva del histórico ni todos los detalles."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Buscador oficial sin resultados por código; no prueba inexistencia. No se obtuvo contrato firmado. API Contrato=2 (formaliza con OC), bases sección14.2/p9 exigen contrato aprobado por decreto y luego OC: discrepancia sin aclaración."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "FechaEstimadaFirma=null; no fecha real acreditada. Vacío no prueba ausencia."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Bases p1:12meses desde acta de inicio posterior a migración recibida. Es condición futura; no acta real leída."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "No fecha real acreditada.12meses desde acta, no30/11 ni26/12 como cierre de propuestas."
+      },
+      "published_at": {
+        "value": "2026-10-19T16:56:16.447-03:00",
+        "verification": "API oficial; ficha e historial coinciden a segundo",
+        "precision": "millisecond_in_api; timezone inferred by agreement with CLI UTC and current Santiago offset"
+      },
+      "participation": {
+        "status": "recepcion_de_ofertas_verificada; calificacion_Efeonce_HOLD",
+        "stage": "convocatoria abierta, recepción electrónica de ofertas",
+        "deadline_at": "2026-10-30T10:00:00-03:00",
+        "deadline_local": "30-10-2026 10:00",
+        "timezone": "America/Santiago como referencia operativa; ficha no rotula zona; concordancia con índiceUTC13:00",
+        "questions_start_at": "2026-10-19T16:59:00-03:00",
+        "questions_deadline_at": "2026-10-23T15:24:00-03:00",
+        "answers_at": "2026-10-27T12:30:00-03:00",
+        "technical_opening_at": "2026-10-30T10:01:00-03:00",
+        "economic_opening_at": "2026-10-30T10:14:00-03:00",
+        "registration_or_invitation_at": null,
+        "route": "Mercado Público exclusivamente; bases11.2/p7, PDF legibles/anexos firmados, inscripción y habilidad requeridas",
+        "authenticated_submission_verified": false
+      },
+      "estimated_award_at": "2026-11-30T12:14:00-03:00",
+      "contract_documents_read": [
+        {
+          "name": "DA1973.pdf",
+          "mode": "RAG ok, texto p1; original no abierto",
+          "pages_observed": [
+            1
+          ]
+        },
+        {
+          "name": "BASES ADM Y TEC. .pdf",
+          "mode": "RAG ok, extractos; no descarga íntegra",
+          "pages_observed": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            15,
+            16
+          ],
+          "load_bearing_pages": [
+            1,
+            4,
+            6,
+            7,
+            9,
+            11,
+            12,
+            13,
+            15,
+            16
+          ]
+        }
+      ],
+      "blockers": [
+        "Discrepancia formalización API frente a bases14.2 pendiente de aclaración primaria.",
+        "PDF originales: bases upstream request timeout; decreto ERR_BLOCKED_BY_CLIENT. Inventario sí leído. No se sorteó CAPTCHA.",
+        "Sin contrato/acta real leído; no certificar inexistencia a partir de campos vacíos o búsquedas sin resultados.",
+        "Falta acreditar dotación municipal50+, habilidad Efeonce, proveedor datacenter nacional certificado, SLA99,98/24x7 y costo/margen."
+      ],
+      "rationale": "Ventana de recepción real confirmada; no hallazgo de compra ya adjudicada. Mantener HOLD para recomendar postulación, gasto o Deal por expediente y encaje pendientes; no afirmar que Efeonce ya es admisible.",
+      "facts": [
+        "DA1973 de19Oct aprueba bases,9Mimpuestos incluidos/12meses y comisión; revoca proceso previo4037-63 porDA1839, no esta compra.",
+        "Contrato futuro: firma10díashábiles desde notificación adjudicación, decreto aprobatorio y posterior OC aceptable2díashábiles segúnp9.",
+        "Servicio actualmente operando describe continuidad del sitio y proveedor saliente; no prueba ejecución de esta compra.",
+        "Migración3díashábiles plan y15corridos desde aceptaciónOC, antes26Dic2026; no cuotas durante migración.",
+        "Apoyo parcial datacenter/seguridad subcontratable con comunicación escrita; responsabilidad total del adjudicatario."
+      ]
+    },
+    {
+      "hsp_id": "HSP-0038",
+      "code": "696704-105-COT26",
+      "entity": "Ministerio Público — Fiscalía Regional del Maule",
+      "result": "hold",
+      "last_checked_at": "2026-10-20T09:42:08.788926-03:00",
+      "source": "https://api2.mercadopublico.cl/v2/compra-agil/696704-105-COT26",
+      "primary_source_read": false,
+      "last_checked_scope": "API Compra Ágil detalle2intentos y listado1:HTTP504. API OC organismo224060 19–20Oct y registro público de contratos. LicitaLAB ficha+inventario+RAG.",
+      "selected_supplier": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "API oficial del detalle indisponible; no puede revisarse proveedor_seleccionado, cotizaciones ni orden_compra.id_orden_compra. LicitaLAB Publicada no resuelve."
+      },
+      "award_resolution_or_order": {
+        "status": "no_encontrado_en_busqueda_acotada; vinculo_COT_no_verificado",
+        "value": null,
+        "note": "API OC Ministerio Público224060:26OC19Oct y1OC20Oct; no aparece códigoCOT/título audiovisual en nombres. Dos OC696704 son neumáticos y mantención incendio. No se leyeron los27detalles; no prueba ausencia de OC."
+      },
+      "contract_status": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Buscador de contratos sin resultados porCOT, campo está orientado a IDlicitación; cobertura de CompraÁgil no acreditada. Sin contrato firmado disponible/leído."
+      },
+      "signed_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "No documento de firma o aceptación real de OC revisado."
+      },
+      "execution_start_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "Basesp5:30díascorridos desde aceptaciónOC, condición futura; no aceptación real acreditada."
+      },
+      "execution_end_at": {
+        "status": "no_verificado",
+        "value": null,
+        "note": "No calculable sin aceptaciónOCreal.22Oct es fecha de ofertas indexada, no fin de ejecución."
+      },
+      "published_at": {
+        "value": "2026-10-19T13:47:55.993Z",
+        "verification": "LicitaLAB índice; primaria pendiente",
+        "precision": "millisecond_in_index"
+      },
+      "participation": {
+        "status": "no_verificada_en_primaria",
+        "stage": "recepción según índice",
+        "deadline_at": "2026-10-22T09:00:00-03:00",
+        "deadline_local": "22-10-2026 09:00",
+        "timezone": "America/Santiago por conversión deUTC12:00 del índice",
+        "registration_or_invitation_at": null,
+        "questions_deadline_at": null,
+        "answers_at": null,
+        "call_number": null,
+        "route": "CompraÁgil según documento; estado del llamado y acceso Efeonce no verificados"
+      },
+      "contract_documents_read": [
+        {
+          "name": "Especificaciones Técnicas SERVICIO DE PRODUCCIÓN DE SEIS CÁPSULAS.pdf",
+          "mode": "RAG ok, extractos p1–8; original no descargado",
+          "pages_observed": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
+        },
+        {
+          "name": "ANEXO N° 1.docx",
+          "mode": "RAG ok, página no informada"
+        },
+        {
+          "name": "PODER SIMPLE ABONO CUENTA BANCARIA.DOC",
+          "mode": "RAG ok, formulario sin completar, sin datos bancarios en registros versionables"
+        }
+      ],
+      "blockers": [
+        "Detalle API oficial y calendario/llamado/proveedor/OC:HTTP504; listadoAPI también504. Resumen web redirige Home y buscador queda cargando.",
+        "Evaluación sin versión final acreditada: sección11/p5–7 dice propuesta referencial por aprobar; tabla25/35/10/30; administrativa1.b/p7 selecciona menorprecio con100%cumplimiento. No dar ponderaciones sugeridas por vigentes.",
+        "P2 menciona experiencia conMinisterioPúblico y p4/6 admiten equivalentes; no inferir exclusión de Efeonce sin aclaración.",
+        "Falta acreditar operación presencial, equipamiento profesional, experiencia, derechos y costo completo dentro de2MIVAincluido."
+      ],
+      "rationale": "No es posible confirmar participación vigente ni compra no seleccionada. HOLD factual; no recomendar postulación, créditos o Deal. No se afirma adjudicación ni inexistencia de contrato.",
+      "facts": [
+        "Seiscápsulas60–200segundos, FullHD, grabación profesional4K, preproducción/rodaje/posproducción enMaule.",
+        "Monto máximo2MIVAincluido,30días desde aceptaciónOC, pago posterior recepciónconforme.",
+        "Declaracióninhabilidades y poder simple firmados; cotización/especificación coherentes con totalplataforma."
+      ],
+      "primary_supporting_sources_read": true
+    }
+  ],
+  "crm": {
+    "reads_this_followup": 0,
+    "writes": 0,
+    "prior_deduplication": "2026-10-20-0906; no nueva propuesta de alta"
+  },
+  "approvals": {
+    "new_requested": false,
+    "outreach": false,
+    "submission": false,
+    "paid_enrichment": false
+  },
+  "privacy": "Sin correos/teléfonos individuales, tokens, URLs firmadas ni raw Apollo; parámetros secretos y enc omitidos."
+}

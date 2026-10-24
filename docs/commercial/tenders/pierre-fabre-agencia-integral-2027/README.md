@@ -1,6 +1,8 @@
 # Pierre Fabre Chile — Agencia Integral de Medios 2027
 
-Estado vigente al **15-10-2026**, America/Santiago, confirmado por Julio: **preinscripción realizada**. Julio preparará las credenciales **mañana viernes16/10/2026** para enviar; el envío sigue pendiente, sin fecha de envío fijada. No acredita propuesta final presentada, presupuesto o adjudicación.
+**Estado vigente16-10-2026, 20:22 America/Santiago:** formulario completo por confirmación de Julio. Credenciales listas y correo aprobado **programado en Outlook para el lunes19/10 a las10:00 Santiago** (13:00UTC), receptor principal y contacto de Marketing en CC por excepción informada sobre posible rebote. Brochure completo mediante enlace nativo HubSpot, sin PDF; firma gráfica y BCC verificados. Estado **Programado** persistió tras recarga; **todavía no enviado ni recibido**. Sin secuencia autorizada. [Evidencia y siguiente paso](../../follow-up-agent/runs/2026-10-16-pierre-fabre-programado.md).
+
+Antecedente15-10-2026, confirmado por Julio: preinscripción realizada y preparación de credenciales prevista para16/10. La programación actual sustituye el pendiente de preparar/enviar, sin acreditar propuesta final presentada, presupuesto o adjudicación.
 
 Corte histórico09/10: proceso registrado en HubSpot y en evaluación; entonces no constaban preinscripción, credenciales enviadas ni propuesta presentada.
 

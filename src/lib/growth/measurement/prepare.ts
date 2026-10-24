@@ -8,9 +8,11 @@ import { buildMeasurementPayloads } from './payload'
 import { resolvePublishedMeasurementPolicy } from './policy-store'
 import { resolveMeasurementSource } from './policy-source'
 
+import type { EnvSource } from '@/types/env-source'
+
 export const prepareMeasurementConversion = async (
   input: Omit<Parameters<typeof buildMeasurementPayloads>[0], 'contact'|'policy'> & { fields?: Record<string, unknown>; contact?: Record<string, unknown> },
-  env: NodeJS.ProcessEnv = process.env,
+  env: EnvSource = process.env,
 ): Promise<PreparedMeasurement | null> => {
   if (env.GROWTH_MEASUREMENT_CAPTURE_ENABLED !== 'true') return null
 

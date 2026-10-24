@@ -20,6 +20,8 @@
 
 import 'server-only'
 
+import type { EnvSource } from '@/types/env-source'
+
 /** Umbrales por configuración; el operador los confirma antes del flip (Out-of-band). */
 export const BACKLINK_DRILLDOWN_MIN_BACKLINK_MOVEMENT_KNOB = 'GROWTH_SEO_BACKLINK_DRILLDOWN_MIN_BACKLINK_MOVEMENT'
 export const BACKLINK_DRILLDOWN_MIN_REFDOMAIN_MOVEMENT_KNOB = 'GROWTH_SEO_BACKLINK_DRILLDOWN_MIN_REFDOMAIN_MOVEMENT'
@@ -40,7 +42,7 @@ const asPositiveInt = (value: unknown, fallback: number): number => {
   return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback
 }
 
-export const resolveDrillDownConfig = (env: NodeJS.ProcessEnv = process.env): DrillDownConfig => ({
+export const resolveDrillDownConfig = (env: EnvSource = process.env): DrillDownConfig => ({
   minBacklinkMovement: asPositiveInt(env[BACKLINK_DRILLDOWN_MIN_BACKLINK_MOVEMENT_KNOB], DEFAULT_MIN_BACKLINK_MOVEMENT),
   minReferringDomainMovement: asPositiveInt(
     env[BACKLINK_DRILLDOWN_MIN_REFDOMAIN_MOVEMENT_KNOB],

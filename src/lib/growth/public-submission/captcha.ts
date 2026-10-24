@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { EnvSource } from '@/types/env-source'
+
 /**
  * TASK-1229 — Growth · Captcha verifier port COMPARTIDO (public-submission).
  *
@@ -31,11 +33,11 @@ export interface CaptchaVerifier {
 const TURNSTILE_SECRET_ENV = 'TURNSTILE_SECRET'
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
-const isProduction = (env: NodeJS.ProcessEnv): boolean => env.VERCEL_ENV === 'production' || env.NODE_ENV === 'production'
+const isProduction = (env: EnvSource): boolean => env.VERCEL_ENV === 'production' || env.NODE_ENV === 'production'
 
 /** Verifier canónico Turnstile con bypass dev / fail-closed prod. */
 export const turnstileCaptchaVerifier = (
-  env: NodeJS.ProcessEnv = process.env,
+  env: EnvSource = process.env,
   expectations: CaptchaExpectations = {},
 ): CaptchaVerifier => ({
   async verify(token, remoteIp) {

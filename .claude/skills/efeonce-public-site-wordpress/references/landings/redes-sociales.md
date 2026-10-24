@@ -1,5 +1,7 @@
 # Landing: Redes Sociales `/servicios/redes-sociales/`
 
+> **Delta 2026-10-23 — dock compartido (TASK-2043).** El dock inferior es el AXIS `efeonce.landing-dock` pintado por el plugin `eo-landing-dock` (config `manifests/landing-dock/social.json`): escritorio; «Reunión» (agendador del menú `site-nav-discovery-meeting`) · «Auditoría» → `#auditoria`, texto «¿Listo para crecer en social?»; sin parada. El dock viejo `div#ghrs-sticky` se quita del HTML mientras el dock está activo (`off` lo devuelve); lo que abajo describe el dock viejo es historia y contexto de rollback. Operar: `global-site-navigation.md` §Landing dock.
+
 > **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-social-audit` v2 entrega en `direct` al formulario HubSpot «Lead Gen - Redes Sociales» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
 
 ## Identity

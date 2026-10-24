@@ -1,0 +1,209 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T22:03:43.428Z",
+  "run": "ai-generations/2026-10-17_byteplus-retratos-elenco",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-17_byteplus-retratos-elenco",
+  "totalBytes": 70137021,
+  "fileCount": 33,
+  "files": [
+    {
+      "path": "antonio/antonio-cuerpo-frontal.png",
+      "sizeBytes": 1796410,
+      "sha256": "db6c662180cd103992482ff4f70046dc58dfc96f1e1143da01282065e91591b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/antonio/antonio-cuerpo-frontal.png"
+    },
+    {
+      "path": "antonio/antonio-rostro-neutro-v2a.png",
+      "sizeBytes": 2392180,
+      "sha256": "b925c83df961c50ff929545afa13f206d26c5d3aaf267a8eb3b6a5efcc54ee11",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/antonio/antonio-rostro-neutro-v2a.png"
+    },
+    {
+      "path": "antonio/antonio-rostro-neutro-v2b.png",
+      "sizeBytes": 2394555,
+      "sha256": "51d2d95b05a157bde05c789e24512af6a0a7a59af9751cc784f1b7dbe9f29800",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/antonio/antonio-rostro-neutro-v2b.png"
+    },
+    {
+      "path": "antonio/antonio-rostro-neutro-v3a.png",
+      "sizeBytes": 2355490,
+      "sha256": "ebdb874727968d44025f7f12c60220c78b01d8a4d4c4c3097da4a7f83fb27f70",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/antonio/antonio-rostro-neutro-v3a.png"
+    },
+    {
+      "path": "antonio/antonio-rostro-neutro-v3b.png",
+      "sizeBytes": 2558644,
+      "sha256": "d8eef43e8c5f56d085e0d480200c37254db3f0ca424cb45a01173abb658d36ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/antonio/antonio-rostro-neutro-v3b.png"
+    },
+    {
+      "path": "antonio/antonio-rostro-neutro.png",
+      "sizeBytes": 2460535,
+      "sha256": "8f0b3092458019e7d35803c684d2ae0e49ba028a6d20acfa2f1bfd109907dc0c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/antonio/antonio-rostro-neutro.png"
+    },
+    {
+      "path": "hum/hum-cuerpo-frontal.png",
+      "sizeBytes": 1710985,
+      "sha256": "c00c6a292eb1bb7f752642e7d6b49c9cd70ace8020bf1cee4be47a481aa1697c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/hum/hum-cuerpo-frontal.png"
+    },
+    {
+      "path": "hum/hum-rostro-neutro.png",
+      "sizeBytes": 2317248,
+      "sha256": "4ded2df56b9f24ff0a21fcb9be1a752014c32aa4b13807eb09459bd02c7fc76f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/hum/hum-rostro-neutro.png"
+    },
+    {
+      "path": "isabella/isabella-cuerpo-frontal.png",
+      "sizeBytes": 1802151,
+      "sha256": "3104b3683294342f916e1f13268428ad93bc3fc75059cc3a5a3505c0dbb255b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/isabella/isabella-cuerpo-frontal.png"
+    },
+    {
+      "path": "isabella/isabella-rostro-neutro.png",
+      "sizeBytes": 2417210,
+      "sha256": "ed2942e871f93cb67eb23f578ca009d5196deeecc6f2e93e36803819d4b1d5e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/isabella/isabella-rostro-neutro.png"
+    },
+    {
+      "path": "karo/karo-cuerpo-frontal.png",
+      "sizeBytes": 1768299,
+      "sha256": "042a0cccfb49672eb0ea579a33af927252c5f0eab9f76847b8ffad1b75faeadd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/karo/karo-cuerpo-frontal.png"
+    },
+    {
+      "path": "karo/karo-rostro-neutro.png",
+      "sizeBytes": 2642692,
+      "sha256": "32600c269ada5ce78eec119894a86a4984e293bbfc4c8edc2070d35bd6f99986",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/karo/karo-rostro-neutro.png"
+    },
+    {
+      "path": "pruebas-antonio/antonio-consola.jpg",
+      "sizeBytes": 59088,
+      "sha256": "984b58844e2e002e097912fd922d37c0a040cab477061e020a2672541f3d4951",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/antonio-consola.jpg"
+    },
+    {
+      "path": "pruebas-antonio/asset-service-autorizacion-aceptada.jpg",
+      "sizeBytes": 104490,
+      "sha256": "93aab87f35011494be29c2048fd4d4aba3cc3dad5de98589d70a6a815a47c0f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/asset-service-autorizacion-aceptada.jpg"
+    },
+    {
+      "path": "pruebas-antonio/asset-service-autorizacion-pendiente.jpg",
+      "sizeBytes": 76590,
+      "sha256": "c6e22397bc83f7457f6abf74927a6ac41f3914a1fae8909fa8eeffcce66cb167",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/asset-service-autorizacion-pendiente.jpg"
+    },
+    {
+      "path": "pruebas-antonio/asset-service-plan-entry-tras-autorizacion.jpg",
+      "sizeBytes": 53701,
+      "sha256": "e6292ca0ec109ea5a7e63618a00e3c0f9d4d2f7d5bdbe6569457df3f1e9bac5e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/asset-service-plan-entry-tras-autorizacion.jpg"
+    },
+    {
+      "path": "pruebas-antonio/elenco-cupo-final.jpg",
+      "sizeBytes": 53371,
+      "sha256": "8ef0b3de5866ae9d6db309e4fdca70d529397bd60bdbef39e676486ff7060832",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/elenco-cupo-final.jpg"
+    },
+    {
+      "path": "pruebas-antonio/elenco-grupos-final.jpg",
+      "sizeBytes": 71790,
+      "sha256": "2c7a4466dfcca4a0e8c3698566efa737c1f4a18949f510b1ab805278aab82787",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/elenco-grupos-final.jpg"
+    },
+    {
+      "path": "sophia/sophia-cuerpo-frontal.png",
+      "sizeBytes": 1743675,
+      "sha256": "e3e64504951f3c09b2c76d6e37a2e34facbfd5c92a1f63b6667e06ee0181f05c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/sophia/sophia-cuerpo-frontal.png"
+    },
+    {
+      "path": "sophia/sophia-rostro-neutro.png",
+      "sizeBytes": 2394430,
+      "sha256": "373854d4e7a476c2c5fc80856551aef102a21b69c280b4264a360ec8d970b219",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/sophia/sophia-rostro-neutro.png"
+    },
+    {
+      "path": "SUBIR/antonio-1-rostro.png",
+      "sizeBytes": 2355490,
+      "sha256": "ebdb874727968d44025f7f12c60220c78b01d8a4d4c4c3097da4a7f83fb27f70",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/antonio-1-rostro.png"
+    },
+    {
+      "path": "SUBIR/antonio-2-cuerpo.png",
+      "sizeBytes": 1796410,
+      "sha256": "db6c662180cd103992482ff4f70046dc58dfc96f1e1143da01282065e91591b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/antonio-2-cuerpo.png"
+    },
+    {
+      "path": "SUBIR/hum-1-rostro.png",
+      "sizeBytes": 2317248,
+      "sha256": "4ded2df56b9f24ff0a21fcb9be1a752014c32aa4b13807eb09459bd02c7fc76f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/hum-1-rostro.png"
+    },
+    {
+      "path": "SUBIR/hum-2-cuerpo.png",
+      "sizeBytes": 1710985,
+      "sha256": "c00c6a292eb1bb7f752642e7d6b49c9cd70ace8020bf1cee4be47a481aa1697c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/hum-2-cuerpo.png"
+    },
+    {
+      "path": "SUBIR/isabella-1-rostro.png",
+      "sizeBytes": 2417210,
+      "sha256": "ed2942e871f93cb67eb23f578ca009d5196deeecc6f2e93e36803819d4b1d5e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/isabella-1-rostro.png"
+    },
+    {
+      "path": "SUBIR/isabella-2-cuerpo.png",
+      "sizeBytes": 1802151,
+      "sha256": "3104b3683294342f916e1f13268428ad93bc3fc75059cc3a5a3505c0dbb255b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/isabella-2-cuerpo.png"
+    },
+    {
+      "path": "SUBIR/karo-1-rostro.png",
+      "sizeBytes": 2642692,
+      "sha256": "32600c269ada5ce78eec119894a86a4984e293bbfc4c8edc2070d35bd6f99986",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/karo-1-rostro.png"
+    },
+    {
+      "path": "SUBIR/karo-2-cuerpo.png",
+      "sizeBytes": 1768299,
+      "sha256": "042a0cccfb49672eb0ea579a33af927252c5f0eab9f76847b8ffad1b75faeadd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/karo-2-cuerpo.png"
+    },
+    {
+      "path": "SUBIR/nexa-1-rostro.png",
+      "sizeBytes": 7673581,
+      "sha256": "11db091e4262cc91b3b7fb3a3a31732259f34c4cdd5b4b54a1a4024ce0371e3e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/nexa-1-rostro.png"
+    },
+    {
+      "path": "SUBIR/nexa-2-cuerpo.png",
+      "sizeBytes": 9981358,
+      "sha256": "c152b98b86e58ad50556bc00cebce9cce5cd98a6f4333389a50e6dd077c905f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/nexa-2-cuerpo.png"
+    },
+    {
+      "path": "SUBIR/sophia-1-rostro.png",
+      "sizeBytes": 2394430,
+      "sha256": "373854d4e7a476c2c5fc80856551aef102a21b69c280b4264a360ec8d970b219",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/sophia-1-rostro.png"
+    },
+    {
+      "path": "SUBIR/sophia-2-cuerpo.png",
+      "sizeBytes": 1743675,
+      "sha256": "e3e64504951f3c09b2c76d6e37a2e34facbfd5c92a1f63b6667e06ee0181f05c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/sophia-2-cuerpo.png"
+    },
+    {
+      "path": "vista-previa-12.jpg",
+      "sizeBytes": 359958,
+      "sha256": "83c486b58e62cf388a0ff23597848aef9b95446b60c2c35cc1239fdb3886987e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-17_byteplus-retratos-elenco/vista-previa-12.jpg"
+    }
+  ]
+}

@@ -66,7 +66,7 @@ const ENABLED_ENV = {
   GROWTH_AI_VISIBILITY_GRADER_ENABLED: 'true',
   GROWTH_AI_VISIBILITY_REGRADE_ENABLED: 'true',
   GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD: '50'
-} as NodeJS.ProcessEnv
+}
 
 const CLAIMED_PROFILE = {
   profile_id: 'gprof-1',
@@ -95,7 +95,7 @@ beforeEach(() => {
 describe('handleRecurringRegradeBatch', () => {
   it('no toca DB ni encola cuando el flag está OFF', async () => {
     const result = await handleRecurringRegradeBatch({
-      env: { NODE_ENV: 'test', GROWTH_AI_VISIBILITY_GRADER_ENABLED: 'true' } as NodeJS.ProcessEnv
+      env: { NODE_ENV: 'test', GROWTH_AI_VISIBILITY_GRADER_ENABLED: 'true' }
     })
 
     expect(result.skipped).toBe('disabled')

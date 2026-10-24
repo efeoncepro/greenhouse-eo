@@ -1,0 +1,272 @@
+{
+  "run": "2026-10-19-1513-agrocompra-envios",
+  "opportunity_id": "HSP-0036",
+  "timezone": "America/Santiago",
+  "checked_at": "2026-10-19T15:13:35.461765-03:00",
+  "weekly_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-19T15:13:35.461765-03:00"
+  },
+  "first_pass_48h_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-19T15:13:35.461765-03:00"
+  },
+  "scope": "Focal explicit authorized outreach continuation; no new20cell discovery",
+  "queries": [
+    {
+      "method": "Local mandatory context/automation memory/private dossier read",
+      "query": "Current instructions, priorHSP0036, prepared4messages and approvals",
+      "result": "Recovered prior pending status and explicit latest send reiteration; no reconstructed approval"
+    },
+    {
+      "method": "Apollo free people search",
+      "query": "domain cnagro.cl; principal digitalbusiness/generalmangement/IT/Marketing titles; page1",
+      "pii_redacted": true,
+      "result": "5people returned;4principal knownIDs matched; extra ambiguous match excluded"
+    },
+    {
+      "method": "Outlook profile",
+      "result": "Julio work mailbox identity verified"
+    },
+    {
+      "method": "HubSpot get_user_details",
+      "result": "Portal48713323 verified; no onboarding run"
+    },
+    {
+      "method": "Outlook search",
+      "query": "agrocompra.com received>=2026-10-19",
+      "result": "0"
+    },
+    {
+      "method": "Apollo bulk people match",
+      "query": "4 previously identified principalIDs; reveal phones=false, personalemails=false; exactnames/IDs retained privately",
+      "pii_redacted": true,
+      "result": "4credits consumed at15:05:44Santiago;4verifiedbusiness emails;catchallfalse"
+    },
+    {
+      "method": "HubSpot CONTACT search pre-send",
+      "query": "email IN [4individual addresses REDACTED]",
+      "pii_redacted": true,
+      "result": "0"
+    },
+    {
+      "method": "HubSpot COMPANY search pre-send",
+      "query": "domain IN cnagro.cl,agrocompra.com,agrocompra.cl",
+      "result": "0"
+    },
+    {
+      "method": "Outlook search pre-send",
+      "query": "cnagro.cl",
+      "result": "0"
+    },
+    {
+      "method": "LinkedIn primary UI",
+      "query": "Exact buyerpost activity7516598217699155969",
+      "result": "Partnerrequest stillvisible;3daysrelative;no decisivecontract/calendar; no LinkedInwrite"
+    },
+    {
+      "method": "HubSpot Documents UI",
+      "query": "Original357053321 summary",
+      "result": "Efeonce-Brochure-Servicios-Web.pdf identified; preservedintact; no upload"
+    },
+    {
+      "method": "HubSpot Documents create recipientlink UI",
+      "query": "Original357053321; recipient1 individualemail REDACTED; requestemailOFF; downloadON",
+      "pii_redacted": true,
+      "result": "Individual linkcreated; nativecontact/autocompany effectsreadback; no manualfieldwrites"
+    },
+    {
+      "method": "Outlook UI send",
+      "query": "Role-specificmessage1; individualemail REDACTED; mandatoryHubSpotBCC; originalWebbrochurelink; installedgraphicalsignature",
+      "pii_redacted": true,
+      "result": "Sendclickedonce; composeclosed; laterSentindependentlyverified"
+    },
+    {
+      "method": "HubSpot Documents create recipientlink UI",
+      "query": "Original357053321; recipient2 individualemail REDACTED; requestemailOFF; downloadON",
+      "pii_redacted": true,
+      "result": "Individual linkcreated; nativecontact/autocompany effectsreadback; no manualfieldwrites"
+    },
+    {
+      "method": "Outlook UI send",
+      "query": "Role-specificmessage2; individualemail REDACTED; mandatoryHubSpotBCC; originalWebbrochurelink; installedgraphicalsignature",
+      "pii_redacted": true,
+      "result": "Sendclickedonce; composeclosed; laterSentindependentlyverified"
+    },
+    {
+      "method": "HubSpot Documents create recipientlink UI",
+      "query": "Original357053321; recipient3 individualemail REDACTED; requestemailOFF; downloadON",
+      "pii_redacted": true,
+      "result": "Individual linkcreated; nativecontact/autocompany effectsreadback; no manualfieldwrites"
+    },
+    {
+      "method": "Outlook UI send",
+      "query": "Role-specificmessage3; individualemail REDACTED; mandatoryHubSpotBCC; originalWebbrochurelink; installedgraphicalsignature",
+      "pii_redacted": true,
+      "result": "Sendclickedonce; composeclosed; laterSentindependentlyverified"
+    },
+    {
+      "method": "HubSpot Documents create recipientlink UI",
+      "query": "Original357053321; recipient4 individualemail REDACTED; requestemailOFF; downloadON",
+      "pii_redacted": true,
+      "result": "Individual linkcreated; nativecontact/autocompany effectsreadback; no manualfieldwrites"
+    },
+    {
+      "method": "Outlook UI send",
+      "query": "Role-specificmessage4; individualemail REDACTED; mandatoryHubSpotBCC; originalWebbrochurelink; installedgraphicalsignature",
+      "pii_redacted": true,
+      "result": "Sendclickedonce; composeclosed; laterSentindependentlyverified"
+    },
+    {
+      "method": "Outlook Sent list readback1",
+      "query": "Sentfolder; sentDateTime>=2026-10-19T18:00:00Z; top10; bcc included",
+      "result": "First2Agrocompramailsconfirmed; unrelatedmail excludedfromprivateaccountreceipt"
+    },
+    {
+      "method": "Outlook Sent list readback2",
+      "query": "Sentfolder; sentDateTime>=2026-10-19T18:08:00Z; top10; bcc included",
+      "result": "All4subjects and individualTo/BCC/links/graphicalsignature verified; no pagination"
+    },
+    {
+      "method": "HubSpot EMAIL search readback1",
+      "query": "hs_email_subject CONTAINS_TOKEN Agrocompra",
+      "result": "3SENT; fourthingestionpending"
+    },
+    {
+      "method": "HubSpot CONTACT search readback",
+      "query": "email IN [4individual addresses REDACTED]",
+      "pii_redacted": true,
+      "result": "4nativecontacts"
+    },
+    {
+      "method": "HubSpot COMPANY search readback",
+      "query": "domain EQ cnagro.cl",
+      "result": "Company59536938778 CNAgro"
+    },
+    {
+      "method": "HubSpot EMAIL search readback2",
+      "query": "hs_email_subject CONTAINS_TOKEN Agrocompra",
+      "result": "4SENT"
+    },
+    {
+      "method": "HubSpot association search",
+      "query": "4contactIDs IN associatedCompany59536938778",
+      "result": "4/4"
+    },
+    {
+      "method": "HubSpot EMAIL association search",
+      "query": "Intendedcontact1 exactsubject REDACTED",
+      "pii_redacted": true,
+      "result": "1SENTassociatedwithintendedcontact"
+    },
+    {
+      "method": "HubSpot EMAIL association search",
+      "query": "Intendedcontact2 exactsubject REDACTED",
+      "pii_redacted": true,
+      "result": "1SENTassociatedwithintendedcontact"
+    },
+    {
+      "method": "HubSpot EMAIL association search",
+      "query": "Intendedcontact3 exactsubject REDACTED",
+      "pii_redacted": true,
+      "result": "1SENTassociatedwithintendedcontact"
+    },
+    {
+      "method": "HubSpot EMAIL association search",
+      "query": "Intendedcontact4 exactsubject REDACTED",
+      "pii_redacted": true,
+      "result": "1SENTassociatedwithintendedcontact"
+    },
+    {
+      "method": "Outlook Sent UI readback",
+      "query": "ExactprincipalSentcopy",
+      "result": "Recipient,subject,body/link and graphicalsignature9imagesloaded; screenshotprivate"
+    },
+    {
+      "method": "LinkedIn final primarypost readback",
+      "query": "Exactoriginalpost andvisiblecomments",
+      "result": "Still3daysrelative andpartnerask; no newcontract/calendar evidence"
+    }
+  ],
+  "sources_read": [
+    "Originalbuyerpost andvisiblecomments",
+    "HubSpot originalWebbrochure summary",
+    "Outlook ownSentcopies",
+    "CRM identity/data/readbacks",
+    "Apollo professionalrecords"
+  ],
+  "sources_blocked": [
+    {
+      "item": "Decisive buyer technologyservices contract / award/order / current receptioncalendar",
+      "reason": "Not available in surfacesread; currentcontractstateunknown"
+    }
+  ],
+  "procurement_control": {
+    "result": "hold",
+    "awardee": "not_verified",
+    "award_act_or_order": "not_found_in_read_surfaces; existence unverified",
+    "contract_status": "not_verified",
+    "signed_at": null,
+    "execution_start": null,
+    "execution_end": null,
+    "participation_route": "Buyer invites conversation in comments; proposal admission not verified",
+    "reception_calendar": "not_published",
+    "documents_read": [
+      "Original buyer post and visible comments this turn; 21 comments read in prior phase",
+      "Prior platform terms sections1-9 are product-sales terms, not the technological-services contract"
+    ],
+    "decisive_document": "not_available_in_read_surfaces",
+    "checked_at": "2026-10-19T15:13:35.461765-03:00",
+    "rationale": "Awardee, act/order, contract/signature/execution and current proposal calendar remain unverified; no open procurement/bid/Deal claim. Reiterated operator request executed as one-time credentials/status inquiry.",
+    "last_checked_at": "2026-10-19T15:13:35.461765-03:00",
+    "facts": "Buyer post remains visible with technological partner / B2B / UX/UI / multichannel ask. Relative age3days. No decisive contract or reception calendar available in read surfaces."
+  },
+  "approval": {
+    "source": "Latest directJulio reiteration after explicitApollo+sendauthorization",
+    "instruction": "Envíalos todos con mi firma gráfica",
+    "scope": "4principalcontacts once; no newchannels/sequences/Deal",
+    "factual_hold": "Retained; authorization is not evidence of openpurchase"
+  },
+  "actions": {
+    "paid_enrichment_calls": 1,
+    "paid_credits": 4,
+    "emails_sent": 4,
+    "recipient_links_created": 4,
+    "manual_crm_writes": 0,
+    "native_contacts_created": 4,
+    "native_company_created": 1,
+    "native_emails_logged": 4,
+    "sequences": 0,
+    "deals": 0
+  },
+  "native_crm": {
+    "company_id": "59536938778",
+    "contact_ids": [
+      "256145010952",
+      "256144330252",
+      "256144452275",
+      "256152435357"
+    ],
+    "email_ids": [
+      "118917828007",
+      "118920314444",
+      "118922012813",
+      "118923564089"
+    ]
+  },
+  "coverage": {
+    "Chile_web": "Focal existingaccount execution/readbacks",
+    "other19cells": "Not rerun; use daily09:00coverage; no exhaustiveclaim"
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-19-agrocompra/outreach-autorizado-2026-10-19",
+  "uncertainties": [
+    "Absolutepublication",
+    "Contractingentity",
+    "Currentselection and supplier/contract",
+    "Calendar/deadlines",
+    "Budget anddecisionauthority",
+    "SAPinterfaces",
+    "Delivery/read/reply"
+  ],
+  "next_action": "Wait for replies; no sends due today; no duplicate/sequences"
+}

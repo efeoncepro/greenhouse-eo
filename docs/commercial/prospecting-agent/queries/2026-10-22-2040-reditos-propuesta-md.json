@@ -1,0 +1,73 @@
+{
+  "run_at": "2026-10-22T20:40:54.165801-03:00",
+  "run_type": "authorized proposal Markdown preparation, not new discovery",
+  "account_id": "GRD-1552",
+  "attempt": 13,
+  "country": "Colombia",
+  "service": "Agencia digital integral",
+  "calendar_week_santiago": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-22T20:40:54.165801-03:00"
+  },
+  "country_service_cells_new": 0,
+  "discovery_queries": 0,
+  "operations": [
+    {
+      "type": "local_memory",
+      "query": "MEMORY.md GRD-1552 / Reditos continuity; current repo refresh"
+    },
+    {
+      "type": "preflight",
+      "query": "AGENTS.md, project_context.md, Handoff.md, context index, status"
+    },
+    {
+      "type": "local_document_reads",
+      "query": "current case brief, requirements, current RFP cell snapshot, brand research, strategy and extras"
+    },
+    {
+      "type": "agent_primary_RFP_review",
+      "query": "original425489 ZIP / XLSX populatedcells and XML comments; current hashes rechecked",
+      "result": "matches prior original hashes; all nine technical rows mapped; no original mutation"
+    },
+    {
+      "type": "skills",
+      "query": "tenders technical/economic; deck narrative; copywriting/voice; pricing reference; campaign planning; documentation closure"
+    },
+    {
+      "type": "agent_creative_review",
+      "query": "two brand-specific concepts and applications; no paid research or images"
+    },
+    {
+      "type": "file_write",
+      "query": "canonical technical and economic Markdown, separate internal control, consolidated projection for Claude Design"
+    },
+    {
+      "type": "verification",
+      "query": "sequence28,scopevolumes,requiredcoverage,COP/USD,sourceprojection,privacy,links,localcopyhash"
+    }
+  ],
+  "validation_ref": "../../tenders/gana-loti-agencia-digital-2027-1552/research/PROPUESTA-MD-VERIFICACION-2026-10-22.json",
+  "contract_check": {
+    "result": "hold",
+    "checked_this_pass": false,
+    "last_checked_at": "2026-10-22T22:07:44Z",
+    "primary_source": "Wherex GRD-1552 offer7578948, prior case control",
+    "awarded_or_selected_supplier": "not verified",
+    "award_act_order": "not verified",
+    "contract_existence_state": "not verified; no decisive available document",
+    "signature_date": "not verified",
+    "execution_start_end": "not verified; 12months requested, not executed contract verified",
+    "published_at": "2026-10-22 13:55 primaryUI, timezoneunlabelled; inherited",
+    "stage": "Editando at last primary review, not rechecked",
+    "participation_calendar": "operator confirmed2026-10-30 18:00 America/Santiago screenshot; otheradmissiondatesnotverified",
+    "document_read_or_block": "no decisive contractual document available; no new primaryportal read in drafting",
+    "basis": "draft preparation does not resolve HOLD or certify absence of contract; revalidate before gated action"
+  },
+  "CRM": "unchanged",
+  "approval_state": "draft preparation authorized; final price, issue and presentation not authorized by this action",
+  "PII": "raw corporate contracts/private reviews excluded; no personal contact queries",
+  "new_candidates": 0,
+  "outreach": 0,
+  "paid_tools": 0,
+  "commit_push": false
+}

@@ -49,6 +49,8 @@ import { normalizeOverviewDomain } from './domain-overview/persist'
 import { resolveSeoEntitlement } from './entitlement'
 import { isSeoModuleEnabled } from './flags'
 
+import type { EnvSource } from '@/types/env-source'
+
 /**
  * Techo de competidores VIGENTES por target — el freno del gasto diferido de cobertura.
  *
@@ -70,7 +72,7 @@ const MAX_PROPOSAL_REF_LENGTH = 500
 
 const DOMAIN_SHAPE = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/
 
-export const resolveCompetitorCapacity = (env: NodeJS.ProcessEnv = process.env): number => {
+export const resolveCompetitorCapacity = (env: EnvSource = process.env): number => {
   const parsed = Number.parseInt(env[COMPETITORS_CAPACITY_ENV] ?? '', 10)
 
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_COMPETITORS_CAPACITY
@@ -104,7 +106,7 @@ export interface DeclareCompetitorsOptions {
    * reader de candidatos del top-N de TASK-1699). NULL = declaración directa. Nunca FK.
    */
   proposalRef?: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 export const declareCompetitors = async (
@@ -284,7 +286,7 @@ export const retireCompetitors = async (
   seoTargetId: string,
   domains: string[],
   actor: string,
-  options: { reason?: string; env?: NodeJS.ProcessEnv } = {}
+  options: { reason?: string; env?: EnvSource } = {}
 ): Promise<RetireCompetitorsResult> => {
   const env = options.env ?? process.env
 

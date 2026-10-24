@@ -16,8 +16,12 @@
  * `1.3.1` (2026-10-16): la cabecera del scheduler nativo deja de partirse en móvil. Las reglas del
  * diálogo usaban `font: … inherit` (inválido): el navegador las descartaba, el tema del host pintaba
  * el título y «Cerrar agenda» quedaba aplastado en tres líneas. Patch: sólo presentación.
+ *
+ * `1.4.0` (2026-10-23, TASK-2045): `open_growth_form` con `presentation: 'dialog'` abre el formulario en un
+ * `<dialog>` modal (montado al abrir) y la telemetría suma `activation_mode: 'dialog'`. Minor: comportamiento
+ * nuevo y observable; los CTA inline no cambian.
  */
-export const RENDERER_VERSION = '1.3.1'
+export const RENDERER_VERSION = '1.4.0'
 
 /** Debe coincidir EXACTO con `CTA_CONTRACT_VERSION` del server (parity test). */
 export const RENDERER_CONTRACT_VERSION = 'greenhouse-growth-cta-popup.v1'

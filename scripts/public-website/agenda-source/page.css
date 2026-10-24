@@ -1,0 +1,10 @@
+/* The native scheduler lives in its own Elementor HTML widget (the pilot's host adapter, kept as is: it loads the public
+   renderer and mounts <efeonce-meeting-scheduler>). It sits between the hero and «Cómo es la reunión», outside the
+   landing modules, so its frame and theme are styled here, guarded by :has so only this landing matches. */
+body:has(.gh-agenda) .gh-agenda-scheduler{display:flow-root;position:relative;z-index:2;background:#f7f8f6;padding:0 clamp(12px,3vw,40px)} /* flow-root: the frame's negative margin must not collapse into the section, or the paper rises with it */
+body:has(.gh-agenda) .gh-agenda-scheduler__frame{max-width:1280px;margin:calc(-1 * clamp(120px,12vw,170px)) auto 0;box-sizing:border-box}
+/* Growth line on paper: teal accent for selection and action, navy ink; the renderer owns layout and behaviour. */
+body:has(.gh-agenda) .gh-agenda-scheduler efeonce-meeting-scheduler{display:block;width:100%;max-width:100%;--gh-meeting-ink:#001a33;--gh-meeting-ink-soft:#0a3157;--gh-meeting-accent:#36c8bf;--gh-meeting-accent-strong:#0e8c82;--gh-meeting-accent-soft:#d9f4f1;--gh-meeting-focus:#0e8c82;--gh-meeting-surface:#f7f8f6;--gh-meeting-paper-alt:#eef1f2;--gh-meeting-font:'Poppins',system-ui,sans-serif;--gh-meeting-shadow:0 0 0 1px rgba(207,228,250,.16)}
+body:has(.gh-agenda) .gh-agenda-scheduler__alt{margin:14px 4px 0;font-family:'Poppins',system-ui,sans-serif;font-size:13px;line-height:1.5;color:#6d6777}
+body:has(.gh-agenda) .gh-agenda-scheduler__alt a{color:#023c70;font-weight:500}
+@media (max-width:760px){body:has(.gh-agenda) .gh-agenda-scheduler{padding:0 10px}body:has(.gh-agenda) .gh-agenda-scheduler__frame{margin-top:-110px}}

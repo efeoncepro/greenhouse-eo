@@ -15,6 +15,8 @@ import {
   stableFingerprint
 } from './persist'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type CloudCostAiSweepTrigger = 'cron' | 'manual' | 'cloud_scheduler'
 
 export interface CloudCostAiSweepSummary {
@@ -50,7 +52,7 @@ interface CloudCostAiResponse {
 
 interface RunCloudCostAiCopilotArgs {
   triggeredBy?: CloudCostAiSweepTrigger
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   preloadedOverview?: GcpBillingOverview
   force?: boolean
 }
@@ -69,7 +71,7 @@ const VALID_CONFIDENCE: ReadonlySet<CloudCostAiConfidence> = new Set([
   'unknown'
 ])
 
-const isCloudCostAiEnabled = (env: NodeJS.ProcessEnv) =>
+const isCloudCostAiEnabled = (env: EnvSource) =>
   env.CLOUD_COST_AI_COPILOT_ENABLED === 'true'
 
 const buildSummary = (

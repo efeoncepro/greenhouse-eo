@@ -36,6 +36,11 @@ contradictorias y brechas si no se alcanzan 2–3 contactos adicionales accionab
 la investigación. Los tipos históricos sin correo siguen existiendo, sin habilitar nuevas altas ni su borrado.
 
 [Decisión del operador y límites](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-11--contactos-accionables-y-cobertura-de-la-cuenta-b2b).
+La [excepción individual informada vigente](../../architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md#delta-de-operación-documentado--21102026)
+se limita a la persona, dirección y acciones autorizadas por el operador después de conocer la incertidumbre.
+El correo conserva su condición inferida en la nota: `individual_email` clasifica persona/canal, no verifica
+la casilla. [Aplicación Contact + envío en Fundación Luz](../../commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md),
+sin secuencia ni membresía efectiva de segmentos acreditada en ese corte.
 No cambia segmentos ni autoriza créditos fuera del alcance aprobado, envíos o Deals.
 
 ## Vigente desde el 12/10/2026: la industria es de la empresa
@@ -100,7 +105,7 @@ retirar al registro del segmento correspondiente; el recálculo es asíncrono.
 | --- | --- | --- |
 | Company y Contact, por separado | `efeonce_prospecting_researched_on` | Fecha de la investigación (`AAAA-MM-DD`). Es el límite del universo de prospección continua desde el 2026-10-11 |
 | Company y Contact, por separado | `efeonce_prospecting_cohorts` | Histórica: sólo las rondas del 06 al 10 de octubre. No añadir opciones ni asignarla a registros nuevos |
-| Contact | `efeonce_prospecting_contact_kind` | Nuevas altas: `individual_email` con correo corporativo individual verificado. Los otros valores clasifican registros históricos y no autorizan altas sin correo |
+| Contact | `efeonce_prospecting_contact_kind` | Admisión general: `individual_email` con correo corporativo individual verificado. Una excepción individual informada conserva calidad pendiente en la nota; este enum no significa `verified`. Los otros valores clasifican registros históricos y no autorizan altas sin correo |
 | Contact | `efeonce_prospecting_service_fit` | `creative`, `hubspot_crm` o ambas cuando haya evidencia; conservar valores compatibles previos |
 | Company | `industry`, `country`, `hs_employee_range` | Industria y datos de cuenta respaldados, usando las opciones exactas existentes |
 | Contact | `jobtitle`, `email` | Datos personales respaldados; no inferir cargo ni inventar email. `industria` ya no alimenta segmentos desde el 12/10: el sector se toma de la empresa |
@@ -200,3 +205,11 @@ Diego y Emily ya cumplen las propiedades de 178; sus empresas, las de 179. No fu
 atributos ni forzar cargo/interés/industria. Fit y pertenencia no equivalen a oportunidad calificada.
 Los negocios previos se conservan por instrucción del operador; siguientes altas siguen lead → calificación
 → oportunidad. [Catálogo, conteos, verificación y diagnóstico de Prospecting Agent](../../audits/commercial/2026-10-08-prospecting-agent-active-segments.md).
+
+## Aplicación individual — 22/10/2026
+
+[Alta Kibernum y readback](../../commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md):
+un Contact nuevo y Company existente, fecha de investigación en ambos y Primary comprobada; tipo
+individual, fit creativo/CRM y cargo verificados. Pertenencia efectiva a 180/181/182/183/151/156 y Company187,
+sin cambio de reglas ni inscripción manual. Es un corte individual; los totales históricos permanecen fechados.
+La solicitud Growth para Colombia se conserva en nota, separada del fit CRM y del país Chile de la empresa.

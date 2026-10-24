@@ -74,6 +74,22 @@
 > [manual para componer una edición](../../../manual-de-uso/creative/componer-una-edicion-de-glitch.md) ·
 > [manual para editar el video](../../../manual-de-uso/creative/editar-video-glitch.md)
 
+> **Delta 2026-10-22 — rol de canal (decisión del operador).** Esta norma gobierna cómo se ven las piezas; dónde se
+> publican lo decide [`PDR-020` rev 2.0](../../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias).
+> **Glitch es el newsletter canónico y el único correo de Efeonce**, con archivo en el blog (`/glitch/`). Sus satélites
+> son el blog (archivo), **Threads, sólo con el gancho el día de la edición** (la portada sin «Desliza», §14) y
+> LinkedIn (la lectura de una noticia). El newsletter Marketing con Manzanitas del LinkedIn de Julio invita a
+> suscribirse a Glitch; las dos marcas no se mezclan y se recomiendan con un enlace en el texto
+> ([estrategia §8.2](../../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22)).
+> Instagram pasó a marca agencia y no lista a Glitch entre sus formatos, y el vlog no está en el catálogo de YouTube:
+> el reel 9:16 para Instagram y TikTok y el vlog en YouTube (§7.1) no figuran entre los satélites de Glitch. La
+> distribución a cuatro redes del hito de §14.5 es registro histórico.
+>
+> **Decidido por el operador el 2026-10-22** ([PDR-020, delta punto 12](../../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)):
+> el **reel y el vlog quedan en pausa** hasta que el piloto de YouTube pruebe el ritmo (el kit de motion sigue
+> aprobado); el **carrusel de la edición no se publica en LinkedIn**, que lleva la lectura de una noticia con su lámina
+> interior suelta; y Glitch es **marca hermana** de Marketing con Manzanitas, aunque su archivo viva en el mismo blog.
+
 ---
 
 ## 0. En una frase
@@ -275,6 +291,9 @@ y el repo taller la sigue leyendo de la máquina que renderiza (§13.1).
 
 ## 5. Láminas del carrusel (LinkedIn, 1080 × 1350)
 
+> **Uso (2026-10-22):** el carrusel completo no se publica en LinkedIn; ahí va la lectura de una noticia con su lámina
+> interior suelta como imagen. El carrusel sigue aprobado y se compone como parte del archivo de la edición.
+
 | Lámina | Estado | Composición |
 |---|---|---|
 | **Interior** | **APROBADO** (2026-09-27) | cabecera compacta; foto de la noticia en navy (176–626) que se desarma en bytes; chip «NOTICIA n» + medio y fecha; crédito de la foto; «SECCIÓN + IA · LA NOTICIA»; titular en Bricolage 300; «GLITCH DROP» con los puntos; POV en 800 condensada cerrado con la manzana; el porqué en Poppins; avance n/8 en 8 segmentos; «DESLIZA» + mano Plastilina |
@@ -318,6 +337,9 @@ Con esto la **maqueta del post** completa queda aprobada (el vlog embebido ya lo
 > **sólo para Glitch**; la transición de la manzana en bytes es exclusiva de Glitch y nunca se usa en piezas de Efeonce.
 
 ### 7.1 Vlog «Glitch en voz alta»
+
+> **En pausa desde el 2026-10-22** (decisión del operador): no se graba ni se programa hasta que el piloto de YouTube
+> de Marketing con Manzanitas pruebe el ritmo. Al reactivarse se decide de nuevo el canal de cada formato.
 
 - Tres de las ocho noticias en ~2:30.
 - **Un guion, dos formatos:** 16:9 (YouTube y blog; miniatura 1280 × 720) y 9:16 reel (Instagram, TikTok, LinkedIn).

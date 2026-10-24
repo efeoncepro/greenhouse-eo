@@ -1,5 +1,72 @@
 # Registro de decisiones y versiones
 
+### 2026-10-24 — Portada del blog v3: aura del buscador como excepción y piezas a AXIS
+
+El operador aprobó el canvas «Portada Blog Efeonce» v3 y pidió el haz del buscador «con más vida… de luminosidad o de
+portal de magia», con un ritmo consistente: anillo de luz + cometa que recorre el borde + aura. El **aura** (resplandor
+pulsante alrededor del campo con foco) es una **excepción aprobada**, acotada al foco del buscador web; no es un patrón
+de foco general ni se usa en otros campos. En AXIS vive como `axisSearchField.beam.exception` (TASK-2052,
+`efeonce.search-field` 0.1.0 candidate, preparado para v0.7.15 sin publicar). Lección medida: `var()` dentro de
+`@keyframes` no anima en Chromium; cada capa del haz lleva sus keyframes explícitos. Las otras dos piezas del canvas que
+pasan a AXIS: la píldora editorial (texto que rueda + flecha dibujada, tono `glitch` sólo en Glitch) y el segmentado
+con indicador que se desliza. Fuente congelada: `docs/ui/visual-directions/TASK-2051-blog-portada-v3/`.
+
+### 2026-10-20 — Propuesta Assetplan: portada sin pregunta y la órbita completa en foto
+
+Operador, sobre la portada: «Pon Servicio Managed CRM, y quita estos textos». La portada de propuesta para un cliente va
+en la voz de decisión (eyebrow · titular con su esfera · evidencia), sin pregunta: composición `cover-proposal` ·
+`orbit-decision` publicada en AXIS 0.6.6/0.7.6 (TASK-2012, Slice 2). Greenhouse la ve al adoptar AXIS (TASK-2014);
+hasta entonces, lámina a mano con las medidas del token. Borrar la pregunta después de componer es parche («no
+parches»). Contraportada BR3h: el operador rechazó la v1 («se ve súper artificial la órbita con ese punto rosado
+allí»); en foto, la órbita lleva su anatomía completa (hilo tenue en la luz de Efeonce, arco corto en el acento y la
+esfera en la punta del arco). Rosado «sólo en la esfera» no alcanza: la esfera suelta se lee pegada. BR3 aprobada tiene
+la misma esfera suelta (pregunta abierta al operador). Norma: delta 2026-10-20 de `EFEONCE_SURFACE_COMPOSITION_V1.md`.
+
+### 2026-10-20 — Landing `/agenda/`: par de voz, sin lima y Nexa lejos
+
+Decisiones del operador al revisar el canvas «Landing Agendar — Efeonce» y publicarla en `efeoncepro.com/agenda/`:
+
+- **Par aprobado:** «¿Por dónde empiezo? **Por aquí.**» (punto tipeado: la órbita de retrato de Nexa ya lleva la esfera).
+- **El verde lima (`cta-growth` oscuro, `#7ed600`) no se usa en la línea:** «Este verde no lo usamos en ninguna parte». El CTA Growth sobre oscuro va en `accent-growth` con texto `ground` ([criteria.md](criteria.md), «CTA de landing: sin verde lima»).
+- **El eslogan no se pone suelto como titular** («Nuestro eslogan no se pone así»): en la landing no va; firman cabecera y footer del sitio.
+- **Nexa más lejos dentro de su órbita:** cabeza, mano y hombros con aire, desde el hero canónico de `/contacto/` (`ai-generations/2026-10-20_agenda-nexa-retrato/`).
+- **No prometer lo que no existe:** se retiró «Quién te recibe» (Nexa no acompaña dentro del agendador).
+
+Publicación y carril: skill `efeonce-public-site-wordpress` → `references/landings/agenda.md`.
+
+### 2026-10-19 — Anuncio de alianza «Efeonce | Google — Oficialmente partners» (post 4:5 + reel 9:16)
+
+Aprobada por el operador la ronda 5 («cine») tras rechazar cuatro rondas. Decisiones del operador, con su frase:
+
+- **Lockup «Efeonce | Google» con filete vertical, no «×»** (la × se lee como colaboración tipo drop/streetwear; el
+  filete es la convención corporativa y la de la familia H3). Ambos logos **completos** y **en blanco monocromo** sobre
+  oscuro: «pon el logo de Google en blanco igual que el de Efeonce». Eyebrow «OFICIALMENTE PARTNERS».
+- **Un solo bloque focal:** la fila de productos (Gemini, Google Cloud, Google Workspace), pequeña y en gris azulado
+  claro, va justo debajo del lockup; con la fila abajo «el ojo va a fijar la vista a dos lugares». Nunca más ancha que
+  el lockup. Énfasis en Gemini y Google Cloud: la primera versión «está muy inclinada a Google Workspace».
+- **Acabado generativo obligatorio sobre la escena compuesta:** «tienes que pedir el acabado a Sunburst porque no se ve
+  bien así determinístico». Firma y textos siguen fuera del modelo.
+- **Rechazos** (criterio en [criteria.md](criteria.md), «Anuncios de alianza»): órbita de trazo fino como único recurso
+  («le falta muchísimo punch»); el par «¿Quién lleva Google a mi empresa? / Nosotros» («absurda»); tipográfico con
+  «Google» en Bricolage y barrido de colores (imita el logo); esferas 3D en colores Google («parecen globos de
+  pintura»); explosión de objetos de oficina con Gigi; contenido generado dentro de pantallas («quedó horrible,
+  quítaselo»).
+
+Receta y producción: [applications.md](applications.md) §A16; trampas: [lessons.md](lessons.md) (2026-10-19).
+Archivos: `ai-generations/2026-10-19_google-partner-freeze/` (`r5-cine/`, `export/`); canvas
+[rondas 1–5](https://claude.ai/artifact/ETWw3CfFq7QPCVLHq7GssH). **Pendiente antes de pauta pagada:** reemplazar las
+reproducciones de íconos (Iconify, Wikimedia) por archivos oficiales del portal de partners de Google. El claim de
+partner se rige por el registro de partnerships (§3.7 de criteria); este registro no lo verifica.
+
+### 2026-10-19 — La voz pregunta-respuesta tiene cuándo sí y cuándo no (propuesta SGS Chile)
+
+Operador, sobre la portada «¿Se ve cada contacto? Todos.»: «Necesito que encuentres una dinámica de que esto de la
+pregunta y respuesta tenga sus casos de uso de cuando sí y cuando no y que haga sentido, porque todos los agentes por
+seguir la regla ponen cosas así». Se fijan cuatro pruebas (pregunta del lector en ese momento, respuesta de la misma
+forma, específica de la lámina, sólo donde la lámina decide) y una tabla de contextos en [criteria.md](criteria.md) §4,
+«Cuándo sí y cuándo no». Pares corregidos en el canvas de SGS el mismo día. Ese mismo día el operador rechazó la voz en la portada de propuesta para un cliente («lo mejor para la portada es decir lo que es»): queda «Propuesta.» con su evidencia. **Pendiente:** layout de `cover-proposal` sin `voice.question` en AXIS (hoy obligatoria); interino, retirar la pregunta tras componer. La regla escrita es inferencia del agente
+sobre el pedido; la aprobación de su redacción queda con el operador.
+
 ### 2026-10-18 — Mención Efeonce: el isotipo en el texto convive con el logo (web)
 
 Decisión del operador: «Para el mention obviamente habría una excepción acá para web». La Mención Efeonce (enlace a un
@@ -72,6 +139,7 @@ solo en memoria y no escribe consentimiento real. Dirección y QA en
 
 | Fecha | Decisión |
 |---|---|
+| 2026-10-19 | **Anuncio de alianza** («Efeonce \| Google — Oficialmente partners», post + reel): lockup con **filete vertical** (no «×»), los dos logos completos **en blanco** sobre oscuro, eyebrow «OFICIALMENTE PARTNERS», fila de productos chica en gris azulado **justo debajo** del lockup (un solo bloque focal, nunca más ancha que el lockup), sin voz pregunta-respuesta; la escena compuesta pasa por **acabado Sunburst** («no se ve bien así determinístico»). Detalle arriba (entrada del 2026-10-19) y [applications.md](applications.md) §A16. |
 | 2026-10-17 | **Kit de componentes de video aprobado completo** (lámina «Componentes de video · v4» del canvas «¿Para cuándo?»; «Todos están aprobados, importante que tenemos color de esfera y/o acento con las líneas»). 18 componentes en 4:5, 9:16 y 16:9 a 1080 de lado corto: zócalos de lugar (con pin `ubicacion` en reposo si la palabra es un lugar), persona y canal; remate y remate con pregunta; cita; burbujas de voz; super de dato; comparación (la etiqueta acepta ícono en reposo, logo o isotipo); cartela de capítulo; cierre con CTA (antes del reveal); barrido e iris; lista de pasos con íconos; momento protagonista; Plastilina en volumen; callout con gesto; pantalla dividida («Antes.» con punto, «Ahora» con esfera). **La línea decide el acento; el fondo sigue siendo el navy de Efeonce** (también el vidrio del subtítulo). **Siempre que va la dirección, va la burbuja URL** (2026-10-17). En AXIS: delta (z), `surfaces.audiovisual.videoKit` + recetas `video-*`, `content.video` en el manifiesto (`axis-tokens` 0.6.4, `axis-ui-contracts` 0.7.4; publicación pendiente de confirmación). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.5, delta 2026-10-17 (b). |
 | 2026-10-13 | Privacidad pública: tras pedir una experiencia moderna/premium/elegante afín a La órbita, el operador autoriza «Vamos, ponla». Se adopta papel/navy, Bricolage/Poppins, aviso compacto y preferencias responsive en WordPress/Think. El footer conserva el enlace legal discreto; HubSpot conserva consentimiento y persistencia. Aplicación publicada y verificada; no habilita la propuesta escalable de medición ni migra otros productos. [Aplicación y mantenimiento](applications.md#producción-y-mantenimiento-de-esta-aplicación). |
 | 2026-10-12 | Prueba de **Plastilina en volumen mate uniforme**: superficie lisa, sin huellas/grano, en cuatro iconos ausentes del catálogo actual. Bases de binoculares, metrónomo, sello de aprobación e imán aprobadas («Sí, continuar con las cuatro») para comparar Flare max y Seedream 5 Pro standard desde sus vectores. Posteriormente el operador seleccionó las cuatro versiones Flare para esta ronda («quedemonos para esta ronda con los de flare»); la comparación se conserva. Selección de ronda sin publicación del catálogo ni default global. [Evidencia y estado](../../../../docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md). |

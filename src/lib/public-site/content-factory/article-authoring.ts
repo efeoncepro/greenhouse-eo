@@ -26,10 +26,27 @@ import {
 import { renderGlitchDropBlock } from './gutenberg-glitch-drop'
 import { slugifyPublicSiteDraft } from './gutenberg-planner'
 
+/** Service lines of AXIS `efeonce.mention` (`efeonceGraphicLine.lines`). */
+export type GutenbergMentionLine = 'growth' | 'brand' | 'engine' | 'voice' | 'revenue-hubspot' | 'revenue-salesforce'
+
+export const GUTENBERG_MENTION_LINES: readonly GutenbergMentionLine[] = [
+  'growth',
+  'brand',
+  'engine',
+  'voice',
+  'revenue-hubspot',
+  'revenue-salesforce'
+]
+
 export type GutenbergRichTextSegment = {
   text: string
   href?: string
   strong?: boolean
+  /**
+   * Renders the link as an AXIS `efeonce.mention` (pill + isotype painted by the site-wide `axis-mention.css`).
+   * Only for Efeonce services or products: requires an https `href` on efeoncepro.com / efeonce.org or a subdomain.
+   */
+  mention?: { line: GutenbergMentionLine; surface?: 'light' | 'dark' }
 }
 
 export type GutenbergRichText = string | GutenbergRichTextSegment[]
@@ -149,12 +166,31 @@ const renderRichText = (value: GutenbergRichText): string => {
         ? `<strong>${escapeGutenbergHtml(segment.text)}</strong>`
         : escapeGutenbergHtml(segment.text)
 
-      if (!segment.href) return text
+      if (!segment.href) {
+        if (segment.mention) throw new Error('content_factory_article_mention_href_required')
+
+        return text
+      }
 
       const url = new URL(segment.href)
 
       if (!['http:', 'https:', 'mailto:'].includes(url.protocol)) {
         throw new Error(`content_factory_article_link_protocol_invalid:${url.protocol}`)
+      }
+
+      if (segment.mention) {
+        const { line, surface = 'light' } = segment.mention
+        const efeonceHost = /(^|\.)(efeoncepro\.com|efeonce\.org)$/.test(url.hostname)
+
+        if (url.protocol !== 'https:' || !efeonceHost) {
+          throw new Error(`content_factory_article_mention_destination_invalid:${url.hostname}`)
+        }
+
+        if (!GUTENBERG_MENTION_LINES.includes(line) || !['light', 'dark'].includes(surface)) {
+          throw new Error(`content_factory_article_mention_line_invalid:${line}`)
+        }
+
+        return `<a class="axis-mention" href="${escapeGutenbergHtml(segment.href)}" data-line="${line}" data-surface="${surface}">${text}</a>`
       }
 
       return `<a href="${escapeGutenbergHtml(segment.href)}">${text}</a>`

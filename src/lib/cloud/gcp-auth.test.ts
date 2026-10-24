@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
 
-const asEnv = (value: Record<string, string>) => value as unknown as NodeJS.ProcessEnv
+const asEnv = (value: Record<string, string>) => value
 
 describe('getCloudGcpAuthPosture', () => {
   afterEach(() => {

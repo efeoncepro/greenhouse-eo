@@ -110,9 +110,10 @@ completos con PII/tokens en ejemplos del repo. Leer motivo y respuesta del servi
 | Varios destinatarios fallan en mismo rail/ventana | Revisar causa común y contener tramo relacionado; no invalidar en masa correos individuales por un fallo del emisor |
 | Baja, queja o negativa | Respetar alcance de restricción y detener contactos dependientes. No tratarlo como falla técnica que resolver con enriquecimiento o contactos adyacentes |
 
-HubSpot no detecta bounces de mensajes enviados fuera de su herramienta; para Outlook directo revisar
-Outlook/NDR además del registro por BCC. Tampoco asumir que cada bounce visible en inbox se sincronizó a
-supresión CRM. La corrección de estado, pausa/unenrollment o desbloqueo real necesita carril/permiso y
+Para Outlook directo revisar Outlook/NDR además del registro por BCC: no presuponer que HubSpot
+detecte el rebote ni que sea incapaz de reflejarlo. En izipay una actividad EMAIL registrada apareció
+`BOUNCED`; ello no probó una supresión global ni la pausa de una secuencia. Tampoco asumir que cada
+bounce visible en inbox se sincronizó a supresión CRM. La corrección de estado, pausa/unenrollment o desbloqueo real necesita carril/permiso y
 readback; documentar una incidencia no ejecuta esas acciones.
 
 ## Verificar resultado con estados separados
@@ -148,3 +149,13 @@ Reconsultar requisitos y reglas efectivas antes de aplicarlos a un caso, sin ext
 describe labels y catch-all. Sus afirmaciones comerciales de precisión/Inbox no se convierten en garantías
 de esta skill. No fija créditos/costos vigentes; usar contrato y plan verificados de enriquecimiento.
 Fuentes se refrescan por cambio de transporte, proveedor, regla, comportamiento o evidencia contradictoria.
+
+## Contradicción posterior al enriquecimiento
+
+Un NDR posterior prevalece para decidir el próximo uso del canal frente a un `verified` anterior de Apollo.
+Conservar ambas evidencias y sus fechas. Si el texto dice cuenta dada de baja y el código es 5.7.1 de
+política, registrar ambos sin reducirlo a una conclusión sobre empleo. Detener esa dirección: sin
+reintento, cambio de remitente ni enrollment para probarla. Si el operador pidió una secuencia, se pueden
+conservar sus textos y el registro creado **sin inscribir** a la persona; verificar cero inscripciones.
+No detener colegas por inferencia si no hay restricción de cuenta ni causa común, pero revisar cada canal.
+[Aplicación y límites](../../../../docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).

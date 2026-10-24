@@ -155,5 +155,9 @@ Los competidores digitales **ganan visibilidad publicando su propio contenido de
 - **Método** (cómo se hizo este benchmark/CI y cómo repetirlo/actualizarlo) → skill `research-benchmark-operator` (carriles Benchmark + `10` Competitive Intelligence).
 - **Posicionamiento / casillero / pitch / battlecards** → `commercial-expert` + `09_marca-agencia.md` + `08_estrategia-comercial.md`.
 - **Ganar el SERP de categoría / PR gremial / data study de autoridad** → `content-marketing-studio` + `seo-aeo`.
+- **Recuerdo y afecto entre las personas de la industria desde los canales propios** (marca agencia en Instagram y
+  Threads, LinkedIn como conversación, blog/YouTube/newsletters) → [estrategia de love brand](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md)
+  + [PDR-020](../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md). Complementa, no reemplaza, la
+  prensa gremial y los gremios de §2.2 y §2.5.
 - **Doctrina de negocio / ICP / jerarquía de categoría** → `efeonce-agency` + `01_quienes-somos.md` + `02_gtm.md` + `13_icp-buyer-personas-jtbd.md` + `14_modelo-negocio-asaas.md`.
 - **Fuente cruda** → `~/Downloads/BAROMETRO-DEL-MKTG-2026_EXTRACTO-EJECUTIVO.pdf` (no está en el repo; pedir informe completo a La Vulca).

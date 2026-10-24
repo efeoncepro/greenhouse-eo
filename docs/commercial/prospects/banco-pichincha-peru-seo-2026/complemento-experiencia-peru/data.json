@@ -1,0 +1,230 @@
+{
+  "capturedAt": "2026-10-21T16:07:57.396Z",
+  "rawSha256": "2229e7bd522cf4544463039fa73a1c72f93d9a020c3dd9f7aaeec226c2b65a0b",
+  "period": {
+    "from": "2025-10-01",
+    "to": "2026-09-30"
+  },
+  "gsc": {
+    "aggregation": "propiedad, dimensión fecha, datos finales",
+    "peru": {
+      "clicks": 128101,
+      "impressions": 5672080
+    },
+    "all": {
+      "clicks": 501386,
+      "impressions": 37561151
+    },
+    "monthly": [
+      {
+        "month": "2025-10",
+        "peruClicks": 11366,
+        "peruImpressions": 321901,
+        "allClicks": 42756,
+        "share": 0.2658340349892413
+      },
+      {
+        "month": "2025-11",
+        "peruClicks": 12141,
+        "peruImpressions": 384161,
+        "allClicks": 43116,
+        "share": 0.2815892012246034
+      },
+      {
+        "month": "2025-12",
+        "peruClicks": 11550,
+        "peruImpressions": 451374,
+        "allClicks": 47077,
+        "share": 0.24534273636807782
+      },
+      {
+        "month": "2026-01",
+        "peruClicks": 14399,
+        "peruImpressions": 735120,
+        "allClicks": 70484,
+        "share": 0.20428749787185743
+      },
+      {
+        "month": "2026-02",
+        "peruClicks": 11949,
+        "peruImpressions": 634406,
+        "allClicks": 57753,
+        "share": 0.20689834294322373
+      },
+      {
+        "month": "2026-03",
+        "peruClicks": 10952,
+        "peruImpressions": 575414,
+        "allClicks": 43639,
+        "share": 0.25096817067302185
+      },
+      {
+        "month": "2026-04",
+        "peruClicks": 9364,
+        "peruImpressions": 500885,
+        "allClicks": 33597,
+        "share": 0.27871536149060927
+      },
+      {
+        "month": "2026-05",
+        "peruClicks": 9729,
+        "peruImpressions": 432114,
+        "allClicks": 36377,
+        "share": 0.2674492124144377
+      },
+      {
+        "month": "2026-06",
+        "peruClicks": 8840,
+        "peruImpressions": 450104,
+        "allClicks": 35862,
+        "share": 0.24650047403937314
+      },
+      {
+        "month": "2026-07",
+        "peruClicks": 11787,
+        "peruImpressions": 503285,
+        "allClicks": 35067,
+        "share": 0.3361279835743006
+      },
+      {
+        "month": "2026-08",
+        "peruClicks": 8460,
+        "peruImpressions": 381658,
+        "allClicks": 29027,
+        "share": 0.29145278533778896
+      },
+      {
+        "month": "2026-09",
+        "peruClicks": 7564,
+        "peruImpressions": 301658,
+        "allClicks": 26631,
+        "share": 0.2840298899778454
+      }
+    ],
+    "pages": {
+      "lima-talara": {
+        "slug": "sky-lanza-nueva-ruta-en-peru-lima-talara",
+        "clicks": 3247,
+        "impressions": 95133,
+        "position": 6.2
+      },
+      "platos-lima": {
+        "slug": "platos-tipicos-de-lima",
+        "clicks": 1146,
+        "impressions": 66370,
+        "position": 7
+      },
+      "tarapoto": {
+        "slug": "mejor-fecha-para-viajar-a-tarapoto",
+        "clicks": 290,
+        "impressions": 19823,
+        "position": 6.6
+      },
+      "canon-shucto": {
+        "slug": "canon-de-shucto",
+        "clicks": 267,
+        "impressions": 26721,
+        "position": 6.7
+      },
+      "punta-sal": {
+        "slug": "punta-sal",
+        "clicks": 253,
+        "impressions": 61259,
+        "position": 6.1
+      },
+      "trujillo": {
+        "slug": "trujillo-peru",
+        "clicks": 35,
+        "impressions": 52435,
+        "position": 10.3
+      }
+    },
+    "limaQueries": {
+      "count": 7,
+      "clicks": 76,
+      "bestPosition": 1,
+      "window": "2026-08/2026-09"
+    },
+    "countries": {
+      "first": "chl",
+      "second": "per",
+      "restBelowPeru": true
+    }
+  },
+  "ga4": {
+    "host": "blog.skyairline.com",
+    "peruSessions": 151884,
+    "allSessions": 649665,
+    "engagedRate": 0.7535487608964736,
+    "avgDurationSec": 174,
+    "organicShare": 0.8016366328313614,
+    "ai": {
+      "monthlyPeru": [
+        {
+          "month": "2025-10",
+          "sessions": 107
+        },
+        {
+          "month": "2025-11",
+          "sessions": 123
+        },
+        {
+          "month": "2025-12",
+          "sessions": 95
+        },
+        {
+          "month": "2026-01",
+          "sessions": 86
+        },
+        {
+          "month": "2026-02",
+          "sessions": 93
+        },
+        {
+          "month": "2026-03",
+          "sessions": 91
+        },
+        {
+          "month": "2026-04",
+          "sessions": 91
+        },
+        {
+          "month": "2026-05",
+          "sessions": 113
+        },
+        {
+          "month": "2026-06",
+          "sessions": 92
+        },
+        {
+          "month": "2026-07",
+          "sessions": 240
+        },
+        {
+          "month": "2026-08",
+          "sessions": 210
+        },
+        {
+          "month": "2026-09",
+          "sessions": 214
+        }
+      ],
+      "avgJanJun": 94.33333333333333,
+      "avgJulSep": 221.33333333333334,
+      "multiple": 2.346289752650177,
+      "chatgptShare": 0.9332932692307693,
+      "peruRank": 2,
+      "peruShareOfBlogAi": 0.3004432453266525
+    },
+    "cities": [
+      "Trujillo",
+      "Cusco",
+      "Arequipa",
+      "Piura",
+      "Iquitos",
+      "Huancayo",
+      "Chiclayo",
+      "Tacna"
+    ]
+  }
+}

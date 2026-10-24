@@ -1,0 +1,47 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Lo que pedimos a la región",
+    "question": "¿Qué le pedimos a la región?",
+    "answer": [
+      "Lo mínimo"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 3
+  },
+  "items": [
+    {
+      "title": "Captura de correo",
+      "desc": "Revisar que el registro de correos esté activo para el equipo piloto."
+    },
+    {
+      "title": "Conector de Aircall",
+      "desc": "Instalarlo solo para los usuarios del piloto, sin desarrollo."
+    },
+    {
+      "title": "Integración de WhatsApp",
+      "desc": "Un acceso de API con permisos mínimos y el valor «WhatsApp» como actividad."
+    },
+    {
+      "title": "Lectura para el panel",
+      "desc": "Acceso de lectura a los conteos de actividad. Todo es reversible."
+    }
+  ],
+  "selected": 2,
+  "selection": {
+    "target": "object",
+    "label": "Región",
+    "participantKind": "department",
+    "anchor": "top-start"
+  },
+  "line": "revenue-salesforce"
+}

@@ -177,7 +177,10 @@ autorización vigente. Revalidar conversación antes de distribuir, aunque la pi
 
 **Canal y personaje.**
 - Canal-hogar del trend-jack en Efeonce = **Threads + Instagram** (PDR-020). LinkedIn recibe el
-  argumento profesional detrás del chiste, no la misma broma con otro caption.
+  argumento profesional detrás del chiste, no la misma broma con otro caption. Threads e Instagram son
+  marca agencia: el trend-jack trabaja la *cercanía* y no vende; un meme sin conexión con el oficio de la casa
+  resta respeto ([estrategia de love brand](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §2, §7 y §10).
+  X no se publica: sirve para escuchar a los laboratorios de IA y alimentar Threads.
 - El personaje de la marca se mantiene aunque el trend empuje a otra cosa: Duolingo rechazó la
   «alianza» que le propuso Samsung y siguió en su personaje.
 - Si la pieza tiene manos, objetos o personas fotorrealistas generados con IA, **declárala** (flags por

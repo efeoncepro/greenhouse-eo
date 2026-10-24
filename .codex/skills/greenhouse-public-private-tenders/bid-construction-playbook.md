@@ -2,11 +2,20 @@
 
 El **método canónico** para construir una propuesta de licitación de punta a punta, orquestando las skills del ecosistema. Los otros companions cubren *una etapa* (admisibilidad, pricing, propuesta, etc.); **este las encadena en un flujo repetible** y dice qué skill entra en cada fase. Es el "director de orquesta" del bid.
 
-> **Regla raíz del método:** una propuesta de licitación no se improvisa ni se escribe de memoria. Se **funda en evidencia** (bases leídas, contexto de negocio real, datos de nómina, casos citables) y se **orquesta con las skills de dominio** (contenido, SEO/AEO, talent, finance, copywriting), no con hechos inventados. Cada afirmación se encadena a su mecanismo o su prueba; las ambigüedades sin canal de aclaración se trabajan con supuestos explícitos acordados, nunca como hechos del comprador.
+> **Regla raíz del método:** una propuesta de licitación no se improvisa ni se escribe de memoria. Se **funda en evidencia** (bases leídas, contexto de negocio real, costos sustentados en el canon de pricing, casos citables) y se **orquesta con las skills de dominio** (contenido, SEO/AEO, talent, finance, copywriting), no con hechos inventados. Cada afirmación se encadena a su mecanismo o su prueba; las ambigüedades sin canal de aclaración se trabajan con supuestos explícitos acordados, nunca como hechos del comprador.
 
 ## Cuándo usar este companion
 
 Cárgalo cuando el encargo es **"armar/construir la propuesta de esta licitación"** de principio a fin (no una etapa suelta). Para una etapa específica, salta directo a su companion (ver `SKILL.md` → árbol de decisión).
+
+## Formato y etapa antes de ejecutar
+
+Si el operador solicita Markdown como insumo para Claude Design, completar la propuesta y anexos en
+MD antes de diseñar. Aplicar `propuesta-tecnica-economica.md` → «Handoff editorial» y el
+[procedimiento](../../../docs/manual-de-uso/comercial/construir-una-licitacion.md). Las fases de
+redacción, pricing y QA se mantienen; export, deck y cierre de Proposal Studio se ejecutan cuando
+formen parte del encargo. Ese handoff no equivale a una oferta aprobada o presentada. Al presentar,
+prevalecen el formato y los requisitos del comprador.
 
 ## El flujo en 10 fases
 
@@ -83,16 +92,20 @@ Uso correcto:
 ### Fase 5 — Diseño del squad (Managed Squad)
 - Diseña el **equipo que se asigna al cliente**: roles, seniority, % dedicación, jerarquía, RACI y sinergias. Un servicio licitado = **Managed Squad** (Efeonce opera), no staff-aug.
 - Si las bases compran roles embebidos bajo dirección del cliente, clasifica esa lane como **Staff Augmentation**. Si compran acceso gobernado a la suite, clasifícala como **Studio Access**. Un híbrido se desglosa por lanes; no se usa como etiqueta opaca. Mantén aparte la forma de engagement y el modo operativo de cada corrida.
-- De cara al cliente: **rol + seniority** (sin nombres, salvo consentimiento). Internamente: mapeo a roles de nómina para trazar el loaded cost.
+- De cara al cliente: **rol + seniority** (sin nombres, salvo consentimiento). Internamente: perfiles y dedicaciones trazables al catálogo de costos vigente; personas planificadas no equivalen a asignaciones confirmadas.
 - **Output:** squad blueprint (interno) + tabla de equipo para la §Equipo de la propuesta.
 - *Skill:* `greenhouse-talent-people-operator` → `references/client-squad-design.md` + `templates/squad-blueprint.md`.
 
-### Fase 6 — Pricing (cost-plus sobre loaded cost real)
-- Levanta el **loaded cost real** desde nómina Greenhouse (`greenhouse_payroll`) por rol × dedicación. Aplica overhead + terceros.
+### Fase 6 — Pricing (costeo sustentado y precio revisable)
+- Para la simulación local, cargar `efeonce-pricing-operator` y su
+  `references/cotizador-v3-agent-workflow.md`: recursos vigentes con `--current`, cotización congelada
+  y `compose assess`. El catálogo aporta costos objetivo de personas y políticas; no consultar ni
+  conectar nómina real para reemplazarlos. Las dedicaciones, tareas y dependencias vienen del
+  expediente; lo faltante se declara, no se valora en cero. Finance conserva tesorería y garantías.
 - Si hay Creative Studio, agrega el desglose de cinco líneas y el presupuesto de Studio Credits del companion. Las “piezas” del pliego son unidades de presentación: internamente se modelan como capacidad + operaciones generativas + determinismo/QA + derechos, sin prometer una equivalencia perpetua pieza↔crédito.
 - **Piso = cost-plus**; en **licitación privada con diferenciación fuerte, precio hacia el valor** (no subvalorar por tener un equipo eficiente). Define margen recomendado, **precio lista** y **piso de negociación (walk-away)**.
 - Absorbe en el margen: comisión de la plataforma (Wherex) + colchón de penalidad.
-- **Output:** oferta económica con precio lista, valor por unidad adicional y walk-away.
+- **Output:** precio y condiciones revisables en la oferta económica; costos, margen, escenarios y walk-away en el control interno. Todo precio preliminar conserva ese estado hasta decisión del operador.
 - *Companion:* `pricing-garantias-finance.md`; *skill:* `greenhouse-finance-accounting-operator` (loaded cost/tesorería). **Nunca GO si el margen no pasa el umbral con un precio competitivo.**
 
 ### Fase 7 — Redacción (con pase de copywriting)
@@ -104,14 +117,14 @@ Uso correcto:
 
 ### Fase 8 — Oferta económica formal
 - Antes de escribirla, **relee la ficha y el Centro de mensajes completo** (también las respuestas a otros proveedores) y mira el paso del portal donde se ingresa el precio: estructura de ítems, moneda y base fiscal.
-- Si las bases exigen su planilla o formato, usa ese. **Si no, la económica que ve el comprador se compone con la plantilla A4 de Efeonce** (`node scripts/documents/render-cotizacion-a4.mjs`, versión 2 para varias líneas), no con una planilla diseñada a mano ni con el Excel de `economica:build`, que queda para cuando las bases piden planilla (corrección del operador, 12/10/2026, Sika 1164).
+- Si las bases exigen su planilla o formato, usa ese. **Para emisión formal sin formato exigido, la económica se compone con la plantilla A4 de Efeonce** (`node scripts/documents/render-cotizacion-a4.mjs`, versión 2 para varias líneas), no con una planilla diseñada a mano ni con el Excel de `economica:build`, que queda para cuando las bases piden planilla (corrección del operador, 12/10/2026, Sika 1164).
 - En una oferta creativa, desglosa por componente de valor (evolución de marca → conceptualización → entregables), no por pieza suelta. No inventes forma de pago ni condiciones que el comprador pospuso. Coherencia aritmética total, y el total igual al monto que se ingresa en el portal.
-- **Output:** oferta económica en PDF (o la planilla exigida), con su fuente y sus supuestos en el expediente.
+- **Output:** oferta económica en el formato de la etapa: MD para handoff editorial; PDF o planilla exigida para el paquete formal, con fuente y supuestos en el expediente.
 - *Companion:* `propuesta-tecnica-economica.md` (§Oferta económica).
 
 ### Fase 9 — Empaquetado, matriz final y export
-- Re-corre la **matriz de cumplimiento** (todos los excluyentes ✅). Maqueta y **exporta a PDF** (formato Wherex). Reúne anexos y declaraciones.
-- **Output:** paquete completo listo para subir.
+- Re-corre la **matriz de cumplimiento**. Para un handoff MD, conservar requisitos pendientes y referencias a sección sin simular páginas; para presentación, resolver todos los excluyentes, maquetar/exportar en el formato exigido y reunir anexos y declaraciones.
+- **Output:** handoff MD completo para diseño, o paquete formal listo para subir según el alcance encargado; declarar el estado real por separado.
 - *Companion:* `propuesta-tecnica-economica.md` (checklist "listo para presentar").
 
 #### ⚠️ `audience`: la regla que evita el peor error de esta fase
@@ -137,13 +150,13 @@ Antes de dar la propuesta por lista, pásala por **tres lentes** que suelen expo
 
 - **Comercial/GTM (`commercial-expert`):** ¿de-riesga la indecisión del comité (JOLT: 40-60% de las pérdidas son indecisión, no el competidor)? → sumar un **plan 30-60-90 con quick win** y un **hook de diagnóstico** (Challenger "teach"). ¿Conecta el entregable con el **negocio del cliente** (no solo tráfico/vanity)? ¿El precio está **empaquetado en tramos** para anclar valor (Ramanujam) o es un número solo? ¿Preempta al **proveedor barato** con framing TCO?
 - **Talent (`client-squad-design`):** ¿el squad es **real** o hay roles `[EST]` que sostienen el diferencial central sin persona confirmada? ¿Se corrió el **gate de capacity** (over-allocation = riesgo de SLA/penalidad)?
-- **Finance (`greenhouse-finance-accounting-operator`):** ¿el loaded cost está **completo** (statutory Chile + utilización 60-75% + overhead real, no bruto×1,3)? En contrato **precio-fijo sin reajuste**, ¿hay **buffer FX+inflación** para no perder margen en años posteriores? ¿Modelado el margen del **último año**, no solo el mes 1?
+- **Pricing/Finance (`efeonce-pricing-operator` + `greenhouse-finance-accounting-operator`):** ¿la cotización usa catálogo y políticas vigentes, costos completos, dedicaciones justificadas, herramientas, terceros y contingencias según su contrato? ¿Se revisó `compose assess` sin confundir su salida con aprobación? En contrato **precio fijo sin reajuste**, ¿están explícitos los riesgos de FX, inflación, garantías y caja, incluido el último periodo? No sustituir el catálogo objetivo con nómina real ni fijar factores a mano.
 
 Regla: si las tres lentes no pasaron, la propuesta **no está lista** aunque el texto se lea bien.
 
 ### Fase 9-bis — El deck (composición, no diseño)
 
-**Cargar `deck-visual-system.md`.** El deck de la propuesta (técnica o de presentación ejecutiva)
+**Cuando el encargo incluya producir un deck con el sistema Efeonce, cargar `deck-visual-system.md`.** Un MD destinado a Claude Design conserva el handoff editorial anterior. El deck de la propuesta (técnica o de presentación ejecutiva)
 **se compone desde un catálogo cerrado de 28 plantillas** — **nunca** se dibuja freehand. Se elige la
 plantilla por el tipo de contenido (selector determinista, `registry.json`) y se rellenan sus slots.
 
@@ -169,7 +182,7 @@ Reglas duras que se cruzan con este playbook:
 
 1. **Admisibilidad antes que fit.** Un excluyente faltante deja fuera aunque el fit sea 10/10.
 2. **Nunca GO sin margen** sobre loaded cost. Fit alto + margen negativo = NO-BID.
-3. **Fundar con skills, no con memoria.** Cada fase se apoya en la skill de dominio y en datos reales (bases, contexto, nómina, casos).
+3. **Fundar con skills, no con memoria.** Cada fase se apoya en la skill de dominio y en datos sustentados (bases, contexto, catálogo de costos vigente, casos).
 4. **Evidence-first + anti-humo.** Cada claim se encadena a su mecanismo o su prueba citable.
 5. **Human-in-control.** El humano decide y autoriza cada alcance sensible; el agente puede ejecutar firma o
    presentación dentro de esa autorización. No inferir permiso de envío desde preparación o firma.

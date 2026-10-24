@@ -3,7 +3,10 @@
 > **Tipo:** Product Decision Record de plataforma del sitio público.
 > **Estado:** Accepted · 2026-10-18 · el operador decidió el alcance y el piloto el mismo día (§Decisiones del operador). Queda
 > abierta sólo la copia pública en el bucket, que se decide en la fase de Think.
-> **Ejecución:** [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md) con tres tasks: `TASK-2040`
+> **Resultado:** en producción en todo `efeoncepro.com` desde el 2026-10-23 00:09 UTC, sin el piloto de una página: el
+> operador eligió encenderlo directo en todo el sitio (§Decisiones del operador, punto 2). `/blog/` conserva la cabecera
+> de Ohio porque es de `TASK-1802`.
+> **Ejecución:** [EPIC-055](../../epics/in-progress/EPIC-055-public-site-global-navigation.md) con tres tasks: `TASK-2040`
 > (mecanismo en AXIS), `TASK-2041` (plugin, contenido y fotos) y `TASK-2042` (puesta en el sitio). Las siete fases de
 > §Fases se reparten entre esas tres tasks.
 > **Arquitectura:** [Navegación global del sitio público V1](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md).
@@ -76,7 +79,7 @@ El contenido del menú es un solo documento de datos con una sola fuente de verd
 
 | Capa | Qué es | Dónde vive |
 |---|---|---|
-| **Mecanismo** | Cápsula, mega menús, onepage, cabecera fija, vidrio, motion, teclado, foco, movimiento reducido y estados de tableta y móvil. HTML que se renderiza en el servidor, CSS y JS liviano, sin React. | AXIS: contrato nuevo (nombre propuesto `efeonce.site-nav`), primitive en `@efeoncepro/axis-ui-primitives`, página en el Lab. |
+| **Mecanismo** | Cápsula, mega menús, onepage, cabecera fija, vidrio, motion, teclado, foco, movimiento reducido y estados de tableta y móvil. HTML que se renderiza en el servidor, CSS y JS liviano, sin React. | AXIS: contrato nuevo `efeonce.site-nav`, primitive en `@efeoncepro/axis-ui-primitives`, página en el Lab. |
 | **Contenido** | Un documento de navegación con ítems, líneas, servicios, hijos, descripción, fotos por recorte, texto alternativo e intención del CTA. Lo valida el esquema del contrato. | Plugin propio de WordPress (§2), con copia pública para otros sitios. |
 | **Adaptador** | Pieza de cada sitio que lee el documento, pinta el mecanismo y conecta el CTA de su propia superficie. | WordPress: parte del tema `ohio-child` o plugin del runtime. Think: envoltura Astro, cuando se pida. |
 
@@ -177,6 +180,11 @@ Decididas el 2026-10-18:
 2. **Piloto: primero en una sola página**, detrás del interruptor `eo_site_nav_enabled`, antes de todo el sitio. El go a
    todo el sitio lo da el operador después de revisar el piloto.
 
+   **Resultado (2026-10-23):** el operador eligió encenderlo en todo el sitio sin piloto de una página
+   (`eo_site_nav_enabled=on`, 00:09 UTC). El interruptor conserva el modo `pilot` y la vuelta atrás sigue siendo
+   ponerlo en `off`. Un barrido de 52 páginas publicadas y 3 posts de Glitch en 1440 y 390 confirmó el menú nuevo en
+   todas. Detalle en la [arquitectura](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md).
+
 Queda abierta:
 
 3. **Copia pública del documento:** servirla desde el propio WordPress o publicarla también en el bucket de AXIS. Se
@@ -204,6 +212,11 @@ Reparto en tasks (EPIC-055):
 | `TASK-2042` | F5 y F6 |
 
 F7 queda como follow-up de la épica.
+
+Estado al 2026-10-23: F1 y F2 completas (`TASK-2040`, AXIS v0.7.7; el sitio usa primitives 0.7.13). F3 y F4 en
+producción salvo la pantalla del admin: hoy el menú se edita con `pnpm public-website:site-nav`, sobre el mismo servicio
+de guardado (`TASK-2041`). F5 se hizo sin piloto de una página y F6 está en producción, con la medición en GTM y GA4 desde el mismo día;
+faltan Core Web Vitals y probar la vuelta a `off` en producción (`TASK-2042`). F7 sigue sin pedirse.
 
 ## Consecuencias
 

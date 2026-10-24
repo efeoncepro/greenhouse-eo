@@ -1,0 +1,20 @@
+{
+  "document": "proposal",
+  "line": "revenue-salesforce",
+  "slides": [
+    {"recipeId": "cover-proposal-orbit", "purpose": "01 · portada"},
+    {"recipeId": "content-text", "purpose": "02 · lo que pedimos decidir"},
+    {"recipeId": "content-bullets", "purpose": "03 · cómo están hoy"},
+    {"recipeId": "proposal-service-revops", "plateRef": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png", "purpose": "04 · la solución"},
+    {"recipeId": "content-day-live-console", "purpose": "05 · panel de contactabilidad"},
+    {"recipeId": "decision-provider-fit", "purpose": "06 · alternativas"},
+    {"recipeId": "method-waves", "purpose": "07 · etapas"},
+    {"recipeId": "content-bullets", "purpose": "08 · lo que pedimos a la región"},
+    {"recipeId": "content-text", "purpose": "09 · adopción"},
+    {"recipeId": "decision-risk", "purpose": "10 · riesgos"},
+    {"recipeId": "decision-plan", "purpose": "11 · plan del piloto"},
+    {"recipeId": "content-pricing", "purpose": "12 · inversión"},
+    {"recipeId": "decision-next-steps", "purpose": "13 · próximos pasos"},
+    {"recipeId": "close-proposal-horizon", "plateRef": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF3-nexa-contraportada-bordada.png", "purpose": "14 · contraportada"}
+  ]
+}

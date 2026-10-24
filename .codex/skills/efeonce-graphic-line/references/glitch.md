@@ -144,6 +144,11 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
 
 ## 4. Carrusel de LinkedIn (1080×1350)
 
+> **Uso en canales (operador, 2026-10-22; PDR-020 delta punto 12):** el carrusel de la edición **no se publica en
+> LinkedIn**. LinkedIn lleva de Glitch **la lectura de una noticia**: un post con la mirada sobre una sola noticia y,
+> como imagen, su lámina interior suelta. El carrusel completo sigue aprobado como pieza y se compone igual (`pdf-merged`),
+> pero su destino es el archivo de la edición, no el feed.
+
 - **Lámina interior — APROBADA:** cabecera compacta; foto de la noticia en navy (176–626) que se desarma en bytes;
   chip «NOTICIA n» + medio y fecha; crédito de la foto; «SECCIÓN + IA · LA NOTICIA»; titular en Bricolage 300;
   «GLITCH DROP» con los puntos; POV en 800 condensado cerrado con la manzana; porqué en Poppins; avance n/8 en 8
@@ -192,6 +197,15 @@ aprobada (el vlog embebido ya lo estaba con el motion).
   apertura) también están aprobados y el taller los entrega con el motion (§12).
   Subtítulos siempre (Poppins 600, blanco sobre navy 78 %, una palabra en el acento). Imagen de las fuentes embebida o
   licenciada, **nunca descargada**; en navy, con bytes en el borde y crédito.
+- **Distribución (delta 2026-10-22,
+  [PDR-020](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)):** el kit sigue
+  aprobado, pero dónde se publica cada formato lo fija PDR-020. La casa de Glitch es el correo y su archivo el blog;
+  en Threads entra sólo como gancho el día de la edición (la noticia más fuerte en una frase y la invitación a
+  suscribirse) y en LinkedIn como lectura de una noticia. Instagram es marca agencia, TikTok no es canal de Efeonce y
+  YouTube pertenece a Marketing con Manzanitas. **Decidido por el operador el 2026-10-22** (PDR-020, delta punto 12):
+  **el reel y el vlog de Glitch quedan en pausa** hasta que el piloto de YouTube pruebe que el ritmo se sostiene; no se
+  graban ni se programan. El kit de motion sigue aprobado para cuando se reactiven; al reactivarse se decide de nuevo
+  el canal y el alojamiento del vlog que se incrusta en el blog.
 - **Reel = overlays ENCIMA de la toma del host** (decisión del operador: el host está en cámara todo el tiempo).
   Pantalla completa sólo la portada del reel y la tarjeta final.
 

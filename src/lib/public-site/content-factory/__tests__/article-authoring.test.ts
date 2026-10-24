@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { authorGutenbergDraft, type GutenbergArticleSpec } from '../article-authoring'
+import {
+  authorGutenbergDraft,
+  type GutenbergArticleSpec,
+  type GutenbergMentionLine,
+  type GutenbergRichTextSegment
+} from '../article-authoring'
 import { validateGeneratedGutenbergDraft } from '../gutenberg-validator'
 
 // A real, differentiated article authored via the structured spec — the loop that
@@ -550,6 +555,55 @@ describe('authorGutenbergDraft', () => {
     expect(postContent).toContain('Primero, <strong>la tesis</strong>.')
     expect(postContent).toContain('<a href="https://doi.org/10.1126/sciadv.adn5290"><strong>la evidencia</strong></a>')
     expect(postContent).toContain('<li><strong>Decisión.</strong> Una persona conserva la autoridad.</li>')
+  })
+
+  it('renders Efeonce service links as AXIS mentions and validates them', () => {
+    const withMention = (segment: GutenbergRichTextSegment) =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [
+          {
+            heading: 'Con mención de servicio',
+            level: 2,
+            blocks: [{ kind: 'paragraph', text: [{ text: 'Trabajamos tu ' }, segment, { text: '.' }] }]
+          },
+          ...kungFuSpec.sections.slice(1)
+        ]
+      })
+
+    const draft = withMention({
+      text: 'posicionamiento SEO',
+      href: 'https://efeoncepro.com/servicios/posicionamiento-seo/',
+      mention: { line: 'engine' }
+    })
+
+    const postContent = draft.draft.kind === 'gutenberg_post' ? draft.draft.postContent : ''
+
+    expect(postContent).toContain(
+      '<a class="axis-mention" href="https://efeoncepro.com/servicios/posicionamiento-seo/" data-line="engine" data-surface="light">posicionamiento SEO</a>'
+    )
+    // The mention adds no validator finding over the same article with a plain link.
+    const plain = withMention({ text: 'posicionamiento SEO', href: 'https://efeoncepro.com/servicios/posicionamiento-seo/' })
+
+    expect(validateGeneratedGutenbergDraft(draft).findings).toEqual(validateGeneratedGutenbergDraft(plain).findings)
+
+    const think = withMention({ text: 'informe', href: 'https://think.efeoncepro.com/brand-visibility', mention: { line: 'growth', surface: 'dark' } })
+
+    expect(think.draft.kind === 'gutenberg_post' ? think.draft.postContent : '').toContain('data-line="growth" data-surface="dark"')
+
+    expect(() => withMention({ text: 'HubSpot', href: 'https://www.hubspot.com/loop', mention: { line: 'revenue-hubspot' } })).toThrow(
+      'content_factory_article_mention_destination_invalid:www.hubspot.com'
+    )
+    expect(() => withMention({ text: 'SEO', href: 'http://efeoncepro.com/seo/', mention: { line: 'engine' } })).toThrow(
+      'content_factory_article_mention_destination_invalid'
+    )
+    expect(() => withMention({ text: 'SEO', href: 'https://efeoncepro.com.evil.io/', mention: { line: 'engine' } })).toThrow(
+      'content_factory_article_mention_destination_invalid'
+    )
+    expect(() =>
+      withMention({ text: 'SEO', href: 'https://efeoncepro.com/', mention: { line: 'pink' as GutenbergMentionLine } })
+    ).toThrow('content_factory_article_mention_line_invalid:pink')
+    expect(() => withMention({ text: 'SEO', mention: { line: 'engine' } })).toThrow('content_factory_article_mention_href_required')
   })
 
   it('rejects unsafe inline-link protocols', () => {

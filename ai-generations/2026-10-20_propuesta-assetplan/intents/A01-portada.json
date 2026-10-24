@@ -1,0 +1,33 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-proposal",
+  "layout": "orbit",
+  "voice": {
+    "eyebrow": "Propuesta · Octubre 2026",
+    "question": "¿Servicio Managed CRM?",
+    "answer": [
+      "Servicio",
+      "Managed CRM"
+    ]
+  },
+  "body": "Preparada para **Assetplan** · Confidencial",
+  "selection": {
+    "target": "client-logo",
+    "label": "Efeonce",
+    "participantKind": "role"
+  },
+  "clientLogo": {
+    "path": "ai-generations/2026-10-20_propuesta-assetplan/assets/assetplan-on-dark.svg",
+    "alt": "Assetplan"
+  },
+  "column": {
+    "topPx": 220
+  }
+}

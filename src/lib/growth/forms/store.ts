@@ -18,7 +18,9 @@ import { commercialFormClassificationSchema, FormClassificationConflictError, fo
 import {
   FORM_SUBMISSION_ACCEPTED_EVENT,
   FORM_SUBMISSION_AGGREGATE,
+  type EventOverCapacityPolicy,
   type FormSubmissionAcceptedEventPayload,
+  type RegistrationStatus,
 } from './contracts'
 
 // ─── Row shapes (lean; mapeados desde greenhouse_growth.*) ────────────────────
@@ -549,7 +551,98 @@ return rows[0] ?? null
 
 // ─── Submissions (write path: in-tx submission + consent + outbox event) ──────
 
+// ─── Reservas por evento (TASK-2053) ─────────────────────────────────────────
+
+/**
+ * Estados de `form_submission` que cuentan como envío ACEPTADO (pasó todos los gates y entró al
+ * pipeline de entrega). `received`/`validated`/`rejected` nunca cuentan: son intentos.
+ */
+export const ACCEPTED_SUBMISSION_STATUSES = [
+  'accepted',
+  'routed',
+  'delivered',
+  'destination_failed',
+  'retrying',
+  'dead_letter',
+] as const
+
+/** El cupo del evento ya está lleno y la política es `reject`: la transacción se revierte entera. */
+export class EventCapacityFullError extends Error {
+  constructor() {
+    super('event_capacity_full')
+    this.name = 'EventCapacityFullError'
+  }
+}
+
+export interface EventRegistrationPersistPolicy {
+  capacity?: number
+  overCapacity: EventOverCapacityPolicy
+  statusField: string
+}
+
+type Queryable = { query: (text: string, params?: unknown[]) => Promise<{ rows: unknown[] }> }
+
+/**
+ * Reservas confirmadas de un formulario: correos DISTINTOS (hash del correo normalizado) entre los
+ * envíos aceptados que no quedaron en lista de espera. Un envío anterior a la política (sin el campo
+ * de estado) cuenta como confirmado. `alreadyConfirmed` dice si `leadEmailHash` ya tiene una reserva
+ * confirmada (re-registro del mismo correo: no ocupa otro cupo).
+ */
+const readConfirmedRegistrations = async (
+  db: Queryable,
+  formId: string,
+  statusField: string,
+  leadEmailHash: string | null,
+): Promise<{ confirmed: number; alreadyConfirmed: boolean }> => {
+  const result = await db.query(
+    `SELECT COUNT(DISTINCT lead_email_hash)::int AS confirmed,
+            COALESCE(BOOL_OR(lead_email_hash = $4), FALSE) AS already_confirmed
+       FROM greenhouse_growth.form_submission
+      WHERE form_id = $1
+        AND lead_email_hash IS NOT NULL
+        AND status = ANY($2::text[])
+        AND COALESCE(normalized_fields_json ->> $3, 'confirmed') <> 'waitlisted'`,
+    [formId, [...ACCEPTED_SUBMISSION_STATUSES], statusField, leadEmailHash],
+  )
+
+  const row = (result.rows[0] ?? {}) as { confirmed?: number | string; already_confirmed?: boolean }
+
+  return { confirmed: Number(row.confirmed ?? 0), alreadyConfirmed: row.already_confirmed === true }
+}
+
+/** Reader de sólo lectura del conteo de reservas confirmadas (lo consume el conteo público). */
+export const countConfirmedRegistrations = async (formId: string, statusField: string): Promise<number> => {
+  const { confirmed } = await readConfirmedRegistrations({ query: (text, params) => query(text, params).then(rows => ({ rows })) }, formId, statusField, null)
+
+  return confirmed
+}
+
+/**
+ * Decide el estado de una reserva DENTRO de la transacción del envío. El lock transaccional por
+ * formulario serializa los envíos concurrentes al mismo evento, así que dos reservas simultáneas
+ * nunca ocupan el último cupo a la vez.
+ */
+const decideRegistrationStatus = async (
+  client: Queryable,
+  formId: string,
+  leadEmailHash: string | null,
+  policy: EventRegistrationPersistPolicy,
+): Promise<RegistrationStatus> => {
+  if (policy.capacity === undefined) return 'confirmed'
+
+  await client.query(`SELECT pg_advisory_xact_lock(hashtextextended('greenhouse_growth.event_capacity:' || $1, 0))`, [formId])
+
+  const { confirmed, alreadyConfirmed } = await readConfirmedRegistrations(client, formId, policy.statusField, leadEmailHash)
+
+  if (alreadyConfirmed || confirmed < policy.capacity) return 'confirmed'
+  if (policy.overCapacity === 'reject') throw new EventCapacityFullError()
+
+  return 'waitlisted'
+}
+
 export interface PersistSubmissionInput {
+  /** TASK-2053 — política de reserva del evento; ausente = comportamiento de hoy. */
+  eventRegistration?: EventRegistrationPersistPolicy | null
   measurement?: PreparedMeasurement | null
   formId: string
   formVersionId: string
@@ -580,8 +673,19 @@ export interface PersistSubmissionInput {
  * `growth.forms.submission_accepted` en UNA transacción. La entrega al destino es
  * async (la drena el dispatcher), NUNCA inline (overlay #3 + CLAUDE.md outbox).
  */
-export const persistAcceptedSubmission = async (input: PersistSubmissionInput): Promise<FormSubmissionRow & { measurementPersisted: boolean }> =>
+export const persistAcceptedSubmission = async (
+  input: PersistSubmissionInput,
+): Promise<FormSubmissionRow & { measurementPersisted: boolean; registrationStatus?: RegistrationStatus }> =>
   withTransaction(async client => {
+    const registrationStatus = input.eventRegistration
+      ? await decideRegistrationStatus(client, input.formId, input.leadEmailHash, input.eventRegistration)
+      : undefined
+
+    const normalizedFields =
+      input.eventRegistration && registrationStatus
+        ? { ...input.normalizedFields, [input.eventRegistration.statusField]: registrationStatus }
+        : input.normalizedFields
+
     const submissionRows = await client.query(
       `INSERT INTO greenhouse_growth.form_submission (
          form_id, form_version_id, surface_id, page_uri, page_name, lead_email_hash,
@@ -596,7 +700,7 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
         input.pageUri,
         input.pageName,
         input.leadEmailHash,
-        JSON.stringify(input.normalizedFields),
+        JSON.stringify(normalizedFields),
         JSON.stringify(input.encryptedFields ?? {}),
         input.dedupeFingerprint,
         input.requestId,
@@ -642,7 +746,7 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
       client,
     )
 
-    return { ...submission, measurementPersisted }
+    return { ...submission, measurementPersisted, ...(registrationStatus ? { registrationStatus } : {}) }
   })
 
 /** Submission rechazada: metadata operacional mínima, sin PII innecesaria. */

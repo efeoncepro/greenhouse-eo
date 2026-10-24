@@ -1,0 +1,365 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:40:12.989Z",
+  "run": "ai-generations/2026-10-04_seo-icons",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-04_seo-icons",
+  "totalBytes": 4331424,
+  "fileCount": 59,
+  "files": [
+    {
+      "path": "Efeonce-SEO-iconos-r2.zip",
+      "sizeBytes": 1096064,
+      "sha256": "09e60287ae49451be825b9120eef97b438fcf5865d80b9fcf6a3599d38518195",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/Efeonce-SEO-iconos-r2.zip"
+    },
+    {
+      "path": "lab-desktop.png",
+      "sizeBytes": 522317,
+      "sha256": "80a8b9f1f927b724c4a87f3e26b5e53e19e5952a0481c84ecbe477a7daf4f1ce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/lab-desktop.png"
+    },
+    {
+      "path": "lab-mobile.png",
+      "sizeBytes": 631526,
+      "sha256": "de29e4785497b1a825fa82f85ee81ad33e1d282977eee34deb1aa1f14fad4603",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/lab-mobile.png"
+    },
+    {
+      "path": "lamina-dark.png",
+      "sizeBytes": 228146,
+      "sha256": "5f655da85246252bf4fc2640ce86edcf665ae083d6518859753ee39c0278f37f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/lamina-dark.png"
+    },
+    {
+      "path": "lamina-light.png",
+      "sizeBytes": 227419,
+      "sha256": "698c2a1e799dd5ca3b5c8214c9de42840897665cf05e44235152d746705bcb69",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/lamina-light.png"
+    },
+    {
+      "path": "nuevos-dark.png",
+      "sizeBytes": 137768,
+      "sha256": "e73fa2e35892cc55792d3d87999a1e55064057682ef8e099c965ba0a9b2ad647",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/nuevos-dark.png"
+    },
+    {
+      "path": "nuevos-light.png",
+      "sizeBytes": 137053,
+      "sha256": "7bf6d809bdc25b8e31890d4809f2b55ba373026d1385b8512f65b8b8133feb80",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/nuevos-light.png"
+    },
+    {
+      "path": "qa/canibalizacion/canibalizacion-control-oscuro.png",
+      "sizeBytes": 15508,
+      "sha256": "22ff3aa990f740a4dae505942dbb92b2b5ee20427cf7784703c4d7ec5e781889",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/canibalizacion/canibalizacion-control-oscuro.png"
+    },
+    {
+      "path": "qa/canibalizacion/canibalizacion-control-papel.png",
+      "sizeBytes": 15573,
+      "sha256": "c6c7e0f2e7a676f54de1d18203e2b29065f2dd073a4c56fddeea8d28000616e3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/canibalizacion/canibalizacion-control-papel.png"
+    },
+    {
+      "path": "qa/canonical/canonical-control-oscuro.png",
+      "sizeBytes": 15430,
+      "sha256": "119d615df73f36e7758596ac98a1788d1648fa9ce11ac1e98a02ac880a5d79cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/canonical/canonical-control-oscuro.png"
+    },
+    {
+      "path": "qa/canonical/canonical-control-papel.png",
+      "sizeBytes": 15454,
+      "sha256": "c93de3643aba989656fedb4524670f95a7a2d95e7ddf70cf366ffd4332e4556b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/canonical/canonical-control-papel.png"
+    },
+    {
+      "path": "qa/cluster-tematico/cluster-tematico-control-oscuro.png",
+      "sizeBytes": 16452,
+      "sha256": "875373909e6c925224ebae3577ad40adadd70741744643247d4574878cb8cd4b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/cluster-tematico/cluster-tematico-control-oscuro.png"
+    },
+    {
+      "path": "qa/cluster-tematico/cluster-tematico-control-papel.png",
+      "sizeBytes": 16404,
+      "sha256": "8d61ed34cf8c30164b6da4cbe498c2b91085e4f066d16b42c5d60f42f70d11c4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/cluster-tematico/cluster-tematico-control-papel.png"
+    },
+    {
+      "path": "qa/datos-estructurados/datos-estructurados-control-oscuro.png",
+      "sizeBytes": 12966,
+      "sha256": "881a2fea882b3deeced8fc86c91dd2287cc4b1c8e57cee64ccfaee7150d307f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/datos-estructurados/datos-estructurados-control-oscuro.png"
+    },
+    {
+      "path": "qa/datos-estructurados/datos-estructurados-control-papel.png",
+      "sizeBytes": 12970,
+      "sha256": "b8d8806e22823d8b4d059b5274815fca0a37d7146763fe1a5f8c237ebd08b95c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/datos-estructurados/datos-estructurados-control-papel.png"
+    },
+    {
+      "path": "qa/enlazado-interno/enlazado-interno-control-oscuro.png",
+      "sizeBytes": 14893,
+      "sha256": "dd26ca23cfef9ac27a1005aa45e09da5df40f91da4d65a0e67d85a80e7747d07",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/enlazado-interno/enlazado-interno-control-oscuro.png"
+    },
+    {
+      "path": "qa/enlazado-interno/enlazado-interno-control-papel.png",
+      "sizeBytes": 14888,
+      "sha256": "2f9c8ca1dd180ea22ed698a17d1dfb3ba222fa97ba33a70d030312b72d0f2d86",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/enlazado-interno/enlazado-interno-control-papel.png"
+    },
+    {
+      "path": "qa/hreflang/hreflang-control-oscuro.png",
+      "sizeBytes": 15448,
+      "sha256": "7a62c6b3fbe5d68e073888a0e52cfb24493ff0a4b94eade3cf0a0dc856a39047",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/hreflang/hreflang-control-oscuro.png"
+    },
+    {
+      "path": "qa/hreflang/hreflang-control-papel.png",
+      "sizeBytes": 15408,
+      "sha256": "79e82a86311808418156f5ba5958f733b0e3d17726d0890723fe2243a37aa950",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/hreflang/hreflang-control-papel.png"
+    },
+    {
+      "path": "qa/indexacion/indexacion-control-oscuro.png",
+      "sizeBytes": 13018,
+      "sha256": "c44ec87d0e77f830481856113109d362bc460157c84b15f99abb34d496fd17fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/indexacion/indexacion-control-oscuro.png"
+    },
+    {
+      "path": "qa/indexacion/indexacion-control-papel.png",
+      "sizeBytes": 13008,
+      "sha256": "41c6aa829a3b310b3638d15ce0fc72780c5327b7036379ef9c14f1a6cf30d0a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/indexacion/indexacion-control-papel.png"
+    },
+    {
+      "path": "qa/intencion-busqueda/intencion-busqueda-control-oscuro.png",
+      "sizeBytes": 15938,
+      "sha256": "874d7a304206063113616f90578c83c3f767ddc22294e605a8fe9d536ab79e7b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/intencion-busqueda/intencion-busqueda-control-oscuro.png"
+    },
+    {
+      "path": "qa/intencion-busqueda/intencion-busqueda-control-papel.png",
+      "sizeBytes": 15868,
+      "sha256": "b2a2dce809f36aac2e97557c62e1989e77ab29a7087a0f4a9b57c77af65321a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/intencion-busqueda/intencion-busqueda-control-papel.png"
+    },
+    {
+      "path": "qa/rastreo/rastreo-control-oscuro.png",
+      "sizeBytes": 13528,
+      "sha256": "3cccd0a6859db22aa4ce024922588edad88b10ac5d0d18c4dd60ac629cc51fd8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/rastreo/rastreo-control-oscuro.png"
+    },
+    {
+      "path": "qa/rastreo/rastreo-control-papel.png",
+      "sizeBytes": 13472,
+      "sha256": "85918595fdc3323cf0d2d4abaca04f09d73e6c7799f45c343feadde137388f64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/rastreo/rastreo-control-papel.png"
+    },
+    {
+      "path": "qa/redireccion/redireccion-control-oscuro.png",
+      "sizeBytes": 13900,
+      "sha256": "949eb15fc2483cb5902c2eb885d8336861678f07b19532770231c4855e34e22b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/redireccion/redireccion-control-oscuro.png"
+    },
+    {
+      "path": "qa/redireccion/redireccion-control-papel.png",
+      "sizeBytes": 13854,
+      "sha256": "5463cb93da15de4c486df0ebc34263717277a73e0513a39bc66b8d9b79c3d491",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/redireccion/redireccion-control-papel.png"
+    },
+    {
+      "path": "qa/renderizado/renderizado-control-oscuro.png",
+      "sizeBytes": 12901,
+      "sha256": "b71749050e25dcd2b7665abeffe11fd2482fbf91939b0969ef6a8d849561c4b0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/renderizado/renderizado-control-oscuro.png"
+    },
+    {
+      "path": "qa/renderizado/renderizado-control-papel.png",
+      "sizeBytes": 12867,
+      "sha256": "5c26c0bfe3e3d471d41f35f6fceede01031f4ac1d558d60f62062908558cbbc0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/renderizado/renderizado-control-papel.png"
+    },
+    {
+      "path": "qa/sitemap/sitemap-control-oscuro.png",
+      "sizeBytes": 12711,
+      "sha256": "ddb6ea2bd3fb2db35c0b9fed1f7661aae3280ec38e28b174de66f7edecefb6bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/sitemap/sitemap-control-oscuro.png"
+    },
+    {
+      "path": "qa/sitemap/sitemap-control-papel.png",
+      "sizeBytes": 12692,
+      "sha256": "7fd2ad436030d0beccd705ce6ccf7cff4c642714fb72a966af153c5590532400",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/qa/sitemap/sitemap-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/lamina-dark.png",
+      "sizeBytes": 225820,
+      "sha256": "d8a640a877a43e2f27fa689142abd301e13257e00010ed5745f30f4ce0e2053f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/lamina-dark.png"
+    },
+    {
+      "path": "r1-cuadrados/lamina-light.png",
+      "sizeBytes": 224683,
+      "sha256": "2a536c0131d6dcb1ac69584354351d66cce4c0041d8af5e796d017853150bee4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/lamina-light.png"
+    },
+    {
+      "path": "r1-cuadrados/nuevos-dark.png",
+      "sizeBytes": 136184,
+      "sha256": "87c96a86509c4d28396f8455c9f3e5d1013a34aab22ff185ad3754f222aca799",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/nuevos-dark.png"
+    },
+    {
+      "path": "r1-cuadrados/nuevos-light.png",
+      "sizeBytes": 134968,
+      "sha256": "89f1d9c22c0b50b44734c823fc3311fa895f14f51a789dd810d5dbc7ae8027d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/nuevos-light.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/canibalizacion/canibalizacion-control-oscuro.png",
+      "sizeBytes": 13861,
+      "sha256": "0e9cee7dc5c607716334a854cd5817f5dc4f194a13710155e37d80a4d1b96c93",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/canibalizacion/canibalizacion-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/canibalizacion/canibalizacion-control-papel.png",
+      "sizeBytes": 13935,
+      "sha256": "50716fa678399bba69a4fdad0909e1d7466e29f8748abb7a67de1503b9cfdff7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/canibalizacion/canibalizacion-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/canonical/canonical-control-oscuro.png",
+      "sizeBytes": 11169,
+      "sha256": "a0bbf12d1d44f3de9b2abaa4ddb960bd9c0da47cf196310134e5531faedec384",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/canonical/canonical-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/canonical/canonical-control-papel.png",
+      "sizeBytes": 11326,
+      "sha256": "5eeaacd0cf4d7346eedfe4c52bd7b9675632a56feb8b95ca97ffc0c4a17436c7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/canonical/canonical-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/cluster-tematico/cluster-tematico-control-oscuro.png",
+      "sizeBytes": 11208,
+      "sha256": "371243c6cc78264e0b42a1fb858835c74a5ebc835eb18d79eb89c0b66f6716cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/cluster-tematico/cluster-tematico-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/cluster-tematico/cluster-tematico-control-papel.png",
+      "sizeBytes": 11176,
+      "sha256": "c700390e0a7eb5ab93efa5f3bd1f498be0efd9751ef61954568b01879e9e9df4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/cluster-tematico/cluster-tematico-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/datos-estructurados/datos-estructurados-control-oscuro.png",
+      "sizeBytes": 10975,
+      "sha256": "52cafe8e302de16426494c5b809aaad9272d9fdef89086f9a7c3ef92b4cf7df1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/datos-estructurados/datos-estructurados-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/datos-estructurados/datos-estructurados-control-papel.png",
+      "sizeBytes": 10947,
+      "sha256": "38207f0f81e94db98868a78066cb46706468c645067abe40f9d3517c99dbd6df",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/datos-estructurados/datos-estructurados-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/enlazado-interno/enlazado-interno-control-oscuro.png",
+      "sizeBytes": 10949,
+      "sha256": "5dfd0b9d3bef9316e66ea76da5fba7ff27fec27610c9db944a796307298b87fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/enlazado-interno/enlazado-interno-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/enlazado-interno/enlazado-interno-control-papel.png",
+      "sizeBytes": 10898,
+      "sha256": "2e5199888caa3fd1894e18aefa00deb7b94468462298f3b7b116cfde2a61168a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/enlazado-interno/enlazado-interno-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/hreflang/hreflang-control-oscuro.png",
+      "sizeBytes": 13425,
+      "sha256": "c5317a4cbdcb2e1f3b39c90775ee9021d81c3a9ddcad17483d3640f25aa663ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/hreflang/hreflang-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/hreflang/hreflang-control-papel.png",
+      "sizeBytes": 13338,
+      "sha256": "2b57570a50dafa4231bb6b23dd211c7ad172a441999284602626504f16ce63de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/hreflang/hreflang-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/indexacion/indexacion-control-oscuro.png",
+      "sizeBytes": 10749,
+      "sha256": "16344a2d14503088b0e2e6ba90923ed4f5366f64e00f38635900398fea5f9cac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/indexacion/indexacion-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/indexacion/indexacion-control-papel.png",
+      "sizeBytes": 10739,
+      "sha256": "54c2a003c101774a2d1c63a57284020b58b370fa5fadca53fc551be6ed93f51a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/indexacion/indexacion-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/intencion-busqueda/intencion-busqueda-control-oscuro.png",
+      "sizeBytes": 15439,
+      "sha256": "4de3de7c544e81bd85464e3282c55da11aac31aee6e72caa4ca23bcd1dc19320",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/intencion-busqueda/intencion-busqueda-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/intencion-busqueda/intencion-busqueda-control-papel.png",
+      "sizeBytes": 15360,
+      "sha256": "e8de88121d646051572175f0de9807f5089163c10326bbe53ec6cf8aa9cea1b4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/intencion-busqueda/intencion-busqueda-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/rastreo/rastreo-control-oscuro.png",
+      "sizeBytes": 11329,
+      "sha256": "6411f717c61515adca8236f6fa9e5b94cf2e9269612949561451c33b88c28e07",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/rastreo/rastreo-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/rastreo/rastreo-control-papel.png",
+      "sizeBytes": 11259,
+      "sha256": "4fe0983541cde8c7237228b14cde28209aea294fc0feb0b19401060368405432",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/rastreo/rastreo-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/redireccion/redireccion-control-oscuro.png",
+      "sizeBytes": 11508,
+      "sha256": "6713169e46c3fe9d02fb4b09ad69febc202b32f77bd41cfd5f7f6ad573f3be47",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/redireccion/redireccion-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/redireccion/redireccion-control-papel.png",
+      "sizeBytes": 11463,
+      "sha256": "9039c3b5948cc9553ce587e3f3265d955936f2746c41bcf5fc520d36e16eb1ae",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/redireccion/redireccion-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/renderizado/renderizado-control-oscuro.png",
+      "sizeBytes": 11054,
+      "sha256": "f9e52a1364386c31d373857cd61b95669be0c1a85e3310f4254336ff31a87643",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/renderizado/renderizado-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/renderizado/renderizado-control-papel.png",
+      "sizeBytes": 11000,
+      "sha256": "91b9fefacaac3a27d785fbb48f99d8d9d95451ce18c7857f3729582bf529734d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/renderizado/renderizado-control-papel.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/sitemap/sitemap-control-oscuro.png",
+      "sizeBytes": 10601,
+      "sha256": "e6c2ec71eb688d1c22c07f7cd43b3d10e2c7a74b4cdaa8b04eba28b48acb1117",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/sitemap/sitemap-control-oscuro.png"
+    },
+    {
+      "path": "r1-cuadrados/qa/sitemap/sitemap-control-papel.png",
+      "sizeBytes": 10617,
+      "sha256": "e9bc804fd711c4fb3060e6f9efed84278d6edafe549f06245c6b3351785edcbb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_seo-icons/r1-cuadrados/qa/sitemap/sitemap-control-papel.png"
+    }
+  ]
+}

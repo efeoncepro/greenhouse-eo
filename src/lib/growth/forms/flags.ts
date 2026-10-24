@@ -5,6 +5,8 @@
  * endpoint público resuelve `disabled` (404), aun si hubiera forms publicados.
  * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
  */
+import type { EnvSource } from '@/types/env-source'
+
 export const GROWTH_FORMS_PUBLIC_API_FLAG = 'GROWTH_FORMS_PUBLIC_API_ENABLED'
 export const GROWTH_FORMS_CATALOG_API_FLAG = 'GROWTH_FORMS_CATALOG_API_ENABLED'
 export const GROWTH_FORMS_DISPATCH_FLAG = 'GROWTH_FORMS_DISPATCH_ENABLED'
@@ -18,11 +20,11 @@ export const GROWTH_EBOOK_EMAIL_DELIVERY_FLAG = 'GROWTH_EBOOK_EMAIL_DELIVERY_ENA
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
 /** Kill switch del API público de forms. Default OFF. */
-export const isFormsPublicApiEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isFormsPublicApiEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_PUBLIC_API_FLAG])
 
 /** Kill switch del email de respaldo del ebook. Default OFF → sólo descarga on-screen. */
-export const isEbookEmailDeliveryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isEbookEmailDeliveryEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_EBOOK_EMAIL_DELIVERY_FLAG])
 
 /**
@@ -35,7 +37,7 @@ export const isEbookEmailDeliveryEnabled = (env: NodeJS.ProcessEnv = process.env
  * para embeber durante la preparación del launch). Se puede prender en staging/prod de
  * forma independiente. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
  */
-export const isFormsCatalogApiEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isFormsCatalogApiEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_CATALOG_API_FLAG])
 
 /**
@@ -43,7 +45,7 @@ export const isFormsCatalogApiEnabled = (env: NodeJS.ProcessEnv = process.env): 
  * worker hace no-op prod-safe (cero queries; el schema greenhouse_growth puede no
  * estar migrado en prod). ON → drena submissions aceptadas y las entrega.
  */
-export const isFormsDispatchEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isFormsDispatchEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_DISPATCH_FLAG])
 
 /**
@@ -51,7 +53,7 @@ export const isFormsDispatchEnabled = (env: NodeJS.ProcessEnv = process.env): bo
  * resuelve skip controlado (no llama a HubSpot). Prod-safe: sin el flag, cero writes
  * a HubSpot aunque exista un destino `hubspot_forms_secure_submit` configurado.
  */
-export const isFormsHubSpotSecureSubmitEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isFormsHubSpotSecureSubmitEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_FLAG])
 
 /**
@@ -62,7 +64,7 @@ export const isFormsHubSpotSecureSubmitEnabled = (env: NodeJS.ProcessEnv = proce
  * (cierra el "POST directo mete basura"). Patrón canónico flag default-OFF + shadow +
  * flip tras staging. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
  */
-export const isFormsServerValidationEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isFormsServerValidationEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_SERVER_VALIDATION_FLAG])
 
 /**
@@ -72,7 +74,7 @@ export const isFormsServerValidationEnabled = (env: NodeJS.ProcessEnv = process.
  * noop) corren y la política del form (`block_field|warn|tag_only`) se aplica. Patrón
  * flag default-OFF + shadow + flip. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
  */
-export const isFormsEmailVerificationEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isFormsEmailVerificationEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_EMAIL_VERIFICATION_FLAG])
 
 /**
@@ -83,7 +85,7 @@ export const isFormsEmailVerificationEnabled = (env: NodeJS.ProcessEnv = process
  * los ve). Patrón flag default-OFF + shadow + flip tras staging. Requiere la key
  * provisionada. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
  */
-export const isFormsPiiEncryptionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isFormsPiiEncryptionEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_PII_ENCRYPTION_FLAG])
 
 /**
@@ -91,7 +93,7 @@ export const isFormsPiiEncryptionEnabled = (env: NodeJS.ProcessEnv = process.env
  * LLM, así que el presupuesto global queda en Infinity (el circuit-breaker de costo se
  * desactiva; sólo opera el rate-limit). Consumido por el abuse-guard core compartido.
  */
-export const resolveFormsAbuseLimits = (env: NodeJS.ProcessEnv = process.env) => ({
+export const resolveFormsAbuseLimits = (env: EnvSource = process.env) => ({
   perEmailPerDay: Number(env.GROWTH_FORMS_PER_EMAIL_PER_DAY) || 10,
   perIpPerDay: Number(env.GROWTH_FORMS_PER_IP_PER_DAY) || 30,
   globalDailyBudgetUsd: Number.POSITIVE_INFINITY,

@@ -1,5 +1,7 @@
 # Landing: Performance Marketing
 
+> **Delta 2026-10-23 — shared dock (TASK-2043).** The bottom dock is AXIS `efeonce.landing-dock` painted by plugin `eo-landing-dock` (config `manifests/landing-dock/performance.json`): phone; «Agenda un diagnóstico» → `#diagnostico`; stop `#diagnostico`. The legacy dock `nav.mbar` is stripped from the HTML while the dock is on (`off` brings it back); anything below describing the legacy dock is history and rollback context. Operate: `global-site-navigation.md` §Landing dock.
+
 ## Identity
 
 - URL: `https://efeoncepro.com/servicios/performance-marketing/` (child of `/servicios/`, `251077`)

@@ -1,0 +1,83 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:54:19.224Z",
+  "run": "ai-generations/2026-10-12_byteplus-direct-canary",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-12_byteplus-direct-canary",
+  "totalBytes": 5205895,
+  "fileCount": 12,
+  "files": [
+    {
+      "path": "fixture.png",
+      "sizeBytes": 30681,
+      "sha256": "140ad5eae69e80dd2df5b625db2e57c7bdef553f30d59a8bf5093043e1be89ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/fixture.png"
+    },
+    {
+      "path": "flash.png",
+      "sizeBytes": 1177687,
+      "sha256": "6ea24e76b5247a4921dcdb92a0d9399d93386ae45f3cab7f319fa5ce2c455dc5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/flash.png"
+    },
+    {
+      "path": "layerize/layers/byteplus-8f35b9f5656fc2e9/00-base.png",
+      "sizeBytes": 513264,
+      "sha256": "38161a3384dfc55eef5a43edb15a2db8ae3210b5157db1cb1f24ea6fa0a699ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/layerize/layers/byteplus-8f35b9f5656fc2e9/00-base.png"
+    },
+    {
+      "path": "layerize/layers/byteplus-8f35b9f5656fc2e9/01-plain-light-gray-background.png",
+      "sizeBytes": 351279,
+      "sha256": "30967ffcb30e54baa2d3cf32be672f9b46b2a258492a9bc5faff0a1dad6c9d2c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/layerize/layers/byteplus-8f35b9f5656fc2e9/01-plain-light-gray-background.png"
+    },
+    {
+      "path": "layerize/layers/byteplus-8f35b9f5656fc2e9/02-red-rounded-rectangle.png",
+      "sizeBytes": 435640,
+      "sha256": "f94734528d4c926aca311e5432141d02ae4541ce11fa41c64c570cb47928c16e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/layerize/layers/byteplus-8f35b9f5656fc2e9/02-red-rounded-rectangle.png"
+    },
+    {
+      "path": "layerize/layers/byteplus-8f35b9f5656fc2e9/03-blue-circle.png",
+      "sizeBytes": 466427,
+      "sha256": "34ecd10a880b5846b9f857f865db507f8fdc178dbb4b3db1e2cafe8526567213",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/layerize/layers/byteplus-8f35b9f5656fc2e9/03-blue-circle.png"
+    },
+    {
+      "path": "layers-contact-sheet.png",
+      "sizeBytes": 277321,
+      "sha256": "4a20051bc13a8e7d2979525b70c5e60ae1ec13e6399a04de52a5bd074afb380a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/layers-contact-sheet.png"
+    },
+    {
+      "path": "mini.mp4",
+      "sizeBytes": 891216,
+      "sha256": "ecbc00a2a7837ca851b3bc4ffcb80f84b95766c9e85297c048d8264396007e4b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/mini.mp4"
+    },
+    {
+      "path": "red-mask-preview.png",
+      "sizeBytes": 14064,
+      "sha256": "8d98f46e60fb084fc0d92ad0be2a6e4d190e97298357f437e419376f6d4bd327",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/red-mask-preview.png"
+    },
+    {
+      "path": "red-mask.png",
+      "sizeBytes": 2534,
+      "sha256": "9f8302c673a7adbb3f0de64e9715386547b2759f2469ccaa00155d2a08599585",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/red-mask.png"
+    },
+    {
+      "path": "seedance25-first-frame.png",
+      "sizeBytes": 136917,
+      "sha256": "61e92275f2dfe33a6e4639fff1df1b85624a9031e1460cc9393e217d0d3215bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/seedance25-first-frame.png"
+    },
+    {
+      "path": "seedance25.mp4",
+      "sizeBytes": 908865,
+      "sha256": "a9210beb59aa23222d5492db07c221bec0243be57abe242a7643214dd33b8018",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_byteplus-direct-canary/seedance25.mp4"
+    }
+  ]
+}

@@ -75,6 +75,7 @@ const SELECTION_ARTIFACT = `${CAT}/examples/designer.quote.artifact.json`
 const COMPOSITION_ARTIFACT = `${OP}/designer.artifact.json`
 const COURTESY = `${OP}/designer-startup-courtesy`
 const ADDON = `${OP}/managed-addon-increment`
+const CURRENT_DESIGNER_DEMAND = 'src/lib/finance/pricing-v3/__tests__/fixtures/current-designer-demand-2026-10-22.json'
 
 const roots: string[] = []
 
@@ -838,12 +839,12 @@ const CURRENT: { id: string; command: string[]; explicit: () => string[]; out?: 
   },
   {
     id: 'compose prepare',
-    command: ['compose', 'prepare', '--input', `${OP}/designer-on-demand.demand.json`],
+    command: ['compose', 'prepare', '--input', CURRENT_DESIGNER_DEMAND],
     explicit: () => named('catalog', 'policy', 'credits')
   },
   {
     id: 'compose quote --out',
-    command: ['compose', 'quote', '--input', `${OP}/designer-on-demand.demand.json`],
+    command: ['compose', 'quote', '--input', CURRENT_DESIGNER_DEMAND],
     explicit: () => named('catalog', 'policy', 'credits'),
     out: 'quote.artifact.json'
   }

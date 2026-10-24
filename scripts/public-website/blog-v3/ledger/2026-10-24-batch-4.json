@@ -1,0 +1,111 @@
+{
+    "contract": "eo-format-backfill-ledger.v1",
+    "mode": "apply",
+    "at": "2026-10-24T07:43:59+00:00",
+    "proposal_sha256": "e6ae85cc94bef9b1748d7291bf170764d15fb6d3ad55e2a50b33f512da986103",
+    "batch": 10,
+    "applied": 10,
+    "remaining": 4,
+    "entries": [
+        {
+            "id": 250196,
+            "slug": "glitch-12-agentes-toman-stack",
+            "title": "Glitch #12: la AI dejó de adoptarse, ahora opera tu marketing",
+            "before": [],
+            "after": [
+                "glitch-edicion"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 250390,
+            "slug": "glitch-13-agentes-checkout-y-el-criterio",
+            "title": "Glitch #13: agentes, checkout y el criterio del marketing",
+            "before": [],
+            "after": [
+                "glitch-edicion"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 251068,
+            "slug": "glitch-14-ia-noticias-marketing",
+            "title": "GLITCH #14: El modelo a centavos, el checkout en vivo, el acceso con dueño.",
+            "before": [],
+            "after": [
+                "glitch-edicion"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 251314,
+            "slug": "platform-properties-para-search-consol",
+            "title": "Platform Properties para Search Console: Google admite que la búsqueda ya no ocurre en un solo lugar",
+            "before": [],
+            "after": [
+                "glitch-nota"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 251326,
+            "slug": "gpt-5-6-y-chatgpt-work-openai",
+            "title": "GPT-5.6 y ChatGPT Work: OpenAI ya no está lanzando modelos, está cambiando la forma de trabajar con IA",
+            "before": [],
+            "after": [
+                "glitch-nota"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 251336,
+            "slug": "glitch-15-ia-abundante-barata-global",
+            "title": "Glitch #15: Token barato, criterio caro, y las capas que no controlas.",
+            "before": [],
+            "after": [
+                "glitch-edicion"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 251363,
+            "slug": "creative-workflows",
+            "title": "Creative Workflows: cómo escalar la creatividad sin automatizar el criterio",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 251397,
+            "slug": "dashboards-hubspot-confiables-caso-anam",
+            "title": "Un dashboard no arregla un proceso comercial: cómo construimos paneles confiables en HubSpot para ANAM",
+            "before": [],
+            "after": [
+                "caso"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 251432,
+            "slug": "ia-atencion-cliente-caso-anam",
+            "title": "¿Qué necesita una IA para atender bien a tus clientes? Lo que aprendimos diseñando el Customer Agent de ANAM",
+            "before": [],
+            "after": [
+                "caso"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 250748,
+            "slug": "i-know-kung-fu-agent-skills-momento-matrix-ia-empresarial",
+            "title": "«I Know Kung Fu»: el momento Matrix de los Agent Skills",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        }
+    ]
+}

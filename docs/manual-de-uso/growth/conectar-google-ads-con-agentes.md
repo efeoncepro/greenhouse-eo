@@ -9,8 +9,10 @@ la futura incorporación al producto. [Resultado funcional](../../documentation/
 El rollout online posterior tiene su propio [manual de activación](activar-conversiones-google-ads.md)
 y [evidencia del 18/10](../../audits/growth/2026-10-18-google-ads-activation.md): dos acciones nativas,
 Web 6/Server 10, EC ON y políticas Performance/Discovery activadas. No equivale a ingesta por la CLI,
-conexión multiorganización o primera conversión atribuida. La ampliación a otros formularios
-comerciales continúa en propuestas validadas sin publicar; [cobertura](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+conexión multiorganización o primera conversión atribuida. La cobertura fue publicada y releída:
+13 Forms comerciales+Discovery; Grader incluido y Contacto/ebooks fueraAds.
+[Publicación](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md) y
+[release/canarios](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
 
 ## Antes de operar
 

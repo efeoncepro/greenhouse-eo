@@ -1,5 +1,7 @@
 # Landing: HubSpot Services
 
+> **Delta 2026-10-23 — dock compartido (TASK-2043).** El dock inferior es el AXIS `efeonce.landing-dock` pintado por el plugin `eo-landing-dock` (config `manifests/landing-dock/hubspot.json`): teléfono; «Agendar reunión» (CTA propio `hubspot-discovery-meeting`) · «Ir al formulario» → `#agenda-form`; sin parada; `cta-location=landing_dock` reemplaza `hubspot_mobile_dock`. El dock viejo `nav.mdock` se quita del HTML mientras el dock está activo (`off` lo devuelve); lo que abajo describe el dock viejo es historia y contexto de rollback. Operar: `global-site-navigation.md` §Landing dock.
+
 > **Delta 2026-10-16 (noche) — correcciones post-publicación, detalle del dock y renderer CTA 1.3.1.** Complementa los
 > dos deltas siguientes (no los repite).
 > - **Correcciones de implementación** (en la fuente `hubspot-v2-source/` y el compilador): el compilador
@@ -95,6 +97,13 @@ The approved Claude Design export replaced the legacy body. Its SHA is
 `f95b6254c2434b58a4d6855dded40dd3a38acb19b881e090e1928674ab8bb812`.
 Keep that source intact; approved later corrections live in adapters and native content. Do not restore
 legacy sections or rejected designs. `/servicios/hubspot/` was not the published migration target.
+- **Temporary 302 (operator, 2026-10-22; PDR-020 delta point 12):** Yoast SEO Premium redirect
+  `servicios/hubspot` → `servicios-contratar-hubspot`, type **302**, format `plain` (before it, WordPress guessed a 301 to
+  the 2024 post `/hubspot/hubspot-marketing-ventas/`). Backup option `_gh_hubspot_302_before_20261022`; option md5 before
+  `93bf1917…`, after `8508b21a…`; 116 → 117 redirects. **Rollback:** delete only that object with
+  `WPSEO_Redirect_Manager::delete_redirects([new WPSEO_Redirect('servicios/hubspot', 'servicios-contratar-hubspot', 302, 'plain')])`,
+  then `wp cache flush` + `wp kinsta cache purge --all`; never restore the whole option. When the PDR-013 pillar ships at
+  `/servicios/hubspot/`, delete this 302 before publishing it and apply PDR-013's 301 in the opposite direction.
 Consult the task registry for formal TASK-1352 lifecycle; publication alone does not close its broader scope.
 
 Latest recorded editorial readback (2026-08-31):

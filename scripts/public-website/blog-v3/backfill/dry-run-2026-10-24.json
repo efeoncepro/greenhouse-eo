@@ -1,0 +1,7 @@
+{
+  "mode": "dry-run",
+  "overrides": {
+    "como-crear-formularios-con-validacion-de-rut": "guia",
+    "ejecutar-loop-marketing-hubspot": "guia"
+  }
+}

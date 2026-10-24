@@ -25,8 +25,8 @@ import { runCompetitorCoverageBatch } from '../../src/lib/growth/seo/competitor-
 const SANITY_DOMAIN = 'sanity-task-1662.invalid'
 const ACTOR = 'sanity-task-1662'
 
-const ENV_ON = { ...process.env, GROWTH_SEO_ENABLED: 'true' } as NodeJS.ProcessEnv
-const ENV_GAP_OFF = { ...ENV_ON, GROWTH_SEO_COMPETITOR_GAP_ENABLED: 'false' } as NodeJS.ProcessEnv
+const ENV_ON = { ...process.env, GROWTH_SEO_ENABLED: 'true' }
+const ENV_GAP_OFF = { ...ENV_ON, GROWTH_SEO_COMPETITOR_GAP_ENABLED: 'false' }
 
 let pass = 0
 let fail = 0

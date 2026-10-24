@@ -321,7 +321,9 @@ El oficio completo está en la skill `audio-studio` y en la etapa 10 del método
 - La **música** va en un tramo continuo y el montaje se ajusta a su grilla de tiempo.
 - El **silencio** se planifica como un evento más (corte de música en el punto de giro).
 - La voz de cada personaje se fija en la biblia (timbre, acento, edad), igual que su cara.
-- **Límite**: el agente no oye; la escucha es humana.
+- **Límite**: el agente no oye; la escucha es humana. Lo medible (silencios, golpes, cortes y su sincronía con la
+  grilla) se controla antes de mostrar con `pnpm ai:listen --measure-only`; ver
+  [escuchar y mirar media](../../manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
 
 **Plantilla**: elemento · plano y momento en la grilla · fuente (voz grabada, voz sintética, música licenciada,
 librería) · estado.

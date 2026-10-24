@@ -105,6 +105,10 @@ completa.
 - **Mezcla:** la música baja bajo la voz (sidechain); master a −16 LUFS / −1 dBTP.
 - **Escucha:** el agente no escucha y no hay ASR local. La elección de tomas de voz por calce de tiempo es provisoria:
   **la escucha del operador es el control** y debe pedirse de forma explícita.
+- **Medición antes de mostrar:** corre `pnpm ai:listen --file mezcla.wav --file corte.mp4 --cues audio-cues.json --measure-only`
+  (sin costo): confirma silencios, golpes y picos de la grilla y la sincronía entre ataques y cortes. Gemini, si se usa,
+  va siempre con `--verify`. No reemplaza la escucha del operador. Ver
+  [escuchar y mirar media](../ai-tooling/escuchar-y-mirar-media-con-gemini.md).
 
 ### Paso 9 · Subtítulos
 

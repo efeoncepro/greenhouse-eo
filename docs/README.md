@@ -12,6 +12,18 @@ Indice maestro de la documentacion no operativa del repo.
    - [Handoff.md](../Handoff.md)
 2. Entrar a la categoria de documentacion que corresponda al trabajo.
 
+## Medición comercial: Forms, agendas y anuncios
+
+[Taxonomía comercial CRM](architecture/EFEONCE_COMMERCIAL_ACQUISITION_TAXONOMY_DECISION_V1.md): separación aceptada; schema y transición aún sin aplicar.
+
+[Arquitectura](architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md) ·
+[funcionamiento](documentation/growth/google-ads-measurement.md) ·
+[manual Ads](manual-de-uso/growth/activar-conversiones-google-ads.md) ·
+[release Grader/clasificación](audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
+La evidencia fechada distingue publicación de recepción/atribución real; no repetir planes históricos.
+LinkedIn: [propuesta y discovery](architecture/GREENHOUSE_LINKEDIN_ADS_MEASUREMENT_ARCHITECTURE_V1.md),
+[funcionamiento](documentation/growth/linkedin-ads-measurement.md) y [preparación](manual-de-uso/growth/preparar-medicion-linkedin.md); sin instalación.
+
 ## Mapa por categoria
 
 ### Business Models

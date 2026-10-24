@@ -40,7 +40,15 @@
 > todavía no compone MCM.
 
 **Nombre canónico:** «registro Marketing con Manzanitas» (abreviado «registro MCM» o «registro Manzanitas»). MCM es la
-marca editorial evergreen del blog de Efeonce: marketing explicado simple.
+marca editorial evergreen de Efeonce: marketing explicado simple, en el blog, el newsletter quincenal del LinkedIn de
+Julio y YouTube (familia de canales de
+[PDR-020, delta 2026-10-22](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)).
+Qué canal publica cada pieza lo decide PDR-020, no este registro. Decisiones del operador del 2026-10-22 (PDR-020,
+delta punto 12): la **story** va en stories de Instagram (nunca en el feed, máximo una por semana, con enlace al blog
+o a la suscripción a Glitch); el **pódcast** no tiene canal (si se produce, va a YouTube en video); el **newsletter
+del LinkedIn de Julio** suma una pieza, la portada de la edición 1920 × 1080, que se compone como la miniatura de
+YouTube (norma §5.7; sin plantilla en AXIS todavía). MCM y Glitch son marcas hermanas: el público ve «Marketing con
+Manzanitas» y «Think» es nombre interno.
 
 ## 0. Alcance — decide esto primero
 
@@ -221,6 +229,10 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
 - **Miniatura de YouTube:** Escena 16:9 (1280 × 720 en el canvas), cabecera de MCM arriba a la izquierda y el logo de
   Efeonce abajo a la izquierda (tablero `Escena-youtube`). Sin eslogan. El **cierre del video** sí lo lleva
   (`YouTube-cierre`).
+- **Un tutorial (operador, 2026-10-22):** cada video sale con **dos miniaturas** para la prueba A/B de YouTube; el
+  título es la búsqueda dicha como la diría una persona, nunca clickbait; capítulos con una cartela de La órbita por
+  capítulo y cierre de marca de este registro. Anatomía completa en la
+  [estrategia de love brand §8.3](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
 - **Pódcast (1:1):** la cabecera del programa en grande (**420 px**), porque la portada se ve a 160 px (ahí queda en
   62 px). Sin eslogan.
 
@@ -963,7 +975,7 @@ el acento; §10.1). Los carruseles de ejemplo del Composer y las identidades del
 - Sub-línea hermana (no se mezcla): [glitch.md](glitch.md).
 - ADR del registro, [Delta 2026-09-29](../../../../docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md#delta-2026-09-29--decisiones-del-operador-y-catálogo-del-artifact-composer)
   (decisiones del operador y catálogo del Artifact Composer).
-- TASK-1939: [`TASK-1939-manzanitas-artifact-composer-catalog.md`](../../../../docs/tasks/in-progress/TASK-1939-manzanitas-artifact-composer-catalog.md).
+- TASK-1939: [`TASK-1939-manzanitas-artifact-composer-catalog.md`](../../../../docs/tasks/complete/TASK-1939-manzanitas-artifact-composer-catalog.md).
 - Código del Composer: `scripts/manzanitas/` (`compose.ts`, `compile-tokens.ts`, `painters.ts`, `errors.ts`),
   `src/lib/artifact-composer/catalogs/manzanitas/` (plantillas, `registry.json`, validadores y hooks) y
   `src/lib/manzanitas-composition/` (mapper, `materialize.ts`, ejemplos).

@@ -28,6 +28,11 @@ no duplicar entidades, no transformar cifras ilustrativas en ratings y distingui
 4. Ajusta padding responsive y colores desde Estilo sólo cuando la revisión lo requiera.
 5. No dupliques Experiencia: modal, progreso y CTA móvil deben existir una sola vez. Para otros módulos,
    evita anclas duplicadas y actualiza los enlaces internos si cambias un identificador.
+   Desde el 2026-10-23 el CTA móvil propio (`div[data-sticky-cta]`) no se sirve: en el teléfono la Home usa el
+   [dock compartido de las landings](operar-dock-de-landings.md) («Agenda una reunión», con el agendador del menú),
+   que empieza tras `[data-capture="hero"]` y se retira en `[data-capture="agenda"]`. Si cambias esos marcadores,
+   actualiza `manifests/landing-dock/home.json` en el runtime y vuelve a revisar con
+   `pnpm public-website:landing-dock preview home`.
 6. Guarda y recarga el editor. Revisa el público en desktop, tablet de 890 px y móvil de 390 px,
    con teclado y movimiento reducido. Comprueba overflow y estados hover, no sólo el reposo.
 

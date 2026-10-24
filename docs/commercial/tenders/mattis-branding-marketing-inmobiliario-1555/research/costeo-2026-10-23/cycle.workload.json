@@ -1,0 +1,262 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "mattis-cycle-v1",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "125",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "mattis:hypothesis-capacity-125-productive-180-scheduled",
+      "effectiveFrom": "2026-10-23",
+      "effectiveUntil": "2026-10-30",
+      "status": "estimated"
+    }
+  },
+  "drivers": [
+    {
+      "driverId": "static-design",
+      "label": "Diseño de maestra estática",
+      "unit": "unidad-entregable",
+      "unitsPerMonth": "4",
+      "minutesPerUnit": "180",
+      "source": {
+        "reference": "mattis:scope-estimate-static-design-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "driverId": "carousel-design",
+      "label": "Diseño de carrusel hasta 5 láminas",
+      "unit": "unidad-entregable",
+      "unitsPerMonth": "2",
+      "minutesPerUnit": "360",
+      "source": {
+        "reference": "mattis:scope-estimate-carousel-design-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "driverId": "format-adaptation",
+      "label": "Adaptación de formato",
+      "unit": "unidad-entregable",
+      "unitsPerMonth": "12",
+      "minutesPerUnit": "45",
+      "source": {
+        "reference": "mattis:scope-estimate-format-adaptation-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "driverId": "static-copy",
+      "label": "Texto de estática",
+      "unit": "unidad-entregable",
+      "unitsPerMonth": "4",
+      "minutesPerUnit": "60",
+      "source": {
+        "reference": "mattis:scope-estimate-static-copy-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "driverId": "carousel-copy",
+      "label": "Texto de carrusel",
+      "unit": "unidad-entregable",
+      "unitsPerMonth": "2",
+      "minutesPerUnit": "120",
+      "source": {
+        "reference": "mattis:scope-estimate-carousel-copy-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "driverId": "video-script",
+      "label": "Guion de video corto",
+      "unit": "unidad-entregable",
+      "unitsPerMonth": "2",
+      "minutesPerUnit": "120",
+      "source": {
+        "reference": "mattis:scope-estimate-video-script-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "driverId": "video-edit",
+      "label": "Edición video 15–45 s",
+      "unit": "unidad-entregable",
+      "unitsPerMonth": "2",
+      "minutesPerUnit": "480",
+      "source": {
+        "reference": "mattis:scope-estimate-video-edit-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    }
+  ],
+  "fixedWork": [
+    {
+      "workId": "cycle-strategy",
+      "label": "Estrategia: bloque de cycle, incluye revisiones y QA",
+      "hoursPerMonth": "4",
+      "source": {
+        "reference": "mattis:scope-estimate-cycle-strategy-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "cycle-art",
+      "label": "Dirección de arte: bloque de cycle, incluye revisiones y QA",
+      "hoursPerMonth": "8",
+      "source": {
+        "reference": "mattis:scope-estimate-cycle-art-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "cycle-pm",
+      "label": "Gestión y calidad: bloque de cycle, incluye revisiones y QA",
+      "hoursPerMonth": "14",
+      "source": {
+        "reference": "mattis:scope-estimate-cycle-pm-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "cycle-design-fixed",
+      "label": "Mantenimiento de plantillas, orden y QA",
+      "hoursPerMonth": "4",
+      "source": {
+        "reference": "mattis:scope-estimate-cycle-design-fixed-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "cycle-copy-fixed",
+      "label": "Planificación editorial y revisión general",
+      "hoursPerMonth": "6",
+      "source": {
+        "reference": "mattis:scope-estimate-cycle-copy-fixed-v1",
+        "effectiveFrom": "2026-10-23",
+        "effectiveUntil": "2026-10-30",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "cycle-strategy",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "cycle-strategy",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "cycle-art",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "cycle-art",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "cycle-design",
+      "driverShares": [
+        {
+          "driverId": "static-design",
+          "share": "1"
+        },
+        {
+          "driverId": "carousel-design",
+          "share": "1"
+        },
+        {
+          "driverId": "format-adaptation",
+          "share": "1"
+        }
+      ],
+      "fixedWorkShares": [
+        {
+          "workId": "cycle-design-fixed",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "cycle-copy",
+      "driverShares": [
+        {
+          "driverId": "static-copy",
+          "share": "1"
+        },
+        {
+          "driverId": "carousel-copy",
+          "share": "1"
+        },
+        {
+          "driverId": "video-script",
+          "share": "1"
+        }
+      ],
+      "fixedWorkShares": [
+        {
+          "workId": "cycle-copy-fixed",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "cycle-motion",
+      "driverShares": [
+        {
+          "driverId": "video-edit",
+          "share": "1"
+        }
+      ],
+      "fixedWorkShares": [],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    },
+    {
+      "lineId": "cycle-pm",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "cycle-pm",
+          "share": "1"
+        }
+      ],
+      "reason": "Hipótesis de esfuerzo del programa; validar con responsable de práctica."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.01"
+  }
+}

@@ -30,13 +30,15 @@ import type { InsightEditionRecord } from '../stores/records'
 import { getInsightEvidenceSnapshotByEdition } from '../stores/snapshot-store'
 import { runInsightGeneration, type RunGenerationResult } from './generation'
 
+import type { EnvSource } from '@/types/env-source'
+
 interface LifecycleInput {
   subject: TenantEntitlementSubject
   actorOrganizationId: string | null
   organizationId: string
   editionId: string
   reason: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 export const issueInsightEdition = async (input: LifecycleInput): Promise<{ edition: InsightEditionRecord; idempotent: boolean }> => {

@@ -111,7 +111,9 @@ contrato del portal.
   ahí sale `buyer.taxId` de la plantilla A4.
 - **La hora de cierre se muestra en la hora local del usuario**, sin zona visible: 19:00 en Santiago era 16:00 en
   Ciudad de México. Se confirmó preguntando. Registra el cierre con las dos zonas y nunca asumas que la hora
-  visible es la del comprador.
+  visible es la del comprador. No es una regla estable: en Gana GRD-1541 (20/10/2026) la UI mostró 18:00 sin zona
+  y la invitación decía 14:00 hora de Colombia, y no se pudo conciliar. Con dos fuentes en conflicto, la hora
+  queda «por conciliar», no se persiste en el CRM y se postula temprano.
 - **Adjuntos (paso 2):** tres casilleros —administrativos, técnicos y económicos— y un límite de peso por archivo que
   configura cada comprador: en el caso, **20 MB** (leído el 13/10/2026). El reel pesaba 23 MB y no se adjuntó; se ve por el
   QR y el enlace del deck. Comprueba el límite antes de exportar los finales y ten lista la copia liviana.
@@ -130,6 +132,11 @@ Esta etapa empieza sólo cuando el operador instruye explícitamente preparar o 
 los requisitos varían por licitación: verifica los campos y adjuntos de la ficha vigente, no reutilices una lista
 de otro proceso como si fuera una condición contractual. Regla del operador: presentar, cargar archivos o enviar
 mensajes en Wherex sólo con su confirmación expresa **en ese momento**.
+
+Runbook medido de una postulación completa (navegador, carga de obligatorios, resumen y envío; Gana GRD-1541,
+20/10/2026): `platform-bids-and-administrative-package.md` → «Postular en Wherex». Lo esencial: se postula con
+**Claude in Chrome** en la sesión del operador, no con el navegador del panel de la app (no dibuja el paso 1 ni
+adjunta archivos), y al paso 1 se llega desde `?tab=information` con «Siguiente», no con la URL directa.
 
 1. En **Servicio licitado**, mira primero la estructura que pide esa ficha: varios ítems con `Ofertar`, cantidad y
    precio unitario, o un solo servicio con un monto total. Completa sólo desde la cotización aprobada y en la

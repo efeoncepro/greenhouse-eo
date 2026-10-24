@@ -38,6 +38,10 @@ Fuentes primarias del marco de resultados: [anuncio Fall Spotlight](https://ir.h
 
 ## ChatGPT Ads dentro de HubSpot
 
+> **Delta 2026-10-21.** OpenAI habilitó ChatGPT Ads en Chile (self-service y partners), así que la integración ya
+> aplica a portales chilenos. Efeonce la vende como composición de su [oferta ChatGPT Ads](../media-distribution/CHATGPT_ADS_SERVICE_V1.md).
+> Hasta esa fecha esta sección prohibía prometer Chile habilitado.
+
 ### Requisitos y flujo de acceso
 
 HubSpot marca la integración como **Beta** y la documentación indica disponibilidad con todos los productos y planes,
@@ -202,7 +206,7 @@ registro no sustituye el contrato ni el DPA del cliente.
   ChatGPT Ads y evaluación de conectores/agentes.
 - **Pilot-first:** ChatGPT Ads beta, Agent Hub/Agent Builder, MCP writes y Scheduled Prompts. El alcance debe quedar
   limitado a un portal, una audiencia/cohorte y objetivos medibles.
-- **No prometer:** Chile habilitado, pricing, seats, créditos incluidos, volumen de entrega, benchmarks, revenue
+- **No prometer:** pricing, seats, créditos incluidos, volumen de entrega, benchmarks, revenue
   incremental, disponibilidad de una acción MCP, publicación de un agente o ejecución de un scheduled prompt sin
   evidencia del portal.
 - **Approval gate:** conexión de cuentas, consentimiento/sync de contactos, publicación de anuncios, creación de

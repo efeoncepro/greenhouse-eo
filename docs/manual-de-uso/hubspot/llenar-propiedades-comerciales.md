@@ -87,6 +87,9 @@ servicio en Lead tienen semántica Deal ambigua: no poblar por defecto.
 
 ## Deal: oportunidad y avance
 
+Adquisición19/10: [separación conceptual aceptada](../../architecture/EFEONCE_COMMERCIAL_ACQUISITION_TAXONOMY_DECISION_V1.md).
+El campo legacy sigue intacto; [plan de transición](normalizar-origen-canales-adquisicion.md) preparado, sin nuevos campos ni backfill.
+
 La creación depende de oportunidad/calificación y alcance autorizado; no de cantidad de contactos o
 selección ABM. La relación comercial y los [criterios Commercial](../../../.codex/skills/commercial-expert/SKILL.md)
 se documentan aunque no existan campos custom para todos ellos.

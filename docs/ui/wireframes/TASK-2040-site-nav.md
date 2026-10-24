@@ -126,20 +126,21 @@ trae etiquetas de sistema:
 | Recursos sin datos dinámicos | Muestra el `featured` fijo del documento. |
 | Etiquetas largas | Se cortan en dos líneas como máximo, con elipsis. La cápsula no crece más de 575 px. |
 | Contexto «Estás aquí» | La línea o el servicio de la landing actual se marca al abrir. |
-| Sin JavaScript | Los enlaces de la cápsula y del onepage existen en el HTML. Los disparadores son enlaces a su página índice (`/soluciones/`, `/blog/`, `/about-us-efeonce/` [verificar destinos]). El botón del agendador es un enlace a `/agenda/`. |
+| Sin JavaScript | Los enlaces de la cápsula y del onepage existen en el HTML. Los disparadores son enlaces a su página índice (`/servicios/`, `/blog/` y `/about-us-efeonce/`, verificados en vivo el 2026-10-22). El botón del agendador es un enlace a `/agenda/`. |
 | Teclado | Foco visible `2px #72ded8` con offset 3. |
 | Movimiento reducido | Sin desplazamientos; cambios instantáneos. |
 | Tacto (`hover: none`) | Abre y cierra por toque, sin vista previa por servicio. |
 
 ## Implementation Mapping
 
-- **Paquete:** `@efeoncepro/axis-ui-primitives`, export `site-nav` (render de servidor), `site-nav.css` y `site-nav.js`.
-  Sigue el patrón de `mention.ts`, `mention-css.ts` y `mention-react.ts` en `packages/primitives/src`; aquí sin React.
+- **Paquete:** `@efeoncepro/axis-ui-primitives`, exports `./site-nav` (`siteNavHtml`, render de servidor),
+  `./site-nav.css` y `./site-nav.js` (`enhanceSiteNav`, sin imports). Archivos `site-nav.ts`, `site-nav-css.ts` y
+  `site-nav-browser.ts` en `packages/primitives/src`; sin React.
 - **Contrato:** `efeonce.site-nav` en `@efeoncepro/axis-ui-contracts`, con el esquema `site-nav.v1` exportado como JSON
   Schema para que el plugin de WordPress lo valide.
-- **Tokens:** receta de vidrio, alturas de cabecera, tamaños de logo y tiempos de motion en `axis-tokens`, con un nombre
-  de grupo por definir en la task. No van como literales en el CSS del sitio.
-- **Íconos:** catálogo Trazo de AXIS (`resolveIcon`), 22 px.
+- **Tokens:** grupo `axisSiteNav` en `axis-tokens` (receta de vidrio, isla, alturas, logo, breakpoints y tiempos sobre
+  `axisMotion`). Una prueba impide HEX, `rgba` y milisegundos escritos a mano en la fuente del CSS.
+- **Íconos:** catálogo Trazo de AXIS (`iconSvg`), 22 px en el mega y 18 px en el onepage; un glifo desconocido es error del documento.
 - **Logo:** `@efeoncepro/axis-brand-assets`. Glitch con su logo negativo oficial.
 - **Lab:** `/patterns/efeonce.site-nav/`, con el documento de ejemplo del canvas y los ajustes «Contexto» y «Cabecera».
 

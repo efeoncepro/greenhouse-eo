@@ -1,0 +1,69 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-difference",
+  "voice": {
+    "eyebrow": "Seguridad y accesos",
+    "question": "¿Quién entra a mi HubSpot?",
+    "answer": [
+      "Sólo quien",
+      "debe"
+    ]
+  },
+  "body": "Entramos con acceso Partner y permisos **mínimos**. Los cambios sensibles los apruebas tú.",
+  "alternative": {
+    "kicker": "Soporte sin reglas",
+    "title": "Accesos sin control"
+  },
+  "efeonce": {
+    "kicker": "Soporte con",
+    "title": "Accesos con control"
+  },
+  "versus": "vs",
+  "rows": [
+    {
+      "alternative": "Contraseñas compartidas entre personas",
+      "efeonce": "Acceso Partner nominativo, sin licencia extra"
+    },
+    {
+      "alternative": "Permisos de superadministrador para todo",
+      "efeonce": "Permisos mínimos según cada tarea"
+    },
+    {
+      "alternative": "Cambios directo en producción",
+      "efeonce": "Pruebas e historial de cada cambio"
+    },
+    {
+      "alternative": "Cambios sensibles sin aviso",
+      "efeonce": "Tu aprobación antes de publicar"
+    },
+    {
+      "alternative": "Al terminar, accesos que quedan",
+      "efeonce": "Salida limpia y accesos revocados"
+    }
+  ],
+  "ownTeam": {
+    "kicker": "¿Y tu equipo de TI?",
+    "title": "Lo ve con nosotros",
+    "pillars": [
+      {
+        "title": "Identidad",
+        "description": "Accesos nominativos y revocables"
+      },
+      {
+        "title": "Cambios",
+        "description": "Probados y documentados"
+      },
+      {
+        "title": "Auditoría",
+        "description": "Accesos y cambios a la vista"
+      }
+    ]
+  },
+  "line": "revenue-hubspot",
+  "use": "proposal"
+}

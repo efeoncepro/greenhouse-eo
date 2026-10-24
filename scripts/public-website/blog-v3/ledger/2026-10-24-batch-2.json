@@ -1,0 +1,111 @@
+{
+    "contract": "eo-format-backfill-ledger.v1",
+    "mode": "apply",
+    "at": "2026-10-24T07:43:53+00:00",
+    "proposal_sha256": "e6ae85cc94bef9b1748d7291bf170764d15fb6d3ad55e2a50b33f512da986103",
+    "batch": 10,
+    "applied": 10,
+    "remaining": 24,
+    "entries": [
+        {
+            "id": 245605,
+            "slug": "inbound-marketing-paid-media",
+            "title": "Inbound Marketing y Paid Media: Técnicas Avanzadas para Optimizar SEM, PPC y Display",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 245732,
+            "slug": "efeonce-truora",
+            "title": "¡Efeonce + Truora: La Alianza que Llevará tu Negocio a Otro Nivel!",
+            "before": [],
+            "after": [
+                "novedad"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 246024,
+            "slug": "como-crear-formularios-con-validacion-de-rut",
+            "title": "Cómo crear formularios con validación de RUT chileno en minutos",
+            "before": [],
+            "after": [
+                "guia"
+            ],
+            "source": "override"
+        },
+        {
+            "id": 246033,
+            "slug": "5-pasos-para-transformar-tu-crm-en-motor-de-crecimiento",
+            "title": "5 Pasos para transformar tu CRM en el motor de crecimiento de tu Negocio",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 246045,
+            "slug": "crea-un-pipeline-de-ventas-que-convierte-guia-paso-a-paso",
+            "title": "Crea un Pipeline de Ventas que Convierte: Guía Paso a Paso",
+            "before": [],
+            "after": [
+                "guia"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 246072,
+            "slug": "de-excel-a-hubspot-en-5-dias",
+            "title": "De Excel a HubSpot en 5 Días: Organiza, Automatiza y Escala tus Ventas",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 246110,
+            "slug": "como-alinear-marketing-con-experiencia-del-cliente",
+            "title": "Yo solo quería cambiar mis lentes: Una lección sobre cómo alinear marketing con experiencia del cliente",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 246315,
+            "slug": "contratar-agencia-de-marketing",
+            "title": "¿Es hora de contratar una agencia de marketing? Guía práctica para elegir la mejor opción",
+            "before": [],
+            "after": [
+                "guia"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 248398,
+            "slug": "que-es-loop-marketing",
+            "title": "¿Qué es Loop Marketing? El framework que reemplaza al funnel y evoluciona el inbound",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        },
+        {
+            "id": 248463,
+            "slug": "seo-aeo-optimizacion-ia-2025",
+            "title": "SEO + AEO: optimización para buscadores y motores de respuesta en 2025",
+            "before": [],
+            "after": [
+                "articulo"
+            ],
+            "source": "rule"
+        }
+    ]
+}

@@ -87,13 +87,19 @@ const REPLAY: Record<(typeof ARTIFACT_VERSIONS)[number], (raw: unknown) => Repla
 }
 
 const loadCorpus = () => {
-  const artifacts = [...walk('data/pricing', '.artifact.json'), ...walk('docs/commercial', '.artifact.json')]
+  const files = [...walk('data/pricing', '.artifact.json'), ...walk('docs/commercial', '.artifact.json')]
     .sort()
     .map(path => {
       const text = readFileSync(path, 'utf8')
 
       return { path, text, ...identifyArtifact(JSON.parse(text)) }
     })
+
+  // The corpus is a set of calculations, not of files: a tender may keep the same calculation twice (an initial and
+  // a final copy, other bytes, same replay digest — Mattis 1555, 2026-10-23). A storage holds it once and refuses the
+  // second write (OUTPUT_EXISTS, which case 2 asserts), so the battery seeds the first copy by path.
+  const seen = new Set<string>()
+  const artifacts = files.filter(artifact => (seen.has(artifact.replayDigest) ? false : (seen.add(artifact.replayDigest), true)))
 
   const versions = (prefix: string) =>
     readdirSync(OPERATING)

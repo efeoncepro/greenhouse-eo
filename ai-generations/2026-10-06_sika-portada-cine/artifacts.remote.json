@@ -1,0 +1,503 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:42:10.219Z",
+  "run": "ai-generations/2026-10-06_sika-portada-cine",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-06_sika-portada-cine",
+  "totalBytes": 268928984,
+  "fileCount": 82,
+  "files": [
+    {
+      "path": "contraportada-brand.png",
+      "sizeBytes": 481896,
+      "sha256": "82263f6c56bed70fc44ffe48dc272592eb63d72fde4a00bc55fabddd5c375d77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/contraportada-brand.png"
+    },
+    {
+      "path": "cs1-compuesto.png",
+      "sizeBytes": 10100367,
+      "sha256": "f2cde43bd5fa23569df06438c5f9dc17250bc8f6bb82c066d7dd21be0e839454",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/cs1-compuesto.png"
+    },
+    {
+      "path": "CS1-sika-squad.png",
+      "sizeBytes": 9932500,
+      "sha256": "adcaaacab9a737d837871899e019a993a3abcec2ea7d882c0ca5dba351d8b539",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/CS1-sika-squad.png"
+    },
+    {
+      "path": "inpaint/inpaint/06954e6eca0a/candidate-1-diff.png",
+      "sizeBytes": 961657,
+      "sha256": "a3ce81a5eb5afae3e36d02177dd6731ace8249290d39a2b3bededbac19ca5235",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/06954e6eca0a/candidate-1-diff.png"
+    },
+    {
+      "path": "inpaint/inpaint/06954e6eca0a/candidate-1-raw.png",
+      "sizeBytes": 3321436,
+      "sha256": "c37cb24111d78219da1e84c1ee84637141d7a4c7f53f8c2476f3864ae4f0806e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/06954e6eca0a/candidate-1-raw.png"
+    },
+    {
+      "path": "inpaint/inpaint/06954e6eca0a/candidate-1.png",
+      "sizeBytes": 3434420,
+      "sha256": "69aa1af999836f7e27a490ea62afdb4f7bb63027f1ec936a62b739127b03adf1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/06954e6eca0a/candidate-1.png"
+    },
+    {
+      "path": "inpaint/inpaint/06954e6eca0a/mask-preview.png",
+      "sizeBytes": 4585228,
+      "sha256": "afa1f96a79a5871af1d01fbba5f2127870068df3f1a693b9d66d33662dd11b0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/06954e6eca0a/mask-preview.png"
+    },
+    {
+      "path": "inpaint/inpaint/06954e6eca0a/provider-input.png",
+      "sizeBytes": 4900880,
+      "sha256": "1e78044ae3752326d32c66011f74a9103ef28d1d98a6796d69bb67a533e6e2a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/06954e6eca0a/provider-input.png"
+    },
+    {
+      "path": "inpaint/inpaint/06954e6eca0a/provider-mask.png",
+      "sizeBytes": 88291,
+      "sha256": "d2a507810a8ac0063b257e4d69c1792c445ed066159aea60eb95eb56d628c28a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/06954e6eca0a/provider-mask.png"
+    },
+    {
+      "path": "inpaint/inpaint/06954e6eca0a/provider-sketch.png",
+      "sizeBytes": 4833748,
+      "sha256": "b0fa879c262ce623f9f0c9013282fd3585ce4856d15621c2846dd8e23babe60e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/06954e6eca0a/provider-sketch.png"
+    },
+    {
+      "path": "inpaint/inpaint/0ecfbc92dc1e/candidate-1-diff.png",
+      "sizeBytes": 1156228,
+      "sha256": "47ea030b171fa360cd88a8cd7e52cdf7c42d88ec42b73223fa657d4389e55de9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/0ecfbc92dc1e/candidate-1-diff.png"
+    },
+    {
+      "path": "inpaint/inpaint/0ecfbc92dc1e/candidate-1-raw.png",
+      "sizeBytes": 6373621,
+      "sha256": "1733e0cf525785b156d5d14650d22a7bba1cba7680d06536abb6ea90f7bbc9c7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/0ecfbc92dc1e/candidate-1-raw.png"
+    },
+    {
+      "path": "inpaint/inpaint/0ecfbc92dc1e/candidate-1.png",
+      "sizeBytes": 6320230,
+      "sha256": "1e974ab15eaf5132b0a1b4608f9a66c7b6fd8ef4255c2c2857d863689fad3302",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/0ecfbc92dc1e/candidate-1.png"
+    },
+    {
+      "path": "inpaint/inpaint/0ecfbc92dc1e/mask-preview.png",
+      "sizeBytes": 5405260,
+      "sha256": "558c9ee3f83582ed707338536ad32981118aaf3df4f63ef224472e4c57a7323e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/0ecfbc92dc1e/mask-preview.png"
+    },
+    {
+      "path": "inpaint/inpaint/0ecfbc92dc1e/provider-input.png",
+      "sizeBytes": 5413164,
+      "sha256": "fcea25c3af11400d93d6004e5db2e6ee6a0f0bb4d7f00bac5996246a05228911",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/0ecfbc92dc1e/provider-input.png"
+    },
+    {
+      "path": "inpaint/inpaint/0ecfbc92dc1e/provider-mask.png",
+      "sizeBytes": 12132,
+      "sha256": "a3dc4586a7e8983015806c0f5772095361c2c99552c0b79664ca5a5ec4e8edc5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/0ecfbc92dc1e/provider-mask.png"
+    },
+    {
+      "path": "inpaint/inpaint/0ecfbc92dc1e/provider-sketch.png",
+      "sizeBytes": 5350522,
+      "sha256": "0be054950b648242e7f1dd7cfbcc05f87ea969b37ec20ba975cc743e5248c451",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/0ecfbc92dc1e/provider-sketch.png"
+    },
+    {
+      "path": "inpaint/inpaint/6255a307e437/candidate-1-diff.png",
+      "sizeBytes": 307719,
+      "sha256": "2547027d31e10803fff3af9a1a6894535de72c8d6013cb8511b0712c06cd3139",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/6255a307e437/candidate-1-diff.png"
+    },
+    {
+      "path": "inpaint/inpaint/6255a307e437/candidate-1-raw.png",
+      "sizeBytes": 1370012,
+      "sha256": "894414a26a5f9405d55c74c2fd37f947330190d5db2fc33fc910cdf27f9d0665",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/6255a307e437/candidate-1-raw.png"
+    },
+    {
+      "path": "inpaint/inpaint/6255a307e437/candidate-1.png",
+      "sizeBytes": 3672190,
+      "sha256": "e996daf85abb355be956e35b86b1689a45cfd780227971173e378f5dc9261bc9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/6255a307e437/candidate-1.png"
+    },
+    {
+      "path": "inpaint/inpaint/6255a307e437/mask-preview.png",
+      "sizeBytes": 3688545,
+      "sha256": "ad0690460ecc1938934b94ca53ae40689317a8563e1c08eecadc83fa946ff587",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/6255a307e437/mask-preview.png"
+    },
+    {
+      "path": "inpaint/inpaint/6255a307e437/provider-input.png",
+      "sizeBytes": 968668,
+      "sha256": "ee9ade3ba8d3172ba845e5e8218d471ce0e403c10cb15583fce4aee10045371f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/6255a307e437/provider-input.png"
+    },
+    {
+      "path": "inpaint/inpaint/6255a307e437/provider-mask.png",
+      "sizeBytes": 2284,
+      "sha256": "e591b6f02be927fdd7a27a3969924f6b8cf7d476efd3ce28d7205ee84bb83075",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/6255a307e437/provider-mask.png"
+    },
+    {
+      "path": "inpaint/inpaint/6255a307e437/provider-sketch.png",
+      "sizeBytes": 961952,
+      "sha256": "17a84274f3a7dba16cf20c83c91d3249ac402bf6a455bf08fe53a4d40f8fc59f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/6255a307e437/provider-sketch.png"
+    },
+    {
+      "path": "inpaint/inpaint/d243fc732635/candidate-1-diff.png",
+      "sizeBytes": 1148222,
+      "sha256": "5c57d2c1aa97f43991c2fcf9103b0ecab08ee865bd4443b4e00e792ac79696f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/d243fc732635/candidate-1-diff.png"
+    },
+    {
+      "path": "inpaint/inpaint/d243fc732635/candidate-1-raw.png",
+      "sizeBytes": 4926887,
+      "sha256": "fe5ed97a24f0f060cf1b1a46bdaad96e84fd2e9550a3e03ec5e91873c7ff814f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/d243fc732635/candidate-1-raw.png"
+    },
+    {
+      "path": "inpaint/inpaint/d243fc732635/candidate-1.png",
+      "sizeBytes": 5874704,
+      "sha256": "bb56eaaeeb8e32211041d32dd22e8d037f23906fba13faedb1c84148354959e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/d243fc732635/candidate-1.png"
+    },
+    {
+      "path": "inpaint/inpaint/d243fc732635/mask-preview.png",
+      "sizeBytes": 5105933,
+      "sha256": "bfce751f982d1790ff6ee95b4161d86ff620ae3db0b6f23be0d130b8fbc41560",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/d243fc732635/mask-preview.png"
+    },
+    {
+      "path": "inpaint/inpaint/d243fc732635/provider-input.png",
+      "sizeBytes": 4277451,
+      "sha256": "0ac33846f384cc0bbcf9c2abaed3a9fbe32eb5816183582c3fae275abefeb744",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/d243fc732635/provider-input.png"
+    },
+    {
+      "path": "inpaint/inpaint/d243fc732635/provider-mask.png",
+      "sizeBytes": 9185,
+      "sha256": "30fe28aa3edc07c41274dff50e8ede0d7ebc31d68d98582117806d0db92d591c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/d243fc732635/provider-mask.png"
+    },
+    {
+      "path": "inpaint/inpaint/d243fc732635/provider-sketch.png",
+      "sizeBytes": 4244022,
+      "sha256": "c0f8eaa5b7d5bfffcfcb2c0dbe0b5c4df9540a186a82760eee0899e6dcdb54b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/inpaint/inpaint/d243fc732635/provider-sketch.png"
+    },
+    {
+      "path": "master-graphic-sika.png",
+      "sizeBytes": 2001311,
+      "sha256": "4a73002b0b1c5a35ac50a4f333d78479215a17aa633b39036cf081b21a85300d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/master-graphic-sika.png"
+    },
+    {
+      "path": "plates/SK1-limpio.png",
+      "sizeBytes": 3434420,
+      "sha256": "69aa1af999836f7e27a490ea62afdb4f7bb63027f1ec936a62b739127b03adf1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK1-limpio.png"
+    },
+    {
+      "path": "plates/SK1-mask-muro.png",
+      "sizeBytes": 73522,
+      "sha256": "ed5746c0654653a760890f6031b2f7052a58627970ea9546a66380c8035f7033",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK1-mask-muro.png"
+    },
+    {
+      "path": "plates/SK1-mask-persona.png",
+      "sizeBytes": 225854,
+      "sha256": "dc0edc38af4d4dd81d600923fc7176516c5a00f77107e99fbf42c00a872a2041",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK1-mask-persona.png"
+    },
+    {
+      "path": "plates/SK1-muro-posible.png",
+      "sizeBytes": 4120445,
+      "sha256": "ab1106375e5aea11245a1d9c3792fc133c58e9115ac58dbeed86ea99217adecf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK1-muro-posible.png"
+    },
+    {
+      "path": "plates/SK1-persona.png",
+      "sizeBytes": 802388,
+      "sha256": "156ed470b6ed018dc848086adb7597fcb9559e94aa1fc57a3de2d5f330a6aa34",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK1-persona.png"
+    },
+    {
+      "path": "plates/SK1b-muro-compuesto.png",
+      "sizeBytes": 3792562,
+      "sha256": "5373a494b0bda5dfe69c91fa168df88176172e50b888cfd9e88bd06cfff93a58",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK1b-muro-compuesto.png"
+    },
+    {
+      "path": "plates/SK1c-muro.png",
+      "sizeBytes": 3613379,
+      "sha256": "49520dbb57df05a9afac8e6b5587499e4a2e78cd758fd0b50dfcb4991fef4468",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK1c-muro.png"
+    },
+    {
+      "path": "plates/SK2-mask-lightbox.png",
+      "sizeBytes": 26627,
+      "sha256": "c02d3ab8662dc7442cb11c14f0a4a17679e2577ec2d9c21865158b2b4d89fdb6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2-mask-lightbox.png"
+    },
+    {
+      "path": "plates/SK2-muro-posible-arte.png",
+      "sizeBytes": 4605054,
+      "sha256": "e301e714719cc2acd2af55358346bdd91d188331b7c3085dd3cc3904f16e812a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2-muro-posible-arte.png"
+    },
+    {
+      "path": "plates/SK2-persona.png",
+      "sizeBytes": 973587,
+      "sha256": "61bde76781cb03da6c61bc887bd2cacb5973fad6b635e5f9c65d81a2782e3239",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2-persona.png"
+    },
+    {
+      "path": "plates/SK2b-arte-exacto.png",
+      "sizeBytes": 5633466,
+      "sha256": "7435af7a218d1caed4543c08ff63c8013add77eebb8c2f1e23ce78cffc34ba49",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2b-arte-exacto.png"
+    },
+    {
+      "path": "plates/SK2c-terminado.png",
+      "sizeBytes": 6233255,
+      "sha256": "2d33fda5e5e9b37645c7cec32f51de33d272c9452dd29a57ba8dcc3d41ba1bcc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2c-terminado.png"
+    },
+    {
+      "path": "plates/SK2d-ampliado-base.png",
+      "sizeBytes": 4608774,
+      "sha256": "80e3adfe7ca90b465a6e0287b899de523d3d54a636a3755412b85fbf09087dd3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2d-ampliado-base.png"
+    },
+    {
+      "path": "plates/SK2d-ampliado-mascara.png",
+      "sizeBytes": 51557,
+      "sha256": "d110a947830d0ff04bd8ee50497475f0252f55e6f6e0666e035606d04afd05a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2d-ampliado-mascara.png"
+    },
+    {
+      "path": "plates/SK2d-ampliado-relleno.png",
+      "sizeBytes": 4325831,
+      "sha256": "fa388d27537713076e1fc690a06cfb817c5f4ee8983efadac59aade59e3c689f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2d-ampliado-relleno.png"
+    },
+    {
+      "path": "plates/SK2d-ampliado.png",
+      "sizeBytes": 5925203,
+      "sha256": "c2743ea9999452e0a3f059e0b76e81e95e7f997d76c0bda3bd3a7c6cacc00f8b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2d-ampliado.png"
+    },
+    {
+      "path": "plates/SK2e-ampliado-modelo-base.png",
+      "sizeBytes": 4608774,
+      "sha256": "80e3adfe7ca90b465a6e0287b899de523d3d54a636a3755412b85fbf09087dd3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2e-ampliado-modelo-base.png"
+    },
+    {
+      "path": "plates/SK2e-ampliado-modelo-mascara.png",
+      "sizeBytes": 51557,
+      "sha256": "d110a947830d0ff04bd8ee50497475f0252f55e6f6e0666e035606d04afd05a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2e-ampliado-modelo-mascara.png"
+    },
+    {
+      "path": "plates/SK2e-ampliado-modelo-relleno.png",
+      "sizeBytes": 4166240,
+      "sha256": "0c32fec62aee94cf49a808ec0c19e7bd751b45671ec6cd20c628e2dd8f41cd61",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2e-ampliado-modelo-relleno.png"
+    },
+    {
+      "path": "plates/SK2e-ampliado-modelo.png",
+      "sizeBytes": 5169922,
+      "sha256": "b5fc7946a9656159310e3e259dba641bee0a8f7b5434192479df8a0e5ef3f995",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2e-ampliado-modelo.png"
+    },
+    {
+      "path": "plates/SK2f-final.png",
+      "sizeBytes": 5279220,
+      "sha256": "228aea431c2e76deac08c1985d4e2f289b1703d509cf338167d442a221934174",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK2f-final.png"
+    },
+    {
+      "path": "plates/SK3-mano.png",
+      "sizeBytes": 17265,
+      "sha256": "f0964640eb587ce403f7a0710a2d82d7879a6a52998be2455c68d2ce8ca83d61",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3-mano.png"
+    },
+    {
+      "path": "plates/SK3-mask-lightbox.png",
+      "sizeBytes": 15747,
+      "sha256": "0b75ed5410b24fd845e33da6b86eb071f6569b2ef55021f9f149c5b9a83b9c54",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3-mask-lightbox.png"
+    },
+    {
+      "path": "plates/SK3-persona.png",
+      "sizeBytes": 914047,
+      "sha256": "084d38ddc5cba485fcc500a3c853c77a3d2ada3ed4b9dc2ec8b951aa033eda9d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3-persona.png"
+    },
+    {
+      "path": "plates/SK3-presenta-posible.png",
+      "sizeBytes": 4451180,
+      "sha256": "cb8c0b6254d665e7949de54999ff413710590b8416f57e1ed2fccd668a88a9cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3-presenta-posible.png"
+    },
+    {
+      "path": "plates/SK3b-arte-exacto.png",
+      "sizeBytes": 5279198,
+      "sha256": "738e4f04c9cf2293c6dfe981345c79a129e8178bd5bc56f7cda80db75ef43b4b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3b-arte-exacto.png"
+    },
+    {
+      "path": "plates/SK3c-hibrido.png",
+      "sizeBytes": 5610075,
+      "sha256": "7edfea8eb89c03054b494cb6dab046497273a2d7c2bdb0b201d2e5074a2e2ebc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3c-hibrido.png"
+    },
+    {
+      "path": "plates/SK3c-terminado.png",
+      "sizeBytes": 5496344,
+      "sha256": "cf48b006eae0ace65c24b26909b0d94e7ff1f372a224b3d0f6589dcb4c4f828d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3c-terminado.png"
+    },
+    {
+      "path": "plates/SK3d-fiel-base.png",
+      "sizeBytes": 3668815,
+      "sha256": "8394d7e4ab1bb09908214bc7d1af8bbb95db107ea2e8dea78854667fae786623",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3d-fiel-base.png"
+    },
+    {
+      "path": "plates/SK3d-fiel-mascara.png",
+      "sizeBytes": 46987,
+      "sha256": "f712ba43e5288c0946a865e280a9b019077b5bcdea4176a0d68bd39f051ff26b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3d-fiel-mascara.png"
+    },
+    {
+      "path": "plates/SK3d-fiel-relleno.png",
+      "sizeBytes": 3979784,
+      "sha256": "fed8138b2256f61fc49aa68b1788fb9ff1a6184f50e8e0efef48a5a6ccbe043d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3d-fiel-relleno.png"
+    },
+    {
+      "path": "plates/SK3d-fiel.png",
+      "sizeBytes": 4968160,
+      "sha256": "f7fa4524e614257f7db77e9bb075f839a609952da2ee9bf849a599f24bd34ca0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3d-fiel.png"
+    },
+    {
+      "path": "plates/SK3d-fiel85-base.png",
+      "sizeBytes": 4563188,
+      "sha256": "fd400ceec8fb3cd169635b7e2a42d4e4e8a913e9e9a0b2df005a8ce82b5fb161",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3d-fiel85-base.png"
+    },
+    {
+      "path": "plates/SK3d-fiel85-mascara.png",
+      "sizeBytes": 56108,
+      "sha256": "f3a497168ad83c4e6de2237e8aca6da117dd1d6372c291611b1604403f664ce9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3d-fiel85-mascara.png"
+    },
+    {
+      "path": "plates/SK3d-fiel85-relleno.png",
+      "sizeBytes": 4041607,
+      "sha256": "36f9ce85f0f70d6536832ab4f1c861eb9476c9f786c0fbe2cbb4610cf201579d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3d-fiel85-relleno.png"
+    },
+    {
+      "path": "plates/SK3d-fiel85.png",
+      "sizeBytes": 5385026,
+      "sha256": "b9a49681ff59adcc060b9ad140dd5f02b11946997fdf811faffedc935bcf6a98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3d-fiel85.png"
+    },
+    {
+      "path": "plates/SK3e-modelo-base.png",
+      "sizeBytes": 3668815,
+      "sha256": "8394d7e4ab1bb09908214bc7d1af8bbb95db107ea2e8dea78854667fae786623",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3e-modelo-base.png"
+    },
+    {
+      "path": "plates/SK3e-modelo-mascara.png",
+      "sizeBytes": 46987,
+      "sha256": "f712ba43e5288c0946a865e280a9b019077b5bcdea4176a0d68bd39f051ff26b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3e-modelo-mascara.png"
+    },
+    {
+      "path": "plates/SK3e-modelo-relleno.png",
+      "sizeBytes": 3920851,
+      "sha256": "15d548b905d0184d318cd88eb40bc372248fc974ca05657d69855d8ae1a94bc4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3e-modelo-relleno.png"
+    },
+    {
+      "path": "plates/SK3e-modelo.png",
+      "sizeBytes": 4436719,
+      "sha256": "a985d874c603556425ba5bc1be515124ef68d8b3bd1d94e812eaf78c499c54a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3e-modelo.png"
+    },
+    {
+      "path": "plates/SK3e-modelo85-base.png",
+      "sizeBytes": 4563188,
+      "sha256": "fd400ceec8fb3cd169635b7e2a42d4e4e8a913e9e9a0b2df005a8ce82b5fb161",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3e-modelo85-base.png"
+    },
+    {
+      "path": "plates/SK3e-modelo85-mascara.png",
+      "sizeBytes": 56108,
+      "sha256": "f3a497168ad83c4e6de2237e8aca6da117dd1d6372c291611b1604403f664ce9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3e-modelo85-mascara.png"
+    },
+    {
+      "path": "plates/SK3e-modelo85-relleno.png",
+      "sizeBytes": 4093573,
+      "sha256": "78e01f303309e6e2bf04ca97800aec54e6f72a6611a481a9142b16c7da979aeb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3e-modelo85-relleno.png"
+    },
+    {
+      "path": "plates/SK3e-modelo85.png",
+      "sizeBytes": 4975006,
+      "sha256": "f62dcedab9d7ad24a4e5acd6f7617fbad920ffdcbe36c14d7a6eddf794456f27",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3e-modelo85.png"
+    },
+    {
+      "path": "plates/SK3f-final.png",
+      "sizeBytes": 4373833,
+      "sha256": "b87c632c455536e9a8116ab04926c5016cf4a970618b6e0e997c27b195dbf716",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3f-final.png"
+    },
+    {
+      "path": "plates/SK3f-final85.png",
+      "sizeBytes": 4869114,
+      "sha256": "9606a642854d55adee3c0d8e1ff8be593a232e08b90bc71d293dcbf21c9abcab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/plates/SK3f-final85.png"
+    },
+    {
+      "path": "portada-sika-cine.png",
+      "sizeBytes": 1783007,
+      "sha256": "c5b1a1ef903a8a8e3fab19511e97a965ce49864f0f65afe037f3de2c25e259c2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/portada-sika-cine.png"
+    },
+    {
+      "path": "portada-sika-lightbox.png",
+      "sizeBytes": 1644498,
+      "sha256": "e4d52449e44aae1da9992d48981f23d01cc17624cd2c7d0aaae1ef21fcbfed65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/portada-sika-lightbox.png"
+    },
+    {
+      "path": "portada-sika-muro.png",
+      "sizeBytes": 1625856,
+      "sha256": "28ec757dd48d1b53d63119e831e83d66c6ee5c63d4c9bc39a3795c22323ca311",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/portada-sika-muro.png"
+    },
+    {
+      "path": "portada-sika-presenta.png",
+      "sizeBytes": 1425596,
+      "sha256": "e451d4d7518a9e5f585d206cb3b2f7f3df780a323dc0ddf590d9acf101d8e8a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-portada-cine/portada-sika-presenta.png"
+    }
+  ]
+}

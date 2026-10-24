@@ -45,3 +45,12 @@ empresa. Con industria y país completos en las empresas y los segmentos de cont
 principal, los contactos de bancos quedaron contenidos en finanzas sin editar a ninguna persona. Una cuenta
 aprobada como banco salió del segmento porque su empresa es un grupo asegurador: se reportó en vez de
 reclasificarla.
+
+## Alta focalizada y respuesta al operador — 22/10/2026
+
+Al informar «qué propiedades le pusiste para los segmentos», distinguir valores persistidos de membresía
+calculada. Releer fecha de investigación en Contact/Company, tipo individual, fit respaldado, cargo y
+Primary/industria/país de Company; después comprobar cada segmento pertinente y nombrar los que ya
+incluyen al contacto. Una lectura filtrada por ID prueba ese registro, no el total del segmento.
+Fit CRM no equivale a una solicitud de HubSpot; país de la empresa y mercado de la iniciativa pueden diferir.
+[Caso Kibernum: seis membresías efectivas y Company reutilizada](../../../../docs/commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md).

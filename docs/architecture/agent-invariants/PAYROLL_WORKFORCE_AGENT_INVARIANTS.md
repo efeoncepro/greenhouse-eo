@@ -365,3 +365,13 @@ El `operational_responsibilities.responsibility_type='approval_delegate'` **gen�
 - **SIEMPRE** que se cambie la política de un stage, mover juntos: config flag + signal parametrizado + tests. El signal `hr.leave.invalid_delegated_approval_snapshots` (moduleKey `identity`, kind `drift`, steady=0) lee la política de `config.ts` y cuenta snapshots PENDIENTES con autoridad delegada inválida en stages que no honran delegate.
 
 **Spec canónica**: `docs/tasks/complete/TASK-1020-leave-approval-authority-delegation-drift-hardening.md` + `GREENHOUSE_IDENTITY_ACCESS_V2.md` Delta 2026-06-07 + `DECISIONS_INDEX.md`. Runbook: `docs/operations/runbooks/leave-approval-authority-recovery.md`. Patrones fuente: TASK-987/ISSUE-083 (over-exposure de acceso), TASK-571/766 (VIEW/helper + signal + lint), TASK-742 (defense-in-depth).
+
+## Payroll Operational Calendar
+
+> Movido verbatim desde `CLAUDE.md` el 2026-10-24 (presupuesto de tokens, TASK-1160).
+
+- Calendario operativo canónico: `src/lib/calendar/operational-calendar.ts`
+- Hidratación pública de feriados: `src/lib/calendar/nager-date-holidays.ts`
+- Timezone canónica de base: `America/Santiago` vía IANA del runtime
+- Feriados nacionales: `Nager.Date` + overrides persistidos en Greenhouse
+- No usar helpers locales de vista para decidir ventana de cierre o mes operativo vigente

@@ -25,9 +25,11 @@ import {
   buildBrandIntelligencePrompt
 } from './prompt'
 
+import type { EnvSource } from '@/types/env-source'
+
 export const PROSE_BRAND_INTELLIGENCE_ANTHROPIC_DEFAULT_MODEL = 'claude-haiku-4-5-20251001'
 
-export const resolveAnthropicBrandIntelligenceModel = (env: NodeJS.ProcessEnv = process.env): string =>
+export const resolveAnthropicBrandIntelligenceModel = (env: EnvSource = process.env): string =>
   env.GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_MODEL_ANTHROPIC?.trim() ||
   PROSE_BRAND_INTELLIGENCE_ANTHROPIC_DEFAULT_MODEL
 

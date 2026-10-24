@@ -57,6 +57,8 @@ import {
   type PriorityScoreVersion
 } from './score-versions'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type MaterializeSeoWorkQueueErrorCode = 'target_not_found' | 'all_origins_failed' | 'query_failed'
 
 export type MaterializeSeoWorkQueueResult =
@@ -76,7 +78,7 @@ export interface MaterializeSeoWorkQueueInput {
   actor: string
   /** Salta el piso de recomputación. Sólo para el carril programado y los sanity. */
   force?: boolean
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 /**

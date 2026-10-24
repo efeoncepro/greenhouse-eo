@@ -28,6 +28,8 @@ import {
   projectMarket
 } from './store'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface MarketActor {
   subject: TenantEntitlementSubject
   actor: string
@@ -61,7 +63,7 @@ const audit = (
   )
 
 export const addGraderMarket = async (
-  input: MarketActor & { organizationId: string; marketCode: string; locale?: string; env?: NodeJS.ProcessEnv }
+  input: MarketActor & { organizationId: string; marketCode: string; locale?: string; env?: EnvSource }
 ) => {
   authorize(input)
   const resolved = resolveGrowthMarket(input.marketCode, input.locale)

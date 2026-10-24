@@ -1,0 +1,51 @@
+{
+  "portalId": 48713323,
+  "dealId": "65832566144",
+  "process": "5251-1060-COT26",
+  "authority": "Julio solicitó cerrar como perdido en HubSpot y repo, registrar motivo y hacer commit en esta conversación el 19/10/2026.",
+  "before": {
+    "dealstage": "presentationscheduled",
+    "closed_lost_reason": null,
+    "closedate": null,
+    "amount": "4800000",
+    "deal_currency_code": "CLP",
+    "pipeline": "default"
+  },
+  "after": {
+    "dealstage": "closedlost",
+    "closed_lost_reason": "Licitación perdida frente a PROMO GIFT SPA (5251-1060-COT26). Ganador seleccionado por CLP 2.290.000 netos frente a Efeonce CLP 4.800.000 netos (52,29% menos). Resultado informado por Julio y corroborado en LicitaLAB el 19/10/2026. La fundamentación oficial de UTEM no fue recuperada; no se atribuye la pérdida a una relación previa ni se afirma que el precio fuera la única causa.",
+    "closedate": "2026-10-19T19:32:59.763Z",
+    "amount": "4800000",
+    "deal_currency_code": "CLP",
+    "pipeline": "default",
+    "hs_next_step": "Caso cerrado como perdido el 19/10/2026. Sin acciones comerciales pendientes para esta compra; conservar expediente y aprendizaje.",
+    "hs_is_closed": "true",
+    "hs_is_closed_won": "false"
+  },
+  "writtenProperties": [
+    "dealstage",
+    "closed_lost_reason",
+    "description",
+    "hs_next_step"
+  ],
+  "closeDateOrigin": "Asignada automáticamente por HubSpot al cerrar; fecha de registro comercial, no fecha de adjudicación inferida.",
+  "verification": {
+    "readbacks": 2,
+    "lanes": [
+      "HubSpot Agent CLI OAuth",
+      "HubSpot MCP"
+    ],
+    "stageAndReasonStable": true,
+    "descriptionReconciled": true,
+    "amountPreserved": true,
+    "namePreserved": true,
+    "associationsNotWritten": true
+  },
+  "updatedAt": "2026-10-19T19:33:03.068Z",
+  "winner": {
+    "name": "PROMO GIFT SPA",
+    "netCLP": 2290000,
+    "source": "LicitaLAB opportunity, consultado 19/10/2026"
+  },
+  "limits": "Fundamentación oficial UTEM no recuperada; precio menor comprobado, causa exclusiva no confirmada; no se registra relación previa ni favoritismo como hecho."
+}

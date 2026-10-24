@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-19T23:22:14.565796+00:00",
+  "portalId": "48713323",
+  "dealId": "66308025451",
+  "noteId": "118923969934",
+  "changedProperties": [
+    "description",
+    "hs_next_step",
+    "deal_currency_code"
+  ],
+  "currency": "MXN",
+  "operationalStatus": "HOLD por admisibilidad: solo Mexico",
+  "stageUnchanged": true,
+  "amountUnchanged": true,
+  "closeDatesUnchanged": true,
+  "noteBodyExactReadback": true,
+  "noteAssociationsVerified": [
+    "66308025451",
+    "59084984648"
+  ],
+  "source": "User-provided Wherex Q&A screenshot; CLI and MCP readbacks"
+}

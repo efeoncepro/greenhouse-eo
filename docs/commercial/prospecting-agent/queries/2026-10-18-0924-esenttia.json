@@ -1,0 +1,533 @@
+{
+  "run_id": "2026-10-18-0924-esenttia",
+  "type": "operator_requested_focused_research",
+  "started_at": "2026-10-18T09:24:11-03:00",
+  "closed_at": "2026-10-18T09:34:37.655281-03:00",
+  "timezone": "America/Santiago",
+  "week_start": "2026-10-12T00:00:00-03:00",
+  "week_end": "2026-10-18T09:34:37.655281-03:00",
+  "first_48h_discovery": "not rerun; focused validation after completed daily radar",
+  "coverage": "one account Colombia; five service lines assessed, no new20-cell sweep; daily20-cell matrix remains in0901 report",
+  "account_ids": [
+    "HSP-0034"
+  ],
+  "queries": [
+    {
+      "id": "E001",
+      "q": "\"CO1.REQ.11210476\" \"Esenttia\"",
+      "purpose": "account_and_procurement_verification",
+      "executed_at": "2026-10-18T12:24:34.670Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E002",
+      "q": "\"5600218590\" DACARTEC",
+      "purpose": "account_and_procurement_verification",
+      "executed_at": "2026-10-18T12:24:34.675Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E003",
+      "q": "site:datos.gov.co SECOP II Procesos de Contratación Colombia Compra Eficiente",
+      "purpose": "account_and_procurement_verification",
+      "executed_at": "2026-10-18T12:24:34.675Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E004",
+      "q": "site:esenttia.co 2025 informe gestión empleados accionistas comercial",
+      "purpose": "account_and_procurement_verification",
+      "executed_at": "2026-10-18T12:24:34.675Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E005",
+      "q": "site:esenttia.co \"2025\" \"colaboradores\"",
+      "purpose": "company_scale_buying_group_and_incumbent",
+      "executed_at": "2026-10-18T12:25:01.176Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E006",
+      "q": "site:esenttia.co \"2026\" \"Vicepresidente Comercial\"",
+      "purpose": "company_scale_buying_group_and_incumbent",
+      "executed_at": "2026-10-18T12:25:01.176Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E007",
+      "q": "site:esenttia.co \"equipo directivo\"",
+      "purpose": "company_scale_buying_group_and_incumbent",
+      "executed_at": "2026-10-18T12:25:01.176Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E008",
+      "q": "site:dacartec.com Esenttia HubSpot",
+      "purpose": "company_scale_buying_group_and_incumbent",
+      "executed_at": "2026-10-18T12:25:01.176Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E009",
+      "q": "site:datos.gov.co \"SECOP II - Contratos Electrónicos\"",
+      "purpose": "official_contract_dataset_discovery",
+      "executed_at": "2026-10-18T12:25:25.252Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E010",
+      "q": "Esenttia \"Gerente de Gestión de la Experiencia\"",
+      "purpose": "target_and_adjacent_people_public_research",
+      "executed_at": "2026-10-18T12:27:54.736Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E011",
+      "q": "Esenttia \"mercadeo\" \"gerente\" LinkedIn",
+      "purpose": "target_and_adjacent_people_public_research",
+      "executed_at": "2026-10-18T12:27:54.736Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E012",
+      "q": "Esenttia \"gerente\" \"tecnología\" LinkedIn",
+      "purpose": "target_and_adjacent_people_public_research",
+      "executed_at": "2026-10-18T12:27:54.736Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E013",
+      "q": "Esenttia \"Gerente de Compras\" LinkedIn",
+      "purpose": "target_and_adjacent_people_public_research",
+      "executed_at": "2026-10-18T12:27:54.736Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E014",
+      "q": "Esenttia \"Gerente de Gestión de Experiencia\"",
+      "purpose": "verify_target_and_adjacent_current_roles",
+      "executed_at": "2026-10-18T12:28:20.773Z",
+      "pii_in_query": false,
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E015",
+      "q": "Esenttia \"[nombre redactado]\" \"2026\"",
+      "purpose": "verify_target_and_adjacent_current_roles",
+      "executed_at": "2026-10-18T12:28:20.773Z",
+      "pii_in_query": true,
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034",
+      "pii_redacted": true
+    },
+    {
+      "id": "E016",
+      "q": "Esenttia \"[nombre redactado]\" \"2026\"",
+      "purpose": "verify_target_and_adjacent_current_roles",
+      "executed_at": "2026-10-18T12:28:20.773Z",
+      "pii_in_query": true,
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034",
+      "pii_redacted": true
+    },
+    {
+      "id": "E017",
+      "q": "Esenttia \"Compras y Almacén\" \"gerente\"",
+      "purpose": "verify_target_and_adjacent_current_roles",
+      "executed_at": "2026-10-18T12:28:20.773Z",
+      "pii_in_query": false,
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E018",
+      "q": "site:linkedin.com/in/ \"Esenttia\" \"Experiencia\"",
+      "purpose": "public_profile_corroboration",
+      "executed_at": "2026-10-18T12:28:45.789Z",
+      "pii_in_query": false,
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "E019",
+      "q": "site:linkedin.com/in/ \"Esenttia\" \"[nombre redactado]\" mercadeo",
+      "purpose": "public_profile_corroboration",
+      "executed_at": "2026-10-18T12:28:45.789Z",
+      "pii_in_query": true,
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034",
+      "pii_redacted": true
+    },
+    {
+      "id": "E020",
+      "q": "site:linkedin.com/in/ \"Esenttia\" \"[nombre redactado]\"",
+      "purpose": "public_profile_corroboration",
+      "executed_at": "2026-10-18T12:28:45.789Z",
+      "pii_in_query": true,
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034",
+      "pii_redacted": true
+    },
+    {
+      "id": "E021",
+      "q": "site:linkedin.com/in/ \"Esenttia\" \"Compras\"",
+      "purpose": "public_profile_corroboration",
+      "executed_at": "2026-10-18T12:28:45.789Z",
+      "pii_in_query": false,
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "secondary_context": [
+        "web",
+        "creative"
+      ],
+      "discovery": false,
+      "filters": "as written in query; no engine recency filter",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "API01",
+      "type": "official_open_data_read",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "url": "https://www.datos.gov.co/api/views/p6dx-8zbt.json",
+      "records": null,
+      "read_time_upper_bound": "2026-10-18T09:25:05.655720-03:00",
+      "time_precision": "local saved-file mtime; not exact request start"
+    },
+    {
+      "id": "API02",
+      "type": "official_open_data_read",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json?%24where=id_del_proceso%3D%27CO1.REQ.11210476%27&%24limit=10",
+      "records": 1,
+      "read_time_upper_bound": "2026-10-18T09:25:22.783662-03:00",
+      "time_precision": "local saved-file mtime; not exact request start"
+    },
+    {
+      "id": "API03",
+      "type": "official_open_data_read",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json?%24where=upper%28entidad%29+like+%27%25ESENTTIA%25%27+AND+%28upper%28nombre_del_procedimiento%29+like+%27%25HUBSPOT%25%27+OR+upper%28descripci_n_del_procedimiento%29+like+%27%25HUBSPOT%25%27%29&%24limit=100&%24order=fecha_de_publicacion_del+DESC",
+      "records": 4,
+      "read_time_upper_bound": "2026-10-18T09:25:25.234879-03:00",
+      "time_precision": "local saved-file mtime; not exact request start"
+    },
+    {
+      "id": "API04",
+      "type": "official_open_data_read",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "url": "https://www.datos.gov.co/api/views/jbjy-vk9h.json",
+      "records": null,
+      "read_time_upper_bound": "2026-10-18T09:25:45.703351-03:00",
+      "time_precision": "local saved-file mtime; not exact request start"
+    },
+    {
+      "id": "API05",
+      "type": "official_open_data_read",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json?%24select=nombre_entidad%2Cnit_entidad%2Cproceso_de_compra%2Cid_contrato%2Creferencia_del_contrato%2Cestado_contrato%2Cdescripcion_del_proceso%2Cmodalidad_de_contratacion%2Cfecha_de_firma%2Cfecha_de_inicio_del_contrato%2Cfecha_de_fin_del_contrato%2Cproveedor_adjudicado%2Cvalor_del_contrato%2Cultima_actualizacion%2Curlproceso%2Cnombre_supervisor&%24where=proceso_de_compra%3D%27CO1.BDOS.11022494%27+OR+referencia_del_contrato%3D%275600218590%27&%24limit=100",
+      "records": 0,
+      "read_time_upper_bound": "2026-10-18T09:26:08.217069-03:00",
+      "time_precision": "local saved-file mtime; not exact request start"
+    },
+    {
+      "id": "API06",
+      "type": "official_contracts_query",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "filter": "upper(nombre_entidad) like '%ESENTTIA%' AND upper(descripcion_del_proceso) like '%HUBSPOT%'",
+      "status": "timeout_after_35_seconds",
+      "records": null,
+      "read_time": "within research interval; exact request start not retained"
+    }
+  ],
+  "sources_read": [
+    {
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json?%24where=id_del_proceso%3D%27CO1.REQ.11210476%27&%24limit=10",
+      "status": "read_primary",
+      "result": "One exact process; date, scope, base price and supplier field; conflicting status prevents open-competition conclusion"
+    },
+    {
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json?%24where=upper%28entidad%29+like+%27%25ESENTTIA%25%27+AND+%28upper%28nombre_del_procedimiento%29+like+%27%25HUBSPOT%25%27+OR+upper%28descripci_n_del_procedimiento%29+like+%27%25HUBSPOT%25%27%29&%24limit=100&%24order=fecha_de_publicacion_del+DESC",
+      "status": "read_primary",
+      "result": "Four HubSpot processes 2023/2025/2026; old open labels show status limit"
+    },
+    {
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json?%24select=nombre_entidad%2Cnit_entidad%2Cproceso_de_compra%2Cid_contrato%2Creferencia_del_contrato%2Cestado_contrato%2Cdescripcion_del_proceso%2Cmodalidad_de_contratacion%2Cfecha_de_firma%2Cfecha_de_inicio_del_contrato%2Cfecha_de_fin_del_contrato%2Cproveedor_adjudicado%2Cvalor_del_contrato%2Cultima_actualizacion%2Curlproceso%2Cnombre_supervisor&%24where=proceso_de_compra%3D%27CO1.BDOS.11022494%27+OR+referencia_del_contrato%3D%275600218590%27&%24limit=100",
+      "status": "read_primary",
+      "result": "Zero exact-reference/portfolio matches; not proof of absence of contract"
+    },
+    {
+      "url": "https://www.datos.gov.co/api/views/p6dx-8zbt.json",
+      "status": "read_primary_metadata",
+      "result": "Official publisher and schema verified"
+    },
+    {
+      "url": "https://www.datos.gov.co/api/views/jbjy-vk9h.json",
+      "status": "read_primary_metadata",
+      "result": "Official contracts publisher and fields verified"
+    },
+    {
+      "url": "https://www.esenttia.co/wp-content/uploads/2025/06/Informe-de-sostenibilidad-Esenttia-2024.pdf",
+      "status": "read_primary_download",
+      "result": "168-page PDF downloaded normally; pp79 and91 visually checked, pp95 text read; reader size limit overcome by local PDF reading, no authentication challenge involved"
+    },
+    {
+      "url": "https://www.esenttia.co/wp-content/uploads/2026/03/1.-Informe-de-Gestion-2025-Esenttia-S.A-1.pdf",
+      "status": "read_primary",
+      "result": "2025 commercial expansion and segmentation, pp5–7 PDF"
+    },
+    {
+      "url": "https://www.esenttia.co/wp-content/uploads/2025/08/Certificado-de-Accesibilidad-WEB-ESENTTIA-S.A.-y-ESENTTIA-MB-2024_organized-1.pdf",
+      "status": "read_primary_download",
+      "result": "Dacartec contractor July2025 and professional signature, pp1–3"
+    },
+    {
+      "url": "https://www.esenttia.co/wp-content/uploads/2026/03/Informe-Derechos-de-Autor-Software-2025.pdf",
+      "status": "read_primary",
+      "result": "Dated technology role; unrelated security findings excluded from commercial report"
+    },
+    {
+      "url": "https://www.esenttia.co/quienes-somos/",
+      "status": "read_primary",
+      "result": "Colombian entity, petrochemical business, Grupo Ecopetrol, international reach"
+    },
+    {
+      "url": "https://www.esenttia.co/transparencia/",
+      "status": "read_primary",
+      "result": "Corporate primary report links and procurement publication"
+    },
+    {
+      "url": "https://www.esenttia.co/home-proveedores/?seccion=2",
+      "status": "read_primary",
+      "result": "Supplier route and Ariba login; no registration or submission"
+    },
+    {
+      "url": "https://www.esenttia.co/requisiciones/",
+      "status": "partial_then_timeout",
+      "result": "Page obtained, reader did not expose relevant process; subsequent timeout, not absence"
+    },
+    {
+      "url": "https://www.esenttia.co/quiero-ser-proveedor/",
+      "status": "partial",
+      "result": "Page obtained; registration requirements not fully established"
+    },
+    {
+      "url": "https://www.esenttia.co/contactenos/",
+      "status": "partial",
+      "result": "Page obtained; no individual commercial procurement contact verified"
+    },
+    {
+      "url": "https://esenttia.co/landing/esenttia-te-ensena/",
+      "status": "read_primary_undated",
+      "result": "Marketing role history and educational content; individual details private"
+    }
+  ],
+  "blocks": [
+    {
+      "source": "SECOP interactive process CO1.NTC.11064557",
+      "status": "prior_recaptcha_preserved_not_retried",
+      "resolution": "independent official open-data publisher queried; interactive documents and admission remain unverified"
+    },
+    {
+      "source": "broad SECOP electronic-contracts search",
+      "status": "timeout"
+    },
+    {
+      "source": "sustainability index",
+      "status": "timeout; original PDF separately downloaded normally"
+    }
+  ],
+  "discarded": [
+    "5Nov secondary recommendation is not deadline",
+    "Open label alone does not prove current competitive intake",
+    "No award inferred from supplier field",
+    "Associated LinkedIn profiles not payroll",
+    "Departed staff and undated roles not current verified contact",
+    "Web/creative opportunities remain hypotheses; no explicit SEO/media demand"
+  ],
+  "crm": {
+    "portal": 48713323,
+    "mode": "read_only",
+    "searches": [
+      "Company name Esenttia/domain esenttia.co OR",
+      "Contact company Esenttia/email domain token",
+      "Deal query Esenttia",
+      "Company historical name Propilco"
+    ],
+    "matching_records": 0,
+    "schema_rechecked": true,
+    "scope": "searches only; not global CRM absence guarantee",
+    "writes": 0
+  },
+  "approvals": "No new CRM or outreach approval requested or inferred",
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-18-esenttia",
+  "outreach": 0,
+  "paid_enrichment": 0
+}

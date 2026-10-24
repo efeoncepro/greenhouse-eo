@@ -315,6 +315,9 @@ fuga, release Greenhouse y readback del front door; no ocurre por publicar esta 
 - El validador de skills prueba frontmatter y estructura.
 - La revisión de una pieza usa el gate del brief, capturas/tamaño final y contraste medido; si la pieza lleva CTA,
   además `pnpm foto:cta:gate` con salida 0 (ver «Piezas con CTA»).
+- Si la pieza lleva video, sonido o animación, antes de mostrarla al operador pasa por `pnpm ai:listen --measure-only`
+  (sincronía, silencios, cortes, cuadros quietos; con `--cues` sale con código 2 si una cue no se confirma). Gemini es
+  segunda opinión opcional y siempre con `--verify`: [manual](../manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
 - La promoción del contrato AXIS de `trial` a `stable` exige segundo consumidor real y comparación visual
   cross-runtime.
 - Commit, push, release AXIS, release Greenhouse y publicación de una pieza son actos separados.

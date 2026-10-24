@@ -218,7 +218,11 @@ contrato algo que todavía es recomendación.
    fin. Una frase nueva: tres tomas → pausa «Empower»→«your» a 0,14 s recortando sólo silencio → palabra final por STT →
    esfera de la línea en ese instante → `master.sh` a −14 LUFS → el operador escucha y aprueba → bucket y JSON de AXIS.
 4. **QA sin oído.** El agente no escucha: verifica con espectrograma, medición de bandas y de LUFS, y transcripción. Lo
-   perceptual lo decide el operador.
+   perceptual lo decide el operador. Cuando el sonido va sobre motion o video (logo, cierre, spot), la grilla se
+   controla con `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only` antes de
+   mostrar la pieza: confirma cada silencio, golpe y pico del sting contra su cue y el desfase entre ataque y evento
+   visual (tolerancia ±42 ms), sin costo; sale con código 2 si una cue no se confirma. Gemini, si se usa, va siempre con
+   `--verify`. Manual: [escuchar y mirar media](../../manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
 5. **Nivelar por sonoridad, nunca por pico.** `master.sh <in> <out> <LUFS> [shelf]`, loudnorm en dos pasadas, al
    objetivo del destino.
 
@@ -290,6 +294,39 @@ Corrida: `ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO-DE-HECHOS.md` 
   norma no cambia.
 - **[pendiente]** El master quedó a −16 LUFS; la norma pide −14 LUFS para video y redes. La decisión del operador no
   cubrió ese punto: revisar el nivel antes de subir la pieza a redes.
+
+### 2026-10-21 · Pieza «Preguntando» (ChatGPT Ads, 12 s) — dirección del operador, en prueba
+
+Corrida: `ai-generations/2026-10-21_chatgpt-ads/v5/` (`audio/mezcla.py`, `audio-cues.json`, `export/qa-measure-only-*.json`).
+
+El operador rechazó la primera banda sonora («parece titular de TV»), pidió rock o punk y dijo que el logo sonoro al
+final «se siente muy forzado»: «hay que flexibilizar las reglas del brandsonic para algo que encaje más».
+
+| Qué cambió | Antes | En esta pieza | Estado |
+|---|---|---|---|
+| Fuente musical | música generada (ElevenLabs) + sting del registro sereno pegado al final | **sólo el kit, registro de energía**: la pieza larga de energía (sha256 `1b23b0a1…`) desde el segundo 0; a 120 BPM su banda entra en el 4,0, que es el golpe de la imagen | **[dirección del operador]** en prueba |
+| Dónde cae el logo sonoro | sting al final, encima del lockup | el **cierre de energía** (sha256 `0a643922…`) entra cuando la banda se corta en el 8,0; su **La cae en el 9,0, cuando la esfera visual aterriza** como punto de la respuesta, y el acorde sostiene el cierre | **[dirección del operador]** en prueba |
+
+**Criterio propuesto [pendiente de aprobación]:** la melodía, la pausa y los archivos del kit no cambian; lo que se
+flexibiliza es **dónde** suena el logo. Puede caer en el evento de marca de la narrativa (la esfera que responde) y no
+necesariamente sobre la firma final. Si la pieza va con banda, el logo sonoro es el del **registro de energía**, nunca el
+sting sereno sobre otra música. Medido: los tres Mi caen en 8,38 · 8,50 · 8,63 s; la esfera despega en 8,625 (la pausa
+del motivo es su vuelo) y el La en 9,00 (`pnpm ai:listen --measure-only`, 2/2 cues, en sincronía, −14,0 LUFS, −1,35 dBTP).
+No cambia las reglas hasta que el operador apruebe la pieza.
+
+**Resultado [decisión del operador, 2026-10-21]: rechazada.** La v5 con la pieza larga de energía y el cierre de energía
+fue rechazada: «es un refrito y se ve que no encaja, de hecho termina súper extraño». Lección: el kit no reemplaza
+una música compuesta para la línea de tiempo de la pieza; reutilizar la pieza larga suena a algo ya oído y su forma no
+coincide con lo que pasa en pantalla. La v6 usa un tema rock nuevo (ElevenLabs, instrumental verificado) **sin logo
+sonoro**, y la imagen se ajustó a sus ataques medidos (4,00 · 6,00 · 10,25). El criterio de «dónde suena el logo» queda
+sin aprobar.
+
+**Versión aprobada [decisión del operador, 2026-10-21]: v10.** Usa la toma 2 de `eleven_music_v2_5`, sin logo sonoro. Arranca
+en el primer golpe propio de la toma y tiene un solo empalme, compás a compás, que entra 12 ms antes del acorde final. El
+acorde cae en el 10,06 s, cuando aterriza la esfera, y se apaga solo bajo la tapa, hacia el 14,6 s. No lleva stop-time
+ni estiramiento. La v9, que arrancaba la toma a mitad de canción y tenía dos stop-time, fue rechazada: se oían restos y
+cortes. El empalme se verifica con `pnpm ai:audio-edits`, según el
+[manual](../../manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md) §«Cortar música sin que se oiga».
 
 ## Qué no hacer
 

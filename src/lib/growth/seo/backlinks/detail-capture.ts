@@ -39,6 +39,8 @@ import {
   type DrillDownDecision
 } from './should-drill-down'
 
+import type { EnvSource } from '@/types/env-source'
+
 export const BACKLINKS_REFERRING_DOMAINS_ENDPOINT = '/v3/backlinks/referring_domains/live'
 export const BACKLINKS_ANCHORS_ENDPOINT = '/v3/backlinks/anchors/live'
 export const BACKLINKS_BACKLINKS_ENDPOINT = '/v3/backlinks/backlinks/live'
@@ -54,7 +56,7 @@ const PROVIDER_MAX_ROW_LIMIT = 1000
 const BACKLINKS_REQUEST_USD = 0.024
 const BACKLINKS_ROW_USD = 0.000036
 
-export const resolveDetailRowLimit = (env: NodeJS.ProcessEnv = process.env): number => {
+export const resolveDetailRowLimit = (env: EnvSource = process.env): number => {
   const raw = Number(env[BACKLINK_DETAIL_ROW_LIMIT_KNOB])
 
   if (!Number.isFinite(raw) || raw <= 0) return BACKLINK_DETAIL_DEFAULT_ROW_LIMIT

@@ -7,6 +7,19 @@
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
+## Verificar transporte comercial sin crear leads
+
+Para medición, partir del [contrato Grader](../../architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md)
+y del [release publicado](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
+Think usa Forms portátil; el POST histórico es una fachada compatible, no la ruta actual de ese host.
+Releer GET del contrato/versión/surface y la política; OPTIONS y los rechazos de JSON inválido previos
+al intake comprueban disponibilidad sin crear solicitudes. No ejecutar un submit válido, reservar,
+repetir una solicitud ni usar identificadores de clic ficticios para certificar publicidad.
+Los tests del motor con proveedor simulado que siguen no prueban conversión Ads.
+Para una ocurrencia comercial legítima, correlacionar aceptación/confirmación, recibo y observación
+proveedor por separado según el [manual Ads](activar-conversiones-google-ads.md). El polling del
+informe nunca produce otra conversión; HTTP202, CORS o READY no demuestran recepción/atribución.
+
 ## Regla de costo
 
 El costo persistido en `grader_runs.estimated_cost_usd` es un estimador parcial, no una factura por corrida.
@@ -23,7 +36,7 @@ Antes de una corrida real:
 
 ## Estado y contrato vigente
 
-TASK-1863 quedó verificada en staging el 2026-09-28; `main` sigue en espera. Consulta las revisiones,
+Snapshot del 28/09/2026: TASK-1863 quedó verificada en staging; en ese corte `main` seguía en espera. No usar ese snapshot como inventario actual de flags. El checkpoint comercial publicado se enlaza arriba. Consulta las revisiones,
 readbacks y limitaciones en la [auditoría de rollout](../../audits/platform/2026-09-28-task-1863-verification.md).
 Para configurar países, idiomas, aliases, competidores y lotes, usa el
 [manual de mercados](configurar-mercados-aeo.md). Google recibe país numérico e idioma resueltos;

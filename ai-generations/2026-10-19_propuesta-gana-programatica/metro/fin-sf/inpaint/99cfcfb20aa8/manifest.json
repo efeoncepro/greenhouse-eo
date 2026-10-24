@@ -1,0 +1,139 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "99cfcfb20aa8",
+  "key": "99cfcfb20aa8a7ede0e7438f0507f855f0315cf11d1a5853c7cc79d33348d90b",
+  "status": "completed",
+  "createdAt": "2026-10-20T11:47:46.259Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_propuesta-gana-programatica/metro/sf-comp.png",
+    "imageSha256": "3f1f133e0fed6999c49bbfe6374aa139c66932d51bb8fdb53b64356f65902e3b",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_propuesta-gana-programatica/metro/mask-sf-fin.png",
+    "maskSha256": "488a68cc4551278d52589c2a0f24d0ba3de9effe517b7317c9219a3fe518da7c",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2880,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Photographic finishing only. Inside the masked area there is a large printed fabric advertising banner hung along the curved balcony of this shopping mall atrium; its artwork is already correct: keep the layout, every word, the numbers, the logo, the colors and their position exactly as they are. Only make it look physically photographed in place by this same camera: printed stretched fabric with soft diagonal tension folds and gentle wrinkles like a real hung banner, subtle shading following the curve of the balcony, the warm ambient light of the atrium and the skylight falling on it, the same sharpness, noise and white balance as the rest of the photo. Keep the potted plants, lamps and railing in front of the banner exactly where they are. Do not redraw, restyle or move any text or logo.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nPhotographic finishing only. Inside the masked area there is a large printed fabric advertising banner hung along the curved balcony of this shopping mall atrium; its artwork is already correct: keep the layout, every word, the numbers, the logo, the colors and their position exactly as they are. Only make it look physically photographed in place by this same camera: printed stretched fabric with soft diagonal tension folds and gentle wrinkles like a real hung banner, subtle shading following the curve of the balcony, the warm ambient light of the atrium and the skylight falling on it, the same sharpness, noise and white balance as the rest of the photo. Keep the potted plants, lamps and railing in front of the banner exactly where they are. Do not redraw, restyle or move any text or logo.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.04297236689814815,
+    "editable": 471940,
+    "soft": 3300,
+    "protected": 10583960
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2880
+    },
+    "target": {
+      "width": 2208,
+      "height": 1664
+    },
+    "aspectError": 0.0048309178743961186,
+    "reason": "la zona con contexto ocupa 27 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0736,
+    "basis": "1 × salida 2208x1664 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 39.445,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.4,
+        "bestError": 5.4,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -1.16,
+        -3.05,
+        -3.33
+      ],
+      "protected": {
+        "pixels": 10583960,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 471940,
+        "maxDelta": 241,
+        "meanDelta": 39.692,
+        "worst": {
+          "x": 3635,
+          "y": 405
+        }
+      },
+      "seam": {
+        "pixels": 3300,
+        "maxDelta": 58,
+        "meanDelta": 4.079,
+        "worst": {
+          "x": 2643,
+          "y": 601
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 10583960,
+        "maxDelta": 237,
+        "meanDelta": 20.878,
+        "worst": {
+          "x": 1941,
+          "y": 2029
+        }
+      },
+      "outputUsd": 0.0736,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3369,
+        "input_tokens_details": {
+          "image_tokens": 3060,
+          "text_tokens": 309
+        },
+        "output_tokens": 2452,
+        "output_tokens_details": {
+          "image_tokens": 2452,
+          "text_tokens": 0
+        },
+        "total_tokens": 5821
+      },
+      "meta": {
+        "size": "2208x1664",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

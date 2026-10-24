@@ -157,6 +157,14 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
   el modelo sólo termina luz y material, y después se **repone** el contenido exacto; el logo sobre un objeto va como
   vinilo compuesto, nunca terminado por el modelo; una tarjeta de UI va en vidrio oscuro, no blanca plana. Método:
   `design-studio` → `references/efeonce-photographic-language.md` §«Caso de cliente con piezas reales».
+- **Íconos oficiales de un partner como escena** (anuncio «Efeonce | Google — Oficialmente partners», 2026-10-19):
+  fondo con Flare, íconos compuestos de forma determinística en capas de profundidad y pasada de **acabado Sunburst**
+  sobre la escena compuesta (sólo luz y lente, íconos idénticos; el operador: «no se ve bien así determinístico»).
+  Luego QA al 100 % contra la escena y reposición de lo que el acabado cambió (borró el contorno de tinta de una
+  mascota), contraste medido bajo la caja del lockup **antes** de componer (una luz detrás del logo blanco dio 1,3:1) y
+  lockup, eyebrow y fila de productos determinísticos. Criterio del lockup (filete, logos en blanco, un solo bloque
+  focal, sin pregunta-respuesta): `efeonce-graphic-line` → `references/applications.md` §A16.
+- 🔴 `pnpm ai:image` sin `--model` genera con `gpt-image-2`: nombra siempre el modelo 2.5 que quieres.
 - Plate cotidiano → GPT Image 2.5 Flare; edición precisa, máscara o master final → 2.5 Sunburst
   (`pnpm ai:image --model gpt-image-2.5-sunburst`); material/atmósfera → Seedream 5 Pro; divergencia barata →
   Seedream 5 Lite (`pnpm ai:fal`).
@@ -221,6 +229,9 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
 6. **Revisa en el tamaño de uso.** Comprueba composición completa y vista reducida, safe areas, ritmo,
    desbordes, solapamientos, contraste, logo, subtítulos y `prefers-reduced-motion` cuando corresponda.
    Ningún texto de diagnóstico, caja de selección o guía puede quedar dentro del entregable.
+   Si la pieza tiene sonido o animación, antes de mostrarla corre el control estándar sin Gemini
+   (`pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json`); Gemini va
+   después, opcional y siempre con `--verify` ([manual](../../../docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md)).
 7. **Entrega evidencia honesta.** Muestra la pieza y conserva formato, fuente editable/export, decisiones
    tipográficas, provenance y resultado del gate. Distingue prueba producida, revisada, aprobada, programada,
    publicada y medida.
@@ -348,6 +359,12 @@ acción, en las piezas nuevas).
 - **El CTA expresa el DESTINO de la etapa, no el ángulo de la pieza.** Varias piezas de la misma etapa del
   embudo convergen en **una sola acción** y lo que cambia entre ellas es el fraseo. Si dos piezas de la misma
   etapa llevan a destinos distintos, la etapa está partida en dos campañas. Ver §9 del mismo canon.
+- **En orgánico de los canales propios de Efeonce, el destino lo fija el canal** (operador, 2026-10-22;
+  [estrategia de love brand §8.4](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) +
+  [PDR-020](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)): Instagram y Threads
+  nunca llevan CTA de venta, precio ni formulario de servicio (su paso es seguir, Glitch o el LinkedIn de Julio);
+  YouTube y el blog llevan antes a Glitch o a una herramienta; **sólo LinkedIn lleva directo a la landing con
+  diagnóstico**. La pauta pagada sigue su propio brief.
 - **Escala tipográfica en horizontal.** En 16:9 el texto se veía perdido, pero la causa **no** es el tamaño de
   fuente respecto de su columna: medido, 4:5 da **968 px** de columna y 16:9 da **901 px** — casi la misma
   columna en un lienzo del doble de ancho. 🔴 **Escalar por ancho de LIENZO es un error**: aplana la jerarquía

@@ -14,6 +14,30 @@ Do not use “property type” as one undifferentiated concept. Record all four 
 
 A smart property is not a new deterministic storage type. It is an eligible custom property whose values are filled by a Breeze/Data Agent prompt. API property metadata alone may show the underlying field but not prove the prompt, source selection, credit policy or auto-fill configuration.
 
+## Enumeration colors and human presentation
+
+Verified19/10/2026: the Efeonce48713323 editor offers Default / With dot / Badge for the
+single-value `dealtype`, and Default / Badge for multivalue `canal_de_adqusicion`; the latter
+already uses Badge with six colors. Preserve its configuration. This is dated editor evidence,
+not a claim that all record/index/report surfaces were visually tested.
+
+- Record option style, per-option colors and visible labels alongside storage/field type in the
+  change set. Keep text readable and present; category color must not imply qualification or risk.
+- The public Properties create/update2026-09 contracts inspected do not expose option colors or
+  dot/badge style. Installed Agent CLI update only offers label/group, without those UI flags.
+  No supported public API write route was verified; recheck documentation before automating.
+- An API GET that omits colors/style does not prove a default/uncolored UI. CLI `optionsDisplay`
+  summarizes enum values/labels; it is not the UI option-style setting. Never invent PATCH fields
+  or replay private browser endpoints to claim API parity.
+- Configure the approved visual delta through the authenticated editor, reopen for persistence,
+  and QA the actual table/record surfaces. Keep API schema/value readback separate from UI QA.
+  Do not create fake records or infer chart/card/tag colors from enumeration colors. HubSpot
+  excludes option colors for stage/lifecycle and property-sync fields.
+
+The [acquisition transition manual](../../../../docs/manual-de-uso/hubspot/normalizar-origen-canales-adquisicion.md#presentación-humana-estilos-colores-y-alcance-de-la-api)
+owns the dated palette, official sources, proposed Efeonce styles and rollback/verification steps.
+New field styles/palette remain proposed; documentation does not authorize schema, data or UI writes.
+
 ## Naming and grouping contract
 
 - `name` is the immutable/internal API identifier and uses stable `snake_case`, for example `anam_awarded_contract_value`.

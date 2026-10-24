@@ -404,6 +404,17 @@
       "protagonista": "Isabella (elenco ficticio) con el hoodie Efeonce, de rodillas hacia arriba, con un brazo extendido dirigiendo una espiral inmensa de piezas de contenido",
       "porque": "Producción con IA: miles de piezas giran en una galaxia que sigue su mano; la escala la da la IA y la dirige una persona. Cámara a unos 8 m y persona chica frente a un espacio enorme. El color vive sólo dentro de los marcos de las piezas; la luz sobre ella, la bruma y la sala quedan en blanco frío y navy, y el naranja es un solo punto junto a su mano (acento como puntuación, regla del 2026-10-06). Un muro negro mate hasta el 48 % del ancho da la reserva de texto a la izquierda. Lámina «¿Producen con IA? Sí, pero lo hacemos bien» del deck de Marketing de Contenidos. Parte de CR4. Aprobada por el operador el 2026-10-10 («Buenísimo, esta también hay que canonizarla»).",
       "ojo": "El sujeto queda a la derecha del centro y chico: `foto:emblema` recorta zonas fijas y no encuentra el isotipo, hay que recortar el pecho a mano para mirarlo al 100 % (en esta toma salió con nave, tres ventanas, órbita y esfera). Elenco con el hoodie Brand por excepción del operador para este deck (precedente HB2, falla 38). Si las piezas de los marcos van a mostrar marcas o personas, se componen aparte: el modelo no dibuja marcas (falla 41)."
+    },
+    {
+      "id": "BR3h",
+      "ficha": "ai-generations/2026-10-20_propuesta-assetplan/fichas/BR3h.json",
+      "plate": "ai-generations/2026-10-20_propuesta-assetplan/plates/BR3h-v3-logo-acabado.png",
+      "formato": "16:9",
+      "alcance": "deck-portada",
+      "protagonista": "Nexa de espaldas con la softshell Efeonce (vista espalda-mujer), chica en el cuadro (≈ 60 % del alto), caminando hacia el anillo",
+      "porque": "Contraportada de propuesta en la línea Revenue-HubSpot: el último cuadro de una película. Nexa camina por un piso pulido hacia un anillo enorme de luz de Efeonce en el horizonte, envuelto en bruma. La órbita lleva su anatomía completa: hilo tenue azul y blanco frío (#0375DB), un arco corto rosado (#E86BD0) arriba a la izquierda y la esfera en la punta del arco; sin partículas. Es la regla del acento como puntuación (2026-10-06) aplicada a la órbita: arco y esfera, nunca la esfera sola. Reemplaza a BR3 en las propuestas `revenue-hubspot`. Propuesta Assetplan, lámina A09 (`close-proposal`, layout `horizon`); aprobada por el operador el 2026-10-20 («Me quedo con esta»), entre la v2 y la v3.",
+      "ojo": "Tres rechazos antes: BR3 recoloreada (se notaba en la esfera y luego quedó rosada entera), la v1 (aro grueso con la esfera suelta arriba: «se ve súper artificial la órbita con ese punto rosado allí») y la v2 (Nexa grande, se leía como retrato). El modelo inventó un isotipo corrido al hombro: se borró con `ai:inpaint erase` y se compuso el logotipo oficial con `foto:isotipo --marca logotipo --sin-limpiar --acabado` (con la limpieza, los hombros quedaban cuadrados contra la bruma); es receta de luz y escena, no de bordado. La escena se corrió 32 px a la derecha con espejo del borde oscuro para dejar ≥ 90 px entre el eslogan y el halo. Sin lecho (`sinLechoPorque`): el piso llega limpio al borde. Cadena completa en el LEEME de la corrida.",
+      "isotipoPintado": true
     }
   ]
 }

@@ -8,8 +8,20 @@ Content Ops compiler/host evidence: `docs/architecture/public-site/CONTENT_MARKE
 and `references/landings/content-marketing.md`. Second canvas compiler (Agencia de Medios, 2026-10-16):
 `references/landings/agencia-de-medios.md`; third (HubSpot v2, 2026-10-16, with a page layer and a mobile dock):
 `references/landings/hubspot-services.md`; fourth (Performance Marketing, 2026-10-17): `references/landings/performance-marketing.md`. Fifth (Inbound
-Marketing, 2026-10-18, first with the native meeting launcher): `references/landings/inbound-marketing.md`. Each is a
-reference for mechanisms and lessons, not a layout to copy (`references/landing-workflow.md` §Start from the landing's need).
+Marketing, 2026-10-18, first with the native meeting launcher): `references/landings/inbound-marketing.md`. Sixth
+(Agenda `/agenda/`, 2026-10-20, on the shared core): `references/landings/agenda.md`. Lessons: the core only has the
+dialog launcher, so an **inline** scheduler is not a module — the publisher places the pilot's host adapter
+(`agenda-source/scheduler-host.html`) in its own Elementor HTML widget between two compiled modules and the page layer
+only frames and themes it (`--gh-meeting-*`, guarded by `body:has(.gh-agenda)`); a frame that overlaps the previous
+section with a negative margin needs `display:flow-root` on its own section, or the margin collapses through it and the
+section background rises with the card (fixed live 2026-10-20). Rail: `compile-agenda-elementor-source.cjs` →
+`build-agenda-elementor-package.cjs <live baseline>` → `deploy-agenda-elementor-package.php` → hash-guarded
+`publish-agenda-elementor-page.php` → `rollback-agenda-elementor-page.php`; both core gates include `agenda`.
+Seventh (Nosotros `/about-us-efeonce/`, 2026-10-23, replaced in place, preview → replace):
+`references/landings/about-us-efeonce.md`. Eighth (Partners `/partnership/`, 2026-10-23, preview → replace):
+`references/landings/partnership.md`. Both fed §Ohio host fidelity (collisions, rails, parallax, wide hero, field
+renumbering). Each is a reference for mechanisms and lessons, not a layout to copy (`references/landing-workflow.md`
+§Start from the landing's need).
 
 ## Shared source-led core (2026-10-17)
 
@@ -198,6 +210,13 @@ Ohio or other pages. Two rules keep that scoping honest:
 
 ## Scroll-driven reveals and mobile docks
 
+> **Delta 2026-10-23 (TASK-2043):** the per-landing mobile docks below are superseded. The seven landings now use the
+> shared AXIS `efeonce.landing-dock` painted by plugin `eo-landing-dock`, which strips the legacy dock (`nav.mbar`,
+> `nav.mdock`, `div.mcta`, `#ghrs-sticky`, `#sticky-cta`, `[data-sticky-cta]`) from the HTML while its config is on;
+> the legacy code still sits in each landing until its retirement task. A new landing never builds its own dock:
+> `global-site-navigation.md` §Landing dock. The reveal bullets and the hidden-pane trap still apply; the dock bullets
+> are history and rollback context (`off` brings the legacy dock back).
+
 - A reveal bound to the scroll (`animation-timeline: view()`) must **finish when the element is fully in view**:
   end its range at `entry 70%`–`entry 100%`, never at `cover N%`. A range that ends at `cover 35–60%` keeps
   cards, titles and bars mid-animation (offset, faded) while the visitor is reading them (HubSpot v2,
@@ -322,6 +341,41 @@ Ohio or other pages. Two rules keep that scoping honest:
 - Parent-document Escape does not prove Escape inside a cross-origin player. Test initial focus, Tab
   into/out of provider controls, Escape there, X/backdrop, fullscreen and focus return separately. If the
   automation cannot advance focus, record the exact gap and keep keyboard certification pending.
+
+## Ohio host fidelity (Partners and Nosotros, 2026-10-23/24)
+
+- **Measure, do not eyeball.** Render the local canvas and the live page at the same viewport with animations frozen
+  and diff computed styles element by element (tag, height, display/padding/margin/type/colour); the Nosotros rig lives
+  in `tmp/nosotros-diff/` (`diff.mjs`, `sec.mjs`, `collide.mjs`). A marquee JS clone adds a track child live and shifts
+  every later index: remove the clone before comparing.
+- **Ohio collisions catalogue** (fixed in each landing's `<landing>-source/host.css`): body `line-height:1.6`, `16.4px`
+  and tracking → root reset `font-size:16px;line-height:normal;letter-spacing:normal`; the `.tag` pill skin; 16px top
+  margins on grids (`.bento`, `.steps`, `.pgrid`); `ul:not(.-unlist) > li{margin:var(--clb-spacer-05) 0}`; theme heading
+  sizes (`font-size:revert;font-weight:revert`); forced `border-box` while the canvas uses `content-box` (2px off on
+  bordered buttons).
+- **Theme rails.** From 1181px Ohio pins its Dark/Light switch (`.elements-bar.left`) and «Follow Us» (`.elements-bar.right`)
+  at `1.5vw + 56px` from each edge; below 1181 they turn full-width. Canvases have no rails, so full-bleed copy at
+  56–72px and a 1320px `.wrap` below ~1320px viewport run under them. Recipe inside `@media (min-width:1181px)`:
+  `--gh-rail: calc(1.5vw + 88px)`; `.wrap` padding `max(56px, calc(var(--gh-rail) - max(0px,(100vw - 1320px) / 2)))`;
+  full-bleed copy padding-left/right = rail (`!important` when the canvas sets it inline); widen fixed-width copy blocks
+  by the same delta so titles keep their line. Detect by comparing `.elements-bar.*` rects with text rects;
+  `content-visibility` can return empty Range rects off-screen, so measure after scrolling the section in.
+- **Parallax under pinned overlays.** A canvas `.par` view-timeline animation (scale 1.16, ±7%) moves an image under
+  absolutely positioned labels (map city labels), which drift off their targets while scrolling; frozen-animation
+  screenshots hide it. No parallax on images that carry pinned overlays.
+- **Wide-screen hero.** Copy centered in `max-width:1320px` drifts onto the bright part of the photo at wide viewports;
+  the approved composition is the one seen at canvas width (~1280px). Anchor it to the left rail (`margin-left:0`,
+  padding-left rail, max-width + delta).
+- **Field renumbering.** Adding an `<img>` (or any field) to a module renumbers that module's compiled `fNNN_*` ids,
+  and every schema changes `sourceSha256`. A widget-only deploy is safe only when the page's `_elementor_data` stores
+  no `fNNN_` keys (the publishers write only `_title/_margin/_padding`): grep it with a wp eval for `"f\d{3}_` first;
+  otherwise republish.
+- **Deploy sequence.** `node scripts/public-website/compile-<landing>-elementor-source.cjs` →
+  `pnpm public-website:export-live-code` (baseline dir) → `node scripts/public-website/build-<landing>-elementor-package.cjs <baseline>`
+  → `pnpm public-website:wpcli -- --eval-file scripts/public-website/deploy-<landing>-elementor-package.php
+  --input-file tmp/<landing>-elementor-release/package.zip --input-file tmp/<landing>-elementor-release/manifest.json --wp-user 12`
+  (SHA guard + tar backup in Kinsta `/tmp`). Verify the live asset content/sha, not the exit code: a reported failure
+  followed by «Live drift» meant the first deploy had already applied.
 
 ## Evidence ladder and recovery
 

@@ -1,5 +1,19 @@
 # Radar comercial Efeonce
 
+### Gate de adjudicación antes de invertir en una compra — corrección18/10/2026
+
+Mandato expreso de Julio del18/10: la compra debe superar esta verificación **antes de recomendarla, recomendar postulación, solicitar/consumir créditos, proponer/crear un Deal o convertirlo en negocio compartido**. Una aprobación previa de ejecución no acredita que la señal esté bien calificada. Revalidar inmediatamente antes de cada gasto o alta/conversión autorizada, también en procesos conocidos.
+
+1. **Fuente y adjudicación:** leer la fuente primaria del comprador, proveedor seleccionado/adjudicado, acto/resolución de adjudicación y orden de compra/servicio cuando existan. Una búsqueda sin resultados, campo vacío o agregado «No adjudicado» no prueba ausencia de adjudicación.
+2. **Contrato y fechas:** comprobar existencia/estado, firma o formalización, inicio y fin/plazo de ejecución. Leer el documento contractual disponible, no sólo el nombre del archivo. Separar publicación de firma, adjudicación y ejecución; conservar hora/zona y precisión reales. Una publicación de esta semana posterior a la firma no abre una oportunidad. El fin de ejecución no es plazo de propuestas.
+3. **Participación vigente:** comprobar etapa, vía de participación y calendario del comprador: inscripción/interés/invitación, solicitudes de bases y entrega de ofertas, según apliquen. Para recomendar postulación, acreditar recepción/admisión vigente y plazo; no basta que el portal diga «Publicado» o «Abierto».
+4. **Decisión obligatoria:** proveedor adjudicado/seleccionado explícito, contrato firmado o ejecución iniciada → **ADJUDICADA / DESCARTADA para esa compra**. Fuente/documento decisivo bloqueado, calendario sin acreditar o contradicción sin resolver → **INVESTIGACIÓN INCOMPLETA / HOLD**. En ambos casos: no recomendar como compra disponible, no gastar créditos ni crear/compartir Deal por esa compra. Resolver con investigación gratuita y reportar el bloqueo; no trasladar al operador una aprobación basada en una oportunidad no verificada. Los hechos contractuales específicos del comprador prevalecen sobre feeds, buscadores y agregadores.
+5. **Evidencia por candidata:** reporte y JSON guardan resultado (`abierta_verificada`, `adjudicada_descartada` o `hold`), fuente primaria, fecha/hora de lectura, adjudicatario, estado/fechas contractuales y de recepción, documento leído o bloqueo y fundamento. Distinguir no aplica, no encontrado y no verificado. La evidencia vive en el expediente; no crear propiedades CRM nuevas por esta regla. Una reevaluación factual no amplía permisos de CRM, pagos o envíos.
+
+La prospección proactiva sin convocatoria conserva su carril de hipótesis y no exige documentos que no aplican; tampoco se presenta como compra abierta. Otra iniciativa futura de una cuenta adjudicada exige una señal independiente y nuevas verificaciones, sin reutilizar esta compra como oportunidad.
+
+**Exclusión concreta:** Esenttia HSP-0034,5600218590/CO1.REQ.11210476, adjudicadaDACARTEC; firma10/10/2026 e inicio15/10/2026. Deal66218288550 cerrado por Julio. No reabrir, perseguir admisión, volver a enriquecer, postular ni compartir por esa compra. Una nueva publicación del mismo contrato no revoca este STOP.
+
 Brochures: [aprobados para uso comercial íntegro, sin revalidar ni recortar](../../operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md), ratificado por Julio el 17-10-2026. Usar el documento existente de HubSpot; la copia Aloja de 38 láminas no está aprobada.
 
 Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
@@ -65,6 +79,21 @@ puntual de escritura para esos archivos; sin cambiar permisos persistentes ni in
 Ante divergencia de su guía de frescura, este ajuste explicita el solape/primera puerta para el trabajo en
 este repo; no afirmar que se propagó al scheduler o a otro host. Eficacia y adopción requieren evidencia
 de futuras corridas; la guía no garantiza exhaustividad ni avisos en tiempo real.
+
+## Presentación clara de acciones — corrección del 17/10/2026
+
+El resumen que recibe Julio debe poder entenderse sin abrir el expediente ni conocer los códigos internos.
+Por cada prioridad, explicar en frases completas: qué pide la empresa, qué decisión concreta falta,
+por qué importa la fecha y qué información o material permite resolverla. Identificar quién puede hacer
+el siguiente paso; no pasar al operador una instrucción genérica como «revisar paquete» o «validar capacidad».
+
+Separar **decisiones y preparación próximas**, **autorizaciones puntuales pendientes**, **investigación que
+le corresponde al agente** y **acciones ya programadas o cuentas en espera**. Una programación existente
+no es una tarea nueva para Julio. Mostrar las 3–5 prioridades reales primero, conservar los demás pendientes
+en el reporte detallado y explicar cualquier dependencia de acceso o del comprador. Fechas con día, hora
+y zona cuando estén acreditadas; no inventar urgencia para hoy sábado. Explicar siglas imprescindibles;
+IDs, tablas de cobertura, consultas y evidencia técnica quedan como referencia después de la acción.
+Esta corrección editorial no modifica permisos, aprobaciones, ICP, ventanas ni obligaciones de investigación.
 
 ## Registro por corrida
 

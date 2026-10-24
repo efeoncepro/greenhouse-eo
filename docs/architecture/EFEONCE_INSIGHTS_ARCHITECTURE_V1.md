@@ -2,6 +2,7 @@
 
 > Status: **En ejecución, actualizado 2026-10-04.** Foundation/render/catálogos/editorial v2/shared web y criterio de figuras publicados; modelo web vigente **1.4** (release `36a73e7b7e19`). Generación, render, IA, editorial v2, sharing, emisión, correo y recurrencias ON en Vercel Production (readback 04/10). TASK-1957/1962 desplegadas, cierre pendiente; TASK-1975 espera revisión y promoción de fixes posteriores. Portal (TASK-1849), jerarquía cliente (TASK-1958), canales y expansión de evidencia siguen abiertos.
 > [Auditoría de cierre](../audits/insights/2026-10-04-epic-045-closure-review.md). Los deltas fechados de §14 conservan historia; no sustituyen este estado vigente.
+> Delta 2026-10-23 (§6.2.1): el catálogo A4 `insights-report` suma hallazgos, escenarios, `productLabel`, tendencia anotada, guarda del pie y `pnpm report:compose` para informes no-Insights (auditorías); en `develop` local.
 > Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 
@@ -395,6 +396,32 @@ Compartidos en `catalogs/insights-shared/` (`figure-svg.ts`, `figure-hooks.ts`, 
 `layout-hooks.ts`). Fidelidad: 41 PNG de referencia en
 `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs/paginas/`, tolerancia ≤ 1 % (§14.9).
 
+### 6.2.1 Delta 2026-10-23 — el catálogo A4 premium sirve también para informes no-Insights
+
+**Regla.** `insights-report` es el catálogo A4 premium de Efeonce, no sólo el render de una edición de Insights. Un
+informe que no sale del pipeline (auditoría, diagnóstico) se compone con el mismo catálogo desde un plan de intención
+(`contentType` + `slots`; nunca plantilla) y declara su producto en `productLabel`. No se maqueta HTML a mano para
+parecerse al informe aprobado. Commit `001683d83` (en `develop` local, sin push al 2026-10-23); el render de ediciones
+Insights en producción no lo tiene hasta su release.
+
+| Capacidad | Contrato | Dónde |
+|---|---|---|
+| `ReportFindingsPage` (`report-findings`) | Registro de hallazgos (1–6): severidad por rol (resolver `report-severity`: `critical`/`high`/`medium`/`low`), `severityLabel` de texto siempre junto al tono, título, detalle, evidencia y responsable. Aviso urgente opcional (`alert`, con lista de afectados); sin aviso, el bloque no se dibuja | `catalogs/insights-report/report-findings.{html,slots.json}` |
+| `ReportScenariosPage` (`report-scenarios`) | Columnas por período (2–4) y escenario (1–3; roles `low` neutro, `base` dato actual, `high` oportunidad) contra la referencia observada del año anterior (línea discontinua, único dato observado). La figura sale de `scenarioChart` (validation-only) por `makeScenariosHook`; el alto de cada columna sale de la cifra impresa. Las tarjetas `scenarios[]` llevan los mismos roles en el mismo orden: si no coinciden, falla. Resolver `report-scenario-role` | `report-scenarios.{html,slots.json}`, `insights-shared/figure-scenarios.ts` |
+| `productLabel` (requerido, ≤ 24 caracteres) | Producto en `report-cover`, `report-cover-light` y `report-chapter`; antes «Insights» fijo en la plantilla. `example: "Insights"` (los frames aprobados no cambian); `render/report-mapper.ts` lo declara con el copy de Insights | `report-cover*.slots.json`, `report-chapter.slots.json` |
+| Tendencia anotada | `lineAnnotations.bands[]` (etapas; tono `alert` opcional; no se superponen), `events[]` (hito vertical) y `pointLabels[]` (rótulo sobre un punto de la línea principal; falla si el punto no tiene dato). Sólo si el plan los declara | `insights-shared/figure-svg.ts`, `report-editorial.css` |
+| Guarda del pie | `withPaperFootGuard` / `paperFootClearanceHook` corre en **todas** las plantillas del catálogo después de su hook: si un bloque del cuerpo termina sobre `.paper-foot` (margen 4 px), el render falla cerrado con la página y el bloque. Antes sólo la cascada lo vigilaba; caso fuente: páginas de comparación con cinco métricas dibujaban el pie dentro del panel de cierre sin error (2026-10-23). La corrección es acortar el copy, nunca tapar el pie | `insights-shared/layout-hooks.ts`, `catalogs/insights-report/index.ts` |
+| CLI `pnpm report:compose <plan.json> [--out <dir>] [--asset <clave>=<archivo>]` | Compone el PDF A4 desde un plan JSON, sin LLM ni red. `--asset org-logo:<id>=<svg\|png>` entrega el logo del cliente como data URI para `asset-ref:org-logo:<id>`; una referencia sin archivo falla. Salida por defecto `.captures/report-compose/` | `scripts/artifact-composer/compose-report.ts` |
+
+**Primer uso.** Auditoría SEO del Blog SKY (23 páginas): `scripts/seo/sky-blog-audit-report.ts` genera el plan (contacto
+desde `src/config/efeonce-brand.ts`; folios, índice y referencias «p. NN» derivados del orden de las páginas); plan y PDF
+en `outputs/sky-blog-seo-audit-2026-10-23/informe/`.
+
+**Gates verdes al commit.** Suite composer + Insights (798 tests); `pnpm insights:canvas-fidelity` 30 páginas ≤ 1 % y
+`Deck-Agrupadas` en su excepción; `pnpm composer:color-ledger` 0 sin mapping; `pnpm composer:visual-gate
+--catalog=insights` 39 frames a 0 px, con los dos frames nuevos declarados en la sección (ab) de `BASELINE_DELTAS.md`
+y `--freeze`. Manual: [componer un informe A4 premium desde un plan](../manual-de-uso/insights/componer-un-informe-a4-premium-desde-un-plan.md).
+
 ### 6.3 Marca de producto Insights: dónde se aplica y dónde falta
 
 Construcción y reglas en el manual de marca (`docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §7.1);
@@ -405,7 +432,7 @@ archivos oficiales en `@efeoncepro/axis-brand-assets` 0.4.0 (`insights-logo-*`, 
 |---|---|---|
 | Informe live (Think) | **Aplicada**: lockup negativo en pantalla, positivo en impresión, también en el modo presentación | `InsightReport.astro`; copias en `efeonce-think/public/branding/insights/` (5 SVG) |
 | Imagen al compartir (OG) de Think | **Aplicada** | `public/branding/insights/og-insights.png`, usada en `[token].astro` y `muestra.astro` |
-| Portadas y aperturas de capítulo PDF A4 y deck | **Tipográfica, no el archivo oficial**: logo Efeonce + filete + «INSIGHTS» en mayúsculas espaciadas (`text-transform: uppercase`, `letter-spacing: 0.34em`; no son versalitas reales) — clase `.brand-product` en A4 `report-cover*.html`, mini-lockup del pie de `report-chapter.html`; `.product` en deck `insights-cover.html` e `insights-chapter.html` (portada y pie) —, como aprobó el canvas de TASK-1889 | `report-cover.html`, `report-cover-light.html`, `report-chapter.html`, `insights-cover.html`, `insights-chapter.html`; los catálogos sólo traen `assets/brand/logo-*.svg` de Efeonce |
+| Portadas y aperturas de capítulo PDF A4 y deck | **Tipográfica, no el archivo oficial**: logo Efeonce + filete + «INSIGHTS» en mayúsculas espaciadas (`text-transform: uppercase`, `letter-spacing: 0.34em`; no son versalitas reales) — clase `.brand-product` en A4 `report-cover*.html`, mini-lockup del pie de `report-chapter.html`; `.product` en deck `insights-cover.html` e `insights-chapter.html` (portada y pie) —, como aprobó el canvas de TASK-1889. Desde el 2026-10-23 la palabra del A4 sale del slot `productLabel` (§6.2.1), que Insights declara como «Insights» | `report-cover.html`, `report-cover-light.html`, `report-chapter.html`, `insights-cover.html`, `insights-chapter.html`; los catálogos sólo traen `assets/brand/logo-*.svg` de Efeonce |
 | Correo de entrega | Falta: `EmailLayout` con `brand='efeonce'` | `src/emails/InsightsEditionDeliveryEmail.tsx` |
 | Favicon de Think | Falta: favicon genérico del hub | `efeonce-think/src/layouts/BaseLayout.astro` |
 | Receta de deck «resultados en vivo» | Usa el isotipo de Efeonce para la ficha de Insights | `deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` |

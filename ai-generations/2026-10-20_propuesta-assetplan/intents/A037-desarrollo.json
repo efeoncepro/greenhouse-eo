@@ -1,0 +1,49 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "method",
+  "recipe": "method-staircase",
+  "voice": {
+    "eyebrow": "Desarrollo a medida",
+    "question": "¿Y si HubSpot no lo trae?",
+    "answer": [
+      "Hecho a",
+      "medida"
+    ]
+  },
+  "body": "Si no viene de fábrica, lo construimos: código versionado, probado y documentado.",
+  "levels": [
+    {
+      "name": "Configuración",
+      "descriptor": "lo nativo, bien hecho"
+    },
+    {
+      "name": "Código propio",
+      "descriptor": "lógica a medida, versionada"
+    },
+    {
+      "name": "Objetos y APIs",
+      "descriptor": "tu modelo de datos"
+    },
+    {
+      "name": "Extensiones",
+      "descriptor": "vistas a medida"
+    },
+    {
+      "name": "Agentes",
+      "descriptor": "con límites claros"
+    }
+  ],
+  "note": "Cada escalón suma capacidad y también control.",
+  "selection": {
+    "target": "level",
+    "level": 2,
+    "label": "TI",
+    "participantKind": "department"
+  },
+  "line": "revenue-hubspot",
+  "use": "proposal"
+}

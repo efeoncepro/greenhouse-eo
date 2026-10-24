@@ -10,6 +10,8 @@ import { getGraderProfile, getGraderRun } from '../store'
 import { buildFixItArtifacts } from './generators'
 import type { GenerateFixItArtifactsResult } from './contracts'
 
+import type { EnvSource } from '@/types/env-source'
+
 export class FixItArtifactsError extends Error {
   readonly code: string
 
@@ -20,7 +22,7 @@ export class FixItArtifactsError extends Error {
   }
 }
 
-const assertEnabled = (env: NodeJS.ProcessEnv): void => {
+const assertEnabled = (env: EnvSource): void => {
   if (!isFixItArtifactsEnabled(env)) {
     throw new FixItArtifactsError('fix_it_disabled', 'La generación de artefactos fix-it está deshabilitada.')
   }
@@ -28,7 +30,7 @@ const assertEnabled = (env: NodeJS.ProcessEnv): void => {
 
 export const generateFixItArtifactsForRun = async (input: {
   runId: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }): Promise<GenerateFixItArtifactsResult> => {
   const env = input.env ?? process.env
 
@@ -64,7 +66,7 @@ export const generateFixItArtifactsForRun = async (input: {
 
 export const generateFixItArtifactsForPublicToken = async (input: {
   reportToken: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }): Promise<GenerateFixItArtifactsResult | null> => {
   const env = input.env ?? process.env
 

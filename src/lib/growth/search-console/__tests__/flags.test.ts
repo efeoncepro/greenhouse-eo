@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { GROWTH_SEARCH_CONSOLE_FLAG, isSearchConsoleEnabled } from '../flags'
 
-const env = (value?: string): NodeJS.ProcessEnv =>
-  (value === undefined ? {} : { [GROWTH_SEARCH_CONSOLE_FLAG]: value }) as NodeJS.ProcessEnv
+import type { EnvSource } from '@/types/env-source'
+
+const env = (value?: string): EnvSource =>
+  (value === undefined ? {} : { [GROWTH_SEARCH_CONSOLE_FLAG]: value })
 
 describe('isSearchConsoleEnabled', () => {
   it('default OFF cuando el flag no está seteado', () => {

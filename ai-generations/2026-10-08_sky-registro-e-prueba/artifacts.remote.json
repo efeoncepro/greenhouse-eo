@@ -1,0 +1,275 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:51:38.699Z",
+  "run": "ai-generations/2026-10-08_sky-registro-e-prueba",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-08_sky-registro-e-prueba",
+  "totalBytes": 128290294,
+  "fileCount": 44,
+  "files": [
+    {
+      "path": "01-austral-kayak-1408x768.webp",
+      "sizeBytes": 195638,
+      "sha256": "a86d1db213954b4c4b3e843e775dabdc2c30055c53cc1671cd21a07dba484896",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/01-austral-kayak-1408x768.webp"
+    },
+    {
+      "path": "01-austral-kayak.png",
+      "sizeBytes": 12126454,
+      "sha256": "f9a22fc4cc1fe0a7e7510cbffdb9f4c9b6864bd1b97b5309895a13c5eb1bdfea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/01-austral-kayak.png"
+    },
+    {
+      "path": "02-cancun-ola-1408x768.webp",
+      "sizeBytes": 174154,
+      "sha256": "5aa583d4ce0d8ae29f9f08b2c49092829e32e46ae17c9a798762b48c29f79e5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/02-cancun-ola-1408x768.webp"
+    },
+    {
+      "path": "02-cancun-ola.png",
+      "sizeBytes": 12472930,
+      "sha256": "9269a9bd78761815f79e92b1e273c9eff82733cb57d4865ca745404d939756ca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/02-cancun-ola.png"
+    },
+    {
+      "path": "dop-v2/01-austral-kayak-1408x768.webp",
+      "sizeBytes": 199234,
+      "sha256": "19aa415d09ca5cc32d2ae71cad9e62b7624eecc021df0776fed1d182fd5aeda9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/dop-v2/01-austral-kayak-1408x768.webp"
+    },
+    {
+      "path": "dop-v2/01-austral-kayak.png",
+      "sizeBytes": 11858556,
+      "sha256": "b84f4672908de3eeb1ff1b654e2b85c0b7baf6dd3f9303fc88373103b1ca9484",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/dop-v2/01-austral-kayak.png"
+    },
+    {
+      "path": "dop-v2/02-cancun-ola-1408x768.webp",
+      "sizeBytes": 181586,
+      "sha256": "246e26e2b1a6b98fc88158409ab4d604dfd84ec10654bf85ebc027410aa44fa3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/dop-v2/02-cancun-ola-1408x768.webp"
+    },
+    {
+      "path": "dop-v2/02-cancun-ola.png",
+      "sizeBytes": 12742559,
+      "sha256": "a8fca3fb70e3b33fc1cbe7be3d9b7b17aeac81fa9ae6c8400e18b5ffe3cbdbc4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/dop-v2/02-cancun-ola.png"
+    },
+    {
+      "path": "dop-v2/qa/01-austral-kayak-comparacion.jpg",
+      "sizeBytes": 635810,
+      "sha256": "a66ff4e3a039decf589ad794e204ea7b8be3b375b6a758906abc4586daf8b6bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/dop-v2/qa/01-austral-kayak-comparacion.jpg"
+    },
+    {
+      "path": "dop-v2/qa/01-mano-remo.png",
+      "sizeBytes": 147250,
+      "sha256": "bb064fbd7e54d742cf8417e19583d85de4cacf372df678b6fc3cd07d6f1f6c08",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/dop-v2/qa/01-mano-remo.png"
+    },
+    {
+      "path": "dop-v2/qa/01-rostro.png",
+      "sizeBytes": 296994,
+      "sha256": "506b66361fc2137595e8818718063f66917f3cee56409f8ba35cdf2e504f5032",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/dop-v2/qa/01-rostro.png"
+    },
+    {
+      "path": "dop-v2/qa/02-cancun-ola-comparacion.jpg",
+      "sizeBytes": 596951,
+      "sha256": "895322a97195a0f5af227f8a55a69e560bab2ba36248e07ea677df015237f88a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/dop-v2/qa/02-cancun-ola-comparacion.jpg"
+    },
+    {
+      "path": "dop-v2/qa/02-manos.png",
+      "sizeBytes": 1135795,
+      "sha256": "521b0532bd82b19f2d57ee80502c17a0664695e01fec3bd0160ed54d1bb44c0d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/dop-v2/qa/02-manos.png"
+    },
+    {
+      "path": "dop-v2/qa/02-pies.png",
+      "sizeBytes": 941423,
+      "sha256": "850c3e1953dc2ed10525a55b0af019c9bbb2cc66aa8f736dcab2e19ae0ee53b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/dop-v2/qa/02-pies.png"
+    },
+    {
+      "path": "dop-v2/qa/02-rostro.png",
+      "sizeBytes": 304283,
+      "sha256": "39a55354fe20ab4588360269d5296148fdca9f40f8b32f6dd558694e0ca5c3ea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/dop-v2/qa/02-rostro.png"
+    },
+    {
+      "path": "qa/01-mano-remo.png",
+      "sizeBytes": 149139,
+      "sha256": "84617b333a415cbe1df8cbb7e14678f146b18b671ecddc5609638b8598ecdaa1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/qa/01-mano-remo.png"
+    },
+    {
+      "path": "qa/01-rostro.png",
+      "sizeBytes": 296325,
+      "sha256": "6932ea981b64eeb04fc02b9ab24994767c2bb1b94d76a419df9c5c8885f344d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/qa/01-rostro.png"
+    },
+    {
+      "path": "qa/02-manos.png",
+      "sizeBytes": 1122611,
+      "sha256": "22568a5715b35adbca49f4e0e33bca5ff07b36011ef8337e9cb74e301693d281",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/qa/02-manos.png"
+    },
+    {
+      "path": "qa/02-pies.png",
+      "sizeBytes": 919924,
+      "sha256": "92331624d3174859abce3cf718abda5e2491572864ca9dd2e37f7ea1499a97a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/qa/02-pies.png"
+    },
+    {
+      "path": "qa/02-rostro.png",
+      "sizeBytes": 304637,
+      "sha256": "ce253e104081d80ee18a97a5e7a881d1328dbd3cd2c8d181a6c5ffde8a17d473",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/qa/02-rostro.png"
+    },
+    {
+      "path": "refs/experiencia-austral.png",
+      "sizeBytes": 5816909,
+      "sha256": "fcc9a3ce3a6d98b75de49411890dcb798db36d48946b2e0e85398fa8ce25f541",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/refs/experiencia-austral.png"
+    },
+    {
+      "path": "refs/experiencia-cancun.png",
+      "sizeBytes": 5808927,
+      "sha256": "e000089732374b4865822e1381905f6e3c8106ffcd11791b2e32ebf458654c1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/refs/experiencia-cancun.png"
+    },
+    {
+      "path": "refs/geo-general-carrera.jpg",
+      "sizeBytes": 345686,
+      "sha256": "fe2960f46023f01bb6ce28fef27e83b8f96536af789ef6231e08e5da38b39b04",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/refs/geo-general-carrera.jpg"
+    },
+    {
+      "path": "refs/geo-playa-delfines.jpg",
+      "sizeBytes": 3559368,
+      "sha256": "83a9078cad4f9b518ac5e7334904b9d1dc43cf50ef5fabce2f2873e5c9b25d41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/refs/geo-playa-delfines.jpg"
+    },
+    {
+      "path": "urbanas-v1/01-valparaiso-v02-1408x768.webp",
+      "sizeBytes": 196704,
+      "sha256": "2f7c16518169e01ac881bb0d98e554f58cf1af79a58c0c2c0437a27b73c7f408",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/01-valparaiso-v02-1408x768.webp"
+    },
+    {
+      "path": "urbanas-v1/01-valparaiso-v02.png",
+      "sizeBytes": 12404541,
+      "sha256": "bf093eb3c510143216a40fac85a3a56c8a0598caeb16bc104d7160c8d16d12d1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/01-valparaiso-v02.png"
+    },
+    {
+      "path": "urbanas-v1/01-valparaiso.png",
+      "sizeBytes": 12366809,
+      "sha256": "b59ab17cc6a5444d61fb957545c29f95b86eda2e7fe64600055feb34eb1b98d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/01-valparaiso.png"
+    },
+    {
+      "path": "urbanas-v1/02-miami-1408x768.webp",
+      "sizeBytes": 136586,
+      "sha256": "1394c395a801ca190a25a219fbf211a14a4381f3eaeee8fcc86aff8bbadad151",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/02-miami-1408x768.webp"
+    },
+    {
+      "path": "urbanas-v1/02-miami.png",
+      "sizeBytes": 10494811,
+      "sha256": "42b9ff01efb1695aa6e207219e861ed4576c6f764fda04fb3a701e2cb90c5e6b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/02-miami.png"
+    },
+    {
+      "path": "urbanas-v1/03-buenos-aires-1408x768.webp",
+      "sizeBytes": 194010,
+      "sha256": "ab4d728d209cc1889b03fb27c0737e9db4daefbceb477df704a63c5bf0b4fe2e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/03-buenos-aires-1408x768.webp"
+    },
+    {
+      "path": "urbanas-v1/03-buenos-aires.png",
+      "sizeBytes": 12285225,
+      "sha256": "a2c918308a9dd131308d883678b76899aa4b7ceb70b3692526054089c4c4cdfe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/03-buenos-aires.png"
+    },
+    {
+      "path": "urbanas-v1/qa/01-valparaiso-cara.png",
+      "sizeBytes": 284929,
+      "sha256": "a722c70421e804393f2f37a06869e172b8edeb70b84d635c8fbf3762f0ac3c2c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/qa/01-valparaiso-cara.png"
+    },
+    {
+      "path": "urbanas-v1/qa/01-valparaiso-mano.png",
+      "sizeBytes": 242169,
+      "sha256": "dad6c3178760e43f1a4e8c7212ccf896bebcee4e56433ff817132b175ac239d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/qa/01-valparaiso-mano.png"
+    },
+    {
+      "path": "urbanas-v1/qa/01-valparaiso-v02-cara.png",
+      "sizeBytes": 280724,
+      "sha256": "a2904fbd20b699a45167004737c88be77c9311ba2c01d5e85731cc2a36cfa80d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/qa/01-valparaiso-v02-cara.png"
+    },
+    {
+      "path": "urbanas-v1/qa/01-valparaiso-v02-mano.png",
+      "sizeBytes": 243881,
+      "sha256": "fc6710d8f18732b08169f4f16cbfc244de8f9ef459aec2716c807d0b8218f44e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/qa/01-valparaiso-v02-mano.png"
+    },
+    {
+      "path": "urbanas-v1/qa/02-miami-caras.png",
+      "sizeBytes": 3668997,
+      "sha256": "ab060e8587b24df3a320d5d6846554ad3f01a59d0241a861279aa3b1c7c9e2e5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/qa/02-miami-caras.png"
+    },
+    {
+      "path": "urbanas-v1/qa/02-miami-contacto.png",
+      "sizeBytes": 528196,
+      "sha256": "553d282ed6966015e217c7b04efd4f155894750e7dd86d7a270145bda112ef78",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/qa/02-miami-contacto.png"
+    },
+    {
+      "path": "urbanas-v1/qa/03-buenos-aires-cara.png",
+      "sizeBytes": 533890,
+      "sha256": "5289047385877d1efa2700b844a0c7d7f090571360e15c9937ac6ecb412eafd9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/qa/03-buenos-aires-cara.png"
+    },
+    {
+      "path": "urbanas-v1/qa/03-buenos-aires-mano.png",
+      "sizeBytes": 298733,
+      "sha256": "61e5db832317320511565e9ac3425619fe2db4f11c5dd85489abfb6cf39f17db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/qa/03-buenos-aires-mano.png"
+    },
+    {
+      "path": "urbanas-v1/qa/miami-cara-hombre.png",
+      "sizeBytes": 527948,
+      "sha256": "f6dfbbc0cd4237ea611ed170a0c642aa6dc09bdf898c52f8ecc8c555d721b55b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/qa/miami-cara-hombre.png"
+    },
+    {
+      "path": "urbanas-v1/qa/miami-cara-mujer.png",
+      "sizeBytes": 606072,
+      "sha256": "6b639a3246c343ee0845f8092b1b7c23722c2a551fae9192c7b6936051b238ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/qa/miami-cara-mujer.png"
+    },
+    {
+      "path": "urbanas-v1/refs/01-valparaiso.jpg",
+      "sizeBytes": 397898,
+      "sha256": "755e97c33b692ea1af4a2ec9d8c3356f4ce710881dd7e14872cd6529c6af0ad3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/refs/01-valparaiso.jpg"
+    },
+    {
+      "path": "urbanas-v1/refs/02-miami.webp",
+      "sizeBytes": 69948,
+      "sha256": "aaf5c5cae5f32fd66eb979a4c5f93db036e6f81bdfbda4e678e237cf5a929484",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/refs/02-miami.webp"
+    },
+    {
+      "path": "urbanas-v1/refs/03-buenos-aires.jpg",
+      "sizeBytes": 195080,
+      "sha256": "730f0d7144784f3000b786ab69ff1d0d11fff8c84d98e4923fbbad230ef417c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/refs/03-buenos-aires.jpg"
+    }
+  ]
+}

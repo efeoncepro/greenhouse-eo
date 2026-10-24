@@ -1,0 +1,65 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:35:24.606Z",
+  "run": "ai-generations/2026-10-02_prueba-ciega-cine-2",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-02_prueba-ciega-cine-2",
+  "totalBytes": 10670353,
+  "fileCount": 9,
+  "files": [
+    {
+      "path": "A/plates/emblemas-al-100.jpg",
+      "sizeBytes": 171533,
+      "sha256": "8db04805ec22646989fa39baf5ca2f614e2c9c0809bc96911705033af372ae96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine-2/A/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "A/plates/PR1-piezas-que-rinden.png",
+      "sizeBytes": 1318369,
+      "sha256": "77a123f57140901cc3d357101600846b5a76cf0f35418b88b73b38b06d0c0900",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine-2/A/plates/PR1-piezas-que-rinden.png"
+    },
+    {
+      "path": "A/plates/PR1b-piezas-que-rinden.png",
+      "sizeBytes": 1282511,
+      "sha256": "3604a7d322fe2e605801757198624a8d11cf329eb22bdf8daad56c24e72765af",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine-2/A/plates/PR1b-piezas-que-rinden.png"
+    },
+    {
+      "path": "B/plates/CT1-contenido-trabaja.png",
+      "sizeBytes": 2082812,
+      "sha256": "5a4791509a631a9179a83ccce299d2257386e8ebda1251eaf31e1376333e5f92",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine-2/B/plates/CT1-contenido-trabaja.png"
+    },
+    {
+      "path": "B/plates/CT1b-contenido-trabaja.png",
+      "sizeBytes": 2067493,
+      "sha256": "f6bca34b866436554765ba6c0ff7c9618e7d8f3e1bd9c9f65cd2f26f720ebae4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine-2/B/plates/CT1b-contenido-trabaja.png"
+    },
+    {
+      "path": "B/plates/emblemas-al-100.jpg",
+      "sizeBytes": 265133,
+      "sha256": "643cd1bdad503433da8e72ed6cb316d705db352e6ba2634c53f7661e0849492b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine-2/B/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "C/plates/emblemas-al-100.jpg",
+      "sizeBytes": 155549,
+      "sha256": "7736a983dbd90e8fb5a5d1fc3d53da89687bdda2d276bfad50c5e5d56c16517e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine-2/C/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "C/plates/NE1-nexa-respuesta-45.png",
+      "sizeBytes": 1624699,
+      "sha256": "4608753913cf611fcd6beac33d677fa45f3fc5bacb8a7a2c147877680d586cab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine-2/C/plates/NE1-nexa-respuesta-45.png"
+    },
+    {
+      "path": "C/plates/NE1b-nexa-respuesta-45.png",
+      "sizeBytes": 1702254,
+      "sha256": "e9e255ed5f879d540422fb6367c51a990d73f0650bfa441056d4dd29136101bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_prueba-ciega-cine-2/C/plates/NE1b-nexa-respuesta-45.png"
+    }
+  ]
+}

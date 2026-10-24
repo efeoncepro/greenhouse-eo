@@ -14,6 +14,14 @@
 > vocero de talking head quedó decidido allí: Julio Reyes. Trendjacking sigue siendo módulo del retainer
 > (§4.1) **y** franquicia de canal propio: un trendjack fallido en canal propio opera como anti-caso comercial.
 
+> **Delta 2026-10-22 — los canales propios no son la promesa de la landing.** Con
+> [PDR-020 revisión 2.0](PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias),
+> el Instagram y el Threads de Efeonce son **marca agencia**: love brand y comunidad de fans, sin conversión directa
+> ni casos con métricas B2B ([estrategia de love brand](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md)).
+> Lo que esta landing vende al cliente (sistema social de autoridad y demanda) no cambia: es la oferta de servicio,
+> no el trabajo de los canales propios. La doctrina de §2 sigue aplicando a ambos; la prueba de este servicio sigue
+> siendo la de §4, nunca las cifras de seguidores de Efeonce.
+
 ## Contexto
 
 Efeonce presta un servicio humano y recurrente de Social Media, operado por un squad gestionado por Efeonce. La oferta puede apoyarse en contenido profesional producido mediante **Efeonce Run & Gun Studio**, pero no depende de Globe ni debe prometer creación automatizada mientras esa capacidad no esté disponible para este servicio. La landing pública debe posicionar y capturar demanda para esta oferta, dentro del paraguas creativo y del ecosistema de crecimiento de Efeonce.

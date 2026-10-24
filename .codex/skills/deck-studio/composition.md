@@ -9,6 +9,12 @@
 
 ---
 
+**Alcance de este módulo:** la composición por Artifact Composer. Cuando el entregable acordado es
+un master Markdown para diseño externo, se aplica la [ruta editorial](SKILL.md#cuando-el-usuario-pide-markdown-para-diseñar-después)
+y no se ejecuta este flujo como requisito de redacción. El MD no se registra como un render ni
+reemplaza el formato exigido por el comprador para presentar. Las restricciones y gates siguientes
+se conservan al componer o emitir por sus carriles correspondientes.
+
 ## Por qué el catálogo es CERRADO (y el motivo no es estético)
 
 > Si ningún tipo de contenido calza con lo que quieres decir, **eso es un GAP del catálogo** — ábrelo

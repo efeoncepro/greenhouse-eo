@@ -109,7 +109,7 @@ capability dentro del sistema, no presentarse como agencia suelta.
 
 - **PDR-006 — Landing "HubSpot" (Agentic Customer Platform + partnership)** (posicionamiento
  decidido) + **TASK-1352** (`complete` 2026-09-11: publicada en `/servicios-contratar-hubspot/`; la migración a
- `/servicios/hubspot/` no se hizo y esa ruta hoy redirige a un post antiguo): **reposiciona la página existente
+ `/servicios/hubspot/` no se hizo; desde el 2026-10-22 esa ruta lleva a la landing vigente con una 302 temporal): **reposiciona la página existente
  `/servicios-contratar-hubspot/`** (id `244079`) del relato "compra e implementa un CRM" al de
  **plataforma agéntica operada con software propio**. Ángulo teach-first ("HubSpot dejó de ser un
  CRM: hay que arquitecturarla, poblarla con datos limpios y gobernar a los agentes"); arco de las
@@ -214,14 +214,29 @@ capability dentro del sistema, no presentarse como agencia suelta.
 
 ## Next
 
-- **Sistema editorial de los canales propios** (PDR-020, `Accepted` rev 1.2): un motor editorial
- compartido con un **rol por canal** (blog el activo · LinkedIn el comprador · YouTube la profundidad ·
- Instagram craft y cultura · Threads conversación viva · Glitch la propiedad), **catálogo propio de
+- **Sistema editorial de los canales propios** (PDR-020, `Accepted` rev 2.0 del 2026-10-22): un motor editorial
+ compartido con **tres familias** — marca agencia (Instagram y Threads: love brand y comunidad, sin conversión
+ directa), conexión B2B (LinkedIn de Efeonce y de Julio) y Marketing con Manzanitas (blog, newsletter en el
+ LinkedIn de Julio y YouTube) —, Glitch como único correo, X sólo para escuchar, **catálogo propio de
  formatos por canal** y franquicias con **canal-hogar** que viajan como corte, nunca como copia. Los
- territorios se heredan de PDR-019; el vocero de talking head es Julio Reyes. **No autoriza producción,
- apertura de cuentas ni cambios en el sitio:** quedan siete decisiones pendientes, de las cuales tres
- (canonical de video, inventario de tools/webinars y naming visible) son compartidas con `TASK-1802` y
- lo siguen bloqueando.
+ territorios se heredan de PDR-019; el vocero de talking head es Julio Reyes. La revisión 2.0 cerró canonical
+ de video (vive en YouTube; el blog lo incrusta con transcripción), secuencia de apertura y cadencia. **No
+ autoriza producción, apertura de cuentas ni cambios en el sitio:** siguen abiertos el inventario de
+ tools/webinars (compartido con `TASK-1802`, que lo sigue bloqueando) y cuántos territorios se abren. El naming
+ visible se cerró el 2026-10-22 (delta, punto 12): el público ve Marketing con Manzanitas y Think es nombre interno. Estrategia hermana: [Love Brand & Community](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
+- **Brechas de conversión de los canales propios** (medidas en efeoncepro.com el 2026-10-22,
+ [estrategia de love brand §8.4 y §14](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22)).
+ Cada canal termina en una landing de servicio con su oferta de entrada; tres destinos no están listos:
+ - **IA con contexto** (línea Engine) y **nube** no tienen landing (`/partnership/` sólo muestra logos). Debe
+   existir antes del 4-ene-2027, cuando abre la serie; requiere task propia del sitio público.
+ - **Agencia creativa duplicada:** `/agencia-creativa/` (página `249582`) y `/agencia-creativa-v2/` siguen vivas;
+   decidir cuál queda.
+ - **`/servicios/hubspot/`** redirigía (301 adivinado por WordPress) a un artículo de blog de 2024; la landing vigente
+   es `/servicios-contratar-hubspot/`. Decidido 2026-10-22: 302 temporal hacia la landing vigente hasta publicar el
+   pillar de PDR-013, que aplica el 301 definitivo. **Aplicada el 2026-10-22** (Yoast, 302 `plain`, respaldo
+   `_gh_hubspot_302_before_20261022`); al publicar el pillar se borra antes de aplicar el 301. Con caché de Kinsta la redirección no conserva los UTM, así que los posts enlazan directo a `/servicios-contratar-hubspot/` con sus UTM.
+ - La **medición del puente** fan → conversación («¿cómo nos conociste?» y fuente del primer contacto en HubSpot)
+   no existe; requiere task propia (`greenhouse-growth-forms` + HubSpot).
 - **Territorio editorial “Creative Workflows”** (PDR-014, Pillar V4 publicada; satélites siguientes): la
  Pillar educativa en Marketing con Manzanitas define la categoría desde la
  tesis **“un sistema de decisiones creativas humanas vuelto ejecutable”** y se

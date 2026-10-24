@@ -31,6 +31,8 @@ import { listActiveCompetitors } from './competitors'
 import { resolveSeoEntitlement } from './entitlement'
 import { isSeoModuleEnabled, isSeoSerpTopResultsEnabled } from './flags'
 
+import type { EnvSource } from '@/types/env-source'
+
 /** Ventana de recurrencia (días). */
 export const SERP_COMPETITOR_DISCOVERY_WINDOW_DAYS = 30
 
@@ -97,7 +99,7 @@ export interface ReadSerpCompetitorCandidatesOptions {
   windowDays?: number
   minKeywords?: number
   minDays?: number
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 /**
@@ -224,7 +226,7 @@ export interface ReadSerpTopResultsOptions {
   from?: string
   to?: string
   limit?: number
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 /** Lectura canónica del top-N persistido (serie fechada, orden por día y ranura). */

@@ -6,7 +6,7 @@ import type { FormConsentSnapshotRow, FormDestinationRow, FormSubmissionRow } fr
 const ENV_ON = {
   GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED: 'true',
   HUBSPOT_ACCESS_TOKEN: 'test-token',
-} as unknown as NodeJS.ProcessEnv
+}
 
 const submission = (fields: Record<string, unknown> = { email: 'lead@example.com', name: 'Lead' }): FormSubmissionRow => ({
   submission_id: 'fsub-1',
@@ -87,13 +87,113 @@ describe('buildSecureSubmitBody', () => {
   })
 })
 
+describe('legalConsentOptions.communications (suscripción de marketing)', () => {
+  const MARKETING_TEXT = 'Quiero recibir novedades y contenidos de Efeonce. Puedes darte de baja cuando quieras.'
+
+  const MARKETING_MAPPING = {
+    ...VALID_MAPPING,
+    communications: [{ checkboxKey: 'marketing_updates', subscriptionTypeId: 535702717, text: MARKETING_TEXT }],
+  }
+
+  const consentWith = (checkboxes: unknown): FormConsentSnapshotRow => ({ ...consent(), checkboxes_json: checkboxes })
+
+  const communicationsOf = (body: Record<string, unknown>) =>
+    (body.legalConsentOptions as { consent: { communications: unknown[] } }).consent.communications
+
+  it('casilla marcada + subscriptionTypeId declarado → envía la suscripción con el texto exacto', () => {
+    const body = buildSecureSubmitBody(submission(), consentWith(['contact_permission', 'marketing_updates']), MARKETING_MAPPING)
+
+    expect(communicationsOf(body)).toEqual([{ value: true, subscriptionTypeId: 535702717, text: MARKETING_TEXT }])
+    expect((body.legalConsentOptions as { consent: { consentToProcess: boolean } }).consent.consentToProcess).toBe(true)
+  })
+
+  it('casilla NO marcada → no envía suscripción', () => {
+    const body = buildSecureSubmitBody(submission(), consentWith(['contact_permission']), MARKETING_MAPPING)
+
+    expect(communicationsOf(body)).toEqual([])
+  })
+
+  it('casilla marcada pero el destino no declara subscriptionTypeId → no envía suscripción', () => {
+    const body = buildSecureSubmitBody(submission(), consentWith(['contact_permission', 'marketing_updates']), VALID_MAPPING)
+
+    expect(communicationsOf(body)).toEqual([])
+  })
+
+  it('snapshot con checkboxes_json no-array → no envía suscripción', () => {
+    const body = buildSecureSubmitBody(submission(), consentWith({ marketing_updates: true }), MARKETING_MAPPING)
+
+    expect(communicationsOf(body)).toEqual([])
+  })
+
+  describe('consentBy submission (píldora en línea bajo aviso, 2026-10-24)', () => {
+    const NOTE = 'Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.'
+
+    const PILL_MAPPING = {
+      ...VALID_MAPPING,
+      communications: [{ consentBy: 'submission', subscriptionTypeId: 535702717, text: NOTE }],
+    }
+
+    it('snapshot con hash del aviso → suscribe por el acto de enviar, sin casilla', () => {
+      const body = buildSecureSubmitBody(submission(), { ...consentWith([]), notice_text_hash: 'abc' }, PILL_MAPPING as never)
+
+      expect(communicationsOf(body)).toEqual([{ value: true, subscriptionTypeId: 535702717, text: NOTE }])
+    })
+
+    it('snapshot sin hash del aviso (la versión no declaraba aviso) → no suscribe', () => {
+      const body = buildSecureSubmitBody(submission(), { ...consentWith([]), notice_text_hash: null }, PILL_MAPPING as never)
+
+      expect(communicationsOf(body)).toEqual([])
+    })
+
+    it('una entrada con consentBy y checkboxKey a la vez es una declaración mal formada', async () => {
+      vi.stubGlobal('fetch', vi.fn())
+
+      const result = await deliverToHubSpotForms({
+        submission: submission(),
+        consent: { ...consentWith([]), notice_text_hash: 'abc' },
+        destination: destination({ ...VALID_MAPPING, communications: [{ consentBy: 'submission', checkboxKey: 'x', subscriptionTypeId: 535702717, text: NOTE }] }),
+        env: ENV_ON,
+      })
+
+      expect(result).toMatchObject({ status: 'failed', errorClass: 'invalid_communications_mapping', retryable: false })
+      expect(fetch).not.toHaveBeenCalled()
+    })
+  })
+
+  it('declaración mal formada → failed invalid_communications_mapping antes del POST', async () => {
+    vi.stubGlobal('fetch', vi.fn())
+
+    const result = await deliverToHubSpotForms({
+      submission: submission(),
+      consent: consentWith(['marketing_updates']),
+      destination: destination({ ...VALID_MAPPING, communications: [{ checkboxKey: 'marketing_updates', subscriptionTypeId: '535702717', text: MARKETING_TEXT }] }),
+      env: ENV_ON,
+    })
+
+    expect(result).toMatchObject({ status: 'failed', errorClass: 'invalid_communications_mapping', retryable: false })
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('entrega real: el POST lleva la suscripción sólo cuando la casilla viene marcada', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200 }))
+
+    await deliverToHubSpotForms({ submission: submission(), consent: consentWith(['marketing_updates']), destination: destination(MARKETING_MAPPING), env: ENV_ON })
+    await deliverToHubSpotForms({ submission: submission(), consent: consentWith([]), destination: destination(MARKETING_MAPPING), env: ENV_ON })
+
+    const [marked, unmarked] = (fetch as ReturnType<typeof vi.fn>).mock.calls.map(call => JSON.parse(call[1].body))
+
+    expect(marked.legalConsentOptions.consent.communications).toEqual([{ value: true, subscriptionTypeId: 535702717, text: MARKETING_TEXT }])
+    expect(unmarked.legalConsentOptions.consent.communications).toEqual([])
+  })
+})
+
 describe('deliverToHubSpotForms', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn())
   })
 
   it('flag OFF → skipped (sin llamar a HubSpot)', async () => {
-    const r = await deliverToHubSpotForms({ submission: submission(), consent: consent(), destination: destination(VALID_MAPPING), env: {} as NodeJS.ProcessEnv })
+    const r = await deliverToHubSpotForms({ submission: submission(), consent: consent(), destination: destination(VALID_MAPPING), env: {} })
 
     expect(r.status).toBe('skipped')
     expect(fetch).not.toHaveBeenCalled()

@@ -1,0 +1,119 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:40:41.517Z",
+  "run": "ai-generations/2026-10-05_factory-notion-bokeh",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-05_factory-notion-bokeh",
+  "totalBytes": 26062956,
+  "fileCount": 18,
+  "files": [
+    {
+      "path": "entrega/anuncio-efeonce-factory-1920x1080.png",
+      "sizeBytes": 1725383,
+      "sha256": "a8a9b32e5a86785a4df1cb5164b729019a4fe4f5a97332073af22e4106ceb0ce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/anuncio-efeonce-factory-1920x1080.png"
+    },
+    {
+      "path": "entrega/anuncio-efeonce-factory-3840x2160.png",
+      "sizeBytes": 3411303,
+      "sha256": "4ea77d9bab633d97be3963ed64d6ff4815173955617553f44b365de0fa59b33e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/anuncio-efeonce-factory-3840x2160.png"
+    },
+    {
+      "path": "entrega/notion-avatar-teamspace-512.png",
+      "sizeBytes": 18671,
+      "sha256": "4003847dab19b4ed6665d23e247ef65ec76e03e2af8586f47ce31d586deef937",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/notion-avatar-teamspace-512.png"
+    },
+    {
+      "path": "entrega/notion-avatar-teamspace-transparente-512.png",
+      "sizeBytes": 20292,
+      "sha256": "833a403ddb0aeef6ffcb6ef5570a386dec0f02f5a0a9b29aee876d42352befb0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/notion-avatar-teamspace-transparente-512.png"
+    },
+    {
+      "path": "entrega/notion-portada-proyectos-1500x600.png",
+      "sizeBytes": 645072,
+      "sha256": "a528b5dd9f07449ddc644cd7439edd807aa6c387dcab1f42644eb7b118e5589a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/notion-portada-proyectos-1500x600.png"
+    },
+    {
+      "path": "entrega/notion-portada-proyectos-3000x1200.png",
+      "sizeBytes": 1622292,
+      "sha256": "dafa3a7324eae1bd51f9bcfd31855fc8a3c477dad7837a34a2ba0e356ad63219",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/notion-portada-proyectos-3000x1200.png"
+    },
+    {
+      "path": "entrega/notion-portada-sprints-1500x600.png",
+      "sizeBytes": 645062,
+      "sha256": "87489feec721989a314f9ac1418e288dffc9ef2397e6a156de53b059e5307216",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/notion-portada-sprints-1500x600.png"
+    },
+    {
+      "path": "entrega/notion-portada-sprints-3000x1200.png",
+      "sizeBytes": 1623089,
+      "sha256": "c73766f92b85a5f5f886c7009ca68a366b3e44470eb05e40792a9d447b7d71fb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/notion-portada-sprints-3000x1200.png"
+    },
+    {
+      "path": "entrega/notion-portada-tareas-1500x600.png",
+      "sizeBytes": 645449,
+      "sha256": "f19c38d30c0399bac13a8ed7faed8b8d43c450e2a696f6e30b8115d84bbfae1f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/notion-portada-tareas-1500x600.png"
+    },
+    {
+      "path": "entrega/notion-portada-tareas-3000x1200.png",
+      "sizeBytes": 1624068,
+      "sha256": "73b0fc6c4a0f784b7782a943a675deb80c42a7adfbf9bc181e28d596086c28b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/notion-portada-tareas-3000x1200.png"
+    },
+    {
+      "path": "entrega/notion-portada-teamspace-1500x600.png",
+      "sizeBytes": 636740,
+      "sha256": "ccb22dac3ec919d6985a02ca2ee75c7c5ebd1c3872b1b627715c57be729b8e62",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/notion-portada-teamspace-1500x600.png"
+    },
+    {
+      "path": "entrega/notion-portada-teamspace-3000x1200.png",
+      "sizeBytes": 1602121,
+      "sha256": "0142261ec857736e345f2bbf339d43b4d8f84d114d593654c4063537977b3478",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/entrega/notion-portada-teamspace-3000x1200.png"
+    },
+    {
+      "path": "factory-anuncio-16x9-1920.png",
+      "sizeBytes": 2912282,
+      "sha256": "976f5c58d6f7c8e4796a866ef6d54e041d588d0775a3c316136e7a81ed61eb82",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/factory-anuncio-16x9-1920.png"
+    },
+    {
+      "path": "factory-anuncio-16x9.png",
+      "sizeBytes": 1841023,
+      "sha256": "6437ab479a2bbcd4a4a6f270b4a33fd0b4b304ccec4cda83d4c4eb079e45f64b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/factory-anuncio-16x9.png"
+    },
+    {
+      "path": "factory-notion-bokeh-5x2.png",
+      "sizeBytes": 1839890,
+      "sha256": "044883b49c742b15777ffc15b81a3269761d4a0fe4b580b534cbea18dc133d06",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/factory-notion-bokeh-5x2.png"
+    },
+    {
+      "path": "factory-notion-bokeh-v2-5x2.png",
+      "sizeBytes": 1689883,
+      "sha256": "a5284af036bdb19b0dd0781859904524a612ffbe773fe565b6be755a38ed84a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/factory-notion-bokeh-v2-5x2.png"
+    },
+    {
+      "path": "factory-notion-bokeh-v2.png",
+      "sizeBytes": 1749786,
+      "sha256": "8b8be888576098bd0d984cab09cc30718a16b9b45b9f9d54860a5e0ad617b834",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/factory-notion-bokeh-v2.png"
+    },
+    {
+      "path": "factory-notion-bokeh.png",
+      "sizeBytes": 1810550,
+      "sha256": "677c114e4c02024aea1966dfe84b99bdf7f57223557b32234bfc65f663bbe962",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-05_factory-notion-bokeh/factory-notion-bokeh.png"
+    }
+  ]
+}

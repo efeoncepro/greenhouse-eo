@@ -7,13 +7,15 @@ import { resolveSecret } from '@/lib/secrets/secret-manager'
 
 import { GA4_READ_SCOPE } from './contracts'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface Ga4OAuthConfig {
   clientId: string
   clientSecret: string
   redirectUri: string
 }
 
-export const resolveGa4OAuthConfig = async (env: NodeJS.ProcessEnv = process.env): Promise<Ga4OAuthConfig | null> => {
+export const resolveGa4OAuthConfig = async (env: EnvSource = process.env): Promise<Ga4OAuthConfig | null> => {
   const [id, secret] = await Promise.all([
     resolveSecret({ envVarName: 'GOOGLE_GA4_OAUTH_CLIENT_ID', secretRefEnvVarName: 'GOOGLE_GA4_OAUTH_CLIENT_ID_SECRET_REF', env }),
     resolveSecret({ envVarName: 'GOOGLE_GA4_OAUTH_CLIENT_SECRET', secretRefEnvVarName: 'GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF', env })

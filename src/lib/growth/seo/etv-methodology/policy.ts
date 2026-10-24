@@ -41,6 +41,8 @@ import {
 } from './contracts'
 import { resolveEtvLabsFamilyByEndpoint, type EtvLabsFamilySlug } from './families'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type EtvMethodologyConfigSource = 'env' | 'default'
 
 export type EtvConfiguredMethodology = {
@@ -73,11 +75,11 @@ const parseClosedVersion = (envName: string, raw: string | undefined): EtvConfig
  * Selector productivo de ESCRITURA (qué fórmula se compra). Parser cerrado: ausente → legacy explícito
  * (`source: 'default'`, visible en el readback), inválido → lanza. Nunca devuelve `unknown`.
  */
-export const resolveConfiguredEtvMethodology = (env: NodeJS.ProcessEnv = process.env): EtvConfiguredMethodology =>
+export const resolveConfiguredEtvMethodology = (env: EnvSource = process.env): EtvConfiguredMethodology =>
   parseClosedVersion(GROWTH_SEO_ETV_METHODOLOGY_ENV, env[GROWTH_SEO_ETV_METHODOLOGY_ENV])
 
 /** Selector de LECTURA (qué fórmula sirven readers/API/MCP). Independiente del de escritura. */
-export const resolveEtvReadMethodology = (env: NodeJS.ProcessEnv = process.env): EtvConfiguredMethodology =>
+export const resolveEtvReadMethodology = (env: EnvSource = process.env): EtvConfiguredMethodology =>
   parseClosedVersion(GROWTH_SEO_ETV_READ_METHODOLOGY_ENV, env[GROWTH_SEO_ETV_READ_METHODOLOGY_ENV])
 
 export const isAfterEtvProviderCutoff = (at: Date): boolean => at.getTime() >= ETV_PROVIDER_CUTOFF_MS
@@ -107,7 +109,7 @@ export type EtvMethodologyRequest = {
 
 export type BuildEtvMethodologyRequestInput = {
   endpoint: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   now?: Date
   /** Override interno (evaluador/shadow). Los callers productivos NO lo pasan. */
   methodologyOverride?: EtvMethodologyVersion

@@ -11,6 +11,8 @@ import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@
 import type { TalentPoolLifecycle } from './contracts'
 import { deriveTalentPoolAccess } from './policy'
 
+import type { EnvSource } from '@/types/env-source'
+
 const TOKEN_TTL_DAYS = 30
 const hashToken = (token: string) => createHash('sha256').update(token).digest('hex')
 
@@ -180,7 +182,7 @@ export const revokeTalentPoolSelfServiceTokens = async (membershipId: string) =>
 
 export type TalentPoolPublicRateAction = 'read' | 'write'
 
-const publicRateLimit = (action: TalentPoolPublicRateAction, env: NodeJS.ProcessEnv = process.env) => {
+const publicRateLimit = (action: TalentPoolPublicRateAction, env: EnvSource = process.env) => {
   const configured = Number(
     action === 'read'
       ? env.HIRING_TALENT_POOL_PUBLIC_READ_PER_IP_PER_MIN

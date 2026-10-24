@@ -1,0 +1,319 @@
+- iframe
+- banner:
+  - link "HubSpot logo":
+    - /url: /reports-dashboard/48713323
+    - img "HubSpot logo"
+  - searchbox "Buscar en HubSpot"
+  - button "Abrir el asistente de Breeze":
+    - generic: Asistente de Breeze
+  - navigation "Global toolbar":
+    - menu:
+      - menuitem "Pruebas gratuitas":
+        - link "Pruebas gratuitas":
+          - /url: /trial-picker/48713323
+          - img "Pruebas gratuitas"
+      - button "Crear nuevo":
+      - menuitem "Llamadas":
+        - button "Llamadas":
+          - img "Llamadas"
+      - menuitem "Mercado":
+        - button "Mercado":
+      - menuitem "Ayuda":
+        - button "Ayuda":
+          - img "Ayuda"
+      - menuitem "Configuración":
+        - link "Configuración":
+          - /url: /user-preferences/48713323?eschref=%2Fsequences%2F48713323%2Fsequence%2F316769702%2Fedit
+      - menuitem "Notificaciones":
+        - button "Notificaciones":
+      - menuitem "Ver perfil y más":
+        - button "Ver perfil y más":
+          - img "Julio Reyes Rangel"
+          - generic: Efeonce Group
+- button "Desplazarse hacia arriba":
+- navigation:
+  - menu:
+    - menuitem:
+    - separator
+    - menuitem:
+    - menuitem:
+    - menuitem:
+    - menuitem:
+- button "Gestionar navegación":
+- button:
+- button "Desplazarse hacia abajo":
+- iframe
+- iframe
+- region "Sección de la página":
+  - navigation:
+    - link "Volver a todas las secuencias":
+      - /url: /sequences/48713323/
+      - generic: Volver a todas las secuencias
+  - banner:
+    - heading "Antalis | Daniela Fuentes | Conversación HubSpot | 5 correos" [level=1]:
+      - textbox: Antalis | Daniela Fuentes | Conversación HubSpot | 5 correos
+    - strong: "Propietario:"
+    - text: Julio Reyes Rangel
+    - button "Acciones":
+      - generic: Acciones
+    - button "Inscribir contactos":
+      - generic: Inscribir contactos
+  - navigation:
+    - link "Rendimiento":
+      - /url: /sequences/48713323/sequence/316769702
+      - text: Rendimiento
+    - link "Inscripciones":
+      - /url: /sequences/48713323/sequence/316769702/enrollments
+      - text: Inscripciones
+    - link "Pasos":
+      - /url: /sequences/48713323/sequence/316769702/edit
+      - text: Pasos
+    - link "Configuración":
+      - /url: /sequences/48713323/sequence/316769702/settings
+      - text: Configuración
+    - link "Automatizar":
+      - /url: /sequences/48713323/sequence/316769702/automation
+      - text: Automatizar
+- region "Sección de la página":
+  - main:
+    - list:
+      - paragraph: Total de pasos
+      - generic: "5"
+      - paragraph: Días para completar
+      - generic: "23"
+      - paragraph: Pasos automatizados
+      - generic: 100%
+      - paragraph:
+        - text: Criterios de exclusión
+      - generic: "2"
+    - button "Contraer paso" [expanded]:
+    - generic: 1. Correo automátizado - Día 1
+    - button "Agregar prueba A/B":
+      - generic: Agregar prueba A/B
+    - button "Acciones":
+      - generic: Acciones
+    - generic: Versión A
+    - generic: Antalis | Daniela | 01 | Apertura
+    - button "Editar correo":
+    - button "Más acciones":
+    - separator
+    - generic: "Asunto:"
+    - paragraph: Una idea a partir de la tienda de Antalis
+    - separator
+    - paragraph: Hola Daniela,
+    - paragraph
+    - paragraph: "Me llamó la atención que en la tienda de Antalis se pueda pedir tanto una caja a medida como una tinta personalizada. Me dio curiosidad lo que pasa después: qué necesita recibir cada especialista para poder ayudar bien al cliente."
+    - paragraph
+    - paragraph:
+      - text: Soy Julio Reyes, de
+      - link "Efeonce":
+        - /url: https://efeoncepro.com/
+      - text: . Ayudamos a configurar HubSpot alrededor del trabajo de los equipos comerciales, desde cómo reciben una consulta hasta cómo le dan seguimiento.
+    - paragraph
+    - paragraph: Armé un ejemplo sencillo con esas dos solicitudes. Me gustaría mostrártelo y saber qué te hace sentido y qué ya tienen cubierto. Si vemos algo interesante, podemos pensar juntos cómo llevarlo a la práctica.
+    - paragraph
+    - paragraph: ¿Te lo comparto?
+    - paragraph
+    - paragraph: Saludos,
+    - button:
+      - generic: Ver más
+    - separator
+    - strong: "0"
+    - generic: Envíos
+    - strong: 0%
+    - generic: Aperturas
+    - strong: 0%
+    - generic: Clics
+    - strong: 0%
+    - generic: Respuestas
+    - strong: 0%
+    - generic: Reuniones
+    - paragraph: "|"
+    - button:
+    - 'button "Retraso: 4 días laborables"':
+      - generic: "Retraso: 4 días laborables"
+    - paragraph: ↓
+    - button "Contraer paso" [expanded]:
+    - generic: 2. Correo automátizado - Día 5
+    - button "Agregar prueba A/B":
+      - generic: Agregar prueba A/B
+    - button "Acciones":
+      - generic: Acciones
+    - generic: Versión A
+    - generic: Antalis | Daniela | 02 | Cajas y tintas
+    - button "Editar correo":
+    - button "Más acciones":
+    - separator
+    - generic: "Asunto:"
+    - paragraph: Una idea a partir de la tienda de Antalis
+    - generic: RESPUESTA
+    - separator
+    - paragraph: Hola Daniela,
+    - paragraph
+    - paragraph: Te dejo el ejemplo que comentaba, con dos casos ficticios.
+    - paragraph
+    - paragraph: "Para una caja a medida: uso, dimensiones, cantidad y si el diseño está listo."
+    - paragraph
+    - paragraph: "Para una tinta personalizada: aplicación, referencia de color y cantidad."
+    - paragraph
+    - paragraph: Validaría estos datos con quienes asesoran al cliente. Después, en HubSpot, dejaría visible qué falta confirmar y quién continúa la conversación.
+    - paragraph
+    - paragraph: "Te comparto nuestro brochure de servicios HubSpot para dar contexto a cómo abordaríamos ese trabajo:"
+    - paragraph
+    - paragraph:
+      - generic: Ver brochure de servicios HubSpot
+    - paragraph
+    - paragraph: ¿Te parece útil este punto de partida o hay otra diferencia entre ambas consultas que convenga considerar?
+    - paragraph
+    - paragraph: Saludos,
+    - button:
+      - generic: Ver más
+    - separator
+    - strong: "0"
+    - generic: Envíos
+    - strong: 0%
+    - generic: Aperturas
+    - strong: 0%
+    - generic: Clics
+    - strong: 0%
+    - generic: Respuestas
+    - strong: 0%
+    - generic: Reuniones
+    - paragraph: "|"
+    - button:
+    - 'button "Retraso: 5 días laborables"':
+      - generic: "Retraso: 5 días laborables"
+    - paragraph: ↓
+    - button "Contraer paso" [expanded]:
+    - generic: 3. Correo automátizado - Día 10
+    - button "Agregar prueba A/B":
+      - generic: Agregar prueba A/B
+    - button "Acciones":
+      - generic: Acciones
+    - generic: Versión A
+    - generic: Antalis | Daniela | 03 | Información inicial
+    - button "Editar correo":
+    - button "Más acciones":
+    - separator
+    - generic: "Asunto:"
+    - paragraph: Una idea a partir de la tienda de Antalis
+    - generic: RESPUESTA (2)
+    - separator
+    - paragraph: Hola Daniela,
+    - paragraph
+    - paragraph: Otra forma de mirar el ejemplo es distinguir lo necesario para empezar de lo que puede resolverse durante la asesoría.
+    - paragraph
+    - paragraph: Empezaría por acordar con cada especialista qué dato le permite avanzar y qué puede preguntar después. En HubSpot, ese criterio puede orientar los campos y las tareas que ve cada equipo.
+    - paragraph
+    - paragraph: La idea es que el formulario facilite la conversación, sin convertirlo en un cuestionario largo.
+    - paragraph
+    - paragraph: ¿Cómo deciden hoy qué información pedir al comienzo?
+    - paragraph
+    - paragraph: Saludos,
+    - button:
+      - generic: Ver más
+    - separator
+    - strong: "0"
+    - generic: Envíos
+    - strong: 0%
+    - generic: Aperturas
+    - strong: 0%
+    - generic: Clics
+    - strong: 0%
+    - generic: Respuestas
+    - strong: 0%
+    - generic: Reuniones
+    - paragraph: "|"
+    - button:
+    - 'button "Retraso: 6 días laborables"':
+      - generic: "Retraso: 6 días laborables"
+    - paragraph: ↓
+    - button "Contraer paso" [expanded]:
+    - generic: 4. Correo automátizado - Día 16
+    - button "Agregar prueba A/B":
+      - generic: Agregar prueba A/B
+    - button "Acciones":
+      - generic: Acciones
+    - generic: Versión A
+    - generic: Antalis | Daniela | 04 | Trabajo con su equipo
+    - button "Editar correo":
+    - button "Más acciones":
+    - separator
+    - generic: "Asunto:"
+    - paragraph: Una idea a partir de la tienda de Antalis
+    - generic: RESPUESTA (3)
+    - separator
+    - paragraph: Hola Daniela,
+    - paragraph
+    - paragraph: Pensando en cómo trabajar una mejora así, empezaría por revisar contigo y con uno de los especialistas que recibe estas consultas un caso concreto.
+    - paragraph
+    - paragraph: Miraríamos qué ya funciona y si queda algún punto por ajustar. Con eso se puede decidir un alcance pequeño y coordinarlo con su equipo y los partners que participen.
+    - paragraph
+    - paragraph: "Te dejo el brochure de servicios HubSpot como referencia para evaluar dónde encajaría Efeonce en ese trabajo:"
+    - paragraph
+    - paragraph:
+      - generic: Ver brochure de servicios HubSpot
+    - paragraph
+    - paragraph: ¿Ese modo de trabajar encaja con cómo evalúan mejoras en Antalis?
+    - paragraph
+    - paragraph: Saludos,
+    - button:
+      - generic: Ver más
+    - separator
+    - strong: "0"
+    - generic: Envíos
+    - strong: 0%
+    - generic: Aperturas
+    - strong: 0%
+    - generic: Clics
+    - strong: 0%
+    - generic: Respuestas
+    - strong: 0%
+    - generic: Reuniones
+    - paragraph: "|"
+    - button:
+    - 'button "Retraso: 7 días laborables"':
+      - generic: "Retraso: 7 días laborables"
+    - paragraph: ↓
+    - button "Contraer paso" [expanded]:
+    - generic: 5. Correo automátizado - Día 23
+    - button "Agregar prueba A/B":
+      - generic: Agregar prueba A/B
+    - button "Acciones":
+      - generic: Acciones
+    - generic: Versión A
+    - generic: Antalis | Daniela | 05 | Cierre
+    - button "Editar correo":
+    - button "Más acciones":
+    - separator
+    - generic: "Asunto:"
+    - paragraph: Una idea a partir de la tienda de Antalis
+    - generic: RESPUESTA (4)
+    - separator
+    - paragraph: Hola Daniela,
+    - paragraph
+    - paragraph: Cierro por aquí estos correos sobre el recorrido desde la consulta al especialista.
+    - paragraph
+    - paragraph: "La propuesta queda acotada: revisar juntos una de esas consultas y ver si hay algo útil que mejorar en HubSpot. Si el flujo actual ya está cubierto o no está entre sus prioridades, está bien dejarlo ahí."
+    - paragraph
+    - paragraph: Gracias por leerme. Si en otro momento te resulta pertinente, podemos retomar desde ese ejemplo.
+    - paragraph
+    - paragraph: Un saludo,
+    - button:
+      - generic: Ver más
+    - separator
+    - strong: "0"
+    - generic: Envíos
+    - strong: 0%
+    - generic: Aperturas
+    - strong: 0%
+    - generic: Clics
+    - strong: 0%
+    - generic: Respuestas
+    - strong: 0%
+    - generic: Reuniones
+    - paragraph: "|"
+    - button:
+    - paragraph: ↓
+    - generic: Completado
+- complementary

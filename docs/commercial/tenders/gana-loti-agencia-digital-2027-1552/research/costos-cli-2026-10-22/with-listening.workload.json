@@ -1,0 +1,318 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "grd1552-with-listening-v1",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "125",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+      "effectiveFrom": "2026-10-22",
+      "effectiveUntil": "2027-12-31",
+      "status": "estimated"
+    }
+  },
+  "drivers": [
+    {
+      "driverId": "posts",
+      "label": "35 monthly posts/static visuals",
+      "unit": "deliverable",
+      "unitsPerMonth": "35",
+      "minutesPerUnit": "39",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "driverId": "stories",
+      "label": "35 monthly static stories",
+      "unit": "deliverable",
+      "unitsPerMonth": "35",
+      "minutesPerUnit": "24",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "driverId": "carousels",
+      "label": "20 monthly carousels up to5slides",
+      "unit": "deliverable",
+      "unitsPerMonth": "20",
+      "minutesPerUnit": "120",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "driverId": "reels",
+      "label": "20 monthly social reels from supplied footage",
+      "unit": "deliverable",
+      "unitsPerMonth": "20",
+      "minutesPerUnit": "150",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "driverId": "motion",
+      "label": "15 monthly simple shorts/GIF/animations",
+      "unit": "deliverable",
+      "unitsPerMonth": "15",
+      "minutesPerUnit": "120",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "fixedWork": [
+    {
+      "workId": "design-finishing",
+      "label": "Organization, exports and consolidated adjustments",
+      "hoursPerMonth": "13.25",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "video-finishing",
+      "label": "Renders, organization, technical QA and adjustments",
+      "hoursPerMonth": "10",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "creative-qa",
+      "label": "Brand consistency and creative production QA",
+      "hoursPerMonth": "8",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "concepts-macro",
+      "label": "Annualized10concepts and2macro creative concepts",
+      "hoursPerMonth": "10",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "strategy-ongoing",
+      "label": "Strategic accompaniment and alignment",
+      "hoursPerMonth": "8",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "strategy-research",
+      "label": "Annualized4sector+4trends+2benchmarks desk research",
+      "hoursPerMonth": "5",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "strategy-reports",
+      "label": "Integrated interpretation and recommendations",
+      "hoursPerMonth": "7",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "strategy-adaptation",
+      "label": "Strategic adaptations and risk assessment",
+      "hoursPerMonth": "4",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "account-flow",
+      "label": "Single account owner coordination and workflow",
+      "hoursPerMonth": "14",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "listening-review",
+      "label": "Review, cleaning, report and queries",
+      "hoursPerMonth": "10",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "listening-senior",
+      "label": "Reputation advice and report review",
+      "hoursPerMonth": "2",
+      "source": {
+        "reference": "estimate:GRD1552-volume-and-time-review-2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "design",
+      "driverShares": [
+        {
+          "driverId": "posts",
+          "share": "1"
+        },
+        {
+          "driverId": "stories",
+          "share": "1"
+        },
+        {
+          "driverId": "carousels",
+          "share": "1"
+        }
+      ],
+      "fixedWorkShares": [
+        {
+          "workId": "design-finishing",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated scope capacity; no assigned person or proven availability."
+    },
+    {
+      "lineId": "video",
+      "driverShares": [
+        {
+          "driverId": "reels",
+          "share": "1"
+        },
+        {
+          "driverId": "motion",
+          "share": "1"
+        }
+      ],
+      "fixedWorkShares": [
+        {
+          "workId": "video-finishing",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated scope capacity; no assigned person or proven availability."
+    },
+    {
+      "lineId": "creative",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "creative-qa",
+          "share": "1"
+        },
+        {
+          "workId": "concepts-macro",
+          "share": "1"
+        },
+        {
+          "workId": "listening-senior",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated scope capacity; no assigned person or proven availability."
+    },
+    {
+      "lineId": "strategy",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "strategy-ongoing",
+          "share": "1"
+        },
+        {
+          "workId": "strategy-research",
+          "share": "1"
+        },
+        {
+          "workId": "strategy-reports",
+          "share": "1"
+        },
+        {
+          "workId": "strategy-adaptation",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated scope capacity; no assigned person or proven availability."
+    },
+    {
+      "lineId": "account",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "account-flow",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated scope capacity; no assigned person or proven availability."
+    },
+    {
+      "lineId": "listening",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "listening-review",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated scope capacity; no assigned person or proven availability."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.05"
+  }
+}

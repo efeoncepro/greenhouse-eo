@@ -1,5 +1,25 @@
 # Google Ads — Arquitectura de medición comercial y conexión API V1
 
+## Checkpoint de producción — 19/10/2026, 02:55 UTC (18/10 Chile)
+
+Todo el develop comprometido se promovió a **main `2559e9242`**; manifest `released`, CI/Deep/smoke,
+health HTTP 200 y watchdog 6/6 sin drift. La API administrativa de clasificación y la compatibilidad
+Grader están publicadas. La corrección une auditoría API Platform y UPDATE Forms en la misma
+transacción y devuelve `commandExecutionId`; no requiere otro schema ni una corrección positiva de prueba.
+[Release y evidencia](../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
+
+La relectura API conserva **13 Forms comerciales + Discovery**, Web **6** / Server **10**, EC ON y
+flag Ads true para **6862539491**. Grader tiene intención comercial; Contacto general y ebooks quedan
+fuera de Ads. Think usa el Forms portátil v8/tokenized_report; la fachada histórica sólo ofrece el
+recibo tras persistencia real, sin reemitir duplicados. [Contrato Grader](GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md)
+y [clasificación auditada](GROWTH_FORMS_COMMERCIAL_CLASSIFICATION_CORRECTION_V1.md).
+No hubo nuevas publicaciones GTM/policy, leads ficticios, reservas de prueba ni replay en este release.
+Una recepción comercial real, matching y atribución siguen **sin verificar**; no son bloqueos de código
+ni se acreditan con configuración, canarios negativos o un deployment READY. La conexión Ads de producto
+multiorganización y el sender CRM siguen siendo unidades futuras separadas del release completado.
+
+## Cortes históricos de activación y publicación — 18/10/2026
+
 Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
 AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
 corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
@@ -497,7 +517,9 @@ API22:57:03Z verificó13 formularios comerciales y Discovery activos,12 altas ad
 con destinos/mappings existentes preservados. [Publicación por fuente](../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
 Una versión nueva exige revisar su política. Inscripción automática y control de cobertura al
 publicar siguen como propuesta. La corrección de clasificación se aplicó por primitive canónico;
-la nueva API de mantenimiento está implementada localmente, sin desplegar. No se cambiaron pujas.
+la API de mantenimiento está publicada en main `2559e9242`, con auditoría API Platform en la misma
+transacción que el UPDATE Forms. [Contrato y límites](GROWTH_FORMS_COMMERCIAL_CLASSIFICATION_CORRECTION_V1.md).
+No se cambiaron pujas.
 
 ### 6.4 Unión con HubSpot Forms
 

@@ -29,6 +29,27 @@ export const HUBSPOT_PROPERTY_GROUP = {
  */
 export const HUBSPOT_REFERENCE_FORM_ID = '8bee8dca-27f2-4ca5-ac09-7606351c7e72'
 
+/**
+ * Subscription types del portal (`GET /communication-preferences/v3/definitions`, leído
+ * 2026-10-18). Al 2026-10-18 el portal tiene uno solo de marketing no interno; los otros dos
+ * («One to One», «Customer Service Communication») son internos y no se ofrecen en formularios.
+ */
+export const HUBSPOT_SUBSCRIPTION_TYPES = {
+  /** «Marketing Information» — purpose Marketing, canal Email, activo, no interno. */
+  marketingInformation: 535702717,
+} as const
+
+/**
+ * Casilla OPCIONAL del consentimiento publicado → subscription type de HubSpot. El texto que
+ * viaja a HubSpot NO se declara acá: la activación lo toma de la etiqueta publicada de la casilla
+ * (`copy_refs_json.checkboxes`), para que sea siempre el texto exacto que vio el visitante.
+ * Una casilla de comunicaciones nunca autoriza publicidad (no toca el matching publicitario).
+ */
+export interface HubSpotCommunicationSpec {
+  checkboxKey: string
+  subscriptionTypeId: number
+}
+
 export type HubSpotDestinationFieldKind =
   /** Property que ya existe en el portal (estándar o custom previa). Nunca se crea ni se edita. */
   | 'existing'
@@ -57,6 +78,8 @@ export interface HubSpotDestinationSpec {
     name: string
   }
   fields: HubSpotDestinationFieldSpec[]
+  /** Suscripciones que se crean en HubSpot sólo si el visitante marca la casilla. */
+  communications?: HubSpotCommunicationSpec[]
 }
 
 const existing = (ghKey: string, property: string, label: string): HubSpotDestinationFieldSpec => ({
@@ -260,6 +283,7 @@ export const HUBSPOT_DESTINATION_SPECS: HubSpotDestinationSpec[] = [
       select('monthlyMediaBudget', 'gh_form_medios_inversion_mensual', 'Inversión Mensual en Medios (Agencia de Medios)', 'Rango de inversión mensual en medios declarado, en USD.'),
       existing('context', 'message', 'Qué quiere resolver'),
     ],
+    communications: [{ checkboxKey: 'marketing_updates', subscriptionTypeId: HUBSPOT_SUBSCRIPTION_TYPES.marketingInformation }],
   },
   {
     formKey: '71ea684f-1ad9-4656-982b-159e4de46dd8',
@@ -297,6 +321,22 @@ export const HUBSPOT_DESTINATION_SPECS: HubSpotDestinationSpec[] = [
       select('loopStage', 'gh_form_inbound_etapa', 'Dónde Se Rompe el Ciclo (Inbound)', 'Etapa del ciclo de marketing que más le duele: definir, adaptar, amplificar u optimizar.'),
       select('crm', 'gh_form_inbound_crm', 'CRM que Usa (Inbound)', 'CRM declarado en el diagnóstico de inbound.'),
       select('role', 'gh_form_inbound_rol', 'Cargo (Inbound)', 'Rango de cargo de la persona que pide el diagnóstico de inbound.'),
+    ],
+  },
+  {
+    // Popup «Quiero ser partner» de /partnership/ (2026-10-23). Reusa el formulario HubSpot de la página
+    // anterior para conservar la fuente de las propuestas de partners en el CRM.
+    formKey: 'eb5c108d-05fc-427b-82b0-4bb161fdbac7',
+    slug: 'efeonce-partner-application',
+    pageUrl: 'https://efeoncepro.com/partnership/',
+    hubspotForm: { id: '4c0066df-9a0f-4199-b0f7-d09e376a9f22', name: 'Lead Gean - Partnership' },
+    fields: [
+      FIRST_NAME,
+      LAST_NAME,
+      EMAIL,
+      COMPANY,
+      WEBSITE,
+      existing('offer', 'message', 'Qué ofrece y a quién le sirve'),
     ],
   },
 ]

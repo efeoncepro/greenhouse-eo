@@ -123,6 +123,7 @@ Before approving or implementing the canvas, map each canvas control to an exist
 - per-label icons → `presentation.icon` (user, mail, phone, link, linkedin, briefcase, calendar, clock,
   message, file, globe);
 - country picker → `presentation.control: 'country_select'`;
+- dropdown/listbox for a single `select` in any variant (pillar draws `select` as chips otherwise) → `presentation.control: 'premium_select'` (renderer code complete 2026-10-18, not yet released; Agencia de Medios waits for the release: `scripts/growth/activate-media-diagnostic-premium-select.ts --apply` refuses until production `renderer-latest.js` contains `"premium_select"`);
 - two columns are adaptive (`@container (min-width: 520px)` on `greenhouse-form`): the host card's width
   and padding decide it. Creativa measured 516 px inside a 588 px card with 36 px padding → one column, 8
   fields stacked beside an empty column. Fix in the host layout, not the form: give the form column room

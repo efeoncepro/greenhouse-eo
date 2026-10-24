@@ -2,6 +2,8 @@ import 'server-only'
 
 import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 
+import type { EnvSource } from '@/types/env-source'
+
 /**
  * TASK-1230 — Resolver canónico del HubSpot private app token (compartido).
  *
@@ -15,7 +17,7 @@ const TOKEN_ENV_VAR = 'HUBSPOT_ACCESS_TOKEN'
 // NO usar `gcp:hubspot-access-token`: el `:` lo parsea como name=gcp/version=... (bug).
 const TOKEN_GCP_SECRET = 'hubspot-access-token'
 
-export const getHubSpotAccessToken = async (env: NodeJS.ProcessEnv = process.env): Promise<string> => {
+export const getHubSpotAccessToken = async (env: EnvSource = process.env): Promise<string> => {
   const envValue = env[TOKEN_ENV_VAR]?.trim()
 
   if (envValue) return envValue

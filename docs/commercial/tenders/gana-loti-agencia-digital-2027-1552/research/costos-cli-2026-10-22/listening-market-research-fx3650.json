@@ -1,0 +1,114 @@
+{
+  "date_santiago": "2026-10-22",
+  "fx": {
+    "cop_per_usd": 3650,
+    "status": "Final cotizador planning FX supplied by parent; replaces prior3191.47 reference for calculation only"
+  },
+  "rfp": "Formato C12/C13, Requisitos técnicos C14/C15; current2027 extraction read",
+  "estimate_recommendation": "Awario Pro USD149/month COP543850, monthly billing as conservative cash assumption; economical conditional fit, not contractual completeness",
+  "plans": [
+    {
+      "name": "Awario Pro",
+      "usd_monthly": 149,
+      "cop_monthly": 543850,
+      "usd_month_equivalent_annual": 89,
+      "cop_month_equivalent_annual": 324850,
+      "usd_annual": 1068,
+      "cop_annual": 3898200,
+      "topic_or_keyword_limit": 15,
+      "mention_limit": 300000,
+      "note": "15000 almacenadas por tema"
+    },
+    {
+      "name": "Brand24 Team",
+      "usd_monthly": 349,
+      "cop_monthly": 1273850,
+      "usd_month_equivalent_annual": 299,
+      "cop_month_equivalent_annual": 1091350,
+      "usd_annual": 3588,
+      "cop_annual": 13096200,
+      "topic_or_keyword_limit": 7,
+      "mention_limit": 10000,
+      "note": "actualización cada hora"
+    },
+    {
+      "name": "Brand24 Pro",
+      "usd_monthly": 499,
+      "cop_monthly": 1821350,
+      "usd_month_equivalent_annual": 399,
+      "cop_month_equivalent_annual": 1456350,
+      "usd_annual": 4788,
+      "cop_annual": 17476200,
+      "topic_or_keyword_limit": 12,
+      "mention_limit": 40000,
+      "note": "actualización en tiempo real"
+    },
+    {
+      "name": "Mentionlytics Advanced",
+      "usd_monthly": null,
+      "cop_monthly": null,
+      "usd_month_equivalent_annual": 299,
+      "cop_month_equivalent_annual": 1091350,
+      "usd_annual": 3588,
+      "cop_annual": 13096200,
+      "topic_or_keyword_limit": 15,
+      "mention_limit": 50000,
+      "note": "actualización continua; mensual no leído"
+    }
+  ],
+  "human_capacity_assumption": {
+    "analyst_hours_monthly": 10,
+    "senior_crisis_hours_monthly": 2,
+    "one_time_setup_and_crisis_protocol_hours": 12,
+    "allocation": "analyst 5h routine review+4h monthly report+1h query maintenance; senior2h base advisory/QA; setup12h once, not12h/mo",
+    "boundaries": "Not24/7 human standby, no15minute SLA promised, crisis work beyond reserve is variable; no double count if strategy team already budgets these hours"
+  },
+  "coverage_limits": [
+    "Awario source list does not establish TikTok/LinkedIn coverage",
+    "Meta requires buyer Business/Creator page connections; Facebook connected-page/tagged content and Instagram professional hashtags/tagged comments; no private/personal/groups/DMs/paid ads",
+    "GANA and LOTI are ambiguous generic words: contextual boolean queries and human cleaning required",
+    "No guarantee existing mention volume fits; no live account trial/volume sampled",
+    "Retention cap overwrites oldest mentions; exports/archive required",
+    "License full dedicated price, no arbitrary allocation/divisor, tax/FXcard charges not included"
+  ],
+  "sources": [
+    {
+      "url": "https://awario.com/pricing/",
+      "read": "prices limits export retention"
+    },
+    {
+      "url": "https://awario.com/features/",
+      "read": "sentiment competitors booleans reports daily/weeklyemailalerts"
+    },
+    {
+      "url": "https://awario.com/help/troubleshooting/ig-monitoring-limitations/",
+      "read": "Meta actual limits"
+    },
+    {
+      "url": "https://awario.com/help/getting-started/ig-monitoring/",
+      "read": "required buyer permissions and hashtags"
+    },
+    {
+      "url": "https://brand24.com/prices/",
+      "read": "Team andPro prices limits refresh"
+    },
+    {
+      "url": "https://help.brand24.com/en/articles/5336549-does-brand24-collect-historical-data",
+      "read": "initial up30day sample notcomplete older archive"
+    },
+    {
+      "url": "https://www.mentionlytics.com/pricing/",
+      "read": "Advanced annual299USD continuous50k15rules"
+    },
+    {
+      "url": "https://mention.com/en/pricing/",
+      "read": "quote only; no public number verified"
+    },
+    {
+      "url": "https://metricool.com/social-listening/",
+      "read": "publishedfeature list socialmanagement cannot substitute verified listeninglicense"
+    }
+  ],
+  "catalog_read_only": "No Awario/Brand24/Mentionlytics/listening match in data/pricing/v3-operating/catalog.review-v11.json. This is only historical artifact; parent must confirm --current canonical CLI. MetricoolETG003 historical seed existsUSD54/mo with outdated15clientdivisor not valid licensepolicy. No mutations.",
+  "audit_path": "/tmp/efeonce-reditos-listening-20261022/query-events.json"
+}

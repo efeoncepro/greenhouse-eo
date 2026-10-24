@@ -5,6 +5,44 @@ description: 'Deliver and operate HubSpot as a managed client service across Sma
 
 # HubSpot as a Service
 
+
+## Partnerships, distribuidores y expedientes externos
+
+Para recuperar membresías, completar altas/crédito o preparar documentos para distribuidores, cargar el
+[manual de operación](../../../docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md) y el registro de partnerships. Cruzar cuenta, razón social/RUT e ID antes
+de registrar, formar o pedir un upgrade; no crear duplicados ni usar una membresía de otra empresa.
+Separar estado del programa, curso, distribución, Marketplace, crédito y capacidad de ordenar.
+Los formularios externos sólo llevan datos pertinentes: notas de búsqueda, pendientes y QA quedan en el
+expediente interno. No inventar datos ni aplicar la firma del correo como firma contractual. Revisar todas
+las páginas y la lista exacta de adjuntos; comprobar Enviados, archivos y CRM por separado.
+Los estados variables viven en el registro/auditoría; los correos y rutas de contacto viven en el
+[directorio de personas y equipos](../../../docs/operations/EFEONCE_PARTNER_CONTACT_DIRECTORY_V1.md).
+Leerlo antes de localizar destinatarios; contiene funciones, fuentes, fechas, reemplazos y rebotes.
+Índice nominal de recuperación (no implica cargo vigente ni autorización de envío):
+- Google/Ingram: Joelvis Sarmiento, Víctor Escárate, Nicolás Santibáñez, Cristian Faúndez;
+  Google for Education: Arthur Guedes y Carlos Jimenez.
+- Microsoft/LOL: Geraldine Vanessa Gonzalez Moreno, Camila Orellana, Reinel Bejarano,
+  Diana Jaimes y Daniela Sedlacek. Alta/crédito LOL: Lucia Gabriela Tovar.
+- AWS/LOL: José Manuel Quezada, Valentina Egaña, Macarena Hein, Víctor Ledezma y Jorge Noguera;
+  AWS directo: Julieth Vanessa Castillo y Daniel López.
+- Adobe/Nexsys: Jean Sánchez, Francisco Araya, Constanza Moya, Javiera Castro, José Orellana
+  y Vicente Ulloa. Adobe/Ingram: Melissa Danae Santos y Marco Seferino.
+No confundir ambos Víctor, ni Ingram con Nexsys. Cristian, Vicente y Marco tienen rebotes registrados;
+consultar la evidencia antes de reutilizarlos. María Berrios pertenece a una membresía ajena;
+Jose Menezes es fuente del anuncio, no contacto operativo acreditado. No copiar ni inferir sus correos.
+
+
+## LinkedIn Ads: distinguir pixel, lifecycle y Lead Sync
+
+Antes de conectar o recomendar configuración, leer [preparación LinkedIn](../../../docs/manual-de-uso/growth/preparar-medicion-linkedin.md)
+y sus fuentes oficiales. Discovery19/10/2026: conexión Efeonce, cuenta/Partner ID, permisos y tier no
+verificados; ninguna activación. HubSpot puede instalar Insight Tag: inventariar Pixels para no
+cargarlo también por GTM. Lifecycle→CAPI y LinkedIn Lead Gen Forms→HubSpot son sentidos/capacidades
+separados. Un emisor por etapa, HubSpot nativo o propio; no presumir que comparte eventId Greenhouse.
+Exigir propiedad/evidencia de consentimiento de compartición, alcance de contactos y datos revisados;
+el campo opcional del proveedor y “todos los contactos” no amplían el mandato. Conectar no acredita
+recepción/atribución; Replace event puede eliminar el anterior. No tocar grants Google para esto.
+
 ## Nombres de negocios y leads Efeonce
 
 Antes de preparar o escribir `dealname` / `hs_lead_name`, aplicar la
@@ -16,7 +54,7 @@ registros existentes sólo cambian nombre dentro del mandato expreso, con antes/
 
 ## Envíos desde el Outlook de Julio
 
-Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
+Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma gráfica oficial siempre y CCO `48713323@bcc.hubspot.com`, incluidos correos nuevos, respuestas, reenvíos y seguimientos manuales, programados o por secuencias (Julio, 21/10/2026). Usar Outlook UI o transporte HTML autorizado que conserve la firma; texto plano no es alternativa. Si la herramienta no la preserva, dejar el correo pendiente sin enviarlo. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
 
 
 Operate HubSpot as an accountable managed service, not as a collection of portal clicks.
@@ -138,11 +176,12 @@ explicit source of truth, lifecycle, consent, attribution, deduplication and syn
 2. Read [service-delivery.md](references/service-delivery.md) for the delivery loop and evidence contract.
    For direct portal operations, read [`HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md`](../../../docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md) for the current CLI/MCP route and per-portal access evidence.
 3. Load only the workstream reference needed:
-   - Customer Agent: [customer-agent.md](references/customer-agent.md)
+   - Customer Agent: [customer-agent.md](references/customer-agent.md). Para llamadas entrantes, cargar el
+     [manual de Customer Agent Voice](../../../docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md): número, canal, implementación, horarios humanos, créditos y QA son verificaciones separadas.
    - Prospecting Agent (native sales outreach), voice, advanced instructions and meeting CTA: [functional reference](../hubspot-solutions-partner/references/prospecting-agent.md) + [voice calibration manual](../../../docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md). This is neither Customer Agent nor Agent CLI. Verify saved play configuration separately from generated drafts and sending.
    - RevOps/schema: [revops-schema.md](references/revops-schema.md)
    - Prospect enrichment, native segments and preparation for personalized email: [prospecting-segmentation.md](references/prospecting-segmentation.md). Declare whether the universe is the entire CRM or a verified research cohort before creating filters; an active attribute segment alone does not restrict source or freshness.
-   - Property types, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md)
+   - Property types, enumeration colors/dot/badge styles, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md). Schema/value readback via API does not certify human presentation; verify supported API coverage and UI persistence separately.
    - Reports, dashboards, native Goals and Goal reports: [report-design.md](references/report-design.md)
    - Marketing/sales email or sequence automation by API: [email-api-routing.md](references/email-api-routing.md)
    - ANAM: [anam-case.md](references/anam-case.md). Para la landing pública y su seam con Customer Agent,

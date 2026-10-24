@@ -58,7 +58,7 @@ aseguradora. Cuando pida un correo comercial **robusto**, usar esta arquitectura
    y respuesta por correo como alternativas de la misma conversación.
 8. **Cierre e identidad:** despedida cordial, firma oficial y CCO según la
    [política Outlook](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
-   Si el pedido exige firma gráfica, comprobar su render y no sustituirla por texto.
+   La firma gráfica es obligatoria siempre, incluidos seguimientos (Julio, 21/10/2026); comprobar su render y no sustituirla por texto.
 
 Voz personal de Julio: cercana, profesional, específica y con párrafos cortos; suficiente detalle para
 defender la propuesta, sin catálogo completo ni fórmulas copiadas entre cuentas. La preferencia es por
@@ -123,3 +123,40 @@ Para varios correos programados, cargar [seguimientos HubSpot](hubspot-follow-up
 Cada paso necesita un aporte nuevo ligado a su contexto, empatía y una razón concreta para elegir Efeonce.
 Si se pidió brochure en cada mensaje, explicar su utilidad antes del enlace nativo; no reutilizar tracking
 ajeno ni repetir la presentación. Personalización completa por persona, no sólo nombres/empresas.
+
+## Agencia Creativa y capacidad local vigente
+
+Para búsqueda de agencia publicitaria, diseño o campañas, contextualizar el brochure original **Agencia
+Creativa** (`357058081` en el portal Efeonce al 21/10/2026); reabrir su identidad al operar, sin revalidar
+contenido aprobado. Compras necesita alcance/proceso; Marketing, concepto y producción de campañas;
+Marca, coherencia y adaptación. Mantener la tesis común sin atribuirles a todos la solicitud de la autora.
+Un «por qué elegirnos» conecta capacidad y forma de trabajo con esa decisión; no inventa resultados.
+
+Aplicar la [capacidad local confirmada por Julio](../../../../docs/operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md):
+producción y fabricación en México, Perú, Chile, Colombia y Ecuador desde octubre de 2026. No repetir
+la premisa anterior de ausencia; tampoco inferir talleres propios, montaje o ausencia de intermediarios.
+La corrección de capacidades no autoriza reenviar un correo anterior ni alterar el brochure.
+
+Si se autoriza LinkedIn al no haber correo vigente, no crear un Contact ficticio para compartir el brochure.
+Si HubSpot exige un email para generar un enlace, usar un mecanismo real permitido y dejar registrada su
+atribución; nunca introducir un correo inventado del prospecto. Un enlace creado con email del remitente
+no identifica al visitante como destinatario. Verificar la conversación enviada y separar visitas del
+agente/escáner, visualizaciones, lectura humana y respuesta. [Caso completo](../../../../docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).
+
+## Aplicación con dos canales expresamente autorizados — 22/10/2026
+
+[Caso Kibernum](../../../../docs/commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md):
+correo robusto ligado a la señal y al contexto de contenido del comprador; InMail más breve con pregunta
+por prioridad, sobre la misma tesis. Compartir el documento original completo mediante enlace nativo del
+destinatario no exige copiar el correo en LinkedIn. Conciliar por separado Enviados/firma/CCO, EMAIL CRM
+SENT y conversación LinkedIn publicada; «Enviando» no cierra el último carril. Autorización de ambos canales
+para una persona no se extiende a colegas, secuencias o futuros toques; declarar el costo del InMail disponible.
+
+[Aplicación Fundación Luz](../../../../docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md):
+InMail y correo robusto respondieron a la misma solicitud pública de PR y campaña, con aportes y extensión
+adaptados al canal. Al faltar correo atribuible, el primer enlace del brochure original se emitió al correo
+real del remitente y se compartió por LinkedIn sin solicitar email al visitante. Tras la excepción individual
+autorizada, el email llevó un enlace propio emitido a la dirección candidata. Conservar ambas atribuciones
+por separado: ninguna visita identifica por sí sola a Mariana ni verifica la casilla, recepción o lectura.
+El envío por email conserva el readback de firma gráfica, CCO y EMAIL SENT; un permiso puntual para ambos
+canales no programa seguimiento.

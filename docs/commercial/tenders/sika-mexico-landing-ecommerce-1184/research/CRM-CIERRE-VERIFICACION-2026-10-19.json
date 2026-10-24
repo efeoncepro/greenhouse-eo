@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-10-19T23:24:46.574840+00:00",
+  "portalId": "48713323",
+  "dealId": "66308025451",
+  "dealstage": "closedlost",
+  "closed_lost_reason": "Descartada por requisito de admisibilidad territorial del comprador: ante la consulta sobre empresas constituidas en Chile y facturación desde el extranjero, Sika respondió «NO, SOLO MÉXICO» (foro LIC-1184, respuesta 19/10/2026 19:18, zona no indicada; captura aportada por Julio). Julio decidió descartar y cerrar como perdido el 19/10/2026. No se presentó oferta; no corresponde a una derrota competitiva ni acredita adjudicación a otro proveedor.",
+  "hs_next_step": "Sin acción comercial: LIC-1184 descartada por requisito «solo México», por decisión de Julio el 19/10/2026. No preparar ni dar seguimiento; reabrir sólo con nueva instrucción del operador.",
+  "closedate": "2026-10-19T23:24:09.253Z",
+  "closedateWriter": "HubSpot; not manually written",
+  "currency": "MXN",
+  "amount": null,
+  "writtenFieldsExactReadback": true,
+  "preservedFieldsVerified": [
+    "dealname",
+    "pipeline",
+    "pipeline_bucket",
+    "amount",
+    "deal_currency_code",
+    "hubspot_owner_id"
+  ],
+  "localStatus": "NO-BID",
+  "offerSubmitted": false
+}

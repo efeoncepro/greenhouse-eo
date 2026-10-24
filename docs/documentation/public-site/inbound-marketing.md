@@ -1,9 +1,9 @@
 # Landing Inbound Marketing — Módulos editables en Elementor
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-18 por Claude
-> **Ultima actualizacion:** 2026-10-18 por Claude
+> **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Registro de primitives del sitio público (`InboundLandingModules`, `EfeonceMention`, lanzador de reunión)](../../architecture/public-site/PRIMITIVES.md#registry) ·
 > [contrato runtime del formulario](../../architecture/growth-public-forms-runtime-contract.md) ·
 > [decisión PDR-026: cada landing deriva su patrón de diseño de su necesidad](../../public-site/decisions/PDR-026-cada-landing-deriva-su-patron-de-diseno.md)
@@ -62,11 +62,15 @@ La página tiene once secciones, una por módulo:
 
 El contenido exacto de cada sección se lee en la página o en el editor; esta tabla sólo ordena los módulos.
 
-En el teléfono aparece una barra fija abajo con dos mitades iguales: «Agenda una reunión» y «Diagnóstico».
+En el teléfono aparece una barra fija abajo con «Agenda una reunión» y «Diagnóstico». Desde el 2026-10-23 es el
+[dock compartido de las landings](dock-de-landings.md): aparece tras el hero y se retira al llegar a la sección de
+diagnóstico.
 
 > Detalle técnico: once widgets nativos `greenhouse_inbound_{hero,confianza,partida,vivo,cambio,rompe,metodo,ciclo,planes,reglas,diagnostico}`
 > del plugin `eo-elementor-widgets`; `vivo` es la sección clara. La interacción de «Arma tu primer ciclo» la maneja
-> `assets/js/inbound-landing.js`. Barra móvil: `nav.mbar`.
+> `assets/js/inbound-landing.js`. Barra móvil: AXIS `efeonce.landing-dock` pintado por el plugin `eo-landing-dock`
+> (manifiesto `manifests/landing-dock/inbound.json`); la barra propia `nav.mbar` sólo vuelve si el dock se apaga
+> ([manual del dock](../../manual-de-uso/public-site/operar-dock-de-landings.md)).
 
 ## Qué se puede editar y qué no
 
@@ -118,7 +122,7 @@ El botón aparece en tres lugares:
 
 - el botón secundario del hero;
 - el bloque «¿Prefieres conversarlo en vivo?» del cierre;
-- la mitad izquierda de la barra fija en el teléfono.
+- el botón principal de la barra fija en el teléfono (el dock compartido).
 
 Los tres abren la misma ventana. Cada lugar se mide por separado, así que se puede saber desde dónde agenda la gente.
 En el escritorio la ventana muestra sólo el agendador flotando sobre la página desenfocada, con un botón redondo para
@@ -130,9 +134,11 @@ Ese aspecto de la ventana es una decisión de diseño de esta landing, no un est
 
 > Detalle técnico: Growth CTA `inbound-discovery-meeting` (`open_meeting_scheduler`, scheduler
 > `fhsf-efeonce-lead-gen-web` + `discovery`), surface propia «Efeonce Inbound landing (WordPress)». Placements por
-> `cta-location`: `inbound_hero`, `inbound_closing`, `inbound_mobile_dock`. El lanzador vive en la base común de las
-> landings compiladas ([registro de primitives](../../architecture/public-site/PRIMITIVES.md#registry)); la piel del
-> diálogo está en `inbound-source/page.css` y la de los botones en `inbound-source/host.css`.
+> `cta-location`: `inbound_hero`, `inbound_closing` y, desde el 2026-10-23 a las 04:07 UTC, `landing_dock` (antes
+> `inbound_mobile_dock`, que ya no se emite mientras el dock compartido está encendido). Los lanzadores del hero y del
+> cierre viven en la base común de las landings compiladas
+> ([registro de primitives](../../architecture/public-site/PRIMITIVES.md#registry)); el del dock lo imprime el plugin
+> `eo-landing-dock`. La piel del diálogo está en `inbound-source/page.css` y la de los botones en `inbound-source/host.css`.
 
 ## Menciones de servicios de Efeonce
 
@@ -174,5 +180,6 @@ revisaron después de cada cambio en la base común y siguen iguales.
 - **Primera reserva real** desde la ventana de reunión.
 - **Buscadores:** revisar los datos estructurados en Rich Results Test.
 - **Prueba de edición en Elementor:** abrir, guardar y recargar desde el editor.
-- **Barra móvil:** esconderla mientras el formulario está en pantalla, como ya hace Performance Marketing.
+- ~~**Barra móvil:** esconderla mientras el formulario está en pantalla~~. Resuelto el 2026-10-23 con el dock
+  compartido, que se retira al llegar a la sección de diagnóstico.
 - **Precarga del formulario** desde lo que la persona hace en la página (`TASK-2039`).

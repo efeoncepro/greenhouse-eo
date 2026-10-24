@@ -2,6 +2,7 @@ import 'server-only'
 
 import { captureWithDomain } from '@/lib/observability/capture'
 import { isCanonicalSecretRefShape } from '@/lib/secrets/secret-manager'
+import type { EnvSource } from '@/types/env-source'
 import type { ReliabilitySignal } from '@/types/reliability'
 
 /**
@@ -46,11 +47,10 @@ interface EnvRefDriftSnapshot {
  *
  * Exportado para reuso desde scripts/audit + tests anti-regresión.
  *
- * Accepts a loose `Record<string, string | undefined>` para permitir test
- * harnesses sin tener que recrear el shape completo de `NodeJS.ProcessEnv`.
+ * Recibe un `EnvSource` para que los tests pasen un objeto parcial sin castear.
  */
 export const detectEnvRefFormatDrift = (
-  envSource: Record<string, string | undefined> = process.env as Record<string, string | undefined>
+  envSource: EnvSource = process.env
 ): EnvRefDriftSnapshot => {
   const entries = Object.entries(envSource).filter(([key]) => key.endsWith('_SECRET_REF'))
 

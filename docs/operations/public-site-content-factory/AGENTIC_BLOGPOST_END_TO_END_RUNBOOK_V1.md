@@ -370,9 +370,13 @@ Aplicar el router `author + surface + speaker`:
 | Artículo con byline de Julio                              | Julio                      | Observa, narra e interpreta; no inventar primera persona.                   |
 | Marketing con Manzanitas                                  | Julio                      | Puede usar sus motivos pedagógicos cuando cumplen una función real.         |
 | Thought leadership Efeonce firmado por Julio              | Julio + doctrina atribuida | Julio conduce; la postura organizacional se introduce como `En Efeonce...`. |
-| Artículo institucional, multi-autor o sin byline personal | Efeonce                    | Profesional-directo, prueba sobre hype, sin intimidad prestada.             |
+| Artículo institucional o multi-autor (con autor real)     | Efeonce                    | Profesional-directo, prueba sobre hype, sin intimidad prestada.             |
 | Superficie institucional aunque Julio sea fundador        | Efeonce                    | La superficie prevalece sobre familiaridad tonal.                           |
 | Autor/speaker incierto                                    | Bloqueado                  | No imitar a Julio como “voz humana genérica”.                               |
+
+**Autor real siempre (operador, 2026-10-22; PDR-020 delta punto 12):** todo artículo del blog lleva como autora a una
+persona (Julio o alguien del equipo) con su ficha, también cuando la voz es institucional. No se publica con byline
+«Efeonce» ni sin byline; en un artículo multi-autor firman las personas. La voz sigue el router; la firma, no.
 
 Para voz Julio, cargar el sistema vigente
 [`JULIO_REYES_VOICE_SYSTEM.md`](../../../.codex/skills/copywriting/efeonce/JULIO_REYES_VOICE_SYSTEM.md). Para voz
@@ -445,6 +449,19 @@ anécdota de Julio.
 
 **Bloqueo:** texto “correcto” pero sin autoría, hook basado en cifra no verificada, first-person inventada,
 running motif decorativo o CTA que promete una capacidad inexistente.
+
+> **Delta 2026-10-22 — autor real y orden de las invitaciones (decisión del operador).** Canon:
+> [`PDR-020` rev 2.0, punto 8](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias)
+> y [estrategia de love brand §8.2](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22).
+>
+> - **Autor real.** Cada artículo lleva como byline a una persona real (Julio o alguien del equipo) con su ficha de
+>   autor (§11.4). La fila «sin byline personal» del router de la Fase 3 decide la **voz** (Efeonce), no exime de
+>   firmar con una persona; un usuario técnico o de integración nunca queda como autor.
+> - **Orden fijo de las invitaciones:** primero suscribirse a **Glitch** (el newsletter canónico y único correo de
+>   Efeonce), después probar una **herramienta** y al final el **diagnóstico** de la landing del servicio. Pedir el
+>   diagnóstico antes de entregar valor es bloqueo.
+> - **Artículo de un tutorial de YouTube:** el video vive en YouTube y el blog lo incrusta en el artículo que responde
+>   la misma pregunta, con la transcripción como texto canónico.
 
 ### Fase 5. Construir la `GutenbergArticleSpec`
 

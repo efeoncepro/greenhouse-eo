@@ -1,6 +1,6 @@
 # UTEM · oferta presentada — 08-10-2026
 
-**Estado vigente: presentada por Julio en Mercado Público; evaluación/resultado pendientes.**
+**Actualización 19/10/2026: caso cerrado como perdido.** Ganador PROMO GIFT SPA, CLP2.290.000 netos; HubSpot `closedlost` con motivo y dos readbacks. [Cierre verificado](hubspot-perdida-2026-10-19.json) · [Análisis](ANALISIS-PROMOGIFT-2026-10-19-INTERNO.md). El registro siguiente conserva la presentación del 08/10/2026.
 Compra Ágil **5251-1060-COT26**. La instrucción «Enviada» y la captura entregada por Julio muestran
 «Cotización enviada correctamente», el código del proceso y cierre 08/10/2026 a las 18:00 Chile.
 No se deduce adjudicación, Orden de Compra, contrato ni inicio del servicio.
@@ -67,7 +67,7 @@ proyecto y fecha interna. La fecha/hora nativa que registra Notion al marcar Env
 actualización de tarea; no prueba la hora de recepción de Mercado Público. Se dejó sin tildar la
 validación interna medida de costo/margen/capacidad y habilitación del panel.
 
-**Siguiente paso:** revisar evaluación/resultado y atender eventuales solicitudes de UTEM por la plataforma.
+**Cierre 19/10/2026:** sin seguimiento comercial pendiente para esta compra; conservar el paquete presentado y el análisis de pérdida.
 La preparación/presentación ya no es un pendiente. Los costos, capacidad, panel y respaldo exacto del caso
 Sky conservan su estado interno de verificación; no se reabren como una decisión de envío.
 No se enviaron correos ni se crearon tareas/Deals nuevos en esta actualización.

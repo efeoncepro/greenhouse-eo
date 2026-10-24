@@ -76,7 +76,7 @@ const env = {
   GROWTH_AI_VISIBILITY_PORTAL_RUN_ENABLED: 'true',
   GROWTH_AI_VISIBILITY_MULTI_MARKET_ENABLED: 'true',
   GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED: 'true'
-} as NodeJS.ProcessEnv
+}
 
 const input = {
   organizationId: 'org-local',

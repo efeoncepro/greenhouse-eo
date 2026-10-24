@@ -34,6 +34,8 @@ type Target = {
   remotePath: string
   required: boolean
   kind?: 'directory' | 'file'
+  /** rsync patterns, relative to the target root, kept even though EXCLUDE_PATTERNS would drop them. */
+  includes?: string[]
 }
 
 type ManifestFile = {
@@ -46,7 +48,10 @@ const TARGETS: Target[] = [
   {
     label: 'ohio-child theme',
     remotePath: 'wp-content/themes/ohio-child',
-    required: true
+    required: true,
+    // Pinned AXIS files the theme serves (TASK-2042): versioned in the runtime repo, so the baseline must see them for
+    // the deploy drift guard, even though `vendor/` is excluded everywhere else.
+    includes: ['/assets/vendor/', '/assets/vendor/axis/***']
   },
   {
     label: 'EO headless content plugin',
@@ -76,6 +81,28 @@ const TARGETS: Target[] = [
   {
     label: 'EO Ohio Gutenberg blocks plugin',
     remotePath: 'wp-content/plugins/eo-ohio-gutenberg-blocks',
+    required: false
+  },
+  {
+    label: 'EO site navigation plugin (TASK-2041)',
+    remotePath: 'wp-content/plugins/eo-site-nav',
+    required: false
+  },
+  {
+    label: 'EO landing dock plugin (TASK-2043)',
+    remotePath: 'wp-content/plugins/eo-landing-dock',
+    required: false,
+    // Its pinned AXIS files, like the theme's: the deploy drift guard needs them in the baseline.
+    includes: ['/assets/vendor/', '/assets/vendor/axis/***']
+  },
+  {
+    label: 'EO blog home plugin (TASK-2051)',
+    remotePath: 'wp-content/plugins/eo-blog-home',
+    required: false
+  },
+  {
+    label: 'Efeonce editorial blocks + blog home content model (TASK-1337, TASK-2050)',
+    remotePath: 'wp-content/plugins/efeonce-editorial-blocks',
     required: false
   },
   {
@@ -266,6 +293,7 @@ const main = () => {
     const rsyncArgs = [
       '-az',
       ...(targetKind === 'directory' ? ['--delete'] : []),
+      ...(target.includes ?? []).flatMap(pattern => ['--include', pattern]),
       ...EXCLUDE_PATTERNS.flatMap(pattern => ['--exclude', pattern]),
       '-e',
       rsyncShell,

@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "fa2aff744028",
+  "key": "fa2aff7440280cdb02aa87d9c3f525119a52f891315d7fbf1643178243013c30",
+  "status": "completed",
+  "createdAt": "2026-10-20T11:27:53.682Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_propuesta-gana-programatica/metro/bello.png",
+    "imageSha256": "e69ac6cca5c88bb84a35e5e2ba08cf4ff77e95a0cfc356f3881e21947fcc70d5",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_propuesta-gana-programatica/metro/mask-pantalla.png",
+    "maskSha256": "129fb15995b56ad12fc7fd6a54be7042f380cd012aff9a098ec656ce43ebd4aa",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2881,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Inside the masked area, add one large landscape 16:9 digital LED advertising screen hanging from the steel roof truss of this metro station by two thin vertical steel cables, centered over the middle of the platform and facing the camera straight on, as it would be installed in a real Metro de Medellín station. Slim matte black bezel and a thin black housing; the screen is turned on and shows a perfectly uniform, flat, pure white image with no content, no text and no logo (the content will be placed later). The screen is self-illuminated and casts a faint soft glow on the nearby truss; keep the roof, lights and perspective of the photo consistent. Do not add people, signs or any text.",
+    "providerPrompt": "Inside the masked area, add one large landscape 16:9 digital LED advertising screen hanging from the steel roof truss of this metro station by two thin vertical steel cables, centered over the middle of the platform and facing the camera straight on, as it would be installed in a real Metro de Medellín station. Slim matte black bezel and a thin black housing; the screen is turned on and shows a perfectly uniform, flat, pure white image with no content, no text and no logo (the content will be placed later). The screen is self-illuminated and casts a faint soft glow on the nearby truss; keep the roof, lights and perspective of the photo consistent. Do not add people, signs or any text."
+  },
+  "mask": {
+    "touchedFraction": 0.08005032974661576,
+    "editable": 885600,
+    "soft": 0,
+    "protected": 10177440
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2881
+    },
+    "target": {
+      "width": 2208,
+      "height": 1664
+    },
+    "aspectError": 0.004482139353787174,
+    "reason": "la zona con contexto ocupa 37 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0736,
+    "basis": "1 × salida 2208x1664 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 119.118,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.9,
+        "bestError": 3.9,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 10177440,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 885600,
+        "maxDelta": 255,
+        "meanDelta": 119.118,
+        "worst": {
+          "x": 1922,
+          "y": 645
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 10177440,
+        "maxDelta": 222,
+        "meanDelta": 10.943,
+        "worst": {
+          "x": 3055,
+          "y": 1314
+        }
+      },
+      "outputUsd": 0.0736,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1719,
+        "input_tokens_details": {
+          "image_tokens": 1530,
+          "text_tokens": 189
+        },
+        "output_tokens": 2452,
+        "output_tokens_details": {
+          "image_tokens": 2452,
+          "text_tokens": 0
+        },
+        "total_tokens": 4171
+      },
+      "meta": {
+        "size": "2208x1664",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

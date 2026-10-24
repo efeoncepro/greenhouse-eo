@@ -22,6 +22,8 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { isSeoModuleEnabled } from './flags'
 import { GROUNDED_QUERY_FALLBACK_NOTICE, type GroundedQueryErrorCode } from './grounded-query-bridge'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface GroundedQueryDraftPromptView {
   id: string
   family: string
@@ -61,7 +63,7 @@ export const readGroundedQueryDraft = async (input: {
   organizationId: string
   profileId: string
   setId: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }): Promise<ReadGroundedQueryDraftResult> => {
   const env = input.env ?? process.env
 

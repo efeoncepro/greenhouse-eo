@@ -119,8 +119,9 @@ Nexa) o un cliente Globe. Para audio genérico basta `../modules/`.
 
 Dónde entra el audio:
 
-- **Think / Glitch:** *Glitch* (newsletter semanal IA/Marketing/Negocios) es candidato natural a **podcast**
-  (`../modules/07`): mnemonic de intro, formato consistente, clips 60-90s para social.
+- **Pódcast (operador, 2026-10-22; PDR-020 delta punto 12):** **sin canal por ahora.** Si se produce, va a YouTube en
+  video y bajo *Marketing con Manzanitas*, no bajo Glitch; el reel y el vlog de Glitch también están en pausa. El oficio
+  de `../modules/07` (mnemonic de intro, formato consistente, clips de 60-90 s) aplica cuando se reactive.
 - **El grader:** un explainer de audio / jingle del grader es pieza compartible.
 - **Landings (`/aeo-2/`):** VO para video hero, jingle de marca.
 

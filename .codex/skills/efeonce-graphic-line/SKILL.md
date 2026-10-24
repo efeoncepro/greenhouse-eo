@@ -7,7 +7,7 @@ description: The Efeonce design system, explicitly governing all Efeonce Rooms p
 
 ## Envíos desde el Outlook de Julio
 
-Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
+Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma gráfica oficial siempre y CCO `48713323@bcc.hubspot.com`, incluidos correos nuevos, respuestas, reenvíos y seguimientos manuales, programados o por secuencias (Julio, 21/10/2026). Usar Outlook UI o transporte HTML autorizado que conserve la firma; texto plano no es alternativa. Si la herramienta no la preserva, dejar el correo pendiente sin enviarlo. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
 
 
 La órbita es la forma propia de Efeonce: **anillo fino + arco con la esfera en la punta + halo**, nacida del isotipo.
@@ -40,11 +40,15 @@ sin número: «NO ESPERA AL LUNES» + «FLASH»), lanzado en producción el 2026
 `axis-ui-contracts` 0.3.22) y compuesto en local con `pnpm glitch:compose` y un manifiesto `edition.kind: "flash"`
 ([glitch.md §14](references/glitch.md)); la ruta productiva (TASK-1921) todavía sólo conoce la edición semanal. **Nunca** uses
 la manzana, el verde Glitch, la falla en bytes, Guttery ni la cabecera «EDICIÓN #N» en una pieza de Efeonce, y nunca
-dos esferas en una pieza (manzana + lente u órbita).
+dos esferas en una pieza (manzana + lente u órbita). En qué canal se publica cada formato de Glitch (único correo de
+Efeonce; en Threads sólo como gancho) lo decide
+[PDR-020, delta 2026-10-22](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md), no esta
+skill ([glitch.md §6](references/glitch.md)).
 
 ### Marketing con Manzanitas: sub-línea de La órbita, sólo para Manzanitas
 
-Marketing con Manzanitas (MCM, la marca editorial evergreen del blog) es una **sub-línea dentro del sistema de La órbita,
+Marketing con Manzanitas (MCM, la marca editorial evergreen de Efeonce: blog, newsletter del LinkedIn de Julio y
+YouTube, según [PDR-020](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)) es una **sub-línea dentro del sistema de La órbita,
 igual que Glitch** (operador, 2026-09-29: «no sustituye a la orbita es una sublinea dentro del design system de la orbita
 igual que glitch»; los documentos anteriores la llaman «registro complementario»: es lo mismo). Estable en AXIS desde `v0.3.37` (token
 `canonical`, contrato `stable`). Aprobada completa por el
@@ -122,6 +126,7 @@ fuente portable; Lab los proyecta; checkout ejecuta CLIs; cada consumidor implem
 | **Efeonce AI Visibility Report** (el PDF del AEO Assessment; aprobado y canónico en AXIS `v0.3.30`, 2026-09-29) y la **medida con gravedad** de su portada (estela, esfera y brillo en el color del nivel, con etiqueta y escala; umbrales del productor; nunca en la marca de estado). Token `measureSeverity` + `aiVisibilityReport`, contratos `efeonce.ai-visibility-report` 0.1.0 `candidate` y órbita 0.4.0, receta `@efeoncepro/axis-graphic-line/report` 0.12.0; TASK-1938 implementado localmente el 03/10 (rollout pendiente); estado y pins vigentes en applications.md §B3c | [criteria.md §3.4](references/criteria.md) + [applications.md §B3c](references/applications.md) + [package-and-tokens.md §2.19, §2.20, §7.10](references/package-and-tokens.md) · Lab [axis.efeonce.org/references/ai-visibility-report/](https://axis.efeonce.org/references/ai-visibility-report/) · **camino recorrido decidido el 2026-09-29** (toda medida, incluida esta portada; AXIS `v0.3.38`, órbita 0.5.0, `axis-graphic-line` 0.13.0; [ledger.md](references/ledger.md)) |
 | **Módulos de correo de Efeonce** (aprobados 2026-09-29; canónicos: el **pie** —agenda, bloque de marca, burbuja + redes, legal, preferencias y motivo—, el **CTA principal** y la **agenda**; «Suscribirme» retirado; el correo de entrega de Insights es una **aplicación**, no la plantilla). Token `efeonceEmail`, contrato `efeonce.email-modules` 0.1.0 `candidate`, PNG `email-*` de `axis-brand-assets` 0.4.6, `pnpm email:resolve` en AXIS; Greenhouse todavía no los adopta. **No confundir con la firma de correo de una persona** (`efeonce.email-signature`) | [applications.md §C4](references/applications.md) + [package-and-tokens.md §2.21](references/package-and-tokens.md) + [qa-checklist.md §7b](references/qa-checklist.md) · Lab [axis.efeonce.org/references/email/](https://axis.efeonce.org/references/email/) · AXIS `docs/agent-composition/email-modules.md` · dirección Greenhouse `docs/ui/visual-directions/EFEONCE_EMAIL_MODULES_V1-direction.md` · skills `greenhouse-email` y `resend-email-platform` |
 | **Mención Efeonce en texto corrido** (enlace con isotipo en la píldora de la línea; sólo destinos Efeonce, no CTA; API en AXIS `efeonce.mention`, 2026-10-18) | [applications.md §A14](references/applications.md#a14-mención-efeonce-en-texto-corrido-2026-10-18) + skill `axis-design-system` → `references/ui-primitives.md` |
+| **Anuncio de alianza / partnership** (post + reel; lockup con filete, logos completos en blanco, un solo bloque focal, sin pregunta-respuesta, acabado Sunburst; 2026-10-19) | [applications.md §A16](references/applications.md#a16-anuncio-de-alianza--partnership-post--reel-aprobado-2026-10-19) + [criteria.md](references/criteria.md) («Anuncios de alianza») |
 | Revisar antes de entregar | [references/qa-checklist.md](references/qa-checklist.md) |
 | Qué decidió el operador, qué está pendiente, qué versiones hay | [references/ledger.md](references/ledger.md) |
 | Trampas que ya costaron tiempo | [references/lessons.md](references/lessons.md) |
@@ -227,7 +232,11 @@ fuente portable; Lab los proyecta; checkout ejecuta CLIs; cada consumidor implem
    aprobada por superficie, `pnpm brand:compose -- --intent <intent.json>`** la entrega entera (ejemplos en
    `src/lib/brand-surfaces/examples/`). Los íconos, con `resolveIcon` de `@efeoncepro/axis-graphic-line` (Greenhouse lo
    usa en `src/lib/brand-surfaces`; fuera de esa ruta, `pnpm icons:export` en AXIS).
-4. Corre los chequeos del adapter y el QA de `qa-checklist.md` sobre los píxeles finales.
+4. Corre los chequeos del adapter y el QA de `qa-checklist.md` sobre los píxeles finales. Si la pieza tiene motion o
+   sonido (reveal, apertura, sting, motion de Glitch), antes de mostrarla corre el control estándar sin Gemini:
+   `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json`
+   (el golpe del sting se verifica como cue). Gemini va después, opcional y siempre con `--verify`
+   ([manual](../../../docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md)).
 5. Si aprendiste algo, actualiza esta skill (abajo).
 
 ## Dónde viven los archivos de `ai-generations/`

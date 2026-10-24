@@ -1,6 +1,8 @@
 import { getVercelOidcToken, getVercelOidcTokenSync } from '@vercel/oidc'
 import { ExternalAccountClient, GoogleAuth, Impersonated, type AuthClient, type GoogleAuthOptions } from 'google-auth-library'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type GoogleCredentialSource = 'wif' | 'service_account_key' | 'ambient_adc'
 
 type GoogleCredentialPreference = GoogleCredentialSource | 'auto'
@@ -142,7 +144,7 @@ const normalizeParsedCredentials = (value: unknown) => {
 
 const hasValue = (value: string | undefined) => Boolean(value?.trim())
 
-const getGoogleCredentialPreference = (env: NodeJS.ProcessEnv = process.env): GoogleCredentialPreference => {
+const getGoogleCredentialPreference = (env: EnvSource = process.env): GoogleCredentialPreference => {
   const value = env.GCP_AUTH_PREFERENCE?.trim().toLowerCase()
 
   switch (value) {
@@ -157,19 +159,19 @@ const getGoogleCredentialPreference = (env: NodeJS.ProcessEnv = process.env): Go
   }
 }
 
-const hasVercelRuntimeMetadata = (env: NodeJS.ProcessEnv = process.env) =>
+const hasVercelRuntimeMetadata = (env: EnvSource = process.env) =>
   hasValue(env.VERCEL_URL) || hasValue(env.VERCEL_DEPLOYMENT_ID) || hasValue(env.VERCEL_REGION)
 
-export const isVercelRuntime = (env: NodeJS.ProcessEnv = process.env) =>
+export const isVercelRuntime = (env: EnvSource = process.env) =>
   hasValue(env.VERCEL) && hasVercelRuntimeMetadata(env)
 
-const hasInjectedVercelOidcToken = (env: NodeJS.ProcessEnv = process.env) =>
+const hasInjectedVercelOidcToken = (env: EnvSource = process.env) =>
   env !== process.env && hasValue(env.VERCEL_OIDC_TOKEN)
 
-export const hasPersistedLocalVercelOidcToken = (env: NodeJS.ProcessEnv = process.env) =>
+export const hasPersistedLocalVercelOidcToken = (env: EnvSource = process.env) =>
   env === process.env && !isVercelRuntime(env) && hasValue(env.VERCEL_OIDC_TOKEN)
 
-const getAvailableVercelOidcTokenSync = (env: NodeJS.ProcessEnv = process.env) => {
+const getAvailableVercelOidcTokenSync = (env: EnvSource = process.env) => {
   if (hasInjectedVercelOidcToken(env)) {
     return env.VERCEL_OIDC_TOKEN?.trim()
   }
@@ -209,7 +211,7 @@ const normalizeWorkloadIdentityProvider = (value: string) => {
 
 const normalizeWorkloadIdentityAudience = (value: string) => `//iam.googleapis.com/${normalizeWorkloadIdentityProvider(value)}`
 
-const getServiceAccountKeyCredentials = (env: NodeJS.ProcessEnv = process.env) => {
+const getServiceAccountKeyCredentials = (env: EnvSource = process.env) => {
   const rawCredentials = normalizeOptionalCredentialEnv(env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
   const rawCredentialsBase64 = normalizeOptionalCredentialEnv(env.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64)
 
@@ -243,7 +245,7 @@ const getServiceAccountKeyCredentials = (env: NodeJS.ProcessEnv = process.env) =
   throw new Error('Invalid Google Cloud credentials environment variable')
 }
 
-const getWorkloadIdentityProvider = (env: NodeJS.ProcessEnv = process.env) => {
+const getWorkloadIdentityProvider = (env: EnvSource = process.env) => {
   const explicitProvider = env.GCP_WORKLOAD_IDENTITY_PROVIDER?.trim()
 
   if (explicitProvider) {
@@ -261,10 +263,10 @@ const getWorkloadIdentityProvider = (env: NodeJS.ProcessEnv = process.env) => {
   return `projects/${projectNumber}/locations/global/workloadIdentityPools/${poolId}/providers/${providerId}`
 }
 
-export const isWorkloadIdentityConfigured = (env: NodeJS.ProcessEnv = process.env) =>
+export const isWorkloadIdentityConfigured = (env: EnvSource = process.env) =>
   hasValue(getWorkloadIdentityProvider(env)) && hasValue(env.GCP_SERVICE_ACCOUNT_EMAIL)
 
-const createVercelSubjectTokenSupplier = (env: NodeJS.ProcessEnv) => ({
+const createVercelSubjectTokenSupplier = (env: EnvSource) => ({
   getSubjectToken: async () => {
     if (hasInjectedVercelOidcToken(env)) {
       return env.VERCEL_OIDC_TOKEN!.trim()
@@ -292,7 +294,7 @@ export const createVercelWifGoogleAuthClient = ({
 }: {
   provider: string
   serviceAccountEmail: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   scopes?: string | string[]
 }) => {
   const normalizedProvider = normalizeWorkloadIdentityProvider(provider)
@@ -326,7 +328,7 @@ export const createVercelWifGoogleIdTokenClientFactory = ({
 }: {
   provider: string
   serviceAccountEmail: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }) => {
   const normalizedProvider = normalizeWorkloadIdentityProvider(provider)
   const normalizedServiceAccountEmail = serviceAccountEmail.trim()
@@ -409,7 +411,7 @@ export const createAmbientImpersonatedGoogleIdTokenClientFactory = ({
  */
 export const fetchGoogleIdTokenForAudience = async (
   audience: string,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<string> => {
   const normalizedAudience = normalizeIdTokenAudience(audience)
 
@@ -437,7 +439,7 @@ export const fetchGoogleIdTokenForAudience = async (
  */
 export type GoogleIdTokenProviderPlan = 'wif' | 'service_account_key' | 'ambient_impersonated' | 'ambient_adc'
 
-export const getGoogleIdTokenProviderPlan = (env: NodeJS.ProcessEnv = process.env): GoogleIdTokenProviderPlan => {
+export const getGoogleIdTokenProviderPlan = (env: EnvSource = process.env): GoogleIdTokenProviderPlan => {
   if (shouldUseWorkloadIdentity(env)) {
     return 'wif'
   }
@@ -449,7 +451,7 @@ export const getGoogleIdTokenProviderPlan = (env: NodeJS.ProcessEnv = process.en
   return hasValue(env.GCP_SERVICE_ACCOUNT_EMAIL) ? 'ambient_impersonated' : 'ambient_adc'
 }
 
-const resolveGoogleIdTokenProvider = async (audience: string, env: NodeJS.ProcessEnv) => {
+const resolveGoogleIdTokenProvider = async (audience: string, env: EnvSource) => {
   const plan = getGoogleIdTokenProviderPlan(env)
 
   if (plan === 'wif') {
@@ -499,7 +501,7 @@ const getWorkloadIdentityAuthClient = ({
   env = process.env,
   scopes
 }: {
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   scopes?: string | string[]
 }) => {
   const provider = getWorkloadIdentityProvider(env)
@@ -517,7 +519,7 @@ const getWorkloadIdentityAuthClient = ({
   })
 }
 
-export const shouldUseWorkloadIdentity = (env: NodeJS.ProcessEnv = process.env) => {
+export const shouldUseWorkloadIdentity = (env: EnvSource = process.env) => {
   const preference = getGoogleCredentialPreference(env)
 
   if (preference === 'service_account_key' || preference === 'ambient_adc') {
@@ -535,7 +537,7 @@ export const shouldUseWorkloadIdentity = (env: NodeJS.ProcessEnv = process.env) 
   return isVercelRuntime(env)
 }
 
-export const getGoogleCredentialSource = (env: NodeJS.ProcessEnv = process.env): GoogleCredentialSource => {
+export const getGoogleCredentialSource = (env: EnvSource = process.env): GoogleCredentialSource => {
   const preference = getGoogleCredentialPreference(env)
 
   if (preference === 'ambient_adc') {
@@ -559,7 +561,7 @@ export const getGoogleCredentialSource = (env: NodeJS.ProcessEnv = process.env):
   return 'ambient_adc'
 }
 
-export const getGoogleCredentialDiagnostics = (env: NodeJS.ProcessEnv = process.env) => {
+export const getGoogleCredentialDiagnostics = (env: EnvSource = process.env) => {
   const preference = getGoogleCredentialPreference(env)
   const source = getGoogleCredentialSource(env)
 
@@ -575,9 +577,9 @@ export const getGoogleCredentialDiagnostics = (env: NodeJS.ProcessEnv = process.
   }
 }
 
-export const getGoogleCredentials = (env: NodeJS.ProcessEnv = process.env) => getServiceAccountKeyCredentials(env)
+export const getGoogleCredentials = (env: EnvSource = process.env) => getServiceAccountKeyCredentials(env)
 
-export const getGoogleProjectId = (env: NodeJS.ProcessEnv = process.env) => {
+export const getGoogleProjectId = (env: EnvSource = process.env) => {
   const explicitProjectId = env.GCP_PROJECT?.trim() || env.GOOGLE_CLOUD_PROJECT?.trim()
 
   if (explicitProjectId) {
@@ -599,7 +601,7 @@ export const getGoogleAuthOptions = ({
   env = process.env,
   scopes
 }: {
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   scopes?: string | string[]
 } = {}): GoogleAuthOptions<AuthClient> => {
   const projectId = getGoogleProjectId(env)
@@ -633,6 +635,6 @@ export const createGoogleAuth = ({
   env = process.env,
   scopes
 }: {
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   scopes?: string | string[]
 } = {}) => new GoogleAuth(getGoogleAuthOptions({ env, scopes }))

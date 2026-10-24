@@ -137,6 +137,28 @@ export const FIELD_PRESENTATION_ICONS = [
 ] as const
 export type FieldPresentationIcon = (typeof FIELD_PRESENTATION_ICONS)[number]
 
+/**
+ * Controles especializados opt-in (`presentation.control`). Conservan el `value` y la semántica del
+ * campo; sólo cambian cómo se dibuja.
+ *   - `country_select`: listbox premium con banderas (`options[].countryCode`).
+ *   - `premium_select`: el mismo listbox premium, sin banderas, para cualquier `select` en cualquier
+ *     `styleVariant` (en `hubspot_pillar` un `select` sin control se dibuja como chips). Sólo aplica a
+ *     `type: 'select'`; el compiler bloquea la publicación si se declara en otro tipo.
+ * Un renderer que no conoce el valor lo ignora y dibuja el control por defecto de la variante.
+ */
+export const FIELD_PRESENTATION_CONTROLS = ['country_select', 'premium_select'] as const
+export type FieldPresentationControl = (typeof FIELD_PRESENTATION_CONTROLS)[number]
+
+/**
+ * TASK-2044 — Ancho del campo en el modo de dos columnas (`presentation.width`).
+ *   - `auto` (default, igual que omitirlo): el renderer decide como siempre (heurística por tipo).
+ *   - `half`: media columna; colapsa a fila completa cuando el contenedor es de una columna.
+ *   - `full`: fila completa.
+ * Es presentación pura: no cambia valor, validación ni orden del campo.
+ */
+export const FIELD_PRESENTATION_WIDTHS = ['auto', 'half', 'full'] as const
+export type FieldPresentationWidth = (typeof FIELD_PRESENTATION_WIDTHS)[number]
+
 export const FILE_UPLOAD_STORAGE_CONTEXTS = ['hiring_application_cv_draft'] as const
 export type FileUploadStorageContext = (typeof FILE_UPLOAD_STORAGE_CONTEXTS)[number]
 
@@ -161,7 +183,8 @@ export type FileUploadPolicy = z.infer<typeof fileUploadPolicySchema>
 export const fieldPresentationSchema = z
   .object({
     icon: z.enum(FIELD_PRESENTATION_ICONS).optional(),
-    control: z.enum(['country_select']).optional()
+    control: z.enum(FIELD_PRESENTATION_CONTROLS).optional(),
+    width: z.enum(FIELD_PRESENTATION_WIDTHS).optional()
   })
   .strict()
 export type FieldPresentation = z.infer<typeof fieldPresentationSchema>
@@ -298,6 +321,12 @@ export const fieldDefinitionSchema = z.object({
   dataClass: z.enum(FIELD_DATA_CLASSES).optional(),
   uploadPolicy: fileUploadPolicySchema.optional(),
   presentation: fieldPresentationSchema.optional(),
+  /**
+   * TASK-2053 — Valor fijo de un campo `hidden` (p.ej. la identificación pública de un evento). Es
+   * browser-safe (viaja en el contrato) y el servidor lo IMPONE al aceptar el envío: lo que mande el
+   * navegador para ese campo se descarta. El compiler lo bloquea en campos que no son `hidden`.
+   */
+  staticValue: z.string().min(1).max(200).optional(),
   autocomplete: z.string().max(40).optional(),
   inputMode: z.string().max(20).optional(),
   // Validador declarativo (catálogo CURADO, anti-ReDoS): el admin elige de
@@ -344,11 +373,29 @@ export const sanitizeRenderCopy = (raw: unknown): Record<string, string> => {
   return out
 }
 
+/**
+ * TASK-2044 — Presentación del consentimiento.
+ *   - `tile` (default, igual que omitirlo): tarjeta con el texto y el enlace a la política en un párrafo aparte.
+ *   - `compact`: casilla compacta; el enlace a la política va dentro de la frase de la casilla.
+ */
+export const CONSENT_PRESENTATIONS = ['tile', 'compact'] as const
+export type ConsentPresentation = (typeof CONSENT_PRESENTATIONS)[number]
+
+/**
+ * TASK-2044 — Único marcador admitido en el `label` de una casilla de consentimiento. El renderer lo
+ * reemplaza por un enlace a `privacyUrl` con el texto `privacyLinkLabel` (o el del diccionario del
+ * locale). Nunca HTML del autor: el enlace lo construye el renderer con DOM.
+ */
+export const CONSENT_PRIVACY_LINK_MARKER = '{privacyLink}'
+export const CONSENT_PRIVACY_LINK_LABEL_MAX = 80
+
 export const consentDisplaySchema = z.object({
   consentPolicyVersion: z.string().optional(),
   noticeText: z.string().max(4000).optional(),
   noticeCopyRef: z.string().optional(),
   privacyUrl: z.string().url().optional(),
+  presentation: z.enum(CONSENT_PRESENTATIONS).optional(),
+  privacyLinkLabel: z.string().min(1).max(CONSENT_PRIVACY_LINK_LABEL_MAX).optional(),
   checkboxes: z
     .array(
       z.object({
@@ -375,9 +422,20 @@ export type ConsentDisplay = z.infer<typeof consentDisplaySchema>
 export const SUCCESS_PRESENTATIONS = ['inline_message', 'success_card'] as const
 export type SuccessPresentation = (typeof SUCCESS_PRESENTATIONS)[number]
 
-/** Kinds de acción permitidos en V1 (browser-safe). */
-export const SUCCESS_ACTION_KINDS = ['external_link', 'download', 'asset_access', 'schedule'] as const
+/**
+ * Kinds de acción permitidos (browser-safe). `dismiss` (TASK-2044) cierra la superficie que contiene
+ * al formulario (p. ej. el diálogo de un Growth CTA): no navega, no lleva `href` y el renderer emite
+ * un evento para que el anfitrión cierre. Un renderer anterior la omite (filtra acciones sin `href`).
+ */
+export const SUCCESS_ACTION_KINDS = ['external_link', 'download', 'asset_access', 'schedule', 'dismiss'] as const
 export type SuccessActionKind = (typeof SUCCESS_ACTION_KINDS)[number]
+
+/**
+ * TASK-2044 — Ícono del estado de éxito. `celebration` (default, igual que omitirlo) es el actual;
+ * `orbit` es el glifo de La órbita (arco con la esfera); `none` no dibuja ícono.
+ */
+export const SUCCESS_ICONS = ['celebration', 'orbit', 'none'] as const
+export type SuccessIcon = (typeof SUCCESS_ICONS)[number]
 
 /** Kinds de reward para lead magnets / gated resources. `none` = sin reward. */
 export const SUCCESS_REWARD_KINDS = ['none', 'ebook', 'guide', 'template', 'report_preview', 'surprise'] as const
@@ -419,14 +477,18 @@ export const successCardHrefSchema = z.string().trim().max(SUCCESS_HREF_MAX).ref
   message: 'href debe ser https (o path same-origin `/`); sin javascript:/data:/non-https externa'
 })
 
-export const successCardActionSchema = z.object({
-  kind: z.enum(SUCCESS_ACTION_KINDS),
-  label: z.string().max(80).optional(),
-  labelCopyRef: z.string().max(120).optional(),
-  href: successCardHrefSchema.optional(),
-  target: z.enum(['_self', '_blank']).optional(),
-  telemetryKey: z.string().max(80).optional()
-})
+export const successCardActionSchema = z
+  .object({
+    kind: z.enum(SUCCESS_ACTION_KINDS),
+    label: z.string().max(80).optional(),
+    labelCopyRef: z.string().max(120).optional(),
+    href: successCardHrefSchema.optional(),
+    target: z.enum(['_self', '_blank']).optional(),
+    telemetryKey: z.string().max(80).optional()
+  })
+  .refine(action => action.kind !== 'dismiss' || (action.href === undefined && action.target === undefined), {
+    message: 'una acción dismiss no navega: sin href ni target'
+  })
 export type SuccessCardAction = z.infer<typeof successCardActionSchema>
 
 export const successCardRewardSchema = z.object({
@@ -509,6 +571,7 @@ export const successBehaviorSchema = z.object({
   // `asset_access` y esto está presente, el renderer emite `download_url` en el evento accepted.
   assetDownload: assetDownloadBehaviorSchema.optional(),
   presentation: z.enum(SUCCESS_PRESENTATIONS).optional(),
+  icon: z.enum(SUCCESS_ICONS).optional(),
   message: z.string().max(2000).optional(),
   messageCopyRef: z.string().optional(),
   // Success card estructurada (browser-safe) — TASK-1319.
@@ -546,6 +609,39 @@ export const renderStepSchema = z.object({
 })
 export type RenderStep = z.infer<typeof renderStepSchema>
 
+/**
+ * TASK-2053 — Presentación del formulario completo (ortogonal a `styleVariant`, que tematiza).
+ *   - ausente (o `standard` en la versión): el formulario de siempre; el contrato no lleva la clave.
+ *   - `inline_pill`: un botón píldora que se estira en el campo de correo con su botón de envío y
+ *     confirma en el mismo lugar (portada del blog v3, canvas aprobado 2026-10-24). Sólo admite un
+ *     campo visible de correo (más campos ocultos) y un consentimiento de aviso, sin casillas.
+ */
+export const FORM_PRESENTATIONS = ['inline_pill'] as const
+export type FormPresentation = (typeof FORM_PRESENTATIONS)[number]
+
+export const INLINE_PILL_LABEL_MAX = 80
+export const INLINE_PILL_NOTE_MAX = 280
+
+const inlinePillLabel = z.string().trim().min(1).max(INLINE_PILL_LABEL_MAX)
+
+/**
+ * TASK-2053 — Etiquetas de la presentación en línea. Todas opcionales: el renderer usa las del
+ * diccionario de su locale según `formKind` cuando faltan. Cruzan al browser tal cual, así que son
+ * strings acotados y sin HTML (el compiler bloquea `<`/`>`). `note` admite un único `{privacyLink}`.
+ */
+export const inlinePillDisplaySchema = z
+  .object({
+    openLabel: inlinePillLabel.optional(),
+    submitLabel: inlinePillLabel.optional(),
+    successLabel: inlinePillLabel.optional(),
+    doneLabel: inlinePillLabel.optional(),
+    waitlistSuccessLabel: inlinePillLabel.optional(),
+    waitlistDoneLabel: inlinePillLabel.optional(),
+    note: z.string().trim().min(1).max(INLINE_PILL_NOTE_MAX).optional()
+  })
+  .strict()
+export type InlinePillDisplay = z.infer<typeof inlinePillDisplaySchema>
+
 export const renderContractSchema = z.object({
   contractVersion: z.literal(CONTRACT_VERSION),
   form: z.object({
@@ -566,6 +662,9 @@ export const renderContractSchema = z.object({
   consent: consentDisplaySchema.optional(),
   successBehavior: successBehaviorSchema,
   styleVariant: z.string().optional(),
+  /** TASK-2053 — ausente = presentación estándar (los contratos publicados no cambian). */
+  presentation: z.enum(FORM_PRESENTATIONS).optional(),
+  inlinePill: inlinePillDisplaySchema.optional(),
   surfacePolicy: z.object({
     surfaceId: z.string().optional(),
     allowedOrigins: z.array(z.string()).default([]),
@@ -624,6 +723,65 @@ export const resolveEmailPolicy = (validationSchemaJson: unknown): EmailPolicy =
   const parsed = emailPolicySchema.safeParse(raw ?? {})
 
   return parsed.success ? parsed.data : { mode: 'off', field: 'email' }
+}
+
+// ─── event_registration — TASK-2053 — cupos y lista de espera (server-only) ────
+
+/**
+ * Qué pasa con un envío cuando las reservas confirmadas ya llenaron el cupo.
+ *  - `waitlist` (default): se acepta igual y queda en lista de espera; ningún envío se pierde.
+ *  - `reject`: se rechaza con el outcome `capacity_full` (no se persiste).
+ */
+export const EVENT_OVER_CAPACITY_POLICIES = ['waitlist', 'reject'] as const
+export type EventOverCapacityPolicy = (typeof EVENT_OVER_CAPACITY_POLICIES)[number]
+
+export const REGISTRATION_STATUSES = ['confirmed', 'waitlisted'] as const
+export type RegistrationStatus = (typeof REGISTRATION_STATUSES)[number]
+
+export const REGISTRATIONS_COUNT_DEFAULT_THRESHOLD = 25
+
+/**
+ * Política de reserva de un formulario `event_registration`. Vive en
+ * `form_version.ui_policy_json.eventRegistration` y NO cruza al render contract: cupo, umbral y la
+ * decisión de mostrar el conteo son del servidor. El estado de cada reserva se escribe en el campo
+ * `statusField` de `normalized_fields_json` (sin columnas nuevas); el destino lo recibe sólo si su
+ * mapping lo declara.
+ */
+export const eventRegistrationPolicySchema = z
+  .object({
+    capacity: z.number().int().positive().max(100_000).optional(),
+    overCapacity: z.enum(EVENT_OVER_CAPACITY_POLICIES).default('waitlist'),
+    statusField: z
+      .string()
+      .regex(/^[A-Za-z][A-Za-z0-9_]{0,79}$/)
+      .default('registration_status'),
+    showRegistrationsCount: z.boolean().default(false),
+    registrationsCountThreshold: z.number().int().min(1).max(100_000).default(REGISTRATIONS_COUNT_DEFAULT_THRESHOLD)
+  })
+  .strict()
+export type EventRegistrationPolicy = z.infer<typeof eventRegistrationPolicySchema>
+
+/**
+ * Resuelve la política de reserva. `null` cuando el formulario no es `event_registration` o no la
+ * declara (comportamiento de hoy). Una política que no parsea también degrada a `null`: el compiler
+ * ya bloquea su publicación, así que en runtime sólo puede venir de una versión legacy.
+ */
+export const resolveEventRegistrationPolicy = (
+  formKind: string,
+  uiPolicyJson: unknown
+): EventRegistrationPolicy | null => {
+  if (formKind !== 'event_registration') return null
+
+  const raw =
+    uiPolicyJson && typeof uiPolicyJson === 'object'
+      ? (uiPolicyJson as Record<string, unknown>).eventRegistration
+      : undefined
+
+  if (raw === undefined || raw === null) return null
+
+  const parsed = eventRegistrationPolicySchema.safeParse(raw)
+
+  return parsed.success ? parsed.data : null
 }
 
 // ─── destination_plan — server-only (router de destinos) ──────────────────────
@@ -686,6 +844,8 @@ export const PUBLIC_SUBMIT_OUTCOMES = [
   'captcha_failed',
   'form_not_published',
   'disabled',
+  // TASK-2053 — formulario de evento con el cupo lleno y política `overCapacity: 'reject'`.
+  'capacity_full',
   // TASK-1255 — fail-closed: el motor no pudo procesar de forma segura (p.ej. cifrado de
   // PII habilitado pero la key no está disponible). NUNCA se persiste PII en claro creyendo
   // cifrarla; se rechaza el submit y se reintenta al resolver la causa.
@@ -697,6 +857,8 @@ export interface PublicSubmitResult {
   outcome: PublicSubmitOutcome
   submissionId?: string
   reason?: string
+  /** TASK-2053 — sólo en formularios de evento con política de reserva. */
+  registrationStatus?: RegistrationStatus
   googleAdsConversion?: GoogleAdsConversionReceipt
 }
 

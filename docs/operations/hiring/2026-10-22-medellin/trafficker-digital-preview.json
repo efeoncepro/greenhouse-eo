@@ -1,0 +1,136 @@
+{
+  "outcome": "validated",
+  "mode": "dryRun",
+  "warnings": [
+    "public_compensation_band_not_set"
+  ],
+  "timings": [],
+  "preview": {
+    "demand": {
+      "stakeholderType": "internal",
+      "engagementType": "on_going",
+      "fulfillmentMode": "internal_hire",
+      "demandOrigin": "prospect_request",
+      "requestedRole": "Trafficker Digital / Especialista en Performance",
+      "requestedSeats": 1,
+      "requestedSkills": [
+        "Paid media",
+        "Optimización de campañas",
+        "GA4",
+        "Google Tag Manager",
+        "Medición"
+      ],
+      "priority": "high",
+      "ownerUserId": "user-efeonce-admin-julio-reyes",
+      "notes": "publication_source_ref=efeonce-medellin-2027-trafficker-digital-20261022"
+    },
+    "opening": {
+      "demandId": "<created-demand-id>",
+      "internalTitle": "Trafficker Digital / Especialista en Performance",
+      "seniority": "Semi-senior",
+      "requestedSeats": 1,
+      "ownerUserId": "user-efeonce-admin-julio-reyes"
+    },
+    "publicOpening": {
+      "publicTitle": "Trafficker Digital / Especialista en Performance",
+      "publicSummary": "Convierte inversión en medios y datos de campaña en decisiones que el equipo pueda ejecutar y explicar.",
+      "publicDescription": "Buscamos un perfil Semi-senior que combine operación de pauta, criterio analítico y orden de medición. Trabajarás dedicado a un importante cliente en Medellín, con el respaldo de nuestros equipos de estrategia, creatividad y datos. Tu contribución se verá en campañas bien implementadas, aprendizajes claros y decisiones sustentadas.\n\n- Planear, implementar y optimizar campañas de pauta digital con objetivos e inversión acordados.\n- Organizar audiencias, segmentaciones, pruebas y seguimiento del presupuesto.\n- Revisar embudos y eventos con GA4, Google Tag Manager y píxeles de plataformas publicitarias.\n- Construir y mantener dashboards y reportes con resultados, contexto, riesgos y próximos pasos.\n- Coordinar necesidades de piezas y medición con creatividad, contenido y equipos técnicos.\n- Documentar cambios, hipótesis y aprendizajes; comunicar alertas antes de que comprometan la operación.",
+      "publicRequirements": "Experiencia práctica implementando y optimizando campañas en plataformas de pauta digital, como Meta Ads o Google Ads.\nCapacidad de explicar cómo definiste audiencias, distribuiste inversión y decidiste ajustes.\nManejo práctico de GA4 y Google Tag Manager para revisar eventos y recorridos de conversión.\nLectura crítica de resultados: distinguir métricas, atribución, limitaciones y decisiones posibles.\nComunicación clara y documentación ordenada para trabajar con especialistas y cliente.\nDisponibilidad para la modalidad híbrida en Medellín y dedicación completa al proyecto.",
+      "publicNiceToHave": "Experiencia con varias líneas de producto, audiencias o marcas en una misma operación.\nExperiencia construyendo dashboards y coordinando implementaciones de medición.\nTrabajo previo en agencia o en colaboración directa con equipos de marketing.",
+      "publicWorkMode": "hybrid",
+      "publicHiringRegion": "Colombia",
+      "publicCity": "Medellín",
+      "publicCountry": "CO",
+      "publicOfficeLocation": "Medellín, Colombia — instalaciones del cliente",
+      "publicArea": "Marketing",
+      "publicSkillTags": [
+        "Paid media",
+        "Optimización de campañas",
+        "GA4",
+        "Google Tag Manager",
+        "Medición"
+      ],
+      "publicLocationMode": "Medellín, Colombia — instalaciones del cliente",
+      "publicEmploymentMode": "Jornada completa",
+      "publicSeniority": "Semi-senior",
+      "publicProcessNotes": "Postulación y revisión inicial: Revisamos tu perfil, tu disponibilidad para trabajar en Medellín y una muestra o caso existente que puedas compartir sin información confidencial.\nConversación estructurada: Conversamos sobre tu experiencia, las decisiones que has tomado y cómo colaboras con equipos y clientes. Aclaramos modalidad, expectativas y remuneración.\nRevisión de un caso de tu trabajo: Profundizamos en una muestra existente y en tu contribución concreta. Puedes anonimizar clientes y resultados; no te pedimos trabajo utilizable ni una campaña gratuita para el cliente.\nAlineación final y respuesta: Revisamos alcance, condiciones, disponibilidad y los siguientes pasos. Cualquier incorporación queda condicionada a la activación del proyecto 2027 y al acuerdo final.\nEsperamos darte una definición o actualización del proceso en tres a cuatro semanas, sujeto a disponibilidad mutua. Ese plazo no es una fecha de incorporación al proyecto.\nTe comunicaremos los avances y la decisión final, incluso si no continuamos; si cambia el plazo, te informaremos.\nPuedes solicitar una adaptación o ajuste razonable al responder a la persona de Efeonce que te contacte durante el proceso.",
+      "publicCompensationBand": null,
+      "publicationSourceRef": "efeonce-medellin-2027-trafficker-digital-20261022",
+      "publicContent": {
+        "version": 2,
+        "promise": "Convierte inversión en medios y datos de campaña en decisiones que el equipo pueda ejecutar y explicar.",
+        "intro": "Buscamos un perfil Semi-senior que combine operación de pauta, criterio analítico y orden de medición. Trabajarás dedicado a un importante cliente en Medellín, con el respaldo de nuestros equipos de estrategia, creatividad y datos. Tu contribución se verá en campañas bien implementadas, aprendizajes claros y decisiones sustentadas.",
+        "outcomes": [
+          "Mantener campañas con objetivos, audiencias, inversión y criterios de optimización documentados.",
+          "Contar con medición revisada, eventos trazables y alertas claras sobre límites o inconsistencias de los datos.",
+          "Traducir el seguimiento de campañas en ajustes priorizados y recomendaciones comprensibles para el cliente.",
+          "Dejar pruebas, resultados y aprendizajes reutilizables para el siguiente ciclo de inversión."
+        ],
+        "workItems": [
+          "Planear, implementar y optimizar campañas de pauta digital con objetivos e inversión acordados.",
+          "Organizar audiencias, segmentaciones, pruebas y seguimiento del presupuesto.",
+          "Revisar embudos y eventos con GA4, Google Tag Manager y píxeles de plataformas publicitarias.",
+          "Construir y mantener dashboards y reportes con resultados, contexto, riesgos y próximos pasos.",
+          "Coordinar necesidades de piezas y medición con creatividad, contenido y equipos técnicos.",
+          "Documentar cambios, hipótesis y aprendizajes; comunicar alertas antes de que comprometan la operación."
+        ],
+        "essentials": [
+          "Experiencia práctica implementando y optimizando campañas en plataformas de pauta digital, como Meta Ads o Google Ads.",
+          "Capacidad de explicar cómo definiste audiencias, distribuiste inversión y decidiste ajustes.",
+          "Manejo práctico de GA4 y Google Tag Manager para revisar eventos y recorridos de conversión.",
+          "Lectura crítica de resultados: distinguir métricas, atribución, limitaciones y decisiones posibles.",
+          "Comunicación clara y documentación ordenada para trabajar con especialistas y cliente.",
+          "Disponibilidad para la modalidad híbrida en Medellín y dedicación completa al proyecto."
+        ],
+        "preferred": [
+          "Experiencia con varias líneas de producto, audiencias o marcas en una misma operación.",
+          "Experiencia construyendo dashboards y coordinando implementaciones de medición.",
+          "Trabajo previo en agencia o en colaboración directa con equipos de marketing."
+        ],
+        "learnables": [
+          "Método de documentación y seguimiento de Efeonce.",
+          "Contexto de las marcas, audiencias y restricciones del proyecto.",
+          "Flujos de colaboración con creatividad, contenido y datos."
+        ],
+        "evidenceAsk": "Comparte un caso existente de pauta: objetivo, tu responsabilidad, audiencias, decisión de optimización y resultado observado. Incluye una captura o dashboard anonimizado si puedes compartirlo. Nos interesa tu criterio, también cuando el resultado fue distinto de lo esperado.",
+        "workModel": "Dedicación completa a un importante cliente de Colombia, con base en Medellín: dos días presenciales en sus instalaciones y tres remotos por semana. Búsqueda anticipada para un proyecto previsto para 2027; la incorporación y su fecha dependen de su activación y de un acuerdo entre las partes. Vinculación por la vía internacional habitual de Efeonce, con pago directo de Efeonce; las condiciones y los beneficios aplicables se formalizan en el acuerdo correspondiente a Colombia. La remuneración se conversa con transparencia durante el proceso.",
+        "collaboration": {
+          "team": "Marketing Digital del cliente y equipos de estrategia, creatividad, medios y datos de Efeonce; colaboración multicultural y entre países.",
+          "reportsTo": "Responsable del proyecto en Efeonce, en coordinación con Marketing Digital del cliente.",
+          "language": "Español para la operación, la documentación y la comunicación con el cliente.",
+          "timezoneOverlap": "Horario de Colombia (America/Bogota, UTC-5); coordinación con los equipos de Efeonce en otros países.",
+          "workingRhythm": "Planificación, seguimiento y optimización continua; reuniones acordadas y documentación de decisiones."
+        },
+        "process": {
+          "steps": [
+            {
+              "title": "Postulación y revisión inicial",
+              "body": "Revisamos tu perfil, tu disponibilidad para trabajar en Medellín y una muestra o caso existente que puedas compartir sin información confidencial."
+            },
+            {
+              "title": "Conversación estructurada",
+              "body": "Conversamos sobre tu experiencia, las decisiones que has tomado y cómo colaboras con equipos y clientes. Aclaramos modalidad, expectativas y remuneración."
+            },
+            {
+              "title": "Revisión de un caso de tu trabajo",
+              "body": "Profundizamos en una muestra existente y en tu contribución concreta. Puedes anonimizar clientes y resultados; no te pedimos trabajo utilizable ni una campaña gratuita para el cliente."
+            },
+            {
+              "title": "Alineación final y respuesta",
+              "body": "Revisamos alcance, condiciones, disponibilidad y los siguientes pasos. Cualquier incorporación queda condicionada a la activación del proyecto 2027 y al acuerdo final."
+            }
+          ],
+          "expectedTiming": "Esperamos darte una definición o actualización del proceso en tres a cuatro semanas, sujeto a disponibilidad mutua. Ese plazo no es una fecha de incorporación al proyecto.",
+          "responseCommitment": "Te comunicaremos los avances y la decisión final, incluso si no continuamos; si cambia el plazo, te informaremos.",
+          "accommodationPath": "Puedes solicitar una adaptación o ajuste razonable al responder a la persona de Efeonce que te contacte durante el proceso."
+        },
+        "benefits": [],
+        "compensation": null,
+        "additionalSections": []
+      },
+      "publicRemoteEligibleCountries": [
+        "CO"
+      ]
+    }
+  }
+}

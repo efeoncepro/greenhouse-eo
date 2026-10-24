@@ -11,7 +11,9 @@
  * y el filete del asistente). Los registros reparten sus columnas con `space-between` (`amount.distribution`). La ventana no recrea la interfaz real del asistente. Las marcas de terceros sujetas a
  * autorización son OPCIONALES y fallan cerradas sin su `authorizationRef`: `assistantMark` (el logotipo del asistente
  * del registro de logos del repo) y `platformMark` (el wordmark Claudeforce de `AXIS_PARTNER_ASSETS`, en su tarjeta
- * navy `coBrand`). El logo de la plataforma del chip de conexión es el del registro del repo.
+ * navy `coBrand`). El logo de la plataforma del chip de conexión es el del registro del repo y sigue a la línea
+ * (`productPartnerOf`): el isotipo de HubSpot en `revenue-hubspot`, el de Salesforce en las demás. El wordmark
+ * Claudeforce es de Salesforce: en `revenue-hubspot` se rechaza.
  */
 
 import { SurfacePieceError, type SurfaceAssetRequest } from '../../types'
@@ -30,6 +32,7 @@ import {
   lumVars,
   noteVars,
   partnerFile,
+  productPartnerOf,
   req,
   stageLayers,
   uniqueAssets,
@@ -108,7 +111,11 @@ type MarkIntent = { authorizationRef?: unknown }
 
 /** El logotipo del asistente y el logo de la plataforma, del registro de logos del repo (sujetos a autorización). */
 const ASSISTANT_LOGO = 'public/images/logos/partners/claude-logotype.svg'
-const PLATFORM_LOGO = 'public/images/logos/partners/salesforce.com_logo.svg'
+
+const PLATFORM_LOGOS = {
+  salesforce: 'public/images/logos/partners/salesforce.com_logo.svg',
+  hubspot: 'public/images/logos/axis/hubspot-isotype.svg'
+} as const
 
 /** La píldora de la fila en riesgo («En riesgo»): a lo sumo una fila la lleva. */
 const RISK_LABEL = 'En riesgo'
@@ -181,8 +188,14 @@ export const contentLiveChat: RecipeBuilder = ({ intent, manifest, recipe }) => 
   const withAssistant = authorizedMark(intent.assistantMark, 'El logotipo del asistente (`assistantMark`)')
   const withPlatform = authorizedMark(intent.platformMark, 'El wordmark de la co-marca (`platformMark`)')
   const assistantLogo = withAssistant ? fileAsset('claude-logotype', ASSISTANT_LOGO) : null
+  const partner = productPartnerOf(line)
+
+  if (withPlatform && partner !== 'salesforce') {
+    throw new SurfacePieceError('El wordmark Claudeforce (`platformMark`) es de Salesforce: no va en una línea de HubSpot.', 'invalid-intent')
+  }
+
   const platformMark = withPlatform ? partnerFile('claudeforce-wordmark') : null
-  const platformLogo = fileAsset('salesforce-logo', PLATFORM_LOGO)
+  const platformLogo = fileAsset(`${partner}-logo`, PLATFORM_LOGOS[partner])
 
   const { stage, platform } = stageLayers(manifest, recipe, line, 'clc')
 

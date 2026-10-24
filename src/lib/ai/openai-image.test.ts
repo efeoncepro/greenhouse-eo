@@ -33,10 +33,10 @@ afterEach(() => {
 })
 
 describe('openai-image helpers', () => {
-  const testEnv = (env: Record<string, string | undefined>) => env as unknown as NodeJS.ProcessEnv
+  const testEnv = (env: Record<string, string | undefined>) => env
 
   it('defaults to gpt-image-2 when OPENAI_IMAGE_MODEL is unset', () => {
-    expect(getOpenAIImageModel({} as NodeJS.ProcessEnv)).toBe('gpt-image-2')
+    expect(getOpenAIImageModel({})).toBe('gpt-image-2')
   })
 
   // TASK-1851: este caso afirmaba la degradación silenciosa como comportamiento correcto.

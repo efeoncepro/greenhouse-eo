@@ -61,6 +61,9 @@
 - `docs/documentation/public-site/public-site-content-factory-end-to-end.md` + `content-factory-golden-examples/` + `gutenberg-post-authoring-recipes.md`.
 - `docs/context/` — context pack de negocio/marca/GTM (empezar por `00_INDEX.md`; `05` voz, `06` métricas, `08` comercial).
 - Ecosistema de contenidos (Think / Marketing con Manzanitas / Glitch / ebooks) → `efeonce/EFEONCE_OVERLAY.md`.
+- Canales propios (rol, catálogo y cadencia por familia; Glitch como único correo) →
+  [PDR-020](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) +
+  [estrategia de love brand](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) §8.2–§8.4.
 
 ## Infografía editorial y benchmark visual (as-of 2026-07)
 

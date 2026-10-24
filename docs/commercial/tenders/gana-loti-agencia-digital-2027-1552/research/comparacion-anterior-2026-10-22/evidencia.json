@@ -1,0 +1,371 @@
+{
+  "reviewed_at": "2026-10-22T20:05:53.077680-03:00",
+  "account_id": "GRD-1552",
+  "attempt": 13,
+  "kind": "negative_comparison_and_strategy_reformulation",
+  "source": {
+    "source": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/6. Agencia Digital/Propuesta Comercial - Agencia Digital 2.pdf",
+    "sha256": "e7339973131a9ff1ec25998d690c8cdc3f6d2ee9a90f330cc76b210e0e227837",
+    "pages": 84,
+    "rendering": "pdftoppm JPEG scale1920 quality88",
+    "original_modified": false
+  },
+  "coverage": {
+    "ocr_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84
+    ],
+    "failed_pages": [],
+    "visual_contact_sheets": "all 84 pages across seven contact sheets",
+    "principal_full_size_pages": [
+      16,
+      17,
+      63,
+      81
+    ],
+    "narrative_reviewer_full_size_pages": [
+      40,
+      52,
+      72,
+      81
+    ],
+    "annexes_pages": {
+      "cronograma": 6,
+      "SLA": 7,
+      "economic": 6
+    },
+    "limitations": [
+      "OCR can contain transcription errors",
+      "Contact-sheet review does not validate every case, logo or result",
+      "File presence is not proof that this exact version was submitted"
+    ]
+  },
+  "private_archive": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-22-reditos-digital-2027/comparison-2026-10-22-2005",
+  "comparison": [
+    {
+      "old_pages": [
+        2,
+        3,
+        10,
+        63,
+        68
+      ],
+      "old_claim": "Ecosistema que integra estrategia, creatividad, tecnología y datos; impacto por encima de tareas/cantidad",
+      "current_idea": "Una operación integrada, dos planes de negocio y mejora demostrable cada mes",
+      "classification": "igual_en_promesa",
+      "why": "La tesis de integración y mejora ya ocupa varias páginas. Cambiar sistema conectado por operación integrada no cambia oferta ni evidencia.",
+      "change": "Sacar integración del titular diferenciador; usarla como arquitectura básica y demostrar una decisión específica de cada marca."
+    },
+    {
+      "old_pages": [
+        11,
+        39,
+        40,
+        41,
+        42,
+        65,
+        66
+      ],
+      "old_claim": "Célula híbrida Medellín y soporte remoto, tres dedicados, coordinación y respaldo senior",
+      "current_idea": "Tres perfiles locales respaldados por capacidad creativa y estratégica regional",
+      "classification": "igual_en_modelo",
+      "why": "Mismo modelo anunciado antes, incluso con Account Manager presencial50% adicional y varios especialistas. Actual no mejora automáticamente aquel organigrama.",
+      "change": "Probar personas/capacidad real, qué tiempo regional existe, presencia2días y decisión de captura del Creator; no vender menos cargos nominales como más equipo."
+    },
+    {
+      "old_pages": [
+        13,
+        15,
+        23,
+        27,
+        30,
+        34,
+        36,
+        61
+      ],
+      "old_claim": "GANA y LOTI con objetivos, parrillas, comparativos y prioridades por marca",
+      "current_idea": "Dos planes: GANA territorial Antioquia y LOTI crecimiento nacional/comercio",
+      "classification": "potencialmente_mejorado",
+      "why": "Nombrar dos marcas ya ocurría; lo más específico ahora son jobs distintos derivadosRFP. Sigue faltando una muestra de decisión y contenido distintos.",
+      "change": "Una decisión comercial por marca con punto de partida conocido, hipótesis rotulada, ejemplo y métrica válida. No presentar unitarias marcas como estrategia diferenciada completa."
+    },
+    {
+      "old_pages": [
+        16,
+        17,
+        18,
+        20
+      ],
+      "old_claim": "Diagnóstico de baja conversión/saturación, reactividad y faltaescuchaformal sin fuente visible; transformación de operación aislada",
+      "current_idea": "Respetar madurez existente, sin diagnosticar fallos no verificados",
+      "classification": "diferencia_real_de_rigor",
+      "why": "Se elimina un diagnóstico factual no sustentado en el documento y se distingue dato de hipótesis. No prueba causa de pérdida ni mejora de negocio.",
+      "change": "Conservar sólo hechosRFP/comprador, hipótesis de trabajo explícitas y plan de comprobación. No afirmar equipo anteriorfalló."
+    },
+    {
+      "old_pages": [
+        12,
+        19,
+        35,
+        36,
+        37,
+        38,
+        45,
+        55,
+        56,
+        62
+      ],
+      "old_claim": "Cadaacciónindicador; reporte semanal, acta, decisión, ciclo deaprendizaje y mejora continua",
+      "current_idea": "Señal→brief→creatividad→despliegue→medición→siguiente decisión",
+      "classification": "igual_hasta_que_se_demuestre",
+      "why": "El mismo circuito ya se explica como proceso. Flechas nuevas no son diferencia.",
+      "change": "Ejemplo comprador-específico con dato simuladorotulado, artefacto revisable, decisión, responsable y evidencia de aceptación. Una pieza de prueba sobrepesa otrodiagrama."
+    },
+    {
+      "old_pages": [
+        43,
+        44,
+        52,
+        53,
+        72,
+        74
+      ],
+      "old_claim": "Canales, QA3niveles, estados/aprobaciones, responsables, actas, RACI y UTMs",
+      "current_idea": "Quién decide y qué ve comprador cada semana",
+      "classification": "igual_en_gobierno",
+      "why": "El deck ya detallaba responsables/aprobador/consultado/informado y bitácora.",
+      "change": "Demostrar un registro pequeño completo y reproducible con rechazo/cambio/revisión. Acordar reglas de prioridad y decisión, no otra tablaabstracta."
+    },
+    {
+      "old_pages": [
+        57,
+        58,
+        59,
+        60,
+        61
+      ],
+      "old_claim": "Metas sinbasevisible:ROAS3x,+10%trimestre,5%comunidad,80%sentimiento,1horahábilcrisis; datos en tiempo real",
+      "current_idea": "Métricas acordadas tras baseline y permisos, sin garantías/resultados inventados",
+      "classification": "diferencia_real_de_rigor",
+      "why": "Menos promesa numérica, mayor disciplina de atribución y acceso. Todavía no se demuestra calidad de medición.",
+      "change": "Reemplazar metas cosméticas por definición/dato/acceso/decisión y rangos sujetosbaseline; distinguir salud operación de outcome comercial."
+    },
+    {
+      "old_pages": [
+        31,
+        34,
+        38,
+        50,
+        64,
+        72,
+        81
+      ],
+      "old_claim": "Informes/trimestres/QBR/workshopsemestral/insightreportbimensual con aplicaciónhallazgos",
+      "current_idea": "Aprendizaje mensual y no regalar talleres genéricos",
+      "classification": "igual_en_mecanismo;mejora_de_limites",
+      "why": "Los informesaccionables y talleres ya estaban. Dejar de contarlosdoble es higienealcance.",
+      "change": "No llamar bonus a reportes o reuniones obligatorias; un extra necesita finalidad/entregable/aceptación fuera de la base."
+    },
+    {
+      "old_pages": [
+        32,
+        33,
+        60,
+        81
+      ],
+      "old_claim": "Listeningcontinuo, informealertas, protocolocrisis, asesoria y 1horahábil; alertas automáticas comoextra",
+      "current_idea": "Dos simulacros anuales con decisiones, escalamiento y actualizaciónprotocolo",
+      "classification": "potencialmente_mejorado",
+      "why": "El ensayo estructurado explícito no aparece en las84p; la proactividad y el protocoloyaaparecían. Debe confirmar queRFP no lo incluye y no prometer cobertura24/7.",
+      "change": "Hacer el diferencial el ensayo verificable (escenario, participantes, tiempos observados y lecciones), no más alertas/reporte."
+    },
+    {
+      "old_pages": [
+        81
+      ],
+      "old_claim": "+2conceptos (total10/año),+5audiovisualenpicos,alertas,workshop,insightreport",
+      "current_idea": "+5adaptacionesestáticas mensuales (125→130)",
+      "classification": "variacion_cuantitativa_no_upgrade_creativo",
+      "why": "El extra mileyaexistía. Los nuevos60estáticos/año son distintos a5audiovisualenpicos: frecuencia y complejidad difieren; no comparaciónsuperiorconocida.",
+      "change": "Vincular cinco variantes a prueba de mensaje específica y decisión posterior, con volumen/costo acotados; no venderlas como cincoideas nuevas o20%más."
+    },
+    {
+      "old_pages": [
+        29,
+        30,
+        50,
+        81
+      ],
+      "old_claim": "Conceptos y coherenciamarca,8conceptosentregables y+2extra (total10)",
+      "current_idea": "10conceptos+2macrosobligatorias yunaactivacióntácticaextra",
+      "classification": "potencialmente_mejorado_en_delimitacion",
+      "why": "La base2027yaexige10;repetir+2seríacontardoble. Laactivaciónnoesunaterceramacroequivalente.",
+      "change": "Exhibir matriz base/extra y derechos/producción/medios; si se quiere tercera campaña comparable, definirla yrecostearlaantes de prometer."
+    },
+    {
+      "old_pages": [
+        36,
+        51,
+        73
+      ],
+      "old_claim": "Onboarding0–30días, diagnósticoaccesosbaseline, primerasparrillas y plan90d",
+      "current_idea": "Entrada90días, accesosdiagnósticopruebasaprendizaje",
+      "classification": "igual_en_secuencia",
+      "why": "Los90díasyaaparecenenanexo. Extender elcronograma nolodiferencia.",
+      "change": "Puertas de aceptación operativas y dependencia comprador, prueba pequeña temprana, criterio de continuidad y evidenciamensual; no promesa dehitos sinaccesos."
+    },
+    {
+      "old_pages": [
+        9,
+        18,
+        67,
+        79,
+        80
+      ],
+      "old_claim": "IApredictiva,tecnologíaavanzada,Brandwatch/HubSpot y catálogoherramientas; escalarinmediatamente",
+      "current_idea": "IA no encabeza ruta; herramientas y coberturas verificadas y costoexplícito",
+      "classification": "diferencia_real_de_rigor;no_prueba_de_capacidad",
+      "why": "Evita vender logos/herramientasnominales como capacidadactiva. Actual no traeejemplocreativovalidado ni automatización delclienteprobada.",
+      "change": "Mostrar sólo uso específico disponible que puede auditarse, revisión humana, permisos y límites. No convertir plataforma propia o tokens en propuesta de valor por sí mismos."
+    },
+    {
+      "old_pages": [
+        75,
+        76,
+        81
+      ],
+      "old_claim": "Cumplimientogeneral, ley21.719 tratadacomoColombia,licenciasgratuitas alcliente, exclusionesexternas",
+      "current_idea": "Entidad/consumos/producción/derechos pendientes, no exclusionesaceptadas",
+      "classification": "diferencia_real_de_rigor",
+      "why": "CláusulasanterioresnoautorizadasparaRFPactual. Ley/ficha técnica ajena aColombia requiere ownerlegal; no copiar.",
+      "change": "Confirmar hechos yalcance con Finance/Legal/comprador; derechos/canales/costos como matriz verificable y no genéricoscompliance."
+    },
+    {
+      "old_pages": [
+        82,
+        83
+      ],
+      "old_claim": "Logosclientes y partners sin casosdetallados o respaldo contextual en deck",
+      "current_idea": "Berel ySKY como experiencia, evidenciaantioqueñapor separado",
+      "classification": "potencialmente_mejorado",
+      "why": "Contratosacreditanexperiencia pero no prueban resultadoGANA/LOTI ni trayectoriaAntioquia. Tamañocliente noesestrategia.",
+      "change": "Dos fichasdecaso de hechos autorizados conproblema/alcance/prueba pertinente; la evidencia territorial en carril propio. No inflar afirmacionesdesdecontratos."
+    }
+  ],
+  "decision": "Earlier integration/local-regional/learning/extra-mile thesis insufficiently differentiated; revised creative choices and buyer-specific proof needed",
+  "causal_claim_of_loss": false,
+  "formal_proposal_created": false,
+  "crm_changed": false,
+  "price_changed": false,
+  "extras_approved": false,
+  "approval_state": "analysis only; prior no-proposal instruction preserved",
+  "current_rfp_sha256": "5b35a47fa917071bbd151966e45253abe277d4a59f264f0f10d810773c3e16c1",
+  "contract_check": {
+    "result": "HOLD",
+    "checked_this_pass": false,
+    "last_checked_at": "2026-10-22T22:07:44Z",
+    "source": "../README.md",
+    "award_order_contract_signature_execution": "not verified; no decisive contractual document available",
+    "participation_calendar": "operator confirmed screenshot 2026-10-30 18:00 America/Santiago; timezone not labelled by buyer",
+    "basis": "local historical comparison does not resolve prior contractual uncertainty"
+  },
+  "annexes_verified": [
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/6. Agencia Digital/Anexo H. Cronograma de Trabajo e Implementación del Servicio.pdf",
+      "sha256": "afb7724a7baf6065e2d7c34d742d242299b7063b096569fe5a4cf3e9a559c714",
+      "pages_read": 6
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/6. Agencia Digital/Propuesta Económica – Agencia Digital Integral Grupo Réditos.pdf",
+      "sha256": "c17f85a737a6f61c2ac3742c518cf6cfa0886a680b241b90424b99c17f0ebffa",
+      "pages_read": 6
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Grupo Reditos/6. Agencia Digital/SLA's Anexo.pdf",
+      "sha256": "4bad63f37c317ef2181249df42539401019304bde6a252e10aa33618bc1c41c4",
+      "pages_read": 7
+    }
+  ]
+}

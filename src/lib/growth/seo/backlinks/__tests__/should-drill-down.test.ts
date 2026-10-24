@@ -82,7 +82,7 @@ describe('shouldDrillDownBacklinks', () => {
 
 describe('resolveDrillDownConfig', () => {
   it('defaults conservadores; knobs respetados; basura ignorada', () => {
-    expect(resolveDrillDownConfig({} as NodeJS.ProcessEnv)).toEqual({
+    expect(resolveDrillDownConfig({})).toEqual({
       minBacklinkMovement: 10,
       minReferringDomainMovement: 3
     })
@@ -91,7 +91,7 @@ describe('resolveDrillDownConfig', () => {
       resolveDrillDownConfig({
         GROWTH_SEO_BACKLINK_DRILLDOWN_MIN_BACKLINK_MOVEMENT: '25',
         GROWTH_SEO_BACKLINK_DRILLDOWN_MIN_REFDOMAIN_MOVEMENT: 'nope'
-      } as unknown as NodeJS.ProcessEnv)
+      })
     ).toEqual({ minBacklinkMovement: 25, minReferringDomainMovement: 3 })
   })
 })

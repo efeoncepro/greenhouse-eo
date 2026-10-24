@@ -16,6 +16,33 @@ For a visual identity change, inventory the Customer Agent profile image and eve
 separately. Saving one does not prove the other changed. Read back each setting and inspect the published channel;
 opening a chat widget to check its avatar is a visual test, not a conversational outcome test.
 
+## Customer Agent Voice: inbound calling
+
+For a phone number, calling channel, voice, IVR or voice-credit question, first load the
+[calling operator manual](../../../../docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md).
+Practice verified 2026-10-19; recheck the target portal, beta eligibility and current documentation.
+
+- Separate number provisioning/assignment, internal label, outbound caller ID, Help Desk/Inbox channel,
+  Customer Agent deployment and IVR. Naming a number after the agent does not deploy it.
+- Obtain specific prior authorization to accept beta terms and activate credit-consuming voice. Reuse explicit
+  authorization already present; do not infer permission to buy credits or increase limits.
+- The verified beta handles inbound calls. Text actions and intent-based handoff workflows do not govern
+  voice transfers: use the calling channel's recipients, hours, availability and voicemail. Configure AI
+  coverage separately from human working hours; another application's presence is not HubSpot availability.
+- Keep agent greeting, recording notice and voicemail separate; inspect the available language/accent catalog.
+  Spanish does not establish a Chilean voice, and no custom-voice import should be promised without evidence.
+- Standard rates observed on 2026-10-19 were 50 credits per rounded-up AI voice minute versus 50 per text
+  resolution. Voice before human transfer is billable. Recheck the applicable pricing scheme; global balance,
+  shared Customer Agent limit, automatic upgrades and telephony minutes are separate controls.
+- Reopen settings after publication, then verify actual inbound reception, useful multi-turn answers, human
+  transfer and unavailable/out-of-hours voicemail independently. Read the resulting ticket and transcript;
+  a recording player is not proof of listening, and aggregated credits are not a per-call billing receipt.
+- An agent-first design does not require creating IVR. If used, verify the live linkage and avoid releasing
+  the agent's number merely to experiment. Recovery must preserve the number and verify the remaining route.
+
+The general text-channel workflow, external-action and asynchronous-handoff guidance below does not extend
+those capabilities to voice. Use the manual's channel-specific contract and QA matrix.
+
 ## Deployment through workflows and rule-based bots
 
 HubSpot's `Deployment > Workflows and bots` surface is a **selective conversation-assignment layer**. It controls when a conversation is handed to the Customer Agent; it does not add knowledge, grant an external action or execute an arbitrary business workflow on the visitor's behalf.

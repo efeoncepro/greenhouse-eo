@@ -941,6 +941,77 @@ pnpm ai:higgsfield:sync-schemas
 
 **Fuentes.** Corrida del spot Sparks en `ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO-DE-HECHOS.md` §5); corrida de Glitch en `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/ai-music.ts`); norma de Glitch `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` §13.12; skill `audio-studio`.
 
+### 5.10 Revisión de piezas con Gemini (`pnpm ai:listen`): escuchar y mirar, no generar
+
+**Qué es.** Gemini recibe audio, video o imagen junto a un prompt y critica la pieza. Es el carril de **QA** de una
+pieza que el agente no puede oír ni mirar en tiempo real: sincronía de golpes y cortes, tirones, legibilidad del lockup
+e impacto [contrato]. **No genera media** ni cambia ningún default de producto [contrato]. La v2 (2026-10-21) agrega
+precisión temporal, hallazgos estructurados y **verificación con ffmpeg de cada afirmación medible** [verificado 2026-10-21].
+
+**Cómo está construido [contrato].**
+- **Helper:** `src/lib/ai/gemini-media-analysis.ts` (`server-only`), con `analyzeMedia`, `countMediaTokens`,
+  `prepareMedia` (inline o staging `gs://`) y `withQuotaRetry` (reintenta 429/503 a los 20 y 40 s).
+- **Cliente:** el canónico `getGoogleGenAIClient({ apiVersion: 'v1beta1' })` de `src/lib/ai/google-genai.ts` (`@google/genai`
+  2.30.0, credenciales de `google-credentials`). El modo agéntico responde «Unknown name mediaProcessing» en `v1` y
+  funciona en `v1beta1` [verificado 2026-10-21]. El resto de los consumidores (Nexa, AI Observer, embeddings) sigue en
+  `v1`, que es el default.
+- **Lógica pura con test:** `src/lib/ai/gemini-media-analysis-cli.ts` (argumentos, límites, partes, schema de hallazgos,
+  cues) y `src/lib/ai/gemini-media-verify.ts` (decisiones de verificación sobre mediciones de ffmpeg).
+- **Rúbricas versionadas:** `src/lib/ai/gemini-media-presets.ts` (`sync`, `impacto`, `cierre`, `tiron`, `lockup`).
+- **CLI:** `scripts/ai/listen.ts`.
+
+**Hechos de Gemini 3.8 Flash que gobiernan la CLI.**
+
+| Hecho | Consecuencia | Evidencia |
+|---|---|---|
+| `temperature`, `top_p` y `top_k` se ignoran en la familia 3.x | El determinismo sale de `thinkingLevel` (LOW, MEDIUM, HIGH; MINIMAL da error) más un schema; `--temperature` solo avisa | [doc oficial 2026-10-21] |
+| El video se muestrea a 1 fps por defecto | Un silencio de 0,25 s o un tirón de 2 cuadros no se ven; esto explica errores de tiempo previos | [doc oficial 2026-10-21] |
+| `VideoMetadata.fps` admite (0, 24] | 60 fps devuelve 400 | [verificado 2026-10-21] |
+| El recorte `startOffset`/`endOffset` funciona | 1 s a 24 fps cuesta 1.998 tokens | [verificado 2026-10-21] |
+| La resolución por defecto del video es la baja; `HIGH` la triplica | `ULTRA_HIGH` da 400 en video y solo vale para imágenes | [verificado 2026-10-21] |
+| El audio de un video llega a 1 kbps mono; se admite 1 audio por prompt | La mezcla se pasa como WAV aparte | [doc oficial 2026-10-21] |
+| Hasta 10 videos por prompt | Sirve para A/B en una sola consulta | [doc oficial 2026-10-21] |
+| Modo agéntico (`mediaProcessing: AGENTIC`) en 3.8 Flash | 246 tokens contra 719 en estático sobre 8 s; `countTokens` no refleja el ahorro | [verificado 2026-10-21] |
+
+**Modelos que responden en `global` [verificado 2026-10-20].** 3.8 Flash, 3.5 Flash, 3.1 Pro preview y 2.5 Pro sí;
+3.8 Pro no (404). El modo agéntico es solo de 3.8 Flash, 3.6 Flash y 3.5 Flash Lite [doc oficial].
+
+**Modo solo medición (`--measure-only`) [verificado 2026-10-21].** Mide la pieza con ffmpeg sin consultar a ningún modelo:
+- **qué entrega:** ataques, silencios, cortes, eventos visuales, cuadros quietos, sincronía general (`buildEventMap` en
+  `gemini-media-verify.ts`) y el veredicto de cada cue;
+- **salida:** código 2 si alguna cue no se confirma;
+- **pieza AWS:** 4 de 4 cues confirmadas y sincronía de +8 ms, medido en 384 ms contra los ~166 s de la consulta con
+  razonamiento alto.
+
+🔴 **Es el control estándar antes de mostrar una pieza.** Gemini queda como segunda opinión de criterio, con `--verify`.
+
+**Cuándo SÍ.**
+- Criterio de oficio que no se puede medir: si una pieza se siente estática, si el cierre se lee o qué toma encaja mejor.
+- Sincronía y tirones con `--fps`/`--clip` más `--verify`.
+- Comparar versiones con el mismo `preset@versión`, modelo y nivel de razonamiento (todo queda en `meta`).
+
+**Cuándo NO.** 🔴 **Nunca como medición sin `--verify`.** Casos medidos:
+- **Claude [verificado 2026-10-21]:** dijo tres veces que el sting estaba «enterrado»; la medición por pistas lo dio dominante.
+- **AWS, v1 de la CLI [verificado 2026-10-21]:** pidió «profundizar el silencio» en un tramo que medía −inf.
+- **AWS, v2 [verificado 2026-10-21]:** afirmó con severidad alta que la Tierra se congelaba de 5,33 a 8,00 s, y
+  `--verify` lo refutó (cero cuadros quietos). Su «desfase de los íconos» también quedó refutado: +8 ms. En cambio, las
+  cues medidas confirmaron el silencio de 1,75 a 2,0 s, los golpes en 2,00 y 4,00 s y el pico del sting en 5,00 s.
+- No se comparan notas entre modelos distintos [verificado 2026-10-21].
+
+**Costo [verificado 2026-10-21, pieza de 8 s].** Entrada: 867 tokens por defecto · 2.547 en `high` · 15.467 a 24 fps ·
+1.998 a 24 fps en 1 s. Con razonamiento alto, el preset `sync` gastó 8.255 tokens de razonamiento y tardó 166 s.
+
+**SDK.** El 2026-10-21 se actualizó `@google/genai` de 1.45 a 2.30 (para `Part.mediaProcessing`) y
+`google-auth-library` a 10.9.0, para que quede una sola copia (con dos, el typecheck fallaba en BigQuery y Secret
+Manager). Validado con typecheck, 1.531 tests de `ai`, `nexa`, `reliability` y `secrets`, los gates de dependencias de
+workers y un smoke en vivo del tool-calling de Nexa y de la búsqueda con grounding.
+
+**Fuentes.**
+- Manual: `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`.
+- Doc funcional: `docs/documentation/ai-tooling/revision-de-piezas-con-gemini.md`.
+- Documentación de Vertex para Gemini 3.8 Flash (ficha del modelo y guía de desarrollador) y *video understanding* de la Gemini API.
+- Casos: métodos de Claude, Microsoft y AWS en `docs/operations/social/`.
+
 ---
 
 ## 6. Recetas por caso de uso

@@ -1,5 +1,27 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-10-23 (ab) — el informe A4 premium sirve también para auditorías: hallazgos y escenarios
+
+<!-- sealed-by-freeze: 121927686f41f8901c7e61f8d5280d1f8afcec869f56a513e87f38a1799efd7e -->
+
+Pedido del operador el 2026-10-23 (auditoría SEO del Blog SKY: «si necesitas sumarle capacidades, súmale»). El catálogo
+`insights-report` gana dos plantillas y tres capacidades sin tocar las páginas aprobadas:
+
+- `ReportFindingsPage` (`report-findings`): registro de hallazgos con severidad por rol (`report-severity`: crítico,
+  alto, medio, bajo; la etiqueta de texto siempre acompaña al tono) y aviso urgente opcional con la lista de afectados.
+- `ReportScenariosPage` (`report-scenarios`): columnas por período y escenario contra la referencia observada del año
+  anterior (`figure-scenarios.ts`, color por rol: base = actual, estructural = oportunidad, sin intervenir = neutro).
+- `productLabel` en portadas y apertura de capítulo (antes «Insights» fijo en la plantilla). Su `example` es
+  «Insights», así que los tres frames existentes no cambian; el mapper de Insights lo declara.
+- La tendencia acepta etapas (`bands`, tono `alert`), hitos (`events`) y rótulos de punto (`pointLabels`); el `example`
+  no los usa y el frame no cambia.
+- Guarda de pie en todas las páginas en papel (`withPaperFootGuard`): un bloque que se monta sobre el pie falla cerrado.
+  Antes sólo la cascada lo vigilaba; las comparaciones con cinco métricas dibujaban el pie dentro del panel de cierre.
+
+Frames nuevos:
+- `templates-insights-report/ReportFindingsPage.png` — nuevo: aviso del `example`, una fila de hallazgo y cierre
+- `templates-insights-report/ReportScenariosPage.png` — nuevo: tres escenarios por tres períodos con su referencia
+
 ## 2026-10-05 (aa) — los símbolos que Poppins no trae salen del font pack, no del sistema
 
 <!-- sealed-by-freeze: 42a9b95d31c61dae8651ef27b63a139fce937ec801f72ab8a2da595c550727bd -->
@@ -1272,7 +1294,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 42a9b95d31c61dae8651ef27b63a139fce937ec801f72ab8a2da595c550727bd -->
+<!-- manifest-digest: 121927686f41f8901c7e61f8d5280d1f8afcec869f56a513e87f38a1799efd7e -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

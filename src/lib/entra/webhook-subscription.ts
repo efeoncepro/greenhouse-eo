@@ -3,6 +3,8 @@ import 'server-only'
 import { query } from '@/lib/db'
 import { resolveSecret } from '@/lib/secrets/secret-manager'
 
+import type { EnvSource } from '@/types/env-source'
+
 // ── Types ──
 
 interface GraphSubscription {
@@ -92,7 +94,7 @@ const getClientState = async (): Promise<string> => {
  * V1.0 por defecto: prod-only (env vars no seteadas en staging).
  */
 export const resolveNotificationUrl = (
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): string => {
   const explicit = env.GREENHOUSE_ENTRA_NOTIFICATION_URL?.trim()
 

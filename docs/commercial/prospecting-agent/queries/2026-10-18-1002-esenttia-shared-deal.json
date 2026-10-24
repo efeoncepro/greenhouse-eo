@@ -1,0 +1,78 @@
+{
+  "run_id": "2026-10-18-1002-esenttia-shared-deal",
+  "started_at": "2026-10-18T10:02:31-03:00",
+  "completed_at": "2026-10-18T10:11:49.882246-03:00",
+  "timezone": "America/Santiago",
+  "week_window": {
+    "from": "2026-10-12T00:00:00-03:00",
+    "to": "2026-10-18T10:11:49.882246-03:00"
+  },
+  "scope": "focused authorized shared-deal operation, no new discovery",
+  "opportunity_ids": [
+    "HSP-0034"
+  ],
+  "queries": [
+    {
+      "id": "S001",
+      "tool": "web search/open",
+      "query": "HubSpot create/manage shared partner deals, official documentation",
+      "country": "Colombia",
+      "service": "CRM/HubSpot",
+      "filters": "official HubSpot sources",
+      "sources_read": [
+        "https://knowledge.hubspot.com/partner-tools/create-shared-partner-deals",
+        "https://knowledge.hubspot.com/partner-tools/manage-shared-partner-deals",
+        "https://knowledge.hubspot.com/partner-tools/communicate-with-the-hubspot-sales-team-regarding-shared-partner-deals"
+      ],
+      "result": "official conversion exists; eligibility separate"
+    },
+    {
+      "id": "S002",
+      "tool": "Chrome CUA",
+      "query": "Deal66218288550: Negocios compartidos > Convertir en negocio compartido",
+      "country": "Colombia",
+      "service": "CRM/HubSpot",
+      "filters": "portal48713323, exact existing deal",
+      "result": "two-step form, required close date and privacy declaration"
+    },
+    {
+      "id": "S003",
+      "tool": "operator",
+      "query": "Missing estimated close date and declaration confirmation",
+      "result": "31/12/2026 then explicit privacy declaration confirmation"
+    },
+    {
+      "id": "S004",
+      "tool": "Chrome CUA write",
+      "query": "Convert existing approved deal; leadership Partner; existing company/contact, Marketing/Service Professional, no buyer conversation, factual opportunity/help/next steps",
+      "result": "shared deal created10:08GMT-3; initial shared message published; no duplicate deal"
+    },
+    {
+      "id": "S005",
+      "tool": "Chrome CUA readback",
+      "query": "Read shared message/card and leadership; screenshot",
+      "result": "Partner, COLLAB, Discovery, products confirmed; one transient CDP timeout recovered without repeat write"
+    },
+    {
+      "id": "S006",
+      "tool": "HubSpot CLI read",
+      "query": "objects get --type deals 66218288550; selected properties",
+      "result": "closedate2026-12-31T03:00:00Z;COLLAB;Marketing/ServiceProfessional;local pipeline preserved; amountnull; hs_is_active_shared_dealnull is not sole proof"
+    },
+    {
+      "id": "S007",
+      "tool": "local documentation",
+      "query": "Update learned procedure, mirrored skills and continuity; no PII in versionable docs",
+      "result": "manual and preference persisted"
+    }
+  ],
+  "blocked_sources": [],
+  "uncertainties": [
+    "buyer admission and deadline",
+    "POI and compensation eligibility",
+    "HubSpot shared card30Dec vs local31Dec"
+  ],
+  "approval_state": "explicit conversion,Partner leadership,31Dec2026,and privacy declaration approved; executed",
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/shared-deal-2026-10-18-esenttia",
+  "pii_policy": "personal emails/phones/raw provider data omitted; UI evidence private"
+}

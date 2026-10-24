@@ -74,8 +74,10 @@ nativos; no afirmar CCO si la pantalla no lo expone. Para Outlook directo conser
 
 1. Buscar secuencias/inscripciones existentes y resolver duplicados antes de crear. Preparar mapa
    persona → textos → documentos → calendario → parada con la [plantilla de cadencia](../templates/account-cadence.md).
-2. Crear **desde cero** con correos automatizados. Evitar la secuencia dinámica por defecto cuando el
-   mandato exige continuar pese a aperturas/clics. Guardar cada plantilla con su mensaje y documento.
+2. Crear desde cero con correos automatizados, o clonar una estructura ya revisada dentro del lote
+   autorizado. Al clonar, **clonar también las plantillas** para personalizar sin alterar las de otra
+   persona. Revisar nombres, cuerpos, reglas y calendario heredados. Evitar la secuencia dinámica por
+   defecto cuando el mandato exige continuar pese a aperturas/clics. Guardar cada plantilla y documento.
 3. Configuración: días laborables activados, retrasos revisados y ventana local de envío. Guardar la
    secuencia con nombre reconocible, owner correcto y visibilidad acotada al alcance.
 4. Automatizar: comprobar **respuesta a cualquier correo → desinscribir el contacto**. Esta regla
@@ -133,3 +135,25 @@ cualquier correo cubra el mensaje inicial enviado por Outlook; reunión/baja/reb
 Tras Programado, reabrir Editar de la inscripción para leer hora/zona persistidas si la fila sólo muestra
 el día; salir sin guardar cambios. No interpretar «Procesando» o un ID viejo de borrador como fallo para
 repetir el envío. [Caso verificado](../../../../docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).
+
+## Edición y persistencia verificadas en la UI — 21/10/2026
+
+- Plantilla, configuración de secuencia e inscripción son guardados diferentes. Después de cambiar
+  ventanas/reglas, pulsar **Guardar secuencia existente** y comprobar persistencia antes de inscribir;
+  guardar el correo no guarda por sí solo esos ajustes. Esperar que termine cada guardado antes del siguiente.
+- No sobrescribir plantillas compartidas al reutilizar una estructura. Elegir la opción de clonar las
+  plantillas y verificar independencia después de personalizar. El nombre de la secuencia no basta.
+- El documento es un elemento nativo del editor: borrar con una operación de texto vacía puede dejarlo.
+  Si ocurre, seleccionar el cuerpo completo y borrarlo; insertar el documento correcto por su nombre,
+  luego colocar el texto antes del vínculo. Releer cuerpo para comprobar una sola inserción, párrafos y
+  cierre. No convertir selectores o teclas de una sesión en una receta universal.
+- En el selector de documentos, confirmar el nombre exacto; Enter sobre una opción puede elegir otra.
+  El botón Insertar del menú y el que confirma documento pueden estar en contenedores distintos: leer
+  estado visible y comprobar que el vínculo fue incorporado, no repetir clics a ciegas.
+- Seleccionar zona del destinatario por desfase y reglas horarias, no sólo etiqueta de ciudad. En el caso
+  Perú se usó UTC−05 fijo; no universalizar esa opción a países con cambios estacionales.
+- Una fila sin fecha o todavía cargando no prueba fallo. Leer Inscripciones después del procesamiento;
+  recargar si sigue mostrando estado anterior, sin repetir Iniciar. Conservar calendario del formulario
+  final y Programado por persona. Total inscritos verifica cantidad, no sustituye ese estado.
+
+[Registro del lote y Laura sin inscripción por rebote](../../../../docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).

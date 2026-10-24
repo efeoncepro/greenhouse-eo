@@ -1,9 +1,9 @@
 # Landing Servicios HubSpot — Módulos editables en Elementor (v2)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.0
+> **Version:** 2.1
 > **Creado:** 2026-08-31 por Codex
-> **Ultima actualizacion:** 2026-10-17 por Claude
+> **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** contrato v2 pendiente; hoy el detalle técnico vive en el
 > [audit de publicación v2](../../audits/public-site/2026-10-16-hubspot-v2-publication.md) y en la fuente
 > `scripts/public-website/hubspot-v2-source/`. El [contrato v1](../../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md)
@@ -59,21 +59,26 @@ títulos de panel no se parten a mitad de palabra y todas las áreas que se toca
 
 ## Dock móvil
 
-En pantallas de hasta 760 px aparece una cápsula fija abajo con dos botones:
+En el teléfono (hasta 768 px) aparece una barra de vidrio fija abajo con dos botones:
 
 - **Agendar reunión:** abre el agendador nativo de Efeonce en pantalla completa, sin salir de la página. Se cierra con
   Escape o con «Cerrar agenda».
-- **Ir al formulario:** baja directo al formulario de alcance.
+- **Ir al formulario:** baja directo al formulario de alcance (`#agenda-form`).
 
-El dock aparece cuando el visitante sale del hero y se oculta al llegar a la sección de agenda (ahí el formulario ya
-está a la vista) y en el footer. Mientras el dock está visible, el interruptor claro/oscuro de Ohio se aparta y vuelve
-desde el formulario. En navegadores que no soportan animaciones ligadas al scroll, el dock queda siempre visible y un
-poco más arriba. En escritorio no existe.
+Desde el 2026-10-23 es el [dock compartido de las landings](dock-de-landings.md): aparece cuando el visitante sale del
+hero, se retira al llegar a la sección de agenda y toma el tono de lo que tiene detrás. En escritorio no existe.
+
+Antes de esa fecha la página tenía su propio dock (`nav.mdock`, hasta 760 px, con animación ligada al scroll y el
+interruptor claro/oscuro de Ohio apartándose). Ese dock sólo vuelve si el compartido se apaga
+([manual del dock](../../manual-de-uso/public-site/operar-dock-de-landings.md)).
 
 «Agendar reunión» es un CTA gobernado de Greenhouse (`hubspot-discovery-meeting`), con su propio permiso para
-funcionar en este sitio. Si ese permiso faltara, el botón no se rompe: lleva a la página `/agenda/`.
+funcionar en este sitio. Si ese permiso faltara, el botón no se rompe: lleva a la página `/agenda/`. Lo que se abre desde
+el dock se mide con el lugar `landing_dock` (antes `hubspot_mobile_dock`).
 
-> Detalle técnico: slug, surface, targeting y medición en el
+> Detalle técnico: el dock compartido está en
+> [§Dock inferior de las landings](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#dock-inferior-de-las-landings-task-2043);
+> slug, surface y targeting del CTA, y el dock anterior, en el
 > [audit, «Dock móvil»](../../audits/public-site/2026-10-16-hubspot-v2-publication.md#dock-móvil-2026-10-16) y en el
 > [plan de medición](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md). El agendador se describe en
 > [Scheduler de reuniones nativo](../growth/scheduler-reuniones-nativo.md).
@@ -120,6 +125,7 @@ La investigación de palabras clave (Chile, México y Colombia, 2026-10-16) most
 | El diseño de un módulo o de la página | La fuente aprobada en Greenhouse, que se recompila y despliega. No se pega HTML en Elementor. |
 | Campos, consentimiento o destino del formulario | Growth Forms. |
 | El botón «Agendar reunión» del dock | El CTA gobernado `hubspot-discovery-meeting`. |
+| Texto, botones o comportamiento del dock | El archivo del dock de esta landing y `pnpm public-website:landing-dock` ([manual](../../manual-de-uso/public-site/operar-dock-de-landings.md)); su diseño, en AXIS. |
 | Título, descripción y redes | El script SEO de la v2 (Yoast). |
 
 > Detalle técnico: pasos exactos, despliegue, republicación y rollback en el
@@ -140,3 +146,5 @@ La investigación de palabras clave (Chile, México y Colombia, 2026-10-16) most
   método y caso ANAM. Su registro sigue en las auditorías de esas fechas en `docs/audits/public-site/`; ya no
   describe lo que se ve en la página.
 - **2026-10-16 — v2:** los 14 módulos descritos arriba, el dock móvil y el SEO nuevo.
+- **2026-10-23 — dock compartido:** el dock propio (`nav.mdock`) se reemplaza por el dock de vidrio común a las
+  siete landings (`TASK-2043`).

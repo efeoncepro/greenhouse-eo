@@ -1,0 +1,215 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:51:49.852Z",
+  "run": "ai-generations/2026-10-08_utem-propuesta",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-08_utem-propuesta",
+  "totalBytes": 22563938,
+  "fileCount": 34,
+  "files": [
+    {
+      "path": "composer-casos/01-p01-deck-decision-case.png",
+      "sizeBytes": 925486,
+      "sha256": "80e3a0563cfc833dd69e34a3d2e3eddb164eb2c7188a0cbdc2870483642e0bf6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-casos/01-p01-deck-decision-case.png"
+    },
+    {
+      "path": "composer-casos/02-p02-deck-decision-case.png",
+      "sizeBytes": 1075892,
+      "sha256": "392d2f741bc854399ffe4d938c64c8bbed34f31067e5db1f2891c86b17448238",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-casos/02-p02-deck-decision-case.png"
+    },
+    {
+      "path": "composer-casos/caso-01-engine.png",
+      "sizeBytes": 1301087,
+      "sha256": "f86d5eeb0613a3983040174c325e996df0e2e1e371ffeaefee6319098310ad49",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-casos/caso-01-engine.png"
+    },
+    {
+      "path": "composer-casos/caso-02-engine.png",
+      "sizeBytes": 1605550,
+      "sha256": "735e8f5ed61aab7ab315ed6d98d8a9dc450b16488c4da180234849155e06ce93",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-casos/caso-02-engine.png"
+    },
+    {
+      "path": "composer-equipo/01-p01-deck-content-team.png",
+      "sizeBytes": 1106200,
+      "sha256": "390aa5ec4f2c42a5f604a986f5608344e23c828ac44058a8aed7b83495071382",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-equipo/01-p01-deck-content-team.png"
+    },
+    {
+      "path": "composer-equipo/equipo-final.png",
+      "sizeBytes": 1111150,
+      "sha256": "daa08f778cc2aefce87541a1988f34b5836c7f92bbc62cb19a233737afc08738",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-equipo/equipo-final.png"
+    },
+    {
+      "path": "composer-equipo/equipo-sin-logo.png",
+      "sizeBytes": 1174980,
+      "sha256": "0784c20f08dc46c0efd76a2bc41127858a4e4bc26b53a72ad67a218f6e79f703",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-equipo/equipo-sin-logo.png"
+    },
+    {
+      "path": "composer-equipo/s1.png",
+      "sizeBytes": 1175527,
+      "sha256": "1c832a6faaa32450ed68a1ad2f640313f38b679f11c3a13c27144eb125e5d3c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-equipo/s1.png"
+    },
+    {
+      "path": "composer-equipo/s1b.png",
+      "sizeBytes": 1175565,
+      "sha256": "43727f9252ecc6dbe1bfc26812670b17351f709e199a5d1e333f3d889d7c9be3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-equipo/s1b.png"
+    },
+    {
+      "path": "composer-equipo/s1c.png",
+      "sizeBytes": 1172569,
+      "sha256": "34c8c4ca3a1186603da936d6a3459c66498f1f6cc80d6e520265dc4209019510",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-equipo/s1c.png"
+    },
+    {
+      "path": "composer-equipo/s2.png",
+      "sizeBytes": 1052489,
+      "sha256": "21ca156a3ae0b365bf0353c87111fbf46bf91c034a6aac969dd10936c5979531",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-equipo/s2.png"
+    },
+    {
+      "path": "composer-equipo/s3.png",
+      "sizeBytes": 1103461,
+      "sha256": "64283f9f48b811cd70dd3080c535f2bd641f868e7622222727dbfac9ef320598",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-equipo/s3.png"
+    },
+    {
+      "path": "composer-equipo/s4.png",
+      "sizeBytes": 1169893,
+      "sha256": "37a35a501f7db1a08f1c8c20d387ce16594563a3ed9e3a9200af2dd84c8b0859",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-equipo/s4.png"
+    },
+    {
+      "path": "composer-sec/01-p01-deck-section-classic-engine.png",
+      "sizeBytes": 73040,
+      "sha256": "3be3a41b669500b1941290526f14d2643e4a696f1980070387d24b1f6df6c6d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/01-p01-deck-section-classic-engine.png"
+    },
+    {
+      "path": "composer-sec/01-p01-deck-section-classic.png",
+      "sizeBytes": 61297,
+      "sha256": "85663acb5be99c52da9dc7143ff32736a5885c0e525e4b3fe0e8280ffbca09c7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/01-p01-deck-section-classic.png"
+    },
+    {
+      "path": "composer-sec/02-p02-deck-section-classic-engine.png",
+      "sizeBytes": 78664,
+      "sha256": "0a9468ac3575b6cdc6cffbcf4b3c08e516b6163cc841a308fdac3888658016b4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/02-p02-deck-section-classic-engine.png"
+    },
+    {
+      "path": "composer-sec/02-p02-deck-section-classic.png",
+      "sizeBytes": 69099,
+      "sha256": "ae16dbc375b5736dec1b8bc9aaeec741fcb0b07d9ee70e9ae360099d09a77453",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/02-p02-deck-section-classic.png"
+    },
+    {
+      "path": "composer-sec/03-p03-deck-section-classic-engine.png",
+      "sizeBytes": 78292,
+      "sha256": "792b4dfc629c4d45d86444aed828be34bd55bb65c3575d56b519fe17b983702b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/03-p03-deck-section-classic-engine.png"
+    },
+    {
+      "path": "composer-sec/03-p03-deck-section-classic.png",
+      "sizeBytes": 68463,
+      "sha256": "446f4656db23f512f3e82f340be00fcbf12a5488ee944824dfaafd371fd18849",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/03-p03-deck-section-classic.png"
+    },
+    {
+      "path": "composer-sec/04-p04-deck-section-classic-engine.png",
+      "sizeBytes": 74309,
+      "sha256": "f6f485e284cad532197827ac7b98bf81fa3ccf36529763cc977cfab26291d095",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/04-p04-deck-section-classic-engine.png"
+    },
+    {
+      "path": "composer-sec/04-p04-deck-section-classic.png",
+      "sizeBytes": 61805,
+      "sha256": "7dd1f2bad86078043b9d9f05893b5f5b1e6c985631a8f99a9ee23956764533a6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/04-p04-deck-section-classic.png"
+    },
+    {
+      "path": "composer-sec/05-p05-deck-content-clients-engine.png",
+      "sizeBytes": 171403,
+      "sha256": "65bafadd41d7204292090e3f1d813d5763ff45f76c96725375020bc09d1d9cac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/05-p05-deck-content-clients-engine.png"
+    },
+    {
+      "path": "composer-sec/05-p05-deck-content-clients.png",
+      "sizeBytes": 185594,
+      "sha256": "2e448bec576aeec9d792c32927574a421631254e8b7ca755b428d88c9bc41a31",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/05-p05-deck-content-clients.png"
+    },
+    {
+      "path": "composer-sec/06-p06-deck-section-classic-engine.png",
+      "sizeBytes": 81784,
+      "sha256": "ed02bf5ea8243213b1b5c1389d648fe385abdc2c68cc2dd64d4a5909f8cf8895",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/06-p06-deck-section-classic-engine.png"
+    },
+    {
+      "path": "composer-sec/06-p06-deck-section-classic.png",
+      "sizeBytes": 72400,
+      "sha256": "920f0b00c10d5e13de90edacf14bcd9155216a1338ae15e5bbff097a094f91d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-sec/06-p06-deck-section-classic.png"
+    },
+    {
+      "path": "composer-vista/01-p01-deck-content-day.png",
+      "sizeBytes": 813027,
+      "sha256": "4284f4c42ba8973dd50ac4009d4c36385a62b54f18eec2fa1030986db516d5c7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-vista/01-p01-deck-content-day.png"
+    },
+    {
+      "path": "composer-vista/vista-utem-engine.png",
+      "sizeBytes": 747437,
+      "sha256": "fd33944fdaf67da5e1c0affa5816d23c58fa8f9f4a03082fd1c9b0b229b74302",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer-vista/vista-utem-engine.png"
+    },
+    {
+      "path": "composer/01-p01-deck-cover-proposal.png",
+      "sizeBytes": 483532,
+      "sha256": "9d6dbb54ba4154b108f3e048de44a353be0326f9938a30e2aed3df0d916a0efa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer/01-p01-deck-cover-proposal.png"
+    },
+    {
+      "path": "composer/02-p02-deck-close-proposal.png",
+      "sizeBytes": 1345682,
+      "sha256": "acffae64af6052edfe0ab0db02e698229c528be245f7d4b3312b3a2802a62a8b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer/02-p02-deck-close-proposal.png"
+    },
+    {
+      "path": "composer/portada-sin-seleccion.png",
+      "sizeBytes": 358582,
+      "sha256": "98eea94036f18ba96957b45a17613ec18296fef6ebbf9c8e99f13d462b70ea6e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/composer/portada-sin-seleccion.png"
+    },
+    {
+      "path": "importadas/dia-19-engine.png",
+      "sizeBytes": 838432,
+      "sha256": "57614e1fea0ffc66004cf5698b21e376c06148a5e090d7dee79868ba9c7e7036",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/importadas/dia-19-engine.png"
+    },
+    {
+      "path": "importadas/dia-20-engine.png",
+      "sizeBytes": 849288,
+      "sha256": "3c2f51493770ae75f8f3380d573cc3c74cdd1676031ffcb6ca916b9c0763afba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/importadas/dia-20-engine.png"
+    },
+    {
+      "path": "importadas/dia-21-engine.png",
+      "sizeBytes": 777570,
+      "sha256": "40077a9833e411b5454f1a2e3d3116080d9510d445eed156f9a43569a8ec0e03",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/importadas/dia-21-engine.png"
+    },
+    {
+      "path": "plates/articulo-analisis-datos.png",
+      "sizeBytes": 124389,
+      "sha256": "a8104700cf8e3453e77e5059e8e3c46d91cf6823fea55220473e8c4745416502",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_utem-propuesta/plates/articulo-analisis-datos.png"
+    }
+  ]
+}

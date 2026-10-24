@@ -19,6 +19,19 @@ las asignaciones ni los estados de las páginas. Releerlos antes de producir, re
 > editorial). Si no hay argumento propio, la pieza se queda en Instagram. Alcance, fechas, responsables y
 > entregas de este plan **no cambian**.
 
+> **Delta 2026-10-22 — Navidad y Año Nuevo (decisiones del operador).** Sólo cambia el estado de estas dos piezas; el
+> resto de este snapshot queda como estaba.
+>
+> - **MET-2337 · Navidad:** la pieza se aprobó el 16-oct, pero el operador decidió **rehacerla desde cero**; su video
+>   no se usa. Sigue siendo la Navidad del equipo en el plan de noviembre–diciembre de la
+>   [estrategia de love brand §13](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#13-hoja-de-ruta).
+> - **MET-2338 · Año Nuevo:** **archivada sin producir**. Su dirección creativa (la idea que escapa del cuaderno) se
+>   conserva abajo como referencia, no como pieza comprometida.
+>
+> Las seasonalities siguen siendo línea permanente con canal-hogar Instagram, que desde esta fecha es canal de marca
+> agencia ([`PDR-020` rev 2.0](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md#delta-2026-10-22--sistema-de-canales-v2-tres-familias)).
+> Este delta no leyó ni modificó Notion: el estado de las páginas de MET-2337 y MET-2338 se relee allá antes de operar.
+
 ## Fuente de inspiración separada
 
 El [Calendario Social Media 2026 preparado por Metricool](../../../.codex/skills/social-media-studio/references/seasonality-reference-calendar.md)

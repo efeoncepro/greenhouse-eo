@@ -132,6 +132,11 @@ Reglas del hook:
 | **LinkedIn video** | 9:16 o 1:1 | 1080×1920 / 1080×1080 | 30–90s | 2 líneas antes de "ver más" |
 | **LinkedIn doc/carrusel** | 4:5 vertical | PDF nativo | — | slide 1 = hook + dwell |
 
+**Portadas de video** *(as-of 2026-10-19 — guías de terceros, sin confirmación oficial de Meta ni LinkedIn)*: portada
+del Reel 1080×1920, con lo clave centrado porque la grilla del perfil la recorta a 3:4 (1080×1440) y el feed a 4:5.
+LinkedIn también acepta video 4:5 (1080×1350, usado en producción el 2026-10-19), con portada propia de la misma
+proporción, JPG o PNG de menos de 2 MB. Receta y fuentes: `references/video-delivery-metricool.md`.
+
 **Shoppable video:** mantenlo **<15s** con el producto en acción y CTA de compra claro; el
 checkout nativo convierte mejor con clips cortos que con demos largas *(as-of 2026-07 — reverificar → módulo 08)*.
 

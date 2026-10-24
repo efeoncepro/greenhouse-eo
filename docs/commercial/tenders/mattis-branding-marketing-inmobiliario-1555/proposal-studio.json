@@ -1,0 +1,20 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "mattis-branding-marketing-inmobiliario-1555",
+  "workspacePath": "docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": []
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "Julio pidió Markdown como insumo y diseño posterior con Claude Design. Master: PROPUESTA-MATTIS-GRD-1555-PARA-CLAUDE-DESIGN.md; borrador v1 sin propuesta registrada ni exportación final.",
+    "La salida de pnpm deck:compose es local/exploratoria y no cuenta como Proposal ni como asset versionado.",
+    "Actualizar este registro solo con evidencia del camino canónico Proposal → render job → asset versionado → verificación autenticada."
+  ]
+}

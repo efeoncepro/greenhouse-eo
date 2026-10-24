@@ -30,11 +30,31 @@ Efeonce.** Cárgalo antes de proponer formato, calendario o distribución en can
 | Canal | Rol | Formatos nativos |
 |---|---|---|
 | **Blog** | el activo (URL canónica, schema, citabilidad) | artículos y Pillars · **casos de éxito completos (canonical)** · tools/graders · webinars · ebooks · data studies · archivo Glitch |
-| **LinkedIn** | el comprador | **educativo** (post extenso + documento nativo) · el corte del caso de éxito · POV profesional · talking head ejecutivo |
-| **YouTube** | la profundidad + segundo buscador | experimento completo · tutorial/how-to · webinar grabado · Shorts como anzuelo |
-| **Instagram** | craft y cultura | proceso real con tropiezos · talking head de tendencia · trendjacking · **seasonalities (la temporada vista desde el oficio)** · cultura y talento. **NO lleva casos de éxito** |
-| **Threads** | conversación viva | reacción rápida · opinión corta · hilo en bruto · pregunta abierta. **Experimento con criterio de salida** |
-| **Glitch (email)** | la propiedad | la edición semanal |
+| **LinkedIn Página** | conexión B2B: la marca ante el comprador | **una serie por servicio** (educativo en post extenso + documento nativo) · el corte del caso de éxito · partners · video corto del talking head |
+| **LinkedIn Julio** | conexión B2B: la persona | lo que vio en terreno · POV · aprendizaje del build · talking head ejecutivo |
+| **Newsletter Marketing con Manzanitas** | audiencia suscrita (artículo en el LinkedIn de Julio, quincenal) | una idea explicada simple + la mirada de Julio + tres enlaces. Nunca el texto del blog ni venta |
+| **YouTube** | Marketing con Manzanitas: profundidad + segundo buscador; love brand desde la utilidad | tutorial «IA con contexto» sobre búsqueda validada · experimento completo · webinar editado · Shorts como anzuelo. Piloto desde feb-2027 |
+| **Instagram** | **marca agencia: love brand y comunidad de fans** | detrás de la pieza (proceso con tropiezos) · oficio en 30 segundos · el equipo · talking head de tendencia · trendjacking · **seasonalities emocionales o culturales (la temporada vista desde el oficio; por fit de canal, PDR-020 delta 2026-10-23)** · partners en reel. **NO lleva casos de éxito ni documentos de servicio; no persigue conversión directa** |
+| **Threads** | marca agencia: la voz en texto y el oído de la comunidad (cuenta Efeonce) | reacción rápida · opinión corta · hilo en bruto · pregunta abierta · **el gancho de Glitch** el día de la edición. **Experimento desde feb-2027, revisión 31-mar** |
+| **X** | sólo escucha | no se publica; se sigue a los laboratorios de IA para alimentar Threads e IA con contexto |
+| **Glitch (email)** | la propiedad: newsletter canónico y único correo de Efeonce | la edición semanal (+ Glitch Flash) |
+
+**Tres familias (PDR-020 revisión 2.0, 2026-10-22):** marca agencia (Instagram, Threads) · conexión B2B (LinkedIn
+página y Julio) · Marketing con Manzanitas (blog, newsletter, YouTube). Instagram hace fans a las personas de las
+empresas; la conversación de negocio nace después en LinkedIn o la web. Medir el puente fan → conversación (fuente
+de primer contacto, «¿cómo nos conociste?», búsquedas de marca), no sólo el canal. **Antes de idear o calendarizar
+marca agencia**, cargar [`EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md`](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md):
+cada pieza declara su pilar emocional (orgullo de oficio, generosidad, cercanía, optimismo con criterio), el peldaño
+de la escalera del fan que mueve y su mecanismo; responder cada comentario con sustancia es parte del entregable.
+**LinkedIn recibe al fan** (§8.1 de esa estrategia): la página construye respeto y Julio confianza; la cultura entra a
+LinkedIn sólo con argumento; Julio sostiene 15 minutos diarios de comentarios y respuestas; el equipo comparte con su
+propia voz (voluntario); los encuentros trimestrales también por LinkedIn Live.
+**Decisiones del 2026-10-22 (PDR-020, delta punto 12):** la story de Marketing con Manzanitas va en **stories de
+Instagram** (nunca en el feed), máximo una por semana, como generosidad y con enlace al blog o a la suscripción a
+Glitch; el **reel y el vlog de Glitch están en pausa**; el **pódcast no tiene canal**; en los destacados, «07 Podcast»
+se retira y «01 Glitch» se reorienta a la suscripción; de Glitch, LinkedIn lleva la lectura de una noticia, nunca el
+carrusel; en una seasonality LinkedIn puede usar el visual clave, nunca el carrusel; los tutoriales de YouTube los
+presenta Julio, con invitados del equipo en episodios de especialidad.
 
 **Franquicias con canal-hogar** (nacen en uno, viajan como corte con trabajo propio, nunca como copia):
 Behind the Build → Instagram · Versus → YouTube + Blog · Educativo → LinkedIn · Glitch → email ·
@@ -274,6 +294,10 @@ negocio»**. Canon: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../.
   espectro completo de Google, así que con ella en cuadro es el **único acento de color** y Efeonce vive en el
   navy y la estructura; buscar otro portador para el azul de Efeonce es competir con un degradado de tres colores
   y perder. Es propiedad de Google: interpretación 3D de uso interno y orgánico, y orgánico aprobado no es pauta.
+- **Serie de anuncios «Efeonce | Partner»** (un reel/video por partner, octubre–diciembre 2026): cada pieza sale del
+  mundo visual de **ese** partner, nunca de una estética genérica, y se programa con tres copies (LinkedIn Efeonce,
+  LinkedIn de Julio, Instagram). Calendario, horarios, verificación de media en bytes y handles de Instagram:
+  [video-delivery-metricool.md](../references/video-delivery-metricool.md) §«Serie «Efeonce | Partner»».
 
 ## Coherencia con las skills hermanas del repo
 

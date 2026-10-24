@@ -1,5 +1,12 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
+> Delta caso AWS (marcas de tercero en anuncio de alianza) verificado contra: método
+> `docs/operations/social/2026-10-21-aws-partner-announcement-production-method.md` y decisiones del operador de esa
+> corrida — 2026-10-21.
+
+> Delta anuncios de alianza verificado contra: correcciones y aprobación del operador en la corrida
+> `ai-generations/2026-10-19_google-partner-freeze/` (rondas 1–5), greenhouse-eo `develop` en `cb9a8e666` — 2026-10-19.
+
 > Delta mate uniforme verificado contra: petición y aprobación de cuatro bases planas por el operador,
 > AXIS `de34866` y catálogo live de 134 entradas — 2026-10-12. Prueba de nuevos volúmenes, sin alta/publicación.
 
@@ -330,7 +337,8 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
   Greenhouse orbitan con su isotipo: **son contexto, no firma** (lámina 3.2; Lab 3.2).
 - **Nunca:** logos de terceros presentados como alianzas. «Los satélites de canales muestran dónde medimos, no con quién
   nos asociamos» (lámina 0.2, «No hacer»). Las alianzas reales sólo se declaran en la zona de partners de la firma de
-  correo, con el registro de partnerships (manual §10.2).
+  correo, con el registro de partnerships (manual §10.2), y en un **anuncio de alianza** (aprobado el 2026-10-19, ver
+  «Anuncios de alianza» al final de este archivo), que también se respalda en ese registro.
 
 #### Marcas de terceros y claims de partner (deck de práctica Salesforce, operador 2026-09-29)
 
@@ -534,6 +542,41 @@ decisión, no en la duda. Es la misma gramática del anillo y la esfera, dicha e
 **Sí / no** (lámina 5.6): pregunta chica, respuesta grande de una a tres palabras · **no:** pregunta grande, respuesta
 larga y chica. Bricolage para decir, Poppins para explicar · **no:** Bricolage en párrafos ni monoespaciada.
 
+**Cuándo sí y cuándo no (operador, 2026-10-19, propuesta SGS Chile).** «Todos los agentes por seguir la regla ponen
+cosas así; si lo ves en contexto es súper absurdo». La voz pregunta-respuesta no es un relleno obligatorio de cada
+título: es una conversación con el lector **en ese punto del documento**. Antes de escribir un par, pasa las cuatro
+pruebas; si una falla, se reescribe el par, y si ninguno pasa, la lámina va con título declarativo (afirma su
+conclusión) donde la receta lo permita.
+
+1. **¿La haría el lector, con esas palabras, en ese momento?** Quien abre una propuesta pregunta «¿Qué nos
+   proponen?»; nadie pregunta «¿Se ve cada contacto?». Pregunta de la persona que lee, no del redactor.
+2. **¿La respuesta contesta la forma de la pregunta?** Sí/no → «Sí», «Ya no», «Con el piloto» (un sí con condición);
+   ¿qué? → una cosa; ¿cómo? → una manera; ¿dónde? → un lugar; ¿por qué? → una razón; ¿X o Y? → X o Y. «¿Se ve cada
+   contacto? Todos.» contesta un sí/no con una cantidad; «¿Cómo va el equipo? Cada semana.» contesta «cómo» con una
+   frecuencia; «¿Aircall o solo Salesforce? Por el celular.» contesta una elección con una razón.
+3. **¿El par dice la tesis de esta lámina y no sirve igual en otra?** «Poco», «Juntos», «Todos» son comodines: caben en
+   cualquier propuesta y no dicen nada de esta. La respuesta tiene que ser verificable en la lámina o el documento.
+4. **¿La lámina decide o explica?** La voz es para un momento de decisión o de duda (portada, apertura de sección,
+   precio, próximos pasos, un riesgo que el cliente planteó). Una lámina que explica —arquitectura, tablas, condiciones,
+   responsabilidades, anexos, glosario— lleva título declarativo. En un documento que se lee sin presentador, la
+   mayoría de las láminas explica.
+
+| Contexto | Voz pregunta-respuesta |
+|---|---|
+| Portada de brochure, anuncio, social, apertura de sección | Sí, con un par aprobado o escrito para esa pieza |
+| Anuncio de alianza o partnership | **No.** El lockup y el eyebrow dicen lo que es («Efeonce \| Google» + «Oficialmente partners»); «¿Quién lleva Google a mi empresa? / Nosotros» fue «absurda» (operador, 2026-10-19) |
+| Portada de propuesta para un cliente | **No.** Dice lo que es: «Propuesta», qué resuelve y para quién (operador, 2026-10-19: «lo mejor para la portada es decir lo que es: una propuesta, o decir en qué basamos la propuesta») |
+| Lámina de decisión (precio, próximos pasos, plan, por qué esta opción) | Sí, si la pregunta es real |
+| Lámina que explica (diagrama, tabla, condiciones, responsabilidades, anexos) | No: título declarativo con su conclusión |
+| Etiqueta o rótulo de producto | No: sin anillo (§ login V4, abajo) |
+
+Corregidos en el caso fuente: la portada «¿Se ve cada contacto? Todos.» y sus dos reemplazos («¿Qué nos proponen? Un piloto.», «¿Qué no queda en Salesforce? Lo del celular.») fueron rechazados: el problema era la voz en la portada, no las palabras. Quedó eyebrow «Trazabilidad comercial · Octubre 2026», título **Propuesta.** y evidencia con qué resuelve y para quién. **Estado (2026-10-20):** en AXIS ya existe la portada sin pregunta: `cover-proposal` · layout `orbit-decision` (publicada en AXIS v0.7.6: `axis-ui-contracts` 0.7.6 / `axis-tokens` 0.6.6, commit `9e72d38`; referencia aprobada `cover-proposal-orbit-decision-assetplan`, la portada de Assetplan), titular de decisión con su esfera, eyebrow y evidencia, sin pregunta ni anillo. Greenhouse fija AXIS 0.3.40/0.3.41, donde `orbit` y `dawn` siguen exigiendo `voice.question` (`layout-field-required`), y no la ve hasta TASK-2014. Mientras tanto, la portada se arma a mano con las medidas del token, como la portada aprobada de Assetplan (receta `cover-proposal` `orbit` + `ai-generations/2026-10-20_propuesta-assetplan/portada-orbit-decision.css`; detalle en el README de recetas, «La propuesta Assetplan»). El script de SGS `ai-generations/2026-10-19_propuesta-sgs-contactabilidad/quitar-pregunta-portada.mjs` es un parche que el operador no quiere: no se reutiliza. En el resto del deck: «¿Cómo va el
+equipo? Cada semana.» → «¿Dónde lo ve la jefatura? **En su panel.**»; «¿Aircall o solo Salesforce? Por el celular.» →
+«¿Por qué Aircall? **Por el celular.**»; «¿Queda cada contacto? Sin anotar.» → «¿Hay que anotar cada contacto? **Ya
+no.**». Rechazadas sin reemplazo (la lámina pasó a título declarativo): «¿Qué les pedimos? Poco.» y «¿Cómo se
+adopta? Juntos.». Los pares aprobados de las tablas de abajo también pasan estas pruebas en su lámina: copiarlos a
+otra pieza no los exime.
+
 **Banco de pares (candidatos, sin aprobar;** lámina 2.1**; el operador lo revisa y aprobará 2 pares por línea con
 respuestas verificables, D12):** ¿Lo medimos? Siempre · ¿Quién decide? Tú, con evidencia ·
 ¿Y si después lo hago yo? Esa es la idea · ¿Y el reporte del viernes? Ya lo viste · ¿Cuánto rindió? Te mostramos todo ·
@@ -571,6 +614,8 @@ portada general del brochure— se rechazó como portada social («Really? WTF?�
 objetada (el operador notó que Efeonce no hace sólo eso; ledger, 2026-09-29). Lo aprobado: «¿Cuántos formatos?
 **Todos.**» y «¿Entre cientos de marcas, a quién cita la IA? **A ti.**», con Nexa en registro cine. Un par aprobado en una lámina o en otra pieza no se traslada solo a una portada social: se escribe para
 ella ([applications.md](applications.md) §A11).
+
+**Landing de agenda (operador, 2026-10-20).** Aprobado para el hero de `efeoncepro.com/agenda/`: «¿Por dónde empiezo? **Por aquí.**». La respuesta lleva **punto tipeado**, no esfera, porque el hero ya tiene la esfera de la órbita de retrato de Nexa (regla de titulares de landing del 2026-10-18). El par vive en esa landing; como los demás, no se traslada solo a otra pieza.
 
 **En una pantalla del producto (login V4, 2026-10-02; riesgo abierto).** El operador pidió la voz completa sobre la
 novedad del escenario: «El ring y la esfera faltan como manda /efeonce-graphic-line». El anillo pequeño va delante del
@@ -879,6 +924,7 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 | **Anillo propio de la esfera** (`sphereRing`) en algo que no está en vivo | está reservado al eco del impacto y al estado «en el aire» | operador 2026-09-26 (D8); `sphere-ring-only-live` |
 | **Eslogan en mayúsculas, con esfera, traducido o rearmado**, o en cada post | sólo el bloque oficial, sólo en cierres | láminas 2.2, 5.6 |
 | **Pregunta grande y respuesta larga y chica**, dos preguntas seguidas, pregunta retórica o chiste | la respuesta domina; la pregunta es real | láminas 2.1, 5.6 |
+| **Par que no pasa las cuatro pruebas**: pregunta que el lector no haría ahí, respuesta que no contesta su forma («¿Se ve…? Todos.»), comodín («Poco», «Juntos») o voz en una lámina que explica | pregunta del lector en ese momento, respuesta de su misma forma, específica de la lámina; si no, título declarativo | operador 2026-10-19 (§4, «Cuándo sí y cuándo no») |
 | **«Te hacemos visible» sin «Y lo medimos.»** ni mecanismo | anti-humo: la visibilidad se mide | lámina 1.4 |
 | **Logos de terceros como satélites-alianza** | los satélites muestran dónde medimos, no con quién | lámina 0.2 |
 | **Insignia de partner fija o sin autorización ni readback**, o marca de tercero sin autorización de su titular | la insignia es un claim: opcional en la receta, con la referencia de su autorización o readback (la de Salesforce, autorizada: `salesforce-partner-authorization-2026-09-29`) y respaldo «Operamos sobre»; cada marca lleva procedencia y autorización | operador 2026-09-29; regla `partner-claim-readback` |
@@ -893,6 +939,8 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 | **La línea aplicada a un cliente o a la interfaz de Greenhouse** | es marca propia de Efeonce; el login V4 (TASK-1964) es la única excepción en curso, sin canon todavía ([applications.md](applications.md) §A12) | ADR, decisión 6 |
 | **Un par del catálogo como portada de perfil social** («¿Qué hace Efeonce? Crecer.») | la portada pide una idea propia | operador 2026-10-01 (§4) |
 | **Destacados de Instagram con la misma toma o con íconos planos**, o firma en el círculo | mezcla de recursos, una escena y un color de luz por destacado; la marca la pone el avatar | operador 2026-10-01 (§7) |
+| **Anuncio de alianza con «×»**, un logo recortado o a color junto al otro en blanco, o la fila de productos lejos del lockup | filete vertical, dos logos completos en blanco, un solo bloque focal | operador 2026-10-19 («Anuncios de alianza») |
+| **La órbita fina como único recurso de un anuncio de alianza**, o voz pregunta-respuesta en él | «le falta muchísimo punch»; el par es «absurdo» en un anuncio que sólo declara la alianza | operador 2026-10-19 («Anuncios de alianza») |
 
 ---
 
@@ -1107,3 +1155,50 @@ Título aprobado por ejecución: «Explora». Autoriza recomponer todo el footer
 equilibradas, newsletter y empleo independientes, tipografía unificada, fila de partners compacta
 y cierre legal discreto. Reducir vacío sin propósito; controles flotantes fuera del cierre mientras
 se lee. No extrapolar ocultamiento global ni borrar funciones fuera del footer.
+
+### Anuncios de alianza (partnership) — 2026-10-19
+
+Caso fuente: «Efeonce | Google — Oficialmente partners» (post 4:5 + reel 9:16), aprobado en la ronda 5 tras cuatro
+rechazadas. La tarjeta de producción es [applications.md](applications.md) §A16; las decisiones con fecha, en
+[ledger.md](ledger.md). El criterio:
+
+- **El lockup es el mensaje.** «Efeonce | Google» con **filete vertical**, nunca «×»: la × se lee como colaboración tipo
+  drop/streetwear; el filete es la convención corporativa y la misma de la familia H3. Los dos logos van **completos**
+  (nunca sólo el isotipo de uno) y **en blanco monocromo** sobre oscuro, los dos iguales: «pon el logo de Google en
+  blanco igual que el de Efeonce». El eyebrow dice el hecho: «OFICIALMENTE PARTNERS» (Poppins 600, tracking .14em).
+- **Un solo bloque focal.** Los logos de productos del partner (aquí Gemini, Google Cloud, Google Workspace) van
+  pequeños, en gris azulado claro, **justo debajo** del lockup; con la fila al pie de la pieza «el ojo va a fijar la
+  vista a dos lugares». La fila nunca es más ancha que el lockup. El énfasis sigue la oferta, no el orden alfabético:
+  Gemini y Google Cloud por sobre Workspace (la primera versión «está muy inclinada a Google Workspace»).
+- **Sin voz pregunta-respuesta.** No hay pregunta real del lector que el anuncio conteste: declara un hecho. «¿Quién
+  lleva Google a mi empresa? / Nosotros» fue «absurda» (§4, «Cuándo sí y cuándo no»).
+- **Cuándo la órbita no basta.** Una órbita de trazo fino como único recurso visual de un anuncio de alianza no tiene
+  impacto: «le falta muchísimo punch». La pieza aprobada no lleva órbita: el impacto lo da una escena con profundidad
+  (íconos oficiales de los productos en tres planos, luz de cine) y el lockup en el centro oscuro.
+- **Lo que delata que no se entendió** (rechazos del 2026-10-19): tipografía que imita el logo del partner («Google» en
+  Bricolage con barrido de colores); esferas 3D en los colores del partner («parecen globos de pintura»); estética de
+  banco de imágenes (explosión de objetos de oficina); la mascota de consumo del partner (Gigi, campaña para
+  estudiantes) en un anuncio B2B y Efeonce ausente de la imagen; contenido generado dentro de pantallas de laptop o
+  teléfono («quedó horrible, quítaselo»).
+- **Las marcas del partner son claim** (§3.7, «Marcas de terceros y claims de partner»): procedencia por archivo y,
+  antes de pauta pagada, archivos oficiales del portal de partners en lugar de reproducciones. El acabado generativo
+  (material acrílico brillante, rim light) se aplica a los íconos del partner como escena, no a la órbita ni a la
+  marca de Efeonce, y lo pidió el operador; [inferido] por eso no choca con «discos rellenos, brillos, reflejos» de §10,
+  que es gramática de la órbita.
+- **Caso AWS (2026-10-21, programado para el 03-12-2026; [método](../../../../docs/operations/social/2026-10-21-aws-partner-announcement-production-method.md)
+  §«Marca de AWS»).** Logo: el **SVG del encabezado de aws.amazon.com**, extraído del HTML; la versión para fondo oscuro
+  sólo cambia las letras a blanco y deja la sonrisa en `#FF9900`; la sonrisa no se anima ni se imita en arcos de luz.
+  Íconos: el **paquete oficial AWS Architecture Icons**, sin modificar (AWS los permite para diagramas de
+  arquitectura, que es lo que muestra la pieza). **Ninguna IA dibujó logos ni íconos de AWS:** keyframes y video van sin
+  marcas y todo lo de AWS se compone después. Las normas de marca de AWS (aws.amazon.com/trademark-guidelines) piden
+  **licencia** para el logo de la sonrisa (badge de la APN o marcas del contrato de reventa) y los nombres de servicio
+  sin licencia van en texto plano; el operador autorizó usar el logo oficial igual: **riesgo aceptado** en este caso,
+  no una autorización de AWS. Pendiente decidir si se reemplaza por el badge de la APN cuando llegue.
+
+### CTA de landing: sin verde lima — corrección del operador, 2026-10-20
+
+El operador, revisando la landing `/agenda/`: «Este verde no lo usamos en ninguna parte de nuestra línea gráfica». El
+token `cta-growth` oscuro (`#7ed600`) existe en el set de tokens, pero **no se usa en piezas ni landings de Efeonce**.
+El CTA principal de la línea Growth sobre oscuro va en el acento Growth (`accent-growth` oscuro) con texto en `ground`,
+igual que el botón «Continuar» del agendador AXIS. Antes de usar un token `cta-*`, comprobar que aparece en una pieza
+aprobada; que exista en `tokens.json` no prueba que la línea lo use.

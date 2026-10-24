@@ -1,7 +1,7 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.10 — 2026-10-15 (Claude, opciones visibles, previsualización por intercepción y revinculación de medición)
+> **Version:** 1.11 — 2026-10-23 (Claude, campos de fidelidad de diseño, TASK-2044)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
@@ -33,6 +33,20 @@ Para revisar o modificar su configuración:
 7. Separa ese smoke sin envío de un envío controlado aceptado, su ledger y la observación GA4.
    El rollout del 2026-08-31 no realizó estos últimos; la fila de
    [TRACKING-PLAN.md](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md) sigue pendiente.
+
+## Medición comercial Ads y corrección de clasificación
+
+Usar el [manual Ads](activar-conversiones-google-ads.md) para descubrir la fuente/versión y verificar
+su política `googleAds`, consentimiento y recibo dedicado. Google UPD, Meta, GA4 y entrega a HubSpot
+se comprueban por separado; no deducir Ads desde `generate_lead` ni aplicar a formularios generales.
+El release2559e9242 sirve Grader y la API de clasificación auditada;13 Forms comerciales + Discovery
+están configurados. La recepción y atribución real aún requieren evidencia de una ocurrencia legítima.
+
+Si una definición comercial heredada tiene clasificación incorrecta, seguir
+[corregir clasificación comercial](corregir-clasificacion-comercial.md): descubrir primero,
+confirmar propósito, fijar versión/hash, aplicar con autoridad y leer resultado/`commandExecutionId`.
+Un409 obliga a reconciliar; no reintentar cambiando el hash a ciegas. Lead Gen Web ya es
+`quote_request`. No usar SQL directo ni enviar un lead ficticio para verificar el endpoint.
 
 ## Verificar matching publicitario de un formulario
 
@@ -344,6 +358,29 @@ Problema comun: si la corrida dice `NO APLICADO ... v4 forms`, ese formulario de
 con el editor nuevo y no admite cambios por API («AEO - Lead Form» es el caso). Agregar los campos
 que lista el contract check desde HubSpot (Marketing → Formularios → editar → Propiedades →
 Revisar y actualizar) y volver a correr; la herramienta no activa `direct` mientras falten.
+
+## Declarar un formulario diseñado en canvas (TASK-2044)
+
+Cuando una landing trae un formulario diseñado (por ejemplo, el popup «Quiero ser partner»), no se estiliza en la
+landing: se declara en una versión nueva del formulario.
+
+1. Ancho de cada campo: `presentation.width` = `half` (media columna) o `full` (fila completa). Sin declararlo, el
+   renderer decide como siempre.
+2. Consentimiento compacto: en `copy_refs_json`, `presentation: "compact"` y `privacyLinkLabel` (texto del enlace).
+   En el `label` de la casilla escribe una sola vez `{privacyLink}` donde va el enlace; `privacyUrl` es obligatoria.
+3. Éxito: `successBehavior.icon` = `orbit`, `none` o `celebration`; para el botón «Cerrar», una acción
+   `{ "kind": "dismiss", "label": "Cerrar" }` sin `href`.
+4. Compila la versión: el compilador bloquea HTML en la casilla, marcadores repetidos o desconocidos y la falta de
+   `privacyUrl`.
+
+5. Para no mostrar los pasos por defecto en la tarjeta de éxito, declara `steps: []`.
+6. La piel va en el CSS del anfitrión con tokens `--ghf-*` y hooks `data-ghf-part` (tabla en el contrato de runtime;
+   ejemplo: `scripts/public-website/partners-source/partner-dialog-skin.css`).
+
+**Qué no hacer:** no publiques una versión con `{privacyLink}` mientras el renderer de TASK-2045 (`1.1.0`) no esté en
+producción: el renderer actual muestra el marcador tal cual. `width`, `compact`, `icon` y `dismiss` sí se pueden
+publicar antes (el renderer actual los ignora sin romper). Tabla completa:
+[contrato de runtime](../../architecture/growth-public-forms-runtime-contract.md#formularios-diseñados-en-canvas-lo-que-el-contrato-admite-task-2044).
 
 ## Referencias tecnicas
 

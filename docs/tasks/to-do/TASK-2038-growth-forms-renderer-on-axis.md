@@ -1,5 +1,16 @@
 # TASK-2038 — Renderer de Growth Forms en AXIS
 
+## Delta 2026-10-24
+
+- El renderer suma la presentación `inline_pill` (`src/growth-forms-renderer/inline-pill.ts`, tokens `--ghf-inline-*`,
+  evento DOM `ghf:success`) y `staticValue`/`registrationStatus` (renderer `1.2.0`) — TASK-2053/TASK-2054. Entra en el
+  alcance de la migración a AXIS junto con su gate visual `scripts/growth/forms/fixtures/inline-pill.scenario.mjs`.
+
+
+## Delta 2026-10-23
+
+- TASK-2044 agrega campos de presentación al contrato (ancho por campo, consentimiento `compact`, éxito `dismiss` e `icon`) y TASK-2045 cambia el renderer (esquema oscuro, tokens nuevos, Turnstile dentro del formulario). El port a AXIS debe llevarlos; si esta task cierra antes, TASK-2045 se hace sobre el código en AXIS.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

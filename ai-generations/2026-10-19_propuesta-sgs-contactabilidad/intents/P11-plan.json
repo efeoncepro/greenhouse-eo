@@ -1,0 +1,38 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "role": "decision",
+  "recipe": "decision-plan",
+  "voice": {
+    "eyebrow": "Plan del piloto",
+    "question": "¿Qué pasará al empezar?",
+    "answer": [
+      "Línea base"
+    ]
+  },
+  "body": "**112** días como máximo: cuatro semanas de línea base y hasta doce de piloto, con umbrales acordados antes.",
+  "horizon": 112,
+  "currentStop": 1,
+  "stops": [
+    {
+      "range": "Días 1–28",
+      "title": "Diagnóstico",
+      "desc": "Procesos, registro de correo y línea base, antes de cambiar nada."
+    },
+    {
+      "range": "Días 29–112",
+      "title": "Piloto",
+      "desc": "Hasta 12 semanas con Aircall, WhatsApp y el panel, con revisión semanal."
+    },
+    {
+      "range": "Día 112",
+      "title": "Decisión",
+      "desc": "Contra la línea base: seguir, ajustar o detener. Si siguen, se pide la conexión."
+    }
+  ],
+  "line": "revenue-salesforce"
+}

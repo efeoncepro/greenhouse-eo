@@ -4,7 +4,7 @@
 >
 > **Submarcas de producto con logo (2026-09-29):** **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report** son submarcas de producto de Efeonce con logos oficiales en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29); acompañan a Efeonce y nunca firman solas. Referencia visual: Lab de AXIS `https://axis.efeonce.org/references/seo-aeo/` (publicados el 2026-09-29; responden 200). ADR de naming §Delta 2026-09-29; uso visual en la skill `efeonce-graphic-line`.
 
-> **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
+> **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` (nombre interno del hub; el público ve *Marketing con Manzanitas*) = demand-gen + nurturing top-of-funnel [*Marketing con Manzanitas* (blog, newsletter del LinkedIn de Julio, YouTube) · *Glitch* (marca hermana: newsletter semanal IA/Marketing/Negocios por correo, archivo en el blog) + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
 
 > Capa de aplicación del núcleo SEO+AEO al caso concreto de Efeonce. **No
 > duplica** la operación del sitio: enlaza con las skills y docs canónicas y
@@ -95,6 +95,14 @@
   entrada, estructura citable, enlaces internos al territorio de `PDR-019` — no el texto optimizado para
   dwell en feed. Copiar canibaliza el único activo que se cita. Si el tema no da para esa versión con
   trabajo propio, **se queda sólo en LinkedIn**.
+- **Blog y video de Efeonce (operador, 2026-10-22).** El blog es la casa donde todo llega: cada artículo lleva
+  **autor real** (Julio o alguien del equipo) con su ficha y `Person`, y sus invitaciones van en orden fijo:
+  **primero Glitch, después una herramienta, al final el diagnóstico**. El video vive en YouTube y el blog lo
+  incrusta **dentro de un artículo que responde la misma pregunta, con la transcripción**: el texto que se cita es
+  el del blog. **Ningún video se graba sin búsqueda validada antes** (DataForSEO y Google Trends); el título es la
+  búsqueda dicha como la diría una persona. Canon:
+  [estrategia de love brand §8.2–§8.3](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) +
+  [PDR-020, delta 2026-10-22](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md).
 - **NUNCA** exponer la marca/nomenclatura del portal interno (Greenhouse, "EO",
   Nexa, etc.) en copy SEO público salvo decisión GTM explícita.
 - **NUNCA** publicar salida del AI Content Factory sin pasar information gain +

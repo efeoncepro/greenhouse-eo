@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.1
+> **Version:** 2.3
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-10-15 por Claude (opciones visibles en cualquier estilo, enlace de privacidad legible, íconos de etiqueta; TASK-2038)
+> **Ultima actualizacion:** 2026-10-24 por Claude (formulario en línea, reservas por evento y conteo, TASK-2053/2054)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -53,6 +53,24 @@ verifica por separado; un recibo Meta no prueba que haya llegado el contacto a H
 La nueva fuente por datos y Meta Test Events se verificaron en producción. Las pruebas controladas
 no sustituyen la primera conversión comercial real consentida ni demuestran mejora de EMQ o
 una audiencia elegible. CRO, abandono, suscripciones y resultados CRM siguen fuera de este release.
+
+## Google Ads online y clasificación comercial
+
+Ads online tiene su propio recibo postpersistencia, separado de Google UPD y del espejo GA4.
+Una aceptación comercial elegible devuelve `googleAdsConversion`; el navegador revalida permiso y
+lo transporta mediante Web6 a los tags nativos Server10. Ese canal no tiene retry backend;
+los hashes de EC usan un canal reservado y nunca dataLayer ni parámetros GA4 ordinarios.
+La exigencia de client ID GA4 descrita para UPD no se traslada automáticamente al canal Ads.
+
+Cobertura verificada en el release2559e9242:13 Forms comerciales y Discovery; Grader comercial,
+Contacto general excluido. Una fuente o versión futura requiere revisar/publicar su política.
+[Alcance, consentimiento y límites](google-ads-measurement.md).
+
+La corrección administrativa de una clasificación heredada permite únicamente
+`lead_magnet` → `quote_request`, con intención confirmada, razón y precondiciones vigentes.
+Preserva identidad, versión, consentimiento y destinos; no publica Ads automáticamente. Requiere
+actor interno con permiso de autor y registra auditoría en la misma transacción. Lead Gen Web
+ya fue corregido; no repetirlo. [Manual de corrección](../../manual-de-uso/growth/corregir-clasificacion-comercial.md).
 
 ## Como funciona (flujo)
 
@@ -205,6 +223,34 @@ separada. El contrato visual reusable vive en
 La piel no duplica la logica: el host aporta chrome, marca y layout; Growth Forms conserva campos, valores,
 seleccion, validacion, consentimiento, Turnstile, destino y success. Si los iconos por opcion se reutilizan en otra
 landing, deben pasar al contrato browser-safe del renderer, no copiarse como CSS o JavaScript por etiqueta.
+
+## Formularios diseñados en canvas — TASK-2044
+
+Un formulario diseñado (columnas, casilla compacta con el enlace a la política dentro de la frase, «Recibido.» con un
+botón «Cerrar» y el arco de La órbita) se declara en el contrato del formulario, sin CSS de la landing. Todo es
+opcional: un formulario que no lo declara se ve igual que antes. El dibujo de estas opciones llega con TASK-2045.
+
+> Detalle técnico: [contrato de runtime](../../architecture/growth-public-forms-runtime-contract.md) ·
+> `src/lib/growth/forms/contracts.ts` · `src/lib/growth/forms/policy-compiler.ts`
+
+## Formulario en línea y reservas por evento — TASK-2053/2054
+
+Un formulario de un solo correo puede mostrarse **en línea**: un botón que, al presionarlo, se estira y se convierte
+en el campo de correo con su botón de envío, muestra un cargador al enviar, confirma con un relleno y un check, y queda
+en un mensaje final («Ya estás suscrito a Glitch», «Te esperamos el 12 de noviembre»). Es lo que usa la portada del
+blog para suscribirse a Glitch y reservar un webinar, sin pop-ups.
+
+- Se declara en el contrato del formulario (presentación `inline_pill` y sus textos); el sitio sólo elige el color.
+- Si dos copias del mismo formulario están en la página, cuando una confirma la otra también queda confirmada.
+- Cada evento tiene su propio formulario de reserva, con su identificación fija (el sitio no puede cambiarla), un
+  **cupo** opcional y una política para cuando se llena: **lista de espera** (se acepta igual y se avisa que quedó en
+  espera) o **rechazo** («Ya no quedan cupos para este evento»). Ningún envío aceptado se pierde.
+- El sitio puede mostrar cuántas personas reservaron («310 personas ya reservaron su lugar») con un conteo público que
+  nunca da el número exacto: se redondea a la decena, se cuenta una vez por correo y sólo aparece desde un mínimo
+  (25 por defecto). Por debajo del mínimo no se muestra nada.
+
+> Detalle técnico: [contrato de runtime](../../architecture/growth-public-forms-runtime-contract.md#formulario-en-línea-y-reserva-por-evento-task-20532054) ·
+> `src/lib/growth/forms/contracts.ts` · `src/lib/growth/forms/readers.ts` · `src/growth-forms-renderer/inline-pill.ts`
 
 ## Que NO hace (todavia)
 

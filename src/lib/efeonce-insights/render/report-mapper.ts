@@ -419,6 +419,9 @@ export const buildInsightReportPlanInput = ({
     { contentTypes: { dark: 'report-cover', light: 'report-cover-light' } }
   )
 
+  // El catálogo A4 lo comparten otros informes (auditorías): la portada nombra su producto.
+  cover.slots.productLabel = L.product
+
   // Secciones del cuerpo, en orden. Cada una sabe su marca de índice y sus páginas.
   const sections: { mark: string; title: string; pages: BodyPage[] }[] = []
 
@@ -510,6 +513,7 @@ export const buildInsightReportPlanInput = ({
         contentType: 'report-chapter',
         slots: {
           chapterLabel: `${L.chapter} ${number}`,
+          productLabel: L.product,
           chapterNumeral: number,
           runningLabel: `${L.reportOf} ${periodInline}`,
           chapterTitle: rejectIfLonger(chapter.title, BUDGET.chapterTitle, `${chapter.chapterId}.title`),

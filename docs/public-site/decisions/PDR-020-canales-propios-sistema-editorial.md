@@ -6,8 +6,17 @@
 > **catálogo propio**; las franquicias tienen **canal-hogar** y satélites, no presencia universal.
 > Vocero de talking head cerrado. Blog declarado multiformato (tools, webinars). Educativo de
 > LinkedIn incorporado.
-> **Ámbito:** Canales propios de marca Efeonce — Blog (Marketing con Manzanitas), LinkedIn, YouTube,
-> Instagram, Threads y Glitch (newsletter). No cubre canales de cliente ni paid social.
+> **Revisión 2.0 (2026-10-22, sesión de planificación social con el operador):** los canales se agrupan en
+> **tres familias** (marca agencia · conexión B2B · Marketing con Manzanitas); Instagram y Threads pasan a
+> **marca agencia** con objetivo de **love brand y comunidad**; YouTube y el newsletter de LinkedIn de Julio se
+> suman a la familia Marketing con Manzanitas; Glitch entra a Threads sólo como gancho; X queda como canal de
+> escucha. Cierra las decisiones pendientes 1, 4, 5 y 6 (esta última en el punto 12 del delta). Detalle en [Delta 2026-10-22](#delta-2026-10-22--sistema-de-canales-v2-tres-familias).
+> **Revisión 2.1 (2026-10-23, decisión del operador):** las seasonalities dejan de tener canal-hogar fijo: cada
+> temporada se publica **sólo en el canal donde tiene fit**, según la prueba de fit por canal. Detalle en
+> [Delta 2026-10-23](#delta-2026-10-23--seasonalities-por-fit-de-canal).
+> **Ámbito:** Canales propios de marca Efeonce — Blog (Marketing con Manzanitas), LinkedIn (página y Julio),
+> newsletter Marketing con Manzanitas en el LinkedIn de Julio, YouTube, Instagram, Threads y Glitch
+> (newsletter por correo). X sólo como escucha. No cubre canales de cliente ni paid social.
 > **Skills:** `content-marketing-studio`, `social-media-studio`, `copywriting`, `seo-aeo`,
 > `digital-marketing`, `growth-marketing-cro`, `efeonce-agency`, `greenhouse-email`,
 > `efeonce-public-site-wordpress`.
@@ -20,6 +29,140 @@
 > [PDR-018](PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md) (Pillar/Cluster y host),
 > `docs/context/09_marca-agencia.md` (masterbrand y voz), `docs/context/15_panorama-competitivo-benchmark-industria.md`
 > (baseline competitivo), `TASK-1802` (Content Hub `/blog`).
+
+## Delta 2026-10-23 — seasonalities por fit de canal
+
+**Decisión del operador:** «no todos los seasonalities publicarlos en IG, sino segmentarlos por el canal donde tengan
+mejor fit». Reemplaza el canal-hogar fijo de §4.4 (Instagram) y la idea de LinkedIn como satélite opcional. Se
+conservan la definición de seasonality, la regla «nunca un saludo» y el punto 12 del delta 2026-10-22.
+
+**Regla:** ninguna red es destino por defecto. Antes de idear una seasonality se pasa la **prueba de fit** y la pieza
+sale **sólo** en los canales que la pasan. Si ninguno la pasa, la temporada no se publica: no se rellena el calendario.
+
+| Canal | Tiene fit cuando… | Ejemplo (plan nov–dic 2026) |
+|---|---|---|
+| **Instagram** (marca agencia) | la temporada es **emocional o cultural** y se puede celebrar **desde el oficio o el equipo**; la pieza es visual antes que argumental | Día de Muertos, Día de las Velitas (CO), Navidad y Año Nuevo del equipo |
+| **LinkedIn Efeonce** (conexión B2B) | la temporada tiene **consecuencia de negocio para el comprador** (cambia cómo compra su cliente, lo regula, mueve una métrica de marketing) y hay un **argumento profesional propio** | Black Friday y Cyber, entrada en vigencia de la Ley 21.719, Día de la Usabilidad (sitios y apps que venden) |
+| **LinkedIn de Julio** | Julio tiene una **opinión propia** sobre la temporada (lo que vio en terreno, una postura) | cierre de año: lo aprendido de la IA en 2026 |
+| **Threads** (desde febrero de 2027) | cabe una **lectura rápida en texto** sobre la temporada, sin pieza visual | — |
+| **Ninguno** | no conecta con una disciplina de la casa | la mayoría de los «días de…» de calendario |
+
+- **Una temporada puede tener fit en más de un canal**; cada canal recibe su pieza o su argumento propio. Sigue
+  vigente el punto 12 del delta 2026-10-22: el visual clave puede ir a LinkedIn como imagen única con argumento
+  propio, nunca el carrusel ni la misma pieza con otro caption.
+- **El brief registra la prueba:** canal(es) elegidos con su razón y los descartados con la suya. «Lo publicamos
+  en todos lados» no es una razón.
+- **La métrica sigue al canal:** en Instagram, envíos y guardados; en LinkedIn, la conversación del comprador
+  (comentarios de calidad, guardados, visitas al perfil). Nunca seguidores ni volumen de posts.
+- **El plan 2026–2027 se relee con esta prueba** antes de producir cada pieza; las piezas ya programadas no se
+  despublican por esta regla.
+
+## Delta 2026-10-22 — sistema de canales v2: tres familias
+
+Decisiones del operador (Julio Reyes) en la sesión de planificación de redes nov 2026 – Q1 2027. Mandan sobre
+cualquier fila anterior de este PDR que las contradiga; las tablas de las capas 4 y 5 ya están actualizadas. El
+plan que las aplica vive en el lienzo privado «Efeonce Social Nov 2026 – Q1 2027» (`claude.ai/artifact/MWoecLSspdKw8ZRXKzPBBd`).
+
+**1. Tres familias, cada una con un trabajo y una audiencia distintos.**
+
+| Familia | Canales | Trabajo | Audiencia |
+|---|---|---|---|
+| **Marca agencia** | Instagram · Threads | Quiénes somos y cómo trabajamos: oficio, cultura y gente. **Love brand y comunidad de fans de Efeonce** | Las personas dentro de las empresas (marketers, creativos, gerentes), talento y partners |
+| **Conexión B2B** | LinkedIn Efeonce · LinkedIn Julio | El problema del comprador y cómo lo resolvemos; abrir conversación de negocio | CMO, gerencia comercial y de marketing, RevOps, TI y transformación digital |
+| **Marketing con Manzanitas** | Blog · newsletter en el LinkedIn de Julio · YouTube | Marketing explicado simple: lo que se busca, se guarda y se cita, y la audiencia suscrita propia | Quien busca cómo resolver algo y quiere aprender sin que le vendan |
+
+**2. Instagram y YouTube construyen love brand.** Decisión del operador: «Efeonce vende a empresas, pero detrás de
+esas empresas hay personas». Instagram no persigue conversión directa: hace fans a las personas de las empresas
+para que la conversación de negocio nazca después en LinkedIn, la web u otro canal. YouTube suma afinidad desde la
+utilidad (tutoriales con caras recurrentes), sin abandonar su rol de segundo buscador. La estrategia completa
+(pilares, fans, activos, escalera, mecánicas, medición y gobierno) vive en
+[`Efeonce Love Brand & Community Strategy V1`](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
+
+- **[recomendación]** Medir el puente fan → conversación, no sólo el canal: pregunta «¿cómo nos conociste?» en
+  formularios y diagnósticos, primer contacto por fuente en HubSpot, búsquedas de marca y tráfico directo, y
+  menciones de Instagram o YouTube en las primeras reuniones. Sin ese puente, el love brand queda sin evidencia.
+- **[recomendación]** La comunidad necesita mecánicas, no sólo frecuencia: caras recurrentes (Julio, el equipo,
+  Nexa), rituales con día fijo, participación (preguntas y decisiones de la audiencia en stories), códigos propios
+  de La órbita y momentos de encuentro (en vivo, workshops, merch).
+
+**3. Roles por canal.** Instagram = marca agencia (detrás de la pieza, oficio en 30 segundos, el equipo,
+seasonalities, trendjacking y partners en reel; nunca casos con métricas B2B ni documentos de servicio). Threads =
+la voz de la agencia en texto y un oído de la comunidad, en la cuenta de Efeonce porque hereda la audiencia de
+Instagram. LinkedIn Efeonce = una serie por servicio, casos contados como método y partners. LinkedIn Julio =
+la persona: lo que vio en terreno, su postura, el aprendizaje del build y talking head. Newsletter Marketing con
+Manzanitas (artículo de LinkedIn de Julio, quincenal) = una idea explicada simple, su mirada y tres enlaces;
+nunca copia el blog ni vende. YouTube = tutoriales «IA con contexto» de 8 a 12 minutos sobre búsquedas
+validadas y Shorts que llevan a ellos.
+
+**4. Glitch en Threads, sólo como gancho.** El día de la edición, la noticia más fuerte en una frase y la
+invitación a suscribirse. La casa de Glitch sigue siendo el correo y su archivo el blog (capa 6).
+
+**5. X no se abre.** Se usa para escuchar a los laboratorios de IA y alimentar Threads y la serie IA con
+contexto. Se reevalúa con datos si aparece una audiencia técnica que valga la pena.
+
+**6. Cierra decisiones pendientes.** (1) El video vive en YouTube y el blog lo incrusta dentro de un artículo
+que responde la misma pregunta, con transcripción: el texto que se cita es el del blog. (4) Secuencia: en enero
+de 2027 operan LinkedIn, Instagram, blog y newsletter; en febrero se suman Threads (experimento, revisión el
+31-mar-2027) y YouTube (piloto, entra sólo si el núcleo sostuvo el ritmo de enero). (5) Cadencia: LinkedIn
+Efeonce 3 por semana, LinkedIn Julio 2 (1 en febrero) + newsletter quincenal, Instagram 3 + stories, Threads 4–5,
+blog 1, YouTube 1 tutorial al mes + 1 Short por semana.
+
+**7. LinkedIn recibe al fan.** LinkedIn Efeonce construye credibilidad (respeto) y el LinkedIn de Julio, relación
+(confianza). La cultura entra a LinkedIn sólo con argumento; Julio suma una rutina diaria de 15 minutos de comentarios
+y respuestas; el equipo comparte con su propia voz, de forma voluntaria; los encuentros trimestrales se transmiten
+también por LinkedIn Live. Detalle en la [estrategia de love brand §8.1](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#81-linkedin-donde-el-fan-se-vuelve-conversación-operador-2026-10-22).
+
+**8. Blog y newsletters.** El blog es la casa donde todo llega y convierte visitas en audiencia propia con un orden
+fijo: primero suscribirse a Glitch, después una herramienta, al final el diagnóstico; cada artículo lleva autor real.
+**Glitch es el newsletter canónico** y el único correo de Efeonce (actualidad: lo que pasó y qué significa). El
+newsletter Marketing con Manzanitas del LinkedIn de Julio (evergreen: cómo se hace) es la puerta de entrada y cada
+edición invita a Glitch, porque su audiencia es de LinkedIn. No se crea un segundo correo de Marketing con
+Manzanitas. Detalle en la [estrategia de love brand §8.2](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22).
+
+**9. YouTube a fondo.** Series por fase (IA con contexto mensual en el piloto, Shorts semanales; explicadores «Con
+manzanitas» en Q2; serie de personalidad trimestral; en vivo trimestral en YouTube y LinkedIn Live), anatomía fija
+del tutorial, búsqueda validada antes de grabar, canal con el nombre Efeonce y playlists por serie. Detalle en la
+[estrategia §8.3](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#83-youtube-el-amor-desde-la-utilidad-operador-2026-10-22).
+
+**10. Camino a conversión.** Todo termina en las landings de servicio con su oferta de entrada, pero cada canal tiene
+su paso siguiente y sólo LinkedIn lleva directo a la landing. IA con contexto y nube no tienen landing al 2026-10-22:
+es pendiente antes del 4-ene-2027. Detalle y landings medidas en la
+[estrategia §8.4](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#84-el-camino-a-conversión-cada-canal-tiene-su-paso-siguiente-operador-2026-10-22).
+
+**11. La línea «IA con contexto».** Nombre aprobado para la serie de implementación de IA empresarial: Gemini
+Enterprise, Claude Enterprise, ChatGPT Enterprise, agentes propios y de plataforma, y la nube donde corren. Línea
+de servicio **Engine** (la familia técnica es *Agent Systems & Platforms* de la marca de producto Wave).
+
+**12. Seis decisiones del operador sobre las contradicciones del barrido (2026-10-22).**
+
+- **Glitch y Marketing con Manzanitas son marcas hermanas.** En la web Glitch sigue dentro del blog (misma URL,
+  categoría raíz de PDR-019, sin migración); como marca no depende de Manzanitas. Glitch es el único correo de
+  Efeonce, tiene línea gráfica y cadencia propias y vive en Threads. Corrige el árbol de PDR-003.
+- **El público ve «Marketing con Manzanitas»; «Think» es nombre interno.** Think nombra el hub de contenidos y el
+  dominio de herramientas (`think.efeoncepro.com`, Radiografía AEO); nunca va como logo, encabezado ni nombre de
+  canal. Cierra la decisión pendiente 6 y la de naming de `TASK-1802`.
+- **`/servicios/hubspot/` no se contradice con PDR-013: es una redirección vieja.** Hoy apunta a un artículo de
+  2024. Mientras no exista el pillar de PDR-013, los posts enlazan a `/servicios-contratar-hubspot/` y la
+  redirección vieja se reemplaza por una **302 temporal** hacia esa landing. **Aplicada el 2026-10-22** con
+  autorización del operador, respaldo y verificación en vivo. Al publicarse el pillar se borra la 302 y se aplica el
+  301 de PDR-013.
+- **Seasonalities: se comparte el visual clave, nunca el carrusel.** Para piezas de marca y de servicio Instagram
+  y LinkedIn llevan cortes propios (§4.4). En una seasonality la celebración es la misma, así que LinkedIn puede
+  usar el visual clave, pero como imagen única con su argumento propio.
+- **Formatos sin canal, decididos uno por uno:**
+  - Reel y vlog de Glitch: **en pausa** hasta que el piloto de YouTube pruebe que el ritmo se sostiene. Glitch vive
+    socialmente en Threads y por correo.
+  - Story de Marketing con Manzanitas: **sí, en stories de Instagram** (nunca en el feed), máximo una por semana,
+    como pilar de generosidad, con sticker de enlace al blog o a la suscripción a Glitch.
+  - Pódcast: **sin canal por ahora.** Si se produce, va a YouTube en video y bajo Marketing con Manzanitas.
+  - Destacados de Instagram: «07 Podcast» se retira hasta que exista el pódcast; «01 Glitch» se queda y se
+    reorienta a la suscripción, que es el paso siguiente desde Instagram.
+- **Presentador de los tutoriales de YouTube: Julio es la cara del piloto.** En episodios de especialidad (SEO,
+  paid, HubSpot) entra alguien del equipo como invitado y Julio lo presenta; la participación es voluntaria, como
+  la voz del equipo en LinkedIn.
+- **Menores:** cada artículo lleva una persona como autora, también los de voz institucional; la opción `Twitter`
+  sale del Calendario de Notion; las imágenes sociales van siempre en PNG; LinkedIn lleva de Glitch la lectura de
+  una noticia, no el carrusel de la edición.
 
 ## Contexto
 
@@ -109,12 +252,13 @@ El sistema distingue dos cosas:
 
 | Canal | Formatos nativos |
 |---|---|
-| **Instagram** | proceso y construcción real con tropiezos · talking head de tendencia · trendjacking · **seasonalities (la temporada vista desde el oficio)** · cultura, equipo y talento (employer brand) — **no lleva casos de éxito**: su señal es reenvío, y una métrica B2B no se manda por DM |
-| **LinkedIn Página** | **contenido educativo** (post extenso y documento nativo) · **el corte del caso de éxito** · anuncios y posición institucional |
-| **LinkedIn Julio** | POV profesional en primera persona · talking head ejecutivo · el aprendizaje del build. **El runtime ya lo modela como canal separado**; la voz es la de `JULIO_REYES_VOICE_SYSTEM`, no la de la marca |
-| **YouTube** | long-form del experimento completo · tutorial y how-to (demanda de búsqueda) · webinar grabado · Shorts como anzuelo al long-form |
-| **Threads** | reacción rápida y trendjacking · opinión corta con criterio · hilo de aprendizaje en bruto · pregunta abierta a la audiencia |
-| **Blog** | artículos y Pillars · **casos de éxito completos** (canonical) · **tools y graders** · **webinars** · ebooks y lead magnets · data studies · archivo Glitch |
+| **Instagram** *(marca agencia · delta 2026-10-22)* | **detrás de la pieza** (proceso real con tropiezos) · **oficio en 30 segundos** (una decisión creativa explicada) · **el equipo** (cultura y talento) · talking head de tendencia · trendjacking · **seasonalities (la temporada vista desde el oficio)** · partners en reel — **no lleva casos de éxito ni documentos de servicio**: su señal es reenvío, y una métrica B2B no se manda por DM |
+| **LinkedIn Página** | **contenido educativo** (post extenso y documento nativo) por serie de servicio · **el corte del caso de éxito** · anuncios y posición institucional · video corto del talking head |
+| **LinkedIn Julio** | POV profesional en primera persona · lo que vio en terreno · talking head ejecutivo · el aprendizaje del build. **El runtime ya lo modela como canal separado**; la voz es la de `JULIO_REYES_VOICE_SYSTEM`, no la de la marca |
+| **Newsletter Marketing con Manzanitas** *(LinkedIn de Julio · delta 2026-10-22)* | la edición quincenal: una idea explicada simple y a fondo, la mirada de Julio y tres enlaces (artículo, herramienta y video). Nunca el texto del blog |
+| **YouTube** *(Marketing con Manzanitas · delta 2026-10-22)* | tutorial y how-to sobre búsquedas validadas («IA con contexto», 8–12 min) · long-form del experimento completo · webinar editado · Shorts como anzuelo al long-form |
+| **Threads** *(marca agencia · delta 2026-10-22)* | reacción rápida y trendjacking · opinión corta con criterio · hilo de aprendizaje en bruto · pregunta abierta a la audiencia · el gancho de Glitch |
+| **Blog** | artículos y Pillars · **casos de éxito completos** (canonical) · **tools y graders** · **webinars** · ebooks y lead magnets · data studies · archivo Glitch · el artículo de cada tutorial de YouTube |
 | **Glitch (email)** | la edición semanal |
 
 **b) Franquicias con canal-hogar — nacen en un canal y viajan como corte, nunca como copia.**
@@ -123,9 +267,9 @@ El sistema distingue dos cosas:
 |---|---|---|
 | **Behind the Build** | Instagram | LinkedIn: el aprendizaje, no el making-of · YouTube: versión larga si el build lo amerita |
 | **Versus** | YouTube + Blog (data study) | Instagram: el resultado visual · LinkedIn: el veredicto y qué implica |
-| **Glitch** | Glitch (email) | Blog: archivo · Threads: el gancho · LinkedIn: la lectura de una noticia |
+| **Glitch** | Glitch (email) | Blog: archivo · Threads: el gancho el día de la edición, con invitación a suscribirse · LinkedIn: la lectura de una noticia |
 | **Trendjacking** | Threads + Instagram | — reactivo; no se despieza a canales lentos |
-| **Seasonalities** | Instagram | LinkedIn: el argumento profesional detrás de la metáfora, sólo cuando la disciplina es legible para un comprador (ver capa 4.4) |
+| **Seasonalities** | por fit (delta 2026-10-23) | cada temporada va sólo al canal donde tiene fit: Instagram si es emocional o cultural, LinkedIn si tiene consecuencia de negocio (ver capa 4.4) |
 | **Casos de Éxito** | Blog (canonical) | LinkedIn: el corte que circula · sales enablement: la versión en video · landings: el dato citable |
 | **Educativo** | LinkedIn | Blog: la versión que responde a búsqueda (ver capa 4.1) |
 
@@ -200,6 +344,9 @@ una con su superficie y su trabajo.
 - **No hay superficie `/casos` en el sitio y este PDR no la crea.** Hoy los casos viven como bloque de prueba
   en landings y como pieza editorial en el blog. Si se decide un índice agregador, es decisión de producto
   aparte y depende del inventario de la decisión pendiente 2.
+  **Delta 2026-10-23:** esa decisión aparte es [PDR-028](PDR-028-portafolio-de-proyectos-eo-portfolio.md): el
+  índice agregador vive en `/portafolio/`, enlaza al caso canónico del blog y lleva la compuerta de aprobación del
+  cliente como regla del sistema.
 
 ### 4.4 Seasonalities: la temporada vista desde el oficio
 
@@ -228,10 +375,10 @@ retícula editorial que empieza a bailar (diseño editorial).
 
 | Atributo | Valor |
 |---|---|
-| **Canal-hogar** | Instagram — es craft y cultura, y la pieza es visual antes que argumental |
-| **Satélite** | LinkedIn, **sólo** cuando la disciplina de la metáfora es legible para un comprador |
-| **Qué recibe el satélite** | **el argumento profesional detrás de la metáfora**, desarrollado — nunca la misma pieza con otro caption |
-| **Métrica** | sends + saves (que la pieza se reenvíe). **Nunca seguidores ni volumen de posts** |
+| **Canal** | **por fit, no fijo** (delta 2026-10-23): Instagram cuando la temporada es emocional o cultural; LinkedIn Efeonce cuando tiene consecuencia de negocio para el comprador; LinkedIn de Julio cuando hay una opinión propia; ninguno si no conecta con un oficio |
+| **Varios canales** | sólo cuando la temporada pasa la prueba en cada uno |
+| **Qué recibe LinkedIn** | **el argumento profesional detrás de la metáfora**, desarrollado — nunca la misma pieza con otro caption |
+| **Métrica** | la del canal: en Instagram, sends + saves (que la pieza se reenvíe); en LinkedIn, la conversación del comprador. **Nunca seguidores ni volumen de posts** |
 | **Trabajo** | afinidad de marca por demostración de oficio |
 | **Unidad de planificación** | la ventana de la temporada, por mercado |
 
@@ -247,6 +394,8 @@ distintos.
   El estándar es el del plan vigente: una metáfora que sólo Efeonce podría firmar.
 - **NUNCA tratar una seasonality como una fecha.** Se planifica por ventana y por mercado; la fecha de
   publicación es un hito dentro de la temporada, no la temporada.
+- **NUNCA publicar una seasonality en un canal sin pasar la prueba de fit** (delta 2026-10-23); si ningún canal la
+  pasa, no se publica.
 - **NUNCA publicar la misma pieza en Instagram y LinkedIn con caption distinto.** LinkedIn recibe el
   argumento desarrollado o no recibe nada.
 - **El plan 2026–2027 sigue vigente** (`docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md`):
@@ -272,10 +421,12 @@ y se reverifican contra su `SOURCES.md` antes de usarlas como argumento. Este PD
 | **Blog** | el **activo**: URL canónica, schema, citabilidad IA | orgánico + citación | es lo único que permanece y se cita; aloja lo que necesita URL estable |
 | **LinkedIn Página** | la **marca ante el comprador** | dwell ≥61s; comentario con sustancia ≫ like | el texto extenso y el documento nativo son los que pagan dwell |
 | **LinkedIn Julio** | la **persona ante el comprador** | igual señal, mayor alcance orgánico personal | talking head, POV en primera persona, el corte del caso |
-| **YouTube** | la **profundidad** y el segundo buscador | watch time, session engagement | único canal con demanda real de long-form y de búsqueda de tutorial |
-| **Instagram** | el **craft y la cultura** | sends + saves (followers = señal débil) | el proceso visual y el tropiezo son lo reenviable |
-| **Threads** | la **conversación viva** | conversación y respuesta rápida | costo de producción casi nulo; premia la ventana temporal |
+| **Newsletter Marketing con Manzanitas** | la **audiencia suscrita** de Julio en LinkedIn | suscriptores, aperturas, clics al blog | la idea a fondo para quien ya sigue; lleva al activo |
+| **YouTube** | la **profundidad** y el segundo buscador; **love brand desde la utilidad** | retención a 30 s, watch time, suscriptores por video | único canal con demanda real de long-form y de búsqueda de tutorial |
+| **Instagram** | la **marca agencia**: craft, cultura y gente; **love brand y comunidad** | sends + saves, alcance fuera de seguidores (followers = señal débil) | el proceso visual y el tropiezo son lo reenviable |
+| **Threads** | la **voz de la agencia en texto** y un oído de la comunidad | conversación y respuesta rápida | costo de producción casi nulo; premia la ventana temporal |
 | **Glitch (email)** | la **propiedad** | suscripciones, CTR | es el único canal que no depende de un algoritmo ajeno |
+| **X** *(delta 2026-10-22)* | **escucha**, no publicación | — | donde anuncian los laboratorios de IA; alimenta Threads e IA con contexto |
 
 El catálogo de cada canal está en la capa 4. **El rol explica el catálogo; el catálogo no se copia entre canales.**
 
@@ -324,8 +475,9 @@ de Contenidos** — mapeadas en `docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_M
 - **Cruce con `TASK-1802`:** el Content Hub `/blog` está bloqueado por *"inventario canónico de Tools, Videos
   y Webinars"*. Abrir YouTube **genera ese inventario**, pero exige decidir **antes de producir** si el
   canonical de un video es YouTube o el blog. Producir primero y ordenar después es deuda editorial garantizada.
-- **El naming visible sigue pendiente** (Think vs Marketing con Manzanitas, declarado en TASK-1802). Abrir
-  canales sin resolverlo obliga a renombrar en seis lugares después.
+  **Decidido el 2026-10-22:** el video vive en YouTube y el blog lo incrusta en su artículo (delta, punto 6).
+- **El naming visible quedó resuelto el 2026-10-22** (delta, punto 12): el público ve Marketing con Manzanitas y
+  Think queda como nombre interno; ningún canal se abre con el nombre Think.
 - **Threads queda como experimento con criterio de salida**, no como compromiso de cadencia: sin documentación
   previa en el repo y siendo la plataforma más volátil del set, se abre con ventana y condición de cierre
   escritas. Su mecánica debe incorporarse a `01_PLATFORM_MECHANICS.md` cuando exista evidencia propia.
@@ -352,12 +504,12 @@ de Contenidos** — mapeadas en `docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_M
 
 | # | Decisión | Bloquea |
 |---|---|---|
-| 1 | **Dónde vive canónicamente un video** (YouTube o blog) | `TASK-1802` y la apertura de YouTube |
+| 1 | ~~**Dónde vive canónicamente un video** (YouTube o blog)~~ **Cerrada 2026-10-22:** vive en YouTube; el blog lo incrusta en el artículo, con transcripción | — |
 | 2 | **Inventario de tools y webinars del blog** — canonical URL, owner, tipo, tema, fecha, estado, freshness | `TASK-1802` (bloqueante declarado) |
 | 3 | **Cuántos territorios se abren** — la recomendación es **dos** (AEO + Inteligencia Artificial/Agentes) | calendario y cadencia |
-| 4 | **Secuencia de apertura de canales** — no simultánea | plan de producción |
-| 5 | **Cadencia comprometida por canal** contra capacidad real del equipo | sostenibilidad del sistema |
-| 6 | **Naming visible** Think / Marketing con Manzanitas | heredada de `TASK-1802` |
+| 4 | ~~**Secuencia de apertura de canales**~~ **Cerrada 2026-10-22:** enero núcleo (LinkedIn, Instagram, blog, newsletter); febrero Threads y YouTube | — |
+| 5 | ~~**Cadencia comprometida por canal**~~ **Cerrada 2026-10-22** (ver delta, punto 6); se revisa contra capacidad real al 31-mar-2027 | — |
+| 6 | ~~**Naming visible** Think / Marketing con Manzanitas~~ **Cerrada 2026-10-22:** el público ve Marketing con Manzanitas; Think es nombre interno del hub y dominio de herramientas (delta, punto 12) | — |
 
 
 Recomendación de arranque registrada en sesión: partir por **Instagram (proceso + talking head)**,

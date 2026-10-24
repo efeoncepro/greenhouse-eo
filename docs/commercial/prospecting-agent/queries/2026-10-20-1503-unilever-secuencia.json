@@ -1,0 +1,215 @@
+{
+  "run_at": "2026-10-20T15:03:18.190078-03:00",
+  "timezone": "America/Santiago",
+  "scope": "HSP-0040 approved sequence5emails×3contacts",
+  "weekly_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-20T15:03:18.190078-03:00"
+  },
+  "discovery_queries": 0,
+  "coverage": "focusedMexicoCreativeContent;not20cellradar",
+  "queries": [
+    {
+      "tool": "MCP get_profile",
+      "query": "Outlook perfil",
+      "result": "Julio, correo conectado pertinente;PII privada",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "MCP search_messages",
+      "query": "dominio unilever.com",
+      "result": "una coincidenciaCrossbeam;sin conversación de los tres en esa búsqueda",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "CLI sequences enrollments",
+      "query": "3Contact [PIIredactada]",
+      "result": "tres lecturas sininscripciones;no ausencia global",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "MCP get_crm_objects",
+      "query": "3Contact, email/supresión/enrollment",
+      "result": "emailsexactos;camposrestricciónsinvalorretornado,no pruebaausencia",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "MCP search_crm_objects",
+      "query": "EMAIL asociados3Contact",
+      "result": "total0;repetido14:57 traspausa yantesnuevainscripción",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "CLI sequences --help/get",
+      "query": "get317473685;user75788512",
+      "result": "helpreadonly;getsinuseridrequirióargumento;getconuserid403OAuth,sinbypass",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "web.open",
+      "query": "https://efeoncepro.com/",
+      "result": "leído",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "web.click",
+      "query": "Contenido y creatividad y Portafolio desdehome",
+      "result": "AgenciaCreativav2leída;Portafoliotimeout",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "web.search",
+      "query": "site:efeoncepro.com marketing de contenidos social media agencia",
+      "result": "páginaespecíficaencontrada",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "web.open",
+      "query": "https://efeoncepro.com/servicio-marketing-de-contenidos/",
+      "result": "leído",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "web.open",
+      "query": "https://efeoncepro.com/agenda/",
+      "result": "timeoutlector;enlaceinstitucionalconservado,nodisponibilidadhoraafirmada",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "web.search",
+      "query": "site.gob.mx octubre2026 díasdescanso obligatorio27octubre",
+      "result": "extractooficial2026,otrosresultadosno usadosparaafirmaciones",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "web.open",
+      "query": "fuentePROFEDET2026 enlazadaenconsultasprivadas",
+      "result": "HTTP403",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "web.open/find/click",
+      "query": "HubSpot create-and-edit-sequences→edit-an-active-sequence",
+      "result": "leído;pasosnuevosrequierenunenroll+nuevaenrollment",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "CUA",
+      "query": "HubSpot317473685crear2templates/private/2steps",
+      "result": "inicial3Programado,Error0,12:00MX",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "CUA",
+      "query": "pausar3,cancelar3,ampliarmisma317473685a5steps",
+      "result": "pausada3→finished3;noEMAILsalienteslocalizados",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "CUA",
+      "query": "3templatesnuevos,personalizar5emails×3,nativeInsertDocuments",
+      "result": "15cuerpos,15brochures,nativegraphicdefaultsignature;PIIprivada",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "CUA",
+      "query": "nuevainscripción3desdepaso1,13:00MX20Oct",
+      "result": "Programado3/Pausada0/Finalizados3/Error0",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "CUA",
+      "query": "reabrirlas3inscripcionesguardadas",
+      "result": "calendario5fechashorascoincidente;guardar cambiosdisabled;cerrarsineditar",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    },
+    {
+      "tool": "CUA",
+      "query": "readbackAutomatizar317473685",
+      "result": "replyymeetingtodosloscontactosempresaACTIVADAS",
+      "country": "México",
+      "service": "creative/content",
+      "PII": "redacted; exact personal queries/readbacks inprivate dossier"
+    }
+  ],
+  "sequence_id": "317473685",
+  "schedule": [
+    {
+      "step": 1,
+      "mx": "2026-10-20T13:00:00-06:00",
+      "santiago": "2026-10-20T16:00:00-03:00"
+    },
+    {
+      "step": 2,
+      "mx": "2026-10-27T10:02:00-06:00",
+      "santiago": "2026-10-27T13:02:00-03:00"
+    },
+    {
+      "step": 3,
+      "mx": "2026-11-03T10:07:00-06:00",
+      "santiago": "2026-11-03T13:07:00-03:00"
+    },
+    {
+      "step": 4,
+      "mx": "2026-11-09T10:03:00-06:00",
+      "santiago": "2026-11-09T13:03:00-03:00"
+    },
+    {
+      "step": 5,
+      "mx": "2026-11-13T10:05:00-06:00",
+      "santiago": "2026-11-13T13:05:00-03:00"
+    }
+  ],
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1426-denis-unilever/secuencia-cinco-readback.json",
+  "approval": "explicit3recipients,initialsequenceandcorrection5touches",
+  "crm": "no newCRMobjects;native sequenceandlogging only",
+  "cost": {
+    "additional_credits": 0
+  },
+  "procurement_control": {
+    "result": "informalrecommendationrequest,formalbuyernotconfirmed",
+    "award_contract_calendar": "notverified,noabsenceasserted",
+    "source": "priorprimarypost;notrereadforthisexecution",
+    "last_checked_at": "2026-10-20T15:03:18.190078-03:00",
+    "block": "noformalprocurementfileidentified",
+    "open_bid_recommendation": false
+  }
+}

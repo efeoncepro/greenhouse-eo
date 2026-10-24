@@ -4,6 +4,14 @@ For Efeonce Contact, Company, Deal or Lead writes, load [property-inventory](pro
 The 2026-10-11 complete active dictionary and capture manual document actual names/enums, system writers
 and gaps in creation/stage requiredness; reconsult the relevant metadata before executing a changeset.
 
+## Adquisición Efeonce — separación conceptual aceptada19/10/2026
+
+Cargar [ADR](../../../../docs/architecture/EFEONCE_COMMERCIAL_ACQUISITION_TAXONOMY_DECISION_V1.md) y
+[transición](../../../../docs/manual-de-uso/hubspot/normalizar-origen-canales-adquisicion.md).
+Origen, canal, fuente, punto de conversión y creación CRM tienen grano/writer distintos. Apollo/CLI/MCP
+no se convierten en origen del comprador. Los tres campos Deal y168 traducciones son candidatos,
+no aplicados; no modificar schema/histórico sin consumidores y payload aprobados.
+
 ## Property decision contract
 
 For every requested field determine:
@@ -16,6 +24,7 @@ For every requested field determine:
 | Internal name       | stable, lowercase and implementation-safe                  |
 | Field type          | string, number, date, boolean, enumeration, owner, etc.    |
 | Options             | labels, internal values, ordering and deprecation policy   |
+| Human presentation  | option style, colors, readable labels and API/UI verification route; see [property-types](property-types.md#enumeration-colors-and-human-presentation) |
 | Source              | human, form, workflow, integration, calculated or imported |
 | Ownership           | who maintains quality and approves changes                 |
 | Requiredness        | stage/process where it becomes mandatory                   |

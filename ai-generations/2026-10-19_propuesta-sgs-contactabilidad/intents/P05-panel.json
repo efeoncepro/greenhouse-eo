@@ -1,0 +1,74 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "role": "content",
+  "recipe": "content-day-live-console",
+  "voice": {
+    "eyebrow": "Panel de contactabilidad",
+    "question": "¿Dónde lo verá la jefatura?",
+    "answer": [
+      "En su",
+      "panel"
+    ]
+  },
+  "body": "Efeonce Insights mostrará intentos, contactos y clientes sin contacto, por **cuenta**, canal y equipo.",
+  "console": {
+    "title": "Contactabilidad · equipo piloto",
+    "subtitle": "Correo · Llamadas · WhatsApp",
+    "sampleMark": "Datos de muestra",
+    "metrics": [
+      {
+        "value": "312",
+        "label": "Intentos",
+        "detail": "esta semana"
+      },
+      {
+        "value": "68 %",
+        "label": "Con contacto",
+        "detail": "de los intentos"
+      },
+      {
+        "value": "14",
+        "label": "Sin contacto",
+        "detail": "hace 30 días o más"
+      }
+    ],
+    "checks": [
+      {
+        "label": "Clientes clave contactados este mes",
+        "status": "Al día",
+        "done": true
+      },
+      {
+        "label": "Seguimiento de cotizaciones abiertas",
+        "status": "Al día",
+        "done": true
+      },
+      {
+        "label": "Ejecutivos con número de empresa",
+        "status": "11 de 12",
+        "done": false
+      },
+      {
+        "label": "Cuentas sin contacto en 30 días",
+        "status": "14 por revisar",
+        "done": false
+      }
+    ],
+    "review": {
+      "kicker": "Revisión semanal",
+      "title": "Lunes 9:00 · 30 min con las jefaturas",
+      "cta": "Ver panel"
+    }
+  },
+  "selection": {
+    "target": "object",
+    "label": "Jefatura",
+    "participantKind": "role"
+  },
+  "line": "revenue-salesforce"
+}

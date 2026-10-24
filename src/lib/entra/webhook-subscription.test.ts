@@ -7,7 +7,7 @@ vi.mock('@/lib/secrets/secret-manager', () => ({ resolveSecret: vi.fn() }))
 const { resolveNotificationUrl } = await import('./webhook-subscription')
 
 describe('resolveNotificationUrl — env-aware URL resolution (ISSUE-075)', () => {
-  const baseEnv = {} as NodeJS.ProcessEnv
+  const baseEnv = {}
 
   afterEach(() => {
     vi.clearAllMocks()

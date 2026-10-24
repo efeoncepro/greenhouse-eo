@@ -1,9 +1,9 @@
 # Efeonce Insights — Registro de implementación y despliegue (TASK-1845)
 
 > **Tipo de documento:** Registro de implementación y despliegue
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-09-15 por Claude
-> **Ultima actualizacion:** 2026-10-03 por Claude (1.7: §8.ac y fila de §10 con TASK-1974 + TASK-1975, code complete y rollout pendiente. 1.6: la página del Lab de AXIS `/references/insights/` quedó publicada el 2026-09-28, AXIS main `3dfbf0e` (§8.ab). 1.5: Think en producción en `544ecd4` —filas `b3c5820` y `544ecd4` en §8.ab—, página del Lab pendiente de publicar (publicada el mismo día, 1.6), decisión abierta sobre el acento de «INSIGHTS» en las portadas navy, fila de §11 con sharing ON. 1.4: §8.ab marca de producto Insights, su aplicación en Think y la página del Lab; filas de §10 y §11 con TASK-1875 en producción. Antes, 2026-09-26: §6.3, §8.aa y fila de §10: TASK-1888 en producción)
+> **Ultima actualizacion:** 2026-10-23 por Claude (1.8: §8.ad y fila de §10 con el catálogo A4 premium para informes no-Insights —hallazgos, escenarios, `productLabel`, tendencia anotada, guarda del pie y `pnpm report:compose`—, commit `001683d83` en `develop` local. 1.7: §8.ac y fila de §10 con TASK-1974 + TASK-1975, code complete y rollout pendiente. 1.6: la página del Lab de AXIS `/references/insights/` quedó publicada el 2026-09-28, AXIS main `3dfbf0e` (§8.ab). 1.5: Think en producción en `544ecd4` —filas `b3c5820` y `544ecd4` en §8.ab—, página del Lab pendiente de publicar (publicada el mismo día, 1.6), decisión abierta sobre el acento de «INSIGHTS» en las portadas navy, fila de §11 con sharing ON. 1.4: §8.ab marca de producto Insights, su aplicación en Think y la página del Lab; filas de §10 y §11 con TASK-1875 en producción. Antes, 2026-09-26: §6.3, §8.aa y fila de §10: TASK-1888 en producción)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · ADR [EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md)
 > **Task:** [TASK-1845](../tasks/complete/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) (EPIC-045)
 
@@ -790,6 +790,29 @@ arquitectura §14.12 y §15; criterio [`EFEONCE_INSIGHTS_CHART_SELECTION_CRITERI
 --catalog=insights` 37 frames a 0 px; vista previa real de septiembre 2026 (Berel 22 + 18, Sky 10 + 8). Dona y apiladas
 sin datos GA4 reales. `pnpm test` completo y `pnpm build` **no corridos** (gate de cierre pendiente).
 
+### 8.ad Catálogo A4 premium para informes no-Insights (2026-10-23, `develop` local)
+
+Fuente: commit `001683d83` («informe A4 premium para auditorías + auditoría SEO del Blog SKY»), sin push al
+2026-10-23; arquitectura §6.2.1; `BASELINE_DELTAS.md` sección (ab).
+
+| Archivo | Responsabilidad nueva |
+|---|---|
+| `catalogs/insights-report/report-findings.{html,slots.json}` | `ReportFindingsPage`: hallazgos (1–6) con severidad por rol y etiqueta de texto, evidencia, responsable y aviso urgente opcional |
+| `catalogs/insights-report/report-scenarios.{html,slots.json}` | `ReportScenariosPage`: figura de escenarios por período y tarjetas con el mismo orden de roles |
+| `catalogs/insights-shared/figure-scenarios.ts` (nuevo) | `makeScenariosHook` / `REPORT_SCENARIOS_BOX`: columnas desde la cifra impresa, referencia discontinua, 2–4 períodos, 1–3 escenarios con rol único; falla si tarjetas y figura no declaran los mismos roles en el mismo orden |
+| `catalogs/insights-report/resolvers.ts` | `report-severity` (`finding--<severidad>`) y `report-scenario-role` (`scenario--<rol>`) |
+| `catalogs/insights-shared/figure-svg.ts`, `report-editorial.css`, `report-figure-trend.slots.json` | `lineAnnotations.bands[]`, `events[]` y `pointLabels[]` (con fallas cerradas por etapa fuera del eje o superpuesta, hito fuera del eje y punto sin dato) |
+| `catalogs/insights-shared/layout-hooks.ts`, `catalogs/insights-report/index.ts` | `paperFootClearanceHook` (margen `PAPER_FOOT_CLEARANCE_PX` = 4) y `withPaperFootGuard`, aplicado a todas las plantillas de `registry.json` |
+| `report-cover{,-light}.{html,slots.json}`, `report-chapter.{html,slots.json}` | Slot `productLabel` (requerido, ≤ 24 caracteres) en lugar de «Insights» fijo |
+| `src/lib/efeonce-insights/render/report-mapper.ts` | Declara `productLabel` en portada y aperturas con el copy de Insights |
+| `scripts/artifact-composer/compose-report.ts` + `package.json` | `pnpm report:compose <plan.json> [--out <dir>] [--asset <clave>=<archivo>]` |
+| `scripts/seo/sky-blog-audit-report.ts` | Primer consumidor: genera el plan de la auditoría SEO del Blog SKY (23 páginas) |
+
+**Verificación (local, declarada en el commit).** Suite composer + Insights 798 tests verdes; `pnpm insights:canvas-fidelity`
+30 páginas ≤ 1 % y `Deck-Agrupadas` en su excepción; `pnpm composer:color-ledger` 0 sin mapping; `pnpm composer:visual-gate
+--catalog=insights` 39 frames a 0 px (2 nuevos: `templates-insights-report/Report{Findings,Scenarios}Page.png`). `pnpm test`
+completo y `pnpm build` no declarados.
+
 ## 9. Verificación realizada
 
 | Capa | Evidencia | Fuente |
@@ -836,6 +859,7 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Vercel staging + Production + `ops-worker` (TASK-1888, 2026-09-26) | contrato editorial v2 (release `0e87c7a443a2`, luego `f9257b9c94af`) + `INSIGHTS_EDITORIAL_V2_ENABLED=true` en los dos runtimes lectores; gateway `efeonce-mcp` v1.9.0 | **En producción, flag ON**; canary de producción selló plan v2 (`insed-f5768172…`); emisión, enlaces y envío siguen OFF | §8.aa |
 | Think (`efeonce-think` `main`) + Vercel Production (TASK-1875, 2026-09-28) | informe live `/insights/r/<token>`, muestra `/insights/muestra`, lockup y OG de Insights; `INSIGHTS_SHARING_ENABLED=true` en Production (redeploy `greenhouse-cssemzyzb`); WAF con la excepción `x-efeonce-think-key` | **En producción** (`544ecd4`); canary sobre `EO-INS-000014` verde (crear, leer, descargar, revocar ⇒ 410); producción sirve el modelo 1.0, el 1.1 en staging | §8.ab; arquitectura §14.10 |
 | `develop` local de greenhouse-eo + `main` local de Think y AXIS (TASK-1974 + TASK-1975, 2026-10-03) | criterio de selección, tarjeta de cifra, páginas PDF/deck de cascada, waffle, dona y apiladas, modelo web 1.4, tokens y contrato AXIS 0.3.42 | **Code complete, rollout pendiente**: nada empujado; orden AXIS (push + tag) → Think (push) → Greenhouse (develop → staging → release); dona y apiladas sin verificar con GA4 real | §8.ac; arquitectura §14.12 |
+| `develop` local de greenhouse-eo (2026-10-23) | catálogo A4 premium para informes no-Insights: `report-findings`, `report-scenarios`, `productLabel`, tendencia anotada, guarda del pie, `pnpm report:compose` | **Code complete, sin push**; sin flag (cambio de render). El mapper de Insights ya declara `productLabel`, así que el render de producción no cambia de aspecto al promoverse | §8.ad; arquitectura §6.2.1 |
 | Ledgers | `FEATURE_FLAG_STATE_LEDGER.md` (3 filas + snapshot), `PRODUCTION_RELEASE_TIMING_LEDGER.md` (fila del release) | Al día | líneas 249–251, 383–385; línea 78 |
 
 ---

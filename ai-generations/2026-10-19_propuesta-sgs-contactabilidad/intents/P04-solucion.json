@@ -1,0 +1,55 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Nuestra propuesta · Trazabilidad",
+    "question": "¿Seguirán anotando a mano?",
+    "answer": [
+      "Ya no"
+    ]
+  },
+  "body": "Proponemos que correo, llamadas y WhatsApp queden solos en la ficha de Salesforce, en etapas que al inicio no la tocan.",
+  "steps": [
+    {
+      "glyph": "checklist",
+      "kicker": "Semanas 1 a 4",
+      "name": "Diagnóstico y correo"
+    },
+    {
+      "glyph": "llamada",
+      "kicker": "Semanas 5 a 16",
+      "name": "Piloto en Chile"
+    },
+    {
+      "glyph": "crm",
+      "kicker": "Tras decidir",
+      "name": "Conexión a Salesforce"
+    },
+    {
+      "glyph": "informe",
+      "kicker": "Mensual",
+      "name": "Operación"
+    }
+  ],
+  "note": "Sin grabación: se registrará el contacto, no el contenido.",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF1-nexa-conexion.png",
+    "alt": "Nexa, con la chaqueta navy de Efeonce, mira a cámara y sostiene sobre la palma un anillo de luz celeste en el que se trenzan haces de partículas"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Comercial",
+    "participantKind": "department",
+    "anchor": "bottom-end"
+  },
+  "line": "revenue-salesforce"
+}

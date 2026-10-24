@@ -6,6 +6,11 @@ Caso creativo completo: [Fiestas Patrias](../../../../docs/operations/social/202
 
 ## 1. Cerrar el paquete antes de programar
 
+**Control previo de una pieza con sonido en grilla:** `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues
+audio-cues.json --measure-only`. Sin Gemini, en menos de 1 s, confirma silencios, golpes y picos de la grilla, la
+sincronía y la ausencia de cuadros congelados; un código 2 bloquea la entrega hasta revisar (manual
+`docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`).
+
 Identificar por red el video aprobado, portada, copy y fecha. Una adaptación 9:16 tiene composición,
 acción y zonas de texto propias: si el usuario exige una adaptación real, producir el video vertical;
 no completar un 4:5 con bandas, relleno de color o un fondo difuminado para llamarlo Reel nativo.
@@ -210,6 +215,86 @@ corrida, no valores por defecto: resolver marca y cuentas con `getBrandSettings`
 Naming en el copy: la marca que habla es **Efeonce** y el servicio se escribe **«Efeonce | AEO»**. El video del caso
 dice «Efeonce AEO» en voz y subtítulos quemados y no se re-renderizó; la corrección vive en los copies.
 
+### Receta: video 4:5 en LinkedIn + Reel 9:16 en Instagram con portada propia y menciones (2026-10-19)
+
+Caso: anuncio «Efeonce | Google — Oficialmente partners». Bitácora:
+`docs/operations/social/2026-10-19-google-partner-announcement-production-method.md`. Estado al documentar:
+**programado** (`PENDING`), no publicado; menciones aceptadas por API pero sin verificar en el post publicado. Los IDs
+son evidencia de esa corrida, no valores por defecto.
+
+| Red | Marca | Hora Chile (20-10-2026) | ID | Forma |
+|---|---|---|---|---|
+| LinkedIn página Efeonce (`urn:li:organization:20503593`) | `3961547` | 11:00 | `400571153` | video 4:5 1080×1350, `linkedinData.previewIncluded:false` |
+| Instagram `efeoncepro` | `3961547` | 11:00 | `400571274` | `REEL` 9:16 1080×1920, `showReelOnFeed:true`, `isAiGenerated:true` |
+| LinkedIn personal de Julio | `5105024` | 11:30 | `400580359` | mismo video 4:5 y portada, 30 min después del de la página |
+
+1. **Una llamada a `createScheduledPost` por red.** Cada post lleva su MP4 en `media` y su portada en
+   **`videoThumbnailUrl`** (nunca como segundo elemento de `media`), con `autoPublish:true`. En Instagram:
+   `instagramData:{type:"REEL", showReelOnFeed:true, isAiGenerated:true}` cuando el arte es generado.
+2. **Portada con la misma proporción del video en cada red** (specs abajo). LinkedIn 4:5 → portada 4:5; Reel 9:16 →
+   portada 9:16 diseñada para sobrevivir el recorte 3:4 de la grilla.
+3. **Transporte:** `gs://efeonce-group-greenhouse-public-media-prod/campaigns/2026-10-google-partner/` con nombres
+   versionados `…-v1.{mp4,jpg}` y HTTP 200 por URL antes de programar. Con `gcloud` vencido,
+   `pnpm gcloud:auth:playwright -- --force`.
+4. **Menciones en el texto** con los IDs de la tabla de la sección «Menciones» (Google, Google Cloud, Ingram Micro).
+5. **`videoThumbnailUrl` aceptado no significa portada publicada** (caso ChatGPT Ads, 22-10-2026). Metricool aceptó la
+   portada PNG en los cuatro posts y la devolvió en el readback. Aun así, el operador vio el Reel de Instagram sin
+   portada: Instagram mostró el cuadro 0, que era casi negro porque el video abría con un fundido. En LinkedIn también
+   faltó, aunque allí pesa menos. Reglas:
+   - El **cuadro 0 del video tiene que funcionar como portada** (hook ya visible, sin fundido desde negro). Así, si la red
+     ignora la portada, el feed no queda vacío.
+   - **Revisa la portada en la cuenta publicada** apenas salga el post. El `PENDING` y el readback no la prueban.
+   - Si falta en un Reel ya publicado, se cambia desde la app de Instagram (editar el Reel → portada) con el PNG de la
+     pieza. Hacerlo es tarea del operador; borrar y republicar sólo se hace con su aprobación.
+6. **Desvío a no repetir:** las portadas se subieron en JPG sin un rechazo observado. Por la regla dura de §3, la
+   próxima vez van en PNG (el PNG 4:5 del caso pesaba 1,29 MB, bajo el límite de 2 MB de LinkedIn).
+
+**Specs de portada de video** *(as-of 2026-10-19; guías de terceros, ni Meta ni LinkedIn las confirmaron
+oficialmente; las guías no coinciden en las zonas seguras exactas, así que todo lo importante va al centro)*:
+
+| Red | Video | Portada | Recortes que debe sobrevivir |
+|---|---|---|---|
+| Instagram Reel | 9:16, 1080×1920 | 1080×1920 | grilla del perfil 3:4 (1080×1440: 240 px menos arriba y abajo); feed 4:5 |
+| LinkedIn video | 4:5, 1080×1350 | misma proporción del video, JPG o PNG de menos de 2 MB | — |
+
+Fuentes en [SOURCES.md](../SOURCES.md) §«Portadas de video y menciones».
+
+### Serie «Efeonce | Partner»: un anuncio por partner (calendario al 2026-10-21)
+
+La receta de arriba se repite una vez por partner. Cada pieza tiene su método en `docs/operations/social/`; el más
+completo es el de AWS
+([método](../../../../docs/operations/social/2026-10-21-aws-partner-announcement-production-method.md)). Estados al
+documentar; `PENDING` ≠ publicado, releer por ID después de la hora.
+
+| Partner | Fecha | Estado al 2026-10-21 | IDs (LI Efeonce / LI Julio / IG) |
+|---|---|---|---|
+| Google | 20-10 | publicado | ver receta de arriba |
+| BytePlus | 29-10 | programado | en su método |
+| Adobe | 05-11 | programado | en su método |
+| Claude | 19-11 | programado | `402024265` / `402024305` / `402024348` |
+| OpenAI | 26-11 | programado | en su método |
+| AWS | 03-12 | programado, **condicionado** a que Licencias OnLine confirme que AWS ya se transacciona (si no, reprogramar o pausar) | `402111783` / `402111851` / `402111909` |
+| Microsoft | 10-12 | programado; confirmar antes con Licencias OnLine que Dynamics 365 se transacciona por CSP (si no, sacarlo del copy) | `402061083` / `402061135` / `402061180` |
+
+- **La pieza sale del mundo visual de ESE partner** (regla del operador), no de una estética genérica: Microsoft,
+  glasmorfismo Fluent (no un «vidrio» cliché); AWS, el diagrama de arquitectura que se vuelve infraestructura y planeta.
+  Los íconos de producto del tercero van en grises modelados (Microsoft) o en sus colores oficiales cuando el cierre
+  repite el diagrama (AWS). Marca del tercero: `efeonce-graphic-line` → criteria.md §«Anuncios de alianza».
+- **Trilogía cloud:** Google (íconos en profundidad) → AWS (oscuro, metálico, luz naranja) → Microsoft (glasmorfismo
+  claro, escala). El copy de Efeonce de AWS cierra con «Y pronto, una tercera» y el de Microsoft nombra «Google Cloud,
+  AWS y Microsoft Azure»: ambos suponen ese orden. Si una pieza se mueve, revisar el copy de las otras.
+- **Tres copies por pieza:** LinkedIn de la página Efeonce, LinkedIn personal de Julio (menciona a Efeonce) e
+  Instagram, cada uno con sus menciones.
+- **Horarios de la serie** (Metricool, `autoPublish:true`, `America/Santiago`): LinkedIn Efeonce **11:00**, LinkedIn
+  Julio **11:30**, Instagram Reel **14:00** e **historia de Instagram 14:30** con el mismo video 9:16 (`instagramData.type: "STORY"`, `text: ""`: con texto Metricool responde `INSTAGRAM:TEXT_NOT_ALLOWED` cuando Instagram es la única red; se agregaron el 21-10 para BytePlus, Adobe, Claude, OpenAI, AWS y Microsoft). Google fue la excepción (Instagram a las 11:00, receta de arriba). Antes
+  de programar, revisar la cola de ese día por marca.
+- **Portadas:** PNG del último cuadro del lockup, comprimido con `sharp` (paleta, quality 92).
+- **Media pública:** `gs://efeonce-group-greenhouse-public-media-prod/campaigns/<aaaa-mm>-<partner>-partner/`. Verificar
+  HTTP 200 por URL y, después de programar, que los archivos que guardó Metricool **pesan lo mismo en bytes** que el
+  original (AWS: los seis archivos, tres videos y tres portadas, iguales byte a byte el 21-10). Si el peso no coincide,
+  comparar SHA-256 y, si tampoco coincide, la firma de imagen del 2026-09-19 (arriba) antes de suponer un archivo
+  equivocado.
+
 ## 4. Readback, evidencia y cierre
 
 La respuesta de creación no cierra la tarea. Leer nuevamente `getScheduledPosts` y comprobar por ID:
@@ -244,8 +329,29 @@ Conservar el ratio pedido; REEL con un MP4 4:5 no se documenta como un master 9:
 
 - LinkedIn: resolver primero el URN de organización y nombre exacto. La sintaxis documentada por Metricool es
   `@[urn:li:organization:ID|Nombre]`; Efeonce se verificó como `@[urn:li:organization:20503593|Efeonce]`.
-- Instagram: la mención usa el handle, `@efeoncepro`, no el nombre de presentación.
-- Fuente oficial, revisada 22/09/2026: https://help.metricool.com/mention-and-tag-other-accounts-9jqzi.
+- IDs de organización obtenidos del HTML público de LinkedIn el 2026-10-19 (el nombre distingue mayúsculas; el
+  formato se usó por API en el post `400571153`, aunque Metricool lo documenta para programación por CSV):
+
+  | Página | Mención |
+  |---|---|
+  | Efeonce | `@[urn:li:organization:20503593\|Efeonce]` |
+  | Google | `@[urn:li:organization:1441\|Google]` |
+  | Google Cloud | `@[urn:li:organization:3648281\|Google Cloud]` |
+  | Ingram Micro (página global; no existe una de Ingram Micro Chile) | `@[urn:li:organization:2576\|Ingram Micro]` |
+
+  Agregados el 2026-10-21 para la serie de partners (ID de organización; la mención lleva el nombre exacto de la
+  página): Amazon Web Services (AWS) `2382910` (leído de la página pública), Licencias OnLine `2453600`, Microsoft
+  `1035`, Microsoft Azure `96411081`.
+
+- Instagram: la mención usa el handle, `@efeoncepro`, no el nombre de presentación. Verificadas como cuentas oficiales
+  conocidas: `@google` y `@googlecloud`. `@ingrammicro` **no se pudo verificar** (Instagram bloquea las consultas
+  automáticas); el operador decidió usarlo igual el 2026-10-19.
+- **El handle de Instagram de un partner se verifica en el enlace oficial de su sitio** (pie o encabezado), porque la
+  API pública de Instagram y su HTML no responden a `curl`. Caso 2026-10-21: el oficial de AWS es
+  `@amazonwebservices` (enlace del pie de aws.amazon.com), **no** `@awscloud`, que es su cuenta de X/Twitter y fue el
+  que puso el borrador. Usados en la serie: `@amazonwebservices`, `@licenciasonline`, `@microsoft`, `@microsoftazure`.
+- Fuente oficial, revisada 22/09/2026: https://help.metricool.com/mention-and-tag-other-accounts-9jqzi (versión
+  citada el 19/10/2026: https://help.metricool.com/en/article/mention-and-tag-other-accounts-tl3osr).
   La sintaxis documentada y preservada en readback no acredita por sí sola el enlace en el post publicado.
 - Copy aprobado: preservar literalmente salvo cambios pedidos; registrar URL exacta, no añadir UTMs en silencio.
   Un URL en caption no prueba un enlace clicable en Instagram ni autoriza cambiar la bio.

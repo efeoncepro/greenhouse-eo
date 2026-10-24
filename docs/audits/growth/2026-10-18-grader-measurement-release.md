@@ -1,6 +1,8 @@
 # Grader y clasificación administrativa — verificación 18/10/2026
 
-Estado: operador reautorizó promover todo develop; candidato en validación, publicación productiva pendiente. [Contrato dueño](../../architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
+Estado actual: todo develop promovido a main2559e9242, Vercel READY y canarios negativos PASS.
+Manifest released y orquestador39190761785 SUCCESS; health200/watchdog6/6 drift0.
+[Cierre productivo](../releases/2026-10-18-grader-commercial-measurement-production-release.md). [Contrato dueño](../../architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
 
 - GET Think y render público:200; key/surface/version8 y handoff del informe confirmados. El frontend vigente usa Forms portátil.
 - GET catálogo/políticas23:06:29Z:13 formularios y Discovery con Ads; Contacto/ebooks fueraAds; heads/destinos preservados.

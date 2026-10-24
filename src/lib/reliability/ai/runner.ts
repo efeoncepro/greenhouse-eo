@@ -23,6 +23,8 @@ import {
   recordAiObservation
 } from './persist'
 
+import type { EnvSource } from '@/types/env-source'
+
 /**
  * TASK-638 — Runner del AI Observer (host-agnostic).
  *
@@ -111,7 +113,7 @@ export interface AiSweepResult {
 
 interface RunAiObserverArgs {
   triggeredBy?: AiSweepTriggerSource
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 
   /** override para tests: snapshot precargado, evita doble fetch */
   preloadedOverview?: ReliabilityOverview

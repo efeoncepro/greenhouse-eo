@@ -20,12 +20,15 @@ import {
   type FormKind,
   type PublicSubmitInput,
   type PublicSubmitResult,
+  type RegistrationStatus,
   type RiskProfile,
+  REGISTRATION_STATUSES,
   fieldDefinitionSchema,
   publicSubmitInputSchema,
+  resolveEventRegistrationPolicy,
 } from './contracts'
 import { mintEmbedKey, verifyEmbedKeySecret } from './embed-key'
-import { dedupeFingerprint } from './hash'
+import { dedupeFingerprint, inlinePillNoticeHash } from './hash'
 import { type InsertableFormCatalogEntryVm, listInsertableFormCatalog } from './readers'
 import {
   isFormsPiiEncryptionEnabled,
@@ -50,6 +53,7 @@ import {
   turnstileCaptchaVerifier,
 } from '@/lib/growth/public-submission'
 import {
+  EventCapacityFullError,
   type FormDestinationRow,
   type FormVersionRow,
   archiveFormDefinition,
@@ -362,6 +366,31 @@ export const revalidateAndNormalizeFields = (
   return { ok: true, normalizedFields: normalized }
 }
 
+/**
+ * TASK-2053 — Impone el `staticValue` de los campos `hidden` que lo declaran: el valor del contrato
+ * gana siempre sobre lo que mande el navegador (que podría omitirlo o falsificarlo). Pura y sin I/O.
+ */
+export const applyStaticFieldValues = (
+  fieldDefs: FieldDefinition[],
+  rawFields: PublicSubmitInput['fields'],
+): PublicSubmitInput['fields'] => {
+  const out: PublicSubmitInput['fields'] = { ...rawFields }
+
+  for (const field of fieldDefs) {
+    if (field.type === 'hidden' && field.staticValue !== undefined) out[field.key] = field.staticValue
+  }
+
+  return out
+}
+
+const readRegistrationStatus = (fields: unknown, statusField: string): RegistrationStatus | undefined => {
+  const value = fields && typeof fields === 'object' ? (fields as Record<string, unknown>)[statusField] : undefined
+
+  return typeof value === 'string' && (REGISTRATION_STATUSES as readonly string[]).includes(value)
+    ? (value as RegistrationStatus)
+    : undefined
+}
+
 export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitContext): Promise<PublicSubmitResult> => {
   const parsed = publicSubmitInputSchema.safeParse(rawInput)
 
@@ -425,11 +454,14 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
   // y el cifrado de national_id (TASK-1255).
   const parsedFieldDefs = z.array(fieldDefinitionSchema).safeParse(version.field_schema_json)
 
-  let normalizedFields: Record<string, unknown> = { ...input.fields }
+  // TASK-2053 — valores fijos del contrato (p.ej. la identificación del evento) antes de validar.
+  const submittedFields = parsedFieldDefs.success ? applyStaticFieldValues(parsedFieldDefs.data, input.fields) : input.fields
+
+  let normalizedFields: Record<string, unknown> = { ...submittedFields }
 
   if (isFormsServerValidationEnabled()) {
     if (parsedFieldDefs.success) {
-      const revalidated = revalidateAndNormalizeFields(parsedFieldDefs.data, input.fields)
+      const revalidated = revalidateAndNormalizeFields(parsedFieldDefs.data, submittedFields)
 
       if (!revalidated.ok) return { outcome: 'invalid', reason: 'Revisa los datos del formulario.' }
 
@@ -511,7 +543,19 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
   const fingerprint = dedupeFingerprint(version.form_id, [emailRaw, input.formSlug])
   const duplicate = await findRecentDuplicate(version.form_id, fingerprint)
 
-  if (duplicate) return { outcome: 'accepted', submissionId: duplicate.submission_id, reason: 'dedupe (submission previa)' }
+  // TASK-2053 — política de reserva del evento (cupos + lista de espera). `null` = como hoy.
+  const eventPolicy = resolveEventRegistrationPolicy(definition.form_kind, version.ui_policy_json)
+
+  if (duplicate) {
+    const duplicateStatus = eventPolicy ? readRegistrationStatus(duplicate.normalized_fields_json, eventPolicy.statusField) : undefined
+
+    return {
+      outcome: 'accepted',
+      submissionId: duplicate.submission_id,
+      reason: 'dedupe (submission previa)',
+      ...(duplicateStatus ? { registrationStatus: duplicateStatus } : {}),
+    }
+  }
 
   const hasUploadedFiles = Object.keys(context.uploadedFiles ?? {}).length > 0
   const hasFileFields = parsedFieldDefs.success && parsedFieldDefs.data.some(field => field.type === 'file')
@@ -554,7 +598,13 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     requestGlobalPrivacyControl: context.requestGlobalPrivacyControl,
   })
 
-  const submission = await persistAcceptedSubmission({
+  let submission: Awaited<ReturnType<typeof persistAcceptedSubmission>>
+
+  try {
+    submission = await persistAcceptedSubmission({
+    eventRegistration: eventPolicy
+      ? { capacity: eventPolicy.capacity, overCapacity: eventPolicy.overCapacity, statusField: eventPolicy.statusField }
+      : null,
     measurement,
     formId: version.form_id,
     formVersionId: version.form_version_id,
@@ -572,12 +622,32 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     consent: {
       consentPolicyVersion: version.consent_policy_version ?? 'unspecified',
       checkboxes: input.consentCheckboxes,
+      noticeTextHash: inlinePillNoticeHash(version.ui_policy_json),
     },
   })
+  } catch (error) {
+    if (!(error instanceof EventCapacityFullError)) throw error
+
+    // Cupo lleno con política `reject`: la transacción se revirtió entera (nada quedó persistido).
+    await insertRejectedSubmission({
+      formId: version.form_id,
+      formVersionId: version.form_version_id,
+      surfaceId,
+      reasonClass: 'capacity_full',
+      requestId: context.requestId ?? null,
+    }).catch(persistError => captureWithDomain(persistError, 'growth', { extra: { stage: 'capacity_full_rejection_persist' } }))
+
+    return { outcome: 'capacity_full', reason: 'Ya no quedan cupos para este evento.' }
+  }
 
   const googleAdsConversion = publishedGoogleAdsReceipt(measurement?.googleAdsConversion, submission.measurementPersisted)
 
-  return { outcome: 'accepted', submissionId: submission.submission_id, ...(googleAdsConversion ? { googleAdsConversion } : {}) }
+  return {
+    outcome: 'accepted',
+    submissionId: submission.submission_id,
+    ...(submission.registrationStatus ? { registrationStatus: submission.registrationStatus } : {}),
+    ...(googleAdsConversion ? { googleAdsConversion } : {}),
+  }
 }
 
 /** Registra un rechazo explícito (para paths que ya resolvieron la versión). */

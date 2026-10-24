@@ -189,6 +189,11 @@ with a regex redirect. The platform fix is the versioned mu-plugin
 plain option and keeps the query. Check whether it is installed before assuming
 UTM behavior. Diagnosis and rollout:
 `docs/public-site/YOAST_REDIRECT_QUERY_STRING_DIAGNOSIS_V1.md`.
+Measured 2026-10-22 (`/servicios/hubspot` 302): the passthrough keeps the query only on a cache **MISS/BYPASS**. Once
+Kinsta caches the redirect, a `utm_*` request is served the cached `Location` without its query (Kinsta ignores
+`utm_*` in the cache key), so UTMs are lost through a cached redirect. Campaign links must point at the final URL,
+never at a redirect origin. Also, after `wp kinsta cache purge --all` the edge kept the old response for a few
+minutes: verify the slash, no-slash and UTM variants again until all three show the new `Location`.
 
 Chains: before creating a redirect, search for existing redirects whose
 *target* is the retiring URL and repoint them. After any retirement, run

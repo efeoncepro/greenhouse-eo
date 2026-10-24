@@ -150,6 +150,12 @@ dirección desde un patrón ni usar un buzón general o personal como correo ind
 validación del proveedor y entregabilidad son hechos distintos; conservar contradicciones y resolverlas antes
 de tratar el canal como accionable.
 
+Ésta es la admisión general. La [excepción individual informada ya documentada](EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md#delta-de-operación-documentado--21102026)
+requiere autorización expresa para la persona, dirección y acciones concretas, conservando `inferida` y calidad
+pendiente en la nota; no convierte el patrón en verificación ni habilita otras altas o envíos. El
+[caso Fundación Luz](../commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md) aplica esa excepción
+a Contact + correo, sin secuencia ni cambio de schema o filtros.
+
 Si el objetivo no tiene correo, conservar su identidad y señal en el expediente de investigación o en una
 nota de la empresa, sin crear Contact/Lead para esa persona, y continuar por los contactos adyacentes. Apollo
 `emails: []` detiene el alta de esa persona, no la investigación de la cuenta. Un buzón compartido puede quedar
@@ -256,3 +262,9 @@ Sin cambio de schema ni de segmentos. [Origen](../audits/commercial/2026-10-12-p
 Cambie la granularidad de cohortes, se requiera ingestión programada o sincronización cross-object, o un campo
 existente pase a representar exactamente estos hechos. Automatización de ingestión y cambios de canal requieren
 su propia autorización; esta decisión sólo configura clasificación y selección nativa activa.
+
+### Evidencia de aplicación sin cambio de decisión — 2026-10-22
+
+[Kibernum: intake focalizado y seis membresías del Contact verificadas](../commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md).
+Se reutilizó Company y se confirmaron Primary, industria/país y fecha de investigación en ambos objetos.
+No se cambiaron schema, filtros, cohortes históricas ni autoridad; encaje CRM separado de solicitud Growth.

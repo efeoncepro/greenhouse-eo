@@ -29,6 +29,8 @@ import {
 import { listEtvLabsFamilies, resolveEtvLabsFamilyBySlug, type EtvLabsFamilySlug } from './families'
 import { buildEtvMethodologyRequest, resolveEtvHistoricalCalculationBasis, type EtvMethodologyRequest } from './policy'
 
+import type { EnvSource } from '@/types/env-source'
+
 // ─── Gate / configuración ───────────────────────────────────────────────────────────────────
 
 /** Flag del evaluador. Default OFF. Dual-runtime (la ejecución pagada puede correr en cualquiera). */
@@ -55,7 +57,7 @@ const toNonNegative = (value: string | undefined, fallback: number): number => {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
 }
 
-export const resolveEtvEvaluatorConfig = (env: NodeJS.ProcessEnv = process.env): EtvEvaluatorConfig => ({
+export const resolveEtvEvaluatorConfig = (env: EnvSource = process.env): EtvEvaluatorConfig => ({
   enabled: isTrue(env[GROWTH_SEO_ETV_EVALUATOR_FLAG]),
   subjectAllowlist: (env[GROWTH_SEO_ETV_EVALUATOR_SUBJECT_ALLOWLIST_KNOB] ?? '')
     .split(',')
@@ -153,7 +155,7 @@ export const planEtvEvaluation = (input: {
   cells: readonly EtvEvaluationCell[]
   mode: EtvEvaluationMode
   config: EtvEvaluatorConfig
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   now?: Date
 }): EtvEvaluationPlan => {
   const now = input.now ?? new Date()

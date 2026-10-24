@@ -126,6 +126,11 @@ npx hyperframes render --docker                       # byte-identical
 
 **Quality guidance:** `draft` while iterating, `standard` for review, `high` for final delivery.
 
+**QA del MP4 con sonido o animación (repo Greenhouse):** antes de mostrar el render, corre el control estándar sin
+Gemini: `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json`
+(código 2 si una cue no se confirma). Gemini va después, opcional y siempre con `--verify`. Manual:
+`docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`.
+
 ## Transcription
 
 ```bash

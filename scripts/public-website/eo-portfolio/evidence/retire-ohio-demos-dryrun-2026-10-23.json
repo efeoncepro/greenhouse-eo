@@ -1,0 +1,661 @@
+{
+  "summary": {
+    "dryRun": true,
+    "demo": 44,
+    "redirectsCreate": 44,
+    "draftsMove": 44,
+    "commentsClose": 59,
+    "realUntouchedStatus": 15
+  },
+  "plan": [
+    {
+      "id": 78,
+      "slug": "minimal-shop",
+      "origin": "project/minimal-shop",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 79,
+      "slug": "creative-agency",
+      "origin": "project/creative-agency",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 80,
+      "slug": "minimal-blog",
+      "origin": "project/minimal-blog",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 96,
+      "slug": "cloud-service",
+      "origin": "project/cloud-service",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 97,
+      "slug": "showcase-slider",
+      "origin": "project/showcase-slider",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 98,
+      "slug": "design-bureau",
+      "origin": "project/design-bureau",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 99,
+      "slug": "personal-blog",
+      "origin": "project/personal-blog",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 100,
+      "slug": "digital-agency",
+      "origin": "project/digital-agency",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 101,
+      "slug": "corporate",
+      "origin": "project/corporate",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 18271,
+      "slug": "unique-bowls-from-the-south-pacific",
+      "origin": "project/unique-bowls-from-the-south-pacific",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 18272,
+      "slug": "wre-22-crossfit-worlds-relays",
+      "origin": "project/wre-22-crossfit-worlds-relays",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 18273,
+      "slug": "a3-cascad-office-hub-in-sogne",
+      "origin": "project/a3-cascad-office-hub-in-sogne",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 18274,
+      "slug": "spacing-it-easier-to-get-things-done",
+      "origin": "project/spacing-it-easier-to-get-things-done",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 18276,
+      "slug": "aws-non-profit-cloud-solutions",
+      "origin": "project/aws-non-profit-cloud-solutions",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 19291,
+      "slug": "space-campaign",
+      "origin": "project/space-campaign",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 19292,
+      "slug": "credit-bank",
+      "origin": "project/credit-bank",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 19293,
+      "slug": "worlds-relays",
+      "origin": "project/worlds-relays",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 19294,
+      "slug": "unicolor-87",
+      "origin": "project/unicolor-87",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 19295,
+      "slug": "grafico-scenic",
+      "origin": "project/grafico-scenic",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 19296,
+      "slug": "lifestyle-app",
+      "origin": "project/lifestyle-app",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 19297,
+      "slug": "stickers-pack",
+      "origin": "project/stickers-pack",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 19298,
+      "slug": "dinamica",
+      "origin": "project/dinamica",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 19299,
+      "slug": "bright-captive",
+      "origin": "project/bright-captive",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 19300,
+      "slug": "diseno-grafico",
+      "origin": "project/diseno-grafico",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 20660,
+      "slug": "diseno-deporte",
+      "origin": "project/diseno-deporte",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46097,
+      "slug": "about-ver1",
+      "origin": "project/about-ver1",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46140,
+      "slug": "about-ver2",
+      "origin": "project/about-ver2",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46142,
+      "slug": "about-ver3",
+      "origin": "project/about-ver3",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46143,
+      "slug": "about-ver4",
+      "origin": "project/about-ver4",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46145,
+      "slug": "about-ver5",
+      "origin": "project/about-ver5",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46166,
+      "slug": "contact-ver1",
+      "origin": "project/contact-ver1",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46172,
+      "slug": "contact-ver2",
+      "origin": "project/contact-ver2",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46173,
+      "slug": "contact-ver3",
+      "origin": "project/contact-ver3",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46174,
+      "slug": "contact-ver4",
+      "origin": "project/contact-ver4",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46175,
+      "slug": "contact-ver5",
+      "origin": "project/contact-ver5",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46202,
+      "slug": "hamburger-menu-standard",
+      "origin": "project/hamburger-menu-standard",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46219,
+      "slug": "hamburger-menu-centered",
+      "origin": "project/hamburger-menu-centered",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 46220,
+      "slug": "hamburger-menu-creative",
+      "origin": "project/hamburger-menu-creative",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 75369,
+      "slug": "salon-de-diseno-de-interiores",
+      "origin": "project/salon-de-diseno-de-interiores",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 88947,
+      "slug": "contact-ver6",
+      "origin": "project/contact-ver6",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 88994,
+      "slug": "about-ver6",
+      "origin": "project/about-ver6",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 223840,
+      "slug": "unica-bowls-from-the-south-pacific-elementor",
+      "origin": "project/unica-bowls-from-the-south-pacific-elementor",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 223842,
+      "slug": "spacing-it-easier-to-get-things-done-elementor",
+      "origin": "project/spacing-it-easier-to-get-things-done-elementor",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    },
+    {
+      "id": 223843,
+      "slug": "jbq-crafting-official-collab-elementor11",
+      "origin": "project/jbq-crafting-official-collab-elementor11",
+      "statusNow": "publish",
+      "redirect410": "create",
+      "draft": "move"
+    }
+  ],
+  "closeComments": [
+    {
+      "id": 78,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 79,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 80,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 96,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 97,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 98,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 99,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 100,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 101,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 18271,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 18272,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 18273,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 18274,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 18276,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 19291,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 19292,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 19293,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 19294,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 19295,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 19296,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 19297,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 19298,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 19299,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 19300,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 20660,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46097,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46140,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46142,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46143,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46145,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46166,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46172,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46173,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46174,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46175,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46202,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46219,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 46220,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 75369,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 88947,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 88994,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223615,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223616,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223617,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223618,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223619,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223620,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223623,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223787,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223840,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223841,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223842,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 223843,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 246154,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 246155,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 246156,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 248334,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 248347,
+      "comment": "open",
+      "ping": "closed"
+    },
+    {
+      "id": 248783,
+      "comment": "open",
+      "ping": "closed"
+    }
+  ]
+}

@@ -136,7 +136,7 @@ describe('TASK-1251 — checkIntakeAbuse: frontera de decisión (delegada a deci
 
 describe('TASK-1251 — resolveIntakeLimits (preservado para el reliability signal reader)', () => {
   it('defaults del grader cuando no hay env', () => {
-    expect(resolveIntakeLimits({} as NodeJS.ProcessEnv)).toEqual({
+    expect(resolveIntakeLimits({})).toEqual({
       perEmailPerDay: 3,
       perIpPerDay: 10,
       globalDailyBudgetUsd: 25,
@@ -148,7 +148,7 @@ describe('TASK-1251 — resolveIntakeLimits (preservado para el reliability sign
       GROWTH_AI_VISIBILITY_PUBLIC_PER_EMAIL_PER_DAY: '5',
       GROWTH_AI_VISIBILITY_PUBLIC_PER_IP_PER_DAY: '20',
       GROWTH_AI_VISIBILITY_PUBLIC_DAILY_BUDGET_USD: '100',
-    } as unknown as NodeJS.ProcessEnv
+    }
 
     expect(resolveIntakeLimits(env)).toEqual({ perEmailPerDay: 5, perIpPerDay: 20, globalDailyBudgetUsd: 100 })
   })

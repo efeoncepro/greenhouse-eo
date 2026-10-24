@@ -20,6 +20,7 @@
 //   - no-dynamic-app-react-apexcharts               — ApexCharts wrapper owns the only ssr:false dynamic boundary
 //   - growth-substrate-boundary                     (TASK-1697) — probes/** privado del dominio AEO; site-substrate no importa growth/*
 //   - no-worker-only-module-in-vercel-code          (ISSUE-177) — src/** no importa valores del motor de composición ni paquetes de navegador/PDF (función de Vercel >250 MB)
+//   - no-process-env-type                           — el env inyectado se tipa EnvSource (@/types/env-source), nunca NodeJS.ProcessEnv ni casts en tests
 
 import noRawTableWithoutShell from './rules/no-raw-table-without-shell.mjs'
 import noHardcodedFontfamily from './rules/no-hardcoded-fontfamily.mjs'
@@ -48,11 +49,12 @@ import noDynamicAppReactApexCharts from './rules/no-dynamic-app-react-apexcharts
 import noDirectKnowledgeChunkQuery from './rules/no-direct-knowledge-chunk-query.mjs'
 import noAdHocLayoutMorph from './rules/no-ad-hoc-layout-morph.mjs'
 import noWorkerOnlyModuleInVercelCode from './rules/no-worker-only-module-in-vercel-code.mjs'
+import noProcessEnvType from './rules/no-process-env-type.mjs'
 
 const plugin = {
   meta: {
     name: 'eslint-plugin-greenhouse',
-    version: '1.16.0'
+    version: '1.17.0'
   },
   rules: {
     'growth-substrate-boundary': growthSubstrateBoundary,
@@ -81,7 +83,8 @@ const plugin = {
     'no-dynamic-app-react-apexcharts': noDynamicAppReactApexCharts,
     'no-direct-knowledge-chunk-query': noDirectKnowledgeChunkQuery,
     'no-ad-hoc-layout-morph': noAdHocLayoutMorph,
-    'no-worker-only-module-in-vercel-code': noWorkerOnlyModuleInVercelCode
+    'no-worker-only-module-in-vercel-code': noWorkerOnlyModuleInVercelCode,
+    'no-process-env-type': noProcessEnvType
   }
 }
 

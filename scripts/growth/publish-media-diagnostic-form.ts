@@ -17,6 +17,9 @@ import 'server-only'
  *     el mismo patrón de Contacto.
  *   - Los `value` de las opciones son estables: si más adelante cambia la variante o el tipo de
  *     control, HubSpot y la medición siguen recibiendo lo mismo.
+ *   - Desplegables premium para «¿Cómo vendes?» e «Inversión mensual» (`presentation.control:
+ *     'premium_select'`): versión siguiente vía `activate-media-diagnostic-premium-select.ts`, que
+ *     espera el release del renderer.
  *
  * La entrega HubSpot NO se configura acá: la v1 nace `greenhouse_only` y el destino `direct` se
  * adjunta con `pnpm growth:forms:activate-hubspot-destinations -- --only=efeonce-media-diagnostic`

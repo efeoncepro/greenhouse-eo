@@ -15,6 +15,28 @@
  */
 export const RENDERER_STYLE_ID = 'greenhouse-form-styles'
 
+/** Tokens del esquema oscuro: los usa `prefers-color-scheme: dark` y el forzado `color-scheme="dark"`. */
+const DARK_TOKENS = `
+--ghf-fg: #e8ebf0;
+--ghf-muted: #9aa3b2;
+--ghf-bg: #11151c;
+--ghf-field-bg: #181d26;
+/* Border ≥3:1 vs dark field bg (WCAG 1.4.11). */
+--ghf-border: #6b7382;
+--ghf-border-strong: #8a93a3;
+--ghf-accent: #6c8cff;
+--ghf-accent-contrast: #0b0f16;
+--ghf-error: #ff8aa0;
+--ghf-error-bg: #2a151b;
+--ghf-success: #34d399;
+--ghf-celebration: #ffd166;
+--ghf-field-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+--ghf-field-shadow-focus: 0 0 0 4px rgba(108, 140, 255, 0.18);
+--ghf-action-shadow: 0 10px 24px rgba(0, 0, 0, 0.34);
+--ghf-action-shadow-hover: 0 14px 30px rgba(0, 0, 0, 0.42);
+--ghf-placeholder: #a9a9a9;
+`
+
 export const RENDERER_CSS = `
   greenhouse-form, .ghf-scope {
     --ghf-font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -38,6 +60,8 @@ export const RENDERER_CSS = `
     --ghf-field-shadow-focus: 0 0 0 4px rgba(37, 99, 235, 0.14);
     --ghf-action-shadow: 0 10px 24px rgba(16, 22, 43, 0.10);
     --ghf-action-shadow-hover: 0 14px 30px rgba(16, 22, 43, 0.14);
+    /* TASK-2045 — color del placeholder (antes era el del navegador; este es su valor habitual). */
+    --ghf-placeholder: #757575;
 
     display: block;
     container-type: inline-size;
@@ -70,24 +94,13 @@ export const RENDERER_CSS = `
 
   @media (prefers-color-scheme: dark) {
     greenhouse-form:not([data-color-scheme="light"]), .ghf-scope:not([data-color-scheme="light"]) {
-      --ghf-fg: #e8ebf0;
-      --ghf-muted: #9aa3b2;
-      --ghf-bg: #11151c;
-      --ghf-field-bg: #181d26;
-      /* Border ≥3:1 vs dark field bg (WCAG 1.4.11). */
-      --ghf-border: #6b7382;
-      --ghf-border-strong: #8a93a3;
-      --ghf-accent: #6c8cff;
-      --ghf-accent-contrast: #0b0f16;
-      --ghf-error: #ff8aa0;
-      --ghf-error-bg: #2a151b;
-      --ghf-success: #34d399;
-      --ghf-celebration: #ffd166;
-      --ghf-field-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
-      --ghf-field-shadow-focus: 0 0 0 4px rgba(108, 140, 255, 0.18);
-      --ghf-action-shadow: 0 10px 24px rgba(0, 0, 0, 0.34);
-      --ghf-action-shadow-hover: 0 14px 30px rgba(0, 0, 0, 0.42);
+${DARK_TOKENS}
     }
+  }
+
+  /* TASK-2045 — color-scheme="dark" fuerza el esquema oscuro aunque el sistema esté en claro. */
+  greenhouse-form[data-color-scheme="dark"], .ghf-scope[data-color-scheme="dark"] {
+${DARK_TOKENS}
   }
 
   /* TASK-1297 — appearance="bare" (chromeless): el renderer no dibuja card; este modo
@@ -107,7 +120,8 @@ export const RENDERER_CSS = `
   .ghf-fields {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--ghf-gap);
+    row-gap: var(--ghf-gap);
+    column-gap: var(--ghf-column-gap, var(--ghf-gap));
     transform-origin: 50% 0%;
     animation: ghf-step-surface-in 200ms cubic-bezier(0.2, 0, 0, 1);
   }
@@ -130,7 +144,7 @@ export const RENDERER_CSS = `
     .ghf-field--full { grid-column: 1 / -1; }
   }
 
-  .ghf-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; position: relative; z-index: 0; }
+  .ghf-field { display: flex; flex-direction: column; gap: var(--ghf-field-gap, 6px); min-width: 0; position: relative; z-index: 0; }
 
   /* Visible choices (radio): cards with a radio mark, tokenized. hubspot_pillar keeps its own chips/cards. */
   .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) .ghf-choice-group { display: grid; grid-template-columns: 1fr; gap: 8px; }
@@ -159,8 +173,8 @@ export const RENDERER_CSS = `
   @media (prefers-reduced-motion: reduce) { .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice { transition: none; } }
   .ghf-field:focus-within { z-index: 40; }
   .ghf-field[data-overlay-open="true"] { z-index: 80; }
-  [data-ghf-style-variant="diagnostic_premium"] .ghf-field { gap: 8px; }
-  .ghf-label { display: inline-flex; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 600; line-height: 1.3; color: var(--ghf-fg); }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-field { gap: var(--ghf-field-gap, 8px); }
+  .ghf-label { display: inline-flex; align-items: center; gap: 8px; font-size: var(--ghf-label-size, 0.875rem); font-weight: var(--ghf-label-weight, 600); line-height: var(--ghf-label-line-height, 1.3); color: var(--ghf-label-color, var(--ghf-fg)); }
   .ghf-field-icon {
     display: inline-grid;
     place-items: center;
@@ -207,10 +221,10 @@ export const RENDERER_CSS = `
     color: var(--ghf-fg);
     background: var(--ghf-field-bg);
     border: 1px solid var(--ghf-border);
-    border-radius: var(--ghf-radius);
-    padding: 10px 12px;
+    border-radius: var(--ghf-field-radius, var(--ghf-radius));
+    padding: var(--ghf-field-padding, 10px 12px);
     width: 100%;
-    min-height: 44px;
+    min-height: var(--ghf-field-min-height, 44px);
     line-height: 1.4;
     box-shadow: var(--ghf-field-shadow);
     transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease, background-color 140ms ease;
@@ -219,12 +233,14 @@ export const RENDERER_CSS = `
   [data-ghf-style-variant="diagnostic_premium"] .ghf-textarea,
   [data-ghf-style-variant="diagnostic_premium"] .ghf-select,
   [data-ghf-style-variant="diagnostic_premium"] .ghf-file-input {
-    min-height: 52px;
-    padding: 14px 16px;
-    border-radius: var(--ghf-radius);
+    min-height: var(--ghf-field-min-height, 52px);
+    padding: var(--ghf-field-padding, 14px 16px);
+    border-radius: var(--ghf-field-radius, var(--ghf-radius));
   }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-select { padding-inline-end: 44px; }
   .ghf-textarea { min-height: 96px; resize: vertical; }
+  .ghf-input::placeholder,
+  .ghf-textarea::placeholder { color: var(--ghf-placeholder); opacity: 1; }
   .ghf-select { appearance: none; }
   .ghf-input:hover,
   .ghf-textarea:hover,
@@ -712,6 +728,38 @@ export const RENDERER_CSS = `
   }
   .ghf-check a { color: var(--ghf-accent); }
 
+  /* TASK-2045 — consentimiento compacto: casilla nativa (accent-color), sin tarjeta, enlace dentro de la frase. */
+  .ghf-check.ghf-check--compact,
+  .ghf-check.ghf-check--compact:hover {
+    min-height: 0;
+    gap: 10px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .ghf-check.ghf-check--compact input {
+    position: static;
+    flex: none;
+    inline-size: var(--ghf-consent-box, 18px);
+    block-size: var(--ghf-consent-box, 18px);
+    margin: 1px 0 0 4px;
+    opacity: 1;
+    appearance: auto;
+    accent-color: var(--ghf-consent-accent, var(--ghf-accent));
+  }
+  .ghf-check.ghf-check--compact input:focus-visible { outline: 2px solid var(--ghf-focus); outline-offset: 2px; }
+  .ghf-check.ghf-check--compact span {
+    min-height: 0;
+    padding-inline-start: 0;
+    font-size: var(--ghf-consent-size, 0.8125rem);
+    line-height: 1.5;
+    color: var(--ghf-consent-color, var(--ghf-muted));
+  }
+  .ghf-check.ghf-check--compact span::before,
+  .ghf-check.ghf-check--compact span::after { content: none; display: none; }
+  .ghf-check.ghf-check--compact a { color: var(--ghf-consent-link, var(--ghf-accent)); text-decoration: underline; text-underline-offset: 2px; }
+
   .ghf-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-actions {
     width: min(100%, 560px);
@@ -720,8 +768,8 @@ export const RENDERER_CSS = `
   }
   .ghf-btn {
     font: inherit; font-weight: 600;
-    min-height: 44px; padding: 10px 20px;
-    border-radius: var(--ghf-radius); border: 1px solid transparent;
+    min-height: var(--ghf-btn-min-height, 44px); padding: var(--ghf-btn-padding, 10px 20px);
+    border-radius: var(--ghf-btn-radius, var(--ghf-radius)); border: 1px solid transparent;
     cursor: pointer;
     background: var(--ghf-accent); color: var(--ghf-accent-contrast);
     box-shadow: var(--ghf-action-shadow);
@@ -732,9 +780,9 @@ export const RENDERER_CSS = `
     align-items: center;
     justify-content: center;
     gap: 10px;
-    min-height: 52px;
+    min-height: var(--ghf-btn-min-height, 52px);
     min-width: 0;
-    padding: 13px 26px;
+    padding: var(--ghf-btn-padding, 13px 26px);
     font-weight: 700;
     letter-spacing: 0 !important;
   }
@@ -802,6 +850,7 @@ export const RENDERER_CSS = `
   .ghf-scope .ghf-form .ghf-select,
   .ghf-scope .ghf-form .ghf-tag-input {
     font: inherit !important;
+    font-size: var(--ghf-field-font-size, 1em) !important;
     color: var(--ghf-fg) !important;
     background: var(--ghf-field-bg) !important;
     background-color: var(--ghf-field-bg) !important;
@@ -819,6 +868,7 @@ export const RENDERER_CSS = `
   .ghf-scope .ghf-form .ghf-textarea:focus-visible,
   .ghf-scope .ghf-form .ghf-select:focus-visible,
   .ghf-scope .ghf-form .ghf-tag-input:focus-within {
+    border-color: var(--ghf-field-focus-border, var(--ghf-border)) !important;
     box-shadow: var(--ghf-field-shadow-focus) !important;
   }
 
@@ -878,10 +928,13 @@ export const RENDERER_CSS = `
   }
 
   greenhouse-form .ghf-form .ghf-btn--ghost,
-  .ghf-scope .ghf-form .ghf-btn--ghost {
-    background: transparent !important;
-    color: var(--ghf-fg) !important;
-    border-color: var(--ghf-border-strong) !important;
+  greenhouse-form .ghf-success-card .ghf-btn--ghost,
+  .ghf-scope .ghf-form .ghf-btn--ghost,
+  .ghf-scope .ghf-success-card .ghf-btn--ghost {
+    background: var(--ghf-btn-ghost-bg, transparent) !important;
+    color: var(--ghf-btn-ghost-fg, var(--ghf-fg)) !important;
+    border-color: var(--ghf-btn-ghost-border, var(--ghf-border-strong)) !important;
+    box-shadow: none !important;
   }
   greenhouse-form .ghf-form .ghf-btn--skip,
   .ghf-scope .ghf-form .ghf-btn--skip {
@@ -1183,6 +1236,20 @@ export const RENDERER_CSS = `
   .ghf-success-card__party-popper-confetti-warm {
     fill: var(--ghf-celebration);
   }
+  /* TASK-2045 — glifo de La órbita en el éxito: el arco se dibuja una vez (sin bucle). */
+  .ghf-orbit-mark { inline-size: 100%; block-size: 100%; overflow: visible; }
+  .ghf-orbit-mark__ring { stroke: var(--ghf-orbit, var(--ghf-accent)); stroke-opacity: 0.25; stroke-width: 1.5; }
+  .ghf-orbit-mark__arc {
+    stroke: var(--ghf-orbit, var(--ghf-accent));
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-dasharray: 1 1;
+    animation: ghf-orbit-draw 600ms cubic-bezier(0.2, 0, 0, 1) 120ms both;
+  }
+  .ghf-orbit-mark__sphere { fill: var(--ghf-orbit, var(--ghf-accent)); }
+  @keyframes ghf-orbit-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) { .ghf-orbit-mark__arc { animation: none; } }
+
   .ghf-success-card__content {
     display: grid;
     justify-items: center;
@@ -1762,13 +1829,204 @@ const PILLAR_CSS = `
 @media(prefers-reduced-motion:reduce){[data-ghf-style-variant="hubspot_pillar"] label.ghf-choice{transition:none}}
 `
 
+/**
+ * TASK-2054 — Presentación `inline_pill` (contrato de TASK-2053). Reproduce `.gxs` del canvas aprobado de
+ * la portada del blog v3 (2026-10-24): valores como tokens `--ghf-inline-*` con el default del canvas
+ * (Glitch); el anfitrión declara el tono (`--ghf-inline-tone`, `--ghf-inline-on-tone` y, para hover y
+ * active exactos, `--ghf-inline-tone-hover/-active`). Los anchos por estado tienen default por tipo de
+ * formulario (suscripción 252 → 480 → 304; evento 236 → 470 → 360). Bajo 480 px de contenedor la píldora
+ * ocupa todo el ancho en todos los estados (tablero móvil del canvas). Sin contorno interno del campo:
+ * el foco lo marca la píldora. Sólo se animan ancho, color, `transform`, `opacity` y `stroke-dashoffset`.
+ * Tipografía = la que el canvas RINDE (medida con estilos computados, no la que declaran sus reglas): el
+ * reset `button{font:inherit}` del tablero gana a `.ab`, así que el botón de apertura se ve en 16 px/400 con
+ * interlineado normal; el de envío, 14 px/600; el campo conserva el padding nativo 1px 2px.
+ */
+const INLINE_PILL_CSS = `
+:is(greenhouse-form,.ghf-scope) .ghf-inline{
+  --ghf-inline-font-resolved:var(--ghf-inline-font,var(--ghf-font));
+  --ghf-inline-tone-resolved:var(--ghf-inline-tone,#6ec207);
+  --ghf-inline-on-tone-resolved:var(--ghf-inline-on-tone,#001a33);
+  --ghf-inline-ease-resolved:var(--ghf-inline-ease,cubic-bezier(0.2,0,0,1));
+  --ghf-inline-spring-resolved:var(--ghf-inline-spring,cubic-bezier(0.34,1.56,0.64,1));
+  --ghf-inline-morph-resolved:var(--ghf-inline-duration-morph,520ms);
+  --ghf-inline-w-idle:var(--ghf-inline-width-idle,252px);
+  --ghf-inline-w-open:var(--ghf-inline-width-open,480px);
+  --ghf-inline-w-done:var(--ghf-inline-width-done,304px);
+  --ghf-inline-done-alpha:55%;
+  --ghf-inline-align-resolved:var(--ghf-inline-align,flex-end);
+  --ghf-inline-note-align-resolved:var(--ghf-inline-note-align,right);
+  display:flex;flex-direction:column;align-items:var(--ghf-inline-align-resolved);
+  font-family:var(--ghf-inline-font-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline[data-ghf-inline-kind="event"]{
+  --ghf-inline-w-idle:var(--ghf-inline-width-idle,236px);
+  --ghf-inline-w-open:var(--ghf-inline-width-open,470px);
+  --ghf-inline-w-done:var(--ghf-inline-width-done,360px);
+  --ghf-inline-done-alpha:60%;
+  --ghf-inline-align-resolved:var(--ghf-inline-align,flex-start);
+  --ghf-inline-note-align-resolved:var(--ghf-inline-note-align,left);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill{
+  position:relative;width:var(--ghf-inline-w-idle);max-width:100%;height:var(--ghf-inline-height,52px);margin:0;
+  border-radius:999px;border:1px solid transparent;background:transparent;
+  transition:width var(--ghf-inline-morph-resolved) var(--ghf-inline-ease-resolved),background-color 320ms var(--ghf-inline-ease-resolved),border-color 320ms var(--ghf-inline-ease-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill:is([data-ghf-inline-state="open"],[data-ghf-inline-state="loading"]){
+  width:var(--ghf-inline-w-open);background:var(--ghf-inline-open-bg,rgba(255,255,255,.06));
+  border-color:var(--ghf-inline-open-border,color-mix(in srgb,var(--ghf-inline-tone-resolved) 60%,transparent));
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="open"]:focus-within{border-color:var(--ghf-inline-focus-border,var(--ghf-inline-tone-resolved))}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-invalid="true"]{border-color:var(--ghf-inline-error-fg,#ff8aa0)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="success"]{
+  width:var(--ghf-inline-w-open);background:var(--ghf-inline-tone-resolved);border-color:var(--ghf-inline-tone-resolved);
+  animation:ghf-inline-pop var(--ghf-inline-morph-resolved) var(--ghf-inline-ease-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"]{
+  width:var(--ghf-inline-w-done);background:transparent;
+  border-color:var(--ghf-inline-done-border,color-mix(in srgb,var(--ghf-inline-tone-resolved) var(--ghf-inline-done-alpha),transparent));
+}
+@keyframes ghf-inline-pop{0%{transform:scale(1)}40%{transform:scale(var(--ghf-inline-pulse-scale,1.035))}100%{transform:scale(1)}}
+
+/* Botón de apertura y botón de envío: botón AXIS del canvas (texto que rueda, flecha que avanza). */
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send){
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  margin:0;border:0!important;border-radius:999px!important;box-shadow:none!important;
+  background:var(--ghf-inline-tone-resolved)!important;color:var(--ghf-inline-on-tone-resolved)!important;
+  font-family:var(--ghf-inline-font-resolved)!important;line-height:normal!important;
+  letter-spacing:.005em!important;text-transform:none!important;text-decoration:none;white-space:nowrap;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-open{
+  position:absolute;inset:-1px;width:calc(100% + 2px);min-height:var(--ghf-inline-height,52px);
+  padding:0 1.25rem 0 1.5rem!important;gap:.75rem;font-size:16px!important;font-weight:400!important;
+  transition:opacity 180ms var(--ghf-inline-ease-resolved),transform 450ms var(--ghf-inline-spring-resolved),background-color 150ms;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill:not([data-ghf-inline-state="idle"]) .ghf-inline-open{opacity:0;pointer-events:none;transform:scale(.96)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-send{
+  flex:none;max-width:60%;min-height:var(--ghf-inline-send-height,42px);padding:0 .875rem 0 1.125rem!important;
+  font-size:14px!important;font-weight:600!important;letter-spacing:normal!important;
+  transition:background-color 150ms cubic-bezier(0.4,0,0.2,1),transform 450ms var(--ghf-inline-spring-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-send-content{display:inline-flex;align-items:center;gap:.5rem;min-width:0;max-width:100%}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):active{transform:scale(.95);transition-duration:90ms;background:var(--ghf-inline-tone-active,color-mix(in srgb,var(--ghf-inline-tone-resolved) 62%,#ffffff))!important}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):focus-visible{outline:2px solid var(--ghf-inline-focus-ring,#ffffff);outline-offset:3px}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-roll{display:inline-block;min-width:0;height:1.4em;overflow:hidden;line-height:1.4;vertical-align:top}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-roll-in{display:flex;flex-direction:column;transition:transform 320ms var(--ghf-inline-ease-resolved)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-roll-in>span{overflow:hidden;text-overflow:ellipsis}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-arrow{flex:none;overflow:visible;transition:transform 340ms var(--ghf-inline-ease-resolved)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-arrow-stem{stroke-dasharray:.5 2;transition:stroke-dasharray 360ms var(--ghf-inline-ease-resolved)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):focus-visible .ghf-inline-roll-in{transform:translateY(-50%)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):focus-visible .ghf-inline-arrow{transform:translateX(3px)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):is(:focus-visible,:active) .ghf-inline-arrow-stem{stroke-dasharray:1 2}
+:is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):active .ghf-inline-arrow{transform:translateX(5px)}
+@media (hover:hover){
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):hover{background:var(--ghf-inline-tone-hover,color-mix(in srgb,var(--ghf-inline-tone-resolved) 80%,#ffffff))!important}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):hover .ghf-inline-roll-in{transform:translateY(-50%)}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):hover .ghf-inline-arrow{transform:translateX(3px)}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):hover .ghf-inline-arrow-stem{stroke-dasharray:1 2}
+}
+
+/* Loader de la órbita en el botón de envío. */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-spin{display:none;position:absolute;inset:0;margin:auto;width:24px;height:24px}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-spin g{transform-origin:center;transform-box:view-box;animation:ghf-inline-rot 1200ms linear infinite}
+@keyframes ghf-inline-rot{to{transform:rotate(360deg)}}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="loading"] .ghf-inline-send-content{visibility:hidden}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="loading"] .ghf-inline-spin{display:block}
+
+/* Campo: aparece 200 ms después de que la píldora empieza a estirarse. */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-form{
+  position:absolute;inset:0;display:flex;align-items:center;gap:8px;margin:0;padding:0 4px 0 22px;
+  opacity:0;visibility:hidden;transition:opacity 220ms var(--ghf-inline-ease-resolved),visibility 0s linear 220ms;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill:is([data-ghf-inline-state="open"],[data-ghf-inline-state="loading"]) .ghf-inline-form{
+  opacity:1;visibility:visible;
+  transition:opacity 260ms var(--ghf-inline-ease-resolved) var(--ghf-inline-field-delay,200ms),visibility 0s;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-input{
+  flex:1;min-width:0;height:44px!important;margin:0!important;padding:1px 2px!important;
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;outline:none!important;
+  color:var(--ghf-inline-field-fg,#ffffff)!important;font:400 16px var(--ghf-inline-font-resolved)!important;
+  letter-spacing:normal!important;text-transform:none!important;-webkit-appearance:none;appearance:none;
+  transition:opacity 220ms var(--ghf-inline-ease-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-input::placeholder{color:var(--ghf-inline-placeholder,rgba(207,228,250,.6));opacity:1}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-input:is(:focus,:focus-visible){outline:none!important;box-shadow:none!important}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="loading"] .ghf-inline-input{opacity:.55}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-honeypot{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+
+/* Confirmación: relleno del tono + check que se dibuja; a los 1,4 s, el texto final. */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-ok{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;
+  opacity:0;visibility:hidden;outline:none;color:var(--ghf-inline-on-tone-resolved);
+  font:600 15px/normal var(--ghf-inline-font-resolved);
+  transition:opacity 220ms var(--ghf-inline-ease-resolved),visibility 0s linear 220ms,color 300ms var(--ghf-inline-ease-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill:is([data-ghf-inline-state="success"],[data-ghf-inline-state="done"]) .ghf-inline-ok{
+  opacity:1;visibility:visible;transition:opacity 220ms var(--ghf-inline-ease-resolved),visibility 0s;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-check{flex:none}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-check path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--ghf-inline-check-duration,420ms) var(--ghf-inline-ease-resolved) var(--ghf-inline-check-delay,140ms)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill:is([data-ghf-inline-state="success"],[data-ghf-inline-state="done"]) .ghf-inline-check path{stroke-dashoffset:0}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-ok{color:var(--ghf-inline-done-fg,#ffffff)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-check{color:var(--ghf-inline-tone-resolved)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-msg{display:grid;min-width:0}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-msg>span{grid-area:1/1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity 260ms var(--ghf-inline-ease-resolved),transform 360ms var(--ghf-inline-ease-resolved)}
+/* El texto que no se ve sale también del árbol accesible y del cálculo de contraste (visibility, con retraso para el fundido). */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-t2{opacity:0;visibility:hidden;transform:translateY(8px)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-t1{
+  opacity:0;visibility:hidden;transform:translateY(-8px);
+  transition:opacity 260ms var(--ghf-inline-ease-resolved),transform 360ms var(--ghf-inline-ease-resolved),visibility 0s linear 260ms;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-t2{opacity:1;visibility:visible;transform:none}
+
+/* Nota legal: sólo con el campo abierto. Errores: bajo la píldora. */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-note{
+  margin:12px 0 0;max-width:var(--ghf-inline-w-open);text-align:var(--ghf-inline-note-align-resolved);
+  font:400 12px/1.5 var(--ghf-inline-font-resolved);color:var(--ghf-inline-note-fg,#cfe4fa);
+  opacity:0;transform:translateY(-4px);transition:opacity 220ms var(--ghf-inline-ease-resolved),transform 300ms var(--ghf-inline-ease-resolved);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline:has(.ghf-inline-pill:is([data-ghf-inline-state="open"],[data-ghf-inline-state="loading"])) .ghf-inline-note{
+  opacity:.8;transform:none;transition-delay:var(--ghf-inline-note-delay,260ms);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-note a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-error{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:var(--ghf-inline-align-resolved);gap:4px 12px;
+  margin:10px 0 0;max-width:var(--ghf-inline-w-open);
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-error[hidden]{display:none}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-error-text{margin:0;font:500 13px/1.45 var(--ghf-inline-font-resolved);color:var(--ghf-inline-error-fg,#ff8aa0);text-align:var(--ghf-inline-note-align-resolved)}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-retry{
+  min-height:32px;margin:0;padding:0 12px!important;border:1px solid currentColor!important;border-radius:999px!important;
+  background:transparent!important;box-shadow:none!important;color:var(--ghf-inline-done-fg,#ffffff)!important;
+  font:600 13px/1 var(--ghf-inline-font-resolved)!important;letter-spacing:normal!important;text-transform:none!important;cursor:pointer;
+}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-retry[hidden]{display:none}
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-retry:focus-visible{outline:2px solid var(--ghf-inline-focus-ring,#ffffff);outline-offset:2px}
+
+/* Tablero móvil del canvas: ancho completo en todos los estados, nota alineada a la izquierda. */
+@container (max-width: 479.98px){
+  :is(greenhouse-form,.ghf-scope) .ghf-inline{align-items:stretch}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-pill,
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-pill:not([data-ghf-inline-state="idle"]){width:100%}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-form{padding-left:18px}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-note,
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-error-text{text-align:left;max-width:none}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline-error{justify-content:flex-start;max-width:none}
+}
+
+@media (prefers-reduced-motion: reduce){
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-pill,.ghf-inline-open,.ghf-inline-send,.ghf-inline-form,.ghf-inline-input,.ghf-inline-ok,.ghf-inline-check path,.ghf-inline-msg>span,.ghf-inline-note,.ghf-inline-roll-in,.ghf-inline-arrow,.ghf-inline-arrow-stem){transition:none!important;animation:none!important}
+  :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):is(:hover,:focus-visible) .ghf-inline-roll-in{transform:none}
+}
+`
+
 /** Inyecta el CSS una sola vez en el documento host (idempotente). */
 export const ensureStylesInjected = (doc: Document = document): void => {
   if (doc.getElementById(RENDERER_STYLE_ID)) return
   const style = doc.createElement('style')
 
   style.id = RENDERER_STYLE_ID
-  style.textContent = RENDERER_CSS + PILLAR_CSS + CONTENT_MARKETING_CSS
+  style.textContent = RENDERER_CSS + PILLAR_CSS + CONTENT_MARKETING_CSS + INLINE_PILL_CSS
   doc.head.appendChild(style)
 }
 

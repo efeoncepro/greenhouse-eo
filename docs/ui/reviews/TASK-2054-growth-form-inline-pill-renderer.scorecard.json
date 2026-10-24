@@ -1,0 +1,30 @@
+{
+  "task": "TASK-2054",
+  "surface": "growth-form-inline-pill",
+  "verdict": "pass-local",
+  "reviewedAt": "2026-10-24",
+  "reviewer": "claude-opus-5.5 (hojas canvas-vs-renderer y frames de video mirados a 1440 y 390)",
+  "evidence": {
+    "desktop": "docs/ui/reviews/TASK-2054-growth-form-inline-pill-renderer/glitch-1440-canvas-vs-renderer.png",
+    "mobile": "docs/ui/reviews/TASK-2054-growth-form-inline-pill-renderer/event-390-canvas-vs-renderer.png",
+    "dossier": "docs/ui/reviews/TASK-2054-growth-form-inline-pill-renderer/review-dossier.md",
+    "gate": "docs/ui/reviews/TASK-2054-growth-form-inline-pill-renderer/gate-report.json"
+  },
+  "dimensions": {
+    "hierarchy": { "score": 4.6, "rationale": "Un solo gesto por estado: el botón es la acción; abierto, el campo y el envío dentro de la píldora; la confirmación ocupa la píldora entera.", "evidence": "glitch-1440-canvas-vs-renderer.png" },
+    "proportions": { "score": 4.7, "rationale": "Anchos del canvas por estado (252/480/304 y 236/470/360), alto 52 y botón interno 42; 0 % de diferencia en reposo, éxito y listo.", "evidence": "event-1440-canvas-vs-renderer.png" },
+    "rhythm": { "score": 4.5, "rationale": "Nota legal a 12 px bajo la píldora y mensajes de error a 10 px, alineados con el borde de la píldora según el tipo.", "evidence": "glitch-1440-canvas-vs-renderer.png" },
+    "density": { "score": 4.5, "rationale": "Un campo, un botón, una nota: nada más en la superficie; el estado final es más angosto que el abierto y se lee como cierre.", "evidence": "event-390-canvas-vs-renderer.png" },
+    "depth": { "score": 4.5, "rationale": "Sin sombras: el plano lo dan el relleno translúcido abierto y el relleno del tono en el éxito, como el canvas.", "evidence": "glitch-390-canvas-vs-renderer.png" },
+    "surfaceEconomy": { "score": 4.8, "rationale": "Una sola superficie que cambia de estado en el mismo lugar; sin pop-up ni card-on-card.", "evidence": "glitch-1440-canvas-vs-renderer.png" },
+    "visualImpact": { "score": 4.5, "rationale": "El momento dominante es el éxito: relleno del tono, pulso 1,035 y check que se dibuja.", "evidence": ".captures/2026-10-24-inline-pill/glitch-1440-sequence.gif" },
+    "typography": { "score": 4.6, "rationale": "Poppins por token del anfitrión; tamaños y pesos medidos sobre el canvas rendido (16/400 apertura, 14/600 envío, 15/600 confirmación, 12/18 nota).", "evidence": "review-dossier.md#hallazgo-de-fidelidad" },
+    "color": { "score": 4.6, "rationale": "Tono declarado por el anfitrión (Glitch #6ec207, evento #36c8bf) sobre navy; axe 0 violaciones en abierto y listo.", "evidence": "gate-report.json" },
+    "iconography": { "score": 4.5, "rationale": "Flecha AXIS con trazo que se completa, loader de la órbita y check dibujado: los mismos SVG del canvas.", "evidence": "event-1440-canvas-vs-renderer.png" },
+    "responsive": { "score": 4.6, "rationale": "Bajo 480 px de contenedor la píldora ocupa todo el ancho en todos los estados; scrollWidth 390 = clientWidth.", "evidence": "glitch-390-canvas-vs-renderer.png" },
+    "motion": { "score": 4.5, "rationale": "Ancho 520 ms cubic-bezier(0.2,0,0,1), campo con 200 ms de retraso, check 420 ms + 140 ms, nota + 260 ms; movimiento reducido sin transiciones.", "evidence": ".captures/2026-10-24-inline-pill/event-390-sequence.gif" },
+    "fidelity": { "score": 4.8, "rationale": "20/20 estados dentro de 1 % contra el canvas literal (máximo 0,498 %); formularios estándar 0 px en 18/18.", "evidence": "gate-report.json" },
+    "genericTemplateResistance": { "score": 4.7, "rationale": "Reproduce la píldora aprobada, no un input + botón genérico; los valores salen del canvas medido.", "evidence": "glitch-1440-canvas-vs-renderer.png" }
+  },
+  "notes": "Gate local reproducible sin base ni deploy. Pendiente fuera de esta task: release del renderer por el control plane (llega a los hosts con el próximo release de Greenhouse a main) y su uso en la portada (TASK-2051)."
+}

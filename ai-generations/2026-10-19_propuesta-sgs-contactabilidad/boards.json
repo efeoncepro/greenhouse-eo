@@ -1,0 +1,270 @@
+{
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "01 · Portada"
+  },
+  "L02-leer.dc.html": {
+   "x": 2000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "02 · Cómo leer esta propuesta"
+  },
+  "L03-resumen.dc.html": {
+   "x": 4000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "03 · Resumen"
+  },
+  "L04-hoy.dc.html": {
+   "x": 6000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "04 · Cómo están hoy"
+  },
+  "L05-vistas.dc.html": {
+   "x": 0,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "05 · Un historial, dos vistas"
+  },
+  "L06-criterios.dc.html": {
+   "x": 2000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "06 · Criterios de diseño"
+  },
+  "L07-solucion.dc.html": {
+   "x": 4000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "07 · Nuestra propuesta"
+  },
+  "L08-ejecutivo.dc.html": {
+   "x": 6000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "08 · Cómo trabaja el ejecutivo"
+  },
+  "L09-aircall.dc.html": {
+   "x": 0,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "09 · Qué es Aircall"
+  },
+  "L10-coexistence.dc.html": {
+   "x": 2000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "10 · WhatsApp Coexistence"
+  },
+  "L11-arquitectura.dc.html": {
+   "x": 4000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "11 · Cómo llega cada canal"
+  },
+  "L12-modelo.dc.html": {
+   "x": 6000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "12 · Modelo de datos"
+  },
+  "L13-panel.dc.html": {
+   "x": 0,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "13 · Panel de contactabilidad"
+  },
+  "L14-panel-propio.dc.html": {
+   "x": 2000,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "14 · Un panel propio"
+  },
+  "L15-insights.dc.html": {
+   "x": 4000,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "15 · Qué es Efeonce Insights"
+  },
+  "L16-alternativas.dc.html": {
+   "x": 6000,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "16 · Alternativas consideradas"
+  },
+  "L17-etapas.dc.html": {
+   "x": 0,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "17 · Cinco etapas"
+  },
+  "L18-cambios.dc.html": {
+   "x": 2000,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "18 · Qué cambia para el equipo"
+  },
+  "L19-adopcion.dc.html": {
+   "x": 4000,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "19 · Cuatro frentes de adopción"
+  },
+  "L20-capacitacion.dc.html": {
+   "x": 6000,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "20 · Capacitación por rol"
+  },
+  "L21-implementacion.dc.html": {
+   "x": 0,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "21 · Implementación"
+  },
+  "L22-region.dc.html": {
+   "x": 2000,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "22 · Lo que pedimos al equipo regional"
+  },
+  "L23-permisos.dc.html": {
+   "x": 4000,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "23 · Permisos y revisión regional"
+  },
+  "L24-privacidad.dc.html": {
+   "x": 6000,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "24 · Privacidad y condiciones laborales"
+  },
+  "L25-medicion.dc.html": {
+   "x": 0,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "25 · Cómo se mide"
+  },
+  "L26-plan.dc.html": {
+   "x": 2000,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "26 · Plan del piloto"
+  },
+  "L27-responsabilidades.dc.html": {
+   "x": 4000,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "27 · Responsabilidades"
+  },
+  "L28-inversion.dc.html": {
+   "x": 6000,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "28 · Inversión"
+  },
+  "L29-datos.dc.html": {
+   "x": 0,
+   "y": 8400,
+   "w": 1920,
+   "h": 1080,
+   "title": "29 · Datos que necesitamos"
+  },
+  "L30-pasos.dc.html": {
+   "x": 2000,
+   "y": 8400,
+   "w": 1920,
+   "h": 1080,
+   "title": "30 · Próximos pasos"
+  },
+  "L31-supuestos.dc.html": {
+   "x": 4000,
+   "y": 8400,
+   "w": 1920,
+   "h": 1080,
+   "title": "31 · Supuestos y fuentes"
+  },
+  "L32-glosario.dc.html": {
+   "x": 6000,
+   "y": 8400,
+   "w": 1920,
+   "h": 1080,
+   "title": "32 · Glosario"
+  },
+  "L33-contraportada.dc.html": {
+   "x": 0,
+   "y": 9600,
+   "w": 1920,
+   "h": 1080,
+   "title": "33 · Contraportada"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "L02-leer.dc.html",
+  "L03-resumen.dc.html",
+  "L04-hoy.dc.html",
+  "L05-vistas.dc.html",
+  "L06-criterios.dc.html",
+  "L07-solucion.dc.html",
+  "L08-ejecutivo.dc.html",
+  "L09-aircall.dc.html",
+  "L10-coexistence.dc.html",
+  "L11-arquitectura.dc.html",
+  "L12-modelo.dc.html",
+  "L13-panel.dc.html",
+  "L14-panel-propio.dc.html",
+  "L15-insights.dc.html",
+  "L16-alternativas.dc.html",
+  "L17-etapas.dc.html",
+  "L18-cambios.dc.html",
+  "L19-adopcion.dc.html",
+  "L20-capacitacion.dc.html",
+  "L21-implementacion.dc.html",
+  "L22-region.dc.html",
+  "L23-permisos.dc.html",
+  "L24-privacidad.dc.html",
+  "L25-medicion.dc.html",
+  "L26-plan.dc.html",
+  "L27-responsabilidades.dc.html",
+  "L28-inversion.dc.html",
+  "L29-datos.dc.html",
+  "L30-pasos.dc.html",
+  "L31-supuestos.dc.html",
+  "L32-glosario.dc.html",
+  "L33-contraportada.dc.html"
+ ]
+}

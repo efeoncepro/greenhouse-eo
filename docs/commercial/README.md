@@ -1,5 +1,7 @@
 # Commercial
 
+- [Partnerships y distribuidores: operación](../manual-de-uso/comercial/operar-partnerships-y-distribuidores.md) · [registro vigente](../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md): Adobe/Nexsys, Google/Ingram y Microsoft/AWS/LOL; identidad, formación, crédito, archivos externos y evidencia de envío.
+
 Nombres de Deal/Lead: [convención vigente Efeonce](../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
 aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
 El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
@@ -18,6 +20,12 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 ## Fuentes y autoridad
 
 - [Prospección B2B compartida](../documentation/comercial/prospeccion-b2b.md): [skill](../../.codex/skills/efeonce-b2b-prospecting/SKILL.md), [manual](../manual-de-uso/comercial/operar-prospeccion-b2b.md) y [decisión](../architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md); coordina Commercial, Customer Model, prácticas, Copy, HubSpot y Sales opcional. Radar/historial conservados.
+
+- [Servicios HubSpot en Chile — estrategia revisada y segundo corte, 19/10/2026](prospects/hubspot-chile-2026-10/ESTRATEGIA.md): señales de trabajo pendiente, herramientas probadas y contraste CRM; primer corte rectificado, sin altas ni outreach.
+- [Generación de demanda HubSpot Chile](prospects/hubspot-chile-2026-10/GENERACION-DE-DEMANDA.md): selección sin intención de compra previa, tres hipótesis de valor, muestra de conversación y piloto propuesto; complementa captura activa.
+- [Cinco cuentas Chile — hipótesis y abordajes, 19/10/2026](prospects/hubspot-chile-2026-10/CUENTAS-GENERACION-2026-10-19.md): Glasstech, Antalis, Talana y dos candidatas condicionales; mapas de participantes, fuentes, contraste CRM y borradores sin envío.
+- [Glasstech y Antalis — contactos y aperturas](prospects/hubspot-chile-2026-10/GLASSTECH-ANTALIS-APERTURAS-2026-10-19.md): objetivos Juan Pablo Quevedo y Daniela Fuentes, adyacentes revalidados, muestras y cuerpos de correo para revisión; sin envío.
+- [Glasstech y Antalis — secuencias guardadas en HubSpot](prospects/hubspot-chile-2026-10/SECUENCIAS-GLASSTECH-ANTALIS-2026-10-19.md): cinco correos por cuenta, espacios entre párrafos, firma gráfica de Julio y brochure nativo en pasos 2 y 4; privadas, cero inscripciones y cero envíos. Incluye vista de lectura y evidencia.
 
 - [Bancos de Chile — segmento activo 188](prospects/bancos-chile-2026-10/README.md): 28 personas con email de 14 bancos, definición por empresa principal, propiedades y brechas de canal verificadas el 11/10. Incluye 20 de la ronda adicional y ocho contactos conocidos; sin outreach.
 

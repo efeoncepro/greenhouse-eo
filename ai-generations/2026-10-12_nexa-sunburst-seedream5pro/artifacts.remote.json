@@ -1,0 +1,101 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:55:30.489Z",
+  "run": "ai-generations/2026-10-12_nexa-sunburst-seedream5pro",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-12_nexa-sunburst-seedream5pro",
+  "totalBytes": 77955585,
+  "fileCount": 15,
+  "files": [
+    {
+      "path": "final/seedream5-pro-standard.png",
+      "sizeBytes": 11921327,
+      "sha256": "667ecbfdb556f47eeac4ebe2dfb7169365fac5bd1b37fa9f97f930e31e86770c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/final/seedream5-pro-standard.png"
+    },
+    {
+      "path": "final/sunburst-max.png",
+      "sizeBytes": 13699828,
+      "sha256": "317ea5e691af74f2a944fef3045c6b6d343bca2705b53d45b9103a0e7ce981ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/final/sunburst-max.png"
+    },
+    {
+      "path": "out/preview-390/seedream5-pro-standard.png",
+      "sizeBytes": 197335,
+      "sha256": "c42bd85dee8f0835114278d6c9fa730a28c26d30c74d61f4fdacf33609b7e0bf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/out/preview-390/seedream5-pro-standard.png"
+    },
+    {
+      "path": "out/preview-390/sunburst-max.png",
+      "sizeBytes": 176353,
+      "sha256": "9a89e87c788de0eb9fbb8d8ca09d33999c963945c17b3e0a385f8ee2afbb2b6c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/out/preview-390/sunburst-max.png"
+    },
+    {
+      "path": "out/seedream5-pro-standard.png",
+      "sizeBytes": 11916081,
+      "sha256": "63b5761764dbdf1341af5eff7ac46d4fda3f93a4bb9fdb7d51423f8f7c16f249",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/out/seedream5-pro-standard.png"
+    },
+    {
+      "path": "out/sunburst-max.png",
+      "sizeBytes": 13686085,
+      "sha256": "c22d36f10a4336c9f8b222a7c2c5bd9a8eab862b9b614c11ea2a44dd546f5110",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/out/sunburst-max.png"
+    },
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 371176,
+      "sha256": "74b0b7d6ea41c1e2bae6d55a21e5986b168b0f7b55b8dcd185fd8b8640fe9aaa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/seedream5-pro-standard.png",
+      "sizeBytes": 7028126,
+      "sha256": "18c57960fd6ffd6d4426d56ed588ef77acea83c65242e43b5a807a49ff8f80a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/plates/seedream5-pro-standard.png"
+    },
+    {
+      "path": "plates/sunburst-max.png",
+      "sizeBytes": 9474598,
+      "sha256": "4fc989c44ab44c73d3e4a945ced787b5ccba416616b8eab8a7a8a04b66fb0e46",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/plates/sunburst-max.png"
+    },
+    {
+      "path": "seedream-emblem-native.png",
+      "sizeBytes": 167130,
+      "sha256": "82a772447fcf99fe45684930cec1865f20fb046a9872d0327b3637a5e19595f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/seedream-emblem-native.png"
+    },
+    {
+      "path": "seedream-face-native.png",
+      "sizeBytes": 505582,
+      "sha256": "a626318cf26b34021132ee4f5e7c48fdfd7c7937bbd8ee4fb18aaaf3ddc8d6df",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/seedream-face-native.png"
+    },
+    {
+      "path": "sunburst-emblem-native.png",
+      "sizeBytes": 190304,
+      "sha256": "8700d62033dfd05579d35f6ccea68712f9218a53138ad6f2e31f2acdce77c5ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/sunburst-emblem-native.png"
+    },
+    {
+      "path": "transport/nexa-ancla-1-rostro-frontal-v2.jpg",
+      "sizeBytes": 3351261,
+      "sha256": "ebd649958883a3910e2915331a92080a2a65211e6fcec443ddc4411c1f5781a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/transport/nexa-ancla-1-rostro-frontal-v2.jpg"
+    },
+    {
+      "path": "transport/nexa-ancla-5-cuerpo-frontal.jpg",
+      "sizeBytes": 2900724,
+      "sha256": "e6fd44062aaf709d9e31f506c892869957e02a0b8ca15bf6ed2d3d6531e03a99",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/transport/nexa-ancla-5-cuerpo-frontal.jpg"
+    },
+    {
+      "path": "transport/nexa-expr-08-conviccion.jpg",
+      "sizeBytes": 2369675,
+      "sha256": "e27a6505e75649d626b5e105ea287f0d06dfe0df95375ab5d59b5ee89c5ed58d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_nexa-sunburst-seedream5pro/transport/nexa-expr-08-conviccion.jpg"
+    }
+  ]
+}

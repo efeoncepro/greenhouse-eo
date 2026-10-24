@@ -1,0 +1,53 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:40:52.463Z",
+  "run": "ai-generations/2026-10-06_inpaint",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-06_inpaint",
+  "totalBytes": 11040056,
+  "fileCount": 7,
+  "files": [
+    {
+      "path": "inpaint/cb8cdab428c8/candidate-1-diff.png",
+      "sizeBytes": 39137,
+      "sha256": "264d870430bdd8b3c18b8a69303ee787d18ed48c57512a254c3e15f1e68d3be4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_inpaint/inpaint/cb8cdab428c8/candidate-1-diff.png"
+    },
+    {
+      "path": "inpaint/cb8cdab428c8/candidate-1-raw.png",
+      "sizeBytes": 1586107,
+      "sha256": "567df7f93aeb747018fe46787a755356e7944da0eedcbb19b2753f73a01d8b90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_inpaint/inpaint/cb8cdab428c8/candidate-1-raw.png"
+    },
+    {
+      "path": "inpaint/cb8cdab428c8/candidate-1.png",
+      "sizeBytes": 3552975,
+      "sha256": "2ef9e34201fde4e0a072976be914db40357cc20fdad92bc17c8d996b22b55086",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_inpaint/inpaint/cb8cdab428c8/candidate-1.png"
+    },
+    {
+      "path": "inpaint/cb8cdab428c8/mask-preview.png",
+      "sizeBytes": 3817536,
+      "sha256": "8d7878ee5f3194550955367881db0ac4bf998962ef554c55528ba1b2c4f45efd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_inpaint/inpaint/cb8cdab428c8/mask-preview.png"
+    },
+    {
+      "path": "inpaint/cb8cdab428c8/provider-input.png",
+      "sizeBytes": 1021780,
+      "sha256": "f8242040bdc8961027f392d74c2531623f2c5b79b3f6254e6d2b3945ca9349ca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_inpaint/inpaint/cb8cdab428c8/provider-input.png"
+    },
+    {
+      "path": "inpaint/cb8cdab428c8/provider-mask.png",
+      "sizeBytes": 2550,
+      "sha256": "7d4fb30df1fcb5b15d7e499b34b150fe22d4a4bd9596bc968fe82498a2efafc6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_inpaint/inpaint/cb8cdab428c8/provider-mask.png"
+    },
+    {
+      "path": "inpaint/cb8cdab428c8/provider-sketch.png",
+      "sizeBytes": 1019971,
+      "sha256": "495611ff2baf0c8b3c09c4c6bbfc8611c7f96f4cb7575c9b34f6ff65c78bd771",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_inpaint/inpaint/cb8cdab428c8/provider-sketch.png"
+    }
+  ]
+}

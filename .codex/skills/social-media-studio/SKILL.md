@@ -117,6 +117,12 @@ Sparks, sin Nexa ni texto en el círculo; un destacado con Nexa usa otro nombre 
    `greenhouse-talent-people-operator`.
 5. **Aterriza a Efeonce** si el trabajo es de canales propios o de un cliente internacional:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`. Globe es un adaptador futuro gated, no una dependencia.
+   Canales propios de Efeonce: rol, catálogo y cadencia por familia —marca agencia (Instagram, Threads: love brand,
+   sin conversión directa), conexión B2B (LinkedIn página y de Julio) y Marketing con Manzanitas (blog, newsletter de
+   LinkedIn de Julio, YouTube)— en el overlay §Canales propios y
+   [PDR-020](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md); antes de idear marca
+   agencia, la [estrategia de love brand](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md)
+   (pilar emocional y peldaño de la escalera del fan por pieza; paso siguiente por canal en §8.4).
    Pieza de marca propia Efeonce o de su familia (nunca cliente): aplica la línea gráfica «La órbita» ([referencia operativa](../efeonce-brand-studio/references/graphic-line-orbit.md); reglas de redes en `efeonce/EFEONCE_OVERLAY.md` §Marca). La órbita se usa en casos declarados y nunca reemplaza la composición fotográfica; la pieza firma con el logo de Efeonce centrado y la burbuja URL sólo lo reemplaza si el logo ya está en la imagen. Los íconos salen sólo de la iconografía canónica de la línea (Plastilina en Brand, Trazo en Growth/Engine/Revenue), nunca generados sueltos; reglas en el overlay §Marca. Un post de un solo objeto protagonista puede llevar la **Plastilina en volumen** (D24: PNG con alfa de AXIS, uno por pieza, ≥ 160 px; nunca regenerado).
 6. **Cierra con el resultado solicitado**: artefacto de `templates/` en ejecución, pieza si se encargó producción,
    o explicación si sólo se pidió comprender/evaluar. No inventar un entregable para una pregunta.
@@ -139,6 +145,13 @@ Para entregar un video por red y programarlo con portada, cargar
 PNG master y transporte, autorización existente, cuenta/zona, duplicados y readback de media,
 portada y estado. Una instrucción explícita de programar satisface la confirmación humana de §4;
 no pedirla otra vez para la misma acción autorizada.
+Para video 4:5 en LinkedIn + Reel 9:16 en Instagram con portada propia, specs de portada (recorte 3:4 de la grilla)
+y menciones de LinkedIn con IDs de organización (Google, Google Cloud, Ingram Micro), usar la receta del 2026-10-19
+de esa misma referencia.
+Antes de mostrar al operador un video, reel o story con sonido o animación, correr el control estándar sin Gemini:
+`pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json`.
+Gemini va después, opcional, como segunda opinión de criterio y siempre con `--verify`
+([manual](../../../docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md)).
 
 ### Entrega de imágenes al equipo de Marketing
 

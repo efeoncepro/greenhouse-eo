@@ -696,6 +696,89 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(trigger.querySelector('.ghf-country-flag')).not.toBeNull()
   })
 
+  it('renders presentation.control premium_select as the premium listbox inside hubspot_pillar, keeping multiselect chips', () => {
+    const { root } = mountInto(
+      staticContractFixture({
+        styleVariant: 'hubspot_pillar',
+        fields: [
+          {
+            key: 'salesModel',
+            type: 'select',
+            label: '¿Cómo vendes?',
+            placeholder: 'Elige una opción',
+            presentation: { control: 'premium_select' },
+            options: [
+              { value: 'online-or-stores', label: 'Online o en tiendas' },
+              { value: 'b2b', label: 'A empresas' }
+            ]
+          },
+          {
+            key: 'mediaChannels',
+            type: 'multiselect',
+            label: 'Dónde pautas hoy',
+            options: [
+              { value: 'Google', label: 'Google' },
+              { value: 'Meta', label: 'Meta' }
+            ]
+          }
+        ],
+        consent: undefined
+      })
+    )
+
+    const trigger = root.querySelector<HTMLButtonElement>('[name="salesModel"].ghf-select-trigger')!
+
+    expect(trigger.getAttribute('role')).toBe('combobox')
+    expect(trigger.textContent).toContain('Elige una opción')
+    expect(root.querySelector('[data-ghf-field-key="salesModel"] .ghf-choice-group')).toBeNull()
+    expect(root.querySelectorAll('[data-ghf-field-key="mediaChannels"] .ghf-choice-group input[type="checkbox"]')).toHaveLength(2)
+
+    trigger.click()
+    expect(root.querySelectorAll('[data-ghf-field-key="salesModel"] [role="option"]').length).toBeGreaterThanOrEqual(2)
+    expect(root.querySelector('[data-ghf-field-key="salesModel"] .ghf-country-flag')).toBeNull()
+
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }))
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+    expect(trigger.textContent).toContain('A empresas')
+  })
+
+  it('falls back to the variant default control for an unknown presentation.control or premium_select outside select', () => {
+    const { root } = mountInto(
+      staticContractFixture({
+        styleVariant: 'hubspot_pillar',
+        fields: [
+          {
+            key: 'futureControl',
+            type: 'select',
+            label: 'Control futuro',
+            // Contrato emitido por un servidor más nuevo que este renderer.
+            presentation: { control: 'future_select' as never },
+            options: [
+              { value: 'a', label: 'A' },
+              { value: 'b', label: 'B' }
+            ]
+          },
+          {
+            key: 'channels',
+            type: 'multiselect',
+            label: 'Canales',
+            presentation: { control: 'premium_select' },
+            options: [
+              { value: 'Google', label: 'Google' },
+              { value: 'Meta', label: 'Meta' }
+            ]
+          }
+        ],
+        consent: undefined
+      })
+    )
+
+    expect(root.querySelector('.ghf-select-trigger')).toBeNull()
+    expect(root.querySelectorAll('[data-ghf-field-key="futureControl"] .ghf-choice-group input[type="radio"]')).toHaveLength(2)
+    expect(root.querySelectorAll('[data-ghf-field-key="channels"] .ghf-choice-group input[type="checkbox"]')).toHaveLength(2)
+  })
+
   it('renders free-entry multiselect fields as removable chips and submits string arrays', async () => {
     const fetchImpl = okFetch()
 
@@ -1357,6 +1440,28 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(turnstile.render.mock.calls[0]?.[1]).not.toHaveProperty('size')
     expect(turnstile.execute).toHaveBeenCalledWith('widget-1')
     expect(turnstile.reset).toHaveBeenCalledWith('widget-1')
+  })
+
+  it('TASK-2045 — monta el widget junto al formulario, no en body (sirve dentro de un <dialog> modal)', async () => {
+    const turnstile = installTurnstile()
+    const fetchImpl = okFetch()
+    const host = document.createElement('section')
+    const root = document.createElement('div')
+
+    host.id = 'form-host'
+    host.appendChild(root)
+    document.body.appendChild(host)
+    new FormRenderer({ root, contract: captchaContract(), api, fetchImpl, doc: document }).mount()
+    fillCaptchaContract(root)
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+    await vi.waitFor(() => expect(turnstile.render).toHaveBeenCalledTimes(1))
+
+    // El verificador real es Turnstile interactivo dentro de un dialog modal en un navegador; acá se
+    // fija dónde vive el contenedor: fuera del root (que se redibuja) y dentro del anfitrión.
+    const container = turnstile.render.mock.calls[0]![0] as HTMLElement
+
+    expect(container.parentElement).toBe(host)
+    expect(root.contains(container)).toBe(false)
   })
 
   it('does not POST when Turnstile token acquisition fails', async () => {

@@ -21,7 +21,9 @@ import {
   buildBrandIntelligencePrompt
 } from './prompt'
 
-export const resolveGeminiBrandIntelligenceModel = (env: NodeJS.ProcessEnv = process.env): string | undefined =>
+import type { EnvSource } from '@/types/env-source'
+
+export const resolveGeminiBrandIntelligenceModel = (env: EnvSource = process.env): string | undefined =>
   env.GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_MODEL_GEMINI?.trim() || undefined
 
 export const geminiBrandIntelligenceProvider: BrandIntelligenceProvider = {

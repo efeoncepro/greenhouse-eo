@@ -1,0 +1,520 @@
+{
+  "schemaVersion": "pricing-v3-composition-summary/1",
+  "version": "pricing-v3-resource-composition/1",
+  "binding": false,
+  "commercialUnit": "managed_service",
+  "calculationId": "composition-5c43325a31e32a1e05e8966b",
+  "replayDigest": "5c43325a31e32a1e05e8966bf020b257110becd1c2a63069d8f5990617c9740b",
+  "calculationStatus": "calculated",
+  "reviewStatus": "requires_review",
+  "quoteReviewStatus": "requires_review",
+  "engineVersion": "pricing-v3-local/1.3.0",
+  "totals": {
+    "cost": "8877988",
+    "marketAdjustment": "-1209809",
+    "engagementAdjustment": "0",
+    "undiscountedPrice": "15000000",
+    "roundingAdjustment": "68012",
+    "discount": "0",
+    "uplift": "0",
+    "net": "15000000",
+    "marginAmount": "6122012",
+    "marginRate": "0.40813413333333333333333333333333333333333333333333333333333333333333333333333333",
+    "tax": null,
+    "grandTotal": null,
+    "cashCommitment": "8877988",
+    "averageMonthlyNet": "15000000",
+    "currency": "COP"
+  },
+  "commercialAdjustments": [],
+  "priceRounding": {
+    "currency": "COP",
+    "multiple": "50000",
+    "scope": "general",
+    "offerId": null,
+    "recordId": "rounding:COP",
+    "revision": 1,
+    "sourceStatus": "confirmed"
+  },
+  "marketFactor": {
+    "country": "CO",
+    "factor": "0.90",
+    "floorBasis": "base_market",
+    "recordId": "market:CO",
+    "revision": 2,
+    "sourceStatus": "confirmed"
+  },
+  "engagementForm": {
+    "form": "on_going",
+    "priceRatio": "1",
+    "scope": "general",
+    "offerId": null,
+    "recordId": "engagement:on_going",
+    "revision": 1,
+    "sourceStatus": "confirmed"
+  },
+  "marginRateRoundedDown": "0.408134",
+  "diagnostics": [],
+  "assumptions": [
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.design.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    },
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.video.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    },
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.creative.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    }
+  ],
+  "periods": [
+    {
+      "periodId": 1,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "8877988",
+        "marketAdjustment": "-1209809",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "15000000",
+        "roundingAdjustment": "68012",
+        "discount": "0",
+        "uplift": "0",
+        "net": "15000000",
+        "marginAmount": "6122012",
+        "marginRate": "0.40813413333333333333333333333333333333333333333333333333333333333333333333333333",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "8877988",
+        "uniformMonthlyNet": "15000000"
+      }
+    }
+  ],
+  "reviewSignals": [
+    {
+      "code": "HISTORICAL_ONLY",
+      "severity": "review",
+      "count": 1,
+      "periodIds": [
+        1
+      ],
+      "lineIds": [],
+      "paths": [
+        "snapshot.mode"
+      ]
+    },
+    {
+      "code": "ESTIMATED_SOURCE",
+      "severity": "review",
+      "count": 10,
+      "periodIds": [
+        1
+      ],
+      "lineIds": [
+        "design",
+        "video",
+        "creative"
+      ],
+      "paths": [
+        "request.lines.0.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-0",
+        "snapshot.resources.fee:ECG-003",
+        "request.lines.1.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-1",
+        "snapshot.resources.fee:ECG-018",
+        "snapshot.resources.composed:frame-io",
+        "request.lines.2.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-2",
+        "snapshot.resources.fee:ECG-001"
+      ]
+    }
+  ],
+  "marginFloor": {
+    "source": "kernel:MARGIN_BELOW_FLOOR",
+    "flaggedLinePeriods": 0,
+    "lines": []
+  },
+  "toolSelections": {
+    "counts": {
+      "rows": 105,
+      "included": 9,
+      "clientProvided": 0,
+      "explicitlyExcluded": 0,
+      "notRequiredForWork": 96
+    },
+    "included": [
+      {
+        "lineId": "design",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "design",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "design",
+        "toolId": "adobe",
+        "reasons": [
+          "task:visual-design"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "video",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "video",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "video",
+        "toolId": "adobe",
+        "reasons": [
+          "task:video-editing"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "video",
+        "toolId": "frame-io",
+        "reasons": [
+          "task:video-editing"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "creative",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "creative",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      }
+    ],
+    "clientProvided": [],
+    "explicitlyExcluded": []
+  },
+  "attributions": [
+    {
+      "toolId": "notion",
+      "priceId": "current",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "3",
+      "serviceShare": "0.533333333333333333",
+      "fullMonthlyCost": "72",
+      "attributedMonthlyCost": "38.399999999999999976",
+      "unallocatedMonthlyCost": "33.600000000000000024",
+      "consumerCount": 3,
+      "lineIds": [
+        "design",
+        "video",
+        "creative"
+      ],
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "3",
+      "serviceShare": "0.533333333333333333",
+      "fullMonthlyCost": "44.1",
+      "attributedMonthlyCost": "23.5199999999999999853",
+      "unallocatedMonthlyCost": "20.5800000000000000147",
+      "consumerCount": 3,
+      "lineIds": [
+        "design",
+        "video",
+        "creative"
+      ],
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "toolId": "adobe",
+      "priceId": "current",
+      "currency": "CLP",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "1",
+      "serviceShare": "1",
+      "fullMonthlyCost": "325405.5",
+      "attributedMonthlyCost": "325405.5",
+      "unallocatedMonthlyCost": "0",
+      "consumerCount": 2,
+      "lineIds": [
+        "design",
+        "video"
+      ],
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "toolId": "frame-io",
+      "priceId": "historical",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "estimated",
+      "quantity": "1",
+      "serviceShare": "1",
+      "fullMonthlyCost": "75",
+      "attributedMonthlyCost": "75",
+      "unallocatedMonthlyCost": "0",
+      "consumerCount": 1,
+      "lineIds": [
+        "video"
+      ],
+      "periodIds": [
+        1
+      ]
+    }
+  ],
+  "creditBudgets": [],
+  "resourceIncrementalCash": [],
+  "cashLedger": [
+    {
+      "key": "human-monthly-and-once",
+      "amount": "8877988",
+      "currency": "COP",
+      "periodIds": [
+        1
+      ]
+    }
+  ],
+  "cashMeaning": "Kernel cashCommitment is attributed modeled commitment, not incremental purchase or an invoice. Incremental cash here covers only declared credit top-ups; seat procurement is not inferred.",
+  "estimateExposure": {
+    "basis": "Shares of the frozen cost components; nothing is recalculated. marginRateLostIfTenPctHigher = 0.10 x costAtRisk / net.",
+    "currency": "COP",
+    "totalCost": "8877988",
+    "net": "15000000",
+    "estimatedCost": "7464250",
+    "confirmedCost": "1413738",
+    "estimatedShareOfCost": "0.840759",
+    "dedicationNotEvidenced": {
+      "lineIds": [],
+      "cost": "0",
+      "shareOfCost": "0.000000"
+    },
+    "priceInputs": [],
+    "estimatedRules": [
+      {
+        "kind": "allocation_policy",
+        "side": "cost",
+        "ids": [
+          "allocation:shared"
+        ],
+        "lineIds": [
+          "design",
+          "video",
+          "creative"
+        ],
+        "periodIds": [
+          1
+        ],
+        "humanCostGoverned": "6653950",
+        "billedFteSetByRuleOn": []
+      },
+      {
+        "kind": "pricing_policy",
+        "side": "price",
+        "ids": [
+          "pricing:ECG-003:creative-managed-service",
+          "pricing:ECG-018:creative-managed-service",
+          "pricing:ECG-001:creative-managed-service"
+        ],
+        "lineIds": [
+          "design",
+          "video",
+          "creative"
+        ],
+        "periodIds": [
+          1
+        ]
+      }
+    ],
+    "costInputs": [
+      {
+        "kind": "dedication",
+        "id": "video",
+        "label": "Video Editor/Motion Graphics Designer",
+        "lineIds": [
+          "video"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "3942000",
+        "shareOfCost": "0.444020",
+        "marginRateLostIfTenPctHigher": "0.026280"
+      },
+      {
+        "kind": "dedication",
+        "id": "design",
+        "label": "Creative Designer",
+        "lineIds": [
+          "design"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "2157150",
+        "shareOfCost": "0.242977",
+        "marginRateLostIfTenPctHigher": "0.014381"
+      },
+      {
+        "kind": "dedication",
+        "id": "creative",
+        "label": "Creative Operations Lead",
+        "lineIds": [
+          "creative"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "554800",
+        "shareOfCost": "0.062492",
+        "marginRateLostIfTenPctHigher": "0.003699"
+      },
+      {
+        "kind": "tool",
+        "id": "frame-io",
+        "priceId": "historical",
+        "label": "Frame.io",
+        "billing": "month",
+        "lineIds": [
+          "video"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "273750",
+        "shareOfCost": "0.030835",
+        "marginRateLostIfTenPctHigher": "0.001825"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-001",
+        "label": "Historical generic platform fee — ECG-001",
+        "billing": "month",
+        "recordId": "fee:ECG-001",
+        "lineIds": [
+          "creative"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "178850",
+        "shareOfCost": "0.020145",
+        "marginRateLostIfTenPctHigher": "0.001193"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-003",
+        "label": "Historical generic platform fee — ECG-003",
+        "billing": "month",
+        "recordId": "fee:ECG-003",
+        "lineIds": [
+          "design"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "178850",
+        "shareOfCost": "0.020145",
+        "marginRateLostIfTenPctHigher": "0.001193"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-018",
+        "label": "Historical generic platform fee — ECG-018",
+        "billing": "month",
+        "recordId": "fee:ECG-018",
+        "lineIds": [
+          "video"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "178850",
+        "shareOfCost": "0.020145",
+        "marginRateLostIfTenPctHigher": "0.001193"
+      }
+    ]
+  },
+  "fullDetail": "Derived from the frozen composition artifact. Every selection row, attribution assignment, kernel line with its cost components, per-period diagnostic and credit plan lives in that file under semantic.result.",
+  "runNotices": {
+    "priceDates": {
+      "withinDays": 30,
+      "reviewDue": [],
+      "dueSoon": [
+        {
+          "subject": "tool_price",
+          "ref": "adobe:current",
+          "toolId": "adobe",
+          "priceId": "current",
+          "label": "Adobe Creative Cloud Pro",
+          "kind": "review",
+          "date": "2026-11-16",
+          "blocksWith": null,
+          "daysLeft": 25
+        }
+      ],
+      "expired": []
+    }
+  }
+}

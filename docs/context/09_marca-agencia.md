@@ -140,6 +140,18 @@ Son el único robot permitido en una foto de Efeonce y se declaran desde el cat�
 «los Sparks de Efeonce»; el nombre no es producto ni marca registrada. Canon:
 [`SPARKS_V1.md`](../operations/brand-characters/SPARKS_V1.md).
 
+### Love brand: la marca agencia vivida en público (2026-10-22)
+
+Decisión del operador: **que las personas que trabajan en las empresas quieran a Efeonce antes de necesitarla.**
+Efeonce vende a empresas, pero detrás de cada empresa hay personas. Instagram y Threads (la familia *marca agencia*)
+y, desde la utilidad, YouTube y el newsletter Marketing con Manzanitas, convierten a esas personas en fans; la
+conversación de negocio nace después en LinkedIn, la web o por recomendación. El love brand es el Why vivido en
+público, con cuatro pilares anclados a creencias y mecanismos: **orgullo de oficio, generosidad, cercanía y optimismo
+con criterio sobre la IA**. Se sostiene en amor (gente, cultura, generosidad) **y** respeto (oficio, evidencia,
+honestidad con los tropiezos). «Comunidad» sigue prohibida sin mecanismo: los mecanismos, la escalera del fan, los
+activos de amor y la medición del puente a negocio viven en
+[`Efeonce Love Brand & Community Strategy V1`](../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
+
 ---
 
 ## Arquitectura de marca: masterbrand con capabilities

@@ -23,6 +23,7 @@ const slide: SlideSpec = {
   template: 'ReportCoverLightPage',
   slots: {
     editionLabel: 'Informe mensual · Agosto 2026',
+    productLabel: 'Insights',
     scopeLabel: 'Qué mide este informe',
     scopeLines: ['Entrega creativa'],
     eyebrow: 'Lectura de Efeonce',

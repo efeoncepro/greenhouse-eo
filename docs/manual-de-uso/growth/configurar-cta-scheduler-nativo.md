@@ -37,7 +37,16 @@ placement `embedded` y style `minimal`, y reduce el card a su botón desde el CS
 Caso fuente: el dock móvil de `/servicios-contratar-hubspot/` (CTA `hubspot-discovery-meeting`, `cta-location=hubspot_mobile_dock`)
 reduce el CTA a un botón de 48 px junto a «Ir al formulario»; `/contacto/` usa el mismo patrón. El botón sigue abriendo el
 scheduler nativo en full-screen y la conversión sigue siendo el receipt `gh_meeting_*`, nunca el click. Si el host no tiene
-surface/key, el hueco debe caer a un enlace a `/agenda/`.
+surface/key, el hueco debe caer a un enlace a `/agenda/`, que desde el 2026-10-20 es la landing de agenda indexable
+(monta el mismo agendador en línea; ya no es sólo el piloto).
+
+**Delta 2026-10-23 — docks de las landings de efeoncepro.com.** Ese caso fuente es el dock propio anterior. Desde el
+2026-10-23 las siete landings usan el dock compartido AXIS `efeonce.landing-dock` (TASK-2043): el plugin
+`eo-landing-dock` imprime un lanzador `<greenhouse-cta cta-location="landing_dock">` oculto y el botón del dock lo abre;
+no se reduce el card a botón. Un dock nuevo en una landing de efeoncepro.com usa ese dock con su archivo
+`manifests/landing-dock/<landing>.json` y su alta en la lista de páginas permitidas del plugin (hoy
+7 páginas), no este patrón. Ver
+[Operar el dock de las landings](../public-site/operar-dock-de-landings.md).
 
 ## Problemas comunes
 
@@ -55,8 +64,9 @@ ese alcance por sí sola. Para una agenda/surface nueva compatible, usar [config
 API/panel/CLI](configurar-medicion-conversiones.md): mapping tipado, destinos explícitos,
 review/publish y lectura de confirmación. No cambiar una lista en código o GTM.
 
-Después de una reserva real autorizada y confirmada, distinguir tres evidencias: receipt/ledger
-server-side, mirror GA4 `generate_lead`, y entrega backend a Meta/Google.
+Después de una reserva real autorizada y confirmada, distinguir receipt/ledger server-side,
+espejo GA4 `generate_lead`, entregas backend Meta/Google UPD y conversión Ads online.
+Ninguno de estos estados prueba por sí solo recepción, matching o atribución en Ads.
 El renderer toma categorías HubSpot/GPC al POST; sin publicidad explícita no hay matching, y
 Google UPD exige también analítica e identificador GA4 real. La casilla para reservar no equivale a
 consentimiento publicitario. El UUID de medición es independiente del recibo privado.
@@ -67,6 +77,27 @@ booking para probar transporte. Usar Meta Test Events efímero para esa prueba a
 [manual CAPI](operar-meta-capi-servidor.md). Las pruebas controladas y sus límites están en el
 [release vigente](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md); el procedimiento completo,
 reintentos/retención y rollback en el [contrato runtime](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+
+### Comprobar Google Ads y EC
+
+1. Descubre la policy vigente del binding/surface/origen y confirma opt-in `meeting_booking`; el
+   binding o CTA activo no la habilita por sí solo. Discovery es la agenda del sitio y no un tipo
+   de campaña Ads. El corte publicado cubre Discovery junto a13 Forms comerciales.
+2. Revisa flags de captura/Ads y consentimiento Google explícito (`analytics_storage`, `ad_storage`,
+   `ad_user_data`, `ad_personalization`), sin GPC. El consentimiento para reservar no sustituye estos permisos.
+3. Para una reserva legítima y fresca, verifica confirmación proveedor y persistencia del ledger y
+   la proyección de medición. Sólo entonces aparece `googleAdsConversion` dedicado en la primera
+   respuesta. Duplicados/replay no lo repiten; no crear otra reserva para probarlo.
+4. Comprueba el circuito `gh_ads_conversion` → GTM Web → GTM Server → Ads, separado del espejo GA4.
+   EC entrega hashes opcionales por el canal reservado `user_data`; no copiarlos a dataLayer, logs
+   ni reportes. No fabricar GCLID/GBRAID/WBRAID. Ads online no tiene retry backend.
+5. Conciliar recepción y atribución en la cuenta6862539491 con evidencia adecuada al proveedor y
+   su ventana. Un tag fired, HTTP200 o recibo local no acreditan esos resultados.
+
+El [release main2559e9242](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md)
+releyó Web6/Server10 y14 políticas sin nuevas publicaciones ni reservas de prueba. No quedó probada
+una conversión Ads real. Para IDs/labels, controles y rollback de medición, usar el
+[manual de activación Ads](activar-conversiones-google-ads.md) antes de cualquier cambio.
 
 ## Degradación y rollback
 

@@ -1,3 +1,5 @@
+import type { EnvSource } from '@/types/env-source'
+
 const trimWebhookValue = (value: string | undefined) => {
   const normalized = value?.replace(/\\[rn]/g, '').trim()
 
@@ -9,7 +11,7 @@ export const resolveWebhookBaseUrl = ({
   env = process.env
 }: {
   request: Request
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }) => {
   const requestUrl = new URL(request.url)
   const forwardedProto = trimWebhookValue(request.headers.get('x-forwarded-proto') ?? undefined)

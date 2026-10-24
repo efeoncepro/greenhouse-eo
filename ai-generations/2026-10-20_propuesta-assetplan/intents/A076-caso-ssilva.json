@@ -1,0 +1,56 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "light",
+  "role": "decision",
+  "recipe": "decision-case",
+  "voice": {
+    "eyebrow": "Caso inmobiliario",
+    "question": "¿Qué cambió en su CRM?",
+    "answer": [
+      "Velocidad"
+    ]
+  },
+  "figures": [
+    {
+      "value": "−44 %",
+      "label": "días en el pipeline",
+      "source": "caso publicado de SSilva en efeoncepro.com, marzo de 2025"
+    },
+    {
+      "value": "+30 %",
+      "label": "tasa de cierre en el CRM",
+      "source": "caso publicado de SSilva en efeoncepro.com, marzo de 2025"
+    },
+    {
+      "value": "Activo",
+      "label": "lead scoring para ventas",
+      "source": "caso publicado de SSilva en efeoncepro.com, marzo de 2025"
+    },
+    {
+      "value": "2",
+      "label": "CRM sincronizados",
+      "source": "caso publicado de SSilva en efeoncepro.com, marzo de 2025"
+    }
+  ],
+  "clientLogo": {
+    "path": "ai-generations/2026-10-20_propuesta-assetplan/assets/ssilva-logo-azul-trim.png",
+    "alt": "SSilva"
+  },
+  "selected": 2,
+  "photo": {
+    "register": "puesta-en-escena",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-20_propuesta-assetplan/caso-ssilva/base-cine.png",
+    "alt": "Una corredora de propiedades levanta las llaves de un departamento nuevo con vista a Santiago y la cordillera al atardecer"
+  },
+  "selection": {
+    "target": "object",
+    "label": "HubSpot",
+    "participantKind": "department"
+  }
+}

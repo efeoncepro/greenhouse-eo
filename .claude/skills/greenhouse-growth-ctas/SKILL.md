@@ -164,6 +164,47 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
 
 ## Estado de rollout (actualizar al cambiar)
 
+- **2026-10-23: `open_growth_form` en diálogo — contrato (TASK-2044) y render (TASK-2045) code complete; renderer `1.4.0`, llega con el próximo release a `main`.**
+  Policy `presentation: 'inline' | 'dialog'` + encabezado `dialog: { eyebrow?, title?, lead? }` (texto plano,
+  estricto). Sólo `dialog` se proyecta al navegador; un encabezado sin `dialog` es `action_policy_invalid` (regla en el
+  resolver: la unión discriminada no admite `.refine`). **No es `popup_modal`**: es abierto por el visitante, sin
+  suppression ni claim interruptivo. `src/growth-cta-renderer/dialog.ts` (`FormDialogController`): `<dialog>` +
+  `showModal`, form montado al abrir y conservado, scroll lock compartido, Escape/velo bloqueados con `data-ghf-busy`,
+  `ghf:dismiss` cierra, `data-sheet` < 760 px, `data-success` retira el encabezado; piel con `--ghcta-dialog-*` y hooks
+  `data-ghcta-dialog-*`. Telemetría `activation_mode: 'dialog'` (DLV/GA4 pendiente). Hasta el release, inline. Arch §30.
+
+- **2026-10-23: placement `landing_dock`** (dock inferior compartido de siete landings de efeoncepro.com, AXIS
+  `efeonce.landing-dock`, plugin `eo-landing-dock`, TASK-2043). Mismo patrón de **lanzador oculto** que el menú: el
+  plugin imprime en `wp_footer` un `<greenhouse-cta cta-location="landing_dock" appearance="bare">` oculto y el botón
+  principal del dock lo activa (`landing-dock-host.js`). Redes Sociales e Inicio usan el CTA del menú
+  `site-nav-discovery-meeting` (misma página HubSpot `efeoncepro/agenda-discovery`; piel `site`), y su key sale de la
+  opción del menú en cada render. Influencers, Inbound y HubSpot conservan su CTA propio (`influencer-`, `inbound-`,
+  `hubspot-discovery-meeting`); `pnpm public-website:landing-dock on` copia la key desde el HTML vivo al meta del dock,
+  así que **rotar la key de esos CTA exige repetir `on`** después de republicar la landing. `landing_dock` reemplaza
+  `inbound_mobile_dock` y `hubspot_mobile_dock`. El clic del dock se mide aparte con `gh_landing_dock_clicked`
+  (GTM web versión 8; el del menú, `gh_site_nav_clicked`, versiones 9–10); el agendador sigue midiendo
+  `greenhouse_cta_*` con `cta_location: landing_dock | site_nav`. Operación: skill `efeonce-public-site-wordpress` →
+  `references/global-site-navigation.md` §Landing dock.
+
+- **2026-10-23: CTA `site-nav-discovery-meeting` publicado** (menú global de efeoncepro.com, EPIC-055/TASK-2042).
+  `open_meeting_scheduler` → meeting surface `fhsf-efeonce-lead-gen-web`, scheduler `discovery`, rutas `/**`; surface
+  WordPress `csur-eb834d53-fd99-4f6b-9615-979e329e7d37` que sólo permite ese CTA, orígenes efeoncepro.com y www;
+  `cta_location: site_nav`. Lo publica `scripts/growth/publish-site-nav-meeting-cta.ts`; la key vive en Greenhouse
+  `.auth/site-nav-meeting-cta-surface.json` (0600, gitignored). **Re-correr el publisher ROTA la key**: en la misma
+  sesión hay que actualizar la opción `eo_site_nav_scheduler` de WordPress (la otra copia de la key) con `set-site-nav-scheduler.php` (nunca imprime la key), o el CTA
+  cae a `/agenda/`. Nunca escribir la key en docs, logs ni chat.
+  - **Lanzador oculto:** el tema imprime un único `<greenhouse-cta>` oculto por página en `wp_footer` (sólo si la opción
+    `eo_site_nav_scheduler` es válida); los botones del menú (cabecera, mega, onepage) lo activan. El renderer carga en
+    idle o cuando el visitante va hacia el CTA (una sola copia en landings que ya lo cargan); si no está listo, el clic
+    espera hasta 2,5 s; un lanzador vacío (`data-ghc-state="empty"`: pausado, origen incorrecto) deja ir el link a
+    `/agenda/` de inmediato. El foco vuelve al control que lo abrió, o a uno visible.
+  - **Piel del diálogo con scope:** el diálogo se marca `data-eo-meeting-skin="site"` y viste
+    `ohio-child/assets/css/meeting-dialog.css` (marco aprobado para Inbound el 2026-10-18 con la paleta de `/agenda/`);
+    peso `:root` para quedar sobre la piel de una landing; el diálogo del CTA propio de una landing conserva su piel.
+  - Verificado live: cabecera, mega, onepage móvil (pantalla completa), Escape/cierre, `gh_site_nav_clicked` +
+    `greenhouse_cta_clicked`/`greenhouse_cta_action_started` con `cta_location: site_nav`, sin errores de página.
+    Operación del menú: skill `efeonce-public-site-wordpress` → `references/global-site-navigation.md`.
+
 - **2026-10-18: CTA `inbound-discovery-meeting` publicado** (landing `/agencia-inbound-marketing/`, surface propia).
   Primer consumidor del lanzador de reunión genérico de la base source-led (`<gh-meeting-cta location="…">` →
   `<greenhouse-cta appearance="bare" cta-location="…">`). Un mismo CTA se renderiza desde **tres placements** de la

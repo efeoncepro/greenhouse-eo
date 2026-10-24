@@ -1,0 +1,136 @@
+{
+  "outcome": "validated",
+  "mode": "dryRun",
+  "warnings": [
+    "public_compensation_band_not_set"
+  ],
+  "timings": [],
+  "preview": {
+    "demand": {
+      "stakeholderType": "internal",
+      "engagementType": "on_going",
+      "fulfillmentMode": "internal_hire",
+      "demandOrigin": "prospect_request",
+      "requestedRole": "Content Creator — Contenido Social y Audiovisual",
+      "requestedSeats": 1,
+      "requestedSkills": [
+        "Contenido social",
+        "Copywriting",
+        "Guiones",
+        "Reels",
+        "Captura audiovisual"
+      ],
+      "priority": "high",
+      "ownerUserId": "user-efeonce-admin-julio-reyes",
+      "notes": "publication_source_ref=efeonce-medellin-2027-content-creator-20261022"
+    },
+    "opening": {
+      "demandId": "<created-demand-id>",
+      "internalTitle": "Content Creator — Contenido Social y Audiovisual",
+      "seniority": "Semi-senior",
+      "requestedSeats": 1,
+      "ownerUserId": "user-efeonce-admin-julio-reyes"
+    },
+    "publicOpening": {
+      "publicTitle": "Content Creator — Contenido Social y Audiovisual",
+      "publicSummary": "Transforma ideas, tendencias y momentos reales en contenido social con una intención clara y una voz reconocible.",
+      "publicDescription": "Buscamos un Content Creator Semi-senior para un importante cliente de Colombia. Tu foco será idear, escribir y capturar contenido en Medellín, trabajando de cerca con Marketing Digital del cliente y con el respaldo creativo y de producción de Efeonce. Queremos conocer la mirada y las decisiones detrás de las piezas que haces.\n\n- Proponer ideas, conceptos, guiones y copies para los canales sociales asignados.\n- Investigar tendencias y seleccionar las que tengan una razón clara para la marca y la audiencia.\n- Planear y realizar captura audiovisual y coberturas según el calendario y las necesidades acordadas.\n- Preparar briefs y materiales para colaborar con diseño, edición y producción.\n- Participar en la organización de parrillas y revisiones de contenido con Marketing Digital del cliente.\n- Incorporar feedback, revisar calidad y dejar referencias y aprendizajes reutilizables.",
+      "publicRequirements": "Portafolio o muestras existentes de contenido social que permitan reconocer tu contribución.\nBuena escritura en español y capacidad de adaptar voz, idea y estructura a cada formato.\nExperiencia convirtiendo una idea en concepto, guion, copy y una propuesta de captura viable.\nCapacidad práctica para capturar contenido audiovisual y explicar decisiones de encuadre, ritmo y narrativa.\nOrganización de entregas y colaboración con diseño, edición y equipos de marketing.\nDisponibilidad para la modalidad híbrida en Medellín y dedicación completa al proyecto.",
+      "publicNiceToHave": "Experiencia en coberturas o contenido realizado cerca de la operación del cliente.\nConocimiento de tendencias, códigos y formatos de las plataformas sociales.\nCapacidad de leer resultados de contenido para proponer ajustes.",
+      "publicWorkMode": "hybrid",
+      "publicHiringRegion": "Colombia",
+      "publicCity": "Medellín",
+      "publicCountry": "CO",
+      "publicOfficeLocation": "Medellín, Colombia — instalaciones del cliente",
+      "publicArea": "Creative",
+      "publicSkillTags": [
+        "Contenido social",
+        "Copywriting",
+        "Guiones",
+        "Reels",
+        "Captura audiovisual"
+      ],
+      "publicLocationMode": "Medellín, Colombia — instalaciones del cliente",
+      "publicEmploymentMode": "Jornada completa",
+      "publicSeniority": "Semi-senior",
+      "publicProcessNotes": "Postulación y revisión inicial: Revisamos tu perfil, tu disponibilidad para trabajar en Medellín y una muestra o caso existente que puedas compartir sin información confidencial.\nConversación estructurada: Conversamos sobre tu experiencia, las decisiones que has tomado y cómo colaboras con equipos y clientes. Aclaramos modalidad, expectativas y remuneración.\nRevisión de un caso de tu trabajo: Profundizamos en una muestra existente y en tu contribución concreta. Puedes anonimizar clientes y resultados; no te pedimos trabajo utilizable ni una campaña gratuita para el cliente.\nAlineación final y respuesta: Revisamos alcance, condiciones, disponibilidad y los siguientes pasos. Cualquier incorporación queda condicionada a la activación del proyecto 2027 y al acuerdo final.\nEsperamos darte una definición o actualización del proceso en tres a cuatro semanas, sujeto a disponibilidad mutua. Ese plazo no es una fecha de incorporación al proyecto.\nTe comunicaremos los avances y la decisión final, incluso si no continuamos; si cambia el plazo, te informaremos.\nPuedes solicitar una adaptación o ajuste razonable al responder a la persona de Efeonce que te contacte durante el proceso.",
+      "publicCompensationBand": null,
+      "publicationSourceRef": "efeonce-medellin-2027-content-creator-20261022",
+      "publicContent": {
+        "version": 2,
+        "promise": "Transforma ideas, tendencias y momentos reales en contenido social con una intención clara y una voz reconocible.",
+        "intro": "Buscamos un Content Creator Semi-senior para un importante cliente de Colombia. Tu foco será idear, escribir y capturar contenido en Medellín, trabajando de cerca con Marketing Digital del cliente y con el respaldo creativo y de producción de Efeonce. Queremos conocer la mirada y las decisiones detrás de las piezas que haces.",
+        "outcomes": [
+          "Construir propuestas de contenido que conecten objetivos, audiencia, mensaje y formato.",
+          "Sostener un flujo ordenado de conceptos, guiones, copies y capturas que facilite producir y aprobar a tiempo.",
+          "Conservar coherencia de voz y criterio de marca al adaptar ideas a Reels, historias y otras piezas sociales.",
+          "Convertir el feedback y las señales de desempeño en aprendizajes concretos para la siguiente parrilla."
+        ],
+        "workItems": [
+          "Proponer ideas, conceptos, guiones y copies para los canales sociales asignados.",
+          "Investigar tendencias y seleccionar las que tengan una razón clara para la marca y la audiencia.",
+          "Planear y realizar captura audiovisual y coberturas según el calendario y las necesidades acordadas.",
+          "Preparar briefs y materiales para colaborar con diseño, edición y producción.",
+          "Participar en la organización de parrillas y revisiones de contenido con Marketing Digital del cliente.",
+          "Incorporar feedback, revisar calidad y dejar referencias y aprendizajes reutilizables."
+        ],
+        "essentials": [
+          "Portafolio o muestras existentes de contenido social que permitan reconocer tu contribución.",
+          "Buena escritura en español y capacidad de adaptar voz, idea y estructura a cada formato.",
+          "Experiencia convirtiendo una idea en concepto, guion, copy y una propuesta de captura viable.",
+          "Capacidad práctica para capturar contenido audiovisual y explicar decisiones de encuadre, ritmo y narrativa.",
+          "Organización de entregas y colaboración con diseño, edición y equipos de marketing.",
+          "Disponibilidad para la modalidad híbrida en Medellín y dedicación completa al proyecto."
+        ],
+        "preferred": [
+          "Experiencia en coberturas o contenido realizado cerca de la operación del cliente.",
+          "Conocimiento de tendencias, códigos y formatos de las plataformas sociales.",
+          "Capacidad de leer resultados de contenido para proponer ajustes."
+        ],
+        "learnables": [
+          "Voz y contexto de las marcas del proyecto.",
+          "Métodos de brief, revisión y documentación de Efeonce.",
+          "Uso responsable de herramientas de IA dentro de los flujos aprobados del equipo."
+        ],
+        "evidenceAsk": "Comparte entre tres y cinco piezas existentes, o un portafolio breve, e identifica qué hiciste tú. Elige una y explica la idea, la audiencia, una decisión creativa y lo que aprendiste. Puedes anonimizar clientes y datos; no necesitas producir contenido nuevo para postular.",
+        "workModel": "Dedicación completa a un importante cliente de Colombia, con base en Medellín: dos días presenciales en sus instalaciones y tres remotos por semana. Búsqueda anticipada para un proyecto previsto para 2027; la incorporación y su fecha dependen de su activación y de un acuerdo entre las partes. Vinculación por la vía internacional habitual de Efeonce, con pago directo de Efeonce; las condiciones y los beneficios aplicables se formalizan en el acuerdo correspondiente a Colombia. La remuneración se conversa con transparencia durante el proceso.",
+        "collaboration": {
+          "team": "Marketing Digital del cliente y equipos de estrategia, creatividad, medios y datos de Efeonce; colaboración multicultural y entre países.",
+          "reportsTo": "Administración operativa de Marketing Digital del cliente, con respaldo y seguimiento de Efeonce.",
+          "language": "Español para la operación, la documentación y la comunicación con el cliente.",
+          "timezoneOverlap": "Horario de Colombia (America/Bogota, UTC-5); coordinación con los equipos de Efeonce en otros países.",
+          "workingRhythm": "Planificación editorial y revisiones acordadas; captura y coberturas coordinadas con el cliente, con documentación para diseño y producción."
+        },
+        "process": {
+          "steps": [
+            {
+              "title": "Postulación y revisión inicial",
+              "body": "Revisamos tu perfil, tu disponibilidad para trabajar en Medellín y una muestra o caso existente que puedas compartir sin información confidencial."
+            },
+            {
+              "title": "Conversación estructurada",
+              "body": "Conversamos sobre tu experiencia, las decisiones que has tomado y cómo colaboras con equipos y clientes. Aclaramos modalidad, expectativas y remuneración."
+            },
+            {
+              "title": "Revisión de un caso de tu trabajo",
+              "body": "Profundizamos en una muestra existente y en tu contribución concreta. Puedes anonimizar clientes y resultados; no te pedimos trabajo utilizable ni una campaña gratuita para el cliente."
+            },
+            {
+              "title": "Alineación final y respuesta",
+              "body": "Revisamos alcance, condiciones, disponibilidad y los siguientes pasos. Cualquier incorporación queda condicionada a la activación del proyecto 2027 y al acuerdo final."
+            }
+          ],
+          "expectedTiming": "Esperamos darte una definición o actualización del proceso en tres a cuatro semanas, sujeto a disponibilidad mutua. Ese plazo no es una fecha de incorporación al proyecto.",
+          "responseCommitment": "Te comunicaremos los avances y la decisión final, incluso si no continuamos; si cambia el plazo, te informaremos.",
+          "accommodationPath": "Puedes solicitar una adaptación o ajuste razonable al responder a la persona de Efeonce que te contacte durante el proceso."
+        },
+        "benefits": [],
+        "compensation": null,
+        "additionalSections": []
+      },
+      "publicRemoteEligibleCountries": [
+        "CO"
+      ]
+    }
+  }
+}

@@ -52,12 +52,15 @@ gh_form_success_action_clicked
 | Descarga | `gh_file_downloaded` | `file_id`, `file_kind` |
 | Búsqueda | `gh_search_submitted`, `gh_search_results_viewed` | `results_count`, `filters_applied` |
 | Lead | `gh_lead_captured`, `gh_demo_requested` | `lead_source`, `plan`, `correlation_id` |
+| **Menú global de `efeoncepro.com`** (AXIS `efeonce.site-nav`, TASK-2042; host `ohio-child/assets/js/site-nav-host.js`) | `gh_site_nav_opened`, `gh_site_nav_line_viewed`, `gh_site_nav_clicked` (GTM web versiones 9 y 10, 2026-10-23) | `panel` (`nosotros`, `soluciones`, `recursos`, `onepage`…), `line` (`brand`, `engine`, `growth`, `revenue-hubspot`, `voice`), y en el clic `target_type`, `target` (id de la entrada; el CTA va como `cta` + `menu_header`/`menu_mega`/`menu_onepage`), `target_label` y `target_url`. `site_nav_cta` no se empuja. |
+| **Dock de las landings** (AXIS `efeonce.landing-dock`, TASK-2043; host `eo-landing-dock/assets/js/landing-dock-host.js`) | `gh_landing_dock_clicked` (GTM web versión 8, 2026-10-23) | `target_type` (`cta` abre el agendador, `link`), `target` (`primary`/`secondary`), `target_label` (etiqueta completa, ≤100), `target_url` (ruta + ancla, sin query; dirección completa si es externa, ≤100) |
 
 Reglas de extensión:
 - `*_location` es la válvula anti-explosión de posición (`hero`/`nav`/`footer`/`pricing`) → **un** `gh_cta_clicked`, nunca `gh_hero_cta_clicked`.
 - `*_kind` (bajo `form_kind`) para variantes low-cardinality → nunca un evento nuevo por variante.
 - `surface_id`, `page_uri`, `correlation_id`, `utm_*` viven en el **allowlist base** compartido por todos los eventos; sólo los keys realmente propios se suman por familia.
 - Duplicar el split intent/outcome (`_accepted`/`_rejected`) **solo si hay outcome de servidor real** (no en clicks de pura navegación).
+- Menú y dock: ningún evento es key event (la conversión sigue siendo `generate_lead`, por formulario o reserva) y la página del clic no lleva parámetro propio: viaja en cada hit (`dl` → `page_location`). El agendador que abren mide `greenhouse_cta_*` con `cta_location: site_nav | landing_dock`.
 
 ---
 
@@ -71,6 +74,10 @@ GA4 publica un **vocabulario de eventos recomendados** (`generate_lead`, `sign_u
 2. **Si NO existe equivalente GA4** (comportamiento propio del producto: `gh_form_viewed`, `gh_form_submission_rejected`, `gh_cta_viewed`) → **evento custom `gh_<object>_<action>`**.
 3. **Patrón dual (recomendado para el momento de conversión):** mantener el `gh_*` granular para gobernanza/funnel interno **y** disparar/derivar el recomendado GA4 para reporting. En GA4 se puede hacer con un GA4 Event tag adicional en GTM, o con "Create event" derivando `generate_lead` desde `gh_form_submission_accepted`. Pro: conservas granularidad interna + heredas features GA4. Contra: dos eventos que mantener alineados.
 
+### Newsletter no es alta de cuenta — precisión20/10/2026
+
+`sign_up` corresponde a una cuenta nueva ([Google](https://developers.google.com/analytics/devguides/collection/ga4/reference/recommended-events)). Para newsletter, Google ejemplifica un custom event ([guía](https://developers.google.com/analytics/devguides/collection/ga4/events)); Greenhouse aplica su gramática `gh_`. La solicitud aceptada de una suscripción editorial se reporta como `gh_newsletter_subscription_accepted`, reutilizando el evento interno genérico y `form_kind=subscribe`. No implica entrega ni opt-in confirmado por HubSpot. La corrección del blog está preparada sólo en develop; Web7 todavía tiene el mapping anterior ([estado](../../audits/public-site/2026-10-20-blog-growth-form-preparation.md)).
+
 ### Tabla de mapeo Greenhouse (canónica)
 
 | Evento interno `gh_*` | Momento | GA4 recomendado | Key event | Trato |
@@ -79,6 +86,7 @@ GA4 publica un **vocabulario de eventos recomendados** (`generate_lead`, `sign_u
 | `gh_form_started` | primera interacción | (GA4 auto `form_start` existe, reservado) | no | custom `gh_` (no colisiona; el reservado es de enhanced measurement) |
 | `gh_form_submitted` | click submit (intent) | (GA4 auto `form_submit` existe, reservado) | no | custom `gh_` |
 | **`gh_form_submission_accepted`** | **lead válido (outcome)** | **`generate_lead`** | **sí** | **dual → dispara también `generate_lead`** |
+| `gh_form_submission_accepted` + `form_kind=subscribe` | solicitud editorial aceptada por el motor | —; custom `gh_newsletter_subscription_accepted` | no por defecto | Excluir de `generate_lead` y `sign_up`; entrega/preferencia HubSpot se verifican aparte. Preparado local20/10, publicación pendiente. |
 | `gh_form_submission_rejected` | rechazo servidor | — | no | custom |
 | `gh_form_asset_accessed` | descarga lead magnet | `select_content` (opcional) | opcional | custom, dual si aplica |
 | `gh_cta_clicked` | click CTA | `select_content` (opcional) | opcional | custom; dual solo si el CTA representa selección de contenido |

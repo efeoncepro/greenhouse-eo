@@ -1,0 +1,142 @@
+/**
+ * TASK-2051 — Emits the approved template into the eo-blog-home plugin (efeonce-public-site-runtime):
+ *   assets/generated/<board>.ast.json        template AST rendered by PHP (server)
+ *   assets/generated/<board>.js              the same AST + the canvas logic class, for the browser runtime
+ *   assets/generated/blog-home-base.css      host reset shared by the boards
+ *   assets/generated/<board>.css             each board's canvas CSS, scoped (see scopeCss); enqueued with the media
+ *                                            query of its board, so only the visible board's CSS blocks rendering
+ *   assets/generated/fixture.<board>.json    the approved example content, %%img%% = plugin image base
+ *   assets/img/<file>                    canvas images used by the fixture
+ * Generated files carry their source hash; never edit them by hand. Rebuild: node build-plugin.cjs.
+ */
+const crypto = require('node:crypto')
+const fs = require('node:fs')
+const path = require('node:path')
+
+const postcss = require('postcss')
+
+const { parseDcFile } = require('./lib/dc-template.cjs')
+const { RUNTIME_DIR } = require('./lib/render-node.cjs')
+
+const SRC = path.join(__dirname, 'source')
+const OUT = path.join(RUNTIME_DIR, 'wp-content/plugins/eo-blog-home/assets/generated')
+const BOARDS = { 'Portada-v3': 'portada', 'Tablet-v3': 'tablet', 'Movil-v3': 'movil' }
+
+const IMG = path.join(OUT, '..', 'img')
+const SCOPE = { portada: '#eobh .eobh-d', tablet: '#eobh .eobh-t', movil: '#eobh .eobh-m' }
+// The tablet board renders the desktop data contract: no fixture of its own.
+const FIXTURES = { portada: 'fixture.json', tablet: null, movil: 'fixture.mobile.json' }
+
+// Host reset: the references were captured against the browser's own element styles, so inside the page every HTML
+// element goes back to them (`all: revert`), above Ohio's element rules (ID specificity) and below the canvas rules
+// (rewritten under the same ID). SVG and IMG are left out of `all`: their presentation attributes (width, height,
+// fill) would be reverted too, so they get back every box and presentation property except width, height and fill
+// (measured in the preview 2026-10-24: the theme sets max-width 100 %, vertical-align top, transition all on every
+// <img> and a 16 px top margin on an image after a heading).
+// The root starts from initial values, so nothing inherited from the theme's <body> (line height, letter spacing,
+// font smoothing) reaches the boards: that is the context the references were captured in.
+const HOST_RESET = `#eobh{all:initial;display:block}
+#eobh :is(h1,h2,h3,h4,h5,h6,p,a,ul,ol,li,dl,dt,dd,button,input,textarea,select,label,form,fieldset,figure,figcaption,blockquote,span,div,section,article,nav,header,footer,strong,em,b,i,small,time,mark,table,tr,td,th){all:revert}
+#eobh :is(img,svg){margin:revert;padding:revert;border:revert;border-radius:revert;box-shadow:revert;outline:revert;max-width:revert;max-height:revert;min-width:revert;min-height:revert;vertical-align:revert;float:revert;opacity:revert;filter:revert;transform:revert;transition:revert;object-fit:revert;object-position:revert}
+`
+
+/** Rewrites one board's canvas CSS under its scope and gives its keyframes board-unique names. */
+function scopeCss(css, slug) {
+  const scope = SCOPE[slug]
+  // No Ohio link guard here: the host reset already reverts Ohio's animated underline on every link of the page.
+  const ast = postcss.parse(css)
+  const frames = new Set()
+
+  ast.walkAtRules(/keyframes$/, at => {
+    frames.add(at.params)
+    at.params = `eobh-${slug}-${at.params}`
+  })
+
+  const rename = value => value.replace(/[\w-]+/g, w => (frames.has(w) ? `eobh-${slug}-${w}` : w))
+
+  ast.walkDecls(/^animation(-name)?$/, d => {
+    d.value = rename(d.value)
+  })
+  ast.walkRules(rule => {
+    for (let p = rule.parent; p; p = p.parent) if (p.type === 'atrule' && /keyframes/.test(p.name)) return
+    rule.selectors = rule.selectors.map(sel => {
+      sel = sel.replace(/:root|(^|[\s>+~(,])(html|body)(?=$|[\s.:#[>+~),])/g, (m, pre) => (m === ':root' ? scope : pre + scope))
+
+      return sel.startsWith(scope) ? sel : scope + ' ' + sel
+    })
+  })
+
+  return ast.toString()
+}
+
+fs.mkdirSync(OUT, { recursive: true })
+fs.mkdirSync(IMG, { recursive: true })
+
+const assets = JSON.parse(fs.readFileSync(path.join(SRC, 'assets.json'), 'utf8'))
+const manifest = {}
+let fontsHref = ''
+
+/** Sections at the top of each board that stay eager (the hero; on mobile, masthead + hero). */
+const EAGER_SECTIONS = { portada: 1, tablet: 1, movil: 2 }
+
+/**
+ * Below the eager sections every image loads lazily: the hidden boards (display:none) never download theirs and the
+ * visible board loads them as the reader scrolls. Same pixels once loaded; server and browser render this same AST.
+ */
+function deferImages(ast, eager) {
+  let section = 0
+
+  const walk = (node, depth) => {
+    if (node[0] === 'if') return node[2].forEach(k => walk(k, depth))
+    if (node[0] === 'for') return node[3].forEach(k => walk(k, depth))
+    if (node[0] !== 'e') return
+    if (depth === 1 && node[1] === 'section') section++
+
+    if (node[1] === 'img' && section > eager && !node[2].some(a => a[0] === 'loading')) {
+      node[2].push(['loading', 's', 'lazy'], ['decoding', 's', 'async'])
+    }
+
+    node[3].forEach(k => walk(k, depth + 1))
+  }
+
+  ast[3].forEach(k => walk(k, 1))
+
+  return ast
+}
+
+for (const [board, slug] of Object.entries(BOARDS)) {
+  const source = fs.readFileSync(path.join(SRC, `${board}.bound.dc.html`), 'utf8')
+  const sha = crypto.createHash('sha256').update(source).digest('hex').slice(0, 16)
+  const parsed = parseDcFile(source)
+  const head = `/* Generated by greenhouse-eo scripts/public-website/blog-v3/build-plugin.cjs from ${board} (sha ${sha}). Do not edit. */`
+
+  fontsHref = parsed.fontLinks.find(h => h.includes('/css2')) || fontsHref
+  deferImages(parsed.ast, EAGER_SECTIONS[slug])
+  fs.writeFileSync(path.join(OUT, `${slug}.ast.json`), JSON.stringify(parsed.ast))
+  fs.writeFileSync(
+    path.join(OUT, `${slug}.js`),
+    `${head}\n;(function (R) {\n'use strict'\nvar DCLogic = R.DCLogic\n${parsed.logic.trim()}\nR.boards[${JSON.stringify(slug)}] = { Component: Component, ast: ${JSON.stringify(parsed.ast)} }\n})(window.EoBlogV3Dc)\n`
+  )
+  fs.writeFileSync(path.join(OUT, `${slug}.css`), `${head}\n` + scopeCss(parsed.css, slug))
+
+  // Example content: canvas blob URLs become plugin images.
+  if (!FIXTURES[slug]) {
+    manifest[slug] = { board, sha }
+    continue
+  }
+
+  let fixture = fs.readFileSync(path.join(SRC, FIXTURES[slug]), 'utf8')
+
+  for (const a of Object.values(assets)) fixture = fixture.split('/_blob/' + a.id).join('%%img%%/' + a.file)
+  if (fixture.includes('/_blob/')) throw new Error('Unmapped asset in ' + FIXTURES[slug])
+  fs.writeFileSync(path.join(OUT, `fixture.${slug}.json`), fixture)
+  manifest[slug] = { board, sha }
+}
+
+for (const a of Object.values(assets)) fs.copyFileSync(path.join(SRC, 'assets', a.file), path.join(IMG, a.file))
+
+fs.writeFileSync(path.join(OUT, 'blog-home-base.css'), '/* Generated by greenhouse-eo scripts/public-website/blog-v3/build-plugin.cjs. Do not edit by hand. */\n' + HOST_RESET)
+if (fs.existsSync(path.join(OUT, 'blog-home.css'))) fs.unlinkSync(path.join(OUT, 'blog-home.css'))
+
+fs.writeFileSync(path.join(OUT, 'manifest.json'), JSON.stringify({ generatedBy: 'greenhouse-eo scripts/public-website/blog-v3/build-plugin.cjs', fonts: fontsHref, boards: manifest }, null, 2) + '\n')
+console.log('build →', OUT, manifest)

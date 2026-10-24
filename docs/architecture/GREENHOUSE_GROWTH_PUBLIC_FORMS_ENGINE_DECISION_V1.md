@@ -7,15 +7,16 @@ store Forms implementan sólo lead_magnet→quote_request, con intención confir
 íntegro esperado, definición activa/riesgo low-medium y única versión publicada fijada; locks y
 preservación de identidad, campos, consentimiento y destinos. CLI de mantenimiento explícita usa
 el mismo command/perfil ops y journal previo; nunca SQL de Forms desde el consumer ni retry unknown.
-La corrección de datos ya se aplicó/releyó. API admin protegida implementada **en código local, aún
-sin desplegar**; no se afirma disponible en main. [Manual](../manual-de-uso/growth/corregir-clasificacion-comercial.md),
+La corrección de datos ya se aplicó/releyó. API admin protegida **publicada en main2559e9242**;
+registra auditoría API Platform y UPDATE Forms en la misma transacción, devuelve `commandExecutionId`
+y revierte si falla la auditoría. [Release y canarios negativos](../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md). [Manual](../manual-de-uso/growth/corregir-clasificacion-comercial.md),
 [contrato técnico](GROWTH_FORMS_COMMERCIAL_CLASSIFICATION_CORRECTION_V1.md)
 y [evidencia](../audits/growth/2026-10-18-commercial-forms-policy-publication.md). No cambia la
 inmutabilidad de versiones publicadas ni habilita automáticamente una política publicitaria.
 
-## Status
+## Status al aceptar — 24/06/2026
 
-Accepted direction — no runtime changes yet.
+Accepted direction — no runtime changes yet. El runtime posterior se documenta en la arquitectura Forms y los deltas fechados de este ADR.
 
 This ADR authorizes architecture and planning for a Greenhouse-owned public forms engine in the `growth` domain. It does not authorize implementation tasks, schema migrations, public endpoints, HubSpot property changes, production deployment, WordPress/Astro plugin release, or live submissions. Those require explicit follow-up tasks and operator approval.
 

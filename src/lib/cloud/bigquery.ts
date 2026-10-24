@@ -1,3 +1,5 @@
+import type { EnvSource } from '@/types/env-source'
+
 const DEFAULT_MAX_BYTES_BILLED = 1_000_000_000
 
 const toPositiveInteger = (value: string | undefined) => {
@@ -14,7 +16,7 @@ const toPositiveInteger = (value: string | undefined) => {
   return parsed
 }
 
-export const getBigQueryMaximumBytesBilled = (env: NodeJS.ProcessEnv = process.env) =>
+export const getBigQueryMaximumBytesBilled = (env: EnvSource = process.env) =>
   toPositiveInteger(env.BIGQUERY_MAX_BYTES_BILLED) ?? DEFAULT_MAX_BYTES_BILLED
 
 export const getBigQueryQueryOptions = (

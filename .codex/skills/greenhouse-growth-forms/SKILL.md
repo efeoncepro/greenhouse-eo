@@ -414,6 +414,7 @@ Two engine capabilities added 2026-07 (TASK-1319/1320/1321) live in the companio
 | `[formSlug]/submit` | POST | accept a submission (validate + captcha + email policy + rate limit + PII encrypt) |
 | `[formSlug]/verify-email` | POST | reactive corporate-email check (debounced; 404 ⇒ non-blocking) |
 | `catalog` | GET | governed form catalog for the editor selector (server-side embed key) |
+| `[formSlug]/registrations-count` | GET | TASK-2053 — `{ count, display, shown }`: confirmed event registrations, floored to the ten, only above the threshold; 10-min cache + per-IP rate limit |
 
 - CORS/origin/surface are governed by `form_host_surface`. Browser-supplied ids never define
   authorization. Errors are **sanitized** (no SQL/stack/secret/PII).
@@ -525,6 +526,12 @@ Do not expose HubSpot `formGuid`, portal id, property names or mappings to the b
 this. The browser still gets only the Greenhouse render contract; HubSpot form definition changes are
 server-side destination hygiene.
 
+**Pendiente: «¿cómo nos conociste?» (operador, 2026-10-22).** La
+[estrategia de love brand](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) (§11 y §14.1)
+exige medir el puente fan → conversación con ese campo en formularios y diagnósticos y una propiedad de fuente de
+primer contacto en HubSpot. Hoy no existe: no lo declares implementado. Requiere task propia; cuando se haga, entra
+como nueva versión de cada formulario y por el camino de arriba (propiedad, `fieldGroups`, `fieldMapping` y smoke).
+
 ---
 
 ## Security & PII
@@ -596,6 +603,37 @@ words. Preview a contract change on the real host by intercepting the contract (
 bundle) in a test browser before publishing a version. The renderer only reaches production with a Greenhouse
 release until TASK-2038 moves it to AXIS. Host checklist: `efeonce-public-site-wordpress`
 `references/growth-forms-wordpress.md` §Canvas-designed forms.
+
+**Design-fidelity fields (TASK-2044 contract + TASK-2045 render, code complete 2026-10-23; renderer `1.1.0`, ships with the next `main` release).** Declare a canvas
+design instead of styling it: `fields[].presentation.width` (`auto|half|full`), `consent.presentation` (`tile|compact`)
++ `consent.privacyLinkLabel` + one `{privacyLink}` marker in a checkbox `label` (compiler blocks HTML, other markers,
+repeats and a missing `privacyUrl`), `successBehavior.icon` (`celebration|orbit|none`) and success action
+`kind: 'dismiss'` (no `href`/`target`). In a Growth CTA, `open_growth_form` takes `presentation: 'dialog'` + optional
+`dialog: { eyebrow, title, lead }`. Absent = today's contract. The live renderer ignores them gracefully **except**
+`{privacyLink}`, which an old renderer shows literally: never publish the marker before the TASK-2045 renderer is in
+production. Full table: `docs/architecture/growth-public-forms-runtime-contract.md` §Formularios diseñados en canvas.
+Host skin = tokens (`--ghf-field-*`, `--ghf-label-*`, `--ghf-btn-*`, `--ghf-consent-*`, `--ghf-orbit`, `--ghf-placeholder`,
+`--ghf-column-gap`) + `data-ghf-part` hooks, never internal classes; `color-scheme="dark"` now forces dark; `steps: []`
+hides default success steps; `dismiss` emits DOM `ghf:dismiss` (telemetry-independent); `data-ghf-busy` while
+submitting; Turnstile mounts next to the form (works inside a modal `<dialog>`). Worked example + evidence:
+`scripts/public-website/partners-source/partner-dialog-skin.css`, `docs/ui/reviews/TASK-2045/`.
+
+**Inline pill + event registration (TASK-2053 contract + TASK-2054 render, code complete 2026-10-24; renderer `1.2.0`,
+ships with the next `main` release).** `ui_policy.presentation: 'inline_pill'` + optional `ui_policy.inlinePill` labels
+draws the blog-v3 canvas pill (button → email field + send → orbit loader → fill + check → final text). Only one
+required visible `email` (+ `hidden`), notice consent without checkboxes, `static`, no `redirect`/`success_card` — the
+compiler blocks the rest. `fields[].staticValue` (hidden only) is enforced server-side (`applyStaticFieldValues`): the
+event identity, never host-injected. `ui_policy.eventRegistration` (server-only, `event_registration` kind) gives
+capacity + `waitlist|reject`; the seat is decided inside the submit transaction under `pg_advisory_xact_lock`
+(distinct email hashes, waitlisted excluded); `reject` → outcome `capacity_full` (409); responses carry
+`registrationStatus`. Publish with `pnpm growth:forms:publish-event-registration -- --config <json>` (dry-run first).
+Host = tokens `--ghf-inline-*` (tone/on-tone/hover/active) + `data-ghf-part="inline-*"` hooks; give `<greenhouse-form>`
+its column width (≥ 480 px for desktop widths). DOM event `ghf:success` syncs instances of the same `formKey`.
+**Never** publish an `inline_pill` version on a page before the renderer release (old renderer draws the standard form).
+Visual gate: `node scripts/growth/forms/fixtures/inline-pill.scenario.mjs` (canvas literal vs real element, ≤ 1 %;
+standard forms 0 px against a baseline rev). Lesson: measure the canvas's COMPUTED styles — its `button{font:inherit}`
+reset beats `.ab`, so the approved open button renders 16 px/400, not the declared 15/600. Full table:
+`docs/architecture/growth-public-forms-runtime-contract.md` §Formulario en línea.
 
 Catalog selector needs `GREENHOUSE_GROWTH_CATALOG_SURFACE_ID` + `GREENHOUSE_GROWTH_CATALOG_EMBED_KEY`
 in `wp-config.php`; embed key minted with `pnpm growth:forms:embed-key --surface-id <id>` (shown once).
@@ -738,7 +776,21 @@ Provider delivery and real commercial outcomes require their own readback; CLI s
 that evidence. Release proofs and pending real traffic/EMQ stay in the linked runtime/audit.
 
 
+## LinkedIn Ads — preparación propuesta19/10/2026
+
+Cargar [manual LinkedIn](../../../docs/manual-de-uso/growth/preparar-medicion-linkedin.md) y
+[arquitectura Proposed](../../../docs/architecture/GREENHOUSE_LINKEDIN_ADS_MEASUREMENT_ARCHITECTURE_V1.md).
+Forms accepted; Grader comercial sí, Contacto general/ebooks/empleo/newsletter/soporte no.
+No existen policy/destino/recibo/bridge LinkedIn en este motor; no transformar `googleAdsConversion`,
+`gh_ads_conversion` ni generate_lead genérico en permiso LinkedIn. Requiere cuenta/reglas/consentimiento
+propios y eventId durable del hecho compartido con CAPI si se adopta; duplicados/polling no reemiten.
+La cobertura Google no inscribe LinkedIn. No crear leads/reservas ficticios ni publicar al documentar.
+
 ## Google Ads online y EC — contrato y checkpoint 18-10-2026
+
+Cierre vigente: [release Grader/clasificación main2559e9242](../../../docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md), manifest released y canarios negativos.
+Antes de operar, releer estado real; no repetir correcciones/planes históricos ni crear leads para
+completar evidencia. TASK-2034 sigue parcial por recepción/atribución y recibos reales pendientes.
 
 Cargar [contrato/activación](../../../docs/manual-de-uso/growth/activar-conversiones-google-ads.md),
 [arquitectura](../../../docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md)
@@ -781,8 +833,10 @@ significa Ads habilitado. La revisión al publicar es hoy un paso del operador, 
 AI Grader tiene intención comercial confirmada por el operador. Contacto es general y queda fueraAds.
 Lead Gen Web corregido a quote_request por command/store Forms, preservando identidad y versión;
 no se exceptúa globalmente lead_magnet ni se publica el plan viejo. La API nueva de clasificación
-está preparada en código local, aún sin deploy; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
-La política configurada no certifica el intake histórico propio del Grader, recepción o atribución.
+está servida en main2559e9242, con auditoría API Platform en la misma transacción que el UPDATE
+y commandExecutionId para correlación; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
+Canarios negativos de Grader/clasificación PASS, sin leads ficticios ni corrección positiva de prueba.
+La política y los canarios no certifican recepción ni atribución de conversiones reales.
 
 
 Grader: cargar [contrato de transporte](../../../docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).

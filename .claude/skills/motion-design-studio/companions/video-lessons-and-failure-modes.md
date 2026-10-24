@@ -507,3 +507,94 @@ fuentes en `ai-generations/2026-10-12_sika-propuesta-tecnica/` (`LEEME.md` y `re
 - **Entrega:** la carga por lote de activos del lienzo rechaza archivos de más de 20 MB; se sube una copia web.
 
 Comandos exactos y forma correcta de cada uno: workflow, §«Qué NO hacer / gotchas».
+
+## 14. Delta 2026-10-21 — serie de anuncios «Efeonce | Partner» (Microsoft y AWS)
+
+**Estado del caso:** las dos piezas quedaron programadas en Metricool (Microsoft para el 10-12-2026 y AWS para el
+03-12-2026); ninguna está publicada todavía. Caso fuente:
+[método del anuncio de AWS](../../../../docs/operations/social/2026-10-21-aws-partner-announcement-production-method.md)
+(§«Producción» y §«Trampas de esta corrida»); el tirón por tramos se vio en el
+[de Microsoft](../../../../docs/operations/social/2026-10-21-microsoft-partner-announcement-production-method.md).
+Fuentes fuera de git en `ai-generations/2026-10-21_aws-partner/` (`edit/rampa.py`, `edit/build-feed.sh`,
+`edit/build-story.sh`).
+
+### QA de movimiento medido
+
+- **Medición:** diferencia entre cuadros consecutivos y su luminancia media por cuadro, por ejemplo
+  `ffmpeg -i pieza.mp4 -vf "tblend=all_mode=difference,signalstats,metadata=print:key=lavfi.signalstats.YAVG" -f null -`.
+- **Criterio de la serie:** **cero cuadros con YAVG < 0,15**. El final de
+  AWS dio 0 en feed y en story; desde el segundo 2, el mínimo fue 0,86 en el feed y 0,63 en la story.
+- Acredita la ausencia de cuadros quietos y tirones; no acredita ritmo, lectura ni que el movimiento se sienta bien
+  (eso sigue en la reproducción 1×, §12 de posproducción).
+
+### Story 9:16 desde tomas 3:4 (acierto)
+
+- Cada toma se decide por separado. El pasillo va **en relleno** con recorte central; la Tierra va **ajustada al
+  ancho** sobre bandas del color medido en el borde de la toma (`0x02070d`), porque recortada perdía los costados.
+- El paso de relleno a ajustado se hace en **un zoom continuo**, alineado para que el sujeto caiga donde empieza el
+  cierre.
+- Defecto aceptado en AWS: un leve doble borde de la Tierra durante 4 cuadros del fundido de la story (0,17 s).
+
+### F39 — Congelados o cámaras lentas por tramos que «cargan»
+
+- **Síntoma:** en Microsoft, el operador vio dos veces un tirón «como si el video cargara».
+- **Causa:** la velocidad cambiaba por escalones (congelados o cámaras lentas por tramo).
+- **Prevención:** rampa **continua**: interpolar a 96 fps con `minterpolate`, mapear tiempo de salida → tiempo de
+  fuente con una curva **PCHIP** (sin sobreoscilación) y aplicar un obturador de 4 muestras con `tmix`. Script de
+  referencia: `edit/rampa.py` (AWS: 1,2x→2,9x en el pasillo y 5,2x→1,4x en la salida a la órbita).
+
+### F40 — Empuje lento a 1x que salta de a píxel
+
+- **Síntoma:** el tamaño cambiaba un cuadro sí y otro no (movimiento alternado 0,08 / 2,5).
+- **Prevención:** hacer el zoom en un lienzo interno a **4x** (`scale` con `eval=frame` + `crop`) y recién después
+  bajar a la resolución de salida.
+
+### F41 — `overlay` con tamaño variable por cuadro que no escala
+
+- **Síntoma:** el zoom por `scale` con `eval=frame` alimentado a un `overlay` quedó congelado en 1,33x y apareció una
+  Tierra doble en el cruce.
+- **Causa:** `overlay` no sigue un tamaño de cuadro que cambia en cada frame.
+- **Prevención:** componer primero a **geometría fija** (`scale` + `pad`) y hacer el zoom con `scale` (`eval=frame`) +
+  `crop` de tamaño fijo, como en el feed.
+
+### F42 — Ease-out hasta velocidad cero que deja cuadros quietos
+
+- **Síntoma:** el alejamiento final dejó 9 cuadros bajo 0,15.
+- **Prevención:** mantener una componente lineal para que la velocidad nunca llegue a cero, p. ej.
+  `0.55·u + 0.45·ease(u)`.
+
+### F43 — Cierre que invierte la dirección del movimiento
+
+- **Síntoma:** si la toma se aleja y el cierre empuja hacia adentro, «rebota» y se siente repentino y estático
+  (observación de `pnpm ai:listen`, confirmada midiendo).
+- **Prevención:** el cierre **continúa** la dirección de la toma que lo precede (AWS: la Tierra sigue alejándose de
+  1,07x a 1,0x bajo el lockup, sin frenar a cero).
+
+### F44 — Tomas generadas con tramos inservibles
+
+- **Síntoma:** en AWS, la toma de salida de Seedance 2.0 traía un tramo blanco (cuadros 16–21) y otro casi quieto
+  (cuadros 28–45, movimiento 0,2); la toma de «vida» venía casi inmóvil (0,1).
+- **Prevención:** medir cada toma con el QA de movimiento antes de montarla, cortar lo que no sirve y, si la toma
+  entera está quieta, sumarle movimiento de cámara en el montaje (F40, F42).
+
+### F45 — Modificadores de zsh dentro de recetas de shell
+
+- **Síntoma:** `r=$R:a=0.5` se expandió a una ruta absoluta (`:a`) y `c=$BG:s=…` aplicó una sustitución (`:s`).
+- **Prevención:** en zsh, siempre `${VAR}` cuando lo que sigue es `:` (`${R}:a=0.5`, `${BG}:s=…`).
+
+### 14.x QA con `pnpm ai:listen` v2 (Gemini 3.8, verificado 2026-10-21)
+
+- **Gemini mira el video a 1 fps por defecto:** no ve un silencio de 0,25 s ni un tirón de dos cuadros. Para sincronía
+  o tirones, usa `--fps` (hasta 24) sobre un `--clip` del tramo; para toda la pieza, los presets `sync` (12 fps) y
+  `tiron` (24 fps).
+- **`--verify` mide cada afirmación con ffmpeg:** silencio, golpe, corte, cuadro quieto y desfase quedan confirmados o
+  refutados. Con `--cues audio-cues.json`, además mide cada cue de la grilla sin depender del modelo.
+- **Caso fuente (AWS):** Gemini afirmó con severidad alta un congelado de 5,33 a 8,00 s; `--verify` lo refutó (cero
+  cuadros quietos). Su desfase de íconos también quedó refutado (+8 ms: el ícono aparece un cuadro después de la grilla
+  y el clic suena con él). Retocar la mezcla por esa crítica habría sido un error.
+- `temperature` no hace nada en Gemini 3.x; la consistencia sale de `--thinking` y de `--findings`, con `preset@versión`
+  y hashes en `meta`.
+- 🔴 **Control estándar antes de mostrar una pieza: `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues
+  audio-cues.json --measure-only`.** Es solo ffmpeg (menos de 1 s), entrega el mapa de eventos y la grilla, y sale con
+  código 2 si una cue falla. Gemini va después, como segunda opinión de criterio.
+- Manual: `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`.

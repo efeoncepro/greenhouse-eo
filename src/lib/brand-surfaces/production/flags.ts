@@ -7,6 +7,8 @@
  * Separado de `ARTIFACT_RENDER_JOBS_ENABLED` (Proposal) e `INSIGHTS_RENDER_ENABLED`: encender uno nunca enciende otro.
  * En Cloud Run el SoT es `deploy.sh` de cada servicio (`--set-env-vars` es destructivo).
  */
+import type { EnvSource } from '@/types/env-source'
+
 const isOn = (value: string | undefined): boolean => value === 'true'
 
-export const isBrandRenderEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.BRAND_RENDER_ENABLED)
+export const isBrandRenderEnabled = (env: EnvSource = process.env): boolean => isOn(env.BRAND_RENDER_ENABLED)

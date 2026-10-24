@@ -22,7 +22,9 @@ import {
   buildProseExtractionPrompt
 } from './prompt'
 
-export const resolveGeminiExtractionModel = (env: NodeJS.ProcessEnv = process.env): string | undefined =>
+import type { EnvSource } from '@/types/env-source'
+
+export const resolveGeminiExtractionModel = (env: EnvSource = process.env): string | undefined =>
   env.GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_MODEL_GEMINI?.trim() || undefined
 
 export const geminiProseProvider: ProseExtractionProvider = {

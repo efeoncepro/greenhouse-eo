@@ -237,3 +237,8 @@ revisión: su identidad.
   `blocksWith: null` y un `consequence` que lo explica, cuando la fecha entra en su ventana o ya pasó. Los dos
   registros de v10 no tienen fecha de término.
 
+
+
+## Evidencia de mantenimiento — 22/10/2026
+
+Aplicación del contrato existente, sin nuevo schema o motor: catálogo v12→v13 y policy v12, con preview/apply y activación del puntero por CLI. Nuevos perfiles y costos CO estimados, referencia Awario y recíproco derivado del FX existente. Se conservaron los rechazos por fecha y datos faltantes, ejemplos y artefactos históricos. [Evidencia](../commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md).

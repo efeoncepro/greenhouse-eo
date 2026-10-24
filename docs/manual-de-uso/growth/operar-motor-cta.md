@@ -1,9 +1,9 @@
 # Operar el motor de CTAs (`/growth/ctas` + API)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-10-17 por Claude (surfaces por landing y patrón `publish-*-meeting-cta.ts`)
+> **Ultima actualizacion:** 2026-10-23 por Claude (`open_growth_form` en diálogo, TASK-2044)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio (agentes):** `greenhouse-growth-ctas`
 
@@ -176,6 +176,18 @@ El motor decide server-side si un visitante debe volver a ver un CTA y, con `GRO
 
 Para el procedimiento específico de binding, continuidad al reabrir, booking controlado y rollback, consulta
 [Configurar un Growth CTA con scheduler nativo](configurar-cta-scheduler-nativo.md).
+
+## Abrir un formulario en un diálogo (TASK-2044)
+
+Para que el botón del CTA abra el formulario en un popup en vez de desplegarlo dentro de la tarjeta, la acción se
+autora así: `{ "kind": "open_growth_form", "formRef": "<slug o form_key>", "presentation": "dialog", "dialog": {
+"eyebrow": "¿Eres una plataforma?", "title": "Sumémonos.", "lead": "…" } }`. El encabezado es opcional (sin `title` se
+usa el titular del CTA) y sólo vale con `presentation: "dialog"`; si no, la publicación falla con
+`action_policy_invalid`. Esto **no** es la colocación interruptiva `popup_modal`: el diálogo sólo se abre cuando el
+visitante pulsa el botón. Renderer `1.4.0` (TASK-2045): el formulario se monta al abrir, Escape y el velo cierran
+salvo mientras envía, «Cerrar» del éxito cierra el diálogo y el foco vuelve al botón. La piel del diálogo va en el CSS
+del anfitrión con los tokens `--ghcta-dialog-*` (tabla en el contrato de runtime de formularios). Hasta el próximo
+release a `main`, el CTA publicado abre el formulario inline.
 
 ## Qué no hacer
 

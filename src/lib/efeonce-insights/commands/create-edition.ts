@@ -22,6 +22,8 @@ import { runInsightGeneration, type RunGenerationResult } from './generation'
 import { defaultReportTitle } from '../presentation/vocabulary'
 import { validateInsightRequest } from './validate-request'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface CreateInsightEditionInput {
   subject: TenantEntitlementSubject
   actorOrganizationId: string | null
@@ -32,7 +34,7 @@ export interface CreateInsightEditionInput {
   reportId?: string | null
   supersedesEditionId?: string | null
   deferGeneration?: boolean
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 export interface CreateInsightEditionResult {

@@ -31,7 +31,7 @@ const ENV_ON = {
   ...process.env,
   GROWTH_SEO_ENABLED: 'true',
   GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED: 'true'
-} as NodeJS.ProcessEnv
+}
 
 const METHODS = [
   { method: 'keyword_suggestions' as const, resultsPerCall: 25 },

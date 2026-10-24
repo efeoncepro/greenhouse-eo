@@ -28,8 +28,11 @@ no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/r
    vínculos confirmados/hipotéticos; para cada brecha, riesgo, owner/ruta y siguiente validación. Un rol
    crítico sin email permanece en investigación. No exigir champion ni comité completo antes de conversar.
 4. Evaluar atribución, empleo y calidad de correo por separado. Revelación/enriquecimiento pagado requiere
-   alcance explícito; no reiterar resultado vacío ni completar direcciones por patrón. Dirección general,
-   personal o incierta no permite alta individual. Si faltan datos, entregar estado parcial y menor chequeo útil.
+   alcance explícito; no reiterar resultado vacío ni tratar un patrón como verificación. Dirección general,
+   personal o incierta no cumple la admisión normal. Si Julio pide investigar un patrón, presentar la candidata
+   como inferida y sus límites antes de actuar; una excepción expresa e informada se conserva por persona,
+   dirección y acciones autorizadas, sin promover la calidad a `verified`. Si faltan datos o permiso,
+   entregar estado parcial y menor chequeo útil.
 5. Preparar un account brief y apertura/prueba según relación. Releer último mandato, validar claim/capacidad
    y graduar costo de preventa. Preparar preguntas de discovery sin convertir borrador en comunicación realizada.
 6. Para registro pedido/autorizado, pasar a HubSpot con changeset revisable, dedupe y valores reales. Ejecutar
@@ -190,3 +193,36 @@ dos créditos Apollo con un correo extrapolado y otro ausente, sin altas vacías
 con firma gráfica y EMAIL SENT leído; un seguimiento nativo futuro, desinscripción por respuesta/reunión.
 Los métodos reusables viven en los módulos de investigación, calidad y secuencias de la skill, y en la
 política Outlook. El expediente no renueva cobertura general ni autoriza contactar a los puentes.
+
+## Aplicación: Agencia Creativa, patrón y lote izipay — 21/10/2026
+
+[Registro consolidado](../../commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md):
+Ana Paula por InMail sin alta ficticia; Andrés por email/CRM, antes de la corrección de capacidad;
+izipay con cuatro contactos, cuatro correos iniciales, tres secuencias programadas y Laura sin inscripción
+por rebote. Correos/cuerpos privados en CRM y expediente; IDs, estados y fechas en el registro.
+
+- Aplicar [producción/fabricación local vigente](../../operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md)
+  sin negar capacidad ni inferir propiedad, ausencia de intermediarios o cumplimiento de un proyecto.
+- Patrón repetido por Apollo sin evidencia independiente sigue inferido. Una excepción expresa e informada
+  conserva alcance individual y calidad pendiente; no modifica el gate normal ni se acredita por envío.
+- Clonar plantillas además de secuencia; personalizar por rol y comprobar independencia. Guardar ajustes
+  de secuencia por separado del texto; releer fechas finales e inscripción Programado antes de cerrar.
+- `verified` anterior no invalida un NDR posterior. Conservar secuencia preparada sin enrollment de la
+  dirección afectada, cero inscritos verificado y diagnóstico privado; no reintentar para comprobar.
+- La asociación Company puede existir aunque el reader omita `associatedcompanyid`: verificar etiqueta
+  Principal en el registro, no crear otra Company ni afirmar herencia sectorial sin evidencia.
+
+## Aplicación: Fundación Luz, candidata inferida y envío único — 22/10/2026
+
+[Expediente Mariana](../../commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md):
+búsqueda pública de PR/campaña, tres adyacentes investigados sin contactar y tres fuentes del patrón
+inicial + apellido. El patrón no verificó la casilla; Julio conoció la incertidumbre y autorizó el alta
+y un correo a esa candidata. La nota conserva la excepción **inferida / no verificada**; `individual_email`
+es tipo de contacto, no estado técnico. La consulta Apollo ofrecida no llegó a ejecutarse ni autoriza
+reportar consumo de enriquecimiento.
+
+Se verificaron Contact/Company/Primary/nota, InMail, copia enviada de Outlook con firma gráfica/CCO y
+EMAIL `SENT` asociado. Cada canal usó su enlace sobre el brochure original; un enlace generado al correo
+del remitente no atribuye las vistas a la prospecta. Entrega, respuesta y membresía efectiva en segmentos
+siguen sin acreditar. Esperar respuesta no crea secuencia ni permiso de otro envío; rebote o negativa
+detienen la casilla afectada y exigen revisar el alcance antes de continuar.

@@ -240,6 +240,57 @@ blanco que se desvanecen en claro) → **[`deck-studio/visual-system.md`](../dec
 
 Detalle completo: `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` → §Delta 2026-07-15.
 
+## Delta 2026-10-20 — propuesta técnica de licitación en La órbita (Voice): caso Gana GRD-1541
+
+Primera propuesta técnica de **licitación** armada en la línea gráfica La órbita (línea **Voice**) en vez de
+`deck-axis`, por decisión del operador (el Delta 2026-09-27 deja esa elección en sus manos). Expediente y
+generadores: `ai-generations/2026-10-19_propuesta-gana-programatica/` (leer su `LEEME.md` antes de reutilizar).
+
+**Tres fuentes de láminas, en un solo deck:**
+
+| Fuente | Qué aporta | Cómo |
+|---|---|---|
+| Recetas `pnpm brand:compose` | portada `cover-proposal` (layout `orbit`), plan `decision-plan`, contraportada `close-proposal` | `intents/*.json` → `out/` |
+| Láminas nativas | agenda, contexto, ventajas, equipo, económica y demás, en la gramática del brochure Agencia de Medios | `native/propuesta.mjs` → HTML → captura |
+| Láminas aprobadas del brochure | tecnología, mapa, audiencias, circuitos DOOH, calidad, medición | **reutilizadas tal cual**, sin retocar |
+
+El plan se valida con `pnpm brand:deck-plan -- --plan plan-recetas.json` (0 errores, 0 avisos) antes de componer.
+Trampas medidas del plan:
+
+- `decision-agenda` **sólo existe en papel**, y una pieza de línea no-Growth no puede ir en papel
+  (`line-piece-keeps-efeonce-dark`): la agenda va **nativa**, como el índice del brochure.
+- `content-measure` y `content-focus` son **variantes excluyentes** (`variant-both-in-deck`): el plan acepta una.
+
+**Formatos digitales con piezas del cliente.** `native/formatos-gana.mjs` + `native/gana-ad.mjs` reproducen la
+gramática de `formatos.mjs` del brochure (voz a la izquierda, maquetas de vidrio con la posición del anuncio
+rotulada), pero con anuncios del cliente hechos en HTML a su **tamaño de referencia** (leaderboard 728×90, 300×250,
+interstitial, 320×50, video/CTV 16:9, miniatura, tarjeta native) y **escalados para cubrir la caja**. Tres láminas:
+Display y mobile · Video y TV conectada · Audio digital y native. Cada una lleva el rótulo «Simulación con piezas de
+campaña de Gana»: no son piezas aprobadas por el cliente.
+
+**Simulaciones DOOH en fotos reales** de su ciudad (Metro de Medellín, estadio, Aguacatala, C. C. Santafé): muestran
+al cliente su anuncio donde lo va a ver. Método, licencias y trampas en la skill `greenhouse-ai-image-generator` →
+[`references/inpainting-and-editing.md`](../greenhouse-ai-image-generator/references/inpainting-and-editing.md)
+§9.
+
+**Reglas de copy aprendidas con el operador (aplican a cualquier oferta en La órbita):**
+
+- **Primera persona:** «La conocemos.», no «Efeonce conoce…».
+- **Oferta conjunta con una plataforma:** «clientes de la alianza Efeonce · Basis DSP»; los clientes de la
+  plataforma se atribuyen a ella, nunca a Efeonce.
+- **Lámina de equipo:** nombres **reales** con su **cargo actual**; si un rol aún no tiene persona, va el rol **sin
+  nombre**. Nunca nombres ni experiencia inventados (mismo guardrail que las fotos del squad).
+- **Lámina económica:** todo se presenta como **cargo de Efeonce** («Plataforma DSP», «Inventario premium», «Al
+  activarse»); nunca «según proveedor».
+- **Un logo de tercero nunca se compone en nuestra tipografía:** se usa su archivo oficial o no va.
+
+**Entrega:**
+
+- PDF con `pdf/build-pdf.cjs` (PNG → JPEG q90 en Playwright, una página por lámina) para respetar el peso del portal.
+- Canvas para revisión: artifact Design con un artboard `<img>` por lámina.
+- **Cada vez que se insertan láminas, renumerar la lámina de cumplimiento** (requisito → láminas): la matriz cita
+  números de página y queda desalineada en silencio.
+
 ## El selector — cómo se elige la plantilla
 
 **Es un lookup determinista, NO un juicio.** `registry.json` mapea **1 tipo de contenido → 1

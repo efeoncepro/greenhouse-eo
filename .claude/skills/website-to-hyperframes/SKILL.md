@@ -90,6 +90,10 @@ handoff link; it is source-code context only.
 
 **Gate:** `npx hyperframes lint` and `npx hyperframes validate` pass with zero errors, and the final response includes the active Studio project URL.
 
+Si se pide el MP4 (con VO o música), en el repo Greenhouse corre antes de mostrarlo el control estándar
+`pnpm ai:listen … --measure-only` y, sólo después, Gemini con `--verify` como segunda opinión (ver `hyperframes-cli`
+→ Rendering y el manual `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`).
+
 ---
 
 ## Quick Reference

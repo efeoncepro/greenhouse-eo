@@ -167,3 +167,7 @@ scripts/creative/layout-compiler/.ref-*
 # de inspección de planillas (`*.xlsx.inspect.ndjson`): locales, regenerables, nunca a git.
 **/_token.txt
 *.inspect.ndjson
+
+# TASK-2051: canvas markup and fixtures are generated from the frozen tarball; ignored so Tailwind never scans them.
+scripts/public-website/blog-v3/source/*.dc.html
+scripts/public-website/blog-v3/source/fixture*.json

@@ -1,0 +1,359 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:53:12.563Z",
+  "run": "ai-generations/2026-10-08_viajeros-pov",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-08_viajeros-pov",
+  "totalBytes": 304675403,
+  "fileCount": 58,
+  "files": [
+    {
+      "path": "01-austral-baker-termo.png",
+      "sizeBytes": 12895637,
+      "sha256": "a150629f7a53f5d05041da98e2577e3e6b4c4efb2d597baa5bcceb537afb2cba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/01-austral-baker-termo.png"
+    },
+    {
+      "path": "02-austral-queulat-mochila.png",
+      "sizeBytes": 14651788,
+      "sha256": "238715500317ed16fcdb42bc53816a65cff06695684ebf8fb51a60708a6f3834",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/02-austral-queulat-mochila.png"
+    },
+    {
+      "path": "03-cancun-delfines-toalla.png",
+      "sizeBytes": 12364579,
+      "sha256": "4beac71d4558e063bca6c5fad6a3046885c84ffc9d1de95dd5bb31905e56b424",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/03-cancun-delfines-toalla.png"
+    },
+    {
+      "path": "04-cancun-delfines-sandalia.png",
+      "sizeBytes": 13028724,
+      "sha256": "12d22a91afaec86d2efc0693f5f5a1516f2e6e310deb96150f6427334cbc13c2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/04-cancun-delfines-sandalia.png"
+    },
+    {
+      "path": "05-rio-ipanema-sombrilla.png",
+      "sizeBytes": 12017143,
+      "sha256": "1f16af131f6ca4201141da034192c58777797b62fdd0ab5c11fa89566602a5f6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/05-rio-ipanema-sombrilla.png"
+    },
+    {
+      "path": "06-rio-copacabana-coco.png",
+      "sizeBytes": 11404403,
+      "sha256": "1bbac35d940ef400f7d34afc816dd14f1e20e4c1a19335f135ef264a73a7b276",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/06-rio-copacabana-coco.png"
+    },
+    {
+      "path": "qa/01-austral-baker-termo-face-temp.png",
+      "sizeBytes": 1567232,
+      "sha256": "9d9710cd57f66b07d4a888abacef5efa3a5b74be40d9a125afb7680c15759d51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/01-austral-baker-termo-face-temp.png"
+    },
+    {
+      "path": "qa/01-austral-baker-termo-mano-100.png",
+      "sizeBytes": 1134560,
+      "sha256": "685137e83d3fe513e2206acf0c6d2c78f2abe147fb90a9fa243bc723a6d54842",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/01-austral-baker-termo-mano-100.png"
+    },
+    {
+      "path": "qa/01-austral-baker-termo-rostro-100.png",
+      "sizeBytes": 1518338,
+      "sha256": "57d8793094f895ef223099f4f7ee152603be2a1edcd5a3c81ce1c61231815821",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/01-austral-baker-termo-rostro-100.png"
+    },
+    {
+      "path": "qa/03-cancun-delfines-toalla-face-temp.png",
+      "sizeBytes": 1524593,
+      "sha256": "2d8ee698423192458b2d031245978105c9b59c8eb59efdf4ff2b1e2fa7377cfb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/03-cancun-delfines-toalla-face-temp.png"
+    },
+    {
+      "path": "qa/03-cancun-delfines-toalla-mano-100.png",
+      "sizeBytes": 1170237,
+      "sha256": "a82fe2429142c1ec722269fe6e7b86b5d93202279c60a595e09e7ae37aeda14b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/03-cancun-delfines-toalla-mano-100.png"
+    },
+    {
+      "path": "qa/03-cancun-delfines-toalla-rostro-100.png",
+      "sizeBytes": 1468348,
+      "sha256": "011c1c4d98ec3595fd99648e1b4123fd6e79657cb44acfd18a628b12d96f00a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/03-cancun-delfines-toalla-rostro-100.png"
+    },
+    {
+      "path": "qa/04-cancun-delfines-sandalia-mano-100.png",
+      "sizeBytes": 917361,
+      "sha256": "83e1b6c5405ed06779c5b4ad2ea946eacfcddac5cacb08a2bff71031eabedb13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/04-cancun-delfines-sandalia-mano-100.png"
+    },
+    {
+      "path": "qa/04-cancun-delfines-sandalia-rostro-100.png",
+      "sizeBytes": 1440936,
+      "sha256": "6b84f64160c134b5e9371b94ccf27dfddf5f88d2de83b44fcabb8deff4d67669",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/04-cancun-delfines-sandalia-rostro-100.png"
+    },
+    {
+      "path": "qa/05-rio-ipanema-sombrilla-face-temp.png",
+      "sizeBytes": 1199706,
+      "sha256": "f1ee04d256fd999bd22f0dd0b4ce3d4b28937b6a47c23a8dbf7201a4c7be3e91",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/05-rio-ipanema-sombrilla-face-temp.png"
+    },
+    {
+      "path": "qa/05-rio-ipanema-sombrilla-mano-100.png",
+      "sizeBytes": 1001725,
+      "sha256": "dd1dfa7e689fc6699bc134c41a25cde384f983aebc95df5c44ada76c6401d50f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/05-rio-ipanema-sombrilla-mano-100.png"
+    },
+    {
+      "path": "qa/05-rio-ipanema-sombrilla-rostro-100.png",
+      "sizeBytes": 1377665,
+      "sha256": "0b0dd7252e8b83379e452ea2e2696fef306d51856693a69710c8ca9f283049e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/05-rio-ipanema-sombrilla-rostro-100.png"
+    },
+    {
+      "path": "qa/06-rio-copacabana-coco-mano-100.png",
+      "sizeBytes": 1673496,
+      "sha256": "5ad0d376c8b40904cd263a2db20bc274d24862a959775e504a8ef7fdab2db1b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/06-rio-copacabana-coco-mano-100.png"
+    },
+    {
+      "path": "qa/06-rio-copacabana-coco-rostro-100.png",
+      "sizeBytes": 1371117,
+      "sha256": "ac7813d30d018382229cac5ec23ae394f73cd55335a2883c787741bc504a79b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/qa/06-rio-copacabana-coco-rostro-100.png"
+    },
+    {
+      "path": "v2/01-austral-baker-termo.png",
+      "sizeBytes": 5546233,
+      "sha256": "7d40308db80d60c704962445a80dbf44081363b4a12eacb8bb08f3a5bdfac0ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/01-austral-baker-termo.png"
+    },
+    {
+      "path": "v2/02-austral-queulat-mochila.png",
+      "sizeBytes": 6300740,
+      "sha256": "629bf699d59c8c1712b347cd6c8d0c244e4bf10954b086da399d0477b6d431ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/02-austral-queulat-mochila.png"
+    },
+    {
+      "path": "v2/03-cancun-delfines-toalla.png",
+      "sizeBytes": 5102715,
+      "sha256": "b61b2618dd2222951daacdd5e0507de5b04373b0319dbea95e7eca306d9eab10",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/03-cancun-delfines-toalla.png"
+    },
+    {
+      "path": "v2/04-cancun-delfines-sandalia.png",
+      "sizeBytes": 5178133,
+      "sha256": "5116c85f0badc29fb0f46c965db2649dc9fbb598576a760497b724b61c8eec0b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/04-cancun-delfines-sandalia.png"
+    },
+    {
+      "path": "v2/05-rio-ipanema-sombrilla.png",
+      "sizeBytes": 5096087,
+      "sha256": "aa0a74c610bfe2e4a78d499ce020c0a6f01f140cbfbf9c6c37cf605c1f30da16",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/05-rio-ipanema-sombrilla.png"
+    },
+    {
+      "path": "v2/06-rio-ipanema-coco.png",
+      "sizeBytes": 4784110,
+      "sha256": "c64f34fabe9e0aee306f6e801657a6e99dc484d792900aac301a18815d480d1f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/06-rio-ipanema-coco.png"
+    },
+    {
+      "path": "v2/anchors/austral.png",
+      "sizeBytes": 2600785,
+      "sha256": "404d80bfc7e329deb4362e00ba096a4d647415f8ffd3089159f236487e39fd9a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/anchors/austral.png"
+    },
+    {
+      "path": "v2/anchors/cancun.png",
+      "sizeBytes": 2280615,
+      "sha256": "4ec777afb036eae14cbc392f24f8626290cf58c21f230904bbf5723a5909af37",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/anchors/cancun.png"
+    },
+    {
+      "path": "v2/anchors/rio.png",
+      "sizeBytes": 2267013,
+      "sha256": "d6804e75a09aefe789b705f8a5fd240a4ee30c372dde85e841b708e941ab0627",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/anchors/rio.png"
+    },
+    {
+      "path": "v2/gaze/01/inpaint/1c181bccdf97/candidate-1-diff.png",
+      "sizeBytes": 130741,
+      "sha256": "2367baf9bb88a2dc0cfdccdfb2923a8373d7c7bbdf2b54379b885927d8af5756",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/gaze/01/inpaint/1c181bccdf97/candidate-1-diff.png"
+    },
+    {
+      "path": "v2/gaze/01/inpaint/1c181bccdf97/candidate-1-raw.png",
+      "sizeBytes": 8975009,
+      "sha256": "10f124e3da2d1f721c9790b3c19da60b344e437cd101814ef5918c807350486f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/gaze/01/inpaint/1c181bccdf97/candidate-1-raw.png"
+    },
+    {
+      "path": "v2/gaze/01/inpaint/1c181bccdf97/candidate-1.png",
+      "sizeBytes": 8309581,
+      "sha256": "498d461b5db439718175c710587a93c15df3aa7e28a30bef51c9d75bfdf7fcc0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/gaze/01/inpaint/1c181bccdf97/candidate-1.png"
+    },
+    {
+      "path": "v2/gaze/01/inpaint/1c181bccdf97/mask-preview.png",
+      "sizeBytes": 8881809,
+      "sha256": "3106f2c07f628db8dc03ddd61d3fc27a5067be49c17046d946c4745eed895914",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/gaze/01/inpaint/1c181bccdf97/mask-preview.png"
+    },
+    {
+      "path": "v2/gaze/01/inpaint/1c181bccdf97/provider-input.png",
+      "sizeBytes": 8308435,
+      "sha256": "803ad0a7734c74adefc1df26e2c8902dd39331753328dbec5f3084f5eb341c88",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/gaze/01/inpaint/1c181bccdf97/provider-input.png"
+    },
+    {
+      "path": "v2/gaze/01/inpaint/1c181bccdf97/provider-mask.png",
+      "sizeBytes": 5829,
+      "sha256": "9f02d83dc56780f7c7fde726401c1bfa3a1cd8f4d5131573b2ded448bc5e9d68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/gaze/01/inpaint/1c181bccdf97/provider-mask.png"
+    },
+    {
+      "path": "v2/gaze/01/inpaint/1c181bccdf97/provider-sketch.png",
+      "sizeBytes": 8285009,
+      "sha256": "6aa4fb8f3a4d6f8e0c64390a80a214293edd6de27566886d157746640adfd9e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/gaze/01/inpaint/1c181bccdf97/provider-sketch.png"
+    },
+    {
+      "path": "v2/qa/01-eyes-mask-preview.png",
+      "sizeBytes": 8881809,
+      "sha256": "3106f2c07f628db8dc03ddd61d3fc27a5067be49c17046d946c4745eed895914",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/qa/01-eyes-mask-preview.png"
+    },
+    {
+      "path": "v2/qa/01-eyes-mask.png",
+      "sizeBytes": 5829,
+      "sha256": "9f02d83dc56780f7c7fde726401c1bfa3a1cd8f4d5131573b2ded448bc5e9d68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/qa/01-eyes-mask.png"
+    },
+    {
+      "path": "v2/qa/01-rostro-100.png",
+      "sizeBytes": 792927,
+      "sha256": "c4ec8e60b06905c165c3302532983a6f0066613baffef90ffb7002f14a4f5543",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/qa/01-rostro-100.png"
+    },
+    {
+      "path": "v2/qa/01-rostro-gaze-100.png",
+      "sizeBytes": 793526,
+      "sha256": "2267ac94de36621486158488f6306938237a9c49fb1a1aa6819c54cbf8ab10a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/qa/01-rostro-gaze-100.png"
+    },
+    {
+      "path": "v2/qa/02-eyes-mask-preview.png",
+      "sizeBytes": 9777939,
+      "sha256": "8d67def72ef53a9929e91dbec2625dde8841d5a3d670023c40928200e1a5c2db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/qa/02-eyes-mask-preview.png"
+    },
+    {
+      "path": "v2/qa/02-eyes-mask.png",
+      "sizeBytes": 5874,
+      "sha256": "68ff574c54290f1092ac26ba677a2ea8d9e5d4d90563f6c999bf97edfa5398c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/qa/02-eyes-mask.png"
+    },
+    {
+      "path": "v2/qa/05-eyes-mask-preview.png",
+      "sizeBytes": 7908693,
+      "sha256": "c3340abf3e937efed546871da80500fa29111d6a928b89707780bdc13cf0c26b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/qa/05-eyes-mask-preview.png"
+    },
+    {
+      "path": "v2/qa/05-eyes-mask.png",
+      "sizeBytes": 5866,
+      "sha256": "f06649bf77c82cd7c636ca034d39d4173cd8b55bbbd9054f8a41b7a3d8a7ceb7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v2/qa/05-eyes-mask.png"
+    },
+    {
+      "path": "v3-experiencias/01-austral-kayak.png",
+      "sizeBytes": 5816909,
+      "sha256": "fcc9a3ce3a6d98b75de49411890dcb798db36d48946b2e0e85398fa8ce25f541",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/01-austral-kayak.png"
+    },
+    {
+      "path": "v3-experiencias/02-austral-sendero.png",
+      "sizeBytes": 7900041,
+      "sha256": "bbef1a175033f6a43bcec2b59c918dcd8b6d98a865749ef744e1adb798e2e6f6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/02-austral-sendero.png"
+    },
+    {
+      "path": "v3-experiencias/03-cancun-ola.png",
+      "sizeBytes": 5808927,
+      "sha256": "e000089732374b4865822e1381905f6e3c8106ffcd11791b2e32ebf458654c1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/03-cancun-ola.png"
+    },
+    {
+      "path": "v3-experiencias/04-cancun-snorkel.png",
+      "sizeBytes": 5754985,
+      "sha256": "baa8d19fad2a8b5f294eccba9a9ec45104cc8e04b6e7817e45159a434d328551",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/04-cancun-snorkel.png"
+    },
+    {
+      "path": "v3-experiencias/05-rio-volei.png",
+      "sizeBytes": 5686516,
+      "sha256": "cb156ad568964a27d9fb0f00105afe7693acec5fb06887d8d224d7292b68ce5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/05-rio-volei.png"
+    },
+    {
+      "path": "v3-experiencias/06-rio-descanso.png",
+      "sizeBytes": 5637657,
+      "sha256": "0646c8c151299c8bd96d8480b207ad0e3a500e72ccc5b1e3e2e9319c68e7ad26",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/06-rio-descanso.png"
+    },
+    {
+      "path": "v3-experiencias/contacto-6.png",
+      "sizeBytes": 8805679,
+      "sha256": "470bf51986dd3f373f14ea2168101f762421bfb8cdc76b727f84e2d11778887f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/contacto-6.png"
+    },
+    {
+      "path": "v3-experiencias/qa/01-austral-kayak-rostro-100.png",
+      "sizeBytes": 231910,
+      "sha256": "cb62543e9dd8cd6c42d577346fc9b88da961bbccc38b5e7e32ec9affdb245154",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/qa/01-austral-kayak-rostro-100.png"
+    },
+    {
+      "path": "v3-experiencias/qa/02-austral-sendero-rostro-100.png",
+      "sizeBytes": 261997,
+      "sha256": "008b7165aba7b1fa7b300f84d699e947aba472b0c8006e8bae4eb5e20061eef2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/qa/02-austral-sendero-rostro-100.png"
+    },
+    {
+      "path": "v3-experiencias/qa/03-cancun-ola-rostro-100.png",
+      "sizeBytes": 287272,
+      "sha256": "69a1f135df124e9c4374cbd5d5b100ea08b10c56543a0d6f420f0b21802d4a80",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/qa/03-cancun-ola-rostro-100.png"
+    },
+    {
+      "path": "v3-experiencias/qa/04-cancun-snorkel-rostro-100.png",
+      "sizeBytes": 538343,
+      "sha256": "5a35d9b8b90f86d698d7a8df2398b6341be97ccad9caf016baff18e7d689eba9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/qa/04-cancun-snorkel-rostro-100.png"
+    },
+    {
+      "path": "v3-experiencias/qa/04-contactos-100.png",
+      "sizeBytes": 2134949,
+      "sha256": "013e83f4fdae534493688cea35c0da7031163ef69370383d724b23abcfffa993",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/qa/04-contactos-100.png"
+    },
+    {
+      "path": "v3-experiencias/qa/05-rio-volei-rostro-100.png",
+      "sizeBytes": 244438,
+      "sha256": "5ace46437b8b1f6ee4f04839b180514dd5aecb964bdb7d98013712b0d62cc8ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/qa/05-rio-volei-rostro-100.png"
+    },
+    {
+      "path": "v3-experiencias/qa/06-rio-descanso-rostro-100.png",
+      "sizeBytes": 397388,
+      "sha256": "d7c8083fdbf20908439f7b8ed724eace109aedf16e6c2093c95883d1b8590ac9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/qa/06-rio-descanso-rostro-100.png"
+    },
+    {
+      "path": "v3-experiencias/viajeros-pov-6-experiencias.zip",
+      "sizeBytes": 51215497,
+      "sha256": "e1bec1c6df60200ae17d19dda47c43c724a40abaad2d16659edd196cda01fc6f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-08_viajeros-pov/v3-experiencias/viajeros-pov-6-experiencias.zip"
+    }
+  ]
+}

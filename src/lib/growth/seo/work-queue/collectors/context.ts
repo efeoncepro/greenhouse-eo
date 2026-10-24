@@ -12,6 +12,8 @@ import type { SeoWorkQueueDecision, SeoWorkQueueOrigin } from '../contracts'
 import type { OrgCtrCurve } from '../priority-score'
 import type { PriorityScoreConfig } from '../score-versions'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface SeoWorkQueueCollectorContext {
   seoTargetId: string
   organizationId: string
@@ -30,7 +32,7 @@ export interface SeoWorkQueueCollectorContext {
    * snapshot y una clave por `item_id` moriría mañana.
    */
   latestDecisions: Map<string, SeoWorkQueueDecision>
-  env: NodeJS.ProcessEnv
+  env: EnvSource
 }
 
 export const decisionKey = (origin: SeoWorkQueueOrigin, normalizedKeyword: string): string =>

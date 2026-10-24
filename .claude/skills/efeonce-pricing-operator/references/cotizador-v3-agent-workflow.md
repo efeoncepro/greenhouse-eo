@@ -788,6 +788,10 @@ cliente); las asignaciones sin evidencia confirmada; `runNotices`; y lo que el c
 document` emite esos datos desde el artefacto congelado; el generador los compone. El manual de la plantilla es la
 autoridad sobre paginación, límites y revisión.
 
+### 6.0 Si se pidió un insumo editorial Markdown
+
+Un caso/propuesta MD para diseño externo puede incluir una transcripción exacta de netos y fases del artefacto calculado, con conciliación y referencia a su versión. Mantener la revisión, impuestos sin resolver y límites del alcance; costos, margen, brechas y `estimateExposure` quedan internos. No editar importes para redondear o cerrar una tabla: modificar demanda y volver a calcular. No es «la cotización» emitida y no exige renderizar un PDF para completar esa entrega de trabajo. Cuando se solicite emitirla, seguir 6.1 y la plantilla A4. [Preparación del master](../../../../docs/manual-de-uso/comercial/construir-una-licitacion.md#preparación-en-markdown-para-diseño-externo).
+
 ### 6.1 Secuencia
 
 ```bash

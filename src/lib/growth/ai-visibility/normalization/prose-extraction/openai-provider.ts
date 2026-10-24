@@ -23,7 +23,9 @@ import {
   buildProseExtractionPrompt
 } from './prompt'
 
-export const resolveOpenAiExtractionModel = (env: NodeJS.ProcessEnv = process.env): string | undefined =>
+import type { EnvSource } from '@/types/env-source'
+
+export const resolveOpenAiExtractionModel = (env: EnvSource = process.env): string | undefined =>
   env.GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_MODEL_OPENAI?.trim() || undefined
 
 export const openAiProseProvider: ProseExtractionProvider = {

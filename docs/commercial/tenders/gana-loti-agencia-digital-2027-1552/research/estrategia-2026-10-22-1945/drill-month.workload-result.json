@@ -1,0 +1,289 @@
+{
+  "status": "prepared",
+  "binding": false,
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-22",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "engagementForm": "on_going",
+    "accountId": "gana-loti-grd1552-internal-cost-only",
+    "offerMarketCountry": "CO",
+    "outputCurrency": "USD",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "design",
+        "profile": "ECG-003",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.8"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "video",
+        "profile": "ECG-018",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.75"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "creative",
+        "profile": "ECG-001",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.2"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "strategy",
+        "profile": "ECG-035",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.25"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "account",
+        "profile": "ECG-016",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.15"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "listening",
+        "profile": "ECG-004",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.15"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "untouchedLineIds": [],
+  "workload": {
+    "schemaVersion": "pricing-v3-workload-result/1",
+    "binding": false,
+    "status": "prepared",
+    "version": "grd1552-extra-drill-month",
+    "mode": "simulation",
+    "totals": {
+      "driverHours": [
+        {
+          "driverId": "posts",
+          "unit": "deliverable",
+          "hours": "22.75"
+        },
+        {
+          "driverId": "stories",
+          "unit": "deliverable",
+          "hours": "14"
+        },
+        {
+          "driverId": "carousels",
+          "unit": "deliverable",
+          "hours": "40"
+        },
+        {
+          "driverId": "reels",
+          "unit": "deliverable",
+          "hours": "50"
+        },
+        {
+          "driverId": "motion",
+          "unit": "deliverable",
+          "hours": "30"
+        }
+      ],
+      "fixedHours": "106.5",
+      "workHours": "263.25",
+      "fte": "2.3"
+    },
+    "lines": [
+      {
+        "lineId": "design",
+        "workHours": "94.25",
+        "presenceHours": "0",
+        "fteByWork": "0.754",
+        "fteByPresence": "0",
+        "fte": "0.8",
+        "bindingConstraint": "work",
+        "reason": "Estimated scope capacity; no assigned person or proven availability.",
+        "evidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        }
+      },
+      {
+        "lineId": "video",
+        "workHours": "90",
+        "presenceHours": "0",
+        "fteByWork": "0.72",
+        "fteByPresence": "0",
+        "fte": "0.75",
+        "bindingConstraint": "work",
+        "reason": "Estimated scope capacity; no assigned person or proven availability.",
+        "evidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        }
+      },
+      {
+        "lineId": "creative",
+        "workHours": "23",
+        "presenceHours": "0",
+        "fteByWork": "0.184",
+        "fteByPresence": "0",
+        "fte": "0.2",
+        "bindingConstraint": "work",
+        "reason": "Estimated scope capacity; no assigned person or proven availability.",
+        "evidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        }
+      },
+      {
+        "lineId": "strategy",
+        "workHours": "26",
+        "presenceHours": "0",
+        "fteByWork": "0.208",
+        "fteByPresence": "0",
+        "fte": "0.25",
+        "bindingConstraint": "work",
+        "reason": "Estimated scope capacity; no assigned person or proven availability.",
+        "evidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        }
+      },
+      {
+        "lineId": "account",
+        "workHours": "16",
+        "presenceHours": "0",
+        "fteByWork": "0.128",
+        "fteByPresence": "0",
+        "fte": "0.15",
+        "bindingConstraint": "work",
+        "reason": "Estimated scope capacity; no assigned person or proven availability.",
+        "evidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        }
+      },
+      {
+        "lineId": "listening",
+        "workHours": "14",
+        "presenceHours": "0",
+        "fteByWork": "0.112",
+        "fteByPresence": "0",
+        "fte": "0.15",
+        "bindingConstraint": "work",
+        "reason": "Estimated scope capacity; no assigned person or proven availability.",
+        "evidence": {
+          "reference": "workload:grd1552-extra-drill-month",
+          "effectiveFrom": "2026-10-22",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        }
+      }
+    ],
+    "diagnostics": [],
+    "note": "Dimensioned from declared volume and hours. It is not a staffing commitment, an availability check or a measured productivity."
+  },
+  "note": "Dedication derived from declared volume. Review the assumptions before quoting; the brief is not a commitment."
+}

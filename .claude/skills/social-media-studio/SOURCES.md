@@ -64,6 +64,15 @@
 - Aspire — 4 Influencer Marketing Strategies 2026 — https://www.aspire.io/blog/influencer-marketing-strategies-2026
 - SocialBook — Influencer Marketing Trends 2026 (micro/nano/UGC/ROI) — https://socialbook.io/blog/influencer-marketing-trends-2026-micro-creators-ugc-and-measurable-roi/
 
+**Portadas de video y menciones (as-of 2026-10-19 — guías de terceros, no documentación oficial de Meta ni LinkedIn;
+no coinciden en zonas seguras exactas)**
+- Hopper HQ — Instagram Reel size — https://hopperhq.com/blog/instagram-reel-size/
+- Oktopost — Instagram grid size guide — https://oktopost.com/blog/instagram-grid-size-guide/
+- Postfast — Instagram Reel cover size and safe zones — https://postfa.st/blog/instagram-reel-cover-size-safe-zones
+- Brandwatch — LinkedIn video specs — https://brandwatch.com/blog/linkedin-video-specs/
+- Postiz — LinkedIn post dimensions — https://postiz.com/blog/linkedin-post-dimensions
+- Metricool (oficial) — mencionar y etiquetar otras cuentas — https://help.metricool.com/en/article/mention-and-tag-other-accounts-tl3osr
+
 ## Datos clave estampados (as-of 2026-07 — reverificar según tabla)
 
 - **Señales universales que rankean**: watch time/completion, saves, shares/sends, dwell.
@@ -78,9 +87,10 @@
   ventana de decisión de ~30 min; las **respuestas pesan más que los likes** y la **profundidad del hilo**
   (gente respondiéndose entre sí) extiende distribución; la frescura se pondera fuerte y For You es
   recommendation-driven con seguidores como señal débil. Efeonce **no tiene evidencia propia** de esta
-  red (PDR-020 la abre como experimento con criterio de salida).
+  red (PDR-020 la abre como experimento de marca agencia desde feb-2027, con revisión el 31-mar-2027).
 - **Cadencia óptima (referencial)**: IG 3–5 feed + 2–4 Reels/sem · LinkedIn 2–3/sem ·
   TikTok 5–10/sem · FB/X 1–2/día · YouTube 1–2 long-form/sem + 3–5 Shorts.
+  La cadencia de los canales propios de Efeonce no sale de aquí: la fija PDR-020, Delta 2026-10-22 §6.
 - **Formato IG**: carruseles +109% engagement por persona alcanzada vs Reels; Reels 2,25×
   más alcance que foto única → elegir por objetivo (engagement vs alcance).
 - **Social search**: varias plataformas ofrecen búsqueda, recomendación y analytics propios;

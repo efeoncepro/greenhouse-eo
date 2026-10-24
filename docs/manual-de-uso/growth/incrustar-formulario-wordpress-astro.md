@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.9 — 2026-10-15 (Claude, opciones visibles, íconos de etiqueta, cuándo llega un cambio del renderer y previsualización por intercepción)
+> **Version:** 1.10 — 2026-10-24 (Claude, formulario en línea `inline_pill`, reservas por evento y conteo público)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -313,6 +313,35 @@ embeds y mutaciones; `slug` queda como alias humano/backward-compatible. La mism
 (`/api/public/growth/forms/{ref}`) resuelve por slug **o** por form-key (UUID) — no hay endpoint
 nuevo. El `form-key` es público/opaco; **NUNCA** es el HubSpot destination form GUID (server-only).
 El catálogo del selector (`InsertableFormCatalogEntryVm.formKey`) ya lo expone.
+
+## Formulario en línea (píldora) y reservas por evento
+
+**Antes de empezar:** el formulario debe estar publicado con la presentación `inline_pill` (un solo campo de correo,
+consentimiento como aviso) y el renderer `1.2.0` en producción (llega con el release de Greenhouse a `main`; antes, la
+página vería el formulario estándar).
+
+1. **Publicar el formulario del evento** (uno por evento): copiar `scripts/growth/forms/examples/webinar-aeo-2026-11-12.json`,
+   ajustar `slug`, `eventKey`, `eventDateLabel`, `capacity`, `overCapacity` (`waitlist` o `reject`),
+   `showRegistrationsCount`, `surfaceId` y `origins`, y correr
+   `pnpm growth:forms:publish-event-registration -- --config <archivo>` (dry-run: dice si pasa el gate). Con el
+   veredicto OK, repetir con `--apply`. Anotar el `form_key` que imprime. El destino HubSpot va aparte, por el registry
+   de destinos.
+2. **Incrustar:** `<greenhouse-form class="eo-inline-pill eo-inline-pill--event" form-key="<form_key>" surface="<surface>"
+   locale="es-CL" color-scheme="dark" appearance="bare">` con un enlace de respaldo adentro (sin JavaScript se ve el
+   enlace). Darle al elemento el ancho de su columna (480 px o más para el diseño de escritorio).
+3. **Color:** sólo tokens (`--ghf-inline-tone`, `--ghf-inline-on-tone` y, para el hover exacto,
+   `--ghf-inline-tone-hover/-active`). Piel de referencia: `scripts/growth/forms/fixtures/inline-pill-host-skin.css`.
+4. **Conteo de reservas (opcional):** leer `GET https://greenhouse.efeoncepro.com/api/public/growth/forms/<form_key>/registrations-count`
+   y mostrar `display` sólo si `shown` es `true`. No pedirlo más de una vez por carga de página (se cachea 10 min).
+5. **Verificar:** abrir, escribir un correo de prueba en staging, enviar y ver «¡Lugar reservado!» → «Te esperamos el …».
+
+**Estados:** reposo (botón), abierto (campo + «Reservar»), enviando (cargador), éxito (relleno + check), listo (mensaje
+final). En lista de espera: «¡Estás en la lista!» → «Te avisamos si se libera un lugar». Cupo lleno con `reject`: «Ya no
+quedan cupos para este evento.» bajo la píldora, sin «Reintentar».
+
+**Qué no hacer:** no copiar la animación en CSS de la página (vive en el renderer); no poner casillas de consentimiento
+(la píldora no las dibuja y el contrato no publica); no inyectar `event_key` desde la página (el servidor lo impone);
+no mostrar el conteo si `shown` es `false`.
 
 ## Que significan los estados (lo que vera el visitante)
 

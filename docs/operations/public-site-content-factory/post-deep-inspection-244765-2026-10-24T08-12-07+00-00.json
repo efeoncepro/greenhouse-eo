@@ -1,0 +1,3766 @@
+{
+  "contractVersion": "contentFactoryPostDeepInspection.v1",
+  "scannedAt": "2026-10-24T08:12:07+00:00",
+  "source": "wp_cli_parse_blocks",
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "post": {
+    "id": 244765,
+    "type": "post",
+    "status": "publish",
+    "slug": "que-es-inbound-marketing",
+    "title": "Inbound Marketing: Qué es y cómo transforma tu estrategia figital",
+    "modified": "2024-08-13T00:24:54+00:00",
+    "permalink": "https://efeoncepro.com/inbound/que-es-inbound-marketing/",
+    "contentLength": 56428
+  },
+  "seo": {
+    "yoastTitle": "¿Qué es Inbound Marketing?: Impacto en tu estrategia y Beneficios",
+    "yoastDescription": "Descubre cómo el Inbound Marketing puede transformar tu estrategia digital con tácticas efectivas, herramientas clave y ejemplos prácticos.",
+    "primaryCategory": "96"
+  },
+  "summary": {
+    "totalBlocks": 295,
+    "topLevelBlocks": 171,
+    "counts": {
+      "core/freeform": 85,
+      "core/group": 1,
+      "core/heading": 23,
+      "core/image": 2,
+      "core/list": 33,
+      "core/list-item": 99,
+      "core/paragraph": 41,
+      "core/pullquote": 4,
+      "core/quote": 3,
+      "core/separator": 1,
+      "core/table": 1,
+      "leadin/hubspot-form-block": 1,
+      "yoast-seo/table-of-contents": 1
+    },
+    "maxDepth": 3,
+    "linkCount": 34,
+    "nonEmptyFreeformCount": 0,
+    "mediaIssueCount": 0
+  },
+  "headingOutline": [
+    {
+      "path": "8",
+      "level": 2,
+      "text": "¿Por qué es importante el Inbound Marketing?"
+    },
+    {
+      "path": "24",
+      "level": 2,
+      "text": "Historia del Inbound Marketing"
+    },
+    {
+      "path": "26",
+      "level": 3,
+      "text": "Origen y Evolución del Concepto"
+    },
+    {
+      "path": "32",
+      "level": 3,
+      "text": "Principales Hitos y Desarrollos a lo Largo del Tiempo"
+    },
+    {
+      "path": "36",
+      "level": 3,
+      "text": "HubSpot y la Popularización del Inbound Marketing"
+    },
+    {
+      "path": "44",
+      "level": 3,
+      "text": "Inbound Marketing al 2024"
+    },
+    {
+      "path": "54",
+      "level": 2,
+      "text": "¿Qué es el Inbound Marketing?"
+    },
+    {
+      "path": "58",
+      "level": 3,
+      "text": "Diferencias con el Marketing Tradicional"
+    },
+    {
+      "path": "68",
+      "level": 3,
+      "text": "¿Debo dejar de hacer Publicidad (Outbound) digital?"
+    },
+    {
+      "path": "84",
+      "level": 4,
+      "text": "Exploración con Inbound y Outbound Marketing"
+    },
+    {
+      "path": "88",
+      "level": 4,
+      "text": "Evaluación con Inbound y Outbound Marketing"
+    },
+    {
+      "path": "92",
+      "level": 3,
+      "text": "Beneficios de la Integración"
+    },
+    {
+      "path": "98",
+      "level": 2,
+      "text": "Inbound Marketing vs otras metodologías"
+    },
+    {
+      "path": "106",
+      "level": 3,
+      "text": "¿La solución? Estrategias integradas de Marketing"
+    },
+    {
+      "path": "112",
+      "level": 2,
+      "text": "Elementos Clave del Inbound Marketing: Atraer, Convertir, Cerrar y Deleitar"
+    },
+    {
+      "path": "118",
+      "level": 2,
+      "text": "Inbound Marketing en el Diseño y Desarrollo Web: Growth Driven Design"
+    },
+    {
+      "path": "122",
+      "level": 3,
+      "text": "Qué es Growth Driven Design (GDD)"
+    },
+    {
+      "path": "130",
+      "level": 3,
+      "text": "Beneficios del Growth Driven Design"
+    },
+    {
+      "path": "138",
+      "level": 2,
+      "text": "¿Cómo Implementar una Estrategia de Inbound Marketing?"
+    },
+    {
+      "path": "142",
+      "level": 2,
+      "text": "Herramientas y Recursos Recomendados"
+    },
+    {
+      "path": "148",
+      "level": 2,
+      "text": "Ejemplos de Tácticas Efectivas"
+    },
+    {
+      "path": "152",
+      "level": 2,
+      "text": "Conclusión"
+    },
+    {
+      "path": "162.0",
+      "level": 4,
+      "text": "Lo que nos diferencia:"
+    }
+  ],
+  "blocks": [
+    {
+      "path": "0",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En el dinámico mundo del marketing digital, las estrategias evolucionan constantemente para adaptarse a los cambios en el comportamiento del consumidor y las tecnologías emergentes. Entre todas las metodologías disponibles, el Inbound Marketing se destaca como…",
+      "innerBlockCount": 0,
+      "fingerprint": "6c9821aa8bb311fe45c8a3b17e030353c62ea834608f3947e3e1ec1a52e52610",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "1",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2da24f92367f7c2b0e4f76ad392b66fce9027bfa35a81485910e5d0ae882d5b9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "2",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Seguramente has notado que las estrategias tradicionales de marketing, como los anuncios intrusivos y las llamadas en frío, están perdiendo efectividad. Los clientes potenciales ahora buscan contenido que realmente les aporte valor y resuelva sus problemas.",
+      "innerBlockCount": 0,
+      "fingerprint": "dc41df4b601f0e6c1da469be05979c11970315ba444f8410b7ec78a67b66a2ca",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "3",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4b5c99f6fafba03d9973d68018f691c628527b5b6e25c9e4fe26fedf312548a7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "4",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esta guía completa te llevará a través de los fundamentos del Inbound Marketing, su historia, beneficios, y cómo puede transformar tu estrategia digital.",
+      "innerBlockCount": 0,
+      "fingerprint": "60f995224f1e6e5b736b5938d99be4f8f7ca8b1fad4c1b10360770bd6ebdf78f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "5",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "62db42a028e487a080771dcb8308c877e830521c7e072b6dbfb3206756272e1f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "6",
+      "depth": 0,
+      "blockName": "yoast-seo/table-of-contents",
+      "attrs": {},
+      "text": "Tabla de contenidos¿Por qué es importante el Inbound Marketing?Historia del Inbound MarketingHubSpot y la Popularización del Inbound MarketingInbound Marketing al 2024¿Qué es el Inbound Marketing?¿Debo dejar de hacer Publicidad (Outbound) digital?Inbound Marke…",
+      "innerBlockCount": 0,
+      "fingerprint": "7ca4ca8d41b9f797510b983c130151327646d831989e1de3c02eb1a23e61d648",
+      "editability": "preserve_structure",
+      "risks": [],
+      "href": "#h-por-que-es-importante-el-inbound-marketing"
+    },
+    {
+      "path": "7",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c284c4c12aefa43352f47d5ae193ebd4c3db1e74bc665ace910fdbfd6b7ca2b5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "8",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "style": {
+          "elements": {
+            "link": {
+              "color": {
+                "text": "var:preset|color|brand-color"
+              }
+            }
+          }
+        }
+      },
+      "text": "¿Por qué es importante el Inbound Marketing?",
+      "innerBlockCount": 0,
+      "fingerprint": "aa09723918eefe4255ed68cb481f1b8076768c1fc3893e309eca43d22cd54ae9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "9",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "83858823bfd43358305f10f00874c21d546e0764e53e599d4a1bd2a8983cbaf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "10",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Los consumidores actuales están cada vez más desinteresados en los mensajes no solicitados, lo que lleva a una desconexión entre las empresas y sus potenciales clientes.",
+      "innerBlockCount": 0,
+      "fingerprint": "671fdb2b1927e15c662c17a6dd192c10682404617aa6837c422f5643f25ad53c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "11",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4dca91fafb9af976b35ddc2b0ddb37e1f98fde38c886593c5707d32d12d69ea5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "12",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Este problema se agrava con la sobrecarga de información que los consumidores enfrentan diariamente. Con tanta competencia por su atención, destacar y captar interés se vuelve una tarea monumental. Las empresas necesitan encontrar formas más efectivas y menos …",
+      "innerBlockCount": 0,
+      "fingerprint": "fac4033e16f0ffd5cc0ef7efee0f49b270f89cc49d0292fc65f8931bcb8e9117",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "13",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e84eb997543a7dd41514d773b9cbe2137fd6e32c2a54cbfc9ac8bcce9e94bbd1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "14",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El resultado es una frustración creciente por no ver resultados tangibles a pesar de los esfuerzos y recursos invertidos. ¿Cómo pueden las empresas romper este ciclo y establecer conexiones significativas que impulsen el crecimiento sostenible?",
+      "innerBlockCount": 0,
+      "fingerprint": "6450114dd9f1e3a98ef908e84b3b17328411e11d244d107e29f2293ba53d4fd1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "15",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "661e12f5c6529bc71e7e349b071d9e1cb7932b3ca81965ead12f9a6463eb2414",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "16",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El Inbound Marketing ofrece una solución a este problema al enfocarse en atraer a los clientes potenciales mediante la creación de contenido valioso y relevante, en lugar de interrumpirlos con mensajes no deseados. Esta metodología no solo mejora la experienci…",
+      "innerBlockCount": 0,
+      "fingerprint": "b1b46429717075f0f3191e8a226892efae08318d60b24c92a1cac669ef248c2d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "17",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c423d4f29c415e75245bec0f0485223b01d85f2f11644b45cb4ac281d90df4a9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "18",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 4,
+      "fingerprint": "86bd1c051f4134923d5e25e66620d6b4a96c5a99193c021c2cd0287d7302b537",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "18.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Generación de Leads de Alta Calidad: Al atraer a personas que ya están interesadas en lo que ofreces, la calidad de los leads mejora significativamente.",
+      "innerBlockCount": 0,
+      "fingerprint": "6419086b50725b7fbaa0b1c9c5b79db183bdd8f4c409436c4d3f2e41d7274b75",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "18.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Mejor ROI: Las estrategias de Inbound Marketing son más rentables en comparación con las tácticas de marketing tradicionales, ya que se centran en la creación de contenido que continúa atrayendo a leads a largo plazo.",
+      "innerBlockCount": 0,
+      "fingerprint": "b86b6cbebb0a9bc1bac65a77e18de1d47e3b23414bd1d2b2050b6d7cc872ed4f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "18.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Fidelización de Clientes: Al proporcionar contenido útil y relevante, se fomenta la confianza y lealtad del cliente, lo que lleva a relaciones a largo plazo.",
+      "innerBlockCount": 0,
+      "fingerprint": "7786cd06c9b06adf23e22d1392ee5a02502d880916ec643d318da8f6a7f9b7b4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "18.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Adaptación a la Era Digital: Con la creciente digitalización, el Inbound Marketing se adapta perfectamente a cómo los consumidores modernos investigan y compran productos y servicios.",
+      "innerBlockCount": 0,
+      "fingerprint": "c7848d92ffb41603a80ba9c7a7e01cd49839234749c204e92ebc00af116a5969",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "19",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd6e2c3c76a82830321d48de818f635d83749645c0a63b252f31832eb9b0e432",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "20",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En un entorno donde los consumidores tienen más control que nunca sobre la información que consumen, el Inbound Marketing ofrece una manera efectiva y ética de atraer y mantener a los clientes. Esta metodología no solo responde a las expectativas de los consum…",
+      "innerBlockCount": 0,
+      "fingerprint": "fb00f3f54a241ebd71549250ba8a9b691e6dd4a1e81350491caadc0f49b40780",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "21",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "657f90f2163e0fe357d624219a016dabec7eba7d57a79f1d2f960c7347b2f9c0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "22",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "f2251cd16d0a6b87d1521c2b86567d9c57ab53595d10dd9ecaa0465cbba27ff8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "22.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "\"El futuro del marketing B2B reside en quienes pueden combinar la creatividad humana con las capacidades transformadoras de la IA.\" Giuseppe Caltabiano, VP of Marketing Rock Content",
+      "innerBlockCount": 0,
+      "fingerprint": "26ad315294b26aaf58c1909f5eafa2fc3740e58e6d5b2f3768eefd7f817516fd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "23",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7d6d371d4dbfcfb1428409fff1c4c0037a77055eea9e723c3624f004292b3ab9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "24",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Historia del Inbound Marketing",
+      "innerBlockCount": 0,
+      "fingerprint": "0f84efbd90593314e1a5f0901011c9850de160eb9c04677c8e4e518288b3d7c2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "25",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ac173ffb8869f6666f0831d325010b26566cbc77a3518c6dd8636efafccb6d9f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "26",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Origen y Evolución del Concepto",
+      "innerBlockCount": 0,
+      "fingerprint": "4a92e41b29e9264b1385a01848ae7b3a760cda9036e841094414f10e0aa66d37",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "27",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "34b63d36ab5e5d57165076da458251645e23ae7836216c9ccd095ad047698b78",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "28",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El Inbound Marketing es una metodología que se enfoca en atraer clientes potenciales a través de la creación de contenido relevante y valioso, y no mediante técnicas intrusivas. Esta metodología nació como una respuesta a la evolución del comportamiento del co…",
+      "innerBlockCount": 0,
+      "fingerprint": "2039b12de5cc9b59dc66c65042713498acd32a50c6fd474df968a25fae50cefd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "29",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2c9b09a2ebe532e3b49c51beea30f1663a68278c4920f7d960e01431c62b5ad5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "30",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Origen (2005): El término \"Inbound Marketing\" fue acuñado por Brian Halligan, cofundador de HubSpot, en 2005. En esa época, los consumidores estaban empezando a cambiar la forma en que buscaban y consumían información debido al auge de Internet. En lugar de se…",
+      "innerBlockCount": 0,
+      "fingerprint": "ae4c33cfa6c0ad766df5408775d5259ed7fd28f536ccae849700af9fc5064a99",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "31",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c50c720347dfe52776431315bb77275805c25a8c8e5cf37883a52413c5ae9cf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "32",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Principales Hitos y Desarrollos a lo Largo del Tiempo",
+      "innerBlockCount": 0,
+      "fingerprint": "4a7c30adc9d7ca3c49f3690002efb7d943f9848630312174307bf54e11e37763",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "33",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ea2bb7516e325cff7952d2b45196e71af3c6fb7d59bbe5d55cbea5e58566194",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "34",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 5,
+      "fingerprint": "1c904b05cfab66efa23762e8d913dfa4a0feb3c45e339e538109b4560c408594",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "34.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Lanzamiento de HubSpot (2006): En 2006, Brian Halligan y Dharmesh Shah fundaron HubSpot con la misión de transformar la manera en que las empresas interactúan con sus clientes. HubSpot proporcionó las herramientas y recursos necesarios para implementar estrate…",
+      "innerBlockCount": 0,
+      "fingerprint": "02e254c3d96ee3c9d8614230b34b2af22dac52074365ca87cfd79a2db5fab43e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "34.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Publicación de \"Inbound Marketing: Get Found Using Google, Social Media, and Blogs\" (2009): Este libro, escrito por Brian Halligan y Dharmesh Shah, popularizó el concepto de Inbound Marketing y proporcionó una guía práctica para su implementación. El libro se …",
+      "innerBlockCount": 0,
+      "fingerprint": "d5ec3f7f5a70f83b4e004c6f269fc14503c69c732dfb6cbacbc55030f8a8e622",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://cdn2.hubspot.net/hub/53/file-13201337-pdf/docs/hubspot-midnight-madness-webinar-dharmesh-june-2010.pdf"
+    },
+    {
+      "path": "34.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Lanzamiento de la Certificación de Inbound Marketing (2013): HubSpot lanzó una serie de cursos y certificaciones en Inbound Marketing, ayudando a educar a los profesionales del marketing en la metodología y creando una comunidad global de expertos en Inbound.",
+      "innerBlockCount": 0,
+      "fingerprint": "f09e953dfe50fa2aea02e59df8f5960f41e6116ade4400574b4c15527db66107",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "34.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Adopción Global (2010s): A lo largo de la década de 2010, el Inbound Marketing ganó popularidad a nivel mundial. Las empresas empezaron a adoptar esta metodología como una forma más efectiva y sostenible de atraer y retener clientes. La creciente importancia d…",
+      "innerBlockCount": 0,
+      "fingerprint": "ce1154b6a62b9735578ea80a5f98f8519a754fe2efc106cfd64d09babad41e33",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "34.4",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Innovaciones Tecnológicas y Automatización (2020s): Con el avance de la inteligencia artificial y las herramientas de automatización, el Inbound Marketing ha evolucionado para ser aún más eficiente y personalizado. Herramientas como la automatización del marke…",
+      "innerBlockCount": 0,
+      "fingerprint": "73ec351fe28752b7cb541c2fdfc529a0364c448c7380181b55786a09fd0cd7c2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "35",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e26d65395fc27b4cdb43da753a28c83ff1ed8e1720f59373d9f081535d704e9b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "36",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "HubSpot y la Popularización del Inbound Marketing",
+      "innerBlockCount": 0,
+      "fingerprint": "845c68bd91de700fc5c328a6f3a38fa738faa1b28af9bd7691a2c7a198ec0ff4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "37",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a41c767a763d456d376dc318669e5ccca6a466b5acc4b23642d9b763fa2e27b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "38",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "HubSpot ha jugado un papel fundamental en la popularización y adopción del Inbound Marketing. Desde su fundación en 2006, HubSpot ha sido un pionero en proporcionar herramientas y recursos que permiten a las empresas implementar estrategias de Inbound de maner…",
+      "innerBlockCount": 0,
+      "fingerprint": "46cf90a3de4bcfe307cd0fdd3b036cff1b1eaf145737c5db0472aa9b268a67ea",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "39",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2afbc9c9b8b1f9a4db9b0885d7a6a3c499d8d7c426782fa741759d88ba945d32",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "40",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 4,
+      "fingerprint": "daa079865b91181981b87eaa3ecfe15d7f99e1febb9b1284e4cbb203ad689b24",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "40.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Plataforma Integral: HubSpot ofrece una plataforma completa que incluye herramientas de marketing, ventas y servicio al cliente, todas diseñadas para apoyar la metodología Inbound. Esto ha facilitado a las empresas la implementación de estrategias integradas y…",
+      "innerBlockCount": 0,
+      "fingerprint": "f6f013fb077551909d4808a18e7c8c83b4aa20aeb5b7062bac78aa4e4c4534fa",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "40.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Educación y Certificación: A través de la HubSpot Academy, la empresa ha educado a miles de profesionales del marketing en todo el mundo, ofreciendo cursos y certificaciones gratuitas en Inbound Marketing. Esto ha ayudado a estandarizar y difundir la metodolog…",
+      "innerBlockCount": 0,
+      "fingerprint": "507220eb49981eafd82fcaebac8ae0f9498cbd4146801bc712cc3a5dca32ab2d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "40.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Comunidad y Eventos: HubSpot ha creado una comunidad global de profesionales del marketing y organiza eventos anuales como INBOUND, donde se comparten las últimas tendencias y mejores prácticas en Inbound Marketing. Estos eventos han ayudado a consolidar y exp…",
+      "innerBlockCount": 0,
+      "fingerprint": "b07993d9582b53e653d4aa2405e67d751e2173f2d2f8cdbc1545b5ef041d570b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "40.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Innovación Continua: HubSpot sigue innovando y adaptando sus herramientas para mantenerse a la vanguardia de las tendencias del marketing digital. La integración de la inteligencia artificial y la automatización en su plataforma ha permitido a las empresas mej…",
+      "innerBlockCount": 0,
+      "fingerprint": "ccf1eacc44b0cf813b1d7a3a489e6c648797078a068778e6c3f0e9942371f237",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "41",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2aefea39ecf1a11ef2f202e026852cabf742c3f2d9ea99480c5d5e3e7c11600a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "42",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "e8366759d05dcc50c1815d0011ba7d4386b198cd0dfc652989cc8ddc23b39a48",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "42.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "\"La clave del éxito en el marketing moderno es ser útil. Cuando tus clientes saben que pueden contar contigo para obtener la información que necesitan, se establece una relación de confianza que va más allá de una simple transacción.\" Brian Halligan - Entrevis…",
+      "innerBlockCount": 0,
+      "fingerprint": "0da8c9f0c496299991540593a9862fcba68049cb7422bdf1c3d00cb5bbc3554e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "43",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "053abf8768233eaab98513ddafe75724ac6e5a9754b362a36113ff86ff23aa9c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "44",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Inbound Marketing al 2024",
+      "innerBlockCount": 0,
+      "fingerprint": "89b2d71d1bc97150bd3f2c8841a3cda5faccc42e50bf8b8d40641f17d017ddf4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "45",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "68a75eb3f45f83dd0fe0c8e79b4d72535a63bf009602dcfaf8963630ec2959fd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "46",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En 2024, el Inbound Marketing se encuentra en uno de sus estados más dinámicos. La integración de tecnologías como la inteligencia artificial y el machine learning está revolucionando la personalización del contenido y la experiencia del cliente.",
+      "innerBlockCount": 0,
+      "fingerprint": "0c0a6d406b567b48c80ca497ed4d19b767fc2b76511f444baa6501f06ffb662e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "47",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd8802fd51e15ee6daa5843253bfee36601c7e5d5c167c34afb0e54024ba8074",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "48",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Además, las estrategias de contenido siguen siendo cruciales, pero ahora se complementan con la optimización para búsqueda por voz y el uso de video en formatos cortos. La ética y la privacidad en el marketing también han ganado protagonismo, con un enfoque en…",
+      "innerBlockCount": 0,
+      "fingerprint": "eaf6f29229c4fe91715597370fefb769fed4532b17bd580aa1c08dd3c34d2bdd",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://semgeeks.com/blog/state-of-inbound-marketing-in-2024/"
+    },
+    {
+      "path": "49",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "51d2e1d1ec468a4a30e27f807594cf18daf531538b5a74412f461defc02da878",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "50",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En Efeonce somos Solution Partner de HubSpot, estamos certificados para apoyarte en el Onboarding de HubSpot, además de ofrecerte soporte continuo a la medida de tus necesidades.",
+      "innerBlockCount": 0,
+      "fingerprint": "08796f55c38ef21d143b25cf8b7835d14c7fc0bfebb7dc9e0e8a6353c980a19c",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/hubspot-onboarding/"
+    },
+    {
+      "path": "51",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7ba90849d64f044316abde25f63291386e97caf3d0b2f4bc32e552b379c84d6e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "52",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "Según HubSpot, el 72% de los marketers utilizan herramientas de IA para la personalización, lo que mejora significativamente la eficiencia y efectividad de las campañas​.HubSpot Blog",
+      "innerBlockCount": 0,
+      "fingerprint": "09a1310ab7bbf0808726b112dd7e2445584db9687553d8eac74cb59a07264c35",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.hubspot.com/state-of-marketing"
+    },
+    {
+      "path": "53",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b119eb48acea4a3b75f200a5ef0ca220944809eb1d1e82d6e4522038affe3534",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "54",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "style": {
+          "elements": {
+            "link": {
+              "color": {
+                "text": "var:preset|color|brand-color"
+              }
+            }
+          }
+        }
+      },
+      "text": "¿Qué es el Inbound Marketing?",
+      "innerBlockCount": 0,
+      "fingerprint": "4192106f5fb235ecd6ea62e683f7f5d84560248b7ed5fb0f4376134c579254a4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "55",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a6da1b32f6ea8e7fd1c94a558978854bfa24ac0739e981e4cc06507499a05ec1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "56",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El Inbound Marketing es una metodología que se centra en atraer clientes potenciales mediante la creación y distribución de contenido valioso y relevante. En lugar de interrumpir al público con anuncios no solicitados, el Inbound Marketing busca atraer a los c…",
+      "innerBlockCount": 0,
+      "fingerprint": "09ac101ecfb14ff03ed3ffa35ce8200dd374ca850b448cc1fa214125eb2a43d2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "57",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "75037fef1c327667189dd5ef37d294d327bade37501c34cce9bcc52874496345",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "58",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Diferencias con el Marketing Tradicional",
+      "innerBlockCount": 0,
+      "fingerprint": "195af957fff3735046c97329d5fafbdcce3115dc69f0e294cca39d66a267d505",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "59",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e6a500b950175889a31e84bef00f32729137a3e72a0ae1cf00247d3fe075d19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "60",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El marketing tradicional, también conocido como Outbound Marketing, se basa en tácticas intrusivas como anuncios de televisión, llamadas en frío y correo directo. Estas estrategias intentan captar la atención del público de manera activa y a menudo no deseada.…",
+      "innerBlockCount": 0,
+      "fingerprint": "128eb21b24a9f0631c2810b379d62c8200779fd651486b3361308a12ce03fa48",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "61",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "46f36295e3cbaa7c9e9ad0514540c3421360fd75423cf1ea4fe33e95b0faa19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "62",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {
+        "className": "is-style-stripes"
+      },
+      "text": "Marketing Tradicional (Outbound)Inbound MarketingAnuncios intrusivosContenido valioso y relevanteLlamadas en fríoBlogs, eBooks, guíasPublicidad masivaSEO, marketing en redes socialesEnfoque en ventas rápidasConstrucción de relaciones a largo plazoComparativo d…",
+      "innerBlockCount": 0,
+      "fingerprint": "e1dba59165f6b38383f93c37efbd2776523c811a14469bd7beabbdd239203437",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "63",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "5503c0d261d1094800218d8e78d04fb56062b8419231c2207c9ffbe69e5804dd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "64",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Las estadísticas de marketing de 2023 muestran que el inbound marketing puede ser hasta 10 veces más efectivo para la conversión de leads que el outbound marketing cuando se ejecuta correctamente (IMPACT). Además, el inbound marketing genera tres veces más lea…",
+      "innerBlockCount": 0,
+      "fingerprint": "e47542f30ff6d22dc942d9b3fc24534f9501f841ac17293131badf0e9076a269",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://99firms.com/blog/inbound-marketing-statistics/"
+    },
+    {
+      "path": "65",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a5f8311ec9417dccecf2995f705067795727f7edef69c275364ed0defcc1ddef",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "66",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "c82ebeb3bf78ed0c1499095e7b390910247ed07d4d630f31de04081a44208cdd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "66.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "\"La clave para una estrategia de marketing exitosa es la personalización a escala, utilizando datos de primera mano para crear experiencias hiperpersonalizadas que realmente resuenen con tu audiencia.\" Dave Gerhardt, CEO of DGMG",
+      "innerBlockCount": 0,
+      "fingerprint": "0d3fefa516f048eb0a05ad3b9915a96f5da64e23be44ff42262dcab460934dae",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "67",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "af5e91bed563afbeea9b1cddea107c5d64754d0a04856862e6fab84195a380a2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "68",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿Debo dejar de hacer Publicidad (Outbound) digital?",
+      "innerBlockCount": 0,
+      "fingerprint": "0af19077b2bb836474100d5d7ace6b9e405fc8895e25fda0b2df18c04c75a3d1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "69",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ca60a7609bbfb11d8627a3d860f2a22668122c737494981d54b2a242342d3c40",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "70",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La respuesta corta es no. El Inbound Marketing y el Outbound Marketing no son mutuamente excluyentes. De hecho, la clave está en integrar estás dos estrategias para potenciar tus resultados de marketing. Una estrategia integrada de Inbound y Outbound Marketing…",
+      "innerBlockCount": 0,
+      "fingerprint": "25bb770496efde2f0dcca4323a255fd15ca9e3015970326426e9bfabf257d891",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "71",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "105166651fb600bf3c74595e4f3f53ff5313c12bd32f55b2f008e23c26c97583",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "72",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La integración permite que ambas metodologías trabajen juntas para atraer, convertir y deleitar a los clientes de manera más efectiva. La clave está en encontrar el equilibrio adecuado y asegurarse de que las estrategias trabajen juntas de manera cohesiva.",
+      "innerBlockCount": 0,
+      "fingerprint": "484f389a4582739f4339fa258f2092116314beec02a61267749d83b271a45b31",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "73",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d6367186a13e4adf1313064870ec2f9d5efbcf34905718193c8bafc772658859",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "74",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 244955,
+        "sizeSlug": "full",
+        "linkDestination": "none",
+        "width": "437px",
+        "height": "auto",
+        "align": "left"
+      },
+      "text": "Messy Middle - Efeonce",
+      "innerBlockCount": 0,
+      "fingerprint": "4fcd5dd09e75adbaed4e8defd14485275f5afd8330f718cbb6c60ffa5ac0206f",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 244955,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2024/08/messy-middle.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2024/08/messy-middle.svg",
+        "alt": "",
+        "width": "437px",
+        "height": "auto"
+      }
+    },
+    {
+      "path": "75",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "21d5b1cde23c059d575b599a99f6b62c70c799468fe8461ce8b71605710aef0e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "76",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El informe \"Decoding Decisions: The Messy Middle of Purchase Behavior\" de Google, publicado en 2020, se basó en un estudio exhaustivo del comportamiento de compra de los consumidores en línea. La investigación analizó cómo los consumidores exploran y evalúan o…",
+      "innerBlockCount": 0,
+      "fingerprint": "693e733be3970de544e600a77d74e1d446b09c107e73d9ba08c48d179a5b01b8",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.thinkwithgoogle.com/intl/es-419/insights/recorrido-del-consumidor/como-es-el-complejo-proceso-de-toma-de-decisiones-de-los-consumidores-durante-el-recorrido-de-compra/"
+    },
+    {
+      "path": "77",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "30bd06b0c23989fc42cec59b28bf9d88f3bd5114f51c7bdf3666368594a25612",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "78",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En la fase de exploración, los consumidores buscan activamente información sobre productos o servicios que puedan satisfacer sus necesidades. Utilizan motores de búsqueda, redes sociales, reseñas y otros recursos para reunir datos y ampliar sus opciones. Luego…",
+      "innerBlockCount": 0,
+      "fingerprint": "0bde20a73706d0c2764085de1e32fbcb1a31e4bc6319d33e69c27ed26cc8fdc5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "79",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "531cc3f2648ef4e2beed396e1be6521a6ee1e794405a59b6466133fda5d9f05a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "80",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Según estadísticas de marketing de 2023, una estrategia integrada de inbound y outbound puede ofrecer resultados excepcionales. Las campañas de marketing omnicanal, que combinan estrategias inbound y outbound, pueden aumentar las tasas de retención de clientes…",
+      "innerBlockCount": 0,
+      "fingerprint": "3b603f13412d5e408aed24ab9638dd823acbea92247272f79eaef43b4540b6b3",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://shortlist.io/blog/inbound-and-outbound-marketing-strategies/"
+    },
+    {
+      "path": "81",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "edf656e8ae68f518cb6260d407b80f346334dc715042fa2ba07031b95b6b4659",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "82",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La visibilidad y relevancia en estas fases son esenciales para influir en las decisiones de compra. Aquí es donde la integración de Inbound y Outbound Marketing juega un papel crucial:",
+      "innerBlockCount": 0,
+      "fingerprint": "7fd7e74be1a8b20a6d80e92ac8e1711fb2472a285ff30926e3d5e6ec3d4a3925",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "83",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4d895cca29deb52cf5cc39c09167eeefe4a1b73c382911c8c0246b8e59ac92f6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "84",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 4
+      },
+      "text": "Exploración con Inbound y Outbound Marketing",
+      "innerBlockCount": 0,
+      "fingerprint": "3a369a41298f9e9b74e9d0864b7f9704cff4b70472c556427fb90a009c9ba1a0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "85",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e52f8a52551e6ae5e34e99987696aa1dbcd9a5954928292d8c03ebacb72215c5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "86",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "d3befab52100659be7d2ef5e9d5e704e506e93015a0eac6d0c9758dd0fbd99d7",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "86.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Inbound Marketing: Publicar contenido valioso y relevante (como blogs, videos y guías) ayuda a atraer a los consumidores que están buscando información. Este contenido debe responder a sus preguntas y necesidades, posicionando tu marca como una autoridad en el…",
+      "innerBlockCount": 0,
+      "fingerprint": "9da0b789cc40eb961c6a6393ee490b1d0334835a5c272dd5d75db47a64d14721",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/inbound/estrategia-de-contenidos/"
+    },
+    {
+      "path": "86.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Outbound Marketing: Utilizar tácticas de outbound, como anuncios en redes sociales y publicidad display, puede atraer a los consumidores hacia tu contenido y sitio web. Estos esfuerzos proactivos pueden captar la atención de quienes aún no conocen tu marca, am…",
+      "innerBlockCount": 0,
+      "fingerprint": "6982b953f966bf279c4d06a7b64ebc2b4c175dfbbe49c49ba61be7ca6d215aca",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "87",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "36cf66906e25b0a6dfc7c1e530ac775708d129ab1b67eafc44c250585befb53f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "88",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 4
+      },
+      "text": "Evaluación con Inbound y Outbound Marketing",
+      "innerBlockCount": 0,
+      "fingerprint": "102ae0819f4a7b530260e03dbd60835c2baa9dafbb3b2d00a0f365d91cdef27c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "89",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "287605b0d2f91e486ba16b88b418797425d607bc5d7a34631202951d8b40e187",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "90",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "1432631839dcf27d8c737057dd704c32943a39d96f01f87d9810421f8a07110f",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "90.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Inbound Marketing: Proporcionar testimonios, estudios de caso y comparativas detalladas ayuda a los consumidores a evaluar tus productos o servicios frente a la competencia. El contenido educativo y los recursos de apoyo pueden consolidar la confianza en tu ma…",
+      "innerBlockCount": 0,
+      "fingerprint": "5f52ba9d3ea32d1ed2ee33f22721273cd11e9e6972cf958d737aa5cf3f1a8aa9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "90.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Outbound Marketing: Implementar campañas de remarketing y enviar correos electrónicos personalizados puede mantener tu marca en la mente del consumidor mientras evalúan sus opciones. Estos esfuerzos pueden recordarles el valor de tus productos o servicios y pr…",
+      "innerBlockCount": 0,
+      "fingerprint": "54e3b6c2fde9ccb7163af15924ea46adf5cac7e50843df542e689310be9e6531",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "91",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9c6d7b896a27b18208a07cbac18aa839f6278ce7b773532190a8fff22aa914cb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "92",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Beneficios de la Integración",
+      "innerBlockCount": 0,
+      "fingerprint": "951b0ddf7516e17fcd4f51c8a561c576de9331ef5d1a7db7f52599719057c603",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "93",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ed3fc775d6bb7ad3db99d75e8c04e6f24fa56c04d9760d4e6cecf0d97e12e945",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "94",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 5,
+      "fingerprint": "c5a085ad85327738d183e7b76b55dd4ea8a92ce036ff99bf6dbd0de70bed663c",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "94.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Cobertura Completa del Cliente: Los consumidores están en diferentes etapas del embudo de ventas y utilizan múltiples canales. Una estrategia integrada asegura que estés presente en todos esos puntos de contacto.",
+      "innerBlockCount": 0,
+      "fingerprint": "4903a9dcb328d54afc41c51dc8963644d9984284e5197b020cdfa6652ccfcf32",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "94.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Consistencia en el Mensaje: Integrar Inbound y Outbound garantiza que tu mensaje sea consistente en todos los canales. Esto ayuda a construir una marca coherente y a reforzar tu propuesta de valor en cada interacción.",
+      "innerBlockCount": 0,
+      "fingerprint": "7dab46dd57495ab0292de6bd1ba134a231a4f62065e6a94fa1515c0b830bb82c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "94.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Mejora en el ROI: Una estrategia combinada puede maximizar el retorno de inversión al combinar las tácticas más efectivas de ambas metodologías. Mientras que el Inbound Marketing puede generar leads de calidad a largo plazo, el Outbound puede impulsar el recon…",
+      "innerBlockCount": 0,
+      "fingerprint": "31ac8b6fc3d672c17b2bc6417e25089f304372e6e099c3cea5cdc1dd53a9b4fe",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "94.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Optimización de Recursos: Utilizar ambas estrategias permite una mejor asignación de recursos. Por ejemplo, puedes usar datos de campañas Outbound para ajustar y optimizar tus esfuerzos Inbound, y viceversa.",
+      "innerBlockCount": 0,
+      "fingerprint": "8d860b8ef66900c3c3bb6a72c8b3c6f897141fea60406070ffc0f51c96da1eaf",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "94.4",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Mejora de la Experiencia del Cliente: Al integrar ambas estrategias, puedes ofrecer una experiencia de cliente más fluida y personalizada. Los esfuerzos Outbound pueden atraer a los clientes hacia el contenido valioso del Inbound, mientras que el contenido de …",
+      "innerBlockCount": 0,
+      "fingerprint": "80dc6da57be0d2c3496640fb3fe8554e6e2193995e09fec0630c6637ca8d0a8d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "95",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1ddea7324634514aa124d436a81cf3e415d0fd7360be45ffde752f239d2e584b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "96",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si quieres integrar tus estrategias de Outbound Marketing (Meta, Google Ads, LinkedIN Ads) con una estrategía robusta de Inbound Marketing, podemos ayudarte con nuestro servicio de Gestión de Campañas Publicitarias.",
+      "innerBlockCount": 0,
+      "fingerprint": "256d2b82a515dd329b3379f18de44348b03f2a14253226b5900c56626d6c2f20",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/gestion-campanas-publicitarias/"
+    },
+    {
+      "path": "97",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "17e26bb627e0497b9be3bcaac2a3f7e56f1365f0c71328adaa2b00fc39fc93fb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "98",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Inbound Marketing vs otras metodologías",
+      "innerBlockCount": 0,
+      "fingerprint": "244f3af0ea8ac5089005e4f5c451d3e29ab04e018d14cac67c49c2c4529016b3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "99",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a46f77a24f2314e2fd5bf7725c605caa94c3d9150085a29b1aa0f18e3743274a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "100",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En el competitivo mundo del marketing digital, los profesionales a menudo se enfrentan al desafío de elegir entre diversas metodologías como SEO, SEM, Growth Marketing y ABM. Cada una tiene sus fortalezas, pero también sus limitaciones.",
+      "innerBlockCount": 0,
+      "fingerprint": "9141b8c22a8fd0dfdbdefa8aa3573ddb1891b52c211ff7f660891355817e6d19",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "101",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "db7925d6b513298e9ea46e69f85b5845985facfab1aa040002acc371f5a2b9e6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "102",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Las empresas suelen enfrentarse a la dificultad de atraer tráfico cualificado, convertir leads en clientes y mantener relaciones duraderas. Dependiendo de una sola metodología puede limitar el alcance y la efectividad de la estrategia de marketing.",
+      "innerBlockCount": 0,
+      "fingerprint": "297045227bdb90d45b9ccf610775b942c299fac5fbe91d18383620ee6d2d38f1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "103",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1959bf9e19c1edd11f2267ce3b54644c6ba4c12aa8f4ab41e8deb0025330d067",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "104",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La dependencia exclusiva de SEO puede resultar en tráfico inconsistente, mientras que confiar solo en SEM puede ser costoso y menos efectivo a largo plazo. Growth Marketing sin una estrategia de contenido robusta puede carecer de la profundidad necesaria para …",
+      "innerBlockCount": 0,
+      "fingerprint": "fb2212fbc2d8ba6bba86ad776f71d7d60faf4bf8b675f0eae4b38d642d3abdea",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "105",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ced5d98af983eb64e922fdd84692386306703c12f3f1d5cf40820c5602bebaf",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "106",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿La solución? Estrategias integradas de Marketing",
+      "innerBlockCount": 0,
+      "fingerprint": "a17e9922eef9f0080c02e3211ad03f0f1a64ea34f24361b5e4ffe5a7c9f40373",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "107",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "87f0142c5e3df57803f7f74b79e46f3248ccbaacac9b26151406b05336b84bbd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "108",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La integración del Inbound Marketing con SEO, SEM, Growth Marketing y ABM proporciona una solución holística a estos desafíos. El Inbound Marketing atrae tráfico cualificado mediante contenido relevante y valioso, complementado por el SEO que asegura la visibi…",
+      "innerBlockCount": 0,
+      "fingerprint": "1f224ad985f11c76063df6d67f0b35f55c4a52529837b83bd5a35559e7f98c23",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "109",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e1b837899b752aeeb8cd013957906ad6fbbaf1c724bbdf66cb10bc914bd0c36f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "110",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Al combinar estas metodologías, las empresas pueden no solo atraer y convertir leads de calidad, sino también nutrirlos y retenerlos, asegurando un crecimiento sostenible y un ROI maximizado. Esta integración permite una cobertura completa del cliente, mensaje…",
+      "innerBlockCount": 0,
+      "fingerprint": "29acdf09f54f904350d6d3310afb0bd18cdbdf1889bda08bdfd63b14d118ba65",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "111",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9cf788d29fec49f8018b7d53e14c3fc1c7bb2af271d22775a0a0ff9c73ff4ec3",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "112",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "style": {
+          "typography": {
+            "fontSize": "48px",
+            "lineHeight": "1.1"
+          }
+        },
+        "align": "wide",
+        "metadata": {
+          "categories": [
+            "featured",
+            "text"
+          ],
+          "patternName": "core/heading",
+          "name": "Heading"
+        }
+      },
+      "text": "Elementos Clave del Inbound Marketing: Atraer, Convertir, Cerrar y Deleitar",
+      "innerBlockCount": 0,
+      "fingerprint": "a25ba34cfed10e8b31d332eec0ad2290d7ad54184e9ee795e1af30ad38b2332b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "113",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "95cb33b8bebf19d5c934600164126ebf6728802a2624e38101c49fe3cc8105c2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "114",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 244952,
+        "sizeSlug": "large",
+        "linkDestination": "none",
+        "width": "337px",
+        "height": "auto",
+        "align": "right"
+      },
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2f31a67882e5f3d939d6bc7aa5fb5d60e57cbf3536d42d1003fd3dbf281cdebf",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 244952,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2024/08/flywheel.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2024/08/flywheel.svg",
+        "alt": "",
+        "width": "337px",
+        "height": "auto"
+      }
+    },
+    {
+      "path": "115",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7c5479807141885b2c36596d125591d304e01f0a310426b9837ae9d479f9af82",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "116",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 4,
+      "fingerprint": "a68e845f619bc136c316ccc1689a57979dc8cb440742e7420b15037df8666304",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "116.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Atraer: El primer paso es atraer a los visitantes adecuados a tu sitio web. Esto se logra mediante la creación de contenido de alta calidad que resuene con tu audiencia. Herramientas como blogs, SEO y redes sociales son esenciales en esta etapa.",
+      "innerBlockCount": 1,
+      "fingerprint": "9c29a47e4e74aee8d9981212b117a42cce6e5849a3fb4fd386169f11c139358b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "116.0.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "7d3e61410d452d2fbc03106ba22249735ddcd8477b511fb713c0b1a8a9462186",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "116.0.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ejemplos: Publicar artículos de blog informativos, optimizar el contenido para motores de búsqueda, compartir contenido en redes sociales.",
+      "innerBlockCount": 0,
+      "fingerprint": "e648914b43e2a8bc9c67b2ed0b41d8d8d924d12073f762578b0c43f8d07f5dee",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "116.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Convertir: Una vez que has atraído a los visitantes a tu sitio, el siguiente paso es convertir esos visitantes en leads, es decir, recopilar su información de contacto. Esto generalmente se logra a través de formularios y ofertas de contenido como eBooks, whit…",
+      "innerBlockCount": 1,
+      "fingerprint": "4834c0bcfe357bbca7934fbdc9b8a87c8ed1edaefacda00b2491a3623845153a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "116.1.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "7fdfcb18d0742dc82faab33947f00b29c0b8b98373d3b41b1bebaf5739c73d03",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "116.1.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ejemplos: Ofrecer descargas de contenido a cambio de la información de contacto, utilizar llamados a la acción (CTAs) claros y persuasivos, implementar landing pages efectivas.",
+      "innerBlockCount": 0,
+      "fingerprint": "3f6c3d742d8e295b446568461b1bcf2a50c0a60eab67d366472fc64f4dd574af",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "116.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Cerrar: Convertir leads en clientes es el siguiente objetivo. Aquí es donde las herramientas de CRM, la automatización del marketing y la gestión de leads juegan un papel crucial. El seguimiento y la comunicación personalizada son esenciales en esta etapa.",
+      "innerBlockCount": 1,
+      "fingerprint": "067dc7b21779e1e5c3e132f960211da2bf3194590835e35699cdf34c2662b4ed",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "116.2.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "79140a99a524a57e99db37c37a665dd4a6468dba89ce3e475904375ffc0105ab",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "116.2.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ejemplos: Enviar correos electrónicos personalizados, automatizar secuencias de correos electrónicos basadas en el comportamiento del lead, usar CRM para gestionar y seguir los leads.",
+      "innerBlockCount": 0,
+      "fingerprint": "e0998853521e3ee3ab73da0bcd8cd18fd9701024a365fe854985abbf34cb43af",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "116.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Deleitar: El Inbound Marketing no termina con la venta. Es vital deleitar a los clientes actuales para que se conviertan en promotores de tu marca. Ofrecer soporte continuo, contenido útil y experiencias excepcionales ayuda a mantener a los clientes satisfecho…",
+      "innerBlockCount": 1,
+      "fingerprint": "113063b1652f29a7ff7881d9559bcc8cd4d293192bd0000e171ef1c74c4eecd4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "116.3.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "29d0e8b5e2c99a57ba3290c5a33fd13cf67c161911a255bf652e33a0750cba2d",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "116.3.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ejemplos: Proporcionar un excelente servicio al cliente, enviar correos electrónicos con contenido útil y relevante post-compra, usar encuestas y feedback para mejorar continuamente.",
+      "innerBlockCount": 0,
+      "fingerprint": "74b34c8b19e93da749dd884372e59230170e90e0662c060674d60944eae757ea",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "117",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6622ba2ebe1cf9fe53fd8e10ce2f57552747e2cf74d1d6b70be576b9711f106c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "118",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Inbound Marketing en el Diseño y Desarrollo Web: Growth Driven Design",
+      "innerBlockCount": 0,
+      "fingerprint": "ca8acedef7235a1f6fea63ccc4edb8f3de710698ee62f9b9db18e1546acd79b9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "119",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3ca2b238e216764b7f46b31a9322ff950a2dc80d81fc6b29f46c49d09cc37ae8",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "120",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En el contexto del Inbound Marketing, el diseño y desarrollo de sitios web también debe adaptarse a las necesidades cambiantes de los usuarios y a las mejoras continuas basadas en datos. Aquí es donde entra en juego el Growth Driven Design (GDD). Esta metodolo…",
+      "innerBlockCount": 0,
+      "fingerprint": "018b656bea37a8fca277a597e987bd584ff66ad018ac3bfe346365d76e07fcf4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "121",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "009639836dc483ec5c02bb5e9898398a96830d008e8d82501c9a16e359a91df9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "122",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Qué es Growth Driven Design (GDD)",
+      "innerBlockCount": 0,
+      "fingerprint": "e9a07fd768333d700117a0f6b6a4651bbf7daa4f959606311c00bc3e17059a53",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "123",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3881fd435acf85c67ae5b3a334de9d356bcdc0da442f9e8e886a8d885e5e8246",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "124",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El GDD es un enfoque de diseño web que prioriza la mejora continua y la adaptación basada en el comportamiento del usuario. A diferencia del diseño web tradicional, que puede ser estático y rígido, GDD permite iterar y optimizar el sitio web regularmente para …",
+      "innerBlockCount": 0,
+      "fingerprint": "afe12e037d45d00c4bcef6c77c6d3430a1e0f842cb57bc4bd5446dca99bb40cf",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "125",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1b0c539d38d5ec2644dac80d0619c8448f39d709a8fd52772a758df4d3fbd5ac",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "126",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El GDD complementa perfectamente las estrategias de Inbound Marketing al proporcionar una plataforma flexible y dinámica que se adapta continuamente para mejorar la experiencia del usuario. Al igual que el Inbound Marketing, GDD se basa en la creación de valor…",
+      "innerBlockCount": 0,
+      "fingerprint": "e5d9fa3a258965a1fd534931fe1282a7b2d5466801a53de13f26f70c9c1e9bc3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "127",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6b680ddb15dc40099b3c99799ecbe4e2d028a327d564cd6f7900c203bbc09f2d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "128",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "Según HubSpot, esta metodología ha demostrado ser efectiva al incrementar los leads en un 16.9% y los ingresos en un 11.2% después de seis meses de implementación​.Bright Digital | HubSpot Diamond partner",
+      "innerBlockCount": 0,
+      "fingerprint": "523f1aa7d957d538010f681d2df7ba05c09b9f0aa2296c6f1b7bbed73c501f55",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.brightdigital.com/en/hubspot-development/growth-driven-design"
+    },
+    {
+      "path": "129",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "da5d3241cb2c536a1be47a54db49d9e3bc6478765dc712651867f323d2c164e0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "130",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Beneficios del Growth Driven Design",
+      "innerBlockCount": 0,
+      "fingerprint": "e6637393f8dde59b8adaf6ce29d3a6d4f5bead1942898f1944b7f3b9c6cff675",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "131",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7fef66948211ecbada4de13e162bbba23d3a1adc739239b3c5dd5b00b0b8c28f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "132",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 5,
+      "fingerprint": "d71b71308ca9eaf26f5753681d7e17902f2c8f67c24f4b1c4fc944b652f79d21",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "132.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Mejora Continua: Permite realizar ajustes y mejoras constantes basadas en el comportamiento del usuario y los datos de rendimiento.",
+      "innerBlockCount": 0,
+      "fingerprint": "d653fccf152f67194217051c6ca856dbbb5f1aceadfce695be87501e791c5ea6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "132.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Optimización Basada en Datos: Utiliza análisis y feedback para guiar las decisiones de diseño, asegurando que el sitio web siempre esté optimizado para conversiones.",
+      "innerBlockCount": 0,
+      "fingerprint": "0f3773c3c9cba20243b670acf96b234f34b1ec034e72fc7ccd033cbbeab62d02",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "132.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Agilidad y Flexibilidad: Facilita la adaptación rápida a nuevas oportunidades y cambios en el mercado, manteniendo el sitio web siempre relevante y eficaz.",
+      "innerBlockCount": 0,
+      "fingerprint": "edca779f85e9f5d96187c3058f2e39674db4646f94ac5dc13d1661b7afe591e3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "132.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Estrategia de Contenido Integrada: Con GDD, el contenido del sitio web se puede ajustar continuamente para alinearse con las estrategias de Inbound Marketing. Esto incluye la optimización SEO, la personalización del contenido y la alineación con las campañas d…",
+      "innerBlockCount": 0,
+      "fingerprint": "9bf8fa9be33130f15439703ee539d2ccbe7502dcb04eaaa4a8bc139dc2499d93",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "132.4",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Mayor ROI: Al mejorar continuamente el rendimiento del sitio web, GDD puede aumentar significativamente el retorno de inversión de las campañas de Inbound Marketing.",
+      "innerBlockCount": 0,
+      "fingerprint": "d063418826406376361457f0f43cbef50072a876f8f23c80a02ddd3f246cb1c6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "133",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a0637bbada41357a6850030ebcbce8af4913f2e33a38f6f782c27f7047ce496",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "134",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "¿Listo para transformar tu sitio web con Growth Driven Design? Descubre cómo Efeonce puede ayudarte a implementar una estrategia de Inbound Marketing y GDD que impulsen el crecimiento de tu negocio.",
+      "innerBlockCount": 0,
+      "fingerprint": "dc0ae05cd4e3396e5c3a42cd304b86037d699c7f5bee03b0d62d5a5b55b2d5cb",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/diseno-de-sitios-web/"
+    },
+    {
+      "path": "135",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "15f118194aa682ad05207926a72fd00b64a43e15ee33f6c2d0b2b33067b84f6d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "136",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "Un enfoque impulsado por el crecimiento asegura que tu sitio web permanezca adaptable y continuamente optimizado para el rendimiento, lo cual es crucial en el cambiante panorama digital actual​Rowland Marsh, Jefe de Contenido en Inbound FinTech",
+      "innerBlockCount": 0,
+      "fingerprint": "93d9d958e0e7328aa5dee287957cd02beb49fc36ea3135d27caa27d936aa1de5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "137",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "32a95ae48e3d9252220f0ddc2faa1741c07518eeb2ef56e5c6ef96f2eb1a6b05",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "138",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "style": {
+          "typography": {
+            "fontSize": "48px",
+            "lineHeight": "1.1"
+          }
+        },
+        "align": "wide",
+        "metadata": {
+          "categories": [
+            "featured",
+            "text"
+          ],
+          "patternName": "core/encabezado",
+          "name": "encabezado"
+        }
+      },
+      "text": "¿Cómo Implementar una Estrategia de Inbound Marketing?",
+      "innerBlockCount": 0,
+      "fingerprint": "490d8726d993bf75b979cdc34f54b99df9dbdf1bb28b451852defdb3174a3f6e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "139",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9b9c3a65a2df3a5cb7cf7ccb2169bc4f219252abe0b305cdcc17db3b4354a24e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "140",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 10,
+      "fingerprint": "ae4178751cd877b2a55e8cb9be6128c7ff146809a77c4795d110df9b631311a5",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "140.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Definir tus Objetivos:",
+      "innerBlockCount": 1,
+      "fingerprint": "744df57c3f2a8b18411f962e4dae4929018676b7680e3ccea1a93e703e6b70d2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.0.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "74d29ed2cf7abd70edd158462f3f23befb7f839d3b5f7d96885dfb24fcc908c1",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "140.0.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "SMART Goals: Asegúrate de que tus objetivos sean específicos, medibles, alcanzables, relevantes y con un tiempo definido.",
+      "innerBlockCount": 0,
+      "fingerprint": "73b19b63c3bbacda2845b1f04751b4ec8729e94ebb70516e3a24e5f908a99a01",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.0.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ejemplo: Incrementar el tráfico del blog en un 20% en los próximos seis meses.",
+      "innerBlockCount": 0,
+      "fingerprint": "c389801e5ee39cd8b6ca6e092b6842d218c0670382355697a5fe0efd9b7b5463",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Conocer a tu Público Objetivo:",
+      "innerBlockCount": 1,
+      "fingerprint": "f8d2dac36e69e63a7a317dc9a0d00180b7661da96979b89ddc63bb40786c9816",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.1.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "61c35411a1f5c95c43a533fbc54313cfffd4782532c6403df2478438037f1a05",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "140.1.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Buyer Personas: Desarrolla perfiles detallados de tus clientes ideales, incluyendo datos demográficos, comportamientos, motivaciones y desafíos.",
+      "innerBlockCount": 0,
+      "fingerprint": "3a328e88bbb997b6184db7d3f678af0955e380e4a834187afa487f5f4f749470",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.1.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Herramientas: HubSpot Persona Tool, Xtensio.",
+      "innerBlockCount": 0,
+      "fingerprint": "daef13f3862ed8af3f6080eaaf24c0b347ee0f8c854443828eacc93d0ce70725",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Crear Contenido de Calidad:",
+      "innerBlockCount": 1,
+      "fingerprint": "a4e767424174e6202861fcf653996a9b28bd9ff125858e16c484abbf07ecca92",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/inbound/estrategia-de-contenidos/"
+    },
+    {
+      "path": "140.2.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "4a0028365d530a99831df2e658263534f31010b97a7a773a4c1f8c8eb82bb013",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "140.2.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Estrategia de Contenidos: Planifica y produce contenido valioso y relevante que atraiga a tus buyer personas. Esto incluye blogs, ebooks, infografías, videos y webinars.",
+      "innerBlockCount": 0,
+      "fingerprint": "4bf98ae23e446e204bc724897a18717a2463ecbf463aa6dcf1faaca45521b9ce",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.2.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Calendario Editorial: Organiza tus publicaciones de contenido en un calendario editorial para asegurar consistencia y relevancia.",
+      "innerBlockCount": 0,
+      "fingerprint": "3fbe75511b4c83c24adf32d70c1ba7302cbc00a08cacaddd5301497ebf24474b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Optimización SEO:",
+      "innerBlockCount": 1,
+      "fingerprint": "64150a3238debc08331a550fd625f1dcf6f2175a4f51c7a5cc825e936f2c324c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.3.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "9dd03b536ca128b107c5e0b70f2bb1858a3bce385bf6097f8d947b5aef5f5d62",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "140.3.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Investigación de Palabras Clave: Utiliza herramientas como Google Keyword Planner y SEMrush para identificar palabras clave relevantes.",
+      "innerBlockCount": 0,
+      "fingerprint": "bc8a20bfac17c7f5b8901a34619a22a6f1c76bec62f64f94feec6f8a144c1fb8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.3.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Optimización On-Page: Asegúrate de que tu contenido esté optimizado para motores de búsqueda, incluyendo títulos, meta descripciones, encabezados y etiquetas alt.",
+      "innerBlockCount": 0,
+      "fingerprint": "2ab1a66e716141b6f0b0f221054e8b8b67dbe2e9ebc6ebf56ee75863828f58c8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.4",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Promoción en Redes Sociales:",
+      "innerBlockCount": 1,
+      "fingerprint": "3b8277aad27589074170cc123b8517b2f5df30ad09018c884824d8cd42c92915",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.4.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "0ddf6eb37a3d2373727efa4ad545baf73cf2ab3eefda08588b6eec77f1bf3208",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "140.4.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Estrategia de Redes Sociales: Comparte tu contenido en las plataformas donde tus buyer personas están activas. Utiliza una combinación de publicaciones orgánicas y pagadas. (Si necesitas integrar tu estrategia social media con una estrategia robusta de Inbound…",
+      "innerBlockCount": 0,
+      "fingerprint": "da4d9db55402442df55db77781c0894a629170fc308c556377bd867333a55044",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/gestion-de-redes-sociales/"
+    },
+    {
+      "path": "140.4.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Herramientas: Hootsuite, Buffer.",
+      "innerBlockCount": 0,
+      "fingerprint": "9712f9a672c58780f8319e68846501cd1fe352010ccabfcd94fc623316156291",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.5",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Convertir Visitantes en Leads:",
+      "innerBlockCount": 1,
+      "fingerprint": "4e4b7c9455536418f0484f71ac5a4e9f831475f18d9642877f12bb15524e0de1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.5.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "a0e9e9bd2437330e73d93d59589ac91dcb0ec7fb072f598f6f48f8c6e3938421",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "140.5.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Llamadas a la Acción (CTAs): Coloca CTAs atractivas en tu contenido para guiar a los visitantes hacia landing pages.",
+      "innerBlockCount": 0,
+      "fingerprint": "9e889619a3aa503278dc024f409db6f8e2eb48f165fb113e4e6b41370373af03",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.5.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Landing Pages: Diseña páginas de destino que conviertan con formularios de captura de información.",
+      "innerBlockCount": 0,
+      "fingerprint": "adc3705af8588b0277b3d3ee47dc93ae5ac934b06ecd106037eefed66cd3fd94",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.5.0.2",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ofertas de Contenido: Ofrece recursos valiosos como ebooks, webinars y guías a cambio de la información de contacto de los visitantes.",
+      "innerBlockCount": 0,
+      "fingerprint": "00c29dd0d4bff59cdee25551e0fa6f07a195a1e9db8eea956b5cae72570c686e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.6",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Nutrición de Leads:",
+      "innerBlockCount": 1,
+      "fingerprint": "225331a4953cab52165d25a113eeb343a447953ba02c4fd9e5a461f25a1be3d0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.6.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "51d7775d821b065bcd15c3be82e61fa8f4703eb5d0d94c0cf9059e9c62bd8527",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "140.6.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Email Marketing: Crea campañas de email marketing personalizadas y automatizadas para nutrir a tus leads y guiarlos a través del embudo de ventas.",
+      "innerBlockCount": 0,
+      "fingerprint": "a486803e291911a1e4e72328e61eea1e312867777c29367d22ba2a4defe0ad28",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.6.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Segmentación: Segmenta tu base de datos para enviar mensajes más relevantes y personalizados.",
+      "innerBlockCount": 0,
+      "fingerprint": "f95ba7b50de80044f470bf962460922cce3311756ab199a42fd9c2dec2d8e9ff",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.6.0.2",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Herramientas: HubSpot, Mailchimp.",
+      "innerBlockCount": 0,
+      "fingerprint": "4c16d4277cc4faaf2c83483f803abb74e17569bb50237f310a50c2da8788fe77",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.7",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Cerrar Clientes:",
+      "innerBlockCount": 1,
+      "fingerprint": "9cb145d898a207b351a17d0cb97821b8a54a100da93d0ba6bbc8cee982c387ca",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.7.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "d25b04bf53eb258bb10b3366fd10ea8c3570fdbaf29997f05f146df7e059f13a",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "140.7.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "CRM: Utiliza un sistema de gestión de relaciones con clientes (CRM) para seguir y gestionar tus leads.",
+      "innerBlockCount": 0,
+      "fingerprint": "7c0a3180fd8a3f36b466b1ac87e652e49fc966251e3806c154ce7c01e9751980",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.7.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Automatización de Marketing: Implementa flujos de trabajo automatizados para nutrir y convertir leads en clientes.",
+      "innerBlockCount": 0,
+      "fingerprint": "8a8cfab1ab3c204cabeade8a7a8f94accd7cb63c3ef636a292189de65eed973f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.7.0.2",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Herramientas: HubSpot CRM, Salesforce.",
+      "innerBlockCount": 0,
+      "fingerprint": "dedc52345f06833adc6d83a6bd2d9c95708506b44a74e2e742db1ee1e242b039",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.8",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Deleitar Clientes:",
+      "innerBlockCount": 1,
+      "fingerprint": "80d72ebd0cafad794e35048a02e0d9b3d335b2ee6638c10681a9010256569132",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.8.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "f648a4aaeeb4bd5ab3c0ca049a4afe2ae96c6bda003092057c175b8980cbd674",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "140.8.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Contenido Post-Venta: Proporciona contenido útil y relevante a tus clientes actuales para mantener su interés y fidelidad.",
+      "innerBlockCount": 0,
+      "fingerprint": "486468ebfe6c927dffa6937eb75d34d90236a088eee71ec63f0ccd2656e65e1b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.8.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Encuestas de Satisfacción: Realiza encuestas para obtener feedback y mejorar continuamente.",
+      "innerBlockCount": 0,
+      "fingerprint": "cffab8519593b8a5fb5252539bd9ec7314e5a2a75a91006aa99695785291a71e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.8.0.2",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Herramientas: SurveyMonkey, Typeform.",
+      "innerBlockCount": 0,
+      "fingerprint": "dbe31272fc5eb134b3d92e1afba2259c760bc92a4f0711acaae5b565f191be7a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.9",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Medir y Optimizar:",
+      "innerBlockCount": 1,
+      "fingerprint": "b7891026a14fa7bffa1db2515854ef735827ecda29a7207c9463e08accbda1da",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.9.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "42ca823bcfb6b5ecd94c12dc057b4565e6c36b420eb8e0a6e24d2eb3423f6bc4",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "140.9.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Análisis y Reportes: Monitorea el rendimiento de tus campañas utilizando herramientas de análisis.",
+      "innerBlockCount": 0,
+      "fingerprint": "ed874f648d98ee5af99c1064b6c7282e8e263790febc8003dbdcdabba086a84a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.9.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ajustes y Mejoras: Realiza cambios basados en los datos para optimizar continuamente tu estrategia.",
+      "innerBlockCount": 0,
+      "fingerprint": "0e110665d3d982e951d30c76d9f86cf37980774ccf40a152f80dea31c3b35adb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "140.9.0.2",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Herramientas: Google Analytics, HubSpot Analytics.",
+      "innerBlockCount": 0,
+      "fingerprint": "fa97716f3b00249f9e0958365607132164a9770b7a7200c04b36e5f205e82cf6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "141",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6e7d637f57e683b96f493a2f0ad3d26f56840948b6bcb47aed3c6a0447be7726",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "142",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "style": {
+          "typography": {
+            "fontSize": "48px",
+            "lineHeight": "1.1"
+          }
+        },
+        "align": "wide",
+        "metadata": {
+          "categories": [
+            "featured",
+            "text"
+          ],
+          "patternName": "core/heading",
+          "name": "Heading"
+        }
+      },
+      "text": "Herramientas y Recursos Recomendados",
+      "innerBlockCount": 0,
+      "fingerprint": "12ebff0364b68e7e495640b28ccbb1bd34f22e6b9ebf35f0a89ccd48ca23b460",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "143",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "41b0089c4c96bc1e59cf38c2b12a8870d533ed9211c0e0762fd42db8faa31d12",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "144",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 11,
+      "fingerprint": "8ebce33c637fb2efd4a1c830135ac42b782d281ce72096332e840bae1d2504a6",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "144.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "HubSpot: Es una plataforma integral que facilita la implementación de estrategias de Inbound Marketing. Con su CRM, puedes gestionar y nutrir leads de manera eficiente, mientras que sus herramientas de automatización te permiten crear campañas personalizadas y…",
+      "innerBlockCount": 0,
+      "fingerprint": "626baf7dc1986cff68f69fe267f4ea62a6b3c471e4e813bbdb154ee93c9a8c74",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "144.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "WordPress: Es una plataforma flexible y amigable que permite la creación de blogs y sitios web optimizados para SEO. Es ideal para publicar contenido valioso y relevante que atraiga a tu audiencia y mejore tu visibilidad en motores de búsqueda.",
+      "innerBlockCount": 0,
+      "fingerprint": "0e8ea54019de4b7363844f5a663e1159b6fe18cc9ab13640fce8412415e38bf6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "144.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Google Analytics: Proporciona datos detallados sobre el comportamiento de los usuarios en tu sitio web. Esta herramienta es esencial para entender qué contenido atrae a tu audiencia, cómo interactúan con tu sitio y qué ajustes necesitas hacer para mejorar la c…",
+      "innerBlockCount": 0,
+      "fingerprint": "43244a7b390a47f2c2f9e2c4ca57b6648a07eb84a421b5b58eaf2a6904f309de",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "144.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Google Search Console: Te ayuda a identificar problemas técnicos y optimizar tu contenido para mejorar su visibilidad en los resultados de búsqueda. Es fundamental para garantizar que tu sitio web esté bien indexado y accesible para los usuarios.",
+      "innerBlockCount": 0,
+      "fingerprint": "80f9f5e0fbac584c445cfa669a6f0f034a159c414c1bdd701822763f23832fa7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "144.4",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "SEMrush / UberSuggest: Para investigación de palabras clave y análisis de la competencia. Estas herramientas te permiten identificar las palabras clave más relevantes para tu negocio, analizar el rendimiento de tus competidores y descubrir oportunidades para m…",
+      "innerBlockCount": 0,
+      "fingerprint": "c40351624e47a5f45814a24e5104ebbad378e17b14083b2801491cd997ff9ced",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "144.5",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Hootsuite / Metricool: Para la gestión de redes sociales. Facilitan la planificación, publicación y monitoreo de tus campañas en redes sociales. Estas herramientas te permiten gestionar múltiples cuentas desde un solo lugar, programar publicaciones y analizar …",
+      "innerBlockCount": 0,
+      "fingerprint": "7ebab4e5626529d2c4821cedc7730a18417a13c1e7fb9afda6f1ff71b8d301b6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "144.6",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Mailchimp: Es una plataforma robusta para crear y automatizar campañas de email marketing. Puedes segmentar tu audiencia, personalizar tus mensajes y realizar un seguimiento del rendimiento de tus campañas para optimizar la comunicación con tus leads y cliente…",
+      "innerBlockCount": 0,
+      "fingerprint": "d7b905fd0a12c806dd0e21d9240533981acce57b0837dcff421f4de3b3a9a4c8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "144.7",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "ActiveCampaign: Combina la automatización de marketing con herramientas de CRM para ayudar a las empresas a gestionar y nutrir sus relaciones con los clientes de manera más efectiva. Es ideal para campañas de email marketing, segmentación avanzada y personaliz…",
+      "innerBlockCount": 0,
+      "fingerprint": "2f4154b4416bb729c6c8b6304aede23906e1013c5f91294acf7e19d8cba44fbe",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "144.8",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "VWO (Visual Website Optimizer): Permite realizar pruebas A/B en tu sitio web para identificar qué cambios mejoran la conversión y la experiencia del usuario. Es fundamental para tomar decisiones basadas en datos y optimizar continuamente tu sitio web.",
+      "innerBlockCount": 0,
+      "fingerprint": "645e66b99fabc63c4700c59eefe00151b1195caba8545f59259b1af4967a0a9d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "144.9",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Trello y Notion: son herramientas versátiles que te ayudan a organizar y gestionar tus proyectos de marketing. Puedes crear tableros para planificar tus campañas, asignar tareas a tu equipo y mantener un calendario editorial para asegurar la consistencia y la …",
+      "innerBlockCount": 0,
+      "fingerprint": "43e55aecaf4abc7883b306ea97d483299aee8f24c85764666eca2dbf3f007a2e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "144.10",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Google Looker Studio (antes Google Data Studio): permite crear informes y dashboards personalizados para visualizar los datos de tus campañas de marketing. Esta herramienta es crucial para monitorear métricas clave, compartir resultados con tu equipo y tomar d…",
+      "innerBlockCount": 0,
+      "fingerprint": "7648c1854638c4652adfe1c42beac8d1d4508a80144aa9ca9ee4e04b1bde7304",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "145",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "cbd6f54bc110dc810e2b8ae8dfb7c77a17cbbbf49ee90578cdea9928e586b4d5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "146",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Estas herramientas son esenciales para implementar una estrategia de Inbound Marketing efectiva y personalizada, alineada con los principios de atraer, convertir, cerrar y deleitar a tus clientes. Con ellas, puedes maximizar el impacto de tus esfuerzos de mark…",
+      "innerBlockCount": 0,
+      "fingerprint": "96e49649978eb7cdfb2934dad1c02de8074c294e565fe081d3f86455b1b9f0f3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "147",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d75b590cb7556b082384145305e5dddca92e6cdc619599ee7f10bf53b94ce5c7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "148",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "style": {
+          "typography": {
+            "fontSize": "48px",
+            "lineHeight": "1.1"
+          }
+        },
+        "align": "wide",
+        "metadata": {
+          "categories": [
+            "featured",
+            "text"
+          ],
+          "patternName": "core/heading",
+          "name": "Heading"
+        }
+      },
+      "text": "Ejemplos de Tácticas Efectivas",
+      "innerBlockCount": 0,
+      "fingerprint": "ba2d6f1f7a6a41b3e8cf0b51910570fad76d6f75dfdbb8a6ba050f83bc921b2f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "149",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "521bc0a7adc61e03aaf6b5e7080eeb206faa8751b3b896eabde7beb110a08c35",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "150",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 6,
+      "fingerprint": "7e01f65db506441a535340ff120256756dac80ae0513226cfe17517f9c28f4c7",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "150.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Blogging:",
+      "innerBlockCount": 1,
+      "fingerprint": "104672778386e93ce7fd0b9ccc5b36ea599b10018d9e7e229e5e67b5634d0d78",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "150.0.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "f59df4684e33b11a4fa37bd3849436fa212b16654bd89afb4e6008f5f2388e99",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "150.0.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ejemplo: Un blog de marketing digital que publica artículos semanalmente sobre SEO, redes sociales y estrategias de contenido, atrayendo tráfico orgánico y generando leads.",
+      "innerBlockCount": 0,
+      "fingerprint": "5e649aa081bf65f4f0b48b54e4f5db48a1848d0f78ec7d09aab14d7a30b3481e",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/blog"
+    },
+    {
+      "path": "150.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ebooks y Whitepapers:",
+      "innerBlockCount": 1,
+      "fingerprint": "fb598599d8cf30f38182f13c3aa948ea7821cb2faef7f94a90f48ea76b6c34bb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "150.1.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "59ed90b87304841666a089caa1ef3c170519486eeb21e568f420b7e2bba22098",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "150.1.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ejemplo: Crear un ebook sobre \"Las Mejores Prácticas de SEO en 2024\" y ofrecerlo como descarga gratuita a cambio de la información de contacto de los visitantes.",
+      "innerBlockCount": 0,
+      "fingerprint": "0c831a205617b2774a02d1d3195726a126a36c70fd6ffca0c65811f74fe04fff",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "150.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Webinars:",
+      "innerBlockCount": 1,
+      "fingerprint": "969185c2b770771b707355e12efbde98522ede2f9f168b7ba51aa04e7cb3216b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "150.2.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "9a891eb26f323c7eaf25f2aac3f8171fa23a0a52ffc4fae0edd7caaae104d892",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "150.2.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ejemplo: Organizar un webinar sobre \"Cómo Implementar una Estrategia de Inbound Marketing\" para educar a la audiencia y captar leads cualificados.",
+      "innerBlockCount": 0,
+      "fingerprint": "518bf22cb97c8742a8f1663f9f3db668183128a3c575e0d37f7e8076024c14a0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "150.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "SEO y Contenido Evergreen:",
+      "innerBlockCount": 1,
+      "fingerprint": "dfeb51ff49a95b2d56be7c2af908bb16fada1930473c6cb198471b6cce3c1829",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "150.3.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "4a16a2b6c56013d6a87c720f19316108e8ae287b41c8bb1b1a908aeea6a4542f",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "150.3.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ejemplo: Crear contenido evergreen optimizado para SEO que responda preguntas comunes y atraiga tráfico durante mucho tiempo.",
+      "innerBlockCount": 0,
+      "fingerprint": "6f3eb5d78976ede0dcb0fb616bc16a81d0695fcc31125ea9b364073b63978cfa",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "150.4",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Email Marketing Automatizado:",
+      "innerBlockCount": 1,
+      "fingerprint": "b6becd7ff0b22ae755f24f00879d1a9bf1a930166a552992245545a75ba61a13",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "150.4.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "2a0980c6e4d4e3790bda23cc8e591842b1e6d702f22b1d2b16aad58e70dad611",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "150.4.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ejemplo: Implementar una serie de correos electrónicos automatizados para nutrir leads desde la fase de interés hasta la decisión de compra.",
+      "innerBlockCount": 0,
+      "fingerprint": "1b6e6390613658e87bb72cdcec0903e16634563089563e44af3d40c1c2d6d8b5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "150.5",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Social Media Engagement:",
+      "innerBlockCount": 1,
+      "fingerprint": "40c87436b95dee9bfdf9b22ca6e9608f97a66e734d7014b4917b251d362964a8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "150.5.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "2af6916705a0ab5aa68927d5c3be340146138bf6c5953886fe63bf11d8a4f77d",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "150.5.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ejemplo: Utilizar campañas pagadas en redes sociales para promocionar contenido y dirigir tráfico a landing pages específicas.",
+      "innerBlockCount": 0,
+      "fingerprint": "d07ff322ee3d1b985c3eb0736068e6ac0032a30ed603c31108a02704385b8fa3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "151",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "bc14d10da8f146e862ddcc728896dc12367678986cc6c73d8aa8e339046a9ebc",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "152",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Conclusión",
+      "innerBlockCount": 0,
+      "fingerprint": "586ce947efecf99b7aa6c422929be883b1d4623c1d1bf5950cb3bafb8216e34c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "153",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "69f20b3131d645c056e00882206f24e09e41e28da49e860c16265be56f218cd5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "154",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El Inbound Marketing se destaca como una de las metodologías más efectivas y sostenibles en el marketing digital actual, adaptándose a los cambios en el comportamiento del consumidor y las tecnologías emergentes. Su importancia radica en:",
+      "innerBlockCount": 0,
+      "fingerprint": "b8781da2993fbd09de225194c22e37a1d4b9c8d72205d0bdc7b5850e71f7a055",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "155",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "eb2daf953c2ec62283a593c100d293851988124394a4c23f06a0ef47effd8619",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "156",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "69824664d9fb44e234798fc2693076b2799f0a2d0c8e8462756cac440ea8c86d",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "156.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Soluciona la desconexión entre empresas y consumidores provocada por las estrategias de marketing intrusivas.",
+      "innerBlockCount": 0,
+      "fingerprint": "39662008f3753a0da60415ad1641b7c79e6dd8e212ea51bb33de5cf5e99b300a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "156.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ofrece generación de leads de alta calidad, mejor ROI, fidelización de clientes y adaptación a la era digital.",
+      "innerBlockCount": 0,
+      "fingerprint": "f66e38045c6680fc0fb15d62ed9d456e9867898a513ea8a65d3d57907ea73952",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "157",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e2c0d23f0f9bf103e3abc39054d38418e186c6cdc116ca027ead1af85ce073ac",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "158",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {
+        "className": "is-style-dots"
+      },
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "91f91f9015665ec955968a901052731f0080c9142ef3cf2ed0899abde9b0432a",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "159",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ffc95905b9883d101f588ce46aa9b274976931b345af7aad4c06dfe2e7c83e49",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "160",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En Efeonce, somos expertos en implementar estrategias de Inbound Marketing que transforman tu negocio. Nuestro equipo especializado trabaja de la mano contigo para definir objetivos claros, crear contenido de calidad y optimizar todas las fases del embudo de v…",
+      "innerBlockCount": 0,
+      "fingerprint": "d8936d7abcb53ea2111751182cac08ad0f5e091512bb9af73d7a7e00b4fa5182",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "161",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "02d56a21a10524525b1d41e74d1466ca6d25e675a85ed32f85a987d45060c6e9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "162",
+      "depth": 0,
+      "blockName": "core/group",
+      "attrs": {
+        "layout": {
+          "type": "constrained"
+        }
+      },
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "17cafb85c5cbae4791a43bc506f04c7fb29a6da47515991d8a5a043b5c66c319",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "162.0",
+      "depth": 1,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 4
+      },
+      "text": "Lo que nos diferencia:",
+      "innerBlockCount": 0,
+      "fingerprint": "f7070b19c662e6a23fc54f4f223156097eb6ec1a3fa50ac7c7090491705c517a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "162.1",
+      "depth": 1,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 4,
+      "fingerprint": "3e0f4f8ca21b190e37949b3198746a2377be42249869248ebb7551f4a1c26a73",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "162.1.0",
+      "depth": 2,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Enfoque Holístico: Integramos Inbound y Outbound Marketing para maximizar resultados.",
+      "innerBlockCount": 0,
+      "fingerprint": "07799c9a5d8d53331163b21bd757e775f442c27c89caf63a940fd8118d5f880c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "162.1.1",
+      "depth": 2,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Expertise: Somos partners de herramientas líderes como HubSpot, Google, ActiveCampaign, VWO.",
+      "innerBlockCount": 0,
+      "fingerprint": "467d3789657fbd2b0cf07afe4598509f21ff8a5f4c65dcf3c1bdb5ba83608abd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "162.1.2",
+      "depth": 2,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Soporte Completo: Ofrecemos un equipo dedicado que incluye estrategas de contenido, gestores de CRM y especialistas en automatización.",
+      "innerBlockCount": 0,
+      "fingerprint": "11f6955dc455e51c6748bc391b00daf1b89b00677c10e63eb917f1e52806b448",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "162.1.3",
+      "depth": 2,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Resultados Medibles: Utilizamos análisis de datos avanzados para optimizar continuamente tus campañas y asegurar el mejor ROI.",
+      "innerBlockCount": 0,
+      "fingerprint": "36e06a0c1c4210798a08b20f02a20769edeafab7e23d2dee7274d09f91e9bf62",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "163",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0299399a422e6558dbe987753bdd46e025543e34e8dddfd2bfb6fd8c2c417512",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "164",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "¿Estás listo para llevar tu estrategia de marketing al siguiente nivel? Contactanos hoy y empieza a atraer, convertir y deleitar a tus clientes con estrategias de Inbound Marketing efectivas y personalizadas. ¡Visita nuestra landing de Inbound Marketing y desc…",
+      "innerBlockCount": 0,
+      "fingerprint": "3a89c863830b269e56c79275dee7df11f588d07a02a19145bb10f98babd58852",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/agencia-inbound-marketing/"
+    },
+    {
+      "path": "165",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0c31b73f5141f4b7c20509437d2c273383fd3712744c54c462e917e4f7b3888c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "166",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {
+        "fontSize": "large"
+      },
+      "text": "¿Te gustaría ver más contenido como este directamente en tu bandeja? ¡Subscribete!",
+      "innerBlockCount": 0,
+      "fingerprint": "db902815521b4f988e98ba18b7c771c63a79d2d85c08ebc865c479cb8f40989b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "167",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "64da2dc65d80c38f3eae39e4e88b56930336e69638990589418b765dbd24f4da",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "168",
+      "depth": 0,
+      "blockName": "leadin/hubspot-form-block",
+      "attrs": {},
+      "text": "[hubspot portal=\"22254404\" id=\"e7c8c52f-a16a-42ef-859e-3dc4b4931953\" type=\"form\"]",
+      "innerBlockCount": 0,
+      "fingerprint": "ff97e4614d9555307a7e84a7014e15931a2179a82e1ccd1851f38f45985b9039",
+      "editability": "inspect_only",
+      "risks": [
+        "third_party_block_preserve_until_serialization_known"
+      ]
+    },
+    {
+      "path": "169",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e93ca3e048e5d4e2c8e5102e19dadf806759335dfa4381897a23c0e3a5183f66",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "170",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6aa8f579fe6be9085e3d3ce28be628615f01575e0d023a39dc48688d3df7a2dd",
+      "editability": "safe_text_edit",
+      "risks": []
+    }
+  ],
+  "links": [
+    {
+      "href": "#h-por-que-es-importante-el-inbound-marketing",
+      "text": "¿Por qué es importante el Inbound Marketing?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-historia-del-inbound-marketing",
+      "text": "Historia del Inbound Marketing",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-hubspot-y-la-popularizacion-del-inbound-marketing",
+      "text": "HubSpot y la Popularización del Inbound Marketing",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-inbound-marketing-al-2024",
+      "text": "Inbound Marketing al 2024",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-es-el-inbound-marketing",
+      "text": "¿Qué es el Inbound Marketing?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-debo-dejar-de-hacer-publicidad-outbound-digital",
+      "text": "¿Debo dejar de hacer Publicidad (Outbound) digital?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-inbound-marketing-vs-otras-metodologias",
+      "text": "Inbound Marketing vs otras metodologías",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-la-solucion-estrategias-integradas-de-marketing",
+      "text": "¿La solución? Estrategias integradas de Marketing",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#we-re-a-studio-in-berlin-with-an-international-practice-in-architecture-urban-planning-and-interior-design-we-believe-in-sharing-knowledge-and-promoting-dialogue-to-increase-the-creative-potential-of-collaboration",
+      "text": "Elementos Clave del Inbound Marketing: Atraer, Convertir, Cerrar y Deleitar",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-inbound-marketing-en-el-diseno-y-desarrollo-web-growth-driven-design",
+      "text": "Inbound Marketing en el Diseño y Desarrollo Web: Growth Driven Design",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-es-growth-driven-design-gdd",
+      "text": "Qué es Growth Driven Design (GDD)",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-beneficios-del-growth-driven-design",
+      "text": "Beneficios del Growth Driven Design",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#we-re-a-studio-in-berlin-with-an-international-practice-in-architecture-urban-planning-and-interior-design-we-believe-in-sharing-knowledge-and-promoting-dialogue-to-increase-the-creative-potential-of-collaboration",
+      "text": "¿Cómo Implementar una Estrategia de Inbound Marketing?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#we-re-a-studio-in-berlin-with-an-international-practice-in-architecture-urban-planning-and-interior-design-we-believe-in-sharing-knowledge-and-promoting-dialogue-to-increase-the-creative-potential-of-collaboration",
+      "text": "Herramientas y Recursos Recomendados",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#we-re-a-studio-in-berlin-with-an-international-practice-in-architecture-urban-planning-and-interior-design-we-believe-in-sharing-knowledge-and-promoting-dialogue-to-increase-the-creative-potential-of-collaboration",
+      "text": "Ejemplos de Tácticas Efectivas",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-conclusion",
+      "text": "Conclusión",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "https://cdn2.hubspot.net/hub/53/file-13201337-pdf/docs/hubspot-midnight-madness-webinar-dharmesh-june-2010.pdf",
+      "text": "Inbound Marketing: Get Found Using Google, Social Media, and Blogs",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://semgeeks.com/blog/state-of-inbound-marketing-in-2024/",
+      "text": "Semgeeks",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://blog.thatagency.com/the-evolution-of-inbound-marketing-2024",
+      "text": "THAT Blog",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/hubspot-onboarding/",
+      "text": "Onboarding de HubSpot",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://www.hubspot.com/state-of-marketing",
+      "text": "HubSpot",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://blog.hubspot.com/marketing/hubspot-blog-marketing-industry-trends-report",
+      "text": "HubSpot Blog",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://99firms.com/blog/inbound-marketing-statistics/",
+      "text": "99Firms",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://marketsplash.com/inbound-marketing-statistics/",
+      "text": "MarketSplash",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.thinkwithgoogle.com/intl/es-419/insights/recorrido-del-consumidor/como-es-el-complejo-proceso-de-toma-de-decisiones-de-los-consumidores-durante-el-recorrido-de-compra/",
+      "text": "\"Decoding Decisions: The Messy Middle of Purchase Behavior\"",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://shortlist.io/blog/inbound-and-outbound-marketing-strategies/",
+      "text": "Shortlist",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/inbound/estrategia-de-contenidos/",
+      "text": "contenido valioso y relevante",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/gestion-campanas-publicitarias/",
+      "text": "Gestión de Campañas Publicitarias.",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://www.brightdigital.com/en/hubspot-development/growth-driven-design",
+      "text": "Bright Digital | HubSpot Diamond partner",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/diseno-de-sitios-web/",
+      "text": "Descubre cómo Efeonce puede ayudarte",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/inbound/estrategia-de-contenidos/",
+      "text": "Crear Contenido de Calidad:",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/gestion-de-redes-sociales/",
+      "text": "Gestión de Redes Sociales",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/blog",
+      "text": "blog de marketing digital",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/agencia-inbound-marketing/",
+      "text": "landing de Inbound Marketing",
+      "kind": "internal_url"
+    }
+  ],
+  "mediaIssues": [],
+  "editabilityLegend": {
+    "safe_text_edit": "Agent may propose text changes while preserving block type, path and surrounding structure.",
+    "safe_attrs_edit": "Agent may propose constrained attribute changes after validating the native block setting.",
+    "media_requires_reconcile": "Agent must reconcile WordPress media id, rendered src, alt text and source brief before write.",
+    "preserve_structure": "Agent should preserve structure and patch child blocks or attrs only with explicit intent.",
+    "inspect_only": "Agent should preserve by default until serialization/plugin behavior is understood."
+  }
+}

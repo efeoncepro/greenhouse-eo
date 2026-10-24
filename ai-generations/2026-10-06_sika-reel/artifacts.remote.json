@@ -1,0 +1,71 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:42:21.627Z",
+  "run": "ai-generations/2026-10-06_sika-reel",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-06_sika-reel",
+  "totalBytes": 38174833,
+  "fileCount": 10,
+  "files": [
+    {
+      "path": "reel-sika-v1-sin-audio.mp4",
+      "sizeBytes": 26088362,
+      "sha256": "22da1f1164c94ca8e10ae2ce0c5838f34b7258fbbdde2ad89629945709f310ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-reel/reel-sika-v1-sin-audio.mp4"
+    },
+    {
+      "path": "storyboard/f01.png",
+      "sizeBytes": 1641402,
+      "sha256": "81d69fd9563d4bc478253bc38611db85cf1768f5ade524d98dd0d1c98c0694d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-reel/storyboard/f01.png"
+    },
+    {
+      "path": "storyboard/f02.png",
+      "sizeBytes": 2336882,
+      "sha256": "8914add244cb4f705a4acf123bf09f8b1b808bcf0ca6aaa310b5536e512bab03",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-reel/storyboard/f02.png"
+    },
+    {
+      "path": "storyboard/f03.png",
+      "sizeBytes": 1332649,
+      "sha256": "5896c10790177e05aa79367a65b8120b8711c984870959357040bc16f0aa3b1d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-reel/storyboard/f03.png"
+    },
+    {
+      "path": "storyboard/f04.png",
+      "sizeBytes": 2409146,
+      "sha256": "f8aafb1068a471a004eac98802ed69431ab2c202f278bb0fb247fab2df35e364",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-reel/storyboard/f04.png"
+    },
+    {
+      "path": "storyboard/f05.png",
+      "sizeBytes": 2350151,
+      "sha256": "87518e6ec5038245aac7f35a23cc03d7f2ca552f3f604e7d2b5c32116cc1f3d1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-reel/storyboard/f05.png"
+    },
+    {
+      "path": "storyboard/f06.png",
+      "sizeBytes": 1144906,
+      "sha256": "e7fc0feddaf290f6d93676ca4e0cde71501a2feb6d7a483e64d27e77b55091d0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-reel/storyboard/f06.png"
+    },
+    {
+      "path": "storyboard/f07.png",
+      "sizeBytes": 368214,
+      "sha256": "cc97e5b6ed93dfe4e49b6de59a188f6c530362c541323532557dc66c49b5cd65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-reel/storyboard/f07.png"
+    },
+    {
+      "path": "storyboard/f07s.png",
+      "sizeBytes": 90142,
+      "sha256": "f46590505803951b708d0117f2f6a92e8bf0f42d414851f3ff195cf67c95c53a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-reel/storyboard/f07s.png"
+    },
+    {
+      "path": "storyboard/f08.png",
+      "sizeBytes": 412979,
+      "sha256": "4e71a567bf72e89ed17185f377f7775ad35c36d7819ead348ba4a6156fc36913",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-06_sika-reel/storyboard/f08.png"
+    }
+  ]
+}

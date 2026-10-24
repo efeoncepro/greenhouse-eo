@@ -17,6 +17,8 @@ import {
   type SisterPlatformOAuthClient
 } from './oauth-broker'
 
+import type { EnvSource } from '@/types/env-source'
+
 export const MCP_GATEWAY_OAUTH_CLIENT_ID = 'efeonce-mcp-gateway'
 export const MCP_HIRING_OAUTH_CLIENT_ID = 'efeonce-mcp-hiring'
 export const MCP_HIRING_REVIEW_OAUTH_CLIENT_ID = 'efeonce-mcp-hiring-review'
@@ -159,7 +161,7 @@ export class McpTokenExchangeError extends Error {
 export async function exchangeMcpGatewayToken(
   input: McpTokenExchangeRequest,
   dependencies: McpTokenExchangeDependencies = {},
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<McpTokenExchangeResult> {
   const config = readConfiguration(env)
   const scopeContract = resolveScopeContract(input.requestedScope)
@@ -321,7 +323,7 @@ function resolveScopeContract(requestedScope: string): ExchangeScopeContract {
   throw new McpTokenExchangeError('scope_not_allowed', 403)
 }
 
-function readConfiguration(env: NodeJS.ProcessEnv): ExchangeConfiguration {
+function readConfiguration(env: EnvSource): ExchangeConfiguration {
   if (!['true', '1', 'yes'].includes(env.GREENHOUSE_MCP_TOKEN_EXCHANGE_ENABLED?.trim().toLowerCase() ?? '')) {
     throw new McpTokenExchangeError('exchange_disabled', 404)
   }
@@ -375,7 +377,7 @@ function assertRequest(
 function assertFederatedClient(
   client: SisterPlatformOAuthClient | null,
   scopeContract: ExchangeScopeContract,
-  env: NodeJS.ProcessEnv
+  env: EnvSource
 ): asserts client {
   const allowedConsumers = list(env.GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS).map(value =>
     value.toLowerCase()

@@ -1,0 +1,419 @@
+{
+  "template": "ReportScenariosPage",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "Escenarios de un informe A4 premium: columnas por período y escenario contra la referencia del año anterior.",
+  "viewport": {
+    "width": 794,
+    "height": 1123
+  },
+  "slots": {
+    "clientName": {
+      "selector": "[data-slot='clientName']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 40,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Nombre del cliente en la cabecera. Sin cliente, la caja queda vacía y la página no se mueve; nunca un nombre inventado. El logo llega con la portada sellada de TASK-1888."
+    },
+    "chapterTab": {
+      "selector": "[data-slot='chapterTab']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Número del capítulo en el canto («01»). Sin capítulo, la pestaña no se dibuja."
+    },
+    "runningSection": {
+      "selector": "[data-slot='runningSection']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Sección de la página («Resumen ejecutivo»)."
+    },
+    "runningPeriod": {
+      "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Período y comparación («Agosto 2026 · contra julio 2026»)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "icon": {
+          "type": "string",
+          "required": false,
+          "resolver": "report-icon",
+          "values": [
+            "bars",
+            "clicks",
+            "impressions",
+            "ctr",
+            "search",
+            "target",
+            "link",
+            "trend"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "maxLines": 1
+        }
+      },
+      "notes": "Antetítulo de la figura con su ícono."
+    },
+    "keyFigure": {
+      "selector": "[data-slot='keyFigure']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 12,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Cifra principal de la figura: `readings[].keyFigure.value` del plan (formateador canónico). Nunca calculada en la plantilla."
+    },
+    "keyCaption": {
+      "selector": "[data-slot='keyCaption']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 110,
+        "maxLines": 3,
+        "overflow": "reject",
+        "allowedTags": [
+          "strong"
+        ]
+      },
+      "notes": "Bajada de la cifra: `keyFigure.caption` del plan."
+    },
+    "conclusion": {
+      "selector": "[data-slot='conclusion']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 96,
+        "maxLines": 3,
+        "overflow": "reject"
+      },
+      "notes": "Conclusión de la página: `readings[].conclusion` o la afirmación del plan que cita la figura."
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 170,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
+    "figureTitle": {
+      "selector": "[data-slot='figureTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 56,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Título de la figura (`chart.title`)."
+    },
+    "referenceLegend": {
+      "selector": "[data-slot='referenceLegend']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Rótulo de la marca discontinua: qué es la referencia («Mismo mes del año anterior»)."
+    },
+    "scenarioChart": {
+      "selector": ".fig-scenarios-host",
+      "type": "object",
+      "required": true,
+      "consumer": "validation-only",
+      "shape": {
+        "periods": {
+          "type": "array",
+          "required": true
+        },
+        "reference": {
+          "type": "object",
+          "required": true
+        },
+        "series": {
+          "type": "array",
+          "required": true
+        }
+      },
+      "notes": "Períodos (2–4), referencia observada y una serie por escenario con su rol; lo dibuja `makeScenariosHook`. Cada cifra es impresa y la columna sale de ella.",
+      "example": {
+        "periods": [
+          "Nov",
+          "Dic",
+          "Ene"
+        ],
+        "reference": {
+          "label": "Año anterior",
+          "values": [
+            "44.000",
+            "50.000",
+            "68.000"
+          ]
+        },
+        "series": [
+          {
+            "role": "low",
+            "values": [
+              "28.000",
+              "32.000",
+              "44.000"
+            ]
+          },
+          {
+            "role": "base",
+            "values": [
+              "44.000",
+              "48.000",
+              "65.000"
+            ]
+          },
+          {
+            "role": "high",
+            "values": [
+              "50.000",
+              "58.000",
+              "75.000"
+            ]
+          }
+        ]
+      }
+    },
+    "note": {
+      "selector": "[data-slot='note']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 120,
+          "maxLines": 1
+        }
+      },
+      "notes": "Nota de lectura bajo la figura. Sin nota del plan, no se dibuja."
+    },
+    "scenarios": {
+      "selector": "[data-slot='scenarios']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 3
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "role": {
+            "type": "string",
+            "required": true,
+            "resolver": "report-scenario-role",
+            "values": [
+              "low",
+              "base",
+              "high"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 28,
+            "maxLines": 1
+          },
+          "outcome": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 2
+          },
+          "assumption": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 150,
+            "maxLines": 5
+          }
+        }
+      },
+      "notes": "Una tarjeta por escenario, en el mismo orden y con los mismos roles que `scenarioChart.series`.",
+      "example": [
+        {
+          "role": "low",
+          "name": "Sin intervenir",
+          "outcome": "~44k en enero",
+          "assumption": "Sigue la tendencia interanual actual."
+        },
+        {
+          "role": "base",
+          "name": "Base",
+          "outcome": "~65k en enero",
+          "assumption": "Correcciones técnicas y contenidos de temporada."
+        },
+        {
+          "role": "high",
+          "name": "Estructural",
+          "outcome": "~75k al mes en 2027",
+          "assumption": "Lo anterior más consolidación y cambio de dominio."
+        }
+      ]
+    },
+    "provenance": {
+      "selector": "[data-slot='provenance']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 3
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 16,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 96,
+            "maxLines": 2
+          }
+        }
+      },
+      "notes": "Unidad, fuente y cobertura de la figura."
+    },
+    "closing": {
+      "selector": "[data-slot='closing']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "string",
+            "required": true,
+            "resolver": "report-closing-icon",
+            "values": [
+              "measure",
+              "action"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 190,
+            "maxLines": 4
+          },
+          "signature": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 40,
+            "maxLines": 1
+          }
+        }
+      },
+      "notes": "Lo que significa / Próximo paso: `readings[].meaning` y `nextStep` del plan. Sin próximo paso, el panel lleva una sola columna."
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "footerContact": {
+      "selector": "[data-slot='footerContact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "address": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 72,
+          "maxLines": 1
+        },
+        "phone": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
+      },
+      "notes": "Desde EFEONCE_CONTACT (dirección de presentación y teléfono de Chile)."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
+    }
+  }
+}

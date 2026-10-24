@@ -1,0 +1,191 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T22:06:28.316Z",
+  "run": "ai-generations/2026-10-19_propuesta-sgs-contactabilidad",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-19_propuesta-sgs-contactabilidad",
+  "totalBytes": 17098092,
+  "fileCount": 30,
+  "files": [
+    {
+      "path": "out/P01-portada/01-deck-cover-proposal.png",
+      "sizeBytes": 535870,
+      "sha256": "315b30af0701147012831087700422c87870de0fd69ec2e7165331a74301bbd6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P01-portada/01-deck-cover-proposal.png"
+    },
+    {
+      "path": "out/P02-decidir/01-deck-content-text.png",
+      "sizeBytes": 111690,
+      "sha256": "33e0466121ab39008c031bb6d06ea22cc83edecf916ca8dfb368faa067b6332f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P02-decidir/01-deck-content-text.png"
+    },
+    {
+      "path": "out/P03-hoy/01-deck-content-bullets.png",
+      "sizeBytes": 120277,
+      "sha256": "975a9caeed373f3a5585d466d707a1f82b8e73cdf6e586e33e0dec194acb18b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P03-hoy/01-deck-content-bullets.png"
+    },
+    {
+      "path": "out/P04-solucion/01-deck-proposal-cinematic.png",
+      "sizeBytes": 1569707,
+      "sha256": "9d3dd02b76c0a3d3688c52fcd0f095cb2a194019f52aeef3d2e8816180b8217d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P04-solucion/01-deck-proposal-cinematic.png"
+    },
+    {
+      "path": "out/P05-panel/01-deck-content-day-live-console.png",
+      "sizeBytes": 695603,
+      "sha256": "ce71bd68e53245cc1452f23712c216c3c0969b066f12bad6676ad53cc787be26",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P05-panel/01-deck-content-day-live-console.png"
+    },
+    {
+      "path": "out/P06-alternativas/01-deck-decision-provider-fit.png",
+      "sizeBytes": 780703,
+      "sha256": "61674f012f0282a7cdbfaaf5a825e101877682b922c95243cd2685cc7549108a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P06-alternativas/01-deck-decision-provider-fit.png"
+    },
+    {
+      "path": "out/P07-etapas/01-deck-method-waves.png",
+      "sizeBytes": 723228,
+      "sha256": "08b9b577b4cade315e3ed4fc0891ca14e7163e37a31c023169ad78de5d3a5451",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P07-etapas/01-deck-method-waves.png"
+    },
+    {
+      "path": "out/P08-region/01-deck-content-bullets.png",
+      "sizeBytes": 120847,
+      "sha256": "cea1f1b9c1e88a479dff5800aefaa7dbdf47f5578e0b6bd6adf2444826b689a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P08-region/01-deck-content-bullets.png"
+    },
+    {
+      "path": "out/P09-adopcion/01-deck-content-text.png",
+      "sizeBytes": 127702,
+      "sha256": "d628dc92b36278e406d725d0824e067b4444fdfcb39beb01cb792de263d0d8cd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P09-adopcion/01-deck-content-text.png"
+    },
+    {
+      "path": "out/P10-riesgos/01-deck-decision-risk.png",
+      "sizeBytes": 177347,
+      "sha256": "17626d34286410e8133a7fc337e35807b80383789e5e875152ea698212357280",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P10-riesgos/01-deck-decision-risk.png"
+    },
+    {
+      "path": "out/P11-plan/01-deck-decision-plan.png",
+      "sizeBytes": 811120,
+      "sha256": "15e6823e46eef92bbdc74689e1192da48aa7db422560d4b9eaa900887bc61704",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P11-plan/01-deck-decision-plan.png"
+    },
+    {
+      "path": "out/P12-inversion/01-deck-content-pricing.png",
+      "sizeBytes": 176270,
+      "sha256": "c4905c8da0758bafe5aabd5e4344e1e395e98f457fec29727d0dc427b3c0776c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P12-inversion/01-deck-content-pricing.png"
+    },
+    {
+      "path": "out/P13-pasos/01-deck-decision-next-steps.png",
+      "sizeBytes": 797392,
+      "sha256": "cc9995eb209af7ca9d95711310ca3b89ad5ed0da4706a1e4fb512393228d7c24",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P13-pasos/01-deck-decision-next-steps.png"
+    },
+    {
+      "path": "out/P14-contraportada/01-deck-close-proposal.png",
+      "sizeBytes": 1414497,
+      "sha256": "05f93d38dd5ce049cdb05b3a422a9cab205c4a7c4d9ae82a20c9084f5aacf457",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/out/P14-contraportada/01-deck-close-proposal.png"
+    },
+    {
+      "path": "png/P01-portada.png",
+      "sizeBytes": 398336,
+      "sha256": "8f4f323737282f38ad014b2d15c4ce2cdb19da4673686a59d4ea4d856431b3ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P01-portada.png"
+    },
+    {
+      "path": "png/P02-decidir.png",
+      "sizeBytes": 111690,
+      "sha256": "33e0466121ab39008c031bb6d06ea22cc83edecf916ca8dfb368faa067b6332f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P02-decidir.png"
+    },
+    {
+      "path": "png/P03-hoy.png",
+      "sizeBytes": 120277,
+      "sha256": "975a9caeed373f3a5585d466d707a1f82b8e73cdf6e586e33e0dec194acb18b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P03-hoy.png"
+    },
+    {
+      "path": "png/P04-solucion.png",
+      "sizeBytes": 1569707,
+      "sha256": "9d3dd02b76c0a3d3688c52fcd0f095cb2a194019f52aeef3d2e8816180b8217d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P04-solucion.png"
+    },
+    {
+      "path": "png/P05-panel.png",
+      "sizeBytes": 695603,
+      "sha256": "ce71bd68e53245cc1452f23712c216c3c0969b066f12bad6676ad53cc787be26",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P05-panel.png"
+    },
+    {
+      "path": "png/P06-alternativas.png",
+      "sizeBytes": 780703,
+      "sha256": "61674f012f0282a7cdbfaaf5a825e101877682b922c95243cd2685cc7549108a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P06-alternativas.png"
+    },
+    {
+      "path": "png/P07-etapas.png",
+      "sizeBytes": 723228,
+      "sha256": "08b9b577b4cade315e3ed4fc0891ca14e7163e37a31c023169ad78de5d3a5451",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P07-etapas.png"
+    },
+    {
+      "path": "png/P08-region.png",
+      "sizeBytes": 120847,
+      "sha256": "cea1f1b9c1e88a479dff5800aefaa7dbdf47f5578e0b6bd6adf2444826b689a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P08-region.png"
+    },
+    {
+      "path": "png/P09-adopcion.png",
+      "sizeBytes": 127702,
+      "sha256": "d628dc92b36278e406d725d0824e067b4444fdfcb39beb01cb792de263d0d8cd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P09-adopcion.png"
+    },
+    {
+      "path": "png/P10-riesgos.png",
+      "sizeBytes": 177347,
+      "sha256": "17626d34286410e8133a7fc337e35807b80383789e5e875152ea698212357280",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P10-riesgos.png"
+    },
+    {
+      "path": "png/P11-plan.png",
+      "sizeBytes": 811120,
+      "sha256": "15e6823e46eef92bbdc74689e1192da48aa7db422560d4b9eaa900887bc61704",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P11-plan.png"
+    },
+    {
+      "path": "png/P12-inversion.png",
+      "sizeBytes": 176270,
+      "sha256": "c4905c8da0758bafe5aabd5e4344e1e395e98f457fec29727d0dc427b3c0776c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P12-inversion.png"
+    },
+    {
+      "path": "png/P13-pasos.png",
+      "sizeBytes": 797392,
+      "sha256": "cc9995eb209af7ca9d95711310ca3b89ad5ed0da4706a1e4fb512393228d7c24",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P13-pasos.png"
+    },
+    {
+      "path": "png/P14-contraportada.png",
+      "sizeBytes": 1414497,
+      "sha256": "05f93d38dd5ce049cdb05b3a422a9cab205c4a7c4d9ae82a20c9084f5aacf457",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/png/P14-contraportada.png"
+    },
+    {
+      "path": "sec/out-p01/01-deck-cover-proposal.png",
+      "sizeBytes": 508979,
+      "sha256": "ca07d259cbf8c97f3ef8343b176616aef3ae33ff93929f559bc70fabb833a22e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/sec/out-p01/01-deck-cover-proposal.png"
+    },
+    {
+      "path": "sec/p01-a.png",
+      "sizeBytes": 402141,
+      "sha256": "507dcede89d8d89fad26c82f31cacd929184f0fc0b03b265aa4423f2561ec613",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-sgs-contactabilidad/sec/p01-a.png"
+    }
+  ]
+}

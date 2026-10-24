@@ -1,6 +1,7 @@
 # Inpainting y edición local — playbook del agente
 
-> **as-of 2026-10-03** (TASK-1965 + TASK-1973). Esto es el playbook operativo: intención → comando → modelo → flags →
+> **as-of 2026-10-03** (TASK-1965 + TASK-1973); delta 2026-10-19 (guarda de marca y `expand` sin saldo, corrida
+> `ai-generations/2026-10-19_google-partner-freeze/`); delta 2026-10-20 (§9, simular un anuncio exacto en foto real, caso Gana GRD-1541); delta 2026-10-20 (§5, borrar una línea de luz del fondo, retrato de Nexa para `/agenda/`). Esto es el playbook operativo: intención → comando → modelo → flags →
 > qué mirar al 100 % → código de salida → costo medido. El contrato vive en otro lado y manda ante cualquier
 > diferencia:
 >
@@ -25,6 +26,7 @@ Herramienta **out-of-band** (`scripts/ai/inpaint/**`): nunca la importa `src/app
 | Retocar la piel de una cara | ❌ medido 2026-10-02: no la arregla; la piel se resuelve en el **retrato ancla** |
 | Generar, borrar, mover o reconstruir un **logo o marca** | ❌ nunca con IA: la guarda de marca lo bloquea; el logo es el vector compuesto después. `--allow-brand` sólo si el prompt nombra la marca y la edición toca el **contexto** |
 | Reiluminar un objeto pegado | `place --finish element --model gpt-image-2.5-sunburst` (único que conservó el objeto, 2026-10-03); `fal:iclight-v2` y `fal:image-apps-relighting` conectados pero deforman o recolorean (§7) |
+| Mostrar un anuncio **exacto** en una superficie real (DOOH, mockup en foto) | ✅ composición geométrica + acabado Sunburst y traslado de luz (§9) |
 
 ## 1. La garantía y cómo leer el resultado
 
@@ -87,6 +89,9 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
   `--reference` empiezan en la **3**. Un prompt que diga «la mujer de la imagen 2» apunta a la guía.
 - **El guardián de marca bloquea el nombre «Nexa»** (lo lee como asset/logo). Para un retoque de persona, no nombrarla:
   describir la identidad y pasarla por `--reference`. `--allow-brand` es para ediciones de contexto, no para esto.
+- **La guarda también aborta si el prompt dice «logos» en negativo** («sin logos», «no logos»; caso anuncio
+  Efeonce | Google, 2026-10-19): lee la palabra, no la intención. Si la edición toca el contexto y hay que nombrar
+  marcas, `--allow-brand`.
 - **Piel craquelada / «papel arrugado»** en una foto IA es artefacto de upscaler; se corrige con la misma ruta. Si la
   persona además no es la canónica, cambiar la cara por las anclas resuelve las dos cosas en una pasada.
 
@@ -94,6 +99,11 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
 área nueva (Flux Fill). `foto:expandir` (Sunburst, `--reponer no`) **redibuja** la escena entera y es el flujo aprobado
 de las horizontales 1,91:1 de CMP-004 (`efeonce-advertising-creative` → `paid-format-safe-zones-and-craft.md` §0c).
 Unificarlos es decisión de TASK-1925; no cambies uno por otro en una serie ya aprobada.
+
+**`expand` sin saldo en fal (2026-10-19):** `expand` usa Flux Fill por fal; si la cuenta responde «User is locked.
+Exhausted balance», el comando no corre (`pnpm ai:fal --balance` antes de planearlo). Con un fondo vacío, sin objetos
+que continuar, el formato se extendió de forma determinística (color por columna + grano), fuera de este pipeline y
+sin su verificación: caso del 9:16 del anuncio Efeonce | Google.
 
 ## 3. Máscaras — `pnpm ai:mask`
 
@@ -124,6 +134,12 @@ Unificarlos es decisión de TASK-1925; no cambies uno por otro en una serie ya a
   cambio de tono.
 - **Borrar:** sin fantasma ni silueta de otro objeto; la sombra proyectada se fue con el objeto; la sombra del vecino
   sigue (el comando nunca toma la sombra de un vecino ni pisa otro objeto, pero míralo).
+- **Borrar una línea de luz del fondo** (2026-10-20, retrato de Nexa para `/agenda/`, carpeta
+  `ai-generations/2026-10-20_agenda-nexa-retrato/`): `ai:inpaint erase --fill model` (Sunburst high, ~USD 0,04) con una
+  máscara **por color** de la línea, **restringida al fondo**: la piel se excluye por región, para que el color no la
+  tome. La zona protegida salió idéntica bit a bit. El comando avisó «la zona casi no cambió» y salió con **código 3**:
+  quedaban restos tenues de la línea fuera de la máscara (fuera del recorte usado). Ese 3 no prueba que el borrado
+  falló: se revisa la imagen al 100 % y se decide por lo que se ve.
 - **Mover / incorporar:** sombra de contacto y reflejo coherentes con la luz; con `--finish element`, que la forma del
   elemento no haya cambiado.
 - **Fondo:** pelo y transparencias contra el fondo nuevo (la costura media viene en el reporte). Con personas reales del
@@ -168,3 +184,37 @@ pipeline ya hace). El canon cine no cambia: el plate se regenera, no se relumina
 - BFL FLUX Tools (outpainting y erase propios, fuera de fal): requiere cuenta BFL del operador. Sin conectar.
 - `foto:expandir` delegando en el núcleo → TASK-1925. Video con VACE + SAM2 → task aparte. `--batch` → pendiente.
 - `fal:seedance25-edit` en video: sólo contrato, sin canario.
+
+## 9. Simular un anuncio exacto en una superficie real (DOOH, mockup en foto)
+
+Caso fuente: propuesta Gana GRD-1541 (2026-10-19/20), cuatro simulaciones en Medellín (Metro estación Bello,
+estadio Atanasio Girardot, estación Aguacatala, C. C. Santafé). Herramientas y salidas:
+`ai-generations/2026-10-19_propuesta-gana-programatica/metro/` (ver `LEEME.md` del expediente).
+
+**El principio:** la pieza del cliente es **exacta** (texto, cifras, logo, legales); la IA sólo aporta **luz y
+acabado**. Nunca se le pide al modelo que dibuje el anuncio.
+
+1. **Foto con licencia:** buscarla en Wikimedia Commons por API y anotar autor + licencia (`FUENTE-foto.txt`); la
+   **atribución va en la lámina**. **CC BY-SA obliga a publicar la imagen intervenida bajo la misma licencia**;
+   CC BY sólo pide atribución.
+2. **Revisar marcas de terceros visibles en la foto** antes de usarla: en el estadio se veía un tapete de Betsson,
+   competidor directo del cliente.
+3. **Pieza exacta:** el anuncio del cliente en HTML → PNG a su tamaño de referencia.
+4. **Composición geométrica (sin IA):** homografía con supersampling (`metro/tools/warp.cjs`; para superficies
+   curvas, por franjas). Para dejar delante plantas, focos o personas, máscara de recorte por color de la superficie
+   original.
+5. **Acabado:** `pnpm ai:inpaint image` con `--model gpt-image-2.5-sunburst` sobre la composición, para que la pieza
+   tome la luz, el reflejo y el grano de la escena.
+6. **Sunburst reescribe el texto chico** (legales, eslóganes, cifras pequeñas). Por eso la salida final **no** es el
+   acabado: se conserva la pieza exacta y sólo se traslada la luz del acabado.
+   - Texto grande — `metro/tools/transfer.cjs`: dentro de la máscara, `exacto + k · (blur(acabado) − blur(compuesto))`;
+     fuera, el acabado. Sigma ≈ 8.
+   - Texto chico — `metro/tools/transfer-light.cjs`: sólo luz difusa positiva y derrame, con la pieza apenas suavizada.
+7. **Superficie que no existe en la foto** (pantalla nueva colgada): `pnpm ai:inpaint image` con
+   `gpt-image-2.5-flare` y máscara; el resto queda idéntico bit a bit (PASS, delta 0). Después se compone la pieza
+   exacta encima, como en el paso 4.
+
+🔴 **Trampa medida (sharp):** un PNG de máscara de un canal se lee con **3 canales** si no se usa
+`.extractChannel(0)`; los índices por píxel se desalinean y la máscara sale vacía o corrida, sin error.
+
+**Costo:** las cuatro simulaciones, con iteraciones, ≈ USD 0,50 en total. La lámina se rotula como simulación.

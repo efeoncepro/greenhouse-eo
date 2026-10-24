@@ -1,0 +1,178 @@
+{
+  "run_id": "2026-10-20-1429-unilever-mx",
+  "hsp_id": "HSP-0040",
+  "date_santiago": "2026-10-20T14:29:49.234031-03:00",
+  "window": {
+    "calendar_week_start": "2026-10-19T00:00:00-03:00",
+    "calendar_week_end_at_check": "2026-10-20T14:29:49.234031-03:00",
+    "first_48h_intersection_start": "2026-10-19T00:00:00-03:00",
+    "temporal_limit": "post21hrelative only; noexactpublication or latencycalculation; focused research not20cellradar"
+  },
+  "scope": "one screenshot-defined agencyrequest; objective plus2verifiedbridges andthirdpartialprofile",
+  "queries": [
+    {
+      "type": "local_memory",
+      "query": "Unilever / [objetivo] / México creatividad",
+      "result": "no relevantmemoryhit used"
+    },
+    {
+      "type": "local_private_history",
+      "query": "Unilever / [objetivo]",
+      "result": "39accounts, no prior matchingHSP; newID assigned afterURLdedupe"
+    },
+    {
+      "type": "websearch",
+      "query": "[objetivo] + exact agencyrequest; [objetivo] + employer/currentrole",
+      "result": "profile identity found; exact post not exposed bysearch"
+    },
+    {
+      "type": "CRM_MCP",
+      "query": "identity/portal; CompanyUnilever; Contact[objetivo]",
+      "result": "48713323verified; globalCompany53984479513found; targetname0"
+    },
+    {
+      "type": "LinkedIn_manual",
+      "query": "read targetprofile, originalpost,5visible rankedcomments",
+      "result": "post7518040999206674432,21hrelative; currentprofileemployerUnilever; company/brandnotnamed; invitationpending"
+    },
+    {
+      "type": "corporate_web",
+      "query": "UnileverMéxico workforce2026; official23Sep2026page read",
+      "result": "more than7000countryemployees; group/local keptseparate"
+    },
+    {
+      "type": "provider_docs",
+      "query": "ApolloPeopleAPISearchcreditcontract",
+      "result": "0credits, noemail/phone returned"
+    },
+    {
+      "type": "Apollo_people_search",
+      "query": "fourpublicprofileURLs [objective+3additional, PIIredacted]",
+      "result": "3matches; target+2bridgeshas_email flags; noaddresses"
+    },
+    {
+      "type": "websearch",
+      "query": "[bridge1]/[bridge2]/[thirdprofile] + employer/roles",
+      "result": "partialpublicmetadata; unrelatedresultsdiscarded"
+    },
+    {
+      "type": "web_open",
+      "query": "[bridge1] and[bridge2] professionalprofiles",
+      "result": "999readerblocked"
+    },
+    {
+      "type": "LinkedIn_manual",
+      "query": "read ownprofileheaders [bridge1] and[bridge2]",
+      "result": "currentFoodsMXTrade andBrandManagerUnilever; no introduction/authorityverified"
+    },
+    {
+      "type": "CRM_MCP",
+      "query": "globalCompanyassociatedDeals/Contacts; Mexicoexactdomain",
+      "result": "0Deals,11Contacts,0MexicodomainCompany, scopedonly; no writes"
+    },
+    {
+      "type": "LinkedIn_manual",
+      "query": "targetcontactinfooverlay",
+      "result": "profileURLonly, noemailpublishedinaccessibleview"
+    },
+    {
+      "type": "local_proof",
+      "query": "foodcase andcreativecanon",
+      "result": "Breslerqualitativeexperience, curatedsampleslimits; approvedAgenciaCreativabrochure27slides"
+    }
+  ],
+  "sources_read": [
+    {
+      "source": "https://www.linkedin.com/feed/update/urn:li:activity:7518040999206674432/",
+      "role": "primary explicitrequest",
+      "published_at": null,
+      "relative": "21h",
+      "last_checked_at": "2026-10-20T14:29:49.234031-03:00"
+    },
+    {
+      "source": "https://www.unilever.com.mx/news/2026/compartimos-nuestro-impacto-positivo-a-traves-del-arte-en-nuevo-leon/",
+      "role": "localentityscale",
+      "published_at": "2026-09-23",
+      "last_checked_at": "2026-10-20T14:29:49.234031-03:00"
+    },
+    {
+      "source": "https://docs.apollo.io/reference/people-api-search",
+      "role": "endpointcontract",
+      "last_checked_at": "2026-10-20T14:29:49.234031-03:00"
+    },
+    {
+      "source": "professionalprofiles of3people",
+      "pii_redacted": true,
+      "private_reference": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1426-denis-unilever/evidence.json",
+      "role": "identity/employment/role"
+    }
+  ],
+  "sources_blocked": [
+    {
+      "source": "professionalprofiles of2bridges viawebreader",
+      "pii_redacted": true,
+      "status": "999",
+      "resolution": "manual authenticatedprofileheadersread; no challengebypass"
+    },
+    {
+      "source": "Chromeoldbrowserbinding2",
+      "status": "unavailable afterruntimeupdate; currentinventoryboundbrowser1",
+      "impact": "resolved before research, no accountchange"
+    }
+  ],
+  "result": {
+    "priority": "highforclarifyingconversation",
+    "buyer": "unconfirmed, candidateUnileverMexico",
+    "services": [
+      "creative"
+    ],
+    "target_plus_verified_bridges": 3,
+    "thirdadditionalprofile_partial": 1,
+    "corporate_emails_obtained": 0,
+    "formal_call_open_verification": "notapplicable toinformalrecommendationrequest",
+    "crm_company_global": "53984479513",
+    "crm_writes": 0,
+    "outreach": 0,
+    "paid_enrichment": 0,
+    "credits_contract": 0
+  },
+  "procurement_control": {
+    "result": "not_applicable_to_informal_recommendation_request",
+    "checked_at": "2026-10-20T14:29:49.234031-03:00",
+    "source": "https://www.linkedin.com/feed/update/urn:li:activity:7518040999206674432/",
+    "supplier_selected": "not verified; not declared in visible request",
+    "award_act_or_order": "not applicable to identified informal phase; no formal procurementfile identified",
+    "contract_status": "not verified; no absence asserted",
+    "signed_at": "not verified",
+    "execution_start_end": "not verified",
+    "publication": "relative21h, noabsoluteverified",
+    "stage": "public request for recommendations",
+    "participation_route": "public post; profile exposes messaging but invitation pending; no formal applicationroute/calendar verified",
+    "deadline_at": null,
+    "contract_document_read": "no formal procurementdocument identified; no assumed requirement for this informal route",
+    "classification_reason": "Eligible to propose a clarifying conversation, not to claim an open tender or approved spend/Deal"
+  },
+  "approvals": {
+    "research": "authorized by Ahora prospecta esta",
+    "paid_enrichment": false,
+    "crm_write": false,
+    "outreach": false,
+    "tracking_document_link": false
+  },
+  "uncertainties": [
+    "Which buyercompany andbrand?",
+    "Which market andsocialchannels?",
+    "Frequency/volume, formats, deliverables andapprovals?",
+    "Ongoingoperation orcampaign?",
+    "Budget, decisionowner, timetable andprocurementrequirements?"
+  ],
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1426-denis-unilever/evidence.json",
+  "pii_redacted": true,
+  "redactions": [
+    "individualnames",
+    "profileURLs",
+    "providerpersonIDs",
+    "personalizedmessage"
+  ],
+  "next_step": "Review manual draft andqualitativefoodproof; ifauthorized, ask author toconfirmbrand/company andscope before quote/CRMdeals"
+}

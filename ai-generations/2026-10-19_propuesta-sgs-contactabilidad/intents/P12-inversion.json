@@ -1,0 +1,61 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "role": "content",
+  "recipe": "content-pricing",
+  "voice": {
+    "eyebrow": "Inversión",
+    "question": "¿Cómo se invierte?",
+    "answer": [
+      "Por",
+      "etapas"
+    ]
+  },
+  "body": "Cada etapa se cotiza por separado y se avanza a la siguiente solo si la anterior cumplió.",
+  "legal": "Valores netos, IVA no incluido. Licencias de Aircall y consumo de WhatsApp, aparte.",
+  "period": "neto + IVA",
+  "recommended": 1,
+  "recommendedLabel": "Recomendado",
+  "plans": [
+    {
+      "name": "Piloto",
+      "tagline": "Etapas 0 a 2",
+      "features": [
+        "Diagnóstico y procesos",
+        "Correo, llamadas y WhatsApp",
+        "Panel del piloto",
+        "Capacitación por rol"
+      ]
+    },
+    {
+      "name": "Conexión",
+      "tagline": "Etapa 3, con la región",
+      "features": [
+        "Conector de Aircall",
+        "Integración de WhatsApp",
+        "Registro en Salesforce",
+        "Pruebas con la región"
+      ]
+    },
+    {
+      "name": "Operación",
+      "tagline": "Etapa 4, mensual",
+      "features": [
+        "Panel e informe mensual",
+        "Soporte a usuarios",
+        "Altas de nuevos equipos",
+        "Mejora continua"
+      ]
+    }
+  ],
+  "selection": {
+    "target": "object",
+    "label": "SGS",
+    "participantKind": "role"
+  },
+  "line": "revenue-salesforce"
+}

@@ -426,3 +426,15 @@ investigación conocida, Persona con email, Correo conocido y Empresa principal 
 Revisar 28 coincidencias, elegir **Activo**, guardar y procesar. Después leer por CLI tipo/expresión y por MCP
 miembros completos. Guardar captura de la UI con Activo y tamaño procesado. No recrear 188 si ya existe ni
 activar envíos, secuencias o workflows como parte de la selección.
+
+## Ejemplo comprobado — alta individual y consulta de pertenencia, 22/10/2026
+
+[Kibernum](../../commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md) reutiliza Company y
+confirma Primary, fecha en ambos objetos, tipo individual, fit y cargo. La lectura comprobó seis segmentos
+del Contact (180/181/182/183/151/156) y Company187. No creó filtros ni cohortes fechadas.
+
+Al contestar «¿lo sumaste a los segmentos?», leer primero los valores persistidos; comprobar después cada
+membresía relevante y mostrar sus nombres. En la CLI verificada en esta sesión, `objects search` admite
+`hs_object_id=<contact-id> AND hs_crm_search.ilsListIds=<segment-id>` en `--filter`: es sólo una consulta
+individual, no una definición de segmento por IDs. Confirmar ayuda/portal antes de reutilizar la sintaxis.
+El fit CRM es encaje, no solicitud observada; conservar industria y país reales aunque el proyecto sea de otro mercado.

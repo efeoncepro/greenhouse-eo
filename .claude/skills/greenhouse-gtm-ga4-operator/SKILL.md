@@ -9,6 +9,20 @@ Use this skill to **operate measurement instrumentation** for Efeonce: build and
 
 > **Efeonce tagging is immature.** Assume nothing is tagged until verified. Build in the workspace, verify, and only publish with human confirmation.
 
+## LinkedIn Ads — discovery, no conexión implementada
+
+Cargar [fuentes y contratos LinkedIn](../../../docs/reference/measurement-gtm-ga4/11-linkedin-insight-tag-conversions-api.md)
+y [preparación](../../../docs/manual-de-uso/growth/preparar-medicion-linkedin.md) antes de recomendar tags.
+InsightTag2.0 es web; CAPI puede usar backend directo o template oficial sGTM revisado. La
+[arquitectura es Proposed](../../../docs/architecture/GREENHOUSE_LINKEDIN_ADS_MEASUREMENT_ARCHITECTURE_V1.md),
+no una instalación activa. Cuenta/Partner ID/reglas/roles/HubSpot siguen sin verificar; Google no los concede.
+Un instalador del tag; revisar HubSpot Pixels antes de duplicar. Tag+CAPI redundantes usan dos reglas,
+misma cuenta y eventId canónico, no una regla compartida ni la ventana Meta. Enhanced tracking
+li_fat_id, enhanced matching web y hashes CAPI son distintos. Consentimiento LinkedIn/CMP y GPC
+se prueban explícitamente; no heredar permiso/bloqueo Google. No PII/hashes en dataLayer ni tokens
+web. No activar, publicar o crear leads ficticios desde el discovery; `growth:measurement` no acepta
+LinkedIn hoy. Backend directo es candidato CAPI, no sender añadido por actualizar esta skill.
+
 ## When to invoke
 
 Google Ads: `pnpm --silent google-ads discover` y el
@@ -142,7 +156,7 @@ no es prerrequisito de UPD. Respetar la restricción shared workspace antes del 
 Verificado 2026-10-13: hosting del mismo `GTM-K2X4ZTTK` recuperado en `efeonce-group`,
 tagging + preview min 0/max 1, 1CPU/512MiB, instance-based; `/healthy` 200 y Preview funcional.
 En ese corte histórico GTM Web **5**/Server **6** estaban publicados; el readback 14/10 posterior
-fijó Server 9 y el checkpoint 18/10 de esta skill fija Web 6/Server 10. HubSpot categoría opt-in y
+fijó Server 9 y el checkpoint 18/10 fijó Web 6/Server 10; al 23/10 Web está en **10** y Server sigue en 10. HubSpot categoría opt-in y
 routing WP/Think activos. Test Events Server procesados y PageView real completó ambos destinos.
 Primera conversión comercial y reconciliación pendientes en ese corte; esto no autoriza replay.
 Ver estado/URLs en la auditoría.
@@ -228,6 +242,15 @@ Ante una tarea de medición, seguir este árbol; NO improvisar el camino:
    (`src/lib/growth/forms/contracts.ts`); CTA engine `greenhouse_cta_*`
    (`src/lib/growth/ctas/contracts.ts`); rail CTA legacy `gh_cta_clicked` (no renombrar); meetings
    `gh_meeting_step_reached|gh_meeting_booking_confirmed` (`src/lib/growth/meetings/contracts.ts`).
+   Cromo del sitio efeoncepro.com (lo emiten scripts del host WordPress, no Greenhouse): menú `gh_site_nav_opened`
+   (panel), `gh_site_nav_line_viewed` (línea) y `gh_site_nav_clicked` (`target_type`/`target`; el CTA viaja como
+   `target_type: cta`, `target: menu_header|menu_mega|menu_onepage`, y su agendador mide por `greenhouse_cta_*` con
+   `cta_location: site_nav`; `site_nav_cta` no se emite) desde `ohio-child/assets/js/site-nav-host.js`, y dock de
+   landings `gh_landing_dock_clicked` con `target_type`/`target` (`eo-landing-dock/assets/js/landing-dock-host.js`,
+   TASK-2043) con además `target_label` y `target_url`. El dock **sí está registrado** (GTM versión 8, 2026-10-23,
+   `scripts/gtm/build-landing-dock-events-workspace.ts`; dimensiones GA4 `target_type`/`target`/`target_label`/`target_url`);
+   `gh_site_nav_*` también (GTM versión 9; desde la 10 el clic suma `target_label`/`target_url`; `scripts/gtm/build-site-nav-events-workspace.ts` actualiza un tag existente si cambian sus parámetros; dimensiones `panel`/`line`). Verificar con visita simulada: ver LEARNINGS 2026-10-23 (service worker + agente de usuario). El agendador abierto desde el dock mide por `greenhouse_cta_*` con
+   `cta_location: landing_dock` (reemplaza `inbound_mobile_dock` y `hubspot_mobile_dock`).
    Verificar el renderer y el dataLayer; GTM no inventa eventos ausentes.
 3. **¿Existe un evento recomendado GA4 que calce?** (lead → `generate_lead`; signup → `sign_up`). Sí → usar ese verbatim (hereda key events/predictivos). No → custom `gh_<object>_<action>`. Regla completa: doc `04`.
 4. **¿Ya hay un tag genérico que lo cubra?** Un solo GA4 Event tag + parámetro de identidad (`form_slug`) cubre N superficies — **reusar antes de crear**. Ver `TRACKING-PLAN.md`.
@@ -307,6 +330,11 @@ Estrategia de deployment: **build agéntico primario + capa delgada** (ADR `GREE
 - **`pnpm gtm:snapshot`** — exporta el config live de los DOS containers (web `container-snapshot.json` + servidor `server-container-snapshot.json`, en `docs/reference/measurement-gtm-ga4/`) con secretos tapados por huella sha256. **Correr tras cada publish** y commitear (el publish por script ya lo hace). `pnpm gtm:snapshot --check` = drift live vs commiteado, exit 1; lo corre a diario `.github/workflows/gtm-drift.yml`. Detalle abajo.
 - **`pnpm measurement:smoke`** — verifica EN VIVO que la medición funciona en los hosts/eventos clave (Playwright `/g/collect`: page_view en efeoncepro.com + think, generate_lead en submit). Atrapa regresiones (Site Kit, drift, consent).
 - **`pnpm growth:forms-tracking-audit`** — forms published+active de la DB vs `TRACKING-PLAN.md`; lista los live sin fila (drift del registro).
+- **Cromo del sitio** — `scripts/gtm/build-landing-dock-events-workspace.ts` (dock) y `scripts/gtm/build-site-nav-events-workspace.ts`
+  (menú; actualiza con PUT+fingerprint un tag existente si cambian sus parámetros): sin `--publish` arman y compilan el
+  workspace (quick_preview); con `--publish` versionan, publican y reescriben ambos snapshots. Verificar con visita
+  simulada en Playwright (banner HubSpot sólo analítica; GA4 envía por service worker → `context.on('request')`;
+  `--user-agent` sin `HeadlessChrome` o GA4 lo filtra como bot): receta en LEARNINGS 2026-10-23.
 
 ### Drift de los dos containers (verificado 2026-10-16)
 
@@ -414,6 +442,10 @@ that evidence. Release proofs and pending real traffic/EMQ stay in the linked ru
 
 ## Google Ads online y EC — contrato y checkpoint 18-10-2026
 
+Cierre vigente: [release Grader/clasificación main2559e9242](../../../docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md), manifest released y canarios negativos.
+Antes de operar, releer estado real; no repetir correcciones/planes históricos ni crear leads para
+completar evidencia. TASK-2034 sigue parcial por recepción/atribución y recibos reales pendientes.
+
 Cargar [contrato/activación](../../../docs/manual-de-uso/growth/activar-conversiones-google-ads.md),
 [arquitectura](../../../docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md)
 y [evidencia de activación](../../../docs/audits/growth/2026-10-18-google-ads-activation.md).
@@ -424,7 +456,8 @@ Exigir los cuatro permisos Google explícitos y GPC sin veto. Hashes sólo en el
 ni mezclar UPD/Meta. GCLID/GBRAID/WBRAID se observan con consentimiento; no se generan ni se disparan.
 El circuito online sigue dependiendo del navegador y no tiene retries backend.
 
-Checkpoint fechado 18/10: Web **6** / Server **10** publicados, Server primero; EC efectiva ON en
+Checkpoint fechado 18/10: Web **6** / Server **10** publicados, Server primero (Web siguió: 7 sign_up Glitch 20/10,
+8 dock, 9–10 menú el 23/10; Server sin cambios); EC efectiva ON en
 **6862539491**, bridge compatible publicado en WordPress/Think y flag Production true con companion
 READY del mismo main liberado. Cobertura ampliada22:57Z:13 formularios comerciales y Discovery
 (reserva) con Ads publicado. Son fuentes del sitio, no tipos de campaña Ads. Ambas acciones
@@ -455,8 +488,10 @@ significa Ads habilitado. La revisión al publicar es hoy un paso del operador, 
 AI Grader tiene intención comercial confirmada por el operador. Contacto es general y queda fueraAds.
 Lead Gen Web corregido a quote_request por command/store Forms, preservando identidad y versión;
 no se exceptúa globalmente lead_magnet ni se publica el plan viejo. La API nueva de clasificación
-está preparada en código local, aún sin deploy; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
-La política configurada no certifica el intake histórico propio del Grader, recepción o atribución.
+está servida en main2559e9242, con auditoría API Platform en la misma transacción que el UPDATE
+y commandExecutionId para correlación; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
+Canarios negativos de Grader/clasificación PASS, sin leads ficticios ni corrección positiva de prueba.
+La política y los canarios no certifican recepción ni atribución de conversiones reales.
 
 
 Grader: cargar [contrato de transporte](../../../docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).

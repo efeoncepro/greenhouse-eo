@@ -1,9 +1,9 @@
 # Operar Layout Ohio + Elementor en el Public Site
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-07-08 por Codex
+> **Ultima actualizacion:** 2026-10-24 por Claude (texto bajo los rieles fijos de Ohio en landings source-led)
 > **Modulo:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Pagina de referencia:** `/blog` (`page_id=18456`)
@@ -470,6 +470,34 @@ wp-content/themes/ohio-child/assets/css/contacto-page-meta-backup-202606140-bg-c
 - No hacer publish/draft/deploy de landings desde Greenhouse hasta que EPIC-019 tenga flujo formal de preview, audit, cache y rollback.
 - No introducir una SPA React dentro de WordPress como solucion rapida para landings; si hace falta React en WordPress, usar Gutenberg/admin tooling o Interactivity API con bloques/templates gobernados.
 - No asumir compatibilidad React 19 hasta probar el plugin/theme activo en staging: WordPress revirtio temporalmente ese upgrade en Gutenberg 23.3.2.
+
+## Texto bajo el switcher Dark/Light o «Follow Us»
+
+Desde 1181 px de ancho Ohio fija el switcher Dark/Light a la izquierda y «Follow Us» a la derecha, a `1.5vw + 56px`
+de cada borde. Un canvas de diseño no los dibuja, así que una landing source-led fiel al canvas puede dejar texto
+debajo (copy a sangre con 56–72 px de padding, o un contenedor de 1320 px entre 1181 y ~1320 px).
+
+1. Mide en el navegador, haciendo scroll hasta cada sección, a 1280, 1440 y 1710 px:
+
+```js
+document.querySelector('.elements-bar.left').getBoundingClientRect().right // borde de la barra
+document.querySelector('<selector del texto>').getBoundingClientRect().left // debe quedar ≥ 32 px más allá
+```
+
+2. Corrige en la capa del host de la landing (`scripts/public-website/<landing>-source/host.css`), sólo dentro de
+   `@media (min-width:1181px)`, con un riel compartido. Nosotros usa `--gh-rail: calc(1.5vw + 88px)`; el `.wrap` sólo
+   recibe el riel mientras es más angosto que él (`max(56px, calc(var(--gh-rail) - max(0px, (100vw - 1320px) / 2)))`).
+3. Compila, empaqueta contra el baseline vivo y despliega con el paquete de la landing
+   (`compile-<landing>-elementor-source.cjs` → `pnpm public-website:export-live-code` →
+   `build-<landing>-elementor-package.cjs <baseline>` → `pnpm public-website:wpcli -- --eval-file
+   scripts/public-website/deploy-<landing>-elementor-package.php --input-file tmp/<landing>-elementor-release/package.zip
+   --input-file tmp/<landing>-elementor-release/manifest.json --wp-user 12`).
+4. Verifica en vivo descargando el CSS publicado (`curl` de la URL con `?ver=`) y comparando contra tu archivo local;
+   no te fíes sólo del código de salida del deploy (un deploy que reportó error ya se había aplicado y el reintento
+   respondió «Live drift»).
+
+No muevas a la vez un bloque que en el diseño aprobado se ve bien: en Nosotros el hero centrado en 1320 px se iba
+sobre la parte iluminada de la foto en pantallas anchas y se ancló al riel izquierdo, como en la composición aprobada.
 
 ## Problemas comunes
 

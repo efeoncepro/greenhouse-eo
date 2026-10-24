@@ -1,0 +1,136 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "82a7cbe9d65e",
+  "key": "82a7cbe9d65ecad58c889ffa19f16f058d0db873cc622728d3aa3f1c3dc0cfcf",
+  "status": "completed",
+  "createdAt": "2026-10-20T11:38:47.386Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_propuesta-gana-programatica/metro/agua-comp.png",
+    "imageSha256": "553f0f8aec9ba9dec7a3a84464eefa2ec6a534736b38dcc82766c4be7b5b12f5",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_propuesta-gana-programatica/metro/mask-agua-fin.png",
+    "maskSha256": "9e0d43f15c2c392fd409c13af57fd23f57f4016959c7ce128906b22ab57aa142",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2550,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Photographic finishing only. The advertising screen inside the masked area is already finished and correct: keep its layout, every word, the numbers, the logo, its colors and its position exactly as they are. Only make it look physically photographed in this place: a real backlit LED screen as captured by this same camera, with the same sharpness, slight lens softness, sensor noise and white balance as the rest of the photo, the faint glare and reflection of the surrounding daylight and windows on the screen glass, a gentle brightness falloff toward the edges, and the bezel catching the ambient light. Do not redraw, restyle, translate or move any text or logo.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nPhotographic finishing only. The advertising screen inside the masked area is already finished and correct: keep its layout, every word, the numbers, the logo, its colors and its position exactly as they are. Only make it look physically photographed in this place: a real backlit LED screen as captured by this same camera, with the same sharpness, slight lens softness, sensor noise and white balance as the rest of the photo, the faint glare and reflection of the surrounding daylight and windows on the screen glass, a gentle brightness falloff toward the edges, and the bezel catching the ambient light. Do not redraw, restyle, translate or move any text or logo.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.04963235294117647,
+    "editable": 486000,
+    "soft": 0,
+    "protected": 9306000
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2550
+    },
+    "target": {
+      "width": 2336,
+      "height": 1568
+    },
+    "aspectError": 0.01079774375503618,
+    "reason": "la zona con contexto ocupa 26 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0653,
+    "basis": "1 × salida 2336x1568 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 34.552,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.87,
+        "bestError": 4.87,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -1.29,
+        -1.59,
+        0.43
+      ],
+      "protected": {
+        "pixels": 9306000,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 486000,
+        "maxDelta": 253,
+        "meanDelta": 34.552,
+        "worst": {
+          "x": 2214,
+          "y": 1110
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 9306000,
+        "maxDelta": 195,
+        "meanDelta": 9.165,
+        "worst": {
+          "x": 3186,
+          "y": 415
+        }
+      },
+      "outputUsd": 0.0653,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3290,
+        "input_tokens_details": {
+          "image_tokens": 3008,
+          "text_tokens": 282
+        },
+        "output_tokens": 2175,
+        "output_tokens_details": {
+          "image_tokens": 2175,
+          "text_tokens": 0
+        },
+        "total_tokens": 5465
+      },
+      "meta": {
+        "size": "2336x1568",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

@@ -7,7 +7,7 @@ description: Crear, modificar y validar templates React Email operados por Green
 
 ## Envíos desde el Outlook de Julio
 
-Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
+Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma gráfica oficial siempre y CCO `48713323@bcc.hubspot.com`, incluidos correos nuevos, respuestas, reenvíos y seguimientos manuales, programados o por secuencias (Julio, 21/10/2026). Usar Outlook UI o transporte HTML autorizado que conserve la firma; texto plano no es alternativa. Si la herramienta no la preserva, dejar el correo pendiente sin enviarlo. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
 
 
 Construye correos de Greenhouse sobre el catálogo y la entrega existentes. La unidad de trabajo no es solo el
@@ -225,6 +225,14 @@ fecha y motivo, en el registro `EMAIL_PRESENTATION_POLICY`; nunca se infieren. E
 excepción, `application` al contrato `efeonce.email-modules` `0.2.0` (publicado en `v0.3.39`, commit `1c18a2e`), que ya no exige la
 agenda; nunca quita módulos por su cuenta. Adopción: TASK-1944. Detalle en
 [references/footer-presentation.md](references/footer-presentation.md) §«Módulos canónicos».
+
+## Correo editorial de Efeonce (operador, 2026-10-22)
+
+**Glitch es el newsletter canónico y el único correo de Efeonce** (hoy no está en el catálogo de correos de
+Greenhouse). Marketing con Manzanitas vive como newsletter quincenal en el LinkedIn de Julio y **no tiene correo
+propio**: no crees un template, tipo ni broadcast de Manzanitas; si hiciera falta, lo evergreen entra a Glitch como
+sección. Canon: [PDR-020, delta 2026-10-22](../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)
++ [estrategia de love brand §8.2](../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md).
 
 ## Verificación mínima
 

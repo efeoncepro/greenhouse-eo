@@ -1,5 +1,11 @@
 # Lecciones (trampas que ya costaron tiempo)
 
+> Delta 2026-10-20 (propuesta Assetplan) verificado contra: greenhouse-eo `develop` en `697fbecb6` (receta
+> `content-live-chat` en `c0e435b38`), AXIS `9e72d38` y la corrida `ai-generations/2026-10-20_propuesta-assetplan/`.
+
+> Delta 2026-10-19 (anuncio de alianza Efeonce | Google) verificado contra: greenhouse-eo `develop` en `cb9a8e666` y la
+> corrida `ai-generations/2026-10-19_google-partner-freeze/`.
+
 > Verificado contra: greenhouse-eo `develop` en `b0efd42a3` (árbol local de TASK-1964, sin commit propio todavía) —
 > 2026-10-02 (última entrada: el login V4 de Greenhouse); antes, `d1a41babb` — 2026-10-01 (los perfiles sociales y los
 > destacados de Instagram); antes, `b84ec7084` — 2026-09-30 (el deck SEO/AEO, TASK-1949); antes, AXIS `c92160b` (tag `v0.3.38`) — 2026-09-29, noche (el camino recorrido y los
@@ -788,3 +794,114 @@ láminas 16:9, Efeonce Creative Studio) y el reel de muestra. Fuente: `ai-genera
   `ground-family` y los contrastes de Engine (3,8:1) y Voice (4,7:1) medidos sobre `ground`.
 - **Misma pasada:** en un menú, los nombres de línea son navegación y van en Poppins (Bricolage sólo para títulos y voz
   editorial, [criteria.md](criteria.md), «Rooms: design system de producto»).
+
+## 2026-10-19 — Deck para un cliente armado a mano en un canvas de Design (propuesta SGS Chile)
+
+- **Síntoma:** el operador pidió «con /design arma un canvas con la propuesta en un deck» y la sesión dibujó las 14
+  láminas a mano en `.dc.html` con los componentes del design system La órbita en Claude. El operador lo rechazó:
+  portada y contraportada distintas de las canónicas (se copió la voz de la portada de SKY, la contraportada no era la
+  `close-proposal-horizon` de la línea), y selección, cursores y etiquetas dibujados a mano («cambiaste hasta los
+  bounding box»).
+- **Causa:** no se cargó esta skill antes de componer; se tomó el design system como kit de piezas sueltas y no como el
+  catálogo de recetas aprobadas.
+- **Regla:** un deck de marca propia, aunque se vaya a mostrar en un canvas, se compone con `pnpm brand:compose` sobre
+  recetas aprobadas: plan con `pnpm brand:deck-plan -- --plan` → un intent por lámina partiendo del ejemplo más cercano
+  de `src/lib/brand-surfaces/examples/` → PNG compuesto → canvas que sólo muestra esos PNG (patrón de
+  `ai-generations/2026-10-06_deck-hubspot/build-canvas.py`). El canvas nunca redibuja una lámina.
+- **Trampas medidas en esta corrida** (carpeta `ai-generations/2026-10-19_propuesta-sgs-contactabilidad/`):
+  `selected`, `selectedVerdict` y `selectedStep` son base 1; una selección en la columna derecha de `content-bullets`
+  sale del lienzo con el ancla por defecto (`top-end`) y pide `selection.anchor` (`bottom-start` en la fila de abajo,
+  `top-start` en la de arriba, para que la etiqueta no tape el texto vecino); `decision-risk` sólo existe en claro y una
+  pieza de línea debe ir en oscuro (`line-piece-keeps-efeonce-dark`), así que se compone como lámina de Efeonce en
+  `growth`, igual que en el deck HubSpot; `decision-plan` antepone «n · » al `range` dentro del máximo de 16;
+  `content-pricing` exige 4 o 5 prestaciones por plan; `cover-proposal` no pinta la insignia de partner (va en la
+  contraportada).
+
+## 2026-10-19 — Anuncio de alianza «Efeonce | Google» (post + reel)
+
+Carpeta: `ai-generations/2026-10-19_google-partner-freeze/` (`r4-impacto-premium/`, `r5-cine/`, `export/`). Tarjeta:
+[applications.md](applications.md) §A16.
+
+- **El acabado Sunburst borró el contorno de tinta de Gigi** (ronda de objetos con Gigi, luego rechazada). Síntoma: la mascota perdió su trazo negro
+  exterior tras la pasada de acabado. Causa: la pasada redibuja todo; un trazo fino de identidad no sobrevive.
+  Regla: después de todo acabado generativo, comparar al 100 % cada marca, mascota o ícono contra la escena compuesta;
+  lo que cambió se **repone componiendo** el original (aquí, el contorno de la pose original), no regenerando.
+- **Un núcleo de luz detrás del logo blanco dejaba 1,3:1.** Síntoma: el fondo con la luz concentrada en el centro se
+  comía el lockup. Causa: la luz ocupaba la caja de la firma. Regla: el fondo se pide con la luz como **horizonte bajo**
+  (≈ 60–64 % del alto) y el **centro oscuro** para el título, y el contraste se **mide bajo la caja de la firma antes de
+  componer** (la versión final quedó en 15–19:1 de media). Nunca rescatar con scrim.
+- **`pnpm ai:inpaint expand` no corrió: fal sin saldo.** Síntoma: «User is locked. Exhausted balance» en la cuenta
+  `FAL_API_KEY_B` (el expand usa Flux Fill por fal). Regla: `pnpm ai:fal --balance` antes de planear un expand; recargar
+  lo hace el operador. El fallback usado: extender el 4:5 a 9:16 **de forma determinística** (color por columna +
+  grano), válido porque el fondo era un espacio vacío sin objetos que continuar.
+- **`pnpm ai:inpaint image` abortó porque el prompt decía «logos»**, aunque fuera en negativo («sin logos»). Causa: la
+  guarda de marca lee la palabra, no la intención. Regla: si la edición toca el contexto y el prompt tiene que nombrar
+  marcas o logos, `--allow-brand`; nunca para generar o reconstruir una marca.
+- **`pnpm ai:image` generó con `gpt-image-2`** (carpeta `v1-gpt-image-2/`). Causa: es el default del CLI. El operador
+  esperaba GPT Image 2.5. Regla: pedir siempre `--model gpt-image-2.5-flare` (fondo) o `--model gpt-image-2.5-sunburst`
+  (acabado o edición final).
+- **El isotipo de Google Cloud salió cortado a la derecha.** Causa: se recortó de `google_cloud_logo.svg` con un
+  `viewBox` escrito a mano. Regla: usar el ícono completo (OneDrive `Workspace/Portafolio/03 DDSoft/Recursos}/google-cloud-1.svg`)
+  o calcular el bbox real del trazo antes de recortar; nunca estimar el `viewBox` a ojo.
+
+## 2026-10-20 — Landing `/agenda/`: el agendador dibujado y el verde lima
+
+Tarjeta: [applications.md](applications.md) §A17. Decisiones: [ledger.md](ledger.md) (2026-10-20).
+
+- **El agendador dibujado en el canvas no es el agendador.** Síntoma: la corrección del operador: la landing tiene que
+  funcionar con el agendador real, nunca con uno dibujado. Causa: tratar el componente vivo como una ilustración más de
+  la composición. Regla: la fuente del carril (`agenda-source/Main.dc.html`) va sin agendador dibujado y la landing se
+  diseña **alrededor del componente real** (`<efeonce-meeting-scheduler>`): el canvas deja el hueco, el host sólo lo
+  enmarca y lo tematiza con `--gh-meeting-*`, y la evidencia se toma con el agendador cargado con disponibilidad real.
+  Tampoco se promete en el copy lo que el agendador no hace (se retiró «Quién te recibe»: Nexa no acompaña dentro).
+- **El verde lima `cta-growth` se coló en el CTA.** Síntoma: el CTA de la landing salió en `#7ed600`; el operador: «Este
+  verde no lo usamos en ninguna parte de nuestra línea gráfica». Causa: se tomó el token `cta-growth` oscuro porque
+  existe en `tokens.json`. Regla: el CTA Growth sobre oscuro va en `accent-growth` con texto `ground`; antes de usar un
+  token `cta-*`, comprobar que aparece en una pieza aprobada ([criteria.md](criteria.md), «CTA de landing: sin verde
+  lima»).
+
+## 2026-10-20 — Propuesta Assetplan (deck de 22 láminas, `revenue-hubspot`)
+
+Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md` lista cada ajuste fuera de receta). Recetas:
+[README de recetas](../../../../docs/operations/brand-graphic-line/deck-recipes/README.md), «La propuesta Assetplan».
+
+- **El chip de `content-live-chat` mostraba la nube de Salesforce en un deck HubSpot.** Síntoma: el operador lo
+  rechazó: «no forces nada, sino consigues la receta haz una nueva, no parches». Causa: el logo de la plataforma
+  estaba fijo en la receta. Regla: corregir la receta, no la lámina. Desde `c0e435b38`
+  (`src/lib/brand-surfaces/recipes/line-stage/content-live-chat.ts`) el logo sigue a la línea con
+  `productPartnerOf(line)` (isotipo de HubSpot en `revenue-hubspot`, Salesforce en las demás) y el wordmark Claudeforce
+  (`platformMark`) se rechaza con `invalid-intent` fuera de Salesforce.
+- **Una cifra sobre foto no muestra una inversión.** Síntoma: el precio en `content-focus` fue rechazado: «no se detalla
+  bien ni el precio real ni la oferta… agarra alguna adecuada de pricing». Regla: cuando la propuesta necesita el precio
+  a la vista, la receta es `content-pricing` live (líneas con monto, total, CTA «Aprobar propuesta», chips laterales).
+  Los montos van como `[MONTO]` (`src/lib/brand-surfaces/recipes/close.ts`, `AMOUNT`); montos reales sólo con excepción
+  explícita del operador, documentada en el `LEEME.md` de la corrida, y con un script que sólo reemplaza el marcador
+  sobre el builder y la plantilla canónicos (aquí, `render-eyebrow-chip.ts --montos`).
+- **La respuesta señalaba como equipo a personajes generados.** Síntoma: en `section-cine` `team` (foto del elenco
+  ficticio con Nexa), «Este equipo» fue rechazado porque «los de la foto son personajes generados con IA». Regla: nunca
+  una respuesta que presente a las personas de una foto de elenco ficticio o generado como el equipo real; la
+  respuesta nombra la capacidad («Expertos.», con «**Multidisciplinarios** en CRM, desarrollo, integraciones y datos,
+  con una contraparte.»). Ojo: el `example` de la receta `section-cine-team` es justamente «Este equipo», y la respuesta
+  admite 16 caracteres («multidisciplinarios», 19, no cabe: va en la evidencia).
+- **Pregunta en tres líneas pegada a la respuesta gigante.** Síntoma: «¿Tengo que reemplazar mis sistemas?» en
+  `decision-platform-coexistence` se partía en tres líneas y tocaba la respuesta; el operador: «Esto se ve mal».
+  Regla: la pregunta va en una o dos líneas; si llega a tres, se acorta (quedó «¿Y mis otros sistemas?»), no se mueve
+  la respuesta.
+- **La órbita en una foto no es un aro con una esfera suelta.** Síntoma: la contraportada BR3h v1, un aro grueso con la
+  esfera rosada aparte, fue rechazada: «se ve super artificial la órbita con ese punto rosado allí, no estás sabiendo
+  cómo funciona la órbita». Regla (§1.3): anillo fino y tenue, un arco corto (≈ 50°) en el acento que termina en la
+  esfera, del mismo color y trazo; nunca una esfera suelta. Recolorear una foto de otra línea tampoco sirve (rotación de
+  tono: «se nota mucho, sobre todo en la esfera»; inpaint: «en exceso rosado»): se regenera la foto. La norma de foto y
+  el registro cine los lleva la sesión de fotografía.
+- **El eyebrow como chip de contorno sin relleno no es estándar.** Fue un pedido del operador sólo para esta propuesta,
+  hecho clonando el catálogo `graphic-line-deck` en una carpeta temporal (`render-eyebrow-chip.ts`); el catálogo del
+  repo no cambió. Regla: no aplicarlo en otro deck hasta que el operador lo apruebe para todos; si se adopta, va como
+  propuesta a AXIS.
+- **Portada de propuesta sin pregunta, sin parche.** El script de SGS que retira la pregunta
+  (`quitar-pregunta-portada.mjs`) es el parche que el operador no quiere. AXIS ya tiene `cover-proposal` ·
+  `orbit-decision` (publicada en AXIS v0.7.6: `axis-ui-contracts` 0.7.6 / `axis-tokens` 0.6.6, commit `9e72d38`; referencia aprobada `cover-proposal-orbit-decision-assetplan`), pero Greenhouse fija 0.3.4x y
+  no la ve hasta TASK-2014. Regla mientras tanto: armar la portada a mano con las medidas del token
+  (`portada-orbit-decision.css` de la corrida), como la A01 aprobada ([criteria.md](criteria.md), caso SGS).
+- **El compositor no emite enlaces en el PDF.** Para que la tarjeta de agenda de `decision-next-steps` lleve a
+  `https://efeoncepro.com/agenda/` se agregó una anotación URI con pdf-lib al armar el PDF (`pdf-sprocket.mjs`,
+  constante `LINKS`) y un `<a>` sobre la tarjeta en el canvas.

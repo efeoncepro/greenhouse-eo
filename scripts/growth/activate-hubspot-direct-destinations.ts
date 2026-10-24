@@ -20,6 +20,12 @@ import 'server-only'
  *      `direct` con el mapeo del registro, publica y depreca las versiones publicadas previas.
  *      Sólo vía commands canónicos; exige contract check limpio.
  *
+ * Suscripciones (`spec.communications`): cada casilla OPCIONAL declarada se resuelve contra el
+ * consentimiento publicado (debe existir y no ser obligatoria) y su texto se toma de la etiqueta
+ * publicada; el subscription type se verifica activo y no interno con una lectura de
+ * `/communication-preferences/v3/definitions`. Si la etiqueta cambia, la idempotencia lo detecta
+ * y planifica una versión nueva con el texto vigente.
+ *
  * DRY-RUN por defecto (sin flags no muta nada). Rollback de un formulario: republicar la versión
  * anterior o adjuntar el destino con `delivery_mode='disabled'`; nunca borrar attempts.
  *
@@ -36,6 +42,7 @@ import {
   buildSecureSubmitBody,
   HUBSPOT_FORMS_ADAPTER_KIND,
   HUBSPOT_FORMS_ADAPTER_VERSION,
+  type HubSpotCommunicationMapping,
 } from '@/lib/growth/forms/destinations/hubspot/adapter'
 import { resolveNameNormalizationPolicy } from '@/lib/growth/forms/name-normalization'
 import {
@@ -610,6 +617,96 @@ const sameMapping = (a: unknown, b: Record<string, string>): boolean => {
   return Object.keys(left).length === keys.length && keys.every(key => left[key] === b[key])
 }
 
+interface HsSubscriptionDefinition {
+  id: string
+  name?: string
+  isActive?: boolean
+  isInternal?: boolean
+}
+
+let cachedSubscriptionDefinitions: HsSubscriptionDefinition[] | null = null
+
+/** Lectura (GET) de los subscription types del portal; cacheada por corrida. */
+const readSubscriptionDefinitions = async (): Promise<HsSubscriptionDefinition[]> => {
+  cachedSubscriptionDefinitions ??= (
+    await hsOrThrow<{ subscriptionDefinitions?: HsSubscriptionDefinition[] }>('GET', '/communication-preferences/v3/definitions')
+  ).subscriptionDefinitions ?? []
+
+  return cachedSubscriptionDefinitions
+}
+
+/**
+ * Resuelve `spec.communications` contra el consentimiento PUBLICADO: la casilla debe existir y ser
+ * opcional (una casilla obligatoria no es un opt-in libre) y el texto es su etiqueta publicada.
+ * Devuelve el mapping para el destino y los motivos de bloqueo.
+ */
+const resolveCommunications = async (
+  spec: HubSpotDestinationSpec,
+  current: FormVersionRow,
+): Promise<{ communications: HubSpotCommunicationMapping[]; blocked: string[] }> => {
+  const declared = spec.communications ?? []
+
+  if (declared.length === 0) return { communications: [], blocked: [] }
+
+  const copyRefs = asObject(current.copy_refs_json)
+  const copy = asObject(copyRefs.copy)
+  const checkboxes = (Array.isArray(copyRefs.checkboxes) ? copyRefs.checkboxes : []).map(asObject)
+  const definitions = await readSubscriptionDefinitions()
+  const communications: HubSpotCommunicationMapping[] = []
+  const blocked: string[] = []
+
+  for (const entry of declared) {
+    const checkbox = checkboxes.find(candidate => candidate.key === entry.checkboxKey)
+
+    if (!checkbox) {
+      blocked.push(`la casilla "${entry.checkboxKey}" no existe en el consentimiento publicado v${current.version}`)
+      continue
+    }
+
+    // `consentDisplaySchema` asume required=true cuando falta: sólo `false` explícito es opt-in.
+    if (checkbox.required !== false) {
+      blocked.push(`la casilla "${entry.checkboxKey}" es obligatoria: una suscripción sólo nace de una casilla opcional`)
+      continue
+    }
+
+    const label =
+      typeof checkbox.label === 'string' && checkbox.label.trim()
+        ? checkbox.label.trim()
+        : typeof checkbox.copyRef === 'string' && typeof copy[checkbox.copyRef] === 'string'
+          ? String(copy[checkbox.copyRef]).trim()
+          : ''
+
+    if (!label) {
+      blocked.push(`la casilla "${entry.checkboxKey}" no tiene etiqueta publicada para usar como texto de la suscripción`)
+      continue
+    }
+
+    const definition = definitions.find(candidate => candidate.id === String(entry.subscriptionTypeId))
+
+    if (!definition || definition.isActive !== true || definition.isInternal === true) {
+      blocked.push(`el subscription type ${entry.subscriptionTypeId} no existe en HubSpot, no está activo o es interno`)
+      continue
+    }
+
+    communications.push({ checkboxKey: entry.checkboxKey, subscriptionTypeId: entry.subscriptionTypeId, text: label })
+  }
+
+  return { communications, blocked }
+}
+
+const sameCommunications = (a: unknown, b: HubSpotCommunicationMapping[]): boolean => {
+  const left = (Array.isArray(a) ? a : []).map(asObject)
+
+  return (
+    left.length === b.length &&
+    b.every((entry, index) =>
+      left[index].checkboxKey === entry.checkboxKey &&
+      left[index].subscriptionTypeId === entry.subscriptionTypeId &&
+      left[index].text === entry.text,
+    )
+  )
+}
+
 const resolveConsentText = (current: FormVersionRow, previousMapping: Record<string, unknown>): string => {
   if (typeof previousMapping.consentText === 'string' && previousMapping.consentText.trim()) return previousMapping.consentText
 
@@ -669,6 +766,16 @@ const processSpec = async (spec: HubSpotDestinationSpec): Promise<Outcome> => {
     .filter(key => !mappedKeys.has(key) && !(namePolicy.mode === 'split_full_name' && key === namePolicy.sourceField))
 
   console.log(`  Greenhouse v${current.version} (${current.form_version_id}) · campos sin mapear: ${unmapped.join(', ') || 'ninguno'}`)
+
+  const resolvedCommunications = await resolveCommunications(spec, current)
+
+  outcome.blocked.push(...resolvedCommunications.blocked)
+
+  const { communications } = resolvedCommunications
+
+  for (const entry of communications) {
+    console.log(`  Suscripción: casilla ${entry.checkboxKey} → subscription type ${entry.subscriptionTypeId} · texto «${entry.text}»`)
+  }
 
   if (outcome.blocked.length > 0) return outcome
 
@@ -747,6 +854,7 @@ const processSpec = async (spec: HubSpotDestinationSpec): Promise<Outcome> => {
     live[0].delivery_mode === 'direct' &&
     asObject(live[0].mapping_json).formGuid === form.id &&
     sameMapping(asObject(live[0].mapping_json).fieldMapping, fieldMapping) &&
+    sameCommunications(asObject(live[0].mapping_json).communications, communications) &&
     publishedVersions.length === 1
 
   if (alreadyDirect) {
@@ -757,7 +865,8 @@ const processSpec = async (spec: HubSpotDestinationSpec): Promise<Outcome> => {
   }
 
   const plannedGreenhouse =
-    `clonar v${current.version} → destino direct (${Object.keys(fieldMapping).length} campos) → publicar → ` +
+    `clonar v${current.version} → destino direct (${Object.keys(fieldMapping).length} campos` +
+    `${communications.length > 0 ? `, ${communications.length} suscripción(es)` : ''}) → publicar → ` +
     `deprecar ${publishedVersions.map(version => `v${version.version}`).join(', ')}`
 
   if (!APPLY_GREENHOUSE) {
@@ -805,6 +914,7 @@ const processSpec = async (spec: HubSpotDestinationSpec): Promise<Outcome> => {
       formGuid: form.id,
       fieldMapping,
       consentText: resolveConsentText(current, previousMapping),
+      ...(communications.length > 0 ? { communications } : {}),
     },
     consentRequirements: { policyVersion: current.consent_policy_version, requiresConsent: true },
     retryPolicy: RETRY_POLICY,

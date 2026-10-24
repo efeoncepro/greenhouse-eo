@@ -42,7 +42,7 @@ const infra = vi.hoisted(() => ({ withTx: vi.fn(async (fn: (client: unknown) => 
 vi.mock('@/lib/postgres/client', () => ({ withGreenhousePostgresTransaction: infra.withTx, runGreenhousePostgresQuery: infra.pgQuery }))
 vi.mock('@/lib/sync/publish-event', () => ({ publishOutboxEvent: infra.publish }))
 
-const ENV_ON = { INSIGHTS_RENDER_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv
+const ENV_ON = { INSIGHTS_RENDER_ENABLED: 'true' }
 const internalSubject = { userId: 'user-int', tenantType: 'efeonce_internal' as const, roleCodes: ['efeonce_account'], primaryRoleCode: 'efeonce_account', routeGroups: ['internal'], authorizedViews: [], memberId: 'mem-1' }
 const clientSubject = { userId: 'user-cli', tenantType: 'client' as const, roleCodes: ['client_manager'], primaryRoleCode: 'client_manager', routeGroups: ['client'], authorizedViews: [] }
 
@@ -74,7 +74,7 @@ describe('requestInsightRender', () => {
   it('flag OFF ⇒ render_disabled antes de tocar la base', async () => {
     const { requestInsightRender } = await import('./commands')
 
-    await expect(requestInsightRender({ ...scope, env: {} as NodeJS.ProcessEnv })).rejects.toMatchObject({ code: 'render_disabled' })
+    await expect(requestInsightRender({ ...scope, env: {} })).rejects.toMatchObject({ code: 'render_disabled' })
     expect(stores.getInsightEditionById).not.toHaveBeenCalled()
   })
 

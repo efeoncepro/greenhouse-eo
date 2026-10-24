@@ -1,0 +1,48 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "role": "method",
+  "recipe": "method-waves",
+  "voice": {
+    "eyebrow": "Cómo se llega",
+    "question": "¿Por dónde empezamos?",
+    "answer": [
+      "Por",
+      "Chile"
+    ]
+  },
+  "body": "Las tres primeras etapas no cambian Salesforce: la solicitud a la región llega con **datos**.",
+  "steps": [
+    {
+      "kicker": "Empieza aquí",
+      "name": "Diagnóstico",
+      "desc": "Procesos, reglas de seguimiento y línea base del equipo."
+    },
+    {
+      "kicker": "Sin la región",
+      "name": "Piloto",
+      "desc": "Correo, llamadas y WhatsApp en un equipo de Chile, con su panel."
+    },
+    {
+      "kicker": "Con la región",
+      "name": "Conexión",
+      "desc": "Cada contacto quedará en la ficha del cliente en Salesforce."
+    },
+    {
+      "kicker": "On-Going",
+      "name": "Operación",
+      "desc": "Soporte, informe mensual y mejora continua."
+    }
+  ],
+  "selectedStep": 1,
+  "selection": {
+    "target": "object",
+    "label": "SGS",
+    "participantKind": "role"
+  },
+  "line": "revenue-salesforce"
+}

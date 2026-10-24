@@ -41,6 +41,8 @@ import { isSeoKeywordDiscoveryEnabled, isSeoModuleEnabled } from '../flags'
 import { normalizeMarketKeyword } from '../keyword-market-data'
 import { resolveSeoTargetForMarket } from '../resolve-target'
 
+import type { EnvSource } from '@/types/env-source'
+
 // ─── Tipos del command ──────────────────────────────────────────────────────────────
 
 /** Seed resuelta server-side. `origin` conserva la procedencia por seed (fuente `mixed`). */
@@ -66,7 +68,7 @@ export interface QueueKeywordDiscoveryInput {
   actor: string
   /** Si no viene, se deriva del intent completo (org+target+seeds+mercado+methods+actor). */
   idempotencyKey?: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 export interface DiscoveryRunLimits {

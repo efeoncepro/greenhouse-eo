@@ -14,7 +14,10 @@ import { emitGoogleAdsConversion } from '../growth-google-ads-conversion/convers
  */
 import type {
   PublicSubmitOutcome,
+  PublicSubmitResult,
+  RendererRegistrationStatus,
   RenderContract,
+  RendererConsentDisplay,
   RendererFieldDefinition,
   RendererSuccessBehavior,
   RendererSuccessCardAction,
@@ -34,7 +37,22 @@ import {
 } from './mask'
 import { resolveSystemCopy, type RendererSystemCopy } from './copy'
 import { validateField, validateFields, type FieldErrors } from './validation'
-import { createTelemetryEmitter, type TelemetryEmitter, type TelemetryPayload } from './telemetry'
+import {
+  createTelemetryEmitter,
+  dispatchGrowthFormSuccess,
+  GROWTH_FORM_SUCCESS_EVENT,
+  type GrowthFormSuccessDetail,
+  type TelemetryEmitter,
+  type TelemetryPayload
+} from './telemetry'
+import {
+  applyInlinePillState,
+  buildInlinePill,
+  setInlinePillError,
+  type InlinePillLabels,
+  type InlinePillRefs,
+  type InlinePillState
+} from './inline-pill'
 import { submitPublicForm, verifyPublicEmail, type RendererApiConfig } from './api-client'
 import { RENDERER_VERSION } from './version'
 import { TurnstileTokenClient } from './turnstile'
@@ -71,6 +89,15 @@ export interface FormRendererOptions {
 
 /** Atributo que excluye un <form> de la captura de formularios no-HubSpot de HubSpot. */
 export const HUBSPOT_DO_NOT_COLLECT_ATTRIBUTE = 'data-hs-do-not-collect'
+
+/** TASK-2044 — Único marcador del enlace a la política en una casilla (espejo de `CONSENT_PRIVACY_LINK_MARKER`). */
+export const CONSENT_PRIVACY_LINK_MARKER = '{privacyLink}'
+
+/**
+ * TASK-2045 — Evento DOM que pide al anfitrión cerrar la superficie que contiene al formulario (acción
+ * de éxito `dismiss`). No es telemetría: se emite aunque la política de telemetría esté apagada.
+ */
+export const GROWTH_FORM_DISMISS_EVENT = 'ghf:dismiss'
 
 const el = <K extends keyof HTMLElementTagNameMap>(
   doc: Document,
@@ -120,6 +147,19 @@ export class FormRenderer {
   private readonly touched = new Set<string>()
   private currentStep = 0
   private submitting = false
+  /** TASK-2054 — el formulario ya confirmó (por envío propio o de otra instancia del mismo formulario). */
+  private succeeded = false
+  private successListener: ((event: Event) => void) | null = null
+
+  // ─── Presentación inline_pill (TASK-2054) ────────────────────────────────────
+  private inlineRefs: InlinePillRefs | null = null
+  private inlineState: InlinePillState = 'idle'
+  private inlineRegistration: RendererRegistrationStatus | undefined
+  private readonly inlineTimers = new Set<ReturnType<typeof setTimeout>>()
+  /** Del canvas: el campo aparece a los 200 ms y el foco entra a los 260; el éxito queda 1,4 s. */
+  private static readonly INLINE_FOCUS_DELAY_MS = 260
+  private static readonly INLINE_RESTORE_FOCUS_DELAY_MS = 60
+  private static readonly INLINE_SUCCESS_HOLD_MS = 1400
   private started = false
   private destroyed = false
 
@@ -196,6 +236,11 @@ export class FormRenderer {
       }
     }
 
+    // TASK-2053 — el valor fijo de un campo oculto gana sobre `initial-values` (el servidor lo impone igual).
+    for (const field of this.contract.fields) {
+      if (field.type === 'hidden' && field.staticValue !== undefined) this.values[field.key] = field.staticValue
+    }
+
     // Restaura un borrador PII-safe (sin cédula/consent) si existe (TASK-1256 Slice 1d).
     try {
       if (this.restoreDraft()) this.draftRestored = true
@@ -237,12 +282,23 @@ export class FormRenderer {
 
     if (this.opts.colorScheme) this.opts.root.setAttribute('data-color-scheme', this.opts.colorScheme)
     if (this.contract.styleVariant) this.opts.root.setAttribute('data-ghf-style-variant', this.contract.styleVariant)
+    if (this.isInlinePill()) this.opts.root.setAttribute('data-ghf-presentation', 'inline_pill')
+
+    // TASK-2054 — otra instancia del mismo formulario que confirma lleva a ésta a su estado final.
+    this.successListener = event => this.onPeerSuccess(event)
+    this.doc.addEventListener(GROWTH_FORM_SUCCESS_EVENT, this.successListener)
+
     this.telemetry.emit('gh_form_viewed', {})
     this.renderForm()
   }
 
   destroy(): void {
     this.destroyed = true
+    if (this.successListener) this.doc.removeEventListener(GROWTH_FORM_SUCCESS_EVENT, this.successListener)
+    this.successListener = null
+    for (const timer of this.inlineTimers) clearTimeout(timer)
+    this.inlineTimers.clear()
+    this.inlineRefs = null
     for (const timer of this.verifyTimers.values()) clearTimeout(timer)
     this.verifyTimers.clear()
     for (const timer of this.statusTimers.values()) clearTimeout(timer)
@@ -255,6 +311,13 @@ export class FormRenderer {
 
   private renderForm(): void {
     if (this.destroyed) return
+
+    if (this.isInlinePill()) {
+      this.renderInlinePill()
+
+      return
+    }
+
     const root = this.opts.root
 
     root.replaceChildren()
@@ -335,7 +398,7 @@ export class FormRenderer {
 
     form.appendChild(this.renderActions())
 
-    const summary = el(this.doc, 'p', { class: 'ghf-summary', role: 'alert', 'aria-live': 'assertive' })
+    const summary = el(this.doc, 'p', { class: 'ghf-summary', role: 'alert', 'aria-live': 'assertive', 'data-ghf-part': 'summary' })
 
     summary.dataset.ghfSummary = 'true'
     form.appendChild(summary)
@@ -670,7 +733,7 @@ export class FormRenderer {
     const label = this.fieldLabel(field)
 
     if (field.type !== 'checkbox' && field.type !== 'consent') {
-      const labelEl = el(this.doc, 'label', { class: 'ghf-label', for: fieldId })
+      const labelEl = el(this.doc, 'label', { class: 'ghf-label', for: fieldId, 'data-ghf-part': 'label' })
 
       if (field.presentation?.icon && !this.usesInlineControlIcons()) {
         // Label icons are inline SVGs. The text glyphs (`@`, `+`, `·`, `↗`…) rendered as broken words on
@@ -695,9 +758,9 @@ export class FormRenderer {
 
       labelEl.appendChild(el(this.doc, 'span', {}, label))
 
-      if (required) labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-required', 'aria-hidden': 'true' }, '*'))
+      if (required) labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-required', 'aria-hidden': 'true', 'data-ghf-part': 'required-mark' }, '*'))
       else if (!this.labelAlreadyMarksOptional(label))
-        labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-optional' }, '(opcional)'))
+        labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-optional', 'data-ghf-part': 'optional-mark' }, '(opcional)'))
       wrap.appendChild(labelEl)
     }
 
@@ -781,6 +844,10 @@ export class FormRenderer {
   }
 
   private fieldPrefersFullWidth(field: RendererFieldDefinition): boolean {
+    // TASK-2044/2045 — el ancho declarado manda sobre la heurística (`auto` o ausente = heurística).
+    if (field.presentation?.width === 'full') return true
+    if (field.presentation?.width === 'half') return false
+
     if (this.usesCareersStaticFidelity()) {
       if (field.key === 'firstName' || field.key === 'lastName') return false
       if (['email', 'tel', 'select', 'url', 'date', 'number'].includes(field.type)) return true
@@ -992,6 +1059,9 @@ export class FormRenderer {
   private usesPremiumSelect(field?: RendererFieldDefinition): boolean {
     return (
       field?.presentation?.control === 'country_select' ||
+      // Listbox premium opt-in para un `select` simple en cualquier variante (en pillar, sin esto, chips).
+      // En otro tipo se ignora; un valor de control desconocido también cae al control por defecto.
+      (field?.type === 'select' && field.presentation?.control === 'premium_select') ||
       this.contract.styleVariant === 'diagnostic_premium' ||
       this.contract.styleVariant === 'careers-html-fidelity'
     )
@@ -2254,6 +2324,49 @@ export class FormRenderer {
     })
   }
 
+  /**
+   * TASK-2045 — El estado de envío también se publica en el root (`data-ghf-busy`): un anfitrión que
+   * contiene el formulario (p. ej. el diálogo de un Growth CTA) no debe cerrarse mientras se envía.
+   */
+  private setSubmitting(value: boolean): void {
+    this.submitting = value
+    this.opts.root.toggleAttribute('data-ghf-busy', value)
+  }
+
+  /**
+   * TASK-2044/2045 — Texto de una casilla de consentimiento. Un único `{privacyLink}` se reemplaza por
+   * un enlace a `privacyUrl` construido con DOM (nunca HTML del autor); el texto del enlace es
+   * `privacyLinkLabel` o el del diccionario del locale.
+   */
+  private buildConsentText(text: string, consent: RendererConsentDisplay): HTMLElement {
+    const span = el(this.doc, 'span', {})
+    const markerAt = text.indexOf(CONSENT_PRIVACY_LINK_MARKER)
+
+    if (markerAt < 0) {
+      span.textContent = text
+
+      return span
+    }
+
+    const linkLabel = consent.privacyLinkLabel ?? this.copy.privacyLinkLabel
+    const before = text.slice(0, markerAt)
+    const after = text.slice(markerAt + CONSENT_PRIVACY_LINK_MARKER.length).replaceAll(CONSENT_PRIVACY_LINK_MARKER, '')
+
+    span.append(this.doc.createTextNode(before))
+
+    if (consent.privacyUrl) {
+      span.appendChild(
+        el(this.doc, 'a', { href: consent.privacyUrl, target: '_blank', rel: 'noopener noreferrer', 'data-ghf-part': 'consent-link' }, linkLabel)
+      )
+    } else {
+      span.append(this.doc.createTextNode(linkLabel))
+    }
+
+    span.append(this.doc.createTextNode(after))
+
+    return span
+  }
+
   private renderConsent(): HTMLElement | null {
     const consent = this.contract.consent
 
@@ -2265,13 +2378,19 @@ export class FormRenderer {
       return null
     }
 
-    const wrap = el(this.doc, 'div', { class: 'ghf-field ghf-field--full' })
+    // TASK-2045 — `compact`: casilla nativa compacta (sin tarjeta); `tile` (o ausente) = la de siempre.
+    const compact = consent.presentation === 'compact'
+
+    const wrap = el(this.doc, 'div', {
+      class: `ghf-field ghf-field--full${compact ? ' ghf-consent--compact' : ''}`,
+      'data-ghf-part': 'consent'
+    })
 
     if (consent.noticeText) wrap.appendChild(el(this.doc, 'p', { class: 'ghf-help' }, consent.noticeText))
 
     for (const box of consent.checkboxes) {
       const id = `${this.instanceId}-consent-${box.key}`
-      const label = el(this.doc, 'label', { class: 'ghf-check', for: id })
+      const label = el(this.doc, 'label', { class: compact ? 'ghf-check ghf-check--compact' : 'ghf-check', for: id })
       const cb = el(this.doc, 'input', { id, type: 'checkbox', name: `consent_${box.key}` })
 
       cb.dataset.ghfConsent = box.key
@@ -2284,11 +2403,14 @@ export class FormRenderer {
         this.patchErrorSummary()
       })
       label.appendChild(cb)
-      label.appendChild(el(this.doc, 'span', {}, box.label ?? box.copyRef ?? 'Acepto'))
+      label.appendChild(this.buildConsentText(box.label ?? box.copyRef ?? 'Acepto', consent))
       wrap.appendChild(label)
     }
 
-    if (consent.privacyUrl) {
+    // El enlace aparte sólo cuando ninguna casilla lo lleva dentro de la frase.
+    const linkInline = consent.checkboxes.some(box => (box.label ?? '').includes(CONSENT_PRIVACY_LINK_MARKER))
+
+    if (consent.privacyUrl && !linkInline) {
       const p = el(this.doc, 'p', { class: 'ghf-help' })
 
       const a = el(
@@ -2328,6 +2450,8 @@ export class FormRenderer {
     const primary = el(this.doc, 'button', { type: 'submit', class: 'ghf-btn' })
 
     primary.dataset.ghfPrimary = 'true'
+    // TASK-2045 — hook estable de estilo para el anfitrión (`[data-ghf-part="submit"]`).
+    primary.dataset.ghfPart = 'submit'
     this.setPrimaryLabel(primary, submitLabel)
     primary.addEventListener('pointerdown', event => {
       // Avoid a pre-click blur validation layout shift moving the submit button under
@@ -2360,10 +2484,10 @@ export class FormRenderer {
     }
 
     // Hint vivo de "campos pendientes / listo para enviar" (TASK-1256 Slice 1d).
-    const wrapper = el(this.doc, 'div', { class: 'ghf-actions-wrap' })
+    const wrapper = el(this.doc, 'div', { class: 'ghf-actions-wrap', 'data-ghf-part': 'actions' })
 
     wrapper.appendChild(actions)
-    const readiness = el(this.doc, 'p', { class: 'ghf-readiness', 'aria-live': 'polite' })
+    const readiness = el(this.doc, 'p', { class: 'ghf-readiness', 'aria-live': 'polite', 'data-ghf-part': 'readiness' })
 
     readiness.dataset.ghfReadiness = 'true'
     if (isLast) wrapper.appendChild(readiness)
@@ -2384,7 +2508,7 @@ export class FormRenderer {
 
     if (trimmed.endsWith('→')) {
       button.appendChild(el(this.doc, 'span', { class: 'ghf-btn-label' }, trimmed.slice(0, -1).trim()))
-      button.appendChild(el(this.doc, 'span', { class: 'ghf-btn-arrow', 'aria-hidden': 'true' }, '→'))
+      button.appendChild(el(this.doc, 'span', { class: 'ghf-btn-arrow', 'aria-hidden': 'true', 'data-ghf-part': 'submit-arrow' }, '→'))
 
       return
     }
@@ -2767,7 +2891,7 @@ export class FormRenderer {
       .filter(([, checked]) => checked)
       .map(([key]) => key)
 
-    this.submitting = true
+    this.setSubmitting(true)
     this.renderForm()
 
     let captchaToken: string | undefined
@@ -2775,7 +2899,7 @@ export class FormRenderer {
     try {
       captchaToken = await this.resolveCaptchaToken()
     } catch {
-      this.submitting = false
+      this.setSubmitting(false)
       this.telemetry.emit('gh_form_submission_rejected', { reason_class: 'captcha_failed' })
       this.renderForm()
       this.setSummary(this.submitErrorMessage('captcha_failed'))
@@ -2805,7 +2929,7 @@ export class FormRenderer {
       this.fetchImpl
     )
 
-    this.submitting = false
+    this.setSubmitting(false)
     this.turnstile?.reset()
 
     if (result.outcome === 'accepted') {
@@ -2823,7 +2947,9 @@ export class FormRenderer {
         ...this.buildAssetDownloadHandoff(result.submissionId)
       })
       this.clearDraft() // enviado OK → el borrador ya no aplica.
+      this.succeeded = true
       this.renderSuccess()
+      this.announceSuccess(result)
 
       return
     }
@@ -2853,7 +2979,8 @@ export class FormRenderer {
       throw new Error('captcha_provider_unsupported')
     }
 
-    this.turnstile ??= new TurnstileTokenClient(this.doc, captcha)
+    // TASK-2045 — el widget vive junto al formulario (padre estable del root, que se redibuja en cada render).
+    this.turnstile ??= new TurnstileTokenClient(this.doc, captcha, () => this.opts.root.parentElement)
 
     return this.turnstile.execute()
   }
@@ -2978,32 +3105,38 @@ export class FormRenderer {
     const body = this.resolveContractCopy(behavior.body, behavior.bodyCopyRef, this.copy.successCardBody)
     const steps = this.resolveSuccessSteps(behavior.steps)
 
+    // `dismiss` (TASK-2044) no navega: se dibuja sin `href`; el resto sigue exigiendo `href`.
     const actions = (behavior.actions ?? [])
       .slice(0, 2)
-      .filter(action => this.successActionLabel(action) && action.href)
+      .filter(action => this.successActionLabel(action) && (action.href || action.kind === 'dismiss'))
 
     const reward = this.buildSuccessReward(behavior.reward)
     const support = this.resolveContractCopy(behavior.supportingNote, behavior.supportingNoteCopyRef)
+
+    const icon = behavior.icon ?? 'celebration'
 
     const card = el(this.doc, 'section', {
       class: 'ghf-success-card',
       role: 'status',
       'aria-live': 'polite',
       tabindex: '-1',
-      'data-capture': 'growth-form-success-card'
+      'data-capture': 'growth-form-success-card',
+      'data-ghf-part': 'success-card',
+      'data-icon': icon
     })
 
     if (steps.length > 0) card.dataset.hasSteps = 'true'
     if (actions.length > 0) card.dataset.hasActions = 'true'
 
-    const mark = el(this.doc, 'span', { class: 'ghf-success-card__mark', 'aria-hidden': 'true' })
+    // TASK-2045 — `celebration` (default) es el de siempre; `orbit`, el glifo de La órbita; `none`, sin ícono.
+    const mark = icon === 'none' ? null : el(this.doc, 'span', { class: 'ghf-success-card__mark', 'aria-hidden': 'true', 'data-ghf-part': 'success-mark' })
 
-    mark.appendChild(this.buildSuccessMarkGraphic())
+    mark?.appendChild(icon === 'orbit' ? this.buildOrbitMarkGraphic() : this.buildSuccessMarkGraphic())
 
-    const content = el(this.doc, 'div', { class: 'ghf-success-card__content' })
+    const content = el(this.doc, 'div', { class: 'ghf-success-card__content', 'data-ghf-part': 'success-content' })
 
-    content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__title' }, title))
-    content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__body' }, body))
+    content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__title', 'data-ghf-part': 'success-title' }, title))
+    content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__body', 'data-ghf-part': 'success-body' }, body))
 
     if (steps.length > 0) {
       const list = el(this.doc, 'ol', { class: 'ghf-success-card__steps' })
@@ -3020,7 +3153,8 @@ export class FormRenderer {
     if (actions.length > 0) {
       const actionRow = el(this.doc, 'div', {
         class: 'ghf-success-card__actions',
-        'data-capture': 'growth-form-success-actions'
+        'data-capture': 'growth-form-success-actions',
+        'data-ghf-part': 'success-actions'
       })
 
       for (const action of actions) {
@@ -3032,9 +3166,44 @@ export class FormRenderer {
 
     if (support) content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__support' }, support))
 
-    card.append(mark, content)
+    if (mark) card.append(mark)
+    card.append(content)
 
     return card
+  }
+
+  /** TASK-2045 — Glifo de La órbita: anillo fino, arco y esfera en la punta (color `--ghf-orbit`). */
+  private buildOrbitMarkGraphic(): SVGSVGElement {
+    const ns = 'http://www.w3.org/2000/svg'
+    const svg = this.doc.createElementNS(ns, 'svg')
+
+    svg.setAttribute('viewBox', '0 0 72 72')
+    svg.setAttribute('fill', 'none')
+    svg.setAttribute('focusable', 'false')
+    svg.setAttribute('class', 'ghf-orbit-mark')
+
+    const ring = this.doc.createElementNS(ns, 'circle')
+
+    ring.setAttribute('class', 'ghf-orbit-mark__ring')
+    ring.setAttribute('cx', '36')
+    ring.setAttribute('cy', '36')
+    ring.setAttribute('r', '30')
+
+    const arc = this.doc.createElementNS(ns, 'path')
+
+    arc.setAttribute('class', 'ghf-orbit-mark__arc')
+    arc.setAttribute('d', 'M 36 6 A 30 30 0 1 1 6 36')
+    arc.setAttribute('pathLength', '1')
+
+    const sphere = this.doc.createElementNS(ns, 'circle')
+
+    sphere.setAttribute('class', 'ghf-orbit-mark__sphere')
+    sphere.setAttribute('cx', '6')
+    sphere.setAttribute('cy', '36')
+    sphere.setAttribute('r', '4')
+    svg.append(ring, arc, sphere)
+
+    return svg
   }
 
   private buildSuccessMarkGraphic(): HTMLElement {
@@ -3129,8 +3298,10 @@ export class FormRenderer {
     action: RendererSuccessCardAction,
     className: string,
     rewardKind?: string
-  ): HTMLAnchorElement {
+  ): HTMLElement {
     const label = this.successActionLabel(action) ?? ''
+
+    if (action.kind === 'dismiss') return this.buildDismissAction(label, className)
 
     const anchor = el(this.doc, 'a', {
       class: `ghf-btn ${className}`,
@@ -3158,6 +3329,27 @@ export class FormRenderer {
     })
 
     return anchor
+  }
+
+  /**
+   * TASK-2044/2045 — «Cerrar» de la tarjeta de éxito. No navega: emite `ghf:dismiss` (DOM, bubbles +
+   * composed) para que el anfitrión cierre su superficie, independiente de la política de telemetría,
+   * y registra el clic con el evento de acción de éxito existente.
+   */
+  private buildDismissAction(label: string, className: string): HTMLButtonElement {
+    const button = el(this.doc, 'button', {
+      type: 'button',
+      class: `ghf-btn ghf-btn--ghost ${className}`,
+      'data-ghf-part': 'success-action'
+    })
+
+    button.appendChild(el(this.doc, 'span', { class: 'ghf-success-card__action-label' }, label))
+    button.addEventListener('click', () => {
+      this.telemetry.emit('gh_form_success_action_clicked', { action_kind: 'dismiss' })
+      this.opts.root.dispatchEvent(new CustomEvent(GROWTH_FORM_DISMISS_EVENT, { bubbles: true, composed: true }))
+    })
+
+    return button
   }
 
   private buildCalendarIcon(): HTMLElement {
@@ -3233,6 +3425,292 @@ export class FormRenderer {
 
   private focusPrimary(): void {
     this.opts.root.querySelector<HTMLElement>('[data-ghf-primary]')?.focus?.()
+  }
+
+  // ─── Presentación inline_pill (TASK-2054) ───────────────────────────────────
+
+  private isInlinePill(): boolean {
+    return this.contract.presentation === 'inline_pill'
+  }
+
+  private inlineEmailField(): RendererFieldDefinition | undefined {
+    return this.contract.fields.find(field => field.type === 'email')
+  }
+
+  private inlineLabels(): InlinePillLabels {
+    const kind = this.contract.form.formKind
+    const defaults = this.copy.inlinePill.byKind[kind] ?? this.copy.inlinePill.fallback
+    const declared = this.contract.inlinePill ?? {}
+    const emailField = this.inlineEmailField()
+    const openLabel = declared.openLabel ?? defaults.openLabel
+
+    const emailLabel =
+      this.resolveContractCopy(emailField?.label, emailField?.copyRef) ?? this.copy.inlinePill.emailLabel
+
+    return {
+      openLabel,
+      submitLabel: declared.submitLabel ?? defaults.submitLabel,
+      successLabel: declared.successLabel ?? defaults.successLabel,
+      doneLabel: declared.doneLabel ?? defaults.doneLabel,
+      emailLabel,
+      note: declared.note ?? this.contract.consent?.noticeText,
+      formAriaLabel: openLabel
+    }
+  }
+
+  private inlineResultLabels(): { success: string; done: string } {
+    const labels = this.inlineLabels()
+
+    if (this.inlineRegistration === 'waitlisted') {
+      return {
+        success: this.contract.inlinePill?.waitlistSuccessLabel ?? this.copy.inlinePill.waitlistSuccessLabel,
+        done: this.contract.inlinePill?.waitlistDoneLabel ?? this.copy.inlinePill.waitlistDoneLabel
+      }
+    }
+
+    return { success: labels.successLabel, done: labels.doneLabel }
+  }
+
+  /** Construye la píldora UNA vez: las transiciones del canvas necesitan los mismos nodos entre estados. */
+  private renderInlinePill(): void {
+    const root = this.opts.root
+
+    if (this.inlineRefs && root.contains(this.inlineRefs.wrap)) return
+
+    const labels = this.inlineLabels()
+    const emailField = this.inlineEmailField()
+    const consent = this.contract.consent
+
+    const refs = buildInlinePill({
+      doc: this.doc,
+      instanceId: this.instanceId,
+      kind: this.contract.form.formKind === 'event_registration' ? 'event' : 'subscribe',
+      labels,
+      placeholder: emailField?.placeholder,
+      autocomplete: emailField?.autocomplete,
+      buildNote: consent && labels.note?.includes(CONSENT_PRIVACY_LINK_MARKER) ? note => this.buildConsentText(note, consent) : undefined,
+      retryLabel: this.copy.retry
+    })
+
+    refs.openButton.addEventListener('click', () => this.openInline())
+
+    refs.input.addEventListener('input', () => {
+      if (emailField) this.values[emailField.key] = refs.input.value
+      this.maybeStart()
+      if (!refs.error.hidden) setInlinePillError(refs, null)
+    })
+
+    refs.input.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || this.inlineState !== 'open') return
+      if (refs.input.value.trim() !== '') return
+      event.preventDefault()
+      this.closeInline()
+    })
+
+    refs.form.addEventListener('submit', event => {
+      event.preventDefault()
+      void this.submitInline()
+    })
+
+    refs.retryButton.addEventListener('click', () => {
+      refs.input.focus({ preventScroll: true })
+      void this.submitInline()
+    })
+
+    root.replaceChildren(refs.wrap)
+    this.inlineRefs = refs
+
+    if (emailField && typeof this.values[emailField.key] === 'string') refs.input.value = String(this.values[emailField.key])
+
+    this.setInlineState(this.succeeded ? 'done' : 'idle')
+  }
+
+  private setInlineState(state: InlinePillState): void {
+    const refs = this.inlineRefs
+
+    this.inlineState = state
+    if (!refs) return
+
+    if (state === 'success' || state === 'done') {
+      const result = this.inlineResultLabels()
+
+      refs.successText.textContent = result.success
+      refs.doneText.textContent = result.done
+      refs.pill.toggleAttribute('data-ghf-inline-waitlisted', this.inlineRegistration === 'waitlisted')
+    }
+
+    applyInlinePillState(refs, state)
+  }
+
+  private scheduleInline(callback: () => void, delayMs: number): void {
+    const timer = setTimeout(() => {
+      this.inlineTimers.delete(timer)
+      if (!this.destroyed) callback()
+    }, delayMs)
+
+    this.inlineTimers.add(timer)
+  }
+
+  private openInline(): void {
+    if (this.inlineState !== 'idle' || !this.inlineRefs) return
+    const refs = this.inlineRefs
+
+    this.setInlineState('open')
+    this.scheduleInline(() => refs.input.focus({ preventScroll: true }), FormRenderer.INLINE_FOCUS_DELAY_MS)
+  }
+
+  private closeInline(): void {
+    const refs = this.inlineRefs
+
+    if (!refs) return
+    setInlinePillError(refs, null)
+    this.setInlineState('idle')
+    this.scheduleInline(() => refs.openButton.focus({ preventScroll: true }), FormRenderer.INLINE_RESTORE_FOCUS_DELAY_MS)
+  }
+
+  /** Mismo envío que el formulario estándar (validación, consentimiento, captcha, API pública, telemetría). */
+  private async submitInline(): Promise<void> {
+    const refs = this.inlineRefs
+    const emailField = this.inlineEmailField()
+
+    if (!refs || !emailField || this.submitting || this.inlineState !== 'open') return
+
+    this.values[emailField.key] = refs.input.value
+    this.touched.add(emailField.key)
+
+    const fieldError = this.validateRendererField(emailField) ?? this.validateConsent()
+
+    if (fieldError) {
+      this.telemetry.emit('gh_form_field_validation_failed', { reason_class: emailField.type })
+      setInlinePillError(refs, fieldError)
+      refs.input.focus({ preventScroll: true })
+
+      return
+    }
+
+    setInlinePillError(refs, null)
+    const honeypot = refs.honeypot.value
+
+    this.setSubmitting(true)
+    this.setInlineState('loading')
+
+    // Gate corporativo (UX; la autoridad es el servidor): el veredicto llega mientras gira el loader.
+    if (this.isEmailGated(emailField) && !this.emailVerifyDisabled) {
+      const verdict = await verifyPublicEmail(this.api, refs.input.value.trim(), this.fetchImpl)
+
+      if (verdict.outcome === 'disabled') this.emailVerifyDisabled = true
+
+      if (verdict.outcome === 'ok' && (verdict.reasonCode === 'email_not_corporate' || verdict.reasonCode === 'email_disposable')) {
+        this.setSubmitting(false)
+        this.setInlineState('open')
+        setInlinePillError(refs, verdict.reasonCode === 'email_disposable' ? this.copy.errors.disposable : this.copy.errors.corporate)
+        refs.input.focus({ preventScroll: true })
+
+        return
+      }
+    }
+
+    let captchaToken: string | undefined
+
+    try {
+      captchaToken = await this.resolveCaptchaToken()
+    } catch {
+      this.setSubmitting(false)
+      this.telemetry.emit('gh_form_submission_rejected', { reason_class: 'captcha_failed' })
+      this.failInline(this.submitErrorMessage('captcha_failed'), false)
+
+      return
+    }
+
+    this.telemetry.emit('gh_form_submitted', {})
+
+    const result = await submitPublicForm(
+      this.api,
+      {
+        fields: this.collectFieldValues(),
+        files: {},
+        consent: this.contract.consent ? (this.contract.consent.checkboxes ?? []).length === 0 : true,
+        consentCheckboxes: [],
+        honeypot,
+        pageUri: this.pageContext.pageUri,
+        pageName: this.pageContext.pageName,
+        referrer: this.pageContext.referrer,
+        formVersionId: this.contract.form.formVersionId,
+        captchaToken
+      },
+      this.fetchImpl
+    )
+
+    this.setSubmitting(false)
+    this.turnstile?.reset()
+    if (this.destroyed) return
+
+    if (result.outcome === 'accepted') {
+      emitGoogleAdsConversion(result.googleAdsConversion, 'commercial_lead')
+      this.telemetry.emit('gh_form_submission_accepted', {
+        ...(result.submissionId ? { correlation_id: result.submissionId } : {}),
+        success_behavior: this.contract.successBehavior.kind,
+        ...this.buildTokenizedReportHandoff(result.submissionId),
+        ...this.buildAssetDownloadHandoff(result.submissionId)
+      })
+      this.succeeded = true
+      this.inlineRegistration = result.registrationStatus
+      this.setInlineState('success')
+      refs.ok.focus({ preventScroll: true })
+      this.scheduleInline(() => this.setInlineState('done'), FormRenderer.INLINE_SUCCESS_HOLD_MS)
+      this.announceSuccess(result)
+
+      return
+    }
+
+    this.telemetry.emit('gh_form_submission_rejected', { reason_class: result.outcome })
+
+    const networkError = result.reason === 'network_error'
+    const retryable = networkError || result.outcome === 'rate_limited' || result.outcome === 'error'
+
+    this.failInline(networkError ? this.copy.submitError : this.submitErrorMessage(result.outcome), retryable)
+  }
+
+  private failInline(message: string, retry: boolean): void {
+    const refs = this.inlineRefs
+
+    if (!refs) return
+    this.setInlineState('open')
+    setInlinePillError(refs, message, { retry, fieldInvalid: false })
+    refs.input.focus({ preventScroll: true })
+  }
+
+  /** Avisa el éxito a las demás instancias del mismo formulario en la página (evento DOM, sin PII). */
+  private announceSuccess(result: PublicSubmitResult): void {
+    const detail: GrowthFormSuccessDetail = {
+      formKey: this.contract.form.formKey,
+      formSlug: this.contract.form.slug,
+      instanceId: this.instanceId,
+      ...(result.registrationStatus ? { registrationStatus: result.registrationStatus } : {})
+    }
+
+    dispatchGrowthFormSuccess(this.opts.root, detail)
+  }
+
+  private onPeerSuccess(event: Event): void {
+    const detail = (event as CustomEvent<GrowthFormSuccessDetail>).detail
+
+    if (this.destroyed || this.succeeded || !detail) return
+    if (detail.instanceId === this.instanceId || detail.formKey !== this.contract.form.formKey) return
+
+    this.succeeded = true
+
+    if (this.isInlinePill()) {
+      for (const timer of this.inlineTimers) clearTimeout(timer)
+      this.inlineTimers.clear()
+      this.inlineRegistration = detail.registrationStatus
+      if (this.inlineRefs) setInlinePillError(this.inlineRefs, null)
+      this.setInlineState('done')
+
+      return
+    }
+
+    if (!this.submitting) this.renderSuccess()
   }
 
   private focusStepHeading(): void {

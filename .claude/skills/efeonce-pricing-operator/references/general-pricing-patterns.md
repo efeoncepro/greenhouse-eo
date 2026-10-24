@@ -119,6 +119,49 @@ valor, no por pieza) lo manda `creative-practice`, `modules/04_PRICING.md` §7 (
 único, los encargos siguientes quedan en el total menos esa línea (48.000), bajo el piso calculado para un
 lanzamiento. Ningún escenario costeó un lanzamiento sin ese componente. La decisión es del operador.
 
+## Patrón medido: descuento de entrada en lugar de bajar la base (operación CRM gestionada)
+
+Medido el 2026-10-20 con Assetplan (Chile, inmobiliaria): operación gestionada de HubSpot, propuesta enviada ese día,
+resultado desconocido. Las cifras son ejemplo interno: no son tarifa, mínimo ni referencia para otro cliente.
+[Caso y readback](../../../../docs/commercial/prospecting-agent/runs/2026-10-20-1221-assetplan-deal.md#propuesta-enviada--20102026).
+
+**El pedido.** Unas 25 h/mes ajustables para mantener al día un canal de dudas y solicitudes comerciales y apoyar
+proyectos; 90 usuarios de HubSpot; atención en horario de Chile (lunes a jueves 09:30–18:30, viernes hasta las 16:00);
+acceso Partner. La responsable de CRM del cliente conserva estrategia y lineamientos.
+
+**Forma.** Managed service mensual con bolsa de capacidad (fee, no tarifa por hora pública). El catálogo V3 no tiene
+una oferta de operación CRM: el precio salió del carril de escenario del workbook (`pricing:workbook`), sin
+reclasificarlo como creatividad o SEO. Cotización base: 40 UF + IVA/mes por 25 h.
+
+**La pregunta del operador.** Julio pidió un 25 % de descuento los primeros cuatro meses y preguntó si el precio era
+caro y convenía bajarlo. La recomendación fue **no bajar la base**:
+
+| Palanca | Qué se ofreció |
+|---|---|
+| Precio de lista | 40 UF + IVA/mes, explícito en la propuesta como ancla |
+| Descuento de entrada | −10 UF/mes los meses 1–4 → 30 UF + IVA (35,70 UF con IVA); 40 UF + IVA (47,60) desde el mes 5 |
+| Riesgo del comprador | Primer mes sin permanencia |
+| Flexibilidad | Bolsa ajustable desde el mes 2, con 15 días de aviso |
+| Plazo | Inicial de 4 meses (el del descuento); después, mes a mes |
+| Vigencia | 15 días (hasta el 04/11/2026) |
+
+Por qué: un descuento temporal y nombrado se retira solo al mes 5; una base rebajada queda como el precio de
+referencia del cliente y de la renovación. El riesgo de entrada se reduce con permanencia y flexibilidad, no con precio.
+El operador aprobó («Si hazlo»).
+
+**Economics estimados.** Costo ≈ USD 822/mes (≈ 18–19 UF); margen ≈ 52–55 % a 40 UF y ≈ 37–40 % a 30 UF. La
+recomendación los ubicó sobre el piso de margen de la práctica. Son estimaciones del escenario (costos
+históricos/objetivo y horas compartidas), no margen comprobado: verificar el piso vigente con Finance antes de usarlo
+en otro caso. Revisar la dedicación real al cierre del mes 4, cuando termina el descuento.
+
+**Cómo se presentó.** En la propuesta, la receta de cotización en vivo (`content-pricing` live) con líneas:
+Operación HubSpot 25 h, 40 UF/mes; Descuento inicial, −10 UF/mes; Primer mes sin permanencia, incluido; Bolsa
+ajustable, incluida; total meses 1–4, 30 UF neto + IVA. La cotización de 4 páginas va como PDF aparte.
+
+**CRM.** Monto del Deal = proyección de 12 meses (4 × 30 + 8 × 40 = 440 UF, cargado como CLF); fecha de cierre =
+vigencia de la cotización, no cierre pactado. Ambos los aprobó el operador; no escribir un fee mensual como monto
+total ni una fecha inventada.
+
 ## Fuentes consultadas (2026-07-26)
 
 [FAR fixed-price](https://www.acquisition.gov/far/subpart-16.2), [FAR T&M](https://www.acquisition.gov/far/subpart-16.6),

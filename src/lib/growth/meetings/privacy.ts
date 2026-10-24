@@ -4,6 +4,8 @@ import { createHash, createHmac } from 'node:crypto'
 
 import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 
+import type { EnvSource } from '@/types/env-source'
+
 const SECRET_ENV = 'GROWTH_MEETING_HMAC_SECRET'
 const SECRET_REF = 'growth-meeting-hmac-secret'
 
@@ -35,7 +37,7 @@ export const createMeetingPrivacyHasher = (secret: string, keyVersion = 'v1'): M
 }
 
 export const resolveMeetingPrivacyHasher = async (
-  env: NodeJS.ProcessEnv = process.env,
+  env: EnvSource = process.env,
 ): Promise<MeetingPrivacyHasher> => {
   const secret = env[SECRET_ENV]?.trim() || await resolveSecretByRef(SECRET_REF)
 

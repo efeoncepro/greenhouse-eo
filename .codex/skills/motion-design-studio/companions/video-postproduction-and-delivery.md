@@ -262,6 +262,7 @@ no prometer identidad de payload por usar `-c copy`. En V17 sí se comprobó igu
 | Escucha completa/mono/dispositivo | Naturalidad, voz residual, fuerza, unión música/SFX | Derechos o coincidencia binaria |
 | Hash de fuente/stream | Identidad de bytes del objeto medido | Mismo timing, calidad o aprobación |
 | Diferencia/correlación a baja resolución | Correspondencia de cuadros/color grueso | Nitidez nativa, ausencia total de deformaciones |
+| Diferencia entre cuadros consecutivos (`tblend` + YAVG de `signalstats`; criterio de la serie de partners: 0 cuadros < 0,15) | Ausencia de cuadros quietos, congelados y tirones de velocidad | Ritmo, lectura o que el movimiento se sienta bien (lecciones §14) |
 | LUFS/true peak/silencios/ASR | Diagnóstico cuantitativo específico | Música adecuada, impacto de marca o ausencia certificada de voz |
 
 Cubrir toda la pieza con muestras y densificar sólo donde está el riesgo: seam, retime, lectura, transformación,

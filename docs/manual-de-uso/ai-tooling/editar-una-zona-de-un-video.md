@@ -204,6 +204,9 @@ siempre.
 
 Si un punto falla, no se entrega aunque el codigo sea 0.
 
+Si el clip lleva sonido o animacion sincronizada, despues corre `pnpm ai:listen --measure-only` sobre `final.mp4`
+(sincronia, cortes y cuadros quietos, sin costo) antes de mostrarlo. Ver [escuchar y mirar media](escuchar-y-mirar-media-con-gemini.md).
+
 ## Referencias tecnicas
 
 - Codigo: `scripts/ai/inpaint/pipeline-video.ts`, `scripts/ai/inpaint/video-mask.ts`, `scripts/ai/inpaint/ffmpeg.ts`,

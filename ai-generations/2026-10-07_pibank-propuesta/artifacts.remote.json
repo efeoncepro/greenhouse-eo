@@ -1,0 +1,419 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-22T21:46:00.417Z",
+  "run": "ai-generations/2026-10-07_pibank-propuesta",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-07_pibank-propuesta",
+  "totalBytes": 55710950,
+  "fileCount": 68,
+  "files": [
+    {
+      "path": "a-la-vista-v13/a-la-vista-v13-final.png",
+      "sizeBytes": 850078,
+      "sha256": "8325ca8f5a1bba872ee8314321cfb2ce4c80504ec8f4dfac4195c348077e4e39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/a-la-vista-v13/a-la-vista-v13-final.png"
+    },
+    {
+      "path": "a-la-vista-v13/crop.png",
+      "sizeBytes": 191837,
+      "sha256": "1f2d2333cb33a95e3fd4dd963f104c54492273eaf8e51c7d0c85fe1c81ef6d73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/a-la-vista-v13/crop.png"
+    },
+    {
+      "path": "ciclo-v13/ciclo-v13-final.png",
+      "sizeBytes": 818895,
+      "sha256": "829c924375010234f164f502b0cbf6c4a31334f822612a7b2dd9b6cbc6a02979",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/ciclo-v13/ciclo-v13-final.png"
+    },
+    {
+      "path": "ciclo-v13/ciclo-v13-root.png",
+      "sizeBytes": 820662,
+      "sha256": "29a4e3f40096ba9fa9abd1fe2c49f78987d96cfaaba009a9582fad90638c50f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/ciclo-v13/ciclo-v13-root.png"
+    },
+    {
+      "path": "ciclo-v13/compose/01-p01-deck-method-surround-cycle.png",
+      "sizeBytes": 970483,
+      "sha256": "6b18d3fe8ba73754a55dae3e06b2e3ae51bb221ede9c1bfccfb8485dd5675992",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/ciclo-v13/compose/01-p01-deck-method-surround-cycle.png"
+    },
+    {
+      "path": "ciclo-v2/01-p01-deck-method-surround-cycle.png",
+      "sizeBytes": 972362,
+      "sha256": "1f5f567d9dc05b02c7edabe62a87ed3e5691cbd8ae2ddbb303e40bc43823f041",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/ciclo-v2/01-p01-deck-method-surround-cycle.png"
+    },
+    {
+      "path": "ciclo-v2/ciclo-logo.png",
+      "sizeBytes": 849693,
+      "sha256": "5d8c10c773657252d39b30d6d6b0894b4da8a6b754316d96dad2157a27680a26",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/ciclo-v2/ciclo-logo.png"
+    },
+    {
+      "path": "ciclo-v3/01-p01-deck-method-surround-cycle.png",
+      "sizeBytes": 969404,
+      "sha256": "d10be34ce9c2bede1dd7bb14ec9e0f92f1be9acfcded3cb89d213607c5ae8500",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/ciclo-v3/01-p01-deck-method-surround-cycle.png"
+    },
+    {
+      "path": "ciclo-v3/ciclo-logo.png",
+      "sizeBytes": 849228,
+      "sha256": "4ac2c2cc468f108eb7f0a530e183b8a4df2bd5a214e242b4a3e41657b91ed4ea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/ciclo-v3/ciclo-logo.png"
+    },
+    {
+      "path": "cierre-engine/01-p01-deck-close-proposal.png",
+      "sizeBytes": 1345682,
+      "sha256": "acffae64af6052edfe0ab0db02e698229c528be245f7d4b3312b3a2802a62a8b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/cierre-engine/01-p01-deck-close-proposal.png"
+    },
+    {
+      "path": "composer/01-p01-deck-cover-proposal.png",
+      "sizeBytes": 453325,
+      "sha256": "a090d69cea21199971e3c00357a83f5aba5fce250eab595deb8ec1bf7636c6c4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/composer/01-p01-deck-cover-proposal.png"
+    },
+    {
+      "path": "composer/02-p02-deck-section-classic.png",
+      "sizeBytes": 64234,
+      "sha256": "a77d7961ba20a5cae5b2b93a19a13e1421c027e0e7f6708557aa54b0d496824e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/composer/02-p02-deck-section-classic.png"
+    },
+    {
+      "path": "composer/03-p03-deck-section-classic.png",
+      "sizeBytes": 66953,
+      "sha256": "f222c57687b24d31bd847ef7e2e64937ba83a2b38a930574d4a611c868dca744",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/composer/03-p03-deck-section-classic.png"
+    },
+    {
+      "path": "composer/04-ciclo-logo.png",
+      "sizeBytes": 847142,
+      "sha256": "4b078eeba9332f1c05b5c3e16ba96eb104e68421e6ad3f4ac95c78dc8be372a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/composer/04-ciclo-logo.png"
+    },
+    {
+      "path": "composer/04-p04-deck-method-surround-cycle.png",
+      "sizeBytes": 972268,
+      "sha256": "1172ce85a9252409d1e500f89ddbbc6ee57ff5e2a481ba2a3bb80c6660b55af3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/composer/04-p04-deck-method-surround-cycle.png"
+    },
+    {
+      "path": "composer/05-p05-deck-section-classic.png",
+      "sizeBytes": 70703,
+      "sha256": "84b5f243b1ccab992c8a03828789ef6e8b2d43ef5714ca22063face9eb6f63f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/composer/05-p05-deck-section-classic.png"
+    },
+    {
+      "path": "composer/06-p06-deck-content-measure-formulas.png",
+      "sizeBytes": 741695,
+      "sha256": "128092b496ad7560e1765dc6caf4538c49826b8a5385f3dfc894729541e1ac8d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/composer/06-p06-deck-content-measure-formulas.png"
+    },
+    {
+      "path": "composer/07-equipo-logo.png",
+      "sizeBytes": 1188141,
+      "sha256": "0fa802738dbc3145eeb1d326d5d16483d98b1dd6360d0ef3f27b124f92ef3f4e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/composer/07-equipo-logo.png"
+    },
+    {
+      "path": "composer/07-p07-deck-content-team.png",
+      "sizeBytes": 1112035,
+      "sha256": "cf277608a123bceb33d97e835544d214840b3abb931f05161c1799bb7ebfbf69",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/composer/07-p07-deck-content-team.png"
+    },
+    {
+      "path": "composer/08-p08-deck-decision-risk.png",
+      "sizeBytes": 185361,
+      "sha256": "2aeae8475b51d7cb3a0adb2021577028dd4f303b400f97971fa3858812e00efa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/composer/08-p08-deck-decision-risk.png"
+    },
+    {
+      "path": "composer/09-p09-deck-close-proposal.png",
+      "sizeBytes": 1156019,
+      "sha256": "b2b849c31c6dc3778764626991403299d315cf1a03bc7138c70c29599c228beb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/composer/09-p09-deck-close-proposal.png"
+    },
+    {
+      "path": "equipo-v13/01-p01-deck-content-team.png",
+      "sizeBytes": 1089567,
+      "sha256": "ba98bd3ac96bf9e9587bd26d0f12411ffa2414650341bb3207603583a7334a76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/equipo-v13/01-p01-deck-content-team.png"
+    },
+    {
+      "path": "equipo-v13/crop-body.png",
+      "sizeBytes": 28448,
+      "sha256": "8082eb46f9453dca8518263631c621dfe6e1befcae0a132a71a0e5e024c7100a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/equipo-v13/crop-body.png"
+    },
+    {
+      "path": "equipo-v13/crop-flags.png",
+      "sizeBytes": 194504,
+      "sha256": "62ad6aea452996f7307f966515df593e5bd27b4fe414ecd1808024edcf889686",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/equipo-v13/crop-flags.png"
+    },
+    {
+      "path": "equipo-v13/crop-flags2.png",
+      "sizeBytes": 247058,
+      "sha256": "5dc49bcc7bdcc4c89fe161e79ab37aec97fde509583884bd89c0cf916df6aa06",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/equipo-v13/crop-flags2.png"
+    },
+    {
+      "path": "equipo-v13/equipo-v13-final.png",
+      "sizeBytes": 1137620,
+      "sha256": "3cc8a4b27f637f365f0424eb152a3c179b14cbcbacea24817d2911839f2a0b7f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/equipo-v13/equipo-v13-final.png"
+    },
+    {
+      "path": "equipo-v13/equipo-v13b-final.png",
+      "sizeBytes": 1140947,
+      "sha256": "529bb812d52f1648ae8584d97f22608da114ffbd2cb1e3745dfd670cab2ffe7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/equipo-v13/equipo-v13b-final.png"
+    },
+    {
+      "path": "equipo-v2/01-p01-deck-content-team.png",
+      "sizeBytes": 1114408,
+      "sha256": "080c9c780a0a2b47c9b92c21a9ed3b08153caf389e470195d37c3d2c3a483d16",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/equipo-v2/01-p01-deck-content-team.png"
+    },
+    {
+      "path": "equipo-v2/equipo-logo.png",
+      "sizeBytes": 1190582,
+      "sha256": "dfc3808fc4f378af6d299dc947f75221990919f7915676c3bd3f217d9e1d1ced",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/equipo-v2/equipo-logo.png"
+    },
+    {
+      "path": "equipo/por-asignar.png",
+      "sizeBytes": 33492,
+      "sha256": "ded6bf2c03cec1ca6be1fcf1ac84fa46799bc7bd59485095f7bf2895cd8a83a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/equipo/por-asignar.png"
+    },
+    {
+      "path": "fotos-c2-v2/01-p01-deck-proposal-cinematic.png",
+      "sizeBytes": 1994741,
+      "sha256": "9e56cbb9533ac8ca49f635b5387caa8492d778b3893b15eae2e922e16127318d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/fotos-c2-v2/01-p01-deck-proposal-cinematic.png"
+    },
+    {
+      "path": "fotos-split-v2/01-p01-deck-section-split.png",
+      "sizeBytes": 881541,
+      "sha256": "aab8dc4a8ad099d953870fbb425acd2cd0e8a203620d9d45a1ac1fe7f90981a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/fotos-split-v2/01-p01-deck-section-split.png"
+    },
+    {
+      "path": "fotos/01-p01-deck-section-split.png",
+      "sizeBytes": 881915,
+      "sha256": "61d92c2757bc1d74b72a85b5d61b9d213a8a166da2ecda86403c0a78f248de4f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/fotos/01-p01-deck-section-split.png"
+    },
+    {
+      "path": "fotos/02-p02-deck-proposal-cinematic.png",
+      "sizeBytes": 1992612,
+      "sha256": "845055f2b12b1d83118d4793dd0a6647322360c412904607d4ded41c20811952",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/fotos/02-p02-deck-proposal-cinematic.png"
+    },
+    {
+      "path": "fotos/03-p03-deck-proposal-cinematic.png",
+      "sizeBytes": 1734994,
+      "sha256": "ea09345b5d64cf3c712c886753d3e2aeb65966a00355dba9cbfd6289c02472ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/fotos/03-p03-deck-proposal-cinematic.png"
+    },
+    {
+      "path": "fotos/04-p04-deck-proposal-cinematic.png",
+      "sizeBytes": 1559439,
+      "sha256": "8cde372a627986fb8c7e7478b8d0552f244bb66ab61068e3dc5e83c703646942",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/fotos/04-p04-deck-proposal-cinematic.png"
+    },
+    {
+      "path": "iconos-ciclo-v3/crear.png",
+      "sizeBytes": 997927,
+      "sha256": "e9e1f2527344a9d1b018472971220501190316a3e607f3d645ddbf3e7dd5a1a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/crear.png"
+    },
+    {
+      "path": "iconos-ciclo-v3/distribuir.png",
+      "sizeBytes": 1102235,
+      "sha256": "ae503682d200920b4f44dcccb3737e86b572ff07b0ac2b78a87de5fcee6070cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/distribuir.png"
+    },
+    {
+      "path": "iconos-ciclo-v3/medir.png",
+      "sizeBytes": 1062392,
+      "sha256": "00bd0dd669ee17dd23fc9138209f05cec97142519a4b297bbd24219f328e55f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/medir.png"
+    },
+    {
+      "path": "iconos-ciclo-v3/optimizar.png",
+      "sizeBytes": 1028220,
+      "sha256": "787f28a51cbc1154d1ddd7f9afd757e0d9300acc95bd744c8183450cc952e67a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/optimizar.png"
+    },
+    {
+      "path": "iconos-ciclo/create.png",
+      "sizeBytes": 1006628,
+      "sha256": "7f0894dbffd8cb8b7614e36777671e69c19d0a7a6ade673eaf5359dd8959cd53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo/create.png"
+    },
+    {
+      "path": "iconos-ciclo/distribute.png",
+      "sizeBytes": 1036555,
+      "sha256": "e561d17bf2c6f08b350870c4b3428ca4d1c9cc522a0210b2bcab9a3d84f777a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo/distribute.png"
+    },
+    {
+      "path": "iconos-ciclo/measure.png",
+      "sizeBytes": 1198699,
+      "sha256": "4fccf6e3639fb718adc2af18c40b8f868b3cfb4fdd3114edb4cf2c2dee880edb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo/measure.png"
+    },
+    {
+      "path": "iconos-ciclo/optimize.png",
+      "sizeBytes": 1129105,
+      "sha256": "2c7b009f4be95e9f8e235b259dc41d80bd8d3b3584b55c59eaa6af66d03dfc87",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo/optimize.png"
+    },
+    {
+      "path": "metricas-v13/busqueda/01-p01-deck-content-measure-formulas.png",
+      "sizeBytes": 740873,
+      "sha256": "626d26cf4bab3e53eda4237ea9c2000634942c4d7f809f295c9bb0e7c5af51fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/metricas-v13/busqueda/01-p01-deck-content-measure-formulas.png"
+    },
+    {
+      "path": "metricas-v13/crop.png",
+      "sizeBytes": 57599,
+      "sha256": "569065498106715f7f4e7263c34cdc47101cf9cc3c8ee915f9d41e9ea941b7bd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/metricas-v13/crop.png"
+    },
+    {
+      "path": "metricas-v13/final/01-p01-deck-content-measure-formulas.png",
+      "sizeBytes": 732034,
+      "sha256": "45a993944327f2cf16f9f62ff7eadcebc34f1152dcf20cfd94d5a47187bd4419",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/metricas-v13/final/01-p01-deck-content-measure-formulas.png"
+    },
+    {
+      "path": "metricas-v13/medicion/01-p01-deck-content-measure-formulas.png",
+      "sizeBytes": 739988,
+      "sha256": "a7b1b27e8d42bd0c52ddd0b522710e62431738b98212a2e6d1a0fef6ccd17b39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/metricas-v13/medicion/01-p01-deck-content-measure-formulas.png"
+    },
+    {
+      "path": "metricas-v13/metricas-v13-final.png",
+      "sizeBytes": 647472,
+      "sha256": "34a2bed5e9f86a91612ccc7788052782230edfc7962ac9a116ef795caace9b62",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/metricas-v13/metricas-v13-final.png"
+    },
+    {
+      "path": "metricas/01-p01-deck-content-measure-formulas.png",
+      "sizeBytes": 731304,
+      "sha256": "d96da5090bb276d691a90d91e29fba213ed9779f15da64bb8b84887d2f750b0c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/metricas/01-p01-deck-content-measure-formulas.png"
+    },
+    {
+      "path": "metricas/02-p02-deck-content-day.png",
+      "sizeBytes": 713937,
+      "sha256": "a9c8136caa311d8be94303323b5fd8cf6fcffd2a0d27e2aa4b494544a4c6d83b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/metricas/02-p02-deck-content-day.png"
+    },
+    {
+      "path": "plates/BR3e-contra-horizonte-engine.png",
+      "sizeBytes": 2051682,
+      "sha256": "46d44fcb014b975fde4b81bb65a8e22ae184e9d13abbdb47b85747f03f78458b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/plates/BR3e-contra-horizonte-engine.png"
+    },
+    {
+      "path": "plates/BR3f-contra-horizonte-engine.png",
+      "sizeBytes": 2011675,
+      "sha256": "d1f5a8d2b4ceab0d2b03257934b63166d8b6a81278fb0e2455bfbd6430d821ea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/plates/BR3f-contra-horizonte-engine.png"
+    },
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 263388,
+      "sha256": "9bcbf247f3cfa2c937acb08554d67ff5a53a2da8e1fdd23f9d62d0a7ee087a7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "portada-v2/01-p01-deck-cover-proposal.png",
+      "sizeBytes": 453270,
+      "sha256": "79b22a0b6df03c381ce0708d5033e3c9a837b5154b8b75f3a6517d4b955f06c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/portada-v2/01-p01-deck-cover-proposal.png"
+    },
+    {
+      "path": "portada-v2/portada-sin-seleccion.png",
+      "sizeBytes": 320650,
+      "sha256": "e1dcc5b75ce6a4d9e901745700033ad97ece6b14569d588a70fbe18168eb65b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/portada-v2/portada-sin-seleccion.png"
+    },
+    {
+      "path": "riesgo-v5/01-deck-decision-risk.png",
+      "sizeBytes": 182822,
+      "sha256": "cb99c96cd6d6fb34bcf9630a56a0d0434cfd5dff8d42702d51bc4e482cd33748",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/riesgo-v5/01-deck-decision-risk.png"
+    },
+    {
+      "path": "riesgo/01-deck-decision-risk.png",
+      "sizeBytes": 182920,
+      "sha256": "1b0b3d9a3fb69c2a02985b06e92b50208e020fc9ffeb7b3ddaacfd483df90f33",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/riesgo/01-deck-decision-risk.png"
+    },
+    {
+      "path": "stack-v13/01-deck-content-stack.png",
+      "sizeBytes": 816198,
+      "sha256": "0148970147f2e2fe502368484e58b43d2b699a470d8fce8ce093ed207891fde6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/stack-v13/01-deck-content-stack.png"
+    },
+    {
+      "path": "v7/01-p01-deck-content-team.png",
+      "sizeBytes": 1113376,
+      "sha256": "c3ad3c162babc35a33cfb6a85ec193231b6da2e11f43e260180f79dd06431c7f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/v7/01-p01-deck-content-team.png"
+    },
+    {
+      "path": "v7/02-p02-deck-content-measure-formulas.png",
+      "sizeBytes": 746218,
+      "sha256": "e422b7f63eb4829dd9195aa21675f922aa817fa612488d905b91d674a41e6a27",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/v7/02-p02-deck-content-measure-formulas.png"
+    },
+    {
+      "path": "v7/03-p03-deck-decision-difference.png",
+      "sizeBytes": 847738,
+      "sha256": "d30af35008150c904027ee7935a04e9aa786287b22f3d3402bb2e7e0d04c3a31",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/v7/03-p03-deck-decision-difference.png"
+    },
+    {
+      "path": "v7/04-p04-deck-content-clients.png",
+      "sizeBytes": 185717,
+      "sha256": "ad1c4d185b24f219da268fdbfaa71dc99dcfef12d827fd623fe56d30f5b6fd2d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/v7/04-p04-deck-content-clients.png"
+    },
+    {
+      "path": "v7/clientes-limpio.png",
+      "sizeBytes": 183893,
+      "sha256": "7c5ef25f3da57cc26d36244cb04b51f00705aa429582ad53f09bba6f65b6525b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/v7/clientes-limpio.png"
+    },
+    {
+      "path": "v7/clientes-limpio2.png",
+      "sizeBytes": 170981,
+      "sha256": "1656b6084005509f8c52e3880602f29e49b9e4d6045edc3e5ac77d06ed805f8f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/v7/clientes-limpio2.png"
+    },
+    {
+      "path": "v7/clientes-limpio3.png",
+      "sizeBytes": 168775,
+      "sha256": "5da676228bba7e66a2f92646a23402c20aff77c526eba80449eeb0e7d730a664",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/v7/clientes-limpio3.png"
+    },
+    {
+      "path": "v7/equipo-limpio.png",
+      "sizeBytes": 1178245,
+      "sha256": "eadf77c44ac4c9fd8bfcdd3546e0adeba6c206544b2ee988c8025faa2fa6ee73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/v7/equipo-limpio.png"
+    },
+    {
+      "path": "v7/equipo-logo.png",
+      "sizeBytes": 1190366,
+      "sha256": "19b62c7d399fd65a019b84bffd49a5a0bbe2d6ba5493e1870efe0e9b9208b920",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-07_pibank-propuesta/v7/equipo-logo.png"
+    }
+  ]
+}

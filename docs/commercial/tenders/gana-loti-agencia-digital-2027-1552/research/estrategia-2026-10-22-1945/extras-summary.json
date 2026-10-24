@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "grd1552-strategy-extras-analysis/1",
+  "status": "hypothesis_only",
+  "source_costs": "canonical compose workload -> compose quote --current -> compose increment with base; no catalogue/CRM/document writes",
+  "scenarios": {
+    "five-static": {
+      "COP": "150874",
+      "USD": "41.33"
+    },
+    "three-extras-annualised": {
+      "COP": "382940",
+      "USD": "104.91"
+    },
+    "campaign-month": {
+      "COP": "2603974",
+      "USD": "713.43"
+    },
+    "drill-month": {
+      "COP": "528702",
+      "USD": "144.84"
+    },
+    "overlap-month": {
+      "COP": "2749736",
+      "USD": "753.35"
+    }
+  },
+  "calendar": {
+    "months_static_only": 9,
+    "months_static_plus_one_tactical_activation": 1,
+    "months_static_plus_one_crisis_exercise": 2,
+    "no_overlap": "schedule assumption; not accepted or assigned"
+  },
+  "annual_increment": {
+    "COP": "5019244",
+    "USD": "1375.08"
+  },
+  "monthly_average_increment": {
+    "COP": "418270.3333333333333333333333",
+    "USD": "114.59"
+  },
+  "monthly_total_including_three_dedicated": {
+    "COP": "25539796.33333333333333333333",
+    "USD": "6997.20"
+  },
+  "margin_sensitivity": [
+    {
+      "revenue_COP": "36000000",
+      "revenue_USD": "9863.01",
+      "monthly_contribution_COP": "10460204",
+      "monthly_contribution_USD": "2865.81",
+      "contribution_margin_percent": "29.06",
+      "margin_including_annualised_initial_percent": "28.52"
+    },
+    {
+      "revenue_COP": "38000000",
+      "revenue_USD": "10410.96",
+      "monthly_contribution_COP": "12460204",
+      "monthly_contribution_USD": "3413.75",
+      "contribution_margin_percent": "32.79",
+      "margin_including_annualised_initial_percent": "32.29"
+    }
+  ],
+  "limits": [
+    "Cost of dedicated three people is imported from case consolidation, not a new integrated canonical quote.",
+    "Annual weighted sum reads distinct canonical monthly increments; no demand prices were manually patched.",
+    "Costs are estimated, before unresolved burdens, overhead, external shoot/stock/talent/media/consumptions and tax.",
+    "Initial preparation cost remains separate."
+  ]
+}

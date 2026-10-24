@@ -20,6 +20,8 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { hashIdentifier, recordIntakeEvent } from '../public-intake/abuse-guard'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type PublicReadKind = 'status' | 'report'
 
 const OUTCOME_BY_KIND: Record<PublicReadKind, string> = {
@@ -27,7 +29,7 @@ const OUTCOME_BY_KIND: Record<PublicReadKind, string> = {
   report: 'read_report',
 }
 
-export const resolvePublicReadLimitPerMinute = (env: NodeJS.ProcessEnv = process.env): number =>
+export const resolvePublicReadLimitPerMinute = (env: EnvSource = process.env): number =>
   Number(env.GROWTH_AI_VISIBILITY_PUBLIC_READ_PER_IP_PER_MIN) || 60
 
 const countReadsLastMinute = async (ipHash: string): Promise<number> => {

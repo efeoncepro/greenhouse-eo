@@ -1,0 +1,416 @@
+{
+  "generatedAt": "2026-10-24T05:53:44.699Z",
+  "budget": 0.01,
+  "fidelity": [
+    {
+      "pill": "glitch",
+      "viewport": "1440",
+      "state": "idle",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "648x152"
+    },
+    {
+      "pill": "glitch",
+      "viewport": "1440",
+      "state": "open",
+      "verdict": "PASS",
+      "diffPixels": 96,
+      "diffShare": 0.097,
+      "size": "648x152"
+    },
+    {
+      "pill": "glitch",
+      "viewport": "1440",
+      "state": "loading",
+      "verdict": "PASS",
+      "diffPixels": 1,
+      "diffShare": 0.001,
+      "size": "648x152"
+    },
+    {
+      "pill": "glitch",
+      "viewport": "1440",
+      "state": "success",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "648x152"
+    },
+    {
+      "pill": "glitch",
+      "viewport": "1440",
+      "state": "done",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "648x152"
+    },
+    {
+      "pill": "event",
+      "viewport": "1440",
+      "state": "idle",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "648x152"
+    },
+    {
+      "pill": "event",
+      "viewport": "1440",
+      "state": "open",
+      "verdict": "PASS",
+      "diffPixels": 55,
+      "diffShare": 0.056,
+      "size": "648x152"
+    },
+    {
+      "pill": "event",
+      "viewport": "1440",
+      "state": "loading",
+      "verdict": "PASS",
+      "diffPixels": 1,
+      "diffShare": 0.001,
+      "size": "648x152"
+    },
+    {
+      "pill": "event",
+      "viewport": "1440",
+      "state": "success",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "648x152"
+    },
+    {
+      "pill": "event",
+      "viewport": "1440",
+      "state": "done",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "648x152"
+    },
+    {
+      "pill": "glitch",
+      "viewport": "390",
+      "state": "idle",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x172"
+    },
+    {
+      "pill": "glitch",
+      "viewport": "390",
+      "state": "open",
+      "verdict": "PASS",
+      "diffPixels": 96,
+      "diffShare": 0.143,
+      "size": "390x172"
+    },
+    {
+      "pill": "glitch",
+      "viewport": "390",
+      "state": "loading",
+      "verdict": "PASS",
+      "diffPixels": 334,
+      "diffShare": 0.498,
+      "size": "390x172"
+    },
+    {
+      "pill": "glitch",
+      "viewport": "390",
+      "state": "success",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x172"
+    },
+    {
+      "pill": "glitch",
+      "viewport": "390",
+      "state": "done",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x172"
+    },
+    {
+      "pill": "event",
+      "viewport": "390",
+      "state": "idle",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x172"
+    },
+    {
+      "pill": "event",
+      "viewport": "390",
+      "state": "open",
+      "verdict": "PASS",
+      "diffPixels": 55,
+      "diffShare": 0.082,
+      "size": "390x172"
+    },
+    {
+      "pill": "event",
+      "viewport": "390",
+      "state": "loading",
+      "verdict": "PASS",
+      "diffPixels": 1,
+      "diffShare": 0.001,
+      "size": "390x172"
+    },
+    {
+      "pill": "event",
+      "viewport": "390",
+      "state": "success",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x172"
+    },
+    {
+      "pill": "event",
+      "viewport": "390",
+      "state": "done",
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x172"
+    }
+  ],
+  "keyboard": [
+    {
+      "pill": "glitch",
+      "tabStop": "inline-open",
+      "afterEnter": {
+        "state": "open",
+        "focus": "inline-input"
+      },
+      "afterEscape": {
+        "state": "idle",
+        "focus": "inline-open"
+      },
+      "escapeWithText": "open",
+      "afterSubmit": {
+        "state": "success",
+        "focus": "inline-ok"
+      }
+    },
+    {
+      "pill": "event",
+      "tabStop": "inline-open",
+      "afterEnter": {
+        "state": "open",
+        "focus": "inline-input"
+      },
+      "afterEscape": {
+        "state": "idle",
+        "focus": "inline-open"
+      },
+      "escapeWithText": "open",
+      "afterSubmit": {
+        "state": "success",
+        "focus": "inline-ok"
+      }
+    }
+  ],
+  "reducedMotion": [
+    {
+      "pill": "glitch",
+      "transitionDuration": "0s",
+      "animationName": "none",
+      "width": 480
+    },
+    {
+      "pill": "event",
+      "transitionDuration": "0s",
+      "animationName": "none",
+      "width": 470
+    }
+  ],
+  "scrollWidth": [
+    {
+      "pill": "glitch",
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "pill": "event",
+      "scrollWidth": 390,
+      "clientWidth": 390
+    }
+  ],
+  "axe": [
+    {
+      "pill": "glitch",
+      "state": "open",
+      "violations": []
+    },
+    {
+      "pill": "glitch",
+      "state": "done",
+      "violations": []
+    },
+    {
+      "pill": "event",
+      "state": "open",
+      "violations": []
+    },
+    {
+      "pill": "event",
+      "state": "done",
+      "violations": []
+    }
+  ],
+  "liveForms": [
+    {
+      "form": "fixture-static",
+      "width": 1440,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "640x672"
+    },
+    {
+      "form": "fixture-conditional",
+      "width": 1440,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "640x173"
+    },
+    {
+      "form": "fixture-success-card",
+      "width": 1440,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "640x672"
+    },
+    {
+      "form": "fixture-multi-step",
+      "width": 1440,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "640x281"
+    },
+    {
+      "form": "fixture-partner",
+      "width": 1440,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "640x440"
+    },
+    {
+      "form": "live-efeonce-media-diagnostic",
+      "width": 1440,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "640x1231"
+    },
+    {
+      "form": "live-efeonce-inbound-diagnostic",
+      "width": 1440,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "640x634"
+    },
+    {
+      "form": "live-efeonce-hubspot-scope",
+      "width": 1440,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "640x441"
+    },
+    {
+      "form": "live-efeonce-aeo-diagnostic",
+      "width": 1440,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "640x754"
+    },
+    {
+      "form": "fixture-static",
+      "width": 390,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x672"
+    },
+    {
+      "form": "fixture-conditional",
+      "width": 390,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x173"
+    },
+    {
+      "form": "fixture-success-card",
+      "width": 390,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x672"
+    },
+    {
+      "form": "fixture-multi-step",
+      "width": 390,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x279"
+    },
+    {
+      "form": "fixture-partner",
+      "width": 390,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x635"
+    },
+    {
+      "form": "live-efeonce-media-diagnostic",
+      "width": 390,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x1709"
+    },
+    {
+      "form": "live-efeonce-inbound-diagnostic",
+      "width": 390,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x745"
+    },
+    {
+      "form": "live-efeonce-hubspot-scope",
+      "width": 390,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x441"
+    },
+    {
+      "form": "live-efeonce-aeo-diagnostic",
+      "width": 390,
+      "verdict": "PASS",
+      "diffPixels": 0,
+      "diffShare": 0,
+      "size": "390x928"
+    }
+  ]
+}

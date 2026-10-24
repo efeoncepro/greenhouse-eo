@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-10-19T21:55:02.956663+00:00",
+  "portalId": "48713323",
+  "dealId": "66308025451",
+  "companyId": "59084984648",
+  "companyPrimary": true,
+  "noteId": "118981930299",
+  "noteAssociationsVerified": [
+    "66308025451",
+    "59084984648"
+  ],
+  "dealProperties": {
+    "amount": null,
+    "closedate": null,
+    "createdate": "2026-10-19T21:53:05.039Z",
+    "deal_currency_code": null,
+    "dealname": "Sika | México | Landing y activación ecommerce | LIC-1184",
+    "dealtype": "newbusiness",
+    "fecha_de_cierre_de_licitacion": null,
+    "hs_lastmodifieddate": "2026-10-19T21:54:22.323Z",
+    "hs_object_id": "66308025451",
+    "pipeline_bucket": "Strategic Bets"
+  },
+  "source": "Independent HubSpot CLI readback and MCP reads",
+  "proposalSubmitted": false
+}

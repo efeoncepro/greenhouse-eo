@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-16T22:21:32-03:00",
+  "scope": "authorized_single_account_crm_email",
+  "account": "HSP-0032",
+  "new_web_discovery_queries": 0,
+  "operations": [
+    "CLI whoami",
+    "MCP identity+schema Company/Contact/Lead",
+    "MCP Company property definitions x2",
+    "MCP Company dedupe OR name/domain/legal:0",
+    "CLI workflows list:403",
+    "CLI Company dry-run",
+    "CLI Company create:success59391176252",
+    "MCP Company independent readback x2",
+    "normal UI company readback/native enrichment",
+    "normal UI Documents/Sales enablement read",
+    "Apollo profile read for mandatory batch approval cost/balance; no enrichment"
+  ],
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host",
+  "crm_company_creates": 1,
+  "crm_contact_creates": 0,
+  "outreach": 0,
+  "paid_enrichment": 0,
+  "approval_pending": "Apollo credits up to3, email validation and material completion"
+}

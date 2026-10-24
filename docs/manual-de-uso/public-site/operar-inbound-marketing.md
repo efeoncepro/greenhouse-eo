@@ -1,9 +1,9 @@
 # Operar la landing Inbound Marketing
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-18 por Claude
-> **Ultima actualizacion:** 2026-10-18 por Claude
+> **Ultima actualizacion:** 2026-10-23 por Claude
 > **Documentacion tecnica:** [Registro de primitives (`InboundLandingModules`, `EfeonceMention`, lanzador de reunión)](../../architecture/public-site/PRIMITIVES.md#registry) ·
 > [contrato runtime del formulario](../../architecture/growth-public-forms-runtime-contract.md) ·
 > [PDR-026](../../public-site/decisions/PDR-026-cada-landing-deriva-su-patron-de-diseno.md)
@@ -57,7 +57,9 @@ canvas → compilar → paquete → deploy → publicar.
 
 1. Cambia el diseño en el canvas aprobado y actualiza la fuente en `scripts/public-website/inbound-source/`. La piel
    del diálogo de reunión está en `page.css` (acotada con `body:has(.gh-inbound)`); la de los botones de reunión, en
-   `host.css` (`.meet-cta`, `.meet-cta--ghost`, `.meet-cta--dock`).
+   `host.css` (`.meet-cta`, `.meet-cta--ghost`, `.meet-cta--dock`). `.meet-cta--dock` es de la barra móvil propia
+   (`nav.mbar`), que desde el 2026-10-23 no se sirve mientras el dock compartido está encendido; el dock se cambia con
+   su [manual](operar-dock-de-landings.md), no aquí.
 2. Si cambió la media del canvas, prepara los assets:
 
    ```bash
@@ -127,7 +129,15 @@ canvas → compilar → paquete → deploy → publicar.
 
 Los tres botones «Agenda una reunión» son un solo Growth CTA, `inbound-discovery-meeting` (`open_meeting_scheduler`,
 scheduler `fhsf-efeonce-lead-gen-web` + `discovery`), con su surface propia «Efeonce Inbound landing (WordPress)». Cada
-lugar se mide con su `cta-location`: `inbound_hero`, `inbound_closing` e `inbound_mobile_dock`.
+lugar se mide con su `cta-location`: `inbound_hero`, `inbound_closing` y `landing_dock` (el dock compartido, desde el
+2026-10-23; antes `inbound_mobile_dock`).
+
+> El lanzador del dock lo imprime el plugin `eo-landing-dock` con la clave que leyó de la página en vivo al encenderlo
+> (`pnpm public-website:landing-dock on`), guardada en su meta. Al rotar el key, ese lanzador no se actualiza con la
+> republicación de la página. Después de republicar, corre `pnpm public-website:landing-dock snapshot inbound` y
+> `on inbound --confirm`: toma la clave nueva de los lanzadores del hero o del cierre (nunca del propio dock). Ver
+> «Rotar la clave de un CTA propio» en el [manual del dock](operar-dock-de-landings.md); confirma abriendo el
+> agendador desde el dock.
 
 1. Levanta el proxy de Cloud SQL: `pnpm pg:connect`.
 2. Corre el publicador del CTA:
@@ -186,11 +196,12 @@ lugar se mide con su `cta-location`: `inbound_hero`, `inbound_closing` e `inboun
 - [ ] Once módulos, un solo `h1`, canonical, `index, follow`, OG `252016`, bloques `Service` y `FAQPage`.
 - [ ] El formulario se dibuja; «Arma tu primer ciclo» actualiza la pregunta al cambiar producto y mercado.
 - [ ] Las diez menciones de servicio pintan el isotipo.
-- [ ] El HTML trae tres lanzadores de reunión (`inbound_closing`, `inbound_hero`, `inbound_mobile_dock`), no el enlace
-      de respaldo.
+- [ ] El HTML trae tres lanzadores de reunión (`inbound_closing`, `inbound_hero` y `landing_dock`; con el dock
+      apagado, `inbound_mobile_dock`), no el enlace de respaldo.
 - [ ] Desde el hero, la ventana de reunión abre y cierra; Escape la cierra y el foco vuelve al botón.
 - [ ] Desde el cierre, la ventana abre igual.
-- [ ] A 390 px, desde la barra móvil abre a pantalla completa; las dos mitades de la barra miden lo mismo (179 px).
+- [ ] A 390 px, el dock aparece tras el hero, se retira al llegar a «Diagnóstico» y desde su botón principal la ventana
+      abre a pantalla completa (revisión del dock: `pnpm public-website:landing-dock verify inbound`).
 - [ ] El botón secundario del hero tiene su fondo propio (no se ve la costura entre el panel y la foto).
 - [ ] Agencia de Medios y Performance Marketing se ven igual que antes del cambio (la base es compartida).
 
@@ -232,8 +243,10 @@ lugar se mide con su `cta-location`: `inbound_hero`, `inbound_closing` e `inboun
 - **Un botón con borde sobre la foto del hero se ve «incrustado» o con bordes sucios.** Era transparente y quedaba sobre
   la costura entre el panel oscuro y la foto. Un botón de contorno sobre el límite de una foto o un degradado necesita su
   propio fondo (aquí: navy translúcido con desenfoque).
-- **En la barra móvil se corta «Agenda una reunión».** El botón del canvas trae `flex:1` en línea; con `flex-basis:0`
-  su padding queda fuera del reparto y ocupa 34 px más. Se corrige con `nav.mbar>*{flex:1 1 50%!important;min-width:0}`.
+- **En la barra móvil se corta «Agenda una reunión».** Aplica sólo a la barra propia (`nav.mbar`, con el dock
+  compartido apagado). El botón del canvas trae `flex:1` en línea; con `flex-basis:0` su padding queda fuera del reparto
+  y ocupa 34 px más. Se corrige con `nav.mbar>*{flex:1 1 50%!important;min-width:0}`. El dock compartido reparte los
+  botones según su etiqueta.
 - **Un título de etapa («Amplificar», «Optimizar») se parte a mitad de palabra.** Se resolvió con
   `word-break:normal; overflow-wrap:normal; hyphens:none; white-space:nowrap` y un tamaño `clamp(40px,3.5vw,56px)`.
 - **Una regla de la hoja de estilos no gana.** Los estilos en línea que vienen del canvas le ganan; para sobrescribirlos
@@ -246,8 +259,8 @@ lugar se mide con su `cta-location`: `inbound_hero`, `inbound_closing` e `inboun
 ## Pendientes conocidos
 
 Primer envío real del formulario (HubSpot `succeeded` y GA4 `generate_lead`), primera reserva real, Rich Results Test,
-prueba de guardar y recargar en el editor, esconder la barra móvil mientras el formulario está en pantalla (como hace
-Performance) y la precarga del formulario desde la página (`TASK-2039`).
+prueba de guardar y recargar en el editor y la precarga del formulario desde la página (`TASK-2039`). Esconder la
+barra móvil al llegar al formulario quedó resuelto el 2026-10-23 con el dock compartido.
 
 ## Referencias técnicas
 
