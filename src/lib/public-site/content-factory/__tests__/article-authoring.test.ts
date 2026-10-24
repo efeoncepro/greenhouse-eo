@@ -338,6 +338,7 @@ describe('authorGutenbergDraft', () => {
             {
               kind: 'faq',
               schema: {
+                source: 'inline',
                 name: 'Preguntas frecuentes sobre Creative Workflows'
               },
               items: [
@@ -405,7 +406,7 @@ describe('authorGutenbergDraft', () => {
     expect(validation.status).toBe('pass')
   })
 
-  it('leaves the FAQ schema to the plugin when schema.source is plugin', () => {
+  it('leaves the FAQ schema to the plugin by default and inlines it only on request', () => {
     const faq = (source?: 'inline' | 'plugin') =>
       authorGutenbergDraft({
         ...kungFuSpec,
@@ -429,7 +430,7 @@ describe('authorGutenbergDraft', () => {
         ]
       })
 
-    const plugin = faq('plugin')
+    const plugin = faq()
     const content = plugin.draft.kind === 'gutenberg_post' ? plugin.draft.postContent : ''
 
     expect(content).not.toContain('application/ld+json')
@@ -437,7 +438,9 @@ describe('authorGutenbergDraft', () => {
     expect(plugin.draft.kind === 'gutenberg_post' && plugin.draft.observedBlocks).not.toContain('core/html')
     expect(validateGeneratedGutenbergDraft(plugin).status).toBe('pass')
 
-    const inline = faq()
+    expect(faq('plugin').draft).toEqual(plugin.draft)
+
+    const inline = faq('inline')
     const inlineContent = inline.draft.kind === 'gutenberg_post' ? inline.draft.postContent : ''
 
     expect(inlineContent).toContain('"@type": "FAQPage"')

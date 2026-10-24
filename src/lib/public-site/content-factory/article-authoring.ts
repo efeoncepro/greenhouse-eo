@@ -60,10 +60,10 @@ export type GutenbergFaqItem = {
 export type GutenbergFaqSchemaOptions = {
   enabled?: boolean
   /**
-   * Who writes the FAQPage schema. `inline` (default until the plugin is live everywhere): a governed `core/html`
-   * JSON-LD block. `plugin`: no JSON-LD in the content; efeonce-editorial-blocks ≥ 0.3.0 builds the FAQ schema from the
-   * styled `core/details` blocks and joins it to the Yoast graph. A post with an inline FAQPage keeps it: the plugin
-   * skips it, so the two never stack.
+   * Who writes the FAQPage schema. `plugin` (default since 2026-10-24, efeonce-editorial-blocks 0.3.0 live): no
+   * JSON-LD in the content; the plugin builds the FAQ schema from the styled `core/details` blocks and joins it to the
+   * Yoast graph. `inline`: a governed `core/html` JSON-LD block, only for a host without the plugin. A post with an
+   * inline FAQPage keeps it: the plugin skips it, so the two never stack.
    */
   source?: 'inline' | 'plugin'
   name?: string
@@ -413,7 +413,7 @@ const faqBlock = (
     )
     .join('\n\n')
 
-  if (block.schema?.enabled === false || block.schema?.source === 'plugin') return details
+  if (block.schema?.enabled === false || (block.schema?.source ?? 'plugin') === 'plugin') return details
 
   return [details, renderFaqJsonLdBlock(block, context)].join('\n\n')
 }
