@@ -1,7 +1,7 @@
 # Inventario de imágenes por artículo del blog
 
 > **Tipo de documento:** Norma operativa (inventario y especificación)
-> **Version:** 1.0
+> **Version:** 1.1 (márgenes de seguridad por imagen y superficie)
 > **Creado:** 2026-10-24 por Claude, a pedido del operador («cuántas imágenes para todas las posiciones … y sus
 > características por cada artículo que se haga»)
 > **Alcance:** artículos de Marketing con Manzanitas en `efeoncepro.com/blog`. Glitch tiene sus propias piezas
@@ -35,6 +35,81 @@ o del plan de canales.
 Siempre aprueba el operador antes de subir, y el agente que sube avisa antes a las sesiones del blog que estén
 trabajando.
 
+## Márgenes de seguridad: cómo debe ser cada imagen
+
+**Sí, cada posición tiene márgenes de seguridad.** Están medidos en vivo el 2026-10-24 (390, 1440 y 1920 px; tablet
+como escritorio) y calculados sobre las cajas reales de cada superficie: qué parte de la imagen se ve y qué tapa el
+texto del sitio. Se expresan en **% del ancho y del alto de la imagen**, así valen para cualquier resolución de
+entrega. La regla general: **lo importante va al menos a un 3 % del borde que corta** y nunca debajo de un texto del
+sitio.
+
+### Portada (1200 × 630)
+
+![Zonas seguras de la portada](../../manual-de-uso/creative/assets/portada-blog-zonas-seguras.svg)
+
+| Zona | Dónde (lienzo de 1200 × 630) | Por qué |
+|---|---|---|
+| Recorte más estrecho | cuadrado central, **x 285–915** (WhatsApp) | todo el texto y la cara caben adentro |
+| Texto (cabecera, pregunta, respuesta) | **x 312–782 · y 50–341** | 27 px de aire contra el borde del cuadrado; 35 px por debajo del recorte de X |
+| Bordes de arriba y abajo | nada importante en los **15 px** de cada borde | la tarjeta de X (2:1) puede cortarlos |
+| Cara | **x 795–900**, en el tercio de arriba | queda 15 px dentro del borde del cuadrado; si sale más a la derecha, la cara se corta en WhatsApp |
+| Lecho | abajo, a lo ancho | ahí no va nada del texto |
+
+### Imagen del slider (2:1, se entrega a 2400 × 1200)
+
+![Zonas seguras de la imagen del slider](../../manual-de-uso/creative/assets/slider-hero-zonas-seguras.svg)
+
+| Zona | Dónde (% de la imagen) | Por qué |
+|---|---|---|
+| Lo que se ve en todos los anchos | **x 42–96 % · y 7–93 %** | 1440 muestra x 25–96 %; 1920, x 4–96 %; el teléfono, sólo la parte derecha (x 42–100 %). Arriba y abajo, el parallax corta 6–7 % |
+| Título del slider | tapa **x 29–65 % · y 31–61 %** en 1440 (x 19–54 % en 1920) | en escritorio va encima de la imagen; en el teléfono va debajo, sin tapar nada |
+| Tarjeta «Siguiente» | tapa **x 75–92 % · y 68–77 %** | abajo a la derecha, en escritorio |
+| Tira de diapositivas | tapa desde **y 86 %** | toda la base, en escritorio |
+| **Cara y gesto** | **x 68–92 % · y 10–64 %** | a la derecha del título, encima de «Siguiente» y dentro de lo que se ve en el teléfono |
+| Mitad izquierda | oscura y calma, sin detalle | es el fondo del título |
+
+### Foto de la tarjeta del rail (el plate, con punto focal «84% 30%»)
+
+![Zonas seguras de la foto de la tarjeta](../../manual-de-uso/creative/assets/card-rail-zonas-seguras.svg)
+
+| Zona | Dónde (% del plate) | Por qué |
+|---|---|---|
+| Lo que se ve | **x 49–91 %** en escritorio y tablet; **x 57–89 %** en el teléfono; todo el alto | la tarjeta es vertical y recorta los costados |
+| Etiqueta de formato y flecha | las esquinas de arriba: **y 5–8 %** del alto | arriba a la izquierda y arriba a la derecha de la tarjeta |
+| Degradado y texto de la tarjeta | el degradado empieza en **y 36 %**, es sólido bajo **y 70 %** y el título va desde **y 64 %** | la mitad de abajo queda tapada |
+| **Cara** | **x 60–86 % · y 10–40 %** | dentro del recorte del teléfono con un 3 % de aire, debajo de las etiquetas y encima del degradado |
+| Mitad de abajo | pareja y oscura (mesa, suelo, sombra) | un detalle ahí compite con el título de la tarjeta |
+
+Las posiciones de la etiqueta, la flecha y el degradado se midieron en la tarjeta de 440 × 600. En el teléfono se
+asume la misma proporción, sin medirla.
+
+### Plate (2560 × 1440): la intersección de todo lo anterior
+
+El plate alimenta las tres imágenes de arriba, así que debe cumplir las tres a la vez:
+
+| Zona | Dónde (% del plate) |
+|---|---|
+| **Cara** | **x 68–75 % · y 10–40 %**: centro de la cara en torno al **71 %**. Se pide al 85 % en la ficha, porque el modelo la corre unos 15 puntos al centro |
+| Lado izquierdo | el **64 % izquierdo** en oscuridad calma: ahí van el texto de la portada y el título del slider |
+| Mitad de abajo | lecho parejo y oscuro: ahí van el degradado de la tarjeta y la tira del slider |
+| Bordes | nada importante en el **7 %** de arriba y de abajo (parallax del slider) |
+| Texto | ninguno |
+
+Si la cara sale entre el 66 % y el 68 %, el `hero` se recorta en 2400 × 1200 quitando hasta 160 px a la izquierda, y
+la cara queda en torno al 69 %. Si sale fuera del 66–76 %, se corrige la ficha y se vuelve a generar: no se estira ni
+se mueve la foto.
+
+### Imágenes del cuerpo y piezas de distribución
+
+- **Cuerpo:** el artículo las muestra enteras, sin recorte. Su margen es interno: el texto de una infografía tiene que
+  leerse a 390 px (la columna del teléfono), así que la composición de móvil existe cuando la de escritorio no se lee
+  ahí ([infografías editoriales](../../manual-de-uso/public-site/producir-infografias-editoriales.md)).
+- **Post de LinkedIn 1200 × 627:** se ve completo; los márgenes son los de la pieza medida de la lente
+  (`applications.md` §A5).
+- **Miniatura de YouTube 1280 × 720:** YouTube pone la duración del video abajo a la derecha; esa esquina va sin
+  nada importante, y el logo de Efeonce va abajo a la izquierda (práctica de la plataforma, sin medir acá).
+- **Story 1080 × 1920:** zona segura del 87 % de AXIS: nada importante en el 13 % de arriba ni de abajo.
+
 ## 1. Plate: la foto sin texto
 
 Es la materia prima: de ella salen la portada y, si hace falta, la imagen del slider. No se publica sola.
@@ -45,7 +120,7 @@ Es la materia prima: de ella salen la portada y, si hace falta, la imagen del sl
 | Cómo | ficha cine (`"registro": "cine"`, `"alcance": "manzanitas"`, la `linea` del tema) → `cine-reviewer` → `pnpm foto:generar <ficha> --quality high --size 2560x1440` → `pnpm foto:validar:cine` y `pnpm foto:validar` → `pnpm foto:emblema` al 100 % |
 | Costo | unos USD 0,055 por toma (gpt-image-2.5-sunburst, octubre de 2026) |
 | Persona | del **elenco ficticio**, con la prenda de su línea y la marca bordada; nunca Julio ni el equipo real en estas fotos |
-| Encuadre | **cara entre el 65 % y el 75 % del ancho** (x 795–900 sobre 1200), en el tercio de arriba. Se pide en torno al 85 %, porque el modelo la corre unos 15 puntos al centro. El 64 % izquierdo en oscuridad calma, sin luces ni objetos. El lecho (mesa o suelo en sombra) abajo, a lo ancho |
+| Encuadre | **cara entre el 68 % y el 75 % del ancho** y entre el 10 % y el 40 % del alto (§Márgenes de seguridad, Plate). Se pide en torno al 85 %, porque el modelo la corre unos 15 puntos al centro. El 64 % izquierdo en oscuridad calma, sin luces ni objetos. El lecho (mesa o suelo en sombra) abajo, a lo ancho |
 | Texto | **ninguno**: ni letras, ni logos de otras marcas, ni carteles legibles |
 | Dónde queda | `ai-generations/<fecha>_<tema>/plates/`; no va a git (`pnpm ai-gen:archive` cuando el operador lo decida) |
 
@@ -91,11 +166,11 @@ título cae encima del texto de la portada: **un post con portada de Manzanitas 
 | Formato | **2:1**. Entrega 2400 × 1200 (la que está en vivo mide 1774 × 887); WebP |
 | De dónde sale | **se recorta del plate**, sin foto nueva: de 2560 × 1440 a 2560 × 1280, quitando arriba |
 | Texto | **ninguno**: el slider pone su propio título (dos líneas, `--light` y `--bold`) |
-| Encuadre | el título ocupa la izquierda: x 80–800 en 1440 (x 320–1040 en 1920), y el slider ancla la foto a la derecha. En el teléfono se ve el 61 % central de la imagen. Por eso el **sujeto va entre el 55 % y el 80 % del ancho**, y la mitad izquierda queda oscura y calma |
-| Medidas del slider | 1440 × 900 y 1920 × 900 en escritorio, con `object-fit: cover`, `object-position: 100% 50%` y un 10 % de margen por el parallax; en 390, la imagen a 636 × 318, centrada |
+| Encuadre | **cara entre x 68 % y x 92 % y entre y 10 % y y 64 %**; mitad izquierda oscura y calma (§Márgenes de seguridad) |
+| Medidas del slider | 1440 × 900 y 1920 × 900 en escritorio, con `object-fit: cover`, `object-position: 100% 50%` y un 10 % de margen por el parallax, con el título encima a la izquierda; en 390, la imagen en una franja de 390 × 300 que muestra su parte derecha (x 42–100 %), con el título debajo |
 | Subida | `pnpm public-website:blog-home hero <post> --image <archivo.webp> --alt "…" --apply` (el velo desaparece) |
 
-Con la cara del plate en x 795–900 (66–75 %), el recorte del plate cumple sin recomponer.
+Con la cara del plate en torno al 71 %, el recorte del plate cumple sin recomponer (si sale entre el 66 % y el 68 %, ver §Márgenes de seguridad, Plate).
 
 ## 4. Imagen de la card del rail (hecha en local, sin desplegar)
 

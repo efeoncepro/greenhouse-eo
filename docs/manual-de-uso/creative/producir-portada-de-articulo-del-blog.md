@@ -99,7 +99,10 @@ pnpm public-website:blog-home card <post> --image <plate.png> --alt "<alt>" --fo
   tarjeta».
 - QA: mira la tarjeta en 1440 y en 390. La cara tiene que quedar entera y el texto de la tarjeta, sobre fondo oscuro.
 
-Para que el sujeto sobreviva a la tarjeta (una portada sin texto incrustado, o el plate que vaya a la tarjeta):
+Para que el sujeto sobreviva a la tarjeta **con el recorte centrado** (una portada sin texto incrustado que vaya tal
+cual). Con el plate y el punto focal «84% 30%», los márgenes son otros y están en el
+[inventario, §Márgenes de seguridad](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md#márgenes-de-seguridad-cómo-debe-ser-cada-imagen):
+cara en x 60–86 % · y 10–40 % del plate. Ahí están también los márgenes del slider y del plate, con sus diagramas.
 
 | Qué | Dónde, en el lienzo de 1200 × 630 | Por qué |
 |---|---|---|
