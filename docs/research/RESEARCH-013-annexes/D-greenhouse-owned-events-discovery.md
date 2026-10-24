@@ -79,9 +79,9 @@ hasta 1.000 asistentes [V]; Resend ya contratado).
 
 ## Riesgos y decisiones abiertas
 
-- **Correos dobles:** si Teams y Greenhouse mandan confirmación, la persona recibe dos. Decidir quién confirma
-  (Greenhouse con su marca y el enlace personal, o Teams). Recordatorio: Teams lo manda una hora antes en plan Business
-  (hora no configurable) [V].
+- **Correos dobles — decidido (2026-10-24):** confirma Greenhouse con su marca y el `joinWebUrl` personal; Teams en
+  silencio. Falta verificar cómo se apagan los correos de Teams por webinar en plan Business (app Eventos o Graph con
+  permiso delegado). Si no se pudieran apagar, la persona recibiría también el correo y el recordatorio de Teams.
 - **Cancelación en Teams:** por aplicación solo con RSC por chat del evento [V]; en fase 1 la persona que cancela sigue
   inscrita en Teams y puede recibir su recordatorio. Decidir si basta o si se suma permiso delegado del organizador.
 - **Duplicado de Evento de marketing** si el conector vuelve a funcionar: el switch por evento lo evita.

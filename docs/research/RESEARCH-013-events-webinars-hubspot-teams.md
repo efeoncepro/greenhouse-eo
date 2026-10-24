@@ -82,11 +82,15 @@ manda).
 4. **Una sola fuente por Evento de marketing:** el conector Teams↔HubSpot si funciona; si no, Greenhouse por API.
 5. **Sin release por ahora** (~3 h cada uno): todo se acumula y sale en un solo release cuando el operador lo decida.
 6. El operador quiere que el agente ejecute (navegador, CLI); solo se le pide lo que exige su identidad.
+7. **La confirmación la manda Greenhouse** con la marca Efeonce y el **enlace personal de Teams** (`joinWebUrl` de la
+   inscripción); **Teams en silencio** (correos a asistentes desactivados en cada webinar). Greenhouse también manda la
+   lista de espera, el «ya tienes cupo» y el recordatorio.
 
 ## Decisiones abiertas
 
-- **Quién manda la confirmación con el enlace:** Greenhouse (marca propia + `joinWebUrl` personal, Teams en silencio)
-  o Teams.
+- **Cómo silenciar Teams en cada webinar:** confirmar si en M365 Business el organizador puede apagar los correos a
+  asistentes en la app Eventos, o si hay que hacerlo por Graph (`settings.isAttendeeEmailNotificationEnabled=false`,
+  que pide permiso delegado del organizador). Verificar en el primer webinar de prueba.
 - **Nombre y apellido en la píldora:** Teams los exige para inscribir; hoy la píldora pide solo correo.
 - **Cancelación en Teams:** por aplicación solo con RSC por evento; ¿basta liberar el cupo en Greenhouse o se suma
   permiso delegado del organizador?

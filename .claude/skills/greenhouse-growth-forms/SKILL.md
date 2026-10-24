@@ -674,6 +674,8 @@ manual: `docs/manual-de-uso/public-site/lanzar-evento-o-webinar.md`. A test even
 
 #### Eventos y webinars — estado y backlog (2026-10-24)
 
+- **Decisión (2026-10-24):** la confirmación la manda Greenhouse con su marca y el enlace personal de Teams (`joinWebUrl`); Teams en silencio en cada webinar.
+
 Fuente única del pendiente: [RESEARCH-013 §Backlog canónico](../../../docs/research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos)
 (diseño en el [anexo D](../../../docs/research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md), conector
 en el [anexo C](../../../docs/research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md)). **No lanzar eventos
