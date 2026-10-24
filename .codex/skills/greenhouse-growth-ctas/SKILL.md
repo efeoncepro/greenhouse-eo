@@ -164,14 +164,25 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
 
 ## Estado de rollout (actualizar al cambiar)
 
-- **2026-10-23: `open_growth_form` en diálogo — contrato (TASK-2044) y render (TASK-2045) code complete; renderer `1.4.0`, llega con el próximo release a `main`.**
+- **2026-10-24: primer consumidor `open_growth_form` + `presentation: 'dialog'` EN VIVO** (tras el release a `main`:
+  CTA `1.4.0`, forms `1.2.0`). CTA `partners-become-partner` en «cierre» de `/partnership/`, surface
+  `csur-5638aab5-d53c-402a-836b-a0a72ce2c7a4`, `cta-location: partners_close`, formulario `efeonce-partner-application`.
+  Key en `.auth/partners-cta-surface.json` (0600, gitignored): re-correr `scripts/growth/publish-partners-become-partner-cta.ts`
+  ROTA la key → re-publicar Partners con ese archivo. Verificado en vivo 1440/390: diálogo «Sumémonos», 5 campos +
+  consentimiento compacto, Escape cierra, dataLayer `greenhouse_cta_viewed/clicked/form_opened` con
+  `activation_mode: dialog`. Pendiente: smoke de envío real (requiere OK del operador: crea un registro en HubSpot
+  «Lead Gean - Partnership») y GTM DLV + dimensión GA4 `activation_mode` (preview + confirmación). Receta de host
+  (lanzador source-led, piel en page layer, ancho explícito): skill `efeonce-public-site-wordpress` →
+  `references/source-led-elementor-patterns.md` §Native meeting launcher «Any governed CTA».
+
+- **2026-10-23: `open_growth_form` en diálogo — contrato (TASK-2044) y render (TASK-2045); renderer `1.4.0`, released 2026-10-24.**
   Policy `presentation: 'inline' | 'dialog'` + encabezado `dialog: { eyebrow?, title?, lead? }` (texto plano,
   estricto). Sólo `dialog` se proyecta al navegador; un encabezado sin `dialog` es `action_policy_invalid` (regla en el
   resolver: la unión discriminada no admite `.refine`). **No es `popup_modal`**: es abierto por el visitante, sin
   suppression ni claim interruptivo. `src/growth-cta-renderer/dialog.ts` (`FormDialogController`): `<dialog>` +
   `showModal`, form montado al abrir y conservado, scroll lock compartido, Escape/velo bloqueados con `data-ghf-busy`,
   `ghf:dismiss` cierra, `data-sheet` < 760 px, `data-success` retira el encabezado; piel con `--ghcta-dialog-*` y hooks
-  `data-ghcta-dialog-*`. Telemetría `activation_mode: 'dialog'` (DLV/GA4 pendiente). Hasta el release, inline. Arch §30.
+  `data-ghcta-dialog-*`. Telemetría `activation_mode: 'dialog'` (DLV/GA4 pendiente). Arch §30.
 
 - **2026-10-23: placement `landing_dock`** (dock inferior compartido de siete landings de efeoncepro.com, AXIS
   `efeonce.landing-dock`, plugin `eo-landing-dock`, TASK-2043). Mismo patrón de **lanzador oculto** que el menú: el

@@ -377,9 +377,10 @@ landing: se declara en una versión nueva del formulario.
 6. La piel va en el CSS del anfitrión con tokens `--ghf-*` y hooks `data-ghf-part` (tabla en el contrato de runtime;
    ejemplo: `scripts/public-website/partners-source/partner-dialog-skin.css`).
 
-**Qué no hacer:** no publiques una versión con `{privacyLink}` mientras el renderer de TASK-2045 (`1.1.0`) no esté en
-producción: el renderer actual muestra el marcador tal cual. `width`, `compact`, `icon` y `dismiss` sí se pueden
-publicar antes (el renderer actual los ignora sin romper). Tabla completa:
+El renderer de producción (`1.2.0`, release del 2026-10-24) ya interpreta `{privacyLink}`, `width`, `compact`, `icon`
+y `dismiss`; el primer formulario diseñado en vivo es `efeonce-partner-application` (popup de `/partnership/`).
+**Qué no hacer:** no embebas una versión con `{privacyLink}` en un host que fije un bundle anterior a `1.1.0`: lo
+mostraría tal cual. Tabla completa:
 [contrato de runtime](../../architecture/growth-public-forms-runtime-contract.md#formularios-diseñados-en-canvas-lo-que-el-contrato-admite-task-2044).
 
 ## Publicar la suscripción a Glitch como píldora (TASK-2053/2054)

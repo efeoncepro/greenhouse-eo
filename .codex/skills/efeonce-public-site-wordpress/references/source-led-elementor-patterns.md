@@ -73,6 +73,18 @@ Medios and Performance now share one core; new canvas landings must use it inste
       launcher on close; on phones it sets `[data-full-screen]`.
     - Splitting a flex row: `flex-basis:0` leaves padding outside the split, so a padded half grows; use
       `flex:1 1 50%` + `min-width:0` on both halves.
+  - **Any governed CTA, not only meetings (2026-10-24, Partners «Quiero ser partner»):** the launcher renders whatever
+    slug `meeting.cta` names, so an `open_growth_form` + `presentation: 'dialog'` CTA reuses it unchanged. Lessons:
+    - The page publisher takes the 0600 `.auth/<…>-cta-surface.json` (`{ surfaceId, embedKey }`) as an extra input and
+      writes `meeting_surface`/`meeting_embed_key` only into the launcher module's widget settings; never in git/logs.
+    - Its dialog is `dialog.ghc-form-surface` in `<body>`: ship the skin as the page layer (`pageLayer: true`);
+      Partners' compiler generates `page.css` from `partner-dialog-skin.css` prefixing `body:has(.gh-partners)`.
+    - `width: fit-content` also collapses to 0 (button clipped, clicks hit the parent): use the canvas button's width
+      (Partners 209px) with `.ghc-card/.ghc-actions/.ghc-primary` at 100%.
+    - The CTA's targeting routes apply: on a preview slug the launcher renders empty. Verify the armed launcher on the
+      live route (publisher snapshot = rollback) or set `route` explicitly in a test.
+    - Deploying the widget package before publishing is safe: the live page keeps the fallback link until the
+      publisher writes the key.
     - Inline styles copied from the canvas beat stylesheet rules: overriding them needs `!important`.
     - An outline/transparent button over a photo or gradient boundary shows the seam through it: give it its own
       backdrop (background + `backdrop-filter`).

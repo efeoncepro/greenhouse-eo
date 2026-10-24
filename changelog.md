@@ -24,8 +24,8 @@
 
 - `/about-us-efeonce/` y `/partnership/` publicadas como widgets Elementor compilados desde los canvas aprobados de «La
   órbita» (11 y 6 módulos). Nosotros: fidelidad al canvas, rieles fijos de Ohio despejados, mapa sin parallax, hero
-  anclado a la izquierda y wordmark de HubSpot. Partners: «Quiero ser partner» sigue a `/agenda/` hasta el release de
-  los renderers de TASK-2044/2045. [Layout](docs/documentation/public-site/wordpress-ohio-elementor-layout.md#landing-nosotros-source-led-page_id-249770-desde-2026-10-23).
+  anclado a la izquierda y wordmark de HubSpot. Partners: desde el release del 2026-10-24, «Quiero ser partner» abre el
+  formulario de alianzas en un diálogo gobernado (Growth CTA + Growth Forms, TASK-2044/2045). [Layout](docs/documentation/public-site/wordpress-ohio-elementor-layout.md#landing-nosotros-source-led-page_id-249770-desde-2026-10-23).
 
 ## 2026-10-23 — Mattis: preparación Markdown y continuidad comercial
 

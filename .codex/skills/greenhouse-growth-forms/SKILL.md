@@ -607,19 +607,21 @@ bundle) in a test browser before publishing a version. The renderer only reaches
 release until TASK-2038 moves it to AXIS. Host checklist: `efeonce-public-site-wordpress`
 `references/growth-forms-wordpress.md` §Canvas-designed forms.
 
-**Design-fidelity fields (TASK-2044 contract + TASK-2045 render, code complete 2026-10-23; renderer `1.1.0`, ships with the next `main` release).** Declare a canvas
+**Design-fidelity fields (TASK-2044 contract + TASK-2045 render; in production since release `40b330175855`, 2026-10-24 — introduced as `1.1.0`, live renderer `1.2.0`; first live consumer: the «Quiero ser partner» dialog on `/partnership/`, see `greenhouse-growth-ctas` §Estado de rollout).** Declare a canvas
 design instead of styling it: `fields[].presentation.width` (`auto|half|full`), `consent.presentation` (`tile|compact`)
 + `consent.privacyLinkLabel` + one `{privacyLink}` marker in a checkbox `label` (compiler blocks HTML, other markers,
 repeats and a missing `privacyUrl`), `successBehavior.icon` (`celebration|orbit|none`) and success action
 `kind: 'dismiss'` (no `href`/`target`). In a Growth CTA, `open_growth_form` takes `presentation: 'dialog'` + optional
 `dialog: { eyebrow, title, lead }`. Absent = today's contract. The live renderer ignores them gracefully **except**
-`{privacyLink}`, which an old renderer shows literally: never publish the marker before the TASK-2045 renderer is in
-production. Full table: `docs/architecture/growth-public-forms-runtime-contract.md` §Formularios diseñados en canvas.
+`{privacyLink}`, which a pre-1.1.0 renderer shows literally (only matters for a consumer-pinned old bundle). Full table: `docs/architecture/growth-public-forms-runtime-contract.md` §Formularios diseñados en canvas.
 Host skin = tokens (`--ghf-field-*`, `--ghf-label-*`, `--ghf-btn-*`, `--ghf-consent-*`, `--ghf-orbit`, `--ghf-placeholder`,
 `--ghf-column-gap`) + `data-ghf-part` hooks, never internal classes; `color-scheme="dark"` now forces dark; `steps: []`
 hides default success steps; `dismiss` emits DOM `ghf:dismiss` (telemetry-independent); `data-ghf-busy` while
 submitting; Turnstile mounts next to the form (works inside a modal `<dialog>`). Worked example + evidence:
 `scripts/public-website/partners-source/partner-dialog-skin.css`, `docs/ui/reviews/TASK-2045/`.
+Observed live (2026-10-24): the compact consent block mounts a moment after the fields (a screenshot taken right after
+the inputs appear misses it); closing a CTA dialog while the first required field is focused fires
+`gh_form_field_validation_failed` (blur validation on dismiss) and inflates that metric — renderer follow-up, not fixed.
 
 **Inline pill + event registration (TASK-2053 contract + TASK-2054 render; in production since release
 `40b330175855`, 2026-10-24, renderer `1.2.0`; first live use: Glitch subscription on `/blog/`; a real human submit and

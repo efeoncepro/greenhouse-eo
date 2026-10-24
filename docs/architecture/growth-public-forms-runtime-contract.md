@@ -189,11 +189,12 @@ anillo del eyebrow, el punto del título y la flecha del botón son piel de la l
 contrato. No se admite: HTML del autor, otros marcadores, anchos en columnas distintas de dos, ni la colocación
 interruptiva `popup_modal` (sigue sin implementar).
 
-**Render (TASK-2045, code complete 2026-10-23; renderers formularios `1.1.0` y CTA `1.4.0`).** Llega a los hosts con
-el próximo release de Greenhouse a `main` (el `prebuild` construye `renderer-latest.js`). Hasta entonces el renderer
-publicado ignora `width`, `consent.presentation` e `icon`, omite `dismiss` y el CTA abre `dialog` inline; ninguno rompe.
-**Excepción:** el renderer anterior muestra `{privacyLink}` literal: no publicar una versión con el marcador antes del
-release.
+**Render (TASK-2045; en producción desde el release del 2026-10-24: formularios `1.2.0`, que incluye lo de `1.1.0`, y
+CTA `1.4.0`).** Primer consumidor en vivo: el popup «Quiero ser partner» de `/partnership/` (formulario
+`efeonce-partner-application`, CTA `partners-become-partner`). Un host que fije un bundle anterior a `1.1.0` ignora
+`width`, `consent.presentation` e `icon`, omite `dismiss`, abre `dialog` inline y muestra `{privacyLink}` literal.
+**Defecto conocido:** cerrar el diálogo con el primer campo enfocado dispara `gh_form_field_validation_failed` (la
+validación del blur corre sobre el campo vacío); pendiente de corregir en el renderer.
 
 Piel del anfitrión (sólo tokens y hooks; nunca selectores internos):
 

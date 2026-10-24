@@ -2,6 +2,17 @@
 
 [Historial](Handoff.archive.md).
 
+## 2026-10-24 — Partners: popup «Quiero ser partner» en vivo tras el release (TASK-2044/2045)
+
+El release a `main` llevó los renderers formularios `1.2.0` y CTA `1.4.0`. En `/partnership/` (248003, módulo
+«cierre») el botón abre el Growth CTA `partners-become-partner` en diálogo con el formulario
+`efeonce-partner-application` (HubSpot directo a «Lead Gean - Partnership»); verificado en vivo 1440/390 (diálogo
+«Sumémonos», 5 campos + consentimiento, Escape, `dataLayer` con `activation_mode: dialog`). Snapshot
+`_gh_partners_v2_before_20261024_122057`; backups `/tmp/eo-partners-widgets-before-20261024-12*.tar`. **Pendiente:**
+smoke de envío real (requiere OK del operador: crea un registro CRM), DLV GTM + dimensión GA4 `activation_mode`
+(preview + confirmación) y GVC formal; defecto: cerrar con el primer campo enfocado dispara
+`gh_form_field_validation_failed` (renderer). TASK-2044/2045 siguen `in-progress`. **Sin push** (develop adelantado).
+
 ## 2026-10-24 — Prospección del chat: documentación y continuidad por canal
 
 [Cinco casos y evidencias](docs/commercial/prospecting-agent/runs/2026-10-24-cierre-chat-prospeccion.md):
@@ -45,8 +56,8 @@ despejado del switcher Dark/Light y «Follow Us» desde 1181 px (`--gh-rail`), m
 sobre sus ciudades), hero anclado al riel izquierdo en pantallas anchas y wordmark oficial de HubSpot en las cifras.
 Commits `7b57a9589`, `1991fe21d`, `c90171c9e` + runtime `b5f7a25`, `4a2bfd2`, `f5d730e`; backups
 `/tmp/eo-nosotros-widgets-before-*.tar` en Kinsta. **Pendiente por decisión del operador:** el mismo choque de rieles en
-Partners entre 1181 y ~1320 px. **Sin push** (develop adelantado; varias sesiones). TASK-1322 y TASK-1369 llevan delta:
-1322 queda superseded, 1369 conserva sólo E-E-A-T (JSON-LD `Organization`/`Person`), captura del portal y reslug.
+Partners entre 1181 y ~1320 px. **Sin push** (develop adelantado; varias sesiones). TASK-1322 cerrada como superada;
+TASK-1369 recalibrada al remanente (JSON-LD `AboutPage`/`Organization`/`Person`, reslug `/nosotros`, GVC; fundación 2018).
 
 ## 2026-10-23 — EO Portfolio: programa creado y TASK-2046 Slice 1 (sólo lectura)
 
@@ -231,12 +242,3 @@ Segunda ronda (`3d9ee81` runtime): sin «Por Efeonce», temas con arte editorial
 Operador detuvo el release y pidió conservar el trabajo en develop y revisar diseño. No merge/release a main ni cutover WordPress.
 HubSpot Glitch creado y GTM Web7 ya publicado antes del stop; Forms review y CF7 live. No envío real.
 No retomar publicación sin nueva autorización. [Vista previa y estado](docs/audits/public-site/2026-10-20-blog-growth-form-preparation.md).
-
-## 2026-10-20 — Partnerships: contactos, habilitación y expediente Nexsys
-
-Adobe `.com`/AM17480390 Registered: Code of Conduct100%, Certified recibido; aprobación pendiente.
-Nexsys: 12PDF enviados19:14Chile a Francisco, CC Jean/Javiera/Constanza, firma gráfica/CCO; Outlook y EMAIL118974219069 SENT verificados. Formulario sin firma para revisión; crédito/Marketplace/capacitación pendientes.
-Google `.org`: Cloud/Workspace indirecto activo/Ingram, handshake completo; respuesta comercial y formación pendientes.
-Microsoft `.com` 20/10: Verified, Authorized e Indirect Reseller Active; correo a Geraldine/CC Camila enviado17:21 con captura/firma, EMAIL119142026297 SENT. Respuesta comercial LOL pendiente; AWS SmartHub/Partner Central por verificar.
-[Registro y auditorías](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) · [manual y controles](docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md).
-[Directorio](docs/operations/EFEONCE_PARTNER_CONTACT_DIRECTORY_V1.md):27 personas,8 buzones, fuentes/rebotes; índice nominal en cuatro skills Codex/Claude. Antes de contactar, leer ficha e hilo; sin nuevos envíos en la consolidación del directorio.
