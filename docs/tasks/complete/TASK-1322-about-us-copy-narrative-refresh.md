@@ -4,8 +4,8 @@
 
 El 2026-10-23 `/about-us-efeonce/` se rediseñó por completo y se publicó como widgets source-led (`greenhouse_nosotros_*`);
 el hero `+90`/«Ver cómo operamos», las secciones `Qué hacemos`/`Infraestructura` y los fixes `body.page-id-249770` de
-`global-fixes.css` que esta task protegía ya no forman parte de la página. Todo su scope quedó superado: cerrar como
-superseded.
+`global-fixes.css` que esta task protegía ya no forman parte de la página. Todo su scope quedó superado. **Cerrada como superada el 2026-10-24** (sin ejecución; los criterios de aceptación
+quedan sin tildar porque nunca se implementaron).
 
 
 ## Delta 2026-07-08 — superseded por TASK-1369
@@ -20,7 +20,7 @@ Esta task era un **refresh de copy ligero** que mantenía el hero actual y no re
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -33,7 +33,7 @@ Esta task era un **refresh de copy ligero** que mantenía el hero actual y no re
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Superada — no se ejecutó`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `none`
