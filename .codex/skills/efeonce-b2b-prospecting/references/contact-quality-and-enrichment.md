@@ -21,6 +21,12 @@ legítimo (grupo/rename), pero exige vínculo verificable. `catch-all` no es cas
 individual concluyente: conserva incertidumbre y verifica antes de admitir el contacto. Buzón general, email
 personal o resultado sin dirección no cumple el gate individual. No presentar un correo aportado por el
 comprador como certificado SMTP ni exigir una única marca de verificación.
+Si el provider devuelve a la vez `email_status=verified`, dominio `catch-all` y un veredicto `allow`,
+conservar los tres datos y su fecha: el estado específico del correo no elimina la incertidumbre del dominio,
+y `allow` no acredita una comprobación SMTP independiente ni resuelve por sí solo el gate. Si catch-all
+sigue sin resolver, mantener el carril pendiente según [entregabilidad](deliverability-operations.md);
+no rebautizar el resultado como validación de otro proveedor ni convertir una actuación histórica en
+excepción general o permiso para nuevas altas/envíos.
 Si la atribución o calidad quedan contradictorias, mantén el carril pendiente y propone el menor chequeo útil.
 No crear el contacto para “completar después”. Puede avanzarse con otros elegibles y explicar la cobertura.
 Una dirección publicada exacta puede respaldar atribución sin acreditar calidad técnica; conservar ambas
@@ -38,6 +44,9 @@ En Apollo, People API Search no entrega correo/teléfono; un resultado de person
 Endpoints de organización/export/lookup/waterfall pueden cobrar según plan y resultado. Verifica contrato
 vigente en [fuentes](sources.md) y las instrucciones del provider antes de llamar, no hardcodear créditos.
 Aplica shortlist: consulta identidad/roles, elige candidatos útiles y enriquece sólo dentro del presupuesto.
+La aprobación de un match estándar para una persona no autoriza waterfall, validación pagada adicional,
+teléfono, datos personales ni otro candidato. Si el resultado basta, continuar con el alcance aprobado;
+si hace falta una operación de mayor costo, declarar lo obtenido y resolver sólo ese permiso pendiente.
 
 Para trabajo asíncrono, aceptación/request ID no es email obtenido: reconciliar finalización y resultado.
 Guardar dirección exactamente retornada, fuente/estado/fecha/costo. Sin email devuelto, termina ese carril;

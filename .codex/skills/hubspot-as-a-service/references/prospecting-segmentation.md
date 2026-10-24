@@ -92,6 +92,21 @@ Use the shared [buying-group method](../../efeonce-b2b-prospecting/references/bu
    A critical stakeholder without email stays in research; a relevant access route may be documented without
    creating that person. A first conversation does not require a confirmed champion or the entire committee.
 
+### Native Documents side effects and parent geography
+
+Generating a recipient link in Documents can create an email-only Contact with a `PRESENTATIONS` origin
+and a lifecycle such as SQL. Dedupe the exact address again before creating, then complete the authorized
+record, its Primary Company and source evidence. Native creation or SQL is not buyer qualification.
+If correcting lifecycle is within the approved intake, read the current value and use the supported route;
+a backward change may require clearing `lifecyclestage`, reading back the empty value, then setting `lead`
+and reading back again. An accepted update alone did not prove that a backward change persisted.
+Do not edit workflows, erase source history or create a second Contact to bypass that behavior.
+
+For a global parent Company, preserve its evidence-backed headquarters country and industry. Capture the
+person's country and the initiative's market separately; do not overwrite the parent location to force a
+local segment. Verify actual memberships after asynchronous indexing instead of changing filters or facts
+when the first immediate membership read is empty.
+
 Historical `individual_no_email`, `shared_inbox` and `identity_pending` values remain readable classifications,
 not exceptions to new-contact admission. Preserve existing records and enums; this rule does not authorize
 deletion, schema/filter changes or historical migration. Do not duplicate an existing no-email record.

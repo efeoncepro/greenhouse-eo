@@ -5,6 +5,10 @@
 Identifica entidad que compraría, marca, dominio, mercado y servicio principal. Distingue filial/grupo,
 empresa/persona y cliente/aliado/competidor. No mezcles personas homónimas ni prospectos de otro portal.
 Lee dossier e hilo vigentes y consulta CRM cuando su estado sea material y el acceso esté autorizado.
+Si el pedido parte de una captura, conciliar nombre completo, perfil, empleador y señal antes de enriquecer
+o escribir en CRM; no sustituir el objetivo por la primera coincidencia del proveedor. Distinguir sede global
+de Company, ubicación de la persona y mercado de la iniciativa. No convertir una operación local en la sede
+del holding ni inventar la entidad contratante cuando aún no se conoce.
 
 Carga [ICP vigente](../../../../docs/context/13_icp-buyer-personas-jtbd.md) y Customer Model. Para clientes
 nuevos de servicios, el piso es 50 personas verificadas en la entidad compradora; desconocido o banda que cruza

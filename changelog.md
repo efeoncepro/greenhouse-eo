@@ -2,6 +2,15 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-24 — Prospección: cierre multicanal y skills conciliadas
+
+- Cinco casos del chat documentados con estados por persona/canal; cinco EMAIL `SENT` corroborados y secuencia sólo
+  NIASA. Se conserva LinkedIn de Arcor pendiente y la incertidumbre de correos inferidos/catch-all.
+- Método/manuales y cuatro skills espejo precisan identidad, permisos de enriquecimiento, originales de brochure,
+  persistencia HTML, efectos de Documents y readbacks separados. Collateral creativo aplica la aprobación íntegra
+  del 17/10. Cinco escenarios sintéticos añadidos; sin nuevas comunicaciones ni cambios runtime.
+  [Auditoría y límites](docs/audits/commercial/2026-10-24-chat-prospeccion-docs-skills.md).
+
 ## 2026-10-24 — Portada del blog v3: revisión en vivo y piezas listas
 
 - Portada nueva publicada para revisión en `efeoncepro.com/blog-v3-revision/` (noindex): plugin `eo-blog-home` con los
@@ -644,29 +653,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - [Product Design 360](docs/architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md): aprobada entera por el operador; ADR `Accepted`, [modelo](docs/business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) `Approved`, Wave con seis familias en portfolio, catálogo de servicios, context pack e índice de decisiones; G1–G6 pasan a validación posterior. Sin precios nuevos.
 
 - Brochure [«Servicios web y digitales»](ai-generations/2026-10-09_deck-web-nexa-spark/deck/LEEME.md) (línea Engine, 29 láminas) aprobado y canonizado: fuente del canvas, PDF rasterizado y render; `deck-studio`, [manual](docs/manual-de-uso/creative/componer-deck-con-recetas.md), doc funcional, norma §4.6 y [collateral de Wave](docs/services/wave/README.md). Pendientes de contenido antes de enviarlo a prospectos.
-
-## 2026-10-09 — Capacidad CRM regional y Talent Assurance aprobados
-
-- [Publicidad programática aprobada](docs/architecture/EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md): modelo V1.4, pricing V1.3, ficha y manual con tarifario USD y cobro estándar; setup único, fee fijo, externos al costo, margen mínimo/objetivo 45%/55%, honorarios a 30 días y liquidación a 15. Catálogo/registry y evidencia sincronizados. PDF previo desactualizado; contratación externa y costos observados por campaña. Sin integración/runtime ni facturas/cotizaciones emitidas.
-
-- Cotizador V3: tres subagentes consolidaron arquitectura, modelos, manuales, contratos y skills Codex/Claude contra el código; routers e índices llevan a la [superficie completa](docs/documentation/finance/cotizador-v3-superficie-implementada.md). [Cobertura y cierre](docs/audits/commercial/2026-10-09-pricing-v3-docs-skills-consolidation.md); simulación local, datos económicos y promoción canónica conservan su revisión pendiente.
-
-- [Pibank](docs/commercial/prospects/banco-pichincha-peru-seo-2026/README.md): propuesta técnica v13 (49 láminas) y cotización USD/PEN enviadas a Jesús Vargas Serpa; compromiso inicial de seis meses y renovación trimestral sobre el plan anual de US$79.200; deal en Presentación de soluciones. [Deck v13](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/deck-propuesta/README.md), [región de filtros SVG](docs/architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) en `method-surround-cycle` y [manual: `content-stack` y empalme](docs/manual-de-uso/creative/componer-deck-con-recetas.md).
-
-- Pricing V3: [operación para agentes](docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md),32perfiles, herramientas por trabajo, reparto reconciliado, costosAdobe/Notion con fuentes, mantenimiento con impacto, evaluación y preview redactado. TASK-2022 completa local;213 testsV2/V3 y26operacionesCLI verificados; economíaTASK-2017 parcial e integración canónica pendiente.
-
-- Pricing V3: [composición por demanda](docs/manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md), base/roles/tareas, seats/pools y créditos integrados al quote; explain/replay congelados, tres casos y revisión obligatoria. TASK-2021 local; sin inventario live ni tarifa comercial aprobada.
-
-- Pricing V3: [presupuesto IA por CLI](docs/manual-de-uso/finance/presupuestar-creditos-ia-v3.md), suscripción y paquetes extra discretos, caja/remanente/vencimiento; TASK-2020 local, sin compra ni binding automático a quotes.
-
-- Pricing V3: [licencias/plataforma declaradas](data/pricing/v3-pilot/economics/resource-inputs/README.md) registradas con créditos, moneda, renovación Adobe y propuesta de reparto; asignaciones/normalización pendientes, sin cambiar catálogo histórico ni quotes.
-
-- Pricing V3: [policy/provisiones propuestas](docs/business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md), seis sensibilidades CLI y fuentes oficiales; TASK-2017 parcial.
-
-- Pricing V3: [selección y mantenimiento local](docs/manual-de-uso/finance/catalogo-v3-seleccion-y-actualizacion.md), 32 perfiles históricos, kits, calendario, desglose y versiones con preview/apply. TASK-2019; tarifas vigentes y promoción runtime pendientes.
-
-- [Pricing V3 local](docs/manual-de-uso/finance/cotizar-v3-por-cli.md): núcleo decimal separado, CLI, snapshots/replay y borrador redactado. 49 pruebas V3 y 23 históricas; tipos/lint focal verdes. [Ficha Colombia→Chile](docs/documentation/finance/cotizador-v3-piloto-colombia-chile.md) preparada: diseñador senior 50%, ledger/readiness y cinco simulaciones históricas y [equipo Pibank Perú/Chile](docs/documentation/finance/cotizador-v3-prueba-pibank.md) con costo reconciliado y margen 40% de prueba; revisión y export bloqueado; costos/políticas pendientes; sin integración canónica o tarifas aprobadas. [Evidencia](docs/audits/commercial/2026-10-09-pricing-v3-local-prototype.md).
-
-- [CLI de pricing](docs/manual-de-uso/finance/consultar-excel-pricing-por-cli.md): Excel extraído con hash/celdas/fórmulas; búsqueda, auditoría, costos declarados, equipos y comparación de márgenes sin UI/DB. Escenarios hipotéticos; Excel/seeds y motor vigente intactos.
-
-- [Dirección regional aceptada](docs/architecture/EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md), [servicio](docs/services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md), modelo y activación documentados: modalidades, buying group, economics, formación, continuidad y matriz contractual. Talent Assurance, arquitectura objetivo y guardrails pasan a aceptados por aprobación del operador; policy e implementación pendientes. Índices, task/epic, documentación funcional/manual y skills espejo conciliados. Sin nuevo runtime, precios, contratos ni envíos.

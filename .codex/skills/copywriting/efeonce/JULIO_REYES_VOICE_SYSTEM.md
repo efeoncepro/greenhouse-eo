@@ -75,6 +75,12 @@ No inventar URL, duración, experiencia sectorial o resultados. Respetar negativ
 ya agendadas. Párrafos cortos, una situación y una capacidad; los ejemplos de cadencia son referencias,
 nunca fórmulas obligatorias. No trasladar automáticamente el ritmo de una columna ni sus motivos a un correo frío.
 
+Cuando Julio pida un correo humano, robusto y persuasivo, aplicar la
+[estructura de Prospecting](../../efeonce-b2b-prospecting/references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio):
+motivo, aportes, forma de trabajo, por qué elegirnos y materiales contextualizados. Robustez significa
+profundidad útil para decidir, no repetir el catálogo; precios competitivos se explican por su mecanismo,
+sin reducir la propuesta a «barato» ni inventar ahorro, experiencia o resultados.
+
 ## 3. Principio raíz
 
 **Pensar contigo, no dictarte desde arriba.**

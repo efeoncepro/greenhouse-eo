@@ -279,3 +279,15 @@ Programado por contacto. Plantilla, configuración, inscripción, envío y entre
 separados. La [capacidad local](../operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md) corrige la premisa
 comercial anterior, sin probar propiedad de talleres ni modificar el contrato de ejecución de terceros.
 Es consolidación del mandato y evidencia del caso, sin nuevo schema, API, scheduler o autorización externa.
+
+
+## Conciliación documental del chat — 24/10/2026
+
+El operador pidió subagentes, actualización de docs/skills y commit del trabajo de Fundación Luz, Arcor,
+Huelquén Montessori, NIASA y Disney. El [cierre por persona](../commercial/prospecting-agent/runs/2026-10-24-cierre-chat-prospeccion.md)
+y la [auditoría](../audits/commercial/2026-10-24-chat-prospeccion-docs-skills.md) conservan acciones y brechas.
+Se precisa la operación existente: identidad antes de enriquecimiento, calidad de correo distinta de match,
+permisos por persona/canal, dos originales de brochure cuando se pidieron, persistencia HTML, readback de
+EMAIL/LinkedIn/inscripción independientes y límites OAuth por comando. Se concilia el pendiente antiguo del
+brochure creativo con la aprobación íntegra del 17/10. No cambia admisión, ICP, fuente de verdad, schema,
+APIs, scheduler, política de envío o autoridad de futuras acciones. No se introduce una decisión arquitectónica nueva.

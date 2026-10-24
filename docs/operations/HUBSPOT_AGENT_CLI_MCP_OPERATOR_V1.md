@@ -192,6 +192,21 @@ Texto de routing preservado desde CLAUDE.md para reducir su presupuesto; este ca
 
 Los invariantes operativos del bridge HubSpot — Cloud Run hubspot-greenhouse-integration (write bridge + webhooks), inbound webhook p_services (0-162) auto-sync, service pipeline lifecycle stage sync, webhook events dual-format — viven en **`docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` → §`Invariantes operativos para agentes — HubSpot bridge/intake`** (+ `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` para el Cloud Run). El inbound companies+contacts (TASK-706) y el sample sprint outbound (TASK-837) viven en el companion `agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` (ver el pointer "Integraciones/infra cross-runtime" abajo). **Invocar la skill `hubspot-greenhouse-bridge` al tocar rutas del bridge, webhooks HubSpot o secretos.**
 
+## Observaciones de prospección — 23–24/10/2026
+
+En el [cierre del chat](../commercial/prospecting-agent/runs/2026-10-24-cierre-chat-prospeccion.md),
+`associations create` y el carril de secuencias rechazaron OAuth de usuario aunque `whoami` mostraba scopes
+CRM. La capacidad se comprueba por comando, no por la autenticación general. Usar la UI autenticada o una
+capability permitida para el alcance autorizado; no usar service key ni saltar controles para eludir el rechazo.
+La asociación Primary se leyó con `associations list`; los EMAIL del CCO con `activities list` y lectura por ID.
+
+Documents puede crear un contacto de correo y producir un lifecycle automático. Buscar la dirección antes
+y después, completar/reutilizar el registro y comprobar Primary sin crear duplicados. La corrección de etapa
+requiere autorización y readback: una respuesta de escritura exitosa no prueba que una etapa anterior se haya
+aplicado; en el caso observado hizo falta vaciar y después asignar `lead`. Esto documenta el mecanismo, no
+habilita normalizaciones de otros contactos ni cambios de workflows. Membresía de segmentos se comprueba
+por búsqueda efectiva; atributos guardados o sede global de la Company no prueban segmentación completa.
+
 ## Fuentes y límites
 
 - [Guía oficial de HubSpot Agent CLI](https://developers.hubspot.com/docs/developer-tooling/local-development/agent-cli/guide) — beta, instalación, OAuth/service key, comandos y permisos; contrastar con `--help` de la versión instalada.

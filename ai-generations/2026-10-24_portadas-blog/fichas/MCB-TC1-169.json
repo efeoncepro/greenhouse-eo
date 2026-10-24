@@ -1,0 +1,43 @@
+{
+  "id": "MCB-TC1-169",
+  "formato": "16:9",
+  "registro": "cine",
+  "alcance": "manzanitas",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "linea": "engine",
+  "identidad": [
+    {
+      "persona": "sophia",
+      "vista": "45-izq"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "nota": "Elenco ficticio en Manzanitas (Sophia, línea engine) por el precedente del operador del 2026-10-18 (fotos del menú: Nexa o el elenco, nunca Julio); nunca con su nombre en pantalla ni como equipo real.",
+  "llave": {
+    "fuente": "the central glass card of azure-white light lying flat on the table in front of her",
+    "lado": "below and slightly toward frame-left of her face",
+    "tamano": "a thin glass card the size of a postcard",
+    "distancia": "about 50 cm below her face, as she leans over the table"
+  },
+  "fondo": "a row of large cold white-azure practical lights very far behind her, melted into round bokeh, all of them to the right of 72 % of the frame width",
+  "fenomeno": {
+    "que": "a cluster of small glass cards arranged in a ring around one larger glowing card, each joined to it by a fine thread of azure light: the topic cluster, visible on the table",
+    "esServicio": "SEO con topic clusters: una página pilar y su contenido de apoyo, ordenados y conectados"
+  },
+  "escena": "SCENE (cinematic still, Hollywood drama, a vast dark Efeonce strategy room at night with a faint haze only far behind her, far behind her on the right, softly out of focus, the tall dark glass wall and the ceiling grid of the room recede into the darkness, giving the room its scale, a cool frame, natural warm-neutral skin): a MEDIUM-WIDE shot of Sophia, wearing the EFEONCE SOFTSHELL JACKET of the corporate uniform over a plain dark top, STANDING behind the far end of a long review table of matte oiled walnut with no reflections, about six metres long; she leans slightly forward over the table, her face about 50 cm above the glowing central card; the camera at the near end of the table, at her chest height, about six metres from her, 85mm f/2.8; the table runs away from the lens diagonally toward the right of the frame, so its far end, where she stands, is in the right quarter of the frame. Her near shoulder is at about 78 % of the frame width and her face at about 86 %; between the left edge of the frame and her body there is a wide band of empty darkness. MOMENT, caught at the exact instant: on the table in front of her, low in the frame, lies one larger glass card that glows azure-white (#0375DB and cold white) and is the only key light, lighting her face from below; around it, in a tight ring about 50 cm across, lie six smaller plain glass cards, each the size of a playing card, each joined to the central card by one fine, faint thread of azure light; with the fingertips of her RIGHT hand she sets down the last small card into its place in the ring, her forearm close to her body, while her left hand rests on the table edge. All the cards stay directly in front of her, between 70 % and 92 % of the frame width, and never higher than her waist. The cards are plain glass with NO text, NO symbols and NO marks. She looks straight into the lens with a serious, analytical calm and a contained closed-mouth smile. At one corner of the last small card, the one under her fingertips, sits ONE tiny brighter point of azure-white light (#0375DB), smaller than any bokeh disc: the only accent in the frame; it lights nothing around it. Near the lens the tabletop fills the whole width of the bottom of the frame; the left two thirds of the visible tabletop are bare, empty dark walnut. Above the bare tabletop, the LEFT 64% of the frame is calm, deep dark space: no light and no objects, no bokeh, no beams. No laptops, no papers, no mugs, no plants, no monitors, no lamps. Enormous contrast, no readable text anywhere, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the near edge of the matte oiled walnut review table, spanning the whole width of the bottom of the frame, only a few centimetres in front of the lens, in deep shadow, outside every light, with no reflections",
+    "tono": "DARK walnut in deep shadow, near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark room above the bare walnut tabletop, empty all the way to her shoulder",
+      "tinta": "blanca"
+    }
+  }
+}

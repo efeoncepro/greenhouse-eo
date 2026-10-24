@@ -59,14 +59,20 @@ describe('what a frozen artifact says, after recomputing it', () => {
       expect(verdict.belowFloor, artifact.path).toBe(diagnosticCodes(value.semantic.result).includes(FLOOR_DIAGNOSTIC))
   })
 
-  it('for a composition it is the same rows the summary of the engine sizes', () => {
-    const compositions = verdicts.filter(({ verdict }) => verdict.artifactVersion === COMPOSITION_VERSION)
+  // Replays every composition again: under coverage instrumentation it outgrew the default 15 s once the corpus took
+  // the Réditos 2027 catalogs (CI Deep of 80a3fcfe7, 2026-10-24).
+  it(
+    'for a composition it is the same rows the summary of the engine sizes',
+    () => {
+      const compositions = verdicts.filter(({ verdict }) => verdict.artifactVersion === COMPOSITION_VERSION)
 
-    expect(compositions.length).toBeGreaterThan(0)
+      expect(compositions.length).toBeGreaterThan(0)
 
-    for (const { artifact, value, verdict } of compositions)
-      expect(verdict.belowFloor, artifact.path).toBe(linesBelowPolicyFloor(replayResourceComposition(value).semantic.result).length > 0)
-  })
+      for (const { artifact, value, verdict } of compositions)
+        expect(verdict.belowFloor, artifact.path).toBe(linesBelowPolicyFloor(replayResourceComposition(value).semantic.result).length > 0)
+    },
+    TIMEOUT
+  )
 
   it('the corpus exercises both verdicts and both statuses', () => {
     // Without these the equalities above would hold over a corpus that never says "below the floor".

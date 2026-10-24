@@ -1,0 +1,603 @@
+{
+ "title": "Topic clusters y contenido pilar: cómo ordenar tu SEO para Google y la IA",
+ "slug": "seo-inbound-marketing",
+ "excerpt": "Qué es un topic cluster, cómo armar una página pilar y su contenido de apoyo, cómo enlazarlos y por qué ordenar tu blog por temas también te ayuda a ser citado por la IA.",
+ "seo": {
+  "title": "Topic clusters y contenido pilar: guía práctica | Efeonce",
+  "description": "Qué es un topic cluster, cómo armar una página pilar y su contenido de apoyo, cómo enlazarlos y por qué ordenar por temas también te ayuda a ser citado por la IA.",
+  "canonicalUrl": "https://efeoncepro.com/inbound/seo-inbound-marketing/",
+  "inLanguage": "es-CL",
+  "indexPolicy": "index"
+ },
+ "intro": [
+  "Imagina un blog con cuarenta artículos. Cada uno se escribió para una palabra clave distinta, cada uno está bien redactado y ninguno aparece en Google.",
+  [
+   {
+    "text": "Ahí hay algo que no calza: más contenido debería significar más autoridad. Pero para un buscador, cuarenta páginas sueltas no prueban que sepas de un tema. "
+   },
+   {
+    "text": "Prueban que escribiste mucho.",
+    "strong": true
+   }
+  ],
+  "Mi lectura es que el problema casi nunca es la cantidad de contenido, sino cómo está ordenado. Vamos por partes."
+ ],
+ "tableOfContents": true,
+ "sections": [
+  {
+   "heading": "¿Qué es un topic cluster?",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Un topic cluster es un grupo de contenidos sobre un mismo tema: una página pilar que explica el tema de forma amplia y varios artículos de apoyo que profundizan en preguntas específicas, todos enlazados entre sí.",
+       "strong": true
+      },
+      {
+       "text": " El pilar responde «qué es y cómo funciona»; cada artículo del cluster responde una pregunta concreta y vuelve al pilar."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "El modelo lo popularizó HubSpot en su investigación "
+      },
+      {
+       "text": "Topic clusters: the next evolution of SEO",
+       "href": "https://blog.hubspot.com/marketing/topic-clusters-seo"
+      },
+      {
+       "text": ", cuando los buscadores ya habían empezado a entender temas y no sólo palabras sueltas."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Dicho de otro modo: dejas de escribir por palabra clave y empiezas a escribir por tema. La palabra clave sigue importando, pero como una pregunta dentro de un tema que quieres que te reconozcan."
+    }
+   ]
+  },
+  {
+   "heading": "Página pilar y contenido de cluster: qué hace cada uno",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "table",
+     "style": "stripes",
+     "caption": "Diferencias entre la página pilar y los artículos de su cluster.",
+     "headers": [
+      "",
+      "Página pilar",
+      "Artículo de cluster"
+     ],
+     "rows": [
+      [
+       "Qué responde",
+       "El tema completo: qué es, cómo funciona, por dónde empezar",
+       "Una pregunta específica, a fondo"
+      ],
+      [
+       "Alcance",
+       "Amplio, sin agotar cada subtema",
+       "Acotado y profundo"
+      ],
+      [
+       "Búsqueda que atiende",
+       "La más general del tema",
+       "Las variantes, dudas y comparaciones"
+      ],
+      [
+       "Enlaza a",
+       "Cada artículo de su cluster",
+       "La pilar y, si suma, a otros del mismo cluster"
+      ],
+      [
+       "Ejemplo",
+       "Qué es el inbound marketing",
+       "Qué es paid media y cómo combinarlo con inbound"
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Vamos con manzanitas 🍏🍏🍏: la página pilar es el frutero y cada artículo es una manzana. Una manzana suelta en la mesa se pierde; el frutero lleno dice, de un vistazo, que en esa casa hay fruta. A un buscador le pasa lo mismo con tu blog."
+    }
+   ]
+  },
+  {
+   "heading": "Por qué funciona, en Google y en la IA",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "En Google, porque demuestra profundidad y ayuda a entender tu sitio.",
+       "strong": true
+      },
+      {
+       "text": " La guía de Google sobre "
+      },
+      {
+       "text": "contenido útil y centrado en las personas",
+       "href": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content"
+      },
+      {
+       "text": " premia el contenido que cubre un tema de forma completa y muestra experiencia real. Y sus "
+      },
+      {
+       "text": "buenas prácticas de enlaces",
+       "href": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable"
+      },
+      {
+       "text": " explican que los enlaces internos, con un texto ancla descriptivo, ayudan a Google a encontrar tus páginas y a entender de qué trata cada una. Un cluster hace las dos cosas a propósito."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "En la IA, por cómo se arman las respuestas.",
+       "strong": true
+      },
+      {
+       "text": " Google explica que su "
+      },
+      {
+       "text": "modo IA usa una técnica llamada query fan-out",
+       "href": "https://blog.google/products/search/google-search-ai-mode-update/"
+      },
+      {
+       "text": ": divide la pregunta de la persona en subtemas y lanza muchas búsquedas a la vez. La hipótesis que vale la pena probar es simple: si tu sitio cubre los subtemas de un tema, tiene más oportunidades de responder alguna de esas búsquedas y de ser citado. No es una garantía; es la razón para ordenar por temas en vez de por palabras sueltas."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Eso es parte de lo que hoy se llama "
+      },
+      {
+       "text": "AEO",
+       "href": "https://efeoncepro.com/aeo-2/",
+       "mention": {
+        "line": "engine"
+       }
+      },
+      {
+       "text": ": que los motores de respuesta te entiendan, te citen y te recomienden. Lo desarrollamos en "
+      },
+      {
+       "text": "SEO + AEO: optimización para buscadores y motores de respuesta",
+       "href": "https://efeoncepro.com/loop-marketing/seo-aeo-optimizacion-ia-2025/"
+      },
+      {
+       "text": " y en "
+      },
+      {
+       "text": "El 80% de lo que cita la IA no existe en Google",
+       "href": "https://efeoncepro.com/aeo/donde-cita-la-ia/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Y en tu cliente, porque acompaña cómo decide.",
+       "strong": true
+      },
+      {
+       "text": " La gente no compra en línea recta: explora y evalúa una y otra vez, lo que Google llamó el Messy Middle. La pilar sirve para explorar; los artículos del cluster, para evaluar. Lo explicamos en "
+      },
+      {
+       "text": "qué es el inbound marketing y cómo funciona en 2026",
+       "href": "https://efeoncepro.com/inbound/que-es-inbound-marketing/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Cómo armar un topic cluster paso a paso",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "ordered": true,
+     "items": [
+      [
+       {
+        "text": "Elige el tema por tu negocio, no por el volumen.",
+        "strong": true
+       },
+       {
+        "text": " Un buen tema es uno donde quieres que te reconozcan y que tu cliente ideal necesita entender antes de comprarte. Aquí está cómo definir a ese cliente: "
+       },
+       {
+        "text": "cliente ideal B2B: ICP, buyer persona, IPP y JTBD",
+        "href": "https://efeoncepro.com/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Junta las preguntas reales.",
+        "strong": true
+       },
+       {
+        "text": " Las búsquedas que ya te traen impresiones en Search Console, lo que le preguntan a tu equipo comercial y lo que tu cliente le pregunta a ChatGPT o a Gemini. Cada pregunta distinta es un candidato a artículo."
+       }
+      ],
+      [
+       {
+        "text": "Agrúpalas por intención.",
+        "strong": true
+       },
+       {
+        "text": " Separa las que exploran («qué es», «cómo funciona») de las que evalúan («X vs Y», «cuánto cuesta», «ejemplos»). Una sola URL por pregunta: si dos páginas responden lo mismo, compiten entre sí."
+       }
+      ],
+      [
+       {
+        "text": "Escribe la página pilar.",
+        "strong": true
+       },
+       {
+        "text": " Responde el tema de forma amplia, con la definición al inicio, y enlaza a cada artículo del cluster donde corresponde."
+       }
+      ],
+      [
+       {
+        "text": "Escribe los artículos del cluster.",
+        "strong": true
+       },
+       {
+        "text": " Uno por pregunta, a fondo, con respuesta directa al comienzo y un punto de vista propio. Ideas para hacerlo bien: "
+       },
+       {
+        "text": "estrategia de contenidos que genera resultados",
+        "href": "https://efeoncepro.com/inbound/estrategia-de-contenidos/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Enlázalos con intención.",
+        "strong": true
+       },
+       {
+        "text": " Cada artículo vuelve a la pilar; la pilar enlaza a cada artículo; y entre artículos, sólo cuando un enlace ayuda a quien lee. Usa textos ancla que digan a dónde llevan, nunca «haz clic aquí»."
+       }
+      ],
+      [
+       {
+        "text": "Mide por tema, no por página.",
+        "strong": true
+       },
+       {
+        "text": " Agrupa en Search Console las búsquedas del cluster y míralas juntas: posiciones, impresiones y clics del tema completo. Suma las menciones y citas en asistentes de IA."
+       }
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Un ejemplo: así ordenamos el tema inbound en este blog",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Lo estamos aplicando con nuestro propio contenido. El tema es el inbound marketing:"
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Página pilar: ",
+        "strong": true
+       },
+       {
+        "text": "Qué es el inbound marketing y cómo funciona en 2026",
+        "href": "https://efeoncepro.com/inbound/que-es-inbound-marketing/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Artículo de cluster: ",
+        "strong": true
+       },
+       {
+        "text": "Qué es paid media y cómo combinarlo con el inbound marketing",
+        "href": "https://efeoncepro.com/marketing-digital/inbound-marketing-paid-media/"
+       },
+       {
+        "text": ", para quien evalúa cómo encaja la publicidad."
+       }
+      ],
+      [
+       {
+        "text": "Artículo de cluster: ",
+        "strong": true
+       },
+       {
+        "text": "Estrategia de contenidos que genera resultados",
+        "href": "https://efeoncepro.com/inbound/estrategia-de-contenidos/"
+       },
+       {
+        "text": ", para quien ya decidió hacer contenido."
+       }
+      ],
+      [
+       {
+        "text": "Artículo de cluster: ",
+        "strong": true
+       },
+       {
+        "text": "este mismo, para quien necesita ordenar su SEO por temas."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Cada uno enlaza de vuelta a la pilar y la pilar enlaza a cada uno. Y si quieres llevar el mismo orden a la búsqueda fuera de Google —video, redes, marketplaces—, lo contamos en "
+      },
+      {
+       "text": "tu cliente ya no busca sólo en Google",
+       "href": "https://efeoncepro.com/aeo/surround-discovery-seo-google-video-marketplace/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Errores frecuentes al armar topic clusters",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "items": [
+      "Escribir dos páginas para la misma pregunta: compiten entre sí y ninguna gana.",
+      "Convertir la página pilar en una página de venta: la pilar enseña; la venta va en tu página de servicio.",
+      "Publicar artículos del cluster que no enlazan de vuelta a la pilar.",
+      "Elegir el tema sólo porque tiene muchas búsquedas, aunque no tenga que ver con lo que vendes.",
+      "Medir cada artículo por separado y perder de vista el tema completo."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Preguntas frecuentes sobre topic clusters",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "faq",
+     "schema": {
+      "enabled": true,
+      "name": "Preguntas frecuentes sobre topic clusters",
+      "canonicalUrl": "https://efeoncepro.com/inbound/seo-inbound-marketing/",
+      "inLanguage": "es-CL"
+     },
+     "items": [
+      {
+       "question": "¿Qué es una página pilar?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Es la página que explica un tema de forma amplia y enlaza a los artículos que profundizan en cada pregunta del tema. Es el centro del topic cluster."
+        }
+       ]
+      },
+      {
+       "question": "¿Cuántos artículos necesita un topic cluster?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "No hay un número fijo. Depende de cuántas preguntas distintas tiene tu cliente sobre ese tema. Es mejor un cluster corto y completo que uno largo con artículos que se repiten."
+        }
+       ]
+      },
+      {
+       "question": "¿Los topic clusters sirven para aparecer en las respuestas de IA?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Pueden ayudar. Los motores de respuesta dividen una pregunta en subtemas y buscan cada uno; un sitio que cubre esos subtemas tiene más oportunidades de ser citado. No es una garantía: también cuentan la calidad, la autoridad y que el contenido sea fácil de citar."
+        }
+       ]
+      },
+      {
+       "question": "¿Qué diferencia hay entre un topic cluster y un silo?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Un silo ordena el contenido sobre todo por la estructura del sitio, con carpetas y categorías. Un topic cluster lo ordena por tema y lo conecta con enlaces internos. Pueden convivir: lo importante es que cada tema tenga una pilar clara y sus artículos enlazados."
+        }
+       ]
+      },
+      {
+       "question": "¿Los topic clusters reemplazan la investigación de palabras clave?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "No. La ordenan. Las palabras clave te dicen qué pregunta la gente; el cluster decide en qué página responde cada pregunta y cómo se conectan."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "En resumen",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Un topic cluster es la forma de decirle a Google, a la IA y a tu cliente que sabes de un tema: una página pilar que lo explica, artículos que responden cada pregunta y enlaces que los unen. No se trata de publicar más, sino de ordenar mejor lo que publicas."
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Si quieres seguir esta conversación, lee "
+       },
+       {
+        "text": "Glitch",
+        "href": "https://efeoncepro.com/category/glitch/"
+       },
+       {
+        "text": ": cada lunes, una idea sobre IA, marketing y negocios."
+       }
+      ],
+      [
+       {
+        "text": "Revisa cómo te describen hoy los asistentes de IA con el "
+       },
+       {
+        "text": "Efeonce AI Visibility Report",
+        "href": "https://think.efeoncepro.com/brand-visibility",
+        "mention": {
+         "line": "growth"
+        }
+       },
+       {
+        "text": ", gratuito."
+       }
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Fuentes y nota de actualización",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "HubSpot. "
+       },
+       {
+        "text": "Topic clusters: the next evolution of SEO",
+        "href": "https://blog.hubspot.com/marketing/topic-clusters-seo"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Google Search Central. "
+       },
+       {
+        "text": "Creating helpful, reliable, people-first content",
+        "href": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Google Search Central. "
+       },
+       {
+        "text": "SEO link best practices for Google",
+        "href": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Google (2025). "
+       },
+       {
+        "text": "AI Mode in Google Search: updates from Google I/O 2025",
+        "href": "https://blog.google/products/search/google-search-ai-mode-update/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Google. "
+       },
+       {
+        "text": "Search Quality Rater Guidelines",
+        "href": "https://static.googleusercontent.com/media/guidelines.raterhub.com/en//searchqualityevaluatorguidelines.pdf"
+       },
+       {
+        "text": "."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Este artículo se publicó en agosto de 2024 con el título «Más allá de las keywords: el impacto del SEO en estrategias inbound» y se reescribió en octubre de 2026: se enfocó en topic clusters y contenido pilar, se sacó la historia de las actualizaciones del algoritmo (la búsqueda con IA vive ahora en nuestro artículo de SEO + AEO) y se retiraron cifras sin fuente verificable. Lo desarrolló Julio Reyes con apoyo de IA en investigación, estructura y edición; Julio definió la tesis y aprobó la versión final."
+    }
+   ]
+  }
+ ],
+ "cta": {
+  "text": [
+   {
+    "text": "Y si quieres ordenar tu sitio por temas, conoce cómo trabajamos el "
+   },
+   {
+    "text": "posicionamiento SEO",
+    "href": "https://efeoncepro.com/servicios/posicionamiento-seo/",
+    "mention": {
+     "line": "engine"
+    }
+   },
+   {
+    "text": " y el "
+   },
+   {
+    "text": "marketing de contenidos",
+    "href": "https://efeoncepro.com/servicio-marketing-de-contenidos/",
+    "mention": {
+     "line": "brand"
+    }
+   },
+   {
+    "text": "."
+   }
+  ]
+ }
+}

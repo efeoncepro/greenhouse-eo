@@ -1,5 +1,13 @@
 # Registro de búsquedas comerciales
 
+## 24/10/2026 — Cierre documental del chat: cinco prospectos
+
+[Cierre consolidado](runs/2026-10-24-cierre-chat-prospeccion.md): Fundación Luz, Arcor, Huelquén Montessori,
+NIASA y Disney. Cinco EMAIL `SENT` corroborados; LinkedIn de Arcor no realizado; sólo NIASA con secuencia.
+Correos inferidos y catch-all conservan sus límites. Auditoría de sólo lectura y actualización de docs/skills,
+sin nuevos mensajes, créditos, altas o inscripciones. [Controles](../../audits/commercial/2026-10-24-chat-prospeccion-docs-skills.md).
+
+
 **Fundación Luz, investigación focalizada22/10/2026:** Contact257217550764 / Company59806188192 / Primary y
 nota119334575454 verificados. Dirección inferida admitida y usada por excepción expresa informada de Julio;
 correo22:18:35Santiago con firma gráfica/CCO/brochure original, EMAIL119337620506SENT e InMail21:37 enviados.

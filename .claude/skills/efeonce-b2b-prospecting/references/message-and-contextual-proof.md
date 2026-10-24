@@ -52,7 +52,9 @@ aseguradora. Cuando pida un correo comercial **robusto**, usar esta arquitectura
    compartir íntegra la versión aprobada pertinente, mediante su documento existente de HubSpot.
    Los brochures están aprobados y no necesitan validaciones adicionales ni recortes (Julio, 17-10-2026).
    Para presentar la agencia completa: «Agencia de Marketing 360°», completo de 84 láminas o corto de 26,
-   en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`. Para contenidos, usar
+   en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`. Si pide «completo»,
+   elegir el de 84, no el corto. Si pide además Agencia Creativa, compartir ambos originales con enlaces
+   nativos individuales y descripciones distintas: el específico no sustituye al 360°. Para contenidos, usar
    el brochure específico de Marketing de Contenidos. [Regla vigente](../../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
 7. **Invitación natural:** pregunta útil sobre prioridades o criterios; enlace de reunión verificado
    y respuesta por correo como alternativas de la misma conversación.
@@ -61,8 +63,17 @@ aseguradora. Cuando pida un correo comercial **robusto**, usar esta arquitectura
    La firma gráfica es obligatoria siempre, incluidos seguimientos (Julio, 21/10/2026); comprobar su render y no sustituirla por texto.
 
 Voz personal de Julio: cercana, profesional, específica y con párrafos cortos; suficiente detalle para
-defender la propuesta, sin catálogo completo ni fórmulas copiadas entre cuentas. La preferencia es por
-la **estructura y profundidad**, no por un número fijo de palabras ni por alargar todos los primeros
+defender la propuesta, sin catálogo completo ni fórmulas copiadas entre cuentas.
+
+Un «por qué elegirnos» explica el mecanismo que responde al pedido: coordinación, especialidades,
+revisión y capacidad local confirmada. Cuando el operador plantea precios competitivos, explicar cómo
+capacidad compartida, tecnología y reutilización distribuyen costos, sin presentarnos como «baratos»,
+descalificar al freelance ni prometer un ahorro o presupuesto sin cotización. Una búsqueda de desarrollo
+con diseño ya resuelto pide implementación y colaboración con su diseñadora; la continuidad en HubSpot
+es una posibilidad a conversar, no un contrato implícito. Trayectoria y nivel Partner necesitan su evidencia
+vigente y se afirman por separado: años de experiencia no son años con ese nivel de partnership.
+
+La preferencia es por la **estructura y profundidad**, no por un número fijo de palabras ni por alargar todos los primeros
 contactos. Adaptar extensión a señal, relación y pedido; en seguimientos, conservar el aporte nuevo
 en vez de repetir toda la presentación. Esta preferencia no autoriza envíos futuros.
 
@@ -151,6 +162,9 @@ por prioridad, sobre la misma tesis. Compartir el documento original completo me
 destinatario no exige copiar el correo en LinkedIn. Conciliar por separado Enviados/firma/CCO, EMAIL CRM
 SENT y conversación LinkedIn publicada; «Enviando» no cierra el último carril. Autorización de ambos canales
 para una persona no se extiende a colegas, secuencias o futuros toques; declarar el costo del InMail disponible.
+Una invitación de conexión pendiente no es un mensaje enviado ni exige retirarla para usar InMail cuando
+el DM y su crédito estén autorizados. Verificar la conversación y hora de envío; el correo enviado no cierra
+LinkedIn, y la solicitud de secuencia de una persona anterior no se hereda al siguiente prospecto.
 
 [Aplicación Fundación Luz](../../../../docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md):
 InMail y correo robusto respondieron a la misma solicitud pública de PR y campaña, con aportes y extensión

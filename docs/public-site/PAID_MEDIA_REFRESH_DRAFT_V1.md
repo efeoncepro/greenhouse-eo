@@ -319,3 +319,11 @@ Total: 18 enlaces únicos + 13 menciones; todos 200 al 2026-10-24.
   (la tabla de 5 columnas se desplaza dentro de su figura); consola sin errores; sin «figital», «【» ni U+200B.
 - **Pendiente humano:** pedir a Google la revisión de la URL en Search Console (estaba «Rastreada: actualmente sin
   indexar»). **Pendiente de diseño:** portada e imagen social en el formato antiguo.
+
+## Portada e imagen social nuevas (2026-10-24)
+
+Imagen destacada y Open Graph reemplazadas por la portada de Marketing con Manzanitas centrada para el recorte móvil
+(adjunto `252066`, `wp-content/uploads/2024/10/que-es-paid-media-portada-2026.jpg`, 2400 × 1260). Verificado en vivo: `og:image` y la imagen principal del
+schema apuntan al archivo nuevo, 200 `image/jpeg`; las tarjetas del blog (recorte cuadrado) muestran la cabecera, la
+respuesta y la firma. Proceso, revisión, rollback y pendientes:
+[`ai-generations/2026-10-24_portadas-blog/LEEME.md`](../../ai-generations/2026-10-24_portadas-blog/LEEME.md).
