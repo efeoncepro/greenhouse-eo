@@ -51,17 +51,17 @@
 
 ## Hipótesis abiertas
 
-1. **La política está sólo como `Global` y la API de webinars la exige asignada al organizador** [I]. Prueba propuesta:
-   `Grant-CsApplicationAccessPolicy -PolicyName MY-APP-POLICY -Identity "jreyes@efeoncepro.com"` (reversible con
-   `-PolicyName $null`; propagación hasta 30 min). El control de permisos de la sesión de Claude bloqueó ejecutarlo; lo
-   corre el operador o se habilita el permiso.
+1. ~~La política está sólo como `Global` y la API de webinars la exige asignada al organizador.~~ **Descartada**: con
+   autorización explícita del operador se asignó `MY-APP-POLICY` a jreyes@efeoncepro.com el 2026-10-24 a las 14:09 CLT
+   (`Grant-CsApplicationAccessPolicy`; reversible con `-PolicyName $null`). A los 30 min la lista y la acción del
+   workflow seguían sin webinars [V]. La asignación se deja puesta: es la que pide la guía de HubSpot.
 2. **Falla del lado de HubSpot** en el descubrimiento de webinars nuevos (suscripciones a cambios de Graph vencidas) [I].
    «Editar cuenta conectada» sólo reasigna la cuenta de Teams del usuario; no reautoriza. Sin opción de reautorizar
    salvo desinstalar. → Caso al soporte de HubSpot (texto abajo).
 3. Si la sincronización vuelve, queda por probar la pregunta de fondo: **¿un envío de Greenhouse por la Forms API al
    formulario conectado inscribe en Teams?** [no documentado].
 
-## Texto para el soporte de HubSpot (borrador, sin enviar)
+## Texto para el soporte de HubSpot (enviado 2026-10-24 ~14:45 CLT por correo desde el Centro de ayuda, con la política por usuario y el resultado del workflow agregados; respuesta prometida en un día laborable)
 
 > **Asunto:** Teams webinars no aparecen ni se sincronizan como eventos de marketing (portal 48713323)
 >
@@ -84,6 +84,7 @@
 
 ## Siguiente paso
 
-- Enviar el caso (con OK del operador sobre el texto) o probar la hipótesis 1.
+- Esperar la respuesta del soporte de HubSpot (caso enviado; chat y teléfono cerrados el lunes 26-oct). Reconectar la
+  app sólo si el soporte lo recomienda, en horario tranquilo y con captura previa de toda su configuración.
 - Cuando HubSpot liste el webinar: marcar Sincronizar, probar el envío de Greenhouse al formulario conectado y recién ahí
   crear la task `backend-data` de la integración.
