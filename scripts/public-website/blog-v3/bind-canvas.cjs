@@ -57,7 +57,19 @@ const CARD_ARROW = '<svg class="card__a" viewBox="0 0 24 24" aria-hidden="true">
 // the slider chip, drawn in the same stroke as the five canvas glyphs. It never renders for the canvas fixture.
 const NOVE_ICON = '<sc-if value="{{ s.fNove }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a3 3 0 0 1 0 6"/><path d="M10 8v11a1 1 0 0 1 -1 1h-1a1 1 0 0 1 -1 -1v-5"/><path d="M12 8l4.524 -3.77a.9 .9 0 0 1 1.476 .692v12.156a.9 .9 0 0 1 -1.476 .692l-4.524 -3.77h-8a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h8"/></g></svg></sc-if>'
 
+// Approved deviations for real editorial images (operator, 2026-10-24, seen live with real content): a post's featured
+// image is not composed for the slider, so it gets a reading scrim on the copy side (only when the data asks for it:
+// never for slider art such as the canvas images), and the dek keeps the canvas two lines.
+const SCRIM = '<sc-if value="{{ s.scrim }}" hint-placeholder-val="{{ false }}"><span class="hs-scrim" aria-hidden="true"></span></sc-if>'
+const REAL_CONTENT_CSS = `
+/* Contenido real (2026-10-24): velo de lectura para imágenes editoriales y bajada en dos líneas */
+.hs-scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,26,51,.94) 0%,rgba(0,26,51,.82) 28%,rgba(0,26,51,.4) 50%,rgba(0,26,51,0) 68%),linear-gradient(0deg,rgba(0,26,51,.72) 0%,rgba(0,26,51,0) 36%)}
+.hs-copy p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+`
+
 function bindMarkup(src) {
+  src = rep(src, /(<img class="hs-bleed" src="\{\{ s\.img \}\}" alt="" style="transform: scale\(\{\{ s\.zoom \}\}\);">)/, '$1' + SCRIM)
+  src = rep(src, /\n<\/style>/, '\n' + REAL_CONTENT_CSS + '</style>')
   src = rep(src, /(<sc-if value="\{\{ s\.fFlash \}\}" hint-placeholder-val="\{\{ false \}\}"><svg[\s\S]*?<\/svg><\/sc-if>)/, '$1' + NOVE_ICON)
 
   // Assets: every canvas file becomes a lookup into the asset map.

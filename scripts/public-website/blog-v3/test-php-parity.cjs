@@ -28,7 +28,7 @@ const variants = {
   }),
   noEvent: d => ({ ...d, event: { ...d.event, show: false } }),
   // A pinned Efeonce announcement (format «Novedad», operator 2026-10-24) leads the slider.
-  novedad: d => ({ ...d, slides: [{ ...d.slides[0], fmt: 'nove', fmtLabel: 'Novedad', topic: 'Novedades', cta: 'Leer la novedad' }, ...d.slides.slice(1)] }),
+  novedad: d => ({ ...d, slides: [{ ...d.slides[0], fmt: 'nove', fmtLabel: 'Novedad', topic: 'Novedades', cta: 'Leer la novedad', scrim: true }, ...d.slides.slice(1)] }),
 }
 
 const CASES = [
