@@ -28,7 +28,7 @@ import {
   resolveEventRegistrationPolicy,
 } from './contracts'
 import { mintEmbedKey, verifyEmbedKeySecret } from './embed-key'
-import { dedupeFingerprint } from './hash'
+import { dedupeFingerprint, inlinePillNoticeHash } from './hash'
 import { type InsertableFormCatalogEntryVm, listInsertableFormCatalog } from './readers'
 import {
   isFormsPiiEncryptionEnabled,
@@ -622,6 +622,7 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     consent: {
       consentPolicyVersion: version.consent_policy_version ?? 'unspecified',
       checkboxes: input.consentCheckboxes,
+      noticeTextHash: inlinePillNoticeHash(version.ui_policy_json),
     },
   })
   } catch (error) {

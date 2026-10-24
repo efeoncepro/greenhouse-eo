@@ -125,6 +125,41 @@ describe('legalConsentOptions.communications (suscripción de marketing)', () =>
     expect(communicationsOf(body)).toEqual([])
   })
 
+  describe('consentBy submission (píldora en línea bajo aviso, 2026-10-24)', () => {
+    const NOTE = 'Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.'
+
+    const PILL_MAPPING = {
+      ...VALID_MAPPING,
+      communications: [{ consentBy: 'submission', subscriptionTypeId: 535702717, text: NOTE }],
+    }
+
+    it('snapshot con hash del aviso → suscribe por el acto de enviar, sin casilla', () => {
+      const body = buildSecureSubmitBody(submission(), { ...consentWith([]), notice_text_hash: 'abc' }, PILL_MAPPING as never)
+
+      expect(communicationsOf(body)).toEqual([{ value: true, subscriptionTypeId: 535702717, text: NOTE }])
+    })
+
+    it('snapshot sin hash del aviso (la versión no declaraba aviso) → no suscribe', () => {
+      const body = buildSecureSubmitBody(submission(), { ...consentWith([]), notice_text_hash: null }, PILL_MAPPING as never)
+
+      expect(communicationsOf(body)).toEqual([])
+    })
+
+    it('una entrada con consentBy y checkboxKey a la vez es una declaración mal formada', async () => {
+      vi.stubGlobal('fetch', vi.fn())
+
+      const result = await deliverToHubSpotForms({
+        submission: submission(),
+        consent: { ...consentWith([]), notice_text_hash: 'abc' },
+        destination: destination({ ...VALID_MAPPING, communications: [{ consentBy: 'submission', checkboxKey: 'x', subscriptionTypeId: 535702717, text: NOTE }] }),
+        env: ENV_ON,
+      })
+
+      expect(result).toMatchObject({ status: 'failed', errorClass: 'invalid_communications_mapping', retryable: false })
+      expect(fetch).not.toHaveBeenCalled()
+    })
+  })
+
   it('declaración mal formada → failed invalid_communications_mapping antes del POST', async () => {
     vi.stubGlobal('fetch', vi.fn())
 

@@ -57,15 +57,19 @@ export interface HubSpotDestinationMapping {
   communications?: HubSpotCommunicationMapping[]
 }
 
-/** Casilla de consentimiento → subscription type de HubSpot (communication preferences). */
-export interface HubSpotCommunicationMapping {
-  /** Key de la casilla en `copy_refs_json.checkboxes` (p. ej. `marketing_updates`). */
-  checkboxKey: string
+/**
+ * Consentimiento → subscription type de HubSpot (communication preferences). Dos fuentes:
+ *   - `checkboxKey`: una casilla del consentimiento que el visitante marcó.
+ *   - `consentBy: 'submission'` (2026-10-24, aprobado por el operador): el acto de suscribirse bajo un aviso visible.
+ *     Sólo para presentaciones `inline_pill` de suscripción: la entrada aplica cuando el snapshot guarda el hash del
+ *     aviso (`notice_text_hash`), que el servidor escribe únicamente si la versión publicada declara ese aviso.
+ */
+export type HubSpotCommunicationMapping = {
   /** ID del subscription type en HubSpot (`/communication-preferences/v3/definitions`). */
   subscriptionTypeId: number
-  /** Texto exacto que el visitante vio junto a la casilla. */
+  /** Texto exacto que el visitante vio (la casilla o el aviso). */
   text: string
-}
+} & ({ /** Key de la casilla en `copy_refs_json.checkboxes`. */ checkboxKey: string; consentBy?: undefined } | { consentBy: 'submission'; checkboxKey?: undefined })
 
 export interface HubSpotCommunicationConsent {
   value: true
@@ -77,9 +81,13 @@ const isValidCommunication = (entry: unknown): entry is HubSpotCommunicationMapp
   if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return false
   const candidate = entry as Record<string, unknown>
 
+  const source =
+    candidate.consentBy === 'submission'
+      ? candidate.checkboxKey === undefined
+      : candidate.consentBy === undefined && typeof candidate.checkboxKey === 'string' && candidate.checkboxKey.trim().length > 0
+
   return (
-    typeof candidate.checkboxKey === 'string' &&
-    candidate.checkboxKey.trim().length > 0 &&
+    source &&
     typeof candidate.subscriptionTypeId === 'number' &&
     Number.isSafeInteger(candidate.subscriptionTypeId) &&
     candidate.subscriptionTypeId > 0 &&
@@ -94,8 +102,9 @@ export const hasInvalidCommunicationsMapping = (mapping: HubSpotDestinationMappi
   (!Array.isArray(mapping.communications) || !mapping.communications.every(isValidCommunication))
 
 /**
- * Suscripciones a enviar: sólo las casillas declaradas en el destino que el visitante MARCÓ
- * (`checkboxes_json` guarda las keys marcadas). Sin casilla marcada o sin declaración → `[]`.
+ * Suscripciones a enviar: las casillas declaradas en el destino que el visitante MARCÓ (`checkboxes_json` guarda las
+ * keys marcadas) y las de `consentBy: 'submission'` cuando el snapshot prueba que hubo aviso (`notice_text_hash`).
+ * Sin casilla marcada, sin aviso o sin declaración → `[]`.
  */
 export const resolveHubSpotCommunications = (
   consent: FormConsentSnapshotRow | null,
@@ -111,7 +120,7 @@ export const resolveHubSpotCommunications = (
 
   return mapping.communications
     .filter(isValidCommunication)
-    .filter(entry => checked.has(entry.checkboxKey))
+    .filter(entry => (entry.consentBy === 'submission' ? Boolean(consent.notice_text_hash) : checked.has(entry.checkboxKey)))
     .filter(entry => (seen.has(entry.subscriptionTypeId) ? false : (seen.add(entry.subscriptionTypeId), true)))
     .map(entry => ({ value: true as const, subscriptionTypeId: entry.subscriptionTypeId, text: entry.text }))
 }
