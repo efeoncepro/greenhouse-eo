@@ -1,7 +1,7 @@
 # Inventario de imágenes por artículo del blog
 
 > **Tipo de documento:** Norma operativa (inventario y especificación)
-> **Version:** 1.2 (márgenes de Open Graph por plataforma y `og:image:alt`)
+> **Version:** 1.3 (ficha completa de un artículo nuevo: entra solo al slider y al rail)
 > **Creado:** 2026-10-24 por Claude, a pedido del operador («cuántas imágenes para todas las posiciones … y sus
 > características por cada artículo que se haga»)
 > **Alcance:** artículos de Marketing con Manzanitas en `efeoncepro.com/blog`. Glitch tiene sus propias piezas
@@ -16,14 +16,44 @@
 > [Modelo de key visual de portadas](EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md) (el método: tesis visual, contrato
 > de recorte, versiones; este inventario fija las posiciones y medidas del blog de hoy)
 
+## Ficha completa: un artículo nuevo de Marketing con Manzanitas
+
+**Un artículo nuevo entra solo al slider y al rail de `/blog/`.** El slider llena sus lugares de posts (hoy dos, después
+de los fijados) con los más nuevos que tienen imagen y no son Glitch ni Novedad (`EO_Home_Readers::build_featured`).
+El rail toma las cuatro lecturas más nuevas de 12 minutos o más (o pódcast) que no son Glitch ni Novedades
+(`EO_Home_Readers::rail`). Por eso, al publicar, las imágenes del slider y de la tarjeta **son obligatorias**: sin
+ellas, el título del slider y el texto de la tarjeta caen encima del texto de la portada.
+
+| Imagen | Archivo que se produce | Se sube como | Se ve en | Márgenes (lo importante va adentro) | Texto en la imagen | La hace |
+|---|---|---|---|---|---|---|
+| **1. Plate** | PNG 16:9, 2560 × 1440 | imagen de la tarjeta del rail (`blog-home card … --focus "84% 30%"`) | la tarjeta de «Para leer con calma» (escritorio 440 × 600, tablet 361 × 492, teléfono 304 × 540) | cara en **x 68–75 % · y 10–40 %**; 64 % izquierdo oscuro; mitad de abajo pareja; 7 % libre arriba y abajo. En la tarjeta: cara en x 60–86 % · y 10–40 %, debajo de las etiquetas (y 5–8 %) y encima del degradado (desde y 36 %) | **ninguno** | agente de foto |
+| **2. Portada** | JPEG 2400 × 1260 (1,9:1), calidad 88, croma 4:4:4, **menos de 300 KB** | imagen destacada + Open Graph (`blog-post-cover-apply.php`) | Open Graph en LinkedIn, Facebook, WhatsApp, iMessage, Slack, Teams y Telegram; tarjeta grande de X; imagen principal del schema; Google y Discover | texto en **x 312–782 · y 50–341**; todo lo importante dentro del **cuadrado central x 285–915** (WhatsApp y miniaturas); **15 px** libres arriba y abajo (X); cara en x 795–900 | cabecera de Manzanitas, pregunta y respuesta; **sin firma** | agente de composición |
+| **3. Imagen del slider** | WebP 2:1, 2400 × 1200, recortada del plate | `hero` (`blog-home hero … --image`) | el slider de `/blog/` (escritorio 1440 y 1920 × 900; teléfono 390 × 300) y la miniatura «Siguiente» (96 × 64) | cara en **x 68–92 % · y 10–64 %**; se ve x 42–96 % · y 7–93 %; tapan el título (x 29–65 % · y 31–61 %), «Siguiente» (x 75–92 % · y 68–77 %) y la tira (desde y 86 %) | **ninguno**: el slider pone su título | agente de composición |
+| 4. Imágenes del cuerpo | SVG directo para infografías y diagramas; raster real para fotos y capturas | bloques del artículo (Content Factory) | dentro del artículo, enteras | sin recorte: legibles a 390 px; versión móvil sólo si la de escritorio no se lee | sí, si es una infografía | agente de contenido |
+
+**Cuenta para un artículo nuevo:** **3 archivos** (plate, portada e imagen del slider), **3 subidas** (portada, `hero` y
+tarjeta) y de 0 a 2 imágenes de cuerpo. Cada subida lleva su `alt`. Con `efeonce-editorial-blocks` 0.4.6 desplegado,
+la descripción de la imagen para redes (`og:image:alt` y `twitter:image:alt`) sale sola del `alt` de la portada.
+
+**Si el artículo es corto (menos de 12 minutos),** no entra al rail: se ahorra la subida de la tarjeta. Si es Glitch o
+Novedad, no entra solo al slider. Un artículo viejo que se refresca no entra a ninguno de los dos hasta que se lo fije:
+`pnpm public-website:blog-home slider` muestra quién está y por qué.
+
+**Fuera del sitio** (sólo si el plan de canales de la semana lo pide, cada una con su norma, §6): post de LinkedIn
+1200 × 627, dos miniaturas de YouTube 1280 × 720 y una story 1080 × 1920.
+
+**Antes de publicar, el operador aprueba** viendo juntas la portada completa, su recorte cuadrado, la imagen del
+slider y la tarjeta (1440 y 390). **Después, QA en vivo:** etiquetas Open Graph y X, la tarjeta en 1440 y 390, el slider
+en 1440 y 390, `blog-home verify --browser`, y los depuradores de cada red para refrescar la caché.
+
 ## Resumen: cuántas imágenes lleva un artículo
 
 | # | Imagen | ¿Cuándo? | Cuántas | La hace |
 |---|---|---|---|---|
 | 1 | **Plate** (foto 16:9 sin texto) | siempre | 1 | agente de foto (`design-studio` + `pnpm foto:*`) |
 | 2 | **Portada** (destacada + OG + X) | siempre | 1 archivo | agente de composición (`efeonce-graphic-line`) desde el plate |
-| 3 | **Imagen del slider** (`hero`) | sólo si el post entra al slider de `/blog/` | 0 o 1 | se recorta del plate (sin foto nueva) |
-| 4 | **Imagen de la card del rail** | si el post entra al rail y su portada trae texto (todas las de Manzanitas). En producción desde el 2026-10-24 (TASK-2051, 0.4.5) | 0 o 1 | se usa el plate tal cual, con punto focal |
+| 3 | **Imagen del slider** (`hero`) | si el post entra al slider de `/blog/`: **todo artículo nuevo entra solo** (salvo Glitch y Novedad) | 1 en un artículo nuevo | se recorta del plate (sin foto nueva) |
+| 4 | **Imagen de la card del rail** | si el post entra al rail: **todo artículo nuevo de 12 minutos o más entra solo**, y su portada trae texto. En producción desde el 2026-10-24 (TASK-2051, 0.4.5) | 0 o 1 | se usa el plate tal cual, con punto focal |
 | 5 | **Imágenes del cuerpo** (diagramas, infografías, capturas) | sólo si explican algo que el texto no puede | 0 a N (lo normal: 0 a 2) | agente de contenido (`content-marketing-studio` + infografías) |
 | 6 | Foto del autor | ya existe; no se hace por artículo | 0 | — |
 | 7 | **Piezas de distribución** (LinkedIn, YouTube, story) | según el plan de canales de esa semana, no por defecto | 0 a 4 | agente social (`social-media-studio`), con su propia norma |
@@ -186,7 +216,7 @@ de LinkedIn y el depurador de Facebook para refrescarla, y comparte de nuevo el 
 | LinkedIn y Facebook (OG) | la imagen completa | ✓ |
 | Vista previa compacta de WhatsApp | el cuadrado central, x 285–915 | ✓ texto y cara |
 | Tarjeta grande de X | 2:1; puede cortar unos 15 px arriba y abajo (fuente secundaria, sin medir) | ✓ |
-| Miniatura «Siguiente» del slider | 96 × 64 (1,5:1), centrada: x 127–1072 | ✓ |
+| Miniatura «Siguiente» del slider | 96 × 64 (1,5:1), centrada. Usa la imagen del slider si existe (de ella se ve x 12–88 %); si no, la portada (x 127–1072) | ✓ |
 | Archivo del blog v3 (temas, etiquetas, autores, búsqueda) | lista de texto, **sin imagen** | no aplica |
 | Cabecera del artículo | Ohio **no muestra** la destacada | no aplica |
 | Cards v2 del rail | 440 × 600 y 361 × 492 → x 369–831; 304 × 540 en móvil → x 423–777, con el texto de la tarjeta encima | ✗ **choca**: la card lleva su propia imagen (§4) |
