@@ -18,6 +18,7 @@ const SITE = 'https://efeoncepro.com'
 const REMOTE = 'scripts/public-website/blog-home/remote.php'
 const VALUE_FLAGS = ['until', 'light', 'bold', 'attachment', 'image', 'alt', 'snapshot', 'surface']
 const FORMATS = ['articulo', 'caso', 'guia', 'grabacion', 'glitch-edicion', 'glitch-flash', 'glitch-nota', 'novedad']
+const LINES = ['growth', 'brand', 'engine', 'voice', 'revenue-hubspot', 'revenue-salesforce']
 
 type Json = Record<string, any>
 
@@ -191,6 +192,7 @@ Write (plan unless --apply; every apply is ledgered and purges /blog/):
   pin <post> --until <UTC date>  pin a post first in the slider until that date
   unpin <post>
   format <post> <${FORMATS.join('|')}>
+  line <post> <${LINES.join('|')}|off>   the post's service line when its category does not say it
   hero <post> [--light t] [--bold t] [--attachment id | --image file --alt text] [--clear]
   resource <file.json> [--image file --alt text]   create/update a resource (see manual for the shape)
   review <resource id>           mark a resource reviewed today (it hides after 180 days)
@@ -227,6 +229,14 @@ const main = () => {
 
     case 'format': {
       const result = remote({ op: 'format', post: pos[0] ?? fail('format needs a post.'), format: pos[1] ?? fail(`format needs one of: ${FORMATS.join(', ')}`), apply })
+
+      print(result)
+
+      return plannedNote(result)
+    }
+
+    case 'line': {
+      const result = remote({ op: 'line', post: pos[0] ?? fail('line needs a post.'), line: pos[1] ?? fail(`line needs one of: ${LINES.join(', ')}, off`), apply })
 
       print(result)
 

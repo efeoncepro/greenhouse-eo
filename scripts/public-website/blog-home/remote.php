@@ -160,6 +160,24 @@ switch ( $op ) {
 		$out( $plan + array( 'applied' => true ) );
 		break;
 
+	case 'line':
+		// The service line of one post when its category does not say it (`_eo_line`); `off` returns it to its topic.
+		$id   = $find( $in['post'] ?? '' );
+		$raw  = strtolower( trim( (string) ( $in['line'] ?? '' ) ) );
+		$line = 'off' === $raw ? '' : EO_CM_Util::line_key( $raw );
+		if ( 'off' !== $raw && '' === $line ) { WP_CLI::error( 'Unknown line. Valid: ' . implode( ', ', array_keys( EO_CM_Util::LINES ) ) . ', off' ); }
+		$plan = array( 'op' => 'line', 'post' => $id, 'title' => get_the_title( $id ), 'url' => get_permalink( $id ), 'before' => (string) get_post_meta( $id, EO_CM_Util::LINE_META, true ), 'after' => $line );
+		if ( ! $apply ) { $out( $plan + array( 'applied' => false ) ); break; }
+		if ( '' === $line ) { delete_post_meta( $id, EO_CM_Util::LINE_META ); } else { update_post_meta( $id, EO_CM_Util::LINE_META, $line ); }
+		clean_post_cache( $id );
+		if ( (string) get_post_meta( $id, EO_CM_Util::LINE_META, true ) !== $line || get_permalink( $id ) !== $plan['url'] ) { WP_CLI::error( 'Readback failed.' ); }
+		$finish( 'line' );
+		// The article changes color too: purge its page, not only /blog/.
+		$kinsta = isset( $GLOBALS['kinsta_cache']->kinsta_cache_purge ) ? $GLOBALS['kinsta_cache']->kinsta_cache_purge : null;
+		if ( $kinsta && method_exists( $kinsta, 'initiate_purge' ) ) { $kinsta->initiate_purge( $id ); }
+		$out( $plan + array( 'applied' => true ) );
+		break;
+
 	case 'hero':
 		$id     = $find( $in['post'] ?? '' );
 		$keys   = array( '_eo_hero_light', '_eo_hero_bold', '_eo_hero_image' );
