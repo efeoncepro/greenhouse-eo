@@ -69,8 +69,9 @@ const AUTHOR_AVATAR = '<span class="hs-av" aria-hidden="true"><sc-if value="{{ s
 // Real Glitch subscription (operator, 2026-10-24). With a published Growth Form (subscribe.live), the canvas' simulated
 // pill and the bottom subscription become the real renderer (`inline_pill`, TASK-2054) inside <greenhouse-form
 // data-dc-keep>, which the runtime's morph never touches. The canvas fixture has no `live` key and keeps the canvas
-// markup; real data without a form renders neither. The bottom section using the pill too is an approved deviation.
-const LIVE_PILL = '<sc-if value="{{ subLive }}" hint-placeholder-val="{{ false }}"><greenhouse-form data-dc-keep="" class="eo-inline-pill eo-inline-pill--glitch" form-key="{{ subKey }}" surface="{{ subSurface }}" base-url="{{ subBase }}" locale="es-CL" color-scheme="dark" appearance="bare"><a href="{{ subAction }}">Suscríbete a Glitch</a></greenhouse-form></sc-if>'
+// markup; real data without a form renders neither. Before the renderer runs (or without JavaScript) the fallback
+// link has the canvas idle pill's classes, so the page keeps its shape and still leads to Glitch. The bottom section using the pill too is an approved deviation.
+const LIVE_PILL = '<sc-if value="{{ subLive }}" hint-placeholder-val="{{ false }}"><greenhouse-form data-dc-keep="" class="eo-inline-pill eo-inline-pill--glitch" form-key="{{ subKey }}" surface="{{ subSurface }}" base-url="{{ subBase }}" locale="es-CL" color-scheme="dark" appearance="bare"><a href="{{ subAction }}" class="ghf-fallback ab ab--glitch ab--xl live"><span>Suscríbete a Glitch</span><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></a><p class="gxs__note" aria-hidden="true">Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.</p></greenhouse-form></sc-if>'
 const simOnly = block => '<sc-if value="{{ subSim }}" hint-placeholder-val="{{ true }}">' + block + '</sc-if>' + LIVE_PILL
 
 function bindSubscription(src) {

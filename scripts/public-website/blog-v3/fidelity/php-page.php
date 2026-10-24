@@ -15,4 +15,17 @@ require $plugin . '/includes/class-eobh-view.php';
 require $plugin . '/includes/class-eobh-data.php';
 require $plugin . '/includes/class-eobh-front.php';
 
-echo EOBH_Front::markup( EOBH_Data::get( $img_base ), $now );
+$data = EOBH_Data::get( $img_base );
+
+// Preview of the real Glitch subscription (serve.cjs --subscribe): the same keys the content-model adapter sets.
+$sub_key = (string) getenv( 'EOBH_PREVIEW_SUBSCRIBE_KEY' );
+if ( '' !== $sub_key ) {
+	foreach ( array( 'portada', 'movil' ) as $board ) {
+		$data[ $board ]['subscribe'] = array_merge(
+			$data[ $board ]['subscribe'] ?? array(),
+			array( 'live' => true, 'formKey' => $sub_key, 'surface' => (string) getenv( 'EOBH_PREVIEW_SUBSCRIBE_SURFACE' ), 'base' => (string) getenv( 'EOBH_PREVIEW_SUBSCRIBE_BASE' ) )
+		);
+	}
+}
+
+echo EOBH_Front::markup( $data, $now );
