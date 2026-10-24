@@ -31,7 +31,7 @@
 - Motion: `docs/ui/motion/TASK-2051-blog-portada-v3-high-fidelity-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `En producción en /blog/ desde 2026-10-24 (corte 08:13Z, snapshot _gh_blog_home_v3_before_20261024_081327) con datos reales, menú canónico, foto del autor y operación por pnpm public-website:blog-home; la suscripción real a Glitch espera el release de Greenhouse (consentBy submission) y la publicación del formulario píldora; sin ella la portada no muestra suscripción`
+- Status real: `En producción en /blog/ desde 2026-10-24 con datos reales, menú canónico, foto del autor, suscripción real a Glitch (píldora de Growth Forms conectada 12:3xZ, verificada en vivo en tres tableros sin envío de prueba) y operación por pnpm public-website:blog-home; falta un envío real de verificación (contacto suscrito en HubSpot) y el visto bueno del operador a la píldora en el pie`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `TASK-2050 (sólo eventos, formatos y fijadas; las demás secciones avanzan antes)`

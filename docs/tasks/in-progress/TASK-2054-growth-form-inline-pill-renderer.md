@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2054-growth-form-inline-pill-renderer-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Code complete en local (Slices 1–3, 2026-10-24; renderer 1.2.0); rollout pendiente: release de Greenhouse a main y uso en la portada (TASK-2051)`
+- Status real: `En producción desde el release 40b330175855 (2026-10-24): renderer inline_pill sirviendo la suscripción a Glitch en /blog/ en los tres tableros (verificado en vivo, sin envío de prueba)`
 - Rank: `TBD`
 - Domain: `growth|forms|ui`
 - Blocked by: `none` (TASK-2053 Slice 1 code complete en develop 2026-10-24)

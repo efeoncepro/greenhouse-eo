@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `Code complete en local (Slices 1–3, 2026-10-24); rollout pendiente: release de Greenhouse a main, formulario de evento real publicado y verificación en staging`
+- Status real: `En producción desde el release 40b330175855 (2026-10-24): contrato inline_pill + consentBy submission con hash del aviso; formulario de Glitch publicado (fver-e6850cc8) y en uso en /blog/; formulario de reserva por evento sin publicar hasta que exista un evento real; falta un envío real de verificación`
 - Rank: `TBD`
 - Domain: `growth|forms|public-site`
 - Blocked by: `none`
