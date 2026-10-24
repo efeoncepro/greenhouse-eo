@@ -45,11 +45,11 @@ Copia congelada: `direcciones-2026-10-24.tar.gz` (los tres tableros `Archivo-{A,
 Recomendación aceptada por el operador: **cabecera oscura de B + una pieza destacada + filas de A + cierre «Otros
 temas» en navy** (la página empieza y termina oscura, el contenido claro al medio, como el ritmo de la portada). De C
 sólo queda el buscador para la vista de búsqueda. Página «Archivo del blog · D · Órbita + Índice» del canvas
-(versión 73), seis vistas a 1440 y 390; capturas de revisión en `capturas/`.
+(versión 74), seis vistas a 1440 y 390; capturas de revisión en `capturas/`.
 
 | Vista | Cabecera | Destacada | Lista |
 |---|---|---|---|
-| Tema (HubSpot) | Nombre en el color del tema, descripción, «12 publicaciones», «Lo último», formatos como filtro | «Lo más reciente» | Por año, año gigante fijo; fila sin tema |
+| Tema (HubSpot) | Nombre en el color del tema, descripción y ficha corta (publicaciones, la última); debajo, barra de formato con el segmentado de la portada | «Lo más reciente» | Por año, año gigante fijo; fila sin tema |
 | Etiqueta (inbound) | Nombre en blanco, una línea de contexto, cifras y formatos | «Lo más reciente» | Por año; la fila muestra el tema |
 | Autor (Julio Reyes) | Foto del perfil con anillo, nombre, cargo y bio de WordPress, cifras y formatos | «Lo último de Julio» | Por año; tema o logo de Glitch |
 | Búsqueda («Inbound») | Término entre comillas, buscador editable con haz, «19 resultados», formatos | «Mejor resultado» | Por relevancia, fecha completa, término resaltado |
@@ -58,6 +58,7 @@ sólo queda el buscador para la vista de búsqueda. Página «Archivo del blog �
 
 Decisiones tomadas con el operador en esta ronda:
 
+- **Cabecera tipográfica con ficha corta** (2.º comentario del operador sobre B, «no me gusta cómo se ve»): sin número gigante ni chips en la cabecera; ficha de dos cifras con filetes (valores del bloque de eventos de la portada) y filtro por formato en una barra propia con `.segc` (en móvil, chips deslizables). No se usa un anillo decorativo: la línea gráfica prohíbe la órbita como adorno.
 - **Sin porcentaje del tema** (comentario del operador sobre B): en una página de tema no le dice nada al lector. Se
   reemplaza por la cantidad, la fecha de lo último y el desglose por formato, que además filtra.
 - **«Publicaciones», no «lecturas» ni «artículos»:** «Artículos» es un formato (filtro) y «lecturas» no nombra bien
