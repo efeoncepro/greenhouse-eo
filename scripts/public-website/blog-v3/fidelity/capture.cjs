@@ -5,6 +5,11 @@
  *   node fidelity/capture.cjs bound <outDir>                bound template + fixtures (pipeline self-check)
  *   node fidelity/capture.cjs url <outDir> <url> <board>    a real page (local preview or WordPress), one board
  *
+ * In `url` mode the page is captured as served (JavaScript off: the browser's first render is byte-identical to the
+ * server HTML, see test-php-parity.cjs) and the site chrome that floats over the content (canonical header,
+ * theme switcher, social bar: every fixed or sticky element outside #eobh) is hidden, since it is an allowed
+ * deviation. Serve the page with the frozen clock (preview/serve.cjs --now) so the countdown matches.
+ *
  * Sections are located by `[data-capture]` when present, otherwise by order of the board root's <section> children.
  * Animations are fast-forwarded to their end state (Playwright `animations: 'disabled'`) and fonts are awaited.
  */
@@ -47,16 +52,35 @@ function serve(pages) {
   return new Promise(resolve => server.listen(0, '127.0.0.1', () => resolve(server)))
 }
 
-async function captureSections(browser, url, board, outDir) {
+async function captureSections(browser, url, board, outDir, { site = false } = {}) {
   const spec = BOARDS[board]
-  const ctx = await browser.newContext({ viewport: spec.viewport, deviceScaleFactor: 1, reducedMotion: 'no-preference' })
+  const ctx = await browser.newContext({ viewport: spec.viewport, deviceScaleFactor: 1, reducedMotion: 'no-preference', javaScriptEnabled: !site })
   const page = await ctx.newPage()
 
-  await page.goto(url, { waitUntil: 'networkidle' })
+  if (process.env.CAPTURE_DEBUG) console.error('goto', url, board)
+  // The live shell never goes network-idle (third-party embeds): wait for load and let late images settle.
+  await page.goto(url, { waitUntil: site ? 'load' : 'networkidle', timeout: 60000 })
   await page.evaluate(() => document.fonts.ready)
 
+  if (site) {
+    await page.waitForTimeout(1500)
+    // addStyleTag waits on page scripts, which are off here: inject through the protocol instead.
+    await page.evaluate(() => {
+      const st = document.createElement('style')
+
+      st.textContent = '#site-nav,.axis-site-nav{visibility:hidden !important}'
+      document.head.appendChild(st)
+
+      for (const el of document.querySelectorAll('body *')) {
+        const pos = getComputedStyle(el).position
+
+        if ((pos === 'fixed' || pos === 'sticky') && !el.closest('#eobh')) el.style.setProperty('visibility', 'hidden', 'important')
+      }
+    })
+  }
+
   const tagged = await page.locator('[data-capture^="blog-"]').count()
-  const rootSel = board === 'Movil-v3' ? '.m3' : '.v3'
+  const rootSel = (site ? '#eobh ' : '') + (board === 'Movil-v3' ? '.m3' : '.v3')
   const results = []
 
   for (const [i, name] of spec.sections.entries()) {
@@ -68,6 +92,7 @@ async function captureSections(browser, url, board, outDir) {
       continue
     }
 
+    if (process.env.CAPTURE_DEBUG) console.error('section', board, name)
     await loc.scrollIntoViewIfNeeded()
     await loc.screenshot({ path: file, animations: 'disabled', caret: 'hide' })
     results.push({ name, file: path.basename(file) })
@@ -89,7 +114,7 @@ async function main() {
 
   try {
     if (mode === 'url') {
-      report[onlyBoard] = await captureSections(browser, url, onlyBoard, outDir)
+      for (const b of onlyBoard ? [onlyBoard] : Object.keys(BOARDS)) report[b] = await captureSections(browser, url, b, outDir, { site: true })
     } else {
       const fixtures = {
         'Portada-v3': JSON.parse(fs.readFileSync(path.join(SRC, 'fixture.json'), 'utf8')),

@@ -9,7 +9,7 @@ const vm = require('node:vm')
 const { parseDcFile } = require('./dc-template.cjs')
 
 const RUNTIME_DIR = process.env.BLOG_RUNTIME_DIR || path.resolve(__dirname, '../../../../../efeonce-public-site-runtime')
-const DC_RUNTIME = path.join(RUNTIME_DIR, 'wp-content/plugins/eo-elementor-widgets/assets/js/blog-v3/dc-runtime.js')
+const DC_RUNTIME = path.join(RUNTIME_DIR, 'wp-content/plugins/eo-blog-home/assets/js/dc-runtime.js')
 // Frozen clock for references: 24 oct 2026 12:00 UTC.
 const FROZEN_NOW = Date.UTC(2026, 9, 24, 12, 0, 0)
 

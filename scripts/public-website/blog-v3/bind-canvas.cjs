@@ -167,12 +167,16 @@ function bindLogic(src) {
 /* ---------- Mobile board (Movil-v3) ---------- */
 
 function deviateMobile(src) {
-  // 1. Canonical site header and footer replace the mock ones.
-  src = rep(src, /\n\s*<nav aria-label="Navegación global del sitio \(heredada\)"[\s\S]*?<\/nav>/, '')
+  // 1. Canonical site header and footer replace the mock ones. The mock navigation island marked the slot the fixed
+  //    canonical bar occupies on mobile, so it becomes an empty spacer of the same height (the MCM logo keeps its
+  //    canvas position under the bar instead of sliding beneath it).
+  src = rep(src, /\n(\s*)<nav aria-label="Navegación global del sitio \(heredada\)"[\s\S]*?<\/nav>/, '\n$1<div aria-hidden="true" style="height: 56px;"></div>')
   src = rep(src, /\n<footer style="background: #f7f8f6; padding: 40px 16px;[\s\S]*?<\/footer>\n/, '\n')
   // 2. Fluid root: the artboard size (390 × 6400, clipped) becomes the viewport width with natural height.
   src = rep(src, '<div class="m3" style="width: 390px; height: 6400px; overflow: hidden; background: #001a33;', '<div class="m3" style="background: #001a33;')
-  // 3. Invisible a11y fix: the giant year does not announce.
+  // 3. Below 390 px (not designed) the topics orbit scales to the available width: hook for assets/css/eobh-host.css.
+  src = rep(src, '<div style="position: relative; width: 358px; height: 358px; margin-top: 32px;">', '<div data-fluid="orbit" style="position: relative; width: 358px; height: 358px; margin-top: 32px;">')
+  // 4. Invisible a11y fix: the giant year does not announce.
   src = rep(src, '<p class="idea" aria-live="polite" style="margin: 8px 0 0; font-size: 140px;', '<p class="idea" style="margin: 8px 0 0; font-size: 140px;')
 
   return src

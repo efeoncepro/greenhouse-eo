@@ -156,6 +156,30 @@
         "dev"
       ],
       "port": 4349
+    },
+    {
+      "name": "blog-v3-preview",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "scripts/public-website/blog-v3/preview/serve.cjs",
+        "--port",
+        "8843"
+      ],
+      "port": 8843,
+      "url": "http://127.0.0.1:8843"
+    },
+    {
+      "name": "blog-v3-preview-frozen",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "scripts/public-website/blog-v3/preview/serve.cjs",
+        "--port",
+        "8844",
+        "--now",
+        "1792843200000"
+      ],
+      "port": 8844,
+      "url": "http://127.0.0.1:8844"
     }
   ]
 }

@@ -1,0 +1,74 @@
+/**
+ * TASK-2051 — Server/browser parity: the PHP renderer of the plugin (EOBH_Template + EOBH_View) must emit exactly
+ * the HTML of the browser runtime's first render (dc-runtime.js + canvas logic) for the same data and clock. Byte
+ * equality, no normalization: the browser patch on load must be a no-op.
+ */
+const { execFileSync } = require('node:child_process')
+const fs = require('node:fs')
+const os = require('node:os')
+const path = require('node:path')
+
+const { renderBoard, FROZEN_NOW, RUNTIME_DIR } = require('./lib/render-node.cjs')
+
+const PLUGIN = path.join(RUNTIME_DIR, 'wp-content/plugins/eo-blog-home')
+const SRC = path.join(__dirname, 'source')
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'eobh-parity-'))
+
+// Variants exercise the branches the approved fixture does not: another default topic and year order, the event
+// hidden or without seats, a single-post topic, an archive year that shows everything, and the countdown at zero.
+const variants = {
+  base: d => d,
+  branches: d => ({
+    ...d,
+    topicDefault: d.topics[d.topics.length - 1].key,
+    years: [...d.years].reverse(),
+    event: { ...d.event, showSeats: false, startMs: 0 },
+    glitch: { ...d.glitch, back: d.glitch.back.slice(0, 1) },
+  }),
+  noEvent: d => ({ ...d, event: { ...d.event, show: false } }),
+}
+
+const CASES = [
+  ['Portada-v3', 'portada', 'fixture.json'],
+  ['Movil-v3', 'movil', 'fixture.mobile.json'],
+]
+
+let failed = 0
+const cases = []
+
+for (const [board, slug, fixture] of CASES) for (const [variant, make] of Object.entries(variants)) {
+  const data = make(JSON.parse(fs.readFileSync(path.join(SRC, fixture), 'utf8')))
+  const file = path.join(TMP, `${slug}-${variant}.json`)
+
+  fs.writeFileSync(file, JSON.stringify(data))
+
+  const js = renderBoard(path.join(SRC, `${board}.bound.dc.html`), { data }).html
+
+  cases.push({ name: `${slug}-${variant}`, board: slug, now: FROZEN_NOW, data, html: js })
+  const php = execFileSync('php', [path.join(__dirname, 'fidelity/php-render.php'), PLUGIN, slug, file, String(FROZEN_NOW)], { encoding: 'utf8', maxBuffer: 64 << 20 })
+
+  if (js === php) {
+    console.log(`✓ ${board} [${variant}]: PHP = browser first render (${php.length} bytes)`)
+    continue
+  }
+
+  failed++
+  let i = 0
+
+  while (i < js.length && js[i] === php[i]) i++
+  console.log(`✗ ${board}: first difference at ${i}`)
+  console.log('  js :', js.slice(Math.max(0, i - 160), i + 160))
+  console.log('  php:', php.slice(Math.max(0, i - 160), i + 160))
+}
+
+// --write-fixtures: the browser renders become the expected output of the runtime repo's own PHP test
+// (tests/eo-blog-home.test.php), so that repo checks parity without greenhouse-eo.
+if (!failed && process.argv.includes('--write-fixtures')) {
+  const dir = path.join(RUNTIME_DIR, 'tests/fixtures/blog-home')
+
+  fs.mkdirSync(dir, { recursive: true })
+  fs.writeFileSync(path.join(dir, 'cases.json'), JSON.stringify(cases) + '\n')
+  console.log('fixtures →', path.join(dir, 'cases.json'), cases.length, 'cases')
+}
+
+process.exit(failed ? 1 : 0)
