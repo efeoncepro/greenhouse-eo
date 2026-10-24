@@ -180,6 +180,15 @@
       ],
       "port": 8844,
       "url": "http://127.0.0.1:8844"
+    },
+    {
+      "name": "blog-v3-playground",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "../efeonce-public-site-runtime/tests/playground/run-eo-blog-home.sh"
+      ],
+      "port": 9418,
+      "url": "http://127.0.0.1:9418"
     }
   ]
 }

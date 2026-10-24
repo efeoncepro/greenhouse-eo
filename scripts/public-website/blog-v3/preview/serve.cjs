@@ -44,7 +44,7 @@ async function page() {
 
   if (body.length !== 1) throw new Error('Shell without a single Elementor page body: ' + SHELL_URL)
 
-  const manifest = JSON.parse(fs.readFileSync(path.join(PLUGIN, 'assets/build/manifest.json'), 'utf8'))
+  const manifest = JSON.parse(fs.readFileSync(path.join(PLUGIN, 'assets/generated/manifest.json'), 'utf8'))
   const markup = execFileSync('php', [path.join(__dirname, '../fidelity/php-page.php'), PLUGIN, LOCAL + 'assets/img', ...(NOW ? [NOW] : [])], { encoding: 'utf8', maxBuffer: 64 << 20 })
 
   body.replaceWith(markup)
@@ -56,8 +56,8 @@ async function page() {
   })
   $('noscript').remove()
   $('head').prepend(`<script>${GUARD}</script>`)
-  $('head').append(`<link rel="stylesheet" href="${manifest.fonts}"><link rel="stylesheet" href="${LOCAL}assets/build/blog-home.css"><link rel="stylesheet" href="${LOCAL}assets/css/eobh-host.css">`)
-  $('body').append(['assets/js/dc-runtime.js', 'assets/build/portada.js', 'assets/build/movil.js', 'assets/js/boot.js'].map(f => `<script defer src="${LOCAL}${f}"></script>`).join(''))
+  $('head').append(`<link rel="stylesheet" href="${manifest.fonts}"><link rel="stylesheet" href="${LOCAL}assets/generated/blog-home.css"><link rel="stylesheet" href="${LOCAL}assets/css/eobh-host.css">`)
+  $('body').append(['assets/js/dc-runtime.js', 'assets/generated/portada.js', 'assets/generated/movil.js', 'assets/js/boot.js'].map(f => `<script defer src="${LOCAL}${f}"></script>`).join(''))
   $('title').text('Blog — preview local TASK-2051')
 
   return $.html()

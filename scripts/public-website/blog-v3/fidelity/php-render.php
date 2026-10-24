@@ -12,7 +12,7 @@ define( 'EOBH_CLI_PARITY', true );
 require $plugin . '/includes/class-eobh-template.php';
 require $plugin . '/includes/class-eobh-view.php';
 
-$ast  = json_decode( file_get_contents( $plugin . '/assets/build/' . $board . '.ast.json' ), true );
+$ast  = json_decode( file_get_contents( $plugin . '/assets/generated/' . $board . '.ast.json' ), true );
 $data = json_decode( file_get_contents( $data_file ), true );
 $vals = 'portada' === $board ? EOBH_View::desktop( $data, (int) $now ) : EOBH_View::mobile( $data, (int) $now );
 
