@@ -2,6 +2,16 @@
 
 [Historial](Handoff.archive.md).
 
+## 2026-10-24 — Portada del blog v3: tasks TASK-2050…2054 y arranque de TASK-2051
+
+El operador aprobó el canvas «Portada Blog Efeonce» v3 (`https://claude.ai/artifact/SmmJZC39UTJ9m6PD5x7tui`, v67) y
+pidió implementarlo en alta fidelidad. Tasks creadas (commit `8398d392e`): modelo de contenido (2050), portada con gate
+de píxeles ≤ 1 % por sección (2051), primitives AXIS (2052), contrato y renderer del formulario en línea (2053/2054).
+Copia congelada del canvas en `docs/ui/visual-directions/TASK-2051-blog-portada-v3/`. TASK-2051 en `in-progress`
+(rama: runtime `main` + Greenhouse `develop`, sin worktrees); discovery hecho, **checkpoint del operador antes del
+Slice 1**. El runtime tiene WIP ajeno sin commit (logo marquee, creativa, content marketing, versión 0.12.0 del
+plugin): no se toca. Reusar `--gh-rail` de Nosotros para los rieles de Ohio. **Sin push.**
+
 ## 2026-10-24 — Nosotros: fidelidad, rieles de Ohio, mapa y wordmark HubSpot (en vivo)
 
 `/about-us-efeonce/` (249770, source-led desde el 2026-10-23) corregida en vivo: capa del host fiel al canvas, texto
@@ -212,22 +222,3 @@ sin correo utilizable ni alta;2 créditos. Primer Outlook21:06Chile con firma gr
 Secuencia316810121: Programado1/Error0, único22Oct09:30Quito=11:30Chile, firma y deck360 íntegro;
 respuesta a cualquier email o reunión desinscribe. No duplicar, contactar puentes ni reinscribir.
 [Expediente y siguiente paso](docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).
-
-## 2026-10-18/19 — Grader: transporte medido y release completado
-
-GET live confirma Think→Forms portátil, versión8 y política Ads publicada. Fachada histórica
-completada con contexto visitante, CORS y recibo sólo tras persistencia; duplicados sin reenvío.
-PR257 promueve todo develop81f6ba525 a main2559e9242, árboles idénticos. Vercel4He READY;
-Grader y clasificación auditada servidos, canarios negativos y smoke productivo PASS.
-Manifest released; orquestador39190761785, CI/Deep/smoke PASS, health200 y watchdog6/6 drift0.
-Sin leads ficticios, replay, nuevo GTM ni otra corrección Web.
-Cierre documental19/10: arquitectura, funcionales, manuales, índices, TASK-2034 y skills espejo conciliados;
-primera recepción/atribución real sigue pendiente. Checkout principal develop, WIP ajeno preservado.
-[Release](docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
-[Contrato y verificación](docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
-Discovery LinkedIn19/10: documentación oficial revisada con tres agentes; [propuesta y pendientes](docs/architecture/GREENHOUSE_LINKEDIN_ADS_MEASUREMENT_ARCHITECTURE_V1.md).
-InsightTag/CAPI/dedupe/HubSpot documentados; cuenta/Partner ID/acceso no verificados, sin instalar ni enviar.
-Adquisición19/10: [taxonomía conceptual aceptada](docs/architecture/EFEONCE_COMMERCIAL_ACQUISITION_TAXONOMY_DECISION_V1.md);293 Deals leídos,168 candidatos/125 revisión.
-Plan propio sin aplicar; consumers incompletos/workflows403. Sin cambio CRM, schema, fuentes nativas o histórico.
-UI19/10: legacy con Insignia/seis colores; selección única ofrece punto/insignia. API pública revisada no expone esos ajustes.
-[Contrato visual y QA](docs/manual-de-uso/hubspot/normalizar-origen-canales-adquisicion.md#presentación-humana-estilos-colores-y-alcance-de-la-api) documentado en ADR/funcional/skills espejo; estilos nuevos propuestos, cero writes.

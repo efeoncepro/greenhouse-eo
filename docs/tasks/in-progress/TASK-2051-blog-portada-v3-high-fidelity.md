@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2051-blog-portada-v3-high-fidelity-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Discovery y plan 2026-10-24; checkpoint del operador antes de Slice 1`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `TASK-2050 (sólo eventos, formatos y fijadas; las demás secciones avanzan antes)`
