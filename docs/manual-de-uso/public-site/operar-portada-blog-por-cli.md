@@ -223,6 +223,7 @@ Rollback por capa, del más chico al más grande: `subscription off --apply` (qu
 | La píldora se ve aplastada o con texto doble | Un estilo del host alcanzó el interior de `<greenhouse-form>` | `subscription off --apply` de inmediato; el reset del host debe excluir `greenhouse-form *` (`build-plugin.cjs`). |
 | El formulario desaparece al cambiar la diapositiva | Falta `data-dc-keep` en `<greenhouse-form>` | Regenerar con `bind-canvas.cjs` y desplegar `deploy home`. |
 | `verify --browser` se queda esperando | La página no llegó a pintar `#eobh` en 30 s | Revisar que `/blog/` responda y que el shortcode siga en la página. |
+| `verify --browser` muestra `… reintento` o `✗ … no abrió: net::ERR_…` | El sitio cortó una conexión (cada ancho se salta la caché) | Un reintento que termina en ✓ es normal. Si después de dos reintentos sigue sin abrir, revisa que el sitio responda y vuelve a correrlo. |
 | `deploy` se niega por drift | Alguien cambió el plugin en Kinsta fuera del repo | Exportar, comparar y llevar el cambio al runtime antes de desplegar. |
 
 ## Referencias técnicas

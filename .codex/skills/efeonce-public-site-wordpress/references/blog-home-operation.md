@@ -12,6 +12,8 @@ canonical site nav (`EO_SITE_NAV_EXCLUDED_PAGES` empty), `eo_content_model_enabl
 - Read (always safe): `status`, `slider`, `post <id|slug>`, `verify [--browser] [--url]`. HTTP verify checks `#eobh`,
   one H1, canonical nav bar, robots `index`, no example data; `--browser` waits for the `#eobh` selector (30 s), never
   the `load` event (site third parties can hold it for minutes), then 8 widths 320–1920 + axe on the three boards.
+  Each width bypasses the Kinsta cache, so the site sometimes drops one connection: only a `page.goto` network failure
+  is retried (5 s, then 15 s, shown as `… reintento`); a missing `#eobh` or a failed check is never retried.
 - Write (plan unless `--apply`; operator's go in production): `pin/unpin`, `format`, `hero`, `resource <json>`,
   `review`, `event <json>`, `retire`, `subscription <key|off> [--surface]`, `flag`, `purge`. Every apply prints `before` (its rollback), reads back, purges
   /blog/ and appends to `scripts/public-website/blog-home/ledger/<YYYY-MM>.jsonl` — commit the ledger.
