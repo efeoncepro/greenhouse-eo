@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Wireframe: `docs/ui/wireframes/TASK-2055-blog-archive-v3-template.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `En producción desde 2026-10-24 ~18:20 UTC (eo_blog_archive_enabled = 1; runtime 2c2cfbb; descripciones de 6 temas cargadas). Verificado en vivo: matriz HTTP/robots/canonical/schema, desborde 0 y un H1 de 320 a 1920, axe 0, /blog/ y post con FAQ sin regresión. Docs y skill actualizadas. Falta para cerrar: gates de repo pnpm test/pnpm build (cambios de greenhouse-eo son scripts y docs) y decidir el push del runtime (origin/main divergido antes de esta task).`
+- Status real: `Complete 2026-10-24. En producción desde ~18:20 UTC (eo_blog_archive_enabled = 1; runtime 2c2cfbb; seis descripciones cargadas), verificado en vivo (matriz HTTP/robots/canonical/schema, desborde 0, axe 0, /blog/ y post con FAQ sin regresión). Gates de repo verdes sobre f908db7d5: pnpm test 2118 archivos / 21299 pruebas, pnpm build compilado. Residual: el runtime efeonce-public-site-runtime no se empujó a su remoto (origin/main ya divergido antes de esta task); lo desplegado vive en Kinsta y en los commits locales 21d7cad/85612b7/2c2cfbb.`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `none`
@@ -319,6 +319,8 @@ Reglas obligatorias:
 - Reasignar las páginas del usuario Greenhouse a otro autor.
 - Cambiar las portadas antiguas de los artículos.
 - Alinear «lecturas» de la órbita de la portada con «publicaciones».
+- Variante Glitch del tema (`/category/glitch/` = `/glitch/`): propuesta al operador el 2026-10-24, pendiente de su decisión y de tablero en el canvas antes de código.
+- Empujar el runtime a su remoto cuando se resuelva la divergencia de origin/main.
 
 ## Detailed Spec
 
@@ -407,7 +409,7 @@ Reglas obligatorias:
 ## Acceptance Criteria
 
 - [x] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
-- [ ] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2055`.
+- [x] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2055`.
 - [x] Se declaro `Wireframe: docs/ui/wireframes/TASK-2055-blog-archive-v3-template.md` y el archivo existe.
 - [x] Cada sección de las seis vistas pasa el gate (≤ 1 % de píxeles distintos) a 1440 y 390 contra las referencias del canvas D. Preview con el shell real (2026-10-24): 44/44, máximo 0,518 % (sólo el header canónico). En producción con datos reales se revisó a ojo cada vista (los datos difieren del fixture); el gate en preview de producción detectó el `header-cap` de Ohio, corregido en 2c2cfbb.
 - [x] La plantilla enlazada con el fixture rinde el mismo HTML que el canvas y PHP = navegador byte a byte. `test-bound-equivalence.cjs` 6/6 vistas; `test-php-parity.cjs` 36/36 casos (2026-10-24).
@@ -430,12 +432,12 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 ## Follow-ups
 

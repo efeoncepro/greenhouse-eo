@@ -92,4 +92,4 @@ El archivo de URL es un JSON `{ "tema": "https://efeoncepro.com/category/hubspot
 
 - [BLOG_ARCHIVE_RUNTIME_V1](../../architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md)
 - [Operar la portada por CLI](operar-portada-blog-por-cli.md)
-- [TASK-2055](../../tasks/in-progress/TASK-2055-blog-archive-v3-template.md)
+- [TASK-2055](../../tasks/complete/TASK-2055-blog-archive-v3-template.md)

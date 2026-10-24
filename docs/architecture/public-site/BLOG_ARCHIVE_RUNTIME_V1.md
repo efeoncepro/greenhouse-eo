@@ -5,7 +5,7 @@ búsqueda (`/?s=`), los temas (`/category/…`), las etiquetas (`/tag/…`) y lo
 
 Dueño: Sitio público / WordPress (runtime `efeonce-public-site-runtime`)
 
-Ejecución: [TASK-2055](../../tasks/in-progress/TASK-2055-blog-archive-v3-template.md) · Dirección visual aprobada:
+Ejecución: [TASK-2055](../../tasks/complete/TASK-2055-blog-archive-v3-template.md) · Dirección visual aprobada:
 [D «Órbita + Índice»](../../ui/visual-directions/TASK-2055-blog-archive-v3/README.md) (canvas «Portada Blog Efeonce» v75) ·
 [Wireframe](../../ui/wireframes/TASK-2055-blog-archive-v3-template.md) · Contrato de superficies:
 [PUBLIC_MISCELLANEOUS_SURFACES_V1](PUBLIC_MISCELLANEOUS_SURFACES_V1.md) (slices 4–6) · Hermano:

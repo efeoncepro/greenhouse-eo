@@ -2,7 +2,7 @@
 
 [Historial](Handoff.archive.md).
 
-## 2026-10-24 — Archivo del blog v3 (TASK-2055): en producción
+## 2026-10-24 — Archivo del blog v3 (TASK-2055): en producción, task cerrada
 
 **Búsqueda, temas, etiquetas y autores de efeoncepro.com sirven el «Archivo del blog» desde el 2026-10-24 ~18:20 UTC**
 (`eo_blog_archive_enabled = 1`): dirección D aprobada (canvas «Portada Blog Efeonce» v75), plantilla en `eo-blog-home`
@@ -12,8 +12,9 @@ temas aprobadas y cargadas. Verificado en vivo: matriz HTTP/robots/canonical/sch
 Contrato `docs/architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md`; manual `operar-archivo-del-blog.md`.
 Lección: el `header-cap` de 108 px de Ohio sólo existe en archivos (el preview local con el shell de /blog/ no lo ve):
 correr siempre el gate en producción con `archive preview`. Pendientes fuera de alcance: `/wp-json/wp/v2/users` y
-`?author=N`, 404 del sitio, «lecturas» vs «publicaciones» en la órbita. Cierre formal de la task pendiente de los gates
-de repo (`pnpm test`/`pnpm build`); el runtime no se empujó a su remoto (origin/main ya estaba divergido).
+`?author=N`, 404 del sitio, «lecturas» vs «publicaciones» en la órbita. Task cerrada: `pnpm test` (21 299 pruebas) y `pnpm build`
+verdes sobre `f908db7d5`. Residual: el runtime no se empujó a su remoto (origin/main ya estaba divergido). Propuesta
+abierta: variante Glitch de `/category/glitch/` (= `/glitch/`), espera decisión del operador y tablero en el canvas.
 
 ## 2026-10-24 — Partners: popup «Quiero ser partner» en vivo tras el release (TASK-2044/2045)
 
