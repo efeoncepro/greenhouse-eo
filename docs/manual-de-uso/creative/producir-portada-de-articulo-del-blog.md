@@ -266,9 +266,9 @@ El archivo de metadatos (por ejemplo `tmp/cover-<post>.json`) lleva:
 
 - `expectedThumb` y `expectedOg` son los ids de la destacada y de la imagen OG **que el post tiene ahora**: léelos
   antes (paso 11). Si alguien cambió la portada mientras tanto, la subida se detiene.
-- El `alt` describe la escena y repite el texto de la portada, como en el ejemplo. Con `efeonce-editorial-blocks`
-  0.4.6 desplegado, ese `alt` también sale como `og:image:alt` y `twitter:image:alt`. Esa versión está construida y
-  simulada en vivo desde el 2026-10-24, pero **todavía no está desplegada**: espera el visto bueno del operador.
+- El `alt` describe la escena y repite el texto de la portada, como en el ejemplo. Desde
+  `efeonce-editorial-blocks` 0.4.6 (en producción desde el 2026-10-24), ese `alt` también sale como `og:image:alt` y
+  `twitter:image:alt`.
 
 ### Paso 10 · Avisa a las sesiones del blog
 

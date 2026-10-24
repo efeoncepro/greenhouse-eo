@@ -32,8 +32,9 @@ ellas, el título del slider y el texto de la tarjeta caen encima del texto de l
 | 4. Imágenes del cuerpo | SVG directo para infografías y diagramas; raster real para fotos y capturas | bloques del artículo (Content Factory) | dentro del artículo, enteras | sin recorte: legibles a 390 px; versión móvil sólo si la de escritorio no se lee | sí, si es una infografía | agente de contenido |
 
 **Cuenta para un artículo nuevo:** **3 archivos** (plate, portada e imagen del slider), **3 subidas** (portada, `hero` y
-tarjeta) y de 0 a 2 imágenes de cuerpo. Cada subida lleva su `alt`. Con `efeonce-editorial-blocks` 0.4.6 desplegado,
-la descripción de la imagen para redes (`og:image:alt` y `twitter:image:alt`) sale sola del `alt` de la portada.
+tarjeta) y de 0 a 2 imágenes de cuerpo. Cada subida lleva su `alt`. Desde `efeonce-editorial-blocks` 0.4.6 (en
+producción desde el 2026-10-24), la descripción de la imagen para redes (`og:image:alt` y `twitter:image:alt`) sale
+sola del `alt` de la portada.
 
 **Si el artículo es corto (menos de 12 minutos),** no entra al rail: se ahorra la subida de la tarjeta. Si es Glitch o
 Novedad, no entra solo al slider. Un artículo viejo que se refresca no entra a ninguno de los dos hasta que se lo fije:
@@ -211,7 +212,7 @@ OG cuando el post no tiene una propia) y la imagen principal del schema (`primar
 | `og:image:type` | `image/jpeg` | JPEG a propósito: los lectores de enlaces no tratan el WebP de forma pareja |
 | `twitter:card` | `summary_large_image` | tarjeta grande |
 | `twitter:image` | **no se publica** | X usa la `og:image` cuando falta; el script sólo la escribe si el post ya tenía una propia |
-| `og:image:alt` y `twitter:image:alt` | **se agregan en `efeonce-editorial-blocks` 0.4.6** (runtime `20575b6`, hecho en local y simulado en vivo; espera el visto bueno del operador para desplegar) | toman el `alt` que Yoast ya resuelve para su `og:image` (Yoast 28.6 lo trae pero no lo imprime); si falta, el del adjunto, sólo cuando es ese mismo archivo. Una línea, 420 caracteres como máximo y nada si está vacío. El `alt` de la portada lo escribe `blog-post-cover-apply.php` |
+| `og:image:alt` y `twitter:image:alt` | **se publican desde `efeonce-editorial-blocks` 0.4.6** (runtime `20575b6`, en producción desde el 2026-10-24; verificado en vivo: una etiqueta de cada una en los posts y ninguna en `/blog/`) | toman el `alt` que Yoast ya resuelve para su `og:image` (Yoast 28.6 lo trae pero no lo imprime); si falta, el del adjunto, sólo cuando es ese mismo archivo. Una línea, 420 caracteres como máximo y nada si está vacío. El `alt` de la portada lo escribe `blog-post-cover-apply.php` |
 | Peso | 230–300 KB | muy por debajo del límite de cualquier red |
 
 Los lectores de enlaces y las redes guardan la imagen en caché: después de cambiar una portada, usa el Post Inspector

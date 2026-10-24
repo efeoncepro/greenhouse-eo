@@ -257,8 +257,8 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
      y 10–64 %. La miniatura «Siguiente» (96 × 64) usa esta imagen cuando existe.
 
   El operador aprueba viendo juntas la portada, su recorte cuadrado, la imagen del slider y la tarjeta (1440 y 390).
-  `og:image:alt` y `twitter:image:alt` salen del `alt` de la portada con editorial-blocks 0.4.6, construido y simulado
-  en vivo el 2026-10-24 y **sin desplegar todavía** (espera el visto bueno del operador). Márgenes por superficie y
+  `og:image:alt` y `twitter:image:alt` salen del `alt` de la portada desde editorial-blocks 0.4.6 (en producción desde
+  el 2026-10-24). Márgenes por superficie y
   diagramas: [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 
   **La portada está pendiente en AXIS:** todavía no es una pieza de `manzanitasRegister` ni la conoce la plantilla

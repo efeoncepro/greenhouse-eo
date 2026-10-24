@@ -1117,8 +1117,8 @@ Una captura `fullPage` puede ocultar overflow horizontal. Medir `scrollWidth`; n
 - `og:image` pública `200`, MIME y dimensiones esperados (en Manzanitas: la portada, 2400 × 1260, `image/jpeg`);
 - Twitter `summary_large_image`; sin `twitter:image` propio, X usa la `og:image`;
 - `og:title` es el título del post, no el título SEO de Yoast;
-- `og:image:alt` y `twitter:image:alt` salen del `alt` de la portada con `efeonce-editorial-blocks` 0.4.6, construido
-  y simulado en vivo pero todavía sin desplegar (espera el visto bueno del operador): hasta entonces no aparecen;
+- `og:image:alt` y `twitter:image:alt` salen del `alt` de la portada desde `efeonce-editorial-blocks` 0.4.6 (en
+  producción desde el 2026-10-24): verificar que haya una de cada una;
 - image URL no depende de auth y no es un fallback global accidental;
 - refrescar la caché con el depurador de Facebook, el Post Inspector de LinkedIn y un chat de prueba en WhatsApp.
 

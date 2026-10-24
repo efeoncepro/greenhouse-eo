@@ -221,8 +221,8 @@ Assign featured and social media deliberately:
 - live QA after the uploads: `og:image` 2400 × 1260 `image/jpeg`, `twitter:card` `summary_large_image` (no
   `twitter:image`: X falls back to `og:image`), the card and the slider at 1440 and 390,
   `pnpm public-website:blog-home verify --browser`, and each network's debugger to refresh its cache.
-  `og:image:alt` / `twitter:image:alt` come from `efeonce-editorial-blocks` 0.4.6, built and simulated live but
-  **not deployed yet** (waits for the operator's go): until then, do not expect them in the HTML;
+  `og:image:alt` / `twitter:image:alt` come from `efeonce-editorial-blocks` 0.4.6 (live since 2026-10-24):
+  check there is exactly one of each;
 - preserve source masters and derivative lineage outside the post body.
 
 For direct SVG infographics, load the governed SVG lane in `content-factory-gutenberg.md` and the SEO contract

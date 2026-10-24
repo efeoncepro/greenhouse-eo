@@ -84,8 +84,8 @@ Reglas que valen para todas:
 2400 × 1260 (lienzo 1200 × 630) que cubre destacada, `og:image`, la tarjeta de X (sin `twitter:image` propio),
 `primaryImageOfPage` y la miniatura cuadrada de «Te puede interesar» al pie de cada artículo (339 × 339; 326 × 326
 en el teléfono, centrada: el mismo cuadrado x 285–915 que WhatsApp). `og:image:alt` y `twitter:image:alt` salen
-del `alt` de la portada con `efeonce-editorial-blocks` 0.4.6, construido y simulado en vivo pero **todavía sin
-desplegar** (espera el visto bueno del operador). Medidas, zonas seguras y QA:
+del `alt` de la portada desde `efeonce-editorial-blocks` 0.4.6 (en producción desde el
+2026-10-24). Medidas, zonas seguras y QA:
 `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
 
 ## QA post-publicación
