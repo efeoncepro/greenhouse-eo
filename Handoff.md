@@ -13,32 +13,29 @@ secuencia desde el seguimiento recurrente. Revisiones internas de Mariana
 de nuevas acciones; el envío histórico no valida la casilla. Sin nuevas comunicaciones, créditos o mutaciones
 CRM en este cierre. Docs, cuatro skills espejo y escenarios conciliados; [auditoría](docs/audits/commercial/2026-10-24-chat-prospeccion-docs-skills.md).
 
-## 2026-10-24 — Portada del blog v3: revisión en vivo con datos reales; falta el corte de `/blog/`
+## 2026-10-24 — Portada del blog v3 en producción; operable por agentes
 
-**En vivo** (pedido del operador): plugin `eo-blog-home` y `https://efeoncepro.com/blog-v3-revision/` (252046, noindex,
-sin enlaces; rollback `wp post delete 252046`) con escritorio, tablet y móvil, **ya con datos reales**: modelo de
-contenido `efeonce-editorial-blocks` 0.2.0 desplegado (runtime `d690227`), PDR-029 *Accepted* (con el formato
-Novedad, que entra al slider sólo si se fija), 44 entradas con formato (ledger en `blog-v3/ledger/`), recursos guía
-252050 y diagnóstico 252054 (adjuntos 252052/252053/252056) y `eo_content_model_enabled = 1`. La entrada 249387 tiene
-título partido y arte del canvas (adjunto 252057, `blog-v3/set-hero-art.php`). Slider: El fin de la web · I Know Kung
-Fu · Glitch Flash Sonnet · Guía Web agéntica · AEO Assessment. Sin evento real: la sección de eventos queda oculta.
-Verificado en vivo: sin desborde de 320 a 1920, un H1, axe 0 en los tres tableros. **`/blog/` sin cambiar.**
-Code complete sin publicar: TASK-2053/2054 (Greenhouse `8b1bd8c2e`…`69f032cd4`) y TASK-2052 (AXIS `5bdfa91`…`ba70438`).
+**`/blog/` (18456) sirve la portada v3 desde el 2026-10-24 08:13Z** con datos reales, menú canónico (paquete del tema
+con `EO_SITE_NAV_EXCLUDED_PAGES` vacío), foto del autor desde su perfil de WordPress y tres tableros. Rollback del
+corte: `pnpm public-website:blog-home page rollback --snapshot _gh_blog_home_v3_before_20261024_081327 --apply`.
+Verificado en vivo: sin desborde de 320 a 1920, un H1, axe 0 en los tres tableros, indexable. La página de revisión
+252046 sigue publicada (noindex): mandarla a la papelera cuando el operador lo confirme.
 
-**Pendiente, con aprobación del operador en cada paso:**
+**Operación por cualquier agente:** `pnpm public-website:blog-home` (manual
+`docs/manual-de-uso/public-site/operar-portada-blog-por-cli.md`, referencia de skill `blog-home-operation.md`):
+estado y motivo de cada diapositiva, fijar, título e imagen del slider, formato, recursos, eventos, suscripción, flag,
+purga, despliegue de los dos plugins (con línea base viva y flag off→on) y verificación en navegador. Cada `--apply`
+queda en `scripts/public-website/blog-home/ledger/`.
 
-1. Corte de `/blog/`: `blog-v3/publish-blog-home-page.php` + paquete de `ohio-child` (`EO_SITE_NAV_EXCLUDED_PAGES`
-   vacío, runtime `df11a21`) juntos; papelera para 252046.
-2. Release de Greenhouse a `main` (renderer 1.2.0 con `inline_pill`) y publicación del formulario de Glitch y del
-   evento (`growth:forms:publish-event-registration`); luego cambiar las acciones de los formularios de la portada.
-3. Cargar el primer evento real (la sección aparece sola) y medir la purga de `/blog/` en Kinsta.
-4. AXIS v0.7.15: push de `main`, CI verde, `release:packages 0.7.15`, readback y vendorización.
+**Suscripción a Glitch:** los formularios del canvas simulaban el envío; en producción ya no se muestran sin un Growth
+Form real (`data-subscribe="off"`). Fix real en el release `80a3fcfe7` (PR #259): suscripción por el acto de
+suscribirse bajo el aviso de la píldora (`consentBy: 'submission'` + hash del aviso, aprobado por el operador el
+2026-10-24) y `pnpm growth:forms:publish-glitch-pill`. Pasos tras el release: `--publish`, luego
+`pnpm public-website:blog-home subscription 6bc62588-a4a0-4214-9501-13b0c2948c81 --apply` y verificar un envío real
+(contacto suscrito al tipo 535702717 en HubSpot). La suscripción del final usa la misma píldora (desvío 13).
 
-Notas: el despliegue del modelo se niega con la opción encendida (apagar → desplegar → encender, scripts
-`set-content-model-flag.php`); re-exportar la línea base antes de cada despliegue; un PHP nuevo tarda 1–2 min en
-llegar a PHP-FPM. Diapositiva de una entrada sin `_eo_hero_image`: el adaptador pone velo de lectura y la bajada se corta
-en 2 líneas. Rendimiento móvil: hero a 3,4–3,8 s; el banner de cookies es el LCP (10–17 s), seguimiento de sitio. La
-entrada 249766 tiene categoría primaria Yoast 204, que no existe.
+**AXIS v0.7.15 publicado** (CI `dc7c721`, primitives 0.7.15; la prueba del haz del buscador ya no compite con el
+runner). Sin evento real cargado: la sección de eventos queda oculta hasta el primero (`blog-home event`).
 
 ## 2026-10-24 — Nosotros: fidelidad, rieles de Ohio, mapa y wordmark HubSpot (en vivo)
 
