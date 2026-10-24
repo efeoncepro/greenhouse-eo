@@ -53,7 +53,13 @@ function deviate(src) {
 
 const CARD_ARROW = '<svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>'
 
+// Extension approved by the operator on 2026-10-24: the «Novedad» format (Efeonce announcements) gets a megaphone in
+// the slider chip, drawn in the same stroke as the five canvas glyphs. It never renders for the canvas fixture.
+const NOVE_ICON = '<sc-if value="{{ s.fNove }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a3 3 0 0 1 0 6"/><path d="M10 8v11a1 1 0 0 1 -1 1h-1a1 1 0 0 1 -1 -1v-5"/><path d="M12 8l4.524 -3.77a.9 .9 0 0 1 1.476 .692v12.156a.9 .9 0 0 1 -1.476 .692l-4.524 -3.77h-8a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h8"/></g></svg></sc-if>'
+
 function bindMarkup(src) {
+  src = rep(src, /(<sc-if value="\{\{ s\.fFlash \}\}" hint-placeholder-val="\{\{ false \}\}"><svg[\s\S]*?<\/svg><\/sc-if>)/, '$1' + NOVE_ICON)
+
   // Assets: every canvas file becomes a lookup into the asset map.
   for (const [key, a] of Object.entries(assets)) {
     const n = src.split('/_blob/' + a.id).length - 1
@@ -164,6 +170,8 @@ function bindMarkup(src) {
 }
 
 function bindLogic(src) {
+  src = rep(src, "fFlash: x.fmt === 'flash',", "fFlash: x.fmt === 'flash', fNove: x.fmt === 'nove',")
+
   src = rep(src, '  renderVals() {\n    const S = [', '  renderVals() {\n    const D = this.props.data;\n    const S0 = [')
   src = rep(src, /const S0 = \[[\s\S]*?\n    \];\n/, 'const S = D.slides;\n')
   src = rep(src, /const T = \[[\s\S]*?\n    \];\n/, 'const T = D.topics;\n')

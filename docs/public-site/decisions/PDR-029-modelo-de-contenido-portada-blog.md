@@ -51,6 +51,7 @@ contenido; lo que ve el visitante (páginas de evento, marcado, portada con dato
 | Glitch Edición | `glitch-edicion` | flash | Leer la edición |
 | Glitch Flash | `glitch-flash` | flash | Leer el Flash |
 | Glitch Nota | `glitch-nota` | flash | Leer la nota |
+| Novedad | `novedad` | nove (megáfono) | Leer la novedad |
 
 - Eje distinto de la categoría (PDR-020 §4.2): nunca reemplaza ni mezcla las 13 categorías, nunca cambia la URL ni
   la categoría primaria de Yoast.
@@ -58,16 +59,22 @@ contenido; lo que ve el visitante (páginas de evento, marcado, portada con dato
   del canvas.
 - **Exactamente un formato por entrada publicada.** Si llegan dos a la vez, queda el primero del orden de la tabla;
   si se publica sin formato, el plugin asigna el inferido (regla de §1.1).
+- **Novedad** (agregado por el operador el 2026-10-24): anuncios de Efeonce (alianzas, partnerships, noticias de la
+  empresa). Entra al slider **sólo si está fijada**: sin fijación, la diapositiva automática nunca es una novedad
+  (ni una entrada de la categoría Novedades). Su ícono es un megáfono con el trazo de los cinco glifos del canvas.
 - «Grabación» es el nombre visible (pregunta abierta de TASK-2050: «Grabación» o «Webinar»). Una grabación es una
   entrada que incrusta el video de YouTube con su transcripción (PDR-020, delta 2026-10-22, punto 6).
 
 #### 1.1 Regla de inferencia (backfill y valor por defecto)
 
 - Categoría Glitch: título que empieza con «Glitch Flash» → Flash; con «Glitch #N» → Edición; si no, Nota.
+- Categoría Novedades → Novedad.
 - Otras: «caso» en el slug o el título, o «Lo que aprendimos» → Caso; «guía» o «paso a paso» → Guía; si no, Artículo.
 
-Aplicada a los títulos de las 44 entradas vivas (inventario de sólo lectura del 2026-10-24) propone: 7 Ediciones, 1
-Flash, 2 Notas, 2 Casos, 3 Guías y 29 Artículos. La regla es un punto de partida: el dry-run lista cada entrada y el
+Aplicada a los títulos de las 44 entradas vivas (inventario de sólo lectura del 2026-10-24) proponía: 7 Ediciones, 1
+Flash, 2 Notas, 2 Casos, 3 Guías y 29 Artículos; con Novedad y dos tutoriales corregidos a Guía (dry-run en vivo del
+2026-10-24, `backfill/dry-run-2026-10-24.json`): 7 Ediciones, 1 Flash, 2 Notas, 2 Casos, 5 Guías, 2 Novedades y 25
+Artículos. La regla es un punto de partida: el dry-run lista cada entrada y el
 operador corrige las que no calcen (por ejemplo, tutoriales que el canvas trató como guía) antes del apply (§7).
 
 ### 2. Fijación con vencimiento y título del slider
