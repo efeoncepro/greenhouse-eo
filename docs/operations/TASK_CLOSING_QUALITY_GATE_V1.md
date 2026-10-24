@@ -186,3 +186,12 @@ canal era el color de su propio run, que ya estaba rojo por otra causa.
 - **NUNCA** empujar en ráfaga a `develop` y darte por cerrado sin que el **último** SHA tenga
   `conclusion=success`. Con `cancel-in-progress` activo, ese último run es el único que juzga el árbol
   que quedó.
+
+### Tests y validación
+
+> Movido verbatim desde `CLAUDE.md` el 2026-10-24 (presupuesto de tokens, TASK-1160). Los comandos siguen en la
+> Quick Reference de `CLAUDE.md`.
+
+- Tests unitarios: Vitest + Testing Library + jsdom
+- Helper de render para tests: `src/test/render.tsx`
+- Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `pnpm typecheck` (ver Quick Reference)
