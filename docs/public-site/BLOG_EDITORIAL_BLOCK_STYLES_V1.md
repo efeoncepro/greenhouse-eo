@@ -1,7 +1,7 @@
 # Estilos editoriales del blog (bloques nativos de Gutenberg)
 
 > **Tipo de documento:** Contrato de diseño y uso
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-10-24 por Claude, a partir de la revisión del operador sobre los posts de inbound, paid media y topic clusters
 > **Código:** plugin `efeonce-editorial-blocks` 0.4.0, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`, commit `f9b0d4d`)
 > **Estado:** en producción desde el 2026-10-24 (§En producción)
@@ -51,8 +51,10 @@ Sólo neutralizan o completan lo que el tema le hace al marcado nativo:
 4. **Tabla rayada en modo oscuro.** Core pinta las filas impares `#f0f0f0` y Ohio pone el texto en blanco, así que no
    se leía. Las rayas pasan a una franja translúcida.
 
-**Sin resolver:** los enlaces normales del blog siguen en navy sobre fondo oscuro. Es un problema del tema en todo el
-blog, no de estos posts, y queda para decisión del operador.
+5. **Enlaces del artículo en modo oscuro** (0.4.1). Las opciones del tema fijan `--clb-color-link` en navy `#022a4e`
+   sobre el propio enlace (`.page-content a:not(.-unlink):not(.tag)`, 0,3,1) y no tienen valor para oscuro, así que
+   quedaban a 1,3:1. Dentro del cuerpo del artículo y en oscuro, la variable pasa a azure claro `#6cb4ff` (8,7:1;
+   7,2:1 sobre el Recuadro) y `#a8d1ff` al pasar el mouse. El modo claro, las menciones y los botones no cambian.
 
 ## Reglas para quien escribe
 
@@ -105,4 +107,12 @@ clásico), y core ya centra esa forma. La regla de `ohio-host.css` cubre la form
 **Pendiente:**
 
 - Diagrama nuevo para topic clusters: el anterior mostraba «efeonce.cl».
-- Color de los enlaces normales del blog en modo oscuro: decisión del operador.
+
+**0.4.1 (2026-10-24, 16:04 UTC).** El operador lo aprobó viendo la vista previa. Se coordinó con las sesiones de la
+portada y de correos y eventos, que no tenían nada en vuelo, y se desplegó por el mismo carril. El paquete cambió sólo
+el main, el readme y `ohio-host.css`. Los hashes en vivo son iguales al commit `a7503e9`, el flag volvió a 1 y el CSS
+se sirve como `?ver=0.4.1`.
+
+QA en vivo: en modo oscuro todos los enlaces normales del cuerpo pasan a `#6cb4ff` en los cuatro posts revisados,
+incluido uno no refrescado («Qué es Loop Marketing»). El modo claro sigue en `#022a4e`, las menciones quedan en blanco,
+no hay errores ni scroll horizontal, y `blog-home verify --browser` pasó con 14 de 14.
