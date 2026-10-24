@@ -387,7 +387,7 @@ a{color:#ffffff}
 
 </style>
 </helmet>
-<main id="main" class="v3 arc" style="position: relative;">
+<div class="v3 arc" style="position: relative;">
 <header class="{{ headCls }}" data-site-nav-tone="dark">
   <div class="w">
     <nav aria-label="Migas de pan"><ol class="crumb"><sc-for list="{{ crumbs }}" as="c" hint-placeholder-count="3"><li><a href="{{ c.url }}">{{ c.label }}</a></li></sc-for><li><span aria-current="page">{{ crumb }}</span></li></ol></nav>
@@ -423,7 +423,7 @@ a{color:#ffffff}
       </div>
       <sc-if value="{{ hero }}" hint-placeholder-val="{{ true }}">
       <a href="{{ hero.url }}" class="hc"><svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>
-        <span class="{{ hero.imgCls }}"><img src="{{ hero.img }}" alt="" fetchpriority="high"></span>
+        <sc-if value="{{ hero.img }}" hint-placeholder-val="{{ true }}"><span class="{{ hero.imgCls }}"><img src="{{ hero.img }}" alt="" fetchpriority="high"></span></sc-if>
         <span class="hc__b">
           <span class="hc__l">{{ hero.label }}</span>
           <span class="hc__k"><span style="{{ hero.bar }}"></span><sc-if value="{{ hero.glitch }}" hint-placeholder-val="{{ false }}"><img src="{{ assets.glitchNavy }}" alt="Glitch" width="56" height="15" style="display: inline-block; height: 15px; width: auto; vertical-align: -2px;"> <span>{{ hero.kind }}</span></sc-if><sc-if value="{{ hero.plain }}" hint-placeholder-val="{{ true }}"><span>{{ hero.kind }}</span></sc-if></span>
@@ -501,7 +501,7 @@ a{color:#ffffff}
           </span>
           <span class="fc__m"><span>{{ meanwhile.glitch.min }} min de lectura · {{ meanwhile.glitch.date }}</span></span>
         </span>
-        <span class="fc__img"><img src="{{ meanwhile.glitch.img }}" alt="" loading="lazy" decoding="async"></span>
+        <sc-if value="{{ meanwhile.glitch.img }}" hint-placeholder-val="{{ true }}"><span class="fc__img"><img src="{{ meanwhile.glitch.img }}" alt="" loading="lazy" decoding="async"></span></sc-if>
       </a>
       <div class="mt__c">
         <a href="{{ meanwhile.guide.url }}" class="gc" style="background: #023c70; color: #ffffff;"><svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>
@@ -531,7 +531,7 @@ a{color:#ffffff}
     </div>
   </div>
 </section>
-</main>
+</div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"data":{"editor":null},"$preview":{"width":1440,"height":4000}}'>
 class Component extends DCLogic {

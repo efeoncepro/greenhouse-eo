@@ -60,9 +60,9 @@ function deviate(src) {
   // 1. Canonical site header and footer: the canvas stand-ins go away.
   src = rep(src, /\n<div class="nvs" aria-hidden="true">[\s\S]*?\n<\/div>/, '')
   src = rep(src, /\n<footer style="background: #f7f8f6; padding: 64px 16px 72px;">[\s\S]*?<\/footer>/, '')
-  // 5. Landmark: the root is the page's <main id="main"> (the site skip link targets it).
-  src = rep(src, /<div class="v3 arc( mob)?" style="position: relative;">/, '<main id="main" class="v3 arc" style="position: relative;">')
-  src = rep(src, '\n</div>\n</x-dc>', '\n</main>\n</x-dc>')
+  // 6. One markup for both widths: the `.mob` root class of the 390 board goes (the media query does its job).
+  // (5. The page's <main id="main"> is opened by the plugin's page template around the board, as Ohio's page.php does.)
+  src = rep(src, /<div class="v3 arc( mob)?" style="position: relative;">/, '<div class="v3 arc" style="position: relative;">')
   // 5. Ids prefixed (the site header may use `q`).
   for (const id of ['q', 'ot-h', 'mt-h']) {
     const n = count(src, `id="${id}"`)
