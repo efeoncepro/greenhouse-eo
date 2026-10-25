@@ -173,6 +173,30 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
     exampleIntent: 'Refresh this pullquote so it connects Loop Marketing with faster learning cycles.'
   },
   {
+    blockName: 'efeoncepro/growth-cta',
+    semanticKind: 'conversion_cta',
+    agentRole:
+      'Places a governed Greenhouse Growth CTA in a post (dynamic block, plugin efeonce-editorial-blocks ≥ 0.7.0). Authored as GutenbergArticleSpec kind="growthCta" with the CTA slug; copy, action and measurement live in the Growth CTA engine.',
+    freedomLevel: 'guided',
+    editableSurfaces: ['attrs'],
+    semanticOperations: ['refresh_cta'],
+    compilesTo: ['update_attrs', 'preserve'],
+    requiredEvidence: [...baseEvidence, 'plugin_serialization_policy'],
+    applyPolicy: draftOnlyPolicy(
+      'The block only references a CTA slug; change the copy by publishing a new CTA version in Greenhouse, never in the post.'
+    ),
+    previewPolicy: previewRequired(
+      'One visible <greenhouse-cta> inside section.eo-gcta on the published page (data-ghc-state="visible"); the editor only shows a placeholder.',
+      'The slug is allowed by the blog surface (option eo_growth_cta_blog); otherwise the block prints nothing.'
+    ),
+    guardrails: [
+      'At most one Growth CTA per post, after the main answer and before the FAQ or the closing.',
+      'Never write CTA copy, forms or links inside the block: they are data of the Growth CTA engine.',
+      'emphasis must be one exact phrase of the published headline; never hand-write the block comment.'
+    ],
+    exampleIntent: 'Place the Efeonce AEO Assessment CTA before the FAQ of this AEO article.'
+  },
+  {
     blockName: 'efeoncepro/glitch-drop',
     semanticKind: 'editorial_aside',
     agentRole:

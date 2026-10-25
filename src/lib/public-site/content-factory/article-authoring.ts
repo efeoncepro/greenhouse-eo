@@ -24,6 +24,7 @@ import {
   type GutenbergOutlineHeading
 } from './gutenberg-blocks'
 import { renderGlitchDropBlock } from './gutenberg-glitch-drop'
+import { renderGrowthCtaBlock } from './gutenberg-growth-cta'
 import { slugifyPublicSiteDraft } from './gutenberg-planner'
 
 /** Service lines of AXIS `efeonce.mention` (`efeonceGraphicLine.lines`). */
@@ -140,6 +141,11 @@ export type GutenbergArticleBlock =
    * next paragraph). Serialized byte-identical to WordPress.
    */
   | { kind: 'glitchDrop'; lines: string[] }
+  /**
+   * Governed Growth CTA of Greenhouse placed in the post (`efeoncepro/growth-cta`, efeonce-editorial-blocks ≥ 0.7.0).
+   * Copy, action and measurement live in the Growth CTA engine; the slug must be allowed by the blog surface.
+   */
+  | { kind: 'growthCta'; cta: string; location?: string; emphasis?: string }
   /** Governed CTA buttons: 1–3 items, closed variants, no literal colors or custom classes. */
   | { kind: 'buttons'; items: GutenbergButtonItem[] }
 
@@ -355,6 +361,7 @@ const blockToPlainText = (block: GutenbergArticleBlock): string => {
       return block.code
     case 'glitchDrop':
       return block.lines.join(' ')
+    case 'growthCta':
     case 'separator':
     case 'image':
     case 'embed':
@@ -680,6 +687,8 @@ const renderArticleBlock = (
       return embedBlock(block)
     case 'glitchDrop':
       return renderGlitchDropBlock(block.lines)
+    case 'growthCta':
+      return renderGrowthCtaBlock(block)
     case 'buttons':
       return buttonsBlock(block)
   }

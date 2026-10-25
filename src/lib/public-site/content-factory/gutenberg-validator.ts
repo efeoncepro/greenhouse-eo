@@ -15,6 +15,12 @@ import {
   glitchDropContentHasLink,
   splitGlitchDropContent
 } from './gutenberg-glitch-drop'
+import {
+  GROWTH_CTA_ALLOWED_ATTRIBUTES,
+  GROWTH_CTA_BLOCK_NAME,
+  isGrowthCtaLocation,
+  isGrowthCtaSlug
+} from './gutenberg-growth-cta'
 
 export type GutenbergDraftValidationOptions = {
   allowedBlocks?: string[]
@@ -55,6 +61,8 @@ const DEFAULT_ALLOWED_GUTENBERG_BLOCKS = [
   // Dynamic Efeonce POV callout (plugin efeonce-editorial-blocks). Allowed only in its
   // governed shape: self-closing, `content` without links or HTML other than <br>.
   GLITCH_DROP_BLOCK_NAME,
+  // Governed Growth CTA placement (plugin efeonce-editorial-blocks ≥ 0.7.0): self-closing, cta/location/emphasis.
+  GROWTH_CTA_BLOCK_NAME,
   'yoast-seo/table-of-contents'
 ]
 
@@ -788,6 +796,59 @@ const findRedundancyNeighbour = (
  * text separated by `<br>`, no links or other HTML. A drop that repeats the
  * neighbouring paragraph is a warning (the 251941 QA finding).
  */
+/**
+ * `efeoncepro/growth-cta` is allowed only in the governed shape the spec emits: self-closing, `cta` (a valid slug),
+ * optional `location` and `emphasis`. The copy lives in the Growth CTA engine, so there is nothing else to validate
+ * in the post; whether the blog surface allows the slug is checked on the live page (the block prints nothing).
+ */
+const validateGrowthCtaBlocks = (blocks: ParsedGutenbergBlockComment[], findings: ContentFactoryValidationFinding[]) => {
+  for (const block of blocks) {
+    if (block.blockName !== GROWTH_CTA_BLOCK_NAME || block.closing) continue
+
+    const path = `draft.postContent[${block.index}]`
+
+    if (!block.selfClosing) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_not_self_closing',
+        message: `${GROWTH_CTA_BLOCK_NAME} is a dynamic block: it is a self-closing comment with cta/location/emphasis.`,
+        path
+      })
+    }
+
+    const unsupportedAttrs = Object.keys(block.attrs).filter(
+      key => key !== '__invalidJson' && !(GROWTH_CTA_ALLOWED_ATTRIBUTES as readonly string[]).includes(key)
+    )
+
+    if (unsupportedAttrs.length > 0) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_attrs_unsupported',
+        message: `${GROWTH_CTA_BLOCK_NAME} only accepts ${GROWTH_CTA_ALLOWED_ATTRIBUTES.join(', ')}; found ${unsupportedAttrs.join(', ')}.`,
+        path
+      })
+    }
+
+    if (!isGrowthCtaSlug(block.attrs.cta)) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_slug_invalid',
+        message: `${GROWTH_CTA_BLOCK_NAME} needs the slug of a published Growth CTA in attrs.cta.`,
+        path
+      })
+    }
+
+    if (block.attrs.location !== undefined && !isGrowthCtaLocation(block.attrs.location)) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_location_invalid',
+        message: `${GROWTH_CTA_BLOCK_NAME} location must be snake_case (cta_location measurement param).`,
+        path
+      })
+    }
+  }
+}
+
 const validateGlitchDropBlocks = (
   postContent: string,
   blocks: ParsedGutenbergBlockComment[],
@@ -1038,6 +1099,7 @@ export const validateGeneratedGutenbergDraft = (
   validateGovernedHtmlJsonLdBlocks(postContent, blocks, findings)
   validateDetailsBlocks(postContent, blocks, findings)
   validateGlitchDropBlocks(postContent, blocks, findings)
+  validateGrowthCtaBlocks(blocks, findings)
   validateButtonBlocks(postContent, blocks, findings)
 
   if (postContent.length < 600) {

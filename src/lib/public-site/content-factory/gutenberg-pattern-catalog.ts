@@ -1,6 +1,7 @@
 import type { GutenbergBlockPatternCatalog, GutenbergBlockPatternCatalogEntry } from './contracts'
 import { renderHeadingBlock, renderYoastTableOfContents } from './gutenberg-blocks'
 import { renderGlitchDropBlock } from './gutenberg-glitch-drop'
+import { renderGrowthCtaBlock } from './gutenberg-growth-cta'
 
 // Examples are generated from the canonical block builders so they are always
 // anchored + populated by construction (regression guard for the 250748 defect).
@@ -204,6 +205,20 @@ export const EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES: GutenbergBlockPatternCatal
       'Short headers: under 600 px each cell shows its header as a label.'
     ],
     example: stripedTableExample
+  },
+  {
+    blockName: 'efeoncepro/growth-cta',
+    role: 'conversion',
+    generationPolicy: 'allowed',
+    refreshPolicy: 'preserve',
+    description:
+      'Governed Greenhouse Growth CTA placed in a post. Dynamic block: CTA slug in a self-closing comment (spec kind="growthCta"); copy lives in the Growth CTA engine.',
+    constraints: [
+      'Only slugs allowed by the blog surface (option eo_growth_cta_blog).',
+      'One per post, after the main answer and before the FAQ or the closing.',
+      'No copy, links or forms inside the block.'
+    ],
+    example: renderGrowthCtaBlock({ cta: 'blog-aeo-assessment', location: 'blog_article', emphasis: '¿aparece tu marca?' })
   },
   {
     blockName: 'efeoncepro/glitch-drop',
