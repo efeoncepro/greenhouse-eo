@@ -8,9 +8,10 @@ bio corta, temas, «Ver sus 44 artículos», LinkedIn e Instagram) en lugar de l
 `efeonce-editorial-blocks` 0.5.5 (runtime d3156f6, lector `EO_Author_Profile`; hovers sin el relleno de Ohio y aire bajo la ficha tras tu revisión) y `page_headline.php` por el paquete del
 tema (runtime 1d7a7bd); perfil de Julio cargado (avatar 252085, cargo «Managing & GTM Director», bios sin «Fundador»)
 e indexable de Yoast reconstruido. Verificado en vivo: Person con cargo, foto, `sameAs` y `worksFor` por `@id`;
-Playwright 5 anchos sin desborde, axe 0. Trampas: `.single-post aside {display:none}` inline (la ficha es `section`)
-y el indexable de Yoast guarda el `og:image` viejo. **Pendiente:** enlace YouTube global de Ohio → `colabrio`; slug de
-autor; `/wp-json/wp/v2/users`. Turno de content-model devuelto a la sesión del Archivo. Sin push.
+Playwright 5 anchos sin desborde, axe 0. Trampas: `.single-post aside {display:none}` inline (la ficha es `section`),
+el indexable de Yoast guarda el `og:image` viejo y Ohio repinta todo enlace al hover (cada enlace de la ficha lleva
+`-unlink -undash`; prueba de 34 chequeos). **Pendiente:** desplegar 0.5.6 (ficha más contenida: retrato 160, ancho
+800; runtime 6a169bc, espera permiso); enlace YouTube global de Ohio → `colabrio`; slug de autor; `/wp-json/wp/v2/users`. Turno de content-model devuelto a la sesión del Archivo. Sin push.
 
 ## 2026-10-24 — Portada del blog: «Explora por tema» v2 (TASK-2051) en producción
 La órbita de `/blog/` dejó de mostrar «¿De qué escribimos más?» y es la puerta a las categorías: «Elige por dónde

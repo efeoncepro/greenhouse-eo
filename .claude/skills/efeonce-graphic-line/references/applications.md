@@ -57,6 +57,9 @@ distribución y readback como pasos distintos, con el scope de cada host explíc
 
 > Delta familia H3 (B3d) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (paquete 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
 
+> Delta ficha de autor del blog (A19) verificado contra: la ficha en producción en `efeoncepro.com`
+> (`efeonce-editorial-blocks` 0.5.5) y greenhouse-eo `develop` en `15e7903c6` — 2026-10-24.
+
 > Delta marca Rooms (A13) verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
 
 > Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
@@ -714,6 +717,38 @@ cuerpo (de 0 a 2) sólo van si explican algo: las infografías en SVG, legibles 
 diagramas: [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 Contrato: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` · FAQ: `docs/public-site/BLOG_FAQ_BLOCK_ANALYSIS_V1.md`.
 
+### A19. Ficha de autor del blog (web) (en producción desde 2026-10-24)
+
+> Verificado contra: la ficha publicada al cierre de los artículos de `efeoncepro.com` (`efeonce-editorial-blocks`
+> 0.5.5, TASK-2057) y greenhouse-eo `develop` en `15e7903c6` — 2026-10-24/25. Criterio: [criteria.md](criteria.md),
+> «Retrato con órbita y nombre: punto tipeado»; decisiones: [ledger.md](ledger.md) (2026-10-24).
+
+- **Para qué:** decir quién escribió el artículo, con qué cargo y dónde seguirlo, al cierre de cada post del blog
+  (reemplaza la caja de autor del tema Ohio). Los datos salen de un solo lector (`EO_Author_Profile`), el mismo del
+  byline y del schema, así que lo visible y lo estructurado no se separan.
+- **Va:** ficha **oscura** `#001a33` (variante B, aprobada para artículos; la A en papel queda como alternativa) con la
+  pieza **`portrait`** de AXIS: caja 208, anillo r 96 al 40 % del halo `#72ded8`, foto r 78, arco de 200° a 250° con
+  trazo 4 y esfera r 7 en el acento Growth `#36c8bf`; se escala a 160 px en escritorio y 120 px en teléfono. Al lado:
+  nombre en Bricolage, cargo, bio corta (≤ 180 caracteres) y las redes con sus **isotipos oficiales** de
+  `@efeoncepro/axis-brand-assets` (`assets/platforms/*-isotype.svg`, monocromos en `currentColor`).
+- **Una esfera por pieza:** la del arco del retrato. El **nombre cierra con punto tipeado en el acento**, nunca con
+  esfera. En la franja chica (texto bajo 24 px), el punto va en el color del nombre: el acento nunca va en texto
+  menor a 24 px.
+- **Esquina recta arriba a la izquierda** (`straightCorner` de AXIS): apunta al borde del que nace el bloque, el de
+  quien habla.
+- **Foto:** la del equipo con fondo azul de fotografía de marca (One User Avatar, nunca Gravatar).
+- **Medidas finales en escritorio:** ancho máximo 800 px, padding `clamp(24px, 3vw, 36px)`, nombre
+  `clamp(28px, 3vw, 36px)`, cuerpo 15 px y 96 px de aire bajo la ficha. La 0.5.6 la deja más contenida: el operador
+  dijo que «quedó bastante grande».
+- **Copy:** el cargo vigente («Managing & GTM Director» para Julio); sin web personal hasta que exista. Las redes
+  visibles son las del `sameAs` del schema, en el mismo orden.
+- **Nunca:** una segunda esfera junto al nombre · el acento en texto chico · íconos de redes dibujados o copiados de
+  otro set · el `aside` del tema (Ohio lo oculta en los posts) · una foto de Gravatar.
+- **Producción y publicación:** skill `efeonce-public-site-wordpress` → `references/blog-home-operation.md` (delta
+  «Author card + byline») y `references/runtime-and-discovery.md` §Ohio host traps for own components. Si se cambia la
+  foto, la capa del avatar se rehace desde la fuente (`ai-generations/2026-10-24_autor-blog/reparar-capa.mjs`): la
+  del 2026-09-29 tenía huecos en la bomber que sobre navy no se veían.
+
 ## B. Presentaciones e informes
 
 ### B1. Deck 16:9 (portada, sección, contenido, cierre)
@@ -1328,6 +1363,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Mención Efeonce en texto corrido | ninguna (el isotipo ya es órbita) | isotipo + etiqueta corta en la píldora de la línea; sólo destinos Efeonce, no CTA | `efeonce.mention` (AXIS) · A14 |
 | Encabezado y navegación del sitio web (en vivo desde 2026-10-23) | — | logo 164/140, cápsula de vidrio, botón «Agenda tu diagnóstico» y hamburguesa con una sola receta de vidrio | `efeonce.site-nav` (AXIS primitives 0.7.13) · A15 |
 | Landing de servicio/agenda con el agendador nativo | órbita de retrato de Nexa en el hero | agendador real enmarcado, titulares con esfera (salvo el del hero), CTA `accent-growth`, firma del sitio | landing source-led + `<efeonce-meeting-scheduler>` · A17 |
+| Ficha de autor del blog (web) | pieza `portrait` de AXIS (la única esfera) | ficha oscura, nombre con punto tipeado en el acento, cargo, bio corta, isotipos oficiales de redes | `EO_Author_Profile` + `efeonce-editorial-blocks` · A19 |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Anuncio de alianza (post 4:5 + reel 9:16) | ninguna (la órbita fina sola no tiene punch) | fondo cine con horizonte bajo, íconos oficiales del partner en tres planos con acabado Sunburst, lockup «Efeonce \| Partner» con filete y fila de productos debajo; sin pregunta-respuesta | composición determinística + acabado `gpt-image-2.5-sunburst` · A16 |
 | Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |

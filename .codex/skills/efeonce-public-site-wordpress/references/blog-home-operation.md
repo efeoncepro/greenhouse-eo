@@ -32,7 +32,19 @@ the byline ships in the site-nav theme package (allowlist + `parts/elements/page
 the card is a `<section aria-label="Sobre el autor">`, **never `aside`** (site inline CSS `.single-post aside
 {display:none}` hides it); after changing photo or job title **rebuild the Yoast author indexable** and purge, or the
 author archive keeps the old `og:image` (`ai-generations/2026-10-24_autor-blog/refrescar-yoast-autor.php` via
-`pnpm public-website:wpcli -- --eval-file … --wp-user 1`). Contract: `BLOG_HOME_RUNTIME_V1.md` §9.
+`pnpm public-website:wpcli -- --eval-file … --wp-user 1`). More traps measured live: (a) Ohio paints every link on
+hover — `a:not(.-unlink):hover` (color `#024c8f`, beats `.your-class:hover` on specificity) and `.links-underline
+a:not(.button):not(.tag):not(.-undash):hover` (animated `currentColor` background = the «underline») — which turned the
+social chips white with an invisible icon; every card link carries Ohio's own classes `-unlink -undash` plus a scoped
+hover; (b) Ohio prints its own «N min read» above the title with its own count, so the byline never repeats minutes and
+that string is translated through the `gettext_ohio` filter; (c) the blue circle/line that follows the pointer on hover
+is Ohio's custom cursor, not the card — do not «fix» it in the card CSS. The replaced widget printed the demo's social
+links (`facebook.com/colabrio`); the filter works because `ohio/single.php:56-57` prints it with `the_widget()`, which
+honours `widget_display_callback` (print the card, return `false`). Generic host traps:
+`runtime-and-discovery.md` §Ohio host traps for own components. Card sizing: 0.5.6 makes it more contained (operator,
+2026-10-24: «quedó bastante grande»); design rules in skill `efeonce-graphic-line` → `applications.md` §A19. Before
+shipping `content-model` the plugin build requires no uncommitted changes in the runtime, and the turn is coordinated
+with the other blog session. Contract: `BLOG_HOME_RUNTIME_V1.md` §9.
 
 ## Use the CLI, never ad hoc scripts
 

@@ -237,6 +237,7 @@ los últimos 180 días el recurso deja de mostrarse.
 | El autor sale con iniciales | No tiene foto subida en su perfil (Gravatar no cuenta) | Subir la foto en el perfil de WordPress. |
 | Al compartir el archivo del autor sale la foto vieja | El indexable de autor de Yoast no se reconstruyó | Correr `refrescar-yoast-autor.php` y purgar. |
 | La ficha no muestra el cargo | **Job title** de Yoast vacío | Cargarlo en el campo de schema del perfil. |
+| Al pasar el mouse, un botón de la ficha se pinta de otro color o pierde el texto | El tema Ohio colorea y subraya todos los enlaces al hover; un enlace nuevo de la ficha o del byline quedó sin las clases `-unlink -undash` | Agregar `-unlink -undash` al enlace y correr la prueba que las exige en cada enlace de la ficha. El círculo azul que sigue al mouse es el cursor del tema, no un error. |
 | Un artículo no tiene ficha de autor | El autor es una cuenta de servicio o no tiene artículos publicados | Es lo esperado; reasignar el autor de la entrada si corresponde. |
 | No se ve la suscripción a Glitch | No hay formulario conectado (`data-subscribe="off"`) | Conectarlo por CLI con un formulario publicado. |
 | No se ve la sección de eventos | No hay un evento próximo | Crear el evento con arte clave y fecha futura. |

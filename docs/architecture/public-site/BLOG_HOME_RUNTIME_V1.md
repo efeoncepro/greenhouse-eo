@@ -294,7 +294,8 @@ puerta de escritura para agentes y operadores; pasa por las metas, taxonomías y
 ## 9. Autor del blog (TASK-2057)
 
 Delta 2026-10-24. En producción desde el 2026-10-24/25 con `efeonce-editorial-blocks` 0.5.4 (runtime
-`efeonce-public-site-runtime` commit `8f19ee0`). Cubre la ficha de autor del single, el byline y el `Person` de Yoast.
+`efeonce-public-site-runtime` commit `8f19ee0`). Delta 2026-10-25: en producción 0.5.5 (runtime `d3156f6`, hovers y
+margen inferior); 0.5.6 (ficha más contenida, runtime `6a169bc`) commiteada, despliegue pendiente de permiso. Cubre la ficha de autor del single, el byline y el `Person` de Yoast.
 Funcionamiento: [Ficha de autor del blog](../../documentation/public-site/ficha-de-autor-del-blog.md). Operación:
 [desde WordPress](../../manual-de-uso/public-site/operar-contenido-portada-blog.md#foto-de-perfil-del-autor).
 
@@ -327,6 +328,21 @@ Cuentas de servicio (`greenhouse-integration`) y autores sin posts devuelven vac
   200→250°, esfera en el acento Growth `#36c8bf`); nombre en Bricolage con el punto tipeado en el acento; esquina recta
   arriba a la izquierda; CTA «Ver sus N artículos»; isotipos oficiales de `@efeoncepro/axis-brand-assets` con
   `rel="me noopener"`.
+- **Medidas (0.5.6, delta 2026-10-25).** Escritorio: ancho máximo 800 px, retrato 160 px, padding
+  `clamp(24px,3vw,36px)`, gap 32 px, nombre `clamp(28px,3vw,36px)`, cargo y bio 15 px, CTA 14 px, iniciales 38 px.
+  Teléfono (≤ 640 px) sin cambios: retrato 120 px, CTA a todo el ancho, botones de 48 px. Margen inferior de 96 px
+  (64 en teléfono) antes de «Related Posts» de Ohio (0.5.5). En producción sigue 0.5.5 (retrato 208, ancho 920) hasta
+  el despliegue de 0.5.6.
+- **Enlaces y hover (trampa del host Ohio, 0.5.5).** Ohio pinta todos los enlaces al hover:
+  `a:not(.-unlink):hover` → `color:#024c8f` y `.links-underline a:not(.button):not(.tag):not(.-undash):hover` →
+  `background-image: linear-gradient(currentColor…)` con la animación «underline». Sin defensa, el chip de tema quedaba
+  blanco sin texto y el isotipo de Instagram desaparecía sobre azul. Regla: **todo enlace de la ficha y del byline lleva
+  las clases `-unlink -undash`** (las exclusiones propias de Ohio) y las reglas de hover se acotan a `.eo-author`
+  (`background-image:none`, `animation:none`). Una prueba exige las dos clases en cada enlace de la ficha (34
+  chequeos). Verificado en vivo (0.5.5, 1440): al hover, chip `rgba(207,228,250,.16)` con texto blanco, redes
+  `rgba(207,228,250,.12)` con ícono blanco, CTA `#cfe4fa` con texto `#001a33`, `background-image:none` en los tres y
+  96 px hasta «Related Posts». El círculo o la línea azul que sigue al mouse es el cursor personalizado de Ohio, no la
+  ficha.
 - **CSS.** `includes/content-model/assets/author.css`, encolado sólo en `is_singular('post')`.
 - **Byline.** `ohio-child/parts/elements/page_headline.php` llama `eo_author_byline()` → «Por {autor}» enlazado al
   archivo + fecha (+ «Actualizado» si la modificación es ≥ 1 día posterior). Sin el plugin activo cae a la lista de

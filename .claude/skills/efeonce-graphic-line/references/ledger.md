@@ -1,5 +1,21 @@
 # Registro de decisiones y versiones
 
+### 2026-10-24 — Ficha de autor del blog: oscura, retrato con órbita y nombre con punto
+
+Decisiones del operador al revisar la ficha de autor que reemplaza la caja de Ohio al cierre de los artículos
+(TASK-2057, en producción desde el 2026-10-24; tarjeta [applications.md](applications.md) §A19):
+
+- **Ficha B oscura en los artículos** (`#001a33`); la A en papel queda como alternativa, no se borra.
+- **Foto con el fondo azul de la fotografía de marca.** La capa del avatar del equipo (2026-09-29) tenía huecos en la
+  bomber, invisibles sobre navy; se rehízo desde la fuente (`ai-generations/2026-10-24_autor-blog/reparar-capa.mjs`).
+- **Sin web personal** hasta que exista una.
+- **Cargo:** «Managing & GTM Director» (sale de Yoast Premium, el mismo dato del schema).
+- **Tamaño:** «quedó bastante grande» → la 0.5.6 la deja más contenida.
+- **Composición** (aplicada con el criterio vigente, sin excepción nueva): pieza `portrait` de AXIS con su única
+  esfera; el nombre cierra con punto tipeado en el acento ([criteria.md](criteria.md), «Retrato con órbita y nombre:
+  punto tipeado»); esquina recta arriba a la izquierda (`straightCorner`); isotipos oficiales de
+  `@efeoncepro/axis-brand-assets` para las redes.
+
 ### 2026-10-24 — Portada del blog v3: aura del buscador como excepción y piezas a AXIS
 
 El operador aprobó el canvas «Portada Blog Efeonce» v3 y pidió el haz del buscador «con más vida… de luminosidad o de

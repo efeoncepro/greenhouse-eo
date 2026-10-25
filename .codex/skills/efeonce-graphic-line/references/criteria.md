@@ -1,5 +1,8 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
+> Delta retrato con órbita y nombre (ficha de autor del blog) verificado contra: la ficha en producción en
+> `efeoncepro.com` (`efeonce-editorial-blocks` 0.5.5) y greenhouse-eo `develop` en `15e7903c6` — 2026-10-24.
+
 > Delta caso AWS (marcas de tercero en anuncio de alianza) verificado contra: método
 > `docs/operations/social/2026-10-21-aws-partner-announcement-production-method.md` y decisiones del operador de esa
 > corrida — 2026-10-21.
@@ -1139,6 +1142,15 @@ El operador, revisando la landing de Inbound Marketing: «Bricolage necesita con
 ### Titulares de landing: la esfera es el punto final — 2026-10-18
 
 El operador, revisando la landing Nosotros: «No estás poniendo el punto (esfera) al final de las frases con el color de la línea gráfica». En una landing web, cada titular en Bricolage (H1 y H2) cierra con la esfera en el acento de la línea en vez del punto tipeado, como ya lo hacía la landing de Inbound. Cómo se aplica: la esfera va pegada a la última palabra dentro de un `white-space: nowrap` para que nunca quede sola en una línea; la parte que introduce (≈ 330) conserva su punto tipeado; sobre papel, la esfera toma el acento oscuro de la línea. No va en listas, ítems ni etiquetas (la esfera como viñeta sigue prohibida) ni en texto Poppins. Si la pieza ya tiene la esfera de una órbita (una lente, por ejemplo), el titular de esa misma pieza no suma otra: en el hero B de Nosotros, con lente, el titular mantiene el punto. En una landing, cada sección cuenta como pieza para esta regla.
+
+### Retrato con órbita y nombre: punto tipeado — 2026-10-24
+
+Aplicación web de la regla anterior y de «nunca dos esferas por pieza» (§3.3), decidida al diseñar la ficha de autor
+del blog (A19). Cuando un retrato lleva su órbita (pieza `portrait`: anillo, arco y esfera), esa esfera es la de la
+pieza; el **nombre** de la persona que va al lado **cierra con punto tipeado en el acento de la línea, nunca con
+esfera**. Vale para la ficha de autor, la del equipo, un speaker o cualquier tarjeta de persona con retrato, en web y
+en impreso. Si el nombre baja de 24 px (una franja chica, un byline), el punto va en el color del nombre: el acento
+nunca va en texto menor a 24 px. Sin retrato con órbita, el nombre sigue la regla de la firma y el carnet (§3.3).
 
 ### Partners del footer público — 2026-10-14
 

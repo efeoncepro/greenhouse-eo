@@ -15,7 +15,7 @@
 | Schema | JSON-LD de Yoast | Person completo y consistente con la ficha; Article.author → Person |
 | Cabecera de `/author/<slug>/` | archivo v3 (otra sesión, TASK-2055) | consume el mismo lector; la dibuja la sesión del Archivo |
 
-## Ficha de autor (desktop, columna del artículo ~920 px)
+## Ficha de autor (desktop, columna del artículo ~920 px; 800 px desde 0.5.6)
 
 ```text
 ┌─ aside «Sobre el autor» · fondo ground #001a33 · radio 0 24 24 24 (esquina recta arriba-izq) ─┐
@@ -34,6 +34,11 @@
 - Redes: isotipos oficiales de `@efeoncepro/axis-brand-assets` (`assets/platforms/*-isotype`), en `currentColor`,
   botones de 44 px con nombre accesible «LinkedIn de Julio Reyes», `rel="me noopener"`, orden del `sameAs`.
 - La web personal no se pinta hasta que el sitio esté en línea (operador, 2026-10-24).
+- Delta 2026-10-25 (0.5.6, revisión del operador; despliegue pendiente): ficha más contenida en escritorio. Ancho
+  máximo 800 px (antes 920), retrato 160 px (antes 208), nombre `clamp(28px,3vw,36px)` (≤ 36), cargo y bio 15 px,
+  CTA 14 px, padding `clamp(24px,3vw,36px)`, gap 32, iniciales 38 px.
+- Margen inferior: 96 px bajo la ficha (64 en teléfono) antes de «Related Posts» de Ohio (0.5.5).
+- Todo enlace de la ficha lleva `-unlink -undash` para que el hover de Ohio no lo repinte (0.5.5).
 
 ## 390 px
 

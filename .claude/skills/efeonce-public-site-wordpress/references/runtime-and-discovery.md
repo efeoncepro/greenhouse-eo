@@ -382,6 +382,25 @@ Runtime observations from the 2026-07-09 read-only audit:
 Recommended next steps: adapt work copy `251875`, clean tags/sidebar, implement
 post-only/editorial search, then decide canonical hub cutover and measurement.
 
+## Ohio host traps for own components
+
+Measured live on 2026-10-24/25 while shipping the blog author card (TASK-2057). They apply to any own section a plugin
+or the child theme prints inside a post, page or archive rendered by Ohio:
+
+- **`aside` is hidden on posts.** Site inline CSS `.single-post aside { display:none }` hides any `aside` of the post.
+  Use `<section aria-label="…">` for a complementary block.
+- **Ohio paints every link on hover.** `a:not(.-unlink):hover` sets color `#024c8f` and beats `.your-class:hover` on
+  specificity; `.links-underline a:not(.button):not(.tag):not(.-undash):hover` draws the animated «underline» as a
+  `currentColor` background (a chip turned into a white block with an invisible icon). Fix canonically: put Ohio's own
+  opt-out classes `-unlink -undash` on each own link and write a hover scoped to the component; never fight it with
+  `!important` or by raising specificity site-wide.
+- **The custom cursor is Ohio's.** The blue circle/line that follows the pointer on hover belongs to Ohio's custom
+  cursor, not to the component under it.
+- **Replace an Ohio widget with a filter, not a template override.** Ohio prints some widgets with `the_widget()` (the
+  author box `ohio_widget_about_author` at `ohio/single.php:56-57`, from `ohio-extra`), and `the_widget()` honours
+  `widget_display_callback`: print your component and return `false`. Check how the widget is printed before relying
+  on it; a widget rendered by a sidebar or Elementor needs another seam.
+
 ## Runtime Repo Binding
 
 Confirmed runtime repo:
