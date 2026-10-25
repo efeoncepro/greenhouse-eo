@@ -128,3 +128,39 @@ El operador fija /goal: seguir con lo pendiente de EPIC-052, con View Transition
 Decisión local: PostgreSQL18.6 en cluster exclusivo loopback55432, schema rooms y roles propios; pg8.23.1/node-pg-migrate9.0.0. El runtime Rooms crea su único pool server-only; la prohibición de pools paralelos Greenhouse no obliga a importar el runtime Greenhouse en otro producto. Migraciones se generan con CLI del runtime. No se usan credenciales/tablas de otro producto ni se despierta infraestructura hibernada.
 
 Rooms conserva su autoridad de grants, leída de DB en la transacción; principal autenticado deberá derivar de Efeonce ID. La prueba local usa harness explícito con datos sintéticos, nunca bypass en API real. Commands create/updateDraft/publish/reopen/archive y grant/revoke comparten expectedRevision, idempotencia, audit/outbox y locks ordenados. Publicación fija snapshot inmutable. Se añaden capabilities rooms.create y editions.reopen con scope explícito; rol nunca bypass. Estado operativo y limitaciones se prueban antes de ampliar a contenido real, identidad federada, medios o rollout.
+
+## Architecture Decision 2026-10-25 — contenido versionado para autoría
+
+- Status: implementación autorizada por el goal vigente de EPIC-052; alcance TASK-2062, sin activar identidad ni datos cloud.
+- Owner: Rooms Platform; Product consume el contrato en una unidad UI posterior.
+- Scope: dominio Content, persistencia y proyecciones Rooms; sin mover datos de otros productos.
+- Reversibility: aditiva por versión; rollback conserva snapshots publicados y exige reader de ambas versiones.
+- Confidence: alta para el problema observado y compatibilidad; readiness de medios depende de R05.
+- Validated as of: 2026-10-25, runtime `bd4b802` inspeccionado.
+
+### Context
+
+El corte inicial `rooms.room.v1` exige creative/editorial/plan y piezas ligadas a tres artes sintéticas. Un editor sobre ese contrato obligaría a inventar contenido para guardar. `publish` valida estructura, pero no puede demostrar integridad/ownership/ready de archivos privados que todavía no existen. La aceptación de EPIC-052 requiere perfiles independientes y combinables, inventario íntegro y trazabilidad.
+
+### Decision
+
+Añadir manifest de contenido v2 y separar validez estructural de readiness para publicar. Un borrador incompleto se guarda con IDs/revisión estables; la validación devuelve coverage por elemento y razones accionables. Bloques tipados/versionados y relaciones son datos del mismo agregado Rooms; no nace un segundo CMS ni una copia de autoridad. La publicación fija snapshot validado y coverage con versiones exactas.
+
+El contrato de AssetVersion sólo referencia identidad/versiones. El cliente no puede afirmar `ready`, ownership ni URLs de entrega. El store resolverá recursos de la misma organización/sala; referencias sin registro verificado bloquean publicación. El worker/upload R05 será dueño de registrar bytes/derivados, no esta unidad de Content.
+
+V1 permanece legible y sus snapshots no se migran ni reescriben. La adopción v2 en borrador es explícita; importar nunca convierte automáticamente hipótesis en observaciones ni contenido sintético en real. Tipos no soportados, referencias rotas y exclusiones sin razón producen findings visibles; no se descartan silenciosamente para lograr un import o publicación exitosos.
+
+### Alternatives Considered
+
+- Añadir más campos opcionales a v1: rechazado; confunde compatibilidad de la muestra con composición extensible y mantiene los tres artes como dominio.
+- Crear editor con almacenamiento sólo en navegador: rechazado como sustituto de autoría durable; no satisface revisión, paridad ni publicación.
+- Reescribir snapshots v1 a v2: rechazado; modifica historia ya publicada y su contrato de render.
+- Esperar Efeonce ID para todo Content: rechazado; se puede verificar el dominio y sus transportes en harness con autoridad persistida, manteniendo la API desplegada cerrada.
+
+### Runtime Contract
+
+Commands/readers canónicos, expectedRevision e idempotencia de TASK-2060. Auditoría/outbox en la misma transacción. API/CLI consumen el mismo primitive; MCP sigue pendiente de su integración gobernada. Capability content.edit para autoría; editions.publish separada. Validación y publicación vuelven a comprobar referencias dentro de la transacción, sin confiar en un resultado de preview del cliente. Guardar por rooms.updateDraft tampoco evade estas reglas.
+
+### Consequences and Revisit
+
+La UI consumidora debe elegir renderer por versión; no convertir v2 a una muestra v1 perdiendo bloques. Esta unidad no completa editor, multimedia, escenarios/tours ni R03/R05 por inferencia. Reabrir la decisión si se requieren imports ejecutables, un nuevo source of truth, transferencia entre tenants o modificación de snapshots existentes.

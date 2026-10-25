@@ -1,12 +1,12 @@
 # Efeonce Rooms — arquitectura V1
 
-Fecha: 2026-10-07. **Proposed; go final y build pendientes.** Dueño: Platform/Product. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md).
+Diseño inicial: 2026-10-07. **Goal de construcción autorizado; estado ejecutado al2026-10-25 en el [dossier vivo](README.md).** El diseño restante sigue propuesto; no confundir topología futura con runtime desplegado. Dueño: Platform/Product. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md).
 
 ## 1. Topología y stack propuestos
 
 Selección de versiones: [baseline y política de actualización](EFEONCE_ROOMS_STACK_BASELINE_V1.md), consulta 07/10/2026. Objetivo: últimas estables compatibles, con pins/lockfile y pruebas. Next 16.4/React 19.3/Tailwind 4.3 son candidatos; TS7 requiere convivencia de tooling y ESLint10 resolver plugins antes de fijar el manifest. Node24 LTS según hosting. No se heredan las versiones de Greenhouse ni se declara un build verificado.
 
-Destino de producto: `rooms.efeonce.org`. Candidato de repo: `efeonce-rooms`, aún sin crear. Documentación canónica en Greenhouse. Una app con módulos y un worker de medios; no se requieren microservicios por entidad.
+Destino de producto: `rooms.efeonce.org`. Repo propio `efeoncepro/efeonce-rooms`, creado y publicado en GitHub; demo Vercel verificada por TASK-2061. Documentación canónica en Greenhouse. Una app con módulos y un worker de medios; no se requieren microservicios por entidad.
 
 | Unidad | Tecnología propuesta | Responsabilidad |
 |---|---|---|
@@ -113,7 +113,7 @@ Operación previa al release: restore de DB + storage probado, rotación de cred
 3. UI: autoría y experiencia sobre ese contrato, luego consola y evaluación.
 4. Perfil creativo y SEO/AEO en dos marcas, recorrido combinado, resiliencia, accesibilidad, recuperación, coste y canary antes de entrega.
 
-Tasks backend/data y UI separadas, con dependencias; no crear solo una task híbrida gigante. Ninguna está implementada por este dossier.
+Tasks backend/data y UI separadas, con dependencias; no crear solo una task híbrida gigante. TASK-2058/2060 implementan foundation y persistencia local; TASK-2059 la primera muestra y TASK-2061 su publicación. El resto conserva gates propios; este dossier no acredita su ejecución.
 
 ## 9. Perfiles y contenido estructurado
 

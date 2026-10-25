@@ -2647,6 +2647,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-2059` | `in-progress` | **Rooms: primera sala y vistas por rol**. EPIC-052; primera entrega local autorizada 2026-10-25, permisos can y vistas por rol. | `docs/tasks/in-progress/TASK-2059-rooms-first-experience.md` |
 | `TASK-2060` | `complete` | **Rooms: persistencia y ciclo de salas**. EPIC-052 R03/R04; PostgreSQL propio y commands locales. | `docs/tasks/complete/TASK-2060-rooms-persistence-and-lifecycle.md` |
 | `TASK-2061` | `complete` | **Rooms: repositorio GitHub y publicación Vercel**. EPIC-052; release público de demo autorizado por operador. | `docs/tasks/complete/TASK-2061-rooms-github-vercel-release.md` |
+| `TASK-2062` | `in-progress` | **Rooms: autoría de contenido versionado**. EPIC-052 R03B; manifest V2, importación y coverage sin alterar V1. | `docs/tasks/in-progress/TASK-2062-rooms-versioned-content-authoring.md` |
 
 > Registro 2026-10-18: TASK-2039 reservada (paraguas: landings que alimentan su Growth Form con señales de la página; pedido del operador tras el prototipo de la landing de inbound). Barrido por dominio/superficie (Growth Forms renderer `initial-values`, hosts WordPress, destinos HubSpot): TASK-2038 es dueña de mover la fuente del renderer a AXIS y TASK-1359 de la instrumentación multipaso; ninguna posee la API de señales ni el patrón de precarga desde la landing. Hijas A/B/C por crear. Siguiente ID libre TASK-2040.
 
@@ -2690,3 +2691,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro 2026-10-25: TASK-2060 por goal explícito de continuar Rooms. Barrido por dominio/superficie: TASK-2058 cerrada es foundation read-only, TASK-2059 conserva UI; ninguna posee persistencia/commands. Siguiente ID libre TASK-2061.
 
 > Registro 2026-10-25: TASK-2061 para GitHub privado/Vercel Rooms, autorizado explícitamente por el operador. Sin dueña previa de release; TASK-2059 UI y TASK-2060 persistencia local conservan alcance. Siguiente ID libre TASK-2062.
+
+> Registro 2026-10-25: TASK-2062 por continuación del goal Rooms. Barrido de dominio/superficie: TASK-2060 cerró ciclo durable V1; TASK-2059 posee UI, ninguna posee autoría de bloques/versiones/coverage. Siguiente ID libre TASK-2063.

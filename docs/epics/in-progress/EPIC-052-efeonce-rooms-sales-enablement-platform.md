@@ -60,6 +60,8 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 ## Child Tasks
 
+[TASK-2062](../../tasks/in-progress/TASK-2062-rooms-versioned-content-authoring.md): R03B, manifest versionado, autoría programática y cobertura antes de publicar; R05 medios y R08 editor conservan alcance propio.
+
 Continuidad autorizada por /goal 2026-10-25: [TASK-2060](../../tasks/complete/TASK-2060-rooms-persistence-and-lifecycle.md) agrega persistencia/ciclo durable local. TASK-2059 suma View Transitions y adopción de badges/botones AXIS; aceptación visual sigue pendiente.
 
 [TASK-2061](../../tasks/complete/TASK-2061-rooms-github-vercel-release.md) publica el repositorio privado y la demo en Vercel por autorización explícita. La integración Efeonce ID es condicional: el issuer vivo sólo anuncia scopes MCP y TASK-1834 permanece pendiente.

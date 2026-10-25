@@ -1,6 +1,6 @@
 # Efeonce Rooms — contrato API y acceso V1
 
-Fecha: 2026-10-07. **Proposed; contrato de diseño, no API desplegada.** [Arquitectura](EFEONCE_ROOMS_ARCHITECTURE_V1.md).
+Diseño inicial: 2026-10-07. **Contrato objetivo; implementación parcial verificada al2026-10-25, descrita en §7 y §8.** [Arquitectura](EFEONCE_ROOMS_ARCHITECTURE_V1.md).
 
 ## 1. Paridad por capacidad
 
@@ -118,3 +118,9 @@ Operaciones implementadas: `rooms.get`, `workspace.get`, `access.getEffective`. 
 `resolvePrincipal()` devuelve null hasta conectar Efeonce ID. La API `/api/v1/rooms/:roomId` devuelve401 incluso con rol/organización forjados. El selector de `/demo` sólo elige fixtures sintéticas y nunca se usa como autenticación real. Este corte no acredita invitaciones, revocación de tokens remotos, tickets de medios ni persistencia. [Manual](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) y [evidencia](../../audits/rooms/2026-10-25-first-local-delivery.md).
 
 Límites de esta implementación: el resumen `permissionRows`/`access` del workspace se refiere a la primera sala visible de la muestra única, y su copy lo declara. Antes de soportar varias salas se debe resolver una selección/agregación explícita, sin mostrar el permiso de una sala como global. El reader interno distingue not_found y forbidden; la futura API autenticada deberá normalizar la respuesta de recursos ajenos para no convertirse en oráculo de existencia. Hoy la ruta real deniega401 antes de cualquier lookup.
+
+## 8. Ciclo durable y siguiente contrato de contenido
+
+TASK-2060 implementa commands `rooms.create`, `rooms.updateDraft`, `editions.publish`, `editions.reopen`, `rooms.archive`, `access.grant` y `access.revoke` en `src/server/commands/execute.ts`; readers persistidos en `src/server/persistence/readers.ts`. HTTP `/api/v1/commands` y CLI `execute` consumen el mismo primitive. `rooms.create`/`editions.reopen` amplían capabilities a11, con grants acotados y autoridad persistida revalidada por transacción. Pruebas con PostgreSQL local, rollback, idempotencia y restore; API de producción401 mientras Efeonce ID dependa de TASK-1834. TASK-2061 publica sólo demo sintética.
+
+TASK-2062 prepara contenido v2 para autoría y mantiene snapshots v1. Importar/editar/ordenar/vincular evidencia será dominio durable, no click handler ni almacenamiento sólo en navegador. Publicación exige validación de integridad/cobertura y resolución de medios; metadata declarada no verifica bytes ni claims remotos. Su implementación y evidencia se registran en la task, sin ampliar el alcance completado de2060.
