@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Backend local 8308077 implementado y certificado: 132/132 pruebas, issuer OTP real + ambos PostgreSQL + Chrome PASS, recuperación de 19 tablas y rollback en clon PASS. UN mensaje inicial contiene enlace/código; abrir no envía otro. OFF; sin correo real ni cloud. Continúa in-progress para cerrar handoff/contratos de recuperación UI TASK-2068 y separar los gates de entrega real/tracking antes de rollout.`
+- Status real: `Backend local 8308077+d23e4d6 implementado y certificado: 137/137 pruebas, issuer OTP real + ambos PostgreSQL + Chrome PASS, recuperación de 19 tablas y rollback en clon PASS. UN mensaje inicial contiene enlace/código; abrir no envía otro. OFF; sin correo real ni cloud. Continúa in-progress para cerrar handoff/contratos de gestión UI TASK-2068 (recovery de transacción ya verificado) y separar los gates de entrega real/tracking antes de rollout.`
 - Rank: `Después del contrato TASK-2067; coordinar primitives de sesión/binding con TASK-2065 sin depender de su journey OIDC`
 - Domain: `identity|platform|data`
 - Blocked by: `none`

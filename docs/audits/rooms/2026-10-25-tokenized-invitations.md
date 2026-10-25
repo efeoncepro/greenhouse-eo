@@ -1,6 +1,6 @@
 # TASK-2066 — invitaciones con enlace y código, evidencia local
 
-25-10-2026. Runtime commit `8308077`. Backend local, feature OFF. No correo real, proveedor live, DB cloud ni nuevo despliegue.
+25-10-2026. Runtime commits `8308077` y `d23e4d6`. Backend local, feature OFF. No correo real, proveedor live, DB cloud ni nuevo despliegue.
 La demo pública conserva bd4b802. TASK-2066 permanece in-progress; TASK-2068 posee la pantalla de
 código, gestión y lectura guest. El epic no está completo.
 
@@ -21,7 +21,7 @@ Commands create/reissue/revoke usan revisión, idempotencia, audit/outbox/receip
 ocurre después del commit y fuera de locks SQL. Pending conserva requestId; respuesta tardía no rota
 nonce ni retrocede delivery aceptado. Reissue/revoke invalidan versiones y sesiones previas.
 
-HTTP: `/api/invitations/{start,verify,resend,session,logout}` y resolver interno
+HTTP: `/api/invitations/{start,transaction,verify,resend,session,logout}` y resolver interno
 `/api/internal/auth/invitation-authority/resolve`, protegido con secreto de servicio independiente,
 audience exacto, sin cookie/origin ni redirects. JSON acotado, origin exacto, errores sanitizados/no-store.
 API/CLI comparten las operaciones `invitations.create`, `.reissue`, `.revoke` y listado por room.
@@ -30,7 +30,7 @@ List/revoke administrativos pueden operar con la entrada OFF; create/reissue res
 
 ## Verificación automatizada
 
-`pnpm lint`, `pnpm lint:negative`, `pnpm typecheck`, `pnpm build` y `pnpm test`: PASS; **132/132**, cero skips.
+`pnpm lint`, `pnpm lint:negative`, `pnpm typecheck`, `pnpm build` y `pnpm test`: PASS; **137/137**, cero skips.
 La matriz incluye firma/claims/nonce/jti, foreign room/RP/issuer/origin, permisos, doble cookie,
 expiry, revoke concurrente, proof replay, audit rollback, fallos de entrega, pending retry,
 OTP vencido con renovación explícita y races de respuesta tardía.
@@ -82,3 +82,16 @@ TASK-2068 debe limpiar el fragmento al capturarlo, soportar reload/recovery con 
 transacción, pegar/autofill, expiración/reenvío y errores accesibles, y mostrar contenido publicado real.
 Falta acordar DTO seguro de gestión y política UX para coexistencia de sesión interna/guest.
 No se tildan esos criterios como si el backend demostrara la experiencia completa.
+
+## Delta de recuperación de pantalla
+
+`d23e4d6` incorpora GET `/api/invitations/transaction`: sólo cookie HttpOnly; retorna estado,
+expiry, retryAt y deliveryStatus, sin identidad de invitación, email, token, code ni proof.
+Cuatro pruebas PG verifican scope/realm/consumed/expiry/owner y fingerprints idénticos de todos
+los efectos durables; una prueba HTTP verifica DTO/no-store/sin renovación de cookie.
+No envía correo ni consulta al issuer. UI puede limpiar fragmento y recuperar estado sin almacenamiento
+persistente del token. El componente que lo consume sigue pendiente TASK-2068.
+
+Durante la suite se detectó un bloqueo del test de respuesta tardía: asumía que el primer Promise
+entraba primero al fetch después de locks SQL. Se corrigió la barrera del test para ordenar ese punto
+explícitamente, manteniendo la carrera real bajo prueba. Suite final137/137PASS, lint/types/buildPASS.

@@ -60,6 +60,8 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 ## Child Tasks
 
+[TASK-2068](../../tasks/to-do/TASK-2068-rooms-invitation-and-guest-experience.md): entrada con código, lectura guest y gestión contextual; diseño/plan preparados, contratos técnicos pendientes.
+
 [TASK-2065](../../tasks/complete/TASK-2065-rooms-efeonce-id-consumer.md): consumidor OIDC interno; foundation1834/login2064.
 
 [TASK-2066](../../tasks/in-progress/TASK-2066-rooms-tokenized-invitations-email-code.md): invitación por correo único enlace+código, input Rooms y sesión guest; OTPissuer2067.
@@ -256,4 +258,4 @@ no implica despliegue. [Evidencia2062](../../audits/rooms/2026-10-25-versioned-c
 
 TASK-2065 complete local en37c799c:95testsPASS0skip, Chromeissuerreal, contexts/tenants/revoke y down/upclon14tablasPASS. EntradaOFF, UIcontext ycloudpendientes. [Evidencia](../../audits/rooms/2026-10-25-efeonce-id-consumer.md).
 
-TASK-2066 backend local:132testsPASS0skip, integración OTP real con buzónRAM/Chrome y restore19tablasPASS. Continúa in-progress para handoffUI/criterios pendientes; sin correo real ni activación. [Evidencia](../../audits/rooms/2026-10-25-tokenized-invitations.md).
+TASK-2066 backend local:137testsPASS0skip, integración OTP real con buzónRAM/Chrome y restore19tablasPASS. Continúa in-progress para handoffUI/criterios pendientes; sin correo real ni activación. [Evidencia](../../audits/rooms/2026-10-25-tokenized-invitations.md).
