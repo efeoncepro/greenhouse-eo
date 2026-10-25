@@ -2,7 +2,7 @@
 
 Coordinador: Codex Auth; peer Rooms «Mira el epic de rooms». Goal autorizado por Julio25Oct,
 incluye infraestructura/deploy y un correo real a `jreyes@efeoncepro.com`. No clientes ni ampliación general.
-Inicio observado de preparación:2026-10-25T21:54:34Z. Estado: **preparación cloud parcial; no deploy ni envío**.
+Inicio observado de preparación:2026-10-25T21:54:34Z. Estado al22:49UTC: **Auth actualizado y sano con flujos nuevos OFF; Rooms preparado OFF. Promoción Greenhouse y canary pendientes; ningún correo enviado**.
 
 ## Cambios aplicados y verificados
 
@@ -91,3 +91,25 @@ del original. El helper de bootstrap lee exclusivamente el recibo privado y mant
 prueba `--snapshot` PASS sin emitir el contenido al log. No había contraseñas, OTP ni tokens en los recibos.
 La corrección elimina esos datos del árbol actual; las versiones anteriores siguen en el historial Git.
 No se realizó force-push ni reescritura de historial y no se afirma borrado histórico.
+
+
+## Readback del primer despliegue Auth apagado — 22:46–22:49 UTC
+
+Workflow40241022877 SUCCESS y CloudBuild689620af-c7ab-41a9-8bbb-80d121f95026 SUCCESS.
+Revisión `auth-server-00166-p77` Ready=True/100%, `GIT_SHA=754a2a28045ebfc9353c86a2d6236ecf59dd805e`,
+imagen `sha256:122e2acbed9961741c3c71307f0c9fc616a213f02f59f1ea00a990056e1a8987`.
+Readback de revisión activa: first-party=false, invitationOTP=false, RP/origen canónicos coincidentes.
+Health/ready/metadata/JWKS200; postgres/kms/activeKey ok, dos kids publicados. Eso no acredita firma
+nueva, sesión ni entrega de correo. El runtime Auth no cambió entre754 y el candidato1859.
+
+Navegador Chrome anónimo, GET-only y sin cookies previas: `/login` en1440px y390px, rendererV4 visible,
+sin overflow, botónMicrosoft presente y destino local `/auth/internal/login`; formulario POST canónico
+sin submit. Foto y fuente200, sin errores de consola/página/HTTP. Se esperó carga/decodificación de imágenes
+antes de inspeccionar ambas capturas. Evidencia local ignorada `.captures/auth-live-00166-readback/`.
+Esta comprobación complementa las capturasGVC locales: verifica red/DOM del issuer servido, no login humano.
+
+Push1859e90a6 confirmado tras `pnpm local:check` completoPASS (lint0errores/26warnings heredados,
+TypeScript8GiBPASS); PR262draft. CI/build/smoke del candidato final pendientes, no promociónmain todavía.
+Preflight22:48: PG/migraciones683, GCP/AzureWIF y SentrysinincidentesPASS. Check exploratory contra
+`target-branch=develop` devuelve batchunknown por diffinexistente respecto al propioHEAD; no es aprobación.
+El preflight de promoción debe usar `target-branch=main` para evaluar el batch respecto al release vigente.

@@ -1,4 +1,8 @@
 # Task Index
+- `TASK-2071` — [Rooms: autoría y lectura de imágenes privadas](in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md), in-progress; diseño y contrato listos, consumidor de TASK-2070. Siguiente ID libre `TASK-2072`.
+
+- `TASK-2070` — [Rooms: imágenes privadas y procedencia](in-progress/TASK-2070-rooms-private-image-media.md), in-progress; contrato y servicios locales, sin despliegue.
+
 - `TASK-2069` — [Rooms: perfil cloud y piloto controlado](in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md), in-progress; plan/ADR, adapter y validación aislada; sin provisioning todavía. Siguiente ID libre `TASK-2070`.
 
 - `TASK-2068` — [Rooms: invitación y lectura compartida](in-progress/TASK-2068-rooms-invitation-and-guest-experience.md), in-progress; contratos backend listos y UI en ejecución, sin aceptación visual. Siguiente ID libre `TASK-2070`.
@@ -41,7 +45,7 @@ Auditoría14/10 de configuración/CAPI/agentes: [docs y skills conciliados](../a
 - `TASK-2036` — [Policy/API/CLI de medición](complete/TASK-2036-growth-measurement-policy-foundation.md), complete; PR255/main9690efad released, alta por datos en producción y Meta Server9 verificados sin redeploy.
 - `TASK-2037` — [Panel de medición](complete/TASK-2037-growth-measurement-configuration-panel.md), complete; mismo contrato que agentes, UI/GVC1440/390 y12 estados PASS, release y readback productivos verificados.
 
-- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2070`.
+- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2072`.
 
 - `TASK-2034` — [Lead matching Meta y Google](in-progress/TASK-2034-growth-lead-matching-meta-google.md), in-progress/parcial. [Release main2559e9242](../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md) con Grader y clasificación auditada servidos; CI/Deep/smoke/health y watchdog6/6 PASS. GTM6/10, EC ON y13 Forms+Discovery verificados; Grader comercial, Contacto fueraAds, Web quote_request. Primera identidad nativa/recibo Graph/recepción y atribución Ads pendientes; umbrella `TASK-2035`.
 - `TASK-2033` — [Efeonce Insights: alcance de contenido por organización](in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md), in-progress (Slices 1–5 en staging y `ops-worker`; Production sin release); `EPIC-045`.

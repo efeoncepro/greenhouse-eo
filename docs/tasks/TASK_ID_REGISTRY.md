@@ -2713,3 +2713,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-2069` | `in-progress` | **Rooms: perfil cloud y piloto controlado.** EPIC-052; DB/roles propios, WIF/Connector, secretos, límites y canary coordinado Auth. | `docs/tasks/in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md` |
 
 > Registro2026-10-25: goal y recursos/piloto autorizados por operador en peer Auth, verificados por root. Runtimecloud no tenía dueña:2061 demohosting,2066invitaciones,2068UI. Siguiente ID libre TASK-2070.
+
+| `TASK-2070` | `in-progress` | **Rooms: imágenes privadas, versiones y procedencia.** EPIC-052 R05A; upload/worker/AssetVersion/publish/delivery con V3 explícito, UI dependiente separada. | `docs/tasks/in-progress/TASK-2070-rooms-private-image-media.md` |
+
+> Registro 2026-10-25: continuación del goal Rooms ratificada; ID2070 revalidado en tabla/notas/filesystem y coordinado con peer UI. Barrido:2062 cerró contratos unresolved,2068 lectura textual,2069 cloud base; ninguna posee R05. Sólo2070 reservado aquí. Siguiente ID libre TASK-2071.
+
+| `TASK-2071` | `in-progress` | **Rooms: autoría mínima y lectura de imágenes privadas.** EPIC-052 R07A/R08A; consumidor de TASK-2070, una imagen por bloque, propiedades, preview y visor accesible. | `docs/tasks/in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md` |
+
+> Registro 2026-10-25: ID2071 revalidado en registro y filesystem, coordinado con backend2070. Barrido:2059 posee demo,2068 lector textual y2070 contratos de medios; esta unidad posee la interacción de imagen real. Siguiente ID libre TASK-2072.

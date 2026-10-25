@@ -60,6 +60,10 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 ## Child Tasks
 
+[TASK-2070](../../tasks/in-progress/TASK-2070-rooms-private-image-media.md): R05A en implementación local; imágenes estáticas privadas, V3/procedencia explícita, procesamiento y publicación sobre bytes verificados. PDF/audio/video y adapter cloud conservan alcance posterior.
+
+[TASK-2071](../../tasks/in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md): editor de imágenes y visor privado, una imagen por bloque/operación con incorporación repetible; UI ready y hook verificados, implementación local sobre contratos2070. No completa R07/R08 ni aceptación humana.
+
 [TASK-2069](../../tasks/in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md): adapter WIF/Cloud SQL, DB propia y secretos separados; runtime20f9fe9 publicado con flags OFF; readback público y WAF activos, canary integrado pendiente.
 
 [TASK-2068](../../tasks/in-progress/TASK-2068-rooms-invitation-and-guest-experience.md): entrada con código, lectura guest y gestión contextual implementadas;129checks integrados y15privacidad PASS; media protegida pendiente R05 y aceptación humana pendiente.
