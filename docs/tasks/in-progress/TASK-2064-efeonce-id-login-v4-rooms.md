@@ -1,5 +1,9 @@
 # TASK-2064 — Efeonce ID: login V4 con Rooms como primer consumidor
 
+## Delta 2026-10-25 — estado al corte de Codex
+
+- Login V4 **ya se sirve** en `/login` desde `auth-server-00166-p77` (`GIT_SHA=754a2a28`, readback vivo). El `Status real` de abajo («no desplegado») está desactualizado. Pendiente: login real hacia Rooms con first-party ON, fuente de novedades y sincronización documental. Codex se detuvo sin uso; corte en [registro de estado](../../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

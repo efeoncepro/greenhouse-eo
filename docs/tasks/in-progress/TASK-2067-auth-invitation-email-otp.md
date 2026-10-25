@@ -1,5 +1,9 @@
 # TASK-2067 — Auth invitation email OTP
 
+## Delta 2026-10-25 — estado al corte de Codex
+
+- Código y migración en cloud; `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED=false` en `auth-server-00166-p77` y HMAC/autoridad sin montar (sólo con ON). Ningún correo enviado. Pendiente: parity S2S, mailer/KMS/S2S integrados, consumo atómico en Rooms, canary único y closing protocol. Corte en [registro de estado](../../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

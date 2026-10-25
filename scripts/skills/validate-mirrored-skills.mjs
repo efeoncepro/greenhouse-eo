@@ -351,6 +351,20 @@ const mirroredSkills = [
     codex: '.codex/skills/salesforce-marketing-cloud-next',
     claude: '.claude/skills/salesforce-marketing-cloud-next',
   },
+  {
+    // Rooms y Auth se operan alternando agentes (Codex se quedó sin uso a mitad del goal, 2026-10-25):
+    // el ledger del programa es la memoria compartida y no puede divergir entre ambos.
+    id: 'efeonce-rooms',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-rooms',
+    claude: '.claude/skills/efeonce-rooms',
+  },
+  {
+    id: 'efeonce-auth',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-auth',
+    claude: '.claude/skills/efeonce-auth',
+  },
 ]
 
 const filesIn = root => {

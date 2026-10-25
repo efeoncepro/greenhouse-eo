@@ -1,5 +1,9 @@
 # TASK-2069 — Rooms Cloud Runtime and Controlled Pilot
 
+## Delta 2026-10-25 — estado al corte de Codex
+
+- El ADR ya está `Accepted` y el WAF tiene 4 reglas activas, pero los criterios correspondientes siguen sin tildar. DB `rooms_production` con 5 migraciones y Vercel `20f9fe9` con `ROOMS_*` OFF. Pendiente: canary conjunto con Auth (bootstrap sintético `--apply` sin evidencia) y corregir el `CONNECT`/`TEMP` heredado de PUBLIC. Corte en [registro de estado](../../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

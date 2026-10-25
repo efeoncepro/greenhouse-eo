@@ -1,5 +1,9 @@
 # Handoff
 
+## 2026-10-25 — Rooms + Auth: estado al corte de Codex (sin uso hasta 1/11)
+
+Claude auditó con tres subagentes de solo lectura: [registro de estado](docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md). Auth `auth-server-00166-p77` (`754a2a28`) vivo con first-party y OTP **OFF**, Login V4 servido; PR #262 draft con CI pendiente; promoción a main, flags y único canary a `jreyes@efeoncepro.com` pendientes; ningún correo enviado. Rooms `20f9fe9` en Vercel con `ROOMS_*` OFF, DB `rooms_production` 5 migraciones. WIP medios TASK-2070/2071 **sin commitear en `efeonce-rooms`** y con `typecheck` rojo (TS2322): llevar a rama, nunca a `main` (cada push es producción). Skills vivas nuevas `efeonce-rooms` y `efeonce-auth` (espejo Claude↔Codex) con ledger del programa.
+
 ## 2026-10-25 — Auth: Rooms primero y login V4
 
 1834/2064/2067 y consumer Rooms verificados localmente; Greenhouse diferido2063. Goal de producción controlada autorizado con único correo a jreyes@efeoncepro.com; migraciones1834/2067+registroRP+secretosv1 aplicados y verificados, aún sin deploy/envío real.1833 en ejecución: Julio sustituyó pentest contratado por evaluación propia; openredirect magiclink corregido y146testsPASS separados, señales5nuevas/PGaislado, workflow flags+secretrefs y senderOTP trackingOFF. Revisión ofensiva CIMD bloqueada automáticamente; patchdefensivo+magiclink192PASS/tscPASS, no pentest completo. [Rollout](docs/audits/identity/2026-10-25-auth-rooms-controlled-rollout.md), [evaluación](docs/audits/auth-server/2026-10-25-independent-protocol-review.md), [preflight](docs/audits/identity/TASK-2067-production-preflight-2026-10-25.md), [base local](docs/audits/identity/2026-10-25-auth-rooms-first-local.md). Peer «Mira el epic de rooms» posee2068UI/WAF/cloud; coordinación continua, sin activar antes de readiness común. Harness OIDC+OTP19336 activo sólo para QA UI3210 del peer; cleanup al terminar. Release en preparación: contención duradera correos Growth OFF, lint gráfico mecánico corregido; fullsuite detectó mirror de rutas Auth incompleto, corregido con2paths y13retestPASS;21598testsPASS/383skip. Lint heredado21whitespace corregido conASTidéntico; lintglobal0errors; tsc del toolingRooms falló y fue corregido d4a1d16e0, nueva pasada globalPASS. PR262 remoto; CI/build/smoke pendientes. Recibos completos pasan a .auth0600 por repo público; resúmenes mínimos, historia previa no borrada.
@@ -238,16 +242,3 @@ con firma gráfica y CCO HubSpot. Urgente para SKY: nueve artículos de Perú de
 ene-2027. El renderer ganó capacidades en `001683d83` (`pnpm report:compose`; regenerar con
 `pnpm exec tsx scripts/seo/sky-blog-audit-report.ts`). El logo de SKY adjunto a la organización es generado por IA:
 usar `ai-generations/2026-09-23_cmp003-sky-hangar/refs/sky-official.svg`. **Sin push.**
-
-## 2026-10-23 — Medición del menú global y del dock de las landings (TASK-2042/2043)
-
-GTM web `GTM-NGHPGRLZ` publicado en la versión 10: la 8 suma `gh_landing_dock_clicked`, la 9 los
-`gh_site_nav_opened|line_viewed|clicked` y la 10 `target_label` y `target_url` en el clic del menú (hosts en runtime
-`3801bc4` y `a27c37e`, desplegados). Scripts `scripts/gtm/build-landing-dock-events-workspace.ts` y
-`build-site-nav-events-workspace.ts` (`--publish` versiona, publica y reescribe los snapshots). GA4 `486264460`: seis
-dimensiones de evento (`target_type`, `target`, `target_label`, `target_url`, `panel`, `line`; 15/50). Servidor
-`GTM-K2X4ZTTK` sin cambios. Ninguno es key event. Verificado en GA4 Tiempo real con una visita simulada que acepta
-sólo analítica; trampas: el service worker (`context.on('request')`) y `HeadlessChrome` (lanzar con `--user-agent`).
-**Sin push:** `a35bc5a9f`, `807180a8b`, `9c24746a5` y `dc18cf45d` en `develop`.
-[LEARNINGS](docs/reference/measurement-gtm-ga4/LEARNINGS.md) ·
-[TRACKING-PLAN](docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md#ctas).

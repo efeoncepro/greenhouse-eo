@@ -1,5 +1,9 @@
 # TASK-2070 — Rooms: imágenes privadas, versiones y procedencia
 
+## Delta 2026-10-25 — estado al corte de Codex
+
+- El WIP en `efeonce-rooms` está **sin commitear**. `pnpm typecheck` falla (TS2322, `src/app/rooms/[roomId]/edit/page.tsx`, `schemaVersion` 2→1). `pnpm test` 178/178 no incluye `tests/media-*` (18/18 aparte, sin DB); los 9 de persistencia y `build` no se corrieron. Migración sin bloque DO y aplicada sólo en la PG local. Llevar a rama, nunca a `main` (cada push es producción). Corte en [registro de estado](../../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

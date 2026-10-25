@@ -1,5 +1,9 @@
 # TASK-2071 — Rooms: autoría mínima y lectura de imágenes privadas
 
+## Delta 2026-10-25 — estado al corte de Codex
+
+- UI implementada en WIP sin commitear (autoría, preview, inspector con zoom y teclado, seis `data-capture`), pero comparte el typecheck rojo de 2070. Sin escenario GVC, capturas, scorecard ni aceptación humana. Hay alcance fuera del mapa congelado (`/rooms/new`, conversión V2→V3 desde UI) que hay que validar. Corte en [registro de estado](../../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -4,8 +4,12 @@
 
 | Flag | Owner / runtime | Default del código y deploy | Estado de verificación |
 | --- | --- | --- | --- |
-| `AUTH_SERVER_FIRST_PARTY_ENABLED` | TASK-1834 / auth-server | `false` | Probado ON/OFF en harness local; no aplicado ni releído en cloud por esta entrega |
-| `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` | TASK-2067 / auth-server | `false` | Probado local; requiere RP allowlisted, secretos separados y autoridad Rooms; no activación cloud ni correo real |
+| `AUTH_SERVER_FIRST_PARTY_ENABLED` | TASK-1834 / auth-server | `false` | Desplegado OFF: readback 2026-10-25 de `auth-server-00166-p77` (`GIT_SHA=754a2a28`) = `false` |
+| `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` | TASK-2067 / auth-server | `false` | Desplegado OFF en 00166 (`false`). HMAC y token de autoridad sin montar (sólo se montan con ON). Sin correo real |
+| `ROOMS_FIRST_PARTY_AUTH_ENABLED` | TASK-2065/2069 / Vercel `efeonce-rooms` (otro repo) | `false` | Presente sólo en Production; OFF según docs, valor no releído 2026-10-25 |
+| `ROOMS_INVITATIONS_ENABLED` | TASK-2066/2068 / Vercel `efeonce-rooms` (otro repo) | `false` | Presente sólo en Production; OFF según docs, valor no releído 2026-10-25 |
+
+Los flags `ROOMS_*` (18 env en Production) viven en el repo `efeonce-rooms`: este gate no los escanea. Su estado vivo se lleva en la skill `efeonce-rooms` (`references/program-ledger.md`). Corte consolidado: [estado Rooms + Auth 2026-10-25](../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md). `ops-worker-00787-7fd` mantiene `GROWTH_EVENT_EMAILS_ENABLED=true` en vivo hasta el próximo deploy del worker (el `deploy.sh` ya trae `:-false`).
 
 El correo también exige `auth_server_rooms_invitation_otp` habilitado en `email_type_config` (seed FALSE).
 Readback25Oct tras aplicar migraciones: revisiónAuth00165-kn4 conserva ambos flags ausentes (OFF efectivo en versión anterior); emailtypeFALSE. RegistroRP y secretos no encienden flujos. [Preparacióncloud](../audits/identity/2026-10-25-auth-rooms-controlled-rollout.md). Estos defaults no afirman activación del nuevo código. [Evidencia y rollout](../audits/identity/2026-10-25-auth-rooms-first-local.md).

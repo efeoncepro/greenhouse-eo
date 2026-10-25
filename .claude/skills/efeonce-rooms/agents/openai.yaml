@@ -1,0 +1,7 @@
+interface:
+  display_name: "Efeonce Rooms (living skill)"
+  short_description: "Operate and extend Efeonce Rooms (EPIC-052): runtime repo efeonce-rooms on Vercel, own PostgreSQL, invitations, guest reading, private media, cloud pilot and the Rooms+Auth canary. Program ledger with what is live, OFF, WIP and pending."
+  default_prompt: "Use $efeonce-rooms before touching the efeonce-rooms repo, docs/architecture/rooms/**, ROOMS_* flags or any EPIC-052 task (2058-2071). Read references/program-ledger.md first. Every push to efeonce-rooms main deploys production. At closure update the ledger and mirror .claude/ <-> .codex/."
+
+policy:
+  allow_implicit_invocation: true
