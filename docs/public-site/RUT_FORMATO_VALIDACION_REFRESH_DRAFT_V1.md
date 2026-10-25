@@ -58,7 +58,6 @@ volumen, y a los clics hacia la página de HubSpot de Efeonce.
 ## 5. Pendientes antes de publicar
 
 - Probar la integración legacy en un portal real, si hay uno con Professional/Enterprise y formulario en HTML sin procesar.
-- Portada e imagen social nuevas (la actual, `246029`, es de 2024, en WebP y sin `alt`).
 - Confirmar la frase de experiencia de la intro: «Es lo que revisamos cuando implementamos HubSpot para empresas chilenas».
 
 ## 6. Copia privada para revisión
@@ -99,7 +98,9 @@ volumen, y a los clics hacia la página de HubSpot de Efeonce.
 - **Copia de revisión `252086`:** pasada a la papelera (recuperable desde WordPress); anónimo `404`.
 - **Observación:** el encabezado muestra «19 min de lectura». Ese número lo calcula el tema, no el meta de Yoast, y
   pasa igual en inbound (18 min con Yoast en 11). Es del tema, no de este refresh.
-- **Pendientes:** portada e imagen social nuevas; probar el código legacy en un portal HubSpot real; observar Search
+- **Portada nueva (2026-10-25 10:44 UTC):** adjunto `252092` como destacada y OG; etiquetas `comohacer` y `how-to`
+  retiradas. Registro y rollback en `ai-generations/2026-10-24_portadas-blog/LEEME.md`.
+- **Pendientes:** probar el código legacy en un portal HubSpot real; observar Search
   Console a las 4, 8 y 12 semanas con las consultas de HubSpot como grupo principal (se espera que bajen las de
   «formato rut»).
 

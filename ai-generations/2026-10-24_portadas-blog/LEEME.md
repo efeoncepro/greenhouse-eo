@@ -70,6 +70,35 @@ ESCALA=2 FIRMA=0 node composicion/componer-centrada.cjs plates/MCB-INB1-169.png 
   "¿Qué es el inbound marketing en 2026?" "Ayudar" final-sin-logo/portada-inbound.png
 ```
 
+## Cómo validar el RUT en formularios de HubSpot (2026-10-25)
+
+Portada del artículo refrescado el mismo día (post `246024`). **Publicada el 2026-10-25 a las 10:44 UTC con aprobación
+del operador** como destacada e imagen OG; la tarjeta de X usa la OG.
+
+| Post | Adjunto nuevo | Archivo | Respaldo (estado previo) |
+|---|---|---|---|
+| `246024` RUT en HubSpot | `252092` | `uploads/2024/11/validar-rut-formularios-hubspot-2026.jpg` (2400 × 1260, 231 KB) | `_gh_cover_refresh_246024_20261025_104440` (destacada `246029`, OG `246030`, WebP de 2024) |
+
+- **Ficha:** `fichas/MCB-RUT1-169.json` (Antonio, `revenue-hubspot`, softshell). Fenómeno: una tarjeta de vidrio cruza
+  una compuerta vertical de luz azure; la mitad que pasó, limpia; las que no pasaron, opacas a la izquierda. Acento
+  magenta en la esquina de la tarjeta que pasó.
+- **`cine-reviewer` antes de generar: CORREGIR** (acento azure sobre luz azure; dirección de la tarjeta ambigua; riesgo
+  de lector, chip o visto bueno en las tarjetas). Las tres correcciones se aplicaron textuales. Plate generado una sola
+  vez (`plates/MCB-RUT1-169.png`, gpt-image-2.5-sunburst high, ≈ USD 0,055).
+- **Validación:** `foto:validar:cine` sin fallas (sombra 93 %); `foto:validar` 4/4 reservas; bordado al 300 %: nave,
+  órbita, tres ventanas y esfera. Cara en torno al 72 % del ancho: en el recorte cuadrado queda en el borde derecho,
+  igual que paid media y topic clusters.
+- **Texto:** «¿Cómo entra un RUT a HubSpot?» → «Validado.» (`answerOverflowPx` 0). La primera versión, «¿Cómo debe
+  entrar un RUT a HubSpot?», dejaba la «a» final contra el hombro del sujeto. Composición: `final-rut/portada-rut-c.png`;
+  hoja de revisión `final-rut/portada-rut-revision.png`.
+- **QA en vivo:** `og:image` y `primaryImageOfPage` apuntan al archivo nuevo, a 2400 × 1260; `og:image:alt` y
+  `twitter:image:alt` con el alt descriptivo; sha256 del publicado = local (`67fb8944…`); ninguna referencia a la portada
+  de 2024. `blog-home verify --browser`: 8 anchos sin desborde y 0 violaciones (una comprobación de «autor de ejemplo»
+  en `/blog/` falló una vez y pasó al repetir). El post no está en el slider ni en el rail.
+- **Antes de subir** se avisó a las cinco sesiones del blog; las cinco confirmaron que no tenían despliegue ni QA en curso.
+- **Mismo día, metadatos:** se quitaron las etiquetas `comohacer` y `how-to` del post (sólo lo usaban a él y salían
+  como `keywords` del schema); quedan `hubspot` y `tutoriales`. Respaldo `_gh_tags_refresh_246024_20261025_104454`.
+
 ## Pendiente
 
 - **Formalizar la variante centrada en AXIS** (pieza nueva o regla de zona segura del banner de blog) y en la plantilla
