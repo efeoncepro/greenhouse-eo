@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Épica registrada y descompuesta; arquitectura/experiencia Proposed; go de implementación pendiente; 0 tasks hijas registradas, 0 capacidades implementadas`
+- Status real: `Primera entrega local verificada2026-10-25; TASK-2058 complete y TASK-2059 pendiente aceptación visual humana; identidad/persistencia/rollout pendientes`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Commercial / Product; responsable individual por asignar`
@@ -20,7 +20,7 @@ Priority, Impact y Effort son inferencias de planificación por alcance multimed
 
 Coordina la construcción de **Efeonce Rooms**, plataforma propia de sales enablement y experiencia del comprador en `rooms.efeonce.org`. Alcance V1: una sala reutilizable para propuestas creativas y SEO/AEO, combinables. El primer recorrido que se materializa es creativo: propuestas gráficas completas, estáticas, largas, audio y video, acompañadas por sus PDFs originales. SEO/AEO añade oportunidad, muestra editorial/técnica, radiografía, evidencia, linaje, plan y medición; no se reduce a adjuntar un PDF o enlazar X-ray. El champion puede comprender, ensayar, presentar y defender la propuesta ante su comité; el evaluador puede explorar y preguntar con contexto.
 
-La administración vive en Rooms; UI, CLI y MCP consumen el mismo contrato. La documentación permanece en Greenhouse. El repo `efeonce-rooms` es destino candidato y no existe como entrega de esta épica. El dominio es un destino acordado, no una afirmación de DNS o servicio desplegado.
+La administración vive en Rooms; UI, CLI y MCP consumen el mismo contrato. La documentación permanece en Greenhouse. El repo `efeonce-rooms` existe localmente desde2026-10-25 para TASK-2058/2059; no tiene rollout ni datos reales. El dominio es un destino acordado, no una afirmación de DNS o servicio desplegado.
 
 ## Why This Epic Exists
 
@@ -60,7 +60,9 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 ## Child Tasks
 
-**Ninguna task hija registrada aún.** Los códigos R01–R15 son unidades de planificación locales a esta épica, no IDs TASK ni promesas de trabajo iniciado. Se materializan con plantilla/addenda vigentes al preparar la implementación; deben declarar esta épica y actualizar esta tabla con el ID real. No se reservan números de tasks especulativos. Cada unidad puede dividirse si su discovery revela contratos independientes.
+**Dos tasks hijas registradas el 2026-10-25:** [TASK-2058](../../tasks/complete/TASK-2058-rooms-foundation-and-permissions.md), foundation/contratos/can (primer corte R01/R04); [TASK-2059](../../tasks/in-progress/TASK-2059-rooms-first-experience.md), primera sala y vistas por rol (primer corte R02). Las dos tienen alcance local acotado; no completan R01/R02/R04 ni el piloto por inferencia.
+
+ Los códigos R01–R15 son unidades de planificación locales a esta épica, no IDs TASK ni promesas de trabajo iniciado. Se materializan con plantilla/addenda vigentes al preparar la implementación; deben declarar esta épica y actualizar esta tabla con el ID real. No se reservan números de tasks especulativos. Cada unidad puede dividirse si su discovery revela contratos independientes.
 
 | Unidad | Entrega prevista | Perfil de futura task / owner funcional | Dependencias | Evidencia de salida |
 |---|---|---|---|---|
@@ -125,9 +127,9 @@ No se estima plazo o precio antes de R01, selección de equipo y fixtures. Las d
 
 ## Existing Related Work
 
-- [EPIC-029 Proposal Studio](EPIC-029-tender-proposal-studio-agentic-authoring.md): expediente/oferta formal y producción documental; se referencia, no se reparentan sus tasks ni se reconstruye la propuesta técnica rechazada.
+- [EPIC-029 Proposal Studio](../to-do/EPIC-029-tender-proposal-studio-agentic-authoring.md): expediente/oferta formal y producción documental; se referencia, no se reparentan sus tasks ni se reconstruye la propuesta técnica rechazada.
 - [EPIC-049 Marketing Studio](../in-progress/EPIC-049-efeonce-marketing-studio-platform.md): campañas y activación; fuente potencial de versiones autorizadas, no editor Rooms.
-- [EPIC-050 Creative Workbench](EPIC-050-creative-workbench-campaign-scale-production.md): producción multimarcas; Rooms exhibe material existente sin absorber sus motores.
+- [EPIC-050 Creative Workbench](../to-do/EPIC-050-creative-workbench-campaign-scale-production.md): producción multimarcas; Rooms exhibe material existente sin absorber sus motores.
 - [EPIC-045 Insights](../in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md): referencia de presentación y evidencia; sin migración de informes por esta épica.
 - [EPIC-044 Identity/MCP](../in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md): contratos compartidos; su existencia documental no prueba integración Rooms.
 - [EPIC-033 UI platform](../complete/EPIC-033-premium-agentic-ui-platform.md): método de calidad; componentes portables AXIS verificados en consumidor, sin importar wrappers privados de Greenhouse.
@@ -203,7 +205,7 @@ El operador aceptó la marca de Rooms («eslabón leve»): las dos «o» como ó
 
 ## Delta 2026-10-12 — destino futuro de la interfaz de Commercial (diferido)
 
-El operador aprobó desacoplar Greenhouse por dominios de producto ([decisión](../../architecture/GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md), [`EPIC-054`](EPIC-054-greenhouse-product-domain-decoupling.md)). Para Commercial declaró su intención: la API se queda en Greenhouse y la interfaz pasaría a Rooms — Sample Sprints, Cotizaciones, Contratos, Productos, MSA y SOW, y Pipeline. Lo dejó **para después**: sin fecha, sin task y sin go.
+El operador aprobó desacoplar Greenhouse por dominios de producto ([decisión](../../architecture/GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md), [`EPIC-054`](../to-do/EPIC-054-greenhouse-product-domain-decoupling.md)). Para Commercial declaró su intención: la API se queda en Greenhouse y la interfaz pasaría a Rooms — Sample Sprints, Cotizaciones, Contratos, Productos, MSA y SOW, y Pipeline. Lo dejó **para después**: sin fecha, sin task y sin go.
 
 - **Esta épica no cambia.** R01–R15, sus dependencias y sus Exit Criteria quedan como están; la interfaz de Commercial no es una unidad de esta épica ni condición del piloto.
 - **Cuando llegue su turno** se registra como trabajo propio y exige primero enmendar el ADR de Rooms, que hoy difiere CPQ y deja el pipeline en HubSpot. Detalle en su [addendum del 2026-10-12](../../architecture/rooms/EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md).
@@ -211,3 +213,12 @@ El operador aprobó desacoplar Greenhouse por dominios de producto ([decisión](
 - **Cotizador V3** (`EPIC-053`): su interfaz sigue sin hogar decidido, portal o Rooms.
 - Del mismo plan, sin efecto en el diseño de Rooms: el motor del Artifact Composer pasa a paquete de AXIS e Insights a dominio propio; R14 los sigue consumiendo por contrato.
 
+
+## Delta 2026-10-25 — construcción autorizada
+
+Julio confirma la primera entrega local y objetivo: base ejecutable seguida de experiencia desktop/móvil con La órbita, lista para revisión visual. Añade can, jerarquías cliente/operador/administrador y vistas propias desde la base; autoriza subagentes. Repo hermano efeonce-rooms/main, documentación Greenhouse/develop. Sin autorización implícita de push, deploy o acceso a clientes. Estado y evidencia se registran en TASK-2058/2059. Las quince unidades conservan su alcance restante.
+
+
+### Evidencia de primera entrega local — 2026-10-25
+
+TASK-2058 complete para foundation/can local; TASK-2059 implementada, QA PASS y pendiente aceptación visual humana.17 tests de dominio,25 E2E, GVC4 tamaños/68frames, build optimizado y CLI/API negativos. [Auditoría](../../audits/rooms/2026-10-25-first-local-delivery.md). No se tildan los Exit Criteria V1 que requieren persistencia, identidad, paridad durable o piloto real; las quince unidades conservan su alcance restante.

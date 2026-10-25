@@ -1,6 +1,6 @@
 # Rooms — perfiles de experiencia creativa y SEO/AEO V1
 
-Fecha: 2026-10-07. **Alcance de producto confirmado por el operador; contratos y renderers propuestos, sin implementación.** Owner: Product / Commercial con Creative y SEO/AEO. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [API](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md) · [EPIC-052](../../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+Fecha: 2026-10-07. **Alcance de producto confirmado por el operador; contratos y renderers propuestos, sin implementación.** Owner: Product / Commercial con Creative y SEO/AEO. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [API](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md) · [EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
 
 ## 1. Una plataforma, experiencias según lo que se vende
 

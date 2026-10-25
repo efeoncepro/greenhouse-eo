@@ -2,21 +2,21 @@
 
 **Nombre y subdominio acordados:** Efeonce Rooms · `rooms.efeonce.org`.
 **Propósito:** experiencia comercial y conversión de demanda; ayuda al comprador a comprender, evaluar y defender una solución. Sirve a propuestas creativas y SEO/AEO, combinables en una sala. Puede abrir conversaciones mediante muestras o diagnósticos personalizados.
-**Estado al 2026-10-07:** diseño para revisión antes del go final. No hay implementación, registro DNS, provisión ni despliegue verificados.
+**Estado al 2026-10-25:** primera entrega local verificada; TASK-2058 complete, TASK-2059 en revisión visual humana. Logo/stack y consumidor ejecutados con evidencia. Sin DNS, provisión ni despliegue de Rooms.
 
-**Programa:** [EPIC-052 — Efeonce Rooms](../../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md), `to-do`: quince unidades de planificación, sin tasks hijas registradas ni go de implementación. La épica es dueña de secuencia, dependencias y cierre; estos documentos conservan los contratos de producto/arquitectura.
+**Programa:** [EPIC-052 — Efeonce Rooms](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md), `in-progress`: quince unidades de planificación; dos tasks para la primera entrega local autorizada, con permisos can y vistas cliente/operador/administrador. La épica es dueña de secuencia, dependencias y cierre; estos documentos conservan los contratos de producto/arquitectura.
 
-**Design system decidido (2026-10-07): La órbita**, gobernado por [efeonce-graphic-line](../../../.codex/skills/efeonce-graphic-line/SKILL.md); Bricolage editorial/Poppins funcional en todas las superficies de Rooms. AXIS distribuye sus recursos y contratos. La composición renderizada sigue pendiente; las piezas del cliente conservan su diseño.
+**Design system decidido (2026-10-07): La órbita**, gobernado por [efeonce-graphic-line](../../../.codex/skills/efeonce-graphic-line/SKILL.md); Bricolage editorial/Poppins funcional en todas las superficies de Rooms. AXIS distribuye sus recursos y contratos. La primera composición local está implementada y su aceptación visual humana sigue pendiente; las piezas conservan su diseño.
 
 ## Documentos de decisión y arquitectura
 
-1. [ADR consolidado](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md): decisiones previas aceptadas y propuesta pendiente de go, sin confundir ambos estados.
+1. [ADR consolidado](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md): decisiones aceptadas y go de primera entrega local, separado del rollout.
 2. [Arquitectura de aplicación, medios y operación](EFEONCE_ROOMS_ARCHITECTURE_V1.md).
 3. [API, datos y acceso](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md).
 4. [Experiencia completa](EFEONCE_ROOMS_EXPERIENCE_V1.md).
 5. [Perfiles creativo y SEO/AEO; continuidad X-ray](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md): bloques, evidencias, sala combinada y aceptación V1.
 
-6. [Política de versiones y baseline técnico](EFEONCE_ROOMS_STACK_BASELINE_V1.md): últimas estables compatibles, hallazgos TS7/ESLint10 y gate R01; sin build conjunto certificado.
+6. [Política de versiones y baseline técnico](EFEONCE_ROOMS_STACK_BASELINE_V1.md): últimas estables compatibles, hallazgos TS7/ESLint10 y pins ejecutados; build local verificado, hosting pendiente.
 7. [Marca de Rooms](EFEONCE_ROOMS_MARK_DECISION_V1.md): «eslabón leve», las dos «o» como órbitas enlazadas con la esfera Growth a la 1:30 de la segunda (nunca en un cruce); aceptada 2026-10-08, 18 SVG `rooms-*` en `axis-brand-assets` 0.4.27 (publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages)). Revisión de parecido por web del mismo día (no es asesoría legal): el riesgo real es el nombre, casi genérico en la categoría; firmar siempre Efeonce | Rooms y hacer búsqueda formal de «EFEONCE ROOMS» mixta. Uso: [manual de la marca](../../manual-de-uso/creative/usar-marca-efeonce-rooms.md).
 
 ## Contratos de experiencia para revisión
@@ -26,11 +26,11 @@
 - [Flujos, navegación y estados](../../ui/flows/rooms-v1.md).
 - [Motion, medios y continuidad](../../ui/motion/rooms-v1.md).
 
-Las decisiones de producto y contratos viven en estos documentos; el nombre final no autoriza infraestructura ni publicación. El logo quedó aceptado el 2026-10-08 en su [ADR de marca](EFEONCE_ROOMS_MARK_DECISION_V1.md). Los contratos de UI son candidatos documentales, no interfaces renderizadas ni aceptación visual.
+Las decisiones de producto y contratos viven en estos documentos; el nombre final no autoriza infraestructura ni publicación. El logo quedó aceptado el 2026-10-08 en su [ADR de marca](EFEONCE_ROOMS_MARK_DECISION_V1.md). Los contratos V1 conservan el alcance futuro. La primera implementación local de TASK-2059 es candidata para revisión, sin aceptación visual humana.
 
 Antecedentes: [frontera comercial aceptada](../sales-enablement/EFEONCE_SALES_ENABLEMENT_PLATFORM_DECISION_V1.md) e [investigación técnica inicial](../../think/creative-proposal-experience-stack-analysis-2026-10-07.md). La solución genérica anterior queda reemplazada por este dossier. Los productos actuales conservan su runtime.
 
-Próximo checkpoint: revisión del dossier y programa por el operador. Después del go, materializar las unidades de EPIC-052 en tasks, fijar versiones y probar primero una composición real en desktop/móvil; una aprobación documental no acredita esos resultados.
+Próximo checkpoint: revisar la primera sala local. [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md), [manual de operación](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) y [QA](../../audits/rooms/2026-10-25-first-local-delivery.md). Identidad real, persistencia y rollout siguen en EPIC-052.
 
 ## Verificación documental 2026-10-07
 

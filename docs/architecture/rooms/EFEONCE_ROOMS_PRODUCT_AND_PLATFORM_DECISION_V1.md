@@ -114,3 +114,9 @@ Qué significa para este ADR:
 
 Efectos del mismo plan que sí tocan a Rooms, sin cambiar su diseño: el motor del Artifact Composer pasa a ser un paquete versionado distribuido por AXIS, e Insights pasa a dominio propio. Rooms los sigue consumiendo como ya estaba previsto, por paquete y por referencia a una edición autorizada.
 
+
+## Addendum 2026-10-25 — arranque autorizado y autorización por capacidad
+
+Julio autoriza construir la primera entrega: foundation ejecutable seguida de primera experiencia desktop/móvil para revisión. Tasks TASK-2058 y TASK-2059; runtime propio en ../efeonce-rooms, documentación en Greenhouse. Añade expresamente permisos can, jerarquías y vistas cliente/operador/administrador; y autoriza subagentes. Este go acepta la implementación local acotada, no acredita aceptación visual, despliegue, invitaciones o integración real.
+
+La política can(principal, capability, resource) deniega por defecto. Los roles fijan techo de capacidades; cada grant intersecta organización, sala y edición con vigencia/revocación. Administrador incluye capacidades de operador dentro de su ámbito, nunca bypass de tenant. Un principal externo no adquiere funciones internas por cambiar rol. Los DTO de cliente excluyen notas y grants internos por construcción. Las personas de demostración son sintéticas y no constituyen una sesión real. La integración Efeonce ID posterior resuelve autoridad en servidor; jamás se acepta rol u organización del navegador como autoridad.

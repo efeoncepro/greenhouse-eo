@@ -642,7 +642,7 @@ Norma, alternativas y consecuencias: [ADR de la marca](../../architecture/rooms/
 aplicaciones del canvas [«Efeonce Rooms — Logo»](https://claude.ai/artifact/GxQAjo17CqRKTDvQVMa8R1) (enlace compartido,
 invitación, modo presentación, ícono de app, placa de sala, lanzamiento y la apertura en movimiento) son exploraciones:
 no aprueban composiciones de la sala, que siguen sujetas a los contratos de UI y al go de
-[EPIC-052](../../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md), ni una animación de logo nueva.
+[EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md), ni una animación de logo nueva.
 Pendiente: la prueba sin contexto del símbolo a 16–32 px, en claro y oscuro, frente a 🔗, ⚣ y argollas de boda; si
 confunde, el símbolo va siempre junto a la palabra.
 

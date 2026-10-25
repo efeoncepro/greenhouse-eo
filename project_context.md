@@ -2,7 +2,7 @@
 
 ## Estado vigente para agentes
 
-[Rooms](docs/architecture/rooms/README.md): creativo/SEO-AEO; sin go.
+[Rooms local: can y vistas](docs/architecture/rooms/README.md).
 
 [Factory](docs/services/factory/README.md): On-Demand.
 

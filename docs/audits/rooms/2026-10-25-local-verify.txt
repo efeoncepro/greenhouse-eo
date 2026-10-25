@@ -1,0 +1,67 @@
+$ pnpm lint && pnpm lint:negative && pnpm typecheck && pnpm test && pnpm build
+$ eslint . --max-warnings=0
+$ node scripts/check-lint-negative.mjs
+PASS negative lint: jsx-a11y/alt-text
+PASS negative lint: react-hooks/rules-of-hooks
+PASS negative lint: @typescript-eslint/no-floating-promises
+$ next typegen && tsc --noEmit
+Generating route types...
+✓ Types generated successfully
+$ node --conditions=react-server --import tsx --test tests/domain*.test.ts
+✔ nominal artwork ratios allow only integer pixel rounding within 0.1% (0.60375ms)
+✔ strict content schema rejects executable payloads, unknown keys and broken evidence anchors (1.234334ms)
+✔ deny by default: absent actor, unknown action, malformed context and no grants (2.478542ms)
+✔ role hierarchy remains bounded by explicit capabilities and grants (0.609792ms)
+✔ external principal cannot acquire internal roles or an organization-wide audience grant (0.241875ms)
+✔ tenant membership, grant tenant, room and edition are independently intersected (0.239291ms)
+✔ expired/revoked principals and grants deny at exact boundary; future grants deny (0.2005ms)
+✔ invalid grant intervals and split grants cannot assemble authority across scopes (0.357875ms)
+✔ published content is not editable and clients never read drafts/archived editions (0.159625ms)
+✔ capability resource kinds cannot be confused to elevate scope (0.218792ms)
+✔ audience projection is a validated allowlist without notes, access lists or principals (0.946666ms)
+✔ evidence permission protects bytes and anchor IDs, not just the inspector button (0.320083ms)
+✔ readers do not mutate or hand out references to the immutable stored edition (0.236458ms)
+✔ workspace rejects client, scopes lists and independently protects internal notes (0.478333ms)
+✔ demo roles expose only the corresponding server projection (0.681083ms)
+✔ live identity resolver fails closed; grants reject undeclared actions and shapes (0.097167ms)
+✔ advertised operation surface is read-only and capability governed (0.041875ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 116.961584
+$ node scripts/sync-brand.mjs && next build
+Brand assets verified from @efeoncepro/axis-brand-assets@0.4.30: 4 exact copies
+▲ Next.js 16.4.3 (Turbopack)
+✓ Running next.config.ts took 11ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 310ms
+  Running TypeScript ...
+  Finished TypeScript in 702ms ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/6) ...
+  Generating static pages using 9 workers (1/6) 
+  Generating static pages using 9 workers (2/6) 
+  Generating static pages using 9 workers (4/6) 
+✓ Generating static pages using 9 workers (6/6) in 157ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/demo/operations
+├ ƒ /api/demo/permissions
+├ ƒ /api/demo/room
+├ ƒ /api/demo/workspace
+├ ƒ /api/v1/rooms/[roomId]
+├ ○ /demo
+└ ƒ /demo/workspace
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

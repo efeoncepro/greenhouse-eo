@@ -2,6 +2,12 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-25 — Rooms: primera base local y experiencia por rol (TASK-2058/2059)
+
+- Nuevo runtime `efeonce-rooms`: contratos y permisos `can` por organización/sala/edición; jerarquías cliente, operador y administrador con grants, vigencia y denegación por defecto.
+- Primera sala creativa y SEO/AEO con La órbita/AXIS, visor de piezas, lectura/radiografía y workspace interno; refinada con Product Design. [Superficie implementada](docs/documentation/rooms/primera-experiencia-local.md) y [manual local](docs/manual-de-uso/rooms/operar-primera-experiencia-local.md).
+- Muestra sintética para revisión; Efeonce ID, persistencia, rollout y aceptación visual humana pendientes. [Evidencia de QA](docs/audits/rooms/2026-10-25-first-local-delivery.md).
+
 ## 2026-10-25 — Criterio reutilizable para nuevas conversaciones comerciales
 
 - Prospección, Commercial y Copywriting incorporan historia por iniciativa, evidencia, pregunta útil y
@@ -617,15 +623,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
   blanca. `scripts/insights/preview-edition.ts` acepta `--cover=light|dark`.
 - **Desplegado** en Vercel staging y en el `ops-worker` (`d9a1c6a2d`). **Vercel Production sin release**: las
   ediciones creadas desde el portal de producción siguen midiendo el sitio completo de Berel (`TASK-2033`).
-
-## 2026-10-12 — Cotizador V3: el registro de cotizaciones existe en la base
-
-- Nuevo en `greenhouse_commercial`: las tablas `quoter_*` (catálogo por huella, puntero de versiones vigentes,
-  cotizaciones con versiones inmutables, estados, destinataria, número y excepciones bajo el piso). Aplicadas a la
-  base compartida; el catálogo del repo quedó importado (24 documentos) y su puntero reflejado. Ninguna API ni
-  pantalla las usa todavía (`TASK-2026`, `TASK-2027`).
-- Comando nuevo `pnpm quoter:import plan | documents | pointer`: hay que correrlo cada vez que el catálogo del repo
-  cambie. Carril de pruebas nuevo `pnpm quoter:test:local` (PostgreSQL 16 local).
-- Seis capacidades nuevas `commercial.quoter.*`. La primera cotización real emitida será `EO-QTE-15001`.
-- [Modelo de datos](docs/architecture/GREENHOUSE_QUOTER_V3_DATA_MODEL_V1.md) ·
-  [manual del importador](docs/manual-de-uso/finance/importar-catalogo-v3-a-la-plataforma.md). `TASK-2025`.

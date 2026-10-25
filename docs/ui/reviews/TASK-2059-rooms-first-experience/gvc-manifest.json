@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "scenarioName": "rooms-first-experience",
+  "qualityProfile": "premium",
+  "route": "/demo",
+  "env": "local",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "startedAt": "2026-10-25T20:49:52.744Z",
+  "finishedAt": "2026-10-25T20:50:04.732Z",
+  "durationMs": 11988,
+  "outputs": {
+    "recordingWebm": null,
+    "framesDir": "",
+    "flipbookGif": null
+  },
+  "frames": [],
+  "readiness": {
+    "status": "passed",
+    "selector": "[data-capture=\"room-entry\"]",
+    "absentSelectors": [
+      "[data-loading=\"true\"]"
+    ],
+    "waitForFonts": true,
+    "durationMs": 228
+  },
+  "assertions": [
+    {
+      "kind": "visible",
+      "status": "passed",
+      "selector": "[data-capture=\"room-entry\"]"
+    },
+    {
+      "kind": "noErrorBoundary",
+      "status": "passed"
+    }
+  ],
+  "qualityFindings": [],
+  "interactions": [
+    {
+      "name": "explore-feedback",
+      "intent": "The proposal entry action gives clear pointer and keyboard feedback",
+      "actionKind": "hover",
+      "selector": "button[aria-label=\"Explorar propuesta\"]",
+      "startMs": 1151,
+      "endMs": 3952,
+      "frameLabels": [
+        "explore-feedback-hover-start",
+        "explore-feedback-hover-settled",
+        "explore-feedback-keyboard",
+        "explore-feedback-reduced-motion"
+      ],
+      "keyboardEquivalent": "focus",
+      "reducedMotion": "capture"
+    }
+  ],
+  "runtimeSummary": {
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "hydrationWarningCount": 0,
+    "httpFailureCount": 0,
+    "consoleErrorSamples": [],
+    "pageErrorSamples": [],
+    "hydrationWarningSamples": [],
+    "httpFailureSamples": []
+  },
+  "performanceSummary": {
+    "domNodes": 340,
+    "requestCount": 33,
+    "transferBytes": 1554661,
+    "fcpMs": 56,
+    "domContentLoadedMs": 45,
+    "jsHeapBytes": 53500000
+  },
+  "enterpriseRubric": {
+    "verdict": "pass",
+    "findingCount": 0
+  },
+  "exitCode": 0,
+  "reportHtml": "index.html",
+  "variants": [
+    {
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "outputDir": "01-desktop",
+      "manifestPath": "01-desktop/manifest.json",
+      "exitCode": 0,
+      "durationMs": 11988,
+      "frameCount": 17
+    },
+    {
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "outputDir": "02-mobile",
+      "manifestPath": "02-mobile/manifest.json",
+      "exitCode": 0,
+      "durationMs": 7782,
+      "frameCount": 17
+    },
+    {
+      "name": "tablet",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "outputDir": "03-tablet",
+      "manifestPath": "03-tablet/manifest.json",
+      "exitCode": 0,
+      "durationMs": 9481,
+      "frameCount": 17
+    },
+    {
+      "name": "compact",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "outputDir": "04-compact",
+      "manifestPath": "04-compact/manifest.json",
+      "exitCode": 0,
+      "durationMs": 7105,
+      "frameCount": 17
+    }
+  ]
+}

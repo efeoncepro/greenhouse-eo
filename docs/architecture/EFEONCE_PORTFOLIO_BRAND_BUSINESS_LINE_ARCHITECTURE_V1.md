@@ -167,4 +167,4 @@ la masterbrand porque, como Factory, no pertenece a una sola línea
 - Aplica la regla 1 de §4: la firma es siempre «efeonce | Rooms», nunca «Rooms» suelto en publicidad; «rooms» es casi
   genérico en la categoría de salas de venta digitales.
 - La marca no decide su clase en la taxonomía de §2, ni producto, publicación o el go de
-  [EPIC-052](../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+  [EPIC-052](../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).

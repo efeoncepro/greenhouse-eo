@@ -94,3 +94,27 @@ Misma fixture por UI, CLI y MCP: crear sala → subir imagen/audio/video/PDF e i
 La paridad se demuestra con cambios persistidos y readback independiente; un inventario de tools o un mock no la acredita.
 
 La certificación repite el ciclo en perfil creativo, SEO/AEO y sala combinada. Probar referencias rotas, datos sin ámbito, simulación identificada, fuente caída, anclas tras revisión y esquema cliente inerte. Publish/readback deben devolver los mismos bloques y evidencias por UI/CLI/MCP; un enlace a Think no acredita esta paridad.
+
+## 7. Primer corte ejecutable 2026-10-25
+
+TASK-2058 implementa `src/domain/{contracts,permissions,operations,errors}.ts` y readers server-only en el runtime `efeonce-rooms`. El [ADR de arranque](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) autoriza este corte local. Los roles de experiencia de §4 siguen siendo especializaciones futuras; las tres jerarquías iniciales solicitadas por el operador son:
+
+| Capacidad | Cliente | Operador | Administrador | Recurso requerido |
+|---|---|---|---|---|
+| rooms.read / evidence.read | sí | sí | sí | edición publicada para cliente |
+| workspace.read | no | sí | sí | organización |
+| notes.internal.read | no | sí | sí | sala/edición |
+| content.edit | no | sí | sí | edición borrador |
+| editions.publish | no | no | sí | edición borrador |
+| access.read | no | no | sí | sala/edición |
+| access.manage / rooms.archive | no | no | sí | sala |
+
+Cada «sí» es sólo un techo: exige principal activo/no vencido, pertenencia a organización y grant del mismo principal, activo, iniciado, no vencido, con capacidad y scope que cubra el recurso. Se validan schemas estrictos y hora finita. Externos sólo pueden ser cliente y no reciben grants de organización. Una edición archivada se deniega. Ningún rol concede privilegio global.
+
+`authorize` devuelve decisión y razón estable; `can` el booleano. Los readers aplican la misma política antes de proyectar datos. `projectRoom` construye allowlist, valida el DTO y clona estructuras; sin evidence.read elimina tanto snapshots como anclas `evidenceIds`. Workspace comprueba acceso a organización y filtra cada sala/nota por permiso propio. Grants no viajan al cliente.
+
+Operaciones implementadas: `rooms.get`, `workspace.get`, `access.getEffective`. UI/server y API demo usan readers compartidos; CLI consume esos endpoints HTTP. Gestos de dispositivo se excluyen expresamente. Los permisos de escritura se calculan para fijar contrato, pero no existen commands, rutas de mutación ni transporte MCP.
+
+`resolvePrincipal()` devuelve null hasta conectar Efeonce ID. La API `/api/v1/rooms/:roomId` devuelve401 incluso con rol/organización forjados. El selector de `/demo` sólo elige fixtures sintéticas y nunca se usa como autenticación real. Este corte no acredita invitaciones, revocación de tokens remotos, tickets de medios ni persistencia. [Manual](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) y [evidencia](../../audits/rooms/2026-10-25-first-local-delivery.md).
+
+Límites de esta implementación: el resumen `permissionRows`/`access` del workspace se refiere a la primera sala visible de la muestra única, y su copy lo declara. Antes de soportar varias salas se debe resolver una selección/agregación explícita, sin mostrar el permiso de una sala como global. El reader interno distingue not_found y forbidden; la futura API autenticada deberá normalizar la respuesta de recursos ajenos para no convertirse en oráculo de existencia. Hoy la ruta real deniega401 antes de cualquier lookup.

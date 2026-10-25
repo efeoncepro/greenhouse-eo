@@ -2,6 +2,10 @@
 
 [Historial](Handoff.archive.md).
 
+## 2026-10-25 — Rooms: primera entrega local para revisión
+
+Julio autorizó TASK-2058/2059 bajo EPIC-052, can/vistas cliente-operador-administrador y subagentes; después exigió calidad premium con Product Design. Runtime `../efeonce-rooms` en main; docs aquí en develop. Foundation, jerarquías/grants, readers/API/CLI y primera sala sintética ya implementados. [QA y límites](docs/audits/rooms/2026-10-25-first-local-delivery.md), [manual local](docs/manual-de-uso/rooms/operar-primera-experiencia-local.md). Próximo checkpoint Product: aceptación visual de Julio; Platform continúa identidad real/persistencia/rollout por unidades propias, sin dar por cerrado EPIC-052. Demo no autentica usuarios; API real fail-closed. Sin push/deploy.
+
 ## 2026-10-25 — UTP Perú: presentación enviada; LinkedIn pendiente
 [Caso y readback](docs/commercial/prospecting-agent/runs/2026-10-25-utp-gustavo.md): Company UTP y Contact Gustavo
 Alfaro con Primary y segmentos comprobados; Apollo waterfall autorizado, correo Verified, 2 créditos.
@@ -271,12 +275,3 @@ quedó en un commit de otra sesión: nadie commitea en AXIS `main` mientras espe
 el plugin. Follow-ups: retirar el código de los docks viejos (no antes del 2026-11-06) y puente de agendador
 compartido; `gh_landing_dock_clicked` ya está en GTM y GA4. [Task](docs/tasks/complete/TASK-2043-landing-dock-glass-primitive.md) ·
 [manual](docs/manual-de-uso/public-site/operar-dock-de-landings.md).
-
-## 2026-10-22 — Fundación Luz: contacto y dos acercamientos verificados
-
-Contact257217550764 / Company59806188192 / Primary y nota119334575454 leídos; dirección inferida admitida por
-excepción expresa informada de Julio, sin etiquetarla verificada. InMail21:37Santiago (1crédito) y correo22:18:35
-con firma gráfica/CCO/brochure original; Enviados y EMAIL119337620506SENT asociados verificados. Sin Apollo
-ejecutado, Lead/Deal/secuencia ni membresías comprobadas. Esperar respuesta; entrega/lectura no acreditadas.
-[Expediente y límites](docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md). Docs/skills espejo
-concilian la excepción vigente y separan atribución de enlaces por canal; no conceden nuevos permisos.

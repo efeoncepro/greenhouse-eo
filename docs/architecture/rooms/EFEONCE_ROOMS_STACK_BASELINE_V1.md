@@ -1,8 +1,8 @@
 # Rooms — política de versiones y baseline técnico V1
 
-Fecha de consulta: **2026-10-07**. Owner: Platform; validación visual: Product/AXIS. [ADR Rooms](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [Arquitectura](EFEONCE_ROOMS_ARCHITECTURE_V1.md) · [EPIC-052 / R01](../../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+Análisis inicial: **2026-10-07**. Refresh e implementación local: **2026-10-25**, §8. Owner: Platform; validación visual: Product/AXIS. [ADR Rooms](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [Arquitectura](EFEONCE_ROOMS_ARCHITECTURE_V1.md) · [EPIC-052 / R01](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
 
-**Autoridad:** el operador solicita usar las versiones más recientes de Next.js, ESLint, TypeScript, Tailwind y herramientas asociadas, y documentar el análisis de viabilidad. La política orienta la selección; la matriz es un baseline candidato fechado. Las excepciones y la convivencia de herramientas se validan en R01. No hay instalación, lockfile, build ni runtime Rooms certificados por este documento.
+**Autoridad:** el operador solicita usar las versiones más recientes de Next.js, ESLint, TypeScript, Tailwind y herramientas asociadas, y documentar el análisis de viabilidad. La política orienta la selección; la matriz es un baseline candidato fechado. Las excepciones y la convivencia de herramientas se validan en R01. La matriz inicial conserva su fecha; §8 registra la instalación y build local posteriores, sin certificar hosting.
 
 ## 1. Política de selección y actualización
 
@@ -92,7 +92,7 @@ R01 debe producir manifest/lockfile revisados, decisión TS7/TS6, configuración
 5. Smoke de API, acceso privado, separación server/client y cache por autoridad; multimedia/presentación se certifican en las unidades dueñas.
 6. Configuración de CI/hosting y versión efectiva de Node verificadas al habilitar esos entornos; dependencia de development o éxito local no equivale a despliegue.
 
-**Estado actual:** investigación de documentación, metadatos npm, manifests locales y código publicado de Next. Sin instalación conjunta, pruebas ejecutadas del stack, cambios de dependencias, repo Rooms nuevo o despliegue. Los manuales operativos se elaboran con el runtime; este documento conserva la decisión técnica y su procedimiento de validación previo.
+**Estado histórico al 07/10:** investigación de documentación, metadatos npm, manifests locales y código publicado de Next. Sin instalación conjunta, pruebas ejecutadas del stack, cambios de dependencias, repo Rooms nuevo o despliegue. Los manuales operativos se elaboran con el runtime; este documento conserva la decisión técnica y su procedimiento de validación previo.
 
 ## 7. Fuentes y trazabilidad del análisis
 
@@ -104,3 +104,29 @@ Consulta del 07/10/2026; refrescar al implementar:
 - [Tailwind releases](https://tailwindcss.com/blog), [compatibilidad](https://tailwindcss.com/docs/compatibility), [Tailwind 4.3.3](https://registry.npmjs.org/tailwindcss/4.3.3), [adapter 4.3.3](https://registry.npmjs.org/@tailwindcss/postcss/4.3.3), [PostCSS 8.5.29](https://registry.npmjs.org/postcss/8.5.29), [pnpm 12.10.1](https://registry.npmjs.org/pnpm/12.10.1).
 - [Node releases](https://nodejs.org/en/blog/release), [Node admitido por Vercel](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions), [Motion 14.0.0](https://registry.npmjs.org/motion/14.0.0), [Sharp 0.35.5](https://registry.npmjs.org/sharp/0.35.5).
 - Inspección local de `../axis-design-system/packages/{graphic-line,primitives,tokens,contracts,registry,brand-assets}/package.json`; [contrato de consumo privado](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+
+
+## 8. Consumidor ejecutado 2026-10-25 — TASK-2058/2059
+
+Pins efectivos de `efeonce-rooms/package.json` y lockfile:
+
+| Componente | Pin ejecutado |
+|---|---|
+| Next / eslint-config-next | 16.4.3 |
+| React / React DOM | 19.3.1 |
+| Typecheck nativo | @typescript/native alias npm:typescript@7.0.2; tsc7.0.2 verificado |
+| API de TypeScript | typescript alias npm:@typescript/typescript6@6.0.2; binario efectivo6.0.3 fijado transitivamente |
+| ESLint / typescript-eslint | 9.39.5 / 8.72.0 |
+| Tailwind / plugin PostCSS | 4.3.3 / 4.3.3 |
+| PostCSS | 8.5.31 |
+| pnpm / Node local | 12.15.0 / 24.17.0; engine24.x |
+| AXIS tokens / primitives / brand-assets | 0.6.10 / 0.7.15 / 0.4.30 |
+| Playwright / axe | 1.64.1 / 4.14.0 |
+
+Se adopta el fallback ESLint9 de §4: ESLint10.13.0 observado, pero react/import/jsx-a11y todavía limitan sus peers a9. Se conserva el preset Next completo, reglas con tipos y gate `--max-warnings=0`. Casos negativos demuestran detección de imagen sin alt, hook condicional y promise flotante. Owner Platform; retirar9 al verificar soporte upstream con los mismos gates, no mediante force ni apagado de plugins.
+
+TS7 hace typecheck independiente después de `next typegen`; Next build y typescript-eslint conservan la API TS6. Sin `ignoreBuildErrors` ni flag experimental. El wrapper6.0.2 resuelve versión efectiva6.0.3: no confundir la versión del wrapper con la del compilador.
+
+Primera instalación limpia379 paquetes, peers estrictos, luego `pnpm install --frozen-lockfile` exitoso. AXIS se descarga del registry privado, no se enlaza al repo hermano; esbuild/unrs-resolver tienen scripts de build explícitamente permitidos. Logo: copias exactas con SHA256 desde brand-assets. Las dependencias históricas de graphic-line permanecen fijadas por su propio paquete, sin override arbitrario.
+
+Lint, negativo, tipos, tests y build local verificados; evidencia visual y matriz de navegador en [auditoría](../../audits/rooms/2026-10-25-first-local-delivery.md). No hay CI, deployment ni certificación de todos los navegadores por este resultado. [Manual reproducible](../../manual-de-uso/rooms/operar-primera-experiencia-local.md).
