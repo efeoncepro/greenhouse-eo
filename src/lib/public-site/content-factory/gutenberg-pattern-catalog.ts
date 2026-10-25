@@ -218,7 +218,7 @@ export const EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES: GutenbergBlockPatternCatal
       'One per post, after the main answer and before the FAQ or the closing.',
       'No copy, links or forms inside the block.'
     ],
-    example: renderGrowthCtaBlock({ cta: 'blog-aeo-assessment', location: 'blog_article', emphasis: '¿aparece tu marca?' })
+    example: renderGrowthCtaBlock({ cta: 'blog-aeo-assessment', location: 'blog_article', emphasis: '¿aparece tu marca?', mark: 'aeo-assessment' })
   },
   {
     blockName: 'efeoncepro/glitch-drop',

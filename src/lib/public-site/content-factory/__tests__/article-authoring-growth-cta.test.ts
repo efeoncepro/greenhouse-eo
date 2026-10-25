@@ -34,10 +34,12 @@ const specWith = (blocks: GutenbergArticleBlock[]): GutenbergArticleSpec => ({
 
 describe('authorGutenbergDraft — growthCta', () => {
   it('renders the governed self-closing block with slug, location and emphasis', () => {
-    const draft = authorGutenbergDraft(specWith([{ kind: 'growthCta', cta: 'blog-aeo-assessment', emphasis: '¿aparece tu marca?' }]))
+    const draft = authorGutenbergDraft(
+      specWith([{ kind: 'growthCta', cta: 'blog-aeo-assessment', emphasis: '¿aparece tu marca?', mark: 'aeo-assessment' }])
+    )
 
     expect(gutenberg(draft).postContent).toContain(
-      '<!-- wp:efeoncepro/growth-cta {"cta":"blog-aeo-assessment","location":"blog_article","emphasis":"¿aparece tu marca?"} /-->'
+      '<!-- wp:efeoncepro/growth-cta {"cta":"blog-aeo-assessment","location":"blog_article","emphasis":"¿aparece tu marca?","mark":"aeo-assessment"} /-->'
     )
     expect(validateGeneratedGutenbergDraft(draft).findings.filter(f => f.code.startsWith('growth_cta'))).toEqual([])
   })

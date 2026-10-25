@@ -14,7 +14,11 @@ import { serializeGutenbergBlockAttributes } from './gutenberg-blocks'
 
 export const GROWTH_CTA_BLOCK_NAME = 'efeoncepro/growth-cta'
 
-export const GROWTH_CTA_ALLOWED_ATTRIBUTES = ['cta', 'location', 'emphasis'] as const
+export const GROWTH_CTA_ALLOWED_ATTRIBUTES = ['cta', 'location', 'emphasis', 'mark'] as const
+
+/** Official product lockups the block can show in place of the eyebrow (efeonce-editorial-blocks EO_Growth_Cta::MARKS). */
+export const GROWTH_CTA_MARKS = ['aeo-assessment'] as const
+export type GrowthCtaMark = (typeof GROWTH_CTA_MARKS)[number]
 
 const SLUG_PATTERN = /^[a-z0-9-]{3,80}$/
 const LOCATION_PATTERN = /^[a-z0-9_]{3,60}$/
@@ -26,7 +30,12 @@ export type GrowthCtaBlockInput = {
   location?: string
   /** One exact phrase of the governed headline to set in bold (AXIS `headlineEmphasis`). */
   emphasis?: string
+  /** Official product lockup in place of the eyebrow (it carries its own sphere, so the headline drops its own). */
+  mark?: GrowthCtaMark
 }
+
+export const isGrowthCtaMark = (value: unknown): value is GrowthCtaMark =>
+  typeof value === 'string' && (GROWTH_CTA_MARKS as readonly string[]).includes(value)
 
 export const isGrowthCtaSlug = (value: unknown): value is string => typeof value === 'string' && SLUG_PATTERN.test(value)
 
@@ -34,7 +43,7 @@ export const isGrowthCtaLocation = (value: unknown): value is string =>
   typeof value === 'string' && LOCATION_PATTERN.test(value)
 
 /**
- * Render `<!-- wp:efeoncepro/growth-cta {"cta":"…","location":"…","emphasis":"…"} /-->`. Throws on an invalid slug
+ * Render `<!-- wp:efeoncepro/growth-cta {"cta":"…","location":"…","emphasis":"…","mark":"…"} /-->`. Throws on an invalid slug
  * or location so a malformed spec never reaches a draft.
  */
 export const renderGrowthCtaBlock = (input: GrowthCtaBlockInput): string => {
@@ -49,6 +58,12 @@ export const renderGrowthCtaBlock = (input: GrowthCtaBlockInput): string => {
   const attrs: Record<string, string> = { cta: input.cta, location }
 
   if (emphasis) attrs.emphasis = emphasis
+
+  if (input.mark !== undefined) {
+    if (!isGrowthCtaMark(input.mark)) throw new Error(`content_factory_article_growth_cta_mark_invalid:${String(input.mark)}`)
+
+    attrs.mark = input.mark
+  }
 
   return `<!-- wp:${GROWTH_CTA_BLOCK_NAME} ${serializeGutenbergBlockAttributes(attrs)} /-->`
 }

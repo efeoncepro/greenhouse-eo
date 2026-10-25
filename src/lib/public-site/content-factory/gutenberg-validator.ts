@@ -19,6 +19,7 @@ import {
   GROWTH_CTA_ALLOWED_ATTRIBUTES,
   GROWTH_CTA_BLOCK_NAME,
   isGrowthCtaLocation,
+  isGrowthCtaMark,
   isGrowthCtaSlug
 } from './gutenberg-growth-cta'
 
@@ -834,6 +835,15 @@ const validateGrowthCtaBlocks = (blocks: ParsedGutenbergBlockComment[], findings
         severity: 'block',
         code: 'growth_cta_slug_invalid',
         message: `${GROWTH_CTA_BLOCK_NAME} needs the slug of a published Growth CTA in attrs.cta.`,
+        path
+      })
+    }
+
+    if (block.attrs.mark !== undefined && !isGrowthCtaMark(block.attrs.mark)) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_mark_invalid',
+        message: `${GROWTH_CTA_BLOCK_NAME} mark must be one of the official product lockups (aeo-assessment).`,
         path
       })
     }
