@@ -135,6 +135,11 @@ consideración de diseño, no como requisito ni garantía de cita.
   numerada no está en el hallazgo** — se la agregamos nosotros. Es el error del `+41%` con otro
   número. Una tabla puede presentar comparaciones con claridad, pero el estudio
   no demuestra que agregarla aumente las citas.
+- **Gráficos con sus números en el HTML:** un dato que sólo vive dentro de la imagen de un gráfico (o de
+  un canvas pintado por JS) no es texto que un buscador o un motor de respuesta pueda leer y citar. Los
+  números del gráfico salen también como tabla HTML; nunca sólo la imagen. En efeoncepro.com el bloque
+  «Gráfico Efeonce» (`efeoncepro/chart`, 2026-10-25) ya lo hace («Ver los datos»); detalle en
+  `efeonce-public-site-wordpress` → `content-factory-gutenberg.md`. Es legibilidad, no un lift prometido.
 
 ## Citabilidad — evidencia externa, no reglas de plataforma
 

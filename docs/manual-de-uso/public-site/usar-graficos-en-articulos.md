@@ -1,11 +1,11 @@
 # Usar gráficos en un artículo del blog — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-25 por Claude
-> **Ultima actualizacion:** 2026-10-25 por Claude
+> **Ultima actualizacion:** 2026-10-25 por Claude (en producción con 0.9.0)
 > **Modulo:** Sitio público · blog (WordPress) · bloque «Gráfico Efeonce» (`efeoncepro/chart`, plugin `efeonce-editorial-blocks`)
-> **Estado:** probado en WordPress local; **todavía no está en efeoncepro.com** (falta aprobación y despliegue)
+> **Estado:** en producción en efeoncepro.com desde el 2026-10-25 (plugin 0.9.0); ningún post publicado lo usa todavía
 > **Documentacion tecnica:** [Estilos editoriales del blog §Gráfico Efeonce](../../public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md)
 
 ## Para qué sirve
@@ -29,6 +29,7 @@ gráfico.
 
 ## Antes de empezar
 
+- El plugin `efeonce-editorial-blocks` tiene que estar en **0.9.0 o más** (en producción desde el 2026-10-25).
 - Ten la **fuente** de cada número. Si los datos son de ejemplo, escríbelo en la fuente («Ejemplo ilustrativo»).
 - Decide **qué quieres que el lector vea**: eso es el título. «Los clics se triplicaron en seis meses», no «Clics por
   mes».

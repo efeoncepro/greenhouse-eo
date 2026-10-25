@@ -1,11 +1,11 @@
 # Estilos editoriales del blog (bloques nativos de Gutenberg)
 
 > **Tipo de documento:** Contrato de diseño y uso
-> **Versión:** 1.8
+> **Versión:** 1.9
 > **Creado:** 2026-10-24 por Claude, a partir de la revisión del operador sobre los posts de inbound, paid media y topic clusters
-> **Código:** plugin `efeonce-editorial-blocks`, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`). Estilos desde 0.4.0 (`f9b0d4d`); diseño vigente 0.4.2 (`710f0d1`); línea por post 0.4.3 (`cab3864`). Las versiones 0.4.4 a 0.5.9 no cambian estos estilos; **0.6.0** (`cd1fe57`, 2026-10-25) suma la Tabla Efeonce, el Destacado v2 y el bloque de código; **0.8.0** (runtime `61251d1`, en producción desde el 2026-10-25) rehace el Destacado y suma Destacado claro, Cita y Cita clara
-> **Documentación funcional:** [recetas de autoría Gutenberg](../documentation/public-site/gutenberg-post-authoring-recipes.md) · **Manual:** [operar la Content Factory](../manual-de-uso/public-site/operar-public-site-content-factory.md#estilos-editoriales-y-preguntas-frecuentes) · [usar Destacados y Citas](../manual-de-uso/public-site/usar-destacados-y-citas.md)
-> **Estado:** en producción desde el 2026-10-24 (§En producción)
+> **Código:** plugin `efeonce-editorial-blocks`, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`). Estilos desde 0.4.0 (`f9b0d4d`); diseño vigente 0.4.2 (`710f0d1`); línea por post 0.4.3 (`cab3864`). Las versiones 0.4.4 a 0.5.9 no cambian estos estilos; **0.6.0** (`cd1fe57`, 2026-10-25) suma la Tabla Efeonce, el Destacado v2 y el bloque de código; **0.8.0** (runtime `61251d1`, en producción desde el 2026-10-25) rehace el Destacado y suma Destacado claro, Cita y Cita clara; **0.9.0** (runtime `fd16ab1`, en producción desde el 2026-10-25) suma el bloque Gráfico Efeonce (`efeoncepro/chart` 1.0.0)
+> **Documentación funcional:** [recetas de autoría Gutenberg](../documentation/public-site/gutenberg-post-authoring-recipes.md) · **Manual:** [operar la Content Factory](../manual-de-uso/public-site/operar-public-site-content-factory.md#estilos-editoriales-y-preguntas-frecuentes) · [usar Destacados y Citas](../manual-de-uso/public-site/usar-destacados-y-citas.md) · [usar gráficos](../manual-de-uso/public-site/usar-graficos-en-articulos.md)
+> **Estado:** en producción desde el 2026-10-24 (§En producción); Destacado y Cita desde 0.8.0 y Gráfico Efeonce desde 0.9.0, ambos el 2026-10-25
 > **Relacionado:** [preguntas frecuentes](BLOG_FAQ_BLOCK_ANALYSIS_V1.md) · `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
 
 ## Por qué existe
@@ -348,12 +348,12 @@ rich text: el remate va en un segmento `{ "text": "…", "strong": true }`. `var
 - **Rollback:** restaurar el `.tar` que imprimió el deploy (la versión anterior), purgar la caché y, si hace falta,
   el contenido de cada post desde su snapshot.
 
-## Gráfico Efeonce (bloque `efeoncepro/chart`, 2026-10-25, NO desplegado)
+## Gráfico Efeonce (bloque `efeoncepro/chart`, en producción: 0.9.0, 2026-10-25)
 
-Bloque dinámico para gráficos «fluidos» en los artículos: **diez tipos**, todos con la misma tabla de datos. Probado de
-punta a punta sólo en un WordPress local (Playground, WordPress 7.1): página publicada en escritorio y 390 px, editor
-de Gutenberg con vista previa en vivo y guardado sin «bloque inválido». **No está en producción**; el despliegue
-necesita la aprobación del operador. Manual: [usar gráficos en un artículo](../manual-de-uso/public-site/usar-graficos-en-articulos.md).
+Bloque dinámico para gráficos «fluidos» en los artículos: **diez tipos**, todos con la misma tabla de datos. Probado
+primero en un WordPress local (Playground, WordPress 7.1): página publicada en escritorio y 390 px, editor de Gutenberg
+con vista previa en vivo y guardado sin «bloque inválido». Aprobado por el operador y **en producción en
+efeoncepro.com desde el 2026-10-25** (§En producción 0.9.0). Manual: [usar gráficos en un artículo](../manual-de-uso/public-site/usar-graficos-en-articulos.md).
 
 ### Tipos
 
@@ -378,7 +378,7 @@ partes, de cada 100, Venn de tres, matriz 2×2, embudo), adaptados a la web, má
 - **Quién dibuja.** El editor del bloque es React (Gutenberg). El visitante **no** carga React: el gráfico lo pinta
   ECharts (SVG; línea, barra, torta, gauge y dispersión), compilado en greenhouse-eo (`src/editorial-chart-renderer/`,
   `pnpm renderer:editorial-chart:build`) y escrito en el plugin como `src/chart/view.js` (cargador, 1 KB) y
-  `engine.js` (~200 KB gzip). El cargador baja el motor sólo cuando un gráfico está a 300 px de la pantalla; la URL del
+  `engine.js` (~218 KB gzip, servido por la CDN de Kinsta con caché inmutable). El cargador baja el motor sólo cuando un gráfico está a 300 px de la pantalla; la URL del
   motor lleva su huella (`engine.js?v=<sha>`), así que una versión nueva no depende de purgar caché.
 - **Los datos están en el HTML.** `render.php` imprime título, bajada, una tabla con todas las cifras (en «Ver los
   datos»; la torta suma la participación, el Venn lista los círculos) y la fuente; el gráfico se pinta encima con el
@@ -412,5 +412,16 @@ partes, de cada 100, Venn de tres, matriz 2×2, embudo), adaptados a la web, má
 5. Las etiquetas de la matriz se colocan con un cálculo propio (la detección de choques de ECharts no ve etiquetas en
    la misma fila); si no caben, se numeran.
 
-**Pendiente para producción:** aprobación visual del operador, versión del plugin, despliegue y purga de caché de
-Kinsta.
+### En producción 0.9.0 (2026-10-25)
+
+- **Despliegue.** Con la aprobación del operador, runtime `fd16ab1` desplegado con
+  `pnpm public-website:blog-home deploy content-model --apply`. La lista de archivos del paquete
+  (`scripts/public-website/deploy-blog-v3-content-model-package.php`) ahora incluye `includes/chart/` y `src/chart/`.
+  Una simulación posterior mostró el sitio idéntico al paquete (46 archivos). Caché de Kinsta purgada a mano: el
+  despliegue del plugin no la purga.
+- **Verificación en vivo.** `view.js` y `engine.js` responden 200 en efeoncepro.com. Gráficos inyectados en local
+  sobre el post publicado `/aeo/seo-y-aeo/` se pintan con las fuentes reales de Ohio (título en Bricolage, texto en DM
+  Sans) en escritorio 1280 y 390 px, sin errores; el modo oscuro del sitio (`.dark-scheme`) repinta el gráfico en navy
+  `#001a33` sin recargar.
+- **Uso.** Ningún post publicado lo usa todavía; el primero se autora desde la spec (`kind: 'chart'`) o el editor.
+- **Rollback:** restaurar el `.tar` que imprimió el deploy y purgar la caché.

@@ -494,7 +494,12 @@ Bloques autorables por el primitive actual:
 - `pullquote`;
 - `separator`;
 - `image` con media real, caption opcional y `linkDestination: none|media`;
-- `embed` YouTube con URL aprobada.
+- `embed` YouTube con URL aprobada;
+- `chart` (Gráfico Efeonce, bloque `efeoncepro/chart`, plugin 0.9.0, en producción desde el 2026-10-25):
+  `{ kind: 'chart', chart, title?, caption?, sourceLabel?, sourceUrl?, tone? }`, diez tipos con la misma tabla
+  (filas × columnas de valores); bloque dinámico autocerrado, validado con `chart_data_invalid`,
+  `chart_attrs_unsupported`, `chart_not_self_closing` y `chart_tone_invalid`. Formas por tipo:
+  `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` §Gráfico Efeonce.
 
 **Estilos editoriales obligatorios (2026-10-24).** `pullquote` sale siempre con un estilo Efeonce: Destacado (la
 tesis, uno o dos por post, remate en `strong`) o, con `variant: "cita"` y `cite` obligatorio, Cita; `tone: "light"` da

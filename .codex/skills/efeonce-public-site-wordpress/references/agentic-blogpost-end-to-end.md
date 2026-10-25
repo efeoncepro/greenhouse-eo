@@ -90,6 +90,13 @@ use `variant: "cita"` only for a real attributed quote with `cite`. 1–2 per
 post, never consecutive. Rules and spec shape: `content-factory-gutenberg.md`
 → «Blog editorial styles».
 
+Charts (`efeoncepro/chart` «Gráfico Efeonce», 0.9.0, live 2026-10-25): use
+`kind: "chart"` only when a comparison, trend or share is clearer as a figure
+than as a sentence. Title = the conclusion, source always (illustrative data
+marked as such), one highlighted entity, `pie` only for ≤ 8 parts of a total.
+The numbers also ship as an HTML table. Ten kinds and limits:
+`content-factory-gutenberg.md` → «Gráfico Efeonce».
+
 For inline citations and contextual links:
 
 - represent content as structured `{ text, href? }` segments in supported
@@ -489,6 +496,7 @@ authorization; every future article needs its own rights decision (§1).
 - [ ] Link check found no confirmed broken links; unresolved responses were reviewed.
 - [ ] Callouts, pullquotes and drops were read against their neighbouring paragraphs; no sentence is repeated.
 - [ ] Each pullquote uses the right variant: Destacado for our thesis (bold landing phrase, no quotes), Cita only with a real author in `cite`.
+- [ ] Each chart has a conclusion title, a verifiable source, one highlighted entity and its «Ver los datos» table; it rendered in headless Playwright (desktop and 390 px).
 - [ ] A post created private and published later carries the publication date, read back from WordPress.
 - [ ] Playwright desktop and mobile passed render, TOC, image, console, and overflow checks.
 - [ ] Final anonymous robots, canonical, schema, Open Graph, and social image passed.

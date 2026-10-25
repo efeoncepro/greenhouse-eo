@@ -139,6 +139,24 @@ En efeoncepro.com el bloque de cita destacada tiene dos papeles que no se mezcla
 Forma del spec y estilos: `efeonce-public-site-wordpress` → `references/content-factory-gutenberg.md`; manual
 `docs/manual-de-uso/public-site/usar-destacados-y-citas.md`.
 
+### Gráficos del blog (2026-10-25)
+
+En efeoncepro.com los datos se muestran con el bloque «Gráfico Efeonce». Cuándo gana a la prosa:
+
+- **Usar gráfico** cuando la idea es una comparación, una tendencia, un reparto o un antes y después que en prosa
+  obliga a retener tres o más cifras. Si la idea cabe en una sola cifra que se lee de corrido, va en la frase (o en
+  un Destacado), no en un gráfico.
+- **El título es la conclusión, no el tema**: «El tráfico orgánico cayó 38 % tras el cambio de dominio», no
+  «Evolución del tráfico». El lector debe saber qué mirar antes de mirarlo.
+- **Una sola entidad destacada**: la que sostiene la conclusión; el resto es contexto.
+- **Fuente siempre**, en la línea de fuente del bloque (nombre y enlace https). Un dato ilustrativo se declara como
+  tal. Sin fuente verificable en el ledger de claims, el número no sale.
+- El párrafo vecino interpreta el gráfico (qué significa, qué hacer); no repite sus cifras una por una.
+- Torta sólo para partes de un total y hasta 8 partes.
+
+Tipos y forma del spec: `efeonce-public-site-wordpress` → `references/content-factory-gutenberg.md`; manual
+`docs/manual-de-uso/public-site/usar-graficos-en-articulos.md`.
+
 ### Casos
 
 Clasificar cada caso como `real`, `anonimizado`, `compuesto` o `hipotético` y hacerlo visible cuando la distinción

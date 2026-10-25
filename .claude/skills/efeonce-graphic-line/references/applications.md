@@ -707,6 +707,18 @@ esta skill el 2026-10-24:
   nunca para una tesis propia ni con autor inventado. 1–2 por post, nunca seguidas. Manual:
   `docs/manual-de-uso/public-site/usar-destacados-y-citas.md`; producción: `efeonce-public-site-wordpress` →
   `content-factory-gutenberg.md`.
+- **Gráfico Efeonce (aplicación aprobada 2026-10-25, `efeonce-editorial-blocks` 0.9.0, bloque `efeoncepro/chart`).**
+  Los gráficos dentro de un artículo del blog llevan la órbita así: el acento de la línea del post sólo en la
+  entidad decisiva (el resto en grises de contexto), la esfera sólo en el punto decisivo y una por pieza (en la
+  línea, el punto destacado; en la Medida, la punta del arco, que es el dato), el texto siempre en tinta y nunca en
+  el color de la serie, panel de papel con el halo del Destacado claro y navy `#001a33` en oscuro. Título = la
+  conclusión, fuente siempre, un solo destacado; los números también salen como tabla HTML («Ver los datos»). Diez
+  tipos: línea, columnas, ranking, torta (≤ 8 partes), embudo, antes y después, Medida en la órbita, de cada 100,
+  matriz 2 × 2 y Venn de tres. **Ojo:** es una implementación de Greenhouse y del plugin (motor ECharts), no el
+  módulo de AXIS `@efeoncepro/axis-graphic-line/charts` (gráficos SVG estáticos de Manzanitas), que sigue con la
+  decisión «charts-in-la-orbita» abierta; esta aprobación no cambia AXIS ni lo da por resuelto. Manual:
+  `docs/manual-de-uso/public-site/usar-graficos-en-articulos.md`; contrato:
+  `BLOG_EDITORIAL_BLOCK_STYLES_V1.md` §Gráfico Efeonce.
 - **Color:** sólo de `efeonceGraphicLine`: navy `#023c70` sobre papel `#f7f8f6`, blanco sobre `#001a33` en oscuro.
 - **Tipografía:** sigue la del artículo de Ohio (DM Sans e Inter) hasta que se migre la plantilla completa del
   artículo a Bricolage y Poppins (decisión del operador, 2026-10-24).
@@ -1378,6 +1390,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Mención Efeonce en texto corrido | ninguna (el isotipo ya es órbita) | isotipo + etiqueta corta en la píldora de la línea; sólo destinos Efeonce, no CTA | `efeonce.mention` (AXIS) · A14 |
 | Encabezado y navegación del sitio web (en vivo desde 2026-10-23) | — | logo 164/140, cápsula de vidrio, botón «Agenda tu diagnóstico» y hamburguesa con una sola receta de vidrio | `efeonce.site-nav` (AXIS primitives 0.7.13) · A15 |
 | Landing de servicio/agenda con el agendador nativo | órbita de retrato de Nexa en el hero | agendador real enmarcado, titulares con esfera (salvo el del hero), CTA `accent-growth`, firma del sitio | landing source-led + `<efeonce-meeting-scheduler>` · A17 |
+| Gráfico en un artículo del blog (web, 2026-10-25) | esfera sólo en el punto decisivo, una por pieza (en la Medida, la punta del arco) | acento sólo en la entidad decisiva, texto en tinta, panel papel con halo del Destacado claro, navy `#001a33` en oscuro, tabla HTML con los datos | `efeoncepro/chart` (plugin 0.9.0, ECharts; no es AXIS `charts`) · A18 |
 | Ficha de autor del blog (web) | pieza `portrait` de AXIS (la única esfera) | ficha oscura, nombre con punto tipeado en el acento, cargo, bio corta, isotipos oficiales de redes | `EO_Author_Profile` + `efeonce-editorial-blocks` · A19 |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Anuncio de alianza (post 4:5 + reel 9:16) | ninguna (la órbita fina sola no tiene punch) | fondo cine con horizonte bajo, íconos oficiales del partner en tres planos con acabado Sunburst, lockup «Efeonce \| Partner» con filete y fila de productos debajo; sin pregunta-respuesta | composición determinística + acabado `gpt-image-2.5-sunburst` · A16 |

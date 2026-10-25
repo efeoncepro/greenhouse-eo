@@ -23,6 +23,16 @@ can pick them in the block's «Styles» panel, and Content Factory emits them fr
 | Recuadro | `core/list` | 2–6 short items seen at once: common mistakes, «three things», the closing invitations (Glitch → tool, PDR-020 order), a cluster map | `{ "kind": "list", "style": "box" }` |
 | Pregunta frecuente | `core/details` | each question of the FAQ section; the plugin builds the `FAQPage` schema from these blocks, so the post carries no hand-written JSON-LD | `{ "kind": "faq", "items": [...] }` (default `schema.source: "plugin"`) |
 
+**Gráfico Efeonce** (`efeoncepro/chart`, since plugin 0.9.0, in production since 2026-10-25) is the one real custom
+block: a self-closing dynamic block with ten kinds (`line`, `column` grouped or stacked, `bar` ranking, `pie` donut,
+`funnel`, `before-after`, `measure`, `per-hundred`, `matrix` 2×2 on 0–10, `venn` of three with `centerLabel`), all fed
+by the same rows × value-columns table. The server prints the title, an accessible data table («Ver los datos») and the
+source, so search and answer engines read the figures without JavaScript. In the spec:
+`{ "kind": "chart", "chart": {...}, "title"?, "caption"?, "sourceLabel"?, "sourceUrl"?, "tone"? }`; validator codes
+`chart_data_invalid`, `chart_attrs_unsupported`, `chart_not_self_closing` and `chart_tone_invalid`. Shapes per kind:
+`docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` §Gráfico Efeonce; how to use it:
+`docs/manual-de-uso/public-site/usar-graficos-en-articulos.md`.
+
 Diagrams and square images go centered (`{ "kind": "image", "align": "center" }`). The accent color of every style is
 the **line of the post's topic** (Paid Media → Voice, HubSpot → Revenue, SEO → Engine), the same color as its card on
 the blog home; a post whose line differs from its category's is set with `pnpm public-website:blog-home line`. Rules,

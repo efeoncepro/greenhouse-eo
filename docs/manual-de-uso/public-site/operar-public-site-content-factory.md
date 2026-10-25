@@ -119,6 +119,10 @@ párrafos no se publica.
    - `{ "kind": "list", "style": "box", "items": [...] }` para 2 a 6 ítems cortos (Recuadro): errores frecuentes, el
      mapa de un cluster o las invitaciones del cierre (Glitch → herramienta).
    - `{ "kind": "image", …, "align": "center" }` para diagramas e imágenes cuadradas.
+   - `{ "kind": "chart", "chart": { "kind": …, "categories": [...], "series": [...] }, "title": "…", "sourceLabel": "…" }`
+     para un **Gráfico Efeonce** (plugin 0.9.0, en producción desde el 2026-10-25): diez tipos con la misma tabla; el
+     título es la conclusión y cada cifra lleva su fuente. Si los datos no calzan con el tipo falla
+     (`chart_data_invalid`). Tipos y tabla de cada uno: [usar gráficos en un artículo](usar-graficos-en-articulos.md).
    - `{ "kind": "faq", "items": [{ "question", "answer" }] }` para las preguntas frecuentes. No agregues JSON-LD: el
      plugin arma el `FAQPage` desde los bloques visibles. Dos preguntas iguales hacen fallar el render
      (`content_factory_article_faq_question_duplicated`).
