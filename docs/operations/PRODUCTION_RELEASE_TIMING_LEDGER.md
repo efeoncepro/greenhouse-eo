@@ -71,6 +71,14 @@ start = primera accion release-related del agente (leer/revisar/analizar cuenta)
 stop  = release comunicado con evidencia + docs/handoff actualizados
 ```
 
+## Preparación activa — Auth + Rooms, 2026-10-25
+
+- Coordinador: Codex Auth, con peer Rooms; inicio medido `2026-10-25T21:54:34Z`.
+- Estado: preparación; target final, release ID y run ID aún no asignados. No dispatch ni cierre.
+- Alcance: Auth first-party/OTP, migraciones1834/2067 y canary Rooms autorizado.
+- Tiempo E2E: en curso; incluye revisión, QA, infraestructura y coordinación.
+- Bloqueos observados: lint heredado en scripts gráficos; contener correos Growth del batch compartido; QA/cloud Rooms pendiente.
+
 ## Ledger
 
 ### Operación cerrada — Codex, 2026-10-13, PR #254

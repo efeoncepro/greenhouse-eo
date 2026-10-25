@@ -1,5 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
+
 const P = text => ({kind:'paragraph',text});
 const S = (heading,blocks,level=2) => ({heading,level,blocks});
 const link = (before,text,href,after='') => [{text:before},{text,href},{text:after}];
@@ -7,6 +8,7 @@ const root=__dirname;
 const mediaFile=path.join(root,'media-readback.json');
 const media=fs.existsSync(mediaFile)?JSON.parse(fs.readFileSync(mediaFile,'utf8')):null;
 const opening=media?.assets?.find(x=>x.role==='opening');
+
 const spec={
  title:'Efeonce es partner de Google Cloud: más posibilidades para conectar tu negocio con la nube y la inteligencia artificial',
  slug:'efeonce-partner-google-cloud',
@@ -72,7 +74,9 @@ const spec={
   ])
  ]
 };
+
 fs.writeFileSync(path.join(root,'articulo-spec.json'),JSON.stringify(spec,null,2)+'\n');
 const contract={manifestId:'efeonce-google-cloud-partner-announcement',authorId:1,categoryId:116,formatId:219,tagIds:[191,117],primaryCategoryId:116,slug:spec.slug,canonical:spec.seo.canonicalUrl,ogTitle:'Efeonce es partner de Google Cloud',ogDescription:'Una nueva etapa para conectar Google Cloud, Google Workspace y la inteligencia artificial con los proyectos de tu empresa.',schemaArticleType:'NewsArticle',focusPhrase:'Efeonce partner de Google Cloud',bannerActivation:false,targetStatus:'private'};
+
 fs.writeFileSync(path.join(root,'contrato-publicacion.json'),JSON.stringify(contract,null,2)+'\n');
 console.log(JSON.stringify({spec:'articulo-spec.json',mediaIncluded:!!opening,sections:spec.sections.length},null,2));

@@ -21,7 +21,7 @@ Referencias para montaje (no payload):
 
 - `projects/efeonce-group/secrets/rooms-production-auth-client-secret/versions/1` — consumidor Rooms.
 - `projects/efeonce-group/secrets/auth-server-rooms-invitation-otp-hmac/versions/1` — emisor Auth.
-- `rooms-production-invitation-authority-token` — creación por peer Rooms, pendiente; compartido sólo resolver/issuer.
+- `rooms-production-invitation-authority-token` versión1 — creado por peer Rooms; root añadió secretAccessor al SA Auth. Compartido sólo resolver/issuer.
 
 No crear `rooms.efeonce.org` por inferencia. Origen canary acordado: `https://efeonce-rooms.vercel.app`.
 Los comandos con credenciales se ejecutaron sin imprimir valores; nunca incorporar secretos/OTP/URL invitación al reporte.
@@ -43,3 +43,21 @@ montar referencias exactas, verificar configuración durable y servida, aplicar 
 canary único y revocación/rollback. El registro cliente y las migraciones no satisfacen esos gates.
 Schedulerrotación, simulacro masivo y steady7d permanecen abiertos; runbooks preparados, sin falsa ejecución.
 Privacidad técnicaV2 documentada sin declaración de cumplimiento ni contratación jurídica.
+
+## Configuración durable y contención del batch
+
+Seis variables GitHub repo-level registradas y leídas de vuelta: flags first-party/OTP false,
+RP `efeonce-rp-rooms-production`, origen `https://efeonce-rooms.vercel.app` y dos referencias de secretos
+versionadas `:1`. Las variables internas/multi-org preexistentes se conservan y coinciden con runtime.
+
+El batch pendiente también contiene el fix de correos de eventos `2a971d768`. Para impedir envíos ajenos
+al canary autorizado, `services/ops-worker/deploy.sh` prepara `GROWTH_EVENT_EMAILS_ENABLED=false` por defecto.
+Runtime previo ON no prueba correos efectivos; OFF servido queda pendiente del deploy y readback.
+El scheduler puede seguir invocando: el handler OFF retorna antes de consultar datos o enviar correo.
+
+`pnpm local:check` detectó errores de lint en dos scripts gráficos previamente trackeados.
+Se corrigen mecánicamente sin regenerar piezas; gates globales pendientes de repetir.
+
+Owner arquitectónico de la contención: `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`; cambia sólo el valor
+durable de un flag existente, sin nuevo contrato ni ADR. Vercel metadata: flag de eventos ausente
+en todos los targets listados del proyecto Greenhouse (default del lector OFF); no se leyeron payloads.

@@ -4,7 +4,7 @@
 
 ## 2026-10-25 — Auth: Rooms primero y login V4
 
-Foundation OIDC y login V4 locales; Greenhouse diferido2063. Consumer y guest OTP probados con navegador/PG.1833 en ejecución con evaluación propia, sin contratar pentest por decisión de Julio; corregido retorno inseguro magiclink, agregadas señales y wiring durable del deploy, senderOTP exclusivo sin tracking. Migraciones y registroRP preparados en cloud, gatesOFF y sin correo real. [Revisión y cobertura pendiente](docs/audits/auth-server/2026-10-25-independent-protocol-review.md).
+Foundation OIDC y login V4 locales; Greenhouse diferido2063. Consumer y guest OTP probados con navegador/PG.1833 en ejecución con evaluación propia, sin contratar pentest por decisión de Julio; corregido retorno inseguro magiclink, agregadas señales y wiring durable del deploy, senderOTP exclusivo sin tracking. Migraciones y registroRP preparados en cloud, gatesOFF y sin correo real. Release prepara correos de eventos OFF para no activar envíos ajenos; lint de dos scripts gráficos corregido sin regenerar piezas. [Revisión y cobertura pendiente](docs/audits/auth-server/2026-10-25-independent-protocol-review.md).
 
 ## 2026-10-25 — Rooms: contenido versionado y contrato de invitación
 
