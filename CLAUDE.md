@@ -767,24 +767,7 @@ Toda respuesta de error API que cruce al cliente **debe** usar el helper canóni
 
 ### Auth en server components / layouts / pages — patrón canónico
 
-- **NUNCA** llamar `getServerAuthSession()` directo desde un layout o page con `try/catch + redirect` ad hoc. Usar siempre los helpers canónicos de `src/lib/auth/require-server-session.ts`:
-  - `requireServerSession(redirectTo = '/login')` — para layouts/pages que **requieren** sesión activa. Si no hay session, redirige; si hay, devuelve `Session` non-null.
-  - `getOptionalServerSession()` — para pages que opcionalmente quieren saber si hay sesión (login, landing pública). Devuelve `Session | null`. La decisión de redirect queda al caller.
-- **Razón**: ambos helpers detectan el `DYNAMIC_SERVER_USAGE` que Next.js lanza durante prerender (cuando NextAuth lee cookies/headers via SSG) y lo re-lanzan correctamente para que Next marque la ruta como dynamic — en lugar de loggearlo como `[X] getServerAuthSession failed:` que ensucia los logs de build y enmascara errores reales.
-- **Combinar con `export const dynamic = 'force-dynamic'`** en cada page/layout que consuma sesión — evita que Next intente prerender la ruta en build phase.
-- Patrón canónico:
-  ```ts
-  import { requireServerSession } from '@/lib/auth/require-server-session'
-
-  export const dynamic = 'force-dynamic'
-
-  const Layout = async ({ children }) => {
-    const session = await requireServerSession()
-    // session.user es non-null acá
-    return <Providers session={session}>{children}</Providers>
-  }
-  ```
-- API routes (`route.ts`) siguen usando `getServerAuthSession()` directo — no necesitan los wrappers porque las routes son siempre dynamic por default y el manejo de error es distinto (return 401 JSON, no redirect).
+Cargar [helpers, prerender y ejemplo canónico](docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md#auth-en-server-components--layouts--pages--patrón-canónico) antes de tocar sesión en layouts/pages.
 
 ### Agent Auth (acceso headless para agentes y E2E)
 
@@ -1034,7 +1017,7 @@ Estos CLIs están autenticados localmente. Cuando una task toca su dominio, **ú
 
 ### Auth resilience — invariantes (TASK-742)
 
-Las **7 capas defensivas** del flujo de autenticación (formato de secretos · readiness · ledger `auth_attempts` · magic-link · CHECK de `auth_mode` · rotación con verify-before-cutover · observabilidad) viven en **`docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` → §`Auth resilience`**. **NUNCA** poner `signInAudience` de la Azure App en `AzureADMyOrg` (Greenhouse es multi-tenant: rompe SSO para todos — pasó el 2026-04-30; el canónico es `AzureADMultipleOrgs`); **NUNCA** rotar un secret de auth a mano (usar `pnpm secrets:rotate`, que hace verify-before-cutover y revierte solo); **NUNCA** computar la salud de SSO en el cliente (`/api/auth/health` es el único source of truth). Auditor de drift: `pnpm auth:audit-azure-app`.
+Cargar las [7 capas defensivas y reglas de auth/SSO](docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md#auth-resilience-invariants-task-742) antes de cambiar login, secrets o Azure App.
 
 ### UI/feature platforms — invariantes (home rollout TASK-780, nexa insights detail TASK-947, quick access TASK-553, table density TASK-743, final settlement TASK-863, real-artifact loop TASK-863, semantic column TASK-863, sample sprints runtime TASK-835, account-360 facet readers TASK-1059)
 
