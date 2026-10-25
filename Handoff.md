@@ -1,5 +1,9 @@
 # Handoff
 
+## 2026-10-25 — Rooms: autoría V2 verificada y acceso coordinado
+
+Runtime e72ad65 incorpora autoría V2;66testsPASS0skip, lint/types/build y migración down/up/restore mixto V1/V2 PASS. TASK-2062 cierre local; demo pública sigue bd4b802. TASK-2065 consumerOIDC interno en implementación con peerAuth1834/2064. TASK-2066 prepara invitaciones: UN correo Resend trae enlace tokenizado+código, cliente pega código EN Rooms; issuer2067 verifica/envía y Rooms conserva sesión guest limitada. No SSO global por OTP, no emails reales enviados, sin DB cloud. GoalEPIC-052 abierto. Índices README/registry compartidos coordinados con peerAuth, no mezclar su WIP. [Auditoría](docs/audits/rooms/2026-10-25-versioned-content-authoring.md).
+
 [Historial](Handoff.archive.md).
 
 ## 2026-10-25 — Rooms: persistencia, motion y primer release

@@ -60,7 +60,11 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 ## Child Tasks
 
-[TASK-2062](../../tasks/in-progress/TASK-2062-rooms-versioned-content-authoring.md): R03B, manifest versionado, autoría programática y cobertura antes de publicar; R05 medios y R08 editor conservan alcance propio.
+[TASK-2065](../../tasks/in-progress/TASK-2065-rooms-efeonce-id-consumer.md): consumidor OIDC interno; foundation1834/login2064.
+
+[TASK-2066](../../tasks/to-do/TASK-2066-rooms-tokenized-invitations-email-code.md): invitación por correo único enlace+código, input Rooms y sesión guest; OTPissuer2067.
+
+[TASK-2062](../../tasks/complete/TASK-2062-rooms-versioned-content-authoring.md): R03B, manifest versionado, autoría programática y cobertura antes de publicar; R05 medios y R08 editor conservan alcance propio.
 
 Continuidad autorizada por /goal 2026-10-25: [TASK-2060](../../tasks/complete/TASK-2060-rooms-persistence-and-lifecycle.md) agrega persistencia/ciclo durable local. TASK-2059 suma View Transitions y adopción de badges/botones AXIS; aceptación visual sigue pendiente.
 
@@ -232,3 +236,20 @@ TASK-2058 complete para foundation/can local; TASK-2059 implementada, QA PASS y 
 ### 2026-10-25 — Continuidad, persistencia local y primera publicación
 
 Goal explícito, View Transitions/AXIS y publicación autorizados por Julio. TASK-2060 complete: ciclo durable PostgreSQL local, permisos persistidos, idempotencia/concurrencia, auditoría/outbox y restore. TASK-2059 añade motion nativo y componentes AXIS; QA local/remoto PASS, aceptación humana pendiente. TASK-2061 publica [demo Vercel](https://efeonce-rooms.vercel.app/demo) y [repo privado GitHub](https://github.com/efeoncepro/efeonce-rooms), SHA `bd4b802`, deployment `dpl_8vJ75Cbn1q75JNe7FEa7LkUccigc`. Efeonce ID no cumple todavía el contrato first-party: TASK-1834 pendiente, API real401. No DB cloud, usuarios reales ni cierre V1 inferidos. [Auditoría del corte](../../audits/rooms/2026-10-25-persistence-motion-release.md).
+
+
+## Avance 2026-10-25 — autoría V2 y acceso por invitación
+
+TASK-2062 cierra autoría backend/API/CLI local: borradores V2, bloques/relaciones, import preview/apply,
+coverage y publicación textual, preservando ediciones V1.66 pruebas PASS sin skip y recovery/rollback
+mixto verificados. No cierra R03 completo (escenarios/tours), R05 medios ni R08 editor.
+
+- [TASK-2065](../../tasks/in-progress/TASK-2065-rooms-efeonce-id-consumer.md): OIDC interno sobre foundation
+  Auth1834 y loginV4 del issuer2064. Implementación local en curso, sin activación pública.
+- [TASK-2066](../../tasks/to-do/TASK-2066-rooms-tokenized-invitations-email-code.md): enlace con token y código
+  generado en UN correo inicial Resend; cliente pega código EN Rooms. Issuer2067 genera/verifica/envía OTP;
+  Rooms conserva invitación/sesión guest limitada, expiry/revoke y permisos. No requiere SSO global ni da acceso
+  a otras salas. Contrato aceptado, implementación pendiente; no mensajes a clientes por registrar el flujo.
+
+Aceptación visual2059 y resto deR01–R15 siguen abiertos. Demo pública conserva SHA bd4b802; código localnuevo
+no implica despliegue. [Evidencia2062](../../audits/rooms/2026-10-25-versioned-content-authoring.md).

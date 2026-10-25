@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-052`
-- Status real: `Discovery y alcance R03B aprobados; registro y task-hook pendientes antes de código`
+- Status real: `Implementación local completa en e72ad65:66testsPASS0skip, lint/typecheck/build, down/up en clon y recovery mixto con reinicio PASS. Evidencia docs/audits/rooms/2026-10-25-versioned-content-authoring.md. API real cerrada hasta2065; sin release nuevo ni editor/media`
 - Rank: `TBD`
 - Domain: `platform|data|content|identity`
 - Blocked by: `none`
@@ -282,16 +282,16 @@ Efeonce ID/RP y storage/media quedan en owners separados. Para este corte local 
 
 ## Acceptance Criteria
 
-- [ ] DraftManifestV2 permite sala vacía/incompleta y perfiles creativo/SEO-AEO independientes sin contenido inventado.
-- [ ] Bloques/relaciones/evidence/AssetVersionRef tienen schemas cerrados, IDs/anclas estables y procedencia explícita; tipos desconocidos se reportan sin pérdida silenciosa.
-- [ ] Dos marcas ficticias y creativo-only/editorial-only/combinado ejercitan importación/readback y resultados de coverage esperados.
-- [ ] Import preview no muta; apply/upsert/arrange/linkEvidence respetan idempotencia, expectedRevision y autoridad persistida, con audit/outbox atómicos.
-- [ ] Publicar V2 recalcula coverage y rechaza referencias rotas, assets requeridos sin ready y exclusiones sin razón; publish textual completo demuestra el camino positivo sin fingir pipeline.
-- [ ] Lector V1 conserva exactamente snapshots/hashes existentes; lector/proyección V2 es explícito y no filtra notas, grants ni evidencias no autorizadas.
-- [ ] Migración aditiva creada por CLI, destinos de escritura propios, down/up en fixture y restore mixto V1/V2 verificados; sin modificar migración aplicada ni snapshots históricos.
-- [ ] API/CLI consumen primitives/registry compartidos; capabilities y SQL permanecen en paridad, y las rutas reales siguen denegando sin Efeonce ID.
-- [ ] Pruebas negativas de tenants, roles, expiry/revoke, tamaño/payload, unsupported, lost updates, replay y rollback pasan contra PG real.
-- [ ] Lint, typecheck, tests y build pasan; docs técnicas/funcionales/manuales registran qué quedó implementado y qué permanece en R04/R05/R08/R13.
+- [x] DraftManifestV2 permite sala vacía/incompleta y perfiles creativo/SEO-AEO independientes sin contenido inventado.
+- [x] Bloques/relaciones/evidence/AssetVersionRef tienen schemas cerrados, IDs/anclas estables y procedencia explícita; tipos desconocidos se reportan sin pérdida silenciosa.
+- [x] Dos marcas ficticias y creativo-only/editorial-only/combinado ejercitan importación/readback y resultados de coverage esperados.
+- [x] Import preview no muta; apply/upsert/arrange/linkEvidence respetan idempotencia, expectedRevision y autoridad persistida, con audit/outbox atómicos.
+- [x] Publicar V2 recalcula coverage y rechaza referencias rotas, assets requeridos sin ready y exclusiones sin razón; publish textual completo demuestra el camino positivo sin fingir pipeline.
+- [x] Lector V1 conserva exactamente snapshots/hashes existentes; lector/proyección V2 es explícito y no filtra notas, grants ni evidencias no autorizadas.
+- [x] Migración aditiva creada por CLI, destinos de escritura propios, down/up en fixture y restore mixto V1/V2 verificados; sin modificar migración aplicada ni snapshots históricos.
+- [x] API/CLI consumen primitives/registry compartidos; capabilities y SQL permanecen en paridad, y las rutas reales siguen denegando sin Efeonce ID.
+- [x] Pruebas negativas de tenants, roles, expiry/revoke, tamaño/payload, unsupported, lost updates, replay y rollback pasan contra PG real.
+- [x] Lint, typecheck, tests y build pasan; docs técnicas/funcionales/manuales registran qué quedó implementado y qué permanece en R04/R05/R08/R13.
 
 ## Verification
 
@@ -302,11 +302,11 @@ Efeonce ID/RP y storage/media quedan en owners separados. Para este corte local 
 
 ## Closing Protocol
 
-- [ ] Lifecycle y carpeta sincronizados con aceptación y evidencia reales.
-- [ ] README/registry de tasks y EPIC-052 actualizados por el coordinador.
-- [ ] Handoff/changelog y ADR/arquitectura reflejan contrato vigente y límites.
-- [ ] Manual y documentación funcional actualizados; reporte claro de medios/identidad pendientes.
-- [ ] Impacto cruzado sobre lectores V1, demo y futuros media/editor verificado.
+- [x] Lifecycle y carpeta sincronizados con aceptación y evidencia reales.
+- [x] README/registry de tasks y EPIC-052 actualizados por el coordinador.
+- [x] Handoff/changelog y ADR/arquitectura reflejan contrato vigente y límites.
+- [x] Manual y documentación funcional actualizados; reporte claro de medios/identidad pendientes.
+- [x] Impacto cruzado sobre lectores V1, demo y futuros media/editor verificado.
 
 ## Follow-ups
 
@@ -314,3 +314,7 @@ Efeonce ID/RP y storage/media quedan en owners separados. Para este corte local 
 - R08: editor visible y preview usando el mismo renderer, sobre este contrato; requiere UX/GVC aparte.
 - R04: RP Efeonce ID y autoridad real; depende de TASK-1834 y su rollout, no de un bypass local.
 - R13: transporte MCP y equivalencia durable; owner Platform, retirada de deuda al registrar provider y certificar el ciclo.
+
+## Evidencia de cierre 2026-10-25
+
+Todos los criterios de este corte local se verifican en [auditoría2062](../../audits/rooms/2026-10-25-versioned-content-authoring.md); runtimecommit e72ad65. Ningún criterio acredita integraciónAuth ni publicacióncloud; esas unidades permanecen abiertas.

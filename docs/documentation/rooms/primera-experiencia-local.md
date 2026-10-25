@@ -15,3 +15,16 @@ PostgreSQL propio conserva salas, borradores, ediciones, autoridad y recibos. Ca
 La API y CLI incluyen el carril durable `/api/v1` y comparten commands/readers. **Todavía no existe una sesión Efeonce ID conectada:** las rutas reales responden401. El selector de persona pertenece sólo a la demo de lectura y nunca habilita escrituras. El ciclo se ha ejercitado mediante herramientas locales y harness de pruebas con autoridad sintética; no supone adopción por un cliente, login real ni base de datos cloud. La autoría visual completa y la invitación de personas siguen pendientes.
 
 [Contrato detallado](../../architecture/rooms/EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md) · [Manual local](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) · [Persistencia y evidencia TASK-2060](../../tasks/complete/TASK-2060-rooms-persistence-and-lifecycle.md) · [QA de primera experiencia](../../audits/rooms/2026-10-25-first-local-delivery.md). [Demo pública](https://efeonce-rooms.vercel.app/demo) y [repo privado](https://github.com/efeoncepro/efeonce-rooms), TASK-2061. Deploy `dpl_8vJ75Cbn1q75JNe7FEa7LkUccigc`/SHA `bd4b802`: el hosting sirve la muestra, no la DB local ni el carril autenticado.
+
+
+## Contenido editable V2 (TASK-2062, local)
+
+La base permite guardar un borrador incompleto, importar contenido estructurado, editar y ordenar bloques,
+y relacionar fragmentos con evidencia. Antes de publicar calcula un reporte que identifica faltantes,
+referencias rotas, elementos no soportados y exclusiones. La publicación textual V2 está probada; los medios
+siguen pendientes del pipeline R05 y no se presentan como archivos listos por tener un identificador.
+
+Este avance es backend/API/CLI: no añade todavía un editor visual. Dos marcas sintéticas verifican perfiles
+creativo, SEO/AEO y combinado. Los lectores mantienen las ediciones V1 originales. Identidad, invitaciones,
+medios y renderer/editor V2 conservan sus unidades abiertas. [Manual](../../manual-de-uso/rooms/operar-primera-experiencia-local.md)
+y [evidencia](../../audits/rooms/2026-10-25-versioned-content-authoring.md).

@@ -1,5 +1,9 @@
 # changelog.md
 
+## 2026-10-25 — Rooms: contenido versionado y contrato de invitación
+
+Autoría V2 local: borradores incompletos por perfil, importación previa con reporte, bloques/relaciones y publicación textual validada.66 pruebas y recuperación histórica PASS; sin editor/medios nuevos ni activación pública. Contrato elegido de acceso invitado: un correo Resend con enlace+código, entrada en Rooms, vencimiento y revocación; implementación coordinada2066/2067. [Evidencia](docs/audits/rooms/2026-10-25-versioned-content-authoring.md).
+
 [Historial interno](docs/changelog/internal/README.md).
 
 ## 2026-10-25 — Rooms: base durable, experiencia por rol y motion (TASK-2058/2059/2060)

@@ -124,3 +124,21 @@ Límites de esta implementación: el resumen `permissionRows`/`access` del works
 TASK-2060 implementa commands `rooms.create`, `rooms.updateDraft`, `editions.publish`, `editions.reopen`, `rooms.archive`, `access.grant` y `access.revoke` en `src/server/commands/execute.ts`; readers persistidos en `src/server/persistence/readers.ts`. HTTP `/api/v1/commands` y CLI `execute` consumen el mismo primitive. `rooms.create`/`editions.reopen` amplían capabilities a11, con grants acotados y autoridad persistida revalidada por transacción. Pruebas con PostgreSQL local, rollback, idempotencia y restore; API de producción401 mientras Efeonce ID dependa de TASK-1834. TASK-2061 publica sólo demo sintética.
 
 TASK-2062 prepara contenido v2 para autoría y mantiene snapshots v1. Importar/editar/ordenar/vincular evidencia será dominio durable, no click handler ni almacenamiento sólo en navegador. Publicación exige validación de integridad/cobertura y resolución de medios; metadata declarada no verifica bytes ni claims remotos. Su implementación y evidencia se registran en la task, sin ampliar el alcance completado de2060.
+
+
+## Implementación local TASK-2062 y siguiente acceso
+
+Desde runtime e72ad65, `rooms.content.v2` permite borradores incompletos y perfiles independientes;
+`rooms.room.v2`/`rooms.renderer.v2` identifica snapshots sin reinterpretar V1. Commands content.importManifest,
+content.upsertBlock, content.arrange y content.linkEvidence comparten autoridad/revisión/idempotencia/audit/outbox.
+Readers previewContentImport y validateDraft exponen coverage con revisión/hash; GET validation y POST
+validate-import son lecturas, no acreditan permiso futuro de publicar. Publication recalcula en transacción.
+Referencias de medios permanecen unresolved hastaR05; fuentes author-declared/unverified y datos sintéticos.
+API/CLI y recovery mixto verificados; no editor ni nueva publicacióncloud.
+
+R04 se divide en consumerOIDC interno2065 y guest invitations2066. Foundationissuer1834 y loginV42064
+son deAuth; OTP2067 se rige por [ADR correo único](../EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md).
+Cada room conserva ID estable; cada invitación tiene token opaco revocable, destinatario/version/vigencia.
+UN correo Resend contiene enlace y código; Rooms muestra input y verifica S2S. No se presenta como MFA ni
+sesión SSOglobal; proof delissuer tieneaud/RP/invitación/nonce/jti y consumoúnico local. El rol invitado sólo
+lee publicado autorizado. Identidad propia para operador usa OIDC y bindingexplícito, nunca tokensMCP.
