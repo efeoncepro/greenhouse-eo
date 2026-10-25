@@ -122,7 +122,7 @@ consideración de diseño, no como requisito ni garantía de cita.
   no 40-60: si escribes 40-60, es craft tuyo — ese número **no lo respalda**.
 - **🟢 EL H2 ES LA PALANCA CON MEJOR EVIDENCIA, y casi nadie lo dice.** Sobre **1,4M de prompts**,
   Ahrefs midió que lo que más separa a una página **citada** de una **recuperada-y-no-citada** es la
-  **relevancia semántica del TÍTULO** frente a la sub-pregunta (**0,656** vs **0,484**). En ese mismo
+  **relevancia semántica del TÍTULO** frente a la pregunta (**0,602** citada vs **0,484** no citada; el «0,656» que circula es sub-pregunta → título citado y no es comparable, corregido 2026-10-25 contra ahrefs.com/blog/why-chatgpt-cites-pages/). En ese mismo
   estudio **la cápsula no aparece entre los predictores**. → **Escribe cada H2 como la pregunta
   literal de una subpregunta.** Es una asociación observada en ese estudio, no
   evidencia de que cada encabezado deba copiar literalmente consultas de Google.
