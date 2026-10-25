@@ -2,9 +2,9 @@
 
 **Nombre y subdominio acordados:** Efeonce Rooms · `rooms.efeonce.org`.
 **Propósito:** experiencia comercial y conversión de demanda; ayuda al comprador a comprender, evaluar y defender una solución. Sirve a propuestas creativas y SEO/AEO, combinables en una sala. Puede abrir conversaciones mediante muestras o diagnósticos personalizados.
-**Estado al 2026-10-25:** primera entrega local verificada; TASK-2058 complete, TASK-2059 en revisión visual humana. Logo/stack y consumidor ejecutados con evidencia. Sin DNS, provisión ni despliegue de Rooms.
+**Estado al 2026-10-25:** foundation y persistencia PostgreSQL local verificadas; TASK-2059 incorpora View Transitions y componentes AXIS, con aceptación visual humana pendiente. Repositorio privado [efeoncepro/efeonce-rooms](https://github.com/efeoncepro/efeonce-rooms) creado; [Demo publicada en Vercel](https://efeonce-rooms.vercel.app/demo), TASK-2061; commit `bd4b802`, deployment `dpl_8vJ75Cbn1q75JNe7FEa7LkUccigc`. Efeonce ID depende de TASK-1834; sin DB cloud ni DNS propio activados.
 
-**Programa:** [EPIC-052 — Efeonce Rooms](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md), `in-progress`: quince unidades de planificación; dos tasks para la primera entrega local autorizada, con permisos can y vistas cliente/operador/administrador. La épica es dueña de secuencia, dependencias y cierre; estos documentos conservan los contratos de producto/arquitectura.
+**Programa:** [EPIC-052 — Efeonce Rooms](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md), `in-progress`: quince unidades de planificación; cuatro tasks para foundation, UI, persistencia local y primer release autorizado, con permisos can y vistas cliente/operador/administrador. La épica es dueña de secuencia, dependencias y cierre; estos documentos conservan los contratos de producto/arquitectura.
 
 **Design system decidido (2026-10-07): La órbita**, gobernado por [efeonce-graphic-line](../../../.codex/skills/efeonce-graphic-line/SKILL.md); Bricolage editorial/Poppins funcional en todas las superficies de Rooms. AXIS distribuye sus recursos y contratos. La primera composición local está implementada y su aceptación visual humana sigue pendiente; las piezas conservan su diseño.
 
@@ -30,7 +30,7 @@ Las decisiones de producto y contratos viven en estos documentos; el nombre fina
 
 Antecedentes: [frontera comercial aceptada](../sales-enablement/EFEONCE_SALES_ENABLEMENT_PLATFORM_DECISION_V1.md) e [investigación técnica inicial](../../think/creative-proposal-experience-stack-analysis-2026-10-07.md). La solución genérica anterior queda reemplazada por este dossier. Los productos actuales conservan su runtime.
 
-Próximo checkpoint: revisar la primera sala local. [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md), [manual de operación](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) y [QA](../../audits/rooms/2026-10-25-first-local-delivery.md). Identidad real, persistencia y rollout siguen en EPIC-052.
+Próximo checkpoint: revisar la sala publicada y continuar editor/medios; Efeonce ID requiere TASK-1834 antes de usuarios reales. [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md), [manual de operación](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) y [QA](../../audits/rooms/2026-10-25-first-local-delivery.md). Identidad real, persistencia cloud y piloto con clientes siguen en EPIC-052; la persistencia local ya tiene commands transaccionales y recuperación probada.
 
 ## Verificación documental 2026-10-07
 

@@ -2645,6 +2645,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-2058` | `complete` | **Rooms: foundation ejecutable y permisos can**. EPIC-052; primera entrega local autorizada 2026-10-25, permisos can y vistas por rol. | `docs/tasks/complete/TASK-2058-rooms-foundation-and-permissions.md` |
 | `TASK-2059` | `in-progress` | **Rooms: primera sala y vistas por rol**. EPIC-052; primera entrega local autorizada 2026-10-25, permisos can y vistas por rol. | `docs/tasks/in-progress/TASK-2059-rooms-first-experience.md` |
+| `TASK-2060` | `complete` | **Rooms: persistencia y ciclo de salas**. EPIC-052 R03/R04; PostgreSQL propio y commands locales. | `docs/tasks/complete/TASK-2060-rooms-persistence-and-lifecycle.md` |
+| `TASK-2061` | `complete` | **Rooms: repositorio GitHub y publicación Vercel**. EPIC-052; release público de demo autorizado por operador. | `docs/tasks/complete/TASK-2061-rooms-github-vercel-release.md` |
 
 > Registro 2026-10-18: TASK-2039 reservada (paraguas: landings que alimentan su Growth Form con señales de la página; pedido del operador tras el prototipo de la landing de inbound). Barrido por dominio/superficie (Growth Forms renderer `initial-values`, hosts WordPress, destinos HubSpot): TASK-2038 es dueña de mover la fuente del renderer a AXIS y TASK-1359 de la instrumentación multipaso; ninguna posee la API de señales ni el patrón de precarga desde la landing. Hijas A/B/C por crear. Siguiente ID libre TASK-2040.
 
@@ -2684,3 +2686,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro 2026-10-24: TASK-2057 reservada por pedido del operador (sesión «Blog author plugin y vistas»): ficha de autor del single, byline y schema de autor. Barrido por dominio/superficie (single de WordPress, widget `ohio_widget_about_author`, `page_headline.php`, `EO_Home_Readers::author_photo`, schema Person de Yoast, `docs/ui/`): TASK-2055 es dueña del archivo de autor (consume el mismo lector, Delta cuando ocurra); TASK-2042 del paquete del tema (suma `page_headline.php`); ninguna task posee el single ni la ficha. Siguiente ID libre TASK-2058.
 
 > Registro 2026-10-25: TASK-2058/2059 reservadas para EPIC-052 por autorización del operador. Barrido Rooms/salas/autoría/permisos: ninguna task previa dueña. Foundation backend-data y consumidor ui-ux separados. Siguiente ID libre TASK-2060.
+
+> Registro 2026-10-25: TASK-2060 por goal explícito de continuar Rooms. Barrido por dominio/superficie: TASK-2058 cerrada es foundation read-only, TASK-2059 conserva UI; ninguna posee persistencia/commands. Siguiente ID libre TASK-2061.
+
+> Registro 2026-10-25: TASK-2061 para GitHub privado/Vercel Rooms, autorizado explícitamente por el operador. Sin dueña previa de release; TASK-2059 UI y TASK-2060 persistencia local conservan alcance. Siguiente ID libre TASK-2062.

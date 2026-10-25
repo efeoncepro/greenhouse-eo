@@ -2,11 +2,12 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
-## 2026-10-25 — Rooms: primera base local y experiencia por rol (TASK-2058/2059)
+## 2026-10-25 — Rooms: base durable, experiencia por rol y motion (TASK-2058/2059/2060)
 
 - Nuevo runtime `efeonce-rooms`: contratos y permisos `can` por organización/sala/edición; jerarquías cliente, operador y administrador con grants, vigencia y denegación por defecto.
 - Primera sala creativa y SEO/AEO con La órbita/AXIS, visor de piezas, lectura/radiografía y workspace interno; refinada con Product Design. [Superficie implementada](docs/documentation/rooms/primera-experiencia-local.md) y [manual local](docs/manual-de-uso/rooms/operar-primera-experiencia-local.md).
-- Muestra sintética para revisión; Efeonce ID, persistencia, rollout y aceptación visual humana pendientes. [Evidencia de QA](docs/audits/rooms/2026-10-25-first-local-delivery.md).
+- PostgreSQL local independiente: crear, editar, publicar, reabrir, archivar y grants; revisiones/idempotencia, auditoría/outbox y recuperación con restore verificados (TASK-2060).
+- View Transitions nativas progresivas, botones/badges AXIS y logo con ratio intrínseco. Muestra sintética; Efeonce ID (TASK-1834), DB cloud y aceptación visual humana pendientes. TASK-2061 publica [la demo](https://efeonce-rooms.vercel.app/demo) con repo privado GitHub vinculado y smoke externo. [QA inicial](docs/audits/rooms/2026-10-25-first-local-delivery.md).
 
 ## 2026-10-25 — Criterio reutilizable para nuevas conversaciones comerciales
 

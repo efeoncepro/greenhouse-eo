@@ -13,3 +13,7 @@ Capturar apertura/cierre y cambio de capítulo con reduced motion y preferencia 
 ## Evidencia de implementación
 
 Dialog AXIS conserva Escape/focus restore. El adapter coloca foco inicial en título y scroll0 para que una radiografía extensa no abra mostrando su cierre. En móvil el cierre superior evita obligar a recorrer el contenido. El desplazamiento entre capítulos respeta reduced motion; no hay autoplay ni animación del logo.
+
+## Delta 2026-10-25 — View Transitions
+
+Adoptar transición progresiva de rutas/detalle según APIs estables verificadas del stack y exports AXIS. El estado y los permisos no dependen de la animación. Reduced motion y navegador sin soporte conservan cambio inmediato; cancelación y clics consecutivos no bloquean navegación ni foco. No capturar vistas privadas en transiciones de cambio de rol/sesión. Nombres únicos por pieza; foco/scroll y Escape se prueban en ambos modos. Documentar API elegida y compatibilidad real antes de code; no activar flags experimentales por inferencia.

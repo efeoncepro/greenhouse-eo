@@ -130,3 +130,11 @@ TS7 hace typecheck independiente después de `next typegen`; Next build y typesc
 Primera instalación limpia379 paquetes, peers estrictos, luego `pnpm install --frozen-lockfile` exitoso. AXIS se descarga del registry privado, no se enlaza al repo hermano; esbuild/unrs-resolver tienen scripts de build explícitamente permitidos. Logo: copias exactas con SHA256 desde brand-assets. Las dependencias históricas de graphic-line permanecen fijadas por su propio paquete, sin override arbitrario.
 
 Lint, negativo, tipos, tests y build local verificados; evidencia visual y matriz de navegador en [auditoría](../../audits/rooms/2026-10-25-first-local-delivery.md). No hay CI, deployment ni certificación de todos los navegadores por este resultado. [Manual reproducible](../../manual-de-uso/rooms/operar-primera-experiencia-local.md).
+
+## 9. Persistencia, motion y hosting — TASK-2060/2061, 2026-10-25
+
+PostgreSQL local18.6, pg8.23.1/@types-pg8.23.1 y node-pg-migrate9.0.0 fijados. Lockfile actualizado410paquetes; 40pruebas de dominio/transporte aprobadas sin skips con DB local disponible. React ViewTransition estable consumida progresivamente; no flag experimental ni dependencia Motion adicional.
+
+Preview Vercel `dpl_FvEsVJKHburHS3XsBx78xnisbQCS` y candidato production preparado `dpl_FASTjo81xf8v8UES2MUZZbJRsAo9`: instalación frozen/controles supply-chain, Next16.4.3, pnpm12.15.0, AXIS y build remoto PASS. Node gestionado24.x confirmado por API de proyecto y deployment; patch del proveedor no afirmado. La CLI local emite aviso al parsear el lockfile multi-documento de pnpm12, pero el instalador remoto lo reconoce y valida íntegro; no se reescribe el lockfile para silenciarlo.
+
+Build iad1, Functions gru1. Los secretos de paquetes permanecen sensibles en el proveedor; localDB/.auth excluidos del tracing y upload. [Evidencia y estado del release](../../audits/rooms/2026-10-25-persistence-motion-release.md). Estos builds no acreditan identidad real, PostgreSQL cloud ni compatibilidad con todos los navegadores.

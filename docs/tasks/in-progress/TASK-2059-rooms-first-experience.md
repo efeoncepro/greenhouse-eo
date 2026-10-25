@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2059-rooms-first-experience-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-052`
-- Status real: `UI local refinada con Product Design;25 E2E y GVC4viewports/68frames PASS; aceptación visual humana pendiente`
+- Status real: `UI refinada con Product Design, AXIS y View Transitions;41 E2E +16 motion/authority,8 contraste y24 burst/foco PASS; GVC4viewports/68frames sin findings; aceptación visual humana pendiente`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`
@@ -279,6 +279,10 @@ Ninguna para contenido sintético local. Aceptación visual de Julio al entregar
 
 ## Acceptance Criteria
 
+- [x] View Transitions en capítulos/paginación de detalle, fallback sin soporte y reduced motion, foco, clics rápidos y cambios de persona verificados. Probe observa animaciones nativas; entrada Dialog usa desplazamiento CSS, sin snapshots entre roles. Evidencia en motion-axis y auditoría del corte.
+- [x] Button/Badge/CountBadge de AXIS0.7.15 adoptados; inventario y capturas en motion-axis. Hover del botón original y contraste durante apertura corregidos y GVC repetido PASS.
+- [x] Logo oficial sin alterar, ratio intrínseco y tamaño224/176px revisados desktop/móvil en capturas finales. Esto no sustituye aceptación humana.
+
 - [x] Contratos y límites de esta task implementados en el runtime propio, sin imports de implementación Greenhouse.
 - [x] Permisos can, jerarquías cliente/operador/admin, ámbito tenant/sala/edición y denegación por defecto verificados; notas internas ausentes del DTO cliente.
 - [x] Dependencias exactas y AXIS de registry con instalación limpia, lint (incluido negativo), typecheck y build verificados.
@@ -316,3 +320,7 @@ R03 persistencia; resto de R04 Efeonce ID e invitaciones; R05 medios; R13 MCP/CL
 - No DB/migración/backfill/rollout; adapter Efeonce ID null. No se afirma producción ni aceptación visual humana.
 
 Gate visual: calidad4.55 PASS; contrato y gate con captura Rooms aislada PASS. Walker global bloqueado por symlink roto de una captura ajena; detalle/hash en auditoría. No se altera el artefacto ajeno ni se oculta esa limitación del tooling.
+
+## Delta 2026-10-25 — continuidad del epic y refinamiento
+
+El operador confirma /goal de continuar EPIC-052 y pide View Transitions modernas y botones/badges La órbita desde el inicio. La UI actual sigue siendo candidata: aceptación posible no equivale a aceptación definitiva. Se reutiliza esta task dueña para refinamiento, sin duplicar ownership. Hook ejecutado con subagentes; UI y QA separados de persistencia/identidad.

@@ -2,7 +2,7 @@
 
 ## Estado vigente para agentes
 
-[Rooms local: can y vistas](docs/architecture/rooms/README.md).
+[Rooms: estado y próximos pasos](docs/architecture/rooms/README.md).
 
 [Factory](docs/services/factory/README.md): On-Demand.
 

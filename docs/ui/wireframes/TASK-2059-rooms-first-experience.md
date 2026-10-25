@@ -45,9 +45,14 @@ Runtime nuevo autorizado `../efeonce-rooms`, main. App Router en src/app; compon
 ## GVC Scenario Plan
 
 - Scenario file: `scripts/frontend/scenarios/rooms-first-experience.scenario.ts`
+- Latest capture manifest: `.captures/2026-10-25T21-13-43_rooms-first-experience/manifest.json`
+- Latest review dossier: `.captures/2026-10-25T21-13-43_rooms-first-experience/review-dossier.md`
+- AXIS and ViewTransitions verification: `docs/ui/reviews/TASK-2059-rooms-first-experience/motion-axis/review.md`
 
 Quality profile: premium. Escenario ejecutable del consumidor `../efeonce-rooms/tests/experience.spec.ts`. Desktop 1440×900, mobile 390×844, tablet 1024×768 y 320px. Capturas entrada, pieza, lectura, radiografía, workspace y acceso restringido. Markers data-capture: room-entry, room-stage, room-detail, editorial-reader, evidence-panel, operator-workspace. Assertions de scroll-width/scrollWidth, foco, Escape, regreso, fuente cargada, permisos y ausencia de notas en cliente. Review dossier: docs/ui/reviews/TASK-2059-rooms-first-experience/. Baseline decision: primera implementación sin baseline aprobado; surface ID rooms.first-experience. No aceptar automáticamente los píxeles como diseño aprobado.
 
 ## Design Decision Log
 
 2026-10-25: dirección editorial seleccionada frente a 3D y dashboard; la UI se construye después de base mínima, antes de persistencia. Can y proyecciones cliente/operador/admin desde el primer corte. Datos sintéticos permiten revisar sin tocar CRM ni medios cliente. Se reusan primitives publicados; nuevas composiciones sólo del dominio Rooms. Riesgo pendiente: feedback visual del operador y conexión real Efeonce ID.
+
+2026-10-25, continuación: Button, Badge y CountBadge publicados de AXIS; logo oficial más legible; paginación de piezas en el visor y ViewTransition de React para cambios de capítulo/pieza. Los cambios de persona hacen navegación de documento completo. Movimiento reducido, navegador sin API y documento oculto conservan la actualización inmediata. La entrada del diálogo conserva texto opaco; el movimiento no reduce su contraste. GVC final: cuatro tamaños, 68 frames, cero hallazgos. Esta evidencia local no certifica login federado ni aceptación visual del operador.

@@ -2,9 +2,9 @@
 
 [Historial](Handoff.archive.md).
 
-## 2026-10-25 — Rooms: primera entrega local para revisión
+## 2026-10-25 — Rooms: persistencia, motion y primer release
 
-Julio autorizó TASK-2058/2059 bajo EPIC-052, can/vistas cliente-operador-administrador y subagentes; después exigió calidad premium con Product Design. Runtime `../efeonce-rooms` en main; docs aquí en develop. Foundation, jerarquías/grants, readers/API/CLI y primera sala sintética ya implementados. [QA y límites](docs/audits/rooms/2026-10-25-first-local-delivery.md), [manual local](docs/manual-de-uso/rooms/operar-primera-experiencia-local.md). Próximo checkpoint Product: aceptación visual de Julio; Platform continúa identidad real/persistencia/rollout por unidades propias, sin dar por cerrado EPIC-052. Demo no autentica usuarios; API real fail-closed. Sin push/deploy.
+Goal explícito de continuar EPIC-052; GitHub privado y publicación Vercel autorizados. TASK-2058/2060 complete: can y ciclo durable PostgreSQL local con concurrencia, auditoría/outbox y recuperación probada. TASK-2059 incorpora View Transitions y botones/badges AXIS; aceptación visual humana pendiente. TASK-2061 publica [demo sintética](https://efeonce-rooms.vercel.app/demo) en Vercel, commit `bd4b802`, deployment `dpl_8vJ75Cbn1q75JNe7FEa7LkUccigc`; [dossier vivo](docs/architecture/rooms/README.md), [manual](docs/manual-de-uso/rooms/operar-primera-experiencia-local.md). Runtime `../efeonce-rooms` main, repo privado `efeoncepro/efeonce-rooms`; docs en develop. Efeonce ID aún depende de TASK-1834: issuer vivo sólo anuncia scopes MCP; API real 401, sin DB cloud ni clientes reales. EPIC-052 continúa abierto.
 
 ## 2026-10-25 — UTP Perú: presentación enviada; LinkedIn pendiente
 [Caso y readback](docs/commercial/prospecting-agent/runs/2026-10-25-utp-gustavo.md): Company UTP y Contact Gustavo
