@@ -60,9 +60,9 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 ## Child Tasks
 
-[TASK-2065](../../tasks/in-progress/TASK-2065-rooms-efeonce-id-consumer.md): consumidor OIDC interno; foundation1834/login2064.
+[TASK-2065](../../tasks/complete/TASK-2065-rooms-efeonce-id-consumer.md): consumidor OIDC interno; foundation1834/login2064.
 
-[TASK-2066](../../tasks/to-do/TASK-2066-rooms-tokenized-invitations-email-code.md): invitación por correo único enlace+código, input Rooms y sesión guest; OTPissuer2067.
+[TASK-2066](../../tasks/in-progress/TASK-2066-rooms-tokenized-invitations-email-code.md): invitación por correo único enlace+código, input Rooms y sesión guest; OTPissuer2067.
 
 [TASK-2062](../../tasks/complete/TASK-2062-rooms-versioned-content-authoring.md): R03B, manifest versionado, autoría programática y cobertura antes de publicar; R05 medios y R08 editor conservan alcance propio.
 
@@ -244,12 +244,14 @@ TASK-2062 cierra autoría backend/API/CLI local: borradores V2, bloques/relacion
 coverage y publicación textual, preservando ediciones V1.66 pruebas PASS sin skip y recovery/rollback
 mixto verificados. No cierra R03 completo (escenarios/tours), R05 medios ni R08 editor.
 
-- [TASK-2065](../../tasks/in-progress/TASK-2065-rooms-efeonce-id-consumer.md): OIDC interno sobre foundation
+- [TASK-2065](../../tasks/complete/TASK-2065-rooms-efeonce-id-consumer.md): OIDC interno sobre foundation
   Auth1834 y loginV4 del issuer2064. Implementación local en curso, sin activación pública.
-- [TASK-2066](../../tasks/to-do/TASK-2066-rooms-tokenized-invitations-email-code.md): enlace con token y código
+- [TASK-2066](../../tasks/in-progress/TASK-2066-rooms-tokenized-invitations-email-code.md): enlace con token y código
   generado en UN correo inicial Resend; cliente pega código EN Rooms. Issuer2067 genera/verifica/envía OTP;
   Rooms conserva invitación/sesión guest limitada, expiry/revoke y permisos. No requiere SSO global ni da acceso
   a otras salas. Contrato aceptado, implementación pendiente; no mensajes a clientes por registrar el flujo.
 
 Aceptación visual2059 y resto deR01–R15 siguen abiertos. Demo pública conserva SHA bd4b802; código localnuevo
 no implica despliegue. [Evidencia2062](../../audits/rooms/2026-10-25-versioned-content-authoring.md).
+
+TASK-2065 complete local en37c799c:95testsPASS0skip, Chromeissuerreal, contexts/tenants/revoke y down/upclon14tablasPASS. EntradaOFF, UIcontext ycloudpendientes. [Evidencia](../../audits/rooms/2026-10-25-efeonce-id-consumer.md).

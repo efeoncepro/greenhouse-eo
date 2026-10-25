@@ -82,7 +82,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-2058-rooms-foundation-and-permissions.md`: foundation, contracts, can y API real cerrada.
 - `docs/tasks/in-progress/TASK-2059-rooms-first-experience.md`: consumidor, assets y evidencia visual del snapshot que se publique. Su QA del candidato es gate de promoción, no bloqueo de creación de infraestructura.
 - `docs/tasks/in-progress/TASK-2060-rooms-persistence-and-lifecycle.md`: si su código entra en el snapshot, verificar que no requiere ni activa DB cloud; sus migraciones permanecen locales.
-- `docs/tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md`: dependencia para identidad real futura; no bloquea publicar datos sintéticos con API real fail-closed.
+- `docs/tasks/in-progress/TASK-1834-efeonce-auth-first-party-oidc-rooms.md`: dependencia para identidad real futura; no bloquea publicar datos sintéticos con API real fail-closed.
 
 ### Blocks / Impacts
 

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Discovery y contrato ADR Rooms-first congelados; plan/hook en preparación. Construcción local paralela al issuer1834, integración conjunta es gate de cierre. Entrada real OFF, DB sólo local; sin cloud ni producción.`
+- Status real: `Consumer local completo:95testsPASS0skip, tipos/lint/build, Chrome con issuer1834 y PostgreSQL reales, rollback/restore14tablas PASS. API/OIDC OFF por defecto, sin DBcloud ni UIcontext/recovery. Evidencia docs/audits/rooms/2026-10-25-efeonce-id-consumer.md.`
 - Rank: `Después de TASK-1834 foundation; integración antes de TASK-2066`
 - Domain: `identity|platform|data`
 - Blocked by: `none`
@@ -168,10 +168,10 @@ Reglas obligatorias: una identidad verificable no concede membership ni capabili
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth y consumers quedan separados y documentados en contrato final.
-- [ ] Tenant/access/idempotency invariants tienen pruebas negativas y concurrentes.
-- [ ] Migración/rollback y privilegios se verifican en PostgreSQL real aislado.
-- [ ] Errores, auditoría y señales sanitizados no filtran tokens ni claims sensibles.
+- [x] Source of truth y consumers quedan separados y documentados en contrato final.
+- [x] Tenant/access/idempotency invariants tienen pruebas negativas y concurrentes.
+- [x] Migración/rollback y privilegios se verifican en PostgreSQL real aislado.
+- [x] Errores, auditoría y señales sanitizados no filtran tokens ni claims sensibles.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -270,15 +270,15 @@ Peer TASK-1834 y dueño de RP/secrets/DB. TASK-1840 conserva logout global; TASK
 
 ## Acceptance Criteria
 
-- [ ] Contrato issuer implementado y delta consumidor documentados; dos RPs demuestran aislamiento.
-- [ ] Transacción/state/nonce/PKCE/code se validan y consumen una vez; callback concurrente/replay denegado.
-- [ ] ID token sólo algoritmo/issuer/audience/tiempos/claims permitidos; token MCP o handle de otro RP no crea sesión.
-- [ ] Binding issuer/sub explícito; sin email-provisioning, sin first-tenant, sin elevación por rol.
-- [ ] Introspection propia precede a sesión autorizada; expired/revoked/unavailable no permiten negocio; PG relee permisos actuales.
-- [ ] Cookie y stores durables protegidos, expiración/GC/CSRF/rotación/logout probados; tokens ausentes de browser/logs.
-- [ ] OFF default conserva demo y401; no configura cloud ni activa público de forma implícita.
-- [ ] Migración/privilegios/rollback PG y ciclo real issuer local pasan; mocks no sustituyen integración.
-- [ ] Evidencia diferencia foundation local, dark deploy y activación; el pendiente UI/DB cloud queda visible.
+- [x] Contrato issuer implementado y delta consumidor documentados; dos RPs demuestran aislamiento.
+- [x] Transacción/state/nonce/PKCE/code se validan y consumen una vez; callback concurrente/replay denegado.
+- [x] ID token sólo algoritmo/issuer/audience/tiempos/claims permitidos; token MCP o handle de otro RP no crea sesión.
+- [x] Binding issuer/sub explícito; sin email-provisioning, sin first-tenant, sin elevación por rol.
+- [x] Introspection propia precede a sesión autorizada; expired/revoked/unavailable no permiten negocio; PG relee permisos actuales.
+- [x] Cookie y stores durables protegidos, expiración/GC/CSRF/rotación/logout probados; tokens ausentes de browser/logs.
+- [x] OFF default conserva demo y401; no configura cloud ni activa público de forma implícita.
+- [x] Migración/privilegios/rollback PG y ciclo real issuer local pasan; mocks no sustituyen integración.
+- [x] Evidencia diferencia foundation local, dark deploy y activación; el pendiente UI/DB cloud queda visible.
 
 ## Verification
 
@@ -289,14 +289,18 @@ Peer TASK-1834 y dueño de RP/secrets/DB. TASK-1840 conserva logout global; TASK
 
 ## Closing Protocol
 
-- [ ] Lifecycle, carpeta y Status real sincronizados con evidencia y sin afirmar rollout no ejecutado.
-- [ ] README/registry/Handoff/changelog y dependencias actualizados por dueño coordinador.
-- [ ] Acceptance Criteria tildados con evidencia proporcional; checks no realizados permanecen abiertos.
-- [ ] Chequeo cruzado TASK-1834/2062/2066/2067 y unidad UI/rollout posterior.
-- [ ] Secretos/handles de integración retirados según propiedad; artefactos sólo sanitizados.
+- [x] Lifecycle, carpeta y Status real sincronizados con evidencia y sin afirmar rollout no ejecutado.
+- [x] README/registry/Handoff/changelog y dependencias actualizados por dueño coordinador.
+- [x] Acceptance Criteria tildados con evidencia proporcional; checks no realizados permanecen abiertos.
+- [x] Chequeo cruzado TASK-1834/2062/2066/2067 y unidad UI/rollout posterior.
+- [x] Secretos/handles de integración retirados según propiedad; artefactos sólo sanitizados.
 
 ## Follow-ups
 
 - Consumer UI Rooms entry/contexto/recovery, separado backend-first; condición de retiro: contratos y pruebas de esta task disponibles.
 - Activación cloud/RP/cohorte con canary y autorización de release; no parte de esta foundation.
 - TASK-2066 invitaciones; TASK-1840 logout multiproducto.
+
+## Evidencia de cierre 2026-10-25
+
+[Auditoría2065](../../audits/rooms/2026-10-25-efeonce-id-consumer.md):95tests,Chromeissuerreal,rollback/restauraciónyOFFsmoke. Aislamiento2RP acreditado porconformanceissuer, harnessbrowser1RPexplicitado. Sin rollout productivo. UI/context y bootstrapproductivo siguenfuera deestefoundation.

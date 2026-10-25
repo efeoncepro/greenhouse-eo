@@ -25,7 +25,7 @@ fabricada desde prueba de invitación.
 - Logintransacción durable ligada a cookie browser/state/nonce/PKCE/redirect/client; TTL≤300s, consumo atómico
   antesdelcanje y anti-replay. Destino relativo allowlist, defaultsafe, sin openredirect.
 - IDtoken por jose/JWKS remoto configurado: ES256/iss/aud/nonce/iat/exp/auth_time, TTL300s conformeissuer,
-  rechazartokens MCP, unknowncriticalheaders, jku/x5u caller. HTTP boundedtimeouts/body, sin tokenlogging.
+  rechazartokens MCP, unknowncriticalheaders, jku/x5u caller. Callback exige `iss` exacto del issuer (RFC9207), implementado por1834 y verificado duranteE2E. HTTP boundedtimeouts/body, sin tokenlogging.
 - Stores `rooms.auth_transactions`, `rooms.identity_bindings`, `rooms.sessions`, eventos auth separados.
   Cookie opaca aleatoria, hash enDB; verifier yhandle cifrados AES256GCM con keyservidor, no tokensbrowser.
 - Binding explícito issuer/sub→principal+org. Bootstrap/control plane administrado fuera callback; ningún

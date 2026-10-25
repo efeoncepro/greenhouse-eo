@@ -144,3 +144,26 @@ API de negocio. Las pruebas CLI usan identidad sintética exclusivamente en harn
 por variable de entorno en la composición de producción.
 
 [Auditoría TASK-2062](../../audits/rooms/2026-10-25-versioned-content-authoring.md).
+
+## Consumidor Efeonce ID — TASK-2065
+
+Backend local verificado con issuer1834 real y Chrome. Por defecto `ROOMS_FIRST_PARTY_AUTH_ENABLED=false`;
+`/login` y readers de sesión responden503 disabled sin consultar DB/red. Con flag activo, `/login` crea
+transacción y redirige al issuer, `/auth/callback` verifica código/iss/state/nonce/PKCE y crea sesión local.
+`GET /api/auth/session` devuelve estado/contextos propios mínimos; `GET/POST /auth/context` permite escoger
+organización mediante JSON `{organizationId}` y Origin exacto. `POST /auth/logout` cierra sólo Rooms.
+Contexto/recovery aún no tienen pantallas de producto; este corte no se activa para humanos en producción.
+
+Config server-only documentada en `.env.example`: ROOMS_AUTH_ISSUER, ORIGIN, CLIENT_ID, CLIENT_SECRET y
+ENCRYPTION_KEY (32bytes base64). HTTP sólo con ALLOW_LOCAL_DEVELOPMENT explícito y loopback. No copiar
+credenciales del harness a Vercel. El registro RP del issuer fija redirect exacto `/auth/callback`.
+
+Un binding issuer/sub previamente administrado liga al principal Rooms existente. Sin binding no hay acceso;
+varios espacios requieren selección. El callback nunca crea personas/memberships/roles. Sesión y grants se
+revalidan en cada operación; un fallo del issuer no permite usar permisos viejos. Cookies/handle/verifier
+no se exportan; el handle OIDC no sirve como ROOMS_ACCESS_TOKEN para la CLI.
+
+`pnpm auth:integration --issuer-fixture <PRIVATE_FIXTURE_JSON>` ejecuta Chrome contra los dos runtimes locales
+y sus bases reales; el archivo0600 lo entrega el harness del issuer. Script no opera contra producción ni
+imprime secretos. Para rollback normal apagar flag y revocar sesiones propias; migración down sólo clon
+vacío descartable. [Evidencia y límites](../../audits/rooms/2026-10-25-efeonce-id-consumer.md).
