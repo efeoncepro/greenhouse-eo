@@ -1,8 +1,9 @@
 # Refresh — «SEO y AEO» (borrador V1)
 
-> **Estado:** investigación (2026-10-25). Borrador del artículo pendiente de dos decisiones de Julio: URL y panel propio.
+> **Estado:** investigación auditada con la skill `seo-aeo` (2026-10-25). URL decidida; falta decidir el panel propio.
 > **URL actual:** https://efeoncepro.com/loop-marketing/seo-aeo-optimizacion-ia-2025/ (post `248463`, categoría principal
-> Loop Marketing; también en AEO). Propuesta: `/aeo/seo-y-aeo/` con 301.
+> Loop Marketing; también en AEO). **Decidido por Julio (2026-10-25):** `/aeo/seo-y-aeo/` con 301, aplicado junto con la
+> publicación del contenido nuevo (§3).
 > **Autor / voz:** Julio Reyes · voz Julio, doctrina como «En Efeonce…».
 > **Propuesta aprobada:** [`BLOG_REFRESH_TANDA_1_PROPUESTA_V1.md`](BLOG_REFRESH_TANDA_1_PROPUESTA_V1.md) §3.
 > **Respaldo del post vivo:** `tmp/aeo-248463-before.json` (contenido, metas, términos; `post_modified_gmt` 2026-03-06 21:27:09).
@@ -13,16 +14,26 @@
 |---|---|---|
 | Impresiones (90 días) | 141, antes 1.051 (−87 %) | Search Console, 2026-07-26 → 2026-10-23 vs. ventana anterior |
 | Clics | 0, antes 1 | Search Console |
-| Posición | 21,5, antes 12,6 | Search Console |
+| Posición | 21,5, antes 12,6 | Search Console (ver la advertencia de abajo) |
 | Visitas desde IA (12 meses) | 18 (Perplexity 14, ChatGPT 3, Gemini 1): la más alta del blog | GA4 486264460 |
 | Palabras | 3.261 | post vivo |
+
+**Cómo leer estas cifras (auditoría con `seo-aeo` → `07_MEASUREMENT.md`).** Las 141 impresiones se reparten en 24
+consultas y casi todas tienen menos de 10. Bajo el piso de impresiones, una posición no dice dónde rankea la página:
+dice dónde apareció las pocas veces que la mostraron. La señal confiable es la caída de impresiones (−87 %) y los cero
+clics, no el 21,5. La suma de la página ya viene sin sitelinks con `#ancla` (los quitó la lectura de Analytics).
 
 **Consultas (medido).** Casi todo son búsquedas largas con forma de pregunta generada por IA: «aeo estrategias sin
 equipo de marketing grande», «software para estrategia aeo», «optimización para motores de ia», «importancia del aeo para
 empresas b2b», «comparar estrategias de aeo vs seo tradicional», «consultor aeo». La de más impresiones en la ventana
 anterior fue «aeo answer engine optimization estrategias para pequeños equipos…» (144, posición 8,9). Lectura (inferida):
 el artículo lo encuentran asistentes que arman búsquedas de fondo; la intención es «cómo hago AEO con un equipo chico,
-qué cambia frente al SEO y cómo lo mido».
+qué cambia frente al SEO y cómo lo mido». Por qué se infiere: frases largas con operadores (`or`), años, «expertos» y una
+en portugués («aeo vs seo: qual priorizar em 2025»), que una persona rara vez escribe así. No está verificado que sean
+sub-consultas de AI Mode: Search Console no las distingue. Uso práctico: son el espacio de sub-preguntas al que tiene
+que responder el artículo, y la mejor evidencia disponible (Ahrefs, §2 fila 15) dice que lo que más separa a una página
+citada de una recuperada y no citada es que su título responda a esa sub-pregunta. Por eso los H2 van a ser esas
+preguntas, en palabras de la persona.
 
 **Volumen (Semrush, octubre de 2026).**
 
@@ -37,8 +48,11 @@ qué cambia frente al SEO y cómo lo mido».
 | qué es geo | 390 | 10 | 320 |
 | cómo aparecer en chatgpt | — | — | 50 |
 
-«aeo» solo es ambiguo: en México y España también es Operador Económico Autorizado (aduanas). No es la consulta foco.
-«qué es geo» en México es sobre todo geografía o geolocalización (inferido). Foco: SEO + AEO como intención compuesta,
+Estos volúmenes son estimaciones de Semrush; con cifras de 10 a 50 al mes la precisión es baja, y «—» significa que la
+consulta no está en su base para ese país, no que valga cero. Chile sólo devolvió 4 de las 20 consultas.
+«aeo» solo es ambiguo: en México y España también es Operador Económico Autorizado (aduanas). No es la consulta foco
+(inferido; confirmarlo con la SERP antes de afirmarlo). «qué es geo» en México es sobre todo geografía o geolocalización
+(inferido). Foco: SEO + AEO como intención compuesta,
 «seo para ia», «qué es aeo», «aeo vs seo», «cómo aparecer en las respuestas de IA».
 
 ## 2. Registro de afirmaciones (verificado al 2026-10-25)
@@ -62,6 +76,22 @@ qué cambia frente al SEO y cómo lo mido».
 | 13 | Secundario / no existe | Neeva cerró su buscador el 2023-06-02. No hay acuerdo OpenAI–Reuters verificable (sí AP, Axel Springer, FT, News Corp, Axios, Washington Post, The Guardian, entre otros) | openai.com/index/partnering-with-axios-… · cnbc.com | — |
 | 14 | No confiable | Modelos insignia de octubre de 2026: fuentes contradictorias. No nombrar modelos | — | — |
 
+**Agregado en la auditoría con la skill `seo-aeo` (`SOURCES.md` §4, auditado 2026-07-14; reverificar la URL antes de
+citar).**
+
+| # | Estado | Qué dice | Uso en el artículo |
+|---|---|---|---|
+| 15 | Fuente de la skill | Ahrefs, 1,4 millones de prompts de ChatGPT: lo que más separa una página citada de una recuperada y no citada es la relevancia semántica del título frente a la sub-pregunta (0,656 vs. 0,484) y la claridad del slug (89,8 % vs. 81,1 %). La cápsula de respuesta no aparece entre los predictores | Es la palanca con mejor evidencia: H2 escritos como la pregunta que responde la sección. También respalda el slug corto `seo-y-aeo` |
+| 16 | Fuente de la skill, sin control | Search Engine Land: el 72,4 % de las entradas citadas por ChatGPT tiene una cápsula de respuesta identificable, definida como 120–150 caracteres (20–25 palabras). Describe un patrón, no prueba que la cápsula cause la cita | Si el artículo recomienda la cápsula, va por mecanismo (el motor recupera pasajes) y con el largo de la fuente, no con una promesa de citas |
+| 17 | Conflicto | La skill registra AI Overviews en ~48–50 % de las consultas (BrightEdge, marzo de 2026); Comscore mide 39,4 % de las búsquedas de escritorio en EE. UU. (junio de 2026). BrightEdge mide sobre conjuntos de palabras clave; Comscore, sobre búsquedas reales de un panel de personas | No se publica una sola cifra «de prevalencia». Si se usa una, va con su fuente, su método y su país. Ninguna es de Chile |
+| 18 | No localizado | La skill afirma que sólo ~11 % de los dominios citados coincide entre ChatGPT y Perplexity (680 millones de citas), sin URL. La verificación del 2026-10-25 no encontró la fuente primaria | No se cita. Para decir que cada motor elige fuentes distintas basta con Ahrefs y Semrush (fila 9) |
+| 19 | Fuente de la skill, con advertencias | Paper GEO (KDD 2024): citas de expertos +41 %, estadísticas +32 %. Mide un motor armado con GPT-3.5 y el top 5 de Google; la métrica es la proporción de palabras atribuidas, no las citas; el efecto cambia por dominio | Mejor no citarlo. Si se cita, van las tres advertencias |
+
+**Matiz sobre «no hace falta trocear».** Google dice que, para su búsqueda, no hay que fragmentar el contenido ni usar
+trucos de AEO. Eso no contradice cómo funcionan los motores: recuperan pasajes. La recomendación del artículo es escribir
+secciones que se entiendan solas y respondan primero, porque así lee mejor una persona; nunca partir el texto en
+fragmentos artificiales «para la IA».
+
 **El artículo no puede afirmar:**
 
 - Que existe un «schema para IA», que FAQ o HowTo te hacen aparecer en AI Overviews o que hace falta trocear el contenido.
@@ -75,9 +105,26 @@ qué cambia frente al SEO y cómo lo mido».
 - El 4,4x como cifra universal o B2B: se atribuye a Semrush, promedio entre industrias, proveedor interesado.
 - Coincidencia alta entre lo que citan ChatGPT y Perplexity, ni «Perplexity usa el top 10 de Google».
 - Un acuerdo OpenAI–Reuters, ni nombres de modelos «más recientes».
+- El «~11 % de coincidencia entre ChatGPT y Perplexity» ni una prevalencia de AI Overviews sin método ni país (filas 17 y 18).
+- Que la cápsula de respuesta o las tablas multiplican las citas: son prevalencias entre corpus, no efectos medidos.
 
-## 3. Decisiones pendientes (Julio)
+## 3. Decisiones
 
-1. **URL:** `/aeo/seo-y-aeo/` con categoría principal AEO y 301, o conservar la actual.
-2. **Panel propio:** 10 preguntas B2B en español de Chile en ChatGPT, Perplexity, Gemini y Google (AI Overviews/AI Mode),
-   con fecha; si no se corre, la sección no se publica.
+1. ✅ **URL (Julio, 2026-10-25):** `/aeo/seo-y-aeo/`. Se aplica en el mismo paso que el contenido nuevo, no antes, para
+   que Google vea un solo cambio:
+   - categoría principal AEO y slug `seo-y-aeo` (la URL sigue a la categoría principal);
+   - redirección 301 de la URL vieja a la nueva, verificada con `curl -I` y sin cadena;
+   - enlaces internos al post viejo reescritos a la URL nueva (topic clusters y los que salgan del barrido);
+   - sitemap y solicitud de indexación de la URL nueva; procedimiento en
+     `efeonce-public-site-wordpress` → `references/taxonomy-permalink-migrations.md`.
+2. ⏳ **Panel propio (pendiente):** si se corre, con este método (`seo-aeo` → `07_MEASUREMENT.md` Parte B y
+   `references/competitor-methodologies-2026-09.md` §1.7):
+   - 10 preguntas B2B en español de Chile, versionadas y con fecha, en cuatro tipos (informativa, comparativa, de
+     recomendación y de marca), con mayoría sin nombrar marcas; ChatGPT, Perplexity, Gemini y Google (AI Overviews o
+     AI Mode), sin sesión iniciada y desde Chile;
+   - cada pregunta se repite 3 veces por motor, porque las respuestas cambian entre corridas (decisión propia, no
+     cifra de una fuente); una celda que falla 3 veces es «no medida», no «sin resultado»;
+   - se registra, por respuesta: fuentes citadas, si efeoncepro.com aparece y si se menciona o se cita (no es lo mismo),
+     cuántas de esas URL están en el top 10 de Google para la misma pregunta y cuánto coinciden las fuentes entre motores;
+   - se publica como muestra fechada, nunca como cuota de mercado; 10 preguntas no alcanzan para un Share of Voice (la
+     skill pide 20 a 50). Si no se corre, esa sección no se publica.
