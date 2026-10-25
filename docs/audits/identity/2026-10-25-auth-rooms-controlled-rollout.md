@@ -68,3 +68,16 @@ los skips sin debilitar el gate de paridad. Retest focal:13PASS en2suites. Fulls
 no se presentan omitidos como PASS. Lint global encontró21errores de formato en5scripts del blog heredados,
 además de los2scripts gráficos ya corregidos. Los5scriptsblog quedaron con AST idéntico a HEAD,
 node --check y lint focal PASS; nueva pasada global en curso. TypeScript global PASS tras patch del mirror.
+
+## Gate previo a publicación
+
+Lint global final:0 errores/26advertencias heredadas. Esa corrida local:check alcanzó TypeScript y falló
+por un import estático al repo hermano en el tooling nuevo Rooms. Peer corrigió la frontera en
+`d4a1d16e0`; TypeScript global Greenhouse con12GiB y TypeScript Rooms PASS, sin excluir archivos ni
+ocultar tipos. Las demás etapas de local:check pasaron; no se declara exit0 de aquella corrida fallida.
+Suite general21598PASS/383skip, único fallo de mirror corregido y13retestPASS; no repetición global por
+cambio acotado ya verificado. Build/CI/smoke de promoción aún pendientes.
+
+[Recibo del operador](2026-10-25-release-operator-authority.json): roles/entitlements canónicos vivos
+confirman capacidad de ejecutar release y excepción de batch. La autorización humana del goal y el
+ejecutor GitHub son entidades separadas; no autoriza ignorar CI/smoke ni convierte un warning en PASS.
