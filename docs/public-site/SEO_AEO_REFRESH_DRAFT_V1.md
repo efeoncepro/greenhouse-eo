@@ -1,6 +1,7 @@
 # Refresh — «SEO y AEO» (borrador V1)
 
-> **Estado:** investigación auditada con la skill `seo-aeo` (2026-10-25). URL decidida; falta decidir el panel propio.
+> **Estado:** borrador V1 en copia privada `252114` (2026-10-25). URL decidida; panel propio descartado por Julio (si Efeonce no aparece, publicarlo perjudica).
+> **Fuente editable:** [`SEO_AEO_REFRESH_GUTENBERG_SPEC_V1.json`](SEO_AEO_REFRESH_GUTENBERG_SPEC_V1.json) (validación `pass`, ~2.400 palabras).
 > **URL actual:** https://efeoncepro.com/loop-marketing/seo-aeo-optimizacion-ia-2025/ (post `248463`, categoría principal
 > Loop Marketing; también en AEO). **Decidido por Julio (2026-10-25):** `/aeo/seo-y-aeo/` con 301, aplicado junto con la
 > publicación del contenido nuevo (§3).
@@ -117,7 +118,9 @@ fragmentos artificiales «para la IA».
    - enlaces internos al post viejo reescritos a la URL nueva (topic clusters y los que salgan del barrido);
    - sitemap y solicitud de indexación de la URL nueva; procedimiento en
      `efeonce-public-site-wordpress` → `references/taxonomy-permalink-migrations.md`.
-2. ⏳ **Panel propio (pendiente):** si se corre, con este método (`seo-aeo` → `07_MEASUREMENT.md` Parte B y
+2. ❌ **Panel propio: descartado por Julio (2026-10-25).** Efeonce todavía no aparece en esas respuestas y publicarlo
+   perjudica más de lo que ayuda. En su lugar va el Growth CTA del Efeonce AEO Assessment (tono claro, lockup oficial),
+   para que quien lee pida el informe de su marca. El método queda registrado por si se retoma: si se corre, con este método (`seo-aeo` → `07_MEASUREMENT.md` Parte B y
    `references/competitor-methodologies-2026-09.md` §1.7):
    - 10 preguntas B2B en español de Chile, versionadas y con fecha, en cuatro tipos (informativa, comparativa, de
      recomendación y de marca), con mayoría sin nombrar marcas; ChatGPT, Perplexity, Gemini y Google (AI Overviews o
@@ -128,3 +131,27 @@ fragmentos artificiales «para la IA».
      cuántas de esas URL están en el top 10 de Google para la misma pregunta y cuánto coinciden las fuentes entre motores;
    - se publica como muestra fechada, nunca como cuota de mercado; 10 preguntas no alcanzan para un Share of Voice (la
      skill pide 20 a 50). Si no se corre, esa sección no se publica.
+
+## 4. Borrador V1 (2026-10-25)
+
+**Estructura (H2 como la pregunta que hace el comprador, por la evidencia de la fila 15):** ¿Qué es AEO? (glosario en
+Recuadro: AEO, GEO, LLMO/LMO, AI Overviews, AI Mode) · ¿En qué se diferencia del SEO? (Tabla Efeonce + Destacado) ·
+¿Cómo eligen sus fuentes los motores? (Pasos del recorrido + Ahrefs 12 % y Semrush por dominio) · ¿Qué mira cada motor?
+(H3 Google, Gemini, ChatGPT, Perplexity, Copilot, Claude + tabla de robots) · ¿Qué cambiar en tu sitio? (Pasos de seis
+hábitos + Recuadro de lo que no hace falta) · ¿Cómo empezar si tu equipo es pequeño? (Pasos + Growth CTA claro) ·
+¿Cómo se mide? (Pew + fuentes de medición) · Preguntas frecuentes (6) · En resumen · Fuentes y nota de actualización.
+
+**Correcciones contra el post de 2025:** fuera Google-Extended como palanca de visibilidad, el schema FAQ/HowTo «para la
+IA», GPT-5 y Neeva, el convenio OpenAI–Reuters, las cinco citas de expertos sin fuente, los «tres caminos» que sumaban
+130 % y el enlace al Grader que llevaba a Loop. Se conservan, corregidos, el glosario y las fichas por motor.
+
+**Cifra corregida en la skill:** el «0,656 vs 0,484» de Ahrefs compara la sub-pregunta contra el título citado (0,656) y
+la pregunta contra el no citado (0,484); el par comparable es pregunta→título citado 0,602 vs no citado 0,484. El
+artículo usa el par comparable.
+
+**Enlaces internos:** posicionamiento SEO (servicio), dónde cita la IA, topic clusters, descubrimiento más allá de
+Google, web agéntica. El Growth CTA `blog-aeo-assessment` va al final de «¿Cómo empezar…?», presentado con una frase
+de contexto.
+
+**Pendientes antes de publicar:** infografía y portada (fórmula nueva), revisión de Julio en `252114`, envío real del
+formulario del CTA, barrido de enlaces internos a la URL vieja y la migración de URL con 301 (§3).
