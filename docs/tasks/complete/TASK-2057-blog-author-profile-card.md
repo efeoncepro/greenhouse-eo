@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Wireframe: `docs/ui/wireframes/TASK-2057-blog-author-profile-card.md`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `En producción: efeonce-editorial-blocks 0.5.6 (runtime 6a169bc, desplegada 2026-10-25 ~02:10 UTC con visto bueno del operador) y el byline del tema; perfil de Julio cargado. Verificado en vivo en 2 posts: ficha de 800 px con retrato de 160 y nombre de 36 px, hovers correctos (sin relleno de Ohio), 96 px antes de los relacionados, sin desborde en 5 anchos y axe 0. Falta: cierre de la task (revisión del operador).`-unlink -undash`) y 96 px bajo la ficha tras la revisión del operador (0.5.5, en producción). 0.5.6 (ficha más contenida, runtime 6a169bc) commiteada, despliegue pendiente de permiso. Falta: desplegar 0.5.6 y cerrar la task.`
+- Status real: `Cerrada el 2026-10-25 por el operador. En producción: efeonce-editorial-blocks 0.5.6 (runtime 6a169bc) y el byline del tema (runtime 1d7a7bd); perfil de Julio cargado; schema Person verificado. Verificado en vivo en 2 posts: ficha, byline, hovers, 96 px antes de los relacionados, sin desborde en 5 anchos, axe 0.`-unlink -undash`) y 96 px bajo la ficha tras la revisión del operador (0.5.5, en producción). 0.5.6 (ficha más contenida, runtime 6a169bc) commiteada, despliegue pendiente de permiso. Falta: desplegar 0.5.6 y cerrar la task.`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `none`
@@ -396,13 +396,13 @@ categoría con posts (alias: «IA aplicada al marketing» → `ai`, «SEO/AEO» 
 ## Acceptance Criteria
 
 - [x] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
-- [ ] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2057`.
+- [x] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2057`.
 - [x] Se declaro `Wireframe: docs/ui/wireframes/TASK-2057-blog-author-profile-card.md` y el archivo existe.
 - [x] El lector pasa sus pruebas puras (33 chequeos; content-model 209 OK, 2026-10-25).
 - [x] Harness local a 1440/390/320 sin desborde y axe 0 (2026-10-24).
 - [x] En vivo: byline y ficha en el single, sin la caja de Ohio, sin textos en inglés del autor («Posted by» → «Por», «min read» → «min de lectura»). El único «colabrio» restante es el YouTube de los enlaces sociales globales de Ohio (fuera de la ficha; follow-up).
 - [x] El JSON-LD del Person trae el cargo nuevo, la foto nueva, `sameAs` con LinkedIn e Instagram y `worksFor` por `@id` (verificado en vivo 2026-10-25).
-- [ ] Documentación actualizada (runtime, funcional, manual, skill).
+- [x] Documentación actualizada (runtime, funcional, manual, skill).
 
 ## Verification
 
@@ -412,12 +412,12 @@ categoría con posts (alias: «IA aplicada al marketing» → `ai`, «SEO/AEO» 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 ## Delta 2026-10-25 — desvíos encontrados en vivo
 

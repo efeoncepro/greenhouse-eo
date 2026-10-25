@@ -5,7 +5,7 @@
 > **Creado:** 2026-10-24 por Claude (TASK-2057)
 > **Ultima actualizacion:** 2026-10-25 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1 §9](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md#9-autor-del-blog-task-2057) ·
-> [TASK-2057](../../tasks/in-progress/TASK-2057-blog-author-profile-card.md)
+> [TASK-2057](../../tasks/complete/TASK-2057-blog-author-profile-card.md)
 
 ## Qué es
 
