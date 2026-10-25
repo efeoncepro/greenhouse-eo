@@ -5,8 +5,8 @@
 - El operador decidió que todo Glitch sin número de edición es un Flash. «Glitch Nota» se retiró del modelo
   (`efeonce-editorial-blocks` 0.5.0, PDR-029 delta «Glitch: Edición o Flash»): el filtro del archivo queda Todo ·
   Ediciones · Flash y esas filas llevan la placa de Flash. Donde esta task dice «Notas» o «nota sin placa», vale Flash.
-- Pendiente: el ejemplo del canvas (`Archivo-D-tema-glitch-*`, versión 79) y su fixture aún muestran dos notas y el chip
-  «Notas»; son contenido de ejemplo, no cambian lo que ve el público.
+- El ejemplo del canvas (`Archivo-D-tema-glitch-*`, versión 97) y `fixture.tema-glitch.json` ya muestran esas dos filas
+  con la placa FLASH y el filtro Todo 10 · Ediciones 7 · Flash 3 (equivalencia, paridad 42/42 y píxel 54/54 en verde).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

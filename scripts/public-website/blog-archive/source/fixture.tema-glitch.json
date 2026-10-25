@@ -57,7 +57,7 @@
   "parent": null,
   "spark": false,
   "filter": {
-    "segStyle": "--n: 4;",
+    "segStyle": "--n: 3;",
     "indStyle": "transform: translateX(0%);",
     "items": [
       {
@@ -76,14 +76,7 @@
       },
       {
         "label": "Flash",
-        "count": 1,
-        "url": "#",
-        "cur": null,
-        "chipCls": "chip live"
-      },
-      {
-        "label": "Notas",
-        "count": 2,
+        "count": 3,
         "url": "#",
         "cur": null,
         "chipCls": "chip live"
@@ -167,12 +160,12 @@
             ],
             "glitch": false,
             "plain": true,
-            "label": "Nota",
+            "label": "Flash",
             "min": 6,
             "pd": false,
             "gd": true,
             "ed": null,
-            "fl": false
+            "fl": true
           },
           {
             "url": "#",
@@ -186,12 +179,12 @@
             ],
             "glitch": false,
             "plain": true,
-            "label": "Nota",
+            "label": "Flash",
             "min": 8,
             "pd": false,
             "gd": true,
             "ed": null,
-            "fl": false
+            "fl": true
           },
           {
             "url": "#",
