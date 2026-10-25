@@ -320,6 +320,7 @@ La diferencia con otras capas de documentacion:
 
 ### Plataforma
 
+- [Shell de los agentes (bash)](plataforma/shell-de-agentes-bash.md) — por qué los agentes de Claude Code corren en bash aunque la terminal sea zsh, qué se cambió (`CLAUDE_CODE_SHELL` + `~/.bashrc`), cómo comprobarlo y **cómo revertirlo**.
 - [Navegar el portal](plataforma/navegar-el-portal.md) — las 3 superficies de navegación (sidebar por zonas con acordeón, menú del avatar como "mi cuenta", buscador ⌘K filtrado por rol), qué cambia para el colaborador puro, estados normales y problemas comunes. TASK-1388 + TASK-1686.
 
 - [Operar layout Ohio + Elementor en el Public Site](public-site/wordpress-ohio-elementor-layout.md) — runbook para diagnosticar, corregir y revertir desfases de contenedor/sidebar en `efeoncepro.com` WordPress/Kinsta, incluyendo `/blog` y el fix page-scoped de Ohio `.light-typo`.
