@@ -109,9 +109,13 @@
 - **Observaciones:** el schema saca `keywords` de las etiquetas (b2b, buyer persona, ipp, jobs to be done, marketing b2b),
   sin «icp»; Yoast no emite `twitter:description` en este post (X usa la de Open Graph). El tema muestra su propio tiempo de
   lectura, no el de Yoast.
-- 🔴 **Decisión abierta (modo oscuro):** el sitio no sigue el modo oscuro del sistema (lo decide su interruptor), pero el
-  `<picture>` sí. Con el sistema en oscuro, la infografía sale oscura sobre la página clara. Mismo comportamiento que Web
-  Agéntica.
+- ✅ **Modo oscuro, decidido (2026-10-25 11:53 UTC):** el sitio no sigue el modo oscuro del sistema (lo decide su
+  interruptor), pero el `<picture>` sí, así que con el sistema en oscuro la infografía salía oscura sobre la página
+  clara. El operador decidió dejar sólo las versiones claras: el `<picture>` quedó con móvil claro y escritorio claro.
+  Se republicó sólo `post_content` (snapshot `_gh_post_republish_249108_20261025_115301`, FAQ idéntico); los adjuntos
+  oscuros siguen en la biblioteca, sin uso.
+- **Tabla Efeonce (2026-10-25 12:12 UTC):** las dos tablas pasaron de `stripes` a `efeonce` con el plugin 0.6.0
+  (snapshot `_gh_post_republish_249108_20261025_121213`). Registro en `BLOG_EDITORIAL_BLOCK_STYLES_V1.md` §0.6.0.
 
 ## 6. Borrador del artículo
 

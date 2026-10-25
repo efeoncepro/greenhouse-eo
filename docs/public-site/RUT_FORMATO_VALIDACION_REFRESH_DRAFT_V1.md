@@ -100,6 +100,9 @@ volumen, y a los clics hacia la página de HubSpot de Efeonce.
   pasa igual en inbound (18 min con Yoast en 11). Es del tema, no de este refresh.
 - **Portada nueva (2026-10-25 10:44 UTC):** adjunto `252092` como destacada y OG; etiquetas `comohacer` y `how-to`
   retiradas. Registro y rollback en `ai-generations/2026-10-24_portadas-blog/LEEME.md`.
+- **Tabla Efeonce y código (2026-10-25 12:12 UTC):** la tabla pasó de `stripes` a `efeonce` con el plugin 0.6.0, y los
+  bloques de código toman el panel oscuro nuevo (snapshot `_gh_post_republish_246024_20261025_121213`). Registro en
+  `BLOG_EDITORIAL_BLOCK_STYLES_V1.md` §0.6.0.
 - **Pendientes:** probar el código legacy en un portal HubSpot real; observar Search
   Console a las 4, 8 y 12 semanas con las consultas de HubSpot como grupo principal (se espera que bajen las de
   «formato rut»).

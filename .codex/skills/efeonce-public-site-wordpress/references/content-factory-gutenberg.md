@@ -283,7 +283,7 @@ estilos, patrones y `parse_blocks` recursivo). Repetirlo antes de extender el bu
 
 ### Brecha: qué sabe emitir Content Factory vs. qué hay
 
-`GutenbergArticleSpec` emite 12 kinds de bloque: `paragraph`, `list`, `details`, `faq`, `table` (+ `style: 'stripes'`),
+`GutenbergArticleSpec` emite 12 kinds de bloque: `paragraph`, `list`, `details`, `faq`, `table` (+ `style: 'efeonce' | 'stripes'`),
 `quote`, `pullquote`, `separator`, `image`, `embed` (YouTube, + `caption`), **`glitchDrop`** y **`buttons`** (ambos
 desde 2026-09-28), más heading/TOC por estructura y CTA en párrafo. El validador acepta además `group`, `columns`,
 `column`, `spacer`, `gallery`, pero **no hay kind** que los emita.
@@ -375,15 +375,20 @@ Rich text con enlaces seguros; render `…<div class="wp-block-embed__wrapper">U
 `youtube.com`/`www.`/`m.`/`youtu.be`; si no, `content_factory_article_embed_url_invalid`) y se escapa en el wrapper y
 en los atributos. `core/video` nativo sigue pendiente.
 
-### 3. `table.style: 'stripes'`
+### 3. `table.style`: `'efeonce'` (por defecto en el blog) o `'stripes'`
 
 ```json
-{ "kind": "table", "style": "stripes", "headers": ["Modelo", "Uso"], "rows": [["Sonnet 5.5", "Agentes"]],
+{ "kind": "table", "style": "efeonce", "headers": ["Modelo", "Uso"], "rows": [["Sonnet 5.5", "Agentes"]],
   "caption": "Fuente: anuncio de Anthropic." }
 ```
 
-Render `<!-- wp:table {"className":"is-style-stripes"} -->` + `<figure class="wp-block-table is-style-stripes">`. Otro
-valor → `content_factory_article_table_style_invalid`. Revisar Ohio a 390 px en tablas anchas.
+`efeonce` → `<!-- wp:table {"className":"is-style-efeonce-tabla"} -->` + `<figure class="wp-block-table
+is-style-efeonce-tabla">`: la «Tabla Efeonce» de `efeonce-editorial-blocks` ≥ 0.6.0 (2026-10-25). Panel papel con margen
+en todos los lados, regla del encabezado en el acento de la línea y filetes entre filas; bajo 600 px cada fila es una
+tarjeta y cada celda muestra su columna, que el plugin copia del encabezado a `data-label` al renderizar. Por eso los
+encabezados van cortos y la primera columna nombra lo que compara cada fila. `stripes` → core `is-style-stripes`
+(sigue disponible; las 13 tablas viejas del blog la usan). Otro valor → `content_factory_article_table_style_invalid`.
+Contrato visual: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md`.
 
 ### 4. `buttons`
 

@@ -442,9 +442,12 @@ real attachment ID:
 <!-- /wp:separator -->
 ```
 
-The spec emits the table style with `{ "kind": "table", "style": "stripes", … }`
-(since 2026-09-28; no other value is accepted). Separator styles are still not
-emitted. Check Ohio's render at 390 px before adopting stripes on wide tables.
+The spec emits the table style with `{ "kind": "table", "style": "efeonce" | "stripes", … }`.
+Since 2026-10-25 blog posts use `efeonce`, the «Tabla Efeonce» of efeonce-editorial-blocks 0.6.0
+(`is-style-efeonce-tabla`): a paper panel that never touches the column edge and, under 600 px, one
+card per row with each cell labeled by its header. Keep headers short and let the first column name
+what each row compares. `stripes` (core, since 2026-09-28) stays valid; no other value is accepted.
+Separator styles are still not emitted. Design: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md`.
 
 ### CTA buttons (`kind: "buttons"`, since 2026-09-28)
 

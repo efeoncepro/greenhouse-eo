@@ -89,7 +89,7 @@
     },
     {
      "kind": "table",
-     "style": "stripes",
+     "style": "efeonce",
      "headers": [
       "",
       "ICP",
@@ -324,7 +324,7 @@
     },
     {
      "kind": "table",
-     "style": "stripes",
+     "style": "efeonce",
      "headers": [
       "Campo",
       "Qué escribir",
