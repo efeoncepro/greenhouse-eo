@@ -1,5 +1,11 @@
 # TASK-2057 — Autor del blog: ficha de autor, byline y schema
 
+## Delta 2026-10-25 (después del cierre)
+
+- 0.5.8: la ficha toma el margen del texto en teléfono y tablet (16/16 px; la grilla de Ohio la corría 16 px) y queda centrada en escritorio; aire de 56 px arriba y abajo (40 en teléfono) en lugar de 96/64.
+- 0.5.9: en teléfono, cabecera de perfil con las redes junto al retrato; el CTA cierra la ficha. Ambas desplegadas con visto bueno del operador y verificadas en vivo (2 posts, 320–1440, axe 0).
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

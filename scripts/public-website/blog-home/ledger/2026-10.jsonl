@@ -112,3 +112,9 @@
 {"at":"2026-10-25T02:19:06.895Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T02-18-13-558Z","flag":"1"}}
 {"at":"2026-10-25T02:19:50.050Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T02-19-07-154Z"}}
 {"at":"2026-10-25T02:19:52.459Z","author":"Julio Reyes","op":"purge","input":{"op":"purge"},"result":{}}
+{"at":"2026-10-25T10:45:12.481Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T10:45:38.688Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T10:45:40.637Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T10-44-51-233Z","flag":"1"}}
+{"at":"2026-10-25T10:50:13.042Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T10:50:35.774Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T10:50:37.815Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T10-49-06-309Z","flag":"1"}}

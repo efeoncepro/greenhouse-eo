@@ -751,6 +751,10 @@ Contrato: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` · FAQ: `docs/pub
 
 ## B. Presentaciones e informes
 
+- **Teléfono (operador 2026-10-25, 0.5.9):** cabecera de perfil — retrato de 112 px a la izquierda y «Escribe», nombre y
+  redes a su derecha; cargo, bio, temas y el CTA a todo el ancho debajo, el CTA cierra. La ficha toma el mismo margen que
+  el texto del artículo (16/16 px) y deja 40 px de aire abajo (56 en escritorio, igual que arriba).
+
 ### B1. Deck 16:9 (portada, sección, contenido, cierre)
 
 - **Para qué:** cualquier presentación de marca Efeonce. **La órbita es la navegación**: el arco suma un tramo por

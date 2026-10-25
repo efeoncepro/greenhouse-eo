@@ -295,7 +295,7 @@ puerta de escritura para agentes y operadores; pasa por las metas, taxonomías y
 
 Delta 2026-10-24. En producción desde el 2026-10-24/25 con `efeonce-editorial-blocks` 0.5.4 (runtime
 `efeonce-public-site-runtime` commit `8f19ee0`). Delta 2026-10-25: en producción 0.5.5 (runtime `d3156f6`, hovers y
-margen inferior); 0.5.6 (ficha más contenida, runtime `6a169bc`) commiteada, desplegada 2026-10-25 y verificada en vivo. Cubre la ficha de autor del single, el byline y el `Person` de Yoast.
+margen inferior); 0.5.6 (ficha más contenida, runtime `6a169bc`), 0.5.8 (alineación y margen, `4ff7daa`) y 0.5.9 (redes junto al retrato en teléfono, `07ed7b5`) desplegadas 2026-10-25 y verificadas en vivo. Cubre la ficha de autor del single, el byline y el `Person` de Yoast.
 Funcionamiento: [Ficha de autor del blog](../../documentation/public-site/ficha-de-autor-del-blog.md). Operación:
 [desde WordPress](../../manual-de-uso/public-site/operar-contenido-portada-blog.md#foto-de-perfil-del-autor).
 
@@ -330,9 +330,17 @@ Cuentas de servicio (`greenhouse-integration`) y autores sin posts devuelven vac
   `rel="me noopener"`.
 - **Medidas (0.5.6, delta 2026-10-25).** Escritorio: ancho máximo 800 px, retrato 160 px, padding
   `clamp(24px,3vw,36px)`, gap 32 px, nombre `clamp(28px,3vw,36px)`, cargo y bio 15 px, CTA 14 px, iniciales 38 px.
-  Teléfono (≤ 640 px) sin cambios: retrato 120 px, CTA a todo el ancho, botones de 48 px. Margen inferior de 96 px
-  (64 en teléfono) antes de «Related Posts» de Ohio (0.5.5). En producción sigue 0.5.5 (retrato 208, ancho 920) hasta
-  el despliegue de 0.5.6.
+  Margen: 56 px arriba y abajo (40 en teléfono) desde 0.5.8; antes, 96/64 px se leía como «demasiado aire» (operador
+  2026-10-25).
+- **Ancho y alineación (0.5.8, 2026-10-25).** La grilla de Ohio en `.author-container` corre la columna 16 px a la
+  izquierda (la fila tira −16 y la columna rellena 16): la ficha quedaba con 16/48 px a 390 y descentrada 16 px en
+  escritorio. Bajo 1024 px la ficha recupera 32 px (`width: calc(100% + 32px)`) y queda con el mismo margen que el texto
+  del artículo (16/16); desde 1024 px se corre 16 px (`position: relative; left: 16px`) para quedar centrada.
+- **Teléfono: cabecera de perfil (0.5.9, 2026-10-25).** En ≤ 640 px la ficha es una grilla: retrato de 112 px a la
+  izquierda y «Escribe», nombre (28 px) y redes (`.eo-author__links`, botones de 44 px) a su derecha; cargo, bio,
+  temas y el CTA (48 px, a todo el ancho) debajo, el CTA al final. `.eo-author__body` y `.eo-author__actions` pasan a
+  `display: contents`. Tablet y escritorio sin cambios (redes junto al CTA). Verificado en vivo: redes bajo el nombre a
+  320/390, 16/16 px, sin desborde, axe 0. El orden del DOM es el de escritorio (redes después del CTA).
 - **Enlaces y hover (trampa del host Ohio, 0.5.5).** Ohio pinta todos los enlaces al hover:
   `a:not(.-unlink):hover` → `color:#024c8f` y `.links-underline a:not(.button):not(.tag):not(.-undash):hover` →
   `background-image: linear-gradient(currentColor…)` con la animación «underline». Sin defensa, el chip de tema quedaba

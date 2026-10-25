@@ -2,6 +2,12 @@
 
 [Historial](Handoff.archive.md).
 
+## 2026-10-25 — Aprendizaje comercial reutilizable y propuesta de pauta
+Prospección, Commercial y Copywriting Codex/Claude cargan el criterio de conversaciones útiles para nuevas
+aperturas, seguimientos e inbound comercial; espejos verificados. [Implementación y cola nativa](docs/commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md).
+Pendiente: leer/aplicar cambios nativos dentro del mandato; no se editaron HubSpot/secuencias ni se enviaron mensajes.
+Pauta propuesta: US$600/mes, Chile, Search/HubSpot, sujeta a demanda/costo y ruta de conversión; sin gasto aprobado.
+
 ## 2026-10-25 — Ficha de autor del blog, byline y schema de autor (TASK-2057) cerrada
 El single muestra «Por Julio Reyes» enlazado al archivo y, al final, la ficha de La órbita (retrato `portrait`, cargo,
 bio corta, temas, «Ver sus 44 artículos», LinkedIn e Instagram) en lugar de la caja de Ohio con redes del demo.
@@ -10,7 +16,7 @@ tema (runtime 1d7a7bd); perfil de Julio cargado (avatar 252085, cargo «Managing
 e indexable de Yoast reconstruido. Verificado en vivo: Person con cargo, foto, `sameAs` y `worksFor` por `@id`;
 Playwright 5 anchos sin desborde, axe 0. Trampas: `.single-post aside {display:none}` inline (la ficha es `section`),
 el indexable de Yoast guarda el `og:image` viejo y Ohio repinta todo enlace al hover (cada enlace de la ficha lleva
-`-unlink -undash`; prueba de 34 chequeos). 0.5.6 (ficha más contenida: retrato 160, ancho 800) en producción y verificada en vivo. **Pendiente:** enlace YouTube global de Ohio → `colabrio`; slug de autor; `/wp-json/wp/v2/users`. Turno de content-model devuelto a la sesión del Archivo, que implementa la cabecera de `/author/` con el mismo lector. TASK-2057 cerrada por el operador el 2026-10-25. Sin push.
+`-unlink -undash`; prueba de 34 chequeos). 0.5.6 (ficha más contenida: retrato 160, ancho 800) en producción y verificada en vivo. **Pendiente:** enlace YouTube global de Ohio → `colabrio`; slug de autor; `/wp-json/wp/v2/users`. Turno de content-model devuelto a la sesión del Archivo, que implementa la cabecera de `/author/` con el mismo lector. TASK-2057 cerrada por el operador el 2026-10-25. Ajustes posteriores en vivo: 0.5.8 (ficha alineada con el texto en teléfono, centrada en escritorio, 56/40 px de aire) y 0.5.9 (redes junto al retrato en teléfono). Sin push.
 
 ## 2026-10-24 — Portada del blog: «Explora por tema» v2 (TASK-2051) en producción
 La órbita de `/blog/` dejó de mostrar «¿De qué escribimos más?» y es la puerta a las categorías: «Elige por dónde
@@ -279,20 +285,3 @@ Revisión completa posterior: [84 páginas y dirección reformulada](docs/commer
 Profundización: [GANA/LOTI y cuatro pares](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/INVESTIGACION-MARCAS-Y-DIRECCION-2026-10-22.md); cercanía/pedagogía ya existen. 97 consultas, fuentes y bloqueos registrados; LOTI sin UI/checkout verificados e informes recientes inaccesibles. Direcciones aún sin muestras creativas; sin cambios de costo/CRM/propuesta.
 
 Mandato posterior: Julio autorizó preparar el MD. [Propuesta para Claude Design](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/PROPUESTA-GANA-LOTI-2027-PARA-CLAUDE-DESIGN.md) redactada: 28 bloques y anexos; técnica/económica separadas. Pausa de redacción superada, emisión/presentación aún pendientes. Sin deck/PDF/CRM/envíos.
-
-## 2026-10-22 — Redes Efeonce: love brand y canales v2
-
-Estrategia social y editorial registrada: [PDR-020 rev. 2.0](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)
-y [love brand y comunidad](docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md). Plan nov 2026–Q1 2027 y piezas
-en el lienzo privado `claude.ai/artifact/MWoecLSspdKw8ZRXKzPBBd`; nada programado en Metricool. Pendientes: medición
-del puente («¿cómo nos conociste?» + fuente de primer contacto, requiere task), baseline nov–dic, piezas de Instagram,
-Año Nuevo (MET-2338 archivada) y Navidad rehecha desde cero. fal sin saldo (A −0,29 / B −0,35 USD al 22-oct).
-Barrido por subagentes aplicado a context, public-site (PDR-003/004/005/018/019), operations, documentación funcional
-(nuevo `docs/documentation/social/sistema-de-canales-y-love-brand.md`), manuales y 34 archivos de skills con espejo
-`.codex` (salvo `commercial-expert`, cuya copia Codex es otra versión). Contradicciones para decidir el operador:
-jerarquía Glitch↔Manzanitas en PDR-003/018, naming Think/Manzanitas, redirección `/servicios/hubspot/` vs PDR-013,
-reutilizar imágenes del carrusel en LinkedIn (manual de seasonalities vs PDR-020 §4.4), canal del reel/vlog de Glitch,
-story de Manzanitas y pódcast, presentador de los tutoriales de YouTube. **Resueltas el mismo día** (PDR-020, delta punto
-12) y aplicadas a docs, skills y Notion (`Twitter 🐦` retirado del Calendario). La 302 de `/servicios/hubspot/` →
-`/servicios-contratar-hubspot/` quedó **aplicada y verificada en vivo** (Yoast, respaldo `_gh_hubspot_302_before_20261022`).
-Con caché la redirección no conserva UTM: los posts enlazan directo a la landing.
