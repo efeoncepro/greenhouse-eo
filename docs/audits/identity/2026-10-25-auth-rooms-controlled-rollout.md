@@ -81,3 +81,13 @@ cambio acotado ya verificado. Build/CI/smoke de promoción aún pendientes.
 [Recibo del operador](2026-10-25-release-operator-authority.json): roles/entitlements canónicos vivos
 confirman capacidad de ejecutar release y excepción de batch. La autorización humana del goal y el
 ejecutor GitHub son entidades separadas; no autoriza ignorar CI/smoke ni convierte un warning en PASS.
+
+## Minimización de evidencia pública
+
+Al verificar la visibilidad PUBLIC del repo, se detectó que dos recibos nuevos publicaban identificadores
+y vínculos internos del operador innecesarios para una auditoría pública. Se conservan íntegros en `.auth/`
+ignorada con0600 y los JSON versionados quedan como resúmenes sin IDs ni relaciones personales, con digest
+del original. El helper de bootstrap lee exclusivamente el recibo privado y mantiene el pin del payload;
+prueba `--snapshot` PASS sin emitir el contenido al log. No había contraseñas, OTP ni tokens en los recibos.
+La corrección elimina esos datos del árbol actual; las versiones anteriores siguen en el historial Git.
+No se realizó force-push ni reescritura de historial y no se afirma borrado histórico.

@@ -12,7 +12,8 @@ import { resolveFirstPartyCorporateIdentity } from '../../src/lib/auth-server/fi
 import { ELIGIBLE_IDENTITY_FROM } from '../../src/lib/identity/internal-access/store'
 
 const ROOT = resolve(fileURLToPath(new URL('../..', import.meta.url)))
-const RECEIPT_PATH = 'docs/audits/identity/2026-10-25-rooms-pilot-authority-receipt.json'
+// Full identity linkage stays outside the public repository; public audit contains only its digest.
+const RECEIPT_PATH = '.auth/rooms-pilot-authority-receipt.json'
 const RECEIPT_HASH = '6cee855f31056407cbe18c92a52b89383eb701e4e4dbe6dd31ba83b217f1fc10'
 const INSTANCE = 'efeonce-group:us-east4:greenhouse-pg-dev'
 const ISSUER = 'https://auth.efeonce.org'

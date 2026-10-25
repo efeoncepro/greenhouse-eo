@@ -2,110 +2,36 @@
   "schemaVersion": 1,
   "purpose": "release_operator_capability_prerequisite_readback",
   "observedAt": "2026-10-25T22:32:12.673Z",
-  "status": "verified_snapshot",
-  "subject": {
-    "userId": "user-efeonce-admin-julio-reyes",
-    "identityProfileId": "identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes",
-    "memberId": "julio-reyes",
-    "tenantType": "efeonce_internal",
-    "roleCodes": [
-      "efeonce_admin"
-    ],
-    "primaryRoleCode": "efeonce_admin"
-  },
+  "status": "verified_snapshot_redacted",
+  "privateReceiptSha256": "c96aab163ec701f1f2704bebb57ab2d00fc44e9b551b0e74f719da6b76d893b8",
+  "publicationPolicy": "Public evidence excludes personal identifiers and identity or employment linkage. Full operator receipt is local, ignored and mode 0600. No secrets or authentication tokens were present. Prior committed versions remain in Git history; this change does not claim historical erasure.",
   "evaluations": [
     {
       "capability": "platform.release.execute",
       "action": "execute",
       "scope": "all",
       "baseAllowed": true,
-      "effectiveAllowed": true,
-      "matchingBaseEntries": [
-        {
-          "capability": "platform.release.execute",
-          "action": "execute",
-          "scope": "all",
-          "source": "role"
-        }
-      ],
-      "matchingEffectiveEntries": [
-        {
-          "capability": "platform.release.execute",
-          "action": "execute",
-          "scope": "all",
-          "source": "role"
-        }
-      ]
+      "effectiveAllowed": true
     },
     {
       "capability": "platform.release.preflight.override_batch_policy",
       "action": "update",
       "scope": "all",
       "baseAllowed": true,
-      "effectiveAllowed": true,
-      "matchingBaseEntries": [
-        {
-          "capability": "platform.release.preflight.override_batch_policy",
-          "action": "update",
-          "scope": "all",
-          "source": "role"
-        }
-      ],
-      "matchingEffectiveEntries": [
-        {
-          "capability": "platform.release.preflight.override_batch_policy",
-          "action": "update",
-          "scope": "all",
-          "source": "role"
-        }
-      ]
+      "effectiveAllowed": true
     },
     {
       "capability": "platform.release.bypass_preflight",
       "action": "bypass_preflight",
       "scope": "all",
       "baseAllowed": true,
-      "effectiveAllowed": true,
-      "matchingBaseEntries": [
-        {
-          "capability": "platform.release.bypass_preflight",
-          "action": "bypass_preflight",
-          "scope": "all",
-          "source": "role"
-        }
-      ],
-      "matchingEffectiveEntries": [
-        {
-          "capability": "platform.release.bypass_preflight",
-          "action": "bypass_preflight",
-          "scope": "all",
-          "source": "role"
-        }
-      ]
+      "effectiveAllowed": true
     }
   ],
   "allRequestedCapabilitiesAllowed": true,
-  "source": {
-    "transaction": "canonical Cloud SQL ops profile, REPEATABLE READ READ ONLY",
-    "checkoutSha": "d4a1d16e096ab5915156ee76d2301cb1ff6e1d3e",
-    "subjectReader": "src/lib/tenant/current-internal-subject.ts:getCurrentInternalEntitlementSubject",
-    "rolesReader": "src/lib/tenant/current-role-assignments.ts:getCurrentInternalRoleAuthority",
-    "baseEvaluation": "src/lib/entitlements/runtime.ts:getTenantEntitlements + can",
-    "effectiveEvaluation": "src/lib/entitlements/effective-reader.ts:readEffectiveEntitlements (__platform__) + can",
-    "roleScope": "current global internal assignments only, clientId=null; no inferred role from ID/email/GitHub"
-  },
   "authoritySeparation": {
-    "humanOperator": "Canonical subject above; human deploy goal authorization is separate conversation evidence, not a database result",
-    "githubExecutor": "GitHub actor/workflow identity is a distinct execution principal; no canonical identity binding or role inferred here",
-    "receipt": "Prerequisite capability observation only; does not execute or authorize a bypass/override; reason, audit, current permission and approved scope remain required",
-    "gates": "Does not waive CI, smoke, migration verification or release evidence"
-  },
-  "mutations": {
-    "grants": false,
-    "overrides": false,
-    "release": false,
-    "identityLinks": false,
-    "sessions": false,
-    "tokens": false
+    "humanAuthorization": "The approved goal is separate from the capability observation.",
+    "githubExecutor": "No identity or role is inferred from the GitHub actor.",
+    "gates": "The receipt neither executes an override nor waives CI, smoke or release evidence."
   }
 }
