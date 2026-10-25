@@ -102,6 +102,7 @@ http
           if (!up.ok) return res.writeHead(up.status).end()
           cache.set(url.pathname, { body: Buffer.from(await up.arrayBuffer()), type: up.headers.get('content-type') || 'application/octet-stream' })
         }
+
         const a = cache.get(url.pathname)
 
         res.writeHead(200, { 'content-type': a.type })

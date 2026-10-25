@@ -61,3 +61,10 @@ Se corrigen mecánicamente sin regenerar piezas; gates globales pendientes de re
 Owner arquitectónico de la contención: `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`; cambia sólo el valor
 durable de un flag existente, sin nuevo contrato ni ADR. Vercel metadata: flag de eventos ausente
 en todos los targets listados del proyecto Greenhouse (default del lector OFF); no se leyeron payloads.
+
+Fullsuite encontró mirror del watchdog Auth incompleto: faltaban workflow y script de config drift.
+Se añaden exactamente esos dos paths al reader; revisión arquitectónica separada confirma que restringe
+los skips sin debilitar el gate de paridad. Retest focal:13PASS en2suites. Fullsuite previo:21598PASS,1fallo (ese mirror),383omitidos;
+no se presentan omitidos como PASS. Lint global encontró21errores de formato en5scripts del blog heredados,
+además de los2scripts gráficos ya corregidos. Los5scriptsblog quedaron con AST idéntico a HEAD,
+node --check y lint focal PASS; nueva pasada global en curso. TypeScript global PASS tras patch del mirror.

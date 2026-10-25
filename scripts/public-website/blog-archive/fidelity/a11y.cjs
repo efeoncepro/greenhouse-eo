@@ -21,6 +21,7 @@ const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-
     const url = map ? map[view] : process.argv[2] + view + '/'
 
     if (!url) continue
+
     for (const [name, viewport] of [['1440', { width: 1440, height: 900 }], ['820', { width: 820, height: 1180 }], ['390', { width: 390, height: 844 }]]) {
       const page = await (await browser.newContext({ viewport })).newPage()
 
@@ -34,6 +35,7 @@ const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-
       await page.context().close()
     }
   }
+
   await browser.close()
   console.log(total ? `✗ ${total} violations` : `✓ axe WCAG 2.2 AA: 0 violations in ${VIEWS.length} views × 3 widths`)
   process.exit(total ? 1 : 0)

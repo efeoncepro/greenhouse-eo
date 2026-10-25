@@ -9,6 +9,7 @@ const fs = require('node:fs')
 const { chromium } = require('playwright')
 
 const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia', 'tema-glitch']
+
 const WIDTHS = [320, 360, 390, 768, 1024, 1100, 1440, 1920]
 
 ;(async () => {
@@ -29,6 +30,7 @@ const WIDTHS = [320, 360, 390, 768, 1024, 1100, 1440, 1920]
 
       await page.goto(url, { waitUntil: 'load', timeout: 60000 })
       await page.evaluate(() => document.fonts.ready)
+
       const m = await page.evaluate(() => {
         const h1 = document.querySelector('#eoba h1')
         // A word split across lines: some text node's line box starts in the middle of a word.
@@ -61,8 +63,10 @@ const WIDTHS = [320, 360, 390, 768, 1024, 1100, 1440, 1920]
       row.push(`${w}:${m.over}${m.h1 !== 1 ? ' h1=' + m.h1 : ''}${m.broken ? ' ROTA' : ''}`)
       await page.context().close()
     }
+
     console.log(view.padEnd(15), row.join('  '))
   }
+
   await browser.close()
   console.log(failed ? `✗ ${failed} problems` : '✓ no overflow, one H1, no broken word, 320–1920')
   process.exit(failed ? 1 : 0)

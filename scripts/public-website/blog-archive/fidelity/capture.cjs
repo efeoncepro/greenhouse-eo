@@ -22,6 +22,7 @@ const { renderBoard } = require('../../blog-v3/lib/render-node.cjs')
 const SRC = path.join(__dirname, '..', 'source')
 const VIEWS = ['tema', 'etiqueta', 'autor', 'busqueda', 'tema-vacio', 'busqueda-vacia', 'tema-glitch']
 const WIDTHS = { 1440: { width: 1440, height: 900 }, 390: { width: 390, height: 844 } }
+
 const SECTIONS = [
   ['archive-head', ':scope > header.ah'],
   ['archive-filter', ':scope > section.fb'],
@@ -30,6 +31,7 @@ const SECTIONS = [
   ['archive-meanwhile', ':scope > section.mt'],
   ['archive-topics', ':scope > section.ot'],
 ]
+
 const assets = JSON.parse(fs.readFileSync(path.join(SRC, 'assets.json'), 'utf8'))
 const byId = Object.fromEntries(Object.values(assets).map(a => [a.id, a.file]))
 const TYPES = { svg: 'image/svg+xml', webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg', ttf: 'font/ttf' }
@@ -52,6 +54,7 @@ function serve(pages) {
 
       return fs.createReadStream(path.join(SRC, 'assets', f)).pipe(res)
     }
+
     const page = pages[req.url.replace(/^\/|\/$/g, '')]
 
     if (page) {
@@ -59,6 +62,7 @@ function serve(pages) {
 
       return res.end(page)
     }
+
     res.writeHead(404).end()
   })
 
@@ -71,6 +75,7 @@ async function capture(browser, url, view, width, outDir, site) {
 
   await page.goto(url, { waitUntil: site ? 'load' : 'networkidle', timeout: 60000 })
   await page.evaluate(() => document.fonts.ready)
+
   if (site) {
     await page.waitForTimeout(1200)
     await page.evaluate(() => {
@@ -92,7 +97,9 @@ async function capture(browser, url, view, width, outDir, site) {
     if (!(await loc.count())) continue
     // The year column is sticky: always shoot a section from the same scroll position (its top at the viewport top).
     await loc.evaluate(el => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY))
-    await loc.evaluate(el => Promise.all([...el.querySelectorAll('img')].map(im => { im.loading = 'eager'; return im.decode().catch(() => {}) })))
+    await loc.evaluate(el => Promise.all([...el.querySelectorAll('img')].map(im => { im.loading = 'eager';
+
+return im.decode().catch(() => {}) })))
     const file = path.join(outDir, `${view}-${width}--${String(i).padStart(2, '0')}-${name}.png`)
 
     // Clip of the full page (an element shot waits for «stable», which the live shell's own CSS animations never are).
@@ -139,6 +146,7 @@ async function main() {
           ? standalone(path.join(SRC, 'Archivo.bound.dc.html'), JSON.parse(fs.readFileSync(path.join(SRC, `fixture.${view}.json`), 'utf8')))
           : standalone(path.join(SRC, `Archivo-${view}.reference.dc.html`))
       }
+
       server = await serve(pages)
       urlOf = view => `http://127.0.0.1:${server.address().port}/${view}`
     }
@@ -147,6 +155,7 @@ async function main() {
       if (!urlOf(view)) continue
       for (const width of Object.keys(WIDTHS)) report[`${view}-${width}`] = await capture(browser, urlOf(view), view, width, outDir, mode === 'url')
     }
+
     if (server) server.close()
   } finally {
     await browser.close()

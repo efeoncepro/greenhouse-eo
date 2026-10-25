@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "purpose": "rooms_authorized_synthetic_room_canary_identity_bootstrap",
+  "observedAt": "2026-10-25T22:21:45.883Z",
+  "status": "verified_snapshot",
+  "person": {
+    "userId": "user-efeonce-admin-julio-reyes",
+    "profileId": "identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes",
+    "memberId": "julio-reyes",
+    "active": true,
+    "status": "active",
+    "profileActive": true,
+    "profileStatus": "active",
+    "profileType": "efeonce_internal",
+    "mergedIntoProfileId": null
+  },
+  "organization": {
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "publicId": "EO-ORG-0007",
+    "active": true,
+    "status": "active",
+    "isOperatingEntity": true
+  },
+  "identities": [
+    {
+      "enrollmentId": "ine-2a0d97af-9a44-4e2b-b5d4-ec573c67d4d2",
+      "environmentId": "efeonce-auth",
+      "profileId": "identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes",
+      "nativeLinkId": "identity-source-link-cc869699-16bc-4b93-b121-eed7f3936c6b",
+      "upstreamLinkId": "identity-link-identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes-azure-ad-user-71acd85d-15a6-4eb6-953d-125370032e93",
+      "status": "active",
+      "revokedAt": null,
+      "issuer": "https://auth.efeonce.org",
+      "environmentStatus": "active",
+      "subject": "5f0WpC8zJrdzcfLsdrbtMur9BblCikKK",
+      "nativeLinkActive": true,
+      "nativeLinkIsLogin": true,
+      "nativeSourceSystem": "external_idp:efeonce-auth",
+      "canonicalFirstPartyReaderResolved": true,
+      "canonicalIdsMatch": true
+    }
+  ],
+  "memberships": [
+    {
+      "membershipId": "mbr-db6f9a83-26aa-4673-94bd-947331ff3ea1",
+      "profileId": "identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes",
+      "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+      "membershipType": "team_member",
+      "active": true,
+      "status": "active",
+      "startDate": null,
+      "endDate": null,
+      "effectiveAtObservation": true
+    }
+  ],
+  "legalRelationships": [
+    {
+      "relationshipId": "pler-735777d2-ce46-4393-b0ca-52517cbef8a5",
+      "profileId": "identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes",
+      "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+      "relationshipType": "employee",
+      "status": "active",
+      "effectiveFrom": "2026-04-18",
+      "effectiveTo": null,
+      "effectiveAtObservation": true
+    }
+  ],
+  "databaseClock": {
+    "effectiveDate": "2026-10-25",
+    "dateTimezone": "UTC"
+  },
+  "source": {
+    "database": "canonical Greenhouse Cloud SQL via ops profile",
+    "transaction": "REPEATABLE READ READ ONLY",
+    "reader": "src/lib/auth-server/first-party/identity.ts:resolveFirstPartyCorporateIdentity",
+    "eligibility": "src/lib/identity/internal-access/store.ts:ELIGIBLE_IDENTITY_FROM",
+    "tables": [
+      "greenhouse_core.client_users",
+      "greenhouse_core.identity_profiles",
+      "greenhouse_core.organizations",
+      "greenhouse_core.person_memberships",
+      "greenhouse_core.person_legal_entity_relationships",
+      "greenhouse_core.internal_native_enrollments",
+      "greenhouse_core.identity_profile_source_links",
+      "greenhouse_core.external_identity_environments"
+    ],
+    "lookup": "administrative lookup only; authority resolved by existing IDs and source links; no email binding"
+  },
+  "expirySemantics": {
+    "membershipEndDate": "inclusive, null means no stored end date; not perpetual authorization",
+    "legalEffectiveTo": "inclusive, null means no stored end date",
+    "enrollment": "status/revoked_at governed; schema has no expiry",
+    "receipt": "point-in-time evidence; revalidate before product bootstrap and normal authorization; not a session or grant"
+  },
+  "constraints": {
+    "notAnAuthorizationGrant": true,
+    "scope": "authorized synthetic Rooms pilot only",
+    "createGrants": false,
+    "createLinks": false,
+    "sessionsRead": false,
+    "tokensRead": false,
+    "deriveProductRolesFromMcp": false
+  }
+}

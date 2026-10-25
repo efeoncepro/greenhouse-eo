@@ -95,6 +95,7 @@ function deviate(src) {
   // 6. One markup for both widths: the `.mob` root class of the 390 board goes (the media query does its job).
   // (5. The page's <main id="main"> is opened by the plugin's page template around the board, as Ohio's page.php does.)
   src = rep(src, /<div class="v3 arc( gl)?( mob)?" style="position: relative;">/, '<div class="v3 arc$1" style="position: relative;">')
+
   // 5. Ids prefixed (the site header may use `q`).
   for (const id of ['q', 'ot-h', 'mt-h', 'gl-sub-h']) {
     const n = count(src, `id="${id}"`)
@@ -102,6 +103,7 @@ function deviate(src) {
     if (n > 1) throw new Error('Duplicated id ' + id)
     src = src.split(`id="${id}"`).join(`id="eoba-${id}"`).split(`for="${id}"`).join(`for="eoba-${id}"`).split(`aria-labelledby="${id}"`).join(`aria-labelledby="eoba-${id}"`)
   }
+
   // 3. Format filter without JS: links with aria-current; 4. indicator placed by the server.
   src = src.replace(/<button type="button" class="segc__b" aria-pressed="true">([\s\S]*?)<\/button>/g, '<a href="#" class="segc__b" aria-current="page">$1</a>')
   src = src.replace(/<button type="button" class="segc__b" aria-pressed="false">([\s\S]*?)<\/button>/g, '<a href="#" class="segc__b">$1</a>')
@@ -138,6 +140,7 @@ for (const view of VIEWS) {
   if (strip(desk) !== strip(mob)) throw new Error(`${view}: the 1440 and 390 boards differ beyond the .mob root class`)
 
   const parts = splitBoard(desk)
+
   parts.body = deviate(parts.body + '</x-dc>').replace(/<\/x-dc>$/, '')
   const css = deviateCss(parts.css)
 
@@ -151,17 +154,20 @@ for (const view of VIEWS) {
   } else if (sharedCss !== css) throw new Error(`${view}: the canvas CSS differs between views`)
 
   const out = parts.head + parts.helmet.replace(parts.css, css) + parts.body + parts.tail
+
   fs.writeFileSync(path.join(SRC, `Archivo-${view}.reference.dc.html`), out)
   console.log(`reference ${view}`)
 }
 
 // The bound template: the shared shell (fonts, CSS) + the hand-bound body + logic that renders the data document.
 const body = fs.readFileSync(path.join(SRC, 'archive-body.template.html'), 'utf8')
+
 const logic = `<script type="text/x-dc" data-dc-script data-props='{"data":{"editor":null},"$preview":{"width":1440,"height":4000}}'>
 class Component extends DCLogic {
   renderVals() { return this.props.data; }
 }
 </script>`
+
 const bound = shell.head.replace(/<title>[^<]*<\/title>/, '<title>Archivo del blog · plantilla enlazada</title>') + shell.helmet.replace(shell.css, boundCss) + '\n' + body + '</x-dc>\n' + logic + '\n</body>\n</html>\n'
 
 fs.writeFileSync(path.join(SRC, 'Archivo.bound.dc.html'), bound)
