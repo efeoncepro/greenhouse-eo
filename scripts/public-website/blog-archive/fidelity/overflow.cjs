@@ -36,13 +36,12 @@ const WIDTHS = [320, 360, 390, 768, 1024, 1100, 1440, 1920]
 
         if (h1) {
           const range = document.createRange()
-          const text = h1.textContent
+          // The words live in the H1's first text node (the author's name is followed by its Growth dot, a <span>).
+          const node = h1.firstChild
+          const text = node && node.nodeType === 3 ? node.data : ''
 
           for (let i = 1; i < text.length; i++) {
             if (/\s/.test(text[i - 1]) || /\s/.test(text[i])) continue
-            const node = h1.firstChild
-
-            if (!node || node.nodeType !== 3) break
             range.setStart(node, i - 1)
             range.setEnd(node, i)
             const a = range.getBoundingClientRect()

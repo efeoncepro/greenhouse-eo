@@ -40,7 +40,7 @@ Seis vistas con un solo contrato de datos (`source/fixture.<vista>.json` es la f
 |---|---|---|---|
 | `tema` | `is_category()` con publicaciones | nombre en el color de su línea, descripción, «N publicaciones · la última», destacada montada | por año, fila sin tema |
 | `etiqueta` | `is_tag()` | nombre, «Publicaciones marcadas con «x»…», ficha, destacada | por año, fila con tema |
-| `autor` | `is_author()` de un autor editorial | foto (`get_avatar_url` 336, sin Gravatar; si falta, iniciales), nombre, cargo (1.ª frase de la bio), bio | por año |
+| `autor` | `is_author()` de un autor editorial | «Autor v2» (§2.2): retrato con órbita, nombre con punto Growth, cargo · organización, bio corta, «Escribe sobre», publicaciones · la última y redes, desde `EO_Author_Profile` | por año |
 | `busqueda` | `is_search()` con resultados | «término», buscador editable, «N resultados», «Mejor resultado» | por relevancia, fecha completa, término resaltado |
 | `tema-vacio` | categoría sin publicaciones | copy del tema vacío + tema que lo contiene | «Mientras tanto»: último Glitch + guía + artículo |
 | `busqueda-vacia` | búsqueda sin resultados o sin término | «Nada sobre «x», todavía.» / «¿Qué quieres resolver hoy?», preguntas frecuentes, Spark | «Mientras tanto, para empezar» |
@@ -63,13 +63,31 @@ la piel de Glitch (canvas «Tema · Glitch (variante)», versión 79). El adapta
 | Muletilla | si la descripción termina en «, sin anestesia.», esa frase va en Guttery (`assets/fonts/`, sólo aquí) |
 | Cabecera | «EDICIÓN #N» = el mayor número «Glitch #N» publicado (formato `glitch-edicion`) y su fecha; «FLASH» = el último `glitch-flash` |
 | Borde | falla en bytes estática (SVG en la plantilla) al pie del bloque navy |
-| Filas | placa `#N` tal como se publicó (`#02`) y título sin el prefijo; Flash con la estela; notas sin placa |
-| Filtro | Ediciones / Flash / Notas (`?formato=edicion|flash|nota`, en `EOBH_Archive::FORMAT_FILTER`) |
+| Filas | placa `#N` tal como se publicó (`#02`) y título sin el prefijo; Flash con la estela (todo Glitch sin número es Flash desde el 2026-10-24) |
+| Filtro | Ediciones / Flash (`?formato=edicion|flash`, en `EOBH_Archive::FORMAT_FILTER`; «Notas» se retiró el 2026-10-24) |
 | Suscripción | banner con la píldora real (`<greenhouse-form inline_pill>`, el mismo formulario de `/blog/`), blanca, con `inline-label-logo`; sin `eo_blog_glitch_form_key` no se pinta. `EOBH_Archive::enqueue()` carga `renderer-latest.js` sólo entonces |
 
 El logo dentro de la píldora llega con el renderer **1.3.0** (Greenhouse, `src/growth-forms-renderer`): hasta su release
 a producción, la píldora muestra «Suscríbete a Glitch» en texto. El CSS de la variante es un superconjunto del de D
 (`bind-archive.cjs` exige el prefijo exacto); el reset del host excluye `greenhouse-form *` (como la portada).
+
+### 2.2 Cabecera de autor v2 (canvas v98, aprobada y en vivo el 2026-10-25)
+
+La vista `autor` lee el perfil del autor de TASK-2057 (`EO_Author_Profile::for_user`, cacheado) en `gather()` y
+`EO_Archive_Adapter::author()` (pura) arma el bloque `author` del documento:
+
+| Pieza | Dato |
+|---|---|
+| Retrato | `photoLarge` (300) dentro de la órbita de la ficha (anillo halo 0,4, arco y esfera Growth); sin foto, iniciales en el mismo círculo |
+| Nombre | H1 con el punto Growth (`.au2__dot`) |
+| Cargo | `role` · `org` («Efeonce Group»); en móvil la organización baja a su línea sin el «·» |
+| Bio | `bioShort` (≤ 180) en lugar de la bio larga |
+| Escribe sobre | `topics` (hasta 4) como chips oscuros enlazados a su categoría; sin temas, no se pinta |
+| Pie | «N publicaciones · la última» (el `meta` de la vista se mueve aquí) y las redes en el orden del `sameAs`, con el isotipo de `EO_Author_Profile::NETWORKS` y `aria-label`; un sitio web propio lleva el globo |
+
+Sin perfil (autor sin publicaciones o sin la clase), el bloque cae a la regla anterior: foto o iniciales y «Cargo. Bio»
+desde la bio de WordPress. El CSS `.au2*` reemplaza a `.au*` en los 14 tableros D (el CSS es uno solo para las siete
+vistas); el gate de desborde lee las palabras del primer nodo de texto del H1 (el punto va en un `<span>`).
 
 ## 3. Reglas de WordPress (EOBH_Archive)
 

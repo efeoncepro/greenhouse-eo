@@ -234,9 +234,27 @@ a{color:#ffffff}
 @media (hover:hover){:is(.v3,.m3) .chip.chip--d:not(.is-on):hover{border-color:#ffffff;background-color:rgba(255,255,255,.08)}}
 .chip--d:focus-visible{outline:2px solid #36c8bf;outline-offset:3px}
 .chip__n{font-weight:400;opacity:.75;font-variant-numeric:tabular-nums}
-.au{display:flex;flex-direction:column;align-items:flex-start;gap:28px;margin-top:24px}
-.au__ph{width:168px;height:168px;flex:none;border-radius:50%;object-fit:cover;box-shadow:0 0 0 4px #001a33,0 0 0 6px #36c8bf}
-.au__r{margin:12px 0 0;font-size:18px;font-weight:600;color:#ffffff}
+.au2{display:flex;flex-direction:column;align-items:flex-start;gap:20px;margin-top:20px}
+.au2__pt{position:relative;flex:none;width:200px;height:200px;margin-left:-12px}
+.au2__ph{position:absolute;left:12.5%;top:12.5%;width:75%;height:75%;border-radius:50%;object-fit:cover}
+.au2__orb{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.au2__id{min-width:0}
+.au2__n{margin:0}
+.au2__dot{color:#36c8bf}
+.au2__r{margin:16px 0 0;font-size:20px;line-height:1.35;font-weight:600;color:#ffffff}
+.au2__sep,.au2__org{font-weight:400;color:#cfe4fa}
+.au2__bio{margin-top:32px;max-width:640px;font-size:20px;line-height:1.55}
+.au2__tp{margin-top:32px}
+.au2__lb{margin:0 0 14px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#cfe4fa}
+.au2__chips{display:flex;flex-wrap:wrap;gap:10px;margin:0;padding:0;list-style:none}
+.au2__ft{display:flex;align-items:flex-end;gap:32px;margin-top:40px;max-width:680px}
+.au2__meta{margin-top:0;flex:1 1 auto}
+.au2__soc{display:flex;gap:12px;margin:0 0 6px;padding:0;list-style:none}
+.au2__s{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border:1px solid rgba(207,228,250,.32);border-radius:50%;color:#ffffff;transition:background-color .2s,border-color .2s,color .2s}
+.au2__s svg{width:20px;height:20px}
+.au2__s:focus-visible{outline:2px solid #ffffff;outline-offset:3px}
+@media (hover:hover){.au2__s:hover{background-color:#ffffff;border-color:#ffffff;color:#001a33}}
+@media (prefers-reduced-motion:reduce){.au2__s{transition:none}}
 .sfd{display:flex;align-items:center;gap:12px;margin-top:40px;max-width:720px;height:84px;padding:0 10px 0 32px;border-radius:999px;background:#ffffff;border:1.5px solid #ffffff}
 .sfd input{flex:1;min-width:0;height:60px;border:0;background:transparent;color:#023c70;font:400 20px 'Poppins',sans-serif}
 .sfd .beamsvg rect{rx:42.5px}
@@ -339,9 +357,18 @@ a{color:#ffffff}
 .fb--f .fb__in{max-width:none}
 .fb__l,.fb .segc{display:none}
 .fb__m{display:flex}
-.au{flex-direction:column;align-items:flex-start;gap:20px;margin-top:8px}
-.au__ph{width:112px;height:112px}
-.au__r{font-size:15px}
+.au2{flex-direction:column;align-items:flex-start;gap:20px;margin-top:12px}
+.au2__pt{width:144px;height:144px;margin-left:-9px}
+.au2__r{margin-top:10px;font-size:16px}
+.au2__sep{display:none}
+.au2__org{display:block}
+.au2__bio{margin-top:24px;font-size:17px}
+.au2__tp{margin-top:28px}
+.au2__lb{font-size:12px}
+.au2__chips .chip{min-height:44px;padding:0 16px;font-size:14px}
+.au2__ft{flex-direction:column;align-items:stretch;gap:20px;margin-top:28px}
+.au2__meta{margin-top:0}
+.au2__soc{margin:0}
 .sfd{height:64px;margin-top:24px;padding:0 6px 0 20px;gap:8px}
 .sfd input{height:52px;font-size:17px}
 .sfd .beamsvg rect{rx:32.5px}
@@ -416,9 +443,18 @@ a{color:#ffffff}
 .mob .fb--f .fb__in{max-width:none}
 .mob .fb__l,.mob .fb .segc{display:none}
 .mob .fb__m{display:flex}
-.mob .au{flex-direction:column;align-items:flex-start;gap:20px;margin-top:8px}
-.mob .au__ph{width:112px;height:112px}
-.mob .au__r{font-size:15px}
+.mob .au2{flex-direction:column;align-items:flex-start;gap:20px;margin-top:12px}
+.mob .au2__pt{width:144px;height:144px;margin-left:-9px}
+.mob .au2__r{margin-top:10px;font-size:16px}
+.mob .au2__sep{display:none}
+.mob .au2__org{display:block}
+.mob .au2__bio{margin-top:24px;font-size:17px}
+.mob .au2__tp{margin-top:28px}
+.mob .au2__lb{font-size:12px}
+.mob .au2__chips .chip{min-height:44px;padding:0 16px;font-size:14px}
+.mob .au2__ft{flex-direction:column;align-items:stretch;gap:20px;margin-top:28px}
+.mob .au2__meta{margin-top:0}
+.mob .au2__soc{margin:0}
 .mob .sfd{height:64px;margin-top:24px;padding:0 6px 0 20px;gap:8px}
 .mob .sfd input{height:52px;font-size:17px}
 .mob .sfd .beamsvg rect{rx:32.5px}
@@ -474,15 +510,32 @@ a{color:#ffffff}
     <div class="ah__g ah__g--f">
       <div>
         <p class="eyb eyb--d"><span class="eyb__bar" style="background: #36c8bf;"></span>Autor</p>
-        <div class="au">
-          <img class="au__ph" src="/_blob/9a8e2f558646ef115b46fdbc23b1ed5b" alt="Julio Reyes">
-          <div>
-            <h1 class="idea ah__t ah__t--m" style="margin: 0;">Julio Reyes</h1>
-            <p class="au__r">Fundador y Managing &amp; GTM Director de Efeonce Group</p>
+        <div class="au2">
+          <div class="au2__pt">
+            <img class="au2__ph" src="/_blob/a6d31c0fe569d576c35e14c3f5305ae6" alt="Julio Reyes">
+            <svg class="au2__orb" viewBox="0 0 208 208" aria-hidden="true" focusable="false"><circle cx="104" cy="104" r="96" fill="none" stroke="#72ded8" stroke-opacity="0.4" stroke-width="1.5"/><path d="M 13.79 71.17 A 96 96 0 0 1 71.17 13.79" fill="none" stroke="#36c8bf" stroke-width="3" stroke-linecap="round"/><circle cx="71.17" cy="13.79" r="6" fill="#36c8bf"/></svg>
+          </div>
+          <div class="au2__id">
+            <h1 class="idea ah__t ah__t--m au2__n">Julio Reyes<span class="au2__dot">.</span></h1>
+            <p class="au2__r">Managing &amp; GTM Director<span class="au2__sep"> · </span><span class="au2__org">Efeonce Group</span></p>
           </div>
         </div>
-        <p class="ah__d">Más de 12 años diseñando sistemas de marketing, crecimiento y operaciones creativas para organizaciones en Latinoamérica. Escribe sobre Loop Marketing, IA aplicada, SEO/AEO, Creative Operations y diseño de sistemas donde tecnología, datos y criterio humano trabajan juntos.</p>
-        <dl class="ah__meta ah__meta--row"><div><dt>publicaciones</dt><dd>44</dd></div><div><dt>la última</dt><dd>28 sep 2026</dd></div></dl>
+        <p class="ah__d au2__bio">Más de 12 años diseñando sistemas de marketing, crecimiento y operaciones creativas para empresas medianas y grandes de Latinoamérica: banca, manufactura, retail y SaaS.</p>
+        <div class="au2__tp">
+          <p class="au2__lb">Escribe sobre</p>
+          <ul class="au2__chips">
+            <li><a href="#" class="chip chip--d live">Inteligencia artificial aplicada al marketing</a></li>
+            <li><a href="#" class="chip chip--d live">Loop Marketing</a></li>
+            <li><a href="#" class="chip chip--d live">SEO/AEO</a></li>
+          </ul>
+        </div>
+        <div class="au2__ft">
+          <dl class="ah__meta ah__meta--row au2__meta"><div><dt>publicaciones</dt><dd>44</dd></div><div><dt>la última</dt><dd>28 sep 2026</dd></div></dl>
+          <ul class="au2__soc" aria-label="Redes de Julio Reyes">
+            <li><a href="#" class="au2__s" rel="me noopener" target="_blank" aria-label="Instagram de Julio Reyes"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path fill="currentColor" d="M128 23.064c34.177 0 38.225.13 51.722.745c12.48.57 19.258 2.655 23.769 4.408c5.974 2.322 10.238 5.096 14.717 9.575s7.253 8.743 9.575 14.717c1.753 4.511 3.838 11.289 4.408 23.768c.615 13.498.745 17.546.745 51.723s-.13 38.226-.745 51.723c-.57 12.48-2.655 19.257-4.408 23.768c-2.322 5.974-5.096 10.239-9.575 14.718s-8.743 7.253-14.717 9.574c-4.511 1.753-11.289 3.839-23.769 4.408c-13.495.616-17.543.746-51.722.746s-38.228-.13-51.723-.746c-12.48-.57-19.257-2.655-23.768-4.408c-5.974-2.321-10.239-5.095-14.718-9.574c-4.479-4.48-7.253-8.744-9.574-14.718c-1.753-4.51-3.839-11.288-4.408-23.768c-.616-13.497-.746-17.545-.746-51.723s.13-38.225.746-51.722c.57-12.48 2.655-19.258 4.408-23.769c2.321-5.974 5.095-10.238 9.574-14.717c4.48-4.48 8.744-7.253 14.718-9.575c4.51-1.753 11.288-3.838 23.768-4.408c13.497-.615 17.545-.745 51.723-.745M128 0C93.237 0 88.878.147 75.226.77c-13.625.622-22.93 2.786-31.071 5.95c-8.418 3.271-15.556 7.648-22.672 14.764S9.991 35.738 6.72 44.155C3.555 52.297 1.392 61.602.77 75.226C.147 88.878 0 93.237 0 128s.147 39.122.77 52.774c.622 13.625 2.785 22.93 5.95 31.071c3.27 8.417 7.647 15.556 14.763 22.672s14.254 11.492 22.672 14.763c8.142 3.165 17.446 5.328 31.07 5.95c13.653.623 18.012.77 52.775.77s39.122-.147 52.774-.77c13.624-.622 22.929-2.785 31.07-5.95c8.418-3.27 15.556-7.647 22.672-14.763s11.493-14.254 14.764-22.672c3.164-8.142 5.328-17.446 5.95-31.07c.623-13.653.77-18.012.77-52.775s-.147-39.122-.77-52.774c-.622-13.624-2.786-22.929-5.95-31.07c-3.271-8.418-7.648-15.556-14.764-22.672S220.262 9.99 211.845 6.72c-8.142-3.164-17.447-5.328-31.071-5.95C167.122.147 162.763 0 128 0m0 62.27c-36.302 0-65.73 29.43-65.73 65.73s29.428 65.73 65.73 65.73c36.301 0 65.73-29.428 65.73-65.73c0-36.301-29.429-65.73-65.73-65.73m0 108.397c-23.564 0-42.667-19.103-42.667-42.667S104.436 85.333 128 85.333s42.667 19.103 42.667 42.667s-19.103 42.667-42.667 42.667m83.686-110.994c0 8.484-6.876 15.36-15.36 15.36s-15.36-6.876-15.36-15.36s6.877-15.36 15.36-15.36s15.36 6.877 15.36 15.36"/></svg></a></li>
+            <li><a href="#" class="au2__s" rel="me noopener" target="_blank" aria-label="LinkedIn de Julio Reyes"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path fill="currentColor" d="M218.123 218.127h-37.931v-59.403c0-14.165-.253-32.4-19.728-32.4c-19.756 0-22.779 15.434-22.779 31.369v60.43h-37.93V95.967h36.413v16.694h.51a39.91 39.91 0 0 1 35.928-19.733c38.445 0 45.533 25.288 45.533 58.186zM56.955 79.27c-12.157.002-22.014-9.852-22.016-22.009s9.851-22.014 22.008-22.016c12.157-.003 22.014 9.851 22.016 22.008A22.013 22.013 0 0 1 56.955 79.27m18.966 138.858H37.95V95.967h37.97zM237.033.018H18.89C8.58-.098.125 8.161-.001 18.471v219.053c.122 10.315 8.576 18.582 18.89 18.474h218.144c10.336.128 18.823-8.139 18.966-18.474V18.454c-.147-10.33-8.635-18.588-18.966-18.453"/></svg></a></li>
+          </ul>
+        </div>
       </div>
       <a href="#" class="hc"><svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>
         <span class="hc__img"><img src="/_blob/08933b6eae580530405a3ebace493378" alt=""></span>

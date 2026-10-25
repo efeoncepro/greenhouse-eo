@@ -58,8 +58,8 @@ botón se iluminan sin perder el texto ni el logo. El círculo o la línea azul 
 
 ## Qué no hace
 
-- No cambia la portada del blog ni el archivo del autor (eso es la [portada](portada-del-blog.md) y el
-  [archivo del blog](archivo-del-blog.md)).
+- No cambia la portada del blog. El [archivo del autor](archivo-del-blog.md) usa el mismo perfil en su cabecera desde
+  el 2026-10-25: cambiar el cargo, la bio corta, los temas o las redes cambia la ficha y esa cabecera a la vez.
 - No corrige los enlaces sociales generales del tema Ohio: el de YouTube todavía apunta a una página ajena y se
   arregla aparte.
 - Todavía no cambia la dirección del archivo del autor (`/author/jreysgo/`) ni enlaza una web personal propia.

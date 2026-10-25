@@ -111,7 +111,8 @@ genérica) no reemplaza las iniciales, a propósito. Las diapositivas de Glitch 
 ### Cargo, bio corta y redes del autor
 
 Todo se edita en el mismo perfil de WordPress (**Usuarios** → el autor). La ficha no tiene campos propios salvo la bio
-corta; el resto lo lee de Yoast, que también lo usa para el schema `Person` que ve Google.
+corta; el resto lo lee de Yoast, que también lo usa para el schema `Person` que ve Google. Los mismos datos arman la
+cabecera del archivo del autor (`/author/…`): un cambio aquí se ve en los dos lugares tras la purga.
 
 | Dato en la ficha | Dónde se cambia | Regla |
 |---|---|---|

@@ -1,5 +1,12 @@
 # TASK-2055 — Archivo del blog v3: búsqueda, temas, etiquetas y autores
 
+## Delta 2026-10-25 — Cabecera de autor v2
+
+- El operador aprobó «Autor v2» (canvas versión 98): la vista `autor` toma cargo, bio corta, retrato, temas, redes y
+  conteo de `EO_Author_Profile` (TASK-2057). Los tableros congelados `Archivo-D-autor-*` se reemplazan y el CSS `.au*`
+  pasa a `.au2*` en los 14 tableros D; equivalencia 7/7, paridad 42/42, píxel 54/54, axe 0 y desborde 0.
+  Detalle: `BLOG_ARCHIVE_RUNTIME_V1.md` §2.2.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

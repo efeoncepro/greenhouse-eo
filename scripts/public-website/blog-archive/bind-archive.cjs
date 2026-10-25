@@ -53,7 +53,8 @@ function deviateCss(css) {
   // 3. The format filter is made of links (no JS): no underline on the segments.
   out = rep(out, '.fb__m{display:none}', '.fb__m{display:none}\n.segc__b{text-decoration:none}')
   // 3. The author without a profile photo shows initials in the photo's circle (as the home's author circle).
-  out = rep(out, '.au__r{margin:', '.au__ph--i{display:grid;place-items:center;background:#023c70;color:#ffffff;font-family:\'Bricolage Grotesque\',sans-serif;font-size:48px;font-weight:700}\n.au__r{margin:')
+  // Autor v2 (canvas v98): the initials sit inside the orbit like the photo.
+  out = rep(out, '.au2__r{margin:', '.au2__ph--i{display:grid;place-items:center;background:#023c70;color:#ffffff;font-family:\'Bricolage Grotesque\',sans-serif;font-size:48px;font-weight:700}\n.au2__r{margin:')
 
   // 8. Fluid type (no board between 768 and 1099, nor between 1100 and 1439): the H1 follows the viewport up to the
   // canvas size and shrinks with `--ah-fit` (set by the data for a name whose longest word would not fit its column).

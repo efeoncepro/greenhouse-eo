@@ -6,14 +6,36 @@
       <div>
         <p class="eyb eyb--d"><span class="eyb__bar" style="{{ eyebrowBar }}"></span>{{ eyebrow }}</p>
         <sc-if value="{{ isAuthor }}" hint-placeholder-val="{{ false }}">
-        <div class="au">
-          <sc-if value="{{ author.photo }}" hint-placeholder-val="{{ true }}"><img class="au__ph" src="{{ author.photo }}" alt="{{ author.name }}"></sc-if>
-          <sc-if value="{{ author.initials }}" hint-placeholder-val="{{ false }}"><span class="au__ph au__ph--i" aria-hidden="true">{{ author.initials }}</span></sc-if>
-          <div>
-            <h1 class="idea ah__t ah__t--m" style="margin: 0;">{{ author.name }}</h1>
-            <sc-if value="{{ author.role }}" hint-placeholder-val="{{ true }}"><p class="au__r">{{ author.role }}</p></sc-if>
+        <div class="au2">
+          <div class="au2__pt">
+            <sc-if value="{{ author.photo }}" hint-placeholder-val="{{ true }}"><img class="au2__ph" src="{{ author.photo }}" alt="{{ author.name }}"></sc-if>
+            <sc-if value="{{ author.initials }}" hint-placeholder-val="{{ false }}"><span class="au2__ph au2__ph--i" aria-hidden="true">{{ author.initials }}</span></sc-if>
+            <svg class="au2__orb" viewBox="0 0 208 208" aria-hidden="true" focusable="false"><circle cx="104" cy="104" r="96" fill="none" stroke="#72ded8" stroke-opacity="0.4" stroke-width="1.5"/><path d="M 13.79 71.17 A 96 96 0 0 1 71.17 13.79" fill="none" stroke="#36c8bf" stroke-width="3" stroke-linecap="round"/><circle cx="71.17" cy="13.79" r="6" fill="#36c8bf"/></svg>
+          </div>
+          <div class="au2__id">
+            <h1 class="idea ah__t ah__t--m au2__n">{{ author.name }}<span class="au2__dot">.</span></h1>
+            <sc-if value="{{ author.role }}" hint-placeholder-val="{{ true }}"><p class="au2__r">{{ author.role }}<span class="au2__sep"> · </span><span class="au2__org">{{ author.org }}</span></p></sc-if>
           </div>
         </div>
+        <sc-if value="{{ author.bio }}" hint-placeholder-val="{{ true }}"><p class="ah__d au2__bio">{{ author.bio }}</p></sc-if>
+        <sc-if value="{{ author.topics }}" hint-placeholder-val="{{ true }}">
+        <div class="au2__tp">
+          <p class="au2__lb">Escribe sobre</p>
+          <ul class="au2__chips">
+            <sc-for list="{{ author.topics }}" as="t" hint-placeholder-count="3"><li><a href="{{ t.url }}" class="chip chip--d live">{{ t.label }}</a></li></sc-for>
+          </ul>
+        </div>
+        </sc-if>
+        <sc-if value="{{ author.foot }}" hint-placeholder-val="{{ true }}">
+        <div class="au2__ft">
+          <sc-if value="{{ author.meta }}" hint-placeholder-val="{{ true }}"><dl class="ah__meta ah__meta--row au2__meta"><sc-for list="{{ author.meta }}" as="m" hint-placeholder-count="2"><div><dt>{{ m.k }}</dt><dd>{{ m.v }}</dd></div></sc-for></dl></sc-if>
+          <sc-if value="{{ author.links }}" hint-placeholder-val="{{ true }}">
+          <ul class="au2__soc" aria-label="{{ author.linksLabel }}">
+            <sc-for list="{{ author.links }}" as="l" hint-placeholder-count="2"><li><a href="{{ l.url }}" class="au2__s" rel="me noopener" target="_blank" aria-label="{{ l.label }}"><sc-if value="{{ l.d }}" hint-placeholder-val="{{ true }}"><svg viewBox="{{ l.box }}" aria-hidden="true" focusable="false"><path fill="currentColor" d="{{ l.d }}"/></svg></sc-if><sc-if value="{{ l.web }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></sc-if></a></li></sc-for>
+          </ul>
+          </sc-if>
+        </div>
+        </sc-if>
         </sc-if>
         <sc-if value="{{ plainH1 }}" hint-placeholder-val="{{ true }}"><h1 class="{{ h1Cls }}" style="{{ h1Style }}">{{ h1 }}</h1></sc-if>
         <sc-if value="{{ gl }}" hint-placeholder-val="{{ false }}"><h1 class="gl-t"><img src="{{ gl.wordmark }}" alt="Glitch" width="430" height="117"></h1>

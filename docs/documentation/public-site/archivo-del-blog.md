@@ -1,9 +1,9 @@
 # Archivo del blog — Búsqueda, temas, etiquetas y autores
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-24 por Claude (TASK-2055)
-> **Ultima actualizacion:** 2026-10-24 por Claude (Glitch sin Nota: Edición o Flash)
+> **Ultima actualizacion:** 2026-10-25 por Claude (cabecera de autor con el perfil)
 > **Documentacion tecnica:** [BLOG_ARCHIVE_RUNTIME_V1](../../architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md)
 
 ## Qué es
@@ -24,7 +24,7 @@ WordPress specialists», una barra lateral de ejemplo y, en algunos casos, se sa
 |---|---|---|
 | **Tema** | Nombre en el color de su línea, descripción, cuántas publicaciones tiene y la fecha de la última | La más reciente destacada; el resto por año; otros temas |
 | **Etiqueta** | Nombre y una línea que explica que reúne publicaciones de distintos temas | Igual que el tema, y cada fila dice a qué tema pertenece |
-| **Autor** | Foto del perfil de WordPress, nombre, cargo y bio | Su última publicación y todo lo que escribió, por año |
+| **Autor** | Retrato con la órbita, nombre, cargo y organización, bio corta, los temas sobre los que escribe (enlazados), cuántas publicaciones tiene y su última fecha, y sus redes | Su última publicación y todo lo que escribió, por año |
 | **Búsqueda** | El término buscado, el buscador para cambiarlo y cuántos resultados hay | El mejor resultado destacado y el resto por relevancia, con el término resaltado |
 | **Tema sin publicaciones** | Explica que todavía no hay publicaciones y enlaza al tema que lo contiene | «Mientras tanto»: el último Glitch, una guía y un artículo |
 | **Búsqueda sin resultados** | «Nada sobre «x», todavía.», el buscador y preguntas frecuentes | «Mientras tanto, para empezar» |

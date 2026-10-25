@@ -235,10 +235,28 @@ a{color:#ffffff}
 @media (hover:hover){:is(.v3,.m3) .chip.chip--d:not(.is-on):hover{border-color:#ffffff;background-color:rgba(255,255,255,.08)}}
 .chip--d:focus-visible{outline:2px solid #36c8bf;outline-offset:3px}
 .chip__n{font-weight:400;opacity:.75;font-variant-numeric:tabular-nums}
-.au{display:flex;flex-direction:column;align-items:flex-start;gap:28px;margin-top:24px}
-.au__ph{width:168px;height:168px;flex:none;border-radius:50%;object-fit:cover;box-shadow:0 0 0 4px #001a33,0 0 0 6px #36c8bf}
-.au__ph--i{display:grid;place-items:center;background:#023c70;color:#ffffff;font-family:'Bricolage Grotesque',sans-serif;font-size:48px;font-weight:700}
-.au__r{margin:12px 0 0;font-size:18px;font-weight:600;color:#ffffff}
+.au2{display:flex;flex-direction:column;align-items:flex-start;gap:20px;margin-top:20px}
+.au2__pt{position:relative;flex:none;width:200px;height:200px;margin-left:-12px}
+.au2__ph{position:absolute;left:12.5%;top:12.5%;width:75%;height:75%;border-radius:50%;object-fit:cover}
+.au2__orb{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.au2__id{min-width:0}
+.au2__n{margin:0}
+.au2__dot{color:#36c8bf}
+.au2__ph--i{display:grid;place-items:center;background:#023c70;color:#ffffff;font-family:'Bricolage Grotesque',sans-serif;font-size:48px;font-weight:700}
+.au2__r{margin:16px 0 0;font-size:20px;line-height:1.35;font-weight:600;color:#ffffff}
+.au2__sep,.au2__org{font-weight:400;color:#cfe4fa}
+.au2__bio{margin-top:32px;max-width:640px;font-size:20px;line-height:1.55}
+.au2__tp{margin-top:32px}
+.au2__lb{margin:0 0 14px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#cfe4fa}
+.au2__chips{display:flex;flex-wrap:wrap;gap:10px;margin:0;padding:0;list-style:none}
+.au2__ft{display:flex;align-items:flex-end;gap:32px;margin-top:40px;max-width:680px}
+.au2__meta{margin-top:0;flex:1 1 auto}
+.au2__soc{display:flex;gap:12px;margin:0 0 6px;padding:0;list-style:none}
+.au2__s{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border:1px solid rgba(207,228,250,.32);border-radius:50%;color:#ffffff;transition:background-color .2s,border-color .2s,color .2s}
+.au2__s svg{width:20px;height:20px}
+.au2__s:focus-visible{outline:2px solid #ffffff;outline-offset:3px}
+@media (hover:hover){.au2__s:hover{background-color:#ffffff;border-color:#ffffff;color:#001a33}}
+@media (prefers-reduced-motion:reduce){.au2__s{transition:none}}
 .sfd{display:flex;align-items:center;gap:12px;margin-top:40px;max-width:720px;height:84px;padding:0 10px 0 32px;border-radius:999px;background:#ffffff;border:1.5px solid #ffffff}
 .sfd input{flex:1;min-width:0;height:60px;border:0;background:transparent;color:#023c70;font:400 20px 'Poppins',sans-serif}
 .sfd .beamsvg rect{rx:42.5px}
@@ -341,9 +359,18 @@ a{color:#ffffff}
 .fb--f .fb__in{max-width:none}
 .fb__l,.fb .segc{display:none}
 .fb__m{display:flex}
-.au{flex-direction:column;align-items:flex-start;gap:20px;margin-top:8px}
-.au__ph{width:112px;height:112px}
-.au__r{font-size:15px}
+.au2{flex-direction:column;align-items:flex-start;gap:20px;margin-top:12px}
+.au2__pt{width:144px;height:144px;margin-left:-9px}
+.au2__r{margin-top:10px;font-size:16px}
+.au2__sep{display:none}
+.au2__org{display:block}
+.au2__bio{margin-top:24px;font-size:17px}
+.au2__tp{margin-top:28px}
+.au2__lb{font-size:12px}
+.au2__chips .chip{min-height:44px;padding:0 16px;font-size:14px}
+.au2__ft{flex-direction:column;align-items:stretch;gap:20px;margin-top:28px}
+.au2__meta{margin-top:0}
+.au2__soc{margin:0}
 .sfd{height:64px;margin-top:24px;padding:0 6px 0 20px;gap:8px}
 .sfd input{height:52px;font-size:17px}
 .sfd .beamsvg rect{rx:32.5px}
@@ -485,14 +512,36 @@ a{color:#ffffff}
       <div>
         <p class="eyb eyb--d"><span class="eyb__bar" style="{{ eyebrowBar }}"></span>{{ eyebrow }}</p>
         <sc-if value="{{ isAuthor }}" hint-placeholder-val="{{ false }}">
-        <div class="au">
-          <sc-if value="{{ author.photo }}" hint-placeholder-val="{{ true }}"><img class="au__ph" src="{{ author.photo }}" alt="{{ author.name }}"></sc-if>
-          <sc-if value="{{ author.initials }}" hint-placeholder-val="{{ false }}"><span class="au__ph au__ph--i" aria-hidden="true">{{ author.initials }}</span></sc-if>
-          <div>
-            <h1 class="idea ah__t ah__t--m" style="margin: 0;">{{ author.name }}</h1>
-            <sc-if value="{{ author.role }}" hint-placeholder-val="{{ true }}"><p class="au__r">{{ author.role }}</p></sc-if>
+        <div class="au2">
+          <div class="au2__pt">
+            <sc-if value="{{ author.photo }}" hint-placeholder-val="{{ true }}"><img class="au2__ph" src="{{ author.photo }}" alt="{{ author.name }}"></sc-if>
+            <sc-if value="{{ author.initials }}" hint-placeholder-val="{{ false }}"><span class="au2__ph au2__ph--i" aria-hidden="true">{{ author.initials }}</span></sc-if>
+            <svg class="au2__orb" viewBox="0 0 208 208" aria-hidden="true" focusable="false"><circle cx="104" cy="104" r="96" fill="none" stroke="#72ded8" stroke-opacity="0.4" stroke-width="1.5"/><path d="M 13.79 71.17 A 96 96 0 0 1 71.17 13.79" fill="none" stroke="#36c8bf" stroke-width="3" stroke-linecap="round"/><circle cx="71.17" cy="13.79" r="6" fill="#36c8bf"/></svg>
+          </div>
+          <div class="au2__id">
+            <h1 class="idea ah__t ah__t--m au2__n">{{ author.name }}<span class="au2__dot">.</span></h1>
+            <sc-if value="{{ author.role }}" hint-placeholder-val="{{ true }}"><p class="au2__r">{{ author.role }}<span class="au2__sep"> · </span><span class="au2__org">{{ author.org }}</span></p></sc-if>
           </div>
         </div>
+        <sc-if value="{{ author.bio }}" hint-placeholder-val="{{ true }}"><p class="ah__d au2__bio">{{ author.bio }}</p></sc-if>
+        <sc-if value="{{ author.topics }}" hint-placeholder-val="{{ true }}">
+        <div class="au2__tp">
+          <p class="au2__lb">Escribe sobre</p>
+          <ul class="au2__chips">
+            <sc-for list="{{ author.topics }}" as="t" hint-placeholder-count="3"><li><a href="{{ t.url }}" class="chip chip--d live">{{ t.label }}</a></li></sc-for>
+          </ul>
+        </div>
+        </sc-if>
+        <sc-if value="{{ author.foot }}" hint-placeholder-val="{{ true }}">
+        <div class="au2__ft">
+          <sc-if value="{{ author.meta }}" hint-placeholder-val="{{ true }}"><dl class="ah__meta ah__meta--row au2__meta"><sc-for list="{{ author.meta }}" as="m" hint-placeholder-count="2"><div><dt>{{ m.k }}</dt><dd>{{ m.v }}</dd></div></sc-for></dl></sc-if>
+          <sc-if value="{{ author.links }}" hint-placeholder-val="{{ true }}">
+          <ul class="au2__soc" aria-label="{{ author.linksLabel }}">
+            <sc-for list="{{ author.links }}" as="l" hint-placeholder-count="2"><li><a href="{{ l.url }}" class="au2__s" rel="me noopener" target="_blank" aria-label="{{ l.label }}"><sc-if value="{{ l.d }}" hint-placeholder-val="{{ true }}"><svg viewBox="{{ l.box }}" aria-hidden="true" focusable="false"><path fill="currentColor" d="{{ l.d }}"/></svg></sc-if><sc-if value="{{ l.web }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></sc-if></a></li></sc-for>
+          </ul>
+          </sc-if>
+        </div>
+        </sc-if>
         </sc-if>
         <sc-if value="{{ plainH1 }}" hint-placeholder-val="{{ true }}"><h1 class="{{ h1Cls }}" style="{{ h1Style }}">{{ h1 }}</h1></sc-if>
         <sc-if value="{{ gl }}" hint-placeholder-val="{{ false }}"><h1 class="gl-t"><img src="{{ gl.wordmark }}" alt="Glitch" width="430" height="117"></h1>
