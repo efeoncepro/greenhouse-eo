@@ -1,6 +1,6 @@
 # Refresh — «Cómo validar el RUT en formularios de HubSpot» (borrador V4)
 
-> **Estado:** borrador para revisión del autor. No publicado.
+> **Estado:** **publicado 2026-10-25** (aprobado por Julio Reyes). Ver §8 «Registro de publicación».
 > **URL (se conserva):** https://efeoncepro.com/hubspot/como-crear-formularios-con-validacion-de-rut/ (post `246024`)
 > **Autor / voz:** Julio Reyes · voz Julio, doctrina como «En Efeonce…».
 > **Creado:** 2026-10-24 · **Última versión:** 2026-10-25 (V4) · **Fuente editable:**
@@ -77,6 +77,31 @@ volumen, y a los clics hacia la página de HubSpot de Efeonce.
 - **QA del render** (V2, mismos tipos de bloque que la V3; 1440 y 390 px): sin desborde de página; tablas y código caben.
 - **Para publicar** (con visto bueno de Julio): escribir título, extracto, contenido y Yoast en `246024` con guardas y
   respaldo, como en inbound; después pasar `252086` a la papelera.
+
+## 8. Registro de publicación (2026-10-25 10:22 UTC)
+
+- **Post:** WordPress `246024`, misma URL, autor Julio Reyes (user `1`), categoría HubSpot (`19`), etiquetas e
+  imagen destacada (`246029`) sin cambios.
+- **Escrito:** `post_title`, `post_content` (V4, 60 bloques), `post_excerpt`, `_yoast_wpseo_title`,
+  `_yoast_wpseo_metadesc`, `_yoast_wpseo_focuskw` («validar RUT en formularios de HubSpot»), tiempo de lectura de
+  Yoast (10 min) y las descripciones Open Graph y X. Escritura con `tmp/post-refresh-apply.php`: guarda de estado,
+  slug, autor, `post_modified_gmt` (`2024-11-20 01:06:29`), hash del contenido previo y título Yoast; las 13
+  comprobaciones de lectura de vuelta en `true`; hash guardado = hash generado (`260ce398…`). Caché de WordPress y
+  de Kinsta purgadas.
+- **Respaldo:** local `tmp/como-crear-formularios-con-validacion-de-rut-post-246024-before-v1-20261025T102200Z.json`
+  (gitignored) y opción de servidor `_gh_post_refresh_246024_20261025_102218`. WordPress además guarda revisiones.
+- **Rollback:** `pnpm public-website:wpcli -- --eval-file ./tmp/post-refresh-rollback.php --input-file ./tmp/rut-246024-rollback-input.json --wp-user 12`
+  (restaura título, contenido, extracto y meta Yoast del estado de 2024 y purga caché).
+- **QA en vivo (anónimo):** `200`; title, descripción, canonical e `index, follow` correctos; un solo H1; schema
+  `BlogPosting` con `headline` y `dateModified` nuevos, `Person` Julio Reyes y `FAQPage` con 5 preguntas; índice con
+  11 anclas, ninguna rota; 5 bloques de código; 1 mención de servicio; los 9 enlaces del artículo responden `200`;
+  sin desborde a 1440 ni a 390 px; consola sin errores.
+- **Copia de revisión `252086`:** pasada a la papelera (recuperable desde WordPress); anónimo `404`.
+- **Observación:** el encabezado muestra «19 min de lectura». Ese número lo calcula el tema, no el meta de Yoast, y
+  pasa igual en inbound (18 min con Yoast en 11). Es del tema, no de este refresh.
+- **Pendientes:** portada e imagen social nuevas; probar el código legacy en un portal HubSpot real; observar Search
+  Console a las 4, 8 y 12 semanas con las consultas de HubSpot como grupo principal (se espera que bajen las de
+  «formato rut»).
 
 ## 7. Borrador del artículo
 
