@@ -107,3 +107,36 @@ y operación retryDelivery para recuperar el mismo delivery_request_id sin rotar
 no llama al issuer. Suite178/178 PASS, lint/typesPASS. La UI de esta recuperación sigue en regresión.
 Cloud DB ya dispone19tablas/ACL mínimos y8negativas runtime; WAF activo, WIF desdeVercel y correo real
 permanecen pendientes. Infra preparada no significa piloto activado.
+
+
+## Cierre de preparación — 2026-10-25, runtime20f9fe9
+
+Publicado en GitHub y promovido a la URL canónica Vercel; ambos flags siguen OFF. Suite final178/178
+PASS0skip, lint/types/build PASS. La regresión integrada final aporta129 comprobaciones; privacidad15,
+alineación en4anchos y GVC público8frames PASS. Token/OTP ausentes de localStorage/sessionStorage;
+fragmento limpiado antes del intercambio; reduced-motion y revocación al volver comprobados.
+`pageshow.persisted` fuefalse: no se acredita una restauración real desde BFCache.
+Evidencia local ignorada: `../efeonce-rooms/.captures/rooms-invitation-ui-1792967328430/`.
+
+WAF4reglas v2 activo: prueba acotada GET/login sobre deployment anterior estático obtuvo30respuestas
+permitidas y5x429; tras76s volvió a permitir. No acredita carga SQL, otras3rutas ni otraIP.
+Readback público de candidata promovida: /invite200 con CSP/no-referrer/no-store; /login503disabled;
+POST/auth/logout con Origin canónico200signed_out. Este último inicializa secretos por WIF, pero no
+prueba SQL ni acredita un evento independiente de auditlog de SecretManager.
+
+DBcloud propia,5migraciones/19tablas y roles mínimos comprobados; auditoría efectiva crossDB sin
+lectura/escritura de150relaciones ni funciones SECURITY DEFINER ejecutables. CONNECT/TEMP heredados
+por PUBLIC permanecen documentados en la auditoría de aislamiento; no afirmar aislamiento total.
+Bootstrap piloto y único correo real siguen pendientes. Next local3210 apagado tras QA; issuer aislado
+ya retirado por su owner. La preparación publicada no significa acceso activado ni aceptación visual.
+
+
+### Smoke SQL desde Vercel, flags OFF
+
+Después del readback anterior se hizo UNA petición POST/auth/logout, Origin canónico, con una cookie
+opaca aleatoria sintética de43caracteres, sin sesión válida. Resultado200signed_out en3588ms,
+correlationId `ea5cc212-dfa2-413c-ab5b-68e5d95b88c5`. La ruta `revokeLocalSession` entra en
+`authTransaction` para toda cookie válida sintácticamente: UPDATE limitado a hash/issuer/client,
+0filas esperadas; fallo SQL no se convierte en éxito. Acredita WIF, cinco secretos, Connector,
+comprobación de rol y transacción desde Vercel. No autentica persona ni prueba OIDC/OTP/correo;
+ningún actor existente fue seleccionado. Canary conjunto conserva su gate.

@@ -23,7 +23,7 @@ for key,name in {
 FORBIDDEN=['GOOGLE_APPLICATION_CREDENTIALS','GOOGLE_CREDENTIALS','GOOGLE_SERVICE_ACCOUNT_KEY','GCP_SERVICE_ACCOUNT_KEY','ROOMS_DATABASE_URL','ROOMS_MIGRATION_DATABASE_URL','ROOMS_POSTGRES_PASSWORD','ROOMS_POSTGRES_MIGRATOR_PASSWORD','ROOMS_POSTGRES_MIGRATOR_PASSWORD_SECRET_REF','ROOMS_AUTH_CLIENT_SECRET','ROOMS_AUTH_ENCRYPTION_KEY','ROOMS_INVITATION_ENCRYPTION_KEY','ROOMS_INVITATION_AUTHORITY_TOKEN']
 def api(path,body=None):
  args=['vercel','api',path,'--scope',SCOPE,'--raw']
- if body is not None:args+=['-X','POST','--input','-']
+ if body is not None:args+=['-X','POST','-H','Content-Type: application/json','--input','-']
  p=subprocess.run(args,input=json.dumps(body) if body is not None else None,capture_output=True,text=True)
  if p.returncode:raise RuntimeError('Vercel request failed; raw output omitted')
  data=json.loads(p.stdout)

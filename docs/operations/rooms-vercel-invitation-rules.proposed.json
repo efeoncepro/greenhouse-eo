@@ -71,7 +71,7 @@
           "keys": [
             "ip"
           ],
-          "action": "deny"
+          "action": "rate_limit"
         }
       }
     }
@@ -120,7 +120,7 @@
           "keys": [
             "ip"
           ],
-          "action": "deny"
+          "action": "rate_limit"
         }
       }
     }
@@ -155,7 +155,7 @@
           "keys": [
             "ip"
           ],
-          "action": "deny"
+          "action": "rate_limit"
         }
       }
     }
@@ -190,7 +190,7 @@
           "keys": [
             "ip"
           ],
-          "action": "deny"
+          "action": "rate_limit"
         }
       }
     }

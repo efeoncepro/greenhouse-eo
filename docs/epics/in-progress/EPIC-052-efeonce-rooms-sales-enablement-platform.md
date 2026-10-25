@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Foundation y persistencia local verificadas 2026-10-25; TASK-2059 refinada con View Transitions y AXIS, aceptación visual pendiente; GitHub privado y demo Vercel publicados por TASK-2061; identidad real depende de TASK-1834`
+- Status real: `Runtime20f9fe9 publicado; autoríaV2, accesoOIDC/OTP y lector/gestión implementados.178testsPASS, UI129+privacidad15PASS aislado. DBcloud/WIF/WAF preparados; ambosflagsOFF y canary conjunto Auth pendiente. Próximo tramo R05medios privados; editor/presentación/colaboración y aceptaciónvisual pendientes.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Commercial / Product; responsable individual por asignar`
@@ -20,7 +20,7 @@ Priority, Impact y Effort son inferencias de planificación por alcance multimed
 
 Coordina la construcción de **Efeonce Rooms**, plataforma propia de sales enablement y experiencia del comprador en `rooms.efeonce.org`. Alcance V1: una sala reutilizable para propuestas creativas y SEO/AEO, combinables. El primer recorrido que se materializa es creativo: propuestas gráficas completas, estáticas, largas, audio y video, acompañadas por sus PDFs originales. SEO/AEO añade oportunidad, muestra editorial/técnica, radiografía, evidencia, linaje, plan y medición; no se reduce a adjuntar un PDF o enlazar X-ray. El champion puede comprender, ensayar, presentar y defender la propuesta ante su comité; el evaluador puede explorar y preguntar con contexto.
 
-La administración vive en Rooms; UI, CLI y MCP consumen el mismo contrato. La documentación permanece en Greenhouse. El repo privado `efeoncepro/efeonce-rooms` existe en GitHub desde 2026-10-25; TASK-2061 posee su primera publicación Vercel de datos sintéticos. La persistencia de TASK-2060 se verifica en PostgreSQL local independiente; no hay identidad ni datos de clientes reales. El dominio es un destino acordado, no una afirmación de DNS o servicio desplegado.
+La administración vive en Rooms; UI, CLI y MCP consumen el mismo contrato. La documentación permanece en Greenhouse. El repo privado `efeoncepro/efeonce-rooms` existe en GitHub desde 2026-10-25; TASK-2061 posee su primera publicación Vercel de datos sintéticos. La persistencia de TASK-2060 se verifica en PostgreSQL local independiente; TASK-2069 ya prepara DBcloud propia y19tablas con flagsOFF. El canary de identidad y único correo autorizado siguen pendientes; no hay rollout a clientes externos. El dominio es un destino acordado, no una afirmación de DNS o servicio desplegado.
 
 ## Why This Epic Exists
 
@@ -60,9 +60,9 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 ## Child Tasks
 
-[TASK-2069](../../tasks/in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md): adapter WIF/Cloud SQL y secretos separados; identidad cloud preparada con flags OFF; DB y canary integrado en ejecución.
+[TASK-2069](../../tasks/in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md): adapter WIF/Cloud SQL, DB propia y secretos separados; runtime20f9fe9 publicado con flags OFF; readback público y WAF activos, canary integrado pendiente.
 
-[TASK-2068](../../tasks/in-progress/TASK-2068-rooms-invitation-and-guest-experience.md): entrada con código, lectura guest y gestión contextual; contratos locales listos; UI OTP/textoV2 en ejecución, media protegida pendiente R05.
+[TASK-2068](../../tasks/in-progress/TASK-2068-rooms-invitation-and-guest-experience.md): entrada con código, lectura guest y gestión contextual implementadas;129checks integrados y15privacidad PASS; media protegida pendiente R05 y aceptación humana pendiente.
 
 [TASK-2065](../../tasks/complete/TASK-2065-rooms-efeonce-id-consumer.md): consumidor OIDC interno; foundation1834/login2064.
 
@@ -72,7 +72,7 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 Continuidad autorizada por /goal 2026-10-25: [TASK-2060](../../tasks/complete/TASK-2060-rooms-persistence-and-lifecycle.md) agrega persistencia/ciclo durable local. TASK-2059 suma View Transitions y adopción de badges/botones AXIS; aceptación visual sigue pendiente.
 
-[TASK-2061](../../tasks/complete/TASK-2061-rooms-github-vercel-release.md) publica el repositorio privado y la demo en Vercel por autorización explícita. La integración Efeonce ID es condicional: el issuer vivo sólo anuncia scopes MCP y TASK-1834 permanece pendiente.
+[TASK-2061](../../tasks/complete/TASK-2061-rooms-github-vercel-release.md) publica el repositorio privado y la demo en Vercel por autorización explícita. La integración Efeonce ID es condicional: el consumer internoTASK-2065 está verificado y la promoción conjunta del issuerTASK-1834/2067 se coordina antes de activar acceso.
 
 **Primeras dos tasks hijas registradas el 2026-10-25:** [TASK-2058](../../tasks/complete/TASK-2058-rooms-foundation-and-permissions.md), foundation/contratos/can (primer corte R01/R04); [TASK-2059](../../tasks/in-progress/TASK-2059-rooms-first-experience.md), primera sala y vistas por rol (primer corte R02). Las dos tienen alcance local acotado; no completan R01/R02/R04 ni el piloto por inferencia.
 

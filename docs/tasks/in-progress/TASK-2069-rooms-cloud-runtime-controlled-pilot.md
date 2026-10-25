@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Adapter cloud commit7276df9;171/171 pruebas PG16 PASS, lint/types/build PASS. WIF/SA y seis secretos Rooms v1 preparados con readback; sin claves de SA ni acceso migrator en runtime. Restore aislado19tablas/1827filas con owners/ACL/constraints/triggers conservados. DBcloud creada con5migraciones/19tablas;rolesconn8/1 sinprivilegiosaltos/membresías y8negativasruntimePASS. UI integrada103checksPASS; recuperaciónpending nueva enregresión. Canaryproductivo pendiente. FlagsOFF.`
+- Status real: `Runtime20f9fe9 publicado y canonical verificado en Vercel; flagsOFF. Adapter171/171 PG16 PASS y suite final178/178 PASS; UI129+privacidad15 PASS aislado. DBcloud19tablas/5migraciones, rolesconn8/1 y8negativas PASS; WIF/SA/seisSecretosv1/18env preparados. WAF4reglas v2 activo: login30permitidos+5rechazados429, ventana recuperada. /invite200 CSP/no-referrer/no-store; /login503 disabled; logout200 con inicialización WIF/secretos y transacción SQL sobre cookie sintética inexistente. RestorePG16 local19tablas/1827filas PASS; aislamiento de datos crossDB PASS, CONNECT/TEMP heredados documentados. Bootstrap sintético y canary/email real pendientes.`
 - Rank: `Foundation cloud después de TASK-2065/2066; canary integrado condicionado a issuer TASK-1834/2067 y consumer TASK-2068`
 - Domain: `platform|identity|data|ops`
 - Blocked by: `none`
@@ -197,9 +197,9 @@ no borrando DB ni revirtiendo migraciones vivas. Owners Platform/Rooms/Auth cons
 ## Acceptance Criteria
 
 - [ ] ADR aceptado, capacidad actual/coste/región y CONNECTION LIMIT registrados con owner.
-- [ ] Cloud config/secret refs efectivos; Production sin fallback local/ADC/SA key; pool máximo2 por isolate.
+- [x] Cloud config/secret refs efectivos; Production sin fallback local/ADC/SA key; pool máximo2 por isolate. Config18env/refsv1 readback; logout canónico200 inicializa4secretos porWIF. Pool probado PG16, SQL desdeVercel comprobado con una cookie sintética inexistente: logout200 después de authTransaction, sin activar acceso ni usuario.
 - [ ] WIF permite sólo Rooms Production; preview/proyecto ajeno denegados; migrator fuera del deployment.
-- [ ] DB/roles propios sin CREATEDB/CREATEROLE/SUPERUSER/BYPASSRLS ni membresías Greenhouse; negativas de DDL/cross-DB.
+- [x] DB/roles propios sin CREATEDB/CREATEROLE/SUPERUSER/BYPASSRLS ni membresías Greenhouse; negativas de DDL/cross-DB.19tablas/8negativas runtime y auditoría150relaciones PASS; [límite CONNECT/TEMP heredado](../../audits/rooms/2026-10-25-cloud-isolation.md) explícito, sin afirmar aislamiento de conexión.
 - [ ] PG objetivo, migraciones y recovery de19 tablas/ACL/constraints/triggers verificados; claves recuperables.
 - [ ] RP, redirect, origin y authority audience/token alineados; ninguna autoridad desde email-match o demo.
 - [ ] WAF/rate limits y fallback seguro verificados antes de exposición; sin challenge en S2S.
@@ -231,3 +231,10 @@ Canary Vercel/WIF y comprobación cruzada de permisos PUBLIC vecinos pendientes.
 ## Follow-ups
 
 - Medios/storage/worker y DNS propio permanecen en EPIC-052; nueva cohorte exige gate explícito.
+
+
+## Evidencia adicional — delta final PG16
+
+HEAD20f9fe9:7/7 pruebas nuevas (`domain-command-executor`3 y `invitation-delivery`4),0skip,
+en PostgreSQL16 aislado puerto55433. Evidencia `/tmp/rooms-pg16-ktAkBU/delta-20f9fe9.log`.
+Complementa la suite previa171/171 PG16; no es una única corrida completa178 en PG16.

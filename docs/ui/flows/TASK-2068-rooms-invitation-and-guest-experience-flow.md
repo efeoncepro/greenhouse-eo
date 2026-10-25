@@ -30,7 +30,7 @@ Reload consume GET `/api/invitations/transaction`, implementado en TASK-2066: st
 
 ## Sesiones coexistentes
 
-El resolver actual da precedencia a cookie interna, incluso si ya no sirve. Antes de implementar, root fija contrato explícito para abrir invitación teniendo sesión interna: detectar contexto, ofrecer continuar con autoridad interna válida o salir de esa sesión antes de redimir como guest. No borrar silenciosamente sesión interna, no usar cookie guest como fallback de auth interna fallida, no inventar switch browser-only. Cada cambio de actor es navegación documento y nueva lectura server-side.
+El resolver actual da precedencia a cookie interna, incluso si ya no sirve. Contrato implementado: entryGate detecta presencia de cookie interna, incluso inválida; ofrecer salida explícita de esa sesión antes de redimir como guest. Verify devuelve409 antes del issuer si sigue presente. No borrar silenciosamente sesión interna, no usar cookie guest como fallback de auth interna fallida, no inventar switch browser-only. Cada cambio de actor es navegación documento y nueva lectura server-side.
 
 ## Journey interno
 
@@ -58,3 +58,13 @@ Escenario rooms-invitations: entrada desde fragmento, scrubURL, reload vía tran
 ## Design Decision Log
 
 Se conserva la precedencia de sesión interna y se exige salida explícita antes de consumirOTP. El backend decide can/TTL y estado; UI sólo guía. MediaR05 no bloquea OTP ni textoV2: una explicación de disponibilidad conserva la lectura sin fingir pieza. Confirmaciones de gestión en un diálogo, con conflicto recuperable, nunca autorización por rol nominal.
+
+## Delta verificado: entrada y entrega recuperable — 2026-10-25
+
+- Un enlace recibido mientras la pestaña ya está en `/invite` provoca navegación de documento ante `#token=`. El nuevo documento limpia el fragmento antes de `start`; el skiplink `#main-content` sigue moviendo el foco sin reiniciar el acceso.
+- Gestión consume `actions.canRetryDelivery` y `retryAt`. “Comprobar envío” ejecuta `invitations.retryDelivery` con room/invitation/revision e idempotency key; conserva generación, enlace y requestId del envío. La recuperación persiste en servidor y vuelve a estar disponible tras recargar, sin guardar claves en localStorage.
+- “Actualizar estado” sólo relee el DTO. Transcurrir tiempo local no concede permisos. Reemisión es una intención distinta con confirmación que explica la invalidación de la invitación anterior; respeta el permiso actual del servidor.
+- Si el comando o la lectura del resultado son inciertos, se conserva la misma key/payload. Si el resultado confirma `pending`, la lista muestra el estado real y la acción de comprobación autorizada. No equivale a entrega confirmada.
+- Al cerrar una acción cuyo botón desapareció, el foco vuelve al título de gestión. Si el disparador sigue disponible, AXIS conserva el retorno a ese control.
+
+Readback local inicial: GVC público premium, 4 anchos/8 frames, pasó en `.captures/2026-10-25T22-23-26_rooms-invitation-entry`. Harness autenticado contra issuer real local y buzón RAM pasó 103 checks (OTP, lectura/evidencia, OIDC, crear/reemitir tras cooldown/revocar, 4 anchos, texto200%, axe, CSP y secretos en red). La corrida final ampliada pasó 129 checks en `../efeonce-rooms/.captures/rooms-invitation-ui-1792967328430/result.json`: recuperación pendiente tras reload con el mismo token/version/requestId, coexistencia interna con logout explícito y entrada como invitado sin evidencia, además del baseline. No es aceptación humana ni correo de proveedor real.

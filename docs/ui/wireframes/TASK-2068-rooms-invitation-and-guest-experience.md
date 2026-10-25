@@ -71,7 +71,7 @@ Anchos 1440/1024/390/320, texto 200%, teclado, reduced motion y API de transici�
 - Dialog para una acción corta; no sidecar persistente ni layout portal Vuexy.
 - Reader separado del demo permite reusar interacción sin mentir sobre contenido.
 - Auth boundaries usan navegación de documento; las transiciones sólo ayudan a orientarse dentro de contenido ya autorizado.
-- Recovery transactionStatus resuelto por TASK-2066 (GET /api/invitations/transaction); DTO de gestión/destinatario/continuación/selección de sesión y entrega media requieren congelación con root. No se cambian scopes desde UI.
+- Contratos de recovery, management, destinatario y coexistencia resueltos por backend TASK-2066; se consumen sin modificar scopes. Media protegida R05 permanece separada y no bloquea OTP/lectura textual.
 
 ## Desktop Target
 
@@ -123,3 +123,15 @@ Entrar es la acción primaria del estado código; Solicitar otro código es secu
 ## Accessibility Contract
 
 Input único type=text/inputMode=numeric/autocomplete=one-time-code; admite pegar seis dígitos, no autoverifica. Label visible, ayuda/error asociados y aria-invalid sólo tras validación. Enter envía; pending deshabilita la operación y anuncia una vez. Cooldown no satura aria-live. Dialog tiene título, Escape, cierre visible y restore al trigger o heading si desaparece. Contraste se mide también durante motion; reduced motion conserva foco y resultado. Marcadores semánticos/main y skiplink; test de teclado, zoom200% y320px sin overflow escondido.
+
+## Delta de implementación local — 2026-10-25
+
+El reader de gestión real es GET `/api/v1/rooms/:roomId/invitations/management`; entrega title, revision, permisos canRead/canManage, issuance y destinatario/acciones por fila. El máximo de vigencia sale del DTO, con techo24h y horizonte persistido; no se deriva de rol ni del TTL corto de sesión OIDC. Contexto interno vive en `/rooms/context`.
+
+Start/transaction/session exponen entryGate continue/internal_session_present; verify rechaza la cookie interna antes del issuer. La UI ofrece logout explícito y recovery sin cambiar precedencia. El fragment se limpia antes de la llamada start; reload usa transaction read-only. Protected reader recibe proyección textualV1/V2 ya filtrada, sin fixtures ni activosdemo; media muestra indisponibilidad explícita. Session boundary retira DOM al expirar/revocar y antes de bfcache. Esto describe implementación local pendiente de QA renderizada, no aceptación visual.
+
+## Delta de gestión recuperable — 2026-10-25
+
+La lista conserva acceso y envío como estados independientes. Agrega “Actualizar estado” como acción secundaria de lectura y una fecha orientativa del servidor durante cooldown. “Comprobar envío” aparece únicamente con `canRetryDelivery`; abre el diálogo AXIS existente con explicación de que se continúa el mismo intento, sin crear otro enlace. Reemitir conserva su confirmación destructiva explícita respecto de la versión anterior. Las acciones no se habilitan por reloj del navegador. Si desaparece el disparador al completar la acción, el título de gestión recibe el foco.
+
+Readback público inicial: GVC premium 4 anchos/8 frames limpio. El harness local autenticado conserva capturas privadas con código vacío o después de limpiarlo; ninguna URL con fragmento, trace, video, correo real o prueba de aceptación humana se incorpora a este documento. El delta de recuperación pasó su gate integrado: 129 checks con issuer real local y buzón RAM en `../efeonce-rooms/.captures/rooms-invitation-ui-1792967328430/result.json`. Se verificó la misma generación/token/requestId tras recuperar, coexistencia interna→logout→invitado y ausencia del control de evidencia sin ese permiso. La aprobación visual humana sigue pendiente.

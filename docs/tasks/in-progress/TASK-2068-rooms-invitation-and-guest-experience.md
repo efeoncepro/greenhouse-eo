@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-2068-rooms-invitation-and-guest-experience-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Contratos de recovery, gestión, delegación y coexistencia implementados con65 pruebas focalizadas PASS; backend2066 conserva151 previas. Readiness técnico para OTP y lectura textualV2; mediaR05 queda fuera del slice. UI en ejecución, sin aceptación visual ni rollout.`
+- Status real: `Runtime20f9fe9 publicado con flagsOFF; UI OTP/guestV2/gestión y recuperación implementadas.129 checks integrados issuerlocal/buzónRAM PASS,15privacidad/reducedmotion PASS y alineación4anchos PASS; GVC8framesPASS. Backend178testsPASS. Token/OTP sin storagebrowser; retorno trasrevocación PASS, BFCache real no observado. MediaR05, canary/emailreal y aceptaciónvisualhumana pendientes.`
 - Rank: `TBD`
 - Domain: `ui|identity`
 - Blocked by: `none`
@@ -354,18 +354,25 @@ Peer Auth posee registro y OTP; root posee release, DB y secrets. No pedir otra 
 
 ## Acceptance Criteria
 
-- [ ] Readiness verifica el recovery implementado y resuelve los restantes gaps documentados y pasa hook/lint; UI ready sólo cambia con evidencia.
-- [ ] Token del fragmento se limpia antes de iniciar; reload y enlace inválido/vencido/revocado tienen recovery sin filtrar destinatario.
-- [ ] Un solo correo inicial, código pegable en campo único; resend explícito, cooldown y errores reales.
-- [ ] Verificación abre edición publicada con DTO real V1/V2 y media autorizada; sin fixtures, notas internas o evidencia no permitida en payload.
-- [ ] Salida, expiración/revocación, bfcache y sesión interna coexistente no muestran contenido bajo actor equivocado.
-- [ ] Gestión usa permisos room correctos y destinatario identificable; rol operador no habilita writes por sí mismo.
-- [ ] Create/reissue/revoke preservan revisión/idempotencia; conflicto mantiene intención; accepted/pending/failed honestos.
-- [ ] AXIS/logo/fuentes/motion reutilizados; sin regresión del demo ni nueva primitive paralela.
+- [x] Readiness verifica el recovery implementado y resuelve los restantes gaps documentados y pasa hook/lint; UI ready sólo cambia con evidencia.
+- [x] Token del fragmento se limpia antes de iniciar; reload y enlace inválido/vencido/revocado tienen recovery sin filtrar destinatario. Evidencia: suite129 y privacy-review15 en `.captures/rooms-invitation-ui-1792967328430/`.
+- [x] Un solo correo inicial, código pegable en campo único; resend explícito, cooldown y errores reales.
+- [ ] Verificación abre edición publicada con DTO real V1/V2 y media autorizada; sin fixtures, notas internas o evidencia no permitida en payload. Lectura textualV2 y scopeevidencePASS; media protegida pendienteR05, sin sustituirla por assets de demo.
+- [ ] Salida, expiración/revocación, bfcache y sesión interna coexistente no muestran contenido bajo actor equivocado. Coexistencia y retorno tras revocación PASS; pageshow.persisted=false, restauración BFCache real no observada.
+- [x] Gestión usa permisos room correctos y destinatario identificable; rol operador no habilita writes por sí mismo.
+- [x] Create/reissue/revoke preservan revisión/idempotencia; conflicto mantiene intención; accepted/pending/failed honestos.
+- [x] AXIS/logo/fuentes/motion reutilizados; sin regresión del demo ni nueva primitive paralela. Build final y revisión desktop/móvil; apertura/cierre del viewer demo sin errores de consola.
 - [ ] GVC1440/1024/390/320 +200%, teclado/axe/contraste/foco y reduced/fallback PASS, capturas inspeccionadas.
 - [ ] Se presentó el resultado renderizado y quedó registrada la respuesta humana; no se sustituye por pruebas automáticas.
 
 ## Verification
+
+Corte local:129 comprobaciones en `../efeonce-rooms/.captures/rooms-invitation-ui-1792967328430/result.json`.
+Issuer real aislado/mailRAM: error/código correcto, reload sin reenvío, recoverypending mismo requestId/token,
+OIDC, coexistencia/logout explícito, permisos de evidencia y revocación DOM. Ningún correo real.
+GVC: `.captures/2026-10-25T22-23-26_rooms-invitation-entry`,8frames/4anchos.
+Captura de código usa input vacío y URL sin fragmento; evidencia no contiene códigos/tokens.
+
 
 - Greenhouse: `pnpm task:lint --task TASK-2068`, `pnpm ui:readiness-check --task TASK-2068` antes de JSX.
 - Rooms: `pnpm lint`, `pnpm typecheck`, `pnpm build` y tests focalizados de consumo/seguridad y Playwright.

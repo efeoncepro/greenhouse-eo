@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Backend local hasta7afcd07 verificado:160/160 pruebas0skip y lint/types/buildPASS; gestión/coexistencia listas para UI2068. Issuer OTP real + ambos PostgreSQL + Chrome y recuperación19tablas en corte previo PASS. Correo único enlace/código; abrir no envía otro. OFF; sin correo real ni cloudRooms. UI2068 y cloud2069 en ejecución; perímetro preparado no activado, entrega/tracking y rollout pendientes.`
+- Status real: `Backend hastacac5311:178/178 pruebas0skip,lint/typesPASS; UIintegrada129checksPASS con issuerlocal/mailRAM. Correo único enlace/código, abrir no envíaotro; pendingrecovery conserva token/version/requestId. CloudRoomsDB19tablas/ACL8negativas yWIF/SM preparados;18envProdOFF. WAF4reglasv2 activas;GETlogin30permitidas/5bloqueadas429,recuperación76s. Sin correoreal; deployWIF/issuer/canary yaceptaciónvisual pendientes.`
 - Rank: `Después del contrato TASK-2067; coordinar primitives de sesión/binding con TASK-2065 sin depender de su journey OIDC`
 - Domain: `identity|platform|data`
 - Blocked by: `none`

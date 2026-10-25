@@ -1,15 +1,16 @@
 # Rooms — perímetro de invitaciones en Vercel
 
-Fecha: 2026-10-25. Owner: Rooms, TASK-2066/2068. Estado: propuesta preparada; reglas NO activadas.
+Fecha: 2026-10-25. Owner: Rooms, TASK-2066/2068. Estado: cuatro reglas activas, configuración `waf_JssfW9nWmJeU` versión2; enforcement de `/login` y recuperación verificados.
 Complementa el ADR Rooms y la evidencia `docs/audits/rooms/2026-10-25-invitation-token-hardening.md`.
 
 ## Evidencia actual
 
 - Proyecto `prj_9iaZv8FXdhvtC68r30OS3H4o3iJo`, team `team_gmNiF4YCHmc1wqsHUTCvqjmN`, slug `efeonce-7670142f`.
 - API autenticada de Vercel confirma plan Pro. API de configuración activa del firewall responde 404
-  `Config not found`; esto no demuestra que falte protección DDoS de plataforma.
+  `Config not found` antes de provisionar; el readback posterior confirmó active/draft nulos. Esto no
+  demostraba ausencia de protección DDoS de plataforma.
 - El conector MCP no resuelve este proyecto con su cuenta actual. Lecturas anteriores se hicieron con CLI
-  autenticada y salida filtrada, sin imprimir credenciales. No se creó configuración ni se cambió el plan.
+  autenticada y salida filtrada, sin imprimir credenciales. La raíz creó únicamente cuatro reglas propias; no cambió el plan.
 - Rate limiting nativo está disponible en Pro; no requiere pentest contratado ni otro proveedor.
   Tiene precio por uso, referencia publicada USD 0.50 por millón de requests permitidos, dependiente
   de región. Revisar Spend Management y condiciones efectivas antes de habilitar; no asumir costo cero.
@@ -21,7 +22,11 @@ Cuatro reglas validadas localmente contra el schema PUT de `https://vercel.com/o
 semántica nullable de OpenAPI para AJV). El schema PATCH rules.insert publicado limita la acción a
 deny/challenge/log y no describe rate_limit; no inventar un payload PATCH compatible. PUT sí declara
 rateLimit, pero reemplaza configuración: usarlo sólo tras readback/diff seguro y sin perder reglas ajenas,
-o usar el editor nativo. El JSON propuesto no es una publicación ni una llamada API ejecutada.
+o usar el editor nativo. El readback aplicado está en [`rooms-vercel-invitation-rules.applied.json`](rooms-vercel-invitation-rules.applied.json).
+PUT se ejecutó tras confirmar ausencia de configuración activa o draft. La versión2 conserva los IDs y
+configuración ajena; sólo corrige la acción de exceso a `rate_limit` (429): `deny` devuelve403.
+No se configuró Log Headers: esa función requiere Priority y la API rechazó incluso la lista vacía.
+No se contrató Priority, rulesets adicionales ni otro proveedor.
 
 ## Reglas propuestas para el piloto
 
@@ -61,3 +66,15 @@ Fuentes oficiales verificadas:
 [uso y precios](https://vercel.com/docs/vercel-firewall/vercel-waf/usage-and-pricing),
 [API](https://vercel.com/docs/vercel-firewall/firewall-api),
 [configuración](https://vercel.com/docs/vercel-firewall/vercel-waf/rule-configuration).
+
+## Resultado de enforcement acotado
+
+Sobre el deployment público anterior (GET /login retorna404 y no ejecuta SQL),35 solicitudes secuenciales
+produjeron30 respuestas404 y5 respuestas429; el primer429 fue la solicitud31. X-Forwarded-For varió en
+cada solicitud y no eludió la cuota de la IP efectiva. Una única solicitud76s después devolvió404 sin
+x-vercel-mitigated. No hubo carga a PostgreSQL, envío, challenge ni bloqueo persistente.
+
+Este resultado acredita sólo GET /login. Las otras tres reglas tienen readback exacto de configuración;
+su enforcement bajo carga y una segunda IP/NAT no se han ejercitado. La app sigue OFF para el piloto.
+No se verificó un límite global de Spend Management; permanece la condición de uso Pro existente, sin
+contratar Priority ni ampliar plan. La prueba realizó tráfico acotado sobre rutas exactas.
