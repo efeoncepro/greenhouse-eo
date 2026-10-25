@@ -140,7 +140,7 @@ Reglas obligatorias:
 
 - Backend rigor: `backend-lite`
 - Impacto principal: `reader`
-- Source of truth afectado: usermeta de WordPress (`description`, `wpseo_user_schema`, `job_title`, contactos de Yoast, `wpdg_user_avatar`) y el nuevo `eo_author_bio_short`
+- Source of truth afectado: usermeta de WordPress (`description`, `wpseo_user_schema`, `job_title`, contactos de Yoast, `wpdg_user_avatar`) y el nuevo `eo_author_bio_short` (≤ 180 caracteres)
 - Consumidores afectados: single (byline y ficha), archivo de autor, schema Yoast
 - Runtime target: `production` (WordPress en Kinsta)
 
@@ -225,7 +225,7 @@ Reglas obligatorias:
 - Error: si falla la lectura, no se pinta la ficha
 - Degraded / partial: sin redes, sin temas, sin bio o sin foto → esas partes no se pintan; iniciales sin foto
 - Permission denied: no aplica
-- Long content: nombre y cargo largos envuelven; bio corta ≤ 160 caracteres
+- Long content: nombre y cargo largos envuelven; bio corta ≤ 180 caracteres
 - Mobile / compact: ficha apilada bajo 640 px, CTA a todo el ancho
 - Keyboard / focus: byline → artículo → temas → CTA → redes, con foco visible
 - Reduced motion: sin animaciones

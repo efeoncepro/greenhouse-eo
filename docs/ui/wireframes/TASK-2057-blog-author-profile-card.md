@@ -22,7 +22,7 @@
 │  ╭──────╮   ESCRIBE                                         (structureLabel, ink-soft)     │
 │  │ foto │   Julio Reyes.          ← Bricolage 740, punto en el acento Growth               │
 │  │órbita│   Managing & GTM Director · Efeonce Group       (Poppins 500, ink)               │
-│  ╰──────╯   Bio corta (≤ 160 car.)                         (Poppins 400, ink-soft)         │
+│  ╰──────╯   Bio corta (≤ 180 car.)                         (Poppins 400, ink-soft)         │
 │  208 px     [Loop Marketing] [IA aplicada] [SEO/AEO]      ← temas que existen como categoría│
 │  pieza      ───────────────────────────────────────────                                    │
 │  portrait   [ Ver sus 44 artículos → ]  (in) (ig)          ← sólo redes con URL             │
@@ -56,7 +56,7 @@ Sin «Author», «Published» ni «Join the Conversation». La mini ficha al foc
 |---|---|---|
 | name | `display_name` | — |
 | role | cargo del perfil (Yoast) | nunca la «primera frase de la bio» |
-| bioShort | meta propia, ≤ 160 caracteres | si falta, la ficha usa la bio larga recortada en frase completa |
+| bioShort | meta propia, ≤ 180 caracteres | si falta, la ficha usa la bio larga recortada en frase completa |
 | bioLong | `description` | — |
 | photo / photoLarge | One User Avatar, 96 y 300 px | nunca Gravatar; iniciales si falta |
 | links | redes de Yoast (+ web sólo si está en línea) | mismo orden y mismas URL que el `sameAs` |
