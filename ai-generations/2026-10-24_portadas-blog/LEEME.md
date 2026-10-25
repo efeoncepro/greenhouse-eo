@@ -99,6 +99,22 @@ del operador** como destacada e imagen OG; la tarjeta de X usa la OG.
 - **Mismo día, metadatos:** se quitaron las etiquetas `comohacer` y `how-to` del post (sólo lo usaban a él y salían
   como `keywords` del schema); quedan `hubspot` y `tutoriales`. Respaldo `_gh_tags_refresh_246024_20261025_104454`.
 
+## ICP B2B: cómo definir tu cliente ideal (2026-10-25)
+
+Portada del refresh del post `249108`. **Aprobada por el operador; se sube junto con la publicación del artículo**
+(simulación con guardas `ok: true`; `expectedOg: 0` porque el post no tiene OG propia de Yoast).
+
+- **Ficha:** `fichas/MCB-ICP1-169.json` (Hum, `growth`, bomber). Fenómeno: de unas veinte tarjetas de vidrio, la mayoría
+  barridas a un montón opaco a la izquierda y tres encendidas frente a ella; acento teal en el bisel de la del medio.
+- **`cine-reviewer`: CORREGIR** (montón del lado equivocado e invisible; «tiles» y «playing cards» invitaban a dibujar
+  palos y números; teal sobre luz azure; resto de TC1). Correcciones aplicadas; una sola generación (≈ USD 0,055).
+- **Validación:** `foto:validar:cine` sin fallas (sombra 92 %); `foto:validar` 4/4; bordado de la bomber correcto al 300 %.
+  Cara en torno al 70 % del ancho.
+- **Texto:** «¿Para qué sirve un ICP?» → «Decir no.» (`answerOverflowPx` 0). «Descartar.» se descartó: la «r» caía sobre
+  el hombro. Archivo: `final-icp/icp-b2b-cliente-ideal-2026.jpg` (2400 × 1260, 227 KB, sha256 `67246507…`).
+- 🔴 **Fórmula agotada (operador, 2026-10-25):** «para las próximas cambiemos la fórmula, tenemos varias portadas con una
+  persona al frente y vidrio». La próxima portada no repite persona tras la mesa con tarjetas de vidrio.
+
 ## Pendiente
 
 - **Formalizar la variante centrada en AXIS** (pieza nueva o regla de zona segura del banner de blog) y en la plantilla

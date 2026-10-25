@@ -12,6 +12,7 @@
  *
  * meta.json: { "mode": "dry-run" | "apply", "postId": 244765, "slug": "…", "expectedThumb": 252065,
  *   "expectedOg": 252065, "filename": "….jpg", "title": "…", "alt": "…", "caption": "", "sha256": "…" }
+ * "expectedOg": 0 declares that the post has no Yoast OG image of its own today (Yoast falls back to the featured).
  * Without "mode" it is a dry run. Manual: docs/manual-de-uso/creative/producir-portada-de-articulo-del-blog.md
  * Rollback: put the ids and URLs of the printed snapshot back in the five metas, rebuild the Yoast indexable, purge.
  */
@@ -24,9 +25,10 @@ if ( ! is_readable( $img ) || ! is_readable( $metaf ) ) { WP_CLI::error( 'Expect
 $m     = json_decode( (string) file_get_contents( $metaf ), true );
 $apply = 'apply' === ( $m['mode'] ?? 'dry-run' );
 $id    = (int) ( $m['postId'] ?? 0 );
-foreach ( [ 'slug', 'expectedThumb', 'expectedOg', 'filename', 'title', 'alt', 'sha256' ] as $k ) {
+foreach ( [ 'slug', 'expectedThumb', 'filename', 'title', 'alt', 'sha256' ] as $k ) {
 	if ( empty( $m[ $k ] ) ) { WP_CLI::error( "Meta file is missing \"$k\"." ); }
 }
+if ( ! isset( $m['expectedOg'] ) || ! is_numeric( $m['expectedOg'] ) ) { WP_CLI::error( 'Meta file is missing "expectedOg" (use 0 when the post has no OG image of its own).' ); }
 if ( hash_file( 'sha256', $img ) !== $m['sha256'] ) { WP_CLI::error( 'Image integrity failed: the file is not the reviewed one.' ); }
 [ $w, $h ] = getimagesize( $img ) ?: [ 0, 0 ];
 $p     = get_post( $id );

@@ -1,5 +1,26 @@
 # Registro de decisiones y versiones
 
+### 2026-10-25 — Infografías de cuerpo del blog (Manzanitas) y fórmula de portadas
+
+Caso: artículo «ICP B2B» (post `249108`), dos infografías SVG (`ai-generations/2026-10-25_icp-infografias/`).
+
+- **Logo + burbuja URL juntos en el pie de una infografía de cuerpo** (operador): «las imágenes muchas veces se comparten
+  solas sin contexto; cuando eso ocurre, la idea es que vaya con nuestro logo y url». Excepción vigente para
+  infografías de cuerpo del blog a la regla general de la burbuja (que sólo reemplaza al logo si ya está en la
+  imagen). No se extiende a otras superficies.
+- **Título discreto, no encabezado** (operador: «la idea es que las imágenes faciliten una experiencia inmersiva de la
+  lectura»): una línea en Poppins 600 como rótulo de figura; sin antetítulo ni subtítulo. La idea larga va en la
+  leyenda HTML.
+- **Los elementos de interfaz se quedan** (operador: «los elementos de interfaz a mí me encantan»): la cuenta como
+  tarjeta, píldoras y baldosas suaves. La dirección editorial sin cajas (v3) fue descartada.
+- **«Que quede todo muy premium»:** numerales en Bricolage 760 con el acento, trazos de 1–1,5 px, más aire.
+- **Bricolage en textos densos con contraste de pesos** (operador): «hay que hacerle contraste con sus pesos, si no se
+  vuelve muy pesada». Parte en peso 400 y la idea clave en 760 (p. ej. ««Cerrar cada mes» + «sin errores ni horas
+  extra.»»).
+- **Fórmula de portadas del blog (operador, 2026-10-25):** la del ICP queda, pero **las próximas cambian de fórmula**:
+  «tenemos varias portadas con una persona al frente y vidrio». La serie (inbound, topic clusters, RUT, ICP) ya
+  repite persona tras una mesa con tarjetas de vidrio; la siguiente portada tiene que proponer otra idea visual.
+
 ### 2026-10-24 — Ficha de autor del blog: oscura, retrato con órbita y nombre con punto
 
 Decisiones del operador al revisar la ficha de autor que reemplaza la caja de Ohio al cierre de los artículos

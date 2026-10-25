@@ -131,6 +131,30 @@
     {
      "kind": "pullquote",
      "text": "ICP sin buyer persona es frío. Buyer persona sin ICP es disperso."
+    },
+    {
+     "kind": "image",
+     "mediaId": 252096,
+     "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-cuatro-capas-desktop-light.svg",
+     "alt": "Infografía: una cuenta, el ICP, definida por industria, tamaño, madurez, problema y trigger, contiene a su grupo de compra de seis roles. Una órbita marca a quien tiene el problema como el IPP, la persona por la que se entra. Abajo, el job de la cuenta: «Cerrar cada mes sin errores ni horas extra».",
+     "width": 1600,
+     "height": 1030,
+     "sizeSlug": "full",
+     "caption": "El ICP elige la empresa; el grupo de compra, el IPP y el job viven dentro de ella.",
+     "sources": [
+      {
+       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-cuatro-capas-mobile-dark.svg",
+       "media": "(prefers-color-scheme: dark) and (max-width: 860px)"
+      },
+      {
+       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-cuatro-capas-mobile-light.svg",
+       "media": "(max-width: 860px)"
+      },
+      {
+       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-cuatro-capas-desktop-dark.svg",
+       "media": "(prefers-color-scheme: dark)"
+      }
+     ]
     }
    ]
   },
@@ -380,6 +404,30 @@
     {
      "kind": "paragraph",
      "text": "Después, puntúa cada cuenta de 0 a 3 en cuatro criterios: problema, trigger, capacidad de compra y acceso a quienes deciden. Las que suman poco no se descartan para siempre: pasan a contenido y se vuelven a mirar cuando aparece un trigger."
+    },
+    {
+     "kind": "image",
+     "mediaId": 252100,
+     "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-filtro-de-cuentas-desktop-light.svg",
+     "alt": "Infografía: cuatro grillas de 30 empresas. La primera muestra todo el mercado; la segunda, sólo las que calzan con el ICP; la tercera, las que además tienen un trigger reciente; la cuarta, las tres que además tienen identificado su grupo de compra. Las que quedan fuera pasan a contenido hasta que aparece un trigger.",
+     "width": 1600,
+     "height": 790,
+     "sizeSlug": "full",
+     "caption": "Cada filtro deja menos cuentas. Proporciones ilustrativas.",
+     "sources": [
+      {
+       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-filtro-de-cuentas-mobile-dark.svg",
+       "media": "(prefers-color-scheme: dark) and (max-width: 860px)"
+      },
+      {
+       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-filtro-de-cuentas-mobile-light.svg",
+       "media": "(max-width: 860px)"
+      },
+      {
+       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-filtro-de-cuentas-desktop-dark.svg",
+       "media": "(prefers-color-scheme: dark)"
+      }
+     ]
     }
    ]
   },

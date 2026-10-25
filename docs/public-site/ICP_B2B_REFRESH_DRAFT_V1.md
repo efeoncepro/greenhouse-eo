@@ -1,10 +1,10 @@
-# Refresh — «ICP B2B: cómo definir tu cliente ideal» (borrador V2)
+# Refresh — «ICP B2B: cómo definir tu cliente ideal» (borrador V3)
 
 > **Estado:** borrador para revisión del autor. No publicado.
 > **URL (se conserva):** https://efeoncepro.com/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/ (post `249108`)
 > **Autor / voz:** Julio Reyes · voz Julio, doctrina como «En Efeonce…».
 > **Creado:** 2026-10-25 · **Fuente editable:** [`ICP_B2B_REFRESH_GUTENBERG_SPEC_V1.json`](ICP_B2B_REFRESH_GUTENBERG_SPEC_V1.json)
-> (validación `pass`; sólo el aviso informativo de sumar una imagen; 72 bloques, ~2.400 palabras).
+> (validación `pass` sin hallazgos; 74 bloques, ~2.500 palabras, 2 infografías).
 > **Propuesta aprobada:** [`BLOG_REFRESH_TANDA_1_PROPUESTA_V1.md`](BLOG_REFRESH_TANDA_1_PROPUESTA_V1.md) §2.
 
 ## 1. Por qué se reescribe
@@ -47,8 +47,6 @@
 
 - **ICP real de Efeonce como ejemplo:** no se incluyó. Los tres ejemplos son ilustrativos y van marcados así. La
   doctrina interna (piso de 50 personas, gate económico) queda fuera del artículo salvo que la apruebes.
-- **Imagen del cuerpo:** el artículo no lleva imágenes; un diagrama «cuenta → grupo de compra → IPP → job» es opcional.
-- **Portada:** la actual es de febrero de 2026; se puede rehacer en la línea de Marketing con Manzanitas.
 
 ## 5. Copia privada para revisión
 
@@ -63,6 +61,28 @@
   externos e internos, todos 200 (Gartner sólo en navegador).
 - **Para publicar** (con tu visto bueno): escribir título, extracto, contenido y Yoast en `249108` con guardas y
   respaldo, como en RUT e inbound; después pasar `252093` a la papelera.
+
+## 5b. Infografías y portada (2026-10-25, aprobadas por Julio)
+
+- **Infografías de cuerpo** (`ai-generations/2026-10-25_icp-infografias/`, builder `build.mjs`): «Cuatro preguntas sobre
+  una misma cuenta» (ICP como tarjeta, grupo de compra en baldosas, órbita de La órbita sobre el IPP, job con contraste
+  de pesos de Bricolage) y «Un buen ICP sirve para descartar» (cuatro grillas de 30 que se vacían; las tres finales en el
+  acento Growth; proporciones ilustrativas). Cada una en escritorio/móvil × claro/oscuro; texto contorneado; tokens de
+  `@efeoncepro/axis-tokens`, `orbitSvg` y `resolveIcon`; `auditIconGroup` ok. Auditor editorial: 8/8 `PASS`, ~20–22 KB
+  Brotli.
+- **Media Library:** adjuntos `252095`–`252102` (`uploads/2026/10/icp-*.svg`), `image/svg+xml`, 200, Brotli, caché
+  anual, sha256 = local. Fallback: escritorio claro (`252096`, `252100`); `<picture>` con móvil oscuro, móvil claro y
+  escritorio oscuro.
+- **Integración:** copia privada V3 (11:21 UTC, respaldo de la V2 `_gh_icp_review_252093_v2_20261025_112155`, hash
+  `c68d5316…`). Verificado en navegador: 1440 claro → escritorio claro; 390 oscuro → móvil oscuro; proporción reservada =
+  natural en los dos; sin desborde. Límite conocido: el modo oscuro del sitio con el interruptor del tema (no el del
+  sistema) muestra la variante clara, igual que en Web Agéntica.
+- **Decisiones de Julio en esta ronda:** logo y burbuja URL en el pie (la imagen se comparte sola); rótulo de figura en
+  vez de encabezado; los elementos de interfaz se quedan; acabado premium; Bricolage con contraste de pesos. Registradas
+  en la skill `efeonce-graphic-line` (`ledger.md`, 2026-10-25).
+- **Portada:** ficha `MCB-ICP1-169` (Hum, growth), «¿Para qué sirve un ICP? Decir no.», JPEG
+  `icp-b2b-cliente-ideal-2026.jpg`; simulación de subida sobre `249108` `ok: true`. Se sube con la publicación. Para la
+  próxima portada, Julio pide cambiar la fórmula (persona + vidrio ya se repite).
 
 ## 6. Borrador del artículo
 

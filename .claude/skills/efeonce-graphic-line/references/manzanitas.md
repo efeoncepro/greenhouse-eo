@@ -932,6 +932,13 @@ manda la regla.
 - [ ] Ninguna foto sintética ni ningún ejemplo versionado en una pieza para publicar; la procedencia
       (`<artifactId>.provenance.json`) acompaña la entrega.
 
+## 12b. Infografías de cuerpo del blog y fórmula de portadas (operador, 2026-10-25)
+
+- Pie de la infografía de cuerpo: fuente a la izquierda; **logo y burbuja `efeoncepro.com` a la derecha** (se comparten
+  solas). Rótulo de figura discreto en vez de encabezado. Elementos de interfaz (tarjeta, píldoras, baldosas) sí.
+  Bricolage en frases largas con contraste de pesos (400 + 760). Detalle y caso: [ledger.md](ledger.md) 2026-10-25.
+- **Portadas:** no repetir la fórmula «persona tras una mesa con tarjetas de vidrio»; la próxima propone otra idea.
+
 ## 13. Pendientes del operador (no los decidas por tu cuenta)
 
 **Estado al 2026-09-29, tarde: no queda ninguna abierta** (`manzanitasRegister.pendingDecisions: []`). El operador
