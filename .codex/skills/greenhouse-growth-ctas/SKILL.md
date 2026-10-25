@@ -164,6 +164,16 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
 
 ## Estado de rollout (actualizar al cambiar)
 
+- **2026-10-25: CTA `blog-aeo-assessment` publicado; bloque Gutenberg «Growth CTA» code complete, despliegue pendiente.**
+  Primer host Gutenberg del motor: bloque dinámico `efeoncepro/growth-cta` (efeonce-editorial-blocks 0.7.0) que imprime
+  `<greenhouse-cta cta-location="blog_article">` con la superficie del blog (opción `eo_growth_cta_blog`; publicador
+  `scripts/growth/publish-blog-aeo-assessment-cta.ts`, setter `scripts/public-website/set-blog-growth-cta.php`; re-correr
+  el publicador ROTA la llave). Acción `open_growth_form` inline → `efeonce-aeo-diagnostic` (el formulario de `/aeo-2/`
+  que corre el Grader). Piel del host = receta AXIS «De marca» en CSS del bloque, con `[data-ghc-variant]` en cada
+  selector para que la variante del renderer no la pise; la negrita de una frase del titular la aplica `host.js` del
+  bloque (regla `headlineEmphasis`), no el renderer. Content Factory: `kind: 'growthCta'`. Pendiente: desplegar el
+  plugin, probar en la página de prueba y un envío real del formulario (lo hace el operador: Turnstile).
+
 - **2026-10-24: primer consumidor `open_growth_form` + `presentation: 'dialog'` EN VIVO** (tras el release a `main`:
   CTA `1.4.0`, forms `1.2.0`). CTA `partners-become-partner` en «cierre» de `/partnership/`, surface
   `csur-5638aab5-d53c-402a-836b-a0a72ce2c7a4`, `cta-location: partners_close`, formulario `efeonce-partner-application`.

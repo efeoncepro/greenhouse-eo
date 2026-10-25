@@ -1,7 +1,7 @@
 # Estilos editoriales del blog (bloques nativos de Gutenberg)
 
 > **Tipo de documento:** Contrato de diseño y uso
-> **Versión:** 1.5
+> **Versión:** 1.6
 > **Creado:** 2026-10-24 por Claude, a partir de la revisión del operador sobre los posts de inbound, paid media y topic clusters
 > **Código:** plugin `efeonce-editorial-blocks`, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`). Estilos desde 0.4.0 (`f9b0d4d`); diseño vigente 0.4.2 (`710f0d1`); línea por post 0.4.3 (`cab3864`). Las versiones 0.4.4 a 0.5.9 no cambian estos estilos; **0.6.0** (`cd1fe57`, 2026-10-25) suma la Tabla Efeonce, el Destacado v2 y el bloque de código
 > **Documentación funcional:** [recetas de autoría Gutenberg](../documentation/public-site/gutenberg-post-authoring-recipes.md) · **Manual:** [operar la Content Factory](../manual-de-uso/public-site/operar-public-site-content-factory.md#estilos-editoriales-y-preguntas-frecuentes)
@@ -69,6 +69,41 @@ más presencia:
   `data-label` al renderizar (`EO_Editorial_Styles::label_table_cells`, filtro `render_block_core/table`), así que el
   contenido guardado no cambia. Una tabla sin encabezado o con otro estilo sale intacta.
 - La leyenda va dentro del panel, en 13 px, separada por un filete.
+
+## Growth CTA (bloque `efeoncepro/growth-cta`, 0.7.0)
+
+**Qué es.** Un bloque dinámico que **ubica** un CTA gobernado de Greenhouse dentro de un artículo. El texto, la acción,
+las versiones, el freno de emergencia y la medición viven en el motor Growth CTA (`src/lib/growth/ctas/`); el artículo
+sólo guarda el slug, la ubicación de medición y, opcional, la frase del titular que va en negrita. Content Factory lo
+emite con `{ "kind": "growthCta", "cta": "blog-aeo-assessment", "emphasis": "¿aparece tu marca?" }`.
+
+**Cómo llega al navegador.** `render.php` imprime `<greenhouse-cta>` con la superficie del blog que guarda la opción
+`eo_growth_cta_blog` (superficie, llave, slugs permitidos y superficie del formulario). Sin superficie válida, o con un
+slug que la superficie no permite, no imprime nada; el renderer también se oculta si el motor no devuelve el CTA. El
+renderer es el mismo archivo que cargan el menú y las landings (`renderer-latest.js`), así que no se carga dos veces.
+
+**Diseño: receta AXIS «De marca»** (aprobada el 2026-10-05; piel del host en `src/growth-cta/style.css`):
+
+- panel navy `#001a33` (navy `#023c70` con el tema en oscuro), radio de 24 px y un halo del acento de la línea del post;
+- etiqueta en Poppins 500 en mayúsculas con un **anillo** de contorno en el acento;
+- titular en Bricolage Grotesque 400 de 30 a 46 px, con **una** frase en 700 y la **esfera** del acento al final
+  (es la única esfera de la pieza);
+- texto en Poppins 16 px; a la derecha, separado por un filete, el botón teal `#36c8bf` con flecha y la nota corta;
+- en el celular todo va en una columna y el botón ocupa el ancho;
+- el formulario se abre **dentro** de la tarjeta, sobre una hoja blanca, y la etiqueta, el titular y el texto quedan
+  arriba. `Escape` lo colapsa sin registrar rechazo (regla del motor).
+
+La negrita del titular la aplica `host.js` sólo si la frase aparece exacta y una vez (misma regla que
+`content.headlineEmphasis` de AXIS); si no calza, el titular queda en 400 y nada se rompe.
+
+**Primer CTA:** `blog-aeo-assessment` («Efeonce AEO Assessment»): botón «Hacer mi assessment» → formulario
+`efeonce-aeo-diagnostic`, el de `/aeo-2/`, que corre el AI Visibility Grader, envía el informe por correo y crea el
+contacto en HubSpot. Las corridas públicas del Grader usan ChatGPT, Gemini, Perplexity y Google; por eso el texto los
+nombra. Medición: fila `blog-aeo-assessment` del plan de medición.
+
+**Reglas:** un Growth CTA por artículo, después de la respuesta principal y antes de las preguntas frecuentes o del
+cierre. Nunca se escribe texto, enlaces ni formularios dentro del bloque. Re-correr el publicador rota la llave:
+repetir `set-blog-growth-cta.php` en la misma sesión.
 
 ## Ajustes de Ohio (`ohio-host.css`, sólo en el sitio)
 
