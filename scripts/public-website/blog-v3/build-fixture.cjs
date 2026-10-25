@@ -26,7 +26,8 @@ function literal(re) {
 const blob = key => '/_blob/' + assets[key].id
 
 const slides = literal(/const S = (\[[\s\S]*?\n    \]);\n/).map(s => ({ ...s, href: '#', authorInitials: '[AA]', authorName: '[Autor real]' }))
-const topics = literal(/const T = (\[[\s\S]*?\n    \]);\n/).map(t => ({ ...t, href: '#' }))
+// «Explora por tema» v2 (lib/topics-v2.cjs): the literal already carries the category and read links.
+const topics = literal(/const T = (\[[\s\S]*?\n    \]);\n/)
 const archive = literal(/const Y = (\{[\s\S]*?\n    \});\n/)
 
 for (const y of Object.values(archive)) {
@@ -119,7 +120,7 @@ for (const y of Object.values(mArchive)) {
 const mobile = {
   assets: fixture.assets,
   slides: mLiteral(/const S = (\[[\s\S]*?\n    \]);\n/).map(s => ({ ...s, href: '#' })),
-  topics: mLiteral(/const T = (\[[\s\S]*?\n    \]);\n/).map(t => ({ ...t, href: '#' })),
+  topics: mLiteral(/const T = (\[[\s\S]*?\n    \]);\n/),
   topicDefault: 'hubspot',
   topicsSource: fixture.topicsSource,
   total: 44,

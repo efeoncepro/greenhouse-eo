@@ -15,6 +15,7 @@ const path = require('node:path')
 const SRC = path.join(__dirname, 'source')
 const assets = JSON.parse(fs.readFileSync(path.join(SRC, 'assets.json'), 'utf8'))
 const railV2 = require('./lib/rail-v2.cjs')
+const topicsV2 = require('./lib/topics-v2.cjs')
 
 Object.assign(assets, railV2.RAIL_ASSETS)
 
@@ -41,6 +42,40 @@ function deviateRail(src, { open, cards }) {
   src = rep(src, '\n      evSpk: [', '\n      ' + railV2.LOGIC + '\n      ' + RAIL_LITERAL + '\n      evSpk: [')
 
   return src
+}
+
+/**
+ * Approved redesign of «Explora por tema» (operator, 2026-10-24; lib/topics-v2.cjs): the orbit becomes the door to the
+ * blog's categories. Applied to the reference and to the bound template alike; the reference renders the canvas
+ * content as the `T` literal, the bound template reads D.topics.
+ */
+function deviateTopicsLogic(src) {
+  src = rep(src, /const T = \[[\s\S]*?\n    \];\n/, topicsV2.T_LITERAL)
+  src = rep(src, /const cur = this\.state\.topic;\n[\s\S]*?\n    const act = \{[^\n]*\};\n/, topicsV2.LOGIC)
+  src = rep(src, 'labels, act, years,', 'labels, act, topicRows, years,')
+
+  return src
+}
+
+function deviateTopicsDesktop(src) {
+  src = rep(src, '\n</style>', '\n' + topicsV2.CSS + '\n</style>')
+  src = src.replace(/<section id="temas"[\s\S]*?<\/section>/, section => {
+    const intro = section.match(/    <div style="position: absolute; left: 0; top: 190px; width: 470px;">[\s\S]*?\n    <\/div>/)
+
+    if (!intro) throw new Error('Topics intro not found')
+
+    return topicsV2.DESKTOP(rep(rep(intro[0], topicsV2.INTRO_TITLE, topicsV2.NEW_TITLE), topicsV2.INTRO_SUB, topicsV2.NEW_SUB))
+  })
+  if (!src.includes('class="core tv-core-box"')) throw new Error('Topics section not replaced')
+
+  return deviateTopicsLogic(src)
+}
+
+function deviateTopicsMobile(src) {
+  src = rep(src, '\n</style>', '\n' + topicsV2.CSS + '\n</style>')
+  src = rep(src, /<section style="padding: 64px 16px 56px;">\n  <p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0\.1em; text-transform: uppercase; color: #cfe4fa;">Explora por tema<\/p>[\s\S]*?<\/section>/, topicsV2.MOBILE)
+
+  return deviateTopicsLogic(src)
 }
 
 /**
@@ -73,6 +108,8 @@ function deviate(src) {
     cards: /(?<=<div class="rail" id="v3-rail" role="list" onScroll="\{\{ onRail \}\}">)\n[\s\S]*?\n(?=  <\/div>\n<\/section>)/,
   })
   src = rep(src, "const card = el.querySelector('.card');", "const card = el.querySelector('.rc');")
+  // 5. «Explora por tema» v2 (see deviateTopicsDesktop).
+  src = deviateTopicsDesktop(src)
 
   return src
 }
@@ -187,10 +224,8 @@ function bindMarkup(src) {
 
   // Reading rail: the v2 card template (deviateRail) already reads `rail` from data.
 
-  // Topics: real totals, latest link and source line.
+  // Topics: the real total (the section itself is deviateTopicsDesktop).
   src = rep(src, '<span class="nl__n">44</span>', '<span class="nl__n">{{ totalPosts }}</span>')
-  src = rep(src, '<a href="#" class="lnk" style="margin-top: 26px; max-width: 360px;">', '<a href="{{ act.href }}" class="lnk" style="margin-top: 26px; max-width: 360px;">')
-  src = rep(src, '>Fuente: blog de Efeonce, 44 publicaciones al 23 oct 2026</span>', '>{{ act.source }}</span>')
 
   // Archive: real title, links and «more».
   src = rep(src, '>Todo el archivo · 44 publicaciones</p>', '>{{ archiveTitle }}</p>')
@@ -217,7 +252,6 @@ function bindLogic(src) {
   src = rep(src, "const years = ['2026', '2025', '2024', '2023'].map(", 'const years = D.years.map(')
   src = rep(src, "yearShift: (['2026', '2025', '2024', '2023'].indexOf(this.state.year) * 100) + '%',", "yearShift: (D.years.indexOf(this.state.year) * 100) + '%',")
   src = rep(src, "this.state = { topic: 'hubspot', year: '2026',", "this.state = { topic: props.data.topicDefault, year: props.data.years[0],")
-  src = rep(src, "pct: Math.round((a.n / 44) * 100) + ' %', share: a.n + ' de 44' }", "pct: Math.round((a.n / D.total) * 100) + ' %', share: a.n + ' de ' + D.total, href: a.href, source: D.topicsSource }")
   src = rep(src, /evSpk: \[[\s\S]*?\n      \],\n      evSeats: '312',\n      evLearn: \[[\s\S]*?\n      \],\n      evAgenda: \[[\s\S]*?\n      \],\n      evNext: \[[\s\S]*?\n      \],\n      evRec: \[[\s\S]*?\n      \],\n/, 'evSpk: D.event.speakers, evSeats: D.event.seats, evLearn: D.event.takeaways, evAgenda: D.event.agenda, evNext: D.event.upcoming, evRec: D.event.recordings,\n      ev: D.event, glitch: D.glitch, rail: D.rail, asset: D.assets, totalPosts: D.total, archiveTitle: D.archiveTitle, moreHref: Y[yr].moreHref,\n      searchAction: D.search.action, searchMethod: D.search.method, searchName: D.search.name, subAction: D.subscribe.action, ' + SUB_LOGIC + '\n')
   src = rep(src, 'const at = Date.UTC(2026, 10, 12, 13, 0, 0);', 'const at = D.event.startMs;')
 
@@ -247,6 +281,8 @@ function deviateMobile(src) {
     open: { from: '<div class="scroller" role="list" style="padding: 0 16px 8px;">', to: '<div class="scroller rc-m" role="list" style="padding: 0 16px 8px;">' },
     cards: /\n    <a href="#" role="listitem" class="lnk" style="flex: none; width: 300px; height: 440px; border-radius: 26px; overflow: hidden;[\s\S]*?Hacer el diagnóstico<\/span><\/a>\n/,
   })
+  // 6. «Explora por tema» v2 (see deviateTopicsMobile): the orbit gives way to the list of categories.
+  src = deviateTopicsMobile(src)
 
   return src
 }
@@ -298,10 +334,6 @@ function bindMarkupMobile(src) {
 
   // Reading rail: the v2 card template (deviateRail) already reads `rail` from data.
 
-  // Topics.
-  src = rep(src, '>Fuente: blog de Efeonce, 44 publicaciones al 23 oct 2026</p>', '>{{ act.source }}</p>')
-  src = rep(src, '<a href="#" class="lnk" style="margin-top: 20px; padding: 18px 0;', '<a href="{{ act.href }}" class="lnk" style="margin-top: 20px; padding: 18px 0;')
-
   // Archive.
   src = rep(src, '>Todo el archivo · 44</p>', '>{{ archiveTitle }}</p>')
   src = rep(src, '<a href="#" class="lnk" style="padding: 16px 0; border-top: 1px solid rgba(2,60,112,0.14);">', '<a href="{{ r.href }}" class="lnk" style="padding: 16px 0; border-top: 1px solid rgba(2,60,112,0.14);">')
@@ -326,7 +358,6 @@ function bindLogicMobile(src) {
   src = rep(src, "const years = ['2026', '2025', '2024', '2023'].map(", 'const years = D.years.map(')
   src = rep(src, "yearShift: (['2026', '2025', '2024', '2023'].indexOf(yr) * 100) + '%',", "yearShift: (D.years.indexOf(yr) * 100) + '%',")
   src = rep(src, "this.state = { topic: 'hubspot', year: '2026',", "this.state = { topic: props.data.topicDefault, year: props.data.years[0],")
-  src = rep(src, "pct: Math.round((a.n / 44) * 100) + ' %', share: a.n + ' de 44 publicaciones' }", "pct: Math.round((a.n / D.total) * 100) + ' %', share: a.n + ' de ' + D.total + ' publicaciones', href: a.href, source: D.topicsSource }")
   src = rep(src, /evSpk: \[[\s\S]*?\n      \],\n      evSeats: '312',\n      evLearn: \[[\s\S]*?\n      \],\n      evAgenda: \[[\s\S]*?\n      \],\n      evNext: \[[\s\S]*?\n      \],\n      evRec: \[[\s\S]*?\n      \],\n/, 'evSpk: D.event.speakers, evSeats: D.event.seats, evLearn: D.event.takeaways, evAgenda: D.event.agenda, evNext: D.event.upcoming, evRec: D.event.recordings,\n      ev: D.event, glitch: D.glitch, rail: D.rail, asset: D.assets, chips: D.chips, archiveTitle: D.archiveTitle, moreHref: Y[yr].moreHref,\n      searchAction: D.search.action, searchMethod: D.search.method, searchName: D.search.name, subAction: D.subscribe.action, ' + SUB_LOGIC + '\n')
   src = rep(src, 'const at = Date.UTC(2026, 10, 12, 13, 0, 0);', 'const at = D.event.startMs;')
 
