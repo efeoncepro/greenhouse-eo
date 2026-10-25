@@ -143,16 +143,8 @@
      "caption": "El ICP elige la empresa; el grupo de compra, el IPP y el job viven dentro de ella.",
      "sources": [
       {
-       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-cuatro-capas-mobile-dark.svg",
-       "media": "(prefers-color-scheme: dark) and (max-width: 860px)"
-      },
-      {
        "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-cuatro-capas-mobile-light.svg",
        "media": "(max-width: 860px)"
-      },
-      {
-       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-cuatro-capas-desktop-dark.svg",
-       "media": "(prefers-color-scheme: dark)"
       }
      ]
     }
@@ -416,16 +408,8 @@
      "caption": "Cada filtro deja menos cuentas. Proporciones ilustrativas.",
      "sources": [
       {
-       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-filtro-de-cuentas-mobile-dark.svg",
-       "media": "(prefers-color-scheme: dark) and (max-width: 860px)"
-      },
-      {
        "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-filtro-de-cuentas-mobile-light.svg",
        "media": "(max-width: 860px)"
-      },
-      {
-       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-filtro-de-cuentas-desktop-dark.svg",
-       "media": "(prefers-color-scheme: dark)"
       }
      ]
     }
