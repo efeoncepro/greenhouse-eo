@@ -10,7 +10,8 @@
  *   reading guide: description, three reads to start, «Ver todo <tema>».
  * - Mobile: a list sorted by reads; every row is the link to its category.
  * The data contract (one row per topic, both boards): key, name, promise, accent, ink, href, n, desc, reads[{t, href}],
- * pos, align, arc, sx, sy. EOBH_View mirrors LOGIC in PHP (first paint = browser first render).
+ * pos, align, deg. EOBH_View mirrors LOGIC in PHP (first paint = browser first render; the arc starts at the topic's
+ * angle and, in the browser, turns around the ring by the shortest way).
  */
 
 const ARROW = '<svg class="ax" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></g></svg>'
@@ -18,7 +19,8 @@ const ARROW = '<svg class="ax" width="18" height="18" viewBox="0 0 24 24" aria-h
 const CSS = `/* Explora por tema v2 (lib/topics-v2.cjs) */
 .tv-nav{display:contents}
 .stage .tv-ring{overflow:visible}
-.tv-ring .tv-arc{transition:d 600ms cubic-bezier(0.22,1,0.36,1)}
+.tv-ring .tv-turn{transform-origin:380px 380px;transition:transform 800ms cubic-bezier(0.22,1,0.36,1)}
+.tv-ring .tv-turn path,.tv-ring .tv-turn circle{transition:stroke 400ms,fill 400ms}
 .lab.tv-lab{color:#ffffff}
 .tv-lab .tv-pr{display:inline-flex;align-items:center;gap:6px;font-size:13px;line-height:1.3;color:#cfe4fa}
 .tv-lab .tv-pr .ax{opacity:0;transform:translateX(-4px);transition:opacity 250ms,transform 340ms cubic-bezier(0.2,0,0,1)}
@@ -46,14 +48,14 @@ const CSS = `/* Explora por tema v2 (lib/topics-v2.cjs) */
 .tv-row .tv-rn{display:block;font-size:24px;line-height:1.05;font-weight:740;letter-spacing:-.025em}
 .tv-row .tv-pr{display:block;margin-top:4px;font-size:13px;color:#cfe4fa}
 .tv-row .tv-n{display:inline-grid;place-items:center;min-width:28px;height:24px;padding:0 8px;border-radius:999px;background:rgba(207,228,250,.14);font-size:13px;font-variant-numeric:tabular-nums}
-@media (prefers-reduced-motion:reduce){.tv-ring .tv-arc,.tv-lab .tv-pr .ax,.tv-reads a .ax,.tv-see{transition:none}}`
+@media (prefers-reduced-motion:reduce){.tv-ring .tv-turn,.tv-lab .tv-pr .ax,.tv-reads a .ax,.tv-see{transition:none}}`
 
 /** Desktop/tablet section; `intro` is the canvas intro block with the new title and copy (same «Todo el archivo» link). */
 const DESKTOP = intro => `<section id="temas" data-site-nav-tone="dark" style="background: #001a33; padding: 120px 0 72px;">
   <div class="stage">
 ${intro}
 
-    <svg class="ring tv-ring" viewBox="0 0 760 760" aria-hidden="true"><circle cx="380" cy="380" r="330" fill="none" stroke="#72ded8" stroke-opacity="0.16" stroke-width="1"></circle><path class="tv-arc" d="{{ act.arc }}" fill="none" stroke="{{ act.accent }}" stroke-width="2" stroke-linecap="round"></path><circle cx="{{ act.sx }}" cy="{{ act.sy }}" r="4" fill="{{ act.accent }}"></circle></svg>
+    <svg class="ring tv-ring" viewBox="0 0 760 760" aria-hidden="true"><circle cx="380" cy="380" r="330" fill="none" stroke="#72ded8" stroke-opacity="0.16" stroke-width="1"></circle><g class="tv-turn" style="transform: rotate({{ act.rot }});"><path d="M 697.2 289.0 A 330 330 0 0 1 697.2 471.0" fill="none" stroke="{{ act.accent }}" stroke-width="2" stroke-linecap="round"></path><circle cx="710" cy="380" r="4" fill="{{ act.accent }}"></circle></g></svg>
 
     <nav class="tv-nav" aria-label="Temas del blog">
       <sc-for list="{{ labels }}" as="l" hint-placeholder-count="6">
@@ -93,7 +95,7 @@ const NEW_TITLE = 'Elige por dónde empezar.'
 const INTRO_SUB = 'Elige un tema en la órbita: verás cuánto escribimos de él y lo último que publicamos.'
 const NEW_SUB = 'Seis temas para lo que hoy te ocupa: ventas, marketing, visibilidad en la IA y creatividad.'
 
-// The six orbit slots (stage coordinates of the canvas) and the angle of each slot's arc on the 760 px ring.
+// The six orbit slots (stage coordinates of the canvas) and the angle the arc turns to (0° = 3 o'clock on the ring).
 const SLOTS = [
   { pos: 'left: 720px; top: 0px; width: 200px; align-items: center; text-align: center;', align: 'center', deg: -90 },
   { pos: 'left: 1078px; top: 96px; align-items: flex-start; text-align: left;', align: 'flex-start', deg: -52 },
@@ -102,16 +104,6 @@ const SLOTS = [
   { pos: 'right: 690px; top: 726px; align-items: flex-end; text-align: right;', align: 'flex-end', deg: 128 },
   { pos: 'right: 690px; top: 96px; align-items: flex-end; text-align: right;', align: 'flex-end', deg: -128 },
 ]
-
-/** Arc of ±16° around `deg` on the r=330 ring of the 760 px viewBox, and its sphere. Mirrored in EO_Home_Adapter. */
-function arc(deg) {
-  const p = a => [380 + 330 * Math.cos((a * Math.PI) / 180), 380 + 330 * Math.sin((a * Math.PI) / 180)]
-  const [x0, y0] = p(deg - 16)
-  const [x1, y1] = p(deg + 16)
-  const [sx, sy] = p(deg)
-
-  return { arc: `M ${x0.toFixed(1)} ${y0.toFixed(1)} A 330 330 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`, sx: sx.toFixed(1), sy: sy.toFixed(1) }
-}
 
 // The canvas content (efeoncepro.com on 2026-10-24) as the data contract, in orbit order.
 const RAW = [
@@ -152,7 +144,7 @@ const ink = accent => (accent === '#0375db' ? '#ffffff' : '#001a33')
 const FIXTURE = RAW.map(([key, name, promise, accent, n, href, desc, reads], i) => ({
   key, name, promise, accent, ink: ink(accent), href, n, desc,
   reads: reads.map(([t, h]) => ({ t, href: h })),
-  pos: SLOTS[i].pos, align: SLOTS[i].align, ...arc(SLOTS[i].deg),
+  pos: SLOTS[i].pos, align: SLOTS[i].align, deg: SLOTS[i].deg,
 }))
 
 /** `const T = [...]` in the canvas literal shape (bind-canvas replaces it with D.topics). */
@@ -165,8 +157,12 @@ const LOGIC = `const cur = this.state.topic;
       return { name: t.name, promise: t.promise, href: t.href, n: String(t.n), pos: t.pos, align: t.align, accent: t.accent, color: on ? t.accent : '#ffffff', barW: on ? '48px' : '0px', current: on ? 'true' : 'false', pick: () => { if (t.key !== this.state.topic) this.setState({ topic: t.key }); } };
     });
     const a = T.find((t) => t.key === cur) || T[0];
-    const act = { key: a.key, name: a.name, accent: a.accent, ink: a.ink, desc: a.desc, reads: a.reads, href: a.href, n: String(a.n), arc: a.arc, sx: a.sx, sy: a.sy };
+    // The arc turns around the ring by the shortest way: the angle keeps winding from the last one shown.
+    const prevRot = this._rot;
+    const rot = typeof prevRot === 'number' ? prevRot + ((((a.deg - prevRot) % 360) + 540) % 360) - 180 : a.deg;
+    this._rot = rot;
+    const act = { key: a.key, name: a.name, accent: a.accent, ink: a.ink, desc: a.desc, reads: a.reads, href: a.href, n: String(a.n), rot: rot + 'deg' };
     const topicRows = labels.slice().sort((x, y) => Number(y.n) - Number(x.n));
 `
 
-module.exports = { CSS, DESKTOP, MOBILE, FIXTURE, T_LITERAL, LOGIC, SLOTS, INTRO_TITLE, NEW_TITLE, INTRO_SUB, NEW_SUB, arc, ink }
+module.exports = { CSS, DESKTOP, MOBILE, FIXTURE, T_LITERAL, LOGIC, SLOTS, INTRO_TITLE, NEW_TITLE, INTRO_SUB, NEW_SUB, ink }

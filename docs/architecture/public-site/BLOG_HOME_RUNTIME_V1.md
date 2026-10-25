@@ -119,12 +119,14 @@ corrige el botón magnético).
 
 `scripts/public-website/blog-v3/lib/topics-v2.cjs` reemplaza la sección de la órbita en los tres tableros (plantilla de
 escritorio/tablet y de móvil, CSS `tv-*`, el literal `T` de la versión 95 del canvas y la lógica). Contrato por tema,
-igual en los dos documentos: `key, name, promise, accent, ink, href, n, desc, reads[{t, href}], pos, align, arc, sx, sy`.
+igual en los dos documentos: `key, name, promise, accent, ink, href, n, desc, reads[{t, href}], pos, align, deg`.
 `EO_Home_Readers::ORBIT` fija las seis categorías (HubSpot, AEO, Marketing digital, Inbound, Diseño, Loop Marketing)
 y entrega su enlace, la descripción de la categoría y las tres lecturas más recientes; `EO_Home_Adapter::ORBIT_TOPICS`
-pone nombre y promesa, y `ORBIT_SLOTS` la posición y el ángulo del arco (`orbit_arc()`, mismo cálculo que
-`topics-v2.cjs`). `EOBH_View::topics()` replica la lógica (rótulos, tema activo y filas del móvil ordenadas por
-lecturas). Los rótulos son enlaces `<a href>` en el HTML del servidor: el enlazado interno a las categorías existe sin
+pone nombre y promesa, y `ORBIT_SLOTS` la posición del rótulo y el ángulo `deg` del tema. El arco es uno solo,
+dibujado a 0° dentro de un `<g class="tv-turn">` que gira con `transform: rotate(…)` (800 ms): al pasar de un tema a
+otro recorre el anillo por el camino más corto en vez de saltar (la lógica acumula el ángulo en `_rot`; el servidor
+pinta `deg` tal cual porque el primer render no tiene giro previo). `EOBH_View::topics()` replica la lógica (rótulos,
+tema activo con `rot` y filas del móvil ordenadas por lecturas). Los rótulos son enlaces `<a href>` en el HTML del servidor: el enlazado interno a las categorías existe sin
 JavaScript. Cambiar un tema = las tres constantes y un deploy de `content-model`; la descripción se edita con
 `topic-descriptions`. Ojo con el caché del lector (300 s): después de un deploy, la portada puede servir la forma vieja
 hasta que expire.
