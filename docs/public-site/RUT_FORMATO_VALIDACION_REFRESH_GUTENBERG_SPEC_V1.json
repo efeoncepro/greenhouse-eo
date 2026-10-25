@@ -323,7 +323,7 @@
         "strong": true
        },
        {
-        "text": " Las reglas de la propiedad también se aplican al importar: los RUT que no cumplan el formato van a dar error."
+        "text": " Las reglas de la propiedad también se aplican al importar: los RUT que no cumplan el formato van a dar error. Más abajo están las dos fórmulas para hacerlo."
        }
       ]
      ]
@@ -342,6 +342,52 @@
        "text": " cuento el orden en que conviene hacerlo."
       }
      ]
+    }
+   ]
+  },
+  {
+   "heading": "Antes de importar a HubSpot: normaliza la columna del RUT",
+   "level": 3,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Si vas a subir una base que viene de otro sistema o de una planilla, prepárala en Excel antes de importarla. Con el RUT original en la columna A, escrito como venga, estas dos fórmulas bastan (Excel en español, Microsoft 365 o Excel 2021)."
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Columna B",
+       "strong": true
+      },
+      {
+       "text": ": deja el RUT como 12345678-5, el formato que vas a guardar en HubSpot. Quita puntos, guion, espacios y ceros a la izquierda, y pasa la k a mayúscula."
+      }
+     ]
+    },
+    {
+     "kind": "code",
+     "code": "=LET(t;MAYUSC(SUSTITUIR(SUSTITUIR(SUSTITUIR(A2;\".\";\"\");\"-\";\"\");\" \";\"\"));VALOR(IZQUIERDA(t;LARGO(t)-1))&\"-\"&DERECHA(t;1))"
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Columna C",
+       "strong": true
+      },
+      {
+       "text": ": revisa el dígito verificador y marca «Revisar» los RUT mal escritos."
+      }
+     ]
+    },
+    {
+     "kind": "code",
+     "code": "=LET(t;MAYUSC(SUSTITUIR(SUSTITUIR(B2;\".\";\"\");\"-\";\"\"));n;SECUENCIA(8);s;SUMAPRODUCTO(--EXTRAE(TEXTO(IZQUIERDA(t;LARGO(t)-1);\"00000000\");n;1);RESIDUO(8-n;6)+2);x;11-RESIDUO(s;11);SI(SI(x=11;\"0\";SI(x=10;\"K\";x&\"\"))=DERECHA(t;1);\"Válido\";\"Revisar\"))"
+    },
+    {
+     "kind": "paragraph",
+     "text": "Corrige las filas marcadas antes de importar, revisa si hay RUT repetidos en la columna B y sube esa columna, no la original. Si tu Excel está en inglés, las funciones se llaman UPPER, SUBSTITUTE, VALUE, LEFT, LEN, RIGHT, SEQUENCE, SUMPRODUCT, MID, TEXT, MOD e IF, y el separador es la coma. Probamos las dos fórmulas con RUT con y sin puntos, con espacios, con k minúscula, con ceros a la izquierda y bajo el millón."
     }
    ]
   },
@@ -570,7 +616,7 @@
     },
     {
      "kind": "paragraph",
-     "text": "Este artículo se publicó en noviembre de 2024 como un tutorial para validar el RUT en formularios de HubSpot y se reescribió en octubre de 2026: se actualizó a los dos editores de formularios que tiene hoy HubSpot, se corrigió un ejemplo de RUT válido que no lo era, se reescribió el código para que HubSpot registre el valor y acepte RUT bajo el millón, se sumó cómo evitar RUT duplicados en el CRM y se retiró la afirmación de que validar el RUT «cumple normativas». Lo desarrolló Julio Reyes con apoyo de IA en investigación, código y edición; el código se probó antes de publicar, y Julio aprobó la versión final."
+     "text": "Este artículo se publicó en noviembre de 2024 como un tutorial para validar el RUT en formularios de HubSpot y se reescribió en octubre de 2026: se actualizó a los dos editores de formularios que tiene hoy HubSpot, se corrigió un ejemplo de RUT válido que no lo era, se reescribió el código para que HubSpot registre el valor y acepte RUT bajo el millón, se sumó cómo evitar RUT duplicados en el CRM y cómo normalizar una base antes de importarla, y se retiró la afirmación de que validar el RUT «cumple normativas». Lo desarrolló Julio Reyes con apoyo de IA en investigación, código y edición; el código y las fórmulas se probaron antes de publicar, y Julio aprobó la versión final."
     }
    ]
   }

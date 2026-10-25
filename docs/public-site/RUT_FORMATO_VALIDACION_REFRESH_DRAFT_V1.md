@@ -1,11 +1,11 @@
-# Refresh — «Cómo validar el RUT en formularios de HubSpot» (borrador V3)
+# Refresh — «Cómo validar el RUT en formularios de HubSpot» (borrador V4)
 
 > **Estado:** borrador para revisión del autor. No publicado.
 > **URL (se conserva):** https://efeoncepro.com/hubspot/como-crear-formularios-con-validacion-de-rut/ (post `246024`)
 > **Autor / voz:** Julio Reyes · voz Julio, doctrina como «En Efeonce…».
-> **Creado:** 2026-10-24 · **Última versión:** 2026-10-25 (V3) · **Fuente editable:**
+> **Creado:** 2026-10-24 · **Última versión:** 2026-10-25 (V4) · **Fuente editable:**
 > [`RUT_FORMATO_VALIDACION_REFRESH_GUTENBERG_SPEC_V1.json`](RUT_FORMATO_VALIDACION_REFRESH_GUTENBERG_SPEC_V1.json)
-> (validación `pass`; sólo el aviso informativo de sumar una imagen; 53 bloques).
+> (validación `pass`; sólo el aviso informativo de sumar una imagen; 60 bloques).
 > **Propuesta:** [`BLOG_REFRESH_TANDA_1_PROPUESTA_V1.md`](BLOG_REFRESH_TANDA_1_PROPUESTA_V1.md) §1, con la decisión del 2026-10-25.
 
 ## 1. Decisión de enfoque (Julio, 2026-10-25)
@@ -14,7 +14,9 @@ El artículo **se queda en validar el RUT en formularios de HubSpot**. La V1/V2 
 en Excel porque Search Console muestra que la página aparece por «formato rut chile / en excel». Julio lo descartó:
 esa audiencia no es la del artículo, que existe para mostrar experiencia en HubSpot y conectar con el servicio.
 Se retiraron la sección y las fórmulas de Excel; el formato del RUT y el módulo 11 quedan sólo como lo que un
-formulario tiene que revisar.
+formulario tiene que revisar. **Ajuste (V4, también de Julio):** vuelven dos fórmulas de Excel, sólo como preparación
+de una base antes de importarla a HubSpot (normalizar a `12345678-5` y marcar dígitos equivocados), dentro de la
+sección de duplicados. Todo el texto habla del CRM; no hay sección de formato en Excel ni fórmula para mostrar puntos.
 
 **Consecuencia esperada:** es probable que bajen las impresiones por «formato rut». Es una pérdida aceptada; la
 medición pasa a las consultas de HubSpot (validar rut hubspot, formulario rut hubspot y variantes), que tienen poco
@@ -47,6 +49,8 @@ volumen, y a los clics hacia la página de HubSpot de Efeonce.
   RUT mal escrito, deja enviar con el campo vacío, guarda `12345678-5` y dispara el evento `input`.
   **No probada en un portal HubSpot real.**
 - **Expresión regular para la propiedad:** probada con 9 casos; no usa grupos de captura.
+- **Fórmulas de importación (Excel):** ejecutadas en Microsoft Excel de este equipo con 9 casos (con y sin puntos,
+  espacios, k minúscula, ceros a la izquierda, bajo el millón); el texto del post es el `formula local` que devolvió Excel.
 - **Enlaces:** los 9 del artículo responden 200 (2026-10-25). Índice con 10 anclas, ninguna rota.
 - **Fuentes:** HubSpot KB (reglas de propiedades, valores únicos, regex), HubSpot Developers (legacy forms), BCN
   (Ley 21.719) y alerta legal de Carey de septiembre de 2026.
@@ -68,6 +72,8 @@ volumen, y a los clics hacia la página de HubSpot de Efeonce.
   - V3 (10:04 UTC): enfoque HubSpot, sin Excel; título, extracto y Yoast nuevos. Respaldos de la V2:
     `_gh_rut_review_252086_v2_20261025_100449` (contenido) y `_gh_rut_review_252086_meta_v2_20261025_100451` (metadatos).
     Hash del contenido: `e7ae0945…`.
+  - V4 (10:15 UTC): subsección «Antes de importar a HubSpot» con las dos fórmulas. Respaldo de la V3:
+    `_gh_rut_review_252086_v3_20261025_101515`. Hash: `260ce398…`.
 - **QA del render** (V2, mismos tipos de bloque que la V3; 1440 y 390 px): sin desborde de página; tablas y código caben.
 - **Para publicar** (con visto bueno de Julio): escribir título, extracto, contenido y Yoast en `246024` con guardas y
   respaldo, como en inbound; después pasar `252086` a la papelera.
@@ -254,9 +260,27 @@ Validar el formato evita errores de tipeo, pero no evita que el mismo RUT entre 
 - **Guarda un solo formato** (12345678-5): con dos formatos, el mismo RUT parece dos datos distintos.
 - **Exige valores únicos en la propiedad.** HubSpot lo permite en todos los planes, hasta diez propiedades únicas por objeto, pero en una propiedad de texto sólo se puede activar al crearla.
 - **Si ya tienes una propiedad de RUT sin esa marca,** crea una nueva con valores únicos, normaliza los RUT existentes al formato sin puntos, resuelve los duplicados y copia los valores a la nueva.
-- **Limpia antes de importar.** Las reglas de la propiedad también se aplican al importar: los RUT que no cumplan el formato van a dar error.
+- **Limpia antes de importar.** Las reglas de la propiedad también se aplican al importar: los RUT que no cumplan el formato van a dar error. Más abajo están las dos fórmulas para hacerlo.
 
 ¿Empresa o contacto? Si vendes a empresas, el RUT que te sirve es el de la empresa, y va en la empresa. El RUT de una persona va en su contacto y sólo lo pediría si lo necesitas para facturarle. Si estás armando el CRM desde cero, en [cómo pasar de Excel a HubSpot](https://efeoncepro.com/hubspot/de-excel-a-hubspot-en-5-dias/) cuento el orden en que conviene hacerlo.
+
+##### Antes de importar a HubSpot: normaliza la columna del RUT
+
+Si vas a subir una base que viene de otro sistema o de una planilla, prepárala en Excel antes de importarla. Con el RUT original en la columna A, escrito como venga, estas dos fórmulas bastan (Excel en español, Microsoft 365 o Excel 2021).
+
+**Columna B**: deja el RUT como 12345678-5, el formato que vas a guardar en HubSpot. Quita puntos, guion, espacios y ceros a la izquierda, y pasa la k a mayúscula.
+
+```
+=LET(t;MAYUSC(SUSTITUIR(SUSTITUIR(SUSTITUIR(A2;".";"");"-";"");" ";""));VALOR(IZQUIERDA(t;LARGO(t)-1))&"-"&DERECHA(t;1))
+```
+
+**Columna C**: revisa el dígito verificador y marca «Revisar» los RUT mal escritos.
+
+```
+=LET(t;MAYUSC(SUSTITUIR(SUSTITUIR(B2;".";"");"-";""));n;SECUENCIA(8);s;SUMAPRODUCTO(--EXTRAE(TEXTO(IZQUIERDA(t;LARGO(t)-1);"00000000");n;1);RESIDUO(8-n;6)+2);x;11-RESIDUO(s;11);SI(SI(x=11;"0";SI(x=10;"K";x&""))=DERECHA(t;1);"Válido";"Revisar"))
+```
+
+Corrige las filas marcadas antes de importar, revisa si hay RUT repetidos en la columna B y sube esa columna, no la original. Si tu Excel está en inglés, las funciones se llaman UPPER, SUBSTITUTE, VALUE, LEFT, LEN, RIGHT, SEQUENCE, SUMPRODUCT, MID, TEXT, MOD e IF, y el separador es la coma. Probamos las dos fórmulas con RUT con y sin puntos, con espacios, con k minúscula, con ceros a la izquierda y bajo el millón.
 
 #### ¿Conviene pedir el RUT en un formulario?
 
@@ -304,4 +328,4 @@ En HubSpot, el RUT se valida con reglas en la propiedad si el formulario es del 
 - Biblioteca del Congreso Nacional. [Ley 21.719](https://www.bcn.cl/leychile/navegar?idLey=21719).
 - Carey (2026). [Gobierno ingresa proyecto de ley que posterga en un año la entrada en vigor de la Ley 21.719](https://www.carey.cl/api/archivo/gobierno-ingresa-proyecto-de-ley-que-posterga-en-un-ano-entrada-en-vigor-de-la-ley-sobre-proteccion-de-datos-personales?lang=es).
 
-Este artículo se publicó en noviembre de 2024 como un tutorial para validar el RUT en formularios de HubSpot y se reescribió en octubre de 2026: se actualizó a los dos editores de formularios que tiene hoy HubSpot, se corrigió un ejemplo de RUT válido que no lo era, se reescribió el código para que HubSpot registre el valor y acepte RUT bajo el millón, se sumó cómo evitar RUT duplicados en el CRM y se retiró la afirmación de que validar el RUT «cumple normativas». Lo desarrolló Julio Reyes con apoyo de IA en investigación, código y edición; el código se probó antes de publicar, y Julio aprobó la versión final.
+Este artículo se publicó en noviembre de 2024 como un tutorial para validar el RUT en formularios de HubSpot y se reescribió en octubre de 2026: se actualizó a los dos editores de formularios que tiene hoy HubSpot, se corrigió un ejemplo de RUT válido que no lo era, se reescribió el código para que HubSpot registre el valor y acepte RUT bajo el millón, se sumó cómo evitar RUT duplicados en el CRM y cómo normalizar una base antes de importarla, y se retiró la afirmación de que validar el RUT «cumple normativas». Lo desarrolló Julio Reyes con apoyo de IA en investigación, código y edición; el código y las fórmulas se probaron antes de publicar, y Julio aprobó la versión final.
