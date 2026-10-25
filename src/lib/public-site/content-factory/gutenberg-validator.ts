@@ -37,6 +37,7 @@ const DEFAULT_ALLOWED_GUTENBERG_BLOCKS = [
   'core/column',
   'core/columns',
   'core/embed',
+  'core/code',
   'core/gallery',
   'core/group',
   'core/details',
@@ -81,6 +82,7 @@ export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionP
   mediaBlocks: ['core/image', 'core/embed'],
   enrichmentBlocks: [
     'core/list',
+    'core/code',
     'core/quote',
     'core/pullquote',
     'core/details',

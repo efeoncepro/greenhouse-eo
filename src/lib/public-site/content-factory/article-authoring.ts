@@ -106,6 +106,8 @@ export type GutenbergArticleBlock =
   /** Rendered with the «Destacado Efeonce» style (efeonce-editorial-blocks ≥ 0.4.0); `cite` = optional source line. */
   | { kind: 'pullquote'; text: string; cite?: string }
   | { kind: 'separator' }
+  /** Plain-text code sample (`core/code`). Newlines are kept; the text is escaped like the block editor does. */
+  | { kind: 'code'; code: string }
   // Media requires a real WordPress asset — never invent ids/urls.
   | {
       kind: 'image'
@@ -344,6 +346,8 @@ const blockToPlainText = (block: GutenbergArticleBlock): string => {
     case 'quote':
     case 'pullquote':
       return block.text
+    case 'code':
+      return block.code
     case 'glitchDrop':
       return block.lines.join(' ')
     case 'separator':
@@ -463,6 +467,22 @@ const pullquoteBlock = (text: string, cite?: string): string => {
     `<figure class="wp-block-pullquote ${className}"><blockquote><p>${escapeGutenbergHtml(text)}</p>${source}</blockquote></figure>`,
     '<!-- /wp:pullquote -->'
   ].join('\n')
+}
+
+const codeBlock = (code: string): string => {
+  if (!code.trim()) {
+    throw new Error('content_factory_article_code_required')
+  }
+
+  // Same escaping as the block editor's code block: HTML entities plus `[` (keeps shortcodes from running).
+  const escaped = code
+    .replace(/\r\n?/g, '\n')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\[/g, '&#91;')
+
+  return ['<!-- wp:code -->', `<pre class="wp-block-code"><code>${escaped}</code></pre>`, '<!-- /wp:code -->'].join('\n')
 }
 
 const separatorBlock = (): string =>
@@ -647,6 +667,8 @@ const renderArticleBlock = (
       return pullquoteBlock(block.text, block.cite)
     case 'separator':
       return separatorBlock()
+    case 'code':
+      return codeBlock(block.code)
     case 'image':
       return imageBlock(block)
     case 'embed':

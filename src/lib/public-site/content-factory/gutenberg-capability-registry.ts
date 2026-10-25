@@ -350,6 +350,24 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
     exampleIntent: 'Make this CTA label more specific without changing the destination.'
   },
   {
+    blockName: 'core/code',
+    semanticKind: 'editorial_code',
+    agentRole: 'Code sample a reader copies (JavaScript, formulas, regex). Authored as GutenbergArticleSpec kind="code".',
+    freedomLevel: 'constrained',
+    editableSurfaces: ['text'],
+    semanticOperations: ['refresh_code_sample'],
+    compilesTo: ['update_text'],
+    requiredEvidence: [...baseEvidence],
+    applyPolicy: draftOnlyPolicy('Regenerate the sample from the spec so escaping stays governed; test the code before it ships.'),
+    previewPolicy: previewRequired('The sample scrolls inside its block at 390 px without widening the page.'),
+    guardrails: [
+      'Publish only code that was run against real cases; say where it was not tested (a live portal, a locale).',
+      'Plain text only: no markup inside the sample.',
+      'Keep explanation in the surrounding paragraphs, not in long code comments.'
+    ],
+    exampleIntent: 'Replace this validation snippet with the tested version that accepts RUTs under one million.'
+  },
+  {
     blockName: 'core/separator',
     semanticKind: 'section_break',
     agentRole: 'Visual section break used for rhythm between editorial modules.',
