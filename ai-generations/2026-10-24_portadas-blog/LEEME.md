@@ -129,9 +129,15 @@ a las sesiones del blog.
 - **`cine-reviewer`: CORREGIR → APROBABLE.** Sin `luz-motivada` (pedía la fuente visible), cámara a ~2,5 m sobre la
   mesa negra, madera negra y fichas blanco frío (el roble con fichas crema se lee fichero antiguo), el color de la
   línea en el borde de la luz y no como punto suelto, «no hay cara» para neutralizar los bloques de piel.
-- **Dos generaciones (≈ USD 0,11).** `plates/MCB-AEO1-169-v1.png` dejaba la ficha al 78 % (fuera del recorte cuadrado)
-  y el cajón cruzando la columna de texto; la v2 pide el cajón casi de frente: ficha en ~64–73 % del ancho.
-  `foto:validar:cine` sin fallas (sombra 95 %), `foto:validar` 4/4.
+- **Cinco generaciones (≈ USD 0,28).** v1 dejaba la ficha al 78 % (fuera del recorte cuadrado); v2 tenía el cajón en
+  el 57 % (la norma pide el 64 % izquierdo vacío) y «La IA» quedaba a 15 px de su esquina; v3 y v4 lo empeoraron (el
+  modelo ignora los porcentajes de un objeto: lo ensancha o lo acerca). **v5, la vigente, describe el cajón con
+  fracciones y tamaño relativo** («lejos y chico, un octavo del ancho, entero en el tercio derecho, la tapa a media
+  altura»). Plates anteriores en `plates/MCB-AEO1-169-v1…v4.png`. v5: `foto:validar:cine` sin fallas (sombra 97 %),
+  `foto:validar` 4/4.
+- **Medido en la portada v5 (lienzo 1200 × 630):** línea de arriba termina en x 710 y el cajón empieza en x 735, más
+  abajo; «te elige.» termina en x 577, a 139 px del cajón; la ficha en x 775–861, con 54 px de margen dentro del
+  cuadrado central (x 285–915).
 - **Textos rechazados** (todos sobre la misma foto, `final-aeo/descartes/`): «¿Qué cita la IA de tu sitio? Pasajes.»,
   «¿A quién recomienda la IA? A pocos.», «La IA recomienda / A pocas.», «Nombra pocas», «Elige pocas», «Cita pocas» y
   otros. El operador: «son mensajes absurdos… no pongas preguntas y respuestas; pon el ring, un texto arriba y uno
@@ -141,13 +147,13 @@ a las sesiones del blog.
 
   | Imagen del inventario | Archivo | Medidas | sha256 |
   |---|---|---|---|
-  | 1 · Plate (tarjeta del rail) | `seo-y-aeo-google-ia-2026-card.webp`: el plate sin los 300 px de arriba y los 40 de abajo, porque con el plate entero la ficha caía en y 36–44 %, sobre el inicio del degradado (zona pedida: y 10–40 %); ahora y 20–30 % | 2560 × 1100 | `a76f8e55…` |
-  | 2 · Portada (destacada, OG, X, «Te puede interesar») | `seo-y-aeo-google-ia-2026.jpg` (151 KB) | 2400 × 1260 | `6136ee39…` |
-  | 3 · Slider (`hero`) | `seo-y-aeo-google-ia-2026-hero.webp` (38 KB): plate sin los 160 px de arriba **y de la derecha**, para dejar la ficha en x 69–78 % | 2400 × 1200 | `5a4fc6f7…` |
+  | 1 · Plate (tarjeta del rail) | `seo-y-aeo-google-ia-2026-card.webp`: el plate sin los 380 px de arriba (con el plate entero la ficha caía sobre el inicio del degradado); ficha en y 16–28 % | 2560 × 1060 | `98b6292d…` |
+  | 2 · Portada (destacada, OG, X, «Te puede interesar») | `seo-y-aeo-google-ia-2026.jpg` (153 KB) | 2400 × 1260 | `026d262e…` |
+  | 3 · Slider (`hero`) | `seo-y-aeo-google-ia-2026-hero.webp` (43 KB): el plate sin los 200 px de arriba y los 160 de la derecha; ficha en x 67–79 % · y 29–40 %, a la derecha del título | 2400 × 1200 | `eaa9f95d…` |
   | 4 · Cuerpo | infografía «Cómo arma su respuesta un motor de IA» v2, adjuntos `252118`/`252119` | 1600 × 930 · 900 × 2578 | — |
 
-  Tarjeta con `--focus "80% 50%"`: se ve x 55–86 % en escritorio y tablet y x 61–85 % en el teléfono; la ficha (x 65–75 %)
-  queda entera, debajo de las etiquetas y por encima del degradado. Medido el 2026-10-25. Hoja de revisión por superficie: `final-aeo/revision-superficies.jpg` (portada, cuadrado, tarjeta 440 ×
+  Tarjeta con `--focus "75% 50%"`: se ve x 52–83 % en escritorio y tablet y x 58–81 % en el teléfono; la ficha queda
+  entera, centrada, debajo de las etiquetas y por encima del degradado. Medido el 2026-10-25. Hoja de revisión por superficie: `final-aeo/revision-superficies.jpg` (portada, cuadrado, tarjeta 440 ×
   600 y 304 × 540, slider 1440 y 390).
 - **Alt de la portada:** «Portada de Marketing con Manzanitas: un cajón de fichero abierto sobre una mesa oscura, con
   una sola ficha levantada bajo un foco de luz azul, junto al texto «Google te encuentra. La IA te elige.»».

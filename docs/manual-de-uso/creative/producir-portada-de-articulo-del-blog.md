@@ -359,6 +359,7 @@ Haz commit sólo de los archivos de texto: los PNG y JPG de `ai-generations/` no
 | El post sigue mostrando la portada vieja | caché del navegador, de Kinsta o de la red social | recarga con un parámetro (`?qa=1`); en redes, usa el inspector de cada una |
 | El slider de la portada del blog no cambia | el post tiene `hero` propio | cámbialo con `pnpm public-website:blog-home hero <post> --image <archivo.webp> --alt "<alt>" --apply` (o `--attachment <id>` si ya está en la biblioteca), coordinando con la sesión de la portada |
 | El título del slider cae encima del texto de la portada | el post entró al slider sin `hero` | súbele el `hero` recortado del plate («La imagen del slider») |
+| Un objeto (no una cara) invade la columna de texto aunque la ficha pida «entre 66 % y 79 %» | el modelo ignora los porcentajes de un objeto: lo ensancha o lo acerca (portada de SEO y AEO, 2026-10-25, cuatro intentos) | descríbelo con fracciones y tamaño relativo: «lejos y chico, un octavo del ancho, entero en el tercio derecho, la tapa a media altura»; después mide en píxeles el aire entre el texto y el objeto |
 | La tarjeta del rail muestra la portada cortada | el post entró al rail sin imagen de tarjeta | súbele el plate con `blog-home card … --focus "84% 30%"` («Las cards v2 del rail») |
 
 ## Volver atrás
