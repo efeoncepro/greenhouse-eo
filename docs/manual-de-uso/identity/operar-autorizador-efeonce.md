@@ -361,7 +361,7 @@ no debería pasar nunca.
   `migrations/20260904130826694_task-1829-auth-oauth-tables.sql`
 - Flags: [`FEATURE_FLAG_STATE_LEDGER.md`](../../operations/FEATURE_FLAG_STATE_LEDGER.md) (`AUTH_SERVER_ENABLED`, `AUTH_SERVER_OAUTH_ENABLED`)
 - Tasks: `docs/tasks/in-progress/TASK-1828-efeonce-auth-server-runtime-deployable.md` ·
-  `docs/tasks/in-progress/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md`
+  `docs/tasks/complete/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md`
 
 
 ## Diagnóstico del flujo Microsoft y evidencia de cierre

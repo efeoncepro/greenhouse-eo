@@ -68,7 +68,7 @@ implementada ni cambia el rollout pendiente de esta task.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -81,7 +81,7 @@ implementada ni cambia el rollout pendiente de esta task.
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-044`
-- Status real: `runtime activado, verificación autenticada pendiente (2026-09-05T01:01Z). Auth Server Deploy 33934410457 success, revisión auth-server-00007-cxb, SHA 3f68e8875, 100% tráfico; OAuth y personas true; emisor active. Metadata/login y negativos públicos verificados (9/9). Falta identidad de canary indicada por operador, correo real, sesión, tokens/refresh/revocación y passkeys en dos navegadores. Deploy por staging sobre servicio compartido; no hay nuevo release main. Evidencia: docs/audits/2026-09-04-epic-044-auth-rollout.md`
+- Status real: `complete (cierre administrativo 2026-10-25). En producción desde el release main 9100bbd2765d (2026-09-04); OAuth ON en auth-server-00166-p77 (healthz oauth:true, metadata RFC 8414 + CIMD vivos, readback 2026-10-25). Tokens ES256, refresh, revocación y consentimiento ejercitados contra el host desplegado por TASK-1836 (carril interno) y TASK-1832 (población externa sintética, revocación en 19.272 s; EPIC-044 criterio de gateway tildado). Passkeys en dos navegadores pertenece a TASK-1830. Gate: CI del HEAD vigente 1859e90a6 verde (PR #262, 11 SUCCESS); sin pnpm build local en este cierre. Hallazgo abierto ajeno al alcance: logs sin token 200 desde 2026-09-26 (ver auditoría 2026-10-25 §6).`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
 - Blocked by: `none`
@@ -395,7 +395,7 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado y archivo en la carpeta correcta — sigue `in-progress`: `code complete, rollout pendiente` (release a main + flag ON en staging + flujo con persona real).
+- [x] `Lifecycle` sincronizado y archivo en la carpeta correcta — cerrada 2026-10-25: release main 9100bbd2765d, OAuth ON en producción y flujo con personas reales/sintéticas verificado por TASK-1836 y TASK-1832.
 - [x] `docs/tasks/README.md`, `Handoff.md` y `changelog.md` actualizados
 - [x] chequeo de impacto cruzado sobre `TASK-1831`, `TASK-1832`, `TASK-659` — deltas 2026-09-04 en cada spec (+ TASK-1830: `SubjectSessionPort` + boundary test).
 - [x] decisión sobre `TASK-659` registrada (supersesión o re-alcance) — **superseded en diseño por EPIC-044**: el emisor nativo cubre el hosted OAuth de los clientes MCP; TASK-659 no se implementa por separado y se cierra por supersesión documental cuando TASK-1832 valide los clientes reales.

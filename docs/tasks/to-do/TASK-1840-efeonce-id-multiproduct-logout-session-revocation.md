@@ -32,7 +32,7 @@ RP-Initiated/Back-Channel Logout y fan-out; el ADR de entry no declara ninguna d
 - Status real: `Diseño exhaustivo; sin implementación, migración, flag, registro de RP ni rollout`
 - Rank: `TBD`
 - Domain: `identity|auth|platform|security|ecosystem`
-- Blocked by: `TASK-1829, TASK-1830, TASK-1836`
+- Blocked by: `TASK-1830, TASK-1836`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -127,7 +127,7 @@ Reglas obligatorias:
 - [OpenID Connect Back-Channel Logout 1.0 — Final](https://openid.net/specs/openid-connect-backchannel-1_0-final.html)
 - [RFC 7009 — OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009)
 - `docs/operations/runbooks/auth-server.md`
-- `docs/tasks/in-progress/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md`
+- `docs/tasks/complete/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md`
 - `docs/tasks/in-progress/TASK-1830-efeonce-auth-external-person-authentication.md`
 - `docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md`
 - `docs/tasks/in-progress/TASK-1834-efeonce-auth-first-party-oidc-rooms.md`
