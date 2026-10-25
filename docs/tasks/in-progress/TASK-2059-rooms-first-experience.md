@@ -1,5 +1,9 @@
 # TASK-2059 — Rooms: primera sala y vistas por rol
 
+## Delta 2026-10-25 — respuesta humana a la demo (NO aceptada)
+
+- Julio revisó la demo publicada (`efeonce-rooms.vercel.app/demo`, `20f9fe9`) y respondió: «la verdad no sé si es lo que busco… buscaba algo más inmersivo». **No es una aceptación.** Pidió frenar Rooms por ahora. Antes de seguir con más superficie (R07–R12) hay que revisar la dirección de experiencia con él: qué significa «inmersivo» para Rooms (`EFEONCE_ROOMS_EXPERIENCE_V1.md`, dirección visual) y validarlo con una maqueta antes de construir.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

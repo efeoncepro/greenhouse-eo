@@ -30,7 +30,7 @@ Fuente consolidada: [auditoría de estado](../../../../docs/audits/rooms/2026-10
 |---|---|
 | 2058, 2060, 2062, 2065 | complete (cierres locales). |
 | 2061 | complete, con contradicción interna entre `:181` y `:292`. |
-| 2059 | Falta la aceptación visual humana. |
+| 2059 | **No aceptada** (2026-10-25): Julio busca «algo más inmersivo» y pidió frenar. Revisar la dirección de experiencia con maqueta antes de construir más. |
 | 2066 | Invitaciones: correo real único, respuestas indistinguibles y canary. |
 | 2068 | Media protegida, BFCache, GVC, aceptación humana y manual. |
 | 2069 | Cloud: 2/12 criterios tildados y canary pendiente. |
