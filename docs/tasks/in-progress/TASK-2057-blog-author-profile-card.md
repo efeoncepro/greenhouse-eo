@@ -19,7 +19,7 @@
 - Wireframe: `docs/ui/wireframes/TASK-2057-blog-author-profile-card.md`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `En producción desde el 2026-10-25 ~01:50 UTC: efeonce-editorial-blocks 0.5.5 (runtime d3156f6) y el byline del tema (paquete site-nav, runtime 1d7a7bd); perfil de Julio cargado (avatar 252085, cargo, bio corta y larga, meta descripción) e indexable de Yoast reconstruido. Verificado en vivo en 2 posts: ficha y byline, sin el widget de Ohio, Person con cargo, foto, sameAs y worksFor por @id; Playwright 1440/390/320/768/1920 sin desborde y axe 0. Hovers corregidos (`-unlink -undash`) y 96 px bajo la ficha tras la revisión del operador (0.5.5, en producción). 0.5.6 (ficha más contenida, runtime 6a169bc) commiteada, despliegue pendiente de permiso. Falta: desplegar 0.5.6 y cerrar la task.`
+- Status real: `En producción: efeonce-editorial-blocks 0.5.6 (runtime 6a169bc, desplegada 2026-10-25 ~02:10 UTC con visto bueno del operador) y el byline del tema; perfil de Julio cargado. Verificado en vivo en 2 posts: ficha de 800 px con retrato de 160 y nombre de 36 px, hovers correctos (sin relleno de Ohio), 96 px antes de los relacionados, sin desborde en 5 anchos y axe 0. Falta: cierre de la task (revisión del operador).`-unlink -undash`) y 96 px bajo la ficha tras la revisión del operador (0.5.5, en producción). 0.5.6 (ficha más contenida, runtime 6a169bc) commiteada, despliegue pendiente de permiso. Falta: desplegar 0.5.6 y cerrar la task.`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `none`
@@ -434,8 +434,8 @@ categoría con posts (alias: «IA aplicada al marketing» → `ai`, «SEO/AEO» 
   exclusiones propias de Ohio (`-unlink -undash`) más reglas de hover acotadas; 96 px bajo la ficha (64 en teléfono)
   antes de los relacionados (0.5.5, revisión del operador).
 - Ficha más contenida en los artículos (0.5.6, revisión del operador; runtime `6a169bc`): retrato 208 → 160 px, ancho
-  920 → 800, nombre `clamp(28px,3vw,36px)`, cargo y bio 15 px, CTA 14 px; teléfono sin cambios. Al escribir esto, el
-  despliegue a producción estaba pendiente de permiso.
+  920 → 800, nombre `clamp(28px,3vw,36px)`, cargo y bio 15 px, CTA 14 px; teléfono sin cambios. Desplegada a
+  producción el 2026-10-25 con visto bueno del operador y verificada en vivo.
 
 ## Follow-ups
 

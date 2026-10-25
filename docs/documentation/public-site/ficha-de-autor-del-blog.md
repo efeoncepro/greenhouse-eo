@@ -39,9 +39,8 @@ en el color de Growth y la esquina superior izquierda recta. Se ve bien en telé
 Delta 2026-10-25. Tras la revisión del operador, la ficha queda más contenida en computador: la foto es más chica
 (160 px en vez de 208), la ficha es más angosta (800 px en vez de 920) y el nombre, la bio y el botón usan letras algo
 más pequeñas. En el teléfono no cambia: foto de 120 px y botón a todo el ancho. Bajo la ficha hay un espacio amplio
-antes de los artículos relacionados. Ese ajuste ya está listo pero todavía no se publica; hoy se ve la versión anterior,
-que ya corrige los colores al pasar el mouse: los temas, las redes y el botón se iluminan sin perder el texto ni el
-logo. El círculo o la línea azul que acompaña al mouse es el cursor del tema del sitio, no parte de la ficha.
+antes de los artículos relacionados. Está publicado desde el 2026-10-25. Al pasar el mouse, los temas, las redes y el
+botón se iluminan sin perder el texto ni el logo. El círculo o la línea azul que acompaña al mouse es el cursor del tema del sitio, no parte de la ficha.
 
 ## Reglas que conviene saber
 

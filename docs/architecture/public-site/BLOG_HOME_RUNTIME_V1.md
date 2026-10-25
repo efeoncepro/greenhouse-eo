@@ -295,7 +295,7 @@ puerta de escritura para agentes y operadores; pasa por las metas, taxonomías y
 
 Delta 2026-10-24. En producción desde el 2026-10-24/25 con `efeonce-editorial-blocks` 0.5.4 (runtime
 `efeonce-public-site-runtime` commit `8f19ee0`). Delta 2026-10-25: en producción 0.5.5 (runtime `d3156f6`, hovers y
-margen inferior); 0.5.6 (ficha más contenida, runtime `6a169bc`) commiteada, despliegue pendiente de permiso. Cubre la ficha de autor del single, el byline y el `Person` de Yoast.
+margen inferior); 0.5.6 (ficha más contenida, runtime `6a169bc`) commiteada, desplegada 2026-10-25 y verificada en vivo. Cubre la ficha de autor del single, el byline y el `Person` de Yoast.
 Funcionamiento: [Ficha de autor del blog](../../documentation/public-site/ficha-de-autor-del-blog.md). Operación:
 [desde WordPress](../../manual-de-uso/public-site/operar-contenido-portada-blog.md#foto-de-perfil-del-autor).
 
