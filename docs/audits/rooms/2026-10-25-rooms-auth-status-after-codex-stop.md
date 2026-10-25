@@ -239,8 +239,9 @@ La primera pasada sólo cubrió las tasks de Auth ligadas a Rooms (1833, 1834, 2
 1. **Cero `/oauth/token` con 200 y cero `/oauth/authorize` en toda la ventana de logs de requests** (desde el 2026-09-26).
    - En las últimas dos semanas hubo unos 5.000 `POST /oauth/token`: 400 en todos, salvo 8 que dieron 401. Todos vienen de `codex-mcp-client`.
    - Aun así, el gateway responde 200 en `/mcp` a esos mismos clientes Codex.
-   - Inferencia, sin verificar: los clientes usan tokens Entra heredados, que el gateway todavía acepta, y reintentan en bucle un refresh nativo muerto.
-   - Falta registrar el motivo del 400, y no existe señal de tasa de error de `/oauth/token`.
+   - **Aclaración del operador (2026-10-25):** el MCP sobre Efeonce ID se construyó, se probó y quedó bien (TASK-1836 y TASK-1832 lo certificaron contra el host real). Lo que falta es **crear los conectores de Codex y Claude** (TASK-1904 y TASK-2000). Por eso no hay inicios de sesión nativos recientes: no es una falla del emisor.
+   - Los 400 de `codex-mcp-client` serían una configuración previa de Codex reintentando un refresh vencido. Se limpian al crear el conector nuevo y reconectar.
+   - Sigue valiendo la pena registrar el motivo del 400 y agregar una señal de tasa de error de `/oauth/token`, para ver el tráfico real cuando los conectores entren en uso.
 2. **Los pushes a `develop` despliegan el emisor de producción.** Las últimas 15 revisiones salieron de `develop`; ningún release a `main` creó una revisión de `auth-server`. `deploy.sh:13-16` declara que staging y producción comparten servicio.
 3. **Configuración de staging en producción:** `SENTRY_ENVIRONMENT=staging`, Resend de staging y `minScale=0` (el ADR pide 1).
 4. **Punto único de falla del login MCP:** una región, máximo 5 instancias, la instancia compartida `greenhouse-pg-dev` y KMS.
