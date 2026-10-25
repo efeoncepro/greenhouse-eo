@@ -1,9 +1,9 @@
 # Archivo del blog — Búsqueda, temas, etiquetas y autores
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-24 por Claude (TASK-2055)
-> **Ultima actualizacion:** 2026-10-24 por Claude (variante Glitch, TASK-2056)
+> **Ultima actualizacion:** 2026-10-24 por Claude (Glitch sin Nota: Edición o Flash)
 > **Documentacion tecnica:** [BLOG_ARCHIVE_RUNTIME_V1](../../architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md)
 
 ## Qué es
@@ -28,7 +28,7 @@ WordPress specialists», una barra lateral de ejemplo y, en algunos casos, se sa
 | **Búsqueda** | El término buscado, el buscador para cambiarlo y cuántos resultados hay | El mejor resultado destacado y el resto por relevancia, con el término resaltado |
 | **Tema sin publicaciones** | Explica que todavía no hay publicaciones y enlaza al tema que lo contiene | «Mientras tanto»: el último Glitch, una guía y un artículo |
 | **Búsqueda sin resultados** | «Nada sobre «x», todavía.», el buscador y preguntas frecuentes | «Mientras tanto, para empezar» |
-| **Glitch** (`/glitch/`) | El logo de Glitch, la última edición y el último Flash, y la frase «sin anestesia.» con la letra de Glitch | Cada fila dice si es una edición (#N) o un Flash; filtro Ediciones, Flash y Notas; un recuadro para suscribirse al newsletter |
+| **Glitch** (`/glitch/`) | El logo de Glitch, la última edición y el último Flash, y la frase «sin anestesia.» con la letra de Glitch | Cada fila dice si es una edición (#N) o un Flash; filtro Ediciones y Flash (todo lo de Glitch sin número de edición es un Flash); un recuadro para suscribirse al newsletter |
 
 En todas: migas en español, filtro por formato (artículos, guías, casos, novedades, Glitch), páginas de 10 en 10 y el
 cierre «Otros temas del blog». Se ve igual en computador, tablet y teléfono.

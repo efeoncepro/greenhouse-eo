@@ -79,7 +79,7 @@ Digital y es Voice, `line` le asigna una propia sin tocar la categoría ni la UR
 Nunca cambies la categoría principal de una entrada publicada para cambiarle el color: la categoría forma parte de la
 URL (`/%category%/%postname%/`).
 
-Formatos: `articulo`, `caso`, `guia`, `grabacion`, `novedad`, `glitch-edicion`, `glitch-flash`, `glitch-nota`. Una
+Formatos: `articulo`, `caso`, `guia`, `grabacion`, `novedad`, `glitch-edicion`, `glitch-flash` (todo Glitch sin número de edición es Flash; «Glitch Nota» se retiró el 2026-10-24). Una
 **Novedad** (alianzas, anuncios de Efeonce) sólo entra al slider si se fija.
 
 Una entrada sin imagen propia del slider usa su imagen destacada con un **velo de lectura** a la izquierda. Si el arte

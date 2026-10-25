@@ -56,7 +56,7 @@ contenido; lo que ve el visitante (páginas de evento, marcado, portada con dato
 | Grabación | `grabacion` | art | Ver la grabación |
 | Glitch Edición | `glitch-edicion` | flash | Leer la edición |
 | Glitch Flash | `glitch-flash` | flash | Leer el Flash |
-| Glitch Nota | `glitch-nota` | flash | Leer la nota |
+~~| Glitch Nota | `glitch-nota` | flash | Leer la nota |~~ (retirada el 2026-10-24: ver el delta «Glitch: Edición o Flash»)
 | Novedad | `novedad` | nove (megáfono) | Leer la novedad |
 
 - Eje distinto de la categoría (PDR-020 §4.2): nunca reemplaza ni mezcla las 13 categorías, nunca cambia la URL ni
@@ -73,7 +73,8 @@ contenido; lo que ve el visitante (páginas de evento, marcado, portada con dato
 
 #### 1.1 Regla de inferencia (backfill y valor por defecto)
 
-- Categoría Glitch: título que empieza con «Glitch Flash» → Flash; con «Glitch #N» → Edición; si no, Nota.
+- Categoría Glitch: título con «Glitch #N» → Edición; cualquier otro → Flash (desde el 2026-10-24; antes, sin «Glitch Flash»
+  al inicio quedaba como Nota).
 - Categoría Novedades → Novedad.
 - Otras: «caso» en el slug o el título, o «Lo que aprendimos» → Caso; «guía» o «paso a paso» → Guía; si no, Artículo.
 
@@ -183,7 +184,8 @@ Aprobado por el operador (canvas versión 93) y en producción desde el 2026-10-
 Runtime: [«Para leer con calma» v2](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
 
 - **§1, formato nuevo `podcast`** («Podcast», botón «Escuchar el episodio»; `TERMS_VERSION` 3). Los formatos quedan:
-  Artículo, Caso, Guía, Grabación, Podcast, Novedad y Glitch Edición, Flash y Nota. La regla de inferencia de §1.1 no
+  Artículo, Caso, Guía, Grabación, Podcast, Novedad y Glitch Edición, Flash y Nota (Nota se retiró después, ver el delta
+  siguiente). La regla de inferencia de §1.1 no
   lo asigna: el podcast se marca a mano.
 - **§2, dos metas de entrada nuevas** (registradas en `EO_Home_Pins`, editables por REST y en el panel «Portada del
   blog»):
@@ -232,6 +234,20 @@ portada. §2 suma dos metas (en `EO_Home_Pins`, editables por REST y en el panel
 
 El adaptador las entrega como `img` y `pos` (`object-position` del recorte). Operación: `pnpm public-website:blog-home
 card` ([manual CLI §2c](../../manual-de-uso/public-site/operar-portada-blog-por-cli.md)).
+
+## Delta 2026-10-24 — Glitch: Edición o Flash (Nota retirada)
+
+Decisión del operador: Glitch tiene dos formatos. La **Edición** es la semanal numerada («Glitch #N»); todo lo demás de
+Glitch es un **Flash**, aunque el título no empiece con «Glitch Flash». El formato «Glitch Nota» se retira.
+
+- `EO_Format_Taxonomy::TERMS` pierde `glitch-nota`; `RETIRED` lo mapea a `glitch-flash`. Con `TERMS_VERSION` 4, la
+  siembra pasa a Flash las entradas que aún lo tengan y borra el término; `of()` lee un resto como Flash.
+- Regla de §1.1: con número de edición → Edición; si no → Flash.
+- Archivo `/glitch/` (TASK-2056): esas filas llevan la placa de Flash y el filtro queda Todo · Ediciones · Flash.
+  `?formato=nota` deja de existir.
+- Entradas movidas en vivo: 251326 («GPT-5.6 y ChatGPT Work…») y 251314 («Platform Properties para Search Console…»).
+  Los títulos no cambian: la placa ya dice Flash.
+- `efeonce-editorial-blocks` 0.5.0.
 
 ## Consecuencias
 

@@ -17,7 +17,7 @@ const TMP = join(ROOT, 'tmp/blog-home')
 const SITE = 'https://efeoncepro.com'
 const REMOTE = 'scripts/public-website/blog-home/remote.php'
 const VALUE_FLAGS = ['until', 'light', 'bold', 'attachment', 'image', 'alt', 'snapshot', 'surface', 'focus']
-const FORMATS = ['articulo', 'caso', 'guia', 'grabacion', 'podcast', 'glitch-edicion', 'glitch-flash', 'glitch-nota', 'novedad']
+const FORMATS = ['articulo', 'caso', 'guia', 'grabacion', 'podcast', 'glitch-edicion', 'glitch-flash', 'novedad']
 const LINES = ['growth', 'brand', 'engine', 'voice', 'revenue-hubspot', 'revenue-salesforce']
 
 type Json = Record<string, any>

@@ -27,7 +27,7 @@ Qué ve el visitante: [Portada del blog](../../documentation/public-site/portada
 ### Formato de una entrada
 
 En el editor de la entrada, panel **Portada del blog** → **Formato**. Una sola opción: Artículo, Caso, Guía, Grabación,
-Podcast, Novedad, Glitch Edición, Glitch Flash o Glitch Nota. Una **Novedad** (alianzas, anuncios de Efeonce) lleva un megáfono
+Podcast, Novedad, Glitch Edición o Glitch Flash (en Glitch, la edición semanal numerada es Edición y todo lo demás es Flash). Una **Novedad** (alianzas, anuncios de Efeonce) lleva un megáfono
 en el chip y sólo entra al slider si se fija. Es distinto de la categoría y no cambia la URL. Si se publica sin formato,
 el plugin asigna uno por las reglas de PDR-029 §1.1 (nunca Podcast: ése se elige a mano).
 

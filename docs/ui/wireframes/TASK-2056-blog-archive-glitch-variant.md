@@ -31,11 +31,11 @@ filtro, lista por año, «Otros temas del blog». Lo que cambia está abajo; tod
 │ │ la última, 28 jul│ el último, 28 sep 2026    │               └──────────────────────┘   │
 │ └──────────────────┴───────────────────────────┘                                         │
 ├─ borde: falla en bytes (celdas navy que caen sobre el blanco, 60 px; 44 px en 390) ───────┤
-├─ FILTRO (archive-filter): Todo 10 · Ediciones 7 · Flash 1 · Notas 2 ─────────────────────┤
+├─ FILTRO (archive-filter): Todo 10 · Ediciones 7 · Flash 3 ───────────────────────────────┤
 ├─ LISTA (archive-list): 2026 · 10 publicaciones en Glitch                                  │
 │   [#17]  Agente rompe la jaula, …                                 Edición · 10 min  →     │
 │   28 jul                                                                                  │
-│   10 jul  GPT-5.6 y ChatGPT Work: …  (nota: sin placa)            Nota · 6 min      →     │
+│   10 jul  GPT-5.6 y ChatGPT Work: …  (estela + FLASH)             Flash · 6 min     →     │
 │   «Mostrando las 10 publicaciones» (sin paginador cuando cabe en una página)              │
 ├─ BANNER navy (archive-subscribe) ────────────────────────────────────────────────────────┤
 │ ▬ SUSCRÍBETE                                   nos vemos el lunes.  ← Guttery verde       │
@@ -57,9 +57,9 @@ fecha en una línea, banner en una columna con la píldora a todo el ancho.
 | Descripción + muletilla | descripción de la categoría | si termina en «, sin anestesia.», se separa: el texto queda hasta «eso,» y «sin anestesia.» va en Guttery; si no, sin muletilla |
 | Edición | post de formato edición con el mayor número «Glitch #N» publicado | número sin ceros a la izquierda en la cabecera; la fecha corta «28 jul 2026» |
 | Flash | post de formato Flash más reciente | fecha corta; sin Flash, la celda no se pinta |
-| Placa de fila | subformato + número del título | edición `#N` tal como se publicó (`#02`); Flash estela + FLASH; nota sin placa; edición sin número reconocible → como nota |
+| Placa de fila | subformato + número del título | edición `#N` tal como se publicó (`#02`); Flash estela + FLASH (todo Glitch sin número es Flash desde el 2026-10-24; antes «nota sin placa»); edición sin número reconocible → como nota |
 | Título de fila | título publicado | sin el prefijo «Glitch #N:», con la primera letra en mayúscula |
-| Filtro | cuentas por subformato | `?formato=edicion|flash|nota` (mismo mecanismo de TASK-2055) |
+| Filtro | cuentas por subformato | `?formato=edicion|flash` (mismo mecanismo de TASK-2055) |
 | Banner | `subscribe` del adaptador de la portada | se pinta sólo con `live`; píldora `<greenhouse-form>` con `inline-label-logo` |
 
 ## Copy (es-CL, tuteo)
@@ -76,7 +76,7 @@ fecha en una línea, banner en una columna con la píldora a todo el ancho.
 | `gl.sub.body` | Lo que cambió en IA, marketing y tecnología, y qué hacer con eso. Cada lunes en tu correo, gratis. |
 | `gl.sub.mul` | nos vemos el lunes. |
 | píldora | textos del formulario de Glitch (Growth Forms): «Suscríbete a Glitch» / «Suscribirme» / «¡Listo!» / «Ya estás suscrito a Glitch» y su aviso |
-| filtro | Ediciones · Flash · Notas |
+| filtro | Ediciones · Flash |
 
 ## Accesibilidad
 

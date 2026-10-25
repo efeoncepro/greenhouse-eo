@@ -1,5 +1,13 @@
 # TASK-2056 — Archivo del blog: variante Glitch del tema
 
+## Delta 2026-10-24 — Nota retirada: Glitch es Edición o Flash
+
+- El operador decidió que todo Glitch sin número de edición es un Flash. «Glitch Nota» se retiró del modelo
+  (`efeonce-editorial-blocks` 0.5.0, PDR-029 delta «Glitch: Edición o Flash»): el filtro del archivo queda Todo ·
+  Ediciones · Flash y esas filas llevan la placa de Flash. Donde esta task dice «Notas» o «nota sin placa», vale Flash.
+- Pendiente: el ejemplo del canvas (`Archivo-D-tema-glitch-*`, versión 79) y su fixture aún muestran dos notas y el chip
+  «Notas»; son contenido de ejemplo, no cambian lo que ve el público.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

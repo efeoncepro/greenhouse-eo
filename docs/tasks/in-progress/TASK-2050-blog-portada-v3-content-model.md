@@ -1,5 +1,10 @@
 # TASK-2050 — Portada del blog v3: modelo de contenido en WordPress
 
+## Delta 2026-10-24 (Glitch Nota retirada)
+
+- `eo_format` pierde «Glitch Nota»: todo Glitch sin número de edición es Flash (decisión del operador; PDR-029 delta
+  «Glitch: Edición o Flash»; `efeonce-editorial-blocks` 0.5.0, `TERMS_VERSION` 4 migra y borra el término).
+
 ## Delta 2026-10-24 (tarjetas v2)
 
 - El modelo creció con las tarjetas v2 de «Para leer con calma» (en producción desde 21:12 UTC; `efeonce-editorial-blocks`
