@@ -545,6 +545,20 @@ decisión, no en la duda. Es la misma gramática del anillo y la esfera, dicha e
 **Sí / no** (lámina 5.6): pregunta chica, respuesta grande de una a tres palabras · **no:** pregunta grande, respuesta
 larga y chica. Bricolage para decir, Poppins para explicar · **no:** Bricolage en párrafos ni monoespaciada.
 
+**Anillo arriba, esfera abajo (operador, 2026-10-25).** El par se fuerza también en las portadas de Marketing con
+Manzanitas: cinco pares para la misma portada de «SEO y AEO» fueron rechazados («Los mensajes no funcionan»). Regla:
+**el par no es obligatorio en ninguna pieza**, y lo que sí se conserva es la estructura. El anillo va en la línea de
+arriba y la esfera al final de la de abajo. Por qué funciona: (1) es la órbita leída de arriba abajo, de abrir a cerrar,
+así que dice Efeonce sin ser pregunta; (2) el anillo fino va con la línea liviana y la esfera llena con el dominante, y
+la marca refuerza la jerarquía 3×; (3) el anillo marca lo que **abre**, no el «¿»: la línea de arriba puede ser una
+pregunta real, el tema, el contexto o un dato; (4) la lectura entra por lo liviano y sale por lo pesado, en dos tiempos;
+(5) la esfera sigue siendo una por pieza. Sin anillo cuando la línea de arriba sólo clasifica (fecha, categoría,
+producto). El destacado es una idea completa que se entiende a la primera, nunca un fragmento que remata un acertijo
+(«Pasajes.», «A pocas.», «Nombra pocas.» fueron rechazados) ni jerga de especialista; si no cabe claro, se reescribe la
+frase entera. Fórmula que funcionó: una frase en dos tiempos, la línea de arriba la abre y el destacado la completa
+(«○ Google te encuentra. La IA / **te elige**●»; también «○ Sé la marca que la IA / **elige**●»). Canon:
+[La órbita §4, delta 2026-10-25](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#delta-2026-10-25--anillo-arriba-esfera-abajo-el-par-sólo-cuando-hay-algo-que-decir-operador).
+
 **Cuándo sí y cuándo no (operador, 2026-10-19, propuesta SGS Chile).** «Todos los agentes por seguir la regla ponen
 cosas así; si lo ves en contexto es súper absurdo». La voz pregunta-respuesta no es un relleno obligatorio de cada
 título: es una conversación con el lector **en ese punto del documento**. Antes de escribir un par, pasa las cuatro

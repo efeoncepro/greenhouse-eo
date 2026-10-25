@@ -36,6 +36,21 @@ Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en 
 
 ---
 
+## Delta 2026-10-25 — Manzanitas sin persona cuando la persona no porta la idea (operador)
+
+**Decisión del operador (2026-10-25):** «mi problema no es que muestre personas, mi problema es que lo haga todo el
+tiempo incluso cuando colocarla es absurdo y existen otras maneras de representar lo que se quiere transmitir». Venía
+de cinco portadas del blog seguidas con una persona detrás de una mesa con tarjetas de vidrio.
+
+- **El caso 4 (§2) sigue diciendo quién puede protagonizar cuando hay persona.** Lo que cambia: la persona no es
+  obligatoria. Va cuando la idea la necesita (alguien decidiendo, usando, explicando); si un objeto, un lugar o el
+  fenómeno cuentan mejor el tema, la foto va sin persona.
+- **Una ficha Manzanitas sin persona** se declara en su `nota` como excepción de alcance y pasa por `cine-reviewer`
+  igual que cualquier ficha cine. Primer caso: `MCB-AEO1-169` (cajón de fichero con una ficha levantada bajo el foco),
+  que validó en cine y que el operador entendió; lo que falló fueron los textos encima (La órbita §4, delta 2026-10-25).
+- **Elegir sin persona no es elegir bodegón.** El riesgo medido el 2026-09-21 sigue vigente: una escena sin persona y
+  poco tecnológica para un tema digital se rechaza («escenas muy poco tecnológicas»).
+
 ## Delta 2026-10-06 — prueba portable con Nano Banana 2.1
 
 **[medido]** El operador pidió probar Nexa en cine con Nano Banana 2.1 y esfuerzo máximo. La ficha

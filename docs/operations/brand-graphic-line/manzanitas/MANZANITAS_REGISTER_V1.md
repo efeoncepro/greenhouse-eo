@@ -140,7 +140,7 @@ El registro no redefine nada de esta tabla; la regla y su valor viven en La órb
 
 | Elemento | Regla | Fuente / token |
 |---|---|---|
-| La voz | Pregunta + respuesta: el anillo abierto antes de la pregunta; la respuesta en Bricolage 760 con la esfera que la cierra. La respuesta tiene **≤ 3 palabras** y mide **≥ 3 veces la pregunta** | `EfeonceOrbit.Voice` · chequeo `answer-dominates-3x` · [La órbita §4](../EFEONCE_GRAPHIC_LINE_V1.md#4-la-voz-pregunta-y-respuesta) |
+| La voz | El anillo abierto en la línea de arriba; el dominante en Bricolage 760 con la esfera que lo cierra, **≥ 3 veces** la línea de arriba. La línea de arriba es una pregunta **sólo si el lector la tiene de verdad**; si no, es el tema, el contexto o un dato (delta 2026-10-25 de La órbita §4: el par nunca se fuerza) | `EfeonceOrbit.Voice` · chequeo `answer-dominates-3x` · [La órbita §4](../EFEONCE_GRAPHIC_LINE_V1.md#4-la-voz-pregunta-y-respuesta) |
 | Una esfera por pieza | Nunca dos esferas en la misma pieza | chequeo `one-sphere-per-piece` · [La órbita §1](../EFEONCE_GRAPHIC_LINE_V1.md#1-la-esfera) |
 | Una órbita por pieza | Una sola órbita; **ningún texto cruza la órbita** | chequeo `one-orbit-per-piece` · [La órbita §1.3](../EFEONCE_GRAPHIC_LINE_V1.md#13-la-órbita--anatomía-y-regla) |
 | La medida en la órbita | La esfera en valor × 360° desde las 12, en sentido horario, con estela corta de 50° | `efeonceGraphicLine.trajectory.measure` · `measureSvg` de `@efeoncepro/axis-graphic-line` |
@@ -370,6 +370,18 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
     plantilla aprobada y cambia sólo las posiciones.
   - **Cómo se hace de punta a punta** (zonas seguras por superficie, ficha cine, composición, exportación, subida con
     guardas y QA en vivo): [manual de la portada de artículo](../../../manual-de-uso/creative/producir-portada-de-articulo-del-blog.md).
+
+- **Delta 2026-10-25 · el texto y la persona se ganan su lugar (operador).** En la portada de «SEO y AEO» se
+  rechazaron cinco pares escritos para llenar el slot («Los mensajes no funcionan»). Desde hoy:
+  - **La portada no exige pregunta y respuesta.** Conserva el anillo en la línea de arriba y la esfera al cerrar el
+    dominante (La órbita §4, delta 2026-10-25); la línea de arriba es una pregunta sólo si el lector la haría de verdad.
+  - **Sin par, el anillo con un texto arriba y el destacado con la esfera abajo**, y el destacado es una idea completa
+    que se entiende a la primera. Los rechazados terminaban en fragmentos que había que explicar («Pasajes.», «A
+    pocas.», «Nombra pocas.»). Sin jerga de especialista.
+  - **Una persona va cuando porta la idea, no por costumbre** («mi problema no es que muestre personas, es que lo haga
+    todo el tiempo incluso cuando colocarla es absurdo»). Si un objeto, un lugar o el fenómeno cuentan mejor el tema,
+    la portada va sin persona; el registro cine lo admite como excepción declarada en la ficha (registro cine, delta
+    2026-10-25).
 
 ### 5.7 YouTube y pódcast
 

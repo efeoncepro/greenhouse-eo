@@ -462,6 +462,10 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   `assetDeUso`, ni `usoPorPersona`/`usoPorColor` —la pieza PUESTA, la que viaja a la escena—, ni las
   vistas de `patronPorColor` entraban al lock; sustituir cualquiera de esos archivos no despertaba
   ningún gate. Hoy sella **las cuatro formas** en que un kit declara un archivo: **66 → 79 assets**.
+- 🔴 **Una persona va cuando porta la idea, no por costumbre** **[operador, 2026-10-25]**: «mi problema no es que
+  muestre personas, es que lo haga todo el tiempo incluso cuando colocarla es absurdo». Si un objeto, un lugar o el
+  fenómeno cuentan mejor el tema, la pieza va sin persona; y entonces la imagen tiene que decir el tema por sí sola
+  (sin persona y sin tecnología, un tema digital se lee bodegón: rechazo del 2026-09-21). Registro cine, delta 2026-10-25.
 - **Tecnología en escena: siempre premium y de la generación vigente** **[operador, 2026-10-17]**: «*smartphone,
   computadores y todo lo relacionado con tecnología sea premium y moderno, nada de los 2000*». Aplica a TODA persona
   y pieza, no sólo a Nexa: portátil de aluminio unibody delgado con biseles mínimos, teléfono insignia de bordes finos,

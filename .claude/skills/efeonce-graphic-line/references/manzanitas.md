@@ -237,6 +237,11 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
     (el banner que sale del sitio sí firma);
   - la foto 16:9 se recorta a 1,9:1 quitando la parte de arriba, para que el lecho quede entero;
   - se entrega en 2400 × 1260, JPEG calidad 88 con croma 4:4:4 y **menos de 300 KB**.
+  - **Delta 2026-10-25 (operador):** la portada **no exige pregunta y respuesta**: conserva el anillo arriba y la
+    esfera al cerrar el dominante, y la línea de arriba es pregunta sólo si el lector la tiene de verdad. Sin par, va el
+    anillo con un texto arriba y el destacado con la esfera abajo: una idea completa, nunca un fragmento tipo «A pocas.»
+    o «Pasajes.». La persona va cuando porta la idea; si un objeto o el
+    fenómeno cuentan mejor el tema, va sin persona (norma §5.6, delta 2026-10-25).
 
   **Un artículo nuevo lleva tres imágenes y tres subidas.** Entra solo al slider de `/blog/` y, si se lee en 12
   minutos o más, al rail «Para leer con calma»; los dos pintan su propio texto encima, así que la portada no les sirve:

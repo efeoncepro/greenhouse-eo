@@ -118,7 +118,12 @@ Portada del refresh del post `249108`. **Aprobada por el operador; se sube junto
 ## SEO y AEO: cómo aparecer en Google y en la IA (2026-10-25)
 
 Portada del refresh del post `248463`, **primera con la fórmula nueva** que pidió el operador (sin persona al frente y
-sin vidrio). **Pendiente de aprobación del operador; se sube junto con la publicación del artículo.**
+sin vidrio). **Textos rechazados por el operador (2026-10-25); la foto se conserva.** Lo que no funcionó fueron los
+mensajes, no la imagen («¿Qué cita la IA de tu sitio? Pasajes.», «¿A quién recomienda la IA? A
+pocos.», «La IA recomienda / A pocas.» y otros: «Los mensajes no funcionan»). Lecciones, ya documentadas en el canon
+(La órbita §4, Manzanitas §5.6 y registro cine, deltas 2026-10-25): el par pregunta–respuesta nunca se fuerza; sin par, el
+anillo con un texto arriba y un destacado claro con la esfera abajo; la persona va sólo si porta la idea. Ninguna de las
+portadas de `final-aeo/` hasta aquí se sube.
 
 - **Ficha:** `fichas/MCB-AEO1-169.json` (línea `engine`, sin personas, sin palanca). Fenómeno: un cajón de fichero
   contemporáneo (fresno teñido negro mate) sobre una mesa negra; de cientos de fichas en blanco, una sola queda

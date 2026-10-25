@@ -107,7 +107,7 @@ function answerCard(p, x, y, w, h, size, idPrefix, W, H, k = 1) {
 function motor(viewport, theme) {
   const p = palette(theme); boxes.length = 0
   const title = 'Cómo arma su respuesta un motor de IA'
-  const desc = 'Una pregunta («¿Cómo aparezco en ChatGPT?») entra a un motor de IA y se abre en cuatro sub-preguntas: qué es AEO, AEO vs. SEO, qué cambiar en mi sitio y cómo se mide. El motor revisa pasajes de seis fuentes (guía oficial, medio, comunidad, video, tu sitio y otro blog), elige dos y redacta una respuesta que cita la guía oficial y tu sitio. La órbita marca la cita de tu sitio. Conclusión: no cita páginas, cita el pasaje que mejor responde.'
+  const desc = 'Una pregunta («¿Cómo aparezco en ChatGPT?») entra a un motor de IA y se abre en cuatro sub-preguntas: qué es AEO, AEO vs. SEO, qué cambiar en mi sitio y cómo se mide. El motor revisa seis fuentes (guía oficial, medio, comunidad, video, tu sitio y otro blog), elige dos y redacta una respuesta que cita la guía oficial y tu sitio. La órbita marca la cita de tu sitio. Conclusión: no elige al primero de Google, elige la mejor respuesta.'
   const source = 'Esquema ilustrativo · Google, OpenAI y Ahrefs (2025–2026)'
   let W, H, x, body, orbit
   if (viewport === 'desktop') {
@@ -115,7 +115,7 @@ function motor(viewport, theme) {
     const cols = [300, 300, 330, 358], gap = 40, xs = []; let cx = 96
     for (const c of cols) { xs.push(cx); cx += c + gap }
     const top = 250, sz = 22
-    const heads = [['01', 'La pregunta'], ['02', 'Se abre'], ['03', 'Busca pasajes'], ['04', 'Responde y cita']].map(([n, l], i) => step(p, n, xs[i], 178, l, '', 26)).join('')
+    const heads = [['01', 'La pregunta'], ['02', 'Se abre'], ['03', 'Revisa fuentes'], ['04', 'Responde y cita']].map(([n, l], i) => step(p, n, xs[i], 178, l, '', 26)).join('')
     const bar = searchBar(p, xs[0], top, cols[0], 24, ['¿Cómo aparezco', 'en ChatGPT?'])
     let chips = ''; SUBQ.forEach((q, i) => { const c = chip(p, q, xs[1], top + i * 64, 20); fit(`chip «${q}»`, c.w, cols[1]); chips += c.svg })
     const rows = PASSAGES.map((r, i) => passageRow(p, r, xs[2], top + i * 72, cols[2], 60, 21)).join('')
@@ -125,7 +125,7 @@ function motor(viewport, theme) {
       ${lines(['Lo que escribe', 'tu comprador'], xs[0], top + bar.h + 40, 20, 'p400', p.soft, 28)}
       ${chips}${lines(['Sub-preguntas que el motor', 'busca por su cuenta'], xs[1], top + 4 * 64 + 34, 20, 'p400', p.soft, 28)}
       ${rows}${card.svg}${arrows}
-      ${runs([['No cita páginas: ', 'b400'], ['cita el pasaje que mejor responde.', 'b760']], 96, 770, 46, p.ink, { tracking: -0.5 })}`
+      ${runs([['No elige al primero de Google: ', 'b400'], ['elige la mejor respuesta.', 'b760']], 96, 770, 46, p.ink, { tracking: -0.5 })}`
   } else {
     W = 900; x = 64
     const cw = 772
@@ -140,14 +140,14 @@ function motor(viewport, theme) {
     for (const q of SUBQ) { const w = measure(q, 28, 'p500') + 48; if (cxp + w > x + cw) { row++; cxp = x } parts.push(chip(p, q, cxp, y + row * 76, 28).svg); cxp += w + 14 }
     y += (row + 1) * 76 + 10
     parts.push(chevronD(p, W / 2, y, 14)); y += 24 + gapStep
-    parts.push(step(p, '03', x, y, 'Busca pasajes', '', 30)); y += 40
+    parts.push(step(p, '03', x, y, 'Revisa fuentes', '', 30)); y += 40
     PASSAGES.forEach((r, i) => parts.push(passageRow(p, r, x, y + i * 86, cw, 72, 28))); y += PASSAGES.length * 86 + 16
     parts.push(chevronD(p, W / 2, y, 14)); y += 24 + gapStep
     parts.push(step(p, '04', x, y, 'Responde y cita', '', 30)); y += 40
     const cardY = y
     y += 590 + 110
-    parts.push(lines(['No cita páginas:'], x, y, 50, 'b400', p.ink, 60)); parts.push(lines(['cita el pasaje que', 'mejor responde.'], x, y + 62, 50, 'b760', p.ink, 60))
-    H = Math.round(y + 120 + 260)
+    parts.push(lines(['No elige al primero', 'de Google:'], x, y, 50, 'b400', p.ink, 60)); parts.push(lines(['elige la mejor', 'respuesta.'], x, y + 124, 50, 'b760', p.ink, 60))
+    H = Math.round(y + 182 + 260)
     const card = answerCard(p, x, cardY, cw, 590, 28, `motor-${viewport}-${theme}`, W, H, 1.4); orbit = card.orbit; parts.push(card.svg)
     body = parts.join('')
   }

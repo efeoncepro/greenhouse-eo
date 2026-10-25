@@ -1,9 +1,10 @@
 # Producir la portada de un artículo del blog (Marketing con Manzanitas) — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-24 por Claude
-> **Ultima actualizacion:** 2026-10-24 por Claude (1.1: superficies alineadas con el inventario de imágenes por
+> **Ultima actualizacion:** 2026-10-25 por Claude (1.2: el texto y la persona se ganan su lugar; el par
+> pregunta–respuesta nunca se fuerza y la persona va sólo si porta la idea. 1.1: superficies alineadas con el inventario de imágenes por
 > artículo v1.4: «Te puede interesar», la miniatura «Siguiente», el slider en el teléfono, la tarjeta del rail en
 > producción y la imagen del slider de cada artículo nuevo)
 > **Modulo:** Creative · Marketing con Manzanitas · sitio público (blog en WordPress)
@@ -159,7 +160,7 @@ Medidas, en píxeles del lienzo de 1200 × 630, para el resto de las superficies
 |---|---|---|
 | Columna de texto | **x 312–782 · y 50–341** | 27 px de aire contra el borde izquierdo del cuadrado (285) y 133 px libres antes del borde derecho (915) |
 | Cabecera de Manzanitas | 312, 50 → 492, 131 | con la manzana en el acento de la línea |
-| Pregunta (la voz) | desde 312, 170 | dos líneas como máximo |
+| Línea de arriba, con el anillo | desde 312, 170 | una pregunta sólo si es real; si no, tema o contexto. Dos líneas como máximo |
 | Respuesta | 312, 250 → 782, 341 | **sin desborde**: el compositor informa `answerOverflowPx`, que tiene que ser 0. Las publicadas tienen de 5 a 8 letras («Orden», «Ayudar», «Atención») |
 | Bordes de arriba y abajo | nada importante en los **15 px** de cada borde | la tarjeta grande de X puede cortarlos |
 | Cara del sujeto | **x 795–900**, en el tercio de arriba | dentro del borde derecho del cuadrado, para que el recorte conserve la cara |
@@ -170,10 +171,13 @@ Medidas, en píxeles del lienzo de 1200 × 630, para el resto de las superficies
 
 ## Paso a paso
 
-### Paso 1 · Escribe la pregunta y la respuesta
+### Paso 1 · Escribe la línea de arriba y el dominante
 
-La pregunta es la que el artículo responde, dicha como la diría una persona. La respuesta es una sola palabra que la
-resume y lleva el punto del acento. Ejemplos publicados: «¿Qué compra de verdad el paid media?» → «Atención.» y
+La línea de arriba lleva el anillo y el dominante cierra con la esfera (La órbita §4, delta 2026-10-25). La línea de
+arriba es **una pregunta sólo si el lector la haría de verdad**; si no, es el tema, el contexto o un dato. Nunca se
+fuerza un par pregunta–respuesta: el 2026-10-25 se rechazaron cinco para la misma portada. Sin par, el destacado es
+una idea completa que se entiende a la primera, nunca un fragmento que hay que explicar («Pasajes.», «A pocas.»). Pares publicados que
+salieron porque la pregunta era real: «¿Qué compra de verdad el paid media?» → «Atención.» y
 «¿Qué le falta a tu blog para rankear?» → «Orden.». Revísalas con la skill `copywriting` si dudas.
 
 ### Paso 2 · Escribe la ficha cine
@@ -181,7 +185,8 @@ resume y lleva el punto del acento. Ejemplos publicados: «¿Qué compra de verd
 Copia una ficha de la carpeta del caso fuente (`fichas/MCB-TC1-169.json`) y ajústala. Lo que no puede faltar:
 
 - `"formato": "16:9"`, `"registro": "cine"`, `"alcance": "manzanitas"` y la `"linea"` del tema.
-- `identidad`: una persona del **elenco ficticio** (Antonio, Isabella, Sophia, Karo o Hum) con su `vista`. En las
+- `identidad` (**sólo si la persona porta la idea**; si un objeto o el fenómeno la cuentan mejor, la portada va sin
+  persona y lo declaras en la `nota`, registro cine, delta 2026-10-25): una persona del **elenco ficticio** (Antonio, Isabella, Sophia, Karo o Hum) con su `vista`. En las
   portadas del blog no aparece Julio ni el equipo real: es el precedente del 2026-10-18 para las fotos del sitio.
 - `objetos`: la prenda de la línea (softshell o bomber en las líneas de negocio, hoodie en Servicios creativos; norma
   §4.2). La marca va **bordada** en la prenda.
