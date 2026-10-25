@@ -1,0 +1,312 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-25T15:48:18.111Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:serp.google.ai.mode.live.advanced",
+      "method": "POST",
+      "path": "/v3/serp/google/ai_mode/live/advanced"
+    },
+    "family": "serp",
+    "organizationId": null,
+    "consumer": "aeo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "¿Cuál es el mejor software de facturación electrónica para una pyme en Chile?",
+        "location_code": 2152,
+        "language_code": "es",
+        "device": "desktop"
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.004,
+    "estimateStatus": "available",
+    "maxUsd": 0.01,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/serp/google/ai_mode/live/advanced/",
+      "sourceModifiedAt": "2026-07-29T13:48:30.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 10536,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 10536,
+        "costUsd": 0.004,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10251548-1987-0139-0000-41d24360be32",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.004,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.004,
+    "tasks": [
+      {
+        "id": "10251548-1987-0139-0000-41d24360be32",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "9.6709 sec.",
+        "cost": 0.004,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "serp",
+          "google",
+          "ai_mode",
+          "live",
+          "advanced"
+        ],
+        "data": {
+          "api": "serp",
+          "function": "live",
+          "se": "google",
+          "se_type": "ai_mode",
+          "keyword": "¿Cuál es el mejor software de facturación electrónica para una pyme en Chile?",
+          "location_code": 2152,
+          "language_code": "es",
+          "device": "desktop",
+          "os": "windows"
+        },
+        "result": [
+          {
+            "keyword": "¿Cuál es el mejor software de facturación electrónica para una pyme en Chile?",
+            "type": "ai_mode",
+            "se_domain": "google.com",
+            "location_code": 2152,
+            "language_code": "es",
+            "check_url": "https://www.google.com/search?q=%C2%BFCu%C3%A1l%20es%20el%20mejor%20software%20de%20facturaci%C3%B3n%20electr%C3%B3nica%20para%20una%20pyme%20en%20Chile%3F&hl=es&gl=CL&udm=50&uule=w+CAIQIFISCS-vJQRBxWKWER25AhET4QUF",
+            "datetime": "2026-10-25 15:48:17 +00:00",
+            "spell": null,
+            "refinement_chips": null,
+            "item_types": [
+              "ai_overview"
+            ],
+            "se_results_count": 0,
+            "items_count": 1,
+            "items": [
+              {
+                "type": "ai_overview",
+                "rank_group": 1,
+                "rank_absolute": 1,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[2]/div[1]/div[9]/div[1]/section[1]/div[1]/div[1]/div[3]/div[4]/div[1]/div[2]/div[1]/div[3]",
+                "markdown": "Seleccionar el mejor software de facturación electrónica para una pyme en Chile `depende de las necesidades específicas de integración, volumen de ventas y presupuesto` , ya que el mercado chileno cuenta con diversas plataformas certificadas por el [SII](https://www.sii.cl/).[[1]](https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-chile-api-comparado)\n\nA continuación se presentan las opciones más destacadas y mejor valoradas para pequeñas y medianas empresas:\n\n### 1. **Nubox** \n\n- **Ideal para:** Pymes que buscan facilidad de uso, soporte robusto y un sistema orientado tanto a la facturación como a la contabilidad y remuneraciones.\n- **Características:** Es uno de los sistemas más populares en Chile por su interfaz amigable, automatización de procesos contables y estabilidad en la conexión con el SII.\n\n### 2. **Clay** \n\n- **Ideal para:** Pymes tecnológicas o que necesitan una conciliación bancaria avanzada y automatización financiera.\n- **Características:** Destaca por su modernidad, rapidez y potentes capacidades de automatización contable. Ofrece planes escalables según el volumen de documentos.[[1]](https://xepelin.com/blog/educacion-financiera/mejores-sistemas-emitir-facturas-electronicas)\n\n### 3. **Open Factura** \n\n- **Ideal para:** Emprendedores y pymes que buscan una solución directa, rápida y económica para emitir documentos tributarios electrónicos (DTE).\n- **Características:** Muy enfocado en la emisión ágil de facturas, boletas, guías de despacho y notas de crédito, con planes accesibles orientados a empresas con menor y mediano volumen de ventas.[[1]](https://xepelin.com/blog/educacion-financiera/mejores-sistemas-emitir-facturas-electronicas)\n\n### 4. **RelBase o Laudus** \n\n- **Ideal para:** Pymes que necesitan un ERP completo (control de inventario, ventas, compras y contabilidad) integrado con la facturación.\n- **Características:** Permiten centralizar la gestión del negocio más allá de solo emitir documentos, ideal si manejas stock de productos y necesitas trazabilidad logística.[[1]](https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-chile-api-comparado)[[2]](https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-api-chile)\n\n### Criterios clave para decidirte:\n\n- **Certificación oficial:** Asegúrate de que esté autorizado como proveedor por el [Servicio de Impuestos Internos (SII)](https://www.sii.cl/).\n- **Volumen e integraciones:** Si vendes por e-commerce (Shopify, WooCommerce) o usas punto de venta (POS), verifica que el software tenga una API robusta para sincronizar ventas e inventario en tiempo real.\n- **Soporte técnico:** Ante cualquier rechazo de un DTE por parte del SII, contar con asistencia rápida evita multas o demoras en la cobranza.[[1]](https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-api-chile)[[2]](https://acepta.com/blog/software-de-facturacion-electronica-chile/?srsltid=AYCX9vK5ZtIP3NNDlU_aAa-MudoNsLP_aJPbkTh9m_o5V4k8Vj9J-svB)[[3]](https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-chile-api-comparado)\n\nSi me cuentas **cuál es tu volumen mensual aproximado de documentos** y **si necesitas control de inventario o integración con e-commerce** , puedo recomendarte **la alternativa más adecuada** para tu caso.",
+                "items": [
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Seleccionar el mejor software de facturación electrónica para una pyme en Chile depende de las necesidades específicas de integración, volumen de ventas y presupuesto, ya que el mercado chileno cuenta con diversas plataformas certificadas por el SII.",
+                    "markdown": "Seleccionar el mejor software de facturación electrónica para una pyme en Chile `depende de las necesidades específicas de integración, volumen de ventas y presupuesto` , ya que el mercado chileno cuenta con diversas plataformas certificadas por el [SII](https://www.sii.cl/).[[1]](https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-chile-api-comparado)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "relBase",
+                        "domain": "blog.relbase.cl",
+                        "url": "https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-chile-api-comparado",
+                        "title": "Software de facturación electrónica en Chile con API - relBase",
+                        "text": "Para comparar software de facturación electrónica en Chile con integración por API, ERP para pymes con API incluida, que resuelve ..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "A continuación se presentan las opciones más destacadas y mejor valoradas para pequeñas y medianas empresas:",
+                    "markdown": "A continuación se presentan las opciones más destacadas y mejor valoradas para pequeñas y medianas empresas:",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "1. Nubox",
+                    "text": "Ideal para: Pymes que buscan facilidad de uso, soporte robusto y un sistema orientado tanto a la facturación como a la contabilidad y remuneraciones. Características: Es uno de los sistemas más populares en Chile por su interfaz amigable, automatización de procesos contables y estabilidad en la conexión con el SII.",
+                    "markdown": "- **Ideal para:** Pymes que buscan facilidad de uso, soporte robusto y un sistema orientado tanto a la facturación como a la contabilidad y remuneraciones.\n- **Características:** Es uno de los sistemas más populares en Chile por su interfaz amigable, automatización de procesos contables y estabilidad en la conexión con el SII.",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "2. Clay",
+                    "text": "Ideal para: Pymes tecnológicas o que necesitan una conciliación bancaria avanzada y automatización financiera. Características: Destaca por su modernidad, rapidez y potentes capacidades de automatización contable. Ofrece planes escalables según el volumen de documentos.",
+                    "markdown": "- **Ideal para:** Pymes tecnológicas o que necesitan una conciliación bancaria avanzada y automatización financiera.\n- **Características:** Destaca por su modernidad, rapidez y potentes capacidades de automatización contable. Ofrece planes escalables según el volumen de documentos.[[1]](https://xepelin.com/blog/educacion-financiera/mejores-sistemas-emitir-facturas-electronicas)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Xepelin",
+                        "domain": "xepelin.com",
+                        "url": "https://xepelin.com/blog/educacion-financiera/mejores-sistemas-emitir-facturas-electronicas",
+                        "title": "Los 6 mejores sistemas de facturación electrónica en Chile",
+                        "text": "Top 6 electronic invoicing systems in Chile: Nubox, Laudus, Clay, Facele, SumUp, Open Factura. Free receivables/payables software ..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "3. Open Factura",
+                    "text": "Ideal para: Emprendedores y pymes que buscan una solución directa, rápida y económica para emitir documentos tributarios electrónicos (DTE). Características: Muy enfocado en la emisión ágil de facturas, boletas, guías de despacho y notas de crédito, con planes accesibles orientados a empresas con menor y mediano volumen de ventas.",
+                    "markdown": "- **Ideal para:** Emprendedores y pymes que buscan una solución directa, rápida y económica para emitir documentos tributarios electrónicos (DTE).\n- **Características:** Muy enfocado en la emisión ágil de facturas, boletas, guías de despacho y notas de crédito, con planes accesibles orientados a empresas con menor y mediano volumen de ventas.[[1]](https://xepelin.com/blog/educacion-financiera/mejores-sistemas-emitir-facturas-electronicas)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Xepelin",
+                        "domain": "xepelin.com",
+                        "url": "https://xepelin.com/blog/educacion-financiera/mejores-sistemas-emitir-facturas-electronicas",
+                        "title": "Los 6 mejores sistemas de facturación electrónica en Chile",
+                        "text": "Top 6 electronic invoicing systems in Chile: Nubox, Laudus, Clay, Facele, SumUp, Open Factura. Free receivables/payables software with SII integration."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "4. RelBase o Laudus",
+                    "text": "Ideal para: Pymes que necesitan un ERP completo (control de inventario, ventas, compras y contabilidad) integrado con la facturación. Características: Permiten centralizar la gestión del negocio más allá de solo emitir documentos, ideal si manejas stock de productos y necesitas trazabilidad logística.",
+                    "markdown": "- **Ideal para:** Pymes que necesitan un ERP completo (control de inventario, ventas, compras y contabilidad) integrado con la facturación.\n- **Características:** Permiten centralizar la gestión del negocio más allá de solo emitir documentos, ideal si manejas stock de productos y necesitas trazabilidad logística.[[1]](https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-chile-api-comparado)[[2]](https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-api-chile)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "relBase",
+                        "domain": "blog.relbase.cl",
+                        "url": "https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-chile-api-comparado",
+                        "title": "Software de facturación electrónica en Chile con API - relBase",
+                        "text": "Para comparar software de facturación electrónica en Chile con integración por API, revisa dos cosas por separado: sola conexión."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "relBase",
+                        "domain": "blog.relbase.cl",
+                        "url": "https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-api-chile",
+                        "title": "Mejores software de facturación API en Chile 2026 - relBase",
+                        "text": "APIs dedicadas solo a emitir documentos tributarios. Cubren contabilidad, inventario, ventas, pedidos y compras, Su API permite em..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "Criterios clave para decidirte:",
+                    "text": "Certificación oficial: Asegúrate de que esté autorizado como proveedor por el Servicio de Impuestos Internos (SII). Volumen e integraciones: Si vendes por e-commerce (Shopify, WooCommerce) o usas punto de venta (POS), verifica que el software tenga una API robusta para sincronizar ventas e inventario en tiempo real. Soporte técnico: Ante cualquier rechazo de un DTE por parte del SII, contar con asistencia rápida evita multas o demoras en la cobranza.",
+                    "markdown": "- **Certificación oficial:** Asegúrate de que esté autorizado como proveedor por el [Servicio de Impuestos Internos (SII)](https://www.sii.cl/).\n- **Volumen e integraciones:** Si vendes por e-commerce (Shopify, WooCommerce) o usas punto de venta (POS), verifica que el software tenga una API robusta para sincronizar ventas e inventario en tiempo real.\n- **Soporte técnico:** Ante cualquier rechazo de un DTE por parte del SII, contar con asistencia rápida evita multas o demoras en la cobranza.[[1]](https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-api-chile)[[2]](https://acepta.com/blog/software-de-facturacion-electronica-chile/?srsltid=AYCX9vK5ZtIP3NNDlU_aAa-MudoNsLP_aJPbkTh9m_o5V4k8Vj9J-svB)[[3]](https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-chile-api-comparado)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "relBase",
+                        "domain": "blog.relbase.cl",
+                        "url": "https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-api-chile",
+                        "title": "Mejores software de facturación API en Chile 2026 - relBase",
+                        "text": "Sistemas de punto de venta con API. permite crear documentos y consultar. Cubren contabilidad, inventario, ventas, pedidos y compras, con una API por área."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Certificado Digital - Acepta",
+                        "domain": "acepta.com",
+                        "url": "https://acepta.com/blog/software-de-facturacion-electronica-chile/?srsltid=AYCX9vK5ZtIP3NNDlU_aAa-MudoNsLP_aJPbkTh9m_o5V4k8Vj9J-svB",
+                        "title": "Cómo elegir un software de facturación electrónica en Chile",
+                        "text": "Certificación SII y cumplimiento normativo. Todo software de facturación debe estar autorizado por el Servicio de Impuestos Intern..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "relBase",
+                        "domain": "blog.relbase.cl",
+                        "url": "https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-chile-api-comparado",
+                        "title": "Software de facturación electrónica en Chile con API - relBase",
+                        "text": "Para comparar software de facturación electrónica en Chile con integración por API, revisa dos cosas por separado: sola conexión."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Si me cuentas cuál es tu volumen mensual aproximado de documentos y si necesitas control de inventario o integración con e-commerce, puedo recomendarte la alternativa más adecuada para tu caso.",
+                    "markdown": "Si me cuentas **cuál es tu volumen mensual aproximado de documentos** y **si necesitas control de inventario o integración con e-commerce** , puedo recomendarte **la alternativa más adecuada** para tu caso.",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  }
+                ],
+                "references": [
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "relBase",
+                    "domain": "blog.relbase.cl",
+                    "url": "https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-chile-api-comparado",
+                    "title": "Software de facturación electrónica en Chile con API - relBase",
+                    "text": "Para comparar software de facturación electrónica en Chile con integración por API, revisa dos cosas por separado: sola conexión."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "relBase",
+                    "domain": "blog.relbase.cl",
+                    "url": "https://blog.relbase.cl/blog-para-empresas-y-emprendedores/software-facturacion-electronica-api-chile",
+                    "title": "Mejores software de facturación API en Chile 2026 - relBase",
+                    "text": "Sistemas de punto de venta con API. permite crear documentos y consultar. Cubren contabilidad, inventario, ventas, pedidos y compras, con una API por área."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Xepelin",
+                    "domain": "xepelin.com",
+                    "url": "https://xepelin.com/blog/educacion-financiera/mejores-sistemas-emitir-facturas-electronicas",
+                    "title": "Los 6 mejores sistemas de facturación electrónica en Chile",
+                    "text": "Top 6 electronic invoicing systems in Chile: Nubox, Laudus, Clay, Facele, SumUp, Open Factura. Free receivables/payables software with SII integration."
+                  }
+                ],
+                "rectangle": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

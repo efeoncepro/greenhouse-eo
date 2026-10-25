@@ -201,3 +201,25 @@ sigue pendiente (Turnstile).
 
 **Pendientes antes de publicar (cerrados):** revisión de Julio en `252114`, envío real del formulario del
 CTA, barrido de enlaces internos a la URL vieja y la migración de URL con 301 (§3).
+
+## 6. Versión 6: más valor propio (2026-10-25, en revisión)
+
+Julio, después de publicar: «siento que quedó muy genérico». Diagnóstico: la V5 resumía documentación ajena sin
+datos, casos ni postura propia (no pasaba la prueba de sustitución) y le hablaba a un técnico. Pidió «valor real,
+tono conversacional y thought leadership». La V6 (spec actual; builder
+`ai-generations/2026-10-25_aeo-ejemplo-real/build-spec-v6.cjs`) suma:
+
+- **Apertura con una escena real** y voz de Julio («Mi lectura…», «En Efeonce…»).
+- **Ejemplo propio con fecha:** tres respuestas de Google AI Mode desde Chile (CRM B2B ×2 y facturación electrónica),
+  `ai-generations/2026-10-25_aeo-ejemplo-real/ai-mode-*.json` (USD 0,012). Hallazgo: la IA recomienda marcas pero
+  cita a quien escribió la comparativa; las fuentes cambian entre corridas. ChatGPT, Gemini y Perplexity **no se
+  corrieron**: la organización de Efeonce no tiene entitlement AEO para DataForSEO (`no_entitlement`, sin gasto); el
+  artículo dice explícitamente que es un solo motor.
+- **Los cinco niveles de Efeonce** (Que te encuentre · te entienda · te represente bien · pueda actuar · te prefiera),
+  con la advertencia honesta sobre los niveles 04 y 05.
+- **Tabla «por dónde empezar»** por situación, **antes/después de un párrafo** y un **caso anonimizado**: el blog de
+  1.700 artículos sin metadatos tras una migración (cifras de la auditoría SKY del 23-10). **Requiere autorización
+  de Julio antes de publicar** (cliente activo; el informe aún no se le entrega).
+- Motores comprimidos en una tabla y una caja; cierre en voz de Julio. Pasa la validación de Content Factory
+  (≈ 3.500 palabras). Copia privada `252114` recuperada de la papelera con la V6 (respaldo
+  `_gh_aeo_review_252114_v6_20261025_155211`). El publicado sigue con la V5 hasta que Julio apruebe.

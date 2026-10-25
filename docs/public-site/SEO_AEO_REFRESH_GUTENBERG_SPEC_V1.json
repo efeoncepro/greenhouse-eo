@@ -10,8 +10,9 @@
   "indexPolicy": "index"
  },
  "intro": [
-  "AEO (Answer Engine Optimization) es el trabajo para que tu marca aparezca, y sea citada, en las respuestas que entregan los motores de IA: los resúmenes de Google, ChatGPT, Perplexity, Gemini, Copilot o Claude. El SEO se ocupa de que tu página rankee en la lista de resultados; el AEO, de que la respuesta te nombre.",
-  "La buena noticia es que no empiezas de cero. Google dice que, para aparecer en sus funciones con IA, no hace falta nada distinto de lo que ya pide para el buscador. Lo nuevo está en otra parte: cada motor elige sus fuentes a su manera, toma el párrafo que responde en vez de la página entera y se mide distinto. Esta guía explica las tres cosas, con lo que dice cada empresa en su propia documentación."
+  "Le preguntamos a Google qué CRM le conviene a una empresa B2B mediana en Chile. En su modo con IA, la respuesta nombró cuatro marcas: HubSpot, Pipedrive, Zoho y Salesforce. Lo interesante vino después: ninguna de las tres páginas que citó como fuente era de esas marcas. Eran comparativas que escribió alguien más.",
+  "Ahí está, en una escena, lo que cambió en la búsqueda. Tu comprador ya no siempre ve diez enlaces y elige: le llega una respuesta armada, y esa respuesta se construye con lo que otros publicaron sobre tu categoría. AEO (Answer Engine Optimization) es el trabajo para que tu marca esté en esa respuesta, y para que esté bien contada.",
+  "Mi lectura es que el AEO no reemplaza al SEO: lo vuelve más exigente. En esta guía te muestro lo que vimos al preguntarle a la IA, cómo lo ordenamos en Efeonce y por dónde conviene empezar según dónde estás hoy."
  ],
  "tableOfContents": true,
  "sections": [
@@ -81,74 +82,84 @@
    ]
   },
   {
-   "heading": "¿En qué se diferencia el AEO del SEO?",
+   "heading": "¿Qué pasa cuando le preguntas a la IA por tu categoría?",
    "level": 2,
    "blocks": [
     {
      "kind": "paragraph",
-     "text": "El SEO y el AEO comparten la base: que tu sitio se pueda rastrear e indexar, que el contenido responda bien y que tu marca tenga autoridad. Cambia lo que cuenta como éxito y cómo se mide."
+     "text": "Para no hablar en abstracto, el 25 de octubre de 2026 le hicimos a Google AI Mode, desde Chile, dos preguntas que podría hacer cualquier comprador B2B. Elegimos categorías que no son la nuestra, para mirar sin sesgo, y repetimos la primera unos minutos después."
     },
     {
      "kind": "table",
      "style": "efeonce",
      "headers": [
-      "",
-      "SEO",
-      "AEO"
+      "Pregunta",
+      "Marcas que recomendó",
+      "Páginas que citó como fuente"
      ],
      "rows": [
       [
-       "Objetivo",
-       "Rankear y ganar el clic",
-       "Ser recuperado y citado en la respuesta"
+       "¿Qué CRM me recomiendas para una empresa B2B mediana en Chile?",
+       "HubSpot, Pipedrive, Zoho y Salesforce",
+       "Tres comparativas de terceros: Simla, Guía de Software y Parrotfy"
       ],
       [
-       "Qué se elige",
-       "La página",
-       "El párrafo que responde la pregunta"
+       "La misma pregunta, minutos después",
+       "Las mismas cuatro, en el mismo orden",
+       "Una sola comparativa (Simla) y, junto a HubSpot, un enlace a su propio artículo que compara CRM B2B"
       ],
       [
-       "Dónde aparece",
-       "En la lista de resultados",
-       "Dentro de la respuesta del motor"
+       "¿Cuál es el mejor software de facturación electrónica para una pyme en Chile?",
+       "Nubox, Clay, Open Factura y RelBase o Laudus",
+       "Dos artículos del blog de RelBase y una comparativa de Xepelin"
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Tres cosas nos llamaron la atención:"
+    },
+    {
+     "kind": "list",
+     "ordered": true,
+     "style": "steps",
+     "items": [
+      [
+       {
+        "text": "La IA recomienda marcas, pero cita a quien escribió la comparación.",
+        "strong": true
+       },
+       {
+        "text": " En la primera respuesta sobre CRM, ninguna de las fuentes era de las marcas recomendadas."
+       }
       ],
       [
-       "Cómo se mide",
-       "Posición, impresiones y clics",
-       "Presencia, citas y menciones por motor"
+       {
+        "text": "Quien escribe la comparativa de su categoría entra a la respuesta.",
+        "strong": true
+       },
+       {
+        "text": " RelBase aparece recomendada y citada con su propio blog, y en la segunda corrida HubSpot quedó enlazada a su artículo de comparación."
+       }
       ],
       [
-       "Qué comparten",
-       "Indexación, contenido útil, autoridad",
-       "Indexación, contenido útil, autoridad"
+       {
+        "text": "Las fuentes cambian de una vez a otra; la lista de marcas, menos.",
+        "strong": true
+       },
+       {
+        "text": " La misma pregunta pasó de tres fuentes a una, con las mismas cuatro marcas en el mismo orden."
+       }
       ]
      ]
     },
     {
      "kind": "pullquote",
-     "text": "Si Google no puede indexar tu página, ninguna IA de Google la va a citar."
+     "text": "Si no escribes tú la comparación de tu categoría, la va a escribir otro, y la IA le va a creer a él."
     },
     {
      "kind": "paragraph",
-     "text": [
-      {
-       "text": "Por eso el SEO sigue sirviendo. Google lo dice en su "
-      },
-      {
-       "text": "guía de funciones con IA",
-       "href": "https://developers.google.com/search/docs/appearance/ai-features"
-      },
-      {
-       "text": ": para salir como enlace en AI Overviews o AI Mode, la página tiene que estar indexada y poder mostrarse con fragmento, sin requisitos técnicos adicionales. Si trabajas el posicionamiento orgánico, ya tienes la mitad del camino hecho; si no, el AEO empieza por ahí ("
-      },
-      {
-       "text": "posicionamiento SEO en Efeonce",
-       "href": "https://efeoncepro.com/servicios/posicionamiento-seo/"
-      },
-      {
-       "text": ")."
-      }
-     ]
+     "text": "Ojo con lo que esto demuestra y lo que no. Son tres respuestas de un solo motor, en un día: sirven para ver cómo se arma una respuesta, no para medir la cuota de nadie. Para eso hay que repetir las preguntas en varios motores, cada mes."
     }
    ]
   },
@@ -259,146 +270,69 @@
    ]
   },
   {
-   "heading": "¿Qué mira cada motor?",
+   "heading": "¿En qué se diferencia el AEO del SEO?",
    "level": 2,
    "blocks": [
     {
      "kind": "paragraph",
-     "text": "Cada empresa publica cómo entra su robot a tu sitio y para qué. Lo más útil es separar dos usos: el que te pone en las respuestas y el que usa tu contenido para entrenar modelos. Bloquear uno no siempre bloquea el otro."
-    }
-   ]
-  },
-  {
-   "heading": "Google: AI Overviews y AI Mode",
-   "level": 3,
-   "blocks": [
+     "text": "El SEO y el AEO comparten la base: que tu sitio se pueda rastrear e indexar, que el contenido responda bien y que tu marca tenga autoridad. Cambia lo que cuenta como éxito y cómo se mide."
+    },
     {
-     "kind": "paragraph",
-     "text": [
-      {
-       "text": "Usa el mismo índice del buscador. No pide un marcado especial ni un archivo para la IA, y en su "
-      },
-      {
-       "text": "guía de optimización para IA",
-       "href": "https://developers.google.com/search/docs/fundamentals/ai-optimization-guide"
-      },
-      {
-       "text": " pide no perder tiempo en trucos de AEO. Si no quieres aparecer, se controla con lo de siempre: "
-      },
-      {
-       "text": "nosnippet, data-nosnippet, max-snippet y noindex"
-      },
-      {
-       "text": ". El tráfico de estas funciones se cuenta dentro de Search Console, en el tipo de búsqueda «Web», sin un informe aparte."
-      }
+     "kind": "table",
+     "style": "efeonce",
+     "headers": [
+      "",
+      "SEO",
+      "AEO"
+     ],
+     "rows": [
+      [
+       "Objetivo",
+       "Rankear y ganar el clic",
+       "Ser recuperado y citado en la respuesta"
+      ],
+      [
+       "Qué se elige",
+       "La página",
+       "El párrafo que responde la pregunta"
+      ],
+      [
+       "Dónde aparece",
+       "En la lista de resultados",
+       "Dentro de la respuesta del motor"
+      ],
+      [
+       "Cómo se mide",
+       "Posición, impresiones y clics",
+       "Presencia, citas y menciones por motor"
+      ],
+      [
+       "Qué comparten",
+       "Indexación, contenido útil, autoridad",
+       "Indexación, contenido útil, autoridad"
+      ]
      ]
-    }
-   ]
-  },
-  {
-   "heading": "Gemini",
-   "level": 3,
-   "blocks": [
+    },
+    {
+     "kind": "pullquote",
+     "text": "Si Google no puede indexar tu página, ninguna IA de Google la va a citar."
+    },
     {
      "kind": "paragraph",
      "text": [
       {
-       "text": "Google-Extended no es un robot de búsqueda: decide si tu contenido se usa para entrenar Gemini y para responder en las apps de Gemini y en Vertex AI. Google aclara que "
+       "text": "Por eso el SEO sigue sirviendo. Google lo dice en su "
       },
       {
-       "text": "no afecta tu inclusión en Google Search",
-       "href": "https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers"
+       "text": "guía de funciones con IA",
+       "href": "https://developers.google.com/search/docs/appearance/ai-features"
       },
       {
-       "text": " ni es señal de ranking. Bloquearlo no te saca de AI Overviews."
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "heading": "ChatGPT",
-   "level": 3,
-   "blocks": [
-    {
-     "kind": "paragraph",
-     "text": [
-      {
-       "text": "OpenAI separa tres robots ("
+       "text": ": para salir como enlace en AI Overviews o AI Mode, la página tiene que estar indexada y poder mostrarse con fragmento, sin requisitos técnicos adicionales. Si trabajas el posicionamiento orgánico, ya tienes la mitad del camino hecho; si no, el AEO empieza por ahí ("
       },
       {
-       "text": "documentación de OpenAI",
-       "href": "https://developers.openai.com/api/docs/bots"
-      },
-      {
-       "text": "). OAI-SearchBot decide si apareces en las respuestas de búsqueda de ChatGPT; si lo bloqueas, quedas fuera. GPTBot recoge contenido para entrenar y es independiente del anterior. ChatGPT-User son las visitas que pide una persona dentro de ChatGPT y puede no seguir el robots.txt. Los cambios tardan cerca de 24 horas en aplicarse."
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "heading": "Perplexity",
-   "level": 3,
-   "blocks": [
-    {
-     "kind": "paragraph",
-     "text": [
-      {
-       "text": "PerplexityBot es el que te hace aparecer en sus resultados, y Perplexity dice que no lo usa para entrenar modelos. Perplexity-User hace las consultas que pide una persona y, en general, no sigue el robots.txt ("
-      },
-      {
-       "text": "documentación de Perplexity",
-       "href": "https://docs.perplexity.ai/guides/bots"
-      },
-      {
-       "text": ")."
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "heading": "Copilot",
-   "level": 3,
-   "blocks": [
-    {
-     "kind": "paragraph",
-     "text": [
-      {
-       "text": "Copilot busca en Bing para fundamentar sus respuestas ("
-      },
-      {
-       "text": "Microsoft",
-       "href": "https://learn.microsoft.com/en-us/microsoft-365/copilot/manage-public-web-access"
-      },
-      {
-       "text": "). Si tu sitio está bien en Bing, partes con ventaja. Desde febrero de 2026, Bing Webmaster Tools tiene un informe, todavía en versión preliminar, que muestra cuándo te citan en Copilot y en los resúmenes de Bing ("
-      },
-      {
-       "text": "Bing",
-       "href": "https://blogs.bing.com/webmaster/February-2026/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview"
-      },
-      {
-       "text": ")."
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "heading": "Claude",
-   "level": 3,
-   "blocks": [
-    {
-     "kind": "paragraph",
-     "text": [
-      {
-       "text": "Anthropic también separa usos: ClaudeBot recoge contenido que puede usarse para entrenar, Claude-SearchBot mejora sus resultados de búsqueda y Claude-User entra cuando una persona le pide algo a Claude. Los tres siguen el robots.txt ("
-      },
-      {
-       "text": "Anthropic",
-       "href": "https://support.claude.com/en/articles/8896518"
+       "text": "posicionamiento SEO en Efeonce",
+       "href": "https://efeoncepro.com/servicios/posicionamiento-seo/"
       },
       {
        "text": ")."
@@ -406,49 +340,119 @@
      ]
     },
     {
+     "kind": "paragraph",
+     "text": "Una forma de verlo: el SEO te pone en el fichero; el AEO decide si eres la ficha que sacan cuando alguien pregunta. Sin lo primero no hay lo segundo, pero estar en el fichero ya no basta."
+    }
+   ]
+  },
+  {
+   "heading": "¿En qué nivel está tu marca frente a la IA?",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "En Efeonce ordenamos este trabajo en cinco niveles. No es una escalera perfecta, pero ayuda a saber dónde estás y qué revisar primero:"
+    },
+    {
      "kind": "table",
      "style": "efeonce",
      "headers": [
-      "Robot",
-      "Para qué sirve",
-      "Si lo bloqueas"
+      "Nivel",
+      "La pregunta",
+      "Qué revisar"
      ],
      "rows": [
       [
-       "Googlebot",
-       "Indexar para Google Search, AI Overviews y AI Mode",
-       "Sales de Google, también de sus respuestas con IA"
+       "01 · Que te encuentre",
+       "¿Existes para la IA?",
+       "Que Google y Bing indexen tus páginas, que tu robots.txt no bloquee a los robots de búsqueda y que tengas un sitemap al día"
       ],
       [
-       "Google-Extended",
-       "Entrenar Gemini y responder en sus apps",
-       "Sigues en Google Search"
+       "02 · Que te entienda",
+       "¿Te puede leer sin adivinar?",
+       "Respuestas al inicio de cada sección, subtítulos como preguntas, datos estructurados que correspondan a lo visible y una marca descrita igual en todas partes"
       ],
       [
-       "OAI-SearchBot",
-       "Aparecer en la búsqueda de ChatGPT",
-       "Sales de las respuestas de búsqueda de ChatGPT"
+       "03 · Que te represente bien",
+       "¿Lo que dice de ti es verdad?",
+       "Qué dice la IA de tus servicios, tus precios y tus competidores; cuando se equivoca, corregir la fuente de la que sacó el dato"
       ],
       [
-       "GPTBot",
-       "Entrenar modelos de OpenAI",
-       "Sigues en la búsqueda de ChatGPT"
+       "04 · Que pueda actuar",
+       "¿Te puede usar un agente, no sólo citar?",
+       "Fichas, formularios y acciones que un agente pueda leer y completar"
       ],
       [
-       "PerplexityBot",
-       "Aparecer en Perplexity",
-       "Sales de sus resultados"
-      ],
-      [
-       "Bingbot",
-       "Indexar Bing, que usa Copilot",
-       "Pierdes el índice que usa Copilot"
-      ],
-      [
-       "ClaudeBot",
-       "Entrenar modelos de Anthropic",
-       "Claude-SearchBot sigue aparte"
+       "05 · Que te prefiera",
+       "¿Eres la recomendación por defecto?",
+       "Presencia en comparativas, medios y comunidades de tu categoría, sostenida en el tiempo"
       ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Dos advertencias. El nivel 05 no se entrega: se gana, y depende de cuánto y cómo hablan otros de ti. Y el 04 corre por un carril propio: una marca puede ser la recomendada y aun así no dejar que un agente cotice o agende. Ese paso lo contamos en "
+      },
+      {
+       "text": "cómo preparar tu sitio para los agentes",
+       "href": "https://efeoncepro.com/aeo/web-agentica-agentes-ia/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "¿Por dónde empezar según dónde estás hoy?",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "La pregunta que más nos hacen no es qué es AEO, sino qué hacer primero. Depende de dónde estés:"
+    },
+    {
+     "kind": "table",
+     "style": "efeonce",
+     "headers": [
+      "Si hoy…",
+      "Empieza por…",
+      "Por qué"
+     ],
+     "rows": [
+      [
+       "Tu sitio casi no aparece en Google",
+       "Lo básico del SEO: indexación, una página por servicio y contenido que responda lo que pregunta tu comprador",
+       "Google arma sus respuestas con IA desde su propio índice: sin eso no hay AEO"
+      ],
+      [
+       "Rankeas, pero la IA no te nombra",
+       "Las comparativas y preguntas de tu categoría: escríbelas tú, con respuestas directas, y busca que te incluyan en las de otros",
+       "Es lo que vimos: la IA cita a quien escribió la comparación"
+      ],
+      [
+       "Ya te nombra un motor",
+       "Medir en los demás y revisar qué dice de ti",
+       "Aparecer en uno no asegura aparecer en otro, y lo que dice puede estar mal"
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Si estás en la primera fila, el trabajo es de "
+      },
+      {
+       "text": "posicionamiento SEO",
+       "href": "https://efeoncepro.com/servicios/posicionamiento-seo/"
+      },
+      {
+       "text": " antes que de IA. Si estás en la segunda, es un trabajo editorial: alguien tiene que escribir esas comparativas con constancia."
+      }
      ]
     }
    ]
@@ -566,6 +570,38 @@
     },
     {
      "kind": "paragraph",
+     "text": "Responder primero se entiende mejor con un ejemplo. Así se ve en un párrafo real:"
+    },
+    {
+     "kind": "list",
+     "style": "box",
+     "items": [
+      [
+       {
+        "text": "Antes:",
+        "strong": true
+       },
+       {
+        "text": " «En un mundo cada vez más digital, las empresas necesitan herramientas que les permitan gestionar la relación con sus clientes de forma eficiente. Por eso, elegir un CRM es una decisión estratégica que requiere analizar múltiples factores.»"
+       }
+      ],
+      [
+       {
+        "text": "Después:",
+        "strong": true
+       },
+       {
+        "text": " «Para una empresa B2B mediana, el CRM correcto es el que tu equipo comercial usa todos los días. Mira tres cosas: cuánto dura tu ciclo de venta, con qué sistemas tiene que conectarse y quién lo va a administrar.»"
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "El segundo se puede citar solo. El primero no dice nada hasta la tercera frase, y un motor que busca una respuesta no llega hasta ahí."
+    },
+    {
+     "kind": "paragraph",
      "text": "Y lo que no hace falta, aunque lo veas recomendado:"
     },
     {
@@ -630,6 +666,193 @@
       {
        "text": "."
       }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "¿Qué aprendimos auditando un blog de 1.700 artículos?",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Hace poco auditamos el blog de una marca grande en Chile que había perdido cerca de la mitad de su tráfico orgánico después de una migración. Cuando un caso así llega, la tentación es pensar en la IA. La causa principal era mucho más básica."
+    },
+    {
+     "kind": "paragraph",
+     "text": "En la mudanza se quedó atrás el plugin de SEO, y ninguno de sus 1.700 artículos tenía descripción, datos estructurados ni autor. Además, sólo un poco más de un tercio de los artículos se podía alcanzar siguiendo enlaces desde el propio sitio."
+    },
+    {
+     "kind": "paragraph",
+     "text": "La lección vale para cualquiera: antes de preguntarte cómo te ve ChatGPT, revisa que Google te pueda leer. En lo que hemos visto, el AEO se cae por los niveles 01 y 02 mucho antes que por algo sofisticado."
+    }
+   ]
+  },
+  {
+   "heading": "¿Qué robots dejan entrar a la IA a tu sitio?",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Cada empresa publica cómo entra su robot a tu sitio y para qué. Lo más útil es separar dos usos: el que te pone en las respuestas y el que usa tu contenido para entrenar modelos. Bloquear uno no siempre bloquea el otro."
+    },
+    {
+     "kind": "table",
+     "style": "efeonce",
+     "headers": [
+      "Robot",
+      "Para qué sirve",
+      "Si lo bloqueas"
+     ],
+     "rows": [
+      [
+       "Googlebot",
+       "Indexar para Google Search, AI Overviews y AI Mode",
+       "Sales de Google, también de sus respuestas con IA"
+      ],
+      [
+       "Google-Extended",
+       "Entrenar Gemini y responder en sus apps",
+       "Sigues en Google Search"
+      ],
+      [
+       "OAI-SearchBot",
+       "Aparecer en la búsqueda de ChatGPT",
+       "Sales de las respuestas de búsqueda de ChatGPT"
+      ],
+      [
+       "GPTBot",
+       "Entrenar modelos de OpenAI",
+       "Sigues en la búsqueda de ChatGPT"
+      ],
+      [
+       "PerplexityBot",
+       "Aparecer en Perplexity",
+       "Sales de sus resultados"
+      ],
+      [
+       "Bingbot",
+       "Indexar Bing, que usa Copilot",
+       "Pierdes el índice que usa Copilot"
+      ],
+      [
+       "ClaudeBot",
+       "Entrenar modelos de Anthropic",
+       "Claude-SearchBot sigue aparte"
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Lo que conviene saber de cada motor, en una línea:"
+    },
+    {
+     "kind": "list",
+     "style": "box",
+     "items": [
+      [
+       {
+        "text": "Google (AI Overviews y AI Mode):",
+        "strong": true
+       },
+       {
+        "text": " usa el mismo índice del buscador y no pide un marcado especial; en su "
+       },
+       {
+        "text": "guía de optimización para IA",
+        "href": "https://developers.google.com/search/docs/fundamentals/ai-optimization-guide"
+       },
+       {
+        "text": " pide no perder tiempo en trucos. Si no quieres aparecer, se controla con nosnippet, max-snippet o noindex."
+       }
+      ],
+      [
+       {
+        "text": "Gemini:",
+        "strong": true
+       },
+       {
+        "text": " Google-Extended decide si tu contenido entrena Gemini; "
+       },
+       {
+        "text": "no afecta tu inclusión en Google Search",
+        "href": "https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "ChatGPT:",
+        "strong": true
+       },
+       {
+        "text": " OAI-SearchBot te pone en sus respuestas de búsqueda y GPTBot entrena; son independientes ("
+       },
+       {
+        "text": "OpenAI",
+        "href": "https://developers.openai.com/api/docs/bots"
+       },
+       {
+        "text": "). Los cambios tardan cerca de 24 horas."
+       }
+      ],
+      [
+       {
+        "text": "Perplexity:",
+        "strong": true
+       },
+       {
+        "text": " PerplexityBot te hace aparecer y, según la empresa, no se usa para entrenar ("
+       },
+       {
+        "text": "Perplexity",
+        "href": "https://docs.perplexity.ai/guides/bots"
+       },
+       {
+        "text": ")."
+       }
+      ],
+      [
+       {
+        "text": "Copilot:",
+        "strong": true
+       },
+       {
+        "text": " responde con Bing ("
+       },
+       {
+        "text": "Microsoft",
+        "href": "https://learn.microsoft.com/en-us/microsoft-365/copilot/manage-public-web-access"
+       },
+       {
+        "text": "). Desde febrero de 2026, Bing Webmaster Tools muestra cuándo te cita ("
+       },
+       {
+        "text": "Bing",
+        "href": "https://blogs.bing.com/webmaster/February-2026/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview"
+       },
+       {
+        "text": ")."
+       }
+      ],
+      [
+       {
+        "text": "Claude:",
+        "strong": true
+       },
+       {
+        "text": " ClaudeBot entrena, Claude-SearchBot mejora sus búsquedas y Claude-User entra cuando alguien le pide algo; los tres siguen el robots.txt ("
+       },
+       {
+        "text": "Anthropic",
+        "href": "https://support.claude.com/en/articles/8896518"
+       },
+       {
+        "text": ")."
+       }
+      ]
      ]
     }
    ]
@@ -841,18 +1064,22 @@
    ]
   },
   {
-   "heading": "En resumen",
+   "heading": "Lo esencial",
    "level": 2,
    "blocks": [
     {
      "kind": "list",
      "items": [
-      "El AEO busca que la respuesta te nombre; el SEO, que tu página rankee. Comparten la base.",
-      "Cada motor elige sus fuentes a su manera: aparecer en uno no te asegura aparecer en otro.",
-      "Separa los robots de búsqueda de los de entrenamiento antes de bloquear nada.",
-      "Responde primero, escribe los subtítulos como preguntas y pon fuentes con fecha.",
+      "El AEO busca que la respuesta te nombre; el SEO, que tu página rankee. Comparten la base, y sin SEO no hay AEO.",
+      "La IA recomienda marcas, pero cita a quien escribió la comparación de la categoría.",
+      "Cada motor elige sus fuentes a su manera, y las fuentes cambian de una vez a otra.",
+      "Ordena el trabajo por niveles: que te encuentre, que te entienda, que te represente bien, que pueda actuar y que te prefiera.",
       "Mide la presencia por motor y por pregunta, cada mes, además del tráfico."
      ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Si te quedas con una sola idea, que sea esta: la IA no va a buscarte a ti, va a buscar a quien mejor explique tu categoría. Que ese alguien seas tú es el trabajo."
     },
     {
      "kind": "paragraph",
@@ -881,6 +1108,11 @@
     {
      "kind": "list",
      "items": [
+      [
+       {
+        "text": "Efeonce. Consultas a Google AI Mode desde Chile, 25 de octubre de 2026 (tres respuestas, vía DataForSEO). Muestra ilustrativa, no medición de cuota."
+       }
+      ],
       [
        {
         "text": "Google Search Central. "
@@ -1050,7 +1282,7 @@
     },
     {
      "kind": "paragraph",
-     "text": "Actualizado el 25 de octubre de 2026. Esta guía reemplaza la versión de 2025: se corrigieron las recomendaciones sobre robots de IA y datos estructurados, y se sacaron cifras y citas que no tenían una fuente verificable."
+     "text": "Actualizado el 25 de octubre de 2026. Esta guía reemplaza la versión de 2025: se corrigieron las recomendaciones sobre robots de IA y datos estructurados, se sacaron cifras y citas sin fuente verificable y se sumaron consultas propias a Google AI Mode."
     }
    ]
   }
