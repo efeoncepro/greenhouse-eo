@@ -182,3 +182,30 @@ invitación256bits se entrega en fragmentoURL, digest para lookup y ciphertext s
 La alternativa de grants genéricos exigiría crear identidades/memberships por correo; se rechaza. Una cookie
 con rol dentro, o aceptar el link como bearer, también se rechazan. Plan2066 fija stores, interfaces, controles
 y pruebas antes código. FeatureOFF y prueba local no equivalen a activación ni envío a destinatarios reales.
+
+## Security delta 2026-10-25 — invitaciones, TASK-2066
+
+Status: Accepted para implementación local por instrucción explícita del operador de reforzar el token.
+Owner: Rooms Platform; issuer OTP sigue TASK-2067. No amplía acceso ni cambia el correo único aprobado.
+
+- Token opaco de 256 bits CSPRNG, sin IDs/correo/rol codificados. No es una credencial de lectura.
+- Nueva emisión/reemisión exige vencimiento como máximo 24 horas desde el reloj DB y dentro de la
+  vigencia de los permisos delegados. Es un techo de seguridad, no una extensión automática del grant.
+  No hay invitaciones productivas previas: los registros del harness son sintéticos y no se migran a cloud.
+- Cada reemisión rota token/version y deja inelegibles enlaces/transacciones/sesiones anteriores.
+  OTP sigue temporal/de un uso; el enlace puede iniciar una nueva verificación mientras siga vigente,
+  sin prometer que el enlace sea de un solo uso ni que el correo único sea MFA.
+- Cuotas durables por invitación, realm y acción, derivadas por servidor. Los tokens/cookies inexistentes
+  no crean filas ni consumen un presupuesto compartido que permita bloquear a todos los invitados.
+  Esta decisión reemplaza los presupuestos globales por RP del corte8308077: una entrada anónima podía
+  agotarlos. No se toma una cabecera IP arbitraria como identidad confiable.
+- Protección de volumen anónimo pertenece al borde: rate limiting por IP confiable/WAF, prueba de
+  aislamiento y límites de infraestructura antes de ON. No se considera cubierta por el rate limit OTP.
+- UI2068 debe retirar fragmento con history.replaceState antes de analítica/requests, no persistir token
+  ni código y no cargar scripts de terceros en entrada. Revisión CSP y correo sin click/open tracking,
+  href recibido íntegro, HTTPS y configuración de secretos siguen gates del despliegue coordinado.
+
+El compromiso del buzón expone enlace y código del mismo canal; la criptografía del token no elimina ese
+riesgo. No se declara MFA, inmunidad a ataques ni certificación de seguridad por esta revisión de código.
+Referencias técnicas: [OWASP tokens](https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html)
+y [sesiones](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html).

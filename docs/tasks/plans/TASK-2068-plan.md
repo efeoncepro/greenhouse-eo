@@ -16,6 +16,8 @@ Reusar ADR invitaciones/consumer y canon Rooms. Separar chrome/renderer de demo;
 
 ## Backend/data contract
 
+Hardening2066 fec6d32: emisión/reemisión máximo24h desde relojDB y dentro de grants; la UI debe derivar su maximumexpiry de este techo. No sugerir invitaciones permanentes ni presentar el correo único como MFA.
+
 Gates con owners:
 
 1. Resuelto, TASK-2066: GET `/api/invitations/transaction` implementado y validado por root (137 tests PASS). Cookie HttpOnly → state code_required/expiresAt/retryAt/deliveryStatus, sin PII, correo, issuer ni writes. La prueba browser reload queda en esta UI.

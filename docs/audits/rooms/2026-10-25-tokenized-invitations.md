@@ -1,5 +1,7 @@
 # TASK-2066 — invitaciones con enlace y código, evidencia local
 
+**Actualización posterior:** [hardening fec6d32](2026-10-25-invitation-token-hardening.md) reemplaza los límites globales descritos en este corte por cuotas por invitación y fija techo24h. Suite posterior144PASS; este documento conserva evidencia histórica del corte inicial.
+
 25-10-2026. Runtime commits `8308077` y `d23e4d6`. Backend local, feature OFF. No correo real, proveedor live, DB cloud ni nuevo despliegue.
 La demo pública conserva bd4b802. TASK-2066 permanece in-progress; TASK-2068 posee la pantalla de
 código, gestión y lectura guest. El epic no está completo.
