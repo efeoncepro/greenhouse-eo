@@ -348,34 +348,69 @@ rich text: el remate va en un segmento `{ "text": "…", "strong": true }`. `var
 - **Rollback:** restaurar el `.tar` que imprimió el deploy (la versión anterior), purgar la caché y, si hace falta,
   el contenido de cada post desde su snapshot.
 
-## Gráfico Efeonce (bloque `efeoncepro/chart`, prototipo del 2026-10-25, NO desplegado)
+## Gráfico Efeonce (bloque `efeoncepro/chart`, 2026-10-25, NO desplegado)
 
-Bloque dinámico para gráficos «fluidos» en los artículos: líneas (cambio en el tiempo) o barras (comparar o rankear).
-Probado de punta a punta sólo en un WordPress local (Playground, WordPress 7.1): página publicada en escritorio y
-390 px, editor de Gutenberg con vista previa en vivo, guardado sin «bloque inválido». **No está en producción**; el
-despliegue necesita la aprobación del operador.
+Bloque dinámico para gráficos «fluidos» en los artículos: **diez tipos**, todos con la misma tabla de datos. Probado de
+punta a punta sólo en un WordPress local (Playground, WordPress 7.1): página publicada en escritorio y 390 px, editor
+de Gutenberg con vista previa en vivo y guardado sin «bloque inválido». **No está en producción**; el despliegue
+necesita la aprobación del operador. Manual: [usar gráficos en un artículo](../manual-de-uso/public-site/usar-graficos-en-articulos.md).
+
+### Tipos
+
+Cubre los nueve gráficos del registro Marketing con Manzanitas de AXIS (medida, ranking, antes y después, tendencia,
+partes, de cada 100, Venn de tres, matriz 2×2, embudo), adaptados a la web, más columnas agrupadas o apiladas.
+
+| `kind` | Para qué | Filas × columnas de valores | Reglas |
+|---|---|---|---|
+| `line` | cambio en el tiempo | 2–36 × 1–4 | la serie destacada lleva acento, área y la esfera en el punto destacado (último por defecto) |
+| `column` | comparar categorías | 2–24 × 1–4 | agrupadas o apiladas (`stacked`) |
+| `bar` | ranking | 2–16 × 1 | `highlight` = la barra en acento; sin él, todas en acento |
+| `pie` | partes de un total (dona) | 2–8 × 1 | sin vacíos ni negativos; porcentajes calculados; el centro muestra la parte destacada (la mayor por defecto); en móvil, leyenda debajo |
+| `funnel` | etapas y conversión | 2–8 × 1 | sin vacíos ni negativos; conversión entre etapas calculada; ancho logarítmico si las etapas difieren más de 10× |
+| `before-after` | antes y después | 1–12 × 2 | una fila: dos columnas y el cambio en %; varias: una pesa por fila, «después» siempre en acento |
+| `measure` | un porcentaje | 1 × 1, 0–100 | el anillo de La órbita: el arco es el dato y la esfera viaja a su punta |
+| `per-hundred` | de cada 100 | 1 × 1, 0–100 | cien puntos que se llenan |
+| `matrix` | dos ejes de 0 a 10 | 2–12 × 2, 0–10 | el encabezado nombra cada eje; en un teléfono saturado, puntos numerados y lista debajo |
+| `venn` | tres conceptos que se cruzan | 3 × 0 | `centerLabel` nombra el cruce; la esfera marca el centro |
+
+### Contrato y arquitectura
 
 - **Quién dibuja.** El editor del bloque es React (Gutenberg). El visitante **no** carga React: el gráfico lo pinta
-  ECharts (SVG, sólo líneas y barras), compilado en greenhouse-eo (`src/editorial-chart-renderer/`,
+  ECharts (SVG; línea, barra, torta, gauge y dispersión), compilado en greenhouse-eo (`src/editorial-chart-renderer/`,
   `pnpm renderer:editorial-chart:build`) y escrito en el plugin como `src/chart/view.js` (cargador, 1 KB) y
-  `engine.js` (~180 KB gzip). El cargador baja el motor sólo cuando un gráfico está a 300 px de la pantalla; la
-  URL del motor lleva su huella (`engine.js?v=<sha>`), así que una versión nueva no depende de purgar caché.
-- **Los datos están en el HTML.** `render.php` imprime título, bajada, una tabla con todas las cifras (en
-  «Ver los datos») y la fuente; el gráfico se pinta encima con el mismo JSON. Google y los motores de respuesta
-  leen las cifras sin ejecutar JavaScript. Sin JavaScript se oculta el área del gráfico y queda la tabla.
-- **Contrato.** Atributo `chart`: `{ kind: 'line'|'bar', categories, series: [{ name, values }], emphasis?,
-  highlight?, format?: 'number'|'percent'|'compact', unit? }`; hasta 4 series y 36 categorías. Se valida en
-  el navegador (`contract.ts`) y en el servidor (`EO_Chart::validate`): un gráfico inválido no se publica y
-  quien edita ve el código de error. En el editor los datos se pegan desde una planilla (tabulaciones o punto y coma
-  aceptan la coma decimal: `5.120,5`).
-- **La órbita.** El acento de la línea del artículo marca sólo lo que importa (la serie destacada, la barra
-  destacada); el resto es contexto gris azulado (validado con el verificador de paletas: separación ΔE ≥ 14). En
-  líneas, el punto destacado es la esfera, la única de la pieza. Panel papel con el halo del Destacado claro;
-  tono navy `#001a33` y modo oscuro con el mismo panel. Se anima una vez al entrar en pantalla; con «reducir
-  movimiento» se pinta quieto.
-- **Lecciones de la prueba.** (1) La vista previa de Gutenberg por GET convierte cada número en texto: el editor usa
-  POST y el servidor acepta números escritos como texto. (2) El editor inyecta el script en su iframe antes de que
-  exista `<body>`; el motor vive en la ventana del editor y vigila el iframe. (3) En un panel de navegador oculto no
-  corre `IntersectionObserver` ni `requestAnimationFrame`: verificar con Playwright sin interfaz, no con el panel.
-- **Pendiente para producción:** aprobación visual del operador, versión del plugin, tipo `chart` en la Content
-  Factory, despliegue y purga de caché de Kinsta.
+  `engine.js` (~200 KB gzip). El cargador baja el motor sólo cuando un gráfico está a 300 px de la pantalla; la URL del
+  motor lleva su huella (`engine.js?v=<sha>`), así que una versión nueva no depende de purgar caché.
+- **Los datos están en el HTML.** `render.php` imprime título, bajada, una tabla con todas las cifras (en «Ver los
+  datos»; la torta suma la participación, el Venn lista los círculos) y la fuente; el gráfico se pinta encima con el
+  mismo JSON. Google y los motores de respuesta leen las cifras sin ejecutar JavaScript. Sin JavaScript se oculta el
+  área del gráfico y queda la tabla.
+- **Un solo contrato, tres lugares.** Atributo `chart`: `{ kind, categories, series: [{ name, values }], emphasis?,
+  highlight?, format?: 'number'|'percent'|'compact', unit?, stacked?, centerLabel? }`. Lo validan el navegador
+  (`contract.ts`, `KIND_SHAPES`), el servidor (`EO_Chart::validate`, `SHAPES`) y la Content Factory (spec
+  `kind: 'chart'`, validador `chart_data_invalid`). Paridad medida el 2026-10-25: 1.350 variantes, mismo veredicto en
+  TypeScript y PHP (`php tests/eo-chart.test.php <cases.json>`). Un gráfico inválido no se publica y quien edita ve el
+  motivo en español con su código.
+- **Editor.** Los datos se pegan desde una planilla (tabulaciones o punto y coma aceptan la coma decimal: `5.120,5`);
+  al cambiar a un tipo cuyos datos no calzan, se carga el ejemplo de ese tipo.
+- **La órbita.** El acento de la línea del artículo marca sólo lo que importa; el resto es contexto en tintes del gris
+  azulado (validado con el verificador de paletas: separación ΔE ≥ 14), separados por 2 px de superficie y con
+  etiquetas directas. Donde el gráfico tiene un punto decisivo (el punto destacado de una línea, la punta del arco de
+  la medida, el centro del Venn) va la esfera, la única de la pieza. El texto va siempre en tinta, nunca en el color de
+  una serie. Panel papel con el halo del Destacado claro; tono navy `#001a33` y modo oscuro con el mismo panel. Se
+  anima una vez al entrar en pantalla; con «reducir movimiento» se pinta quieto.
+
+### Lecciones de la prueba
+
+1. La vista previa de Gutenberg por GET convierte cada número en texto: el editor usa POST y el servidor acepta
+   números escritos como texto.
+2. El editor inyecta el script en su iframe antes de que exista `<body>`; el motor vive en la ventana del editor y
+   vigila el iframe (documento blob que cambia al cargar).
+3. En un panel de navegador oculto no corre `IntersectionObserver` ni `requestAnimationFrame`: se verifica con
+   Playwright sin interfaz, no con el panel.
+4. La leyenda de ECharts toma el color de la **serie**, no el de cada barra: sin color de serie muestra la paleta por
+   defecto (verde, morado).
+5. Las etiquetas de la matriz se colocan con un cálculo propio (la detección de choques de ECharts no ve etiquetas en
+   la misma fila); si no caben, se numeran.
+
+**Pendiente para producción:** aprobación visual del operador, versión del plugin, despliegue y purga de caché de
+Kinsta.

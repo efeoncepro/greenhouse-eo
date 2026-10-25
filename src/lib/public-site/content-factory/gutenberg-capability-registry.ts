@@ -173,6 +173,28 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
     exampleIntent: 'Refresh this pullquote so it connects Loop Marketing with faster learning cycles.'
   },
   {
+    blockName: 'efeoncepro/chart',
+    semanticKind: 'editorial_chart',
+    agentRole:
+      'Places a «Gráfico Efeonce» in a post (dynamic block, plugin efeonce-editorial-blocks): line, column, bar, pie, funnel, before-after, measure, per-hundred, matrix or venn. Authored as GutenbergArticleSpec kind="chart"; the numbers are printed as a table in the HTML and the chart is painted on top.',
+    freedomLevel: 'guided',
+    editableSurfaces: ['attrs'],
+    semanticOperations: ['refresh_chart_data'],
+    compilesTo: ['update_attrs', 'preserve'],
+    requiredEvidence: [...baseEvidence, 'plugin_serialization_policy'],
+    applyPolicy: draftOnlyPolicy('Change data, title or source on a draft clone; the chart contract validates the shape per kind.'),
+    previewPolicy: previewRequired(
+      'figure.eo-chart reaches data-eo-chart-state="ready" on the published page, desktop and 390 px.',
+      'The title states the conclusion and the source line is present.'
+    ),
+    guardrails: [
+      'Every number needs a verifiable source; mark illustrative data as such in sourceLabel.',
+      'The title says what the chart proves, not its topic.',
+      'One highlighted entity: emphasis/highlight, never a second accent.'
+    ],
+    exampleIntent: 'Add a line chart of monthly organic clicks before and after the AEO work, highlighting the last month.'
+  },
+  {
     blockName: 'efeoncepro/growth-cta',
     semanticKind: 'conversion_cta',
     agentRole:

@@ -24,6 +24,7 @@ import {
   type GutenbergOutlineHeading
 } from './gutenberg-blocks'
 import { renderGlitchDropBlock } from './gutenberg-glitch-drop'
+import { renderEditorialChartBlock, type EditorialChartBlockInput } from './gutenberg-editorial-chart'
 import { renderGrowthCtaBlock } from './gutenberg-growth-cta'
 import { slugifyPublicSiteDraft } from './gutenberg-planner'
 
@@ -157,6 +158,11 @@ export type GutenbergArticleBlock =
    * Copy, action and measurement live in the Growth CTA engine; the slug must be allowed by the blog surface.
    */
   | { kind: 'growthCta'; cta: string; location?: string; emphasis?: string; tone?: 'dark' | 'light'; mark?: 'aeo-assessment' }
+  /**
+   * «Gráfico Efeonce» (`efeoncepro/chart`, dynamic block): line, column, bar, pie, funnel, before-after, measure,
+   * per-hundred, matrix or venn. The table of numbers is printed in the HTML; the chart is painted on top.
+   */
+  | ({ kind: 'chart' } & EditorialChartBlockInput)
   /** Governed CTA buttons: 1–3 items, closed variants, no literal colors or custom classes. */
   | { kind: 'buttons'; items: GutenbergButtonItem[] }
 
@@ -376,6 +382,8 @@ const blockToPlainText = (block: GutenbergArticleBlock): string => {
       return block.code
     case 'glitchDrop':
       return block.lines.join(' ')
+    case 'chart':
+      return [block.title ?? '', block.caption ?? ''].join(' ')
     case 'growthCta':
     case 'separator':
     case 'image':
@@ -724,6 +732,8 @@ const renderArticleBlock = (
       return renderGlitchDropBlock(block.lines)
     case 'growthCta':
       return renderGrowthCtaBlock(block)
+    case 'chart':
+      return renderEditorialChartBlock(block)
     case 'buttons':
       return buttonsBlock(block)
   }
