@@ -44,6 +44,12 @@ describe('authorGutenbergDraft — growthCta', () => {
     expect(validateGeneratedGutenbergDraft(draft).findings.filter(f => f.code.startsWith('growth_cta'))).toEqual([])
   })
 
+  it('emits the light tone when the spec asks for it', () => {
+    const draft = authorGutenbergDraft(specWith([{ kind: 'growthCta', cta: 'blog-aeo-assessment', tone: 'light', mark: 'aeo-assessment' }]))
+
+    expect(gutenberg(draft).postContent).toContain('"tone":"light","mark":"aeo-assessment"')
+  })
+
   it('rejects an invalid slug before it reaches a draft', () => {
     expect(() => authorGutenbergDraft(specWith([{ kind: 'growthCta', cta: 'Blog AEO' }]))).toThrow(
       'content_factory_article_growth_cta_slug_invalid'

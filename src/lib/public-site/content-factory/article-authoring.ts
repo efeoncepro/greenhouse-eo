@@ -145,7 +145,7 @@ export type GutenbergArticleBlock =
    * Governed Growth CTA of Greenhouse placed in the post (`efeoncepro/growth-cta`, efeonce-editorial-blocks ≥ 0.7.0).
    * Copy, action and measurement live in the Growth CTA engine; the slug must be allowed by the blog surface.
    */
-  | { kind: 'growthCta'; cta: string; location?: string; emphasis?: string; mark?: 'aeo-assessment' }
+  | { kind: 'growthCta'; cta: string; location?: string; emphasis?: string; tone?: 'dark' | 'light'; mark?: 'aeo-assessment' }
   /** Governed CTA buttons: 1–3 items, closed variants, no literal colors or custom classes. */
   | { kind: 'buttons'; items: GutenbergButtonItem[] }
 

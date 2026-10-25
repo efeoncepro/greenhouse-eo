@@ -20,7 +20,8 @@ import {
   GROWTH_CTA_BLOCK_NAME,
   isGrowthCtaLocation,
   isGrowthCtaMark,
-  isGrowthCtaSlug
+  isGrowthCtaSlug,
+  isGrowthCtaTone
 } from './gutenberg-growth-cta'
 
 export type GutenbergDraftValidationOptions = {
@@ -835,6 +836,15 @@ const validateGrowthCtaBlocks = (blocks: ParsedGutenbergBlockComment[], findings
         severity: 'block',
         code: 'growth_cta_slug_invalid',
         message: `${GROWTH_CTA_BLOCK_NAME} needs the slug of a published Growth CTA in attrs.cta.`,
+        path
+      })
+    }
+
+    if (block.attrs.tone !== undefined && !isGrowthCtaTone(block.attrs.tone)) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_tone_invalid',
+        message: `${GROWTH_CTA_BLOCK_NAME} tone must be dark or light.`,
         path
       })
     }

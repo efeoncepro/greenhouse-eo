@@ -14,7 +14,11 @@ import { serializeGutenbergBlockAttributes } from './gutenberg-blocks'
 
 export const GROWTH_CTA_BLOCK_NAME = 'efeoncepro/growth-cta'
 
-export const GROWTH_CTA_ALLOWED_ATTRIBUTES = ['cta', 'location', 'emphasis', 'mark'] as const
+export const GROWTH_CTA_ALLOWED_ATTRIBUTES = ['cta', 'location', 'emphasis', 'tone', 'mark'] as const
+
+/** Card tone: navy (default) or paper. */
+export const GROWTH_CTA_TONES = ['dark', 'light'] as const
+export type GrowthCtaTone = (typeof GROWTH_CTA_TONES)[number]
 
 /** Official product lockups the block can show in place of the eyebrow (efeonce-editorial-blocks EO_Growth_Cta::MARKS). */
 export const GROWTH_CTA_MARKS = ['aeo-assessment'] as const
@@ -30,9 +34,14 @@ export type GrowthCtaBlockInput = {
   location?: string
   /** One exact phrase of the governed headline to set in bold (AXIS `headlineEmphasis`). */
   emphasis?: string
+  /** Card tone: `dark` (navy, default) or `light` (paper). */
+  tone?: GrowthCtaTone
   /** Official product lockup in place of the eyebrow (it carries its own sphere, so the headline drops its own). */
   mark?: GrowthCtaMark
 }
+
+export const isGrowthCtaTone = (value: unknown): value is GrowthCtaTone =>
+  typeof value === 'string' && (GROWTH_CTA_TONES as readonly string[]).includes(value)
 
 export const isGrowthCtaMark = (value: unknown): value is GrowthCtaMark =>
   typeof value === 'string' && (GROWTH_CTA_MARKS as readonly string[]).includes(value)
@@ -58,6 +67,12 @@ export const renderGrowthCtaBlock = (input: GrowthCtaBlockInput): string => {
   const attrs: Record<string, string> = { cta: input.cta, location }
 
   if (emphasis) attrs.emphasis = emphasis
+
+  if (input.tone !== undefined) {
+    if (!isGrowthCtaTone(input.tone)) throw new Error(`content_factory_article_growth_cta_tone_invalid:${String(input.tone)}`)
+
+    attrs.tone = input.tone
+  }
 
   if (input.mark !== undefined) {
     if (!isGrowthCtaMark(input.mark)) throw new Error(`content_factory_article_growth_cta_mark_invalid:${String(input.mark)}`)
