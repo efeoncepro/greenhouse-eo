@@ -99,8 +99,11 @@ export type GutenbergArticleBlock =
       headers: GutenbergRichText[]
       rows: GutenbergRichText[][]
       caption?: GutenbergRichText
-      /** Core-registered table style (`is-style-stripes`). Check Ohio at 390 px on wide tables. */
-      style?: 'stripes'
+      /**
+       * `efeonce`: «Tabla Efeonce» (efeonce-editorial-blocks ≥ 0.6.0), the default for blog posts — paper panel, and
+       * under 600 px one card per row with each cell labeled by its header. `stripes`: core `is-style-stripes`.
+       */
+      style?: 'efeonce' | 'stripes'
     }
   | { kind: 'quote'; text: string }
   /** Rendered with the «Destacado Efeonce» style (efeonce-editorial-blocks ≥ 0.4.0); `cite` = optional source line. */
@@ -278,11 +281,13 @@ const tableBlock = (block: Extract<GutenbergArticleBlock, { kind: 'table' }>): s
     ? `<figcaption class="wp-element-caption">${renderRichText(block.caption)}</figcaption>`
     : ''
 
-  if (block.style !== undefined && block.style !== 'stripes') {
+  const styleClasses: Record<string, string> = { efeonce: 'is-style-efeonce-tabla', stripes: 'is-style-stripes' }
+
+  if (block.style !== undefined && !(block.style in styleClasses)) {
     throw new Error(`content_factory_article_table_style_invalid:${String(block.style)}`)
   }
 
-  const styleClass = block.style === 'stripes' ? 'is-style-stripes' : ''
+  const styleClass = block.style ? styleClasses[block.style] : ''
   const comment = styleClass ? `<!-- wp:table ${serializeGutenbergBlockAttributes({ className: styleClass })} -->` : '<!-- wp:table -->'
   const figureClass = styleClass ? `wp-block-table ${styleClass}` : 'wp-block-table'
 

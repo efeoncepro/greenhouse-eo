@@ -197,11 +197,11 @@ export const EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES: GutenbergBlockPatternCatal
     role: 'structure',
     generationPolicy: 'allowed',
     refreshPolicy: 'patch_carefully',
-    description: 'Native comparison/data table with optional caption and the core-registered stripes style (spec kind="table", style="stripes").',
+    description: 'Native comparison/data table with optional caption in the «Tabla Efeonce» style (spec kind="table", style="efeonce"; core stripes with style="stripes").',
     constraints: [
       'Every row keeps the header column count.',
-      'Only the core-registered is-style-stripes style; no inline colors.',
-      'Check Ohio at 390 px before using stripes on wide tables.'
+      'Only «Tabla Efeonce» (is-style-efeonce-tabla) or core is-style-stripes; no inline colors.',
+      'Short headers: under 600 px each cell shows its header as a label.'
     ],
     example: stripedTableExample
   },

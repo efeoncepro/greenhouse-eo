@@ -195,6 +195,17 @@ describe('authorGutenbergDraft — embed caption, table stripes, buttons', () =>
     expect(validateGeneratedGutenbergDraft(draft).status).toBe('pass')
   })
 
+  it('renders the «Tabla Efeonce» style on the comment and the figure', () => {
+    const draft = authorGutenbergDraft(
+      specWith([{ kind: 'table', headers: ['Campo', 'Ejemplo'], rows: [['Tamaño', '200 a 2.000']], style: 'efeonce' }])
+    )
+
+    expect(gutenberg(draft).postContent).toContain(
+      '<!-- wp:table {"className":"is-style-efeonce-tabla"} -->\n<figure class="wp-block-table is-style-efeonce-tabla"><table>'
+    )
+    expect(validateGeneratedGutenbergDraft(draft).status).toBe('pass')
+  })
+
   it('rejects table styles that core does not register', () => {
     expect(() =>
       authorGutenbergDraft(

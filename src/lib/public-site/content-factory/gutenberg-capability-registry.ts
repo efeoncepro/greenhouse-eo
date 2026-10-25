@@ -200,7 +200,7 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
   {
     blockName: 'core/table',
     semanticKind: 'editorial_table',
-    agentRole: 'Native comparison/data table with optional caption and the core-registered stripes style.',
+    agentRole: 'Native comparison/data table with optional caption, in the «Tabla Efeonce» style (or core stripes).',
     freedomLevel: 'constrained',
     editableSurfaces: ['text', 'attrs', 'structure'],
     semanticOperations: ['refresh_table_cells'],
@@ -212,7 +212,8 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
       'Caption credits the data source when figures come from third parties.'
     ),
     guardrails: [
-      'Use only the core-registered is-style-stripes style (spec table.style="stripes"); no inline colors.',
+      'Blog posts use «Tabla Efeonce» (spec table.style="efeonce", efeonce-editorial-blocks ≥ 0.6.0); core stripes only outside it; no inline colors.',
+      'The header names each column: on the phone every cell shows its header as a label, so headers stay short.',
       'Every row keeps the header column count.',
       'Prefer a table over columns for side-by-side comparisons.'
     ],
