@@ -101,6 +101,13 @@ La negrita del titular la aplica `host.js` sólo si la frase aparece exacta y un
 contacto en HubSpot. Las corridas públicas del Grader usan ChatGPT, Gemini, Perplexity y Google; por eso el texto los
 nombra. Medición: fila `blog-aeo-assessment` del plan de medición.
 
+**En producción (0.7.0, 2026-10-25 13:40 UTC).** Desplegado por `blog-home deploy content-model --apply` (sólo los
+archivos del bloque, el main y el readme); opción `eo_growth_cta_blog` guardada con `set-blog-growth-cta.php`. Probado en
+vivo en la página de prueba `/greenhouse-cta-prueba/` (no indexada; snapshot `_gh_gcta_test_20261025_134046`) a 1440 y
+390 px: tarjeta navy con Bricolage y la frase en 700, formulario real abierto dentro de la tarjeta, medición
+`greenhouse_cta_viewed` → `clicked` → `form_opened` y `gh_form_viewed`, sin errores ni scroll horizontal. Falta un envío
+real del formulario (sólo lo puede hacer una persona, por Turnstile).
+
 **Reglas:** un Growth CTA por artículo, después de la respuesta principal y antes de las preguntas frecuentes o del
 cierre. Nunca se escribe texto, enlaces ni formularios dentro del bloque. Re-correr el publicador rota la llave:
 repetir `set-blog-growth-cta.php` en la misma sesión.
