@@ -93,6 +93,16 @@ renderer es el mismo archivo que cargan el menú y las landings (`renderer-lates
 - el formulario se abre **dentro** de la tarjeta, sobre una hoja blanca, y la etiqueta, el titular y el texto quedan
   arriba. `Escape` lo colapsa sin registrar rechazo (regla del motor).
 
+**Logo del producto y tono (0.7.1, 2026-10-25).**
+
+- `mark: "aeo-assessment"` muestra el lockup oficial «Efeonce | AEO Assessment» (copia byte de
+  `@efeoncepro/axis-brand-assets` 0.4.25, negativo en la tarjeta oscura y positivo en la clara) **en lugar** de la
+  etiqueta y su anillo, como pide La órbita: el lockup reemplaza la etiqueta, nunca se suma. La O del lockup ya lleva la
+  esfera, así que el titular deja la suya: una esfera por pieza. Lista cerrada en `EO_Growth_Cta::MARKS`.
+- `tone: "light"` es la versión clara: papel `#f7f8f6`, tinta navy, el acento de la línea sobre papel, halo más suave y
+  el mismo botón teal. Sigue clara aunque la página esté en modo oscuro. El formulario abierto va en una hoja blanca
+  con borde fino.
+
 La negrita del titular la aplica `host.js` sólo si la frase aparece exacta y una vez (misma regla que
 `content.headlineEmphasis` de AXIS); si no calza, el titular queda en 400 y nada se rompe.
 
@@ -105,8 +115,9 @@ nombra. Medición: fila `blog-aeo-assessment` del plan de medición.
 archivos del bloque, el main y el readme); opción `eo_growth_cta_blog` guardada con `set-blog-growth-cta.php`. Probado en
 vivo en la página de prueba `/greenhouse-cta-prueba/` (no indexada; snapshot `_gh_gcta_test_20261025_134046`) a 1440 y
 390 px: tarjeta navy con Bricolage y la frase en 700, formulario real abierto dentro de la tarjeta, medición
-`greenhouse_cta_viewed` → `clicked` → `form_opened` y `gh_form_viewed`, sin errores ni scroll horizontal. Falta un envío
-real del formulario (sólo lo puede hacer una persona, por Turnstile).
+`greenhouse_cta_viewed` → `clicked` → `form_opened` y `gh_form_viewed`, sin errores ni scroll horizontal. 0.7.1 (13:55 UTC) suma el
+logo y el tono claro; las dos versiones se verificaron en vivo en la misma página a 1440 y 390 px. Falta un envío real
+del formulario (sólo lo puede hacer una persona, por Turnstile).
 
 **Reglas:** un Growth CTA por artículo, después de la respuesta principal y antes de las preguntas frecuentes o del
 cierre. Nunca se escribe texto, enlaces ni formularios dentro del bloque. Re-correr el publicador rota la llave:
