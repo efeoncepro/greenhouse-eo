@@ -1,0 +1,17 @@
+{
+  "id": "RC1-recepcion-larga",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "larga-exposicion",
+  "escena": "SCENE (the Efeonce reception, Providencia, Santiago, late afternoon): a wide, frontal architectural photograph of a contemporary, premium marketing agency reception, camera on a tripod at chest height, perfectly level, 35mm lens at f/8. On the RIGHT HALF of the frame a tall feature wall of smooth dark charcoal micro-cement fills from floor to ceiling, matte, one continuous surface; its CENTRE is completely EMPTY and bare — no signage, no logo, no lettering, no artwork, no light fixture, no object and no shadow on it — a clean circular area about two metres across, high on the wall, whose lower edge sits clearly ABOVE the heads of the people walking past. In front of that wall, low and to the right, a long monolithic reception desk in black honed stone with a thin brushed-steel top edge, its surface bare except for one slim current-generation all-in-one display seen from behind, edge-on and dark. The ceiling is a deep black slatted ceiling; one linear cool white-blue light line runs across the ceiling and grazes the top of the charcoal wall, and the rest of the room falls into soft shadow. The LEFT third of the frame is a deep corridor of dark board-formed concrete in shadow, receding, nothing on its surface and no light reaching it. Floor: polished dark grey terrazzo with faint reflections. Cool, contemporary, quiet luxury, nothing warm, amber, orange or golden; no tungsten, no brass lamp, no plants, no books, no magazines, no leather sofa. Within the right half of the frame, several people walk past in front of the desk and dissolve into long translucent streaks of motion, ghosted, faces and bodies blurred into light and nobody recognisable; their trails reflect softly on the terrazzo. The architecture, the desk and the empty wall stay razor sharp — the one thing that holds while everything moves. Nobody looks at the camera.",
+  "reservas": {
+    "texto": {
+      "muro": "the dark board-formed concrete corridor on the left third of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the edge of a low black honed-stone bench in the immediate foreground, its top edge running unbroken across the lower part of the frame",
+    "tono": "DARK charcoal stone in deep shadow, matte, out of focus, far outside the light"
+  }
+}

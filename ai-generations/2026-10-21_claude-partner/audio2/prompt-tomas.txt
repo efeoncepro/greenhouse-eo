@@ -1,0 +1,31 @@
+Eres diseñador de sonido de tráilers. Te paso 18 archivos de audio en este orden exacto:
+ 1. aleteo-a.mp3
+ 2. aleteo-b.mp3
+ 3. arena-a.mp3
+ 4. arena-b.mp3
+ 5. braam-a.mp3
+ 6. braam-b.mp3
+ 7. cristal-a.mp3
+ 8. cristal-b.mp3
+ 9. golpe-a.mp3
+10. golpe-b.mp3
+11. pad-a.mp3
+12. pad-b.mp3
+13. pluma-a.mp3
+14. pluma-b.mp3
+15. riser-a.mp3
+16. riser-b.mp3
+17. rozan-a.mp3
+18. rozan-b.mp3
+Cada par (a/b) es una alternativa para el mismo uso:
+- pluma: pluma metálica rascando papel grueso, en silencio.
+- riser: subida tensa con cello y carga eléctrica que corta en su máximo.
+- golpe: cartulina que se rasga + golpe metálico de tráiler + sub de 40 Hz.
+- rozan: pájaros que pasan rozando el micrófono con aleteo.
+- arena: látigo de viento con granos de arena.
+- aleteo: miles de estorninos aleteando (como naipes barajados) que crece.
+- braam: braam orquestal híbrido de tráiler con impacto.
+- cristal: brillo de cristal o cuarzo.
+- pad: pad analógico cálido y aireado.
+Para CADA archivo, en una línea: nombre — qué se oye realmente — ¿sirve para su uso? (sí/no/a medias) — en qué segundo está su golpe o momento fuerte, si lo tiene.
+Después, para cada uso, di qué alternativa elegir (a o b) o si ninguna sirve. Sé estricto y concreto, en español.

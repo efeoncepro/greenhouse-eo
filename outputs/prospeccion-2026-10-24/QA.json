@@ -1,0 +1,32 @@
+{
+  "page_count": 14,
+  "counts": "PASS",
+  "footer_content_pages": "12/12",
+  "fonts": "Embedded Poppins and Geist (pdffonts)",
+  "format": "A4 portrait",
+  "text_extraction": "PASS",
+  "process_leaks": "none found",
+  "inspection": "Poppler fallback; PyMuPDF unavailable",
+  "tagged": false,
+  "links_and_pdfua": "not certified",
+  "files": {
+    "INFORME.md": "82148aa56b4fae02ee445e5f69476300214705fdf5ab5ac19efb0ac233eb75f9",
+    "cuentas-octubre.csv": "7da71db093565368a9e464a346d8f24dbebed5944c8fec40a61517518740e900",
+    "negocios-historicos.csv": "1e3452c2fb85471236a36bb27f0f3cae09908f66902c7f953ab9e93162a65030",
+    "radar.csv": "909ef2aa4717dadfaec35f22c38af4a4d92adeee91a70bc45645cdfb04742113",
+    "datos.json": "709473e3adb16dc02c9f24202bc2b21e3a2c9b89cefa2d2ca0be8bc8923c8d6d",
+    "radar.json": "f31d6182396e49ff22305a333c6c22f2e4e184ba8476e2d1a38fc61ae762f48e",
+    "informe.plan.json": "a40a00fd86ebd9e7d5660f24bdba493465d65630dc5092ef8416ca4fa5d06b9c",
+    "generar-informe.ts": "75e728c53fbd9175f1a2b585d393c41f645fb962f181feb7ba04d127368f737a",
+    "pdf/Efeonce-Analisis-Prospeccion-2026-10-24.pdf": "46dcba1f6fde4243bb8bbd045c5815525b7c8ee64c027ec84112571056e72881"
+  },
+  "visual_review": {
+    "pages": "1–14",
+    "source": "Rasterización del PDF final con Poppler, 1200 px",
+    "result": "Sin cortes o superposiciones observados; pie y folios revisados en todas las páginas aplicables"
+  },
+  "limitations": [
+    "El PDF no está etiquetado; no se certifica PDF/UA ni navegación de enlaces.",
+    "Preflight de respaldo Poppler; PyMuPDF no está disponible."
+  ]
+}

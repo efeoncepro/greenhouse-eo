@@ -1,0 +1,21 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 public-website:wpcli /Users/jreye/Documents/greenhouse-eo
+> tsx scripts/public-website/wpcli-remote.ts -- --eval-file tmp/google-published-readonly.php --wp-user 12
+
+{
+    "status": "pass",
+    "postId": 252108,
+    "checks": {
+        "published": true,
+        "author": true,
+        "content": true,
+        "cover": true,
+        "category": true,
+        "format": true,
+        "index": true,
+        "noHero": true,
+        "noPin": true
+    },
+    "dateGmt": "2026-10-25 15:58:30",
+    "url": "https://efeoncepro.com/novedades/efeonce-partner-google-cloud/"
+}

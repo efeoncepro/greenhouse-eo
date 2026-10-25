@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "7bad7185abb2",
+  "key": "7bad7185abb29ef8253b5bbb1b53b549bf3cf88b12c19dfa6d7ea8b2761abb32",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:37:34.074Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v3/04-aplastada.png",
+    "imageSha256": "ec2fd5e3da8d76569283adefc40ca571042d23887e1d6e80846014218db9da94",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/04.png",
+    "maskSha256": "5e23a32ec14fe85a1815300ef19b2ed6014b0705838166f08d63dee04de6dc6e",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked laptop: the same open laptop with the same angle and size, now in dark space-grey anodized aluminum, ultra-thin, minimal bezels, plain unbranded lid. Keep her arm, head and everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Replace only the marked laptop: the same open laptop with the same angle and size, now in dark space-grey anodized aluminum, ultra-thin, minimal bezels, plain unbranded lid. Keep her arm, head and everything outside the zone unchanged. Photorealistic."
+  },
+  "mask": {
+    "touchedFraction": 0.06031036376953125,
+    "editable": 67910,
+    "soft": 11140,
+    "protected": 1231670
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 32 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 48.16,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.14,
+        "bestError": 3.14,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1231670,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 67910,
+        "maxDelta": 198,
+        "meanDelta": 54.327,
+        "worst": {
+          "x": 681,
+          "y": 891
+        }
+      },
+      "seam": {
+        "pixels": 11140,
+        "maxDelta": 125,
+        "meanDelta": 10.568,
+        "worst": {
+          "x": 553,
+          "y": 855
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1231670,
+        "maxDelta": 144,
+        "meanDelta": 4.842,
+        "worst": {
+          "x": 539,
+          "y": 843
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1378,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 98
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 2888
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

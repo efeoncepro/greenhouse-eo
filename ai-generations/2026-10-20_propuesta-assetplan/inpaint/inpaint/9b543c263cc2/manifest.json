@@ -1,0 +1,59 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "9b543c263cc2",
+  "key": "9b543c263cc2e6e50a5f16d3cfe704eb5fd7871f8a8bb2905b4087d7f20bde92",
+  "status": "dry-run",
+  "createdAt": "2026-10-20T16:29:15.553Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+    "imageSha256": "5fe61d83c650e74976f73a5033f07cff0fec8c41480d5bf54662103f9bf6d8f9",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-20_propuesta-assetplan/plates/BR3-mask-luz.png",
+    "maskSha256": "82593f62f9a85f4a7703443ed5b171c527870490d3c8a998fa15442978e85f56",
+    "maskConvention": "white-editable",
+    "width": 1792,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Relight this exact scene so the glowing ring portal is a neon light in a vivid magenta-pink (the color #E86BD0) instead of teal. The sphere at the top of the ring is a white-hot light source with a soft magenta-pink bloom around it, like a real bright lamp: a bright almost-white core fading into saturated pink glow, never a flat pastel disc. The ring keeps exactly the same shape, thickness, position and the same gap where it meets the sphere. The thin haze inside and around the ring glows a soft, clean magenta-pink near the ring and fades into deep dark navy-black away from it; no red, no maroon, no brown tint anywhere. The wet floor reflections and the light line on the horizon reflect the same magenta-pink light. Everything else stays identical: same composition, same camera, same dark studio, same floor texture. Do not add any object or text. Keep the framing identical. Photographic, cinematic, realistic light physics.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nRelight this exact scene so the glowing ring portal is a neon light in a vivid magenta-pink (the color #E86BD0) instead of teal. The sphere at the top of the ring is a white-hot light source with a soft magenta-pink bloom around it, like a real bright lamp: a bright almost-white core fading into saturated pink glow, never a flat pastel disc. The ring keeps exactly the same shape, thickness, position and the same gap where it meets the sphere. The thin haze inside and around the ring glows a soft, clean magenta-pink near the ring and fades into deep dark navy-black away from it; no red, no maroon, no brown tint anywhere. The wet floor reflections and the light line on the horizon reflect the same magenta-pink light. Everything else stays identical: same composition, same camera, same dark studio, same floor texture. Do not add any object or text. Keep the framing identical. Photographic, cinematic, realistic light physics.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.9630208696637835,
+    "editable": 1767151,
+    "soft": 0,
+    "protected": 67857
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1792,
+      "height": 1024
+    },
+    "target": {
+      "width": 1792,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0373,
+    "basis": "1 × salida 1792x1024 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": []
+}

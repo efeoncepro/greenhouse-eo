@@ -1,0 +1,22 @@
+{
+ "id": "S11r-a-ola-llega",
+ "formato": "4:5",
+ "impacto": true,
+ "escena": "SCENE: a still from a modern, cinematic corporate comedy sketch, photorealistic. REVERSE SHOT from the FAR end of the long table (where Antonio sits, just off-frame behind the camera), camera low, almost at table height, 28mm, looking down the whole length of the oak table toward Paula, who sits at the NEAR end facing the camera, small-to-medium in frame. In the same brand-new contemporary meeting room on a high floor of a modern office tower in Santiago de Chile: floor-to-ceiling frameless glass walls, a long pale oak meeting table with a thin matte black steel base, modern upholstered chairs in warm grey, linear recessed LED ceiling lights, polished concrete floor; through the glass the Santiago skyline and the Andes. Current-generation hardware only, clean surfaces; nothing dated. In the foreground, starting right in front of the lens, a huge rolling WAVE of sparkling water with ice cubes and orange slices races ALONG the table surface away from the camera toward Paula, frozen at 1/8000 s, about halfway down the table; a fictional aluminum citrus drink can (abstract orange-and-teal wave label, no readable text) rides on its crest. Paula, still DRY, holding her paper coffee cup, has just seen it coming: eyes wide, eyebrows up, mouth open in a silent gasp, frozen in disbelief. She wears her cream fine-knit sweater over a white collared shirt. Light: the room has burst into vivid orange and teal light coming from behind the camera (from Antonio's laptop), warm sunlight through the windows, punchy contrast. Comic and spectacular.",
+ "sinLechoPorque": "Storyboard de video (keyframe), sin firma ni capa gráfica: no lleva lecho.",
+ "casting": {
+  "paula": {
+   "etiqueta": "Paula (casting)",
+   "identity": "IDENTITY (critical): the woman is the SAME person shown in the reference portrait: a Chilean marketing manager, 42, light-medium olive skin, shoulder-length straight dark brown hair, dark brown eyes, defined natural brows, small silver hoop earrings, slim gold-rimmed reading glasses pushed up on top of her head. She wears a cream fine-knit crewneck sweater over a crisp white collared shirt. Preserve her face, skin and hair exactly; her pose, expression and light come from the scene. Do not age, beautify or smooth her.",
+   "refs": [
+    "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png"
+   ],
+   "cuerpo": "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png",
+   "silueta": "mujer"
+  }
+ },
+ "identidad": [
+  "paula"
+ ],
+ "lecho": "sin-lecho"
+}

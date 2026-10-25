@@ -1,0 +1,8 @@
+COMMAND ["pnpm", "ai:byteplus", "--model", "seedance25", "--draft", "--references", "--image", "asset://asset-20261017163742-t66nd", "--image", "asset://asset-20261017164311-42bch", "--prompt-file", "ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/referencia/s07-prompt.txt", "--duration", "4", "--resolution", "480p", "--out", "ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/referencia/antonio-ref.mp4", "--out-dir", "ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/referencia", "--yes"]
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:byteplus /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/byteplus.ts --model seedance25 --draft --references --image asset://asset-20261017163742-t66nd --image asset://asset-20261017164311-42bch --prompt-file ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/referencia/s07-prompt.txt --duration 4 --resolution 480p --out ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/referencia/antonio-ref.mp4 --out-dir ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/referencia --yes
+
+BytePlus seedance25: estimado USD 0.4112
+BytePlus HTTP 400 (InvalidParameter); requestId=02179222668293607b4b942199433a510c68da6d01b36ec9b5e92
+ ELIFECYCLE  Command failed with exit code 1.

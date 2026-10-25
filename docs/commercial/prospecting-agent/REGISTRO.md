@@ -1,5 +1,13 @@
 # Registro de búsquedas comerciales
 
+**Delta focal25/10 · aplicación autorizada en HubSpot:** [guía y continuidades releídas](../analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md).
+Nueve correos futuros de ocho inscripciones y nueve plantillas ajustados; Unilever(Karla/Estefanía),
+Olivos(Emily), Toyota(Fabricio) y NIASA(Liliana) pausados, con condiciones explícitas para retomar.
+Cola13→8 próximos correos el29Oct; conservar fechas, firmas, paradas y la excepción individual de CCO
+Flesan/Sigelec. No duplicar ni reactivar por calendario. Guía9.705 guardada; QA borrador nuevo pendiente
+por créditos. Sin envío inmediato, nuevas inscripciones ni pauta. No renueva el corte global.
+
+
 ## 24/10/2026 — Lucía y Yvette: inferencia, validación y cierre documental
 
 [Dos casos conciliados](runs/2026-10-24-lucia-yvette-prospeccion.md): Lucía/Flesan con resultado laboral
@@ -22,6 +30,9 @@ nota119334575454 verificados. Dirección inferida admitida y usada por excepció
 correo22:18:35Santiago con firma gráfica/CCO/brochure original, EMAIL119337620506SENT e InMail21:37 enviados.
 InMail1crédito; sin Apollo ejecutado, Lead/Deal/secuencia, nuevoIDHSP ni membresías efectivas acreditadas.
 Esperar respuesta; entrega/lectura no confirmadas. [Expediente saneado](runs/2026-10-22-fundacion-luz-mariana.md).
+
+**Radar diario 22/10/2026 — 2026-10-22-0904:** 56 consultas, 48 semanales (85,7%) y 20 celdas. Nuevas investigaciones: HSP-0046 Berel 7084 y HSP-0047 Salud Pública 757-100-LR26, ambas HOLD; cero compras nuevas calificadas. La API confirma Maule cerrado hoy a las 09:00 con 13 ofertas. TdR de CLADEM recuperado, con calendario contradictorio. Gana sigue Enviada y cierra hoy a las 16:00 de Santiago; izipay ya acusó el interés y tiene Deal. Se conservan 45 IDs anteriores, 27 lotes y 32 decisiones; total 47 cuentas locales. Sin CRM writes, envíos ni créditos.
+[Reporte](runs/2026-10-22-0904.md) · [Consultas y 19 controles](queries/2026-10-22-0904.json).
 
 **Kibernum, investigación focalizada22/10/2026:** Contact256968083769 creado con correo laboral verificado,
 Company53955357196 reutilizada/Primary; seis segmentos del contacto y Company187 verificados. Correo00:56Santiago
@@ -146,6 +157,41 @@ Sin Leads, Deals ni envíos; la fila de búsqueda conserva su estado original an
 
 14 enviados y 14 EMAIL SENT comprobados en HubSpot; 13 firmas gráficas y Pierre Fabre textual anterior a la corrección. Momentum excluido; secuencias del contacto regional y Teva preservadas. Sin otras altas CRM ni créditos. [Informe](../follow-up-agent/runs/2026-10-21-seguimientos-enviados.md) · [Controles redactados](queries/2026-10-21-seguimientos-enviados.json).
 
+
+### 21/10/2026 10:55 — Respuestas de izipay y Olivos del Sur
+
+izipay invitó a RFQ001: confirmación de interés22Oct17h sin zona; documentación y expediente pendientes. Iris ya no inscrita; dos adyacentes sí, sin cambios automáticos. Olivos acusa revisión interna, esperar. [Revisión](../follow-up-agent/runs/2026-10-21-1055-respuestas-izipay-olivos.md) · [Controles](queries/2026-10-21-1055-respuestas-izipay-olivos.json). Sin envíos ni escrituras CRM.
+
+
+### 21/10/2026 11:40 — izipay paquete para revisión y Olivos programado
+
+Iris: correo/firma gráfica y3adjuntos preparados, SINENVIAR hasta revisión deJulio. Ariana/Diego desinscritos y comprobados. Olivos: secuencia317665660 Programado1/Error0,29Oct/12Nov/3Dic,09:30–09:35UTC-5, paradarespuesta/reunión; sin correo hoy. [Evidencia](../follow-up-agent/runs/2026-10-21-1140-izipay-paquete-olivos-secuencia.md) · [Consultas](queries/2026-10-21-1140-izipay-paquete-olivos-secuencia.json). SinDeals/créditos/otroscontactos.
+
+
+### 21/10/2026 11:52 — izipay: confirmación enviada
+
+Enviado21Oct11:49:59Chile sólo a Compras, sinCC, firma gráfica y CCOHubSpot;2PDF+enlaces creativo/360completo. Outlook y EMAIL119215175851 SENT verificados. Admisión extranjera/bases/calendario pendientes; no repetir hoy. [Evidencia](../follow-up-agent/runs/2026-10-21-1152-izipay-confirmacion-enviada.md) · [Consultas](queries/2026-10-21-1152-izipay-confirmacion-enviada.json). Sin otrosenvíos/Deals/créditos/commit.
+
+
+### 21/10/2026 13:00 — izipay: Deal autorizado, sin alta por HOLD
+
+Alta porMCP expresamente autorizada; dedupe0 por nombre y Company. Fuente primaria sigue sin bases/calendario ni verificación contractual; alta no ejecutada conforme control18Oct. No confundir autorización con ejecución. [Evidencia](runs/2026-10-21-1300-izipay-deal-autorizado-hold.md).
+
+
+### 21/10/2026 13:54 — izipay: Lead creado
+
+Lead598745034768 abierto/Conectado, Warm/NewBusiness, dueñoJulio, PrimaryContact/Company existentes verificados. MCPwrite nohabilitado, CLIOAuth autorizado mismoporal conreadbackMCP. Admisión/bases/calendario pendientes, sinDeal. [Evidencia](runs/2026-10-21-1354-izipay-lead-creado.md).
+
+
+### 21/10/2026 16:47 — izipay: negocio abierto por instrucción reiterada
+
+Deal66481946424 creado porMCP, dueñoJulio, administrativo/sinmonto/cierre, tresasociacionesyreadback verificados. Comprasacusainterésynovedadespróximassemanas;admisión/bases/calendario/contratopendientes. Excepciónespecíficainterpretadapara registro;sinGOparapostulación/gasto/compartir. LifecycleContact/Companyopportunitynativo;LeadConnected. [Evidencia](runs/2026-10-21-1647-izipay-deal-abierto.md).
+
+
+### 21/10/2026 19:26 — auditoría de envíos y tracking
+
+Requisito de consentimiento desactivado y tracking general activado. Lote manual:14/14 copias Outlook y14/14 EMAIL SENT releídos. Secuencias:10envíos automáticos; pasos futuros separados; Unilever conserva un rebote y dos contactos en curso. No reenviar por ceros de apertura. CCO registra sin añadir por sí solo tracking. Sin cambios CRM, consentimientos, inscripciones ni envíos. [Informe](../follow-up-agent/runs/2026-10-21-1926-auditoria-envios-tracking.md) · [Consultas](queries/2026-10-21-1926-auditoria-envios-tracking.json).
+
 - 2026-10-22 14:13 — Réditos, intento13 Agencia Digital2027 LIC1552: bases y duplicados verificados; HOLD calendario/entidad, alta preparada sin ejecutar; excepción administrativa pendiente. [Reporte](runs/2026-10-22-1413-reditos-digital-2027.md) · [Consultas](queries/2026-10-22-1413-reditos-digital-2027.json) · [Expediente](../tenders/gana-loti-agencia-digital-2027-1552/README.md).
 
 - 2026-10-22T14:15:56.264225-03:00 — Resolución Réditos: Julio confirmó «Crea el deal». Deal66560488750 creado y leído, intento13 GRD-1552, Company34264439413 Primary; HOLD administrativo y campos de importe/cierre vacíos. Intento12 Programática sin cambios. [Recibo](../tenders/gana-loti-agencia-digital-2027-1552/research/CRM-ALTA-VERIFICADA-2026-10-22.json).
@@ -177,6 +223,21 @@ Sin Leads, Deals ni envíos; la fila de búsqueda conserva su estado original an
 - 2026-10-22T20:24:15.879419-03:00 — GRD-1552: investigación profunda GANA/LOTI con tres subagentes, 97 búsquedas y cuatro pares cualitativos. Cercanía y pedagogía ya trabajadas; dirección refinada y límites de acceso documentados. [Informe](runs/2026-10-22-2024-reditos-investigacion-marcas.md) · [Consultas](queries/2026-10-22-2024-reditos-investigacion-marcas.json). Sin nuevas convocatorias, propuesta o CRM.
 
 - 2026-10-22T20:40:54.165801-03:00 — GRD-1552: Julio autoriza preparar propuestaMD para Claude Design; borrador28bloques y anexos, fuentes técnica/económica y control interno separados. [Corrida](runs/2026-10-22-2040-reditos-propuesta-md.md) · [Operaciones](queries/2026-10-22-2040-reditos-propuesta-md.json). Sin emisión, presentación o CRM.
+
+
+### 23/10/2026 09:03 — Radar diario: tres cuentas en investigación; Berel retirada
+
+Cero nuevas compras calificadas; HSP-0048 UChile, HSP-0049 UMAG y HSP-0050 Salud Hidalgo sólo HOLD. Berel7084 Descartada en portal, cierre adelantado22Oct20:30; GANA1541 En Evaluación; Réditos1552 REDIAPUESTAS y dos preguntas sin respuesta. 64 consultas web,59descubrimiento/54semanales (91,5%),20celdas; LicitaLAB196códigos; Wherex35Nueva+2Editando. [Reporte](runs/2026-10-23-0903.md) · [Consultas y controles](queries/2026-10-23-0903.json). SinCRM,envíos,créditos,commit/push ni tareas adicionales.
+
+
+### 24/10/2026 09:06 — Radar diario: Aysén prorrogada y Vitacura en HOLD
+
+Cero nuevas compras calificadas; 52 consultas de descubrimiento (47 semanales, 90,4%) y 20 celdas. Aysén27Oct15:00 y modificaciones23Oct; Mattis dos consultas de Efeonce ya enviadas/cero respuestas, GANA/LOTI cuatro ajenas/cero respuestas. HSP-0051 consolida Réditos conocido; HSP-0052 Vitacura, publicación23Oct22:40, investigación; UChile5485web adicional HOLD. SUBDERE/UChile/UMAG primeros llamados cerrados. LicitaLAB160filas, Wherex30Nueva/4Editando; 30 controles, 52HSP/27lotes/32decisiones preservados. SinCRM/envíos/créditos/commit/push. [Reporte](runs/2026-10-24-0906.md) · [Consultas](queries/2026-10-24-0906.json).
+
+
+### 25/10/2026 08:59 — Radar diario: Talca y FUCOA en investigación
+
+Cero nuevas compras calificadas; HSP-0053 Universidad de Talca y HSP-0054 FUCOA sólo HOLD, ambas con Company existente. Talca publicación23Oct con horas discrepantes/30d vs2meses; FUCOA publicaciónprimaria23Oct, CRM30personas sin ICP corroborado. GANA/LOTI5preguntasajenas/0respuestas; Mattis2propias/0respuestas. UChile5485primerllamadoCerrada; Olivos pausada según auditoría local25Oct, no repetir programación anterior. 56consultasdescubrimiento/47semanales(83,9%),20celdas; LicitaLAB154filas, Wherex30Nueva+4Editando. 34controles:17conevidenciaointentoactual/17heredados,54HSP/27lotes/32decisionespreservados. SinCRM/envíos/créditos/commit/push/tareasnuevas. [Reporte](runs/2026-10-25-0859.md) · [Consultas](queries/2026-10-25-0859.json).
 
 ### 25/10/2026 — UTP Perú: presentación a red de proveedores
 

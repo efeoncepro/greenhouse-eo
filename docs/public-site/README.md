@@ -30,6 +30,8 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 
 ## Índice
 
+- **[Google Cloud — anuncio publicado](../audits/public-site/2026-10-25-google-cloud-partner-private-post.md)** — entrada `252108`, imágenes sin texto, autor Julio, metadatos y sitemap verificados; QA público a 1440/390 y veinte controles en verde. Hero reservado, sin activación en el banner.
+
 - **[Footer completo: Explora, newsletter, empleo y partners](../audits/public-site/2026-10-14-footer-composition-v2.md)** — cuatro columnas, nueve partners de las firmas en gris, QA responsive, accesibilidad y rollback.
 
 - **Reproductor AXIS — adapter preparado, sin activación:** bloque `eo-axis-video` en

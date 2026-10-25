@@ -1,0 +1,223 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "e72a50583737",
+  "key": "e72a505837376c93c0d00f58c827a92933497252c3b57a4b822f6e8e79131829",
+  "status": "completed",
+  "createdAt": "2026-10-22T17:18:42.085Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/final/11a-ola-llega.png",
+    "imageSha256": "8580bf9b6d8d4849861eac01d957a0f03fd777ec2d293e0e8dba19d67041eff6",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/cuadro-inicio/mascara-11a-v2.png",
+    "maskSha256": "fe071ea8d015e32e541d1c55563e6eff579c7d5cba19e3376f1a92e26fc4223d",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/lata/breakr-lata-v1.png",
+        "sha256": "0df65a914b53de2df35fb9b7acfebdccca499250a3e3ecc42111cd1b68b9a180"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "Edit only the marked zone of image 1. This is a single frame from a real-time live-action film at 24 fps, 1/48 s shutter, so fast water is motion-blurred.\n\nThe laptop's screen faces the woman; we see the back of its lid at the bottom centre. The can and the water have just burst OUT OF THAT SCREEN toward her. Show that instant:\n- A thick, glassy jet of water shoots out horizontally from just above the top edge of the laptop lid and travels straight AWAY from the camera, toward the woman's chest, like a bucket of water thrown across the table. It is LOW: it never rises higher than her elbows. It arcs down as it goes and its far end is just hitting the tabletop about one third of the way to her, spreading into a thin fast sheet with a white foaming leading edge. The water body is clear and refracting, with motion-blur streaks pointing from the laptop toward her.\n- The BREAKR can from image 2 flies inside the jet, low over the table, tumbling and tilted toward her, motion-blurred along the same direction; its orange body and teal band stay recognisable. Two or three orange slices fly in the jet.\n- The table between the camera and the laptop, the table to the left and right of the jet, and all the air around her stay completely DRY: no droplets in the air, no spray around her hands, no water near the man.\n- Where the old splash covered her sweater, her raised left hand and the background, restore them: dry cream knit sweater, her open raised hand with five clean fingers and no water on it, the office behind the glass partition, the dark screen on the right wall.\nKeep the woman's face, hair, cup, the man in the navy jacket, the laptop and the warm low morning sunlight exactly as in image 1.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nEdit only the marked zone of image 1. This is a single frame from a real-time live-action film at 24 fps, 1/48 s shutter, so fast water is motion-blurred.\n\nThe laptop's screen faces the woman; we see the back of its lid at the bottom centre. The can and the water have just burst OUT OF THAT SCREEN toward her. Show that instant:\n- A thick, glassy jet of water shoots out horizontally from just above the top edge of the laptop lid and travels straight AWAY from the camera, toward the woman's chest, like a bucket of water thrown across the table. It is LOW: it never rises higher than her elbows. It arcs down as it goes and its far end is just hitting the tabletop about one third of the way to her, spreading into a thin fast sheet with a white foaming leading edge. The water body is clear and refracting, with motion-blur streaks pointing from the laptop toward her.\n- The BREAKR can from image 2 flies inside the jet, low over the table, tumbling and tilted toward her, motion-blurred along the same direction; its orange body and teal band stay recognisable. Two or three orange slices fly in the jet.\n- The table between the camera and the laptop, the table to the left and right of the jet, and all the air around her stay completely DRY: no droplets in the air, no spray around her hands, no water near the man.\n- Where the old splash covered her sweater, her raised left hand and the background, restore them: dry cream knit sweater, her open raised hand with five clean fingers and no water on it, the office behind the glass partition, the dark screen on the right wall.\nKeep the woman's face, hair, cup, the man in the navy jacket, the laptop and the warm low morning sunlight exactly as in image 1.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.35632781982421874,
+    "editable": 415649,
+    "soft": 51397,
+    "protected": 843674
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0906,
+    "basis": "2 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 42.319,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.3,
+        "bestError": 3.3,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -1.91,
+        -2.22,
+        -0.92
+      ],
+      "protected": {
+        "pixels": 843674,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 415649,
+        "maxDelta": 249,
+        "meanDelta": 45.986,
+        "worst": {
+          "x": 602,
+          "y": 755
+        }
+      },
+      "seam": {
+        "pixels": 51397,
+        "maxDelta": 201,
+        "meanDelta": 12.664,
+        "worst": {
+          "x": 962,
+          "y": 666
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 843674,
+        "maxDelta": 203,
+        "meanDelta": 4.358,
+        "worst": {
+          "x": 414,
+          "y": 893
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4637,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 572
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 6147
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 40.663,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.8,
+        "bestError": 3.8,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -4.77,
+        -4.85,
+        -2.78
+      ],
+      "protected": {
+        "pixels": 843674,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 415649,
+        "maxDelta": 252,
+        "meanDelta": 44.21,
+        "worst": {
+          "x": 617,
+          "y": 749
+        }
+      },
+      "seam": {
+        "pixels": 51397,
+        "maxDelta": 212,
+        "meanDelta": 11.974,
+        "worst": {
+          "x": 399,
+          "y": 898
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 843674,
+        "maxDelta": 239,
+        "meanDelta": 5.154,
+        "worst": {
+          "x": 414,
+          "y": 894
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4637,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 572
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 6147
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

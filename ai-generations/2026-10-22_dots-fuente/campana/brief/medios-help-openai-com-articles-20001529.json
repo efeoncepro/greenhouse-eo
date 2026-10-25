@@ -1,0 +1,81 @@
+{
+  "url": "https://help.openai.com/articles/20001529",
+  "dom": {
+    "title": "Preguntas frecuentes sobre la privacidad, la seguridad y las protecciones de los dots | OpenAI Help Center",
+    "iframes": [],
+    "videos": [],
+    "posters": [],
+    "imgs": [
+      {
+        "src": "https://help.openai.com/logo.png",
+        "alt": "OpenAI",
+        "w": 1125
+      },
+      {
+        "src": "https://help.openai.com/favicon.png",
+        "alt": "Logotipo de OpenAI",
+        "w": 512
+      }
+    ],
+    "links": [
+      "https://help.openai.com/es-es",
+      "https://help.openai.com/auth/login?redirectTo=%2Fauth%2Flogin-success%3FreturnTo%3D%252Fes-es%252Farticles%252F20001529-dots-privacy-security-and-safety-faqs",
+      "https://help.openai.com/es-es",
+      "https://help.openai.com/es-es/collections/3742473-chatgpt",
+      "https://help.openai.com/resources/translation-view-redirect?articleId=20001529&routeLanguage=es-es&redirectTo=%2Fen%2Farticles%2F20001529-dots-privacy-security-and-safety-faqs",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#actions-approvals-and-control",
+      "https://help.openai.com/es-es/articles/7039943-how-openai-handles-data-in-consumer-services#authorized-human-access-to-content",
+      "https://help.openai.com/articles/7730893",
+      "https://help.openai.com/es-es/articles/20001530",
+      "https://help.openai.com/es-es/articles/7967234-managing-multi-factor-authentication-mfa?utm_source=chatgpt.com",
+      "https://help.openai.com/es-es/articles/9377311-chatgpt-edu-at-openai",
+      "https://help.openai.com/es-es/articles/20001195-being-someones-trusted-contact",
+      "https://help.openai.com/es-es/articles/20001554-manage-dots-in-chatgpt-workspaces",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#acceso-y-permisos",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#puede-mi-dot-usar-complementos-que-ya-he-configurado-en-chatgpt-chatgpt-work-o-codex",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#d%C3%B3nde-puedo-conceder-nuevos-permisos-o-gestionar-los-existentes",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#c%C3%B3mo-controlo-lo-que-mi-dot-puede-leer-o-cambiar-a-trav%C3%A9s-de-los-complementos",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#puede-mi-dot-acceder-a-mi-c%C3%A1mara-micr%C3%B3fono-o-pantalla",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#est%C3%A1n-disponibles-los-dots-para-usuarios-menores-de-18-a%C3%B1os",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#uso-de-datos-memoria-y-privacidad",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#comparte-mi-dot-la-memoria-con-chatgpt",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#qu%C3%A9-informaci%C3%B3n-conserva-mi-dot-y-c%C3%B3mo-se-protege",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#puedo-ver-corregir-o-eliminar-lo-que-mi-dot-recuerda-sobre-m%C3%AD",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#qu%C3%A9-ocurre-con-mi-informaci%C3%B3n-si-desconecto-un-servicio-vinculado-a-trav%C3%A9s-de-un-complemento",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#qu%C3%A9-ocurre-con-mi-informaci%C3%B3n-si-elimino-mi-dot",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#pueden-las-personas-vinculadas-a-openai-revisar-la-actividad-de-mi-dot-si-he-desactivado-la-mejora-de-los-modelos",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#usa-openai-la-informaci%C3%B3n-de-mi-dot-para-mejorar-sus-modelos-c%C3%B3mo-puedo-desactivar-este-uso",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#c%C3%B3mo-solicito-el-acceso-la-rectificaci%C3%B3n-o-la-supresi%C3%B3n-de-mi-informaci%C3%B3n-personal",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#c%C3%B3mo-recurre-openai-a-los-proveedores-de-servicios",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#acciones-aprobaciones-y-control",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#qu%C3%A9-acciones-requieren-mi-aprobaci%C3%B3n-o-que-tome-el-control",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#qu%C3%A9-puedo-permitir-o-bloquear-con-las-reglas-personalizadas-y-qu%C3%A9-requisitos-de-aprobaci%C3%B3n-o-comprobaciones-de-seguridad-no-se-pueden-anular",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#c%C3%B3mo-puedo-revisar-y-orientar-la-actividad-de-mi-dot",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#puedo-detener-a-mi-dot-corregir-sus-instrucciones-o-deshacer-una-acci%C3%B3n-que-ya-haya-realizado",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#qu%C3%A9-debo-hacer-si-mi-dot-comete-un-error-comparte-informaci%C3%B3n-de-forma-inesperada-o-realiza-una-acci%C3%B3n-que-yo-no-pretend%C3%ADa",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#seguridad-y-protecciones-integradas",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#c%C3%B3mo-puedo-ayudar-a-mantener-segura-mi-cuenta-al-usar-dots",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#qu%C3%A9-comprobaciones-de-seguridad-ayudan-a-evitar-que-mi-dot-comparta-informaci%C3%B3n-privada-o-act%C3%BAe-fuera-de-los-permisos-que-le-he-concedido",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#c%C3%B3mo-se-protege-mi-dot-frente-a-la-inyecci%C3%B3n-de-prompts-el-phishing-y-las-instrucciones-maliciosas",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#contrase%C3%B1as-autenticaci%C3%B3n-y-pagos",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#c%C3%B3mo-gestiona-mi-dot-las-contrase%C3%B1as",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#puede-mi-dot-completar-por-m%C3%AD-las-comprobaciones-de-inicio-de-sesi%C3%B3n-y-de-seguridad",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs#compras-con-tarjetas-guardadas-en-sitios-web-de-comercios"
+    ],
+    "text": "Interrupción del servicio\nHemos identificado un problema que afecta a nuestros servicios y estamos trabajando en una solución. Ver incidente\nLanguage\nespañol\nEspaña\nIniciar sesión\nAll Collections\nChatGPT\nPreguntas frecuentes sobre la privacidad, la seguridad y las protecciones de los dots\nEsta página se tradujo automáticamente. Ver el artículo original en inglés.\nDanos tu opinión sobre esta traducción\nPreguntas frecuentes sobre la privacidad, la seguridad y las protecciones de los dots\n\nDescubre a qué puede acceder tu dot, cómo usa y protege tu información y cuándo necesita tu aprobación.\n\nActualización: hace 16 horas\nAcceso y permisos\n¿Puede mi dot usar complementos que ya he configurado en ChatGPT, ChatGPT Work o Codex?\n\nSí. Los permisos de los complementos se comparten entre los dots, ChatGPT, ChatGPT Work y Codex. Tu dot puede usar tus conexiones existentes dentro de los permisos que hayas concedido.\n\nTu dot incluye una configuración predeterminada sólida que establece qué acciones requieren tu aprobación cada vez, cuáles puedes aprobar de antemano y cuáles puede realizar sin preguntar. Consulta la sección Acciones, aprobaciones y control para obtener más detalles.\n\n¿Dónde puedo conceder nuevos permisos o gestionar los existentes?\n\nPuedes conectar nuevos complementos y gestionar los existentes en la pestaña Complementos de ChatGPT. Estas conexiones se comparten entre los dots, ChatGPT, ChatGPT Work y Codex.\n\nTambién puedes configurar una cuenta de Slack independiente para tu dot, de modo que tenga su propia identidad y acceso en esos servicios. Tu dot puede seguir usando los complementos que ya has conectado a ChatGPT, aunque tenga su propia cuenta de correo electrónico o de Slack.\n\n¿Cómo controlo lo que mi dot puede leer o cambiar a través de los complementos?\n\nPuedes gestionar el acceso a los distintos complementos en la pestaña Complementos de ChatGPT. Tu dot sigue una configuración predeterminada sólida que establece cuándo necesita tu aprobación antes de realizar acciones a través de los complementos.\n\nLas reglas personalizadas te permiten establecer límites adicionales para los dots, como indicarle a tu dot que nunca envíe correos electrónicos. Estas reglas no pueden anular ciertas protecciones integradas ni determinados requisitos de seguridad.\n\nTu dot también puede buscar novedades útiles antes de que le hagas una solicitud. Esto se denomina investigación proactiva. Puede leer información de fuentes conectadas autorizadas y guardar notas privadas, pero sus herramientas de investigación no pueden realizar directamente las siguientes acciones:\n\nEnviar mensajes a otras personas.\n\nCambiar contenido a través de los complementos.\n\nControlar un navegador o un ordenador.\n\nCualquier acción posterior debe cumplir las reglas de actuación y las comprobaciones de seguridad habituales. Esas mismas reglas se aplican a las tareas que ya has autorizado y que continúan en segundo plano.\n\n¿Puede mi dot acceder a mi cámara, micrófono o pantalla?\n\nPara que tu dot pueda acceder a la cámara, el micrófono o la pantalla de tu ordenador, primero debes conectar el ordenador a tu dot. También debes dar permiso a la aplicación de ChatGPT para acceder a tu cámara, micrófono o pantalla en los ajustes de tu dispositivo. \n\n¿Están disponibles los dots para usuarios menores de 18 años?\n\nNo. Los dots aún no están disponibles para usuarios menores de 18 años.\n\nUso de datos, memoria y privacidad\n¿Comparte mi dot la memoria con ChatGPT?\n\nSí. Tu dot puede recibir recuerdos y contexto de conversaciones recientes de ChatGPT, y las conversaciones con tu dot pueden aportar información a la memoria de ChatGPT. La información de Memoria puede seguir compartiéndose entre ChatGPT y tu dot después de la configuración. \n\nAl desactivar Memoria en ChatGPT, se deja de compartir esa información. Esto no elimina la información que tu dot ya haya recibido.\n\n¿Qué información conserva mi dot y cómo se protege?\n\nTu dot puede conservar el contexto de tus conversaciones y complementos mientras lo mantengas. Puedes eliminar el contexto de tu dot eliminando tu dot. Cualquier información que tu dot haya compartido con Memoria de ChatGPT se puede gestionar por separado en los ajustes de Memoria de ChatGPT. \n\nEl contexto de tu dot no conserva credenciales, imágenes ni capturas de pantalla. Los archivos que tu dot crea o usa en otras ubicaciones, como la biblioteca de ChatGPT, tu ordenador o un servicio de almacenamiento conectado, están sujetos a las políticas de conservación de esa ubicación.\n\nOpenAI cifra tu contenido tanto durante su almacenamiento como cuando se transmite entre tú, OpenAI y nuestros proveedores de servicios.\n\n¿Puedo ver, corregir o eliminar lo que mi dot recuerda sobre mí?\n\nPuedes eliminar el contexto de tu dot eliminando tu dot. Actualmente no puedes ver, eliminar ni modificar directamente recuerdos individuales de tu dot, incluidos los detalles específicos que se incorporan a su contexto a través de los complementos.\n\n¿Qué ocurre con mi información si desconecto un servicio vinculado a través de un complemento?\n\nEsto impide nuevos accesos a través de esa conexión. No elimina la información que tu dot ya haya incorporado a su contexto.\n\n¿Qué ocurre con mi información si elimino mi dot?\n\nEliminar tu dot: esto elimina el contexto propio de tu dot.\n\nArchivos y conversaciones: los archivos, los hilos de Codex y las conversaciones de ChatGPT que haya creado tu dot se almacenan por separado. Eliminar tu dot no elimina esos elementos.\n\nRecuerdos de ChatGPT: los recuerdos de tus otras conversaciones de ChatGPT se conservan. Puedes gestionarlos mediante los controles de memoria de ChatGPT.\n\n¿Pueden las personas vinculadas a OpenAI revisar la actividad de mi dot si he desactivado la mejora de los modelos?\n\nSí. Puede haber revisión humana en circunstancias limitadas, incluidos casos relacionados con la seguridad, incluso cuando la mejora de los modelos está desactivada.\n\n¿Usa OpenAI la información de mi dot para mejorar sus model"
+  },
+  "medios": [
+    {
+      "u": "https://help.openai.com/favicon.png",
+      "ct": "image/png",
+      "status": 200,
+      "len": "17151"
+    },
+    {
+      "u": "https://help.openai.com/logo.png",
+      "ct": "image/png",
+      "status": 200,
+      "len": "13508"
+    }
+  ]
+}

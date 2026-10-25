@@ -1,0 +1,23 @@
+{
+  "id": "RC2-recepcion-logo3d",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "larga-exposicion",
+  "escena": "SCENE (the Efeonce reception, Providencia, Santiago, late afternoon): a wide, frontal architectural photograph of a contemporary, premium marketing agency reception, camera on a tripod at chest height, perfectly level, 35mm lens at f/8. On the RIGHT HALF of the frame a tall feature wall of smooth dark charcoal micro-cement fills from floor to ceiling, matte, one continuous surface; high on its centre, clearly ABOVE the heads of the people walking past, the official 3D Efeonce logo from the reference is mounted as dimensional wall signage about 1.6 metres wide: solid matte white letters with a fine bevel, standing a few centimetres off the micro-cement on hidden pins, the ceiling light grazing its top faces and casting a soft, tight contact shadow down onto the wall. The logo is frontal and level, perfectly sharp, the only signage in the whole room; nothing else on that wall. In front of that wall, low and to the right, a long monolithic reception desk in black honed stone with a thin brushed-steel top edge, its surface bare except for one slim current-generation all-in-one display seen from behind, edge-on and dark. The ceiling is a deep black slatted ceiling; one linear cool white-blue light line runs across the ceiling and grazes the top of the charcoal wall, and the rest of the room falls into soft shadow. The LEFT third of the frame is a deep corridor of dark board-formed concrete in shadow, receding, nothing on its surface and no light reaching it. Floor: polished dark grey terrazzo with faint reflections. Cool, contemporary, quiet luxury, nothing warm, amber, orange or golden; no tungsten, no brass lamp, no plants, no books, no magazines, no leather sofa. Within the right half of the frame, several people walk past in front of the desk and dissolve into long translucent streaks of motion, ghosted, faces and bodies blurred into light and nobody recognisable; their trails reflect softly on the terrazzo. The architecture, the desk and the logo stay razor sharp — the one thing that holds while everything moves. Nobody looks at the camera.",
+  "reservas": {
+    "texto": {
+      "muro": "the dark board-formed concrete corridor on the left third of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the edge of a low black honed-stone bench in the immediate foreground, its top edge running unbroken across the lower part of the frame",
+    "tono": "DARK charcoal stone in deep shadow, matte, out of focus, far outside the light"
+  },
+  "objetos": [
+    {
+      "objeto": "logo-efeonce-3d-letrero-blanco",
+      "vista": "frente"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "PT1b-mesa-convergencia-sangre",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "cenital",
+  "atmosfera": "bruma",
+  "haz": "the glow of the screens and of the luminous fibres is the only light: a soft cool cyan-white bloom rises from the centre of the ring and fades into the dark around it",
+  "escena": "SCENE (the Efeonce studio at night, one large work table seen from straight above): a wide table of matte black linoleum fills the whole frame. NINE current-generation devices lie face-up in a tight ring that occupies ONLY THE RIGHT HALF of the frame: the centre of the ring sits at about 72% of the frame width and halfway down, and no device reaches further left than 50% of the frame width. The devices lie in that ring, each one a different kind of work, all with dark-themed screens that are illegible from this height: a slim aluminium unibody laptop showing a dark sales pipeline board of columns; a thin tablet showing a cloud console of small server tiles; a flagship phone with minimal bezels showing a chat conversation with an assistant; a frameless monitor laid flat showing a video editing timeline; a tablet showing a design canvas with layered shapes; a second laptop showing a data dashboard with one bright azure (#0375DB) line chart; a small tablet showing a spreadsheet of a media plan; a phone showing a calendar; a slim keyboard and trackpad pair. From EACH device one single thin cable of glowing cool white-cyan fibre-optic light runs across the black table towards the centre of the ring, the nine glowing lines converging like spokes on one small round matte navy hub. Two hands enter from the bottom edge of the frame, sleeves of a plain dark navy knit, and plug the ninth glowing cable into the hub: the exact moment everything connects, the hub's thin ring of light just turning on. The LEFT HALF of the frame is empty matte black linoleum in deep shadow: nothing on it, no device, no cable, no glow reaching it — a calm dark field. Clean, premium, contemporary: no clutter, no coffee, no plants, no books, no paper, no old hardware, no third-party logos on any device. Nothing warm, amber, orange or golden.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty matte black table on the left half of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the out-of-focus edge of a dark felt desk mat along the bottom of the frame, far from the glow",
+    "tono": "DARK charcoal felt in deep shadow, matte, outside every light"
+  }
+}

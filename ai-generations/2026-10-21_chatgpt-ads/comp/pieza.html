@@ -1,0 +1,201 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Bric;src:url(BricolageGrotesque-Variable.ttf);font-weight:200 800;font-stretch:75% 100%}
+@font-face{font-family:Pop;src:url(Poppins-400.ttf);font-weight:400}
+@font-face{font-family:Pop;src:url(Poppins-500.ttf);font-weight:500}
+@font-face{font-family:Pop;src:url(Poppins-600.ttf);font-weight:600}
+@font-face{font-family:Pop;src:url(Poppins-700.ttf);font-weight:700}
+*{box-sizing:border-box;font-synthesis:none}
+html,body{margin:0;background:#000}
+#root{position:relative;width:1080px;overflow:hidden;background:#dfe7ff}
+#bg{position:absolute;inset:-200px}
+.blob{position:absolute;border-radius:50%;filter:blur(110px);will-change:transform}
+#grain{position:absolute;inset:0;pointer-events:none;opacity:.10;mix-blend-mode:overlay;background-repeat:repeat}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#stage{position:absolute;left:0;width:1080px;height:1350px;transform-origin:0 0}
+.abs{position:absolute}
+.eyebrow{font-family:Pop;font-weight:600;font-size:28px;letter-spacing:.18em;text-transform:uppercase}
+.h{font-family:Bric;font-weight:760;letter-spacing:-.025em;line-height:.98;color:#fff}
+/* chat */
+#chat{left:90px;width:900px;height:760px;border-radius:44px;background:rgba(250,250,252,.94);box-shadow:0 40px 120px rgba(20,30,90,.18);overflow:hidden}
+#chat .bar{position:absolute;left:0;right:0;top:0;height:76px;display:flex;align-items:center;padding:0 34px;font-family:Pop;font-weight:500;font-size:24px;color:#2b2b33;border-bottom:1px solid rgba(0,0,0,.06)}
+#ubub{position:absolute;right:34px;top:110px;max-width:600px;background:#ececf1;border-radius:30px;padding:20px 28px;font-family:Pop;font-size:27px;line-height:1.35;color:#16161d;opacity:0}
+#ans{position:absolute;left:40px;right:48px;top:250px;font-family:Pop;font-size:25px;line-height:1.5;color:#2a2a33}
+#ad{position:absolute;left:40px;right:40px;top:470px;height:150px;border-radius:26px;background:#fff;border:1px solid rgba(0,0,0,.08);box-shadow:0 18px 50px rgba(20,30,90,.14);display:flex;align-items:center;gap:24px;padding:0 28px;opacity:0;transform-origin:50% 50%}
+#ad .lbl{position:absolute;left:28px;top:-40px;font-family:Pop;font-weight:500;font-size:20px;color:#6b6b78}
+#ad .av{width:92px;height:92px;border-radius:22px;background:linear-gradient(135deg,#0375db,#7b5cff);display:flex;align-items:center;justify-content:center;font-family:Bric;font-weight:760;font-size:38px;color:#fff;flex:none}
+#ad .tx{flex:1;font-family:Pop}
+#ad .t1{font-weight:600;font-size:28px;color:#16161d}
+#ad .t2{font-size:22px;color:#5d5d6a;margin-top:4px}
+#ad .cta{flex:none;font-family:Pop;font-weight:600;font-size:22px;color:#fff;background:#16161d;border-radius:999px;padding:14px 26px}
+#comp{position:absolute;left:30px;right:30px;bottom:26px;height:92px;border-radius:999px;background:#fff;border:1px solid rgba(0,0,0,.10);box-shadow:0 8px 30px rgba(20,30,90,.08);display:flex;align-items:center;padding:0 16px 0 34px;font-family:Pop;font-size:27px;color:#16161d}
+#comp .ph{color:#8e8ea0}
+#comp .caret{display:inline-block;width:2px;height:32px;background:#16161d;vertical-align:-6px;margin-left:2px}
+#send{width:60px;height:60px;border-radius:50%;background:#16161d;display:flex;align-items:center;justify-content:center;flex:none}
+#cursor{width:54px;height:54px;opacity:0}
+/* pipeline */
+#pipe{left:70px;width:940px;height:520px;display:flex;gap:22px;opacity:0}
+.col{flex:1;border-radius:30px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.4);padding:22px;position:relative}
+.col .ct{font-family:Pop;font-weight:600;font-size:26px;color:#fff;letter-spacing:.01em}
+.ghost{height:96px;border-radius:20px;background:rgba(255,255,255,.18);margin-top:18px}
+#deal{position:absolute;width:276px;height:150px;border-radius:22px;background:#fff;box-shadow:0 20px 50px rgba(120,30,10,.28);padding:20px 22px;font-family:Pop;opacity:0}
+#deal .d1{font-weight:600;font-size:24px;color:#16161d}
+#deal .d2{font-size:19px;color:#5d5d6a;margin-top:6px}
+#deal .tag{display:inline-block;margin-top:12px;font-weight:600;font-size:17px;color:#b4380f;background:#ffe6dc;border-radius:999px;padding:5px 12px}
+#won{position:absolute;right:18px;top:16px;width:44px;height:44px;border-radius:50%;background:#00a86b;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(0)}
+#word{left:0;width:1080px;text-align:center;font-family:Bric;font-weight:780;letter-spacing:-.035em;color:#fff}
+#lk{left:0;width:1080px;display:flex;align-items:center;justify-content:center;gap:40px;opacity:0}
+</style></head><body><div id="root">
+<div id="bg"><div class="blob" id="b0"></div><div class="blob" id="b1"></div><div class="blob" id="b2"></div><div class="blob" id="b3"></div></div>
+<div id="grain"></div>
+<div id="stage">
+  <div class="abs eyebrow" id="eb" style="left:0;width:1080px;text-align:center;top:150px;color:#1c2a6b">ChatGPT Ads · ahora en Chile</div>
+  <div class="abs h" id="h1" style="left:90px;width:900px;top:118px;font-size:122px;opacity:0"><span>Tu&nbsp;cliente</span><br><span>decide&nbsp;aquí.</span></div>
+  <div class="abs" id="chat">
+    <div class="bar"><img src="chatgpt-logo-negro.svg" style="height:34px"></div>
+    <div id="ubub"></div>
+    <div id="ans"></div>
+    <div id="ad"><div class="lbl">Patrocinado</div><div class="av">TM</div><div class="tx"><div class="t1">Tu marca</div><div class="t2">Facturación electrónica para pymes</div></div><div class="cta">Ver más</div></div>
+    <div id="comp"><svg width="30" height="30" viewBox="0 0 24 24" style="flex:none;margin-right:18px"><path d="M12 5v14M5 12h14" stroke="#16161d" stroke-width="2" stroke-linecap="round"/></svg><span id="ctext"><span class="ph">Pregúntale a ChatGPT</span></span><svg width="30" height="30" viewBox="0 0 24 24" style="margin-left:auto;margin-right:18px;flex:none"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="#16161d" stroke-width="1.9"/><path d="M5.5 11a6.5 6.5 0 0013 0M12 17.5V21" fill="none" stroke="#16161d" stroke-width="1.9" stroke-linecap="round"/></svg><div id="send"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+  </div>
+  <svg class="abs" id="cursor" viewBox="0 0 24 24"><path d="M4 2l15 11-6.5 1.2L16 21l-3 1.4-3.4-6.9L4 20z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>
+  <!-- escena HubSpot -->
+  <div class="abs h" id="h2" style="left:90px;width:900px;top:118px;font-size:104px;opacity:0">Y lo medimos<br>hasta la venta.</div>
+  <div class="abs" id="hsrow" style="left:90px;top:372px;display:flex;align-items:center;gap:18px;opacity:0"><span style="font-family:Pop;font-weight:500;font-size:34px;color:#fff">en</span><img src="hubspot-logotype.svg" style="height:50px;filter:brightness(0) invert(1)"></div>
+  <div class="abs" id="pipe" style="top:500px">
+    <div class="col"><div class="ct">[Contacto]</div><div class="ghost"></div><div class="ghost" style="opacity:.6"></div></div>
+    <div class="col"><div class="ct">[Oportunidad]</div><div class="ghost"></div></div>
+    <div class="col"><div class="ct">[Ganado]</div><div class="ghost" style="opacity:.5"></div></div>
+    <div id="deal"><div class="d1">Tu marca</div><div class="d2">Lead desde un anuncio</div><span class="tag">Fuente: ChatGPT Ads</span><img src="iso-hubspot.svg" style="position:absolute;right:20px;bottom:18px;height:26px"><div id="won"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+  </div>
+  <div class="abs" id="sub2" style="left:90px;width:900px;top:1072px;font-family:Pop;font-weight:500;font-size:32px;line-height:1.35;color:#fff;opacity:0">HubSpot, el primer CRM integrado con ChatGPT&nbsp;Ads.</div>
+  <!-- escena canales -->
+  <div class="abs eyebrow" id="eb3" style="left:0;width:1080px;text-align:center;top:470px;color:#fff;opacity:0">Compramos medios en</div>
+  <div class="abs" id="word" style="top:540px;font-size:190px;line-height:1.1;opacity:0"></div><div class="abs" id="tile" style="left:390px;top:560px;width:300px;height:300px;border-radius:76px;background:#fff;box-shadow:0 30px 80px rgba(0,0,30,.25);display:flex;align-items:center;justify-content:center;opacity:0"><img id="ti-google" src="iso-google.svg" style="position:absolute;width:176px;height:176px;object-fit:contain;opacity:0"><img id="ti-meta" src="iso-meta.svg" style="position:absolute;width:176px;height:176px;object-fit:contain;opacity:0"><img id="ti-tiktok" src="iso-tiktok.svg" style="position:absolute;width:176px;height:176px;object-fit:contain;opacity:0"><img id="ti-linkedin" src="iso-linkedin.svg" style="position:absolute;width:176px;height:176px;object-fit:contain;opacity:0"></div><img class="abs" id="gptlogo" src="chatgpt-logo-blanco.svg" style="left:140px;top:600px;width:800px;opacity:0">
+  <!-- cierre -->
+  <div class="abs h" id="h4" style="left:90px;width:900px;top:300px;font-size:112px;text-align:center;opacity:0">Compramos medios donde tu cliente decide.</div>
+  <div class="abs" id="sub4" style="left:0;width:1080px;top:690px;text-align:center;font-family:Pop;font-weight:500;font-size:34px;color:#fff;opacity:0">Performance Marketing · ahora también en ChatGPT</div>
+  <div class="abs" id="lk" style="top:1010px"><img src="efeonce-negativo.svg" style="width:300px"><span style="width:2px;height:74px;background:rgba(255,255,255,.55)"></span><img src="openai-blanco.svg" style="height:80px"></div>
+  <div class="abs" id="gold" style="left:0;width:1080px;top:1130px;display:flex;align-items:center;justify-content:center;gap:14px;opacity:0"><img src="hubspot-logotype.svg" style="height:30px;filter:brightness(0) invert(1)"><span class="eyebrow" style="font-size:20px;color:rgba(255,255,255,.88)">Gold Solutions Partner</span></div>
+</div>
+<div id="flash"></div>
+</div>
+<script>
+const H=+(new URLSearchParams(location.search).get('h')||1350)
+const root=document.getElementById('root');root.style.height=H+'px'
+const OFF=(H-1350)/2;document.getElementById('stage').style.top=OFF+'px'
+const $=id=>document.getElementById(id)
+const ST=H>1350
+if(ST){const mv=(ids,d)=>ids.forEach(i=>{const e=$(i);e.style.top=(parseFloat(e.style.top)+d)+'px'});mv(['eb','h1','h2','hsrow'],-130);mv(['pipe','sub2'],110);mv(['h4','sub4'],-80);mv(['lk','gold'],190);mv(['eb3','word'],0)}
+const CH_OFF=ST?110:0
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t
+const eo=t=>1-Math.pow(1-t,3),eio=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2
+const back=t=>{const c=1.9;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}
+const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),mix=(a,b,t)=>{const A=hex(a),B=hex(b);return 'rgb('+A.map((v,i)=>Math.round(lerp(v,B[i],t))).join(',')+')'}
+// paletas: base + 4 manchas
+const PAL={
+ pastel:['#dfe4ff','#c8b5ff','#8fc6ff','#f7b3e3','#a9d8ff'],
+ azul:['#1f45f0','#3b78ff','#5a2cff','#1aa0ff','#0b2fd1'],
+ coral:['#a82c0c','#c23e16','#b8264a','#c94e1c','#962509'],
+ c1:['#0b6e66','#12a08f','#0a5c8f','#1fbf9a','#08525a'],
+ c2:['#c2410c','#f0a020','#1d5fd6','#ff7a1a','#a3360a'],
+ c3:['#5b2fd6','#8a5cff','#c03ab0','#3a2bd0','#3d1fa8'],
+ c4:['#0c63c9','#22a6e8','#0b3fa8','#3fc0f0','#0a4aa0'],
+ c5:['#c2185b','#ff4f7b','#7b2bd6','#ff6a3d','#9c1450'],
+ gpt:['#0f2fd8','#3b78ff','#7b4dff','#18a8ff','#0a24b0'],
+ eo:['#03306c','#0366c2','#022a4e','#0b5bb8','#04437f']}
+const POS=[[0.15,0.2,1.0],[0.85,0.25,0.9],[0.3,0.85,1.05],[0.8,0.8,0.85]]
+function palAt(t){
+ if(t<3)return['pastel','pastel',0]
+ if(t<5)return['azul','azul',0]
+ if(t<7)return['coral','coral',0]
+ const seq=['c1','c2','c3','c4','c5'];if(t<8.5){const i=Math.min(4,Math.floor((t-7)/0.25));return[seq[i],seq[i],0]}
+ if(t<9.5)return['gpt','gpt',0]
+ if(t<10.1)return['gpt','eo',eio(clamp((t-9.5)/0.6))]
+ return['eo','eo',0]}
+function setBg(t){const [a,b,k]=palAt(t);const A=PAL[a],B=PAL[b];root.style.background=mix(A[0],B[0],k)
+ for(let i=0;i<4;i++){const e=$('b'+i),[px,py,s]=POS[i],W=1480,Hh=H+400
+  const dx=Math.sin(t*0.9+i*1.7)*90,dy=Math.cos(t*0.7+i*2.3)*80,sz=900*s*(1+0.08*Math.sin(t*1.3+i))
+  e.style.width=e.style.height=sz+'px';e.style.left=(px*W-sz/2+dx)+'px';e.style.top=(py*Hh-sz/2+dy)+'px';e.style.background=mix(A[i+1],B[i+1],k)}}
+// grano determinista
+const gc=document.createElement('canvas');gc.width=gc.height=256;const gx=gc.getContext('2d'),gi=gx.createImageData(256,256);let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647
+for(let i=0;i<gi.data.length;i+=4){const v=rnd()*255;gi.data[i]=gi.data[i+1]=gi.data[i+2]=v;gi.data[i+3]=255}gx.putImageData(gi,0,0);$('grain').style.backgroundImage='url('+gc.toDataURL()+')'
+const PROMPT='¿Qué software de facturación le conviene a mi pyme?'
+const ANS='Para una pyme que está creciendo, conviene un software que emita facturas y boletas electrónicas, se conecte con tu banco y te muestre en tiempo real cuánto te deben. Estas son algunas opciones:'
+const AW=ANS.split(' ')
+const CH=['Google','Meta','TikTok','LinkedIn','Programática']
+function show(id,o,ty=0,sc=1){const e=$(id);e.style.opacity=o;e.style.transform=`translateY(${ty}px) scale(${sc})`}
+window.setT=function(t){
+ setBg(t);$('grain').style.backgroundPosition=`${Math.floor(t*24)*37%256}px ${Math.floor(t*24)*91%256}px`
+ // flash en golpes
+ let fl=0;for(const g of [3.0,5.0,8.5]){const d=t-g;if(d>=0&&d<0.25)fl=Math.max(fl,0.85*(1-d/0.25))}
+ const pre=t-4.75;if(pre>0&&pre<0.25)fl=Math.max(fl,pre/0.25*0.95)
+ $('flash').style.opacity=fl
+ // cámara del stage (sacudida + zoom al anuncio)
+ let sc=1,ox=0,oy=0,sh=0
+ for(const g of [3.0,5.0,8.5]){const d=t-g;if(d>=0&&d<0.2)sh=Math.max(sh,(1-d/0.2)*14)}
+ const sx=sh*Math.sin(t*173),sy=sh*Math.cos(t*151)
+ // ===== Escena A: chat (0-5)
+ const A=t<5
+ $('chat').style.display=A?'block':'none';$('eb').style.opacity=t<3?clamp(t/0.3):0
+ if(A){
+  const lift=t<3?0:eo(clamp((t-3)/0.35))
+  const chatTop=lerp(300,470,lift)+(t<3?0:CH_OFF*lift)
+  const chatScale=t<3?lerp(0.94,1,eo(clamp(t/0.5))):1
+  $('chat').style.top=chatTop+'px';$('chat').style.transform=`scale(${chatScale})`;$('chat').style.opacity=clamp(t/0.25)
+  // tipeo
+  const typed=t<0.3?0:Math.min(PROMPT.length,Math.floor((t-0.3)/1.3*PROMPT.length))
+  const sent=t>=1.65
+  $('ctext').innerHTML=sent?'<span class="ph">Pregúntale a ChatGPT</span>':(typed?PROMPT.slice(0,typed)+'<span class="caret"></span>':'<span class="ph">Pregúntale a ChatGPT</span>')
+  const ub=$('ubub');ub.textContent=PROMPT;const us=clamp((t-1.65)/0.25);ub.style.opacity=us;ub.style.transform=`translateY(${40*(1-eo(us))}px)`
+  const nw=t<1.8?0:Math.min(AW.length,Math.floor((t-1.8)/0.75*AW.length));$('ans').textContent=AW.slice(0,nw).join(' ')
+  const ad=$('ad'),ap=clamp((t-3)/0.28);ad.style.opacity=t>=3?1:0;ad.style.transform=`translateY(${-60*(1-ap)}px) scale(${t>=3?lerp(1.18,1,back(ap)):1})`
+  const cl=t-4.0;ad.querySelector('.cta').style.transform=`scale(${cl>0&&cl<0.18?0.9:1})`
+  // titular
+  const h=$('h1'),sp=h.children;h.style.opacity=t>=3?1:0
+  ;[3.0,3.25].forEach((g,i)=>{const p=clamp((t-g)/0.22);const el=sp[i===0?0:2];el.style.display='inline-block';el.style.opacity=t>=g?1:0;el.style.transform=`translateY(${-50*(1-eo(p))}px) scale(${lerp(1.25,1,eo(p))})`})
+  // cursor
+  const c=$('cursor');const cp=clamp((t-3.45)/0.5);c.style.opacity=t>3.4?1:0
+  const tx=lerp(1000,90+40+900-40-28-80,eio(cp)),ty=lerp(1300,470+CH_OFF+470+75+20,eio(cp));const csc=cl>0&&cl<0.15?0.85:1
+  c.style.left=tx+'px';c.style.top=ty+'px';c.style.transform=`scale(${csc})`
+  // zoom al anuncio 4.2-5.0
+  const z=clamp((t-4.2)/0.8);if(z>0){sc=Math.pow(9,eio(z)*1);const fx=540,fy=470+CH_OFF+470+75;ox=fx-fx*sc;oy=fy-fy*sc}
+ } else {$('cursor').style.opacity=0;$('h1').style.opacity=0}
+ // ===== Escena B: HubSpot (5-7)
+ const B=t>=5&&t<7.0
+ for(const id of ['h2','hsrow','pipe','sub2'])$(id).style.visibility=B?'visible':'hidden'
+ if(B){const k=t-5;const zp=clamp(k/0.3);sc*=lerp(1.08,1,eo(zp));ox=540-540*sc;oy=675-675*sc
+  show('h2',1,-40*(1-eo(clamp(k/0.25))));show('hsrow',clamp((k-0.2)/0.25),20*(1-eo(clamp((k-0.2)/0.25))));show('pipe',clamp(k/0.2),30*(1-eo(clamp(k/0.3))))
+  show('sub2',clamp((k-0.5)/0.3),16*(1-eo(clamp((k-0.5)/0.3))))
+  const d=$('deal');d.style.opacity=clamp((k-0.15)/0.15)
+  const cols=[22,22+320+22-22+0,0].map((_,i)=>22+i*(940-44)/3+i*22/1.5)
+  const colX=i=>i*((940+22)/3)+22-3, step=[0.5,1.0,1.5]
+  let pos=0;for(let i=0;i<2;i++){const p=clamp((k-step[i]+0.12)/0.12);pos+=eio(p)}
+  const yb=80+Math.sin(clamp((k-1.38)/0.25)*Math.PI)*-18
+  d.style.left=lerp(colX(0),colX(2),pos/2)+'px';d.style.top=yb+'px';d.style.transform=`rotate(${(pos%1>0&&pos%1<1)?-3:0}deg)`
+  const w=clamp((k-1.5)/0.18);$('won').style.opacity=w;$('won').style.transform=`scale(${back(w)})`}
+ // ===== Escena C: canales (7-9.5)
+ const C=t>=7&&t<9.5
+ for(const id of ['eb3','word','tile','gptlogo'])$(id).style.visibility=C?'visible':'hidden'
+ if(C){const k=t-7;$('eb3').style.opacity=t<8.5?clamp(k/0.15):clamp((t-8.5)/0.1)
+  const w=$('word'),tl=$('tile'),gl=$('gptlogo');let txt,g
+  if(t<8.25){const i=Math.min(4,Math.floor(k/0.25));txt=CH[i];g=7+i*0.25}else if(t<8.5){txt=CH[4];g=8.0}else{txt='ChatGPT';g=8.5}
+  const p=clamp((t-g)/0.16),ISO={Google:'google',Meta:'meta',TikTok:'tiktok',LinkedIn:'linkedin'}
+  w.style.opacity=0;tl.style.opacity=0;gl.style.opacity=0
+  for(const k of ['google','meta','tiktok','linkedin'])$('ti-'+k).style.opacity=ISO[txt]===k?1:0
+  if(ISO[txt]){tl.style.opacity=1;tl.style.transform=`scale(${lerp(1.35,1,eo(p))}) rotate(${lerp(-8,0,eo(p))}deg)`}
+  else if(txt==='ChatGPT'){gl.style.opacity=1;gl.style.transform=`scale(${lerp(1.5,1,eo(p))})`}
+  else{w.textContent=txt;w.style.opacity=1;w.style.fontSize='140px';w.style.transform=`scale(${lerp(1.3,1,eo(p))})`}
+  $('eb3').textContent=t<8.5?'Compramos medios en':'Y ahora también en'}
+ // ===== Escena D: cierre (9.5-12)
+ const D=t>=9.5
+ for(const id of ['h4','sub4','lk','gold'])$(id).style.visibility=D?'visible':'hidden'
+ if(D){const k=t-9.5;show('h4',clamp(k/0.3),30*(1-eo(clamp(k/0.4))));show('sub4',clamp((k-0.3)/0.3),14*(1-eo(clamp((k-0.3)/0.3))))
+  const l=clamp((k-0.5)/0.4);$('lk').style.opacity=clamp((k-0.5)/0.3);$('lk').style.transform=`scale(${lerp(1.1,1,eo(l))})`
+  show('gold',clamp((k-0.85)/0.3),10*(1-eo(clamp((k-0.85)/0.3))))
+  // deriva lenta, nunca quieta
+  const dr=1+0.025*(k/2.5);sc*=dr;ox=540-540*sc;oy=675-675*sc}
+ $('stage').style.transform=`translate(${ox+sx}px,${oy+sy}px) scale(${sc})`
+}
+setT(0)
+</script></body></html>

@@ -78,6 +78,21 @@ o duplicar correos para resolverlo. Para los demás envíos conserva la
 
 ## Ejecutar en HubSpot
 
+### Plantilla y contenido de una inscripción son estados distintos
+
+La [lectura nativa del 25/10/2026](../../../../docs/commercial/analyses/2026-10-prospeccion/REVISION-HUBSPOT-2026-10-25.md)
+verificó el aviso del editor: cambiar la secuencia no afecta a contactos ya inscritos. Para corregir
+próximos envíos, leer y editar dentro del mandato **cada inscripción y sus pasos futuros**, además de
+alinear la plantilla para usos posteriores. No reenrolar ni duplicar una secuencia para forzar el cambio.
+Verificar asunto/cuerpo, documentos, firma, calendario y paradas en la inscripción efectiva después de
+guardar; una plantilla correcta no acredita el correo individual. Si el editor individual queda vacío,
+conservar el bloqueo de ese readback: la plantilla base no certifica sus personalizaciones.
+
+Una pausa por créditos del Prospecting Agent no demuestra pausa de Sales Sequences. Consultar su cola
+independiente y distinguir histórico inscrito, persona única, en curso, programado, error y finalizado.
+
+### Recorrido autorizado
+
 1. Buscar secuencias/inscripciones existentes y resolver duplicados antes de crear. Preparar mapa
    persona → textos → documentos → calendario → parada con la [plantilla de cadencia](../templates/account-cadence.md).
 2. Crear desde cero con correos automatizados, o clonar una estructura ya revisada dentro del lote

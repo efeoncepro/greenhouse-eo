@@ -11,6 +11,11 @@ Canon: [skill](../../../.codex/skills/efeonce-b2b-prospecting/SKILL.md),
 
 ## Antes de empezar
 
+Para cualquier nueva apertura, respuesta inbound, reactivación o seguimiento comercial, aplicar
+[conversaciones útiles](../../../.codex/skills/efeonce-b2b-prospecting/references/conversation-quality-and-review.md).
+La [implementación de octubre](../../commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md)
+distingue método local aplicado, cambios nativos preparados y evaluación de pauta; no autoriza envíos.
+
 Definir cuenta/persona/señal o micro-ICP, mercado, servicio, historia y resultado pedido. Identificar las
 acciones autorizadas y presupuesto si hay créditos. Una aprobación anterior cubre exactamente su alcance;
 no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/radar no aprueba lotes futuros.

@@ -1,0 +1,290 @@
+[
+  {
+    "hero": "Felipe",
+    "id": "blue_beret",
+    "reaction": "saludo",
+    "result": 0,
+    "files": [
+      "dots-felipe-saludo-01.png",
+      "dots-felipe-saludo-02.png",
+      "dots-felipe-saludo-03.png",
+      "dots-felipe-saludo-04.png",
+      "dots-felipe-saludo-05.png",
+      "dots-felipe-saludo-06.png",
+      "dots-felipe-saludo-07.png",
+      "dots-felipe-saludo-08.png",
+      "dots-felipe-saludo-09.png",
+      "dots-felipe-saludo-10.png"
+    ]
+  },
+  {
+    "hero": "Felipe",
+    "id": "blue_beret",
+    "reaction": "firma",
+    "result": 0,
+    "files": [
+      "dots-felipe-firma-01.png",
+      "dots-felipe-firma-02.png",
+      "dots-felipe-firma-03.png",
+      "dots-felipe-firma-04.png",
+      "dots-felipe-firma-05.png",
+      "dots-felipe-firma-06.png",
+      "dots-felipe-firma-07.png",
+      "dots-felipe-firma-08.png",
+      "dots-felipe-firma-09.png",
+      "dots-felipe-firma-10.png"
+    ]
+  },
+  {
+    "hero": "Alfred",
+    "id": "alfred",
+    "reaction": "saludo",
+    "result": 0,
+    "files": [
+      "dots-alfred-saludo-01.png",
+      "dots-alfred-saludo-02.png",
+      "dots-alfred-saludo-03.png",
+      "dots-alfred-saludo-04.png",
+      "dots-alfred-saludo-05.png",
+      "dots-alfred-saludo-06.png",
+      "dots-alfred-saludo-07.png",
+      "dots-alfred-saludo-08.png",
+      "dots-alfred-saludo-09.png",
+      "dots-alfred-saludo-10.png"
+    ]
+  },
+  {
+    "hero": "Alfred",
+    "id": "alfred",
+    "reaction": "firma",
+    "result": 0,
+    "files": [
+      "dots-alfred-firma-01.png",
+      "dots-alfred-firma-02.png",
+      "dots-alfred-firma-03.png",
+      "dots-alfred-firma-04.png",
+      "dots-alfred-firma-05.png",
+      "dots-alfred-firma-06.png",
+      "dots-alfred-firma-07.png",
+      "dots-alfred-firma-08.png",
+      "dots-alfred-firma-09.png",
+      "dots-alfred-firma-10.png"
+    ]
+  },
+  {
+    "hero": "Jojo",
+    "id": "purple_heart",
+    "reaction": "saludo",
+    "result": 0,
+    "files": [
+      "dots-jojo-saludo-01.png",
+      "dots-jojo-saludo-02.png",
+      "dots-jojo-saludo-03.png",
+      "dots-jojo-saludo-04.png",
+      "dots-jojo-saludo-05.png",
+      "dots-jojo-saludo-06.png",
+      "dots-jojo-saludo-07.png",
+      "dots-jojo-saludo-08.png",
+      "dots-jojo-saludo-09.png",
+      "dots-jojo-saludo-10.png"
+    ]
+  },
+  {
+    "hero": "Jojo",
+    "id": "purple_heart",
+    "reaction": "firma",
+    "result": 0,
+    "files": [
+      "dots-jojo-firma-01.png",
+      "dots-jojo-firma-02.png",
+      "dots-jojo-firma-03.png",
+      "dots-jojo-firma-04.png",
+      "dots-jojo-firma-05.png",
+      "dots-jojo-firma-06.png",
+      "dots-jojo-firma-07.png",
+      "dots-jojo-firma-08.png",
+      "dots-jojo-firma-09.png",
+      "dots-jojo-firma-10.png"
+    ]
+  },
+  {
+    "hero": "Todd",
+    "id": "lime_frog",
+    "reaction": "saludo",
+    "result": 0,
+    "files": [
+      "dots-todd-saludo-01.png",
+      "dots-todd-saludo-02.png",
+      "dots-todd-saludo-03.png",
+      "dots-todd-saludo-04.png",
+      "dots-todd-saludo-05.png",
+      "dots-todd-saludo-06.png",
+      "dots-todd-saludo-07.png",
+      "dots-todd-saludo-08.png",
+      "dots-todd-saludo-09.png",
+      "dots-todd-saludo-10.png"
+    ]
+  },
+  {
+    "hero": "Todd",
+    "id": "lime_frog",
+    "reaction": "firma",
+    "result": 0,
+    "files": [
+      "dots-todd-firma-01.png",
+      "dots-todd-firma-02.png",
+      "dots-todd-firma-03.png",
+      "dots-todd-firma-04.png",
+      "dots-todd-firma-05.png",
+      "dots-todd-firma-06.png",
+      "dots-todd-firma-07.png",
+      "dots-todd-firma-08.png",
+      "dots-todd-firma-09.png",
+      "dots-todd-firma-10.png"
+    ]
+  },
+  {
+    "hero": "Iris",
+    "id": "coral_monocle",
+    "reaction": "saludo",
+    "result": 0,
+    "files": [
+      "dots-iris-saludo-01.png",
+      "dots-iris-saludo-02.png",
+      "dots-iris-saludo-03.png",
+      "dots-iris-saludo-04.png",
+      "dots-iris-saludo-05.png",
+      "dots-iris-saludo-06.png",
+      "dots-iris-saludo-07.png",
+      "dots-iris-saludo-08.png",
+      "dots-iris-saludo-09.png",
+      "dots-iris-saludo-10.png"
+    ]
+  },
+  {
+    "hero": "Iris",
+    "id": "coral_monocle",
+    "reaction": "firma",
+    "result": 0,
+    "files": [
+      "dots-iris-firma-01.png",
+      "dots-iris-firma-02.png",
+      "dots-iris-firma-03.png",
+      "dots-iris-firma-04.png",
+      "dots-iris-firma-05.png",
+      "dots-iris-firma-06.png",
+      "dots-iris-firma-07.png",
+      "dots-iris-firma-08.png",
+      "dots-iris-firma-09.png",
+      "dots-iris-firma-10.png"
+    ]
+  },
+  {
+    "hero": "Thelma",
+    "id": "gus",
+    "reaction": "saludo",
+    "result": 0,
+    "files": [
+      "dots-thelma-saludo-01.png",
+      "dots-thelma-saludo-02.png",
+      "dots-thelma-saludo-03.png",
+      "dots-thelma-saludo-04.png",
+      "dots-thelma-saludo-05.png",
+      "dots-thelma-saludo-06.png",
+      "dots-thelma-saludo-07.png",
+      "dots-thelma-saludo-08.png",
+      "dots-thelma-saludo-09.png",
+      "dots-thelma-saludo-10.png"
+    ]
+  },
+  {
+    "hero": "Thelma",
+    "id": "gus",
+    "reaction": "firma",
+    "result": 0,
+    "files": [
+      "dots-thelma-firma-01.png",
+      "dots-thelma-firma-02.png",
+      "dots-thelma-firma-03.png",
+      "dots-thelma-firma-04.png",
+      "dots-thelma-firma-05.png",
+      "dots-thelma-firma-06.png",
+      "dots-thelma-firma-07.png",
+      "dots-thelma-firma-08.png",
+      "dots-thelma-firma-09.png",
+      "dots-thelma-firma-10.png"
+    ]
+  },
+  {
+    "hero": "Josh",
+    "id": "blue_spectacles",
+    "reaction": "saludo",
+    "result": 0,
+    "files": [
+      "dots-josh-saludo-01.png",
+      "dots-josh-saludo-02.png",
+      "dots-josh-saludo-03.png",
+      "dots-josh-saludo-04.png",
+      "dots-josh-saludo-05.png",
+      "dots-josh-saludo-06.png",
+      "dots-josh-saludo-07.png",
+      "dots-josh-saludo-08.png",
+      "dots-josh-saludo-09.png",
+      "dots-josh-saludo-10.png"
+    ]
+  },
+  {
+    "hero": "Josh",
+    "id": "blue_spectacles",
+    "reaction": "firma",
+    "result": 0,
+    "files": [
+      "dots-josh-firma-01.png",
+      "dots-josh-firma-02.png",
+      "dots-josh-firma-03.png",
+      "dots-josh-firma-04.png",
+      "dots-josh-firma-05.png",
+      "dots-josh-firma-06.png",
+      "dots-josh-firma-07.png",
+      "dots-josh-firma-08.png",
+      "dots-josh-firma-09.png",
+      "dots-josh-firma-10.png"
+    ]
+  },
+  {
+    "hero": "Iggy",
+    "id": "lime_headphones",
+    "reaction": "saludo",
+    "result": 0,
+    "files": [
+      "dots-iggy-saludo-01.png",
+      "dots-iggy-saludo-02.png",
+      "dots-iggy-saludo-03.png",
+      "dots-iggy-saludo-04.png",
+      "dots-iggy-saludo-05.png",
+      "dots-iggy-saludo-06.png",
+      "dots-iggy-saludo-07.png",
+      "dots-iggy-saludo-08.png",
+      "dots-iggy-saludo-09.png",
+      "dots-iggy-saludo-10.png"
+    ]
+  },
+  {
+    "hero": "Iggy",
+    "id": "lime_headphones",
+    "reaction": "firma",
+    "result": 0,
+    "files": [
+      "dots-iggy-firma-01.png",
+      "dots-iggy-firma-02.png",
+      "dots-iggy-firma-03.png",
+      "dots-iggy-firma-04.png",
+      "dots-iggy-firma-05.png",
+      "dots-iggy-firma-06.png",
+      "dots-iggy-firma-07.png",
+      "dots-iggy-firma-08.png",
+      "dots-iggy-firma-09.png",
+      "dots-iggy-firma-10.png"
+    ]
+  }
+]

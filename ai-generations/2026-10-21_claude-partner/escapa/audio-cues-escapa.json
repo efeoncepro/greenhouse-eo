@@ -1,0 +1,14 @@
+{
+  "pieza": "Efeonce | Claude — lo que Claude crea se escapa de la pantalla",
+  "duracion_s": 8.0, "fps": 24, "tempo_bpm": 128, "tiempo_s": 0.46875, "compas_s": 1.875,
+  "regla": "La animación se arma SOBRE esta grilla. Golpes en tiempos exactos; los dos drops a un compás. La música se edita al mismo mapa.",
+  "cues": [
+    { "t": 0.0,     "hasta": 1.406, "imagen": "Código escribiéndose en semicorcheas; cada línea cierra en un tiempo con zoom seco de cámara (0,469 · 0,938 · 1,406)", "sonido": "tecleo en semicorcheas; clic + whoosh corto por zoom; colchón tenso que crece" },
+    { "t": 1.64,    "imagen": "Se escribe volar()", "sonido": "todo corta: silencio (0,23 s)" },
+    { "t": 1.875,   "imagen": "GOLPE 1 — Enter: el sol detona, la ventana estalla, pájaros hacia la cámara; cámara lenta 1 tiempo", "sonido": "DROP 1: sub drop + braam + estallido de papel; cola en succión reversa durante la cámara lenta" },
+    { "t": 2.344,   "hasta": 3.75, "imagen": "La cámara se lanza por el agujero al mundo real; pájaros rozan el lente; la bandada sube en ola", "sonido": "barrido + aleteos cercanos; la música empuja con pulso de corcheas y sube" },
+    { "t": 3.75,    "imagen": "GOLPE 2 — la ola rompe sobre el sol: destello, sacudida, onda en la arena; cámara lenta", "sonido": "DROP 2 (un compás después): braam + sub + cristal" },
+    { "t": 4.688,   "imagen": "Golpe del lockup con fogonazo", "sonido": "sting de Efeonce (pico aquí); música bajada 7 dB" },
+    { "t": 4.688,   "hasta": 8.0, "imagen": "Bandada viva bajo el lockup", "sonido": "pad cálido + alas lejanas; fundido 7,3 → 8,0" }
+  ]
+}

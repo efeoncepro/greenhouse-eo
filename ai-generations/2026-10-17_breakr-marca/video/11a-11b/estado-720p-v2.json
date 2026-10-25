@@ -1,0 +1,11 @@
+{
+  "provider": "google-cloud",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-1.1-flash-preview",
+  "task": "frames",
+  "interactionId": "ChBiN2M1OTU5NDhhNTBhYzk1EAgaAjNiKgRtYWlu",
+  "status": "in_progress",
+  "gcsOutput": "gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/byteplus-para-cuando/11a-11b/out-720p-v2/",
+  "submittedAt": "2026-10-22T16:36:16.536Z"
+}

@@ -12,7 +12,7 @@ texto preparado en nota CRM. Esperar admisión/documentación de Compras; no rep
 ## 2026-10-25 — Aprendizaje comercial reutilizable y propuesta de pauta
 Prospección, Commercial y Copywriting Codex/Claude cargan el criterio de conversaciones útiles para nuevas
 aperturas, seguimientos e inbound comercial; espejos verificados. [Implementación y cola nativa](docs/commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md).
-Pendiente: leer/aplicar cambios nativos dentro del mandato; no se editaron HubSpot/secuencias ni se enviaron mensajes.
+[Aplicación nativa verificada](docs/commercial/analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md): guía9.705, nueve correos/nueve plantillas ajustados, cinco pausas en cuatro cuentas; cola13→8 el29Oct. QA borrador nuevo pendiente por créditos; sin envío inmediato.
 Pauta propuesta: US$600/mes, Chile, Search/HubSpot, sujeta a demanda/costo y ruta de conversión; sin gasto aprobado.
 
 ## 2026-10-25 — Ficha de autor del blog, byline y schema de autor (TASK-2057) cerrada

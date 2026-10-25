@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "8a6c9b6c2782",
+  "key": "8a6c9b6c27824986b404f1e19feafb1e71cd4931a477924bd1a1f8b36fa7bb03",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:37:34.083Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v3/09-ya-esta.png",
+    "imageSha256": "5f239123377b48bf6f57e6ac015df42fd137714a7e116f7bc978de3e4153f4e7",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/09.png",
+    "maskSha256": "c2d88be358d920b66653a26dc5a46630a21ba37fd4f7bd98b3f5e1c6709f4a9b",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked tabletop: the same long meeting table in pale oak wood with a matte satin finish (light natural oak, not dark walnut, not glossy), with only a soft warm glow from the laptop screen; keep the table edge position and perspective exactly. Keep the laptop, cup, notebook, people and everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Replace only the marked tabletop: the same long meeting table in pale oak wood with a matte satin finish (light natural oak, not dark walnut, not glossy), with only a soft warm glow from the laptop screen; keep the table edge position and perspective exactly. Keep the laptop, cup, notebook, people and everything outside the zone unchanged. Photorealistic."
+  },
+  "mask": {
+    "touchedFraction": 0.22071990966796876,
+    "editable": 262997,
+    "soft": 26305,
+    "protected": 1021418
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 65 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 32.61,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.07,
+        "bestError": 3.07,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1021418,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 262997,
+        "maxDelta": 172,
+        "meanDelta": 34.456,
+        "worst": {
+          "x": 1006,
+          "y": 698
+        }
+      },
+      "seam": {
+        "pixels": 26305,
+        "maxDelta": 121,
+        "meanDelta": 14.159,
+        "worst": {
+          "x": 414,
+          "y": 685
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1021418,
+        "maxDelta": 138,
+        "meanDelta": 6.109,
+        "worst": {
+          "x": 419,
+          "y": 662
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1394,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 114
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 2904
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

@@ -10,7 +10,8 @@ ni a un agente propio de Kortex. La disponibilidad, etiquetas y límites deben r
 - [Referencia funcional del agente](../../../.codex/skills/hubspot-solutions-partner/references/prospecting-agent.md).
 - [Voz personal de Julio](../../../.codex/skills/copywriting/efeonce/JULIO_REYES_VOICE_SYSTEM.md).
 - [Auditoría de la calibración](../../audits/commercial/2026-10-07-hubspot-prospecting-agent-voz.md).
-- [Texto vigente guardado: 7.969 caracteres](../../operations/hubspot-prospecting-agent/julio-reyes-starter-play-2026-10-07-enlace-web.txt)
+- [Texto vigente guardado: 9.705 caracteres, 25/10](../../operations/hubspot-prospecting-agent/julio-reyes-starter-play-2026-10-25-conversaciones-utiles.txt)
+- [Snapshot previo: 7.969 caracteres, 07/10](../../operations/hubspot-prospecting-agent/julio-reyes-starter-play-2026-10-07-enlace-web.txt)
 - [Snapshot previo: 7.550 caracteres](../../operations/hubspot-prospecting-agent/julio-reyes-starter-play-2026-10-07.txt).
 
 El archivo de texto es el snapshot aprobado para Julio, portal Efeonce Group 48713323, Starter Play
@@ -34,8 +35,8 @@ Traducir patrones observados a instrucciones concretas:
 - Investigar para encontrar un motivo de conversación, sin recitar el cargo ni resumir la empresa al destinatario.
 - Una expansión o adquisición no prueba problemas internos. Formular la necesidad desconocida como posibilidad
   o pregunta, con una sola condición suficiente.
-- Párrafos cortos y lenguaje cotidiano; tecnicismos solo si aportan precisión. Orientación del snapshot:
-  100–170 palabras en primer contacto, 60–110 en seguimientos, sin firma; no son límites técnicos de HubSpot.
+- Párrafos cortos y lenguaje cotidiano; tecnicismos solo si aportan precisión. La versión del 25/10 usa extensión según contexto y conserva una presentación robusta cuando aporta.
+  Los rangos 100–170 / 60–110 del snapshot 07/10 son históricos, no límites técnicos ni regla vigente.
 - Capacidades, casos, cifras y promesas verificables y habilitados para uso comercial.
 - Seguimientos con un aporte nuevo, respetando respuestas, negativas y reuniones ya agendadas.
 
@@ -72,7 +73,7 @@ la presencia de ambos enlaces debe comprobarse en un borrador nuevo, todavía pe
    la autorización de un portal no se hereda a otro.
 2. Leer el texto real, las directrices y el estado de revisión humana. Guardar el estado previo y preparar
    un delta dentro del alcance autorizado. El ejemplo gris con contador 0/10000 era un placeholder, no
-   instrucciones guardadas. El límite observado fue 10.000 caracteres; el snapshot vigente usa 7.969.
+   instrucciones guardadas. El límite observado fue 10.000 caracteres; el snapshot del 25/10 usa 9.705.
 3. Editar Comunicaciones → Instrucciones avanzadas, sin introducir reglas incompatibles o bloques repetidos.
    Verificar el contador del producto, además del conteo local.
 4. Pulsar Guardar en el panel. En la UI observada esto creó un cambio pendiente en la guía.
@@ -88,6 +89,19 @@ La autorización para ajustar copy no autoriza cambios de audiencia, enrollment,
 envíos. En esta práctica se conservó la revisión humana y no se pulsó Iniciar comunicación.
 Para revertir, usar el estado previo verificado y el mismo flujo de guardado/readback dentro del alcance
 autorizado; no desactivar el agente ni cambiar automatización para corregir una instrucción de voz.
+
+## Aprendizaje incorporado 25/10/2026
+
+**Aplicado y releído el 25/10:** versión reconciliada de 9.705 caracteres guardada y aprobada en el
+Starter Play `101042425`, tras contrastar la base de 7.969. El [registro de aplicación](../../commercial/analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md)
+conserva readbacks, nueve correos futuros/nueve plantillas ajustados y cinco contactos pausados.
+La [revisión previa](../../commercial/analyses/2026-10-prospeccion/REVISION-HUBSPOT-2026-10-25.md)
+es histórica; la propuesta aditiva anterior queda sustituida por el snapshot completo, no se suman ambos.
+
+Antes de preparar una apertura o seguimiento, aplicar
+[conversaciones útiles](../../../.codex/skills/efeonce-b2b-prospecting/references/conversation-quality-and-review.md).
+La guía guardada no modifica borradores anteriores ni concede permiso de envío. Sigue pendiente generar y
+revisar un borrador nuevo: los créditos estaban agotados, sin compra ni inicio de comunicación.
 
 ## Revisión de salida
 

@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "model": "gemini-3.8-flash",
+    "thinking": "high",
+    "preset": null,
+    "promptHash": "717d3924cded",
+    "fps": 12,
+    "clip": null,
+    "resolution": "default",
+    "processing": "static",
+    "files": [
+      {
+        "path": "ai-generations/2026-10-17_breakr-marca/video/11a-11b/fisica/previa/climax-pov-chapuzon-continuacion-4x5.mp4",
+        "sha256": "059312dc1e43"
+      }
+    ],
+    "usage": {
+      "inputTokens": 6718,
+      "outputTokens": 586,
+      "thoughtTokens": 1562
+    },
+    "latencyMs": 20713
+  },
+  "resumen": "El corte a los 3.5 s resulta forzado por la omisión del impacto físico y una ruptura severa de raccord en estado y orientación. Posteriormente, la física del fluido y la ingravidez de la lata delatan generación sintética.",
+  "hallazgos": [
+    {
+      "t": 0,
+      "tipo": "ritmo",
+      "severidad": "media",
+      "afirmacion": "La toma subjetiva dura 3.5 s con una expresión facial completamente congelada sin evolución reactiva.",
+      "medible": true,
+      "sugerencia": "Acelerar la aproximación a 1.5 s para dinamizar el suspenso y disimular el estatismo gestual.",
+      "t_fin": 3.5,
+      "verificacion": {
+        "estado": "no_medible",
+        "medido": "«ritmo» es juicio: no se mide"
+      }
+    },
+    {
+      "t": 3.5,
+      "tipo": "corte",
+      "severidad": "alta",
+      "afirmacion": "Falta el cuadro de impacto y hay discontinuidad en la rotación de la lata y empapado instantáneo.",
+      "medible": false,
+      "sugerencia": "Insertar un fotograma intermedio de colisión o disimular con un destello/sacudida de cámara.",
+      "verificacion": {
+        "estado": "confirmado",
+        "medido": "corte más cercano en 3.50 s (Δ +0 ms)"
+      }
+    },
+    {
+      "t": 3.5,
+      "tipo": "juicio",
+      "severidad": "media",
+      "afirmacion": "La lata levita de forma no plausible antes de asentarse y las partículas de agua desaparecen bruscamente.",
+      "medible": false,
+      "sugerencia": "Ajustar curvas de aceleración por gravedad en la lata y añadir persistencia de gotas.",
+      "t_fin": 5.5,
+      "verificacion": {
+        "estado": "no_medible",
+        "medido": "«juicio» es juicio: no se mide"
+      }
+    },
+    {
+      "t": 6,
+      "tipo": "cuadro_quieto",
+      "severidad": "baja",
+      "afirmacion": "Estatismo casi total del sujeto entre los 6.0 s y el final de la toma.",
+      "medible": true,
+      "sugerencia": "Agregar micro-movimientos de respiración o parpadeo para evitar sensación de imagen fija congelada.",
+      "t_fin": 7.4,
+      "verificacion": {
+        "estado": "refutado",
+        "medido": "0 cuadro(s) quieto(s) seguidos en 6.00–7.40 s (diferencia mínima 0.57; quieto < 0.15)"
+      }
+    }
+  ],
+  "puntajes": {
+    "cierre": 4.8,
+    "impacto": 5.2,
+    "legibilidad": 6.1,
+    "sincronia": 4.2
+  }
+}

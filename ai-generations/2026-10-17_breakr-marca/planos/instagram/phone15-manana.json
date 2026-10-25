@@ -1,0 +1,4 @@
+{"plate":"/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/bloqueo/15-santiago-manana.png","content":"/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6c01f8c0-9b1d-4bbf-a45d-33556c130cbc/scratchpad/ig/ig-screen.png",
+ "quad":[[220,590],[504,601],[462,1232],[146,1210]],"cornerRadius":150,
+ "modules":[1,1],"exposure":0.97,"falloff":[1.0,0.94],"bloom":0.08,"bloomThreshold":215,"bloomSmall":3,"bloomLarge":10,
+ "lensBlur":0.55,"grain":2.2,"maskBlur":0.5,"out":"/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/bloqueo/15-santiago-manana-ig.png"}

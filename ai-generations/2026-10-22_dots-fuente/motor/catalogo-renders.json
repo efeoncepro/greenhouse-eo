@@ -1,0 +1,1198 @@
+[
+ {
+  "file": "formas/forma-01-circle-pink.png",
+  "ok": {
+   "Shape:circle": true,
+   "Color:pink": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-01-circle-orchid.png",
+  "ok": {
+   "Shape:circle": true,
+   "Color:orchid": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-01-circle-violet.png",
+  "ok": {
+   "Shape:circle": true,
+   "Color:violet": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-01-circle-blue.png",
+  "ok": {
+   "Shape:circle": true,
+   "Color:blue": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-01-circle-cyan.png",
+  "ok": {
+   "Shape:circle": true,
+   "Color:cyan": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-01-circle-teal.png",
+  "ok": {
+   "Shape:circle": true,
+   "Color:teal": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-01-circle-lime.png",
+  "ok": {
+   "Shape:circle": true,
+   "Color:lime": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-01-circle-yellow.png",
+  "ok": {
+   "Shape:circle": true,
+   "Color:yellow": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-01-circle-coral.png",
+  "ok": {
+   "Shape:circle": true,
+   "Color:coral": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-02-rounded_triangle-pink.png",
+  "ok": {
+   "Shape:rounded_triangle": true,
+   "Color:pink": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-02-rounded_triangle-orchid.png",
+  "ok": {
+   "Shape:rounded_triangle": true,
+   "Color:orchid": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-02-rounded_triangle-violet.png",
+  "ok": {
+   "Shape:rounded_triangle": true,
+   "Color:violet": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-02-rounded_triangle-blue.png",
+  "ok": {
+   "Shape:rounded_triangle": true,
+   "Color:blue": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-02-rounded_triangle-cyan.png",
+  "ok": {
+   "Shape:rounded_triangle": true,
+   "Color:cyan": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-02-rounded_triangle-teal.png",
+  "ok": {
+   "Shape:rounded_triangle": true,
+   "Color:teal": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-02-rounded_triangle-lime.png",
+  "ok": {
+   "Shape:rounded_triangle": true,
+   "Color:lime": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-02-rounded_triangle-yellow.png",
+  "ok": {
+   "Shape:rounded_triangle": true,
+   "Color:yellow": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-02-rounded_triangle-coral.png",
+  "ok": {
+   "Shape:rounded_triangle": true,
+   "Color:coral": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-03-capsule-pink.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:pink": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-03-capsule-orchid.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:orchid": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-03-capsule-violet.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:violet": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-03-capsule-blue.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:blue": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-03-capsule-cyan.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:cyan": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-03-capsule-teal.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-03-capsule-lime.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:lime": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-03-capsule-yellow.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-03-capsule-coral.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:coral": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-04-rounded_head_two_ears-pink.png",
+  "ok": {
+   "Shape:rounded_head_two_ears": true,
+   "Color:pink": true,
+   "Eyes:oval": false
+  }
+ },
+ {
+  "file": "formas/forma-04-rounded_head_two_ears-orchid.png",
+  "ok": {
+   "Shape:rounded_head_two_ears": true,
+   "Color:orchid": true,
+   "Eyes:oval": false
+  }
+ },
+ {
+  "file": "formas/forma-04-rounded_head_two_ears-violet.png",
+  "ok": {
+   "Shape:rounded_head_two_ears": true,
+   "Color:violet": true,
+   "Eyes:oval": false
+  }
+ },
+ {
+  "file": "formas/forma-04-rounded_head_two_ears-blue.png",
+  "ok": {
+   "Shape:rounded_head_two_ears": true,
+   "Color:blue": true,
+   "Eyes:oval": false
+  }
+ },
+ {
+  "file": "formas/forma-04-rounded_head_two_ears-cyan.png",
+  "ok": {
+   "Shape:rounded_head_two_ears": true,
+   "Color:cyan": true,
+   "Eyes:oval": false
+  }
+ },
+ {
+  "file": "formas/forma-04-rounded_head_two_ears-teal.png",
+  "ok": {
+   "Shape:rounded_head_two_ears": true,
+   "Color:teal": true,
+   "Eyes:oval": false
+  }
+ },
+ {
+  "file": "formas/forma-04-rounded_head_two_ears-lime.png",
+  "ok": {
+   "Shape:rounded_head_two_ears": true,
+   "Color:lime": true,
+   "Eyes:oval": false
+  }
+ },
+ {
+  "file": "formas/forma-04-rounded_head_two_ears-yellow.png",
+  "ok": {
+   "Shape:rounded_head_two_ears": true,
+   "Color:yellow": true,
+   "Eyes:oval": false
+  }
+ },
+ {
+  "file": "formas/forma-04-rounded_head_two_ears-coral.png",
+  "ok": {
+   "Shape:rounded_head_two_ears": true,
+   "Color:coral": true,
+   "Eyes:oval": false
+  }
+ },
+ {
+  "file": "formas/forma-05-six_lobed_flower-pink.png",
+  "ok": {
+   "Shape:six_lobed_flower": true,
+   "Color:pink": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-05-six_lobed_flower-orchid.png",
+  "ok": {
+   "Shape:six_lobed_flower": true,
+   "Color:orchid": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-05-six_lobed_flower-violet.png",
+  "ok": {
+   "Shape:six_lobed_flower": true,
+   "Color:violet": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-05-six_lobed_flower-blue.png",
+  "ok": {
+   "Shape:six_lobed_flower": true,
+   "Color:blue": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-05-six_lobed_flower-cyan.png",
+  "ok": {
+   "Shape:six_lobed_flower": true,
+   "Color:cyan": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-05-six_lobed_flower-teal.png",
+  "ok": {
+   "Shape:six_lobed_flower": true,
+   "Color:teal": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-05-six_lobed_flower-lime.png",
+  "ok": {
+   "Shape:six_lobed_flower": true,
+   "Color:lime": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-05-six_lobed_flower-yellow.png",
+  "ok": {
+   "Shape:six_lobed_flower": true,
+   "Color:yellow": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-05-six_lobed_flower-coral.png",
+  "ok": {
+   "Shape:six_lobed_flower": true,
+   "Color:coral": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-06-heart-pink.png",
+  "ok": {
+   "Shape:heart": true,
+   "Color:pink": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-06-heart-orchid.png",
+  "ok": {
+   "Shape:heart": true,
+   "Color:orchid": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-06-heart-violet.png",
+  "ok": {
+   "Shape:heart": true,
+   "Color:violet": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-06-heart-blue.png",
+  "ok": {
+   "Shape:heart": true,
+   "Color:blue": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-06-heart-cyan.png",
+  "ok": {
+   "Shape:heart": true,
+   "Color:cyan": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-06-heart-teal.png",
+  "ok": {
+   "Shape:heart": true,
+   "Color:teal": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-06-heart-lime.png",
+  "ok": {
+   "Shape:heart": true,
+   "Color:lime": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-06-heart-yellow.png",
+  "ok": {
+   "Shape:heart": true,
+   "Color:yellow": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-06-heart-coral.png",
+  "ok": {
+   "Shape:heart": true,
+   "Color:coral": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-07-four_lobed_butterfly-pink.png",
+  "ok": {
+   "Shape:four_lobed_butterfly": true,
+   "Color:pink": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-07-four_lobed_butterfly-orchid.png",
+  "ok": {
+   "Shape:four_lobed_butterfly": true,
+   "Color:orchid": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-07-four_lobed_butterfly-violet.png",
+  "ok": {
+   "Shape:four_lobed_butterfly": true,
+   "Color:violet": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-07-four_lobed_butterfly-blue.png",
+  "ok": {
+   "Shape:four_lobed_butterfly": true,
+   "Color:blue": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-07-four_lobed_butterfly-cyan.png",
+  "ok": {
+   "Shape:four_lobed_butterfly": true,
+   "Color:cyan": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-07-four_lobed_butterfly-teal.png",
+  "ok": {
+   "Shape:four_lobed_butterfly": true,
+   "Color:teal": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-07-four_lobed_butterfly-lime.png",
+  "ok": {
+   "Shape:four_lobed_butterfly": true,
+   "Color:lime": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-07-four_lobed_butterfly-yellow.png",
+  "ok": {
+   "Shape:four_lobed_butterfly": true,
+   "Color:yellow": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-07-four_lobed_butterfly-coral.png",
+  "ok": {
+   "Shape:four_lobed_butterfly": true,
+   "Color:coral": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-08-circle_two_ears-pink.png",
+  "ok": {
+   "Shape:circle_two_ears": true,
+   "Color:pink": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-08-circle_two_ears-orchid.png",
+  "ok": {
+   "Shape:circle_two_ears": true,
+   "Color:orchid": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-08-circle_two_ears-violet.png",
+  "ok": {
+   "Shape:circle_two_ears": true,
+   "Color:violet": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-08-circle_two_ears-blue.png",
+  "ok": {
+   "Shape:circle_two_ears": true,
+   "Color:blue": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-08-circle_two_ears-cyan.png",
+  "ok": {
+   "Shape:circle_two_ears": true,
+   "Color:cyan": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-08-circle_two_ears-teal.png",
+  "ok": {
+   "Shape:circle_two_ears": true,
+   "Color:teal": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-08-circle_two_ears-lime.png",
+  "ok": {
+   "Shape:circle_two_ears": true,
+   "Color:lime": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-08-circle_two_ears-yellow.png",
+  "ok": {
+   "Shape:circle_two_ears": true,
+   "Color:yellow": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-08-circle_two_ears-coral.png",
+  "ok": {
+   "Shape:circle_two_ears": true,
+   "Color:coral": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-09-twelve_scalloped_rosette-pink.png",
+  "ok": {
+   "Shape:twelve_scalloped_rosette": true,
+   "Color:pink": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-09-twelve_scalloped_rosette-orchid.png",
+  "ok": {
+   "Shape:twelve_scalloped_rosette": true,
+   "Color:orchid": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-09-twelve_scalloped_rosette-violet.png",
+  "ok": {
+   "Shape:twelve_scalloped_rosette": true,
+   "Color:violet": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-09-twelve_scalloped_rosette-blue.png",
+  "ok": {
+   "Shape:twelve_scalloped_rosette": true,
+   "Color:blue": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-09-twelve_scalloped_rosette-cyan.png",
+  "ok": {
+   "Shape:twelve_scalloped_rosette": true,
+   "Color:cyan": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-09-twelve_scalloped_rosette-teal.png",
+  "ok": {
+   "Shape:twelve_scalloped_rosette": true,
+   "Color:teal": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-09-twelve_scalloped_rosette-lime.png",
+  "ok": {
+   "Shape:twelve_scalloped_rosette": true,
+   "Color:lime": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-09-twelve_scalloped_rosette-yellow.png",
+  "ok": {
+   "Shape:twelve_scalloped_rosette": true,
+   "Color:yellow": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-09-twelve_scalloped_rosette-coral.png",
+  "ok": {
+   "Shape:twelve_scalloped_rosette": true,
+   "Color:coral": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-10-rounded_cube-pink.png",
+  "ok": {
+   "Shape:rounded_cube": true,
+   "Color:pink": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-10-rounded_cube-orchid.png",
+  "ok": {
+   "Shape:rounded_cube": true,
+   "Color:orchid": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-10-rounded_cube-violet.png",
+  "ok": {
+   "Shape:rounded_cube": true,
+   "Color:violet": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-10-rounded_cube-blue.png",
+  "ok": {
+   "Shape:rounded_cube": true,
+   "Color:blue": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-10-rounded_cube-cyan.png",
+  "ok": {
+   "Shape:rounded_cube": true,
+   "Color:cyan": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-10-rounded_cube-teal.png",
+  "ok": {
+   "Shape:rounded_cube": true,
+   "Color:teal": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-10-rounded_cube-lime.png",
+  "ok": {
+   "Shape:rounded_cube": true,
+   "Color:lime": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-10-rounded_cube-yellow.png",
+  "ok": {
+   "Shape:rounded_cube": true,
+   "Color:yellow": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-10-rounded_cube-coral.png",
+  "ok": {
+   "Shape:rounded_cube": true,
+   "Color:coral": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-11-rounded_diamond-pink.png",
+  "ok": {
+   "Shape:rounded_diamond": true,
+   "Color:pink": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-11-rounded_diamond-orchid.png",
+  "ok": {
+   "Shape:rounded_diamond": true,
+   "Color:orchid": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-11-rounded_diamond-violet.png",
+  "ok": {
+   "Shape:rounded_diamond": true,
+   "Color:violet": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-11-rounded_diamond-blue.png",
+  "ok": {
+   "Shape:rounded_diamond": true,
+   "Color:blue": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-11-rounded_diamond-cyan.png",
+  "ok": {
+   "Shape:rounded_diamond": true,
+   "Color:cyan": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-11-rounded_diamond-teal.png",
+  "ok": {
+   "Shape:rounded_diamond": true,
+   "Color:teal": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-11-rounded_diamond-lime.png",
+  "ok": {
+   "Shape:rounded_diamond": true,
+   "Color:lime": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-11-rounded_diamond-yellow.png",
+  "ok": {
+   "Shape:rounded_diamond": true,
+   "Color:yellow": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "formas/forma-11-rounded_diamond-coral.png",
+  "ok": {
+   "Shape:rounded_diamond": true,
+   "Color:coral": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "piezas/ojos-01-swept_lids.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:swept_lids": true
+  }
+ },
+ {
+  "file": "piezas/ojos-02-oval.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true
+  }
+ },
+ {
+  "file": "piezas/ojos-03-sparkle_capsules.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:sparkle_capsules": true
+  }
+ },
+ {
+  "file": "piezas/ojos-04-highlight_capsules.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:highlight_capsules": true
+  }
+ },
+ {
+  "file": "piezas/ojos-05-dots.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:dots": true
+  }
+ },
+ {
+  "file": "piezas/ojos-06-double_highlights.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:double_highlights": true
+  }
+ },
+ {
+  "file": "piezas/ojos-07-round_inset.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:round_inset": false
+  }
+ },
+ {
+  "file": "piezas/ojos-08-crescent_inset.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:crescent_inset": true
+  }
+ },
+ {
+  "file": "piezas/ojos-09-sleepy_lids.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:sleepy_lids": true
+  }
+ },
+ {
+  "file": "piezas/lentes-01-monocle.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Eyewear:monocle": true
+  }
+ },
+ {
+  "file": "piezas/lentes-02-tall_oval_frames.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Eyewear:tall_oval_frames": true
+  }
+ },
+ {
+  "file": "piezas/lentes-03-separate_trapezoid_lenses.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Eyewear:separate_trapezoid_lenses": true
+  }
+ },
+ {
+  "file": "piezas/lentes-04-classic_sunglasses.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Eyewear:classic_sunglasses": true
+  }
+ },
+ {
+  "file": "piezas/lentes-05-round_sunglasses.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Eyewear:round_sunglasses": true
+  }
+ },
+ {
+  "file": "piezas/accesorio-01-headphones.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Accessory:headphones": true
+  }
+ },
+ {
+  "file": "piezas/accesorio-02-bow.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Accessory:bow": true
+  }
+ },
+ {
+  "file": "piezas/accesorio-03-beanie.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true
+  }
+ },
+ {
+  "file": "piezas/accesorio-04-hat.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Accessory:hat": true
+  }
+ },
+ {
+  "file": "piezas/accesorio-05-beret.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Accessory:beret": true
+  }
+ },
+ {
+  "file": "piezas/accesorio-06-orb.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Accessory:orb": true
+  }
+ },
+ {
+  "file": "piezas/accesorio-07-three_lobe.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Accessory:three_lobe": true
+  }
+ },
+ {
+  "file": "piezas/accesorio-08-crown.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Accessory:crown": true
+  }
+ },
+ {
+  "file": "piezas/accesorio-09-antennae-RETIRADO.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:teal": true,
+   "Eyes:oval": true,
+   "Accessory:antennae": false
+  }
+ },
+ {
+  "file": "piezas/color-utileria-beanie-pink.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true,
+   "color:beanie=pink": true
+  }
+ },
+ {
+  "file": "piezas/color-utileria-beanie-orchid.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true,
+   "color:beanie=orchid": true
+  }
+ },
+ {
+  "file": "piezas/color-utileria-beanie-violet.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true,
+   "color:beanie=violet": true
+  }
+ },
+ {
+  "file": "piezas/color-utileria-beanie-blue.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true,
+   "color:beanie=blue": true
+  }
+ },
+ {
+  "file": "piezas/color-utileria-beanie-cyan.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true,
+   "color:beanie=cyan": true
+  }
+ },
+ {
+  "file": "piezas/color-utileria-beanie-teal.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true,
+   "color:beanie=teal": true
+  }
+ },
+ {
+  "file": "piezas/color-utileria-beanie-lime.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true,
+   "color:beanie=lime": true
+  }
+ },
+ {
+  "file": "piezas/color-utileria-beanie-yellow.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true,
+   "color:beanie=yellow": true
+  }
+ },
+ {
+  "file": "piezas/color-utileria-beanie-coral.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true,
+   "color:beanie=coral": true
+  }
+ },
+ {
+  "file": "piezas/color-utileria-beanie-charcoal.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true,
+   "color:beanie=charcoal": true
+  }
+ },
+ {
+  "file": "piezas/color-utileria-beanie-brown.png",
+  "ok": {
+   "Shape:capsule": true,
+   "Color:yellow": true,
+   "Eyes:oval": true,
+   "Accessory:beanie": true,
+   "color:beanie=brown": true
+  }
+ },
+ {
+  "file": "curados/curado-semilla-01.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-02.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-03.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-04.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-05.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-06.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-07.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-08.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-09.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-10.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-11.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-12.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-13.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-14.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-15.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-16.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-17.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-18.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-19.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-20.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-21.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-22.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-23.png",
+  "ok": {}
+ },
+ {
+  "file": "curados/curado-semilla-24.png",
+  "ok": {}
+ }
+]

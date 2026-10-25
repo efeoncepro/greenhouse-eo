@@ -305,3 +305,16 @@ y los módulos progresivos conservan el descarte de la candidata inválida, la v
 los permisos por operación y los readbacks de los dos canales. Brochures originales, firma/CCO, privacidad
 de recibos y ausencia de secuencias nuevas se mantienen. Es documentación explicativa y evidencia de una
 aplicación, sin nueva decisión arquitectónica, autonomía, schema, endpoint ni scheduler.
+
+### Aplicación documental 25/10/2026 — calidad de nuevas conversaciones
+
+Julio pidió incorporar las mejoras de la revisión de octubre a futuras aperturas y seguimientos. El
+[módulo compartido](../../.codex/skills/efeonce-b2b-prospecting/references/conversation-quality-and-review.md)
+conecta historia por iniciativa, evidencia, siguiente decisión y aprendizaje; los routers de Prospección,
+Commercial y Copywriting lo cargan en captación/expansión, incluidas consultas web/pauta. Se conserva
+la arquitectura robusta de correo, el brochure aprobado y la autoridad separada de cada canal.
+
+Es una aplicación reversible del método existente: sin nuevo schema, autonomía, scheduler ni permiso de
+envío. Los espejos de Prospección se mantienen idénticos. La [entrega de implementación](../commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md)
+separa método aplicado en el repo, adaptaciones nativas propuestas y recomendación de pauta. No declara
+modificadas instrucciones, plantillas, programaciones o audiencias de HubSpot.

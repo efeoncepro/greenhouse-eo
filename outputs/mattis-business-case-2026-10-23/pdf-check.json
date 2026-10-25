@@ -1,0 +1,24 @@
+{
+  "page_size_mm": [
+    210,
+    297
+  ],
+  "size_tolerance_mm": 0.5,
+  "page_count": 20,
+  "rotation": 0,
+  "require_extractable_text": true,
+  "require_embedded_fonts": true,
+  "require_language": true,
+  "require_structure": true,
+  "require_outline": true,
+  "required_text": [
+    "Mattis: marca y comercialización",
+    "Confidencial",
+    "80 maestras y 120 adaptaciones",
+    "900.554.998",
+    "14.424",
+    "30/10/2026"
+  ],
+  "each_page_text": [],
+  "required_uris": []
+}

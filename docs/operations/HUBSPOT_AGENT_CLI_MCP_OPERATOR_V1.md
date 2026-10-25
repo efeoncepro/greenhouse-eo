@@ -20,6 +20,13 @@ CLI y MCP son rutas alternativas de operación directa cuando la operación est�
 
 ## Estado observado en esta máquina y portal
 
+### Lectura 25/10/2026 — secuencias por UI
+
+Agent CLI `0.16.0`, OAuth Julio/portal `48713323`, scope `automation.sequences.read` presente.
+`sequences list --user-id 75788512` devolvió 403: el endpoint no admite OAuth de usuario. Se pasó a la UI
+autenticada, sin crear service key ni ampliar autoridad. No inferir acceso por scope/help ni probar writes
+para resolver lectura. [Auditoría del agente, cola y secuencias](../commercial/analyses/2026-10-prospeccion/REVISION-HUBSPOT-2026-10-25.md).
+
 Para elegir propiedades de Contact/Company/Deal/Lead, cargar el
 [inventario completo 2026-10-11](../audits/commercial/hubspot-properties-2026-10-11/README.md) y la
 [guía de captura](../manual-de-uso/hubspot/llenar-propiedades-comerciales.md). El snapshot contiene todas

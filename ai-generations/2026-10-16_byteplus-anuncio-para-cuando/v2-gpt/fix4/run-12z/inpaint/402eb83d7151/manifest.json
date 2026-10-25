@@ -1,0 +1,144 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "402eb83d7151",
+  "key": "402eb83d71519f214ffe7b2aaf584dcf2e0fccc87eee309960126d97e790b82c",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:42:02.869Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/12s.png",
+    "imageSha256": "0ea66f6b919be057f6f5f772bbbfc09b3ab83f32ca571b24ea63c013d97e6736",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/12z.png",
+    "maskSha256": "2998f02a52c88dabbf43bef85e7838a3a56ef820dd97476f3c3608a0a7c570b4",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/producto/lata.png",
+        "sha256": "d161bf641d4f491508ca0dffa48e2b97e2c678f3e1af886fd145c629b7725e59"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Three small edits only. Right zone (the glowing glass panel on the window): it shows EXACTLY the beverage can of image 2 (same orange-and-teal wave label, no text) with orange splashes, same glow and perspective. Zone on her right shoulder (left of the image): no orange slice, only her soaked cream knit sweater. Zone on her LEFT shoulder near the neck (right of the image): one orange slice stuck on the soaked cream sweater, real size. Keep everything outside the zones unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nThree small edits only. Right zone (the glowing glass panel on the window): it shows EXACTLY the beverage can of image 2 (same orange-and-teal wave label, no text) with orange splashes, same glow and perspective. Zone on her right shoulder (left of the image): no orange slice, only her soaked cream knit sweater. Zone on her LEFT shoulder near the neck (right of the image): one orange slice stuck on the soaked cream sweater, real size. Keep everything outside the zones unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.0832977294921875,
+    "editable": 96676,
+    "soft": 12504,
+    "protected": 1201540
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 78 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 32.713,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.91,
+        "bestError": 2.91,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        0.94,
+        -0.52,
+        -1.28
+      ],
+      "protected": {
+        "pixels": 1201540,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 96676,
+        "maxDelta": 231,
+        "meanDelta": 36.423,
+        "worst": {
+          "x": 853,
+          "y": 283
+        }
+      },
+      "seam": {
+        "pixels": 12504,
+        "maxDelta": 169,
+        "meanDelta": 4.029,
+        "worst": {
+          "x": 389,
+          "y": 407
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1201540,
+        "maxDelta": 213,
+        "meanDelta": 6.399,
+        "worst": {
+          "x": 401,
+          "y": 439
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4359,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 294
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 5869
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

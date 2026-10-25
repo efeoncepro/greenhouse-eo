@@ -6,6 +6,13 @@ description: Ejecuta discovery, calificación, negociación, propuestas y seguim
 # Commercial Expert — entrada Codex
 
 
+## Conversaciones comerciales: criterio compartido
+
+Antes de preparar una apertura, reactivación, seguimiento o respuesta inbound comercial de captación o
+expansión Efeonce, cargar [conversaciones útiles](../efeonce-b2b-prospecting/references/conversation-quality-and-review.md).
+Conservar la historia de la iniciativa, los claims sustentados y la voz robusta de Julio cuando corresponda.
+Esta guía no modifica por sí sola borradores, instrucciones o secuencias guardadas en proveedores.
+
 ## Partnerships, distribuidores y expedientes externos
 
 Para recuperar membresías, completar altas/crédito o preparar documentos para distribuidores, cargar el

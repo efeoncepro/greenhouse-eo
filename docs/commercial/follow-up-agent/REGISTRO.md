@@ -1,12 +1,32 @@
 # Registro de seguimiento comercial
 
+**Delta focal25/10 · aplicación autorizada en HubSpot:** [guía y continuidades releídas](../analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md).
+Nueve correos futuros de ocho inscripciones y nueve plantillas ajustados; Unilever(Karla/Estefanía),
+Olivos(Emily), Toyota(Fabricio) y NIASA(Liliana) pausados, con condiciones explícitas para retomar.
+Cola13→8 próximos correos el29Oct; conservar fechas, firmas, paradas y la excepción individual de CCO
+Flesan/Sigelec. No duplicar ni reactivar por calendario. Guía9.705 guardada; QA borrador nuevo pendiente
+por créditos. Sin envío inmediato, nuevas inscripciones ni pauta. No renueva el corte global.
+
+
 **Delta focal24/10 · Lucía/Flesan y Yvette/Sigelec:** dos secuencias privadas creadas, **318443153 / 318421077**,
 dos correos personalizados por persona, brochures originales y firma gráfica comprobados. Julio autorizó
 excepción al CCO con registro nativo: ambas **Programado1/EnCurso0/Error0**,29Oct10:00 y05Nov10:05 Perú,
 calendario persistido releído. Respuesta/reunión desinscribe al Contact. Todavía no enviados; no duplicar por
 radar. [Autorización y evidencia](runs/2026-10-24-lucia-yvette-secuencias.md). No renueva el corte global.
 
-**Corte vigente: 21/10/2026, 09:00 Chile.** [Informe completo](runs/2026-10-21-0900.md). Hoy: conciliar auditoría SKY comprometida para20/10; responder estado a Federico/Berel y Rossana/Lotus; checkpoint ANAM12h; decidir SKY1547 antes del cierre16h; Gana revisión17h/demoBasis18h y cierre mañana16h. Assetplan propuesta v2 ya enviada20/10 18:11, ahora espera23Oct11h; Denis InMail ya enviado, espera26Oct10h. SUBDERE respuestas publicadas, lectura parcial; cierre23Oct15h. AWS confirmó relación activa: borrador guardado y CCO/firma verificados, sin enviar. Laura/izipay rebotó, revisión22Oct12h sin contacto. Producción/fabricación local Efeonce enMX/PE/CL/CO/EC ratificada. 295Deals/70abiertos/2pipelines,204TASKprevias,211Leads recientes,334mensajes/56Sent/12borradores previos,86Notion y17eventos. 9TASKactualizadas+2nuevas;11readbacks y33asociaciones verificados. Dos calendarios MP y ocho LicitaLAB; Wherex exige login. Sin envíos, postulaciones, otras mutaciones CRM, secuencias, Notion o commit. Próximo corte hoy16h.
+**Corte vigente: 23/10/2026, 16:00 Chile.** [Informe completo](runs/2026-10-23-1600.md). **Aysén prorrogó al 27/10 15:00**, confirmado en Mercado Público y LicitaLAB; misma TASK119277345698, decisión interna26Oct12h. **Auditoría SKY enviada hoy12:36**, PDF verificado por metadata; TASK118588664157 pasa a recepción/accesos/recuperación, revisión26Oct10h. Respuesta automática no aceptación. Salesforce/SUBDERE/Chillán figuran Cerradas: conciliar comprobantes, no inferir pérdida. CMF alcanzó plazo16h, estado vivo bloqueado porlogin. Arcor/Ignacio correo enviado10:38; nueva TASK119420874102 para28Oct10h, sin otro contacto. Lunes Ñuble15h y ProChile nuevo15:01; Gana1552 preparada/cierre30Oct18h, distinta1541yaenviada. UChile web5485-868-COT26 cierra sábado24Oct20h,CLP200.000,baja prioridad pendiente de alcance. Factura814356022 mismo riesgo23Oct sin pago/saldo vivo comprobado. Cobertura297Deals/72abiertos/217TASKprevias/231Leadsrecientes/326mensajes/46Sent/58drafts/86Notion;12fichasLicitaLAB+1MP. Una TASKnueva y6actualizadas,7lecturas independientes y21listas de asociaciones verificadas. Cero envíos, postulaciones, otrasmutacionesCRM, Notion, secuencias o commit. Próximo lunes26Oct09Chile.
+
+**Corte histórico: 23/10/2026, 09:00 Chile; sustituido por corte 16h.** [Informe completo](runs/2026-10-23-0900.md). Salesforce U. Chile cierra hoy10h; SUBDERE/Aysén/Chillán15h y CMF16h. **Berel7084 adelantó cierre a ayer22Oct20:30 y figura Descartada**: TASK119276711501 ahora concilia presentación, no envío futuro. Gana1552 ya tiene Markdown preparado, revisar hoy12h; COP38M/mes es escenario interno, no precio final; distinto de1541 enviada20Oct. SKY Social Care tuvo seguimiento22Oct19:05; revisión26Oct10h, no repetir. Mariana/Fundación Luz correo+InMail enviados por operación focal; nueva revisión interna TASK119332928269 para27Oct10h, excepción de correo inferido no ampliada. INAPI publicóRes403:20.000sesiones/70–30sobrebruto. Nueva UChileemailMKT831830-40-COT26 cierra18h, HOLDporproveedordirecto/ISO27001. UTEMclosedlost confirmado; no reabrir. Factura814356022 conserva riesgo23Oct sin saldo vivo. Cobertura297Deals/72abiertos/216TASKprevias/224Leadsrecientes/341mensajes/16Sentrecientes/13drafts/86Notion/17eventos;11fichasLicitaLAB+2MP+2Wherex. Una TASKnueva y3actualizadas,4readbacks/12asociaciones verificados. Sin envíos, Notion, otrosCRM, secuencias ni commit. Próximo hoy16h.
+
+**Corte histórico: 22/10/2026, 16:00 Chile; sustituido por23Oct09h.** [Informe completo](runs/2026-10-22-1600.md). **Gana1541 ya enviada20/10**, comprobante7543223; esperar evaluación, revisión26Oct10h, no reiterar envío. **Gana y Loti1552 es otro proceso**, Deal66560488750/HOLD: TASK119352256257 revisión23Oct12h, cierre operativo30Oct18h. UChileFEN Salesforce3licencias/12meses, CLP2.500.000 IVAincluido, cierra23Oct10h: TASK119351329034 hoy17h para validar suministro. CMF1197 prorrogó23Oct16h, TASK119351329035 mañana09:30. Berel7084 ficha leída: desglose de fee/alcance/cargos; correo23Oct17Chile frente aUI19sinzona, mantener17conservador. Bivien/Sergio rebotó5505.7.1; fuera de secuencia, TASK119344838796 sin reenvío. Santiago pide contexto PierreFabreCRM, TASK118338182493 actualizada. Socopur confirma proceso cerrado, STOP. SUBDERE/Aysén/Chillán23Oct15h; factura814356022 mismo riesgo23Oct sin saldo vivo. 297Deals/72abiertos/2pipelines;212TASKprevias,218Leadsrecientes,328mensajes/56Sent/14drafts,86Notion/16eventos;9fichasLicitaLAB+2MP+2Wherexautenticadas. 4TASKnuevas+2actualizadas,6readbacks/18asociaciones verificados. Sin envíos, borradores nuevos, otras mutacionesCRM, Notion o commit. Próximo23Oct09h.
+
+**Corrección focal22/10 · Gana:** Julio confirma que se envió hace dos días (20/10). Comprobante7543223. TASK[118589409195](https://app.hubspot.com/tasks/48713323/view/all/task/118589409195) actualizada y releída: «Gana1541 — oferta enviada el20/10; esperar evaluación», WAITING/MEDIUM, ownerJulio75788512, revisión interna26Oct10Chile. No hay postulación ni reenvío pendiente; el cierre general22Oct no genera una acción de presentación. Retirada de las prioridades urgentes del informe de hoy. Basis queda como coordinación independiente. Esta corrección no renueva la cobertura global ni acredita adjudicación; sin envío, nuevos objetos ni commit.
+
+**Corte histórico: 22/10/2026, mañana Chile; sustituido por corte16h.** [Informe completo](runs/2026-10-22-0900.md). Berel7084 nuevo: agencia influencers, cierre23Oct17Chile; Wherexlogin impide leerbases, TASK119276711501. Gana enviada20Oct, comprobante7543223: esperar evaluación, sin alerta de postulación pendiente por cierre22Oct; revisión interna26Oct10Chile. Reagendar Basis es coordinación independiente. izipay acusóinterés, Deal66481946424 existeporordenfocal; esperar novedades, TASK29Oct10h. SKY acusódocumentos y enviaráadenda; revisión26Oct10h. LOL/Valentina reiteróconsultaLucía; pendiente hoy. SUBDERE/Aysén/Chillán23Oct15h: decidir/prepararhoy. Kibernumcorreo/InMail enviadosporoperaciónfocal; revisión27Oct10h. HubSpot814356022: mismo riesgo23Oct,saldovivonoverificado. 296Deals/71abiertos/2pipelines,208TASKprevias,214Leads,349mensajes/57Sent/14borradores,86Notion/15eventos;8fichasLicitaLAB+2MP. CuatroTASKnuevas/cincoactualizadas,9readbacks/27asociaciones;sinenvíos/borradoresnuevos/otrosCRM/Notion/commit. Próximo22Oct16h.
+
+**Corte histórico: 21/10/2026, 16:00 Chile; sustituido por22Octmañana.** [Informe completo](runs/2026-10-21-1600.md). Gana: demoBasis hoy18h, cierre mañana16h, oferta ya presentada. izipay: interés enviado11:49, Leadexistente, admisión/bases pendientes; nuevaTASK119233755237 revisión22Oct10h. Olivos respondió y tiene secuencia autorizada29Oct/12Nov/3Dic: esperar sin duplicar. Pibank complementoPerú enviado13:56; revisión22Oct09:30. Berel pidió que Efeonce proponga colores; Lotus requiere conciliar notas/coordinarRossana. SKY1547 venció16h: conciliar comprobante, no pérdida inferida. Ingram confirmó vinculaciónGoogle; nuevaTASK119233666985 para altaCliente pendiente. SUBDERE/Aysén/Chillán siguen23Oct15h. BorradorAWS corregido con firma gráfica y CCO, sinenvío. 295Deals/70abiertos/2pipelines;206TASKprevias,213Leadsrecientes;385mensajes/72Sent/14borradoresrecientes,86Notion/17eventos. DosTASKnuevas+seisactualizadas,8readbacks/24asociaciones exactos.10fichasLicitaLAB/2calendariosMP;Wherexinaccesible. SinotrosobjetosCRM/secuencias/envíos/Notion/commit. Próximo22Oct09h.
+
+**Corte histórico: 21/10/2026, 09:00 Chile; sustituido por el corte16h.** [Informe completo](runs/2026-10-21-0900.md). Hoy: conciliar auditoría SKY comprometida para20/10; responder estado a Federico/Berel y Rossana/Lotus; checkpoint ANAM12h; decidir SKY1547 antes del cierre16h; Gana revisión17h/demoBasis18h y cierre mañana16h. Assetplan propuesta v2 ya enviada20/10 18:11, ahora espera23Oct11h; Denis InMail ya enviado, espera26Oct10h. SUBDERE respuestas publicadas, lectura parcial; cierre23Oct15h. AWS confirmó relación activa: borrador guardado y CCO/firma verificados, sin enviar. Laura/izipay rebotó, revisión22Oct12h sin contacto. Producción/fabricación local Efeonce enMX/PE/CL/CO/EC ratificada. 295Deals/70abiertos/2pipelines,204TASKprevias,211Leads recientes,334mensajes/56Sent/12borradores previos,86Notion y17eventos. 9TASKactualizadas+2nuevas;11readbacks y33asociaciones verificados. Dos calendarios MP y ocho LicitaLAB; Wherex exige login. Sin envíos, postulaciones, otras mutaciones CRM, secuencias, Notion o commit. Próximo corte hoy16h.
 
 **Corte histórico: 20/10/2026, 16:00 Chile (sustituido).** [Informe completo](runs/2026-10-20-1600.md). Gana presentada: comprobante7543223, cierre extendido22Oct16Chile; mismaTASK118589409195, revisión21Oct17 y demoBasis18. Denis/Unilever rebotó UNKNOWN_USER y ya no está inscrito; revisión119127021452, no reenviar. Assetplan tiene cotización40UF/25h preparada, sin envío observado; revisión119143092834. Lucía/LOL pidió datos de cuenta; borrador en119143246418. Berel/Federico espera coordinación; SKY auditoría sigue sin entrega observada. Tarapacá Cerrada y calendarioTalca vencido15h: conciliar comprobantes, no declarar pérdidas. 295Deals/70abiertos/2pipelines;201TASKprevias,302Leadsrecientes,296mensajes/48Sent/12Drafts,86Notion,16eventos. 3TASKcreadas+3actualizadas, seis cuerpos y18asociaciones verificados. Browser bloqueado;4calendariosMP+3LicitaLAB y avisosWherex. Sin envíos, otrasmutacionesCRM, secuencias, Notion o commit. Próximo corte21Oct09Chile.
 
@@ -400,3 +420,48 @@ Pedido directo de Julio: revisar Teva, Pierre Fabre y demás enviados. [Reporte 
 ### 21/10/2026 — Seguimientos expresamente autorizados
 
 14 enviados y 14 EMAIL SENT comprobados en HubSpot; 13 firmas gráficas y Pierre Fabre textual anterior a la corrección. Momentum excluido; secuencias del contacto regional y Teva preservadas. Sin otras altas CRM ni créditos. [Informe](runs/2026-10-21-seguimientos-enviados.md) · [Controles redactados](../prospecting-agent/queries/2026-10-21-seguimientos-enviados.json).
+
+
+### 21/10/2026 10:55 — Respuestas de izipay y Olivos del Sur
+
+izipay invitó a RFQ001: confirmación de interés22Oct17h sin zona; documentación y expediente pendientes. Iris ya no inscrita; dos adyacentes sí, sin cambios automáticos. Olivos acusa revisión interna, esperar. [Revisión](runs/2026-10-21-1055-respuestas-izipay-olivos.md) · [Controles](../prospecting-agent/queries/2026-10-21-1055-respuestas-izipay-olivos.json). Sin envíos ni escrituras CRM.
+
+
+### 21/10/2026 11:40 — izipay paquete para revisión y Olivos programado
+
+Iris: correo/firma gráfica y3adjuntos preparados, SINENVIAR hasta revisión deJulio. Ariana/Diego desinscritos y comprobados. Olivos: secuencia317665660 Programado1/Error0,29Oct/12Nov/3Dic,09:30–09:35UTC-5, paradarespuesta/reunión; sin correo hoy. [Evidencia](runs/2026-10-21-1140-izipay-paquete-olivos-secuencia.md) · [Consultas](../prospecting-agent/queries/2026-10-21-1140-izipay-paquete-olivos-secuencia.json). SinDeals/créditos/otroscontactos.
+
+
+### 21/10/2026 11:52 — izipay: confirmación enviada
+
+Enviado21Oct11:49:59Chile sólo a Compras, sinCC, firma gráfica y CCOHubSpot;2PDF+enlaces creativo/360completo. Outlook y EMAIL119215175851 SENT verificados. Admisión extranjera/bases/calendario pendientes; no repetir hoy. [Evidencia](runs/2026-10-21-1152-izipay-confirmacion-enviada.md) · [Consultas](../prospecting-agent/queries/2026-10-21-1152-izipay-confirmacion-enviada.json). Sin otrosenvíos/Deals/créditos/commit.
+
+
+### 21/10/2026 13:00 — izipay: Deal autorizado, sin alta por HOLD
+
+Alta porMCP expresamente autorizada; dedupe0 por nombre y Company. Fuente primaria sigue sin bases/calendario ni verificación contractual; alta no ejecutada conforme control18Oct. No confundir autorización con ejecución. [Evidencia](../prospecting-agent/runs/2026-10-21-1300-izipay-deal-autorizado-hold.md).
+
+
+### 21/10/2026 13:54 — izipay: Lead creado
+
+Lead598745034768 abierto/Conectado, Warm/NewBusiness, dueñoJulio, PrimaryContact/Company existentes verificados. MCPwrite nohabilitado, CLIOAuth autorizado mismoporal conreadbackMCP. Admisión/bases/calendario pendientes, sinDeal. [Evidencia](../prospecting-agent/runs/2026-10-21-1354-izipay-lead-creado.md).
+
+
+## Bitácora 21/10/2026 — corte16:00 Chile
+
+[Revisión integral](runs/2026-10-21-1600.md) con dosaltasTASK(izipayRFQ/Ingram) yseisactualizaciones(Pibank,Lotus,Berel,SKY1547,Laura,AWS), propiedadesyasociaciones releídas. Mismo borradorAWS corregido conHTMLdefirmacanónica, verificadoenDrafts yvisual; no enviado. State94claves conserva deltasmanuales, historial, descartes yFabrimetal2027. Actualizado READMEparaexigirfirma gráfica conforme políticavigente. Ningúncommit ni cambioalradardiario.
+
+
+### 21/10/2026 16:47 — izipay: negocio abierto por instrucción reiterada
+
+Deal66481946424 creado porMCP, dueñoJulio, administrativo/sinmonto/cierre, tresasociacionesyreadback verificados. Comprasacusainterésynovedadespróximassemanas;admisión/bases/calendario/contratopendientes. Excepciónespecíficainterpretadapara registro;sinGOparapostulación/gasto/compartir. LifecycleContact/Companyopportunitynativo;LeadConnected. [Evidencia](../prospecting-agent/runs/2026-10-21-1647-izipay-deal-abierto.md).
+
+
+### 21/10/2026 19:26 — auditoría de envíos y tracking
+
+Requisito de consentimiento desactivado y tracking general activado. Lote manual:14/14 copias Outlook y14/14 EMAIL SENT releídos. Secuencias:10envíos automáticos; pasos futuros separados; Unilever conserva un rebote y dos contactos en curso. No reenviar por ceros de apertura. CCO registra sin añadir por sí solo tracking. Sin cambios CRM, consentimientos, inscripciones ni envíos. [Informe](runs/2026-10-21-1926-auditoria-envios-tracking.md) · [Consultas](../prospecting-agent/queries/2026-10-21-1926-auditoria-envios-tracking.json).
+
+
+## Bitácora 23/10/2026 — corte09:00 Chile
+
+[Revisión integral](runs/2026-10-23-0900.md): cambio de cierre anticipado Berel, avance de propuesta Gana1552 y seguimiento SKY ya enviado conciliados. Una altaTASK de revisión interna para Mariana y tres actualizaciones, con campos y12listas de asociaciones releídos. Se preservan las claves, históricos, descartes y Fabrimetal2027. INAPI responde y rectifica; nueva señal emailMKT con exigencia excluyente, sin Deal ni GO. No emails ni postulaciones, no cambios al radar separado, no commit.

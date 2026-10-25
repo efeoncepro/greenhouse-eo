@@ -1,0 +1,10 @@
+Edit image 1, a still from a commercial film. Fix ONLY the lighting on the person so it has a believable source in this room.
+
+Problem: Antonio (the man in the navy bomber) is lit by a hard, golden, sunset-like light from the right side of the frame, but on that side there is only a wall and a screen; the real light source of the room is the large window behind, showing an overcast midday sky with soft, cool, even daylight.
+
+Relight the scene physically:
+- the main light is the soft daylight from the window: cool-neutral, diffuse, wrapping gently, with soft shadows, no golden sunset tone, no hard sun patches on the face or clothes;
+- add a subtle, soft orange glow from the switched-on BREAKR screen onto the side of the face, hair and shoulder nearest to it, as light from a bright display would fall, much weaker than the daylight;
+- the table, the wet surface and the reflections follow the same daylight.
+
+Keep EVERYTHING else exactly as in image 1: the face, identity, expression, gaze, hair, clothes, hands, every object, the screen and its BREAKR artwork, the wet table and orange slices, the framing, lens and depth of field. Photographic, real, nothing looks generated.

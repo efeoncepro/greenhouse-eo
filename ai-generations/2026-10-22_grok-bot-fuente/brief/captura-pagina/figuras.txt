@@ -1,0 +1,29 @@
+FIGURE SearchKenny7:34 PMNeed your yes on the Friday all-hands deck.Justin8 intros draf
+FIGURE Project AcmeDraft a follow-up to Acme after Friday’s callRewrite the pricing one
+FIGURE Bot avatar visual style explorations
+FIGCAPTION Bot avatar visual style explorations
+FIGURE 
+FIGURE IdleWorkingWaitingBlockedThinkingDoneAvatar motion system
+FIGCAPTION Avatar motion system
+FIGURE 
+@keyframes gba-dot {
+  0%, 55%, 100% { opacity: 0.35; transform: translateY(0);
+FIGURE 
+@keyframes gba-dot {
+  0%, 55%, 100% { opacity: 0.35; transform: translateY(0);
+FIGURE 
+@keyframes gba-dot {
+  0%, 55%, 100% { opacity: 0.35; transform: translateY(0);
+FIGURE 
+@keyframes gba-dot {
+  0%, 55%, 100% { opacity: 0.35; transform: translateY(0);
+FIGURE 
+FIGURE 
+FIGURE Dynamic wallpaper
+FIGCAPTION Dynamic wallpaper
+FIGURE 
+        /* The next card pushes forward: from the first waiting slot into place
+FIGCAPTION Inline chat widgets
+FIGURE 9:41 AMMorning! Can you check in with everyone for me?On it — pinging the team f
+FIGURE 
+FIGURE Every day at 8:00 AMOn weekdays at 8:00 AMEvery Monday at 9:00 AMMonthly on the 

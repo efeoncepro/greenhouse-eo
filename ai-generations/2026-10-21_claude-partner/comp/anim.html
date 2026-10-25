@@ -1,0 +1,56 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#001a33}canvas{display:block}</style></head><body>
+<canvas id="cv" width="1080" height="1350"></canvas>
+<script>
+// Fuente única de tiempos (grilla 120 BPM, corchea = 0,25 s). audio-cues.json sale de aquí.
+const T_NODES=0.0, T_CORE=0.75, T_LINK0=1.0, LINK_STEP=0.125, T_RING0=3.5, T_RING=3.75, T_HORIZ=4.0, T_SIGN=4.45
+const W=1080,H=1350,CX=540,CY=735,RX=420,RY=185,HY=960
+const WARM=[217,119,87]           // terracota de Claude, solo en el núcleo y el centro del horizonte
+const COOL=[207,228,250]
+const ctx=document.getElementById('cv').getContext('2d')
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),easeOut=t=>1-Math.pow(1-t,3),easeInOut=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2
+let s=7;const rnd=()=>(s=(s*16807)%2147483647)/2147483647
+// Nodos dentro del perímetro (con distancia mínima) y polvo fuera de él
+const NODES=[{x:CX,y:CY,r:7,core:true}]
+for(const [cnt,k,off] of [[6,0.46,0.3],[10,0.86,0.0]])for(let q=0;q<cnt;q++){const a=off+q*2*Math.PI/cnt+(rnd()-0.5)*0.45,kk=k*(0.9+rnd()*0.18);NODES.push({x:CX+Math.cos(a)*RX*kk,y:CY+Math.sin(a)*RY*kk,r:3.2+rnd()*1.6})}
+// Red desde el núcleo: primero rayos a los 5 nodos más cercanos, luego cada nodo al más cercano ya conectado,
+// y al final 4 enlaces cruzados entre vecinos. El orden del arreglo es el orden de la animación.
+const LINKS=[];{const d=(i,j)=>Math.hypot(NODES[i].x-NODES[j].x,(NODES[i].y-NODES[j].y)*1.5)
+ const inT=[0],out=NODES.map((_,i)=>i).slice(1)
+ const spokes=out.slice().sort((a,b)=>d(0,a)-d(0,b)).slice(0,5).sort((a,b)=>Math.atan2(NODES[a].y-CY,NODES[a].x-CX)-Math.atan2(NODES[b].y-CY,NODES[b].x-CX))
+ for(const o of spokes){LINKS.push({a:0,b:o});inT.push(o);out.splice(out.indexOf(o),1)}
+ while(out.length){let best=null;for(const o of out)for(const i of inT){const v=d(o,i);if(!best||v<best.v)best={a:i,b:o,v}}LINKS.push(best);inT.push(best.b);out.splice(out.indexOf(best.b),1)}
+ const has=(a,b)=>LINKS.some(L=>(L.a===a&&L.b===b)||(L.a===b&&L.b===a));const cand=[]
+ for(let i=1;i<NODES.length;i++)for(let j=i+1;j<NODES.length;j++)if(!has(i,j))cand.push({a:i,b:j,v:d(i,j)})
+ cand.sort((x,y)=>x.v-y.v).slice(0,4).forEach(c=>LINKS.push(c))}
+const DUST=[];for(let i=0;i<260;i++){const x=rnd()*W,y=rnd()*H*0.95;const e=((x-CX)/RX)**2+((y-CY)/RY)**2;if(e>1.25)DUST.push({x,y,r:0.4+rnd()*1.1,a:0.15+rnd()*0.35})}
+function glow(x,y,r,c,a){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${c},${a})`);g.addColorStop(1,`rgba(${c},0)`);ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r)}
+function line(a,b,p,alpha){const x=a.x+(b.x-a.x)*p,y=a.y+(b.y-a.y)*p
+ ctx.strokeStyle=`rgba(${COOL},${0.22*alpha})`;ctx.lineWidth=5;ctx.filter='blur(3px)';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(x,y);ctx.stroke();ctx.filter='none'
+ ctx.strokeStyle=`rgba(235,244,255,${0.85*alpha})`;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(x,y);ctx.stroke()
+ if(p<1)glow(x,y,14,'255,255,255',0.9*alpha)}
+window.setT=function(t){
+ ctx.globalCompositeOperation='source-over';ctx.fillStyle='#001a33';ctx.fillRect(0,0,W,H)
+ {const g=ctx.createRadialGradient(CX,HY,0,CX,HY,900);g.addColorStop(0,'rgba(14,46,90,0.55)');g.addColorStop(1,'rgba(0,12,28,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+ ctx.globalCompositeOperation='lighter'
+ for(const d of DUST)glow(d.x,d.y,d.r*3,`${COOL}`,d.a*0.6)
+ const lit=NODES.map(()=>0);lit[0]=clamp((t-T_CORE)/0.3)
+ LINKS.forEach((L,i)=>{const t0=T_LINK0+i*LINK_STEP-0.2,p=clamp((t-t0)/0.2);if(p>0){line(NODES[L.a],NODES[L.b],easeOut(p),1)}if(p>=1)lit[L.b]=Math.max(lit[L.b],clamp((t-t0-0.2)/0.12))})
+ // Respiración tras el cierre del perímetro
+ const br=t>T_RING?Math.sin(clamp((t-T_RING)/0.75)*Math.PI)*0.35:0
+ NODES.forEach((n,i)=>{const base=clamp(t/0.8)*0.28,l=Math.max(base,lit[i])*(1+br)
+  if(n.core){glow(n.x,n.y,90*(0.5+l),`${WARM}`,0.55*l);glow(n.x,n.y,26,'255,236,224',0.95*l);glow(n.x,n.y,9,'255,255,255',l)}
+  else{glow(n.x,n.y,30,`${COOL}`,0.35*l);glow(n.x,n.y,n.r*2.2,'255,255,255',0.95*l)}})
+ // Perímetro: se traza en sentido horario y se cierra en T_RING
+ const rp=clamp((t-T_RING0)/(T_RING-T_RING0));if(rp>0){const a0=-Math.PI/2,a1=a0+Math.PI*2*easeInOut(rp)
+  ctx.strokeStyle=`rgba(${COOL},0.18)`;ctx.lineWidth=6;ctx.filter='blur(4px)';ctx.beginPath();ctx.ellipse(CX,CY,RX,RY,0,a0,a1);ctx.stroke();ctx.filter='none'
+  ctx.strokeStyle='rgba(225,238,255,0.8)';ctx.lineWidth=1.2;ctx.beginPath();ctx.ellipse(CX,CY,RX,RY,0,a0,a1);ctx.stroke()
+  if(rp<1)glow(CX+Math.cos(a1)*RX,CY+Math.sin(a1)*RY,18,'255,255,255',1)}
+ // Horizonte: nace en T_HORIZ desde el centro, núcleo terracota y bordes fríos
+ const hp=clamp((t-T_HORIZ)/0.5);if(hp>0){const half=W*0.55*easeOut(hp)
+  const g=ctx.createLinearGradient(CX-half,0,CX+half,0);g.addColorStop(0,`rgba(${COOL},0)`);g.addColorStop(0.3,`rgba(${COOL},0.7)`);g.addColorStop(0.5,`rgba(255,214,196,1)`);g.addColorStop(0.7,`rgba(${COOL},0.7)`);g.addColorStop(1,`rgba(${COOL},0)`)
+  ctx.fillStyle=g;ctx.fillRect(CX-half,HY-1,2*half,2);ctx.filter='blur(6px)';ctx.globalAlpha=0.6;ctx.fillRect(CX-half,HY-4,2*half,8);ctx.filter='none';ctx.globalAlpha=1
+  glow(CX,HY,260*hp,`${WARM}`,0.35*hp);glow(CX,HY,60,'255,230,215',0.8*hp)}
+}
+setT(0)
+</script></body></html>

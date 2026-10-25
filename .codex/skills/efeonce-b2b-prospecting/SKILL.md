@@ -5,6 +5,13 @@ description: Investiga cuentas B2B para Efeonce, identifica compradores y contac
 
 # Prospección B2B Efeonce
 
+## Criterio para nuevas comunicaciones
+
+Antes de preparar una apertura, reactivación, seguimiento o respuesta comercial de captación/expansión,
+cargar [conversaciones útiles](references/conversation-quality-and-review.md). Aplicar también a leads
+de web/pauta y a la revisión de borradores/secuencias; conservar el correo robusto de Julio cuando corresponda.
+La guía local no modifica instrucciones, borradores ni programaciones nativas de HubSpot por sí sola.
+
 ## Brochures ya aprobados
 
 Aplicar la [decisión de Julio del 17-10-2026](../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md):

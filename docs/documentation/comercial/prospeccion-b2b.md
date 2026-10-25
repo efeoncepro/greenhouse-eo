@@ -12,6 +12,11 @@ Se opera con [efeonce-b2b-prospecting](../../../.codex/skills/efeonce-b2b-prospe
 
 ## Qué entrega
 
+Cada apertura, seguimiento y respuesta inbound comercial aplica el criterio compartido de
+[conversaciones útiles](../../../.codex/skills/efeonce-b2b-prospecting/references/conversation-quality-and-review.md).
+Se conserva una tesis por iniciativa, la voz robusta de Julio y un siguiente paso proporcional. Cambiar
+la skill no cambia borradores ni secuencias existentes; cada canal mantiene sus permisos y readback.
+
 Cuenta/entidad compradora, fit con evidencia, problema o hipótesis, objetivo y personas adicionales,
 calidad de correo, relación/demanda/proceso separados, ruta principal/alternativa, mensaje o prueba sugerida
 y siguiente decisión. Fuentes por campo, fecha de corte, contradicciones y cobertura visibles.

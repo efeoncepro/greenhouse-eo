@@ -1,0 +1,96 @@
+{
+  "run_at": "2026-10-21T13:54:48.732233-03:00",
+  "timezone": "America/Santiago",
+  "scope": "CreaciónfocaldeLead autorizada, no radarcompleto",
+  "week_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-21T13:54:48.732233-03:00"
+  },
+  "queries": [
+    {
+      "source": "HubSpot MCPget_user_details/discover_schema",
+      "query": "USER_INFORMATION+TOOL_INFORMATION; GET_OBJECT_TYPES LEAD",
+      "result": "Portal48713323 y usuario75788512; LEADlectura disponible/escritura nohabilitada enMCP"
+    },
+    {
+      "source": "HubSpot MCPsearch_crm_objects",
+      "query": "LEAD asociadoContact256738112539 OR Company59717761399,limit100",
+      "result": "total0"
+    },
+    {
+      "source": "HubSpot MCPschema/get_properties",
+      "query": "GET_PIPELINES LEAD y seis propiedades delchangeset",
+      "result": "Connected/Warm/NewBusiness, owner75788512, enumsverificados"
+    },
+    {
+      "source": "HubSpotCLIwhoami/version/help",
+      "query": "whoami --format json; version; objectscreate --help; associationslist --help",
+      "result": "OAuthJulio portal48713323, leadswrite;0.16.0/build1487;create condry-run"
+    },
+    {
+      "source": "HubSpotCLIassociationslist + MCPget_crm_objects",
+      "query": "Contact256738112539→companies y prestateContact/Company",
+      "result": "PrimaryCompany59717761399, emaillaboralverificado, lifecyclelead y fuerasecuencia"
+    },
+    {
+      "source": "Websearch",
+      "query": "site.developers.hubspot.com leads associations 580 578",
+      "result": "Búsqueda inicialmalformada; resultados nooficiales no utilizados"
+    },
+    {
+      "source": "HubSpotdocumentación oficial",
+      "query": "https://developers.hubspot.com/docs/api-reference/crm-associations-v4/guide ; find580/Lead to object",
+      "result": "578primaryContact;580primaryCompany verificados"
+    },
+    {
+      "source": "HubSpotCLI",
+      "query": "objects create --type leads --dry-run --format json < [payloadprivado]",
+      "result": "Dospreviews por agregarasociaciónCompany;executedfalse, sin digest mostrado"
+    },
+    {
+      "source": "HubSpotCLI",
+      "query": "objects create --type leads --format json < [payloadprivado]",
+      "result": "Unaalta598745034768, dosasociacionesprimarias"
+    },
+    {
+      "source": "HubSpotMCP/CLI readback",
+      "query": "getLEAD598745034768; associationslist→contacts/companies; getContact/Company",
+      "result": "Conectado y abierto, dueñoJulio, Warm/NewBusiness, primarioscorrectos; lifecycleconservado, Iris fuerasecuencia"
+    }
+  ],
+  "account": "izipay",
+  "stable_crm_company_id": 59717761399,
+  "stable_contact_id": 256738112539,
+  "lead_id": 598745034768,
+  "approval": "Instrucción expresa: entonces al menos crealos como Lead",
+  "result": "CREATED_READBACK_VERIFIED",
+  "lead_stage": "connected-stage-id",
+  "contract_control": {
+    "result": "HOLD_FOR_DEAL_NOT_QUALIFIED",
+    "source": "Correo primarioRFQ001 leído hoy y expediente previo enlazado",
+    "last_checked_at": "2026-10-21T13:54:48.732233-03:00",
+    "published_at": "NO_VERIFICADO",
+    "first_seen_at": "2026-10-21T13:41:20Z",
+    "awardee": "NO_VERIFICADO",
+    "award_act_order": "NO_VERIFICADO",
+    "contract_status": "NO_VERIFICADO",
+    "signed_at": "NO_VERIFICADO",
+    "execution_start_end": "NO_VERIFICADO;2027general",
+    "interest_deadline": "2026-10-22T17:00;sinzona",
+    "offer_deadline": "NO_VERIFICADO;pendientebases",
+    "document_read": "Correo comprador;documentocontractualno disponible",
+    "reason": "Lead para seguimiento de interacciónreal expresamenteautorizado; no se afirma compra adjudicable ni creaDeal"
+  },
+  "crm_writes": {
+    "new_leads": 1,
+    "primary_associations": 2,
+    "contacts": 0,
+    "companies": 0,
+    "deals": 0,
+    "notes": 0
+  },
+  "paid_credits": 0,
+  "sends": 0,
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-izipay-confirmacion",
+  "pii_queries": "Datosnominales,payload y emails permanecenfueraGit; expresiones deContact/Company IDs no contienenemail"
+}

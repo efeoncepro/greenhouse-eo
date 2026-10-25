@@ -1,0 +1,163 @@
+{
+ "video": "¿Para cuándo? · anuncio BytePlus × Efeonce",
+ "idioma": "es",
+ "bpm": 120,
+ "estado": "Tiempos ESTIMADOS sobre el animatic v2 (montaje a 120 BPM); se rehacen con la voz grabada.",
+ "reglas": {
+  "max_lineas": 2,
+  "max_caracteres_por_linea": 37,
+  "max_caracteres_por_segundo": 17,
+  "min_duracion_s": 0.8
+ },
+ "lineas": [
+  {
+   "plano": "01",
+   "quien": "Paula",
+   "tipo": "subtitulo",
+   "lineas": [
+    "¿Y para cuándo estaría",
+    "la campaña?"
+   ],
+   "palabras": [
+    [
+     "¿Y",
+     1.55
+    ],
+    [
+     "para",
+     1.7
+    ],
+    [
+     "cuándo",
+     1.85
+    ],
+    [
+     "estaría",
+     2.15
+    ],
+    [
+     "la",
+     2.5
+    ],
+    [
+     "campaña?",
+     2.6
+    ]
+   ],
+   "sale": 3.5
+  },
+  {
+   "plano": "06",
+   "quien": null,
+   "tipo": "sonido",
+   "texto": "[Silencio]",
+   "entra": 9.0,
+   "sale": 10.5
+  },
+  {
+   "plano": "07",
+   "quien": "Antonio",
+   "tipo": "subtitulo",
+   "lineas": [
+    "¿Para cuándo la necesitas?"
+   ],
+   "palabras": [
+    [
+     "¿Para",
+     10.6
+    ],
+    [
+     "cuándo",
+     10.8
+    ],
+    [
+     "la",
+     11.05
+    ],
+    [
+     "necesitas?",
+     11.15
+    ]
+   ],
+   "sale": 12.0
+  },
+  {
+   "plano": "08",
+   "quien": "Paula",
+   "tipo": "subtitulo",
+   "lineas": [
+    "…¿Para ayer?"
+   ],
+   "palabras": [
+    [
+     "…¿Para",
+     12.1
+    ],
+    [
+     "ayer?",
+     12.45
+    ]
+   ],
+   "sale": 13.0
+  },
+  {
+   "plano": "09",
+   "quien": "Antonio",
+   "tipo": "remate",
+   "texto": "Ya está.",
+   "entra": 13.05,
+   "sale": 14.0
+  },
+  {
+   "plano": "11b",
+   "quien": null,
+   "tipo": "sonido",
+   "texto": "[Chapuzón]",
+   "entra": 15.5,
+   "sale": 16.5
+  },
+  {
+   "plano": "16",
+   "quien": "Vocera",
+   "tipo": "pendiente",
+   "texto": "(guion de la vocera en ES, EN y PT pendiente)",
+   "entra": 21.0,
+   "sale": 23.5
+  },
+  {
+   "plano": "17",
+   "quien": "Paula",
+   "tipo": "subtitulo",
+   "lineas": [
+    "…¿Y para el lunes?"
+   ],
+   "palabras": [
+    [
+     "…¿Y",
+     23.6
+    ],
+    [
+     "para",
+     23.8
+    ],
+    [
+     "el",
+     24.0
+    ],
+    [
+     "lunes?",
+     24.1
+    ]
+   ],
+   "sale": 25.0
+  },
+  {
+   "plano": "18",
+   "quien": "Antonio",
+   "tipo": "remate",
+   "texto": "También.",
+   "entra": 25.05,
+   "sale": 26.0
+  }
+ ]
+}

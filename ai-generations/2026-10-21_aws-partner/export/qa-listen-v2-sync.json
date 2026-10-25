@@ -1,0 +1,160 @@
+{
+  "meta": {
+    "model": "gemini-3.8-flash",
+    "thinking": "high",
+    "preset": "sync@1",
+    "promptHash": "abf033e5bc32",
+    "fps": 12,
+    "clip": null,
+    "resolution": "default",
+    "processing": "static",
+    "files": [
+      {
+        "path": "ai-generations/2026-10-21_aws-partner/audio/mezcla-master.wav",
+        "sha256": "eb975ac39b8a"
+      },
+      {
+        "path": "ai-generations/2026-10-21_aws-partner/export/efeonce-aws-feed-4x5.mp4",
+        "sha256": "f8ea5338f236"
+      }
+    ],
+    "usage": {
+      "inputTokens": 8123,
+      "outputTokens": 772,
+      "thoughtTokens": 8255
+    },
+    "latencyMs": 166244,
+    "verificacionRecalculada": "2026-10-21 con el detector corregido (commit dcc83aff7); la respuesta de Gemini es la de la corrida original"
+  },
+  "resumen": "La pieza tiene una excelente potencia en los dos impactos principales (2,00 s y 4,00 s), pero falla en la sincronía fina de los íconos iniciales y muere prematuramente en un cuadro completamente congelado en los últimos 2,67 segundos.",
+  "hallazgos": [
+    {
+      "t": 0.5,
+      "tipo": "desfase",
+      "severidad": "media",
+      "afirmacion": "Los íconos de arquitectura aparecen con un desfase de 40 a 83 ms de retraso visual respecto a los clics sonoros.",
+      "medible": true,
+      "sugerencia": "Adelantar la aparición visual de cada ícono entre 1 y 2 cuadros para que sus transitorios coincidan con la grilla de audio.",
+      "t_fin": 1.08,
+      "verificacion": {
+        "estado": "refutado",
+        "medido": "2 par(es); desfase mediano +8 ms (el sonido llega después de la imagen); rango 8…8 ms; tolerancia ±42 ms"
+      }
+    },
+    {
+      "t": 5.33,
+      "tipo": "cuadro_quieto",
+      "severidad": "alta",
+      "afirmacion": "La Tierra y el lockup quedan en cuadro congelado absoluto desde 5,33 s hasta 8,00 s sin el alejamiento continuo pautado.",
+      "medible": true,
+      "sugerencia": "Mantener la interpolación de escala lenta (1,07x a 1,0x) sin frenar a cero hasta el final del video.",
+      "t_fin": 8,
+      "verificacion": {
+        "estado": "refutado",
+        "medido": "0 cuadro(s) quieto(s) seguidos en 5.33–8.00 s (diferencia mínima 0.86; quieto < 0.15)"
+      }
+    },
+    {
+      "t": 5.33,
+      "tipo": "legibilidad",
+      "severidad": "baja",
+      "afirmacion": "Los textos de los servicios al pie ('Amazon EC2', 'Amazon S3', 'Amazon Bedrock') tienen un tamaño tipográfico demasiado reducido para pantallas móviles.",
+      "medible": false,
+      "sugerencia": "Aumentar el cuerpo tipográfico o priorizar los isotipos para optimizar la lectura en feed móvil.",
+      "t_fin": 8,
+      "verificacion": {
+        "estado": "no_medible",
+        "medido": "«legibilidad» es juicio: no se mide"
+      }
+    }
+  ],
+  "cues": [
+    {
+      "t": 0,
+      "veredicto": "cumple",
+      "nota": "Trazado de cajas y build musical en sincronía adecuada."
+    },
+    {
+      "t": 0.5,
+      "veredicto": "falla",
+      "nota": "Los íconos entran desfasados respecto a los clics de audio (EC2 en 0,58 s, S3 en 1,08 s)."
+    },
+    {
+      "t": 1,
+      "veredicto": "cumple",
+      "nota": "Pulsos por flechas y riser sonoro ascendente bien coordinados."
+    },
+    {
+      "t": 1.62,
+      "veredicto": "cumple",
+      "nota": "Zambullida al chip y corte a silencio antes del impacto."
+    },
+    {
+      "t": 2,
+      "veredicto": "cumple",
+      "nota": "Golpe 1 exacto: flash en 2,00 s, entrada al pasillo e impacto de sub alineados al cuadro."
+    },
+    {
+      "t": 2,
+      "veredicto": "cumple",
+      "nota": "Aceleración de cámara y rampa de ventiladores y aire bien lograda."
+    },
+    {
+      "t": 4,
+      "veredicto": "cumple",
+      "nota": "Golpe 2 exacto: flash blanco e impacto coordinados al milisegundo."
+    },
+    {
+      "t": 4.6,
+      "veredicto": "cumple",
+      "nota": "Desaceleración de la Tierra y espacio en la mezcla para el sting."
+    },
+    {
+      "t": 5,
+      "veredicto": "cumple",
+      "nota": "Aparición escalonada de textos y logos alineada con el remate del sting."
+    },
+    {
+      "t": 5,
+      "veredicto": "falla",
+      "nota": "La Tierra no mantiene el alejamiento residual continuo (1,07x a 1,0x), congelándose por completo."
+    }
+  ],
+  "puntajes": {
+    "cierre": 5.5,
+    "impacto": 9,
+    "legibilidad": 7,
+    "sincronia": 7.5
+  },
+  "cuesMedidos": [
+    {
+      "cue": 1.62,
+      "kind": "silencio",
+      "t": 1.75,
+      "tFin": 2,
+      "estado": "confirmado",
+      "medido": "RMS máx. −inf dB en 1.75–2.00 s (silencio ≤ -50 dB)"
+    },
+    {
+      "cue": 2,
+      "kind": "golpe",
+      "t": 2,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 2.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 4,
+      "kind": "golpe",
+      "t": 4,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 4.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 5,
+      "kind": "pico",
+      "t": 5,
+      "estado": "confirmado",
+      "medido": "pico de ±0,5 s en 5.00 s (-3.1 dBFS)"
+    }
+  ]
+}

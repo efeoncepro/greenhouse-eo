@@ -2,6 +2,12 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-25 — Criterio reutilizable para nuevas conversaciones comerciales
+
+- Prospección, Commercial y Copywriting incorporan historia por iniciativa, evidencia, pregunta útil y
+  revisión de respuesta; [método y estados](docs/commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md).
+  [Aplicación nativa verificada](docs/commercial/analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md): guía9.705, nueve correos/nueve plantillas ajustados, cinco pausas; cola13→8 el29Oct. QA de borrador nuevo pendiente; sin envío inmediato ni pauta.
+
 ## 2026-10-25 — Ficha de autor, byline y schema de autor del blog (TASK-2057)
 
 - El single del blog tiene byline «Por {autor}» enlazado al archivo y, al cierre, una ficha de autor de La órbita
@@ -623,13 +629,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - Seis capacidades nuevas `commercial.quoter.*`. La primera cotización real emitida será `EO-QTE-15001`.
 - [Modelo de datos](docs/architecture/GREENHOUSE_QUOTER_V3_DATA_MODEL_V1.md) ·
   [manual del importador](docs/manual-de-uso/finance/importar-catalogo-v3-a-la-plataforma.md). `TASK-2025`.
-
-## 2026-10-12 — Growth: el regrade AEO respeta el contrato y la captura de rankings tiene segunda pasada
-
-- El regrade recurrente fallaba todos los días desde el 3 de octubre con los 6 mercados secundarios de Sky: tenían
-  cadencia prendida y el contrato no los declaraba. Ahora un solo predicado decide la cobertura para quien ejecuta,
-  quien reclama y quien habilita; `assignAeoTier` acepta `marketsIncluded` y existe `pnpm growth:aeo-contracted-markets`.
-  Sky quedó con AR, BR, CL, CO, PE, US y UY declarados (confirmación del operador). [ISSUE-181](docs/issues/open/ISSUE-181-aeo-regrade-claims-markets-outside-contract.md)
-- La captura diaria de rankings perdía keywords cuando DataForSEO tardaba más de 35 s y el resumen decía
-  `degraded=0 failed=0`. Se agrega la segunda pasada `ops-seo-rank-capture-retry` a las 07:00 (cuesta cero con el día
-  completo) y el log avisa los parciales. Rige tras el próximo deploy del `ops-worker`. [ISSUE-182](docs/issues/open/ISSUE-182-seo-rank-capture-partial-days-silent.md)

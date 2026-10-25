@@ -1,0 +1,1 @@
+Replace only the marked laptop screen content in the foreground: a video call in a 2x2 grid with exactly the four people of image 2, softly out of focus like the rest of the foreground. Keep the laptop frame and everything outside the zone unchanged. Photorealistic.

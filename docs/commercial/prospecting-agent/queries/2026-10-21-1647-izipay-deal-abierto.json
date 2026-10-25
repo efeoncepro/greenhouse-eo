@@ -1,0 +1,109 @@
+{
+  "run_at": "2026-10-21T16:47:21.150926-03:00",
+  "timezone": "America/Santiago",
+  "scope": "AltaadministrativaDealizipayporinstrucciónreiteradatrasrespuesta;nocorridadedescubrimiento",
+  "week_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-21T16:47:21.150926-03:00"
+  },
+  "queries": [
+    {
+      "source": "Outlooksearch_messages",
+      "query": "from:[correo laboraldeIris redactado] received>=2026-10-21",
+      "pii_redacted": true,
+      "result": "Nuevarespuesta16:37:50Chile másinvitaciónoriginal; cuerposcompletos leídos; sinadjuntos"
+    },
+    {
+      "source": "HubSpotMCPget_user_details",
+      "query": "USER_INFORMATION",
+      "result": "Portal48713323,Julio75788512"
+    },
+    {
+      "source": "HubSpotMCPsearch_crm_objects",
+      "query": "DEALqueryizipay yDEALasociadoCompany59717761399",
+      "result": "total0enambas,limit100,sinpaginación"
+    },
+    {
+      "source": "HubSpotMCPschema/properties",
+      "query": "GET_PIPELINESDEAL ycamposdesolicitud",
+      "result": "Pipeline/etapas/owner/enumsvalidados; sinenumnuevoCreativeServices"
+    },
+    {
+      "source": "HubSpotMCPgetLEAD",
+      "query": "LEAD598745034768 pre/post",
+      "result": "Connected,PrimaryContact/Companyconservados;1Dealasociadotrasalta"
+    },
+    {
+      "source": "HubSpotCLI",
+      "query": "workflowslist --limit100 --formatjson",
+      "result": "403faltascopes;sinreauth,cambiosniconclusiónsobreworkflowespecífico"
+    },
+    {
+      "source": "HubSpotMCPmanage_crm_objects",
+      "query": "CREATE1DEALcon3asociacionesycamposrevisados",
+      "result": "66481946424,created1/failed0,asociaciones3/3;CONFIRMEDporinstrucciónreiteradadeJulio"
+    },
+    {
+      "source": "HubSpotMCPgetDEAL",
+      "query": "66481946424,peticiónnueva ysegundoestado",
+      "result": "Nombre/campos/bucketadministrativopersisten;monto vacío,closedatesinvalor,USDdefault"
+    },
+    {
+      "source": "HubSpotCLIassociationslist",
+      "query": "deals66481946424→companies,contacts,leads",
+      "result": "TresIDsesperados,PrimaryCompany yPrimaryDealLead,sinpaginación"
+    },
+    {
+      "source": "HubSpotMCPgetContact/Company",
+      "query": "256738112539 y59717761399",
+      "result": "lifecycleopportunitynativo,Contactfuera desecuencia;sinwritesmanuales"
+    },
+    {
+      "source": "Codexopen_in_codex",
+      "query": "AbrirURLdelDealverificado",
+      "result": "queued;sinconfirmarrenderizado"
+    }
+  ],
+  "country": "Perú",
+  "service": "Agenciacreativa",
+  "company_id": 59717761399,
+  "contact_id": 256738112539,
+  "lead_id": 598745034768,
+  "deal_id": 66481946424,
+  "approval_instruction": "Me acaba de responder. Abre el deal",
+  "approval_interpretation": "Instrucción reiterada de crear/abrir el Deal tras informar el HOLD; excepción específica interpretada para registro administrativo izipay, sin sustituir verificación factual para postulación/gasto/compartir.",
+  "contract_control": {
+    "result": "HOLD_FACTUAL_REGISTRO_ADMINISTRATIVO_ABIERTO_POR_INSTRUCCION_ESPECIFICA",
+    "source": "Correoprimariocomprador invitaciónyacuserecibo21Oct",
+    "last_checked_at": "2026-10-21T16:47:21.150926-03:00",
+    "new_reply_received_at": "2026-10-21T19:37:50Z",
+    "published_at": "NO_VERIFICADO",
+    "first_seen_at": "2026-10-21T13:41:20Z",
+    "awardee": "NO_VERIFICADO",
+    "award_act_order": "NO_VERIFICADO",
+    "contract_status": "NO_VERIFICADO",
+    "signature_at": "NO_VERIFICADO",
+    "execution_start_end": "NO_VERIFICADO;2027general",
+    "interest_deadline_at": "2026-10-22T17:00;zonapendiente",
+    "registration_admission": "NO_VERIFICADO;E-RUT/proveedorextranjeropendiente",
+    "offer_deadline_at": "NO_VERIFICADO;calendariopendiente",
+    "document_read": "Correoíntegro;nodocumentocontractualrecibido",
+    "basis": "Acuserecibonoconfirmaadmisión olicitacióndisponible;controlparapostulación/gasto/compartirpermaneceHOLD"
+  },
+  "result": "DEAL_CREATED_READBACK_VERIFIED",
+  "crm_writes": {
+    "deals": 1,
+    "associations": 3,
+    "manual_lifecycle": 0,
+    "notes": 0,
+    "other_records": 0
+  },
+  "native_effects": {
+    "company_lifecycle": "opportunity",
+    "contact_lifecycle": "opportunity",
+    "lead_stage": "connected-stage-id"
+  },
+  "paid_credits": 0,
+  "sends": 0,
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-izipay-confirmacion"
+}

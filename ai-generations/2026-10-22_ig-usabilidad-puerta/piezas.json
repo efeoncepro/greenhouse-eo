@@ -1,0 +1,5 @@
+[{"id": "u1-usabilidad-45", "plate": "plates/U1-puerta-45-cartel.png", "align": "left", "top": 0.075, "textWidth": 0.84,
+  "lead": "Si tu puerta necesita un cartel,", "leadFamily": "bricolage", "leadSize": 46, "leadGap": 0.15, "leadFill": "#ffffff",
+  "dominant": "no es usable.", "dominantSize": 175, "dominantMax": 0.84,
+  "after": "Feliz Día de la Usabilidad.", "afterFamily": "poppins", "afterSize": 38, "afterGap": 0.12, "afterFill": "#ffffff",
+  "logo": {"width": 0.2, "x": 0.5}}]

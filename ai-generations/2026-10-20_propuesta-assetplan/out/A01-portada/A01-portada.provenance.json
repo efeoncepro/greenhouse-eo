@@ -1,0 +1,21 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "75433df261c66771c025ed6f16923a87cfb142d3126d2c08e0edb70330b7ceca",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-proposal",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:assetplan-on-dark",
+      "path": "ai-generations/2026-10-20_propuesta-assetplan/assets/assetplan-on-dark.svg",
+      "sha256": "89eaec5b3d9686df75beac11713bf4d63bcb7766303f6dd99c6e85e39f4e63ec"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  },
+  "adjustment": "eyebrow-chip-outline-2026-10-20"
+}

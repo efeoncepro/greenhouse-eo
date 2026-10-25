@@ -1,0 +1,237 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "0ea0b3257966",
+  "key": "0ea0b3257966294da4e69fb0e6dc9512e79c5f51f4203d4ac4307a70b97b0136",
+  "status": "completed",
+  "createdAt": "2026-10-22T18:34:06.194Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/fisica/planoA/b-inicio-v2-sin-limpiar.png",
+    "imageSha256": "6a7d7137972c2a44c7ca142d556f211913de585c0fff296b4d7c16777529ef9c",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/fisica/planoA/mascara-resto.png",
+    "maskSha256": "ce2772b2e780a91e927ef5ccbf481348cde7beec0314b04c029c51e02c806607",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": null,
+    "seed": null,
+    "count": 2,
+    "prompt": "Remove the partial orange can in the marked area. Show her cream knit sweater, her brown hair and the white collar behind it, with a few motion-blurred water streaks continuing from the water burst next to it. Change nothing else; keep the other can (silver bottom) exactly as it is.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nRemove the partial orange can in the marked area. Show her cream knit sweater, her brown hair and the white collar behind it, with a few motion-blurred water streaks continuing from the water burst next to it. Change nothing else; keep the other can (silver bottom) exactly as it is.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.006284332275390625,
+    "editable": 6085,
+    "soft": 2152,
+    "protected": 1302483
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 265,
+      "top": 490,
+      "width": 235,
+      "height": 221
+    },
+    "target": {
+      "width": 1056,
+      "height": 992
+    },
+    "aspectError": 0.0010969422734128107,
+    "reason": "la zona con contexto ocupa 3.9 % de la imagen: se genera recortada a 1056x992"
+  },
+  "estimate": {
+    "usd": 0.0252,
+    "basis": "2 × salida 1056x992 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 23.468,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 6.25,
+        "bestError": 6.25,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.05,
+        -2.02,
+        -2.41
+      ],
+      "protected": {
+        "pixels": 1302483,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 6085,
+        "maxDelta": 187,
+        "meanDelta": 30.382,
+        "worst": {
+          "x": 394,
+          "y": 581
+        }
+      },
+      "seam": {
+        "pixels": 2152,
+        "maxDelta": 52,
+        "meanDelta": 3.918,
+        "worst": {
+          "x": 398,
+          "y": 613
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1302483,
+        "maxDelta": 89,
+        "meanDelta": 0.25,
+        "worst": {
+          "x": 456,
+          "y": 628
+        }
+      },
+      "outputUsd": 0.0126,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2230,
+        "input_tokens_details": {
+          "image_tokens": 2046,
+          "text_tokens": 184
+        },
+        "output_tokens": 421,
+        "output_tokens_details": {
+          "image_tokens": 421,
+          "text_tokens": 0
+        },
+        "total_tokens": 2651
+      },
+      "meta": {
+        "size": "1056x992",
+        "quality": "medium",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 20.149,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.02,
+        "bestError": 5.02,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        1.65,
+        -0.88,
+        -0.88
+      ],
+      "protected": {
+        "pixels": 1302483,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 6085,
+        "maxDelta": 207,
+        "meanDelta": 26.212,
+        "worst": {
+          "x": 377,
+          "y": 585
+        }
+      },
+      "seam": {
+        "pixels": 2152,
+        "maxDelta": 37,
+        "meanDelta": 3.005,
+        "worst": {
+          "x": 391,
+          "y": 624
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1302483,
+        "maxDelta": 75,
+        "meanDelta": 0.212,
+        "worst": {
+          "x": 455,
+          "y": 628
+        }
+      },
+      "outputUsd": 0.0126,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2230,
+        "input_tokens_details": {
+          "image_tokens": 2046,
+          "text_tokens": 184
+        },
+        "output_tokens": 421,
+        "output_tokens_details": {
+          "image_tokens": 421,
+          "text_tokens": 0
+        },
+        "total_tokens": 2651
+      },
+      "meta": {
+        "size": "1056x992",
+        "quality": "medium",
+        "providerMask": false
+      }
+    }
+  ],
+  "erase": {
+    "fill": "model",
+    "layers": [],
+    "shadow": null,
+    "erasure": [
+      {
+        "changeInCore": 21.83,
+        "corePixels": 6085,
+        "objectLikeness": null,
+        "residueSuspected": false
+      },
+      {
+        "changeInCore": 18.46,
+        "corePixels": 6085,
+        "objectLikeness": null,
+        "residueSuspected": false
+      }
+    ]
+  }
+}

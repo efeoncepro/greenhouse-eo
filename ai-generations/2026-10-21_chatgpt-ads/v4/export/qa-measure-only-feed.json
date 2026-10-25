@@ -1,0 +1,105 @@
+{
+  "meta": {
+    "mode": "measure-only",
+    "audio": "ai-generations/2026-10-21_chatgpt-ads/v4/audio/mezcla-master.wav",
+    "video": "ai-generations/2026-10-21_chatgpt-ads/v4/export/efeonce-chatgpt-ads-v4-feed.mp4",
+    "files": [
+      {
+        "path": "ai-generations/2026-10-21_chatgpt-ads/v4/audio/mezcla-master.wav"
+      },
+      {
+        "path": "ai-generations/2026-10-21_chatgpt-ads/v4/export/efeonce-chatgpt-ads-v4-feed.mp4"
+      }
+    ],
+    "latencyMs": 395
+  },
+  "mapa": {
+    "durationSec": 11.99,
+    "onsets": [
+      0.08,
+      4,
+      6,
+      9,
+      9.58
+    ],
+    "silences": [
+      {
+        "t": 3.76,
+        "tFin": 4
+      },
+      {
+        "t": 5.87,
+        "tFin": 6
+      },
+      {
+        "t": 8.49,
+        "tFin": 9
+      },
+      {
+        "t": 11.52,
+        "tFin": 12
+      }
+    ],
+    "cuts": [
+      4,
+      5.958333,
+      9
+    ],
+    "visualEvents": [
+      4,
+      6,
+      6.625,
+      6.916667,
+      7.083333,
+      7.416667,
+      7.583333,
+      9,
+      10
+    ],
+    "frozen": [],
+    "sync": {
+      "pairs": 3,
+      "medianMs": 0,
+      "worstMs": 0,
+      "inSync": true
+    }
+  },
+  "cuesMedidos": [
+    {
+      "cue": 3.75,
+      "kind": "silencio",
+      "t": 3.75,
+      "tFin": 4,
+      "estado": "confirmado",
+      "medido": "RMS máx. −inf dB en 3.75–4.00 s (silencio ≤ -50 dB)"
+    },
+    {
+      "cue": 4,
+      "kind": "golpe",
+      "t": 4,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 4.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 6,
+      "kind": "golpe",
+      "t": 6,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 6.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 9,
+      "kind": "golpe",
+      "t": 9,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 9.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 10,
+      "kind": "pico",
+      "t": 10,
+      "estado": "confirmado",
+      "medido": "pico de ±0,5 s en 10.00 s (-3.0 dBFS)"
+    }
+  ]
+}

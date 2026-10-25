@@ -1,0 +1,94 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#0e141c}
+#c{position:relative;overflow:hidden;width:1080px;height:1350px;font-family:Inter,sans-serif;
+ background:radial-gradient(ellipse at 50% 42%,#1d2939 0%,#141c27 45%,#0b1017 100%)}
+#persp{position:absolute;inset:0;perspective:1500px;perspective-origin:50% 45%}
+#cam{position:absolute;left:90px;top:0;width:900px;height:1000px;transform-origin:450px 480px}
+#plane{position:absolute;inset:0;transform-origin:450px 480px;transform-style:preserve-3d;
+ background-image:radial-gradient(rgba(255,255,255,.07) 1.2px,transparent 1.3px);background-size:30px 30px;background-position:15px 15px}
+svg#lines{position:absolute;inset:0;overflow:visible}
+.ic{position:absolute;transform-origin:center}
+.ic img{width:100%;height:100%;display:block;border-radius:6%}
+.lab{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:12px;white-space:nowrap;color:#e8edf3;font-size:19px;font-weight:500;letter-spacing:.1px}
+.glab{position:absolute;color:#e8edf3;font-size:19px;font-weight:600;display:flex;align-items:center;gap:10px}
+.glab img{width:34px;height:34px}
+#flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,#fff 0%,#ffd08a 35%,#ff9900 70%,#ff9900 100%);opacity:0}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(0,0,0,.55) 100%);pointer-events:none}
+</style></head><body><div id="c">
+<div id="persp"><div id="cam"><div id="plane">
+ <svg id="lines" width="900" height="1000" viewBox="0 0 900 1000">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e8edf3"/></marker>
+  <filter id="gl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <rect id="gCloud" x="40" y="130" width="820" height="840" fill="none" stroke="#cfd8e3" stroke-width="2" pathLength="1"/>
+  <rect id="gRegion" x="80" y="210" width="740" height="720" fill="none" stroke="#00A4A6" stroke-width="2" stroke-dasharray="10 8"/>
+  <rect id="gVpc" x="120" y="290" width="660" height="400" fill="none" stroke="#8C4FFF" stroke-width="2" pathLength="1"/>
+  <g id="arrows" fill="none" stroke="#e8edf3" stroke-width="2.4" marker-end="url(#ah)">
+   <path id="a0" d="M450 118 L450 392" pathLength="1"/>
+   <path id="a1" d="M313 480 L363 480" pathLength="1"/>
+   <path id="a2" d="M537 480 L587 480" pathLength="1"/>
+   <path id="a3" d="M450 600 L450 742" pathLength="1"/>
+  </g>
+  <g id="pulses" filter="url(#gl)"></g>
+ </svg>
+ <div class="glab" id="lCloud" style="left:40px;top:130px"><img src="icons/AWS-Cloud-logo_32_Dark.svg">AWS Cloud</div>
+ <div class="glab" id="lRegion" style="left:80px;top:210px"><img src="icons/Region_32.svg">Region</div>
+ <div class="glab" id="lVpc" style="left:120px;top:290px"><img src="icons/Virtual-private-cloud-VPC_32.svg">VPC</div>
+ <div class="ic" id="iUsers" style="left:415px;top:20px;width:70px;height:70px"><img src="icons/Res_Users_48_Dark.svg" style="border-radius:0"><div class="lab" style="top:auto;bottom:100%;margin:0 0 -4px;left:auto;right:100%;transform:translate(-14px,-38px)">Users</div></div>
+ <div class="ic" id="iLambda" style="left:195px;top:425px;width:110px;height:110px"><img src="icons/Arch_AWS-Lambda_64.svg"><div class="lab">AWS Lambda</div></div>
+ <div class="ic" id="iEc2" style="left:375px;top:405px;width:150px;height:150px"><img src="icons/Arch_Amazon-EC2_64.svg"><div class="lab">Amazon EC2</div></div>
+ <div class="ic" id="iBedrock" style="left:595px;top:425px;width:110px;height:110px"><img src="icons/Arch_Amazon-Bedrock_64.svg"><div class="lab">Amazon Bedrock</div></div>
+ <div class="ic" id="iS3" style="left:395px;top:755px;width:110px;height:110px"><img src="icons/Arch_Amazon-Simple-Storage-Service_64.svg"><div class="lab">Amazon S3</div></div>
+</div></div></div>
+<div id="vig"></div><div id="flash"></div>
+</div>
+<script>
+// Grilla 120 BPM: tiempo 0,5 s, semicorchea 0,125 s. Fuente: ../audio-cues.json
+const qs=new URLSearchParams(location.search), H=+(qs.get('h')||1350)
+document.getElementById('c').style.height=H+'px'
+document.getElementById('cam').style.top=((H-1000)/2-20)+'px'
+document.getElementById('persp').style.perspectiveOrigin=`50% ${(H/2-20)/H*100}%`
+const $=id=>document.getElementById(id)
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)), eo=t=>1-Math.pow(1-t,3), ei=t=>t*t*t
+const back=t=>{const c=2.2;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}
+// ícono que «encaja»: escala desde 1.6 con rebote, destello y pulso de brillo en cada golpe
+const snap=(el,t0,t)=>{const p=cl((t-t0)/0.11);if(t<t0){el.style.opacity=0;return 0}
+ el.style.opacity=cl((t-t0)/0.03);const s=t-t0<0.11?1.55-0.55*back(p):1;el.style.transform=`scale(${s})`;return Math.exp(-(t-t0)*9)}
+const draw=(el,t0,dur,t)=>{const p=eo(cl((t-t0)/dur));el.style.strokeDasharray='1';el.style.strokeDashoffset=1-p;el.style.opacity=t<t0?0:1;return p}
+// pulsos que viajan por las flechas hacia/desde EC2
+const P=$('pulses'), A=['a0','a1','a2','a3'].map($), dirs=[1,1,1,1]
+const pulseDefs=[];for(let k=0;k<8;k++){for(let a=0;a<4;a++)pulseDefs.push({a,t0:1.25+k*0.0625+a*0.015})}
+pulseDefs.forEach(d=>{d.el=document.createElementNS('http://www.w3.org/2000/svg','circle');d.el.setAttribute('r',6);d.el.setAttribute('fill','#FF9900');P.appendChild(d.el)})
+window.setT=function(t){
+ // Grupos
+ const pc=draw($('gCloud'),0.0,0.28,t);$('lCloud').style.opacity=cl((t-0.05)/0.08)
+ const r=$('gRegion');const pr=eo(cl((t-0.125)/0.28));r.style.opacity=t<0.125?0:1;r.style.clipPath=`inset(0 ${100-100*pr}% ${100-100*pr}% 0)`;$('lRegion').style.opacity=cl((t-0.17)/0.08)
+ draw($('gVpc'),0.25,0.28,t);$('lVpc').style.opacity=cl((t-0.3)/0.08)
+ // Íconos en tiempos y corcheas
+ const kE=snap($('iEc2'),0.5,t), kU=snap($('iUsers'),0.625,t), kL=snap($('iLambda'),0.75,t), kB=snap($('iBedrock'),0.875,t), kS=snap($('iS3'),1.0,t)
+ draw(A[0],0.625,0.12,t);draw(A[1],0.875,0.08,t);draw(A[2],0.9375,0.08,t);draw(A[3],1.125,0.1,t)
+ // Pulsos
+ pulseDefs.forEach(d=>{const p=(t-d.t0)/0.22;const el=d.el;if(p<0||p>1||t>1.98){el.style.opacity=0;return}
+  const path=A[d.a],L=path.getTotalLength();const pt=path.getPointAtLength(L*p);
+  el.setAttribute('cx',pt.x);el.setAttribute('cy',pt.y);el.style.opacity=Math.sin(Math.PI*p)})
+ // Energía: todo se calienta hacia naranja de 1,25 a 1,75
+ const heat=cl((t-1.25)/0.5)
+ document.querySelectorAll('#arrows path').forEach(p=>p.style.stroke=heat>0?`rgb(${232+23*heat},${237-84*heat},${243-243*heat})`:'#e8edf3')
+ const tick=(t>=1.25&&t<1.75)?Math.exp(-((t-1.25)%0.125)*22):0
+ const glow=Math.max(kE,0.25*kL,0.25*kB,0.25*kS)+heat*0.9+tick*0.6
+ $('iEc2').querySelector('img').style.filter=`drop-shadow(0 0 ${8+40*glow}px rgba(255,153,0,${0.25+0.6*cl(glow)})) brightness(${1+0.35*cl(glow)})`
+ ;['iLambda','iBedrock','iS3','iUsers'].forEach((id,i)=>{const k=[kL,kB,kS,kU][i];$(id).querySelector('img').style.filter=`drop-shadow(0 0 ${6+26*(k+tick*0.5)}px rgba(255,255,255,${0.15+0.5*cl(k+tick*0.4)}))`})
+ // Cámara: escalones secos en cada tiempo + zambullida continua en EC2 desde 1,75
+ const steps=[[0.5,1.24],[1.0,1.36],[1.5,1.5]];let z0=1.06+0.06*eo(cl(t/0.5)),z=z0,prev=z0,kick=0
+ for(const [tb,zt] of steps){if(t>=tb){const d=t-tb;z=prev+(zt-prev)*eo(cl(d/0.07));prev=zt;kick=Math.max(kick,Math.exp(-d*26))}}
+ let tilt=22-12*eo(cl(t/1.75)), rotz=-5+5*eo(cl(t/1.9))
+ if(t>=1.62){const d=cl((t-1.62)/0.38);z=prev*Math.pow(20,ei(d));tilt*=1-eo(d)}
+ const sh=kick*7*Math.sin(t*97), sv=kick*6*Math.cos(t*71)
+ $('cam').style.transform=`translate(${sh}px,${sv}px) scale(${z*(1+0.03*kick)})`
+ $('plane').style.transform=`rotateX(${tilt}deg) rotateZ(${rotz}deg)`
+ // Destello final: el naranja de EC2 llena el cuadro y se vuelve luz
+ $('flash').style.opacity=t<1.9?0:ei(cl((t-1.9)/0.1))
+}
+setT(0)
+</script></body></html>

@@ -1,0 +1,144 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "edb27a9acdd3",
+  "key": "edb27a9acdd315c5e0a0f6d2caa35c2fda06c0cd99c04d56c172b41384cc96e5",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:35:40.870Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/S17-pantalla.png",
+    "imageSha256": "aa6dd6996da17b6d8014a1a688b29525cae71b58ecb2b1b6e86ee35975cf6f67",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/17.png",
+    "maskSha256": "1ce1e080a6925bd14eb96998e8faa083a440df096b90b2dfc0c208afd85d83a6",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/producto/lata.png",
+        "sha256": "d161bf641d4f491508ca0dffa48e2b97e2c678f3e1af886fd145c629b7725e59"
+      },
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/ref-vaso-paula.png",
+        "sha256": "06beb4bec2815b989f096da0fef98e2186a80defa7d11e991c70418f9408b92e"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked zones. In her hand: her kraft paper coffee cup with a matte black lid exactly like image 3, wet, held the same way, clean bottom. On the wall display: a full-screen photo of EXACTLY the beverage can of image 2 (same orange-and-teal wave label) with orange slices and splashing water, no words or letters on the screen. Keep everything outside the zones unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the marked zones. In her hand: her kraft paper coffee cup with a matte black lid exactly like image 3, wet, held the same way, clean bottom. On the wall display: a full-screen photo of EXACTLY the beverage can of image 2 (same orange-and-teal wave label) with orange slices and splashing water, no words or letters on the screen. Keep everything outside the zones unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.12763290405273436,
+    "editable": 152811,
+    "soft": 14480,
+    "protected": 1143429
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 80 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 107.712,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.3,
+        "bestError": 4.3,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1143429,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 152811,
+        "maxDelta": 255,
+        "meanDelta": 115.918,
+        "worst": {
+          "x": 881,
+          "y": 299
+        }
+      },
+      "seam": {
+        "pixels": 14480,
+        "maxDelta": 151,
+        "meanDelta": 21.108,
+        "worst": {
+          "x": 394,
+          "y": 478
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1143429,
+        "maxDelta": 226,
+        "meanDelta": 7.905,
+        "worst": {
+          "x": 131,
+          "y": 1172
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 3259,
+        "input_tokens_details": {
+          "image_tokens": 3006,
+          "text_tokens": 253
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 4769
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

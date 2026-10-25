@@ -1,0 +1,21 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "15bec87a1da89c756fdfa0682faa75b816d9e57b0e24bdedf967b843eca16fe8",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-live-chat",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:hubspot-logo",
+      "path": "public/images/logos/axis/hubspot-isotype.svg",
+      "sha256": "350d65195238c0b9b77f6694c1a43861c579417ac31c5d8f10488f36416573b2"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  },
+  "adjustment": "eyebrow-chip-outline-2026-10-20"
+}

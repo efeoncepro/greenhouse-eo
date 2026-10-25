@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "a5dc15bc6a1d",
+  "key": "a5dc15bc6a1de8df8a415df556d6c80a7ad400c2609719cb218c3eb89e77f5f6",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:38:23.799Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/09.png",
+    "imageSha256": "5e1c38178215b3a83107789d83e65c4fa7216cc7c580efc6d9d88ad245c01065",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/09b.png",
+    "maskSha256": "589c8f9ebe0f3b0c610a412e31882460933949829c1d000b9783e09ffb3b4516",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked tabletop around the cup and the notebook so it is the same pale natural oak with a matte satin finish as the rest of the table, seamless, no rectangles or patches, with the soft shadows of the cup and the notebook. Keep the cup, the notebook and everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Replace only the marked tabletop around the cup and the notebook so it is the same pale natural oak with a matte satin finish as the rest of the table, seamless, no rectangles or patches, with the soft shadows of the cup and the notebook. Keep the cup, the notebook and everything outside the zone unchanged. Photorealistic."
+  },
+  "mask": {
+    "touchedFraction": 0.08484268188476562,
+    "editable": 94909,
+    "soft": 16296,
+    "protected": 1199515
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 36 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 13.937,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.22,
+        "bestError": 3.22,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1199515,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 94909,
+        "maxDelta": 161,
+        "meanDelta": 14.593,
+        "worst": {
+          "x": 887,
+          "y": 953
+        }
+      },
+      "seam": {
+        "pixels": 16296,
+        "maxDelta": 136,
+        "meanDelta": 10.117,
+        "worst": {
+          "x": 881,
+          "y": 933
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1199515,
+        "maxDelta": 171,
+        "meanDelta": 5.176,
+        "worst": {
+          "x": 665,
+          "y": 936
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1388,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 108
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 2898
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}
