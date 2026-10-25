@@ -155,8 +155,9 @@ de contexto.
 
 **Infografía (2026-10-25):** «Cómo arma su respuesta un motor de IA», sólo en versión clara, en «¿Cómo eligen sus
 fuentes…?» después de los Pasos que describe: la pregunta, las cuatro sub-preguntas, seis fuentes con dos elegidas y la
-respuesta que cita la guía oficial y tu sitio (la órbita marca la cita de tu sitio). Adjuntos `252115` (escritorio
-1600 × 930) y `252116` (móvil 900 × 2516), subidos con hash verificado; fuente y builder en
+respuesta que cita la guía oficial y tu sitio (la órbita marca la cita de tu sitio). Adjuntos v2 `252118` (escritorio
+1600 × 930) y `252119` (móvil 900 × 2578), subidos con hash verificado (la v1, `252115`/`252116`, decía «pasaje» y
+queda sin uso); fuente y builder en
 `ai-generations/2026-10-25_aeo-infografia/` (alt y pie en `media-meta.json`). Íconos auditados (`auditIconGroup` ok) y
 sin texto cruzando la órbita.
 
@@ -164,5 +165,11 @@ sin texto cruzando la órbita.
 infografía); ahora tiene la V3 del spec. Respaldo `_gh_aeo_review_252114_v3_20261025_141519`. Los nueve enlaces internos
 responden 200.
 
-**Pendientes antes de publicar:** portada (fórmula nueva), revisión de Julio en `252114`, envío real del formulario del
+**Sin jerga (operador, 2026-10-25):** «pasaje» no se entendía; el artículo y la infografía hablan de «párrafo» o
+«fuentes». Copia privada `252114` al día con el spec (respaldo `_gh_aeo_review_252114_v3_20261025_150307`).
+
+**Portada aprobada (2026-10-25):** «Google te encuentra. La IA te elige.», con su `hero` y la imagen de la tarjeta;
+archivos y alt en `ai-generations/2026-10-24_portadas-blog/LEEME.md`. Se suben con la publicación.
+
+**Pendientes antes de publicar:** revisión de Julio en `252114`, envío real del formulario del
 CTA, barrido de enlaces internos a la URL vieja y la migración de URL con 301 (§3).

@@ -118,32 +118,43 @@ Portada del refresh del post `249108`. **Aprobada por el operador; se sube junto
 ## SEO y AEO: cómo aparecer en Google y en la IA (2026-10-25)
 
 Portada del refresh del post `248463`, **primera con la fórmula nueva** que pidió el operador (sin persona al frente y
-sin vidrio). **Textos rechazados por el operador (2026-10-25); la foto se conserva.** Lo que no funcionó fueron los
-mensajes, no la imagen («¿Qué cita la IA de tu sitio? Pasajes.», «¿A quién recomienda la IA? A
-pocos.», «La IA recomienda / A pocas.» y otros: «Los mensajes no funcionan»). Lecciones, ya documentadas en el canon
-(La órbita §4, Manzanitas §5.6 y registro cine, deltas 2026-10-25): el par pregunta–respuesta nunca se fuerza; sin par, el
-anillo con un texto arriba y un destacado claro con la esfera abajo; la persona va sólo si porta la idea. Ninguna de las
-portadas de `final-aeo/` hasta aquí se sube.
+sin vidrio). **Aprobada por el operador el 2026-10-25** («Ok dale») con el texto «○ Google te encuentra. La IA /
+**te elige**●». Se sube junto con la publicación del artículo (portada, `hero` y tarjeta), con simulación previa y aviso
+a las sesiones del blog.
 
 - **Ficha:** `fichas/MCB-AEO1-169.json` (línea `engine`, sin personas, sin palanca). Fenómeno: un cajón de fichero
   contemporáneo (fresno teñido negro mate) sobre una mesa negra; de cientos de fichas en blanco, una sola queda
-  levantada bajo un foco frío con el borde en azul de la línea (#0375DB) = el pasaje que el motor elige y cita.
-  Excepción de alcance declarada en la `nota`: el registro cine define Manzanitas por persona (§2 caso 4).
-- **`cine-reviewer`: CORREGIR → APROBABLE.** Correcciones: sin `luz-motivada` (pedía la fuente visible), cámara a
-  ~2,5 m sobre la mesa negra (a centímetros del cajón la ficha llenaba el cuadro), madera negra y fichas blanco frío
-  (el roble con fichas crema se lee fichero de los cincuenta), el color de la línea en el borde de la luz y no como
-  punto suelto, «no hay cara» para neutralizar los bloques de piel del compilador, sin guías ni pestañas.
+  levantada bajo un foco frío con el borde en el azul de la línea (#0375DB): la que el motor elige. Excepción de
+  alcance declarada en la `nota` (el registro cine define Manzanitas por persona, §2 caso 4).
+- **`cine-reviewer`: CORREGIR → APROBABLE.** Sin `luz-motivada` (pedía la fuente visible), cámara a ~2,5 m sobre la
+  mesa negra, madera negra y fichas blanco frío (el roble con fichas crema se lee fichero antiguo), el color de la
+  línea en el borde de la luz y no como punto suelto, «no hay cara» para neutralizar los bloques de piel.
 - **Dos generaciones (≈ USD 0,11).** `plates/MCB-AEO1-169-v1.png` dejaba la ficha al 78 % (fuera del recorte cuadrado)
-  y el cajón cruzando la columna de texto; la v2 pide el cajón casi de frente y todo lo iluminado a la derecha del 64 %:
-  ficha en ~64–73 % del ancho. `foto:validar:cine` sin fallas (sombra 95 %), `foto:validar` 4/4.
-- **Texto:** «¿Qué cita la IA de tu sitio?» → «Pasajes.» (`answerOverflowPx` 0). «Un pasaje.» dejaba el punto sobre el
-  borde del cajón (`final-aeo/portada-aeo-un-pasaje.png`, descartada).
-- **Archivos:** portada `final-aeo/seo-y-aeo-google-ia-2026.jpg` (2400 × 1260, 157 KB, sha256 `cb02115f…`); `hero` del
-  slider `final-aeo/seo-y-aeo-google-ia-2026-hero.webp` (2400 × 1200, recortado del plate quitando arriba); tarjeta del
-  rail = el plate con foco sugerido `"70% 40%"` (la ficha queda en y 36–44 %, sobre el inicio del degradado: mirar en
-  QA). Hoja: `final-aeo/portada-aeo-revision.jpg`.
-- **Alt propuesto:** «Portada de Marketing con Manzanitas: un cajón de fichero abierto sobre una mesa oscura, con una
-  sola ficha levantada bajo un foco de luz azul, junto al texto «¿Qué cita la IA de tu sitio? Pasajes.»».
+  y el cajón cruzando la columna de texto; la v2 pide el cajón casi de frente: ficha en ~64–73 % del ancho.
+  `foto:validar:cine` sin fallas (sombra 95 %), `foto:validar` 4/4.
+- **Textos rechazados** (todos sobre la misma foto, `final-aeo/descartes/`): «¿Qué cita la IA de tu sitio? Pasajes.»,
+  «¿A quién recomienda la IA? A pocos.», «La IA recomienda / A pocas.», «Nombra pocas», «Elige pocas», «Cita pocas» y
+  otros. El operador: «son mensajes absurdos… no pongas preguntas y respuestas; pon el ring, un texto arriba y uno
+  abajo destacado con la esfera», con fórmulas de la skill `copywriting`. Lecciones en el canon (La órbita §4,
+  Manzanitas §5.6 y registro cine, deltas 2026-10-25).
+- **Archivos finales** (`final-aeo/`):
+
+  | Imagen del inventario | Archivo | Medidas | sha256 |
+  |---|---|---|---|
+  | 1 · Plate (tarjeta del rail) | `seo-y-aeo-google-ia-2026-card.webp` (WebP del plate, 50 KB) | 2560 × 1440 | `e489a1a9…` |
+  | 2 · Portada (destacada, OG, X, «Te puede interesar») | `seo-y-aeo-google-ia-2026.jpg` (151 KB) | 2400 × 1260 | `6136ee39…` |
+  | 3 · Slider (`hero`) | `seo-y-aeo-google-ia-2026-hero.webp` (38 KB): plate sin los 160 px de arriba **y de la derecha**, para dejar la ficha en x 69–78 % | 2400 × 1200 | `5a4fc6f7…` |
+  | 4 · Cuerpo | infografía «Cómo arma su respuesta un motor de IA» v2, adjuntos `252118`/`252119` | 1600 × 930 · 900 × 2578 | — |
+
+  Tarjeta con `--focus "84% 30%"`: la ficha queda en el centro de la tarjeta en escritorio y teléfono, por encima del
+  degradado. Hoja de revisión por superficie: `final-aeo/revision-superficies.jpg` (portada, cuadrado, tarjeta 440 ×
+  600 y 304 × 540, slider 1440 y 390).
+- **Alt de la portada:** «Portada de Marketing con Manzanitas: un cajón de fichero abierto sobre una mesa oscura, con
+  una sola ficha levantada bajo un foco de luz azul, junto al texto «Google te encuentra. La IA te elige.»».
+- **Alt del `hero` y de la tarjeta:** «Un cajón de fichero abierto sobre una mesa oscura, con una sola ficha levantada
+  bajo un foco de luz azul.»
+- **Fuera del sitio** (sólo si el plan de canales lo pide): post de LinkedIn 1200 × 627, miniaturas de YouTube y story;
+  no se produjeron.
 
 ## Pendiente
 

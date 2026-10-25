@@ -11,7 +11,7 @@
  },
  "intro": [
   "AEO (Answer Engine Optimization) es el trabajo para que tu marca aparezca, y sea citada, en las respuestas que entregan los motores de IA: los resúmenes de Google, ChatGPT, Perplexity, Gemini, Copilot o Claude. El SEO se ocupa de que tu página rankee en la lista de resultados; el AEO, de que la respuesta te nombre.",
-  "La buena noticia es que no empiezas de cero. Google dice que, para aparecer en sus funciones con IA, no hace falta nada distinto de lo que ya pide para el buscador. Lo nuevo está en otra parte: cada motor elige sus fuentes a su manera, recupera pasajes en vez de páginas y se mide distinto. Esta guía explica las tres cosas, con lo que dice cada empresa en su propia documentación."
+  "La buena noticia es que no empiezas de cero. Google dice que, para aparecer en sus funciones con IA, no hace falta nada distinto de lo que ya pide para el buscador. Lo nuevo está en otra parte: cada motor elige sus fuentes a su manera, toma el párrafo que responde en vez de la página entera y se mide distinto. Esta guía explica las tres cosas, con lo que dice cada empresa en su propia documentación."
  ],
  "tableOfContents": true,
  "sections": [
@@ -105,7 +105,7 @@
       [
        "Qué se elige",
        "La página",
-       "El pasaje que responde la pregunta"
+       "El párrafo que responde la pregunta"
       ],
       [
        "Dónde aparece",
@@ -176,7 +176,7 @@
       ],
       [
        {
-        "text": "Busca pasajes",
+        "text": "Revisa fuentes",
         "strong": true
        },
        {
@@ -205,16 +205,16 @@
     },
     {
      "kind": "image",
-     "mediaId": 252115,
-     "url": "https://efeoncepro.com/wp-content/uploads/2026/10/aeo-motor-respuesta-desktop-light.svg",
-     "alt": "Infografía en cuatro pasos. 1: alguien pregunta «¿Cómo aparezco en ChatGPT?». 2: el motor abre la pregunta en cuatro sub-preguntas: qué es AEO, AEO vs. SEO, qué cambiar en mi sitio y cómo se mide. 3: revisa pasajes de seis fuentes (guía oficial, medio, comunidad, video, tu sitio y otro blog) y elige dos. 4: redacta una respuesta que cita la guía oficial y tu sitio. Conclusión: no cita páginas, cita el pasaje que mejor responde.",
+     "mediaId": 252118,
+     "url": "https://efeoncepro.com/wp-content/uploads/2026/10/aeo-motor-respuesta-v2-desktop-light.svg",
+     "alt": "Infografía en cuatro pasos. 1: alguien pregunta «¿Cómo aparezco en ChatGPT?». 2: el motor abre la pregunta en cuatro sub-preguntas: qué es AEO, AEO vs. SEO, qué cambiar en mi sitio y cómo se mide. 3: revisa seis fuentes (guía oficial, medio, comunidad, video, tu sitio y otro blog) y elige dos. 4: redacta una respuesta que cita la guía oficial y tu sitio. Conclusión: no elige al primero de Google, elige la mejor respuesta.",
      "width": 1600,
      "height": 930,
      "sizeSlug": "full",
-     "caption": "El motor no elige una página entera: elige el pasaje que mejor responde cada sub-pregunta. Esquema ilustrativo.",
+     "caption": "El motor no elige al primero de Google: elige la fuente que mejor responde cada sub-pregunta. Esquema ilustrativo.",
      "sources": [
       {
-       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/aeo-motor-respuesta-mobile-light.svg",
+       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/aeo-motor-respuesta-v2-mobile-light.svg",
        "media": "(max-width: 860px)"
       }
      ]
@@ -481,7 +481,7 @@
         "strong": true
        },
        {
-        "text": " Empieza cada sección con la respuesta en una o dos frases que se entiendan solas, y después explica. Así lee mejor una persona, y el motor encuentra el pasaje."
+        "text": " Empieza cada sección con la respuesta en una o dos frases que se entiendan solas, y después explica. Así lee mejor una persona, y el motor encuentra el párrafo que responde."
        }
       ],
       [

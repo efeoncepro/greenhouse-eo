@@ -8,17 +8,17 @@
       "file": "delivery/aeo-motor-respuesta-desktop-light.svg",
       "w": 1600,
       "h": 930,
-      "bytes": 191166,
-      "sha256": "7f3c2c08005776576075645f17968b7ef01fb59fd8268608f18f84a0e259a2c8",
+      "bytes": 190738,
+      "sha256": "facbcfd6981fd7d336d461515314e83daf6349454eb00aa5b800b77b7ab47c64",
       "outOfCanvasOrFooter": [],
       "textCrossesOrbit": []
     },
     {
       "file": "delivery/aeo-motor-respuesta-mobile-light.svg",
       "w": 900,
-      "h": 2516,
-      "bytes": 172501,
-      "sha256": "712949429edf8baa720622e15a04d0fb223f826ef90c61b1bd5fbc1e82cc7bfa",
+      "h": 2578,
+      "bytes": 172058,
+      "sha256": "76f63a1a7cda20137f5096912af111d4a255f607566e92b89009fbe85db01340",
       "outOfCanvasOrFooter": [],
       "textCrossesOrbit": []
     }
