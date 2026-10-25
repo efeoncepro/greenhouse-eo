@@ -1,13 +1,21 @@
 ---
 name: efeonce-auth
-description: Operate and extend Efeonce Auth / Efeonce ID — the native OAuth/OIDC authorization server (`auth.efeonce.org`, Cloud Run `auth-server`, EPIC-044) and its relying parties (Rooms first, Greenhouse/MCP later). Use when touching `services/auth-server/**`, `src/lib/auth-server/**`, `scripts/auth-server/**`, first-party login (TASK-1834), Login V4 screens and product context `/login/rooms` (TASK-2064), invitation email OTP (TASK-2067), Greenhouse login convergence (TASK-2063), security review TASK-1833, RP registration, signing keys/KMS rotation, Auth flags (`AUTH_SERVER_FIRST_PARTY_ENABLED`, `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED`), the PR 262 release, or the Rooms+Auth canary. Living skill: read references/program-ledger.md first and update it at every Auth task closure.
+description: Operate and extend Efeonce Auth / Efeonce ID — the native OAuth/OIDC authorization server (`auth.efeonce.org`, Cloud Run `auth-server`, EPIC-044) in production since 2026-09-04 and ALREADY the sign-in issuer of the MCP gateway `mcp.efeonce.org` (scopes `efeonce.mcp.*`); Rooms is its first first-party relying party and the Greenhouse portal login converges later (TASK-2063). Use when touching `services/auth-server/**`, `src/lib/auth-server/**`, `scripts/auth-server/**`, first-party login (TASK-1834), Login V4 screens and product context `/login/rooms` (TASK-2064), invitation email OTP (TASK-2067), Greenhouse login convergence (TASK-2063), security review TASK-1833, RP registration, signing keys/KMS rotation, Auth flags (`AUTH_SERVER_FIRST_PARTY_ENABLED`, `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED`), the PR 262 release, or the Rooms+Auth canary. Living skill: read references/program-ledger.md first and update it at every Auth task closure.
 ---
 
 # Efeonce Auth / Efeonce ID (skill viva)
 
 Efeonce ID es el **autorizador propio** de Efeonce: OAuth 2.1/OIDC servido por Cloud Run `auth-server`
-en `auth.efeonce.org`. Se decidió en 2026-09-03 en lugar de WorkOS ([ADR nativo](../../../docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)).
-**Rooms es su primer relying party first-party.** Greenhouse y el MCP convergen después (TASK-2063).
+en `auth.efeonce.org`. Se decidió el 2026-09-03 en lugar de WorkOS ([ADR nativo](../../../docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md))
+y está **en producción desde el 2026-09-04** (release `9100bbd2765d`).
+
+- **Ya es el login del MCP:** `https://mcp.efeonce.org/.well-known/oauth-protected-resource` declara
+  `authorization_servers: ["https://auth.efeonce.org"]`. El emisor publica `efeonce.mcp.read`,
+  `efeonce.mcp.globe.read` y `efeonce.mcp.hiring.read` (readback 2026-10-25).
+- **Rooms es su primer relying party first-party** (login propio + OTP de invitación).
+- **El login del portal Greenhouse converge después** (TASK-2063).
+- **No tiene repo propio:** el código vive en `greenhouse-eo`. El host `auth.efeonce.org` es el segundo host
+  del load balancer del gateway MCP (Terraform en `efeonce-mcp/infra/terraform/`).
 
 Esta skill es el conocimiento operativo acumulado, no una copia de los ADR. Los ADR dicen qué ES Auth;
 esta skill dice qué hay que saber para trabajar sin repetir lo que ya costó un día.
@@ -48,6 +56,9 @@ Comandos útiles:
 
 ## Reglas duras
 
+- **Hay UN solo servicio Cloud Run `auth-server`** y es el que atiende el login del MCP. Un deploy o
+  flag roto deja sin login a todo cliente MCP, no sólo a Rooms. Probar siempre `/.well-known/*`, JWKS y
+  `readyz` después de cada revisión.
 - **Prender un flag de Auth es una mutación de PRODUCCIÓN.** Los flags viven en variables GitHub a nivel de repo y `deploy.sh` las lee.
   - Según el audit del rollout, el único servicio que sirve `auth.efeonce.org` se despliega en push a `develop`. Encenderlas y pushear a `develop` activa el flujo en el host real **sin pasar por la promoción**.
   - Hacerlo sólo deliberadamente, con autorización explícita, y conciliar antes qué host sirve cada revisión.

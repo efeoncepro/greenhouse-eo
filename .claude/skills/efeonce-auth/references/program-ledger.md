@@ -9,6 +9,8 @@ Fuente consolidada: [auditoría de estado](../../../../docs/audits/rooms/2026-10
 
 ### Vivo
 
+- **Emisor del MCP:** `mcp.efeonce.org` declara `authorization_servers: ["https://auth.efeonce.org"]` (`vivo`). Scopes publicados: `efeonce.mcp.read`, `efeonce.mcp.globe.read` y `efeonce.mcp.hiring.read`. Un solo servicio Cloud Run `auth-server` (`vivo`). En producción desde el 2026-09-04.
+
 - **`auth-server-00166-p77`**: Ready, 100% del tráfico, `GIT_SHA=754a2a28…` (`vivo`).
   - Login V4 servido en `/login`.
   - `AUTH_SERVER_FIRST_PARTY_ENABLED=false`, `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED=false` y `EXTERNAL_IDENTITY_CANARY_ENABLED=false`.
@@ -44,7 +46,7 @@ Fuente consolidada: [auditoría de estado](../../../../docs/audits/rooms/2026-10
 
 ### Riesgos abiertos
 
-- La vía de deploy en push a `develop` toca el host real; el comentario del workflow dice «staging».
+- La vía de deploy en push a `develop` toca el único servicio, que es el login del MCP; el comentario del workflow dice «staging».
 - `SENTRY_ENVIRONMENT=staging` y Resend con secreto `…-staging` en ese servicio.
 - Login SQL con `CREATEROLE`/`CREATEDB`.
 - KMS v1 lleva más de 51 días *retiring*.

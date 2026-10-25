@@ -24,6 +24,12 @@ Nada de esto está `complete` operacionalmente. La etiqueta correcta para Auth y
 
 ### 2.1 Qué existe
 
+- **Efeonce Auth está en producción desde el 2026-09-04 y es el login del MCP** (`vivo`):
+  - `https://mcp.efeonce.org/.well-known/oauth-protected-resource` declara `authorization_servers: ["https://auth.efeonce.org"]`.
+  - Scopes publicados: `efeonce.mcp.read`, `efeonce.mcp.globe.read` y `efeonce.mcp.hiring.read`.
+  - Existe un solo servicio Cloud Run `auth-server`.
+  - Lo de este corte es la capa nueva para Rooms sobre un emisor que ya opera: login propio, Login V4 y OTP de invitación.
+
 - **Commit de la funcionalidad:** `deae1ce15` (159 archivos): login first-party (TASK-1834), renderer Login V4
   con contexto de producto Rooms (TASK-2064) y OTP de invitación por correo (TASK-2067).
 - **Fixes posteriores:**
@@ -79,7 +85,7 @@ Nada de esto está `complete` operacionalmente. La etiqueta correcta para Auth y
 
 ### 2.5 Riesgos abiertos de Auth
 
-- **Vía de deploy:** según el audit de Codex, el servicio único que sirve `auth.efeonce.org` se despliega en push a `develop`. Así llegó la 00166 sin pasar por `main`.
+- **Vía de deploy:** el servicio único que sirve `auth.efeonce.org`, que también es el login del MCP, se despliega en push a `develop` (readback 2026-10-25: un solo servicio Cloud Run). Así llegó la 00166 sin pasar por `main`.
   - El comentario del workflow habla de «staging automatically»; hay que conciliar esa descripción con el host real.
   - Como los flags viven en variables GitHub a nivel de repo, **ponerlos en `true` y pushear a `develop` activaría los flujos en el host real sin promoción**. No encender flags hasta resolver esto o hacerlo deliberadamente.
 - **Etiquetas de staging en ese servicio:** `SENTRY_ENVIRONMENT=staging` y `RESEND_API_KEY_SECRET_REF=greenhouse-resend-api-key-staging`. Ya estaban en la 00165, pero hay que confirmarlas antes del correo real.
