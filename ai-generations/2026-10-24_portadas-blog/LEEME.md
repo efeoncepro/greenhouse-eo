@@ -115,6 +115,31 @@ Portada del refresh del post `249108`. **Aprobada por el operador; se sube junto
 - 🔴 **Fórmula agotada (operador, 2026-10-25):** «para las próximas cambiemos la fórmula, tenemos varias portadas con una
   persona al frente y vidrio». La próxima portada no repite persona tras la mesa con tarjetas de vidrio.
 
+## SEO y AEO: cómo aparecer en Google y en la IA (2026-10-25)
+
+Portada del refresh del post `248463`, **primera con la fórmula nueva** que pidió el operador (sin persona al frente y
+sin vidrio). **Pendiente de aprobación del operador; se sube junto con la publicación del artículo.**
+
+- **Ficha:** `fichas/MCB-AEO1-169.json` (línea `engine`, sin personas, sin palanca). Fenómeno: un cajón de fichero
+  contemporáneo (fresno teñido negro mate) sobre una mesa negra; de cientos de fichas en blanco, una sola queda
+  levantada bajo un foco frío con el borde en azul de la línea (#0375DB) = el pasaje que el motor elige y cita.
+  Excepción de alcance declarada en la `nota`: el registro cine define Manzanitas por persona (§2 caso 4).
+- **`cine-reviewer`: CORREGIR → APROBABLE.** Correcciones: sin `luz-motivada` (pedía la fuente visible), cámara a
+  ~2,5 m sobre la mesa negra (a centímetros del cajón la ficha llenaba el cuadro), madera negra y fichas blanco frío
+  (el roble con fichas crema se lee fichero de los cincuenta), el color de la línea en el borde de la luz y no como
+  punto suelto, «no hay cara» para neutralizar los bloques de piel del compilador, sin guías ni pestañas.
+- **Dos generaciones (≈ USD 0,11).** `plates/MCB-AEO1-169-v1.png` dejaba la ficha al 78 % (fuera del recorte cuadrado)
+  y el cajón cruzando la columna de texto; la v2 pide el cajón casi de frente y todo lo iluminado a la derecha del 64 %:
+  ficha en ~64–73 % del ancho. `foto:validar:cine` sin fallas (sombra 95 %), `foto:validar` 4/4.
+- **Texto:** «¿Qué cita la IA de tu sitio?» → «Pasajes.» (`answerOverflowPx` 0). «Un pasaje.» dejaba el punto sobre el
+  borde del cajón (`final-aeo/portada-aeo-un-pasaje.png`, descartada).
+- **Archivos:** portada `final-aeo/seo-y-aeo-google-ia-2026.jpg` (2400 × 1260, 157 KB, sha256 `cb02115f…`); `hero` del
+  slider `final-aeo/seo-y-aeo-google-ia-2026-hero.webp` (2400 × 1200, recortado del plate quitando arriba); tarjeta del
+  rail = el plate con foco sugerido `"70% 40%"` (la ficha queda en y 36–44 %, sobre el inicio del degradado: mirar en
+  QA). Hoja: `final-aeo/portada-aeo-revision.jpg`.
+- **Alt propuesto:** «Portada de Marketing con Manzanitas: un cajón de fichero abierto sobre una mesa oscura, con una
+  sola ficha levantada bajo un foco de luz azul, junto al texto «¿Qué cita la IA de tu sitio? Pasajes.»».
+
 ## Pendiente
 
 - **Formalizar la variante centrada en AXIS** (pieza nueva o regla de zona segura del banner de blog) y en la plantilla
