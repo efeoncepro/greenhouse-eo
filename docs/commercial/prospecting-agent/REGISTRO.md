@@ -177,3 +177,7 @@ Sin Leads, Deals ni envíos; la fila de búsqueda conserva su estado original an
 - 2026-10-22T20:24:15.879419-03:00 — GRD-1552: investigación profunda GANA/LOTI con tres subagentes, 97 búsquedas y cuatro pares cualitativos. Cercanía y pedagogía ya trabajadas; dirección refinada y límites de acceso documentados. [Informe](runs/2026-10-22-2024-reditos-investigacion-marcas.md) · [Consultas](queries/2026-10-22-2024-reditos-investigacion-marcas.json). Sin nuevas convocatorias, propuesta o CRM.
 
 - 2026-10-22T20:40:54.165801-03:00 — GRD-1552: Julio autoriza preparar propuestaMD para Claude Design; borrador28bloques y anexos, fuentes técnica/económica y control interno separados. [Corrida](runs/2026-10-22-2040-reditos-propuesta-md.md) · [Operaciones](queries/2026-10-22-2040-reditos-propuesta-md.json). Sin emisión, presentación o CRM.
+
+### 25/10/2026 — UTP Perú: presentación a red de proveedores
+
+Skills actuales recargadas. Company UTP y Contact Gustavo creados con Primary y propiedades leídas; correo laboral Verified por Apollo waterfall autorizado, 2 créditos. Documents creó también un buzón compartido, conservado separado de la persona. Presentación enviada una vez al canal publicado con copia a Gustavo, dos brochures originales, principales clientes, firma gráfica y CCO; Enviados y EMAIL SENT asociados comprobados. LinkedIn pendiente por falta de créditos de InMail, invitación previa preservada; sin nuevo Lead/Deal, secuencia ni adjudicación. [Corrida y evidencia](runs/2026-10-25-utp-gustavo.md).

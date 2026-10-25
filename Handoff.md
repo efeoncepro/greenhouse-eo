@@ -2,6 +2,13 @@
 
 [Historial](Handoff.archive.md).
 
+## 2026-10-25 — UTP Perú: presentación enviada; LinkedIn pendiente
+[Caso y readback](docs/commercial/prospecting-agent/runs/2026-10-25-utp-gustavo.md): Company UTP y Contact Gustavo
+Alfaro con Primary y segmentos comprobados; Apollo waterfall autorizado, correo Verified, 2 créditos.
+Enviados y EMAIL `SENT` asociados: dos brochures originales, clientes, firma gráfica y CCO; sin Lead/Deal ni
+nueva secuencia. LinkedIn **no enviado**, faltan créditos de InMail y la invitación previa sigue pendiente;
+texto preparado en nota CRM. Esperar admisión/documentación de Compras; no repetir el correo ni comprar plan.
+
 ## 2026-10-25 — Aprendizaje comercial reutilizable y propuesta de pauta
 Prospección, Commercial y Copywriting Codex/Claude cargan el criterio de conversaciones útiles para nuevas
 aperturas, seguimientos e inbound comercial; espejos verificados. [Implementación y cola nativa](docs/commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md).
@@ -273,15 +280,3 @@ con firma gráfica/CCO/brochure original; Enviados y EMAIL119337620506SENT asoci
 ejecutado, Lead/Deal/secuencia ni membresías comprobadas. Esperar respuesta; entrega/lectura no acreditadas.
 [Expediente y límites](docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md). Docs/skills espejo
 concilian la excepción vigente y separan atribución de enlaces por canal; no conceden nuevos permisos.
-
-## 2026-10-22 — Cotizador local: perfiles y costos Réditos
-
-Catálogo v13 / recursos v12 / créditos v1 activos en CLI; tres perfiles nuevos estimados y Awario público. [Costo y evidencia](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COSTOS-RESTO-ALCANCE-CLI-2026-10-22.md). Propuesta detenida; sin importación DB, commit o push. Suite: 1.860 aprobadas, tres omitidas.
-Decisión comercial posterior: rango COP 36–38M / USD 9.863,01–10.410,96 al mes; Deal66560488750 COP456M / USD124.931,51 (38M x12), leído de vuelta. [Base vigente](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/BRIEF-COMERCIAL-VIGENTE.md) gobierna futuros documentos. Precio final y propuesta detenidos; HOLD contractual conservado.
-Análisis posterior con tres subagentes: [ruta y extras para elegir](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/ESTRATEGIA-DIFERENCIACION-2026-10-22.md); no ganador anterior confirmado. Extras no aprobados; sin nuevo CRM o propuesta.
-
-Revisión completa posterior: [84 páginas y dirección reformulada](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/COMPARACION-PROPUESTA-ANTERIOR-Y-REFORMULACION-2026-10-22.md). La ruta anterior repetía integración, equipo y extras; elecciones creativas específicas por marca pendientes de materializar. Sin cambio de precio, CRM o propuesta.
-
-Profundización: [GANA/LOTI y cuatro pares](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/research/INVESTIGACION-MARCAS-Y-DIRECCION-2026-10-22.md); cercanía/pedagogía ya existen. 97 consultas, fuentes y bloqueos registrados; LOTI sin UI/checkout verificados e informes recientes inaccesibles. Direcciones aún sin muestras creativas; sin cambios de costo/CRM/propuesta.
-
-Mandato posterior: Julio autorizó preparar el MD. [Propuesta para Claude Design](docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/PROPUESTA-GANA-LOTI-2027-PARA-CLAUDE-DESIGN.md) redactada: 28 bloques y anexos; técnica/económica separadas. Pausa de redacción superada, emisión/presentación aún pendientes. Sin deck/PDF/CRM/envíos.

@@ -1,5 +1,7 @@
 # Commercial
 
+- [UTP Perú — convocatoria de proveedores, 25/10/2026](prospecting-agent/runs/2026-10-25-utp-gustavo.md): Company y Contact de Compras creados, correo Verified por Apollo (2 créditos), presentación con brochures/firma/CCO y EMAIL `SENT` verificados; LinkedIn pendiente por créditos, sin nueva secuencia ni homologación acreditada.
+
 - [Partnerships y distribuidores: operación](../manual-de-uso/comercial/operar-partnerships-y-distribuidores.md) · [registro vigente](../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md): Adobe/Nexsys, Google/Ingram y Microsoft/AWS/LOL; identidad, formación, crédito, archivos externos y evidencia de envío.
 
 Nombres de Deal/Lead: [convención vigente Efeonce](../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
