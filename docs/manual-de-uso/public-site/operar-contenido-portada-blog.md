@@ -1,9 +1,9 @@
 # Operar el contenido de la portada del blog
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-10-24 por Claude
-> **Ultima actualizacion:** 2026-10-24 por Claude
+> **Ultima actualizacion:** 2026-10-24 por Claude (ficha de autor del blog, TASK-2057)
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) · [PDR-029 — Modelo de contenido de la portada del blog](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md) · [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-content-model.md)
 > **Estado:** en producción en `/blog/` desde el 2026-10-24 con datos reales (`eo_content_model_enabled = 1`). Los pasos marcados «producción» necesitan la aprobación del operador.
 
@@ -11,7 +11,7 @@
 
 Para mantener la portada del blog (`/blog/`) con contenido real sin tocar código: el formato de cada entrada, qué va
 fijado en el slider y hasta cuándo, las tarjetas de «Para leer con calma» (cliente, última revisión, podcast), los eventos (webinars y talleres) y los recursos (guía, herramienta, diagnóstico,
-Glitch), la foto del autor y la suscripción a Glitch. La portada se arma sola con eso y se refresca al publicar.
+Glitch), la foto, el cargo, la bio y las redes del autor, y la suscripción a Glitch. La portada se arma sola con eso y se refresca al publicar.
 Qué ve el visitante: [Portada del blog](../../documentation/public-site/portada-del-blog.md).
 
 ## Antes de empezar
@@ -95,16 +95,50 @@ Una entrada sin imagen ni cliente sale como tarjeta tipográfica.
 
 ### Foto de perfil del autor
 
-El círculo del autor en el slider muestra la foto de perfil que la persona tiene subida en WordPress (plugin One User
-Avatar), no la de Gravatar.
+El círculo del autor en el slider y la **ficha de autor** al final de cada artículo (desde el 2026-10-24, TASK-2057)
+muestran la foto de perfil que la persona tiene subida en WordPress (plugin One User Avatar), no la de Gravatar.
+Qué ve el visitante: [Ficha de autor del blog](../../documentation/public-site/ficha-de-autor-del-blog.md).
 
 1. En el escritorio de WordPress, **Usuarios** → el perfil del autor (o **Perfil** si eres tú).
 2. En la sección del avatar que agrega One User Avatar, elige la imagen desde la biblioteca de medios (una foto
-   cuadrada, con la cara centrada).
-3. Guarda con **Actualizar perfil**. La portada la toma en la próxima purga (o pide `purge --apply` por CLI).
+   cuadrada, con la cara centrada y encuadre cerrado: la ficha la recorta en un círculo).
+3. Guarda con **Actualizar perfil**.
+4. Reconstruye el indexable de autor de Yoast y purga (ver «Después de cambiar foto o cargo», abajo).
 
-Sin foto subida, el slider muestra las iniciales del autor. Una imagen de Gravatar (incluida la silueta genérica) no
-reemplaza las iniciales, a propósito. Las diapositivas de Glitch no llevan foto.
+Sin foto subida, el slider y la ficha muestran las iniciales del autor. Una imagen de Gravatar (incluida la silueta
+genérica) no reemplaza las iniciales, a propósito. Las diapositivas de Glitch no llevan foto.
+
+### Cargo, bio corta y redes del autor
+
+Todo se edita en el mismo perfil de WordPress (**Usuarios** → el autor). La ficha no tiene campos propios salvo la bio
+corta; el resto lo lee de Yoast, que también lo usa para el schema `Person` que ve Google.
+
+| Dato en la ficha | Dónde se cambia | Regla |
+|---|---|---|
+| **Cargo** | Perfil → sección de schema de Yoast → **Job title** (campo de schema del usuario) | Si está vacío, la ficha no inventa un cargo con la bio. |
+| **Bio corta** | Perfil → **Ficha de autor del blog → Bio corta** | Hasta 180 caracteres. Vacía = las primeras frases de la bio. |
+| **Bio larga** | Perfil → **Información biográfica** | Es la que lee el schema de Yoast. |
+| **Redes** | Perfil → campos de contacto de Yoast: Instagram, LinkedIn, X/Twitter, Wikipedia | Se muestran en ese orden, con su isotipo oficial. Un usuario de X se enlaza a `x.com`. |
+| **Sitio web** | Perfil → **Sitio web** | Sólo aparece si no es `efeoncepro.com`. |
+| **Temas** | Perfil → sección de schema de Yoast → temas que domina (`knowsAbout`) | Sólo los que son una categoría con artículos; máximo 4. |
+
+La organización («Efeonce Group») y el botón «Ver sus N artículos» salen solos. Las cuentas de servicio (la integración
+«Greenhouse») y los autores sin artículos no tienen ficha.
+
+### Después de cambiar foto o cargo
+
+1. **Reconstruye el indexable de autor de Yoast.** Si no se hace, el archivo del autor (`/author/<slug>/`) sigue
+   compartiéndose con la foto vieja (`og:image`) y el schema puede quedar con el cargo anterior. Referencia:
+   `ai-generations/2026-10-24_autor-blog/refrescar-yoast-autor.php`, que se corre con
+   `pnpm public-website:wpcli -- --eval-file <script> --wp-user 1` (producción, con aprobación del operador).
+2. **Purga** con `pnpm public-website:blog-home purge --apply` (portada) y la caché de Kinsta del artículo y del
+   archivo del autor si se necesita ver el cambio de inmediato. Sin purgar, el lector de la ficha refresca solo en hasta
+   5 minutos más la caché de página.
+3. **Revisa** un artículo del autor: la ficha al final, el «Por {autor}» bajo el título y, en el código fuente, el
+   `jobTitle` y la `image` del `Person`.
+
+El caso de referencia (foto nueva de Julio, adjunto 252085, y carga del perfil con `cargar-perfil-julio.php`) está
+documentado en el `LEEME.md` de esa misma carpeta; el avatar anterior (244826) sirve para volver atrás.
 
 ### Suscripción a Glitch
 
@@ -184,6 +218,7 @@ los últimos 180 días el recurso deja de mostrarse.
   tarjeta del riel** y **Punto focal de la tarjeta**.
 - No guardar enlaces privados de webinars en ningún campo del evento.
 - No usar «Fijar arriba» (sticky) de WordPress: la portada no lo lee.
+- No subir la foto del autor a Gravatar ni escribir el cargo como primera frase de la bio: la ficha no los lee.
 - No aplicar el backfill sin revisar el dry-run ni con un `expect_sha256` viejo (el script lo rechaza).
 - No encender la opción antes de cargar contenido real.
 
@@ -200,6 +235,9 @@ los últimos 180 días el recurso deja de mostrarse.
 | La tarjeta de foto corta el texto de la portada o deja fuera la cara | La destacada tiene texto incrustado y se recorta al centro | Cargar **Imagen de la tarjeta del riel** sin texto y ajustar **Punto focal de la tarjeta** hacia el sujeto. |
 | Un podcast no aparece en el riel | Le falta el formato Podcast, o es de Glitch o Novedades | Cambiar el formato a Podcast. |
 | El autor sale con iniciales | No tiene foto subida en su perfil (Gravatar no cuenta) | Subir la foto en el perfil de WordPress. |
+| Al compartir el archivo del autor sale la foto vieja | El indexable de autor de Yoast no se reconstruyó | Correr `refrescar-yoast-autor.php` y purgar. |
+| La ficha no muestra el cargo | **Job title** de Yoast vacío | Cargarlo en el campo de schema del perfil. |
+| Un artículo no tiene ficha de autor | El autor es una cuenta de servicio o no tiene artículos publicados | Es lo esperado; reasignar el autor de la entrada si corresponde. |
 | No se ve la suscripción a Glitch | No hay formulario conectado (`data-subscribe="off"`) | Conectarlo por CLI con un formulario publicado. |
 | No se ve la sección de eventos | No hay un evento próximo | Crear el evento con arte clave y fecha futura. |
 

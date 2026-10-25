@@ -15,6 +15,8 @@ Ejecución: [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-conten
 
 Segunda plantilla del mismo plugin: [Archivo del blog — runtime V1](BLOG_ARCHIVE_RUNTIME_V1.md) (búsqueda, temas, etiquetas y autores; TASK-2055, en producción desde 2026-10-24).
 
+Ficha de autor, byline y `Person` del single: §9 (TASK-2057, en producción desde 2026-10-24/25).
+
 Funcionamiento: [Portada del blog](../../documentation/public-site/portada-del-blog.md) · Operación:
 [por CLI](../../manual-de-uso/public-site/operar-portada-blog-por-cli.md) y
 [desde WordPress](../../manual-de-uso/public-site/operar-contenido-portada-blog.md)
@@ -288,6 +290,70 @@ puerta de escritura para agentes y operadores; pasa por las metas, taxonomías y
 | Plugin | restaurar el `.tar` que imprime el despliegue | código anterior |
 | Página `/blog/` | `page rollback --snapshot _gh_blog_home_v3_before_20261024_081327 --apply` | vuelve exactamente a la página previa al corte |
 | Formatos | `backfill-format.php` en modo `restore` con el ledger del apply | formatos previos |
+
+## 9. Autor del blog (TASK-2057)
+
+Delta 2026-10-24. En producción desde el 2026-10-24/25 con `efeonce-editorial-blocks` 0.5.4 (runtime
+`efeonce-public-site-runtime` commit `8f19ee0`). Cubre la ficha de autor del single, el byline y el `Person` de Yoast.
+Funcionamiento: [Ficha de autor del blog](../../documentation/public-site/ficha-de-autor-del-blog.md). Operación:
+[desde WordPress](../../manual-de-uso/public-site/operar-contenido-portada-blog.md#foto-de-perfil-del-autor).
+
+### Lector `EO_Author_Profile`
+
+`includes/content-model/class-eo-author-profile.php`. `build(array)` es puro (testeable sin WordPress);
+`for_user(id)` lo alimenta y se cachea con `EO_Home_Readers::cached` (5 min).
+
+| Campo | Fuente | Regla |
+|---|---|---|
+| `name`, `initials` | `display_name` | iniciales como respaldo visual |
+| `role` | Yoast Premium `wpseo_user_schema.jobTitle`; respaldo usermeta `job_title` | nunca se deriva de la primera frase de la bio |
+| `org` | fijo | «Efeonce Group» |
+| `bioShort` | usermeta `eo_author_bio_short` (≤ 180 caracteres; perfil de WordPress «Ficha de autor del blog → Bio corta») | si falta, primeras frases de `description` |
+| `bioLong` | `description` | la que usa el schema |
+| `photo` / `photoLarge` | One User Avatar a 96 y 300 px | nunca Gravatar |
+| `links` | contactos de Yoast `instagram`, `linkedin`, `twitter` (→ `x.com`), `wikipedia`, en el orden del `sameAs`, normalizados a https | `user_url` sólo si no es el propio sitio |
+| `topics` | `knowsAbout` que calza con una categoría con posts, con alias (p. ej. «Inteligencia artificial aplicada al marketing» → `ai`, «SEO/AEO» → `aeo`) | máx. 4 |
+| `postCount`, `archiveUrl` | posts publicados, `get_author_posts_url` | — |
+
+Cuentas de servicio (`greenhouse-integration`) y autores sin posts devuelven vacío: sin ficha.
+
+### Hooks y render
+
+- **Ficha.** Filtro `widget_display_callback` reemplaza el widget `ohio_widget_about_author` (traía redes del demo de
+  Ohio: `facebook.com/colabrio` y LinkedIn vacío) en el mismo lugar, el `.author-container` de `ohio/single.php`.
+  Marcado: `<section aria-label="Sobre el autor">`, sin encabezados. **No `aside`:** el sitio trae CSS inline
+  `.single-post aside {display:none}` y la ficha desaparecería.
+- **Diseño La órbita.** Fondo `#001a33`; pieza `portrait` (anillo r 96/208 al 40 % del halo, foto r 78, arco
+  200→250°, esfera en el acento Growth `#36c8bf`); nombre en Bricolage con el punto tipeado en el acento; esquina recta
+  arriba a la izquierda; CTA «Ver sus N artículos»; isotipos oficiales de `@efeoncepro/axis-brand-assets` con
+  `rel="me noopener"`.
+- **CSS.** `includes/content-model/assets/author.css`, encolado sólo en `is_singular('post')`.
+- **Byline.** `ohio-child/parts/elements/page_headline.php` llama `eo_author_byline()` → «Por {autor}» enlazado al
+  archivo + fecha (+ «Actualizado» si la modificación es ≥ 1 día posterior). Sin el plugin activo cae a la lista de
+  Ohio. La cifra de lectura sigue siendo la de Ohio sobre el título, traducida («min read» → «min de lectura»);
+  «Posted by» → «Por» en relacionados.
+- **Schema.** Yoast sigue siendo dueño del `Person`. El filtro `wpseo_schema_person` sólo cambia `worksFor`
+  `"Efeonce Group"` → `{"@id":"https://efeoncepro.com/#organization"}`. Verificado en vivo: `jobTitle`, `image` = foto
+  nueva, `sameAs`, `description` = bio larga, `url` = archivo del autor.
+
+### Despliegue
+
+| Pieza | Comando | Nota |
+|---|---|---|
+| Lector, ficha, CSS, schema | `pnpm public-website:blog-home deploy content-model [--apply]` | allowlist ampliada con `includes/content-model/assets/*.(js\|css)` |
+| Byline del tema | paquete del tema site-nav (`build-site-nav-theme-package.cjs` + `deploy-site-nav-theme-package.php`) | allowlist ampliada con `parts/elements/page_headline.php`; **sin dry-run** |
+
+### Reglas
+
+- Cambiar foto o cargo exige **reconstruir el indexable de autor de Yoast** y purgar: si no, el `og:image` del archivo
+  del autor queda con la foto vieja. Script de referencia: `ai-generations/2026-10-24_autor-blog/refrescar-yoast-autor.php`
+  (`pnpm public-website:wpcli -- --eval-file … --wp-user 1`); procedencia en el `LEEME.md` de esa carpeta.
+- La foto de Julio es el adjunto 252085 (`julio-reyes-autor-2026-10.png`); el avatar anterior, 244826, sirve de rollback.
+- Verificación del corte: 2 posts, Playwright 1440/390/320/768/1920 sin desborde, axe WCAG 2.2 AA con 0 hallazgos en
+  `.eo-author` y `.eo-byline`, sin widget de Ohio.
+- Fuera de alcance: el YouTube de los enlaces sociales globales de Ohio apunta a `facebook.com/colabrio` (configuración
+  del tema, no de la ficha); el slug `/author/jreysgo/`; el cierre de `/wp-json/wp/v2/users`; la web personal
+  `cesargrowth.com` cuando exista.
 
 ## Pendientes
 

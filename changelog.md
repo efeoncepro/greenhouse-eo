@@ -2,6 +2,14 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-25 — Ficha de autor, byline y schema de autor del blog (TASK-2057)
+
+- El single del blog tiene byline «Por {autor}» enlazado al archivo y, al cierre, una ficha de autor de La órbita
+  (retrato con la pieza `portrait`, cargo, bio corta, temas, CTA al archivo y redes con isotipos oficiales) que
+  reemplaza la caja de Ohio con redes del demo. Un solo lector, `EO_Author_Profile` (efeonce-editorial-blocks 0.5.4),
+  para la ficha, el byline, el schema y la cabecera de `/author/`; `worksFor` del Person apunta a `#organization`.
+  Bio corta editable en el perfil de WordPress («Ficha de autor del blog»).
+
 ## 2026-10-24 — «Explora por tema» v2 en la portada del blog (TASK-2051, desvío 15)
 
 - La órbita de `/blog/` enlaza las categorías del blog: seis temas con contenido, cada uno con su promesa, y un centro
@@ -625,13 +633,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - La captura diaria de rankings perdía keywords cuando DataForSEO tardaba más de 35 s y el resumen decía
   `degraded=0 failed=0`. Se agrega la segunda pasada `ops-seo-rank-capture-retry` a las 07:00 (cuesta cero con el día
   completo) y el log avisa los parciales. Rige tras el próximo deploy del `ops-worker`. [ISSUE-182](docs/issues/open/ISSUE-182-seo-rank-capture-partial-days-silent.md)
-
-## 2026-10-12 — AXIS: lo que depende de `axis-brand-assets` 0.4.25 queda regenerado
-
-- El pin subió de 0.4.15 a 0.4.25 el 2026-10-06 sin regenerar sus dependientes y `pnpm test` mostraba tres fallas.
-  Ahora los tokens de Manzanitas registran la versión instalada, el vocabulario de canales de Insights tiene las 22
-  plataformas de AXIS (se suman Facebook, Threads y X, con su isotipo en el PDF, el deck y Think) y los cuatro lockups
-  del PDF del AI Visibility Report llevan el dibujo vigente, con la terminación concéntrica del anillo.
-- En las tablas del PDF y del deck, una fuente citada de facebook.com muestra el isotipo de Facebook en vez del de
-  Meta, y los dominios de Threads y X también tienen el suyo. Rige para lo que se renderice después del próximo
-  release. El informe web no cambia: no recibe canal por dominio citado.

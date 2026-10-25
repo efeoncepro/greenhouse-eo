@@ -16,6 +16,23 @@ latest Flash, Guttery narrator line, byte edge, row plates, `?formato=edicion|fl
 real white `inline_pill` + `inline-label-logo`, only when `eo_blog_glitch_form_key` is set). Deploy order: `deploy
 content-model` BEFORE `deploy home` (the new template needs `rootCls`); full purge with `archive 1 --apply`. The pill
 logo needs Growth Forms renderer 1.3.0 released in Greenhouse; until then the label is text.
+**Author card + byline (TASK-2057, live 2026-10-24/25; delta 2026-10-24):** `efeonce-editorial-blocks` 0.5.4
+(runtime commit `8f19ee0`) adds `EO_Author_Profile` (`includes/content-model/class-eo-author-profile.php`): pure
+`build(array)` + `for_user(id)` cached 5 min via `EO_Home_Readers::cached`. `role` = Yoast Premium
+`wpseo_user_schema.jobTitle` (fallback usermeta `job_title`, never the bio's first sentence); `bioShort` = usermeta
+`eo_author_bio_short` ≤ 180 (WP profile «Ficha de autor del blog → Bio corta»; else first bio sentences); photos from
+One User Avatar 96/300, never Gravatar; links = Yoast contacts in `sameAs` order (twitter → x.com), `user_url` only if
+not the site; topics = `knowsAbout` that are categories with posts (aliases, max 4). Service accounts
+(greenhouse-integration) and authors without posts get no card. The card replaces `ohio_widget_about_author` via
+`widget_display_callback` inside `.author-container` of `ohio/single.php`; CSS `includes/content-model/assets/author.css`
+only on `is_singular('post')`. Byline: `ohio-child/parts/elements/page_headline.php` → `eo_author_byline()`; falls back to
+Ohio's list without the plugin. Schema stays Yoast's; `wpseo_schema_person` only rewrites `worksFor` to the
+`#organization` `@id`. Deploy: `deploy content-model` (allowlist now takes `includes/content-model/assets/*.(js|css)`);
+the byline ships in the site-nav theme package (allowlist + `parts/elements/page_headline.php`, **no dry-run**). Traps:
+the card is a `<section aria-label="Sobre el autor">`, **never `aside`** (site inline CSS `.single-post aside
+{display:none}` hides it); after changing photo or job title **rebuild the Yoast author indexable** and purge, or the
+author archive keeps the old `og:image` (`ai-generations/2026-10-24_autor-blog/refrescar-yoast-autor.php` via
+`pnpm public-website:wpcli -- --eval-file … --wp-user 1`). Contract: `BLOG_HOME_RUNTIME_V1.md` §9.
 
 ## Use the CLI, never ad hoc scripts
 

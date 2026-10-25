@@ -2,6 +2,16 @@
 
 [Historial](Handoff.archive.md).
 
+## 2026-10-25 — Ficha de autor del blog, byline y schema de autor (TASK-2057) en producción
+El single muestra «Por Julio Reyes» enlazado al archivo y, al final, la ficha de La órbita (retrato `portrait`, cargo,
+bio corta, temas, «Ver sus 44 artículos», LinkedIn e Instagram) en lugar de la caja de Ohio con redes del demo.
+`efeonce-editorial-blocks` 0.5.5 (runtime d3156f6, lector `EO_Author_Profile`; hovers sin el relleno de Ohio y aire bajo la ficha tras tu revisión) y `page_headline.php` por el paquete del
+tema (runtime 1d7a7bd); perfil de Julio cargado (avatar 252085, cargo «Managing & GTM Director», bios sin «Fundador»)
+e indexable de Yoast reconstruido. Verificado en vivo: Person con cargo, foto, `sameAs` y `worksFor` por `@id`;
+Playwright 5 anchos sin desborde, axe 0. Trampas: `.single-post aside {display:none}` inline (la ficha es `section`)
+y el indexable de Yoast guarda el `og:image` viejo. **Pendiente:** enlace YouTube global de Ohio → `colabrio`; slug de
+autor; `/wp-json/wp/v2/users`. Turno de content-model devuelto a la sesión del Archivo. Sin push.
+
 ## 2026-10-24 — Portada del blog: «Explora por tema» v2 (TASK-2051) en producción
 La órbita de `/blog/` dejó de mostrar «¿De qué escribimos más?» y es la puerta a las categorías: «Elige por dónde
 empezar.», seis temas (HubSpot, Inbound, Marketing digital, Loop Marketing, AEO, Diseño) como enlaces a
@@ -286,11 +296,3 @@ story de Manzanitas y pódcast, presentador de los tutoriales de YouTube. **Resu
 12) y aplicadas a docs, skills y Notion (`Twitter 🐦` retirado del Calendario). La 302 de `/servicios/hubspot/` →
 `/servicios-contratar-hubspot/` quedó **aplicada y verificada en vivo** (Yoast, respaldo `_gh_hubspot_302_before_20261022`).
 Con caché la redirección no conserva UTM: los posts enlazan directo a la landing.
-
-## 2026-10-22 — Kibernum: Growth Colombia, contacto y dos canales
-
-Contact `256968083769` / Company `53955357196` / Primary verificados; seis segmentos del contacto
-(180/181/182/183/151/156) y Company 187 comprobados. Apollo: 1 crédito.
-Correo 22/10 00:56 Santiago con firma gráfica/CCO y brochure 360° completo; Outlook y EMAIL `119266980893`
-SENT verificados. InMail distinto enviado (1 crédito); nota `119264638728` releída. Esperar respuesta, sin Lead,
-Deal ni secuencia nuevos. [Evidencia y continuidad](docs/commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md).

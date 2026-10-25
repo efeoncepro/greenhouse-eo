@@ -19,7 +19,7 @@
 - Wireframe: `docs/ui/wireframes/TASK-2057-blog-author-profile-card.md`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `Código local listo y probado (lector + ficha + byline + schema): 32 pruebas PHP verdes; harness a 1440/390/320 sin desborde y axe 0. Falta: pasar el código al plugin cuando la sesión del Archivo libere content-model, cargar el perfil y la foto en WordPress y desplegar con visto bueno del operador.`
+- Status real: `En producción desde el 2026-10-25 ~01:50 UTC: efeonce-editorial-blocks 0.5.5 (runtime d3156f6) y el byline del tema (paquete site-nav, runtime 1d7a7bd); perfil de Julio cargado (avatar 252085, cargo, bio corta y larga, meta descripción) e indexable de Yoast reconstruido. Verificado en vivo en 2 posts: ficha y byline, sin el widget de Ohio, Person con cargo, foto, sameAs y worksFor por @id; Playwright 1440/390/320/768/1920 sin desborde y axe 0. Hovers corregidos y 96 px bajo la ficha tras la revisión del operador (0.5.5). Falta: cierre de la task.`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `none`
@@ -192,7 +192,7 @@ Reglas obligatorias:
 - [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
 - [x] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo.
 - [x] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
 - [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## UI/UX Contract
@@ -398,10 +398,10 @@ categoría con posts (alias: «IA aplicada al marketing» → `ai`, «SEO/AEO» 
 - [x] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
 - [ ] `UI ready` permanece `no` hasta que el wireframe y `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log; si esta en `yes`, pasa `pnpm task:lint --task TASK-2057`.
 - [x] Se declaro `Wireframe: docs/ui/wireframes/TASK-2057-blog-author-profile-card.md` y el archivo existe.
-- [x] El lector pasa sus pruebas puras (32 chequeos, 2026-10-24).
+- [x] El lector pasa sus pruebas puras (33 chequeos; content-model 209 OK, 2026-10-25).
 - [x] Harness local a 1440/390/320 sin desborde y axe 0 (2026-10-24).
-- [ ] En vivo: byline y ficha en el single, sin la caja de Ohio ni «colabrio», sin textos en inglés del autor.
-- [ ] El JSON-LD del Person trae el cargo nuevo, la foto nueva, `sameAs` con LinkedIn e Instagram y `worksFor` por `@id`.
+- [x] En vivo: byline y ficha en el single, sin la caja de Ohio, sin textos en inglés del autor («Posted by» → «Por», «min read» → «min de lectura»). El único «colabrio» restante es el YouTube de los enlaces sociales globales de Ohio (fuera de la ficha; follow-up).
+- [x] El JSON-LD del Person trae el cargo nuevo, la foto nueva, `sameAs` con LinkedIn e Instagram y `worksFor` por `@id` (verificado en vivo 2026-10-25).
 - [ ] Documentación actualizada (runtime, funcional, manual, skill).
 
 ## Verification
@@ -419,8 +419,24 @@ categoría con posts (alias: «IA aplicada al marketing» → `ai`, «SEO/AEO» 
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
+## Delta 2026-10-25 — desvíos encontrados en vivo
+
+- La ficha es un `<section aria-label="Sobre el autor">`, no un `aside`: el sitio tiene CSS inline
+  `.single-post aside { display: none }` (oculta la barra lateral de Ohio) y la ocultaba (0.5.3).
+- El byline queda con autor y fecha: la cifra de lectura ya la muestra Ohio sobre el título (con otro cálculo: 33 contra
+  21 min); se traduce «min read» → «min de lectura» para que el encabezado tenga una sola cifra (0.5.4).
+- La bio corta acepta hasta 180 caracteres: la aprobada en el canvas mide 169.
+- El perfil vivo dice «Inteligencia artificial aplicada al marketing»: alias a la categoría `ai` (0.5.2).
+- Tras cambiar foto o cargo hay que reconstruir el indexable de autor de Yoast; si no, el `og:image` del archivo sigue
+  con la foto vieja (`ai-generations/2026-10-24_autor-blog/refrescar-yoast-autor.php`).
+- Ohio pinta todos los enlaces al hover (`a:not(.-unlink):hover` → `#024c8f`; `.links-underline a:hover` → fondo
+  `currentColor`): el chip quedaba blanco y el ícono desaparecía. Los enlaces de la ficha y del byline llevan las
+  exclusiones propias de Ohio (`-unlink -undash`) más reglas de hover acotadas; 96 px bajo la ficha (64 en teléfono)
+  antes de los relacionados (0.5.5, revisión del operador).
+
 ## Follow-ups
 
 - Slug de autor sin el usuario y cierre de `/wp-json/wp/v2/users`.
 - Mini ficha al foco del byline; «Más de Julio» en lugar de los relacionados de Ohio.
 - Web personal de Julio cuando cesargrowth.com esté en línea.
+- Enlace YouTube de los enlaces sociales globales de Ohio apunta a `facebook.com/colabrio` (opción del tema).
