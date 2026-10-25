@@ -222,4 +222,10 @@ tono conversacional y thought leadership». La V6 (spec actual; builder
   de Julio antes de publicar** (cliente activo; el informe aún no se le entrega).
 - Motores comprimidos en una tabla y una caja; cierre en voz de Julio. Pasa la validación de Content Factory
   (≈ 3.500 palabras). Copia privada `252114` recuperada de la papelera con la V6 (respaldo
-  `_gh_aeo_review_252114_v6_20261025_155211`). El publicado sigue con la V5 hasta que Julio apruebe.
+  `_gh_aeo_review_252114_v6_20261025_155211`). **Publicada el 2026-10-25 a las 15:56 UTC con aprobación de Julio («Apruebo la V6 con el caso anonimizado»)**,
+reemplazando la V5 con `blog-post-content-republish.php` (FAQ idéntica, lectura de vuelta en verde, respaldo
+`_gh_post_republish_248463_20261025_155612`); tiempo de lectura 13 → 18 min. QA en vivo: apertura, tabla del ejemplo,
+cinco niveles, antes/después y caso presentes; un H1, canonical propio, `index, follow`, FAQ 6, cero «pasaje» y cero
+enlaces a la URL vieja; Playwright 1440 y 390 sin desborde, tablas legibles (tarjetas en el teléfono), CTA e
+infografía visibles. Persiste el 404 ajeno de la miniatura de *Surround discovery*. Copia `252114` de nuevo en la
+papelera.
