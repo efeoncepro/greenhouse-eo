@@ -28,6 +28,11 @@ caída que es pareja en todo el blog.
 
 ## 1. Formato y validación del RUT (`/hubspot/como-crear-formularios-con-validacion-de-rut/`)
 
+> **Decisión de Julio (2026-10-25):** el artículo se queda en **validar el RUT en formularios de HubSpot**. Se
+> descartó abrirlo al formato del RUT en Excel: trae una audiencia que no es la del artículo, que existe para mostrar
+> experiencia en HubSpot. Se acepta perder parte de las impresiones por «formato rut». Borrador vigente:
+> [`RUT_FORMATO_VALIDACION_REFRESH_DRAFT_V1.md`](RUT_FORMATO_VALIDACION_REFRESH_DRAFT_V1.md).
+
 **Qué es hoy:** un tutorial de unas 600 palabras de 2024, sin imágenes. El código de validación (módulo 11) es
 correcto, probado en 400 000 casos [V], pero el artículo tiene cuatro problemas:
 

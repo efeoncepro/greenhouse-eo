@@ -1,204 +1,58 @@
 {
- "title": "Formato del RUT chileno: cómo escribirlo, validarlo y llevarlo limpio a HubSpot",
+ "title": "Cómo validar el RUT en formularios de HubSpot: editor nuevo, legacy y un CRM sin duplicados",
  "slug": "como-crear-formularios-con-validacion-de-rut",
- "excerpt": "Cómo se escribe un RUT, cómo se calcula su dígito verificador, cómo darle formato y validarlo en Excel, y cómo validarlo en un formulario de HubSpot sin duplicados en el CRM.",
+ "excerpt": "Cómo validar el RUT chileno en formularios de HubSpot: reglas de propiedad en el editor nuevo, código para formularios legacy y cómo evitar RUT duplicados en el CRM.",
  "seo": {
-  "title": "Formato del RUT chileno: cómo validarlo en Excel y HubSpot | Efeonce",
-  "description": "El RUT se escribe 12.345.678-5: cuerpo, guion y dígito verificador (0 a 9 o K). Cómo calcularlo, darle formato en Excel y validarlo en HubSpot.",
+  "title": "Cómo validar el RUT en formularios de HubSpot | Efeonce",
+  "description": "Cómo validar el RUT chileno en formularios de HubSpot: reglas de propiedad en el editor nuevo, código para formularios legacy y RUT sin duplicados en el CRM.",
   "canonicalUrl": "https://efeoncepro.com/hubspot/como-crear-formularios-con-validacion-de-rut/",
   "inLanguage": "es-CL",
   "indexPolicy": "index"
  },
  "intro": [
-  "Si alguna vez exportaste a Excel una base de contactos chilenos, ya viste el problema: el mismo RUT escrito de cuatro formas. 12.345.678-5, 12345678-5, 123456785 y, de vez en cuando, uno que termina en una k minúscula.",
+  "HubSpot no trae un campo de RUT. Trae campos de texto, y en un campo de texto cabe cualquier cosa: 12.345.678-5, 123456785, un RUT con el dígito equivocado o uno con una k minúscula.",
   [
    {
-    "text": "Para una persona es el mismo dato. Para un CRM son cuatro registros distintos, y ninguno cruza con facturación. "
+    "text": "Para una empresa que vende en Chile, eso no es un detalle. "
    },
    {
-    "text": "El RUT es de los pocos datos que identifican a un cliente sin ambigüedad, siempre que esté bien escrito.",
+    "text": "El RUT es la llave que une el CRM con facturación, y si entra mal escrito o dos veces, el CRM deja de servir para cruzar datos.",
     "strong": true
    }
   ],
-  "Esta guía parte por lo básico (cómo se escribe un RUT y cómo se calcula su dígito verificador) y termina donde nos importa cuando implementamos HubSpot para empresas chilenas: que el RUT llegue al CRM bien escrito y una sola vez."
+  "Esta guía explica cómo validarlo en los dos tipos de formulario que tiene hoy HubSpot y cómo dejar la propiedad configurada para que el mismo RUT no entre dos veces. Es lo que revisamos cuando implementamos HubSpot para empresas chilenas."
  ],
  "tableOfContents": true,
  "sections": [
   {
-   "heading": "¿Cuál es el formato del RUT chileno?",
+   "heading": "¿Qué tiene que revisar un formulario con RUT?",
    "level": 2,
    "blocks": [
     {
      "kind": "paragraph",
      "text": [
       {
-       "text": "El RUT (Rol Único Tributario) se escribe con un cuerpo de hasta ocho dígitos, un guion y un dígito verificador, que va del 0 al 9 o es la letra K. Por ejemplo: 12.345.678-5.",
+       "text": "Un RUT válido tiene un cuerpo de hasta ocho dígitos, un guion y un dígito verificador, que va del 0 al 9 o es la letra K. Por ejemplo: 12.345.678-5.",
        "strong": true
       },
       {
-       "text": " Los puntos que separan los miles son opcionales: 12345678-5 es el mismo RUT."
+       "text": " Validarlo significa revisar dos cosas: que tenga esa forma y que el dígito verificador calce con el cuerpo."
       }
      ]
     },
     {
-     "kind": "table",
-     "style": "stripes",
-     "headers": [
-      "Parte",
-      "En el ejemplo",
-      "Qué es"
-     ],
-     "rows": [
-      [
-       "Cuerpo",
-       "12.345.678",
-       "El número del RUT. Las personas tienen el mismo número que su RUN, el de la cédula de identidad."
-      ],
-      [
-       "Guion",
-       "-",
-       "Separa el cuerpo del dígito verificador."
-      ],
-      [
-       "Dígito verificador",
-       "5",
-       "Se calcula a partir del cuerpo y sirve para detectar errores de tipeo. Puede ser un número del 0 al 9 o la letra K."
-      ]
-     ]
-    },
-    {
      "kind": "paragraph",
-     "text": "En la práctica vas a encontrar el RUT de tres maneras, y conviene usar cada una para lo suyo:"
-    },
-    {
-     "kind": "list",
-     "style": "box",
-     "items": [
-      [
-       {
-        "text": "12.345.678-5",
-        "strong": true
-       },
-       {
-        "text": ": con puntos y guion. Es la forma de mostrarlo a una persona."
-       }
-      ],
-      [
-       {
-        "text": "12345678-5",
-        "strong": true
-       },
-       {
-        "text": ": sin puntos y con guion. Es la forma que conviene guardar en un CRM o una base de datos."
-       }
-      ],
-      [
-       {
-        "text": "123456785",
-        "strong": true
-       },
-       {
-        "text": ": sin puntos ni guion. Es lo que suele salir de un sistema antiguo o de un Excel mal formateado."
-       }
-      ]
-     ]
-    }
-   ]
-  },
-  {
-   "heading": "¿Cómo se calcula el dígito verificador del RUT?",
-   "level": 2,
-   "blocks": [
-    {
-     "kind": "paragraph",
-     "text": "El dígito verificador se calcula con un algoritmo llamado módulo 11. Son cinco pasos:"
+     "text": "El dígito verificador se calcula con un algoritmo llamado módulo 11:"
     },
     {
      "kind": "list",
      "ordered": true,
      "style": "steps",
      "items": [
-      "Toma el cuerpo del RUT y recórrelo de derecha a izquierda.",
-      "Multiplica cada dígito por 2, 3, 4, 5, 6 y 7, en ese orden. Si quedan dígitos, vuelve a empezar desde el 2.",
-      "Suma todos los resultados.",
-      "Divide esa suma por 11, toma el resto y réstaselo a 11.",
-      "Si te da 11, el dígito verificador es 0. Si te da 10, es K. En cualquier otro caso, es el número que obtuviste."
+      "Recorre el cuerpo de derecha a izquierda y multiplica cada dígito por 2, 3, 4, 5, 6 y 7, volviendo a empezar en 2 si quedan dígitos.",
+      "Suma los resultados, divide por 11 y réstale el resto a 11.",
+      "Si te da 11, el dígito es 0; si te da 10, es K; si no, es el número que obtuviste. Para 12.345.678 la suma es 138, el resto es 6 y el dígito es 5."
      ]
-    },
-    {
-     "kind": "paragraph",
-     "text": "Con el cuerpo 12.345.678 queda así:"
-    },
-    {
-     "kind": "table",
-     "style": "stripes",
-     "headers": [
-      "Dígito (de derecha a izquierda)",
-      "Peso",
-      "Resultado"
-     ],
-     "rows": [
-      [
-       "8",
-       "2",
-       "16"
-      ],
-      [
-       "7",
-       "3",
-       "21"
-      ],
-      [
-       "6",
-       "4",
-       "24"
-      ],
-      [
-       "5",
-       "5",
-       "25"
-      ],
-      [
-       "4",
-       "6",
-       "24"
-      ],
-      [
-       "3",
-       "7",
-       "21"
-      ],
-      [
-       "2",
-       "2",
-       "4"
-      ],
-      [
-       "1",
-       "3",
-       "3"
-      ],
-      [
-       [
-        {
-         "text": "Suma",
-         "strong": true
-        }
-       ],
-       "",
-       [
-        {
-         "text": "138",
-         "strong": true
-        }
-       ]
-      ]
-     ],
-     "caption": "138 dividido por 11 deja resto 6, y 11 menos 6 es 5. El RUT completo es 12.345.678-5."
-    },
-    {
-     "kind": "paragraph",
-     "text": "La K aparece cuando el cálculo da 10: el dígito verificador ocupa un solo carácter, así que el 10 se reemplaza por una letra."
     },
     {
      "kind": "pullquote",
@@ -206,193 +60,12 @@
     },
     {
      "kind": "paragraph",
-     "text": "Por eso la validación sirve para atrapar errores de tipeo, no para confirmar una identidad. Si necesitas saber si un RUT está registrado y su situación tributaria, eso se consulta en el SII."
+     "text": "Por eso la validación de un formulario atrapa errores de tipeo, no identidades falsas. Si necesitas saber si un RUT está registrado y su situación tributaria, eso se consulta en el SII."
     }
    ]
   },
   {
-   "heading": "¿Cómo dar formato y validar el RUT en Excel?",
-   "level": 2,
-   "blocks": [
-    {
-     "kind": "paragraph",
-     "text": [
-      {
-       "text": "Antes de las fórmulas, una regla: "
-      },
-      {
-       "text": "guarda la columna del RUT como texto.",
-       "strong": true
-      },
-      {
-       "text": " Un RUT no es una cantidad y la K no cabe en una celda numérica."
-      }
-     ]
-    },
-    {
-     "kind": "paragraph",
-     "text": "Con el RUT en la celda A2, escrito como venga, estas fórmulas lo limpian, lo validan y lo devuelven en los dos formatos útiles. Están en Excel en español (Microsoft 365 o Excel 2021, por LET y SECUENCIA) y las probamos con RUT con y sin puntos, con k minúscula y bajo el millón."
-    },
-    {
-     "kind": "paragraph",
-     "text": [
-      {
-       "text": "Columna B",
-       "strong": true
-      },
-      {
-       "text": ": deja sólo los dígitos y la K, en mayúscula."
-      }
-     ]
-    },
-    {
-     "kind": "code",
-     "code": "=MAYUSC(SUSTITUIR(SUSTITUIR(SUSTITUIR(A2;\".\";\"\");\"-\";\"\");\" \";\"\"))"
-    },
-    {
-     "kind": "paragraph",
-     "text": [
-      {
-       "text": "Columnas C y D",
-       "strong": true
-      },
-      {
-       "text": ": separan el cuerpo y el dígito escrito. Una fórmula en cada columna."
-      }
-     ]
-    },
-    {
-     "kind": "code",
-     "code": "=IZQUIERDA(B2;LARGO(B2)-1)\n=DERECHA(B2;1)"
-    },
-    {
-     "kind": "paragraph",
-     "text": [
-      {
-       "text": "Columna E",
-       "strong": true
-      },
-      {
-       "text": ": calcula el dígito verificador."
-      }
-     ]
-    },
-    {
-     "kind": "code",
-     "code": "=LET(c;TEXTO(C2;\"00000000\");i;SECUENCIA(8);s;SUMAPRODUCTO(--EXTRAE(c;i;1);RESIDUO(8-i;6)+2);x;11-RESIDUO(s;11);SI(x=11;\"0\";SI(x=10;\"K\";x&\"\")))"
-    },
-    {
-     "kind": "paragraph",
-     "text": [
-      {
-       "text": "Columnas F y G",
-       "strong": true
-      },
-      {
-       "text": ": dicen si el RUT es válido y lo devuelven sin puntos, listo para el CRM."
-      }
-     ]
-    },
-    {
-     "kind": "code",
-     "code": "=SI(E2=D2;\"Válido\";\"Inválido\")\n=C2&\"-\"&D2"
-    },
-    {
-     "kind": "paragraph",
-     "text": [
-      {
-       "text": "Columna H",
-       "strong": true
-      },
-      {
-       "text": ": lo devuelve con puntos y guion, para mostrarlo."
-      }
-     ]
-    },
-    {
-     "kind": "code",
-     "code": "=LET(n;VALOR(C2);m;ENTERO(n/1000000);k;RESIDUO(ENTERO(n/1000);1000);u;RESIDUO(n;1000);SI(m>0;m&\".\"&TEXTO(k;\"000\")&\".\"&TEXTO(u;\"000\");SI(k>0;k&\".\"&TEXTO(u;\"000\");u&\"\"))&\"-\"&D2)"
-    },
-    {
-     "kind": "paragraph",
-     "text": "Si prefieres validar en una sola celda, esta fórmula hace todo junto. No admite espacios dentro del RUT:"
-    },
-    {
-     "kind": "code",
-     "code": "=LET(t;MAYUSC(SUSTITUIR(SUSTITUIR(A2;\".\";\"\");\"-\";\"\"));n;SECUENCIA(8);s;SUMAPRODUCTO(--EXTRAE(TEXTO(IZQUIERDA(t;LARGO(t)-1);\"00000000\");n;1);RESIDUO(8-n;6)+2);x;11-RESIDUO(s;11);SI(SI(x=11;\"0\";SI(x=10;\"K\";x&\"\"))=DERECHA(t;1);\"Válido\";\"Inválido\"))"
-    },
-    {
-     "kind": "paragraph",
-     "text": "La fórmula del dígito rellena el cuerpo con ceros a la izquierda hasta ocho dígitos y aplica los pesos de derecha a izquierda, igual que el cálculo a mano. Si tu Excel está en inglés, las funciones se llaman UPPER, SUBSTITUTE, LEFT, LEN, RIGHT, TEXT, SEQUENCE, SUMPRODUCT, MID, MOD, IF, VALUE e INT, y el separador es la coma."
-    }
-   ]
-  },
-  {
-   "heading": "¿Cómo validar el RUT en un formulario web?",
-   "level": 2,
-   "blocks": [
-    {
-     "kind": "paragraph",
-     "text": "La misma lógica, en JavaScript y sin librerías. Estas funciones aceptan el RUT con o sin puntos, con k minúscula y bajo el millón:"
-    },
-    {
-     "kind": "code",
-     "code": "// Deja solo dígitos y K (en mayúscula): \"12.345.678-k\" → \"12345678K\"\nfunction limpiarRut(valor) {\n  return String(valor).toUpperCase().replace(/[^0-9K]/g, '');\n}\n\n// Dígito verificador por módulo 11: pesos 2 a 7, de derecha a izquierda\nfunction calcularDv(cuerpo) {\n  let suma = 0;\n  let peso = 2;\n  for (let i = cuerpo.length - 1; i >= 0; i--) {\n    suma += Number(cuerpo[i]) * peso;\n    peso = peso === 7 ? 2 : peso + 1;\n  }\n  const resto = 11 - (suma % 11);\n  if (resto === 11) return '0';\n  if (resto === 10) return 'K';\n  return String(resto);\n}\n\n// true si el RUT tiene forma válida y su dígito verificador calza\nfunction esRutValido(valor) {\n  const rut = limpiarRut(valor);\n  if (!/^[0-9]{1,8}[0-9K]$/.test(rut)) return false;\n  const cuerpo = rut.slice(0, -1).replace(/^0+/, '');\n  if (cuerpo === '') return false;\n  return calcularDv(cuerpo) === rut.slice(-1);\n}\n\n// \"123456785\" → \"12.345.678-5\"\nfunction formatearRut(valor) {\n  const rut = limpiarRut(valor);\n  if (rut.length < 2) return rut;\n  const cuerpo = rut.slice(0, -1).replace(/^0+/, '');\n  const dv = rut.slice(-1);\n  return cuerpo.replace(/\\B(?=(\\d{3})+(?!\\d))/g, '.') + '-' + dv;\n}\n\n// \"12.345.678-5\" → \"12345678-5\": el formato que conviene guardar en el CRM\nfunction normalizarRut(valor) {\n  const rut = limpiarRut(valor);\n  return rut.slice(0, -1).replace(/^0+/, '') + '-' + rut.slice(-1);\n}"
-    },
-    {
-     "kind": "paragraph",
-     "text": "Las probamos con más de 200.000 RUT generados al azar contra una segunda implementación, y con los casos que suelen fallar: K mayúscula y minúscula, RUT bajo el millón, ceros a la izquierda y letras en medio del número."
-    },
-    {
-     "kind": "paragraph",
-     "text": "La función es la parte fácil. Lo que hace que un formulario funcione bien son estas decisiones:"
-    },
-    {
-     "kind": "list",
-     "style": "box",
-     "items": [
-      [
-       {
-        "text": "Valida al salir del campo, no en cada tecla.",
-        "strong": true
-       },
-       {
-        "text": " Marcar error mientras la persona todavía está escribiendo sólo la apura."
-       }
-      ],
-      [
-       {
-        "text": "Explica el error junto al campo.",
-        "strong": true
-       },
-       {
-        "text": " «Revisa el RUT: el dígito verificador no calza» se entiende; «RUT inválido» no dice qué corregir."
-       }
-      ],
-      [
-       {
-        "text": "Guarda un solo formato.",
-        "strong": true
-       },
-       {
-        "text": " Muestra el RUT con puntos si quieres, pero guárdalo como 12345678-5."
-       }
-      ],
-      [
-       {
-        "text": "Si el dato importa, valídalo también en el servidor.",
-        "strong": true
-       },
-       {
-        "text": " Lo que corre en el navegador se puede saltar."
-       }
-      ]
-     ]
-    }
-   ]
-  },
-  {
-   "heading": "¿Cómo validar el RUT en un formulario de HubSpot?",
+   "heading": "¿Cómo se valida el RUT en HubSpot?",
    "level": 2,
    "blocks": [
     {
@@ -436,7 +109,7 @@
        "href": "https://knowledge.hubspot.com/properties/set-validation-rules-for-properties"
       },
       {
-       "text": ", las reglas de la propiedad se aplican en los formularios del editor nuevo, al editar registros y al importar, pero no en los formularios del editor legacy."
+       "text": ", las reglas de la propiedad se aplican en los formularios del editor nuevo, al editar registros y al importar, pero no en los formularios del editor legacy. Y al revés, el código de personalización sólo funciona en formularios legacy en HTML sin procesar."
       }
      ]
     }
@@ -452,6 +125,7 @@
      "style": "steps",
      "items": [
       "Crea una propiedad de texto de una línea llamada RUT, en la empresa o en el contacto (más abajo te explico cuál).",
+      "Si quieres evitar duplicados, marca que exija valores únicos al crearla: después ya no se puede activar.",
       "En la pestaña de reglas, bloquea los espacios.",
       [
        {
@@ -474,7 +148,7 @@
     },
     {
      "kind": "paragraph",
-     "text": "Esta expresión acepta 12345678-5, 999999-K y 1-9, y rechaza el RUT con puntos o sin guion. No usa grupos de captura, que el motor de HubSpot no admite. Su límite es que revisa la forma y no el dígito: 12345678-6 pasa. Si necesitas el dígito verificador en estos formularios, la alternativa es revisarlo después en el CRM, por ejemplo con una lista de registros con RUT inválido que alguien corrige."
+     "text": "Esta expresión acepta 12345678-5, 999999-K y 1-9, y rechaza el RUT con puntos o sin guion. No usa grupos de captura, que el motor de HubSpot no admite. Su límite es que revisa la forma y no el dígito: 12345678-6 pasa. Si necesitas el dígito verificador en estos formularios, revísalo después en el CRM, por ejemplo con una lista de registros con RUT inválido que alguien de tu equipo corrige."
     }
    ]
   },
@@ -484,7 +158,15 @@
    "blocks": [
     {
      "kind": "paragraph",
-     "text": "Este código reemplaza el código de inserción del formulario: no va debajo, va en su lugar. Pega primero las funciones de la sección anterior y después esto, cambiando el portal, el formulario y el nombre interno de tu propiedad:"
+     "text": "En un formulario legacy sí puedes revisar el dígito verificador antes de que se envíe. Primero, estas funciones, en JavaScript y sin librerías. Aceptan el RUT con o sin puntos, con k minúscula y bajo el millón:"
+    },
+    {
+     "kind": "code",
+     "code": "// Deja solo dígitos y K (en mayúscula): \"12.345.678-k\" → \"12345678K\"\nfunction limpiarRut(valor) {\n  return String(valor).toUpperCase().replace(/[^0-9K]/g, '');\n}\n\n// Dígito verificador por módulo 11: pesos 2 a 7, de derecha a izquierda\nfunction calcularDv(cuerpo) {\n  let suma = 0;\n  let peso = 2;\n  for (let i = cuerpo.length - 1; i >= 0; i--) {\n    suma += Number(cuerpo[i]) * peso;\n    peso = peso === 7 ? 2 : peso + 1;\n  }\n  const resto = 11 - (suma % 11);\n  if (resto === 11) return '0';\n  if (resto === 10) return 'K';\n  return String(resto);\n}\n\n// true si el RUT tiene forma válida y su dígito verificador calza\nfunction esRutValido(valor) {\n  const rut = limpiarRut(valor);\n  if (!/^[0-9]{1,8}[0-9K]$/.test(rut)) return false;\n  const cuerpo = rut.slice(0, -1).replace(/^0+/, '');\n  if (cuerpo === '') return false;\n  return calcularDv(cuerpo) === rut.slice(-1);\n}\n\n// \"123456785\" → \"12.345.678-5\"\nfunction formatearRut(valor) {\n  const rut = limpiarRut(valor);\n  if (rut.length < 2) return rut;\n  const cuerpo = rut.slice(0, -1).replace(/^0+/, '');\n  const dv = rut.slice(-1);\n  return cuerpo.replace(/\\B(?=(\\d{3})+(?!\\d))/g, '.') + '-' + dv;\n}\n\n// \"12.345.678-5\" → \"12345678-5\": el formato que conviene guardar en el CRM\nfunction normalizarRut(valor) {\n  const rut = limpiarRut(valor);\n  return rut.slice(0, -1).replace(/^0+/, '') + '-' + rut.slice(-1);\n}"
+    },
+    {
+     "kind": "paragraph",
+     "text": "Después, el formulario. Este código reemplaza el código de inserción del formulario: no va debajo, va en su lugar. Cambia el portal, el formulario y el nombre interno de tu propiedad:"
     },
     {
      "kind": "code",
@@ -540,7 +222,59 @@
     },
     {
      "kind": "paragraph",
-     "text": "Antes de publicarlo en tu sitio, pruébalo con tres casos: un RUT válido, uno con el dígito equivocado y el campo vacío."
+     "text": "Probamos las funciones con más de 200.000 RUT generados al azar contra una segunda implementación, y con los casos que suelen fallar: K mayúscula y minúscula, RUT bajo el millón, ceros a la izquierda y letras en medio del número. Antes de publicar el formulario en tu sitio, pruébalo con tres casos: un RUT válido, uno con el dígito equivocado y el campo vacío."
+    }
+   ]
+  },
+  {
+   "heading": "¿Qué hace que un formulario con RUT funcione bien?",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "El código es la parte fácil. Estas decisiones son las que se notan del otro lado del formulario:"
+    },
+    {
+     "kind": "list",
+     "style": "box",
+     "items": [
+      [
+       {
+        "text": "Valida al salir del campo, no en cada tecla.",
+        "strong": true
+       },
+       {
+        "text": " Marcar error mientras la persona todavía está escribiendo sólo la apura."
+       }
+      ],
+      [
+       {
+        "text": "Explica el error junto al campo.",
+        "strong": true
+       },
+       {
+        "text": " «Revisa el RUT: el dígito verificador no calza» se entiende; «RUT inválido» no dice qué corregir."
+       }
+      ],
+      [
+       {
+        "text": "Guarda un solo formato.",
+        "strong": true
+       },
+       {
+        "text": " Muestra el RUT con puntos si quieres, pero guárdalo como 12345678-5."
+       }
+      ],
+      [
+       {
+        "text": "Si el dato importa, valídalo también fuera del navegador.",
+        "strong": true
+       },
+       {
+        "text": " Lo que corre en la página se puede saltar."
+       }
+      ]
+     ]
     }
    ]
   },
@@ -567,11 +301,20 @@
       ],
       [
        {
-        "text": "Marca la propiedad para que exija valores únicos.",
+        "text": "Exige valores únicos en la propiedad.",
         "strong": true
        },
        {
-        "text": " HubSpot lo permite en todos los planes, pero sólo al crear la propiedad y hasta diez propiedades únicas por objeto."
+        "text": " HubSpot lo permite en todos los planes, hasta diez propiedades únicas por objeto, pero en una propiedad de texto sólo se puede activar al crearla."
+       }
+      ],
+      [
+       {
+        "text": "Si ya tienes una propiedad de RUT sin esa marca,",
+        "strong": true
+       },
+       {
+        "text": " crea una nueva con valores únicos, normaliza los RUT existentes al formato sin puntos, resuelve los duplicados y copia los valores a la nueva."
        }
       ],
       [
@@ -580,7 +323,7 @@
         "strong": true
        },
        {
-        "text": " Pasa la base por las fórmulas de Excel de arriba y sube la columna sin puntos."
+        "text": " Las reglas de la propiedad también se aplican al importar: los RUT que no cumplan el formato van a dar error."
        }
       ]
      ]
@@ -614,7 +357,7 @@
      "kind": "paragraph",
      "text": [
       {
-       "text": "No es sólo una cuestión de experiencia. La "
+       "text": "Y no es sólo una cuestión de experiencia. La "
       },
       {
        "text": "Ley 21.719",
@@ -639,52 +382,43 @@
    ]
   },
   {
-   "heading": "Preguntas frecuentes sobre el RUT",
+   "heading": "Preguntas frecuentes sobre el RUT en HubSpot",
    "level": 2,
    "blocks": [
     {
      "kind": "faq",
      "schema": {
       "enabled": true,
-      "name": "Preguntas frecuentes sobre el formato y la validación del RUT",
+      "name": "Preguntas frecuentes sobre validar el RUT en formularios de HubSpot",
       "canonicalUrl": "https://efeoncepro.com/hubspot/como-crear-formularios-con-validacion-de-rut/",
       "inLanguage": "es-CL",
       "source": "plugin"
      },
      "items": [
       {
-       "question": "¿El RUT se escribe con puntos?",
+       "question": "¿HubSpot valida el RUT chileno de forma nativa?",
        "answer": [
         {
          "kind": "paragraph",
-         "text": "Los puntos son opcionales. 12.345.678-5 y 12345678-5 son el mismo RUT. Conviene mostrarlo con puntos y guardarlo sin puntos, con guion."
+         "text": "No. Las reglas de la propiedad pueden exigir un formato, pero no calculan el dígito verificador. Para eso necesitas código de personalización en un formulario legacy o una revisión posterior en el CRM."
         }
        ]
       },
       {
-       "question": "¿Qué significa la K en el RUT?",
+       "question": "¿El código de personalización funciona en los formularios del editor nuevo?",
        "answer": [
         {
          "kind": "paragraph",
-         "text": "La K reemplaza al 10. Cuando el cálculo del dígito verificador da 10, se escribe K para que el dígito siga ocupando un solo carácter."
+         "text": "No. El código de personalización sólo funciona en formularios legacy en HTML sin procesar. En los del editor nuevo, la validación se configura con reglas en la propiedad."
         }
        ]
       },
       {
-       "question": "¿Validar el dígito verificador confirma que el RUT existe?",
+       "question": "¿Qué plan de HubSpot necesito para validar el RUT?",
        "answer": [
         {
          "kind": "paragraph",
-         "text": "No. Sólo confirma que el RUT está bien escrito. Para saber si está registrado hay que consultarlo en el SII."
-        }
-       ]
-      },
-      {
-       "question": "¿Basta con una expresión regular para validar un RUT?",
-       "answer": [
-        {
-         "kind": "paragraph",
-         "text": "No. Una expresión regular revisa la forma, pero no puede calcular el dígito verificador: 12345678-6 tiene la forma correcta y es un RUT inválido."
+         "text": "Las reglas básicas de una propiedad y los valores únicos están en todos los planes. La regla con expresión regular necesita Professional o Enterprise, y el código de personalización de formularios legacy, Marketing Hub o Content Hub Professional o Enterprise."
         }
        ]
       },
@@ -694,6 +428,15 @@
         {
          "kind": "paragraph",
          "text": "Si vendes a empresas, en la empresa. El RUT de una persona va en su contacto y sólo vale la pena pedirlo si lo necesitas para facturarle."
+        }
+       ]
+      },
+      {
+       "question": "¿Validar el dígito verificador confirma que el RUT existe?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "No. Sólo confirma que el RUT está bien escrito. Para saber si está registrado hay que consultarlo en el SII."
         }
        ]
       }
@@ -707,7 +450,7 @@
    "blocks": [
     {
      "kind": "paragraph",
-     "text": "Un RUT bien escrito tiene cuerpo, guion y dígito verificador. El dígito se calcula con módulo 11 y atrapa errores de tipeo, no identidades falsas. Lo que hace la diferencia en un CRM es guardarlo siempre igual, validarlo donde entra y pedirlo sólo cuando lo vas a usar."
+     "text": "En HubSpot, el RUT se valida con reglas en la propiedad si el formulario es del editor nuevo, y con código si es legacy en HTML sin procesar. En los dos casos, lo que más pesa en el CRM es guardarlo siempre igual, exigir valores únicos desde que creas la propiedad y pedirlo sólo cuando lo vas a usar."
     },
     {
      "kind": "list",
@@ -739,7 +482,7 @@
       ],
       [
        {
-        "text": "Y si estás implementando o ordenando HubSpot en Chile, conoce cómo trabajamos "
+        "text": "Y si estás implementando u ordenando HubSpot en Chile, conoce cómo trabajamos "
        },
        {
         "text": "HubSpot en Efeonce",
@@ -827,7 +570,7 @@
     },
     {
      "kind": "paragraph",
-     "text": "Este artículo se publicó en noviembre de 2024 como un tutorial para validar el RUT en formularios de HubSpot y se reescribió en octubre de 2026: se sumó el formato del RUT, el cálculo del dígito verificador y las fórmulas de Excel; se corrigió un ejemplo de RUT válido que no lo era; se actualizó el código a los dos editores de formularios de HubSpot y se retiró la afirmación de que validar el RUT «cumple normativas». Lo desarrolló Julio Reyes con apoyo de IA en investigación, código y edición; el código y las fórmulas se probaron antes de publicar, y Julio aprobó la versión final."
+     "text": "Este artículo se publicó en noviembre de 2024 como un tutorial para validar el RUT en formularios de HubSpot y se reescribió en octubre de 2026: se actualizó a los dos editores de formularios que tiene hoy HubSpot, se corrigió un ejemplo de RUT válido que no lo era, se reescribió el código para que HubSpot registre el valor y acepte RUT bajo el millón, se sumó cómo evitar RUT duplicados en el CRM y se retiró la afirmación de que validar el RUT «cumple normativas». Lo desarrolló Julio Reyes con apoyo de IA en investigación, código y edición; el código se probó antes de publicar, y Julio aprobó la versión final."
     }
    ]
   }
