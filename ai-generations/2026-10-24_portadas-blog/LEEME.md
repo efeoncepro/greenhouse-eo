@@ -141,13 +141,13 @@ a las sesiones del blog.
 
   | Imagen del inventario | Archivo | Medidas | sha256 |
   |---|---|---|---|
-  | 1 · Plate (tarjeta del rail) | `seo-y-aeo-google-ia-2026-card.webp` (WebP del plate, 50 KB) | 2560 × 1440 | `e489a1a9…` |
+  | 1 · Plate (tarjeta del rail) | `seo-y-aeo-google-ia-2026-card.webp`: el plate sin los 300 px de arriba y los 40 de abajo, porque con el plate entero la ficha caía en y 36–44 %, sobre el inicio del degradado (zona pedida: y 10–40 %); ahora y 20–30 % | 2560 × 1100 | `a76f8e55…` |
   | 2 · Portada (destacada, OG, X, «Te puede interesar») | `seo-y-aeo-google-ia-2026.jpg` (151 KB) | 2400 × 1260 | `6136ee39…` |
   | 3 · Slider (`hero`) | `seo-y-aeo-google-ia-2026-hero.webp` (38 KB): plate sin los 160 px de arriba **y de la derecha**, para dejar la ficha en x 69–78 % | 2400 × 1200 | `5a4fc6f7…` |
   | 4 · Cuerpo | infografía «Cómo arma su respuesta un motor de IA» v2, adjuntos `252118`/`252119` | 1600 × 930 · 900 × 2578 | — |
 
-  Tarjeta con `--focus "84% 30%"`: la ficha queda en el centro de la tarjeta en escritorio y teléfono, por encima del
-  degradado. Hoja de revisión por superficie: `final-aeo/revision-superficies.jpg` (portada, cuadrado, tarjeta 440 ×
+  Tarjeta con `--focus "80% 50%"`: se ve x 55–86 % en escritorio y tablet y x 61–85 % en el teléfono; la ficha (x 65–75 %)
+  queda entera, debajo de las etiquetas y por encima del degradado. Medido el 2026-10-25. Hoja de revisión por superficie: `final-aeo/revision-superficies.jpg` (portada, cuadrado, tarjeta 440 ×
   600 y 304 × 540, slider 1440 y 390).
 - **Alt de la portada:** «Portada de Marketing con Manzanitas: un cajón de fichero abierto sobre una mesa oscura, con
   una sola ficha levantada bajo un foco de luz azul, junto al texto «Google te encuentra. La IA te elige.»».
