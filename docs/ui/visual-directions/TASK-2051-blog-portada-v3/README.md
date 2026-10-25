@@ -61,6 +61,9 @@ el sitio sólo se reutiliza infraestructura (consultas, formularios, despliegue,
     riel v1 del canvas congelado se reemplaza por la plantilla v2 en los tres tableros (`lib/rail-v2.cjs`, aplicada a
     la referencia y a la plantilla ligada). Ajuste propio: el riel arranca alineado con el título (`scroll-padding`),
     porque el snap dejaba la primera tarjeta pegada al borde.
+15. «Explora por tema» v2 (operador, 2026-10-24, canvas versión 95; sección «Explora por tema v2» abajo): la órbita
+    deja de medir cuánto publicamos y pasa a ser la puerta a las categorías del blog (`lib/topics-v2.cjs`, aplicado a la
+    referencia y a la plantilla ligada en los tres tableros).
 
 ## Tablero de tablet (768–1099 px), 2026-10-24
 
@@ -168,3 +171,23 @@ del canvas: hoja de la familia (1920, con una fila en estado hover) y la secció
   `scripts/public-website/blog-v3/lib/rail-v2.cjs`; datos en `EO_Home_Adapter::rail()`. Webinar y podcast tienen
   soporte desde ya: el próximo evento publicado entra al riel como entrada y una entrada con formato Podcast como onda.
   «Últimos cupos», «Lista de espera», «Más leído» y «Tendencia» esperan su lector (filtro `eo_home_rail_signals`).
+
+## Explora por tema v2 — EN PRODUCCIÓN (2026-10-24, canvas versión 95)
+
+Pedido del operador: «¿De qué escribimos más?» no aporta a la audiencia; la sección debe enlazar las categorías del blog.
+Página «Explora por tema · v2 (categorías)» del canvas: 1440 con HubSpot activo, 1440 con AEO activo (estado al pasar
+el cursor) y 390. Generador, datos y tableros en `temas-v2-2026-10-24.tar.gz`; capturas en
+`referencias/temas-v2-{1440,390}.jpg`.
+
+- **Título y bajada para el lector:** «Elige por dónde empezar.» / «Seis temas para lo que hoy te ocupa: ventas,
+  marketing, visibilidad en la IA y creatividad.»; el enlace «Todo el archivo · 44» se conserva.
+- **Seis temas con contenido:** HubSpot (12), Inbound (10), Marketing digital (6), Loop Marketing (5), AEO (4) y Diseño
+  (3). Growth (1) e IA (2) salen; Inbound y Marketing digital, categorías grandes que no estaban, entran. Colores
+  canónicos de cada categoría; los del mismo color van enfrentados en la órbita (HubSpot/Inbound, Marketing digital/Loop).
+- **Cada tema es un enlace real** a su categoría (`/category/<slug>/`), con una promesa corta en lugar del conteo. Al
+  pasar el cursor o enfocar, el centro muestra la descripción de la categoría, «Para empezar» con sus tres lecturas más
+  recientes y «Ver todo <tema> · N». El arco marca el tema activo; ya no mide participación. Sin «Fuente: …».
+- **Móvil:** una lista ordenada por lecturas; cada fila (color, nombre, promesa, cantidad, flecha) lleva a la categoría.
+- **Tablet:** la órbita con el centro y, debajo, los seis temas en grilla (la composición de tablet de la portada).
+- Diseño no tenía descripción de categoría: se cargó «Cómo trabajamos la creatividad: procesos, flujos y criterio para
+  producir más y mejor sin perder la idea.» (`topic-descriptions`, 2026-10-24).

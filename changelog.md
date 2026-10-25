@@ -2,6 +2,13 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-24 — «Explora por tema» v2 en la portada del blog (TASK-2051, desvío 15)
+
+- La órbita de `/blog/` enlaza las categorías del blog: seis temas con contenido, cada uno con su promesa, y un centro
+  que guía la lectura (descripción, tres lecturas, «Ver todo»); en móvil, una lista por lecturas. Growth e IA salen;
+  Inbound y Marketing digital entran. `lib/topics-v2.cjs`, `EO_Home_Readers::ORBIT`, `EO_Home_Adapter::ORBIT_TOPICS`,
+  `EOBH_View::topics()`; efeonce-editorial-blocks 0.4.8.
+
 ## 2026-10-24 — Imagen y punto focal propios de la tarjeta de foto del riel (TASK-2051)
 
 - La tarjeta de foto de «Para leer con calma» (vertical) recortaba al centro la destacada horizontal y cortaba el
@@ -628,16 +635,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - En las tablas del PDF y del deck, una fuente citada de facebook.com muestra el isotipo de Facebook en vez del de
   Meta, y los dominios de Threads y X también tienen el suyo. Rige para lo que se renderice después del próximo
   release. El informe web no cambia: no recibe canal por dominio citado.
-
-## 2026-10-12 — HubSpot: los segmentos de industria leen la empresa, y Bancos queda dentro de Finanzas
-
-- El operador vio que los contactos del segmento de bancos casi no aparecían en el de finanzas. El de bancos
-  (188) enumeraba 14 empresas por ID y el de finanzas (153) leía una industria llenada a mano en cada contacto:
-  sólo 9 de 28 coincidían. Ahora los segmentos de contactos 151–155 leen la industria de la empresa principal
-  y 188 se define como banca en Chile. Trece empresas corregidas; membresía real igual a la simulada en los
-  seis segmentos. 188 pasa de 28 a 26: Consorcio sale por estar clasificada como seguros, pendiente de decisión.
-  Con la misma regla se creó Seguros Chile (195), contenido en Finanzas, tras prospectar BICE Vida.
-- La skill de prospección suma el módulo `segments-by-attribute` y el escenario P50; el adaptador de HubSpot,
-  la regla vigente y el lector de membresía que funciona con OAuth de usuario.
-  [Decisión](docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md) ·
-  [snapshot](docs/operations/HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json).

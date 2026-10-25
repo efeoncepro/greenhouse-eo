@@ -1,6 +1,14 @@
 # TASK-2051 — Portada del blog v3 en alta fidelidad
 
 
+## Delta 2026-10-24 (Explora por tema v2)
+
+- La órbita de temas pasa a ser la puerta a las categorías del blog (desvío 15, `lib/topics-v2.cjs`): seis temas con
+  contenido (HubSpot, Inbound, Marketing digital, Loop Marketing, AEO, Diseño), cada uno enlace a su categoría con
+  promesa; el centro muestra descripción, tres lecturas y «Ver todo»; en móvil, lista por lecturas. Descripción de
+  Diseño cargada con `topic-descriptions`. Gates locales (equivalencia, paridad 27, píxeles 25/25, axe 0, desborde 0)
+  y en vivo verdes.
+
 ## Delta 2026-10-24 (tarjetas v2)
 
 - Rediseño de «Para leer con calma» aprobado por el operador (canvas versión 93) y desplegado: `lib/rail-v2.cjs`

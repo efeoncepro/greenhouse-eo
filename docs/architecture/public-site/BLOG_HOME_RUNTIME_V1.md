@@ -84,7 +84,8 @@ defecto del gate.
 | 4 | Comportamiento sin JavaScript | 11 | Velo de lectura, bajada en 2 líneas, megáfono de Novedad |
 | 5 | Raíz fluida del tablero móvil | 12 | Foto del autor |
 | 6 | Espaciador de 56 px en lugar de la isla móvil | 13 | Suscripción real a Glitch (también en el pie) |
-| 7 | Órbita de temas fluida bajo 390 px | 14 | Tarjetas v2 de «Para leer con calma» |
+| 7 | Órbita de temas fluida bajo 390 px (retirada con el desvío 15) | 14 | Tarjetas v2 de «Para leer con calma» |
+| | | 15 | «Explora por tema» v2: la órbita como puerta a las categorías |
 
 ### «Para leer con calma» v2 (desvío 14)
 
@@ -113,6 +114,20 @@ enciende. La guía publicada en `think.efeoncepro.com` firma con el logo de Efeo
 El hover fija `--px/--py/--rx/--ry` en el `style` de la tarjeta; `dc-runtime.js` (`syncAttrs`) sólo reescribe un
 `style` renderizado cuando cambia su valor de plantilla, así que el repintado de cada segundo ya no lo borra (también
 corrige el botón magnético).
+
+### «Explora por tema» v2 (desvío 15)
+
+`scripts/public-website/blog-v3/lib/topics-v2.cjs` reemplaza la sección de la órbita en los tres tableros (plantilla de
+escritorio/tablet y de móvil, CSS `tv-*`, el literal `T` de la versión 95 del canvas y la lógica). Contrato por tema,
+igual en los dos documentos: `key, name, promise, accent, ink, href, n, desc, reads[{t, href}], pos, align, arc, sx, sy`.
+`EO_Home_Readers::ORBIT` fija las seis categorías (HubSpot, AEO, Marketing digital, Inbound, Diseño, Loop Marketing)
+y entrega su enlace, la descripción de la categoría y las tres lecturas más recientes; `EO_Home_Adapter::ORBIT_TOPICS`
+pone nombre y promesa, y `ORBIT_SLOTS` la posición y el ángulo del arco (`orbit_arc()`, mismo cálculo que
+`topics-v2.cjs`). `EOBH_View::topics()` replica la lógica (rótulos, tema activo y filas del móvil ordenadas por
+lecturas). Los rótulos son enlaces `<a href>` en el HTML del servidor: el enlazado interno a las categorías existe sin
+JavaScript. Cambiar un tema = las tres constantes y un deploy de `content-model`; la descripción se edita con
+`topic-descriptions`. Ojo con el caché del lector (300 s): después de un deploy, la portada puede servir la forma vieja
+hasta que expire.
 
 ## 3. Modelo de contenido y adaptador
 

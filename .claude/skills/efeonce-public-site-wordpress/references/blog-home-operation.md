@@ -86,6 +86,13 @@ logo needs Growth Forms renderer 1.3.0 released in Greenhouse; until then the la
   `_eo_card_focus`); the featured image stays the OG image. Try it first with `preview/serve.cjs --rail <cards.json>`.
   The hover writes CSS vars on `style`; `dc-runtime.js` keeps them (it rewrites a rendered `style` only when its
   template value changes) — do not revert that or the once-a-second repaint wipes the light and tilt.
+- «Explora por tema» v2 (deviation 15, live 2026-10-24): the orbit is the door to the blog's categories, not a share
+  metric. Six topics fixed in `EO_Home_Readers::ORBIT` + `EO_Home_Adapter::ORBIT_TOPICS` (name, promise) +
+  `ORBIT_SLOTS` (position, arc angle); each label is a server-rendered `<a href>` to `/category/<slug>/`; the centre
+  shows the category description, its three newest reads and «Ver todo». Template/logic in
+  `scripts/public-website/blog-v3/lib/topics-v2.cjs`, mirrored by `EOBH_View::topics()` (change both together).
+  Category descriptions are edited with `topic-descriptions`. After a `content-model` deploy the reader cache (300 s)
+  can serve the old topic shape until it expires: poll `/wp-json/eo/v1/home/board/portada` before judging the page.
 - Resources hide after 180 days without `review`. Events never store private meeting links (the CLI refuses them).
 - Events with real reservation: never create them by hand. `pnpm events:launch -- --brief <json> [--apply]` publishes the
   Greenhouse form, the HubSpot destination and the WordPress event with its `form_key` in one go; the portada shows the

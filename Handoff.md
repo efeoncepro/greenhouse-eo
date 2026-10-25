@@ -2,6 +2,14 @@
 
 [Historial](Handoff.archive.md).
 
+## 2026-10-24 — Portada del blog: «Explora por tema» v2 (TASK-2051) en producción
+La órbita de `/blog/` dejó de mostrar «¿De qué escribimos más?» y es la puerta a las categorías: «Elige por dónde
+empezar.», seis temas (HubSpot, Inbound, Marketing digital, Loop Marketing, AEO, Diseño) como enlaces a
+`/category/<slug>/`; el centro muestra descripción, tres lecturas y «Ver todo»; en móvil, lista por lecturas
+(runtime `f2210d7`, efeonce-editorial-blocks 0.4.8; Greenhouse `55c0b7d8e`; canvas versión 95). Descripción de Diseño
+cargada. Verificado en vivo: enlaces en el HTML del servidor, hover, 1440/390, desborde 0, axe 0. Además, las tarjetas
+de foto del riel tienen imagen y foco propios (`card`), aplicados a 249387, 251397 y al recurso 252050. Sin push.
+
 ## 2026-10-24 — Portada del blog: imagen y punto focal propios de la tarjeta de foto (TASK-2051)
 Pedido de la sesión «Análisis de Analytics y Search Console» con aprobación del operador: la tarjeta de foto recortaba
 al centro y cortaba el texto incrustado de las portadas de Manzanitas. En vivo: metas `_eo_card_image` /
@@ -286,7 +294,3 @@ Contact `256968083769` / Company `53955357196` / Primary verificados; seis segme
 Correo 22/10 00:56 Santiago con firma gráfica/CCO y brochure 360° completo; Outlook y EMAIL `119266980893`
 SENT verificados. InMail distinto enviado (1 crédito); nota `119264638728` releída. Esperar respuesta, sin Lead,
 Deal ni secuencia nuevos. [Evidencia y continuidad](docs/commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md).
-
-## 2026-10-21 — Correos de Julio: firma gráfica siempre
-
-Mandato permanente: firma gráfica oficial en todo correo, incluidos respuestas, reenvíos y seguimientos manuales, programados o por secuencias. Texto plano deja de ser alternativa; si la herramienta no conserva la firma, mantener pendiente. [Política vigente](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Routers y referencias de skills alineados; no se enviaron correos ni se modificaron secuencias por registrar esta regla.

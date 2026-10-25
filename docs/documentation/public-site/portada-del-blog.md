@@ -1,7 +1,7 @@
 # Portada del blog — Marketing con Manzanitas en efeoncepro.com/blog/
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-10-24 por Claude
 > **Ultima actualizacion:** 2026-10-24 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) ·
@@ -27,7 +27,7 @@ Tiene tres versiones del mismo diseño: escritorio (desde 1100 px de ancho), tab
 | Glitch | La manzana en bytes, la última edición, el último Flash y la suscripción | Las entradas de Glitch y el formulario de suscripción |
 | Eventos y webinars | El próximo evento con cuenta regresiva, aprendizajes, agenda, próximos y grabaciones | Los eventos cargados en WordPress |
 | Para leer con calma | Un riel de tarjetas de la misma familia: lecturas largas, casos, guías, el diagnóstico, el próximo webinar y episodios de podcast, con autor, fecha, tema e insignia | Entradas, recursos marcados para el riel y el próximo evento |
-| ¿De qué escribimos más? | Una órbita con los temas del blog y cuánto se escribe de cada uno | Las categorías de las entradas publicadas |
+| Elige por dónde empezar | Una órbita con seis temas del blog: cada uno lleva a su categoría y, al pasar el cursor, muestra de qué trata y tres lecturas para empezar (en el celular, una lista) | Las categorías del blog, su descripción y sus entradas |
 | Archivo por año | Todo el archivo, filtrable por año y tema | Todas las entradas publicadas |
 | Suscripción del final | La suscripción a Glitch | El mismo formulario de suscripción |
 
