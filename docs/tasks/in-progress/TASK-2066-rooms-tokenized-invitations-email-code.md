@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Diseño corregido por última instrucción de Julio: UN correo inicial contiene enlace Rooms y código; el cliente introduce el código EN Rooms. TASK-2067 genera/verifica OTP por s2s y coordina entrega única Resend. Sin implementación ni envíos; OFF y sin DB cloud. TASK-2065 OIDC interno es independiente; UI invitado posterior.`
+- Status real: `Diseño corregido por última instrucción de Julio: UN correo inicial contiene enlace Rooms y código; el cliente introduce el código EN Rooms. TASK-2067 genera/verifica OTP por s2s y coordina entrega única Resend. Contrato issuer2067 congelado, plan consumidor y hook preparados; implementación local en curso, sin envíos reales, OFF y sin DB cloud. TASK-2065 OIDC interno es independiente; UI invitado posterior.`
 - Rank: `Después del contrato TASK-2067; coordinar primitives de sesión/binding con TASK-2065 sin depender de su journey OIDC`
 - Domain: `identity|platform|data`
-- Blocked by: `TASK-2067`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; efeonce-rooms main; checkout compartido sin worktrees`
 
 ## Summary

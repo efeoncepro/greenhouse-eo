@@ -164,3 +164,21 @@ Commands/readers canónicos, expectedRevision e idempotencia de TASK-2060. Audit
 ### Consequences and Revisit
 
 La UI consumidora debe elegir renderer por versión; no convertir v2 a una muestra v1 perdiendo bloques. Esta unidad no completa editor, multimedia, escenarios/tours ni R03/R05 por inferencia. Reabrir la decisión si se requieren imports ejecutables, un nuevo source of truth, transferencia entre tenants o modificación de snapshots existentes.
+
+
+## Architecture Decision 2026-10-25 — sesión guest por invitación
+
+Decisión de implementación bajo el flujo aprobado por Julio (correo único con enlace+código), en conjunto
+con ADR `EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md`. TASK-2066 implementa autoridad guest local derivada
+de invitación/version/session vigentes. No crea profiles/source-links/memberships globales ni roles en Auth.
+Un principal externo virtual, persistido como sesión invitada y releído por loadAuthority, aplica el mismo
+can y proyección publicada. El grant previsto vive en la invitación, limitado a rooms.read y evidencia sólo
+si se delegó expresamente; revocar invitación o autoridad del invitador invalida sesiones sin tocar grants ajenos.
+No se interpreta una prueba OTP como IDtoken OIDC ni se mezclan cookies o permisos internos/guest.
+
+Issuer genera/verifica/envía OTP con Resend gobernado; Rooms sólo transmite el código ingresado y consume
+proof ES256 de un uso en transacción. Authority S2S usa endpoint fijo y token servicio dedicado. Token de
+invitación256bits se entrega en fragmentoURL, digest para lookup y ciphertext sólo para mailer autorizado.
+La alternativa de grants genéricos exigiría crear identidades/memberships por correo; se rechaza. Una cookie
+con rol dentro, o aceptar el link como bearer, también se rechazan. Plan2066 fija stores, interfaces, controles
+y pruebas antes código. FeatureOFF y prueba local no equivalen a activación ni envío a destinatarios reales.
