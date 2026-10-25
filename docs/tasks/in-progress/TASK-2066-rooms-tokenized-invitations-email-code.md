@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Diseño corregido por última instrucción de Julio: UN correo inicial contiene enlace Rooms y código; el cliente introduce el código EN Rooms. TASK-2067 genera/verifica OTP por s2s y coordina entrega única Resend. Contrato issuer2067 congelado, plan consumidor y hook preparados; implementación local en curso, sin envíos reales, OFF y sin DB cloud. TASK-2065 OIDC interno es independiente; UI invitado posterior.`
+- Status real: `Backend local 8308077 implementado y certificado: 132/132 pruebas, issuer OTP real + ambos PostgreSQL + Chrome PASS, recuperación de 19 tablas y rollback en clon PASS. UN mensaje inicial contiene enlace/código; abrir no envía otro. OFF; sin correo real ni cloud. Continúa in-progress para cerrar handoff/contratos de recuperación UI TASK-2068 y separar los gates de entrega real/tracking antes de rollout.`
 - Rank: `Después del contrato TASK-2067; coordinar primitives de sesión/binding con TASK-2065 sin depender de su journey OIDC`
 - Domain: `identity|platform|data`
 - Blocked by: `none`
@@ -170,10 +170,10 @@ Reglas obligatorias: token de enlace no es identidad ni grant; issuer posee OTP;
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth y contrato s2s se congelan con owner issuer; no autenticador/mail sender paralelo.
-- [ ] Invariantes de tenant/scope/prueba/idempotencia y concurrencia están cubiertas por SQL/HTTP real.
-- [ ] Migración additive, rollback y privilegios mínimos verificados.
-- [ ] Evidencia distingue solicitud de envío, entrega, OTP, grant y lectura; sin secretos.
+- [x] Source of truth y contrato s2s se congelan con owner issuer; no autenticador/mail sender paralelo.
+- [x] Invariantes de tenant/scope/prueba/idempotencia y concurrencia están cubiertas por SQL/HTTP real.
+- [x] Migración additive, rollback y privilegios mínimos verificados.
+- [x] Evidencia distingue solicitud de envío, entrega, OTP, grant y lectura; sin secretos.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -281,23 +281,29 @@ Peer Identity TASK-2067/1834, sesión Rooms2065 y dueño Resend/remitente. Reuti
 
 ## Acceptance Criteria
 
-- [ ] ADR Accepted prepare/verify se consume fielmente; proof ES256 exacto con jti UNIQUE/nonce/aud/typ/expiry, sin autenticador alterno.
+- [x] ADR Accepted prepare/verify se consume fielmente; proof ES256 exacto con jti UNIQUE/nonce/aud/typ/expiry, sin autenticador alterno.
 - [ ] Emisión inicial produce UN correo con enlace tokenizado y código; sin envío inicial separado, sin primer CTA de solicitud OTP ni verificación visible fuera de Rooms.
-- [ ] Contrato permite capturar código EN Rooms y verificar sólo por issuer s2s; no autenticador alterno ni afirmación 2FA/MFA de mismo canal.
-- [ ] GET/scanner no consume token, concede grant ni envía correo; enlace solo no revela contenido/correo/organización.
+- [x] Contrato permite capturar código EN Rooms y verificar sólo por issuer s2s; no autenticador alterno ni afirmación 2FA/MFA de mismo canal.
+- [x] GET/scanner no consume token, concede grant ni envía correo; enlace solo no revela contenido/correo/organización.
 - [ ] Invalid/expired/revoked públicos son indistinguibles; renovación opcional no enumera correo por body/status/tiempo y nunca revive una invitación revocada.
-- [ ] Prueba incorrecta/vencida/repetida/otro RP/otro subject/otra transacción no acepta ni auto-provisiona por email.
-- [ ] Invitador, invitación y destinatario se revalidan; grant sólo room/client/capabilities permitidas y nunca organización/workspace/notas.
-- [ ] Aceptación concurrente consume jti/versión una vez y crea sesión guest acotada; sin profile/membership/rol global. OTP consumido no recupera proof: nueva emisión gobernada si falló el resto.
-- [ ] Revocación durante y después de aceptación deniega; grant asociado revocado sin afectar grants ajenos; expiry probada con reloj servidor.
+- [x] Prueba incorrecta/vencida/repetida/otro RP/otro subject/otra transacción no acepta ni auto-provisiona por email.
+- [x] Invitador, invitación y destinatario se revalidan; grant sólo room/client/capabilities permitidas y nunca organización/workspace/notas.
+- [x] Aceptación concurrente consume jti/versión una vez y crea sesión guest acotada; sin profile/membership/rol global. OTP consumido no recupera proof: nueva emisión gobernada si falló el resto.
+- [x] Revocación durante y después de aceptación deniega; grant asociado revocado sin afectar grants ajenos; expiry probada con reloj servidor.
 - [ ] Readback llega sólo a edición inicial publicada autorizada; fallback demo/otra sala prohibido.
 - [ ] Token/código/prueba/URL secreta no aparecen en logs/analytics/browser persistente; secreto digest y sesión OTP de producto correctos, sin fabricar token OIDC.
 - [ ] Entrega usa issuer sendEmail/Resend existente, remitente exacto y tracking OFF; accepted no se declara delivered; sin mailer/key nuevos.
-- [ ] Authority.resolve confiable revalida invitación/versión/recipient/expiry/RP; URL fuera de origen denegada y ningún caller libre decide destinatario.
+- [x] Authority.resolve confiable revalida invitación/versión/recipient/expiry/RP; URL fuera de origen denegada y ningún caller libre decide destinatario.
 - [ ] Migración/rollback SQL y integración issuer real con canary controlado verificados; mocks o 401 anónimos no acreditan éxito.
-- [ ] OFF default, UI consumer y cloud pendientes documentados; task no afirma experiencia humana/productiva completa.
+- [x] OFF default, UI consumer y cloud pendientes documentados; task no afirma experiencia humana/productiva completa.
 
 ## Verification
+
+Evidencia del corte local: [auditoría de invitaciones](../../audits/rooms/2026-10-25-tokenized-invitations.md).
+Los criterios tildados se acreditan mediante SQL/HTTP y el harness de dos runtimes, no por envío real.
+Los pendientes de browser persistente, pantalla humana, remitente/tracking y canary externo permanecen
+sin tildar. TASK-2068 posee el consumer UI; no se da esta task por cerrada con esos límites ambiguos.
+
 
 - En Rooms: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` y suites dedicadas de invitación.
 - SQL real de emisión/aceptación/revoke/expiry/concurrencia con readback; comando exacto registrado en plan.

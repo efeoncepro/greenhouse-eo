@@ -245,13 +245,15 @@ coverage y publicación textual, preservando ediciones V1.66 pruebas PASS sin sk
 mixto verificados. No cierra R03 completo (escenarios/tours), R05 medios ni R08 editor.
 
 - [TASK-2065](../../tasks/complete/TASK-2065-rooms-efeonce-id-consumer.md): OIDC interno sobre foundation
-  Auth1834 y loginV4 del issuer2064. Implementación local en curso, sin activación pública.
+  Auth1834 y loginV4 del issuer2064. Foundation local completa y verificada, sin activación pública.
 - [TASK-2066](../../tasks/in-progress/TASK-2066-rooms-tokenized-invitations-email-code.md): enlace con token y código
   generado en UN correo inicial Resend; cliente pega código EN Rooms. Issuer2067 genera/verifica/envía OTP;
   Rooms conserva invitación/sesión guest limitada, expiry/revoke y permisos. No requiere SSO global ni da acceso
-  a otras salas. Contrato aceptado, implementación pendiente; no mensajes a clientes por registrar el flujo.
+  a otras salas. Backend local implementado y probado con issuer real; pantalla y entrega real pendientes. No mensajes a clientes.
 
 Aceptación visual2059 y resto deR01–R15 siguen abiertos. Demo pública conserva SHA bd4b802; código localnuevo
 no implica despliegue. [Evidencia2062](../../audits/rooms/2026-10-25-versioned-content-authoring.md).
 
 TASK-2065 complete local en37c799c:95testsPASS0skip, Chromeissuerreal, contexts/tenants/revoke y down/upclon14tablasPASS. EntradaOFF, UIcontext ycloudpendientes. [Evidencia](../../audits/rooms/2026-10-25-efeonce-id-consumer.md).
+
+TASK-2066 backend local:132testsPASS0skip, integración OTP real con buzónRAM/Chrome y restore19tablasPASS. Continúa in-progress para handoffUI/criterios pendientes; sin correo real ni activación. [Evidencia](../../audits/rooms/2026-10-25-tokenized-invitations.md).
