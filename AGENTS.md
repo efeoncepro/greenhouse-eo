@@ -228,6 +228,7 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
   perfil interactivamente, restaurar `default` al terminar. No cambiar el proyecto de `default` para
   un acto puntual.
 - macOS usa `gtimeout`, no asumir `timeout` GNU.
+- El shell del operador es zsh: `$VAR` sin comillas no se separa en palabras, `$ref:src/...` se lee como modificador y `status` es de solo lectura. Pasa listas como arreglo (`F=(a b); cmd "${F[@]}"`) y usa `"${ref}:ruta"`. Claude Code corre en bash desde 2026-10-25 (`CLAUDE_CODE_SHELL`).
 - GVC: `pnpm fe:capture <scenario> --env=staging`; review/diff/health según necesidad.
 - Antes de una acción sensible, consultar Platform Health/safe modes cuando el dominio lo exponga.
 - Superficie MCP (`src/mcp/**`): `pnpm mcp:manifest:check` — el inventario de tools es un manifiesto con dos
