@@ -113,7 +113,8 @@ nombra. Medición: fila `blog-aeo-assessment` del plan de medición.
 
 **En producción (0.7.0, 2026-10-25 13:40 UTC).** Desplegado por `blog-home deploy content-model --apply` (sólo los
 archivos del bloque, el main y el readme); opción `eo_growth_cta_blog` guardada con `set-blog-growth-cta.php`. Probado en
-vivo en la página de prueba `/greenhouse-cta-prueba/` (no indexada; snapshot `_gh_gcta_test_20261025_134046`) a 1440 y
+vivo en la página de prueba `/greenhouse-cta-prueba/` (no indexada; snapshot `_gh_gcta_test_20261025_134046`; bloques
+retirados el 2026-10-25, ya en vivo en `/aeo/seo-y-aeo/`) a 1440 y
 390 px: tarjeta navy con Bricolage y la frase en 700, formulario real abierto dentro de la tarjeta, medición
 `greenhouse_cta_viewed` → `clicked` → `form_opened` y `gh_form_viewed`, sin errores ni scroll horizontal. 0.7.1 (13:55 UTC) suma el
 logo y el tono claro; las dos versiones se verificaron en vivo en la misma página a 1440 y 390 px. Falta un envío real

@@ -171,5 +171,33 @@ responden 200.
 **Portada aprobada (2026-10-25):** «Google te encuentra. La IA te elige.», con su `hero` y la imagen de la tarjeta;
 archivos y alt en `ai-generations/2026-10-24_portadas-blog/LEEME.md`. Se suben con la publicación.
 
-**Pendientes antes de publicar:** revisión de Julio en `252114`, envío real del formulario del
+## 5. Publicación (2026-10-25, aprobada por Julio)
+
+Publicado a las 15:23 UTC en **`https://efeoncepro.com/aeo/seo-y-aeo/`** (post `248463`), con
+`tmp/aeo-248463-publish.php`: contenido, título, extracto y metas de Yoast (título SEO, descripción, frase clave
+«seo y aeo», 13 min) + slug `seo-y-aeo` + categoría principal AEO (`156`; Loop Marketing queda asignada) + una 301 plain
+de Yoast Premium desde `/loop-marketing/seo-aeo-optimizacion-ia-2025/`. Las 17 comprobaciones de lectura en verde.
+
+| Paso | Resultado | Respaldo / rollback |
+|---|---|---|
+| Contenido, URL y 301 | `saved` | opción `_gh_post_refresh_248463_20261025_152329` (post y metas previos); quitar la redirección creada |
+| Portada (destacada + OG) | adjunto `252123`, 2400 × 1260 | `_gh_cover_refresh_248463_20261025_152401` (destacada `248479`, OG `248480`) |
+| `hero` del slider | `_eo_hero_image` = `252124` (no fijado en el slider) | `blog-home hero 248463 --clear` |
+| Foto de la tarjeta del rail | `_eo_card_image` = `252125`, foco `75% 50%` | `blog-home card 248463 --clear` |
+| Enlaces internos a la URL vieja | reescritos en `244765` (inbound), `245154` (topic clusters) y `248483` (Loop); 0 restantes; specs de inbound y topic clusters actualizadas en el repo | `_gh_post_republish_<id>_20261025_15260x` |
+| Limpieza | `251561` restaurada a su contenido previo a la prueba del CTA; copia `252114` en la papelera | `_gh_gcta_test_before_cleanup_*`; restaurar `252114` desde la papelera |
+
+**QA en vivo (anónimo, después de la purga):** 200 en la URL nueva; 301 en un salto desde la vieja, con y sin barra y
+conservando `utm_*`; canonical, `og:url` y breadcrumb (Portada › AEO › …) en la URL nueva; `index, follow,
+max-image-preview:large`; `og:image` = portada nueva 2400 × 1260 con `og:image:alt`; `summary_large_image`; schema
+`Article`+`BlogPosting` con el titular nuevo, `FAQPage` con 6 preguntas; un H1; sitemap con la URL nueva y `lastmod`
+de hoy, sin la vieja. Playwright 1440 y 390: un H1, 0 desborde, 0 imágenes rotas, infografía v2 en su versión de cada
+ancho, Growth CTA visible. `blog-home verify --browser`: 8 anchos sin desborde, 0 violaciones.
+
+**Residuales:** un 404 en la miniatura de «Related Posts» de *Surround discovery* (su `srcset` pide
+`Portada-Blog_AEO-768x768.webp`, que no existe; previo a este cambio, no es de este artículo). Solicitar la indexación
+de la URL nueva en Search Console la hace una persona (la API no lo permite). El envío real del formulario del CTA
+sigue pendiente (Turnstile).
+
+**Pendientes antes de publicar (cerrados):** revisión de Julio en `252114`, envío real del formulario del
 CTA, barrido de enlaces internos a la URL vieja y la migración de URL con 301 (§3).

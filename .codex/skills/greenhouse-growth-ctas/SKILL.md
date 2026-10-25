@@ -173,7 +173,7 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   selector para que la variante del renderer no la pise; la negrita de una frase del titular la aplica `host.js` del
   bloque (regla `headlineEmphasis`), no el renderer. Content Factory: `kind: 'growthCta'`. Verificado en vivo en `/greenhouse-cta-prueba/`
   (1440/390): viewed → clicked → form_opened + `gh_form_viewed`, sin errores; snapshot de la página
-  `_gh_gcta_test_20261025_134046`. Pendiente: envío real del formulario (operador: Turnstile) y primer artículo.
+  `_gh_gcta_test_20261025_134046`. Primer artículo en vivo: `/aeo/seo-y-aeo/` (post 248463), 2026-10-25, tono claro y lockup del AEO Assessment; bloques de prueba retirados de `251561` (contenido previo restaurado). Pendiente: envío real del formulario (operador: Turnstile).
 
 - **2026-10-24: primer consumidor `open_growth_form` + `presentation: 'dialog'` EN VIVO** (tras el release a `main`:
   CTA `1.4.0`, forms `1.2.0`). CTA `partners-become-partner` en «cierre» de `/partnership/`, surface

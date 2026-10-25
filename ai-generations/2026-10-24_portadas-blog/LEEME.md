@@ -119,8 +119,9 @@ Portada del refresh del post `249108`. **Aprobada por el operador; se sube junto
 
 Portada del refresh del post `248463`, **primera con la fórmula nueva** que pidió el operador (sin persona al frente y
 sin vidrio). **Aprobada por el operador el 2026-10-25** («Ok dale») con el texto «○ Google te encuentra. La IA /
-**te elige**●». Se sube junto con la publicación del artículo (portada, `hero` y tarjeta), con simulación previa y aviso
-a las sesiones del blog.
+**te elige**●». **Publicada el 2026-10-25 a las 15:24 UTC** con el artículo: portada `252123` (respaldo
+`_gh_cover_refresh_248463_20261025_152401`), `hero` `252124` (no fijado) y tarjeta `252125` (foco `75% 50%`). Se avisó
+antes a las sesiones del blog. QA en vivo en `docs/public-site/SEO_AEO_REFRESH_DRAFT_V1.md` §5.
 
 - **Ficha:** `fichas/MCB-AEO1-169.json` (línea `engine`, sin personas, sin palanca). Fenómeno: un cajón de fichero
   contemporáneo (fresno teñido negro mate) sobre una mesa negra; de cientos de fichas en blanco, una sola queda
