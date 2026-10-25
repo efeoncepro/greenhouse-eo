@@ -16,7 +16,8 @@ can pick them in the block's «Styles» panel, and Content Factory emits them fr
 
 | Style | Native block | When to use it | In the spec |
 |---|---|---|---|
-| Destacado Efeonce | `core/pullquote` | the sentence a section rests on; 1–2 per post, never next to the sentence it repeats | `{ "kind": "pullquote", "text", "cite"? }` |
+| Destacado Efeonce / claro | `core/pullquote` | the thesis a section rests on; 1–2 per post, never next to the sentence it repeats; mark the landing phrase with `strong` (0.8.0) | `{ "kind": "pullquote", "text", "tone"? }` |
+| Cita Efeonce / clara | `core/pullquote` | a real quote with its author and source | `{ "kind": "pullquote", "variant": "cita", "text", "cite", "tone"? }` |
 | Pasos | ordered `core/list` | a step-by-step section | `{ "kind": "list", "ordered": true, "style": "steps" }` |
 | Recuadro | `core/list` | 2–6 short items seen at once: common mistakes, «three things», the closing invitations (Glitch → tool, PDR-020 order), a cluster map | `{ "kind": "list", "style": "box" }` |
 | Pregunta frecuente | `core/details` | each question of the FAQ section; the plugin builds the `FAQPage` schema from these blocks, so the post carries no hand-written JSON-LD | `{ "kind": "faq", "items": [...] }` (default `schema.source: "plugin"`) |

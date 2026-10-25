@@ -491,6 +491,34 @@ describe('authorGutenbergDraft', () => {
     expect(() => steps(false)).toThrow('content_factory_article_list_steps_requires_ordered')
   })
 
+  it('emits the four pullquote styles: Destacado and Cita, dark and light (efeonce-editorial-blocks 0.8.0)', () => {
+    const pq = (block: Record<string, unknown>) => {
+      const draft = authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [{ heading: 'Destacados', level: 2, blocks: [{ kind: 'pullquote', ...block } as never] }, ...kungFuSpec.sections]
+      })
+
+      return draft.draft.kind === 'gutenberg_post' ? draft.draft.postContent : ''
+    }
+
+    const tesis = pq({ text: [{ text: 'Si Google no puede indexar tu página, ' }, { text: 'ninguna IA de Google la va a citar.', strong: true }] })
+
+    expect(tesis).toContain('<figure class="wp-block-pullquote is-style-efeonce-destacado"><blockquote><p>Si Google no puede indexar tu página, <strong>ninguna IA de Google la va a citar.</strong></p></blockquote></figure>')
+    expect(pq({ text: 'Una tesis.', tone: 'light' })).toContain('{"className":"is-style-efeonce-destacado-claro"}')
+
+    const cita = pq({
+      text: 'No hay requisitos técnicos adicionales.',
+      variant: 'cita',
+      cite: [{ text: 'Google Search Central', strong: true }, { text: ' · ' }, { text: 'Ver la fuente', href: 'https://developers.google.com/search/docs/appearance/ai-features' }]
+    })
+
+    expect(cita).toContain('<figure class="wp-block-pullquote is-style-efeonce-cita"><blockquote><p>No hay requisitos técnicos adicionales.</p><cite><strong>Google Search Central</strong> · <a href="https://developers.google.com/search/docs/appearance/ai-features">Ver la fuente</a></cite>')
+    expect(pq({ text: 'Cita.', variant: 'cita', tone: 'light', cite: 'Alguien' })).toContain('{"className":"is-style-efeonce-cita-clara"}')
+    expect(() => pq({ text: 'Cita sin autor.', variant: 'cita' })).toThrow('content_factory_article_pullquote_cita_requires_cite')
+    expect(() => pq({ text: 'X.', variant: 'banner' })).toThrow('content_factory_article_pullquote_variant_invalid')
+    expect(() => pq({ text: 'X.', tone: 'gris' })).toThrow('content_factory_article_pullquote_tone_invalid')
+  })
+
   it('rejects a FAQ that repeats a question', () => {
     expect(() =>
       authorGutenbergDraft({

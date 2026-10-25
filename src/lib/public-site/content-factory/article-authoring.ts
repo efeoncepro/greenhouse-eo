@@ -107,8 +107,19 @@ export type GutenbergArticleBlock =
       style?: 'efeonce' | 'stripes'
     }
   | { kind: 'quote'; text: string }
-  /** Rendered with the «Destacado Efeonce» style (efeonce-editorial-blocks ≥ 0.4.0); `cite` = optional source line. */
-  | { kind: 'pullquote'; text: string; cite?: string }
+  /**
+   * Efeonce pullquote styles (efeonce-editorial-blocks ≥ 0.8.0). `variant`: `destacado` (default) is the thesis a
+   * section stands on — ring → sphere, no quotation marks; mark the landing phrase with `strong` (Bricolage 700).
+   * `cita` is a real quote and requires `cite` (who said it; a link is welcome). `tone`: `dark` (navy, default) or
+   * `light` (paper).
+   */
+  | {
+      kind: 'pullquote'
+      text: GutenbergRichText
+      cite?: GutenbergRichText
+      variant?: 'destacado' | 'cita'
+      tone?: 'dark' | 'light'
+    }
   | { kind: 'separator' }
   /** Plain-text code sample (`core/code`). Newlines are kept; the text is escaped like the block editor does. */
   | { kind: 'code'; code: string }
@@ -237,6 +248,9 @@ const paragraphBlock = (text: GutenbergRichText): string =>
 /** Efeonce editorial block styles registered by efeonce-editorial-blocks ≥ 0.4.0. */
 export const EDITORIAL_STYLE_CLASS = {
   pullquote: 'is-style-efeonce-destacado',
+  pullquoteLight: 'is-style-efeonce-destacado-claro',
+  quoteAttributed: 'is-style-efeonce-cita',
+  quoteAttributedLight: 'is-style-efeonce-cita-clara',
   steps: 'is-style-efeonce-pasos',
   box: 'is-style-efeonce-recuadro'
 } as const
@@ -355,8 +369,9 @@ const blockToPlainText = (block: GutenbergArticleBlock): string => {
         block.caption ? renderRichTextPlainText(block.caption) : ''
       ].join(' ')
     case 'quote':
-    case 'pullquote':
       return block.text
+    case 'pullquote':
+      return [renderRichTextPlainText(block.text), block.cite ? renderRichTextPlainText(block.cite) : ''].join(' ')
     case 'code':
       return block.code
     case 'glitchDrop':
@@ -470,13 +485,33 @@ const quoteBlock = (text: string): string =>
     '<!-- /wp:quote -->'
   ].join('\n')
 
-const pullquoteBlock = (text: string, cite?: string): string => {
-  const className = EDITORIAL_STYLE_CLASS.pullquote
-  const source = cite?.trim() ? `<cite>${escapeGutenbergHtml(cite.trim())}</cite>` : ''
+const pullquoteBlock = (block: Extract<GutenbergArticleBlock, { kind: 'pullquote' }>): string => {
+  const variant = block.variant ?? 'destacado'
+  const tone = block.tone ?? 'dark'
+
+  if (variant !== 'destacado' && variant !== 'cita') throw new Error(`content_factory_article_pullquote_variant_invalid:${String(variant)}`)
+  if (tone !== 'dark' && tone !== 'light') throw new Error(`content_factory_article_pullquote_tone_invalid:${String(tone)}`)
+
+  const text = renderRichText(block.text)
+
+  if (!renderRichTextPlainText(block.text).trim()) throw new Error('content_factory_article_pullquote_text_empty')
+
+  const cite = block.cite ? renderRichText(block.cite) : ''
+
+  if (variant === 'cita' && !(block.cite && renderRichTextPlainText(block.cite).trim())) {
+    throw new Error('content_factory_article_pullquote_cita_requires_cite')
+  }
+
+  const className =
+    variant === 'cita'
+      ? tone === 'light' ? EDITORIAL_STYLE_CLASS.quoteAttributedLight : EDITORIAL_STYLE_CLASS.quoteAttributed
+      : tone === 'light' ? EDITORIAL_STYLE_CLASS.pullquoteLight : EDITORIAL_STYLE_CLASS.pullquote
+
+  const source = cite.trim() ? `<cite>${cite}</cite>` : ''
 
   return [
     `<!-- wp:pullquote {"className":"${className}"} -->`,
-    `<figure class="wp-block-pullquote ${className}"><blockquote><p>${escapeGutenbergHtml(text)}</p>${source}</blockquote></figure>`,
+    `<figure class="wp-block-pullquote ${className}"><blockquote><p>${text}</p>${source}</blockquote></figure>`,
     '<!-- /wp:pullquote -->'
   ].join('\n')
 }
@@ -676,7 +711,7 @@ const renderArticleBlock = (
     case 'quote':
       return quoteBlock(block.text)
     case 'pullquote':
-      return pullquoteBlock(block.text, block.cite)
+      return pullquoteBlock(block)
     case 'separator':
       return separatorBlock()
     case 'code':

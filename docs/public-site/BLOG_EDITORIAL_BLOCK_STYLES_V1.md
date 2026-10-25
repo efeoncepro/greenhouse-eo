@@ -1,9 +1,9 @@
 # Estilos editoriales del blog (bloques nativos de Gutenberg)
 
 > **Tipo de documento:** Contrato de diseño y uso
-> **Versión:** 1.6
+> **Versión:** 1.7
 > **Creado:** 2026-10-24 por Claude, a partir de la revisión del operador sobre los posts de inbound, paid media y topic clusters
-> **Código:** plugin `efeonce-editorial-blocks`, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`). Estilos desde 0.4.0 (`f9b0d4d`); diseño vigente 0.4.2 (`710f0d1`); línea por post 0.4.3 (`cab3864`). Las versiones 0.4.4 a 0.5.9 no cambian estos estilos; **0.6.0** (`cd1fe57`, 2026-10-25) suma la Tabla Efeonce, el Destacado v2 y el bloque de código
+> **Código:** plugin `efeonce-editorial-blocks`, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`). Estilos desde 0.4.0 (`f9b0d4d`); diseño vigente 0.4.2 (`710f0d1`); línea por post 0.4.3 (`cab3864`). Las versiones 0.4.4 a 0.5.9 no cambian estos estilos; **0.6.0** (`cd1fe57`, 2026-10-25) suma la Tabla Efeonce, el Destacado v2 y el bloque de código; **0.8.0** (2026-10-25, local, pendiente de despliegue) rehace el Destacado y suma Destacado claro, Cita y Cita clara
 > **Documentación funcional:** [recetas de autoría Gutenberg](../documentation/public-site/gutenberg-post-authoring-recipes.md) · **Manual:** [operar la Content Factory](../manual-de-uso/public-site/operar-public-site-content-factory.md#estilos-editoriales-y-preguntas-frecuentes)
 > **Estado:** en producción desde el 2026-10-24 (§En producción)
 > **Relacionado:** [preguntas frecuentes](BLOG_FAQ_BLOCK_ANALYSIS_V1.md) · `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
@@ -25,7 +25,8 @@ La guía de recetas ya pedía bloques de enriquecimiento, pero Ohio no les daba 
 
 | Estilo | Bloque | Clase | Uso | Content Factory |
 |---|---|---|---|---|
-| Destacado Efeonce | `core/pullquote` | `is-style-efeonce-destacado` | La frase en la que se apoya una sección. Una o dos por post, nunca seguidas, y sin repetir la oración que tiene al lado (se saca del párrafo) | `{ "kind": "pullquote", "text", "cite"? }` (siempre con el estilo) |
+| Destacado Efeonce / Destacado claro | `core/pullquote` | `is-style-efeonce-destacado` (navy) · `is-style-efeonce-destacado-claro` (papel) | La tesis en la que se apoya una sección. Una o dos por post, nunca seguidas, y sin repetir la oración que tiene al lado (se saca del párrafo). Sin comillas: anillo al inicio, esfera en vez del punto final, el remate en `strong` | `{ "kind": "pullquote", "text", "tone"?: "light" }` |
+| Cita Efeonce / Cita clara | `core/pullquote` | `is-style-efeonce-cita` (navy) · `is-style-efeonce-cita-clara` (papel) | Una cita real, de alguien con nombre: comillas en su columna y autoría bajo una línea fina | `{ "kind": "pullquote", "variant": "cita", "text", "cite", "tone"? }` (`cite` obligatorio) |
 | Pasos | `core/list` ordenada | `is-style-efeonce-pasos` | Las secciones «paso a paso»: número grande (28 px, 24 px en el celular) en el acento de la línea, sin disco; líneas entre pasos y el arranque en negrita | `{ "kind": "list", "ordered": true, "style": "steps" }` |
 | Recuadro | `core/list` | `is-style-efeonce-recuadro` | Un conjunto corto que conviene ver de una vez: errores frecuentes, «tres cosas», las invitaciones del cierre (Glitch → herramienta, orden de PDR-020) y el mapa de un cluster | `{ "kind": "list", "style": "box" }` |
 | Tabla Efeonce (0.6.0) | `core/table` | `is-style-efeonce-tabla` | Comparaciones y plantillas. La primera columna nombra lo que compara cada fila y los encabezados van cortos, porque en el teléfono son la etiqueta de cada dato | `{ "kind": "table", "style": "efeonce" }` |
@@ -294,3 +295,33 @@ otro post con código) y `/author/jreysgo/`.
 
 **Rollback:** restaurar el `.tar` que imprimió el deploy (0.5.9) y, si hace falta, el contenido de los dos posts desde
 sus snapshots. Las 13 tablas viejas del blog siguen en `stripes`; pasarlas es una decisión de contenido post por post.
+
+## 0.8.0: Destacado y Cita (2026-10-25, aprobado por el operador; pendiente de despliegue)
+
+**Por qué.** El operador: «no me gusta tanto… lo siento mal distribuido y como que le falta algo». El Destacado v2 usaba
+comillas sin decir quién hablaba (la forma prometía una cita y el contenido era una tesis), dejaba la mitad derecha
+vacía (26 caracteres por línea), ponía el halo en la esquina vacía y escribía todo en DM Sans 600, sin nada de La órbita.
+
+**Qué cambia** (maqueta sobre el artículo real, aprobada; `includes/editorial/editorial.css`):
+
+| Estilo | Para qué | Cómo se ve |
+|---|---|---|
+| Destacado Efeonce (`efeonce-destacado`) | La tesis de una sección | Panel navy con el halo de la línea desde la esquina superior (el degradado de siempre). Sin comillas. Anillo al inicio, esfera en el acento en lugar del punto final. Bricolage: 400 abre, `strong` (700) remata; sin `strong`, toda la frase en 700. Hasta 36 caracteres por línea |
+| Destacado corto (automático, `is-eo-corta`) | Una tesis de hasta 80 caracteres | Lo agrega el render (`EO_Editorial_Styles::pullquote_classes`): la letra sube a 56 px |
+| Destacado claro (`efeonce-destacado-claro`) | La misma tesis, más liviana en la página | Papel `#f7f8f6`, tinta navy, borde fino y halo suave del acento |
+| Cita Efeonce y Cita clara (`efeonce-cita`, `-cita-clara`) | Una cita real con autoría | Comillas en su columna, Bricolage 400, autoría en `cite` bajo una línea fina (negrita para el nombre, enlace a la fuente). Content Factory exige `cite` |
+
+**Reglas del render.** El filtro de `core/pullquote` sólo actúa sobre los dos Destacados: quita el punto final del
+último párrafo (la esfera lo reemplaza); si la frase termina en «?», «!», «…» u otra puntuación, no hay esfera
+(`is-eo-sin-esfera`). La Cita no se toca. Una esfera por pieza.
+
+**Modo oscuro (opción A, elegida por el operador el 2026-10-25: «va más con la línea gráfica de Efeonce»).** El panel
+navy queda en `#001a33` con borde fino, sin aclarar a `#023c70`: el acento de Engine `#0375db` da 3,82:1 sobre
+`#001a33` y 2,43:1 sobre `#023c70`. La opción B (navy medio con anillo y esfera en blanco) fue descartada. Las
+versiones claras pasan a `#023c70` con el anillo y la esfera en blanco y el halo del acento.
+
+**Degradado.** Una primera versión movió el halo y lo debilitó; el operador lo rechazó («se ve horrible así», plano).
+Todos los paneles conservan el halo amplio desde la esquina superior (120 % × 140 %, 22 % del acento; 14 % en papel).
+
+**Posts publicados.** 12 Destacados en 7 posts (244765, 245154, 245605, 246024, 248463, 249108, 252108), todos sin
+`strong`: con 0.8.0 salen completos en 700 hasta que se marque su remate (propuesta en la sesión del 2026-10-25).
