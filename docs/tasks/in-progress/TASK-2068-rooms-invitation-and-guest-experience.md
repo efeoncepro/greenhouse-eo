@@ -4,23 +4,23 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-2068-rooms-invitation-and-guest-experience.md`
 - Flow: `docs/ui/flows/TASK-2068-rooms-invitation-and-guest-experience-flow.md`
 - Motion: `docs/ui/motion/TASK-2068-rooms-invitation-and-guest-experience-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Diseno; discovery del runtime y plan preparados; contratos de recovery, gestión y entrega media pendientes de resolver antes de JSX; sin implementación ni aceptación visual`
+- Status real: `Contratos de recovery, gestión, delegación y coexistencia implementados con65 pruebas focalizadas PASS; backend2066 conserva151 previas. Readiness técnico para OTP y lectura textualV2; mediaR05 queda fuera del slice. UI en ejecución, sin aceptación visual ni rollout.`
 - Rank: `TBD`
 - Domain: `ui|identity`
-- Blocked by: `TASK-2066, TASK-2067`
+- Blocked by: `none`
 - Branch: `Greenhouse develop para docs; efeonce-rooms main para runtime; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -101,16 +101,14 @@ Fuera de ownership: issuer, session/authority, migraciones, reglas de grants y D
 - `src/server/persistence/content-projection.ts`: DTO de audiencia V1/V2 filtrado por can.
 - AXIS Button, Badge, Dialog, Tabs, Field/Input/Checkbox y forms.css instalados; marca oficial y motion con reduced motion.
 
-### Gap
+### Readiness resuelta 2026-10-25
 
-1. Resuelto en TASK-2066: GET `/api/invitations/transaction` usa cookie HttpOnly y devuelve `state: code_required`, `expiresAt`, `retryAt`, `deliveryStatus`, sin PII, correo, issuer ni writes. Root reporta137 tests PASS. La UI debe consumirlo para reload después de limpiar el fragmento; jamás guardar token en storage.
-2. El listado de rooms proyecta permisos sobre edición; `access.manage` requiere recurso room. Falta DTO autoritativo de gestión con capacidades delegables/TTL/operaciones disponibles, separado del rol nominal.
-3. El resumen de invitación sólo tiene ID opaco, estado y expiración; falta identificación del destinatario autorizada para gestión, sin exposición al visitante.
-4. La sesión guest devuelve room pero no edición de retorno; fijar reader de continuación y política al expirar. Tras expirar se puede pedir reabrir el enlace del correo, sin envío automático.
-5. Cookie interna tiene precedencia sobre guest incluso si es inválida. Definir selección explícita de contexto/salida antes de construir un camino que autentique guest y luego lea como otro actor.
-6. `RoomExperience` exige V1 y assets Nómada por artDirection. V2 trae IDs de assets, sin URL/bytes/dimensiones de entrega. Falta contrato de media protegida y renderer de media/editorial/diagnostic/plan. No sustituirlos por imágenes de demo ni afirmar lectura media completa.
-
-El punto1 ya tiene contrato implementado. Los demás puntos son gates de readiness, no preguntas pendientes para Julio: los resuelven los dueños técnicos respetando las decisiones ya dadas.
+- GET `/api/invitations/transaction` recupera la transacción sin PII ni envío, con entryGate por presencia de cookie interna. Verify devuelve409 antes del issuer si requiere salida interna explícita.
+- GET `/api/v1/rooms/:roomId/invitations/management?organizationId=...` exige access.read sobre room y devuelve serverNow/organizationId/roomId/revision/currentEditionId, permissions canRead/canManage, issuance enabled/capabilities/maxTtlSeconds/maxExpiresAt/capabilityExpiresAt/unavailableReason y lista con recipientEmail/actions autorizados.
+- Writer/reader comparten helper de autoridad persistida; sesión vigente autoriza y principal/membresía/grants fijan techo hasta24h. Revoke/list conservados con emisiónOFF; no simular can desde el rol.
+- Session guest incluye initialEditionId autorizado. Sesión interna conserva precedencia; salida explícita revoca durable incluso con loginOFF y reporta503 si falla persistencia.
+- TASK2066/2067 siguen abiertos por rollout/cierre, no por ausencia de estos contratos locales.65 pruebas focalizadas backend PASS, cero skips; suite completa del corte previo151PASS.
+- MediaR05 no bloquea entrada y lectura textualV2. Renderizar editorial/diagnostic/plan/evidencia real; media sin entrega autorizada muestra indisponibilidad explícita. No sustituir por assets Nómada ni declarar visor multimedia completo.
 
 ## Modular Placement Contract
 
@@ -209,7 +207,7 @@ El punto1 ya tiene contrato implementado. Los demás puntos son gates de readine
 - Alternatives considered: seis casillas OTP (pegar/foco peor), login global (scope incorrecto), sidecar permanente (ocupa lectura), duplicar demo (mezcla datos).
 - Why this pattern: correo ya contiene ambos factores del mismo canal; una acción clara conduce a la edición sin onboarding.
 - Reuse / extend / new primitive: reutilizar AXIS, extraer chrome/reader de demo; componentes de producto, no nueva primitive del sistema.
-- Open risks: gates de DTOs/entrega media/sesiones concurrentes detallados arriba; resolver antes de marcar ready.
+- Open risks: verificar UI integrada y pérdida de autoridad; entrega mediaR05 excluida explícitamente, sin sustituciones.
 
 ### Visual verification
 
@@ -281,7 +279,7 @@ El punto1 ya tiene contrato implementado. Los demás puntos son gates de readine
 - Risk controls: hook/readiness antes de JSX, tests de no filtración y revisión de acceso independiente; bloqueos explícitos hasta congelar contratos.
 
 <!-- ZONE 2 — PLAN MODE
-Plan de discovery propuesto: docs/tasks/plans/TASK-2068-plan.md. Ejecución espera hook root.
+Plan vigente: docs/tasks/plans/TASK-2068-plan.md. Contratos locales resueltos; root ejecuta hook/readiness antes de JSX.
 
 ZONE 3 — EXECUTION SPEC -->
 

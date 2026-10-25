@@ -13,6 +13,15 @@ Complementa el ADR Rooms y la evidencia `docs/audits/rooms/2026-10-25-invitation
 - Rate limiting nativo está disponible en Pro; no requiere pentest contratado ni otro proveedor.
   Tiene precio por uso, referencia publicada USD 0.50 por millón de requests permitidos, dependiente
   de región. Revisar Spend Management y condiciones efectivas antes de habilitar; no asumir costo cero.
+- La lectura `billing.controls` sólo expuso controles de Analytics; no acredita límite global de gasto
+  del firewall. El presupuesto global sigue pendiente de readback específico; no cambiarlo en silencio.
+
+Diff preparado: [`rooms-vercel-invitation-rules.proposed.json`](rooms-vercel-invitation-rules.proposed.json).
+Cuatro reglas validadas localmente contra el schema PUT de `https://vercel.com/openapi.json` (conversión
+semántica nullable de OpenAPI para AJV). El schema PATCH rules.insert publicado limita la acción a
+deny/challenge/log y no describe rate_limit; no inventar un payload PATCH compatible. PUT sí declara
+rateLimit, pero reemplaza configuración: usarlo sólo tras readback/diff seguro y sin perder reglas ajenas,
+o usar el editor nativo. El JSON propuesto no es una publicación ni una llamada API ejecutada.
 
 ## Reglas propuestas para el piloto
 

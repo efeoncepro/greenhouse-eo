@@ -30,3 +30,11 @@ Clicks rápidos usan estado actual/secuencial; no pérdida de offsets ni respues
 ## Verification
 
 E2E cuenta llamadas reales de transición en capítulos/galería; cero llamadas en verify/logout/revoke/cambio de actor. Probar supported/reduced/noAPI, spam de pager y Escape, pending/doble submit, tamaño 320/200% texto y contraste durante la animación. Registrar evidencia, no inferir soporte desde CSS solo.
+
+## GVC / Micro Evidence
+
+Capturar input→pending→error y reapertura del diálogo con Escape/restauración; probar cooldown sin anuncios por segundo. Verificar supported/reduced/noAPI para capítulos y evidencia. Cero transiciones de snapshot al verificar, cerrar sesión o perder autoridad. Medir contraste durante entrada y ausencia de overflow en320px/200%. Evidencia en docs/ui/reviews/TASK-2068-rooms-invitation-and-guest-experience/.
+
+## Design Decision Log
+
+Reutilizar AXIS y helper Rooms sólo dentro del contexto autorizado. La entrada de código no necesita animación de viaje ni loader de pantalla completa. Feedback inmediato y geometría estable prevalecen. Auth cambia documento; no animar el contenido que acaba de perder acceso ni el logo.

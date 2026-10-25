@@ -67,3 +67,12 @@ Resultado independiente root: **151/151 pruebas, cero skips**, lint/typecheck/bu
 
 Perímetro: [propuesta Vercel](../../operations/ROOMS_VERCEL_INVITATION_PERIMETER_V1.md) preparada con plan Pro
 verificado por API y cuotas por IP nativa. No activada; no se amplía la afirmación de cobertura productiva.
+
+## Continuación — gestión y coexistencia
+
+Commit `7afcd07`: reader de gestión exige access.read sobre room; expone destinatario únicamente al
+actor autorizado y calcula acciones/techos con la misma autoridad persistida del writer. API/CLI comparten
+reader. Login OFF conserva revocación local durable; fallo DB se devuelve503, no éxito ficticio.
+Presencia de cookie interna bloquea verify antes de llamar issuer; start/recovery informan entryGate.
+Guest session conserva la edición inicial autorizada; retorno interno limitado a patrones explícitos Rooms.
+Resultado: **160/160 pruebas, cero skips**, lint/types/build PASS. UI humana y cloud aún pendientes.

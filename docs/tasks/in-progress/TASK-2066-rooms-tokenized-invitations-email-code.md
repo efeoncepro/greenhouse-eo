@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Backend local y hardening fec6d32+4805c6d verificados: 151/151 pruebas; issuer OTP real + ambos PostgreSQL + Chrome y recuperación de19 tablas/rollback en clon PASS en corte previo. UN mensaje inicial contiene enlace/código; abrir no envía otro. OFF; sin correo real ni cloud. Gestión/coexistencia para UI TASK-2068 en implementación; recovery ya verificado. Perímetro Vercel preparado, no activado; entrega/tracking y rollout pendientes.`
+- Status real: `Backend local hasta7afcd07 verificado:160/160 pruebas0skip y lint/types/buildPASS; gestión/coexistencia listas para UI2068. Issuer OTP real + ambos PostgreSQL + Chrome y recuperación19tablas en corte previo PASS. Correo único enlace/código; abrir no envía otro. OFF; sin correo real ni cloudRooms. UI2068 y cloud2069 en ejecución; perímetro preparado no activado, entrega/tracking y rollout pendientes.`
 - Rank: `Después del contrato TASK-2067; coordinar primitives de sesión/binding con TASK-2065 sin depender de su journey OIDC`
 - Domain: `identity|platform|data`
 - Blocked by: `none`

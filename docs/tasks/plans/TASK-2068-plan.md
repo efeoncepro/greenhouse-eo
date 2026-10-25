@@ -1,6 +1,6 @@
 # TASK-2068 — Plan de implementación propuesto
 
-Estado 2026-10-25: discovery/documentación únicamente; root reservó ID2068 y autorizó preparación. Goal/subagentes vigentes, pero runtime espera hook de root. UI ready no por contratos pendientes; no visual acceptance.
+Estado 2026-10-25: contratos backend implementados y pruebas focalizadas65PASS; goal/subagentes autorizados. UI ready yes para OTP+textoV2, sin visual acceptance. Hook/readiness de root antes de JSX. MediaR05 se mantiene fuera de este slice.
 
 ## Discovery summary
 
@@ -67,3 +67,9 @@ None. Preservar demo, assets aprobados y pruebas anteriores.
 ## Open questions
 
 Ninguna decisión de producto pendiente de Julio para comenzar: ya confirmó correo único+código en Rooms. Root debe resolver los gates técnicos anteriores. La aceptación visual humana se obtiene sobre implementación revisable; autorización de tests/envíos reales y rollout conservan sus límites existentes.
+
+## Contratos congelados para ejecución
+
+Management en `/api/v1/rooms/:roomId/invitations/management` con organizationId intersectado por servidor, canRead/canManage, límites por capability y destinatario autorizado; lista/acciones quedan en `InvitationManagement`. start/transaction añaden entryGate continue/internal_session_present; verify409 antes del issuer. Guest session añade initialEditionId; logout interno explícito sigue disponible OFF y reporta fallo durable. UI consume contratos del runtime, no las formas preliminares de discovery.
+
+Media sin entrega protegida muestra estado explícito; texto editorial/diagnóstico/plan y evidenciaV2 son funcionales. R05 conserva pipeline/visores reales. Este recorte no declara R05 completo.

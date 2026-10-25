@@ -1,0 +1,198 @@
+[
+  {
+    "name": "rooms-invitation-write",
+    "description": "TASK-2066 Rooms pilot; native IP; 60 second fixed window",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "eq",
+            "value": "/api/invitations/start"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "eq",
+            "value": "/api/invitations/verify"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "eq",
+            "value": "/api/invitations/resend"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "eq",
+            "value": "/api/invitations/logout"
+          }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "rate_limit",
+        "rateLimit": {
+          "algo": "fixed_window",
+          "window": 60,
+          "limit": 120,
+          "keys": [
+            "ip"
+          ],
+          "action": "deny"
+        }
+      }
+    }
+  },
+  {
+    "name": "rooms-invitation-read",
+    "description": "TASK-2066 Rooms pilot; native IP; 60 second fixed window",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "GET"
+          },
+          {
+            "type": "path",
+            "op": "eq",
+            "value": "/api/invitations/session"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "GET"
+          },
+          {
+            "type": "path",
+            "op": "eq",
+            "value": "/api/invitations/transaction"
+          }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "rate_limit",
+        "rateLimit": {
+          "algo": "fixed_window",
+          "window": 60,
+          "limit": 240,
+          "keys": [
+            "ip"
+          ],
+          "action": "deny"
+        }
+      }
+    }
+  },
+  {
+    "name": "rooms-login",
+    "description": "TASK-2066 Rooms pilot; native IP; 60 second fixed window",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "GET"
+          },
+          {
+            "type": "path",
+            "op": "eq",
+            "value": "/login"
+          }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "rate_limit",
+        "rateLimit": {
+          "algo": "fixed_window",
+          "window": 60,
+          "limit": 30,
+          "keys": [
+            "ip"
+          ],
+          "action": "deny"
+        }
+      }
+    }
+  },
+  {
+    "name": "rooms-invitation-authority",
+    "description": "TASK-2066 Rooms pilot; native IP; 60 second fixed window",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "eq",
+            "value": "/api/internal/auth/invitation-authority/resolve"
+          }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "rate_limit",
+        "rateLimit": {
+          "algo": "fixed_window",
+          "window": 60,
+          "limit": 240,
+          "keys": [
+            "ip"
+          ],
+          "action": "deny"
+        }
+      }
+    }
+  }
+]

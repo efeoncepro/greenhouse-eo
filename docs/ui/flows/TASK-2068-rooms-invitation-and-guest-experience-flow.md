@@ -50,3 +50,11 @@ Reissue/revoke abre confirmación con destinatario y versión esperada. Conflict
 ## Test journeys
 
 Happy path local real con correo capturado1 vez, código erróneo/correcto, código expirado → resend, doble pestaña/reload, link revocado, issuer unavailable, mismatch room/edition, evidence false, sesión interna coexistente, return from bfcache tras revoke y409 admin. No convertir una ruta sólo mock en evidencia de acceso real.
+
+## GVC Scenario Plan
+
+Escenario rooms-invitations: entrada desde fragmento, scrubURL, reload vía transaction, código inválido/correcto, resend/cooldown, logout, sesión interna coexistente yrevocación. Gestión: listar/create/reissue/revoke/409 y entrega pendiente/fallida. Lectura textualV2 con perfiles independientes y media parcial explícita. Capturas a1440/1024/390/320 ytexto200%; inspeccionar foco, mensajes y ausencia de datos privados en payload. Dossier docs/ui/reviews/TASK-2068-rooms-invitation-and-guest-experience/.
+
+## Design Decision Log
+
+Se conserva la precedencia de sesión interna y se exige salida explícita antes de consumirOTP. El backend decide can/TTL y estado; UI sólo guía. MediaR05 no bloquea OTP ni textoV2: una explicación de disponibilidad conserva la lectura sin fingir pieza. Confirmaciones de gestión en un diálogo, con conflicto recuperable, nunca autorización por rol nominal.
