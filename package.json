@@ -109,6 +109,7 @@
     "build:icons": "tsx src/assets/iconify-icons/bundle-icons-css.ts",
     "renderer:build": "node scripts/build-growth-forms-renderer.mjs",
     "renderer:cta:build": "node scripts/build-growth-cta-renderer.mjs",
+    "renderer:editorial-chart:build": "node scripts/build-editorial-chart-renderer.mjs",
     "renderer:meeting:build": "node scripts/build-growth-meeting-renderer.mjs",
     "renderer:meeting:site:build": "node scripts/build-growth-meeting-renderer-site.mjs",
     "renderer:meeting:site:verify": "node scripts/verify-growth-meeting-renderer-site.mjs",

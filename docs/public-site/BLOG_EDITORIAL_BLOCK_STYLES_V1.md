@@ -347,3 +347,35 @@ rich text: el remate va en un segmento `{ "text": "…", "strong": true }`. `var
   clusters) quedaron iguales a lo publicado.
 - **Rollback:** restaurar el `.tar` que imprimió el deploy (la versión anterior), purgar la caché y, si hace falta,
   el contenido de cada post desde su snapshot.
+
+## Gráfico Efeonce (bloque `efeoncepro/chart`, prototipo del 2026-10-25, NO desplegado)
+
+Bloque dinámico para gráficos «fluidos» en los artículos: líneas (cambio en el tiempo) o barras (comparar o rankear).
+Probado de punta a punta sólo en un WordPress local (Playground, WordPress 7.1): página publicada en escritorio y
+390 px, editor de Gutenberg con vista previa en vivo, guardado sin «bloque inválido». **No está en producción**; el
+despliegue necesita la aprobación del operador.
+
+- **Quién dibuja.** El editor del bloque es React (Gutenberg). El visitante **no** carga React: el gráfico lo pinta
+  ECharts (SVG, sólo líneas y barras), compilado en greenhouse-eo (`src/editorial-chart-renderer/`,
+  `pnpm renderer:editorial-chart:build`) y escrito en el plugin como `src/chart/view.js` (cargador, 1 KB) y
+  `engine.js` (~180 KB gzip). El cargador baja el motor sólo cuando un gráfico está a 300 px de la pantalla; la
+  URL del motor lleva su huella (`engine.js?v=<sha>`), así que una versión nueva no depende de purgar caché.
+- **Los datos están en el HTML.** `render.php` imprime título, bajada, una tabla con todas las cifras (en
+  «Ver los datos») y la fuente; el gráfico se pinta encima con el mismo JSON. Google y los motores de respuesta
+  leen las cifras sin ejecutar JavaScript. Sin JavaScript se oculta el área del gráfico y queda la tabla.
+- **Contrato.** Atributo `chart`: `{ kind: 'line'|'bar', categories, series: [{ name, values }], emphasis?,
+  highlight?, format?: 'number'|'percent'|'compact', unit? }`; hasta 4 series y 36 categorías. Se valida en
+  el navegador (`contract.ts`) y en el servidor (`EO_Chart::validate`): un gráfico inválido no se publica y
+  quien edita ve el código de error. En el editor los datos se pegan desde una planilla (tabulaciones o punto y coma
+  aceptan la coma decimal: `5.120,5`).
+- **La órbita.** El acento de la línea del artículo marca sólo lo que importa (la serie destacada, la barra
+  destacada); el resto es contexto gris azulado (validado con el verificador de paletas: separación ΔE ≥ 14). En
+  líneas, el punto destacado es la esfera, la única de la pieza. Panel papel con el halo del Destacado claro;
+  tono navy `#001a33` y modo oscuro con el mismo panel. Se anima una vez al entrar en pantalla; con «reducir
+  movimiento» se pinta quieto.
+- **Lecciones de la prueba.** (1) La vista previa de Gutenberg por GET convierte cada número en texto: el editor usa
+  POST y el servidor acepta números escritos como texto. (2) El editor inyecta el script en su iframe antes de que
+  exista `<body>`; el motor vive en la ventana del editor y vigila el iframe. (3) En un panel de navegador oculto no
+  corre `IntersectionObserver` ni `requestAnimationFrame`: verificar con Playwright sin interfaz, no con el panel.
+- **Pendiente para producción:** aprobación visual del operador, versión del plugin, tipo `chart` en la Content
+  Factory, despliegue y purga de caché de Kinsta.
