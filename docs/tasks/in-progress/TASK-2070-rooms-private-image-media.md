@@ -2,6 +2,7 @@
 
 ## Delta 2026-10-25 — estado al corte de Codex
 
+- **Avance 2026-10-25 (Claude, rama `task/2070-2071-private-media`, commit `7ca5fd3`):** limpieza `sweepMedia` (expira subidas vencidas con auditoría/outbox, borra temporales y objetos sin referencia tras un margen, nunca renditions ni fuentes vivas), worker `--sweep`/`--loop` con parada limpia, el hijo decodificador hereda el loader del worker (ya no fuerza `tsx`) y la migración trae un bloque DO de verificación (probado en la PG local). `pnpm verify` PASS con 207/207 y build OK. Faltan: adapter GCS, empaquetado desplegable del worker, ensayo de restore y GVC.
 - **Rescate 2026-10-25 (Claude):** el WIP quedó commiteado en la rama local `task/2070-2071-private-media` de `efeonce-rooms` (`c0facfd` backend, `2626921` UI; sin push). Se corrigió el TS2322 y los tests de medios entraron a `pnpm test`: `pnpm verify` PASS con 205/205 tests (incluye 9 de persistencia en la PG local) y build OK. `main` sigue en `20f9fe9` (candidato del canary). Lo de abajo describe el estado previo al rescate.
 - El WIP en `efeonce-rooms` está **sin commitear**. `pnpm typecheck` falla (TS2322, `src/app/rooms/[roomId]/edit/page.tsx`, `schemaVersion` 2→1). `pnpm test` 178/178 no incluye `tests/media-*` (18/18 aparte, sin DB); los 9 de persistencia y `build` no se corrieron. Migración sin bloque DO y aplicada sólo en la PG local. Llevar a rama, nunca a `main` (cada push es producción). Corte en [registro de estado](../../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
 

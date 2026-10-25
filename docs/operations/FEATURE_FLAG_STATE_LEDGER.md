@@ -8,6 +8,7 @@
 | `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` | TASK-2067 / auth-server | `false` | Desplegado OFF en 00166 (`false`). HMAC y token de autoridad sin montar (sólo se montan con ON). Sin correo real |
 | `ROOMS_FIRST_PARTY_AUTH_ENABLED` | TASK-2065/2069 / Vercel `efeonce-rooms` (otro repo) | `false` | Presente sólo en Production; OFF según docs, valor no releído 2026-10-25 |
 | `ROOMS_INVITATIONS_ENABLED` | TASK-2066/2068 / Vercel `efeonce-rooms` (otro repo) | `false` | Presente sólo en Production; OFF según docs, valor no releído 2026-10-25 |
+| `ROOMS_MEDIA_ENABLED` | TASK-2070 / `efeonce-rooms` (rama local, sin desplegar) | `false` | Sólo storage LOCAL; falla cerrado en Vercel y `cloud-production` hasta que exista el adapter GCS. No existe en ningún entorno remoto |
 
 Los flags `ROOMS_*` (18 env en Production) viven en el repo `efeonce-rooms`: este gate no los escanea. Su estado vivo se lleva en la skill `efeonce-rooms` (`references/program-ledger.md`). Corte consolidado: [estado Rooms + Auth 2026-10-25](../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md). `ops-worker-00787-7fd` mantiene `GROWTH_EVENT_EMAILS_ENABLED=true` en vivo hasta el próximo deploy del worker (el `deploy.sh` ya trae `:-false`).
 
