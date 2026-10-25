@@ -80,6 +80,23 @@ AUTH_SERVER_TOTP_KMS_KEY="${AUTH_SERVER_TOTP_KMS_KEY:-projects/${PROJECT_ID}/loc
 # TASK-1836: durable corporate references, shared by staging and production on this service.
 # Provisioning these dependencies does not activate login; activation remains a separate decision.
 AUTH_SERVER_INTERNAL_AUTH_ENABLED="${AUTH_SERVER_INTERNAL_AUTH_ENABLED:-false}"
+AUTH_SERVER_FIRST_PARTY_ENABLED="${AUTH_SERVER_FIRST_PARTY_ENABLED:-false}"
+if [[ "${AUTH_SERVER_FIRST_PARTY_ENABLED}" != "true" && "${AUTH_SERVER_FIRST_PARTY_ENABLED}" != "false" ]]; then
+  echo "ERROR: AUTH_SERVER_FIRST_PARTY_ENABLED must be true or false."
+  exit 1
+fi
+# TASK-2067: independent invitation lane, disabled until migration + mail canary + Rooms authority.
+AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED="${AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED:-false}"
+if [[ "${AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED}" != "true" && "${AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED}" != "false" ]]; then
+  echo "ERROR: AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED must be true or false."
+  exit 1
+fi
+if [[ "${AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED}" == "true" ]]; then
+  if [[ "${AUTH_SERVER_FIRST_PARTY_ENABLED}" != "true" || -z "${AUTH_SERVER_INVITATION_EMAIL_OTP_CLIENT_ID:-}" || -z "${AUTH_SERVER_INVITATION_EMAIL_OTP_ROOMS_ORIGIN:-}" || -z "${AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET_REF:-}" || -z "${ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF:-}" ]]; then
+    echo "ERROR: invitation OTP requires the first-party gate, explicit client/origin and two dedicated secret references."
+    exit 1
+  fi
+fi
 AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED="${AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED:-false}"
 AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS="${AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS:-}"
 if [[ "${AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED}" != "true" && "${AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED}" != "false" ]]; then
@@ -246,6 +263,11 @@ ENV_VARS="${ENV_VARS}::AUTH_SERVER_KMS_KEY=${AUTH_SERVER_KMS_KEY}"
 # OFF ⇒ los endpoints OAuth y la metadata responden 404; sólo /readyz y el JWKS siguen vivos.
 # Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md (runtime auth-server únicamente).
 ENV_VARS="${ENV_VARS}::AUTH_SERVER_OAUTH_ENABLED=${AUTH_SERVER_OAUTH_ENABLED:-true}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_FIRST_PARTY_ENABLED=${AUTH_SERVER_FIRST_PARTY_ENABLED}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED=${AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_INVITATION_EMAIL_OTP_CLIENT_ID=${AUTH_SERVER_INVITATION_EMAIL_OTP_CLIENT_ID:-}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_INVITATION_EMAIL_OTP_ROOMS_ORIGIN=${AUTH_SERVER_INVITATION_EMAIL_OTP_ROOMS_ORIGIN:-}"
+
 # environment_id del emisor en greenhouse_core.external_identity_environments (TASK-1631): la
 # llave durable con la que se resuelve (subject → identity_profile → bindings → gv). Nunca el issuer crudo.
 ENV_VARS="${ENV_VARS}::AUTH_SERVER_ENVIRONMENT_ID=${AUTH_SERVER_ENVIRONMENT_ID:-efeonce-auth}"
@@ -277,6 +299,13 @@ ENV_VARS="${ENV_VARS}::SENTRY_ENVIRONMENT=${ENV}"
 # ─── Secrets (Secret Manager → env) ─────────────────────────────────────────
 
 SECRETS="GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
+if [[ "${AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED}" == "true" ]]; then
+  ensure_secret_accessor_binding "${AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET_REF}"
+  ensure_secret_accessor_binding "${ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF}"
+  SECRETS="${SECRETS},AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET=$(normalize_secret_ref_for_cloud_run "${AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET_REF}")"
+  SECRETS="${SECRETS},ROOMS_INVITATION_AUTHORITY_TOKEN=$(normalize_secret_ref_for_cloud_run "${ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF}")"
+fi
+
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
 SECRETS="${SECRETS},AUTH_SERVER_ENTRA_CLIENT_SECRET=${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF}"
 # El mailer resuelve esta referencia desde el runtime: declarar la env var no concede IAM.

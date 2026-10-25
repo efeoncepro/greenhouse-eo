@@ -130,7 +130,7 @@ Reglas obligatorias:
 - `docs/tasks/in-progress/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md`
 - `docs/tasks/in-progress/TASK-1830-efeonce-auth-external-person-authentication.md`
 - `docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md`
-- `docs/tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md`
+- `docs/tasks/in-progress/TASK-1834-efeonce-auth-first-party-oidc-rooms.md`
 
 ## Dependencies & Impact
 
@@ -697,3 +697,7 @@ restaurar una sesión revocada está prohibido.
 - Fijar retención exacta de operation/delivery/replay audit bajo la revisión de privacidad de TASK-1833.
 - Decidir si el readback de sesiones se sirve en `auth.efeonce.org` o mediante API interna antes de crear su
   consumer UI; la source of truth permanece server-side en ambos casos.
+
+## Actualización de consumers — 2026-10-25
+
+Rooms (TASK-2065) es el primer RP sobre foundation TASK-1834; la adopción Greenhouse se conserva en TASK-2063. Su logout local inicial no acredita esta foundation multiproducto.

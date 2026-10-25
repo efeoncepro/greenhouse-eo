@@ -65,7 +65,7 @@ Reglas: BFF hoja, productores como SoT, autorización server-side por objeto, no
 - `docs/epics/to-do/EPIC-046-client-services-visibility-and-self-service.md`.
 - `docs/context/00_INDEX.md`, `docs/context/10_experiencia-cliente.md` y `docs/context/05_voz-tono-estilo.md`.
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
-- `docs/tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md` para entrada/retorno; no adquirir su ownership.
+- `docs/tasks/to-do/TASK-2063-greenhouse-customer-login-convergence-native-issuer.md` para entrada/retorno; no adquirir su ownership.
 - Skills: greenhouse-task-planner y greenhouse-documentation-governor; al implementar, skill de dominio y greenhouse-qa-release-auditor.
 
 ## Dependencies & Impact
@@ -239,7 +239,7 @@ Slice 1 → Slice 2 → Slice 3. Contrato/negativos antes de habilitación; stag
 
 ### Feature flags / cutover
 
-Rollout por cohorte/módulo existente; no inventar nombres de flags activos. Toda capacidad nueva comienza deshabilitada o sólo lectura hasta evidencias. Si se necesita flag nueva, declararla en ledger antes del apply. TASK-1834 controla de forma independiente login legacy/nativo/recovery.
+Rollout por cohorte/módulo existente; no inventar nombres de flags activos. Toda capacidad nueva comienza deshabilitada o sólo lectura hasta evidencias. Si se necesita flag nueva, declararla en ledger antes del apply. TASK-2063 controla de forma independiente login legacy/nativo/recovery.
 
 ### Rollback plan per slice
 

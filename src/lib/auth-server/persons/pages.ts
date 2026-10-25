@@ -1,9 +1,8 @@
 /**
- * Páginas mínimas de la superficie de personas (TASK-1830).
+ * Páginas nativas de la superficie de personas (TASK-1830/1835/2064).
  *
- * Mismo shell, misma marca y misma CSP estricta que las del protocolo (`oauth/pages/render.ts`): sin
- * JS, sin fuentes remotas, sin imágenes externas. `TASK-1835` las reemplaza por las pantallas reales
- * de «Efeonce ID» SIN cambiar este contrato (rutas, campos del formulario, ids de copy).
+ * Comparten CSP estricta, assets locales y contratos del protocolo. El login V4 usa controller
+ * con nonce y degradación a correo sin JS; el resto conserva su shell funcional existente.
  *
  * La página intermedia del magic link existe por una razón concreta: los escáneres de correo y los
  * prefetchers de los clientes visitan los enlaces. Si el consumo fuera un GET, el enlace se quemaría
@@ -13,6 +12,11 @@
 import { randomBytes } from 'node:crypto'
 
 import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
+import { AUTH_LOGIN_V4_COPY as v4 } from '@/lib/copy/auth-server-login-v4'
+import type { LoginAnnouncementDto } from '@/lib/login-announcements/types'
+import type { LoginProductContext } from '../oauth/pages/login-v4'
+
+export type { LoginProductContext } from '../oauth/pages/login-v4'
 
 import { htmlResponse } from '../oauth/http'
 import { ICON_ALERT, ICON_CLOCK, ICON_KEY, ICON_MAIL, MICROSOFT_MARK_SVG } from '../oauth/pages/icons'
@@ -55,6 +59,8 @@ const hiddenField = (name: string, value: string | null): string =>
 
 export type LoginPageInput = {
   returnTo: string | null
+  productContext?: LoginProductContext
+  announcements?: readonly LoginAnnouncementDto[]
   internalLoginUrl?: string | null
   error?: 'invalid_email' | null
   /**
@@ -83,24 +89,24 @@ export const renderLoginPage = (input: LoginPageInput): string => {
    * secundario y lleva el logo oficial, como pide el botón estándar de Microsoft.
    */
   const internalMethod = input.internalLoginUrl
-    ? `<section class="id-section"><h2>${escapeHtml(GH_AUTH_SERVER.login_team_title)}</h2>
-    <a class="id-secondary" href="${escapeHtml(input.internalLoginUrl)}">${MICROSOFT_MARK_SVG}${escapeHtml(GH_AUTH_SERVER.login_microsoft_cta)}</a></section>
-  <p class="id-or" aria-hidden="true"><span>${escapeHtml(GH_AUTH_SERVER.login_methods_separator)}</span></p>`
+    ? `<section class="id-section id-v4-methods">
+    <a class="id-secondary" href="${escapeHtml(input.internalLoginUrl)}">${MICROSOFT_MARK_SVG}${escapeHtml(GH_AUTH_SERVER.login_microsoft_cta)}</a></section>`
     : ''
 
   return layout(
-    GH_AUTH_SERVER.login_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_title)}</h1>
-  <p class="id-intro">${escapeHtml(input.internalLoginUrl ? GH_AUTH_SERVER.login_methods_intro : GH_AUTH_SERVER.login_intro)}</p>
+    input.productContext ? v4.productTitle(input.productContext.displayName) : v4.neutralTitle,
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(input.productContext ? v4.productTitle(input.productContext.displayName) : v4.neutralTitle)}</h1>
+  <p class="id-intro">${escapeHtml(input.productContext ? v4.contextualIntro : v4.intro)}</p>
   ${invalidEmail ? `<p class="id-alert" id="email-error" role="alert" data-capture="id-status">${ICON_ALERT}<span>${escapeHtml(GH_AUTH_SERVER.login_invalid_email)}</span></p>` : ''}
   ${internalMethod}
-  <section class="id-section"><h2>${escapeHtml(GH_AUTH_SERVER.login_invitation_title)}</h2>
+  <section class="id-section id-v4-credentials">
   <div data-capture="id-passkey">
     ${hiddenField('return_to', input.returnTo)}
-    <div class="id-actions"><button type="button" class="id-primary" data-login-passkey hidden>${ICON_KEY}${escapeHtml(GH_AUTH_SERVER.login_passkey_cta)}</button></div>
+    <div class="id-actions"><button type="button" class="id-secondary" data-login-passkey hidden>${ICON_KEY}${escapeHtml(GH_AUTH_SERVER.login_passkey_cta)}</button></div>
     <p class="id-note-fine" data-login-status role="status" aria-live="polite"></p>
-    <p class="id-note-fine">${escapeHtml(GH_AUTH_SERVER.login_email_fallback_hint)}</p>
+
   </div>
+  <p class="id-or" aria-hidden="true"><span>${escapeHtml(v4.emailDivider)}</span></p>
   <form method="post" action="${escapeHtml(PERSON_AUTH_PATHS.magicLinkRequest)}" data-capture="id-form">
     ${hiddenField('return_to', input.returnTo)}
     <ul>
@@ -110,12 +116,12 @@ export const renderLoginPage = (input: LoginPageInput): string => {
       </li>
     </ul>
     <div class="actions">
-      <button class="secondary" type="submit">${ICON_MAIL}${escapeHtml(GH_AUTH_SERVER.login_submit_cta)}</button>
+      <button class="primary" type="submit">${ICON_MAIL}${escapeHtml(GH_AUTH_SERVER.login_submit_cta)}</button>
     </div>
   </form>
-  <p class="id-note-fine">${escapeHtml(GH_AUTH_SERVER.login_card_note)}</p></section>
+  <p class="id-note-fine">${escapeHtml(v4.accessNote)}</p></section>
   <script nonce="${escapeHtml(input.passkeyNonce)}">${LOGIN_CONTROLLER_SCRIPT}</script>`,
-    { state: 'login' }
+    { state: 'login', productContext: input.productContext, announcements: input.announcements }
   )
 }
 

@@ -62,7 +62,7 @@
 - Status real: `Diseno. Última task del programa por decisión del operador (2026-09-25): «construir primero todo y después lo cierro». El código de Studio ya modela el actor user y el modo efeonce_id, que hoy falla cerrado con 401.`
 - Rank: `TBD`
 - Domain: `platform|identity`
-- Blocked by: `TASK-1894, TASK-1895; además depende de la foundation OIDC first-party reusable de TASK-1834 (Slice 0–1).`
+- Blocked by: `TASK-1894, TASK-1895; además depende de la foundation OIDC first-party reusable de TASK-1834 (Slices 0–2).`
 - Branch: `Greenhouse develop (reader de acceso, registro del RP, docs) · efeonce-marketing-studio main (código); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -148,7 +148,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/operations/runbooks/auth-server.md` (§Registrar un cliente confidencial, §Rollback OAuth, §Qué no hacer).
-- `docs/tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md` (Slice 0–1: perfil OIDC
+- `docs/tasks/in-progress/TASK-1834-efeonce-auth-first-party-oidc-rooms.md` (Slices 0–2: perfil OIDC
   first-party reusable, conformance con un segundo RP).
 - `docs/tasks/to-do/TASK-1840-efeonce-id-multiproduct-logout-session-revocation.md` (contrato de logout
   multiproducto y back-channel logout).
@@ -165,7 +165,7 @@ Reglas obligatorias:
   el control de cuenta/salir y el estado «sin acceso» (ver `## Hybrid Execution Justification`).
 - `TASK-1890` (bearer `api_client`, capability `marketing_studio.campaign.read`, organización canónica
   `org-2df565fb-98aa-42f7-b324-ea9a2209017f`).
-- `TASK-1834` Slice 0–1: perfil OIDC first-party reusable en el emisor (`openid`, `id_token` ES256 con `nonce`,
+- `TASK-1834` Slices 0–2: perfil OIDC first-party reusable en el emisor (`openid`, `id_token` ES256 con `nonce`,
   audiencia del RP, clase `first_party_sign_in` tipada en el registro, perfil de presentación confiable). **Dependencia
   dura descubierta al planificar:** hoy el emisor no acepta `openid` ni emite `id_token`; si esa foundation no existe,
   esta task queda bloqueada y no la construye con atajos.
@@ -177,7 +177,7 @@ Reglas obligatorias:
 - `EPIC-049`: cierra el criterio «`studio.efeonce.org` sirve Studio con login Efeonce ID y sin modo `open`».
 - `TASK-1891`: la federación MCP no debe cambiar; el canary de esta task lo verifica.
 - `TASK-1840`: Studio se vuelve un consumidor más del contrato de logout multiproducto.
-- `TASK-1834`: Studio actúa como segundo relying party real de la conformance del perfil reusable.
+- `TASK-1834`: Rooms es el primer relying party real (TASK-2065); Studio aporta conformance propia posterior, sin fijar un segundo lugar por inferencia.
 
 ### Files owned
 
@@ -311,7 +311,7 @@ Reglas obligatorias:
 
 La task se mantiene `backend-data` con `UI impact: none`, sin partirse, por estas razones:
 
-- Why not split: la superficie de login la posee el emisor (pantalla contextual de Efeonce ID, TASK-1834/1835) y el
+- Why not split: la superficie de login la posee el emisor (pantalla contextual de Efeonce ID, TASK-1834/2064) y el
   ADR prohíbe un vestíbulo de producto; Studio sólo responde redirects. Lo visible en Studio es mínimo y no introduce
   layout: retirar la píldora «solo lectura», un control de salir y un estado «sin acceso» que reutilizan primitives y
   copy existentes de la UI de TASK-1895.
@@ -402,7 +402,7 @@ La task se mantiene `backend-data` con `UI impact: none`, sin partirse, por esta
 ## Out of Scope
 
 - Construir el perfil OIDC first-party del emisor, `id_token`, la clase `first_party_sign_in` o el renderer
-  contextual: son de TASK-1834 (y TASK-1835 para las pantallas).
+  contextual: son de TASK-1834 (y TASK-2064 para la pantalla V4; TASK-1835 conserva la foundation histórica).
 - Logout multiproducto, `sid` y back-channel logout del emisor: TASK-1840.
 - Acceso de personas de clientes externos a Studio (población externa, TASK-1833 y piloto consentido): esta task
   cubre la población interna de Efeonce. Abrir Studio a clientes requiere su propia decisión.

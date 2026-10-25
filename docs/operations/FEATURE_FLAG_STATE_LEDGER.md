@@ -1,5 +1,15 @@
 # Greenhouse — Feature Flag State Ledger (env-var flags)
 
+## Auth first-party e invitaciones — implementación local 2026-10-25
+
+| Flag | Owner / runtime | Default del código y deploy | Estado de verificación |
+| --- | --- | --- | --- |
+| `AUTH_SERVER_FIRST_PARTY_ENABLED` | TASK-1834 / auth-server | `false` | Probado ON/OFF en harness local; no aplicado ni releído en cloud por esta entrega |
+| `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` | TASK-2067 / auth-server | `false` | Probado local; requiere RP allowlisted, secretos separados y autoridad Rooms; no activación cloud ni correo real |
+
+El correo también exige `auth_server_rooms_invitation_otp` habilitado en `email_type_config` (seed FALSE).
+Readback25Oct tras aplicar migraciones: revisiónAuth00165-kn4 conserva ambos flags ausentes (OFF efectivo en versión anterior); emailtypeFALSE. RegistroRP y secretos no encienden flujos. [Preparacióncloud](../audits/identity/2026-10-25-auth-rooms-controlled-rollout.md). Estos defaults no afirman activación del nuevo código. [Evidencia y rollout](../audits/identity/2026-10-25-auth-rooms-first-local.md).
+
 ## Delta operativo18/10/2026 — Ads
 
 Flag Ads Production true leído20:36:20.421Z; CAPTURE permanece true. EC ON, GTMWeb6/Server10,

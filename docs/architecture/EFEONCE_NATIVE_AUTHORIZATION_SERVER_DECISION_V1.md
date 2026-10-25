@@ -12,6 +12,19 @@
 > **Supersedes:** la sección `Proposed decision` + `Slice 0 recommendation` (WorkOS staging de gasto cero) de [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md). **Siguen vigentes** de ese ADR: `Invariants`, `Required binding design`, `Slice 0 binding design proposal`, `Slice 0 gateway authorization-context contract`, `Slice 0 convergence contract`.
 > **Program:** [`EPIC-044`](../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
 
+## Secuencia vigente first-party — 2026-10-25
+
+[Decisión aceptada](EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md): TASK-1834 entrega la foundation OIDC; Rooms es primer consumer (TASK-2065). TASK-2064 adopta el login V4 de Greenhouse en Auth y TASK-2063 conserva su migración posterior. Las referencias históricas a Greenhouse como primer consumer no gobiernan la ejecución actual.
+
+### Aseguramiento propio aprobado — 2026-10-25
+
+Julio instruyó: «Pentest contratado? No. Hazlo tu. No le pagaré a nadie mas».
+La evaluación ofensiva de TASK-1833 la ejecutan los agentes disponibles sobre entornos propios aislados,
+con casos reproducibles, revisión separada, correcciones y retest. Esta decisión sustituye las referencias
+históricas de este ADR a contratación externa y pareo obligatorio de proveedores. Se mantienen los gates
+de cobertura y cierre de hallazgos críticos/altos; el informe declara sus límites y no es certificación de un tercero.
+No autoriza comprar servicios ni implica haber completado la evaluación o desplegado el piloto.
+
 ## Contrato vigente de acceso interno y federación
 
 Corte consolidado: [construcción, verificaciones y pendientes](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).

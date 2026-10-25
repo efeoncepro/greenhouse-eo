@@ -141,3 +141,85 @@ export function installLoginController(
     })()
   })
 }
+
+/** Small native adapter for the V4 editorial carousel; no dependency on auth success or remote data. */
+export function installLoginCarousel(
+  root: HTMLElement | null,
+  copy: { pause: string; play: string },
+  options: { reducedMotion: boolean; intervalMs: number }
+) {
+  if (!root) return
+  const slides = [...root.querySelectorAll<HTMLElement>('[data-login-slide]')]
+  const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-login-slide-index]')]
+  const pause = root.querySelector<HTMLButtonElement>('[data-login-carousel-pause]')
+
+  if (slides.length < 2 || !pause) return
+  let current = 0
+  let manualPause = options.reducedMotion
+  let hover = false
+  let focused = false
+  const win = root.ownerDocument.defaultView!
+  const doc = root.ownerDocument
+
+  const updatePause = () => {
+    pause.setAttribute('aria-label', manualPause ? copy.play : copy.pause)
+    pause.setAttribute('aria-pressed', String(manualPause))
+    pause.textContent = manualPause ? '▶' : 'Ⅱ'
+    root.setAttribute('aria-live', manualPause ? 'polite' : 'off')
+  }
+
+  const select = (next: number) => {
+    current = next
+    slides.forEach((slide, index) => { slide.hidden = index !== current })
+    tabs.forEach((tab, index) => tab.setAttribute('aria-current', String(index === current)))
+  }
+
+  tabs.forEach((tab, index) => tab.addEventListener('click', () => {
+    select(index)
+    manualPause = true
+    updatePause()
+  }))
+  pause.addEventListener('click', () => { manualPause = !manualPause; updatePause() })
+  root.addEventListener('mouseenter', () => { hover = true })
+  root.addEventListener('mouseleave', () => { hover = false })
+  root.addEventListener('focusin', () => { focused = true })
+  root.addEventListener('focusout', event => { focused = !!event.relatedTarget && root.contains(event.relatedTarget as Node) })
+
+  const timer = win.setInterval(() => {
+    if (!manualPause && !hover && !focused && !doc.hidden) select((current + 1) % slides.length)
+  }, options.intervalMs)
+
+  win.addEventListener('pagehide', () => win.clearInterval(timer), { once: true })
+  updatePause()
+}
+
+/** Keep the same source lens geometry at every viewport; CSS remains nonce/hash governed. */
+export function installLoginLenses(root: Document, anatomy: { ringAirRatio: number; zoom: number; sphereRadiusScale: number; endDeg: number }): void {
+  for (const svg of root.querySelectorAll<SVGSVGElement>('[data-login-lens]')) {
+    const update = () => {
+      const { width, height } = svg.getBoundingClientRect()
+
+      if (!width || !height) return
+      const cx = width * Number(svg.dataset.lensX) / 100
+      const cy = height * Number(svg.dataset.lensY) / 100
+      const radius = Math.min(width, height) * Number(svg.dataset.lensRadius)
+      const ring = radius * (1 + anatomy.ringAirRatio)
+      const angle = anatomy.endDeg * Math.PI / 180
+
+      const set = (element: Element | null, attrs: Record<string, number | string>) => {
+        for (const [name, value] of Object.entries(attrs)) element?.setAttribute(name, String(value))
+      }
+
+      set(svg, { viewBox: `0 0 ${width} ${height}` })
+      for (const image of svg.querySelectorAll('image')) set(image, { width, height })
+      set(svg.querySelector('clipPath circle'), { cx, cy, r: radius })
+      set(svg.querySelector('.id-v4-lens-ring'), { cx, cy, r: ring })
+      set(svg.querySelector('.id-v4-lens-arc'), { transform: `translate(${cx} ${cy}) scale(${ring})` })
+      set(svg.querySelector('.id-v4-lens-sphere'), { cx: cx + ring * Math.cos(angle), cy: cy + ring * Math.sin(angle), r: anatomy.sphereRadiusScale * width })
+      set(svg.querySelector('.id-v4-lens-inside'), { transform: `translate(${cx} ${cy}) scale(${anatomy.zoom}) translate(${-cx} ${-cy})` })
+    }
+
+    update()
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(update).observe(svg)
+  }
+}

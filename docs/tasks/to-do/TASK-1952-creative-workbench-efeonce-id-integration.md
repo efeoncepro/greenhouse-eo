@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `optional`
-- Status real: `Diseño registrado por pedido de Julio el 2026-09-30. Autenticación diferida: primero producción de piezas. Depende de la foundation OIDC first-party de TASK-1834, Slices 0–1. Sin implementación, registro de RP, bindings nuevos, activación de IA ni despliegue por esta tarea.`
+- Status real: `Diseño registrado por pedido de Julio el 2026-09-30. Autenticación diferida: primero producción de piezas. Depende de la foundation OIDC first-party de TASK-1834, Slices 0–2. Sin implementación, registro de RP, bindings nuevos, activación de IA ni despliegue por esta tarea.`
 - Rank: `TBD`
 - Domain: `platform|identity`
-- Blocked by: `TASK-1834 (foundation first-party OIDC, Slices 0–1)`
+- Blocked by: `TASK-1834 (foundation first-party OIDC, Slices 0–2)`
 - Branch: `Greenhouse develop para documentación; Creative Workbench según su contrato de ramas y PR vigente; preservar WIP y no modificar las CLI locales de Greenhouse`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -84,7 +84,7 @@ Cambios al contrato común requieren revisión con su dueño y ADR adicional si 
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md`: Slices 0–1,
+- `docs/tasks/in-progress/TASK-1834-efeonce-auth-first-party-oidc-rooms.md`: Slices 0–2,
   perfil OIDC first-party, registro administrado de RP y conformance; no esperar la migración completa de Greenhouse.
 - `docs/tasks/in-progress/TASK-1947-creative-workbench-brand-production-entry.md`: contrato vigente del
   broker, GitHub App, reserva de cupo y rechazo antes de proveedor; revalidar su estado al tomar esta task.

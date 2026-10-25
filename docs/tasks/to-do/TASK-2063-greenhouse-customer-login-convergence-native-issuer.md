@@ -1,4 +1,4 @@
-# TASK-1834 — Greenhouse Login Convergence on Efeonce ID
+# TASK-2063 — Greenhouse Login Convergence on Efeonce ID after Rooms
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -16,24 +16,39 @@
 - Execution profile: `backend-data`
 - UI impact: `flow`
 - UI ready: `no`
-- Visual direction: `docs/ui/visual-directions/TASK-1834-greenhouse-login-convergence-native-issuer.md`
-- Wireframe: `docs/ui/wireframes/TASK-1834-greenhouse-login-convergence-native-issuer.md`
-- Flow: `docs/ui/flows/TASK-1834-greenhouse-login-convergence-native-issuer-flow.md`
-- Motion: `docs/ui/motion/TASK-1834-greenhouse-login-convergence-native-issuer-motion.md`
+- Visual direction: `docs/ui/visual-directions/TASK-2063-greenhouse-login-convergence-native-issuer.md`
+- Wireframe: `docs/ui/wireframes/TASK-2063-greenhouse-login-convergence-native-issuer.md`
+- Flow: `docs/ui/flows/TASK-2063-greenhouse-login-convergence-native-issuer-flow.md`
+- Motion: `docs/ui/motion/TASK-2063-greenhouse-login-convergence-native-issuer-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Dirección v2 de producto/identidad aprobada el 2026-09-07 y elevada a ADR transversal de EPIC-044: para una cohorte habilitada, /login de Greenhouse orquesta un redirect server-side sin pantalla intermedia y Efeonce ID presenta el único login visible, contextualizado como Greenhouse; una sesión suficiente del issuer puede completar el flujo sin mostrar login. El first-party sign-in no presenta consentimiento delegado. TASK-1834 queda como primer consumer Greenhouse. Sin implementación, flags, migración ni rollout; UI ready permanece no hasta first fold, GVC y scorecard. La foundation OIDC/resolver puede construirse en oscuro antes de TASK-1833, pero la activación externa y el retiro de métodos conservan gates independientes.`
+- Status real: `2026-10-25: sucesora documental autorizada de la adopción Greenhouse antes incluida en TASK-1834. Conserva sus criterios, matrices, recovery y migración de sesión sin implementación. TASK-1834 entrega la foundation OIDC reusable y TASK-2065 certifica Rooms primero; TASK-2064 posee el login V4 del issuer. Esta task consume esas entregas y conserva sus gates de rollout.`
 - Rank: `TBD`
 - Domain: `platform|identity|ui`
-- Blocked by: `none`
+- Blocked by: `TASK-1834 (foundation OIDC first-party reusable); TASK-2064 (login del issuer) antes de exposición`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
-- Legacy ID: `none`
+- Legacy ID: `TASK-1834 (alcance Greenhouse transferido por decisión del operador 2026-10-25)`
 - GitHub Issue: `none`
+
+## Delta de ownership 2026-10-25 — sucesora Greenhouse sin pérdida
+
+El operador decidió ejecutar Rooms antes de Greenhouse y trasladar el login V4 recién renovado al issuer.
+Esta task conserva el cuerpo y los criterios de la antigua TASK-1834 para no perder la migración del portal,
+pero **ya no implementa la foundation OIDC ni la pantalla del issuer**: son TASK-1834 y TASK-2064.
+Los requisitos de protocolo conservados de Slice 0–1 se interpretan
+como adopción/conformance de Greenhouse sobre el contrato compartido, nunca como orden vigente ni ownership
+duplicado. Si falta una primitive, se devuelve a su task dueña y se registra el bloqueo de activación.
+
+Ownership ejecutable propio: resolver TenantAccessRecord/session_360, provider NextAuth, auth_attempts,
+revalidación, selección de contexto, entrada/recovery por cohorte y preservación de métodos/deep links.
+TASK-1842 depende de esta adopción para la puerta /my/profile; TASK-1852 y EPIC-046 conservan aquí sus
+pruebas de retorno del portal. UI de Greenhouse sigue activa hasta su cutover propio; adoptar su diseño en
+Auth no mueve cookies, contraseñas, sesiones ni permisos.
 
 ## Summary
 
 Establecer **Efeonce ID** como la identidad humana canónica de los productos Efeonce para clientes externos y
-colaboradores internos, y convertir Greenhouse en su primer relying party de referencia. Cada producto actual o
+colaboradores internos, y integrar Greenhouse como relying party después de Rooms. Cada producto actual o
 futuro debe autenticar la misma cuenta Efeonce mediante un cliente OIDC propio, pero conservar audiencia, cookie,
 sesión y autorización de producto separadas.
 
@@ -48,7 +63,7 @@ canónica y después uno de los contextos de sesión Greenhouse vigentes en Pers
 `TenantAccessRecord`. Cero contextos falla cerrado; múltiples contextos exigen selección explícita dentro de
 Greenhouse; nunca se elige la primera fila. La task no implementa el runtime de Globe ni de productos futuros.
 
-Esta task entrega coexistencia segura y medible y prueba el patrón del primer producto. No declara convergencia
+Esta task entrega coexistencia segura y medible en Greenhouse sobre el patrón certificado primero en Rooms. No declara convergencia
 final del ecosistema ni autoriza retirar métodos; cada producto requiere adopción, paridad, assurance, rollout y
 rollback propios.
 
@@ -94,7 +109,7 @@ tampoco concede acceso universal: cada producto y organización resuelve su cont
 - Preservar Microsoft, Google, credenciales y magic link durante la migración en el login legado para cohortes no
   habilitadas y en una recovery explícita sin auto-redirect; medir su uso y probar rollback antes de retirarlos.
 - Dejar registrado el contrato de onboarding/conformance para nuevos relying parties y las unidades separadas que
-  migrarán Globe y cualquier otro producto; TASK-1834 no implementa esos consumers.
+  migrarán Globe y cualquier otro producto; TASK-2063 no implementa esos consumers.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -180,12 +195,12 @@ Reglas obligatorias:
 - `docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md`
 - `docs/tasks/complete/TASK-1835-efeonce-id-login-consent-screens.md`
 - `docs/tasks/in-progress/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md`
-- `docs/tasks/to-do/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md`
+- `docs/tasks/in-progress/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md`
 - `docs/tasks/to-do/TASK-1839-invitation-delivery-primitive-convergence.md`
 - `docs/tasks/to-do/TASK-1840-efeonce-id-multiproduct-logout-session-revocation.md`
 - `docs/tasks/to-do/TASK-1841-efeonce-id-first-consented-customer-pilot.md`
 - `docs/tasks/to-do/TASK-1842-efeonce-id-person-credentials.md`
-- `docs/ui/visual-directions/TASK-1834-greenhouse-login-convergence-native-issuer.md`
+- `docs/ui/visual-directions/TASK-2063-greenhouse-login-convergence-native-issuer.md`
 - `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
 - `docs/documentation/identity/sistema-identidad-roles-acceso.md`
@@ -193,6 +208,9 @@ Reglas obligatorias:
 ## Dependencies & Impact
 
 ### Depends on
+
+- [TASK-1834](../in-progress/TASK-1834-efeonce-auth-first-party-oidc-rooms.md): perfil OIDC reusable, registro de RP y policy first-party. Los requisitos de issuer conservados abajo son conformance que esta task verifica y consume; no autorizan reimplementar el protocolo.
+- TASK-2064: pantalla V4 de Efeonce Auth. TASK-2065: primer consumer Rooms, cerrado localmente con browser/PG/recovery el 2026-10-25; dependencia satisfecha, no blocker. [Evidencia](../../audits/rooms/2026-10-25-efeonce-id-consumer.md).
 
 - TASK-1829/TASK-1830: OAuth, sesión y autenticación de personas del emisor; se extienden, no se asumen OIDC.
 - TASK-1631: source links externos, invitations linked, grants y bindings Account 360.
@@ -220,7 +238,7 @@ duplicación de TASK-1839 y semántica de logout de TASK-1840.
   ID, preservando su sesión, tenancy, capabilities, créditos y derechos; debe coordinarse con TASK-1480/TASK-1511.
 - Contrato de onboarding/conformance para relying parties futuros, sin código ad hoc por producto en el issuer.
 - TASK-1835 si una decisión posterior agrega Microsoft cliente o Google como upstreams visibles del emisor.
-- TASK-1839 para provisionar un principal de portal; TASK-1834 sólo consume principals existentes.
+- TASK-1839 para provisionar un principal de portal; TASK-2063 sólo consume principals existentes.
 - TASK-1840 para que `salir de Greenhouse`, `cerrar la sesión Efeonce ID de este dispositivo` y `cerrar todas las
   sesiones` no se confundan durante el cutover.
 - TASK-1842 para que una persona pueda enrolar passkey antes de presentarla como método primario general.
@@ -229,15 +247,15 @@ duplicación de TASK-1839 y semántica de logout de TASK-1840.
 ### Files owned
 
 - Delta ADR y actualización de `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`.
-- `src/lib/auth-server/oauth/**` y `services/auth-server/**` sólo para el contrato OIDC de Greenhouse.
+- Registro del RP Greenhouse por command de TASK-1834 y tests de conformance; `src/lib/auth-server/**`/`services/auth-server/**` conservan ownership TASK-1834, sin implementación duplicada.
 - `src/lib/identity/**` o `src/lib/tenant/**` para el resolver canónico, después de confirmar ownership.
 - `src/lib/auth.ts`, `src/views/Login.tsx`, la page `/login` y copy canónico.
 - Migración aditiva y `src/lib/auth/attempt-tracker.ts` para admitir el provider nuevo en el ledger.
 - Tests focales, escenario GVC y documentación funcional/manual.
-- `docs/ui/wireframes/TASK-1834-greenhouse-login-convergence-native-issuer.md`.
-- `docs/ui/flows/TASK-1834-greenhouse-login-convergence-native-issuer-flow.md`.
-- `docs/ui/motion/TASK-1834-greenhouse-login-convergence-native-issuer-motion.md`.
-- `docs/ui/visual-directions/TASK-1834-greenhouse-login-convergence-native-issuer.md`.
+- `docs/ui/wireframes/TASK-2063-greenhouse-login-convergence-native-issuer.md`.
+- `docs/ui/flows/TASK-2063-greenhouse-login-convergence-native-issuer-flow.md`.
+- `docs/ui/motion/TASK-2063-greenhouse-login-convergence-native-issuer-motion.md`.
+- `docs/ui/visual-directions/TASK-2063-greenhouse-login-convergence-native-issuer.md`.
 
 ## Current Repo State
 
@@ -276,7 +294,7 @@ duplicación de TASK-1839 y semántica de logout de TASK-1840.
   match único o `ambiguous`.
 - El Admin Center combina `role_entitlement_defaults`/`user_entitlement_overrides` para mostrar permisos
   efectivos, pero el hot path `getTenantEntitlements()`/`can()` inspeccionado deriva desde claims y no aplica esos
-  overlays. Es una brecha preexistente: TASK-1834 no puede usar la vista administrativa como prueba de enforcement.
+  overlays. Es una brecha preexistente: TASK-2063 no puede usar la vista administrativa como prueba de enforcement.
 - SSO directo admite principals `invited`, mientras el refresh de claims sólo conserva `active`; el Delta ADR debe
   fijar una única semántica de elegibilidad sin activación implícita desde el callback.
 - El acceso efectivo no cabe sólo en `roles/views`: internos usan roles, route groups, permission sets, overrides
@@ -307,7 +325,7 @@ duplicación de TASK-1839 y semántica de logout de TASK-1840.
 ## Modular Placement Contract
 
 - Topology impact: `cross-runtime`
-- Current home: `src/lib/auth-server/**` + `services/auth-server/**` y portal `src/lib/auth.ts`/`src/views/Login.tsx`
+- Current home: portal `src/lib/auth.ts`/`src/views/Login.tsx` y resolver server-side; consume issuer de TASK-1834 sin apropiarse de su runtime
 - Future candidate home: `remain-shared`
 - Boundary: perfil OIDC first-party reusable + cliente Greenhouse aislado + resolver server-side
   `subject -> identity_profile -> contexto Greenhouse -> TenantAccessRecord`
@@ -432,7 +450,7 @@ duplicación de TASK-1839 y semántica de logout de TASK-1840.
 - Why this pattern: preserves product context without duplicating screens, removes a click without decision, keeps
   trusted server-side resolution and supports a measured rollback without claiming ecosystem-wide convergence.
 - Reuse / extend / new primitive: `reuse/extend`; no new primitive approved.
-- Direction artifact: `docs/ui/visual-directions/TASK-1834-greenhouse-login-convergence-native-issuer.md`.
+- Direction artifact: `docs/ui/visual-directions/TASK-2063-greenhouse-login-convergence-native-issuer.md`.
 - Open risks: first-fold primitive lookup, upstream parity and fallback retirement evidence; `UI ready: no`.
 
 ### Visual verification
@@ -446,7 +464,7 @@ duplicación de TASK-1839 y semántica de logout de TASK-1840.
 - Before/after evidence: login actual vs redirect sin pantalla intermedia + issuer contextual.
 - Known visual debt: first fold, GVC y scorecard pendientes; la dirección detallada ya está seleccionada, pero
   no equivale a readiness ni implementación.
-- Visual scorecard: `docs/ui/reviews/TASK-1834-greenhouse-login-convergence-native-issuer.scorecard.json`.
+- Visual scorecard: `docs/ui/reviews/TASK-2063-greenhouse-login-convergence-native-issuer.scorecard.json`.
 - Quality threshold: `average >= 4.5; floor >= 4; hierarchy/surface economy/visual impact/fidelity/template resistance >= 4.5`.
 
 ## Backend/Data Contract
@@ -519,7 +537,7 @@ duplicación de TASK-1839 y semántica de logout de TASK-1840.
 
 ## Hybrid Execution Justification
 
-- Why not split: TASK-1834 es la primera adopción de un relying party y su gate E2E; issuer, resolver, callback y
+- Why not split: TASK-2063 es la adopción Greenhouse y su gate E2E; contrato del issuer, resolver, callback y
   experiencia deben cerrar un único contrato verificable. Separarlos aquí permitiría declarar un provider listo
   sin identidad contextual o una UI lista sin autoridad fail-closed. La ejecución sí se separa en dos checkpoints
   internos: `foundation dark` y `experience activation`.
@@ -553,7 +571,7 @@ duplicación de TASK-1839 y semántica de logout de TASK-1840.
 
 Este slice ya no decide el contrato transversal: lo consume desde
 `EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` y aterriza únicamente decisiones, gaps y evidencia del
-primer RP Greenhouse. Cualquier cambio material al contrato común vuelve al ADR/EPIC, no se esconde aquí.
+RP Greenhouse posterior a Rooms. Cualquier cambio material al contrato común vuelve al ADR/EPIC, no se esconde aquí.
 
 - Aplicar que Efeonce ID es la única autoridad de autenticación humana de los productos Efeonce para internos y
   externos, sin inferir población, organización ni acceso por issuer.
@@ -568,7 +586,7 @@ primer RP Greenhouse. Cualquier cambio material al contrato común vuelve al ADR
   relying parties y matriz de métodos upstream.
 - Respetar el ownership del epic: U02 conserva protocolo/registro/policy de consentimiento, U03 sesión y métodos,
   U15 logout y U09 la adopción Greenhouse. La adopción de Globe sigue como unidad propia bajo EPIC-028,
-  coordinada con TASK-1480/TASK-1511; TASK-1834 permanece como primer consumer.
+  coordinada con TASK-1480/TASK-1511; TASK-2063 conserva el consumer Greenhouse posterior a Rooms.
 - Documentar la matriz de autoridades y enforcement points: autenticación Efeonce Auth; delegación OAuth;
   gateway MCP; autorización de negocio del provider; principal/sesión portal; navegación; vistas internas;
   vistas cliente; entitlements/actions; scopes de datos.
@@ -596,20 +614,19 @@ primer RP Greenhouse. Cualquier cambio material al contrato común vuelve al ADR
 
 ### Slice 1 — Consumir el perfil OIDC reusable y registrar Greenhouse
 
-- Consumir la primitive/policy OIDC first-party aprobada por Slice 0 y registrar Greenhouse como primer relying
-  party; no crear un branch Greenhouse-specific dentro del issuer.
-- Agregar `openid` y un `id_token` ES256 para el cliente Greenhouse con `iss`, `sub`, `aud`, `iat`, `exp`,
+- Consumir la primitive/policy OIDC first-party aprobada por Slice 0 y registrar Greenhouse como relying
+  party posterior a Rooms; no crear un branch Greenhouse-specific dentro del issuer.
+- Verificar/consumir `openid` y un `id_token` ES256 de TASK-1834 para el cliente Greenhouse con `iss`, `sub`, `aud`, `iat`, `exp`,
   `auth_time` y `nonce`; no incluir roles, organización, población ni datos que el producto pueda resolver.
 - El `id_token.aud` es el `client_id` Greenhouse. `openid` no entra en `EFEONCE_MCP_SCOPES`; el flujo OIDC no
   reutiliza `GrantsVersionPort`, `gv`, consentimientos/scopes MCP ni el access token de audiencia MCP.
-- Definir la respuesta exacta del token endpoint para la clase OIDC y cualquier access token asociado; cerrar el
-  drift de metadata que hoy anuncia firma de ID token sin emitirlo.
+- Verificar la respuesta exacta del token endpoint de TASK-1834 para la clase OIDC y cualquier access token asociado; si hay drift de metadata, devolverlo a su owner antes de activar Greenhouse.
 - Mantener separados cliente, audiencia, consentimientos, revocación y token families MCP/OIDC; metadata y
   comportamiento deben coincidir y sus registries no contaminarse.
 - Registrar el cliente Greenhouse con modo server-owned `first_party_sign_in`; omitir únicamente su pantalla de
   consentimiento delegado, sin ampliar la excepción a clientes MCP o terceros.
 - Registrar cliente confidencial y redirect exacto por environment mediante el command gobernado.
-- Extender la authorization transaction con un contexto de RP confiable apto para el renderer de login; reutilizar
+- Consumir de TASK-1834 la authorization transaction con un contexto de RP confiable apto para el renderer de TASK-2064; reutilizar
   el `clientContext` existente o su successor sin aceptar application label/logo/return URL del query string.
 - El login directo sin transacción válida conserva `Entra a Efeonce`; sólo el cliente Greenhouse registrado produce
   `Greenhouse`, `Entra a Greenhouse` y `Volver a Greenhouse`.
@@ -658,9 +675,9 @@ primer RP Greenhouse. Cualquier cambio material al contrato común vuelve al ADR
   inmediato sin HTML, flash del formulario legado ni CTA intermedio; cohorte no habilitada ve sólo el login actual.
 - Implementar una recovery estable que omite el auto-redirect, permite reintento explícito y conserva los métodos
   Greenhouse anteriores según la fase; nunca mostrar primero legacy y luego reemplazarlo client-side.
-- Extender el login del issuer con contexto Greenhouse derivado del RP validado, métodos elegibles, trust cue y
+- Consumir/verificar el login de TASK-2064 con contexto Greenhouse derivado del RP validado, métodos elegibles, trust cue y
   `Volver a Greenhouse`; preservar la variante directa neutral.
-- Implementar fast path de sesión suficiente y suprimir consentimiento delegado sólo para `first_party_sign_in`.
+- Verificar el fast path de TASK-1834 y la supresión de consentimiento delegado sólo para `first_party_sign_in`.
 - Implementar estados entry routing, legacy, issuer session fast path, issuer direct/contextual/method pending,
   returning, recovery, denied y `0 | 1 | many` contextos sin enumeración ni loops.
 - Realizar primero el first fold mínimo detrás de flags OFF y checkpoint humano. Después completar GVC 1440/390,
@@ -770,7 +787,7 @@ expone si existe una cuenta, cuál vínculo falló ni el nombre de una organizac
 
 El flujo OIDC de cada producto y el OAuth del resource MCP comparten issuer y primitives de seguridad sólo donde el
 Delta ADR lo permita; no comparten audiencia, catálogo de scopes, grants resolver, versión de autoridad ni token
-family. Greenhouse es el primer relying party, no una excepción hardcodeada. La identidad canónica puede ser una,
+family. Greenhouse es un relying party posterior a Rooms, no una excepción hardcodeada. La identidad canónica puede ser una,
 pero las relaciones, contextos y autoridades efectivas continúan separadas.
 
 ### Matriz transicional obligatoria
@@ -781,7 +798,7 @@ pero las relaciones, contextos y autoridades efectivas continúan separadas.
 | Colaborador interno | Microsoft Entra directo y cualquier método adicional elegible, sólo en login legacy o recovery temporal | Microsoft Entra upstream de TASK-1836; passkey enrolada y step-up local cuando aplique | enrollment + profile + principal + member + organización + relación workforce + roles vigentes |
 
 La contraseña permanece temporalmente sólo en Greenhouse. Su retiro exige una task/ADR posterior con adopción de
-magic link/passkey, recuperación y soporte probados; no es criterio de cierre de TASK-1834.
+magic link/passkey, recuperación y soporte probados; no es criterio de cierre de TASK-2063.
 
 ### Resultado cerrado del resolver
 
@@ -919,7 +936,7 @@ La migración del enum/check de `auth_attempts` es expand-only y puede permanece
       entrada sin render intermedio, Efeonce ID autentica en la única pantalla visible del flujo nuevo, se rechazan
       quinto provider, CTA-vestíbulo e iframe y se documentan alternativas, copy, estados, responsive, accessibility
       y GVC en
-      `docs/ui/visual-directions/TASK-1834-greenhouse-login-convergence-native-issuer.md`.
+      `docs/ui/visual-directions/TASK-2063-greenhouse-login-convergence-native-issuer.md`.
 - [x] ADR aceptado declara Efeonce ID como única autoridad de autenticación humana de productos Efeonce para
       clientes e internos; declara que cada producto conserva su entrada; separa issuer, upstream,
       relaciones/poblaciones, contexto y autoridad; y actualiza los límites previos de MCP/Greenhouse/Entra.
@@ -927,7 +944,7 @@ La migración del enum/check de `auth_attempts` es expand-only y puede permanece
 - [ ] El implementation contract fija la estrategia de `sub`, account/factor linking, privacidad/correlación, sesión SSO,
       assurance y revocación/logout por relying party sin compartir cookies o tokens entre productos.
 - [x] El epic declara ownership reusable sin crear una task duplicada: U02 protocolo/registro/consentimiento, U03
-      sesión/métodos, U05 autorización MCP y U15 logout; U09 es primer consumer Greenhouse. La adopción Globe sigue
+      sesión/métodos, U05 autorización MCP y U15 logout; U09/TASK-1834 entrega foundation común con Rooms primero; TASK-2063 posee el consumer Greenhouse. La adopción Globe sigue
       separada bajo EPIC-028/TASK-1480/TASK-1511. Es un cierre de ownership documental, no de implementación.
 - [ ] Esta task aterriza para Greenhouse la matriz de autoridades/no-transferencia y la matriz de revocación por
       mecanismo, cache, SLA y evidencia; la convergencia de login no cambia quién autoriza el portal.
@@ -1008,11 +1025,11 @@ La migración del enum/check de `auth_attempts` es expand-only y puede permanece
 
 ## Verification
 
-- `pnpm task:lint --task TASK-1834`
-- `pnpm ui:wireframe-check --task TASK-1834`
-- `pnpm ui:flow-check --task TASK-1834`
-- `pnpm ui:motion-check --task TASK-1834`
-- `pnpm ui:readiness-check --task TASK-1834`
+- `pnpm task:lint --task TASK-2063`
+- `pnpm ui:wireframe-check --task TASK-2063`
+- `pnpm ui:flow-check --task TASK-2063`
+- `pnpm ui:motion-check --task TASK-2063`
+- `pnpm ui:readiness-check --task TASK-2063`
 - tests focales auth-server/OIDC, resolver, NextAuth, ledger/migration y Login
 - `pnpm local:check` y gates build/deploy aplicables al auth-server
 - canaries reales staging/Production por población, revocación y rollback
@@ -1022,7 +1039,7 @@ La migración del enum/check de `auth_attempts` es expand-only y puede permanece
 
 - [ ] `Lifecycle`, carpeta, `Status real` y acceptance actualizados con evidencia proporcional.
 - [ ] `docs/tasks/README.md`, EPIC-044, ADRs, docs funcionales/manuales y ledgers sincronizados.
-- [ ] `pnpm task:lint --task TASK-1834`, QA/docs/context gates aplicables pasan.
+- [ ] `pnpm task:lint --task TASK-2063`, QA/docs/context gates aplicables pasan.
 - [ ] No se afirma cutover, retiro de provider ni convergencia final sin task/ADR y evidencia separadas.
 
 ## Delta 2026-09-06 — un consumer nuevo que esta task no sabía que tenía
@@ -1047,13 +1064,13 @@ de tener recorrido.
 ### Conexión 2026-09-09 — servicios y retorno desde comunicaciones
 
 El operador pidió enlazar P01 con esta task. P01 ahora es TASK-1852: posee cuenta/servicio/persona,
-fuentes, módulos y canales; TASK-1834 conserva issuer, login, selección de contexto y retorno seguro.
+fuentes, módulos y canales; TASK-2063 conserva issuer, login, selección de contexto y retorno seguro.
 La matriz y los casos de deep links se consumen en ambos planes. No esperar el cierre total de 1834
 para preparar/abrir servicios con acceso vigente comprobado; sí exigir sus gates antes de activar
 OIDC nativo para la cohorte. Las pruebas técnicas usan fixtures, separadas del piloto cliente.
 
 - Mantener el contrato reusable en los owners existentes del epic: U02 protocolo/registro/consentimiento, U03
-  sesión/métodos, U05 autorización MCP y U15 logout. TASK-1834 sólo implementa el primer consumer Greenhouse.
+  sesión/métodos, U05 autorización MCP y U15 logout. TASK-2063 sólo implementa el consumer Greenhouse posterior a Rooms.
 - Registrar la adopción de Efeonce ID por Globe como unidad propia de EPIC-028, sucesora del broker vigente y
   coordinada con TASK-1480/TASK-1511; preservar cookie/sesión y autorización Globe.
 - Upstream Microsoft para clientes en Efeonce ID, si el Delta ADR lo selecciona.
@@ -1079,4 +1096,4 @@ OIDC nativo para la cohorte. Las pruebas técnicas usan fixtures, separadas del 
 
 El operador aprobó el 2026-10-02 la dirección **V4 premium** del login (canvas «Login Greenhouse · La órbita»): papel con Efeonce como marca principal, Greenhouse como sello secundario y escenario fotográfico con la Lente de «La órbita» y novedades gobernadas (`TASK-1963`/`TASK-1964`). Mientras esta task no active el redirect para una cohorte, `/login` de Greenhouse renderiza el V4. Cuando Efeonce ID presente el único login visible, su pantalla debería adoptar la misma dirección y puede leer las novedades desde `GET /api/public/login-announcements`.
 
-- [ ] La pantalla de login de Efeonce ID adopta la dirección V4 premium aprobada (o registra por qué difiere).
+- [ ] Greenhouse consume la pantalla V4 premium del issuer entregada por TASK-2064; verifica su contexto/retorno y no reimplementa el renderer.

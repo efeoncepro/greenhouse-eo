@@ -1,5 +1,29 @@
 # TASK-1833 — Efeonce Auth Server Security Assurance and Operations
 
+## Revalidación 2026-10-25 — assurance para producción controlada Rooms
+
+Julio autorizó el goal de producción controlada Auth + Rooms y el correo real únicamente a
+`jreyes@efeoncepro.com`. El coordinador conserva infraestructura/release/env/envíos. Esta revisión sólo
+hizo discovery, lectura pública y metadata GCP; no ejecutó mutaciones cloud, correo ni nuevos modelos/API pagadas.
+Steering posterior explícito de Julio: «Pentest contratado? No. Hazlo tu. No le pagaré a nadie mas». La evaluación ofensiva y refutación se ejecutan por los agentes disponibles, sin proveedor externo, API pagadas ni pareo obligatorio de modelos. La evidencia no se presenta como certificación de un tercero.
+
+Plan y matriz A1–A7: [TASK-1833-plan](../plans/TASK-1833-plan.md).
+
+- TASK-1829/TASK-1830 ya ofrecen superficie implementada y autenticada; sus cierres parciales no bloquean
+  iniciar este aseguramiento. No se declaran completas sus matrices pendientes de navegador/cohortes.
+- El piloto interno controlado y el cierre de esta task son hitos distintos. La evaluación ofensiva reproducible y refutada permanece
+  exigida antes de la primera organización cliente pagando; no se presenta este canary como pentest, cierre
+  total de assurance ni autorización de expansión. Los gates de rollout aplicables siguen abiertos hasta su evidencia.
+- Los párrafos fechados de septiembre se conservan como historia, no describen la operación actual. Existe
+  GC horario y ocho señales base; no se deben reconstruir como capacidades ausentes.
+- Readback 2026-10-25T21:55Z: `auth-server-00165-kn4` Ready/100%; `/healthz` y `/readyz` 200,
+  PG/KMS/activeKey `ok`, SHA `ba15711d022cb0450e2e9d185e692d02631fc306`; metadata aún sólo MCP.
+  JWKS publica dos kids históricos. Scheduler `ops-auth-ephemeral-gc` ENABLED, `13 * * * *`,
+  America/Santiago, último intento `21:13:03Z`. `ops-auth-key-rotate` no existe en us-east4.
+- KMS v1/v2 siguen ENABLED/HSM (creadas 2026-09-04). Eso y el JWKS público no prueban el estado
+  SQL ni antigüedad exacta de `retiring`; CLI `rotate-key --status` no pudo consultarlo por falta del
+  `AUTH_SERVER_KMS_KEY` local. Requiere readback SQL/config del coordinador antes de retirar ninguna llave.
+
 ## Delta 2026-09-07 — assurance de entry, RP y consentimiento
 
 El ADR `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` agrega casos obligatorios al
@@ -60,7 +84,7 @@ El assessment de este slice consume su ADR y código; no bloquea el diseño inic
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -73,19 +97,18 @@ El assessment de este slice consume su ADR y código; no bloquea el diseño inic
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación; desde 2026-09-04 existen rotación manual ejercitada (registerSigningKeyVersion/retireSigningKey, CLI auth-server:rotate-key), 2 señales base y el runbook base de TASK-1828; sin red-team, pentest, scheduler de rotación, retención ni privacidad V2; retiro de la versión 1 (retiring) pendiente`
+- Status real: `2026-10-25: discovery, plan y señales de assurance implementados localmente para producción controlada Auth/Rooms autorizada por Julio; correo real sólo jreyes@efeoncepro.com. Superficie1829/1830 ya existe; se retira su bloqueo genérico de inicio. Readback público/GCP: issuer saludable00165-kn4, GC horario activo, JWKS dos kids, keyrotation scheduler ausente. Cinco señales nuevas integradas; tests17PASS y SQL7PASS, typecheckPASS. Protocolos1834/OTP2067 y consumer Rooms tienen evidencia local; activación y canary productivos todavía pendientes. A1–A7 contrastados con código/evidencia posterior, sin equiparar revisión a pentest. Evaluaciónofensivarefutada/privacidadV2/runbooksensayados/rotaciónprogramada/steady7d conservan criterios abiertos.`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
-- Blocked by: `TASK-1829 y TASK-1830 en staging (superficie completa a auditar)`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Asegurar y hacer operable el authorization server antes del primer cliente pagando: red-team agéntico
-cruzado (Fable 5.1 y GPT-6 Astra con roles adversarios sobre la superficie real en staging; ver §Pareo de modelos), pentest externo
-con hallazgos críticos cerrados, rotación de llaves KMS ejercitada y programada, señales de reliability
+Asegurar y hacer operable el authorization server antes del primer cliente pagando: evaluación ofensiva por los agentes disponibles, refutación independiente y retest
+con hallazgos críticos/altos cerrados, rotación de llaves KMS ejercitada y programada, señales de reliability
 completas, runbooks de incidente, revocación masiva y recuperación, retención y postura frente a la Ley
 21.719 (vigente 2026-12-01). El ADR nativo asumió la operación permanente; esta task es donde esa
 responsabilidad se vuelve verificable.
@@ -103,7 +126,7 @@ un subprocesador externo y debe reescribirse para un tratamiento propio.
   redirect, enumeración, brute force TOTP, replay de challenge WebAuthn, confused deputy por cliente,
   spoofing/degradación de clase RP, cross-RP code/token/session, loops de recovery, token del issuer externo sobre
   tool interna, JWKS poisoning) con resultado por caso y fix aplicado.
-- Pentest externo contratado sobre staging con alcance documentado; hallazgos críticos y altos cerrados.
+- Evaluación ofensiva propia sobre entorno aislado/staging autorizado, con catálogo>=10 casos reproducibles, revisión de un agente separado, retest y críticos/altos cerrados. No certificación de tercero.
 - Rotación de llave ejercitada en staging y producción; programación trimestral por Cloud Scheduler
   (`ops-auth-key-rotate`) con verificación post-rotación.
 - Señales de reliability del dominio registradas en el control plane con steady y severidad.
@@ -143,13 +166,13 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1829`, `TASK-1830` en staging con flags ON; `TASK-1828` para llaves y señales base.
-- Proveedor de pentest contratado por el operador (fuera del repo).
+- `TASK-1829`/`TASK-1830`: superficie implementada y autenticada según evidencia de septiembre y readback público actual; sus matrices incompletas permanecen con sus dueños. `TASK-1828` aporta llaves/señales base.
+- Un agente separado para refutar la evaluación ofensiva y evidencia reproducible; no contratación externa.
 
 ### Blocks / Impacts
 
 - `TASK-1832` Slice 3 cuando la organización es un cliente pagando.
-- `TASK-1834`: no converge el login sin este cierre.
+- `TASK-1834` y consumer Rooms: assurance del alcance activado y evidencia de rollout antes de producción controlada; cierre completo antes del primer cliente pagando. La migración Greenhouse tiene dueño TASK-2063.
 
 ### Files owned
 
@@ -176,13 +199,23 @@ Reglas obligatorias:
   audit append-only `greenhouse_auth.signing_key_events`; IAM mínimo (SA `auth-server@` signerVerifier +
   cloudsql.client; deployer `cloudkms.viewer`).
 
-### Gap
+### Gap revalidado
 
-- Sin abuse cases, pentest, runbooks de incidente/revocación masiva ni scheduler de rotación; privacidad V1
-  no aplica al tratamiento propio.
-- Señales pendientes: `auth.kms.sign_failures`, `auth.keys.rotation_overdue`, `auth.oauth.*`, `auth.person.*`;
-  `auth.issuer.jwks_unreachable` sigue `not_configured` hasta declarar `AUTH_SERVER_JWKS_URL` en Vercel.
-- Retiro programado de la versión 1 de la llave (hoy `retiring`) y retención por tabla sin ejecutar.
+- Existe GC acotado en `src/lib/auth-server/maintenance/gc.ts` y scheduler horario activo. La extensión
+  first-party/OTP está probada localmente (funciones ausentes → skip; 30 días; locks; counts), aún pendiente
+  del despliegue/migraciones y ejecución observada del nuevo código en ops-worker.
+- Existen ocho señales en `src/lib/reliability/queries/auth-server-signals.ts`: JWKS, lifecycle, code reuse,
+  refresh reuse, CIMD rejected, magic-link rate-limit, passkey counter regression y orphan sessions.
+  KMS usa incidente de dominio existente. Reader `rotation_overdue` y cuatro señales first-party/OTP ya implementados localmente y probados encendiendo/recuperando; SQL real verifica clasificación. Falta su despliegue y readback operativo.
+- No se encontró scheduler/command automático de rotación ni runbooks específicos `auth-server-incident.md`
+  y `auth-server-key-rotation.md`. El runbook base sí contiene rollback, rotación manual y diagnóstico;
+  expandir/reusar, no fingir ausencia total de operación.
+- Privacidad V1 está superseded para WorkOS y no es revisión del tratamiento propio. V2/RAT y validación
+  pertinente siguen pendientes. No se afirma cumplimiento jurídico con una prueba técnica.
+- Retiro SQL/KMS de la versión antigua por verificar; KMSv1 sigue ENABLED y su kid sigue publicado.
+  No retirar por inferencia: probar solapamiento y ausencia de tokens que aún dependan de ella.
+- Evaluación ofensiva y refutación de esta task no están acreditadas sólo por las pruebas de implementación.
+  Se reutiliza evidencia1836/1831/1844 con fecha y límites; no se cuentan sesiones/modelos como refutación independiente automáticamente.
 
 ## Modular Placement Contract
 
@@ -215,7 +248,7 @@ Reglas obligatorias:
 
 - Entidades/tablas/views afectadas: `signing_keys`; tablas de `TASK-1829/1830` para retención
 - Invariantes que no se pueden romper:
-  - `Retención: authorization_codes 24 h, magic_link_tokens 7 días, refresh revocados 90 días, auth_attempts 12 meses, audit append-only.`
+  - Retención implementada: función `gc_ephemeral_state` de migración1836 conserva mínimo30d después de expiración y respeta dependencias/familias vigentes; audit e intentos no se borran. Helpers1834/2067 conservan30d y lotes<=500. Los objetivos históricos24h/7d/90d/12meses requieren conciliación explícita en privacidadV2; no se ejecutan borrados nuevos desde este spec.
   - `Rotación programada sólo si la última rotación verificada tiene más de 80 días.`
 - Write-target allowlist: `N/A — sin tablas nuevas`
 - Tenant/space boundary: n/a
@@ -228,7 +261,7 @@ Reglas obligatorias:
 - Default state: scheduler `paused` hasta la primera rotación manual verificada
 - Backfill plan: none
 - Rollback path: pausar scheduler; retirar señal
-- External coordination: pentest externo; Cloud Scheduler; Sentry alert rules
+- External coordination: evaluación ofensiva interna; Cloud Scheduler; Sentry alert rules
 
 ### Security and access
 
@@ -281,9 +314,10 @@ Reglas obligatorias:
 
 - Runbooks de incidente/rotación/revocación; revisión de privacidad V2; registro de actividades de tratamiento.
 
-### Slice 4 — Pentest externo
+### Slice 4 — Evaluación ofensiva propia y retest
 
-- Alcance, ejecución sobre staging, cierre de críticos/altos, informe redactado.
+- Catálogo de amenazas y>=10casos reproducibles en entorno aislado/staging autorizado; agente separado refuta hallazgos y cobertura.
+- Fixes por ownership, retest red/green y reporte redactado. No contratación, modelos adicionales ni certificación de tercero.
 
 ## Out of Scope
 
@@ -295,26 +329,16 @@ Reglas obligatorias:
 - Red-team: cada agente recibe la superficie (metadata, endpoints, contratos) y un objetivo por caso; la
   evidencia es un request reproducible; el otro agente intenta refutar el hallazgo antes de aceptarlo
   (los hallazgos de subagentes fallan hacia el daño máximo).
-### Pareo de modelos del red-team (actualizado 2026-09-06)
+### Ejecución y refutación por agentes — autoridad vigente 2026-10-25
 
-`GPT-6 Astra` reemplaza a `GPT 5.6 High` en el carril adversario. Astra se publicó el 2026-09-03 y es el primer
-modelo de OpenAI en alcanzar el nivel **Critical** de capacidad en ciberseguridad bajo su Preparedness Framework:
-con herramientas y acceso encuentra fallas desconocidas y desarrolla formas de explotarlas sin guía paso a paso.
-
-Tres condiciones que no se pueden saltar:
-
-- **Mantener los dos proveedores.** El diseño exige que un agente refute al otro antes de aceptar un hallazgo. Si
-  ambos carriles son Astra, un punto ciego compartido pasa desapercibido. `Fable 5.1` contra `GPT-6 Astra` conserva
-  la independencia de la refutación.
-- **La capacidad ofensiva está gated.** La versión menos restringida para defensores vive en el programa
-  `Daybreak` / `Daybreak Blue` de OpenAI, en alpha con un grupo reducido. Con la API normal Astra rechaza parte del
-  trabajo. Verificar cobertura real contra un caso del catálogo ANTES de comprometer el plan del Slice 1; si
-  rechaza, degradar el carril a otro modelo y dejarlo escrito, nunca reformular el caso para esquivar el rechazo.
-- **Sólo staging, sólo superficie propia.** Nunca producción, nunca un host de terceros. Es uso defensivo sobre
-  infraestructura propia; cualquier otra cosa sale del alcance de esta task.
-
-Costo a considerar en el Slice 1: la API de Astra cobra USD 10 por millón de tokens de entrada y USD 50 por millón
-de salida — órdenes de magnitud bajo el pentest del Slice 4, pero no trivial en corridas agénticas largas.
+Julio sustituyó expresamente el requisito de contratación externa y el pareo obligatorio entre proveedores:
+la evaluación la hacemos nosotros. Usar los agentes disponibles autorizados; no comprar servicios ni llamar
+APIs pagadas. Un agente ejecuta el catálogo, otro intenta refutar cada hallazgo y señalar cobertura ausente.
+La independencia de revisión es por ownership y revisión separada; compartir proveedor no equivale a
+independencia comercial ni certificación externa. Conservar requests/tests reproducibles, resultados,
+retest de fixes y limitaciones. Ningún crítico/alto se cierra sólo por mitigación escrita.
+Las pruebas adversariales son de superficie propia y en entorno aislado/staging explícitamente autorizado;
+la activación productiva usa canaries acotados, no ataques de carga contra SQL compartido.
 
 - Rotación: `registerSigningKeyVersion` → verificación de JWKS con dos `kid` → espera ≥ `SIGNING_KEY_MIN_OVERLAP_MS` (1 h, mayor que el TTL del access token) → `retireSigningKey` del viejo.
 
@@ -322,13 +346,13 @@ de salida — órdenes de magnitud bajo el pentest del Slice 4, pero no trivial 
 
 ### Slice ordering hard rule
 
-- Slice 1 → Slice 2 → Slice 3 → Slice 4. El pentest (Slice 4) sólo sobre la superficie ya endurecida por Slice 1.
+- Slice 1 → Slice 2 → Slice 3 → Slice 4. La evaluación ofensiva final (Slice 4) sólo sobre la superficie ya endurecida por Slice 1.
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Hallazgo crítico tardío bloquea la cohorte | rollout | medium | red-team temprano; pentest antes de clientes pagando | informe |
+| Hallazgo crítico tardío bloquea la cohorte | rollout | medium | evaluación/refutación temprana y retest antes de clientes pagando | informe |
 | Rotación programada retira un `kid` con tokens vigentes | identity | low | solapamiento fijo ≥ TTL máximo + margen; verificación post-rotación | `auth.issuer.jwks_unreachable` |
 | Retención borra evidencia de un incidente | ops | low | audit append-only excluido; retención por tabla documentada | revisión de runbook |
 
@@ -350,11 +374,11 @@ de salida — órdenes de magnitud bajo el pentest del Slice 4, pero no trivial 
 1. Staging: red-team completo con hallazgos cerrados.
 2. Staging y producción: rotación manual verificada; scheduler activado.
 3. Producción: señales steady 7 días; runbooks probados en simulacro de revocación masiva en staging.
-4. Pentest cerrado antes de la primera organización pagando.
+4. Evaluación propia>=10casos, refutación y retest cerrados antes de la primera organización pagando; no certificado externo.
 
 ### Out-of-band coordination required
 
-- Contratación del pentest; validación de la revisión de privacidad V2 por abogado habilitado.
+- Sin contratación de pentest. La revisión de privacidad describe hechos técnicos y sus límites; cualquier validación jurídica que resulte necesaria debe tratarse separadamente, sin contratar servicios por inferencia.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -362,7 +386,7 @@ de salida — órdenes de magnitud bajo el pentest del Slice 4, pero no trivial 
 
 ## Acceptance Criteria
 
-- [ ] Revisar hallazgos A1–A7 y evidencia de docs/audits/2026-09-04-task-1836-mcp-design-audit.md; el cierre documental de la auditoría no acredita mitigaciones runtime ni pentest.
+- [x] Revisar hallazgos A1–A7 y evidencia de docs/audits/2026-09-04-task-1836-mcp-design-audit.md; revisión2026-10-25 contrastada con evidencia1836/1831/1844 y código actual en el plan. El cierre documental no acredita todas las mitigaciones runtime actuales ni pentest.
 
 - [ ] Cambio de frontera de TASK-1836 cubierto por assurance: externo del mismo issuer sin autoridad interna, binding no derivado de email y revocación con token vigente.
 
@@ -373,13 +397,23 @@ de salida — órdenes de magnitud bajo el pentest del Slice 4, pero no trivial 
       consentimiento de un cliente MCP nuevo, scopes elevados ni el step-up de escritura.
 - [ ] Evidencia reproducible de los casos externo-sobre-interno entregada a `TASK-1831`, con sus criterios (a) y (b)
       tildados allá o el bloqueo declarado con razón.
-- [ ] Pentest externo con alcance documentado y sin críticos/altos abiertos.
+- [ ] Evaluación ofensiva propia>=10casos con alcance documentado, revisión independiente de otro agente, retest y sin críticos/altos abiertos; expresamente sin certificación de tercero.
 - [ ] Rotación de llave ejercitada en staging y producción; scheduler trimestral activo con verificación.
-- [ ] Señales del dominio registradas en el control plane con steady y severidad.
+- [ ] Señales del dominio registradas en el control plane con steady y severidad. Ocho existentes y cinco nuevas integradas localmente; 17 tests de lectores PASS y SQL agregado real PASS. Ventana productiva steady aún pendiente; no se tilda por código.
 - [ ] Runbooks de incidente, rotación y revocación masiva publicados y ensayados en staging.
 - [ ] Revisión de privacidad V2 publicada con retención por tabla y registro de actividades.
 
 ## Verification
+
+- [Revisión técnica de privacidad V2](../../operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V2.md) preparada con inventario/retención/RAT propuesto; sin afirmar aprobación jurídica.
+- [Preparación cloud](../../audits/identity/2026-10-25-auth-rooms-controlled-rollout.md): migraciones/RP/secretosv1, gatesOFF; no canary/deploy todavía.
+
+- [Revisión separada y corrección magic-link](../../audits/auth-server/2026-10-25-independent-protocol-review.md):146PASS separados; cobertura ofensiva CIMD bloqueada automáticamente, parche defensivo verificado localmente192PASS con suite de magic-link y TypeScriptPASS.
+- Runbooks [incidente](../../operations/runbooks/auth-server-incident.md) y [rotación](../../operations/runbooks/auth-server-key-rotation.md) preparados; ensayos/scheduler pendientes, no tildar criterio completo.
+
+- [Evaluación ofensiva reproducible y hallazgos](../../audits/auth-server/AUTH_SERVER_RED_TEAM_2026-10-25.md): 20 casos backend, 122 PASS/3 SQL omitidos en suite focal; refutación independiente pendiente de consolidar.
+- Remediación defensiva CIMD: IP validada fijada al socket HTTPS, parser IPv6 binario y deadline DNS+cuerpo de 3 s, 64 PASS CIMD/OAuth; revisión independiente magic link 128 PASS incluye filas persistidas previas. Ampliación ofensiva CIMD detenida por control automático de seguridad, sin reintento por otro canal; gateway/roles-sin-scope no evaluado en esta pasada. No se afirma pentest completo ni exfiltración demostrada. Detalle y límites en el mismo dossier.
+- Señales17PASS; PostgreSQL aislado7PASS con prueba de mutación que falla al quitar clasificación de replay. `pnpm typecheck` y ESLint focal PASS.
 
 - `pnpm vitest run src/lib/auth-server src/lib/reliability/queries`
 - simulacro de revocación masiva en staging
@@ -394,11 +428,11 @@ de salida — órdenes de magnitud bajo el pentest del Slice 4, pero no trivial 
 
 ## Follow-ups
 
-- Repetir red-team en cada cambio de protocolo; pentest anual.
+- Repetir evaluación ofensiva en cada cambio de protocolo y revisión periódica, sin asumir contratación externa.
 
 ## Open Questions
 
-- Proveedor y alcance del pentest; decisión del operador.
+- Ninguna decisión de proveedor pendiente: Julio asignó la evaluación a los agentes. El alcance técnico y resultados se registran en el catálogo del plan.
 
 ## Correction 2026-09-05 — TASK-1836
 

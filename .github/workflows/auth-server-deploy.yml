@@ -16,6 +16,8 @@ on:
       - develop
     paths:
       - 'services/auth-server/**'
+      - 'scripts/auth-server/rooms-config-drift.py'
+      - '.github/workflows/auth-server-deploy.yml'
       - 'services/_shared/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
@@ -173,6 +175,12 @@ jobs:
         id: worker-drift
         shell: bash
         env:
+          AUTH_SERVER_FIRST_PARTY_ENABLED: ${{ vars.AUTH_SERVER_FIRST_PARTY_ENABLED || 'false' }}
+          AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED: ${{ vars.AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED || 'false' }}
+          AUTH_SERVER_INVITATION_EMAIL_OTP_CLIENT_ID: ${{ vars.AUTH_SERVER_INVITATION_EMAIL_OTP_CLIENT_ID || '' }}
+          AUTH_SERVER_INVITATION_EMAIL_OTP_ROOMS_ORIGIN: ${{ vars.AUTH_SERVER_INVITATION_EMAIL_OTP_ROOMS_ORIGIN || '' }}
+          AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET_REF: ${{ vars.AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET_REF || '' }}
+          ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF: ${{ vars.ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF || '' }}
           DESIRED_AUTH_SERVER_INTERNAL_AUTH_ENABLED: ${{ vars.AUTH_SERVER_INTERNAL_AUTH_ENABLED || 'false' }}
           DESIRED_AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED: ${{ vars.AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED || 'false' }}
           DESIRED_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS: ${{ vars.AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS || '' }}
@@ -184,6 +192,8 @@ jobs:
             pnpm-lock.yaml
             tsconfig.json
             services/auth-server
+            scripts/auth-server/rooms-config-drift.py
+            .github/workflows/auth-server-deploy.yml
             services/_shared
             src/lib
             src/emails
@@ -217,11 +227,19 @@ jobs:
             CURRENT_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS="${CURRENT_RUNTIME_STATE[4]:-}"
           fi
 
+          ROOMS_CONFIG_MATCHES="false"
+          if [ -n "${CURRENT_REVISION}" ]; then
+            ROOMS_CONFIG_MATCHES="$(gcloud run revisions describe "${CURRENT_REVISION}" \
+              --project="${GCP_PROJECT_ID}" --region="${GCP_REGION}" --format=json \
+              | python3 scripts/auth-server/rooms-config-drift.py)"
+          fi
+
           CONFIG_MATCHES="false"
           if [ "${CURRENT_AUTH_SERVER_INTERNAL_AUTH_ENABLED}" = "${DESIRED_AUTH_SERVER_INTERNAL_AUTH_ENABLED}" ] \
             && [ "${CURRENT_EXTERNAL_IDENTITY_CANARY_ENABLED}" = "${DESIRED_EXTERNAL_IDENTITY_CANARY_ENABLED}" ] \
             && [ "${CURRENT_AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED}" = "${DESIRED_AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED}" ] \
-            && [ "${CURRENT_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS}" = "${DESIRED_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS}" ]; then
+            && [ "${CURRENT_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS}" = "${DESIRED_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS}" ] \
+            && [ "${ROOMS_CONFIG_MATCHES}" = "true" ]; then
             CONFIG_MATCHES="true"
           fi
 
@@ -252,6 +270,12 @@ jobs:
           bash services/auth-server/deploy.sh
         env:
           ENV: ${{ env.ENV }}
+          AUTH_SERVER_FIRST_PARTY_ENABLED: ${{ vars.AUTH_SERVER_FIRST_PARTY_ENABLED || 'false' }}
+          AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED: ${{ vars.AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED || 'false' }}
+          AUTH_SERVER_INVITATION_EMAIL_OTP_CLIENT_ID: ${{ vars.AUTH_SERVER_INVITATION_EMAIL_OTP_CLIENT_ID || '' }}
+          AUTH_SERVER_INVITATION_EMAIL_OTP_ROOMS_ORIGIN: ${{ vars.AUTH_SERVER_INVITATION_EMAIL_OTP_ROOMS_ORIGIN || '' }}
+          AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET_REF: ${{ vars.AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET_REF || '' }}
+          ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF: ${{ vars.ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF || '' }}
           AUTH_SERVER_INTERNAL_AUTH_ENABLED: ${{ vars.AUTH_SERVER_INTERNAL_AUTH_ENABLED || 'false' }}
           AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED: ${{ vars.AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED || 'false' }}
           AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS: ${{ vars.AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS || '' }}

@@ -64,6 +64,7 @@ import {
   type PasskeyDeps
 } from './passkeys'
 import type { PersonAuthStorePort } from './store/port'
+import type { FirstPartyLoginContext } from '../first-party/protocol'
 import type { TotpSecretCipherPort } from './totp-cipher'
 import {
   enforceRateLimit,
@@ -75,6 +76,7 @@ import { startTotpEnrollment, verifyTotp, type TotpDeps } from './totp'
 
 export type PersonAuthHandlerDeps = Omit<MagicLinkDeps, 'store' | 'config'> & {
   internalLoginEnabled: () => boolean
+  resolveProductContext?: (returnTo: string | null) => Promise<FirstPartyLoginContext | null>
   store: PersonAuthStorePort
   config: AuthServerPersonAuthConfig
   invitations: InvitationAcceptancePort
@@ -281,6 +283,7 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
       if (request.method !== 'GET') return methodNotAllowed('GET')
 
       return renderLoginPageResponse(200, {
+        productContext: await deps.resolveProductContext?.(sanitizeReturnTo(request.url.searchParams.get('return_to'))) ?? undefined,
         returnTo: sanitizeReturnTo(request.url.searchParams.get('return_to')),
         internalLoginUrl: corporateLoginUrl(deps, request.url.searchParams.get('return_to'))
       })
@@ -310,6 +313,7 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
       if (result.status === 'invalid_email') {
         return wantsHtml
           ? renderLoginPageResponse(400, {
+              productContext: await deps.resolveProductContext?.(sanitizeReturnTo(readField(request, 'return_to'))) ?? undefined,
               returnTo: sanitizeReturnTo(readField(request, 'return_to')),
               internalLoginUrl: corporateLoginUrl(deps, readField(request, 'return_to')),
               error: 'invalid_email'

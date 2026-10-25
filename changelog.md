@@ -1,10 +1,14 @@
 # changelog.md
 
+[Historial interno](docs/changelog/internal/README.md).
+
+## 2026-10-25 — Auth: Rooms primero y login V4
+
+Foundation OIDC y login V4 locales; Greenhouse diferido2063. Consumer y guest OTP probados con navegador/PG.1833 en ejecución con evaluación propia, sin contratar pentest por decisión de Julio; corregido retorno inseguro magiclink, agregadas señales y wiring durable del deploy, senderOTP exclusivo sin tracking. Migraciones y registroRP preparados en cloud, gatesOFF y sin correo real. [Revisión y cobertura pendiente](docs/audits/auth-server/2026-10-25-independent-protocol-review.md).
+
 ## 2026-10-25 — Rooms: contenido versionado y contrato de invitación
 
 Autoría V2 local: borradores incompletos por perfil, importación previa con reporte, bloques/relaciones y publicación textual validada.66 pruebas y recuperación histórica PASS; sin editor/medios nuevos ni activación pública. Contrato elegido de acceso invitado: un correo Resend con enlace+código, entrada en Rooms, vencimiento y revocación; implementación coordinada2066/2067. [Evidencia](docs/audits/rooms/2026-10-25-versioned-content-authoring.md).
-
-[Historial interno](docs/changelog/internal/README.md).
 
 ## 2026-10-25 — Rooms: base durable, experiencia por rol y motion (TASK-2058/2059/2060)
 
@@ -598,33 +602,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
   binoculares, metrónomo, sello e imán, bases planas aprobadas; prueba Flare/Pro con originales y alfa derivado.
   Ajuste adicional Pro y avisos geométricos documentados. Operador seleccionó Flare para esta ronda;
   comparación preservada, sin publicación del catálogo ni cambio del default global.
-
-## 2026-10-12 — Medios: composición integral y operación programática acompañada
-
-- [Modelo de línea §1.1](docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios):
-  estrategia, compra/operación, creatividad, medición y gestión de inversión bajo Efeonce; taxonomía/estados conservados.
-- Modelo programático V1.5 y pricing V1.4: ruta DSP directa acompañada en evaluación, RACI/gate, calibración y fee
-  incremental en cuenta integral; tarifa aprobada sin cambio, medios/externos separados y sin doble cobro.
-- [Evidencia HubSpot 12-10](docs/audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md): transcripción completa,
-  demo 21-10 registrada; ejemplos de fees no son cotización ni crédito. Catálogos, ADR/índices, manual/contexto y
-  skills Codex/Claude sincronizados. Sólo documentación: sin contrato, compra, integración, envío o publicación.
-
-## 2026-10-12 — Insights: el informe SEO puede medir sólo el contenido que Efeonce trabaja
-
-- Nuevo en `greenhouse_growth`: `seo_content_scope_versions`, el alcance de contenido de una organización (reglas de
-  ruta, versiones append-only). Aplicada a la base compartida. Berel tiene su alcance v1: `/articulos`, `/tutoriales`,
-  `/inspiracion` y dos guías de la raíz.
-- Comando nuevo `pnpm seo:content-scope`: muestra lo que un alcance mediría y las páginas que deja fuera; con
-  `--apply` lo fija.
-- Con alcance, el capítulo de búsqueda de Efeonce Insights mide sólo esas páginas, lo dice en la portada blanca, deja
-  el sitio completo como contexto y saca el tráfico estimado del dominio a los límites. Sin alcance, el informe no
-  cambia.
-- Cambian para toda organización: la línea de clics por semana dibuja sólo semanas completas (los últimos días del
-  mes ya no aparecen como una caída) y tres textos de Analytics pierden «al sitio» («Visitas orgánicas», «Visitas
-  desde buscadores», «Visitas orgánicas, con y sin interacción»).
-- Una página con un nombre más largo que la columna del informe ya no hace fallar el render: se abrevia por el
-  comienzo y el final de su ruta.
-- Berel: logos oficiales cargados en la organización (el anterior era una imagen generada con IA) y portada fijada en
-  blanca. `scripts/insights/preview-edition.ts` acepta `--cover=light|dark`.
-- **Desplegado** en Vercel staging y en el `ops-worker` (`d9a1c6a2d`). **Vercel Production sin release**: las
-  ediciones creadas desde el portal de producción siguen midiendo el sitio completo de Berel (`TASK-2033`).

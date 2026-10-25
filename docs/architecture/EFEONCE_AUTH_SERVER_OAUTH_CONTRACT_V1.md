@@ -1,5 +1,8 @@
 # Efeonce Auth Server — OAuth Protocol Contract V1
 
+> Perfil Rooms first-party (TASK-1834): callback incluye `iss` según RFC 9207; el consumidor exige issuer exacto antes del canje, además de validar state/nonce/PKCE y firma del ID token.
+
+
 > **Tipo:** contrato técnico (endpoints, claims, tablas, invariantes) del authorization server propio
 > `https://auth.efeonce.org` — **TASK-1829** (EPIC-044 U02).
 > **Estado:** OAuth y personas activos; emisión/refresh/revocación internos verificados por TASK-1836 y
@@ -12,6 +15,10 @@
 > Contrato de federación: [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md).
 > Código: `src/lib/auth-server/oauth/**` (dominio, server-only) · `services/auth-server/app.ts` (handler) ·
 > `services/auth-server/server.ts` (cableado Cloud Run).
+
+## Extensión first-party en implementación — 2026-10-25
+
+TASK-1834 añade un carril de identidad separado de MCP; contrato: [Rooms primero y login V4](EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md). Registro server-owned, scope openid, ID token y handle opaco por RP; sin refresh ni userinfo en este corte. Flag OFF por defecto, sin rollout declarado. Las tablas y gv de este contrato MCP no se reutilizan para simular identidad.
 
 ## 1. Decisión en una línea
 

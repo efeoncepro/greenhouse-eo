@@ -1,0 +1,71 @@
+{
+  "origin": "http://127.0.0.1:19064",
+  "checkedAt": "2026-10-25T21:38:01.451Z",
+  "scope": "fictional-local-renderers-no-authentication",
+  "checks": [
+    {
+      "path": "/login",
+      "javaScriptEnabled": true,
+      "colorScheme": "dark",
+      "reducedMotion": "reduce",
+      "status": 200,
+      "result": "pass"
+    },
+    {
+      "path": "/login/rooms",
+      "javaScriptEnabled": true,
+      "colorScheme": "dark",
+      "reducedMotion": "reduce",
+      "status": 200,
+      "result": "pass"
+    },
+    {
+      "path": "/login/invalid-email",
+      "javaScriptEnabled": true,
+      "colorScheme": "dark",
+      "reducedMotion": "reduce",
+      "status": 400,
+      "result": "pass"
+    },
+    {
+      "path": "/consent",
+      "javaScriptEnabled": true,
+      "colorScheme": "dark",
+      "reducedMotion": "reduce",
+      "status": 200,
+      "result": "pass"
+    },
+    {
+      "path": "/login",
+      "javaScriptEnabled": false,
+      "colorScheme": "dark",
+      "reducedMotion": "reduce",
+      "status": 200,
+      "result": "pass"
+    },
+    {
+      "path": "/login/rooms",
+      "javaScriptEnabled": false,
+      "colorScheme": "dark",
+      "reducedMotion": "reduce",
+      "status": 200,
+      "result": "pass"
+    },
+    {
+      "path": "/login/invalid-email",
+      "javaScriptEnabled": false,
+      "colorScheme": "dark",
+      "reducedMotion": "reduce",
+      "status": 400,
+      "result": "pass"
+    },
+    {
+      "path": "/consent",
+      "javaScriptEnabled": false,
+      "colorScheme": "dark",
+      "reducedMotion": "reduce",
+      "status": 200,
+      "result": "pass"
+    }
+  ]
+}

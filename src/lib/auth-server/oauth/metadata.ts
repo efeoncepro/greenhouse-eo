@@ -60,7 +60,7 @@ export const buildAuthorizationServerMetadata = (config: AuthServerOAuthConfig):
     registration_endpoint: at(OAUTH_ENDPOINT_PATHS.register),
     revocation_endpoint: at(OAUTH_ENDPOINT_PATHS.revoke),
     introspection_endpoint: at(OAUTH_ENDPOINT_PATHS.introspect),
-    scopes_supported: [...PUBLISHED_SCOPES_SUPPORTED],
+    scopes_supported: [...PUBLISHED_SCOPES_SUPPORTED, ...(config.firstPartyEnabled ? ['openid'] : [])],
     response_types_supported: ['code'],
     response_modes_supported: ['query'],
     grant_types_supported: ['authorization_code', 'refresh_token'],
@@ -77,5 +77,7 @@ export const buildAuthorizationServerMetadata = (config: AuthServerOAuthConfig):
 export const buildOpenIdConfiguration = (config: AuthServerOAuthConfig): OpenIdConfiguration => ({
   ...buildAuthorizationServerMetadata(config),
   id_token_signing_alg_values_supported: ['ES256'],
-  claims_supported: ['iss', 'sub', 'aud', 'azp', 'scope', 'gv', 'exp', 'iat', 'jti']
+  claims_supported: config.firstPartyEnabled
+    ? ['iss', 'sub', 'aud', 'iat', 'exp', 'auth_time', 'nonce']
+    : ['iss', 'sub', 'aud', 'azp', 'scope', 'gv', 'exp', 'iat', 'jti']
 })
