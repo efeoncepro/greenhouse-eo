@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Plan/ADR aceptados y hookPASS; adaptercloud en implementación. Readback SQL16.14 confirma100máximas/3reservadas/10actuales y Monitoring24h pico42. PG16aislado migraciones19tablasPASS, suite/restore en ejecución. Sin provisioningRooms ni canary; refsclientsecret/HMAC propiedadpeerAuth creadas por ella, otrasrefsRooms pendientes. FlagsOFF.`
+- Status real: `Adapter cloud commit7276df9;171/171 pruebas PG16 PASS, lint/types/build PASS. WIF/SA y seis secretos Rooms v1 preparados con readback; sin claves de SA ni acceso migrator en runtime. Restore aislado19tablas/1827filas con owners/ACL/constraints/triggers conservados. DBcloud creada con5migraciones/19tablas;rolesconn8/1 sinprivilegiosaltos/membresías y8negativasruntimePASS. UI integrada103checksPASS; recuperaciónpending nueva enregresión. Canaryproductivo pendiente. FlagsOFF.`
 - Rank: `Foundation cloud después de TASK-2065/2066; canary integrado condicionado a issuer TASK-1834/2067 y consumer TASK-2068`
 - Domain: `platform|identity|data|ops`
 - Blocked by: `none`
@@ -45,7 +45,7 @@ aislamiento y no resolvería configuración, capacidad o recuperación.
 
 ## Architecture Alignment
 
-- `docs/architecture/rooms/EFEONCE_ROOMS_CLOUD_RUNTIME_PILOT_DECISION_V1.md` — Proposed; aceptar antes del cambio irreversible.
+- `docs/architecture/rooms/EFEONCE_ROOMS_CLOUD_RUNTIME_PILOT_DECISION_V1.md` — Accepted bajo autorización humana de infraestructura/piloto; activación conserva gates.
 - `docs/architecture/rooms/EFEONCE_ROOMS_ARCHITECTURE_V1.md`.
 - `docs/architecture/rooms/EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md`.
 - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`.
@@ -208,8 +208,19 @@ no borrando DB ni revirtiendo migraciones vivas. Owners Platform/Rooms/Auth cons
 
 ## Verification
 
-Esta creación sólo verifica documentación. Ejecutar `pnpm task:lint --task TASK-2069`; durante ejecución,
-usar la secuencia del plan y guardar pruebas sanitizadas. Ningún resultado cloud está acreditado aquí.
+Corte actual: `7276df9` implementa el adapter. QA independiente ejecutó171/171 pruebas contra PostgreSQL16,
+cero skips; lint/types/build PASS. Pool inicia con statement10s, idle-transacción15s e idle-sesión60s.
+Recovery local conserva19tablas,1827filas, owners, ACL, constraints y triggers.
+
+Provisión ejecutada: SA runtime exclusiva, WIF limitado a owner/proyecto/production, Cloud SQL Client y
+lectura de cinco secretos runtime; migrator separado sin acceso de la SA. Readback: cero claves de SA.
+Secretos creados con payload sólo en memoria/stdin y versiones explícitas; no se imprimieron valores.
+Esto acredita configuración cloud, no conectividad WIF/SQL desde Vercel ni recepción del correo.
+Bootstrap cloud aplicado y leído:19tablas,5migraciones,ACL exactos y8 negativas DDL/identidad/inmutabilidad.
+Las contraseñas se inicializaron por SQLAdmin users.update; ninguna pasó por SQL/logs ni se alteraron
+settings globales. La API omite type para BUILT_IN por defecto; una interrupción previa se reconcilió
+explícitamente sólo para estos dos roles recién creados, antes de cualquier uso. No se rotaron terceros.
+Canary Vercel/WIF y comprobación cruzada de permisos PUBLIC vecinos pendientes.
 
 ## Closing Protocol
 

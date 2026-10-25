@@ -76,3 +76,34 @@ reader. Login OFF conserva revocación local durable; fallo DB se devuelve503, n
 Presencia de cookie interna bloquea verify antes de llamar issuer; start/recovery informan entryGate.
 Guest session conserva la edición inicial autorizada; retorno interno limitado a patrones explícitos Rooms.
 Resultado: **160/160 pruebas, cero skips**, lint/types/build PASS. UI humana y cloud aún pendientes.
+
+## Continuación — aislamiento cloud y cabeceras de entrada
+
+Commit `7276df9`: WIF exclusivo Production con validación de firma, issuer, audience, subject, owner y
+project; sin ADC/key o credencial migrator en runtime. Secret refs versionadas y cache acotada, errores
+sanitizados, pool2 y rol mínimo comprobado antes de servir. Pruebas SDK ejercitan fallo de inicialización
+y cleanup tardío; resolver de autoridad no consulta secretos bajo lock de organización.
+
+QA independiente: **171/171 pruebas PostgreSQL16, cero skips**; build/lint/types PASS. Se verificaron
+statement10s, idle-transacción15s e idle-sesión60s en SQL real local. Restore conserva owners/ACL y datos.
+CSP con nonce por petición en /invite y /rooms, no-referrer/no-store y sin unsafe-inline para scripts;
+test rechaza nonce suministrado por caller. UI integrada y ausencia de filtraciones browser siguen en QA.
+
+WIF/SA y secretos cloud preparados OFF; DB cloud, WAF activo y correo real todavía no acreditados.
+Esta revisión interna focalizada no equivale a pentest externo ni certificación de seguridad.
+
+## Continuación — prueba humana integrada y recuperación
+
+CSP/origin `56e1d45`: Next conserva la URL original mediante skipProxyUrlNormalize; sin relajar el
+origin permitido. El harness real local issuer19336/Next3210 completó103 comprobaciones: OTP incorrecto
+y correcto, reload sin correo adicional, lector V2/evidencia, OIDC, crear/reemitir/revocar, cuatro anchos
+y200%, accesibilidad/foco y ausencia de violaciones CSP. Buzón RAM sintético; ningún envío real.
+
+GVC público:8 frames/4viewports PASS; artefactos
+`.captures/2026-10-25T22-23-26_rooms-invitation-entry` en Greenhouse. Aceptación humana aún pendiente.
+
+El recorrido encontró reemisión antes del cooldown del issuer. `cac5311` incorpora cooldown60s visible
+y operación retryDelivery para recuperar el mismo delivery_request_id sin rotar token/version; replay
+no llama al issuer. Suite178/178 PASS, lint/typesPASS. La UI de esta recuperación sigue en regresión.
+Cloud DB ya dispone19tablas/ACL mínimos y8negativas runtime; WAF activo, WIF desdeVercel y correo real
+permanecen pendientes. Infra preparada no significa piloto activado.

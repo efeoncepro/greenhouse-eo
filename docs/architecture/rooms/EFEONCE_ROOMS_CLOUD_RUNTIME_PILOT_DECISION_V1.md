@@ -6,7 +6,7 @@
 - Scope: `TASK-2069; PostgreSQL Rooms, Vercel, WIF, secretos y activación controlada`
 - Reversibility: `two-way-but-slow`
 - Confidence: `medium`
-- Validated as of: `2026-10-25; canon/código local y readback cloud proporcionado por raíz, sin writes cloud en esta preparación`
+- Validated as of: `2026-10-25; adapter7276df9, QA171PASS y WIF/SA/secretos preparados OFF; DB y canary pendientes`
 
 ## Context
 
@@ -74,7 +74,9 @@ acceso de Rooms a tablas Auth. El issuer consulta autoridad Rooms por HTTP, nunc
 
 ### Secretos y configuración
 
-Los siguientes seis nombres son propuestas, no recursos creados ni secretos leídos:
+Los siguientes seis secretos están creados en versión1; cinco de consumo runtime y uno exclusivo de
+tooling migrador. Client-secret fue registrado por el peer Auth; raíz creó los otros cinco. Readback
+verificó valores sin imprimirlos y acceso IAM por recurso. No equivale a consumo exitoso desde Vercel:
 
 | Secret Manager ID propuesto | Consumer |
 | --- | --- |
@@ -88,8 +90,8 @@ Los siguientes seis nombres son propuestas, no recursos creados ni secretos leí
 Usar referencias a versiones explícitas y resolverlas efectivamente en servidor. El contrato nuevo del
 adapter puede exponer `ROOMS_POSTGRES_PASSWORD_SECRET_REF` para runtime y
 `ROOMS_POSTGRES_MIGRATOR_PASSWORD_SECRET_REF` sólo en tooling; los cuatro nombres existentes reciben
-su correspondiente sufijo `_SECRET_REF`. Los readers actuales no implementan resolución de refs:
-declarar una referencia o conceder IAM no monta su valor. Construir servicios sólo tras resolver la
+su correspondiente sufijo `_SECRET_REF`. El adapter7276df9 implementa resolución efectiva de refs; declarar una referencia o conceder IAM
+por sí solo no monta su valor. Construir servicios sólo tras resolver la
 configuración, con errores sanitizados y cache acotada. Nunca usar `NEXT_PUBLIC_*` para estos valores.
 
 El perfil cloud usa nombre de instancia, DB, usuario y WIF explícitos; no admite fallback a `.local`,

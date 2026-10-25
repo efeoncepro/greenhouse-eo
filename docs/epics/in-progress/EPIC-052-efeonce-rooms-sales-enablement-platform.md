@@ -60,6 +60,8 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 ## Child Tasks
 
+[TASK-2069](../../tasks/in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md): adapter WIF/Cloud SQL y secretos separados; identidad cloud preparada con flags OFF; DB y canary integrado en ejecución.
+
 [TASK-2068](../../tasks/in-progress/TASK-2068-rooms-invitation-and-guest-experience.md): entrada con código, lectura guest y gestión contextual; contratos locales listos; UI OTP/textoV2 en ejecución, media protegida pendiente R05.
 
 [TASK-2065](../../tasks/complete/TASK-2065-rooms-efeonce-id-consumer.md): consumidor OIDC interno; foundation1834/login2064.
