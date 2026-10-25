@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Backend local 8308077+d23e4d6 y hardening fec6d32 verificados: 144/144 pruebas, issuer OTP real + ambos PostgreSQL + Chrome PASS, recuperación de 19 tablas y rollback en clon PASS. UN mensaje inicial contiene enlace/código; abrir no envía otro. OFF; sin correo real ni cloud. Continúa in-progress para cerrar handoff/contratos de gestión UI TASK-2068 (recovery de transacción ya verificado) y separar los gates de entrega real/tracking antes de rollout.`
+- Status real: `Backend local y hardening fec6d32+4805c6d verificados: 151/151 pruebas; issuer OTP real + ambos PostgreSQL + Chrome y recuperación de19 tablas/rollback en clon PASS en corte previo. UN mensaje inicial contiene enlace/código; abrir no envía otro. OFF; sin correo real ni cloud. Gestión/coexistencia para UI TASK-2068 en implementación; recovery ya verificado. Perímetro Vercel preparado, no activado; entrega/tracking y rollout pendientes.`
 - Rank: `Después del contrato TASK-2067; coordinar primitives de sesión/binding con TASK-2065 sin depender de su journey OIDC`
 - Domain: `identity|platform|data`
 - Blocked by: `none`
@@ -300,6 +300,10 @@ Peer Identity TASK-2067/1834, sesión Rooms2065 y dueño Resend/remitente. Reuti
 ## Verification
 
 Refuerzo por solicitud de seguridad del operador: [auditoría del token](../../audits/rooms/2026-10-25-invitation-token-hardening.md). Techo24h create/reissue y cuotas por invitación/realm/acción; presupuesto global anterior retirado.144testsPASS0skip, lint/types/buildPASS. WAF por IP confiable y controles browser/correo son gates de activación pendientes.
+
+Continuación4805c6d: sesión vigente autoriza el comando; principal/membresía/grants persistidos fijan
+vigencia delegada, con techo24h.151testsPASS0skip y lint/types/buildPASS. Propuesta concreta del perímetro:
+[`ROOMS_VERCEL_INVITATION_PERIMETER_V1.md`](../../operations/ROOMS_VERCEL_INVITATION_PERIMETER_V1.md), sin activación.
 
 Evidencia del corte local: [auditoría de invitaciones](../../audits/rooms/2026-10-25-tokenized-invitations.md).
 Los criterios tildados se acreditan mediante SQL/HTTP y el harness de dos runtimes, no por envío real.

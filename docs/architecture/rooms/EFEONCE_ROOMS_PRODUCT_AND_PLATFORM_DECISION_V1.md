@@ -191,6 +191,9 @@ Owner: Rooms Platform; issuer OTP sigue TASK-2067. No amplía acceso ni cambia e
 - Token opaco de 256 bits CSPRNG, sin IDs/correo/rol codificados. No es una credencial de lectura.
 - Nueva emisión/reemisión exige vencimiento como máximo 24 horas desde el reloj DB y dentro de la
   vigencia de los permisos delegados. Es un techo de seguridad, no una extensión automática del grant.
+  La sesión interna debe estar vigente para autorizar el comando. El horizonte delegado se calcula con
+  principal, membresía y grants persistidos, no con la duración corta de esa sesión; todos se revalidan
+  en la misma transacción y en cada lectura invitada. Una sesión vencida no puede emitir ni reemitir.
   No hay invitaciones productivas previas: los registros del harness son sintéticos y no se migran a cloud.
 - Cada reemisión rota token/version y deja inelegibles enlaces/transacciones/sesiones anteriores.
   OTP sigue temporal/de un uso; el enlace puede iniciar una nueva verificación mientras siga vigente,

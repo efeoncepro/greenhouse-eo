@@ -54,3 +54,16 @@ y [OWASP sesiones](https://cheatsheetseries.owasp.org/cheatsheets/Session_Manage
 Ocho pruebas focalizadas PG del corte: cuatro de expiración/tampering/OTP y cuatro de cuotas. La suite
 conserva los negativos previos de firma/proof, revocación, aislamiento y recuperación. No cambio de schema.
 Commit runtime `fec6d32`, árbol runtime limpio; sin push, despliegue ni envío en este corte.
+
+## Continuación — vigencia de la delegación
+
+Commit `4805c6d`: una sesión interna vigente autoriza emitir/reemitir, pero su duración corta no recorta
+por sí sola la invitación. El techo sigue siendo24h y el mínimo de principal, membresía y grants
+persistidos, comprobado en la misma transacción; sesión vencida rechaza el comando.
+
+Siete pruebas PostgreSQL adicionales demuestran creación/reemisión de30min con sesión5min y autoridad2h;
+sesión vencida y cada techo persistido insuficiente rechazan sin cambios parciales ni llamadas al issuer.
+Resultado independiente root: **151/151 pruebas, cero skips**, lint/typecheck/build PASS.
+
+Perímetro: [propuesta Vercel](../../operations/ROOMS_VERCEL_INVITATION_PERIMETER_V1.md) preparada con plan Pro
+verificado por API y cuotas por IP nativa. No activada; no se amplía la afirmación de cobertura productiva.
