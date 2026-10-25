@@ -350,7 +350,15 @@
     },
     {
      "kind": "pullquote",
-     "text": "La publicidad compra la primera mirada; el contenido gana la decisión.",
+     "text": [
+      {
+       "text": "La publicidad compra la primera mirada; "
+      },
+      {
+       "text": "el contenido gana la decisión.",
+       "strong": true
+      }
+     ],
      "cite": "Cómo lo pensamos en Efeonce"
     },
     {
@@ -423,7 +431,18 @@
     },
     {
      "kind": "pullquote",
-     "text": "Lo que tú controlas es la calidad de lo que le das: creatividades, páginas de destino, contenido y datos de conversión reales."
+     "text": [
+      {
+       "text": "Lo que tú controlas es "
+      },
+      {
+       "text": "la calidad de lo que le das",
+       "strong": true
+      },
+      {
+       "text": ": creatividades, páginas de destino, contenido y datos de conversión reales."
+      }
+     ]
     },
     {
      "kind": "paragraph",

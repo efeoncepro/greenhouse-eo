@@ -67,6 +67,7 @@ Canal (dónde nace).
 - Docs: `docs/documentation/public-site/public-site-content-factory-end-to-end.md`, `content-factory-golden-examples/` (README + `gutenberg-post-ai-revops-draft.json`), `gutenberg-post-authoring-recipes.md`.
 - **Refresh de evergreen** (`../modules/04`): `refresh-plan` / `existing-post-refresh-draft-plan` — opéralo vía la skill dueña.
 - **Publicar al blog WP:** write path `wpcli eval-file` (writes normalmente OFF), autor WP user 1; gotchas: TOC Yoast anclas `h-{slug}`, UTF-8 nowdoc nunca `\uXXXX` (ver TASK-1123 / reference de publish).
+- **Destacados y citas en el post (editorial-blocks 0.8.0, 2026-10-25):** `pullquote` es Destacado por defecto (nuestra tesis, sin comillas, remate en `strong` como idea completa) y Cita sólo con `variant: 'cita'` + `cite` de un autor real; 1–2 por post, nunca seguidos. Reglas: `copywriting` → `efeonce/AGENTIC_BLOGPOST_AUTHORING.md` §«Destacados y citas del blog»; spec: `efeonce-public-site-wordpress` → `content-factory-gutenberg.md`.
 - **Regla dura:** nunca publiques output crudo del factory — pasa por el gate de REVIEW (`../modules/02`) + barra de insight/voz.
 
 ## Ebooks / lead magnets (mecánica real)

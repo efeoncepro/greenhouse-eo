@@ -59,7 +59,15 @@
     },
     {
      "kind": "pullquote",
-     "text": "El inbound no es una táctica ni un canal. Es un orden de prioridades."
+     "text": [
+      {
+       "text": "El inbound no es una táctica ni un canal. "
+      },
+      {
+       "text": "Es un orden de prioridades.",
+       "strong": true
+      }
+     ]
     },
     {
      "kind": "paragraph",
@@ -490,7 +498,15 @@
     },
     {
      "kind": "pullquote",
-     "text": "El inbound que sólo se mide en visitas al blog va a mostrar números cada vez más bajos, aunque esté funcionando."
+     "text": [
+      {
+       "text": "El inbound que sólo se mide en visitas al blog "
+      },
+      {
+       "text": "va a mostrar números cada vez más bajos, aunque esté funcionando.",
+       "strong": true
+      }
+     ]
     },
     {
      "kind": "paragraph",

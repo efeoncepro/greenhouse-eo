@@ -11,7 +11,8 @@ legacy block debt before preparing any `post_draft_gutenberg` or
 ## Efeonce editorial styles (since 2026-10-24)
 
 Ohio barely styles native blocks, so a post made only of paragraphs and lists looks unstyled. Since 2026-10-24 the
-plugin `efeonce-editorial-blocks` registers four Efeonce styles on native blocks. They are not new blocks: an editor
+plugin `efeonce-editorial-blocks` registers Efeonce styles on native blocks (since 0.8.0, four of them on
+`core/pullquote`: Destacado Efeonce, Destacado claro, Cita Efeonce and Cita clara). They are not new blocks: an editor
 can pick them in the block's «Styles» panel, and Content Factory emits them from the article spec.
 
 | Style | Native block | When to use it | In the spec |
@@ -129,8 +130,9 @@ Recommended enrichment:
   Contract: `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
 - `core/quote` for actual quotes, strong principles outside the Glitch format,
   or temporary POV fallback when no custom block is available.
-- `core/pullquote` for a short, high-signal editorial callout, always with the
-  Destacado Efeonce style (see «Efeonce editorial styles» above).
+- `core/pullquote` for a short, high-signal editorial callout, always with an
+  Efeonce style: a Destacado for a thesis, a Cita for a real attributed quote
+  (see «Efeonce editorial styles» above).
 - `core/details` for compact FAQ/disclosure moments inside a section when the
   summary must remain visible and the full answer should stay in HTML without a
   custom block.
@@ -357,12 +359,26 @@ deserve visual emphasis. They are allowed in generated drafts and should be
 preserved during refresh unless the refresh explicitly changes that section.
 
 ```html
-<!-- wp:pullquote -->
-<figure class="wp-block-pullquote">
-  <blockquote><p>El loop no es una campaña: es un sistema que aprende en cada vuelta.</p></blockquote>
+<!-- wp:pullquote {"className":"is-style-efeonce-destacado"} -->
+<figure class="wp-block-pullquote is-style-efeonce-destacado">
+  <blockquote><p>El loop no es una campaña: <strong>es un sistema que aprende en cada vuelta</strong>.</p></blockquote>
 </figure>
 <!-- /wp:pullquote -->
 ```
+
+Since 0.8.0 (in production 2026-10-25):
+
+- **Destacado** (`is-style-efeonce-destacado`, navy; `-destacado-claro`, paper):
+  no quotation marks. The render filter replaces the final period with the
+  sphere (no sphere if the line ends in «?», «!» or «…»: `is-eo-sin-esfera`) and
+  adds `is-eo-corta` to lines of 80 characters or less. Bricolage 400 opens and
+  `<strong>` (700) lands the idea; without `<strong>` the whole line is 700. In
+  the spec, the landing phrase is a segment `{ "text": "…", "strong": true }`.
+- **Cita** (`is-style-efeonce-cita`, `-cita-clara`): a real quote with its
+  author in `<cite>`. In the spec, `variant: "cita"` requires `cite`
+  (`content_factory_article_pullquote_cita_requires_cite`).
+- `tone: "light"` picks the paper variant of either one; default is `dark`.
+- How to choose and write them: `docs/manual-de-uso/public-site/usar-destacados-y-citas.md`.
 
 ### Images
 

@@ -1,9 +1,9 @@
 # Operar Public Site y Content Factory
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 3.1
+> **Version:** 3.2
 > **Creado:** 2026-06-15 por Codex
-> **Ultima actualizacion:** 2026-10-24 por Claude (imágenes por artículo: set de 3 archivos y 3 subidas)
+> **Ultima actualizacion:** 2026-10-25 por Claude (Destacados y Citas de 0.8.0: `variant`, `tone`, remate en `strong` y purga de caché)
 > **Modulo:** Public Site / Content Factory / Astro binding
 > **Comandos/API:** `pnpm public-website:content-factory:{ideate,author,run,validate,plan}`, `pnpm public-website:*`, `GET /api/admin/public-site/binding`
 > **Documentacion relacionada:** `docs/operations/public-site-content-factory/AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md`, `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`, `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`, `docs/documentation/public-site/wordpress-blog-content-hub-search.md`, `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
@@ -108,8 +108,13 @@ Desde el 2026-10-24 todo post nuevo o refrescado usa los estilos Efeonce sobre b
 párrafos no se publica.
 
 1. **En la spec del artículo**, usa:
-   - `{ "kind": "pullquote", "text": "…", "cite": "…" }`: sale siempre como Destacado. Pon uno o dos por post y saca la
-     oración del párrafo de al lado.
+   - `{ "kind": "pullquote", "text": [...] }` para un **Destacado**: la tesis de una sección, sin comillas. Pon uno o
+     dos por post, saca la oración del párrafo de al lado y marca el remate con un segmento
+     `{ "text": "…", "strong": true }`. `"tone": "light"` lo deja en papel (Destacado claro); por defecto es navy.
+   - `{ "kind": "pullquote", "variant": "cita", "text": "…", "cite": [...] }` para una **Cita** real de alguien con
+     nombre (Cita clara con `"tone": "light"`). Sin `cite` falla
+     (`content_factory_article_pullquote_cita_requires_cite`). Cuándo usar cada uno:
+     [usar Destacados y Citas](usar-destacados-y-citas.md).
    - `{ "kind": "list", "ordered": true, "style": "steps", "items": [...] }` para un paso a paso (Pasos).
    - `{ "kind": "list", "style": "box", "items": [...] }` para 2 a 6 ítems cortos (Recuadro): errores frecuentes, el
      mapa de un cluster o las invitaciones del cierre (Glitch → herramienta).
@@ -117,9 +122,9 @@ párrafos no se publica.
    - `{ "kind": "faq", "items": [{ "question", "answer" }] }` para las preguntas frecuentes. No agregues JSON-LD: el
      plugin arma el `FAQPage` desde los bloques visibles. Dos preguntas iguales hacen fallar el render
      (`content_factory_article_faq_question_duplicated`).
-2. **En el editor de WordPress**, los mismos estilos aparecen en el panel «Estilos» del bloque: «Destacado Efeonce» en
-   la cita destacada, «Pasos» y «Recuadro» en la lista, «Pregunta frecuente» en el desplegable. Elegir «Pregunta
-   frecuente» ya suma esa pregunta al schema.
+2. **En el editor de WordPress**, los mismos estilos aparecen en el panel «Estilos» del bloque: «Destacado Efeonce»,
+   «Destacado claro», «Cita Efeonce» y «Cita clara» en la cita destacada; «Pasos» y «Recuadro» en la lista; «Pregunta
+   frecuente» en el desplegable. Elegir «Pregunta frecuente» ya suma esa pregunta al schema.
 3. **El color** de los estilos es el de la línea del tema del post. Si el tema no corresponde a la línea de la
    categoría (Paid Media es Voice; HubSpot es Revenue), fíjalo con
    `pnpm public-website:blog-home line <post> <línea>` ([manual](operar-portada-blog-por-cli.md)). Nunca cambies la
@@ -142,8 +147,9 @@ párrafos no se publica.
    imágenes y sólo si explican algo (SVG directo para infografías). Márgenes, diagramas y QA en vivo: el
    [inventario de imágenes por artículo](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md);
    la portada paso a paso: [producir la portada de un artículo](../creative/producir-portada-de-articulo-del-blog.md).
-6. **QA en vivo:** un solo `FAQPage`, el Destacado sin las líneas negras de Ohio, los Pasos y el Recuadro visibles en
-   modo claro y oscuro, y las imágenes centradas.
+6. **QA en vivo:** un solo `FAQPage`, el Destacado con su anillo y su esfera (sin comillas), los Pasos y el Recuadro
+   visibles en modo claro y oscuro, y las imágenes centradas. Si se acaba de desplegar el plugin, purga antes la caché
+   de Kinsta (`kinsta cache purge --all` por WP-CLI): el despliegue no la purga y la página sigue con el HTML viejo.
 
 ## Inspeccionar el sitio
 

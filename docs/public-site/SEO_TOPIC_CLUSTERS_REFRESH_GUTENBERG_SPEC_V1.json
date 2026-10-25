@@ -57,7 +57,15 @@
     },
     {
      "kind": "pullquote",
-     "text": "Dejas de escribir por palabra clave y empiezas a escribir por tema."
+     "text": [
+      {
+       "text": "Dejas de escribir por palabra clave "
+      },
+      {
+       "text": "y empiezas a escribir por tema.",
+       "strong": true
+      }
+     ]
     },
     {
      "kind": "paragraph",
@@ -472,7 +480,15 @@
     },
     {
      "kind": "pullquote",
-     "text": "No se trata de publicar más, sino de ordenar mejor lo que publicas."
+     "text": [
+      {
+       "text": "No se trata de publicar más, "
+      },
+      {
+       "text": "sino de ordenar mejor lo que publicas.",
+       "strong": true
+      }
+     ]
     },
     {
      "kind": "list",

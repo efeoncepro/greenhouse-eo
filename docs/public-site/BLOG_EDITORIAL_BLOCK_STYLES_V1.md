@@ -1,10 +1,10 @@
 # Estilos editoriales del blog (bloques nativos de Gutenberg)
 
 > **Tipo de documento:** Contrato de diseño y uso
-> **Versión:** 1.7
+> **Versión:** 1.8
 > **Creado:** 2026-10-24 por Claude, a partir de la revisión del operador sobre los posts de inbound, paid media y topic clusters
-> **Código:** plugin `efeonce-editorial-blocks`, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`). Estilos desde 0.4.0 (`f9b0d4d`); diseño vigente 0.4.2 (`710f0d1`); línea por post 0.4.3 (`cab3864`). Las versiones 0.4.4 a 0.5.9 no cambian estos estilos; **0.6.0** (`cd1fe57`, 2026-10-25) suma la Tabla Efeonce, el Destacado v2 y el bloque de código; **0.8.0** (2026-10-25, local, pendiente de despliegue) rehace el Destacado y suma Destacado claro, Cita y Cita clara
-> **Documentación funcional:** [recetas de autoría Gutenberg](../documentation/public-site/gutenberg-post-authoring-recipes.md) · **Manual:** [operar la Content Factory](../manual-de-uso/public-site/operar-public-site-content-factory.md#estilos-editoriales-y-preguntas-frecuentes)
+> **Código:** plugin `efeonce-editorial-blocks`, carpeta `includes/editorial/` (repo `efeonce-public-site-runtime`). Estilos desde 0.4.0 (`f9b0d4d`); diseño vigente 0.4.2 (`710f0d1`); línea por post 0.4.3 (`cab3864`). Las versiones 0.4.4 a 0.5.9 no cambian estos estilos; **0.6.0** (`cd1fe57`, 2026-10-25) suma la Tabla Efeonce, el Destacado v2 y el bloque de código; **0.8.0** (runtime `61251d1`, en producción desde el 2026-10-25) rehace el Destacado y suma Destacado claro, Cita y Cita clara
+> **Documentación funcional:** [recetas de autoría Gutenberg](../documentation/public-site/gutenberg-post-authoring-recipes.md) · **Manual:** [operar la Content Factory](../manual-de-uso/public-site/operar-public-site-content-factory.md#estilos-editoriales-y-preguntas-frecuentes) · [usar Destacados y Citas](../manual-de-uso/public-site/usar-destacados-y-citas.md)
 > **Estado:** en producción desde el 2026-10-24 (§En producción)
 > **Relacionado:** [preguntas frecuentes](BLOG_FAQ_BLOCK_ANALYSIS_V1.md) · `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
 
@@ -46,7 +46,8 @@ La guía de recetas ya pedía bloques de enriquecimiento, pero Ohio no les daba 
   - la pregunta de la FAQ queda en navy (blanco en oscuro), y el acento va en el anillo y la ×;
   - el número de Pasos va a 28 px (24 px en el celular) en el acento, sin disco de fondo.
 - **Sin esferas de adorno.**
-  - El Destacado (v2, 0.6.0) es un panel oscuro que corta la página clara: fondo `#001a33` (navy `#023c70` con el tema
+  - *Reemplazado por 0.8.0 (§0.8.0): el Destacado ya no lleva comillas ni DM Sans, y en oscuro queda en `#001a33`.*
+    El Destacado (v2, 0.6.0) era un panel oscuro que corta la página clara: fondo `#001a33` (navy `#023c70` con el tema
     en oscuro), radio de 24 px, un halo suave del acento en la esquina superior y comillas vectoriales de 52 px en el
     acento sobre oscuro. Son puntuación, no una esfera. El texto va en blanco, DM Sans 600 de 26 a 40 px (24 px en el
     celular), con un ancho de 26 caracteres, balanceado, y la fuente opcional en mayúsculas chicas. Reemplazó a la
@@ -55,7 +56,8 @@ La guía de recetas ya pedía bloques de enriquecimiento, pero Ohio no les daba 
   - El anillo de la FAQ nunca se rellena.
   - La esfera significa «lo decidido»: va una por pieza y nunca como viñeta.
 - **La tipografía sigue la del artículo de Ohio** (DM Sans e Inter). Pasar a Bricolage y Poppins queda para cuando se
-  migre la plantilla completa del artículo (decisión del operador, 2026-10-24).
+  migre la plantilla completa del artículo (decisión del operador, 2026-10-24). Excepción desde 0.8.0: el Destacado y
+  la Cita van en Bricolage.
 
 **Tabla Efeonce** (0.6.0, 2026-10-25). El operador pidió tablas que no se pegaran al borde derecho en el celular y con
 más presencia:
@@ -296,7 +298,7 @@ otro post con código) y `/author/jreysgo/`.
 **Rollback:** restaurar el `.tar` que imprimió el deploy (0.5.9) y, si hace falta, el contenido de los dos posts desde
 sus snapshots. Las 13 tablas viejas del blog siguen en `stripes`; pasarlas es una decisión de contenido post por post.
 
-## 0.8.0: Destacado y Cita (2026-10-25, aprobado por el operador; pendiente de despliegue)
+## 0.8.0: Destacado y Cita (2026-10-25, aprobado por el operador; en producción)
 
 **Por qué.** El operador: «no me gusta tanto… lo siento mal distribuido y como que le falta algo». El Destacado v2 usaba
 comillas sin decir quién hablaba (la forma prometía una cita y el contenido era una tesis), dejaba la mitad derecha
@@ -323,5 +325,25 @@ versiones claras pasan a `#023c70` con el anillo y la esfera en blanco y el halo
 **Degradado.** Una primera versión movió el halo y lo debilitó; el operador lo rechazó («se ve horrible así», plano).
 Todos los paneles conservan el halo amplio desde la esquina superior (120 % × 140 %, 22 % del acento; 14 % en papel).
 
-**Posts publicados.** 12 Destacados en 7 posts (244765, 245154, 245605, 246024, 248463, 249108, 252108), todos sin
-`strong`: con 0.8.0 salen completos en 700 hasta que se marque su remate (propuesta en la sesión del 2026-10-25).
+**Posts publicados.** 12 Destacados en 7 posts (244765, 245154, 245605, 246024, 248463, 249108, 252108). Antes del
+despliegue no tenían `strong`; ese mismo día se les marcó el remate (§En producción 0.8.0).
+
+**Content Factory** (greenhouse-eo `d3316c718`). La spec es
+`{ kind: 'pullquote', text, cite?, variant?: 'destacado' | 'cita', tone?: 'dark' | 'light' }`, con `text` y `cite` como
+rich text: el remate va en un segmento `{ "text": "…", "strong": true }`. `variant: 'cita'` sin `cite` falla con
+`content_factory_article_pullquote_cita_requires_cite`. Cómo elegir y escribir cada uno: el
+[manual de Destacados y Citas](../manual-de-uso/public-site/usar-destacados-y-citas.md).
+
+### En producción 0.8.0 (2026-10-25)
+
+- **Plugin.** Runtime `efeonce-public-site-runtime` `61251d1`, desplegado con
+  `pnpm public-website:blog-home deploy content-model --apply`.
+- **Caché.** El despliegue del plugin **no** purga la caché de página de Kinsta: los posts siguieron con el HTML viejo
+  hasta correr `kinsta cache purge --all` por WP-CLI. Después de cada despliegue de estilos, purgar y recién entonces
+  hacer QA.
+- **Posts.** Los 12 Destacados de los 7 posts quedaron con su remate en `strong`, con
+  `scripts/public-website/blog-post-content-republish.php` (FAQ idéntico, snapshots
+  `_gh_post_republish_<id>_20261025_16345x`). Las specs del repo (ICP, inbound, paid media, RUT, SEO y AEO, topic
+  clusters) quedaron iguales a lo publicado.
+- **Rollback:** restaurar el `.tar` que imprimió el deploy (la versión anterior), purgar la caché y, si hace falta,
+  el contenido de cada post desde su snapshot.

@@ -155,7 +155,15 @@
     },
     {
      "kind": "pullquote",
-     "text": "Si no escribes tú la comparación de tu categoría, la va a escribir otro, y la IA le va a creer a él."
+     "text": [
+      {
+       "text": "Si no escribes tú la comparación de tu categoría, "
+      },
+      {
+       "text": "la va a escribir otro, y la IA le va a creer a él.",
+       "strong": true
+      }
+     ]
     },
     {
      "kind": "paragraph",
@@ -315,7 +323,15 @@
     },
     {
      "kind": "pullquote",
-     "text": "Si Google no puede indexar tu página, ninguna IA de Google la va a citar."
+     "text": [
+      {
+       "text": "Si Google no puede indexar tu página, "
+      },
+      {
+       "text": "ninguna IA de Google la va a citar.",
+       "strong": true
+      }
+     ]
     },
     {
      "kind": "paragraph",

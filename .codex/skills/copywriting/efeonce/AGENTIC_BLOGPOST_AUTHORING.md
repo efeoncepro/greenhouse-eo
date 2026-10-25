@@ -123,6 +123,22 @@ conversación. Para la firma narrativa de Julio, aplicar la sección de hook de 
 - Evaluar el énfasis en desktop y móvil. Una frase que funciona como ancla en una línea puede volverse un muro de
   negrita al envolver en una pantalla estrecha.
 
+### Destacados y citas del blog (2026-10-25)
+
+En efeoncepro.com el bloque de cita destacada tiene dos papeles que no se mezclan:
+
+- **Destacado** (por defecto): la tesis en la que se apoya la sección, escrita por nosotros. **No es una cita**: sin
+  comillas. Abre liviano y remata en negrita (`strong`): el remate es una **idea completa** que se entiende a la
+  primera, nunca un fragmento críptico; la línea entera en negrita pierde la jerarquía. Funciona la estructura que
+  abre y cierra (la frase en dos tiempos); no funciona forzar un par de pregunta y respuesta. Idealmente ≤ 80
+  caracteres; si termina en `?`, `!` o `…` no lleva la esfera de cierre.
+- **Cita**: sólo una cita real de alguien, con su atribución (nombre, fuente, enlace). Nunca inventar el autor ni
+  usar Cita para una tesis propia.
+- 1–2 por artículo, nunca seguidos, y nunca repitiendo la oración del párrafo vecino (sacarla del párrafo).
+
+Forma del spec y estilos: `efeonce-public-site-wordpress` → `references/content-factory-gutenberg.md`; manual
+`docs/manual-de-uso/public-site/usar-destacados-y-citas.md`.
+
 ### Casos
 
 Clasificar cada caso como `real`, `anonimizado`, `compuesto` o `hipotético` y hacerlo visible cuando la distinción

@@ -686,16 +686,27 @@ vale en toda aplicación:
 ### A18. Bloques del artículo del blog (en producción desde 2026-10-24)
 
 Los posts del blog (WordPress con el tema Ohio) usan cuatro estilos Efeonce sobre bloques nativos de Gutenberg:
-Destacado (cita destacada), Pasos (lista ordenada), Recuadro (lista corta) y Pregunta frecuente (desplegable). Su
-diseño se revisó con esta skill el 2026-10-24:
+Destacado (la tesis de la sección), Pasos (lista ordenada), Recuadro (lista corta) y Pregunta frecuente (desplegable);
+desde la 0.8.0 (2026-10-25) el bloque de cita destacada suma la Cita (cita real con autor). Su diseño se revisó con
+esta skill el 2026-10-24:
 
 - **El acento es el de la línea del tema del post**, igual que en Marketing con Manzanitas y en la tarjeta del post en
   la portada del blog. Sale de un mismo resolvedor (`EO_CM_Util::line_of()`); cuando el tema no coincide con su
   categoría, el post lleva `_eo_line`.
 - **El acento sólo va en un gráfico (≥ 3:1) o en un texto de 24 px o más.** La pregunta de la FAQ queda en navy y el
   acento va en su anillo, que nunca se rellena; el número de Pasos va a 28 px en el acento, sin disco; el Destacado
-  abre con una barra de 48 × 3 px.
+  abría con una barra de 48 × 3 px (0.4.2), reemplazada en la 0.8.0 por la voz de abajo.
 - **Ninguna esfera como adorno ni como viñeta.** La viñeta del Recuadro es un guion corto en tinta.
+- **Destacado con la voz de la órbita (aplicación aprobada 2026-10-25, `efeonce-editorial-blocks` 0.8.0).** El
+  Destacado del blog usa la estructura anillo arriba, esfera abajo (criteria.md, delta 2026-10-25): el anillo abierto
+  inicia la línea y la esfera en el acento de la línea reemplaza el punto final; es la única esfera de la pieza, y no
+  va si la frase cierra con `?`, `!` o `…`. Bricolage 400 abre y el remate va en `<strong>` (700): una idea completa,
+  nunca un fragmento críptico, y sin par de pregunta y respuesta forzado. Es la tesis de la sección, no una cita: sin
+  comillas. Variantes: «Destacado Efeonce» (navy) y «Destacado claro» (papel); ≤ 80 caracteres sale más grande. La
+  «Cita Efeonce» / «Cita clara» es sólo para una cita real con autor en `<cite>` (nombre en negrita, fuente, enlace),
+  nunca para una tesis propia ni con autor inventado. 1–2 por post, nunca seguidas. Manual:
+  `docs/manual-de-uso/public-site/usar-destacados-y-citas.md`; producción: `efeonce-public-site-wordpress` →
+  `content-factory-gutenberg.md`.
 - **Color:** sólo de `efeonceGraphicLine`: navy `#023c70` sobre papel `#f7f8f6`, blanco sobre `#001a33` en oscuro.
 - **Tipografía:** sigue la del artículo de Ohio (DM Sans e Inter) hasta que se migre la plantilla completa del
   artículo a Bricolage y Poppins (decisión del operador, 2026-10-24).

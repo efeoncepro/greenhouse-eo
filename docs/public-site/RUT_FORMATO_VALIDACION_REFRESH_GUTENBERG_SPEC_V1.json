@@ -56,7 +56,15 @@
     },
     {
      "kind": "pullquote",
-     "text": "Un dígito verificador correcto dice que el RUT está bien escrito. No dice que exista."
+     "text": [
+      {
+       "text": "Un dígito verificador correcto dice que el RUT está bien escrito. "
+      },
+      {
+       "text": "No dice que exista.",
+       "strong": true
+      }
+     ]
     },
     {
      "kind": "paragraph",

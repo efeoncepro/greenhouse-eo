@@ -83,6 +83,13 @@ Use the governed native vocabulary, including `core/heading`,
 whose links resolve to deterministic heading anchors. Treat `core/freeform` as
 legacy inspection debt, not generated content.
 
+Pullquotes (`efeonce-editorial-blocks` 0.8.0, live 2026-10-25): default to the
+«Destacado» variant for the section's own thesis (no quotation marks, the
+landing phrase as a complete idea in `strong`, `tone` to match the background);
+use `variant: "cita"` only for a real attributed quote with `cite`. 1–2 per
+post, never consecutive. Rules and spec shape: `content-factory-gutenberg.md`
+→ «Blog editorial styles».
+
 For inline citations and contextual links:
 
 - represent content as structured `{ text, href? }` segments in supported
@@ -481,6 +488,7 @@ authorization; every future article needs its own rights decision (§1).
 - [ ] Kinsta cache purge and repeated anonymous/authenticated readback agreed.
 - [ ] Link check found no confirmed broken links; unresolved responses were reviewed.
 - [ ] Callouts, pullquotes and drops were read against their neighbouring paragraphs; no sentence is repeated.
+- [ ] Each pullquote uses the right variant: Destacado for our thesis (bold landing phrase, no quotes), Cita only with a real author in `cite`.
 - [ ] A post created private and published later carries the publication date, read back from WordPress.
 - [ ] Playwright desktop and mobile passed render, TOC, image, console, and overflow checks.
 - [ ] Final anonymous robots, canonical, schema, Open Graph, and social image passed.

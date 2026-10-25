@@ -496,8 +496,9 @@ Bloques autorables por el primitive actual:
 - `image` con media real, caption opcional y `linkDestination: none|media`;
 - `embed` YouTube con URL aprobada.
 
-**Estilos editoriales obligatorios (2026-10-24).** `pullquote` sale siempre como Destacado Efeonce (uno o dos por
-post); `list` acepta `style: "steps"` (Pasos, sólo ordenada) y `style: "box"` (Recuadro, 2–6 ítems); `image` acepta
+**Estilos editoriales obligatorios (2026-10-24).** `pullquote` sale siempre con un estilo Efeonce: Destacado (la
+tesis, uno o dos por post, remate en `strong`) o, con `variant: "cita"` y `cite` obligatorio, Cita; `tone: "light"` da
+la versión en papel (0.8.0, 2026-10-25); `list` acepta `style: "steps"` (Pasos, sólo ordenada) y `style: "box"` (Recuadro, 2–6 ítems); `image` acepta
 `align: "center"`; `faq` emite cada pregunta con el estilo «Pregunta frecuente» y `schema.source: "plugin"` por
 defecto. El acento sale de la línea del tema del post. Contrato: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md`.
 
@@ -534,8 +535,8 @@ El renderer vigente:
 - admite sólo `http:`, `https:` y `mailto:`;
 - rechaza protocolos inseguros antes de producir Gutenberg;
 - usa `new URL(...)`, por lo que el `href` debe ser absoluto en el contrato actual;
-- aplica rich text a intro, párrafos, items de lista, celdas/caption de tabla, captions de imagen y CTA; quote y
-  pullquote siguen siendo texto plano.
+- aplica rich text a intro, párrafos, items de lista, celdas/caption de tabla, captions de imagen, CTA y el `text` y
+  `cite` de pullquote (desde 0.8.0, para marcar el remate del Destacado con `strong`); quote sigue siendo texto plano.
 
 No insertar `<a>` manual, `target`, `onclick`, iframe, script ni `javascript:` dentro de la spec. Si una
 capacidad falta, abrir trabajo del primitive; no rodearla con freeform.

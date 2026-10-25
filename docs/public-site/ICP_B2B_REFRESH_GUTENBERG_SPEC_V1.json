@@ -130,7 +130,15 @@
     },
     {
      "kind": "pullquote",
-     "text": "ICP sin buyer persona es frío. Buyer persona sin ICP es disperso."
+     "text": [
+      {
+       "text": "ICP sin buyer persona es frío. "
+      },
+      {
+       "text": "Buyer persona sin ICP es disperso.",
+       "strong": true
+      }
+     ]
     },
     {
      "kind": "image",
@@ -583,7 +591,15 @@
     },
     {
      "kind": "pullquote",
-     "text": "Cuando la empresa crece más rápido que su área de personas, quiero sacar las remuneraciones de las planillas para cerrar cada mes sin errores ni horas extra."
+     "text": [
+      {
+       "text": "Cuando la empresa crece más rápido que su área de personas, quiero sacar las remuneraciones de las planillas "
+      },
+      {
+       "text": "para cerrar cada mes sin errores ni horas extra.",
+       "strong": true
+      }
+     ]
     },
     {
      "kind": "paragraph",

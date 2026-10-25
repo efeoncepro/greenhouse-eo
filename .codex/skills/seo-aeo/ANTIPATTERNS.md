@@ -22,6 +22,8 @@ publica como *«poner una tabla te da 2,3× más citas»* — un **lift causal**
 Es la misma operación mental que convirtió el **`Quotation Addition` (+41%)** —que mide **citar
 FUENTES o EXPERTOS entre comillas**— en *«nuestra cita destacada da +41%»*. Tomar una descripción y
 venderla como palanca.
+En el blog Efeonce la tesis propia va como **Destacado** (sin comillas); sólo la variante **Cita** con un autor real
+en `cite` es una cita de fuente (`efeonce-public-site-wordpress` → `content-factory-gutenberg.md`).
 
 - 🔴 **NUNCA** conviertas una correlación/prevalencia en una recomendación causal.
 - 🔴 **NUNCA** le agregues variables al hallazgo (*«tabla **+ lista numerada** → 2,3×»* — la lista
