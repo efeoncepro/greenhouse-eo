@@ -42,8 +42,9 @@ sin redirección hostil. Corrección local verificada; todavía no desplegada.
 ## Cobertura pendiente y bloqueo automático
 
 La revisión de fuente CIMD detectó validación DNS seguida de una segunda resolución no fijada al abrir
-conexión, rangosIPv6 comparados por texto y DNS fuera del plazo del fetch. Se preparan correcciones defensivas
-y regresiones locales; el resultado final se registra en el [catálogo](AUTH_SERVER_RED_TEAM_2026-10-25.md).
+conexión, rangosIPv6 comparados por texto y DNS fuera del plazo del fetch. Correcciones defensivas implementadas: resolución IP fijada para la conexión TLS, validación binaria IPv6,
+plazo compartido DNS/stream y límite de64KiB. Revisión del coordinador y192 pruebas de regresión combinadas
+CIMD/OAuth/magic-link PASS; TypeScript global PASS. Evidencia en el [catálogo](AUTH_SERVER_RED_TEAM_2026-10-25.md).
 La severidad/alcance no presume exfiltración: HTTPS y validación de certificado continúan siendo fronteras relevantes.
 
 Una subtarea de validación ofensiva fue detenida por revisión automática de seguridad con la razón

@@ -132,3 +132,10 @@ exit0 (router, no certificación). Worktree compartido137paths, no broadstage/co
 ## Resultado del slice de señales
 
 Implementados `rotation_overdue` y cuatro indicadores first-party/OTP dentro del reader canónico. Pruebas17PASS, SQL aislado7PASS, sensibilidad por mutación comprobada y restaurada; typecheck y lint focal PASS. Evidencia y matriz de20casos en [evaluación ofensiva](../../audits/auth-server/AUTH_SERVER_RED_TEAM_2026-10-25.md). La refutación y el readback productivo permanecen separados.
+
+## Propuesta posterior: rotación con privilegios aislados
+
+Discovery25Oct identificó creación KMS previa al registro PG y ausencia de firma previa al cambio activo.
+La [propuesta de Job dedicado](TASK-1833-key-rotation-proposal.md), estado Proposed, detalla ledger,
+recuperación de resultado incierto y SA exclusiva; no amplía la SA compartida de ops-worker.
+Requiere decisión arquitectónica antes de implementación. No existe scheduler nuevo ni ensayo acreditado.
