@@ -216,3 +216,44 @@ Corregida en este pase: el ledger de flags (filas Auth releídas en 00166 + flag
   [`efeonce-auth`](../../../.claude/skills/efeonce-auth/SKILL.md), espejadas en `.codex/`.
 - Rollout Auth: [auditoría de rollout controlado](../identity/2026-10-25-auth-rooms-controlled-rollout.md).
 - Rooms: [dossier](../../architecture/rooms/README.md) y [EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+
+## 6. Segunda auditoría de Auth (2026-10-25 ~23:30 UTC): EPIC-044 completo y logs en vivo
+
+La primera pasada sólo cubrió las tasks de Auth ligadas a Rooms (1833, 1834, 2063, 2064 y 2067). Esta segunda pasada usó cuatro subagentes de solo lectura y reverificó a mano lo crítico.
+
+**Dónde vive.** No existe un repo separado de Auth. Se revisó GitHub (los 17 repos de `efeoncepro`, repos de colaborador y búsqueda de código), el disco, el origen de los builds en Cloud Build y las sesiones de Codex:
+- El servidor está en `greenhouse-eo`: `services/auth-server`, `src/lib/auth-server` (140 archivos) y `scripts/auth-server`.
+- El host del load balancer está en `efeonce-mcp/infra/terraform`.
+- Es una excepción aprobada de EPIC-027 (`GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md:124`).
+
+**Programa.** EPIC-044 tiene 27 unidades (U00–U26).
+- **En producción:** gateway, runtime/KMS, OAuth (CIMD/DCR/PKCE/tokens), personas (passkey, magic link, TOTP), multi-issuer, pantallas, interop, invitación externa y autoridad interna multi-org (una identidad).
+- **Desplegado con flag OFF:** first-party Rooms y OTP.
+- **No iniciadas:** consola del admin cliente (1838), primitive de invitación (1839), logout multiproducto (1840), piloto con cliente (1841), alta de passkey (1842), carga/rollback del gateway (1843), convergencia Greenhouse (2063) y las de distribución (1864, 1904, 1917, 2000).
+- **Cierres administrativos ya ganados:** 1829, 1830, 1832 (falta la muestra steady) y 1828 (falta retirar la llave v1).
+- Mapa: `EPIC-044…md:114-144`. El `Status real` del epic está congelado desde el 2026-09-08.
+
+**PR #262.** CI con 11 SUCCESS y 1 omitido; mergeable `CLEAN`; sigue draft. Codex y la sesión Rooms acordaron no mover el HEAD de `develop` hasta mergearlo.
+
+**Hallazgos en vivo (`vivo`, reverificados):**
+1. **Cero `/oauth/token` con 200 y cero `/oauth/authorize` en toda la ventana de logs de requests** (desde el 2026-09-26).
+   - En las últimas dos semanas hubo unos 5.000 `POST /oauth/token`: 400 en todos, salvo 8 que dieron 401. Todos vienen de `codex-mcp-client`.
+   - Aun así, el gateway responde 200 en `/mcp` a esos mismos clientes Codex.
+   - Inferencia, sin verificar: los clientes usan tokens Entra heredados, que el gateway todavía acepta, y reintentan en bucle un refresh nativo muerto.
+   - Falta registrar el motivo del 400, y no existe señal de tasa de error de `/oauth/token`.
+2. **Los pushes a `develop` despliegan el emisor de producción.** Las últimas 15 revisiones salieron de `develop`; ningún release a `main` creó una revisión de `auth-server`. `deploy.sh:13-16` declara que staging y producción comparten servicio.
+3. **Configuración de staging en producción:** `SENTRY_ENVIRONMENT=staging`, Resend de staging y `minScale=0` (el ADR pide 1).
+4. **Punto único de falla del login MCP:** una región, máximo 5 instancias, la instancia compartida `greenhouse-pg-dev` y KMS.
+5. **Gateway:** revisión `00064` (v1.10.0); `origin/main` tiene `454d80e` sin desplegar.
+
+**Contradicciones documentales** (quedan para el dueño):
+- Ledger de flags: `:149` dice que OAuth está OFF y cita revisiones 00030/00007.
+- El ADR nativo y el contrato OAuth dicen que el canary «sigue en observación», pero se retiró el 09-18.
+- 1837 está complete pero bloqueada en su `:25`; 1835 está complete con 7 casillas abiertas.
+- 1833: el epic pide «pentest externo», pero el operador decidió no contratar.
+
+**Plan recomendado (no ejecutado):**
+1. Promover el PR #262 y hacer el canary único.
+2. Separar staging y producción de `auth-server`, flags por entorno y smoke post-deploy con rollback.
+3. Higiene de seguridad: auditorías con hallazgos fuera del repo público, cerrar hallazgos, scheduler de rotación y reconciliar 1833.
+4. Más adelante, extraer Auth a un repo privado (primer corte de la decisión de desacople por producto del 2026-10-12).

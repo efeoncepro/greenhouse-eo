@@ -3,6 +3,16 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## Segunda auditoría 2026-10-25 ~23:30 UTC (EPIC-044 completo + logs)
+
+Detalle en §6 de la [auditoría](../../../../docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
+
+- **Sin repo propio** (verificado en GitHub, disco, Cloud Build y sesiones de Codex): el servidor vive en `greenhouse-eo`.
+- **EPIC-044 tiene 27 unidades.** No iniciadas: 1838–1843, 2063, 1864, 1904, 1917 y 2000. Cierres administrativos ganados: 1828, 1829, 1830 y 1832.
+- **PR #262:** CI verde (11/11 + 1 omitido), `CLEAN`, draft. No mover el HEAD de `develop` hasta mergearlo.
+- **Logs (`vivo`):** cero token 200 y cero `/oauth/authorize` desde el 2026-09-26. Unos 5.000 `/oauth/token` 400 de `codex-mcp-client` en dos semanas, mientras el gateway responde 200 a esos clientes (¿tokens Entra heredados?). Falta registrar el motivo del 400 y una señal de tasa de error.
+- **Últimas 15 revisiones desde `develop`:** ningún release a `main` desplegó `auth-server`. Configuración staging en producción (Sentry, Resend) y `minScale=0`.
+
 ## Corte 2026-10-25 ~22:55 UTC — Codex se queda sin uso
 
 Fuente consolidada: [auditoría de estado](../../../../docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
