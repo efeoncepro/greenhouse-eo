@@ -65,6 +65,8 @@ correcto, probado en 400 000 casos [V], pero el artículo tiene cuatro problemas
 
 ## 2. Cliente ideal B2B: ICP (`/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/`)
 
+> **Publicado el 2026-10-25** con dos infografías y portada nueva. Registro: [`ICP_B2B_REFRESH_DRAFT_V1.md`](ICP_B2B_REFRESH_DRAFT_V1.md) §5c.
+
 **Qué es hoy:** un ensayo de marco conceptual de 3.900 palabras, no una guía. Tiene cinco problemas:
 
 - **La definición llega tarde** [V]: el ICP se define recién tras ~560 palabras, y primero en negativo.

@@ -1,6 +1,6 @@
 # Refresh — «ICP B2B: cómo definir tu cliente ideal» (borrador V3)
 
-> **Estado:** borrador para revisión del autor. No publicado.
+> **Estado:** **publicado 2026-10-25** (aprobado por Julio Reyes). Ver §5c «Registro de publicación».
 > **URL (se conserva):** https://efeoncepro.com/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/ (post `249108`)
 > **Autor / voz:** Julio Reyes · voz Julio, doctrina como «En Efeonce…».
 > **Creado:** 2026-10-25 · **Fuente editable:** [`ICP_B2B_REFRESH_GUTENBERG_SPEC_V1.json`](ICP_B2B_REFRESH_GUTENBERG_SPEC_V1.json)
@@ -83,6 +83,35 @@
 - **Portada:** ficha `MCB-ICP1-169` (Hum, growth), «¿Para qué sirve un ICP? Decir no.», JPEG
   `icp-b2b-cliente-ideal-2026.jpg`; simulación de subida sobre `249108` `ok: true`. Se sube con la publicación. Para la
   próxima portada, Julio pide cambiar la fórmula (persona + vidrio ya se repite).
+
+## 5c. Registro de publicación (2026-10-25 11:29 UTC)
+
+- **Post:** WordPress `249108`, misma URL, autor Julio Reyes (user `1`), categoría Growth (`80`), etiquetas sin cambios.
+- **Escrito** con `tmp/post-refresh-apply.php`: título, contenido (V3, 74 bloques, 2 infografías), extracto, title y
+  descripción de Yoast, palabra clave «icp b2b» (antes «cliente ideal B2B»), tiempo de lectura 13 min y el título y la
+  descripción Open Graph (seguían con la versión de febrero). Guardas: estado, slug, autor, `post_modified_gmt`
+  (`2026-02-13 20:59:19`), hash previo y título Yoast; 13 comprobaciones en `true`; hash guardado `c68d5316…`.
+- **Portada** (11:30 UTC): adjunto `252105`, `uploads/2026/02/icp-b2b-cliente-ideal-2026.jpg` (2400 × 1260, sha256
+  `67246507…`), destacada e imagen OG; respaldo `_gh_cover_refresh_249108_20261025_113007` (destacada previa `249142`).
+  `blog-post-cover-apply.php` ahora acepta `expectedOg: 0` (post sin OG propia).
+- **Respaldo del contenido:** local `tmp/cliente-ideal-b2b-icp-post-249108-before-v1-20261025T112923Z.json` y opción
+  `_gh_post_refresh_249108_20261025_112953`.
+- **Rollback:** `pnpm public-website:wpcli -- --eval-file ./tmp/post-refresh-rollback.php --input-file ./tmp/icp-249108-rollback-input.json --wp-user 12`;
+  la portada, con la opción `_gh_cover_refresh_249108_20261025_113007` (manual de portadas, «Volver atrás»).
+- **QA en vivo (anónimo):** `200`; title, descripción, canonical e `index, follow`; un H1; `og:title`/`og:description`
+  nuevos; `og:image` = portada nueva con `og:image:alt` y `twitter:image:alt`; `BlogPosting` con `headline` y
+  `dateModified` nuevos, `Person` Julio Reyes, `FAQPage` con 7 preguntas, breadcrumb Portada › Growth › título; índice
+  con 13 anclas sin rotas; 2 infografías con alt, leyenda y 3 `<source>` cada una (390 claro → móvil claro; 1440 con
+  sistema oscuro → escritorio oscuro; proporción = natural); 2 tablas que caben a 390 px; 7 preguntas con el estilo
+  Efeonce; 3 menciones; 13 enlaces con 200 (Gartner bloquea curl, verificado en navegador); sin rastro de Trustmary,
+  `utm_source=chatgpt` ni la portada anterior; sin desborde; consola sin errores. `blog-home verify --browser` en verde.
+- **Copia `252093`:** en la papelera; anónimo `404`.
+- **Observaciones:** el schema saca `keywords` de las etiquetas (b2b, buyer persona, ipp, jobs to be done, marketing b2b),
+  sin «icp»; Yoast no emite `twitter:description` en este post (X usa la de Open Graph). El tema muestra su propio tiempo de
+  lectura, no el de Yoast.
+- 🔴 **Decisión abierta (modo oscuro):** el sitio no sigue el modo oscuro del sistema (lo decide su interruptor), pero el
+  `<picture>` sí. Con el sistema en oscuro, la infografía sale oscura sobre la página clara. Mismo comportamiento que Web
+  Agéntica.
 
 ## 6. Borrador del artículo
 
