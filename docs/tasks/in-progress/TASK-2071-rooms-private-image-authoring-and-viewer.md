@@ -2,6 +2,7 @@
 
 ## Delta 2026-10-25 — estado al corte de Codex
 
+- **Rescate 2026-10-25 (Claude):** el WIP quedó commiteado en la rama local `task/2070-2071-private-media` de `efeonce-rooms` (`c0facfd` backend, `2626921` UI; sin push). Se corrigió el TS2322 y los tests de medios entraron a `pnpm test`: `pnpm verify` PASS con 205/205 tests (incluye 9 de persistencia en la PG local) y build OK. `main` sigue en `20f9fe9` (candidato del canary). Lo de abajo describe el estado previo al rescate.
 - UI implementada en WIP sin commitear (autoría, preview, inspector con zoom y teclado, seis `data-capture`), pero comparte el typecheck rojo de 2070. Sin escenario GVC, capturas, scorecard ni aceptación humana. Hay alcance fuera del mapa congelado (`/rooms/new`, conversión V2→V3 desde UI) que hay que validar. Corte en [registro de estado](../../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
 
 <!-- ═══════════════════════════════════════════════════════════

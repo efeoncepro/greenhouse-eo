@@ -258,3 +258,7 @@ La primera pasada sólo cubrió las tasks de Auth ligadas a Rooms (1833, 1834, 2
 2. Separar staging y producción de `auth-server`, flags por entorno y smoke post-deploy con rollback.
 3. Higiene de seguridad: auditorías con hallazgos fuera del repo público, cerrar hallazgos, scheduler de rotación y reconciliar 1833.
 4. Más adelante, extraer Auth a un repo privado (primer corte de la decisión de desacople por producto del 2026-10-12).
+
+## 7. Rescate del WIP de medios (2026-10-25, después del corte)
+
+**Rescate 2026-10-25 (Claude):** el WIP quedó commiteado en la rama local `task/2070-2071-private-media` de `efeonce-rooms` (`c0facfd` backend, `2626921` UI; sin push). Se corrigió el TS2322 y los tests de medios entraron a `pnpm test`: `pnpm verify` PASS con 205/205 tests (incluye 9 de persistencia en la PG local) y build OK. `main` sigue en `20f9fe9` (candidato del canary). Siguen pendientes los puntos de §3.5, salvo el typecheck y la cobertura de tests.

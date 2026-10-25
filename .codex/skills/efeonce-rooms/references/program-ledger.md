@@ -34,9 +34,14 @@ Fuente consolidada: [auditoría de estado](../../../../docs/audits/rooms/2026-10
 | 2066 | Invitaciones: correo real único, respuestas indistinguibles y canary. |
 | 2068 | Media protegida, BFCache, GVC, aceptación humana y manual. |
 | 2069 | Cloud: 2/12 criterios tildados y canary pendiente. |
-| 2070 / 2071 | WIP sin commitear (abajo). |
+| 2070 / 2071 | WIP rescatado en rama local `task/2070-2071-private-media` (abajo). |
 
-### WIP de medios (sin commitear en `efeonce-rooms`, ~1.950 líneas)
+### WIP de medios — rescatado en rama
+
+- **Rescate 2026-10-25 (Claude):** el WIP quedó commiteado en la rama local `task/2070-2071-private-media` de `efeonce-rooms` (`c0facfd` backend, `2626921` UI; sin push). Se corrigió el TS2322 y los tests de medios entraron a `pnpm test`: `pnpm verify` PASS con 205/205 tests (incluye 9 de persistencia en la PG local) y build OK. `main` sigue en `20f9fe9` (candidato del canary).
+- Para cerrar siguen faltando: adapter GCS, worker desplegable sin `tsx`, bloque DO en la migración, ensayo down/up/restore, limpieza de cuarentena, flag `ROOMS_MEDIA_ENABLED`, GVC y aceptación humana. También confirmar `sharp` como dependencia directa.
+
+### Estado previo al rescate (sin commitear, ~1.950 líneas)
 
 - **Implementado en local:**
   - V3 opt-in.
