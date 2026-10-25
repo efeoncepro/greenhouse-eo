@@ -506,6 +506,13 @@
         "href": "https://efeoncepro.com/inbound/seo-inbound-marketing/"
        },
        {
+        "text": ". Si falta quién produzca ese contenido con constancia, ese es el trabajo de un equipo de "
+       },
+       {
+        "text": "marketing de contenidos",
+        "href": "https://efeoncepro.com/servicio-marketing-de-contenidos/"
+       },
+       {
         "text": "."
        }
       ],
@@ -529,7 +536,14 @@
         "href": "https://efeoncepro.com/aeo/surround-discovery-seo-google-video-marketplace/"
        },
        {
-        "text": "."
+        "text": "; en "
+       },
+       {
+        "text": "Loop Marketing",
+        "href": "https://efeoncepro.com/loop-marketing/que-es-loop-marketing/"
+       },
+       {
+        "text": ", es la etapa de amplificación."
        }
       ]
      ]
@@ -623,7 +637,14 @@
         "strong": true
        },
        {
-        "text": " que haría tu comprador antes de contratar algo como lo tuyo, con sus palabras y sin nombrar tu marca."
+        "text": " que haría tu comprador antes de contratar algo como lo tuyo, con sus palabras y sin nombrar tu marca. Si todavía no tienes claro quién es ese comprador, parte por definir tu "
+       },
+       {
+        "text": "cliente ideal",
+        "href": "https://efeoncepro.com/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/"
+       },
+       {
+        "text": "."
        }
       ],
       [
@@ -815,6 +836,24 @@
       "Separa los robots de búsqueda de los de entrenamiento antes de bloquear nada.",
       "Responde primero, escribe los subtítulos como preguntas y pon fuentes con fecha.",
       "Mide la presencia por motor y por pregunta, cada mes, además del tráfico."
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "El AEO no es un proyecto de una vez: es una práctica que se mide cada mes, motor por motor. Si quieres trabajarlo con un equipo que ya lo hace, conversemos en "
+      },
+      {
+       "text": "Efeonce | AEO",
+       "href": "https://efeoncepro.com/aeo-2/",
+       "mention": {
+        "line": "engine"
+       }
+      },
+      {
+       "text": "."
+      }
      ]
     }
    ]
