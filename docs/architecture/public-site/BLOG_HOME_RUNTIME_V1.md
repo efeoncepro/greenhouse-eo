@@ -387,7 +387,7 @@ Cuentas de servicio (`greenhouse-integration`) y autores sin posts devuelven vac
 - Visto bueno visual del operador a la píldora en el pie (desvío 13).
 - Primer evento real (hoy la sección está oculta) y prueba de `Event` en Rich Results Test y del `.ics`.
 - Medir en Kinsta la purga de `/blog/` (< 2 min); hoy sólo está medida en Playground.
-- Papelera de la página de revisión 252046 `/blog-v3-revision/` (publicada, noindex): espera confirmación del operador.
+- Página de revisión 252046 `/blog-v3-revision/`: en la papelera desde el 2026-10-26 (OK del operador); responde 404.
 - LCP de laboratorio sobre 2,5 s en el perfil móvil por el peso de scripts del sitio (seguimiento de sitio, ver
   TASK-2051).
 

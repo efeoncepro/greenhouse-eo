@@ -153,7 +153,7 @@ Método y skills espejo concilian la excepción individual y el reader CLI falli
 con `EO_SITE_NAV_EXCLUDED_PAGES` vacío), foto del autor desde su perfil de WordPress y tres tableros. Rollback del
 corte: `pnpm public-website:blog-home page rollback --snapshot _gh_blog_home_v3_before_20261024_081327 --apply`.
 Verificado en vivo: sin desborde de 320 a 1920, un H1, axe 0 en los tres tableros, indexable. La página de revisión
-252046 sigue publicada (noindex): mandarla a la papelera cuando el operador lo confirme.
+252046 quedó en la papelera el 2026-10-26 con OK del operador (`/blog-v3-revision/` responde 404).
 
 **Operación por cualquier agente:** `pnpm public-website:blog-home` (manual
 `docs/manual-de-uso/public-site/operar-portada-blog-por-cli.md`, referencia de skill `blog-home-operation.md`):

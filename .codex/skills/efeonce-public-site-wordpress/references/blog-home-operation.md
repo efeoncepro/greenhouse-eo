@@ -160,5 +160,4 @@ with the other blog session. Contract: `BLOG_HOME_RUNTIME_V1.md` §9.
 - A new PHP file reaches PHP-FPM 1–2 min after a deploy.
 - Open items (2026-10-24): operator's visual OK on the bottom pill, first real event
   (events section hidden until then; blocked: email fix release + HubSpot Marketing Events redesign, RESEARCH-013; the
-  2026-10-24 end-to-end test proved reservations + HubSpot and found the email bug), purge timing measured on Kinsta, trash of review page 252046 pending the
-  operator.
+  2026-10-24 end-to-end test proved reservations + HubSpot and found the email bug), purge timing measured on Kinsta. Review page 252046 trashed 2026-10-26 (operator's OK; 404).
