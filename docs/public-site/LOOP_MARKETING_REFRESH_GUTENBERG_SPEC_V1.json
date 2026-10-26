@@ -16,14 +16,38 @@
       },
       {
         "text": "Y remató",
-        "href": "https://www.hubspot.com/company-news/loop"
+        "href": "https://www.hubspot.com/company-news/loop",
+        "strong": true
       },
       {
-        "text": ": ese manual ya no funciona."
+        "text": ": "
+      },
+      {
+        "text": "ese manual ya no funciona.",
+        "strong": true
       }
     ],
-    "Basta mirar cómo compra cualquiera de nosotros. Vemos un video en YouTube, seguimos en el scroll de Instagram, le preguntamos a Google o a ChatGPT y terminamos comprando en dos clics desde el celular. Todo en una tarde, y sin pasar ordenadamente por ninguna etapa. No hay embudo que aguante ese recorrido.",
-    "En esta guía te explico qué es Loop Marketing, cuáles son sus cuatro etapas y en qué se diferencia del embudo y del inbound. También te muestro algo que no vas a encontrar en la documentación de HubSpot: cómo encaja con las 4S de Google, porque ahí está, para mí, la forma más clara de entender por qué funciona."
+    [
+      {
+        "text": "Basta mirar cómo compra cualquiera de nosotros. Vemos un video en YouTube, seguimos en el scroll de Instagram, le preguntamos a Google o a ChatGPT y terminamos comprando en dos clics desde el celular. Todo en una tarde, y sin pasar ordenadamente por ninguna etapa. "
+      },
+      {
+        "text": "No hay embudo que aguante ese recorrido.",
+        "strong": true
+      }
+    ],
+    [
+      {
+        "text": "En esta guía te explico qué es Loop Marketing, cuáles son sus cuatro etapas y en qué se diferencia del embudo y del inbound. También te muestro algo que no vas a encontrar en la documentación de HubSpot: "
+      },
+      {
+        "text": "cómo encaja con las 4S de Google",
+        "strong": true
+      },
+      {
+        "text": ", porque ahí está, para mí, la forma más clara de entender por qué funciona."
+      }
+    ]
   ],
   "tableOfContents": true,
   "sections": [
@@ -33,7 +57,18 @@
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Loop Marketing es el framework de cuatro etapas que HubSpot presentó en septiembre de 2025 para hacer marketing en la era de la IA. En vez de llevar a una persona por un embudo de principio a fin, la marca trabaja en un ciclo: define qué decir, lo adapta a cada persona, lo distribuye donde esa persona está y aprende de lo que pasó para la vuelta siguiente, que sale más rápida y más precisa."
+          "text": [
+            {
+              "text": "Loop Marketing es el framework de cuatro etapas que HubSpot presentó en septiembre de 2025 para hacer marketing en la era de la IA. En vez de llevar a una persona por un embudo de principio a fin, "
+            },
+            {
+              "text": "la marca trabaja en un ciclo",
+              "strong": true
+            },
+            {
+              "text": ": define qué decir, lo adapta a cada persona, lo distribuye donde esa persona está y aprende de lo que pasó para la vuelta siguiente, que sale más rápida y más precisa."
+            }
+          ]
         },
         {
           "kind": "paragraph",
@@ -43,7 +78,8 @@
             },
             {
               "text": "su página en español",
-              "href": "https://www.hubspot.es/loop-marketing"
+              "href": "https://www.hubspot.es/loop-marketing",
+              "strong": true
             },
             {
               "text": ": «los humanos y la IA trabajan juntos para definir tu historia, adaptarla a tu audiencia, amplificarla a través de distintos canales y optimizarla en tiempo real»."
@@ -116,14 +152,22 @@
           "kind": "paragraph",
           "text": [
             {
-              "text": "Loop Marketing no reemplaza al "
+              "text": "Tal vez estarás pensando que esto es el inbound con otro nombre. No del todo: Loop Marketing no reemplaza al "
             },
             {
               "text": "inbound marketing",
-              "href": "https://efeoncepro.com/inbound/que-es-inbound-marketing/"
+              "href": "https://efeoncepro.com/inbound/que-es-inbound-marketing/",
+              "strong": true
             },
             {
-              "text": ". Se construye sobre él. El inbound nos enseñó que atraer con valor y ganarse la confianza funciona mejor que interrumpir. El Loop suma lo que hoy falta: velocidad, presencia en todos los canales y aprendizaje continuo con IA. Si el inbound es la raíz, el loop es la savia que lo mantiene vivo."
+              "text": ". Se construye sobre él. El inbound nos enseñó que atraer con valor y ganarse la confianza funciona mejor que interrumpir. El Loop suma lo que hoy falta: "
+            },
+            {
+              "text": "velocidad, presencia en todos los canales y aprendizaje continuo con IA",
+              "strong": true
+            },
+            {
+              "text": ". Si el inbound es la raíz, el loop es la savia que lo mantiene vivo."
             }
           ]
         },
@@ -135,10 +179,18 @@
             },
             {
               "text": "preguntas frecuentes",
-              "href": "https://www.hubspot.es/loop-marketing"
+              "href": "https://www.hubspot.es/loop-marketing",
+              "strong": true
             },
             {
-              "text": ": «los componentes básicos del Inbound Marketing siguen siendo esenciales, pero ya no son suficientes». Y trae un dato que conviene mirar de frente: en Latinoamérica, el 86 % conoce el inbound marketing, pero sólo el 60 % lo aplica bien. Antes de pensar en el loop, muchas marcas todavía tienen que terminar de hacer bien el inbound."
+              "text": ": «los componentes básicos del Inbound Marketing siguen siendo esenciales, pero ya no son suficientes». Y trae un dato que conviene mirar de frente: en Latinoamérica, "
+            },
+            {
+              "text": "el 86 % conoce el inbound marketing, pero sólo el 60 % lo aplica bien",
+              "strong": true
+            },
+            {
+              "text": ". Antes de pensar en el loop, muchas marcas todavía tienen que terminar de hacer bien el inbound."
             }
           ]
         }
@@ -186,16 +238,35 @@
             },
             {
               "text": "TechTarget",
-              "href": "https://www.techtarget.com/searchcustomerexperience/podcast/New-HubSpot-products-strategy-CMS-updates-from-Inbound"
+              "href": "https://www.techtarget.com/searchcustomerexperience/podcast/New-HubSpot-products-strategy-CMS-updates-from-Inbound",
+              "strong": true
             },
             {
-              "text": "). El Loop toma esa idea y la vuelve operación: no basta con girar alrededor del cliente, hay que aprender de él en cada vuelta."
+              "text": "). El Loop toma esa idea y la vuelve operación: no basta con girar alrededor del cliente, "
+            },
+            {
+              "text": "hay que aprender de él en cada vuelta",
+              "strong": true
+            },
+            {
+              "text": "."
             }
           ]
         },
         {
           "kind": "paragraph",
-          "text": "Dicho en una línea: el embudo describe un viaje que ya no existe, el flywheel cuenta una buena historia y el loop te da un motor que aprende más rápido que tu competencia. Ojo: esta comparación es nuestra. HubSpot presenta el Loop como continuación del inbound, no como reemplazo del flywheel."
+          "text": [
+            {
+              "text": "Dicho en una línea: el embudo describe un viaje que ya no existe, el flywheel cuenta una buena historia y "
+            },
+            {
+              "text": "el loop te da un motor que aprende más rápido que tu competencia",
+              "strong": true
+            },
+            {
+              "text": ". Ojo: esta comparación es nuestra. HubSpot presenta el Loop como continuación del inbound, no como reemplazo del flywheel."
+            }
+          ]
         }
       ]
     },
@@ -207,11 +278,19 @@
           "kind": "paragraph",
           "text": [
             {
-              "text": "En febrero de 2025, Google publicó junto con BCG una forma nueva de describir cómo compra la gente: las 4S, por streaming, scrolling, searching y shopping. Ver video, recorrer el feed, buscar y comprar. Su conclusión es la misma que la de HubSpot, vista desde el comprador: «los recorridos de los consumidores están más fragmentados que nunca» ("
+              "text": "En febrero de 2025, Google publicó junto con BCG una forma nueva de describir cómo compra la gente: las 4S, por "
+            },
+            {
+              "text": "streaming, scrolling, searching y shopping",
+              "strong": true
+            },
+            {
+              "text": ". Ver video, recorrer el feed, buscar y comprar. Su conclusión es la misma que la de HubSpot, vista desde el comprador: «los recorridos de los consumidores están más fragmentados que nunca» ("
             },
             {
               "text": "Google",
-              "href": "https://business.google.com/es-all/think/consumer-insights/nuevo-proceso-decision-de-compra/"
+              "href": "https://business.google.com/es-all/think/consumer-insights/nuevo-proceso-decision-de-compra/",
+              "strong": true
             },
             {
               "text": ")."
@@ -222,11 +301,26 @@
           "kind": "paragraph",
           "text": [
             {
-              "text": "Las cifras de Google en Estados Unidos lo muestran: una persona interactúa con más de 130 puntos de contacto móviles al día, y el 64 % de quienes compraron en la última temporada de fiestas dice que mezcló las 4S en esa compra ("
+              "text": "Las cifras de Google en Estados Unidos lo muestran: una persona interactúa con "
+            },
+            {
+              "text": "más de 130 puntos de contacto móviles al día",
+              "strong": true
+            },
+            {
+              "text": ", y "
+            },
+            {
+              "text": "el 64 % de quienes compraron en la última temporada de fiestas dice que mezcló las 4S",
+              "strong": true
+            },
+            {
+              "text": " en esa compra ("
             },
             {
               "text": "Google, 2025",
-              "href": "https://business.google.com/en-all/think/consumer-insights/modern-consumer-holiday-marketing-strategy/"
+              "href": "https://business.google.com/en-all/think/consumer-insights/modern-consumer-holiday-marketing-strategy/",
+              "strong": true
             },
             {
               "text": ")."
@@ -235,7 +329,15 @@
         },
         {
           "kind": "paragraph",
-          "text": "Google describe el comportamiento. HubSpot propone el método. Ninguno de los dos los conecta, y ahí está la clave para entender el Loop: las 4S son lo que hace la persona y el Loop es lo que hace la marca para responder."
+          "text": [
+            {
+              "text": "Google describe el comportamiento. HubSpot propone el método. Ninguno de los dos los conecta, y ahí está la clave para entender el Loop: "
+            },
+            {
+              "text": "las 4S son lo que hace la persona y el Loop es lo que hace la marca para responder.",
+              "strong": true
+            }
+          ]
         },
         {
           "kind": "paragraph",
@@ -284,11 +386,19 @@
           "kind": "paragraph",
           "text": [
             {
-              "text": "Un ejemplo de por qué la búsqueda ya no es sólo Google: Prabhakar Raghavan, entonces vicepresidente sénior de Google, contó en 2022 que casi el 40 % de los jóvenes de 18 a 24 años en Estados Unidos busca dónde almorzar en TikTok o Instagram, según un estudio interno de la empresa ("
+              "text": "Un ejemplo de por qué la búsqueda ya no es sólo Google: Prabhakar Raghavan, entonces vicepresidente sénior de Google, contó en 2022 que "
+            },
+            {
+              "text": "casi el 40 % de los jóvenes de 18 a 24 años en Estados Unidos busca dónde almorzar en TikTok o Instagram",
+              "strong": true
+            },
+            {
+              "text": ", según un estudio interno de la empresa ("
             },
             {
               "text": "Fortune",
-              "href": "https://fortune.com/2022/07/13/google-tiktok-instagram-search-engine-brainstorm-tech/"
+              "href": "https://fortune.com/2022/07/13/google-tiktok-instagram-search-engine-brainstorm-tech/",
+              "strong": true
             },
             {
               "text": "). Las estaciones se mezclan: buscar también ocurre en el feed."
@@ -390,7 +500,8 @@
             },
             {
               "text": "Express en Loop Marketing: voz, POV, buyer persona y Jobs to be done",
-              "href": "https://efeoncepro.com/loop-marketing/express-voz-marca-ia-loop-marketing/"
+              "href": "https://efeoncepro.com/loop-marketing/express-voz-marca-ia-loop-marketing/",
+              "strong": true
             },
             {
               "text": "."
@@ -405,7 +516,18 @@
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Si la Definición es la voz, la Adaptación es el oído: escucha y ajusta. HubSpot lo pide así: que tu mensaje parezca realmente personal, no sólo personalizado."
+          "text": [
+            {
+              "text": "Si la Definición es la voz, la Adaptación es el oído: escucha y ajusta. HubSpot lo pide así: que tu mensaje "
+            },
+            {
+              "text": "parezca realmente personal, no sólo personalizado",
+              "strong": true
+            },
+            {
+              "text": "."
+            }
+          ]
         },
         {
           "kind": "list",
@@ -480,18 +602,27 @@
                 "strong": true
               },
               {
-                "text": " En Estados Unidos y la Unión Europea, casi el 60 % de las búsquedas en Google ya termina sin un clic ("
+                "text": " En Estados Unidos y la Unión Europea, "
+              },
+              {
+                "text": "casi el 60 % de las búsquedas en Google ya termina sin un clic",
+                "strong": true
+              },
+              {
+                "text": " ("
               },
               {
                 "text": "SparkToro, 2024",
-                "href": "https://searchengineland.com/google-search-zero-click-study-2024-443869"
+                "href": "https://searchengineland.com/google-search-zero-click-study-2024-443869",
+                "strong": true
               },
               {
                 "text": "): si la respuesta se arma antes del clic, tienes que estar dentro de la respuesta. Te lo explicamos en "
               },
               {
                 "text": "SEO y AEO: cómo aparecer en Google y en las respuestas de la IA",
-                "href": "https://efeoncepro.com/aeo/seo-y-aeo/"
+                "href": "https://efeoncepro.com/aeo/seo-y-aeo/",
+                "strong": true
               },
               {
                 "text": "."
@@ -526,11 +657,19 @@
           "kind": "paragraph",
           "text": [
             {
-              "text": "El loop no termina cuando una campaña sale al aire: ahí empieza lo más valioso. Yamini Rangan, CEO de HubSpot, lo resumió en INBOUND 2025: «con la IA no ganas lanzando, ganas aprendiendo» ("
+              "text": "El loop no termina cuando una campaña sale al aire: ahí empieza lo más valioso. Yamini Rangan, CEO de HubSpot, lo resumió en INBOUND 2025: "
+            },
+            {
+              "text": "«con la IA no ganas lanzando, ganas aprendiendo»",
+              "strong": true
+            },
+            {
+              "text": " ("
             },
             {
               "text": "TechRadar",
-              "href": "https://www.techradar.com/pro/we-did-not-chase-clicks-we-build-trust-how-hubspot-wants-to-help-write-the-ai-marketing-playbook"
+              "href": "https://www.techradar.com/pro/we-did-not-chase-clicks-we-build-trust-how-hubspot-wants-to-help-write-the-ai-marketing-playbook",
+              "strong": true
             },
             {
               "text": "). HubSpot propone cuatro hábitos: predecir antes de publicar, monitorear en tiempo real, experimentar rápido y nunca dejar de optimizar."
@@ -575,7 +714,18 @@
         },
         {
           "kind": "paragraph",
-          "text": "Por eso la Optimización no es el final del loop: es el motor que lo mantiene girando. HubSpot repasa el ciclo completo en este video:"
+          "text": [
+            {
+              "text": "Por eso la Optimización no es el final del loop: "
+            },
+            {
+              "text": "es el motor que lo mantiene girando",
+              "strong": true
+            },
+            {
+              "text": ". HubSpot repasa el ciclo completo en este video:"
+            }
+          ]
         },
         {
           "kind": "embed",
@@ -591,7 +741,18 @@
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Por la que más sentido tenga en tu negocio: puedes empezar personalizando, distribuyendo o midiendo, y el ciclo se activa igual. Con una condición: si tu voz todavía no está definida, empieza por la Definición. Personalizar o amplificar un mensaje que no es tuyo sólo acelera el ruido."
+          "text": [
+            {
+              "text": "Por la que más sentido tenga en tu negocio: puedes empezar personalizando, distribuyendo o midiendo, y el ciclo se activa igual. Con una condición: "
+            },
+            {
+              "text": "si tu voz todavía no está definida, empieza por la Definición",
+              "strong": true
+            },
+            {
+              "text": ". Personalizar o amplificar un mensaje que no es tuyo sólo acelera el ruido."
+            }
+          ]
         }
       ]
     },
@@ -601,7 +762,18 @@
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "El framework es el mismo; lo que cambia es en qué estaciones de las 4S pasa más tiempo tu comprador."
+          "text": [
+            {
+              "text": "El framework es el mismo; lo que cambia es "
+            },
+            {
+              "text": "en qué estaciones de las 4S pasa más tiempo tu comprador",
+              "strong": true
+            },
+            {
+              "text": "."
+            }
+          ]
         }
       ]
     },
@@ -707,7 +879,18 @@
         },
         {
           "kind": "paragraph",
-          "text": "El B2B se parece a un matrimonio: largo, con muchas conversaciones y varias personas que opinan. El B2C es un flechazo: si no convences en segundos, la persona pasa a la marca siguiente. El Loop sirve en los dos, pero el ritmo de cada vuelta es distinto."
+          "text": [
+            {
+              "text": "El B2B se parece a un matrimonio: largo, con muchas conversaciones y varias personas que opinan. El B2C es un flechazo: si no convences en segundos, la persona pasa a la marca siguiente. El Loop sirve en los dos, pero "
+            },
+            {
+              "text": "el ritmo de cada vuelta es distinto",
+              "strong": true
+            },
+            {
+              "text": "."
+            }
+          ]
         }
       ]
     },
@@ -723,18 +906,34 @@
           "kind": "paragraph",
           "text": [
             {
-              "text": "HubSpot dice que, aplicando el Loop, los costos de adquisición empiezan a bajar entre 30 y 60 días después de implementarlo ("
+              "text": "HubSpot dice que, aplicando el Loop, "
+            },
+            {
+              "text": "los costos de adquisición empiezan a bajar entre 30 y 60 días",
+              "strong": true
+            },
+            {
+              "text": " después de implementarlo ("
             },
             {
               "text": "HubSpot",
-              "href": "https://www.hubspot.es/loop-marketing"
+              "href": "https://www.hubspot.es/loop-marketing",
+              "strong": true
             },
             {
-              "text": "). Y la retención pesa más de lo que parece: un estudio clásico de Bain encontró que retener apenas un 5 % más de clientes puede subir las utilidades entre un 25 % y un 95 % ("
+              "text": "). Y la retención pesa más de lo que parece: un estudio clásico de Bain encontró que "
+            },
+            {
+              "text": "retener apenas un 5 % más de clientes puede subir las utilidades entre un 25 % y un 95 %",
+              "strong": true
+            },
+            {
+              "text": " ("
             },
             {
               "text": "Bain & Company",
-              "href": "https://www.bain.com/insights/e-loyalty-your-secret-weapon-on-the-web/"
+              "href": "https://www.bain.com/insights/e-loyalty-your-secret-weapon-on-the-web/",
+              "strong": true
             },
             {
               "text": ")."
@@ -743,7 +942,15 @@
         },
         {
           "kind": "paragraph",
-          "text": "Un ejemplo con números redondos, para ver cómo se mueve cada métrica. Es ilustrativo, no un resultado medido:"
+          "text": [
+            {
+              "text": "Un ejemplo con números redondos, para ver cómo se mueve cada métrica. "
+            },
+            {
+              "text": "Es ilustrativo, no un resultado medido:",
+              "strong": true
+            }
+          ]
         },
         {
           "kind": "table",
@@ -801,16 +1008,34 @@
             },
             {
               "text": "HubSpot",
-              "href": "https://efeoncepro.com/servicios-contratar-hubspot/"
+              "href": "https://efeoncepro.com/servicios-contratar-hubspot/",
+              "mention": {
+                "line": "revenue-hubspot"
+              }
             },
             {
-              "text": " y con Salesforce, y en los dos casos el cuello de botella rara vez es la herramienta."
+              "text": " y con Salesforce, y en los dos casos "
+            },
+            {
+              "text": "el cuello de botella rara vez es la herramienta",
+              "strong": true
+            },
+            {
+              "text": "."
             }
           ]
         },
         {
           "kind": "paragraph",
-          "text": "El reto de verdad es cultural. El marketing tradicional se organizaba en campañas trimestrales: plan, producción, ejecución y reporte. Con el loop cambia la mentalidad:"
+          "text": [
+            {
+              "text": "El reto de verdad es cultural.",
+              "strong": true
+            },
+            {
+              "text": " El marketing tradicional se organizaba en campañas trimestrales: plan, producción, ejecución y reporte. Seguro conoces la escena: es viernes por la tarde, la campaña terminó hace dos semanas y recién llega el reporte que dice qué funcionó. Para entonces ya no queda nada que ajustar. Con el loop cambia la mentalidad:"
+            }
+          ]
         },
         {
           "kind": "list",
@@ -840,7 +1065,18 @@
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Si todo gira más rápido gracias a la IA, la pregunta obvia es cómo evitar que la velocidad se lleve la confianza. La respuesta tiene nombre: human-in-the-loop. Las decisiones que importan no quedan sólo en manos de un algoritmo: una persona revisa, aprueba y guía lo que la IA produce."
+          "text": [
+            {
+              "text": "Si todo gira más rápido gracias a la IA, la pregunta obvia es cómo evitar que la velocidad se lleve la confianza. La respuesta tiene nombre: human-in-the-loop. Las decisiones que importan no quedan sólo en manos de un algoritmo: "
+            },
+            {
+              "text": "una persona revisa, aprueba y guía lo que la IA produce",
+              "strong": true
+            },
+            {
+              "text": "."
+            }
+          ]
         },
         {
           "kind": "chart",
@@ -866,7 +1102,18 @@
         },
         {
           "kind": "paragraph",
-          "text": "En la práctica, la confianza se diseña desde el principio, no se repara al final:"
+          "text": [
+            {
+              "text": "En la práctica, "
+            },
+            {
+              "text": "la confianza se diseña desde el principio, no se repara al final",
+              "strong": true
+            },
+            {
+              "text": ":"
+            }
+          ]
         },
         {
           "kind": "list",
@@ -974,14 +1221,18 @@
             },
             {
               "text": "Cómo ejecutar Loop Marketing con HubSpot",
-              "href": "https://efeoncepro.com/loop-marketing/ejecutar-loop-marketing-hubspot/"
+              "href": "https://efeoncepro.com/loop-marketing/ejecutar-loop-marketing-hubspot/",
+              "strong": true
             },
             {
               "text": ". Y si quieres aterrizarlo en tu empresa, en Efeonce lo hacemos sobre "
             },
             {
               "text": "HubSpot",
-              "href": "https://efeoncepro.com/servicios-contratar-hubspot/"
+              "href": "https://efeoncepro.com/servicios-contratar-hubspot/",
+              "mention": {
+                "line": "revenue-hubspot"
+              }
             },
             {
               "text": "."
@@ -990,7 +1241,18 @@
         },
         {
           "kind": "paragraph",
-          "text": "Loop Marketing no es magia ni el juguete de la temporada: es un sistema operativo de marketing ágil, humano y rentable. Esto recién empieza, y el loop no se detiene."
+          "text": [
+            {
+              "text": "Loop Marketing no es magia ni el juguete de la temporada: "
+            },
+            {
+              "text": "es un sistema operativo de marketing ágil, humano y rentable",
+              "strong": true
+            },
+            {
+              "text": ". Esto recién empieza, y el loop no se detiene."
+            }
+          ]
         }
       ]
     },
@@ -1055,7 +1317,8 @@
                     },
                     {
                       "text": "Semrush, 2025",
-                      "href": "https://www.semrush.com/blog/ai-search-seo-traffic-study/"
+                      "href": "https://www.semrush.com/blog/ai-search-seo-traffic-study/",
+                      "strong": true
                     },
                     {
                       "text": "). No encontramos fuente para el «13 veces más efectivo que Google Ads» ni para los experimentos «en 48 horas». Antes de usar una cifra, busca el estudio original."
@@ -1090,14 +1353,16 @@
               },
               {
                 "text": "Loop Marketing (página en español)",
-                "href": "https://www.hubspot.es/loop-marketing"
+                "href": "https://www.hubspot.es/loop-marketing",
+                "strong": true
               },
               {
                 "text": " y "
               },
               {
                 "text": "anuncio de Loop Marketing",
-                "href": "https://www.hubspot.com/company-news/loop"
+                "href": "https://www.hubspot.com/company-news/loop",
+                "strong": true
               },
               {
                 "text": ", 3 de septiembre de 2025."
@@ -1109,7 +1374,8 @@
               },
               {
                 "text": "Nuevo proceso de decisión de compra (las 4S)",
-                "href": "https://business.google.com/es-all/think/consumer-insights/nuevo-proceso-decision-de-compra/"
+                "href": "https://business.google.com/es-all/think/consumer-insights/nuevo-proceso-decision-de-compra/",
+                "strong": true
               },
               {
                 "text": ", 25 de febrero de 2025."
@@ -1121,7 +1387,8 @@
               },
               {
                 "text": "Holiday shopping: the modern consumer's new value equation",
-                "href": "https://business.google.com/en-all/think/consumer-insights/modern-consumer-holiday-marketing-strategy/"
+                "href": "https://business.google.com/en-all/think/consumer-insights/modern-consumer-holiday-marketing-strategy/",
+                "strong": true
               },
               {
                 "text": ", agosto de 2025 (datos de EE. UU.)."
@@ -1133,7 +1400,8 @@
               },
               {
                 "text": "Google Search is in danger of losing Gen Z",
-                "href": "https://fortune.com/2022/07/13/google-tiktok-instagram-search-engine-brainstorm-tech/"
+                "href": "https://fortune.com/2022/07/13/google-tiktok-instagram-search-engine-brainstorm-tech/",
+                "strong": true
               },
               {
                 "text": ", 13 de julio de 2022."
@@ -1145,7 +1413,8 @@
               },
               {
                 "text": "2024 zero-click search study",
-                "href": "https://searchengineland.com/google-search-zero-click-study-2024-443869"
+                "href": "https://searchengineland.com/google-search-zero-click-study-2024-443869",
+                "strong": true
               },
               {
                 "text": "."
@@ -1157,7 +1426,8 @@
               },
               {
                 "text": "Yamini Rangan en INBOUND 2025",
-                "href": "https://www.techradar.com/pro/we-did-not-chase-clicks-we-build-trust-how-hubspot-wants-to-help-write-the-ai-marketing-playbook"
+                "href": "https://www.techradar.com/pro/we-did-not-chase-clicks-we-build-trust-how-hubspot-wants-to-help-write-the-ai-marketing-playbook",
+                "strong": true
               },
               {
                 "text": ", 4 de septiembre de 2025."
@@ -1169,7 +1439,8 @@
               },
               {
                 "text": "Brian Halligan en INBOUND 2018",
-                "href": "https://www.techtarget.com/searchcustomerexperience/podcast/New-HubSpot-products-strategy-CMS-updates-from-Inbound"
+                "href": "https://www.techtarget.com/searchcustomerexperience/podcast/New-HubSpot-products-strategy-CMS-updates-from-Inbound",
+                "strong": true
               },
               {
                 "text": "."
@@ -1181,7 +1452,8 @@
               },
               {
                 "text": "E-Loyalty: Your Secret Weapon on the Web",
-                "href": "https://www.bain.com/insights/e-loyalty-your-secret-weapon-on-the-web/"
+                "href": "https://www.bain.com/insights/e-loyalty-your-secret-weapon-on-the-web/",
+                "strong": true
               },
               {
                 "text": ", 2000."
@@ -1193,7 +1465,8 @@
               },
               {
                 "text": "2025 AI Trends for Marketers",
-                "href": "https://www.hubspot.com/hubfs/HubSpots%202025%20AI%20Trends%20for%20Marketers%20Report.pdf"
+                "href": "https://www.hubspot.com/hubfs/HubSpots%202025%20AI%20Trends%20for%20Marketers%20Report.pdf",
+                "strong": true
               },
               {
                 "text": "."
@@ -1205,15 +1478,11 @@
               },
               {
                 "text": "AI search SEO traffic study",
-                "href": "https://www.semrush.com/blog/ai-search-seo-traffic-study/"
+                "href": "https://www.semrush.com/blog/ai-search-seo-traffic-study/",
+                "strong": true
               },
               {
                 "text": ", 2025."
-              }
-            ],
-            [
-              {
-                "text": "Efeonce. Search Console de efeoncepro.com, lectura del 24 de octubre de 2026."
               }
             ]
           ]

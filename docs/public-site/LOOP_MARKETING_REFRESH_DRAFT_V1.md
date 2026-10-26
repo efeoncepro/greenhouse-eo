@@ -191,3 +191,19 @@ El post 248483 pasa a **borrador**: conservado y recuperable, fuera del índice 
 **Residual:** queda un pingback viejo en los comentarios del pilar con la URL `/uncategorized/como-aplicar-loop-marketing/`.
 Es un comentario, no contenido, así que no se tocó. **Pendiente de una persona:** solicitar la indexación del pilar en
 Search Console, porque la API no lo permite.
+
+### Delta 2026-10-26 (tarde) · énfasis, enlaces y mención (aprobado por Julio)
+
+Se aplicó la regla nueva de su voz (`JULIO_REYES_VOICE_SYSTEM.md` §4.5 y §4.6):
+- **Negritas por importancia:** en los datos, en la cita de Rangan y en las ideas que hilan la lectura.
+- **Enlaces:** los 27 enlaces del cuerpo, internos y a fuentes, van en negrita.
+- **Mención:** la landing de HubSpot va como `mention` de la línea `revenue-hubspot`, en «El stack importa menos que
+  el ciclo» y en «Por dónde empezar».
+- **Dos toques conversacionales:**
+  - una anticipación al abrir «No mata al inbound» («Tal vez estarás pensando…»);
+  - una escena en la parte cultural (el reporte que llega un viernes por la tarde, cuando ya no queda nada que
+    ajustar).
+- **Fuentes:** se quitó «Efeonce. Search Console…», que sólo respaldaba la sección de transparencia ya retirada.
+
+Republicado con `blog-post-content-republish.php`: la FAQ sin cambios y la lectura de vuelta en orden. Respaldo:
+`_gh_post_republish_248398_20261026_114151`.
