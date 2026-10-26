@@ -1,6 +1,6 @@
 # Portada del pilar «Qué es Loop Marketing» (2026-10-26)
 
-**Estado:** candidata, pendiente de aprobación del operador. No está subida. Va con la publicación del pilar (post
+**Estado:** aprobada por el operador el 2026-10-26 («El loop quedó muy achatado, pero bueno vamos»). No está subida. Va con la publicación del pilar (post
 `248398`, fusión con `248483`). Reemplaza las dos portadas anteriores (`248432` y `248501`), que el operador pidió
 rehacer.
 
@@ -51,7 +51,7 @@ rehacer.
 
 ## Pendiente
 
-- Aprobación del operador viendo la hoja de revisión.
+- **Lección para la próxima (operador):** el infinito quedó achatado. La cámara en picado a unos 30° y la figura chica lo aplastan. Si se rehace, hay que pedir la cámara más alta o la figura en un plano vertical frente al lente, y medir la relación alto/ancho de cada lazo en el plate.
 - Subirla con la publicación del pilar. Antes hay que avisar a las sesiones del blog y a la sesión de Analytics, que
   mantiene `blog-post-cover-apply.php`.
 - Casebook cine: agregar la fila del péndulo y la estela de un objeto sin persona.
