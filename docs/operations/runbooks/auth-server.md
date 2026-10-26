@@ -1,9 +1,9 @@
 # Runbook — Efeonce Auth Server (`auth.efeonce.org`)
 
 > **Tipo de documento:** Runbook operativo
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-04 por Claude (TASK-1828, EPIC-044)
-> **Última actualización:** 2026-09-08 por Codex (TASK-1844: v2, configuración durable, CIMD y rollback compatible)
+> **Última actualización:** 2026-10-26 por Codex (control de despliegue production/main, SHA exacto y bloqueo de retroceso)
 > **Documentación técnica:** [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) · [`services/auth-server/README.md`](../../../services/auth-server/README.md)
 
 ## Para qué sirve
@@ -26,8 +26,8 @@ TASK-1844 está desplegada para la cohorte interna exacta. [Manual](../../manual
 ## Antes de empezar
 
 - `gcloud` autenticado en `efeonce-group`. Para PG local, `pnpm pg:connect` (proxy `127.0.0.1:15432`).
-- Topología: **un** Cloud Run service `auth-server` (`us-east4`) compartido por staging y producción, como
-  `ops-worker`; publicado como **segundo host** del front door del gateway MCP (`efeonce-mcp/infra/terraform`,
+- Topología: **un** Cloud Run service `auth-server` (`us-east4`) de producción; no hay servicio Auth staging.
+  Está publicado como **segundo host** del front door del gateway MCP (`efeonce-mcp/infra/terraform`,
   variable `enable_auth_host`). Misma IP `34.111.78.237`, misma policy Cloud Armor. **En producción desde
   2026-09-04** (release `9100bbd2765d`, revisión `auth-server-00005-pk8`).
 - Identidad de runtime: SA `auth-server@efeonce-group` con `roles/cloudkms.signerVerifier` **sólo** sobre la
@@ -45,11 +45,24 @@ Seguir el [runbook de release](production-release.md): preflight, candidato apro
 
 Cloud Build construye `gcr.io/efeonce-group/auth-server` (~6 min) y despliega con
 `--ingress=internal-and-cloud-load-balancing --allow-unauthenticated`. El script verifica que la revisión
-activa sirva `GIT_SHA=EXPECTED_SHA`. En CI lo hace `.github/workflows/auth-server-deploy.yml` (staging en
-push a `develop`; producción sólo vía `production-release.yml`).
+activa sirva `GIT_SHA=EXPECTED_SHA`. `.github/workflows/auth-server-deploy.yml` acepta sólo `main` con
+Environment `production`: push filtrado por rutas, `workflow_call` del orquestador o dispatch productivo.
+El SHA completo debe pertenecer a `origin/main` y se descarga antes de WIF; un lock único del servicio
+serializa las vías y no cancela un deploy activo. El script también rechaza staging, SHA mal etiquetado
+o inputs tracked con cambios sin commit. Resend queda en production v1, Sentry en production y OTP OFF
+retira sus dos montajes; verificar esta configuración además del código.
+
+Si la revisión viva todavía sirve código de `develop` ausente en `main`, el guard debe fallar antes del
+build/deploy. No forzar una promoción ni presentar ese bloqueo como despliegue exitoso. Reconciliar por
+separado el código servido y el candidato gobernado; este fix no autoriza el release amplio ni activa flags.
+Después de fusionar el control, comprobar el run y el readback de la revisión con tráfico.
+
+Publicar el YAML sólo en `main` no elimina el disparador remoto de `develop`: GitHub usa el archivo de la
+rama que recibe el push. Aplicar la corrección estrecha también sobre `origin/develop`, sin publicar el
+historial local ajeno. Hasta verificar ambas ramas, el riesgo de pushes a develop sigue abierto.
 
 El filtro de push incluye `services/auth-server/**`, también su README: un cambio documental dentro del
-servicio puede iniciar el workflow. Su etiqueta staging no aísla el Cloud Run compartido de producción.
+servicio puede iniciar el workflow en main. Ninguna etiqueta staging aísla este servicio productivo.
 Antes de publicar documentación en esas rutas, revisar ese efecto y el plan de publicación. Una cancelación
 no se considera efectiva por aceptar la solicitud: comprobar estado final del job, builds pendientes y
 revisión con tráfico. El step `Deploy auth-server` incluye preflight antes del build; haberlo iniciado no
