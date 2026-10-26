@@ -60,6 +60,8 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 ## Child Tasks
 
+Canary interno real2026-10-26 completado: Microsoft/MFA, una sala sintética, un correo y un PNG físico con GCS/worker/lectura privada; aislamiento y revocación comprobados. Flags OFF restaurados. [Evidencia](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). No cierra UX, disparo del Job ni activación general.
+
 [TASK-2072](../../tasks/in-progress/TASK-2072-rooms-cloud-media-backend.md): backend cloud de imágenes,
 worker desplegable/perfil propio y contrato API para Claude Design. Instrucción2026-10-26: diseño del
 operador con Claude Design; Codex backend. Publicación backend main a87852e por PR2 sin scaffold visual;

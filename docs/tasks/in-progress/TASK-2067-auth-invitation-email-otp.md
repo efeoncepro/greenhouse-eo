@@ -22,7 +22,7 @@
 - UI ready: `n/a`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Core OTP, stores, correo gobernado y SQL local verificados; wiring root disponible con flag OFF. E2E Rooms/issuer con ambas PG y ES256 reales PASS; entrega sólo RAM, migración cloud aplicada con ACL verificadas, emailtypeFALSE; HMACv1 creado, sender sin tracking validado con keyproducción; deploy/KMS/canary pendientes, sin envíos reales.`
+- Status real: `Canary interno real 2026-10-26 PASS: issuer y Rooms productivos, una entrega Resend y recepción Outlook, código consumido una vez, lectura privada y revocación comprobadas. Dominio remitente sin tracking; Resend producción v1 y Sentry production corregidos. Misma imagen Auth sin full release: revisión00167 ON para prueba,00168 OFF final100%, montajes OTP retirados y tipo de correo OFF. Assurance y activación general siguen abiertos; ningún cliente ni pentest completo afirmado.`
 - Rank: `P1`
 - Domain: `identity|platform|data`
 - Blocked by: `none`
@@ -247,6 +247,8 @@ Peer Rooms posee contrato invitación y sesión; root posee email template, KMS,
 
 ## Acceptance Criteria
 
+
+- [x] Canary interno real de identidad, un correo y una imagen: acceso válido, denegaciones y revocación, con flags restaurados OFF. Evidencia: [canary2026-10-26](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). No acredita UI ni activación general.
 - [x] Contrato correo único, proof limitado y ownership acordado en ADR con root/peer.
 - [x] Core rechaza replay, wrong code, expiry, cruce RP/version/recipient y revocación. Evidencia: QA local TASK-2067, 2026-10-25.
 - [x] Reenvío invalida previo, idempotencia no duplica correo y límites sobreviven reenvío/versiones. Evidencia: QA local TASK-2067, 2026-10-25.

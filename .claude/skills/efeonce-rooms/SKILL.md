@@ -56,6 +56,7 @@ Comandos:
   - Prenderlos es una mutación de producción: autorización explícita y readback del valor (no sólo de la presencia).
   - No están en el ledger de flags de Greenhouse (otro repo), así que su estado se registra en `references/program-ledger.md` y en el ledger con una nota.
 - **El canary es uno solo y conjunto con Auth:**
+  Leer primero el ledger: si el correo único ya fue recibido y verificado, no repetirlo por un nuevo despliegue o continuación.
   1. Auth con flags ON.
   2. `ROOMS_*` ON.
   3. Bootstrap de una sala sintética (`scripts/bootstrap-production-pilot.ts`, dry-run por defecto; `--apply` crea).
@@ -69,7 +70,7 @@ Comandos:
   - Cada petición se vuelve a autorizar.
   - `private, no-store`.
   - Nunca se sirve el original, sólo los derivados.
-  - Adapter GCS integrado en main; bucket/IAM, siete migraciones y Job privado desplegados2026-10-26. Job finito probado con cola vacía; sin scheduler ni imagen real. Variables GCS preparadas para próximo deploy. `ROOMS_MEDIA_ENABLED` de la app sigue OFF: activar sólo después del consumidor frontend y canary conjunto.
+  - Adapter GCS integrado en main; bucket/IAM, siete migraciones y Job privado desplegados2026-10-26. Job finito probado con cola vacía y después con un PNG físico a dos WebP; sin scheduler. Canary Auth/correo/imagen completado y desactivado; ver ledger. Variables GCS preparadas para próximo deploy. `ROOMS_MEDIA_ENABLED` de la app sigue OFF: activar sólo después del consumidor frontend y canary conjunto.
 - **Datos sintéticos rotulados.** La demo y el piloto usan personas ficticias. La badge «synthetic» aparece cuando el origen no es `real`.
 - **AXIS y paquetes publicados exactos.** Ninguna copia manual de tokens, logos o primitives. Los SVG públicos salen de `scripts/sync-brand.mjs`.
 - Paridad Full API: toda acción de UI es un command o reader con su contrato. La CLI ya existe; el MCP está pendiente (R13/R14).

@@ -3,6 +3,27 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-26 — Canary real de Auth y una imagen completado; flags OFF
+
+Alcance humano: una sala sintética, una imagen y un correo autorizado.
+[Prueba y límites](../../../../docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
+
+- Microsoft/MFA personal y seis canjes first-party reales durante renovaciones. La sala fue accesible;
+  el listado global quedó denegado. Edición y reapertura sólo en la sala, sin extender su expiración.
+- PNG físico de 3.010.606 bytes por PUT GCS y verificación SHA. Job `rooms-media-worker-nzxrg` produjo
+  dos WebP. Preview de 304.540 bytes, 1122×1402; SHA de SQL, bytes y ETag coincidentes. GET/HEAD200,
+  Range206, condicional304 y no-store. Edición V2 original conservada.
+- Un correo recibido en Outlook: código correcto200, incorrecto400, replay404; invitado sala/imagen200,
+  borrador/otro espacio404. Revocación401 para sala/imagen y404 para enlace. Un challenge y un consumo.
+- Invitación revocada y sala archivada; sesiones y pestañas de prueba cerradas. El archivo pertenece
+  a la demo sintética, sin contenido de clientes. No existe scheduler ni worker continuo.
+- Final: Rooms main `a87852e`, deployment `dpl_GACNzAvGSQVcjcMCCvjWj9BooizV`, flags de acceso e
+  invitaciones false y media ausente/OFF. Auth `00168-vzb`, 100%, first-party/OTP OFF y correo OFF.
+- Auth conserva la corrección a Resend producción v1 y Sentry production, sin nueva imagen ni full
+  release. El default staging del workflow requiere una corrección separada.
+- Bootstrap `b2f90fa` en rama local `codex/rooms-real-image-canary`, sin push ni cambio de main.
+  Lint/typecheck PASS; no se repitió la full suite. Consumidor Claude Design y disparo del Job pendientes.
+
 ## 2026-10-26 — Infraestructura de medios aplicada; bloque acotado terminado
 
 Usuario autoriza infraestructura/migraciones/worker con subagentes, excluyendo Efeonce ID, correo y UI.

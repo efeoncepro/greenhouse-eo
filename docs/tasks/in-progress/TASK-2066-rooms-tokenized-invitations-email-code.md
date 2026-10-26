@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Backend hastacac5311:178/178 pruebas0skip,lint/typesPASS; UIintegrada129checksPASS con issuerlocal/mailRAM. Correo único enlace/código, abrir no envíaotro; pendingrecovery conserva token/version/requestId. CloudRoomsDB19tablas/ACL8negativas yWIF/SM preparados;18envProdOFF. WAF4reglasv2 activas;GETlogin30permitidas/5bloqueadas429,recuperación76s. Sin correoreal; deployWIF/issuer/canary yaceptaciónvisual pendientes.`
+- Status real: `Canary productivo interno 2026-10-26 PASS: una invitación y un correo combinado aceptado y recibido; código recibido abre sala V3 y WebP privados mediante HTTP real. Código incorrecto, reutilización, borrador y otro espacio denegados; revocación invalida sala, imagen y enlace. Un challenge y un consumo comprobados en SQL. Sala archivada, sesiones de prueba cerradas y flags OFF restaurados. Rediseño/UI y activación general siguen separados.`
 - Rank: `Después del contrato TASK-2067; coordinar primitives de sesión/binding con TASK-2065 sin depender de su journey OIDC`
 - Domain: `identity|platform|data`
 - Blocked by: `none`
@@ -281,6 +281,8 @@ Peer Identity TASK-2067/1834, sesión Rooms2065 y dueño Resend/remitente. Reuti
 
 ## Acceptance Criteria
 
+
+- [x] Canary interno real de identidad, un correo y una imagen: acceso válido, denegaciones y revocación, con flags restaurados OFF. Evidencia: [canary2026-10-26](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). No acredita UI ni activación general.
 - [x] ADR Accepted prepare/verify se consume fielmente; proof ES256 exacto con jti UNIQUE/nonce/aud/typ/expiry, sin autenticador alterno.
 - [ ] Emisión inicial produce UN correo con enlace tokenizado y código; sin envío inicial separado, sin primer CTA de solicitud OTP ni verificación visible fuera de Rooms.
 - [x] Contrato permite capturar código EN Rooms y verificar sólo por issuer s2s; no autenticador alterno ni afirmación 2FA/MFA de mismo canal.

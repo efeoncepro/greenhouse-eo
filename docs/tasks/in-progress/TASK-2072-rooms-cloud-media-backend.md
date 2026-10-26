@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Backend main a87852e publicado por PR2. Bloque de infraestructura cerrado: bucket GCS privado, IAM/CORS y SA; 7 migraciones y 25 tablas cloud; rol worker con límite 2 y secreto v1. Job con imagen inmutable, CPU 1/RAM 1Gi, timeout 240s y cero reintentos. Ejecución única rooms-media-worker-sqbt9 SUCCESS con cola vacía; seis negativas SQL, lint del script y typecheck global PASS. Variables GCS preparadas para próximo deploy; app OFF, sin Auth/correo/UI/scheduler ni redeploy web. Canary real de imagen y OIDC, consumidor y disparo automático del Job siguen pendientes.`
+- Status real: `Canary real 2026-10-26 PASS: Efeonce ID con Microsoft/MFA, PNG físico de 3.010.606 bytes por PUT GCS, worker a dos WebP, preview 304.540 bytes 1122x1402 con SHA/ETag/SQL coincidentes. Un correo recibido en Outlook, código válido abre sala V3 e imagen, incorrecto/replay/otro espacio/borrador denegados; revocación niega sala e imagen. Sala archivada, flags web/Auth y correo OFF restaurados. Main a87852e sin cambio funcional; tooling b2f90fa local. Consumidor frontend y disparo automático del Job pendientes; sin cierre de rollout general.`
 - Rank: `R05 cloud después del circuito local2070; frontend2071 conserva ownership separado`
 - Domain: `platform|data|content|ops`
 - Blocked by: `none`
@@ -183,6 +183,8 @@ GCS; previews siguen <=3MiB. La app reautoriza GET/HEAD/Range y nunca ofrece ori
 
 ## Acceptance Criteria
 
+
+- [x] Canary interno real de identidad, un correo y una imagen: acceso válido, denegaciones y revocación, con flags restaurados OFF. Evidencia: [canary2026-10-26](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). No acredita UI ni activación general.
 - [x] GCS privado escribe sólo destinos propios y fija generation en lectura/borrado. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
 - [x] Transfer directo exige sesión/owner/expiry y no persiste URL en receipts/logs. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
 - [x] Complete confirma bytes/checksum/generación antes de encolar, con autoridad fresca al confirmar. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
@@ -191,7 +193,8 @@ GCS; previews siguen <=3MiB. La app reautoriza GET/HEAD/Range y nunca ofrece ori
 - [x] PG y restore preservan V1/V2/V3, hashes, generaciones, permisos y auditoría. Evidencia: recovery aislado PG16/18, seis salas de dos tenants,25tablas/18objetos/12bindings; generaciones cloud físicas siguen sin canary.
 - [x] HTTP/CLI comparten operaciones y guía frontend completa sin lógica de permisos en cliente. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
 - [x] Recursos/env/flags/migraciones tienen readback; canary completo queda explícitamente pendiente. Evidencias: [storage/IAM](../../audits/rooms/2026-10-26-media-storage-infra.json), [DB](../../audits/rooms/2026-10-26-media-database-infra.json), [Job](../../audits/rooms/2026-10-26-media-worker-deployment.json) y [configuración](../../audits/rooms/2026-10-26-media-vercel-configuration.json). Ejecución de cola vacía no acredita imagen real.
-- [ ] Transferencia física GCS y procesamiento/lectura de imagen por autoridad real verificados; consumidor frontend y disparoJob listos antes de mediaON. Bloque posterior a esta entrega acotada.
+- [x] Transferencia física GCS y procesamiento/lectura de imagen por autoridad real verificados. Evidencia: [canary real](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
+- [ ] Consumidor frontend y disparo automático del Job listos antes de activar medios de forma general. Dependencias separadas; no cerrar por este canary.
 
 ## Verification
 

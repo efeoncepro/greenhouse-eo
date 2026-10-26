@@ -10,7 +10,7 @@ web conserva medios, invitaciones y acceso first-party desactivados.
 - SA exclusiva sin claves; acceso al secreto de su rol SQL únicamente.
 - Rol `rooms_media_worker`: máximo dos conexiones, sin privilegios altos y con writes por tabla/columna.
 - Siete migraciones y 25 tablas en `rooms_production`. La instancia compartida conserva backup y PITR.
-- Una ejecución real con cola vacía terminó con `{processed:false}`. No se ha procesado una imagen real.
+- Una ejecución con cola vacía y otra con un PNG físico terminaron correctamente; la segunda produjo dos WebP. [Canary real y cierre OFF](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
 
 Evidencias: [Job](../../audits/rooms/2026-10-26-media-worker-deployment.json),
 [base de datos](../../audits/rooms/2026-10-26-media-database-infra.json),
@@ -47,6 +47,7 @@ contraseñas en SQL ni argumentos. No inicializa otra vez la contraseña de un r
 Las variables GCS del proyecto Vercel están preparadas para el próximo deploy. No se reconstruyó la
 aplicación por este bloque. [Configuración](../../audits/rooms/2026-10-26-media-vercel-configuration.json).
 
-Antes de activar medios faltan consumidor frontend, transferencia y procesamiento de una imagen real,
-canary conjunto con Efeonce ID y una decisión explícita sobre el disparo del Job. No activar un scheduler,
+La transferencia y el canary conjunto con Efeonce ID ya se comprobaron con un archivo físico y el único
+correo autorizado; no repetir ese envío por inferencia. Antes de activar medios de forma general faltan
+el consumidor frontend y una decisión explícita sobre el disparo del Job. No activar un scheduler,
 `--loop`, flags web ni envío de correos por el solo hecho de tener infraestructura lista.

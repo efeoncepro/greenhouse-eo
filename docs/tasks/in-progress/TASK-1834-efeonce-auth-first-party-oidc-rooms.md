@@ -18,7 +18,7 @@
 - UI ready: `n/a`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-10-25: foundation first-party implementada y verificada localmente: registro auditado, authorize/code/token ES256, handles opacos introspect/revoke, contexto Rooms y sesión viva separados de MCP. PostgreSQL efímero real 6/6 PASS; suite focal 156/156 PASS; suite auth+service+correo del coordinador 571 PASS/16 skip y regresión OTP posterior 23 PASS. Recorrido browser Rooms→Auth→Rooms con ambas PG reales PASS por TASK-2065. AUTH_SERVER_FIRST_PARTY_ENABLED=false por defecto; migraciones cloud1834/2067 aplicadas, RP efeonce-rp-rooms-production registrado y secretosv1 verificados; deploy, activación y release pendientes. TASK-2064 posee V4; TASK-2065 posee consumer/E2E; TASK-2063 conserva migración Greenhouse. Assurance operacional, staging y rollout permanecen abiertos.`
+- Status real: `Canary first-party real 2026-10-26 PASS: Microsoft y MFA aprobados por la persona, seis canjes Rooms emitidos y consumidos durante renovaciones, autoridad limitada a una sala y listado global denegado. Misma imagen Auth; configuración ON temporal00167 y OFF final00168 con health/readiness/discovery200. Migración Greenhouse2063, assurance1833 y activación general continúan separados; no full release Greenhouse ni clientes.`
 - Rank: `TBD`
 - Domain: `platform|identity|ui`
 - Blocked by: `none para implementación local verificada; TASK-1833 antes de activación Production`
@@ -314,6 +314,8 @@ identidad productiva ni DB cloud. La autorización de implementación no acredit
 
 ## Acceptance Criteria
 
+
+- [x] Canary interno real de identidad, un correo y una imagen: acceso válido, denegaciones y revocación, con flags restaurados OFF. Evidencia: [canary2026-10-26](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). No acredita UI ni activación general.
 - [x] Operador aprobó el2026-10-25 Rooms primero y login V4 Greenhouse como pantalla del issuer; re-scope documental asigna consumer Rooms a2065, UI a2064 y Greenhouse a2063.
 - [ ] Registro RP tipado/auditado exige redirect exacto, clase first-party, audience, scopes mínimos y assurance. Registro, redirect, audience y scope verificados localmente; v1 limita frescura por `sessionMaxAgeSeconds`/`prompt`/`max_age`, sin declarar ACR/AMR o step-up assurance completo (TASK-1833).
 - [x] Metadata y token endpoint concuerdan: openid emite id_token ES256 con nonce/aud propios sin gv/grants MCP. Evidencia: `protocol.test.ts` valida firma y conjunto exacto de claims; HTTP local verifica canje real.

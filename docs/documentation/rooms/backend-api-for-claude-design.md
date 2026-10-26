@@ -1,5 +1,7 @@
 # Rooms — contrato backend para Claude Design
 
+> Canary real completado: Microsoft/MFA, un correo y un PNG por GCS→Job→WebP privado, con aislamiento y revocación comprobados. Flags restaurados OFF; consumidor frontend y disparo automático del Job pendientes. [Evidencia](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
+
 > Release2026-10-26: backend integrado en `main@a87852e` mediante [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2). Se excluyeron los doce paths visuales2071; la interfaz actual sigue con placeholder. Bucket/IAM, migracionescloud y Job aplicados; ejecuciónvacíaPASS, flagsappOFF. El diseño debe conectar transferencia directa y entrega privada antes de activar medios. [Recibo](../../audits/rooms/2026-10-26-production-backend-release.json).
 
 Responsabilidades ratificadas por el operador2026-10-26: **Codex backend; Claude Design interfaz**.
@@ -10,7 +12,7 @@ Este documento describe contratos ejecutables, no una composición visual ni una
 - Producción: `https://efeonce-rooms.vercel.app`, backend `main@a87852e`, acceso/invitaciones/mediosOFF.
 - Backend de medios: TASK-2070/2072 integrado por [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2).
   Bucket/IAM/CORS, siete migraciones cloud y Job ya aplicados; imagen Linux probada por CI y una ejecución
-  real con cola vacíaPASS. Variables GCS del proyecto preparadas para próximo deploy. Canary físico,
+  real con cola vacíaPASS. Variables GCS del proyecto preparadas para próximo deploy. Canary físico interno completado;
   consumidor y disparo automático del Job antes de mediaON permanecen pendientes. PR1 conserva el antecedente d056708.
 - Schemas: `efeonce-rooms/src/domain/{contracts,persistence-contracts,content-contracts,content-v3,media-contracts}.ts`.
 - Fuente de permisos: `can` y autoridad persistida servidor. Roles nominales/organizationId no conceden acceso.
@@ -107,7 +109,7 @@ V2 sin medios del scaffold exige permisos completos; V1 y V2 con medios no se mi
    fuera de SQL y vuelve a comprobar autoridad/CAS. Respuesta no implica que el worker haya terminado.
 8. Consultar estado hasta ready/failed/cancelled. Worker comprueba contenedor/animación/codec/límites y produce
    preview+thumbnail. En failed, mostrar problem.code y ofrecer únicamente acciones autorizadas.
-9. `content.attachAsset` vincula asset al bloque/ref con revisión actual. Título/alt/pie se guardan mediante
+9. `content.attachAsset` vincula asset al bloque/ref con revisión actual. El `assetRefId` debe ser nuevo o apuntar ya a esa misma versión; un ref existente con otro valor, incluso null, produce409. Mantener refs vacíos hasta el attach verificado. Título/alt/pie se guardan mediante
    `content.upsertBlock` sobre el bloque correspondiente. Lista para añadir y añadida son estados distintos.
 10. Preview usa el mismo contenido proyectado. Publicar con `editions.publish` sólo con canPublish y cobertura
     válida; servidor vuelve a resolver ready/scope y fija generaciones. No transformar ready en publicado en UI.

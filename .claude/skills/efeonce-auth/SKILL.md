@@ -64,6 +64,7 @@ Comandos útiles:
   - Hacerlo sólo deliberadamente, con autorización explícita, y conciliar antes qué host sirve cada revisión.
 - **El HMAC del OTP y el token de autoridad de Rooms sólo se montan con el flag ON** (`deploy.sh`). Un flag OFF con secreto ausente es el estado correcto, no un bug.
 - **El correo real tiene un único destinatario autorizado** (`jreyes@efeoncepro.com`) y se manda una sola vez, como canary.
+  - Leer el ledger y reconciliar entregas antes de enviarlo: un canary ya recibido no autoriza repetir el correo en otro despliegue.
   - Ningún cliente.
   - Ninguna ampliación sin una nueva autorización del operador.
   - `email_type_config.auth_server_rooms_invitation_otp` nace en FALSE.

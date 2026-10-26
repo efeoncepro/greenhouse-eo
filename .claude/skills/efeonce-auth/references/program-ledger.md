@@ -3,6 +3,26 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-26 — Canary interno Rooms y una imagen real PASS; flags OFF
+
+[Recibo conjunto](../../../../docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md): una sala
+sintética, un archivo físico y un correo al único destinatario autorizado; ningún cliente.
+
+- Código ya servido en `754a2a280`, digest `122e2acb…`: sin imagen nueva ni full release de Greenhouse.
+  Revisión de configuración `00167-ml6` ON temporal con HMAC/authority v1 y Resend producción v1.
+- Microsoft/MFA aprobados por la persona; seis códigos first-party emitidos y consumidos. Renovación
+  por SSO sin ampliar grants, workspace global ni scopes MCP.
+- RP, secreto y redirect coincidentes; seis tablas Auth. Remitente exacto sin tracking. Un correo
+  aceptado y recibido en Outlook, un challenge y un proof; código incorrecto400, replay404 y
+  revocación401/404. Guest HTTP real leyó sala V3 e imagen procesada en GCS.
+- Final activo `auth-server-00168-vzb`, 100%, misma imagen; first-party/OTP false, montajes HMAC/authority
+  retirados y tipo de correo OFF. Health/readiness/discovery200. Resend producción v1 y Sentry production
+  permanecen corregidos. Variables GitHub no cambiaron: false.
+- Workflow con ENV staging por defecto pendiente de corrección antes de activación duradera. Este
+  canary no cierra el release262, assurance1833, migración Greenhouse ni aceptación del nuevo frontend.
+- Invitación revocada y sala archivada; sesiones de prueba cerradas, sin rotación ni claves nuevas.
+  Identificadores personales y recibos sensibles permanecen en `.auth` privada, fuera de Git.
+
 ## Segunda auditoría 2026-10-25 ~23:30 UTC (EPIC-044 completo + logs)
 
 Detalle en §6 de la [auditoría](../../../../docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
