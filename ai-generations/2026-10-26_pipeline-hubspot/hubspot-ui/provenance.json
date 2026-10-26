@@ -1,0 +1,91 @@
+{
+  "capturedAt": "2026-10-26T18:12:26.556453Z",
+  "source": "https://brandfolder.com/hubspot/solutions-partner-hub",
+  "rights": "Solutions Partner Hub user agreement accepted 2026-10-26 with Julio Reyes's explicit OK (Efeonce is a HubSpot Solutions Partner). Use as-is: no recolor, no data or text edits; caption 'Interfaz: HubSpot'.",
+  "assets": [
+    {
+      "file": "prospecting-agent-plays.svg",
+      "sha256": "c3df149667f54aa4cdf795f65a54b1a78b69d6dcbf4c0e75e060dfd8e6ff98e0",
+      "bytes": 371958,
+      "embeddedRasters": 0,
+      "textNodes": 0,
+      "brandfolderAssetName": "SH AH_ProspectingAgent_Plays_EN_03132026",
+      "brandfolderAsset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/63wjtqhw5f9n4fcm5kqks5tc",
+      "attachmentId": "t3rhgsk9mb2xgfnz5pwg5",
+      "section": "Product User Interface (English)",
+      "modified": false
+    },
+    {
+      "file": "prospecting-agent-contact-sourcing.svg",
+      "sha256": "76108d52b4f97dfdf64ebc2a0a0dd693f6150e8736b2ab6ff1944c0bb045f5e6",
+      "bytes": 840870,
+      "embeddedRasters": 1,
+      "textNodes": 0,
+      "brandfolderAssetName": "SH AH_ProspectingAgent_ContactSourcing_EN_ 3132028",
+      "brandfolderAsset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/fvswrf4vvzxj7j4vghmc6t63",
+      "attachmentId": "xbfhgf5hjtq7z9t8fhjqg36",
+      "section": "Product User Interface (English)",
+      "modified": false
+    },
+    {
+      "file": "prospecting-agent-buying-signals.svg",
+      "sha256": "5f1a59545ac0fb39f7231d8e6d82dfba9e06b623d9974ed07a439f89fef452d7",
+      "bytes": 8708035,
+      "embeddedRasters": 4,
+      "textNodes": 0,
+      "brandfolderAssetName": "SH AH_ProspectingAgent_BuyingSignalMonitoring_EN_03132026",
+      "brandfolderAsset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/5rxfst6br35c3knx4wfhhvfv",
+      "attachmentId": "bp2hjvxjhv33xgmp6xsw75v",
+      "section": "Product User Interface (English)",
+      "modified": false
+    },
+    {
+      "file": "prospecting-agent-advanced-settings.svg",
+      "sha256": "e3fadfebe8445d6d31b29571781bc87a908ac0e9c8e6664813c492727d230b16",
+      "bytes": 432350,
+      "embeddedRasters": 0,
+      "textNodes": 0,
+      "brandfolderAssetName": "SH AH_Prospecting Agent - Personalize messaging_EN_9032025",
+      "brandfolderAsset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/294439ffx4j2jghk9jbfh3",
+      "attachmentId": "545q9jfmstkjgvk3m9st3rns",
+      "section": "Product User Interface (English)",
+      "modified": false
+    },
+    {
+      "file": "prospecting-agent-review-before-sending.svg",
+      "sha256": "79f94bbf8c184291b505d2233faadf08d3b0c528c079ac1ed6a7db11223e852a",
+      "bytes": 270395,
+      "embeddedRasters": 0,
+      "textNodes": 0,
+      "brandfolderAssetName": "SH AH_Prospecting Agent - Automation controls_EN_9032025",
+      "brandfolderAsset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/jn4qr4hsfhxxxwhcm4mq67g",
+      "attachmentId": "m79q25v6tz89rmgpmcsgc5v",
+      "section": "Product User Interface (English)",
+      "modified": false
+    },
+    {
+      "file": "smart-deal-progression-update-crm.svg",
+      "sha256": "d2193722fe4cc7a9d03d2f29af82d9d9707ad90f8b64e072411a1fe503c8307d",
+      "bytes": 269530,
+      "embeddedRasters": 0,
+      "textNodes": 0,
+      "brandfolderAssetName": "SH_SmartDealProgression_UpdateCRM_EN_03102026",
+      "brandfolderAsset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/6pqrwxjgxc8kjxc3j9fzjpxg",
+      "attachmentId": "j9nw3sjtmc9mmfgk7v8z6b4v",
+      "section": "Product User Interface (English)",
+      "modified": false
+    },
+    {
+      "file": "smart-deal-progression-board-notification.svg",
+      "sha256": "ecb2901181723120aabe9fb4729804a10dd4ba0aaeaa2ce2fa1c0744eec43ab3",
+      "bytes": 583275,
+      "embeddedRasters": 1,
+      "textNodes": 0,
+      "brandfolderAssetName": "SH_SmartDealProgression_BoardNotification_EN_03102026",
+      "brandfolderAsset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/45fnwxktkqvsr7kmjrsrrh7s",
+      "attachmentId": "wj9v86pwf4443gnmpkxzgp8r",
+      "section": "Product User Interface (English)",
+      "modified": false
+    }
+  ]
+}
