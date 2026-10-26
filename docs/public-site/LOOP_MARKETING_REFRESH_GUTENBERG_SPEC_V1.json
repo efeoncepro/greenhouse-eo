@@ -95,6 +95,16 @@
               }
             ]
           ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Si prefieres escucharlo de HubSpot, así lo presentaron Yamini Rangan y Karen Ng en INBOUND 2025:"
+        },
+        {
+          "kind": "embed",
+          "provider": "youtube",
+          "url": "https://www.youtube.com/watch?v=1YwSHwGM8ws",
+          "caption": "Fuente: HubSpot, Spotlight de INBOUND 2025"
         }
       ]
     },
@@ -306,6 +316,16 @@
         {
           "kind": "paragraph",
           "text": "Cada etapa tiene una tarea y le entrega algo a la siguiente. Te las cuento con los pasos que propone HubSpot y lo que hemos aprendido aplicándolas."
+        },
+        {
+          "kind": "image",
+          "mediaId": 248439,
+          "url": "https://efeoncepro.com/wp-content/uploads/2025/09/Loop-MKT.svg",
+          "alt": "Diagrama del Loop Marketing: un símbolo de infinito naranja con las cuatro etapas en orden, Express (01), Tailor (02), Amplify (03) y Evolve (04), conectadas en un ciclo continuo.",
+          "width": 772,
+          "height": 423,
+          "align": "center",
+          "caption": "Las cuatro etapas con sus nombres en inglés: Express es la Definición, Tailor la Adaptación, Amplify la Amplificación y Evolve la Optimización."
         }
       ]
     },
@@ -555,7 +575,13 @@
         },
         {
           "kind": "paragraph",
-          "text": "Por eso la Optimización no es el final del loop: es el motor que lo mantiene girando."
+          "text": "Por eso la Optimización no es el final del loop: es el motor que lo mantiene girando. HubSpot repasa el ciclo completo en este video:"
+        },
+        {
+          "kind": "embed",
+          "provider": "youtube",
+          "url": "https://www.youtube.com/watch?v=Pv-lPAukoMI&t=113s",
+          "caption": "Fuente: HubSpot, «Loop Marketing, Explained»"
         }
       ]
     },

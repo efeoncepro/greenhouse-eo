@@ -84,6 +84,8 @@ const spec = {
             [b('Optimización'), t(' (Evolve): aprender rápido y cambiar en días, no en trimestres.')]
           ]
         },
+        P('Si prefieres escucharlo de HubSpot, así lo presentaron Yamini Rangan y Karen Ng en INBOUND 2025:'),
+        { kind: 'embed', provider: 'youtube', url: 'https://www.youtube.com/watch?v=1YwSHwGM8ws', caption: 'Fuente: HubSpot, Spotlight de INBOUND 2025' },
         { kind: 'heading', text: 'No mata al inbound: lo continúa', level: 3 },
         {
           kind: 'paragraph',
@@ -195,6 +197,16 @@ const spec = {
         P(
           'Cada etapa tiene una tarea y le entrega algo a la siguiente. Te las cuento con los pasos que propone HubSpot y lo que hemos aprendido aplicándolas.'
         ),
+        {
+          kind: 'image',
+          mediaId: 248439,
+          url: 'https://efeoncepro.com/wp-content/uploads/2025/09/Loop-MKT.svg',
+          alt: 'Diagrama del Loop Marketing: un símbolo de infinito naranja con las cuatro etapas en orden, Express (01), Tailor (02), Amplify (03) y Evolve (04), conectadas en un ciclo continuo.',
+          width: 772,
+          height: 423,
+          align: 'center',
+          caption: 'Las cuatro etapas con sus nombres en inglés: Express es la Definición, Tailor la Adaptación, Amplify la Amplificación y Evolve la Optimización.'
+        },
         { kind: 'heading', text: 'Definición (Express): la voz antes que la IA', level: 3 },
         {
           kind: 'paragraph',
@@ -269,7 +281,8 @@ const spec = {
             [b('A la Amplificación:'), t(' mejora la mezcla de canales según dónde se genera valor.')]
           ]
         },
-        P('Por eso la Optimización no es el final del loop: es el motor que lo mantiene girando.'),
+        P('Por eso la Optimización no es el final del loop: es el motor que lo mantiene girando. HubSpot repasa el ciclo completo en este video:'),
+        { kind: 'embed', provider: 'youtube', url: 'https://www.youtube.com/watch?v=Pv-lPAukoMI&t=113s', caption: 'Fuente: HubSpot, «Loop Marketing, Explained»' },
         { kind: 'heading', text: '¿Por qué etapa se entra?', level: 3 },
         P(
           'Por la que más sentido tenga en tu negocio: puedes empezar personalizando, distribuyendo o midiendo, y el ciclo se activa igual. Con una condición: si tu voz todavía no está definida, empieza por la Definición. Personalizar o amplificar un mensaje que no es tuyo sólo acelera el ruido.'

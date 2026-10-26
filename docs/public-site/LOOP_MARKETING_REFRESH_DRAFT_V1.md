@@ -125,3 +125,15 @@ frecuente: el 4,4 es de Semrush; «13 veces» y «48 horas» no tienen fuente.
 - **Pendiente de decidir:** 248513 «Ejecutar Loop Marketing con HubSpot» está fuera del índice («Rastreada: actualmente
   sin indexar», sesión de Analytics, 2026-10-26) y el pilar lo enlaza en «Por dónde empezar»: sumarlo a la fusión con
   301 o refrescarlo aparte.
+- **Visuales de los originales reincorporados (2026-10-26, pedido de Julio):**
+  - El diagrama `Loop-MKT.svg` (media 248439, del post 248398) va al inicio de «Las 4 etapas», a 772 px de ancho como
+    en el original. Ahora tiene texto alternativo y un pie que traduce los nombres en inglés a las etapas en español.
+  - El Spotlight de INBOUND 2025 (`1YwSHwGM8ws`, de 248483) va después de la caja con los dos juegos de nombres.
+  - «Loop Marketing, Explained» (`Pv-lPAukoMI`, empieza en 1:53 como en el original) va en Optimización, donde estaba.
+  - Los dos videos usan el bloque `core/embed` de Gutenberg. Sus títulos se comprobaron con oEmbed.
+  - Los 7 pullquotes de los originales no vuelven (Julio: «los destacados obvialos»).
+- **Portadas pendientes:** las destacadas 248432 y 248501 se descartan y hay que rehacerlas (Julio). La copia 252141
+  sigue usando la de 248398 mientras tanto.
+- **Prioridad comercial (sesión de Analytics, 2026-10-26; decide Julio):** Loop queda sexto en el orden del blog.
+  Instrucción: cerrar la fusión sin sobreinvertir, porque la demanda de «loop marketing» baja. Primero va reescribir
+  «SEO + AEO 2025» a 2026, sin cambiar la URL.
