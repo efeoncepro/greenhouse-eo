@@ -943,6 +943,27 @@ manda la regla.
   solas). Rótulo de figura discreto en vez de encabezado. Elementos de interfaz (tarjeta, píldoras, baldosas) sí.
   Bricolage en frases largas con contraste de pesos (400 + 760). Detalle y caso: [ledger.md](ledger.md) 2026-10-25.
 - **Portadas:** no repetir la fórmula «persona tras una mesa con tarjetas de vidrio»; la próxima propone otra idea.
+- **Método de construcción (tres casos: ICP y AEO el 2026-10-25, marketing de contenidos el 2026-10-26).** Un script
+  versionado por pieza; referencia vigente:
+  `ai-generations/2026-10-26_marketing-contenidos-leads/infografia/build.mjs` (copiarlo y adaptarlo, no partir de cero).
+  - Valores de La órbita desde `@efeoncepro/axis-tokens` (`efeonceGraphicLine`), la órbita con `orbitSvg` y los íconos
+    con `resolveIcon` de `@efeoncepro/axis-graphic-line`: ningún HEX, px ni trazo transcrito a mano.
+  - Texto **medido y contorneado con fontkit** (Poppins y Bricolage Grotesque; el peso de la idea clave sale de
+    `GL.type.answer.weight`) en `delivery/`; **texto vivo** en `source/` para editar. Pie con fuente, logo y burbuja URL.
+  - `preview.mjs` rinde los PNG con Playwright para revisar a tamaño real.
+  - **La línea de servicio sigue a la portada del artículo** (en marketing de contenidos, `brand`: acento `#bb1954` en
+    claro y `#ff6500` en oscuro), y con ella la voz de los íconos.
+  - **Cuatro variantes:** escritorio de 1600 de ancho y teléfono de 900 de ancho, en claro y en oscuro. **En el blog
+    sólo se publican las claras** (el sitio no sigue el modo oscuro del sistema; decisión del 2026-10-25 en el ICP);
+    las oscuras se construyen igual.
+  - **El build mide y falla** (resultado en `build-report.json`): texto fuera del lienzo o sobre el pie, texto que cruza
+    la órbita (`textCrossesRing`) y **texto encimado** (intersección de cajas entre textos protegidos). La tercera
+    comprobación nació el 2026-10-26: el canal de la última fila quedaba encimado sobre su texto y nada lo detectaba;
+    se corrigió llevando los canales a una pastilla junto al nombre. Una infografía sin esa medición no se entrega.
+  - Íconos del grupo en **una sola voz**: `auditIconGroup` corta con `mixed-voices` si se mezclan Trazo y Plastilina
+    (inventario por voz y formatos de contenido resueltos: [iconography.md](iconography.md) §0). Si el concepto no
+    tiene glifo en la voz de la pieza, se dibuja la forma al trazo con el mismo grosor relativo y la tinta del tema, sin
+    esfera propia (caso: el foco «idea» como cubo isométrico, que además retoma el cubo de la portada).
 
 ## 13. Pendientes del operador (no los decidas por tu cuenta)
 

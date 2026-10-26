@@ -736,7 +736,9 @@ esta skill el 2026-10-24:
   su título encima.
 
 La cabecera del artículo no muestra la destacada, y el archivo v3 del blog es una lista de texto. Las imágenes del
-cuerpo (de 0 a 2) sólo van si explican algo: las infografías en SVG, legibles a 390 px. Márgenes por superficie y
+cuerpo (de 0 a 2) sólo van si explican algo: las infografías en SVG, legibles a 390 px, construidas con el método de
+[manzanitas.md](manzanitas.md) §12b (build versionado, texto contorneado, mediciones en `build-report.json`; en el blog
+sólo la versión clara). Márgenes por superficie y
 diagramas: [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 Contrato: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` · FAQ: `docs/public-site/BLOG_FAQ_BLOCK_ANALYSIS_V1.md`.
 

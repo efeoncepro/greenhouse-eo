@@ -415,5 +415,7 @@ una idea, contada en cada formato, con un siguiente paso claro y medida para apr
 - **Rollback:** contenido y metas desde `_gh_post_refresh_244883_20261026_224419`; portada desde
   `_gh_cover_refresh_244883_20261026_224432` (manual de portadas, «Volver atrás»); hero y tarjeta con
   `blog-home hero|card 244883 --clear --apply`.
-- **Pendiente:** la indexación la pide la sesión de Analytics sólo si Julio se lo pide directamente; mapa de átomos
+- **Indexación:** Julio se la pidió directamente a la sesión de Analytics; Google confirmó la solicitud a las **22:51 UTC**
+  (`pnpm public-website:gsc-index`). Último rastreo previo: 2026-10-24, anterior al cambio. 3 de 10 solicitudes del día.
+- **Pendiente:** mapa de átomos
   (carrusel de LinkedIn con la infografía, post de Julio, edición del newsletter, Threads).

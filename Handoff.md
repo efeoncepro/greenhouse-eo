@@ -1,5 +1,15 @@
 # Handoff
 
+## 2026-10-26 — Blog: refresh de Pipeline y de marketing de contenidos publicados
+
+Pipeline (246045 → `/hubspot/pipeline-de-ventas/` con 301) y marketing de contenidos (244883, misma URL, 22:44 UTC)
+publicados con portada, hero, tarjeta e infografía «Una idea, cada formato» (adjuntos 252169/252170, sólo claras).
+Copias privadas 252161/252171 en la papelera; indexación de ambos pedida por la sesión de Analytics con OK directo de
+Julio. Registro, QA y rollback en [Pipeline §11](docs/public-site/HUBSPOT_PIPELINE_REFRESH_DRAFT_V1.md) y
+[marketing de contenidos §9–§10](docs/public-site/CONTENT_MARKETING_LEADS_REFRESH_DRAFT_V1.md). Receta de refresh y
+trampas de QA (host.js del Growth CTA, engine.js del gráfico, categoría principal de la copia) en la skill del sitio
+público §17. Pendiente: mapa de átomos de marketing de contenidos; tanda 2: GA4 formularios y Excel→HubSpot (246072).
+
 ## 2026-10-26 — Rooms/Auth: continuidad documental y conexión Claude Design
 
 Estado y pendientes reconciliados en [dossier Rooms](docs/architecture/rooms/README.md),
@@ -279,12 +289,3 @@ Commits `7b57a9589`, `1991fe21d`, `c90171c9e` + runtime `b5f7a25`, `4a2bfd2`, `f
 `/tmp/eo-nosotros-widgets-before-*.tar` en Kinsta. **Pendiente por decisión del operador:** el mismo choque de rieles en
 Partners entre 1181 y ~1320 px. **Sin push** (develop adelantado; varias sesiones). TASK-1322 cerrada como superada;
 TASK-1369 recalibrada al remanente (JSON-LD `AboutPage`/`Organization`/`Person`, reslug `/nosotros`, GVC; fundación 2018).
-
-## 2026-10-23 — EO Portfolio: programa creado y TASK-2046 Slice 1 (sólo lectura)
-
-[PDR-028](docs/public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md), EPIC-056, ISSUE-183 y
-TASK-2046…2049 creados (`658e828fe`). TASK-2046 en curso: inventario por WP-CLI de las 59 entradas `ohio_portfolio`
-(15 reales, 44 demo), allowlist por ID y foto previa versionadas en `scripts/public-website/eo-portfolio/`; Yoast
-Premium 27.7 acepta 410; Search Console por API: demos 0 clics. **Sin cambios en el sitio.** Pendiente antes del
-Slice 2: revisar enlaces externos de las URLs demo en la interfaz de Search Console y el OK del operador al `dryRun`.
-Hallazgos: 12 entradas reales con metadatos duplicados (afecta el Slice 3) y `cms.efeoncepro.com` indexado (ISSUE-183).

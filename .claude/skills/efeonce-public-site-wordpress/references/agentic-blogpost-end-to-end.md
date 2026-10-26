@@ -8,7 +8,8 @@ and the Glitch Flash post `251941` (§15); case-specific IDs and values are
 evidence, never reusable defaults.
 
 Also load `content-factory-gutenberg.md` for Content Factory commands, block
-recipes, and existing-post refresh rules.
+recipes, and existing-post refresh rules. Refresh of a published post through a
+private review copy: §17; merging two posts: §16.
 
 ## Non-negotiable Invariants
 
@@ -545,6 +546,79 @@ IDs son evidencia del caso, no valores por defecto. El detalle del caso vive en
   detiene sobre él, porque se dibuja cerca del viewport: haz scroll hasta el
   gráfico y espera antes de capturar.
 
+## 17. Refresh de un post publicado: copia privada → publicación
+
+Úsalo para reescribir un post ya publicado sin tocarlo hasta que la versión nueva
+esté revisada. Casos fuente (2026-10-26): Pipeline 246045 (slug nuevo + 301) y
+Marketing de contenidos 244883 (misma URL). Las reglas de refresh de
+`content-factory-gutenberg.md` siguen aplicando; si el refresh absorbe otro post,
+es una fusión (§16).
+
+1. **Borrador en el repo** `docs/public-site/<TEMA>_REFRESH_DRAFT_V1.md`, con
+   §registro de publicación y rollback. Las notas internas viven sólo ahí: el texto
+   público nunca menciona la versión anterior ni el refresh.
+2. **Coordinación.** Antes de cualquier escritura en el sitio (copia, publicación,
+   portada, hero, tarjeta, papelera), avisa a las sesiones del blog (portada,
+   artículos, Analytics, author plugin, archivo) y espera respuesta. La purga ya
+   está autorizada (§10); la escritura no.
+3. **Copia privada de revisión** con `wp_insert_post`: `post_status=private`,
+   slug `revision-<tema>-v1`, mismo autor, categorías y destacada del original,
+   `_yoast_wpseo_meta-robots-noindex=1` y `_eo_review_copy_of=<id original>`.
+   Copia también `_yoast_wpseo_primary_category`: sin ella el permalink toma otra
+   categoría (en 244883 salió `/marketing-digital/` en vez de `/inbound/`).
+4. **QA visual de la copia.** Sin sesión no se ve: renderiza su `the_content` con
+   WP-CLI e inyéctalo con Playwright en un artículo publicado que ya cargue los
+   scripts de los bloques (se usó `/loop-marketing/que-es-loop-marketing/`, que
+   tiene gráficos y Growth CTA). Trampas:
+   - el Growth CTA sale sin lockup ni negrita del énfasis porque
+     `src/growth-cta/host.js` (efeonce-editorial-blocks) no vuelve a correr:
+     reinyecta `#eo-growth-cta-host-js`;
+   - el gráfico Efeonce sale vacío porque su loader (`#efeoncepro-chart-script-js`,
+     `src/chart/view.js`) carga el engine en diferido observando las figuras que la
+     inyección quitó: agrega `engine.js` a mano junto al loader;
+   - en el render por WP-CLI `data-eo-gcta-mark` sale con `http://` (`plugins_url`
+     sin https): no es bug, en una petición web sale `https://`;
+   - la tarjeta flotante «Next Post» del tema puede tapar capturas.
+5. **Publicación en la misma URL**, con autorización del operador (§10). Patrón
+   versionado: `ai-generations/2026-10-26_marketing-contenidos-leads/publicacion/publish.php`;
+   con cambio de URL, la variante de Pipeline
+   (`ai-generations/2026-10-26_pipeline-hubspot/publicacion/publish.php`: slug
+   nuevo + 301 plain de Yoast, `taxonomy-permalink-migrations.md` §4). Simulación →
+   `apply`, con guardas: estado publicado, slug, `post_modified_gmt` esperado,
+   sha256 del contenido actual, permalink, que la copia sea la copia privada de ese
+   post, y `sameAsReviewed` (lo que se publica es idéntico a la copia revisada).
+   Escribe título, contenido, extracto y metas Yoast (title, descripción, frase
+   clave, tiempo de lectura, OG title y OG description). Respaldo previo en la
+   opción `_gh_post_refresh_<id>_<UTC>`. Conserva fecha, categorías, etiquetas y
+   destacada.
+6. **Emojis:** WordPress guarda `🍏` como `&#x1f34f;`. Toda guarda o readback que
+   compare contenido (`sameAsReviewed`, sha, QA) normaliza esas entidades en los
+   dos lados (§5).
+7. **Después de publicar**, en este orden:
+   - portada con `scripts/public-website/blog-post-cover-apply.php` sin modificar
+     (simulación con `expectedThumb`/`expectedOg` → `apply`), avisando antes a la
+     sesión de Analytics;
+   - hero y tarjeta con `pnpm public-website:blog-home hero|card <id> … --apply`
+     (§6). Escriben en `scripts/public-website/blog-home/ledger/2026-10.jsonl`,
+     compartido entre sesiones: sólo se agregan líneas, nunca se reescribe; se
+     commitea el archivo completo con add+commit en una sola llamada y ruta
+     explícita. Un post que conserva su fecha antigua **no entra hoy** al slider ni
+     al rail aunque tenga hero y tarjeta; la tarjeta exige lectura ≥ 12 min;
+   - copia privada a la papelera (`wp_trash_post`), con guarda de que sigue siendo
+     la copia privada de ese post;
+   - purga de caché WP + `kinsta cache purge --all`;
+   - `pnpm public-website:blog-home verify --browser` (conteo de posts y 8 anchos).
+8. **QA en vivo mínima:** 200; title, descripción, `index, follow`, canonical,
+   `og:url`, `og:title`/`og:description`, `og:image` = portada nueva con alt,
+   `article:modified_time` actualizado (Analytics lo exige antes de pedir
+   indexación), `BlogPosting` con el titular nuevo y `FAQPage`. Playwright 1440 y
+   390: un H1, sin desborde, `<picture>` carga la fuente de cada ancho, gráfico
+   dibujado, CTA con lockup, índice sin anclas rotas, consola sin errores; enlaces
+   con 200. Aplican las trampas de §16 (lectura vieja tras purgar, `load` en vez de
+   `networkidle`, scroll hasta el gráfico).
+9. **Indexación:** `pnpm public-website:gsc-index` lo ejecuta sólo la sesión de
+   Analytics, cuando el operador se lo pide directamente en esa sesión.
+
 ## Definition of Done
 
 - [ ] Final spec, research, claims, rights, CTA, and visible author were approved.
@@ -569,6 +643,7 @@ IDs son evidencia del caso, no valores por defecto. El detalle del caso vive en
 - [ ] Each chart has a conclusion title, a verifiable source, one highlighted entity and its «Ver los datos» table; it rendered in headless Playwright (desktop and 390 px).
 - [ ] A post created private and published later carries the publication date, read back from WordPress.
 - [ ] En una fusión: visuales de los originales inventariados, absorbido en borrador con 301 de un salto, enlaces internos reescritos sin duplicar y QA de §16 completa.
+- [ ] En un refresh: copia privada con categoría principal revisada, publicada con `sameAsReviewed` y respaldo, enviada a la papelera, y QA de §17 completa.
 - [ ] Playwright desktop and mobile passed render, TOC, image, console, and overflow checks.
 - [ ] Final anonymous robots, canonical, schema, Open Graph, and social image passed.
 - [ ] Final URL appears in the correct sitemap with an honest `lastmod`; any GSC observation is reported separately.

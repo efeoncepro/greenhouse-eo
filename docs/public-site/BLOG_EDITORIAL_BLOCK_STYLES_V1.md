@@ -124,8 +124,20 @@ logo y el tono claro; las dos versiones se verificaron en vivo en la misma pági
 del formulario (sólo lo puede hacer una persona, por Turnstile).
 
 **Reglas:** un Growth CTA por artículo, después de la respuesta principal y antes de las preguntas frecuentes o del
-cierre. Nunca se escribe texto, enlaces ni formularios dentro del bloque. Re-correr el publicador rota la llave:
-repetir `set-blog-growth-cta.php` en la misma sesión.
+cierre, presentado por una frase propia en el párrafo anterior. Nunca se escribe texto, enlaces ni formularios dentro
+del bloque: titular, botón y formulario viven en el motor de Greenhouse. `blog-aeo-assessment` es el único slug que
+imprime en el blog (lista permitida de la superficie, opción `eo_growth_cta_blog`). `location: blog_article` (por
+defecto) es la que tiene plan de medición. Para el titular «Cuando le preguntan a la IA, ¿aparece tu marca?» el
+`emphasis` es `¿aparece tu marca?`. Re-correr el publicador rota la llave: repetir `set-blog-growth-cta.php` en la
+misma sesión.
+
+**QA del bloque.**
+
+- El lockup y la negrita los pone `src/growth-cta/host.js` en el navegador; `render.php` sólo imprime la `<section>`
+  con `data-eo-gcta-mark` y el `<greenhouse-cta>`. En una QA que inyecta HTML renderizado sobre otra página hay que
+  reinyectar `host.js`; si no, sale sólo el texto «EFEONCE AEO ASSESSMENT».
+- Renderizado por WP-CLI, `data-eo-gcta-mark` sale con `http://` (`plugins_url` sin https); en una petición web sale
+  con `https://`. No es un bug.
 
 ## Ajustes de Ohio (`ohio-host.css`, sólo en el sitio)
 
@@ -416,6 +428,10 @@ partes, de cada 100, Venn de tres, matriz 2×2, embudo), adaptados a la web, má
    defecto (verde, morado).
 5. Las etiquetas de la matriz se colocan con un cálculo propio (la detección de choques de ECharts no ve etiquetas en
    la misma fila); si no caben, se numeran.
+6. En una QA que inyecta HTML renderizado sobre otra página, el cargador (`src/chart/view.js`, id
+   `efeoncepro-chart-script-js`) sigue observando las figuras originales y el motor nunca carga: hay que agregar
+   `engine.js` a mano. Un `per-hundred` verificado así: `{ kind: 'per-hundred', categories: ['…'], series: [{ name:
+   '…', values: [12] }] }` con `title` (la conclusión), `caption`, `sourceLabel`, `sourceUrl` y `tone`.
 
 ### En producción 0.9.0 (2026-10-25)
 

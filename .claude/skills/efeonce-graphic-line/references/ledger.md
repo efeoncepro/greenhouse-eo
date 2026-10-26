@@ -1,5 +1,25 @@
 # Registro de decisiones y versiones
 
+### 2026-10-26 — Infografía «Una idea, cada formato» (marketing de contenidos): aprobada y publicada
+
+Caso: refresh del artículo de marketing de contenidos (post `244883`), tercera infografía de cuerpo tras ICP y AEO
+(`ai-generations/2026-10-26_marketing-contenidos-leads/infografia/`, `build.mjs` versionado).
+
+- **Aprobada por el operador el 2026-10-26** y publicada en el post `244883` (adjuntos `252169` y `252170`, versiones
+  claras de escritorio y teléfono). Se construyen igual escritorio 1600 y teléfono 900 en claro y oscuro; el blog sólo
+  publica las claras (decisión del 2026-10-25 en el ICP).
+- **Línea `brand`**, porque la línea sigue a la portada del artículo (acento `#bb1954` en claro, `#ff6500` en oscuro).
+- **Nueva comprobación del build: texto encimado** (intersección de cajas entre textos protegidos), junto a texto fuera
+  del lienzo o sobre el pie y `textCrossesRing`; las tres quedan en `build-report.json`. Motivo: el primer escritorio
+  tenía el canal de la última fila encima de su texto y nada lo detectaba; se movieron los canales a una pastilla junto
+  al nombre.
+- **Íconos en una sola voz (Trazo):** `auditIconGroup` corta con `mixed-voices`. Formatos resueltos: artículo
+  `contenido`, carrusel `swipe`, newsletter `correo`, video corto `multimedia`, respuesta en la IA `ia`. Sin Trazo de
+  «idea»: el foco de la órbita es un cubo isométrico dibujado al trazo (mismo grosor relativo, tinta del tema), que
+  retoma el cubo con tres sombras de la portada. No es alta de catálogo; si el concepto se repite, se propone al
+  operador.
+- Método consolidado en [manzanitas.md](manzanitas.md) §12b; inventario de voces en [iconography.md](iconography.md) §0.
+
 ### 2026-10-25 — Infografías de cuerpo del blog (Manzanitas) y fórmula de portadas
 
 Caso: artículo «ICP B2B» (post `249108`), dos infografías SVG (`ai-generations/2026-10-25_icp-infografias/`).
