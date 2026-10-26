@@ -352,7 +352,7 @@ confiable.**
 marketing, ventas e IA.
 
 [Bloque 2 — Diagnóstico] Y si quieres revisar cómo está armado tu pipeline o activar estos agentes con criterio,
-conoce cómo trabajamos [Mención: HubSpot → https://efeoncepro.com/servicios-contratar-hubspot/ · línea
+mira cómo implementamos [Mención: HubSpot → https://efeoncepro.com/servicios-contratar-hubspot/ · línea
 revenue-hubspot].
 
 ### Fuentes
@@ -521,3 +521,21 @@ autoridad en implementación HubSpot → landing de servicios. Datos: Search Con
 - Consolidación de la migración: impresiones URL vieja + nueva; la vieja debería salir del índice en 2–4 semanas.
 - «pipeline de ventas» en MX/ES/CL: entrar al top 30 en 12 semanas es la hipótesis; no es promesa.
 - Panel de las preguntas de sí/no en ChatGPT, Gemini y Perplexity antes y después.
+
+## 10. Copia privada de revisión (2026-10-26)
+
+- **Spec:** [`HUBSPOT_PIPELINE_REFRESH_GUTENBERG_SPEC_V1.json`](HUBSPOT_PIPELINE_REFRESH_GUTENBERG_SPEC_V1.json), generada
+  por `ai-generations/2026-10-26_pipeline-hubspot/build-spec-v1.cjs`. `content-factory:validate`: **pass, 0 hallazgos**
+  (79 bloques: TOC, 9 H2, 6 imágenes, 2 tablas Efeonce, pasos, 2 recuadros, destacado, FAQ con 9 preguntas).
+- **Imágenes:** seis WebP 1400 px exportados de los SVG oficiales sin modificar (48–79 KB), subidos como adjuntos
+  **252155–252160** con `alt`, pie y `_eo_source_sha256` (script idempotente `tmp/pipeline-review/upload-media.php`).
+  Están en la biblioteca de medios, sin enlazar desde ningún contenido publicado.
+- **Copia privada:** post **252161**, `private`, `noindex`, `_eo_review_copy_of = 246045`, URL de revisión
+  https://efeoncepro.com/hubspot/revision-pipeline-de-ventas-v1/ (requiere sesión). Contenido guardado idéntico al
+  enviado salvo los 🍏, que WordPress guarda como entidades.
+- **QA (render del servidor inyectado en un post publicado, Playwright 1440 y 390):** sin desborde horizontal
+  (`scrollWidth` = viewport); tablas como tarjetas en el teléfono; pasos, destacado, recuadros, FAQ y mención AXIS
+  renderizan con los estilos Efeonce; las seis imágenes cargan. Corrección tras el QA: «conoce cómo trabajamos
+  HubSpot» → «mira cómo implementamos HubSpot».
+- **No hecho (requiere OK de Julio):** publicar; cambiar slug y 301; actualizar enlaces en ICP e Inbound; portada,
+  hero y tarjeta; pedir indexación. La URL `/hubspot/pipeline-de-ventas/` sigue libre.

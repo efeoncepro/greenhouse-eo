@@ -1,0 +1,1335 @@
+{
+  "title": "Pipeline de ventas en HubSpot: cómo configurarlo para que diga la verdad",
+  "slug": "pipeline-de-ventas",
+  "excerpt": "Qué es un pipeline de ventas y cómo configurarlo en HubSpot: etapas con criterio de salida, reglas, previsión, y cómo usar el Prospecting Agent y Deal Progression sin que el pipeline mienta.",
+  "seo": {
+    "title": "Pipeline de ventas en HubSpot: cómo configurarlo en 2026 | Efeonce",
+    "description": "Qué es un pipeline de ventas y cómo configurarlo en HubSpot: etapas con criterio de salida, reglas, previsión, Prospecting Agent y Deal Progression.",
+    "canonicalUrl": "https://efeoncepro.com/hubspot/pipeline-de-ventas/",
+    "inLanguage": "es-CL",
+    "indexPolicy": "index"
+  },
+  "intro": [
+    "Lunes, reunión de previsión. El tablero de negocios muestra una columna de «Negociación» llena, con un importe que haría feliz a cualquier gerente. Alguien pregunta cuántos de esos negocios se cierran este mes y la sala se queda en silencio. Nadie sabe. Todos sospechan que menos de la mitad.",
+    [
+      {
+        "text": "Hasta ahí, nada nuevo. Lo nuevo es esto: "
+      },
+      {
+        "text": "en 2026, HubSpot ya puede llenar la parte alta de ese pipeline",
+        "strong": true
+      },
+      {
+        "text": " con un agente que investiga cuentas y redacta el primer correo, "
+      },
+      {
+        "text": "y proponer cómo actualizarlo",
+        "strong": true
+      },
+      {
+        "text": " después de cada reunión. Entonces, si la máquina ya hace el trabajo pesado, ¿por qué el pipeline seguiría mintiendo?"
+      }
+    ],
+    "Mi lectura es que el problema nunca estuvo en la carga de datos. Estuvo en qué significa cada etapa. Si eso no está definido, el agente no lo arregla: lo acelera. Vamos por partes."
+  ],
+  "tableOfContents": true,
+  "sections": [
+    {
+      "heading": "¿Qué es un pipeline de ventas y cómo funciona en HubSpot?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Un "
+            },
+            {
+              "text": "pipeline de ventas",
+              "strong": true
+            },
+            {
+              "text": " es la secuencia de etapas por la que avanza una oportunidad, desde que existe hasta que se gana o se pierde, con una probabilidad de cierre asociada a cada etapa. En HubSpot, cada oportunidad es un "
+            },
+            {
+              "text": "negocio",
+              "strong": true
+            },
+            {
+              "text": " (deal): la probabilidad de su etapa calcula el "
+            },
+            {
+              "text": "importe ponderado",
+              "strong": true
+            },
+            {
+              "text": " que ves en la vista de tablero, y las etapas de cierre ganado (100 %) y perdido (0 %) son obligatorias para que los reportes funcionen."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Antes del negocio hay otra pieza que conviene no mezclar: el "
+            },
+            {
+              "text": "objeto Leads",
+              "href": "https://knowledge.hubspot.com/records/understand-objects",
+              "strong": true
+            },
+            {
+              "text": ", con su propio pipeline (por defecto: New, Attempting, Connected, Qualified y Disqualified). Ahí se trabaja a la persona o cuenta mientras todavía no hay una oportunidad. Usar leads requiere "
+            },
+            {
+              "text": "Sales Hub Professional o Enterprise",
+              "strong": true
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Tal vez estarás pensando que da lo mismo dónde viva un prospecto mientras esté en el CRM. No da lo mismo: un contacto que todavía no confirmó una necesidad, metido en el pipeline de negocios, infla la previsión desde el día uno."
+        }
+      ]
+    },
+    {
+      "heading": "¿Cómo diseñar las etapas antes de abrir la configuración?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Cada etapa se define por su "
+            },
+            {
+              "text": "criterio de salida",
+              "strong": true
+            },
+            {
+              "text": ": la evidencia de que el comprador hizo algo que acerca la decisión. En una venta B2B de servicios suelen bastar cuatro o cinco etapas abiertas, más ganado y perdido. Más etapas no dan más control: dan más lugares donde un negocio puede quedarse quieto."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "La pregunta útil no es «¿qué etapas tiene una venta?», sino "
+            },
+            {
+              "text": "«¿qué tiene que haber pasado para que un negocio avance?»",
+              "strong": true
+            },
+            {
+              "text": ". Y la respuesta que mejor funciona es una acción del comprador, no del vendedor."
+            }
+          ]
+        },
+        {
+          "kind": "pullquote",
+          "text": [
+            {
+              "text": "Una etapa no se gana por lo que hizo el vendedor: "
+            },
+            {
+              "text": "se gana por algo que hizo el comprador.",
+              "strong": true
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Te lo explico con manzanitas 🍏🍏🍏: «enviamos la propuesta» es algo que hiciste tú. «El cliente revisó la propuesta con quien firma y pidió ajustar el alcance» es algo que hizo él. Lo primero puede pasar sin que la venta avance un milímetro; lo segundo, no. A eso se le llama "
+            },
+            {
+              "text": "criterio de salida",
+              "strong": true
+            },
+            {
+              "text": ": la evidencia verificable que permite pasar a la siguiente etapa."
+            }
+          ]
+        },
+        {
+          "kind": "table",
+          "style": "efeonce",
+          "headers": [
+            "Etapa",
+            "Criterio de salida (lo hizo el comprador)",
+            "Probabilidad inicial (ejemplo)"
+          ],
+          "rows": [
+            [
+              "Descubrimiento agendado",
+              "Aceptó una reunión para hablar de un problema concreto",
+              "10 %"
+            ],
+            [
+              "Necesidad confirmada",
+              "Confirmó el problema, quién decide y un plazo",
+              "25 %"
+            ],
+            [
+              "Propuesta en revisión",
+              "Revisó la propuesta con quien decide y pidió ajustes",
+              "50 %"
+            ],
+            [
+              "Decisión en curso",
+              "Está validando términos, legal o compras",
+              "75 %"
+            ],
+            [
+              "Ganado",
+              "Firmó",
+              "100 %"
+            ],
+            [
+              "Perdido",
+              "Decidió no avanzar (con motivo registrado)",
+              "0 %"
+            ]
+          ],
+          "caption": "Ejemplo de pipeline para una venta B2B de servicios. Las probabilidades son un punto de partida ilustrativo, no un estándar de la industria: se reemplazan con tu propio historial apenas lo tengas."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Dos detalles que conviene tener claros. Primero, la "
+            },
+            {
+              "text": "probabilidad de una etapa",
+              "strong": true
+            },
+            {
+              "text": " no es lo mismo que la "
+            },
+            {
+              "text": "tasa de conversión entre dos etapas",
+              "strong": true
+            },
+            {
+              "text": ": la primera es la chance de que ese negocio se cierre ganado; la segunda, cuántos pasan a la siguiente. Segundo, si alguien edita a mano la probabilidad de un negocio, "
+            },
+            {
+              "text": "HubSpot deja de actualizarla sola",
+              "href": "https://knowledge.hubspot.com/properties/hubspots-default-deal-properties",
+              "strong": true
+            },
+            {
+              "text": " cuando el negocio cambia de etapa. Conviene que eso sea la excepción."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "En Efeonce trabajamos con una regla simple: "
+            },
+            {
+              "text": "una señal de interés o un lead no es una oportunidad calificada",
+              "strong": true
+            },
+            {
+              "text": ". Si abres un negocio por cada señal, el pipeline crece en la reunión del lunes y se vacía en la del viernes. Por eso las señales se trabajan como leads hasta que alguien las califica."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "¿Cómo crear y personalizar el pipeline en HubSpot?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Necesitas el permiso Edit property settings. Luego:"
+        },
+        {
+          "kind": "list",
+          "ordered": true,
+          "style": "steps",
+          "items": [
+            [
+              {
+                "text": "Ve a "
+              },
+              {
+                "text": "Configuración → Objetos → Negocios → pestaña Pipelines",
+                "strong": true
+              },
+              {
+                "text": " y elige el pipeline (o créalo)."
+              }
+            ],
+            [
+              {
+                "text": "Agrega, renombra o reordena etapas con "
+              },
+              {
+                "text": "+ Agregar etapa",
+                "strong": true
+              },
+              {
+                "text": ". Cada etapa tiene un nombre interno para integraciones."
+              }
+            ],
+            [
+              {
+                "text": "Define la "
+              },
+              {
+                "text": "probabilidad",
+                "strong": true
+              },
+              {
+                "text": " de cada etapa, predefinida o personalizada."
+              }
+            ],
+            [
+              {
+                "text": "En la lógica condicional de cada etapa, marca las "
+              },
+              {
+                "text": "propiedades obligatorias",
+                "strong": true
+              },
+              {
+                "text": ": el negocio no puede entrar a esa etapa sin completarlas. Es la forma de convertir el criterio de salida en un campo (por ejemplo, «quién decide» al entrar a Necesidad confirmada). La propiedad debe existir antes."
+              }
+            ],
+            [
+              {
+                "text": "Guarda. Para eliminar una etapa, primero hay que limpiar las referencias que aparecen en la columna «Se usa en»."
+              }
+            ]
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "No hace falta código. También puedes pedirle a "
+            },
+            {
+              "text": "Breeze Assistant",
+              "strong": true
+            },
+            {
+              "text": " que cree el pipeline y después ajustarlo a mano."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Cuántos pipelines puedes tener depende del plan. "
+            },
+            {
+              "text": "El límite se comparte entre todos los objetos",
+              "href": "https://knowledge.hubspot.com/object-settings/set-up-and-customize-pipelines",
+              "strong": true
+            },
+            {
+              "text": " y no cuenta el pipeline por defecto:"
+            }
+          ]
+        },
+        {
+          "kind": "table",
+          "style": "efeonce",
+          "headers": [
+            "Plan (cuentas por asiento)",
+            "Pipelines personalizados"
+          ],
+          "rows": [
+            [
+              "Herramientas gratuitas",
+              "0"
+            ],
+            [
+              "Starter",
+              "15"
+            ],
+            [
+              "Professional",
+              "100"
+            ],
+            [
+              "Enterprise",
+              "350"
+            ]
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "En cuentas con Flexible Seats & Credits, los topes de Professional y Enterprise son 350. El detalle por objeto está en "
+            },
+            {
+              "text": "Gestión de datos → Modelo de datos → Límites",
+              "strong": true
+            },
+            {
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "¿Cómo evitar que el pipeline se desordene?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Un pipeline bien diseñado se degrada en semanas si cualquiera puede mover cualquier negocio a cualquier etapa. Para eso están las "
+            },
+            {
+              "text": "reglas de pipeline",
+              "href": "https://knowledge.hubspot.com/object-settings/set-up-pipeline-rules",
+              "strong": true
+            },
+            {
+              "text": " (Professional o Enterprise; las configura un Super Admin):"
+            }
+          ]
+        },
+        {
+          "kind": "list",
+          "items": [
+            [
+              {
+                "text": "Restringir saltar etapas",
+                "strong": true
+              },
+              {
+                "text": ", en todas o en algunas. Siempre se puede mover a ganado o perdido."
+              }
+            ],
+            [
+              {
+                "text": "Restringir retroceder",
+                "strong": true
+              },
+              {
+                "text": " de etapa."
+              }
+            ],
+            [
+              {
+                "text": "Limitar en qué etapas se crean negocios",
+                "strong": true
+              },
+              {
+                "text": ", para que nadie abra uno directamente en Decisión en curso."
+              }
+            ],
+            [
+              {
+                "text": "Controlar quién edita",
+                "strong": true
+              },
+              {
+                "text": " en ciertas etapas (por ejemplo, las cerradas)."
+              }
+            ],
+            [
+              {
+                "text": "Exigir aprobación",
+                "href": "https://knowledge.hubspot.com/object-settings/pipeline-approvals",
+                "strong": true
+              },
+              {
+                "text": " antes de avanzar: una etapa Pending approval con hasta diez aprobadores. Requiere "
+              },
+              {
+                "text": "Sales Hub Enterprise",
+                "strong": true
+              },
+              {
+                "text": "."
+              }
+            ],
+            [
+              {
+                "text": "Obligar a crear un negocio",
+                "strong": true
+              },
+              {
+                "text": " cuando un lead pasa a Qualified (Sales Hub Professional o Enterprise). Es la bisagra entre el pipeline de leads y el de negocios."
+              }
+            ]
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Ojo con tres efectos de las reglas: con reglas activas "
+            },
+            {
+              "text": "no se puede editar en bloque",
+              "strong": true
+            },
+            {
+              "text": " la etapa de los negocios; los Super Admins, los workflows y la API pueden saltárselas (salvo la aprobación); y una regla que nadie entiende se vuelve una molestia que el equipo rodea. Explícalas antes de activarlas."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Lo que sí conviene automatizar desde el primer día son las "
+            },
+            {
+              "text": "automatizaciones por etapa",
+              "href": "https://knowledge.hubspot.com/object-settings/set-up-pipeline-automations-for-objects",
+              "strong": true
+            },
+            {
+              "text": ": crear y asignar una tarea, avisar por correo interno o editar una propiedad cuando un negocio entra a una etapa (Sales o Service Hub, desde Starter). Y las "
+            },
+            {
+              "text": "etiquetas de negocio",
+              "href": "https://knowledge.hubspot.com/object-settings/color-coded-object-tags",
+              "strong": true
+            },
+            {
+              "text": " de colores, que HubSpot aplica solas según filtros (por ejemplo, «sin actividad en 14 días»), ayudan a ver de un vistazo qué está estancado."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "¿Uno o varios pipelines?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Un pipeline nuevo se justifica cuando el "
+            },
+            {
+              "text": "proceso de venta es distinto",
+              "strong": true
+            },
+            {
+              "text": ": otro tipo de venta (proyecto o renovación), otro ciclo u otros criterios de salida. Si sólo cambia el equipo o la marca, HubSpot recomienda "
+            },
+            {
+              "text": "un mismo pipeline con permisos por equipo",
+              "strong": true
+            },
+            {
+              "text": " («Team only»), para que cada equipo vea sólo sus negocios."
+            }
+          ]
+        },
+        {
+          "kind": "list",
+          "items": [
+            [
+              {
+                "text": "Restringir un pipeline por equipo:",
+                "strong": true
+              },
+              {
+                "text": " Professional o Enterprise. Los "
+              },
+              {
+                "text": "equipos anidados",
+                "href": "https://knowledge.hubspot.com/user-management/create-and-manage-teams",
+                "strong": true
+              },
+              {
+                "text": " (jerarquía) requieren Enterprise."
+              }
+            ],
+            [
+              {
+                "text": "Territorios:",
+                "strong": true
+              },
+              {
+                "text": " HubSpot no documenta una función de territorios propia; se modelan con equipos, propiedades y workflows."
+              }
+            ],
+            [
+              {
+                "text": "Clonar un pipeline",
+                "strong": true
+              },
+              {
+                "text": " (Professional o Enterprise) copia propiedades condicionales, reglas, automatizaciones, etiquetas y accesos. Sirve para probar un cambio de etapas sin tocar el pipeline en uso."
+              }
+            ],
+            [
+              {
+                "text": "Grupos con matriz y filiales:",
+                "strong": true
+              },
+              {
+                "text": " HubSpot "
+              },
+              {
+                "text": "asocia empresas matriz y filial",
+                "href": "https://knowledge.hubspot.com/records/add-a-parent-or-child-company",
+                "strong": true
+              },
+              {
+                "text": " (una filial tiene una sola matriz, en todos los planes), y con etiquetas de asociación puedes armar reportes de las filiales de una matriz."
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "¿Cómo llena el Prospecting Agent la parte alta del pipeline?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "El "
+            },
+            {
+              "text": "Prospecting Agent",
+              "href": "https://knowledge.hubspot.com/prospecting/use-the-prospecting-agent",
+              "strong": true
+            },
+            {
+              "text": " de HubSpot investiga cuentas y contactos, vigila "
+            },
+            {
+              "text": "señales de compra",
+              "strong": true
+            },
+            {
+              "text": " y redacta el contacto inicial. Se configura con plays: a quién le habla (segmentos de empresas que calzan con tu "
+            },
+            {
+              "text": "cliente ideal",
+              "href": "https://efeoncepro.com/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/",
+              "strong": true
+            },
+            {
+              "text": " y perfiles de contacto), qué señales mira, cómo escribe y con qué límites."
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "mediaId": 252155,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/10/prospecting-agent-plays.webp",
+          "alt": "Interfaz de HubSpot: configuración de un play del Prospecting Agent con el método de comunicación en secuencia, tres pasos (correo automático, tarea de correo y llamada manual) y métricas de envíos, aperturas, clics, respuestas y reuniones.",
+          "width": 1400,
+          "height": 1050,
+          "sizeSlug": "full",
+          "caption": "En cada play se elige cómo escribe el agente: pasos que decide él o una secuencia propia. Interfaz: HubSpot.",
+          "linkDestination": "none"
+        },
+        {
+          "kind": "paragraph",
+          "text": "Lo que hace, según la documentación de HubSpot:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            [
+              {
+                "text": "Señales:",
+                "strong": true
+              },
+              {
+                "text": " visitas e "
+              },
+              {
+                "text": "intención de búsqueda",
+                "href": "https://knowledge.hubspot.com/reports/use-intent-signals",
+                "strong": true
+              },
+              {
+                "text": ", menciones en el CRM (presupuesto, plazos, riesgo) y noticias de las empresas (financiamiento, lanzamientos, despidos), entre otras."
+              }
+            ],
+            [
+              {
+                "text": "Fuentes de contactos:",
+                "strong": true
+              },
+              {
+                "text": " puede sugerir contactos nuevos o traerlos de una fuente externa conectada a la vez: Apollo, Surfe, ZoomInfo o Seamless."
+              }
+            ],
+            [
+              {
+                "text": "Comunicación:",
+                "strong": true
+              },
+              {
+                "text": " el agente decide los pasos dentro de un máximo de correos y una espera mínima, o sigue una secuencia que tú armas."
+              }
+            ],
+            [
+              {
+                "text": "Dos modos:",
+                "strong": true
+              },
+              {
+                "text": " Review emails, donde una persona aprueba cada correo antes de que salga, o Send without review."
+              }
+            ],
+            [
+              {
+                "text": "Costo:",
+                "strong": true
+              },
+              {
+                "text": " se cobra en créditos de HubSpot por cada lead para el que el agente genera un correo, lo haya recomendado él o lo hayas inscrito tú. El precio vigente está en la "
+              },
+              {
+                "text": "página de créditos de HubSpot",
+                "href": "https://www.hubspot.com/products/artificial-intelligence/credits",
+                "strong": true
+              },
+              {
+                "text": "."
+              }
+            ]
+          ]
+        },
+        {
+          "kind": "image",
+          "mediaId": 252156,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/10/prospecting-agent-contact-sourcing.webp",
+          "alt": "Interfaz de HubSpot: borrador de correo del Prospecting Agent para una cuenta con señales de compra y, al lado, la lista de contactos sugeridos dentro de esa empresa.",
+          "width": 1400,
+          "height": 1050,
+          "sizeSlug": "full",
+          "caption": "El agente sugiere contactos dentro de cada cuenta y redacta el primer correo. Interfaz: HubSpot.",
+          "linkDestination": "none"
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "En Efeonce usamos el Prospecting Agent conectado a "
+            },
+            {
+              "text": "Apollo",
+              "strong": true
+            },
+            {
+              "text": ": Apollo aporta los contactos y el agente investiga y propone a quién escribir. Lo que aprendimos al configurarlo:"
+            }
+          ]
+        },
+        {
+          "kind": "list",
+          "style": "box",
+          "items": [
+            [
+              {
+                "text": "Empezamos en modo revisión.",
+                "strong": true
+              },
+              {
+                "text": " Cada correo pasa por una persona antes de salir, con un máximo de cinco correos en treinta días, al menos dos días entre uno y otro, en español de Chile y sólo en horario hábil."
+              }
+            ],
+            [
+              {
+                "text": "La voz se entrena con correos reales.",
+                "strong": true
+              },
+              {
+                "text": " Cargamos en las instrucciones del agente una guía armada desde correos propios. Tomó varias versiones: los primeros borradores sonaban inseguros, repetían el perfil del prospecto y acumulaban servicios. "
+              },
+              {
+                "text": "Después de cada ajuste, hay que leer un borrador nuevo",
+                "strong": true
+              },
+              {
+                "text": ": el cambio no se valida en la configuración, se valida en el correo."
+              }
+            ],
+            [
+              {
+                "text": "Una persona, un canal.",
+                "strong": true
+              },
+              {
+                "text": " Nadie está al mismo tiempo en el agente de HubSpot y en una secuencia de Apollo."
+              }
+            ]
+          ]
+        },
+        {
+          "kind": "image",
+          "mediaId": 252157,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/10/prospecting-agent-advanced-settings.webp",
+          "alt": "Interfaz de HubSpot: configuración avanzada del Prospecting Agent con las instrucciones personalizadas activadas y un ejemplo de instrucciones sobre el tono y el seguimiento de los correos.",
+          "width": 1400,
+          "height": 1052,
+          "sizeSlug": "full",
+          "caption": "En las instrucciones personalizadas se define cómo escribe el agente. Interfaz: HubSpot.",
+          "linkDestination": "none"
+        },
+        {
+          "kind": "image",
+          "mediaId": 252158,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/10/prospecting-agent-review-before-sending.webp",
+          "alt": "Interfaz de HubSpot: resumen del plan de comunicación del Prospecting Agent con la opción destacada de revisar los correos antes de enviarlos y los botones para editar el correo o iniciar la inscripción.",
+          "width": 1400,
+          "height": 1052,
+          "sizeSlug": "full",
+          "caption": "Con la revisión activada, el agente pide aprobar cada correo antes de enviarlo. Interfaz: HubSpot.",
+          "linkDestination": "none"
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Y lo más importante para el pipeline: "
+            },
+            {
+              "text": "el agente llena la parte alta, pero no decide qué es una oportunidad.",
+              "strong": true
+            },
+            {
+              "text": " Un contacto que respondió entra como lead; el negocio se abre cuando alguien confirma una necesidad, que es exactamente el criterio de salida de la primera etapa."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "¿Cómo se mantiene al día el pipeline con Notetaker y Deal Progression?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "La otra mitad del problema del lunes es que los negocios no se actualizan. El vendedor sale de la reunión, tiene otra en diez minutos y la ficha del negocio queda como estaba hace tres semanas."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Notetaker",
+              "href": "https://knowledge.hubspot.com/meetings-tool/review-recommended-next-steps-for-deals",
+              "strong": true
+            },
+            {
+              "text": " graba y transcribe reuniones de Google Meet, Microsoft Teams y Zoom. Después de la reunión propone un resumen, tareas, un correo de seguimiento y "
+            },
+            {
+              "text": "cambios en propiedades del negocio",
+              "strong": true
+            },
+            {
+              "text": ", que el vendedor aprueba, edita o rechaza. Requiere un asiento de Sales o Service (en Starter, un asiento Core)."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Deal Progression",
+              "href": "https://knowledge.hubspot.com/records/move-deals-forward-with-deal-progression",
+              "strong": true
+            },
+            {
+              "text": " (HubSpot la presentó como Smart Deal Progression) va un paso más allá: usa las transcripciones, los correos y las llamadas para sugerir cambios en las propiedades del negocio, con el valor actual al lado del sugerido, y "
+            },
+            {
+              "text": "próximas acciones",
+              "strong": true
+            },
+            {
+              "text": ": enviar un correo, agendar o preparar una reunión, crear una tarea o reactivar un negocio estancado. Se activa desde Agent Hub y está disponible para Sales Hub o Service Hub Professional y Enterprise."
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "mediaId": 252159,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/10/smart-deal-progression-update-crm.webp",
+          "alt": "Interfaz de HubSpot: panel de próximos pasos de un negocio con cambios propuestos a sus propiedades, cada uno con botones para aceptarlo o rechazarlo.",
+          "width": 1400,
+          "height": 1050,
+          "sizeSlug": "full",
+          "caption": "Cada cambio propuesto se acepta o se rechaza, uno por uno. Interfaz: HubSpot.",
+          "linkDestination": "none"
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "En Efeonce usamos Notetaker en todas las reuniones junto con Deal Progression. La decisión que importa está en la configuración de captura: "
+            },
+            {
+              "text": "por cada propiedad, eliges si el cambio se aplica solo o queda esperando aprobación.",
+              "strong": true
+            },
+            {
+              "text": " Nuestra recomendación es empezar con todo en revisión y pasar a automático sólo las propiedades donde la sugerencia casi nunca se corrige."
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "mediaId": 252160,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/10/smart-deal-progression-board-notification.webp",
+          "alt": "Interfaz de HubSpot: tablero de negocios con un aviso sobre una tarjeta que indica que, después de la última reunión, hay un borrador de seguimiento, tareas y cambios de propiedades listos para revisar.",
+          "width": 1400,
+          "height": 1050,
+          "sizeSlug": "full",
+          "caption": "Después de una reunión, el tablero avisa que hay un seguimiento, tareas y cambios por revisar. Interfaz: HubSpot.",
+          "linkDestination": "none"
+        },
+        {
+          "kind": "paragraph",
+          "text": "Las sugerencias sobre propiedades personalizadas consumen créditos; las estándar, no."
+        }
+      ]
+    },
+    {
+      "heading": "¿Cómo leer el pipeline: probabilidad, previsión y reportes?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Con etapas bien definidas, el "
+            },
+            {
+              "text": "importe ponderado",
+              "strong": true
+            },
+            {
+              "text": " (importe × probabilidad de la etapa) empieza a significar algo. Para el seguimiento contra la meta está la "
+            },
+            {
+              "text": "herramienta de previsión",
+              "href": "https://knowledge.hubspot.com/forecast/set-up-the-forecast-tool",
+              "strong": true
+            },
+            {
+              "text": " (Sales o Service Hub Professional o Enterprise), con categorías como Pipeline, Best case y Commit y una vista por equipo. HubSpot tiene además una "
+            },
+            {
+              "text": "previsión con IA",
+              "href": "https://knowledge.hubspot.com/forecast/improve-forecasting-with-ai-projections",
+              "strong": true
+            },
+            {
+              "text": " que proyecta un rango a partir de los negocios ganados de los últimos tres meses."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Dos cuidados que vimos en terreno:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            [
+              {
+                "text": "El importe de un negocio no es facturación.",
+                "strong": true
+              },
+              {
+                "text": " Un negocio puede incluir varias líneas, renovaciones o alcances distintos. La previsión habla de oportunidades, no de ingresos reconocidos."
+              }
+            ],
+            [
+              {
+                "text": "Los reportes dependen de las asociaciones.",
+                "strong": true
+              },
+              {
+                "text": " En el "
+              },
+              {
+                "text": "caso de dashboards de ANAM",
+                "href": "https://efeoncepro.com/hubspot/dashboards-hubspot-confiables-caso-anam/",
+                "strong": true
+              },
+              {
+                "text": ", la calidad de los reportes dependía de asociar cada negocio con su empresa. Sólo asociamos los que tenían evidencia convergente, y la cobertura pasó de "
+              },
+              {
+                "text": "47,98 % a 50,73 %",
+                "strong": true
+              },
+              {
+                "text": ". Subió poco a propósito: una asociación inventada mejora el número y empeora la decisión."
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Preguntas frecuentes",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "faq",
+          "schema": {
+            "enabled": true,
+            "name": "Preguntas frecuentes sobre el pipeline de ventas en HubSpot",
+            "canonicalUrl": "https://efeoncepro.com/hubspot/pipeline-de-ventas/",
+            "inLanguage": "es-CL",
+            "source": "plugin"
+          },
+          "items": [
+            {
+              "question": "¿Cuáles son las etapas de un pipeline de ventas?",
+              "answer": [
+                {
+                  "kind": "paragraph",
+                  "text": "Depende de tu proceso, pero una venta B2B típica pasa por descubrimiento, necesidad confirmada, propuesta, decisión y cierre (ganado o perdido). Lo que importa no es el nombre de la etapa sino su criterio de salida: qué hizo el comprador para avanzar."
+                }
+              ]
+            },
+            {
+              "question": "¿En qué se diferencia un pipeline de un embudo de ventas?",
+              "answer": [
+                {
+                  "kind": "paragraph",
+                  "text": "El embudo describe el recorrido de los prospectos y cuántos llegan a cada fase, desde el primer contacto. El pipeline muestra los negocios abiertos que gestiona ventas, con su valor y su probabilidad de cierre. En HubSpot, lo primero se parece más al ciclo de vida y al pipeline de leads; lo segundo, al pipeline de negocios."
+                }
+              ]
+            },
+            {
+              "question": "¿HubSpot permite crear pipelines personalizados ilimitados?",
+              "answer": [
+                {
+                  "kind": "paragraph",
+                  "text": "No. El tope de pipelines personalizados se comparte entre todos los objetos: 15 en Starter, 100 en Professional y 350 en Enterprise en cuentas por asiento (350 en Professional con Flexible Seats & Credits). El pipeline por defecto no cuenta."
+                }
+              ]
+            },
+            {
+              "question": "¿Se pueden personalizar las etapas del pipeline sin código?",
+              "answer": [
+                {
+                  "kind": "paragraph",
+                  "text": "Sí. Se editan en Configuración → Objetos → Negocios → Pipelines: agregar, renombrar, reordenar, cambiar la probabilidad y marcar propiedades obligatorias por etapa. También se puede pedir a Breeze Assistant que cree el pipeline."
+                }
+              ]
+            },
+            {
+              "question": "¿Se pueden exigir campos obligatorios por etapa?",
+              "answer": [
+                {
+                  "kind": "paragraph",
+                  "text": "Sí, con las propiedades condicionales de cada etapa: el negocio no entra a la etapa sin completarlas. Para impedir saltar o retroceder etapas se usan las reglas de pipeline (Professional o Enterprise)."
+                }
+              ]
+            },
+            {
+              "question": "¿Se puede duplicar un pipeline para hacer pruebas?",
+              "answer": [
+                {
+                  "kind": "paragraph",
+                  "text": "Sí. Clonar un pipeline (Professional o Enterprise) copia propiedades condicionales, reglas, automatizaciones, etiquetas y accesos."
+                }
+              ]
+            },
+            {
+              "question": "¿HubSpot maneja territorios con pipelines separados y previsión consolidada?",
+              "answer": [
+                {
+                  "kind": "paragraph",
+                  "text": "No hay una función de territorios documentada como tal. Se resuelve con equipos (Professional o Enterprise; equipos anidados en Enterprise), restricción de pipelines por equipo y la vista por equipo de la herramienta de previsión."
+                }
+              ]
+            },
+            {
+              "question": "¿Cómo se modela un holding con filiales y marcas?",
+              "answer": [
+                {
+                  "kind": "paragraph",
+                  "text": "Con empresas matriz y filial (una filial tiene una sola matriz) y reportes por etiqueta de asociación. Si las marcas venden con el mismo proceso, HubSpot recomienda un solo pipeline con permisos por equipo en vez de un pipeline por marca."
+                }
+              ]
+            },
+            {
+              "question": "¿El Prospecting Agent crea negocios solo?",
+              "answer": [
+                {
+                  "kind": "paragraph",
+                  "text": "Su trabajo es investigar, sugerir contactos y redactar el contacto inicial. Que alguien responda no lo convierte en oportunidad: en Efeonce el negocio se abre cuando una persona confirma la necesidad."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "En resumen",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "HubSpot ya puede llenar la parte alta del pipeline y proponer cómo mantenerlo al día. Lo que sigue siendo tuyo es decidir qué tiene que hacer el comprador para avanzar y quién aprueba lo que propone la máquina. "
+            },
+            {
+              "text": "Si esas dos decisiones están claras, los agentes te devuelven tiempo; si no, te devuelven un pipeline más grande y menos confiable.",
+              "strong": true
+            }
+          ]
+        },
+        {
+          "kind": "list",
+          "style": "box",
+          "items": [
+            [
+              {
+                "text": "Si quieres seguir esta conversación, lee "
+              },
+              {
+                "text": "Glitch",
+                "href": "https://efeoncepro.com/category/glitch/",
+                "strong": true
+              },
+              {
+                "text": ": cada lunes, una idea sobre IA, marketing y negocios."
+              }
+            ],
+            [
+              {
+                "text": "Y si quieres revisar cómo está armado tu pipeline o activar estos agentes con criterio, mira cómo implementamos "
+              },
+              {
+                "text": "HubSpot",
+                "href": "https://efeoncepro.com/servicios-contratar-hubspot/",
+                "mention": {
+                  "line": "revenue-hubspot"
+                }
+              },
+              {
+                "text": "."
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Fuentes y nota de actualización",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "list",
+          "items": [
+            [
+              {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "Set up and manage object pipelines",
+                "href": "https://knowledge.hubspot.com/object-settings/set-up-and-customize-pipelines",
+                "strong": true
+              },
+              {
+                "text": ", actualizado el 29 de septiembre de 2026."
+              }
+            ],
+            [
+              {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "Set up rules for object pipelines",
+                "href": "https://knowledge.hubspot.com/object-settings/set-up-pipeline-rules",
+                "strong": true
+              },
+              {
+                "text": " y "
+              },
+              {
+                "text": "Require approvals for deals",
+                "href": "https://knowledge.hubspot.com/object-settings/pipeline-approvals",
+                "strong": true
+              },
+              {
+                "text": ", septiembre de 2026."
+              }
+            ],
+            [
+              {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "Set up pipeline automations",
+                "href": "https://knowledge.hubspot.com/object-settings/set-up-pipeline-automations-for-objects",
+                "strong": true
+              },
+              {
+                "text": " y "
+              },
+              {
+                "text": "Color-coded object tags",
+                "href": "https://knowledge.hubspot.com/object-settings/color-coded-object-tags",
+                "strong": true
+              },
+              {
+                "text": ", 2026."
+              }
+            ],
+            [
+              {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "HubSpot's default deal properties",
+                "href": "https://knowledge.hubspot.com/properties/hubspots-default-deal-properties",
+                "strong": true
+              },
+              {
+                "text": " y "
+              },
+              {
+                "text": "Understand objects",
+                "href": "https://knowledge.hubspot.com/records/understand-objects",
+                "strong": true
+              },
+              {
+                "text": ", septiembre y octubre de 2026."
+              }
+            ],
+            [
+              {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "Set up and use the prospecting agent",
+                "href": "https://knowledge.hubspot.com/prospecting/use-the-prospecting-agent",
+                "strong": true
+              },
+              {
+                "text": " y "
+              },
+              {
+                "text": "Use intent signals",
+                "href": "https://knowledge.hubspot.com/reports/use-intent-signals",
+                "strong": true
+              },
+              {
+                "text": ", octubre y septiembre de 2026."
+              }
+            ],
+            [
+              {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "Record and take notes in meetings with Notetaker",
+                "href": "https://knowledge.hubspot.com/meetings-tool/review-recommended-next-steps-for-deals",
+                "strong": true
+              },
+              {
+                "text": " y "
+              },
+              {
+                "text": "Move deals forward with deal progression",
+                "href": "https://knowledge.hubspot.com/records/move-deals-forward-with-deal-progression",
+                "strong": true
+              },
+              {
+                "text": ", octubre de 2026."
+              }
+            ],
+            [
+              {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "Set up the forecast tool",
+                "href": "https://knowledge.hubspot.com/forecast/set-up-the-forecast-tool",
+                "strong": true
+              },
+              {
+                "text": " y "
+              },
+              {
+                "text": "Improve forecasting with AI projections",
+                "href": "https://knowledge.hubspot.com/forecast/improve-forecasting-with-ai-projections",
+                "strong": true
+              },
+              {
+                "text": ", 2026."
+              }
+            ],
+            [
+              {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "Create and manage teams",
+                "href": "https://knowledge.hubspot.com/user-management/create-and-manage-teams",
+                "strong": true
+              },
+              {
+                "text": " y "
+              },
+              {
+                "text": "Add a parent or child company",
+                "href": "https://knowledge.hubspot.com/records/add-a-parent-or-child-company",
+                "strong": true
+              },
+              {
+                "text": ", 2026."
+              }
+            ],
+            [
+              {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "HubSpot Credits",
+                "href": "https://www.hubspot.com/products/artificial-intelligence/credits",
+                "strong": true
+              },
+              {
+                "text": "."
+              }
+            ]
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Funciones verificadas en la documentación de HubSpot en octubre de 2026. Lo desarrolló Julio Reyes con apoyo de IA en investigación, estructura y edición; Julio definió la tesis y aprobó la versión final."
+        }
+      ]
+    }
+  ]
+}
