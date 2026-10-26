@@ -136,7 +136,7 @@ with the other blog session. Contract: `BLOG_HOME_RUNTIME_V1.md` §9.
   Greenhouse form, the HubSpot destination and the WordPress event with its `form_key` in one go; the portada shows the
   event pill (state widths via `:has()`, 236/470/360 px, height 52) only when the event has a live `form_key`. The private
   room link lives only in the form's server-only policy and in the emails. Manual:
-  `docs/manual-de-uso/public-site/lanzar-evento-o-webinar.md`. **State 2026-10-24: do not launch real events yet** —
+  `docs/manual-de-uso/public-site/lanzar-evento-o-webinar.md`. **Create Teams webinars from the Teams Calendar (New → Webinar), never from the Events app: HubSpot's connector only discovers calendar-created webinars (verified 2026-10-26, RESEARCH-013 annex C).** **State 2026-10-24: do not launch real events yet** —
   reservations reach HubSpot, but emails do not send in production until the accepted-status fix
   (`ACCEPTED_SUBMISSION_STATUSES`) is released to the `ops-worker`, and the HubSpot Marketing Events / Teams webinar
   integration is pending design (RESEARCH-013).

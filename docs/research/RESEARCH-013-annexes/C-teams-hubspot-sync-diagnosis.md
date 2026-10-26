@@ -100,3 +100,16 @@
   app sólo si el soporte lo recomienda, en horario tranquilo y con captura previa de toda su configuración.
 - Cuando HubSpot liste el webinar: marcar Sincronizar, probar el envío de Greenhouse al formulario conectado y recién ahí
   crear la task `backend-data` de la integración.
+
+## Causa aislada (2026-10-26)
+
+- La agente Johanna (HubSpot) confirmó de su lado la cuenta enlazada y la sincronización global activa sin exclusiones,
+  y pidió crear un webinar por el **flujo clásico del Calendario** de Teams.
+- Se creó «Prueba sync HubSpot (calendario)» (`b206c3ae-e278-48fc-83c6-db05832d7798@a80bf6c1-…`) desde Calendario →
+  Nuevo → Webinar a las 13:56 CLT: **apareció en minutos** en «Gestionar webinarios individuales» («Última sincronización
+  completada 2:11 PM») y en Eventos de marketing [V].
+- Los creados desde **Eventos → Crear evento → Seminario web** (`a5c907d4-1403-441d-a52a-59dcba3271bd`,
+  `4d1e7c57-dcec-4bfa-bd00-d1c03d904072`) siguen sin aparecer [V].
+- Conclusión: **el conector no descubre los webinars creados en la app Eventos**. Regla operativa: crear los webinars
+  desde el Calendario. Se respondió en el ticket preguntando si la app Eventos está soportada o si pueden forzar la
+  lectura de esos dos.

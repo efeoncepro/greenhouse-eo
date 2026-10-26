@@ -32,6 +32,12 @@ no renovación del inventario global ni autonomía nueva. [Método](.codex/skill
 
 ## 2026-10-25 — Rooms + Auth: estado al corte de Codex (sin uso hasta 1/11)
 
+### 2026-10-26 — Rooms: backend Codex y diseño Claude Design
+
+Asignación humana vigente: Codex backend; Claude Design interfaz. TASK-2072, runtime rama `task/2072-cloud-media-backend`, commitd056708 y [PR1](https://github.com/efeoncepro/efeonce-rooms/pull/1) draft contra el scaffold rescatado.225/225testsPASS0skip,lint/types/build,PG16/18restore2tenants/6rooms y CI DockerLinux/decoderPASS. GCS/directPUT/generaciones y workerComputeperfilpropio preparados; ningún JSX/layout/motion nuevo. Main20f9fe9 conservado. Bucket/IAM/CORS,rol/SA/secretworker,migracióncloud/canary siguen pendientes;CLI+ADC renovados por runner canónico y verificados vigentes; readback confirma bucket/SA/secret worker aún ausentes, lectura Job no concluyente. [Contrato frontend](docs/documentation/rooms/backend-api-for-claude-design.md), [recovery](docs/audits/rooms/2026-10-26-media-backend-recovery.md). No cerrar2072 por código/fakesSDK ni activarflags por conectar diseño.
+
+
+
 Claude auditó con tres subagentes de solo lectura: [registro de estado](docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md). Auth `auth-server-00166-p77` (`754a2a28`) vivo con first-party y OTP **OFF**, Login V4 servido; PR #262 draft con CI pendiente; promoción a main, flags y único canary a `jreyes@efeoncepro.com` pendientes; ningún correo enviado. Rooms `20f9fe9` en Vercel con `ROOMS_*` OFF, DB `rooms_production` 5 migraciones. WIP medios TASK-2070/2071 **sin commitear en `efeonce-rooms`** y con `typecheck` rojo (TS2322): llevar a rama, nunca a `main` (cada push es producción). Skills vivas nuevas `efeonce-rooms` y `efeonce-auth` (espejo Claude↔Codex) con ledger del programa. Segunda auditoría (§6): EPIC-044 tiene 27 unidades, sin repo propio, sin logins nativos desde 26/9 porque faltan los conectores de Codex y Claude (TASK-1904/2000; MCP construido y probado), `develop` despliega el emisor productivo. TASK-1829 cerrada (administrativa). 1828/1830/1832 NO listas (llave v1, passkeys 2 navegadores, muestra steady). PR #262 CI verde sin promover. Medios de Rooms rescatados en rama local `efeonce-rooms` `task/2070-2071-private-media` (`c0facfd`, `2626921`, `7ca5fd3`: limpieza, worker `--loop`, hijo sin `tsx`, DO en migración; verify 207/207), `main` sigue en `20f9fe9`. Demo de Rooms **no aceptada** por Julio (busca algo más inmersivo): Rooms en pausa hasta revisar la dirección con maqueta. Login V4 vivo en `auth.efeonce.org/login`; entrar a Rooms con él sigue OFF. Siguiente (con créditos Codex desde 1/11): release #262 + canary único, conectores Codex/Claude, separar deploy de Auth, higiene de seguridad.
 
 ## 2026-10-25 — Auth: Rooms primero y login V4
@@ -182,6 +188,10 @@ Desconectar: `subscription off --apply`.
 real); «¡Listo!» quedaba corrido por la grilla de `.ghf-inline-msg`. Gate `inline-pill.scenario.mjs` dentro de
 presupuesto. **El operador decidió no hacer release por ahora** (~3 h cada uno): correos (`2a971d768`) y píldora esperan
 al próximo release que él decida.
+**Eventos/webinars — causa del conector aislada (2026-10-26):** el conector de HubSpot solo descubre webinars creados
+**desde el Calendario de Teams (Nuevo → Webinar)**; «Prueba sync HubSpot (calendario)» apareció en minutos como Evento de
+marketing, los de la app Eventos nunca. Regla: crear desde el Calendario; el conector es la fuente del Evento de
+marketing y la escritura por API de Greenhouse queda de respaldo. Respuesta enviada a Johanna (ticket #50018204746).
 **Eventos/webinars (2026-10-24):** las sesiones son **webinars de Teams** (no reuniones). El conector Teams↔HubSpot no
 lee ningún webinar aunque Entra, la política de Teams (`MY-APP-POLICY`, ahora también asignada a jreyes) y los ajustes
 de HubSpot están bien; ticket de soporte **#50018204746** derivado a agente humano (anexo C). Diseño alternativo sin

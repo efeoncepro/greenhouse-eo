@@ -674,6 +674,8 @@ manual: `docs/manual-de-uso/public-site/lanzar-evento-o-webinar.md`. A test even
 
 #### Eventos y webinars — estado y backlog (2026-10-24)
 
+- **Causa aislada (2026-10-26):** el conector de HubSpot solo descubre los webinars creados **desde el Calendario de Teams (Nuevo → Webinar)**; los creados en **Eventos → Crear evento → Seminario web** nunca aparecen. Prueba: «Prueba sync HubSpot (calendario)» apareció en minutos como Evento de marketing. Regla: crear siempre desde el Calendario; la fuente del Evento de marketing es el conector y la escritura de Greenhouse por API queda de respaldo. Ver anexo C de RESEARCH-013.
+
 - **Decisión (2026-10-24):** la confirmación la manda Greenhouse con su marca y el enlace personal de Teams (`joinWebUrl`); Teams en silencio en cada webinar.
 
 Fuente única del pendiente: [RESEARCH-013 §Backlog canónico](../../../docs/research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos)

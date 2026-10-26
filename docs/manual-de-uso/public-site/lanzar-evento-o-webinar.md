@@ -39,18 +39,23 @@
 
 ### La sesión es un webinar de Teams
 
-La sesión se hace como **seminario web (webinar) de la app Eventos de Teams**, no como una reunión normal. El webinar
+La sesión se hace como **seminario web (webinar) de Teams**, no como una reunión normal. El webinar
 trae sus propios roles (presentadores y asistentes sin micrófono ni cámara), preguntas y respuestas, página del evento,
 correos e informe de asistencia.
 
 El tenant de Efeonce es Microsoft 365 **Business**: inscripción básica, hasta 1.000 asistentes, **sin lista de espera ni
 aprobación en Teams**. Por eso el cupo y la lista de espera los lleva Greenhouse.
 
-Cómo se crea hoy:
+Cómo se crea hoy (**desde el Calendario, no desde la app Eventos**):
 
-1. En Teams, abre **Eventos** → **Crear evento** → **Seminario web**.
-2. Completa los datos del webinar y **publícalo**.
-3. Si es una prueba, ponle el prefijo `prueba-` al nombre y ocúltalo de la app Eventos para que no lo vea nadie más.
+1. En Teams, abre **Calendario** → flecha junto a **Nuevo** → **Webinar**.
+2. Completa título, fecha, descripción y **Guardar**; luego **Publicar sitio** → **Publicar**.
+3. En el aviso final deja apagado «Mostrar evento en la aplicación Eventos» si es una prueba, y ponle `prueba-` al nombre.
+
+**Por qué desde el Calendario:** el conector de HubSpot solo descubre los webinars creados por ese camino. Verificado el
+2026-10-26: «Prueba sync HubSpot (calendario)» apareció en HubSpot en minutos (lista de webinars y Eventos de
+marketing), mientras que los dos creados desde **Eventos → Crear evento → Seminario web** nunca aparecieron (ticket de
+soporte #50018204746). Así HubSpot recibe solo el evento, los inscritos y la asistencia.
 
 Con el flujo de hoy, el lanzador pide un enlace fijo de la sala (`joinUrl`), el mismo para todas las personas. En el
 diseño final recibirá el id del webinar y cada persona tendrá su propio enlace.

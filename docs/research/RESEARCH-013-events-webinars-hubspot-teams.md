@@ -82,6 +82,10 @@ manda).
 4. **Una sola fuente por Evento de marketing:** el conector Teams↔HubSpot si funciona; si no, Greenhouse por API.
 5. **Sin release por ahora** (~3 h cada uno): todo se acumula y sale en un solo release cuando el operador lo decida.
 6. El operador quiere que el agente ejecute (navegador, CLI); solo se le pide lo que exige su identidad.
+8. **Los webinars se crean desde el Calendario de Teams (Nuevo → Webinar), no desde la app Eventos.** Verificado el
+   2026-10-26 con el soporte de HubSpot: el conector descubre y sincroniza los del Calendario en minutos («Prueba sync
+   HubSpot (calendario)», `b206c3ae-…`), y no ve los creados en la app Eventos (`a5c907d4-…`, `4d1e7c57-…`). Con eso la
+   **fuente del Evento de marketing es el conector** por defecto; la escritura de Greenhouse por API queda de respaldo.
 7. **La confirmación la manda Greenhouse** con la marca Efeonce y el **enlace personal de Teams** (`joinWebUrl` de la
    inscripción); **Teams en silencio** (correos a asistentes desactivados en cada webinar). Greenhouse también manda la
    lista de espera, el «ya tienes cupo» y el recordatorio.
@@ -113,8 +117,9 @@ manda).
 
 **B. Externo / del operador (con su OK)**
 
-- [ ] Respuesta del soporte de HubSpot; reconectar la app de Teams solo si lo recomiendan, con captura previa de su
-      configuración.
+- [x] Causa del conector aislada con el soporte (2026-10-26): los webinars de la app Eventos no se descubren; los del
+      Calendario sí. Pendiente: respuesta de HubSpot sobre soporte de la app Eventos o forzar la lectura de los dos
+      identificadores (ticket #50018204746).
 - [ ] Pasar `crm.objects.marketing_events.read/write` a `requiredScopes`, `hs project upload`, reinstalar el app
       «Efeonce Data Platform» e introspeccionar el token (precedente PDR-009: no rota). Actualizar el snapshot
       `docs/operations/hubspot-app-manifest/`.
@@ -122,7 +127,8 @@ manda).
       `VirtualEvent.Read.All` y `OnlineMeetingArtifact.Read.All`; consentimiento de administrador; secreto blob en
       Secret Manager; agregar su AppId a `MY-APP-POLICY` (`Set-CsApplicationAccessPolicy -AppIds @{Add=…}`).
       Coordinar con TASK-1769.
-- [ ] Cancelar o despublicar los webinars de prueba «La IA no conoce tu negocio» (24-oct) y «La IA y la busqueda» (26-oct).
+- [ ] Cancelar o despublicar los webinars de prueba «La IA no conoce tu negocio» (24-oct), «La IA y la busqueda» (26-oct)
+      y «Prueba sync HubSpot (calendario)» (26-oct), cuando el soporte ya no los necesite.
 
 **C. Construcción (tasks por crear con greenhouse-task-planner, `backend-data` primero)**
 
@@ -134,7 +140,8 @@ manda).
 - [ ] **Inscripción y asistencia en Teams por Graph:** cliente Graph (patrón token-cache del bot, principal dedicado);
       proyección que inscribe al confirmar/promover (idempotente); lectura del informe de asistencia por sesión del
       webinar y transición `attended` con entrada/salida; lanzador recibe el id del webinar y lo valida.
-- [ ] **HubSpot Marketing Events** (si la fuente es Greenhouse): cliente in-app API `2026-09`; upsert al lanzar y
+- [ ] **HubSpot Marketing Events — solo respaldo** (el conector cubre los webinars del Calendario; construir solo si
+      se necesita sin conector): cliente in-app API `2026-09`; upsert al lanzar y
       `objectId` persistido; proyección `REGISTERED`/`CANCELLED`/`ATTENDED`; backfill `pnpm events:hubspot-sync`;
       señal `growth.events.hubspot_participation_drift`; flag `GROWTH_EVENT_HUBSPOT_PARTICIPATION_ENABLED` solo en el
       ops-worker (`deploy.sh` + ledger).

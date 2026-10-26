@@ -51,6 +51,8 @@ implements that sender. Do not mutate CRM stages, contacts or click IDs to manuf
 
 ## HubSpot Marketing Events + conector de webinars de Teams (2026-10-24)
 
+- **Causa aislada (2026-10-26):** el conector de HubSpot solo descubre los webinars creados **desde el Calendario de Teams (Nuevo → Webinar)**; los creados en **Eventos → Crear evento → Seminario web** nunca aparecen. Prueba: «Prueba sync HubSpot (calendario)» apareció en minutos como Evento de marketing. Regla: crear siempre desde el Calendario; la fuente del Evento de marketing es el conector y la escritura de Greenhouse por API queda de respaldo. Ver anexo C de RESEARCH-013.
+
 Estado y backlog: [RESEARCH-013](../../../docs/research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos)
 (objeto en el anexo B, conector en el [anexo C](../../../docs/research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md),
 diseño en el [anexo D](../../../docs/research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md)). Los eventos
