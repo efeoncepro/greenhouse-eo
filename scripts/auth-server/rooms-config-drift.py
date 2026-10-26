@@ -43,6 +43,20 @@ def config_matches(revision, desired):
             mounted = env.get(name, {}).get('valueFrom', {}).get('secretKeyRef', {})
             if wanted is None or (mounted.get('name'), mounted.get('key')) != wanted:
                 return False
+    else:
+        # OFF must remove the dedicated canary credentials, not merely stop reading them.
+        if any(name in env for name in SECRETS):
+            return False
+    if desired.get('ENV') == 'production':
+        if env.get('SENTRY_ENVIRONMENT', {}).get('value') != 'production':
+            return False
+        wanted = secret_ref(desired.get('RESEND_API_KEY_SECRET_REF', 'greenhouse-resend-api-key-production:1'))
+        if wanted is None or wanted[0] != 'greenhouse-resend-api-key-production':
+            return False
+        declared = secret_ref(env.get('RESEND_API_KEY_SECRET_REF', {}).get('value', ''))
+        mounted = env.get('RESEND_API_KEY', {}).get('valueFrom', {}).get('secretKeyRef', {})
+        if declared != wanted or (mounted.get('name'), mounted.get('key')) != wanted:
+            return False
     return True
 
 

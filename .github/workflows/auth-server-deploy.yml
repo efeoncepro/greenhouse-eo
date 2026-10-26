@@ -2,18 +2,15 @@ name: Auth Server Deploy
 
 # TASK-1828 / EPIC-044 — Efeonce authorization server (`auth.efeonce.org`) on Cloud Run.
 #
-# Mirrors the ops-worker deploy contract: pushes to `develop` that touch the
-# service or its bundled runtime surface deploy staging automatically;
-# production deploys are owned by `production-release.yml` via workflow_call;
-# workflow_dispatch remains available for audited break-glass.
-#
-# The service ships with AUTH_SERVER_ENABLED=false by default (readyz 503,
-# JWKS 404); flipping the flag is a declarative change in deploy.sh + ledger.
+# ONE service serves production at auth.efeonce.org: no staging deployment exists.
+# Only main pushes, production-release.yml workflow_call and audited production
+# dispatches may deploy. All lanes use the production Environment and one lock.
+# Feature flags/cohorts remain independent governed inputs; routing never enables them.
 
 on:
   push:
     branches:
-      - develop
+      - main
     paths:
       - 'services/auth-server/**'
       - 'scripts/auth-server/rooms-config-drift.py'
@@ -37,12 +34,11 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment'
+        description: 'Single production service (staging is unsupported)'
         type: choice
         required: true
-        default: staging
+        default: production
         options:
-          - staging
           - production
       expected_sha:
         description: 'Expected git SHA (default: github.sha). TASK-851 — orchestrator passes target_sha.'
@@ -52,7 +48,7 @@ on:
   workflow_call:
     inputs:
       environment:
-        description: 'Target environment (staging | production)'
+        description: 'Must be production; there is no staging Auth service'
         type: string
         required: true
       expected_sha:
@@ -63,10 +59,10 @@ on:
       GCP_WORKLOAD_IDENTITY_PROVIDER:
         required: true
 
-# Dynamic cancel-in-progress (TASK-848 Slice 3 / TASK-931) — never revert to a literal false.
+# Serialize all callers of the same production service. Never cancel a running deploy.
 concurrency:
-  group: auth-server-deploy-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
+  group: auth-server-production
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -78,32 +74,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
-    environment: >-
-      ${{
-        github.event_name == 'workflow_call'
-          && inputs.environment
-          || (github.event_name == 'workflow_dispatch'
-              && github.event.inputs.environment
-              || 'staging')
-      }}
+    environment: production
 
     env:
-      ENV: >-
-        ${{
-          github.event_name == 'workflow_call'
-            && inputs.environment
-            || (github.event_name == 'workflow_dispatch'
-                && github.event.inputs.environment
-                || 'staging')
-        }}
-      RAW_EXPECTED_SHA: >-
-        ${{
-          github.event_name == 'workflow_call'
-            && inputs.expected_sha
-            || (github.event_name == 'workflow_dispatch'
-                && github.event.inputs.expected_sha
-                || github.sha)
-        }}
+      ENV: production
+      REQUESTED_ENVIRONMENT: ${{ inputs.environment || 'production' }}
+      RAW_EXPECTED_SHA: ${{ inputs.expected_sha || github.sha }}
       GCP_PROJECT_ID: efeonce-group
       GCP_REGION: us-east4
       # Deployer identity via WIF; runtime identity is the dedicated auth-server SA
@@ -125,34 +101,29 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ -n "${RAW_EXPECTED_SHA}" ]; then
-            RESOLVED_SHA="${RAW_EXPECTED_SHA}"
-            RESOLUTION_SOURCE="explicit-input"
-          elif [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
-            RESOLVED_SHA="$(git log -1 --format=%H -- \
-              package.json \
-              pnpm-lock.yaml \
-              tsconfig.json \
-              services/auth-server \
-              services/_shared \
-              src/lib \
-              src/types \
-              src/config)"
-            RESOLUTION_SOURCE="latest-worker-runtime-path"
-          else
-            RESOLVED_SHA="${GITHUB_SHA}"
-            RESOLUTION_SOURCE="event-sha"
-          fi
-
-          if [ -z "${RESOLVED_SHA}" ]; then
-            echo "ERROR: could not resolve expected auth-server SHA."
+          # workflow_call retains the caller's event/ref; never trust event_name
+          # to distinguish reusable calls from production dispatches.
+          if [ "${GITHUB_REF}" != "refs/heads/main" ] || [ "${REQUESTED_ENVIRONMENT}" != "production" ]; then
+            echo "ERROR: auth-server serves production; only main + production may deploy."
             exit 1
           fi
-
-          echo "EXPECTED_SHA=${RESOLVED_SHA}" >> "${GITHUB_ENV}"
-          echo "expected_sha=${RESOLVED_SHA}" >> "${GITHUB_OUTPUT}"
-          echo "resolution_source=${RESOLUTION_SOURCE}" >> "${GITHUB_OUTPUT}"
-          echo "Resolved auth-server expected SHA: ${RESOLVED_SHA} (${RESOLUTION_SOURCE})"
+          if [[ ! "${RAW_EXPECTED_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "ERROR: expected_sha must be a full 40-character commit SHA."
+            exit 1
+          fi
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "${RAW_EXPECTED_SHA}" origin/main; then
+            echo "ERROR: expected_sha is not published on main."
+            exit 1
+          fi
+          git checkout --detach "${RAW_EXPECTED_SHA}"
+          if [ "$(git rev-parse HEAD)" != "${RAW_EXPECTED_SHA}" ]; then
+            echo "ERROR: build checkout does not match expected_sha."
+            exit 1
+          fi
+          echo "EXPECTED_SHA=${RAW_EXPECTED_SHA}" >> "${GITHUB_ENV}"
+          echo "expected_sha=${RAW_EXPECTED_SHA}" >> "${GITHUB_OUTPUT}"
+          echo "resolution_source=verified-main-commit" >> "${GITHUB_OUTPUT}"
 
       - name: Authenticate to Google Cloud
         id: auth
@@ -175,6 +146,8 @@ jobs:
         id: worker-drift
         shell: bash
         env:
+          ENV: production
+          RESEND_API_KEY_SECRET_REF: greenhouse-resend-api-key-production:1
           AUTH_SERVER_FIRST_PARTY_ENABLED: ${{ vars.AUTH_SERVER_FIRST_PARTY_ENABLED || 'false' }}
           AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED: ${{ vars.AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED || 'false' }}
           AUTH_SERVER_INVITATION_EMAIL_OTP_CLIENT_ID: ${{ vars.AUTH_SERVER_INVITATION_EMAIL_OTP_CLIENT_ID || '' }}
@@ -207,7 +180,7 @@ jobs:
           CURRENT_REVISION="$(gcloud run services describe auth-server \
             --project="${GCP_PROJECT_ID}" \
             --region="${GCP_REGION}" \
-            --format='value(status.latestReadyRevisionName)' 2>/dev/null || true)"
+            --format=json | python3 -c 'import json, sys; traffic = [t for t in json.load(sys.stdin).get("status", {}).get("traffic", []) if t.get("percent", 0) > 0]; sys.exit("ERROR: Auth requires one revision with 100% traffic before deployment") if len(traffic) != 1 or traffic[0].get("percent") != 100 or not traffic[0].get("revisionName") else print(traffic[0]["revisionName"])')"
 
           CURRENT_GIT_SHA=""
           CURRENT_AUTH_SERVER_INTERNAL_AUTH_ENABLED=""
@@ -227,6 +200,11 @@ jobs:
             CURRENT_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS="${CURRENT_RUNTIME_STATE[4]:-}"
           fi
 
+          if [[ ! "${CURRENT_GIT_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "ERROR: active Auth revision has no verifiable source SHA; refusing deployment."
+            exit 1
+          fi
+
           ROOMS_CONFIG_MATCHES="false"
           if [ -n "${CURRENT_REVISION}" ]; then
             ROOMS_CONFIG_MATCHES="$(gcloud run revisions describe "${CURRENT_REVISION}" \
@@ -244,6 +222,18 @@ jobs:
           fi
 
           echo "auth-server config drift: internal_auth current=${CURRENT_AUTH_SERVER_INTERNAL_AUTH_ENABLED:-unset} desired=${DESIRED_AUTH_SERVER_INTERNAL_AUTH_ENABLED}; external_canary current=${CURRENT_EXTERNAL_IDENTITY_CANARY_ENABLED:-unset} desired=${DESIRED_EXTERNAL_IDENTITY_CANARY_ENABLED}"
+
+          if [ -n "${CURRENT_GIT_SHA}" ] && [ "${CURRENT_GIT_SHA}" != "${EXPECTED_SHA}" ]; then
+            if ! git cat-file -e "${CURRENT_GIT_SHA}^{commit}" 2>/dev/null; then
+              echo "ERROR: cannot verify currently served commit; refusing an unverified source replacement."
+              exit 1
+            fi
+            if ! git merge-base --is-ancestor "${CURRENT_GIT_SHA}" "${EXPECTED_SHA}" \
+              && ! git diff --quiet "${EXPECTED_SHA}..${CURRENT_GIT_SHA}" -- "${WORKER_RUNTIME_PATHS[@]}"; then
+              echo "ERROR: target would replace unpromoted or newer Auth runtime; promote/reconcile it first."
+              exit 1
+            fi
+          fi
 
           if [ "${CURRENT_GIT_SHA}" = "${EXPECTED_SHA}" ] && [ "${CONFIG_MATCHES}" = "true" ]; then
             DEPLOY_NEEDED="false"

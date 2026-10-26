@@ -54,6 +54,35 @@ class RoomsConfigDriftTests(unittest.TestCase):
         revision['spec']['containers'][0]['env'] = revision['spec']['containers'][0]['env'][:-2]
         self.assertTrue(drift.config_matches(revision, desired))
 
+    def test_disabled_otp_with_stale_mounts_requires_deploy(self):
+        revision, desired = self.configured()
+        desired[drift.FLAGS[1]] = 'false'
+        revision['spec']['containers'][0]['env'][1]['value'] = 'false'
+        self.assertFalse(drift.config_matches(revision, desired))
+
+    def production(self):
+        revision = {'spec': {'containers': [{'env': [
+            {'name': 'SENTRY_ENVIRONMENT', 'value': 'production'},
+            {'name': 'RESEND_API_KEY_SECRET_REF', 'value': 'greenhouse-resend-api-key-production:1'},
+            {'name': 'RESEND_API_KEY', 'valueFrom': {'secretKeyRef': {'name': 'greenhouse-resend-api-key-production', 'key': '1'}}},
+        ]}]}}
+        return revision, {'ENV': 'production'}
+
+    def test_production_config_matches_pinned_resend(self):
+        self.assertTrue(drift.config_matches(*self.production()))
+
+    def test_staging_sentry_requires_deploy_even_if_code_matches(self):
+        revision, desired = self.production()
+        revision['spec']['containers'][0]['env'][0]['value'] = 'staging'
+        self.assertFalse(drift.config_matches(revision, desired))
+
+    def test_resend_declared_and_mounted_must_both_match_production_pin(self):
+        for entry, field, value in ((1, 'value', 'greenhouse-resend-api-key-staging'), (2, 'valueFrom', {'secretKeyRef': {'name': 'greenhouse-resend-api-key-production', 'key': 'latest'}})):
+            with self.subTest(entry=entry):
+                revision, desired = self.production()
+                revision['spec']['containers'][0]['env'][entry][field] = value
+                self.assertFalse(drift.config_matches(revision, desired))
+
     def test_malformed_metadata_never_skips(self):
         self.assertFalse(drift.config_matches({}, {}))
 

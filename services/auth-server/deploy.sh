@@ -3,7 +3,6 @@
 # Efeonce Auth Server — Cloud Run Deployment (TASK-1828, EPIC-044)
 #
 # Usage:
-#   ENV=staging    bash services/auth-server/deploy.sh
 #   ENV=production bash services/auth-server/deploy.sh
 #
 # Prerequisites:
@@ -11,9 +10,8 @@
 #   - Cloud KMS key `auth-server-es256` (HSM) + SA `auth-server@` (TASK-1828 Slice 0)
 #
 # Topology: ONE Cloud Run service (`auth-server`, us-east4) publicado como segundo host
-# del front door del gateway MCP (`auth.efeonce.org`). Igual que ops-worker, staging y
-# production comparten servicio y base; ENV sólo selecciona secretos y el mínimo de
-# instancias. El servicio nace con AUTH_SERVER_ENABLED=false (readyz 503, JWKS 404).
+# del front door del gateway MCP (`auth.efeonce.org`). Es PRODUCCIÓN: no hay servicio
+# staging. Sólo se despliega código publicado en main, con configuración production.
 #
 # Ingress/auth: `--ingress=internal-and-cloud-load-balancing` + `--allow-unauthenticated`
 # — el ALB no emite tokens IAM hacia un serverless NEG; la app valida `Host`.
@@ -24,14 +22,24 @@
 
 set -euo pipefail
 
-if [ -z "${ENV:-}" ]; then
-  echo "ERROR: ENV must be set explicitly — 'staging' or 'production'."
-  echo "       Usage: ENV=staging bash services/auth-server/deploy.sh"
+if [ "${ENV:-}" != "production" ]; then
+  echo "ERROR: the single auth-server serves production; ENV=production is required."
   exit 1
 fi
 
-if [ "${ENV}" != "staging" ] && [ "${ENV}" != "production" ]; then
-  echo "ERROR: ENV must be 'staging' or 'production', got '${ENV}'."
+# Refuse mislabeled builds and unpublished sources before any cloud operation.
+SOURCE_SHA="$(git rev-parse HEAD)"
+EXPECTED_SHA="${EXPECTED_SHA:-${GITHUB_SHA:-${SOURCE_SHA}}}"
+if [[ ! "${EXPECTED_SHA}" =~ ^[0-9a-f]{40}$ ]] || [ "${SOURCE_SHA}" != "${EXPECTED_SHA}" ]; then
+  echo "ERROR: checked-out source must exactly match the full EXPECTED_SHA."
+  exit 1
+fi
+if ! git merge-base --is-ancestor "${SOURCE_SHA}" refs/remotes/origin/main; then
+  echo "ERROR: source must be published on origin/main before production deployment."
+  exit 1
+fi
+if ! git diff --quiet HEAD -- services/auth-server services/_shared scripts/auth-server src package.json pnpm-lock.yaml tsconfig.json vendor .dockerignore .gcloudignore; then
+  echo "ERROR: Auth build inputs contain uncommitted changes."
   exit 1
 fi
 
@@ -46,15 +54,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../_shared/gcloud-secret-iam.sh"
 
 # Cloud Run settings (ADR EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1):
-#   - production: min=1 (un login con arranque en frío se siente mal); staging: min=0.
+#   - production: min=1 (un login con arranque en frío se siente mal).
 #   - cpu=1/512Mi: emisión de tokens es liviana; la firma la hace KMS.
 #   - concurrency=80, timeout=30s: requests cortos (OAuth, JWKS, health).
-if [ "${ENV}" = "production" ]; then
-  DEFAULT_MIN_INSTANCES="1"
-else
-  DEFAULT_MIN_INSTANCES="0"
-fi
-MIN_INSTANCES="${MIN_INSTANCES:-${DEFAULT_MIN_INSTANCES}}"
+MIN_INSTANCES="${MIN_INSTANCES:-1}"
 MAX_INSTANCES="${MAX_INSTANCES:-5}"
 MEMORY="${MEMORY:-512Mi}"
 CPU="${CPU:-1}"
@@ -66,8 +69,12 @@ DEFAULT_PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
 PG_PASSWORD_REF="${PG_PASSWORD_REF:-${DEFAULT_PG_PASSWORD_REF}}"
 PG_INSTANCE="${PG_INSTANCE:-${DEFAULT_PG_INSTANCE}}"
 
-DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-${ENV}"
+DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-production:1"
 RESEND_API_KEY_SECRET_REF="${RESEND_API_KEY_SECRET_REF:-${DEFAULT_RESEND_API_KEY_SECRET_REF}}"
+case "${RESEND_API_KEY_SECRET_REF}" in
+  greenhouse-resend-api-key-production:*|projects/efeonce-group/secrets/greenhouse-resend-api-key-production/versions/*) ;;
+  *) echo "ERROR: production Auth requires the production Resend secret."; exit 1 ;;
+esac
 EMAIL_FROM="${EMAIL_FROM:-Efeonce <greenhouse@efeoncepro.com>}"
 
 AUTH_SERVER_ISSUER="${AUTH_SERVER_ISSUER:-https://auth.efeonce.org}"
@@ -77,7 +84,7 @@ AUTH_SERVER_KMS_KEY="${AUTH_SERVER_KMS_KEY:-projects/${PROJECT_ID}/locations/${R
 # es EC de firma y no puede cifrar. Creada 2026-09-04 (HSM, ENCRYPT_DECRYPT, rotación 90 d) con
 # `cryptoKeyEncrypterDecrypter` para `auth-server@`.
 AUTH_SERVER_TOTP_KMS_KEY="${AUTH_SERVER_TOTP_KMS_KEY:-projects/${PROJECT_ID}/locations/${REGION}/keyRings/auth-server/cryptoKeys/auth-server-totp-envelope}"
-# TASK-1836: durable corporate references, shared by staging and production on this service.
+# TASK-1836: durable corporate references for the single production service.
 # Provisioning these dependencies does not activate login; activation remains a separate decision.
 AUTH_SERVER_INTERNAL_AUTH_ENABLED="${AUTH_SERVER_INTERNAL_AUTH_ENABLED:-false}"
 AUTH_SERVER_FIRST_PARTY_ENABLED="${AUTH_SERVER_FIRST_PARTY_ENABLED:-false}"
@@ -299,11 +306,16 @@ ENV_VARS="${ENV_VARS}::SENTRY_ENVIRONMENT=${ENV}"
 # ─── Secrets (Secret Manager → env) ─────────────────────────────────────────
 
 SECRETS="GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
+OTP_SECRET_ARGS=()
 if [[ "${AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED}" == "true" ]]; then
-  ensure_secret_accessor_binding "${AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET_REF}"
-  ensure_secret_accessor_binding "${ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF}"
+  # IAM binds the secret name; main may still carry the helper that strips only :latest.
+  ensure_secret_accessor_binding "${AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET_REF%%:*}"
+  ensure_secret_accessor_binding "${ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF%%:*}"
   SECRETS="${SECRETS},AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET=$(normalize_secret_ref_for_cloud_run "${AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET_REF}")"
   SECRETS="${SECRETS},ROOMS_INVITATION_AUTHORITY_TOKEN=$(normalize_secret_ref_for_cloud_run "${ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF}")"
+else
+  # --update-secrets alone retains mounts from a prior ON revision.
+  OTP_SECRET_ARGS=(--remove-secrets=AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET,ROOMS_INVITATION_AUTHORITY_TOKEN)
 fi
 
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
@@ -316,7 +328,7 @@ SECRETS="${SECRETS},AUTH_SERVER_ENTRA_CLIENT_SECRET=${AUTH_SERVER_ENTRA_CLIENT_S
 # configured» en `email_deliveries`, sin que nadie se entere. Detectado en vivo por
 # `pnpm auth-server:person-auth:canary` el 2026-09-05; mismo patrón que ops-worker.
 SECRETS="${SECRETS},RESEND_API_KEY=$(normalize_secret_ref_for_cloud_run "${RESEND_API_KEY_SECRET_REF}")"
-ensure_secret_accessor_binding "${RESEND_API_KEY_SECRET_REF}"
+ensure_secret_accessor_binding "${RESEND_API_KEY_SECRET_REF%%:*}"
 
 SENTRY_DSN_SECRET_NAME="${SENTRY_DSN_SECRET_NAME:-greenhouse-sentry-dsn}"
 
@@ -330,7 +342,6 @@ fi
 
 # ─── GIT_SHA (TASK-849/851 drift detection) ─────────────────────────────────
 
-EXPECTED_SHA="${EXPECTED_SHA:-${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}}"
 GIT_SHA="${EXPECTED_SHA}"
 ENV_VARS="${ENV_VARS}::GIT_SHA=${GIT_SHA}"
 
@@ -351,6 +362,7 @@ gcloud run deploy "${SERVICE_NAME}" \
   --allow-unauthenticated \
   --set-env-vars="^::^${ENV_VARS}" \
   --update-secrets="${SECRETS}" \
+  "${OTP_SECRET_ARGS[@]}" \
   --quiet
 
 SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" \
