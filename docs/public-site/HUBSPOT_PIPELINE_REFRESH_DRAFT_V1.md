@@ -36,19 +36,21 @@
 actualizarlo después de cada reunión. Lo que no puede hacer por ti es decidir qué significa cada etapa. Un agente
 que alimenta un pipeline mal definido sólo lo hace mentir más rápido.
 
-**Lo que se acepta perder:** la búsqueda genérica «pipeline de ventas». Igual que en el RUT, el artículo se queda en
-su tema (HubSpot), que es el que demuestra experiencia.
+**Lo genérico no se abandona (corregido en la auditoría §9):** «pipeline de ventas» tiene volumen real (Semrush,
+2026-10-26: 720/mes México, 390 España, 140 Chile; dificultad 27–32) y en su SERP rankean agencias, no sólo los CRM.
+El artículo la disputa con la definición agnóstica y el diseño de etapas, y gana con lo que los CRM no cuentan: la
+implementación en HubSpot y la experiencia propia.
 
 ## 2. Metadata propuesta
 
 | Campo | Actual | Propuesto |
 |---|---|---|
 | Title (SEO) | Crea un Pipeline de Ventas que Convierte: Guía Paso a Paso - Efeonce | Pipeline de ventas en HubSpot: cómo configurarlo en 2026 \| Efeonce |
-| Meta description | Aprende a implementar un pipeline de ventas efectivo con etapas claras, checklists y tips prácticos para maximizar conversiones. | Cómo configurar el pipeline de ventas en HubSpot: etapas con criterio de salida, reglas, probabilidad y previsión, y qué cambia con el Prospecting Agent y Deal Progression. |
+| Meta description | Aprende a implementar un pipeline de ventas efectivo con etapas claras, checklists y tips prácticos para maximizar conversiones. | Qué es un pipeline de ventas y cómo configurarlo en HubSpot: etapas con criterio de salida, reglas, previsión, Prospecting Agent y Deal Progression. |
 | H1 | Crea un Pipeline de Ventas que Convierte: Guía Paso a Paso | Pipeline de ventas en HubSpot: cómo configurarlo para que diga la verdad |
 | og:title | — | Tu pipeline en HubSpot ya se llena y se actualiza solo. ¿Dice la verdad? |
 | og:description | — | Etapas, reglas y previsión en HubSpot, y cómo usar el Prospecting Agent y Deal Progression sin que el pipeline mienta. |
-| Slug | `/hubspot/crea-un-pipeline-de-ventas-que-convierte-guia-paso-a-paso/` | Sin cambio: conserva historial y evita otra migración como la de GA4 |
+| Slug | `/hubspot/crea-un-pipeline-de-ventas-que-convierte-guia-paso-a-paso/` (57 caracteres de slug) | **`/hubspot/pipeline-de-ventas/`** + 301 desde la URL actual (auditoría SEO/AEO §9, decisión D1) |
 | Fecha | Publicado 2024-11-24 | Conservar publicación; `dateModified` real + «Actualizado el …» visible + «Funciones verificadas en la documentación de HubSpot en octubre de 2026» |
 | Schema | `BlogPosting` + `Person` (Julio Reyes) | Mantener; actualizar `headline`, `description`, `dateModified`. FAQ visible al final |
 | Portada | Sin portada propia | Nueva (se rehace; ver §6) |
@@ -73,12 +75,12 @@ Entonces, si la máquina ya hace el trabajo pesado, ¿por qué el pipeline segui
 Mi lectura es que el problema nunca estuvo en la carga de datos. Estuvo en qué significa cada etapa. Si eso no está
 definido, el agente no lo arregla: lo acelera. Vamos por partes.
 
-## ¿Qué es un pipeline de ventas en HubSpot?
+## ¿Qué es un pipeline de ventas y cómo funciona en HubSpot?
 
-Un **pipeline de ventas en HubSpot** es la secuencia de etapas por la que avanza un negocio (*deal*) desde que
-existe una oportunidad hasta que se gana o se pierde. Cada etapa tiene una **probabilidad de cierre**, y HubSpot la
-usa para calcular el **importe ponderado** que ves en la vista de tablero. Las etapas de cierre ganado (100 %) y
-perdido (0 %) son obligatorias para que los reportes funcionen.
+Un **pipeline de ventas** es la secuencia de etapas por la que avanza una oportunidad, desde que existe hasta que se
+gana o se pierde, con una probabilidad de cierre asociada a cada etapa. En HubSpot, cada oportunidad es un **negocio**
+(*deal*): la probabilidad de su etapa calcula el **importe ponderado** que ves en la vista de tablero, y las etapas de
+cierre ganado (100 %) y perdido (0 %) son obligatorias para que los reportes funcionen.
 
 Antes del negocio hay otra pieza que conviene no mezclar: el **objeto Leads**, con su propio pipeline (por defecto:
 *New*, *Attempting*, *Connected*, *Qualified* y *Disqualified*). Ahí se trabaja a la persona o cuenta mientras
@@ -89,6 +91,10 @@ contacto que todavía no confirmó una necesidad, metido en el pipeline de negoc
 uno.
 
 ## ¿Cómo diseñar las etapas antes de abrir la configuración?
+
+Cada etapa se define por su **criterio de salida**: la evidencia de que el comprador hizo algo que acerca la decisión.
+En una venta B2B de servicios suelen bastar cuatro o cinco etapas abiertas, más ganado y perdido [I —
+recomendación]. Más etapas no dan más control: dan más lugares donde un negocio puede quedarse quieto.
 
 La pregunta útil no es «¿qué etapas tiene una venta?», sino **«¿qué tiene que haber pasado para que un negocio
 avance?»**. Y la respuesta que mejor funciona es una acción del comprador, no del vendedor.
@@ -247,7 +253,7 @@ otra en diez minutos y la ficha del negocio queda como estaba hace tres semanas.
 resumen, tareas, un correo de seguimiento y **cambios en propiedades del negocio**, que el vendedor aprueba, edita o
 rechaza. Requiere un asiento de Sales o Service (en Starter, un asiento Core).
 
-**Deal Progression** va un paso más allá: usa las transcripciones, los correos y las llamadas para sugerir cambios en
+**Deal Progression** (HubSpot la presentó como *Smart Deal Progression*) va un paso más allá: usa las transcripciones, los correos y las llamadas para sugerir cambios en
 las propiedades del negocio, con el valor actual al lado del sugerido, y **próximas acciones**: enviar un correo,
 agendar o preparar una reunión, crear una tarea o reactivar un negocio estancado. Se activa desde **Agent Hub** y está
 disponible para Sales Hub o Service Hub Professional y Enterprise.
@@ -282,6 +288,18 @@ Dos cuidados que vimos en terreno:
   el número y empeora la decisión.
 
 ## Preguntas frecuentes
+
+### ¿Cuáles son las etapas de un pipeline de ventas?
+
+Depende de tu proceso, pero una venta B2B típica pasa por descubrimiento, necesidad confirmada, propuesta, decisión y
+cierre (ganado o perdido). Lo que importa no es el nombre de la etapa sino su criterio de salida: qué hizo el comprador
+para avanzar.
+
+### ¿En qué se diferencia un pipeline de un embudo de ventas?
+
+El embudo describe el recorrido de los prospectos y cuántos llegan a cada fase, desde el primer contacto. El pipeline
+muestra los negocios abiertos que gestiona ventas, con su valor y su probabilidad de cierre. En HubSpot, lo primero
+se parece más al ciclo de vida y al pipeline de leads; lo segundo, al pipeline de negocios.
 
 ### ¿HubSpot permite crear pipelines personalizados ilimitados?
 
@@ -437,11 +455,17 @@ Exportar a WebP para el sitio.
    «De Excel a HubSpot». Revisar la URL del bloque de suscripción a Glitch.
 5. Infografía de etapas y portada nueva.
 6. Spec Gutenberg + validación + copia privada + QA en 1440 y 390 + publicación con guardas.
+7. **Cambio de URL (D1):** slug `pipeline-de-ventas` en la misma publicación; 301 de un salto desde la URL actual;
+   actualizar los enlaces internos de ICP B2B (249108) e Inbound (244765) y sus specs en el repo; verificar sitemap,
+   canonical y `og:url`; pedir indexación de la URL nueva con el runner sólo con OK de Julio.
 
 ## 8. Cómo se mide
 
-- **Grupo de búsquedas:** pipeline hubspot · etapas del pipeline hubspot · personalizar pipeline hubspot · reglas de
-  pipeline hubspot · prospecting agent hubspot · deal progression hubspot · las preguntas de sí/no de §1.
+- **Grupo de búsquedas:** pipeline de ventas · etapas del pipeline de ventas · cómo hacer un pipeline de ventas ·
+  pipeline hubspot · personalizar pipeline hubspot · reglas de pipeline hubspot · prospecting agent hubspot · deal
+  progression hubspot · las preguntas de sí/no de §1.
+- **Migración:** sumar URL vieja + nueva durante la consolidación; revisar a las 2 semanas que la vieja sale del
+  índice y la nueva entra (el caso GA4 mostró que Google tarda).
 - **Search Console:** posición e impresiones ponderadas para ese grupo; línea base = 90 días previos; revisar a las 4,
   8 y 12 semanas.
 - **Hipótesis a 12 semanas:** primera página en las preguntas específicas de HubSpot y top 20 en «pipeline hubspot».
@@ -449,3 +473,47 @@ Exportar a WebP para el sitio.
 - **IA:** panel de las preguntas de sí/no en ChatGPT, Gemini y Perplexity; registrar si citan a Efeonce.
 - **Vigencia:** revisar el artículo después de cada lanzamiento de HubSpot (primavera y otoño). Deal Progression y la
   previsión con IA figuran como beta en la documentación (dato interno; el texto público no lo menciona).
+
+## 9. Auditoría SEO/AEO de la propuesta (2026-10-26, skill `seo-aeo`)
+
+**Intake:** blog de agencia no-YMYL; motores objetivo Google orgánico + AI Overviews/AI Mode + ChatGPT/Perplexity
+(las búsquedas de sí/no sugieren agentes evaluando HubSpot [I]); mercados CL, MX y ES; objetivo de negocio
+autoridad en implementación HubSpot → landing de servicios. Datos: Search Console (sesión Analytics), Semrush CL/MX/ES
+(2026-10-26), HTML en vivo.
+
+### Evidencia nueva
+
+| Dato | Valor | Fuente |
+|---|---|---|
+| «pipeline de ventas» | 720/mes MX · 390 ES · 140 CL; KD 32 / 27 / 29 | Semrush `phrase_these` |
+| «etapas del pipeline de ventas» | 20 MX · 40 ES · 20 CL | Ídem |
+| «como hacer un pipeline de ventas» | 30 MX · 20 ES · 30 CL | Ídem |
+| «pipeline hubspot» / «hubspot pipeline» | 20–30 por país | Ídem |
+| «prospecting agent hubspot» | 30 ES (sin dato MX/CL) | Ídem |
+| SERP «pipeline de ventas» MX | Salesforce, Connext, Pipedrive, IBM, HubSpot, DocuSign, Freshworks, ForceManager, Livebeep, Porter Metrics, Lagahe, Sales Business School: CRM **y agencias/blogs** | Semrush `phrase_organic`, top 12 |
+| Enlaces externos a la URL actual | Semrush no tiene datos (no prueba ausencia, pero no hay señal de autoridad que perder) | Semrush `backlinks_overview` |
+| Enlaces internos a la URL actual | ICP B2B (249108) e Inbound (244765), en sus specs | `grep` del repo |
+| Slugs candidatos | `/hubspot/pipeline-de-ventas/`, `-hubspot/` y `/hubspot/pipeline-hubspot/` responden 404 (libres) | `curl`, 2026-10-26 |
+
+### Decisiones y hallazgos, por prioridad
+
+| # | Hallazgo | Decisión | Impacto · esfuerzo |
+|---|---|---|---|
+| D1 | **Slug.** El actual tiene 57 caracteres de relleno («crea-un… que-convierte-guia-paso-a-paso») y describe la intención vieja. La URL acumula poco que perder: 0 clics, posición 39, sin enlaces externos registrados. Como el contenido se reescribe entero, Google lo reevalúa igual | **Cambiar a `/hubspot/pipeline-de-ventas/`** con 301 de un salto, en la misma publicación. La categoría ya aporta «HubSpot»; el slug lleva la búsqueda principal. Corrige lo que dije antes («cambiarla obliga a otra migración»): el costo de migrar sólo pesa cuando la URL tiene algo que perder | Alto · bajo |
+| D2 | **Lo genérico sí se disputa.** El borrador lo daba por perdido; el volumen y una SERP con agencias dicen lo contrario | Primer H2 con definición agnóstica y luego HubSpot; título y slug con «pipeline de ventas»; FAQ de etapas y de embudo vs. pipeline | Alto · bajo |
+| D3 | **Cápsulas de respuesta.** Varios H2 abrían con contexto antes de responder | Respuesta directa de 40–60 palabras tras el H2 de definición y el de etapas; el resto ya abre respondiendo | Medio · bajo |
+| D4 | **Cobertura de sub-preguntas.** Faltaban «etapas del pipeline de ventas» y «pipeline vs. embudo», que cubre toda la SERP | Dos FAQ nuevas | Medio · bajo |
+| D5 | **Entidad.** HubSpot usa dos nombres para el mismo producto | «Deal Progression (HubSpot la presentó como *Smart Deal Progression*)» una vez, para casar ambas búsquedas | Bajo · mínimo |
+| D6 | **Title de 66 caracteres** | Se acepta: lo que se trunca es «\| Efeonce»; la parte con intención queda visible | — |
+| D7 | **Meta description** | 148 caracteres, con la búsqueda principal al inicio | — |
+| D8 | **Imágenes** | `alt` en español que describa lo que muestra la interfaz; pie «Interfaz: HubSpot»; WebP; la de señales (8,7 MB) queda fuera | Medio · bajo |
+| D9 | **FAQ y schema** | FAQ visible; `FAQPage` sólo si el sitio ya lo emite (Google no muestra ese resultado enriquecido para este tipo de sitio). Las respuestas de sí/no empiezan con «Sí» o «No» para que un agente las extraiga | — |
+| D10 | **Enlaces internos** | Mantener caso ANAM y mención a la landing de HubSpot; agregar ICP B2B donde se habla del perfil del Prospecting Agent; actualizar los dos artículos que apuntan a la URL vieja | Medio · bajo |
+| D11 | **Canibalización** | Riesgo bajo: «5 pasos CRM» trata de adopción y «De Excel a HubSpot» de migración; ninguno compite por «pipeline de ventas» | — |
+| D12 | **Vigencia** | «Funciones verificadas en octubre de 2026» visible + revisión tras cada lanzamiento de HubSpot | — |
+
+### Cómo se mide (además de §8)
+
+- Consolidación de la migración: impresiones URL vieja + nueva; la vieja debería salir del índice en 2–4 semanas.
+- «pipeline de ventas» en MX/ES/CL: entrar al top 30 en 12 semanas es la hipótesis; no es promesa.
+- Panel de las preguntas de sí/no en ChatGPT, Gemini y Perplexity antes y después.
