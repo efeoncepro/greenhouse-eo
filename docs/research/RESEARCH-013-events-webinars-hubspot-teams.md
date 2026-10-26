@@ -104,6 +104,9 @@ manda).
 
 ## Backlog canónico para cerrar el módulo de eventos
 
+> **Arquitectura definida (2026-10-26):** [`GREENHOUSE_GROWTH_EVENTS_WEBINARS_ARCHITECTURE_V1.md`](../architecture/GREENHOUSE_GROWTH_EVENTS_WEBINARS_ARCHITECTURE_V1.md)
+> (modelo, slices 0–7, reglas duras y 4 pilares). Las tasks se crean desde esa spec.
+>
 > Fuente única del pendiente. Las demás piezas (skills, manuales, contratos, Handoff) apuntan aquí. Detalle técnico:
 > [anexo D](RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md); diagnóstico del conector:
 > [anexo C](RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md).
