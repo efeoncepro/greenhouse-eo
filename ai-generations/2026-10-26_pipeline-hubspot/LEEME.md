@@ -32,8 +32,8 @@ Nada de esta carpeta está subido como portada, `hero` ni tarjeta: espera la apr
 
 | Candidato | `answerOverflowPx` | Estado |
 |---|---|---|
-| «○ Que en tu pipeline avance / **sólo lo real**●» | 0 | candidato (`final/candidatos/portada-2.*`) |
-| «○ Que tu pipeline en HubSpot / **no mienta**●» | 0 | candidato (`final/candidatos/portada-4.*`) |
+| «○ Que tu pipeline en HubSpot / **no mienta**●» | 0 | **elegido por Julio el 2026-10-26** |
+| «○ Que en tu pipeline avance / **sólo lo real**●» | 0 | candidato no elegido (`final/candidatos/descartes/portada-2.*`) |
 | «○ Haz que tu pipeline / **diga la verdad**●» | 79 | descartado (desborda) |
 | «○ Tu pipeline en HubSpot, / **sin negocios inflados**●» | 348 | descartado (desborda) |
 
@@ -45,7 +45,7 @@ Antes se descartaron «Tú decides», «Se califica» y «el comprador» sin com
 | Imagen | Archivo | Medidas | sha256 |
 |---|---|---|---|
 | 1 · Tarjeta del rail | `final/pipeline-de-ventas-hubspot-2026-card.webp` (58 KB): el plate entero; `--focus "91% 50%"` (fórmula del manual: se ve x 54–95 % en escritorio y x 62–94 % en el teléfono; el conjunto está en x 65–83 %) | 2560 × 1440 | `25a3c91d…` |
-| 2 · Portada | `final/candidatos/portada-2.jpg` o `portada-4.jpg` (184 y 183 KB); se renombra a `pipeline-de-ventas-hubspot-2026.jpg` al elegir | 2400 × 1260 | `3463773f…` / `a34b7e7c…` |
+| 2 · Portada | `final/pipeline-de-ventas-hubspot-2026.jpg` (183 KB), texto «Que tu pipeline en HubSpot no mienta.»; recorte cuadrado en `-recorte-movil.png` | 2400 × 1260 | `a34b7e7c…` |
 | 3 · Slider (`hero`) | `final/pipeline-de-ventas-hubspot-2026-hero.webp` (46 KB): el plate sin los 160 px de arriba; umbrales en x ≈ 66–82 %, a la derecha del título; la tarjeta «Siguiente» tapa el extremo derecho de la fila de abajo | 2400 × 1200 | `b4d7f5c8…` |
 
 Simulación del rail (440 × 600 y 304 × 540) y del slider (escritorio con zonas y teléfono):
@@ -55,7 +55,7 @@ Simulación del rail (440 × 600 y 304 × 540) y del slider (escritorio con zona
 
 - **Portada:** «Portada de Marketing con Manzanitas: tres umbrales de luz azul en fila sobre una mesa oscura; cuatro
   bloques esperan ante el primero, cada umbral deja pasar menos y sólo uno cruza el último bajo un foco, junto al
-  texto «Que en tu pipeline avance sólo lo real.»» (o «Que tu pipeline en HubSpot no mienta.»).
+  texto «Que tu pipeline en HubSpot no mienta.»».
 - **Tarjeta y `hero`:** «Tres umbrales de luz azul en fila sobre una mesa oscura: de cuatro bloques, cada umbral deja
   pasar menos y sólo uno cruza el último, bajo un foco.»
 
