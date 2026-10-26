@@ -46,6 +46,20 @@ no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/r
 7. Entregar action pack a Commercial/seguimiento: estado observado, owner, próximo paso/fecha, fuentes y brechas.
    Mantener HSP e historial privados en radar existente; no cambiar scheduler ni crear otro.
 
+## Si HubSpot avisa que vieron las credenciales
+
+Aplicar [visitas a documentos](../../../.codex/skills/efeonce-b2b-prospecting/references/document-engagement-signals.md):
+recuperar aviso Outlook y detalle **Documentos → Visitantes → Detalles**; comparar sesiones, páginas,
+tiempos y atribución. Separar evento/aviso/consulta, usando vista previa interna para interpretar páginas.
+Releer hilo, último envío, proceso, respuestas y cadencia; recomendar espera o un contacto útil sin revelar
+el tracking. El mismo día/próximo hábil puede ser oportuno en el caso, nunca obligación ni permiso automático.
+
+«Redacta» deja borrador con firma gráfica/CCO; «envíalo» sobre ese texto autoriza ese envío único.
+Comprobar guardado, nueva copia en Enviados e ingestión EMAIL por separado. Registrar el delta en expediente,
+REGISTRO y state existentes; no renovar inventario global ni crear secuencia por una visita.
+[Indecaucho26/10](../../commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md)
+distingue exploración rápida, recomendación, autorización y envío/registro; admisión y respuesta pendientes.
+
 ## Radar: primera puerta y aviso temprano
 
 1. Leer la [guía compartida](../../commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md) y el estado del proceso.

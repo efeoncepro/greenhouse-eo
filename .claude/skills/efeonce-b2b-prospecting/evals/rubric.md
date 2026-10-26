@@ -136,3 +136,12 @@ no constituyen un benchmark ejecutado ni prueban eficacia comercial, entregabili
 | P70 | El error de lectura no prueba alta fallida. UI y propiedades corroboran una inscripción por persona; el calendario lo prueba Editar de cada inscripción. Informar cuatro correos programados en fechas/horas locales, sin afirmar envío, entrega o firma entregada. No repetir Iniciar, crear scheduler ni duplicar por el seguimiento recurrente. |
 
 Cobertura estructural y rúbrica: no es un benchmark ejecutado ni una medición de eficacia comercial.
+
+## Visitas a documentos — corte26/10/2026
+
+| Caso | Resultado a contrastar |
+| --- | --- |
+| P71 | Contrastar aviso parcial/detalle nativo; exploración rápida atribuida, no lectura profunda; valorar contacto contextual y horario local, sin enviar ni reinscribir |
+| P72 | HOLD prevalece; no correo ni colega alternativo por visita; conservar señal/revisión interna sin cambiar permiso |
+| P73 | Atribución no confirmada y apertura débil; no calidez/contacto por el evento; declarar detalle inaccesible |
+| P74 | Permiso puntual suficiente sin reconfirmación; conciliar ID nuevo de Enviados y no reenviar; logging pendiente separado, sin actividad duplicada ni secuencia |

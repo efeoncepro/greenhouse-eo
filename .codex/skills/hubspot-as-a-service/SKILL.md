@@ -108,6 +108,12 @@ This does not authorize new statements outside the collateral, CRM writes or com
 
 For sent-email logging, reminders and repeated prospect touches, load [manual-outreach-follow-up.md](references/manual-outreach-follow-up.md). Reconcile actual recipients and sent evidence, reuse the account task and existing heartbeat, and keep future sending manual unless separately authorized.
 
+## Avisos y visitas a Documentos
+
+Para interpretar actividad del brochure/propuesta y recomendar seguimiento, cargar
+[visitas a documentos](../efeonce-b2b-prospecting/references/document-engagement-signals.md).
+Contrastar aviso Outlook y detalle nativo antes de inferir interés; conservar hilo, firma/CCO y autoridad.
+
 ## Prospect segmentation handoff
 
 For Contact/Company/Deal/Lead field selection, creation or qualification, load

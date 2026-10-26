@@ -53,6 +53,12 @@ el alcance antes de escribir como si se conociera la marca; una pregunta ya form
 - Firma gráfica y CCO de Julio conservan la política vigente y sus excepciones individuales documentadas.
   Revisar HTML, enlaces y canal dentro del envío autorizado; escribir este módulo no autoriza enviar.
 
+## Momento del seguimiento por interacción con documentos
+
+Si el motivo es una visita al brochure/propuesta, aplicar [el método de Documentos](document-engagement-signals.md).
+Usar la señal para valorar oportunidad y pertinencia; el correo ayuda a resolver una decisión sin revelar
+páginas/tiempos observados ni afirmar lectura o compra. Conservar hilo y autoridad de preparación/envío.
+
 ## Revisión proporcional de cada pieza
 
 Antes de entregar el borrador, comprobar motivo verificable, continuidad con la iniciativa, capacidad/claim

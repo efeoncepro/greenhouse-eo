@@ -1,5 +1,12 @@
 # Registro de seguimiento comercial
 
+**Delta focal26/10 · Indecaucho:** [visita y seguimiento autorizado](runs/2026-10-26-indecaucho-documento-seguimiento.md).
+HubSpot atribuye a Katia23páginas/91,147s hoy09:22Ecuador; aviso muestra sólo primeras5. Exploración rápida,
+sin admisión/lectura profunda confirmadas. Julio pidió borrador y después «Envíalo»: correo11:43Chile/09:43Ecuador
+en hilo18Oct, firma gráfica/CCO y nueva copia Enviados verificados; EMAIL119538629237 visible en Contact.
+Esperar respuesta, sin nueva secuencia ni envío futuro. Método compartido y skills espejo actualizados.
+La UI permitió estas lecturas; no prueba pago/recuperación general ni renueva el corte09h.
+
 **Delta focal25/10 · aplicación autorizada en HubSpot:** [guía y continuidades releídas](../analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md).
 Nueve correos futuros de ocho inscripciones y nueve plantillas ajustados; Unilever(Karla/Estefanía),
 Olivos(Emily), Toyota(Fabricio) y NIASA(Liliana) pausados, con condiciones explícitas para retomar.

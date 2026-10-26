@@ -8,6 +8,12 @@ argument-hint: "[area or specific question]"
 ---
 
 
+## Seguimiento motivado por visitas al material
+
+Antes de recomendar contacto por un aviso de brochure/propuesta visto, cargar
+[visitas a documentos](../efeonce-b2b-prospecting/references/document-engagement-signals.md).
+La interacción orienta la revisión del momento comercial; no acredita demanda ni amplía permisos.
+
 ## Conversaciones comerciales: criterio compartido
 
 Antes de preparar una apertura, reactivación, seguimiento o respuesta inbound comercial de captación o

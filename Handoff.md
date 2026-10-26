@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-26 — Indecaucho: señal Documents y seguimiento
+
+[Expediente](docs/commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md):23páginas/91,147s
+registrados; Julio autorizó borrador y envío único11:43Chile, firma/CCO y EMAIL119538629237 verificados.
+Esperar respuesta, sin reinscripción. Método compartido, manual, registros/state y skills espejo actualizados;
+no renovación del inventario global ni autonomía nueva. [Método](.codex/skills/efeonce-b2b-prospecting/references/document-engagement-signals.md).
+
 ## 2026-10-26 — Blog: pilar Loop Marketing publicado y barrido de docs y skills
 
 - **Pilar publicado:** «Qué es Loop Marketing» (248398) en `/loop-marketing/que-es-loop-marketing/`.
@@ -244,12 +251,3 @@ release a `main` de los renderers (no autorizado), Turnstile interactivo real en
 los 4 formularios vivos idénticos a producción y 0 px de diferencia con el renderer nuevo; axe limpio en 4 viewports.
 **Push a `develop` no hecho:** son 174 commits locales de varias sesiones (decisión del operador). Activar el popup =
 runbook en `references/landings/partnership.md`, después del release.
-
-## 2026-10-23 — Mattis: propuesta Markdown y método conciliado
-
-[Expediente GRD-1555](docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md): caso MD principal,
-master de 23 bloques para Claude Design y anexos; copias en carpeta 14. Simulación COP 190.150.000 netos, no aprobada;
-proyecto, elegibilidad, capacidad e impuestos pendientes. Sin envío ni nueva mutación CRM.
-Tres subagentes conciliaron continuidad y skills; método/manuales/plantillas distinguen preparación MD, diseño y emisión,
-y usan costo objetivo V3. [Auditoría y validación](docs/audits/commercial/2026-10-23-mattis-markdown-docs-skills.md).
-Sin cambio runtime; commit local autorizado por Julio, sin push. Próximo paso: diseño con Claude Design y validación comercial antes de presentar.

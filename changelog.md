@@ -2,6 +2,13 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-26 — Comercial: visitas a documentos y seguimiento contextual
+
+Método compartido para contrastar aviso y detalle de Documents, separar interacción/intención, revisar
+restricciones y conservar autoridad de borrador/envío. Skills Codex/Claude, manual y continuidad concilian
+[Indecaucho](docs/commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md):
+correo único autorizado, firma/CCO y Enviados/EMAIL verificados; esperar respuesta, sin nuevo scheduler.
+
 ## 2026-10-26 — Sitio público: runner para pedir indexación en Search Console
 
 `pnpm public-website:gsc-index` pide la indexación por el botón de la interfaz (la API no lo permite), desde un Chrome
@@ -566,11 +573,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 
 - Auditoría integral con tres subagentes: [inventario y cierre](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), [runtime10](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
   ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md) **propuesta sin GO, no implementada**. Commit documental, sin publicación/release adicional.
-
-## 2026-10-13 — Radar comercial con registro por corrida
-
-- Automatización existente convertida a tarea nueva diaria en greenhouse-eo, conservando 09:00 Santiago.
-- [Contrato y ledger](docs/commercial/prospecting-agent/README.md): búsquedas saneadas en repo, datos privados separados,
-  cinco líneas × cuatro mercados; nuevas convocatorias para postular dentro de la misma semana calendario.
-- INTURSA y Alfin registradas bajo autorización; cuatro contactos verificados vía Apollo. Históricos tratados como
-  prospección futura. No Deals, notas ni envíos nuevos. Próxima ejecución programada todavía no observada.

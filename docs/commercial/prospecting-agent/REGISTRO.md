@@ -1,5 +1,10 @@
 # Registro de búsquedas comerciales
 
+**Delta focal26/10 · Indecaucho:** [Documents y seguimiento](../follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md):
+señal atribuida a Katia contrastada en aviso/UI; correo autorizado enviado11:43Chile y EMAIL119538629237
+registrado. Esperar respuesta; sin nuevo discovery, contactos, secuencias ni renovación del corte del radar.
+Método de señales/cadencia y manual actualizados; interacción no implica intención ni permiso automático.
+
 **Delta focal25/10 · aplicación autorizada en HubSpot:** [guía y continuidades releídas](../analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md).
 Nueve correos futuros de ocho inscripciones y nueve plantillas ajustados; Unilever(Karla/Estefanía),
 Olivos(Emily), Toyota(Fabricio) y NIASA(Liliana) pausados, con condiciones explícitas para retomar.

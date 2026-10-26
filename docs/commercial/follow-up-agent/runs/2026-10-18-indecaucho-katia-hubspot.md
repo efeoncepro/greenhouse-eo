@@ -9,6 +9,13 @@
   [firma/CCO](../../../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md) y
   [brochures íntegros](../../../operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
 
+## Continuidad posterior, 26/10/2026
+
+Este archivo conserva el corte18/10. El seguimiento22/10 se corroboró posteriormente en Enviados/CRM;
+la secuencia figuraba finalizada en la revisión25/10. [Delta26/10](2026-10-26-indecaucho-documento-seguimiento.md):
+nueva visita al original, borrador y envío único autorizado por separado, EMAIL119538629237 registrado.
+**Estado actual al delta: esperar respuesta, sin paso futuro autorizado.** No repetir la programación histórica.
+
 ## Señal y vigencia
 
 Katia Vannesa Chugá Ortiz, Marketing y Comunicación Corporativa en Indecaucho, publicó la

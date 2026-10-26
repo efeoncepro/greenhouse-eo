@@ -951,6 +951,10 @@ se conserva el contexto en el diagnóstico.
 
 ## 33. Indecaucho
 
+**Delta posterior26/10:** [señal nueva y envío autorizado](../../follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md).
+La recomendación de espera de este corte se reevaluó por una visita contrastada; un único seguimiento
+personal autorizado y registrado. Esperar respuesta; la secuencia original no se amplió.
+
 **Leído:** E095 · 18/10, 21:06 · «Indecaucho | LinkedIn B2B, contenido técnico y oportunidades trazables — Efeonce»; E139 · 22/10, 11:30 · «Katia | Un criterio para evaluar LinkedIn B2B — Efeonce».
 
 **Pasaje que orienta la revisión:** «Si la lista ya está definida». Procede del saliente o de la respuesta relevante de la cuenta;

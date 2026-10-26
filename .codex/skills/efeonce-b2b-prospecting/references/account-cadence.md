@@ -47,6 +47,13 @@ ambigua como permiso para trasladar la conversación a otra iniciativa. Mantener
 potencialmente afectado —pedirle una aclaración al comprador lo decide Commercial—, sin convertir la duda en
 una exclusión definitiva de toda la organización.
 
+## Nueva interacción con el material enviado
+
+Aplicar [visitas a documentos](document-engagement-signals.md) antes de adelantar o reabrir una revisión.
+Distinguir apertura aislada, exploración registrada y conversación humana. Una visita sustantiva puede
+justificar valorar un contacto contextual dentro del permiso, con un aporte concreto; no crea otro paso
+por defecto ni cambia las paradas vigentes. Registrar la razón nueva y el envío real para evitar duplicados.
+
 ## Revisión interna de largo plazo
 
 La [política](../../../../docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) conserva la cuenta tras detener el

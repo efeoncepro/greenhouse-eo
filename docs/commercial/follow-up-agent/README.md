@@ -44,6 +44,16 @@ excluido por Julio. Mandato posterior: [18 seguimientos programados en HubSpot](
 para el 16/22/29 de octubre; seis inscripciones `Programado` verificadas, parada por respuesta. No duplicarlos
 desde el heartbeat ni usar Apollo. Esta autorización es acotada y no amplía la autonomía general.
 
+## Señales de documentos después del envío
+
+En las fuentes ya cubiertas por cada corte, revisar avisos pertinentes de Documents y aplicar
+[visitas a documentos](../../../.codex/skills/efeonce-b2b-prospecting/references/document-engagement-signals.md).
+Contrastar detalle nativo e historial antes de recomendar un borrador o cambio de prioridad. Si no se
+puede leer el documento, declarar esa brecha; no reportar cobertura integral de Documents por un aviso.
+Visita no es respuesta ni permiso de envío; HOLD/bajas y pasos existentes prevalecen. Reusar expediente,
+clave y scheduler. [Caso26/10](runs/2026-10-26-indecaucho-documento-seguimiento.md): envío humano autorizado
+por separado, con Enviados y EMAIL corroborados, sin nueva autonomía recurrente.
+
 ## Seguimiento de largo plazo
 
 Aplicar la [política aceptada](../../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md): conservar cuenta con encaje,

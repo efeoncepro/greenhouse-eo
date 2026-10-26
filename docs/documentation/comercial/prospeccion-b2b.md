@@ -22,6 +22,14 @@ calidad de correo, relación/demanda/proceso separados, ruta principal/alternati
 y siguiente decisión. Fuentes por campo, fecha de corte, contradicciones y cobertura visibles.
 Investigación, preparación, aprobación, escritura/readback y comunicación se informan separadas.
 
+## Interacción con credenciales o propuestas
+
+Las visitas a documentos son señales para revisar prioridad y siguiente ayuda al comprador, con
+[criterio compartido](../../../.codex/skills/efeonce-b2b-prospecting/references/document-engagement-signals.md).
+El aviso puede resumir sólo parte de la sesión; el detalle nativo, atribución e historial gobiernan la
+interpretación. Preparación, aprobación, envío, registro CRM y respuesta permanecen separados.
+No cambia calidez, admisión, etapa ni cadencia automáticamente. [Operación](../../manual-de-uso/comercial/operar-prospeccion-b2b.md#si-hubspot-avisa-que-vieron-las-credenciales).
+
 ## Cómo se comporta
 
 | Situación | Resultado esperado |

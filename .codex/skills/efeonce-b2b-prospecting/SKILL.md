@@ -91,6 +91,7 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Agrupar cuentas o personas en segmentos, o revisar por qué uno sale incompleto | [segments-by-attribute](references/segments-by-attribute.md) + HubSpot |
 | Representar cuentas objetivo y roles en HubSpot | [adapter account-based](../hubspot-as-a-service/references/account-based-prospecting.md) |
 | Elegir campos de Contact/Company/Lead/Deal por fase | [diccionario y captura HubSpot](../hubspot-as-a-service/references/property-inventory.md) |
+| Interpretar avisos/visitas de Documentos y valorar seguimiento contextual | [document-engagement-signals](references/document-engagement-signals.md) + Commercial/HubSpot; interacción no equivale a intención ni permiso |
 | Convertir una señal en validación y siguiente acción | [signal-to-action](references/signal-to-action.md) |
 | Elegir entrada por proveedor/equipo/proyecto/transformación/operación | [situation-entry-playbooks](references/situation-entry-playbooks.md) + Commercial/práctica |
 | Coordinar personas, canales, pasos y pausas de una cuenta | [account-cadence](references/account-cadence.md) |

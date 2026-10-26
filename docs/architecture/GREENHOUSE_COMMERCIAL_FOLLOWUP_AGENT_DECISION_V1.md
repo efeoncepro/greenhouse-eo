@@ -87,3 +87,13 @@ con identidad/owner/enums/dedupe/readback; no otros objetos/etapas/segmentos, nu
 La [política](../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) y el prompt vigente del heartbeat consumen este destino.
 Fabrimetal: TASK HubSpot `118419088700`, revisión 13/04/2027 09:00 Chile; duplicado Notion Cancelado
 tras verificar el reemplazo. La revisión futura permanece pendiente y las comunicaciones detenidas.
+
+## Evidencia y aclaración del método — 2026-10-26
+
+El [caso Indecaucho](../commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md)
+contrastó aviso Outlook y detalle de Documents, revisó la recomendación de espera y ejecutó un único
+seguimiento tras «Envíalo» de Julio. El [método](../../.codex/skills/efeonce-b2b-prospecting/references/document-engagement-signals.md)
+ordena señal → contexto/restricciones → recomendación → borrador → autorización → envío/readbacks.
+Documenta la operación dentro de esta decisión: ninguna visita dispara contacto, calificación o
+reinscripción automática, ni levanta HOLD/baja. El delta focal no renueva inventario ni prueba recuperación
+de un bloqueo general. Sin nuevo runtime, schema, permisos o autonomía del heartbeat.

@@ -72,3 +72,16 @@ Si `objects search --type emails` devuelve vacío con OAuth, no concluir ausenci
 verificar SENT, remitente, destinatario y asociaciones. Es un fallback de lectura, sin crear duplicados ni
 ampliar permisos. Un evento Documents/open tampoco demuestra lectura humana por sí solo.
 [Aplicación y límites](../../../../docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).
+
+## Aviso de documento visto y contacto contextual
+
+Aplicar el [método dueño de Prospecting](../../efeonce-b2b-prospecting/references/document-engagement-signals.md).
+Aviso y detalle nativo pueden cubrir páginas distintas; hora de recepción no es hora del evento. Usar la
+vista previa interna para interpretar contenido sin contaminar el tracking del destinatario. Proponer
+espera o un contacto pertinente según historial/restricciones; la visita no habilita envío/reinscripción.
+
+En respuestas al correo propio, comprobar Para/CC/CCO; guardar explícitamente y releer el borrador.
+Una búsqueda inicial vacía no acredita pérdida si la UI sigue guardando: verificar guardado y leer Drafts
+por recencia antes de crear otro. Tras «envíalo», enviar una vez y verificar la nueva copia de Enviados,
+firma y CCO, y luego EMAIL en Contact. El cambio de ID o la demora del logging no autorizan reenvío.
+[Aplicación26/10](../../../../docs/commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md).
