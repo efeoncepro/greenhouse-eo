@@ -105,6 +105,10 @@ export const selectedProperty = pageUrl => {
   try { return new URL(pageUrl).searchParams.get('resource_id') } catch { return null }
 }
 
+/** A confirmed request for this URL in the last 24 hours (ledger), so a re-run never spends quota twice. */
+export const requestedRecently = (lines, url, now = new Date()) =>
+  lines.some(l => l && l.url === url && l.result === 'requested' && now - new Date(l.at) < 24 * 3600 * 1000)
+
 // --- Runtime -------------------------------------------------------------------------------------------------------
 
 const args = process.argv.slice(2)
@@ -145,6 +149,23 @@ const STOP = {
   captcha: /captcha|unusual traffic|tráfico inusual|no soy un robot|i'm not a robot/i,
   quota: /se ha superado la cuota|quota exceeded|cuota diaria/i,
   notInProperty: /no pertenece a (esta|la) propiedad|not in (this|the current) property|isn.t in this property/i
+}
+
+const REQUESTED = /Se ha solicitado la indexación|Indexing requested/i
+
+/** Polls the page's rendered text (innerText skips hidden nodes) until one pattern shows up; 'timeout' otherwise. */
+const waitForRenderedText = async (page, patterns, timeoutMs) => {
+  const until = Date.now() + timeoutMs
+
+  while (Date.now() < until) {
+    const text = await page.locator('body').innerText().catch(() => '')
+    const hit = Object.entries(patterns).find(([, re]) => re.test(text))
+
+    if (hit) return hit[0]
+    await page.waitForTimeout(2000)
+  }
+
+  return 'timeout'
 }
 
 const assertProperty = (page, url) => {
@@ -189,17 +210,21 @@ const inspectOne = async (page, url, apply, force) => {
     return { ...base, result: apply ? 'skipped' : 'dry-run' }
   }
 
+  // Already requested (ledger in the last 24 h, or the panel shows the confirmation): don't spend quota twice.
+  if (!force && (requestedRecently(readLedger(), url) || REQUESTED.test(body))) {
+    writeLedger({ ...base, result: 'already-requested' })
+
+    return { ...base, result: 'already-requested' }
+  }
+
   const button = page.getByRole('button', { name: /solicitar indexación|request indexing/i }).first()
   const link = page.getByText(/^(SOLICITAR INDEXACIÓN|Solicitar indexación|REQUEST INDEXING|Request indexing)$/).first()
 
   await ((await button.count()) ? button : link).click()
-  const done = page.getByText(/Se ha solicitado la indexación|Indexing requested/i).first()
-  const quota = page.getByText(STOP.quota).first()
 
-  const outcome = await Promise.race([
-    done.waitFor({ timeout: 180_000 }).then(() => 'requested'),
-    quota.waitFor({ timeout: 180_000 }).then(() => 'quota')
-  ]).catch(() => 'timeout')
+  // Read the rendered text, not a locator: the first DOM match of the confirmation can be a hidden copy, and waiting
+  // for it to become visible timed out on 2026-10-26 while the page already showed «Se ha solicitado la indexación».
+  const outcome = await waitForRenderedText(page, { requested: REQUESTED, quota: STOP.quota }, 180_000)
 
   const close = page.getByRole('button', { name: /^(Cerrar|Got it|Close|Entendido)$/i }).first()
 

@@ -134,5 +134,9 @@ La única vía para pedir indexación de una página normal es el botón «Solic
   `--apply` pide sólo si la URL no está en Google o se rastreó antes del cambio; `--force` pide siempre.
 - Se detiene ante captcha, cuenta sin acceso, cupo agotado o falta de confirmación; registra cada URL en
   `scripts/public-website/gsc-indexing/ledger/AAAA-MM.jsonl` y no pasa de 10 solicitudes confirmadas por día.
+- No repite una URL con solicitud confirmada en las últimas 24 horas (`already-requested`; `--force` la pide igual).
+- La confirmación se lee del texto **visible** (`innerText`), no con un locator: el primer nodo con «Se ha solicitado
+  la indexación» puede estar oculto, y esperarlo dio `timeout` en la primera solicitud real (2026-10-26) con la
+  solicitud ya hecha. Tras pedirla, «Último rastreo» pasa al minuto de la prueba en vivo de Google.
 
 Manual: `docs/manual-de-uso/public-site/solicitar-indexacion-search-console.md`.

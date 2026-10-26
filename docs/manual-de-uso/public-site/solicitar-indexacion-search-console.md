@@ -1,9 +1,9 @@
 # Solicitar la indexación de una URL en Search Console
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-26 por Claude (sesión del blog y Search Console)
-> **Ultima actualizacion:** 2026-10-26 por Claude
+> **Ultima actualizacion:** 2026-10-26 por Claude (primera solicitud real verificada)
 > **Documentacion tecnica:** [`scripts/public-website/gsc-request-indexing.mjs`](../../../scripts/public-website/gsc-request-indexing.mjs) ·
 > [capacidades de la API de Search Console](../../../.claude/skills/seo-aeo/references/google-search-console-api-indexing.md) ·
 > [publicación agéntica de un post](../../../.claude/skills/efeonce-public-site-wordpress/references/agentic-blogpost-end-to-end.md)
@@ -62,7 +62,8 @@ Pedirla no garantiza que Google indexe la página ni cuándo. Sirve para que la 
    ```
 
    Hace clic en «Solicitar indexación», espera la prueba de Google (hasta tres minutos) y confirma con el mensaje «Se ha
-   solicitado la indexación».
+   solicitado la indexación». No repite una URL ya pedida en las últimas 24 horas. Primera solicitud real: «Qué es
+   Inbound Marketing», 2026-10-26.
 
 5. **Cierra el Chrome dedicado** cuando termines. Mientras está abierto, cualquier programa del equipo puede
    controlarlo por ese puerto.
@@ -98,6 +99,7 @@ el veredicto, el último rastreo, la fecha de modificación y el motivo.
 |---|---|
 | `dry-run` | Sólo se inspeccionó |
 | `skipped` | Con `--apply`, pero no hacía falta pedirla |
+| `already-requested` | Ya había una solicitud confirmada de esa URL en las últimas 24 horas (registro) o la pantalla ya la mostraba. No vuelve a pedirla salvo con `--force` |
 | `requested` | Google confirmó la solicitud |
 | `quota` | Search Console dijo que se agotó el cupo del día. El runner se detiene |
 | `timeout` | Google no confirmó a tiempo. El runner se detiene; revisa esa URL a mano antes de repetir |
@@ -121,6 +123,8 @@ Los códigos de salida: `1` uso o tope diario, `2` no hay Chrome en el puerto, `
 | «La cuenta abierta no tiene acceso» | Estás en otra cuenta. Cámbiala en la esquina superior derecha de esa ventana |
 | «No hay Chrome escuchando» | Corre `launch` primero, o revisa `--port` |
 | «Search Console no mostró lo esperado a tiempo» | Google tardó o cambió la interfaz. Mira la ventana; si cambió el texto de un botón, actualiza el runner |
+| Sale `timeout` pero la pantalla dice «Se ha solicitado la indexación» | La solicitud sí se hizo. Desde el 2026-10-26 el runner lee el texto visible y ya no debería pasar. Si pasa, agrega al registro una línea `requested` que corrija la de `timeout` (no la borres) |
+| Justo después de pedirla, el «Último rastreo» cambia a ese minuto | Es la prueba en vivo que hace Google al recibir la solicitud. Una nueva inspección dirá que ya está rastreada después del cambio |
 | Pide la indexación de una página que no cambió | La página no actualiza su `article:modified_time`. Corrígelo en WordPress o usa el modo inspección |
 
 ## Referencias técnicas

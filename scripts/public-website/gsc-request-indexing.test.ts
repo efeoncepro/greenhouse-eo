@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import { decide, pageModified, parseCrawlDate, requestedToday, selectedProperty, urlBelongsToProperty } from './gsc-request-indexing.mjs'
+import {
+  decide,
+  pageModified,
+  parseCrawlDate,
+  requestedRecently,
+  requestedToday,
+  selectedProperty,
+  urlBelongsToProperty
+} from './gsc-request-indexing.mjs'
 
 describe('parseCrawlDate', () => {
   it('reads the Spanish format Search Console shows', () => {
@@ -74,5 +82,22 @@ describe('property guard', () => {
     expect(selectedProperty('https://search.google.com/search-console/inspect?resource_id=sc-domain%3Aefeoncepro.com&id=abc')).toBe('sc-domain:efeoncepro.com')
     expect(selectedProperty('https://search.google.com/search-console?resource_id=sc-domain%3Acliente.cl')).toBe('sc-domain:cliente.cl')
     expect(selectedProperty('https://search.google.com/search-console/about')).toBeNull()
+  })
+})
+
+describe('requestedRecently', () => {
+  it('blocks a second request for the same URL within 24 hours, never another URL', () => {
+    const now = new Date('2026-10-26T16:00:00Z')
+    const url = 'https://efeoncepro.com/inbound/que-es-inbound-marketing/'
+
+    const lines = [
+      { at: '2026-10-26T15:39:00Z', url, result: 'timeout' },
+      { at: '2026-10-26T15:50:00Z', url, result: 'requested' }
+    ]
+
+    expect(requestedRecently(lines, url, now)).toBe(true)
+    expect(requestedRecently(lines, 'https://efeoncepro.com/aeo/seo-y-aeo/', now)).toBe(false)
+    expect(requestedRecently(lines, url, new Date('2026-10-27T16:00:00Z'))).toBe(false)
+    expect(requestedRecently([{ at: '2026-10-26T15:39:00Z', url, result: 'timeout' }], url, now)).toBe(false)
   })
 })

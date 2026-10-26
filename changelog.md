@@ -16,7 +16,7 @@ dedicado donde una persona inicia sesión una vez. Inspecciona por defecto; `--a
 último cambio. Verifica que la propiedad seleccionada sea efeoncepro.com, porque la cuenta ve varios clientes. No pasa
 de 10 por día, registra cada URL y se detiene ante captcha, sesión cerrada o cupo agotado. Probado en vivo en modo
 inspección: Google ya volvió a rastrear el pilar de Loop y la landing de Performance, que ya no necesita la solicitud
-pendiente. Falta ejercitar el clic de `--apply`. [Manual](docs/manual-de-uso/public-site/solicitar-indexacion-search-console.md).
+pendiente. `--apply` probado con «Qué es Inbound Marketing»: Google la volvió a rastrear al minuto. Desde ese caso, el runner lee la confirmación visible y no repite una URL pedida en las últimas 24 horas. [Manual](docs/manual-de-uso/public-site/solicitar-indexacion-search-console.md).
 
 ## 2026-10-26 — Blog: pilar Loop Marketing publicado, embed corregido, voz de Julio y Loop 2026
 
