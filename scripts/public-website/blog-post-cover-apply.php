@@ -12,9 +12,11 @@
  *
  * meta.json: { "mode": "dry-run" | "apply", "postId": 244765, "slug": "…", "expectedThumb": 252065,
  *   "expectedOg": 252065, "filename": "….jpg", "title": "…", "alt": "…", "caption": "", "sha256": "…" }
- * "expectedOg": 0 declares that the post has no Yoast OG image of its own today (Yoast falls back to the featured).
+ * "expectedOg": 0 declares that the post has no Yoast OG image of its own today (no id and no URL; Yoast falls back to the
+ * featured image). A post with an OG URL but no id fails the guard.
  * Without "mode" it is a dry run. Manual: docs/manual-de-uso/creative/producir-portada-de-articulo-del-blog.md
- * Rollback: put the ids and URLs of the printed snapshot back in the five metas, rebuild the Yoast indexable, purge.
+ * Rollback: put the ids and URLs of the printed snapshot back in the five metas; a meta that was null in the snapshot
+ * did not exist before, so delete it instead. Then rebuild the Yoast indexable and purge.
  */
 if ( ! defined( 'ABSPATH' ) || ! class_exists( 'WP_CLI' ) ) { exit; }
 require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -36,7 +38,9 @@ $guard = [
 	'published'    => $p && 'post' === $p->post_type && 'publish' === $p->post_status,
 	'slug'         => $p && $p->post_name === $m['slug'],
 	'thumb'        => (int) get_post_thumbnail_id( $id ) === (int) $m['expectedThumb'],
-	'og'           => (int) get_post_meta( $id, '_yoast_wpseo_opengraph-image-id', true ) === (int) $m['expectedOg'],
+	'og'           => (int) get_post_meta( $id, '_yoast_wpseo_opengraph-image-id', true ) === (int) $m['expectedOg']
+		// With "expectedOg": 0 the post must have no OG image of its own at all: no id and no URL either.
+		&& ( 0 !== (int) $m['expectedOg'] || '' === trim( (string) get_post_meta( $id, '_yoast_wpseo_opengraph-image', true ) ) ),
 	'ratio_1_9'    => $h > 0 && abs( $w / $h - 1200 / 630 ) < 0.01,
 	'min_1200_630' => $w >= 1200 && $h >= 630,
 ];

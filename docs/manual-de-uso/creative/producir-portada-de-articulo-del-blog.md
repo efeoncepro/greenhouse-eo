@@ -1,9 +1,9 @@
 # Producir la portada de un artículo del blog (Marketing con Manzanitas) — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-24 por Claude
-> **Ultima actualizacion:** 2026-10-25 por Claude (1.2: el texto y la persona se ganan su lugar; el par
+> **Ultima actualizacion:** 2026-10-26 por Claude (1.3: caso `"expectedOg": 0` y metas que no existían en el respaldo) · 2026-10-25 por Claude (1.2: el texto y la persona se ganan su lugar; el par
 > pregunta–respuesta nunca se fuerza y la persona va sólo si porta la idea. 1.1: superficies alineadas con el inventario de imágenes por
 > artículo v1.4: «Te puede interesar», la miniatura «Siguiente», el slider en el teléfono, la tarjeta del rail en
 > producción y la imagen del slider de cada artículo nuevo)
@@ -271,6 +271,9 @@ El archivo de metadatos (por ejemplo `tmp/cover-<post>.json`) lleva:
 
 - `expectedThumb` y `expectedOg` son los ids de la destacada y de la imagen OG **que el post tiene ahora**: léelos
   antes (paso 11). Si alguien cambió la portada mientras tanto, la subida se detiene.
+- **Si el post no tiene imagen OG propia** (Yoast usa la destacada), pon `"expectedOg": 0`. La simulación lo
+  confirma: en `current`, `_yoast_wpseo_opengraph-image-id` y `_yoast_wpseo_opengraph-image` vienen en `null` o
+  vacíos. Si el post tiene una URL de OG sin id, la guarda falla: revisa esa imagen antes de reemplazarla.
 - El `alt` describe la escena y repite el texto de la portada, como en el ejemplo. Desde
   `efeonce-editorial-blocks` 0.4.6 (en producción desde el 2026-10-24), ese `alt` también sale como `og:image:alt` y
   `twitter:image:alt`.
@@ -365,8 +368,10 @@ Haz commit sólo de los archivos de texto: los PNG y JPG de `ai-generations/` no
 ## Volver atrás
 
 Cada subida deja la opción `_gh_cover_refresh_<post>_<fecha UTC>` con las cinco metas anteriores (`_thumbnail_id`,
-la imagen OG de Yoast y su id, la imagen de X y su id). Para restaurar, vuelve a poner esos valores en el post,
-reconstruye el indexable de Yoast y purga la caché. El adjunto nuevo queda en la biblioteca: bórralo sólo si el
+la imagen OG de Yoast y su id, la imagen de X y su id). Para restaurar, vuelve a poner esos valores en el post. Una
+meta que en el respaldo dice `null` no existía antes de la subida: **bórrala**, no la dejes vacía. Pasa, por ejemplo,
+con la imagen OG de un post que usaba la destacada (`"expectedOg": 0`). Después reconstruye el indexable de Yoast y
+purga la caché. El adjunto nuevo queda en la biblioteca: bórralo sólo si el
 operador lo pide.
 
 ## Referencias técnicas
