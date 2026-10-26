@@ -174,3 +174,15 @@ reintento, cambio de remitente ni enrollment para probarla. Si el operador pidi�
 conservar sus textos y el registro creado **sin inscribir** a la persona; verificar cero inscripciones.
 No detener colegas por inferencia si no hay restricción de cuenta ni causa común, pero revisar cada canal.
 [Aplicación y límites](../../../../docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).
+
+## Recuperar el mismo borrador antes de repetir acciones
+
+[Mass Chile — 26/10/2026](../../../../docs/commercial/prospecting-agent/runs/2026-10-26-mass-chile.md)
+reprodujo cuerpo visible con sólo la firma guardada y destinatarios vacíos. Reabrir el mismo borrador,
+resolver destinatarios por la UI, corregir el HTML con la firma oficial y guardar; después exigir lectura
+independiente completa. El atajo de guardado o un aviso de guardado no sustituyen esa lectura. No fijar
+selectores, coordenadas ni atajos de una sesión como contrato universal.
+
+Un NDR explícito de destinatario inexistente conserva prioridad sobre un envío solicitado o un registro
+SENT: no reintentar ni interpretar la aceptación de conexión LinkedIn como validación del correo. El estado
+adverso de una dirección de Yuri no se extendió a colegas verificados sin evidencia de bloqueo de cuenta.

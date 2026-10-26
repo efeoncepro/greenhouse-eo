@@ -2,6 +2,13 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-26 — Prospección: cierre Mass Chile y conciliación de canales
+
+[Expediente Mass Chile](docs/commercial/prospecting-agent/runs/2026-10-26-mass-chile.md), excepción personal
+acotada, NDR y duplicado BCC preservados; permisos de créditos, CRM y envío separados. Skills espejo de
+prospección/HubSpot, manual, funcional y política Outlook refuerzan readback del borrador persistido,
+Enviados y CRM sin reintentos ni direcciones privadas en Git. Sin cambios de runtime, filtros o automatizaciones.
+
 ## 2026-10-26 — Comercial: visitas a documentos y seguimiento contextual
 
 Método compartido para contrastar aviso y detalle de Documents, separar interacción/intención, revisar
@@ -548,34 +555,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
 Medición14/10: todo develop publicado en main9690efad (PR255/orquestador38591329633), Server9 estricto y watchdog6/6/drift0. API/panel/CLI para agentes comparten políticas y comandos; alta nueva por datos recibida en Meta Test Events con nueve claves sin otro build/redeploy/GTM. Consentimiento y Forms→HubSpot Forms→CRM preservados; fixtures archivados. [Release y límites](docs/audits/releases/2026-10-14-scalable-measurement-agent-first-release.md); [auditoría integral docs/skills](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-14.md). Tráfico comercial/EMQ y resto de TASK-2035 pendientes.
 
 Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independientes y partners gris. [QA y reversión](docs/audits/public-site/2026-10-14-footer-composition-v2.md).
-
-## 2026-10-13 — Meta CAPI y consentimiento publicados
-
-- Diseño de consentimiento La órbita autorizado y adoptado mediante adapter de presentación sobre HubSpot;
-  [rollout WP/Think](docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md). Categorías y persistencia nativas, sin cambios de matching.
-- Rotación Vercel autorizada14/10: anterior revocada/403, nueva CLI/API200; fuentes locales0600, GitHub y wrappers corregidos. [Recibo](docs/audits/measurement/VERCEL_CREDENTIAL_ROTATION_2026-10-14.json); sin workflow/deploy de prueba.
-- Auditoría documental 14/10 con tres subagentes: contrato/recibo, capa [funcional](docs/documentation/growth/medicion-gtm-ga4.md#cookies-y-preferencias-del-visitante), [manual operativo](docs/manual-de-uso/growth/operar-consentimiento-cookies-publico.md) y skills; límites de QA y pendiente de seguridad explícitos.
-
-- [ADR](docs/architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md),
-  [contrato HubSpot](docs/reference/measurement-gtm-ga4/09-hubspot-consent.md) y
-  [auditoría](docs/audits/measurement/META_CAPI_RECOVERY_2026-10-13.md): mismo GTM Server en
-  `efeonce-group`, min 0/max 1; **server live6/web live5**, Meta v25 y forwarding GA4.
-- Banner español opt-in/GPC y routing activos WP/Think. PageView por destino, default denied,
-  URL limpia, UUID sender compatible, Lead accepted form/confirmed meeting; sin nuevo sender.
-- Meta Test Events Processed/Server y diez negativos sin salidas; navegación real ambos hosts
-  completó Meta/GA4. Lead QA accidental previo documentado y gate UUID corregido.
-- 16 tests bridge y 30 renderer PASS; renderer con contexto released PR254. Think promovido y WP
-  plugin scoped 1.0.3 con preferencias inline junto a enlaces legales, sin franja adicional. Próximos leads/replay reales pendientes.
-  Recuperación previa documentada; matching posterior abajo. Sin nuevo proyecto/suscripción.
-- [Matching](docs/audits/measurement/META_LEAD_MATCHING_2026-10-13.md) activado tras
-  [release completo PR254](docs/audits/releases/2026-10-13-full-develop-matching-release.md):
-  main d692ab51dc48, orquestador38483437158/manifest released, CI20.100 PASS y build/Deep/smoke.
-  SQL aplicada, GTM6 retira legacyLead12/17, GA4 Client boundary preservada. Ops00775-fnh
-  y GitHub vars Meta/Google/retención true; captura Vercel true + redeploy READY/alias.
-- GA4 UPD/ack y siete audiencias90d, secretos pinned/identidad real resueltos dentro del worker;
-  Test Events em/ph/fn/ln, negativos live y cola/leaseCAS/retención PASS. Watchdog ok6/6 drift0.
-  Primera conversión comercial consentida post-flip sin observar; TASK-2034 parcial, sin datos
-  sintéticos de negocio. Incidente mindicador separado sigue abierto, excepción auditada.
-
-- Auditoría integral con tres subagentes: [inventario y cierre](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), [runtime10](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
-  ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md) **propuesta sin GO, no implementada**. Commit documental, sin publicación/release adicional.

@@ -338,3 +338,20 @@ una respuesta abre reunión/propuesta o se pide preparar/analizar discovery. Man
 
 [ARMOR / Indecaucho](../../commercial/accounts/indecaucho-armor/README.md) conserva la aplicación del
 26/10: guía de reunión27/10, caso previo y revisión posterior HubSpot/Notion focal autorizada.
+
+## Correo personal público y varios canales de una cuenta
+
+[Mass Chile — 26/10/2026](../../commercial/prospecting-agent/runs/2026-10-26-mass-chile.md)
+aplica los gates existentes sin ampliar su permiso general:
+
+1. Separar dirección personal publicada, candidata corporativa inferida y correo corporativo verificado.
+   La primera acredita procedencia; la segunda conserva su veredicto adverso; ninguna hereda la calidad de otra.
+2. Reutilizar la excepción informada de alta/envío sólo para esa persona y dirección. El waterfall de
+   adyacentes necesita alcance propio; recuperar el resultado terminal y no repetir el gasto cuando después
+   se autoriza CRM/envío. Ignorar datos personales secundarios no necesarios.
+3. Crear/reusar los contactos elegibles antes de sus enlaces Documents. Personalizar por función y
+   atribuir la señal a quien la publicó, sin inventar solicitudes de colegas ni relaciones jerárquicas.
+4. Leer el borrador guardado con todos sus destinatarios y contenido. Si sólo conserva la firma, recuperar
+   ese mismo borrador y corregir por la UI; releer antes de enviar y luego verificar Enviados/CRM por separado.
+5. Registrar un NDR de casilla inexistente y cerrar esa dirección, sin repetir el envío, fusionar registros
+   automáticos o detener colegas por inferencia. Comprobar el DM por su hilo y no repetirlo al corregir email.

@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-10-26 — Mass Chile: tres personas y cierre por canal
+
+[Expediente](docs/commercial/prospecting-agent/runs/2026-10-26-mass-chile.md): Yuri por email personal
+(excepción expresa) y DM; corporativo inferido rebotó, no reintentar. Guillermo/Judith: alta con Primary
+Company/campos/segmento182 y dos correos personalizados, firma gráfica, CCO y dos brochures originales
+por links nativos; Enviados y EMAIL SENT independientes. Cinco créditos históricos, sin nuevo gasto.
+[Auditoría](docs/audits/commercial/2026-10-26-mass-chile-docs-skills.md); dos skills espejo y dueños
+documentales actualizados. Corte17:04Chile, sin entrega/lectura confirmadas ni cadencia futura autorizada.
+
 ## 2026-10-26 — ARMOR / Indecaucho: discovery y caso en construcción
 
 [Expediente único](docs/commercial/accounts/indecaucho-armor/README.md): Katia respondió y pide propuesta
@@ -261,23 +270,3 @@ TASK-2046…2049 creados (`658e828fe`). TASK-2046 en curso: inventario por WP-CL
 Premium 27.7 acepta 410; Search Console por API: demos 0 clics. **Sin cambios en el sitio.** Pendiente antes del
 Slice 2: revisar enlaces externos de las URLs demo en la interfaz de Search Console y el OK del operador al `dryRun`.
 Hallazgos: 12 entradas reales con metadatos duplicados (afecta el Slice 3) y `cms.efeoncepro.com` indexado (ISSUE-183).
-
-## 2026-10-23 — Partners en vivo y contrato de formularios diseñados (TASK-2044)
-
-`/partnership/` (248003) reemplazada por 6 widgets compilados del canvas Partners v14 (snapshot
-`_gh_partners_v2_before_20261023_220804`, preview 252038 privada, SEO/OG con adjunto 252045);
-[referencia](.claude/skills/efeonce-public-site-wordpress/references/landings/partnership.md). «Quiero ser partner»
-lleva a `/agenda/` hasta TASK-2045; el formulario HubSpot «Lead Gean - Partnership» ya no está en la página.
-TASK-2044 code complete en local (`0864b7c04`…`36aa21309`): ancho por campo, consentimiento `compact` + `{privacyLink}`,
-`successBehavior.icon` y `dismiss`, CTA `open_growth_form` en `dialog`. **Rollout pendiente:** diff del contrato
-público en staging tras deploy. **No publicar `{privacyLink}`** antes del renderer de TASK-2045 (el actual lo muestra
-literal). Arreglado de paso el typecheck de `scripts/public-website/landing-dock/cli.ts`. **Sin push ni release a main**
-(instrucción del operador). TASK-2045 code complete (`ff9d693fc`…`5080b47d0`): renderers formularios `1.1.0` y CTA
-`1.4.0` (diálogo `open_growth_form`, tokens/hooks, Turnstile junto al form); popup de Partners medido a 0–2 px del canvas
-con renderers reales (`docs/ui/reviews/TASK-2045/`, piel en `partners-source/partner-dialog-skin.css`). **Pendiente:**
-release a `main` de los renderers (no autorizado), Turnstile interactivo real en el diálogo, DLV/GA4 de
-`activation_mode`. Hecho después (2026-10-23): formulario `efeonce-partner-application` publicado (v2, HubSpot directo
-«Lead Gean - Partnership», smoke 200/200) y CTA `partners-become-partner` publicado (key en `.auth` 0600); contratos de
-los 4 formularios vivos idénticos a producción y 0 px de diferencia con el renderer nuevo; axe limpio en 4 viewports.
-**Push a `develop` no hecho:** son 174 commits locales de varias sesiones (decisión del operador). Activar el popup =
-runbook en `references/landings/partnership.md`, después del release.

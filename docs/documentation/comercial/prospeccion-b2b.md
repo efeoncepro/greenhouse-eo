@@ -189,3 +189,12 @@ se corroboraron en CRM; LinkedIn tiene su propia evidencia y Arcor sigue sin ese
 secuencia autorizada e inscrita. Estados automáticos de lifecycle o Documents no acreditan calificación.
 La matriz global se distingue de la persona local; una dirección inferida o un catch-all conservan su
 incertidumbre aunque exista un envío. Reutilizar estos casos exige leer su corte y revalidar el dato pertinente.
+
+## Aplicación focal Mass Chile — 26/10/2026
+
+El [expediente](../../commercial/prospecting-agent/runs/2026-10-26-mass-chile.md) conserva la excepción
+informada de correo personal de Yuri, el rebote de su corporativo inferido y dos adyacentes con email laboral
+verificado y alta/envío expresamente autorizados. No convierte la excepción en admisión normal, ni la señal
+de Yuri en demanda propia de Guillermo/Judith. El dato personal adicional no solicitado de un proveedor
+queda fuera de CRM y del envío. Borrador visible, contenido persistido, Enviados, logging y DM se concilian
+por separado; el NDR cierra sólo la dirección afectada. No hay cadencia futura autorizada por este cierre.

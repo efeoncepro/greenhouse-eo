@@ -201,6 +201,16 @@ regla: corregir el cuerpo visible que no persistió, releer el borrador completo
 Enviados, con ambos enlaces de Documents, una firma gráfica y Para/CCO exactos. En Yvette, la excepción
 de atribución de correo autorizó ese destinatario y envío; no modifica esta política ni prueba entrega.
 
+### Aplicación Mass Chile — 26/10/2026
+
+El [borrador de Guillermo](../commercial/prospecting-agent/runs/2026-10-26-mass-chile.md) volvió a mostrar
+texto completo aunque la lectura persistida tenía sólo firma y destinatarios vacíos. Se recuperó el mismo
+borrador, se resolvieron Para/CCO, se insertó el HTML por la UI y se guardó; la lectura independiente completa
+habilitó el envío. Judith tuvo el mismo control previo. Un aviso o atajo de guardado no reemplaza el readback.
+Se comprobaron las copias nuevas de Enviados y las actividades EMAIL SENT por separado, sin duplicación.
+El NDR del corporativo inferido de Yuri se registra como resultado adverso aunque el envío fuera solicitado;
+no se reintenta ni se usa la conexión LinkedIn para validar el correo.
+
 ## Evidencia, alternativas y límites
 
 El 2026-10-08 se verificó en Enviados el correo a Dianesty sobre diseñador senior: salió desde Outlook con los dos enlaces, pero con cierre simple y sin BCC. El operador pidió esta corrección permanente. El contrato aplica a futuros envíos; no reenvía ni registra retroactivamente ese correo sin mandato específico.

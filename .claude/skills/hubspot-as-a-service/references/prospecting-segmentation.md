@@ -378,3 +378,18 @@ Keep that distinction in the source note, not a fabricated verification property
 intakes read back Contact, Primary Company, evidence-backed properties and effective segments; neither
 permission inherited a sequence from another person in the chat. Receipts, real email and recipient links
 remain in the private CRM dossier.
+
+## Individual personal-email exception and BCC-created duplicate — 26/10/2026
+
+A personal address publicly attributed by its owner still fails normal corporate-email admission.
+An informed, explicit authorization for that person's Contact and send can be applied once within scope;
+keep the personal source and actual technical status in the associated note, not a fabricated verification
+field. Enrichment credits alone do not grant CRM or sending authority. Omit unrelated personal data
+returned by the provider. Reuse already obtained results when a later instruction authorizes CRM/send.
+
+If BCC creates another Contact for a corporate candidate that then bounces, reconcile both records and
+the NDR, preserve history and associate authorized evidence; do not merge/delete automatically or mark the
+invalid address verified. A native record and lifecycle cannot override the actual delivery result.
+[Mass Chile](../../../../docs/commercial/prospecting-agent/runs/2026-10-26-mass-chile.md) documents Yuri's
+bounded exception and the normal intake of Guillermo/Judith, each with Primary Company, researched fields,
+effective creative-segment membership, separate personalized email and CRM SENT readback.

@@ -1,5 +1,11 @@
 # Registro de búsquedas comerciales
 
+**Delta focal26/10 · Mass Chile:** [Yuri, Guillermo y Judith](runs/2026-10-26-mass-chile.md):
+excepción personal de Yuri y DM enviados; corporativo inferido rebotado, no reintentar. Guillermo/Judith
+con alta autorizada y dos correos personalizados; firma gráfica, CCO, brochures nativos, Enviados y
+EMAIL SENT verificados. Cinco créditos históricos, sin nuevo gasto ni cadencia. No renueva el radar.
+[Cierre documental](../../audits/commercial/2026-10-26-mass-chile-docs-skills.md).
+
 **Delta focal26/10 · Indecaucho:** [Documents y seguimiento](../follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md):
 señal atribuida a Katia contrastada en aviso/UI; correo autorizado enviado11:43Chile y EMAIL119538629237
 registrado. Respuesta posterior identificó ARMOR; [expediente y preparación](../accounts/indecaucho-armor/README.md),

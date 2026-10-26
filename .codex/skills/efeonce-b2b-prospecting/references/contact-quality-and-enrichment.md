@@ -127,3 +127,21 @@ Aplicaciones del 24/10/2026:
   Dos correos oficiales de otras personas apoyaron inicial + primer apellido; una única candidata distinta
   recibió validación LeadMagic `validated` por un crédito adicional autorizado. La atribución siguió inferida;
   Julio aprobó expresamente Contact y envío a esa dirección tras conocerlo, sin autorizar secuencia.
+
+## Correo personal publicado y dato adicional no solicitado
+
+Una dirección personal publicada por la propia persona puede acreditar atribución; no la convierte en
+correo corporativo ni certifica SMTP. Si el operador, informado, autoriza expresamente alta y envío a esa
+dirección como excepción individual, reutilizar esa autorización sólo para esa persona y acciones.
+Conservar fuente, naturaleza personal y calidad técnica real en la nota CRM. El permiso de gasto de un
+waterfall no autoriza por sí solo CRM o envío, ni se amplía a datos personales secundarios retornados por
+el proveedor: omitirlos si no son necesarios ni autorizados para el fin del pedido.
+
+Una instrucción posterior de enviar también a una candidata inválida no cambia su veredicto. Registrar
+el mandato puntual y el resultado real; un NDR de destinatario inexistente cierra ese canal sin reintento.
+La existencia de un Contact automático por BCC no verifica la dirección ni autoriza fusionar/borrar
+historia. Aceptación de conexión, email enviado y DM son estados separados; conciliar cada canal.
+
+[Aplicación Mass Chile — 26/10/2026](../../../../docs/commercial/prospecting-agent/runs/2026-10-26-mass-chile.md):
+excepción personal de Yuri, corporativo inferido rebotado y adyacentes con correo laboral verificado,
+permisos posteriores de alta/envío, sin heredar intención ni ampliar el gasto.
