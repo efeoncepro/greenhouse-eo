@@ -59,6 +59,12 @@ implementación en HubSpot y la experiencia propia.
 
 ## 3. Borrador del artículo
 
+> **Cómo leer esta sección (interno):** todo lo que está aquí es texto público, salvo las marcas de maquetación entre
+> corchetes (`[Destacado]`, `[Tabla Efeonce]`, `[Pasos]`, `[Imagen N — archivo]`, `[Bloque]`, `[Mención]`), que la spec
+> convierte en bloques y no se publican como texto. Las notas internas (inferencias, decisiones, comparaciones con la
+> versión anterior) viven sólo en §1, §4, §5 y §9; el artículo nunca habla de su versión anterior (regla de Julio,
+> 2026-10-26).
+
 # Pipeline de ventas en HubSpot: cómo configurarlo para que diga la verdad
 
 *Actualizado el [fecha de publicación] · Julio Reyes · Funciones verificadas en la documentación de HubSpot en
@@ -93,8 +99,7 @@ uno.
 ## ¿Cómo diseñar las etapas antes de abrir la configuración?
 
 Cada etapa se define por su **criterio de salida**: la evidencia de que el comprador hizo algo que acerca la decisión.
-En una venta B2B de servicios suelen bastar cuatro o cinco etapas abiertas, más ganado y perdido [I —
-recomendación]. Más etapas no dan más control: dan más lugares donde un negocio puede quedarse quieto.
+En una venta B2B de servicios suelen bastar cuatro o cinco etapas abiertas, más ganado y perdido. Más etapas no dan más control: dan más lugares donde un negocio puede quedarse quieto.
 
 La pregunta útil no es «¿qué etapas tiene una venta?», sino **«¿qué tiene que haber pasado para que un negocio
 avance?»**. Y la respuesta que mejor funciona es una acción del comprador, no del vendedor.
@@ -118,14 +123,14 @@ ilustrativo, no un estándar de la industria: se reemplazan con tu propio histor
 | Ganado | Firmó | 100 % |
 | Perdido | Decidió no avanzar (con motivo registrado) | 0 % |
 
-Dos detalles que el artículo original confundía. Primero, la **probabilidad de una etapa** no es lo mismo que la
-**tasa de conversión entre dos etapas**: la primera es la chance de que ese negocio se cierre ganado; la segunda,
-cuántos pasan a la siguiente. Segundo, si alguien edita a mano la probabilidad de un negocio, **HubSpot deja de
+Dos detalles que conviene tener claros. Primero, la **probabilidad de una etapa** no es lo mismo que la **tasa de
+conversión entre dos etapas**: la primera es la chance de que ese negocio se cierre ganado; la segunda, cuántos pasan
+a la siguiente. Segundo, si alguien edita a mano la probabilidad de un negocio, **HubSpot deja de
 actualizarla sola** cuando el negocio cambia de etapa. Conviene que eso sea la excepción.
 
-[NEEDS AUTHOR — doctrina] En Efeonce lo aprendimos en nuestro propio CRM: **una señal de interés o un lead no es una
-oportunidad calificada**. Si abres un negocio por cada señal, el pipeline crece en la reunión del lunes y se vacía
-en la del viernes. Por eso las señales se trabajan como leads hasta que alguien las califica.
+En Efeonce trabajamos con una regla simple: **una señal de interés o un lead no es una oportunidad calificada**. Si
+abres un negocio por cada señal, el pipeline crece en la reunión del lunes y se vacía en la del viernes. Por eso las
+señales se trabajan como leads hasta que alguien las califica.
 
 ## ¿Cómo crear y personalizar el pipeline en HubSpot?
 
@@ -189,7 +194,7 @@ mismo pipeline con permisos por equipo** («Team only»), para que cada equipo v
 - **Restringir un pipeline por equipo:** Professional o Enterprise. Los **equipos anidados** (jerarquía) requieren
   Enterprise.
 - **Territorios:** HubSpot no documenta una función de territorios propia; se modelan con equipos, propiedades y
-  workflows [I].
+  workflows.
 - **Clonar un pipeline** (Professional o Enterprise) copia propiedades condicionales, reglas, automatizaciones,
   etiquetas y accesos. Sirve para probar un cambio de etapas sin tocar el pipeline en uso.
 - **Grupos con matriz y filiales:** HubSpot asocia empresas *Parent* y *Child* (una filial tiene una sola matriz,
@@ -229,9 +234,6 @@ propone a quién escribir. Lo que aprendimos al configurarlo:
   correos propios. Tomó varias versiones: los primeros borradores sonaban inseguros, repetían el perfil del
   prospecto y acumulaban servicios. **Después de cada ajuste, hay que leer un borrador nuevo**; el cambio no se
   valida en la configuración, se valida en el correo.
-- [NEEDS AUTHOR — créditos] **Los créditos se planifican antes de inscribir.** Al activar el agente, los créditos del
-  mes se nos fueron antes de lo previsto. El tope de sugerencias diarias y las inscripciones automáticas son las dos
-  perillas que mueven el consumo.
 - **Una persona, un canal.** Nadie está al mismo tiempo en el agente de HubSpot y en una secuencia de Apollo.
 
 [Imagen 3 — `prospecting-agent-advanced-settings.svg`] Pie: En las instrucciones avanzadas se define cómo escribe el
@@ -264,7 +266,7 @@ vendedor acepta o rechaza cada uno. Interfaz: HubSpot.
 En Efeonce usamos Notetaker en todas las reuniones junto con Deal Progression. La decisión que importa está en la
 configuración de captura: **por cada propiedad, eliges si el cambio se aplica solo o queda esperando aprobación.**
 Nuestra recomendación es empezar con todo en revisión y pasar a automático sólo las propiedades donde la sugerencia
-casi nunca se corrige [I — recomendación, no medición].
+casi nunca se corrige.
 
 [Imagen 6 — `smart-deal-progression-board-notification.svg`] Pie: El aviso de cambios por revisar aparece en el
 tablero de negocios. Interfaz: HubSpot.
@@ -414,9 +416,9 @@ revenue-hubspot].
 | C20 | Efeonce usa Prospecting Agent con Apollo | experiencia propia | Julio, 2026-10-26 (chat) | verified (autorizado) |
 | C21 | Configuración: revisión humana, 5 correos/30 días, 2 días mínimo, es-CL, horario hábil | experiencia propia | Auditoría 2026-10-08; 2026-10-07 | verified — NEEDS AUTHOR confirma que se puede publicar |
 | C22 | Voz calibrada con correos propios en instrucciones avanzadas; borradores intermedios con fallas | experiencia propia | Auditoría 2026-10-07 | verified — NEEDS AUTHOR |
-| C23 | Créditos del mes agotados antes de lo previsto | experiencia propia | Auditoría 2026-10-08 (panel de créditos) | NEEDS AUTHOR — sin cifras ni fechas |
+| C23 | Créditos del mes agotados antes de lo previsto | experiencia propia | Auditoría 2026-10-08 (panel de créditos) | rejected — Julio, 2026-10-26: no va en el artículo |
 | C24 | Una persona no está a la vez en el agente y en Apollo | doctrina Efeonce | AGENTIC_REVENUE_OPERATING_MODEL_V1 §Carril B regla 1 | verified — NEEDS AUTHOR |
-| C25 | Una señal o lead no es una oportunidad calificada | doctrina Efeonce | Corrección de Julio en CRM_DEAL_REGISTER.md | verified — NEEDS AUTHOR para «lo aprendimos en nuestro propio CRM» |
+| C25 | Una señal o lead no es una oportunidad calificada | doctrina Efeonce | Corrección de Julio en CRM_DEAL_REGISTER.md | verified — Julio, 2026-10-26: sólo como doctrina («En Efeonce trabajamos con una regla…»), sin contar que nos pasó |
 | C26 | Notetaker: Meet/Teams/Zoom; propone resumen, tareas, correo y propiedades; asiento Sales/Service (Core en Starter) | fact | KB Notetaker (2026-10-19) | verified |
 | C27 | Deal Progression: Sales/Service Pro/Ent; sugiere propiedades con valor actual vs sugerido y próximas acciones; se activa en Agent Hub | fact | KB deal progression (2026-10-01; la página la marca BETA) | verified — **no** afirmar que propone etapa o fecha de cierre. Julio (2026-10-26): «Lo de la beta es lo de menos, ya está funcionando»; no se menciona beta en el texto público |
 | C28 | Aprobación automática o manual por propiedad en smart data capture | fact | KB Notetaker | verified |
@@ -426,6 +428,7 @@ revenue-hubspot].
 | C32 | Previsión: Sales/Service Pro/Ent, categorías, vista por equipo; previsión con IA en beta con negocios ganados de 3 meses | fact | KB forecast (2026-09-09); AI projections (2026-05-29) | verified |
 | C33 | Importe de negocio ≠ facturación | doctrina / caso | Caso ANAM publicado | verified |
 | C34 | ANAM: cobertura negocio–empresa 47,98 % → 50,73 %, sólo asociaciones determinísticas | caso real publicado | Caso dashboards ANAM (público) | verified |
+| C35 | «En una venta B2B de servicios suelen bastar cuatro o cinco etapas abiertas» | recomendación Efeonce | Criterio editorial | [I] — formulado como recomendación, sin cifra de respaldo |
 | R1–R8 | 79 %, 28 % HubSpot, 33 % Salesforce, 87 % HubSpot, 50 % Salesforce, 28 % McKinsey, citas Halligan y Hunter | — | 404 o sin fuente | rejected |
 
 ## 6. Visuales
@@ -448,8 +451,9 @@ Exportar a WebP para el sitio.
 
 ## 7. Pendientes antes de publicar
 
-1. Lectura de Julio: tesis, hook, motivo 🍏🍏🍏, doctrina (C24, C25) y experiencia propia (C21–C23).
-2. Decidir si va la lección de créditos (C23) y si la tabla de etapas lleva probabilidades de ejemplo.
+1. Lectura de Julio: tesis, hook, motivo 🍏🍏🍏, doctrina (C24) y experiencia propia (C21, C22).
+2. ~~Créditos, doctrina del CRM y probabilidades~~ — resuelto el 2026-10-26: créditos fuera (C23), C25 sólo como
+   doctrina, la tabla conserva las probabilidades marcadas como ejemplo.
 3. Confirmar en el portal los nombres de menú en español (C4) y el filtro de ejemplo de etiquetas (C12).
 4. Enlaces internos: ICP B2B (perfil del Prospecting Agent), caso ANAM de dashboards (ya enlazado), y evaluar
    «De Excel a HubSpot». Revisar la URL del bloque de suscripción a Glitch.
