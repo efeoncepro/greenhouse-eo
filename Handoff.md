@@ -51,6 +51,12 @@ se conservan; respuesta posterior no prueba causalidad.
 
 ### 2026-10-26 — Rooms: backend Codex y diseño Claude Design
 
+Auth separado: corrección preparada en PR263 (main,5e1fc2554) y264 (develop,aabd6d78d), **retenidas en PR
+por instrucción expresa del operador**, sin merge ni deploy.22Python+14contratosVitest/gates/hook normal
+PASS;CI general de HEAD nuevos pendiente, tras corregir fixture/espejo que fallaron en primera pasada.
+No release262 ni flags/correo/workflows ajenos. Revisar filtros de deploy por src/lib antes de264.
+[Auditoría y límites](docs/audits/rooms/2026-10-26-auth-deploy-control.md).
+
 Disparo automático posterior ya verificado: Rooms main `e4b2e890` (PR3), endpoint de máquina con OIDC
 y Scheduler cada minuto. Vacío200 sin contenedor; demanda sintética en la misma sala archivada202→Job
 `4r9nz` SUCCESS, cola vacía/ack liberado y publicaciones intactas. Ocho migraciones/26tablas, worker

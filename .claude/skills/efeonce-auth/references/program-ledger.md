@@ -3,6 +3,18 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-26 — Control de despliegue corregido; operador retiene Auth en PR
+
+- `doc/local`: [PR263 main](https://github.com/efeoncepro/greenhouse-eo/pull/263) HEAD `5e1fc2554` y
+  [PR264 develop](https://github.com/efeoncepro/greenhouse-eo/pull/264) HEAD `aabd6d78d`, ambas abiertas.
+  Sólo control/tests/docs y delta de metadata; sin producto Auth/UI ni historial local ajeno.
+- `local`:22Python+14Vitest de drift/paridad/watchdog PASS en árbol main exportado, gates y hook normal
+  PASS sin bypass. CI inicial encontró fixture/espejo omitidos, corregidos; CI general nuevo pendiente.
+- `vivo`: revisión00168-vzb100%, SHA754a2a28 y misma imagen, first-party/OTP OFF; health/ready/discovery200.
+- Decisión humana expresa: **dejar Auth en PR por ahora**, sin merge main/develop ni deploy. No262,
+  flags, correos ni disable/enable de otros workflows. Revisar filtros src/lib de otros deploys antes de264.
+  [Evidencia y siguiente paso](../../../../docs/audits/rooms/2026-10-26-auth-deploy-control.md).
+
 ## 2026-10-26 — Canary interno Rooms y una imagen real PASS; flags OFF
 
 [Recibo conjunto](../../../../docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md): una sala

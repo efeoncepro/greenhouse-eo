@@ -107,7 +107,13 @@
     "skipped": 0,
     "focusedDispatchTests": 9,
     "linuxImageSmoke": "PASS",
-    "cloudBuild": "5aaeea33-ba75-4cc3-95b3-ed2128813e58"
+    "cloudBuild": "5aaeea33-ba75-4cc3-95b3-ed2128813e58",
+    "playwright": {
+      "passed": 53,
+      "skipped": 3,
+      "failed": 0,
+      "humanVisualAcceptance": false
+    }
   },
   "limits": {
     "fixture": "Synthetic queued row in existing archived pilot. Guard fails before storage/decoder, no object or rendition created.",

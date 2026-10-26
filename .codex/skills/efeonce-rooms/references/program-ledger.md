@@ -12,7 +12,8 @@
 - `vivo`: ocho migraciones/26 tablas, salas y publicaciones conservadas. Lease singleton10min y nonce
   cercado. Worker timeout240s/retries0, imagen `sha256:d49995de3ee7e5fa71ec7fabe0e8bb04d8ac3b4bbd2ef125a8331311d1d121f2`.
 - `vivo`: flag de máquina ON; first-party/invitaciones/medios web OFF. Cero correos nuevos, no repetir canary.
-- `local`: verify234/234,9focales,lint/types/build y CI Linux PASS. Bootstrap `b2f90fa` local preservado.
+- `local`: verify234/234,9focales,lint/types/build y CI Linux PASS. Playwright53PASS/3skip (no aceptación visual). Bootstrap `b2f90fa` local preservado.
+- Auth: corrección queda en PR263/264 por decisión expresa del operador; sin merge ni despliegue.
 - Diseño y consumidor bajo Claude Design; activación general no acreditada.
   [Evidencia](../../../../docs/audits/rooms/2026-10-26-automatic-media-dispatch.json) y [manual](../../../../docs/manual-de-uso/rooms/operar-worker-medios.md).
 
