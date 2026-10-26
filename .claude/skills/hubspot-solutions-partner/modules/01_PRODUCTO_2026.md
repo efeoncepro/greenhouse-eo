@@ -163,6 +163,17 @@ sostienen que el Loop *no reemplaza* inbound sino que es "un playbook AI-driven 
 omnicanal". Úsalo si necesitas que el cliente no sienta que tiró la plata. **Pero HubSpot oficialmente lo
 presenta como reemplazo del funnel.** Si el cliente es HubSpot-native, usa el marco oficial.
 
+**Loop en 2026 (as-of 2026-10-26)** ✅/❌ en `SOURCES.md` § Loop Marketing 2026:
+- **El marco se volvió libro:** *Loop: Outlearn. Outmarket. Outgrow.*, de Bodnar y Flanagan. En UNBOUND
+  2026 lo presentaron en el escenario principal como el sistema que probaron en el marketing de HubSpot.
+- **Taste Profile y medición propia:** la base es el Taste Profile, y se mide con las 4 Rs, una por etapa
+  (Remarkability, Resonance, Reach y Regeneration). Para el cliente, es el puente directo a AEO: Reach mide
+  «LLM/AI share of voice».
+- **Qué no citar:** el «perdimos 80 % de tráfico y crecimos 20 % en leads» circula mucho, pero HubSpot no
+  lo confirma.
+- **Si el cliente lee en español:** la página de hubspot.es sigue con la versión anterior, así que hay que
+  citar cada versión por su URL.
+
 **Tesis del Spring 2026 Spotlight: "Growth Context"** ✅. Cita para deck (Duncan Lennox, CPTO):
 *"Context is much more complex. If data is what happened, context is why."* Es el posicionamiento
 anti-commodity frente a Salesforce/Adobe: *"cualquiera tiene tus datos; nosotros tenemos el porqué."*

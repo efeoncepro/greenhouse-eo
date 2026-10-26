@@ -98,6 +98,23 @@ Fuentes verificadas 2026-08-27: [Gartner B2B Marketing Automation 2025](https://
 | Marketplace: 156+ apps nuevas y 21+ actualizadas | [HubSpot Community](https://community.hubspot.com/t/156-new-and-21-featured-updated-apps-in-the-hubspot-marketplace/157999) | ✅ Cifra del Marketplace; apps son integraciones del ecosistema, no capacidades nativas ni entitlements automáticos |
 | Cambios legales para Revenue Hub, créditos y AI Agents | [Legal Update 2026-09-16](https://community.hubspot.com/t/september-16-2026-legal-update/158698) | ✅ Cambio documental; revisar contrato/DPA antes de propuesta o activación |
 
+### Loop Marketing 2026 — libro, UNBOUND y medición — as-of 2026-10-26
+
+Lo que cambió en Loop desde su lanzamiento (INBOUND 2025). La razón de los productos de Fall Spotlight es este
+mismo argumento de marketing: la IA rompió el playbook lineal y gana quien aprende más rápido.
+
+| Claim | Fuente primaria / evidencia | Marca y uso |
+|---|---|---|
+| Libro **«Loop: Outlearn. Outmarket. Outgrow.»**, de Kipp Bodnar (CMO) y Kieran Flanagan (SVP of Agentic GTM and Systems). HubSpot dice que lo probó en su propio marketing («hundreds of marketers, billions in pipeline») | [Página del libro](https://www.hubspot.com/loop-marketing-book) | ✅ Existencia, autores y aprendizajes. ⚠️ El «superó al framework anterior en un año» no trae métricas: no citarlo como resultado |
+| Sesión de escenario principal **«AI Broke The Old Marketing Playbook. Here's What Replaces It»** (Bodnar y Flanagan, 17-sep-2026, 11:15 ET): Loop «built and proved on HubSpot's own marketing engine» | [Speaker page](https://unbound.hubspot.com/speakers/kipp-bodnar) (sess-1392) | ✅ Que la sesión existió y su descripción. ⚠️ Sin grabación pública al corte (HubSpot Live publica una selección después) |
+| **Taste Profile** como base: «a picture of your customer and your brand that gives AI the context to sound like you, not everyone else» | [Loop Marketing (EN)](https://www.hubspot.com/loop-marketing) | ✅ Textual |
+| **4 Rs**, una por etapa: **Remarkability** (Express; «Ability to scale brand differentiation across teams»), **Resonance** (Tailor; alineación con el **Buyer Sim**, «the AI clone of your customer profile»), **Reach** (Amplify; «LLM/AI share of voice», impresiones multicanal, conversión por canal), **Regeneration** (Evolve; «Speed of your Loop», mejora de aprendizajes y del pipeline) | [Loop Marketing (EN)](https://www.hubspot.com/loop-marketing) · [libro](https://www.hubspot.com/loop-marketing-book) («one number per quarter») | ✅ Textual. 🔴 **La página en español no se actualizó**: mantiene Definición/Adaptación/Amplificación/Optimización y otro scorecard (visibilidad en la IA, cuota de participación en la IA, citas, velocidad del Loop). Citar cada versión por su URL |
+| State of Marketing 2026: **71 %** «trying to keep up with how buyers move between platforms, formats, and discovery paths»; casi **56 %** siente que internet está «now flooded with AI-generated content»; sólo **47 %** entiende cómo usar la IA estratégicamente | [Blog HubSpot — Loop trends](https://blog.hubspot.com/marketing/loop-marketing-trends) (act. 2026-07-24) | ✅ Textual; la página no publica el tamaño de muestra |
+| **Loop Marketing Landscape Report**: 1.800+ profesionales de marca; 51 % tiene una propuesta de valor clara, documentada y única | [Landing del informe](https://offers.hubspot.com/loop-marketing-research) (gated) | ⚠️ El 51 % viene de resúmenes de terceros; leer el informe antes de citarlo |
+| «HubSpot perdió 80 % del tráfico y creció 20 % en leads» | Bodnar, [explicación del blog](https://blog.hubspot.com/marketing/blog-traffic-loss-explainer) (act. 2026-07-14): dice que el 80 % lo **publicaron terceros**, no da cifras, y atribuye la caída al giro hacia «influence» desde 2020 y a las búsquedas sin clic | ❌ **No citar el 80 % ni el 20 %.** Las «140 millones de visitas en un año» salen de un comunicado de un podcast (DesignRush, 2026-09-24), no de HubSpot |
+| Rangan en UNBOUND: «9 de cada 10 empresas usan IA y sólo 6 % logra resultados transformadores»; «la IA con mal contexto es peor que no tener IA» | Sólo recaps de terceros; el comunicado de IR devolvió 403 | ❌ No citar hasta leer el comunicado o la grabación |
+| Colin Fleming (CMO de OpenAI) con Bodnar: «Activity is not achievement» | [Exit Five](https://exitfive.com/newsletter/5-takeaways-from-hubspots-unbound-2026/) | ⚠️ Recap de terceros |
+
 ### Narrativa agéntica, workspaces y motion de partners — as-of 2026-09-19 ✅
 
 | Claim verificado | Fuente primaria | Uso |

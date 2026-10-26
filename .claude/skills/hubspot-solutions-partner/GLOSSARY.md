@@ -49,7 +49,10 @@
 | **Custom Assistants** | 🔴 **Sunset.** Read-only desde el **2026-07-13**; migran a "Breeze projects" |
 | **HubSpot Credits** | La moneda de Breeze. **USD 0,010/crédito.** 🔴 **NO se suman entre hubs** (manda el tier más alto) y **no hay rollover** |
 | **Outcome-based pricing** | Desde el **2026-04-14**: Customer Agent cobra **USD 0,50 por conversación RESUELTA**; Prospecting Agent **USD 1,00 por lead recomendado**. Las que no resuelven no cuestan |
-| **Loop Marketing** | La metodología con que HubSpot **enterró el funnel lineal** (INBOUND 2025). Cuatro etapas: **Express → Tailor → Amplify → Evolve**. Es el idioma que hay que hablar |
+| **Loop Marketing** | La metodología con que HubSpot **enterró el funnel lineal** (INBOUND 2025). Cuatro etapas: **Express → Tailor → Amplify → Evolve** (en español: Definición, Adaptación, Amplificación, Optimización). Es el idioma que hay que hablar. Desde 2026 tiene libro (*Loop: Outlearn. Outmarket. Outgrow.*) y medición propia (4 Rs) |
+| **Taste Profile** | Base de Loop 2026: un retrato del cliente y de la marca que le da a la IA el contexto para sonar como tú, no como todos |
+| **Buyer Sim** | El «clon IA» del perfil de cliente con que Loop 2026 mide la Resonance del contenido |
+| **4 Rs** | Scorecard de Loop 2026, una por etapa: Remarkability (Express), Resonance (Tailor), Reach (Amplify), Regeneration (Evolve); «un número por trimestre». La página en español aún usa otro scorecard |
 | **Growth Context** | Fundación de Fall Spotlight: contexto de negocio, equipo, clientes y procesos que alimenta resultados y agentes; no es un SKU ni prueba de calidad del portal |
 | **Context Home** | Superficie para revisar qué contexto usa HubSpot, detectar vacíos y corregir información que alimenta a Breeze y agentes |
 | **Self-updating Smart CRM** | Dirección/producto de Fall Spotlight para capturar llamadas, emails y reuniones y mantener registros actualizados; validar cobertura, permisos y plan |
