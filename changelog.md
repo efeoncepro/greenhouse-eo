@@ -2,6 +2,13 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-26 — Rooms: entorno de integración y conectores locales
+
+Sandbox propio de datos/medios/credenciales y launcher de personas fixture; SDKbrowser tipado sobre
+API canónica, CAS/idempotencia, sesiones y transfer seguro. Rama local sin publicación;250tests y18checks
+APIbrowserPASS, nueva UI pendiente. [Manual](docs/manual-de-uso/rooms/integrar-claude-design-local.md).
+Auth retenido en PR; ningún flag productivo, correo ni despliegue.
+
 ## 2026-10-26 — Rooms/Auth: estado, skills y contratos de integración conciliados
 
 Dossier, tres capas documentales, tareas/epics e índices alineados con backend Rooms publicado,
@@ -543,12 +550,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
   informe, marco de cuenta y plan distinguen diagnóstico base entregado, auditoría integral parcial y lote preparado.
 - Skills `sky-blog-seo`/`seo-aeo` espejadas y modelo de informes conservan cobertura/denominadores y baseline real;
   GSC anterior no disponible no bloquea profundizar. Actualización documental, sin cambios al sitio ni nuevas compras.
-
-## 2026-10-15 — OmniHuman: contrato API y routing de producción
-
-- [Manual](docs/manual-de-uso/creative-studio/omnihuman-2-api.md),
-  [funcional](docs/documentation/creative-studio/omnihuman.md) y
-  [auditoría](docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md) separan Vision AI de ModelArk,
-  AK/SK de IAM Bearer, capacidad publicada de acceso efectivo y permisos de imagen/voz.
-- Skills de imagen, motion, audio, derechos y flota canalizadas al contrato; sin activación, inferencia,
-  implementación CLI o promoción Globe. API300s y ficha UI120s quedan registrados por superficie.

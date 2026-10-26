@@ -16,6 +16,8 @@ La diferencia con otras capas de documentacion:
 
 ### Efeonce Rooms e identidad
 
+- [Integrar Claude Design en local](rooms/integrar-claude-design-local.md): entorno aislado y SDK tipado; sin publicación ni activación productiva.
+
 - [Operar Rooms en desarrollo](rooms/operar-primera-experiencia-local.md): sesiones y fixtures aislados, sin autoridad productiva.
 - [Operar el worker privado de imágenes](rooms/operar-worker-medios.md): Scheduler/Job, leases, comprobación y rollback.
 - [Invitación Rooms por correo y código](identity/operar-invitacion-rooms-email-otp.md): canary único ya comprobado; no repetir envíos ni activar por conectar diseño.

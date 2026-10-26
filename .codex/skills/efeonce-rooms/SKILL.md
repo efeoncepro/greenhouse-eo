@@ -39,6 +39,7 @@ Vercel. La identidad la pone Efeonce ID (skill `efeonce-auth`); Rooms es su prim
 | CLI de paridad | `scripts/rooms.ts` (`pnpm rooms …`: list, room, draft, editions, execute, validate, invitations y medios) |
 
 Comandos:
+- `pnpm integration:up`, `pnpm integration:status`, `pnpm integration:check` y `pnpm integration:stop`: entorno local exclusivo para Claude Design, fixture explícita; [manual](../../../docs/manual-de-uso/rooms/integrar-claude-design-local.md). No activa producción ni correo.
 - `pnpm verify`: lint, lint negativo, typecheck, test y build. Gate local de aplicación; CI de imagen Linux/decoder del worker ya integrado en main.
 - `pnpm test:e2e`, `pnpm db:local`, `pnpm db:migrate`, `pnpm db:smoke`, `pnpm db:recovery`.
 - `pnpm auth:integration`, `pnpm invitation:integration`.

@@ -10,6 +10,17 @@ Julio. Registro, QA y rollback en [Pipeline §11](docs/public-site/HUBSPOT_PIPEL
 trampas de QA (host.js del Growth CTA, engine.js del gráfico, categoría principal de la copia) en la skill del sitio
 público §17. Pendiente: mapa de átomos de marketing de contenidos; tanda 2: GA4 formularios y Excel→HubSpot (246072).
 
+## 2026-10-26 — Rooms: entorno local y conectores listos
+
+Rama runtime `codex/rooms-design-integration@2cddc98a`, sólo commit local. Next3216, PG55433 propio,
+issuer fixture19338 y datos/permisos sintéticos; SDKbrowser same-origin para DTO/commands/media/sesión.
+250testsPASS,lint/types/build y18checksAPIenChrome (imagen→publicación→guest,conflicto/replay/denegaciones);
+Playwright53PASS/3skip. [Manual](docs/manual-de-uso/rooms/integrar-claude-design-local.md),
+[evidencia](docs/audits/rooms/2026-10-26-local-design-integration.json).
+Queda conectar/aceptar UI Claude Design, entorno cloud si se decide y activación separada. AuthPR263/264
+OPEN sinmerge; producción no cambiada, sincorreo/push/deploy. Caché Next local puede regenerar archivos
+de tipos: revisar sólo sus cambios generados antes de commitear. Runtime limpio al checkpoint; entorno activo.
+
 ## 2026-10-26 — Rooms/Auth: continuidad documental y conexión Claude Design
 
 Estado y pendientes reconciliados en [dossier Rooms](docs/architecture/rooms/README.md),
@@ -279,13 +290,3 @@ prueba `event-emails-accepted-status.test.ts`, SQL contra PG real), **sin releas
 sólo recibe el envío + `ef_event_key`: sin objeto Marketing Events (token sin scopes, 403). **Decisión del operador:**
 diseñar Marketing Events y un posible webinar en Teams antes del próximo release; no lanzar eventos reales hasta entonces.
 El formulario de prueba sigue publicado para re-verificar y luego deprecarlo. Próximo paso: sesión nueva con RESEARCH-013.
-
-## 2026-10-24 — Nosotros: fidelidad, rieles de Ohio, mapa y wordmark HubSpot (en vivo)
-
-`/about-us-efeonce/` (249770, source-led desde el 2026-10-23) corregida en vivo: capa del host fiel al canvas, texto
-despejado del switcher Dark/Light y «Follow Us» desde 1181 px (`--gh-rail`), mapa sin parallax (las etiquetas quedan
-sobre sus ciudades), hero anclado al riel izquierdo en pantallas anchas y wordmark oficial de HubSpot en las cifras.
-Commits `7b57a9589`, `1991fe21d`, `c90171c9e` + runtime `b5f7a25`, `4a2bfd2`, `f5d730e`; backups
-`/tmp/eo-nosotros-widgets-before-*.tar` en Kinsta. **Pendiente por decisión del operador:** el mismo choque de rieles en
-Partners entre 1181 y ~1320 px. **Sin push** (develop adelantado; varias sesiones). TASK-1322 cerrada como superada;
-TASK-1369 recalibrada al remanente (JSON-LD `AboutPage`/`Organization`/`Person`, reslug `/nosotros`, GVC; fundación 2018).

@@ -30,7 +30,7 @@ Este documento describe contratos ejecutables, no una composición visual ni una
 
 | Entrega | Owner | Criterio de salida |
 | --- | --- | --- |
-| Entorno aislado y datos/permisos de integración | Codex backend, coordinado con quien integra | Nueva UI prueba sesiones/estados de forma controlada sin activar clientes ni reutilizar la sala archivada como sala activa |
+| Entorno local aislado y conectores | Codex backend: preparado en rama local `codex/rooms-design-integration` | Next3216, PG55433, issuer fixture19338, dos organizaciones, SDKbrowser y18comprobaciones API PASS; nueva UI aún por conectar |
 | Conectores de pantalla a DTO/readers/commands | Claude Design / integrador con apoyo backend | Listado, borrador, upload, estado, attach, preview, publicación y lector consumen la API existente; permisos vienen del servidor |
 | Recorrido completo desde la nueva UI | Ambos | Cargar→verificar→procesar→adjuntar→publicar→leer; conflictos, expiración, denegación y revocación verificados |
 | Acceso general de producción | Operador / Platform | Aceptación y decisión explícita de flags/cohorte; Auth permanece en PR hasta nueva instrucción |
@@ -38,11 +38,21 @@ Este documento describe contratos ejecutables, no una composición visual ni una
 Integrar el frontend dentro del runtime Rooms y su **mismo origen**. Un artifact o preview en otro
 origin no es un consumidor autenticado habilitado: cookies, Origin exacto y CORS GCS no deben relajarse.
 `cloud-production` exige Vercel Production/WIF exactos; Vercel Preview no puede heredar credenciales o
-permisos de Production. El entorno de integración sigue pendiente: no afirmar que ya hay un staging listo.
+permisos de Production. El entorno local está preparado; no hay un staging cloud habilitado. [Arranque y SDK](../../manual-de-uso/rooms/integrar-claude-design-local.md).
 
 Para el primer recorrido ya existen los servicios de backend; no depende de completar todo EPIC-052.
 PDF/audio/video, presentación avanzada, colaboración, CRM y MCP conservan sus unidades futuras; no
 incluirlos como capacidades disponibles sólo porque el contrato V1 los enumera.
+
+## Implementación local disponible para Claude Design
+
+Rama `codex/rooms-design-integration`, commit `2cddc98a`, sin push ni deploy. Conectores browser-safe
+`src/client`: readers, commands tipados/revisión/idempotencia, sesión/contexto, SHA y transferencia segura.
+DTOs type-only derivados de las fuentes canónicas; bundle sin runtime server/fixtures. Prueba real con
+navegador de los conectores: upload→worker local→attach→publish→lectura privada guest, negativas de
+operador/cross-tenant/draft/workspace/anon y conflicto/replay. Esto verifica API en navegador, no la nueva UI.
+[Manual](../../manual-de-uso/rooms/integrar-claude-design-local.md) y [evidencia](../../audits/rooms/2026-10-26-local-design-integration.json).
+El launcher local es una fixture de acceso sin correo/Microsoft reales; no sustituye ni repite el canary cloud.
 
 ## Identidad y límites de consumidor
 

@@ -5,6 +5,10 @@
 [efeonce-rooms.vercel.app](https://efeonce-rooms.vercel.app/demo). `rooms.efeonce.org` sigue siendo el
 subdominio acordado; su DNS no se declara activado.
 
+**Continuidad local de integración:** rama `codex/rooms-design-integration` (`2cddc98a`), sin push/deploy:
+entorno propio3216/55433/19338 y conectores browser-safe disponibles;250testsPASS y18comprobaciones
+API en navegador. Claude Design aún debe conectar/aceptar su UI. [Manual local](../../manual-de-uso/rooms/integrar-claude-design-local.md).
+
 **Propósito:** plataforma comercial propia para comprender, evaluar y defender propuestas creativas y
 SEO/AEO, combinables en una sala. La implementación actual no acredita todo el alcance de V1/EPIC-052.
 
@@ -13,7 +17,7 @@ SEO/AEO, combinables en una sala. La implementación actual no acredita todo el 
 | Backend/API/CLI | Salas, borradores y ediciones inmutables V1/V2/V3; autoridad persistida y `can`; revisión/idempotencia, auditoría/outbox; lectores y comandos compartidos | Autoría visual completa, presentación, colaboración, integraciones y MCP del roadmap |
 | Identidad e invitación | Canary real conjunto Efeonce ID/Microsoft/MFA, un correo enlace+código, sesión guest, lectura y revocación | Flags humanos OFF; sala del canary archivada/invitación revocada; no repetir correo ni ampliar cohorte |
 | Medios | GCS privado, PUT directo, verificación de bytes/generación y dos WebP desde un PNG físico; entrega GET/HEAD/Range/304 reautorizada | Consumidor de la nueva interfaz; PDF/audio/video y originales descargables no pertenecen al corte de imágenes |
-| Operación cloud | Ocho migraciones/26 tablas; SA/rol propio worker; Scheduler OIDC cada minuto, sólo arranca Job con demanda; lease10min, timeout240s/retries0 | Activación general y entorno de integración de la nueva UI separados |
+| Operación cloud | Ocho migraciones/26 tablas; SA/rol propio worker; Scheduler OIDC cada minuto, sólo arranca Job con demanda; lease10min, timeout240s/retries0 | Entorno local preparado; nueva UI, staging cloud y activación general separados |
 | Diseño e interfaz | Scaffold y demo sintética; primitives/logo oficiales AXIS/La órbita | Claude Design posee interfaz; conexión y aceptación visual humana pendientes |
 | Auth deploy-control | Corrección preparada en PR263/264 de Greenhouse | Operador exige conservarlas en PR, sin merge main/develop ni deploy; no release262 |
 

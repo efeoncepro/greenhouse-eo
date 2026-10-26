@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Canary real 2026-10-26 PASS: Efeonce ID con Microsoft/MFA, PNG físico de 3.010.606 bytes por PUT GCS, worker a dos WebP, preview 304.540 bytes 1122x1402 con SHA/ETag/SQL coincidentes. Un correo recibido en Outlook, código válido abre sala V3 e imagen, incorrecto/replay/otro espacio/borrador denegados; revocación niega sala e imagen. Sala archivada, flags web/Auth y correo OFF restaurados. Main e4b2e890 (PR3) añade disparador privado de Cloud Scheduler, flags humanos OFF; migración8 y worker por digest desplegados. Disparo automático verificado: Scheduler OIDC200 en vacío,202 con demanda, un Job4r9nz exitoso, cola vacía y ack cercado; sin nuevo correo ni imagen. Tooling b2f90fa local preservado. Consumidor frontend Claude Design pendiente; Auth deploy-control PR263/264 retenidas por operador, sin merge/deploy. Sin cierre de rollout general.`
+- Status real: `Canary real 2026-10-26 PASS: Efeonce ID con Microsoft/MFA, PNG físico de 3.010.606 bytes por PUT GCS, worker a dos WebP, preview 304.540 bytes 1122x1402 con SHA/ETag/SQL coincidentes. Un correo recibido en Outlook, código válido abre sala V3 e imagen, incorrecto/replay/otro espacio/borrador denegados; revocación niega sala e imagen. Sala archivada, flags web/Auth y correo OFF restaurados. Main e4b2e890 (PR3) añade disparador privado de Cloud Scheduler, flags humanos OFF; migración8 y worker por digest desplegados. Disparo automático verificado: Scheduler OIDC200 en vacío,202 con demanda, un Job4r9nz exitoso, cola vacía y ack cercado; sin nuevo correo ni imagen. Tooling b2f90fa local preservado. Entorno local aislado y SDK preparados en codex/rooms-design-integration@2cddc98a sin push/deploy:250testsPASS,18checksAPIbrowser yPlaywright53PASS/3skip; conexión/aceptación de la nueva UI Claude Design pendientes. Auth deploy-control PR263/264 retenidas por operador, sin merge/deploy. Sin cierre de rollout general.`
 - Rank: `R05 cloud después del circuito local2070; frontend2071 conserva ownership separado`
 - Domain: `platform|data|content|ops`
 - Blocked by: `none`
@@ -28,6 +28,18 @@
 Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
 
 El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+
+## Siguiente corte autorizado26Oct — entorno y conectores
+
+Corte ejecutado: [evidencia local](../../audits/rooms/2026-10-26-local-design-integration.json) y [manual](../../manual-de-uso/rooms/integrar-claude-design-local.md); no es aceptación de la nueva UI ni rollout cloud.
+
+Operador solicita ejecutar entorno local aislado y cliente tipado para Claude Design con subagentes,
+cuidando cuota. Plan: (1) cluster/datos/sesiones/medios propios y launcherloopback; (2) conectores
+browser-safe tipados same-origin con revisión/idempotencia y transferencia segura; (3) prueba focal
+integrada sobre APIs reales, negativas de scope y cleanup de procesos; (4) manual/ledger y evidencia.
+Auth permanece en PR, sin código ni flags remotos. Runtime de trabajo `codex/rooms-design-integration`,
+sin push ni despliegue; la interfaz de producto no pertenece a este corte. ADR incremental en
+[contrato de entorno](../../architecture/rooms/EFEONCE_ROOMS_CLOUD_RUNTIME_PILOT_DECISION_V1.md).
 
 ## Summary
 

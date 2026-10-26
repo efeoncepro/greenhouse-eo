@@ -188,3 +188,33 @@ o el piloto solicita una cohorte nueva. Cada caso exige revisión, no ampliació
 Autorización: operador indicó usar jreyes@efeoncepro.com y continuar coordinado con peer Auth después
 del goal de producción controlada. No amplía clientes ni migración Greenhouse. El peer Auth crea
 rooms-production-auth-client-secret y HMACOTP propio; Rooms posee las otras cinco refs para evitar duplicación.
+
+## Entorno local de integración Claude Design — decisión incremental26Oct2026
+
+El operador autoriza entorno aislado y conectores, con Auth retenido en PR y sin activar producción.
+La integración inicial se ejecuta sólo en loopback: Next real3216, issuer fixture19338 y PostgreSQL
+local55433 en cluster propio `.local/design-integration`, sin compartir el cluster de tests55432.
+Mismo nombre lógico rooms_local y roles propios compatibles con el validador local; ocho migraciones
+actuales. Credenciales/estado0600 en carpeta0700 ignorada; datos sintéticos y grants acotados por recurso.
+
+El launcher/supervisor vive en tooling de scripts, nunca en rutas ni composición productiva. Actores
+internos usan el consumer OAuth/OIDC canónico contra issuer fixture con PKCE/nonce; invitado usa una
+sesión fixture offline limitada a sala/edición, resuelta por las mismas primitives de autorización.
+No se declara conformance de Efeonce ID, correo entregado ni nuevo canary real. Nada de bearer/cookie
+en localStorage, roles confiados desde el browser o fallback de identidad en la API. Ningún secreto
+WIF/GCP/Resend ni lectura de configuración productiva. Rechazar VERCEL, perfiles cloud y destinos externos.
+
+Media local usa raíz exclusiva del sandbox, override permitido sólo por el guard local ya existente;
+configuración GCS/Production se conserva intacta. Worker finito de desarrollo atiende una cola propia
+con frecuencia acotada, sin Cloud Scheduler ni sweep destructivo automático. Start/status/stop sólo
+controlan procesos/paths propios, nunca el dev server o DB de otra sesión. Conservar datos al detener.
+
+Cliente tipado browser-safe same-origin sobre readers/commands/DTO existentes: idempotencia explícita,
+revisión, errores saneados, cancelación y límites de transfer. Tipos server se pueden reutilizar sólo
+como type-only borrados del bundle; no importar runtime server/fixtures al cliente. PUT a GCS sólo
+según descriptor exacto, sin Cookie/Authorization/Content-Length manual ni persistir URL firmada.
+
+Validación: guardas negativas, login/cookies reales contra fixture, aislamiento de dos organizaciones,
+permisos de administrador/operador/invitado, flujo de imagen y publicación por API/conectores. Pruebas
+focales y gates del repo proporcionados; aceptación de la nueva UI queda en Claude Design.
+No push/main/deploy, no merge Auth y ningún flag remoto se modifica por este entorno.

@@ -3,6 +3,21 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-26 — Entorno local y conectores preparados para Claude Design
+
+- `local`: rama `codex/rooms-design-integration`, commit `2cddc98a`, sin push/deploy. Next3216,
+  PG propio55433 y issuer fixture19338;8migraciones, dos organizaciones, admin/operator y guest RoomA.
+  Medios/caché/credenciales propios; child-env allowlist, guardhosted/cloud y estados privados0600.
+- `local`: `src/client` tipado, readers/commands con CAS/idempotencia, errores/abort/timeout y PUT seguro.
+  Bundle browser sin runtime server/fixtures.250testsPASS0skip,lint/types/build; Playwright53PASS/3skip.
+ 18checksAPIbrowserPASS: upload→worker→attach→publish→guestimagen, denegaciones, conflicto y replay.
+- `local`: up idempotente/stop con puertos libres+PG detenido/up inmediato conservan datos. Entorno running.
+  Login fixture sigue PKCE/nonce/iss/claims del consumer real; guest es fixture offline, sin OTP/correo.
+- La nueva UI aún no está conectada ni aceptada; no nuevo canary GCS/ID, no restorecloud8. AuthPR263/264
+  siguen abiertas y retenidas; producción/main e4b2e890 y flags remotos no cambiados.
+  [Manual](../../../../docs/manual-de-uso/rooms/integrar-claude-design-local.md),
+  [prueba](../../../../docs/audits/rooms/2026-10-26-local-design-integration.json).
+
 ## 2026-10-26 — Contrato para integrar Claude Design y documentación sincronizados
 
 - `doc`: dossier, ADRs, manuales y contrato frontend distinguen corte ejecutado de roadmap V1 e historia.
