@@ -16,6 +16,24 @@ hierarchy is an editorial/URL relation, not a home-page ranking: a root term is
 not automatically featured and does not automatically become a post's Yoast
 primary category.
 
+## Antes de cambiar la URL de un post que pierde posiciones (2026-10-26)
+
+Cambiar la URL de un post que ya pierde posiciones tiene un costo: unas semanas de
+bajón, un 301 que queda para siempre y citas de los motores de IA que tardan en
+migrar a la URL nueva. Refrescar el contenido no exige cambiar la URL; cambiarla es
+una decisión aparte del operador, tomada con ese costo a la vista.
+
+Caso fuente: SEO y AEO (248463) se republicó el 2026-10-25 en `/aeo/seo-y-aeo/`
+con un 301 desde `/loop-marketing/seo-aeo-optimizacion-ia-2025/`, por decisión del
+operador; después, la sesión de Analytics recomendó no cambiar la URL. Si se cambia:
+
+- una persona pide la indexación de la URL nueva en Search Console (no hay API para
+  eso, ver `agentic-blogpost-end-to-end.md` §11);
+- revisa los backlinks que apuntan a la URL vieja;
+- sigue las dos URLs cada semana contra una línea base fechada (en 248463:
+  la foto del 24-oct, 141 impresiones en posición 21,5, contra 1.051 en la 12,6 de
+  la ventana anterior).
+
 ## Contents
 
 1. Non-negotiable rules

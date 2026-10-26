@@ -160,8 +160,13 @@ Sólo neutralizan o completan lo que el tema le hace al marcado nativo:
 - Un Recuadro tiene entre 2 y 6 ítems cortos; una lista larga de definiciones queda como lista normal.
 - Las tablas nuevas van con la Tabla Efeonce. Encabezados cortos: en el celular son la etiqueta de cada dato.
 - Las imágenes cuadradas o diagramas angostos van con `align: "center"`.
-- Las menciones siguen siendo para servicios y productos de Efeonce. En el blog se usan pocas y en el cierre; el resto
-  van como enlaces normales.
+- Las menciones son para servicios y productos de Efeonce. Desde el 2026-10-26 (regla de Julio, voz §4.6), **todo
+  enlace del cuerpo a una landing, servicio o producto de Efeonce va como mención**, esté donde esté; antes se usaban
+  pocas y sólo en el cierre. Los enlaces a artículos y a fuentes van como enlace en negrita.
+- Desde el 2026-10-26 la Content Factory falla en vez de descartar en silencio: Pasos sin `ordered: true` da
+  `content_factory_article_list_steps_requires_ordered`, y un `kind` desconocido da
+  `content_factory_article_block_kind_unknown:<kind>`. No existe un bloque `heading`: un H3 es una sección con
+  `level: 3`.
 
 ## En producción (2026-10-24)
 

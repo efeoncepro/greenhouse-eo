@@ -186,7 +186,9 @@ file. Do not open a parallel ad hoc SCP path.
 WordPress may canonicalize emoji in raw content. A confirmed example is
 `🍏` becoming `&#x1f34f;` before the frontend renders `img.emoji[alt="🍏"]`.
 Accept this only after proving the exact byte diff and unchanged structure; do
-not weaken the normal post hash guard.
+not weaken the normal post hash guard. Para comparar el contenido guardado con el
+autorado (QA de fusión, 2026-10-26), normaliza las entidades en los dos lados
+antes de calcular el hash: la diferencia sólo por emojis no es drift.
 
 ## 6. Media Contract
 
@@ -228,7 +230,9 @@ Assign featured and social media deliberately:
      slider title falls over the cover's baked-in text;
   3. **rail card** (`_eo_card_image` / `_eo_card_focus`, live 0.4.5): the plate PNG 2560 × 1440 as is, with
      `pnpm public-website:blog-home card <post> --image <plate> --alt "…" --focus "84% 30%"`. The featured image
-     never changes for the card (it stays the OG image). A post under 12 minutes skips this upload;
+     never changes for the card (it stays the OG image). A post under 12 minutes skips this upload. `84% 30%` es
+     el foco de una placa con el sujeto a la derecha; si el sujeto cae en otro lugar, recalcúlalo con la fórmula de
+     `blog-home-operation.md` (caso 248398, 2026-10-26: `71% 50%`);
 - sizes, safe zones per surface (cover, slider, card, plate) and OG per platform live in
   `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`; cover craft in
   `docs/manual-de-uso/creative/producir-portada-de-articulo-del-blog.md`; command detail in `blog-home-operation.md`;
@@ -348,6 +352,14 @@ relevant Kinsta cache and execute the critical live checks. On the first failed
 critical check, automatically restore `private`, purge again, verify anonymous
 non-disclosure, and report the failure. Do not leave a partially verified post
 public and do not retry until the cause is corrected.
+
+**Coordinación con las sesiones del blog (2026-10-26).** Antes de escribir en el
+sitio, avisa a las cuatro sesiones que trabajan el blog y a la de Analytics, que
+mantiene `scripts/public-website/blog-post-cover-apply.php`. Desde el 2026-10-26
+las cuatro autorizaron **purgar la caché después de republicar contenido** sin
+consultarles, siempre que no tengan un despliegue en curso. Un despliegue de
+plugin sí se les avisa antes. Esa autorización cubre la purga, no la
+publicación: cada publicación sigue necesitando el visto bueno del operador.
 
 ## 11. Live Readback and Cache Verification
 
@@ -475,6 +487,59 @@ Photo rights: third-party launch images were published with credit and without a
 license by explicit operator decision for this case. That is not a general
 authorization; every future article needs its own rights decision (§1).
 
+## 16. Fusión de dos posts en un pilar (caso 248483 → 248398, 2026-10-26)
+
+Úsalo cuando dos posts compiten por la misma intención y uno absorbe al otro. Los
+IDs son evidencia del caso, no valores por defecto. El detalle del caso vive en
+`docs/public-site/LOOP_MARKETING_REFRESH_DRAFT_V1.md` §0–§4 y sus deltas.
+
+1. **Inventario de visuales antes de escribir.** Lista los diagramas, videos,
+   gráficos, destacados y portadas de los dos originales y decide uno por uno.
+   Vuelven los que aportan (en 248398 volvieron el diagrama `Loop-MKT.svg`, media
+   248439, y los dos videos de HubSpot). No vuelven los destacados con cifras sin
+   fuente. Las portadas se rehacen.
+2. **Una sola operación con guardas.** El script del caso (`ai-generations/2026-10-26_loop-marketing/publicacion/merge-publish.php`,
+   one-off) verificó 14 guardas sobre los dos posts antes de tocar nada: estado,
+   slug, `post_modified_gmt`, sha del contenido, título Yoast, rutas y que no
+   hubiera redirecciones previas en el origen ni en el destino.
+3. **Respaldo de los dos posts** en opciones `_gh_post_refresh_<id>_<UTC>` (pilar)
+   y `_gh_post_merge_<id>_<UTC>` (absorbido).
+4. **El absorbido pasa a borrador, nunca a la papelera:** queda recuperable y sale
+   del índice y del sitemap. Su slug se conserva.
+5. **301 plain de Yoast Premium** (`WPSEO_Redirect_Manager`, ver
+   `taxonomy-permalink-migrations.md` §4) desde la ruta del absorbido al pilar,
+   creado **después** de pasarlo a borrador. Luego reindexa los dos con el
+   `Indexable_Builder` de Yoast.
+6. **Lectura de vuelta:** borrador, slug conservado, 301 y metas del pilar.
+7. **Enlaces internos al absorbido:** reescríbelos con
+   `scripts/public-website/blog-post-content-republish.php` (simulación y después
+   `apply`). Si una frase citaba los dos posts, **quita el enlace duplicado** en
+   vez de apuntar dos veces al pilar (caso: inbound 244765, «…en ¿Qué es Loop
+   Marketing? y en cómo ejecutarlo…»). Actualiza también la spec del repo de cada
+   post reescrito.
+8. **QA en vivo de la fusión:** 200 en el pilar; 301 en un solo salto desde la URL
+   vieja, con y sin barra final y conservando `utm_*`; canonical, `og:image` con
+   alt, `summary_large_image` y schema con el titular nuevo; sitemap con `lastmod`
+   del día y sin la URL vieja; Playwright en 1440 y 390 (un H1, 0 desborde, 0
+   imágenes rotas, iframes y gráficos visibles); `blog-home verify --browser`; y
+   `blog-home slider`, que muestra que un post refrescado no entra al slider si su
+   fecha no cambió.
+
+**Trampas de QA que aparecieron en el caso:**
+
+- el hash del contenido guardado difiere sólo por emojis (`🍏` → `&#x1f34f;`):
+  compara normalizando entidades (§5);
+- `apply_filters('the_content')` por wp-cli no resuelve los oEmbed (su caché vive
+  en post meta `_oembed_*`); el navegador real sí. Para una vista previa de
+  servidor, inyecta los iframes a mano;
+- justo después de purgar, la primera lectura anónima puede devolver la versión
+  vieja: repite la lectura o agrega `?nc=<ts>` antes de dar por mala la publicación;
+- Playwright con `waitUntil: 'networkidle'` agota el tiempo con iframes de
+  YouTube: usa `load`;
+- un gráfico Efeonce (por ejemplo «7 de cada 100») figura vacío si la prueba no se
+  detiene sobre él, porque se dibuja cerca del viewport: haz scroll hasta el
+  gráfico y espera antes de capturar.
+
 ## Definition of Done
 
 - [ ] Final spec, research, claims, rights, CTA, and visible author were approved.
@@ -498,6 +563,7 @@ authorization; every future article needs its own rights decision (§1).
 - [ ] Each pullquote uses the right variant: Destacado for our thesis (bold landing phrase, no quotes), Cita only with a real author in `cite`.
 - [ ] Each chart has a conclusion title, a verifiable source, one highlighted entity and its «Ver los datos» table; it rendered in headless Playwright (desktop and 390 px).
 - [ ] A post created private and published later carries the publication date, read back from WordPress.
+- [ ] En una fusión: visuales de los originales inventariados, absorbido en borrador con 301 de un salto, enlaces internos reescritos sin duplicar y QA de §16 completa.
 - [ ] Playwright desktop and mobile passed render, TOC, image, console, and overflow checks.
 - [ ] Final anonymous robots, canonical, schema, Open Graph, and social image passed.
 - [ ] Final URL appears in the correct sitemap with an honest `lastmod`; any GSC observation is reported separately.

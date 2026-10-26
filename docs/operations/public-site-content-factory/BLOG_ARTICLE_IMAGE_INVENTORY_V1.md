@@ -1,7 +1,7 @@
 # Inventario de imágenes por artículo del blog
 
 > **Tipo de documento:** Norma operativa (inventario y especificación)
-> **Version:** 1.4 (relacionados al pie del artículo y superficies sin imagen)
+> **Version:** 1.5 (delta 2026-10-26: el foco de la tarjeta se recalcula con la fórmula. 1.4: relacionados al pie del artículo y superficies sin imagen)
 > **Creado:** 2026-10-24 por Claude, a pedido del operador («cuántas imágenes para todas las posiciones … y sus
 > características por cada artículo que se haga»)
 > **Alcance:** artículos de Marketing con Manzanitas en `efeoncepro.com/blog`. Glitch tiene sus propias piezas
@@ -278,6 +278,21 @@ pnpm public-website:blog-home card <post> --image <plate.png> --alt "<alt>" --fo
 | Archivo | **el plate tal cual** (2560 × 1440), sin texto y sin recorte propio. La destacada no cambia y sigue siendo la OG |
 | Punto focal | con la cara al 71 % del plate, **84 % 30 %**: se ve del 49 % al 91 % del plate en escritorio y tablet, y del 57 % al 89 % en el teléfono. Si la cara cae en otro lugar, recalcula |
 | Subida | `blog-home card` (plan, estado anterior, ledger y lectura de vuelta) o el panel «Imagen de la tarjeta del riel» del editor |
+
+**Delta 2026-10-26 — el foco se recalcula con la fórmula.** «84% 30%» vale sólo con la cara en torno al 71 % del
+plate. Si el sujeto cae en otro lugar (siempre pasa en una portada sin persona), se recalcula: la tarjeta muestra el
+plate entero de alto, así que `ventana = ancho de la tarjeta / ancho del plate escalado a la altura de la tarjeta`, y lo
+visible va de `left = foco × (1 − ventana)` a `left + ventana`. Se calcula en escritorio (440 × 600) y en el teléfono
+(304 × 540), y el sujeto tiene que quedar entero en los dos. Si hace falta subir el sujeto, primero se recortan píxeles
+de arriba del plate. Casos publicados:
+
+- *SEO y AEO*: plate sin los 380 px de arriba, `--focus "75% 50%"`. Se ve x 52–83 % en escritorio y tablet, y x 58–81 %
+  en el teléfono (medido el 2026-10-25).
+- *Qué es Loop Marketing*: plate sin los 200 px de arriba, `--focus "71% 50%"`, con la figura en x 58–73 % del plate.
+  Según la fórmula se ve x 46–81 % en escritorio y x 52–79 % en el teléfono (calculado, no medido en vivo). El `hero`
+  es el recorte x 0–2080 · y 150–1190 del plate, con la figura en x 71–90 %, a la derecha del título.
+
+Paso a paso: [manual de la portada, «Recalcular el foco de la tarjeta y el recorte del `hero`»](../../manual-de-uso/creative/producir-portada-de-articulo-del-blog.md#recalcular-el-foco-de-la-tarjeta-y-el-recorte-del-hero).
 
 ## 5. Imágenes del cuerpo
 

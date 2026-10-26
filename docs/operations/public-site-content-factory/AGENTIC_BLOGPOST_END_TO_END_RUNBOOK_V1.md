@@ -682,12 +682,34 @@ evita abrir una segunda vía SCP/SSH ad hoc y mantiene el mismo preflight/cleanu
 El hash authored puede diferir del hash raw de WordPress por normalizaciones deterministas. Caso confirmado:
 WordPress convierte cada `🍏` a `&#x1f34f;` al persistir (`15` bytes de diferencia para tres emojis) y el frontend
 lo renderiza como `img.emoji[alt="🍏"]`. Aceptar una equivalencia sólo si se demuestra el diff exacto y el resto
-de los bytes/estructura coincide; nunca relajar el guard porque “WordPress suele normalizar”.
+de los bytes/estructura coincide; nunca relajar el guard porque “WordPress suele normalizar”. Para la QA de vuelta
+(2026-10-26), normalizar las entidades en los dos lados antes de calcular el hash.
 
 El script temporal debe fallar si no coinciden ID, manifest, owner o hash. Debe eliminarse local y remotamente
 al terminar; el wrapper ya elimina su copia remota por defecto.
 
 **Gate:** snapshot recuperable, guard pre-write, readback independiente y post aún `private`.
+
+#### 9.1 Refresh y fusión de posts publicados (delta 2026-10-26)
+
+**Regla de refresh:** al refrescar o fusionar, inventariar los visuales de los originales (diagramas, videos,
+gráficos, destacados, portadas) y decidir uno por uno. Vuelven los que aportan: diagramas y videos valen. No vuelven
+los destacados con cifras sin fuente. Las portadas se rehacen. Caso: en el pilar Loop 248398 volvieron el diagrama
+`Loop-MKT.svg` (media 248439) y los dos videos de HubSpot.
+
+**Fusión de dos posts en un pilar** (caso 248483 → 248398): una sola operación con guardas sobre los dos posts
+(estado, slug, `post_modified_gmt`, sha del contenido, título Yoast, rutas y ausencia de redirecciones previas en
+origen y destino); respaldo de los dos en opciones `_gh_post_refresh_<id>_<UTC>` y `_gh_post_merge_<id>_<UTC>`; el
+absorbido pasa a **borrador**, nunca a la papelera (recuperable, fuera del índice y del sitemap, slug conservado);
+después, 301 plain de Yoast Premium desde su ruta al pilar y reindexación con el `Indexable_Builder`. Los enlaces
+internos al absorbido se reescriben con `scripts/public-website/blog-post-content-republish.php` (simulación y después
+`apply`); si una frase citaba los dos posts, se quita el enlace duplicado en vez de apuntar dos veces al pilar, y se
+actualiza la spec del repo. Pasos, QA de la fusión y trampas:
+`.claude/skills/efeonce-public-site-wordpress/references/agentic-blogpost-end-to-end.md` §16. Detalle del caso:
+`docs/public-site/LOOP_MARKETING_REFRESH_DRAFT_V1.md` §0–§4.
+
+**Gate:** visuales inventariados, absorbido en borrador con 301 de un salto, enlaces internos reescritos y QA de la
+fusión completa.
 
 ### Fase 10. Sistema visual, GPT Image 2 y Media Library
 
@@ -911,6 +933,9 @@ El artículo debe responder:
 Casos propios incluyen método, periodo, muestra, mercados, permisos y límites. No presentar un caso observado
 como experimento controlado ni una mejora local como garantía universal.
 
+La transparencia no incluye exponer en público la caída de posiciones o de tráfico de un contenido propio (decisión
+del operador, 2026-10-26); la regla vive en `.claude/skills/copywriting/efeonce/JULIO_REYES_VOICE_SYSTEM.md`.
+
 #### 11.4 Entidad de autor Yoast
 
 Antes de publicar, inspeccionar el nodo `Person` que Yoast enlaza desde `Article/BlogPosting`:
@@ -1060,6 +1085,11 @@ purge con secretos.
 
 No purgar caché como efecto lateral de dry-run o de una iteración privada que no afecta render público.
 
+Justo después de purgar, la primera lectura anónima puede devolver la versión vieja: repetir la lectura o agregar
+`?nc=<ts>` antes de juzgar el resultado. Coordinación (2026-10-26): las cuatro sesiones del blog autorizaron purgar
+después de republicar contenido sin consultarles, mientras no tengan un despliegue en curso; un despliegue de plugin
+sí se les avisa antes, igual que a la sesión de Analytics, que mantiene `blog-post-cover-apply.php`.
+
 #### 13.4 Falla durante publicación
 
 - Si el write no devuelve readback: estado desconocido; inspeccionar antes de reintentar.
@@ -1106,6 +1136,13 @@ Verificar al menos:
 - consola sin errores relevantes.
 
 Una captura `fullPage` puede ocultar overflow horizontal. Medir `scrollWidth`; no inferirlo de la imagen.
+
+Trampas de render (delta 2026-10-26):
+
+- `apply_filters('the_content')` por wp-cli no resuelve los oEmbed (su caché vive en post meta `_oembed_*`); el
+  navegador real sí. Para una vista previa de servidor, inyectar los iframes a mano;
+- Playwright con `waitUntil: 'networkidle'` agota el tiempo con iframes de YouTube: usar `load`;
+- un gráfico Efeonce se dibuja cerca del viewport: si la prueba no se detiene sobre él, figura vacío.
 
 #### 14.3 Links y CTA
 

@@ -233,7 +233,7 @@ rehacerla, no memorizarla. Por eso la calculadora vive en `templates/tier-calcul
 
 | Cuándo | Módulo |
 |---|---|
-| Qué vendes hoy: Hubs, Breeze, seats, créditos, onboarding fees, Loop Marketing, y **dónde HubSpot no llega** | `modules/01_PRODUCTO_2026.md` |
+| Qué vendes hoy: Hubs, Breeze, seats, créditos, onboarding fees, Loop Marketing (Loop 2026: Taste Profile y 4 Rs, ledger en `SOURCES.md` § Loop Marketing 2026), y **dónde HubSpot no llega** | `modules/01_PRODUCTO_2026.md` |
 | Cómo se gana plata y cómo se sostiene el tier: comisión, deal-based model, puntos, growth markets, deal registration, POI | `modules/02_ECONOMIA_PARTNER.md` |
 | **El motor de libro**: managed ops, la regla de los 60 días, GRR, expansión, QBR | `modules/03_MOTOR_LIBRO.md` |
 | A quién le vendes: ICP, señales de compra, comité, triggers regulatorios | `modules/04_ICP_Y_SENALES.md` |

@@ -103,6 +103,19 @@ pnpm public-website:content-factory:post-tool -- edit-pullquote --post-url <url>
 - **La órbita design of those styles (0.4.2, live 2026-10-24) and the line per post (0.4.3):** colors only from `efeonceGraphicLine` (navy `#023c70` text on paper, white on dark; paper `#f7f8f6` / `#001a33` for the Recuadro). The accent is the **post's topic line**, published per post as `--eo-line-on-light` / `--eo-line-on-dark` by `EO_CM_Util::line_of()` — the same resolver the blog home uses for its card, so article and card match. The accent goes only in graphics (≥ 3:1) or text ≥ 24 px: the FAQ question stays navy and only its ring takes the accent (never filled); the Pasos number is 28 px in the accent with no disc; the Destacado (0.8.0) opens with the ring and closes with the accent sphere in place of the final period, one sphere per pullquote; the Recuadro bullet is a short ink dash. In dark mode, article links are white and underlined. A post whose line differs from its category's (Paid Media is Voice, HubSpot is Revenue) gets `_eo_line`, written only with `pnpm public-website:blog-home line <post> <growth|brand|engine|voice|revenue-hubspot|revenue-salesforce|off>` — never by changing the primary category (it changes the URL). Manual: `docs/manual-de-uso/public-site/operar-portada-blog-por-cli.md`.
 - **Images per article (2026-10-24, inventory v1.4):** a new Marketing con Manzanitas post enters the `/blog/` slider (`EO_Home_Readers::build_featured`: newest posts with image, not Glitch/Novedad) and the «Para leer con calma» rail (`EO_Home_Readers::rail`: the 4 newest reads ≥ 12 min or podcast, not Glitch/Novedades) **on its own**, so it ships **3 files and 3 uploads**: (1) the textless plate PNG 2560 × 1440 → rail card image with `pnpm public-website:blog-home card <post> --image <plate> --alt "…" --focus "84% 30%"` (`_eo_card_image` / `_eo_card_focus`, live in 0.4.5); (2) the cover JPEG 2400 × 1260 < 300 KB = featured + Yoast OG + X fallback + schema `primaryImageOfPage` + the square «Te puede interesar» related-posts thumbnail, uploaded with `scripts/public-website/blog-post-cover-apply.php`; (3) the slider `hero` WebP 2:1 2400 × 1200 cropped from the plate, no text, with `blog-home hero`. Body images 0–2, only when they explain. Without `--apply` both `blog-home` commands only print the plan; `--apply` needs the operator's go. `og:image:alt` / `twitter:image:alt` (taken from the cover `alt`) are published by `efeonce-editorial-blocks` 0.4.6 (live since 2026-10-24). Sizes, safe zones per surface and OG per platform: `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
 - **Code samples (2026-10-24):** use `{ kind: 'code', code }` → native `core/code`, escaped like the block editor (`&`, `<`, `>` and `[` → `&#91;`), newlines kept, CRLF normalized. Plain text only. Publish only code that was run against real cases and say where it was not tested (a live portal, a locale).
+- **El spec falla en voz alta (2026-10-26, `article-authoring.ts`):**
+  - un `kind` que el renderer no conoce lanza `content_factory_article_block_kind_unknown:<kind>`; antes se
+    descartaba en silencio. Caso fuente: los H3 se perdieron porque **no existe un bloque `heading`**. Un H3 es una
+    sección con `level: 3` (`{ heading, level: 3, blocks }`). Prueba: `__tests__/article-authoring-chart.test.ts`;
+  - `list` con `style: "steps"` exige `ordered: true`; si falta, `content_factory_article_list_steps_requires_ordered`;
+  - un segmento con `strong: true` y `href` sale como `<a><strong>…</strong></a>`; con `mention` sale como píldora
+    `a.axis-mention` (sólo https sobre efeoncepro.com o efeonce.org);
+  - **embed de YouTube (commit `d210c8aa0`):** la URL va en su propia línea dentro de
+    `<div class="wp-block-embed__wrapper">` (`\nURL\n`), como la guarda el editor. Pegada al `div`,
+    `WP_Embed::autoembed` no la convierte en reproductor y el post en vivo muestra el enlace pelado (le pasó sólo al
+    pilar de Loop 248398). Pruebas: `__tests__/article-authoring-editorial-blocks.test.ts`;
+  - al republicar, `blog-post-content-republish.php` compara la FAQ que arma el plugin (`EO_Faq::items`) antes y
+    después y no escribe si cambia. Sumar negritas o enlaces fuera de la FAQ no la mueve.
 - Do not hand-author `core/html`; the validator only allows generated `application/ld+json` structured data from semantic capabilities such as `kind: "faq"` and blocks FAQPage questions that do not match visible summaries.
 - `status=block` from validation is a hard stop; `status=warning` requires review.
 - For Glitch POV, use `{ kind: 'glitchDrop', lines: [...] }` (block `efeoncepro/glitch-drop`, implemented
@@ -372,8 +385,8 @@ los cuatro tipos: `validation=pass`, cero findings.
   "caption": [{ "text": "Fuente: " }, { "text": "Anthropic", "href": "https://www.anthropic.com/news" }] }
 ```
 
-Rich text con enlaces seguros; render `…<div class="wp-block-embed__wrapper">URL</div><figcaption class="wp-element-caption">…</figcaption></figure>`
-(la forma real de Glitch #17). Sin caption el markup no cambia. De paso, la URL ahora se valida (`https:` y host
+Rich text con enlaces seguros; render `…<div class="wp-block-embed__wrapper">\nURL\n</div><figcaption class="wp-element-caption">…</figcaption></figure>`
+(la forma real de Glitch #17; desde 2026-10-26 la URL va en su propia línea, o `autoembed` no arma el reproductor). Sin caption el markup no cambia. De paso, la URL ahora se valida (`https:` y host
 `youtube.com`/`www.`/`m.`/`youtu.be`; si no, `content_factory_article_embed_url_invalid`) y se escapa en el wrapper y
 en los atributos. `core/video` nativo sigue pendiente.
 

@@ -18,6 +18,25 @@ Fuentes primarias del marco de resultados: [anuncio Fall Spotlight](https://ir.h
 [kit de partners](https://offers.hubspot.com/fall-2026-spotlight-partner-enablement-kit). La expresión exacta
 «Outcomes Era» se atribuye al discurso de UNBOUND/Analyst Day; no se usa como claim propio de Efeonce.
 
+## Loop Marketing 2026
+
+> **Delta 2026-10-26.** Este corte no cubría lo que UNBOUND cambió en Loop Marketing. Lo verificado:
+>
+> - el libro *Loop: Outlearn. Outmarket. Outgrow.*, de Kipp Bodnar y Kieran Flanagan;
+> - la sesión «AI Broke The Old Marketing Playbook. Here's What Replaces It» del 17-sep (sess-1392), sin grabación
+>   pública al corte;
+> - el **Taste Profile** como base del método y las **4 Rs**, una métrica por etapa (Remarkability, Resonance,
+>   Reach con «LLM/AI share of voice» y Regeneration), textuales en hubspot.com/loop-marketing;
+> - la página en español (hubspot.es) **no se actualizó** y conserva otras etapas y otro scorecard: cada versión
+>   se cita por su URL;
+> - el State of Marketing 2026 (71 % y casi 56 %, con su texto exacto en el ledger).
+>
+> **No se cita:** el «80 % menos de tráfico y 20 % más de leads» de HubSpot ni el 6 % atribuido a Rangan; sólo
+> vienen de terceros. Ledger completo, con fuentes y marcas de uso, en
+> [`SOURCES.md` § Loop Marketing 2026](../../../.claude/skills/hubspot-solutions-partner/SOURCES.md) de la skill
+> `hubspot-solutions-partner`; cómo explicarlo al cliente en `modules/01_PRODUCTO_2026.md` y el puente Reach ↔ AEO
+> en `modules/07_CUNA_AEO.md` de la misma skill.
+
 ## Estado ejecutivo
 
 | Superficie | Estado al corte | Qué puede afirmarse | Qué sigue sin probar |

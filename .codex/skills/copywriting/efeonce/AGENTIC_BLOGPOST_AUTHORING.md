@@ -237,6 +237,19 @@ En cada reescritura, preservar la tesis, claims, límites y pasajes ya protegido
 `qué cambió / por qué / qué decisión sigue abierta`. Si dos instrucciones del autor chocan, mostrar la tensión;
 no resolverla silenciosamente con una voz promedio.
 
+### Refresh o fusión de artículos ya publicados (2026-10-26)
+
+Antes de reescribir, inventariar los visuales de cada original (diagramas, videos, gráficos, destacados y portadas)
+y decidir uno por uno:
+
+- **Diagramas y videos vuelven** cuando aportan: son la parte del original que más vale reutilizar.
+- **Destacados con cifras sin fuente no vuelven**; si la cifra importa, entra al ledger de claims como cualquier otra.
+- **Las portadas se rehacen** para el artículo nuevo; no se hereda la del original.
+
+Caso fuente: el pilar «Qué es Loop Marketing» (248398, fusión de 248483) recuperó el diagrama `Loop-MKT.svg` y los
+dos videos de HubSpot, y descartó los destacados viejos. Detalle en
+`docs/public-site/LOOP_MARKETING_REFRESH_DRAFT_V1.md`.
+
 ## 8. Auditoría editorial
 
 Usar estados `PASS | NEEDS AUTHOR | BLOCK`. Un texto fluido puede estar bloqueado.
@@ -252,6 +265,10 @@ Usar estados `PASS | NEEDS AUTHOR | BLOCK`. Un texto fluido puede estar bloquead
 - **CTA:** corresponde al trabajo del artículo y no secuestra el cierre.
 - **Disclosure:** cumple el criterio editorial y cualquier regla externa vigente.
 - **Producción:** links, metadata, jerarquía, preview y estado de publicación fueron verificados.
+- **Exposición propia (2026-10-26):** el texto público nunca expone la caída de posiciones o de tráfico de un
+  contenido propio, ni siquiera como ejercicio de transparencia. Es `BLOCK`. Caso fuente: del pilar de Loop se retiró
+  la sección «Así aplicamos el loop a esta misma guía», con su gráfico antes/después de impresiones, porque, en
+  palabras de Julio, «eso nos perjudica más de lo que nos ayuda». Esas métricas se quedan en los documentos internos.
 
 ### Antipatrones específicos del authoring agentic
 

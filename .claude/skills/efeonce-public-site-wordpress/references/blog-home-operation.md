@@ -80,6 +80,15 @@ with the other blog session. Contract: `BLOG_HOME_RUNTIME_V1.md` §9.
     face x 60–86 % · y 10–40 %, below the chip/arrow (y 5–8 %) and above the gradient (from y 36 %, solid under 70 %,
     title from y 64 %). A post under 12 minutes does not enter the rail and skips it.
   Full set (plate, cover, hero, card, body) and diagrams: `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
+  - **El foco depende del sujeto, no es fijo (2026-10-26, pilar 248398).** `84% 30%` sirve para una cara a la
+    derecha; con otro sujeto, recalcúlalo: ventana visible = ancho de la tarjeta / ancho de la imagen escalada, y
+    `left = foco × (1 − ventana)`. Elige el foco que deja al sujeto dentro de la ventana en escritorio y en el
+    teléfono (en 248398 quedó `--focus "71% 50%"`). El recorte del `hero` se elige igual: en 248398 dejó al sujeto
+    en x 71–90 %, a la derecha del título. Portada (destacada + OG) con `blog-post-cover-apply.php`
+    (`expectedThumb` / `expectedOg`), hero con `hero <id> --image … --alt … --apply` y tarjeta con
+    `card <id> --image … --alt … --focus … --apply`.
+  - Un post **refrescado** no reentra al slider si su fecha no cambió: confírmalo con `slider` después de
+    republicar, en vez de esperar que aparezca.
 - Slider places: the three invitations (Glitch → guide/tool → diagnostic) are reserved and never cut by pins; pins,
   then recent candidates, fill the rest; on screen posts come first, invitations after.
 - Author circle: the author's uploaded WordPress profile photo (`get_avatar_url`, One User Avatar;

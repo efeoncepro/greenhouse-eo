@@ -1,6 +1,8 @@
 # Blog efeoncepro.com — Refresh tanda 1: propuesta por artículo (V1)
 
 > **Estado:** propuesta para revisión de Julio. No hay borradores ni cambios en WordPress.
+> **Actualización 2026-10-26:** los cuatro artículos de la tanda ya están publicados (fecha y registro al inicio de
+> cada sección).
 > **Creado:** 2026-10-24 · sesión «Mejora de artículos del blog».
 > **Insumos:** lectura completa de cada artículo en vivo (4 subagentes, una lectura por artículo/par) +
 > Search Console y GA4 de la sesión «Análisis de Analytics y Search Console» (ventanas 2026-07-26 → 10-23 vs
@@ -101,6 +103,9 @@ enlaza.
 
 ## 3. SEO y AEO (`/loop-marketing/seo-aeo-optimizacion-ia-2025/`)
 
+> **Publicado el 2026-10-25** en `/aeo/seo-y-aeo/` (post 248463; la sesión de Analytics lo marcó como prioridad 1 en su mensaje del 2026-10-26, con datos de Search Console del 24-oct, sin saber que ya estaba publicado), con 301
+> desde la URL vieja, por decisión de Julio. Registro: [`SEO_AEO_REFRESH_DRAFT_V1.md`](SEO_AEO_REFRESH_DRAFT_V1.md).
+
 **Qué es hoy:** 3.200 palabras con la mejor señal de IA del blog (18 visitas en 12 meses, sobre todo desde
 Perplexity) y los errores más serios. Los siete principales:
 
@@ -130,6 +135,11 @@ web agéntica, topic clusters y surround discovery, y se enlaza con todos.
   el enlace desde topic clusters.
 
 ## 4. Loop Marketing: «Qué es» (248398) + «Cómo aplicar» (248483)
+
+> **Publicado el 2026-10-26** en `https://efeoncepro.com/loop-marketing/que-es-loop-marketing/` (248398, misma
+> URL). Se aprobó la fusión: «Cómo aplicar» (248483) pasó a borrador y su URL redirige con 301 al pilar. **«Ejecutar
+> Loop Marketing con HubSpot» (248513) queda aparte**, sin fusionar ni cambiar. Registro:
+> [`LOOP_MARKETING_REFRESH_DRAFT_V1.md`](LOOP_MARKETING_REFRESH_DRAFT_V1.md) §4.
 
 **Qué son hoy:** dos posts de 4.100 palabras que se repiten [V]:
 

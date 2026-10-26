@@ -145,7 +145,7 @@ artículo perdía posiciones, eso nos perjudica más de lo que nos ayuda». La s
 guía» y su gráfico antes/después se quitaron. **248513 queda aparte**, sin cambios.
 
 Publicado a las 10:07 UTC en **`https://efeoncepro.com/loop-marketing/que-es-loop-marketing/`** (post `248398`, misma
-URL) con `tmp/loop-publish/publish.php`. Ese script tiene 14 guardas sobre los dos posts y hace respaldo antes de
+URL) con `ai-generations/2026-10-26_loop-marketing/publicacion/merge-publish.php`. Ese script tiene 14 guardas sobre los dos posts y hace respaldo antes de
 escribir. Cambia el contenido, el título, el extracto y las metas de Yoast:
 - título SEO «Qué es Loop Marketing: las 4 etapas del framework de HubSpot %%page%% %%sep%% %%sitename%%»;
 - descripción;

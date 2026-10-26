@@ -2,6 +2,17 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-26 — Blog: pilar Loop Marketing publicado, embed corregido, voz de Julio y Loop 2026
+
+Pilar «Qué es Loop Marketing» (248398) publicado con 248483 absorbido (borrador + 301 de Yoast), portada nueva sin
+persona (infinito en luz), diagrama y videos de HubSpot recuperados, sin la sección de transparencia (decisión de Julio),
+negritas por importancia, enlaces en negrita, mención de HubSpot y lo verificado de UNBOUND 2026 (libro, Taste Profile,
+4 Rs, State of Marketing, Lennox). Content Factory: el embed de YouTube lleva la URL en su línea (en línea, WordPress
+mostraba el enlace pelado) y un `kind` desconocido ya no se descarta en silencio. Voz de Julio: hablarle al lector y
+énfasis por importancia. Loop 2026 en la skill HubSpot con lo que no se cita (80 %/20 %, 6 %). [Borrador y
+rollback](docs/public-site/LOOP_MARKETING_REFRESH_DRAFT_V1.md) · [brief del artículo
+futuro](docs/public-site/LOOP_TASTE_PROFILE_4RS_ARTICLE_BRIEF_V1.md).
+
 ## 2026-10-25 — Rooms + Auth: auditoría al corte de Codex
 
 Registro de estado y skills vivas `efeonce-rooms`/`efeonce-auth`; TASK-1829 (superficie OAuth del emisor) cerrada: en producción desde 2026-09-04. [Auditoría](docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
@@ -573,13 +584,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
   routing, cadencia/mensaje/respuesta/entregabilidad, template, manual y adapter HubSpot espejados.
   Fixtures v9 P51–P55 cubren plataforma, autorización, programación, personalización y evidencia; sin nueva ejecución externa.
 - [Política de seguimiento a largo plazo](docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) aprobada: proveedor vigente, revisión interna a seis meses sin hito, nutrición con permiso y reactivación autorizada. Skills espejo/fixtures v11 y seguimiento existentes actualizados; tareas comerciales en HubSpot por corrección de Julio. Fabrimetal: TASK 118419088700 para 13/04/2027 09:00 Chile, duplicado Notion Cancelado y nota CRM conciliada, sin envío.
-
-## 2026-10-12 — Propuesta de campaña creativa: playbook y skills
-
-- [Playbook de punta a punta](docs/operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md) (caso fuente Sika N.º 1164): cinco piezas, secuencia,
-  reglas del operador por pieza, trampas medidas y lista de control. Fila nueva en el router de `CLAUDE.md` y `AGENTS.md`.
-- La oferta económica que ve el comprador va con la [plantilla A4](docs/commercial/templates/cotizacion-a4/README.md), desglosada por componente de valor
-  (evolución gráfica → concepto → entregables); `economica:build` (Excel) sólo si las bases exigen planilla. Skills de licitaciones, práctica creativa y pricing actualizadas.
-- `deck-studio`: referencia nueva de propuesta técnica de campaña creativa (segunda persona, nada defensivo, cumplimiento con las palabras de la ficha).
-- `motion-design-studio` y `audio-studio`: workflow del reel de muestra (cuadros fijos → Seedance 2.5 → capa de motion de la campaña → montaje) y sus modos de falla.
-- `efeonce-graphic-line`, `astro` y `docs/think`: página suelta de video de muestra con el reproductor de AXIS.

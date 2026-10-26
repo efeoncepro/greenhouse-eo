@@ -1053,6 +1053,12 @@ centro), el **64 % izquierdo** en oscuridad calma, la **mitad de abajo** pareja 
 mueve la foto. Márgenes de cada superficie y diagramas:
 [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 
+**Portada sin persona (2026-10-25 y 2026-10-26).** Cuando la persona no porta la idea, el sujeto es un objeto o un
+fenómeno: parte de `MCB-AEO1-169` o `MCB-LOOP1-169` (`pnpm foto:cine:nueva --desde`). Tamaño y posición con fracciones,
+nunca porcentajes; mide en el plate el ancho (salió unas 2,5 veces más grande de lo pedido), la relación alto/ancho de
+una figura horizontal y el foco de la tarjeta, que se recalcula. Detalle: [casebook cine, fallas 59 a 64](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#portadas-de-manzanitas-sin-persona-2026-10-25-y-2026-10-26--lo-que-aprendimos)
+y [manual de la portada del blog](../../../../docs/manual-de-uso/creative/producir-portada-de-articulo-del-blog.md).
+
 ## La capa de composición no es sólo texto
 
 Una pieza puede llevar etiqueta (Poppins `structureLabel`), entrada/dominante/cierre (Bricolage `ideaLead`/

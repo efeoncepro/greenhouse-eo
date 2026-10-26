@@ -1,9 +1,9 @@
 # Producir la portada de un artículo del blog (Marketing con Manzanitas) — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-10-24 por Claude
-> **Ultima actualizacion:** 2026-10-26 por Claude (1.3: caso `"expectedOg": 0` y metas que no existían en el respaldo) · 2026-10-25 por Claude (1.2: el texto y la persona se ganan su lugar; el par
+> **Ultima actualizacion:** 2026-10-26 por Claude (1.4: la fórmula sin persona, con las lecciones de tamaño y posición de las portadas de SEO y AEO y de Loop; la esfera como punto final; cómo descartar un texto; cómo recalcular el foco de la tarjeta y el recorte del `hero`. 1.3: caso `"expectedOg": 0` y metas que no existían en el respaldo) · 2026-10-25 por Claude (1.2: el texto y la persona se ganan su lugar; el par
 > pregunta–respuesta nunca se fuerza y la persona va sólo si porta la idea. 1.1: superficies alineadas con el inventario de imágenes por
 > artículo v1.4: «Te puede interesar», la miniatura «Siguiente», el slider en el teléfono, la tarjeta del rail en
 > producción y la imagen del slider de cada artículo nuevo)
@@ -152,6 +152,29 @@ pnpm public-website:blog-home hero <post> --image <archivo.webp> --alt "<alt>" -
 
 `pnpm public-website:blog-home slider` muestra qué posts están en el slider y por qué.
 
+### Recalcular el foco de la tarjeta y el recorte del `hero`
+
+Las medidas de arriba suponen la cara en torno al 71 % del plate. Cuando el sujeto cae en otro lugar (siempre pasa en una
+portada sin persona), recalcula con la fórmula del inventario en vez de copiar «84% 30%»:
+
+1. **Recorta el plate por arriba si hace falta.** La tarjeta muestra la imagen entera de alto, así que la posición
+   vertical del sujeto en la tarjeta es `(y del sujeto en px − recorte de arriba) / (alto del plate − recorte de arriba)`.
+   Tiene que quedar entre el 10 % y el 36 %: debajo de la etiqueta y la flecha (5–8 %) y encima del degradado (36 %).
+2. **Calcula la ventana visible.** `ventana = ancho de la tarjeta / ancho de la imagen escalada`, con la imagen escalada
+   a la altura de la tarjeta (`ancho escalado = ancho de la imagen × alto de la tarjeta / alto de la imagen`). Hazlo para
+   escritorio (440 × 600) y para el teléfono (304 × 540).
+3. **Prueba un foco.** `left = foco × (1 − ventana)` y `right = left + ventana`. El sujeto tiene que quedar entero entre
+   `left` y `right` en los dos anchos. Para centrarlo: `foco = (centro del sujeto − ventana / 2) / (1 − ventana)`.
+4. **El `hero`** es un recorte 2:1 del plate: el sujeto queda en `(x en el plate − borde izquierdo del recorte) / ancho
+   del recorte`, y lo mismo en y. Tiene que caer en x 68–92 % · y 10–64 %.
+
+Casos publicados:
+
+| Portada | Tarjeta | Lo que se ve | `hero` |
+|---|---|---|---|
+| *SEO y AEO* | plate sin los 380 px de arriba (2560 × 1060), `--focus "75% 50%"` | x 52–83 % en escritorio y tablet, x 58–81 % en el teléfono, con la ficha en y 16–28 % (medido el 2026-10-25) | plate sin los 200 px de arriba y los 160 de la derecha: ficha en x 67–79 % · y 29–40 % |
+| *Qué es Loop Marketing* | plate sin los 200 px de arriba (2560 × 1240), `--focus "71% 50%"`; la figura está en x 58–73 % del plate | según la fórmula, x 46–81 % en escritorio y x 52–79 % en el teléfono, con la figura en y ≈ 16–25 % (calculado; no se midió en vivo) | recorte x 0–2080 · y 150–1190: figura en x 71–90 %, a la derecha del título |
+
 ### Medidas de la portada
 
 Medidas, en píxeles del lienzo de 1200 × 630, para el resto de las superficies:
@@ -180,6 +203,15 @@ una idea completa que se entiende a la primera, nunca un fragmento que hay que e
 salieron porque la pregunta era real: «¿Qué compra de verdad el paid media?» → «Atención.» y
 «¿Qué le falta a tu blog para rankear?» → «Orden.». Revísalas con la skill `copywriting` si dudas.
 
+- **La esfera es el punto final.** El destacado cierra con la esfera y no lleva otro punto antes: «Es un loop●», nunca
+  «Es un loop.●» (lo corrigió `cine-reviewer` en la portada de Loop, 2026-10-26; canon en
+  [La órbita §1.2](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)). El `alt` sí lleva la puntuación
+  normal.
+- **Un texto se descarta sobre la foto, no en abstracto.** Compón cada candidato sobre el plate (paso 6) y descártalo si
+  choca con el sujeto o si `answerOverflowPx` es mayor que 0. En la portada de Loop cayeron «El embudo termina. El
+  loop / aprende.» (choca: «El loop» caía sobre el lazo izquierdo del infinito) y «El embudo termina. / El loop
+  aprende.» (el destacado se desborda 152 px). No achiques la letra para que entre: cambia el texto.
+
 ### Paso 2 · Escribe la ficha cine
 
 Copia una ficha de la carpeta del caso fuente (`fichas/MCB-TC1-169.json`) y ajústala. Lo que no puede faltar:
@@ -195,6 +227,44 @@ Copia una ficha de la carpeta del caso fuente (`fichas/MCB-TC1-169.json`) y ajú
 - `escena`: **pide la cara en torno al 85 % del ancho** y deja **el 64 % izquierdo en oscuridad calma**, sin luces ni
   objetos. El modelo corre al sujeto unos 15 puntos hacia el centro, así que la cara termina cerca de x 800–900.
 - `lecho` en sombra abajo y `reservas.texto` con tinta blanca sobre el muro oscuro.
+
+#### Si la portada va sin persona
+
+Úsala **cuando una persona no porta la idea** y un objeto o un fenómeno cuentan mejor el tema (registro cine, delta
+2026-10-25). No es la opción por defecto ni un bodegón: el sujeto tiene que ser el servicio. Hay dos recetas aprobadas
+para partir, con su ficha:
+
+| Receta | Sujeto | Artículo |
+|---|---|---|
+| `MCB-AEO1-169` | un objeto: un cajón de fichero con una sola ficha levantada bajo un foco frío | *SEO y AEO*, 2026-10-25 |
+| `MCB-LOOP1-169` | un fenómeno: la estela de un péndulo con LED en larga exposición, que dibuja el infinito | *Qué es Loop Marketing*, 2026-10-26 |
+
+```bash
+pnpm foto:cine:nueva --desde MCB-AEO1-169 --id MCB-<TEMA>1-169 --dir ai-generations/<carpeta>
+```
+
+Lo que cambia frente a la ficha con persona, según lo medido en esas dos portadas
+([casebook cine, fallas 59 a 64](../../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#portadas-de-manzanitas-sin-persona-2026-10-25-y-2026-10-26--lo-que-aprendimos)):
+
+- **Sin `identidad` ni `objetos` de prenda.** La `nota` declara la excepción de alcance, y la escena dice «There is no
+  face anywhere in this frame: wherever the lighting notes speak of a face, they mean [el sujeto]», porque los bloques
+  de luz del compilador siguen hablando de una cara.
+- **Tamaño y posición con fracciones, no con porcentajes.** El modelo ignora los porcentajes de un objeto: lo ensancha o
+  lo acerca. Funciona «lejos y chico, un octavo del ancho, entero en el tercio derecho, la tapa a media altura».
+- **Cuenta con que salga más grande.** En Loop se pidió un veinteavo del ancho y salió unas 2,5 veces más grande. Mide
+  el ancho real en el plate antes de componer.
+- **El sujeto entero dentro del cuadrado central** (x 285–915 en el lienzo de 1200) y fuera de la columna de texto. En
+  AEO, la ficha levantada quedó en x 775–861, con 54 px de margen dentro del cuadrado.
+- **Una figura horizontal se aplasta** si la cámara está a ras de mesa, y en Loop se aplastó también con la cámara en
+  picado a unos 30° y la figura chica. Pide la cámara más alta o la figura en un plano vertical frente al lente, y mide
+  en el plate la relación alto/ancho de la figura.
+- **Un número exacto, nunca aproximado.** «three or four passes» invita a una espiral; pide «exactly two» y nombra cada
+  pasada. Después cuéntalas en el plate.
+- **El acento no va como punto suelto.** En la foto, el color de la línea va en el borde de la luz (AEO) o no va (Loop:
+  la estela es entera de un color, porque un LED no cambia de color a mitad del trazo); el acento queda en la esfera del
+  texto.
+- **`lecho`.** La portada de blog no firma, así que si no hay ningún objeto real entre el lente y el sujeto, declara
+  `"lecho": "sin-lecho"` con su `sinLechoPorque` (Loop). Si lo hay, úsalo como lecho (AEO: el canto de la mesa en sombra).
 
 ### Paso 3 · Pide la revisión antes de gastar
 
@@ -221,6 +291,10 @@ Además, mira al 100 % que el bordado de la prenda sea el logo correcto (`pnpm f
 corresponda a la persona del elenco. Si la cara cae fuera del 66–76 % del ancho (x 795–900 en el lienzo de 1200),
 corrige la escena y vuelve a generar: no muevas ni recortes la foto de lado para compensar. Entre el 66 % y el 68 %
 sirve para la portada, pero el `hero` necesita el ajuste que describe el inventario.
+
+En una portada sin persona, mide en el plate dónde quedó el sujeto (x e y, en % del plate), su ancho y, si es una
+figura, su relación alto/ancho. Con esas medidas recalculas el foco de la tarjeta y el recorte del `hero`
+(«Recalcular el foco de la tarjeta y el recorte del `hero`», arriba).
 
 ### Paso 6 · Compón la portada
 
@@ -363,6 +437,9 @@ Haz commit sólo de los archivos de texto: los PNG y JPG de `ai-generations/` no
 | El slider de la portada del blog no cambia | el post tiene `hero` propio | cámbialo con `pnpm public-website:blog-home hero <post> --image <archivo.webp> --alt "<alt>" --apply` (o `--attachment <id>` si ya está en la biblioteca), coordinando con la sesión de la portada |
 | El título del slider cae encima del texto de la portada | el post entró al slider sin `hero` | súbele el `hero` recortado del plate («La imagen del slider») |
 | Un objeto (no una cara) invade la columna de texto aunque la ficha pida «entre 66 % y 79 %» | el modelo ignora los porcentajes de un objeto: lo ensancha o lo acerca (portada de SEO y AEO, 2026-10-25, cuatro intentos) | descríbelo con fracciones y tamaño relativo: «lejos y chico, un octavo del ancho, entero en el tercio derecho, la tapa a media altura»; después mide en píxeles el aire entre el texto y el objeto |
+| El objeto salió mucho más grande de lo que pediste | deriva de tamaño: en Loop, un veinteavo del ancho salió unas 2,5 veces más grande | mide el ancho en el plate; si invade el texto o sale del cuadrado central, corrige la ficha y regenera |
+| La figura se ve aplastada | la cámara mira la figura de canto (a ras de mesa o en un picado bajo) | cámara más alta o la figura en un plano vertical frente al lente; mide la relación alto/ancho en el plate |
+| Un texto choca con el sujeto o se desborda | el candidato no cabe en el espacio que dejó la foto | descártalo y prueba otro sobre el mismo plate; nunca achiques la letra (paso 1) |
 | La tarjeta del rail muestra la portada cortada | el post entró al rail sin imagen de tarjeta | súbele el plate con `blog-home card … --focus "84% 30%"` («Las cards v2 del rail») |
 
 ## Volver atrás

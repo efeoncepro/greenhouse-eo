@@ -1,5 +1,28 @@
 # Handoff
 
+## 2026-10-26 — Blog: pilar Loop Marketing publicado y barrido de docs y skills
+
+- **Pilar publicado:** «Qué es Loop Marketing» (248398) en `/loop-marketing/que-es-loop-marketing/`.
+  - 248483 quedó en borrador, con un 301 de Yoast hacia el pilar.
+  - Portada 252148, `hero` 252149 y tarjeta 252150.
+  - Lleva lo verificado de UNBOUND 2026.
+  - Sin la sección de transparencia, por decisión de Julio.
+- **Detalle y rollback:** [borrador del pilar](docs/public-site/LOOP_MARKETING_REFRESH_DRAFT_V1.md) §4 y sus deltas.
+- **Content Factory:** el embed de YouTube lleva la URL en su propia línea.
+- **Reglas nuevas:**
+  - voz de Julio §4.5 y §4.6;
+  - no exponer la caída de un contenido propio (`AGENTIC_BLOGPOST_AUTHORING` §8);
+  - fusión de posts (skill del sitio §16);
+  - Loop 2026 en `hubspot-solutions-partner`.
+- **Casebook cine:** fallas 59–64 de portadas sin persona y dos recetas nuevas en `cine-recetas.json`.
+- **Pendiente:**
+  - indexación en Search Console del pilar y de `/aeo/seo-y-aeo/` (la hace una persona);
+  - 248513, sin decidir;
+  - grabación de UNBOUND (sesión del 17-sep);
+  - [brief Taste Profile/4 Rs](docs/public-site/LOOP_TASTE_PROFILE_4RS_ARTICLE_BRIEF_V1.md), por validar demanda.
+- **Coordinación:** las sesiones del blog autorizaron purgar la caché después de republicar contenido sin
+  consultarles, salvo cuando haya despliegues de plugins.
+
 ## 2026-10-25 — Rooms + Auth: estado al corte de Codex (sin uso hasta 1/11)
 
 Claude auditó con tres subagentes de solo lectura: [registro de estado](docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md). Auth `auth-server-00166-p77` (`754a2a28`) vivo con first-party y OTP **OFF**, Login V4 servido; PR #262 draft con CI pendiente; promoción a main, flags y único canary a `jreyes@efeoncepro.com` pendientes; ningún correo enviado. Rooms `20f9fe9` en Vercel con `ROOMS_*` OFF, DB `rooms_production` 5 migraciones. WIP medios TASK-2070/2071 **sin commitear en `efeonce-rooms`** y con `typecheck` rojo (TS2322): llevar a rama, nunca a `main` (cada push es producción). Skills vivas nuevas `efeonce-rooms` y `efeonce-auth` (espejo Claude↔Codex) con ledger del programa. Segunda auditoría (§6): EPIC-044 tiene 27 unidades, sin repo propio, sin logins nativos desde 26/9 porque faltan los conectores de Codex y Claude (TASK-1904/2000; MCP construido y probado), `develop` despliega el emisor productivo. TASK-1829 cerrada (administrativa). 1828/1830/1832 NO listas (llave v1, passkeys 2 navegadores, muestra steady). PR #262 CI verde sin promover. Medios de Rooms rescatados en rama local `efeonce-rooms` `task/2070-2071-private-media` (`c0facfd`, `2626921`, `7ca5fd3`: limpieza, worker `--loop`, hijo sin `tsx`, DO en migración; verify 207/207), `main` sigue en `20f9fe9`. Demo de Rooms **no aceptada** por Julio (busca algo más inmersivo): Rooms en pausa hasta revisar la dirección con maqueta. Login V4 vivo en `auth.efeonce.org/login`; entrar a Rooms con él sigue OFF. Siguiente (con créditos Codex desde 1/11): release #262 + canary único, conectores Codex/Claude, separar deploy de Auth, higiene de seguridad.
@@ -230,15 +253,3 @@ proyecto, elegibilidad, capacidad e impuestos pendientes. Sin envío ni nueva mu
 Tres subagentes conciliaron continuidad y skills; método/manuales/plantillas distinguen preparación MD, diseño y emisión,
 y usan costo objetivo V3. [Auditoría y validación](docs/audits/commercial/2026-10-23-mattis-markdown-docs-skills.md).
 Sin cambio runtime; commit local autorizado por Julio, sin push. Próximo paso: diseño con Claude Design y validación comercial antes de presentar.
-
-## 2026-10-23 — Auditoría SEO del Blog SKY: informe listo, envío pendiente de Julio
-
-Informe A4 de 23 páginas «Por qué cayó el tráfico y cómo recuperarlo» generado y revisado página por página
-(`outputs/sky-blog-seo-audit-2026-10-23/informe/`; copia para adjuntar en OneDrive › Alineación › 1. Clientes
-(Interno) › Sky - SEO-AEO › Auditoría SEO 2026-10). **Nada enviado a SKY:** los dos correos están en borrador en
-[`caso-auditoria-2026-10/correos/`](docs/services/sky-blog-seo/caso-auditoria-2026-10/README.md) y salen por Outlook web
-con firma gráfica y CCO HubSpot. Urgente para SKY: nueve artículos de Perú despublicados entre el 15 y el 23-10
-(restaurables desde la papelera 30 días) y la propiedad GSC de `www.skyairline.com`, que vence entre nov-2026 y
-ene-2027. El renderer ganó capacidades en `001683d83` (`pnpm report:compose`; regenerar con
-`pnpm exec tsx scripts/seo/sky-blog-audit-report.ts`). El logo de SKY adjunto a la organización es generado por IA:
-usar `ai-generations/2026-09-23_cmp003-sky-hangar/refs/sky-official.svg`. **Sin push.**
