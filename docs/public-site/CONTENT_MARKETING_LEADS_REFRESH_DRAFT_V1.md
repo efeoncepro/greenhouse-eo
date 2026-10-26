@@ -365,3 +365,25 @@ una idea, contada en cada formato, con un siguiente paso claro y medida para apr
   revisión a las 4, 8 y 12 semanas. Hipótesis: primera página en las búsquedas de leads. No es promesa.
 - **GA4:** clics hacia la landing y hacia el AEO Assessment desde el artículo.
 - **IA:** panel con las preguntas largas de §1 en ChatGPT, Gemini y Perplexity.
+
+## 9. Copia privada de revisión (2026-10-26, aprobada por Julio)
+
+- **Aviso previo:** confirmaron sin trabajo en curso «Mejora de artículos del blog», «Análisis de Analytics y Search
+  Console», «Rediseño portada blog», «Blog v3 portada» y «Blog author plugin»; «Plantilla Archivo» no respondió.
+- **Spec:** `docs/public-site/CONTENT_MARKETING_LEADS_REFRESH_GUTENBERG_SPEC_V1.json`, generada por
+  `ai-generations/2026-10-26_marketing-contenidos-leads/build-spec-v1.cjs`. `content-factory:author`: **pass, 0 hallazgos**,
+  68 bloques (gráfico Efeonce, destacado, Growth CTA AEO Assessment, tabla Efeonce, pasos, cita de Robert Rose,
+  infografía, recuadros, FAQ con schema, índice).
+- **Infografía:** adjuntos **252169** (escritorio claro, 1600 × 1000) y **252170** (teléfono claro, 900 × 2150),
+  `uploads/2026/10/contenido-una-idea-cada-formato-*-light.svg`, sha256 igual al local, servidos con 200. Sólo las
+  claras, por la regla del ICP (el sitio no sigue el modo oscuro del sistema); las oscuras quedan en el repo sin subir.
+- **Copia:** post **252171**, privada, noindex, `_eo_review_copy_of = 244883`, categoría principal Inbound →
+  `https://efeoncepro.com/inbound/revision-marketing-de-contenidos-leads-v1/` (sólo con sesión). Autor, categorías y
+  destacada copiados del original. El contenido guardado sólo difiere en que WordPress guarda los 🍏 como entidades.
+- **QA (render inyectado sobre el pilar de Loop, 1440 y 390):** sin desborde; la infografía carga la versión correcta
+  en cada ancho; el gráfico per-hundred se dibuja (12 de 100); la tabla se apila en el teléfono; el CTA muestra el
+  lockup «efeonce | AEO Assessment» y el énfasis, igual que en SEO y AEO, una vez que corre el `host.js` del bloque.
+  `blog-home verify --browser`: 44 posts, 7 anchos sin desborde, 0 violaciones (la copia privada no entra).
+- **Pendiente antes de publicar:** lectura de Julio y su confirmación de la analogía de las manzanitas (C3); og:title
+  «Una pieza sola no genera leads. El sistema que la rodea, sí» se escribe al publicar; la portada, el hero y la tarjeta
+  se suben con la publicación; al terminar la revisión, la copia 252171 va a la papelera.
