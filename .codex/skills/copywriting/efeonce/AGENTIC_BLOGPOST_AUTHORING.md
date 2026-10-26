@@ -117,9 +117,11 @@ conversación. Para la firma narrativa de Julio, aplicar la sección de hook de 
 - Cortar transiciones que solo anuncian lo que el siguiente párrafo ya hace.
 - Mantener pequeñas inflexiones humanas confirmadas; no pulir hasta volver anónima la voz.
 - Usar listas cuando ordenan decisiones, no para que todo parezca completo y simétrico.
-- Después de cerrar la prosa, diseñar una ruta de escaneo con negritas semánticas: normalmente una tesis, dato,
-  contraste o etiqueta decisiva por bloque de lectura. No poner en negrita párrafos enteros por sistema, repetir
-  el título ni usar énfasis para fabricar autoridad sobre un claim débil.
+- Después de cerrar la prosa, diseñar una ruta de escaneo con negritas semánticas. La negrita se gana por
+  importancia, no por cuota por bloque (Julio, 2026-10-26): va en el dato, la fuente, la idea principal o la parte
+  que la resume. Los enlaces van en negrita, y las landings, servicios y productos de Efeonce van con `mention`
+  (`JULIO_REYES_VOICE_SYSTEM.md` §4.6). No poner en negrita párrafos enteros por sistema, repetir el título ni usar
+  énfasis para fabricar autoridad sobre un claim débil.
 - Evaluar el énfasis en desktop y móvil. Una frase que funciona como ancla en una línea puede volverse un muro de
   negrita al envolver en una pantalla estrecha.
 
