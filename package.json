@@ -295,6 +295,7 @@
     "public-website:deploy-dry-run": "tsx scripts/public-website/deploy-dry-run.ts",
     "public-website:diff-runtime": "tsx scripts/public-website/diff-runtime-baseline.ts",
     "public-website:export-live-code": "tsx scripts/public-website/export-live-code-baseline.ts",
+    "public-website:gsc-index": "node scripts/public-website/gsc-request-indexing.mjs",
     "public-website:runtime-status": "tsx scripts/public-website/runtime-status.ts",
     "public-website:ssh-check": "tsx scripts/public-website/ssh-check.ts",
     "public-website:verify-influencer-landing-fidelity": "tsx scripts/public-website/verify-influencer-landing-fidelity.ts",

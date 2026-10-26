@@ -394,8 +394,13 @@ is asynchronous and remains separate from publication success.
   it to `JobPosting` and `BroadcastEvent` inside `VideoObject`.
 - Search Console URL Inspection API observes the indexed version only; it does
   not run a live test or request indexing.
-- A human may request indexing in the Search Console UI for a small number of
-  critical URLs, without any guarantee of timing or inclusion.
+- Indexing for a small number of critical URLs is requested through the Search
+  Console UI, without any guarantee of timing or inclusion. Agents use
+  `pnpm public-website:gsc-index request <url> [--apply]`: a dedicated Chrome
+  where a person signed in once; dry run by default, `--apply` only when the
+  URL is not on Google or was crawled before its last change, about 10 per
+  day, ledger in `scripts/public-website/gsc-indexing/ledger/`. Manual:
+  `docs/manual-de-uso/public-site/solicitar-indexacion-search-console.md`.
 - Use `0h`, `24h`, and `72h` observations only after the capability described in
   `TASK-1426` exists and has runtime evidence. Until then, do not fabricate an
   automated checkpoint.
