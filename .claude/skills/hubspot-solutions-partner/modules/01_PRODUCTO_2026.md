@@ -174,6 +174,21 @@ presenta como reemplazo del funnel.** Si el cliente es HubSpot-native, usa el ma
 - **Si el cliente lee en español:** la página de hubspot.es sigue con la versión anterior, así que hay que
   citar cada versión por su URL.
 
+**Cómo explicarlo frente al cliente** (explicación aprobada por Julio, 2026-10-26):
+- **Taste Profile:** *«"Taste" es criterio. Sin contexto, la IA escribe el promedio de internet; el Taste Profile
+  junta quién es tu cliente y quién es tu marca para que suene a ti.»* Es lo que Efeonce ya arma con la guía de
+  voz, el buyer persona y el JTBD, así que es la puerta a voz y contenido.
+- **4 Rs:** una pregunta por etapa.
+  - Remarkability: ¿tu diferencia se sostiene cuando más gente y agentes crean contenido?
+  - Resonance: ¿lo que publicas le llega a tu comprador?
+  - Reach: ¿apareces donde se decide, incluida la IA?
+  - Regeneration: ¿qué tan rápido aprende tu ciclo?
+
+  Reach es medición AEO (puente al AEO Assessment). Es un marco, no un estándar: HubSpot no publica las
+  fórmulas.
+- Brief del artículo futuro que desarrolla esto:
+  `docs/public-site/LOOP_TASTE_PROFILE_4RS_ARTICLE_BRIEF_V1.md`.
+
 **Tesis del Spring 2026 Spotlight: "Growth Context"** ✅. Cita para deck (Duncan Lennox, CPTO):
 *"Context is much more complex. If data is what happened, context is why."* Es el posicionamiento
 anti-commodity frente a Salesforce/Adobe: *"cualquiera tiene tus datos; nosotros tenemos el porqué."*

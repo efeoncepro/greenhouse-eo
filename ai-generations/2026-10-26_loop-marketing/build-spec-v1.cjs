@@ -295,7 +295,9 @@ const spec = {
             b('Taste Profile'),
             t(', «un retrato de tu cliente y de tu marca que le da a la IA el contexto para sonar como tú, no como todos» ('),
             a('HubSpot', SRC.loopEn),
-            t('). Profundizamos en esta etapa en '),
+            t('). «Taste» es criterio: '),
+            b('lo que te diferencia no es la herramienta, es tu forma de decidir qué decir y qué no'),
+            t('. Si ya tienes una guía de voz, tu buyer persona y los trabajos que tu cliente quiere resolver, tienes la mitad del camino hecho. Profundizamos en esta etapa en '),
             a('Express en Loop Marketing: voz, POV, buyer persona y Jobs to be done', IN.express),
             t('.')
           ]
@@ -370,10 +372,10 @@ const spec = {
           kind: 'list',
           style: 'box',
           items: [
-            [b('Remarkability (Definición):'), t(' si tu diferencia de marca se sostiene cuando más equipos crean contenido.')],
-            [b('Resonance (Adaptación):'), t(' si el contenido conecta con tu comprador. HubSpot lo mide contra un «Buyer Sim», un clon con IA del perfil de tu cliente.')],
-            [b('Reach (Amplificación):'), t(' tu cuota de voz en las respuestas de la IA, además de impresiones y conversión por canal.')],
-            [b('Regeneration (Optimización):'), t(' la velocidad del loop y cuánto mejoran tus aprendizajes y tu pipeline.')]
+            [b('Remarkability (Definición):'), t(' ¿tu diferencia se sostiene cuando más gente y más agentes crean contenido?')],
+            [b('Resonance (Adaptación):'), t(' ¿lo que publicas le llega a tu comprador? HubSpot lo contrasta con un «Buyer Sim», un clon con IA del perfil de tu cliente.')],
+            [b('Reach (Amplificación):'), t(' ¿apareces donde se decide, incluidas las respuestas de la IA?')],
+            [b('Regeneration (Optimización):'), t(' ¿qué tan rápido aprende tu ciclo?')]
           ]
         },
         P('En su página en español, HubSpot todavía mide con otro tablero: visibilidad en la IA, cuota de participación, citas y velocidad del loop. Las dos versiones apuntan a lo mismo: medir el ciclo, no la campaña.'),

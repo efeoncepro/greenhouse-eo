@@ -225,3 +225,10 @@ quedaron registradas en `hubspot-solutions-partner/SOURCES.md` § Loop Marketing
 «6 % de resultados transformadores» de Rangan, que sólo sale en recaps de terceros. Se reevalúan cuando HubSpot Live
 publique la grabación de la sesión del 17-sep. Republicado con la FAQ sin cambios; respaldo
 `_gh_post_republish_248398_20261026_121701`.
+
+### Delta 2026-10-26 (cierre) · criterio y 4 Rs como preguntas
+
+En Definición se sumó qué significa «taste» (criterio: lo que te diferencia es tu forma de decidir qué decir y qué
+no) y el puente a la guía de voz, el buyer persona y el JTBD. Cada línea del recuadro de las 4 Rs pasó a ser la
+pregunta que responde. Republicado con la FAQ sin cambios; respaldo `_gh_post_republish_248398_20261026_122515`. La
+explicación completa quedó como semilla en [`LOOP_TASTE_PROFILE_4RS_ARTICLE_BRIEF_V1.md`](LOOP_TASTE_PROFILE_4RS_ARTICLE_BRIEF_V1.md).
