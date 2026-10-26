@@ -25,6 +25,27 @@ históricas de este ADR a contratación externa y pareo obligatorio de proveedor
 de cobertura y cierre de hallazgos críticos/altos; el informe declara sus límites y no es certificación de un tercero.
 No autoriza comprar servicios ni implica haber completado la evaluación o desplegado el piloto.
 
+## Contrato de despliegue del servicio único — 2026-10-26
+
+`auth-server` es producción en `auth.efeonce.org`; no existe un servicio Auth staging. El control de
+publicación usa sólo pushes a `main`, promoción por `production-release.yml` desde `main` o dispatch
+productivo desde `main`. Todas las vías seleccionan el Environment `production` y un único lock del
+servicio, sin cancelar un despliegue activo. Este contrato sustituye las referencias históricas de este
+ADR a staging sobre el mismo servicio.
+
+El SHA completo debe estar publicado en `main` y ser el checkout construido. Antes de crear una revisión,
+el workflow identifica la única revisión con 100% del tráfico y rechaza una fuente desconocida, tráfico
+dividido o reemplazar código vivo no promovido por un target anterior o divergente. Publicar un fix del
+control no promueve el runtime servido desde `develop`: ese caso queda bloqueado antes de build/deploy,
+con error explícito. El release amplio y la activación first-party/OTP siguen siendo decisiones separadas.
+
+Resend usa el secreto production v1 y Sentry declara `production`; el drift verifica ambos y los montajes
+OTP se retiran con el flag OFF. Flags y cohorte conservan sus inputs gobernados. La eliminación efectiva
+del disparador de `develop` exige actualizar también su YAML remoto: GitHub evalúa el workflow de la rama
+que recibe el push. Las PR estrechas de control se publican por separado sobre cada base, sin incorporar
+el historial local ni código runtime/UI. Preparar o fusionar esas PR no acredita un deploy: comprobar
+checks, ausencia de build cuando el guard bloquea y revisión con tráfico después de publicar.
+
 ## Contrato vigente de acceso interno y federación
 
 Corte consolidado: [construcción, verificaciones y pendientes](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
