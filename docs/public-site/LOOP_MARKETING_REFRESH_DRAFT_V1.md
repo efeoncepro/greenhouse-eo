@@ -137,3 +137,57 @@ frecuente: el 4,4 es de Semrush; «13 veces» y «48 horas» no tienen fuente.
 - **Prioridad comercial (sesión de Analytics, 2026-10-26; decide Julio):** Loop queda sexto en el orden del blog.
   Instrucción: cerrar la fusión sin sobreinvertir, porque la demanda de «loop marketing» baja. Primero va reescribir
   «SEO + AEO 2025» a 2026, sin cambiar la URL.
+
+## 4. Publicación (2026-10-26, aprobada por Julio)
+
+Julio aprobó la publicación así: «solo vas a quitar la sección que dice que aplicamos el loop marketing porque este
+artículo perdía posiciones, eso nos perjudica más de lo que nos ayuda». La sección «Así aplicamos el loop a esta misma
+guía» y su gráfico antes/después se quitaron. **248513 queda aparte**, sin cambios.
+
+Publicado a las 10:07 UTC en **`https://efeoncepro.com/loop-marketing/que-es-loop-marketing/`** (post `248398`, misma
+URL) con `tmp/loop-publish/publish.php`. Ese script tiene 14 guardas sobre los dos posts y hace respaldo antes de
+escribir. Cambia el contenido, el título, el extracto y las metas de Yoast:
+- título SEO «Qué es Loop Marketing: las 4 etapas del framework de HubSpot %%page%% %%sep%% %%sitename%%»;
+- descripción;
+- frase clave «Loop Marketing»;
+- 14 minutos de lectura.
+
+El post 248483 pasa a **borrador**: conservado y recuperable, fuera del índice y del sitemap. Su URL redirige con un
+301 plain de Yoast Premium al pilar. Antes de escribir se avisó a las cinco sesiones del blog y las cinco confirmaron.
+
+| Paso | Resultado | Respaldo / rollback |
+|---|---|---|
+| Contenido y metas del pilar | `saved` (el hash difiere sólo por los emojis 🍏 guardados como entidades; normalizado, idéntico) | `_gh_post_refresh_248398_20261026_100746` |
+| 248483 a borrador + 301 | `draft`, redirección creada | `_gh_post_merge_248483_20261026_100746`; volver a `publish` y quitar la redirección |
+| Enlaces internos a 248483 | 244765: se quita el enlace duplicado («…en ¿Qué es Loop Marketing? y en cómo ejecutarlo…»); 249056: el enlace apunta al pilar. La spec de inbound del repo quedó igual | `_gh_post_republish_244765_20261026_100817`, `_gh_post_republish_249056_20261026_100817` |
+| Portada (destacada + OG) | adjunto `252148`, 2400 × 1260 | `_gh_cover_refresh_248398_20261026_100835` (destacada `248432`, OG `248434`) |
+| `hero` del slider | `_eo_hero_image` = `252149` (no fijado) | `blog-home hero 248398 --clear` |
+| Tarjeta del rail | `_eo_card_image` = `252150`, foco `71% 50%` | `blog-home card 248398 --clear` |
+| Videos (corrección) | republicado con la URL de cada embed en su propia línea | `_gh_post_republish_248398_20261026_101049` |
+| Copia de revisión `252141` | en la papelera | restaurar desde la papelera |
+
+**Defecto encontrado y corregido en la Content Factory:**
+- **El defecto:** el bloque `embed` escribía la URL pegada a `<div class="wp-block-embed__wrapper">`. Con la URL en
+  línea, `WP_Embed::autoembed` no la convierte en reproductor, y la página mostró el enlace pelado.
+- **La corrección:** ahora la URL va en su propia línea, como la guarda el editor, en `article-authoring.ts` y en sus
+  pruebas.
+- **Alcance:** la auditoría de los posts publicados sólo encontró el pilar y su copia privada.
+
+**QA en vivo (anónimo, después de la purga):**
+- **Respuestas:** 200 en el pilar. El 301 sale en un salto desde la URL vieja, con y sin barra final y conservando
+  `utm_*`.
+- **Metas:**
+  - canonical propio;
+  - `index, follow, max-image-preview:large`;
+  - `og:image` = la portada nueva a 2400 × 1260, con `og:image:alt`;
+  - `summary_large_image`.
+- **Schema:** `TechArticle` con el titular nuevo y `FAQPage` con 6 preguntas.
+- **Sitemap:** el pilar con `lastmod` 2026-10-26T10:10:49Z y sin la URL vieja.
+- **Playwright en 1440 y 390 px:** un H1, 0 desborde, 0 imágenes rotas, 0 errores de página, los 2 videos de YouTube
+  en iframe, el diagrama `Loop-MKT.svg`, el gráfico «7 de cada 100» dibujado y el Growth CTA.
+- **`blog-home verify --browser`:** 0 violaciones en escritorio, tablet y móvil. El pilar no entró al slider: no se
+  cambió la fecha.
+
+**Residual:** queda un pingback viejo en los comentarios del pilar con la URL `/uncategorized/como-aplicar-loop-marketing/`.
+Es un comentario, no contenido, así que no se tocó. **Pendiente de una persona:** solicitar la indexación del pilar en
+Search Console, porque la API no lo permite.

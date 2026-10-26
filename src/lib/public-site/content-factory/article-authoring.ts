@@ -635,14 +635,16 @@ const embedBlock = (block: Extract<GutenbergArticleBlock, { kind: 'embed' }>): s
   })
 
   // Same shape WordPress stores for a captioned embed (Glitch #17, 251605): the
-  // figcaption follows the wrapper inside the figure.
+  // figcaption follows the wrapper inside the figure. The URL goes on its own line
+  // inside the wrapper, as the editor saves it: WP_Embed::autoembed only turns a
+  // URL alone on its line into the player (inline, the post showed the bare link).
   const caption = block.caption
     ? `<figcaption class="wp-element-caption">${renderRichText(block.caption)}</figcaption>`
     : ''
 
   return [
     `<!-- wp:embed ${attrs} -->`,
-    `<figure class="wp-block-embed is-type-video is-provider-${block.provider} wp-block-embed-${block.provider} wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">${escapeGutenbergHtml(url)}</div>${caption}</figure>`,
+    `<figure class="wp-block-embed is-type-video is-provider-${block.provider} wp-block-embed-${block.provider} wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">\n${escapeGutenbergHtml(url)}\n</div>${caption}</figure>`,
     '<!-- /wp:embed -->'
   ].join('\n')
 }

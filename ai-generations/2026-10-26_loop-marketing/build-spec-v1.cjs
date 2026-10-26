@@ -415,37 +415,6 @@ const spec = {
       ]
     },
     {
-      heading: 'Así aplicamos el loop a esta misma guía',
-      level: 2,
-      blocks: [
-        P(
-          'Esta guía es el resultado de una vuelta del loop. Antes había dos artículos: «¿Qué es Loop Marketing?» y «Cómo aplicar Loop Marketing», publicados en septiembre de 2025. En la Optimización miramos Search Console y encontramos dos cosas.'
-        ),
-        {
-          kind: 'chart',
-          chart: {
-            kind: 'before-after',
-            categories: ['Impresiones en Google (90 días)'],
-            series: [
-              { name: 'Abr – jul 2026', values: [3687] },
-              { name: 'Jul – oct 2026', values: [1851] }
-            ]
-          },
-          title: 'La guía perdió la mitad de sus impresiones en tres meses',
-          caption: '«¿Qué es Loop Marketing?», ventanas del 27 de abril al 25 de julio y del 26 de julio al 23 de octubre de 2026.',
-          sourceLabel: 'Search Console de efeoncepro.com',
-          tone: 'light'
-        },
-        P(
-          'La primera: muchas de las búsquedas que llegaban eran preguntas armadas por asistentes de IA sobre cifras del texto, como si Loop Marketing podía «convertir 4,4 veces más» o generar contenido «13 veces más efectivo que Google Ads». Todo indica que asistentes de IA usaban el artículo para responder esas preguntas, y varios de esos datos no tenían fuente.'
-        ),
-        P(
-          'La segunda: los dos artículos se repetían y hasta se contradecían. Así que hicimos lo que propone el método. Revisamos en su fuente original las 34 cifras y las 7 citas: 6 cifras se sostenían tal cual, 14 existían con otra cifra, otra fecha u otro autor, y 14 no aparecían en ninguna fuente. Corregimos las primeras, sacamos las otras, unimos los dos artículos en uno y usamos los nombres oficiales de las etapas en español.'
-        ),
-        P('Definición, Adaptación, Amplificación y Optimización, aplicadas a un artículo. En seis a ocho semanas vamos a ver en Search Console si la vuelta funcionó.')
-      ]
-    },
-    {
       heading: 'Por dónde empezar',
       level: 2,
       blocks: [

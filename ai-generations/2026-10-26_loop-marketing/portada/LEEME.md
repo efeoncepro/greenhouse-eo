@@ -1,6 +1,6 @@
 # Portada del pilar «Qué es Loop Marketing» (2026-10-26)
 
-**Estado:** aprobada por el operador el 2026-10-26 («El loop quedó muy achatado, pero bueno vamos»). No está subida. Va con la publicación del pilar (post
+**Estado:** aprobada por el operador el 2026-10-26 («El loop quedó muy achatado, pero bueno vamos») y **publicada el mismo día** con el pilar: portada `252148`, `hero` `252149` y tarjeta `252150` (detalle en `docs/public-site/LOOP_MARKETING_REFRESH_DRAFT_V1.md` §4). Va con la publicación del pilar (post
 `248398`, fusión con `248483`). Reemplaza las dos portadas anteriores (`248432` y `248501`), que el operador pidió
 rehacer.
 
