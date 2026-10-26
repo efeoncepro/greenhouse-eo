@@ -569,6 +569,7 @@ autoridad en implementación HubSpot → landing de servicios. Datos: Search Con
   preguntas; sitemap con la URL nueva y `lastmod` 2026-10-26, sin la vieja; Inbound e ICP enlazan a la nueva y a la
   vieja ninguna vez. Playwright 1440 y 390: un H1, sin desborde, seis imágenes cargadas, TOC de 11 enlaces, 0 errores.
   `blog-home verify --browser`: 7 anchos sin desborde y 0 violaciones.
-- **Pendiente:** pedir indexación de la URL nueva (lo hace la sesión de Analytics con el runner, cuando Julio lo diga);
-  decidir si la copia privada 252161 va a la papelera; Search Console repartirá datos entre las dos URL durante semanas:
+- **Después de publicar (Julio, 2026-10-26):** copia privada 252161 a la papelera (recuperable). Indexación aprobada por
+  Julio; la sesión de Analytics la corre con el runner cuando él se la confirme directamente en esa sesión (su regla).
+- **Pendiente:** Search Console repartirá datos entre las dos URL durante semanas:
   sumar ambas contra la línea base (1 033 impresiones, posición 39,3).
