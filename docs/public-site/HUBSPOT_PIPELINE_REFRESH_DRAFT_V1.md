@@ -570,6 +570,8 @@ autoridad en implementación HubSpot → landing de servicios. Datos: Search Con
   vieja ninguna vez. Playwright 1440 y 390: un H1, sin desborde, seis imágenes cargadas, TOC de 11 enlaces, 0 errores.
   `blog-home verify --browser`: 7 anchos sin desborde y 0 violaciones.
 - **Después de publicar (Julio, 2026-10-26):** copia privada 252161 a la papelera (recuperable). Indexación aprobada por
-  Julio; la sesión de Analytics la corre con el runner cuando él se la confirme directamente en esa sesión (su regla).
+  Julio y confirmada por él en la sesión de Analytics: solicitada a las **19:41:37 UTC** con `pnpm public-website:gsc-index`,
+  resultado `requested` («Se ha solicitado la indexación»). Antes: «La URL no está en Google», sin rastreo. 2 de 10
+  solicitudes del día.
 - **Pendiente:** Search Console repartirá datos entre las dos URL durante semanas:
   sumar ambas contra la línea base (1 033 impresiones, posición 39,3).
