@@ -25,6 +25,7 @@ const hashes: Record<string, string> = {
   '1792964731337_rooms-invitation-issuer-binding.sql': 'c5ec49f2018306507d7adcc1eddff13ddd282021227647801a7030609ab2205a',
   '1792968329622_rooms-private-image-media.sql': 'f1ed5baccc9b5f087e550176eae7f82945f5dc7674c88b1a9b048cf311309fac',
   '1793022282668_rooms-media-storage-generations.sql': '0ab4c2095422117970b3ab238aaeccfb43851a8b3c16a9ec8dc85e08f8999a87',
+  '1793042981615_rooms-media-dispatch.sql': '1063ad0e9ed544825e98a15ed7e56fc1a0a9dd2abee2136003f5ae8ad0357b27',
 }
 
 let phase = 'arguments'
@@ -119,7 +120,7 @@ return client
     const appliedBefore = (await migrator.query('SELECT name FROM public.rooms_migrations ORDER BY id')).rows.map(r => r.name as string)
     const allNames = Object.keys(hashes).map(n => n.replace('.sql', ''))
 
-    if (![5,7].includes(appliedBefore.length) || JSON.stringify(appliedBefore) !== JSON.stringify(allNames.slice(0, appliedBefore.length))) fail('applied_inventory')
+    if (![5,7,8].includes(appliedBefore.length) || JSON.stringify(appliedBefore) !== JSON.stringify(allNames.slice(0, appliedBefore.length))) fail('applied_inventory')
 
     const snapshot = async () => (await migrator.query(`SELECT
       (SELECT count(*)::int FROM rooms.rooms) AS rooms,
@@ -199,6 +200,8 @@ return client
       await migrator.query(`GRANT UPDATE(state,receiving_nonce) ON rooms.upload_sessions TO ${ROLE}`)
       await migrator.query(`GRANT UPDATE(state,attempts,lease_token,lease_expires_at) ON rooms.media_jobs TO ${ROLE}`)
       await migrator.query(`GRANT INSERT ON rooms.media_renditions,rooms.audit,rooms.outbox TO ${ROLE}`)
+      await migrator.query(`GRANT SELECT ON rooms.media_dispatch TO ${ROLE}`)
+      await migrator.query(`GRANT UPDATE(nonce,lease_expires_at,completed_at) ON rooms.media_dispatch TO ${ROLE}`)
       await migrator.query('COMMIT')
     } catch (e) { await migrator.query('ROLLBACK'); throw e }
 
@@ -216,6 +219,7 @@ return client
       if (!denied) fail('negative_acl')
     }
 
+    await worker.query('BEGIN'); await worker.query('UPDATE rooms.media_dispatch SET nonce=NULL,lease_expires_at=NULL,completed_at=clock_timestamp() WHERE false'); await worker.query('ROLLBACK')
     await worker.query('SELECT asset_version_id FROM rooms.media_jobs WHERE state=\'queued\' LIMIT 1')
     await worker.query('BEGIN'); await worker.query('UPDATE rooms.rooms SET revision=revision WHERE false'); await worker.query('ROLLBACK')
     const grants = (await worker.query(`SELECT table_name,privilege_type FROM information_schema.table_privileges WHERE grantee=current_user AND table_schema='rooms' ORDER BY table_name,privilege_type`)).rows
@@ -223,7 +227,7 @@ return client
     const tables = (await migrator.query("SELECT count(*)::int AS count FROM pg_tables WHERE schemaname='rooms'")).rows[0].count
     const receipt = { at:new Date().toISOString(),status:'applied_and_verified',instance:INSTANCE,database:DATABASE,tables,migrationsApplied:migrations.map(m=>m.name),migrations:names,contentPreserved:true,contentBefore:before,workerRole:await readRole(),workerConnection:'PASS',negativeAclChecks:6,grants,updateColumns:columns,secretVersion:`projects/${PROJECT}/secrets/${SECRET}/versions/1`,newPasswordInitialized:created,passwordsInSql:false,flagsChanged:false,publicConnectResidual:'Other databases retain inherited PUBLIC CONNECT/TEMP; no shared/global ACL change in this rollout.' }
 
-    await writeFile(resolve('docs/audits/rooms/2026-10-26-media-database-infra.json'),JSON.stringify(receipt,null,2)+'\n')
+    await writeFile(resolve('docs/audits/rooms/2026-10-26-media-dispatch-database.json'),JSON.stringify(receipt,null,2)+'\n')
     console.log(JSON.stringify(receipt))
   } finally {
     for (const c of clients) await c.end().catch(()=>{})

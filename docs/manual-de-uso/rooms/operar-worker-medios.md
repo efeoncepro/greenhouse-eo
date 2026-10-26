@@ -1,7 +1,8 @@
 # Operar el worker privado de medios de Rooms
 
 El Job `rooms-media-worker` está desplegado en `efeonce-group`, región `us-east4`. Una ejecución reclama
-como máximo un trabajo de la cola y termina. No existe scheduler ni proceso continuo. La aplicación
+como máximo un trabajo de la cola y termina. Cloud Scheduler comprueba la cola cada minuto; no existe
+proceso continuo. La aplicación
 web conserva medios, invitaciones y acceso first-party desactivados.
 
 ## Estado comprobado
@@ -9,7 +10,7 @@ web conserva medios, invitaciones y acceso first-party desactivados.
 - Imagen fijada por digest; CPU 1, memoria 1Gi, timeout 240 segundos, cero reintentos y paralelismo 1.
 - SA exclusiva sin claves; acceso al secreto de su rol SQL únicamente.
 - Rol `rooms_media_worker`: máximo dos conexiones, sin privilegios altos y con writes por tabla/columna.
-- Siete migraciones y 25 tablas en `rooms_production`. La instancia compartida conserva backup y PITR.
+- Ocho migraciones y 26 tablas en `rooms_production`. La instancia compartida conserva backup y PITR.
 - Una ejecución con cola vacía y otra con un PNG físico terminaron correctamente; la segunda produjo dos WebP. [Canary real y cierre OFF](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
 
 Evidencias: [Job](../../audits/rooms/2026-10-26-media-worker-deployment.json),
@@ -41,13 +42,40 @@ El timeout puede dejar una lease pendiente de vencimiento; el fencing impide con
 
 El script `scripts/rooms/provision-cloud-media-database.ts` usa el perfil admin canónico para crear el rol,
 y el migrador propio de Rooms para su schema. Por defecto es un plan de lectura; `--apply` exige autorización
-y verifica hashes de las siete migraciones. Usa ADC del operador y refs de Secret Manager; nunca recibe
+y verifica hashes de las ocho migraciones. Usa ADC del operador y refs de Secret Manager; nunca recibe
 contraseñas en SQL ni argumentos. No inicializa otra vez la contraseña de un rol existente.
 
-Las variables GCS del proyecto Vercel están preparadas para el próximo deploy. No se reconstruyó la
-aplicación por este bloque. [Configuración](../../audits/rooms/2026-10-26-media-vercel-configuration.json).
+Las variables GCS están en el despliegue de Production. El flag de máquina
+`ROOMS_MEDIA_DISPATCH_ENABLED=true` habilita únicamente el disparador. `ROOMS_FIRST_PARTY_AUTH_ENABLED`,
+`ROOMS_INVITATIONS_ENABLED` y `ROOMS_MEDIA_ENABLED` permanecen OFF en la aplicación web.
 
 La transferencia y el canary conjunto con Efeonce ID ya se comprobaron con un archivo físico y el único
 correo autorizado; no repetir ese envío por inferencia. Antes de activar medios de forma general faltan
-el consumidor frontend y una decisión explícita sobre el disparo del Job. No activar un scheduler,
-`--loop`, flags web ni envío de correos por el solo hecho de tener infraestructura lista.
+el consumidor frontend y la activación general autorizada. El disparo automático fue autorizado en un
+bloque posterior. No activar `--loop`, flags web ni envío de correos por tener el scheduler listo.
+
+## Disparo automático
+
+Scheduler `rooms-media-dispatch` (`us-east4`, cada minuto, UTC, deadline30s y sin retry) hace POST con
+body `{}` al endpoint fijo `/api/internal/media/dispatch` en el dominio canónico. Firma OIDC de Google,
+email verificado de `rooms-media-scheduler-prod@efeonce-group.iam.gserviceaccount.com`, issuer y audience
+exactos; rechaza cookies, Origin, otros cuerpos/URLs y peticiones anónimas. No hay clave compartida.
+
+Con cola vacía devuelve200 y no inicia contenedor. Con demanda reclama la fila singleton
+`rooms.media_dispatch` y llama al Job:202. Sólo envía un nonce como override. Lease10min, timeout
+del Job240s, acknowledgement cercado por nonce; un resultado tardío no borra una lease posterior.
+Error ambiguo503 conserva lease; revisar ejecución/SQL antes de reintentar. La SA de app tiene un rol
+custom de dos permisos sobre este Job únicamente; Scheduler no tiene acceso a DB, secretos ni medios.
+
+```sh
+gcloud scheduler jobs describe rooms-media-dispatch --project=efeonce-group --location=us-east4
+gcloud scheduler jobs pause rooms-media-dispatch --project=efeonce-group --location=us-east4
+```
+
+Rollback: pausar primero; poner flag de máquina OFF y desplegar/promover esa configuración. Conservar
+la migración/lease hasta terminar el Job; nunca hacer down con nonce activo. Para reanudar usar
+`gcloud scheduler jobs resume` sólo después del readback del endpoint y su configuración.
+
+[Readback y prueba de transporte](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). La prueba
+sintética en la sala archivada valida Scheduler→API→Job→SQL→ack; no escribe objeto ni se presenta como
+nuevo canary de imagen. El PNG real y el único correo conservan su evidencia anterior.

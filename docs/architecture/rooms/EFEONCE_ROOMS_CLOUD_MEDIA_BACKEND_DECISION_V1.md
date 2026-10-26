@@ -86,6 +86,27 @@ Tres variables GCS se guardaron en Vercel Production para el próximo deploy; no
 ni se reconstruyó la aplicación. El canary real y el consumidor conservan su gate separado.
 [Manual y evidencias](../../manual-de-uso/rooms/operar-worker-medios.md).
 
+## Disparo automático autorizado 2026-10-26
+
+Decisión incremental de TASK-2072: Cloud Scheduler cada minuto hace POST al endpoint fijo
+`https://efeonce-rooms.vercel.app/api/internal/media/dispatch`, autenticado con OIDC Google de la SA
+`rooms-media-scheduler-prod@efeonce-group.iam.gserviceaccount.com`. No utiliza sesión humana,
+API key, cookies ni autoridad de cliente. Verificar firma, expiración, issuer, audience y email exactos.
+
+`ROOMS_MEDIA_DISPATCH_ENABLED` es un flag de máquina independiente. Acceso, invitaciones y medios web
+permanecen OFF. El endpoint consulta la cola y sólo invoca el Job existente con trabajo pendiente.
+Una fila singleton SQL y lease de diez minutos evitan ejecuciones superpuestas; nonce por invocación
+cerca el acknowledgement del worker. Llamada Jobs API fuera de la transacción, sin retry automático;
+fallo ambiguo conserva lease hasta expiración. Worker mantiene timeout240s y retries0. Nueva migración8
+sólo añade coordinación, sin cambiar salas/publicaciones. App obtiene exclusivamente `run.jobs.run` y
+`run.jobs.runWithOverrides` sobre este Job; la única override es el nonce. No conceder roles de proyecto.
+
+Rollout: migración/ACL → worker por digest → endpoint desplegado → Scheduler verificado y habilitado.
+Comprobar cola vacía sin ejecución y una única demanda sintética en la sala archivada existente:
+rechazo previo a storage y lease liberada prueban transporte, sin repetir canary de imagen/correo.
+Rollback: pausar Scheduler, flag máquina OFF y conservar tabla/lease hasta terminación del Job.
+No ejecutar down sobre una lease activa. El frontend sigue bajo Claude Design.
+
 ## Alternativas
 
 - Proxy de originales20MiB por Vercel: rechazada por límite de plataforma.

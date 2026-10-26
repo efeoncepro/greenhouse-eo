@@ -3,6 +3,19 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-26 — Disparo automático de medios verificado; interfaz Claude Design
+
+- `vivo`: Rooms main `e4b2e890` (PR3), despliegue promovido `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS`.
+- `vivo`: Scheduler `rooms-media-dispatch` cada minuto, SA OIDC dedicada y audience fijo. Cola vacía200
+  sin ejecutar Job; demanda sintética en sala archivada202 → `rooms-media-worker-4r9nz` SUCCESS.
+  Guard de archivo rechaza antes de storage; cero objetos/derivados, cola vacía y ack liberado.
+- `vivo`: ocho migraciones/26 tablas, salas y publicaciones conservadas. Lease singleton10min y nonce
+  cercado. Worker timeout240s/retries0, imagen `sha256:d49995de3ee7e5fa71ec7fabe0e8bb04d8ac3b4bbd2ef125a8331311d1d121f2`.
+- `vivo`: flag de máquina ON; first-party/invitaciones/medios web OFF. Cero correos nuevos, no repetir canary.
+- `local`: verify234/234,9focales,lint/types/build y CI Linux PASS. Bootstrap `b2f90fa` local preservado.
+- Diseño y consumidor bajo Claude Design; activación general no acreditada.
+  [Evidencia](../../../../docs/audits/rooms/2026-10-26-automatic-media-dispatch.json) y [manual](../../../../docs/manual-de-uso/rooms/operar-worker-medios.md).
+
 ## 2026-10-26 — Canary real de Auth y una imagen completado; flags OFF
 
 Alcance humano: una sala sintética, una imagen y un correo autorizado.

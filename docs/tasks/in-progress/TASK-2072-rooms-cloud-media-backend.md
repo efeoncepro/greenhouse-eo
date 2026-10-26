@@ -17,11 +17,11 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Canary real 2026-10-26 PASS: Efeonce ID con Microsoft/MFA, PNG físico de 3.010.606 bytes por PUT GCS, worker a dos WebP, preview 304.540 bytes 1122x1402 con SHA/ETag/SQL coincidentes. Un correo recibido en Outlook, código válido abre sala V3 e imagen, incorrecto/replay/otro espacio/borrador denegados; revocación niega sala e imagen. Sala archivada, flags web/Auth y correo OFF restaurados. Main a87852e sin cambio funcional; tooling b2f90fa local. Consumidor frontend y disparo automático del Job pendientes; sin cierre de rollout general.`
+- Status real: `Canary real 2026-10-26 PASS: Efeonce ID con Microsoft/MFA, PNG físico de 3.010.606 bytes por PUT GCS, worker a dos WebP, preview 304.540 bytes 1122x1402 con SHA/ETag/SQL coincidentes. Un correo recibido en Outlook, código válido abre sala V3 e imagen, incorrecto/replay/otro espacio/borrador denegados; revocación niega sala e imagen. Sala archivada, flags web/Auth y correo OFF restaurados. Main e4b2e890 (PR3) añade disparador privado de Cloud Scheduler, flags humanos OFF; migración8 y worker por digest desplegados. Disparo automático verificado: Scheduler OIDC200 en vacío,202 con demanda, un Job4r9nz exitoso, cola vacía y ack cercado; sin nuevo correo ni imagen. Tooling b2f90fa local preservado. Consumidor frontend Claude Design pendiente; sin cierre de rollout general.`
 - Rank: `R05 cloud después del circuito local2070; frontend2071 conserva ownership separado`
 - Domain: `platform|data|content|ops`
 - Blocked by: `none`
-- Branch: `efeonce-rooms main@a87852e vía codex/rooms-backend-production y PR2; documentos greenhouse-eo develop`
+- Branch: `efeonce-rooms main@e4b2e890 vía PR3 (dispatch); base de medios PR2; documentos greenhouse-eo develop`
 
 ## Summary
 
@@ -190,6 +190,7 @@ GCS; previews siguen <=3MiB. La app reautoriza GET/HEAD/Range y nunca ofrece ori
 - [x] Complete confirma bytes/checksum/generación antes de encolar, con autoridad fresca al confirmar. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
 - [x] GET/HEAD/Range/304 reautorizan y conservan no-store/denegación de originales. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
 - [x] Worker se construye/ejecuta sin tsx; perfil cloud propio y ninguna SA key/ADC local en Production. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
+- [x] Disparo automático privado sin contenedor en vacío; una demanda arranca un único Job y libera lease por nonce. Evidencia: [Scheduler y readback SQL](../../audits/rooms/2026-10-26-automatic-media-dispatch.json), PR3 y nueve pruebas focales.
 - [x] PG y restore preservan V1/V2/V3, hashes, generaciones, permisos y auditoría. Evidencia: recovery aislado PG16/18, seis salas de dos tenants,25tablas/18objetos/12bindings; generaciones cloud físicas siguen sin canary.
 - [x] HTTP/CLI comparten operaciones y guía frontend completa sin lógica de permisos en cliente. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
 - [x] Recursos/env/flags/migraciones tienen readback; canary completo queda explícitamente pendiente. Evidencias: [storage/IAM](../../audits/rooms/2026-10-26-media-storage-infra.json), [DB](../../audits/rooms/2026-10-26-media-database-infra.json), [Job](../../audits/rooms/2026-10-26-media-worker-deployment.json) y [configuración](../../audits/rooms/2026-10-26-media-vercel-configuration.json). Ejecución de cola vacía no acredita imagen real.

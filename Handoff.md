@@ -42,7 +42,13 @@ se conservan; respuesta posterior no prueba causalidad.
 
 ### 2026-10-26 — Rooms: backend Codex y diseño Claude Design
 
-Canary real de Auth y una imagen completado; flags OFF: Microsoft/MFA, una sala sintética y PNG físico de 3 MB por GCS→Job→dos WebP; preview de 304 KB con SHA/ETag/SQL coincidentes. Un correo recibido: código correcto200/incorrecto400/replay404, lectura privada200 y revocación401/404. Invitación revocada y sala archivada. Final Rooms main a87852e OFF y Auth00168-vzb OFF, misma imagen; Resend producción v1 y Sentry production corregidos. [Prueba y límites](docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). Bootstrap b2f90fa local sólo habilita edición/reapertura de esa sala. Consumidor Claude Design, disparo del Job y workflow Auth staging siguen pendientes. Sin full suite repetida ni release de Greenhouse.
+Disparo automático posterior ya verificado: Rooms main `e4b2e890` (PR3), endpoint de máquina con OIDC
+y Scheduler cada minuto. Vacío200 sin contenedor; demanda sintética en la misma sala archivada202→Job
+`4r9nz` SUCCESS, cola vacía/ack liberado y publicaciones intactas. Ocho migraciones/26tablas, worker
+por digest `d49995de…`,234testsPASS. Flag dispatch ON; flags humanos web OFF; cero correos y ningún
+cambio UI. [Prueba](docs/audits/rooms/2026-10-26-automatic-media-dispatch.json). Claude Design conserva frontend.
+
+Canary real de Auth y una imagen completado; flags OFF: Microsoft/MFA, una sala sintética y PNG físico de 3 MB por GCS→Job→dos WebP; preview de 304 KB con SHA/ETag/SQL coincidentes. Un correo recibido: código correcto200/incorrecto400/replay404, lectura privada200 y revocación401/404. Invitación revocada y sala archivada. Final Rooms main a87852e OFF y Auth00168-vzb OFF, misma imagen; Resend producción v1 y Sentry production corregidos. [Prueba y límites](docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). Bootstrap b2f90fa local sólo habilita edición/reapertura de esa sala. Al terminar ese canary quedaban consumidor Claude Design, disparo del Job y workflow Auth staging pendientes (deltas posteriores arriba). Sin full suite repetida ni release de Greenhouse.
 
 Bloque de infraestructura cerrado: bucket GCS privado con IAM/CORS y SA, 7 migraciones/25 tablas cloud, rol worker con límite 2 y secreto v1; Job CPU 1/RAM 1Gi, timeout 240s y cero reintentos, con una ejecución de cola vacía SUCCESS. Variables GCS preparadas para próximo deploy; app OFF, sin Auth/correos/UI/scheduler ni otro deploy. [DB](docs/audits/rooms/2026-10-26-media-database-infra.json), [storage](docs/audits/rooms/2026-10-26-media-storage-infra.json), [worker](docs/audits/rooms/2026-10-26-media-worker-deployment.json). Canary OIDC y de imagen real, consumidor y disparo del Job quedan para el siguiente bloque. Lint del script y typecheck global PASS; no se repitieron las 225 pruebas anteriores.
 

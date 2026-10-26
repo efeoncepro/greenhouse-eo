@@ -1,0 +1,119 @@
+{
+  "at": "2026-10-26T19:41:42.464757+00:00",
+  "status": "verified",
+  "runtimeMain": "e4b2e890cd0bd27823a1760e6c06f90330dadf3d",
+  "source": "2097977f1461f2b8eb4e80bb78b9e7684a075363",
+  "pullRequest": "https://github.com/efeoncepro/efeonce-rooms/pull/3",
+  "deployment": {
+    "id": "dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS",
+    "canonicalOrigin": "https://efeonce-rooms.vercel.app"
+  },
+  "scheduler": {
+    "name": "projects/efeonce-group/locations/us-east4/jobs/rooms-media-dispatch",
+    "state": "ENABLED",
+    "schedule": "* * * * *",
+    "timeZone": "Etc/UTC",
+    "attemptDeadline": "30s",
+    "retryConfig": {
+      "maxBackoffDuration": "3600s",
+      "maxDoublings": 5,
+      "maxRetryDuration": "0s",
+      "minBackoffDuration": "5s"
+    },
+    "lastAttemptTime": "2026-10-26T19:41:02.775876Z"
+  },
+  "oidc": {
+    "audience": "https://efeonce-rooms.vercel.app/api/internal/media/dispatch",
+    "serviceAccountEmail": "rooms-media-scheduler-prod@efeonce-group.iam.gserviceaccount.com"
+  },
+  "endpoint": "https://efeonce-rooms.vercel.app/api/internal/media/dispatch",
+  "anonymousPost": 401,
+  "schedulerHttpResponses": [
+    {
+      "timestamp": "2026-10-26T19:41:10.895354904Z",
+      "debugInfo": "URL_CRAWLED. Original HTTP response code number = 200",
+      "status": {}
+    },
+    {
+      "timestamp": "2026-10-26T19:40:05.060323785Z",
+      "debugInfo": "URL_CRAWLED. Original HTTP response code number = 202",
+      "status": {}
+    },
+    {
+      "timestamp": "2026-10-26T19:39:14.980136836Z",
+      "debugInfo": "URL_CRAWLED. Original HTTP response code number = 200",
+      "status": {}
+    },
+    {
+      "timestamp": "2026-10-26T19:38:42.203242420Z",
+      "debugInfo": "URL_CRAWLED. Original HTTP response code number = 200",
+      "status": {}
+    }
+  ],
+  "worker": {
+    "name": "rooms-media-worker",
+    "image": "gcr.io/efeonce-group/rooms-media-worker@sha256:d49995de3ee7e5fa71ec7fabe0e8bb04d8ac3b4bbd2ef125a8331311d1d121f2",
+    "serviceAccount": "rooms-media-worker-production@efeonce-group.iam.gserviceaccount.com",
+    "timeoutSeconds": "240",
+    "maxRetries": 0,
+    "execution": "rooms-media-worker-4r9nz",
+    "completed": true,
+    "completionTime": "2026-10-26T19:40:41.827152Z",
+    "newExecutions": [
+      "rooms-media-worker-4r9nz"
+    ],
+    "idleStartedNoWorker": true
+  },
+  "iam": {
+    "jobBindings": [
+      {
+        "members": [
+          "serviceAccount:rooms-runtime-production@efeonce-group.iam.gserviceaccount.com"
+        ],
+        "role": "projects/efeonce-group/roles/roomsMediaDispatch"
+      }
+    ],
+    "customRole": "projects/efeonce-group/roles/roomsMediaDispatch",
+    "permissions": [
+      "run.jobs.run",
+      "run.jobs.runWithOverrides"
+    ],
+    "schedulerAccountHasNoProductGrants": true
+  },
+  "sql": {
+    "at": "2026-10-26T19:41:00.422Z",
+    "fixture": "archived_room_transport_only",
+    "row": {
+      "state": "failed",
+      "attempts": 0,
+      "problem_code": "processing_unavailable",
+      "renditions": 0
+    },
+    "queue": {
+      "pending": 0,
+      "dispatchActive": false
+    },
+    "contentPreserved": true
+  },
+  "flags": {
+    "ROOMS_MEDIA_DISPATCH_ENABLED": true,
+    "ROOMS_FIRST_PARTY_AUTH_ENABLED": false,
+    "ROOMS_INVITATIONS_ENABLED": false,
+    "ROOMS_MEDIA_ENABLED": false
+  },
+  "checks": {
+    "pnpmVerify": "PASS",
+    "tests": 234,
+    "skipped": 0,
+    "focusedDispatchTests": 9,
+    "linuxImageSmoke": "PASS",
+    "cloudBuild": "5aaeea33-ba75-4cc3-95b3-ed2128813e58"
+  },
+  "limits": {
+    "fixture": "Synthetic queued row in existing archived pilot. Guard fails before storage/decoder, no object or rendition created.",
+    "realImageCanary": "Previous canary retained, not repeated.",
+    "emailsSent": 0,
+    "uiChanges": false,
+    "generalRollout": false
+  }
+}

@@ -1,5 +1,14 @@
 # Greenhouse — Feature Flag State Ledger (env-var flags)
 
+## Rooms — disparo automático 2026-10-26
+
+Readback de Production `efeonce-rooms` main `e4b2e890` y despliegue `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS`:
+`ROOMS_MEDIA_DISPATCH_ENABLED=true` (default código OFF), independiente de permisos humanos.
+`ROOMS_FIRST_PARTY_AUTH_ENABLED=false`, `ROOMS_INVITATIONS_ENABLED=false` y `ROOMS_MEDIA_ENABLED`
+ausente/default OFF. Cloud Scheduler habilitado; sólo consulta SQL y arranca el Job con demanda.
+Worker conserva `ROOMS_MEDIA_ENABLED=true` en su perfil privado. [Prueba](../audits/rooms/2026-10-26-automatic-media-dispatch.json).
+El canary anterior ya envió y comprobó el único correo; este bloque envió cero. El corte25Oct siguiente es histórico.
+
 ## Auth first-party e invitaciones — implementación local 2026-10-25
 
 | Flag | Owner / runtime | Default del código y deploy | Estado de verificación |
