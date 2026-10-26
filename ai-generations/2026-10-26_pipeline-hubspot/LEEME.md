@@ -1,7 +1,7 @@
 # Refresh «Pipeline de ventas en HubSpot» (post 246045) — imágenes
 
 Artículo: [`docs/public-site/HUBSPOT_PIPELINE_REFRESH_DRAFT_V1.md`](../../docs/public-site/HUBSPOT_PIPELINE_REFRESH_DRAFT_V1.md).
-Nada de esta carpeta está subido como portada, `hero` ni tarjeta: espera la aprobación de Julio.
+**Publicado el 2026-10-26** (19:33 UTC) en `/hubspot/pipeline-de-ventas/`: portada 252166, `hero` 252167, tarjeta 252168 (foco `91% 50%`). Registro y QA en el borrador §11.
 
 ## Interfaz de HubSpot (cuerpo del artículo)
 

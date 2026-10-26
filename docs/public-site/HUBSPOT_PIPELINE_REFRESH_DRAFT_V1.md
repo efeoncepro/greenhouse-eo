@@ -543,3 +543,32 @@ autoridad en implementación HubSpot → landing de servicios. Datos: Search Con
   los dos posts y sus specs están libres; la spec de Inbound ya está al día con el post vivo (sin el enlace a «Cómo
   aplicar Loop Marketing»). Partir de ese estado y usar `scripts/public-website/blog-post-content-republish.php`
   (simulación → apply; guarda la FAQ y deja respaldo).
+
+## 11. Registro de publicación (2026-10-26, aprobado por Julio)
+
+- **Aviso previo:** confirmaron sin trabajo en curso «Rediseño portada blog», «Mejora de artículos del blog», «Blog v3
+  portada» y «Análisis de Analytics y Search Console»; «Blog author plugin» y «Plantilla Archivo» no respondieron
+  (estaban inactivas).
+- **Publicación (19:33 UTC):** `ai-generations/2026-10-26_pipeline-hubspot/publicacion/publish.php` (simulación con 10
+  guardas en verde → apply). Título, contenido, extracto, slug `pipeline-de-ventas` y metas Yoast (title, descripción,
+  frase clave «pipeline de ventas», 13 min). Fecha de publicación, categoría, etiquetas y destacada conservadas.
+  Respaldo `_gh_post_refresh_246045_20261026_193316`. **301 plain de Yoast** creado:
+  `/hubspot/crea-un-pipeline-de-ventas-que-convierte-guia-paso-a-paso/` → `/hubspot/pipeline-de-ventas/` (ningún
+  redirect previo apuntaba a la URL vieja).
+- **Enlaces internos:** Inbound (244765) e ICP (249108) republicados con `blog-post-content-republish.php`, partiendo
+  del contenido vivo con sólo la URL reemplazada; las specs del repo se actualizaron y regeneran exactamente ese
+  contenido. FAQ idéntica, sin cambios en otros campos. Respaldos `_gh_post_republish_244765_20261026_193334` y
+  `_gh_post_republish_249108_20261026_193335`.
+- **Portada:** adjunto **252166** (`uploads/2024/11/pipeline-de-ventas-hubspot-2026.jpg`, 2400 × 1260, sha256
+  `a34b7e7c…`, igual al local), destacada + OG. Respaldo `_gh_cover_refresh_246045_20261026_193355` (antes: destacada
+  246062, OG 246063). **Hero:** adjunto **252167**. **Tarjeta del rail:** adjunto **252168**, foco `91% 50%`.
+  Hero y tarjeta quedan guardados, pero el post no entra hoy al slider ni al rail porque conserva su fecha de 2024.
+- **QA en vivo:** URL nueva 200; la vieja 301 en un salto, con y sin barra final y conservando `utm_*`; title,
+  descripción, robots `index, follow`, canonical y `og:url` nuevos; `og:image` nueva con alt; `summary_large_image`;
+  schema BlogPosting con el titular nuevo, autor Julio Reyes y `primaryImageOfPage` = portada nueva; FAQPage con 9
+  preguntas; sitemap con la URL nueva y `lastmod` 2026-10-26, sin la vieja; Inbound e ICP enlazan a la nueva y a la
+  vieja ninguna vez. Playwright 1440 y 390: un H1, sin desborde, seis imágenes cargadas, TOC de 11 enlaces, 0 errores.
+  `blog-home verify --browser`: 7 anchos sin desborde y 0 violaciones.
+- **Pendiente:** pedir indexación de la URL nueva (lo hace la sesión de Analytics con el runner, cuando Julio lo diga);
+  decidir si la copia privada 252161 va a la papelera; Search Console repartirá datos entre las dos URL durante semanas:
+  sumar ambas contra la línea base (1 033 impresiones, posición 39,3).
