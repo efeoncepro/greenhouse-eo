@@ -539,3 +539,7 @@ autoridad en implementación HubSpot → landing de servicios. Datos: Search Con
   HubSpot» → «mira cómo implementamos HubSpot».
 - **No hecho (requiere OK de Julio):** publicar; cambiar slug y 301; actualizar enlaces en ICP e Inbound; portada,
   hero y tarjeta; pedir indexación. La URL `/hubspot/pipeline-de-ventas/` sigue libre.
+- **Para reescribir los enlaces de ICP e Inbound al publicar** (sesión «Mejora de artículos del blog», 2026-10-26):
+  los dos posts y sus specs están libres; la spec de Inbound ya está al día con el post vivo (sin el enlace a «Cómo
+  aplicar Loop Marketing»). Partir de ese estado y usar `scripts/public-website/blog-post-content-republish.php`
+  (simulación → apply; guarda la FAQ y deja respaldo).
