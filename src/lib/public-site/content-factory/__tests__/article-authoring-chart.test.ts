@@ -90,3 +90,17 @@ describe('authorGutenbergDraft + validateGeneratedGutenbergDraft · efeoncepro/c
     expect(codes).toContain('chart_attrs_unsupported')
   })
 })
+
+describe('authorGutenbergDraft · unknown block kinds', () => {
+  it('fails loud instead of dropping a block it does not know (e.g. a heading block instead of a level-3 section)', () => {
+    const spec = {
+      title: 'T',
+      excerpt: 'E',
+      seo: { title: 'T', description: 'D' },
+      intro: ['Intro.'],
+      sections: [{ heading: 'H2', level: 2, blocks: [{ kind: 'heading', text: 'H3', level: 3 }] }]
+    } as unknown as GutenbergArticleSpec
+
+    expect(() => authorGutenbergDraft(spec)).toThrow('content_factory_article_block_kind_unknown:heading')
+  })
+})

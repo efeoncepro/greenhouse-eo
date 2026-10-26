@@ -736,6 +736,10 @@ const renderArticleBlock = (
       return renderEditorialChartBlock(block)
     case 'buttons':
       return buttonsBlock(block)
+    default:
+      // Specs arrive as JSON, so the union does not protect them: an unknown kind (e.g. a `heading` block instead of a
+      // level-3 section) used to render as nothing and vanish from the draft without a trace.
+      throw new Error(`content_factory_article_block_kind_unknown:${String((block as { kind?: unknown }).kind)}`)
   }
 }
 
