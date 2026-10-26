@@ -176,14 +176,24 @@ Tres prácticas que ayudan:
   terminan en oportunidades y no sólo en descargas.
 - **Decide con lo que mediste.** Cada mes, qué ideas repetir, cuáles adaptar a otro formato y cuáles dejar.
 
-## Cómo lo trabajamos en Efeonce
+## Cómo lo hacemos en Efeonce
 
-NEEDS AUTHOR — experiencia propia. En Efeonce trabajamos el contenido como un sistema: cada pieza parte de preguntas
-reales, se escribe con fuentes que verificamos una por una antes de publicar, pasa por revisión con versiones y se
-adapta a cada canal desde la misma idea. Es lo que hacemos para los equipos que necesitan un partner y no otro
-proveedor de piezas: investigamos, planificamos, producimos, adaptamos y publicamos con ellos, con la operación a la
-vista. Si quieres verlo en detalle, así trabajamos el [Mención: marketing de contenidos →
-https://efeoncepro.com/servicio-marketing-de-contenidos/ · línea brand].
+En Efeonce aplicamos este sistema a nuestro propio blog, y hay tres prácticas que nos cambiaron la forma de escribir.
+
+**Partimos de lo que ya se pregunta.** Antes de escribir, miramos qué búsquedas traen hoy a cada artículo en Search
+Console y qué preguntas hace la gente a la IA sobre el tema. Muchas veces la pregunta que rinde no es la que
+habríamos elegido nosotros, y el artículo se ordena alrededor de ella.
+
+**Cada cifra tiene que tener su fuente original.** Llevamos un registro de cada afirmación del texto: de dónde sale, qué
+demuestra y qué no. Si no encontramos el estudio original, la cifra no entra, aunque sea buena. Es la parte más
+incómoda del proceso, porque obliga a dejar fuera datos que circulan en todas partes, y también la que más confianza
+nos da al publicar.
+
+**Nada sale sin una revisión completa.** Cada artículo se revisa en una copia privada, con la misma maqueta con la que
+se va a publicar, en escritorio y en teléfono, antes de que lo vea un lector. Y nace con su mapa: qué carrusel, qué
+newsletter y qué post van a salir de la misma idea.
+
+Lo que aprendimos es que **el sistema no hace más lento el contenido: hace que cada pieza trabaje más tiempo.**
 
 ## Preguntas frecuentes
 
@@ -263,7 +273,7 @@ una idea, contada en cada formato, con un siguiente paso claro y medida para apr
 | C1 | Con resumen de IA, clic en un resultado en el 8 % de las visitas vs 15 % sin resumen; 900 adultos EE. UU. | medición | Pew Research Center 2025 (verificado en el refresh de Inbound, C6) | verified |
 | C2 | Lead ≠ oportunidad | doctrina Efeonce | Regla publicada en Pipeline | verified |
 | C3 | La idea es el activo; formatos = versiones (manzanitas) | analogía | — | NEEDS AUTHOR (motivo 🍏🍏🍏, una vez) |
-| C4 | Cómo trabaja Efeonce el contenido (fuentes verificadas, revisión con versiones, adaptación por canal) | experiencia propia | Content Factory (`docs/operations/public-site-content-factory/`) + landing | NEEDS AUTHOR |
+| C4 | Cómo hace Efeonce su propio contenido: parte de Search Console y preguntas a la IA, registro de afirmaciones con fuente original (sin fuente, la cifra no entra), revisión en copia privada en escritorio y teléfono, mapa de átomos | experiencia propia | Proceso del blog (Content Factory, `docs/public-site/*_REFRESH_DRAFT_V1.md`, `AGENTIC_BLOGPOST_AUTHORING.md`) | verified — Julio, 2026-10-26: «cuéntalo pero no como venta porque esto es un artículo». Sin mención a la landing en esta sección; sin hablar de caídas ni de versiones anteriores |
 | C5 | Tabla por etapa | criterio editorial | — | [I] — sin cifras |
 | D1–D4 | `[DATO pendiente]` | — | investigación en curso | pending |
 
@@ -280,7 +290,7 @@ una idea, contada en cada formato, con un siguiente paso claro y medida para apr
 
 ## 7. Pendientes antes de la spec
 
-1. Respuestas de Julio: experiencia propia (C4) y concepto de portada. **Ebook «Content Supply Chain»: fuera** (Julio,
+1. Respuesta de Julio: concepto de portada. Experiencia propia (C4) resuelta como práctica, sin venta. **Ebook «Content Supply Chain»: fuera** (Julio,
    2026-10-26: «ese ebook hay que reescribirlo, pero no lo haré ahora»); el artículo no lo ofrece ni lo menciona.
 2. Cerrar los `[DATO pendiente]` con la investigación o quitarlos.
 3. Mapa de átomos: carrusel de LinkedIn con la Infografía 1 (página Efeonce), post de Julio con la tesis, edición del
