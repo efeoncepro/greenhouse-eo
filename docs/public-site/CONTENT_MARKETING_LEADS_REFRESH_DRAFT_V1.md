@@ -280,8 +280,8 @@ una idea, contada en cada formato, con un siguiente paso claro y medida para apr
 
 ## 7. Pendientes antes de la spec
 
-1. Respuestas de Julio: experiencia propia (C4), ebook «Content Supply Chain» como oferta (su landing con formulario
-   está pendiente de crear) y concepto de portada.
+1. Respuestas de Julio: experiencia propia (C4) y concepto de portada. **Ebook «Content Supply Chain»: fuera** (Julio,
+   2026-10-26: «ese ebook hay que reescribirlo, pero no lo haré ahora»); el artículo no lo ofrece ni lo menciona.
 2. Cerrar los `[DATO pendiente]` con la investigación o quitarlos.
 3. Mapa de átomos: carrusel de LinkedIn con la Infografía 1 (página Efeonce), post de Julio con la tesis, edición del
    newsletter Marketing con Manzanitas (LinkedIn de Julio) y la tesis en una frase en Threads (PDR-020).
