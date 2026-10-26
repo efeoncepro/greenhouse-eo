@@ -71,14 +71,23 @@ Conviene separar dos cosas desde el principio. Un **lead** es alguien que te dej
 **oportunidad** es un lead que confirmó una necesidad. Si los mezclas, el contenido parece funcionar mucho mejor de lo
 que funciona; lo explico con más detalle en **[cómo configurar el pipeline de ventas en HubSpot](https://efeoncepro.com/hubspot/pipeline-de-ventas/)**.
 
-[DATO pendiente — uso y efectividad del contenido para generar demanda en B2B, fuente primaria 2025–2026.]
+Los equipos de marketing lo saben, y aun así les cuesta. En el **[estudio de tendencias B2B del Content Marketing Institute](https://contentmarketinginstitute.com/b2b-research/b2b-content-marketing-trends-research)**
+publicado en octubre de 2025, **sólo el 12 % de los marketers B2B dijo que su contenido superó sus metas**, y el reto
+más citado fue justamente **crear contenido que provoque una acción (40 %)**. La muestra es mayormente de Norteamérica,
+pero el problema se reconoce en cualquier mercado: publicar no es lo mismo que convertir.
+
+[Gráfico Efeonce — per-hundred: «Sólo 12 de cada 100 marketers B2B dice que su contenido superó sus metas» · fuente
+Content Marketing Institute, B2B Content Marketing Benchmarks, Budgets, and Trends: Insights for 2026 · tono claro]
+
+[Destacado] Una pieza suelta compite sola: **los leads los genera el sistema que la rodea.**
 
 ## ¿Qué cambió con la búsqueda con IA?
 
 Antes, que te encontraran terminaba en una visita. Hoy, muchas veces termina en una respuesta. Cuando Google muestra
 un resumen hecho con IA, **las personas hacen clic en un resultado en el 8 % de las visitas, frente al 15 % cuando no
 hay resumen**, según un **[análisis de Pew Research Center (2025)](https://www.pewresearch.org/short-reads/2025/07/22/google-users-are-less-likely-to-click-on-links-when-an-ai-summary-appears-in-the-results/)**
-sobre 900 adultos en Estados Unidos.
+sobre 900 adultos en Estados Unidos. Y en el primer tercio de 2026, **el 68 % de las búsquedas en Google en Estados
+Unidos terminó sin un clic**, según **[SparkToro con datos de Similarweb](https://sparktoro.com/blog/in-2026-less-than-one-third-of-google-searches-still-send-a-click/)**.
 
 Eso le cambia dos trabajos al contenido. Primero, tiene que ser **citable**: claro, con fuentes y con respuestas que
 una IA pueda tomar y atribuirte. Segundo, la visita que sí llega vale más, así que **cada pieza tiene que tener un
@@ -102,7 +111,10 @@ está tratando de resolver tu cliente en cada etapa y qué le puedes ofrecer a c
 | Evalúa a quién elegir | ¿Funciona en una empresa como la mía? | Caso de éxito, webinar, demo | Diagnóstico o reunión |
 | Ya es cliente | ¿Cómo saco más provecho? | Tutoriales, sesiones, comunidad | Referidos y expansión |
 
-[DATO pendiente — formatos que más influyen en compras o leads B2B, fuente primaria.]
+Para distribuir ideas que posicionan a una marca, los marketers B2B califican como más eficaces **LinkedIn (76 %),
+los newsletters (54 %) y los eventos y webinars (52 %)**, según el mismo **[estudio del Content Marketing Institute](https://contentmarketinginstitute.com/b2b-research/b2b-content-marketing-trends-research)**.
+Es su percepción, no la conducta del comprador, pero coincide con la tabla: el contacto se gana donde la relación
+continúa.
 
 Tal vez estarás pensando que esto es el embudo de siempre con otro nombre. No del todo: el orden no es fijo. Tu
 cliente salta de una etapa a otra y vuelve, como explico en **[qué es el inbound marketing](https://efeoncepro.com/inbound/que-es-inbound-marketing/)**.
@@ -110,7 +122,8 @@ Lo que sí es fijo es que **cada pieza tiene que saber en qué etapa vive y qué
 
 ## ¿Cómo se arma el sistema que genera leads?
 
-[Destacado] Una pieza suelta compite sola: **los leads los genera el sistema que la rodea.**
+[Cita — Robert Rose, Content Marketing Institute, en el estudio de tendencias B2B 2026: «Fewer random acts of content,
+more coordinated direction» → traducida: «Menos actos aleatorios de contenido, más dirección coordinada.» · enlace https://contentmarketinginstitute.com/b2b-research/b2b-content-marketing-trends-research]
 
 El sistema no es una herramienta ni un calendario lleno. Es una forma de trabajar donde cada pieza nace sabiendo de
 dónde viene, en qué se va a convertir y cómo se va a medir.
@@ -138,7 +151,9 @@ canción suena distinta en la radio, en un concierto y en un video de 30 segundo
 distinta. Nadie graba una canción para tocarla una sola vez. Con el contenido pasa lo mismo: **la idea es el activo;
 cada formato es una versión que la lleva a otro lugar.**
 
-[DATO pendiente — estrategia documentada, falta de operación o retos de escala, fuente primaria.]
+Adaptar no es copiar y pegar. En el **[informe de tendencias de HubSpot de 2026](https://blog.hubspot.com/marketing/hubspot-blog-marketing-industry-trends-report)**, **el 49,4 % de los equipos
+usa el mismo contenido en todas las plataformas y el 39,5 % lo adapta a cada una**. La primera opción ahorra tiempo;
+la segunda es la que hace que cada canal tenga una razón para mostrarte.
 
 ## ¿Cómo convertir lectores en leads sin espantarlos?
 
@@ -166,7 +181,8 @@ Hay dos tipos de señales y conviene no confundirlas. Las **señales tempranas**
 impresiones, posición, lectura, suscripciones. Los **resultados** dicen si está trayendo negocio: leads que se
 convierten en oportunidades, reuniones y ventas en las que el contenido participó.
 
-[DATO pendiente — medición de contenido hasta pipeline o ingresos, fuente primaria.]
+Si te cuesta medir, no estás solo: **medir el retorno es el reto número uno de 2026 para el 33 % de los marketers**,
+según el **[informe de tendencias de HubSpot](https://blog.hubspot.com/marketing/hubspot-blog-marketing-industry-trends-report)**.
 
 Tres prácticas que ayudan:
 
@@ -216,8 +232,9 @@ respuestas distintas. Un mismo tema puede necesitar una guía para quien evalúa
 ### ¿Sirve el contenido hecho con IA para generar leads?
 
 Sirve como apoyo para investigar, ordenar y adaptar, pero no reemplaza lo que hace que un contenido se elija: una idea
-propia, experiencia real y fuentes verificadas. El contenido genérico, con o sin IA, compite con miles de piezas
-iguales.
+propia, experiencia real y fuentes verificadas. En el estudio del Content Marketing Institute, entre quienes usan IA
+para crear contenido, el 58 % dice que la calidad mejoró, pero sólo el 39 % ve mejores resultados. El contenido
+genérico, con o sin IA, compite con miles de piezas iguales.
 
 ### ¿Cómo desarrollar una estrategia de marketing de contenidos que genere leads de forma sostenible?
 
@@ -242,8 +259,10 @@ una idea, contada en cada formato, con un siguiente paso claro y medida para apr
 
 ### Fuentes y nota de actualización
 
-- Pew Research Center (2025). Google users are less likely to click on links when an AI summary appears in the results.
-- [Fuentes pendientes de la investigación, §5.]
+- Pew Research Center (2025). Google users are less likely to click on links when an AI summary appears in the results. https://www.pewresearch.org/short-reads/2025/07/22/google-users-are-less-likely-to-click-on-links-when-an-ai-summary-appears-in-the-results/
+- Content Marketing Institute y MarketingProfs (2025). B2B Content Marketing Benchmarks, Budgets, and Trends: Insights for 2026. https://contentmarketinginstitute.com/b2b-research/b2b-content-marketing-trends-research
+- HubSpot (2026). Marketing industry trends report. https://blog.hubspot.com/marketing/hubspot-blog-marketing-industry-trends-report
+- SparkToro (2026). In 2026, less than one third of Google searches still send a click. https://sparktoro.com/blog/in-2026-less-than-one-third-of-google-searches-still-send-a-click/
 - Lo desarrolló Julio Reyes con apoyo de IA en investigación, estructura y edición; Julio definió la tesis y aprobó la
   versión final.
 
@@ -275,7 +294,15 @@ una idea, contada en cada formato, con un siguiente paso claro y medida para apr
 | C3 | La idea es el activo; formatos = versiones (manzanitas) | analogía | — | NEEDS AUTHOR (motivo 🍏🍏🍏, una vez) |
 | C4 | Cómo hace Efeonce su propio contenido: parte de Search Console y preguntas a la IA, registro de afirmaciones con fuente original (sin fuente, la cifra no entra), revisión en copia privada en escritorio y teléfono, mapa de átomos | experiencia propia | Proceso del blog (Content Factory, `docs/public-site/*_REFRESH_DRAFT_V1.md`, `AGENTIC_BLOGPOST_AUTHORING.md`) | verified — Julio, 2026-10-26: «cuéntalo pero no como venta porque esto es un artículo». Sin mención a la landing en esta sección; sin hablar de caídas ni de versiones anteriores |
 | C5 | Tabla por etapa | criterio editorial | — | [I] — sin cifras |
-| D1–D4 | `[DATO pendiente]` | — | investigación en curso | pending |
+| C6 | Sólo 12 % de marketers B2B dice que su contenido superó sus metas; 47 % cumplió la mayoría | medición | CMI 2026 (pub. 2025-10-08; 1.015 marketers B2B, mayormente Norteamérica; campo jun–ago 2025) | verified [V] — autoevaluación; no comparable con 2025 |
+| C7 | Reto principal: crear contenido que provoque una acción (40 %) | medición | CMI 2026 (hasta 3 respuestas) | verified [V] |
+| C8 | Canales más eficaces para liderazgo de pensamiento: LinkedIn 76 %, newsletters 54 %, eventos/webinars 52 % | medición (percepción) | CMI 2026 | verified [V] — canales, no formatos |
+| C9 | 49,4 % usa el mismo contenido en todas las plataformas; 39,5 % lo adapta | medición | HubSpot 2026 (act. 2026-04-10; 1.500+ B2B y B2C globales) | verified [V] — mezcla B2B y B2C |
+| C10 | Medir el ROI es el reto n.º 1 de 2026 (33 %) | medición | HubSpot 2026 | verified [V] — mezcla B2B y B2C |
+| C11 | 68,01 % de búsquedas en Google en EE. UU. sin clic (ene–abr 2026) | medición | SparkToro 2026 con Similarweb | verified [V] — cambió el panel; no se compara con 2024 |
+| C12 | Con IA: 58 % ve mejor calidad, 39 % mejor desempeño | medición | CMI 2026, subgrupo que usa IA para crear | verified [V] — autoevaluación |
+| C13 | Cita de Robert Rose: «Fewer random acts of content, more coordinated direction» | cita real | CMI 2026 | verified [V] — se publica traducida con la original en la cita |
+| R1–R4 | Edelman-LinkedIn 2025, Gartner 2025–2026, Demand Gen Report, «% con estrategia documentada» | — | 403 o sin original / agregadores | rejected |
 
 ## 6. Visuales
 
@@ -285,14 +312,14 @@ una idea, contada en cada formato, con un siguiente paso claro y medida para apr
 | 2 | Infografía 1 «Una idea, cada formato» (SVG propio, La órbita, escritorio y teléfono, claro y oscuro) | por diseñar |
 | 3 | Infografía 2 «El sistema que aprende» (publicar → medir → decidir → siguiente idea) | opcional; puede quedar en los pasos |
 | 4 | Tabla Efeonce por etapa · Pasos · Destacado · Recuadros | en el texto |
-| 5 | Gráfico Efeonce | sólo con una cifra primaria del §5 |
+| 5 | Gráfico Efeonce per-hundred «12 de cada 100» (C6) en la primera sección | en el texto |
 | 6 | Growth CTA AEO Assessment (único aprobado para el blog) en la sección de IA | en el texto |
 
 ## 7. Pendientes antes de la spec
 
 1. Respuesta de Julio: concepto de portada. Experiencia propia (C4) resuelta como práctica, sin venta. **Ebook «Content Supply Chain»: fuera** (Julio,
    2026-10-26: «ese ebook hay que reescribirlo, pero no lo haré ahora»); el artículo no lo ofrece ni lo menciona.
-2. Cerrar los `[DATO pendiente]` con la investigación o quitarlos.
+2. ~~Datos pendientes~~: cerrados con la investigación del 2026-10-26 (C6–C13); descartadas las cifras sin original.
 3. Mapa de átomos: carrusel de LinkedIn con la Infografía 1 (página Efeonce), post de Julio con la tesis, edición del
    newsletter Marketing con Manzanitas (LinkedIn de Julio) y la tesis en una frase en Threads (PDR-020).
 4. Enlace de vuelta desde la landing (sesión de la landing).
