@@ -2,6 +2,15 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-26 — Sitio público: runner para pedir indexación en Search Console
+
+`pnpm public-website:gsc-index` pide la indexación por el botón de la interfaz (la API no lo permite), desde un Chrome
+dedicado donde una persona inicia sesión una vez. Inspecciona por defecto; `--apply` sólo pide si Google no vio el
+último cambio. Verifica que la propiedad seleccionada sea efeoncepro.com, porque la cuenta ve varios clientes. No pasa
+de 10 por día, registra cada URL y se detiene ante captcha, sesión cerrada o cupo agotado. Probado en vivo en modo
+inspección: Google ya volvió a rastrear el pilar de Loop y la landing de Performance, que ya no necesita la solicitud
+pendiente. Falta ejercitar el clic de `--apply`. [Manual](docs/manual-de-uso/public-site/solicitar-indexacion-search-console.md).
+
 ## 2026-10-26 — Blog: pilar Loop Marketing publicado, embed corregido, voz de Julio y Loop 2026
 
 Pilar «Qué es Loop Marketing» (248398) publicado con 248483 absorbido (borrador + 301 de Yoast), portada nueva sin
@@ -565,22 +574,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
   cinco líneas × cuatro mercados; nuevas convocatorias para postular dentro de la misma semana calendario.
 - INTURSA y Alfin registradas bajo autorización; cuatro contactos verificados vía Apollo. Históricos tratados como
   prospección futura. No Deals, notas ni envíos nuevos. Próxima ejecución programada todavía no observada.
-
-## 2026-10-13 — Prospección personalizada: Outlook y seguimiento HubSpot
-
-- 15/10: [Socopur](docs/commercial/tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md), seguimiento puntual autorizado a Katherine con firma gráfica/PDF y EMAIL `118603198768` SENT asociado. Dossier y registros conciliados; Prospecting/HubSpot Codex-Claude precisan decisión por historial de cuenta, aporte nuevo y verificación de reply/adjunto/CRM. Sin admisión, secuencia o nuevo permiso futuro.
-
-- 14/10: Prospección Codex/Claude incorpora la [estructura de correo robusto aprobada por Julio](.codex/skills/efeonce-b2b-prospecting/references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio): contexto, encaje, aportes, enfoque sectorial, forma de trabajo, brochure explicado e invitación; profundidad adaptable, firma por la vía pedida y permiso de envío separado.
-- [Política y ruta gráfica](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): contexto individual,
-  empatía, motivo para elegir Efeonce, brochure explicado y firma instalada en Outlook web; Enviados,
-  adjuntos y EMAIL de HubSpot comprobados por separado. Criterio enlazado desde las skills espejo de HubSpot.
-- [Registro de seis envíos](docs/commercial/follow-up-agent/runs/2026-10-13-outreach-personalizado.md),
-  estado focalizado y continuidad de WIN actualizados; Rafael excluido y salvedad de Paula conservada.
-  No renueva el corte global del pipeline ni concede autonomía recurrente de envío.
-- Mandato posterior: [seis secuencias HubSpot, 18 seguimientos](docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md)
-  para 16/22/29 octubre en horas locales laborales. Inscripciones `Programado`, firma global Julio y
-  parada por respuesta verificados. Apollo inactivo, cero inscritos. Preferencia y alcance documentados.
-- [Módulo de secuencias en Prospecting](.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md),
-  routing, cadencia/mensaje/respuesta/entregabilidad, template, manual y adapter HubSpot espejados.
-  Fixtures v9 P51–P55 cubren plataforma, autorización, programación, personalización y evidencia; sin nueva ejecución externa.
-- [Política de seguimiento a largo plazo](docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) aprobada: proveedor vigente, revisión interna a seis meses sin hito, nutrición con permiso y reactivación autorizada. Skills espejo/fixtures v11 y seguimiento existentes actualizados; tareas comerciales en HubSpot por corrección de Julio. Fabrimetal: TASK 118419088700 para 13/04/2027 09:00 Chile, duplicado Notion Cancelado y nota CRM conciliada, sin envío.

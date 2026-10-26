@@ -1195,7 +1195,11 @@ con `<lastmod>` honesto. La indexación de Google es asíncrona y no debe falsea
 - no usar la Indexing API para artículos o landings genéricos; sólo corresponde a `JobPosting` y
   `BroadcastEvent` dentro de `VideoObject`;
 - URL Inspection API observa la versión conocida por el índice; no ejecuta live test ni solicita indexación;
-- una solicitud manual desde URL Inspection puede reservarse para unas pocas URLs críticas, sin promesa de plazo;
+- la solicitud de indexación (botón de la interfaz, unas 10 por día) se reserva para unas pocas URLs críticas, sin
+  promesa de plazo. Los agentes la hacen con `pnpm public-website:gsc-index request <url>` (inspección) y `--apply`
+  (pide sólo si Google no vio el último cambio), en un Chrome dedicado donde una persona inició sesión; queda una
+  línea por URL en `scripts/public-website/gsc-indexing/ledger/`. Manual:
+  [solicitar indexación](../../manual-de-uso/public-site/solicitar-indexacion-search-console.md);
 - cuando exista la capability verificada de `TASK-1426`, registrar checkpoints `0h`, `24h` y `72h` separados del
   gate de publicación; hasta entonces, no inventar evidencia automatizada.
 
