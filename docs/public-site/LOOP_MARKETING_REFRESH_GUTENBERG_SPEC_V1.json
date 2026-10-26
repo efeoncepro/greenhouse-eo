@@ -88,6 +88,27 @@
         },
         {
           "kind": "paragraph",
+          "text": [
+            {
+              "text": "Un año después, en "
+            },
+            {
+              "text": "UNBOUND 2026",
+              "href": "https://unbound.hubspot.com/speakers/kipp-bodnar",
+              "strong": true
+            },
+            {
+              "text": " (el nuevo nombre de INBOUND), Kipp Bodnar y Kieran Flanagan lo presentaron como el sistema que probaron en el propio marketing de HubSpot, y lo llevaron a un libro: "
+            },
+            {
+              "text": "Loop: Outlearn. Outmarket. Outgrow.",
+              "href": "https://www.hubspot.com/loop-marketing-book",
+              "strong": true
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
           "text": "Vas a ver las etapas con dos juegos de nombres. Son las mismas:"
         },
         {
@@ -323,6 +344,21 @@
               "strong": true
             },
             {
+              "text": "). Y del otro lado del mostrador se nota: "
+            },
+            {
+              "text": "el 71 % de los marketers dice que está tratando de seguirle el paso a cómo se mueven los compradores",
+              "strong": true
+            },
+            {
+              "text": " entre plataformas, formatos y caminos de descubrimiento ("
+            },
+            {
+              "text": "HubSpot, State of Marketing 2026",
+              "href": "https://blog.hubspot.com/marketing/loop-marketing-trends",
+              "strong": true
+            },
+            {
               "text": ")."
             }
           ]
@@ -454,7 +490,22 @@
               "strong": true
             },
             {
-              "text": ". En un mundo lleno de contenido generado por IA, lo único que realmente te diferencia es tu punto de vista."
+              "text": ". En un mundo lleno de contenido generado por IA, lo único que realmente te diferencia es tu punto de vista. Y no es una sensación tuya: "
+            },
+            {
+              "text": "casi el 56 % de los marketers dice que internet ya está inundado de contenido generado por IA",
+              "strong": true
+            },
+            {
+              "text": " ("
+            },
+            {
+              "text": "HubSpot, State of Marketing 2026",
+              "href": "https://blog.hubspot.com/marketing/loop-marketing-trends",
+              "strong": true
+            },
+            {
+              "text": ")."
             }
           ]
         },
@@ -496,7 +547,22 @@
           "kind": "paragraph",
           "text": [
             {
-              "text": "Profundizamos en esta etapa en "
+              "text": "En 2026, HubSpot le puso nombre a esa base: "
+            },
+            {
+              "text": "Taste Profile",
+              "strong": true
+            },
+            {
+              "text": ", «un retrato de tu cliente y de tu marca que le da a la IA el contexto para sonar como tú, no como todos» ("
+            },
+            {
+              "text": "HubSpot",
+              "href": "https://www.hubspot.com/loop-marketing",
+              "strong": true
+            },
+            {
+              "text": "). Profundizamos en esta etapa en "
             },
             {
               "text": "Express en Loop Marketing: voz, POV, buyer persona y Jobs to be done",
@@ -711,6 +777,75 @@
               }
             ]
           ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "¿Y cómo sabes si el loop está funcionando? HubSpot propone "
+            },
+            {
+              "text": "un número por etapa",
+              "strong": true
+            },
+            {
+              "text": ", que llama las 4 Rs ("
+            },
+            {
+              "text": "HubSpot",
+              "href": "https://www.hubspot.com/loop-marketing",
+              "strong": true
+            },
+            {
+              "text": "):"
+            }
+          ]
+        },
+        {
+          "kind": "list",
+          "style": "box",
+          "items": [
+            [
+              {
+                "text": "Remarkability (Definición):",
+                "strong": true
+              },
+              {
+                "text": " si tu diferencia de marca se sostiene cuando más equipos crean contenido."
+              }
+            ],
+            [
+              {
+                "text": "Resonance (Adaptación):",
+                "strong": true
+              },
+              {
+                "text": " si el contenido conecta con tu comprador. HubSpot lo mide contra un «Buyer Sim», un clon con IA del perfil de tu cliente."
+              }
+            ],
+            [
+              {
+                "text": "Reach (Amplificación):",
+                "strong": true
+              },
+              {
+                "text": " tu cuota de voz en las respuestas de la IA, además de impresiones y conversión por canal."
+              }
+            ],
+            [
+              {
+                "text": "Regeneration (Optimización):",
+                "strong": true
+              },
+              {
+                "text": " la velocidad del loop y cuánto mejoran tus aprendizajes y tu pipeline."
+              }
+            ]
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "En su página en español, HubSpot todavía mide con otro tablero: visibilidad en la IA, cuota de participación, citas y velocidad del loop. Las dos versiones apuntan a lo mismo: medir el ciclo, no la campaña."
         },
         {
           "kind": "paragraph",
@@ -1022,6 +1157,29 @@
             },
             {
               "text": "."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Y esas piezas no sólo tienen que pasarse datos. Duncan Lennox, director de producto y tecnología de HubSpot, lo explicó así: "
+            },
+            {
+              "text": "«si los datos son lo que pasó, el contexto es el porqué»",
+              "strong": true
+            },
+            {
+              "text": " ("
+            },
+            {
+              "text": "HubSpot",
+              "href": "https://www.hubspot.com/company-news/spring-2026-spotlight",
+              "strong": true
+            },
+            {
+              "text": "). Sin ese porqué, la IA trabaja a ciegas."
             }
           ]
         },
@@ -1370,6 +1528,61 @@
             ],
             [
               {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "Loop Marketing (página en inglés, versión 2026)",
+                "href": "https://www.hubspot.com/loop-marketing",
+                "strong": true
+              },
+              {
+                "text": ", "
+              },
+              {
+                "text": "Loop: Outlearn. Outmarket. Outgrow.",
+                "href": "https://www.hubspot.com/loop-marketing-book",
+                "strong": true
+              },
+              {
+                "text": " y "
+              },
+              {
+                "text": "la sesión de Kipp Bodnar y Kieran Flanagan en UNBOUND 2026",
+                "href": "https://unbound.hubspot.com/speakers/kipp-bodnar",
+                "strong": true
+              },
+              {
+                "text": ", 17 de septiembre de 2026."
+              }
+            ],
+            [
+              {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "Why Loop Marketing matters in 2026 (State of Marketing)",
+                "href": "https://blog.hubspot.com/marketing/loop-marketing-trends",
+                "strong": true
+              },
+              {
+                "text": ", actualizado el 24 de julio de 2026."
+              }
+            ],
+            [
+              {
+                "text": "HubSpot. "
+              },
+              {
+                "text": "Spring 2026 Spotlight",
+                "href": "https://www.hubspot.com/company-news/spring-2026-spotlight",
+                "strong": true
+              },
+              {
+                "text": ", abril de 2026."
+              }
+            ],
+            [
+              {
                 "text": "Google y BCG. "
               },
               {
@@ -1489,7 +1702,7 @@
         },
         {
           "kind": "paragraph",
-          "text": "Actualizado el 26 de octubre de 2026: unimos «Cómo aplicar Loop Marketing» en esta guía, revisamos cada cifra y cita en su fuente original y usamos los nombres oficiales de las etapas en español."
+          "text": "Actualizado el 26 de octubre de 2026: unimos «Cómo aplicar Loop Marketing» en esta guía, revisamos cada cifra y cita en su fuente original, usamos los nombres oficiales de las etapas en español y sumamos lo que HubSpot presentó en UNBOUND 2026."
         }
       ]
     }

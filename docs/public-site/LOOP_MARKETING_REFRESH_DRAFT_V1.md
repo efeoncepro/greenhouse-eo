@@ -207,3 +207,21 @@ Se aplicó la regla nueva de su voz (`JULIO_REYES_VOICE_SYSTEM.md` §4.5 y §4.6
 
 Republicado con `blog-post-content-republish.php`: la FAQ sin cambios y la lectura de vuelta en orden. Respaldo:
 `_gh_post_republish_248398_20261026_114151`.
+
+### Delta 2026-10-26 (noche) · lo que HubSpot presentó en UNBOUND 2026 (aprobado por Julio, «de forma no forzada»)
+
+Cinco agregados cortos, cada uno en la sección donde ya vivía la idea. Las fuentes se verificaron el 2026-10-26 y
+quedaron registradas en `hubspot-solutions-partner/SOURCES.md` § Loop Marketing 2026:
+
+| Dónde | Qué se sumó | Fuente |
+|---|---|---|
+| ¿Qué es Loop Marketing? | UNBOUND 2026 (el nuevo nombre de INBOUND) y el libro *Loop: Outlearn. Outmarket. Outgrow.*, de Bodnar y Flanagan | speaker page de UNBOUND, página del libro |
+| Definición | Taste Profile (cita textual) y el 56 % de los marketers que siente internet inundado de contenido IA | página EN de Loop; State of Marketing 2026 |
+| Las 4S | El 71 % de los marketers que trata de seguirle el paso a cómo se mueven los compradores | State of Marketing 2026 |
+| Optimización | Las 4 Rs, un número por etapa, y la aclaración de que la página en español aún mide con otro tablero | página EN de Loop; hubspot.es |
+| El stack importa menos que el ciclo | Duncan Lennox: «si los datos son lo que pasó, el contexto es el porqué» | Spring 2026 Spotlight |
+
+**No se usó** el «HubSpot perdió 80 % de su tráfico y creció 20 % en leads», porque HubSpot no lo confirma, ni el
+«6 % de resultados transformadores» de Rangan, que sólo sale en recaps de terceros. Se reevalúan cuando HubSpot Live
+publique la grabación de la sesión del 17-sep. Republicado con la FAQ sin cambios; respaldo
+`_gh_post_republish_248398_20261026_121701`.

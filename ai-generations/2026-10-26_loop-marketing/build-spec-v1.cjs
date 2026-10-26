@@ -26,7 +26,13 @@ const SRC = {
   halligan: 'https://www.techtarget.com/searchcustomerexperience/podcast/New-HubSpot-products-strategy-CMS-updates-from-Inbound',
   bain: 'https://www.bain.com/insights/e-loyalty-your-secret-weapon-on-the-web/',
   aiTrends: 'https://www.hubspot.com/hubfs/HubSpots%202025%20AI%20Trends%20for%20Marketers%20Report.pdf',
-  semrush: 'https://www.semrush.com/blog/ai-search-seo-traffic-study/'
+  semrush: 'https://www.semrush.com/blog/ai-search-seo-traffic-study/',
+  // Loop 2026 (verified 2026-10-26; ledger in hubspot-solutions-partner SOURCES.md § Loop Marketing 2026).
+  loopEn: 'https://www.hubspot.com/loop-marketing',
+  book: 'https://www.hubspot.com/loop-marketing-book',
+  unbound: 'https://unbound.hubspot.com/speakers/kipp-bodnar',
+  stateOfMarketing: 'https://blog.hubspot.com/marketing/loop-marketing-trends',
+  spring: 'https://www.hubspot.com/company-news/spring-2026-spotlight'
 }
 
 const IN = {
@@ -87,6 +93,15 @@ const spec = {
             t('HubSpot lo describe así en '),
             a('su página en español', SRC.hubspotEs),
             t(': «los humanos y la IA trabajan juntos para definir tu historia, adaptarla a tu audiencia, amplificarla a través de distintos canales y optimizarla en tiempo real».')
+          ]
+        },
+        {
+          kind: 'paragraph',
+          text: [
+            t('Un año después, en '),
+            a('UNBOUND 2026', SRC.unbound),
+            t(' (el nuevo nombre de INBOUND), Kipp Bodnar y Kieran Flanagan lo presentaron como el sistema que probaron en el propio marketing de HubSpot, y lo llevaron a un libro: '),
+            a('Loop: Outlearn. Outmarket. Outgrow.', SRC.book)
           ]
         },
         P('Vas a ver las etapas con dos juegos de nombres. Son las mismas:'),
@@ -185,6 +200,10 @@ const spec = {
             b('el 64 % de quienes compraron en la última temporada de fiestas dice que mezcló las 4S'),
             t(' en esa compra ('),
             a('Google, 2025', SRC.googleHoliday),
+            t('). Y del otro lado del mostrador se nota: '),
+            b('el 71 % de los marketers dice que está tratando de seguirle el paso a cómo se mueven los compradores'),
+            t(' entre plataformas, formatos y caminos de descubrimiento ('),
+            a('HubSpot, State of Marketing 2026', SRC.stateOfMarketing),
             t(').')
           ]
         },
@@ -252,7 +271,11 @@ const spec = {
           text: [
             t('HubSpot la resume en tres preguntas: qué decir, cómo decirlo y por qué importa ahora. Es la primera etapa por una razón simple: '),
             b('sin una voz clara, personalizar o amplificar sólo multiplica el ruido'),
-            t('. En un mundo lleno de contenido generado por IA, lo único que realmente te diferencia es tu punto de vista.')
+            t('. En un mundo lleno de contenido generado por IA, lo único que realmente te diferencia es tu punto de vista. Y no es una sensación tuya: '),
+            b('casi el 56 % de los marketers dice que internet ya está inundado de contenido generado por IA'),
+            t(' ('),
+            a('HubSpot, State of Marketing 2026', SRC.stateOfMarketing),
+            t(').')
           ]
         },
         {
@@ -267,7 +290,15 @@ const spec = {
         },
         {
           kind: 'paragraph',
-          text: [t('Profundizamos en esta etapa en '), a('Express en Loop Marketing: voz, POV, buyer persona y Jobs to be done', IN.express), t('.')]
+          text: [
+            t('En 2026, HubSpot le puso nombre a esa base: '),
+            b('Taste Profile'),
+            t(', «un retrato de tu cliente y de tu marca que le da a la IA el contexto para sonar como tú, no como todos» ('),
+            a('HubSpot', SRC.loopEn),
+            t('). Profundizamos en esta etapa en '),
+            a('Express en Loop Marketing: voz, POV, buyer persona y Jobs to be done', IN.express),
+            t('.')
+          ]
         },
         { kind: 'heading', text: 'Adaptación (Tailor): del mensaje para todos al mensaje para ti', level: 3 },
         {
@@ -331,6 +362,21 @@ const spec = {
             [b('A la Amplificación:'), t(' mejora la mezcla de canales según dónde se genera valor.')]
           ]
         },
+        {
+          kind: 'paragraph',
+          text: [t('¿Y cómo sabes si el loop está funcionando? HubSpot propone '), b('un número por etapa'), t(', que llama las 4 Rs ('), a('HubSpot', SRC.loopEn), t('):')]
+        },
+        {
+          kind: 'list',
+          style: 'box',
+          items: [
+            [b('Remarkability (Definición):'), t(' si tu diferencia de marca se sostiene cuando más equipos crean contenido.')],
+            [b('Resonance (Adaptación):'), t(' si el contenido conecta con tu comprador. HubSpot lo mide contra un «Buyer Sim», un clon con IA del perfil de tu cliente.')],
+            [b('Reach (Amplificación):'), t(' tu cuota de voz en las respuestas de la IA, además de impresiones y conversión por canal.')],
+            [b('Regeneration (Optimización):'), t(' la velocidad del loop y cuánto mejoran tus aprendizajes y tu pipeline.')]
+          ]
+        },
+        P('En su página en español, HubSpot todavía mide con otro tablero: visibilidad en la IA, cuota de participación, citas y velocidad del loop. Las dos versiones apuntan a lo mismo: medir el ciclo, no la campaña.'),
         {
           kind: 'paragraph',
           text: [
@@ -446,6 +492,16 @@ const spec = {
             t(' y con Salesforce, y en los dos casos '),
             b('el cuello de botella rara vez es la herramienta'),
             t('.')
+          ]
+        },
+        {
+          kind: 'paragraph',
+          text: [
+            t('Y esas piezas no sólo tienen que pasarse datos. Duncan Lennox, director de producto y tecnología de HubSpot, lo explicó así: '),
+            b('«si los datos son lo que pasó, el contexto es el porqué»'),
+            t(' ('),
+            a('HubSpot', SRC.spring),
+            t('). Sin ese porqué, la IA trabaja a ciegas.')
           ]
         },
         {
@@ -595,6 +651,9 @@ const spec = {
           kind: 'list',
           items: [
             [t('HubSpot. '), a('Loop Marketing (página en español)', SRC.hubspotEs), t(' y '), a('anuncio de Loop Marketing', SRC.news), t(', 3 de septiembre de 2025.')],
+            [t('HubSpot. '), a('Loop Marketing (página en inglés, versión 2026)', SRC.loopEn), t(', '), a('Loop: Outlearn. Outmarket. Outgrow.', SRC.book), t(' y '), a('la sesión de Kipp Bodnar y Kieran Flanagan en UNBOUND 2026', SRC.unbound), t(', 17 de septiembre de 2026.')],
+            [t('HubSpot. '), a('Why Loop Marketing matters in 2026 (State of Marketing)', SRC.stateOfMarketing), t(', actualizado el 24 de julio de 2026.')],
+            [t('HubSpot. '), a('Spring 2026 Spotlight', SRC.spring), t(', abril de 2026.')],
             [t('Google y BCG. '), a('Nuevo proceso de decisión de compra (las 4S)', SRC.google4s), t(', 25 de febrero de 2025.')],
             [t('Google. '), a('Holiday shopping: the modern consumer\'s new value equation', SRC.googleHoliday), t(', agosto de 2025 (datos de EE. UU.).')],
             [t('Fortune. '), a('Google Search is in danger of losing Gen Z', SRC.fortune), t(', 13 de julio de 2022.')],
@@ -607,7 +666,7 @@ const spec = {
           ]
         },
         P(
-          'Actualizado el 26 de octubre de 2026: unimos «Cómo aplicar Loop Marketing» en esta guía, revisamos cada cifra y cita en su fuente original y usamos los nombres oficiales de las etapas en español.'
+          'Actualizado el 26 de octubre de 2026: unimos «Cómo aplicar Loop Marketing» en esta guía, revisamos cada cifra y cita en su fuente original, usamos los nombres oficiales de las etapas en español y sumamos lo que HubSpot presentó en UNBOUND 2026.'
         )
       ]
     }
