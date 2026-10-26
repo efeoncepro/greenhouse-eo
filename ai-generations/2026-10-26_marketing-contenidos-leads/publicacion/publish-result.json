@@ -1,0 +1,23 @@
+{
+    "status": "saved",
+    "snapshot": "_gh_post_refresh_244883_20261026_224419",
+    "checks": {
+        "status": true,
+        "slug": true,
+        "title": true,
+        "excerpt": true,
+        "path": true,
+        "date": true,
+        "categories": true,
+        "tags": true,
+        "thumbnail": true,
+        "content": true,
+        "_yoast_wpseo_title": true,
+        "_yoast_wpseo_metadesc": true,
+        "_yoast_wpseo_focuskw": true,
+        "_yoast_wpseo_estimated-reading-time-minutes": true,
+        "_yoast_wpseo_opengraph-title": true,
+        "_yoast_wpseo_opengraph-description": true
+    },
+    "modifiedGmt": "2026-10-26 22:44:19"
+}

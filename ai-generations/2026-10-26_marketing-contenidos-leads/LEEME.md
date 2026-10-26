@@ -1,7 +1,7 @@
 # Refresh «Marketing de contenidos para generar leads» (post 244883) — imágenes
 
 Artículo: [`docs/public-site/CONTENT_MARKETING_LEADS_REFRESH_DRAFT_V1.md`](../../docs/public-site/CONTENT_MARKETING_LEADS_REFRESH_DRAFT_V1.md).
-Estado al 2026-10-26: **portada, `hero` y tarjeta listas, sin subir**; Julio aprobó el texto de la portada. **Infografía 1 lista, sin subir.**
+**Publicado el 2026-10-26** (22:44 UTC) en la misma URL: portada 252173, `hero` 252174, tarjeta 252175 (foco `85% 50%`), infografía 252169 (escritorio) y 252170 (teléfono). Registro y QA en el borrador §10.
 
 ## Portada, `hero` y tarjeta
 

@@ -387,3 +387,33 @@ una idea, contada en cada formato, con un siguiente paso claro y medida para apr
 - **Pendiente antes de publicar:** lectura de Julio y su confirmación de la analogía de las manzanitas (C3); og:title
   «Una pieza sola no genera leads. El sistema que la rodea, sí» se escribe al publicar; la portada, el hero y la tarjeta
   se suben con la publicación; al terminar la revisión, la copia 252171 va a la papelera.
+
+## 10. Registro de publicación (2026-10-26, aprobado por Julio)
+
+- **Aprobación:** Julio revisó la copia privada 252171 y dijo «Ok publica» (incluye la analogía de las manzanitas, C3).
+- **Aviso previo:** confirmaron sin trabajo en curso «Análisis de Analytics y Search Console» (también para la portada),
+  «Rediseño portada blog», «Mejora de artículos del blog», «Blog v3 portada» y «Blog author plugin»; «Plantilla Archivo»
+  no respondió.
+- **Publicación (22:44 UTC):** `ai-generations/2026-10-26_marketing-contenidos-leads/publicacion/publish.php`
+  (simulación con 7 guardas en verde, entre ellas que el contenido sea idéntico al de la copia revisada → apply). Misma URL,
+  sin cambio de slug ni redirect. Escribe título, contenido, extracto y metas Yoast: title, descripción, OG title
+  «Una pieza sola no genera leads. El sistema que la rodea, sí», OG description y lectura de 12 min. Frase clave sin
+  cambio («marketing de contenidos»). Fecha, categorías, etiquetas y destacada conservadas; 16 comprobaciones en
+  `true`. Respaldo `_gh_post_refresh_244883_20261026_224419`.
+- **Portada:** adjunto **252173** (`uploads/2024/08/marketing-de-contenidos-leads-2026.jpg`, 2400 × 1260, sha256
+  `92aff117…`), destacada + OG, con `blog-post-cover-apply.php` sin modificar. Respaldo
+  `_gh_cover_refresh_244883_20261026_224432` (antes: destacada 244949, OG 244948). **Hero:** adjunto **252174**.
+  **Tarjeta del rail:** adjunto **252175**, foco `85% 50%`. Como el post conserva su fecha de 2024, hoy no entra al
+  slider ni al rail. Dos líneas en `scripts/public-website/blog-home/ledger/2026-10.jsonl`.
+- **Después:** copia 252171 en la papelera (recuperable); caché de WordPress y de Kinsta purgadas.
+- **QA en vivo:** 200; title, descripción, `index, follow`, canonical y `og:url` correctos; OG title y description
+  nuevos; `og:image` = portada nueva con alt; `summary_large_image`; `article:modified_time` 2026-10-26T22:44:19Z;
+  BlogPosting con el titular nuevo; FAQPage con 5 preguntas; sin rastro del título anterior. Playwright 1440 y 390: un
+  H1, sin desborde, la infografía carga la versión de cada ancho, el gráfico se dibuja, el CTA con el lockup y su
+  énfasis, índice de 13 anclas sin rotas, 5 preguntas, 2 menciones, ficha de autor, consola sin errores; 16 enlaces
+  con 200. `blog-home verify --browser`: 44 posts, 8 anchos sin desborde, 0 violaciones.
+- **Rollback:** contenido y metas desde `_gh_post_refresh_244883_20261026_224419`; portada desde
+  `_gh_cover_refresh_244883_20261026_224432` (manual de portadas, «Volver atrás»); hero y tarjeta con
+  `blog-home hero|card 244883 --clear --apply`.
+- **Pendiente:** la indexación la pide la sesión de Analytics sólo si Julio se lo pide directamente; mapa de átomos
+  (carrusel de LinkedIn con la infografía, post de Julio, edición del newsletter, Threads).
