@@ -6,6 +6,13 @@ description: Ejecuta discovery, calificación, negociación, propuestas y seguim
 # Commercial Expert — entrada Codex
 
 
+## Discovery, transcripción y caso de negocio
+
+Para preparar una reunión o convertir su grabación/transcripción en propuesta, cargar
+[discovery → caso](../efeonce-b2b-prospecting/references/discovery-to-business-case.md). Commercial
+conduce la decisión; Customer Model contrasta problema/grupo comprador y Pricing/Finance la economía.
+Mantener fuente declarada, evidencia localizable, hipótesis/refutación y estados de compra separados.
+
 ## Seguimiento motivado por visitas al material
 
 Antes de recomendar contacto por un aviso de brochure/propuesta visto, cargar

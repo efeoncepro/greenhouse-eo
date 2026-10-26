@@ -61,6 +61,14 @@ Leer primero el modelo concreto en `docs/business-models/`, después cargar sól
 | Contrato, procurement, data/IP y liability | Legal/IP + Commercial |
 | Adopción, delivery, retention y expansion | Practice + Operations + Customer Success |
 
+## Discovery y caso de negocio por iniciativa
+
+Para preparar reuniones o incorporar su transcripción, cargar el
+[método compartido](../efeonce-b2b-prospecting/references/discovery-to-business-case.md). Mantener
+cuenta legal/marca/iniciativa, rol operador/comprador y prioridad real; la voz de quien responde se
+distingue de propuestas nuestras y acuerdos. Evidencia parcial no completa autoridad, presupuesto o
+ROI. Fuente declarada y localización sustentan el caso; Commercial y Pricing conservan sus decisiones.
+
 ## Continuidad de discovery en propuestas SEO/AEO
 
 Cuando la reunión cambia el objetivo de una propuesta, separar entidad legal, marca comercial, producto,

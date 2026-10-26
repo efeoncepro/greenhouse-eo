@@ -82,3 +82,11 @@ Aplicación: [Indecaucho, 26/10/2026](../../../../docs/commercial/follow-up-agen
 La documentación oficial de [Documentos de HubSpot](https://knowledge.hubspot.com/documents/use-documents),
 consultada el 26/10/2026, sustenta notificaciones y uso para orientar el seguimiento; los datos del caso
 proceden del aviso y la UI autenticada. La recomendación de contacto es juicio comercial Efeonce.
+
+
+## Continuidad hacia discovery y caso de negocio
+
+Si la respuesta abre reunión/propuesta o se pide analizar su transcripción, cargar
+[discovery → caso](discovery-to-business-case.md). Conservar marca/iniciativa, fuente declarada,
+reunión enviada/aceptada/realizada y criterios de selección separados; la evidencia posterior confirma
+o refuta hipótesis y condiciona economía. No activar una cadencia, Deal o precio por este avance.

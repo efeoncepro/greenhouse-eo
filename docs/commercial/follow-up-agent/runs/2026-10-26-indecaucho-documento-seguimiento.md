@@ -1,8 +1,20 @@
 # Indecaucho — visita al brochure y seguimiento autorizado, 26/10/2026
 
-**Estado real: seguimiento enviado por Outlook y registrado en HubSpot; esperar respuesta.**
+**Estado actual: respuesta humana y reunión solicitadas; invitación y confirmación enviadas.**
+La espera de respuesta que describe el corte inicial queda histórica.
 Owner: Julio Reyes. Delta focal sobre el [expediente del 18/10](2026-10-18-indecaucho-katia-hubspot.md);
 no renueva el inventario global ni acredita admisión, entrega, respuesta o recuperación integral del portal.
+
+## Delta posterior: respuesta y reunión solicitadas
+
+Katia respondió26/10 16:59:32Z: confirma revisión de credenciales, identifica ARMOR EPPS y solicita
+reunión27/10 12:30Ecuador para preparar propuesta económica; selección en terna posterior y pendiente.
+Julio pidió enviar la invitación: evento Outlook/Teams27/10 14:30–15:00Chile creado y releído, con firma
+gráfica, sólo Katia invitada; aceptación pendiente. [Brief, investigación y continuidad](2026-10-26-armor-epps-reunion-research.md).
+El estado de espera del corte anterior queda histórico; no seguir con mensajes genéricos.
+El correo de confirmación pedido después fue enviado14:28Chile con firma gráfica/CCO; nueva copia de
+Enviados y mensaje de14:28 dentro de cadena HubSpot de cuatro comprobados. [Expediente único ARMOR](../../accounts/indecaucho-armor/README.md):
+research ampliado, preparación27/10, caso v0 y lectura posterior de HubSpot/Notion programada para16h.
 
 ## Señal contrastada
 

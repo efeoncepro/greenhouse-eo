@@ -85,3 +85,12 @@ Una búsqueda inicial vacía no acredita pérdida si la UI sigue guardando: veri
 por recencia antes de crear otro. Tras «envíalo», enviar una vez y verificar la nueva copia de Enviados,
 firma y CCO, y luego EMAIL en Contact. El cambio de ID o la demora del logging no autorizan reenvío.
 [Aplicación26/10](../../../../docs/commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md).
+
+
+## Respuesta que abre una reunión
+
+Reconciliar el hilo y aplicar [discovery → caso](../../efeonce-b2b-prospecting/references/discovery-to-business-case.md).
+La invitación y el correo de confirmación tienen readbacks distintos; un evento no registra por sí solo
+la actividad CRM ni admite añadir el buzón BCC como asistente. Para evidencia posterior, distinguir
+grabación/transcripción de reunión o llamada de contenido de inbox/tickets; leer el artefacto correcto
+en la fuente declarada. Un alias observado no autoriza fusionar/cambiar Contact ni crear Deal.

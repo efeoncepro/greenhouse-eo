@@ -1,5 +1,18 @@
 # Registro de seguimiento comercial
 
+**Delta posterior26/10 · ARMOR EPPS:** [expediente único y caso v0](../accounts/indecaucho-armor/README.md).
+Research profundo con tres subagentes, guía27/10 y método de discovery→caso actualizados. Confirmación
+cordial14:28Chile con firma/CCO, Enviados y mensaje de14:28 en cadena HubSpot comprobados. Lectura de
+transcripción **HubSpot/Notion** autorizada y programada27/10 16hChile, una ejecución focal en este hilo;
+seguimiento global PAUSED conservado. [Brief inicial](runs/2026-10-26-armor-epps-reunion-research.md).
+Registro final autorizado: NOTE119606905700 y TASK[119625704196](https://app.hubspot.com/tasks/48713323/view/all/task/119625704196),
+owner Julio, TODO/NOT_STARTED/MEDIUM,27/10 16hChile. Cuerpos y asociaciones Contact/Company releídos;
+sin EMAIL duplicado, alta de Deal/Lead, cambio de etapa ni alias.
+Katia confirma revisión y pide propuesta; reunión27Oct12:30Ecuador. Julio autorizó invitación propia:
+Outlook/Teams14:30–15:00Chile emitida y releída con firma gráfica; aceptación pendiente. Brief con fuentes
+públicas y preguntas preparado. Supera «esperar respuesta» del delta anterior; no terna confirmada ni
+seguimientos genéricos. Sin renovación de inventario global, otro envío comercial o cambios de etapa.
+
 **Delta focal26/10 · Indecaucho:** [visita y seguimiento autorizado](runs/2026-10-26-indecaucho-documento-seguimiento.md).
 HubSpot atribuye a Katia23páginas/91,147s hoy09:22Ecuador; aviso muestra sólo primeras5. Exploración rápida,
 sin admisión/lectura profunda confirmadas. Julio pidió borrador y después «Envíalo»: correo11:43Chile/09:43Ecuador

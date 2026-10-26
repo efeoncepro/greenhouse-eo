@@ -85,6 +85,7 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Encontrar objetivo, adyacentes y rutas de acceso | [buying-group-and-access](references/buying-group-and-access.md) |
 | Conseguir y evaluar datos accionables | [contact-quality-and-enrichment](references/contact-quality-and-enrichment.md) |
 | Preparar acercamiento, correo robusto de Julio o prueba contextual | [message-and-contextual-proof](references/message-and-contextual-proof.md) ([estructura preferida](references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio)) + Copywriting/práctica |
+| Preparar reunión, leer transcripción y construir caso de negocio | [discovery-to-business-case](references/discovery-to-business-case.md) + Commercial/Customer Model/Pricing; fuente declarada y economía condicionada |
 | Preparar discovery, criterios o prueba por oferta/función | [discovery-and-proof](references/discovery-and-proof.md) + Commercial/práctica |
 | Dimensionar cartera, preventa y seguimiento | [capacity-and-economics](references/capacity-and-economics.md) + Pricing/Finance |
 | Proponer o ejecutar un registro autorizado | [crm-and-commercial-handoff](references/crm-and-commercial-handoff.md) + HubSpot |

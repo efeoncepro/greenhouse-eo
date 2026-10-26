@@ -7,7 +7,13 @@
 Método compartido para contrastar aviso y detalle de Documents, separar interacción/intención, revisar
 restricciones y conservar autoridad de borrador/envío. Skills Codex/Claude, manual y continuidad concilian
 [Indecaucho](docs/commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md):
-correo único autorizado, firma/CCO y Enviados/EMAIL verificados; esperar respuesta, sin nuevo scheduler.
+correo único autorizado, firma/CCO y Enviados/EMAIL verificados. Delta posterior: respuesta y marca ARMOR,
+invitación/confirmación verificadas, [caso previo a discovery](docs/commercial/accounts/indecaucho-armor/README.md)
+y research con tres subagentes. Método/plantilla/espejos y fixtures v16 conectan reunión, transcripción
+de la fuente declarada y economía condicionada. Lectura HubSpot/Notion programada una vez27/10 16hChile
+por mandato expreso; seguimiento global PAUSED conservado, resultado posterior pendiente.
+Registro CRM posterior autorizado: nota de respuesta119606905700 y tarea119625704196 con owner/fecha
+y asociaciones a cuenta/contacto comprobados; la revisión focal reutiliza esa TASK.
 
 ## 2026-10-26 — Sitio público: runner para pedir indexación en Search Console
 

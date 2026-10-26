@@ -1,5 +1,9 @@
 # Commercial
 
+- [ARMOR EPPS / Indecaucho — discovery y caso de negocio](accounts/indecaucho-armor/README.md):
+  preparación de la reunión27/10, investigación de marca/canal/demanda, caso v0 y continuidad desde
+  la transcripción HubSpot/Notion. Invitación y confirmación enviadas; terna aún por decidir.
+
 - [UTP Perú — convocatoria de proveedores, 25/10/2026](prospecting-agent/runs/2026-10-25-utp-gustavo.md): Company y Contact de Compras creados, correo Verified por Apollo (2 créditos), presentación con brochures/firma/CCO y EMAIL `SENT` verificados; LinkedIn pendiente por créditos, sin nueva secuencia ni homologación acreditada.
 
 - [Octubre comercial — análisis profundo y plan propuesto, 24/10/2026](analyses/2026-10-prospeccion/README.md): 147 correos a 62 cuentas, madurez de cohortes, expansión, calidad del pipeline y prioridades al 06/11; matriz por cuenta y datos auditables. Incluye Solidaria y excluye Momentum de la cohorte de clientes; no activa contactos ni cambios CRM. [Revisión de mensajes por cuenta](analyses/2026-10-prospeccion/REVISION-MENSAJES.md): 64 fichas, 47 textos alternativos condicionados y 17 decisiones sin nuevo mensaje.

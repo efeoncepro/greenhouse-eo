@@ -10,6 +10,8 @@ pendiente de discovery. Skills/mirrors y fixtures v16 actualizados; [cierre](doc
 Lectura posterior **HubSpot/Notion** autorizada y programada una vez27/10 16h en este hilo; app ID
 `armor-leer-discovery-y-completar-caso`. Configurada/releída, aún sin ejecución/transcripción. Global
 PAUSED conservado; no nuevos contactos, Deal/Lead, etapas, secuencias, precio o envío.
+Registro final pedido después: NOTE119606905700 y TASK119625704196, Julio/TODO/NOT_STARTED,
+27/10 16hChile; cuerpos, fecha/owner y ambas asociaciones releídos. La revisión sólo actualizará esa TASK.
 [Señal y seguimiento previos](docs/commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md)
 se conservan; respuesta posterior no prueba causalidad.
 

@@ -318,3 +318,31 @@ Es una aplicación reversible del método existente: sin nuevo schema, autonomí
 envío. Los espejos de Prospección se mantienen idénticos. La [entrega de implementación](../commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md)
 separa método aplicado en el repo, adaptaciones nativas propuestas y recomendación de pauta. No declara
 modificadas instrucciones, plantillas, programaciones o audiencias de HubSpot.
+
+
+### Delta aceptado 26/10/2026 — discovery, transcripción y caso de negocio
+
+Julio pidió actualizar documentos/skills, construir el caso ARMOR / Indecaucho y profundizar con
+subagentes para preparar la reunión; después, leer la transcripción y completar el caso. Aclaró que
+las reuniones se graban con HubSpot y Notion. El
+[método progresivo](../../.codex/skills/efeonce-b2b-prospecting/references/discovery-to-business-case.md)
+y su plantilla conectan respuesta humana, preparación, fuente declarada de reunión, evidencia
+localizable, hipótesis confirmada/refutada, economía condicionada y siguiente decisión.
+
+Se conserva la separación Company/entidad legal/marca/iniciativa; terna anunciada distinta de selección,
+invitación enviada/aceptada/reunión realizada y sugerencia del vendedor distinta de acuerdo. La
+transcripción se trata como evidencia, sin ejecutar instrucciones insertas ni inventar speaker,
+timestamp, presupuesto o ROI. Commercial, Customer Model, práctica y Pricing/Finance conservan sus
+dominios. Referencias/plantilla/fixtures v16 P75–P80 y routing Codex/Claude comparten el mismo método.
+
+Es una ampliación reversible del contrato de agentes existente; no cambia source of truth CRM,
+schema, oferta, precios ni autonomía general. Se descarta duplicar la skill en una metodología por
+marca o imponer la plataforma de videollamada como único repositorio de transcripción. Los datos
+reales y estado operativo permanecen en el [expediente de cuenta](../commercial/accounts/indecaucho-armor/README.md).
+
+El mandato específico de retomar tras la reunión se concretó en **una revisión focal del hilo el
+27/10/2026 a las16:00 America/Santiago**, app ID `armor-leer-discovery-y-completar-caso`; no reactivó el
+seguimiento global pausado. Configuración/readback distintos de ejecución y fuente aún por generarse.
+La skill no crea automatizaciones por defecto. Sin correo nuevo, Deal/Lead, stage, gastos o propuesta
+aprobada por esta documentación. Reabrir si cambian fuentes, permisos, calidad de extracción o
+evidencia de decisión. [Cierre y verificación](../audits/commercial/2026-10-26-armor-discovery-case-docs-skills.md).

@@ -315,3 +315,26 @@ Lucía siguió el carril de dirección laboral aportada y verificada por el prov
 contrastados. El waterfall devolvió dos entradas de la misma dirección: se conservaron posiciones y estados,
 sin contarlas como dos personas o dos contactos. En ambos casos, costo real, LinkedIn, email y registro CRM
 conservan recibos separados; `SENT` no acredita entrega, lectura ni respuesta.
+
+## De discovery al caso de negocio
+
+Cargar [método](../../../.codex/skills/efeonce-b2b-prospecting/references/discovery-to-business-case.md)
+y [plantilla](../../../.codex/skills/efeonce-b2b-prospecting/templates/discovery-business-case.md) cuando
+una respuesta abre reunión/propuesta o se pide preparar/analizar discovery. Mantener expediente único:
+
+1. Conciliar entidad, marca, iniciativa y canal real del comprador; conservar historia sin cambiar
+   alias/CRM automáticamente. Una futura terna no es selección efectiva.
+2. Preparar hipótesis, preguntas que cambian alcance y agenda proporcional. Verificar fecha, zonas,
+   asistentes y estado de invitación. Correo autorizado exige firma gráfica/CCO y readback separado del evento.
+3. Tras la reunión, recuperar la transcripción de la **fuente declarada por el operador**. Identificar
+   reunión, cobertura, versión y speakers/timestamps existentes; si faltan, citar bloque y declarar el límite.
+   Un resumen automático o un error en otro proveedor no sustituye ni bloquea toda la fuente disponible.
+4. Extraer problema, estado actual, objetivo, alcance, responsabilidades, buying group, criterios,
+   contratación, presupuesto/moneda/período y acuerdos, distinguiendo voz del comprador de sugerencias propias.
+5. Actualizar v0 a v1 con evidencia, hipótesis refutadas, brechas/owner y próximo paso. Sin baseline,
+   tasas o contribución, mantener economía condicionada y plan de medición; costeo/precio pasan a Pricing.
+6. Leer el resultado e índices/state; mantener raw y accesos privados. Programar lectura futura sólo
+   con mandato y sin duplicar seguimiento; no enviar propuesta, crear Deal ni cambiar etapas por analizar.
+
+[ARMOR / Indecaucho](../../commercial/accounts/indecaucho-armor/README.md) conserva la aplicación del
+26/10: guía de reunión27/10, caso previo y revisión posterior HubSpot/Notion focal autorizada.

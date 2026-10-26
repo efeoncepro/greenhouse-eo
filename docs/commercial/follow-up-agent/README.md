@@ -1,5 +1,11 @@
 # Seguimiento comercial recurrente
 
+**ARMOR / Indecaucho, delta26/10:** [expediente por iniciativa](../accounts/indecaucho-armor/README.md).
+Katia respondió; reunión27/10 14:30Chile, invitación y confirmación con firma verificadas. Preparación y
+caso v0 listos; lectura posterior de grabación/transcripción HubSpot/Notion autorizada y programada en
+este hilo27/10 16h, una ejecución. El seguimiento global se observó PAUSED y permanece así; no duplicar
+cadencia, correo, reunión ni tarea por este dossier. [Protocolo](../accounts/indecaucho-armor/POSTREUNION.md).
+
 **Mandato focal 24/10:** [Lucía y Yvette](runs/2026-10-24-lucia-yvette-secuencias.md) tienen dos secuencias
 con dos pasos futuros por persona, Programado verificado y excepción expresa al CCO con registro nativo.
 Conservar firma gráfica y parada por respuesta/reunión; este agente no duplica esos correos ni amplía el lote.

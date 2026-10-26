@@ -32,6 +32,23 @@ No cambia calidez, admisión, etapa ni cadencia automáticamente. [Operación](.
 
 ## Cómo se comporta
 
+### De la respuesta a la reunión y al caso
+
+Una respuesta que delimita marca y pide propuesta pasa a discovery, con
+[método progresivo](../../../.codex/skills/efeonce-b2b-prospecting/references/discovery-to-business-case.md)
+y [plantilla](../../../.codex/skills/efeonce-b2b-prospecting/templates/discovery-business-case.md).
+La preparación conserva cuenta legal/marca/iniciativa y separa invitación enviada, aceptada y reunión
+realizada; anunciar una terna no acredita pertenencia. Un alias de respuesta no cambia CRM por sí solo.
+
+Después, la transcripción de la fuente declarada aporta evidencia a problema, alcance, roles, decisión,
+economía y siguiente acuerdo. La v0 contiene hipótesis; la v1 confirma o refuta con localización de la
+fuente y brechas explícitas. Sin baseline no hay ROI inventado. Preparar el caso no implica precio,
+propuesta enviada ni stage. [Operación](../../manual-de-uso/comercial/operar-prospeccion-b2b.md#de-discovery-al-caso-de-negocio).
+
+[ARMOR / Indecaucho](../../commercial/accounts/indecaucho-armor/README.md) es la aplicación fechada:
+respuesta y reunión solicitadas, confirmación enviada y preparación lista; lectura posterior
+HubSpot/Notion y caso económico final pendientes. No se acredita eficacia causal del seguimiento.
+
 | Situación | Resultado esperado |
 | --- | --- |
 | Fría | Hipótesis pertinente y pregunta de encaje/interés basada en señal verificable |

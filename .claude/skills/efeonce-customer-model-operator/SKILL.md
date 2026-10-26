@@ -41,6 +41,14 @@ reduces it, what evidence reaches the sponsor and what risk appears when the ope
 The model must also test the Why: the offer increases client capability and leaves useful memory for the next cycle.
 Do not call opaque dependency that the client cannot explain, transfer or port “retention.”
 
+## Discovery y caso de negocio por iniciativa
+
+Para preparar reuniones o incorporar su transcripción, cargar el
+[método compartido](../efeonce-b2b-prospecting/references/discovery-to-business-case.md). Mantener
+cuenta legal/marca/iniciativa, rol operador/comprador y prioridad real; la voz de quien responde se
+distingue de propuestas nuestras y acuerdos. Evidencia parcial no completa autoridad, presupuesto o
+ROI. Fuente declarada y localización sustentan el caso; Commercial y Pricing conservan sus decisiones.
+
 ## Continuidad de discovery en propuestas SEO/AEO
 
 Cuando la reunión cambia el objetivo de una propuesta, separar entidad legal, marca comercial, producto,
