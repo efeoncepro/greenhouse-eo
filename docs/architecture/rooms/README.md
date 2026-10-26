@@ -1,5 +1,7 @@
 # Efeonce Rooms
 
+> Backend en `main@a87852e` por PR2 (2026-10-26), sin el scaffold visual2071; flagsOFF y cloud media/canary pendientes. [Release](../../audits/rooms/2026-10-26-production-backend-release.json) y [contrato Claude Design](../../documentation/rooms/backend-api-for-claude-design.md).
+
 **Nombre y subdominio acordados:** Efeonce Rooms · `rooms.efeonce.org`.
 **Propósito:** experiencia comercial y conversión de demanda; ayuda al comprador a comprender, evaluar y defender una solución. Sirve a propuestas creativas y SEO/AEO, combinables en una sala. Puede abrir conversaciones mediante muestras o diagnósticos personalizados.
 **Estado al 2026-10-25:** runtime `20f9fe9` publicado en [Vercel](https://efeonce-rooms.vercel.app/invite), deployment `dpl_7o71umG3uuNgz8RguhPPGksA69ad`; repo privado [efeoncepro/efeonce-rooms](https://github.com/efeoncepro/efeonce-rooms). Autoría V2, lector protegido, invitación por correo único enlace+código y gestión contextual implementados. Suite178/178 PASS; UI integrada129 comprobaciones y15 de privacidad PASS en entorno aislado. PostgreSQL cloud propio con19tablas/5migraciones, WIF/secretos y WAF preparados y verificados; ambos flags de acceso siguen OFF. Readback público: /invite200, /login503 disabled y logout200. Piloto con Efeonce ID y único correo real aún pendientes de coordinación con Auth. Medios privados/editor/presentación/colaboración conservan su alcance pendiente en EPIC-052; aceptación visual humana pendiente. DNS `rooms.efeonce.org` no activado. [Evidencia de seguridad](../../audits/rooms/2026-10-25-invitation-token-hardening.md), [aislamiento SQL](../../audits/rooms/2026-10-25-cloud-isolation.md).
@@ -7,6 +9,14 @@
 **Programa:** [EPIC-052 — Efeonce Rooms](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md), `in-progress`: quince unidades de planificación; tasks para foundation, UI, persistencia, autoría versionada, identidad/invitaciones y primer release autorizado, con permisos can y vistas cliente/operador/administrador. La épica es dueña de secuencia, dependencias y cierre; estos documentos conservan los contratos de producto/arquitectura.
 
 **Design system decidido (2026-10-07): La órbita**, gobernado por [efeonce-graphic-line](../../../.codex/skills/efeonce-graphic-line/SKILL.md); Bricolage editorial/Poppins funcional en todas las superficies de Rooms. AXIS distribuye sus recursos y contratos. La primera composición local está implementada y su aceptación visual humana sigue pendiente; las piezas conservan su diseño.
+
+## Continuidad 2026-10-26 — backend y diseño
+
+El operador hará el diseño con **Claude Design**; Codex retoma exclusivamente backend.
+[TASK-2072](../../tasks/in-progress/TASK-2072-rooms-cloud-media-backend.md) agrega storage GCS,
+transferencia directa limitada, worker compilado e identidad propia, sin activar producción.
+[Contrato de API para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md).
+La UI rescatada2071 conserva su condición de scaffold y la aceptación visual sigue pendiente.
 
 ## Documentos de decisión y arquitectura
 
@@ -24,7 +34,9 @@
 - [TASK-2070 — imágenes privadas y procedencia](../../tasks/in-progress/TASK-2070-rooms-private-image-media.md): primer circuito local PNG/JPEG/WebP, procesamiento fuera del request, publicación y entrega autorizada; [ADR](EFEONCE_ROOMS_PRIVATE_IMAGE_MEDIA_AND_PROVENANCE_DECISION_V1.md).
 - [TASK-2071 — editor y visor](../../tasks/in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md): cargar, validar, incorporar, previsualizar y publicar; zoom/teclado y retorno al contenido. Una imagen por bloque, varias piezas por sala.
 
-Ambas continúan el goal autorizado, con hooks verificados. El runtime remoto20f9fe9 y su canary de identidad permanecen separados del WIP local. Medios cloud, PDF/audio/video, editor completo y presentación conservan entregas pendientes.
+Ambas continúan el goal autorizado, con hooks verificados. El backend de2070/2072 se integró en main a87852e
+sin el scaffold UI2071. El canary de identidad sigue separado y pendiente. Recursos/worker/migraciones
+de medios cloud, PDF/audio/video, editor completo y presentación conservan entregas pendientes.
 
 ## Contratos de experiencia para revisión
 

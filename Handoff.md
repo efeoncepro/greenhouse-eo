@@ -34,6 +34,8 @@ no renovación del inventario global ni autonomía nueva. [Método](.codex/skill
 
 ### 2026-10-26 — Rooms: backend Codex y diseño Claude Design
 
+Actualización posterior autorizada: backend fusionado en `efeonce-rooms/main@a87852e` vía [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2), sin los doce paths visuales2071.225tests+lint/types/build,53 browserPASS+3skip,CI Docker/previewPASS; flagsOFF sin cambios. [Recibo de despliegue](docs/audits/rooms/2026-10-26-production-backend-release.json). Recursos/migraciones/worker cloud y canary pendientes; no correo ni deploy Auth/Greenhouse.
+
 Asignación humana vigente: Codex backend; Claude Design interfaz. TASK-2072, runtime rama `task/2072-cloud-media-backend`, commitd056708 y [PR1](https://github.com/efeoncepro/efeonce-rooms/pull/1) draft contra el scaffold rescatado.225/225testsPASS0skip,lint/types/build,PG16/18restore2tenants/6rooms y CI DockerLinux/decoderPASS. GCS/directPUT/generaciones y workerComputeperfilpropio preparados; ningún JSX/layout/motion nuevo. Main20f9fe9 conservado. Bucket/IAM/CORS,rol/SA/secretworker,migracióncloud/canary siguen pendientes;CLI+ADC renovados por runner canónico y verificados vigentes; readback confirma bucket/SA/secret worker aún ausentes, lectura Job no concluyente. [Contrato frontend](docs/documentation/rooms/backend-api-for-claude-design.md), [recovery](docs/audits/rooms/2026-10-26-media-backend-recovery.md). No cerrar2072 por código/fakesSDK ni activarflags por conectar diseño.
 
 

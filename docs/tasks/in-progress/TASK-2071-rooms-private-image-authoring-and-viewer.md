@@ -11,6 +11,12 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Ownership 2026-10-26
+
+El operador asigna diseño e interfaz a **Claude Design** y backend a Codex. Codex conserva el scaffold
+histórico de esta task y no lo rediseña ni lo considera aceptado. Contratos/backend e integración:
+[TASK-2072](TASK-2072-rooms-cloud-media-backend.md) y [guía para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md).
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -26,7 +32,7 @@
 - Motion: `docs/ui/motion/TASK-2071-rooms-private-image-authoring-and-viewer-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Diseño mínimo aprobado por raíz bajo goal confirmado: una imagen por bloque y operación; repetible en la misma sala, propiedades y lectura protegida. Contrato 2070 congelado; implementación backend local paralela; sin JSX ni modificación de candidata 20f9fe9. Preparación y mapeo listos para hook; QA integrada depende de servicios ejecutables 2070.`
+- Status real: `Scaffold UI rescatado2626921 en rama privada, diseño/aceptación pendientes. Operador asigna diseño a Claude Design2026-10-26 y Codexbackend; ningún JSX/layout/motion nuevo en2072. API/DTO para conectar diseño documentados. GVC/aceptación humana y recorrido integrado cloud permanecen pendientes.`
 - Rank: `R07A/R08A inmediatamente después del contrato TASK-2070`
 - Domain: `ui|content`
 - Blocked by: `none`

@@ -39,7 +39,7 @@ Vercel. La identidad la pone Efeonce ID (skill `efeonce-auth`); Rooms es su prim
 | CLI de paridad | `scripts/rooms.ts` (`pnpm rooms …`: list, room, draft, editions, execute, validate, invitations; con el WIP, también medios) |
 
 Comandos:
-- `pnpm verify`: lint, lint negativo, typecheck, test y build. **Es el único gate**: no hay CI.
+- `pnpm verify`: lint, lint negativo, typecheck, test y build. Gate local de aplicación; la rama2072 añade CI de imagenLinux/decoder del worker.
 - `pnpm test:e2e`, `pnpm db:local`, `pnpm db:migrate`, `pnpm db:smoke`, `pnpm db:recovery`.
 - `pnpm auth:integration`, `pnpm invitation:integration`.
 - `pnpm dev` (127.0.0.1:3210).
@@ -50,7 +50,8 @@ Comandos:
 - **Cada push a `main` de `efeonce-rooms` construye PRODUCCIÓN en Vercel** (integración Git, sin CI).
   - El WIP va a rama, nunca a `main`.
   - Antes de pushear, `pnpm verify` completo y leer qué SHA queda como deploy activo.
-  - Hoy `20f9fe9` es el candidato del canary: no moverlo sin decidirlo.
+  - El build puede quedar `READY/STAGED` conservando el alias anterior: comprobar el dominio canónico y usar promoción explícita si está autorizada; READY por sí solo no prueba publicación.
+  - Backend publicado en `main@a87852e` por autorización2026-10-26; `20f9fe9` queda como rollback previo. Leer el ledger y el recibo de release antes de otra promoción.
 - **Flags `ROOMS_*` viven en Vercel Production y nacen OFF.**
   - Prenderlos es una mutación de producción: autorización explícita y readback del valor (no sólo de la presencia).
   - No están en el ledger de flags de Greenhouse (otro repo), así que su estado se registra en `references/program-ledger.md` y en el ledger con una nota.
@@ -68,7 +69,7 @@ Comandos:
   - Cada petición se vuelve a autorizar.
   - `private, no-store`.
   - Nunca se sirve el original, sólo los derivados.
-  - Hoy el storage es local y falla cerrado en cloud hasta que exista el adapter GCS.
+  - Adapter GCS y worker compilado integrados en main; recursos/env/migraciones cloud y canary pendientes. `ROOMS_MEDIA_ENABLED` sigue OFF: no activar antes del consumidor frontend y readbacks.
 - **Datos sintéticos rotulados.** La demo y el piloto usan personas ficticias. La badge «synthetic» aparece cuando el origen no es `real`.
 - **AXIS y paquetes publicados exactos.** Ninguna copia manual de tokens, logos o primitives. Los SVG públicos salen de `scripts/sync-brand.mjs`.
 - Paridad Full API: toda acción de UI es un command o reader con su contrato. La CLI ya existe; el MCP está pendiente (R13/R14).

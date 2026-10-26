@@ -2721,3 +2721,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-2071` | `in-progress` | **Rooms: autoría mínima y lectura de imágenes privadas.** EPIC-052 R07A/R08A; consumidor de TASK-2070, una imagen por bloque, propiedades, preview y visor accesible. | `docs/tasks/in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md` |
 
 > Registro 2026-10-25: ID2071 revalidado en registro y filesystem, coordinado con backend2070. Barrido:2059 posee demo,2068 lector textual y2070 contratos de medios; esta unidad posee la interacción de imagen real. Siguiente ID libre TASK-2072.
+
+| `TASK-2072` | `in-progress` | **Rooms: backend cloud de medios y contrato para diseño.** R05 GCS, worker compilado/perfil propio y API/CLI; diseño Claude Design separado. | `docs/tasks/in-progress/TASK-2072-rooms-cloud-media-backend.md` |
+
+> Registro2026-10-26: usuario asigna backend a Codex y diseño a Claude Design;2070 posee base local,2071 UI,2069 identidadcloud. Siguiente ID libre TASK-2073.

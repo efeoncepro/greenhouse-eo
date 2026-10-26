@@ -51,7 +51,7 @@ receipts/audit/outbox y CAS como el dominio existente. I/O y decodificación fue
 ### 3. Transferencia y procesamiento
 
 - initiate reconsulta autoridad content.edit sobre borrador; sesión fija owner/org/room, formato esperado,
-  tamaño, expiración y destino generado por servidor. Descriptor efímero no se persiste en receipts/logs.
+  tamaño, expiración y destino generado por servidor. Descriptores bearer cloud no se persisten en receipts/logs; una URL local que exige sesión fresca no es un bearer y conserva compatibilidad del receipt local.
 - Primer adapter local: filesystem privado fuera de public; endpoint streaming acotado con autenticación
   y sesión de transferencia limitada. Namespace sólo IDs generados, sin paths arbitrarios del caller.
 - Cloud futuro: cuarentena GCS propia y transferencia directa; CORS al origin exacto, sin wildcard. Una

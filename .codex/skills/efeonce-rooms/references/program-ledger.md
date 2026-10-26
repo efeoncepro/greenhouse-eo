@@ -3,6 +3,42 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-26 — Backend integrado en main por autorización humana
+
+Pedido: «Sería al main de rooms cierto?» → «Ok, hazlo». [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2)
+fusionado a main en `a87852e345c331d6f4b3ca8e3137bf1fb2120e35`. Release preparado desde main con los
+commits backend de2070/2072; se excluyeron los doce paths visuales del scaffold2071. Se conserva sólo su
+contrato TypeScript de DTO. No hay diff de JSX, estilos ni copy visible frente a20f9fe9.
+
+- Verificación del candidato95609d5:225/225 tests,lint/types/build PASS; navegador53PASS y3 omisiones
+  intencionales de API repetida entre viewports; CI DockerLinux/decoder y preview Vercel SUCCESS.
+- Main ahora ejecuta también el gate CI del worker. Runtime checkout main limpio tras ff.
+- Readback Vercel Production previo: first-party=false, invitations=false, media ausente/defaultOFF;
+  perfil cloud-production configurado, storage/bucket de medios sin configurar. No se cambiaron variables.
+- Despliegue y smoke posteriores: ver [recibo de release](../../../../docs/audits/rooms/2026-10-26-production-backend-release.json).
+- Siguen pendientes recursos/IAM/CORS, migraciones cloud6/7, worker desplegado y canary Auth/medios.
+  La interfaz publicada conserva placeholder de medios: Claude Design debe conectar uploads.getTransfer
+  y lectura privada antes de activar medios. No se envió correo ni se desplegó Auth/Greenhouse.
+
+## 2026-10-26 — Codex backend; Claude Design interfaz
+
+Instrucción humana: «El diseño lo haré con Claude Design, prefiero que tu tomes backend». La pausa de
+aceptación visual2059 se conserva; Codex no modifica JSX/layout/motion. Backend sobre rama
+`task/2072-cloud-media-backend`, base7ca5fd3. Main publicado20f9fe9 permanece sin cambios por esta entrega.
+
+- TASK-2072: GCS privado por port, PUTV4efímero<=5min fuera de receipts, complete verifica bytes/generación
+  fueraSQL y revalida autoridad/CAS; lecturaSHA antesGET/HEAD/Range/304, sin originaldownload.
+- Worker compilado con submanifest/lock mínimo y prodsmoke aislado sin tsx/Next/React/AXIS; perfil
+  CloudRunJob+Compute metadata de SA/rol/secret separados, sin simular Vercel ni ADC de operador.
+- Runtime225/225testsPASS0skip, lint/types/build. RecoveryPG16fresh7migraciones yPG18aisladoPASS:
+  2tenants/6rooms,25tablas,18objetos/12bindings,ACL/hashes/generación/down-up/corrupción/revocación.
+- CLI soporta sesión existente en archivo0600 con Cookie+Origin, valida destino directo y no copia
+  credenciales aGCS. Su login/obtención de sesión y OIDC productivo conservan canary propio.
+- [Contrato para Claude Design](../../../../docs/documentation/rooms/backend-api-for-claude-design.md).
+- Publicado backend en commitd056708 y [PR1](https://github.com/efeoncepro/efeonce-rooms/pull/1), draft contra rama rescatada; CI Linux Docker/decoder SUCCESS y preview Vercel SUCCESS. Main conserva20f9fe9.
+- Pendientes reales: bucket/IAM/CORS, rol/SA/secret/worker cloud, migracióncloud y canary.
+  Código/fakesSDK y recursos preparados no acreditan esos resultados. Ningún flag/correo activado. CLI+ADC renovados y verificados; bucket/SA/secret worker not_found, lectura Job no concluyente.
+
 ## Corte 2026-10-25 ~22:55 UTC — Codex se queda sin uso
 
 Fuente consolidada: [auditoría de estado](../../../../docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).

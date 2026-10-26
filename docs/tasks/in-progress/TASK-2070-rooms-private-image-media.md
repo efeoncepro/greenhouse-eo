@@ -27,7 +27,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Implementación LOCAL en curso: ADR/plan aceptados, hook --subagents PASS, linttask0warnings. SchemasV3/media, migraciónaditiva y servicio/worker en construcción. HTTP streaming autenticado y rutas/api/v1 implementadas;8/8 pruebas transportePASS y5/5 auth-returnPASS. No integraciónPG/worker/UI completa ni rolloutmedia. Candidataremota20f9fe9 preservada.`
+- Status real: `Backend local7ca5fd3 recuperado y ampliado en task/2072-cloud-media-backend: suite225/225 PASS, tipos/lint/build y workerprodclosure PASS. Recovery PG16fresh7migraciones yPG18aislado PASS:2tenants/6rooms,25tablas,18objetos/12bindings,ACL/hash/generación/down-up/revoke/corrupción. Claude Design posee UI desde2026-10-26; Codex backend. GCS/IAM/CORS y canary reales conservan gates2072/2069; no cierre cloud por pruebas locales.`
 - Rank: `R05A después de R03B/R04; consumidor UI dependiente separado`
 - Domain: `platform|data|content`
 - Blocked by: `none`
@@ -214,7 +214,7 @@ Job con fencing/retry/cancel; corrupción o formato no soportado bloquean public
 
 Publish carga AssetVersion ready autorizadas y congela generación, checksum, metadata y rendition IDs en la edición.
 Reader de previewAudience requiere content.edit y devuelve proyección de audiencia sin hacerse pasar por cliente.
-Endpoint same-origin GET/HEAD/Range reautoriza cada petición y transmite derivados con backpressure; nunca arrayBuffer de archivo completo.
+Endpoint same-origin GET/HEAD/Range reautoriza cada petición. Snapshot verificado de derivado<=3MiB y stream acotado protegen SHA/TOCTOU; originales/grandes no se cargan completos en el handler.
 HTTP/CLI suben bytes y hacen readback; original descargable, PDF/audio/video quedan explícitamente fuera de esta primera entrega.
 
 ## Out of Scope
@@ -281,14 +281,14 @@ El registro de esta task no inicia aprovisionamiento ni despliegue.
 
 ## Acceptance Criteria
 
-- [ ] V1/V2 permanecen legibles e inmutables; V3 real/synthetic explícito y procedencia sin inferencias.
-- [ ] PNG/JPEG/WebP de dos marcas/tenants recorren upload→bytes verificados→derivados→publish→lectura privada por HTTP/CLI.
-- [ ] MIME/ready/checksum/dimensiones falsificados, oversized, malformed, unsupported y assets ajenos son rechazados sin pérdida silenciosa.
-- [ ] Retry/CAS/cancel/replay y lease/fencing no duplican originales ni publican resultado obsoleto; auditoría y outbox son atómicos.
-- [ ] Snapshot fija assetVersion/rendition/generation y conserva edición antigua cuando llega material nuevo.
-- [ ] Revocar sesión/grant o archivar niega nuevas peticiones de bytes; cache/logs/HTML no filtran transferencias o keys.
-- [ ] Ratios/orientación/alpha e imágenes largas se verifican sin crop/stretch; límite de resolución y original no descargable quedan explícitos.
-- [ ] Down/up y restore de DB+storage/generaciones/ACL PASS; código worker aislado del bundle de UI.
+- [x] V1/V2 permanecen legibles e inmutables; V3 real/synthetic explícito y procedencia sin inferencias. Evidencia local: [recovery PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) y suite media; identidad fixture, sin canary cloud.
+- [x] PNG/JPEG/WebP de dos marcas/tenants recorren upload→bytes verificados→derivados→publish→lectura privada por HTTP/CLI. Evidencia local: [recovery PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) y suite media; identidad fixture, sin canary cloud.
+- [x] MIME/ready/checksum/dimensiones falsificados, oversized, malformed, unsupported y assets ajenos son rechazados sin pérdida silenciosa. Evidencia local: [recovery PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) y suite media; identidad fixture, sin canary cloud.
+- [x] Retry/CAS/cancel/replay y lease/fencing no duplican originales ni publican resultado obsoleto; auditoría y outbox son atómicos. Evidencia local: [recovery PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) y suite media; identidad fixture, sin canary cloud.
+- [x] Snapshot fija assetVersion/rendition/generation y conserva edición antigua cuando llega material nuevo. Evidencia local: [recovery PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) y suite media; identidad fixture, sin canary cloud.
+- [x] Revocar sesión/grant o archivar niega nuevas peticiones de bytes; cache/logs/HTML no filtran transferencias o keys. Evidencia local: [recovery PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) y suite media; identidad fixture, sin canary cloud.
+- [x] Ratios/orientación/alpha e imágenes largas se verifican sin crop/stretch; límite de resolución y original no descargable quedan explícitos. Evidencia local: [recovery PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) y suite media; identidad fixture, sin canary cloud.
+- [x] Down/up y restore de DB+storage/generaciones/ACL PASS; código worker aislado del bundle de UI. Evidencia local: [recovery PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) y suite media; identidad fixture, sin canary cloud.
 - [ ] Gates lint/typecheck/test/build, paridad HTTP/CLI, manual técnico y limitaciones R05B/R13 actualizados.
 
 ## Verification
