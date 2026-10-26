@@ -74,6 +74,18 @@ ACL/inmutabilidad y down sólo en clones. Worker build/smoke sobre prod closure.
 Cloud después de capacidad/IAM/config/migración/backup/readbacks. Canary de identidad sigue único,
 con destinatario autorizado existente y coordinaciónAuth; no enviar clientes por completar backend.
 
+## Rollout acotado ejecutado 2026-10-26
+
+El operador autorizó infraestructura, migraciones y worker con subagentes, manteniendo Auth/correo/UI
+fuera del bloque. Bucket/IAM/CORS y SA aplicados; siete migraciones y rol SQL dedicado verificados.
+Cloud Run Job finito: CPU1/RAM1Gi, timeout240s, reintentos0, una tarea y paralelismo1; imagen inmutable,
+una ejecución con cola vacía completada. No scheduler ni loop. El límite de memoria cubre también el
+decoder nativo; todavía no se ha medido el peor caso de una imagen real en cloud.
+
+Tres variables GCS se guardaron en Vercel Production para el próximo deploy; no se cambiaron flags web
+ni se reconstruyó la aplicación. El canary real y el consumidor conservan su gate separado.
+[Manual y evidencias](../../manual-de-uso/rooms/operar-worker-medios.md).
+
 ## Alternativas
 
 - Proxy de originales20MiB por Vercel: rechazada por límite de plataforma.

@@ -5,6 +5,12 @@ provision/rollout conservan gates. Base7ca5fd3. Autorización humana posterior20
 backend en main: PR2, commit a87852e. El release excluye doce paths visuales2071 y mantiene flagsOFF;
 recursos/migracionescloud/worker/canary siguen pendientes.
 
+Extensión autorizada posterior: cerrar únicamente infraestructura/migraciones/worker y detenerse antes
+de Auth/correo/UI. Dos subagentes: bucket+SA/IAM y build+Job; root DB/secret/configuración/handoff.
+Resultado: bucket/IAM/CORS,7migraciones25tablas,rolsecretworker,imagen+Job yunaejecuciónvacíaPASS.
+Sin scheduler, sin flags appON, sin redeploy web. Configuración GCS preparada para próximo deploy.
+Canary real de identidad+medios y disparo automático del Job conservan bloque posterior.
+
 1. Root registra task/ADR y ejecuta hook --subagents; load-bearing interfaces acordadas.
 2. Agentmedia_cloud_backend: MediaStorage local/GCS, subida directa efímera, verify complete fueraSQL,
    generation física y entrega verificada por SHA antesHEAD/304. Owner server/media salvoprocessor.

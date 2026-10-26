@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 1,
+  "scope": "Rooms media bucket and service-account IAM only",
+  "project": "efeonce-group",
+  "projectNumber": "183008134038",
+  "operator": "Existing operator CLI and ADC verified; personal identifiers omitted",
+  "authorizedBy": "Human scoped infrastructure authorization relayed and exact plan approved by root",
+  "startedAt": "2026-10-26T17:40:54.152609+00:00",
+  "cliAndAdcPreflight": "valid; tokens never persisted",
+  "steps": [
+    {
+      "step": "create_role_roomsMediaAppObjects",
+      "status": "applied"
+    },
+    {
+      "step": "create_role_roomsMediaWorkerObjects",
+      "status": "applied"
+    },
+    {
+      "step": "create_role_roomsMediaWorkerList",
+      "status": "applied"
+    },
+    {
+      "step": "create_role_roomsMediaUploadSigner",
+      "status": "applied"
+    },
+    {
+      "step": "create_worker_service_account",
+      "status": "applied"
+    },
+    {
+      "step": "create_private_bucket",
+      "status": "applied"
+    },
+    {
+      "step": "configure_cors",
+      "status": "applied"
+    },
+    {
+      "step": "bind_roomsMediaAppObjects",
+      "status": "applied"
+    },
+    {
+      "step": "bind_roomsMediaWorkerObjects",
+      "status": "applied"
+    },
+    {
+      "step": "bind_worker_bucket_list",
+      "status": "applied"
+    },
+    {
+      "step": "bind_app_self_signblob",
+      "status": "applied"
+    },
+    {
+      "step": "bind_worker_cloudsql_client",
+      "status": "applied"
+    },
+    {
+      "step": "bind_worker_dedicated_secret_accessor",
+      "status": "applied_and_readback_verified"
+    }
+  ],
+  "resources": {
+    "bucket": {
+      "name": "efeonce-rooms-production-media",
+      "location": "US-EAST4",
+      "default_storage_class": "STANDARD",
+      "uniform_bucket_level_access": true,
+      "public_access_prevention": "enforced",
+      "cors_config": [
+        {
+          "maxAgeSeconds": 300,
+          "method": [
+            "PUT"
+          ],
+          "origin": [
+            "https://efeonce-rooms.vercel.app"
+          ],
+          "responseHeader": [
+            "Content-Type",
+            "Content-Length",
+            "x-goog-if-generation-match"
+          ]
+        }
+      ],
+      "soft_delete_policy": {
+        "effectiveTime": "2026-10-26T17:41:12.037000+00:00",
+        "retentionDurationSeconds": "604800"
+      },
+      "versioning_enabled": false
+    },
+    "bucketBindings": [
+      {
+        "condition": {
+          "description": "Only objects in the Rooms media namespace",
+          "expression": "resource.name.startsWith('projects/_/buckets/efeonce-rooms-production-media/objects/rooms-media/')",
+          "title": "rooms_media_prefix_only"
+        },
+        "members": [
+          "serviceAccount:rooms-runtime-production@efeonce-group.iam.gserviceaccount.com"
+        ],
+        "role": "projects/efeonce-group/roles/roomsMediaAppObjects"
+      },
+      {
+        "members": [
+          "serviceAccount:rooms-media-worker-production@efeonce-group.iam.gserviceaccount.com"
+        ],
+        "role": "projects/efeonce-group/roles/roomsMediaWorkerList"
+      },
+      {
+        "condition": {
+          "description": "Only objects in the Rooms media namespace",
+          "expression": "resource.name.startsWith('projects/_/buckets/efeonce-rooms-production-media/objects/rooms-media/')",
+          "title": "rooms_media_prefix_only"
+        },
+        "members": [
+          "serviceAccount:rooms-media-worker-production@efeonce-group.iam.gserviceaccount.com"
+        ],
+        "role": "projects/efeonce-group/roles/roomsMediaWorkerObjects"
+      }
+    ],
+    "appSelfSignerBindings": [
+      {
+        "members": [
+          "serviceAccount:rooms-runtime-production@efeonce-group.iam.gserviceaccount.com"
+        ],
+        "role": "projects/efeonce-group/roles/roomsMediaUploadSigner"
+      }
+    ],
+    "projectBindings": [
+      {
+        "members": [
+          "serviceAccount:rooms-media-worker-production@efeonce-group.iam.gserviceaccount.com",
+          "serviceAccount:rooms-runtime-production@efeonce-group.iam.gserviceaccount.com"
+        ],
+        "role": "roles/cloudsql.client"
+      }
+    ],
+    "customRoles": {
+      "roomsMediaAppObjects": {
+        "includedPermissions": [
+          "storage.objects.create",
+          "storage.objects.get"
+        ],
+        "stage": "GA"
+      },
+      "roomsMediaWorkerObjects": {
+        "includedPermissions": [
+          "storage.objects.create",
+          "storage.objects.delete",
+          "storage.objects.get"
+        ],
+        "stage": "GA"
+      },
+      "roomsMediaWorkerList": {
+        "includedPermissions": [
+          "storage.objects.list"
+        ],
+        "stage": "GA"
+      },
+      "roomsMediaUploadSigner": {
+        "includedPermissions": [
+          "iam.serviceAccounts.signBlob"
+        ],
+        "stage": "GA"
+      }
+    },
+    "workerServiceAccount": {
+      "email": "rooms-media-worker-production@efeonce-group.iam.gserviceaccount.com",
+      "disabled": null,
+      "uniqueId": "103333685253317687359",
+      "userManagedKeys": 0
+    }
+  },
+  "limitations": [
+    "No application environment or flags changed",
+    "No DB, password, Job, build, Auth, UI or email changes",
+    "Resource posture readback is not an authenticated end-to-end media canary"
+  ],
+  "sources": [
+    "docs/architecture/rooms/EFEONCE_ROOMS_CLOUD_MEDIA_BACKEND_DECISION_V1.md",
+    "https://cloud.google.com/storage/pricing",
+    "https://docs.cloud.google.com/iam/docs/roles-permissions/iam",
+    "https://docs.cloud.google.com/storage/docs/access-control/using-iam-permissions"
+  ],
+  "cost": {
+    "fixedCapacity": "none for bucket, IAM roles or service accounts",
+    "metered": "stored bytes, 7 days soft-deleted bytes, operations, and outbound network transfer",
+    "standardRegionalOperationsUSDPer1000": {
+      "classA": 0.005,
+      "classB": 0.0004
+    },
+    "storageRate": "Regional US-EAST4 rate applies; no fixed-volume reservation or budget mutation",
+    "workerCompute": "outside this receipt"
+  },
+  "secretAccessor": {
+    "resource": "projects/efeonce-group/secrets/rooms-production-postgres-media-worker-password",
+    "member": "serviceAccount:rooms-media-worker-production@efeonce-group.iam.gserviceaccount.com",
+    "role": "roles/secretmanager.secretAccessor",
+    "scope": "dedicated_secret_only",
+    "projectWideAccessor": false,
+    "payloadRead": false
+  },
+  "status": "storage_and_iam_verified",
+  "verification": {
+    "checks": {
+      "region": true,
+      "standard": true,
+      "uniformAccess": true,
+      "publicAccessPrevention": true,
+      "softDelete7Days": true,
+      "versioningOff": true,
+      "noGeneralLifecycle": true,
+      "allowedCorsOrigin": true,
+      "deniedOtherCorsOrigin": true,
+      "anonymousReadDenied": true
+    },
+    "corsAllowed": {
+      "status": 200,
+      "headers": {
+        "access-control-allow-origin": "https://efeonce-rooms.vercel.app",
+        "access-control-max-age": "300",
+        "access-control-allow-methods": "PUT",
+        "access-control-allow-headers": "Content-Type,Content-Length,x-goog-if-generation-match"
+      }
+    },
+    "corsOtherOrigin": {
+      "status": 200,
+      "headers": {}
+    },
+    "anonymousHead": {
+      "status": 403
+    }
+  },
+  "lastVerifiedAt": "2026-10-26T17:46:49.575077+00:00"
+}

@@ -69,7 +69,7 @@ Comandos:
   - Cada petición se vuelve a autorizar.
   - `private, no-store`.
   - Nunca se sirve el original, sólo los derivados.
-  - Adapter GCS y worker compilado integrados en main; recursos/env/migraciones cloud y canary pendientes. `ROOMS_MEDIA_ENABLED` sigue OFF: no activar antes del consumidor frontend y readbacks.
+  - Adapter GCS integrado en main; bucket/IAM, siete migraciones y Job privado desplegados2026-10-26. Job finito probado con cola vacía; sin scheduler ni imagen real. Variables GCS preparadas para próximo deploy. `ROOMS_MEDIA_ENABLED` de la app sigue OFF: activar sólo después del consumidor frontend y canary conjunto.
 - **Datos sintéticos rotulados.** La demo y el piloto usan personas ficticias. La badge «synthetic» aparece cuando el origen no es `real`.
 - **AXIS y paquetes publicados exactos.** Ninguna copia manual de tokens, logos o primitives. Los SVG públicos salen de `scripts/sync-brand.mjs`.
 - Paridad Full API: toda acción de UI es un command o reader con su contrato. La CLI ya existe; el MCP está pendiente (R13/R14).

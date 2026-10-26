@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Backend integrado en main de Rooms a87852e vía PR2, sin los doce paths visuales2071;225/225 testsPASS,lint/types/build,53 browserPASS+3skip API duplicada,CI Linux/previewPASS. Vercel release en recibo2026-10-26-production-backend-release.json. Flags sin cambiosOFF; migraciones6/7 sóloLOCAL, recursos/IAM/CORS/workercloud y canary pendientes. Sin correo ni deploy Auth/Greenhouse.`
+- Status real: `Backend main a87852e publicado por PR2. Bloque de infraestructura cerrado: bucket GCS privado, IAM/CORS y SA; 7 migraciones y 25 tablas cloud; rol worker con límite 2 y secreto v1. Job con imagen inmutable, CPU 1/RAM 1Gi, timeout 240s y cero reintentos. Ejecución única rooms-media-worker-sqbt9 SUCCESS con cola vacía; seis negativas SQL, lint del script y typecheck global PASS. Variables GCS preparadas para próximo deploy; app OFF, sin Auth/correo/UI/scheduler ni redeploy web. Canary real de imagen y OIDC, consumidor y disparo automático del Job siguen pendientes.`
 - Rank: `R05 cloud después del circuito local2070; frontend2071 conserva ownership separado`
 - Domain: `platform|data|content|ops`
 - Blocked by: `none`
@@ -190,7 +190,8 @@ GCS; previews siguen <=3MiB. La app reautoriza GET/HEAD/Range y nunca ofrece ori
 - [x] Worker se construye/ejecuta sin tsx; perfil cloud propio y ninguna SA key/ADC local en Production. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
 - [x] PG y restore preservan V1/V2/V3, hashes, generaciones, permisos y auditoría. Evidencia: recovery aislado PG16/18, seis salas de dos tenants,25tablas/18objetos/12bindings; generaciones cloud físicas siguen sin canary.
 - [x] HTTP/CLI comparten operaciones y guía frontend completa sin lógica de permisos en cliente. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
-- [ ] Recursos/env/flags/migraciones y canary cloud tienen readback o quedan explícitamente pendientes.
+- [x] Recursos/env/flags/migraciones tienen readback; canary completo queda explícitamente pendiente. Evidencias: [storage/IAM](../../audits/rooms/2026-10-26-media-storage-infra.json), [DB](../../audits/rooms/2026-10-26-media-database-infra.json), [Job](../../audits/rooms/2026-10-26-media-worker-deployment.json) y [configuración](../../audits/rooms/2026-10-26-media-vercel-configuration.json). Ejecución de cola vacía no acredita imagen real.
+- [ ] Transferencia física GCS y procesamiento/lectura de imagen por autoridad real verificados; consumidor frontend y disparoJob listos antes de mediaON. Bloque posterior a esta entrega acotada.
 
 ## Verification
 

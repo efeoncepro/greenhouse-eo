@@ -1,5 +1,7 @@
 # Efeonce Rooms
 
+> Infra2026-10-26: bucket/IAM,7migraciones25tablas y Job privado aplicados; una ejecución con cola vacíaPASS. VariablesGCSpreparadaspróximodeploy; appOFF, sinAuth/correo/UI/scheduler. Canary de imagen real y acceso siguen pendientes. Ver ledger vivo de la skill Rooms.
+
 > Backend en `main@a87852e` por PR2 (2026-10-26), sin el scaffold visual2071; flagsOFF y cloud media/canary pendientes. [Release](../../audits/rooms/2026-10-26-production-backend-release.json) y [contrato Claude Design](../../documentation/rooms/backend-api-for-claude-design.md).
 
 **Nombre y subdominio acordados:** Efeonce Rooms · `rooms.efeonce.org`.

@@ -63,7 +63,7 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 [TASK-2072](../../tasks/in-progress/TASK-2072-rooms-cloud-media-backend.md): backend cloud de imágenes,
 worker desplegable/perfil propio y contrato API para Claude Design. Instrucción2026-10-26: diseño del
 operador con Claude Design; Codex backend. Publicación backend main a87852e por PR2 sin scaffold visual;
-recursos, worker, migraciones cloud y canary siguen pendientes.
+infraestructura/IAM, migraciones cloud y Job aplicados con ejecuciónvacíaPASS; canary real y consumidor/disparoJob siguen pendientes.
 
 [TASK-2070](../../tasks/in-progress/TASK-2070-rooms-private-image-media.md): R05A en implementación local; imágenes estáticas privadas, V3/procedencia explícita, procesamiento y publicación sobre bytes verificados. PDF/audio/video y adapter cloud conservan alcance posterior.
 

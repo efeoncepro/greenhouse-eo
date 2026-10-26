@@ -1,6 +1,6 @@
 # Rooms — contrato backend para Claude Design
 
-> Release2026-10-26: backend integrado en `main@a87852e` mediante [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2). Se excluyeron los doce paths visuales2071; la interfaz actual sigue con placeholder. GCS/worker y migraciones cloud pendientes, flagsOFF. El diseño debe conectar transferencia directa y entrega privada antes de activar medios. [Recibo](../../audits/rooms/2026-10-26-production-backend-release.json).
+> Release2026-10-26: backend integrado en `main@a87852e` mediante [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2). Se excluyeron los doce paths visuales2071; la interfaz actual sigue con placeholder. Bucket/IAM, migracionescloud y Job aplicados; ejecuciónvacíaPASS, flagsappOFF. El diseño debe conectar transferencia directa y entrega privada antes de activar medios. [Recibo](../../audits/rooms/2026-10-26-production-backend-release.json).
 
 Responsabilidades ratificadas por el operador2026-10-26: **Codex backend; Claude Design interfaz**.
 Este documento describe contratos ejecutables, no una composición visual ni una aceptación de la UI.
@@ -9,8 +9,9 @@ Este documento describe contratos ejecutables, no una composición visual ni una
 
 - Producción: `https://efeonce-rooms.vercel.app`, backend `main@a87852e`, acceso/invitaciones/mediosOFF.
 - Backend de medios: TASK-2070/2072 integrado por [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2).
-  GCS/worker cloud preparados en código e imagen Linux probada por CI; recursos, IAM/CORS, migraciones
-  cloud, despliegue del worker y canary físico permanecen pendientes. PR1 conserva el antecedente d056708.
+  Bucket/IAM/CORS, siete migraciones cloud y Job ya aplicados; imagen Linux probada por CI y una ejecución
+  real con cola vacíaPASS. Variables GCS del proyecto preparadas para próximo deploy. Canary físico,
+  consumidor y disparo automático del Job antes de mediaON permanecen pendientes. PR1 conserva el antecedente d056708.
 - Schemas: `efeonce-rooms/src/domain/{contracts,persistence-contracts,content-contracts,content-v3,media-contracts}.ts`.
 - Fuente de permisos: `can` y autoridad persistida servidor. Roles nominales/organizationId no conceden acceso.
 - El scaffold UI2071 queda en su rama histórica; producción conserva la interfaz de20f9fe9.

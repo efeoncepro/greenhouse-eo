@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-26T17:49:24.099943+00:00",
+  "status": "project_configuration_verified",
+  "project": "efeonce-rooms",
+  "environment": "production",
+  "values": {
+    "ROOMS_MEDIA_STORAGE": "gcs",
+    "ROOMS_MEDIA_GCS_BUCKET": "efeonce-rooms-production-media",
+    "ROOMS_MEDIA_GCS_PREFIX": "rooms-media/"
+  },
+  "created": [
+    "ROOMS_MEDIA_STORAGE",
+    "ROOMS_MEDIA_GCS_BUCKET",
+    "ROOMS_MEDIA_GCS_PREFIX"
+  ],
+  "flags": {
+    "ROOMS_FIRST_PARTY_AUTH_ENABLED": "false",
+    "ROOMS_INVITATIONS_ENABLED": "false",
+    "ROOMS_MEDIA_ENABLED": "absent_defaults_off"
+  },
+  "activation": "project values stored for next deployment; existing deployment not rebuilt",
+  "sensitiveValuesPrinted": false
+}

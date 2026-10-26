@@ -3,6 +3,33 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-26 — Infraestructura de medios aplicada; bloque acotado terminado
+
+Usuario autoriza infraestructura/migraciones/worker con subagentes, excluyendo Efeonce ID, correo y UI.
+Runtime permanece main a87852e; no hubo nuevo push ni redeploy Vercel.
+
+- Bucket `efeonce-rooms-production-media`, Standard US-EAST4: acceso uniforme, prevención pública,
+  soft-delete7d y CORS exclusivo del origin de Rooms. Anónimo403 y preflight origen ajeno denegado.
+  Roles de objetos mínimos por prefijo; app signBlob sólo sobre sí misma. Worker SA sin claves y
+  secretAccessor sólo sobre su secreto. [Storage/IAM](../../../../docs/audits/rooms/2026-10-26-media-storage-infra.json).
+- Cloud SQL Rooms pasa de5 a7 migraciones y de19 a25 tablas, sin salas ni ediciones preexistentes.
+  Rol `rooms_media_worker` sin privilegios altos/membresías, límite2 conexiones, UPDATE sólo columnas
+  necesarias; conexión y6 negativasACL PASS. Backup automático SUCCESS y PITR habilitado.
+  [DB](../../../../docs/audits/rooms/2026-10-26-media-database-infra.json).
+- Job `rooms-media-worker` us-east4, imagen digest c588d012…913133: CPU1/RAM1Gi, timeout240s,
+  reintentos0, una tarea/paralelismo1. Una ejecución `rooms-media-worker-sqbt9` completó con
+  `{processed:false}`: identidad/secreto/SQL comprobados con cola vacía, cero imágenes reales procesadas.
+  Sin scheduler ni loop. [Worker](../../../../docs/audits/rooms/2026-10-26-media-worker-deployment.json).
+- Tres variables GCS preparadas en el proyecto Vercel Production para el próximo deploy; no se
+  reconstruyó la aplicación. First-party=false, invitations=false, media ausente/defaultOFF.
+  El flag media=true existe únicamente dentro del Job privado.
+  [Configuración](../../../../docs/audits/rooms/2026-10-26-media-vercel-configuration.json).
+- Verificación nueva: lint del script operacional y typecheck global PASS; no repetir suite225 ya
+  pasada ni rediseñar interfaz. Un build y una ejecución del Job, sin consumo continuo de cómputo.
+- Próximo bloque separado: canary conjunto Auth/Rooms con el único correo autorizado, transferencia
+  física GCS y procesamiento de imagen; conectar consumidor frontend y definir disparo del Job antes
+  de activar medios. No declarar integración completa por infraestructura ni por la cola vacía.
+
 ## 2026-10-26 — Backend integrado en main por autorización humana
 
 Pedido: «Sería al main de rooms cierto?» → «Ok, hazlo». [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2)

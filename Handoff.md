@@ -1,11 +1,17 @@
 # Handoff
 
-## 2026-10-26 — Indecaucho: señal Documents y seguimiento
+## 2026-10-26 — ARMOR / Indecaucho: discovery y caso en construcción
 
-[Expediente](docs/commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md):23páginas/91,147s
-registrados; Julio autorizó borrador y envío único11:43Chile, firma/CCO y EMAIL119538629237 verificados.
-Esperar respuesta, sin reinscripción. Método compartido, manual, registros/state y skills espejo actualizados;
-no renovación del inventario global ni autonomía nueva. [Método](.codex/skills/efeonce-b2b-prospecting/references/document-engagement-signals.md).
+[Expediente único](docs/commercial/accounts/indecaucho-armor/README.md): Katia respondió y pide propuesta
+para ARMOR; terna posterior sin selección. Invitación27/10 14:30–15:00Chile y confirmación26/10 14:28
+con firma/CCO verificadas; cadena HubSpot de cuatro contiene la confirmación, no cuatro envíos nuevos.
+Tres subagentes ampliaron marca/canal/digital y método. Guía de reunión y caso v0 listos, economía
+pendiente de discovery. Skills/mirrors y fixtures v16 actualizados; [cierre](docs/audits/commercial/2026-10-26-armor-discovery-case-docs-skills.md).
+Lectura posterior **HubSpot/Notion** autorizada y programada una vez27/10 16h en este hilo; app ID
+`armor-leer-discovery-y-completar-caso`. Configurada/releída, aún sin ejecución/transcripción. Global
+PAUSED conservado; no nuevos contactos, Deal/Lead, etapas, secuencias, precio o envío.
+[Señal y seguimiento previos](docs/commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md)
+se conservan; respuesta posterior no prueba causalidad.
 
 ## 2026-10-26 — Blog: pilar Loop Marketing publicado y barrido de docs y skills
 
@@ -33,6 +39,8 @@ no renovación del inventario global ni autonomía nueva. [Método](.codex/skill
 ## 2026-10-25 — Rooms + Auth: estado al corte de Codex (sin uso hasta 1/11)
 
 ### 2026-10-26 — Rooms: backend Codex y diseño Claude Design
+
+Bloque de infraestructura cerrado: bucket GCS privado con IAM/CORS y SA, 7 migraciones/25 tablas cloud, rol worker con límite 2 y secreto v1; Job CPU 1/RAM 1Gi, timeout 240s y cero reintentos, con una ejecución de cola vacía SUCCESS. Variables GCS preparadas para próximo deploy; app OFF, sin Auth/correos/UI/scheduler ni otro deploy. [DB](docs/audits/rooms/2026-10-26-media-database-infra.json), [storage](docs/audits/rooms/2026-10-26-media-storage-infra.json), [worker](docs/audits/rooms/2026-10-26-media-worker-deployment.json). Canary OIDC y de imagen real, consumidor y disparo del Job quedan para el siguiente bloque. Lint del script y typecheck global PASS; no se repitieron las 225 pruebas anteriores.
 
 Actualización posterior autorizada: backend fusionado en `efeonce-rooms/main@a87852e` vía [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2), sin los doce paths visuales2071.225tests+lint/types/build,53 browserPASS+3skip,CI Docker/previewPASS; flagsOFF sin cambios. [Recibo de despliegue](docs/audits/rooms/2026-10-26-production-backend-release.json). Recursos/migraciones/worker cloud y canary pendientes; no correo ni deploy Auth/Greenhouse.
 
