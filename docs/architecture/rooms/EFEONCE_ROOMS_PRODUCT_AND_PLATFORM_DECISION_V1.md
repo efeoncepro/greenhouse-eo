@@ -6,8 +6,19 @@
 - Scope: Rooms, autoría, experiencia de comprador/champion, API/CLI/MCP, multimedia y límites del ecosistema.
 - Reversibility: two-way-but-slow.
 - Confidence: high en propósito y frontera; medium en arquitectura propuesta; experiencia visual pendiente de prototipo.
-- Validated as of: 2026-10-07; conversación, fuentes locales y documentación técnica; sin runtime Rooms.
+- Validated as of inicial: 2026-10-07; conversación, fuentes locales y documentación técnica; entonces sin runtime Rooms.
 - Depends on: [frontera propia aceptada](../sales-enablement/EFEONCE_SALES_ENABLEMENT_PLATFORM_DECISION_V1.md).
+
+## Continuidad de ejecución 2026-10-26
+
+El status `Proposed` pertenece al ADR consolidado completo; no borra los go parciales fechados de este
+mismo documento ni acepta por inferencia toda la experiencia. Backend/API/CLI y medios cloud están en
+main `e4b2e890`, con canary real completado/cerrado y worker automático verificado. [Dossier y evidencias](README.md).
+
+Claude Design posee la interfaz; integración y aceptación humana pendientes. Sólo dispatch de máquina
+ON; acceso/invitación/medios web OFF. Auth deploy-control permanece en PR263/264 por instrucción
+expresa, sin merge/deploy ni release262. PDF/audio/video, presentación, colaboración, CRM y MCP
+conservan el alcance futuro de la épica; una base ejecutable no equivale al cierre del producto.
 
 ## Context
 

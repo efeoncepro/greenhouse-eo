@@ -16,9 +16,11 @@
 > Código: `src/lib/auth-server/oauth/**` (dominio, server-only) · `services/auth-server/app.ts` (handler) ·
 > `services/auth-server/server.ts` (cableado Cloud Run).
 
-## Extensión first-party en implementación — 2026-10-25
+## Extensión first-party — baseline25-oct y canary del 26 de octubre
 
-TASK-1834 añade un carril de identidad separado de MCP; contrato: [Rooms primero y login V4](EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md). Registro server-owned, scope openid, ID token y handle opaco por RP; sin refresh ni userinfo en este corte. Flag OFF por defecto, sin rollout declarado. Las tablas y gv de este contrato MCP no se reutilizan para simular identidad.
+TASK-1834 añade un carril de identidad separado de MCP; contrato: [Rooms primero y login V4](EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md). Registro server-owned, scope openid, ID token y handle opaco por RP; sin refresh ni userinfo en este corte. El canary conjunto Rooms del 26 de octubre acreditó el carril real para una identidad interna con Microsoft/MFA;
+volvió a OFF y quedó cerrado. No es rollout general ni autorización de un nuevo correo.
+Estado efectivo, retención PR #263/#264 y límites: [runbook](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26). Las tablas y gv de este contrato MCP no se reutilizan para simular identidad.
 
 ## 1. Decisión en una línea
 

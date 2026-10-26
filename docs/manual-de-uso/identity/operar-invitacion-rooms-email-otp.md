@@ -1,6 +1,16 @@
 # Invitaciones Rooms: código y enlace en un solo correo
 
-Estado: implementado y probado localmente, sin activación cloud ni envíos reales. Canon: [decisión](../../architecture/EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md). Dueños: TASK-2067 Auth y TASK-2066 Rooms.
+Estado al 26 de octubre: un canary cloud real con un correo recibido PASS y cerrado; first-party/OTP OFF. Canon: [decisión](../../architecture/EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md). Dueños: TASK-2067 Auth y TASK-2066 Rooms.
+
+## Límite operativo vigente
+
+El canary único ya comprobó Microsoft/MFA en el carril corporativo, OIDC y el recorrido invitado con PNG
+privado; el OTP por correo no se convierte por ello en MFA. Invitación revocada, sala archivada y sesiones
+cerradas. Auth `00168-vzb` al 100%, misma imagen, flags false, HMAC/authority ausentes, tipo de correo OFF;
+Resend production v1 y Sentry production. **No repetir el envío ni activar este recorrido.**
+PR #263/#264 de deploy siguen abiertas y retenidas. El YAML remoto aún conserva el riesgo develop/staging;
+[runbook y corte de CI](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+El recorrido siguiente describe el contrato para una futura activación autorizada, no una operación disponible hoy.
 
 ## Recorrido
 
@@ -34,7 +44,7 @@ Las rutas OTP admiten JSON únicamente desde el RP autenticado, sin cookies/Orig
 
 ## Verificación y rollback
 
-Usar `bash scripts/auth-server/email-otp-local-smoke.sh`: cluster efímero, correo simulado y cleanup al terminar. La plantilla puede revisarse con `scripts/auth-server/email-otp-preview.tsx`, sin envío.
+Usar `bash scripts/auth-server/email-otp-local-smoke.sh`: cluster efímero, correo simulado y cleanup al terminar. La plantilla puede revisarse con `scripts/auth-server/email-otp-preview.tsx`, sin envío. El canary productivo ya completado no debe repetirse para validar otra versión local.
 
 Para detener este carril: gate OTP OFF y tipo de correo deshabilitado; Rooms debe denegar nuevas sesiones y respetar revocación de invitaciones. Los demás métodos de Auth y el consentimiento MCP mantienen sus contratos. No borrar filas de identidad global para revocar una invitación.
 
@@ -63,7 +73,7 @@ las campañas. Readback GET Resend del 2026-10-25: dominio `mail.efeoncepro.com`
 `59ea58b3-cc1e-41e0-920e-85cbd53bd5c7`, verified/sending enabled, click_tracking=false, open_tracking=false,
 tracking_subdomain=null. El dominio raíz `efeoncepro.com` conservaba ambos tracking=true; no se cambió.
 
-Revalidar por GET el dominio exacto antes del canary y confirmar el href recibido, conservando sólo resultado
+Revalidar por GET el dominio exacto antes de cualquier futura entrega autorizada y confirmar el href recibido, conservando sólo resultado
 sanitizado. La referencia oficial aplica tracking a todos los emails del dominio; la API Send Email y el SDK
 local no exponen override por email. No añadir campos/headers inventados para simularlo. Fuentes:
 [tracking](https://resend.com/docs/dashboard/domains/tracking) y

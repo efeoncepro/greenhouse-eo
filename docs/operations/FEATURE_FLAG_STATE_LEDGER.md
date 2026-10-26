@@ -1,15 +1,28 @@
 # Greenhouse — Feature Flag State Ledger (env-var flags)
 
-## Rooms — disparo automático 2026-10-26
+## Rooms / Auth — estado releído26Oct2026
 
-Readback de Production `efeonce-rooms` main `e4b2e890` y despliegue `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS`:
-`ROOMS_MEDIA_DISPATCH_ENABLED=true` (default código OFF), independiente de permisos humanos.
-`ROOMS_FIRST_PARTY_AUTH_ENABLED=false`, `ROOMS_INVITATIONS_ENABLED=false` y `ROOMS_MEDIA_ENABLED`
-ausente/default OFF. Cloud Scheduler habilitado; sólo consulta SQL y arranca el Job con demanda.
-Worker conserva `ROOMS_MEDIA_ENABLED=true` en su perfil privado. [Prueba](../audits/rooms/2026-10-26-automatic-media-dispatch.json).
-El canary anterior ya envió y comprobó el único correo; este bloque envió cero. El corte25Oct siguiente es histórico.
+Lectura sin mutaciones a17:38:40Chile: [metadata y PRs](../audits/rooms/2026-10-26-docs-skills-state-readback.json).
+Rooms `main@e4b2e890`, despliegue `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS` PROMOTED. Auth conserva
+`auth-server-00168-vzb`,100%, SHA754a2a28. Su emisor OAuth/MCP y login base siguen activos; OFF abajo
+se refiere únicamente a los carriles de Rooms. Corrección de deploy Auth retenida en PR263/264, sin merge.
 
-## Auth first-party e invitaciones — implementación local 2026-10-25
+| Flag | Runtime | Valor observado26Oct | Límite |
+| --- | --- | --- | --- |
+| `ROOMS_MEDIA_DISPATCH_ENABLED` | Vercel Rooms Production | `true`, presente; default código OFF | Sólo endpoint de máquina Scheduler OIDC; no concede acceso humano |
+| `ROOMS_FIRST_PARTY_AUTH_ENABLED` | Vercel Rooms Production | `false`, presente | Login de Rooms no activado en general |
+| `ROOMS_INVITATIONS_ENABLED` | Vercel Rooms Production | `false`, presente | No nuevos correos ni clientes por integrar UI |
+| `ROOMS_MEDIA_ENABLED` | Vercel Rooms Production | ausente, default OFF | Backend implementado, consumidor/activación general pendientes |
+| `ROOMS_MEDIA_ENABLED` | Job privado media-worker | `true` | SA/rol propios; sólo procesa cola, no concede sesión |
+| `AUTH_SERVER_FIRST_PARTY_ENABLED` | Auth00168-vzb | `false` | Base OAuth/MCP no se apaga |
+| `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` | Auth00168-vzb | `false` | Montajes HMAC/authority ausentes; estado correcto con OFF |
+
+Scheduler habilitado cada minuto; vacío200 sin Job y demanda202→Job/ack verificados.
+[Prueba](../audits/rooms/2026-10-26-automatic-media-dispatch.json). El canary ya recibió el único correo;
+no se repitió en este bloque. Emailtype OTP quedó OFF según cierre del canary; esta lectura no consultó SQL.
+La tabla25Oct que sigue es un corte histórico y sus pendientes quedan supersedidos por este delta.
+
+## Histórico25Oct — Auth first-party e invitaciones, antes del canary
 
 | Flag | Owner / runtime | Default del código y deploy | Estado de verificación |
 | --- | --- | --- | --- |

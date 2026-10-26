@@ -27,6 +27,12 @@
 - Blocked by: `none`
 - Branch: `Greenhouse develop; efeonce-rooms main; checkout compartido sin worktrees`
 
+## Conciliación vigente — 2026-10-26
+
+Cierre original: consumer OIDC interno local. Posteriormente el [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md) probó Microsoft/MFA y Rooms productivos, con cierre OFF. [Auth retenido en PR](../../audits/rooms/2026-10-26-auth-deploy-control.md); el consumer no implica activación general ni aprovisionamiento de usuarios por email.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+
 ## Summary
 
 Construir el consumidor first-party Efeonce ID en Rooms: transacción OIDC, callback validado, binding explícito, sesión durable y revalidación por introspection. El issuer autentica; Rooms conserva sus principals, memberships, roles y grants en PostgreSQL. Foundation backend OFF por defecto, con integración local real antes de cualquier rollout.
@@ -90,6 +96,8 @@ Reglas obligatorias: una identidad verificable no concede membership ni capabili
 - Documentación de task, plan, ADR delta consumidor y manual Rooms; no archivos del issuer.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 

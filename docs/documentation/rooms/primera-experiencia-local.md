@@ -1,6 +1,6 @@
 # Rooms — primera experiencia implementada
 
-Fecha: 2026-10-25 · TASK-2058/2059/2060 · [EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+Base local: 2026-10-25 · Estado actualizado: 2026-10-26 · TASK-2058/2059/2060/2072 · [EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
 
 Rooms dispone de una primera experiencia local con una propuesta ficticia de Nómada: tres piezas en sus formatos originales, artículo SEO/AEO estructurado, radiografía de evidencia y plan de trabajo. El entorno consume el logo oficial, La órbita y primitives AXIS publicados. La muestra y las imágenes generadas se identifican como sintéticas; no son un cliente ni un resultado medido.
 
@@ -12,19 +12,36 @@ El ciclo local permite crear una sala, guardar su borrador, publicar una edició
 
 PostgreSQL propio conserva salas, borradores, ediciones, autoridad y recibos. Cada cambio registra auditoría y un evento outbox en la misma transacción; no se afirma entrega a sistemas externos. El ciclo, aislamiento, conflictos, recuperación tras reinicio y restore están verificados con contenido sintético local. La lectura del cliente omite notas internas y grants; cuando falta permiso de evidencia también elimina sus referencias. Una edición publicada puede seguir siendo visible aunque un nuevo borrador quede fuera del permiso de esa persona.
 
-La API y CLI incluyen el carril durable `/api/v1` y comparten commands/readers. **Todavía no existe una sesión Efeonce ID conectada:** las rutas reales responden401. El selector de persona pertenece sólo a la demo de lectura y nunca habilita escrituras. El ciclo se ha ejercitado mediante herramientas locales y harness de pruebas con autoridad sintética; no supone adopción por un cliente, login real ni base de datos cloud. La autoría visual completa y la invitación de personas siguen pendientes.
+La API y CLI incluyen el carril durable `/api/v1` y comparten commands/readers. Efeonce ID, invitación por correo único enlace+código y sesión guest ya se verificaron en un canary real acotado. Terminó con invitación revocada, sala archivada y flags humanos OFF; la denegación actual no significa que el mecanismo siga sin implementarse. El selector de persona pertenece sólo a la demo de lectura y nunca habilita escrituras. No acredita adopción por clientes ni autoría visual completa. [Canary y límites](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
 
-[Contrato detallado](../../architecture/rooms/EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md) · [Manual local](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) · [Persistencia y evidencia TASK-2060](../../tasks/complete/TASK-2060-rooms-persistence-and-lifecycle.md) · [QA de primera experiencia](../../audits/rooms/2026-10-25-first-local-delivery.md). [Demo pública](https://efeonce-rooms.vercel.app/demo) y [repo privado](https://github.com/efeoncepro/efeonce-rooms), TASK-2061. Deploy `dpl_8vJ75Cbn1q75JNe7FEa7LkUccigc`/SHA `bd4b802`: el hosting sirve la muestra, no la DB local ni el carril autenticado.
+Producción [efeonce-rooms.vercel.app](https://efeonce-rooms.vercel.app/demo) usa main `e4b2e890`,
+con ocho migraciones/26 tablas cloud, GCS privado y worker automático por demanda. Sólo dispatch de
+máquina está ON; acceso/invitaciones/medios web siguen OFF. Backend234PASS y Playwright53PASS/3skip
+son verificaciones técnicas, no aceptación de la nueva interfaz. [Estado y evidencias](../../architecture/rooms/README.md).
 
+[Contrato de conexión para Claude Design](backend-api-for-claude-design.md) · [Manual local](../../manual-de-uso/rooms/operar-primera-experiencia-local.md)
+· [Persistencia TASK-2060](../../tasks/complete/TASK-2060-rooms-persistence-and-lifecycle.md)
+· [QA inicial25Oct](../../audits/rooms/2026-10-25-first-local-delivery.md).
+El deploy inicial `bd4b802` corresponde a la demo histórica, no al SHA productivo actual.
 
 ## Contenido editable V2 (TASK-2062, local)
 
 La base permite guardar un borrador incompleto, importar contenido estructurado, editar y ordenar bloques,
 y relacionar fragmentos con evidencia. Antes de publicar calcula un reporte que identifica faltantes,
-referencias rotas, elementos no soportados y exclusiones. La publicación textual V2 está probada; los medios
-siguen pendientes del pipeline R05 y no se presentan como archivos listos por tener un identificador.
+referencias rotas, elementos no soportados y exclusiones. La publicación textual V2 está probada. V3 añadió medios privados con verificación de bytes, dos derivados WebP y referencias resueltas; un identificador por sí solo nunca acredita readiness.
 
 Este avance es backend/API/CLI: no añade todavía un editor visual. Dos marcas sintéticas verifican perfiles
-creativo, SEO/AEO y combinado. Los lectores mantienen las ediciones V1 originales. Identidad, invitaciones,
-medios y renderer/editor V2 conservan sus unidades abiertas. [Manual](../../manual-de-uso/rooms/operar-primera-experiencia-local.md)
+creativo, SEO/AEO y combinado. Los lectores mantienen las ediciones V1 originales. La conexión del nuevo renderer/editor y la aceptación visual siguen pendientes. Identidad, invitaciones y medios cuentan con evidencia acotada; activación general y demás unidades de la épica no se dan por cerradas. [Manual](../../manual-de-uso/rooms/operar-primera-experiencia-local.md)
 y [evidencia](../../audits/rooms/2026-10-25-versioned-content-authoring.md).
+
+## Medios e interfaz — continuidad 2026-10-26
+
+El corte actual admite PNG/JPEG/WebP estáticos, no todo el multimedia del diseño V1. Una imagen física
+ya completó PUT GCS→verificación→Job→dos WebP→lectura privada y revocación. Scheduler OIDC comprueba
+cada minuto y no inicia contenedor en vacío; el transporte automático tuvo su propia prueba sintética.
+Ninguna de esas pruebas acredita la nueva interfaz de Claude Design.
+
+Pendiente: entorno de integración aislado con datos/permisos, conectar pantallas a DTO/commands y
+transferencia GCS del mismo origen, y probar el recorrido completo con la nueva UI. Auth PR263/264 se
+mantienen sin fusionar/desplegar por instrucción del operador; no activar flags ni repetir correo por
+conectar diseño. [Contrato y owners](backend-api-for-claude-design.md).

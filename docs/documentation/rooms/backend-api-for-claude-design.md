@@ -1,23 +1,48 @@
 # Rooms — contrato backend para Claude Design
 
-> Canary real completado: Microsoft/MFA, un correo y un PNG por GCS→Job→WebP privado, con aislamiento y revocación comprobados. Flags restaurados OFF; consumidor frontend y disparo automático del Job pendientes. [Evidencia](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
-
-> Release2026-10-26: backend integrado en `main@a87852e` mediante [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2). Se excluyeron los doce paths visuales2071; la interfaz actual sigue con placeholder. Bucket/IAM, migracionescloud y Job aplicados; ejecuciónvacíaPASS, flagsappOFF. El diseño debe conectar transferencia directa y entrega privada antes de activar medios. [Recibo](../../audits/rooms/2026-10-26-production-backend-release.json).
+> Estado26Oct2026: backend publicado en `main@e4b2e890` ([PR3](https://github.com/efeoncepro/efeonce-rooms/pull/3)).
+> Canary real de identidad/correo/imagen y disparo automático completados; acceso humano e imágenes web
+> siguen OFF. Auth PR263/264 quedan retenidas por el operador, sin merge/deploy. Esta guía es el contrato
+> de integración; no acredita interfaz conectada ni aceptación visual.
 
 Responsabilidades ratificadas por el operador2026-10-26: **Codex backend; Claude Design interfaz**.
 Este documento describe contratos ejecutables, no una composición visual ni una aceptación de la UI.
 
+[Readback conjunto26Oct](../../audits/rooms/2026-10-26-docs-skills-state-readback.json). Los recibos previos conservan su alcance fechado.
+
 ## Estado y fuentes
 
-- Producción: `https://efeonce-rooms.vercel.app`, backend `main@a87852e`, acceso/invitaciones/mediosOFF.
-- Backend de medios: TASK-2070/2072 integrado por [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2).
-  Bucket/IAM/CORS, siete migraciones cloud y Job ya aplicados; imagen Linux probada por CI y una ejecución
-  real con cola vacíaPASS. Variables GCS del proyecto preparadas para próximo deploy. Canary físico interno completado;
-  consumidor y disparo automático del Job antes de mediaON permanecen pendientes. PR1 conserva el antecedente d056708.
+- Producción: `https://efeonce-rooms.vercel.app`, main `e4b2e890`, despliegue promovido
+  `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS`; acceso/invitaciones/medios web OFF.
+- Salas/ediciones V1/V2/V3, permisos, API/CLI, GCS privado y transferencia directa implementados.
+  Ocho migraciones/26 tablas y Job con SA/rol propios; Scheduler OIDC cada minuto sólo lo inicia con
+  demanda. Flag de máquina ON separado de todos los flags humanos.
+- [Canary real](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md): PNG físico a dos WebP,
+  lectura privada, correo único recibido, revocación comprobada y cierre OFF; no repetir el envío.
+  [Scheduler](../../audits/rooms/2026-10-26-automatic-media-dispatch.json):200 en vacío sin contenedor,
+  202 con demanda sintética archivada→Job exitoso→ack libre. Son dos verificaciones de distinto alcance.
 - Schemas: `efeonce-rooms/src/domain/{contracts,persistence-contracts,content-contracts,content-v3,media-contracts}.ts`.
 - Fuente de permisos: `can` y autoridad persistida servidor. Roles nominales/organizationId no conceden acceso.
 - El scaffold UI2071 queda en su rama histórica; producción conserva la interfaz de20f9fe9.
   Diseño y experiencia definitivos pertenecen a Claude Design.
+
+## Lo que falta para conectar la interfaz
+
+| Entrega | Owner | Criterio de salida |
+| --- | --- | --- |
+| Entorno aislado y datos/permisos de integración | Codex backend, coordinado con quien integra | Nueva UI prueba sesiones/estados de forma controlada sin activar clientes ni reutilizar la sala archivada como sala activa |
+| Conectores de pantalla a DTO/readers/commands | Claude Design / integrador con apoyo backend | Listado, borrador, upload, estado, attach, preview, publicación y lector consumen la API existente; permisos vienen del servidor |
+| Recorrido completo desde la nueva UI | Ambos | Cargar→verificar→procesar→adjuntar→publicar→leer; conflictos, expiración, denegación y revocación verificados |
+| Acceso general de producción | Operador / Platform | Aceptación y decisión explícita de flags/cohorte; Auth permanece en PR hasta nueva instrucción |
+
+Integrar el frontend dentro del runtime Rooms y su **mismo origen**. Un artifact o preview en otro
+origin no es un consumidor autenticado habilitado: cookies, Origin exacto y CORS GCS no deben relajarse.
+`cloud-production` exige Vercel Production/WIF exactos; Vercel Preview no puede heredar credenciales o
+permisos de Production. El entorno de integración sigue pendiente: no afirmar que ya hay un staging listo.
+
+Para el primer recorrido ya existen los servicios de backend; no depende de completar todo EPIC-052.
+PDF/audio/video, presentación avanzada, colaboración, CRM y MCP conservan sus unidades futuras; no
+incluirlos como capacidades disponibles sólo porque el contrato V1 los enumera.
 
 ## Identidad y límites de consumidor
 
@@ -107,7 +132,7 @@ V2 sin medios del scaffold exige permisos completos; V1 y V2 con medios no se mi
    mismo objeto: ejecutar complete para reconciliar, sin afirmar éxito ni subir otra versión silenciosamente.
 7. `uploads.complete` con uploadId y expectedRevision. Backend inspecciona metadata/generación/tamaño/tipo/SHA
    fuera de SQL y vuelve a comprobar autoridad/CAS. Respuesta no implica que el worker haya terminado.
-8. Consultar estado hasta ready/failed/cancelled. Worker comprueba contenedor/animación/codec/límites y produce
+8. Consultar estado hasta ready/failed/cancelled. Scheduler revisa cada minuto: no hay promesa de arranque inmediato ni porcentaje de progreso. Worker comprueba contenedor/animación/codec/límites y produce
    preview+thumbnail. En failed, mostrar problem.code y ofrecer únicamente acciones autorizadas.
 9. `content.attachAsset` vincula asset al bloque/ref con revisión actual. El `assetRefId` debe ser nuevo o apuntar ya a esa misma versión; un ref existente con otro valor, incluso null, produce409. Mantener refs vacíos hasta el attach verificado. Título/alt/pie se guardan mediante
    `content.upsertBlock` sobre el bloque correspondiente. Lista para añadir y añadida son estados distintos.
@@ -152,9 +177,18 @@ para soporte. No reinterpretar404 como invitación a probar otra organización.
 
 ## Verificación y pendientes operativos
 
-Recuperación aislada PG16(fresh,siete migraciones) y PG18 DB+storage ya prueba2tenants/6salas,PNG/JPEG/WebP,hashes/generaciones/ACL/inmutabilidad,
-legacy/down-up y corrupción/revocación: [evidencia](../../audits/rooms/2026-10-26-media-backend-recovery.md).
-Dobles de GCS prueban contrato SDK/complete/CAS; no acreditan bucket/IAM/firma o entrega física.
-Worker compila sin tsx/Next/React/AXIS; smoke prodclosure aislado y construcción Docker Linux con smoke CI PASS.
-Recursos/roles/IAM/CORS/scheduler/memoria nativa/timeout, migración cloud y canary de medios pendientes;
-acceso e invitación reales dependen del canary conjunto Auth–Rooms. No cambiar flags por conectar el diseño.
+Backend234/234,9pruebas focales de dispatch,lint/types/build y CI Linux PASS. Playwright53PASS/3skip
+acredita la interfaz/scaffold existente y sus pruebas automáticas; no certifica el nuevo diseño.
+[Recovery aislado PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) conserva evidencia de
+su corte de siete migraciones, hashes/generaciones, ACL e inmutabilidad; la
+[migración8](../../audits/rooms/2026-10-26-media-dispatch-database.json) añadió coordinación y preservó
+salas/publicaciones. No convertir esa combinación en una nueva prueba física de restore cloud.
+
+Bucket/IAM/CORS, SA/rol y Job están desplegados, y el PNG físico con entrega privada ya está probado.
+La prueba automática de transporte no decodifica otra imagen: una sala archivada debe rechazarla antes
+de storage. Memoria de peor caso/formato máximo, coste/throughput bajo carga y rollout general no se
+acreditan con una imagen de canary o un contenedor vacío. [Manual worker](../../manual-de-uso/rooms/operar-worker-medios.md).
+
+Auth conserva el runtime previo y flags OFF. Las correcciones de su deploy-control están sólo en
+[PR263/264](../../audits/rooms/2026-10-26-auth-deploy-control.md), por decisión humana. No fusionar,
+encender flags ni enviar correos por conectar el diseño. El canary completado no se repite por inferencia.

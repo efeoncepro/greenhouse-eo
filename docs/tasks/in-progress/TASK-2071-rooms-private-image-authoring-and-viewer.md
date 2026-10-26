@@ -1,5 +1,7 @@
 # TASK-2071 — Rooms: autoría mínima y lectura de imágenes privadas
 
+> Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
+
 ## Delta 2026-10-25 — estado al corte de Codex
 
 - **Rescate 2026-10-25 (Claude):** el WIP quedó commiteado en la rama local `task/2070-2071-private-media` de `efeonce-rooms` (`c0facfd` backend, `2626921` UI; sin push). Se corrigió el TS2322 y los tests de medios entraron a `pnpm test`: `pnpm verify` PASS con 205/205 tests (incluye 9 de persistencia en la PG local) y build OK. `main` sigue en `20f9fe9` (candidato del canary). Lo de abajo describe el estado previo al rescate.
@@ -26,17 +28,23 @@ histórico de esta task y no lo rediseña ni lo considera aceptado. Contratos/ba
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `yes`
+- UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-2071-rooms-private-image-authoring-and-viewer.md`
 - Flow: `docs/ui/flows/TASK-2071-rooms-private-image-authoring-and-viewer-flow.md`
 - Motion: `docs/ui/motion/TASK-2071-rooms-private-image-authoring-and-viewer-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Scaffold UI rescatado2626921 en rama privada, diseño/aceptación pendientes. Operador asigna diseño a Claude Design2026-10-26 y Codexbackend; ningún JSX/layout/motion nuevo en2072. API/DTO para conectar diseño documentados. GVC/aceptación humana y recorrido integrado cloud permanecen pendientes.`
+- Status real: `2026-10-26: nuevo diseño e interfaz pertenecen a Claude Design; scaffold histórico conserva referencia y no está aceptado. Backend main e4b2e890, contrato API/DTO, cloud privado y canary físico ya disponibles; Scheduler automático comprobado. Falta entorno de integración aislado con datos/permisos, conectar consumidor same-origin y completar recorrido UI→API→GCS→worker→publicación→lectura con errores/permisos, GVC y aceptación humana. Acceso productivo continúa OFF; Auth retenido en PR.`
 - Rank: `R07A/R08A inmediatamente después del contrato TASK-2070`
 - Domain: `ui|content`
 - Blocked by: `none`
 - Branch: `Greenhouse develop para docs; efeonce-rooms main para runtime; sin worktrees`
+
+## Conciliación vigente — 2026-10-26
+
+Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
 
 ## Summary
 
@@ -98,6 +106,8 @@ El lector 20f9fe9 sirve texto V1/V2 y muestra indisponibilidad para media. El ma
 - Esta task, wireframe, flow, motion y plan. API/domain/DB/worker/proxy/secrets/registry de operaciones pertenecen a2070 o raíz.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 
@@ -359,7 +369,7 @@ Raíz coordina canary Auth, worker/storage/CSP y release. No enviar archivos a t
 
 ## Acceptance Criteria
 
-- [ ] UI ready permanece no hasta DTO2070 congelado y mapping/GVC/decision log completos; hook y readiness pasan antes de JSX.
+- [ ] UI ready del nuevo diseño permanece no hasta mapping/GVC/decision log completos y contrato backend consumido; hook y readiness pasan antes de JSX. El DTO backend ya existe; no confundir ese avance con aceptación de la interfaz.
 - [ ] Wireframe/flow/motion existentes pasan sus gates focales; fuente visual y reuse AXIS comprobados.
 - [ ] Una imagen con bytes reales recorre upload→verificar→attach→preview→publish→guest; Lista no se confunde con publicada.
 - [ ] Título/alt/pie preservan cambios ante409, y retry de resultado incierto no duplica archivo/command.

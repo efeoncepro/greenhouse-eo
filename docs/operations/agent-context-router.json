@@ -5,8 +5,19 @@
   "domains": [
     {
       "id": "byteplus-direct-account",
-      "triggers": ["BytePlus directo", "consola BytePlus", "KYC BytePlus", "Entry BytePlus", "Asset Service BytePlus", "retratos BytePlus", "pnpm ai:byteplus"],
-      "skills": ["greenhouse-secret-hygiene", "greenhouse-ai-creative-rights-governance"],
+      "triggers": [
+        "BytePlus directo",
+        "consola BytePlus",
+        "KYC BytePlus",
+        "Entry BytePlus",
+        "Asset Service BytePlus",
+        "retratos BytePlus",
+        "pnpm ai:byteplus"
+      ],
+      "skills": [
+        "greenhouse-secret-hygiene",
+        "greenhouse-ai-creative-rights-governance"
+      ],
       "sources": [
         "docs/manual-de-uso/creative-studio/byteplus-directo.md",
         "docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md",
@@ -15,8 +26,17 @@
     },
     {
       "id": "sky-blog-seo",
-      "triggers": ["servicio SEO SKY", "recuperación blog SKY", "indicador orgánico SKY", "operación SEO blog SKY"],
-      "skills": ["sky-blog-seo", "seo-aeo", "dataforseo-operator"],
+      "triggers": [
+        "servicio SEO SKY",
+        "recuperación blog SKY",
+        "indicador orgánico SKY",
+        "operación SEO blog SKY"
+      ],
+      "skills": [
+        "sky-blog-seo",
+        "seo-aeo",
+        "dataforseo-operator"
+      ],
       "sources": [
         "docs/services/sky-blog-seo/README.md",
         "docs/services/sky-blog-seo/INDICADOR_VALOR_ORGANICO_V1.md",
@@ -542,6 +562,32 @@
         "docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md",
         "docs/tasks/to-do/TASK-1642-globe-flux3-video-fleet-producer-integration.md",
         "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md"
+      ]
+    },
+    {
+      "id": "efeonce-rooms-auth",
+      "triggers": [
+        "Efeonce Rooms",
+        "efeonce-rooms",
+        "EPIC-052",
+        "ROOMS_*",
+        "private media Rooms",
+        "Efeonce Auth",
+        "Efeonce ID",
+        "auth-server",
+        "EPIC-044",
+        "Claude Design Rooms"
+      ],
+      "skills": [
+        "efeonce-rooms",
+        "efeonce-auth"
+      ],
+      "sources": [
+        ".codex/skills/efeonce-rooms/references/program-ledger.md",
+        ".codex/skills/efeonce-auth/references/program-ledger.md",
+        "docs/architecture/rooms/README.md",
+        "docs/documentation/rooms/backend-api-for-claude-design.md",
+        "docs/audits/rooms/2026-10-26-auth-deploy-control.md"
       ]
     },
     {

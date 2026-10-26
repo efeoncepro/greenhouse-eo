@@ -2,6 +2,14 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-26 — Rooms/Auth: estado, skills y contratos de integración conciliados
+
+Dossier, tres capas documentales, tareas/epics e índices alineados con backend Rooms publicado,
+canary único cerrado y worker automático verificado. Skills Codex/Claude y routers distinguen flags de
+máquina/acceso humano, referencias UI históricas y pendientes de integración Claude Design.
+Auth permanece en PR263/264 por instrucción del operador; ningún merge/deploy, correo ni código nuevo.
+[Alcance, evidencias y gates](docs/audits/rooms/2026-10-26-docs-skills-continuity.md).
+
 ## 2026-10-26 — Prospección: cierre Mass Chile y conciliación de canales
 
 [Expediente Mass Chile](docs/commercial/prospecting-agent/runs/2026-10-26-mass-chile.md), excepción personal
@@ -544,14 +552,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
   AK/SK de IAM Bearer, capacidad publicada de acceso efectivo y permisos de imagen/voz.
 - Skills de imagen, motion, audio, derechos y flota canalizadas al contrato; sin activación, inferencia,
   implementación CLI o promoción Globe. API300s y ficha UI120s quedan registrados por superficie.
-
-## 2026-10-15 — Convención comercial de nombres
-
-- Adoptada la [convención de negocios y leads](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md)
-  aprobada por Julio, con routing en skills Codex/Claude, captura CRM, licitaciones y prospección.
-- Primera aplicación: Gana66065702426; renombrado con readback. Nuevas altas autorizadas usan la regla;
-  histórico pendiente de lote. Sin schema, workflows, envíos ni migración masiva.
-
-Medición14/10: todo develop publicado en main9690efad (PR255/orquestador38591329633), Server9 estricto y watchdog6/6/drift0. API/panel/CLI para agentes comparten políticas y comandos; alta nueva por datos recibida en Meta Test Events con nueve claves sin otro build/redeploy/GTM. Consentimiento y Forms→HubSpot Forms→CRM preservados; fixtures archivados. [Release y límites](docs/audits/releases/2026-10-14-scalable-measurement-agent-first-release.md); [auditoría integral docs/skills](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-14.md). Tráfico comercial/EMQ y resto de TASK-2035 pendientes.
-
-Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independientes y partners gris. [QA y reversión](docs/audits/public-site/2026-10-14-footer-composition-v2.md).

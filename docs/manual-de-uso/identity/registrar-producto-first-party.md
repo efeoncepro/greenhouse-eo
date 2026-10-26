@@ -1,6 +1,7 @@
 # Registrar un producto en Efeonce Auth
 
-Estado: implementación local TASK-1834, sin rollout ni registro productivo acreditados.
+Estado al 26 de octubre: RP Rooms productivo ya registrado y probado en un canary único cerrado; first-party OFF.
+No volver a registrar ni rotar su secreto para repetir la prueba. Nuevos RPs requieren autorización propia.
 Decisión: [Rooms primero](../../architecture/EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md).
 
 ## Qué registra
@@ -8,6 +9,14 @@ Decisión: [Rooms primero](../../architecture/EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN
 Un cliente confidencial first-party tiene ID `efeonce-rp-*`, producto allowlisted, redirects exactos, estado
 y política de frescura de sesión. El operador requiere `identity.auth_client.register`. Registrar no concede
 salas, organizaciones, roles ni grants MCP. El callback de Rooms resuelve un binding previamente autorizado.
+
+## Estado y límite actual
+
+El registro existente no equivale a acceso habilitado. Auth quedó `00168-vzb` al 100%, first-party/OTP OFF,
+sin montajes OTP/authority; el canary Microsoft/MFA+PNG+correo recibido ya pasó y no se repite.
+Las PR #263/#264 siguen abiertas, con integración retenida. Consultar [runbook](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26)
+y cliente/redirect/secreto efectivos antes de cualquier cambio autorizado; el ejemplo siguiente no es un
+comando para rehacer Rooms ni declara que el dominio ilustrativo sea el callback actualmente registrado.
 
 ## Preparación
 

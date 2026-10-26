@@ -1,6 +1,6 @@
 ---
 name: efeonce-rooms
-description: Operate and extend Efeonce Rooms (EPIC-052) — the sales-enablement / buyer-experience product (`rooms.efeonce.org`, runtime repo `efeonce-rooms`, Next.js on Vercel, own PostgreSQL `rooms_production`). Use when touching the `efeonce-rooms` repo, Rooms docs in `docs/architecture/rooms/**`, EPIC-052 tasks (TASK-2058…2071: foundation, first experience, persistence, Vercel release, versioned authoring, Efeonce ID consumer, tokenized invitations, guest reading, cloud runtime pilot, private image media, image authoring/viewer), Rooms flags (`ROOMS_*`), the controlled pilot or the Rooms+Auth canary, Rooms media/storage, or when asked "what's the state of Rooms". Living skill: read references/program-ledger.md first and update it at every Rooms task closure.
+description: Operate and extend Efeonce Rooms (EPIC-052) — the sales-enablement / buyer-experience product (`rooms.efeonce.org`, runtime repo `efeonce-rooms`, Next.js on Vercel, own PostgreSQL `rooms_production`). Use when touching the `efeonce-rooms` repo, Rooms docs in `docs/architecture/rooms/**`, EPIC-052 tasks (TASK-2058…2072: foundation, first experience, persistence, Vercel release, versioned authoring, Efeonce ID consumer, tokenized invitations, guest reading, cloud runtime pilot, private image media, image authoring/viewer, automatic worker dispatch and Claude Design integration), Rooms flags (`ROOMS_*`), the controlled pilot or the Rooms+Auth canary, Rooms media/storage, or when asked "what's the state of Rooms". Living skill: read references/program-ledger.md first and update it at every Rooms task closure.
 ---
 
 # Efeonce Rooms (skill viva)
@@ -15,7 +15,7 @@ Vercel. La identidad la pone Efeonce ID (skill `efeonce-auth`); Rooms es su prim
 1. Este archivo: reglas y ruteo.
 2. [`references/program-ledger.md`](references/program-ledger.md): estado vivo por unidad y por task,
    runtime cloud, WIP y secuencia pendiente. **Empezar aquí.**
-3. Corte consolidado: [`docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md`](../../../docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
+3. Estado vigente: [dossier](../../../docs/architecture/rooms/README.md), [contrato Claude Design](../../../docs/documentation/rooms/backend-api-for-claude-design.md) y recibos de26Oct enlazados en el ledger. Antecedente histórico: [`docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md`](../../../docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
 4. Dossier: [`docs/architecture/rooms/README.md`](../../../docs/architecture/rooms/README.md). Incluye:
    - `EFEONCE_ROOMS_ARCHITECTURE_V1.md`
    - `EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md`
@@ -36,10 +36,10 @@ Vercel. La identidad la pone Efeonce ID (skill `efeonce-auth`); Rooms es su prim
 | API | `src/app/api/v1/rooms/**` |
 | Páginas | `src/app/rooms/**` y `/demo` (sintética) |
 | Migraciones | `migrations/` (node-pg-migrate) |
-| CLI de paridad | `scripts/rooms.ts` (`pnpm rooms …`: list, room, draft, editions, execute, validate, invitations; con el WIP, también medios) |
+| CLI de paridad | `scripts/rooms.ts` (`pnpm rooms …`: list, room, draft, editions, execute, validate, invitations y medios) |
 
 Comandos:
-- `pnpm verify`: lint, lint negativo, typecheck, test y build. Gate local de aplicación; la rama2072 añade CI de imagenLinux/decoder del worker.
+- `pnpm verify`: lint, lint negativo, typecheck, test y build. Gate local de aplicación; CI de imagen Linux/decoder del worker ya integrado en main.
 - `pnpm test:e2e`, `pnpm db:local`, `pnpm db:migrate`, `pnpm db:smoke`, `pnpm db:recovery`.
 - `pnpm auth:integration`, `pnpm invitation:integration`.
 - `pnpm dev` (127.0.0.1:3210).
@@ -47,14 +47,15 @@ Comandos:
 
 ## Reglas duras
 
-- **Cada push a `main` de `efeonce-rooms` construye PRODUCCIÓN en Vercel** (integración Git, sin CI).
+- **Cada push a `main` de `efeonce-rooms` construye PRODUCCIÓN en Vercel** (integración Git; CI de worker no equivale a publicación).
   - El WIP va a rama, nunca a `main`.
   - Antes de pushear, `pnpm verify` completo y leer qué SHA queda como deploy activo.
   - El build puede quedar `READY/STAGED` conservando el alias anterior: comprobar el dominio canónico y usar promoción explícita si está autorizada; READY por sí solo no prueba publicación.
-  - Backend publicado en `main@a87852e` por autorización2026-10-26; `20f9fe9` queda como rollback previo. Leer el ledger y el recibo de release antes de otra promoción.
-- **Flags `ROOMS_*` viven en Vercel Production y nacen OFF.**
+  - Backend publicado en `main@e4b2e890` por autorización2026-10-26, PR3 y despliegue promovido `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS`. PR2/a87852e es el antecedente de medios; leer ledger y recibos antes de otra promoción.
+- **Flags humanos `ROOMS_*` viven en Vercel Production y nacen OFF.**
   - Prenderlos es una mutación de producción: autorización explícita y readback del valor (no sólo de la presencia).
-  - No están en el ledger de flags de Greenhouse (otro repo), así que su estado se registra en `references/program-ledger.md` y en el ledger con una nota.
+  - Su runtime es otro repo; registrar readback en `references/program-ledger.md` y en el ledger de flags de Greenhouse con nota de alcance.
+  - Excepción ya autorizada: `ROOMS_MEDIA_DISPATCH_ENABLED=true` es sólo de máquina; no concede sesión ni acceso a clientes. El Job privado lleva su propio mediaON, distinto de la app web.
 - **El canary es uno solo y conjunto con Auth:**
   Leer primero el ledger: si el correo único ya fue recibido y verificado, no repetirlo por un nuevo despliegue o continuación.
   1. Auth con flags ON.
@@ -70,9 +71,11 @@ Comandos:
   - Cada petición se vuelve a autorizar.
   - `private, no-store`.
   - Nunca se sirve el original, sólo los derivados.
-  - Adapter GCS integrado en main; bucket/IAM, siete migraciones y Job privado desplegados2026-10-26. Job finito probado con cola vacía y después con un PNG físico a dos WebP; sin scheduler. Canary Auth/correo/imagen completado y desactivado; ver ledger. Variables GCS preparadas para próximo deploy. `ROOMS_MEDIA_ENABLED` de la app sigue OFF: activar sólo después del consumidor frontend y canary conjunto.
+  - Adapter GCS, bucket/IAM, ocho migraciones/26 tablas y Job privado desplegados2026-10-26. PNG físico a dos WebP y entrega privada verificados. Scheduler OIDC cada minuto consulta SQL y sólo inicia un Job con demanda; lease10min/nonce cercado, timeout240s/retries0. Prueba de transporte en sala archivada no añade otra imagen ni correo. Variables GCS están en el despliegue publicado. `ROOMS_MEDIA_ENABLED` de la app sigue OFF: falta consumidor frontend, recorrido integrado con la nueva UI y autorización de activación; no repetir el canary conjunto ya recibido.
 - **Datos sintéticos rotulados.** La demo y el piloto usan personas ficticias. La badge «synthetic» aparece cuando el origen no es `real`.
 - **AXIS y paquetes publicados exactos.** Ninguna copia manual de tokens, logos o primitives. Los SVG públicos salen de `scripts/sync-brand.mjs`.
+- **Auth sigue en PR263/264** por instrucción expresa: no merge main/develop, deploy, flags ni release262 por actualizar Rooms.
+- **Claude Design posee la interfaz.** Preparar integración same-origin, datos/permisos de prueba y recorrido UI; no conectar un artifact de otro origin con tokens en storage ni reutilizar secretos/WIF Production en Preview. El perfil cloud exige Production exacto.
 - Paridad Full API: toda acción de UI es un command o reader con su contrato. La CLI ya existe; el MCP está pendiente (R13/R14).
 - Las tasks y ADR de Rooms se escriben en `greenhouse-eo/docs`. Ningún doc canónico vive en el repo runtime.
 

@@ -1,0 +1,273 @@
+{
+  "observedAt": "2026-10-26T17:38:40.166641-03:00",
+  "timezone": "America/Santiago",
+  "mode": "read-only",
+  "scope": "Docs and skills continuity only",
+  "observations": {
+    "auth": {
+      "revision": "auth-server-00168-vzb",
+      "trafficPercent": 100,
+      "gitSha": "754a2a28045ebfc9353c86a2d6236ecf59dd805e",
+      "image": "gcr.io/efeonce-group/auth-server@sha256:122e2acbed9961741c3c71307f0c9fc616a213f02f59f1ea00a990056e1a8987",
+      "firstParty": "false",
+      "invitationOtp": "false",
+      "sentryEnvironment": "production",
+      "otpMountsAbsent": true
+    },
+    "scheduler": {
+      "name": "projects/efeonce-group/locations/us-east4/jobs/rooms-media-dispatch",
+      "state": "ENABLED",
+      "schedule": "* * * * *",
+      "timeZone": "Etc/UTC",
+      "lastAttemptTime": "2026-10-26T20:38:02.754188Z",
+      "status": {}
+    },
+    "worker": {
+      "image": "gcr.io/efeonce-group/rooms-media-worker@sha256:d49995de3ee7e5fa71ec7fabe0e8bb04d8ac3b4bbd2ef125a8331311d1d121f2",
+      "serviceAccount": "rooms-media-worker-production@efeonce-group.iam.gserviceaccount.com",
+      "timeoutSeconds": "240",
+      "maxRetries": 0,
+      "mediaEnabled": "true"
+    },
+    "authPrs": [
+      {
+        "headRefOid": "5e1fc255472427ae245a3a3548ee28fff794f7f6",
+        "mergedAt": null,
+        "state": "OPEN",
+        "statusCheckRollup": [
+          {
+            "__typename": "CheckRun",
+            "completedAt": "0001-01-01T00:00:00Z",
+            "conclusion": "",
+            "detailsUrl": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/40393093681/job/121818919235",
+            "name": "Fast feedback and conditional build",
+            "startedAt": "2026-10-26T20:09:19Z",
+            "status": "IN_PROGRESS",
+            "workflowName": "CI"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-10-26T20:10:49Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/40393093684/job/121818919004",
+            "name": "CLAUDE.md budget + content-loss audit",
+            "startedAt": "2026-10-26T20:09:19Z",
+            "status": "COMPLETED",
+            "workflowName": "CLAUDE.md governance"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-10-26T20:10:39Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/40393093558/job/121818918525",
+            "name": "Detect affected modules",
+            "startedAt": "2026-10-26T20:09:19Z",
+            "status": "COMPLETED",
+            "workflowName": "Reliability change-based verification"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-10-26T20:13:06Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/40393093558/job/121819637780",
+            "name": "Run affected smoke specs",
+            "startedAt": "2026-10-26T20:10:41Z",
+            "status": "COMPLETED",
+            "workflowName": "Reliability change-based verification"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-10-26T20:10:39Z",
+            "conclusion": "SKIPPED",
+            "detailsUrl": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/40393093558/job/121819640961",
+            "name": "No reliability modules affected",
+            "startedAt": "2026-10-26T20:10:39Z",
+            "status": "COMPLETED",
+            "workflowName": "Reliability change-based verification"
+          },
+          {
+            "__typename": "StatusContext",
+            "context": "Vercel",
+            "startedAt": "2026-10-26T20:17:24Z",
+            "state": "SUCCESS",
+            "targetUrl": "https://vercel.com/efeonce-7670142f/greenhouse-eo/4xBDxPp4LhZVuxVr65CcEbEfK5AJ"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-10-26T20:17:25Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://vercel.com/github",
+            "name": "Vercel Preview Comments",
+            "startedAt": "2026-10-26T20:17:25Z",
+            "status": "COMPLETED",
+            "workflowName": ""
+          }
+        ]
+      },
+      {
+        "headRefOid": "aabd6d78d1d73ead4956cce15abc1efd7208472c",
+        "mergedAt": null,
+        "state": "OPEN",
+        "statusCheckRollup": [
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-10-26T20:34:46Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/40393090208/job/121818907591",
+            "name": "Fast feedback and conditional build",
+            "startedAt": "2026-10-26T20:09:18Z",
+            "status": "COMPLETED",
+            "workflowName": "CI"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-10-26T20:10:41Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/40393090329/job/121818908202",
+            "name": "Detect affected modules",
+            "startedAt": "2026-10-26T20:09:18Z",
+            "status": "COMPLETED",
+            "workflowName": "Reliability change-based verification"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-10-26T20:10:42Z",
+            "conclusion": "SKIPPED",
+            "detailsUrl": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/40393090329/job/121819664800",
+            "name": "Run affected smoke specs",
+            "startedAt": "2026-10-26T20:10:42Z",
+            "status": "COMPLETED",
+            "workflowName": "Reliability change-based verification"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-10-26T20:10:46Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/40393090329/job/121819662387",
+            "name": "No reliability modules affected",
+            "startedAt": "2026-10-26T20:10:44Z",
+            "status": "COMPLETED",
+            "workflowName": "Reliability change-based verification"
+          },
+          {
+            "__typename": "StatusContext",
+            "context": "Vercel",
+            "startedAt": "2026-10-26T20:17:23Z",
+            "state": "SUCCESS",
+            "targetUrl": "https://vercel.com/efeonce-7670142f/greenhouse-eo/Ha9AphZLevegNG1DVpEJfYnvKMnF"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-10-26T20:17:24Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://vercel.com/github",
+            "name": "Vercel Preview Comments",
+            "startedAt": "2026-10-26T20:17:24Z",
+            "status": "COMPLETED",
+            "workflowName": ""
+          }
+        ]
+      }
+    ],
+    "roomsProduction": {
+      "deploymentId": "dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS",
+      "url": "efeonce-rooms-6r3r60nsl-efeonce-7670142f.vercel.app",
+      "readyState": "READY",
+      "readySubstate": "PROMOTED",
+      "gitSha": "e4b2e890cd0bd27823a1760e6c06f90330dadf3d",
+      "flags": {
+        "ROOMS_FIRST_PARTY_AUTH_ENABLED": {
+          "present": true,
+          "value": "false"
+        },
+        "ROOMS_INVITATIONS_ENABLED": {
+          "present": true,
+          "value": "false"
+        },
+        "ROOMS_MEDIA_ENABLED": {
+          "present": false,
+          "value": "false"
+        },
+        "ROOMS_MEDIA_DISPATCH_ENABLED": {
+          "present": true,
+          "value": "true"
+        }
+      }
+    }
+  },
+  "ciFollowUp": {
+    "observedAt": "2026-10-26T17:44:15.495125-03:00",
+    "timezone": "America/Santiago",
+    "authPrs": [
+      {
+        "number": 263,
+        "head": "5e1fc255472427ae245a3a3548ee28fff794f7f6",
+        "state": "OPEN",
+        "mergedAt": null,
+        "checks": [
+          {
+            "name": "Fast feedback and conditional build",
+            "state": "SUCCESS"
+          },
+          {
+            "name": "CLAUDE.md budget + content-loss audit",
+            "state": "SUCCESS"
+          },
+          {
+            "name": "Detect affected modules",
+            "state": "SUCCESS"
+          },
+          {
+            "name": "Run affected smoke specs",
+            "state": "SUCCESS"
+          },
+          {
+            "name": "No reliability modules affected",
+            "state": "SKIPPED"
+          },
+          {
+            "name": "Vercel",
+            "state": "SUCCESS"
+          },
+          {
+            "name": "Vercel Preview Comments",
+            "state": "SUCCESS"
+          }
+        ]
+      },
+      {
+        "number": 264,
+        "head": "aabd6d78d1d73ead4956cce15abc1efd7208472c",
+        "state": "OPEN",
+        "mergedAt": null,
+        "checks": [
+          {
+            "name": "Fast feedback and conditional build",
+            "state": "SUCCESS"
+          },
+          {
+            "name": "Detect affected modules",
+            "state": "SUCCESS"
+          },
+          {
+            "name": "Run affected smoke specs",
+            "state": "SKIPPED"
+          },
+          {
+            "name": "No reliability modules affected",
+            "state": "SUCCESS"
+          },
+          {
+            "name": "Vercel",
+            "state": "SUCCESS"
+          },
+          {
+            "name": "Vercel Preview Comments",
+            "state": "SUCCESS"
+          }
+        ]
+      }
+    ],
+    "operatorDecision": "Retained in PR; no merge or deployment even with CI green."
+  }
+}

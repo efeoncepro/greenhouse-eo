@@ -6,6 +6,16 @@ Estado: **revisión técnica preparada; decisiones de tratamiento, plazos y apro
 No constituye opinión jurídica, certificación, firma del responsable ni aprobación de una organización cliente.
 No solicita ni presupone contratación externa. La evaluación de seguridad propia tiene expediente separado.
 
+## Continuidad técnica26Oct (sin aprobación jurídica nueva)
+
+El corte25Oct que sigue conserva su alcance de revisión de código. Después se verificaron un login
+Microsoft/MFA, una imagen física y el único correo de canary con acceso y revocación; el acceso first-party/OTP
+quedó OFF. Rooms publicó GCS/SQL/worker y Scheduler; no equivale a adopción por clientes, residencia integral,
+retención aprobada ni pentest completo. [Canary](../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md),
+[medios automáticos](../audits/rooms/2026-10-26-automatic-media-dispatch.json) y
+[metadata releída26Oct](../audits/rooms/2026-10-26-docs-skills-state-readback.json).
+Corrección de deploy Auth retenida en PR263/264; no aplicada. Decisiones de tratamiento/plazos siguen pendientes.
+
 ## Alcance y evidencia
 
 Esta V2 sustituye el análisis técnico activo de la [V1](EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md), que se
@@ -112,10 +122,7 @@ enlace y código. El pipeline token_sensitive persiste destinatario normalizado 
 ni el enlace/código**; no hay retry durable del payload sensible. La etiqueta de sala debe ser apta para correo.
 El proveedor y el buzón son superficies con políticas propias; no se verificó borrado ni retención de sus cuerpos.
 
-El sender OTP local exclusivo es `Efeonce <acceso@mail.efeoncepro.com>`. GET de metadata del preflight, tanto con
-la referencia staging actual como con la producción prevista, confirmó el mismo dominio verified/sending enabled
-con click/open tracking OFF. Eso no demuestra entrega, preservación del href recibido ni ausencia de escáneres
-del buzón. El dominio raíz conserva tracking ON para otros tipos; no extender la afirmación OTP a toda la agencia.
+El sender OTP exclusivo es `Efeonce <acceso@mail.efeoncepro.com>`. El preflight25Oct comparó referencias staging/production y verificó el dominio con click/open tracking OFF. El canary26Oct ya comprobó el único correo recibido, enlace y código con Resend producción v1; final OTP OFF. Esa recepción no certifica ausencia de escáneres ni retención/borrado del proveedor o buzón. El dominio raíz conserva tracking ON para otros tipos; no extender la afirmación OTP a toda la agencia.
 
 El enlace `https://<origen-exacto>/invite#token=<opaco>` deja el bearer en fragmento: el frontend Rooms lo toma en
 memoria, limpia history y lo intercambia por POST. No ponerlo en query/path, analytics, screenshots, errores,
@@ -127,7 +134,7 @@ elimina ese riesgo. Los receipts S2S no incluyen OTP; el proof no contiene email
 | Componente / destino | Evidencia técnica | Límite de la evidencia y decisión |
 | --- | --- | --- |
 | Auth Cloud Run, Cloud SQL, KMS | Preflight2026-10-25: proyecto efeonce-group, us-east4; DB greenhouse-pg-dev compartida; claves HSM | Región de recursos observados, no certificación de residencia integral ni ubicación de todas las copias/support |
-| Rooms | Runtime y datos separados por contrato; código usa schema rooms y RP scoped | Inventario de despliegue, región DB, logs/backups y acceso operativo definitivo por completar con owner Rooms |
+| Rooms | Runtime propio Vercel; DB rooms_production en instancia compartida us-east4; GCS privado US-EAST4 y worker/Scheduler us-east4 verificados26Oct; RP scoped | Inventario operativo base documentado; logs, retención, accesos y totalidad de copias/proveedores aún por completar. Regiones observadas no certifican residencia integral |
 | Resend | Endpoint de envío externo; dominio mail en us-east-1; referencia producción accesible al runtime Auth | Región del dominio no demuestra ubicación de todos los logs, subprocessors ni retención. Revisar contrato/DPA y configuración aplicable |
 | Entra/corporate login, navegador, consumidor MCP | Evidencia upstream y cookies/tokens por cada flujo; bindings canónicos | El inventario contractual debe contemplar cada integración efectivamente usada; no inferir necesidad de nuevos proveedores |
 | Logs, observabilidad, edge y backups | Superficies posibles de datos de acceso/redacción y copias | No se inventaría aquí la totalidad de proveedores ni TTLs; owner Platform debe completar mapa y accesos |

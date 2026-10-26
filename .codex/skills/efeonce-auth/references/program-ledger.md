@@ -2,17 +2,21 @@
 
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
+> Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
 ## 2026-10-26 — Control de despliegue corregido; operador retiene Auth en PR
 
-- `doc/local`: [PR263 main](https://github.com/efeoncepro/greenhouse-eo/pull/263) HEAD `5e1fc2554` y
-  [PR264 develop](https://github.com/efeoncepro/greenhouse-eo/pull/264) HEAD `aabd6d78d`, ambas abiertas.
+- `doc/local`: [PR #263 main](https://github.com/efeoncepro/greenhouse-eo/pull/263) HEAD `5e1fc2554` y
+  [PR #264 develop](https://github.com/efeoncepro/greenhouse-eo/pull/264) HEAD `aabd6d78d`, ambas abiertas.
   Sólo control/tests/docs y delta de metadata; sin producto Auth/UI ni historial local ajeno.
-- `local`:22Python+14Vitest de drift/paridad/watchdog PASS en árbol main exportado, gates y hook normal
-  PASS sin bypass. CI inicial encontró fixture/espejo omitidos, corregidos; CI general nuevo pendiente.
-- `vivo`: revisión00168-vzb100%, SHA754a2a28 y misma imagen, first-party/OTP OFF; health/ready/discovery200.
-- Decisión humana expresa: **dejar Auth en PR por ahora**, sin merge main/develop ni deploy. No262,
-  flags, correos ni disable/enable de otros workflows. Revisar filtros src/lib de otros deploys antes de264.
+- `local`: 22 Python + 14 Vitest de drift/paridad/watchdog PASS en árbol main exportado, gates y hook normal
+  PASS sin bypass. CI inicial encontró fixture/espejo omitidos, corregidos. Seguimiento CI26Oct: PR #263 y #264 CI completo, governance/reliability aplicables y Vercel PASS. Ambas OPEN, sin merge; ver `ciFollowUp` del readback enlazado.
+- `vivo`: `auth-server-00168-vzb` al 100% del tráfico, `GIT_SHA=754a2a28…`, misma imagen/digest `122e2acb…`; first-party/OTP false, HMAC/authority ausentes, Resend production v1 y Sentry production; health/ready/discovery200.
+- Decisión humana expresa: **dejar Auth en PR por ahora**, sin merge main/develop ni deploy. No release #262,
+  flags, correos ni disable/enable de otros workflows. Revisar filtros src/lib de otros deploys antes de PR #264.
+  El guard production/main existe LOCAL+PR, no está desplegado ni integrado: remoto main/develop sigue con el workflow viejo. El path `src/lib/**` de PR #264 puede disparar artifact/commercial/ico/ops; hace falta protección antes de cualquier futura integración, ninguna aplicada ahora.
+- Diseño y desarrollo de nueva UI en entorno aislado pueden continuar; acceso productivo OFF y aceptación visual siguen separados. Canary único Microsoft/MFA+PNG+correo recibido PASS y cerrado: no repetir ni ampliar.
+  [Readback actual 17:38:40 Chile](../../../../docs/audits/rooms/2026-10-26-docs-skills-state-readback.json).
   [Evidencia y siguiente paso](../../../../docs/audits/rooms/2026-10-26-auth-deploy-control.md).
 
 ## 2026-10-26 — Canary interno Rooms y una imagen real PASS; flags OFF

@@ -14,6 +14,12 @@ La diferencia con otras capas de documentacion:
 
 ## Indice por categoria
 
+### Efeonce Rooms e identidad
+
+- [Operar Rooms en desarrollo](rooms/operar-primera-experiencia-local.md): sesiones y fixtures aislados, sin autoridad productiva.
+- [Operar el worker privado de imágenes](rooms/operar-worker-medios.md): Scheduler/Job, leases, comprobación y rollback.
+- [Invitación Rooms por correo y código](identity/operar-invitacion-rooms-email-otp.md): canary único ya comprobado; no repetir envíos ni activar por conectar diseño.
+
 - [Operar Efeonce Marketing Studio](marketing-studio/operar-marketing-studio.md) — revisar campañas (preview por formato, UTM, estados y presupuestos), actualizar datos desde OneDrive (import), generar imágenes (renditions), dar y revocar acceso por API, leer Studio con un agente por MCP y resolver problemas comunes.
 
 - [Descubrir recursos y componer con AXIS](creative/descubrir-y-componer-con-axis.md) — Lab, packages, CLI, íconos, logos y evidencia de salida.

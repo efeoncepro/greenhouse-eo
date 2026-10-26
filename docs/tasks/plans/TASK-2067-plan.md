@@ -1,5 +1,7 @@
 # TASK-2067 — ejecución del núcleo OTP por invitación
 
+> Estado posterior26Oct: consultar la [task vigente](../in-progress/TASK-2067-auth-invitation-email-otp.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 Decisión autorizada en sesión por Julio, coordinada por root con peer Rooms. La implementación sigue el ADR
 `docs/architecture/EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md`. La primera propuesta issue-on-open fue
 reemplazada antes del código por correo único con enlace+OTP; esa propuesta no se implementó.

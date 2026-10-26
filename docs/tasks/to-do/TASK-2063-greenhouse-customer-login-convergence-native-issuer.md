@@ -45,6 +45,12 @@ TASK-1842 depende de esta adopción para la puerta /my/profile; TASK-1852 y EPIC
 pruebas de retorno del portal. UI de Greenhouse sigue activa hasta su cutover propio; adoptar su diseño en
 Auth no mueve cookies, contraseñas, sesiones ni permisos.
 
+## Conciliación vigente — 2026-10-26
+
+Rooms ya validó su primer relying party mediante [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). Esta task sigue sin implementación y no hereda ese cierre: migrar el login Greenhouse es otra población/sesión/rollout. [Auth retenido en PR](../../audits/rooms/2026-10-26-auth-deploy-control.md); no integrar ni desplegar por inferencia.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+
 ## Summary
 
 Establecer **Efeonce ID** como la identidad humana canónica de los productos Efeonce para clientes externos y
@@ -228,7 +234,7 @@ duplicación de TASK-1839 y semántica de logout de TASK-1840.
 
 ### Blocks / Impacts
 
-- [TASK-1852](TASK-1852-berel-sky-service-access-and-channel-enablement.md) / EPIC-046: matriz de
+- [TASK-1852](../in-progress/TASK-1852-berel-sky-service-access-and-channel-enablement.md) / EPIC-046: matriz de
   habilitación Berel/Sky y contrato de entrada desde email/in-app/Teamsbot. Es conexión de contrato y
   rollout nativo condicional, no bloqueo de inventario/readers ni dependencia circular de foundation.
 - Login de clientes y colaboradores internos en `/login`.
@@ -258,6 +264,8 @@ duplicación de TASK-1839 y semántica de logout de TASK-1840.
 - `docs/ui/visual-directions/TASK-2063-greenhouse-login-convergence-native-issuer.md`.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 

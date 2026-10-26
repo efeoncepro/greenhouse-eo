@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso
 > **Version:** 1.4
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-07 (TASK-1832)
+> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828 · TASK-1829)
 > **Administración en portal:** operaciones programáticas; la UI pública de login vive en `auth.efeonce.org`. Se opera con `curl`, `gcloud`, `pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:register-issuer-environment` y las rutas admin `POST /api/admin/auth-server/oauth-clients` y `POST /api/admin/auth-server/consents/revoke`. Señales en `/admin/operations`.
 > **Documentacion relacionada:** [Autorizador de Efeonce](../../documentation/identity/autorizador-efeonce.md), [Runbook auth-server](../../operations/runbooks/auth-server.md), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md), [Operar el binding de identidad externa](operar-binding-identidad-externa.md), [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
@@ -13,7 +13,7 @@
 Este manual te guía para operar el día a día del autorizador propio de Efeonce: comprobar que está sano,
 prenderlo o apagarlo, rotar la llave con la que firma y retirar la versión vieja, y leer sus señales. Cubre la
 capa entregada en `TASK-1828` (runtime, llaves y dirección pública) y, desde `TASK-1829`, la superficie OAuth:
-registrar un cliente confidencial, revocar el consentimiento de una persona y prender el flag en staging. El acceso corporativo de TASK-1836 se opera según
+registrar un cliente confidencial, revocar el consentimiento de una persona y diagnosticar flags en el único servicio productivo. El acceso corporativo de TASK-1836 se opera según
 [el manual interno](efeonce-id-interno.md) y su [runbook de cohorte](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
 
 Para clientes MCP externos usa el [manual del canary](certificar-cliente-mcp-con-canary-sintetico.md). ChatGPT
@@ -35,12 +35,20 @@ activas. Una familia nueva puede compartir contexto con otra revocada. No retire
 limpiar una familia de prueba ni elimines un CIMD compartido. La certificación de TASK-1844 conserva sus
 [conexiones definitivas](../../audits/mcp/TASK-1844_FINAL_CLIENTS_2026-09-08.json).
 
+## Retención Auth al 26 de octubre
+
+PR #263 HEAD `5e1fc2554` y PR #264 HEAD `aabd6d78d` están abiertas, sin merge ni despliegue por decisión del
+operador. La corrección production/main existe localmente y en PR, no en los YAML remotos todavía.
+El canary único Microsoft/MFA+PNG+correo recibido ya pasó y cerró; Auth first-party/OTP sigue OFF.
+No repetir correo, activar flags ni usar los ejemplos de este manual como permiso de despliegue.
+[Estado vivo, CI y control preparado](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+
 ## Antes de empezar
 
 - Necesitas `gcloud` autenticado en el proyecto `efeonce-group` y, para rotar llaves, acceso a PostgreSQL por el
   proxy local (`pnpm pg:connect`, queda en `127.0.0.1:15432`).
-- Ten claro que es **un solo servicio** Cloud Run (`auth-server`, `us-east4`) compartido por staging y
-  producción, igual que `ops-worker`. Lo que hagas afecta a ambos. Está **en producción desde el 2026-09-04**
+- Ten claro que es **un solo servicio** Cloud Run (`auth-server`, `us-east4`) productivo, sin aislamiento Auth staging;
+  los nombres de workflow/ENV no cambian esa frontera. Un despliegue de Auth alcanza ese host productivo. Está **en producción desde el 2026-09-04**
   (release inicial `9100bbd2765d`). La revisión actual se relee antes de operar; no se toma ese SHA histórico como referencia de rollback.
 - La única dirección válida es `https://auth.efeonce.org`. La URL `.run.app` del servicio responde `421` a
   propósito.
@@ -79,14 +87,11 @@ Los `kid` que imprime deben ser los mismos que publica el JWKS. Si acabas de rot
 
 `AUTH_SERVER_ENABLED` está en `deploy.sh` con default `true` desde 2026-09-04.
 
-- **Apagado puntual** (por ejemplo, durante un incidente):
-
-  ```bash
-  AUTH_SERVER_ENABLED=false ENV=staging bash services/auth-server/deploy.sh
-  ```
-
-- **Apagado o encendido durable:** cambia el default en `deploy.sh`, haz commit y deja que el carril normal
-  despliegue.
+No ejecutar un deploy con sólo `ENV` y un flag: `--set-env-vars` reemplaza la configuración y los defaults
+pueden retirar autoridad vigente. La receta histórica `ENV=staging` apuntaba a producción y el script local
+corregido ya la rechaza; el remoto aún no integra esa corrección. Mientras rija la retención no se publica.
+Un cambio futuro exige autorización explícita, todos los flags/cohortes actuales preservados, SHA/entorno
+conciliados y readback de la revisión con tráfico según el runbook.
 
 En ambos casos actualiza la fila del flag en
 [`FEATURE_FLAG_STATE_LEDGER.md`](../../operations/FEATURE_FLAG_STATE_LEDGER.md). Nunca uses
@@ -228,10 +233,10 @@ con el token consumer del gateway) responde `200` con `outcome: environment_inac
 `bound`. Es fail-closed por diseño, no una falla: en producción se comprobó exactamente eso el 2026-09-04 (`400`
 sin parámetros, `401` sin token).
 
-### 9. Prender la superficie OAuth en staging
+### 9. Activación futura de OAuth en el servicio productivo
 
-Este procedimiento sirve para una activación nueva, no describe el piloto ya activo. Como el servicio
-es compartido, el nombre `staging` del workflow no aísla el host público. Antes de activar, confirma:
+Este procedimiento sólo aplica después de levantar la retención con autorización expresa; no describe
+una operación pendiente que deba ejecutarse ahora. El nombre staging nunca aisló el host público. Antes de activar, confirma:
 
 1. El runtime está sano (paso 1) con `AUTH_SERVER_ENABLED=true`.
 2. El emisor existe como environment en `greenhouse_core.external_identity_environments` (paso 8)
@@ -242,12 +247,10 @@ es compartido, el nombre `staging` del workflow no aísla el host público. Ante
 3. Tienes al menos un cliente de prueba: un documento CIMD publicado por HTTPS o un registro DCR (abajo).
 4. La fila del flag existe en [`FEATURE_FLAG_STATE_LEDGER.md`](../../operations/FEATURE_FLAG_STATE_LEDGER.md).
 
-Prender:
-
-- **Durable:** en `services/auth-server/deploy.sh` cambia el default
-  del flag a `true` sólo si ése es el mecanismo vigente, haz commit y deja que el workflow
-  `.github/workflows/auth-server-deploy.yml` despliegue al empujar a `develop`.
-- **Puntual:** `AUTH_SERVER_OAUTH_ENABLED=true ENV=staging bash services/auth-server/deploy.sh`.
+La publicación futura sigue el runbook gobernado y el contrato remoto que se haya integrado y verificado.
+No usar un push develop ni `ENV=staging` como atajo. Mientras PR #263/#264 permanezcan abiertas, el guard
+production/main del workspace no está aplicado al remoto; primero resolver esa frontera y sus efectos
+sobre los otros workers, sin activar ni desactivar workflows por inferencia.
 
 Verificar la metadata:
 

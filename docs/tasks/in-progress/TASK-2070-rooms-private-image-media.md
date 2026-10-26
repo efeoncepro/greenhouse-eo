@@ -1,5 +1,7 @@
 # TASK-2070 — Rooms: imágenes privadas, versiones y procedencia
 
+> Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
+
 ## Delta 2026-10-25 — estado al corte de Codex
 
 - **Avance 2026-10-25 (Claude, rama `task/2070-2071-private-media`, commit `7ca5fd3`):** limpieza `sweepMedia` (expira subidas vencidas con auditoría/outbox, borra temporales y objetos sin referencia tras un margen, nunca renditions ni fuentes vivas), worker `--sweep`/`--loop` con parada limpia, el hijo decodificador hereda el loader del worker (ya no fuerza `tsx`) y la migración trae un bloque DO de verificación (probado en la PG local). `pnpm verify` PASS con 207/207 y build OK. Faltan: adapter GCS, empaquetado desplegable del worker, ensayo de restore y GVC.
@@ -27,11 +29,17 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Backend local7ca5fd3 recuperado y ampliado en task/2072-cloud-media-backend: suite225/225 PASS, tipos/lint/build y workerprodclosure PASS. Recovery PG16fresh7migraciones yPG18aislado PASS:2tenants/6rooms,25tablas,18objetos/12bindings,ACL/hash/generación/down-up/revoke/corrupción. Claude Design posee UI desde2026-10-26; Codex backend. GCS/IAM/CORS y canary reales conservan gates2072/2069; no cierre cloud por pruebas locales.`
+- Status real: `2026-10-26: R05A de imágenes estáticas implementado en Rooms main e4b2e890 y verificado en cloud por TASK-2072: GCS privado, generaciones, procesamiento a WebP y entrega por autorización fresca. Suite234PASS/0skip,9focales,lint/types/build y CI Linux PASS; recovery histórico PG16/18 de25tablas/7migraciones conservado. Claude Design posee interfaz; coordinación dispatch añade migración8/tabla26. PDF/audio/video, consumidor nuevo y activación general siguen fuera de este cierre técnico.`
 - Rank: `R05A después de R03B/R04; consumidor UI dependiente separado`
 - Domain: `platform|data|content`
 - Blocked by: `none`
 - Branch: `Greenhouse develop para documentos; efeonce-rooms main para runtime; sin worktrees`
+
+## Conciliación vigente — 2026-10-26
+
+Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
 
 ## Summary
 
@@ -100,6 +108,8 @@ permitir subir archivos reales sin resolver esa frontera produciría procedencia
 - Esta task, su plan y ADR; índices/Handoff/CLAUDE quedan coordinados por raíz.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 
@@ -289,7 +299,7 @@ El registro de esta task no inicia aprovisionamiento ni despliegue.
 - [x] Revocar sesión/grant o archivar niega nuevas peticiones de bytes; cache/logs/HTML no filtran transferencias o keys. Evidencia local: [recovery PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) y suite media; identidad fixture, sin canary cloud.
 - [x] Ratios/orientación/alpha e imágenes largas se verifican sin crop/stretch; límite de resolución y original no descargable quedan explícitos. Evidencia local: [recovery PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) y suite media; identidad fixture, sin canary cloud.
 - [x] Down/up y restore de DB+storage/generaciones/ACL PASS; código worker aislado del bundle de UI. Evidencia local: [recovery PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) y suite media; identidad fixture, sin canary cloud.
-- [ ] Gates lint/typecheck/test/build, paridad HTTP/CLI, manual técnico y limitaciones R05B/R13 actualizados.
+- [x] Gates lint/typecheck/test/build y paridad HTTP/CLI acreditados por suite234 y evidencia2072; manual técnico, límites R05B/R13 y recuperación actualizados. [Conciliación documental26Oct](../../audits/rooms/2026-10-26-docs-skills-continuity.md); no acredita MCP ni restore ampliado8.
 
 ## Verification
 
@@ -303,10 +313,10 @@ No cerrar por código local solamente: registrar evidencia exacta por criterio y
 
 ## Closing Checklist
 
-- [ ] Lifecycle/Status real/criterios y carpeta coinciden con evidencia.
-- [ ] Raíz sincroniza README/registry/epic/DECISIONS_INDEX/Handoff sin sobrescribir WIP.
-- [ ] Manuales de operar medios y documentación técnica registran límites y recuperación.
-- [ ] Deuda PDF/audio/video/editor/MCP conserva owner y siguiente condición verificable.
+- [ ] Cierre formal de lifecycle pendiente: este barrido actualiza Status real/criterios, pero no mueve la task. El cierre técnico R05A no certifica rollout general ni aceptación UI.
+- [x] Raíz sincroniza README/epic/DECISIONS_INDEX/Handoff sin sobrescribir WIP; registry de IDs no cambia porque no hay altas ni movimientos de lifecycle.
+- [x] Manuales de operar medios y documentación técnica registran límites y recuperación; evidencia y gates en [conciliación documental](../../audits/rooms/2026-10-26-docs-skills-continuity.md).
+- [x] Deuda PDF/audio/video/editor/MCP conserva owner y siguiente condición verificable en dossier/roadmap y guía Claude Design; no se presenta como implementada.
 
 ## Follow-ups
 

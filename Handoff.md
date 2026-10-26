@@ -1,5 +1,17 @@
 # Handoff
 
+## 2026-10-26 — Rooms/Auth: continuidad documental y conexión Claude Design
+
+Estado y pendientes reconciliados en [dossier Rooms](docs/architecture/rooms/README.md),
+[contrato Claude Design](docs/documentation/rooms/backend-api-for-claude-design.md) y skills Rooms/Auth
+espejadas. Main Rooms e4b2e890 publicado: GCS/DB8/26tablas, worker automático y canary único comprobados;
+flags humanos OFF. Falta entorno aislado/datos/permisos, conexión UI same-origin, recorrido nuevo y
+activación general separada; restore8 no se infiere del ensayo histórico7. Claude Design conserva UI.
+Auth **permanece en PR263/264 por decisión humana**, sin merge main/develop ni deploy; revisión00168-vzb
+con emisor/login base activos, first-party/OTP OFF. CI263/264 y Vercel PASS en seguimiento posterior; ambas siguen abiertas.
+[Readback](docs/audits/rooms/2026-10-26-docs-skills-state-readback.json),
+[auditoría documental](docs/audits/rooms/2026-10-26-docs-skills-continuity.md).
+
 ## 2026-10-26 — Mass Chile: tres personas y cierre por canal
 
 [Expediente](docs/commercial/prospecting-agent/runs/2026-10-26-mass-chile.md): Yuri por email personal
@@ -47,7 +59,7 @@ se conservan; respuesta posterior no prueba causalidad.
 - **Coordinación:** las sesiones del blog autorizaron purgar la caché después de republicar contenido sin
   consultarles, salvo cuando haya despliegues de plugins.
 
-## 2026-10-25 — Rooms + Auth: estado al corte de Codex (sin uso hasta 1/11)
+## Antecedentes25–26Oct — Rooms/Auth antes de la conciliación documental
 
 ### 2026-10-26 — Rooms: backend Codex y diseño Claude Design
 

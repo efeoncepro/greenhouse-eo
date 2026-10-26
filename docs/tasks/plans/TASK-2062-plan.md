@@ -1,5 +1,7 @@
 # Plan — TASK-2062 Rooms: autoría de contenido versionado
 
+> Estado posterior26Oct: consultar la [task vigente](../complete/TASK-2062-rooms-versioned-content-authoring.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 ## Discovery summary
 
 HEAD Rooms bd4b802 y Greenhouse538dbdd81 limpios al inicio. V1 conserva contratos/can y PostgreSQL local verificados; el schema obliga contenido creativo/editorial completo y tres artes sintéticas. No hay upload/AssetVersion listo ni editor genérico. Esto exige contenido versionado, no un formulario que fabrique datos. Identity depende de TASK-1834; no bloquea dominio/test harness, sí usuarios reales. El objetivo completo de EPIC-052 permanece activo, sin reducirlo a este corte.

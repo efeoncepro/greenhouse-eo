@@ -1,6 +1,15 @@
 # Rooms — perfiles de experiencia creativa y SEO/AEO V1
 
-Fecha: 2026-10-07. **Alcance de producto confirmado por el operador; contratos y renderers propuestos, sin implementación.** Owner: Product / Commercial con Creative y SEO/AEO. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [API](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md) · [EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+Fecha: 2026-10-07. **Alcance completo confirmado por el operador; contratos objetivo con implementación parcial posterior.** Owner: Product / Commercial con Creative y SEO/AEO. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [API](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md) · [EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+
+## Corte de implementación 2026-10-26
+
+Contenido V2 y procedencia/medios V3, readers autorizados y API/CLI implementan una parte del modelo;
+la demo incluye material creativo y editorial sintético. El canary físico demuestra una imagen privada,
+no la aceptación integral de dos propuestas reales ni todos los renderers de §3. Escenarios, tours,
+colaboración y capacidades multimedia completas mantienen sus entregas del roadmap. Claude Design
+posee la nueva interfaz; su conexión y aceptación están pendientes. [Estado vigente](README.md) y
+[contrato de conexión](../../documentation/rooms/backend-api-for-claude-design.md).
 
 ## 1. Una plataforma, experiencias según lo que se vende
 

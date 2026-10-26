@@ -1,5 +1,7 @@
 # TASK-2067 — Auth invitation email OTP
 
+> Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
+
 ## Delta 2026-10-25 — estado al corte de Codex
 
 - Código y migración en cloud; `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED=false` en `auth-server-00166-p77` y HMAC/autoridad sin montar (sólo con ON). Ningún correo enviado. Pendiente: parity S2S, mailer/KMS/S2S integrados, consumo atómico en Rooms, canary único y closing protocol. Corte en [registro de estado](../../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
@@ -22,11 +24,17 @@
 - UI ready: `n/a`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Canary interno real 2026-10-26 PASS: issuer y Rooms productivos, una entrega Resend y recepción Outlook, código consumido una vez, lectura privada y revocación comprobadas. Dominio remitente sin tracking; Resend producción v1 y Sentry production corregidos. Misma imagen Auth sin full release: revisión00167 ON para prueba,00168 OFF final100%, montajes OTP retirados y tipo de correo OFF. Assurance y activación general siguen abiertos; ningún cliente ni pentest completo afirmado.`
+- Status real: `2026-10-26: issuer/Rooms productivos completaron un correo combinado recibido, un challenge y consumo único, lectura privada y revocación. Final auth-server-00168-vzb100%, misma imagen; first-party/OTP OFF, montajes OTP retirados y tipo de correo OFF. Resend producción v1 y Sentry production corregidos. PR263/264 de control de despliegue abiertas y retenidas; assurance, cierre de concurrencia y activación general siguen separados.`
 - Rank: `P1`
 - Domain: `identity|platform|data`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
+
+## Conciliación vigente — 2026-10-26
+
+Canary de identidad y correo ya completado: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). [Auth retenido en PR](../../audits/rooms/2026-10-26-auth-deploy-control.md). No ampliar esa prueba a assurance completo, login Greenhouse, clientes o nueva activación. CI general y Vercel de ambos HEAD PR263/264 PASS según el [readback documental26Oct](../../audits/rooms/2026-10-26-docs-skills-state-readback.json); ambas PR siguen abiertas y retenidas. Los criterios aún abiertos abajo mantienen su razón y alcance.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
 
 ## Summary
 
@@ -84,6 +92,8 @@ Un código verificado no puede convertirse implícitamente en identidad global n
 - `scripts/auth-server/email-otp-local-smoke.sh`, `scripts/auth-server/email-otp-preview.tsx`.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 
@@ -155,7 +165,7 @@ Un código verificado no puede convertirse implícitamente en identidad global n
 ### Acceptance criteria additions
 
 - [x] Tablas declaradas en allowlist de escritura y migración verificada localmente: boundary-domain.test.ts y SQL local3PASS.
-- [x] Fuente, consumidores, invariantes, frontera y rollback SQL local comprobados en ADR/QA. Rollback operativo pendiente del canary.
+- [x] Fuente, consumidores, invariantes, frontera y rollback SQL local comprobados en ADR/QA. Rollback operativo a flags/montajes OFF verificado después en canary26Oct; los consumos no se revierten y la activación general sigue separada.
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -254,9 +264,9 @@ Peer Rooms posee contrato invitación y sesión; root posee email template, KMS,
 - [x] Reenvío invalida previo, idempotencia no duplica correo y límites sobreviven reenvío/versiones. Evidencia: QA local TASK-2067, 2026-10-25.
 - [x] Código nunca sale por HTTP ni persiste; secreto corto/ausente falla cerrado. Evidencia: QA local TASK-2067, 2026-10-25.
 - [x] SQL local prueba concurrencia; delivery/signing failure no permiten replay. Evidencia: QA local TASK-2067, 2026-10-25.
-- [ ] Mailer token_sensitive, auth S2S, authority reader y KMS integrados con evidencia.
+- [x] Mailer token_sensitive, auth S2S, authority reader y KMS integrados con evidencia. Evidencia: canary real26Oct con issuer autenticado, authority y proof verificado por Rooms; una entrega/consumo y replay/revoke negativos. No cierre de assurance general.
 - [ ] Rooms consume jti/invitation/session atómicamente y revocación bloquea sesión guest. E2E TASK-2066 confirma consumo, replay denegado y revoke→401; cierre de atomicidad/concurrencia en QA backend de la sesión dueña.
-- [ ] Rollout autorizado y canary end-to-end; estado runtime explícito.
+- [x] Rollout autorizado y canary end-to-end; estado runtime explícito. Evidencia: canary real26Oct y final00168/flags/tipo de correoOFF. Activación general no autorizada por este criterio.
 
 ## Verification
 

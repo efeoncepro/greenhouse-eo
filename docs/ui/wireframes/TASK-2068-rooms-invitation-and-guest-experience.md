@@ -1,5 +1,12 @@
 # TASK-2068 — Entrada, invitaciones y lectura real
 
+> Continuidad26Oct: referencia del diseño/scaffold anterior, no aceptación de la interfaz de Claude Design.
+> Codex conserva backend; Claude Design posee la nueva UI y su validación. Los requisitos de AXIS,
+> View Transitions, reduced-motion, fallback y accesibilidad siguen siendo obligaciones a verificar.
+> Integración/estado actual: [dossier Rooms](../../architecture/rooms/README.md) y
+> [contrato backend](../../documentation/rooms/backend-api-for-claude-design.md). No activar flags ni repetir canary por este documento.
+
+
 Diseño de implementación, 2026-10-25. No es captura ni aceptación visual. Contratos backend de gestión/coexistencia listos; alcance inicial OTP y texto V2, media R05 separada. Fuente: runtime Rooms main checkpoint 8308077 y canon de experiencia; no nuevo scaffold.
 
 ## Visual Direction Contract

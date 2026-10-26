@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Runtime20f9fe9 publicado; autoríaV2, accesoOIDC/OTP y lector/gestión implementados.178testsPASS, UI129+privacidad15PASS aislado. DBcloud/WIF/WAF preparados; ambosflagsOFF y canary conjunto Auth pendiente. Próximo tramo R05medios privados; editor/presentación/colaboración y aceptaciónvisual pendientes.`
+- Status real: `2026-10-26: Rooms main e4b2e890 publicado, GCS privado/SQL8migraciones26tablas y worker automático por Scheduler verificados. Canary interno de Microsoft/MFA, un correo recibido y PNG→WebP→lectura privada/revocación PASS; sala archivada y flags humanos first-party/OTP/invitaciones/medios web OFF. Emisor OAuth/MCP y login base Auth siguen activos. Suite234PASS y Playwright53PASS/3skip no equivalen a aceptación visual. Claude Design posee nueva interfaz; faltan entorno de integración aislado, consumidor same-origin, recorrido UI completo y activación general. PR263/264 Auth retenidas por operador; R05B y R09–R15 conservan alcance pendiente.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Commercial / Product; responsable individual por asignar`
@@ -20,7 +20,7 @@ Priority, Impact y Effort son inferencias de planificación por alcance multimed
 
 Coordina la construcción de **Efeonce Rooms**, plataforma propia de sales enablement y experiencia del comprador en `rooms.efeonce.org`. Alcance V1: una sala reutilizable para propuestas creativas y SEO/AEO, combinables. El primer recorrido que se materializa es creativo: propuestas gráficas completas, estáticas, largas, audio y video, acompañadas por sus PDFs originales. SEO/AEO añade oportunidad, muestra editorial/técnica, radiografía, evidencia, linaje, plan y medición; no se reduce a adjuntar un PDF o enlazar X-ray. El champion puede comprender, ensayar, presentar y defender la propuesta ante su comité; el evaluador puede explorar y preguntar con contexto.
 
-La administración vive en Rooms; UI, CLI y MCP consumen el mismo contrato. La documentación permanece en Greenhouse. El repo privado `efeoncepro/efeonce-rooms` existe en GitHub desde 2026-10-25; TASK-2061 posee su primera publicación Vercel de datos sintéticos. La persistencia de TASK-2060 se verifica en PostgreSQL local independiente; TASK-2069 ya prepara DBcloud propia y19tablas con flagsOFF. El canary de identidad y único correo autorizado siguen pendientes; no hay rollout a clientes externos. El dominio es un destino acordado, no una afirmación de DNS o servicio desplegado.
+La administración vive en Rooms; UI, CLI y MCP consumen el mismo contrato. La documentación permanece en Greenhouse. El repo privado `efeoncepro/efeonce-rooms` existe en GitHub desde 2026-10-25; TASK-2061 posee su primera publicación Vercel de datos sintéticos. La persistencia nació en PostgreSQL local independiente; TASK-2069/2072 ya tienen DBcloud propia con26tablas/8migraciones y GCS privado. El canary de identidad, correo único e imagen se completó y cerró OFF; no hay rollout a clientes externos. El dominio es un destino acordado, no una afirmación de DNS o servicio desplegado.
 
 ## Why This Epic Exists
 
@@ -60,30 +60,27 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 ## Child Tasks
 
-Canary interno real2026-10-26 completado: Microsoft/MFA, una sala sintética, un correo y un PNG físico con GCS/worker/lectura privada; aislamiento y revocación comprobados. Flags OFF restaurados. [Evidencia](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). No cierra UX, disparo del Job ni activación general.
+Canary interno real26Oct completado: Microsoft/MFA, una sala sintética, un correo recibido y un PNG físico con GCS/worker/lectura privada; aislamiento y revocación comprobados. El piloto quedó archivado/revocado, first-party/OTP/invitaciones/medios web OFF; OAuth/MCP y login base Auth permanecen activos. [Evidencia](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). El disparo posterior automático ya pasó: vacío200 sin contenedor, demanda202→JobSUCCESS→ack cercado/libre. [Scheduler](../../audits/rooms/2026-10-26-automatic-media-dispatch.json).
 
-[TASK-2072](../../tasks/in-progress/TASK-2072-rooms-cloud-media-backend.md): backend cloud de imágenes,
-worker desplegable/perfil propio y contrato API para Claude Design. Instrucción2026-10-26: diseño del
-operador con Claude Design; Codex backend. Publicación backend main a87852e por PR2 sin scaffold visual;
-infraestructura/IAM, migraciones cloud y Job aplicados con ejecuciónvacíaPASS; canary real y consumidor/disparoJob siguen pendientes.
+[TASK-2072](../../tasks/in-progress/TASK-2072-rooms-cloud-media-backend.md): backend cloud de imágenes y contrato para Claude Design, main `e4b2e890` por PR2/PR3;8migraciones/26tablas, GCS/IAM/CORS, worker por digest y Scheduler privado comprobados. Codex conserva backend y Claude Design interfaz. Falta entorno aislado/datos/permisos, consumidor same-origin y recorrido mediante la nueva UI; acceso productivo general permanece separado.
 
-[TASK-2070](../../tasks/in-progress/TASK-2070-rooms-private-image-media.md): R05A en implementación local; imágenes estáticas privadas, V3/procedencia explícita, procesamiento y publicación sobre bytes verificados. PDF/audio/video y adapter cloud conservan alcance posterior.
+[TASK-2070](../../tasks/in-progress/TASK-2070-rooms-private-image-media.md): R05A de imágenes estáticas implementado y con canary cloud por2072; V3/procedencia, generaciones y entrega verificada. PDF/audio/video y pipeline multimedia completo quedan en R05B; no se declaran listos por el PNG.
 
-[TASK-2071](../../tasks/in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md): editor de imágenes y visor privado, una imagen por bloque/operación con incorporación repetible; UI ready y hook verificados, implementación local sobre contratos2070. No completa R07/R08 ni aceptación humana.
+[TASK-2071](../../tasks/in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md): nuevo editor/visor bajo Claude Design. Scaffold anterior es referencia, `UI ready=no` hasta mapping y gates del nuevo diseño; conexión al backend, GVC y aceptación humana pendientes. No completa R07/R08.
 
-[TASK-2069](../../tasks/in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md): adapter WIF/Cloud SQL, DB propia y secretos separados; runtime20f9fe9 publicado con flags OFF; readback público y WAF activos, canary integrado pendiente.
+[TASK-2069](../../tasks/in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md): WIF/Cloud SQL, DB y secretos propios, WAF y piloto integrado ya verificados. La evidencia de restore previa cubre su esquema de fecha; el estado ampliado26tablas no hereda un ensayo de restore por conteo. Coste/observación y activación general mantienen gates.
 
-[TASK-2068](../../tasks/in-progress/TASK-2068-rooms-invitation-and-guest-experience.md): entrada con código, lectura guest y gestión contextual implementadas;129checks integrados y15privacidad PASS; media protegida pendiente R05 y aceptación humana pendiente.
+[TASK-2068](../../tasks/in-progress/TASK-2068-rooms-invitation-and-guest-experience.md): entrada con código, lectura guest y gestión históricas; la lectura V3/imagen privada ya pasó en HTTP real. Nueva UI, BFCache real y aceptación humana pendientes.
 
-[TASK-2065](../../tasks/complete/TASK-2065-rooms-efeonce-id-consumer.md): consumidor OIDC interno; foundation1834/login2064.
+[TASK-2065](../../tasks/complete/TASK-2065-rooms-efeonce-id-consumer.md): consumer OIDC interno cerrado localmente; foundation1834/login2064 y canary productivo interno posterior comprobados. [PR263/264 de control Auth](../../audits/rooms/2026-10-26-auth-deploy-control.md) retenidas por el operador aun con CI/VercelPASS, sin merge/deploy ni release262.
 
-[TASK-2066](../../tasks/in-progress/TASK-2066-rooms-tokenized-invitations-email-code.md): invitación por correo único enlace+código, input Rooms y sesión guest; OTPissuer2067.
+[TASK-2066](../../tasks/in-progress/TASK-2066-rooms-tokenized-invitations-email-code.md): correo inicial único enlace+código, proof/sesión guest room-scoped y revocación reales comprobados con OTPissuer2067. No repetir canary ni inferir invitaciones a clientes.
 
-[TASK-2062](../../tasks/complete/TASK-2062-rooms-versioned-content-authoring.md): R03B, manifest versionado, autoría programática y cobertura antes de publicar; R05 medios y R08 editor conservan alcance propio.
+[TASK-2062](../../tasks/complete/TASK-2062-rooms-versioned-content-authoring.md): R03B de autoría programática, manifest versionado y coverage. V1/V2 inmutables, V3 opt-in; un editor completo sigue perteneciendo a R08.
 
-Continuidad autorizada por /goal 2026-10-25: [TASK-2060](../../tasks/complete/TASK-2060-rooms-persistence-and-lifecycle.md) agrega persistencia/ciclo durable local. TASK-2059 suma View Transitions y adopción de badges/botones AXIS; aceptación visual sigue pendiente.
+[TASK-2060](../../tasks/complete/TASK-2060-rooms-persistence-and-lifecycle.md): cierre original de persistencia/ciclo local; evolución cloud en2069/2072. [TASK-2059](../../tasks/in-progress/TASK-2059-rooms-first-experience.md) conserva View Transitions/AXIS y QA de la demo previa; no aceptación visual de la nueva dirección.
 
-[TASK-2061](../../tasks/complete/TASK-2061-rooms-github-vercel-release.md) publica el repositorio privado y la demo en Vercel por autorización explícita. La integración Efeonce ID es condicional: el consumer internoTASK-2065 está verificado y la promoción conjunta del issuerTASK-1834/2067 se coordina antes de activar acceso.
+[TASK-2061](../../tasks/complete/TASK-2061-rooms-github-vercel-release.md): primera demo GitHub/Vercel cerrada por su evidencia. Los SHAs/deployments de su cierre son históricos; el main vigente está indicado arriba. Ningún cierre local, build o captura enciende acceso humano ni registra aceptación de diseño.
 
 **Primeras dos tasks hijas registradas el 2026-10-25:** [TASK-2058](../../tasks/complete/TASK-2058-rooms-foundation-and-permissions.md), foundation/contratos/can (primer corte R01/R04); [TASK-2059](../../tasks/in-progress/TASK-2059-rooms-first-experience.md), primera sala y vistas por rol (primer corte R02). Las dos tienen alcance local acotado; no completan R01/R02/R04 ni el piloto por inferencia.
 
@@ -108,6 +105,17 @@ Continuidad autorizada por /goal 2026-10-25: [TASK-2060](../../tasks/complete/TA
 | R15 | Certificación y rollout: dos marcas, perfiles creativo y SEO/AEO y tour combinado, champion, accesibilidad, resiliencia, costes, restore, canary y manuales | standard / QA + Ops + Commercial | R01–R14 | Todos los Exit Criteria con evidencia; despliegue/piloto autorizados y readback; handoff operativo |
 
 La exposición HTTP/CLI/MCP acompaña cada contrato desde R03; R13 integra y certifica, no deja la paridad para una reescritura al final. R09 define autoridad y estado durable; coordinación local entre ventanas es adapter de R10. R15 verifica el conjunto: no concentra implementación pendiente de otras unidades.
+
+## Lectura del roadmap al cierre26Oct
+
+- R01/R03: foundation, permisos, persistencia y autoría programática construidos; conservar los límites de cada task.
+- R04: OIDC/OTP y canary interno comprobados, con acceso humano OFF al finalizar; rollout general pendiente.
+- R05: R05A imágenes estáticas y trigger automático comprobados; PDF/audio/video y el resto multimedia pendientes.
+- R02/R06/R07/R08: demo/scaffold históricos disponibles; nuevo diseño, conexión y aceptación bajo Claude Design.
+- R09/R10: presentación/champion, consola, notas, coordinación y reconexión conservan sus unidades y criterios propios.
+- R11/R12: preguntas, pasos, actividad y su lectura comercial requieren completar y certificar sus contratos durables/experiencias; una capability declarada o una demo no los certifica.
+- R13/R14: CLI existente para operaciones construidas no certifica equivalencia final UI/CLI/MCP ni puentes comerciales/CRM/X-ray; esas unidades siguen abiertas.
+- R15: certificación conjunta de dos marcas, perfiles/tour/champion, costes/resiliencia/restore y rollout continúa abierta. El canary único no cierra el epic.
 
 ## Sequence and Milestones
 

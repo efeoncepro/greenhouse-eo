@@ -25,26 +25,33 @@ históricas de este ADR a contratación externa y pareo obligatorio de proveedor
 de cobertura y cierre de hallazgos críticos/altos; el informe declara sus límites y no es certificación de un tercero.
 No autoriza comprar servicios ni implica haber completado la evaluación o desplegado el piloto.
 
-## Contrato de despliegue del servicio único — 2026-10-26
+## Control de despliegue preparado en PR, sin integración — 2026-10-26
 
-`auth-server` es producción en `auth.efeonce.org`; no existe un servicio Auth staging. El control de
-publicación usa sólo pushes a `main`, promoción por `production-release.yml` desde `main` o dispatch
-productivo desde `main`. Todas las vías seleccionan el Environment `production` y un único lock del
-servicio, sin cancelar un despliegue activo. Este contrato sustituye las referencias históricas de este
-ADR a staging sobre el mismo servicio.
+`auth-server` es producción en `auth.efeonce.org`; no existe un servicio Auth staging. **Estado: LOCAL+PR,
+retenido por el operador; no es todavía el contrato efectivo del YAML remoto.** PR #263 HEAD `5e1fc2554`
+y PR #264 HEAD `aabd6d78d` siguen abiertas, sin merge ni despliegue. El remoto todavía permite pushes de
+`develop` al servicio único. El control preparado usará sólo pushes a `main`, promoción por `production-release.yml` desde `main` o dispatch
+productivo desde `main`. Al integrarse, todas las vías seleccionarían el Environment `production` y un único lock del
+servicio, sin cancelar un despliegue activo. Este contrato propuesto sustituiría las referencias históricas de este
+ADR a staging sobre el mismo servicio una vez integrado; no declarar esa sustitución aplicada hoy.
 
-El SHA completo debe estar publicado en `main` y ser el checkout construido. Antes de crear una revisión,
-el workflow identifica la única revisión con 100% del tráfico y rechaza una fuente desconocida, tráfico
+En el control preparado, el SHA completo debe estar publicado en `main` y ser el checkout construido. Antes de crear una revisión,
+el workflow preparado identifica la única revisión con 100% del tráfico y rechaza una fuente desconocida, tráfico
 dividido o reemplazar código vivo no promovido por un target anterior o divergente. Publicar un fix del
 control no promueve el runtime servido desde `develop`: ese caso queda bloqueado antes de build/deploy,
 con error explícito. El release amplio y la activación first-party/OTP siguen siendo decisiones separadas.
 
-Resend usa el secreto production v1 y Sentry declara `production`; el drift verifica ambos y los montajes
-OTP se retiran con el flag OFF. Flags y cohorte conservan sus inputs gobernados. La eliminación efectiva
+El runtime vivo conserva Resend production v1 y Sentry `production`. El drift preparado verificará ambos
+y el deploy preparado retirará los montajes OTP con el flag OFF. Flags y cohorte conservan sus inputs gobernados. La eliminación efectiva
 del disparador de `develop` exige actualizar también su YAML remoto: GitHub evalúa el workflow de la rama
 que recibe el push. Las PR estrechas de control se publican por separado sobre cada base, sin incorporar
 el historial local ni código runtime/UI. Preparar o fusionar esas PR no acredita un deploy: comprobar
-checks, ausencia de build cuando el guard bloquea y revisión con tráfico después de publicar.
+checks, ausencia de build cuando el guard bloquee y revisión con tráfico después de una publicación autorizada.
+Antes de la futura integración de PR #264, proteger de forma gobernada los deploys artifact/commercial/ico/ops
+que coinciden con el nuevo path de test `src/lib/**`; ninguna protección temporal se aplicó ahora.
+Seguimiento CI26Oct: PR #263 y #264 CI completo y Vercel PASS; ambas siguen abiertas por retención humana. La retención no bloquea nueva UI aislada; no autoriza el release #262 ni activación.
+Estado vivo: [readback del 26 de octubre 17:38:40 Chile](../audits/rooms/2026-10-26-docs-skills-state-readback.json).
+Secuencia y retención: [runbook](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
 
 ## Contrato vigente de acceso interno y federación
 

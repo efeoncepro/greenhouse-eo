@@ -1,5 +1,7 @@
 # TASK-2066 — invitación con enlace y código en un correo
 
+> Estado posterior26Oct: consultar la [task vigente](../in-progress/TASK-2066-rooms-tokenized-invitations-email-code.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 25-10-2026. Julio pidió preparar el flujo completo y aclaró su forma final: UN correo inicial contiene enlace
 y código; la persona pega el código EN Rooms. Resend existente es el proveedor. No solicita otro correo al
 abrir ni se presenta como MFA. Goal, implementación local y subagentes ya autorizados.

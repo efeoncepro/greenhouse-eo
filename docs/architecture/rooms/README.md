@@ -1,12 +1,30 @@
 # Efeonce Rooms
 
-> Canary real2026-10-26 completado: Efeonce ID, un correo y una imagen física procesada/servida en privado; revocación comprobada y flags OFF restaurados. [Prueba y alcance](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). Consumidor frontend y disparo del Job pendientes.
+**Estado vigente al 2026-10-26:** runtime privado [efeoncepro/efeonce-rooms](https://github.com/efeoncepro/efeonce-rooms),
+`main@e4b2e890` ([PR3](https://github.com/efeoncepro/efeonce-rooms/pull/3)), publicado en
+[efeonce-rooms.vercel.app](https://efeonce-rooms.vercel.app/demo). `rooms.efeonce.org` sigue siendo el
+subdominio acordado; su DNS no se declara activado.
 
+**Propósito:** plataforma comercial propia para comprender, evaluar y defender propuestas creativas y
+SEO/AEO, combinables en una sala. La implementación actual no acredita todo el alcance de V1/EPIC-052.
 
+| Frente | Implementado y comprobado | Pendiente / límite |
+| --- | --- | --- |
+| Backend/API/CLI | Salas, borradores y ediciones inmutables V1/V2/V3; autoridad persistida y `can`; revisión/idempotencia, auditoría/outbox; lectores y comandos compartidos | Autoría visual completa, presentación, colaboración, integraciones y MCP del roadmap |
+| Identidad e invitación | Canary real conjunto Efeonce ID/Microsoft/MFA, un correo enlace+código, sesión guest, lectura y revocación | Flags humanos OFF; sala del canary archivada/invitación revocada; no repetir correo ni ampliar cohorte |
+| Medios | GCS privado, PUT directo, verificación de bytes/generación y dos WebP desde un PNG físico; entrega GET/HEAD/Range/304 reautorizada | Consumidor de la nueva interfaz; PDF/audio/video y originales descargables no pertenecen al corte de imágenes |
+| Operación cloud | Ocho migraciones/26 tablas; SA/rol propio worker; Scheduler OIDC cada minuto, sólo arranca Job con demanda; lease10min, timeout240s/retries0 | Activación general y entorno de integración de la nueva UI separados |
+| Diseño e interfaz | Scaffold y demo sintética; primitives/logo oficiales AXIS/La órbita | Claude Design posee interfaz; conexión y aceptación visual humana pendientes |
+| Auth deploy-control | Corrección preparada en PR263/264 de Greenhouse | Operador exige conservarlas en PR, sin merge main/develop ni deploy; no release262 |
 
-**Nombre y subdominio acordados:** Efeonce Rooms · `rooms.efeonce.org`.
-**Propósito:** experiencia comercial y conversión de demanda; ayuda al comprador a comprender, evaluar y defender una solución. Sirve a propuestas creativas y SEO/AEO, combinables en una sala. Puede abrir conversaciones mediante muestras o diagnósticos personalizados.
-**Estado al 2026-10-25:** runtime `20f9fe9` publicado en [Vercel](https://efeonce-rooms.vercel.app/invite), deployment `dpl_7o71umG3uuNgz8RguhPPGksA69ad`; repo privado [efeoncepro/efeonce-rooms](https://github.com/efeoncepro/efeonce-rooms). Autoría V2, lector protegido, invitación por correo único enlace+código y gestión contextual implementados. Suite178/178 PASS; UI integrada129 comprobaciones y15 de privacidad PASS en entorno aislado. PostgreSQL cloud propio con19tablas/5migraciones, WIF/secretos y WAF preparados y verificados; ambos flags de acceso siguen OFF. Readback público: /invite200, /login503 disabled y logout200. Piloto con Efeonce ID y único correo real aún pendientes de coordinación con Auth. Medios privados/editor/presentación/colaboración conservan su alcance pendiente en EPIC-052; aceptación visual humana pendiente. DNS `rooms.efeonce.org` no activado. [Evidencia de seguridad](../../audits/rooms/2026-10-25-invitation-token-hardening.md), [aislamiento SQL](../../audits/rooms/2026-10-25-cloud-isolation.md).
+`ROOMS_MEDIA_DISPATCH_ENABLED=true` habilita sólo la máquina. Acceso first-party, invitaciones y medios
+web permanecen OFF. Backend234/234 y9pruebas focales PASS; Playwright53PASS/3skip y CI Linux PASS
+acreditan verificaciones automáticas, no aceptación humana ni rollout general.
+
+Evidencia: [canary real y cierre OFF](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md),
+[disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json),
+[DB8 y permisos](../../audits/rooms/2026-10-26-media-dispatch-database.json),
+[Auth retenido](../../audits/rooms/2026-10-26-auth-deploy-control.md).
 
 **Programa:** [EPIC-052 — Efeonce Rooms](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md), `in-progress`: quince unidades de planificación; tasks para foundation, UI, persistencia, autoría versionada, identidad/invitaciones y primer release autorizado, con permisos can y vistas cliente/operador/administrador. La épica es dueña de secuencia, dependencias y cierre; estos documentos conservan los contratos de producto/arquitectura.
 
@@ -15,8 +33,9 @@
 ## Continuidad 2026-10-26 — backend y diseño
 
 El operador hará el diseño con **Claude Design**; Codex retoma exclusivamente backend.
-[TASK-2072](../../tasks/in-progress/TASK-2072-rooms-cloud-media-backend.md) agrega storage GCS,
-transferencia directa limitada, worker compilado e identidad propia, sin activar producción.
+[TASK-2072](../../tasks/in-progress/TASK-2072-rooms-cloud-media-backend.md) implementó storage GCS,
+transferencia directa limitada, worker compilado e identidad propia y su disparo automático. La máquina
+está habilitada; el acceso humano/medios web y el rollout general permanecen OFF.
 [Contrato de API para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md).
 La UI rescatada2071 conserva su condición de scaffold y la aceptación visual sigue pendiente.
 
@@ -28,7 +47,7 @@ La UI rescatada2071 conserva su condición de scaffold y la aceptación visual s
 4. [Experiencia completa](EFEONCE_ROOMS_EXPERIENCE_V1.md).
 5. [Perfiles creativo y SEO/AEO; continuidad X-ray](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md): bloques, evidencias, sala combinada y aceptación V1.
 
-6. [Política de versiones y baseline técnico](EFEONCE_ROOMS_STACK_BASELINE_V1.md): últimas estables compatibles, hallazgos TS7/ESLint10 y pins ejecutados; build local verificado, hosting pendiente.
+6. [Política de versiones y baseline técnico](EFEONCE_ROOMS_STACK_BASELINE_V1.md): últimas estables compatibles, hallazgos TS7/ESLint10 y pins ejecutados; pins y build ejecutados; hosting Vercel publicado, aceptación visual separada.
 7. [Marca de Rooms](EFEONCE_ROOMS_MARK_DECISION_V1.md): «eslabón leve», las dos «o» como órbitas enlazadas con la esfera Growth a la 1:30 de la segunda (nunca en un cruce); aceptada 2026-10-08, 18 SVG `rooms-*` en `axis-brand-assets` 0.4.27 (publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages)). Revisión de parecido por web del mismo día (no es asesoría legal): el riesgo real es el nombre, casi genérico en la categoría; firmar siempre Efeonce | Rooms y hacer búsqueda formal de «EFEONCE ROOMS» mixta. Uso: [manual de la marca](../../manual-de-uso/creative/usar-marca-efeonce-rooms.md).
 
 ## Construcción actual
@@ -36,9 +55,10 @@ La UI rescatada2071 conserva su condición de scaffold y la aceptación visual s
 - [TASK-2070 — imágenes privadas y procedencia](../../tasks/in-progress/TASK-2070-rooms-private-image-media.md): primer circuito local PNG/JPEG/WebP, procesamiento fuera del request, publicación y entrega autorizada; [ADR](EFEONCE_ROOMS_PRIVATE_IMAGE_MEDIA_AND_PROVENANCE_DECISION_V1.md).
 - [TASK-2071 — editor y visor](../../tasks/in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md): cargar, validar, incorporar, previsualizar y publicar; zoom/teclado y retorno al contenido. Una imagen por bloque, varias piezas por sala.
 
-Ambas continúan el goal autorizado, con hooks verificados. El backend de2070/2072 se integró en main a87852e
-sin el scaffold UI2071. El canary de identidad sigue separado y pendiente. Recursos/worker/migraciones
-de medios cloud, PDF/audio/video, editor completo y presentación conservan entregas pendientes.
+TASK-2070/2072 tienen backend cloud publicado; TASK-2071 conserva la conexión y aceptación de la nueva
+interfaz. El canary conjunto ya se completó, con cierre OFF. El disparo automático también se verificó;
+ninguno debe volver a listarse como trabajo pendiente. PDF/audio/video, editor completo, presentación,
+colaboración y demás unidades de la épica conservan sus entregas propias.
 
 ## Contratos de experiencia para revisión
 
@@ -51,7 +71,7 @@ Las decisiones de producto y contratos viven en estos documentos; el nombre fina
 
 Antecedentes: [frontera comercial aceptada](../sales-enablement/EFEONCE_SALES_ENABLEMENT_PLATFORM_DECISION_V1.md) e [investigación técnica inicial](../../think/creative-proposal-experience-stack-analysis-2026-10-07.md). La solución genérica anterior queda reemplazada por este dossier. Los productos actuales conservan su runtime.
 
-Próximo checkpoint: cerrar canary conjunto Auth–Rooms y continuar R05 (medios privados), que desbloquea exploración y autoría visual. [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md), [manual de operación](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) y [QA inicial](../../audits/rooms/2026-10-25-first-local-delivery.md) conservan su evidencia histórica; el estado vigente es el indicado arriba y en las tasks2066/2068/2069.
+Próximo checkpoint: preparar entorno de integración aislado, conectar el diseño a la API del mismo origen y verificar cargar→procesar→adjuntar→publicar→leer desde esa interfaz. Auth permanece en PR; activar acceso/medios de producción exige una decisión posterior. [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md), [manual de operación](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) y [QA inicial](../../audits/rooms/2026-10-25-first-local-delivery.md) conservan su evidencia histórica; el estado vigente es el indicado arriba, en TASK-2072 y en el ledger de la skill Rooms.
 
 ## Verificación documental 2026-10-07
 

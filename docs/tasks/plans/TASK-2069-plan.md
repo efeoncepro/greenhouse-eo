@@ -1,5 +1,7 @@
 # TASK-2069 — plan propuesto de cloud runtime y piloto Rooms
 
+> Estado posterior26Oct: consultar la [task vigente](../in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 Fecha: 2026-10-25. Estado: plan de implementación autorizado por goal humano y confirmación de infraestructura/piloto
 verificada en peer Auth. ADR aceptado para adapter y validación; gates de provisioning/activación pendientes. Raíz posee índices,
 registro de tasks, Handoff y coordinación de release. Este plan no es un recibo cloud.

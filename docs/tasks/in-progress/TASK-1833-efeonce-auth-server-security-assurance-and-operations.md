@@ -97,13 +97,19 @@ El assessment de este slice consume su ADR y código; no bloquea el diseño inic
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-10-25: discovery, plan y señales de assurance implementados localmente para producción controlada Auth/Rooms autorizada por Julio; correo real sólo jreyes@efeoncepro.com. Superficie1829/1830 ya existe; se retira su bloqueo genérico de inicio. Readback público/GCP: issuer saludable00165-kn4, GC horario activo, JWKS dos kids, keyrotation scheduler ausente. Cinco señales nuevas integradas; tests17PASS y SQL7PASS, typecheckPASS. Protocolos1834/OTP2067 y consumer Rooms tienen evidencia local; activación y canary productivos todavía pendientes. A1–A7 contrastados con código/evidencia posterior, sin equiparar revisión a pentest. Evaluaciónofensivarefutada/privacidadV2/runbooksensayados/rotaciónprogramada/steady7d conservan criterios abiertos.`
+- Status real: `2026-10-26: assurance propio conserva pruebas/señales locales y revisión entre agentes; no pentest completo ni certificación externa. Canary real Auth/Rooms con Microsoft/MFA, un correo y una imagen completado y cerrado OFF; Auth00168-vzb100%, SHA754a2a28, health/ready/discovery200. Esto no cierra abuso ofensivo refutado, privacidadV2, rotación programada, ensayos de runbooks ni steady7d. PR263/264 de control de despliegue retenidas por el operador, sin merge/deploy.`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Conciliación vigente — 2026-10-26
+
+Canary de identidad y correo ya completado: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). [Auth retenido en PR](../../audits/rooms/2026-10-26-auth-deploy-control.md). No ampliar esa prueba a assurance completo, login Greenhouse, clientes o nueva activación. CI general y Vercel de ambos HEAD PR263/264 PASS según el [readback documental26Oct](../../audits/rooms/2026-10-26-docs-skills-state-readback.json); ambas PR siguen abiertas y retenidas. Los criterios aún abiertos abajo mantienen su razón y alcance.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
 
 ## Summary
 
@@ -185,6 +191,8 @@ Reglas obligatorias:
 - `src/lib/auth-server/**` (fixes derivados del red-team/pentest)
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 

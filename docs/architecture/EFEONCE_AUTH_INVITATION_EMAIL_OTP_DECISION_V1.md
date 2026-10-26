@@ -2,7 +2,18 @@
 
 > Status: Accepted — flujo autorizado por Julio y coordinado entre Auth y Rooms, 2026-10-25.
 > Owner: TASK-2067 (issuer); TASK-2066 (invitación, correo contextual y sesión guest Rooms).
-> Runtime: contrato de implementación; sin envíos ni rollout productivo acreditados.
+> Runtime al 26 de octubre: canary único real PASS y cerrado; first-party/OTP OFF. Activación duradera retenida.
+
+## Corte operativo — 2026-10-26
+
+El canary conjunto Auth+Rooms pasó con una identidad interna y Microsoft/MFA, OIDC y renovación SSO,
+una sala sintética, un PNG privado y un único correo recibido. Se verificaron wrong-code, replay y
+revocación; invitación revocada, sala archivada y sesiones de prueba cerradas. No repetir el correo.
+Auth conserva `00168-vzb` al 100%, SHA754a2a28/digest122e2acb, first-party/OTP false y montajes HMAC/authority
+ausentes; Resend production v1 y Sentry production. Esto no abre acceso general ni acredita pentest,
+release #262, migración del portal o aceptación de la nueva UI. La UI puede desarrollarse aislada.
+El control de deploy sólo está LOCAL+PR #263/#264 abiertas, con retención humana sin merge/despliegue.
+[Estado, CI y próximos pasos](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
 
 ## Decisión y frontera
 
@@ -81,7 +92,9 @@ canonical authority fallan cerrado. No existe endpoint público que reciba un em
 TASK-2067 entrega `src/lib/auth-server/email-otp/**`, stores memoria/PostgreSQL, migración aditiva y pruebas.
 Auth root integra router, autenticación cliente, authority reader y signer; email adapter/template gobernados.
 TASK-2066 implementa canonical resolver confiable y consumo de proof/sesión. Un mock no prueba esa integración.
-La feature queda deshabilitada hasta adapters completos. No se aplica DB cloud ni se envían correos reales.
+El baseline local no autorizaba DB cloud ni correo real. El canary acotado del 26 de octubre integró adapters,
+Cloud SQL, mailer y signer reales con una única entrega recibida y cleanup. La feature vuelve a OFF;
+no queda habilitada para operación general ni se autoriza repetir ese canary.
 
 Tests exigibles: correo único/idempotencia; wrong code; replay/concurrencia; expiry; revocación/recipient/version;
 cruce RP; nonce; rate-limit agregado; resend invalida anterior; delivery fallo; firma falla tras consume;

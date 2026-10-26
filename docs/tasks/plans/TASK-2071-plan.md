@@ -1,5 +1,7 @@
 # TASK-2071 — Plan de consumidor de imágenes privadas
 
+> Estado posterior26Oct: consultar la [task vigente](../in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 Estado: diseño mínimo aprobado por raíz bajo goal vigente; contrato 2070 congelado, readiness lista; ejecución local tras hook. Sin cloud, push ni ampliación de canary 20f9fe9. Backend2070 posee package/lock y codec.
 
 ## Source and decision

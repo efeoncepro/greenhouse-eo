@@ -1,6 +1,17 @@
 # Operar la primera experiencia local de Rooms
 
-Fecha: 2026-10-25. Owners: Platform/Product. [Dossier](../../architecture/rooms/README.md) · [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md).
+Creado: 2026-10-25; continuidad operativa: 2026-10-26. Owners: Platform/Product. [Dossier](../../architecture/rooms/README.md) · [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md).
+
+## Estado y alcance
+
+Este manual opera demo y herramientas **locales**; no activa el acceso de producción. El runtime
+publicado es main `e4b2e890`, con GCS/DB/worker automático ya verificados, flags humanos OFF y sólo
+dispatch de máquina ON. El canary real de identidad/correo/imagen terminó revocado/archivado; no usar
+esa sala como fixture activa ni repetir el envío. [Estado y evidencia](../../architecture/rooms/README.md).
+
+La nueva UI pertenece a Claude Design. Preparar un entorno de integración aislado y conectar la API
+same-origin; no copiar WIF/secretos de Production a Preview ni introducir bearer tokens en almacenamiento
+del navegador. Auth sigue en PR263/264, sin merge/deploy. [Contrato vigente](../../documentation/rooms/backend-api-for-claude-design.md).
 
 ## Arranque
 
@@ -71,7 +82,7 @@ pnpm rooms edition --organization ORGANIZATION_ID --room ROOM_ID --edition EDITI
 pnpm rooms execute --organization ORGANIZATION_ID --operation rooms.updateDraft --input draft.json --idempotency-key revision:00000001
 ```
 
-La CLI toma `ROOMS_ACCESS_TOKEN` del entorno y no lo imprime; la integración que verificará ese token aún está pendiente. No usar los readers demo como fallback. El archivo de `--input` es sólo el payload del command; la CLI construye el envelope con organización y operación.
+El resolver productivo no acepta bearer nativo. Para una sesión ya existente del origin exacto, la CLI admite `--session-file <ARCHIVO_PRIVADO_0600>` con `{origin,sessionCookie}`, sin symlink; no crea identidad ni evita expiración/revocación. `ROOMS_ACCESS_TOKEN` se conserva para consumers aprobados/fixtures históricos, no para prometer login CLI certificado. No usar readers demo como fallback. `--input` es sólo el payload; la CLI construye organización/operación. [Contrato CLI/sesión](../../documentation/rooms/backend-api-for-claude-design.md).
 
 | Ruta | Función |
 |---|---|
@@ -83,7 +94,7 @@ La CLI toma `ROOMS_ACCESS_TOKEN` del entorno y no lo imprime; la integración qu
 | `GET /api/v1/rooms/:roomId/editions/:editionId?organizationId=…` | Snapshot exacto |
 | `POST /api/v1/commands` | Command JSON con `Idempotency-Key` |
 
-Commands implementados: `rooms.create`, `rooms.updateDraft`, `editions.publish`, `editions.reopen`, `rooms.archive`, `access.grant` y `access.revoke`. Crear recibe `{roomId, content}`; actualizar recibe `{roomId, expectedRevision, content}`; publicar/archivar reciben `{roomId, expectedRevision}`; reabrir añade `sourceEditionId`. El contrato estricto de grants y contenido vive en `src/domain/persistence-contracts.ts`; el contenido sigue siendo sintético. Ningún command acepta notas internas dentro del snapshot.
+Commands implementados: `rooms.create`, `rooms.updateDraft`, `editions.publish`, `editions.reopen`, `rooms.archive`, `access.grant` y `access.revoke`. Crear recibe `{roomId, content}`; actualizar recibe `{roomId, expectedRevision, content}`; publicar/archivar reciben `{roomId, expectedRevision}`; reabrir añade `sourceEditionId`. El contrato estricto de grants y contenido vive en `src/domain/persistence-contracts.ts`; V1/V2 conservan su origen sintético y V3 exige procedencia explícita real/synthetic. Ningún command acepta notas internas dentro del snapshot.
 
 Guardar exige la revisión leída: conflicto409 no pisa cambios concurrentes. La clave de idempotencia admite8–200 caracteres alfanuméricos, punto, guion, guion bajo y dos puntos; debe empezar por alfanumérico. Repetir clave/payload devuelve el recibo anterior sólo si la autoridad continúa vigente; cambiar el payload produce409. Publicar fija una edición inmutable; reabrir crea otro borrador y conserva la publicación. Recursos ajenos o no disponibles devuelven404; errores de configuración/disponibilidad503 están sanitizados. Lecturas y respuestas llevan `private, no-store` y correlationId.
 
@@ -132,9 +143,7 @@ Los tipos desconocidos se reportan y el apply completo se rechaza, sin descartar
 
 El manifiesto tiene bloques editorial/media/diagnostic/plan, evidencia declarada, relaciones evidence/lineage
 y referencias AssetVersion. Campos y límites: `src/domain/content-contracts.ts`. IDs y anclas se preservan;
-fuentes son `author-declared` / `unverified`, no verificación de hechos. El corte mantiene `dataOrigin:synthetic`.
-Sin pipeline R05, cualquier AssetVersion referenciada permanece unresolved y bloquea publicación si se incluye;
-una exclusión opcional requiere motivo explícito. No importar `ready`, deliveryURL, rol ni verificación.
+fuentes son `author-declared` / `unverified`, no verificación de hechos. V1/V2 conservan `dataOrigin:synthetic`. Las referencias legacy no se convierten automáticamente; V3 admite assets del pipeline privado verificado. Un asset required sin ready/resolución bloquea publicación; una exclusión opcional requiere motivo explícito. No importar `ready`, deliveryURL, rol ni verificación.
 
 `editions.publish` recalcula coverage dentro de la transacción. Snapshot V2 lleva
 `rooms.room.v2` / `rooms.renderer.v2`, manifiesto y coverage congelados. Audiencia recibe proyección por
@@ -147,12 +156,12 @@ por variable de entorno en la composición de producción.
 
 ## Consumidor Efeonce ID — TASK-2065
 
-Backend local verificado con issuer1834 real y Chrome. Por defecto `ROOMS_FIRST_PARTY_AUTH_ENABLED=false`;
+Backend local y canary cloud verificados con issuer1834 real y Chrome/Microsoft/MFA. El canary cloud ya terminó con cierre OFF; no repetirlo por esta instrucción local. Por defecto `ROOMS_FIRST_PARTY_AUTH_ENABLED=false`;
 `/login` y readers de sesión responden503 disabled sin consultar DB/red. Con flag activo, `/login` crea
 transacción y redirige al issuer, `/auth/callback` verifica código/iss/state/nonce/PKCE y crea sesión local.
 `GET /api/auth/session` devuelve estado/contextos propios mínimos; `GET/POST /auth/context` permite escoger
 organización mediante JSON `{organizationId}` y Origin exacto. `POST /auth/logout` cierra sólo Rooms.
-Contexto/recovery aún no tienen pantallas de producto; este corte no se activa para humanos en producción.
+Contexto/recovery aún requieren su integración de producto; el acceso humano general de producción permanece desactivado. La prueba acotada completada no autoriza encenderlo.
 
 Config server-only documentada en `.env.example`: ROOMS_AUTH_ISSUER, ORIGIN, CLIENT_ID, CLIENT_SECRET y
 ENCRYPTION_KEY (32bytes base64). HTTP sólo con ALLOW_LOCAL_DEVELOPMENT explícito y loopback. No copiar
@@ -167,3 +176,15 @@ no se exportan; el handle OIDC no sirve como ROOMS_ACCESS_TOKEN para la CLI.
 y sus bases reales; el archivo0600 lo entrega el harness del issuer. Script no opera contra producción ni
 imprime secretos. Para rollback normal apagar flag y revocar sesiones propias; migración down sólo clon
 vacío descartable. [Evidencia y límites](../../audits/rooms/2026-10-25-efeonce-id-consumer.md).
+
+## Medios privados e integración con Claude Design
+
+Usar el [contrato de backend](../../documentation/rooms/backend-api-for-claude-design.md) para DTOs,
+`uploads.initiate`→transfer→PUT→complete→estado→attach→publish y lectura privada. El entorno local y GCS
+comparten contrato; para GCS el navegador omite credenciales de la app y respeta headers/destino/TTL.
+No usar optimizador/caché pública para derivados ni exponer originales.
+
+El [manual del worker](operar-worker-medios.md) describe Scheduler, lease, consulta y rollback. Los comandos
+de ese manual apuntan a producción y no forman parte de este arranque local: no ejecutarlos por seguir
+una prueba de UI. Falta el entorno de integración de la nueva interfaz y su prueba completa; no confundir
+los 53PASS/3skip de Playwright del scaffold con aceptación visual de Claude Design.

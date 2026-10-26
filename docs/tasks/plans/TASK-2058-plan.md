@@ -1,5 +1,7 @@
 # Plan — TASK-2058 Rooms
 
+> Estado posterior26Oct: consultar la [task vigente](../complete/TASK-2058-rooms-foundation-and-permissions.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 Fecha 2026-10-25. Objetivo/primera entrega aprobados por Julio («Vamos»), ampliados con permisos can y subagentes explícitos. No requiere otro checkpoint para el mismo alcance.
 
 ## Discovery summary

@@ -1,5 +1,7 @@
 # TASK-2059 — Rooms: primera sala y vistas por rol
 
+> Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
+
 ## Delta 2026-10-25 — respuesta humana a la demo (NO aceptada)
 
 - Julio revisó la demo publicada (`efeonce-rooms.vercel.app/demo`, `20f9fe9`) y respondió: «la verdad no sé si es lo que busco… buscaba algo más inmersivo». **No es una aceptación.** Pidió frenar Rooms por ahora. Antes de seguir con más superficie (R07–R12) hay que revisar la dirección de experiencia con él: qué significa «inmersivo» para Rooms (`EFEONCE_ROOMS_EXPERIENCE_V1.md`, dirección visual) y validarlo con una maqueta antes de construir.
@@ -25,13 +27,19 @@
 - Motion: `docs/ui/motion/TASK-2059-rooms-first-experience-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-052`
-- Status real: `UI refinada con Product Design, AXIS y View Transitions;41 E2E +16 motion/authority,8 contraste y24 burst/foco PASS; GVC4viewports/68frames sin findings; aceptación visual humana pendiente`
+- Status real: `2026-10-26: demo histórica y QA automatizado disponibles; Rooms main e4b2e890 conserva la interfaz previa. El operador asignó la nueva interfaz a Claude Design y backend a Codex. View Transitions/AXIS y capturas históricas no acreditan aceptación humana; diseño e integración del nuevo consumidor siguen pendientes.`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`
 - Branch: `Greenhouse develop para docs; nuevo runtime efeonce-rooms main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Conciliación vigente — 2026-10-26
+
+Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
 
 ## Summary
 
@@ -85,6 +93,8 @@ EPIC-052 tenía sólo definición. El operador autorizó base mínima seguida in
 - Esta task, su plan, epic, dossier Rooms, índices y handoff de Greenhouse.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 

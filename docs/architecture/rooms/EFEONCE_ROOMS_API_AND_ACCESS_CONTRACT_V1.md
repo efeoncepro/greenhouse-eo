@@ -1,6 +1,22 @@
 # Efeonce Rooms — contrato API y acceso V1
 
-Diseño inicial: 2026-10-07. **Contrato objetivo; implementación parcial verificada al2026-10-25, descrita en §7 y §8.** [Arquitectura](EFEONCE_ROOMS_ARCHITECTURE_V1.md).
+Diseño inicial: 2026-10-07. **Contrato objetivo; el corte implementado al2026-10-26 se distingue abajo de la paridad futura.** [Arquitectura](EFEONCE_ROOMS_ARCHITECTURE_V1.md).
+
+## Corte vigente — 2026-10-26
+
+Salas/lifecycle, borradores/ediciones V1/V2/V3, permisos `can`, API/CLI, identidad/invitación y medios
+privados tienen backend ejecutable. [Guía de endpoints/DTO/errores para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md)
+es el contrato de conexión actual: `authoring`, `preview`, `media`, estado/transfer de uploads, commands
+y bytes privados de derivados. Main `e4b2e890`; ocho migraciones/26 tablas y Scheduler de máquina por demanda.
+
+Canary real de identidad/correo/imagen completado y cerrado; no repetir. Acceso/invitaciones/medios web
+OFF, dispatch máquina ON; sala del canary archivada e invitación revocada. La nueva interfaz aún requiere
+conexión/prueba integrada; Auth se conserva en PR263/264. [Estado y evidencia](README.md).
+
+Las familias de §1 son el **contrato objetivo completo**, no inventario de endpoints disponibles. MCP,
+colaboración, presentación avanzada, escenarios y multimedia más allá de imágenes siguen en roadmap.
+Los apartados fechados25Oct preservan el avance de cada corte; sus pendientes locales no sustituyen
+este estado vigente. La autoridad productiva no acepta un bearer nativo por inferencia de CLI/MCP.
 
 ## 1. Paridad por capacidad
 

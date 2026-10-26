@@ -7,7 +7,18 @@
 > Confidence: alta en límites; readiness productiva depende de pruebas y rollout.
 > Validated as of: 2026-10-25, discovery de código y probes públicos del issuer.
 
-## Context
+## Corte operativo — 2026-10-26
+
+El canary conjunto Auth+Rooms pasó con una identidad interna y Microsoft/MFA, OIDC y renovación SSO,
+una sala sintética, un PNG privado y un único correo recibido. Se verificaron wrong-code, replay y
+revocación; invitación revocada, sala archivada y sesiones de prueba cerradas. No repetir el correo.
+Auth conserva `00168-vzb` al 100%, SHA754a2a28/digest122e2acb, first-party/OTP false y montajes HMAC/authority
+ausentes; Resend production v1 y Sentry production. Esto no abre acceso general ni acredita pentest,
+release #262, migración del portal o aceptación de la nueva UI. La UI puede desarrollarse aislada.
+El control de deploy sólo está LOCAL+PR #263/#264 abiertas, con retención humana sin merge/despliegue.
+[Estado, CI y próximos pasos](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+
+## Context (baseline de aceptación 2026-10-25)
 
 Auth publica login y OAuth MCP, pero no emite todavía identidad OIDC first-party. El registro y los códigos
 actuales están acoplados a grants, consentimientos y audiencia MCP. Rooms ya tiene demo Vercel y autoridad
@@ -83,7 +94,8 @@ la persona introduce ese código en Rooms. Abrir el enlace no dispara un segundo
 invitación, sala, expiry, revocación y grant limitado. TASK-2067 agrega OTP y correo gobernado al issuer;
 TASK-2066 consume su proof y crea una sesión guest limitada a la sala, sin sesión global de identidad.
 La [decisión de OTP](EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md) fija autoridad S2S, HMAC,
-intentos y proof. Implementado localmente; canary, rollout y envío real siguen pendientes.
+intentos y proof. El canary real acotado del 26 de octubre ya pasó y quedó cerrado; activación duradera y
+rollout general siguen pendientes de decisiones separadas.
 
 ## Alternatives Considered
 
@@ -95,9 +107,10 @@ intentos y proof. Implementado localmente; canary, rollout y envío real siguen 
 
 ## Rollout y evidencia
 
-La autorización vigente cubre discovery, ajuste canónico, implementación y pruebas locales. Push, deploy,
+La autorización inicial del 25 de octubre cubrió discovery, ajuste canónico, implementación y pruebas locales. Push, deploy,
 registro real de clientes, secretos y DB cloud se preparan con recibos/canary y se ejecutan bajo su autorización
-de release; no se deducen de la demo Rooms. Una migración en Cloud SQL compartido afecta producción.
+de release; no se deducen de la demo Rooms. Las acciones acotadas del canary del 26 de octubre se documentan arriba;
+la retención actual de Auth sustituye aquella secuencia como próximo paso operativo. Una migración en Cloud SQL compartido afecta producción.
 
 Baseline previo: 442 tests Auth PASS, 7 skip explícitos de integración; `pg:doctor` PASS. Esto no valida el
 nuevo carril. El cierre exige SQL real aislado, regresiones MCP, browser E2E Rooms/issuer, GVC V4 desktop/390px,

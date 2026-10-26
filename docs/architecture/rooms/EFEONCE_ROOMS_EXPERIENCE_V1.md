@@ -1,6 +1,15 @@
 # Efeonce Rooms — experiencia completa V1
 
-Fecha: 2026-10-07. **Proposed para revisión del operador; ninguna pantalla implementada o aceptada visualmente.** [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [Dirección visual](../../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md).
+Fecha: 2026-10-07. **Experiencia completa propuesta; demo/scaffold implementados después, aceptación visual humana pendiente.** [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [Dirección visual](../../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md).
+
+## Continuidad 2026-10-26
+
+Claude Design posee la nueva interfaz; Codex conserva backend. Existe una primera demo/scaffold y
+backend publicado con identidad, invitaciones y medios probados en un canary cerrado, más dispatch
+automático de máquina. Esto no acredita el recorrido integral de consola/tours/colaboración/multimedia
+que se diseña aquí. [Dossier vivo](README.md) y [contrato para integrar diseño](../../documentation/rooms/backend-api-for-claude-design.md).
+La integración de la nueva UI, su aceptación y el acceso general de producción siguen pendientes;
+Auth PR263/264 quedan sin merge/deploy por decisión humana.
 
 ## Design system decidido
 

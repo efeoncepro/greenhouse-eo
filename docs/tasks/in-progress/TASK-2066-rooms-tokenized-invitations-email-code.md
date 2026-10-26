@@ -21,11 +21,17 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Canary productivo interno 2026-10-26 PASS: una invitación y un correo combinado aceptado y recibido; código recibido abre sala V3 y WebP privados mediante HTTP real. Código incorrecto, reutilización, borrador y otro espacio denegados; revocación invalida sala, imagen y enlace. Un challenge y un consumo comprobados en SQL. Sala archivada, sesiones de prueba cerradas y flags OFF restaurados. Rediseño/UI y activación general siguen separados.`
+- Status real: `2026-10-26: un correo inicial con enlace+código recibido y canjeado contra Rooms productivo; lectura de sala V3 e imagen, denegación de borrador/otra sala, replay y revocación verificados. Invitación revocada y sala archivada; flags web/Auth y correo OFF. Integración de la interfaz Claude Design, revisión de criterios de privacidad/concurrencia restantes y activación general separadas. No repetir el correo.`
 - Rank: `Después del contrato TASK-2067; coordinar primitives de sesión/binding con TASK-2065 sin depender de su journey OIDC`
 - Domain: `identity|platform|data`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; efeonce-rooms main; checkout compartido sin worktrees`
+
+## Conciliación vigente — 2026-10-26
+
+Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
 
 ## Summary
 
@@ -90,6 +96,8 @@ Reglas obligatorias: token de enlace no es identidad ni grant; issuer posee OTP;
 - Plan y contrato ADR de invitaciones bajo docs de arquitectura Rooms; no editar issuer, TASK-2062 ni UI runtime.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 
@@ -284,7 +292,7 @@ Peer Identity TASK-2067/1834, sesión Rooms2065 y dueño Resend/remitente. Reuti
 
 - [x] Canary interno real de identidad, un correo y una imagen: acceso válido, denegaciones y revocación, con flags restaurados OFF. Evidencia: [canary2026-10-26](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). No acredita UI ni activación general.
 - [x] ADR Accepted prepare/verify se consume fielmente; proof ES256 exacto con jti UNIQUE/nonce/aud/typ/expiry, sin autenticador alterno.
-- [ ] Emisión inicial produce UN correo con enlace tokenizado y código; sin envío inicial separado, sin primer CTA de solicitud OTP ni verificación visible fuera de Rooms.
+- [x] Emisión inicial produce UN correo con enlace tokenizado y código; sin envío inicial separado, sin primer CTA de solicitud OTP ni verificación visible fuera de Rooms. Evidencia: recibo canary26Oct, una entrega Resend recibida en Outlook con enlace+código y una redención; no repetir.
 - [x] Contrato permite capturar código EN Rooms y verificar sólo por issuer s2s; no autenticador alterno ni afirmación 2FA/MFA de mismo canal.
 - [x] GET/scanner no consume token, concede grant ni envía correo; enlace solo no revela contenido/correo/organización.
 - [ ] Invalid/expired/revoked públicos son indistinguibles; renovación opcional no enumera correo por body/status/tiempo y nunca revive una invitación revocada.
@@ -292,11 +300,11 @@ Peer Identity TASK-2067/1834, sesión Rooms2065 y dueño Resend/remitente. Reuti
 - [x] Invitador, invitación y destinatario se revalidan; grant sólo room/client/capabilities permitidas y nunca organización/workspace/notas.
 - [x] Aceptación concurrente consume jti/versión una vez y crea sesión guest acotada; sin profile/membership/rol global. OTP consumido no recupera proof: nueva emisión gobernada si falló el resto.
 - [x] Revocación durante y después de aceptación deniega; grant asociado revocado sin afectar grants ajenos; expiry probada con reloj servidor.
-- [ ] Readback llega sólo a edición inicial publicada autorizada; fallback demo/otra sala prohibido.
+- [x] Readback llega sólo a edición inicial publicada autorizada; fallback demo/otra sala prohibido. Evidencia: canary real salaV3+imagen200, borrador y otro espacio404; no fallback de demo.
 - [ ] Token/código/prueba/URL secreta no aparecen en logs/analytics/browser persistente; secreto digest y sesión OTP de producto correctos, sin fabricar token OIDC.
-- [ ] Entrega usa issuer sendEmail/Resend existente, remitente exacto y tracking OFF; accepted no se declara delivered; sin mailer/key nuevos.
+- [x] Entrega usa issuer sendEmail/Resend existente, remitente exacto y tracking OFF; accepted no se declara delivered; sin mailer/key nuevos. Evidencia: remitente exacto y trackingOFF comprobados; recepción Outlook observada, no inferida de accepted.
 - [x] Authority.resolve confiable revalida invitación/versión/recipient/expiry/RP; URL fuera de origen denegada y ningún caller libre decide destinatario.
-- [ ] Migración/rollback SQL y integración issuer real con canary controlado verificados; mocks o 401 anónimos no acreditan éxito.
+- [x] Migración/rollback SQL y integración issuer real con canary controlado verificados; mocks o 401 anónimos no acreditan éxito. Evidencia: migracionescloud/readback, canary real y cierre OFF26Oct; down sólo en clones, sin revertir schema vivo.
 - [x] OFF default, UI consumer y cloud pendientes documentados; task no afirma experiencia humana/productiva completa.
 
 ## Verification

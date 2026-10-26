@@ -2,8 +2,7 @@
 
 El Job `rooms-media-worker` está desplegado en `efeonce-group`, región `us-east4`. Una ejecución reclama
 como máximo un trabajo de la cola y termina. Cloud Scheduler comprueba la cola cada minuto; no existe
-proceso continuo. La aplicación
-web conserva medios, invitaciones y acceso first-party desactivados.
+proceso continuo. La aplicación web conserva medios, invitaciones y acceso first-party desactivados.
 
 ## Estado comprobado
 
@@ -14,7 +13,8 @@ web conserva medios, invitaciones y acceso first-party desactivados.
 - Una ejecución con cola vacía y otra con un PNG físico terminaron correctamente; la segunda produjo dos WebP. [Canary real y cierre OFF](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
 
 Evidencias: [Job](../../audits/rooms/2026-10-26-media-worker-deployment.json),
-[base de datos](../../audits/rooms/2026-10-26-media-database-infra.json),
+[base de datos inicial](../../audits/rooms/2026-10-26-media-database-infra.json),
+[migración8/ACL/content-preserved](../../audits/rooms/2026-10-26-media-dispatch-database.json),
 [almacenamiento y permisos](../../audits/rooms/2026-10-26-media-storage-infra.json).
 
 ## Consultar
@@ -79,3 +79,11 @@ la migración/lease hasta terminar el Job; nunca hacer down con nonce activo. Pa
 [Readback y prueba de transporte](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). La prueba
 sintética en la sala archivada valida Scheduler→API→Job→SQL→ack; no escribe objeto ni se presenta como
 nuevo canary de imagen. El PNG real y el único correo conservan su evidencia anterior.
+
+## Qué queda fuera del cierre
+
+El canary físico acreditó un PNG, no el peor caso de20MiB/40MP ni rendimiento/coste bajo carga.
+El siguiente bloque es entorno de integración y consumidor de Claude Design, más el recorrido completo
+con esa UI; aceptación y flags humanos siguen separados. Auth PR263/264 se conservan abiertas por
+instrucción expresa, sin merge/deploy. Estado documental y readback conjunto:
+[26Oct](../../audits/rooms/2026-10-26-docs-skills-state-readback.json).

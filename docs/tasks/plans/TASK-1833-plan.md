@@ -1,5 +1,7 @@
 # TASK-1833 — plan de assurance actualizado, 2026-10-25
 
+> Estado posterior26Oct: consultar la [task vigente](../in-progress/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 Goal autorizado por Julio: producción controlada Auth + Rooms, infraestructura/deploy necesarios y correo
 real únicamente a `jreyes@efeoncepro.com`. Coordinador raíz posee release, entornos y comunicaciones;
 este slice de discovery no autoriza ni ejecuta cambios cloud. No se usan modelos adicionales ni API pagadas. Julio sustituyó expresamente la contratación externa: la evaluación ofensiva la ejecutamos nosotros, con otro agente refutando y retest reproducible; no certificación de tercero.

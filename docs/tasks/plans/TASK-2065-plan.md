@@ -1,5 +1,7 @@
 # TASK-2065 — consumidor OIDC de Rooms
 
+> Estado posterior26Oct: consultar la [task vigente](../complete/TASK-2065-rooms-efeonce-id-consumer.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 2026-10-25. Goal Rooms activo; integración Efeonce ID, subagentes y coordinación Auth autorizados por Julio.
 Hook `pnpm codex:task-hook TASK-2065 --subagents` ejecutado. No repetir confirmación para implementación local.
 

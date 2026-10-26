@@ -1,5 +1,7 @@
 # TASK-2069 — Rooms Cloud Runtime and Controlled Pilot
 
+> Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
+
 ## Delta 2026-10-25 — estado al corte de Codex
 
 - El ADR ya está `Accepted` y el WAF tiene 4 reglas activas, pero los criterios correspondientes siguen sin tildar. DB `rooms_production` con 5 migraciones y Vercel `20f9fe9` con `ROOMS_*` OFF. Pendiente: canary conjunto con Auth (bootstrap sintético `--apply` sin evidencia) y corregir el `CONNECT`/`TEMP` heredado de PUBLIC. Corte en [registro de estado](../../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
@@ -21,11 +23,17 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Runtime20f9fe9 publicado y canonical verificado en Vercel; flagsOFF. Adapter171/171 PG16 PASS y suite final178/178 PASS; UI129+privacidad15 PASS aislado. DBcloud19tablas/5migraciones, rolesconn8/1 y8negativas PASS; WIF/SA/seisSecretosv1/18env preparados. WAF4reglas v2 activo: login30permitidos+5rechazados429, ventana recuperada. /invite200 CSP/no-referrer/no-store; /login503 disabled; logout200 con inicialización WIF/secretos y transacción SQL sobre cookie sintética inexistente. RestorePG16 local19tablas/1827filas PASS; aislamiento de datos crossDB PASS, CONNECT/TEMP heredados documentados. Bootstrap sintético y canary/email real pendientes.`
+- Status real: `2026-10-26: Rooms main e4b2e890 promovido en Vercel; cloud GCS/WIF/SQL, ocho migraciones y26tablas, roles separados y Job finito por digest. Canary interno real de Microsoft/MFA, un correo recibido y PNG→WebP→lectura privada/revocación PASS; piloto archivado y flags humanos OFF. Scheduler OIDC cada minuto verificado con vacío200/demanda202→un JobSUCCESS→ack liberado. General rollout, entorno aislado para nueva UI y evidencia completa de costes/restore del estado ampliado pendientes; CONNECT/TEMP heredados se mantienen documentados.`
 - Rank: `Foundation cloud después de TASK-2065/2066; canary integrado condicionado a issuer TASK-1834/2067 y consumer TASK-2068`
 - Domain: `platform|identity|data|ops`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; efeonce-rooms main; checkout compartido sin worktrees`
+
+## Conciliación vigente — 2026-10-26
+
+Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
 
 ## Summary
 
@@ -86,6 +94,8 @@ aislamiento y no resolvería configuración, capacidad o recuperación.
 - Esta task, `docs/tasks/plans/TASK-2069-plan.md` y ADR cloud Rooms; índices/Handoff coordinados por raíz.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 
@@ -204,10 +214,11 @@ no borrando DB ni revirtiendo migraciones vivas. Owners Platform/Rooms/Auth cons
 - [x] Cloud config/secret refs efectivos; Production sin fallback local/ADC/SA key; pool máximo2 por isolate. Config18env/refsv1 readback; logout canónico200 inicializa4secretos porWIF. Pool probado PG16, SQL desdeVercel comprobado con una cookie sintética inexistente: logout200 después de authTransaction, sin activar acceso ni usuario.
 - [ ] WIF permite sólo Rooms Production; preview/proyecto ajeno denegados; migrator fuera del deployment.
 - [x] DB/roles propios sin CREATEDB/CREATEROLE/SUPERUSER/BYPASSRLS ni membresías Greenhouse; negativas de DDL/cross-DB.19tablas/8negativas runtime y auditoría150relaciones PASS; [límite CONNECT/TEMP heredado](../../audits/rooms/2026-10-25-cloud-isolation.md) explícito, sin afirmar aislamiento de conexión.
-- [ ] PG objetivo, migraciones y recovery de19 tablas/ACL/constraints/triggers verificados; claves recuperables.
-- [ ] RP, redirect, origin y authority audience/token alineados; ninguna autoridad desde email-match o demo.
-- [ ] WAF/rate limits y fallback seguro verificados antes de exposición; sin challenge en S2S.
-- [ ] Canary autorizado distingue aceptación del proveedor, recepción y acceso; revocación/cross-tenant/expiry/OFF negativos.
+- [ ] Recovery del estado ampliado de26tablas/8migraciones y sus ACL/constraints/triggers certificado; claves recuperables. El restore previo de19tablas y el ensayo posterior PG16/18 de25tablas/7migraciones ya tienen evidencia; migración8 se probó por claim/fencing/ack, pero no se infiere un restore completo26tablas por haberla aplicado.
+- [x] RP, redirect, origin y authority audience/token alineados; ninguna autoridad desde email-match o demo. Evidencia: canary real26Oct Microsoft/MFA y guest proof, con scope a la única sala y denegación de workspace/otro espacio.
+- [x] WAF/rate limits y fallback seguro verificados antes de exposición; sin challenge en S2S. Evidencia: WAF v2/readback y429/recuperación del piloto, S2S real de issuer/authority durante canary26Oct. No certifica capacidad para rollout masivo.
+- [x] Canary autorizado distingue aceptación del proveedor, recepción y acceso; revocación/cross-tenant/OFF negativos. Evidencia: un correo Resend recibido en Outlook, sala/imagen200, borrador/otro espacio404 y revoke401/404; flags humanos OFF finales.
+- [ ] Completar evidencia de negativas de expiry/recuperación del piloto y del nuevo consumidor antes de activación general; las comprobaciones locales previas y el cierre OFF no sustituyen ese caso runtime. No repetir el correo único por inferencia.
 - [ ] Rollback/deployment/config readback y observabilidad/coste documentados; sin secretos en evidencia.
 
 ## Verification

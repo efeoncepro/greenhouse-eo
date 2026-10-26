@@ -29,6 +29,12 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Conciliación vigente — 2026-10-26
+
+Cierre original: primera publicación de demo. Producción posterior está en `main@e4b2e890`, deployment `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS`; [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). Los IDs/SHAs de esta entrega inicial son historia del release, no el despliegue vigente. API de acceso humano permanece OFF.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+
 ## Summary
 
 Publicar el runtime existente de Rooms en su repositorio privado y Vercel, con instalación reproducible, preview validada y promoción verificable a producción. El release expone únicamente la demostración sintética; no activa identidad real, persistencia cloud ni permisos de clientes reales.
@@ -98,6 +104,8 @@ Reglas obligatorias:
 - Registro operativo del proyecto GitHub/Vercel; los índices, epic y Handoff se coordinan con el agente raíz.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 
@@ -178,7 +186,7 @@ Reglas obligatorias:
 
 - [x] Source of truth, contrato, consumidores y allowlist externos están declarados; no se introduce una tabla ni capability de negocio.
 - [x] Postura de identidad, datos, migración, rollback y errores está explícita; la verificación runtime sigue pendiente en los criterios del release.
-- [ ] El runtime publicado acredita invariantes y frontera de acceso mediante pruebas sobre su URL efectiva, no sólo pruebas locales.
+- [x] El runtime publicado acredita invariantes y frontera de acceso mediante pruebas sobre su URL efectiva, no sólo pruebas locales. Evidencia: smoke externo y API anónima del release inicial ya descritos en sus checks posteriores; canary privado posterior2026-10-26 en el recibo conjunto. No equivale a aceptación visual ni activación general.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE

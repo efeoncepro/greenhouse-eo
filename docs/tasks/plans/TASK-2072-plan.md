@@ -1,5 +1,7 @@
 # TASK-2072 — Plan backend cloud
 
+> Estado posterior26Oct: consultar la [task vigente](../in-progress/TASK-2072-rooms-cloud-media-backend.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 Continuidad backend autorizada2026-10-26; diseño Claude Design. Plan aprobado para código y pruebas;
 provision/rollout conservan gates. Base7ca5fd3. Autorización humana posterior2026-10-26 para publicar
 backend en main: PR2, commit a87852e. El release excluye doce paths visuales2071 y mantiene flagsOFF;

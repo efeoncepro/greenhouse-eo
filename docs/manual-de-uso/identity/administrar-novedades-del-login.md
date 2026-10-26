@@ -11,6 +11,13 @@
 
 Para crear, corregir, publicar y retirar las novedades que rotan en el carrusel de la pantalla de ingreso, sin desplegar código. Todavía no hay una pantalla de administración: se opera por la API.
 
+## Límite Auth — 2026-10-26
+
+La API de este manual administra novedades del portal Greenhouse. Auth reutiliza V4, pero su consumo
+de este feed sigue pendiente: no publicar datos compartidos para ensayar la nueva UI del issuer.
+Desarrollarla en un entorno aislado no exige activar first-party/OTP ni integrar PR #263/#264, retenidas.
+[Runbook Auth](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+
 ## Antes de empezar
 
 - Necesitas una sesión de administración (`efeonce_admin`) con la capability `login_announcements.manage`.

@@ -138,3 +138,19 @@ PostgreSQL local18.6, pg8.23.1/@types-pg8.23.1 y node-pg-migrate9.0.0 fijados. L
 Preview Vercel `dpl_FvEsVJKHburHS3XsBx78xnisbQCS` y candidato production preparado `dpl_FASTjo81xf8v8UES2MUZZbJRsAo9`: instalación frozen/controles supply-chain, Next16.4.3, pnpm12.15.0, AXIS y build remoto PASS. Node gestionado24.x confirmado por API de proyecto y deployment; patch del proveedor no afirmado. La CLI local emite aviso al parsear el lockfile multi-documento de pnpm12, pero el instalador remoto lo reconoce y valida íntegro; no se reescribe el lockfile para silenciarlo.
 
 Build iad1, Functions gru1. Los secretos de paquetes permanecen sensibles en el proveedor; localDB/.auth excluidos del tracing y upload. [Evidencia y estado del release](../../audits/rooms/2026-10-25-persistence-motion-release.md). Estos builds no acreditan identidad real, PostgreSQL cloud ni compatibilidad con todos los navegadores.
+
+## 9. Publicación y verificación posteriores — 2026-10-26
+
+El baseline instalado de §8 continúa en el manifest de main `e4b2e890`: Next16.4.3, React19.3.1,
+Tailwind4.3.3, TS7.0.2 para typecheck independiente y wrapper TS6.0.2 para APIs del tooling, ESLint9.39.5,
+pnpm12.15.0 y Node24.x. `@google-cloud/storage`8.4.0, Sharp0.35.5, esbuild0.28.2 y el manifest/lock
+mínimo del worker son pins ejecutables; no se actualizó ningún paquete por esta revisión documental.
+
+Vercel fue publicado/promovido; worker Docker Linux/decoder y Cloud Build por digest PASS. Backend234/234,
+9pruebas focales de dispatch, lint/types/build y Playwright53PASS/3skip son la evidencia del corte actual.
+Los 3skip y los perfiles de prueba se conservan; no se convierten en cobertura de todos los navegadores
+ni aceptación visual humana. [Readback](../../audits/rooms/2026-10-26-automatic-media-dispatch.json).
+
+La convivencia TS6 y ESLint9 mantiene sus criterios de retiro, sin deshabilitar peers/lint/typecheck.
+El análisis07Oct y los resultados25Oct son antecedentes fechados; frases de hosting pendiente allí no
+sustituyen este estado. [Dossier vigente](README.md).

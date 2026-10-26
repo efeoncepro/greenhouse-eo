@@ -17,13 +17,19 @@
 - Motion: `docs/ui/motion/TASK-2068-rooms-invitation-and-guest-experience-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Runtime20f9fe9 publicado con flagsOFF; UI OTP/guestV2/gestión y recuperación implementadas.129 checks integrados issuerlocal/buzónRAM PASS,15privacidad/reducedmotion PASS y alineación4anchos PASS; GVC8framesPASS. Backend178testsPASS. Token/OTP sin storagebrowser; retorno trasrevocación PASS, BFCache real no observado. MediaR05, canary/emailreal y aceptaciónvisualhumana pendientes.`
+- Status real: `2026-10-26: UI histórica OTP/guest/gestión permanece en Rooms main e4b2e890; canary HTTP real ya abrió sala V3 e imagen privada y probó replay/scope/revocación, con un único correo recibido. Flags web/Auth OFF; sala archivada. Claude Design posee nueva interfaz; BFCache real, recorrido mediante esa interfaz, GVC final y aceptación humana siguen pendientes. Playwright53PASS/3skip no cierra esos criterios.`
 - Rank: `TBD`
 - Domain: `ui|identity`
 - Blocked by: `none`
 - Branch: `Greenhouse develop para docs; efeonce-rooms main para runtime; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Conciliación vigente — 2026-10-26
+
+Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
 
 ## Summary
 
@@ -93,6 +99,8 @@ Paths runtime relativos a `../efeonce-rooms`; docs permanecen aquí.
 Fuera de ownership: issuer, session/authority, migraciones, reglas de grants y DTOs canónicos. Sus cambios pequeños son dependencias coordinadas con TASK-2066/2062, no implementaciones escondidas en la vista.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 
@@ -357,7 +365,7 @@ Peer Auth posee registro y OTP; root posee release, DB y secrets. No pedir otra 
 - [x] Readiness verifica el recovery implementado y resuelve los restantes gaps documentados y pasa hook/lint; UI ready sólo cambia con evidencia.
 - [x] Token del fragmento se limpia antes de iniciar; reload y enlace inválido/vencido/revocado tienen recovery sin filtrar destinatario. Evidencia: suite129 y privacy-review15 en `.captures/rooms-invitation-ui-1792967328430/`.
 - [x] Un solo correo inicial, código pegable en campo único; resend explícito, cooldown y errores reales.
-- [ ] Verificación abre edición publicada con DTO real V1/V2 y media autorizada; sin fixtures, notas internas o evidencia no permitida en payload. Lectura textualV2 y scopeevidencePASS; media protegida pendienteR05, sin sustituirla por assets de demo.
+- [x] Verificación abre edición publicada con DTO real V1/V2 y media autorizada; sin fixtures, notas internas o evidencia no permitida en payload. Lectura textualV2 y scopeevidencePASS; lectura V3/medios privada probada después en canary real, sin sustituirla por assets de demo. Evidencia adicional: canary26Oct V3/imagen privada200 y rechazo de borrador/otro espacio404; el recorrido nuevo de Claude Design sigue pendiente.
 - [ ] Salida, expiración/revocación, bfcache y sesión interna coexistente no muestran contenido bajo actor equivocado. Coexistencia y retorno tras revocación PASS; pageshow.persisted=false, restauración BFCache real no observada.
 - [x] Gestión usa permisos room correctos y destinatario identificable; rol operador no habilita writes por sí mismo.
 - [x] Create/reissue/revoke preservan revisión/idempotencia; conflicto mantiene intención; accepted/pending/failed honestos.

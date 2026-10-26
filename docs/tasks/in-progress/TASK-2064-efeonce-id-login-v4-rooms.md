@@ -1,5 +1,7 @@
 # TASK-2064 — Efeonce ID: login V4 con Rooms como primer consumidor
 
+> Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
+
 ## Delta 2026-10-25 — estado al corte de Codex
 
 - Login V4 **ya se sirve** en `/login` desde `auth-server-00166-p77` (`GIT_SHA=754a2a28`, readback vivo). El `Status real` de abajo («no desplegado») está desactualizado. Pendiente: login real hacia Rooms con first-party ON, fuente de novedades y sincronización documental. Codex se detuvo sin uso; corte en [registro de estado](../../audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
@@ -22,13 +24,19 @@
 - Motion: `docs/ui/motion/TASK-2064-efeonce-id-login-v4-rooms-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-044`
-- Status real: `Implementación y QA local completos 2026-10-25: V4 neutral/Rooms, GVC premium42 frames,116 tests y55 rangos contraste verdes. Pendientes rollout, login real y contrato del feed de novedades; no desplegado.`
+- Status real: `2026-10-26: Login V4 servido en Auth y Microsoft/MFA real hacia Rooms comprobado durante el canary interno; final auth-server-00168-vzb100%, misma imagen, first-party/OTP OFF. Fuente pública de novedades y aceptación visual humana conservan gates propios. Corrección de despliegue PR263/264 retenida por el operador, sin merge ni nuevo deploy.`
 - Rank: `TBD`
 - Domain: `identity|ui`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Conciliación vigente — 2026-10-26
+
+Canary de identidad y correo ya completado: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). [Auth retenido en PR](../../audits/rooms/2026-10-26-auth-deploy-control.md). No ampliar esa prueba a assurance completo, login Greenhouse, clientes o nueva activación. CI general y Vercel de ambos HEAD PR263/264 PASS según el [readback documental26Oct](../../audits/rooms/2026-10-26-docs-skills-state-readback.json); ambas PR siguen abiertas y retenidas. Los criterios aún abiertos abajo mantienen su razón y alcance.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
 
 ## Summary
 
@@ -79,6 +87,8 @@ El issuer tiene shell Nocturno editorial mientras Greenhouse ya tiene V4 aprobad
 - `docs/ui/` TASK-2064 y esta task.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 
@@ -278,7 +288,7 @@ Sesión Rooms posee consumer; root coordina integración y release. No nuevos cl
 - [x] CSP, formulario, exposición de passkey/Microsoft, teclado y reduced motion verificados localmente;8 checks browser y116 tests. Autenticación real pendiente abajo.
 - [x] Consentimiento y páginas existentes conservan regresiones verdes; suite UI y harness con/sin JS.
 - [x] Evidencia visual/scorecard y estado rollout registrados en dossier; no desplegado.
-- [ ] Release y autenticación real Efeonce ID→Rooms verificados; dependen del rollout TASK-1834/2065.
+- [x] Release y autenticación real Efeonce ID→Rooms verificados; dependen del rollout TASK-1834/2065. Evidencia: Auth00168 y canary Microsoft/MFA Rooms26Oct; flags OFF al finalizar. No cierra feed de novedades ni assurance.
 - [ ] Fuente pública bounded de novedades definida e integrada; hoy fallback oficial y fixtures sólo para QA.
 
 ## Verification

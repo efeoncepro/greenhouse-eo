@@ -3,6 +3,20 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-26 — Contrato para integrar Claude Design y documentación sincronizados
+
+- `doc`: dossier, ADRs, manuales y contrato frontend distinguen corte ejecutado de roadmap V1 e historia.
+  [Estado vigente](../../../../docs/architecture/rooms/README.md) y [readback conjunto](../../../../docs/audits/rooms/2026-10-26-docs-skills-state-readback.json).
+- Backend disponible: lifecycle/ediciones V1/V2/V3, `can`, API/CLI, invitación tokenizada, imágenes privadas
+  GCS y worker automático. Eso no cierra todo EPIC-052 ni sustituye aceptación visual.
+- Pendiente para la nueva UI: entorno aislado con datos/permisos, conectores de pantallas al API same-origin,
+  recorrido cargar→procesar→adjuntar→publicar→leer y negativas de acceso/conflicto/revocación.
+  [Contrato y owners](../../../../docs/documentation/rooms/backend-api-for-claude-design.md).
+- Claude Design conserva interfaz; Codex backend. Auth PR263/264 permanecen abiertas sin merge/deploy
+  por decisión humana. Acceso general/flags humanos y ampliación de cohorte requieren otra decisión.
+- Canary real único ya recibido/verificado/cerrado; no enviar otro correo. El entorno nuevo aún no está
+  aprovisionado y el perfil WIF Production no se amplía a Preview. Sin nueva activación ni prueba de aplicación.
+
 ## 2026-10-26 — Disparo automático de medios verificado; interfaz Claude Design
 
 - `vivo`: Rooms main `e4b2e890` (PR3), despliegue promovido `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS`.

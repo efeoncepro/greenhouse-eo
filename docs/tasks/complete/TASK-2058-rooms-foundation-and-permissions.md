@@ -29,6 +29,12 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Conciliación vigente — 2026-10-26
+
+Cierre original: foundation local. La persistencia, identidad y medios posteriores no cambian su alcance: ver [estado actual de EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md). Permisos `can` siguen siendo autoridad del servidor; el nuevo diseño no crea permisos por rol nominal.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+
 ## Summary
 
 Crear el runtime independiente mínimo, contratos de sala/edición/evidencia y autorización can por acción y recurso. Verificar stack y AXIS antes del primer consumidor visual.
@@ -81,6 +87,8 @@ EPIC-052 tenía sólo definición. El operador autorizó base mínima seguida in
 - Esta task, su plan, epic, dossier Rooms, índices y handoff de Greenhouse.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 

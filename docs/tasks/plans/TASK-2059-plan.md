@@ -1,5 +1,7 @@
 # Plan — TASK-2059 Rooms
 
+> Estado posterior26Oct: consultar la [task vigente](../in-progress/TASK-2059-rooms-first-experience.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 Fecha 2026-10-25. Objetivo/primera entrega aprobados por Julio («Vamos»), ampliados con permisos can y subagentes explícitos. No requiere otro checkpoint para el mismo alcance.
 
 ## Discovery summary

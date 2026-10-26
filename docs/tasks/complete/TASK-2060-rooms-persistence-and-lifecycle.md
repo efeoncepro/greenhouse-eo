@@ -29,6 +29,12 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Conciliación vigente — 2026-10-26
+
+Cierre original: persistencia local. La evolución cloud posterior ya acredita ocho migraciones/26 tablas y un piloto interno: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md) y [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). No interpretar el snapshot de cierre local como ausencia actual de DB cloud, ni su cierre como rollout general.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+
 ## Summary
 
 Persistir salas, borradores, ediciones y autoridad Rooms en PostgreSQL propio. Crear, guardar, publicar, reabrir y archivar por commands compartidos y transportes HTTP/CLI, con transacciones, permisos, idempotencia y auditoría. Entrega local; identidad federada y despliegue se certifican por separado.
@@ -79,6 +85,8 @@ La primera entrega sólo lee fixtures. R03/R04 requieren estado durable y no pue
 - Esta task y arquitectura/índices Rooms en Greenhouse.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 

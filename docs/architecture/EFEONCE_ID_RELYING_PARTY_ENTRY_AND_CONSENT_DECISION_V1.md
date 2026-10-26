@@ -16,7 +16,15 @@
 > **Primer consumidor vigente:** Rooms (TASK-2065), sobre foundation TASK-1834; Greenhouse continúa en TASK-2063.
 > **Decisión 2026-10-25:** [Rooms primero y login V4](EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md) prevalece sobre la secuencia histórica de este documento.
 
-## Estado de implementación al aceptar la decisión
+## Corte operativo posterior — 2026-10-26
+
+Rooms sigue primero; el canary OIDC/OTP real acotado ya pasó con Microsoft/MFA, PNG privado y un correo
+recibido, y quedó cerrado. Auth first-party/OTP false, sin montajes HMAC/authority; no hay apertura de
+cohorte ni migración Greenhouse (TASK-2063). PR #263/#264 del control de deploy siguen abiertas y retenidas;
+el guard del workspace todavía no protege los YAML remotos. Nueva UI puede desarrollarse aislada,
+sin publicación ni activación implícitas. [Runbook vigente](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+
+## Estado de implementación al aceptar la decisión (2026-09-07)
 
 `auth.efeonce.org` ya opera el carril OAuth del MCP y su sesión propia. Este ADR acepta el contrato
 multiproducto, pero **no afirma que el carril OIDC first-party, el entry routing directo de Greenhouse ni su

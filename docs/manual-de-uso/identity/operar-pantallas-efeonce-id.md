@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso
 > **Version:** 1.0
 > **Creado:** 2026-09-06 por Claude (TASK-1835)
-> **Ultima actualizacion:** 2026-09-06 por Claude (TASK-1835)
+> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1835)
 > **Administracion en portal:** ninguna. Estas pantallas viven en `auth.efeonce.org` (servicio Cloud Run `auth-server`), no en el portal, y se revisan con un harness local y dos verificadores de linea de comandos.
 > **Documentacion relacionada:** [Pantallas de Efeonce ID](../../documentation/identity/pantallas-efeonce-id.md) (funcional), [Operar el autorizador de Efeonce](operar-autorizador-efeonce.md) (el servicio, sus llaves y flags), [Operar la autenticacion de clientes externos](operar-autenticacion-clientes-externos.md) (invitar, revocar, canary), [PATTERNS.md § Runtime sin React](../../architecture/ui-platform/PATTERNS.md)
@@ -21,6 +21,18 @@ responde, o cuando necesitas revisar un estado que en produccion no se puede pro
 **Este manual no cubre** invitar personas, revocar accesos, rotar llaves ni prender flags: eso esta en
 los dos manuales relacionados de arriba.
 
+## Corte de interfaz — 2026-10-26
+
+Login V4 ya está servido en `/login`; `/login/rooms` toma el contexto sólo del registro/transacción
+confiable. El canary acotado validó el recorrido real con Microsoft/MFA, pero Auth first-party/OTP quedó
+OFF y el ensayo cerrado. Eso no acredita aceptación visual de una nueva dirección ni el feed de novedades del issuer.
+Puede continuar nueva UI en harness/entorno aislado; su publicación y activación necesitan decisiones
+separadas. PR #263/#264 siguen abiertas y retenidas; no desplegar para revisar una pantalla.
+[Estado operativo](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+
+El inventario original TASK-1835 que sigue documenta estados y fallback del issuer; su marco visual de
+septiembre no debe leerse como especificación de fidelidad del V4 ni aprobación de una futura UI.
+
 ## Antes de empezar
 
 - Todo corre **en local**. El harness escucha en `127.0.0.1:19036` y no se despliega a ningun lado.
@@ -30,7 +42,7 @@ los dos manuales relacionados de arriba.
   ficticios; no toca la base de datos, ni KMS, ni el servicio en Cloud Run.
 - ⚠️ **Hoy ninguna pantalla ofrece crear una passkey.** El servidor tiene el camino
   (`/auth/passkeys/register/*`) pero no hay superficie que lo use: **quien opere esto debe asumir que
-  toda entrada de una persona nueva sera por enlace de correo**, y que el boton «Entrar con mi
+  una persona externa nueva sin passkey necesita el carril de correo**, y que el boton «Entrar con mi
   passkey» solo le sirve a quien ya tenga una credencial registrada por otra via. Lo cierra
   `TASK-1842`, bloqueada por `TASK-1834`. No lo prometas en una demo ni en un piloto.
 
@@ -58,9 +70,11 @@ Cada direccion dibuja una pantalla real con datos ficticios:
 | Direccion en el harness | Que muestra |
 | --- | --- |
 | `/login` | Inicio de sesion con los tres caminos (Microsoft, passkey, correo). |
+| `/login/rooms` | Contexto Rooms derivado de datos confiables del harness; no activa el acceso del producto. |
 | `/login/external` | El mismo, sin el acceso corporativo: lo que ve alguien de fuera de Efeonce. |
 | `/login/invalid-email` | Inicio de sesion con el error de correo mal escrito. |
 | `/consent` | Consentimiento con una organizacion y dos permisos (uno de lectura, uno de escritura). |
+| `/consent/multi-org-v2` | Consentimiento MCP interno v2 con datos ficticios; no es consentimiento first-party. |
 | `/consent/multiple` | Consentimiento con varias organizaciones. |
 | `/step-up` | Verificacion adicional con segundo factor y passkey ya configurados. |
 | `/step-up/enroll` | Verificacion adicional sin factores: la pantalla que ofrece activarlo. |

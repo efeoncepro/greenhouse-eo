@@ -26,6 +26,8 @@ esta skill dice qué hay que saber para trabajar sin repetir lo que ya costó un
 2. [`references/program-ledger.md`](references/program-ledger.md): estado vivo por task, qué está
    desplegado, qué está OFF y la secuencia pendiente. **Empezar aquí.**
 3. Auditorías de rollout (la verdad operativa más reciente):
+   - [`docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md`](../../../docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md): canary único real PASS, cerrado y flags OFF; no repetir correo.
+   - [`docs/audits/rooms/2026-10-26-auth-deploy-control.md`](../../../docs/audits/rooms/2026-10-26-auth-deploy-control.md): control preparado en PR y retención humana; consultar ledger para el corte de CI.
    - [`docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md`](../../../docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md): corte consolidado.
    - [`docs/audits/identity/2026-10-25-auth-rooms-controlled-rollout.md`](../../../docs/audits/identity/2026-10-25-auth-rooms-controlled-rollout.md): bitácora del rollout controlado.
 4. ADR y contratos, sólo cuando haga falta el contrato completo:
@@ -47,7 +49,7 @@ esta skill dice qué hay que saber para trabajar sin repetir lo que ya costó un
 | Servicio Cloud Run (entrypoint, Dockerfile, `deploy.sh`) | `services/auth-server/` |
 | Dominio | `src/lib/auth-server/{oauth,persons,internal,first-party,email-otp,keys,maintenance}` |
 | Scripts operativos | `scripts/auth-server/*`: registro de clientes/RP/issuer, rotación de llave, canaries, smoke, drift de config Rooms (`rooms-config-drift.py`) |
-| Deploy | `.github/workflows/auth-server-deploy.yml` (push a `develop` con paths de Auth) + `production-release.yml` vía `workflow_call` |
+| Deploy | `.github/workflows/auth-server-deploy.yml`: remoto aún permite push `develop`; corrección production/main sólo local + PR #263/#264 abiertas, retenidas. `production-release.yml` conserva su `workflow_call` |
 
 Comandos útiles:
 - `pnpm auth-server:dev-ui`: arnés visual con renderers reales y DTOs ficticios, sin auth ni comandos. Puerto por defecto 19036; se cambia con `AUTH_SERVER_DEV_UI_PORT`. Rutas: `/login`, `/login/rooms`, `/login/external`, `/magic-link/*`, `/invitation/*`, `/session/*`, `/error/*` y `/consent/multi-org-v2`.
@@ -60,9 +62,10 @@ Comandos útiles:
   flag roto deja sin login a todo cliente MCP, no sólo a Rooms. Probar siempre `/.well-known/*`, JWKS y
   `readyz` después de cada revisión.
 - **Prender un flag de Auth es una mutación de PRODUCCIÓN.** Los flags viven en variables GitHub a nivel de repo y `deploy.sh` las lee.
-  - Según el audit del rollout, el único servicio que sirve `auth.efeonce.org` se despliega en push a `develop`. Encenderlas y pushear a `develop` activa el flujo en el host real **sin pasar por la promoción**.
+  - El YAML remoto de `main`/`develop` aún es el anterior: el push de `develop` puede tocar el host real **sin pasar por promoción**. El guard visible en el workspace no lo protege hasta integrar las PR.
+  - **Retención humana vigente:** PR #263 `main` HEAD `5e1fc2554` y PR #264 `develop` HEAD `aabd6d78d` abiertas; sin merge, deploy ni disable/enable de workflows. Antes de una eventual integración de PR #264, evaluar los filtros gruesos `src/lib/**` de artifact/commercial/ico/ops; no se aplicó protección temporal ahora.
   - Hacerlo sólo deliberadamente, con autorización explícita, y conciliar antes qué host sirve cada revisión.
-- **El HMAC del OTP y el token de autoridad de Rooms sólo se montan con el flag ON** (`deploy.sh`). Un flag OFF con secreto ausente es el estado correcto, no un bug.
+- **El HMAC del OTP y el token de autoridad de Rooms sólo se requieren con el flag ON.** En el readback final ambos flags están OFF y esos montajes ausentes. El retiro declarativo en `deploy.sh` está corregido localmente y en PR; no asumir que el remoto ya lo incorpora.
 - **El correo real tiene un único destinatario autorizado** (`jreyes@efeoncepro.com`) y se manda una sola vez, como canary.
   - Leer el ledger y reconciliar entregas antes de enviarlo: un canary ya recibido no autoriza repetir el correo en otro despliegue.
   - Ningún cliente.
@@ -70,7 +73,8 @@ Comandos útiles:
   - `email_type_config.auth_server_rooms_invitation_otp` nace en FALSE.
 - **El preflight de promoción se corre contra `target-branch=main`.** Contra `develop` devuelve «batch unknown» y no aprueba nada.
 - **Readback de la revisión ACTIVA** (`gcloud run services describe auth-server`) después de cada deploy: `GIT_SHA`, flags y RP/origen. «Deploy verde» no es lo mismo que «flag aplicado».
-- **Un preparativo no prueba una integración.** RP registrado, secretos v1 o health/JWKS en 200 no acreditan firma nueva, sesión ni entrega de correo.
+- **Un preparativo no prueba una integración.** RP registrado, secretos v1 o health/JWKS en 200 no acreditan firma nueva, sesión ni entrega de correo. El canary Rooms del 26 de octubre sí acreditó Microsoft/MFA, OIDC, PNG privado y un correo recibido; ya se cerró, no se repite ni amplía por inferencia.
+- **Nueva UI en entorno aislado sigue autorizada.** La retención de las PR y el acceso productivo OFF no bloquean diseño/desarrollo local. No autoriza publicación, activación ni aceptación visual de la nueva dirección.
 - **El repo `greenhouse-eo` es PÚBLICO.** Los recibos con identificadores del operador viven fuera de git (`.auth/…`), nunca en `docs/`. Lo que ya se commiteó sigue en el historial.
 - **Seguridad (TASK-1833):** hay evaluación propia y revisión entre agentes, **sin pentest completo**; la cobertura ofensiva quedó bloqueada. No declarar «pentest hecho».
 - Paridad Full API: toda pantalla de Auth es cliente de un command o reader de `src/lib/auth-server/**`. Copy en `src/lib/copy/*`, tuteo es-CL.

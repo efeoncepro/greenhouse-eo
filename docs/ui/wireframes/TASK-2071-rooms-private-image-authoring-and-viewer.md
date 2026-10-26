@@ -1,5 +1,12 @@
 # TASK-2071 — Una imagen, del borrador a la lectura
 
+> Continuidad26Oct: referencia del diseño/scaffold anterior, no aceptación de la interfaz de Claude Design.
+> Codex conserva backend; Claude Design posee la nueva UI y su validación. Los requisitos de AXIS,
+> View Transitions, reduced-motion, fallback y accesibilidad siguen siendo obligaciones a verificar.
+> Integración/estado actual: [dossier Rooms](../../architecture/rooms/README.md) y
+> [contrato backend](../../documentation/rooms/backend-api-for-claude-design.md). No activar flags ni repetir canary por este documento.
+
+
 Diseño aprobado para implementación local, 2026-10-25; no es runtime ni aceptación visual. UI ready=yes: DTO/rutas 2070 congelados; integración espera servicios locales. Scope: una imagen por bloque y operación, repetible para varias piezas de una sala, sin sustituir el editor completo.
 
 ## Visual Direction Contract

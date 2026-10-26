@@ -1,10 +1,26 @@
 # Efeonce Rooms — arquitectura V1
 
-Diseño inicial: 2026-10-07. **Goal de construcción autorizado; estado ejecutado al2026-10-25 en el [dossier vivo](README.md).** El diseño restante sigue propuesto; no confundir topología futura con runtime desplegado. Dueño: Platform/Product. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md).
+Diseño inicial: 2026-10-07. **Goal de construcción autorizado; estado ejecutado al2026-10-26 en el [dossier vivo](README.md).** El diseño restante sigue propuesto; no confundir topología futura con runtime desplegado. Dueño: Platform/Product. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md).
 
-## 1. Topología y stack propuestos
+## 0. Corte ejecutado y frontera pendiente — 2026-10-26
 
-Selección de versiones: [baseline y política de actualización](EFEONCE_ROOMS_STACK_BASELINE_V1.md), consulta 07/10/2026. Objetivo: últimas estables compatibles, con pins/lockfile y pruebas. Next 16.4/React 19.3/Tailwind 4.3 son candidatos; TS7 requiere convivencia de tooling y ESLint10 resolver plugins antes de fijar el manifest. Node24 LTS según hosting. No se heredan las versiones de Greenhouse ni se declara un build verificado.
+[Estado vigente y evidencias](README.md): main `e4b2e890`, API/CLI, lifecycle, contenido V1/V2/V3,
+Efeonce ID/invitaciones probados en canary cerrado, GCS privado, ocho migraciones/26 tablas y worker
+finito con Scheduler OIDC por demanda. Sólo el flag de máquina está ON; flags humanos/medios web OFF.
+
+El pipeline actual admite imágenes estáticas PNG/JPEG/WebP, produce dos derivados WebP y entrega sólo
+esos derivados mediante API reautorizada. §3/§5 describen también el alcance multimedia futuro: no hay
+FFmpeg/HLS/PDF/audio/video, descarga de originales o tickets de lectura habilitados por este corte.
+El descriptor firmado actual sólo escribe; no concede lectura. Presentación, colaboración, CRM/MCP y
+otros contratos del diseño objetivo no se certifican como implementados.
+
+Claude Design posee interfaz. Falta entorno de integración aislado, conexión same-origin y recorrido
+completo desde la nueva UI; aceptación y activación general separadas. Auth sigue en PR263/264 sin
+merge/deploy por instrucción humana. [Contrato de integración](../../documentation/rooms/backend-api-for-claude-design.md).
+
+## 1. Topología y stack objetivo
+
+Pins instalados, no candidatos: Next16.4.3,React19.3.1,Tailwind4.3.3,Node24.x,TS7 typecheck independiente y API TS6 para Next/tooling; ESLint9.39.5 retenido por peers. [Baseline y evidencia fechada](EFEONCE_ROOMS_STACK_BASELINE_V1.md). Build y Vercel están verificados para el corte publicado; no se heredan versiones de Greenhouse.
 
 Destino de producto: `rooms.efeonce.org`. Repo propio `efeoncepro/efeonce-rooms`, creado y publicado en GitHub; demo Vercel verificada por TASK-2061. Documentación canónica en Greenhouse. Una app con módulos y un worker de medios; no se requieren microservicios por entidad.
 

@@ -1,5 +1,7 @@
 # TASK-2068 — Plan de implementación propuesto
 
+> Estado posterior26Oct: consultar la [task vigente](../in-progress/TASK-2068-rooms-invitation-and-guest-experience.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 Estado 2026-10-25: contratos backend implementados y pruebas focalizadas65PASS; goal/subagentes autorizados. UI ready yes para OTP+textoV2, sin visual acceptance. Hook/readiness de root antes de JSX. MediaR05 se mantiene fuera de este slice.
 
 ## Discovery summary

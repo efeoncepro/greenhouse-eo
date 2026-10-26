@@ -4,7 +4,21 @@
 - Owner: TASK-2072, Platform / Media. TASK-2070 conserva recuperación del corte local;2071 conserva UI histórica sin aceptación visual.
 - Reemplaza únicamente la limitación de código local del ADR de imágenes; preserva semántica V3, fuente inmutable y permisos.
 
-## Contexto y decisión
+## Estado ejecutado al cierre 2026-10-26
+
+Main `e4b2e890` publicado/promovido, GCS privado, ocho migraciones/26 tablas y Job con SA/rol propio.
+Canary real cerrado: un PNG físico→dos WebP→lectura privada, único correo recibido y revocación; no
+repetir. Scheduler OIDC cada minuto devuelve200 sin iniciar contenedor con cola vacía, y202 con demanda
+→Job `rooms-media-worker-4r9nz` SUCCESS→ack/liberación cercada. Esa última demanda sintética archivada
+se rechaza antes de storage; no es otra decodificación de imagen. Lease10min, timeout240s/retries0.
+[Canary](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md),
+[dispatch](../../audits/rooms/2026-10-26-automatic-media-dispatch.json) y [DB8](../../audits/rooms/2026-10-26-media-dispatch-database.json).
+
+Flag dispatch máquina ON; flags humanos/medios web OFF. La nueva interfaz/consumidor de Claude Design,
+el entorno de integración y su recorrido completo siguen pendientes; activación general separada.
+Auth queda en PR263/264. El contexto y rollout inicial siguientes preservan la secuencia histórica.
+
+## Contexto y decisión iniciales
 
 Base7ca5fd3 en rama task/2070-2071-private-media. El pipeline local está recuperado con207tests
 registrados. Producción20f9fe9 sigue OFF. El límite de4,5MB de request de Vercel obliga a transferir
@@ -45,8 +59,7 @@ público. Una petición ya admitida y bytes guardados no se recuperan mediante r
 
 Worker compilado Node24, decoder aislado por proceso con tiempo/heap/stdout/threads acotados. Artefacto
 propio y lock mínimo público, versiones exactas verificadas contra manifest raíz, sin tsx ni paquetes web.
-Cloud Run Job candidato `rooms-media-worker`; una invocación drena un lote acotado y termina. Programación,
-concurrencia/capacidad/coste/retención y triggers se deciden y verifican antes de desplegar.
+Cloud Run Job `rooms-media-worker`; una invocación procesa como máximo un candidato y termina. Scheduler y concurrencia tienen el contrato de dispatch descrito abajo; coste/throughput bajo carga y retención general conservan decisiones/medición propias.
 
 Perfil `cloud-worker` explícito: Compute metadata de la SA exclusiva
 `rooms-media-worker-production@efeonce-group.iam.gserviceaccount.com`, sin ADC de archivos ni claves JSON,
@@ -74,7 +87,7 @@ ACL/inmutabilidad y down sólo en clones. Worker build/smoke sobre prod closure.
 Cloud después de capacidad/IAM/config/migración/backup/readbacks. Canary de identidad sigue único,
 con destinatario autorizado existente y coordinaciónAuth; no enviar clientes por completar backend.
 
-## Rollout acotado ejecutado 2026-10-26
+## Primer rollout acotado de infraestructura 2026-10-26 (antes de canary/dispatch)
 
 El operador autorizó infraestructura, migraciones y worker con subagentes, manteniendo Auth/correo/UI
 fuera del bloque. Bucket/IAM/CORS y SA aplicados; siete migraciones y rol SQL dedicado verificados.
@@ -86,7 +99,7 @@ Tres variables GCS se guardaron en Vercel Production para el próximo deploy; no
 ni se reconstruyó la aplicación. El canary real y el consumidor conservan su gate separado.
 [Manual y evidencias](../../manual-de-uso/rooms/operar-worker-medios.md).
 
-## Disparo automático autorizado 2026-10-26
+## Disparo automático autorizado y verificado 2026-10-26
 
 Decisión incremental de TASK-2072: Cloud Scheduler cada minuto hace POST al endpoint fijo
 `https://efeonce-rooms.vercel.app/api/internal/media/dispatch`, autenticado con OIDC Google de la SA

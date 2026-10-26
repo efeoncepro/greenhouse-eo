@@ -6,9 +6,25 @@
 - Scope: `TASK-2069; PostgreSQL Rooms, Vercel, WIF, secretos y activación controlada`
 - Reversibility: `two-way-but-slow`
 - Confidence: `medium`
-- Validated as of: `2026-10-25; adapter7276df9, QA171PASS y WIF/SA/secretos preparados OFF; DB y canary pendientes`
+- Validated as of: `2026-10-26; DB/WIF/secretos y canary real completos; cierre humano OFF; dispatch de máquina ON. Ver evidencia y límites de continuidad.`
 
-## Context
+## Continuidad verificada 2026-10-26
+
+El piloto ya comprobó sesión Efeonce ID con Microsoft/MFA, un correo enlace+código, lectura de sala
+V3/imagen y revocación. La invitación se revocó, la sala quedó archivada y los flags humanos volvieron
+OFF; no repetir el canary ni ampliar cohorte por actualizar diseño/docs. [Recibo](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
+
+Rooms main `e4b2e890` está publicado; base `rooms_production`, ocho migraciones/26 tablas, GCS privado,
+Job con SA/rol propios y Scheduler OIDC por demanda verificados. Dispatch máquina ON no concede
+acceso humano. [Estado vigente](README.md) y [prueba de dispatch](../../audits/rooms/2026-10-26-automatic-media-dispatch.json).
+La política/tabla inicial siguiente preserva el diseño del piloto; no vuelve pendientes recursos ya comprobados.
+
+Auth deploy-control queda en PR263/264 por decisión humana, sin merge ni deploy. Interfaz de Claude
+Design, entorno de integración aislado, recorrido desde la nueva UI y activación general siguen pendientes.
+El WIF Production no se amplía a previews por este acuerdo; el acceso residual PUBLIC a otras bases de
+la instancia compartida permanece documentado, sin cambio global de ACL.
+
+## Context inicial
 
 Rooms tiene persistencia, OIDC e invitaciones verificadas localmente, pero su configuración PostgreSQL
 sólo acepta `127.0.0.1:55432/rooms_local`. Una variable de conexión remota no habilita producción.
@@ -167,7 +183,7 @@ o el piloto solicita una cohorte nueva. Cada caso exige revisión, no ampliació
 - [Cloud SQL](../cloud-infrastructure/CLOUD_SQL.md), [topología](../cloud-infrastructure/TOPOLOGY.md), [secretos](../cloud-infrastructure/SECRETS.md).
 - [Postura de seguridad](../GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md), [acceso PostgreSQL](../GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md), [pooling](../GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md).
 - [Auth Rooms-first](../EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md), [OTP](../EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md).
-- [Perímetro Rooms](../../operations/ROOMS_VERCEL_INVITATION_PERIMETER_V1.md), [TASK-2069](../../tasks/to-do/TASK-2069-rooms-cloud-runtime-controlled-pilot.md).
+- [Perímetro Rooms](../../operations/ROOMS_VERCEL_INVITATION_PERIMETER_V1.md), [TASK-2069](../../tasks/in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md).
 
 Autorización: operador indicó usar jreyes@efeoncepro.com y continuar coordinado con peer Auth después
 del goal de producción controlada. No amplía clientes ni migración Greenhouse. El peer Auth crea

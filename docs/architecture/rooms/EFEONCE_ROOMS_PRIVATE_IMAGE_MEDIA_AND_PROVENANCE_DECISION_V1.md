@@ -5,7 +5,19 @@
 - Dueño: Platform / Media / Product; implementación backend TASK-2070, consumidor UI dependiente separado.
 - Alcance: EPIC-052 R05A. No supersede identidad, invitaciones ni el piloto cloud de TASK-2069.
 
-## Contexto verificado
+## Continuidad cloud 2026-10-26
+
+Este ADR conserva la decisión del primer corte local; su límite de despliegue fue extendido por el
+[ADR cloud de medios](EFEONCE_ROOMS_CLOUD_MEDIA_BACKEND_DECISION_V1.md). Backend integrado en main
+`e4b2e890`: GCS privado, ocho migraciones/26 tablas, Job propio y Scheduler OIDC por demanda. Un PNG
+físico produjo dos WebP y se leyó con autoridad real; el canary de identidad/correo/imagen terminó con
+revocación/archivo y flags humanos OFF. [Estado y evidencias](README.md).
+
+La máquina dispatch está ON; la nueva UI de Claude Design y su recorrido integrado están pendientes.
+No repetir el correo ni activar medios por este estado. Auth PR263/264 siguen sin merge/deploy.
+El contexto siguiente describe el HEAD previo al inicio local, no el inventario actual.
+
+## Contexto verificado al iniciar el corte local
 
 HEAD Rooms `20f9fe9` conserva manifest/snapshot V2 synthetic, AssetVersionRef sin resolución,
 publicación textual y lector privado. `content-validation.ts:86–91` mantiene todos los assets en pending;

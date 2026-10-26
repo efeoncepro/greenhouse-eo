@@ -1,5 +1,7 @@
 # TASK-1834 — plan de ejecución: Rooms primero
 
+> Estado posterior26Oct: consultar la [task vigente](../in-progress/TASK-1834-efeonce-auth-first-party-oidc-rooms.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+
 Fecha: 2026-10-25. Goal confirmado por Julio; subagentes y coordinación con Rooms autorizados.
 Checkout compartido develop; sin worktrees ni push/deploy automáticos.
 

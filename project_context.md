@@ -4,7 +4,7 @@
 
 [Rooms: estado y próximos pasos](docs/architecture/rooms/README.md).
 
-[Auth: Rooms primero y V4 local](docs/architecture/EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md).
+[Auth: estado vivo y correcciones retenidas en PR](.codex/skills/efeonce-auth/references/program-ledger.md).
 
 [Factory](docs/services/factory/README.md): On-Demand.
 

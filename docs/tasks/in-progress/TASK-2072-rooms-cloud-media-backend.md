@@ -23,6 +23,12 @@
 - Blocked by: `none`
 - Branch: `efeonce-rooms main@e4b2e890 vía PR3 (dispatch); base de medios PR2; documentos greenhouse-eo develop`
 
+## Conciliación vigente — 2026-10-26
+
+Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+
 ## Summary
 
 Completar el backend cloud de imágenes privadas: storage GCS, subida directa limitada, procesamiento
@@ -80,6 +86,8 @@ Hace falta un adapter propio y un perfil de worker real, sin simular entorno Ver
 - Contrato de integración en `docs/documentation/rooms/`, esta task/plan/ADR.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 
@@ -191,11 +199,11 @@ GCS; previews siguen <=3MiB. La app reautoriza GET/HEAD/Range y nunca ofrece ori
 - [x] GET/HEAD/Range/304 reautorizan y conservan no-store/denegación de originales. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
 - [x] Worker se construye/ejecuta sin tsx; perfil cloud propio y ninguna SA key/ADC local en Production. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
 - [x] Disparo automático privado sin contenedor en vacío; una demanda arranca un único Job y libera lease por nonce. Evidencia: [Scheduler y readback SQL](../../audits/rooms/2026-10-26-automatic-media-dispatch.json), PR3 y nueve pruebas focales.
-- [x] PG y restore preservan V1/V2/V3, hashes, generaciones, permisos y auditoría. Evidencia: recovery aislado PG16/18, seis salas de dos tenants,25tablas/18objetos/12bindings; generaciones cloud físicas siguen sin canary.
+- [x] PG y restore preservan V1/V2/V3, hashes, generaciones, permisos y auditoría. Evidencia: recovery aislado PG16/18, seis salas de dos tenants,25tablas/18objetos/12bindings; generaciones físicas verificadas después en el canary real26Oct; ese canary no equivale a restore cloud completo del schema ampliado26tablas.
 - [x] HTTP/CLI comparten operaciones y guía frontend completa sin lógica de permisos en cliente. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
-- [x] Recursos/env/flags/migraciones tienen readback; canary completo queda explícitamente pendiente. Evidencias: [storage/IAM](../../audits/rooms/2026-10-26-media-storage-infra.json), [DB](../../audits/rooms/2026-10-26-media-database-infra.json), [Job](../../audits/rooms/2026-10-26-media-worker-deployment.json) y [configuración](../../audits/rooms/2026-10-26-media-vercel-configuration.json). Ejecución de cola vacía no acredita imagen real.
+- [x] Recursos/env/flags/migraciones tienen readback; canary de identidad/correo/imagen completado en criterio separado, rollout general pendiente. Evidencias: [storage/IAM](../../audits/rooms/2026-10-26-media-storage-infra.json), [DB](../../audits/rooms/2026-10-26-media-database-infra.json), [Job](../../audits/rooms/2026-10-26-media-worker-deployment.json) y [configuración](../../audits/rooms/2026-10-26-media-vercel-configuration.json). Ejecución de cola vacía no acredita imagen real.
 - [x] Transferencia física GCS y procesamiento/lectura de imagen por autoridad real verificados. Evidencia: [canary real](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
-- [ ] Consumidor frontend y disparo automático del Job listos antes de activar medios de forma general. Dependencias separadas; no cerrar por este canary.
+- [ ] Consumidor frontend de Claude Design integrado y recorrido UI completo verificado antes de activar medios de forma general. El disparo automático del Job ya está comprobado y tiene su criterio propio tildado; faltan entorno aislado/datos/permisos, consumidor same-origin y gates UI/humanos. No cerrar por el canary de backend.
 
 ## Verification
 

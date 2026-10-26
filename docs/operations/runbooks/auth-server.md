@@ -3,8 +3,28 @@
 > **Tipo de documento:** Runbook operativo
 > **Versión:** 1.4
 > **Creado:** 2026-09-04 por Claude (TASK-1828, EPIC-044)
-> **Última actualización:** 2026-10-26 por Codex (control de despliegue production/main, SHA exacto y bloqueo de retroceso)
+> **Última actualización:** 2026-10-26 por Codex (readback vigente, control preparado en PR y retención humana)
 > **Documentación técnica:** [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) · [`services/auth-server/README.md`](../../../services/auth-server/README.md)
+
+## Estado operativo y retención — 2026-10-26
+
+El [readback del 26 de octubre a las 17:38:40 Chile](../../audits/rooms/2026-10-26-docs-skills-state-readback.json) conserva `auth-server-00168-vzb` con 100% del tráfico,
+`GIT_SHA=754a2a28…` y digest `122e2acb…`. First-party/OTP false, montajes HMAC/authority ausentes,
+Resend production v1 y Sentry production. El canary único de Rooms acreditó Microsoft/MFA, OIDC,
+PNG privado y un correo recibido; está cerrado. No repetir correo ni reabrirlo como prueba de otro deploy.
+
+**El control production/main está preparado LOCALMENTE y en PR, no aplicado al remoto ni al servicio.**
+[PR #263 main](https://github.com/efeoncepro/greenhouse-eo/pull/263) HEAD `5e1fc2554` y
+[PR #264 develop](https://github.com/efeoncepro/greenhouse-eo/pull/264) HEAD `aabd6d78d` siguen abiertas.
+Corte de readback 2026-10-26 20:38:40 UTC: PR #264 CI completo/Vercel PASS; PR #263 fast feedback en curso,
+governance/reliability/Vercel PASS. Las 36 pruebas focales (14 Vitest + 22 Python), gates y hook normal PASS
+no equivalen a integración ni deploy. El operador indicó dejar Auth en PR: sin merge main/develop,
+despliegue, flags, correo ni disable/enable de workflows. El YAML remoto anterior todavía puede desplegar
+auth-server desde develop con defaults staging. Consultar [el expediente](../../audits/rooms/2026-10-26-auth-deploy-control.md)
+antes de cualquier publicación futura; el workspace corregido no prueba que esa protección esté vigente.
+
+La retención permite desarrollar nueva UI en un entorno aislado. Su aceptación visual y publicación,
+el release amplio #262 y la activación productiva de acceso son decisiones posteriores independientes.
 
 ## Para qué sirve
 
@@ -39,30 +59,33 @@ TASK-1844 está desplegada para la cohorte interna exacta. [Manual](../../manual
 
 ## Paso a paso
 
-### 1. Desplegar
+### 1. Publicación futura — retenida actualmente
 
-Seguir el [runbook de release](production-release.md): preflight, candidato aprobado y orquestador `production-release.yml` con `target_sha` exacto. El workflow del emisor consume gates/cohorte desde GitHub. No copiar una invocación local con sólo `ENV`: `deploy.sh --set-env-vars` reemplaza configuración y los defaults multiorg false/cohorte vacía apagarían la autoridad existente. Uso directo sólo bajo break-glass autorizado, con todos los valores actuales preservados explícitamente y readback posterior.
+Cuando el operador levante la retención, seguir el [runbook de release](production-release.md): preflight, candidato aprobado y orquestador `production-release.yml` con `target_sha` exacto. El workflow del emisor consume gates/cohorte desde GitHub. No copiar una invocación local con sólo `ENV`: `deploy.sh --set-env-vars` reemplaza configuración y los defaults multiorg false/cohorte vacía apagarían la autoridad existente. Uso directo sólo bajo break-glass autorizado, con todos los valores actuales preservados explícitamente y readback posterior.
 
 Cloud Build construye `gcr.io/efeonce-group/auth-server` (~6 min) y despliega con
 `--ingress=internal-and-cloud-load-balancing --allow-unauthenticated`. El script verifica que la revisión
-activa sirva `GIT_SHA=EXPECTED_SHA`. `.github/workflows/auth-server-deploy.yml` acepta sólo `main` con
+activa sirva `GIT_SHA=EXPECTED_SHA`. **Contrato preparado en las PR, todavía no efectivo en el remoto:**
+`.github/workflows/auth-server-deploy.yml` aceptará sólo `main` con
 Environment `production`: push filtrado por rutas, `workflow_call` del orquestador o dispatch productivo.
-El SHA completo debe pertenecer a `origin/main` y se descarga antes de WIF; un lock único del servicio
-serializa las vías y no cancela un deploy activo. El script también rechaza staging, SHA mal etiquetado
+Al integrarse, el SHA completo deberá pertenecer a `origin/main` y se descarga antes de WIF; un lock único del servicio
+serializa las vías y no cancela un deploy activo. El script preparado también rechaza staging, SHA mal etiquetado
 o inputs tracked con cambios sin commit. Resend queda en production v1, Sentry en production y OTP OFF
 retira sus dos montajes; verificar esta configuración además del código.
 
-Si la revisión viva todavía sirve código de `develop` ausente en `main`, el guard debe fallar antes del
+En ese contrato propuesto, si la revisión viva todavía sirve código de `develop` ausente en `main`, el guard debe fallar antes del
 build/deploy. No forzar una promoción ni presentar ese bloqueo como despliegue exitoso. Reconciliar por
 separado el código servido y el candidato gobernado; este fix no autoriza el release amplio ni activa flags.
 Después de fusionar el control, comprobar el run y el readback de la revisión con tráfico.
 
 Publicar el YAML sólo en `main` no elimina el disparador remoto de `develop`: GitHub usa el archivo de la
-rama que recibe el push. Aplicar la corrección estrecha también sobre `origin/develop`, sin publicar el
-historial local ajeno. Hasta verificar ambas ramas, el riesgo de pushes a develop sigue abierto.
+rama que recibe el push. La futura integración deberá cubrir también `origin/develop`, sin publicar el historial local ajeno.
+El fixture bajo `src/lib/**` de PR #264 coincide con filtros de deploy de artifact/commercial/ico/ops: definir
+y autorizar la protección de esos workflows antes de integrar. Ninguna protección temporal ni integración
+se aplicó en este cierre. Hasta verificar ambas ramas, el riesgo de pushes a develop sigue abierto.
 
 El filtro de push incluye `services/auth-server/**`, también su README: un cambio documental dentro del
-servicio puede iniciar el workflow en main. Ninguna etiqueta staging aísla este servicio productivo.
+servicio puede iniciar el workflow remoto de develop; tras integrar la corrección, sólo en main. Ninguna etiqueta staging aísla este servicio productivo.
 Antes de publicar documentación en esas rutas, revisar ese efecto y el plan de publicación. Una cancelación
 no se considera efectiva por aceptar la solicitud: comprobar estado final del job, builds pendientes y
 revisión con tráfico. El step `Deploy auth-server` incluye preflight antes del build; haberlo iniciado no
@@ -133,11 +156,12 @@ Requiere `AUTH_SERVER_KMS_KEY` y acceso a PG por el proxy con las variables `GRE
 `GREENHOUSE_POSTGRES_PORT=15432`, `GREENHOUSE_POSTGRES_SSL=false` y `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=""`.
 `--retire` sin la ventana cumplida falla; `--force` sólo en incidente y queda en `signing_key_events`.
 
-## OAuth (TASK-1829)
+## OAuth (TASK-1829): contrato y baseline histórico del 2026-09-04
 
 > Contrato técnico: [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md).
 > Estado 2026-09-04: **`code complete, rollout pendiente`** — código en `develop` (commits `263ee3a74`, `19d1658de`,
 > `d31e6e913`), migraciones aplicadas en Cloud SQL, flag `AUTH_SERVER_OAUTH_ENABLED=false` en `deploy.sh`.
+> Snapshot del bootstrap, no estado actual: OAuth/personas ya están operativos. First-party/OTP permanecen OFF; la retención actual del inicio de este runbook prevalece sobre cualquier receta histórica.
 
 ### Registrar el environment del emisor (precondición del flag OAuth)
 
@@ -148,7 +172,7 @@ TASK-1631 (`upsertExternalIdentityEnvironment`: tx + audit + outbox), nunca por 
 `displayName` «Efeonce Auth», provider `efeonce_auth`, `issuerUrl https://auth.efeonce.org`, `jwksUri
 https://auth.efeonce.org/.well-known/jwks.json`, `audience https://mcp.efeonce.org/mcp`, `issuerClass external`,
 `subjectType public`. Nace en `draft` (**registrada el 2026-09-04**, actor `cli:jreye`, `created=true`) y se pasa a
-`active` con `--status active` en el mismo momento en que se prende `AUTH_SERVER_OAUTH_ENABLED` en staging; en
+`active` con `--status active` durante el bootstrap OAuth del servicio único; esa activación ya ocurrió y no debe repetirse; en
 `draft` el resolver responde `environment_inactive` y ningún token sería `bound` (verificado en producción por el
 lane ecosystem: `GET /api/platform/ecosystem/identity/binding?environment=efeonce-auth&subject=…` con el token
 consumer del gateway → 200 `outcome: environment_inactive`; 400 sin parámetros; 401 sin token). `issuerClass` no
@@ -174,12 +198,12 @@ por **CIMD** (primario: `client_id` = URL https del documento; anti-SSRF, cache 
 `refresh_tokens`, `access_tokens`, `client_consents`, `oauth_audit_events` (append-only; el rate limit cuenta
 sobre ella, sin tabla extra). Access token: JWT ES256 de 15 min firmado por `signWithActiveKey`. El carril externo conserva su resolución de memberships/binding y versión de grants; la fórmula histórica `max(grantsVersion)` no se aplica a contextos internos. En v1/v2 interno, `gv` valida el ancla firmada; v2 reautoriza cada target con su propia revisión, nunca con el máximo entre organizaciones. Sin autoridad vigente en la población/contexto correspondiente, se deniega.
 
-### Prender en staging
+### Bootstrap inicial ya ejecutado (historia, no ejecutar)
 
-Precondiciones, en este orden:
+Precondiciones del ensayo inicial, en este orden:
 
 1. Runtime desplegado con el código de TASK-1829 (verificar contenido del candidato aprobado y SHA servido, no ordenar SHAs lexicográficamente; lo hace
-   `auth-server-deploy.yml` en el push a `develop`).
+   verificar revisión con tráfico y candidato exactos; el YAML remoto anterior aún puede disparar producción desde develop).
 2. Fila del emisor en `greenhouse_core.external_identity_environments`: `environment_id=efeonce-auth`
    (= `AUTH_SERVER_ENVIRONMENT_ID`), `issuer_url=https://auth.efeonce.org`, `issuer_class=external`, `status=active`.
    La fila se creó en `draft` el 2026-09-04 y el bootstrap posterior la activó. Si se incorpora otro environment bajo autorización, usar
@@ -206,9 +230,10 @@ curl -s -X POST https://auth.efeonce.org/oauth/token \
   -d 'grant_type=authorization_code&client_id=<client_id>&code=efc_invalido&redirect_uri=http://127.0.0.1:8976/cb&code_verifier=x'   # {"error":"invalid_grant"}
 ```
 
-El flujo con persona real (`/oauth/authorize` → consentimiento → code → JWT) recién se ejercita en staging cuando
-TASK-1830 provea la sesión: hoy `authorize` responde `login_required` (401; con `prompt=none`, redirect con
-`error=login_required`) para todo el mundo, y los scopes de escritura exigen además `step_up`.
+En el baseline del 4 de septiembre anterior a TASK-1830, la ausencia de sesión producía `login_required`.
+Ese corte no describe hoy todo el servicio: el OAuth MCP y la sesión corporativa tienen evidencia real,
+y el canary Rooms del 26 de octubre verificó el carril first-party antes de devolverlo a OFF. Los scopes
+de escritura conservan su exigencia de `step_up`; no se reabre el canary para comprobar este apartado.
 
 ### Registrar un cliente confidencial
 
@@ -329,7 +354,9 @@ task1835-runtime-<fixture> --env=local` (la lista sale de `scripts/frontend/scen
 - Gates OAuth: `pnpm vitest run src/lib/auth-server` (68 tests, flujo completo in-process) · `pnpm auth-server:oauth-store:smoke` (PG real)
 - Tasks: `TASK-1828` (runtime + llaves) · `TASK-1829` (OAuth) en `docs/tasks/`
 
-## Rollout conjunto OAuth/personas autorizado 2026-09-04
+## Rollout conjunto OAuth/personas autorizado 2026-09-04 (historia)
+
+Este rollout ya ocurrió; no es una instrucción actual de activación. Ver retención y readback al inicio.
 
 El servicio Cloud Run es único para staging y producción: un despliegue de staging cambia el mismo host público. La activación conjunta requiere llevar TASK-1830 al runtime, activar `efeonce-auth` por `pnpm auth-server:register-issuer-environment --status active` y declarar ambos flags en `deploy.sh`. El mailer necesita además `secretAccessor` del runtime sobre la referencia Resend; el deploy reconcilia ese permiso con `ensure_secret_accessor_binding`. Declarar la referencia no concede IAM.
 

@@ -18,13 +18,19 @@
 - UI ready: `n/a`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Canary first-party real 2026-10-26 PASS: Microsoft y MFA aprobados por la persona, seis canjes Rooms emitidos y consumidos durante renovaciones, autoridad limitada a una sala y listado global denegado. Misma imagen Auth; configuración ON temporal00167 y OFF final00168 con health/readiness/discovery200. Migración Greenhouse2063, assurance1833 y activación general continúan separados; no full release Greenhouse ni clientes.`
+- Status real: `2026-10-26: foundation first-party y canary real con Microsoft/MFA comprobados; seis canjes Rooms durante renovaciones, autoridad de una sala y listado global denegado. Final Auth00168-vzb100%, SHA754a2a28 y misma imagen; first-party/OTP OFF. Migración Greenhouse2063, assurance1833, onboarding general de RPs y activación duradera separados. Corrección del control de despliegue PR263/264 retenida en PR, sin merge/deploy.`
 - Rank: `TBD`
 - Domain: `platform|identity|ui`
 - Blocked by: `none para implementación local verificada; TASK-1833 antes de activación Production`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees. Runtime Rooms main bajo ownership TASK-2065`
 - Legacy ID: `TASK-1834 conserva su ID; alcance específico Greenhouse transferido a TASK-2063`
 - GitHub Issue: `none`
+
+## Conciliación vigente — 2026-10-26
+
+Canary de identidad y correo ya completado: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). [Auth retenido en PR](../../audits/rooms/2026-10-26-auth-deploy-control.md). No ampliar esa prueba a assurance completo, login Greenhouse, clientes o nueva activación. CI general y Vercel de ambos HEAD PR263/264 PASS según el [readback documental26Oct](../../audits/rooms/2026-10-26-docs-skills-state-readback.json); ambas PR siguen abiertas y retenidas. Los criterios aún abiertos abajo mantienen su razón y alcance.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
 
 ## Summary
 
@@ -108,6 +114,8 @@ El issuer autentica; Rooms revalida sus permisos persistidos y Greenhouse conser
 - Contrato OAuth/ADR, tests focales y conformance; no archivos del runtime Rooms ni provider NextAuth Greenhouse.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 

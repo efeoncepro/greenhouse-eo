@@ -1,5 +1,12 @@
 # TASK-2059 — Motion Rooms
 
+> Continuidad26Oct: referencia del diseño/scaffold anterior, no aceptación de la interfaz de Claude Design.
+> Codex conserva backend; Claude Design posee la nueva UI y su validación. Los requisitos de AXIS,
+> View Transitions, reduced-motion, fallback y accesibilidad siguen siendo obligaciones a verificar.
+> Integración/estado actual: [dossier Rooms](../../architecture/rooms/README.md) y
+> [contrato backend](../../documentation/rooms/backend-api-for-claude-design.md). No activar flags ni repetir canary por este documento.
+
+
 Estados de Button y Dialog/Tabs desde AXIS; CSS sobre axisMotion, sin animación del logo. Foco nunca espera una transición. Piezas mantienen ratio. Reduced motion elimina movimiento de interfaz; ningún autoplay.
 
 ## GVC / Micro Evidence

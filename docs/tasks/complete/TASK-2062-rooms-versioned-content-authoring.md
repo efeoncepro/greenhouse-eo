@@ -29,6 +29,12 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Conciliación vigente — 2026-10-26
+
+Cierre original: autoría programática V2 local. V1/V2 conservan inmutabilidad; V3 y medios se añadieron sin conversión implícita: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). El editor de Claude Design y los formatos PDF/audio/video no se declaran completos por estos contratos.
+
+El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+
 ## Summary
 
 Crear contratos V2 de contenido y autoría que permitan borradores incompletos, perfiles creativo y SEO/AEO independientes, bloques y relaciones tipadas, referencias de assets y validación de cobertura antes de publicar. Mantener lectores V1 y snapshots históricos sin cambios. Este tramo prepara editor y pipeline de medios; no conecta identidad ni sube archivos.
@@ -89,6 +95,8 @@ La decisión de versión y compatibilidad se registra en el ADR Rooms antes del 
 - Documentación: esta task y contratos/manuales Rooms; índices, ADR y Handoff a cargo del coordinador.
 
 ## Current Repo State
+
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 

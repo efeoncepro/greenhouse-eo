@@ -18,6 +18,11 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ## Indice por dominio
 
+### Efeonce Rooms y Efeonce ID
+
+- [Rooms: capacidades y estado](rooms/primera-experiencia-local.md) y [contrato backend para Claude Design](rooms/backend-api-for-claude-design.md): API/permisos y medios privados publicados; consumidor e integración pendientes.
+- [Entrada a productos por Efeonce ID](identity/acceso-a-productos-efeonce.md): identidad, acceso local y estado de activación; corrección de despliegue Auth retenida en PR.
+
 ### Social y Creative Studio
 
 - [BytePlus directo y biblioteca de retratos](creative-studio/byteplus-directo.md) — cuenta obligatoria, aprobaciones
