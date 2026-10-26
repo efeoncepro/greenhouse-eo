@@ -342,7 +342,7 @@ una idea, contada en cada formato, con un siguiente paso claro y medida para apr
 | # | Pieza | Estado |
 |---|---|---|
 | 1 | Portada nueva, sin persona ni vidrio. Concepto propuesto: un solo foco sobre un objeto que proyecta varias sombras de formas distintas («una idea, cada formato») | NEEDS AUTHOR (concepto) → ficha + `cine-reviewer` |
-| 2 | Infografía 1 «Una idea, cada formato» (SVG propio, La órbita, escritorio y teléfono, claro y oscuro) | por diseñar |
+| 2 | Infografía 1 «Una idea, cada formato» (SVG propio, La órbita, escritorio y teléfono, claro y oscuro) | lista, sin subir (`ai-generations/2026-10-26_marketing-contenidos-leads/infografia/`); espera revisión de Julio |
 | 3 | Infografía 2 «El sistema que aprende» (publicar → medir → decidir → siguiente idea) | opcional; puede quedar en los pasos |
 | 4 | Tabla Efeonce por etapa · Pasos · Destacado · Recuadros | en el texto |
 | 5 | Gráfico Efeonce per-hundred «12 de cada 100» (C6) en la primera sección | en el texto |

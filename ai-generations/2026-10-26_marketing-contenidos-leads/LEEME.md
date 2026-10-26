@@ -1,7 +1,7 @@
 # Refresh «Marketing de contenidos para generar leads» (post 244883) — imágenes
 
 Artículo: [`docs/public-site/CONTENT_MARKETING_LEADS_REFRESH_DRAFT_V1.md`](../../docs/public-site/CONTENT_MARKETING_LEADS_REFRESH_DRAFT_V1.md).
-Estado al 2026-10-26: **portada, `hero` y tarjeta listas, sin subir**; el texto de la portada espera el OK de Julio.
+Estado al 2026-10-26: **portada, `hero` y tarjeta listas, sin subir**; Julio aprobó el texto de la portada. **Infografía 1 lista, sin subir.**
 
 ## Portada, `hero` y tarjeta
 
@@ -23,7 +23,7 @@ Estado al 2026-10-26: **portada, `hero` y tarjeta listas, sin subir**; el texto 
 
 | Candidato | `answerOverflowPx` | Estado |
 |---|---|---|
-| «○ Una idea fuerte llega a / **cada canal**●» | 0 | **propuesto** (`final/candidatos/portada-4.*`), espera OK |
+| «○ Una idea fuerte llega a / **cada canal**●» | 0 | **aprobado por Julio el 2026-10-26** (`final/candidatos/portada-4.*`) |
 | «○ Una pieza suelta no genera leads. / **El sistema, sí**●» | 29 | descartado (desborda) |
 | «○ Una pieza suelta no genera leads. / **El sistema sí**●» | 15 | descartado (desborda) |
 | «○ Una idea, / **cada formato**●» | 70 | descartado (desborda y es jerga del artículo) |
@@ -54,3 +54,20 @@ Simulación del rail y del slider con sus zonas: `final/revision-superficies.png
 2. `pnpm public-website:blog-home hero 244883 --image final/marketing-de-contenidos-leads-2026-hero.webp --alt "…"`
 3. `pnpm public-website:blog-home card 244883 --image final/marketing-de-contenidos-leads-2026-card.webp --alt "…" --focus "85% 50%"`
    (sólo si el artículo publicado se lee en 12 minutos o más y entra al rail).
+
+## Infografía 1 — «Una idea, cada formato»
+
+- **Carpeta:** `infografia/` con el mismo método que las del ICP (`2026-10-25_icp-infografias`): `build.mjs` toma los
+  valores de La órbita de `@efeoncepro/axis-tokens`, la órbita de `orbitSvg` y los íconos de `resolveIcon`, en la línea
+  `brand` (la de la portada). `source/` lleva texto vivo; `delivery/` lleva el texto contorneado y es lo que se sube.
+  `node build.mjs && node preview.mjs` la rehace y deja los PNG de revisión en `review/` (no versionados).
+- **Contenido:** la idea al centro («Una pieza suelta compite sola.», el ejemplo del paso 2 del artículo), marcada con
+  la órbita alrededor de un cubo (el de la portada). Salen cinco formatos, cada uno con su trabajo y su canal: artículo,
+  carrusel, newsletter, video corto y respuesta en la IA. Cierra con «La idea es el activo; **cada formato la lleva a
+  otro lugar.**», la frase en negrita del artículo. Fuente: «Esquema ilustrativo · Marco editorial Efeonce».
+- **Íconos:** todos en la voz Trazo (`contenido`, `swipe`, `correo`, `multimedia`, `ia`); `auditIconGroup` pasa sin
+  avisos. Plastilina quedó fuera porque no se mezcla con el Trazo en un mismo grupo.
+- **Comprobaciones del build (`build-report.json`):** cero textos fuera del lienzo o sobre el pie, cero textos que
+  crucen la órbita y cero textos encimados, en las cuatro versiones.
+- **Archivos:** escritorio 1600 × 1000 y teléfono 900 × 2150, cada una en claro y oscuro (≈ 195 KB y ≈ 178 KB).
+  Alt, leyenda y ubicación en `infografia/media-meta.json`.
