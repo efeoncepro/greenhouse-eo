@@ -50,7 +50,7 @@ implementación en HubSpot y la experiencia propia.
 | H1 | Crea un Pipeline de Ventas que Convierte: Guía Paso a Paso | Pipeline de ventas en HubSpot: cómo configurarlo para que diga la verdad |
 | og:title | — | Tu pipeline en HubSpot ya se llena y se actualiza solo. ¿Dice la verdad? |
 | og:description | — | Etapas, reglas y previsión en HubSpot, y cómo usar el Prospecting Agent y Deal Progression sin que el pipeline mienta. |
-| Slug | `/hubspot/crea-un-pipeline-de-ventas-que-convierte-guia-paso-a-paso/` (57 caracteres de slug) | **`/hubspot/pipeline-de-ventas/`** + 301 desde la URL actual (auditoría SEO/AEO §9, decisión D1) |
+| Slug | `/hubspot/crea-un-pipeline-de-ventas-que-convierte-guia-paso-a-paso/` (57 caracteres de slug) | **`/hubspot/pipeline-de-ventas/`** + 301 desde la URL actual (auditoría SEO/AEO §9, D1). **Aprobado por Julio el 2026-10-26** |
 | Fecha | Publicado 2024-11-24 | Conservar publicación; `dateModified` real + «Actualizado el …» visible + «Funciones verificadas en la documentación de HubSpot en octubre de 2026» |
 | Schema | `BlogPosting` + `Person` (Julio Reyes) | Mantener; actualizar `headline`, `description`, `dateModified`. FAQ visible al final |
 | Portada | Sin portada propia | Nueva (se rehace; ver §6) |
