@@ -15,6 +15,18 @@ Julio aclara: **las reuniones se graban con HubSpot y Notion**; éstas son las f
 - Seguimiento focal posterior: configurado en la app y releído el 26/10. No reactivar
   el heartbeat comercial general, observado **PAUSED**, ni alterar el radar por este caso.
 
+## Lectura preliminar — 27/10, ~15:10 Chile
+
+- Reunión realizada (~15 min). Fuentes: nota de reunión Notion «ARMOR EPPS | Reunión de alcance y
+  propuesta — Indecaucho × Efeonce» y transcripción HubSpot de MEETING **119610757452**
+  (`READY`, 104 intervenciones, con timestamps). Misma grabación: no son dos testimonios.
+- La interlocutora se presenta como **Vanessa**; el Contact original la registra «Katia Vannesa
+  Chugá Ortiz». Dirigirse a ella como Vanessa; el CRM no se corrigió.
+- **CRM del cliente: Kommo.** Aclaración de Julio el 27/10; la transcripción no lo resolvía.
+- La MEETING quedó asociada a duplicados creados el 26/10 desde el dominio .ec (Contact
+  **257975486849**, Company **60018354510**), no a los registros del expediente. Sin outcome ni notas.
+  Asociar o fusionar queda pendiente de decisión de Julio.
+
 ## Recuperar y conciliar la fuente
 
 1. Releer [expediente](README.md), [caso v0](CASO-DE-NEGOCIO.md) y el evento/hilo para comprobar que la
