@@ -56,7 +56,7 @@ atención por su canal de Slack y alcance de las 25 h. Julio aprobó las respues
   nominativo). En `A051` la selección va en el ítem 3: en el 1 la etiqueta del cursor tapaba el «04» y en el 4 se salía
   del lienzo.
 - **Cambiadas:** `A05` (canal en Slack de Assetplan por Slack Connect; ícono de Slack desde el kit de Salesforce, fix en
-  `content-day-live-approval.ts`), `A07` (lo lidera Julio Reyes y se suma un Especialista de CRM dedicado), `A058`
+  `content-day-live-approval.ts`), `A07` («Un equipo asignado»: dirección de cuenta, Especialista de CRM dedicado y especialistas; la cotización v3 dice lo mismo en su alcance), `A058`
   (semana 2: Slack Connect + teamspace).
 - `plan.json` y `pdf-sprocket.mjs` con el nuevo orden; `pnpm brand:deck-plan` sin avisos. El caso ANAM se bajó del
   archivo con `pnpm ai-gen:pull` (estaba archivado).
