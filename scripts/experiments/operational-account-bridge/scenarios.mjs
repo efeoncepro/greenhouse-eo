@@ -14,9 +14,13 @@ export const designContext = { organizationId: ORG, spaceId: DESIGN, serviceId: 
 export const reportIntent = { ...seoContext, period: PERIOD, scope: blogScope }
 
 const codeFrom = operation => {
-  try { operation(); 
+  try {
+    operation()
 
-return 'unexpected_success' } catch (error) { return error.message }
+    return 'unexpected_success'
+  } catch (error) {
+    return error.message
+  }
 }
 
 export function evaluateVariant(variant) {
