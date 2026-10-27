@@ -443,9 +443,10 @@ ARMOR para lanzar.
 | Quién contrata, moneda | Términos | Pregunta a Vanessa | Proponer en USD |
 
 **Siguientes pasos internos:**
-1. **Pricing (V3):** costear el fee de Efeonce. Empaque sugerido: semana 0–2 de preparación y medición
-   (equivalente a un Growth Activation Sprint acotado) + operación de 3 meses (Managed Performance, mínimo
-   3 meses). Medios por separado, en cuentas de ARMOR.
+1. **Pricing:** costeado el 27/10 en [PRICING-PILOTO-90D.md](PRICING-PILOTO-90D.md) con el método del pack de
+   Performance (el cotizador V3 no tiene oferta de performance ni mercado Ecuador). Recomendado: puesta en marcha
+   **USD 5.400** + operación **USD 5.200/mes** × 3 = **USD 21.000** de fee (margen ~55 %; piso 45 % en
+   USD 17.079), más USD 18.000 de medios pagados por ARMOR: **USD 39.000** en total. Pendiente de aprobación.
 2. **Julio:** aprobar escenario recomendado, empaque y fee; decidir si se envían preguntas a Vanessa antes del
    jueves (sólo con su autorización).
 3. **Propuesta:** documento para Vanessa y versión ejecutiva para gerencia con los mismos hechos y límites.
