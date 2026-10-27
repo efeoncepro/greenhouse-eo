@@ -1,5 +1,11 @@
 # Handoff
 
+## 2026-10-27 — SKY: decisión de cuentas operativas y sandbox local
+
+[TASK-2073](docs/tasks/in-progress/TASK-2073-operational-account-bridge-local-prototype.md): ADR Proposed y
+comparación A′/B autorizada con fixtures; sin DB/proveedores/producción ni reasignar Diseño.
+[Plan](docs/tasks/plans/TASK-2073-plan.md); decisión/medición sintética pendientes de ejecución.
+
 ## 2026-10-26 — Blog: refresh de Pipeline y de marketing de contenidos publicados
 
 Pipeline (246045 → `/hubspot/pipeline-de-ventas/` con 301) y marketing de contenidos (244883, misma URL, 22:44 UTC)

@@ -2725,3 +2725,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-2072` | `in-progress` | **Rooms: backend cloud de medios y contrato para diseño.** R05 GCS, worker compilado/perfil propio y API/CLI; diseño Claude Design separado. | `docs/tasks/in-progress/TASK-2072-rooms-cloud-media-backend.md` |
 
 > Registro2026-10-26: usuario asigna backend a Codex y diseño a Claude Design;2070 posee base local,2071 UI,2069 identidadcloud. Siguiente ID libre TASK-2073.
+
+
+| `TASK-2073` | `in-progress` | Cuentas operativas bajo Organization: ADR Proposed y comparación local A′/B del bridge, sin producción ni historia de Diseño. | `docs/tasks/in-progress/TASK-2073-operational-account-bridge-local-prototype.md` |
+
+> Registro 2026-10-27: pedido directo de formalizar ADR/primera task y prototipo local. Barrido por dominio/superficie: TASK-195 modelo; 1852 acceso; 1853/1854 portal/métricas; 1960 informes; 2033 URLs conservan sus owners. 2073 libre en filas/reservas/filesystem; la nota previa lo indicaba siguiente libre. Siguiente ID libre TASK-2074.
