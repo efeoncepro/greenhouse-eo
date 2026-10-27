@@ -120,7 +120,7 @@ Cortes del 27/10/2026. Detalle y fuentes en la [investigación de empresa](resea
 | Frente | Hallazgo | Estado |
 | --- | --- | --- |
 | LinkedIn orgánico | ARMOR 1.554 seguidores; ~1,3 publicaciones por semana; mediana de 12 «me gusta» (≈0,8 % de seguidores). Temas: AR410/AR420, posventa, educación respiratoria. Indecaucho 4.314; Dánamo 294. | Verificado |
-| LinkedIn pagado | 2 anuncios de ARMOR pagados por Indecaucho: video de ferias (Expominas y ExpoIndustrial, 6–8/05/2026) y documento de marca de 7 páginas. Sin fechas ni impresiones fuera de la UE. | Verificado |
+| LinkedIn pagado | 2 anuncios de ARMOR pagados por Indecaucho: video de ferias (Expominas y ExpoIndustrial, 6–8/05/2026) y documento de marca de 7 páginas. Sin fechas ni impresiones fuera de la UE. Filtro de la Biblioteca de anuncios al 27/10: **2 en 2026, 0 en los últimos 30 días: no están activos**. Capturas en OneDrive, `Licitaciones/Indecaucho - ARMOR EPPS/03. Antecedentes y evidencia/`. | Verificado |
 | Google Ads | 0 anuncios de armorepps.com, productosmaster.com y fantape.ec en el Transparency Center (con 3m.com como control). | Verificado |
 | Búsqueda de marca | «armor» no tiene búsquedas medibles como marca EPP; «indecaucho» ~390 al mes en Ecuador. armorepps.com tiene ~388 visitas orgánicas estimadas en EC y casi nada en PE y CO (Semrush). | Estimado |
 | Medición | Etiqueta de Google (`GT-NGP9FL6D`, GA4) vía Site Kit. Sin GTM, conversión de Google Ads, Insight Tag ni banner de consentimiento. | Verificado |
