@@ -187,3 +187,13 @@ No se han creado otra organización, Space, client bridge, usuario, contrato, fu
 modificaron indicadores/snapshots ni se iniciaron syncs, corridas, backfills, envíos o deploys. El WIP comercial
 ajeno permanece intacto. El siguiente paso es formalizar las decisiones y unidades del capítulo 05, no ejecutar
 un cambio manual de datos como sustituto del diseño.
+
+
+## 10. Continuación autorizada — ADR y sandbox local
+
+El mismo 27-10 el operador autorizó formalizar la decisión y primera task, y ejecutar sólo prototipo local.
+[ADR Proposed](../../../architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md),
+[TASK-2073 cerrada por sandbox](../../../tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md)
+y [evaluación reproducible](../2026-10-27-sky-operational-bridge-prototype/README.md): 97 tests/68 checks PASS,
+preferencia condicionada A′. No altera el baseline del discovery: sin alta/configuración productiva ni historia
+Diseño reasignada. U01/U02/U02F siguen siendo gates previos a provisioning real.

@@ -9,7 +9,7 @@
 - Reversibility: `two-way-but-slow` para la transición de datos; `two-way` para el prototipo local.
 - Confidence: `medium`; la evidencia local no certifica migración, transacciones ni rollout.
 - Validated as of: `2026-10-27`, código del checkout y discovery sellado en `4be89a9d4`; sin nueva conexión productiva.
-- Primera unidad: [TASK-2073](../tasks/in-progress/TASK-2073-operational-account-bridge-local-prototype.md).
+- Primera unidad: [TASK-2073](../tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md).
 
 ## Context
 
@@ -39,9 +39,10 @@ Se propone una Organization con varios Spaces. El Space histórico conserva iden
 indicadores y ediciones de Diseño. La nueva relación Blog SEO/AEO se aloja en un Space propio. Un Space puede
 contener varios Servicios de la misma operación; no se crea una Organization por departamento ni un master Account.
 
-El puente preferido para evaluar es **A′: bridge operativo legacy distinto por Space, con un único owner
-comercial/financiero**. B (client compartido con contexto Space en todos los consumers) es la alternativa de
-comparación. La preferencia depende de la prueba local y de gates downstream; no autoriza insertar filas reales.
+Tras la comparación local, se recomienda **A′: bridge operativo legacy distinto por Space, con un único owner
+comercial/financiero**. B (client compartido con contexto Space en todos los consumers) sigue siendo viable
+si se retiran todos sus selectores client-only antes de abrir. La preferencia condicionada a foundations
+no autoriza insertar filas reales.
 
 El bridge operativo no representa otra empresa, Company de HubSpot, perfil Finance, factura, pago o persona.
 Su representación persistida —campo/relación de owner y rol del bridge— se diseñará en una unidad posterior.
@@ -137,3 +138,9 @@ Owners existentes que deberán evolucionar por sus unidades, sin duplicarlos en 
 El resultado reproducible del prototipo se registra en
 [TASK-2073: evaluación local](../audits/client-portal/2026-10-27-sky-operational-bridge-prototype/README.md).
 Un PASS local permite recomendar el puente; no acepta automáticamente este ADR ni abre la cuenta SEO.
+
+Resultado 2026-10-27: 97 tests PASS bajo red bloqueada/filesystem restringido, con 68 comprobaciones A′/B y nueve
+anchors de código local. Ambas variantes pasan con primitives explícitas; A′ conserva selectividad de los
+predicados client-only modelados y exige normalización Finance previa para evitar un falso candidato único de
+Diseño. No demuestra transacciones, migración o integración real. Typecheck global baseline agotó heap; lint
+global sin errores y 26 warnings existentes. Detalle y recibo reproducible en la evaluación enlazada arriba.

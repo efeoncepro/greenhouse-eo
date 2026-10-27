@@ -1,6 +1,6 @@
 # Task Index
 
-- `TASK-2073` — [Cuentas operativas: comparación local del bridge](in-progress/TASK-2073-operational-account-bridge-local-prototype.md), in-progress; ADR Proposed, sandbox local autorizado sin producción/historia.
+- `TASK-2073` — [Cuentas operativas: comparación local del bridge](complete/TASK-2073-operational-account-bridge-local-prototype.md), complete por sandbox local: 97 tests/68 checks PASS; A′ recomendado con owner Finance común; ADR Proposed, sin producción/historia.
 - `TASK-2072` — [Rooms: backend cloud de medios](in-progress/TASK-2072-rooms-cloud-media-backend.md), in-progress; main e4b2e890, GCS/SQL8migraciones/26tablas y Scheduler/worker verificados; consumidor Claude Design/entorno aislado/rollout general pendientes.
 - `TASK-2071` — [Rooms: autoría y lectura de imágenes privadas](in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md), in-progress; nueva interfaz Claude Design, UI ready=no; contrato backend disponible, integración/GVC/aceptación humana pendientes.
 

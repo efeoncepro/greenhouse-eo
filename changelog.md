@@ -2,6 +2,12 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-27 — SKY: ADR y comparación local de cuentas operativas
+
+TASK-2073 añade sandbox sin red/DB para comparar bridges A′/B: 97 tests PASS, nueve anchors locales y evidencia
+reproducible. A′ recomendado con owner comercial común y foundations previas; ADR Proposed. Sin cambios de runtime
+o historia Diseño. [Resultado y gates](docs/audits/client-portal/2026-10-27-sky-operational-bridge-prototype/README.md).
+
 ## 2026-10-26 — Rooms: entorno de integración y conectores locales
 
 Sandbox propio de datos/medios/credenciales y launcher de personas fixture; SDKbrowser tipado sobre
@@ -543,10 +549,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
   envío inicial verificado y tres seguimientos HubSpot Programado con salida por respuesta a cualquier correo.
 - Prospección y adapter HubSpot Codex/Claude precisan versión de brochure, cuerpo/calendario de inscripción,
   límites de firma y conciliación BCC_TO_CRM. Manual, funcional y registro actualizados; sin nuevas acciones externas.
-
-## 2026-10-15 — SKY: cobertura de auditoría y skills SEO
-
-- [Matriz de siete frentes abiertos](docs/services/sky-blog-seo/COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md),
-  informe, marco de cuenta y plan distinguen diagnóstico base entregado, auditoría integral parcial y lote preparado.
-- Skills `sky-blog-seo`/`seo-aeo` espejadas y modelo de informes conservan cobertura/denominadores y baseline real;
-  GSC anterior no disponible no bloquea profundizar. Actualización documental, sin cambios al sitio ni nuevas compras.

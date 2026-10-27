@@ -178,6 +178,10 @@ siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
 
 ## Referencias de ejecución
 
+- [ADR de cuentas operativas](../../architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md)
+  Proposed y [comparación local A′/B](../../audits/client-portal/2026-10-27-sky-operational-bridge-prototype/README.md):
+  A′ recomendado con owner comercial común; 97 tests PASS. Sin alta real ni cambios de Diseño; foundations pendientes.
+
 - [Discovery integral de cuentas SKY, 27-10](../../audits/client-portal/2026-10-27-sky-multi-account-discovery/README.md):
   una Organization, dos cuentas operativas; alternativas de bridge, identidad/acceso, sync/Notion, historia/ICO/
   Finance, medición e Insights y plan con dependencias. Propuesta sin configuración aplicada; preserva Diseño.

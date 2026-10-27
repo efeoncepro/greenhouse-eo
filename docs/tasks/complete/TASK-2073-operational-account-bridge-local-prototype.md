@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `En ejecución local; ADR Proposed y plan registrados; sin producción`
+- Status real: `Completa — sandbox local: 97 tests PASS, 68 checks A′/B; ADR Proposed, sin rollout`
 - Rank: `2073`
 - Domain: `identity|data|agency`
 - Blocked by: `none`
@@ -253,37 +253,44 @@ Ninguna para sandbox. Julio/Core/Identity/Finance aceptan puente/gates antes de 
 
 ## Acceptance Criteria
 
-- [ ] ADR Proposed y task/índices registrados sin sustituir dueñas existentes.
-- [ ] Source of truth, contract surface y consumers nombrados con paths reales.
-- [ ] A′ y B comparados con fallos legacy observables y anchors vigentes.
-- [ ] Historia Diseño intacta, sin duplicar Organization/owner comercial/Finance.
-- [ ] Acceso cruzado denegado, refresh preserva contexto y revocación invalida cache/retry.
-- [ ] Routing inequívoco de servicios/fuentes y replay con conflicto de intención.
-- [ ] Finance normaliza owner antes de candidatos; sin señal sigue unresolved.
-- [ ] GA4/GSC/AEO obligatorios, ausencia distinta de cero y scope Blog explícito.
-- [ ] Migration/backfill/rollback, errores, auditoría y límites de concurrencia/runtime declarados.
-- [ ] Runner/tests pasan sin imports privilegiados, red o credenciales.
-- [ ] Evidencia/recomendación/gates versionados; ningún cambio productivo/histórico.
+- [x] ADR Proposed y task/índices registrados; plan documenta barrido de dueñas, sin sustituirlas.
+- [x] Source of truth, contract surface y consumers nombrados en Backend/Data Contract y ADR Runtime Contract.
+- [x] A′ y B comparados: results.json, 34 comprobaciones por variante y nueve anchors de ocho archivos.
+- [x] Historia Diseño idéntica por digest en ambas variantes; un owner comercial/perfil Finance en replay de alta.
+- [x] Denegación cruzada, refresh, cache y revocación: escenarios y tests de capability/autoridad actual PASS.
+- [x] Routing/fuentes inequívocos y replay/conflicto: source_ambiguous, routing_ambiguous e history_owner_conflict PASS.
+- [x] Finance normaliza antes de candidatos; sin señal unresolved, señal SEO válida, owner ajeno rechazado.
+- [x] GA4/GSC/AEO obligatorios: tests de cada fuente ausente/stale/null y URLs/denominador PASS.
+- [x] Postura de migration/rollback/errores/auditoría y límites de concurrencia/runtime documentados en evaluación.
+- [x] Runner restringido: 97 tests PASS, sin skip; imports, FS/credenciales/child denegados y red bloqueada.
+- [x] Evidencia/recomendación/gates versionados; sin comandos DB/proveedores ni cambios productivos/históricos.
 
 ## Verification
 
 - `pnpm task:lint --task TASK-2073`: scanned=1 template=1 legacy=0 y cero hallazgos.
-- `node --test scripts/experiments/operational-account-bridge/prototype.test.mjs`
-- `node scripts/experiments/operational-account-bridge/evaluate.mjs`
+- `bash scripts/experiments/operational-account-bridge/run-local.sh test`
+- `bash scripts/experiments/operational-account-bridge/run-local.sh evaluate`
 - `pnpm exec eslint scripts/experiments/operational-account-bridge/`
 - `pnpm ops:lint --changed` y cierre documental focal.
 - Baseline lint/types global registrada separadamente; no demuestra integración o migración.
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta sincronizados.
-- [ ] Índices tasks/ADR sincronizados.
-- [ ] Handoff actualizado con evidencia y gates.
-- [ ] Changelog evaluado: sandbox aislado no cambia producto.
-- [ ] Chequeo cruzado TASK-1852/1853/1854/1960/2033 registrado.
-- [ ] Diferenciar cierre de sandbox, ADR Proposed y rollout no autorizado.
+- [x] Lifecycle complete y archivo en complete; cierre limitado al sandbox.
+- [x] Índices tasks/ADR sincronizados; ADR sigue Proposed.
+- [x] Handoff enlaza evaluación y gates de U01/U02/U02F.
+- [x] Changelog registra tooling local, sin cambio de comportamiento/estructura productiva.
+- [x] Chequeo cruzado registrado en plan/ADR/evaluación; dueñas sin cambio de lifecycle.
+- [x] Cierre local separado de aceptación del ADR y rollout no autorizado.
 
 ## Follow-ups
 
 U01 contexto/acceso; U02 sync/fuentes; U02F owner Finance **antes** de U03 provisioning. U04–U10 permanecen en
 el plan integral; registrar ejecución posterior sin duplicar dueñas.
+
+## Delta 2026-10-27 — Evidencia local
+
+Evaluación: `docs/audits/client-portal/2026-10-27-sky-operational-bridge-prototype/README.md` y `results.json`.
+97/97 tests bajo sandbox, 68/68 checks A′/B; ESLint focal sin hallazgos. Baseline global lint: 0 errores/26 warnings;
+types agotó heap ~4 GB antes de modificar el prototipo, sin evidencia de typecheck global satisfactorio. No se
+modificó TypeScript. Preferencia A′ condicionada a U01/U02/U02F y command hijo; ADR sigue Proposed.

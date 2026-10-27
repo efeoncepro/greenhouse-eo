@@ -59,6 +59,7 @@ no se necesita nueva delegación para la unidad local ni se altera el trabajo de
 ## Files to create
 
 - `scripts/experiments/operational-account-bridge/{fixtures,prototype,scenarios,source-anchors,evaluate,prototype.test}.mjs`
+- `scripts/experiments/operational-account-bridge/run-local.sh`, wrapper sin red y con filesystem restringido.
 - ADR/task/plan y `docs/audits/client-portal/2026-10-27-sky-operational-bridge-prototype/{README.md,results.json}`.
 
 ## Files to modify
@@ -82,3 +83,9 @@ Ninguno; sólo movimiento lifecycle de esta task al cumplir sus criterios.
 
 Schema canónico del owner/rol de bridge, política definitiva de acceso consolidado, vigencias y stakeholders
 reales se resuelven en aceptación/foundations; no bloquean el experimento sintético.
+
+## Delta 2026-10-27 — Cierre del sandbox
+
+97 tests/68 comprobaciones PASS y recomendación A′ condicionada. Se añade wrapper de ejecución restringida;
+no amplía superficie productiva. Task completa sólo por experimento local, ADR permanece Proposed. Baseline
+global de tipos agotó heap ~4 GB; no se modificó TypeScript y los checks del tooling nuevo sí pasaron.

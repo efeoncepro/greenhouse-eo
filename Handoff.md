@@ -1,10 +1,13 @@
 # Handoff
 
-## 2026-10-27 — SKY: decisión de cuentas operativas y sandbox local
+## 2026-10-27 — SKY: ADR y puente operativo probado localmente
 
-[TASK-2073](docs/tasks/in-progress/TASK-2073-operational-account-bridge-local-prototype.md): ADR Proposed y
-comparación A′/B autorizada con fixtures; sin DB/proveedores/producción ni reasignar Diseño.
-[Plan](docs/tasks/plans/TASK-2073-plan.md); decisión/medición sintética pendientes de ejecución.
+[TASK-2073](docs/tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md) cerrada sólo por sandbox:
+97 tests/68 checks A′/B PASS, red/FS restringidos. [Evaluación](docs/audits/client-portal/2026-10-27-sky-operational-bridge-prototype/README.md).
+[ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md): una Organization,
+Spaces separados y A′ recomendado, owner Finance común normalizado **antes** de candidatos. U01/U02/U02F antes de
+provisioning; no producción, fuentes, servicios o historia Diseño tocados, ni push/deploy. Types global baseline
+agotó heap; lint global 0 errores/26 warnings existentes. Aceptación ADR y foundations reales pendientes.
 
 ## 2026-10-26 — Blog: refresh de Pipeline y de marketing de contenidos publicados
 
@@ -233,66 +236,3 @@ ambas: Programado1/EnCurso0/Error0,29Oct10:00 y05Nov10:05 Perú. Respuesta/reuni
 no duplicar por radar/Outlook. Calendario guardado releído; correos de seguimiento todavía no enviados.
 Método y skills espejo concilian la excepción individual y el reader CLI fallido sin repetir inscripciones;
 [cierre documental](docs/audits/commercial/2026-10-24-lucia-yvette-secuencias-docs-skills.md). No cambia el permiso del radar.
-
-## 2026-10-24 — Portada del blog v3 en producción; operable por agentes
-
-**`/blog/` (18456) sirve la portada v3 desde el 2026-10-24 08:13Z** con datos reales, menú canónico (paquete del tema
-con `EO_SITE_NAV_EXCLUDED_PAGES` vacío), foto del autor desde su perfil de WordPress y tres tableros. Rollback del
-corte: `pnpm public-website:blog-home page rollback --snapshot _gh_blog_home_v3_before_20261024_081327 --apply`.
-Verificado en vivo: sin desborde de 320 a 1920, un H1, axe 0 en los tres tableros, indexable. La página de revisión
-252046 quedó en la papelera el 2026-10-26 con OK del operador (`/blog-v3-revision/` responde 404).
-
-**Operación por cualquier agente:** `pnpm public-website:blog-home` (manual
-`docs/manual-de-uso/public-site/operar-portada-blog-por-cli.md`, referencia de skill `blog-home-operation.md`):
-estado y motivo de cada diapositiva, fijar, título e imagen del slider, formato, recursos, eventos, suscripción, flag,
-purga, despliegue de los dos plugins (con línea base viva y flag off→on) y verificación en navegador. Cada `--apply`
-queda en `scripts/public-website/blog-home/ledger/`.
-
-**Suscripción a Glitch: real y en vivo** desde el release `40b330175855` (orquestador `40090589488`, released): formulario
-`efeonce-blog-subscription` publicado como píldora (`fver-e6850cc8…`, `pnpm growth:forms:publish-glitch-pill`) y
-conectado con `pnpm public-website:blog-home subscription 6bc62588-… --apply`. HubSpot suscribe por el acto de enviar
-bajo el aviso (`consentBy: 'submission'` + hash del aviso, aprobado por el operador). Verificado en vivo sin envío:
-renderer en los tres tableros, sobrevive al autoplay del slider, abre el campo, axe 0. **Envío humano real verificado
-(2026-10-24 15:33Z, operador):** submission `delivered`, recibo HubSpot `verified`, contacto `SUBSCRIBED` al tipo 535702717
-(«Marketing Information», genérico) con `CONSENT_WITH_NOTICE`. No sale correo de bienvenida: no hay ninguno configurado.
-**Pendiente:** visto bueno visual de la píldora en el pie (desvío 13); decidir bienvenida y tipo de suscripción propio.
-Desconectar: `subscription off --apply`.
-**Defectos visuales de la píldora: corregidos en local (`a5b028461`, sin push).** El autocompletado lo pintaba la regla
-`:-internal-autofill-selected` de Chrome (`!important` de agente de usuario; reproducido con `Autofill.trigger` en Chrome
-real); «¡Listo!» quedaba corrido por la grilla de `.ghf-inline-msg`. Gate `inline-pill.scenario.mjs` dentro de
-presupuesto. **El operador decidió no hacer release por ahora** (~3 h cada uno): correos (`2a971d768`) y píldora esperan
-al próximo release que él decida.
-**Eventos/webinars — causa del conector aislada (2026-10-26):** el conector de HubSpot solo descubre webinars creados
-**desde el Calendario de Teams (Nuevo → Webinar)**; «Prueba sync HubSpot (calendario)» apareció en minutos como Evento de
-marketing, los de la app Eventos nunca. Regla: crear desde el Calendario; el conector es la fuente del Evento de
-marketing y la escritura por API de Greenhouse queda de respaldo. Respuesta enviada a Johanna (ticket #50018204746).
-**Eventos/webinars (2026-10-24):** las sesiones son **webinars de Teams** (no reuniones). El conector Teams↔HubSpot no
-lee ningún webinar aunque Entra, la política de Teams (`MY-APP-POLICY`, ahora también asignada a jreyes) y los ajustes
-de HubSpot están bien; ticket de soporte **#50018204746** derivado a agente humano (anexo C). Diseño alternativo sin
-costo: Greenhouse dueño de la reserva e inscripción en el webinar por Graph (app Entra dedicada), asistencia por sesión
-y Marketing Events por API solo mientras el conector esté roto (anexo D). **Backlog canónico** para cerrar el módulo:
-`docs/research/RESEARCH-013-events-webinars-hubspot-teams.md` § «Backlog canónico». Pendiente del operador: quién manda
-la confirmación con el enlace (Greenhouse o Teams). Webinars de prueba publicados en Teams: «La IA no conoce tu negocio»
-(24-oct) y «La IA y la busqueda» (26-oct); cancelarlos al terminar. PowerShell 7.6.8 + módulo MicrosoftTeams 8.0.0
-instalados en el Mac del operador (`brew`, `Install-Module -Scope CurrentUser`).
-
-**AXIS v0.7.15 publicado** (CI `dc7c721`, primitives 0.7.15; la prueba del haz del buscador ya no compite con el
-runner). Sin evento real cargado: la sección de eventos queda oculta hasta el primero (`blog-home event`).
-
-**Búsqueda y archivos del blog (2026-10-24, sin dueño):** búsqueda, categoría, etiqueta y autor siguen en la plantilla
-de archivo de Ohio, con el recuadro de demo «Hire us! We are WordPress specialists», textos en inglés, categoría vacía
-indexable y desborde a 390 en dos archivos. Diagnóstico y propuesta (contención en vivo + plantilla «Archivo del blog» v3):
-[auditoría](docs/audits/public-site/2026-10-24-blog-search-archive-views.md). Decisión: contención junto con el rediseño, en sesión nueva; falta la task.
-
-**Eventos y webinars: infraestructura desplegada, NO operativa.** El release `e593e3993bc3` llevó los correos de
-reserva (confirmación con `joinUrl` + `.ics`, lista de espera, recordatorio por `/growth/events/reminders` + Cloud
-Scheduler `ops-growth-event-reminders` `*/15`), `GROWTH_EVENT_EMAILS_ENABLED` ON en el ops-worker y el lanzador
-`pnpm events:launch -- --brief <json> [--apply] [--skip-wordpress]` (manual `lanzar-evento-o-webinar.md`). La prueba de
-punta a punta con `prueba-e2e-eventos-2026-10-24` (sin WordPress) dejó 2 reservas (confirmada + en espera), consentimiento
-con hash y HubSpot 200, pero **ningún correo salió**: consumer y recordatorio exigían `status='accepted'` y el dispatcher
-ya la había pasado a `delivered`. Corrección local (`ACCEPTED_SUBMISSION_STATUSES` en `event-emails.ts` + `store.ts`,
-prueba `event-emails-accepted-status.test.ts`, SQL contra PG real), **sin release**; un intento local sin
-`RESEND_API_KEY` dejó 3 filas `config_error` en `email_deliveries` (el job de reintentos no las toma: no salió ningún correo). HubSpot
-sólo recibe el envío + `ef_event_key`: sin objeto Marketing Events (token sin scopes, 403). **Decisión del operador:**
-diseñar Marketing Events y un posible webinar en Teams antes del próximo release; no lanzar eventos reales hasta entonces.
-El formulario de prueba sigue publicado para re-verificar y luego deprecarlo. Próximo paso: sesión nueva con RESEARCH-013.
