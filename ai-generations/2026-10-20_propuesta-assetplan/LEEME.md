@@ -43,3 +43,25 @@ Canvas: https://claude.ai/code/artifact/a167ca41-cc6c-4748-8370-dc14dd63e340
 - Enviado a Karla por Outlook el 20/10 a las 18:11, con firma gráfica, CCO HubSpot y los dos PDF. Readback en Enviados y EMAIL 119144374556 `SENT` en HubSpot.
 - Deal 66450601027: Precios y términos, 440 UF (proyección de 12 meses), cierre 04/11/2026 (vigencia).
 - Entregables también en OneDrive `Alineación/4. Comercial/Licitaciones/Assetplan/`.
+
+## Versión 2 — 27/10/2026 (respuesta a los cinco puntos de Karla)
+
+Karla pidió, antes de la reunión del miércoles 28/10 a las 15:45: persona asignada, continuidad, tiempos de respuesta,
+atención por su canal de Slack y alcance de las 25 h. Julio aprobó las respuestas; la propuesta pasa a 25 láminas.
+
+- **Nuevas:** `A041-bolsa` (content-text, «¿Qué se cobra aparte? Poco.»: ordinario y agentes priorizados dentro, aparte
+  sólo lo grande, hasta 5 h pasan al mes siguiente en los meses 1–4) · `A051-tiempos` (content-bullets: urgente ≤ 1 h con
+  plan en el día; importante ≤ 4 h y ajustes en 24 h hábiles; relevante ≤ 24 h y 48–72 h hábiles; Slack Connect) ·
+  `A071-continuidad` (content-bullets: respaldo designado, memoria en Notion, traspaso con traslape sin costo, acceso
+  nominativo). En `A051` la selección va en el ítem 3: en el 1 la etiqueta del cursor tapaba el «04» y en el 4 se salía
+  del lienzo.
+- **Cambiadas:** `A05` (canal en Slack de Assetplan por Slack Connect; ícono de Slack desde el kit de Salesforce, fix en
+  `content-day-live-approval.ts`), `A07` (lo lidera Julio Reyes y se suma un Especialista de CRM dedicado), `A058`
+  (semana 2: Slack Connect + teamspace).
+- `plan.json` y `pdf-sprocket.mjs` con el nuevo orden; `pnpm brand:deck-plan` sin avisos. El caso ANAM se bajó del
+  archivo con `pnpm ai-gen:pull` (estaba archivado).
+- **Cotización v3** (`Efeonce-Cotizacion-Assetplan-HubSpot-v3.pdf`, ref. `ASSETPLAN-2026-10-27-v3`): mismo precio;
+  tiempos de respuesta en «Capacidad», traspaso de hasta 5 h en lugar de «no acumulable», Slack Connect en el ciclo,
+  contraparte y continuidad en el alcance. Datos en el expediente privado (`cotizacion-v3/`).
+- En OneDrive quedan las versiones enviadas el 20/10 sin tocar y, al lado, `…-Operacion-HubSpot-v2.pdf` y la cotización v3.
+- Canvas actualizado (versión 60). **Sin enviar:** el correo de respuesta a Karla lo envía Julio.

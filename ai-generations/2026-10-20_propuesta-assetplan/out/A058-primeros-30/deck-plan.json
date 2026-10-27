@@ -111,7 +111,7 @@
             "number": "02",
             "kicker": "Semana 2",
             "title": "Canal y teamspace",
-            "description": "Canal de Teams o Slack y teamspace de Notion con el backlog priorizado."
+            "description": "Slack Connect en tu canal de CRM y teamspace de Notion con el backlog priorizado."
           },
           {
             "role": "rest",

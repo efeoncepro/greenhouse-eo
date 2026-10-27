@@ -180,11 +180,11 @@
             "eyebrow": "Tu día a día con Efeonce",
             "answerLead": "En tu"
           },
-          "body": "Tu equipo pide en su <strong>canal</strong> de Teams o Slack, lo ordenamos en Notion y lo resolvemos en HubSpot.",
-          "note": "Ejemplo ilustrativo · usamos el canal que ya tengas: Teams o Slack",
+          "body": "Tu equipo pide en su <strong>canal</strong> de solicitudes de CRM en Slack, lo ordenamos en Notion y lo resolvemos en HubSpot.",
+          "note": "Ejemplo ilustrativo · atendemos por Slack Connect en tu canal",
           "channel": {
-            "icon": "asset-ref:file:tool-teams",
-            "name": "Assetplan · Soporte HubSpot"
+            "icon": "asset-ref:file:salesforce-icon-slack",
+            "name": "Assetplan · Solicitudes CRM"
           },
           "agentIcon": {
             "src": "asset-ref:file:hubspot-icon-sales"
@@ -218,7 +218,7 @@
             {
               "number": "01",
               "title": "Pides",
-              "detail": "En Teams o Slack",
+              "detail": "En tu Slack",
               "state": "now"
             },
             {
@@ -437,11 +437,11 @@
           "eyebrow": "Tu día a día con Efeonce",
           "answerLead": "En tu"
         },
-        "body": "Tu equipo pide en su <strong>canal</strong> de Teams o Slack, lo ordenamos en Notion y lo resolvemos en HubSpot.",
-        "note": "Ejemplo ilustrativo · usamos el canal que ya tengas: Teams o Slack",
+        "body": "Tu equipo pide en su <strong>canal</strong> de solicitudes de CRM en Slack, lo ordenamos en Notion y lo resolvemos en HubSpot.",
+        "note": "Ejemplo ilustrativo · atendemos por Slack Connect en tu canal",
         "channel": {
-          "icon": "asset-ref:file:tool-teams",
-          "name": "Assetplan · Soporte HubSpot"
+          "icon": "asset-ref:file:salesforce-icon-slack",
+          "name": "Assetplan · Solicitudes CRM"
         },
         "agentIcon": {
           "src": "asset-ref:file:hubspot-icon-sales"
@@ -475,7 +475,7 @@
           {
             "number": "01",
             "title": "Pides",
-            "detail": "En Teams o Slack",
+            "detail": "En tu Slack",
             "state": "now"
           },
           {
