@@ -31,6 +31,14 @@ Julio aclara: **las reuniones se graban con HubSpot y Notion**; éstas son las f
   key ni `HUBSPOT_SKIP_AUTH_CHECK`. Readback CLI: cuatro asociaciones (ambos Contacts y ambas
   Companies) y la reunión visible en las actividades del Contact original.
 
+## Caso v1 producido — 27/10, ~15:45 Chile
+
+Por pedido de Julio, el [caso de negocio v1](CASO-DE-NEGOCIO.md) ya se escribió con la transcripción y la
+investigación de `research-2026-10-27/` (empresa, competidores, mercado y medios/medición). La revisión
+programada de las 16:00 **no debe reescribirlo ni crear otra lectura paralela**: si corre, sólo valida contra la
+transcripción, registra discrepancias aquí y actualiza el body de la TASK **119625704196** con el estado real
+(caso v1 listo; pendientes: datos de Kommo, certificados, regla de canal, fee en Pricing).
+
 ## Recuperar y conciliar la fuente
 
 1. Releer [expediente](README.md), [caso v0](CASO-DE-NEGOCIO.md) y el evento/hilo para comprobar que la

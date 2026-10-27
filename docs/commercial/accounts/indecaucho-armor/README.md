@@ -4,7 +4,15 @@ Uso interno. Owner: Julio Reyes. Corte: **26/10/2026**. Versión **v0, previa a 
 Decisión próxima: comprender la necesidad y acordar los insumos de una propuesta defendible ante
 gerencia Industria. **Reunión solicitada e invitación enviada; no selección en terna ni negocio ganado.**
 
-## Leer antes de la reunión
+## Estado al 27/10, después de la discovery
+
+Reunión realizada el 27/10 con Vanessa (Katia Vannesa Chugá Ortiz). Leer primero el
+[caso de negocio v1](CASO-DE-NEGOCIO.md): piloto de 90 días LinkedIn Ads + Google Ads para Compras y SSO en
+Ecuador, Colombia y Perú; propuesta comprometida para el jueves 29 o viernes 30; terna a gerencia el 4/11.
+Investigación de soporte en [research-2026-10-27/](research-2026-10-27/) y lectura de la reunión en
+[POSTREUNION](POSTREUNION.md).
+
+## Leer antes de la reunión (preparación del 26/10, histórica)
 
 1. [Guía de conversación del 27/10](REUNION-2026-10-27.md): apertura, agenda y preguntas prioritarias.
 2. [Caso de negocio v0](CASO-DE-NEGOCIO.md): hipótesis de valor, grupo comprador, alternativas,
