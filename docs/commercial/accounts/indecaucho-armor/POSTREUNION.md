@@ -25,7 +25,11 @@ Julio aclara: **las reuniones se graban con HubSpot y Notion**; éstas son las f
 - **CRM del cliente: Kommo.** Aclaración de Julio el 27/10; la transcripción no lo resolvía.
 - La MEETING quedó asociada a duplicados creados el 26/10 desde el dominio .ec (Contact
   **257975486849**, Company **60018354510**), no a los registros del expediente. Sin outcome ni notas.
-  Asociar o fusionar queda pendiente de decisión de Julio.
+- Por instrucción de Julio (27/10), la MEETING se asoció por UI también al Contact **255985568411** y
+  a la Company **59393386572**, sin fusionar duplicados. La Agent CLI `0.16.0` rechaza
+  `associations create` con OAuth de usuario (`AUTH_MODE_MISMATCH`, chequeo local); no se usó service
+  key ni `HUBSPOT_SKIP_AUTH_CHECK`. Readback CLI: cuatro asociaciones (ambos Contacts y ambas
+  Companies) y la reunión visible en las actividades del Contact original.
 
 ## Recuperar y conciliar la fuente
 
