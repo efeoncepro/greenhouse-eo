@@ -1,9 +1,12 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.24
+> **Versión:** 1.25
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-20 por Claude (1.24: la propuesta Assetplan — 22 láminas en `revenue-hubspot` con
+> **Última actualización:** 2026-10-28 por Claude (1.25: la propuesta Assetplan v2 — 25 láminas, tres nuevas con
+> `content-text` y `content-bullets` para las preguntas de la clienta; el ícono de Slack sale siempre del kit de
+> Salesforce en cualquier línea; posición limpia de la selección en `content-bullets` y límites de slots medidos.
+> Antes, 2026-10-20, 1.24: la propuesta Assetplan — 22 láminas en `revenue-hubspot` con
 > `pnpm brand:compose`, sin recetas nuevas; `content-live-chat` sirve para HubSpot con el isotipo correcto; precedente de
 > montos reales en `content-pricing` live por excepción del operador; portada de propuesta sin pregunta a mano con las
 > medidas de `cover-proposal` · `orbit-decision` hasta TASK-2014; enlace a la agenda en el PDF de próximos pasos. Antes,
@@ -180,7 +183,7 @@ Salesforce»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck). Task:
 | 06 · Todo el ciclo | `content-service-lanes` | `content` | la lámina que lista qué hace la práctica | seis carriles del catálogo `docs/services/`; Agent Astro sólo con autorización |
 | 07 · Agentes | `content-season-launches` | `content` | semanas después del evento, con el ledger vigente | fecha de corte obligatoria; nunca en un brochure evergreen |
 | 08 · Una persona | `method-agent-supervisor` | `method` | la objeción es el control del agente | toda ficha dice quién aprueba o qué nunca hace |
-| 09 · Donde trabajas | `content-day-live-approval` | `content` | vivir la supervisión del agente en el canal del equipo | el agente propone con evidencia y una persona aprueba; botones a 26 px; `[MONTO]`; Slack o Teams según la cuenta |
+| 09 · Donde trabajas | `content-day-live-approval` | `content` | vivir la supervisión del agente en el canal del equipo | el agente propone con evidencia y una persona aprueba; botones a 26 px; `[MONTO]`; Slack o Teams según la cuenta; el ícono de Slack (`channel.tool: 'slack'`) sale siempre del kit `revenue-salesforce`, en cualquier línea (2026-10-27) |
 | 10 · Te responde | `content-live-chat` | `content` | el servicio de Enablement conversacional | ventana genérica; marcas de Claude y Claudeforce opcionales con autorización; `[MONTO]` |
 | 11 · Con permiso | `method-identity-consent` | `method` | activar audiencias con datos personales | toda activación por un canal con permiso |
 | 12 · Porque cuadra | `method-migration-reconcile` | `method` | migrar con datos existentes | los números cuadran; datos de muestra marcados |
@@ -568,6 +571,39 @@ la corrida. No promueve recetas nuevas ni registra `approvedUses`.
   desarrollo, integraciones y datos, con una contraparte.» (la respuesta admite 16 caracteres: «multidisciplinarios»
   no cabe). La pregunta de `decision-platform-coexistence` en tres líneas quedaba pegada a la respuesta gigante: se
   acortó a «¿Y mis otros sistemas?». La pregunta va en una o dos líneas.
+
+### Delta v2 (27–28/10)
+
+La clienta respondió con cinco puntos antes de la reunión (persona asignada, continuidad, tiempos de respuesta, canal
+en Slack y alcance de las horas) y la propuesta pasó a **25 láminas**, enviada el 2026-10-28 como link de HubSpot. Los
+archivos del 20/10 quedan como respaldo. Sigue sin promover recetas nuevas ni registrar `approvedUses`.
+
+- **Tres láminas nuevas, una por pregunta:**
+
+  | Lámina | Receta | Pregunta · respuesta | Responde a |
+  |---|---|---|---|
+  | `A041-bolsa` | `content-text` | «¿Qué se cobra aparte? Poco.» | el alcance de la bolsa de horas y qué va aparte |
+  | `A051-tiempos` | `content-bullets` | «¿Cuándo me responden? A tiempo.» | los tiempos de primera respuesta por prioridad |
+  | `A071-continuidad` | `content-bullets` | «¿Y si cambia la persona? Nada se pierde.» | reemplazos y retención del conocimiento |
+
+- **Continuidad con `content-bullets`, no con `decision-risk`.** `decision-risk` es sólo light y `revenue-hubspot` exige
+  dark (`line-piece-keeps-efeonce-dark` / `theme-invalid-for-recipe`).
+- **Slack es de Salesforce en cualquier línea.** `content-day-live-approval` con `channel.tool: 'slack'` en un deck
+  `revenue-hubspot` lanzaba «el ícono de producto es uno de marketing · sales…». Se corrigió la receta
+  (`src/lib/brand-surfaces/recipes/line-stage/content-day-live-approval.ts`): el ícono del canal Slack sale siempre
+  del kit `revenue-salesforce` (`productIcon('slack', …, 'revenue-salesforce')`), con test en
+  `src/lib/brand-surfaces/__tests__/line-stage-content-day-live-approval.test.ts`.
+- **La selección en `content-bullets` (`selected`, 1–4, base 1).** En `A051`, con `selected: 1` la etiqueta del cursor
+  tapaba el número «04»; con `selected: 4` el compositor lanzó `GraphicLineSelectionError` (la selección o su etiqueta
+  quedan fuera del lienzo). `selected: 3` (abajo a la izquierda) es la posición limpia. Mirar la lámina al 100 %: el
+  gate no ve que la etiqueta tape un número.
+- **Límites de slots medidos en esta corrida:** `content-text` answer ≤8 caracteres, body ≤95, cada point ≤46;
+  `content-bullets` answer en una sola línea; `section-cine` body ≤136; `decision-next-steps` body ≤60.
+- **Cambiadas:** A02, A04 y A041 (30 horas); A035 (sin landing pages); A036 (sin Teams ni Microsoft 365); A05 (canal en
+  Slack por Slack Connect); A057 (reunión semanal; 26 de 30 h; revisión presencial o Meet); A058 (semana 2: Slack
+  Connect + teamspace); A06 (reunión semanal); A07 («Un equipo asignado: dirección de cuenta, un Especialista de CRM
+  fijo desde el inicio y especialistas en desarrollo y datos.»); A078 (36 UF, 48 de lista, vigencia 30/11); A08
+  (segunda reunión «Conoce a tu contraparte»; inicio antes de diciembre).
 
 ## Anatomía de una receta (campos del JSON)
 

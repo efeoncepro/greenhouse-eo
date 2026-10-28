@@ -82,3 +82,7 @@ la contraparte como «Especialista de CRM fijo desde el inicio», sin nombre tod
   mes 5, 48 UF + IVA = 57,12 UF. Equipo asignado con Especialista fijo y reunión semanal en el ciclo. La v3 del 27/10
   nunca se envió: se reemplazó.
 - OneDrive y canvas (versión 65) actualizados. Vigencia extendida al 30/11/2026 (Julio, 28/10). Deal 66450601027: monto 528 UF (4 × 36 + 8 × 48), readback verificado; cierre movido al 30/11/2026.
+- **Enviado el 28/10 a las 17:03** por Julio, en el hilo original: propuesta por link de documento de HubSpot
+  (https://hubs.ly/Q04CGTr30; el PDF pesa ~16 MB) y cotización v3 adjunta. Verificado en Enviados; HubSpot registró
+  EMAIL 119864568951 `SENT` en el deal. HubSpot: próximo paso actualizado, nota 119880247983 y tarea 119879914252
+  («confirmar Especialista de CRM y agendar la segunda reunión», vence 03/11).

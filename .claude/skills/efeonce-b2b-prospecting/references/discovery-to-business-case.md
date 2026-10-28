@@ -183,6 +183,22 @@ Revisión proporcional antes de entregar:
 - Dependencias/capacidad/pricing revisados para el nivel de propuesta que se prepara.
 - Próximo paso distingue acuerdo comprador, propuesta interna, autorización y acción verificada.
 
+**Primer envío después de la reunión.** Antes de tocar documentos, CRM o correo, releer la nota y la
+transcripción de la reunión (§3). Un correo o una versión preparados antes de la reunión quedan obsoletos si la
+conversación cambió el relato: no enviarlos porque estén listos, sino rehacerlos sobre lo escuchado.
+
+- Contrastar lo dicho en vivo con lo que dicen los documentos ya entregados o en preparación (tiempos, horas,
+  alcance, condiciones). Si no coinciden, presentar ambas versiones al operador para que elija una y aplicar la
+  elegida en todos los documentos; no promediarlas ni dejar las dos vigentes.
+- Una objeción de fondo sobre quién atiende («quiero una persona fija que entienda el negocio») se responde con
+  la persona: rol, seniority, desde cuándo está y cómo se cubre su ausencia. Agregar método, herramientas o
+  proceso no la responde.
+- Si la cuenta arranca con la dirección de Efeonce ejecutando, no presentarlo como «lo haré yo» (se lee como una
+  empresa de una persona) ni ocultarlo: presentar un equipo asignado con contraparte fija y senior, y la dirección
+  de la cuenta a cargo del director. Mientras la persona no esté comprometida, describir el rol sin nombrarla.
+
+Caso fuente: discovery de operación CRM con una cuenta inmobiliaria, 2026-10-28 (propuesta y cotización reemitidas ese día).
+
 Actualizar resumen y estado **donde se leerán**, conservando historia y enlaces al expediente único.
 No copiar transcripciones o cifras volátiles a todos los entrypoints. El método y los ejemplos de skills
 permanecen anónimos; el expediente privado conserva evidencia específica. Al cerrar una fase, registrar

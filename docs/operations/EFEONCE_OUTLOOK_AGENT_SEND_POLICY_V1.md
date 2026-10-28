@@ -211,6 +211,14 @@ Se comprobaron las copias nuevas de Enviados y las actividades EMAIL SENT por se
 El NDR del corporativo inferido de Yuri se registra como resultado adverso aunque el envío fuera solicitado;
 no se reintenta ni se usa la conexión LinkedIn para validar el correo.
 
+### Delta 2026-10-28 — PDF pesado por link de HubSpot
+
+En la segunda propuesta a Assetplan, el PDF de ~16 MB (el del 20/10 viajó adjunto) se compartió como link de
+documento de HubSpot, que registra vistas, y se adjuntó sólo la cotización. Regla: un PDF pesado va por link de
+HubSpot, la cotización adjunta y la respuesta en el hilo original, con firma gráfica y CCO HubSpot como siempre.
+El readback confirmó Enviados y la actividad EMAIL `SENT` asociada al Deal.
+[Registro del caso](../commercial/CRM_DEAL_REGISTER.md#assetplan--operación-hubspot--reunión-y-propuesta-a-30-horas-28-10-2026).
+
 ## Evidencia, alternativas y límites
 
 El 2026-10-08 se verificó en Enviados el correo a Dianesty sobre diseñador senior: salió desde Outlook con los dos enlaces, pero con cierre simple y sin BCC. El operador pidió esta corrección permanente. El contrato aplica a futuros envíos; no reenvía ni registra retroactivamente ese correo sin mandato específico.

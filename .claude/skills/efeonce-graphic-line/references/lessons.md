@@ -905,3 +905,25 @@ Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md` lista cada
 - **El compositor no emite enlaces en el PDF.** Para que la tarjeta de agenda de `decision-next-steps` lleve a
   `https://efeoncepro.com/agenda/` se agregó una anotación URI con pdf-lib al armar el PDF (`pdf-sprocket.mjs`,
   constante `LINKS`) y un `<a>` sobre la tarjeta en el canvas.
+
+## 2026-10-27/28 — Propuesta Assetplan v2 (25 láminas, `revenue-hubspot`)
+
+Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md`). Recetas:
+[README de recetas](../../../../docs/operations/brand-graphic-line/deck-recipes/README.md), «Delta v2 (27–28/10)».
+
+- **Slack es de Salesforce en cualquier línea (2026-10-27).** Síntoma: `content-day-live-approval` con
+  `channel.tool: 'slack'` en un deck `revenue-hubspot` lanzaba «el ícono de producto es uno de marketing · sales…». Regla: corregir la
+  receta, no la lámina. En `src/lib/brand-surfaces/recipes/line-stage/content-day-live-approval.ts` el ícono de Slack
+  sale siempre del kit `revenue-salesforce` (`productIcon('slack', …, 'revenue-salesforce')`); test en
+  `src/lib/brand-surfaces/__tests__/line-stage-content-day-live-approval.test.ts`.
+- **La selección de `content-bullets` puede tapar o salirse (2026-10-27).** Síntoma: en `A051`, `selected: 1` dejó la
+  etiqueta del cursor sobre el número «04» y `selected: 4` lanzó `GraphicLineSelectionError` (fuera del lienzo).
+  Regla: `selected: 3` (abajo a la izquierda) es la posición limpia; mirar la lámina al 100 %, porque el gate no ve que
+  la etiqueta tape un número.
+- **Raster archivado no se regenera (2026-10-28).** Síntoma: el caso ANAM
+  (`ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/62-ANM-...jpg`) no estaba en disco al rearmar el PDF.
+  Regla: `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer; nunca regenerar ni aproximar.
+- **La copia local del canvas no es la fuente (2026-10-28).** Síntoma: la copia en el scratchpad se pierde entre
+  sesiones y el artefacto puede tener versiones más nuevas (el visor guarda). Regla: leer los archivos con
+  `action: read` antes de publicar; subir el PNG como asset, cambiar el `/_blob/<id>` y el `alt`, y publicar con
+  `file_path` + `root` (+ `files`).
