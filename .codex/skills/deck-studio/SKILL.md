@@ -1027,6 +1027,10 @@ Para una licitación o propuesta técnica SEO/AEO que el cliente lee sin nosotro
 
 Para una licitación de servicio creativo (evolución de línea gráfica, concepto, piezas de muestra y método de producción) existe el molde hermano, con la misma técnica y otro argumento: el deck abre con el trabajo, sigue con una lámina de cumplimiento en las palabras de la ficha y recorre propuesta → producción → equipo → continuidad e inicio. Caso fuente: Sika Mexicana, Wherex N.º 1164, 22 láminas, línea Brand (presentada por el operador el 13/10/2026; resultado desconocido). Orden, las nueve correcciones del operador, cómo se enlaza un video (QR + enlace clicable), mecánica, trampas medidas y lista de control: [references/propuesta-tecnica-campana-creativa.md](references/propuesta-tecnica-campana-creativa.md). Difiere del molde SEO/AEO en dos cosas que no se mezclan: títulos directos sin pregunta y respuesta, y el rótulo «Qué significa para ustedes». Las láminas HTML a mano de ambos moldes son sólo para datos del cliente sin receta; lo que tiene lámina aprobada (portada, cierre, caso) sale del compositor.
 
+### Propuesta de performance que una champion presenta a su gerencia (2026-10-28)
+
+Cuando quien recibe el deck lo lleva a su gerencia sin nosotros (caso ARMOR EPPS, línea Voice, 41 láminas + ruta corta de 19, enviada el 28/10/2026; resultado desconocido): esfera en el acento de la línea en cada titular display, revisión «¿Se explica sola?», ruta corta generada en la renumeración, lámina de inversión total y condiciones, precio desglosado sin total en el correo, láminas de entrega Voice, partners según el registro, casos del brochure 360° y contraportada Voice VOX3: [references/propuesta-performance-champion.md](references/propuesta-performance-champion.md).
+
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
 Casi todo el mal deck del mundo nace de saltarse una de estas. **Contéstalas en voz alta.**
@@ -1290,6 +1294,7 @@ Derechos de stock, talento, música, likeness y licencias se cotizan aparte. Can
 ├─ GRÁFICOS en un deck (≠ dashboard) .................. data-storytelling.md
 ├─ PROPUESTA TÉCNICA que se lee sin presentador:
 │  SEO/AEO · campaña creativa .......................... references/propuesta-tecnica-*.md
+├─ PROPUESTA que una champion lleva a su gerencia ..... references/propuesta-performance-champion.md
 └─ FUENTES verificadas + LOS MITOS QUE NO SE CITAN .... SOURCES.md
 ```
 

@@ -22,11 +22,26 @@ existía ningún negocio de ARMOR o Indecaucho: 0 asociados a las Companies 5939
 El readback de las asociaciones se hizo con la HubSpot Agent CLI (`associations list --from deals:66992325527`). El
 índice de búsqueda tardó en reflejar el negocio filtrando por Company y Contact.
 
+## Propuesta enviada — 28/10/2026
+
+Autorizado por Julio en el chat. Readback del negocio 66992325527 después de actualizarlo:
+
+| Campo | Antes | Ahora |
+| --- | --- | --- |
+| Etapa | `qualifiedtobuy` (Calificado para comprar) | `presentationscheduled` (Presentación de soluciones) |
+| Monto | Vacío | **9.260 USD** (honorarios del piloto; los medios los paga ARMOR y no son ingreso de Efeonce) |
+| Moneda | Vacía | USD |
+| Fecha de cierre | 2026-11-04 | Sin cambio (revisión con la gerencia) |
+| Descripción | Vacía | Resumen del precio, la Fase 0 bonificada, los medios y el calendario |
+
+Nota **119882988849** asociada al negocio, al contacto 255985568411 y a la empresa 59393386572, con los tres
+enlaces del paquete. Detalle en [ENVIO-PROPUESTA-2026-10-28](ENVIO-PROPUESTA-2026-10-28.md).
+
 ## Pendiente
 
 - El duplicado de la empresa, 60018354510 (`indecaucho.ec`), y el del contacto, 257975486849, siguen sin fusionar y
   sin el negocio.
-- Monto y etapa se actualizan cuando el precio se apruebe y la propuesta se presente.
+- Monto y etapa: actualizados el 28/10 (arriba).
 
 ## Segundo negocio: HubSpot para el grupo — 28/10/2026
 
