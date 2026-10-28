@@ -76,8 +76,10 @@ en la voz de decisión (eyebrow · titular con su esfera · evidencia), sin preg
 hasta entonces, lámina a mano con las medidas del token. Borrar la pregunta después de componer es parche («no
 parches»). Contraportada BR3h: el operador rechazó la v1 («se ve súper artificial la órbita con ese punto rosado
 allí»); en foto, la órbita lleva su anatomía completa (hilo tenue en la luz de Efeonce, arco corto en el acento y la
-esfera en la punta del arco). Rosado «sólo en la esfera» no alcanza: la esfera suelta se lee pegada. BR3 aprobada tiene
-la misma esfera suelta (pregunta abierta al operador). Norma: delta 2026-10-20 de `EFEONCE_SURFACE_COMPOSITION_V1.md`.
+esfera en la punta del arco). Rosado «sólo en la esfera» no alcanza: una esfera de otro tono sobre un anillo neutro
+se lee pegada. **Corrección del 2026-10-28:** BR3, BR4 y NXSF3 siguen aprobadas (anillo entero en el color de la línea,
+esfera blanca arriba) y son el patrón que el operador pidió para la contraportada Voice de ARMOR. Norma: delta
+2026-10-20 de `EFEONCE_SURFACE_COMPOSITION_V1.md`.
 
 ### 2026-10-20 — Landing `/agenda/`: par de voz, sin lima y Nexa lejos
 
