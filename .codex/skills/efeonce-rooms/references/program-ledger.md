@@ -3,6 +3,17 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-28 — B18 local: invitación guest no crea sesión interna ni SSO
+
+- `local`: runtime `codex/rooms-design-integration@3b1b7b2`; arnés UI de invitaciones ampliado con
+  control antes/después del OTP: cookie guest HttpOnly, sin cookies issuer/interna, sesión interna401;
+  authorize `prompt=none` devuelve `login_required`, sin código ni Set-Cookie.51checksPASS,lint/typesPASS.
+- Issuer real + PG efímero de Auth `31ffef1d1`; buzón RAM, cero correo real. Modo `--guest-sso-only`
+  acotado; cuatro capturas privadas con axe/layout limpios, sin aceptación de nueva UI ni suite general repetida.
+- Next3210/issuer19336/PG55432 detenidos; sin push/main/flags/cloud ni nuevo canary. Ningún cambio
+  necesario en contrato Auth. Claude Design aún debe entregar su interfaz para conectar/aceptar.
+  [Resultado](../../../../docs/audits/rooms/2026-10-28-b18-guest-without-internal-sso.md).
+
 ## 2026-10-26 — Entorno local y conectores preparados para Claude Design
 
 - `local`: rama `codex/rooms-design-integration`, commit `2cddc98a`, sin push/deploy. Next3216,

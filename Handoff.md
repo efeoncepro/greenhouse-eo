@@ -21,6 +21,9 @@ público §17. Pendiente: mapa de átomos de marketing de contenidos; tanda 2: G
 
 ## 2026-10-26 — Rooms: entorno local y conectores listos
 
+B18 local28Oct: invitado OTP sin sesión interna/SSO;51checks,lint/typesPASS;
+[prueba](docs/audits/rooms/2026-10-28-b18-guest-without-internal-sso.md). Commit Rooms3b1b7b2, procesos detenidos; sin push/flags/deploy. Nueva UI pendiente de Claude Design.
+
 Rama runtime `codex/rooms-design-integration@2cddc98a`, sólo commit local. Next3216, PG55433 propio,
 issuer fixture19338 y datos/permisos sintéticos; SDKbrowser same-origin para DTO/commands/media/sesión.
 250testsPASS,lint/types/build y18checksAPIenChrome (imagen→publicación→guest,conflicto/replay/denegaciones);

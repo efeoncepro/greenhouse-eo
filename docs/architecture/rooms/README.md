@@ -9,6 +9,8 @@ subdominio acordado; su DNS no se declara activado.
 entorno propio3216/55433/19338 y conectores browser-safe disponibles;250testsPASS y18comprobaciones
 API en navegador. Claude Design aún debe conectar/aceptar su UI. [Manual local](../../manual-de-uso/rooms/integrar-claude-design-local.md).
 
+**Seguridad local 28Oct:** [B18](../../audits/rooms/2026-10-28-b18-guest-without-internal-sso.md) PASS: OTP guest sin sesión interna ni SSO, 51 comprobaciones. No cambia el contrato Auth ni acredita la nueva UI.
+
 **Propósito:** plataforma comercial propia para comprender, evaluar y defender propuestas creativas y
 SEO/AEO, combinables en una sala. La implementación actual no acredita todo el alcance de V1/EPIC-052.
 
