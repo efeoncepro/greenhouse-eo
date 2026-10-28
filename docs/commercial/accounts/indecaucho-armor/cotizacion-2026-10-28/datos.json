@@ -1,0 +1,193 @@
+{
+  "version": 2,
+  "status": "draft",
+  "date": "2026-10-28",
+  "reference": "ARMOR · Piloto Performance 90 días",
+  "currency": "USD",
+  "vatRate": null,
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "Indecaucho · ARMOR EPPS",
+    "unit": "División Industria",
+    "contact": "Vanessa Chugá, Coordinadora de Marketing",
+    "taxId": "RUC por confirmar"
+  },
+  "cover": {
+    "label": "Cotización · Octubre 2026",
+    "title": [
+      "Piloto de Performance",
+      "B2B · 90 días"
+    ],
+    "subtitle": "LinkedIn Ads y Google Ads para Compras y Seguridad y Salud Ocupacional en Ecuador, Colombia y Perú, con cada contacto seguido en Kommo hasta la venta.",
+    "netLabel": "Honorarios netos del piloto"
+  },
+  "service": {
+    "name": "Piloto de Performance B2B · 90 días"
+  },
+  "scope": {
+    "title": [
+      "Alcance"
+    ],
+    "intro": "Lo que incluye el piloto, desde la medición hasta la decisión del día 90.",
+    "rows": [
+      {
+        "title": "Fase 0 · Cimientos de medición",
+        "text": "Google Tag Manager, banner y modo de consentimiento, conversiones de Google Ads y LinkedIn, formulario o chat de Kommo que guarda el origen, campos y etapas por país en Kommo, y retorno de los calificados a las plataformas. Bonificada."
+      },
+      {
+        "title": "Estrategia y operación de pauta",
+        "text": "Un Trafficker Digital dedicado lleva la estrategia y la operación diaria de LinkedIn Ads y Google Ads en Ecuador, Colombia y Perú: audiencias, campañas, presupuestos y ajustes semanales."
+      },
+      {
+        "title": "Campaña creativa",
+        "text": "Las 23 piezas de lanzamiento ya están producidas. Las variantes nuevas las hace el equipo de diseño de Efeonce y todas salen con la aprobación de ARMOR."
+      },
+      {
+        "title": "Medición y reporte",
+        "text": "Un Data Analyst arma el tablero semanal por país, canal y pieza, y prepara una reunión de resultados con la gerencia cada 30 días."
+      },
+      {
+        "title": "Lead calificado en Kommo",
+        "text": "Definición escrita de lead calificado y seguimiento de cada contacto hasta inspección, cotización y venta, contra los 4–5 leads mensuales de hoy."
+      },
+      {
+        "title": "Lectura final",
+        "text": "Al día 90, el informe con costo por lead calificado y lo que rindió por país, canal y mensaje, y el plan de inversión para el resto de 2027."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario",
+    "phases": [
+      {
+        "label": "Noviembre",
+        "title": "Fase 0",
+        "text": "Se instala la medición. Termina cuando un lead de prueba llega a Kommo con su origen y su conversión aparece en Google y LinkedIn."
+      },
+      {
+        "label": "Diciembre",
+        "title": "Preparación",
+        "text": "Campañas, audiencias y piezas aprobadas y cargadas, listas para salir sin gastar medios en las fiestas de fin de año."
+      },
+      {
+        "label": "Enero a abril de 2027",
+        "title": "90 días de pauta",
+        "text": "Arranque, activación, optimización y escala, con la decisión de la gerencia al cierre."
+      }
+    ]
+  },
+  "conditions": {
+    "title": [
+      "Condiciones"
+    ],
+    "rows": [
+      {
+        "title": "Fase 0 bonificada",
+        "text": "La Fase 0 de medición está valorizada en US$3.090 y Efeonce la bonifica: no se factura."
+      },
+      {
+        "title": "Forma de pago",
+        "text": "Honorarios mensuales anticipados, al inicio de cada tramo de 30 días de pauta."
+      },
+      {
+        "title": "Medios",
+        "text": "ARMOR paga directo a LinkedIn y Google, en cuentas a su nombre. Los montos son un techo mensual que se libera de forma gradual y nunca sube sin aprobación de ARMOR. Efeonce no cobra sobre los medios."
+      },
+      {
+        "title": "Plazo",
+        "text": "90 días de pauta, sin renovación automática. Al cierre, la gerencia decide escalar, concentrar o cambiar."
+      },
+      {
+        "title": "Lo que aporta ARMOR",
+        "text": "Accesos a WordPress, GA4, Kommo y cuentas publicitarias; una persona que apruebe piezas; un enlace comercial por país; certificados vigentes; y la regla de derivación a distribuidores."
+      },
+      {
+        "title": "Vigencia",
+        "text": "30 días desde la fecha de esta cotización."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Inversión"
+    ],
+    "intro": "Honorarios de Efeonce por los 90 días del piloto. Los medios se pagan aparte, directo a LinkedIn y Google.",
+    "summary": "Es un valor fijo por el trabajo: no es un porcentaje de la inversión en medios ni sube si se mueven fondos entre países o canales.",
+    "taxNote": "Los impuestos dependen de la entidad que facture y se confirman antes de firmar."
+  },
+  "lines": [
+    {
+      "label": "Honorarios Efeonce · piloto",
+      "detail": "Estrategia, pauta, medición y reporte",
+      "group": "Servicio",
+      "quantity": {
+        "value": 1,
+        "unit": "mes"
+      },
+      "unitNet": "3280.00",
+      "net": "3280.00"
+    },
+    {
+      "label": "Honorarios Efeonce · piloto",
+      "detail": "Estrategia, pauta, medición y reporte",
+      "group": "Servicio",
+      "quantity": {
+        "value": 2,
+        "unit": "meses"
+      },
+      "unitNet": "2990.00",
+      "net": "5980.00"
+    }
+  ],
+  "net": "9260.00",
+  "clientPaidDirectly": [
+    {
+      "label": "LinkedIn Ads · Ecuador",
+      "amount": "2050",
+      "currency": "USD",
+      "detail": "Importe por mes · Meses 1 a 3"
+    },
+    {
+      "label": "Google Ads · Ecuador",
+      "amount": "200",
+      "currency": "USD",
+      "detail": "Importe por mes · Meses 1 a 3"
+    },
+    {
+      "label": "LinkedIn Ads · Colombia",
+      "amount": "2100",
+      "currency": "USD",
+      "detail": "Importe por mes · Meses 1 a 3"
+    },
+    {
+      "label": "Google Ads · Colombia",
+      "amount": "450",
+      "currency": "USD",
+      "detail": "Importe por mes · Meses 1 a 3"
+    },
+    {
+      "label": "LinkedIn Ads · Perú",
+      "amount": "1050",
+      "currency": "USD",
+      "detail": "Importe por mes · Meses 1 a 3"
+    },
+    {
+      "label": "Google Ads · Perú",
+      "amount": "150",
+      "currency": "USD",
+      "detail": "Importe por mes · Meses 1 a 3"
+    }
+  ],
+  "source": {
+    "system": "pricing-v3",
+    "calculationId": "composition-6441356a187e79d5925562e3",
+    "digest": "6441356a187e79d5925562e361b9768b4c8d2b7dd73b6fdffbdca2000c08d12d",
+    "engineVersion": "pricing-v3-local/1.4.0"
+  }
+}
