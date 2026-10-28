@@ -22,6 +22,6 @@ Simulaciones locales con `pnpm --silent pricing:v3 compose quote --current` (cat
 - La Fase 0 de medición se cotiza aparte (aún no cotizada).
 
 - D lo eligió Julio (28/10): sin Paid Media Manager ni copy; el diseño lo pone el equipo de diseño de Efeonce como
-  costo existente, no cotizado. La dirección estratégica queda sin horas asignadas: la cubre Julio o se recotiza.
+  costo existente, no cotizado. La dirección estratégica la lleva el mismo trafficker (decisión de Julio, 28/10).
 - E no calcula (`RESOURCE_ALLOCATION_REQUIRED`): el perfil de diseño pide asignaciones de herramientas que la demanda
   no declara. Sirve para medir el costo del diseño cuando se quiera hacerlo visible.
