@@ -1,0 +1,17 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "close",
+  "recipe": "close-proposal",
+  "use": "proposal",
+  "line": "voice",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-10-28_propuesta-armor/plates/BR3v-sin-isotipo-isotipo-acabado.png",
+    "alt": "Nexa, de espaldas con la chaqueta de Efeonce, camina hacia un anillo fino de luz azul con un arco corto y su esfera en el naranja de la línea Voice"
+  }
+}
