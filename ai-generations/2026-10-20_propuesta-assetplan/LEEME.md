@@ -81,4 +81,4 @@ la contraparte como «Especialista de CRM fijo desde el inicio», sin nombre tod
 - **Cotización v3** rehecha a 30 horas (`ASSETPLAN-2026-10-28-v3`): 36 UF + IVA = 42,84 UF en los meses 1–4; desde el
   mes 5, 48 UF + IVA = 57,12 UF. Equipo asignado con Especialista fijo y reunión semanal en el ciclo. La v3 del 27/10
   nunca se envió: se reemplazó.
-- OneDrive y canvas (versión 64) actualizados. Pendiente de Julio: vigencia (04/11/2026) y monto del deal en HubSpot.
+- OneDrive y canvas (versión 65) actualizados. Vigencia extendida al 30/11/2026 (Julio, 28/10). Deal 66450601027: monto 528 UF (4 × 36 + 8 × 48), readback verificado; cierre aún en 04/11/2026.
