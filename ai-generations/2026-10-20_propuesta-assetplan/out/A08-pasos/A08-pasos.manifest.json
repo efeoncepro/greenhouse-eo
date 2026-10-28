@@ -78,7 +78,7 @@
             "stepDescPx": "--gl-ns-step-desc-px=18px",
             "stepDescGap": "--gl-ns-step-desc-gap=10px",
             "stepDescColor": "--gl-ns-step-desc-color=#c9d6e2",
-            "chosenDay": "2",
+            "chosenDay": "4",
             "chosenTime": "2",
             "docFill": "--gl-ns-doc-color=#ffffff",
             "docInk": "--gl-ns-doc-ink-color=#0b1f33",
@@ -116,37 +116,37 @@
             "answer": "Hablemos",
             "eyebrow": "Próximos pasos"
           },
-          "body": "Adjuntamos la cotización formal: inversión y condiciones.",
+          "body": "Adjuntamos la cotización formal a 30 horas, con condiciones.",
           "contact": {
             "email": "sales@efeoncepro.com",
             "phone": "+56 9 3732 3064"
           },
           "agenda": {
-            "kicker": "01 · Revisión · 30 min",
-            "title": "Revisemos la propuesta",
-            "descriptor": "30 min por videollamada · alcance, tiempos de respuesta y dudas",
-            "summary": "Jueves 22 · 11:30 · hora de Chile"
+            "kicker": "01 · Segunda reunión · 45 min",
+            "title": "Conoce a tu contraparte",
+            "descriptor": "Tu Especialista de CRM, tu equipo y el plan de inicio",
+            "summary": "Martes 3 · 11:30 · hora de Chile"
           },
           "days": [
             {
-              "weekday": "Mié",
-              "day": "21"
-            },
-            {
               "weekday": "Jue",
-              "day": "22"
+              "day": "29"
             },
             {
               "weekday": "Vie",
-              "day": "23"
+              "day": "30"
             },
             {
               "weekday": "Lun",
-              "day": "26"
+              "day": "2"
             },
             {
               "weekday": "Mar",
-              "day": "27"
+              "day": "3"
+            },
+            {
+              "weekday": "Mié",
+              "day": "4"
             }
           ],
           "times": [
@@ -164,7 +164,7 @@
             }
           ],
           "cta": {
-            "text": "Agenda la revisión",
+            "text": "Agenda la reunión",
             "cursorScale": 1.25
           },
           "nextSteps": [
@@ -172,13 +172,13 @@
               "number": "02",
               "label": "Acuerdos",
               "title": "Alcance",
-              "desc": "Tiempos de respuesta, inicio y accesos Partner."
+              "desc": "Inicio antes de diciembre, accesos Partner y canal."
             },
             {
               "number": "03",
               "label": "On-Going",
               "title": "Primer ciclo",
-              "desc": "El canal al día desde el primer mes."
+              "desc": "El canal al día antes de tus vacaciones."
             }
           ]
         }
@@ -266,7 +266,7 @@
           "stepDescPx": "--gl-ns-step-desc-px=18px",
           "stepDescGap": "--gl-ns-step-desc-gap=10px",
           "stepDescColor": "--gl-ns-step-desc-color=#c9d6e2",
-          "chosenDay": "2",
+          "chosenDay": "4",
           "chosenTime": "2",
           "docFill": "--gl-ns-doc-color=#ffffff",
           "docInk": "--gl-ns-doc-ink-color=#0b1f33",
@@ -304,37 +304,37 @@
           "answer": "Hablemos",
           "eyebrow": "Próximos pasos"
         },
-        "body": "Adjuntamos la cotización formal: inversión y condiciones.",
+        "body": "Adjuntamos la cotización formal a 30 horas, con condiciones.",
         "contact": {
           "email": "sales@efeoncepro.com",
           "phone": "+56 9 3732 3064"
         },
         "agenda": {
-          "kicker": "01 · Revisión · 30 min",
-          "title": "Revisemos la propuesta",
-          "descriptor": "30 min por videollamada · alcance, tiempos de respuesta y dudas",
-          "summary": "Jueves 22 · 11:30 · hora de Chile"
+          "kicker": "01 · Segunda reunión · 45 min",
+          "title": "Conoce a tu contraparte",
+          "descriptor": "Tu Especialista de CRM, tu equipo y el plan de inicio",
+          "summary": "Martes 3 · 11:30 · hora de Chile"
         },
         "days": [
           {
-            "weekday": "Mié",
-            "day": "21"
-          },
-          {
             "weekday": "Jue",
-            "day": "22"
+            "day": "29"
           },
           {
             "weekday": "Vie",
-            "day": "23"
+            "day": "30"
           },
           {
             "weekday": "Lun",
-            "day": "26"
+            "day": "2"
           },
           {
             "weekday": "Mar",
-            "day": "27"
+            "day": "3"
+          },
+          {
+            "weekday": "Mié",
+            "day": "4"
           }
         ],
         "times": [
@@ -352,7 +352,7 @@
           }
         ],
         "cta": {
-          "text": "Agenda la revisión",
+          "text": "Agenda la reunión",
           "cursorScale": 1.25
         },
         "nextSteps": [
@@ -360,13 +360,13 @@
             "number": "02",
             "label": "Acuerdos",
             "title": "Alcance",
-            "desc": "Tiempos de respuesta, inicio y accesos Partner."
+            "desc": "Inicio antes de diciembre, accesos Partner y canal."
           },
           {
             "number": "03",
             "label": "On-Going",
             "title": "Primer ciclo",
-            "desc": "El canal al día desde el primer mes."
+            "desc": "El canal al día antes de tus vacaciones."
           }
         ]
       },

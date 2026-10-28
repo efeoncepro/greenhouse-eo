@@ -220,7 +220,7 @@
               "id": "voice",
               "questionId": "question",
               "answerId": "answer",
-              "answerText": "30 UF"
+              "answerText": "36 UF"
             },
             {
               "kind": "url-bubble",
@@ -264,10 +264,10 @@
     "eyebrow": "Inversión",
     "question": "¿Cuánto es al mes?",
     "answer": [
-      "30 UF"
+      "36 UF"
     ],
     "answerSphere": "closes-last-line",
-    "body": "Precio de lista: **40 UF + IVA** al mes. Del mes 1 al 4 tienes 25 % de descuento; después, mes a mes.",
+    "body": "Precio de lista: **48 UF + IVA** al mes. Del mes 1 al 4 tienes 25 % de descuento; después, mes a mes.",
     "proof": null,
     "measure": null,
     "progress": null,

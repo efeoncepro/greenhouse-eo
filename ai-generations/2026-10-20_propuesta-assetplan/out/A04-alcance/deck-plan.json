@@ -67,7 +67,7 @@
           "src": "asset-ref:layer:csl-platform"
         },
         "voice": {
-          "question": "¿Qué cubren las 25 horas?",
+          "question": "¿Qué cubren las 30 horas?",
           "answer": "La operación",
           "eyebrow": "Alcance del servicio"
         },

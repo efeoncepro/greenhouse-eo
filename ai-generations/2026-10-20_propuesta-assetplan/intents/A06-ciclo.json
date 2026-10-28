@@ -15,7 +15,7 @@
       "Por etapas"
     ]
   },
-  "body": "Cada mes ordenamos, ejecutamos y revisamos **contigo**. Tiempos de respuesta y criticidad se acuerdan antes de empezar.",
+  "body": "Cada semana nos reunimos **contigo**, en persona o por Meet; cada mes cerramos el ciclo.",
   "horizon": 30,
   "currentStop": 1,
   "stops": [
@@ -27,7 +27,7 @@
     {
       "range": "Todo el mes",
       "title": "Ejecutar",
-      "desc": "Solicitudes en horario de Chile, con el plazo de cada trabajo comunicado."
+      "desc": "Canal de solicitudes al día y reunión semanal contigo."
     },
     {
       "range": "Cierre",

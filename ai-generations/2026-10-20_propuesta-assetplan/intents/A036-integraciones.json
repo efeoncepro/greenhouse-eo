@@ -24,7 +24,7 @@
       "items": [
         "ERP y facturación",
         "BI y data warehouse",
-        "Correo, calendario y Teams",
+        "Correo, calendario y Slack",
         "CRM y planillas actuales"
       ]
     },
@@ -51,7 +51,7 @@
       "verdict": "Integrar"
     },
     {
-      "capability": "Correo y calendario de Microsoft 365",
+      "capability": "Correo, calendario y videollamadas",
       "verdict": "Mantener"
     },
     {

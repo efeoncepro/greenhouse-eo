@@ -65,3 +65,20 @@ atención por su canal de Slack y alcance de las 25 h. Julio aprobó las respues
   contraparte y continuidad en el alcance. Datos en el expediente privado (`cotizacion-v3/`).
 - En OneDrive quedan las versiones enviadas el 20/10 sin tocar y, al lado, `…-Operacion-HubSpot-v2.pdf` y la cotización v3.
 - Canvas actualizado (versión 60). **Sin enviar:** el correo de respuesta a Karla lo envía Julio.
+
+## Versión 2 a 30 horas — 28/10/2026 (tras la reunión con Karla)
+
+En la reunión (nota en Notion «Discovery Call - Assetplan | Efeonce», 28/10 15:45) Karla pidió **30 horas mensuales** y
+una **persona fija** que entienda el negocio, presente en la segunda reunión. Julio decidió: precio proporcional
+(48 UF de lista, 36 UF netas en los meses 1–4, 1,2 UF/h), mantener los tiempos de respuesta de la lámina y presentar
+la contraparte como «Especialista de CRM fijo desde el inicio», sin nombre todavía.
+
+- Láminas recompuestas: `A02` (30 horas), `A04` y `A041` (30 horas), `A035` (sin landing pages: en Assetplan las hace
+  su diseñador), `A036` (sin Teams ni Microsoft 365), `A057` (reunión semanal; 26 de 30 h; revisión presencial o Meet),
+  `A06` (reunión semanal), `A07` (Especialista de CRM fijo desde el inicio), `A078` (36 UF; montos en
+  `render-eyebrow-chip.ts` y `render-pricing-real.ts`: 48 / −12 / 36) y `A08` (segunda reunión para conocer a la
+  contraparte; inicio antes de diciembre).
+- **Cotización v3** rehecha a 30 horas (`ASSETPLAN-2026-10-28-v3`): 36 UF + IVA = 42,84 UF en los meses 1–4; desde el
+  mes 5, 48 UF + IVA = 57,12 UF. Equipo asignado con Especialista fijo y reunión semanal en el ciclo. La v3 del 27/10
+  nunca se envió: se reemplazó.
+- OneDrive y canvas (versión 64) actualizados. Pendiente de Julio: vigencia (04/11/2026) y monto del deal en HubSpot.

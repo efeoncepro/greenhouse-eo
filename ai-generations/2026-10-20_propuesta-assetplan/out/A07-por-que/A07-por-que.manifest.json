@@ -36,7 +36,7 @@
             "answer": "Expertos",
             "eyebrow": "Quién te acompaña"
           },
-          "body": "Un <strong>equipo asignado</strong>: dirección de cuenta, un Especialista de CRM dedicado y especialistas en desarrollo, integraciones y datos."
+          "body": "Un <strong>equipo asignado</strong>: dirección de cuenta, un Especialista de CRM fijo desde el inicio y especialistas en desarrollo y datos."
         }
       }
     ]
@@ -80,7 +80,7 @@
           "answer": "Expertos",
           "eyebrow": "Quién te acompaña"
         },
-        "body": "Un <strong>equipo asignado</strong>: dirección de cuenta, un Especialista de CRM dedicado y especialistas en desarrollo, integraciones y datos."
+        "body": "Un <strong>equipo asignado</strong>: dirección de cuenta, un Especialista de CRM fijo desde el inicio y especialistas en desarrollo y datos."
       },
       "template": "SectionCine",
       "contractHash": "ed6405fedf35415e48c2516cd4e2f23b280e275bb284c454f3edb6a2c2eb924f",

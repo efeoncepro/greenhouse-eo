@@ -26,8 +26,8 @@ const CHIP_CSS = `
   white-space: nowrap;
 }
 `
-const AMOUNTS = ['40 UF / mes', '−10 UF / mes', 'Incluido', 'Incluido']
-const TOTAL = '30 UF'
+const AMOUNTS = ['48 UF / mes', '−12 UF / mes', 'Incluido', 'Incluido']
+const TOTAL = '36 UF'
 
 const chipCatalog = async (extraCss = '') => {
   const base = await catalogFor('graphic-line-deck')

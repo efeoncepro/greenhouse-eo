@@ -10,8 +10,8 @@ import { planSurfacePiece } from '@/lib/brand-surfaces'
 import { catalogFor, materializeAssets } from '../../scripts/brand-surfaces/compose'
 
 const [intentPath, outArg] = process.argv.slice(2)
-const AMOUNTS = ['40 UF / mes', '−10 UF / mes', 'Incluido', 'Incluido']
-const TOTAL = '30 UF'
+const AMOUNTS = ['48 UF / mes', '−12 UF / mes', 'Incluido', 'Incluido']
+const TOTAL = '36 UF'
 
 const main = async () => {
   const intent = JSON.parse(fs.readFileSync(intentPath, 'utf8'))

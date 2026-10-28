@@ -78,7 +78,7 @@
             "answer": "Por etapas",
             "eyebrow": "Un ciclo cada mes"
           },
-          "body": "Cada mes ordenamos, ejecutamos y revisamos <strong>contigo</strong>. Tiempos de respuesta y criticidad se acuerdan antes de empezar.",
+          "body": "Cada semana nos reunimos <strong>contigo</strong>, en persona o por Meet; cada mes cerramos el ciclo.",
           "stops": [
             {
               "range": "1 · Semana 1",
@@ -88,7 +88,7 @@
             {
               "range": "2 · Todo el mes",
               "title": "Ejecutar",
-              "desc": "Solicitudes en horario de Chile, con el plazo de cada trabajo comunicado."
+              "desc": "Canal de solicitudes al día y reunión semanal contigo."
             },
             {
               "range": "3 · Cierre",
@@ -181,7 +181,7 @@
           "answer": "Por etapas",
           "eyebrow": "Un ciclo cada mes"
         },
-        "body": "Cada mes ordenamos, ejecutamos y revisamos <strong>contigo</strong>. Tiempos de respuesta y criticidad se acuerdan antes de empezar.",
+        "body": "Cada semana nos reunimos <strong>contigo</strong>, en persona o por Meet; cada mes cerramos el ciclo.",
         "stops": [
           {
             "range": "1 · Semana 1",
@@ -191,7 +191,7 @@
           {
             "range": "2 · Todo el mes",
             "title": "Ejecutar",
-            "desc": "Solicitudes en horario de Chile, con el plazo de cada trabajo comunicado."
+            "desc": "Canal de solicitudes al día y reunión semanal contigo."
           },
           {
             "range": "3 · Cierre",

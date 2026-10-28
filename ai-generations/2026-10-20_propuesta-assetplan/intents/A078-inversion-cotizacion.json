@@ -13,17 +13,17 @@
     "eyebrow": "Inversión",
     "question": "¿Cuánto es al mes?",
     "answer": [
-      "30 UF"
+      "36 UF"
     ]
   },
-  "body": "Precio de lista: **40 UF + IVA** al mes. Del mes 1 al 4 tienes 25 % de descuento; después, mes a mes.",
+  "body": "Precio de lista: **48 UF + IVA** al mes. Del mes 1 al 4 tienes 25 % de descuento; después, mes a mes.",
   "quote": {
-    "kicker": "Cotización · v2",
+    "kicker": "Cotización · v3",
     "title": "Para Assetplan",
     "lines": [
       {
         "name": "Operación HubSpot",
-        "desc": "25 h al mes: canal, soporte y proyectos",
+        "desc": "30 h al mes: canal, soporte y proyectos",
         "period": "/ mes"
       },
       {
@@ -49,7 +49,7 @@
   "chips": [
     {
       "kicker": "Desde el mes 5",
-      "text": "40 UF + IVA,\nmes a mes"
+      "text": "48 UF + IVA,\nmes a mes"
     },
     {
       "kicker": "Plazo inicial",

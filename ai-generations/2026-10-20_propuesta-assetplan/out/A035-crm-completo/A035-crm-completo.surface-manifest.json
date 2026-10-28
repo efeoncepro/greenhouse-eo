@@ -193,7 +193,7 @@
       {
         "index": 1,
         "glyph": "web",
-        "name": "Desarrollos y landings",
+        "name": "Desarrollos",
         "desc": null,
         "kicker": {
           "text": "A medida",
@@ -481,7 +481,7 @@
           "line": "revenue-hubspot",
           "surface": "dark",
           "state": "rest",
-          "label": "Desarrollos y landings"
+          "label": "Desarrollos"
         }
       },
       {
@@ -543,7 +543,7 @@
       "Todo el CRM"
     ],
     "answerSphere": "closes-last-line",
-    "body": "Integraciones, desarrollos a medida, landing pages, automatizaciones, agentes de IA y parametrización.",
+    "body": "Integraciones, desarrollos a medida, automatizaciones, agentes de IA y parametrización.",
     "proof": null,
     "measure": null,
     "progress": null,

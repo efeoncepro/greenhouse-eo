@@ -16,7 +16,7 @@
       "Todo el CRM"
     ]
   },
-  "body": "Integraciones, desarrollos a medida, landing pages, automatizaciones, agentes de IA y parametrización.",
+  "body": "Integraciones, desarrollos a medida, automatizaciones, agentes de IA y parametrización.",
   "steps": [
     {
       "glyph": "automatizacion",
@@ -26,7 +26,7 @@
     {
       "glyph": "web",
       "kicker": "A medida",
-      "name": "Desarrollos y landings"
+      "name": "Desarrollos"
     },
     {
       "glyph": "embudo",

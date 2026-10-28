@@ -156,7 +156,7 @@
                 "text": "BI y data warehouse"
               },
               {
-                "text": "Correo, calendario y Teams"
+                "text": "Correo, calendario y Slack"
               },
               {
                 "text": "CRM y planillas actuales"
@@ -209,7 +209,7 @@
             "role": "rest",
             "pillFill": "--gl-dpc-pill-color=#0b1f33",
             "pillInk": "--gl-dpc-pill-ink-color=#ffffff",
-            "capability": "Correo y calendario de Microsoft 365",
+            "capability": "Correo, calendario y videollamadas",
             "verdict": "Mantener"
           },
           {

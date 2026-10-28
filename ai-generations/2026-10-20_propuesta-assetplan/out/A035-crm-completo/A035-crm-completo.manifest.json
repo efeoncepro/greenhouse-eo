@@ -39,7 +39,7 @@
             "answer": "Todo el CRM",
             "eyebrow": "Nuestra propuesta · RevOps"
           },
-          "body": "Integraciones, desarrollos a medida, landing pages, automatizaciones, agentes de IA y parametrización.",
+          "body": "Integraciones, desarrollos a medida, automatizaciones, agentes de IA y parametrización.",
           "steps": [
             {
               "icon": "asset-ref:icon:automatizacion-revenue-hubspot-dark-44",
@@ -49,7 +49,7 @@
             {
               "icon": "asset-ref:icon:web-revenue-hubspot-dark-44",
               "kicker": "A medida",
-              "name": "Desarrollos y landings"
+              "name": "Desarrollos"
             },
             {
               "icon": "asset-ref:icon:embudo-revenue-hubspot-dark-44",
@@ -114,7 +114,7 @@
           "answer": "Todo el CRM",
           "eyebrow": "Nuestra propuesta · RevOps"
         },
-        "body": "Integraciones, desarrollos a medida, landing pages, automatizaciones, agentes de IA y parametrización.",
+        "body": "Integraciones, desarrollos a medida, automatizaciones, agentes de IA y parametrización.",
         "steps": [
           {
             "icon": "asset-ref:icon:automatizacion-revenue-hubspot-dark-44",
@@ -124,7 +124,7 @@
           {
             "icon": "asset-ref:icon:web-revenue-hubspot-dark-44",
             "kicker": "A medida",
-            "name": "Desarrollos y landings"
+            "name": "Desarrollos"
           },
           {
             "icon": "asset-ref:icon:embudo-revenue-hubspot-dark-44",
