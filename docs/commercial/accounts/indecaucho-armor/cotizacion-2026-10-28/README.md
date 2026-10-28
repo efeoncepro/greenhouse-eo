@@ -9,6 +9,6 @@ cliente vive sólo en OneDrive, `Licitaciones/Indecaucho - ARMOR EPPS/05. Paquet
   paga directo; se imprimen fuera del total, no cambian el fee).
 - **Fase 0:** valorizada en US$3.090 (`../pricing-v3-2026-10-28-fase0/`) y bonificada por decisión de Julio. Un servicio
   gestionado no admite puesta en marcha con valor de referencia, así que va como texto en «Condiciones».
-- **Pendientes:** razón social y RUC de quien contrata («por confirmar»), entidad que factura e impuestos («por
+- **Pendientes:** razón social y RUC de quien contrata (no se imprimen: la portada dice «Ecuador», por decisión de Julio, 28/10), entidad que factura e impuestos («por
   confirmar»). La vigencia de 30 días y la forma de pago (mensual anticipado) son las condiciones sugeridas del costeo.
 - Archivos: `D-con-medios.demand.json`, `D-con-medios.artifact.json`, `D-con-medios.summary.json`, `brief.json`, `datos.json`.
