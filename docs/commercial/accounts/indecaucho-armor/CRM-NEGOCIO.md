@@ -43,8 +43,31 @@ HubSpot». La razón: en una venta B2B por empresa, con prueba en planta y distr
 | Propietario | Julio Reyes (75788512) |
 | Asociaciones | Company 59393386572 (**Primary**), Contact 255985568411, Meeting 119610757452 |
 
-**No está convertido en negocio compartido.** La conversión publica un mensaje para HubSpot y pide fecha de cierre,
-productos, cercanía de compra y la declaración del programa. Espera la confirmación de Julio
-([manual](../../../manual-de-uso/hubspot/convertir-negocio-compartido.md); liderazgo **Partner**). Las propiedades
-`prospect_source` y `modalidad_venta` que nombra la plantilla de deal registration no existen en el portal
-(consultado el 28/10).
+**Convertido en negocio compartido el 28/10/2026, ~09:18 (GMT-3)**, con autorización de Julio en el chat: liderazgo
+Partner, cierre 31/03/2027, Sales Hub Professional, cercanía «Aún no hemos hablado de HubSpot», mensaje propuesto y
+la declaración del programa confirmada por él. Se hizo por la interfaz, siguiendo el
+[manual](../../../manual-de-uso/hubspot/convertir-negocio-compartido.md).
+
+| Campo del formulario | Valor enviado |
+| --- | --- |
+| Fecha de cierre local | 31/03/2027 (`2027-03-31T15:00:00Z`: guardada a mediodía para que no se muestre 30/03 en GMT-3) |
+| Interés en el producto | Sales Hub Professional |
+| Liderazgo | **Partner** (verificado en el formulario antes de enviar) |
+| Cercanía | Aún no hemos hablado de HubSpot |
+| Oportunidad | Mensaje aprobado, más «Sales Hub Professional sería la base; Marketing Hub también puede tener sentido, sin edición definida todavía». |
+| Ayuda requerida | Saber si hay programas o incentivos de migración desde otro CRM para el mercado andino, y coordinar antes de proponérselo a ARMOR. |
+| Próximos pasos | Coordinar con el especialista antes de plantearles HubSpot; mientras tanto, se presenta la propuesta del piloto de 90 días. |
+
+Lo que muestra la tarjeta después del envío: tipo «Negocio de colaboración iniciada por el partner», etapa de HubSpot
+**Discovery**, Sales Hub Professional, PDM Simón Suárez, y el especialista de crecimiento «Pendiente, conectando con un
+ejecutivo» (aviso: «está tardando más de lo usual»). La «Fecha de cierre de HubSpot» aparece vacía. HubSpot creó
+además la nota automática 119760808326 con recursos de Sales Hub y la tarea «Configurar primera llamada de
+estrategia» para el 02/11. En el Deal local se mantienen el pipeline `default`, la etapa `appointmentscheduled` y el
+cierre `2027-03-31T15:00:00Z`.
+
+**Pendiente de verificar:** el mensaje compartido todavía no aparece en el registro, y tampoco la fecha de cierre de
+HubSpot. Hay que volver a mirar cuando se asigne el especialista y, si hace falta, corregir el mensaje desde su cuerpo
+(ver el manual). No hay POI.
+
+Las propiedades `prospect_source` y `modalidad_venta` que nombra la plantilla de deal registration no existen en el
+portal (consultado el 28/10).
