@@ -7,9 +7,15 @@
 >
 > - Flujo de edición: [`TASK-2047-eo-portfolio-editing-flow.md`](../flows/TASK-2047-eo-portfolio-editing-flow.md).
 > - Flujo maestro del programa: `docs/ui/flows/EPIC-056-eo-portfolio-UI-FLOW.md` [verificar nombre final].
-> - **Dirección visual: no existe todavía.** El canvas del portafolio
+> - **Dirección visual propuesta (2026-10-29), pendiente de aprobación:** WordPress nativo, como la pantalla de ajustes
+>   de `eo-headless-content` (único precedente de admin propio del runtime): barra y menú del admin, cajas, botones y
+>   campos del editor de entradas, tipografía del sistema. La marca sólo colorea la línea de servicio; lo que el alcance
+>   oculta se marca con «No se mostrará» como estado, no como color. Canvas «Admin del Portafolio»
+>   ([claude.ai/artifact/7cLqYYXWkE3pJQVhBKP3DW](https://claude.ai/artifact/7cLqYYXWkE3pJQVhBKP3DW)): listado, edición
+>   con errores, capítulos y piezas, y publicado con alcance parcial y restaurar. Hasta el OK, `UI ready: no`.
+> - El canvas del portafolio público
 >   ([claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm](https://claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm)) diseña la portada y
->   la entrada públicas, no esta pantalla. Se aprueba una dirección antes del Slice 5; hasta entonces `UI ready: no`.
+>   la entrada, no esta pantalla.
 
 ## Product contract
 
