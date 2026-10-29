@@ -1,5 +1,15 @@
 # TASK-2047 — EO Portfolio: plugin «eo-portfolio», documento del proyecto y tres puertas
 
+## Delta 2026-10-29 — v0.2.0 en producción
+
+- Desplegado (runtime 3ab38ad): 13 archivos, 4 nuevos (`includes/class-eop-admin.php`, `assets/admin.css`,
+  `assets/admin.js`, `schema/media-hosts.v1.json`), plugin activo, ningún proyecto escrito; respaldo
+  `/tmp/eo-portfolio-before-20261029-215459.tar` en el servidor.
+- Verificado en vivo: `/portafolio/` 200, `/portafolio/no-existe/` 404, `/project/lifestyle-app/` 410, REST vacía;
+  admin pintado en el servidor como el usuario del carril (listado con el estado vacío, formulario nuevo con 78 campos y
+  «Guarda el proyecto como borrador.»); la regla del bucket rechaza un video de Vimeo; la CLI valida un fixture contra
+  el sitio.
+
 ## Delta 2026-10-29 — Slice 5: pantalla del admin
 
 - Diseño aprobado por el operador: canvas «Admin del Portafolio»
@@ -75,7 +85,7 @@ Decisiones tomadas al construir (`efeonce-public-site-runtime` ede185a):
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -88,7 +98,7 @@ Decisiones tomadas al construir (`efeonce-public-site-runtime` ede185a):
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `Slices 1–5 code complete. Slices 1–4 en producción desde 2026-10-29 (sin proyectos). Slice 5 (admin, v0.2.0, runtime 3ab38ad) construido sobre el diseño aprobado y verificado en Playground y en navegador; falta desplegarlo con el OK del operador`
+- Status real: `Completa 2026-10-29: plugin eo-portfolio v0.2.0 en producción (runtime 3ab38ad), los cinco slices desplegados, sin proyectos. Verificado en vivo: /portafolio/ 200, /portafolio/no-existe/ 404, REST vacía con ETag, admin renderizado como el usuario del carril (listado vacío y formulario nuevo), regla del bucket activa y CLI de agentes operando contra el sitio`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -416,11 +426,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime evidence (WP-CLI, REST, fixtures) is listed and captured.
-- [ ] The public projection has no internal fields (approval, Greenhouse link, revisions).
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. (`docs/architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md`)
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. (§Data model and invariants; probados en Playground)
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. (aditivo; rollback = desactivar o restaurar el tar del despliegue)
+- [x] Runtime evidence (WP-CLI, REST, fixtures) is listed and captured. (128 + 53 + 21 + 21 comprobaciones; verificación en vivo 2026-10-29)
+- [x] The public projection has no internal fields (approval, Greenhouse link, revisions). (PHP puro, Playground y `pnpm public-website:portfolio -- verify`)
 
 ## Hybrid Execution Justification
 
@@ -654,12 +664,12 @@ WordPress o en meta propia, y replicar lo mismo].
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes (pendiente: el archivo tiene cambios sin commitear de otra sesión al 2026-10-29; el estado vive en esta task, la arquitectura y el manual)
+- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible (pendiente por la misma razón)
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [x] Arquitectura del portafolio documentada (`docs/architecture/public-site/`) con el esquema, las compuertas y las
       tres puertas, y la skill `efeonce-public-site-wordpress` actualizada (`.claude` y `.codex`). (2026-10-29; se completa con el admin del Slice 5)

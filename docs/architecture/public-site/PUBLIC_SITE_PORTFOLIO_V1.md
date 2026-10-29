@@ -5,8 +5,8 @@
 > **Creado:** 2026-10-29 por Claude (TASK-2047)
 > **Decisión:** [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) ·
 > **Epic:** [EPIC-056](../../epics/to-do/EPIC-056-eo-portfolio.md)
-> **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/` (v0.1.0, activo en producción desde
-> 2026-10-29, runtime 009bddb)
+> **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/` (v0.2.0 con el admin, activo en producción
+> desde 2026-10-29, runtime 3ab38ad)
 
 ## 1. Qué resuelve
 

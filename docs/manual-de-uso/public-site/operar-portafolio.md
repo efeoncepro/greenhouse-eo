@@ -15,8 +15,8 @@ con `pnpm public-website:portfolio`. Cada proyecto es un documento `portfolio-en
 formato real. La CLI usa el mismo servicio de guardado que la pantalla del admin y que `wp eo-portfolio`: no tiene
 reglas propias.
 
-Estado al 2026-10-29: plugin activo en producción, **sin proyectos**. La pantalla del admin (v0.2.0) está construida y
-probada; se despliega con el OK del operador. La portada y la entrada pública llegan con
+Estado al 2026-10-29: plugin activo en producción, **sin proyectos**. La pantalla del admin (v0.2.0) está en producción
+desde el 2026-10-29. La portada y la entrada pública llegan con
 `TASK-2048`; hasta entonces una entrada publicada responde 404 y sólo se ve por la REST.
 
 ## Antes de empezar

@@ -1,5 +1,14 @@
 # TASK-2049 — EO Portfolio: migración y salida a producción
 
+## Delta 2026-10-29 — TASK-2047 cerrada
+
+- Carga de las 15 entradas con `pnpm public-website:portfolio -- new <slug> --from <export>` → `validate` → `preview` →
+  `apply` (o un lote `{"projects": [...]}` con `wp eo-portfolio apply`, todo o nada); publicar sólo con aprobación del
+  cliente registrada. También se puede cargar desde el admin «Portafolio».
+- Videos, pósters y subtítulos deben estar en `https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/`
+  antes de aplicar: el servicio rechaza cualquier otro origen.
+- Las imágenes se referencian por `mediaId` de la biblioteca; sus dimensiones salen de los metadatos del adjunto.
+
 ## Delta 2026-10-29 — TASK-2046 cerrada
 
 - La lista final de reales es la misma del delta anterior (15 IDs); siguen publicadas en `/project/<slug>/`.
@@ -50,7 +59,7 @@
 - Status real: `Diseño. Esperando TASK-2047 (plugin) y TASK-2048 (plantillas), y la lista de aprobaciones de cliente del operador.`
 - Rank: `TBD`
 - Domain: `content`
-- Blocked by: `TASK-2047, TASK-2048`
+- Blocked by: `TASK-2048`
 - Branch: `Greenhouse develop para docs; el contenido y el código viven en efeonce-public-site-runtime con su release acotado por SSH; sin worktrees`
 
 ## Summary

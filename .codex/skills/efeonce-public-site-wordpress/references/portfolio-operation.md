@@ -5,14 +5,14 @@ gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_po
 
 ## State (2026-10-29)
 
-- Plugin `eo-portfolio` v0.1.0 **active in production**, runtime commit 009bddb, **no projects**.
+- Plugin `eo-portfolio` v0.2.0 (with the admin) **active in production**, runtime commit 3ab38ad, **no projects**.
 - `/portafolio/` is still the Elementor page 247116 with Ohio's widget. Entries `/portafolio/<slug>/` answer 404 until
   `TASK-2048` hooks `eo_portfolio_render_entry`. The 15 real projects load in `TASK-2049`.
 - Ohio's 44 demo entries are drafts with Yoast 410 (TASK-2046); the 15 real ones still live at `/project/<slug>/`.
 
 ## Admin screen
 
-`Portafolio` menu (plugin v0.2.0, built 2026-10-29 on the approved design; deploy pending the operator's OK): list and
+`Portafolio` menu (plugin v0.2.0, live since 2026-10-29, built on the approved design): list and
 structured editor over the same `EOP_Store`. Review it locally with
 `efeonce-public-site-runtime/tests/playground/serve-eo-portfolio.sh` (Playground on :9400, fixtures loaded, logged in).
 

@@ -1,5 +1,14 @@
 # TASK-2048 — EO Portfolio: portada y entrada
 
+## Delta 2026-10-29 — TASK-2047 cerrada
+
+- El plugin `eo-portfolio` v0.2.0 está en producción sin proyectos. Lectura para las plantillas: `EOP_Store::served()` /
+  `EOP_Store::published()` y la proyección `EOP_Projection::entry()` / `summary()` (con `format`, `formats`, `measure`,
+  `cover`), en el servidor, no por la REST.
+- Mientras nadie enganche `eo_portfolio_render_entry`, toda entrada responde 404 y queda fuera del sitemap: esta task
+  enciende ambas cosas al engancharlo. La adivinanza de 404 ya está apagada bajo `/project/` y `/portafolio/`.
+- Los videos viven sólo en el bucket público de AXIS (`schema/media-hosts.v1.json`).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +33,7 @@
 - Status real: `Diseño en revisión en canvas; bloqueada por TASK-2047 (documento del proyecto y servicio de lectura)`
 - Rank: `TBD`
 - Domain: `content`
-- Blocked by: `TASK-2047`
+- Blocked by: `none`
 - Branch: `Greenhouse develop para docs; el codigo vive en efeonce-public-site-runtime con su contrato de rama y release acotado por SSH; sin worktrees`
 
 ## Summary
