@@ -49,8 +49,12 @@
   internal line links in the same tab, first hero portrait `fetchpriority="high"` (deploy backup
   `/tmp/eo-inicio-widgets-before-20261029-092003.tar`).
 - `/home-2-2/` (page `248852` «Home 2», indexable, in the sitemap, competing with the front page) retired 2026-10-29 by
-  operator request: trashed (reversible) + Yoast 301 `home-2-2 → /` (`retire-home-2-2.php`). Legacy backup `2791`
-  (`/home-2/`, noindex) untouched.
+  operator request: trashed (reversible) + Yoast 301 `home-2-2 → /` (`retire-home-2-2.php`). Legacy backup `2791` retired
+  later the same day (see next bullet).
+- Old Home pages retired 2026-10-29 by operator request («deja solo la que hicimos hoy», `retire-old-homes.php`), all to the
+  trash (reversible): `2791` /home-2/ (former Home, legacy backup), `242261` /home/, `246396` /home-prueba/ — each with a
+  Yoast 301 to `/` — plus drafts `248857`, `250260` and the QA preview `252177`. `251731` is the only Home page left.
+  Ohio theme demos (`homedemo*-elementor`) are still published and in the sitemap (not Efeonce homes; untouched).
 - SEO backlog (global, not the Home body): WebSite description = site tagline «Agencia de marketing 360°»; no X account in
   Yoast (`twitter_site`); Slider Revolution `sr7.js` and Font Awesome brands load on the Home without use; field CWV and
   PageSpeed not measured (public PSI quota exhausted 2026-10-29).
