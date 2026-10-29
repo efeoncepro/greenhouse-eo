@@ -1,5 +1,10 @@
 # Efeonce B2B Prospecting — decisión de método compartido
 
+**Aplicación del adapter Sales Navigator:** [44 búsquedas nativas guardadas](../commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md)
+para cuatro mercados hispanos, con aviso semanal y muestras/IDs verificados. Es ejecución del mandato
+explícito y del adapter existente: no añade API privada, runner autónomo, autoridad de envío, esquema CRM
+ni scheduler externo. Criterios comerciales y límites permanecen en la política y el expediente.
+
 - **Status:** Accepted.
 - **Date:** 2026-10-11; el operador aprobó crear la estructura investigada con «Vamos» y pidió apoyo de `@Sales`.
 - **Owner:** Commercial / Julio Reyes; Customer Model, prácticas y CRM conservan sus dominios.

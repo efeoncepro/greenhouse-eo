@@ -94,6 +94,34 @@ la keyword ni la recomendación de Persona como gate automático o ranking comer
 la pauta viaja como método. En cargos simultáneos, verificar/corregir asociación de cuenta y conservar la
 limitación si el título resumido de la fila sigue mostrando otra actividad.
 
+## Búsquedas guardadas: configuración, validación y reemplazo
+
+Mandato específico del 29/10: 24 búsquedas de cuentas y 20 de personas para Chile/México/Colombia/Perú,
+con avisos semanales nativos. [Manifest y muestras](../../../../docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md).
+Los guardados de listas anteriores no autorizaban búsquedas; reutilizar ahora el alcance expreso sin ampliarlo
+a contacto, InMail, CRM o scheduler. Capacidad oficial documentada: 50 cuentas + 50 personas; separar de los
+cinco perfiles ideales/Personas y de créditos InMail. El borrado de búsquedas es posible; no afirmar que se
+probó recuperar cupo. La edición de filtros guarda una copia y no actualiza el original por defecto.
+
+- Empezar por sede/tamaño/sector en cuentas; personas combinan cargo actual de liderazgo, sede de empresa,
+  tamaño y las industrias del ejercicio. Industria de perfil no es prueba de sector de empresa. Listas de
+  cuentas curadas sirven cuando existen; no fingir que ya hay carteras en países/sectores sin investigar.
+- Usar Boolean en Cargo actual y Enter sólo después de que el selector acepte el texto. Leer el chip y
+  resultados cargados; `fill` + evento final de teclado puede resolver estado anterior. Comillas pueden
+  verse como `&quot;` en nombres accesibles. No forzar el selector ni parchear estado interno.
+- Validar muestras por país: acquisition puede incluir Talent Acquisition; producción genérica incluye
+  fábricas; contenido/marketing digital puede devolver docencia; experiencia/producto genéricos incluyen
+  CX no digital y producto físico. Refinar según ruido, preservar diferencias por país y declarar cobertura.
+  Función/seniority son aproximaciones: no certifican jefatura ni eliminan todos los operadores.
+- Activar Guardar búsqueda; esperar estado estable. Inventario → Editar → nombre país/sector o servicio →
+  Guardar; leer nombre/ID/criterios y comparar inventario tras recarga. «+1 filtro más» puede tener el mismo
+  nombre/enlace que el principal: deduplicar por ID, sin contar dos búsquedas.
+- Un toast o checkbox efímero no prueba persistencia. El ID DOM del switch cambia tras renderizar y los
+  toasts acumulados repiten texto. Conciliar en inventario antes de reintentar; ante interrupción del control,
+  recuperar página/registro pendiente y continuar sin duplicar. Checkpoints locales no contienen credenciales.
+- Los nuevos matches no son leads calificados ni se guardan/contactan automáticamente. Corroborar cuenta,
+  mercado, liderazgo, agencias/autoridad y restricciones; diferenciar cliente existente de net-new.
+
 ## Personas: consultas reutilizables, no el ICP completo
 
 La UI y ayuda consultadas permitían **cinco Personas**, con función, seniority, cargos actuales normalizados

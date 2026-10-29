@@ -1,23 +1,18 @@
 # Handoff
 
-## 2026-10-29 — Sales Navigator: gerencias, agencias y contratación
+## 2026-10-29 — Sales Navigator: búsquedas en cuatro mercados hispanos
 
-[Último corte/manifest](docs/commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md):
-**54cuentas** (banca10/seguros23/fintech21), siete nuevas; **57personas/5listas**
-(Search4/Marca16/Growth22/Web6/CRM9),20incorporaciones, todas con perfil abierto/membresía nominal releída.
-Prioridad reforzada: StefanoDiBiase declara presupuesto/campañas en cargo actual; CarlaZelada y FernandaCortés
-coordinación/manejo de agencias en trayectoria, con liderazgo actual.17casosB por liderazgo funcional;
-no gestión de agencias/presupuesto confirmados. JorgeGodoy queda investigado por afiliación a agencia propia.
-[Política](docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md): priorizar gestión específica de
-agencias/proveedores/presupuesto y posibilidad de impulsar contratación, preservando fuente y alcance
-actual/trayectoria; A/B no es scoreCRM ni autoridad contractual. Sin primer grado obligatorio ni operadores.
-AlejandraValdivia asociada nativamente aGoCapital; fila conserva título comitéWIF, gerencia confirmada en perfil.
-[Skills/manual](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md), capas técnica/funcional,
-índices y fixtureP88v19 actualizados.12servicios/5Personas sin cambio; Core150es observación anterior.
-Sin comunicaciones, solicitudes, InMail, créditos, CRM, alertas o scheduler. Próximo: priorizar iniciativa/cuenta,
-conciliar historial/restricciones y validar necesidad/autoridad/proveedor antes de acercamiento.
-[Corte anterior47/37 y depuración](docs/commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md)
-conserva historia; Haulmer sigue nominalmente verificado. Cambios ajenos del repositorio preservados.
+[Inventario y manifest](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md): **24 búsquedas de cuentas y 20 de personas**,
+Chile/México/Colombia/Perú; seis sectores y cinco frentes. Nombres/IDs y filtros releídos tras recarga.
+Muestras por país: cargos de gerencia/subgerencia/head; refinamientos por talento, producción industrial,
+docencia/coordinación y producto/CX no digital. Industria del perfil no certifica sector de empresa.
+Growth Chile conserva consulta inicial más amplia; el expediente declara diferencias y límites de precisión.
+Mandato cubre guardado y emails semanales nativos; no prueba recepción futura ni calificación de matches.
+Política, manuales, documentación y skill B2B espejo actualizados. Cupos documentados 50 cuentas + 50 personas;
+quedan 26/30; sin experimento de eliminación. No mensajes, solicitudes, InMail, CRM o scheduler externo.
+[Listas anteriores 54 cuentas/57 personas](docs/commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md)
+y portafolio 12/5 sin cambios. Próximo: revisar matches, confirmar cuenta/alcance comprador y medir ruido;
+no incorporar ni contactar automáticamente. Cambios concurrentes preservados; commit local, sin push.
 
 ## 2026-10-27 — SKY: ADR y puente operativo probado localmente
 

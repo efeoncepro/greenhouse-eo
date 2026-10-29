@@ -52,6 +52,28 @@ la recomendación nativa no es un ranking de valor comercial. Verificar asociaci
 varios puestos activos: comité/asociación, docencia o empresa propia no sustituyen la entidad compradora.
 Presupuesto disponible, firma contractual, demanda y proveedor vigente siguen siendo hechos distintos.
 
+## Búsquedas guardadas y mercados hispanos — mandato posterior del 29/10
+
+Julio autorizó expresamente configurar y guardar las búsquedas propuestas para **Chile, México, Colombia y
+Perú**, validar liderazgo, documentar y commit. Este mandato sí cubre el guardado y sus avisos semanales
+nativos: el permiso anterior para listas por sí solo no los cubría. Aplicación verificada: **24 búsquedas de
+cuentas + 20 de personas**, renombradas y releídas por ID tras recargar; [inventario y límites](../commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md).
+No amplía a comunicaciones, solicitudes, InMail, enrichment, CRM ni scheduler externo. Servicios y Personas
+nativas permanecen sin cambio; no incorporar automáticamente los matches a listas comerciales.
+
+La ayuda oficial documenta **50 búsquedas de cuentas y 50 de personas**, cupos independientes; LinkedIn
+publicó también alertas semanales para 50+50. La referencia histórica a 15 no es un límite adicional actual
+comprobado. Eliminar está permitido por el producto; la recuperación del cupo se interpreta desde el tope de
+búsquedas almacenadas, sin experimento de borrado en esta cuenta. Cambiar criterios y guardar crea copia;
+renombrar sólo cambia el nombre. Conservar criterios/ID y conciliar antes de reemplazar o eliminar.
+
+Cuentas por país/sector; personas por país/frente con varios sectores como alternativas. No multiplicar
+país × industria × cada servicio cuando el grupo comprador es el mismo. No restringir primer grado, idioma
+del perfil o residencia personal como sustituto del mercado comprador. Sede y presencia local son distintas;
+Industria en Personas no certifica la industria de su empresa actual. Validar cada nuevo match con el gate
+comprador: cargo normalizado, titular, puestos simultáneos, función y seniority pueden devolver falsos positivos.
+La consulta inicial chilena de Growth conserva más amplitud; el expediente declara diferencias y ruido.
+
 ## Regla de elección de canal
 
 | Situación del prospecto | Ruta operativa |

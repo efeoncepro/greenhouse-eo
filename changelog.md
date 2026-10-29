@@ -2,16 +2,14 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
-## 2026-10-29 — Prospección: Sales Navigator Core, gerencias y listas
+## 2026-10-29 — Prospección: búsquedas Sales Navigator multimercado
 
-[Flujo/configuración](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md):12servicios/5Personas
-persistidos y listas sectoriales/servicio. [Última ampliación](docs/commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md):
-siete cuentas y20personas nuevas; **54cuentas/57personas nominales**. PrioridadA/B por agencias/proveedores,
-presupuesto o liderazgo funcional, con alcance actual/trayectoria; no calificaciónCRM o firma confirmada.
-Filtro personas por3listas+Marketing+responsabilidad+agencias, y asociación GoCapital corregida paraAlejandra.
-Política, docs, skillsB2B/Commercial/CustomerModel y fixtureP88v19 actualizados. Sin outreach, créditos,CRM o
-scheduler;12+5sin cambios. La [depuración previa47/37](docs/commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md)
-y [cierre anterior](docs/audits/commercial/2026-10-29-sales-navigator-docs-skills.md) conservan su historia.
+[44 búsquedas persistidas](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md): 24 cuentas por país/sector y 20 personas
+por país/frente para Chile, México, Colombia y Perú, con avisos semanales nativos autorizados. Filtros,
+muestras y 44 IDs verificados tras recarga; ajustes por ruido y diferencias por mercado declarados.
+Política, tres capas documentales, continuidad y skill B2B espejo actualizados. Sin mensajes, solicitudes,
+InMail, nuevas membresías de listas, CRM o scheduler externo. Listas financieras 54/57 y servicios/Personas
+12/5 conservados. Límite oficial 50+50 separado; sin prueba de borrado/recuperación de cupo o email futuro.
 
 ## 2026-10-27 — SKY: ADR y comparación local de cuentas operativas
 

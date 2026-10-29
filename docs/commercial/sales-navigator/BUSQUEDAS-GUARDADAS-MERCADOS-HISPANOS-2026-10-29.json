@@ -1,0 +1,2050 @@
+{
+  "date": "2026-10-29",
+  "timezone": "America/Santiago",
+  "actor": "Julio Reyes",
+  "plan": "Sales Navigator Core",
+  "status": "saved, renamed and verified by name/ID after reload",
+  "counts": {
+    "accountSearches": 24,
+    "leadSearches": 20,
+    "accountSlotsRemainingAgainstDocumented50": 26,
+    "leadSlotsRemainingAgainstDocumented50": 30
+  },
+  "authority": "Explicit user mandate to configure/save proposed searches in Chile, Mexico, Colombia and Peru, validate leadership, document and commit. Includes native weekly saved-search notifications; no outreach or CRM mandate.",
+  "accountSearches": [
+    {
+      "name": "Efeonce | CL | Cuentas | Viajes y turismo",
+      "savedSearchId": "1991165825",
+      "countryCode": "CL",
+      "country": "Chile",
+      "front": "Viajes y turismo",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165825",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Chile",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | MX | Cuentas | Viajes y turismo",
+      "savedSearchId": "1991165817",
+      "countryCode": "MX",
+      "country": "México",
+      "front": "Viajes y turismo",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165817",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "México",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | CO | Cuentas | Viajes y turismo",
+      "savedSearchId": "1991165809",
+      "countryCode": "CO",
+      "country": "Colombia",
+      "front": "Viajes y turismo",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165809",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Colombia",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | PE | Cuentas | Viajes y turismo",
+      "savedSearchId": "1991165801",
+      "countryCode": "PE",
+      "country": "Perú",
+      "front": "Viajes y turismo",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165801",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Perú",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | PE | Cuentas | Salud",
+      "savedSearchId": "1991165793",
+      "countryCode": "PE",
+      "country": "Perú",
+      "front": "Salud",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165793",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Perú",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Hospitales y atención sanitaria"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | CO | Cuentas | Salud",
+      "savedSearchId": "1991165785",
+      "countryCode": "CO",
+      "country": "Colombia",
+      "front": "Salud",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165785",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Colombia",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Hospitales y atención sanitaria"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | MX | Cuentas | Salud",
+      "savedSearchId": "1991165777",
+      "countryCode": "MX",
+      "country": "México",
+      "front": "Salud",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165777",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "México",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Hospitales y atención sanitaria"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | CL | Cuentas | Salud",
+      "savedSearchId": "1991165769",
+      "countryCode": "CL",
+      "country": "Chile",
+      "front": "Salud",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165769",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Chile",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Hospitales y atención sanitaria"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | CL | Cuentas | Educación",
+      "savedSearchId": "1991165761",
+      "countryCode": "CL",
+      "country": "Chile",
+      "front": "Educación",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165761",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Chile",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Educación"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | MX | Cuentas | Educación",
+      "savedSearchId": "1991165753",
+      "countryCode": "MX",
+      "country": "México",
+      "front": "Educación",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165753",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "México",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Educación"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | CO | Cuentas | Educación",
+      "savedSearchId": "1991165745",
+      "countryCode": "CO",
+      "country": "Colombia",
+      "front": "Educación",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165745",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Colombia",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Educación"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | PE | Cuentas | Educación",
+      "savedSearchId": "1991165737",
+      "countryCode": "PE",
+      "country": "Perú",
+      "front": "Educación",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165737",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Perú",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Educación"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | PE | Cuentas | Industria y construcción",
+      "savedSearchId": "1991165729",
+      "countryCode": "PE",
+      "country": "Perú",
+      "front": "Industria y construcción",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165729",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Perú",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Industria manufacturera",
+          "Construcción"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | CO | Cuentas | Industria y construcción",
+      "savedSearchId": "1991165721",
+      "countryCode": "CO",
+      "country": "Colombia",
+      "front": "Industria y construcción",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165721",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Colombia",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Industria manufacturera",
+          "Construcción"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | MX | Cuentas | Industria y construcción",
+      "savedSearchId": "1991165713",
+      "countryCode": "MX",
+      "country": "México",
+      "front": "Industria y construcción",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165713",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "México",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Industria manufacturera",
+          "Construcción"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | CL | Cuentas | Industria y construcción",
+      "savedSearchId": "1991165705",
+      "countryCode": "CL",
+      "country": "Chile",
+      "front": "Industria y construcción",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165705",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Chile",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Industria manufacturera",
+          "Construcción"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | CL | Cuentas | Retail y consumo",
+      "savedSearchId": "1991165697",
+      "countryCode": "CL",
+      "country": "Chile",
+      "front": "Retail y consumo",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165697",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Chile",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | MX | Cuentas | Retail y consumo",
+      "savedSearchId": "1991165689",
+      "countryCode": "MX",
+      "country": "México",
+      "front": "Retail y consumo",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165689",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "México",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | CO | Cuentas | Retail y consumo",
+      "savedSearchId": "1991165681",
+      "countryCode": "CO",
+      "country": "Colombia",
+      "front": "Retail y consumo",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165681",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Colombia",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | PE | Cuentas | Retail y consumo",
+      "savedSearchId": "1991165673",
+      "countryCode": "PE",
+      "country": "Perú",
+      "front": "Retail y consumo",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165673",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Perú",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | PE | Cuentas | Finanzas y fintech",
+      "savedSearchId": "1991165665",
+      "countryCode": "PE",
+      "country": "Perú",
+      "front": "Finanzas y fintech",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165665",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Perú",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Servicios financieros"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | CO | Cuentas | Finanzas y fintech",
+      "savedSearchId": "1991165657",
+      "countryCode": "CO",
+      "country": "Colombia",
+      "front": "Finanzas y fintech",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165657",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Colombia",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Servicios financieros"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | MX | Cuentas | Finanzas y fintech",
+      "savedSearchId": "1991165649",
+      "countryCode": "MX",
+      "country": "México",
+      "front": "Finanzas y fintech",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165649",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "México",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Servicios financieros"
+        ]
+      }
+    },
+    {
+      "name": "Efeonce | CL | Cuentas | Finanzas y fintech",
+      "savedSearchId": "1991165641",
+      "countryCode": "CL",
+      "country": "Chile",
+      "front": "Finanzas y fintech",
+      "url": "https://www.linkedin.com/sales/search/company?savedSearchId=1991165641",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "headquarters": "Chile",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "industriesOr": [
+          "Servicios financieros"
+        ]
+      }
+    }
+  ],
+  "leadSearches": [
+    {
+      "name": "Efeonce | PE | Personas | CRM RevOps Lifecycle",
+      "savedSearchId": "1991166001",
+      "countryCode": "PE",
+      "country": "Perú",
+      "front": "CRM RevOps Lifecycle",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991166001",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Perú",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director) AND (CRM OR RevOps OR \"Marketing Operations\" OR \"Experiencia de Cliente\" OR CX OR lifecycle)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Jhoel Tipismana",
+          "role": "Subgerente de CRM",
+          "company": "Grupo Efe"
+        },
+        {
+          "name": "Natalia Vanessa Rodríguez Polo",
+          "role": "Gerente Implementación y Evolución CRM",
+          "company": "Mibanco, banco de la Microempresa"
+        },
+        {
+          "name": "Luis Carlos M.",
+          "role": "Gerente de Transformación CX",
+          "company": "Banco de Crédito BCP"
+        },
+        {
+          "name": "Mariela Sotomayor",
+          "role": "Gerente Corporativo de Diseño y Experiencia de Cliente - Credicorp",
+          "company": "Credicorp"
+        },
+        {
+          "name": "Tania Salcedo",
+          "role": "Gerente de transformación digital & CX",
+          "company": "NGR S.A."
+        }
+      ],
+      "validationNote": "Muestra de tarjetas con liderazgo pertinente; presupuesto, agencias actuales, contratación y alcance territorial no confirmados.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | CO | Personas | CRM RevOps Lifecycle",
+      "savedSearchId": "1991165993",
+      "countryCode": "CO",
+      "country": "Colombia",
+      "front": "CRM RevOps Lifecycle",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165993",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Colombia",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director) AND (CRM OR RevOps OR \"Marketing Operations\" OR \"Experiencia de Cliente\" OR CX OR lifecycle)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Camilo Ernesto Diusaba Perdomo",
+          "role": "Director Corporativo de Mercadeo Estratégico",
+          "company": "Clínica Medilaser S.A.S"
+        },
+        {
+          "name": "Carlos Casilimas Olivar",
+          "role": "Jefe de Loyalty & CX, Retail Media IT",
+          "company": "Cencosud S.A."
+        },
+        {
+          "name": "Ximena Chaparro Oviedo",
+          "role": "GERENTE DE MERCADEO Y EXPERIENCIA DE CLIENTE",
+          "company": "Banco Mundo Mujer"
+        },
+        {
+          "name": "Juan Manuel Zuleta Mesa",
+          "role": "Director de inteligencia de negocios y CRM",
+          "company": "Autogermana"
+        },
+        {
+          "name": "Liliana Velandia Cetina",
+          "role": "Head of Digital Marketing & CRM (Global Corporate)",
+          "company": "TOTTO"
+        }
+      ],
+      "validationNote": "Muestra de tarjetas con liderazgo pertinente; presupuesto, agencias actuales, contratación y alcance territorial no confirmados.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | MX | Personas | CRM RevOps Lifecycle",
+      "savedSearchId": "1991165985",
+      "countryCode": "MX",
+      "country": "México",
+      "front": "CRM RevOps Lifecycle",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165985",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "México",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director) AND (CRM OR RevOps OR \"Marketing Operations\" OR \"Experiencia de Cliente\" OR CX OR lifecycle)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Daniela Elizaga",
+          "role": "Marketing, PR and CRM/UX Director - Chirey, Omoda and Jaecoo Brands",
+          "company": "Chirey Motor Mexico"
+        },
+        {
+          "name": "Thabata R.",
+          "role": "Gerente Growth Marketing & Performance",
+          "company": "Innova Schools México"
+        },
+        {
+          "name": "Carlos Delgado Espejel",
+          "role": "Marketing & CRM Director",
+          "company": "R.H. Shipping & Chartering"
+        },
+        {
+          "name": "Mariana Gallardo",
+          "role": "Customer intelligence and data innovation projects deputy director",
+          "company": "GNP Seguros"
+        },
+        {
+          "name": "Omar Alvirde Pedroza",
+          "role": "Operations Director – Collections, CX, Customer operations",
+          "company": "SECORSE"
+        }
+      ],
+      "validationNote": "Growth puede actuar como sponsor de lifecycle; no acredita responsabilidad CRM ni HubSpot. Validar alcance de operaciones/cobranza antes de propuesta.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | CL | Personas | CRM RevOps Lifecycle",
+      "savedSearchId": "1991165977",
+      "countryCode": "CL",
+      "country": "Chile",
+      "front": "CRM RevOps Lifecycle",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165977",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Chile",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director) AND (CRM OR RevOps OR \"Marketing Operations\" OR \"Experiencia de Cliente\" OR CX OR lifecycle)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Alejandro Cuéllar Barra",
+          "role": "Subgerente Socios y CRM",
+          "company": "Walmart Chile"
+        },
+        {
+          "name": "Valeria Cerpa Brito",
+          "role": "Gerente de Marketing, Comunicaciones Corporativas, Experiencia de Clientes (CX) y Contact Latam",
+          "company": "CMT | Centro Médico del Trabajador"
+        },
+        {
+          "name": "Gabriela M.",
+          "role": "Subgerente Experiencia de Cliente",
+          "company": "Cocha"
+        },
+        {
+          "name": "Diego Caramuta",
+          "role": "Gerente de Analytics y CRM Wholesale y Finanzas",
+          "company": "Banco Bci"
+        },
+        {
+          "name": "Oscar Cortes",
+          "role": "Gerente de Evolución y Diseño CX",
+          "company": "Walmart Chile"
+        }
+      ],
+      "validationNote": "Muestra de tarjetas con liderazgo pertinente; presupuesto, agencias actuales, contratación y alcance territorial no confirmados.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | CL | Personas | Web y Experiencia Digital",
+      "savedSearchId": "1991165969",
+      "countryCode": "CL",
+      "country": "Chile",
+      "front": "Web y Experiencia Digital",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165969",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Chile",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR CTO OR CPO) AND (digital OR web OR ecommerce OR UX OR CTO OR CPO)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Luis Varela",
+          "role": "Subgerente de Transformación Digital",
+          "company": "Bupa Chile"
+        },
+        {
+          "name": "Cristián Hojas Pedrosa",
+          "role": "Subgerente de Ecommerce",
+          "company": "MELT Pizzas"
+        },
+        {
+          "name": "Cristián N.",
+          "role": "Subgerente Canal Directo",
+          "company": "Bci Seguros"
+        },
+        {
+          "name": "Nicole Haddad Ocampo",
+          "role": "Gerente TI Digital",
+          "company": "BTG Pactual Chile"
+        },
+        {
+          "name": "Tomás Abett de la Torre Paredes",
+          "role": "Subgerente de Canales Digitales",
+          "company": "BICE VIDA"
+        }
+      ],
+      "validationNote": "Muestra de tarjetas con liderazgo pertinente; presupuesto, agencias actuales, contratación y alcance territorial no confirmados.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | MX | Personas | Web y Experiencia Digital",
+      "savedSearchId": "1991165961",
+      "countryCode": "MX",
+      "country": "México",
+      "front": "Web y Experiencia Digital",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165961",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "México",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR CTO OR CPO) AND (digital OR web OR ecommerce OR UX OR CTO OR CPO)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Omar Galicia",
+          "role": "Executive Director Digital Omnichannel",
+          "company": "Farmacias del Ahorro"
+        },
+        {
+          "name": "Rolando Armando Lopez Vazquez",
+          "role": "Ecommerce & Omnichannel Director",
+          "company": "Gran Chapur"
+        },
+        {
+          "name": "Dennys Espinoza",
+          "role": "Head of Omnichannel & Digital",
+          "company": "Grupo Chedraui"
+        },
+        {
+          "name": "José Luis Mendoza López",
+          "role": "Gerente Sr. de Digitalización",
+          "company": "Grupo Bafar"
+        },
+        {
+          "name": "Yesenia Rodríguez",
+          "role": "Head of Ecommerce & Product Manager",
+          "company": "Miniso Mexico"
+        }
+      ],
+      "validationNote": "Muestra de tarjetas con liderazgo pertinente; presupuesto, agencias actuales, contratación y alcance territorial no confirmados.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | CO | Personas | Web y Experiencia Digital",
+      "savedSearchId": "1991165953",
+      "countryCode": "CO",
+      "country": "Colombia",
+      "front": "Web y Experiencia Digital",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165953",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Colombia",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR CTO OR CPO) AND (digital OR web OR ecommerce OR UX OR CTO OR CPO)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Alejandro Guerra Molina",
+          "role": "Director de Transformación Digital y Tecnología",
+          "company": "Ingredientes y Productos Funcionales"
+        },
+        {
+          "name": "Blanca Rosa Sámano Rocha",
+          "role": "Solutions and Digital Transformation Director",
+          "company": "SURA Asset Management"
+        },
+        {
+          "name": "Mónica Andrea Osorio Loaiza",
+          "role": "Gerente de Marca & Digital",
+          "company": "Genfar"
+        },
+        {
+          "name": "Alejandro Escobedo Morales",
+          "role": "Director de Omnicanalidad y Negocios digitales",
+          "company": "Grupo Unicomer"
+        },
+        {
+          "name": "Edsson Estupiñan",
+          "role": "Gerente de Transformación Digital e Innovación",
+          "company": "Seguros Mundial"
+        }
+      ],
+      "validationNote": "Muestra de tarjetas con liderazgo pertinente; presupuesto, agencias actuales, contratación y alcance territorial no confirmados.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | PE | Personas | Web y Experiencia Digital",
+      "savedSearchId": "1991165937",
+      "countryCode": "PE",
+      "country": "Perú",
+      "front": "Web y Experiencia Digital",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165937",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Perú",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR CTO OR CPO) AND (digital OR web OR ecommerce OR UX OR CTO OR CPO)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Juan Pedro Andujar",
+          "role": "Head de TI",
+          "company": "TOTAL Servicios Financieros"
+        },
+        {
+          "name": "Carlos Eduardo Flores Gargurevich",
+          "role": "Gerente de Transformación Digital",
+          "company": "Almacenes Santa Clara"
+        },
+        {
+          "name": "Stefanie Trigoso Roman",
+          "role": "CMO / Head of Digital",
+          "company": "Prima AFP"
+        },
+        {
+          "name": "Maria Isabel Carmi",
+          "role": "Gerente Digital, Ecommerce y Marketing",
+          "company": "Mascotas Latinas"
+        },
+        {
+          "name": "Ana Claudia Hinojosa",
+          "role": "Head of Digital Marketing",
+          "company": "Universidad Científica del Sur"
+        }
+      ],
+      "validationNote": "Excluidos producto físico y experiencia no digital.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | PE | Personas | Search Contenidos Social",
+      "savedSearchId": "1991165921",
+      "countryCode": "PE",
+      "country": "Perú",
+      "front": "Search Contenidos Social",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165921",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Perú",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director) AND (SEO OR contenido OR content OR \"marketing digital\" OR \"social media\") NOT (profesor OR professor OR coordinator OR coordinador OR \"community manager\")",
+        "function": [
+          "Marketing"
+        ],
+        "seniority": [
+          "Director",
+          "Gerente con experiencia",
+          "Vicepresidente",
+          "Director ejecutivo"
+        ],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Stefanie Trigoso Roman",
+          "role": "Gerente de Marketing, Digital Growth & Channels y Voz Cliente (CMO, CXO, Head of Digital)",
+          "company": "Prima AFP"
+        },
+        {
+          "name": "Sergio Velez",
+          "role": "Head de Marketing Digital",
+          "company": "Interbank"
+        },
+        {
+          "name": "Isaac Flores D.",
+          "role": "Head de Growth y Contact Center",
+          "company": "Divemotor"
+        },
+        {
+          "name": "Brenda Abad Rivas",
+          "role": "Head of E-Commerce Content & Product Publishing - Jefe de Publicaciones E-Commerce",
+          "company": "Falabella Perú"
+        },
+        {
+          "name": "Byandie Myrsha Saint Pierre",
+          "role": "Director of Marketing & Social Media",
+          "company": "MEDLIFE"
+        }
+      ],
+      "validationNote": "Marketing + cuatro seniorities y NOT docencia/coordinación/CM para limpiar falsos positivos.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | CO | Personas | Search Contenidos Social",
+      "savedSearchId": "1991165913",
+      "countryCode": "CO",
+      "country": "Colombia",
+      "front": "Search Contenidos Social",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165913",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Colombia",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director) AND (SEO OR contenido OR content OR \"marketing digital\" OR \"social media\")",
+        "function": [
+          "Marketing"
+        ],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Danny Figueroa Ramírez",
+          "role": "Director Marketing Digital",
+          "company": "Banco de Occidente"
+        },
+        {
+          "name": "Nicolay Coral Gómez",
+          "role": "Head of Content & Marketing Regional",
+          "company": "KrediYA"
+        },
+        {
+          "name": "Carolina Vargas",
+          "role": "Gerente de Marketing Digital",
+          "company": "JGB S.A."
+        },
+        {
+          "name": "Fabián Torres",
+          "role": "Gerente de Marketing Digital",
+          "company": "avianca"
+        },
+        {
+          "name": "Laura Gutiérrez Herrera",
+          "role": "Content & Social Media Manager",
+          "company": "BBVA en Colombia"
+        }
+      ],
+      "validationNote": "Función Marketing añadida por falsos positivos académico/médico.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | MX | Personas | Search Contenidos Social",
+      "savedSearchId": "1991165905",
+      "countryCode": "MX",
+      "country": "México",
+      "front": "Search Contenidos Social",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165905",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "México",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director) AND (SEO OR contenido OR content OR \"marketing digital\" OR \"social media\")",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Ileana S.",
+          "role": "Head of Content & Influencer Marketing",
+          "company": "Kapital Grupo Financiero"
+        },
+        {
+          "name": "Guadalupe Aragón",
+          "role": "Director de marketing digital",
+          "company": "Aliat Universidades"
+        },
+        {
+          "name": "Alma Pérez García",
+          "role": "Gerente Marketing Digital",
+          "company": "El Puerto de Liverpool"
+        },
+        {
+          "name": "Roberto Renedo",
+          "role": "Gerente de Inteligencia de Contenidos (Personalización Digital)",
+          "company": "Coppel"
+        },
+        {
+          "name": "Enrique Baranda Grajales",
+          "role": "Commercial Director (CCO) - Marketing, Digital, Sales & Revenue Strategy | Brand Building",
+          "company": "Schwabe Pharma México"
+        }
+      ],
+      "validationNote": "Muestra de tarjetas con liderazgo pertinente; presupuesto, agencias actuales, contratación y alcance territorial no confirmados.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | CL | Personas | Search Contenidos Social",
+      "savedSearchId": "1991165897",
+      "countryCode": "CL",
+      "country": "Chile",
+      "front": "Search Contenidos Social",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165897",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Chile",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director) AND (SEO OR contenido OR content OR \"marketing digital\" OR \"social media\")",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "David Galaz Riveros",
+          "role": "Gerente de Marketing Digital",
+          "company": "Grafton Latam"
+        },
+        {
+          "name": "Denise Iglesias",
+          "role": "Gerente de Comunicaciones y Marketing Digital",
+          "company": "Viña Concha y Toro"
+        },
+        {
+          "name": "Miguel Angel Navarrete López",
+          "role": "Subgerente Marketing Digital, Growth & eCommerce",
+          "company": "SKY Airline"
+        },
+        {
+          "name": "Carolina Águila",
+          "role": "Head of Branding & Social Media",
+          "company": "AFP Cuprum"
+        },
+        {
+          "name": "Sergio Mondaca",
+          "role": "Gerente Marketing Digital LATAM & LATAM Pass",
+          "company": "LATAM Airlines"
+        }
+      ],
+      "validationNote": "Grafton requiere revisión sectorial: industria de persona no certifica industria de empresa. SKY ya cliente: no asumir nueva prospección.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | CL | Personas | Marca y Creatividad",
+      "savedSearchId": "1991165889",
+      "countryCode": "CL",
+      "country": "Chile",
+      "front": "Marca y Creatividad",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165889",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Chile",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR \"brand manager\") AND (marca OR brand OR comunicaciones OR creativo OR creativa OR creative)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Sebastián Dañil",
+          "role": "Gerente General de Suzuki",
+          "company": "Empresas Indumotora"
+        },
+        {
+          "name": "Felipe Hott Hess",
+          "role": "Subgerente de Marketing Brand Experience y Alianzas",
+          "company": "Ripley Chile"
+        },
+        {
+          "name": "Paula Bravo Ithurbisquy",
+          "role": "Gerente Senior de Comunicaciones Corporativas",
+          "company": "Laboratorio Chile | Teva"
+        },
+        {
+          "name": "Johanna Fischer Uribe",
+          "role": "Gerente de Marketing y Comunicaciones",
+          "company": "AFP Modelo"
+        },
+        {
+          "name": "Erika San Martín Bombal",
+          "role": "Senior Brand Manager Kiko Milano",
+          "company": "Empresas DBS"
+        }
+      ],
+      "validationNote": "Cuatro cargos de marca/comunicaciones pertinentes; gerente general Suzuki aparece por coincidencia de cargo/posiciones y requiere verificar alcance.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | MX | Personas | Marca y Creatividad",
+      "savedSearchId": "1991165881",
+      "countryCode": "MX",
+      "country": "México",
+      "front": "Marca y Creatividad",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165881",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "México",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR \"brand manager\") AND (marca OR brand OR comunicaciones OR creativo OR creativa OR creative)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Enrique Tron",
+          "role": "Marketing, Brand & Sponsorships Director",
+          "company": "MetLife México"
+        },
+        {
+          "name": "Ana Laura Caballero Alvarez",
+          "role": "Communications & Brand Head",
+          "company": "Pluxee México"
+        },
+        {
+          "name": "Geraldine Barragan",
+          "role": "Product & Brand Manager · Loyalty Program A Comer Club",
+          "company": "Grupo Restaurantero Gigante"
+        },
+        {
+          "name": "Luis Lucido",
+          "role": "Head of Brand Marketing and Creative Studio",
+          "company": "Bravo México"
+        },
+        {
+          "name": "Abraham Nava",
+          "role": "Marketing Category Director - HD Cleaners (Pinol Masterbrand) & Citrex Dishwashing",
+          "company": "Grupo AlEn"
+        }
+      ],
+      "validationNote": "Muestra de tarjetas con liderazgo pertinente; presupuesto, agencias actuales, contratación y alcance territorial no confirmados.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | CO | Personas | Marca y Creatividad",
+      "savedSearchId": "1991165873",
+      "countryCode": "CO",
+      "country": "Colombia",
+      "front": "Marca y Creatividad",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165873",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Colombia",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR \"brand manager\") AND (marca OR brand OR comunicaciones OR creativo OR creativa OR creative)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Mónica Andrea Osorio Loaiza",
+          "role": "Gerente de Marca & Digital",
+          "company": "Genfar"
+        },
+        {
+          "name": "Luz Adriana Arango Giraldo",
+          "role": "Director de Mercadeo y Comunicaciones",
+          "company": "Universidad de San Buenaventura Cali"
+        },
+        {
+          "name": "Juan Carlos Rodriguez Ospina",
+          "role": "Gerente de Experiencia, Marca y Publicidad",
+          "company": "PTM Plataforma"
+        },
+        {
+          "name": "CARLOS LARROTA",
+          "role": "HEAD OF BRAND STAGING EN DAVIVIENDA",
+          "company": "Banco Davivienda"
+        },
+        {
+          "name": "Ana Maria Arango Vallejo",
+          "role": "Senior Brand Manager",
+          "company": "Novartis Colombia"
+        }
+      ],
+      "validationNote": "Muestra de tarjetas con liderazgo pertinente; presupuesto, agencias actuales, contratación y alcance territorial no confirmados.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | PE | Personas | Marca y Creatividad",
+      "savedSearchId": "1991165865",
+      "countryCode": "PE",
+      "country": "Perú",
+      "front": "Marca y Creatividad",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165865",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Perú",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR \"brand manager\") AND (marca OR brand OR comunicaciones OR creativo OR creativa OR creative)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Sckarleth Sanchez Moreno",
+          "role": "Gerente de Marca Internacional",
+          "company": "INKACROPS"
+        },
+        {
+          "name": "Sebastian Moy Solé",
+          "role": "Subgerente de Comunicaciones",
+          "company": "Yape"
+        },
+        {
+          "name": "Anna Lenka Jáuregui",
+          "role": "Gerente Corporativa de Comunicaciones y Marca",
+          "company": "Credicorp"
+        },
+        {
+          "name": "Augusto Alvarez Peñaranda",
+          "role": "Head of Brand & Licensing and Ceremonies & Torch",
+          "company": "Lima 2027"
+        },
+        {
+          "name": "Fatima Roman",
+          "role": "Gerente Principal de Marketing y Comunicaciones",
+          "company": "Banco Pichincha Perú"
+        }
+      ],
+      "validationNote": "Se retiró producción genérica: devolvía gerente industrial Laive. Evento público Lima2027 requiere canal/procurement propio.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | PE | Personas | Growth y Medios",
+      "savedSearchId": "1991165857",
+      "countryCode": "PE",
+      "country": "Perú",
+      "front": "Growth y Medios",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165857",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Perú",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR CMO) AND (marketing OR growth OR performance OR medios) NOT (talent OR talento OR recruitment)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Paola Chavez Soria /Marketing - Innovation Leader/ Branding / Digital / Trade / Comercial",
+          "role": "Gerente de Marketing y Trade",
+          "company": "P&D Andina Alimentos S.A."
+        },
+        {
+          "name": "Christian Romero Córdova",
+          "role": "Jefe de Marketing, Sostenibilidad y Experiencia al Cliente",
+          "company": "Financiera ProEmpresa"
+        },
+        {
+          "name": "Jorge Lazo Arias",
+          "role": "Gerente de Marketing de Producto",
+          "company": "Pacífico Seguros"
+        },
+        {
+          "name": "Angela Castillo Palomino",
+          "role": "Gerente de marketing, retail e innovación",
+          "company": "Grupo Santa Elena"
+        },
+        {
+          "name": "Andrea Escudero Asin",
+          "role": "Gerente de Marketing y Experiencia al Cliente",
+          "company": "Santander Consumer Perú"
+        }
+      ],
+      "validationNote": "Muestra de tarjetas con liderazgo pertinente; presupuesto, agencias actuales, contratación y alcance territorial no confirmados.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | CO | Personas | Growth y Medios",
+      "savedSearchId": "1991165849",
+      "countryCode": "CO",
+      "country": "Colombia",
+      "front": "Growth y Medios",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165849",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Colombia",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR CMO) AND (marketing OR growth OR performance OR medios) NOT (talent OR talento OR recruitment)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Camilo Ernesto Diusaba Perdomo",
+          "role": "Director Corporativo de Mercadeo Estratégico",
+          "company": "Clínica Medilaser S.A.S"
+        },
+        {
+          "name": "David Nieto",
+          "role": "Gerente, Marketing & Media",
+          "company": "Banco de Bogotá"
+        },
+        {
+          "name": "Ivonne Bohórquez",
+          "role": "Corporate Marketing Director",
+          "company": "Faranda Hotels & Resorts"
+        },
+        {
+          "name": "Maria Isabel Colom",
+          "role": "Head of Global Accounts and Marketing",
+          "company": "avianca cargo"
+        },
+        {
+          "name": "Diego Barragán Murillo",
+          "role": "Gerente global de marketing",
+          "company": "Nuvant S.A.S."
+        }
+      ],
+      "validationNote": "Muestra de tarjetas con liderazgo pertinente; presupuesto, agencias actuales, contratación y alcance territorial no confirmados.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | MX | Personas | Growth y Medios",
+      "savedSearchId": "1991165841",
+      "countryCode": "MX",
+      "country": "México",
+      "front": "Growth y Medios",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165841",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "México",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR CMO) AND (marketing OR growth OR performance OR medios) NOT (talent OR talento OR recruitment)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Julio Soto",
+          "role": "Director de Marketing y Comercial",
+          "company": "Los Cinco Soles"
+        },
+        {
+          "name": "Charlie Henao",
+          "role": "Marketing Director",
+          "company": "Bitso"
+        },
+        {
+          "name": "Claudia Aida López Orozco",
+          "role": "Head of Marketing and Corporate Communications",
+          "company": "Bovis"
+        },
+        {
+          "name": "Ileana S.",
+          "role": "Head of Content & Influencer Marketing",
+          "company": "Kapital Grupo Financiero"
+        },
+        {
+          "name": "MSc José Antonio Flores Calvillo",
+          "role": "Head de Marketing Retail Media",
+          "company": "Coppel SA de CV"
+        }
+      ],
+      "validationNote": "Cinco tarjetas pertinentes de dirección/head; talento excluido tras falso positivo.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    },
+    {
+      "name": "Efeonce | CL | Personas | Growth y Medios",
+      "savedSearchId": "1991165833",
+      "countryCode": "CL",
+      "country": "Chile",
+      "front": "Growth y Medios",
+      "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165833",
+      "savedAndRenamed": true,
+      "verifiedAfterReload": true,
+      "nativeWeeklyAlerts": true,
+      "filters": {
+        "companyHeadquarters": "Chile",
+        "companyHeadcountBands": [
+          "51-200",
+          "201-500",
+          "501-1.000",
+          "1.001-5.000",
+          "5.001-10.000",
+          "10.001 o más"
+        ],
+        "profileIndustriesOr": [
+          "Servicios financieros",
+          "Comercio al por menor",
+          "Fabricación de alimentos y bebidas",
+          "Industria manufacturera",
+          "Construcción",
+          "Educación",
+          "Hospitales y atención sanitaria",
+          "Organización de viajes",
+          "Aeronáutica y aviación",
+          "Hostelería"
+        ],
+        "currentTitleBoolean": "(gerente OR subgerente OR head OR director OR CMO) AND (marketing OR growth OR performance OR medios OR acquisition)",
+        "function": [],
+        "seniority": [],
+        "relationshipRestriction": null,
+        "personLocationRestriction": null,
+        "profileLanguageRestriction": null
+      },
+      "reviewedCards": [
+        {
+          "name": "Vivian Budinich",
+          "role": "Gerente Marketing Corporativo y Sostenibilidad",
+          "company": "Empresas Iansa"
+        },
+        {
+          "name": "Makarena Uribe",
+          "role": "Gerente de Marketing",
+          "company": "Transbank S.A."
+        },
+        {
+          "name": "Felipe Hott Hess",
+          "role": "Subgerente de Marketing Brand Experience y Alianzas",
+          "company": "Ripley Chile"
+        },
+        {
+          "name": "Tomás Valdés D.",
+          "role": "CMO | Gerente Comercial y Marketing",
+          "company": "Sodimac"
+        },
+        {
+          "name": "Cristhián R.",
+          "role": "Gerente de Marketing & Experiencia",
+          "company": "Cervecería Kross"
+        }
+      ],
+      "validationNote": "Muestra de cinco tarjetas: Vivian Budinich/Iansa, Makarena Uribe/Transbank, Felipe Hott/Ripley subgerente, Tomás Valdés/Sodimac CMO, Cristhián/Kross gerente.",
+      "validationDepth": "search cards; not full profile audit or buyer qualification"
+    }
+  ],
+  "unchanged": {
+    "serviceProducts": 12,
+    "personas": 5,
+    "financialAccountListsUniqueAccounts": 54,
+    "financialServiceLeadListsUniquePeople": 57
+  },
+  "actionsNotPerformed": [
+    "messages",
+    "connection requests",
+    "InMail use",
+    "paid enrichment",
+    "CRM writes",
+    "external scheduler changes",
+    "saved search deletions"
+  ],
+  "sources": [
+    "https://www.linkedin.com/help/sales-navigator/answer/a102024",
+    "https://www.linkedin.com/help/sales-navigator/answer/a106018",
+    "https://nonprofit.linkedin.com/blog/2024/03/forging-lasting-corporate-partners-sales-navigator"
+  ],
+  "limits": [
+    "50 account searches and 50 lead searches are separate documented limits, not a tested maximum in this account.",
+    "Saving searches produces native weekly notification emails; receipt of a future email was not observed.",
+    "Deleting/replacing can be used to manage stored capacity according to published behavior; no delete/slot recovery experiment was performed.",
+    "Profile industry filter is not proof of current company industry. Headquarters is not local presence or initiative ownership.",
+    "All new search results require manual review; current titles may match normalized or simultaneous positions. No universal precision/exhaustiveness claim."
+  ]
+}

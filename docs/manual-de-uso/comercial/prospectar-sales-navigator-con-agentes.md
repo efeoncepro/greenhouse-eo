@@ -1,5 +1,9 @@
 # Prospectar con Sales Navigator desde la sesión de Chrome
 
+**Búsquedas guardadas posteriores:** [24 de cuentas y 20 de personas](../../commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md)
+para Chile, México, Colombia y Perú, con filtros/muestras y persistencia verificada tras recarga.
+Guardar/avisos semanales fue autorizado expresamente en ese mandato; no hubo contacto, InMail ni CRM.
+
 **Último corte:** [gerencias, agencias y contratación](../../commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md)
 registra 54 cuentas/57 personas. Priorizar gestión específica de agencias/proveedores o presupuesto de área;
 separar responsabilidad actual de trayectoria y liderazgo potencial de autoridad contractual confirmada.
@@ -304,3 +308,21 @@ para catálogos cortos, vaciar y escribir secuencialmente. Confirmar contador, s
 guardado. Si una escritura queda ambigua, comprobar identidad/membresía antes de reintentar; un contador o
 notificación agregada nunca sustituye el readback nominal. Las recetas son evidencia fechada, no garantías
 de estabilidad de la UI ni autorización de automatización masiva.
+
+## Guardar y mantener búsquedas por mercado
+
+1. Cuentas: sede del país, bandas 51+ e industrias alternativas por cohorte. Personas: cargo actual de
+   liderazgo + sede de empresa/tamaño + industrias del ejercicio; usar listas curadas cuando ya existan.
+2. Leer una muestra de tarjetas reales; excluir/ajustar coordinación, docencia, talento o producción física
+   cuando sean cruces del texto. Conservar reservas: industria personal, puestos simultáneos, producto,
+   mercado comprador y plataforma no se certifican por un chip. No copiar Personas amplias sin gate comprador.
+3. Activar Guardar búsqueda. Abrir Búsquedas guardadas → pestaña Cuenta/Posibles clientes → Editar → nombre
+   `Efeonce | país | Cuentas/Personas | sector/frente` → Guardar. Esperar el cierre del editor.
+4. Leer el enlace/nombre/ID y criterios; recargar y comparar conjuntos. El switch y sus IDs pueden
+   reconstruirse; notificaciones repetidas y «+1 filtro más» no prueban búsquedas adicionales.
+5. La UI informa emails semanales de nuevos matches; no crear otro scheduler para replicarlos.
+6. Cambiar filtros y guardar genera copia; renombrar conserva criterios. Para una sustitución autorizada,
+   conservar definición/ID anterior, verificar la nueva y conciliar la retirada. Esta ejecución no borró ninguna.
+
+Detalle de 44 nombres, expresiones por país, muestras, casos de ruido y límites en el expediente enlazado.
+La capacidad documentada es 50 cuentas + 50 personas: no son 100 cupos intercambiables ni cinco Personas.

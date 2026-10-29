@@ -1,5 +1,10 @@
 # Prospección B2B Efeonce
 
+**Sales Navigator multimer­cado:** [44 búsquedas guardadas](../../commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md)
+(24 cuentas/20 personas) para Chile, México, Colombia y Perú. Sector por cuenta, frente por persona;
+validación por muestra y mercado, sin primer grado obligatorio. Avisos semanales nativos autorizados;
+los resultados requieren gate comprador y no generan lista comercial, contacto o CRM automáticamente.
+
 **Último corte:** [gerencias, agencias y contratación](../../commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md)
 registra 54 cuentas/57 personas. Priorizar gestión específica de agencias/proveedores o presupuesto de área;
 separar responsabilidad actual de trayectoria y liderazgo potencial de autoridad contractual confirmada.

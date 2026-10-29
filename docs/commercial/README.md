@@ -1,5 +1,7 @@
 # Commercial
 
+**Sales Navigator multimercado:** [44 búsquedas guardadas](sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md) para Chile, México, Colombia y Perú; criterios, muestras y límites documentados. Las listas financieras 54/57 conservan su corte.
+
 **Sales Navigator, último corte:** [54cuentas/57personas y evidencia de contratación](prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md). Priorización de gerentes/subgerentes/heads por agencias/proveedores/presupuesto o liderazgo funcional; estado anterior47/37 conservado como historia.
 
 **SalesNavigator, corte posterior29/10:** [47cuentas/37personas y criterio comprador](prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md).

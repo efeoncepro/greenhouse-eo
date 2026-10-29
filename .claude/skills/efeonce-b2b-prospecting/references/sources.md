@@ -126,3 +126,13 @@ LinkedIn autodeclarado; A/B ordena revisión y no acredita demanda, presupuesto 
 Conservar descripción de cargo actual frente a Acerca de/trayectoria; la keyword «agencias» por sí sola no
 prueba gestión de proveedores. Se ejercitó filtro de listas de cuentas+función+seniority y asociación
 nativa de la persona a la empresa pertinente cuando tenía cargos simultáneos. Sin outreach/CRM/créditos.
+
+## Búsquedas guardadas — fuentes y alcance del 29-10-2026
+
+[Guardar búsquedas/límite](https://www.linkedin.com/help/sales-navigator/answer/a102024): 50 de personas y
+50 de cuentas, avisos semanales, renombrar y eliminar. [Editar](https://www.linkedin.com/help/sales-navigator/answer/a106018):
+modificar filtros y guardar crea otra búsqueda. [LinkedIn for Nonprofits, 06-03-2024](https://nonprofit.linkedin.com/blog/2024/03/forging-lasting-corporate-partners-sales-navigator)
+explicita alertas semanales 50+50. El artículo histórico a106086 de cinco años menciona 15; no se usa como
+límite vigente adicional. Fuentes generales Sales Navigator, sin evidencia de un cupo menor Core.
+La UI confirmó aviso semanal y persistencia tras recarga de 24/20; no se probaron 100 guardados, entrega de
+emails futuros ni eliminación/recuperación de cupo. [Aplicación](../../../../docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md).
