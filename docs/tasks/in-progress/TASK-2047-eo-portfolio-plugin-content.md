@@ -1,5 +1,20 @@
 # TASK-2047 — EO Portfolio: plugin «eo-portfolio», documento del proyecto y tres puertas
 
+## Delta 2026-10-29 — despliegue y CLI de agentes
+
+- Plugin desplegado y activo en producción (runtime ede185a, corrección 009bddb). Sin proyectos. Con el plugin activo,
+  `/project/lifestyle-app/` pasó de 301 a 410: los 44 demos de TASK-2046 responden 410.
+- `pnpm public-website:portfolio` (`scripts/public-website/portfolio/cli.ts` + `local.php` + `remote.php`): ciclo
+  `pull`/`new` → `validate`/`preview`/`diff` → `apply` → `publish`/`unpublish` → `verify`, con el validador del plugin en
+  local y `wp eo-portfolio` en remoto. La primera previsualización destapó que `formats` publicaba «1» en vez de «1:1»
+  (corregido en 009bddb y cubierto por la prueba).
+- `export-live-code` ahora exporta `wp-content/plugins/eo-portfolio`: sin eso la guarda de deriva del despliegue se
+  negaba (correctamente) a sobrescribir el plugin vivo.
+- Documentación: manual `docs/manual-de-uso/public-site/operar-portafolio.md`, funcional
+  `docs/documentation/public-site/portafolio-de-proyectos.md`, arquitectura
+  `docs/architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md` y referencia de la skill
+  `efeonce-public-site-wordpress/references/portfolio-operation.md` (`.claude` y `.codex`).
+
 ## Delta 2026-10-29 — implementación de los Slices 1 a 4
 
 Decisiones tomadas al construir (`efeonce-public-site-runtime` ede185a):
@@ -54,7 +69,7 @@ Decisiones tomadas al construir (`efeonce-public-site-runtime` ede185a):
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `Slices 1–4 code complete en local (2026-10-29, runtime ede185a): plugin, esquema, servicio, WP-CLI, REST y compuertas probadas sobre tres fixtures (121 comprobaciones en PHP puro, 53 en Playground y 21 por WP-CLI, con la estructura de enlaces de producción). Paquete y despliegue escritos; nada desplegado. Precheck de producción en solo lectura: 247116 sin páginas hijas ni reglas con «portafolio». Pendiente: OK del operador al diseño del admin (Slice 5) y autorización para desplegar`
+- Status real: `Slices 1–4 en producción desde 2026-10-29 (runtime 009bddb, plugin activo, sin proyectos): /portafolio/ 200, /portafolio/no-existe/ 404, REST vacía con ETag, fixture validado y apply en dry run contra el sitio. CLI de agentes pnpm public-website:portfolio. Pendiente: OK del operador al diseño del admin (Slice 5)`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -592,16 +607,16 @@ WordPress o en meta propia, y replicar lo mismo].
 
 ## Acceptance Criteria
 
-- [ ] El plugin `eo-portfolio` registra `eo_project` con `has_archive=false` y entradas en `/portafolio/<slug>/`, y
-      `/portafolio/` sigue sirviendo la página 247116. (Verificado en Playground con la estructura de enlaces de producción; falta en producción tras el despliegue.)
+- [x] El plugin `eo-portfolio` registra `eo_project` con `has_archive=false` y entradas en `/portafolio/<slug>/`, y
+      `/portafolio/` sigue sirviendo la página 247116. (Playground y producción, 2026-10-29: /portafolio/ 200, /portafolio/no-existe/ 404)
 - [x] `schema/portfolio-entry.v1.json` existe en el plugin y `wp eo-portfolio validate` rechaza un documento inválido sin
       escribir nada. (Archivo `schema/portfolio-entry.v1.schema.json`; Playground + WP-CLI, 2026-10-29)
 - [ ] `wp eo-portfolio publish` falla sin `clientApproval` con `ref`, `date` y `scope`, y la pantalla del admin muestra
       «Publicar» deshabilitado con la razón. (La mitad de WP-CLI y el servicio, verificada; la pantalla es el Slice 5.)
 - [x] Una cifra sin `source` no valida, y un video sin `width`, `height` o `poster` no valida. (`tests/eo-portfolio.test.php`)
 - [x] La proyección pública omite resultados, logo, testimonio o medios cuando el alcance de la aprobación no los cubre. (PHP puro y REST en Playground)
-- [ ] `GET /wp-json/eo/v1/portfolio` devuelve sólo proyectos publicados, con `ETag`, y nunca `clientApproval`,
-      `greenhouseOrganizationId` ni revisiones. (Verificado en Playground; falta el `curl` en producción.)
+- [x] `GET /wp-json/eo/v1/portfolio` devuelve sólo proyectos publicados, con `ETag`, y nunca `clientApproval`,
+      `greenhouseOrganizationId` ni revisiones. (Playground con proyectos; producción 2026-10-29: 200, lista vacía, `ETag`, entrada no publicada 404, `/wp/v2/eo_project` 404)
 - [x] `apply` del mismo documento no crea revisión nueva, y un guardado con revisión base vieja devuelve conflicto. (Playground y WP-CLI)
 - [x] Las pruebas corren sobre los fixtures de Sky, PabellonToGo y ANAM, y lo esperado se deriva de cada fixture. (`tests/fixtures/portfolio/` del runtime)
 - [x] Ningún archivo del plugin compara contra nombres de cliente, campaña o slug. (Guarda en `tests/eo-portfolio.test.php` sobre los nombres, slugs y capítulos de los fixtures)
@@ -627,9 +642,9 @@ WordPress o en meta propia, y replicar lo mismo].
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] Arquitectura del portafolio documentada (`docs/architecture/public-site/`) con el esquema, las compuertas y las
-      tres puertas, y la skill `efeonce-public-site-wordpress` actualizada (`.claude` y `.codex`).
-- [ ] Manual de uso en `docs/manual-de-uso/` para cargar, aprobar y publicar un proyecto.
+- [x] Arquitectura del portafolio documentada (`docs/architecture/public-site/`) con el esquema, las compuertas y las
+      tres puertas, y la skill `efeonce-public-site-wordpress` actualizada (`.claude` y `.codex`). (2026-10-29; se completa con el admin del Slice 5)
+- [x] Manual de uso en `docs/manual-de-uso/` para cargar, aprobar y publicar un proyecto. (`operar-portafolio.md`, 2026-10-29)
 
 ## Follow-ups
 

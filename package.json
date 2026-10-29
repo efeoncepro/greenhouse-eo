@@ -319,6 +319,7 @@
     "public-website:site-nav": "tsx scripts/public-website/site-nav/cli.ts",
     "public-website:blog-home": "tsx scripts/public-website/blog-home/cli.ts",
     "public-website:landing-dock": "tsx scripts/public-website/landing-dock/cli.ts",
+    "public-website:portfolio": "tsx scripts/public-website/portfolio/cli.ts",
     "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
     "ai:image": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts",
     "ai:nano": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/nano-banana.ts",
