@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `Slice 1 hecho en lo automatizable (2026-10-23): inventario, allowlist por ID y foto previa versionados; Search Console por API sin tráfico en demos. Slice 2 escrito y probado en dryRun en producción (44 × 410, 44 a borrador, comentarios cerrados en 59; sin conflictos ni drift). Falta: revisión de enlaces externos en Search Console (operador) y OK para aplicar. Sin cambios en el sitio`
+- Status real: `Slice 2 aplicado en producción el 2026-10-29 con OK del operador: 44 demos en borrador, 44 redirects 410 de Yoast y comentarios cerrados en las 59; 35 demos ya responden 410, 15 reales 200 y el sitemap lista sólo las 15. Los otros 9 demos los redirige WordPress por _wp_old_slug (8, terminan en 404) o por la adivinanza de 404 (lifestyle-app → Eusari). Slice 3 escrito y en dryRun limpio (15 documentos Elementor 100 % demo a vaciar, 3 enlaces Envato, 71 filas _wp_old_slug en 8 slugs demo); falta el OK para aplicarlo`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -371,12 +371,12 @@ Entrada de cada script (JSON por `--input-file`):
 ## Acceptance Criteria
 
 - [x] La allowlist versionada tiene exactamente 15 IDs reales y 44 IDs demo, y suma las 59 entradas del inventario. (`allowlist-2026-10-23.json`, 2026-10-23)
-- [ ] Las 44 entradas demo están en borrador y ninguna fue borrada.
-- [ ] `curl -sI` de cada `/project/<slug>/` demo responde `410`.
-- [ ] `https://efeoncepro.com/ohio_portfolio-sitemap.xml` no lista ningún slug demo.
+- [x] Las 44 entradas demo están en borrador y ninguna fue borrada. (readback del script y foto `ohio-portfolio-2026-10-29.json.gz`, 2026-10-29)
+- [ ] `curl -sI` de cada `/project/<slug>/` demo responde `410`. (Parcial 2026-10-29: 35 de 44; 8 los redirige `_wp_old_slug`, que limpia el Slice 3, y `lifestyle-app` cae en la adivinanza de 404 de WordPress hacia la entrada real de Eusari. La verificación va sin query string: Yoast compara la URL completa y `?nc=` no calza.)
+- [x] `https://efeoncepro.com/ohio_portfolio-sitemap.xml` no lista ningún slug demo. (15 URLs, todas reales, 2026-10-29)
 - [ ] Las 15 entradas reales responden `200` y su HTML no contiene `1.envato.market`, `ohio.clbthemes.com` ni
       `colabrio.ams3.cdn.digitaloceanspaces.com`.
-- [ ] Los 59 posts `ohio_portfolio` tienen comentarios y pings cerrados.
+- [x] Los 59 posts `ohio_portfolio` tienen comentarios y pings cerrados. (foto `ohio-portfolio-2026-10-29.json.gz`, 2026-10-29)
 - [ ] La foto previa y la salida de cada script quedaron enlazadas en la task.
 - [ ] La revisión de Search Console de las URLs demo quedó registrada antes del Slice 2. (Parcial: clics e impresiones por API registrados; los enlaces externos sólo se ven en la interfaz y siguen pendientes.)
 

@@ -7,8 +7,10 @@ Scripts y evidencia de la limpieza del tipo `ohio_portfolio` en `efeoncepro.com`
 |---|---|
 | `inventory-ohio-portfolio.php` | Slice 1. Sólo lee: inventario y foto completa de las entradas `ohio_portfolio`, sonda de la API de redirects de Yoast y redirects existentes bajo `/project/`. |
 | `retire-ohio-demos.php` | Slice 2. Con la allowlist como entrada: 410 por Yoast para cada `/project/<slug>/` demo, demo a borrador (nunca se borra) y comentarios y pings cerrados en las 59. `dryRun` por defecto; aborta sin escribir si la allowlist no calza con el sitio, si un post cambió desde la foto o si un origen ya redirige a otro lado. |
+| `clean-ohio-real-entries.php` | Slice 3. Vacía con el guardado de Elementor el documento de las 15 reales sólo si cada texto e URL que contiene también está en algún demo (más tres textos exactos de la plantilla de CTA de Ohio); vacía `project_link` donde apunta al afiliado de Envato y borra las filas `_wp_old_slug` con slugs demo. `dryRun` por defecto. |
 | `gsc-project-urls.ts` | Slice 1. Sólo lee: clics e impresiones de Search Console bajo `/project/` y `/portfolio-category/` (16 meses). |
 | `allowlist-2026-10-23.json` | Lista versionada por ID: 15 reales y 44 demo, con `post_modified` de la foto. Es la entrada de los Slices 2 y 3. |
+| `snapshots/ohio-portfolio-2026-10-29.json.gz` | Foto posterior al Slice 2 y previa al Slice 3 (rollback del Slice 3). `sha256` del JSON sin comprimir: `f54085fdc51daf99fff82ce598c7cd9963476579ce806aeb0f6e8ae6b6c49b55`. |
 | `snapshots/ohio-portfolio-2026-10-23.json.gz` | Foto previa para rollback (estado, comentarios, contenido y todos los metadatos de las 59 entradas). |
 | `evidence/gsc-project-urls-2026-10-23.json` | Salida de Search Console del 2026-10-23. |
 
@@ -82,3 +84,30 @@ distinguen por ID; nunca por texto.
   Search Console. Si una aplicación queda a medias, cerrar comentarios cambia el `post_modified` de las reales: antes de
   reintentar, regenerar la allowlist desde un inventario nuevo (el script trata como hechos los demos ya en borrador y los
   410 ya creados).
+
+## Slice 2 — aplicado el 2026-10-29
+
+- Con OK del operador en chat. Salida en `evidence/retire-ohio-demos-apply-2026-10-29.json`: 44 redirects 410 creados y
+  leídos de vuelta, 44 demos a borrador, comentarios cerrados en las 59, sin fallas de readback, caché de Kinsta purgada.
+- HTTP después de aplicar (`evidence/http-after-apply-2026-10-29.csv`): 15 reales en 200 y 35 demos en 410. El sitemap
+  `ohio_portfolio-sitemap.xml` lista sólo las 15 reales.
+- **Verificar sin query string.** Yoast compara la URL pedida completa: `/project/corporate/?nc=123` no calza con la regla
+  y cae en 404. Las visitas y los buscadores piden la URL limpia.
+- **9 demos no llegan al 410.** WordPress los redirige antes de que Yoast responda: 8 porque su slug quedó como
+  `_wp_old_slug` en otras entradas (las reales nacieron duplicando demos y se renombraron), y terminan en 404 tras un
+  salto a `?post_type=ohio_portfolio&p=<id>`; `lifestyle-app` por la adivinanza de 404 de WordPress, que lo lleva a la
+  entrada real de Eusari (`lifestyle-app-elementor`, 200). El Slice 3 borra esas filas `_wp_old_slug`; la adivinanza se
+  puede apagar con `do_redirect_guess_404_permalink` en el plugin de `TASK-2047`.
+- Hallazgo fuera de alcance: el ícono social «YouTube» del tema enlaza a `facebook.com/colabrio` en todas las páginas del
+  sitio (opción global de Ohio, no de las entradas).
+
+## Slice 3 — `dryRun` del 2026-10-29
+
+- Entrada armada desde la foto del 2026-10-29 (las fechas de modificación de las reales cambiaron al cerrar comentarios).
+  Salida en `evidence/clean-ohio-real-entries-dryrun-2026-10-29.json`.
+- Las 15 entradas reales tienen un documento de Elementor 100 % demo: el CTA «Got a project? / Get a Quote» hacia
+  `ohio.clbthemes.com` y el texto en inglés sobre fin-tech; en Beebot y Big House, además, el caso de estudio completo del
+  demo (imágenes de Colabrio, equipo y premios ficticios). La galería de cada proyecto vive en `project_content` de Ohio y
+  no se toca.
+- Plan: 15 documentos a vaciar, 3 `project_link` de Envato a vaciar (Bresler, Flick, Ghamadent; Ohio oculta «Open
+  Project» cuando el campo está vacío) y 71 filas `_wp_old_slug` en 8 slugs demo.
