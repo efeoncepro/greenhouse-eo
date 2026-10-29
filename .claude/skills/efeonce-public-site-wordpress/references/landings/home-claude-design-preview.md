@@ -66,7 +66,9 @@
   `--ty`); dock start/stop on `#top`/`#agenda`; `page.css` lifts Ohio's `.elements-bar` 76 px while the dock shows.
   Traps: canvas two-class selectors (`.mstep.s1`) beat one-class responsive rules; a text-structure change renumbers
   schema keys `fNNN_` (safe only while page `251731` stores no `fNNN_` values — check before deploy). Code verified
-  locally at 320/390/768/1024; production deploy awaiting operator authorization. Contract: `HOME_INICIO_ELEMENTOR_MODULES_V1.md` §Móvil y tablet.
+  locally at 320/390/768/1024; deployed 2026-10-29 12:17 UTC (backup `/tmp/eo-inicio-widgets-before-20261029-121754.tar`)
+  and verified live at 375/1440 (dock start/stop and switch lift confirmed). QA trap: with the browser pane hidden,
+  `requestAnimationFrame` stalls and the dock looks dead — use real scroll or force a frame with a screenshot. Contract: `HOME_INICIO_ELEMENTOR_MODULES_V1.md` §Móvil y tablet.
 - Pending: in-editor save/reload not verified; keyboard traversal of the scenes not certified; the agents offer still
   has no own landing (CTA goes to the agenda).
 

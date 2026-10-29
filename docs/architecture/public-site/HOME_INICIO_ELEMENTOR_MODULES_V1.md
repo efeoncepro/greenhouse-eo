@@ -222,8 +222,7 @@ snap; no hay recorrido guiado ni rotación de citas.
 
 ## Pendientes
 
-- Pasada móvil 2026-10-29: código y compilado listos y verificados en local (320/390/768/1024); despliegue a
-  producción pendiente de autorización del operador.
+- Pasada móvil 2026-10-29 desplegada el 2026-10-29 12:17 UTC (`scoped_package_installed`, 190 archivos, backup `/tmp/eo-inicio-widgets-before-20261029-121754.tar`) y verificada en vivo a 375 y 1440 px. Falta probarla en un teléfono real.
 - PageSpeed / Lighthouse y Core Web Vitals de campo: no medidos (cuota pública de PSI agotada el 2026-10-29).
 - Prueba de guardar y recargar desde el editor de Elementor: no registrada en este rollout.
 - Push de `af1a785` al runtime y de los commits de `develop` en Greenhouse.

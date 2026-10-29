@@ -133,7 +133,14 @@ de consola; escenas revisadas sección por sección. Encontrado y corregido en e
 dos columnas, estaciones del método con alineación mixta (especificidad del canvas) y contador KPI que arrancaba en
 negativo. Paquete acotado: 190 archivos, 7 cambiados (5 de `includes/inicio/`, CSS y JS), sha
 `82a18c49…`. La página no tiene textos `fNNN_` guardados (verificado en vivo), así que la renumeración de claves de los
-schemas `agenda` y `agentes` no altera contenido. **Despliegue a producción: pendiente de autorización.**
+schemas `agenda` y `agentes` no altera contenido. Despliegue autorizado por el operador («Vamos») y aplicado a las 12:17 UTC (`scoped_package_installed`, backup
+`/tmp/eo-inicio-widgets-before-20261029-121754.tar`). Verificación en vivo, emulación de teléfono de 375 px: JS y CSS
+nuevos servidos; desborde 0; dock oculto en el hero, visible a mitad de página (con el selector de tema subido 76 px) y
+oculto de nuevo en la agenda; AEO avanza con el scroll; la pista dice «Toca un Spark.». A 1440 px: desborde 0, sin
+errores de consola, un `<h1>`, canónico `/` e `index, follow` intactos. Las 8 «imágenes sin cargar» que aparecen al
+medir son fotos diferidas del menú global (cargan al abrirlo), no de la home. Nota de método: con el panel del
+navegador oculto, `requestAnimationFrame` no corre y el dock parece no mostrarse; hay que hacer scroll real o forzar un
+render con una captura.
 
 ## Commits
 
@@ -152,7 +159,9 @@ No es del cuerpo de la home:
 
 ## Pendientes
 
-- Desplegar la pasada móvil y verificarla en vivo (dock, selector de tema, escenas táctiles) en teléfono real.
+- Probar la pasada móvil en un teléfono real (toques, deslizamientos, recorrido de Sparks).
+- El selector de tema de Ohio queda sobre la esquina del botón «Agenda tu diagnóstico» en la agenda (posición por
+  defecto del tema, previa a esta pasada).
 - Medir PageSpeed / Lighthouse y CWV de campo cuando haya cuota.
 - Prueba de guardar y recargar desde el editor de Elementor (no registrada en este rollout).
 - Push de `af1a785` al runtime y de los commits de `develop`.
