@@ -19,6 +19,11 @@ Para listas comerciales LinkedIn, aplicar además el gate comprador de esa polí
 Community Managers/ejecución pura por afinidad de servicio. Priorizar liderazgo funcional pertinente para
 impulsar contratación; operadores y validadores quedan en investigación, no como destinatarios por defecto.
 
+Priorizar gestión de agencias/proveedores o capacidad de impulsar contratación. Conservar evidencia
+actual frente a trayectoria y prioridad A/B de revisión, sin convertirla en calificación CRM. «Trabajó en
+agencias» no demuestra que las gestione; la [política](../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md)
+gobierna el orden y los límites.
+
 ## Criterio para nuevas comunicaciones
 
 Antes de preparar una apertura, reactivación, seguimiento o respuesta comercial de captación/expansión,

@@ -1,5 +1,7 @@
 # Sales Navigator — portafolio completo y modelo operativo de cliente
 
+La [priorización posterior de gerencias/agencias](../prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md) aplica al guardado comercial. Esta configuración 12+5 conserva su alcance de descubrimiento; no convierte operadores devueltos por Personas en compradores ni demuestra autoridad contractual.
+
 **Corrección comercial posterior:** las Personas amplias que se documentan aquí incluyen operadores como cobertura de investigación. Julio los excluyó de las listas comerciales por mera afinidad técnica: aplicar [criterio comprador vigente](../../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md#selección-de-interlocutores--corrección-posterior-del-2910). No se cambiaron las12fichas ni los5filtros nativos durante esa depuración.
 
 Corte **29-10-2026**, America/Santiago. Owner: Commercial / Julio Reyes.

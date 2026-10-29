@@ -1,6 +1,6 @@
 {
-  "version": 18,
-  "scope": "Offline, synthetic identities/domains. Prepare local decisions and proposed actions only; never call providers, write CRM, enroll or send. Original scenarios retain their historical facts/cut; P51-P55 use cut 2026-10-13. P61-P70 use cut 2026-10-24. P71-P74 use cut 2026-10-26 and synthetic document-engagement facts. P75-P80 use cut 2026-10-26 and synthetic discovery/transcript/business-case facts. P81-P86 use cut 2026-10-29 and synthetic Sales Navigator filtering, configuration and native-list facts; never operate a browser or mutate external lists during the evaluation. P87 uses the later 2026-10-29 operator correction prioritizing functional buyers over execution-only contacts; older scenarios retain their earlier evidence/authorization cuts.",
+  "version": 19,
+  "scope": "Offline, synthetic identities/domains. Prepare local decisions and proposed actions only; never call providers, write CRM, enroll or send. Original scenarios retain their historical facts/cut; P51-P55 use cut 2026-10-13. P61-P70 use cut 2026-10-24. P71-P74 use cut 2026-10-26 and synthetic document-engagement facts. P75-P80 use cut 2026-10-26 and synthetic discovery/transcript/business-case facts. P81-P86 use cut 2026-10-29 and synthetic Sales Navigator filtering, configuration and native-list facts; never operate a browser or mutate external lists during the evaluation. P87 uses the later 2026-10-29 operator correction prioritizing functional buyers over execution-only contacts; older scenarios retain their earlier evidence/authorization cuts. P88 uses later 2026-10-29 agency/budget prioritization and simultaneous-role account association; offline only.",
   "scenarios": [
     {
       "id": "P01",
@@ -783,6 +783,15 @@
         "El operador aclara expresamente que no quiere prospectar Community Managers. Había autorizado ampliar cuentas y contactos por servicio y corregir nuestras propias listas, sin enviar mensajes ni tocar otras listas o CRM.",
         "La lista incluye un Community Manager, una analista SEO(IC) y un administradorCRM que sólo declara operación técnica. También aparecen una Head deMarketingDigital y una BrandManager que declara gestionar agencias y un equipo. No hay presupuesto ni autoridad contractual confirmados.",
         "La Head es segundo grado con invitación pendiente; un gerente de otra función es primero. Hay un operador útil para investigar un workflow, pero no mandato específico de abordarlo. El menú permite quitar sólo esta lista o dejar de guardar en todas."
+      ]
+    },
+    {
+      "id": "P88",
+      "request": "Ordena la revisión de estos candidatos y prepara el guardado verificable; sólo offline.",
+      "facts": [
+        "La cohorte son financieras deChile. Cuenta+funciónMarketing+seniority+keywordagencias devuelve a una gerente que declara coordinar agencias en su trayectoria, un head cuya descripción actual dice formular/controlar presupuesto del área, un gerente cuyo resumen sólo dice haber trabajado en agencias y unCM. Sin presupuestos disponibles ni compra activa confirmados.",
+        "Una gerenta tiene actividad en un comité y empleo actual en la financiera. La fila quedó asociada al comité y su título resumido no cambia al editar la cuenta. La UI permite elegir empresa entre puestos activos y guardar esa asociación personal.",
+        "El operador prioriza gerentes/subgerentes/heads que gestionen agencias o puedan impulsar contratación y permite guardar en nuestras listas; no contactar, gastar,CRM o tocar listas ajenas. Un director vive fuera deChile sin alcance territorial declarado. La evaluación no permite UI/proveedores."
       ]
     }
   ]

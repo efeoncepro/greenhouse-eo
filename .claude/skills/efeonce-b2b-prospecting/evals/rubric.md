@@ -186,3 +186,11 @@ conservan su corte histórico; no habilitan prospectar operadores contra la pref
 | P87 | Reconocer afinidad técnica insuficiente; priorizar HeadDigital y BrandManager con agencias/equipo como interlocutores candidatos, sin inventar presupuesto/autoridad. Retirar sólo membresía propia deCM/analista/administrador operativo y mantener investigación/otras listas; no exigir presupuesto confirmado para investigar una jefatura. Primero/segundo grado no define fit; pendiente no aceptación. Proponer plan con readback, sin UI, envío, invitación oCRM. |
 
 Fixture añadida y validada estructuralmente; no se afirma evaluación conductual independiente deP87.
+
+## Agencias y contratación — v19
+
+| Caso | Resultado a contrastar |
+| --- | --- |
+| P88 | Priorizar evidencia específica de presupuesto actual y coordinación de agencias, preservando scope actual/trayectoria; no inventar monto disponible, firma o demanda. Trabajar en agencias no prueba gestionarlas. Liderazgo actual pertinente permite revisiónB, CM queda fuera. Corregir sólo asociación a financiera por puesto actual y releer empresa; título resumido del comité puede persistir y se explica con perfil, sin cambiar perfil público/CRM. Residencia no prueba mercado, conservar alcance pendiente. Plan offline sin UI/envío/créditos. |
+
+P88 preparada y validada estructuralmente; no evaluación conductual independiente ejecutada.

@@ -1,5 +1,11 @@
 # Prospección B2B Efeonce
 
+**Último corte:** [gerencias, agencias y contratación](../../commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md)
+registra 54 cuentas/57 personas. Priorizar gestión específica de agencias/proveedores o presupuesto de área;
+separar responsabilidad actual de trayectoria y liderazgo potencial de autoridad contractual confirmada.
+La [política](../../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md) gobierna revisión A/B.
+Las cifras de cortes anteriores que siguen conservan su fase histórica.
+
 **Gate comprador vigente:** Julio excluyóCommunityManagers y ejecución pura como prospectos por afinidad de servicio. Priorizar liderazgo funcional con posibilidad de impulsar contratación; operadores/validadores quedan en investigación. Ver [política](../../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md) y [resultado corregido47cuentas/37personas](../../commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md). Los cortes previos que siguen son históricos.
 
 Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),

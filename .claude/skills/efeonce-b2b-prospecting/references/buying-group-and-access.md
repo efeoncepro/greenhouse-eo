@@ -56,6 +56,11 @@ Para listas comerciales LinkedIn, el [gate comprador](../../../../docs/operation
 excluye CM/ejecución pura por afinidad de servicio. Operador relevante para investigar el buying group no
 equivale a destinatario comercial: priorizar liderazgo funcional de contratación y mantener esa distinción.
 
+En el orden de revisión, priorizar evidencia de gestión de agencias/proveedores o presupuesto del área;
+después liderazgo funcional actual que pueda impulsar evaluación. Separar mandato actual, experiencia de
+trayectoria y posibilidad de contratación. No elevar un ex empleado de agencia a gestor de proveedor ni
+una jefatura a firmante económico sin prueba. Pauta A/B y registro en la política de Sales Navigator.
+
 ## Mapa de acceso
 
 Para LinkedIn aplicar [Core, conexiones e InMail](../../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md):

@@ -1,5 +1,7 @@
 # Sales Navigator — índice de configuración y evidencia
 
+**Último corte:** [gerencias y agencias](../prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md):54 cuentas/57 personas, siete empresas y 20 contactos nuevos. Prioridad sustentada en agencias/proveedores/presupuesto o liderazgo funcional; sin comunicaciones/CRM. Los 12 servicios/5 Personas no cambiaron; los estados de fase que siguen son históricos.
+
 Corte de sesión **29-10-2026**, America/Santiago. Operador: Julio Reyes. Este índice recupera la
 configuración y los resultados del chat; no sustituye una revalidación futura de LinkedIn o HubSpot.
 

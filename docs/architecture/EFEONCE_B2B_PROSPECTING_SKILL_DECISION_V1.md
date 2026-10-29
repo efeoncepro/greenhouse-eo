@@ -51,6 +51,16 @@ La [ampliación](../commercial/prospects/servicios-financieros-chile-2026-10/AMP
 verificó47cuentas/37personas tras14retiros de membresías propias;Haulmerresuelto. Corrección de selección
 bajo el adapter vigente, sin nueva autonomía/API/CRM o permiso de envío; configuración12+5 preservada.
 
+### Ampliación con gerencias y agencias — corte posterior 29/10
+
+Mandato expreso: priorizar gerencias/subgerencias/heads con gestión de agencias o capacidad de impulsar
+contratación. La [política](../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md) distingue evidencia
+actual/trayectoria y revisión A/B, sin equivaler a calificación CRM. La
+[ronda verificada](../commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md)
+añadió siete cuentas/20 personas:54 cuentas y 57 membresías únicas al cierre. Se ejercitaron listas de cuentas
+como filtro de personas y corrección de cuenta asociada en cargo simultáneo. Mismo adapter/autoridad,
+sin API privada, runtime, envío, CRM, créditos o scheduler nuevos. Configuración 12 servicios/5 Personas intacta.
+
 ## Context
 
 Evidencia operativa del mismo día: [diccionario completo del portal](../audits/commercial/hubspot-properties-2026-10-11/README.md)

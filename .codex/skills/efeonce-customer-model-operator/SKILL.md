@@ -71,6 +71,10 @@ presupuesto, autoridad ni demanda. Servicios/landings, cobertura de roles y memb
 
 En listas comerciales, priorizar liderazgo funcional para impulsar contratación; Julio excluye CM/ejecución
 pura por afinidad técnica. Operadores del mapa de investigación no son destinatarios por defecto.
+Priorizar evidencia de agencias/proveedores o presupuesto del área, separando cargo actual de trayectoria.
+Liderazgo funcional puede habilitar investigación de contratación; no certifica comprador económico.
+Pauta de revisión A/B y fuente textual en el módulo B 2 B/política, sin convertirla en score o etapa CRM.
+
 
 ## Discovery y caso de negocio por iniciativa
 

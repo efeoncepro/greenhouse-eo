@@ -1,5 +1,7 @@
 # Ampliación financiera — criterio comprador corregido
 
+**Corte histórico 47 cuentas/37 personas.** La [ampliación posterior de gerencias y agencias](GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md) registra 54 cuentas/57 personas; conserva el criterio comprador y lo precisa con evidencia actual/trayectoria y prioridad de revisión.
+
 Corte posterior del **29-10-2026**, America/Santiago, actor Julio Reyes, Sales Navigator Core.
 Mandato: ampliar cuentas financieras/fintech de Chile y contactos por servicio, sin limitar a primer grado.
 Durante la ejecución Julio corrigió explícitamente: **«un community manager no me interesa prospectarlo»**.

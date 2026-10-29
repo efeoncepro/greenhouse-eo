@@ -1,22 +1,23 @@
 # Handoff
 
-## 2026-10-29 — Sales Navigator: cuentas ampliadas y criterio comprador corregido
+## 2026-10-29 — Sales Navigator: gerencias, agencias y contratación
 
-[Último corte y manifest](docs/commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md):
-**47cuentas nominales** (banca10/seguros22/fintech15),15nuevas;Haulmerresuelto por fila nominal.
-**37personas/5listas**:Search2/Marca9/Growth14/Web4/CRM8, conjuntos releídos. Julio rechazó prospectarCM;
-se retiraron14membresías propias de ejecución/afinidad sin liderazgo y se incorporaron8responsables para
-corregir la ronda inicial.22incorporaciones de personas permanecen;15anteriores conservadas.
-[Política](docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md): liderazgo funcional para impulsar
-contratación, no sólo afinidad técnica/servicio. Operadores/validadores quedan en investigación; cargo no
-prueba presupuesto. Sin restricción a primer grado. BárbaraLetelier asociada nativamente aBICEVIDA;
-fila conserva título de voluntariado3xi, cargo pertinente confirmado en perfil completo.
-[Portafolio12+5](docs/commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md) permanece guardado; Personas
-amplias requieren gate comprador. [Método/manual](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md)
-y skills actualizados; fixtureP87v18 estructural, sin eval conductual afirmada. Core150observado en corte
-anterior; sin mensajes, solicitudes,InMail,CRM ni scheduler. Próximo: elegir iniciativa/cuenta, validar
-necesidad/autoridad/proveedor e historial antes de comunicar. [Cierre anterior](docs/audits/commercial/2026-10-29-sales-navigator-docs-skills.md)
-y cortes previos conservan su historia; no son estado actual de las listas.
+[Último corte/manifest](docs/commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md):
+**54cuentas** (banca10/seguros23/fintech21), siete nuevas; **57personas/5listas**
+(Search4/Marca16/Growth22/Web6/CRM9),20incorporaciones, todas con perfil abierto/membresía nominal releída.
+Prioridad reforzada: StefanoDiBiase declara presupuesto/campañas en cargo actual; CarlaZelada y FernandaCortés
+coordinación/manejo de agencias en trayectoria, con liderazgo actual.17casosB por liderazgo funcional;
+no gestión de agencias/presupuesto confirmados. JorgeGodoy queda investigado por afiliación a agencia propia.
+[Política](docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md): priorizar gestión específica de
+agencias/proveedores/presupuesto y posibilidad de impulsar contratación, preservando fuente y alcance
+actual/trayectoria; A/B no es scoreCRM ni autoridad contractual. Sin primer grado obligatorio ni operadores.
+AlejandraValdivia asociada nativamente aGoCapital; fila conserva título comitéWIF, gerencia confirmada en perfil.
+[Skills/manual](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md), capas técnica/funcional,
+índices y fixtureP88v19 actualizados.12servicios/5Personas sin cambio; Core150es observación anterior.
+Sin comunicaciones, solicitudes, InMail, créditos, CRM, alertas o scheduler. Próximo: priorizar iniciativa/cuenta,
+conciliar historial/restricciones y validar necesidad/autoridad/proveedor antes de acercamiento.
+[Corte anterior47/37 y depuración](docs/commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md)
+conserva historia; Haulmer sigue nominalmente verificado. Cambios ajenos del repositorio preservados.
 
 ## 2026-10-27 — SKY: ADR y puente operativo probado localmente
 

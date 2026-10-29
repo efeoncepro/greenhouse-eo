@@ -75,6 +75,25 @@ Las Personas amplias descritas abajo conservan su configuración histórica; un 
 este gate automáticamente. La [ronda corregida](../../../../docs/commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md)
 retiró14membresías operativas y verificó47cuentas/37personas. No convertir esos números en cuota.
 
+## Priorizar evidencia de agencias, proveedores y contratación
+
+El mandato posterior prioriza gerentes/subgerentes/heads que gestionen agencias o puedan impulsar una
+contratación. Pauta de revisión: A = evidencia específica de agencias/proveedores o presupuesto de área;
+B = liderazgo funcional actual pertinente, sin esa evidencia específica. No son scores/tiers CRM ni compra
+calificada. Leer primero A y dentro de A separar responsabilidad actual de trayectoria profesional general.
+Registrar fuente textual, fecha, alcance y hechos pendientes; no inventar agencia actual, monto, presupuesto
+disponible o firma contractual. Una mención a empleo en agencias no prueba gestión de agencias proveedoras.
+
+Pasada ejercitada: Personas → panel lateral → Listas de cuentas (las tres listas sectoriales) + Marketing +
+Vicepresidente/Director/Gerente con experiencia + keyword «agencias». Los cinco resultados fueron evidencia
+parcial, con un guardado previo que no se duplicó. Combinar con búsqueda por cuenta y lectura real; no usar
+la keyword ni la recomendación de Persona como gate automático o ranking comercial.
+
+[Aplicación y manifest](../../../../docs/commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md):
+20 incorporaciones y siete cuentas nuevas, con readback nominal. Los nombres/cifras pertenecen al expediente;
+la pauta viaja como método. En cargos simultáneos, verificar/corregir asociación de cuenta y conservar la
+limitación si el título resumido de la fila sigue mostrando otra actividad.
+
 ## Personas: consultas reutilizables, no el ICP completo
 
 La UI y ayuda consultadas permitían **cinco Personas**, con función, seniority, cargos actuales normalizados

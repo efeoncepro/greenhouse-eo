@@ -1,5 +1,7 @@
 # Commercial
 
+**Sales Navigator, último corte:** [54cuentas/57personas y evidencia de contratación](prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md). Priorización de gerentes/subgerentes/heads por agencias/proveedores/presupuesto o liderazgo funcional; estado anterior47/37 conservado como historia.
+
 **SalesNavigator, corte posterior29/10:** [47cuentas/37personas y criterio comprador](prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md).
 Julio excluyeCommunityManagers/ejecución pura de listas comerciales; liderazgo funcional para impulsar contratación.
 Haulmerresuelto. Los bloques de guardado iniciales que siguen conservan sus cifras de fase.

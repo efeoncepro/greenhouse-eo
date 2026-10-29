@@ -2,15 +2,16 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
-## 2026-10-29 — Prospección: Sales Navigator Core, portafolio y listas
+## 2026-10-29 — Prospección: Sales Navigator Core, gerencias y listas
 
-[Flujo y configuración](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md):Chromeautenticado,
-12servicios conlanding/5Personas y listas nativas porsector/servicio,con readback. [Ampliaciónposterior](docs/commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md):
-47cuentas nominales (15nuevas,Haulmerresuelto) y37personas finales. Correcciónexpresa deJulio:CommunityManagers
-no son prospectos; liderazgo funcional para impulsar contratación antes de afinidadtécnica.14membresías propias
-retiradas,8responsables incorporados para corregir;22incorporaciones de personas permanecen. Política,docs,
-skills B2B/Commercial/CustomerModel y fixtureP87v18 actualizados. Sin mensajes,solicitudes,InMail,CRM o scheduler.
-[Cierreanterior](docs/audits/commercial/2026-10-29-sales-navigator-docs-skills.md) conserva sus cifras históricas.
+[Flujo/configuración](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md):12servicios/5Personas
+persistidos y listas sectoriales/servicio. [Última ampliación](docs/commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md):
+siete cuentas y20personas nuevas; **54cuentas/57personas nominales**. PrioridadA/B por agencias/proveedores,
+presupuesto o liderazgo funcional, con alcance actual/trayectoria; no calificaciónCRM o firma confirmada.
+Filtro personas por3listas+Marketing+responsabilidad+agencias, y asociación GoCapital corregida paraAlejandra.
+Política, docs, skillsB2B/Commercial/CustomerModel y fixtureP88v19 actualizados. Sin outreach, créditos,CRM o
+scheduler;12+5sin cambios. La [depuración previa47/37](docs/commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md)
+y [cierre anterior](docs/audits/commercial/2026-10-29-sales-navigator-docs-skills.md) conservan su historia.
 
 ## 2026-10-27 — SKY: ADR y comparación local de cuentas operativas
 

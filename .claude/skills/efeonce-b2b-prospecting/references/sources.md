@@ -117,3 +117,12 @@ outreach. No consultar proveedores ni realizar mutaciones para ejecutar fixtures
 Las recetas `fill`/typing, espera de sugerencias, selección persistente y corrección sólo de membresía se
 sustentan en el ensayo observado. No extrapolar éxito de Personas al selector Search ni convertir soluciones
 de eventos React en acceso a estado oculto. Screenshot aislado no sustituye membresía nominal persistida.
+
+## Gerencias y gestión de agencias — corte posterior 29/10/2026
+
+[Expediente y manifest](../../../../docs/commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md):
+UI autenticada, perfiles completos y readback nominal 54 cuentas/57 personas. La fuente profesional es
+LinkedIn autodeclarado; A/B ordena revisión y no acredita demanda, presupuesto disponible ni firma.
+Conservar descripción de cargo actual frente a Acerca de/trayectoria; la keyword «agencias» por sí sola no
+prueba gestión de proveedores. Se ejercitó filtro de listas de cuentas+función+seniority y asociación
+nativa de la persona a la empresa pertinente cuando tenía cargos simultáneos. Sin outreach/CRM/créditos.

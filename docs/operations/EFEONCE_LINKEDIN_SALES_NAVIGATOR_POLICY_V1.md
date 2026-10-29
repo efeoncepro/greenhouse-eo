@@ -27,6 +27,31 @@ Las Personas nativas amplias pueden devolver operadores: aplicar este gate antes
 comerciales. Para corregir una inclusión, retirar sólo esa membresía, conservar historial/otras listas y
 releer el conjunto. [Aplicación, depuración y resultado47cuentas/37personas](../commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md).
 
+## Priorizar agencias y capacidad de contratación — ampliación del 29/10
+
+Julio confirmó ampliar con **gerentes, subgerentes y heads** pertinentes, priorizando quienes gestionen
+agencias o puedan impulsar una contratación. Una jefatura de departamento o responsable de marca se evalúa
+por alcance real: estrategia, equipos, presupuesto, agencias/proveedores o responsabilidad de la función;
+no por la palabra Manager ni por la clasificación de seniority de LinkedIn.
+
+- **Prioridad A de revisión:** declaración específica de gestión/coordinación de agencias/proveedores o
+  formulación/control de presupuesto del área. Conservar si la fuente es descripción del cargo actual o
+  resumen de trayectoria. Dentro de A, la responsabilidad actual específica prima sobre la experiencia general.
+- **Prioridad B de revisión:** liderazgo funcional actual con encaje para impulsar una evaluación, sin
+  prueba específica de gestión de agencias/presupuesto. No presentarlo como comprador económico confirmado.
+
+A/B es una pauta de revisión de esta prospección, no tier ICP, Lead Score, etapa CRM o probabilidad de cierre.
+«Trabajó en agencias» no equivale a «gestiona agencias»; ni trayectoria implica proveedor actual. Guardar
+persona/cuenta, cargo actual, servicio principal, evidencia textual localizable, alcance de esa evidencia,
+prioridad y validaciones pendientes. Las cifras y nombres viven en el
+[expediente de gerencias](../commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md).
+
+Para descubrir esa evidencia, combinar listas sectoriales de cuentas, función y responsabilidad; keyword
+«agencias» es complementaria y se contrasta en el perfil. Un cero no prueba ausencia de responsables, y
+la recomendación nativa no es un ranking de valor comercial. Verificar asociación de cuenta cuando hay
+varios puestos activos: comité/asociación, docencia o empresa propia no sustituyen la entidad compradora.
+Presupuesto disponible, firma contractual, demanda y proveedor vigente siguen siendo hechos distintos.
+
 ## Regla de elección de canal
 
 | Situación del prospecto | Ruta operativa |
