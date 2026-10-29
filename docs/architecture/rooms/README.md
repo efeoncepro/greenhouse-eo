@@ -13,6 +13,8 @@ API en navegador. Claude Design aún debe conectar/aceptar su UI. [Manual local]
 
 **B10 local 28Oct:** [Navegador Rooms→MCP con reader real de autoridad](../../audits/rooms/2026-10-28-b10-rooms-mcp-authority.md) PASS: consentimiento read explícito/token sólo read/write con step-up; store y reader PostgreSQL reales, código consumido con versión7. Datos/proyección/contexto son fixtures; sin dispatch gateway, revocación browser de binding ni MFA humana.
 
+**Aislamiento RP local:** [Tres casos de servicios/persistencia](../../audits/rooms/2026-10-28-cross-rp-persistence-focal.md) PASS sin omisiones; sesión/callback con otro clientId y cookie guest crossRP rechazados. No cierra el recorrido integral de dos aplicaciones RP.
+
 **Propósito:** plataforma comercial propia para comprender, evaluar y defender propuestas creativas y
 SEO/AEO, combinables en una sala. La implementación actual no acredita todo el alcance de V1/EPIC-052.
 

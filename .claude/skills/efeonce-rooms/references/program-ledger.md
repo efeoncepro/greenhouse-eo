@@ -3,6 +3,14 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-28 — Aislamiento RP en servicios/persistencia:3casosPASS
+
+- `local`: Rooms `e0edf1e` intacto;3pruebas focales existentes,0fallos/0skip sobre PG18 efímero y
+  issuer HTTP sintético: sesión/callback con otro clientId y guest crossRP/issuer/origin rechazados.
+- Cluster retirado/puerto libre; no B10/B18 browser ni correo/canary/push/deploy repetidos.
+  No acredita dos aplicaciones RP completas: ese criterio sigue abierto.
+  [Recibo y comando](../../../../docs/audits/rooms/2026-10-28-cross-rp-persistence-focal.md).
+
 ## 2026-10-28 — B10 browser con reader de autoridad real
 
 - `local`: Rooms `e0edf1e` intacto + Auth `8d027f747` con `--mcp-pg --mcp-authority`; dos bases

@@ -1,0 +1,42 @@
+{
+  "observedAt": "2026-10-29T01:27:47.893736+00:00",
+  "status": "PASS",
+  "source": {
+    "roomsCommit": "e0edf1e6c94a887c40c5e9615f05ce4ac2c81c08",
+    "hashes": {
+      "tests/auth-persistence.test.ts": "4b25dc479b072d3255640fa321b39941f0ad40adab431e8b5ba0715effff71b2",
+      "tests/invitation-persistence.test.ts": "22ee93151896f4cdebf810cd3793fb2e7d4a358819b8c3952950d7c6bf31fee6",
+      "tests/fixtures/auth-issuer.ts": "544c1e7892654e2829b976d96cd015f56f0c4ef25e397d21a0f31c1ccddf1391"
+    },
+    "databaseEphemeral": true,
+    "databasePort": 50688
+  },
+  "result": {
+    "tests": 3,
+    "suites": 0,
+    "pass": 3,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "exitCode": 0,
+    "pattern": "^(auth sessions bind verified identity|auth state and browser binding|invitation guest cookies cannot cross RP)",
+    "selectedTests": [
+      "auth sessions bind verified identity to existing authority and persist only opaque hashes and encrypted secrets",
+      "auth state and browser binding reject substitution and parallel callbacks consume one transaction only",
+      "invitation guest cookies cannot cross RP, issuer or origin, and trusted runtime OFF denies asserted guest authority"
+    ]
+  },
+  "database": {
+    "kind": "disposable PostgreSQL18",
+    "migrations": 8,
+    "stopped": true,
+    "directoryRemoved": true,
+    "portFree": true
+  },
+  "testIssuer": "existing synthetic HTTP issuer fixture; not corporate Auth runtime",
+  "roomsSourceChanged": false,
+  "browserRepeated": false,
+  "realEmailsSent": 0,
+  "productionTouched": false,
+  "limitation": "Services/persistence cross-client and guest issuer/origin isolation only; not a complete browser traversal between two first-party RP applications."
+}
