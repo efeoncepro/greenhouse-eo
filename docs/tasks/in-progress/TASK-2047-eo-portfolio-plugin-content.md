@@ -1,5 +1,30 @@
 # TASK-2047 — EO Portfolio: plugin «eo-portfolio», documento del proyecto y tres puertas
 
+## Delta 2026-10-29 — implementación de los Slices 1 a 4
+
+Decisiones tomadas al construir (`efeonce-public-site-runtime` ede185a):
+
+- **Fixtures en el repo del runtime** (`tests/fixtures/portfolio/{sky,pabellontogo,anam}.json`), no en
+  `scripts/public-website/portfolio/fixtures/`: las pruebas que los usan viven ahí y duplicarlos abre deriva. Llevan la
+  marca `[fixture]` en aprobación, cifras y testimonio, y nunca se aplican en producción.
+- **Catálogo de servicios** `schema/services.v1.json`: las 9 líneas de servicio de `docs/services/`; `sky-blog-seo` queda
+  fuera porque es una instancia de cuenta, no un servicio.
+- **Guardar un proyecto publicado** que lo deja sin aprobación con alcance falla (`eop_publish_gate`): hay que
+  despublicarlo antes. La compuerta vive en el servicio, así que la cumplen admin, WP-CLI y restaurar.
+- **Sin plantilla todavía**, una entrada publicada responde 404, su `post_content` (el JSON) nunca sale como contenido y
+  el tipo queda fuera del sitemap de Yoast. Se enciende cuando `TASK-2048` engancha `eo_portfolio_render_entry`.
+- **Adivinanza de 404 de WordPress** apagada bajo `/project/` y `/portafolio/` (`do_redirect_guess_404_permalink`).
+- **Historial**: revisiones nativas de WordPress con meta `_eop_revision`, `_eop_hash`, `_eop_message` y `_eop_author`,
+  igual que `eo-site-nav`; las publicaciones quedan en `_eop_publication` (quién, cuándo, revisión, referencia y alcance
+  de la aprobación) y salen por `wp eo-portfolio log`, nunca por la REST.
+- **`apply` todo o nada**: valida y revisa conflictos de todo el archivo antes de escribir; si falla a medias, vuelve
+  los existentes a su revisión anterior y manda los nuevos a la papelera. `--snapshot` guarda el estado previo.
+- **Proyección pública**: lista blanca de campos; agrega `format` (derivado de las dimensiones), `formats` del proyecto
+  y `measure` (el primer porcentaje, sólo con alcance `metrics`). La lista `GET /eo/v1/portfolio` usa el contrato
+  `portfolio-index.v1` con `cover` y `measure` según el alcance.
+- **Despliegue**: `scripts/public-website/build-portfolio-plugin-package.cjs` y `deploy-portfolio-plugin-package.php`;
+  el despliegue se niega si `/portafolio/` tiene páginas hijas.
+
 ## Delta 2026-10-29 — desde el cierre de TASK-2046
 
 - WordPress adivina destinos para URLs 404 (`redirect_guess_404_permalink`) antes de que Yoast entregue un 410: por eso
@@ -16,7 +41,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -29,7 +54,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `Diseño — PDR-028 aceptado; sin código`
+- Status real: `Slices 1–4 code complete en local (2026-10-29, runtime ede185a): plugin, esquema, servicio, WP-CLI, REST y compuertas probadas sobre tres fixtures (121 comprobaciones en PHP puro, 53 en Playground y 21 por WP-CLI, con la estructura de enlaces de producción). Paquete y despliegue escritos; nada desplegado. Precheck de producción en solo lectura: 247116 sin páginas hijas ni reglas con «portafolio». Pendiente: OK del operador al diseño del admin (Slice 5) y autorización para desplegar`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -568,18 +593,18 @@ WordPress o en meta propia, y replicar lo mismo].
 ## Acceptance Criteria
 
 - [ ] El plugin `eo-portfolio` registra `eo_project` con `has_archive=false` y entradas en `/portafolio/<slug>/`, y
-      `/portafolio/` sigue sirviendo la página 247116.
-- [ ] `schema/portfolio-entry.v1.json` existe en el plugin y `wp eo-portfolio validate` rechaza un documento inválido sin
-      escribir nada.
+      `/portafolio/` sigue sirviendo la página 247116. (Verificado en Playground con la estructura de enlaces de producción; falta en producción tras el despliegue.)
+- [x] `schema/portfolio-entry.v1.json` existe en el plugin y `wp eo-portfolio validate` rechaza un documento inválido sin
+      escribir nada. (Archivo `schema/portfolio-entry.v1.schema.json`; Playground + WP-CLI, 2026-10-29)
 - [ ] `wp eo-portfolio publish` falla sin `clientApproval` con `ref`, `date` y `scope`, y la pantalla del admin muestra
-      «Publicar» deshabilitado con la razón.
-- [ ] Una cifra sin `source` no valida, y un video sin `width`, `height` o `poster` no valida.
-- [ ] La proyección pública omite resultados, logo, testimonio o medios cuando el alcance de la aprobación no los cubre.
+      «Publicar» deshabilitado con la razón. (La mitad de WP-CLI y el servicio, verificada; la pantalla es el Slice 5.)
+- [x] Una cifra sin `source` no valida, y un video sin `width`, `height` o `poster` no valida. (`tests/eo-portfolio.test.php`)
+- [x] La proyección pública omite resultados, logo, testimonio o medios cuando el alcance de la aprobación no los cubre. (PHP puro y REST en Playground)
 - [ ] `GET /wp-json/eo/v1/portfolio` devuelve sólo proyectos publicados, con `ETag`, y nunca `clientApproval`,
-      `greenhouseOrganizationId` ni revisiones.
-- [ ] `apply` del mismo documento no crea revisión nueva, y un guardado con revisión base vieja devuelve conflicto.
-- [ ] Las pruebas corren sobre los fixtures de Sky, PabellonToGo y ANAM, y lo esperado se deriva de cada fixture.
-- [ ] Ningún archivo del plugin compara contra nombres de cliente, campaña o slug.
+      `greenhouseOrganizationId` ni revisiones. (Verificado en Playground; falta el `curl` en producción.)
+- [x] `apply` del mismo documento no crea revisión nueva, y un guardado con revisión base vieja devuelve conflicto. (Playground y WP-CLI)
+- [x] Las pruebas corren sobre los fixtures de Sky, PabellonToGo y ANAM, y lo esperado se deriva de cada fixture. (`tests/fixtures/portfolio/` del runtime)
+- [x] Ningún archivo del plugin compara contra nombres de cliente, campaña o slug. (Guarda en `tests/eo-portfolio.test.php` sobre los nombres, slugs y capítulos de los fixtures)
 - [ ] El wireframe y el flujo del admin existen y el diseño visual fue aprobado antes del Slice 5.
 - [ ] `UI ready` permanece `no` hasta que el wireframe y el `## UI/UX Contract` tengan implementation mapping, GVC
       scenario plan y design decision log aprobados.
