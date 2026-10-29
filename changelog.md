@@ -10,6 +10,8 @@ o historia Diseño. [Resultado y gates](docs/audits/client-portal/2026-10-27-sky
 
 ## 2026-10-26 — Rooms: entorno de integración y conectores locales
 
+28Oct: [Dos adapters RP con issuer Auth real](docs/audits/rooms/2026-10-28-two-rp-auth-adapters.md),35checksPASS de cookies/callbacks/logout y positivos; sóloQA local/PG efímero, sin producto RP2 completo ni release.
+
 28Oct: [Tres regresiones RP existentes](docs/audits/rooms/2026-10-28-cross-rp-persistence-focal.md) PASS/0skip sobre PG efímero; sin cambio de fuentes ni repetición browser/canary. Aislamiento integral dos productos pendiente.
 
 28Oct: [B10 browser con reader externo real](docs/audits/rooms/2026-10-28-b10-rooms-mcp-authority.md) sobre PG efímero,16checks+8gruposPASS; SQL confirma código consumido v7. Fuentes Rooms y producción intactas.

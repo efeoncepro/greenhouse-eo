@@ -21,6 +21,8 @@ público §17. Pendiente: mapa de átomos de marketing de contenidos; tanda 2: G
 
 ## 2026-10-26 — Rooms: entorno local y conectores listos
 
+[Dos RP/adapters locales](docs/audits/rooms/2026-10-28-two-rp-auth-adapters.md): Rooms8750750 + Authe7b127647,35checks/Chrome/PGPASS; cookies/callbacks/logout cruzados rechazados. RP2 arnés del mismo consumer; sin rollout/HTTPS/MFA. Bases retiradas.
+
 [Aislamiento RP focal](docs/audits/rooms/2026-10-28-cross-rp-persistence-focal.md):3PASS/0skip, servicios/persistencia con PG efímero; Rooms e0edf1e intacto, DB retirada. Dos aplicaciones RP/browser integral sigue pendiente.
 
 B10 reader real: [Auth8d027f747→Rooms e0edf1e](docs/audits/rooms/2026-10-28-b10-rooms-mcp-authority.md),16checks+8gruposPASS y SQLv7; datos/proyección sintéticos, sin revocación browser binding ni dispatch/MFA. Bases efímeras retiradas, sin publicar.

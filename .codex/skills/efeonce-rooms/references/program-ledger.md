@@ -3,6 +3,16 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-28 — Dos adapters RP con Auth real:35checksPASS
+
+- `local`: Rooms `8750750`, Auth `e7b127647`; dos createAuthHttp/createAuthService en hosts distintos,
+  dos registros reales del issuer, navegador y PG efímero. Cookies/callbacks rechazados en ambos
+  sentidos, original no consumido/funcional y logout cruzado sin revocar dueño; SSO legítimo coexiste.
+- 35checks,lint/typesPASS; clave cifrado compartida deliberadamente sóloQA. RP2 es arnés del mismo
+  consumer, no segundo producto completo: sin HTTPS/MFA/entitlements/rollout; UI Claude aún pendiente.
+- Bases temporales retiradas/puertos libres, commit local limpio; sincorreo/push/flags/deploy/canary.
+  [Prueba y límites](../../../../docs/audits/rooms/2026-10-28-two-rp-auth-adapters.md).
+
 ## 2026-10-28 — Aislamiento RP en servicios/persistencia:3casosPASS
 
 - `local`: Rooms `e0edf1e` intacto;3pruebas focales existentes,0fallos/0skip sobre PG18 efímero y
