@@ -1,5 +1,17 @@
 # TASK-2049 — EO Portfolio: migración y salida a producción
 
+## Delta 2026-10-29 — TASK-2046 cerrada
+
+- La lista final de reales es la misma del delta anterior (15 IDs); siguen publicadas en `/project/<slug>/`.
+- Su documento de Elementor quedó vacío (era 100 % demo) y su contenido propio vive en los campos de Ohio
+  (`project_content`, `project_description`, `project_task`, cliente, servicios, `project_link`). El export debe leer de
+  ahí. Foto con todas las filas: `scripts/public-website/eo-portfolio/snapshots/ohio-portfolio-2026-10-29.json.gz`.
+- Las 44 demos están en borrador con 410 de Yoast; al desactivar Ohio Portfolio los 410 siguen vigentes porque viven en
+  Yoast. `lifestyle-app` sigue en 301 hacia `lifestyle-app-elementor` por la adivinanza de 404 de WordPress: si
+  `TASK-2047` la apaga, pasa a 410.
+- Se borraron las filas `_wp_old_slug` con slugs demo; las demás (slugs viejos propios de las reales) siguen y también
+  deben reencadenarse a `/portafolio/<slug>/`.
+
 ## Delta 2026-10-23 — insumos del inventario de TASK-2046
 
 - IDs de las 15 entradas reales: 223615 `social-media-nutribait`, 223616 `fivest-branding`, 223617 `pabellotogo-design`,

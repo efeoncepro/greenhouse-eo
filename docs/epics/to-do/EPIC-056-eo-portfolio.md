@@ -23,7 +23,7 @@ validado, las plantillas de portada y entrada, y la migración de las 15 entrada
 ## Why This Epic Exists
 
 El programa cruza cuatro frentes que no caben en una task: contenido de producción con riesgo de marca (44 demos de Ohio
-indexados, [ISSUE-183](../../issues/open/ISSUE-183-portfolio-ohio-demo-entries-indexed.md)), un modelo de datos nuevo con
+indexados, [ISSUE-183](../../issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md)), un modelo de datos nuevo con
 una compuerta de aprobación del cliente, una superficie visible con video y una migración con redirecciones. La regla de
 partir backend-data y ui-ux obliga a separar el plugin de las plantillas, y la limpieza tiene que salir antes, sola,
 porque es urgente y de bajo riesgo.
@@ -58,14 +58,14 @@ porque es urgente y de bajo riesgo.
 
 ## Child Tasks
 
-- `TASK-2046` — [Limpieza de los demos de Ohio](../../tasks/in-progress/TASK-2046-eo-portfolio-ohio-demo-cleanup.md): 44 demos a 410 y restos de Envato fuera de las entradas reales. Remedia ISSUE-183. Sin dependencias; va primero.
+- `TASK-2046` — [Limpieza de los demos de Ohio](../../tasks/complete/TASK-2046-eo-portfolio-ohio-demo-cleanup.md): complete (2026-10-29). 44 demos en borrador con 410, Elementor demo y Envato fuera de las 15 reales; resolvió ISSUE-183.
 - `TASK-2047` — [Plugin y contenido](../../tasks/to-do/TASK-2047-eo-portfolio-plugin-content.md): tipo `eo_project`, documento validado, compuerta de cliente, tres puertas. Puede correr en paralelo con TASK-2046.
 - `TASK-2048` — [Portada y entrada](../../tasks/to-do/TASK-2048-eo-portfolio-index-entry-templates.md): plantillas del servidor sobre AXIS y el reproductor. Bloqueada por TASK-2047 y por la aprobación del diseño.
 - `TASK-2049` — [Migración y salida a producción](../../tasks/to-do/TASK-2049-eo-portfolio-migration-rollout.md): 15 entradas, 301, video al bucket, Ohio Portfolio desactivado a los 30 días. Bloqueada por TASK-2047 y TASK-2048.
 
 ## Existing Related Work
 
-- [ISSUE-183](../../issues/open/ISSUE-183-portfolio-ohio-demo-entries-indexed.md) — demos de Ohio publicados e indexados.
+- [ISSUE-183](../../issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md) — demos de Ohio publicados e indexados.
 - `TASK-2041` y `TASK-2042` (EPIC-055) — plugin `eo-site-nav` y su adaptador: el patrón técnico que este programa repite. El menú global ya enlaza «Portafolio» con la foto `portafolio-op`.
 - Plugin `eo-axis-video` en `efeonce-public-site-runtime` — reproductor de AXIS, candidato, no activo.
 - Material de casos ya publicado: experiencia.efeoncepro.com (Sky), módulo de prueba de Agencia Creativa y posts 251397 y 251432 (ANAM).

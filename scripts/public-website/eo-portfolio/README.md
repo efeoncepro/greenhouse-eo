@@ -98,8 +98,11 @@ distinguen por ID; nunca por texto.
   salto a `?post_type=ohio_portfolio&p=<id>`; `lifestyle-app` por la adivinanza de 404 de WordPress, que lo lleva a la
   entrada real de Eusari (`lifestyle-app-elementor`, 200). El Slice 3 borra esas filas `_wp_old_slug`; la adivinanza se
   puede apagar con `do_redirect_guess_404_permalink` en el plugin de `TASK-2047`.
-- Hallazgo fuera de alcance: el ícono social «YouTube» del tema enlaza a `facebook.com/colabrio` en todas las páginas del
-  sitio (opción global de Ohio, no de las entradas).
+- Hallazgo fuera de alcance, corregido el 2026-10-29 a pedido del operador: el ícono social «YouTube» del encabezado
+  enlazaba a `facebook.com/colabrio` en todas las páginas (opción ACF de Ohio
+  `global_header_menu_social_links`, fila 3). Ahora apunta a `https://www.youtube.com/@efeoncepro`
+  (`scripts/public-website/site-options/fix-ohio-header-youtube.php`). Quedan latentes, sin publicarse hoy, los enlaces
+  sociales del autor 1 en las opciones de Ohio (Threads y Twitter a Colabrio).
 
 ## Slice 3 — `dryRun` del 2026-10-29
 
@@ -111,3 +114,15 @@ distinguen por ID; nunca por texto.
   no se toca.
 - Plan: 15 documentos a vaciar, 3 `project_link` de Envato a vaciar (Bresler, Flick, Ghamadent; Ohio oculta «Open
   Project» cuando el campo está vacío) y 71 filas `_wp_old_slug` en 8 slugs demo.
+
+## Slice 3 — aplicado el 2026-10-29
+
+- Con OK del operador en chat. Salida en `evidence/clean-ohio-real-entries-apply-2026-10-29.json`: 15 documentos de
+  Elementor vaciados con el guardado de Elementor (todas las filas duplicadas quedaron en `[]`; `post_content` no
+  necesitó limpieza aparte), 3 `project_link` de Envato vaciados y 71 filas `_wp_old_slug` borradas (listadas con
+  `meta_id`, `post_id` y valor para rollback). Sin fallas de readback; cachés de Elementor y Kinsta purgadas.
+- HTTP en vivo (`evidence/http-after-slice3-2026-10-29.csv`): 43 demos en 410, 15 reales en 200 sin huellas del demo.
+  «Open Project» sólo queda donde el enlace es de Behance. `lifestyle-app` sigue en 301 hacia
+  `lifestyle-app-elementor` por la adivinanza de 404 de WordPress (`TASK-2047`).
+- Rollback: `_elementor_data`, `post_content` y `project_link` por ID desde `snapshots/ohio-portfolio-2026-10-29.json.gz`
+  (o la revisión que Elementor creó al guardar); re-agregar las filas de `applied.oldSlugsDeleted`.

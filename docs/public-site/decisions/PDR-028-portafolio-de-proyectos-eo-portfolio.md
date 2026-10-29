@@ -6,7 +6,7 @@
 > **Ejecución:** [EPIC-056](../../epics/to-do/EPIC-056-eo-portfolio.md) con cuatro tasks en orden: `TASK-2046`
 > (limpieza de los demos de Ohio), `TASK-2047` (plugin y contenido), `TASK-2048` (portada y entrada) y `TASK-2049`
 > (migración y salida a producción).
-> **Incidente asociado:** [ISSUE-183](../../issues/open/ISSUE-183-portfolio-ohio-demo-entries-indexed.md) — 44 entradas
+> **Incidente asociado:** [ISSUE-183](../../issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md) — 44 entradas
 > demo del tema Ohio publicadas e indexadas.
 > **Diseño en revisión:** canvas «Portafolio Efeonce — concepto», página «EO Portfolio» —
 > [claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm](https://claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm) (versión 13 al
@@ -28,7 +28,7 @@ del plugin Ohio Portfolio 1.1.3) encontró:
 - **El tipo de contenido `ohio_portfolio` tiene 59 entradas publicadas; sólo 15 son trabajo de Efeonce.** Las otras 44
   son demos del tema (cliente «Envato», enlace de afiliado `1.envato.market`, imágenes del CDN de Colabrio) y están
   en `ohio_portfolio-sitemap.xml`. Cada entrada real termina llevando a ellas por «Next Project». Es
-  [ISSUE-183](../../issues/open/ISSUE-183-portfolio-ohio-demo-entries-indexed.md).
+  [ISSUE-183](../../issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md).
 - **Las 15 entradas reales arrastran restos del demo:** un bloque en inglés «Got a project? Get a Quote» que enlaza a
   `ohio.clbthemes.com`, el botón «Open Project» de Bresler, Flick y Ghamadent apuntando al afiliado de Envato, y 10
   entradas con la fecha por defecto «junio 3, 2020».

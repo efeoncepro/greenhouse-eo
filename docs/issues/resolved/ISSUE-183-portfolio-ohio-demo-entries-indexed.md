@@ -64,7 +64,22 @@ rediseño del portafolio (PDR-028). Evidencia descargada en el scratchpad de la 
 
 ## Estado
 
-open — remediación planificada en `TASK-2046`; sin cambios aplicados todavía.
+resolved (2026-10-29) por `TASK-2046`, con OK del operador para cada paso.
+
+Verificado en vivo el 2026-10-29 (`scripts/public-website/eo-portfolio/evidence/`):
+
+- 44 demos en borrador (ninguna borrada) con redirect 410 de Yoast; **43 responden 410**. `lifestyle-app` responde 301
+  a la entrada real de Eusari por la adivinanza de 404 de WordPress; se apaga en `TASK-2047`.
+- 15 reales en 200, sin `1.envato.market`, `ohio.clbthemes.com`, imágenes de Colabrio ni «Got a project?».
+- `ohio_portfolio-sitemap.xml` lista sólo las 15 reales; «Next Project», `/portfolio-category/branding/` y `/portafolio/`
+  ya no enlazan demos. Comentarios y pings cerrados en las 59.
+- Causa adicional encontrada: las reales heredaron como `_wp_old_slug` los slugs de los demos desde los que se
+  duplicaron, y WordPress redirigía esas URLs antes del 410; se borraron 71 filas.
+- Fuera de alcance, también corregido: el ícono YouTube del encabezado del tema enlazaba a `facebook.com/colabrio` en
+  todo el sitio; ahora apunta a `https://www.youtube.com/@efeoncepro`. Queda latente: los enlaces sociales del autor 1
+  en las opciones de Ohio (Threads y Twitter) apuntan a Colabrio, sin publicarse hoy.
+- Sigue abierto aparte: fechas por defecto en 10 entradas reales (se rehacen en `TASK-2049`) y el host
+  `cms.efeoncepro.com` indexado.
 
 ## Relacionado
 

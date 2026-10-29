@@ -1,5 +1,13 @@
 # TASK-2047 — EO Portfolio: plugin «eo-portfolio», documento del proyecto y tres puertas
 
+## Delta 2026-10-29 — desde el cierre de TASK-2046
+
+- WordPress adivina destinos para URLs 404 (`redirect_guess_404_permalink`) antes de que Yoast entregue un 410: por eso
+  `/project/lifestyle-app/` responde 301 a la entrada real de Eusari. El plugin debe apagar esa adivinanza al menos bajo
+  `/project/` y `/portafolio/` (`do_redirect_guess_404_permalink`) para que los 410 de los proyectos retirados se cumplan.
+- Al duplicar entradas, WordPress copia `_wp_old_slug`; un proyecto nuevo nacido de un duplicado hereda redirecciones
+  ajenas. El servicio de guardado no debe copiar ese meta.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

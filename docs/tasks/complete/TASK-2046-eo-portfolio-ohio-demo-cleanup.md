@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `Slice 2 aplicado en producción el 2026-10-29 con OK del operador: 44 demos en borrador, 44 redirects 410 de Yoast y comentarios cerrados en las 59; 35 demos ya responden 410, 15 reales 200 y el sitemap lista sólo las 15. Los otros 9 demos los redirige WordPress por _wp_old_slug (8, terminan en 404) o por la adivinanza de 404 (lifestyle-app → Eusari). Slice 3 escrito y en dryRun limpio (15 documentos Elementor 100 % demo a vaciar, 3 enlaces Envato, 71 filas _wp_old_slug en 8 slugs demo); falta el OK para aplicarlo`
+- Status real: `Completa 2026-10-29 en producción, con OK del operador para cada slice. Slice 2: 44 demos en borrador, 44 redirects 410 de Yoast, comentarios cerrados en las 59. Slice 3: documentos Elementor 100 % demo vaciados en las 15 reales, afiliado de Envato fuera de Bresler, Flick y Ghamadent, 71 filas _wp_old_slug de slugs demo borradas. Verificado en vivo: 43 demos en 410, 15 reales en 200 sin huellas del demo, sitemap sólo con reales, navegación y categorías sin demos. Pendiente acotado: lifestyle-app responde 301 a la entrada real de Eusari por la adivinanza de 404 de WordPress (se apaga en TASK-2047). Además se corrigió el ícono YouTube del encabezado, que enlazaba a facebook.com/colabrio`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -81,7 +81,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/issues/open/ISSUE-183-portfolio-ohio-demo-entries-indexed.md`
+- `docs/issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md`
 - `scripts/public-website/create-yoast-redirect.php` (precedente de redirect gobernado por Yoast)
 
 ## Dependencies & Impact
@@ -110,7 +110,7 @@ Reglas obligatorias:
 - `scripts/public-website/eo-portfolio/evidence/gsc-project-urls-2026-10-23.json` (nuevo)
 - `scripts/public-website/eo-portfolio/evidence/retire-ohio-demos-dryrun-2026-10-23.json` (nuevo)
 - `scripts/public-website/eo-portfolio/evidence/http-baseline-2026-10-23.csv` (nuevo)
-- `docs/issues/open/ISSUE-183-portfolio-ohio-demo-entries-indexed.md`
+- `docs/issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md`
 
 ## Current Repo State
 
@@ -372,13 +372,13 @@ Entrada de cada script (JSON por `--input-file`):
 
 - [x] La allowlist versionada tiene exactamente 15 IDs reales y 44 IDs demo, y suma las 59 entradas del inventario. (`allowlist-2026-10-23.json`, 2026-10-23)
 - [x] Las 44 entradas demo están en borrador y ninguna fue borrada. (readback del script y foto `ohio-portfolio-2026-10-29.json.gz`, 2026-10-29)
-- [ ] `curl -sI` de cada `/project/<slug>/` demo responde `410`. (Parcial 2026-10-29: 35 de 44; 8 los redirige `_wp_old_slug`, que limpia el Slice 3, y `lifestyle-app` cae en la adivinanza de 404 de WordPress hacia la entrada real de Eusari. La verificación va sin query string: Yoast compara la URL completa y `?nc=` no calza.)
+- [ ] `curl -sI` de cada `/project/<slug>/` demo responde `410`. (43 de 44 tras el Slice 3, `evidence/http-after-slice3-2026-10-29.csv`. Sin tildar: `lifestyle-app` responde 301 a la entrada real de Eusari por la adivinanza de 404 de WordPress, que corre antes del 410 de Yoast; se apaga con `do_redirect_guess_404_permalink` en `TASK-2047`. La verificación va sin query string: Yoast compara la URL completa.)
 - [x] `https://efeoncepro.com/ohio_portfolio-sitemap.xml` no lista ningún slug demo. (15 URLs, todas reales, 2026-10-29)
-- [ ] Las 15 entradas reales responden `200` y su HTML no contiene `1.envato.market`, `ohio.clbthemes.com` ni
-      `colabrio.ams3.cdn.digitaloceanspaces.com`.
+- [x] Las 15 entradas reales responden `200` y su HTML no contiene `1.envato.market`, `ohio.clbthemes.com` ni
+      `colabrio.ams3.cdn.digitaloceanspaces.com`. (`evidence/http-after-slice3-2026-10-29.csv`: 0 huellas y sin «Got a project?»; «Open Project» sólo donde apunta a Behance, 2026-10-29)
 - [x] Los 59 posts `ohio_portfolio` tienen comentarios y pings cerrados. (foto `ohio-portfolio-2026-10-29.json.gz`, 2026-10-29)
-- [ ] La foto previa y la salida de cada script quedaron enlazadas en la task.
-- [ ] La revisión de Search Console de las URLs demo quedó registrada antes del Slice 2. (Parcial: clics e impresiones por API registrados; los enlaces externos sólo se ven en la interfaz y siguen pendientes.)
+- [x] La foto previa y la salida de cada script quedaron enlazadas en la task. (`scripts/public-website/eo-portfolio/README.md`: fotos del 2026-10-23 y 2026-10-29, dryRun y apply de los Slices 2 y 3, HTTP antes y después)
+- [x] La revisión de Search Console de las URLs demo quedó registrada antes del Slice 2. (Clics e impresiones por API el 2026-10-23; enlaces externos revisados por el operador en la interfaz y confirmados en chat al autorizar el Slice 2, 2026-10-29.)
 
 ## Verification
 
@@ -390,15 +390,15 @@ Entrada de cada script (JSON por `--input-file`):
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes (pendiente: el archivo tiene cambios sin commitear de otra sesión al 2026-10-29; el estado vive en esta task, en `ISSUE-183` y en el README de los scripts)
+- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible (pendiente por la misma razón que `Handoff.md`)
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `ISSUE-183` movido a `docs/issues/resolved/` con fecha y verificación, y `docs/issues/README.md` actualizado
-- [ ] `TASK-2049` recibió un `## Delta` con la lista final de las 15 entradas reales y sus IDs
+- [x] `ISSUE-183` movido a `docs/issues/resolved/` con fecha y verificación, y `docs/issues/README.md` actualizado
+- [x] `TASK-2049` recibió un `## Delta` con la lista final de las 15 entradas reales y sus IDs
 
 ## Follow-ups
 
