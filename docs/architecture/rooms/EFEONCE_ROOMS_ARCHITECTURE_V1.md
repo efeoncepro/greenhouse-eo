@@ -1,22 +1,33 @@
 # Efeonce Rooms — arquitectura V1
 
-Diseño inicial: 2026-10-07. **Goal de construcción autorizado; estado ejecutado al2026-10-26 en el [dossier vivo](README.md).** El diseño restante sigue propuesto; no confundir topología futura con runtime desplegado. Dueño: Platform/Product. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md).
+Diseño inicial: 2026-10-07. **Goal de construcción autorizado; estado ejecutado al2026-10-29 en el [dossier vivo](README.md).** El diseño restante sigue propuesto; no confundir topología futura con runtime desplegado. Dueño: Platform/Product. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md).
 
-## 0. Corte ejecutado y frontera pendiente — 2026-10-26
+## 0. Corte ejecutado y frontera pendiente — 2026-10-29
 
-[Estado vigente y evidencias](README.md): main `e4b2e890`, API/CLI, lifecycle, contenido V1/V2/V3,
-Efeonce ID/invitaciones probados en canary cerrado, GCS privado, ocho migraciones/26 tablas y worker
-finito con Scheduler OIDC por demanda. Sólo el flag de máquina está ON; flags humanos/medios web OFF.
+El [candidato backend local](../../audits/rooms/2026-10-29-backend-local-completion.md)
+`codex/rooms-design-integration@3c7bcb5` incorpora13migraciones/43tablas, colaboración,
+tours/notas/sesiones durables, importación X-ray y referencia/handoff CRM, multimedia V4 mixto
+y MCP stdio por sesión existente. HTTP/CLI/SDK comparten primitives; el contrato disponible y sus
+exclusiones se detallan en la [guía para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md)
+y en los ADR de [colaboración](EFEONCE_ROOMS_COLLABORATION_DECISION_V1.md),
+[presentación](EFEONCE_ROOMS_DURABLE_PRESENTATION_DECISION_V1.md),
+[fuentes/CRM](EFEONCE_ROOMS_SOURCE_IMPORT_AND_CRM_HANDOFF_DECISION_V1.md),
+[multimedia local](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md) y
+[MCP local](EFEONCE_ROOMS_LOCAL_STDIO_MCP_DECISION_V1.md).
 
-El pipeline actual admite imágenes estáticas PNG/JPEG/WebP, produce dos derivados WebP y entrega sólo
-esos derivados mediante API reautorizada. §3/§5 describen también el alcance multimedia futuro: no hay
-FFmpeg/HLS/PDF/audio/video, descarga de originales o tickets de lectura habilitados por este corte.
-El descriptor firmado actual sólo escribe; no concede lectura. Presentación, colaboración, CRM/MCP y
-otros contratos del diseño objetivo no se certifican como implementados.
+V4 combina imagen/PDF/audio/video; sólo entrega derivados privados de referencias ubicadas en bloques
+visibles. Cada GET/HEAD/Range/304 reautoriza; originales, HLS y tickets de lectura no están habilitados.
+Los contratos publicados V1–V3 se conservan. Puertos externos X-ray/CRM OFF: un handoff `pending`
+no acredita entrega ni sincronización. MCP stdio no acredita OAuth/federación remota ni transferencia binaria.
 
-Claude Design posee interfaz. Falta entorno de integración aislado, conexión same-origin y recorrido
-completo desde la nueva UI; aceptación y activación general separadas. Auth sigue en PR263/264 sin
-merge/deploy por instrucción humana. [Contrato de integración](../../documentation/rooms/backend-api-for-claude-design.md).
+El corte publicado26Oct sigue separado: main local `e4b2e890`, ocho migraciones/26tablas,
+GCS/worker de imágenes y Scheduler por demanda, canary único cerrado con flags humanos OFF.
+No se revalidó el deployment remoto en29Oct ni se promovió el candidato local. Restore local13 en
+PG16/18 y337testsPASS0skip no certifican restore cloud ni worker multimedia Linux/cloud.
+
+El entorno aislado de integración ya está construido y quedó detenido; falta conectar y aceptar la
+nueva UI de Claude Design y certificar su experiencia. Auth sigue retenido en PR263/264; rollout,
+proveedores reales y activación general conservan sus gates. [Estado vivo](README.md).
 
 ## 1. Topología y stack objetivo
 
@@ -67,7 +78,7 @@ flowchart TD
 - **Content:** inventario de archivos y bloques estructurados, piezas/variantes, editorial, diagnósticos, relaciones X-ray, planes, escenarios, evidencia y tema validado.
 - **Editions:** revisión, snapshot, publicación y referencias inmutables.
 - **Access:** invitaciones, grants, sesiones externas y autorización de bytes/acciones.
-- **Presentation:** tours y notas persistidas; estado efímero de sesión separado.
+- **Presentation:** tours, notas propias y sesiones/control/ACK durables; adapter visual entre ventanas separado, según el [ADR local](EFEONCE_ROOMS_DURABLE_PRESENTATION_DECISION_V1.md).
 - **Collaboration:** preguntas, respuestas y pasos simples ligados a edición.
 - **Media:** uploads, assets y derivados; nunca lógica de precios o pipeline.
 - **Integrations:** adaptadores CRM/Greenhouse/fuentes, estados y reconciliación.
@@ -77,6 +88,8 @@ La autoridad de diseño es [efeonce-graphic-line](../../../.codex/skills/efeonce
 El renderer compartido vive en Rooms para preview/explorar/presentar. AXIS posee únicamente valores, recursos y composiciones realmente portables. No exportar el modelo de permisos ni el dominio comercial a AXIS.
 
 ## 3. Pipeline de medios
+
+Alcance objetivo; los perfiles ejecutados y límites actuales son V3 imágenes cloud y V4 multimedia sólo local (§0).
 
 1. Registrar manifest; asignar identidad y destino permitido por asset.
 2. Emitir sesión de transferencia limitada por tamaño/tipo/owner; cliente sube directamente.
@@ -102,13 +115,13 @@ CRM es integración asíncrona: una caída no bloquea una edición disponible y 
 
 ## 5. Entrega de medios y revocación
 
-Base candidata: tickets cortos para bytes privados. Revocar niega nuevos tickets; los existentes pueden seguir válidos hasta su TTL. Una descarga admitida o bytes guardados no se recuperan. Antes de producción fijar TTL y medir el margen efectivo de revocación; no llamarlo instantáneo.
+La entrega ejecutada (§0) reautoriza cada petición y no emite tickets de lectura. La alternativa de diseño siguiente no está habilitada: tickets cortos para bytes privados. Revocar niega nuevos tickets; los existentes pueden seguir válidos hasta su TTL. Una descarga admitida o bytes guardados no se recuperan. Antes de producción fijar TTL y medir el margen efectivo de revocación; no llamarlo instantáneo.
 
 Si el caso requiere revalidación por Range/segmento, introducir gateway de streaming con backpressure y respuestas 200/206/416 verificadas. Nunca proxy de archivos grandes mediante arrayBuffer dentro del handler de UI. Límites de upload/download/CPU, concurrencia y egress por sala y organización.
 
 ## 6. Presentación
 
-Una sesión fija editionId y tourId. La consola y la pantalla de audiencia reciben DTOs diferentes. BroadcastChannel coordina ventanas del mismo origen mediante sessionId, secuencia y ack; jamás transporta notas. La pantalla de audiencia informa escena aplicada, buffer y bloqueo de reproducción. Un command enviado no equivale a una reproducción iniciada.
+El [backend local](EFEONCE_ROOMS_DURABLE_PRESENTATION_DECISION_V1.md) ya fija edición/tour, ownership, TTL, control exclusivo, secuencia y ACK; no implementa el adapter de ventanas ni certifica playback. El resto de este apartado describe la experiencia objetivo. Una sesión fija editionId y tourId. La consola y la pantalla de audiencia reciben DTOs diferentes. BroadcastChannel coordina ventanas del mismo origen mediante sessionId, secuencia y ack; jamás transporta notas. La pantalla de audiencia informa escena aplicada, buffer y bloqueo de reproducción. Un command enviado no equivale a una reproducción iniciada.
 
 No hay sincronización remota entre dispositivos en V1; requiere transporte y autoridad propios. Una ventana o pantalla compartida permite presentar sin ese sistema. El navegador puede bloquear sonido/fullscreen: preflight real, fallback visible y playback iniciado por gesto. Al perder la consola, la audiencia mantiene la escena y permite salida; no avanza sola.
 

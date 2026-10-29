@@ -27,7 +27,7 @@ de 129/15 checks pertenecen al scaffold anterior.
 - Motion: `docs/ui/motion/TASK-2068-rooms-invitation-and-guest-experience-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-29: canary interno del 26-10 completó correo único recibido, código, guest, imagen privada y revocación; cerró con acceso humano OFF. B18 local 51 checks PASS sin SSO/sesión interna para guest. El scaffold previo pasó 129 checks de integración y 15 de privacidad; UI nueva de Claude Design aún sin entrega ni aceptación. Falta QA integral del flujo nuevo, recovery y activación estable; no repetir canary por inferencia.`
+- Status real: `2026-10-29: canary interno del 26-10 completó correo único recibido, código, guest, imagen privada y revocación; cerró con acceso humano OFF. B18 local 51 checks PASS sin SSO/sesión interna para guest. El scaffold previo pasó 129 checks de integración y 15 de privacidad; UI nueva de Claude Design aún sin entrega ni aceptación. SDK/entorno aislado y backend local13 ya preparados y verificados; derechos adicionales guest explícitos sólo en edición inicial. Falta QA integral del flujo nuevo, recuperación UI/BFCache y activación estable; no repetir canary por inferencia.`
 - Rank: `TBD`
 - Domain: `ui|identity`
 - Blocked by: `none`

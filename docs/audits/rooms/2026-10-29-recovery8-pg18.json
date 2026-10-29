@@ -1,0 +1,125 @@
+{
+  "status": "passed",
+  "scope": "local-PG18-fresh-disposable-clusters-only",
+  "checks": {
+    "migrationInventory": {
+      "cut": 8,
+      "allowlist": [
+        {
+          "name": "1792962301842_rooms-foundation.sql",
+          "sha256": "15d5e843ceeacd4c53417b6594283d109ebe9aa8891062e6362debe984c3600f"
+        },
+        {
+          "name": "1792963858690_rooms-content-v2.sql",
+          "sha256": "4e24b99b271769332ebd6a2d8fa5066be0356481b97f9a3b66404a7f551de36e"
+        },
+        {
+          "name": "1792964148932_rooms-oidc-consumer.sql",
+          "sha256": "a11175aed58f15908102293bd382f7b9b3f8946e32dcf372dbe270cdc894539f"
+        },
+        {
+          "name": "1792964574644_rooms-invitations.sql",
+          "sha256": "95ba9935c4a855cdd99cbaba0a43d6f1ea93366b851c942da9c6ed7977e1516b"
+        },
+        {
+          "name": "1792964731337_rooms-invitation-issuer-binding.sql",
+          "sha256": "c5ec49f2018306507d7adcc1eddff13ddd282021227647801a7030609ab2205a"
+        },
+        {
+          "name": "1792968329622_rooms-private-image-media.sql",
+          "sha256": "f1ed5baccc9b5f087e550176eae7f82945f5dc7674c88b1a9b048cf311309fac"
+        },
+        {
+          "name": "1793022282668_rooms-media-storage-generations.sql",
+          "sha256": "0ab4c2095422117970b3ab238aaeccfb43851a8b3c16a9ec8dc85e08f8999a87"
+        },
+        {
+          "name": "1793042981615_rooms-media-dispatch.sql",
+          "sha256": "1063ad0e9ed544825e98a15ed7e56fc1a0a9dd2abee2136003f5ae8ad0357b27"
+        }
+      ],
+      "excludesLaterWorkingTreeMigrations": true
+    },
+    "source": {
+      "postgresMajor": 18,
+      "access": "fresh-isolated-cluster; no source database read"
+    },
+    "engine": {
+      "postgresMajor": 18,
+      "migrations": 8,
+      "tables": 26,
+      "mode": "fresh"
+    },
+    "physicalGenerationGuard": "SQL only: NULL\u2192value allowed while pending; replacement/removal denied23514; all changes rolled back",
+    "pipeline": {
+      "identity": "synthetic-principal-test-seam; production CLI Bearer authentication remains unsupported",
+      "tenants": 2,
+      "brands": [
+        "Lumbre",
+        "Bruma"
+      ],
+      "formats": [
+        "image/png",
+        "image/jpeg",
+        "image/webp"
+      ],
+      "publishedRooms": 6,
+      "upload": "CLI\u2192HTTP\u2192service\u2192SQL\u2192storage",
+      "publish": "CLI\u2192HTTP\u2192command",
+      "delivery": [
+        "HTTP GET",
+        "HTTP HEAD",
+        "HTTP Range",
+        "CLI exact bytes"
+      ],
+      "negatives": [
+        "cross-tenant HTTP/CLI",
+        "original 404",
+        "reader metadata redaction"
+      ]
+    },
+    "restore": {
+      "tables": 26,
+      "tableRowsAndHashes": "identical",
+      "constraintsAndAcl": "identical",
+      "databaseAcl": "identical; PUBLIC connect revoked",
+      "immutableGenerationBindings": 12,
+      "verifiedObjects": 19,
+      "storageModes": "0600",
+      "negativeSql": [
+        "ready asset",
+        "rendition",
+        "edition binding",
+        "published edition",
+        "cross-tenant FK"
+      ],
+      "runtimeAcl": {
+        "delete": false,
+        "update": false,
+        "read": true
+      }
+    },
+    "dispatchRollback": "idle down8/up8 preserves full V1/V2 fingerprint and dispatch ACL/default row",
+    "rollback": {
+      "activeDispatch": "down8 rejected; full fingerprint unchanged",
+      "v3": "down6 rejected; full fingerprint unchanged",
+      "legacy": "V1/V2 published; up/down preserves full fingerprint; re-up preserves content/hashes"
+    },
+    "restoreDelivery": "six published rooms served exact bytes after switching active DB+storage to restored copies",
+    "dispatchRestore": {
+      "activeLeaseAndPendingJob": "preserved exactly",
+      "idempotency": "original receipt replay; one version only",
+      "recovery": "expired lease reclaimed once among three concurrent claims",
+      "fencing": "stale acknowledgement cannot release new lease; current ACK idempotent",
+      "pendingImage": "processed once to ready after restore; then empty queue",
+      "runtimeWorkerAcl": {
+        "runtime_claim": true,
+        "runtime_ack": false,
+        "worker_ack": true,
+        "worker_claim": false
+      }
+    },
+    "corruption": "same-size modified rendition rejected before GET/HEAD/304",
+    "revocation": "fresh HTTP conditional/range denied for both tenants"
+  }
+}

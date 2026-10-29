@@ -44,7 +44,7 @@ histórico de esta task y no lo rediseña ni lo considera aceptado. Contratos/ba
 - Motion: `docs/ui/motion/TASK-2071-rooms-private-image-authoring-and-viewer-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-29: backend de imagen privada y lectura guest ejercitados en canary del 26-10, cerrado con acceso humano OFF. Scaffold de autoría anterior existe; nueva UI de Claude Design aún sin entrega/SHA ni aceptación. Falta integrarla con conectores y probar flujo completo crear/cargar/procesar/adjuntar/publicar/guest, conflictos, revocación, aislamiento y QA visual.`
+- Status real: `2026-10-29: backend de imagen privada y lectura guest ejercitados en canary del 26-10, cerrado con acceso humano OFF. Scaffold de autoría anterior existe; nueva UI de Claude Design aún sin entrega/SHA ni aceptación. Conectores/entorno aislado y SDK ya preparados; autoría/preview V4 combinan imagen/PDF/audio/video en backend3c7bcb5. Falta integrar la interfaz y probar flujo completo crear/cargar/procesar/adjuntar/publicar/guest, conflictos, revocación, aislamiento y QA visual.`
 - Rank: `R07A/R08A inmediatamente después del contrato TASK-2070`
 - Domain: `ui|content`
 - Blocked by: `none`
@@ -323,7 +323,7 @@ Proyección de audiencia del borrador, revisión de coverage y publicación con 
 
 ### Slice 4 — Calidad y handoff
 
-Probar fixtures reales de formatos autorizados, fallos, revocación, móvil/teclado/reduce, evidencia premium y revisión humana. Conservar canary remoto hasta release explícito de raíz.
+Probar fixtures reales de formatos autorizados, fallos, revocación, móvil/teclado/reduce, evidencia premium y revisión humana. El canary remoto26Oct ya está cerrado; no reabrirlo para QA de la nueva UI. Usar el entorno aislado.
 
 ## Out of Scope
 
@@ -337,7 +337,7 @@ El wireframe, flow y motion son el contrato visual. La carga puede terminar sin 
 
 ### Slice ordering hard rule
 
-Contrato2070 y ADR aceptado → readiness/hook2071 → autoría → preview/lectura → QA. Ningún client ready flag adelanta bytes verificados. Sólo código local mientras canary Auth 20f9fe9 esté activo.
+Contrato2070 y ADR aceptado → readiness/hook2071 → autoría → preview/lectura → QA. Ningún client ready flag adelanta bytes verificados. Sólo código local en el entorno aislado; canary26Oct cerrado y Auth retenido en PR, sin reactivación por esta task.
 
 ### Risk matrix
 

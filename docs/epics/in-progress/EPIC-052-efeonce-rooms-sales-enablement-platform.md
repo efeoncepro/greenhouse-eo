@@ -85,7 +85,7 @@ Canary interno real26Oct completado: Microsoft/MFA, una sala sintética, un corr
 
 [TASK-2071](../../tasks/in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md): nuevo editor/visor bajo Claude Design. Scaffold anterior es referencia, `UI ready=no` hasta mapping y gates del nuevo diseño; conexión al backend, GVC y aceptación humana pendientes. No completa R07/R08.
 
-[TASK-2069](../../tasks/in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md): WIF/Cloud SQL, DB y secretos propios, WAF y piloto integrado ya verificados. La evidencia de restore previa cubre su esquema de fecha; el estado ampliado26tablas no hereda un ensayo de restore por conteo. Coste/observación y activación general mantienen gates.
+[TASK-2069](../../tasks/in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md): WIF/Cloud SQL, DB y secretos propios, WAF y piloto integrado ya verificados. Restore LOCAL8 PG16/18 certificó26tablas/19objetos/12bindings; candidato local13 certificó43tablas/23objetos/14pins. Recovery cloud/PITR/secretos, coste/observación y activación general mantienen gates.
 
 [TASK-2068](../../tasks/in-progress/TASK-2068-rooms-invitation-and-guest-experience.md): entrada con código, lectura guest y gestión históricas; la lectura V3/imagen privada ya pasó en HTTP real. Nueva UI, BFCache real y aceptación humana pendientes.
 
@@ -123,11 +123,11 @@ Canary interno real26Oct completado: Microsoft/MFA, una sala sintética, un corr
 
 La exposición HTTP/CLI/MCP acompaña cada contrato desde R03; R13 integra y certifica, no deja la paridad para una reescritura al final. R09 define autoridad y estado durable; coordinación local entre ventanas es adapter de R10. R15 verifica el conjunto: no concentra implementación pendiente de otras unidades.
 
-## Lectura del roadmap al cierre26Oct
+## Lectura vigente del roadmap — 29Oct
 
 - R01/R03: foundation, permisos, persistencia y autoría programática construidos; conservar los límites de cada task.
 - R04: OIDC/OTP y canary interno comprobados, con acceso humano OFF al finalizar; rollout general pendiente.
-- R05: R05A imágenes estáticas y trigger automático comprobados; PDF/audio/video y el resto multimedia pendientes.
+- R05: R05A imágenes/trigger automático comprobados; R05B V4 mixto local2077 implementado y recuperado. Certificación multimedia Linux/cloud permanece pendiente.
 - R02/R06/R07/R08: demo/scaffold históricos disponibles; nuevo diseño, conexión y aceptación bajo Claude Design.
 - R09/R10: backend de tours/notas/sesiones/control/ACK local2075; consola/champion visual, playback y coordinación observable conservan sus criterios de experiencia.
 - R11/R12: preguntas, pasos y actividad durables implementados local2074, con anclas y permisos; experiencia de evaluación/lectura comercial y certificación integral siguen pendientes.

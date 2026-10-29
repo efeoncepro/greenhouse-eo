@@ -5,14 +5,17 @@ description: Operate and extend Efeonce Rooms (EPIC-052) — the sales-enablemen
 
 # Efeonce Rooms (skill viva)
 
-**Corte 2026-10-29:** [mapa coordinado con Auth](../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
-El canary del 26-10 cerró con acceso humano OFF. Backend GCS, worker y dispatch
-condicionado están construidos; el Git `main=origin/main=e4b2e89` no acredita
-qué deployment sirve Vercel. La nueva UI de Claude Design no se había
-entregado. B18 guest sin SSO y dos adapters RP tienen comprobaciones locales;
-el corte precede el candidato backend ampliado de29Oct. Leer el ledger actual y el
-[manual backend local](../../../docs/manual-de-uso/rooms/operar-backend-local.md):13migraciones/43tablas locales verificadas,
-colaboración/presentación, puertos X-ray/CRM OFF, multimediaV4 sólo local y MCPstdio local. 337tests y restorePG16/18 mixto PASS en3c7bcb5; rollout/UI/QA integral continúan pendientes y separados.
+**Corte vigente 2026-10-29:** [backend local verificado](../../../docs/audits/rooms/2026-10-29-backend-local-completion.md)
+en `codex/rooms-design-integration@3c7bcb5`, sin push/deploy: 337 tests sin skips,
+13 migraciones/43 tablas y restore mixto PG16/18 PASS. Incluye colaboración,
+presentación, derechos guest explícitos, importación X-ray/referencias CRM con puertos OFF,
+multimedia V4 sólo local y MCP stdio local. La interfaz de Claude Design sigue por conectar y aceptar;
+Linux/cloud multimedia, conectores reales y federación remota no están certificados.
+El [mapa coordinado Auth+Rooms](../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md)
+precede esta ampliación. El canary del 26-10 ya cerró con acceso humano OFF y Auth retenido en PR.
+GCS/worker/dispatch de imágenes pertenecen a ese corte cloud; el ref Git `main@e4b2e89`
+no acredita el deployment activo. Leer el ledger y el
+[manual backend local](../../../docs/manual-de-uso/rooms/operar-backend-local.md) antes de operar.
 
 Rooms es la **plataforma comercial propia de Efeonce**: salas privadas por oportunidad donde el comprador
 recorre la propuesta, sus piezas y sus pruebas. Greenhouse conserva la **gobernanza documental** (ADR,
@@ -30,6 +33,8 @@ Vercel. La identidad la pone Efeonce ID (skill `efeonce-auth`); Rooms es su prim
    - `EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md`
    - `EFEONCE_ROOMS_CLOUD_RUNTIME_PILOT_DECISION_V1.md`
    - `EFEONCE_ROOMS_PRIVATE_IMAGE_MEDIA_AND_PROVENANCE_DECISION_V1.md`
+   - Colaboración/presentación, importación X-ray/CRM, multimedia local y MCP stdio:
+     los cinco ADR enlazados en el dossier poseen los contratos de la ampliación local.
    - `EFEONCE_ROOMS_STACK_BASELINE_V1.md`
    - Experiencia, perfiles y marca.
 5. [`EPIC-052`](../../../docs/epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md): roadmap R01–R15 y criterios de salida.
@@ -100,6 +105,22 @@ Comandos:
 - Presentación: notas propias incluso ante admin; audiencia nunca recibe notas/controllerinstance. Control/ack usan secuencia; ack no prueba reproducción. Bloques excluidos no forman un tour visible ni se rehabilitan por replay.
 - X-ray/CRM: puertos OFF por defecto; snapshot autorizado y mapping/exclusiones, no URLs arbitrarias ni una sincronización supuesta. Handoff pending es intención durable, no entrega.
 - Las tasks y ADR de Rooms se escriben en `greenhouse-eo/docs`. Ningún doc canónico vive en el repo runtime.
+
+## Lecciones operacionales del backend local
+
+- Confirmar la base elegida antes de una suite: las pruebas PostgreSQL comparten colas globales de
+  workers y se ejecutan en serie. No correr suites simultáneas contra la misma base con raíces de
+  storage distintas. Cada recovery usa su propia base y storage desechables.
+- Distinguir recovery de imágenes de ocho migraciones y restore ampliado de trece/V4. Para este último,
+  el manual usa `scripts/backend-recovery.ts` en PG18 o `--pg16`. Si el recibo precede el commit y dice
+  dirty, atribuirlo por los hashes de las fuentes contrastadas; nunca presentar aquel HEAD como limpio.
+- El bootstrap reconcilia sólo sus tres actores sintéticos y conserva salas/borradores. Cambiar el modo
+  multimedia exige stop previo; `integration:up` sin opción conserva el modo guardado. No resetear la DB
+  para adoptar una migración ni usar un down poblado para borrar capacidades con datos.
+- Ready, attach y publicación son estados distintos. V4 exige un bloque visible para cada referencia
+  no excluida; las preguntas con `timeMs` se limitan a audio/video publicado y su duración medida.
+- Las comprobaciones Chrome/API/SDK prueban contratos en navegador; no aceptan la nueva UI.
+  Mantener separados resultados locales, canary cloud histórico, release y aceptación humana.
 
 ## Contrato de mantenimiento de la skill
 

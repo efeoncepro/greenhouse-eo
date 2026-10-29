@@ -5,6 +5,16 @@ sin convertir pruebas locales en despliegues. Los recibos enlazados conservan
 comandos, resultados y límites; los SHA y estados de terceros se fechan porque
 pueden cambiar. No contiene credenciales, códigos, cookies ni datos del canary.
 
+## Continuidad documental posterior del29Oct
+
+Esta consolidación conserva su fotografía anterior a la ampliación del backend consumer. El
+[recibo local posterior](2026-10-29-backend-local-completion.md) acredita aplicación Rooms3c7bcb5,
+337pruebas,13migraciones/43tablas, V4 mixto, colaboración/presentación y MCPstdio; sin release.
+El [recibo de dos RP con Authca97eecd1](2026-10-28-two-rp-auth-ca97eecd1.md), citado como ausente en
+la tabla original, ya existe en este checkout. Conserva sus límites de issuerQA/HTTP local; no prueba
+el entrypoint Auth completo, HTTPS ni MFA nuevos. Estado vigente en el [dossier](../../architecture/rooms/README.md)
+y ledgers Rooms/Auth; la retención de Auth y el cierre OFF siguen vigentes.
+
 ## Decisión, repositorios y fronteras
 
 - Efeonce Auth vive en `greenhouse-eo` (`services/auth-server/`,
@@ -25,7 +35,7 @@ pueden cambiar. No contiene credenciales, códigos, cookies ni datos del canary.
 
 ## Evidencia por circuito
 
-| Circuito | Construido o comprobado | Límite actual |
+| Circuito | Construido o comprobado | Límite en el corte original |
 | --- | --- | --- |
 | Foundation Auth TASK-1834 | Registro administrado de RP, OAuth code + PKCE S256, ID token ES256 de audiencia exacta, sesión/introspection/revoke first-party separadas de grants MCP; SQL y arneses locales. [Base](../identity/2026-10-25-auth-rooms-first-local.md) | La rama integrada no está publicada en las PR remotas; flags first-party siguen OFF en el último readback vivo. |
 | Login TASK-2064 | V4 neutral y contextual Rooms desde RP confiable; preview aceptado por Julio, revisión local desktop/móvil y feed público acotado. [QA](2026-10-28-auth-develop-integration-local.md) | Sin CI del HEAD nuevo ni readback visual productivo. |

@@ -4,6 +4,25 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-10-29 — Conciliación con backend local Rooms; issuer y release sin cambio
+
+- `doc`: el [recibo final de Rooms](../../../../docs/audits/rooms/2026-10-29-backend-local-completion.md)
+  acredita `codex/rooms-design-integration@3c7bcb5`, 337 tests/0 skips, 13 migraciones/43 tablas,
+  Chrome/API 18+23 y recovery mixto PG16/18. Colaboración, presentación, derechos guest explícitos,
+  puertos X-ray/CRM OFF, V4 local y MCP stdio ya están construidos en el consumer; no son backend
+  pendiente del issuer Auth. No hubo cambio de fuentes Auth ni push/deploy/flags/correo por ese corte.
+- `doc`: el recibo detallado de [dos adapters RP](../../../../docs/audits/rooms/2026-10-28-two-rp-auth-ca97eecd1.md)
+  ya está versionado en este checkout y supera la indicación de ausencia del snapshot inferior:
+  35 checks con fuentes ejecutables Auth `ca97eecd1`, checkout avanzado sólo por docs a `0ab888728`.
+  Ejecutó issuer QA con protocolo/store reales; no el servidor completo `services/auth-server/server.ts`.
+  RP2 es otro adapter del mismo consumer, sin certificar segundo producto, HTTPS, MFA o rollout.
+- `doc`: la invitación guest sigue sin sesión interna/SSO; sus nuevos derechos locales se fijan
+  expresamente a la edición inicial y los receipts referencian invitación/sesión, sin internalización.
+  Stdio MCP consume la sesión HTTP existente de Rooms: no modifica consentimiento, scopes ni issuer.
+- Pendientes separados: UI Claude Design y QA de experiencia; Linux/cloud multimedia, conectores
+  reales y federación remota de Rooms; gates de seguridad/CI/readback y release Auth bajo su retención
+  humana vigente. No reactivar first-party/OTP, fusionar PR ni repetir el único canary del 26-10.
+
 ## 2026-10-29 UTC — candidato local y release retenido
 
 - `local`: [dossier Auth+Rooms](../../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).

@@ -1,22 +1,37 @@
 # Efeonce Rooms — contrato API y acceso V1
 
-Diseño inicial: 2026-10-07. **Contrato objetivo; el corte implementado al2026-10-26 se distingue abajo de la paridad futura.** [Arquitectura](EFEONCE_ROOMS_ARCHITECTURE_V1.md).
+Diseño inicial: 2026-10-07. **Contrato objetivo; el corte implementado al2026-10-29 se distingue abajo de la paridad futura.** [Arquitectura](EFEONCE_ROOMS_ARCHITECTURE_V1.md).
 
-## Corte vigente — 2026-10-26
+## Corte vigente — 2026-10-29
 
-Salas/lifecycle, borradores/ediciones V1/V2/V3, permisos `can`, API/CLI, identidad/invitación y medios
-privados tienen backend ejecutable. [Guía de endpoints/DTO/errores para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md)
-es el contrato de conexión actual: `authoring`, `preview`, `media`, estado/transfer de uploads, commands
-y bytes privados de derivados. Main `e4b2e890`; ocho migraciones/26 tablas y Scheduler de máquina por demanda.
+La [guía de endpoints/DTO/errores para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md)
+es el inventario de conexión del candidato local `3c7bcb5`: lifecycle y contenido V1–V4, `can`,
+readers/commands HTTP/CLI/SDK, identidad/invitación, imágenes privadas y multimedia local,
+colaboración, notas/tours/presentación e integraciones. [Recibo local y límites](../../audits/rooms/2026-10-29-backend-local-completion.md).
+Los cinco ADR locales29Oct fijan el contrato de [colaboración](EFEONCE_ROOMS_COLLABORATION_DECISION_V1.md),
+[presentación](EFEONCE_ROOMS_DURABLE_PRESENTATION_DECISION_V1.md),
+[fuentes/CRM](EFEONCE_ROOMS_SOURCE_IMPORT_AND_CRM_HANDOFF_DECISION_V1.md),
+[V4](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md) y [MCP stdio](EFEONCE_ROOMS_LOCAL_STDIO_MCP_DECISION_V1.md).
 
-Canary real de identidad/correo/imagen completado y cerrado; no repetir. Acceso/invitaciones/medios web
-OFF, dispatch máquina ON; sala del canary archivada e invitación revocada. La nueva interfaz aún requiere
-conexión/prueba integrada; Auth se conserva en PR263/264. [Estado y evidencia](README.md).
+Invitaciones nuevas pueden solicitar derechos adicionales explícitos fijados a su edición inicial;
+no se amplían invitaciones legadas ni se crea una identidad interna para receipts/notas/sesiones guest.
+Notas propias siguen privadas incluso ante administrador. Control/ACK revalida autoridad y secuencia;
+ACK declara estado, no acredita reproducción. Actividad enumera acciones explícitas, sin cuerpos ni atención inferida.
 
-Las familias de §1 son el **contrato objetivo completo**, no inventario de endpoints disponibles. MCP,
-colaboración, presentación avanzada, escenarios y multimedia más allá de imágenes siguen en roadmap.
-Los apartados fechados25Oct preservan el avance de cada corte; sus pendientes locales no sustituyen
-este estado vigente. La autoridad productiva no acepta un bearer nativo por inferencia de CLI/MCP.
+V4 sólo publica referencias ready ubicadas en bloques visibles y entrega sus derivados por rutas
+privadas reautorizadas; omite referencias excluidas/huérfanas. Anclas temporales exigen audio/video V4
+y duración medida. Puertos X-ray/CRM OFF y handoff `pending` no equivalen a proveedor conectado o envío.
+MCP stdio usa una sesión existente y toolsets explícitos; excluye transferencia binaria, OTP/login y
+OAuth/federación remota. La autoridad productiva no acepta un bearer nativo por inferencia de CLI/MCP.
+
+Las familias de §1 siguen siendo el **contrato objetivo completo**, no nombres de endpoints disponibles;
+escenarios, equivalencia de la UI final y certificación integral conservan sus gates. Los apartados
+fechados25Oct preservan aquel corte.13migraciones/43tablas y restore PG16/18 son evidencia local;
+no se aplicaron al cloud del corte8 de26Oct ni se revalidó el deployment remoto.
+
+Entorno aislado construido y detenido; nueva interfaz Claude Design aún sin integrar/aceptar. Canary
+real26Oct ya cerrado, sin repetición. Auth retenido en PR263/264; producción y activación general
+no cambian. [Estado vivo](README.md).
 
 ## 1. Paridad por capacidad
 
@@ -67,7 +82,7 @@ La apariencia propia de Rooms consume La órbita según la [dirección visual](.
 | Grant | Principal, room/edition scope, capabilities, expiración, estado y revocación |
 | PresenterNotes | Contenido privado del rol/autor autorizado; nunca parte del DTO de audiencia |
 | Question / Step | Colaboración mutable, anclada a edición, con autores y visibilidad |
-| Session / Event | Sesión efímera y eventos mínimos, sin inferir comprensión o intención de compra |
+| Session / Event | Presentación durable con TTL, control/secuencia/ACK y eventos mínimos según el ADR local; sin inferir comprensión o intención de compra |
 
 Índice narrativo e inventario son vistas diferentes del mismo material. Validación informa activos importados, incluidos, pendientes y excluidos con razón; las exclusiones requieren decisión editorial explícita. No publicar silenciosamente solo los primeros archivos o páginas. El manifest incluye bloques, relaciones, evidencias y versiones de perfiles; no convertir el artículo/diagnóstico en una imagen para eludir su estructura. Ver [perfiles y reglas de claims](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md).
 
@@ -83,9 +98,9 @@ La apariencia propia de Rooms consume La órbita según la [dirección visual](.
 
 ## 4. Identidad y acceso
 
-Operadores internos: Efeonce ID y autoridad delegada verificable. El organizationId enviado por el cliente solo intersecta el ámbito del principal; jamás lo amplía. Revocación/expiración vence sobre roles nominales. MCP usa el gateway como adapter, no como dueño de las políticas Rooms.
+Operadores internos: Efeonce ID y autoridad delegada verificable. El organizationId enviado por el cliente solo intersecta el ámbito del principal; jamás lo amplía. Revocación/expiración vence sobre roles nominales. La federación MCP remota mantiene el gateway como adapter, sin transferirle las políticas Rooms; el adapter stdio local reutiliza sesión HTTP existente (§Corte vigente).
 
-Compradores: principal externo limitado a la sala, mediante invitación y sesión verificadas. El mecanismo concreto de canje y recuperación se define con Identity antes de build. Un vínculo compartido no concede por defecto acceso a toda la cuenta ni a notas privadas. Modo público de muestra exige publicación explícita independiente de una sala privada.
+Compradores: principal externo limitado a la sala, mediante invitación y sesión verificadas. El canje enlace+código y su sesión local guest se rigen por el [ADR OTP](../EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md) y el [contrato de invitación](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md); el alcance actual está en la guía de conexión, sin sesión interna ni SSO por OTP. Un vínculo compartido no concede por defecto acceso a toda la cuenta ni a notas privadas. Modo público de muestra exige publicación explícita independiente de una sala privada.
 
 | Rol de experiencia | Capacidades candidatas; siempre acotadas por grant |
 |---|---|
@@ -99,7 +114,7 @@ La etiqueta de rol orienta UX; la decisión efectiva combina principal + tenant 
 
 ## 5. Privacidad, conservación y observación
 
-Registrar eventos observables: apertura autorizada, escena visible, reproducción efectiva, pregunta y descarga permitida. Distinguir actor identificado, sesión y visita anónima cuando esta exista; no identificar personas por conjetura. Minimizar IP/dispositivo y fijar retención/base de tratamiento antes de producción. No capturar teclas, pantallas ni contenido de notas en analytics.
+Modelo objetivo de observación: apertura autorizada, escena visible, reproducción efectiva, pregunta y descarga permitida. El reader de actividad implementado sólo enumera acciones explícitas de colaboración; no certifica visitas ni reproducción. Cada evento adicional necesita instrumentación y cobertura verificadas. Distinguir actor identificado, sesión y visita anónima cuando esta exista; no identificar personas por conjetura. Minimizar IP/dispositivo y fijar retención/base de tratamiento antes de producción. No capturar teclas, pantallas ni contenido de notas en analytics.
 
 Propuesta de lifecycle: draft → ready → published → archived; revocar acceso y archivar son operaciones distintas. Ediciones publicadas inmutables; correcciones generan nueva edición. Borrado, retención y preservación contractual requieren política explícita por clase de dato; no prometer borrado físico inmediato de backups.
 

@@ -4,6 +4,13 @@
 - Owner: TASK-2072, Platform / Media. TASK-2070 conserva recuperación del corte local;2071 conserva UI histórica sin aceptación visual.
 - Reemplaza únicamente la limitación de código local del ADR de imágenes; preserva semántica V3, fuente inmutable y permisos.
 
+## Continuidad local posterior — 2026-10-29
+
+El [candidato local3c7bcb5](../../audits/rooms/2026-10-29-backend-local-completion.md) tiene entorno
+integrador construido/detenido y restore13 en PG16/18. No modifica el corte cloud8 fechado abajo ni
+revalida su deployment remoto. Multimedia V4 sigue [sólo local](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md),
+sin certificación Linux/cloud; UI Claude Design y activación general siguen pendientes. [Estado vivo](README.md).
+
 ## Estado ejecutado al cierre 2026-10-26
 
 Main `e4b2e890` publicado/promovido, GCS privado, ocho migraciones/26 tablas y Job con SA/rol propio.

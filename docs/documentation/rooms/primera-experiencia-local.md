@@ -1,6 +1,12 @@
 # Rooms — primera experiencia implementada
 
-Base local: 2026-10-25 · Estado actualizado: 2026-10-26 · TASK-2058/2059/2060/2072 · [EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+Base local: 2026-10-25 · Continuidad documental: 2026-10-29 · TASK-2058/2059/2060/2072 · [EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+
+Esta guía conserva el alcance de la primera experiencia y del corte cloud26Oct. El backend local vigente
+es `codex/rooms-design-integration@3c7bcb5`: colaboración, presentación/notas, referencias X-ray/CRM con
+puertos externos OFF, V4 mixto y MCP stdio. Sus 13 migraciones/43 tablas y verificaciones locales pertenecen al
+[recibo29Oct](../../audits/rooms/2026-10-29-backend-local-completion.md), no al despliegue cloud.
+Para operarlo, usar el [manual backend actual](../../manual-de-uso/rooms/operar-backend-local.md).
 
 Rooms dispone de una primera experiencia local con una propuesta ficticia de Nómada: tres piezas en sus formatos originales, artículo SEO/AEO estructurado, radiografía de evidencia y plan de trabajo. El entorno consume el logo oficial, La órbita y primitives AXIS publicados. La muestra y las imágenes generadas se identifican como sintéticas; no son un cliente ni un resultado medido.
 
@@ -14,7 +20,7 @@ PostgreSQL propio conserva salas, borradores, ediciones, autoridad y recibos. Ca
 
 La API y CLI incluyen el carril durable `/api/v1` y comparten commands/readers. Efeonce ID, invitación por correo único enlace+código y sesión guest ya se verificaron en un canary real acotado. Terminó con invitación revocada, sala archivada y flags humanos OFF; la denegación actual no significa que el mecanismo siga sin implementarse. El selector de persona pertenece sólo a la demo de lectura y nunca habilita escrituras. No acredita adopción por clientes ni autoría visual completa. [Canary y límites](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
 
-Producción [efeonce-rooms.vercel.app](https://efeonce-rooms.vercel.app/demo) usa main `e4b2e890`,
+El corte cloud documentado26Oct de [efeonce-rooms.vercel.app](https://efeonce-rooms.vercel.app/demo) publicó main `e4b2e890`,
 con ocho migraciones/26 tablas cloud, GCS privado y worker automático por demanda. Sólo dispatch de
 máquina está ON; acceso/invitaciones/medios web siguen OFF. Backend234PASS y Playwright53PASS/3skip
 son verificaciones técnicas, no aceptación de la nueva interfaz. [Estado y evidencias](../../architecture/rooms/README.md).
@@ -22,7 +28,7 @@ son verificaciones técnicas, no aceptación de la nueva interfaz. [Estado y evi
 [Contrato de conexión para Claude Design](backend-api-for-claude-design.md) · [Manual local](../../manual-de-uso/rooms/operar-primera-experiencia-local.md)
 · [Persistencia TASK-2060](../../tasks/complete/TASK-2060-rooms-persistence-and-lifecycle.md)
 · [QA inicial25Oct](../../audits/rooms/2026-10-25-first-local-delivery.md).
-El deploy inicial `bd4b802` corresponde a la demo histórica, no al SHA productivo actual.
+El deploy inicial `bd4b802` corresponde a la demo histórica. Este documento no revalida el deployment activo.
 
 ## Contenido editable V2 (TASK-2062, local)
 
@@ -36,12 +42,14 @@ y [evidencia](../../audits/rooms/2026-10-25-versioned-content-authoring.md).
 
 ## Medios e interfaz — continuidad 2026-10-26
 
-El corte actual admite PNG/JPEG/WebP estáticos, no todo el multimedia del diseño V1. Una imagen física
+El corte cloud26Oct admite PNG/JPEG/WebP estáticos. Una imagen física
 ya completó PUT GCS→verificación→Job→dos WebP→lectura privada y revocación. Scheduler OIDC comprueba
 cada minuto y no inicia contenedor en vacío; el transporte automático tuvo su propia prueba sintética.
 Ninguna de esas pruebas acredita la nueva interfaz de Claude Design.
 
-Pendiente: entorno de integración aislado con datos/permisos, conectar pantallas a DTO/commands y
-transferencia GCS del mismo origen, y probar el recorrido completo con la nueva UI. Auth PR263/264 se
+El entorno de integración aislado con datos/permisos y SDK ya está preparado; el candidato29Oct añade
+V4 local para combinar imágenes, PDF, audio y video. [Arranque de diseño](../../manual-de-uso/rooms/integrar-claude-design-local.md).
+Pendiente: conectar pantallas a DTO/commands y probar el recorrido completo con la nueva UI; el perfil
+local no prueba de nuevo GCS ni habilita multimedia cloud. Auth PR263/264 se
 mantienen sin fusionar/desplegar por instrucción del operador; no activar flags ni repetir correo por
 conectar diseño. [Contrato y owners](backend-api-for-claude-design.md).

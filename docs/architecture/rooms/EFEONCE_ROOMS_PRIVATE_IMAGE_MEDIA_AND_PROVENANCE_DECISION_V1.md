@@ -5,6 +5,13 @@
 - Dueño: Platform / Media / Product; implementación backend TASK-2070, consumidor UI dependiente separado.
 - Alcance: EPIC-052 R05A. No supersede identidad, invitaciones ni el piloto cloud de TASK-2069.
 
+## Continuidad local posterior — 2026-10-29
+
+El [candidato local3c7bcb5](../../audits/rooms/2026-10-29-backend-local-completion.md) tiene entorno
+integrador construido/detenido y restore13 en PG16/18. No modifica el corte cloud8 fechado abajo ni
+revalida su deployment remoto. Multimedia V4 sigue [sólo local](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md),
+sin certificación Linux/cloud; UI Claude Design y activación general siguen pendientes. [Estado vivo](README.md).
+
 ## Continuidad cloud 2026-10-26
 
 Este ADR conserva la decisión del primer corte local; su límite de despliegue fue extendido por el

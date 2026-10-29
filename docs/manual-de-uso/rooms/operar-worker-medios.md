@@ -4,6 +4,12 @@ El Job `rooms-media-worker` está desplegado en `efeonce-group`, región `us-eas
 como máximo un trabajo de la cola y termina. Cloud Scheduler comprueba la cola cada minuto; no existe
 proceso continuo. La aplicación web conserva medios, invitaciones y acceso first-party desactivados.
 
+Este manual describe el corte cloud de imágenes documentado26Oct; no contiene un nuevo readback remoto.
+El candidato local29Oct contiene 13 migraciones, restorePG16/18 y V4 mixto imagen+PDF/audio/video, pero no
+actualiza este Job ni certifica multimedia Linux/cloud. Su operación vive en el
+[manual backend local](operar-backend-local.md) y su evidencia en el
+[recibo29Oct](../../audits/rooms/2026-10-29-backend-local-completion.md).
+
 ## Estado comprobado
 
 - Imagen fijada por digest; CPU 1, memoria 1Gi, timeout 240 segundos, cero reintentos y paralelismo 1.
@@ -82,8 +88,9 @@ nuevo canary de imagen. El PNG real y el único correo conservan su evidencia an
 
 ## Qué queda fuera del cierre
 
-El canary físico acreditó un PNG, no el peor caso de20MiB/40MP ni rendimiento/coste bajo carga.
-El siguiente bloque es entorno de integración y consumidor de Claude Design, más el recorrido completo
-con esa UI; aceptación y flags humanos siguen separados. Auth PR263/264 se conservan abiertas por
+El canary físico acreditó un PNG. El candidato local29Oct añadió una prueba del decoder de imágenes con
+40MP/20MiB; sus medidas Darwin no certifican memoria dura, throughput ni coste del Job cloud.
+El entorno aislado para Claude Design ya está preparado; faltan conectar su interfaz y el recorrido
+completo con esa UI. Aceptación y flags humanos siguen separados. Auth PR263/264 se conservan abiertas por
 instrucción expresa, sin merge/deploy. Estado documental y readback conjunto:
 [26Oct](../../audits/rooms/2026-10-26-docs-skills-state-readback.json).

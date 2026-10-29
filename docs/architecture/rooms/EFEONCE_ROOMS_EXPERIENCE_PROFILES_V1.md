@@ -2,13 +2,18 @@
 
 Fecha: 2026-10-07. **Alcance completo confirmado por el operador; contratos objetivo con implementación parcial posterior.** Owner: Product / Commercial con Creative y SEO/AEO. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [API](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md) · [EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
 
-## Corte de implementación 2026-10-26
+## Corte de implementación 2026-10-29
 
-Contenido V2 y procedencia/medios V3, readers autorizados y API/CLI implementan una parte del modelo;
-la demo incluye material creativo y editorial sintético. El canary físico demuestra una imagen privada,
-no la aceptación integral de dos propuestas reales ni todos los renderers de §3. Escenarios, tours,
-colaboración y capacidades multimedia completas mantienen sus entregas del roadmap. Claude Design
-posee la nueva interfaz; su conexión y aceptación están pendientes. [Estado vigente](README.md) y
+El [backend local3c7bcb5](../../audits/rooms/2026-10-29-backend-local-completion.md) amplía V1–V3 con
+V4 mixto imagen/PDF/audio/video, preguntas/pasos, notas propias, tours/sesiones y MCP stdio. El mapper
+X-ray ya produce bloques nativos y un reporte de cobertura/pérdidas; [su contrato](EFEONCE_ROOMS_SOURCE_IMPORT_AND_CRM_HANDOFF_DECISION_V1.md)
+excluye medios, tablas, experiencia especializada y navegación sin mapping, con aceptación explícita
+antes de aplicar. Su puerto externo sigue OFF: no es una importación real ni una experiencia X-ray completa.
+
+Escenarios, renderers especializados, conexión/aceptación de la nueva interfaz Claude Design, dos
+propuestas reales y el recorrido combinado siguen pendientes. El canary26Oct sólo demostró una
+imagen privada y fue cerrado; no acredita los criterios completos de §6. Backend probado localmente
+no certifica multimedia Linux/cloud, proveedores reales o rollout. [Estado vivo](README.md) y
 [contrato de conexión](../../documentation/rooms/backend-api-for-claude-design.md).
 
 ## 1. Una plataforma, experiencias según lo que se vende
@@ -40,7 +45,7 @@ El champion puede recorrer este relato, abrir el hallazgo o fragmento técnico a
 
 ## 3. Modelo de contenido propuesto
 
-Un `ContentBlock` tipado y versionado es la unidad de composición; `Piece/Variant` conserva su especialización multimedia. Los nombres siguientes son candidatos de contrato, no exports ni endpoints existentes:
+Un `ContentBlock` tipado y versionado es la unidad de composición; `Piece/Variant` conserva su especialización multimedia. La tabla expresa el modelo objetivo; no es inventario de exports/endpoints. Los schemas ejecutables y el subconjunto de mapping disponible están en el [contrato de conexión](../../documentation/rooms/backend-api-for-claude-design.md):
 
 | Tipo de bloque | Datos y comportamiento requeridos |
 |---|---|

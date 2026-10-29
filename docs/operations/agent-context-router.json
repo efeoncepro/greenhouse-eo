@@ -587,6 +587,8 @@
         ".codex/skills/efeonce-auth/references/program-ledger.md",
         "docs/architecture/rooms/README.md",
         "docs/documentation/rooms/backend-api-for-claude-design.md",
+        "docs/manual-de-uso/rooms/operar-backend-local.md",
+        "docs/audits/rooms/2026-10-29-backend-local-completion.md",
         "docs/audits/rooms/2026-10-26-auth-deploy-control.md"
       ]
     },

@@ -31,7 +31,7 @@ La nueva interfaz no está entregada ni aceptada. Estas capacidades de backend n
 - **Recovery13 en PG16 y PG18:** dos tenants,43tablas,23objetos y14bindings físicos en ambos almacenes;dos salas V4 con los cuatro tipos de medios;12receipts guest/dos sesiones/cero identidades internalizadas. Dump/restore preserva filas, hashes, generaciones, ACL por DB/schema/tabla/columna, triggers y funciones. Replay, privacidad, revocación y job pendiente/fencing/segundo intento comprobados.
 - Downgrade vacío **13→8→13** PASS; los cinco downs poblados9–13 rechazan pérdida y conservan fingerprint. Única normalización DDL: asociatividad AND del CHECK de grants validada contra gramática exacta y24capacidades. [PG16](2026-10-29-backend-recovery-pg16.json), [PG18](2026-10-29-backend-recovery-pg18.json).
 - Los dos restores finales probaron fuentes idénticas y estables, incluidos los guards de perfil local, contenido excluido/huérfano y cobertura V4. Se ejecutaron antes del commit final: sus recibos conservan HEAD8702a6f/dirty=true y hashes contrastados byte por byte con el candidato limpio3c7bcb5.
-- Recovery del corte8 de imágenes también pasó en PG16/18:26tablas,19objetos/12bindings, dispatch/lease/ACK y trabajo pendiente. No es un restore cloud.
+- Recovery del corte8 de imágenes también pasó en PG16/18:26tablas,19objetos/12bindings, dispatch/lease/ACK y trabajo pendiente. Recibos originales sanitizados [PG16](2026-10-29-recovery8-pg16.json)/[PG18](2026-10-29-recovery8-pg18.json), publicados en el barrido documental posterior sin repetir el ensayo. No es un restore cloud.
 - Worker de imágenes compilado y verificado mediante instalación productiva aislada sin paquetes web/dev:44inputs,8dependencias, dos WebP, bounds y shutdown PASS; cero cloud calls. No se construyó contenedor multimedia Linux.
 - Decoder de imágenes probado con40MP y20MiB: caso observado máximo241,4MiB RSS/1.065ms en Darwin arm64; no representa peor caso universal, memoria total del worker ni coste cloud.
 
@@ -58,3 +58,6 @@ avisos revisados: project_context ya apunta al dossier y la skill existente ya e
 requiere otra entrada.31destinos locales nuevos resuelven;49referencias/ejemplos históricos rotos
 de índices permanecen sin cambios. Context strict es el último gate antes del commit.
 Estado: código local completo, rollout/certificación externa pendientes; no se cierra EPIC-052 ni TASK-2072 por estas pruebas.
+
+Continuidad documental: [barrido completo de docs/skills](2026-10-29-docs-skills-full-reconciliation.md).
+La aplicación probada sigue en3c7bcb5; de38af5 posterior sólo actualiza el contrato AGENTS del runtime.

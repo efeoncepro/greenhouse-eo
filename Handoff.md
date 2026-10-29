@@ -21,8 +21,13 @@ público §17. Pendiente: mapa de átomos de marketing de contenidos; tanda 2: G
 
 ## 2026-10-26 — Rooms: entorno local y conectores listos
 
+29Oct: [conciliación completa docs/skills](docs/audits/rooms/2026-10-29-docs-skills-full-reconciliation.md)
+con3subagentes: arquitectura/manuales/Rooms/Auth/MCP, tasks y routers. Fuente3c7 intacta;
+AGENTS runtime actualizado en de38af5. Recovery8 PG16/18 ya ejecutado ahora tiene recibos versionados.
+Sin repetir pruebas, correo o servicios; UI/externos/rollout y retención Auth se conservan.
+
 29Oct: [backend local listo para conectar](docs/audits/rooms/2026-10-29-backend-local-completion.md),
-Rooms3c7bcb5 limpio/sin push:337tests0skip, lint/types/build, Chrome18+23 y restore PG16/18
+Código Rooms3c7bcb5 sin push:337tests0skip, lint/types/build, Chrome18+23 y restore PG16/18
 (13migraciones/43tablas,23archivos/14pins) PASS. Colaboración/presentación, V4 mixto y MCPstdio;
 [contrato Claude Design](docs/documentation/rooms/backend-api-for-claude-design.md) y manual listos.
 Cierre local2070/2074–2078; UI2071/2072, Linux/cloud, conectores reales y rollout separados.

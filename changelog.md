@@ -10,6 +10,10 @@ o historia Diseño. [Resultado y gates](docs/audits/client-portal/2026-10-27-sky
 
 ## 2026-10-26 — Rooms: entorno de integración y conectores locales
 
+29Oct: [barrido completo de documentación y skills](docs/audits/rooms/2026-10-29-docs-skills-full-reconciliation.md)
+con3subagentes concilia arquitectura/guías, Rooms/Auth/MCP y routers, sin retest de aplicación.
+AGENTS runtime de38af5 sólo documental; fuente3c7 intacta y Auth retenido.
+
 29Oct: [corte backend local3c7bcb5](docs/audits/rooms/2026-10-29-backend-local-completion.md):
 337tests0skip,13migraciones/43tablas, restore mixtoPG16/18 y Chrome18+23 PASS. Preguntas/pasos,
 tours/notas/sesiones, V4 imagen+PDF/audio/video y MCPstdio; contratos/guías/skills actualizados.

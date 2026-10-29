@@ -8,6 +8,13 @@
 - Confidence: `medium`
 - Validated as of: `2026-10-26; DB/WIF/secretos y canary real completos; cierre humano OFF; dispatch de máquina ON. Ver evidencia y límites de continuidad.`
 
+## Continuidad local posterior — 2026-10-29
+
+El [candidato local3c7bcb5](../../audits/rooms/2026-10-29-backend-local-completion.md) tiene entorno
+integrador construido/detenido y restore13 en PG16/18. No modifica el corte cloud8 fechado abajo ni
+revalida su deployment remoto. Multimedia V4 sigue [sólo local](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md),
+sin certificación Linux/cloud; UI Claude Design y activación general siguen pendientes. [Estado vivo](README.md).
+
 ## Continuidad verificada 2026-10-26
 
 El piloto ya comprobó sesión Efeonce ID con Microsoft/MFA, un correo enlace+código, lectura de sala

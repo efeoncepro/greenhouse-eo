@@ -2,14 +2,18 @@
 
 Fecha: 2026-10-07. **Experiencia completa propuesta; demo/scaffold implementados después, aceptación visual humana pendiente.** [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [Dirección visual](../../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md).
 
-## Continuidad 2026-10-26
+## Continuidad 2026-10-29
 
-Claude Design posee la nueva interfaz; Codex conserva backend. Existe una primera demo/scaffold y
-backend publicado con identidad, invitaciones y medios probados en un canary cerrado, más dispatch
-automático de máquina. Esto no acredita el recorrido integral de consola/tours/colaboración/multimedia
-que se diseña aquí. [Dossier vivo](README.md) y [contrato para integrar diseño](../../documentation/rooms/backend-api-for-claude-design.md).
-La integración de la nueva UI, su aceptación y el acceso general de producción siguen pendientes;
-Auth PR263/264 quedan sin merge/deploy por decisión humana.
+Claude Design posee la nueva interfaz; Codex conserva backend. El [candidato local](../../audits/rooms/2026-10-29-backend-local-completion.md)
+ya incorpora colaboración, notas/tours/sesiones con control/ACK, multimedia V4 mixto, mapper X-ray/CRM
+con puertos OFF y MCP stdio. [Contrato para integrar diseño](../../documentation/rooms/backend-api-for-claude-design.md).
+Estas capacidades no certifican la consola visual, sincronización entre ventanas, reproducción real,
+renderers especializados ni los recorridos de dos propuestas y sala combinada diseñados aquí.
+
+El entorno aislado está construido y detenido; nueva UI aún sin conectar/aceptar. Worker multimedia
+Linux/cloud, proveedores reales, MCP remoto, rollout y activación general conservan gates propios.
+El corte publicado26Oct y canary único cerrado no se repitieron; Auth PR263/264 siguen retenidas.
+[Dossier vivo](README.md).
 
 ## Design system decidido
 
@@ -86,7 +90,7 @@ Inicio desde plantilla creativa, SEO/AEO o combinada, o manifest: contexto → i
 
 Editor desktop en tres zonas: inventario/estructura, escenario real y propiedades del elemento seleccionado. El centro usa el mismo renderer del comprador. Se puede plegar la edición y explorar en contexto, con una indicación inequívoca de preview. El estado de procesado y los errores viven junto al archivo, con reintento individual.
 
-CLI y MCP pueden ejecutar todo el ciclo durable sobre el mismo contrato: subir, ordenar, vincular, versionar, publicar y administrar acceso. La UI no concentra privilegios especiales. Publicación y concesión de acceso son decisiones distintas y auditadas.
+El objetivo de paridad exige que CLI y MCP operen el ciclo durable con el mismo contrato. En el corte local actual, CLI soporta transferencia autorizada; el adapter MCP stdio excluye explícitamente bytes binarios y OTP/login, según su [ADR](EFEONCE_ROOMS_LOCAL_STDIO_MCP_DECISION_V1.md). El resto del ciclo disponible permite ordenar, vincular, versionar, publicar y administrar acceso según toolset/grant. La UI no concentra privilegios especiales. Publicación y concesión de acceso son decisiones distintas y auditadas.
 
 ## 10. Móvil, accesibilidad y fallos
 

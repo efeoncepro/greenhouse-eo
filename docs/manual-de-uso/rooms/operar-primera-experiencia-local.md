@@ -1,21 +1,29 @@
 # Operar la primera experiencia local de Rooms
 
-Creado: 2026-10-25; continuidad operativa: 2026-10-26. Owners: Platform/Product. [Dossier](../../architecture/rooms/README.md) · [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md).
+Creado: 2026-10-25; continuidad documental: 2026-10-29. Owners: Platform/Product. [Dossier](../../architecture/rooms/README.md) · [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md).
 
 ## Estado y alcance
 
-Este manual opera demo y herramientas **locales**; no activa el acceso de producción. El runtime
-publicado es main `e4b2e890`, con GCS/DB/worker automático ya verificados, flags humanos OFF y sólo
+Este manual opera demo y herramientas **locales**; no activa el acceso de producción. El corte cloud
+documentado26Oct publicó main `e4b2e890`, con GCS/DB/worker automático verificados, flags humanos OFF y sólo
 dispatch de máquina ON. El canary real de identidad/correo/imagen terminó revocado/archivado; no usar
 esa sala como fixture activa ni repetir el envío. [Estado y evidencia](../../architecture/rooms/README.md).
 
-La nueva UI pertenece a Claude Design. Preparar un entorno de integración aislado y conectar la API
+El backend vigente está en `codex/rooms-design-integration@3c7bcb5`, con 13 migraciones/43 tablas locales;
+el [manual backend actual](operar-backend-local.md) posee colaboración, presentación, V4 mixto y MCP.
+El [recibo29Oct](../../audits/rooms/2026-10-29-backend-local-completion.md) conserva sus pruebas y límites.
+Este manual sigue describiendo la demo inicial, sin revalidar despliegues remotos.
+
+La nueva UI pertenece a Claude Design. El entorno aislado ya está preparado: usar su
+[manual de integración](integrar-claude-design-local.md) y conectar la API
 same-origin; no copiar WIF/secretos de Production a Preview ni introducir bearer tokens en almacenamiento
 del navegador. Auth sigue en PR263/264, sin merge/deploy. [Contrato vigente](../../documentation/rooms/backend-api-for-claude-design.md).
 
 ## Arranque
 
-Runtime en `/Users/jreye/Documents/efeonce-rooms`, rama `main`. La documentación sigue en Greenhouse. Node24.x y pnpm12.15.0; paquetes privados AXIS se instalan desde GitHub Packages con el acceso existente. No copiar `.npmrc`, tokens o credenciales al repo ni al navegador. Usar la [política privada AXIS](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+Runtime en `/Users/jreye/Documents/efeonce-rooms`. Confirmar rama/estado antes de operar: la demo se
+publicó desde `main`, mientras el candidato backend vive en `codex/rooms-design-integration`; no cambiar
+de rama ni reemplazar WIP por seguir este manual. La documentación sigue en Greenhouse. Node24.x y pnpm12.15.0; paquetes privados AXIS se instalan desde GitHub Packages con el acceso existente. No copiar `.npmrc`, tokens o credenciales al repo ni al navegador. Usar la [política privada AXIS](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
 ```sh
 cd /Users/jreye/Documents/efeonce-rooms
@@ -66,11 +74,16 @@ pnpm db:local status
 
 `db:local up` guarda las credenciales de runtime/migrador en `.local/db-config.json`0600; cluster, socket, logs y backups viven bajo `.local/` ignorado. Las variables opcionales `ROOMS_DATABASE_URL` y `ROOMS_MIGRATION_DATABASE_URL` sustituyen ese archivo, pero el guard de este corte sólo admite la base, host, puerto y usuarios Rooms previstos. No imprimir ni copiar las cadenas de conexión a mensajes, commits o Vercel.
 
-`pnpm db:recovery --restart` añade el reinicio del cluster exclusivo antes del dump/restore. Ejecutarlo cuando no haya pruebas o escrituras locales de Rooms activas. El restore usa una base temporal creada para esa corrida, compara conteos y hashes de ediciones y elimina esa base y el dump. `pnpm db:local stop` detiene sólo este cluster. `pnpm db:migrate down` elimina el schema y sus datos: se verificó down/up con la base vacía, y no es el procedimiento para preservar salas ya creadas.
+`pnpm db:recovery --restart` añade el reinicio del cluster exclusivo antes del dump/restore. Ejecutarlo cuando no haya pruebas o escrituras locales de Rooms activas. El restore usa una base temporal creada para esa corrida, compara conteos y hashes de ediciones y elimina esa base y el dump. `pnpm db:local stop` detiene sólo este cluster. `pnpm db:migrate down` revierte una migración; según la migración puede destruir datos o rechazar un downgrade poblado. No usarlo para preservar salas. El restore ampliado13 y sus cinco guards poblados tienen su propio comando y evidencia en el [manual backend](operar-backend-local.md#verificar-y-cerrar); el recovery inicial no los sustituye.
 
 ## Contrato durable HTTP y CLI
 
-Las rutas están implementadas, pero **todas las solicitudes válidas al carril real reciben401 hasta integrar Efeonce ID**. Un bearer inventado, `ROOMS_ACCESS_TOKEN`, el selector demo o una organización enviada por el navegador no crean autoridad. La CLI sin token termina antes de llamar HTTP. Con una futura sesión válida, estos son los comandos del contrato:
+Las rutas requieren una sesión vigente y autoridad persistida. Efeonce ID y guest ya tienen su
+evidencia acotada; un401 sin sesión no implica que falte su implementación. Un bearer inventado,
+`ROOMS_ACCESS_TOKEN`, el selector demo o una organización enviada por el navegador no crean autoridad.
+La CLI exige `--session-file` privado0600 de una sesión existente del origen exacto; su obtención/login
+interactivo sigue pendiente. Los siguientes ejemplos muestran argumentos de negocio: añadir a cada uno
+`--base-url ORIGIN --session-file /ruta/privada/rooms-session.json` para el entorno elegido.
 
 ```sh
 pnpm rooms operations
@@ -94,7 +107,7 @@ El resolver productivo no acepta bearer nativo. Para una sesión ya existente de
 | `GET /api/v1/rooms/:roomId/editions/:editionId?organizationId=…` | Snapshot exacto |
 | `POST /api/v1/commands` | Command JSON con `Idempotency-Key` |
 
-Commands implementados: `rooms.create`, `rooms.updateDraft`, `editions.publish`, `editions.reopen`, `rooms.archive`, `access.grant` y `access.revoke`. Crear recibe `{roomId, content}`; actualizar recibe `{roomId, expectedRevision, content}`; publicar/archivar reciben `{roomId, expectedRevision}`; reabrir añade `sourceEditionId`. El contrato estricto de grants y contenido vive en `src/domain/persistence-contracts.ts`; V1/V2 conservan su origen sintético y V3 exige procedencia explícita real/synthetic. Ningún command acepta notas internas dentro del snapshot.
+Commands del ciclo inicial: `rooms.create`, `rooms.updateDraft`, `editions.publish`, `editions.reopen`, `rooms.archive`, `access.grant` y `access.revoke`. Crear recibe `{roomId, content}`; actualizar recibe `{roomId, expectedRevision, content}`; publicar/archivar reciben `{roomId, expectedRevision}`; reabrir añade `sourceEditionId`. El contrato estricto de grants y contenido vive en `src/domain/persistence-contracts.ts`; V1/V2 conservan su origen sintético y V3 exige procedencia explícita real/synthetic. Ningún command acepta notas internas dentro del snapshot. El catálogo ampliado está en `/api/v1/operations` y en el manual backend actual.
 
 Guardar exige la revisión leída: conflicto409 no pisa cambios concurrentes. La clave de idempotencia admite8–200 caracteres alfanuméricos, punto, guion, guion bajo y dos puntos; debe empezar por alfanumérico. Repetir clave/payload devuelve el recibo anterior sólo si la autoridad continúa vigente; cambiar el payload produce409. Publicar fija una edición inmutable; reabrir crea otro borrador y conserva la publicación. Recursos ajenos o no disponibles devuelven404; errores de configuración/disponibilidad503 están sanitizados. Lecturas y respuestas llevan `private, no-store` y correlationId.
 
@@ -107,18 +120,24 @@ Guardar exige la revisión leída: conflicto409 no pisa cambios concurrentes. La
 
 ## Límites y continuidad
 
-La demo visual y el ciclo durable local son entregas distintas. Persistencia, publicación, auditoría y outbox están verificadas con fixtures locales; no hay base de datos cloud ni identidad federada acreditadas por esta task. Efeonce ID/invitaciones, medios, editor visual, entrega de outbox a sistemas externos, MCP y piloto con clientes siguen pendientes en EPIC-052. GitHub/Vercel pertenecen a TASK-2061; un preview no convierte la demo en sala privada ni traslada la base local. Rollback de código conserva DB; cualquier rollback de schema requiere preservar previamente las salas y verificar recuperación.
+La demo visual y el ciclo durable local son entregas distintas. La TASK-2060 inicial verificó
+persistencia, publicación, auditoría y outbox con fixtures locales; no acreditaba cloud ni identidad
+federada. Después se construyeron Efeonce ID/invitaciones, imágenes cloud y el backend ampliado local,
+incluido MCP stdio. Ver sus cortes y fronteras en el [manual backend](operar-backend-local.md).
+Editor/interfaz nueva, entrega externa, federación MCP remota, multimedia cloud y piloto con clientes
+conservan sus gates. Un preview no convierte la demo en sala privada ni traslada la base local.
+Rollback de código conserva DB; cualquier rollback de schema requiere preservar las salas y verificar recuperación.
 
-## Abrir la demo publicada — TASK-2061
+## Abrir la demo publicada — antecedente TASK-2061
 
-https://efeonce-rooms.vercel.app/demo · [Repo privado](https://github.com/efeoncepro/efeonce-rooms). Publicación del SHA `bd4b802acbbe1db1b0089c9dc0d558c67c41d111`, deployment `dpl_8vJ75Cbn1q75JNe7FEa7LkUccigc`. Vistas cliente, operador y administrador son personas sintéticas de revisión. Las rutas `/api/v1` requieren sesión real y siguen401. No introducir datos reales ni asumir que la DB local se subió.
+https://efeonce-rooms.vercel.app/demo · [Repo privado](https://github.com/efeoncepro/efeonce-rooms). Publicación inicial del SHA `bd4b802acbbe1db1b0089c9dc0d558c67c41d111`, deployment `dpl_8vJ75Cbn1q75JNe7FEa7LkUccigc`, conservados como antecedente. Vistas cliente, operador y administrador son personas sintéticas de revisión. Las rutas `/api/v1` requieren sesión real y responden401 sin ella. No introducir datos reales ni asumir que la DB local se subió.
 
 GitHub/main está vinculado a Vercel; asignación automática de dominios desactivada. Para un nuevo release, verificar candidato de producción y promover su ID explícitamente, luego comprobar alias/HTTP. Primer release sin anterior aceptado: retirada sólo por ID exacto mediante `vercel remove <deploymentId> --yes --scope efeonce-7670142f` y readback del alias, nunca usar nombre del proyecto para borrar todos los deployments. [Evidencia de release](../../audits/rooms/2026-10-25-persistence-motion-release.md).
 
 
 ## Autoría de contenido versionado — TASK-2062
 
-Implementación local; sin editor visible ni identidad real activada. `rooms.create` y `rooms.updateDraft`
+Alcance inicial local de TASK-2062; sin editor visible en ese corte. `rooms.create` y `rooms.updateDraft`
 aceptan contenido V1 o un manifiesto `rooms.content.v2`. Un borrador V2 permite campos aún vacíos y perfiles
 `creative` / `seo-aeo` independientes; la publicación valida requisitos adicionales. No se permite degradar
 un borrador V2 a V1. Las ediciones publicadas V1 conservan bytes y hashes.
@@ -186,5 +205,5 @@ No usar optimizador/caché pública para derivados ni exponer originales.
 
 El [manual del worker](operar-worker-medios.md) describe Scheduler, lease, consulta y rollback. Los comandos
 de ese manual apuntan a producción y no forman parte de este arranque local: no ejecutarlos por seguir
-una prueba de UI. Falta el entorno de integración de la nueva interfaz y su prueba completa; no confundir
+una prueba de UI. El entorno de integración ya está preparado; falta conectar la nueva interfaz y su prueba completa; no confundir
 los 53PASS/3skip de Playwright del scaffold con aceptación visual de Claude Design.

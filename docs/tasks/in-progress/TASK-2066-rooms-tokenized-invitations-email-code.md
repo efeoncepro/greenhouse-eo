@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-26: un correo inicial con enlace+código recibido y canjeado contra Rooms productivo; lectura de sala V3 e imagen, denegación de borrador/otra sala, replay y revocación verificados. Invitación revocada y sala archivada; flags web/Auth y correo OFF. Integración de la interfaz Claude Design, revisión de criterios de privacidad/concurrencia restantes y activación general separadas. No repetir el correo.`
+- Status real: `2026-10-29: canary26Oct: un correo inicial con enlace+código recibido y canjeado contra Rooms productivo; lectura de sala V3 e imagen, denegación de borrador/otra sala, replay y revocación verificados. Invitación revocada y sala archivada; flags web/Auth y correo OFF. Integración de la interfaz Claude Design, revisión de criterios de privacidad/concurrencia restantes y activación general separadas. No repetir el correo. Backend local29Oct incorpora derechos adicionales explícitos fijados a edición inicial y receipts guest sin principal interno(migración13); no modifica el issuer ni amplía invitaciones legadas.`
 - Rank: `Después del contrato TASK-2067; coordinar primitives de sesión/binding con TASK-2065 sin depender de su journey OIDC`
 - Domain: `identity|platform|data`
 - Blocked by: `none`
@@ -297,7 +297,7 @@ Peer Identity TASK-2067/1834, sesión Rooms2065 y dueño Resend/remitente. Reuti
 - [x] GET/scanner no consume token, concede grant ni envía correo; enlace solo no revela contenido/correo/organización.
 - [ ] Invalid/expired/revoked públicos son indistinguibles; renovación opcional no enumera correo por body/status/tiempo y nunca revive una invitación revocada.
 - [x] Prueba incorrecta/vencida/repetida/otro RP/otro subject/otra transacción no acepta ni auto-provisiona por email.
-- [x] Invitador, invitación y destinatario se revalidan; grant sólo room/client/capabilities permitidas y nunca organización/workspace/notas.
+- [x] Invitador, invitación y destinatario se revalidan; lectura legacy limitada a room/client y capabilities permitidas, nunca organización/workspace/notas ajenas. El corte local13 permite solicitar nuevos derechos explícitos para colaboración/notas propias/presentación sólo en la edición inicial; [evidencia](../../audits/rooms/2026-10-29-backend-local-completion.md), sin autogrants ni cambio Auth.
 - [x] Aceptación concurrente consume jti/versión una vez y crea sesión guest acotada; sin profile/membership/rol global. OTP consumido no recupera proof: nueva emisión gobernada si falló el resto.
 - [x] Revocación durante y después de aceptación deniega; grant asociado revocado sin afectar grants ajenos; expiry probada con reloj servidor.
 - [x] Readback llega sólo a edición inicial publicada autorizada; fallback demo/otra sala prohibido. Evidencia: canary real salaV3+imagen200, borrador y otro espacio404; no fallback de demo.

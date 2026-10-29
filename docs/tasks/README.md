@@ -14,7 +14,7 @@
 
 - `TASK-2070` — [Rooms: imágenes privadas y procedencia](complete/TASK-2070-rooms-private-image-media.md), complete local; R05A backend implementado y canary cloud real por2072; formatos PDF/audio/video y activación general separados.
 
-- `TASK-2069` — [Rooms: perfil cloud y piloto controlado](in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md), in-progress; infraestructura aplicada,8migraciones/26tablas y canary interno cerrado OFF; observación/costes/recovery ampliado y rollout general conservan gates.
+- `TASK-2069` — [Rooms: perfil cloud y piloto controlado](in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md), in-progress; infraestructura aplicada,8migraciones/26tablas y canary interno cerrado OFF; restore local8/13PG16/18 PASS; observación/costes/recovery cloud y rollout general conservan gates.
 
 - `TASK-2068` — [Rooms: invitación y lectura compartida](in-progress/TASK-2068-rooms-invitation-and-guest-experience.md), in-progress; canary HTTP real V3/medios/revocación comprobado; nueva interfaz y BFCache/GVC/aceptación pendientes.
 

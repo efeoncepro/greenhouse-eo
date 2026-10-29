@@ -1,6 +1,6 @@
 # Rooms — política de versiones y baseline técnico V1
 
-Análisis inicial: **2026-10-07**. Refresh e implementación local: **2026-10-25**, §8. Owner: Platform; validación visual: Product/AXIS. [ADR Rooms](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [Arquitectura](EFEONCE_ROOMS_ARCHITECTURE_V1.md) · [EPIC-052 / R01](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+Análisis inicial: **2026-10-07**. Refresh e implementación local: **2026-10-25**, §8; ampliación backend **2026-10-29**, §10. Owner: Platform; validación visual: Product/AXIS. [ADR Rooms](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) · [Arquitectura](EFEONCE_ROOMS_ARCHITECTURE_V1.md) · [EPIC-052 / R01](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
 
 **Autoridad:** el operador solicita usar las versiones más recientes de Next.js, ESLint, TypeScript, Tailwind y herramientas asociadas, y documentar el análisis de viabilidad. La política orienta la selección; la matriz es un baseline candidato fechado. Las excepciones y la convivencia de herramientas se validan en R01. La matriz inicial conserva su fecha; §8 registra la instalación y build local posteriores, sin certificar hosting.
 
@@ -147,10 +147,25 @@ pnpm12.15.0 y Node24.x. `@google-cloud/storage`8.4.0, Sharp0.35.5, esbuild0.28.2
 mínimo del worker son pins ejecutables; no se actualizó ningún paquete por esta revisión documental.
 
 Vercel fue publicado/promovido; worker Docker Linux/decoder y Cloud Build por digest PASS. Backend234/234,
-9pruebas focales de dispatch, lint/types/build y Playwright53PASS/3skip son la evidencia del corte actual.
+9pruebas focales de dispatch, lint/types/build y Playwright53PASS/3skip son la evidencia de ese corte publicado26Oct.
 Los 3skip y los perfiles de prueba se conservan; no se convierten en cobertura de todos los navegadores
 ni aceptación visual humana. [Readback](../../audits/rooms/2026-10-26-automatic-media-dispatch.json).
 
 La convivencia TS6 y ESLint9 mantiene sus criterios de retiro, sin deshabilitar peers/lint/typecheck.
 El análisis07Oct y los resultados25Oct son antecedentes fechados; frases de hosting pendiente allí no
 sustituyen este estado. [Dossier vigente](README.md).
+
+
+## 10. Candidato backend local ampliado — 2026-10-29
+
+El manifest de `codex/rooms-design-integration@3c7bcb5` conserva el stack de §9 y añade pins exactos
+`@modelcontextprotocol/server@2.0.0` y cliente de pruebas `@modelcontextprotocol/client@2.0.0` para el
+[adapter stdio local](EFEONCE_ROOMS_LOCAL_STDIO_MCP_DECISION_V1.md). Multimedia V4 verifica al arrancar
+FFmpeg8.1.1, Poppler26.04.0 y cwebp1.6.0; no hereda el contenedor del worker cloud de imágenes.
+[Contrato y límites de toolchain/sandbox](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md).
+
+[Recibo local](../../audits/rooms/2026-10-29-backend-local-completion.md): Node24.17.0,
+337testsPASS0skip, lint/lint negativo/tipos/build, Chrome18+23 y restore13 en PG16/18. No se repite
+ni se convierte Playwright53PASS/3skip del26Oct en aceptación de la nueva UI. El worker de imágenes
+pasó compilación/instalación productiva aislada; el worker multimedia Linux/cloud, memoria dura y
+empaquetado aún no están certificados. No hay upgrade del stack, publicación o rollout por este delta.

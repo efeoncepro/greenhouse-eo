@@ -20,7 +20,7 @@ pnpm integration:stop
 - PostgreSQL propio55433, DB `rooms_local`; no comparte cluster con el55432 de las pruebas anteriores.
 - Datos, medios, caché y estado: `.local/design-integration/`, ignorados. Estado/credenciales0600 y
   carpeta0700. No copiar su contenido a frontend, documentación, conversaciones o repositorios.
-- Trece migraciones verificadas en8702a6f. `up` conserva salas/ediciones y reconcilia sólo autoridad de los fixtures
+- Candidato3c7bcb5: trece migraciones verificadas. `up` conserva salas/ediciones y reconcilia sólo autoridad de los fixtures
   declarados; `stop` termina únicamente sus procesos/cluster, confirma puertos libres y conserva datos.
 - Worker local finito cada2s, con un trabajo a la vez; sin sweep destructivo, GCS ni Scheduler cloud.
 
@@ -64,10 +64,15 @@ await rooms.command('content.upsertBlock', {
 }, { idempotencyKey: intentionKey, signal: abortController.signal })
 ```
 
-API del cliente: `rooms/room/draft/authoring/preview/validation/editions/edition/media/upload/transfer`,
+API inicial del cliente: `rooms/room/draft/authoring/preview/validation/editions/edition/media/upload/transfer`,
 `invitations/invitationManagement`, `session/selectContext/operations`, `command` y `renditionPath`.
 Resultados `{data,correlationId}`; `RoomsClientError` expone code/status/correlationId/retryAfter saneados.
 Abort y timeout terminan la espera; no se repite ningún write automáticamente. Ante409 releer/reconciliar.
+
+El candidato29Oct añade readers de preguntas/pasos/actividad, tours/notas/presentación, integraciones
+y multimedia; firmas y límites están en el [contrato backend](../../documentation/rooms/backend-api-for-claude-design.md#ampliaciones-locales-disponibles29oct).
+Sus puertos X-ray/CRM siguen OFF y un handoff `pending` no prueba entrega. El MCP stdio local usa el
+mismo HTTP y sesión existente, con lecturas por defecto: [operación](operar-backend-local.md#mcp-stdio-local).
 
 Tipos de DTO derivados de las fuentes canónicas mediante imports type-only; el bundle browser no contiene
 módulos server, PG, crypto Node ni fixtures. Este es un módulo del repo Rooms, no un paquete SDK externo
@@ -95,9 +100,16 @@ bloque `image` de la sala sintética reservada para verificar la secuencia de im
 reabre borrador para continuar integrando. Las ediciones publicadas anteriores permanecen inmutables.
 No ejecutarlo sobre salas reales ni sobre la sala cloud archivada del canary anterior.
 
-Evidencia local privada: `.local/design-integration/check.json`; reporte público saneado en Greenhouse.
+Con multimedia explícitamente habilitada, `node --conditions=react-server --import tsx scripts/design-backend-check.ts`
+comprueba el backend nuevo mediante SDK/API en navegador; crea su sala sintética y no acepta el diseño.
+El [recibo29Oct](../../audits/rooms/2026-10-29-backend-local-completion.md) registra18checks de imágenes y23
+del backend nuevo, además de337tests y restore13PG16/18. Son resultados ejecutados en ese corte, no una
+repetición de QA por actualizar esta guía. El entorno quedó detenido al cerrar.
+
+Evidencia local privada de imágenes: `.local/design-integration/check.json`; reporte público saneado en Greenhouse.
 Pruebas de conectores/guardas se incluyen en `pnpm test`. El nuevo diseño, componentes visuales y aceptación
 humana siguen con Claude Design; este corte prepara infraestructura y transporte, no una UI aceptada.
 
 Producción mantiene sus flags humanos OFF y Auth PR263/264 retenidas. Publicación de esta rama, activación
-cloud, envío a clientes y cierre del recovery ampliado son acciones separadas, sin autorización implícita.
+cloud y envío a clientes son acciones separadas, sin autorización implícita. El restore ampliado local
+ya pasó; recovery/PITR cloud, certificación multimedia Linux/cloud y rollout conservan sus gates.

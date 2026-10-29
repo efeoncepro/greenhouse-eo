@@ -12,6 +12,11 @@ guards de deploy y Job aislado de rotación tienen avances en el candidato
 producción. El Job nace OFF/dry-run y no tiene Scheduler; recuperación y
 retirement de llaves requieren supervisión. Release Auth permanece retenido.
 
+El [backend local ampliado de Rooms](../../../docs/audits/rooms/2026-10-29-backend-local-completion.md)
+ya está verificado en `3c7bcb5`: sus 337 tests, restore de trece migraciones y pruebas Chrome/API
+acreditan al consumer. Este corte no cambia fuentes, protocolo, flags ni release del issuer Auth.
+Conectar/aceptar la nueva UI y certificar los frentes externos de Rooms siguen en su propio programa.
+
 Efeonce ID es el **autorizador propio** de Efeonce: OAuth 2.1/OIDC servido por Cloud Run `auth-server`
 en `auth.efeonce.org`. Se decidió el 2026-09-03 en lugar de WorkOS ([ADR nativo](../../../docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md))
 y está **en producción desde el 2026-09-04** (release `9100bbd2765d`).
@@ -32,7 +37,9 @@ esta skill dice qué hay que saber para trabajar sin repetir lo que ya costó un
 1. Este archivo: reglas y ruteo.
 2. [`references/program-ledger.md`](references/program-ledger.md): estado vivo por task, qué está
    desplegado, qué está OFF y la secuencia pendiente. **Empezar aquí.**
-3. Auditorías de rollout (la verdad operativa más reciente):
+3. Estado y auditorías (cada recibo conserva su alcance local o cloud):
+   - [`docs/audits/rooms/2026-10-29-backend-local-completion.md`](../../../docs/audits/rooms/2026-10-29-backend-local-completion.md): backend consumer construido; no release Auth ni prueba del servidor completo.
+   - [`docs/audits/rooms/2026-10-28-two-rp-auth-ca97eecd1.md`](../../../docs/audits/rooms/2026-10-28-two-rp-auth-ca97eecd1.md): 35 checks con issuer QA y dos adapters del mismo consumer, con límites explícitos.
    - [`docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md`](../../../docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md): canary único real PASS, cerrado y flags OFF; no repetir correo.
    - [`docs/audits/rooms/2026-10-26-auth-deploy-control.md`](../../../docs/audits/rooms/2026-10-26-auth-deploy-control.md): control preparado en PR y retención humana; consultar ledger para el corte de CI.
    - [`docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md`](../../../docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md): corte consolidado.
@@ -81,6 +88,11 @@ Comandos útiles:
 - **El preflight de promoción se corre contra `target-branch=main`.** Contra `develop` devuelve «batch unknown» y no aprueba nada.
 - **Readback de la revisión ACTIVA** (`gcloud run services describe auth-server`) después de cada deploy: `GIT_SHA`, flags y RP/origen. «Deploy verde» no es lo mismo que «flag aplicado».
 - **Un preparativo no prueba una integración.** RP registrado, secretos v1 o health/JWKS en 200 no acreditan firma nueva, sesión ni entrega de correo. El canary Rooms del 26 de octubre sí acreditó Microsoft/MFA, OIDC, PNG privado y un correo recibido; ya se cerró, no se repite ni amplía por inferencia.
+- **Issuer, consumer y derechos locales son autoridades separadas.** Los derechos guest adicionales de
+  Rooms se conceden expresamente para su edición inicial; sus receipts/notas/sesiones/ACK no crean un
+  principal interno, sesión issuer ni SSO. MCP stdio usa una sesión HTTP existente de Rooms y no inicia
+  OAuth ni concede consentimiento MCP remoto. Un arnés con protocolo/store Auth reales no certifica
+  `services/auth-server/server.ts` completo, dos productos RP, HTTPS, Microsoft/MFA o dispatch gateway.
 - **Nueva UI en entorno aislado sigue autorizada.** La retención de las PR y el acceso productivo OFF no bloquean diseño/desarrollo local. No autoriza publicación, activación ni aceptación visual de la nueva dirección.
 - **El repo `greenhouse-eo` es PÚBLICO.** Los recibos con identificadores del operador viven fuera de git (`.auth/…`), nunca en `docs/`. Lo que ya se commiteó sigue en el historial.
 - **Seguridad (TASK-1833):** hay evaluación propia y revisión entre agentes, **sin pentest completo**; la cobertura ofensiva quedó bloqueada. No declarar «pentest hecho».

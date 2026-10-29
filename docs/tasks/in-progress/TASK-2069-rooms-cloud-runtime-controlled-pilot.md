@@ -6,11 +6,11 @@ El [canary Auth+Rooms del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-i
 ejercitó DB cloud, identidad, invitación, imagen privada y guest con una sala
 sintética y un único correo recibido. Auth y Rooms volvieron a OFF. El checkout
 Rooms avanzó después a `main=origin/main=e4b2e89` según Git local; ese SHA no
-demuestra el deployment Vercel activo. Continúan pendientes la UI nueva,
-recovery con las ocho migraciones actuales y gates de carga/operación. El delta
+demuestra el deployment Vercel activo. El recovery local8 ya pasó en PG16/18:26tablas,19objetos/12bindings, dispatch y ACL.
+Continúan pendientes la UI nueva, recuperación cloud/PITR/secretos y gates de carga/operación. El delta
 fechado 25-10 y sus métricas abajo son evidencia histórica anterior al canary.
 
-> Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
+> Estado actual29Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
 
 ## Delta 2026-10-25 — estado al corte de Codex
 
@@ -33,7 +33,7 @@ fechado 25-10 y sus métricas abajo son evidencia histórica anterior al canary.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-29: canary interno Auth+Rooms del 26-10 completado con DB cloud, imagen GCS procesada/servida en privado, correo único recibido, guest y revocación; flags de acceso humano nuevamente OFF. Main/origin/main local de Rooms e4b2e89, sin readback nuevo del deployment Vercel activo. El restore previo cubrió 19 tablas; falta recuperación con ocho migraciones actuales, carga/operación, UI nueva y decisión de activación general. CONNECT/TEMP heredados siguen documentados; no inferir aislamiento más fuerte.`
+- Status real: `2026-10-29: canary interno Auth+Rooms del 26-10 completado con DB cloud, imagen GCS procesada/servida en privado, correo único recibido, guest y revocación; flags de acceso humano nuevamente OFF. Main/origin/main local de Rooms e4b2e89, sin readback nuevo del deployment Vercel activo. Restore local8 PG16/18 PASS(26tablas/19objetos/12bindings); restore local13 del candidato también PASS(43tablas/23objetos/14pins). Ninguno certifica cloud/PITR/secretos. Carga/coste cloud, UI nueva y activación general siguen pendientes. CONNECT/TEMP heredados siguen documentados; no inferir aislamiento más fuerte.`
 - Rank: `Foundation cloud después de TASK-2065/2066; canary integrado condicionado a issuer TASK-1834/2067 y consumer TASK-2068`
 - Domain: `platform|identity|data|ops`
 - Blocked by: `none`
@@ -224,7 +224,8 @@ no borrando DB ni revirtiendo migraciones vivas. Owners Platform/Rooms/Auth cons
 - [x] Cloud config/secret refs efectivos; Production sin fallback local/ADC/SA key; pool máximo2 por isolate. Config18env/refsv1 readback; logout canónico200 inicializa4secretos porWIF. Pool probado PG16, SQL desdeVercel comprobado con una cookie sintética inexistente: logout200 después de authTransaction, sin activar acceso ni usuario.
 - [ ] WIF permite sólo Rooms Production; preview/proyecto ajeno denegados; migrator fuera del deployment.
 - [x] DB/roles propios sin CREATEDB/CREATEROLE/SUPERUSER/BYPASSRLS ni membresías Greenhouse; negativas de DDL/cross-DB.19tablas/8negativas runtime y auditoría150relaciones PASS; [límite CONNECT/TEMP heredado](../../audits/rooms/2026-10-25-cloud-isolation.md) explícito, sin afirmar aislamiento de conexión.
-- [ ] Recovery del estado ampliado de26tablas/8migraciones y sus ACL/constraints/triggers certificado; claves recuperables. El restore previo de19tablas y el ensayo posterior PG16/18 de25tablas/7migraciones ya tienen evidencia; migración8 se probó por claim/fencing/ack, pero no se infiere un restore completo26tablas por haberla aplicado.
+- [x] Recovery LOCAL del corte8 certificado en PG16/18:26tablas,19objetos/12bindings, hashes/ACL/constraints/triggers, dispatch/lease/fencing y trabajo pendiente. Recibos [PG16](../../audits/rooms/2026-10-29-recovery8-pg16.json)/[PG18](../../audits/rooms/2026-10-29-recovery8-pg18.json). No es un restore cloud.
+- [ ] Recovery cloud/PITR y recuperación de secretos/claves del entorno publicados: sin ensayo autorizado ni evidencia; conserva gate Platform/Ops antes de activación general.
 - [x] RP, redirect, origin y authority audience/token alineados; ninguna autoridad desde email-match o demo. Evidencia: canary real26Oct Microsoft/MFA y guest proof, con scope a la única sala y denegación de workspace/otro espacio.
 - [x] WAF/rate limits y fallback seguro verificados antes de exposición; sin challenge en S2S. Evidencia: WAF v2/readback y429/recuperación del piloto, S2S real de issuer/authority durante canary26Oct. No certifica capacidad para rollout masivo.
 - [x] Canary autorizado distingue aceptación del proveedor, recepción y acceso; revocación/cross-tenant/OFF negativos. Evidencia: un correo Resend recibido en Outlook, sala/imagen200, borrador/otro espacio404 y revoke401/404; flags humanos OFF finales.
@@ -245,7 +246,7 @@ Bootstrap cloud aplicado y leído:19tablas,5migraciones,ACL exactos y8 negativas
 Las contraseñas se inicializaron por SQLAdmin users.update; ninguna pasó por SQL/logs ni se alteraron
 settings globales. La API omite type para BUILT_IN por defecto; una interrupción previa se reconcilió
 explícitamente sólo para estos dos roles recién creados, antes de cualquier uso. No se rotaron terceros.
-Canary Vercel/WIF y comprobación cruzada de permisos PUBLIC vecinos pendientes.
+El canary Vercel/WIF ya cerró26Oct; comprobación/remediación de permisos PUBLIC vecinos y recuperación cloud conservan sus gates. La verificación anterior es histórica; el recibo local29Oct amplía recovery sin mutación cloud.
 
 ## Closing Protocol
 

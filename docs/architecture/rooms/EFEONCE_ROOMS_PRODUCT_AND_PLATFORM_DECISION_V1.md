@@ -1,6 +1,6 @@
 # Efeonce Rooms — ADR de producto y plataforma V1
 
-- Status: **Proposed** — consolidado para revisión antes del go final de implementación.
+- Status: **Proposed** — consolidado completo; los go parciales de implementación y el estado actual se distinguen abajo.
 - Date: 2026-10-07.
 - Owner: Commercial / Product; Platform para arquitectura y operación; Creative/AXIS para dirección visual.
 - Scope: Rooms, autoría, experiencia de comprador/champion, API/CLI/MCP, multimedia y límites del ecosistema.
@@ -9,16 +9,23 @@
 - Validated as of inicial: 2026-10-07; conversación, fuentes locales y documentación técnica; entonces sin runtime Rooms.
 - Depends on: [frontera propia aceptada](../sales-enablement/EFEONCE_SALES_ENABLEMENT_PLATFORM_DECISION_V1.md).
 
-## Continuidad de ejecución 2026-10-26
+## Continuidad de ejecución 2026-10-29
 
 El status `Proposed` pertenece al ADR consolidado completo; no borra los go parciales fechados de este
-mismo documento ni acepta por inferencia toda la experiencia. Backend/API/CLI y medios cloud están en
-main `e4b2e890`, con canary real completado/cerrado y worker automático verificado. [Dossier y evidencias](README.md).
+mismo documento ni acepta por inferencia toda la experiencia. El corte publicado26Oct y canary cerrado
+siguen separados del [candidato local3c7bcb5](../../audits/rooms/2026-10-29-backend-local-completion.md),
+sin push/deploy: colaboración, presentación durable, importación X-ray/referencia/handoff CRM,
+multimedia V4 mixto y MCP stdio están construidos con ADRs propios. [Dossier y contratos](README.md).
 
-Claude Design posee la interfaz; integración y aceptación humana pendientes. Sólo dispatch de máquina
-ON; acceso/invitación/medios web OFF. Auth deploy-control permanece en PR263/264 por instrucción
-expresa, sin merge/deploy ni release262. PDF/audio/video, presentación, colaboración, CRM y MCP
-conservan el alcance futuro de la épica; una base ejecutable no equivale al cierre del producto.
+Claude Design posee la interfaz; entorno local ya preparado y detenido, integración/aceptación humana
+pendientes. Puertos externos OFF y handoff `pending` no prueban entrega; MCP remoto y certificación
+multimedia Linux/cloud siguen pendientes. El backend local no cierra EPIC-052, perfiles completos ni
+la paridad de experiencia UI/CLI/MCP. Auth deploy-control permanece retenido en PR263/264, sin merge
+o deploy; no hay nuevo canary/correo, cambio de producción ni activación general.
+
+Los apartados iniciales y addenda fechados conservan decisiones y permisos de cada momento. En
+particular, la autorización documental inicial no sustituye los go locales posteriores ni los gates
+vigentes de release.
 
 ## Context
 
@@ -38,7 +45,7 @@ Think se concibió para marketing, tools y lead magnets. Administrar esta nueva 
 | D6. Design system de Rooms: La órbita (`efeonce-graphic-line`) | Accepted 2026-10-07 por corrección explícita del operador; estética, tipografía, componentes, iconografía y motion, también en autoría/consola. AXIS lo distribuye. Composición específica y QA visual siguen pendientes |
 | D7. Rooms sirve a propuestas creativas y SEO/AEO, combinables en una sala | Accepted 2026-10-07 por aclaración explícita del operador; creatividad es el primer recorrido, no el límite del producto. Contratos especializados Proposed |
 
-La solicitud actual autoriza redactar y explicar este dossier. No es el go final para construir, migrar, provisionar, desplegar o compartir una propuesta con un cliente.
+En la solicitud inicial del07Oct se autorizó redactar y explicar este dossier. Los go posteriores están registrados en sus addenda y ADRs dueños; no autorizan por inferencia nuevos despliegues, activaciones o propuestas compartidas con clientes.
 
 ## Decision proposed
 

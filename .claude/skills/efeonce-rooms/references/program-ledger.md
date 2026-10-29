@@ -2,6 +2,8 @@
 
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
+> Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
+> sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
 ## 2026-10-29 — Backend local completado y verificado para integrar diseño
 
@@ -23,6 +25,15 @@
   sin mutaciones de producción ni otro canary. Integración/aceptación Claude y rollout siguen separados.
   [Recibo completo](../../../../docs/audits/rooms/2026-10-29-backend-local-completion.md),
   [manual](../../../../docs/manual-de-uso/rooms/operar-backend-local.md).
+- Procedencia: commit exacto `3c7bcb50392bea9d408adf602c6da00583b87798`;
+  [resultado estructurado](../../../../docs/audits/rooms/2026-10-29-backend-local-completion.json),
+  [recovery PG16](../../../../docs/audits/rooms/2026-10-29-backend-recovery-pg16.json) y
+  [PG18](../../../../docs/audits/rooms/2026-10-29-backend-recovery-pg18.json).
+  Las suites comparten colas y se ejecutan en serie contra su base dedicada; cada restore usa
+  base/storage propios. Los 18+23 checks Chrome/API no certifican aceptación visual ni un nuevo login.
+- Continuidad documental posterior: HEAD runtime `de38af5e73ac4e653923c3e892ebba5eafb3139b`
+  sólo actualiza `AGENTS.md`; el código y la atribución de las pruebas siguen en `3c7bcb5`.
+  Ese commit documental no es retest, publicación ni activación.
 
 ## 2026-10-29 UTC — UI y operación pendientes tras canary cerrado
 

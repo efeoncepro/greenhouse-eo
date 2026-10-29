@@ -11,9 +11,10 @@ Rama `codex/rooms-design-integration`, sin push/deploy. La nueva UI de Claude De
 entregado. El entorno aislado3216/55433/19338 y el SDK browser-safe ya están preparados; no volver a
 listarlos como trabajo pendiente. [Manual de integración](../../manual-de-uso/rooms/integrar-claude-design-local.md),
 [operación del backend](../../manual-de-uso/rooms/operar-backend-local.md) y
-[recibo del candidato/gates finales](../../audits/rooms/2026-10-29-backend-local-completion.md).
+[recibo del candidato/gates finales](../../audits/rooms/2026-10-29-backend-local-completion.md) y
+[barrido completo docs/skills](../../audits/rooms/2026-10-29-docs-skills-full-reconciliation.md).
 
-Commit local `3c7bcb5`:13migraciones/43tablas,337testsPASS0skip,lint/types/build y smoke aislado del
+Código probado `3c7bcb5` (HEAD documental posterior `de38af5` sólo cambia AGENTS):13migraciones/43tablas,337testsPASS0skip,lint/types/build y smoke aislado del
 worker de imágenes PASS. Chrome18+23checks; restore físico13 en PG16/18 y downgrade vacío13→8→13
 PASS. El entorno13/multimedia opt-in se verificó y quedó detenido. No certifica rollout ni contenedor multimedia Linux.
 
