@@ -285,6 +285,24 @@ $('#__root a[target="_blank"]').each((_, a) => { if (/^https:\/\/efeoncepro\.com
 // Hero photos: the first line's portrait is the likely LCP; the other four load after it.
 $('section#top .lens-inner > img.cast').each((i, img) => { $(img).attr('fetchpriority', i ? 'low' : 'high') })
 
+// Mobile/touch pass (2026-10-29). The shared bottom dock shows after the hero and hides from the agenda to the end
+// of the page (default selectors of eo-landing-dock); touch screens get their own hint for the Sparks.
+one('section#top').attr('data-landing-dock-start', '')
+one('section#agenda').attr('data-landing-dock-stop', '')
+{
+  const hint = one('section#agentes .cst-hint')
+  const img = hint.find('img').first()
+
+  hint.html($.html(img) + '<span>Nada sale sin que una persona lo apruebe. <span class="h-fine">Pasa el cursor por un Spark.</span><span class="h-touch">Toca un Spark.</span></span>')
+  hint.after('<p class="sk-live" aria-live="polite"></p>')
+}
+{
+  const mail = one('section#agenda .mail')
+
+  mail.find('code').replaceWith('<a class="mail-a" href="mailto:hola@efeoncepro.com">hola@efeoncepro.com</a>')
+  mail.append('<span class="sr" aria-live="polite" data-gh-copy-status></span>')
+}
+
 // Buttons that only switch state are not form submits.
 $('#__root button').each((_, b) => { if (!$(b).attr('type')) $(b).attr('type', 'button') })
 

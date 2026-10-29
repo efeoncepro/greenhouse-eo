@@ -1,7 +1,7 @@
 # Home de Efeonce — «La órbita»
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-29 por Claude
 > **Documentacion tecnica:** [HOME_INICIO_ELEMENTOR_MODULES_V1.md](../../architecture/public-site/HOME_INICIO_ELEMENTOR_MODULES_V1.md)
@@ -57,8 +57,14 @@ relación de trabajo, no como resultado de un servicio específico.
 
 ## Cómo se comporta en distintas pantallas
 
-- En teléfono, la sección AEO se lee como una sección normal: la etapa avanza con cada pregunta. Se ocultan los Sparks de
-  media altura, y las tarjetas del motor se ubican en las cuatro esquinas con letra más chica.
+- En teléfono y tablet (pasada del 2026-10-29), cada escena tiene su versión táctil: deslizar la lente del hero cambia la
+  línea; tocar un Spark muestra qué hace (y, si nadie toca, la sección los va presentando uno a uno); deslizar cambia la
+  cita de los testimonios o la vista del tablero de Greenhouse; las cintas de trabajos se pueden arrastrar.
+- Las escenas que dependen del scroll (el motor, la respuesta AEO, el ciclo del método) ocurren mientras se ven en
+  pantalla. En AEO, la respuesta cambia al bajar, como dice la pantalla. Se ocultan los Sparks de media altura y las
+  tarjetas del motor se ubican en las cuatro esquinas.
+- La barra inferior de acciones aparece después del inicio y se detiene antes de «Conversemos»; mientras se muestra, el
+  selector de tema claro u oscuro sube para no quedar debajo.
 - Si la persona tiene activada la opción de reducir movimiento, todo queda quieto y legible.
 - Para lectores de pantalla, el título principal se lee completo: «¿Qué necesita tu marketing? Crecer, destacar,
   aparecer, rendir y vender.». Las letras animadas son decorativas.

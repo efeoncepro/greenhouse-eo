@@ -1,7 +1,7 @@
 # Home Inicio Elementor Modules V1
 
 > **Tipo de documento:** Contrato técnico (public site)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-29 por Claude (rediseño de la home «La órbita × Pingback»)
 > **Ultima actualizacion:** 2026-10-29 por Claude
 > **Documentacion funcional:** [home-efeonce-la-orbita.md](../../documentation/public-site/home-efeonce-la-orbita.md)
@@ -158,7 +158,37 @@ Se importa siempre como **adjunto nuevo** (las redes cachean por URL) y queda ta
 `_elementor_page_settings.post_featured_image`, porque Elementor reescribe la featured image al guardar desde el
 editor. La anterior (`248149`, arte 2025, WebP 2000×960) sigue en la biblioteca.
 
-## Invariantes
+## Móvil y tablet (pasada 2026-10-29)
+
+Objetivo del operador: que en teléfono la home sea igual de espectacular que en escritorio. Tres auditorías en paralelo
+(ritmo y tipografía, escenas interactivas, touch y accesibilidad) a 320/360/390/430/768/1024 px; los cambios viven en
+`inicio-source/host.css` (capa responsive), `inicio-source/page.css` (capa de página sin scope), el compilador y
+`inicio-landing.js`.
+
+Cortes: `≤360`, `≤520`, `≤699`, `≤900` (teléfono/tablet vertical, la misma frontera que `narrow()` en JS), `521–900`,
+`640–900`, `700–900` y `901–1180` (tablet horizontal / laptop chico). Sobre 1180 no cambia nada.
+
+| Sección | Teléfono | Tablet |
+| --- | --- | --- |
+| Hero | Lente `min(64vw,300px)` que sigue al dedo: deslizar cambia la línea, tocar pasa a la siguiente; botones de ancho completo; la rotación se pausa fuera de pantalla (`.hero.idle`). | Grilla de dos columnas desde 700 px. |
+| Motor | La escena se resuelve con la etapa centrada en pantalla, no al salir; las tarjetas van a las esquinas (`ORD_NARROW`) con texto que envuelve; el copy de la solución espera a la escena resuelta (`[data-gh-ready]`); la flotación sólo corre con la escena visible. | Fichas de 200 px. |
+| Líneas | Pestañas de 44 px con chevron; al abrir una línea la página la lleva bajo la navegación; la foto se ve en la tarjeta. | Cuerpo a dos columnas con foto. |
+| Trabajo | Arrastrar una cinta la recorre (Web Animations sobre la animación CSS) y retoma al soltar; con `saveData` sólo pósters. | — |
+| AEO | Vuelve a avanzar con el scroll («Baja para ver cómo cambia la respuesta» se cumple): la etapa sigue a la respuesta en pantalla; riel de etapas horizontal; filas apiladas a su alto real (`--ty`); motores en una fila con scroll y el activo a la vista. | Etapas con scroll igual que teléfono. |
+| Agentes | Tocar un Spark lo enciende y muestra su leyenda bajo el copy (`.sk-live`, `aria-live`); sin tocar, un recorrido guiado enciende uno cada 3,2 s; la pista dice «Toca un Spark.» en touch. | Altura `clamp(820px,100vw + 140px,1080px)`. |
+| Greenhouse | KPI a dos columnas sin cortes; la línea del gráfico se dibuja al llegar a pantalla; deslizar el tablero cambia de vista. | KPI a cuatro columnas desde 640 px. |
+| Método | Las cuatro etapas y «Ciclo completo» ocurren con el anillo entero en pantalla; estaciones en grilla 2×2 bajo el anillo, tocables; la descripción del paso va fuera del anillo (`.m-desc`). | Brújula con la estación sur visible. |
+| Respaldo | Testimonios en una sola celda (alto estable); deslizar cambia la cita y elegir una detiene la rotación (WCAG 2.2.2); la rotación sólo corre con la sección visible; los partners se reparten en grilla al llegar (`gh-stack`). | Abanico dimensionado con `cqw`. |
+| FAQ | Al abrir una respuesta bajo otra abierta, la pregunta tocada queda bajo la navegación. | — |
+| Agenda | El correo es un enlace `mailto:`; «Copiar» anuncia «Correo copiado» (`aria-live`) y tiene respaldo sin la API de portapapeles. | — |
+
+Dock y selector de tema: la sección `#top` marca el inicio del dock compartido (`data-landing-dock-start`) y `#agenda`
+su parada (`data-landing-dock-stop`); en `page.css`, mientras el dock se muestra (≤1180 px), el selector claro/oscuro
+de Ohio (`.elements-bar`) sube 76 px para no quedar debajo.
+
+Movimiento reducido: todas las escenas quedan en su estado final legible; las cintas se vuelven scroll horizontal con
+snap; no hay recorrido guiado ni rotación de citas.
+
 
 - No reescribir el cuerpo de `251731` fuera de `publish-inicio-elementor-page.php` con `expectedDataSha`.
 - No portar el menú dibujado del canvas ni modificar header/footer desde este carril.
@@ -174,8 +204,16 @@ editor. La anterior (`248149`, arte 2025, WebP 2000×960) sigue en la biblioteca
 - El canvas usa reset `border-box` (no el `content-box` de Nosotros).
 - Los widgets laterales de Ohio necesitan rieles desde 1181 px (`--gh-rail`).
 - En el sitio, `offsetTop` es relativo al contenedor de Elementor: medir con `getBoundingClientRect().top + scrollY`.
-- Móvil: reservar espacio para el rótulo de la lente; AEO pasa a sección normal (la etapa avanza por pregunta);
-  Sparks a media altura ocultos (`gh-mid`); tarjetas del motor a las cuatro esquinas con tipografía menor.
+- Móvil: reservar espacio para el rótulo de la lente; AEO es sección normal (sin sticky) y desde la pasada móvil la
+  etapa avanza con el scroll, no por pregunta; Sparks a media altura ocultos (`gh-mid`); tarjetas del motor a las
+  cuatro esquinas con texto que envuelve.
+- Reglas del canvas con dos clases (`.mstep.s1`) ganan a una regla responsive de una clase: en móvil hay que repetir
+  la propiedad en el mismo selector compuesto (pasó con la alineación de las estaciones del método).
+- El contador de KPI arrancaba en negativo porque el primer frame de `requestAnimationFrame` llega con un timestamp
+  anterior al `performance.now()` del arranque: el progreso se acota a `[0,1]`.
+- Si un texto cambia de estructura, las claves `fNNN_` del schema se renumeran; es seguro porque los widgets de
+  `251731` sólo guardan título y márgenes (los textos salen de los defaults del schema). Antes de desplegar, confirmar
+  que la página no tenga valores `fNNN_` guardados.
 - Las palabras del hero dentro del `<h1>` ensuciaban su texto accesible: se movieron a `<template>`.
 - Pre-live local: render de todos los módulos con stubs (`tmp/inicio-local/render.php`, basado en
   `verify-source-led-render.php`), servido estático y revisado en navegador antes de tocar el sitio.
@@ -184,6 +222,8 @@ editor. La anterior (`248149`, arte 2025, WebP 2000×960) sigue en la biblioteca
 
 ## Pendientes
 
+- Pasada móvil 2026-10-29: código y compilado listos y verificados en local (320/390/768/1024); despliegue a
+  producción pendiente de autorización del operador.
 - PageSpeed / Lighthouse y Core Web Vitals de campo: no medidos (cuota pública de PSI agotada el 2026-10-29).
 - Prueba de guardar y recargar desde el editor de Elementor: no registrada en este rollout.
 - Push de `af1a785` al runtime y de los commits de `develop` en Greenhouse.

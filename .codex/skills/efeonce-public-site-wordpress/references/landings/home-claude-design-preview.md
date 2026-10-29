@@ -59,6 +59,14 @@
 - SEO backlog (global, not the Home body): WebSite description = site tagline «Agencia de marketing 360°»; no X account in
   Yoast (`twitter_site`); Slider Revolution `sr7.js` and Font Awesome brands load on the Home without use; field CWV and
   PageSpeed not measured (public PSI quota exhausted 2026-10-29).
+- Mobile/tablet pass 2026-10-29 (operator: «igual de espectacular o mejor en mobile»): breakpoints ≤360/≤520/≤699/≤900
+  plus 521–900/640–900/700–900/901–1180 in `inicio-source/host.css`; touch equivalents for every hover scene (hero lens
+  swipe/tap, Spark tap legend `.sk-live` + guided tour, quote swipe, partner deal-in `gh-stack`, ribbon drag, dashboard
+  swipe); motor/method resolve while on screen; AEO advances with scroll again on phones (rows stacked at real height via
+  `--ty`); dock start/stop on `#top`/`#agenda`; `page.css` lifts Ohio's `.elements-bar` 76 px while the dock shows.
+  Traps: canvas two-class selectors (`.mstep.s1`) beat one-class responsive rules; a text-structure change renumbers
+  schema keys `fNNN_` (safe only while page `251731` stores no `fNNN_` values — check before deploy). Code verified
+  locally at 320/390/768/1024; production deploy awaiting operator authorization. Contract: `HOME_INICIO_ELEMENTOR_MODULES_V1.md` §Móvil y tablet.
 - Pending: in-editor save/reload not verified; keyboard traversal of the scenes not certified; the agents offer still
   has no own landing (CTA goes to the agenda).
 

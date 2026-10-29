@@ -113,6 +113,28 @@ exige un post publicado en el destino). Para retirar páginas hacia `/` se usan 
 Yoast `WPSEO_Redirect('origen', '/', 301, 'plain')` + `wp_trash_post`, con corrida en seco y guardas de id, título,
 estado y menú. Rollback: `wp_untrash_post( <id> )`, restaurar su estado y borrar la redirección del origen.
 
+## Pasada móvil y tablet (2026-10-29, tarde)
+
+Pedido del operador: «la experiencia debe ser igual de espectacular o mejor en mobile que en desktop». Tres subagentes
+auditaron el sitio en vivo a 320/360/390/430/768/1024 px (ritmo y tipografía; escenas interactivas; touch y
+accesibilidad). Hallazgos principales y su corrección:
+
+- Escenas que en teléfono se resolvían fuera de pantalla (motor, método) o no avanzaban (AEO): ahora se resuelven con la
+  etapa en pantalla y AEO vuelve a avanzar con el scroll.
+- Interacciones que dependían del hover (Sparks, abanico de partners, pausa de citas, lente del hero): equivalentes
+  táctiles (tocar, deslizar, recorrido guiado, reparto al llegar).
+- Cortes de texto y objetivos táctiles chicos (pills, pestañas, segmentos, KPI): 44 px mínimo y texto que envuelve.
+- Accesibilidad: elegir una cita detiene la rotación; leyenda de Sparks y copia del correo con `aria-live`; correo como
+  `mailto:`; estaciones del método operables con teclado.
+- El dock compartido no tenía inicio/parada en la home y tapaba el selector de tema de Ohio.
+
+Verificación local (render con stubs, servidor estático): 320, 390, 768 y 1024 px sin desborde horizontal ni errores
+de consola; escenas revisadas sección por sección. Encontrado y corregido en esa revisión: pista de Sparks partida en
+dos columnas, estaciones del método con alineación mixta (especificidad del canvas) y contador KPI que arrancaba en
+negativo. Paquete acotado: 190 archivos, 7 cambiados (5 de `includes/inicio/`, CSS y JS), sha
+`82a18c49…`. La página no tiene textos `fNNN_` guardados (verificado en vivo), así que la renumeración de claves de los
+schemas `agenda` y `agentes` no altera contenido. **Despliegue a producción: pendiente de autorización.**
+
 ## Commits
 
 - Greenhouse `develop` (locales, sin push): `5532e6371` (home en vivo), `e023f811f` (OG + videos preparados),
@@ -130,6 +152,7 @@ No es del cuerpo de la home:
 
 ## Pendientes
 
+- Desplegar la pasada móvil y verificarla en vivo (dock, selector de tema, escenas táctiles) en teléfono real.
 - Medir PageSpeed / Lighthouse y CWV de campo cuando haya cuota.
 - Prueba de guardar y recargar desde el editor de Elementor (no registrada en este rollout).
 - Push de `af1a785` al runtime y de los commits de `develop`.

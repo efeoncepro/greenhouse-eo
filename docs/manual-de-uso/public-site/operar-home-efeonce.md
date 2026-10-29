@@ -145,7 +145,10 @@ Snapshots del rollout del 2026-10-29: cuerpo `_gh_home_orbita_before_20261029_01
 
 ## Qué revisar después
 
-- 1440, 1280 y 390 px: sin desborde horizontal, sin imágenes rotas, sin errores de consola.
+- 1440, 1280, 1024, 768, 390 y 320 px: sin desborde horizontal, sin imágenes rotas, sin errores de consola.
+- En teléfono (o con emulación táctil): deslizar la lente del hero cambia la línea; tocar un Spark muestra su leyenda;
+  la escena AEO avanza al bajar; el método recorre sus cuatro pasos con el anillo en pantalla.
+- El dock inferior aparece tras el hero, se detiene antes de la agenda y el selector claro/oscuro no queda debajo.
 - El diálogo del agendador abre desde el módulo agenda (no agendes una reunión de prueba).
 - Canónico `/`, `index, follow`, título y descripción intactos; un solo `<h1>`.
 - Al cargar no se descarga video (los videos de trabajos sólo arrancan en pantalla).
@@ -170,7 +173,9 @@ Snapshots del rollout del 2026-10-29: cuerpo `_gh_home_orbita_before_20261029_01
 | Los widgets laterales de Ohio se montan sobre el contenido en pantallas anchas | Hacen falta rieles desde 1181 px (`--gh-rail`). |
 | Una escena de scroll se activa en el lugar equivocado | En el sitio, `offsetTop` es relativo al contenedor de Elementor; mide con `getBoundingClientRect().top + scrollY`. |
 | El título accesible se lee con palabras sueltas repetidas | Las palabras del hero quedaron dentro del `<h1>`; deben vivir en `<template data-gh-words>`. |
-| En móvil el rótulo de la lente se corta o la escena AEO no avanza | Reserva espacio para el rótulo; en móvil AEO es sección normal y la etapa avanza por pregunta. |
+| En móvil el rótulo de la lente se corta o la escena AEO no avanza | Reserva espacio para el rótulo; en móvil AEO es sección normal y la etapa avanza con el scroll de la respuesta. |
+| Una regla responsive no se aplica a un elemento del canvas | El canvas usa selectores de dos clases; repite la propiedad en el selector compuesto dentro del `@media`. |
+| Un texto editado en Elementor aparece en otro campo tras un despliegue | Cambió la estructura del texto y se renumeraron las claves `fNNN_`; republica los textos desde el editor o revierte el despliegue. |
 | En móvil hay Sparks encima del texto o las tarjetas del motor chocan | Los Sparks de media altura van ocultos (`gh-mid`); las tarjetas del motor van a las cuatro esquinas con letra menor. |
 | El editor muestra un layout por cada fila en Sparks o partners | Es por los estilos inline por fila; está aceptado. |
 | Al compartir se ve la imagen vieja | Caché de la red social: refresca en LinkedIn Post Inspector o Facebook Sharing Debugger. |
