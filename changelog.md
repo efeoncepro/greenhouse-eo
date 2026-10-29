@@ -4,14 +4,13 @@
 
 ## 2026-10-29 — Prospección: Sales Navigator Core, portafolio y listas
 
-[Flujo interactivo](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md) ejercitado en Chrome autenticado:
-filtros laterales de cuentas/personas, perfiles, paginación, configuración y verificación tras recarga.
-[Portafolio e ICP](docs/commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md): 12servicios con landing y 5Personas;
-[cartera financiera](docs/commercial/prospects/servicios-financieros-chile-2026-10/README.md): 3listas sectoriales,
-31cuentas nominales verificadas y Haulmer incierto; 23personas guardadas en 5listas por servicio (3/4/9/3/4).
-Core con saldo150 observado; 50 iniciales conservados como historia, conexión primero e InMail táctico.
-[Cierre docs/skills](docs/audits/commercial/2026-10-29-sales-navigator-docs-skills.md): B2B espejo, rutas Commercial/Customer Model,
-política, capas técnica/funcional/manual y expedientes BCI/BICE conciliados. Sin comunicaciones, créditos, CRM ni runner desatendido.
+[Flujo y configuración](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md):Chromeautenticado,
+12servicios conlanding/5Personas y listas nativas porsector/servicio,con readback. [Ampliaciónposterior](docs/commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md):
+47cuentas nominales (15nuevas,Haulmerresuelto) y37personas finales. Correcciónexpresa deJulio:CommunityManagers
+no son prospectos; liderazgo funcional para impulsar contratación antes de afinidadtécnica.14membresías propias
+retiradas,8responsables incorporados para corregir;22incorporaciones de personas permanecen. Política,docs,
+skills B2B/Commercial/CustomerModel y fixtureP87v18 actualizados. Sin mensajes,solicitudes,InMail,CRM o scheduler.
+[Cierreanterior](docs/audits/commercial/2026-10-29-sales-navigator-docs-skills.md) conserva sus cifras históricas.
 
 ## 2026-10-27 — SKY: ADR y comparación local de cuentas operativas
 

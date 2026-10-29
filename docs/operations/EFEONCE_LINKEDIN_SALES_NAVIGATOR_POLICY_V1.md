@@ -9,6 +9,24 @@
   El recurso sigue sujeto a uso táctico y selectivo.
 - **Marco:** [decisión B2B](../architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md).
 
+## Selección de interlocutores — corrección posterior del 29/10
+
+Julio aclaró: **«un community manager no me interesa prospectarlo»**. La afinidad técnica/funcional con un
+servicio no basta para incorporar una persona a las listas comerciales de Efeonce. Priorizar liderazgo de la
+función y posibilidad de impulsar contratación: gerencia, subgerencia, dirección, head o jefatura pertinente,
+con señales de estrategia, equipo, inversión, agencias/proveedores u ownership de la decisión.
+
+No prospectar Community Managers, redactores, analistas, especialistas, atención operativa o validadores
+técnicos por coincidencia de servicio. Pueden conservarse como investigación/adyacentes del grupo comprador;
+no son destinatarios comerciales por defecto. Un títuloManager/Lead o el seniority clasificado por LinkedIn
+no bastan: leer alcance real. BrandManager con agencias a cargo sí puede ser interlocutor pertinente.
+Presupuesto, autoridad contractual y demanda no se infieren; se validan después. Tampoco exigir esos hechos
+confirmados para investigar una jefatura funcional pertinente.
+
+Las Personas nativas amplias pueden devolver operadores: aplicar este gate antes de guardar en listas
+comerciales. Para corregir una inclusión, retirar sólo esa membresía, conservar historial/otras listas y
+releer el conjunto. [Aplicación, depuración y resultado47cuentas/37personas](../commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md).
+
 ## Regla de elección de canal
 
 | Situación del prospecto | Ruta operativa |

@@ -1,5 +1,7 @@
 # Cartera financiera Chile — listas y contactos candidatos
 
+**Corte histórico anterior a la ampliación y corrección compradora.** El [estado posterior](AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md) registra47cuentas,37personas,Haulmerresuelto y retiro de perfiles operativos. Las cifras y reglas de inclusión que siguen describen aquella fase, no la selección comercial vigente.
+
 > **Ampliación posterior autorizada:** [23 personas guardadas en cinco listas por servicio](LISTAS-PERSONAS-POR-SERVICIO-2026-10-29.md).
 > Este documento conserva el corte previo de investigación y guardado de empresas.
 

@@ -1,10 +1,16 @@
 # Servicios financieros Chile — cartera y continuidad
 
 Corte **29-10-2026**, America/Santiago. Fuentes: UI autenticada de Sales Navigator Core de Julio Reyes
-y expedientes enlazados. Las listas guardadas son una cartera de investigación por afinidad de cuenta/rol;
+y expedientes enlazados. Las listas guardadas son una cartera de investigación de cuentas y liderazgo funcional;
 no un pipeline calificado ni evidencia de compra activa.
 
 ## Estado más reciente y rutas de recuperación
+
+**Corte posterior vigente:** [ampliación y criterio comprador](AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md)
+· [manifest nominal](AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.json): **47cuentas/37personas**.15cuentas
+nuevas,Haulmerresuelto;22incorporaciones de personas permanecen tras14retiros de membresías propias.
+Julio excluyóCommunityManagers y ejecución pura: liderazgo de función/contratación antes de afinidad técnica.
+Los cortes siguientes conservan su historia y no equivalen al estado actual.
 
 | Capa | Evidencia | Estado |
 | --- | --- | --- |
@@ -19,16 +25,16 @@ no un pipeline calificado ni evidencia de compra activa.
 | Lista nativa | Contador observado | Miembros nominales verificados |
 | --- | ---: | ---: |
 | [Efeonce \| Chile \| Banca \| 2026-10](https://www.linkedin.com/sales/accounts/dashboard?listGroup=CUSTOM_LISTS&listId=7521632464428240896) | 10 | 10 |
-| [Efeonce \| Chile \| Seguros e Inversiones \| 2026-10](https://www.linkedin.com/sales/accounts/dashboard?listGroup=CUSTOM_LISTS&listId=7521632789671071745) | 10 | 10 |
-| [Efeonce \| Chile \| Fintech y Pagos \| 2026-10](https://www.linkedin.com/sales/accounts/dashboard?listGroup=CUSTOM_LISTS&listId=7521632742405529601) | 12 | 11 |
+| [Efeonce \| Chile \| Seguros e Inversiones \| 2026-10](https://www.linkedin.com/sales/accounts/dashboard?listGroup=CUSTOM_LISTS&listId=7521632789671071745) | 22 | 22 |
+| [Efeonce \| Chile \| Fintech y Pagos \| 2026-10](https://www.linkedin.com/sales/accounts/dashboard?listGroup=CUSTOM_LISTS&listId=7521632742405529601) | 15 | 15 |
 
-**32 en contadores / 31 entidades nominales.** Haulmer recibió confirmación de guardado y su cuenta mostró
-una lista, pero no apareció nominalmente en el dashboard fintech y la búsqueda dentro de la lista dio cero.
-La causa y asociación concreta siguen sin verificarse. Sus siete personas sí quedaron guardadas y releídas;
-ese hecho no resuelve la membresía de la empresa. No afirmar 32 cuentas nominales ni atribuirlo a indexación.
+**47cuentas nominales, sin discrepancia pendiente al cierre posterior.** El primer corte tuvo32en
+contadores/31nominales yHaulmerincierto. En la ampliación se releyeron las3listas yHaulmer aparece en
+fintech/pagos; se preserva la incertidumbre histórica sin inventar su causa. Quinceincorporaciones nuevas
+quedaron reconocidas y nominalmente verificadas después de una lectura inicial incompleta.
 
 La búsqueda base fue sede Chile + Servicios financieros + bandas 51+, sin filtro de relación; se revisaron
-páginas 1–3 del conjunto de 295. Una pasada de software + fintech añadió cobertura tecnológica acotada.
+páginas1–3 inicialmente y2/4 en la ampliación del conjunto295. Una pasada de software + fintech añadió cobertura tecnológica acotada.
 Sede Chile no incluye necesariamente toda operación local extranjera; la clasificación LinkedIn no acredita
 actividad regulada. BCI/MACHBANK y BICE/BICE VIDA requieren coordinar entidad, iniciativa y presupuesto para
 evitar tratar cada marca o página como una oportunidad independiente.
@@ -37,15 +43,15 @@ evitar tratar cada marca o página como una oportunidad independiente.
 
 | Lista nativa | Personas / membresías verificadas |
 | --- | ---: |
-| [Efeonce \| Finanzas CL \| SEO-AEO, Contenidos y Social](https://www.linkedin.com/sales/lists/people/7521636011433635841) | 3 |
-| [Efeonce \| Finanzas CL \| Marca, Creatividad e Influencia](https://www.linkedin.com/sales/lists/people/7521636034506563584) | 4 |
-| [Efeonce \| Finanzas CL \| Growth, Medios e Inbound](https://www.linkedin.com/sales/lists/people/7521636056379809792) | 9 |
-| [Efeonce \| Finanzas CL \| Web, Producto y Experiencia](https://www.linkedin.com/sales/lists/people/7521636078219526144) | 3 |
-| [Efeonce \| Finanzas CL \| CRM, RevOps y Lifecycle](https://www.linkedin.com/sales/lists/people/7521636092668833793) | 4 |
+| [Efeonce \| Finanzas CL \| SEO-AEO, Contenidos y Social](https://www.linkedin.com/sales/lists/people/7521636011433635841) | 2 |
+| [Efeonce \| Finanzas CL \| Marca, Creatividad e Influencia](https://www.linkedin.com/sales/lists/people/7521636034506563584) | 9 |
+| [Efeonce \| Finanzas CL \| Growth, Medios e Inbound](https://www.linkedin.com/sales/lists/people/7521636056379809792) | 14 |
+| [Efeonce \| Finanzas CL \| Web, Producto y Experiencia](https://www.linkedin.com/sales/lists/people/7521636078219526144) | 4 |
+| [Efeonce \| Finanzas CL \| CRM, RevOps y Lifecycle](https://www.linkedin.com/sales/lists/people/7521636092668833793) | 8 |
 
 Las primeras veinte tarjetas de Global66, Tenpo, MACHBANK, Fintual y Haulmer se preservan como corte de
 descubrimiento; después se abrieron los perfiles, se guardaron y se añadieron tres de Web/Producto de
-Haulmer. Cada persona tiene un frente principal en este corte: 23 identidades, no 20 + 23. «Finanzas CL»
+Haulmer. Ese corte inicial tuvo23identidades; la tabla vigente registra37tras la depuración. «Finanzas CL»
 identifica la cohorte de cuentas; Vivian está en Colombia y Cecilia/Leonardo en México según el corte leído.
 No les atribuye presupuesto o alcance comprador chileno. Las listas preexistentes del operador se conservaron.
 

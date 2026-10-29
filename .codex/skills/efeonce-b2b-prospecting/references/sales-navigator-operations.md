@@ -62,6 +62,19 @@ son observaciones fechadas, no cuotas ni resultados esperados. El subconjunto de
 universo pertinente. Excluir o separar bancos centrales, holdings no financieros, páginas inactivas y
 duplicados según la tesis del ejercicio, conservando razón y entidad canónica.
 
+## Gate comprador antes del guardado comercial
+
+Aplicar la [corrección de Julio](../../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md#selección-de-interlocutores--corrección-posterior-del-2910):
+CommunityManager y afinidad técnica no son criterio de prospección de agencia. Priorizar gerencia,
+subgerencia, dirección, head o jefatura con responsabilidad funcional y posibilidad de impulsar contratación;
+leer estrategia/equipo/inversión/agencias/proveedores y scope. No exigir autoridad económica ya confirmada
+para investigar una jefatura, ni certificarla por seniority o palabraManager. Mantener operadores como
+investigación del buying group, fuera de las listas comerciales por defecto.
+
+Las Personas amplias descritas abajo conservan su configuración histórica; un resultado suyo no supera
+este gate automáticamente. La [ronda corregida](../../../../docs/commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md)
+retiró14membresías operativas y verificó47cuentas/37personas. No convertir esos números en cuota.
+
 ## Personas: consultas reutilizables, no el ICP completo
 
 La UI y ayuda consultadas permitían **cinco Personas**, con función, seniority, cargos actuales normalizados
@@ -73,7 +86,8 @@ Marca/Creatividad/Influencia; Web/Producto/Experiencia; y RevOps/CRM/Cliente. So
 reutilizables entre sectores, sin geografía, industria o grado de relación permanentes. Cuenta/lista y mercado
 se aplican en cada búsqueda. Los criterios y títulos exactos viven en el manifest, no se reconstruyen por
 nombre de Persona. En P1 se usó Marketing y seis niveles sin títulos; las otras cuatro usaron títulos sin
-función/seniority. No exigir rango directivo a especialistas que pueden ser problem owners.
+función/seniority. Los especialistas pueden ser problem owners del mapa de investigación; eso no los habilita como
+destinatarios de prospección bajo el gate comprador vigente.
 
 Los cargos se traducen/normalizan y dos chips distintos pueden mostrar el mismo rótulo español. Revisar el
 rol real y unidad en cada resultado: un título no demuestra responsabilidad, presupuesto ni autoridad.
@@ -158,6 +172,18 @@ verificó cinco listas/23 personas únicas/23 membresías, con perfiles abiertos
 no significa auditoría completa de trayectoria ni calificación. Guardar un posible cliente nativo no exige
 correo verificado: el gate de correo individual atribuible corresponde a Contact/Lead en HubSpot y conserva
 su autoridad independiente. La lista nativa no autoriza CRM, mensajes, solicitudes, InMail ni cadencias.
+
+## Cuenta asociada y cargos simultáneos
+
+La fila de una lista puede asociar por defecto una cuenta de voluntariado distinta de la entidad compradora.
+Verificar perfil completo y empleo actual. Menú de fila → Editarcuenta → elegir entre puestos activos →
+Guardar y releer la empresa; `.check()` puede no cambiar el radio, Space funcionó con estado comprobado.
+La asociación nativa no cambia el perfil público ni CRM. El título resumido puede seguir mostrando otra
+posición: registrar esa limitación y sostener el cargo objetivo con el perfil, sin reescribirlo por inferencia.
+
+Para retirar operadores, elegir Eliminar de la lista → sólo esta lista, conservando guardado/otras listas.
+Esperar cierre real del diálogo y tabla estable antes del siguiente menú; la ausencia de una fila o heading
+puede preceder a la estabilización. Ante un click perdido, reinspeccionar y conciliar, no repetir a ciegas.
 
 ## Fiabilidad de UI y evidencia
 

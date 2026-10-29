@@ -69,6 +69,9 @@ Las Personas son filtros de roles; el ICP conserva cuenta, problema, iniciativa 
 Descubrir por encaje antes de filtrar por relación; conexión, seniority y lista guardada no acreditan
 presupuesto, autoridad ni demanda. Servicios/landings, cobertura de roles y membresía se verifican por separado.
 
+En listas comerciales, priorizar liderazgo funcional para impulsar contratación; Julio excluye CM/ejecución
+pura por afinidad técnica. Operadores del mapa de investigación no son destinatarios por defecto.
+
 ## Discovery y caso de negocio por iniciativa
 
 Para preparar reuniones o incorporar su transcripción, cargar el

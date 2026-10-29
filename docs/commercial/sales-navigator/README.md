@@ -3,6 +3,14 @@
 Corte de sesión **29-10-2026**, America/Santiago. Operador: Julio Reyes. Este índice recupera la
 configuración y los resultados del chat; no sustituye una revalidación futura de LinkedIn o HubSpot.
 
+## Corte posterior: ampliación y criterio comprador
+
+[Resultado y corrección del operador](../prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md):
+47cuentas nominales en3listas;37personas en5listas. Haulmerresuelto;CommunityManagers/ejecución pura retirados
+de listas comerciales. Liderazgo funcional para impulsar contratación prima sobre afinidad técnica; título,
+primer grado y presupuesto siguen siendo dimensiones separadas. Los12servicios/5Personas no se modificaron.
+Las Personas amplias son descubrimiento, no autorización automática de inclusión. Los cortes anteriores se conservan.
+
 ## Punto de entrada según el trabajo
 
 | Trabajo | Expediente dueño | Estado probado al cierre de la sesión |

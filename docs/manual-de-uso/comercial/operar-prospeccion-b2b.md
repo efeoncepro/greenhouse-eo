@@ -1,5 +1,7 @@
 # Operar prospección B2B con agentes
 
+**Gate comprador vigente:** Julio excluyóCommunityManagers y ejecución pura como prospectos por afinidad de servicio. Priorizar liderazgo funcional con posibilidad de impulsar contratación; operadores/validadores quedan en investigación. Ver [política](../../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md) y [resultado corregido47cuentas/37personas](../../commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md). Los cortes previos que siguen son históricos.
+
 Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
 aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
 El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;

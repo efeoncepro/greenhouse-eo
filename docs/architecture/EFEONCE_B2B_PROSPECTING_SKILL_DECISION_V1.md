@@ -43,6 +43,14 @@ La captura y lectura posterior en Ajustes mostraron **150 disponibles el 29/10**
 como historia, sin atribuir causa a la diferencia. Saldo futuro y reposición no inferidos.
 No cambia autonomía, scheduler, CRM ni genera comunicaciones.
 
+### Corrección posterior de selección — 29/10
+
+Julio rechazó prospectarCommunityManagers por mera afinidad de servicio. La [política](../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md)
+prioriza liderazgo funcional para impulsar contratación y separa operadores investigados de destinatarios.
+La [ampliación](../commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md)
+verificó47cuentas/37personas tras14retiros de membresías propias;Haulmerresuelto. Corrección de selección
+bajo el adapter vigente, sin nueva autonomía/API/CRM o permiso de envío; configuración12+5 preservada.
+
 ## Context
 
 Evidencia operativa del mismo día: [diccionario completo del portal](../audits/commercial/hubspot-properties-2026-10-11/README.md)

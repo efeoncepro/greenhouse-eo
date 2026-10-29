@@ -1,5 +1,7 @@
 # Prospectar con Sales Navigator desde la sesión de Chrome
 
+**Gate comprador vigente:** Julio excluyóCommunityManagers y ejecución pura como prospectos por afinidad de servicio. Priorizar liderazgo funcional con posibilidad de impulsar contratación; operadores/validadores quedan en investigación. Ver [política](../../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md) y [resultado corregido47cuentas/37personas](../../commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md). Los cortes previos que siguen son históricos.
+
 Ruta ejercitada el **29-10-2026**, con Julio Reyes autenticado en Chrome, perfil Julio.
 Marco: [método aprobado](../../architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md),
 [funcionamiento](../../documentation/comercial/prospeccion-b2b.md) y

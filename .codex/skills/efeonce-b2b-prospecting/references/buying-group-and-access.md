@@ -52,6 +52,10 @@ champion ni oportunidad. Varios servicios pueden compartir frente y una persona 
 personas únicas aparte de membresías y justificar pertenencias adicionales por responsabilidad/iniciativa.
 Guardar un posible cliente nativo no exige correo, no es alta Contact/Lead ni permiso de contacto.
 
+Para listas comerciales LinkedIn, el [gate comprador](../../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md)
+excluye CM/ejecución pura por afinidad de servicio. Operador relevante para investigar el buying group no
+equivale a destinatario comercial: priorizar liderazgo funcional de contratación y mantener esa distinción.
+
 ## Mapa de acceso
 
 Para LinkedIn aplicar [Core, conexiones e InMail](../../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md):

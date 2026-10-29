@@ -1,5 +1,9 @@
 # Commercial
 
+**SalesNavigator, corte posterior29/10:** [47cuentas/37personas y criterio comprador](prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md).
+Julio excluyeCommunityManagers/ejecución pura de listas comerciales; liderazgo funcional para impulsar contratación.
+Haulmerresuelto. Los bloques de guardado iniciales que siguen conservan sus cifras de fase.
+
 - [Sales Navigator Core — operación y filtros con agentes](../manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md):
   adapter interactivo sobre Chrome/Julio, 15 familias de filtros de cuentas (14 operables), selección por
   relevancia antes de relación y [uso táctico de InMail](../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md).

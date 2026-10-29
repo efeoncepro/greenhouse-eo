@@ -1,5 +1,7 @@
 # Posibles clientes financieros — listas por frente de servicio
 
+**Corte histórico anterior a la ampliación y corrección compradora.** El [estado posterior](AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md) registra47cuentas,37personas,Haulmerresuelto y retiro de perfiles operativos. Las cifras y reglas de inclusión que siguen describen aquella fase, no la selección comercial vigente.
+
 Corte **29-10-2026**, America/Santiago. Actor: Julio Reyes, **Sales Navigator Core**.
 Mandato posterior al guardado de empresas: «También pon en listas (…) basado en nuestros servicios».
 

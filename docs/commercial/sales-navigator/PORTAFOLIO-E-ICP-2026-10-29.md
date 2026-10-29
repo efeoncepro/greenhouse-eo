@@ -1,5 +1,7 @@
 # Sales Navigator — portafolio completo y modelo operativo de cliente
 
+**Corrección comercial posterior:** las Personas amplias que se documentan aquí incluyen operadores como cobertura de investigación. Julio los excluyó de las listas comerciales por mera afinidad técnica: aplicar [criterio comprador vigente](../../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md#selección-de-interlocutores--corrección-posterior-del-2910). No se cambiaron las12fichas ni los5filtros nativos durante esa depuración.
+
 Corte **29-10-2026**, America/Santiago. Owner: Commercial / Julio Reyes.
 Mandato: ampliar la configuración de servicios y perfiles ideales para cubrir el portafolio de Efeonce,
 incluyendo web, HubSpot, contenidos, redes sociales e influencers, además de las cuatro entradas iniciales.

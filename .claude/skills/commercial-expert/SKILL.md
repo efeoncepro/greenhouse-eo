@@ -373,3 +373,6 @@ Para cuentas, filtros laterales, servicios/landings, Personas y listas, cargar
 Las cuentas se agrupan por sector y los interlocutores por frente de servicio y responsabilidad real;
 conservar una tesis por iniciativa y comprobar membresías nominales tras recargar. Fit, acceso y demanda
 son decisiones separadas; guardar listas no autoriza comunicaciones ni acredita calificación CRM.
+
+En listas comerciales, priorizar liderazgo funcional para impulsar contratación; Julio excluye CM/ejecución
+pura por afinidad técnica. Operadores del mapa de investigación no son destinatarios por defecto.

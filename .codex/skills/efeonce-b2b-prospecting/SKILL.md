@@ -15,6 +15,10 @@ Construir el buying group sin limitarlo a primer grado y evaluar el acceso por p
 conexión en una cuenta no acredita acceso a su decisor. La observación de Julio sobre posibles contactos
 valiosos fuera del primer grado es una hipótesis, no un hecho general de su red.
 
+Para listas comerciales LinkedIn, aplicar además el gate comprador de esa política: Julio excluye
+Community Managers/ejecución pura por afinidad de servicio. Priorizar liderazgo funcional pertinente para
+impulsar contratación; operadores y validadores quedan en investigación, no como destinatarios por defecto.
+
 ## Criterio para nuevas comunicaciones
 
 Antes de preparar una apertura, reactivación, seguimiento o respuesta comercial de captación/expansión,

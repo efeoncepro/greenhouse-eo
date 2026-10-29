@@ -1,23 +1,22 @@
 # Handoff
 
-## 2026-10-29 — Sales Navigator: configuración y listas verificadas
+## 2026-10-29 — Sales Navigator: cuentas ampliadas y criterio comprador corregido
 
-[Cierre integral](docs/audits/commercial/2026-10-29-sales-navigator-docs-skills.md) ·
-[manual interactivo](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md): Chrome/Julio,
-locators Playwright vía `cua_repl`; filtros laterales, perfiles, actividad, paginación y readback nativo.
-[BCI](docs/commercial/prospects/contactos-conocidos-banca-retail-2026-10/BCI-SALES-NAVIGATOR-2026-10-29.md) y
-[BICE VIDA](docs/commercial/prospects/bice-vida-2026-10/SALES-NAVIGATOR-2026-10-29.md) conservan cortes iniciales.
-[Portafolio e ICP](docs/commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md): 12servicios con landing/copyES y
-5Personas guardados y releídos. [Cuentas financieras Chile](docs/commercial/prospects/servicios-financieros-chile-2026-10/README.md):
-15 familias de filtros; universo295 sin relación, subconjuntos31/28 de acceso; pasada fintech/software adicional.
-Tres listas sectoriales: banca10, seguros/inversiones10, fintech/pagos11 nominales; contador fintech12 y
-asociación Haulmer sin resolver. [Personas por servicio](docs/commercial/prospects/servicios-financieros-chile-2026-10/LISTAS-PERSONAS-POR-SERVICIO-2026-10-29.md):
-23únicas/5listas (Search3/Marca4/Growth9/Web3/CRM4), membresías exactas releídas; listas previas preservadas.
-[Core/InMail](docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md): 150disponibles observados;
-50 iniciales históricos. Conexión → aceptación → abordaje habitual; InMail táctico con motivo individual.
-Decisores fuera del primer grado sigue como hipótesis de Julio; ubicación de cuenta/persona y autoridad separadas.
-Skills B2B/Commercial/Customer Model y capas técnica, funcional y manual conciliadas. Sin comunicaciones,
-solicitudes, gasto, altas CRM ni runner desatendido. Pendiente Haulmer; próximo elegir cuenta/tesis y validar grupo comprador.
+[Último corte y manifest](docs/commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md):
+**47cuentas nominales** (banca10/seguros22/fintech15),15nuevas;Haulmerresuelto por fila nominal.
+**37personas/5listas**:Search2/Marca9/Growth14/Web4/CRM8, conjuntos releídos. Julio rechazó prospectarCM;
+se retiraron14membresías propias de ejecución/afinidad sin liderazgo y se incorporaron8responsables para
+corregir la ronda inicial.22incorporaciones de personas permanecen;15anteriores conservadas.
+[Política](docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md): liderazgo funcional para impulsar
+contratación, no sólo afinidad técnica/servicio. Operadores/validadores quedan en investigación; cargo no
+prueba presupuesto. Sin restricción a primer grado. BárbaraLetelier asociada nativamente aBICEVIDA;
+fila conserva título de voluntariado3xi, cargo pertinente confirmado en perfil completo.
+[Portafolio12+5](docs/commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md) permanece guardado; Personas
+amplias requieren gate comprador. [Método/manual](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md)
+y skills actualizados; fixtureP87v18 estructural, sin eval conductual afirmada. Core150observado en corte
+anterior; sin mensajes, solicitudes,InMail,CRM ni scheduler. Próximo: elegir iniciativa/cuenta, validar
+necesidad/autoridad/proveedor e historial antes de comunicar. [Cierre anterior](docs/audits/commercial/2026-10-29-sales-navigator-docs-skills.md)
+y cortes previos conservan su historia; no son estado actual de las listas.
 
 ## 2026-10-27 — SKY: ADR y puente operativo probado localmente
 
