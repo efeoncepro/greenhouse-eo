@@ -3,6 +3,16 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-28 — Retest dos RP contra fuentes Auth ca97eecd1:35PASS
+
+- `local`: Rooms `8750750` intacto y issuerQA con fuentes de `ca97eecd1`,35checksPASS/Chrome/PG
+  efímero. Checkout Auth avanzó sólo dos docs a0ab888728; hashes/ausencia de diff fuente comprobados.
+- Login legítimo, cookies/callbacks en ambos sentidos, preservación de transacción y logout aislado
+  mantienen resultados. Se ejecuta el issuerQA, **no services/auth-server/server.ts completo**;
+  RP2 es mismo consumer, sin HTTPS/MFA/productos completos ni rollout.
+- Bases temporales retiradas, puertos libres; sincorreo/canary/push/flags/deploy ni cambio de fuentes.
+  [Recibo y procedencia](../../../../docs/audits/rooms/2026-10-28-two-rp-auth-ca97eecd1.md).
+
 ## 2026-10-28 — Dos adapters RP con Auth real:35checksPASS
 
 - `local`: Rooms `8750750`, Auth `e7b127647`; dos createAuthHttp/createAuthService en hosts distintos,

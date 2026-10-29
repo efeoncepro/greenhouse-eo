@@ -15,7 +15,7 @@ API en navegador. Claude Design aún debe conectar/aceptar su UI. [Manual local]
 
 **Aislamiento RP local:** [Tres casos de servicios/persistencia](../../audits/rooms/2026-10-28-cross-rp-persistence-focal.md) PASS sin omisiones; sesión/callback con otro clientId y cookie guest crossRP rechazados. No cierra el recorrido integral de dos aplicaciones RP.
 
-**Dos RP locales:** [35 comprobaciones en navegador con adapters consumer reales y Auth real](../../audits/rooms/2026-10-28-two-rp-auth-adapters.md) PASS, cookies/callbacks/logout aislados en ambos sentidos y controles positivos. RP2 es arnés del mismo consumer; producción/HTTPS y segundo producto completo no acreditados.
+**Dos RP locales:** [35 comprobaciones repetidas con fuentes del candidato Auth ca97eecd1](../../audits/rooms/2026-10-28-two-rp-auth-ca97eecd1.md) PASS; cookies/callbacks/logout aislados y controles positivos. IssuerQA, no server.ts completo; RP2 es arnés del mismo consumer. Producción/HTTPS y segundo producto completo no acreditados.
 
 **Propósito:** plataforma comercial propia para comprender, evaluar y defender propuestas creativas y
 SEO/AEO, combinables en una sala. La implementación actual no acredita todo el alcance de V1/EPIC-052.
