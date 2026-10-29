@@ -81,6 +81,9 @@ No se contrata pentest ni se mantiene pareo histórico obligatorio de proveedore
    overlap>=TTLmax+margen y audit; nunca delegar createKeyVersion al SA del issuer por comodidad.
    Archivos propuestos `auth-server/maintenance/key-rotation.ts`, tests, ops-worker/server/deploy y runbook.
    Root asigna ownership antes de código; retirov1 requiere readbackSQL y evidence, no inferencia del JWKS.
+   **Actualización 29-10:** este carril `ops-worker` fue reemplazado por el
+   [Job aislado aceptado para implementación local](TASK-1833-key-rotation-proposal.md).
+   El candidato está en `codex/auth-pr-develop-stack`; Scheduler/IAM/cloud siguen pendientes.
 4. **Runbooks:** ampliar `docs/operations/runbooks/auth-server.md` y crear incident/key-rotation con comandos
    exactos y pasos de simulacro; conservar revocación canónica por persona/organización/contexto. No SQL manual
    de emergencia que eluda auditoría/grants. Reconciliar el párrafo stale que todavía llama GC follow-up.
@@ -138,6 +141,7 @@ Implementados `rotation_overdue` y cuatro indicadores first-party/OTP dentro del
 ## Propuesta posterior: rotación con privilegios aislados
 
 Discovery25Oct identificó creación KMS previa al registro PG y ausencia de firma previa al cambio activo.
-La [propuesta de Job dedicado](TASK-1833-key-rotation-proposal.md), estado Proposed, detalla ledger,
-recuperación de resultado incierto y SA exclusiva; no amplía la SA compartida de ops-worker.
-Requiere decisión arquitectónica antes de implementación. No existe scheduler nuevo ni ensayo acreditado.
+El [Job dedicado](TASK-1833-key-rotation-proposal.md) fue aceptado el 29-10
+para implementación local: ledger, recuperación de resultado incierto y SA
+exclusiva, sin ampliar `ops-worker`. El candidato local está construido y
+probado; no existe Scheduler nuevo ni ensayo cloud acreditado.

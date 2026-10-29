@@ -539,3 +539,58 @@ el registro efectivo usa la intersección soportada y el endpoint continúa rech
 Esto corrige el bloqueo observado de Claude hospedado sin ampliar autoridad ni scope, dentro de la ejecución
 y certificación aprobadas de TASK-1844. Contrato, fuente y prueba de rechazo/emisión:
 [OAuth contract](EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md#compatibilidad-cimd-comprobada-en-task-1844--2026-09-08).
+
+## Architecture Decision 2026-10-28 — mantenimiento aislado de llaves (TASK-1833)
+
+- **Status:** `Accepted` para implementación local por decisión de Julio del 2026-10-29 («sigamos tus recomendaciones» tras recomendar el Job aislado). Rollout cloud y release retenidos.
+- **Owner:** Platform / Identity para la llave y el command; Ops para deploy, señales y recuperación.
+- **Scope:** rotación y retiro de la llave KMS `auth-server-es256`, registry `greenhouse_auth.signing_keys`, un Cloud Run Job dedicado y su invocación programada. No cambia el issuer HTTP ni los flujos OAuth.
+- **Reversibility:** `two-way-but-slow`; pausar la automatización es inmediato, pero una llave ya activada exige conservar el solapamiento y verificar consumidores antes del retiro.
+- **Confidence / validated as of:** `medium` para la frontera propuesta. Código, runbook y documentación de Cloud Run Jobs contrastados el 2026-10-28; costo tarifario modelado y billing export existente leído a nivel proyecto en CLP. Costo incremental del Job, IAM efectivo y operación cloud aún no medidos.
+
+### Context
+
+La CLI actual crea una versión KMS antes de registrarla en PostgreSQL; si se pierde la respuesta de creación,
+no existe una operación durable que permita reintentar sin riesgo de crear otra versión. La llave v2 está
+`active` y v1 `retiring` según el readback SQL del 28-10; ninguna de esas observaciones autoriza retirar v1.
+El plan histórico de TASK-1833 apunta a Scheduler → `ops-worker`, cuya identidad compartida ampliaría sus
+privilegios administrativos. La [propuesta detallada](../tasks/plans/TASK-1833-key-rotation-proposal.md)
+define el estado recuperable, los límites de IAM y las pruebas antes de construirlo.
+
+### Decisión aceptada para implementación local
+
+Crear `auth-key-maintenance` como **Job de una tarea**, con identidad de runtime y rol PostgreSQL dedicados.
+Un Scheduler separado invocaría sólo `jobs.run` con OAuth para Google APIs, sin overrides ni parámetros que
+seleccionen otra llave. El tick diario haría conciliación; iniciaría una rotación sólo cuando la última
+operación verificada tenga 90 días. Nacería con flag OFF, dry-run ON y Scheduler PAUSED. La exclusión,
+fencing y recuperación de resultados inciertos pertenecerían a un ledger durable en PostgreSQL, no al
+Scheduler ni a la exclusividad de una ejecución Cloud Run. La
+[guía oficial Scheduler → Jobs API](https://docs.cloud.google.com/run/docs/execute/jobs-on-schedule)
+usa OAuth para esa invocación; la [configuración de Jobs](https://docs.cloud.google.com/run/docs/create-jobs)
+permite una tarea y cero reintentos, opciones a fijar y verificar antes del apply. La creación KMS
+incierta detendría nuevas
+creaciones hasta reconciliación auditada. El retiro exigiría prueba de firma nueva, JWKS de ambos `kid`,
+solapamiento y verificación de consumidores; no retiraría automáticamente llaves históricas.
+
+Esta decisión acepta una excepción adicional de build unit en
+[GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md](GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md)
+y reemplaza el carril Scheduler → `ops-worker` de TASK-1833. El candidato local usa
+`services/auth-key-maintenance`, ledger de operaciones y una CLI de baseline; no hay IAM, Job,
+Scheduler, migración aplicada ni rotación cloud por esta aceptación. El Job no automatiza retiro,
+disable ni destroy de versiones: primero exige ensayo del issuer, consumidores, cachés y política
+de conservación. Sin una baseline verificada y la llave anterior retirada, no crea otra versión.
+
+### Alternativas y consecuencias
+
+- Conservar sólo la CLI manual evita un deployable nuevo, pero deja la recuperación de un create incierto al operador.
+- Usar `ops-worker` reutiliza su deploy, pero amplía los permisos de su identidad compartida sobre la llave del emisor.
+- El Job aislado acota permisos y blast radius a cambio de imagen, control plane, ledger, señales y costo operativo propios. El [modelo tarifario preliminar](../tasks/plans/TASK-1833-key-rotation-proposal.md#modelo-preliminar-de-costo-sin-recursos-creados) estima ≈ USD 0,04–0,18/mes de cómputo bruto diario bajo supuestos, más Scheduler y versiones HSM; no equivale a facturación observada. Conservar versiones HSM deshabilitadas hace crecer el costo, por lo que su plazo requiere decisión explícita antes de aceptar.
+
+### Contrato y reapertura
+
+`greenhouse_auth.signing_keys` sigue siendo la autoridad de emisión, KMS conserva la clave
+privada y la CLI reutiliza el command; el Job es sólo otro adapter. Registrar el Job en el release control
+plane, aplicar migración/grants con pruebas, ensayar recuperación y comprobar el SHA/estado de ejecución
+son gates previos a habilitar Scheduler. Los [runbooks](../operations/runbooks/auth-server-key-rotation.md)
+siguen rigiendo la operación manual actual. Reabrir ante un nuevo issuer, TTL/caché distinto, permisos más
+amplios, fallo de reconciliación o costo medido que invalide la cadencia.

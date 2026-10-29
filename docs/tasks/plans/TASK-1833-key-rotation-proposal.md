@@ -1,16 +1,27 @@
 # TASK-1833 — Propuesta de rotación aislada de llaves
 
-- Status: `Proposed`
+- Status: `Accepted for local implementation` (Julio, 2026-10-29); rollout cloud pendiente
 - Date: `2026-10-25`
 - Owner: `Platform / Identity`; coordinación de release: agente raíz
 - Scope: command de mantenimiento, registry Auth, Cloud Run Job y sus identidades; sin ampliar `ops-worker`
 - Reversibility: `two-way-but-slow`; detener el Job es reversible, una activación exige respetar tokens/cachés
-- Confidence: `medium`; diseño contrastado con código, sin implementación ni ensayo cloud
-- Validated as of: `2026-10-25` para código/documentación; infraestructura propuesta no creada
+- Confidence: `medium`; candidato de código/schema local, sin ensayo cloud
+- Validated as of: `2026-10-29` para candidato local; infraestructura no creada
 - Task: [TASK-1833](../in-progress/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md)
 - Plan general: [TASK-1833-plan](TASK-1833-plan.md)
 
-## Decisión propuesta
+## Corte de implementación local 2026-10-29
+
+La elección del Job aislado está aceptada **sólo para implementación local**.
+`codex/auth-pr-develop-stack` contiene candidato de command durable, migración,
+CLI y Job: PostgreSQL desechable 4/4, pruebas focales 44/44 y gates de código
+PASS. [Recibo](../../audits/auth-server/2026-10-29-key-rotation-job-local.md).
+El Job nace OFF/dry-run ON; Scheduler, IAM, migración y ensayo KMS cloud no
+están aplicados. La automatización llega a llave nueva verificada; retiro,
+disable y destroy siguen manuales. Los apartados de discovery de abajo
+describen el estado anterior al candidato cuando así se indica.
+
+## Decisión adoptada para implementación local
 
 Crear un **Cloud Run Job dedicado `auth-key-maintenance`**, con service account propia, que ejecute el
 command de rotación y conciliación de llaves. No añadir permisos KMS, rutas ni dispatch a `ops-worker`,
@@ -21,7 +32,8 @@ Un único Scheduler diario despierta el Job; el command sólo inicia rotación c
 verificada tiene **90 días**, satisfaciendo el piso vigente de **más de 80 días**. La frecuencia diaria
 permite recuperar operaciones y revisar retiros, sin crear una versión cada día. Es una modificación explícita
 del wording actual «scheduler trimestral»: la **rotación** es aproximadamente trimestral; la conciliación es
-diaria. La propuesta no modifica ese canon hasta ser aceptada.
+diaria. Esta decisión reemplaza el carril histórico Scheduler trimestral →
+`ops-worker`, sin activar Scheduler ni autorizar rotación cloud.
 
 Job con una tarea, paralelismo 1, timeout inicial propuesto de 5 minutos y reintentos automáticos de tarea 0.
 La exclusión real reside en PostgreSQL, porque varias ejecuciones del Job aún pueden coincidir. El tick posterior
@@ -50,10 +62,10 @@ con frontera de privilegios propia, no un segundo issuer.
 
 ## ADR y nuevo deployable formal
 
-**Sí exige un nuevo deployable/control plane registrado.** El ADR nativo autorizó `auth-server`, y TASK-1833
-prevé actualmente Scheduler→ops-worker. Ninguno autoriza por sí solo este Job independiente.
+**Sí exige un nuevo deployable/control plane registrado.** El ADR nativo autorizó `auth-server`;
+la decisión de Julio del 29-10 acepta esta frontera Job aislado para implementación local.
 
-Para aceptar, añadir una decisión acotada al [ADR nativo](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
+La decisión acotada vive en el [ADR nativo](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
 y la excepción de build unit correspondiente en
 [decomposición](../../architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md), enlazadas desde el índice.
 Aplican el [modelo ADR](../../operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md),
@@ -65,10 +77,10 @@ Costo aún no medido: contar ejecuciones diarias/cold starts, CPU/memoria, logs,
 solapamiento. Sin precio inventado ni gasto cero asumido. No hay instancia permanente ni front door nuevo.
 Dueño Platform/Identity para command/IAM y Ops para build, scheduler, señales y recuperación.
 
-La aceptación humana se justifica por la **frontera nueva y permisos administrativos**, no por una regla genérica
-de skill ni por redactar el plan. El coordinador debe comprobar si la autorización humana vigente ya cubre esta
-decisión concreta; de ser así, registrar esa evidencia sin pedirla otra vez. En esta etapa sólo se solicitó la
-propuesta: estado Proposed, sin crear runtime, IAM, migración o scheduler. No se pide otra aprobación en este documento.
+Julio aceptó el Job aislado el 29-10 para el candidato local. Esta aprobación
+no levanta la retención del release ni acredita permisos efectivos, costo,
+migración aplicada o ensayo cloud. Antes de provisionar, conciliar costo,
+IAM, recuperación y ownership según el ADR; el Scheduler sigue sin activar.
 
 ## Identidades y recursos cerrados
 

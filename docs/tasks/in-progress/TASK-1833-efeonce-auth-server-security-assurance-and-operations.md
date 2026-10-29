@@ -1,5 +1,19 @@
 # TASK-1833 — Efeonce Auth Server Security Assurance and Operations
 
+## Delta 2026-10-29 — Job aislado aceptado para candidato local
+
+Julio aprobó Cloud Run Job aislado con identidad propia, tick diario y
+rotación sólo tras 90 días de una operación verificada. El [ADR](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md#architecture-decision-2026-10-28--mantenimiento-aislado-de-llaves-task-1833)
+y la [excepción de build unit](../../architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md#delta-aceptado-2026-10-29--auth-key-maintenance-task-1833)
+aceptan **implementación local**. En `codex/auth-pr-develop-stack` ya existe
+candidato de Job/ledger/CLI: PostgreSQL 4/4, focales 44/44 y gates de código
+PASS. [Recibo](../../audits/auth-server/2026-10-29-key-rotation-job-local.md).
+No hay IAM, migración aplicada, Job ni Scheduler cloud, rotación KMS real o
+ensayo de recuperación. El release continúa retenido; esta aprobación no
+cierra assurance, privacidad V2 ni siete días steady. Las menciones posteriores
+al carril Scheduler → `ops-worker` y estado `Proposed` son historia anterior
+a esta decisión, sin autoridad para implementarlo.
+
 ## Revalidación 2026-10-25 — assurance para producción controlada Rooms
 
 Julio autorizó el goal de producción controlada Auth + Rooms y el correo real únicamente a
@@ -97,7 +111,7 @@ El assessment de este slice consume su ADR y código; no bloquea el diseño inic
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-10-26: assurance propio conserva pruebas/señales locales y revisión entre agentes; no pentest completo ni certificación externa. Canary real Auth/Rooms con Microsoft/MFA, un correo y una imagen completado y cerrado OFF; Auth00168-vzb100%, SHA754a2a28, health/ready/discovery200. Esto no cierra abuso ofensivo refutado, privacidadV2, rotación programada, ensayos de runbooks ni steady7d. PR263/264 de control de despliegue retenidas por el operador, sin merge/deploy.`
+- Status real: `2026-10-29: canary Auth/Rooms del 26-10 cerrado OFF; assurance propio parcial, sin pentest completo ni steady de siete días. Job aislado aceptado sólo para implementación local; candidato Job/ledger/CLI con PG 4/4 y focales 44/44 PASS, sin recursos ni rotación cloud. PR y release Auth retenidos. Pendientes: IAM/ensayo cloud, B15/B20 completos, privacidad V2, simulacros, señales y operación steady.`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
 - Blocked by: `none`
