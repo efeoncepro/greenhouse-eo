@@ -10,6 +10,8 @@ o historia Diseño. [Resultado y gates](docs/audits/client-portal/2026-10-27-sky
 
 ## 2026-10-26 — Rooms: entorno de integración y conectores locales
 
+28Oct: [B10 browser con reader externo real](docs/audits/rooms/2026-10-28-b10-rooms-mcp-authority.md) sobre PG efímero,16checks+8gruposPASS; SQL confirma código consumido v7. Fuentes Rooms y producción intactas.
+
 28Oct: B10 [repetido con PostgresOAuthStore y ambas DB efímeras](docs/audits/rooms/2026-10-28-b10-rooms-mcp-postgres.md), readback SQL confirma consentimiento/código consumido/tokens sólo read. Sin cambios de fuentes Rooms ni producción.
 
 28Oct: [B10 browser local](docs/audits/rooms/2026-10-28-b10-rooms-mcp-explicit-consent.md) conserva sesión Rooms y exige consentimiento MCP explícito; token sólo read, write con step-up. Sin cambio productivo.

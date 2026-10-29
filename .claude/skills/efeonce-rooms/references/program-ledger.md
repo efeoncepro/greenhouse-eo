@@ -3,6 +3,16 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-28 — B10 browser con reader de autoridad real
+
+- `local`: Rooms `e0edf1e` intacto + Auth `8d027f747` con `--mcp-pg --mcp-authority`; dos bases
+  efímeras,16checksMCP+8gruposRoomsPASS. Reader real externo sobre binding/membership sintéticos;
+  SQL:1bindinggv7,1membership,1consentread,1código consumidov7 y1access/1refresh sólo read.
+- Arnes sin nueva aserción JWTgv ni revocación browser de binding; consentimiento/contexto y datos
+  son fixtures. Sin dispatch gateway, MFA humana, TLS ni rollout; no cierra B15/B20.
+- Bases temporales retiradas/puertos libres; fuentes Rooms limpias, sincorreo/push/flags/deploy.
+  [Evidencia y límites](../../../../docs/audits/rooms/2026-10-28-b10-rooms-mcp-authority.md).
+
 ## 2026-10-28 — B10 browser repetido con MCP PostgreSQL
 
 - `local`: mismo Rooms `e0edf1e`, sin cambios de fuentes.16checksMCP+8gruposRoomsPASS contra issuer

@@ -21,6 +21,8 @@ público §17. Pendiente: mapa de átomos de marketing de contenidos; tanda 2: G
 
 ## 2026-10-26 — Rooms: entorno local y conectores listos
 
+B10 reader real: [Auth8d027f747→Rooms e0edf1e](docs/audits/rooms/2026-10-28-b10-rooms-mcp-authority.md),16checks+8gruposPASS y SQLv7; datos/proyección sintéticos, sin revocación browser binding ni dispatch/MFA. Bases efímeras retiradas, sin publicar.
+
 B10 ampliado: [MCP PostgreSQL y dos bases efímeras](docs/audits/rooms/2026-10-28-b10-rooms-mcp-postgres.md),16checks+8gruposPASS y SQL read-only; Rooms intacto e0edf1e. Límites grants/contexto/dispatch/MFA separados; procesos retirados.
 
 B10 local28Oct: Rooms→MCP en el mismo navegador, consentimiento explícito/tokenread/write-stepup,16checksMCP+8gruposRoomsPASS;
