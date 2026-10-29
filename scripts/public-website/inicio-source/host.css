@@ -1,0 +1,72 @@
+/* Host layer: what the canvas got from its own document (its `.page` wrapper and body) and the WordPress theme does not give. */
+/* Ohio gives body line-height 1.6, 16.4px and -0.01em tracking; the canvas sets 16px/1.6 on its wrapper (now each module root). */
+.gh-inicio{--accent:#36c8bf;font-size:16px;letter-spacing:normal;width:100%;overflow-x:clip;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box;min-height:0}
+.gh-inicio *,.gh-inicio *::before,.gh-inicio *::after{box-sizing:border-box} /* the canvas' own reset (`.page *`) */
+.gh-inicio section{margin:0}
+/* Ohio skins headings, paragraphs, lists and buttons globally; the canvas sets what it needs. */
+.gh-inicio :is(h1,h2,h3,h4,h5,h6){font-family:inherit;color:inherit;text-transform:none;letter-spacing:inherit;margin:0;font-weight:inherit;line-height:inherit;font-size:revert}
+.gh-inicio :is(p,ul,ol,li,figure,figcaption,blockquote){font-family:inherit;color:inherit;letter-spacing:inherit}
+.gh-inicio :is(ul,ol){list-style:none}
+body .gh-inicio :is(ul,ol) > li{margin:0}
+.gh-inicio li::before{content:none}
+.gh-inicio a{box-shadow:none}
+.gh-inicio button{text-transform:none;letter-spacing:normal;height:auto;box-shadow:none;margin:0;background:none;border:0;cursor:pointer}
+.gh-inicio img,.gh-inicio video{max-width:100%}
+.gh-inicio code{background:none;padding:0;font-family:inherit;color:inherit;font-size:inherit}
+/* Editor switch «Animaciones» off. */
+.gh-inicio[data-motion="no"] *{animation:none !important;transition:none !important}
+
+/* States the canvas swapped in its runtime: every variant is editable markup and inicio-landing.js shows one. */
+.gh-inicio .gh-st:not(.on){display:none}
+.gh-inicio .gh-view:not(.on),.gh-inicio .gh-chart:not(.on){display:none}
+.gh-inicio .gh-k{display:none}
+.gh-inicio [data-gh-cmp-table="0"] .gh-k[data-gh-k="0"],.gh-inicio [data-gh-cmp-table="1"] .gh-k[data-gh-k="1"],.gh-inicio [data-gh-cmp-table="2"] .gh-k[data-gh-k="2"]{display:inline}
+.gh-inicio .gh-yt{display:none}
+.gh-inicio .you.s0 .gh-yt[data-gh-ystate="0"],.gh-inicio .you.s1 .gh-yt[data-gh-ystate="1"],.gh-inicio .you.s2 .gh-yt[data-gh-ystate="2"]{display:inline}
+/* The FAQ panel mirrors the open answer only when the script runs; without it the list keeps every answer. */
+.gh-inicio [data-gh-faq]:not([data-gh-ready]) .faq-a{grid-template-rows:1fr}
+/* Before the script measures the sticky scenes they read as normal sections. */
+.gh-inicio [data-gh-aeo]:not([data-gh-ready]) .aeo2-sticky{position:relative}
+
+/* The site's global navigation floats over the hero: keep the hero copy below it. */
+.gh-inicio .hero{padding-top:clamp(150px,11vw,176px)}
+
+/* «Agenda una reunión»: governed Growth CTA (open_meeting_scheduler, the global menu's discovery meeting) painted as
+   the canvas' primary button. The renderer owns the action, the dialog and telemetry; the host only skins the launcher. */
+.gh-inicio .meet-cta{display:flex;margin-top:22px}
+.gh-inicio .meet-cta greenhouse-cta{display:flex;width:min(100%,320px);--gh-cta-reserve:52px} /* the renderer contains its inline size: it needs an explicit width */
+.gh-inicio .meet-cta greenhouse-cta .ghc-card{display:flex!important;gap:0!important;width:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;animation:none!important}
+.gh-inicio .meet-cta greenhouse-cta :is(.ghc-content,.ghc-dismiss){display:none!important}
+.gh-inicio .meet-cta greenhouse-cta .ghc-actions{width:100%;margin:0!important;padding:0!important}
+.gh-inicio .meet-cta greenhouse-cta .ghc-primary{width:100%}
+.gh-inicio .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inicio-meeting-fallback){display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:16px 26px;border:0;border-radius:14px;font-family:'Poppins',system-ui,sans-serif;font-size:16px;font-weight:600;line-height:1;letter-spacing:0;text-transform:none;white-space:nowrap;text-decoration:none!important;color:#ffffff!important;background:#0e8c82!important;box-shadow:none!important;cursor:pointer;transition:background-color .3s,transform .5s cubic-bezier(.2,0,0,1)}
+.gh-inicio .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inicio-meeting-fallback)::after{content:"→";font-size:18px;line-height:1;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.gh-inicio .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inicio-meeting-fallback):hover{background:#0b7a71!important;transform:translateY(-2px)}
+.gh-inicio .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inicio-meeting-fallback):hover::after{transform:translateX(4px)}
+.gh-inicio .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inicio-meeting-fallback):focus-visible{outline:2px solid #091951;outline-offset:3px}
+
+/* Phones and tablets: the AEO scene reads as a normal section (the stage advances with each question). */
+@media (max-width:900px){
+.gh-inicio .aeo2{height:auto!important}
+.gh-inicio .aeo2-sticky{position:relative!important;height:auto!important;padding-block:80px}
+/* The lens caption hangs 46px under the photo: leave it room above the hero chip. */
+.gh-inicio .lens{margin-bottom:64px}
+.gh-inicio .stp-b b{font-size:16px}
+.gh-inicio .stp-b small{font-size:12px}
+.gh-inicio .cmp-box{min-height:172px}
+.gh-inicio .cmp-q{font-size:20px;right:64px}
+.gh-inicio .sk.gh-mid{display:none}
+.gh-inicio .chipx{width:168px;margin:-34px 0 0 -84px;padding:10px 10px}
+.gh-inicio .chipx .t{font-size:11px}
+.gh-inicio .chipx .s{font-size:10px}
+.gh-inicio .rows{height:336px}
+.gh-inicio .row{height:auto;transform:translateY(calc(var(--rk) * 84px))}
+.gh-inicio .rv{height:auto;min-height:56px;padding-block:8px;font-size:14px}
+}
+
+/* Ohio pins its Dark/Light switch (left) and «Follow Us» (right) at 1.5vw + 56px from each edge from 1181px up. The
+   canvas' .wrap (1240px, 20px gutters) clears them from ~1400px; below that the copy would run under them. */
+@media (min-width:1181px){
+.gh-inicio{--gh-rail:calc(1.5vw + 88px)}
+.gh-inicio .wrap{padding-left:max(20px,calc(var(--gh-rail) - max(0px,(100vw - 1240px) / 2)));padding-right:max(20px,calc(var(--gh-rail) - max(0px,(100vw - 1240px) / 2)))}
+}

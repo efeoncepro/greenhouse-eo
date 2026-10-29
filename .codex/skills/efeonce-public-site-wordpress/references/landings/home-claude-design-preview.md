@@ -1,5 +1,51 @@
 # Home — Claude Design / Elementor
 
+## Rediseño 2026-10-28 «La órbita × Pingback» (vigente)
+
+- URL `https://efeoncepro.com/`, `page_id` `251731` (`page_on_front`). Body replaced in place 2026-10-29 01:25 UTC by
+  operator request («reemplaza la home actual por esta que hiciste»); slug, title SEO, Yoast metas, canonical, index
+  policy, featured image `248149` and the page's Ohio `page_*` metas kept. Global AXIS navigation and Ohio footer are the
+  site's canonical chrome; the canvas' drawn navigation and brand close were left out (operator: «el header y el footer
+  deben ser los canónicos del sitio»). Shared bottom dock `manifests/landing-dock/home.json` unchanged.
+- Need: the front door for enterprise buyers (CMO, Head of Growth, CEO, CTO; Chile, Colombia, México, Perú, EE. UU.): the
+  five lines (Crecer · Destacar · Aparecer · Rendir · Vender), proof, AEO, agents with Sparks, Greenhouse, method,
+  SKY testimonials and comparison; conversion = native scheduler. Operator decisions 2026-10-28: «+90 marcas»; the agents
+  (Sparks) section is published; direct replacement after preview QA.
+- Design: canvas «Home Efeonce en órbita» (`https://claude.ai/artifact/CuJ5wNPXrfYBXV9wFMevNq`). SKY quotes are verbatim
+  from `experiencia.efeoncepro.com` (relationship proof, not service results). AEO answers, Greenhouse figures and
+  competitors are labelled illustrative.
+- Source and rail (shared source-led core): `scripts/public-website/inicio-source/` (Main.dc.html without the drawn nav,
+  assets.json, host.css, page-custom.css, page.css) → `compile-inicio-elementor-source.cjs` (evaluates the canvas
+  DCLogic, expands every runtime state into editable markup: hero words in a `<template>`, descriptions/captions, AEO
+  questions and «Tu marca» states, Greenhouse views, method steps, quotes, comparison columns) →
+  `build-inicio-elementor-package.cjs <live baseline>` → `deploy-inicio-elementor-package.php` (contract
+  `inicio-elementor-release.v1`, allows mp4) → `publish-inicio-elementor-page.php` (`preview` | `replace` with
+  `expectedDataSha`; optional 3rd input `.auth/site-nav-meeting-cta-surface.json`) →
+  `rollback-inicio-elementor-page.php` `{ "snapshot": "…" }`. Gates `verify-source-led-compilers.cjs` and
+  `verify-source-led-render.php` include `inicio` (other six landings byte/render identical).
+- Runtime: 12 containers, one `greenhouse_inicio_*` widget each: hero · marcas · motor · lineas · trabajo · aeo · agentes ·
+  greenhouse · metodo · respaldo · faq · agenda. Behaviour in `assets/js/inicio-landing.js` (reads only the DOM; nothing
+  runs in the editor; reduced motion keeps states still): hero rotation + accent, logo/work loops, motor and method sticky
+  scenes, line accordion, AEO typed question across five engines with scroll stages, Sparks constellation, Greenhouse
+  views with count-up, quote rotation, comparison, FAQ panel, copy e-mail.
+- Agenda uses the global menu's governed CTA `site-nav-discovery-meeting` (surface key written by the publisher into the
+  agenda widget; `cta_location=home_agenda`); fallback link `/agenda/`.
+- Hero `<h1>`: sr text «¿Qué necesita tu marketing? Crecer, destacar, aparecer, rendir y vender.»; the visible question
+  paragraph is `aria-hidden`, the letters are decorative.
+- Host fixes found in QA: canvas `border-box` reset kept; rails for Ohio's lateral widgets from 1181 px; phones: lens
+  caption room, AEO as a normal section (stage advances per question), mid-height Sparks hidden, motor chips to the four
+  corners with smaller type.
+- Live 2026-10-29: replace snapshot `_gh_home_orbita_before_20261029_012508` (previous hash `9aa8c770…`); new data hash
+  `c148f3df…`; widget deploy backups on Kinsta `/tmp/eo-inicio-widgets-before-20261029-012032.tar` … `-013142.tar`.
+  Verified live at 1440, 1280 and 390: overflow 0, no broken images, no console errors, scheduler dialog opens (no
+  booking made), canonical/robots/title/description unchanged. QA preview `252177` (`/home-orbita-preview-20261029/`) left
+  `private`.
+- Pending: in-editor save/reload not verified; keyboard traversal of the scenes not certified; the agents offer still
+  has no own landing (CTA goes to the agenda).
+
+## Before 2026-10-28 (history; replaced)
+
+
 > **Delta 2026-10-23 — shared dock (TASK-2043).** The bottom dock is AXIS `efeonce.landing-dock` painted by plugin `eo-landing-dock` (config `manifests/landing-dock/home.json`): phone; «Agenda una reunión» (no line; menu scheduler `site-nav-discovery-meeting`); no stop. The legacy dock `div[data-sticky-cta]` is stripped from the HTML while the dock is on (`off` brings it back); anything below describing the legacy dock is history and rollback context. Operate: `global-site-navigation.md` §Landing dock.
 
 ## Recorded runtime identity — checkpoint 2026-08-31
