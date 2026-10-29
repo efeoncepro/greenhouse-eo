@@ -1,7 +1,7 @@
 # Operar el portafolio de proyectos
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-29 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -15,7 +15,8 @@ con `pnpm public-website:portfolio`. Cada proyecto es un documento `portfolio-en
 formato real. La CLI usa el mismo servicio de guardado que la pantalla del admin y que `wp eo-portfolio`: no tiene
 reglas propias.
 
-Estado al 2026-10-29: plugin activo en producción, **sin proyectos**. La portada y la entrada pública llegan con
+Estado al 2026-10-29: plugin activo en producción, **sin proyectos**. La pantalla del admin (v0.2.0) está construida y
+probada; se despliega con el OK del operador. La portada y la entrada pública llegan con
 `TASK-2048`; hasta entonces una entrada publicada responde 404 y sólo se ve por la REST.
 
 ## Antes de empezar
@@ -28,6 +29,20 @@ Estado al 2026-10-29: plugin activo en producción, **sin proyectos**. La portad
   (`scope`: `logo`, `pieces`, `metrics`, `testimonial`). Sin eso el plugin no publica.
 
 ## Paso a paso
+
+### Desde el admin de WordPress
+
+Menú **Portafolio** → **Proyectos** (listado) o **Agregar proyecto**. Es el mismo servicio que la CLI:
+
+1. Completa las secciones. Las imágenes se eligen de la biblioteca (sus dimensiones salen de ahí); los videos se pegan
+   como URL del bucket público de AXIS y el navegador lee su formato. El formato no se escribe a mano.
+2. Escribe en «Qué cambiaste» por qué cambió y pulsa **Guardar**. Si algo no cumple, no se guarda nada: el resumen de
+   arriba enlaza a cada campo con su error.
+3. Registra la **Aprobación del cliente** (referencia, fecha, qué aprobó) y guarda. Lo que no aprobó muestra
+   «No se mostrará» en su sección.
+4. **Publicar** se habilita cuando «Falta para publicar» queda vacío, no hay cambios sin guardar y todos los videos se
+   pudieron leer. Publica la revisión guardada.
+5. En **Historial** puedes ver una revisión o restaurarla (crea una revisión nueva).
 
 ### Ver qué hay
 

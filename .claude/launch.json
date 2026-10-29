@@ -200,6 +200,11 @@
       ],
       "port": 8845,
       "url": "http://127.0.0.1:8845"
+    },
+    {
+      "name": "eo-portfolio-playground",
+      "url": "http://127.0.0.1:9400",
+      "port": 9400
     }
   ]
 }

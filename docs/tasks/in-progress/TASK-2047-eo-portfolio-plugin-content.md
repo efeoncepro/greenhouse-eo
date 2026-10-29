@@ -1,5 +1,24 @@
 # TASK-2047 — EO Portfolio: plugin «eo-portfolio», documento del proyecto y tres puertas
 
+## Delta 2026-10-29 — Slice 5: pantalla del admin
+
+- Diseño aprobado por el operador: canvas «Admin del Portafolio»
+  ([claude.ai/artifact/7cLqYYXWkE3pJQVhBKP3DW](https://claude.ai/artifact/7cLqYYXWkE3pJQVhBKP3DW)), WordPress nativo.
+- Construido en `includes/class-eop-admin.php`, `assets/admin.js` y `assets/admin.css` (runtime 3ab38ad, v0.2.0): menú
+  «Portafolio» con listado y editor; el formulario se convierte en documento y pasa por `EOP_Store` (guardar, publicar,
+  despublicar, restaurar), y los errores del validador vuelven a su campo y al resumen.
+- Reglas nuevas en el servicio, para las tres puertas: videos, pósters y subtítulos sólo del bucket público de AXIS
+  (`schema/media-hosts.v1.json`, `MEDIA_HOST_NOT_ALLOWED`); mensajes `REQUIRED` con nombres legibles; el hash trata
+  `null` como ausente (cargar y guardar sin tocar da «Sin cambios»).
+- Las dimensiones de un video las lee el navegador al pegar la URL; un video guardado que no se puede leer al abrir se
+  marca y bloquea «Publicar», sin borrar sus dimensiones. Las de una imagen salen de la biblioteca en el servidor.
+- Verificación: `tests/playground/eo-portfolio-admin.check.php` (21 comprobaciones: ida y vuelta sin perder campos en
+  los tres fixtures, error en línea, publicar, despublicar, borrador nuevo, listado) y revisión en navegador sobre
+  `tests/playground/serve-eo-portfolio.sh` a 1440 y 375 px (secciones, piezas, lente, restaurar, sin desborde). Tres
+  defectos corregidos en esa revisión: secciones que no cerraban (`display` sobre `hidden`), miniaturas rotas sin texto
+  y el borrado de dimensiones de videos guardados.
+- Pendiente: desplegar v0.2.0 (export → paquete → deploy; la lista de rutas del despliegue ya incluye `assets/admin.*`).
+
 ## Delta 2026-10-29 — despliegue y CLI de agentes
 
 - Plugin desplegado y activo en producción (runtime ede185a, corrección 009bddb). Sin proyectos. Con el plugin activo,
@@ -63,13 +82,13 @@ Decisiones tomadas al construir (`efeonce-public-site-runtime` ede185a):
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `interaction`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-2047-eo-portfolio-admin.md`
 - Flow: `docs/ui/flows/TASK-2047-eo-portfolio-editing-flow.md`
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `Slices 1–4 en producción desde 2026-10-29 (runtime 009bddb, plugin activo, sin proyectos): /portafolio/ 200, /portafolio/no-existe/ 404, REST vacía con ETag, fixture validado y apply en dry run contra el sitio. CLI de agentes pnpm public-website:portfolio. Pendiente: OK del operador al diseño del admin (Slice 5)`
+- Status real: `Slices 1–5 code complete. Slices 1–4 en producción desde 2026-10-29 (sin proyectos). Slice 5 (admin, v0.2.0, runtime 3ab38ad) construido sobre el diseño aprobado y verificado en Playground y en navegador; falta desplegarlo con el OK del operador`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -611,8 +630,8 @@ WordPress o en meta propia, y replicar lo mismo].
       `/portafolio/` sigue sirviendo la página 247116. (Playground y producción, 2026-10-29: /portafolio/ 200, /portafolio/no-existe/ 404)
 - [x] `schema/portfolio-entry.v1.json` existe en el plugin y `wp eo-portfolio validate` rechaza un documento inválido sin
       escribir nada. (Archivo `schema/portfolio-entry.v1.schema.json`; Playground + WP-CLI, 2026-10-29)
-- [ ] `wp eo-portfolio publish` falla sin `clientApproval` con `ref`, `date` y `scope`, y la pantalla del admin muestra
-      «Publicar» deshabilitado con la razón. (La mitad de WP-CLI y el servicio, verificada; la pantalla es el Slice 5.)
+- [x] `wp eo-portfolio publish` falla sin `clientApproval` con `ref`, `date` y `scope`, y la pantalla del admin muestra
+      «Publicar» deshabilitado con la razón. (WP-CLI, servicio y admin: `eo-portfolio-admin.check.php` y revisión en navegador, 2026-10-29)
 - [x] Una cifra sin `source` no valida, y un video sin `width`, `height` o `poster` no valida. (`tests/eo-portfolio.test.php`)
 - [x] La proyección pública omite resultados, logo, testimonio o medios cuando el alcance de la aprobación no los cubre. (PHP puro y REST en Playground)
 - [x] `GET /wp-json/eo/v1/portfolio` devuelve sólo proyectos publicados, con `ETag`, y nunca `clientApproval`,
@@ -620,8 +639,8 @@ WordPress o en meta propia, y replicar lo mismo].
 - [x] `apply` del mismo documento no crea revisión nueva, y un guardado con revisión base vieja devuelve conflicto. (Playground y WP-CLI)
 - [x] Las pruebas corren sobre los fixtures de Sky, PabellonToGo y ANAM, y lo esperado se deriva de cada fixture. (`tests/fixtures/portfolio/` del runtime)
 - [x] Ningún archivo del plugin compara contra nombres de cliente, campaña o slug. (Guarda en `tests/eo-portfolio.test.php` sobre los nombres, slugs y capítulos de los fixtures)
-- [ ] El wireframe y el flujo del admin existen y el diseño visual fue aprobado antes del Slice 5.
-- [ ] `UI ready` permanece `no` hasta que el wireframe y el `## UI/UX Contract` tengan implementation mapping, GVC
+- [x] El wireframe y el flujo del admin existen y el diseño visual fue aprobado antes del Slice 5. (Canvas «Admin del Portafolio», aprobado por el operador el 2026-10-29)
+- [x] `UI ready` permanece `no` hasta que el wireframe y el `## UI/UX Contract` tengan implementation mapping, GVC
       scenario plan y design decision log aprobados.
 
 ## Verification

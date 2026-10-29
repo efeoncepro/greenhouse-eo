@@ -7,15 +7,18 @@
 >
 > - Flujo de edición: [`TASK-2047-eo-portfolio-editing-flow.md`](../flows/TASK-2047-eo-portfolio-editing-flow.md).
 > - Flujo maestro del programa: `docs/ui/flows/EPIC-056-eo-portfolio-UI-FLOW.md` [verificar nombre final].
-> - **Dirección visual propuesta (2026-10-29), pendiente de aprobación:** WordPress nativo, como la pantalla de ajustes
+> - **Dirección visual aprobada por el operador (2026-10-29) y construida (runtime 3ab38ad):** WordPress nativo, como la pantalla de ajustes
 >   de `eo-headless-content` (único precedente de admin propio del runtime): barra y menú del admin, cajas, botones y
 >   campos del editor de entradas, tipografía del sistema. La marca sólo colorea la línea de servicio; lo que el alcance
 >   oculta se marca con «No se mostrará» como estado, no como color. Canvas «Admin del Portafolio»
 >   ([claude.ai/artifact/7cLqYYXWkE3pJQVhBKP3DW](https://claude.ai/artifact/7cLqYYXWkE3pJQVhBKP3DW)): listado, edición
->   con errores, capítulos y piezas, y publicado con alcance parcial y restaurar. Hasta el OK, `UI ready: no`.
+>   con errores, capítulos y piezas, y publicado con alcance parcial y restaurar. `UI ready: yes`.
 > - El canvas del portafolio público
 >   ([claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm](https://claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm)) diseña la portada y
 >   la entrada, no esta pantalla.
+
+- Visual direction mode: source-led
+- Product Design asset: docs/ui/designs/TASK-2047-eo-portfolio-admin/Main.dc.html (copia versionada del canvas aprobado; también `Lista`, `Piezas` y `Publicado`)
 
 ## Product contract
 
@@ -64,7 +67,50 @@ Escritorio (1280–1440). Dos columnas: editor a la izquierda (≈ 70 %) y panel
 - **Panel lateral:** siempre visible; «Falta para publicar» lista las reglas del validador que impiden publicar, cada
   una con enlace al campo.
 
-## States
+## Desktop Target
+
+1440 × 900 (verificado también a 1280): menú del admin de WordPress, editor a la izquierda (`flex: 999 1 560px`) y panel
+lateral fijo de 300–360 px con Estado, Aprobación del cliente, Falta para publicar e Historial. Secciones colapsables;
+abiertas por defecto «Cliente y contexto» y toda sección con errores. Referencia: `Main.dc.html` y `Publicado.dc.html`.
+
+## Mobile Target
+
+390 × 844 (verificado a 375): no es objetivo de trabajo, pero nada se corta: el panel lateral pasa debajo del editor, las
+grillas de dos columnas y la fila de resultados se apilan en una columna, la tabla del listado hace scroll dentro de su
+caja y la página no tiene scroll horizontal (medido: `scrollWidth` 353 en 375).
+
+## Action Hierarchy
+
+1. **Guardar** (primario, panel Estado): guarda una revisión con el mensaje del cambio; nunca publica.
+2. **Publicar** (primario, panel Falta para publicar): sólo con la revisión guardada lista; deshabilitado con la razón.
+3. **Despublicar** (secundario de peligro, sólo en publicados): saca del sitio y conserva contenido e historial.
+4. **Restaurar** (en Historial, confirmación en línea con motivo): crea una revisión nueva.
+5. Acciones de contenido (agregar resultado, capítulo, imagen, video, persona; quitar): botones secundarios o enlaces.
+
+## Visual Fidelity Mapping
+
+| Canvas | Implementación |
+|---|---|
+| Barra y menú del admin | Los nativos de WordPress (no se dibujan) |
+| Cajas, títulos de sección, campos y botones | `.eop-box`, `.eop-toggle`, `.eop-in`, `.button` / `.button-primary` nativos |
+| Píldoras de línea con color sólo en la elegida | `.eop-pill` + `.eop-line-<línea>:has(input:checked)` |
+| Chip de formato oscuro «Video · 16:9 · 1156 × 650» | `.eop-format`, calculado de las dimensiones reales |
+| «No se mostrará» punteado | `.eop-hidden-note` |
+| Resumen de errores y aviso de guardado sin borde lateral | `.eop-notice-error` / `.eop-notice-ok` con borde completo |
+| Órbita de medida «88 %» | `.eop-measure` con el primer porcentaje |
+| Confirmación de restaurar en línea | `<details class="eop-restore">` con formulario propio por revisión |
+
+## State Copy
+
+| Estado | Copy visible | Salida |
+|---|---|---|
+| ready | «Listo para publicar» · «Publica la revisión guardada.» | Publicar |
+| loading | El botón enviado queda en espera del navegador; el aviso llega tras la recarga («Guardado como revisión N.») | Esperar la recarga |
+| empty | «Todavía no hay proyectos. Crea el primero.» · proyecto nuevo: «Borrador · sin guardar» | «Agregar proyecto» |
+| partial | «No se mostrará: la aprobación no incluye cifras.» · «No pudimos leer este video. Revisa la URL del bucket.» | Ampliar la aprobación o corregir la URL |
+| error | «No guardamos: hay N errores.» con enlace a cada campo; conflicto: «Alguien guardó la revisión N mientras editabas. Revisa sus cambios antes de guardar.» | Corregir y guardar; «Abrir la vigente para editar sobre ella» |
+| denied | Sin `eo_publish_portfolio`: «Publica una persona con permiso de publicación.» (no hay botón); sin `eo_manage_portfolio` el menú no aparece | Pedir el permiso a un administrador |
+
 
 | Estado | Qué se ve |
 |---|---|
@@ -81,7 +127,7 @@ Escritorio (1280–1440). Dos columnas: editor a la izquierda (≈ 70 %) y panel
 | Restaurar | Confirmación en línea «¿Restaurar la revisión N? Se creará una revisión nueva.» |
 | 390 px | No es objetivo; las columnas se apilan y nada se corta. |
 
-## Copy
+## Copy Ledger
 
 Ledger inicial (es-CL neutro, tuteo, dominio `eo-portfolio`). Se valida con `greenhouse-ux-writing` antes de construir.
 
@@ -117,7 +163,7 @@ Ledger inicial (es-CL neutro, tuteo, dominio `eo-portfolio`). Se valida con `gre
 | `restore.confirm` | ¿Restaurar la revisión %d? Se creará una revisión nueva. |
 | `publish.noPermission` | Publica una persona con permiso de publicación. |
 
-## Accessibility
+## Accessibility Contract
 
 - Cada campo con `<label>` visible; ayudas asociadas con `aria-describedby`.
 - Resumen de errores con `role="alert"` y enlaces que mueven el foco al campo.
@@ -142,7 +188,8 @@ Ledger inicial (es-CL neutro, tuteo, dominio `eo-portfolio`). Se valida con `gre
 
 - **Superficie:** admin local o de staging; surface ID `wp-admin-eo-portfolio`.
 - **Viewports:** 1440×900 y 1280×800; 390×844 sólo para verificar que no rompe.
-- **Quality profile:** premium.
+- Quality profile: premium
+- Scroll-width: sin scroll horizontal en 1280, 1440 y 390 (medido en Playground el 2026-10-29).
 - **Pasos:**
   1. Crear un proyecto con el fixture de PabellonToGo cargado por WP-CLI.
   2. Borrar la fuente de una cifra y guardar → error y foco.
@@ -165,3 +212,15 @@ Ledger inicial (es-CL neutro, tuteo, dominio `eo-portfolio`). Se valida con `gre
 | Formato calculado, no editable | La proporción declarada a mano se desvía; la real no (PDR-028 §3.3). |
 | Video por URL del bucket | El plugin no tiene credenciales de GCP (PDR-028 §4). |
 | Sin vista previa pública en esta task | La vista previa necesita las plantillas de `TASK-2048`; se suma ahí. |
+
+## Delta 2026-10-29 — implementación
+
+- Enganche: menú propio `admin.php?page=eo-portfolio` (listado, `action=edit`, `action=view` para leer una revisión) y
+  `admin-post.php` (`eop_save` con `eop_do` = save | publish | unpublish, `eop_restore`). El tipo `eo_project` sigue sin
+  UI nativa.
+- Video: el navegador lee `videoWidth` y `videoHeight` al pegar la URL (no hace falta `ffprobe` ni descargar en el
+  servidor); el servicio exige además que la URL esté en el bucket público de AXIS.
+- Ids y nombres de campo salen de la ruta del documento, así que cada falla del validador cae en su campo.
+- Lo que el canvas no dibujaba y quedó construido: conflicto (con «Ver la revisión vigente» y «Abrir la vigente para
+  editar sobre ella»), sin permiso de publicación (texto en vez de botón), proyecto nuevo con slug sugerido desde el
+  título, y la vista de solo lectura de una revisión.

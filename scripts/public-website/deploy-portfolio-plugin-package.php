@@ -24,7 +24,7 @@ if ( $index ) {
 }
 
 $root    = WP_PLUGIN_DIR . '/eo-portfolio/';
-$allowed = '#^(eo-portfolio\.php|includes/class-eop-[a-z]+\.php|schema/[A-Za-z0-9.-]+\.json)$#';
+$allowed = '#^(eo-portfolio\.php|includes/class-eop-[a-z]+\.php|schema/[A-Za-z0-9.-]+\.json|assets/admin\.(css|js))$#';
 $main    = 'eo-portfolio.php';
 $files   = array();
 foreach ( $manifest['files'] as $entry ) {

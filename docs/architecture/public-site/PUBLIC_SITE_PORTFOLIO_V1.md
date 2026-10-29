@@ -1,7 +1,7 @@
 # Portafolio del sitio público (EO Portfolio) — V1
 
 > **Tipo de documento:** Arquitectura técnica
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-29 por Claude (TASK-2047)
 > **Decisión:** [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) ·
 > **Epic:** [EPIC-056](../../epics/to-do/EPIC-056-eo-portfolio.md)
@@ -36,14 +36,16 @@ documento validado, un solo servicio de guardado y tres puertas, render del serv
   rechazados.
 - Reglas de conjunto: imagen con `mediaId` y sin campos de video; video con `src` y `poster` y sin `mediaId`; voz exige
   `captionsVtt`; ids de medio únicos; `hero.mediaRef` existe; `percent` entre 0 y 100; `services` en
-  `schema/services.v1.json` (9 líneas de `docs/services/`).
+  `schema/services.v1.json` (9 líneas de `docs/services/`); `src`, `poster` y `captionsVtt` sólo bajo los prefijos de
+  `schema/media-hosts.v1.json` (bucket público de AXIS, `MEDIA_HOST_NOT_ALLOWED`). Los mensajes `REQUIRED` nombran el
+  campo en castellano (`EOP_Validator::NAMES`).
 - Compuerta de publicación (`publish_issues`): `clientApproval` con `ref`, `date` y `scope` no vacío.
 - Formato derivado de las dimensiones (`9:16`, `4:5`, `1:1`, `16:9`, `3:1`, `otro`, tolerancia 3 %); no se guarda.
 - Ninguna regla nombra un cliente, una campaña o un slug (guarda en `tests/eo-portfolio.test.php`).
 
 ## 4. Servicio (`EOP_Store`)
 
-Guardar: permiso → mensaje → validar → slug libre (sin página hija de `/portafolio/` con ese nombre) → idempotencia por
+El hash ignora `revision`, `updatedAt` y los campos en `null` (equivalen a ausentes). Guardar: permiso → mensaje → validar → slug libre (sin página hija de `/portafolio/` con ese nombre) → idempotencia por
 hash (sin `revision` ni `updatedAt`) → conflicto por revisión base (`force` sólo al restaurar) → si está publicado, la
 compuerta → candado por slug → escritura → verificación del slug y del hash guardados → meta y revisión → términos →
 purga de Kinsta si está publicado. `publish`/`unpublish` exigen `eo_publish_portfolio`, registran y purgan.
@@ -54,7 +56,7 @@ el log de PHP.
 
 | Puerta | Detalle |
 |---|---|
-| Admin | Slice 5 de `TASK-2047`, pendiente de aprobación del diseño. |
+| Admin | `EOP_Admin` (v0.2.0, diseño aprobado «Admin del Portafolio»): `admin.php?page=eo-portfolio` (listado, editor, revisión de sólo lectura) y `admin-post.php` (`eop_save`: save, publish, unpublish; `eop_restore`). Convierte el formulario en documento (`to_document`; dimensiones de imagen desde la biblioteca) y llama a `EOP_Store`; ids y nombres de campo derivados de la ruta del documento. Sin reglas propias. |
 | `wp eo-portfolio` | `list`, `export [--revision] [--public]`, `validate [--publish] [--format=json]`, `apply [--dry-run] [--snapshot]` (uno o `{"projects": [...]}`, todo o nada), `publish [--dry-run]`, `unpublish`, `revisions`, `log`, `restore`. Escritura con `--user`. |
 | REST pública | `GET /wp-json/eo/v1/portfolio` (`portfolio-index.v1`: tarjetas) y `GET /wp-json/eo/v1/portfolio/<slug>` (entrada). Sólo publicados; `ETag`, 304, `Cache-Control: public, max-age=300`; borrador = 404. |
 

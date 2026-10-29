@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Capítulos y piezas · Portafolio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#f0f0f1;color:#1d2327;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;font-size:13px;line-height:1.5}
+a{color:#2271b1}a:hover{color:#135e96}
+.box{background:#fff;border:1px solid #c3c4c7;box-shadow:0 1px 1px rgba(0,0,0,.04)}
+.box-h{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:0 12px;border:0;border-bottom:1px solid #c3c4c7;background:#fff;font:600 14px/1.4 inherit;color:#1d2327;text-align:left;cursor:pointer}
+.lbl{display:block;font-weight:600;margin:0 0 4px}
+.in{box-sizing:border-box;width:100%;min-height:36px;padding:6px 8px;border:1px solid #8c8f94;border-radius:4px;font:inherit;color:#1d2327;background:#fff}
+.help{margin:4px 0 0;color:#50575e;font-size:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 12px;border:1px solid #2271b1;border-radius:3px;background:#f6f7f7;color:#2271b1;font:inherit;cursor:pointer;text-decoration:none}
+.chip{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:11px;font-size:12px;font-weight:600}
+.err{color:#b32d2e}
+.fmt{display:inline-flex;align-items:center;gap:6px;min-height:24px;padding:0 8px;border-radius:4px;background:#1d2327;color:#fff;font-size:12px;font-weight:600}
+.side-h{margin:0;padding:10px 12px;border-bottom:1px solid #c3c4c7;font-size:14px;font-weight:600}
+</style>
+</helmet>
+<div style="min-height: 1640px; display: flex; flex-direction: column;">
+  <header style="height: 32px; background: #1d2327; color: #f0f0f1; display: flex; align-items: center; justify-content: space-between; padding: 0 12px;">
+    <span>Efeonce Group</span>
+    <span>Hola, Ana</span>
+  </header>
+  <div style="display: flex; flex-wrap: wrap; flex: 1 1 auto;">
+    <nav aria-label="Menú principal" style="flex: 0 0 160px; background: #1d2327; color: #f0f0f1; padding: 8px 0;">
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Escritorio</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Entradas</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Medios</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Páginas</a>
+      <a href="Lista.dc.html" aria-current="page" style="display: block; padding: 8px 12px; color: #fff; background: #2271b1; font-weight: 600; text-decoration: none;">Portafolio</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Apariencia</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Plugins</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Ajustes</a>
+    </nav>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 20px 24px 48px; box-sizing: border-box;">
+      <div style="max-width: 1240px; display: flex; flex-direction: column; gap: 16px;">
+        <a href="Main.dc.html">← Un año de campañas en cinco mercados</a>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
+          <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px;">
+
+            <section class="box">
+              <button type="button" class="box-h" aria-expanded="true" aria-controls="s-piezas">
+                <span style="flex: 1 1 auto;">Capítulos y piezas</span>
+                <span class="chip err" style="background: #fcf0f1;">2 errores</span>
+              </button>
+              <div id="s-piezas" style="padding: 16px; display: flex; flex-direction: column; gap: 20px;">
+
+                <div style="display: flex; flex-wrap: wrap; gap: 16px; padding: 12px; background: #f6f7f7; border-radius: 4px;">
+                  <div style="flex: 1 1 260px;">
+                    <label class="lbl" for="f-hero">Pieza destacada de la portada</label>
+                    <select class="in" id="f-hero"><option>Black Sky · Spot «Último llamado»</option></select>
+                    <p class="help">Abre el proyecto en la portada y en la entrada.</p>
+                  </div>
+                  <div style="flex: 1 1 320px;">
+                    <span class="lbl">Foco de la lente</span>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                      <div style="position: relative; width: 192px; height: 108px; background: #3c434a; border-radius: 4px; overflow: hidden;">
+                        <span style="position: absolute; left: 8px; bottom: 6px; color: #dcdcde; font-size: 11px;">[fotograma del spot]</span>
+                        <span aria-hidden="true" style="position: absolute; left: 34px; top: 42px; width: 24px; height: 24px; border: 2px solid #fff; border-radius: 50%;"></span>
+                      </div>
+                      <p class="help" style="margin: 0;">Haz clic en la imagen para mover el foco.<br>x 0,24 · y 0,50</p>
+                    </div>
+                  </div>
+                </div>
+
+                <fieldset style="border: 1px solid #dcdcde; border-radius: 4px; padding: 16px; margin: 0; display: flex; flex-direction: column; gap: 16px;">
+                  <legend style="padding: 0 6px; font-weight: 600; font-size: 14px;">Capítulo 1 · Black Sky</legend>
+                  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+                    <div><label class="lbl" for="c1-nombre">Nombre</label><input class="in" id="c1-nombre" value="Black Sky"></div>
+                    <div><label class="lbl" for="c1-nota">Nota</label><input class="in" id="c1-nota" value="1 campaña · video, reel y feed"></div>
+                  </div>
+
+                  <article style="display: flex; flex-wrap: wrap; gap: 16px; padding-top: 12px; border-top: 1px solid #f0f0f1;" aria-label="Pieza: spot Último llamado">
+                    <div style="flex: 0 0 200px; display: flex; flex-direction: column; gap: 8px;">
+                      <div style="width: 200px; height: 113px; background: #3c434a; border-radius: 4px; display: flex; align-items: flex-end; padding: 6px 8px; box-sizing: border-box; color: #dcdcde; font-size: 11px;">[póster del spot]</div>
+                      <span class="fmt">Video · 16:9 · 1156 × 650</span>
+                      <span class="help" style="margin: 0;">El formato se calcula del archivo; no se escribe a mano.</span>
+                    </div>
+                    <div style="flex: 999 1 360px; min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+                      <div style="grid-column: span 2;"><label class="lbl" for="p1-src">URL del video</label><input class="in" id="p1-src" value="https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/sky/ultimo-llamado.mp4"></div>
+                      <div style="grid-column: span 2;"><label class="lbl" for="p1-poster">Póster</label><input class="in" id="p1-poster" value="…/portfolio/v1/sky/ultimo-llamado.poster.webp"></div>
+                      <div><label class="lbl" for="p1-alt">Texto alternativo</label><input class="in" id="p1-alt" value="Spot Black Sky, último llamado"></div>
+                      <div><label class="lbl" for="p1-cap">Leyenda</label><input class="in" id="p1-cap" value="«Último llamado», spot"></div>
+                      <fieldset style="border: 0; padding: 0; margin: 0;"><legend class="lbl">¿Tiene voz?</legend><label style="margin-right: 12px;"><input type="radio" name="p1-voz"> Sí</label><label><input type="radio" name="p1-voz" checked> No</label></fieldset>
+                    </div>
+                  </article>
+
+                  <article style="display: flex; flex-wrap: wrap; gap: 16px; padding-top: 12px; border-top: 1px solid #f0f0f1;" aria-label="Pieza: reel vertical">
+                    <div style="flex: 0 0 200px; display: flex; flex-direction: column; gap: 8px;">
+                      <div style="width: 90px; height: 160px; background: #3c434a; border-radius: 4px; display: flex; align-items: flex-end; padding: 6px; box-sizing: border-box; color: #dcdcde; font-size: 11px;">[póster]</div>
+                      <span class="fmt">Video · 9:16 · 1080 × 1920</span>
+                    </div>
+                    <div style="flex: 999 1 360px; min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+                      <div style="grid-column: span 2;"><label class="lbl" for="p2-src">URL del video</label><input class="in" id="p2-src" value="…/portfolio/v1/sky/black-sky-reel.mp4"></div>
+                      <div><label class="lbl" for="p2-alt">Texto alternativo</label><input class="in" id="p2-alt" value="Reel vertical de Black Sky"></div>
+                      <fieldset style="border: 0; padding: 0; margin: 0;"><legend class="lbl">¿Tiene voz?</legend><label style="margin-right: 12px;"><input type="radio" name="p2-voz" checked> Sí</label><label><input type="radio" name="p2-voz"> No</label></fieldset>
+                      <div style="grid-column: span 2;">
+                        <label class="lbl" for="p2-vtt">Subtítulos (.vtt)</label>
+                        <input class="in" id="p2-vtt" value="" aria-invalid="true" aria-describedby="e-p2-vtt" style="border-color: #d63638;">
+                        <p class="help err" id="e-p2-vtt">Un video con voz necesita subtítulos. Sube el .vtt al bucket junto al video y pega su URL.</p>
+                      </div>
+                    </div>
+                  </article>
+
+                  <article style="display: flex; flex-wrap: wrap; gap: 16px; padding-top: 12px; border-top: 1px solid #f0f0f1;" aria-label="Pieza: video sin leer">
+                    <div style="flex: 0 0 200px; display: flex; flex-direction: column; gap: 8px;">
+                      <div style="width: 200px; height: 113px; border: 1px dashed #d63638; border-radius: 4px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; color: #b32d2e; font-size: 12px; text-align: center; padding: 8px;">Sin dimensiones</div>
+                    </div>
+                    <div style="flex: 999 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+                      <label class="lbl" for="p3-src">URL del video</label>
+                      <input class="in" id="p3-src" value="https://vimeo.com/356065748" aria-invalid="true" aria-describedby="e-p3" style="border-color: #d63638;">
+                      <p class="help err" id="e-p3">No pudimos leer este video. Revisa la URL del bucket: los videos van en portfolio/v1/&lt;proyecto&gt;/ del bucket público de AXIS.</p>
+                    </div>
+                  </article>
+
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <button type="button" class="btn">Agregar imagen de la biblioteca</button>
+                    <button type="button" class="btn">Agregar video del bucket</button>
+                  </div>
+                </fieldset>
+
+                <fieldset style="border: 1px solid #dcdcde; border-radius: 4px; padding: 16px; margin: 0; display: flex; flex-direction: column; gap: 16px;">
+                  <legend style="padding: 0 6px; font-weight: 600; font-size: 14px;">Capítulo 2 · Cyber Sky</legend>
+                  <article style="display: flex; flex-wrap: wrap; gap: 16px;" aria-label="Pieza: feed de Cyber Sky">
+                    <div style="flex: 0 0 200px; display: flex; flex-direction: column; gap: 8px;">
+                      <div style="width: 128px; height: 160px; background: #dcdcde; border-radius: 4px; display: flex; align-items: flex-end; padding: 6px; box-sizing: border-box; color: #50575e; font-size: 11px;">[imagen]</div>
+                      <span class="fmt">Imagen · 4:5 · 1080 × 1350</span>
+                    </div>
+                    <div style="flex: 999 1 360px; min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+                      <div><label class="lbl" for="p4-alt">Texto alternativo</label><input class="in" id="p4-alt" value="Pieza de feed de Cyber Sky"></div>
+                      <div><label class="lbl" for="p4-cap">Leyenda</label><input class="in" id="p4-cap" value=""></div>
+                      <div style="grid-column: span 2; display: flex; gap: 12px;"><button type="button" class="btn">Cambiar imagen</button><button type="button" class="btn">Quitar pieza</button></div>
+                    </div>
+                  </article>
+                </fieldset>
+
+                <div><button type="button" class="btn">Agregar capítulo</button></div>
+              </div>
+            </section>
+          </div>
+
+          <aside aria-label="Estado y publicación" style="flex: 1 1 300px; max-width: 360px; display: flex; flex-direction: column; gap: 16px;">
+            <section class="box">
+              <h2 class="side-h">Falta para publicar</h2>
+              <div style="padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px;">
+                  <li><a href="#p2-vtt">El reel de Black Sky tiene voz y no tiene subtítulos.</a></li>
+                  <li><a href="#p3-src">Un video de Black Sky no se pudo leer.</a></li>
+                  <li><a href="Main.dc.html">Registrar la aprobación del cliente.</a></li>
+                </ul>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1640}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

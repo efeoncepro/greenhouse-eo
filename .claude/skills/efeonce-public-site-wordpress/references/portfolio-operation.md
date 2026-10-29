@@ -10,6 +10,12 @@ gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_po
   `TASK-2048` hooks `eo_portfolio_render_entry`. The 15 real projects load in `TASK-2049`.
 - Ohio's 44 demo entries are drafts with Yoast 410 (TASK-2046); the 15 real ones still live at `/project/<slug>/`.
 
+## Admin screen
+
+`Portafolio` menu (plugin v0.2.0, built 2026-10-29 on the approved design; deploy pending the operator's OK): list and
+structured editor over the same `EOP_Store`. Review it locally with
+`efeonce-public-site-runtime/tests/playground/serve-eo-portfolio.sh` (Playground on :9400, fixtures loaded, logged in).
+
 ## The only way to change a project
 
 ```bash
@@ -36,6 +42,8 @@ pnpm public-website:portfolio -- revisions <slug> | log <slug> | restore <slug> 
   `poster` in the public AXIS bucket (`portfolio/v<N>/<slug>/`) and `captionsVtt` when they have voice. No video upload
   to WordPress.
 - `services` only from `schema/services.v1.json`; `line` is growth | brand | engine | voice | revenue.
+- Video `src`, `poster` and `captionsVtt` must be under `schema/media-hosts.v1.json` (public AXIS bucket); anything else
+  fails with `MEDIA_HOST_NOT_ALLOWED`.
 - Saves are against a base revision: a conflict means someone saved in between → `pull`, reapply, `apply`.
 - No rule may depend on a client, campaign or slug name.
 
