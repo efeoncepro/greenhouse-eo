@@ -73,7 +73,7 @@ Read the minimal set:
 | AEO `/aeo-2/` | `references/landings/aeo.md` |
 | Agencia Creativa `/agencia-creativa/` | `references/landings/agencia-creativa.md` |
 | HubSpot services `/servicios-contratar-hubspot/` | `references/landings/hubspot-services.md` |
-| Home `/` (former Claude Design preview) | `references/landings/home-claude-design-preview.md`; verify current CMS identity/hash before writes |
+| Home `/` (compiled landing `inicio` since 2026-10-28; retiring pages with a 301 to `/`) | `references/landings/home-claude-design-preview.md` + `references/source-led-elementor-patterns.md`; retirements: `references/taxonomy-permalink-migrations.md` §4; verify current CMS identity/hash before writes |
 | Performance Marketing `/servicios/performance-marketing/` | `references/landings/performance-marketing.md` + `references/source-led-elementor-patterns.md` |
 | Inbound Marketing `/agencia-inbound-marketing/` | `references/landings/inbound-marketing.md` + `references/source-led-elementor-patterns.md` |
 | Content Marketing / Content Ops `/servicio-marketing-de-contenidos/` | `references/landings/content-marketing.md` + `references/source-led-elementor-patterns.md` |

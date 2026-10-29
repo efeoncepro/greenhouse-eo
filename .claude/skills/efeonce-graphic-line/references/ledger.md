@@ -1,5 +1,25 @@
 # Registro de decisiones y versiones
 
+### 2026-10-28 — Home de efeoncepro.com en «La órbita» (canvas «Home Efeonce en órbita»): aprobada y publicada
+
+Caso: rediseño de la home del sitio con la línea gráfica y el motion de referencia de getpingback.com (canvas
+`https://claude.ai/artifact/CuJ5wNPXrfYBXV9wFMevNq`; en producción desde el 2026-10-29, landing compilada `inicio`).
+Registro técnico en `efeonce-public-site-wordpress`, `references/landings/home-claude-design-preview.md`.
+
+- **Constelación de Sparks con los colores de las cinco líneas** (operador). Excepción aprobada para la home a la regla
+  «Sparks del color de una línea sólo en piezas de esa línea» (2026-10-01 (f), `SPARKS_V1.md` §6.1): la página presenta
+  todas las líneas, así que la constelación las mezcla. 18 Sparks (3D de las cinco líneas en estados y acciones + 2D al
+  fondo) a distintas profundidades alrededor del titular, parallax con cursor y scroll, tooltip con línea y qué hace;
+  fondo blanco porque la sección anterior es oscura. No se extiende a otras superficies.
+- **La primera versión de agentes se rechazó** («no me gustó en absoluto»: escenario oscuro, ciclo, familias). De tres
+  direcciones ofrecidas, el operador eligió la constelación: «Ese sí quedó genial».
+- **Sin cierre de marca en la home del sitio** (logo en órbita + Empower your Growth + «Desde Santiago, operando en…»):
+  «en la home no hay forma de ponerlo». El footer canónico del sitio lo reemplaza; header y footer son los canónicos,
+  el menú dibujado del canvas no se porta.
+- **Imagen OG de la home:** 1200×630 PNG con la lente y la persona al centro y el logo centrado abajo; la pregunta y
+  «Crecer.» a la izquierda, Destacar/Aparecer/Rendir/Vender a la derecha, para que sobreviva al recorte cuadrado de los
+  chats y al 2:1 de X (fuente `scripts/public-website/inicio-source/og/og.html`; adjunto `252184`).
+
 ### 2026-10-26 — Infografía «Una idea, cada formato» (marketing de contenidos): aprobada y publicada
 
 Caso: refresh del artículo de marketing de contenidos (post `244883`), tercera infografía de cuerpo tras ICP y AEO

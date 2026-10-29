@@ -3,7 +3,7 @@
 > **Tipo de documento:** Especificación canónica de marca (personajes)
 > **Versión:** 1.7
 > **Creado:** 2026-10-01 por Claude
-> **Última actualización:** 2026-10-03 por Claude (1.7: §8.2, los Sparks en animación 2D, primer uso en el spot «Sparks × Efeonce AEO»; 1.6: §5, dos Sparks con referencia como máximo en una toma cine; §6, `NX7d` como escena de referencia con Nexa en su traje biónico)
+> **Última actualización:** 2026-10-29 por Claude (1.8: §6.1, excepción aprobada: una pieza que presenta todas las líneas, como la home, reúne Sparks de varias líneas; 1.7: §8.2, los Sparks en animación 2D, primer uso en el spot «Sparks × Efeonce AEO»; 1.6: §5, dos Sparks con referencia como máximo en una toma cine; §6, `NX7d` como escena de referencia con Nexa en su traje biónico)
 > **Estado:** nombre, plantel y relato aprobados por el operador (Julio Reyes) el 2026-09-29; diseño elegido y Spark
 > base aprobado el 2026-10-01 («Me encanta»). Kit producido (Spark base v02 y plantel v01, aprobado el 2026-10-01: «Aprobados») y catálogo de `foto:prompt`
 > con guarda contra robots. Sin publicar en AXIS; sin prueba de reconocimiento.
@@ -165,6 +165,10 @@ brillo bajo la esfera—, siempre de un solo color. El azul de **Engine** (`#037
 ```
 
 - **Sólo cuando la pieza es de esa línea**; en cualquier otra, el azul de Engine.
+  **Excepción [operador, 2026-10-28: «Ese sí quedó genial»]:** una pieza que presenta todas las líneas a la vez —la home
+  de efeoncepro.com, sección «Agentes con contexto»— puede reunir Sparks de varias líneas, cada uno en el color de la
+  suya. Caso fuente: la constelación de 18 Sparks de la home (`scripts/public-website/inicio-source/`); el detalle está
+  en el ledger de `efeonce-graphic-line`.
 - **Brand y Voice son cálidos:** en estudio no tiñen la escena, pero en una foto cine oscura el LED puede llevar la cara
   de la persona al ámbar (la trampa de la criatura cálida, `.claude/rules/brand-photography.md`). Se prueban en cine
   antes de usarse en una foto oscura.

@@ -11,6 +11,10 @@ Use this folder when a reusable public landing component, Elementor widget, host
 
 ## Landing contracts
 
+- [Home «La órbita» (landing `inicio`)](HOME_INICIO_ELEMENTOR_MODULES_V1.md) — portada `/` (`251731`) desde el
+  2026-10-29: doce widgets `greenhouse_inicio_*` compilados desde el canvas «Home Efeonce en órbita» sobre el núcleo
+  source-led, agendador con el CTA del menú global, carril build/deploy/publish/rollback, SEO/OG y lecciones de QA.
+  Supersede como home a [Agency](AGENCY_ELEMENTOR_MODULES_V1.md), que queda histórico.
 - [Content Marketing / Content Ops](CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) — trece widgets
   semánticos, captura Growth Forms y SEO sobre la página existente; incluye límites y evidencia.
 - [Agencia Creativa](AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md) — quince widgets `greenhouse_creativa_*`

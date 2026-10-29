@@ -229,6 +229,20 @@ Tested live with slash, without slash and with `?utm_source=x` (301 keeping the 
 passthrough mu-plugin, deployed to production 2026-10-17). Detail and rollback:
 `references/landings/performance-marketing.md`.
 
+Case — retiring pages to the trash with a 301 to the front page (2026-10-29, operator request, after the new Home went
+live): `/home-2-2/` (`248852`, indexable and in the sitemap, competing with the front page), the old Homes
+(`2791` /home-2/, `242261` /home/, `246396` /home-prueba/ + drafts and the QA preview) and the published Ohio demos
+(`/homedemo{1,8,17,27,35}-elementor/`). Scripts: `scripts/public-website/retire-home-2-2.php`, `retire-old-homes.php`,
+`retire-ohio-demos.php`. Lessons:
+
+- `scripts/public-website/create-yoast-redirect.php` **cannot target the front page**: it normalizes `/` to `//` and
+  requires a published post at the target. For a 301 to `/`, use a `retire-*` script: Yoast
+  `new WPSEO_Redirect('<origin>', '/', 301, 'plain')` + `wp_trash_post()` (trash, reversible; never a hard delete).
+- Each script has a dry run and guards id, title, status and menu membership of every target before writing. Not
+  touched: demo drafts `21404` and `243726`, and the work copy `251875` (publish + noindex).
+- Verify live: slash, no-slash and `?utm_` variants all 301 to `/`; the sitemap no longer lists them; `/` and `/blog/`
+  return 200. Ids and evidence: `references/landings/home-claude-design-preview.md`.
+
 ## 5. Update Owned Internal Links
 
 Search for every old canonical after the redirect exists. Replace owned links
