@@ -944,3 +944,11 @@ Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md`). Recetas:
   1920 × 1080 sobre la lámina. Todas las páginas llevan el mismo `sections`. Y antes de inventar una portada o un cierre
   para una propuesta, se usan las recetas aprobadas (`cover-proposal-*`, `close-proposal-*`) compuestas con
   `pnpm brand:compose`: la propuesta no lleva «¿Conversamos?».
+- **SVG con clases `<style>` sale negro en el canvas de diseño (propuesta Agencia Digital 2027 GRD-1552).** Síntoma: el
+  badge de HubSpot en SVG con estilos por clase se pintó negro en la lámina. Regla: un SVG cuyo color depende de un
+  bloque `<style>` se rasteriza a PNG antes de subirlo al canvas.
+- **Logos de clientes «un tono» para láminas de papel (GRD-1552).** Para la grilla de clientes en papel (lámina
+  canónica del brochure 360° v9, p. 78) los logos se generan desde
+  `src/lib/artifact-composer/catalogs/deck-axis/assets/clients/` mapeando los píxeles opacos a navy `#023c70` (claros →
+  blanco, medios → navy medio). Mirar cada logo al 100 %: la regla del isotipo dentro de un cuadrado de color
+  (`deck-studio`, brochure Servicios web) sigue vigente.

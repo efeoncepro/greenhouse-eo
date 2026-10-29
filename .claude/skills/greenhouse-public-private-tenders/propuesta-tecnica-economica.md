@@ -226,6 +226,10 @@ openpyxl no estaba instalado y exceljs pierde partes del archivo. Se guarda como
 oferente; el original del comprador no se toca. Cada «CUMPLE» apunta a una página real del PDF entregado
 y entra a la matriz de cumplimiento.
 
+Delta GRD-1552 (29/10/2026): aunque openpyxl esté instalado, **no se guarda con openpyxl**: borra las
+validaciones de extensión `x14:dataValidation` (en el caso, las de la hoja «Requisitos técnicos»). Se escriben las celdas
+como `inlineStr` en el XML de la hoja, sobre el original copiado.
+
 ## Oferta administrativa — anexos y declaraciones juradas
 
 Los típicos (varían por bases — lee siempre):

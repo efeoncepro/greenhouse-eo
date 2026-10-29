@@ -1,0 +1,184 @@
+{
+  "version": 2,
+  "status": "draft",
+  "date": "2026-10-29",
+  "reference": "GRD-1552 · Agencia Digital 2027",
+  "currency": "COP",
+  "vatRate": null,
+  "taxStatus": "not_applicable",
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "Grupo Réditos · GANA y LOTI",
+    "unit": "Coordinación de Marketing Digital",
+    "taxId": "NIT 901716185",
+    "logo": null
+  },
+  "cover": {
+    "label": "Oferta económica",
+    "title": [
+      "Agencia digital",
+      "integral para",
+      "GANA y LOTI."
+    ],
+    "subtitle": "Una mensualidad desglosada en cinco componentes, durante doce meses, para todo el alcance del requerimiento.",
+    "netLabel": "Valor neto por 12 meses"
+  },
+  "service": {
+    "name": "Agencia digital integral para GANA y LOTI · 2027"
+  },
+  "scope": {
+    "title": [
+      "Cinco componentes,",
+      "un solo equipo."
+    ],
+    "intro": "La mensualidad reúne todo el alcance del requerimiento. Cada componente puede evaluarse y ajustarse por separado.",
+    "rows": [
+      {
+        "title": "Equipo dedicado en Medellín",
+        "text": "Trafficker Digital, Content Creator y Especialista en Email Marketing y SMS, 100% para GANA y LOTI, con dos días presenciales por semana, coordinación y reemplazos."
+      },
+      {
+        "title": "Creatividad y producción",
+        "text": "10 conceptos creativos y 2 campañas macro al año; 125 piezas mensuales más 5 variantes; 24 parrillas; copies, edición y adaptaciones; una activación táctica anual."
+      },
+      {
+        "title": "Estrategia, cuenta e informes",
+        "text": "Diagnóstico inicial, acompañamiento permanente, Flash Report semanal, informe integral al segundo día hábil, informe de contactabilidad, 4 informes de sector, 4 de tendencias, 2 benchmark e innovación."
+      },
+      {
+        "title": "Social Listening y reputación",
+        "text": "Herramienta de escucha, 12 informes mensuales, protocolo anual de crisis, acompañamiento a demanda y dos ejercicios programados de crisis."
+      },
+      {
+        "title": "Analítica, GA4 y dashboard",
+        "text": "Funnels de conversión en GA4, dashboard de pauta, indicadores por frente y medición de SEO y SEM."
+      },
+      {
+        "title": "A cargo de Grupo Réditos",
+        "text": "La inversión en medios, la plataforma de Email y SMS y su consumo. No forman parte de esta oferta."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Doce meses de servicio",
+    "phases": [
+      {
+        "label": "Días 1 a 30",
+        "title": "Arranque y diagnóstico",
+        "text": "Accesos, equipo instalado en Medellín, diagnóstico estratégico inicial y primeras parrillas."
+      },
+      {
+        "label": "Días 31 a 90",
+        "title": "Operación y metas",
+        "text": "Línea base, metas acordadas por frente, protocolo de crisis y primera prueba de innovación."
+      },
+      {
+        "label": "Meses 4 a 12",
+        "title": "Operación plena",
+        "text": "Una campaña macro por semestre, informes trimestrales de sector y tendencias y revisiones de resultados."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Una mensualidad",
+      "por componente."
+    ],
+    "intro": "Cada componente se cotiza por mes durante doce meses. Todos los valores se expresan en pesos colombianos (COP).",
+    "summary": "Doce meses · Pesos colombianos · Valor neto",
+    "taxLabel": "IVA",
+    "taxNote": "Valores netos. Impuestos y retenciones de cada parte, conforme a la normativa vigente.",
+    "monthly": null
+  },
+  "lines": [
+    {
+      "label": "Equipo dedicado en Medellín",
+      "detail": "Tres perfiles 100% para GANA y LOTI.",
+      "quantity": {
+        "value": 12,
+        "unit": "meses"
+      },
+      "unitNet": "18800000",
+      "net": "225600000"
+    },
+    {
+      "label": "Creatividad y producción",
+      "detail": "Conceptos, campañas macro, piezas y parrillas.",
+      "quantity": {
+        "value": 12,
+        "unit": "meses"
+      },
+      "unitNet": "9600000",
+      "net": "115200000"
+    },
+    {
+      "label": "Estrategia, dirección de cuenta e informes",
+      "detail": "Diagnóstico, acompañamiento e informes.",
+      "quantity": {
+        "value": 12,
+        "unit": "meses"
+      },
+      "unitNet": "4800000",
+      "net": "57600000"
+    },
+    {
+      "label": "Social Listening y reputación",
+      "detail": "Herramienta, informes y crisis.",
+      "quantity": {
+        "value": 12,
+        "unit": "meses"
+      },
+      "unitNet": "2900000",
+      "net": "34800000"
+    },
+    {
+      "label": "Analítica, GA4 y dashboard",
+      "detail": "Funnels, tablero e indicadores.",
+      "quantity": {
+        "value": 12,
+        "unit": "meses"
+      },
+      "unitNet": "1900000",
+      "net": "22800000"
+    }
+  ],
+  "net": "456000000",
+  "conditions": {
+    "title": [
+      "Alcance, responsabilidades",
+      "y condiciones de cobro."
+    ],
+    "rows": [
+      {
+        "title": "Modulable por componente",
+        "text": "Si ustedes ajustan el alcance de un componente, su valor se ajusta sin modificar los demás."
+      },
+      {
+        "title": "Medios y plataformas",
+        "text": "La inversión en medios, la plataforma de Email y SMS y su consumo son de Grupo Réditos. La producción para televisión, radio y exterior se acordará según el alcance que ustedes definan."
+      },
+      {
+        "title": "Facturación y pago",
+        "text": "Facturación mensual en pesos colombianos durante doce meses. Pago a 30 días corridos desde la recepción de la factura."
+      },
+      {
+        "title": "Continuidad del equipo",
+        "text": "Efeonce asegura la continuidad de los tres perfiles dedicados. Un reemplazo se informa con anticipación y mantiene la dedicación ofertada."
+      },
+      {
+        "title": "Aprobaciones y accesos",
+        "text": "Su Coordinación de Marketing Digital prioriza el trabajo, aprueba las entregas y facilita los accesos y permisos acordados."
+      },
+      {
+        "title": "Vigencia",
+        "text": "La vigencia de la oferta es la que establece el proceso GRD-1552 en Wherex. La complementan la propuesta técnica y el formulario de requisitos."
+      }
+    ]
+  }
+}

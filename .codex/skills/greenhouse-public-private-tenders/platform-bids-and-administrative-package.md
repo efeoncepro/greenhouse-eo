@@ -170,6 +170,47 @@ su OK explícito en el chat: aceptar términos y enviar son el acto de presentac
 de Colombia; en Sika 1164 la UI mostró hora de Santiago. No persistir en el CRM una hora dudosa: registrar
 ambas fuentes como «por conciliar» y postular temprano.
 
+## Paquete Wherex de Grupo Réditos: composición y armado (Agencia Digital 2027 GRD-1552, 29/10/2026)
+
+Segunda oferta a Grupo Réditos por Wherex (después de GRD-1541). Armado el 28–29/10/2026; al cierre de la sesión
+nada estaba subido, firmado ni enviado por el agente. Carpeta: OneDrive `Licitaciones/Grupo Reditos/13. Agencia
+Digital 2027/02 - Para subir a Wherex/`.
+
+- **Composición del paquete** (numerados 01–07): 01 propuesta técnica PDF
+  · 02 propuesta económica PDF, modulable · 03 RFP Excel del comprador diligenciado · 04 declaración de conflicto
+  de intereses (Word) · 05 Cámara de Comercio = certificado de vigencia ≤ 30 días + estatuto (Registro de Empresas y
+  Sociedades de Chile; ver «Oferente extranjero») · 06 e-RUT · 07 dos certificaciones de experiencia (SKY Airline +
+  Gobierno de Santiago).
+- **Documentos legales: reutilizar los del último paquete del mismo comprador** si siguen vigentes. Los 05–07
+  salieron de `12. Programmatic/` (GRD-1541); la vigencia tenía 11 días al cierre, dentro del límite de 30. Medir la
+  fecha de emisión al cierre de la licitación nueva, no la del paquete anterior.
+- **Declaración de conflicto de intereses:** se llena con python-docx (nombre y cargo del representante, razón
+  social y RUT de la empresa, lugar, fecha y respuesta). Llena no es firmada: queda en el checklist como pendiente
+  de firma del representante.
+- **RFP Excel:** por cada requisito, «CUMPLE» + «Páginas … de la propuesta en PDF» + observación (una observación
+  puede quedar vacía por decisión del operador). Se edita a nivel XML: openpyxl borra las validaciones
+  `x14:dataValidation` al guardar (detalle en `propuesta-tecnica-economica.md` → «RFP en Excel del comprador»). Las
+  páginas citadas salen del PDF final; si el deck se renumera, se rehacen.
+- **Checklist interno fuera de la carpeta de subida:** `CHECKLIST WHEREX GRD-1552 (INTERNO).md` vive en la carpeta
+  del proceso, no en `02 - Para subir a Wherex/`. Así la carpeta de carga contiene sólo lo que se sube.
+- **Versión cliente de la técnica:** antes de exportar se barren códigos de fuente internos (`[E01]`, «Fuente E02»),
+  cajas «Por confirmar» / «pendiente» / «por adjuntar», sellos «Borrador» y frases defensivas; se retiran los anexos
+  de fuentes internas y se verifica con `pdftotext` sobre el PDF final completo (detalle en `deck-studio` →
+  «Reglas generales para decks de licitación»).
+- **Económica modulable:** un total mensual y anual antes de impuestos, desglosado en componentes de valor (equipo
+  dedicado, creatividad y producción, estrategia y cuenta, social listening, analítica) cuyo peso sigue el costo
+  interno (el equipo ≈ 49 % del costo mensual pesa ≈ 49 % del precio; el resto se repartió por alcance). Ajustar un
+  componente no cambia los demás. Se declara lo que queda a cargo del comprador (medios, plataforma y consumo de
+  Email/SMS). **Nunca se publican costos ni márgenes:** el peso interno ordena el desglose, no se imprime.
+  **Formato: plantilla A4** (`node scripts/documents/render-cotizacion-a4.mjs`, versión 2, una línea por componente ×
+  12 meses con valor unitario mensual), nunca una lámina del deck: en GRD-1552 se armó primero como lámina 1920×1080 y
+  hubo que rehacerla. Comprador extranjero en Wherex: `vatRate: null` + `taxStatus: "not_applicable"` (precedente Sika
+  1164); con líneas mensuales visibles, `pricing.monthly: null` evita una página casi vacía.
+- **Riesgos que se informan, no se tapan:** permiso de un aliado para aparecer y usar logos de sus clientes,
+  requisito marcado «CUMPLE» por decisión del operador sin evidencia documental, contraparte legal del comprador sin
+  fijar, costo completo no validado por Finance y fechas de fundación que difieren entre deck y estatuto. Quedan en
+  el checklist y en el reporte al operador.
+
 ## Seguimiento y continuidad
 
 Leer [follow-up-agent/README.md](../../../docs/commercial/follow-up-agent/README.md) y su registro antes de
