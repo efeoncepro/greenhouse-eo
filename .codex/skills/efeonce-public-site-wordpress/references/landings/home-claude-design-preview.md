@@ -40,6 +40,20 @@
   Verified live at 1440, 1280 and 390: overflow 0, no broken images, no console errors, scheduler dialog opens (no
   booking made), canonical/robots/title/description unchanged. QA preview `252177` (`/home-orbita-preview-20261029/`) left
   `private`.
+- SEO/social 2026-10-29 09:21 UTC (`configure-inicio-seo.php`, snapshot option `_gh_home_orbita_seo_before_20261029_092107`):
+  new attachment `252184` `efeonce-home-que-necesita-tu-marketing-og.png` (1200×630 PNG from `inicio-source/og/og.html`,
+  center-safe for square/2:1 crops, alt set) as OG image, Twitter image and featured image (also mirrored in
+  `_elementor_page_settings.post_featured_image`); the 2025 art `248149` (WebP 2000×960) stays in the library. Meta
+  description, OG/Twitter title «¿Qué necesita tu marketing? | Efeonce» and descriptions rewritten from the page copy;
+  SEO title unchanged. Same day: work videos `preload="none"` + play only on screen (0 MB of video at load, was 6.2 MB),
+  internal line links in the same tab, first hero portrait `fetchpriority="high"` (deploy backup
+  `/tmp/eo-inicio-widgets-before-20261029-092003.tar`).
+- `/home-2-2/` (page `248852` «Home 2», indexable, in the sitemap, competing with the front page) retired 2026-10-29 by
+  operator request: trashed (reversible) + Yoast 301 `home-2-2 → /` (`retire-home-2-2.php`). Legacy backup `2791`
+  (`/home-2/`, noindex) untouched.
+- SEO backlog (global, not the Home body): WebSite description = site tagline «Agencia de marketing 360°»; no X account in
+  Yoast (`twitter_site`); Slider Revolution `sr7.js` and Font Awesome brands load on the Home without use; field CWV and
+  PageSpeed not measured (public PSI quota exhausted 2026-10-29).
 - Pending: in-editor save/reload not verified; keyboard traversal of the scenes not certified; the agents offer still
   has no own landing (CTA goes to the agenda).
 
