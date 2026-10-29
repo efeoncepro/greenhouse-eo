@@ -8,6 +8,41 @@
 - **Confidence:** high en contrato/ownership; medium en eficacia comercial, a experimentar localmente.
 - **Validated as of:** 2026-10-11, documentos locales, revisión Sales y fuentes fechadas del discovery; no estado live de proveedores.
 
+## Evidencia de adapter 2026-10-29 — Sales Navigator
+
+[Recorrido interactivo verificado](../manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md)
+con `cua_repl` y sus locators Playwright sobre Chrome autenticado: cuentas, filtros laterales,
+perfil/actividad y paginación. Adapter interactivo dentro del método vigente, sin API interna,
+exportación de credenciales, nuevo runtime, scheduler ni ampliación de autonomía. Las identidades y
+datos profesionales los declara LinkedIn; el CRM conserva sus campos y permisos independientes.
+La [aplicación BCI](../commercial/prospects/contactos-conocidos-banca-retail-2026-10/BCI-SALES-NAVIGATOR-2026-10-29.md)
+contrasta filtros laterales de función, ubicación, seniority, relación y nombre con perfiles reales.
+Cargo actual sin sugerencias no cuenta como aplicado; el manual conserva el límite y fuentes oficiales.
+
+Por mandatos posteriores del mismo día, el [corte inicial de cuatro servicios](../commercial/sales-navigator/CONFIGURACION-2026-10-29.md)
+se amplió a [doce servicios con landing y cinco Personas](../commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md),
+con persistencia releída en Core. Se guardaron [tres listas de cuentas](../commercial/prospects/servicios-financieros-chile-2026-10/CARTERA-Y-LISTAS-2026-10-29.md)
+(31 identidades verificadas, asociación de Haulmer incierta) y [cinco listas por frente de servicio](../commercial/prospects/servicios-financieros-chile-2026-10/LISTAS-PERSONAS-POR-SERVICIO-2026-10-29.md)
+(23 personas únicas, membresía nominal releída). El método requiere conciliar identidades y membresía,
+sin sustituir esa prueba por contadores o una notificación agregada.
+
+Continúa el adapter dentro de esta decisión: documenta operaciones nativas autorizadas, sin nueva API,
+runtime, scheduler, autonomía o permiso de envío/CRM. No se extrajeron credenciales ni se implementó un runner
+desatendido. Customer Model conserva ICP/JTBD; Personas son filtros de roles, las listas son organización
+operativa y los servicios son personalización de oferta. Identidad, encaje, autoridad, acceso, demanda y
+admisión CRM se verifican por separado. La base financiera sin relación y las pasadas complementarias de
+software/fintech evitan convertir conexiones existentes en condición de relevancia.
+
+### Instrucción del operador 29-10-2026 — Core y uso táctico de InMail
+
+Julio declaró inicialmente **Sales Navigator Core y 50 créditos InMail** y ordenó documentar una estrategia de
+conexión primero, espera de aceptación y abordaje posterior; InMail para alta relevancia o alto valor
+estratégico por tiempo/ventana. La [política operativa](../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md)
+gobierna esa elección y su trazabilidad dentro de los permisos separados del método B2B vigente.
+La captura y lectura posterior en Ajustes mostraron **150 disponibles el 29/10**; los 50 iniciales quedan
+como historia, sin atribuir causa a la diferencia. Saldo futuro y reposición no inferidos.
+No cambia autonomía, scheduler, CRM ni genera comunicaciones.
+
 ## Context
 
 Evidencia operativa del mismo día: [diccionario completo del portal](../audits/commercial/hubspot-properties-2026-10-11/README.md)

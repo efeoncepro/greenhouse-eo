@@ -11,6 +11,12 @@ Canon: [skill](../../../.codex/skills/efeonce-b2b-prospecting/SKILL.md),
 
 ## Antes de empezar
 
+Sales Navigator: [recorrido verificado en Chrome con Playwright](prospectar-sales-navigator-con-agentes.md)
+con sesión abierta del operador: filtros de cuentas → empleados/Personas → perfil/actividad → listas.
+El manual distingue investigación, configuración autorizada, guardado/readback y comunicación; documenta
+Core, 150 InMail observados el 29/10 (50 fue el antecedente inicial) y uso táctico según la
+[política de canal](../../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md).
+
 Para cualquier nueva apertura, respuesta inbound, reactivación o seguimiento comercial, aplicar
 [conversaciones útiles](../../../.codex/skills/efeonce-b2b-prospecting/references/conversation-quality-and-review.md).
 La [implementación de octubre](../../commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md)
@@ -21,6 +27,18 @@ acciones autorizadas y presupuesto si hay créditos. Una aprobación anterior cu
 no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/radar no aprueba lotes futuros.
 
 ## Recorrido
+
+Para Sales Navigator, definir primero las cuentas por industria/sede/tamaño y comprobar la entidad exacta;
+usar keywords para ampliar taxonomías como fintech clasificada en software. Conservar una base sin relación
+y añadir la pasada de primer grado sólo para acceso. Inventariar un filtro no prueba haber aplicado todas
+sus opciones; el control CRM bloqueado en Core no se resuelve reconectando HubSpot.
+
+El [modelo de servicios e ICP](../../commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md) cubre las doce
+landings verificadas y cinco Personas por rol. Elegir frente por problema/ownership, no por coincidencia
+literal con SEO. Organizar cuentas por sector/cohorte y personas por servicio; mantener el buying group y la
+tesis de cuenta compartidos entre listas. Guardar una persona en Sales Navigator no requiere email y no
+equivale a crear Contact/Lead CRM, contactar ni consumir InMail. Si el mandato incluye guardar, comprobar
+perfil/Cargo actual, destino exacto y membresía nominal tras recarga; conciliar intentos ambiguos antes de repetir.
 
 1. Invocar `$efeonce-b2b-prospecting` o pedir investigación/registro/recuperación de cuenta. Cargar sólo módulos
    pertinentes; resolver entidad y leer expediente/hilo vigente. Si el pedido nombra Sales, cargar su índice

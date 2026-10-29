@@ -5,6 +5,16 @@ description: Investiga cuentas B2B para Efeonce, identifica compradores y contac
 
 # Prospección B2B Efeonce
 
+## LinkedIn y presupuesto InMail
+
+Aplicar la [política de Sales Navigator Core](../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md):
+Saldo fechado en la política (150 disponibles observados el 29/10; declaración inicial de 50); conexión y espera de aceptación como ruta habitual para quien
+no está conectado. Reservar InMail para alta relevancia o valor estratégico por tiempo/ventana de oportunidad.
+Verificar saldo/costo antes del uso; esta política no autoriza envíos ni nuevas solicitudes por sí sola.
+Construir el buying group sin limitarlo a primer grado y evaluar el acceso por persona después; tener alguna
+conexión en una cuenta no acredita acceso a su decisor. La observación de Julio sobre posibles contactos
+valiosos fuera del primer grado es una hipótesis, no un hecho general de su red.
+
 ## Criterio para nuevas comunicaciones
 
 Antes de preparar una apertura, reactivación, seguimiento o respuesta comercial de captación/expansión,
@@ -54,7 +64,8 @@ externos y el comprador de sus propias declaraciones. Resuelve contradicciones s
   Distingue identidad, participación/autoridad, correo, acceso e interacción; no se validan unos por otros.
 - **No crees un Contact/Lead de prospección sin correo corporativo individual verificado y atribuible a esa
   persona.** Si falta, conserva la señal en investigación o nota de Company y busca personas adyacentes.
-  No inventes direcciones, uses un buzón general como correo individual ni rellenes una cuota con desconocidos.
+  Este gate es de CRM; guardar un posible cliente en una lista nativa de Sales Navigator no exige email ni
+  autoriza un alta CRM. No inventes direcciones, uses un buzón general como correo individual ni rellenes una cuota con desconocidos.
   Una candidata por patrón se mantiene en investigación: calidad técnica y atribución se evalúan por separado;
   aplicar sólo la [excepción individual informada](references/contact-quality-and-enrichment.md#patrón-solicitado-y-excepción-individual-explícita)
   expresamente autorizada, sin convertirla en permiso general ni alterar el gate.
@@ -83,6 +94,7 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Descubrir o verificar entidad, fit y señales | [account-research-and-signals](references/account-research-and-signals.md) + Customer Model |
 | Radar de convocatorias, primera entrada y alertas tempranas | [guía compartida del radar](../../../docs/commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md) + Tenders; descubrimiento amplio y vigilancia de conocidos separados |
 | Encontrar objetivo, adyacentes y rutas de acceso | [buying-group-and-access](references/buying-group-and-access.md) |
+| Investigar, configurar servicios/Personas o guardar cuentas/personas en Sales Navigator | [sales-navigator-operations](references/sales-navigator-operations.md) + [manual de Chrome/Playwright](../../../docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md); panel lateral, taxonomía y readback nominal; sesión/UI a revalidar |
 | Conseguir y evaluar datos accionables | [contact-quality-and-enrichment](references/contact-quality-and-enrichment.md) |
 | Preparar acercamiento, correo robusto de Julio o prueba contextual | [message-and-contextual-proof](references/message-and-contextual-proof.md) ([estructura preferida](references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio)) + Copywriting/práctica |
 | Preparar reunión, leer transcripción y construir caso de negocio | [discovery-to-business-case](references/discovery-to-business-case.md) + Commercial/Customer Model/Pricing; fuente declarada y economía condicionada |

@@ -1,0 +1,257 @@
+{
+  "date": "2026-10-29",
+  "timezone": "America/Santiago",
+  "actor": "Julio Reyes",
+  "plan": "Sales Navigator Core",
+  "status": "saved_and_read_back_after_reload",
+  "supersedes": "CONFIGURACION-2026-10-29.json",
+  "inMailAvailableObserved": 150,
+  "products": [
+    {
+      "name": "Posicionamiento SEO",
+      "description": "Efeonce ayuda a equipos de marketing, Growth y comercio electrónico de empresas medianas y grandes a convertir su presencia web en una capacidad de descubrimiento orgánico medible. Integramos SEO técnico, arquitectura e indexación, investigación de intención de búsqueda, contenido y clusters temáticos, enlazado interno, datos estructurados y señales de entidad y autoridad. Partimos de un diagnóstico y un baseline para priorizar, ejecutar mejoras y revisar resultados por ciclo. Conectamos visibilidad, tráfico calificado y conversión con la analítica y los objetivos de negocio acordados. La ejecución y publicación en el CMS, las dependencias técnicas y la coordinación con el equipo interno se definen en el alcance. Es una entrada pertinente ante una migración web, un nuevo producto o mercado, pérdida de visibilidad comprobada o falta de continuidad entre diagnóstico, contenido e implementación.",
+      "category": "SEO y posicionamiento orgánico",
+      "url": "https://efeoncepro.com/servicios/posicionamiento-seo/",
+      "verified": true
+    },
+    {
+      "name": "Efeonce | AEO — Visibilidad en IA",
+      "description": "El servicio Efeonce | AEO ayuda a equipos de marketing, marca, SEO y Growth a entender y mejorar cómo su marca es encontrada, citada y representada en motores de respuesta e inteligencia artificial. Establecemos un baseline por mercado, categoría y preguntas relevantes; revisamos menciones, fuentes, citaciones, representación de la marca y contexto competitivo. Conectamos ese diagnóstico con prioridades de contenido, estructura semántica, datos estructurados, entidades, evidencia y señales de autoridad, coordinadas con la base SEO existente. El trabajo combina diagnóstico, implementación y seguimiento según la fase y el alcance acordados. Resulta pertinente cuando la dirección necesita entender su visibilidad en IA, existen inconsistencias verificadas en la representación de la marca o se prepara un cambio de oferta, producto o mercado. Los resultados se evalúan con consultas, mercados y métodos comparables y decisiones de siguiente ciclo.",
+      "category": "AEO y visibilidad en motores de respuesta de IA",
+      "url": "https://efeoncepro.com/aeo-2/",
+      "verified": true
+    },
+    {
+      "name": "Agencia Creativa",
+      "description": "Efeonce se suma al equipo interno de marketing y marca para convertir desafíos de negocio en decisiones creativas y sistemas que el equipo pueda ejecutar. Trabajamos estrategia y posicionamiento de marca, sistemas de identidad, conceptos y plataformas de campaña, mensajes, key visuals y toolkits multicanal, con dirección creativa y revisión humana. Conectamos investigación, criterio de marca y desarrollo creativo con un plan de despliegue que conserva contexto, prioridades y decisiones entre ciclos. Es una ruta pertinente para un rebranding, evolución de posicionamiento, lanzamiento o campaña que necesita coherencia entre equipos, formatos y mercados. El trabajo puede cubrir desde la definición hasta el despliegue, o un tramo delimitado en coordinación con el cliente y sus otros partners. Brief, responsables de aprobación, entregables, derechos de uso, capacidad y criterios de aceptación se acuerdan por iniciativa.",
+      "category": "Agencia creativa y estrategia de marca",
+      "url": "https://efeoncepro.com/agencia-creativa/",
+      "verified": true
+    },
+    {
+      "name": "Producción Creativa a Escala",
+      "description": "Efeonce ayuda a equipos internos de marketing, marca y contenido a resolver demanda recurrente y picos de campañas mediante capacidad de producción definida, coordinación y control de calidad. Producimos y adaptamos piezas gráficas, contenido digital, audiovisual y motion según el alcance, con sistemas modulares, versionado, localización y continuidad de marca. Podemos ejecutar a partir de un concepto o key visual ya aprobado por el cliente u otra agencia, conservando su dirección y autoridad sobre la marca. La operación articula briefs, prioridades, aprobaciones, revisión humana, control de derechos y registro de decisiones y entregas. Es pertinente cuando el volumen de formatos o mercados supera la capacidad estable del equipo, hay un lanzamiento con backlog o la adaptación continua genera retrabajo. La capacidad, los formatos, las rondas, los responsables, los plazos y los criterios de aceptación se definen antes de producir.",
+      "category": "Producción creativa y operaciones de contenido",
+      "url": "https://efeoncepro.com/agencia-creativa-v2/",
+      "verified": true
+    },
+    {
+      "name": "Diseño y Desarrollo Web",
+      "description": "Diseño, desarrollo y evolución de sitios web y landing pages para organizaciones que necesitan una experiencia digital clara, útil, rápida y medible. Conectamos arquitectura de información, diseño, contenido, CMS, desarrollo y calidad técnica con los objetivos del negocio. Definimos desde el inicio rendimiento, accesibilidad, fundamentos SEO/AEO, analítica y criterios de conversión según el alcance acordado. Podemos abordar un nuevo sitio, rediseño, migración o evolución del activo existente, con responsables, accesos, integraciones y aprobaciones definidos. Trabajamos con los equipos de marketing, producto y tecnología para entregar una web que puedan operar y mejorar. No prometemos resultados de conversión sin baseline, instrumentación y capacidad de implementar.",
+      "category": "Diseño, desarrollo y evolución web",
+      "url": "https://efeoncepro.com/desarrollo-sitios-web/",
+      "verified": true
+    },
+    {
+      "name": "Servicios HubSpot y RevOps",
+      "description": "Ayudamos a organizaciones a diagnosticar, implementar, migrar, integrar, optimizar y operar HubSpot con datos confiables, procesos claros y adopción del equipo. La oferta se organiza por resultados: Marketing, Contenido y AEO; Ventas y Pipeline con IA; Revenue Lifecycle; Servicio, Customer Success y Delivery; Datos, Integración e Inteligencia CRM; y Agent Hub y Operaciones Agénticas. Diseñamos arquitectura CRM, automatizaciones, reporting y conexiones con sistemas operativos, conservando su fuente de verdad. Acordamos objetivos, gobierno, responsables, calidad de datos y backlog de mejora. HubSpot Ops y Agentic Ops son modalidades de operación según alcance. La elegibilidad de agentes, funciones y betas depende del portal, plan y mercado; licencias y terceros se evalúan por separado. HubSpot no sustituye al ERP ni al core bancario.",
+      "category": "HubSpot, CRM y operaciones de ingresos",
+      "url": "https://efeoncepro.com/servicios-contratar-hubspot/",
+      "verified": true
+    },
+    {
+      "name": "Content Marketing y Content Ops",
+      "description": "Convertimos conocimiento de marca y de sus expertos en contenido útil, consistente y adaptado a cada canal. Investigamos audiencias, preguntas e intención; definimos estrategia y planificación editorial; producimos, editamos y adaptamos artículos, contenidos web y piezas derivadas según el alcance. Coordinamos fuentes, versiones, revisiones y aprobaciones, y podemos publicar en el CMS del cliente con accesos acordados. Integramos fundamentos SEO/AEO y medición para aprender por ciclo, trabajando con marketing, comunicaciones y especialistas del negocio. Es adecuado para ofertas complejas, educación de mercado, expansión regional y equipos que necesitan continuidad editorial. Se requiere un owner y acceso a expertos o fuentes; no prometemos rankings, viralidad ni volumen ilimitado.",
+      "category": "Marketing de contenidos y operación editorial",
+      "url": "https://efeoncepro.com/servicio-marketing-de-contenidos/",
+      "verified": true
+    },
+    {
+      "name": "Gestión de Redes Sociales",
+      "description": "Estrategia y operación recurrente de canales sociales para marcas que necesitan una presencia coherente, contenido relevante y aprendizaje continuo. Definimos audiencias, objetivos, voz, pilares editoriales y calendario; producimos y adaptamos contenido, coordinamos su aprobación y publicación, y medimos el desempeño por ciclo. La gestión de comunidad se define con horarios, responsabilidades, protocolos y escalamiento acordados. Conectamos conversación, expertos y contenidos de la organización sin tratar todos los canales como copias de una misma publicación. El servicio requiere un responsable y un circuito de aprobación viable. Paid media, atención especializada, cobertura permanente e influencers se acuerdan como alcances específicos; no prometemos viralidad ni ventas garantizadas.",
+      "category": "Estrategia y operación de redes sociales",
+      "url": "https://efeoncepro.com/servicios/redes-sociales/",
+      "verified": true
+    },
+    {
+      "name": "Influencer Marketing y UGC",
+      "description": "Diseñamos y coordinamos activaciones con influencers, creadores y contenido UGC a partir del objetivo, audiencia, mercado y papel de la marca. Evaluamos afinidad, calidad de comunidad y riesgos; seleccionamos perfiles, construimos briefs y coordinamos entregables, revisiones y publicación según la campaña. Definimos derechos de uso, duración, territorios, canales, exclusividad y eventual amplificación pagada antes de reutilizar contenidos. Medimos por creador y pieza para aprender y ajustar futuras activaciones. Es adecuado para lanzamientos, temporadas, expansión de mercado y necesidades de credibilidad o contenido nativo. Honorarios de creadores, inversión en medios y derechos se presupuestan según alcance. No prometemos alcance, ventas o ROAS garantizados ni derechos perpetuos incluidos.",
+      "category": "Influencers, creadores y contenido UGC",
+      "url": "https://efeoncepro.com/servicios/agencia-de-influencers/",
+      "verified": true
+    },
+    {
+      "name": "Agencia de Medios",
+      "description": "Conectamos objetivos de negocio, audiencia, mensaje, canales y medición en una estrategia de distribución. Diseñamos arquitectura y planificación de medios, mix de canales y presupuesto; coordinamos compra, activación, seguimiento y optimización según el alcance acordado. Podemos integrar performance, distribución programática, comercio e iniciativas con creadores y partnerships cuando corresponde al objetivo. Reconciliamos señales, inversión y aprendizaje para apoyar decisiones, trabajando con marketing, creatividad y los responsables de datos. Las cuentas publicitarias, accesos, criterios de medición y responsabilidades se definen antes de operar. La inversión en medios, fees de terceros y derechos se separan del trabajo de agencia. No prometemos resultados garantizados ni disponibilidad de cualquier plataforma en todos los mercados.",
+      "category": "Estrategia, planificación y operación de medios",
+      "url": "https://efeoncepro.com/servicios/agencia-de-medios/",
+      "verified": true
+    },
+    {
+      "name": "Performance Marketing y Paid Media",
+      "description": "Operamos y optimizamos campañas pagadas conectando inversión, creatividad y una señal de conversión válida. Revisamos medición, eventos y calidad de leads; definimos hipótesis, campañas y experimentos creativos; medimos por ciclo para decidir qué mantener, corregir o escalar. Coordinamos señales de web y CRM con sus equipos responsables para evitar optimizar sólo por métricas superficiales. Es adecuado para organizaciones con owner, cuentas publicitarias propias, inversión suficiente para aprender y capacidad de ejecutar mejoras. Acordamos objetivos, baseline, atribución, accesos y responsabilidades. Cuando la señal está rota, priorizamos resolverla antes de escalar. Medios, licencias y terceros se presupuestan por separado; no prometemos ventas, ROAS o coste de adquisición garantizados.",
+      "category": "Performance marketing y campañas pagadas",
+      "url": "https://efeoncepro.com/servicios/performance-marketing/",
+      "verified": true
+    },
+    {
+      "name": "Inbound y Loop Marketing",
+      "description": "Diseñamos una estrategia de crecimiento que conecta contenido, captación, nutrición, automatización y CRM en ciclos de medición y mejora. Partimos del cliente ideal, sus preguntas y el recorrido de compra para alinear marketing, ventas y servicio. Definimos oportunidades de contenido, conversiones, workflows, criterios de calidad y un backlog de experimentos con responsables claros. La operación puede combinar capacidades de contenido, SEO/AEO, web y HubSpot según las necesidades y el alcance acordado. Requiere sponsor, acceso a datos, colaboración entre equipos y capacidad de implementar. No se ofrece una garantía de ingresos ni se incluyen automáticamente licencias, medios o todos los servicios de la agencia.",
+      "category": "Estrategia inbound y ciclos de crecimiento",
+      "url": "https://efeoncepro.com/agencia-inbound-marketing/",
+      "verified": true
+    }
+  ],
+  "personas": [
+    {
+      "name": "RevOps, CRM y Experiencia de Cliente",
+      "searchUrl": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3APERSONA%2Cvalues%3AList((id%3A1991048337%2CselectionType%3AINCLUDED)))))&viewAllFilters=true",
+      "criteria": {
+        "currentJobTitles": [
+          "Jefe de Operaciones de Ingresos",
+          "Vicepresidente de Operaciones de Ingresos",
+          "Especialista en Operaciones de Ingresos",
+          "Director de Operaciones de Ingresos",
+          "Director Senior de Operaciones de Ingresos",
+          "Especialista en CRM",
+          "Director de CRM",
+          "Jefe de gestión de relación con clientes",
+          "Arquitecto de soluciones de clientes",
+          "Jefe de operaciones de marketing y ventas",
+          "Director de operaciones de marketing y ventas",
+          "Jefe de operaciones de marketing",
+          "Director de operaciones de marketing",
+          "Jefe de operaciones de marketing",
+          "Director de éxito de clientes",
+          "Gerente de Éxito del Cliente",
+          "Jefe de Éxito del Cliente",
+          "Vicepresidente de Éxito del Cliente",
+          "Director de experiencia de clientes",
+          "Director de experiencia del cliente",
+          "Jefe del servicio de atención al cliente",
+          "Jefe de experiencia de cliente",
+          "Vicepresidente de operaciones de venta",
+          "Jefe de operaciones de venta",
+          "Director de operaciones de venta"
+        ]
+      }
+    },
+    {
+      "name": "Web, Producto y Experiencia Digital",
+      "searchUrl": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3APERSONA%2Cvalues%3AList((id%3A1991048345%2CselectionType%3AINCLUDED)))))&viewAllFilters=true",
+      "criteria": {
+        "currentJobTitles": [
+          "Director de productos digitales",
+          "Gerente de productos",
+          "Gerente superior de productos",
+          "Gerente principal de productos",
+          "Webmaster",
+          "Desarrollador superior de páginas web",
+          "Jefe de productos",
+          "Vicepresidente de Ecommerce",
+          "Jefe de comercio electrónico",
+          "Gerente Senior de Ecommerce",
+          "Director de marketing de comercio electrónico",
+          "Director de proyectos de comercio electrónico",
+          "Director de diseño de experiencia de usuario",
+          "Administrador de experiencia del usuario",
+          "Arquitecto de experiencia del usuario"
+        ]
+      }
+    },
+    {
+      "name": "Marca, Creatividad e Influencia",
+      "searchUrl": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3APERSONA%2Cvalues%3AList((id%3A1899654042%2CselectionType%3AINCLUDED)))))&viewAllFilters=true",
+      "criteria": {
+        "currentJobTitles": [
+          "Responsable superior de marca",
+          "Director de marca",
+          "Director nacional de marcas",
+          "Director de general de marcas",
+          "Responsable de marca",
+          "Director de estrategia de marca",
+          "Director de comunicaciones de marca",
+          "Director de marketing de marca",
+          "Director de producción creativa",
+          "Jefe del grupo creativo",
+          "Jefe del equipo creativo",
+          "Responsable de diseño creativo",
+          "Director creativo",
+          "Productor creativo",
+          "Productor de servicios creativos",
+          "Gerente de Marketing de Influencers",
+          "Jefe de Marketing de Influencers",
+          "Director de Marketing de Influenciadores",
+          "Gestor de Marketing de Influenciadores"
+        ]
+      }
+    },
+    {
+      "name": "Search, Contenido y Social",
+      "searchUrl": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3APERSONA%2Cvalues%3AList((id%3A1991048321%2CselectionType%3AINCLUDED)))))&viewAllFilters=true",
+      "criteria": {
+        "currentJobTitles": [
+          "Especialista en posicionamiento web",
+          "Analista de posicionamiento web",
+          "Director de posicionamiento web",
+          "Jefe de posicionamiento web",
+          "Responsable del equipo de posicionamiento web",
+          "Jefe de contenidos online",
+          "Jefe de contenidos",
+          "Director de contenidos",
+          "Encargado de redes sociales",
+          "Director de redes sociales",
+          "Encargado de estrategia de redes sociales",
+          "Director de marketing en redes sociales",
+          "Community Manager"
+        ]
+      }
+    },
+    {
+      "name": "Dirección de Marketing, Growth y Medios",
+      "searchUrl": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3APERSONA%2Cvalues%3AList((id%3A1899654034%2CselectionType%3AINCLUDED)))))&viewAllFilters=true",
+      "criteria": {
+        "functions": [
+          "Marketing"
+        ],
+        "seniority": [
+          "Propietario/socio",
+          "Director ejecutivo",
+          "Vicepresidente",
+          "Director",
+          "Gerente con experiencia",
+          "Gerente sin experiencia"
+        ]
+      }
+    }
+  ],
+  "personaGeographyRestriction": false,
+  "personaConnectionRestriction": false,
+  "personaIndustryRestriction": false,
+  "smokeTests": [
+    {
+      "persona": "RevOps, CRM y Experiencia de Cliente",
+      "account": "BICE VIDA",
+      "resultCount": 0,
+      "interpretation": "Sin coincidencias normalizadas; no prueba ausencia de responsables. Usar empresa + función o revisión nominal."
+    },
+    {
+      "persona": "RevOps, CRM y Experiencia de Cliente",
+      "account": "Banco Bci",
+      "resultCount": 15,
+      "visibleRoleExamples": [
+        {
+          "name": "Aquiles Lobos Ibaceta",
+          "role": "Gerente de Experiencia de Clientes",
+          "connectionDegree": 2
+        },
+        {
+          "name": "Ricardo Westermeyer",
+          "role": "CRM Growth Lead",
+          "connectionDegree": 2
+        },
+        {
+          "name": "Adolfo Villanueva Bonilla",
+          "role": "CRM Growth Lead",
+          "connectionDegree": 2
+        },
+        {
+          "name": "Ari Szarf",
+          "role": "Customer Relationship Management Manager",
+          "connectionDegree": 2
+        }
+      ],
+      "interpretation": "Prueba de cobertura de rol, sin verificar autoridad, demanda, presupuesto ni plataforma utilizada."
+    }
+  ]
+}

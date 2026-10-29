@@ -1,5 +1,19 @@
 # Commercial
 
+- [Sales Navigator Core — operación y filtros con agentes](../manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md):
+  adapter interactivo sobre Chrome/Julio, 15 familias de filtros de cuentas (14 operables), selección por
+  relevancia antes de relación y [uso táctico de InMail](../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md).
+  150 disponibles observados el 29/10; 50 queda como declaración histórica, sin reposición inferida.
+  [Portafolio e ICP](sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md): doce servicios/landings y cinco Personas
+  persistidos; [manifest exacto](sales-navigator/PORTAFOLIO-CONFIGURADO-2026-10-29.json). El
+  [primer corte de cuatro servicios](sales-navigator/CONFIGURACION-2026-10-29.md) se conserva como historia.
+- [Servicios financieros/fintech de Chile — cuentas y listas](prospects/servicios-financieros-chile-2026-10/CARTERA-Y-LISTAS-2026-10-29.md):
+  base firmográfica 295; 31/28 son pasadas de acceso. Tres listas sectoriales, 31 cuentas únicas con membresía
+  nominal verificada y Haulmer con asociación incierta. [Cinco listas de personas por servicio](prospects/servicios-financieros-chile-2026-10/LISTAS-PERSONAS-POR-SERVICIO-2026-10-29.md):
+  23 identidades únicas releídas. [BCI](prospects/contactos-conocidos-banca-retail-2026-10/BCI-SALES-NAVIGATOR-2026-10-29.md)
+  y [BICE VIDA](prospects/bice-vida-2026-10/SALES-NAVIGATOR-2026-10-29.md) conservan aplicaciones y descartes.
+  Configuración y guardado autorizados; sin comunicaciones, créditos consumidos ni altas CRM.
+
 - [ARMOR EPPS / Indecaucho — discovery y caso de negocio](accounts/indecaucho-armor/README.md):
   preparación de la reunión27/10, investigación de marca/canal/demanda, caso v0 y continuidad desde
   la transcripción HubSpot/Notion. Invitación y confirmación enviadas; terna aún por decidir.
@@ -20,7 +34,7 @@ no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre
 
 - [Outreach personalizado del 13/10/2026](follow-up-agent/runs/2026-10-13-outreach-personalizado.md): seis correos enviados por Outlook web con firma gráfica, brochure contextual y actividades HubSpot `SENT`; Rafael excluido. Referencia para próximos primeros contactos y su verificación.
 
-> **Naming AEO vigente:** **Efeonce AEO** es la capacidad comercial; **Efeonce AEO Assessment** es el diagnóstico público y **Efeonce AI Visibility Report** su entregable. Casos y propuestas fechados conservan sus nombres de época (`AI Visibility Grader`, `Brand Visibility Grader`, `AEO Grader`). [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+> **Naming AEO vigente:** en copy nuevo el servicio se escribe **Efeonce | AEO**; Efeonce es la marca que habla y firma. **Efeonce | AEO Assessment** conserva su identidad de diagnóstico; la landing pública del diagnóstico usa **Efeonce | AI Visibility Report** según el delta del 03/10. Casos y propuestas fechados conservan sus nombres de época (`AI Visibility Grader`, `Brand Visibility Grader`, `AEO Grader`). [ADR y deltas vigentes](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
 Índice operativo de ventas de Efeonce. Esta carpeta conecta las metas aprobadas, el forecast y los negocios
 verificados sin convertir Markdown en una segunda base de datos comercial.

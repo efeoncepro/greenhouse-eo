@@ -12,6 +12,43 @@ Se opera con [efeonce-b2b-prospecting](../../../.codex/skills/efeonce-b2b-prospe
 
 ## Qué entrega
 
+Sales Navigator aporta identidad profesional declarada, empleo, actividad y rutas de conexión desde la
+sesión abierta del operador. El [recorrido probado](../../manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md)
+filtra cuentas por industria/sede/tamaño y empleados por función/país/rol; permite leer perfiles y paginar.
+No certifica correo, demanda, autoridad de compra ni admisión CRM. El corte inicial fue sólo lectura;
+mandatos posteriores autorizaron configurar y guardar listas. No se enviaron mensajes ni se escribió CRM.
+Las shortlists usan filtros laterales y pasadas complementarias de responsabilidad/acceso; cada perfil se
+revisa por cargo y alcance reales. [BCI, 29/10](../../commercial/prospects/contactos-conocidos-banca-retail-2026-10/BCI-SALES-NAVIGATOR-2026-10-29.md)
+conserva resultados, descartes y el fallo observado del selector Cargo actual.
+
+El plan contratado es **Sales Navigator Core**. El 29/10 se leyeron **150 InMail disponibles** en Ajustes;
+los 50 declarados inicialmente por Julio se conservan como antecedente. El saldo se verifica antes de usarlo.
+La [política de canal](../../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md) prioriza mensajes
+a conexiones existentes y conexión → espera de aceptación → abordaje para nuevos vínculos. InMail se
+reserva para alta relevancia o alto valor estratégico por tiempo/ventana; la investigación no lo consume.
+La búsqueda del grupo comprador parte de relevancia y ownership sin filtro de primer grado; el acceso se
+comprueba por persona después. El filtro de contactos en cuentas puede servir para hallar puentes, sin
+reemplazar la búsqueda de responsables o convertir una hipótesis de relación en un hecho.
+
+Por mandato del 29/10 se [configuraron servicios y Personas](../../commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md):
+doce fichas con landing, incluido Web, HubSpot, contenidos, redes, influencers, medios y performance; cinco perfiles por papel comprador,
+ICP de cuenta separado, copys revisados y readback tras recarga. Su configuración no valida demanda ni
+amplía el permiso a comunicaciones. El inventario exacto vive en el expediente, no en esta capa funcional.
+
+La [cohorte financiera de Chile](../../commercial/prospects/servicios-financieros-chile-2026-10/SALES-NAVIGATOR-2026-10-29.md)
+documenta 15 familias de filtros visibles (14 operables, CRM bloqueado en Core): 295 cuentas con sede Chile,
+industria financiera y 51+ como base; 31 con conexión y 28 al añadir Marketing >3 son carriles de acceso,
+no selección de los mejores compradores. Se amplió a fintech clasificada como software; sede no equivale a
+toda operación local, headcount no certifica plantilla y la industria no prueba condición regulada.
+
+La [cartera guardada](../../commercial/prospects/servicios-financieros-chile-2026-10/CARTERA-Y-LISTAS-2026-10-29.md)
+separa tres listas sectoriales con 31 cuentas únicas nominalmente verificadas de la asociación incierta de
+Haulmer; los contadores agregados sumaron 32. Las [cinco listas de personas por servicio](../../commercial/prospects/servicios-financieros-chile-2026-10/LISTAS-PERSONAS-POR-SERVICIO-2026-10-29.md)
+contienen 23 identidades únicas y 23 membresías releídas. Las Personas reutilizan criterios de roles; las
+listas organizan el trabajo y las fichas de servicio aportan oferta/landing. Ninguna acredita compra o
+contacto realizado. Guardar un perfil en Sales Navigator no exige email; la admisión normal de Contact/Lead
+CRM sigue exigiendo correo corporativo individual verificado y autorización de escritura.
+
 Cada apertura, seguimiento y respuesta inbound comercial aplica el criterio compartido de
 [conversaciones útiles](../../../.codex/skills/efeonce-b2b-prospecting/references/conversation-quality-and-review.md).
 Se conserva una tesis por iniciativa, la voz robusta de Julio y un siguiente paso proporcional. Cambiar

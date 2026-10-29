@@ -1,5 +1,15 @@
 # BICE Vida — equipo creativo y SEO
 
+Actualización **29-10-2026**: [shortlist contrastada en Sales Navigator](SALES-NAVIGATOR-2026-10-29.md).
+Empresa/Marketing/Chile → 22 resultados; primer grado → 6. Pilar, Valentina y Marta priorizadas;
+acceso a Pilar resuelto por LinkedIn. Sin comunicaciones, créditos ni cambios CRM. El corte siguiente
+conserva los registros y decisiones del 12/10; no es estado CRM revalidado hoy.
+
+**Continuación posterior del 29/10:** BICE VIDA guardada y nominalmente verificada en seguros/inversiones;
+[cartera financiera y estados](../servicios-financieros-chile-2026-10/README.md). Las 23 personas guardadas
+por servicio corresponden a cinco cuentas de otra ronda; no implican guardado nuevo de los perfiles BICE VIDA.
+[Configuración y evidencia general](../../sales-navigator/README.md).
+
 Corte 12-10-2026. **Relación por persona sin declarar.** Julio trabajó en BICE y conoce parte de la organización;
 qué personas de esta lista conoce y con qué cercanía lo declara él, no se infiere. Pidió identificar a los
 responsables de creatividad y SEO y autorizó enriquecimiento en Apollo y registro en HubSpot. No se envió

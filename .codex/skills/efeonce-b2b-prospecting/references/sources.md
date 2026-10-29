@@ -91,3 +91,29 @@ Efeonce, acceso API/CLI, sender/DNS, reputación ni inbox. No adoptar cifras bul
 [Señal→acción](signal-to-action.md) y [entradas](situation-entry-playbooks.md) son procedimientos Efeonce sobre
 fuentes dueñas locales; no benchmarks ni técnicas con eficacia comercial demostrada. Las fechas/hitos del
 caso y su revisión no constituyen consentimiento, vigencia garantizada ni scheduler nuevo.
+
+
+## Sales Navigator Core — operación verificada 29/10/2026
+
+[Operación progresiva](sales-navigator-operations.md) deriva de UI/AX y readback real, con
+[manual](../../../../docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md),
+[política Core/InMail](../../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md),
+[configuración y manifest](../../../../docs/commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md) y
+[cartera/listas](../../../../docs/commercial/prospects/servicios-financieros-chile-2026-10/CARTERA-Y-LISTAS-2026-10-29.md).
+La configuración inicial de cuatro fichas es histórica; la ampliación final registró doce y cinco Personas.
+Los saldos, contadores, personas, filtros y límites son evidencia fechada, no valores permanentes del método.
+El guardado nativo se verificó nominalmente, incluida una contradicción no resuelta; no prueba demanda ni
+outreach. No consultar proveedores ni realizar mutaciones para ejecutar fixtures sintéticos.
+
+| Fuente primaria consultada en ese corte | Uso y límite |
+| --- | --- |
+| [Personas FAQ](https://www.linkedin.com/help/sales-navigator/answer/a1422192) | Máximo cinco y cuatro dimensiones; consultas de búsqueda, no ICP completo. UI y contenido a revalidar. |
+| [Definiciones de filtros de cuenta](https://www.linkedin.com/help/sales-navigator/answer/a1461507) | Alcance de sede, industria, crecimiento y departamento; inspección no demuestra aplicación de cada opción. |
+| [Contacto en cuentas](https://www.linkedin.com/help/sales-navigator/answer/a1507484) | Algún empleado de primer grado, no conexión con decisor pertinente. |
+| [Límite de cuentas visibles](https://www.linkedin.com/help/sales-navigator/answer/a106030) | 1.000 cuentas/40 páginas en la referencia consultada; dividir universos y deduplicar, no afirmar exhaustividad. |
+| [Tipos de cuenta](https://www.linkedin.com/help/sales-navigator/answer/a104003/sales-navigator-account-types-overview?lang=en) | Diferenciar Core de Advanced/Advanced Plus; no prueba habilitación de funciones ni saldo/periodicidad propios. |
+| [Taxonomía de industrias](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/industry-codes-v2) | Categorías y jerarquía LinkedIn; no categoría regulatoria ni prueba de que toda fintech use Financial Services. |
+
+Las recetas `fill`/typing, espera de sugerencias, selección persistente y corrección sólo de membresía se
+sustentan en el ensayo observado. No extrapolar éxito de Personas al selector Search ni convertir soluciones
+de eventos React en acceso a estado oculto. Screenshot aislado no sustituye membresía nominal persistida.

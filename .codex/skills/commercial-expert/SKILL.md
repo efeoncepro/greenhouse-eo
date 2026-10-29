@@ -100,3 +100,11 @@ mix/inversión y presentar una responsabilidad Efeonce con alcance, owners, hono
 permanecen en el expediente interno. Una demo, entrenamiento declarado o ejemplo de fee no prueba licencia,
 crédito, ahorro ni capacidad activa. Mapear retainer y cotizar sólo alcance incremental; no duplicar planificación,
 setup, coordinación o reportes ni sumar fees completos por canal. Preservar la aprobación acotada del servicio.
+
+## Prospección y listas en Sales Navigator
+
+Para cuentas, filtros laterales, servicios/landings, Personas y listas, cargar
+[operación de Sales Navigator](../efeonce-b2b-prospecting/references/sales-navigator-operations.md).
+Las cuentas se agrupan por sector y los interlocutores por frente de servicio y responsabilidad real;
+conservar una tesis por iniciativa y comprobar membresías nominales tras recargar. Fit, acceso y demanda
+son decisiones separadas; guardar listas no autoriza comunicaciones ni acredita calificación CRM.

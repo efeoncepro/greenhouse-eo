@@ -2,6 +2,17 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-29 — Prospección: Sales Navigator Core, portafolio y listas
+
+[Flujo interactivo](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md) ejercitado en Chrome autenticado:
+filtros laterales de cuentas/personas, perfiles, paginación, configuración y verificación tras recarga.
+[Portafolio e ICP](docs/commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md): 12servicios con landing y 5Personas;
+[cartera financiera](docs/commercial/prospects/servicios-financieros-chile-2026-10/README.md): 3listas sectoriales,
+31cuentas nominales verificadas y Haulmer incierto; 23personas guardadas en 5listas por servicio (3/4/9/3/4).
+Core con saldo150 observado; 50 iniciales conservados como historia, conexión primero e InMail táctico.
+[Cierre docs/skills](docs/audits/commercial/2026-10-29-sales-navigator-docs-skills.md): B2B espejo, rutas Commercial/Customer Model,
+política, capas técnica/funcional/manual y expedientes BCI/BICE conciliados. Sin comunicaciones, créditos, CRM ni runner desatendido.
+
 ## 2026-10-27 — SKY: ADR y comparación local de cuentas operativas
 
 TASK-2073 añade sandbox sin red/DB para comparar bridges A′/B: 97 tests PASS, nueve anchors locales y evidencia
@@ -563,10 +574,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
 - Aprobado como brochure oficial de la agencia: versión completa (84 láminas) y corta (26), con índice linkeable,
   Channel & Commerce dentro de Brand y casos Berel y Sky compuestos con piezas reales. Registrado en la
   [norma](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md), la documentación funcional y el manual.
-
-## 2026-10-16 — Seguimiento web y evidencia reutilizable
-
-- [Fabricio / Toyota del Bajío](docs/commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md):
-  envío inicial verificado y tres seguimientos HubSpot Programado con salida por respuesta a cualquier correo.
-- Prospección y adapter HubSpot Codex/Claude precisan versión de brochure, cuerpo/calendario de inscripción,
-  límites de firma y conciliación BCC_TO_CRM. Manual, funcional y registro actualizados; sin nuevas acciones externas.

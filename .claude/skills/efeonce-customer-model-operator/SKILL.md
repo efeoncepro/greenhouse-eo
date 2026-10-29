@@ -41,6 +41,14 @@ reduces it, what evidence reaches the sponsor and what risk appears when the ope
 The model must also test the Why: the offer increases client capability and leaves useful memory for the next cycle.
 Do not call opaque dependency that the client cannot explain, transfer or port “retention.”
 
+## Sales Navigator y perfiles de cliente
+
+Para traducir ICP/JTBD a búsqueda y listas nativas, cargar
+[operación de Sales Navigator](../efeonce-b2b-prospecting/references/sales-navigator-operations.md).
+Las Personas son filtros de roles; el ICP conserva cuenta, problema, iniciativa y grupo comprador.
+Descubrir por encaje antes de filtrar por relación; conexión, seniority y lista guardada no acreditan
+presupuesto, autoridad ni demanda. Servicios/landings, cobertura de roles y membresía se verifican por separado.
+
 ## Discovery y caso de negocio por iniciativa
 
 Para preparar reuniones o incorporar su transcripción, cargar el

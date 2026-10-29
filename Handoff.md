@@ -1,5 +1,24 @@
 # Handoff
 
+## 2026-10-29 — Sales Navigator: configuración y listas verificadas
+
+[Cierre integral](docs/audits/commercial/2026-10-29-sales-navigator-docs-skills.md) ·
+[manual interactivo](docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md): Chrome/Julio,
+locators Playwright vía `cua_repl`; filtros laterales, perfiles, actividad, paginación y readback nativo.
+[BCI](docs/commercial/prospects/contactos-conocidos-banca-retail-2026-10/BCI-SALES-NAVIGATOR-2026-10-29.md) y
+[BICE VIDA](docs/commercial/prospects/bice-vida-2026-10/SALES-NAVIGATOR-2026-10-29.md) conservan cortes iniciales.
+[Portafolio e ICP](docs/commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md): 12servicios con landing/copyES y
+5Personas guardados y releídos. [Cuentas financieras Chile](docs/commercial/prospects/servicios-financieros-chile-2026-10/README.md):
+15 familias de filtros; universo295 sin relación, subconjuntos31/28 de acceso; pasada fintech/software adicional.
+Tres listas sectoriales: banca10, seguros/inversiones10, fintech/pagos11 nominales; contador fintech12 y
+asociación Haulmer sin resolver. [Personas por servicio](docs/commercial/prospects/servicios-financieros-chile-2026-10/LISTAS-PERSONAS-POR-SERVICIO-2026-10-29.md):
+23únicas/5listas (Search3/Marca4/Growth9/Web3/CRM4), membresías exactas releídas; listas previas preservadas.
+[Core/InMail](docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md): 150disponibles observados;
+50 iniciales históricos. Conexión → aceptación → abordaje habitual; InMail táctico con motivo individual.
+Decisores fuera del primer grado sigue como hipótesis de Julio; ubicación de cuenta/persona y autoridad separadas.
+Skills B2B/Commercial/Customer Model y capas técnica, funcional y manual conciliadas. Sin comunicaciones,
+solicitudes, gasto, altas CRM ni runner desatendido. Pendiente Haulmer; próximo elegir cuenta/tesis y validar grupo comprador.
+
 ## 2026-10-27 — SKY: ADR y puente operativo probado localmente
 
 [TASK-2073](docs/tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md) cerrada sólo por sandbox:
@@ -238,27 +257,3 @@ El release a `main` llevó los renderers formularios `1.2.0` y CTA `1.4.0`. En `
 smoke de envío real (requiere OK del operador: crea un registro CRM), DLV GTM + dimensión GA4 `activation_mode`
 (preview + confirmación) y GVC formal; defecto: cerrar con el primer campo enfocado dispara
 `gh_form_field_validation_failed` (renderer). TASK-2044/2045 siguen `in-progress`. **Sin push** (develop adelantado).
-
-## 2026-10-24 — Prospección del chat: documentación y continuidad por canal
-
-[Cinco casos y evidencias](docs/commercial/prospecting-agent/runs/2026-10-24-cierre-chat-prospeccion.md):
-Fundación Luz, Arcor, Huelquén, NIASA y Disney. Los cinco EMAIL `SENT` corroborados en CRM; Huelquén ya tiene
-logging. LinkedIn de Arcor sigue sin realizar. Sólo NIASA tiene secuencia, con pasos futuros observados
-29/10 y 05/11 en hora de México; comprobar el CCO de cada paso automático antes del disparo, sin duplicar la
-secuencia desde el seguimiento recurrente. Revisiones internas de Mariana
-27/10 e Ignacio 28/10 ya pertenecen al radar separado. Paola conserva catch-all pendiente de aclaración antes
-de nuevas acciones; el envío histórico no valida la casilla. Sin nuevas comunicaciones, créditos o mutaciones
-CRM en este cierre. Docs, cuatro skills espejo y escenarios conciliados; [auditoría](docs/audits/commercial/2026-10-24-chat-prospeccion-docs-skills.md).
-
-[Lucía/Flesan y Yvette/Sigelec](docs/commercial/prospecting-agent/runs/2026-10-24-lucia-yvette-prospeccion.md)
-añaden dos casos con Contact/Primary/segmentos, Enviados, EMAIL `SENT` e InMail comprobados por separado.
-Yvette: primer resultado inválido descartado; patrón inicial + primer apellido y LeadMagic `validated` para
-otra candidata; atribución aún inferida, alta/envío por excepción expresa. Sin secuencias nuevas. Docs y dos
-skills espejo actualizadas, tres escenarios sintéticos; [controles y límites](docs/audits/commercial/2026-10-24-lucia-yvette-docs-skills.md).
-
-Mandato posterior: [dos secuencias programadas](docs/commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md),
-dos correos por persona y firma gráfica comprobada. Julio autorizó registro nativo con excepción al CCO para
-ambas: Programado1/EnCurso0/Error0,29Oct10:00 y05Nov10:05 Perú. Respuesta/reunión desinscribe al Contact;
-no duplicar por radar/Outlook. Calendario guardado releído; correos de seguimiento todavía no enviados.
-Método y skills espejo concilian la excepción individual y el reader CLI fallido sin repetir inscripciones;
-[cierre documental](docs/audits/commercial/2026-10-24-lucia-yvette-secuencias-docs-skills.md). No cambia el permiso del radar.

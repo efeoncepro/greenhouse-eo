@@ -61,6 +61,14 @@ Leer primero el modelo concreto en `docs/business-models/`, después cargar sól
 | Contrato, procurement, data/IP y liability | Legal/IP + Commercial |
 | Adopción, delivery, retention y expansion | Practice + Operations + Customer Success |
 
+## Sales Navigator y perfiles de cliente
+
+Para traducir ICP/JTBD a búsqueda y listas nativas, cargar
+[operación de Sales Navigator](../efeonce-b2b-prospecting/references/sales-navigator-operations.md).
+Las Personas son filtros de roles; el ICP conserva cuenta, problema, iniciativa y grupo comprador.
+Descubrir por encaje antes de filtrar por relación; conexión, seniority y lista guardada no acreditan
+presupuesto, autoridad ni demanda. Servicios/landings, cobertura de roles y membresía se verifican por separado.
+
 ## Discovery y caso de negocio por iniciativa
 
 Para preparar reuniones o incorporar su transcripción, cargar el

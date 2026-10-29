@@ -21,6 +21,20 @@ El contexto ICP mantiene un gate económico para el plan outbound, cuyo document
 el criterio declarado y señala esa discrepancia si afecta elegibilidad; no transformes esos rangos en tarifa
 universal ni apruebes/descartes toda entrada por un número inferido. Pricing/operador resuelve el caso.
 
+## Descubrimiento por cuentas en Sales Navigator
+
+Usar [panel lateral y cobertura](sales-navigator-operations.md): filtros estructurados antes de keywords,
+con una base sin primer grado. Contacto en cuentas prueba algún empleado conectado, no acceso al buyer.
+Sede local, presencia local y ubicación del profesional son universos distintos. Industria financiera puede
+omitir fintech clasificada como software: complementar y leer negocio/entidad, sin reclasificar por comodidad.
+Bandas 51+ son proxy; 11–50 cruza el piso y necesita confirmación. No sumar cortes anidados ni declarar
+exhaustividad cuando hay límite de visualización; particionar y deduplicar por identidad canónica.
+
+En carteras manuales, separar cuentas por sector y personas por frente de servicio. Los contadores y el
+acuse de Guardar no sustituyen la lectura nominal de miembros; contradicción sin resolver queda explícita,
+como [el caso Haulmer del 29/10](../../../../docs/commercial/prospects/servicios-financieros-chile-2026-10/CARTERA-Y-LISTAS-2026-10-29.md).
+No duplicar empresa para cuadrar un contador ni corregir una membresía quitando cuenta/contactos guardados.
+
 ## Autoridad de fuentes
 
 | Fuente | Qué acredita y qué no |
