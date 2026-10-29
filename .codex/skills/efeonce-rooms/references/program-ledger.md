@@ -3,6 +3,16 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-28 — B10 local: Rooms no concede consentimiento MCP
+
+- `local`: Rooms `codex/rooms-design-integration@e0edf1e`, issuer Auth con fuentes idénticas a
+  `1136ac273`. Un BrowserContext y cookies sin renovar: read exige aprobación explícita, write403
+  por step-up antes/después; código real de un uso, token ES256 verificado con scope sólo read.
+- 16comprobacionesMCP +8gruposRoomsPASS;lint/typesPASS. PG real de identidad/Rooms; store MCP y
+  grantsPort sintéticos. No prueba dispatch gateway, persistencia MCP PG ni MFA; no cierra B15/B20.
+- Procesos19334/19335/55432 detenidos; sincorreo/push/main/flags/deploy. Nueva UI pendiente de
+  Claude Design; contrato productivo Auth sin cambios. [Prueba](../../../../docs/audits/rooms/2026-10-28-b10-rooms-mcp-explicit-consent.md).
+
 ## 2026-10-28 — B18 local: invitación guest no crea sesión interna ni SSO
 
 - `local`: runtime `codex/rooms-design-integration@3b1b7b2`; arnés UI de invitaciones ampliado con

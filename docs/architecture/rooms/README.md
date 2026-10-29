@@ -11,6 +11,8 @@ API en navegador. Claude Design aún debe conectar/aceptar su UI. [Manual local]
 
 **Seguridad local 28Oct:** [B18](../../audits/rooms/2026-10-28-b18-guest-without-internal-sso.md) PASS: OTP guest sin sesión interna ni SSO, 51 comprobaciones. No cambia el contrato Auth ni acredita la nueva UI.
 
+**B10 local 28Oct:** [Navegador Rooms→MCP](../../audits/rooms/2026-10-28-b10-rooms-mcp-explicit-consent.md) PASS: consentimiento read explícito, token firmado sólo read y write retenido por step-up. Persistencia MCP/grants sintéticos; sin dispatch gateway.
+
 **Propósito:** plataforma comercial propia para comprender, evaluar y defender propuestas creativas y
 SEO/AEO, combinables en una sala. La implementación actual no acredita todo el alcance de V1/EPIC-052.
 

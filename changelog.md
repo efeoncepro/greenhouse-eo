@@ -10,6 +10,8 @@ o historia Diseño. [Resultado y gates](docs/audits/client-portal/2026-10-27-sky
 
 ## 2026-10-26 — Rooms: entorno de integración y conectores locales
 
+28Oct: [B10 browser local](docs/audits/rooms/2026-10-28-b10-rooms-mcp-explicit-consent.md) conserva sesión Rooms y exige consentimiento MCP explícito; token sólo read, write con step-up. Sin cambio productivo.
+
 28Oct: [B18 local](docs/audits/rooms/2026-10-28-b18-guest-without-internal-sso.md) verifica OTP guest sin sesión interna/SSO (51checksPASS); contrato Auth y producción sin cambios.
 
 Sandbox propio de datos/medios/credenciales y launcher de personas fixture; SDKbrowser tipado sobre

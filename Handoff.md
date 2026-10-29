@@ -21,6 +21,9 @@ público §17. Pendiente: mapa de átomos de marketing de contenidos; tanda 2: G
 
 ## 2026-10-26 — Rooms: entorno local y conectores listos
 
+B10 local28Oct: Rooms→MCP en el mismo navegador, consentimiento explícito/tokenread/write-stepup,16checksMCP+8gruposRoomsPASS;
+[recibo y límites](docs/audits/rooms/2026-10-28-b10-rooms-mcp-explicit-consent.md). Roomse0edf1e, Auth1136ac273; procesos cerrados, sin publicar.
+
 B18 local28Oct: invitado OTP sin sesión interna/SSO;51checks,lint/typesPASS;
 [prueba](docs/audits/rooms/2026-10-28-b18-guest-without-internal-sso.md). Commit Rooms3b1b7b2, procesos detenidos; sin push/flags/deploy. Nueva UI pendiente de Claude Design.
 
