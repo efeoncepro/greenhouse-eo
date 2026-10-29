@@ -1,0 +1,80 @@
+{
+  "status": "passed",
+  "mode": "chromium-browser-redirect-and-http",
+  "issuer": "real-first-party-protocol-and-postgresql-local",
+  "rooms": "real-auth-http-business-api-and-postgresql-local",
+  "checks": [
+    "zero-context-denied",
+    "one-context-selected",
+    "multiple-contexts-explicit",
+    "role-isolation",
+    "published-reads",
+    "cross-tenant-denial",
+    "local-logout",
+    "issuer-revocation"
+  ],
+  "mcpChecks": [
+    "rooms-and-issuer-http-only-sessions-present",
+    "rooms-sign-in-still-requires-new-mcp-consent",
+    "real-read-consent-form",
+    "no-mcp-code-before-consent",
+    "silent-read-denied-until-explicit-consent",
+    "write-requires-step-up-before-read-consent",
+    "write-denial-does-not-issue-code",
+    "explicit-browser-consent-issues-one-mcp-code",
+    "mcp-code-exchange-succeeds",
+    "local-issuer-jwks-available",
+    "signed-token-bound-to-same-subject-mcp-client-audience-and-read-only",
+    "mcp-code-replay-denied",
+    "write-still-requires-step-up-after-read-consent",
+    "write-after-read-consent-issues-no-additional-code",
+    "same-browser-context-and-unchanged-sessions-throughout-mcp-flow",
+    "rooms-session-remains-usable-after-mcp-consent"
+  ],
+  "relyingParties": 2,
+  "observedAt": "2026-10-29T01:02:19.101949+00:00",
+  "runtimeCommit": "e0edf1e6c94a887c40c5e9615f05ce4ac2c81c08",
+  "roomsSourceChanged": false,
+  "issuerSource": {
+    "baseCommit": "2284bb66e8b150a060439b491502bb3230979b68",
+    "hashes": {
+      "scripts/auth-server/first-party-local-server.ts": "9b1f5b52da9ee73fc504fda7f1c625217b25b798c0d15244a073ef0c90fd6900",
+      "scripts/qa/verify-auth-first-party-local-pg.py": "b2d9661d4007e38fb0c650550a38a942d81eb6c90761f0b7dc4c4f2cb3991583"
+    },
+    "roomsCommit": "e0edf1e6c94a887c40c5e9615f05ce4ac2c81c08",
+    "roomsDatabaseEphemeral": true,
+    "roomsDatabasePort": 65317
+  },
+  "actualMcpStore": "PostgresOAuthStore",
+  "harnessStaticLimitation": "Local B10: PostgreSQL identity and Rooms, in-memory MCP consent/grant store; issuer step-up denial, not gateway tool dispatch or human MFA.",
+  "harnessLabelNote": "Unchanged Rooms script emits a fixed in-memory label from the previous test. The PostgreSQL mode is proven by issuer source/launch flags and independent SQL readback.",
+  "mcpCheckCount": 16,
+  "roomsCheckGroups": 8,
+  "postgresReadback": {
+    "activeConsentCount": 1,
+    "activeConsentScopes": [
+      "efeonce.mcp.read"
+    ],
+    "codeCount": 1,
+    "consumedCodeCount": 1,
+    "accessTokenCount": 1,
+    "accessTokensReadOnly": true,
+    "refreshTokenCount": 1,
+    "refreshTokensReadOnly": true
+  },
+  "limitations": [
+    "Synthetic bound grantsPort",
+    "NULL-context fixture projection; not full TASK-1836 migration or multi-organization context coverage",
+    "No gateway dispatch, human MFA, Microsoft or production conformance"
+  ],
+  "cleanup": {
+    "issuerAndRoomsDatabases": "both ephemeral; stopped and removed",
+    "issuer19334Stopped": true,
+    "rooms19335Stopped": true,
+    "ephemeralRoomsPgStopped": true,
+    "existingRoomsPg55432Stopped": true
+  },
+  "realEmailsSent": 0,
+  "productionTouched": false,
+  "fullSuiteRepeated": false
+}

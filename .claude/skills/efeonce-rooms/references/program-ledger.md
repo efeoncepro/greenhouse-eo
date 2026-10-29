@@ -3,6 +3,15 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-28 — B10 browser repetido con MCP PostgreSQL
+
+- `local`: mismo Rooms `e0edf1e`, sin cambios de fuentes.16checksMCP+8gruposRoomsPASS contra issuer
+  `--mcp-pg`: PostgresOAuthStore real y dos bases efímeras. SQL independiente:1consentread,1código
+  consumido,1access+1refresh con scopes sólo read. Cookies sin renovar, consentimiento y step-up intactos.
+- El rótulo estático «memoria» del arnés anterior no describe este modo: fuente/flags/SQL lo refutan.
+  Grants bound sintéticos y proyección NULL-context; sin dispatch gateway/MFA ni migración1836 completa.
+- Bases temporales retiradas, procesos detenidos; sincorreo/push/flags/deploy. [Recibo y límites](../../../../docs/audits/rooms/2026-10-28-b10-rooms-mcp-postgres.md).
+
 ## 2026-10-28 — B10 local: Rooms no concede consentimiento MCP
 
 - `local`: Rooms `codex/rooms-design-integration@e0edf1e`, issuer Auth con fuentes idénticas a
