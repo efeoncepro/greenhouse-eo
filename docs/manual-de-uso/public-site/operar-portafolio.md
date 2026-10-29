@@ -1,7 +1,7 @@
 # Operar el portafolio de proyectos
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-29 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -43,6 +43,20 @@ Menú **Portafolio** → **Proyectos** (listado) o **Agregar proyecto**. Es el m
 4. **Publicar** se habilita cuando «Falta para publicar» queda vacío, no hay cambios sin guardar y todos los videos se
    pudieron leer. Publica la revisión guardada.
 5. En **Historial** puedes ver una revisión o restaurarla (crea una revisión nueva).
+
+### Sitios web, partes de un sitio y videos de creadores
+
+El **Tipo de proyecto** (en «Cliente y contexto») dice cómo se arma la página: campaña, sitio web, parte de un sitio,
+videos de creadores, sistema u otro. Cada pieza tiene su **Tipo de pieza**, y al elegirlo aparecen sólo sus campos:
+
+| Tipo de pieza | Qué pide |
+|---|---|
+| Sitio en pantalla | Dispositivo, si es la página completa (se recorre con scroll) y, opcional, la URL en vivo si el sitio sigue tal como lo entregamos. |
+| Parte de una página | El nombre con que la reconoce el cliente (obligatorio) y dónde empieza y termina, en % de la página, para ubicarla en la barra. |
+| Video de creador | La cuenta con @, la plataforma y dónde quedó registrada su autorización. La autorización nunca se publica. |
+
+Un video de creador se ve sólo si la aprobación marca **Piezas** y **Creadores**; si falta «Creadores», el editor
+avisa «sus videos no se verán». Un proyecto de tipo «Videos de creadores» no se publica sin «Creadores».
 
 ### Ver qué hay
 
@@ -126,6 +140,7 @@ Restaurar crea una revisión nueva con el contenido de la elegida; el historial 
 | `eop_invalid` | El documento no cumple el esquema; el detalle dice qué campo y por qué. No se guardó nada. |
 | `eop_conflict` | Alguien guardó mientras editabas. Nada se pisó. |
 | `eop_approval_required` | No hay aprobación del cliente con referencia, fecha y alcance. No se publicó. |
+| `APPROVAL_SCOPE_CREATORS` | Proyecto de videos de creadores sin «Creadores» en la aprobación. No se publicó. |
 | `eop_publish_gate` | El proyecto está publicado y el cambio lo dejaría sin aprobación: despublícalo antes. |
 | `eop_slug_taken` | Ya existe una página en `/portafolio/<slug>/`. |
 | `sin cambios` | El contenido es igual a la revisión vigente: no se crea revisión. |
@@ -137,6 +152,8 @@ Restaurar crea una revisión nueva con el contenido de la elegida; el historial 
 - No subir video a la biblioteca de medios: va al bucket público de AXIS y el documento lo referencia por URL.
 - No editar `post_content` ni las meta `_eop_*` a mano: todo cambio pasa por la CLI, `wp eo-portfolio` o el admin.
 - No decidir nada por el nombre de un cliente o una campaña: las reglas son del documento.
+- No marcar «Creadores» sin la autorización de cada creador registrada: que el cliente apruebe la campaña no autoriza
+  mostrar a la persona.
 - No aplicar los fixtures en producción: llevan la marca `[fixture]` y no tienen aprobación real.
 
 ## Problemas comunes

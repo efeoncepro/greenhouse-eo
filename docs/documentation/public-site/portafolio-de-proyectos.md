@@ -1,7 +1,7 @@
 # Portafolio de proyectos — Sitio público
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-29 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -32,8 +32,21 @@ del tema Ohio.
 | `pieces` | las piezas (imágenes y videos) y la imagen principal |
 | `metrics` | las cifras de resultados |
 | `testimonial` | el testimonio |
+| `creators` | los videos de creadores (además de `pieces`) |
 
 - Lo que la aprobación no cubre no aparece, aunque esté cargado.
+- Un video de creador necesita dos permisos: el del cliente sobre la campaña y el del creador sobre su imagen. Por eso
+  pide `creators` además de `pieces`, y cada video guarda dónde quedó la autorización del creador (eso nunca se
+  publica).
+
+## Tipos de proyecto y de pieza
+
+- Cada proyecto dice qué es: una campaña, un sitio web, una parte de un sitio, videos de creadores, un sistema u otro.
+  Eso decide cómo se arma su página.
+- Cada pieza dice qué es: una pieza de campaña, un sitio en pantalla (escritorio, teléfono o tableta, a veces la
+  página completa), una parte de una página (con su nombre y dónde está), un video de creador (con su cuenta y
+  plataforma), una pieza en su lugar, un diagrama o una respuesta de IA.
+- Los proyectos anteriores, sin tipo, siguen siendo campañas.
 - Cada publicación registra quién la hizo y con qué aprobación. Ese registro no es público.
 
 ## Las cifras
@@ -50,7 +63,8 @@ del tema Ohio.
 
 ## Estado actual
 
-- Al 2026-10-29 el plugin está activo en producción y todavía no tiene proyectos.
+- Al 2026-10-29 el plugin está activo en producción y todavía no tiene proyectos. Los tipos de proyecto y de pieza
+  están construidos y probados, pero todavía no desplegados.
 - La portada y la página de cada proyecto llegan con `TASK-2048`; la carga de los 15 proyectos reales, con `TASK-2049`.
 
 > Detalle técnico: [arquitectura](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md) ·

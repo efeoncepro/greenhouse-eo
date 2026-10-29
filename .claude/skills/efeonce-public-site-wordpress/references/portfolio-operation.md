@@ -6,6 +6,7 @@ gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_po
 ## State (2026-10-29)
 
 - Plugin `eo-portfolio` v0.2.0 (with the admin) **active in production**, runtime commit 3ab38ad, **no projects**.
+- v0.3.0 (project `kind` and piece `role`: web, section, ugc) is **local only**, runtime commit d583a97, not deployed.
 - `/portafolio/` is still the Elementor page 247116 with Ohio's widget. Entries `/portafolio/<slug>/` answer 404 until
   `TASK-2048` hooks `eo_portfolio_render_entry`. The 15 real projects load in `TASK-2049`.
 - Ohio's 44 demo entries are drafts with Yoast 410 (TASK-2046); the 15 real ones still live at `/project/<slug>/`.
@@ -34,9 +35,16 @@ pnpm public-website:portfolio -- revisions <slug> | log <slug> | restore <slug> 
 ## Rules the plugin enforces (do not re-implement, do not work around)
 
 - No publish without `clientApproval` with `ref` (opaque pointer to where the approval is recorded, never a contact's
-  name or email), `date` and a non-empty `scope` (`logo`, `pieces`, `metrics`, `testimonial`). A published project
+  name or email), `date` and a non-empty `scope` (`logo`, `pieces`, `metrics`, `testimonial`, `creators`). A published project
   cannot be saved without it (`eop_publish_gate`): unpublish first.
 - The scope decides what the public sees; what it does not cover is not served even if loaded.
+- Project `kind` (campaign | website | web-section | ugc | system | other) and piece `role` (campaign | web | section |
+  ugc | in-situ | diagram | answer); absent means `campaign`. Each role carries only its fields
+  (`EOP_Validator::ROLE_FIELDS`): `web` → `device`, `longCapture`, `liveUrl`; `section` → `sectionName` (required),
+  `position` {from < to, 0–1}, `liveUrl`; `ugc` → `creator` {`handle` with @, `platform`, `consentRef`} (required).
+- A creator's video shows only with `pieces` **and** `creators` (client approval of a campaign does not license a
+  creator's face); `consentRef` never leaves the projection; a `kind: ugc` project cannot publish without `creators`.
+  Only set `creators` when each creator's authorization is recorded.
 - Every `results[]` has `source`; `percent` is 0–100 without `%`; only a percent enables the measure orbit.
 - Every media item has real `width`, `height` and `alt`; images use a Media Library `mediaId`; videos use `src` and
   `poster` in the public AXIS bucket (`portfolio/v<N>/<slug>/`) and `captionsVtt` when they have voice. No video upload

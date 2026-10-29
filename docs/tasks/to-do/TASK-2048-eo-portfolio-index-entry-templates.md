@@ -1,5 +1,15 @@
 # TASK-2048 — EO Portfolio: portada y entrada
 
+## Delta 2026-10-29 — tipos de proyecto y de pieza (eo-portfolio v0.3.0, local)
+
+- El esquema distingue `kind` del proyecto (campaign, website, web-section, ugc, system, other) y `role` de cada pieza
+  (campaign, web, section, ugc, in-situ, diagram, answer), con sus campos: `device`, `longCapture`, `liveUrl` (web);
+  `sectionName`, `position` (section); `creator` {handle, platform, consentRef} (ugc). Alcance nuevo `creators`.
+- La proyección ya entrega `kind`, `roles` en la tarjeta y por pieza `role` y sus campos; los videos de creador sólo
+  con `pieces` + `creators`. Las plantillas de entrada web y UGC del canvas (`EntradaWeb`, `EntradaUGC`) leen eso.
+- Runtime d583a97, sin desplegar: el paquete de esta task debe llevar v0.3.0. Fixture ficticio
+  `tests/fixtures/portfolio/cordillera.json` cubre sitio, parte y creador.
+
 ## Delta 2026-10-29 — TASK-2047 cerrada
 
 - El plugin `eo-portfolio` v0.2.0 está en producción sin proyectos. Lectura para las plantillas: `EOP_Store::served()` /

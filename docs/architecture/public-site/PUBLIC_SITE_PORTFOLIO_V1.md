@@ -1,12 +1,13 @@
 # Portafolio del sitio público (EO Portfolio) — V1
 
 > **Tipo de documento:** Arquitectura técnica
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-29 por Claude (TASK-2047)
+> **Ultima actualizacion:** 2026-10-29 por Claude (tipos de pieza, TASK-2048)
 > **Decisión:** [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) ·
 > **Epic:** [EPIC-056](../../epics/to-do/EPIC-056-eo-portfolio.md)
 > **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/` (v0.2.0 con el admin, activo en producción
-> desde 2026-10-29, runtime 3ab38ad)
+> desde 2026-10-29, runtime 3ab38ad; v0.3.0 con tipos de proyecto y de pieza, local en runtime d583a97, sin desplegar)
 
 ## 1. Qué resuelve
 
@@ -32,14 +33,23 @@ documento validado, un solo servicio de guardado y tres puertas, render del serv
 `EOP_Validator` (PHP puro):
 
 - Esquema: tipos, enums (`line`: growth, brand, engine, voice, revenue; `results[].kind`: number, percent, text;
-  `scope`: logo, pieces, metrics, testimonial), largos, patrones (sin `<>`, `https`, slugs), campos desconocidos
+  `scope`: logo, pieces, metrics, testimonial, creators; `kind` del proyecto: campaign, website, web-section, ugc,
+  system, other; `role` de cada pieza: campaign, web, section, ugc, in-situ, diagram, answer), largos, patrones (sin `<>`, `https`, slugs), campos desconocidos
   rechazados.
 - Reglas de conjunto: imagen con `mediaId` y sin campos de video; video con `src` y `poster` y sin `mediaId`; voz exige
   `captionsVtt`; ids de medio únicos; `hero.mediaRef` existe; `percent` entre 0 y 100; `services` en
   `schema/services.v1.json` (9 líneas de `docs/services/`); `src`, `poster` y `captionsVtt` sólo bajo los prefijos de
   `schema/media-hosts.v1.json` (bucket público de AXIS, `MEDIA_HOST_NOT_ALLOWED`). Los mensajes `REQUIRED` nombran el
   campo en castellano (`EOP_Validator::NAMES`).
-- Compuerta de publicación (`publish_issues`): `clientApproval` con `ref`, `date` y `scope` no vacío.
+- Tipos de pieza (`EOP_Validator::ROLE_FIELDS`): una pieza sin `role` es `campaign` y un proyecto sin `kind` es
+  `campaign` (los documentos anteriores siguen válidos). Cada rol trae sólo sus campos: `web` → `device`
+  (desktop, mobile, tablet), `longCapture` (captura de la página completa), `liveUrl`; `section` → `sectionName`
+  (obligatorio), `position` {`from`, `to`} en fracción de la página, con `from` < `to`, y `liveUrl`; `ugc` →
+  `creator` {`handle` con @, `platform`, `consentRef`} obligatorio. Un campo en un rol que no lo admite es
+  `INVALID_SHAPE`.
+- Compuerta de publicación (`publish_issues`): `clientApproval` con `ref`, `date` y `scope` no vacío; un proyecto
+  `kind: ugc` exige además `creators` en el alcance (`APPROVAL_SCOPE_CREATORS`), porque sin él no se vería ningún
+  video.
 - Formato derivado de las dimensiones (`9:16`, `4:5`, `1:1`, `16:9`, `3:1`, `otro`, tolerancia 3 %); no se guarda.
 - Ninguna regla nombra un cliente, una campaña o un slug (guarda en `tests/eo-portfolio.test.php`).
 
@@ -67,9 +77,13 @@ proyecta en local con el validador del plugin (`local.php`) y escribe por `pnpm 
 ## 6. Proyección pública (`EOP_Projection`)
 
 Lista blanca de campos. Nunca salen `clientApproval`, `client.greenhouseOrganizationId`, `revision`, `updatedAt` ni el
-historial. Por alcance: sin `logo` no hay logo; sin `pieces` no hay `hero`, `chapters`, `formats` ni `cover`; sin
-`metrics` no hay `results` ni `measure`; sin `testimonial` no hay testimonio. Agrega `format` por medio, `formats` del
-proyecto y `measure` (primer porcentaje con alcance `metrics`, habilita la órbita de medida). Las URLs de imágenes y
+historial, ni `creator.consentRef`. Por alcance: sin `logo` no hay logo; sin `pieces` no hay `hero`, `chapters`,
+`formats` ni `cover`; sin `metrics` no hay `results` ni `measure`; sin `testimonial` no hay testimonio. Un video de
+creador (`role: ugc`) necesita `pieces` y además `creators`: que el cliente apruebe su campaña no autoriza mostrar la
+cara de un creador. Una pieza que no se ve no deja rastro (sale de su capítulo, de `formats`, de `roles` y de la
+portada; un capítulo que queda vacío no se publica). Agrega `kind`, y por pieza `role` y sus campos (`device`,
+`liveUrl`, `longCapture`, `sectionName`, `position`, `creator.handle`, `creator.platform`); `roles` en la tarjeta
+del índice; `format` por medio, `formats` del proyecto y `measure` (primer porcentaje con alcance `metrics`, habilita la órbita de medida). Las URLs de imágenes y
 el permalink llegan como callbacks (`EOP_REST::options`).
 
 ## 7. Salvaguardas mientras no hay plantilla
@@ -81,9 +95,10 @@ entrada en vez de responder 410 (TASK-2046).
 
 ## 8. Pruebas y despliegue
 
-- `php tests/eo-portfolio.test.php` (126 comprobaciones en PHP puro sobre 3 fixtures) y
-  `tests/playground/run-eo-portfolio.sh` (53 en Playground + 21 por WP-CLI, con la estructura de enlaces de
-  producción). Fixtures en `tests/fixtures/portfolio/`, marcados `[fixture]`.
+- `php tests/eo-portfolio.test.php` (214 comprobaciones en PHP puro sobre 4 fixtures) y
+  `tests/playground/run-eo-portfolio.sh` (53 en Playground + 22 por WP-CLI + 33 del admin, con la estructura de
+  enlaces de producción). Fixtures en `tests/fixtures/portfolio/`, marcados `[fixture]`; `cordillera.json` es
+  ficticio y cubre sitio, parte de página y video de creador.
 - Paquete `scripts/public-website/build-portfolio-plugin-package.cjs` y despliegue
   `deploy-portfolio-plugin-package.php` (contrato `eo-portfolio-release.v1`): lista de rutas, hashes, guarda de deriva
   contra la línea base de `export-live-code`, tar de respaldo, archivo principal al final, activación con un solo
