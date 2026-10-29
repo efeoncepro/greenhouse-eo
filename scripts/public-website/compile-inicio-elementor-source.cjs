@@ -171,7 +171,9 @@ $('section#trabajo .rb-track').each((_, t) => {
 })
 $('section#trabajo .ribbon').first().find('figure.ad').attr('data-gh-repeat', 'piezas_a')
 $('section#trabajo .ribbon.rev').find('figure.ad').attr('data-gh-repeat', 'piezas_b')
-$('section#trabajo video').each((_, v) => { $(v).attr({ autoplay: '', muted: '', loop: '', playsinline: '' }).removeAttr('autoPlay').removeAttr('playsInline') })
+// Videos load only when they come into view (inicio-landing.js plays and pauses them); the poster paints until then.
+// Without this the five work videos (6 MB) downloaded with the page, also on phones.
+$('section#trabajo video').each((_, v) => { $(v).attr({ muted: '', loop: '', playsinline: '', preload: 'none', 'data-gh-autoplay': '' }).removeAttr('autoPlay').removeAttr('autoplay').removeAttr('playsInline') })
 
 // AEO: five questions (the category is highlighted), the stage of «Tu marca» per answer, engine icon/name from the
 // pressed engine button. JS types the active question letter by letter and moves the rows.
@@ -276,6 +278,12 @@ $('section#agentes .sk').each((_, el) => { const y = parseFloat((/--y:\s*([\d.]+
 <div class="meet-cta"><gh-meeting-cta location="home_agenda"></gh-meeting-cta></div>
 <div class="mail">¿Prefieres escribirnos? <code>hola@efeoncepro.com</code><button class="copy" type="button" data-gh-copy="hola@efeoncepro.com">Copiar</button></div>`)
 }
+
+// Internal links stay in the same tab (the canvas opened every line link in a new one); external ones keep it.
+$('#__root a[target="_blank"]').each((_, a) => { if (/^https:\/\/efeoncepro\.com\//.test($(a).attr('href') || '')) $(a).removeAttr('target').removeAttr('rel') })
+
+// Hero photos: the first line's portrait is the likely LCP; the other four load after it.
+$('section#top .lens-inner > img.cast').each((i, img) => { $(img).attr('fetchpriority', i ? 'low' : 'high') })
 
 // Buttons that only switch state are not form submits.
 $('#__root button').each((_, b) => { if (!$(b).attr('type')) $(b).attr('type', 'button') })
