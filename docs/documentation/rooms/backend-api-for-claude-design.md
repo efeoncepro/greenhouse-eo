@@ -1,9 +1,9 @@
 # Rooms — contrato backend para Claude Design
 
-> Estado26Oct2026: backend publicado en `main@e4b2e890` ([PR3](https://github.com/efeoncepro/efeonce-rooms/pull/3)).
-> Canary real de identidad/correo/imagen y disparo automático completados; acceso humano e imágenes web
-> siguen OFF. Auth PR263/264 quedan retenidas por el operador, sin merge/deploy. Esta guía es el contrato
-> de integración; no acredita interfaz conectada ni aceptación visual.
+> Candidato local29Oct2026 en `codex/rooms-design-integration`: backend ampliado sin UI ni push/deploy.
+> [Recibo y gates finales](../../audits/rooms/2026-10-29-backend-local-completion.md).
+> El corte cloud26Oct publicó imágenes V3; no acredita las ampliaciones V4/R09/R11/R14/MCP descritas abajo.
+> Canary único cerrado OFF y Auth retenido en PR, sin merge/deploy ni cambios de flags.
 
 Responsabilidades ratificadas por el operador2026-10-26: **Codex backend; Claude Design interfaz**.
 Este documento describe contratos ejecutables, no una composición visual ni una aceptación de la UI.
@@ -12,7 +12,7 @@ Este documento describe contratos ejecutables, no una composición visual ni una
 
 ## Estado y fuentes
 
-- Producción: `https://efeonce-rooms.vercel.app`, main `e4b2e890`, despliegue promovido
+- Corte cloud documentado26Oct: `https://efeonce-rooms.vercel.app`, main `e4b2e890`, despliegue entonces promovido
   `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS`; acceso/invitaciones/medios web OFF.
 - Salas/ediciones V1/V2/V3, permisos, API/CLI, GCS privado y transferencia directa implementados.
   Ocho migraciones/26 tablas y Job con SA/rol propios; Scheduler OIDC cada minuto sólo lo inicia con
@@ -41,18 +41,129 @@ origin no es un consumidor autenticado habilitado: cookies, Origin exacto y CORS
 permisos de Production. El entorno local está preparado; no hay un staging cloud habilitado. [Arranque y SDK](../../manual-de-uso/rooms/integrar-claude-design-local.md).
 
 Para el primer recorrido ya existen los servicios de backend; no depende de completar todo EPIC-052.
-PDF/audio/video, presentación avanzada, colaboración, CRM y MCP conservan sus unidades futuras; no
-incluirlos como capacidades disponibles sólo porque el contrato V1 los enumera.
+Las ampliaciones locales29Oct se detallan a continuación: no están desplegadas por haber pasado pruebas
+locales. La entrega visual, la certificación conjunta y los conectores externos conservan sus gates.
 
-## Implementación local disponible para Claude Design
+## Paquete inicial para Claude Design — antecedente26Oct
 
-Rama `codex/rooms-design-integration`, commit `2cddc98a`, sin push ni deploy. Conectores browser-safe
+Paquete inicial en `codex/rooms-design-integration@2cddc98a`, sin push ni deploy; el candidato vigente se
+describe en la sección siguiente. Conectores browser-safe
 `src/client`: readers, commands tipados/revisión/idempotencia, sesión/contexto, SHA y transferencia segura.
 DTOs type-only derivados de las fuentes canónicas; bundle sin runtime server/fixtures. Prueba real con
 navegador de los conectores: upload→worker local→attach→publish→lectura privada guest, negativas de
 operador/cross-tenant/draft/workspace/anon y conflicto/replay. Esto verifica API en navegador, no la nueva UI.
 [Manual](../../manual-de-uso/rooms/integrar-claude-design-local.md) y [evidencia](../../audits/rooms/2026-10-26-local-design-integration.json).
 El launcher local es una fixture de acceso sin correo/Microsoft reales; no sustituye ni repite el canary cloud.
+
+## Ampliaciones locales disponibles29Oct
+
+Contrato ejecutable: `src/domain/{collaboration,presentation,integration,multimedia}-contracts.ts`.
+Commit local3c7bcb5:13migraciones/43tablas,337tests sin omisiones, lint/types/build, restorePG16/18
+y Chrome18+23checks PASS; no cambios de producción. [Operar y verificar](../../manual-de-uso/rooms/operar-backend-local.md).
+No atribuir estos resultados al deployment cloud26Oct ni activar flags para diseñar.
+
+### Preguntas, próximos pasos y actividad
+
+Commands: `questions.create/answer/resolve`, `steps.create/update`; todos usan edición publicada,
+`expectedRevision`, idempotencyKey, autoridad persistida y audit/outbox. Las anclas sólo apuntan a contenido
+visible de esa edición; un bloque excluido no queda habilitado por existir en el manifest.
+Una ancla con assetVersionId debe aparecer en el bloque de medios visible. timeMs sólo se acepta
+para audio/video V4, entre0 y su duración medida en milisegundos; imágenes y PDF lo rechazan.
+Responder y administrar pasos exige actor interno y capability explícita. Un externo sólo resuelve su
+propia pregunta con permiso; no existe un bypass por nombre de rol. Una pregunta resuelta no admite
+más respuestas. Responsable de paso es una persona interna activa o null.
+
+SDK: `questions(roomId, editionId, page?)`, `steps(...)`, `activity(...)`. Respuestas contienen `items`,
+`nextCursor` y revisión; la actividad es registro de operaciones reales, no prueba de atención, lectura
+completa, intención de compra ni rendimiento comercial.
+
+### Tours, notas propias y presentación
+
+Commands: `tours.upsert`, `notes.upsert/delete`, `presentation.prepare/start/end/control/ack`.
+Tours sólo admiten anclas visibles de edición publicada. Notes son propias incluso frente a administrador;
+no van en edición, audiencia, receipt ni audit/outbox. Un invitado champion necesita permisos explícitos.
+
+Prepare fija edición/hash y copia del tour, owner e instanceId. Cambiar el tour después no modifica esa
+sesión. TTL máximo2h, limitado además por autoridad/grants/sesión; una renovación no extiende lo preparado.
+Start/end usan revisión de sala y secuencia; control/ack usan secuencia exacta y no incrementan la revisión
+de autoría. Control exige owner+instanceId; ningún admin toma otra consola por inferencia. Ack registra
+un reporte de escena, nunca reproducción efectiva. Releer tras reconexión; no aplicar escenas antiguas
+porque un receipt se haya repetido. Revoke/archivo/expiry se revalidan también en replay y readers.
+
+SDK: `tours(roomId, editionId, page?)`, `tour(roomId, editionId, tourId)`, `ownNotes(...)`,
+`presentation(roomId, editionId, sessionId)` y `presentationConsole(roomId, editionId, sessionId, page?)`.
+Audiencia recibe estado/escena/secuencia/tour fijado; jamás notas o instanceId del controller. Console sólo
+sirve al owner y pagina sus notas con `notesNextCursor`. El backend no implementa ventanas, BroadcastChannel,
+WebSocket, sonido/fullscreen o sincronización remota: Claude Design implementará su adapter con QA propio.
+
+### Derechos de invitación y actor guest
+
+La migración13 permite pedir derechos adicionales explícitos de colaboración/notas/presentación sobre
+la **edición inicial**, intersectados con autoridad vigente del emisor. Las invitaciones existentes
+conservan sus capacidades guardadas. No concede estos derechos adicionales en futuras ediciones ni transforma al invitado en
+miembro/principal interno. Receipts y referencias de notes/sessions/ack se ligan a sesión/invitación para
+mantener sus FKs y revocación. El OTP sigue en Auth y su prueba local usa buzón sintético; no repetir correo.
+
+### X-ray y referencia comercial
+
+SDK: `integrations(roomId, page?)` (máximo25) y `previewXrayImport(roomId, sourceEditionId)`.
+Commands: `integrations.importXray/linkCrm/requestHandoff`. Preview convierte el contrato Think real a
+bloques nativos con fuente/hash/revisión, cobertura y exclusiones; importar exige previewHash y exclusiones
+aceptadas exactas, más CAS/idempotencia. No se acepta una URL/cookie/JSON de cliente como autoridad de fuente.
+Los puertos fuente/CRM son server-owned y **están deshabilitados en la composición por defecto**.
+Mostrar unavailable/not_configured; no convertir fixtures en conectores operativos.
+
+La referencia HubSpot exige verificador autorizado del sistema dueño. RequestHandoff guarda edición/hash,
+responsable y referencia como solicitud `pending`; ese estado no es envío, entrega ni sincronización CRM.
+`integrations(...).data.imports` pagina por `nextCursor`; preserva evidencias/linaje/exclusiones.
+
+### Imágenes, PDF, audio y video en una sala V4
+
+V4 es opt-in explícito (`rooms.content.v4`/`rooms.room.v4`, mediaBlock schemaVersion3); no convierte
+V1/V2/V3. Una misma sala V4 puede combinar imágenes del pipeline existente y PDF/audio/video.
+El DTO V4 multimediaAssets discrimina kind=image/pdf/audio/video; /media entrega imágenes y /multimedia
+los otros tipos. No cruzar endpoints. HTTP/SDK y worker local usan archivos físicos, sandbox macOS y codecs fijados.
+`ROOMS_MULTIMEDIA_LOCAL_ENABLED=true` exige perfil local y rechaza Vercel/cloud; el entorno de diseño no
+lo habilita por defecto. Docker/Linux/cloudstorage/transcodificación no están certificados.
+
+1. Crear V4 con procedencia explícita y bloque multimedia sin referencia aún.
+2. Calcular `sha256MultimediaBlob(file)` dentro del límite de su formato. `sha256Blob` sigue limitado
+   a imágenes20MiB; ningún hash o dimensión browser acredita readiness.
+3. `multimedia.initiate` fija tamaño/tipo/SHA/owner; `multimediaTransfer(roomId, uploadId)` devuelve descriptor.
+4. `putMultimediaTransfer(transfer, blob, {origin})` hace PUT same-origin y exige tamaño/tipo/expiry exactos.
+   No registrar el descriptor. El PUT aún necesita verificación.
+5. `multimedia.complete`; consultar `multimediaUpload(...)` o `multimedia(roomId)` hasta ready/failed.
+   `integration:up --multimedia` configura/supervisa el worker local y su storage. Fuera del launcher,
+   `pnpm multimedia:worker` exige DB, perfil, flag y raíz privada explícitos; termina tras un trabajo.
+6. `multimedia.attachAsset`, preview y `editions.publish` canónicos; publicación fija todos los derivados.
+   `multimediaRenditionPath(...)` usa edición fija o draft, nunca ambos. GET/HEAD/Range/304 reautorizan.
+
+PDF devuelve todas sus páginas o falla completo. Audio produce MP3+peaks; video MP4faststart+poster.
+No HLS, contenido remoto, originales descargables o un fallback a parser del browser. El CLI genérico
+`execute` puede operar commands JSON; su `upload-bytes/media-bytes` pertenece al corte de imágenes,
+no es un transporte multimedia de128MiB. Para ello usar `multimedia-upload-bytes`/`multimedia-bytes`
+del CLI, con streaming, o el SDK multimedia. MCP excluye las transferencias binarias explícitamente.
+
+### Lecturas HTTP nuevas
+
+Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cursor` según su contrato.
+
+| Ruta | SDK |
+| --- | --- |
+| GET `/api/v1/rooms/:roomId/editions/:editionId/questions` | questions |
+| GET `.../steps` y `.../activity` | steps/activity |
+| GET `.../tours`, `.../tours/:tourId`, `.../notes` | tours/tour/ownNotes |
+| GET `.../presentations/:sessionId` y `.../console` | presentation/presentationConsole |
+| GET `/api/v1/rooms/:roomId/integrations` | integrations |
+| POST `.../integrations/xray/preview` | previewXrayImport |
+| GET `/api/v1/rooms/:roomId/multimedia` | multimedia |
+| GET `.../multimedia/uploads/:uploadId` y `.../transfer` | multimediaUpload/multimediaTransfer |
+| PUT `.../multimedia/uploads/:uploadId` | putMultimediaTransfer |
+| GET/HEAD `.../multimedia/:assetVersionId/:renditionId` | multimediaRenditionPath |
+
+Los comandos nuevos conservan POST `/api/v1/commands`; no crear writers dentro de componentes.
+Todos los DTOs se importan type-only desde `src/client`, no desde módulos SQL/worker al bundle del browser.
+MCP local usa el mismo HTTP con sesión existente; no inicia OAuth ni concede autorización MCP remota.
 
 ## Identidad y límites de consumidor
 
@@ -104,7 +215,7 @@ Todos los readers de la tabla llevan `?organizationId=...`. IDs van codificados 
 | GET `/api/v1/operations` | Catálogo de operaciones implementadas; no afirma flagsON ni grants efectivos |
 | GET `/api/v1/rooms` | Salas/contexto del actor; workspace.read |
 | GET `/api/v1/rooms/:roomId/draft` | Proyección autorizada del borrador; puede omitir evidencia |
-| GET `/api/v1/rooms/:roomId/authoring` | DTO V3 de autoría; content.edit + rooms.read + evidence.read |
+| GET `/api/v1/rooms/:roomId/authoring` | DTO V3/V4 de autoría; content.edit + rooms.read + evidence.read |
 | GET `/api/v1/rooms/:roomId/preview` | Proyección de audiencia del borrador; content.edit, sin suplantar guest |
 | GET `/api/v1/rooms/:roomId/media` | Assets y estados; content.edit |
 | GET `/api/v1/rooms/:roomId/uploads/:uploadId` | Estado de carga y asset; content.edit |
@@ -114,7 +225,8 @@ Todos los readers de la tabla llevan `?organizationId=...`. IDs van codificados 
 | GET/HEAD `/api/v1/rooms/:roomId/media/:assetVersionId/:renditionId` | Bytes privados; añadir editionId O draft=true, nunca ambos |
 
 `authoring` devuelve `{organizationId,roomId,title,revision,draftId,permissions:{canEdit,canPublish},content,
-coverage,assets}`. Cada asset devuelve id/assetVersionId/displayName/mimeType/byteSize,width/height/orientation,
+coverage,assets,multimediaAssets?}`. assets conserva el DTO de imágenes; V4 añade multimediaAssets
+para los estados de PDF/audio/video y content.assets resuelve el inventario combinado. Cada asset devuelve id/assetVersionId/displayName/mimeType/byteSize,width/height/orientation,
 state,preview,problem y acciones canRetry/canCancel/canAttach. Valores nulos significan no medidos aún.
 No inferir ready de dimensiones browser o de que PUT devolvió200.
 
@@ -151,15 +263,15 @@ V2 sin medios del scaffold exige permisos completos; V1 y V2 con medios no se mi
 11. Lector invitado usa DTO de la edición fija y la ruta privada de rendition con editionId. El servidor
     reautoriza GET/HEAD/Range/304; no hay download del original ni URL bearer de lectura.
 
-Los writes de media incrementan revisión. Releer tras recuperación/conflicto. `uploads.cancel`,
+Los writes del corte de imágenes incrementan revisión. Releer tras recuperación/conflicto. `uploads.cancel`,
 `media.cancel` y `media.retry` son commands con expectedRevision/idempotencia. Cancelar no borra bytes ya
 recibidos por otro actor; una URL de escritura ya emitida puede durar hasta5min, pero complete queda denegado.
 
 ## Formatos, errores y presentación de estados
 
-Fuente ejecutable: MEDIA_LIMITS en media-contracts.ts. Corte actual: PNG/JPEG/WebP estáticos, original<=20MiB,
+Fuente ejecutable: MEDIA_LIMITS en media-contracts.ts. Corte de imágenes V3: PNG/JPEG/WebP estáticos, original<=20MiB,
 <=40MP; dos derivados WebP<=3MiB cada uno. APNG, WebP animado, SVG, HTML, GIF, PDF/audio/video no están
-habilitados por este corte. No usar el nombre/extensión como validación. Alt obligatorio, ratio y alpha intactos.
+habilitados por el corte V3. El V4 local separado usa MULTIMEDIA_LIMITS y su ADR; no ampliar esta allowlist. No usar el nombre/extensión como validación. Alt obligatorio, ratio y alpha intactos.
 
 | Estado | Significado para el consumidor |
 | --- | --- |
@@ -187,7 +299,7 @@ para soporte. No reinterpretar404 como invitación a probar otra organización.
 
 ## Verificación y pendientes operativos
 
-Backend234/234,9pruebas focales de dispatch,lint/types/build y CI Linux PASS. Playwright53PASS/3skip
+Histórico26Oct: backend234/234,9pruebas focales de dispatch,lint/types/build y CI Linux PASS. Playwright53PASS/3skip
 acredita la interfaz/scaffold existente y sus pruebas automáticas; no certifica el nuevo diseño.
 [Recovery aislado PG16/18](../../audits/rooms/2026-10-26-media-backend-recovery.md) conserva evidencia de
 su corte de siete migraciones, hashes/generaciones, ACL e inmutabilidad; la
@@ -202,3 +314,7 @@ acreditan con una imagen de canary o un contenedor vacío. [Manual worker](../..
 Auth conserva el runtime previo y flags OFF. Las correcciones de su deploy-control están sólo en
 [PR263/264](../../audits/rooms/2026-10-26-auth-deploy-control.md), por decisión humana. No fusionar,
 encender flags ni enviar correos por conectar el diseño. El canary completado no se repite por inferencia.
+
+Una referencia de archivo no excluida necesita un bloque de medios visible. Si falta, coverage devuelve
+asset_reference_unplaced y publicación falla aunque los bytes estén ready. Para omitir un archivo,
+excluir explícitamente su referencia con required=false y una razón, o ubicarla en otro bloque visible.

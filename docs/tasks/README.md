@@ -1,10 +1,18 @@
 # Task Index
 
+- `TASK-2077` — [Rooms: multimedia V4 local](complete/TASK-2077-rooms-local-multimedia-pipeline.md), complete local; sala combinada, derivados privados y codecs macOS; Linux/cloud separados.
+- `TASK-2076` — [Rooms: importación X-ray y handoff CRM](complete/TASK-2076-rooms-source-import-and-crm-handoff.md), complete local; mapping y referencias durables, puertos externos OFF.
+- `TASK-2074` — [Rooms: colaboración durable](complete/TASK-2074-rooms-durable-collaboration.md), complete local; preguntas/respuestas/pasos con anclas y actividad explícita, UI separada.
+
+- `TASK-2078` — [Rooms: MCP stdio local](complete/TASK-2078-rooms-local-stdio-mcp.md), complete local; adapter sobre sesión existente y HTTPcanónico; lectura default, federación remota y bytes por MCP fuera de alcance.
+
+- `TASK-2075` — [Rooms: presentación durable](complete/TASK-2075-rooms-durable-presentation.md), complete local; backend local R09, sin UI ni producción.
+
 - `TASK-2073` — [Cuentas operativas: comparación local del bridge](complete/TASK-2073-operational-account-bridge-local-prototype.md), complete por sandbox local: 97 tests/68 checks PASS; A′ recomendado con owner Finance común; ADR Proposed, sin producción/historia.
-- `TASK-2072` — [Rooms: backend cloud de medios](in-progress/TASK-2072-rooms-cloud-media-backend.md), in-progress; main e4b2e890, GCS/SQL8migraciones/26tablas y Scheduler/worker verificados; consumidor Claude Design/entorno aislado/rollout general pendientes.
+- `TASK-2072` — [Rooms: backend cloud de medios](in-progress/TASK-2072-rooms-cloud-media-backend.md), in-progress; main e4b2e890, GCS/SQL8migraciones/26tablas y Scheduler/worker verificados; entorno aislado/SDK probados; consumidor Claude Design y rollout general pendientes.
 - `TASK-2071` — [Rooms: autoría y lectura de imágenes privadas](in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md), in-progress; nueva interfaz Claude Design, UI ready=no; contrato backend disponible, integración/GVC/aceptación humana pendientes.
 
-- `TASK-2070` — [Rooms: imágenes privadas y procedencia](in-progress/TASK-2070-rooms-private-image-media.md), in-progress; R05A backend implementado y canary cloud real por2072; formatos PDF/audio/video y activación general separados.
+- `TASK-2070` — [Rooms: imágenes privadas y procedencia](complete/TASK-2070-rooms-private-image-media.md), complete local; R05A backend implementado y canary cloud real por2072; formatos PDF/audio/video y activación general separados.
 
 - `TASK-2069` — [Rooms: perfil cloud y piloto controlado](in-progress/TASK-2069-rooms-cloud-runtime-controlled-pilot.md), in-progress; infraestructura aplicada,8migraciones/26tablas y canary interno cerrado OFF; observación/costes/recovery ampliado y rollout general conservan gates.
 
@@ -52,7 +60,7 @@ Auditoría14/10 de configuración/CAPI/agentes: [docs y skills conciliados](../a
 - `TASK-2036` — [Policy/API/CLI de medición](complete/TASK-2036-growth-measurement-policy-foundation.md), complete; PR255/main9690efad released, alta por datos en producción y Meta Server9 verificados sin redeploy.
 - `TASK-2037` — [Panel de medición](complete/TASK-2037-growth-measurement-configuration-panel.md), complete; mismo contrato que agentes, UI/GVC1440/390 y12 estados PASS, release y readback productivos verificados.
 
-- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2074`.
+- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2079`.
 
 - `TASK-2034` — [Lead matching Meta y Google](in-progress/TASK-2034-growth-lead-matching-meta-google.md), in-progress/parcial. [Release main2559e9242](../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md) con Grader y clasificación auditada servidos; CI/Deep/smoke/health y watchdog6/6 PASS. GTM6/10, EC ON y13 Forms+Discovery verificados; Grader comercial, Contacto fueraAds, Web quote_request. Primera identidad nativa/recibo Graph/recepción y atribución Ads pendientes; umbrella `TASK-2035`.
 - `TASK-2033` — [Efeonce Insights: alcance de contenido por organización](in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md), in-progress (Slices 1–5 en staging y `ops-worker`; Production sin release); `EPIC-045`.

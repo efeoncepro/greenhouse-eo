@@ -3,16 +3,38 @@
 **Corte coordinado Auth+Rooms 2026-10-29:** [evidencia, pendientes y estado de release](../../audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
 El canary único permanece cerrado OFF. El ref Git local `e4b2e89` no prueba el
 deployment activo; Claude Design aún no había entregado la UI nueva. La
-sesión Rooms continúa el decoder, la presentación y los gates de operación.
+sesión Rooms amplía ahora el backend local; ese corte coordinado precede las ampliaciones siguientes.
 
-**Estado vigente al 2026-10-26:** runtime privado [efeoncepro/efeonce-rooms](https://github.com/efeoncepro/efeonce-rooms),
-`main@e4b2e890` ([PR3](https://github.com/efeoncepro/efeonce-rooms/pull/3)), publicado en
-[efeonce-rooms.vercel.app](https://efeonce-rooms.vercel.app/demo). `rooms.efeonce.org` sigue siendo el
-subdominio acordado; su DNS no se declara activado.
+## Candidato backend local — 2026-10-29
 
-**Continuidad local de integración:** rama `codex/rooms-design-integration` (`2cddc98a`), sin push/deploy:
-entorno propio3216/55433/19338 y conectores browser-safe disponibles;250testsPASS y18comprobaciones
-API en navegador. Claude Design aún debe conectar/aceptar su UI. [Manual local](../../manual-de-uso/rooms/integrar-claude-design-local.md).
+Rama `codex/rooms-design-integration`, sin push/deploy. La nueva UI de Claude Design aún no se ha
+entregado. El entorno aislado3216/55433/19338 y el SDK browser-safe ya están preparados; no volver a
+listarlos como trabajo pendiente. [Manual de integración](../../manual-de-uso/rooms/integrar-claude-design-local.md),
+[operación del backend](../../manual-de-uso/rooms/operar-backend-local.md) y
+[recibo del candidato/gates finales](../../audits/rooms/2026-10-29-backend-local-completion.md).
+
+Commit local `3c7bcb5`:13migraciones/43tablas,337testsPASS0skip,lint/types/build y smoke aislado del
+worker de imágenes PASS. Chrome18+23checks; restore físico13 en PG16/18 y downgrade vacío13→8→13
+PASS. El entorno13/multimedia opt-in se verificó y quedó detenido. No certifica rollout ni contenedor multimedia Linux.
+
+| Frente nuevo local | Construido | Límite de este corte |
+| --- | --- | --- |
+| Colaboración2074 | Preguntas/respuestas, próximos pasos y actividad redactada;14pruebas focales(13PG+1schema) | Grants finos y anclas de edición; actividad no demuestra atención/intención comercial |
+| Presentación2075 | Tours de edición publicada, notas propias, snapshot de sesión, owner/instance exclusivo, secuencia/ack/reconexión | Notas ajenas ni admin; bloques excluidos rechazados también en replay/lectura; sin adapter visual, playback ni sincronización remota |
+| Integraciones2076 | Mapping nativo del contrato Think X-ray, coverage/exclusiones/previewHash y referencias/solicitudes CRM durables | Puertos externos deshabilitados; `pending` no significa entrega o sincronización CRM |
+| Multimedia2077 | V4 opt-in local: Imagen+PDF/audio/video en una edición, con codecs reales, sandbox y entrega privada de derivados | Sólo macOS/toolchain fijado; Docker/Linux/cloud bloqueados; sin auto-conversión legacy, HLS ni originales descargables |
+| MCP2078 | SDKoficial stdio local sobre HTTP y sesión existente; defaultread, toolsets explícitos, cobertura/exclusiones | Sin OAuth nativo nuevo, federación remota ni transferencia binaria por MCP |
+| Invitados/migración13 | Derechos adicionales explícitos sólo en edición inicial; receipts/notas/sesiones/ack referencian sesión/invitación | No crea un principal interno, no amplía invitaciones anteriores ni concede esos derechos adicionales en una edición futura |
+
+HTTP, SDK y comandos CLI comparten primitives, permisos y receipts. La UI sólo consumirá esos contratos.
+Los readers están paginados; integraciones acepta máximo25elementos por página. El flujo binario multimedia
+local usa HTTP/SDK propio; no atribuir al CLI de imágenes o al MCP un transporte que no implementan.
+
+**Corte cloud documentado26Oct:** runtime privado [efeoncepro/efeonce-rooms](https://github.com/efeoncepro/efeonce-rooms),
+publicación [PR3/e4b2e890](https://github.com/efeoncepro/efeonce-rooms/pull/3), GCS privado,8migraciones/26tablas
+y worker/dispatch de imágenes comprobados. Ese SHA/ref Git no prueba qué deployment sirve hoy Vercel;
+este corte no hizo readback cloud ni cambió flags. `rooms.efeonce.org` sigue como destino acordado,
+sin afirmar activación DNS. Canary único cerrado OFF y Auth retenido en PR.
 
 **Seguridad local 28Oct:** [B18](../../audits/rooms/2026-10-28-b18-guest-without-internal-sso.md) PASS: OTP guest sin sesión interna ni SSO, 51 comprobaciones. No cambia el contrato Auth ni acredita la nueva UI.
 
@@ -25,23 +47,13 @@ API en navegador. Claude Design aún debe conectar/aceptar su UI. [Manual local]
 **Propósito:** plataforma comercial propia para comprender, evaluar y defender propuestas creativas y
 SEO/AEO, combinables en una sala. La implementación actual no acredita todo el alcance de V1/EPIC-052.
 
-| Frente | Implementado y comprobado | Pendiente / límite |
-| --- | --- | --- |
-| Backend/API/CLI | Salas, borradores y ediciones inmutables V1/V2/V3; autoridad persistida y `can`; revisión/idempotencia, auditoría/outbox; lectores y comandos compartidos | Autoría visual completa, presentación, colaboración, integraciones y MCP del roadmap |
-| Identidad e invitación | Canary real conjunto Efeonce ID/Microsoft/MFA, un correo enlace+código, sesión guest, lectura y revocación | Flags humanos OFF; sala del canary archivada/invitación revocada; no repetir correo ni ampliar cohorte |
-| Medios | GCS privado, PUT directo, verificación de bytes/generación y dos WebP desde un PNG físico; entrega GET/HEAD/Range/304 reautorizada | Consumidor de la nueva interfaz; PDF/audio/video y originales descargables no pertenecen al corte de imágenes |
-| Operación cloud | Ocho migraciones/26 tablas; SA/rol propio worker; Scheduler OIDC cada minuto, sólo arranca Job con demanda; lease10min, timeout240s/retries0 | Entorno local preparado; nueva UI, staging cloud y activación general separados |
-| Diseño e interfaz | Scaffold y demo sintética; primitives/logo oficiales AXIS/La órbita | Claude Design posee interfaz; conexión y aceptación visual humana pendientes |
-| Auth deploy-control | Corrección preparada en PR263/264 de Greenhouse | Operador exige conservarlas en PR, sin merge main/develop ni deploy; no release262 |
-
-`ROOMS_MEDIA_DISPATCH_ENABLED=true` habilita sólo la máquina. Acceso first-party, invitaciones y medios
-web permanecen OFF. Backend234/234 y9pruebas focales PASS; Playwright53PASS/3skip y CI Linux PASS
-acreditan verificaciones automáticas, no aceptación humana ni rollout general.
-
-Evidencia: [canary real y cierre OFF](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md),
-[disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json),
-[DB8 y permisos](../../audits/rooms/2026-10-26-media-dispatch-database.json),
+La evidencia cloud permanece en sus recibos fechados: [canary real/cierre OFF](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md),
+[dispatch automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json),
+[DB8/permisos](../../audits/rooms/2026-10-26-media-dispatch-database.json) y
 [Auth retenido](../../audits/rooms/2026-10-26-auth-deploy-control.md).
+`ROOMS_MEDIA_DISPATCH_ENABLED=true` sólo habilita la máquina en ese corte, no acceso humano.
+Las cifras234/234,53PASS/3skip y CI Linux del worker de imágenes son históricas; no certifican el
+candidato13/V4 ni aceptación visual. El recibo del29Oct separa los resultados nuevos.
 
 **Programa:** [EPIC-052 — Efeonce Rooms](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md), `in-progress`: quince unidades de planificación; tasks para foundation, UI, persistencia, autoría versionada, identidad/invitaciones y primer release autorizado, con permisos can y vistas cliente/operador/administrador. La épica es dueña de secuencia, dependencias y cierre; estos documentos conservan los contratos de producto/arquitectura.
 
@@ -69,13 +81,19 @@ La UI rescatada2071 conserva su condición de scaffold y la aceptación visual s
 
 ## Construcción actual
 
-- [TASK-2070 — imágenes privadas y procedencia](../../tasks/in-progress/TASK-2070-rooms-private-image-media.md): primer circuito local PNG/JPEG/WebP, procesamiento fuera del request, publicación y entrega autorizada; [ADR](EFEONCE_ROOMS_PRIVATE_IMAGE_MEDIA_AND_PROVENANCE_DECISION_V1.md).
+- [TASK-2070 — imágenes privadas y procedencia](../../tasks/complete/TASK-2070-rooms-private-image-media.md): primer circuito local PNG/JPEG/WebP, procesamiento fuera del request, publicación y entrega autorizada; [ADR](EFEONCE_ROOMS_PRIVATE_IMAGE_MEDIA_AND_PROVENANCE_DECISION_V1.md).
 - [TASK-2071 — editor y visor](../../tasks/in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md): cargar, validar, incorporar, previsualizar y publicar; zoom/teclado y retorno al contenido. Una imagen por bloque, varias piezas por sala.
 
 TASK-2070/2072 tienen backend cloud publicado; TASK-2071 conserva la conexión y aceptación de la nueva
 interfaz. El canary conjunto ya se completó, con cierre OFF. El disparo automático también se verificó;
-ninguno debe volver a listarse como trabajo pendiente. PDF/audio/video, editor completo, presentación,
-colaboración y demás unidades de la épica conservan sus entregas propias.
+ninguno debe volver a listarse como trabajo pendiente. Las ampliaciones locales2074–2078 se describen
+arriba; su despliegue, el editor/visor nuevos y la certificación conjunta siguen separados.
+
+## ADRs de las ampliaciones locales29Oct
+
+- [Colaboración](EFEONCE_ROOMS_COLLABORATION_DECISION_V1.md), [presentación](EFEONCE_ROOMS_DURABLE_PRESENTATION_DECISION_V1.md).
+- [Importación X-ray/referencia CRM](EFEONCE_ROOMS_SOURCE_IMPORT_AND_CRM_HANDOFF_DECISION_V1.md).
+- [Multimedia local V4](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md), [MCP stdio local](EFEONCE_ROOMS_LOCAL_STDIO_MCP_DECISION_V1.md).
 
 ## Contratos de experiencia para revisión
 
@@ -88,7 +106,7 @@ Las decisiones de producto y contratos viven en estos documentos; el nombre fina
 
 Antecedentes: [frontera comercial aceptada](../sales-enablement/EFEONCE_SALES_ENABLEMENT_PLATFORM_DECISION_V1.md) e [investigación técnica inicial](../../think/creative-proposal-experience-stack-analysis-2026-10-07.md). La solución genérica anterior queda reemplazada por este dossier. Los productos actuales conservan su runtime.
 
-Próximo checkpoint: preparar entorno de integración aislado, conectar el diseño a la API del mismo origen y verificar cargar→procesar→adjuntar→publicar→leer desde esa interfaz. Auth permanece en PR; activar acceso/medios de producción exige una decisión posterior. [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md), [manual de operación](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) y [QA inicial](../../audits/rooms/2026-10-25-first-local-delivery.md) conservan su evidencia histórica; el estado vigente es el indicado arriba, en TASK-2072 y en el ledger de la skill Rooms.
+Próximo checkpoint: conectar la entrega de Claude Design a la API del mismo origen; con los gates global/restore ya pasados. Verificar crear→cargar→procesar→adjuntar→publicar→leer desde esa interfaz. El entorno aislado ya está preparado. Auth permanece en PR; activar acceso/medios de producción exige una decisión posterior. [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md), [manual de operación](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) y [QA inicial](../../audits/rooms/2026-10-25-first-local-delivery.md) conservan su evidencia histórica; el estado vigente es el indicado arriba, en TASK-2072 y en el ledger de la skill Rooms.
 
 ## Verificación documental 2026-10-07
 

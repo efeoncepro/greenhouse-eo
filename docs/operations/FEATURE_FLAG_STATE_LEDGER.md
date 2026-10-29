@@ -11,8 +11,9 @@ Rooms `main@e4b2e890`, despliegue `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS` PROMOTED. A
 `auth-server-00168-vzb`,100%, SHA754a2a28. Su emisor OAuth/MCP y login base siguen activos; OFF abajo
 se refiere únicamente a los carriles de Rooms. Corrección de deploy Auth retenida en PR263/264, sin merge.
 
-| Flag | Runtime | Valor observado26Oct | Límite |
+| Flag | Runtime | Valor observado26Oct o estado local indicado | Límite |
 | --- | --- | --- | --- |
+| `ROOMS_MULTIMEDIA_LOCAL_ENABLED` | TASK-2077 / proceso local Rooms exclusivamente | local29Oct: default `false`; sólo opt-in local explícito | Perfil hosted/cloud rechazado; no configurado ni activado en Vercel/Cloud Run por esta entrega |
 | `ROOMS_MEDIA_DISPATCH_ENABLED` | Vercel Rooms Production | `true`, presente; default código OFF | Sólo endpoint de máquina Scheduler OIDC; no concede acceso humano |
 | `ROOMS_FIRST_PARTY_AUTH_ENABLED` | Vercel Rooms Production | `false`, presente | Login de Rooms no activado en general |
 | `ROOMS_INVITATIONS_ENABLED` | Vercel Rooms Production | `false`, presente | No nuevos correos ni clientes por integrar UI |

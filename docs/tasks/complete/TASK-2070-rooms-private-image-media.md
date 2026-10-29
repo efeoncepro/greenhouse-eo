@@ -8,11 +8,12 @@ el acceso humano cerró OFF. El backend de medios, worker aislado y dispatch
 condicionado a demanda avanzaron después en Rooms, según el
 [estado consolidado](../../audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
 El Git `main=origin/main=e4b2e89` no acredita por sí mismo un deployment nuevo.
-La sesión Rooms continúa ensayos del decoder; faltan recuperación con ocho
-migraciones y límites bajo carga en el contenedor, además de PDF/audio/video.
+El29Oct el decoder pasó límites40MP/20MiB y empaquetado productivo aislado; recovery8 físico
+PG16/18 pasó26tablas/19objetos/12bindings, dispatch y fencing. Son ensayos locales: carga/coste
+del contenedor cloud no se atribuyen a esa medición. PDF/audio/video corresponden a2077, UI a2071.
 Los deltas del 25-10 conservan sólo el avance histórico de ese día.
 
-> Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
+> Estado actual29Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
 
 ## Delta 2026-10-25 — estado al corte de Codex
 
@@ -28,7 +29,7 @@ Los deltas del 25-10 conservan sólo el avance histórico de ese día.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -41,7 +42,7 @@ Los deltas del 25-10 conservan sólo el avance histórico de ese día.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-29: imagen privada física procesada a derivados WebP y servida autorizadamente en canary del 26-10; acceso humano terminó OFF. Backend GCS/worker y dispatch condicionado construidos; main/origin/main local Rooms e4b2e89, deployment vigente no revalidado desde ese ref. Decoder y operación bajo carga/restore de ocho migraciones pendientes; PDF/audio/video fuera del circuito de imagen. UI nueva y QA integral aún pendientes.`
+- Status real: `2026-10-29: circuito R05A de imágenes completo y verificado: canary cloud26Oct cerrado OFF, GCS/worker/dispatch; recovery8 local PG16/18 con26tablas/19objetos/12bindings y fencing, decoder40MP/20MiB y empaquetado productivo aislado PASS. Gates de aplicación/Chrome del candidato29Oct PASS. UI2071, multimedia2077, capacidad/coste cloud y rollout general conservan owners separados; Auth retenido, sin nueva producción.`
 - Rank: `R05A después de R03B/R04; consumidor UI dependiente separado`
 - Domain: `platform|data|content`
 - Blocked by: `none`
@@ -199,10 +200,10 @@ permitir subir archivos reales sin resolver esa frontera produciría procedencia
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contratos, consumidores y destinos de escritura/grants quedan en el mismo cambio.
-- [ ] Tenancy, CAS/idempotencia, permisos y errores no filtrantes están verificados.
-- [ ] Migración/rollback y restore de bytes+metadata están acreditados.
-- [ ] HTTP/CLI/registry usan primitives únicos; exclusión/deuda MCP explícita sin declarar parity completa.
+- [x] Source of truth, contratos, consumidores y destinos de escritura/grants quedan documentados: ADR de imágenes, contrato Claude Design y [corte verificado29Oct](../../audits/rooms/2026-10-29-backend-local-completion.md).
+- [x] Tenancy, CAS/idempotencia, permisos y errores no filtrantes verificados por tests PG/HTTP y Chrome18checks; [corte29Oct](../../audits/rooms/2026-10-29-backend-local-completion.md).
+- [x] Migración/rollback y restore de bytes+metadata acreditados localmente: recovery8 PG16/18 y fingerprint/ACL/fencing; [recibo29Oct](../../audits/rooms/2026-10-29-backend-local-completion.md).
+- [x] HTTP/CLI/registry usan primitives únicos; MCPstdio2078 excluye binarios y federación remota. [Contrato vigente](../../documentation/rooms/backend-api-for-claude-design.md); sin parity final UI/CLI/MCP.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -325,10 +326,10 @@ No cerrar por código local solamente: registrar evidencia exacta por criterio y
 
 ## Closing Checklist
 
-- [ ] Cierre formal de lifecycle pendiente: este barrido actualiza Status real/criterios, pero no mueve la task. El cierre técnico R05A no certifica rollout general ni aceptación UI.
-- [x] Raíz sincroniza README/epic/DECISIONS_INDEX/Handoff sin sobrescribir WIP; registry de IDs no cambia porque no hay altas ni movimientos de lifecycle.
+- [x] Cierre formal29Oct: lifecycle/carpeta/registry sincronizados después de tasklint; se preserva evidencia local y cloud por fecha. El cierre técnico R05A no certifica rollout general ni aceptación UI.
+- [x] Raíz sincroniza README/epic/DECISIONS_INDEX/Handoff sin sobrescribir WIP; registry de IDs y links actualizados por el cierre local29Oct.
 - [x] Manuales de operar medios y documentación técnica registran límites y recuperación; evidencia y gates en [conciliación documental](../../audits/rooms/2026-10-26-docs-skills-continuity.md).
-- [x] Deuda PDF/audio/video/editor/MCP conserva owner y siguiente condición verificable en dossier/roadmap y guía Claude Design; no se presenta como implementada.
+- [x] PDF/audio/video2077 y MCPstdio2078 tienen backend local; editor2071, federación remota y certificación cloud conservan owners/condición en dossier y guía Claude Design.
 
 ## Follow-ups
 

@@ -17,13 +17,15 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Canary real 2026-10-26 PASS: Efeonce ID con Microsoft/MFA, PNG físico de 3.010.606 bytes por PUT GCS, worker a dos WebP, preview 304.540 bytes 1122x1402 con SHA/ETag/SQL coincidentes. Un correo recibido en Outlook, código válido abre sala V3 e imagen, incorrecto/replay/otro espacio/borrador denegados; revocación niega sala e imagen. Sala archivada, flags web/Auth y correo OFF restaurados. Main e4b2e890 (PR3) añade disparador privado de Cloud Scheduler, flags humanos OFF; migración8 y worker por digest desplegados. Disparo automático verificado: Scheduler OIDC200 en vacío,202 con demanda, un Job4r9nz exitoso, cola vacía y ack cercado; sin nuevo correo ni imagen. Tooling b2f90fa local preservado. Entorno local aislado y SDK preparados en codex/rooms-design-integration@2cddc98a sin push/deploy:250testsPASS,18checksAPIbrowser yPlaywright53PASS/3skip; conexión/aceptación de la nueva UI Claude Design pendientes. Auth deploy-control PR263/264 retenidas por operador, sin merge/deploy. Sin cierre de rollout general.`
+- Status real: `Canary real 2026-10-26 PASS: Efeonce ID con Microsoft/MFA, PNG físico de 3.010.606 bytes por PUT GCS, worker a dos WebP, preview 304.540 bytes 1122x1402 con SHA/ETag/SQL coincidentes. Un correo recibido en Outlook, código válido abre sala V3 e imagen, incorrecto/replay/otro espacio/borrador denegados; revocación niega sala e imagen. Sala archivada, flags web/Auth y correo OFF restaurados. Main e4b2e890 (PR3) añade disparador privado de Cloud Scheduler, flags humanos OFF; migración8 y worker por digest desplegados. Disparo automático verificado: Scheduler OIDC200 en vacío,202 con demanda, un Job4r9nz exitoso, cola vacía y ack cercado; sin nuevo correo ni imagen. Tooling b2f90fa local preservado. Entorno local aislado/SDK preparados y actualizados29Oct a13migraciones/43tablas en codex/rooms-design-integration sin push/deploy:337testsPASS0skip, restore mixto PG16/18 y ChromeAPI; conexión/aceptación de la nueva UI Claude Design pendientes. Auth deploy-control PR263/264 retenidas por operador, sin merge/deploy. Sin cierre de rollout general.`
 - Rank: `R05 cloud después del circuito local2070; frontend2071 conserva ownership separado`
 - Domain: `platform|data|content|ops`
 - Blocked by: `none`
 - Branch: `efeonce-rooms main@e4b2e890 vía PR3 (dispatch); base de medios PR2; documentos greenhouse-eo develop`
 
-## Conciliación vigente — 2026-10-26
+## Conciliación vigente — 2026-10-29
+
+[Ampliación backend local29Oct](../../audits/rooms/2026-10-29-backend-local-completion.md):13migraciones/43tablas, multimedia V4, colaboración/presentación y MCPstdio; restore local8/13 en PG16/18. No cambia el corte cloud8 ni cierra la condición de integración UI de esta task.
 
 Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
 
@@ -99,7 +101,7 @@ Hace falta un adapter propio y un perfil de worker real, sin simular entorno Ver
 
 ## Current Repo State
 
-> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-26»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
+> Snapshot del discovery original. El estado actual y los pendientes posteriores están en `Status real` y «Conciliación vigente — 2026-10-29»; no ejecutar otra vez un canary ya completado por leer esta fotografía inicial.
 
 ### Already exists
 
@@ -215,7 +217,7 @@ GCS; previews siguen <=3MiB. La app reautoriza GET/HEAD/Range y nunca ofrece ori
 - [x] HTTP/CLI comparten operaciones y guía frontend completa sin lógica de permisos en cliente. Evidencia: suite225, tests cloud-worker/media-storage/media-http/media-cli y guía de integración; SDK falso no acredita recursos vivos.
 - [x] Recursos/env/flags/migraciones tienen readback; canary de identidad/correo/imagen completado en criterio separado, rollout general pendiente. Evidencias: [storage/IAM](../../audits/rooms/2026-10-26-media-storage-infra.json), [DB](../../audits/rooms/2026-10-26-media-database-infra.json), [Job](../../audits/rooms/2026-10-26-media-worker-deployment.json) y [configuración](../../audits/rooms/2026-10-26-media-vercel-configuration.json). Ejecución de cola vacía no acredita imagen real.
 - [x] Transferencia física GCS y procesamiento/lectura de imagen por autoridad real verificados. Evidencia: [canary real](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
-- [ ] Consumidor frontend de Claude Design integrado y recorrido UI completo verificado antes de activar medios de forma general. El disparo automático del Job ya está comprobado y tiene su criterio propio tildado; faltan entorno aislado/datos/permisos, consumidor same-origin y gates UI/humanos. No cerrar por el canary de backend.
+- [ ] Consumidor frontend de Claude Design integrado y recorrido UI completo verificado antes de activar medios de forma general. El disparo automático del Job ya está comprobado y tiene su criterio propio tildado; el entorno aislado/datos/permisos y SDK ya están probados. Faltan conectar la nueva UI same-origin y sus gates UI/humanos. No cerrar por el canary de backend.
 
 ## Verification
 

@@ -2,7 +2,7 @@
 
 ## Corte vigente 2026-10-29
 
-El [canary real interno del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md) ya está completado y cerrado: una sala sintética, imagen GCS procesada y servida con autorización, un correo enlace+código recibido, sesión guest limitada y revocación. Auth y Rooms volvieron a OFF; no fue aceptación de UI, activación de clientes ni ampliación de cohorte. En el checkout hermano, `main` y `origin/main` apuntan localmente a `e4b2e89` (merge del dispatch automático); ese Git readback no acredita por sí mismo el deployment Vercel activo. La sesión Rooms reportó 35 checks browser/HTTP/PG PASS para dos RP locales contra fuentes Auth; el recibo detallado no está en este checkout y no hay E2E HTTPS/entrypoint completo. La UI nueva de Claude Design aún no estaba entregada al último intercambio; siguen pendientes su integración y QA, recuperación y límites de operación, PDF/audio/video, presentación/notas, preguntas/pasos/actividad y MCP/integraciones. Auth conserva su release retenido. [Conciliación Auth](../../audits/rooms/2026-10-29-auth-develop-reconciliation-local.md).
+El [canary real interno del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md) ya está completado y cerrado: una sala sintética, imagen GCS procesada y servida con autorización, un correo enlace+código recibido, sesión guest limitada y revocación. Auth y Rooms volvieron a OFF; no fue aceptación de UI, activación de clientes ni ampliación de cohorte. En el checkout hermano, `main` y `origin/main` apuntan localmente a `e4b2e89` (merge del dispatch automático); ese Git readback no acredita por sí mismo el deployment Vercel activo. La sesión Rooms reportó 35 checks browser/HTTP/PG PASS para dos RP locales contra fuentes Auth; el recibo detallado no está en este checkout y no hay E2E HTTPS/entrypoint completo. La nueva UI de Claude Design sigue sin entregar/integrar. El corte backend local29Oct añade multimedia V4, presentación/notas, colaboración/actividad, MCPstdio y mapping/referencias de integraciones, con pruebas de restore y límites. La certificación Linux/cloud, conectores reales, paridad de la experiencia y rollout siguen abiertos; el detalle vigente está en Status real y el recibo local. Auth conserva su release retenido. [Conciliación Auth](../../audits/rooms/2026-10-29-auth-develop-reconciliation-local.md).
 
 ## Status
 
@@ -10,11 +10,11 @@ El [canary real interno del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `2026-10-29: canary interno Auth+Rooms del 26-10 completado/cerrado con único correo recibido, imagen privada y revocación; flags devueltos a OFF. Main/origin/main local de Rooms e4b2e89 incorpora merge del dispatch automático, sin readback nuevo del deployment activo. UI Claude Design aún pendiente; QA integral, operación bajo carga/recovery y capacidades restantes de medios/presentación/colaboración/MCP abiertas. Auth release retenido, sin segundo canary ni activación general.`
+- Status real: `2026-10-29: backend local ampliado con colaboración, presentación, X-ray/CRM preparado, multimedia V4 local y MCP stdio; 337tests sin omisiones, lint/types/build PASS sobre base nueva13migraciones/43tablas. Down/up vacío de migraciones9–13, recuperación física PG16/18 y launcher/Chrome18+23checks PASS. Publicación cloud permanece en el corte8 de26Oct con canary cerrado; sin nuevo readback ni cambio de producción. UI Claude Design, certificación multimedia Linux/cloud, puertos externos, federación MCP remota y rollout permanecen separados. Auth retenido en PR.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Commercial / Product; responsable individual por asignar`
-- Branch: `Greenhouse develop para documentación; efeonce-rooms main para runtime propio`
+- Branch: `Greenhouse develop para documentación; candidato Rooms codex/rooms-design-integration, sin push; main conserva release anterior`
 - GitHub Issue: `n/a; registro local, sin issue remoto`
 - Created: `2026-10-07`
 
@@ -64,11 +64,24 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 ## Child Tasks
 
+Corte local29Oct, autorizado para terminar backend sin UI; construcción en `codex/rooms-design-integration`, sin push/deploy:
+
+- [TASK-2074](../../tasks/complete/TASK-2074-rooms-durable-collaboration.md): colaboración, actividad explícita y derechos guest sólo por edición solicitados explícitamente; actor references y receipts sin identidad interna.
+- [TASK-2075](../../tasks/complete/TASK-2075-rooms-durable-presentation.md): tours, notas propias, sesión/edición fija, control/secuencia/ACK y reconexión por lectura.
+- [TASK-2076](../../tasks/complete/TASK-2076-rooms-source-import-and-crm-handoff.md): mapping X-ray, metadata de cobertura/pérdidas, referencia autorizada y handoff pendiente; puertos externos OFF.
+- [TASK-2077](../../tasks/complete/TASK-2077-rooms-local-multimedia-pipeline.md): PDF/audio/video y V4 opt-in local; sin certificación de worker Linux/cloud ni nueva UI.
+- [TASK-2078](../../tasks/complete/TASK-2078-rooms-local-stdio-mcp.md): MCP stdio local por sesión existente; sin OAuth/federación remota ni transferencia binaria MCP.
+
+[Recibo del corte y límites](../../audits/rooms/2026-10-29-backend-local-completion.md). TASK-2070 y2074–2078 quedan complete por su alcance técnico local verificado. TASK-2071/2072 y la
+épica conservan in-progress por interfaz/certificación conjunta/rollout; cerrar el backend local no
+certifica el producto completo.
+
+
 Canary interno real26Oct completado: Microsoft/MFA, una sala sintética, un correo recibido y un PNG físico con GCS/worker/lectura privada; aislamiento y revocación comprobados. El piloto quedó archivado/revocado, first-party/OTP/invitaciones/medios web OFF; OAuth/MCP y login base Auth permanecen activos. [Evidencia](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). El disparo posterior automático ya pasó: vacío200 sin contenedor, demanda202→JobSUCCESS→ack cercado/libre. [Scheduler](../../audits/rooms/2026-10-26-automatic-media-dispatch.json).
 
-[TASK-2072](../../tasks/in-progress/TASK-2072-rooms-cloud-media-backend.md): backend cloud de imágenes y contrato para Claude Design, main `e4b2e890` por PR2/PR3;8migraciones/26tablas, GCS/IAM/CORS, worker por digest y Scheduler privado comprobados. Codex conserva backend y Claude Design interfaz. Falta entorno aislado/datos/permisos, consumidor same-origin y recorrido mediante la nueva UI; acceso productivo general permanece separado.
+[TASK-2072](../../tasks/in-progress/TASK-2072-rooms-cloud-media-backend.md): backend cloud de imágenes y contrato para Claude Design, main `e4b2e890` por PR2/PR3;8migraciones/26tablas, GCS/IAM/CORS, worker por digest y Scheduler privado comprobados. Codex conserva backend y Claude Design interfaz. Entorno aislado/datos/permisos y SDK preparados/probados; falta consumidor y recorrido mediante la nueva UI same-origin; acceso productivo general permanece separado.
 
-[TASK-2070](../../tasks/in-progress/TASK-2070-rooms-private-image-media.md): R05A de imágenes estáticas implementado y con canary cloud por2072; V3/procedencia, generaciones y entrega verificada. PDF/audio/video y pipeline multimedia completo quedan en R05B; no se declaran listos por el PNG.
+[TASK-2070](../../tasks/complete/TASK-2070-rooms-private-image-media.md): R05A de imágenes estáticas implementado y con canary cloud por2072; V3/procedencia, generaciones y entrega verificada. PDF/audio/video y pipeline multimedia completo quedan en R05B; no se declaran listos por el PNG.
 
 [TASK-2071](../../tasks/in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md): nuevo editor/visor bajo Claude Design. Scaffold anterior es referencia, `UI ready=no` hasta mapping y gates del nuevo diseño; conexión al backend, GVC y aceptación humana pendientes. No completa R07/R08.
 
@@ -116,9 +129,9 @@ La exposición HTTP/CLI/MCP acompaña cada contrato desde R03; R13 integra y cer
 - R04: OIDC/OTP y canary interno comprobados, con acceso humano OFF al finalizar; rollout general pendiente.
 - R05: R05A imágenes estáticas y trigger automático comprobados; PDF/audio/video y el resto multimedia pendientes.
 - R02/R06/R07/R08: demo/scaffold históricos disponibles; nuevo diseño, conexión y aceptación bajo Claude Design.
-- R09/R10: presentación/champion, consola, notas, coordinación y reconexión conservan sus unidades y criterios propios.
-- R11/R12: preguntas, pasos, actividad y su lectura comercial requieren completar y certificar sus contratos durables/experiencias; una capability declarada o una demo no los certifica.
-- R13/R14: CLI existente para operaciones construidas no certifica equivalencia final UI/CLI/MCP ni puentes comerciales/CRM/X-ray; esas unidades siguen abiertas.
+- R09/R10: backend de tours/notas/sesiones/control/ACK local2075; consola/champion visual, playback y coordinación observable conservan sus criterios de experiencia.
+- R11/R12: preguntas, pasos y actividad durables implementados local2074, con anclas y permisos; experiencia de evaluación/lectura comercial y certificación integral siguen pendientes.
+- R13/R14: HTTP/CLI/SDK y MCPstdio local2078 comparten primitives; mapping X-ray/referencia CRM/handoff2076 construidos con puertos OFF. Conectores reales, federación MCP remota y equivalencia final UI/CLI/MCP siguen abiertos.
 - R15: certificación conjunta de dos marcas, perfiles/tour/champion, costes/resiliencia/restore y rollout continúa abierta. El canary único no cierra el epic.
 
 ## Sequence and Milestones
@@ -177,7 +190,7 @@ Barrido de dominio/superficie efectuado sobre registries y épicas: no existe du
 
 ## Exit Criteria
 
-Todos pendientes de implementación/evidencia, salvo el hito documental M0. Registrar evidencia junto a cada casilla al cumplirla; no estimar porcentaje de producto usando el número de documentos redactados.
+Los criterios V1 integrales siguen abiertos; hay implementaciones/evidencia parciales en el corte local29Oct y el canary26Oct. Registrar evidencia junto a cada casilla al cumplirla; no estimar porcentaje de producto usando el número de documentos redactados.
 
 - [ ] Go de implementación registrado; ADR/decisiones concretas y tasks hijas sincronizadas con sus owners, perfiles y dependencias.
 - [ ] Baseline R01 certificado: versiones estables/pins, instalación reproducible, resolución TS7/tooling y ESLint/plugins, lint con casos negativos, typecheck, build y primer consumidor AXIS; excepciones temporales con owner/condición de retiro.

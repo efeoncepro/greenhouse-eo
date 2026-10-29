@@ -1,6 +1,6 @@
 ---
 name: efeonce-rooms
-description: Operate and extend Efeonce Rooms (EPIC-052) — the sales-enablement / buyer-experience product (`rooms.efeonce.org`, runtime repo `efeonce-rooms`, Next.js on Vercel, own PostgreSQL `rooms_production`). Use when touching the `efeonce-rooms` repo, Rooms docs in `docs/architecture/rooms/**`, EPIC-052 tasks (TASK-2058…2072: foundation, first experience, persistence, Vercel release, versioned authoring, Efeonce ID consumer, tokenized invitations, guest reading, cloud runtime pilot, private image media, image authoring/viewer, automatic worker dispatch and Claude Design integration), Rooms flags (`ROOMS_*`), the controlled pilot or the Rooms+Auth canary, Rooms media/storage, or when asked "what's the state of Rooms". Living skill: read references/program-ledger.md first and update it at every Rooms task closure.
+description: Operate and extend Efeonce Rooms (EPIC-052) — the sales-enablement / buyer-experience product (`rooms.efeonce.org`, runtime repo `efeonce-rooms`, Next.js on Vercel, own PostgreSQL `rooms_production`). Use when touching the `efeonce-rooms` repo, Rooms docs in `docs/architecture/rooms/**`, EPIC-052 tasks (TASK-2058…2072 and TASK-2074…2078: foundation, first experience, persistence, Vercel release, versioned authoring, Efeonce ID consumer, tokenized invitations, guest reading, cloud runtime pilot, private image media, image authoring/viewer, automatic worker dispatch, Claude Design integration, durable collaboration/presentation, X-ray/CRM reference ports, local multimedia V4 and local stdio MCP), Rooms flags (`ROOMS_*`), the controlled pilot or the Rooms+Auth canary, Rooms media/storage, or when asked "what's the state of Rooms". Living skill: read references/program-ledger.md first and update it at every Rooms task closure.
 ---
 
 # Efeonce Rooms (skill viva)
@@ -10,7 +10,9 @@ El canary del 26-10 cerró con acceso humano OFF. Backend GCS, worker y dispatch
 condicionado están construidos; el Git `main=origin/main=e4b2e89` no acredita
 qué deployment sirve Vercel. La nueva UI de Claude Design no se había
 entregado. B18 guest sin SSO y dos adapters RP tienen comprobaciones locales;
-faltan UI/QA integral, recovery con ocho migraciones y límites de carga.
+el corte precede el candidato backend ampliado de29Oct. Leer el ledger actual y el
+[manual backend local](../../../docs/manual-de-uso/rooms/operar-backend-local.md):13migraciones/43tablas locales verificadas,
+colaboración/presentación, puertos X-ray/CRM OFF, multimediaV4 sólo local y MCPstdio local. 337tests y restorePG16/18 mixto PASS en3c7bcb5; rollout/UI/QA integral continúan pendientes y separados.
 
 Rooms es la **plataforma comercial propia de Efeonce**: salas privadas por oportunidad donde el comprador
 recorre la propuesta, sus piezas y sus pruebas. Greenhouse conserva la **gobernanza documental** (ADR,
@@ -43,13 +45,19 @@ Vercel. La identidad la pone Efeonce ID (skill `efeonce-auth`); Rooms es su prim
 | API | `src/app/api/v1/rooms/**` |
 | Páginas | `src/app/rooms/**` y `/demo` (sintética) |
 | Migraciones | `migrations/` (node-pg-migrate) |
-| CLI de paridad | `scripts/rooms.ts` (`pnpm rooms …`: list, room, draft, editions, execute, validate, invitations y medios) |
+| CLI de paridad | `scripts/rooms.ts`: readers y execute JSON de los módulos construidos; bytes de imágenes separados |
+| Colaboración/presentación | `src/server/collaboration`, `src/server/presentation/lifecycle.ts`; no confundir con adapters SSR session/content |
+| Integraciones | `src/server/integrations`; puertos externos deshabilitados por defecto |
+| Multimedia V4 local | `src/server/media/multimedia`, `scripts/multimedia-worker.ts`; opt-in sin cloud |
+| MCP stdio local | `src/server/mcp`, `scripts/rooms-mcp.ts`; HTTP con sesión existente, no gateway remoto |
 
 Comandos:
 - `pnpm integration:up`, `pnpm integration:status`, `pnpm integration:check` y `pnpm integration:stop`: entorno local exclusivo para Claude Design, fixture explícita; [manual](../../../docs/manual-de-uso/rooms/integrar-claude-design-local.md). No activa producción ni correo.
 - `pnpm verify`: lint, lint negativo, typecheck, test y build. Gate local de aplicación; CI de imagen Linux/decoder del worker ya integrado en main.
 - `pnpm test:e2e`, `pnpm db:local`, `pnpm db:migrate`, `pnpm db:smoke`, `pnpm db:recovery`.
 - `pnpm auth:integration`, `pnpm invitation:integration`.
+- `pnpm multimedia:worker`: ejecución finita sólo con perfil local/flag explícito/toolchain fijado; sin scheduler cloud.
+- `node --conditions=react-server --import tsx scripts/rooms-mcp.ts --base-url ORIGIN --session-file ARCHIVO --toolset read`: stdio sin banners; usar sesión existente0600 y origen exacto. `pnpm --silent rooms:mcp` es alternativa. No iniciar OAuth ni configurar hosts por inferencia.
 - `pnpm dev` (127.0.0.1:3210).
 - `pnpm test` escribe en la PG **local del repo** (`.local/postgres`, :55432) si existe `.local/db-config.json`. No es compartida, pero conviene saberlo.
 
@@ -84,7 +92,13 @@ Comandos:
 - **AXIS y paquetes publicados exactos.** Ninguna copia manual de tokens, logos o primitives. Los SVG públicos salen de `scripts/sync-brand.mjs`.
 - **Auth sigue en PR263/264** por instrucción expresa: no merge main/develop, deploy, flags ni release262 por actualizar Rooms.
 - **Claude Design posee la interfaz.** Preparar integración same-origin, datos/permisos de prueba y recorrido UI; no conectar un artifact de otro origin con tokens en storage ni reutilizar secretos/WIF Production en Preview. El perfil cloud exige Production exacto.
-- Paridad Full API: toda acción de UI es un command o reader con su contrato. La CLI ya existe; el MCP está pendiente (R13/R14).
+- Paridad Full API: toda acción de UI es un command o reader con su contrato. API/SDK/CLI y el adapter MCPstdio local comparten los módulos construidos. Federación MCP remota, conectores externos y binarios por MCP siguen fuera; ver exclusiones canónicas y manual.
+- V4 combina imágenes existentes con PDF/audio/video en una edición mediante kind, sin ampliar MIME V3
+  ni alterar su metadata SQL. Opt-in local,13migraciones y sandbox/codecs propios; /media sólo imágenes,
+  /multimedia sólo otros tipos. Toda ref no excluida requiere bloque visible o publicación queda pending. Docker/Linux/cloud se certifican aparte; no activar producción por codecs locales.
+- Invitados con derechos adicionales sólo por concesión explícita de edición inicial. No autogrants de derechos adicionales en otra edición ni principal interno artificial.
+- Presentación: notas propias incluso ante admin; audiencia nunca recibe notas/controllerinstance. Control/ack usan secuencia; ack no prueba reproducción. Bloques excluidos no forman un tour visible ni se rehabilitan por replay.
+- X-ray/CRM: puertos OFF por defecto; snapshot autorizado y mapping/exclusiones, no URLs arbitrarias ni una sincronización supuesta. Handoff pending es intención durable, no entrega.
 - Las tasks y ADR de Rooms se escriben en `greenhouse-eo/docs`. Ningún doc canónico vive en el repo runtime.
 
 ## Contrato de mantenimiento de la skill

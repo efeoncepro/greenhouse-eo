@@ -1,0 +1,321 @@
+{
+  "status": "passed",
+  "startedAt": "2026-10-29T11:18:33.505Z",
+  "completedAt": "2026-10-29T11:18:37.665Z",
+  "scope": "fresh-local-PG16-13-migrations-SQL-dump-and-private-file-restore-only",
+  "limitations": [
+    "no cloud/PITR",
+    "no real Auth/Microsoft/MFA",
+    "no real email or CRM/source provider",
+    "no new UI acceptance"
+  ],
+  "cleanup": "local issuer and disposable PostgreSQL stopped; scratch/storage removed; original env restored",
+  "checks": {
+    "engine": {
+      "postgresMajor": 16,
+      "migrations": 13,
+      "tables": 43,
+      "source": "fresh-isolated; normal55432 and cloud never read",
+      "emptyRollback": "13\u21928\u219213 fingerprints identical"
+    },
+    "fixtures": {
+      "tenants": 2,
+      "publishedRooms": 4,
+      "pendingRooms": 1,
+      "privateObjects": 23,
+      "renditionBindings": 14,
+      "imageBindings": 4,
+      "multimediaBindings": 10,
+      "mixedV4Rooms": 2,
+      "assetsPerV4Edition": 4,
+      "formats": [
+        "PNG\u21922WebP",
+        "PDF1page",
+        "audio1second",
+        "video0.3seconds"
+      ],
+      "realEmails": 0,
+      "identity": "synthetic Rooms authority and local RAM OTP issuer fixture; not production Auth"
+    },
+    "before": {
+      "tables": 43,
+      "rowFingerprintSha256": "741466c1e0f9a3de98152df134a64b583b1a57a788b668a7524d988f494a65ea",
+      "objectManifestSha256": "8f8f10d60bfb68970aec3d6d36b3538564392d51f7c6d7de721389bea0d26e11",
+      "constraints": 217,
+      "triggers": 18
+    },
+    "retention": {
+      "migrations": [
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "result": "all populated downs rejected; complete fingerprint unchanged"
+    },
+    "restore": {
+      "completeFingerprint": "identical43tables; rows/hashes/owners/table-column-schema-databaseACL/triggers/functions/migration-names",
+      "constraintComparison": "all definitions exact except known grants CHECK AND associativity, validated by exact grammar and24capability allowlist",
+      "privateObjects": "all23 recursive byte/hash/mode identical across both private storage planes",
+      "renditionBindings": "10 multimedia+4 image bindings identical in same V4 editions",
+      "guestIdentity": {
+        "receipts": 12,
+        "internalized": 0,
+        "guest_sessions": 2,
+        "valid_guest_references": 12
+      },
+      "runtimeAcl": {
+        "guest_update": false,
+        "source_delete": false,
+        "rendition_update": false,
+        "instance_update": false,
+        "image_rendition_update": false
+      },
+      "immutableSqlGuards": 10,
+      "physicalGeneration": "source metadata and rendition generation bindings unchanged"
+    },
+    "readback": {
+      "freshConnectionsAndFactories": true,
+      "editionDtos": "V3/V4 identical for both tenants",
+      "collaboration": "guest question/answer/step retained; receipt replay unique",
+      "integration": "source import draft with pending authoring/field map retained; CRM reference/handoff pending retained; no writer configured",
+      "presentation": "guest ownership/notes isolation/current sequence and controller fences retained",
+      "crossTenant": "denied",
+      "guestScope": "edition features do not cross room/edition"
+    },
+    "delivery": {
+      "physicallyVerifiedRenditions": 14,
+      "imageRenditions": 4,
+      "multimediaRenditions": 10,
+      "mixedPlaneRouting": "same V4 edition; image/MM routes reject the other plane",
+      "http": [
+        "HEAD200",
+        "Range206",
+        "conditional304"
+      ],
+      "corruption": "both image and multimedia same-size changed bytes reject GET/HEAD/304 before legitimate response"
+    },
+    "resume": {
+      "pendingSource": "physical source restored",
+      "lateWorker": "stolen lease cannot commit derivative; outputs cleaned",
+      "expiredLease": "reclaimed once within attempt cap; ready then empty queue",
+      "finalAttempts": 2
+    },
+    "revocation": {
+      "mixedV4Assets": "same grant revocation denies image+MM GET/HEAD/Range/conditional",
+      "guest": "session, receipt replay and console denied after invitation revoke",
+      "otherTenant": "guest session remains authorized"
+    },
+    "provenance": {
+      "sourceCheckoutAtStart": {
+        "head": "8702a6fecd762327c5d2ad0351b6f2df8f74ef12",
+        "dirty": true
+      },
+      "sourceCheckoutAtEnd": {
+        "head": "8702a6fecd762327c5d2ad0351b6f2df8f74ef12",
+        "dirty": true
+      },
+      "sourceInventory": [
+        {
+          "file": "migrations/1792962301842_rooms-foundation.sql",
+          "sha256": "15d5e843ceeacd4c53417b6594283d109ebe9aa8891062e6362debe984c3600f"
+        },
+        {
+          "file": "migrations/1792963858690_rooms-content-v2.sql",
+          "sha256": "4e24b99b271769332ebd6a2d8fa5066be0356481b97f9a3b66404a7f551de36e"
+        },
+        {
+          "file": "migrations/1792964148932_rooms-oidc-consumer.sql",
+          "sha256": "a11175aed58f15908102293bd382f7b9b3f8946e32dcf372dbe270cdc894539f"
+        },
+        {
+          "file": "migrations/1792964574644_rooms-invitations.sql",
+          "sha256": "95ba9935c4a855cdd99cbaba0a43d6f1ea93366b851c942da9c6ed7977e1516b"
+        },
+        {
+          "file": "migrations/1792964731337_rooms-invitation-issuer-binding.sql",
+          "sha256": "c5ec49f2018306507d7adcc1eddff13ddd282021227647801a7030609ab2205a"
+        },
+        {
+          "file": "migrations/1792968329622_rooms-private-image-media.sql",
+          "sha256": "f1ed5baccc9b5f087e550176eae7f82945f5dc7674c88b1a9b048cf311309fac"
+        },
+        {
+          "file": "migrations/1793022282668_rooms-media-storage-generations.sql",
+          "sha256": "0ab4c2095422117970b3ab238aaeccfb43851a8b3c16a9ec8dc85e08f8999a87"
+        },
+        {
+          "file": "migrations/1793042981615_rooms-media-dispatch.sql",
+          "sha256": "1063ad0e9ed544825e98a15ed7e56fc1a0a9dd2abee2136003f5ae8ad0357b27"
+        },
+        {
+          "file": "migrations/1793250000000_rooms-collaboration.sql",
+          "sha256": "494c29a8676000f642f082e91fb22aeeed4b074ca2e2bc6c2f9edfa4c6914a54"
+        },
+        {
+          "file": "migrations/1793251000000_rooms-presentation.sql",
+          "sha256": "fc3995e26f783d009ef6d821a37fc35f92530afd8bc6bfb508df857d4a77b902"
+        },
+        {
+          "file": "migrations/1793252000000_rooms-integrations.sql",
+          "sha256": "b413afb6e98fb8b4855965c4ac71a14cebdca4029f82c09edf5703f6b7fe10d4"
+        },
+        {
+          "file": "migrations/1793253000000_rooms-multimedia-local.sql",
+          "sha256": "70f284582afa545bb691fba0a5e3ae9bfc42eaf67a38960b94addd55216f4dc3"
+        },
+        {
+          "file": "migrations/1793254000000_rooms-invitation-edition-capabilities.sql",
+          "sha256": "de1d7de3588e3c6bfef5119e9071a9d24dad09d12f31fb43c7b369f9784fa943"
+        },
+        {
+          "file": "scripts/backend-recovery.ts",
+          "sha256": "03fdf5a8f66d1f1b1bf72c6b0980b334b546d1e9bc11e38c16ff88e0653c2c97"
+        },
+        {
+          "file": "src/domain/contracts.ts",
+          "sha256": "c3bff64550df2386b00f249c51841167922905dd4b51bb2636ae4618010821f4"
+        },
+        {
+          "file": "src/domain/permissions.ts",
+          "sha256": "0e09218cae445dd07bd93d183cc2a01a7656764db66f0494f5b2d0db65a07164"
+        },
+        {
+          "file": "src/domain/multimedia-contracts.ts",
+          "sha256": "e2b5871385582eae2744d88e6d77d491704d6f1a5df948c938a789989ee98a4c"
+        },
+        {
+          "file": "package.json",
+          "sha256": "8f5b602d1888fb206071712bada5444ccce3c43d6bbe507044b559b7f09098cb"
+        },
+        {
+          "file": "pnpm-lock.yaml",
+          "sha256": "f2cd734e404bc2a73ac9f154216ebfbced1848c2617fddb9a01acba3e51cad2d"
+        },
+        {
+          "file": "src/domain/persistence-contracts.ts",
+          "sha256": "c4cc7cae6b3c6443407096ed0336f22fa7bf66ed0ed4a4dcee5b6d47e026c0f2"
+        },
+        {
+          "file": "src/domain/content-v3.ts",
+          "sha256": "76b1bb886229bb5eb2e88eaa5bb411ebe2f3f6c182d22ffa359b39b1739508cd"
+        },
+        {
+          "file": "src/domain/content-contracts.ts",
+          "sha256": "1f3c2087f0009b31a350227ce1916031d29995c7d94b94d9e495c756465ede59"
+        },
+        {
+          "file": "src/domain/integration-contracts.ts",
+          "sha256": "00adbbc77528f14d3110f92a95ba233fac85f6de98043098d1754b31bc301c32"
+        },
+        {
+          "file": "src/server/persistence/content-projection.ts",
+          "sha256": "c37e1388c15aed3f935d45bced5839560f1241dd21c4f508cc6e2153043aecae"
+        },
+        {
+          "file": "src/server/media/http.ts",
+          "sha256": "54fbc9a265c046568c234e0e0358b4e84612c1118d042fe6a320bcae2dcf3abd"
+        },
+        {
+          "file": "src/server/media/multimedia/http.ts",
+          "sha256": "53b63e06372f38d8d3ef98bcf4d038abf51a3d92884de5de01d6a31f487a0ad7"
+        },
+        {
+          "file": "src/server/commands/execute.ts",
+          "sha256": "cd6c233bddcad5ff91dfe6b9fd39851ee5e2c493200d0f381d0f5b947eb99119"
+        },
+        {
+          "file": "src/server/commands/feature-receipts.ts",
+          "sha256": "177406db5f1fd45da90c57d192d36e3aaeafc3bff9eb692c4c85bd6c6ff7c83c"
+        },
+        {
+          "file": "src/server/persistence/store.ts",
+          "sha256": "6d755c342aecd03d40c70c4522638b081eb604488e8159b0941f1ac382f02f28"
+        },
+        {
+          "file": "src/server/persistence/authority.ts",
+          "sha256": "d48d117345b1af91761ee297475716625e6d554633061af8fbafb1988ec2a79c"
+        },
+        {
+          "file": "src/server/collaboration/service.ts",
+          "sha256": "e27797e3f4cbdfdb72be8796de8240644a2bb979ae8e7e4afff3eced006b7a1a"
+        },
+        {
+          "file": "src/server/presentation/lifecycle.ts",
+          "sha256": "de809baf4ab4de9ced12dfab219f52fcf509e5e83837664b4a663f95e2f3910c"
+        },
+        {
+          "file": "src/server/integrations/service.ts",
+          "sha256": "cac93f60f1e9c14b30c7271eea4ca36dceb0c4b4a54e1b14a368763694799fbd"
+        },
+        {
+          "file": "src/server/integrations/xray-mapper.ts",
+          "sha256": "eea0b03fa91e8747d1c716a4c5bd1f985f7ff5ec598b4a8ecbbb682c984a1c99"
+        },
+        {
+          "file": "src/server/invitations/service.ts",
+          "sha256": "67cfac4056290332bc27869afa631fab3e72478a29f3fa24ba2e42a226735adf"
+        },
+        {
+          "file": "src/server/invitations/authority.ts",
+          "sha256": "a9f672dee395fc4b877688e09e226d12794d31c7dc1f341607ec3175391b2df3"
+        },
+        {
+          "file": "src/server/media/multimedia/service.ts",
+          "sha256": "ad661e40d416fe9f57ebd176d1e51fd0b07ad1210b8e51be606901b5864c3db4"
+        },
+        {
+          "file": "src/server/media/multimedia/storage.ts",
+          "sha256": "589e7ded09bac0da10cecd5870a04149692bf10a1563dd8fb502373c186b876a"
+        },
+        {
+          "file": "src/server/media/multimedia/processor.ts",
+          "sha256": "9166bd9deabd7aea77329a4be3bd19a54bec8d232be0acf8a5937f89c6bf7ad4"
+        },
+        {
+          "file": "src/server/media/multimedia/content.ts",
+          "sha256": "098ca143fb94d906a8b2b17e0ce2acf727352f53de042b5a6adb06c92354d63b"
+        },
+        {
+          "file": "src/server/media/service.ts",
+          "sha256": "29938fc92540ad27894407d64f25ad7a5ea857d2be1229dd848202cd2e426db3"
+        },
+        {
+          "file": "src/server/media/worker.ts",
+          "sha256": "61250084d51976a24f521c8566f8709ca6918d5306d64df5dd0fff5e8deac519"
+        },
+        {
+          "file": "src/server/media/processor.ts",
+          "sha256": "4c95f8dc468adcf3f4e80922d81fb7e1d93561c2c7928a08b2968de14d461b7b"
+        },
+        {
+          "file": "src/server/media/storage-local.ts",
+          "sha256": "5a931b9bb96e2525e6e50f01d7105d8469fd7a8a166caf4b60926f83358769dd"
+        },
+        {
+          "file": "src/server/media/content.ts",
+          "sha256": "8bc3d2bea1eb014c8203e752f21ad118f02352630deebe8e622d182adf6a6ffb"
+        },
+        {
+          "file": "src/domain/media-contracts.ts",
+          "sha256": "ca9a8eaa4e6144921dcd84511133361e2816e19023661399eb75afc837b2f491"
+        },
+        {
+          "file": "tests/fixtures/media-images.ts",
+          "sha256": "f2a32166fb262aef19d982145af2807be6265f612bd7795147dc538544276427"
+        },
+        {
+          "file": "tests/fixtures/multimedia-files.ts",
+          "sha256": "230a6f108a2bba72bfa35ab6bbae1f8c1055dfcc56ab77739a1db2a5c6e725d4"
+        },
+        {
+          "file": "tests/fixtures/invitation-issuer.ts",
+          "sha256": "22a1588a6a60625c65b0483c5e1b98cc096a5d2a0d40d65565d66434d92d5485"
+        }
+      ],
+      "codeUnchangedDuringRun": true,
+      "observedAt": "2026-10-29T11:18:37.295Z"
+    }
+  }
+}

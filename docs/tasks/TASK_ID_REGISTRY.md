@@ -2714,7 +2714,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 > Registro2026-10-25: goal y recursos/piloto autorizados por operador en peer Auth, verificados por root. Runtimecloud no tenía dueña:2061 demohosting,2066invitaciones,2068UI. Siguiente ID libre TASK-2070.
 
-| `TASK-2070` | `in-progress` | **Rooms: imágenes privadas, versiones y procedencia.** EPIC-052 R05A; upload/worker/AssetVersion/publish/delivery con V3 explícito, UI dependiente separada. | `docs/tasks/in-progress/TASK-2070-rooms-private-image-media.md` |
+| `TASK-2070` | `complete` | **Rooms: imágenes privadas, versiones y procedencia.** EPIC-052 R05A; upload/worker/AssetVersion/publish/delivery con V3 explícito, UI dependiente separada. | `docs/tasks/complete/TASK-2070-rooms-private-image-media.md` |
 
 > Registro 2026-10-25: continuación del goal Rooms ratificada; ID2070 revalidado en tabla/notas/filesystem y coordinado con peer UI. Barrido:2062 cerró contratos unresolved,2068 lectura textual,2069 cloud base; ninguna posee R05. Sólo2070 reservado aquí. Siguiente ID libre TASK-2071.
 
@@ -2730,3 +2730,26 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-2073` | `complete` | Cuentas operativas bajo Organization: ADR Proposed y comparación local A′/B del bridge, sin producción ni historia de Diseño. | `docs/tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md` |
 
 > Registro 2026-10-27: pedido directo de formalizar ADR/primera task y prototipo local. Barrido por dominio/superficie: TASK-195 modelo; 1852 acceso; 1853/1854 portal/métricas; 1960 informes; 2033 URLs conservan sus owners. 2073 libre en filas/reservas/filesystem; la nota previa lo indicaba siguiente libre. Siguiente ID libre TASK-2074.
+
+
+| `TASK-2074` | `complete` | **Rooms: colaboración durable, preguntas y próximos pasos.** EPIC-052 R11; primitives locales, permisos explícitos y actividad redactada, UI separada. | `docs/tasks/complete/TASK-2074-rooms-durable-collaboration.md` |
+
+> Registro2026-10-29: operador pide terminar backend sin UI; barrido Rooms/R11 sin dueña previa;2074 libre en nota/filas/filesystem al escribir. Siguiente ID libre TASK-2075.
+
+| `TASK-2075` | `complete` | Rooms: tours, notas propias y sesiones durables de presentación; backend local sin UI ni rollout. EPIC-052 R09. | `docs/tasks/complete/TASK-2075-rooms-durable-presentation.md` |
+
+> Registro 2026-10-29: TASK-2075 tras barrido de presentación/notas, separada de UI2071 y colaboración2074. Siguiente ID libre TASK-2076.
+
+| `TASK-2076` | `complete` | Rooms: adapter X-ray nativo, referencia HubSpot y handoff pendiente durable; puertos externos OFF. EPIC-052 R14. | `docs/tasks/complete/TASK-2076-rooms-source-import-and-crm-handoff.md` |
+
+> Registro2026-10-29:2076 libre en nota/filas/filesystem; R14 separado de presentación2075 y UI2071. Siguiente ID libre TASK-2077.
+
+
+| `TASK-2077` | `complete` | Rooms: pipeline local privado PDF/audio/video, V4 opt-in, decoder aislado y derivados físicos; Linux/cloud/UI separados. EPIC-052 R05B. | `docs/tasks/complete/TASK-2077-rooms-local-multimedia-pipeline.md` |
+
+> Registro2026-10-29:2077 revalidado libre en notas/filas/filesystem,2076 pertenece a integración por peer. Siguiente ID libre TASK-2078.
+
+
+| `TASK-2078` | `complete` | **Rooms: adapter MCP stdio local con sesión existente.** EPIC-052 R13 parcial; SDKoficial, cobertura/exclusiones y herramientas read/write sin gateway remoto ni producción. | `docs/tasks/complete/TASK-2078-rooms-local-stdio-mcp.md` |
+
+> Registro2026-10-29:2078 reservado tras2077 por el integrador Rooms; verificado libre en filas/notas/filesystem antes de crear el adapter. El operador autorizó terminar backend independiente de UI; Auth/release retenidos. Siguiente ID libre TASK-2079.

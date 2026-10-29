@@ -1,6 +1,6 @@
 # TASK-2070 — Plan de imágenes privadas y procedencia
 
-> Estado posterior26Oct: consultar la [task vigente](../in-progress/TASK-2070-rooms-private-image-media.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
+> Estado posterior26Oct: consultar la [task vigente](../complete/TASK-2070-rooms-private-image-media.md) y sus criterios/evidencias. Este plan conserva la secuencia e hipótesis de su fecha; sus pendientes históricos no sustituyen el estado actual. Auth retenido en PR; interfaz Claude Design y activación general separadas.
 
 Estado: aprobado por raíz para implementación LOCAL R05A parcial; hook --subagents PASS, tasklint0errors/1warning índice compartido; cero cambios runtime al redactar.
 Base observada: Rooms20f9fe9. La candidata remota/canary de identidad queda fija y no depende del WIP local.

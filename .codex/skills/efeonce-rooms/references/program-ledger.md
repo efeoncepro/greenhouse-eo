@@ -3,7 +3,30 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-29 — Backend local completado y verificado para integrar diseño
+
+- `local`: runtime `codex/rooms-design-integration@3c7bcb5`, limpio, sin push/deploy.13migraciones/
+  43tablas;337testsPASS0skip,lint/negativo/types/build y empaquetado aislado del worker de imágenes PASS.
+- Colaboración/presentación, derechos guest explícitos en edición inicial, referencias de sesión sin
+  identidad interna, importación X-ray/metadata y CRMpending, V4 mixto imagen+PDF/audio/video local y MCPstdio construidos.
+  Puertos externos OFF; no confundir metadata preparada con entrega CRM o federación remota.
+- V4 valida cobertura: ref no excluida sin bloque visible queda pending. Ambos endpoints y proyección
+  niegan contenido excluido/huérfano; preguntas sólo temporizan audio/video dentro de duración medida.
+- Chrome18checks de imágenes+23delbackend nuevo PASS. PDF1página desde SDK real, supervisor, publicación
+  y bytes privados; notas/consola/tenant/replay/revocación. No aceptación de la nueva UI.
+- Restore13PG16/18:43tablas,23objetos/14bindings/12guestreceipts,0guestinternalizado; ACL/hashes/
+  snapshots/fencing/revocación. Empty13→8→13 y cinco guards poblados PASS. Dos motores usan fuentes idénticas/estables;
+  recibos HEAD8702dirty se contrastaron por hash contra commit final3c7bcb5. No cloud/PITR/MFA/correo.
+- Bootstrap13y`up --multimedia` verificados: conserva salas/borradores, reconcilia sólo3fixtures,
+  storage propio y procesamiento secuencial. Entorno/PGs detenidos y temporales retirados al cerrar.
+- Multimedia sigue sólo local; Linux/cloud sin certificar(Docker ausente). Auth retenido en PR,
+  sin mutaciones de producción ni otro canary. Integración/aceptación Claude y rollout siguen separados.
+  [Recibo completo](../../../../docs/audits/rooms/2026-10-29-backend-local-completion.md),
+  [manual](../../../../docs/manual-de-uso/rooms/operar-backend-local.md).
+
 ## 2026-10-29 UTC — UI y operación pendientes tras canary cerrado
+
+> Snapshot anterior a la ampliación local de la entrada superior; sus pendientes no describen el candidato3c7bcb5.
 
 - `local/vivo` (recibos fechados): [dossier coordinado](../../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
   El canary del 26-10 probó una sala, imagen física privada, correo único

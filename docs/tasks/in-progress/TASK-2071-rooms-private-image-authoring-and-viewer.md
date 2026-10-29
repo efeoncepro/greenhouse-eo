@@ -98,7 +98,7 @@ El lector 20f9fe9 sirve texto V1/V2 y muestra indisponibilidad para media. El ma
 
 ### Depends on
 
-- `docs/tasks/in-progress/TASK-2070-rooms-private-image-media.md`: V3/provenance, upload, trabajo de medios, proyección autorizada, attach, publish y bytes.
+- `docs/tasks/complete/TASK-2070-rooms-private-image-media.md`: V3/provenance, upload, trabajo de medios, proyección autorizada, attach, publish y bytes.
 - TASK-2062: comandos de borrador/coverage; TASK-2065/2066: sesión verificada y permisos; TASK-2068: lector 20f9fe9.
 - Nombres/DTOs, rutas y límites congelados el 2026-10-25; integración local depende de servicios 2070, sin bloquear trabajo de presentación.
 

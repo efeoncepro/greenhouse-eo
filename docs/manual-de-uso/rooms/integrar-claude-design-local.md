@@ -20,7 +20,7 @@ pnpm integration:stop
 - PostgreSQL propio55433, DB `rooms_local`; no comparte cluster con el55432 de las pruebas anteriores.
 - Datos, medios, caché y estado: `.local/design-integration/`, ignorados. Estado/credenciales0600 y
   carpeta0700. No copiar su contenido a frontend, documentación, conversaciones o repositorios.
-- Ocho migraciones actuales. `up` conserva salas/ediciones y renueva sólo autoridad de los fixtures
+- Trece migraciones verificadas en8702a6f. `up` conserva salas/ediciones y reconcilia sólo autoridad de los fixtures
   declarados; `stop` termina únicamente sus procesos/cluster, confirma puertos libres y conserva datos.
 - Worker local finito cada2s, con un trabajo a la vez; sin sweep destructivo, GCS ni Scheduler cloud.
 
@@ -35,6 +35,13 @@ reciben una allowlist de entorno sin credenciales GCP/Resend/migrator. No borra 
 operador. El caché Next separado sólo funciona con opt-in local/development y falla cerrado en hosted.
 Next puede regenerar `next-env.d.ts`/includes de tsconfig al usar ese caché: revisar y excluir exclusivamente
 esos cambios generados antes de un commit, conservando cualquier edición real de otra persona.
+
+
+Multimedia es opt-in: `pnpm integration:up --multimedia`; `--images-only` vuelve al corte de imágenes.
+`up` sin opción conserva el modo guardado. Cambiar modo exige `stop` primero; éste espera al trabajo
+activo finito, hasta240s más60s de cierre. El supervisor procesa imágenes/multimedia secuencialmente,
+con storage multimedia propio. No cambia flags remotos ni habilita conexiones X-ray/CRM.
+[Contrato y helpers V4](../../documentation/rooms/backend-api-for-claude-design.md).
 
 ## Conectores para la interfaz
 
