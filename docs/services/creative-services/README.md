@@ -12,6 +12,7 @@
 > · **Modelo operativo:** [`Creative Services Operating Model V1`](EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md)
 > · **Creative Velocity modular:** [`Modular Production Addendum V1`](EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md)
 > · **Embedded Pod:** [`Embedded Creative Pod Operating Model V1`](EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md)
+> · **Caso de cuenta (CreativeOps, propuesta):** [`SKY Performance — Modelo operativo V1`](SKY_PERFORMANCE_CREATIVE_OPERATING_MODEL_V1.md)
 
 ## Qué es esta línea
 

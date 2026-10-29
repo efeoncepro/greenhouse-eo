@@ -1031,6 +1031,10 @@ Para una licitación de servicio creativo (evolución de línea gráfica, concep
 
 Cuando quien recibe el deck lo lleva a su gerencia sin nosotros (caso ARMOR EPPS, línea Voice, 41 láminas + ruta corta de 19, enviada el 28/10/2026; resultado desconocido): esfera en el acento de la línea en cada titular display, revisión «¿Se explica sola?», ruta corta generada en la renumeración, lámina de inversión total y condiciones, precio desglosado sin total en el correo, láminas de entrega Voice, partners según el registro, casos del brochure 360° y contraportada Voice VOX3: [references/propuesta-performance-champion.md](references/propuesta-performance-champion.md).
 
+### Propuesta operativa para un cliente activo (2026-10-29)
+
+Cuando el cliente ya trabaja con nosotros y el deck propone cambiar cómo se opera la cuenta (roles, flujo, herramientas, entregas) — caso «Sky × Efeonce — Cómo trabajamos», 18 láminas, línea Growth, iterado con el operador y la Creative Operations Lead; aún no presentado: diagnóstico con tres miradas, «Quién hace qué» en vez de «Quiénes somos», comparativas hoy → propuesta por rol, casos especiales, exactitud de cada rol buscada en todo el deck, banderas en círculo y exportación del canvas a PDF con Playwright: [references/propuesta-operativa-cliente-activo.md](references/propuesta-operativa-cliente-activo.md).
+
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
 Casi todo el mal deck del mundo nace de saltarse una de estas. **Contéstalas en voz alta.**

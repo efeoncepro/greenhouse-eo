@@ -927,3 +927,20 @@ Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md`). Recetas:
   sesiones y el artefacto puede tener versiones más nuevas (el visor guarda). Regla: leer los archivos con
   `action: read` antes de publicar; subir el PNG como asset, cambiar el `/_blob/<id>` y el `alt`, y publicar con
   `file_path` + `root` (+ `files`).
+
+## 2026-10-29
+
+- **Deck en el canvas de diseño (propuesta operativa Sky): el indicador de avance se veía como un cuadro.** Síntoma: en
+  las láminas interiores, el componente `EfeonceOrbit.Progress` del sistema «Efeonce — La órbita» (bundle con
+  `axis-graphic-line` 0.6.0) a 80 × 80 px pintó un cuadro con su propio fondo y un anillo casi invisible; el operador
+  lo leyó como «quisiste poner la órbita y no lo lograste». El primer arreglo fue quitarlo, y también fue un error: el
+  operador corrigió «no había que quitarlo». Causa: `Progress` compone la pieza `progress` en un lienzo propio del
+  tamaño que se le pasa y con fondo; no es el indicador de esquina. El indicador de las láminas de contenido es la pieza
+  `pieces.deck.content` (anillo cx 1760, cy 130, r 40; arco desde las 12 hasta n/N; esfera en la punta), la misma que
+  pintan `DeckSlide` y las recetas de contenido (`content-text`, `content-bullets`: «Indicador de navegación arriba a la
+  derecha: es la única órbita de la lámina»). Regla: en un deck, **toda lámina interior lleva el indicador de 80 px**
+  (applications.md §B1) y se reproduce desde la pieza, no con `Progress` a tamaño chico: se toma el SVG que genera
+  `DeckSlide slide="content"` (con `sections` y `current` del deck), se le quita el rectángulo de fondo y se monta a
+  1920 × 1080 sobre la lámina. Todas las páginas llevan el mismo `sections`. Y antes de inventar una portada o un cierre
+  para una propuesta, se usan las recetas aprobadas (`cover-proposal-*`, `close-proposal-*`) compuestas con
+  `pnpm brand:compose`: la propuesta no lleva «¿Conversamos?».
