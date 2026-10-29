@@ -4,12 +4,12 @@
 
 ## 2026-10-29 — Prospección: búsquedas Sales Navigator multimercado
 
-[44 búsquedas persistidas](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md): 24 cuentas por país/sector y 20 personas
-por país/frente para Chile, México, Colombia y Perú, con avisos semanales nativos autorizados. Filtros,
-muestras y 44 IDs verificados tras recarga; ajustes por ruido y diferencias por mercado declarados.
-Política, tres capas documentales, continuidad y skill B2B espejo actualizados. Sin mensajes, solicitudes,
-InMail, nuevas membresías de listas, CRM o scheduler externo. Listas financieras 54/57 y servicios/Personas
-12/5 conservados. Límite oficial 50+50 separado; sin prueba de borrado/recuperación de cupo o email futuro.
+[44 búsquedas persistidas](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md),
+24 búsquedas de cuentas/20 de personas en cuatro mercados, con avisos semanales nativos. [Corrección de cobertura Perú](docs/commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md):
+CRM 58/81/106/868, Growth 789; son consultas, no censo ni compradores calificados. Persistencia, muestra y
+cobertura separadas; controles conocidos y contraste de filtros en política, manuales y skill B2B espejo.
+Las 44 consultas no se alteraron por el diagnóstico; cobertura pendiente, fixture P89 sin evaluación conductual.
+Listas 54/57 y portafolio 12/5 intactos. Sin contacto, InMail, CRM, scheduler externo o prueba de recuperar cupo.
 
 ## 2026-10-27 — SKY: ADR y comparación local de cuentas operativas
 

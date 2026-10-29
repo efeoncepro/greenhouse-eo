@@ -24,6 +24,10 @@ actual frente a trayectoria y prioridad A/B de revisión, sin convertirla en cal
 agencias» no demuestra que las gestione; la [política](../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md)
 gobierna el orden y los límites.
 
+Al validar búsquedas, separar persistencia, pertinencia de muestra y cobertura contrastada. Usar controles
+conocidos y contrastes de filtros del [recorrido Sales Navigator](references/sales-navigator-operations.md#gate-de-cobertura-antes-de-recomendar-la-consulta);
+ni pocos resultados prueban ausencia de compradores ni ampliar el volumen los califica automáticamente.
+
 ## Criterio para nuevas comunicaciones
 
 Antes de preparar una apertura, reactivación, seguimiento o respuesta comercial de captación/expansión,

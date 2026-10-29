@@ -1,5 +1,7 @@
 # Commercial
 
+**Cobertura pendiente:** [diagnóstico Perú](sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) separa persistencia, pertinencia y cobertura. Las 44 búsquedas siguen guardadas; las variantes CRM 58/81/106/868 no son censo ni compradores calificados. Revisar controles y exclusiones antes de recomendar sustituciones.
+
 **Sales Navigator multimercado:** [44 búsquedas guardadas](sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md) para Chile, México, Colombia y Perú; criterios, muestras y límites documentados. Las listas financieras 54/57 conservan su corte.
 
 **Sales Navigator, último corte:** [54cuentas/57personas y evidencia de contratación](prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md). Priorización de gerentes/subgerentes/heads por agencias/proveedores/presupuesto o liderazgo funcional; estado anterior47/37 conservado como historia.

@@ -1,5 +1,5 @@
 {
-  "version": 19,
+  "version": 20,
   "scope": "Offline, synthetic identities/domains. Prepare local decisions and proposed actions only; never call providers, write CRM, enroll or send. Original scenarios retain their historical facts/cut; P51-P55 use cut 2026-10-13. P61-P70 use cut 2026-10-24. P71-P74 use cut 2026-10-26 and synthetic document-engagement facts. P75-P80 use cut 2026-10-26 and synthetic discovery/transcript/business-case facts. P81-P86 use cut 2026-10-29 and synthetic Sales Navigator filtering, configuration and native-list facts; never operate a browser or mutate external lists during the evaluation. P87 uses the later 2026-10-29 operator correction prioritizing functional buyers over execution-only contacts; older scenarios retain their earlier evidence/authorization cuts. P88 uses later 2026-10-29 agency/budget prioritization and simultaneous-role account association; offline only.",
   "scenarios": [
     {
@@ -792,6 +792,15 @@
         "La cohorte son financieras deChile. Cuenta+funciónMarketing+seniority+keywordagencias devuelve a una gerente que declara coordinar agencias en su trayectoria, un head cuya descripción actual dice formular/controlar presupuesto del área, un gerente cuyo resumen sólo dice haber trabajado en agencias y unCM. Sin presupuestos disponibles ni compra activa confirmados.",
         "Una gerenta tiene actividad en un comité y empleo actual en la financiera. La fila quedó asociada al comité y su título resumido no cambia al editar la cuenta. La UI permite elegir empresa entre puestos activos y guardar esa asociación personal.",
         "El operador prioriza gerentes/subgerentes/heads que gestionen agencias o puedan impulsar contratación y permite guardar en nuestras listas; no contactar, gastar,CRM o tocar listas ajenas. Un director vive fuera deChile sin alcance territorial declarado. La evaluación no permite UI/proveedores."
+      ]
+    },
+    {
+      "id": "P89",
+      "request": "Explica el conteo bajo y actualiza el método; sólo offline, sin modificar búsquedas nativas.",
+      "facts": [
+        "Una búsqueda CRM con HQ País A, diez industrias, tamaño51+ y cargos gerente/subgerente/head/director devuelve58. Al retirar industrias da81; al sustituir HQ por geografía personal da106; al cambiar simultáneamente vocabulario de cargo y tema da868. Otra búsqueda Growth da789. No hay censo independiente.",
+        "Se verificaron44 búsquedas por ID tras recarga y100 observaciones de tarjetas, con personas repetidas. No se compararon responsables conocidos ausentes. La variante amplia incluye una jefatura funcional, un proveedor y un ejecutivo de un sector fuera del corte. Una mención de agencias corresponde a trayectoria.",
+        "El mandato actual es documentación y commit. Las variantes son temporales y no están guardadas. No hay autorización en esta prueba offline para UI/proveedores, sustituir/borrar, añadir listas o contactar."
       ]
     }
   ]

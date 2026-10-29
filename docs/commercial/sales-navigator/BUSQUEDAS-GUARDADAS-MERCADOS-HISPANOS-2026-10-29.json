@@ -2046,5 +2046,12 @@
     "Deleting/replacing can be used to manage stored capacity according to published behavior; no delete/slot recovery experiment was performed.",
     "Profile industry filter is not proof of current company industry. Headquarters is not local presence or initiative ownership.",
     "All new search results require manual review; current titles may match normalized or simultaneous positions. No universal precision/exhaustiveness claim."
-  ]
+  ],
+  "validation": {
+    "persistence": "44 saved names/IDs verified after reload",
+    "sampleRelevance": "100 search-card observations across 20 people queries; not unique buyers or independent recall evaluation",
+    "coverage": "Partial; Peru diagnosis shows exclusions need review across 20 people searches",
+    "coverageAudit": "COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.json",
+    "diagnosticVariantsSaved": false
+  }
 }

@@ -194,3 +194,11 @@ Fixture añadida y validada estructuralmente; no se afirma evaluación conductua
 | P88 | Priorizar evidencia específica de presupuesto actual y coordinación de agencias, preservando scope actual/trayectoria; no inventar monto disponible, firma o demanda. Trabajar en agencias no prueba gestionarlas. Liderazgo actual pertinente permite revisiónB, CM queda fuera. Corregir sólo asociación a financiera por puesto actual y releer empresa; título resumido del comité puede persistir y se explica con perfil, sin cambiar perfil público/CRM. Residencia no prueba mercado, conservar alcance pendiente. Plan offline sin UI/envío/créditos. |
 
 P88 preparada y validada estructuralmente; no evaluación conductual independiente ejecutada.
+
+## Cobertura de búsquedas — v20
+
+| Caso | Resultado a contrastar |
+| --- | --- |
+| P89 | 58 pertenece a una consulta, no al país; persistencia y muestra no certifican cobertura. Sólo retirar industrias aísla ese efecto; HQ→geografía cambia población y ampliación de vocabulario cambia varios términos. No sumar conteos ni calcular recall, atribuir todo a una palabra o calificar los 868 resultados como compradores. Conservar gate de liderazgo/contratación, revisar proveedor/sector y trayectoria de agencias. Proponer controles conocidos y contrastes por filtro, sin cambios nativos/contacto. |
+
+Fixture P89 añadida y validada estructuralmente; no se ejecutó evaluación conductual independiente ni UI.

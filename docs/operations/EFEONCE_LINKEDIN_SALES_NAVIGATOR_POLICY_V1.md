@@ -74,6 +74,21 @@ Industria en Personas no certifica la industria de su empresa actual. Validar ca
 comprador: cargo normalizado, titular, puestos simultáneos, función y seniority pueden devolver falsos positivos.
 La consulta inicial chilena de Growth conserva más amplitud; el expediente declara diferencias y ruido.
 
+## Validación de pertinencia y cobertura — corrección Perú del 29/10
+
+Una búsqueda guardada tiene tres estados separados: persistencia por nombre/ID tras recarga, pertinencia
+de la muestra y cobertura contrastada. Una muestra relevante no demuestra que los filtros recuperen a los
+responsables pertinentes; pocos resultados tampoco prueban un mercado pequeño. [Diagnóstico y método](../commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md).
+
+Antes de recomendar su cobertura, contrastar controles conocidos de rol/cuenta y variantes de industria,
+sede frente a ubicación personal, vocabulario bilingüe, función y seniority. Aislar variables para atribuir
+causas; sede y residencia pueden definir poblaciones no anidadas. Registrar ausencias y ruido, sin sumar
+conteos solapados ni afirmar exhaustividad o recall sin denominador independiente. No hay cuota de resultados.
+Descubrimiento amplio y selección comercial revisada son capas distintas; ampliar títulos a manager/jefe/chief
+no admite operadores o proveedores automáticamente. Mantener el gate comprador y el alcance territorial.
+El ensayo temporal no autoriza guardar/reemplazar/borrar; aplicar el mandato vigente y verificar el cambio.
+Las 44 búsquedas persisten, con cobertura parcial pendiente de revisión; no se modificaron por el diagnóstico.
+
 ## Regla de elección de canal
 
 | Situación del prospecto | Ruta operativa |

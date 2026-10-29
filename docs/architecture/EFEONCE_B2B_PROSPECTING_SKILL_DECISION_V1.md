@@ -1,5 +1,7 @@
 # Efeonce B2B Prospecting — decisión de método compartido
 
+**Cobertura pendiente:** [diagnóstico Perú](../commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) separa persistencia, pertinencia y cobertura. Las 44 búsquedas siguen guardadas; las variantes CRM 58/81/106/868 no son censo ni compradores calificados. Revisar controles y exclusiones antes de recomendar sustituciones.
+
 **Aplicación del adapter Sales Navigator:** [44 búsquedas nativas guardadas](../commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md)
 para cuatro mercados hispanos, con aviso semanal y muestras/IDs verificados. Es ejecución del mandato
 explícito y del adapter existente: no añade API privada, runner autónomo, autoridad de envío, esquema CRM

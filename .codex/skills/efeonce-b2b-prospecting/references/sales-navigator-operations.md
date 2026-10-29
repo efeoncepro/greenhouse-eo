@@ -122,6 +122,25 @@ probó recuperar cupo. La edición de filtros guarda una copia y no actualiza el
 - Los nuevos matches no son leads calificados ni se guardan/contactan automáticamente. Corroborar cuenta,
   mercado, liderazgo, agencias/autoridad y restricciones; diferenciar cliente existente de net-new.
 
+### Gate de cobertura antes de recomendar la consulta
+
+Separar persistencia, precisión de muestra y cobertura. Guardar 44 búsquedas y leer tarjetas pertinentes
+no certifica compradores recuperados en el mercado. El [ensayo Perú](../../../../docs/commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md)
+mostró 58/81/106/868 en variantes CRM y 789 en Growth: conteos fechados, no cuotas ni compradores calificados.
+
+- Registrar consulta/chips/ID y contador principal estable; no un aviso de nuevos matches o estado anterior.
+- Contrastar con roles/cuentas pertinentes conocidos, verificados por búsqueda nominal/empresa; documentar
+  ausentes y motivos antes de afirmar cobertura. Sin denominador independiente no hay porcentaje de recall.
+- Probar industria, sede/geografía personal, cargos bilingües, función y seniority por separado para atribuir
+  efectos. HQ y persona definen poblaciones no anidadas; una variante con varios cambios sólo explora.
+  No sumar solapes ni atribuir a una palabra el aumento obtenido al cambiar varios términos/filtros.
+- Evaluar ruido y recuperación de responsables: manager/jefe/chief/customer pueden descubrir perfiles útiles
+  y también operadores/proveedores. La selección comercial conserva liderazgo y posibilidad de contratación;
+  ampliar vocabulario no reduce el criterio ni acredita presupuesto, plataforma o mercado comprador.
+- Mantener descubrimiento amplio y shortlist revisada como capas; no crear copias guardadas por cada ensayo.
+  Documentar revisión parcial y proponer ajustes; guardar/reemplazar sólo dentro del mandato, con conciliación
+  del original, capacidad y readback. El diagnóstico Perú dejó intactas las 44 búsquedas.
+
 ## Personas: consultas reutilizables, no el ICP completo
 
 La UI y ayuda consultadas permitían **cinco Personas**, con función, seniority, cargos actuales normalizados

@@ -2,17 +2,17 @@
 
 ## 2026-10-29 — Sales Navigator: búsquedas en cuatro mercados hispanos
 
-[Inventario y manifest](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md): **24 búsquedas de cuentas y 20 de personas**,
-Chile/México/Colombia/Perú; seis sectores y cinco frentes. Nombres/IDs y filtros releídos tras recarga.
-Muestras por país: cargos de gerencia/subgerencia/head; refinamientos por talento, producción industrial,
-docencia/coordinación y producto/CX no digital. Industria del perfil no certifica sector de empresa.
-Growth Chile conserva consulta inicial más amplia; el expediente declara diferencias y límites de precisión.
-Mandato cubre guardado y emails semanales nativos; no prueba recepción futura ni calificación de matches.
-Política, manuales, documentación y skill B2B espejo actualizados. Cupos documentados 50 cuentas + 50 personas;
-quedan 26/30; sin experimento de eliminación. No mensajes, solicitudes, InMail, CRM o scheduler externo.
-[Listas anteriores 54 cuentas/57 personas](docs/commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md)
-y portafolio 12/5 sin cambios. Próximo: revisar matches, confirmar cuenta/alcance comprador y medir ruido;
-no incorporar ni contactar automáticamente. Cambios concurrentes preservados; commit local, sin push.
+[Inventario](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md): **24 búsquedas de cuentas/20 de personas**,
+Chile/México/Colombia/Perú; nombres/IDs verificados tras recarga. Persistencia completa, cobertura parcial:
+[diagnóstico Perú](docs/commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) CRM 58→81→106→868 y Growth 789.
+Sede/geografía cambian población; vocabulario ampliado cambia varios términos. No sumar ni calificar conteos.
+Las 100 observaciones de tarjetas previas no validaron compradores excluidos. Skill B2B espejo, política y
+capas documentales separan persistencia/muestra/cobertura, controles conocidos y contrastes por filtro.
+P89 offline preparada, sin evaluación conductual. Variantes temporales sin guardar; las 44 nativas intactas.
+Cupos documentados 50+50, sin prueba de borrado/recuperación ni recepción futura de avisos semanales.
+Listas 54/57 y servicios/Personas 12/5 sin cambio. Sin mensajes, solicitudes, InMail, CRM o scheduler externo.
+Próximo: auditar cobertura de las 20 consultas de personas antes de proponer reemplazos; mantener criterio
+comprador y prioridad agencias/proveedores. Commit local, sin push; cambios concurrentes preservados.
 
 ## 2026-10-27 — SKY: ADR y puente operativo probado localmente
 

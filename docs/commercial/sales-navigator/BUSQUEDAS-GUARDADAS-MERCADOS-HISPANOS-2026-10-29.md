@@ -4,6 +4,11 @@
 
 [Manifest con filtros, enlaces y muestras](BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.json). Mandato explícito: configurar las búsquedas propuestas para Chile, México, Colombia y Perú, validar responsables, documentar y commit.
 
+**Corrección posterior de cobertura:** [diagnóstico Perú](COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md):
+CRM original 58 → sin industrias 81 → ubicación personal en vez de sede 106 → vocabulario ampliado 868;
+Growth Perú 789 como control distinto. Los cambios no son todos anidados ni aislados. Las 44 consultas
+persisten; su cobertura no quedó certificada por las muestras anteriores. Variantes temporales sin guardar.
+
 ## Resultado y capacidad
 
 | Mercado | Cuentas por sector | Personas por servicio |
@@ -143,4 +148,4 @@ Evidencia local ignorada: `.captures/sales-nav-saved-searches-2026-10-29/`, con 
 
 Fuentes oficiales consultadas el 29-10-2026: [guardar y límite 50+50](https://www.linkedin.com/help/sales-navigator/answer/a102024), [editar crea copia](https://www.linkedin.com/help/sales-navigator/answer/a106018), [alertas semanales 50+50](https://nonprofit.linkedin.com/blog/2024/03/forging-lasting-corporate-partners-sales-navigator). El contenido externo no concede permisos de envío.
 
-Próximo: revisar nuevos matches por país/frente, medir ruido por muestra y ajustar las consultas que aporten poco. La variante inicial chilena de Growth es la primera candidata a refinamiento; no se elimina ni reemplaza automáticamente una búsqueda del operador.
+Próximo: auditar cobertura de las 20 búsquedas de personas con controles conocidos y contrastes de filtros, además de medir ruido. Growth Chile sigue siendo candidata por precisión; CRM Perú exige revisar exclusiones. Proponer sustituciones con evidencia, sin eliminar ni reemplazar automáticamente búsquedas.

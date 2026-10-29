@@ -136,3 +136,13 @@ explicita alertas semanales 50+50. El artículo histórico a106086 de cinco año
 límite vigente adicional. Fuentes generales Sales Navigator, sin evidencia de un cupo menor Core.
 La UI confirmó aviso semanal y persistencia tras recarga de 24/20; no se probaron 100 guardados, entrega de
 emails futuros ni eliminación/recuperación de cupo. [Aplicación](../../../../docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md).
+
+## Cobertura de búsquedas — contraste Perú del 29-10-2026
+
+[Definiciones oficiales de filtros](https://www.linkedin.com/help/sales-navigator/answer/a1452817),
+consultadas el 29/10: sede de empresa actual y geografía personal son campos distintos; cargo actual,
+función y seniority tampoco son equivalentes. La documentación general no prueba disponibilidad de cada
+filtro en Core ni su precisión comercial. [Evidencia UI y límites del ensayo](../../../../docs/commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md):
+58/81/106/868 son variantes de CRM y 789 otra búsqueda Growth; sin suma, censo, denominador de recall ni
+calificación de todos los resultados. Los cambios de población/vocabulario no son todos aislados o anidados.
+No se guardaron las variantes. Validación de muestras anterior no certificó cobertura de las 20 consultas.

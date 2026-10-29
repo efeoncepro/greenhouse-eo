@@ -1,5 +1,7 @@
 # Sales Navigator — índice de configuración y evidencia
 
+**Cobertura pendiente:** [diagnóstico Perú](COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) separa persistencia, pertinencia y cobertura. Las 44 búsquedas siguen guardadas; las variantes CRM 58/81/106/868 no son censo ni compradores calificados. Revisar controles y exclusiones antes de recomendar sustituciones.
+
 **Búsquedas persistidas:** [24 de cuentas + 20 de personas para Chile, México, Colombia y Perú](BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md), por sector y frente de servicio. Verificación tras recarga, filtros y muestras; avisos semanales nativos, sin outreach ni CRM.
 
 **Último corte:** [gerencias y agencias](../prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md):54 cuentas/57 personas, siete empresas y 20 contactos nuevos. Prioridad sustentada en agencias/proveedores/presupuesto o liderazgo funcional; sin comunicaciones/CRM. Los 12 servicios/5 Personas no cambiaron; los estados de fase que siguen son históricos.

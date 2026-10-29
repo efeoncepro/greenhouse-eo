@@ -1,5 +1,7 @@
 # Prospección B2B Efeonce
 
+**Cobertura pendiente:** [diagnóstico Perú](../../commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) separa persistencia, pertinencia y cobertura. Las 44 búsquedas siguen guardadas; las variantes CRM 58/81/106/868 no son censo ni compradores calificados. Revisar controles y exclusiones antes de recomendar sustituciones.
+
 **Sales Navigator multimer­cado:** [44 búsquedas guardadas](../../commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md)
 (24 cuentas/20 personas) para Chile, México, Colombia y Perú. Sector por cuenta, frente por persona;
 validación por muestra y mercado, sin primer grado obligatorio. Avisos semanales nativos autorizados;

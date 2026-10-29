@@ -1,5 +1,7 @@
 # Prospectar con Sales Navigator desde la sesión de Chrome
 
+**Cobertura pendiente:** [diagnóstico Perú](../../commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) separa persistencia, pertinencia y cobertura. Las 44 búsquedas siguen guardadas; las variantes CRM 58/81/106/868 no son censo ni compradores calificados. Revisar controles y exclusiones antes de recomendar sustituciones.
+
 **Búsquedas guardadas posteriores:** [24 de cuentas y 20 de personas](../../commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md)
 para Chile, México, Colombia y Perú, con filtros/muestras y persistencia verificada tras recarga.
 Guardar/avisos semanales fue autorizado expresamente en ese mandato; no hubo contacto, InMail ni CRM.
@@ -316,6 +318,10 @@ de estabilidad de la UI ni autorización de automatización masiva.
 2. Leer una muestra de tarjetas reales; excluir/ajustar coordinación, docencia, talento o producción física
    cuando sean cruces del texto. Conservar reservas: industria personal, puestos simultáneos, producto,
    mercado comprador y plataforma no se certifican por un chip. No copiar Personas amplias sin gate comprador.
+   Antes de recomendar cobertura, contrastar responsables conocidos y variantes de industria, sede frente a
+   geografía personal, vocabulario de cargos/temas, función y seniority. Registrar conteos estables, ausencias
+   y ruido; aislar variables cuando se quiera explicar diferencias. Poblaciones HQ/residencia no son anidadas.
+   Sin denominador independiente no declarar exhaustividad; un ensayo amplio conserva el gate comprador.
 3. Activar Guardar búsqueda. Abrir Búsquedas guardadas → pestaña Cuenta/Posibles clientes → Editar → nombre
    `Efeonce | país | Cuentas/Personas | sector/frente` → Guardar. Esperar el cierre del editor.
 4. Leer el enlace/nombre/ID y criterios; recargar y comparar conjuntos. El switch y sus IDs pueden
