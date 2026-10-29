@@ -1,12 +1,16 @@
 # EPIC-052 — Efeonce Rooms: experiencia comercial inmersiva y sales enablement
 
+## Corte vigente 2026-10-29
+
+El [canary real interno del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md) ya está completado y cerrado: una sala sintética, imagen GCS procesada y servida con autorización, un correo enlace+código recibido, sesión guest limitada y revocación. Auth y Rooms volvieron a OFF; no fue aceptación de UI, activación de clientes ni ampliación de cohorte. En el checkout hermano, `main` y `origin/main` apuntan localmente a `e4b2e89` (merge del dispatch automático); ese Git readback no acredita por sí mismo el deployment Vercel activo. La sesión Rooms reportó 35 checks browser/HTTP/PG PASS para dos RP locales contra fuentes Auth; el recibo detallado no está en este checkout y no hay E2E HTTPS/entrypoint completo. La UI nueva de Claude Design aún no estaba entregada al último intercambio; siguen pendientes su integración y QA, recuperación y límites de operación, PDF/audio/video, presentación/notas, preguntas/pasos/actividad y MCP/integraciones. Auth conserva su release retenido. [Conciliación Auth](../../audits/rooms/2026-10-29-auth-develop-reconciliation-local.md).
+
 ## Status
 
 - Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `2026-10-26: Rooms main e4b2e890 publicado, GCS privado/SQL8migraciones26tablas y worker automático por Scheduler verificados. Canary interno de Microsoft/MFA, un correo recibido y PNG→WebP→lectura privada/revocación PASS; sala archivada y flags humanos first-party/OTP/invitaciones/medios web OFF. Emisor OAuth/MCP y login base Auth siguen activos. Suite234PASS y Playwright53PASS/3skip no equivalen a aceptación visual. Claude Design posee nueva interfaz; faltan entorno de integración aislado, consumidor same-origin, recorrido UI completo y activación general. PR263/264 Auth retenidas por operador; R05B y R09–R15 conservan alcance pendiente.`
+- Status real: `2026-10-29: canary interno Auth+Rooms del 26-10 completado/cerrado con único correo recibido, imagen privada y revocación; flags devueltos a OFF. Main/origin/main local de Rooms e4b2e89 incorpora merge del dispatch automático, sin readback nuevo del deployment activo. UI Claude Design aún pendiente; QA integral, operación bajo carga/recovery y capacidades restantes de medios/presentación/colaboración/MCP abiertas. Auth release retenido, sin segundo canary ni activación general.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Commercial / Product; responsable individual por asignar`

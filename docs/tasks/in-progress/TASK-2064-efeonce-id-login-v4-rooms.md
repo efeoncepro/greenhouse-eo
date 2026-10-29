@@ -1,5 +1,9 @@
 # TASK-2064 — Efeonce ID: login V4 con Rooms como primer consumidor
 
+## Corte 2026-10-29 — fuente aceptada preservada; release retenido
+
+La pantalla V4 que ya sirve Auth en el SHA productivo leído conserva first-party/OTP OFF. El candidato Auth apilado mantiene byte a byte renderer, copy, assets y generadores de la rama visual aceptada; se verificó localmente a 1440/390 con tres novedades públicas acotadas. La UI nueva del producto Rooms de Claude Design aún no se había entregado al último intercambio; pertenece a EPIC-052 y no cambia la aceptación de esta pantalla del issuer. El canary interno del 26-10 ejercitó identidad/OTP una vez y cerró con flags OFF. Faltan CI del HEAD Auth publicado y readback visual después de un release autorizado. [Evidencia](../../audits/rooms/2026-10-28-auth-release-readiness.md).
+
 > Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
 
 ## Delta 2026-10-25 — estado al corte de Codex
@@ -24,7 +28,7 @@
 - Motion: `docs/ui/motion/TASK-2064-efeonce-id-login-v4-rooms-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-044`
-- Status real: `2026-10-26: Login V4 servido en Auth y Microsoft/MFA real hacia Rooms comprobado durante el canary interno; final auth-server-00168-vzb100%, misma imagen, first-party/OTP OFF. Fuente pública de novedades y aceptación visual humana conservan gates propios. Corrección de despliegue PR263/264 retenida por el operador, sin merge ni nuevo deploy.`
+- Status real: `V4 neutral/Rooms servido en la última revisión Auth leída, con first-party/OTP OFF. Candidato integrado local conserva el renderer aceptado; QA 1440/390 y tres novedades públicas actuales revisadas 2026-10-28. GVC previo 42 frames, 116 tests y 55 rangos de contraste. Feed nuevo sólo local: faltan CI remoto, release/readback visual del candidato y login real Rooms. TASK-2064 sigue in-progress.`
 - Rank: `TBD`
 - Domain: `identity|ui`
 - Blocked by: `none`

@@ -4,6 +4,10 @@
 > Owner: TASK-2067 (issuer); TASK-2066 (invitación, correo contextual y sesión guest Rooms).
 > Runtime al 26 de octubre: canary único real PASS y cerrado; first-party/OTP OFF. Activación duradera retenida.
 
+**Actualización 2026-10-29:** el canary y correo únicos continúan cerrados;
+B18 confirmó localmente que guest con código no crea sesión interna ni SSO.
+No hubo segundo envío ni apertura general. [Estado y límites](../audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
+
 ## Corte operativo — 2026-10-26
 
 El canary conjunto Auth+Rooms pasó con una identidad interna y Microsoft/MFA, OIDC y renovación SSO,

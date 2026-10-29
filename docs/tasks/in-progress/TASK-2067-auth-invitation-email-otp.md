@@ -1,5 +1,9 @@
 # TASK-2067 — Auth invitation email OTP
 
+## Delta 2026-10-29 — único canary real cerrado
+
+El [canary Auth+Rooms del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md) envió un único correo enlace+código al destinatario autorizado; Resend aceptó la entrega y Outlook la recibió. Código incorrecto 400, correcto 200, reutilización 404 y prueba consumida; la sesión guest vio sólo la sala/imagen autorizadas y revocación pasó a 401/404. El cierre devolvió el tipo de correo y los flags Auth/Rooms a OFF y retiró los montajes OTP/authority. No repetir el envío ni ampliar a clientes. El carril general, el ensayo de recuperación y assurance TASK-1833 siguen pendientes; este delta reemplaza el «sin envíos reales» del snapshot fechado 25-10 de abajo.
+
 > Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
 
 ## Delta 2026-10-25 — estado al corte de Codex
@@ -24,7 +28,7 @@
 - UI ready: `n/a`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-10-26: issuer/Rooms productivos completaron un correo combinado recibido, un challenge y consumo único, lectura privada y revocación. Final auth-server-00168-vzb100%, misma imagen; first-party/OTP OFF, montajes OTP retirados y tipo de correo OFF. Resend producción v1 y Sentry production corregidos. PR263/264 de control de despliegue abiertas y retenidas; assurance, cierre de concurrencia y activación general siguen separados.`
+- Status real: `2026-10-29: core OTP y SQL local probados; canary interno real del 26-10 completó un correo recibido, prueba de un uso, guest limitado y revocación. Auth/Rooms y tipo de correo volvieron a OFF; no hay activación general ni otro envío autorizado. El candidato local posterior conserva fixes de gate fail-closed y release retenido. Falta cierre de assurance, recuperación y operación steady.`
 - Rank: `P1`
 - Domain: `identity|platform|data`
 - Blocked by: `none`

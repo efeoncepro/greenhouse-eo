@@ -1,5 +1,9 @@
 # Greenhouse — Feature Flag State Ledger (env-var flags)
 
+**Nota documental 2026-10-29:** [corte Auth+Rooms](../audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
+Este registro conserva el último readback de flags del 26-10. Los trabajos
+locales posteriores no autorizan inferir un cambio del valor vivo.
+
 ## Rooms / Auth — estado releído26Oct2026
 
 Lectura sin mutaciones a17:38:40Chile: [metadata y PRs](../audits/rooms/2026-10-26-docs-skills-state-readback.json).

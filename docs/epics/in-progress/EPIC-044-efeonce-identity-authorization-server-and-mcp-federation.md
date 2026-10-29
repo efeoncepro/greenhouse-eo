@@ -1,5 +1,11 @@
 # EPIC-044 — Efeonce Identity, Native Authorization Server and MCP Federation
 
+## Corte vigente 2026-10-29 — Auth con Rooms primero
+
+El emisor MCP sigue productivo. El [canary interno Auth+Rooms del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md) completó una sala sintética, identidad Microsoft/MFA, invitación OTP con un correo recibido, guest limitado y revocación; Auth y Rooms terminaron OFF. No equivale a acceso general ni se repite el correo. TASK-1834/2064/2067 y el consumer Rooms conservan pruebas locales adicionales; el V4 aceptado está preservado byte a byte en la rama Auth apilada. Los guards de deploy que comprueban el SHA de la revisión activa y el Job aislado de rotación de TASK-1833 están en commits locales, con pruebas y scan, pero fuera de CI/release productivo. [Conciliación](../../audits/rooms/2026-10-29-auth-develop-reconciliation-local.md) · [rotación](../../audits/auth-server/2026-10-29-key-rotation-job-local.md).
+
+PR #262/#263/#264 seguían con HEAD remotos anteriores al último readback del 29-10; el release está retenido. Faltan UI nueva y QA integral de Rooms, staging/recuperación/rotación cloud, privacidad V2, B15/B20 y siete días steady para el assurance completo. Greenhouse permanece en TASK-2063; el canary no cambió su login.
+
 Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/1831](../../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
 
 
@@ -15,7 +21,7 @@ El operador ordenó **dejar Auth en PR por ahora**:263→main y264→develop abi
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `2026-10-26: emisor OAuth/MCP y login base productivos; Rooms primer RP con canary real Microsoft/MFA, correo único e imagen completado y cerrado OFF para first-party/OTP. Auth00168-vzb100%, SHA754a2a28/misma imagen. Control de despliegue corregido en PR263/264, retenidas por el operador: sin merge/deploy ni release262. Assurance1833, rollout general, migración Greenhouse2063 y restantes unidades del epic abiertas; no pentest completo ni aceptación de nueva UI afirmados. Los cierres anteriores de1813/U19 mantienen su evidencia y alcance propios.`
+- Status real: `2026-10-29: emisor y gateway MCP productivos; Rooms primer RP first-party. Canary interno único del 26-10 completado/cerrado con correo recibido y Auth/Rooms OFF al final. Login V4 aceptado servido en SHA previo; candidato Auth apilado, guards de deploy y Job aislado de rotación sólo locales, sin CI/release de esos HEAD. PR #262/#263/#264 remotas anteriores. TASK-1833 assurance, UI/QA Rooms, privacidad, cloud/recovery y steady siguen abiertos; Greenhouse se difiere a TASK-2063.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Owner: `Efeonce Platform / Identity`

@@ -3,6 +3,21 @@
 > Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 
+## 2026-10-29 UTC — UI y operación pendientes tras canary cerrado
+
+- `local/vivo` (recibos fechados): [dossier coordinado](../../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
+  El canary del 26-10 probó una sala, imagen física privada, correo único
+  recibido, guest y revocación; terminó con acceso humano OFF. El Git local
+  Rooms `main=origin/main=e4b2e89` incluye backend GCS, worker y dispatch
+  condicionado; ese ref no prueba por sí solo el deployment activo.
+- `local` (sesión Rooms): Claude Design aún no había entregado la UI nueva.
+  B18 guest sin sesión interna/SSO dio 51 checks; dos adapters RP dieron
+  35 checks reportados con issuer QA, sin servidor Auth completo ni HTTPS.
+  Faltan integrar UI y probar crear → cargar/procesar → adjuntar → publicar →
+  invitado con conflicto, revocación y aislamiento; también recovery de ocho
+  migraciones y límites/carga. PDF/audio/video, presentación/notas, actividad,
+  MCP y CRM permanecen en EPIC-052. Auth mantiene el release retenido.
+
 ## 2026-10-28 — Retest dos RP contra fuentes Auth ca97eecd1:35PASS
 
 - `local`: Rooms `8750750` intacto y issuerQA con fuentes de `ca97eecd1`,35checksPASS/Chrome/PG

@@ -4,6 +4,22 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-10-29 UTC — candidato local y release retenido
+
+- `local`: [dossier Auth+Rooms](../../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
+  El único canary real del 26-10 sigue cerrado con first-party/OTP y correo OFF;
+  no se autorizó otro correo ni activación general. Login V4 aceptado en preview
+  y revisado localmente en el stack Auth; falta CI del HEAD y readback visual
+  tras release. La UI nueva de Rooms aún no estaba entregada.
+- `local`: `codex/auth-pr-develop-stack@dddc922d7` conserva fixes de Auth,
+  guards de deploy y Job de rotación en `987044d9d`. El Job es candidato
+  OFF/dry-run, sin Scheduler, IAM ni ejecución KMS cloud; [recibo](../../../../docs/audits/auth-server/2026-10-29-key-rotation-job-local.md).
+  No hubo push/merge/deploy/flags por este corte. #262/#263/#264 conservaban
+  HEAD remotos anteriores al readback del 29-10 y el release sigue retenido.
+- `local` (reporte peer Rooms): dos adapters RP probaron 35 checks frente a
+  issuer QA con protocolo/store reales. El recibo detallado no está en este
+  checkout; no prueba el entrypoint completo, HTTPS ni producción.
+
 ## 2026-10-26 — Control de despliegue corregido; operador retiene Auth en PR
 
 - `doc/local`: [PR #263 main](https://github.com/efeoncepro/greenhouse-eo/pull/263) HEAD `5e1fc2554` y

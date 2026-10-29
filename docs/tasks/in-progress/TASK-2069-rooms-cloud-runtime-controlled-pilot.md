@@ -1,5 +1,15 @@
 # TASK-2069 — Rooms Cloud Runtime and Controlled Pilot
 
+## Delta 2026-10-29 — canary ejecutado; acceso cerrado
+
+El [canary Auth+Rooms del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md)
+ejercitó DB cloud, identidad, invitación, imagen privada y guest con una sala
+sintética y un único correo recibido. Auth y Rooms volvieron a OFF. El checkout
+Rooms avanzó después a `main=origin/main=e4b2e89` según Git local; ese SHA no
+demuestra el deployment Vercel activo. Continúan pendientes la UI nueva,
+recovery con las ocho migraciones actuales y gates de carga/operación. El delta
+fechado 25-10 y sus métricas abajo son evidencia histórica anterior al canary.
+
 > Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
 
 ## Delta 2026-10-25 — estado al corte de Codex
@@ -23,7 +33,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-26: Rooms main e4b2e890 promovido en Vercel; cloud GCS/WIF/SQL, ocho migraciones y26tablas, roles separados y Job finito por digest. Canary interno real de Microsoft/MFA, un correo recibido y PNG→WebP→lectura privada/revocación PASS; piloto archivado y flags humanos OFF. Scheduler OIDC cada minuto verificado con vacío200/demanda202→un JobSUCCESS→ack liberado. General rollout, entorno aislado para nueva UI y evidencia completa de costes/restore del estado ampliado pendientes; CONNECT/TEMP heredados se mantienen documentados.`
+- Status real: `2026-10-29: canary interno Auth+Rooms del 26-10 completado con DB cloud, imagen GCS procesada/servida en privado, correo único recibido, guest y revocación; flags de acceso humano nuevamente OFF. Main/origin/main local de Rooms e4b2e89, sin readback nuevo del deployment Vercel activo. El restore previo cubrió 19 tablas; falta recuperación con ocho migraciones actuales, carga/operación, UI nueva y decisión de activación general. CONNECT/TEMP heredados siguen documentados; no inferir aislamiento más fuerte.`
 - Rank: `Foundation cloud después de TASK-2065/2066; canary integrado condicionado a issuer TASK-1834/2067 y consumer TASK-2068`
 - Domain: `platform|identity|data|ops`
 - Blocked by: `none`

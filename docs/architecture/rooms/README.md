@@ -1,5 +1,10 @@
 # Efeonce Rooms
 
+**Corte coordinado Auth+Rooms 2026-10-29:** [evidencia, pendientes y estado de release](../../audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
+El canary único permanece cerrado OFF. El ref Git local `e4b2e89` no prueba el
+deployment activo; Claude Design aún no había entregado la UI nueva. La
+sesión Rooms continúa el decoder, la presentación y los gates de operación.
+
 **Estado vigente al 2026-10-26:** runtime privado [efeoncepro/efeonce-rooms](https://github.com/efeoncepro/efeonce-rooms),
 `main@e4b2e890` ([PR3](https://github.com/efeoncepro/efeonce-rooms/pull/3)), publicado en
 [efeonce-rooms.vercel.app](https://efeonce-rooms.vercel.app/demo). `rooms.efeonce.org` sigue siendo el

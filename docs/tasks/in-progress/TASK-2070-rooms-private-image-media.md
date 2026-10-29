@@ -1,5 +1,17 @@
 # TASK-2070 — Rooms: imágenes privadas, versiones y procedencia
 
+## Delta 2026-10-29 — imágenes y worker cloud
+
+El [canary del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md)
+procesó una imagen física en GCS privado y sirvió derivados con autorización;
+el acceso humano cerró OFF. El backend de medios, worker aislado y dispatch
+condicionado a demanda avanzaron después en Rooms, según el
+[estado consolidado](../../audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
+El Git `main=origin/main=e4b2e89` no acredita por sí mismo un deployment nuevo.
+La sesión Rooms continúa ensayos del decoder; faltan recuperación con ocho
+migraciones y límites bajo carga en el contenedor, además de PDF/audio/video.
+Los deltas del 25-10 conservan sólo el avance histórico de ese día.
+
 > Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
 
 ## Delta 2026-10-25 — estado al corte de Codex
@@ -29,7 +41,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-26: R05A de imágenes estáticas implementado en Rooms main e4b2e890 y verificado en cloud por TASK-2072: GCS privado, generaciones, procesamiento a WebP y entrega por autorización fresca. Suite234PASS/0skip,9focales,lint/types/build y CI Linux PASS; recovery histórico PG16/18 de25tablas/7migraciones conservado. Claude Design posee interfaz; coordinación dispatch añade migración8/tabla26. PDF/audio/video, consumidor nuevo y activación general siguen fuera de este cierre técnico.`
+- Status real: `2026-10-29: imagen privada física procesada a derivados WebP y servida autorizadamente en canary del 26-10; acceso humano terminó OFF. Backend GCS/worker y dispatch condicionado construidos; main/origin/main local Rooms e4b2e89, deployment vigente no revalidado desde ese ref. Decoder y operación bajo carga/restore de ocho migraciones pendientes; PDF/audio/video fuera del circuito de imagen. UI nueva y QA integral aún pendientes.`
 - Rank: `R05A después de R03B/R04; consumidor UI dependiente separado`
 - Domain: `platform|data|content`
 - Blocked by: `none`

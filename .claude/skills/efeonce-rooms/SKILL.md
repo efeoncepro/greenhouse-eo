@@ -5,6 +5,13 @@ description: Operate and extend Efeonce Rooms (EPIC-052) — the sales-enablemen
 
 # Efeonce Rooms (skill viva)
 
+**Corte 2026-10-29:** [mapa coordinado con Auth](../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
+El canary del 26-10 cerró con acceso humano OFF. Backend GCS, worker y dispatch
+condicionado están construidos; el Git `main=origin/main=e4b2e89` no acredita
+qué deployment sirve Vercel. La nueva UI de Claude Design no se había
+entregado. B18 guest sin SSO y dos adapters RP tienen comprobaciones locales;
+faltan UI/QA integral, recovery con ocho migraciones y límites de carga.
+
 Rooms es la **plataforma comercial propia de Efeonce**: salas privadas por oportunidad donde el comprador
 recorre la propuesta, sus piezas y sus pruebas. Greenhouse conserva la **gobernanza documental** (ADR,
 tasks, epic). El **runtime** vive en un repo aparte, `/Users/jreye/Documents/efeonce-rooms`, desplegado en

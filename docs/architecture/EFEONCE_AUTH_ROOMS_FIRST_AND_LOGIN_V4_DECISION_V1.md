@@ -7,6 +7,12 @@
 > Confidence: alta en límites; readiness productiva depende de pruebas y rollout.
 > Validated as of: 2026-10-25, discovery de código y probes públicos del issuer.
 
+**Actualización 2026-10-29:** [corte consolidado Auth+Rooms](../audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
+El canary único del 26-10 sigue cerrado con acceso humano OFF. Login V4 fue
+revisado en el candidato Auth local, cuya CI/release y readback visual faltan;
+la nueva UI de Rooms no se había entregado. El Job de rotación y los guards
+de deploy continúan como candidatos locales, sin activar producción.
+
 ## Corte operativo — 2026-10-26
 
 El canary conjunto Auth+Rooms pasó con una identidad interna y Microsoft/MFA, OIDC y renovación SSO,

@@ -1,5 +1,9 @@
 # TASK-1834 — Efeonce Auth first-party OIDC; Rooms como primer consumidor
 
+## Delta 2026-10-29 — canary cerrado y candidato apilado local
+
+El [canary interno Auth+Rooms del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md) ejecutó el ingreso Microsoft/MFA, canje first-party, lectura autorizada, un correo OTP recibido, guest limitado y revocación. Terminó con first-party/OTP OFF; no acredita cohortes ni activación general. La sesión Rooms reportó después 35 checks browser/HTTP/PG PASS para dos adapters RP locales contra fuentes Auth; su recibo detallado no está en este checkout. El issuer era QA, sin entrypoint completo ni HTTPS. El candidato `codex/auth-pr-develop-stack` conserva el SHA Auth servido como ancestro, incorpora guards de revisión activa y V4 aceptado; aún no está en las PR remotas ni tiene CI del HEAD exacto. [Conciliación Auth](../../audits/rooms/2026-10-29-auth-develop-reconciliation-local.md). TASK-1833 sigue abierta y el release retenido.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -18,7 +22,7 @@
 - UI ready: `n/a`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-10-26: foundation first-party y canary real con Microsoft/MFA comprobados; seis canjes Rooms durante renovaciones, autoridad de una sala y listado global denegado. Final Auth00168-vzb100%, SHA754a2a28 y misma imagen; first-party/OTP OFF. Migración Greenhouse2063, assurance1833, onboarding general de RPs y activación duradera separados. Corrección del control de despliegue PR263/264 retenida en PR, sin merge/deploy.`
+- Status real: `2026-10-29: foundation OIDC first-party implementada; canary interno Auth+Rooms del 26-10 completado y cerrado con flags nuevamente OFF. Sesión Rooms reportó 35 checks browser/HTTP/PG PASS para dos RP locales; recibo detallado ausente de este checkout, issuer QA sin HTTPS/entrypoint completo. Rama Auth apilada local con V4 aceptado, guards y fixes, aún fuera de PR remotas/CI del HEAD exacto. Migraciones/RP/secretos del canary no equivalen a activación general. TASK-1833, privacidad, QA de UI Rooms y release siguen pendientes; Greenhouse queda en TASK-2063.`
 - Rank: `TBD`
 - Domain: `platform|identity|ui`
 - Blocked by: `none para implementación local verificada; TASK-1833 antes de activación Production`

@@ -5,6 +5,13 @@ description: Operate and extend Efeonce Auth / Efeonce ID — the native OAuth/O
 
 # Efeonce Auth / Efeonce ID (skill viva)
 
+**Corte 2026-10-29:** leer el [mapa Auth+Rooms](../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md)
+antes de operar. El canary del 26-10 cerró OFF y no se repite. Login V4,
+guards de deploy y Job aislado de rotación tienen avances en el candidato
+`codex/auth-pr-develop-stack`; ese HEAD no está en las PR remotas ni en
+producción. El Job nace OFF/dry-run y no tiene Scheduler; recuperación y
+retirement de llaves requieren supervisión. Release Auth permanece retenido.
+
 Efeonce ID es el **autorizador propio** de Efeonce: OAuth 2.1/OIDC servido por Cloud Run `auth-server`
 en `auth.efeonce.org`. Se decidió el 2026-09-03 en lugar de WorkOS ([ADR nativo](../../../docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md))
 y está **en producción desde el 2026-09-04** (release `9100bbd2765d`).

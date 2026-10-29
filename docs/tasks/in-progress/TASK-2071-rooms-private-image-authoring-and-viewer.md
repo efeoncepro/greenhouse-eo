@@ -1,5 +1,15 @@
 # TASK-2071 — Rooms: autoría mínima y lectura de imágenes privadas
 
+## Delta 2026-10-29 — backend de imagen disponible; UI nueva pendiente
+
+El [canary interno del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md)
+acreditó procesamiento y lectura privada de una imagen real por la ruta
+existente. La sesión Rooms conserva conectores para que Claude Design integre
+la nueva UI, aún no entregada al último intercambio. Falta verificar como un
+solo flujo crear sala → cargar/procesar → adjuntar → publicar → invitado, con
+conflicto, revocación y aceptación visual humana. El scaffold anterior y los
+deltas del 25-10 no acreditan esa experiencia nueva.
+
 > Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
 
 ## Delta 2026-10-25 — estado al corte de Codex
@@ -34,7 +44,7 @@ histórico de esta task y no lo rediseña ni lo considera aceptado. Contratos/ba
 - Motion: `docs/ui/motion/TASK-2071-rooms-private-image-authoring-and-viewer-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-26: nuevo diseño e interfaz pertenecen a Claude Design; scaffold histórico conserva referencia y no está aceptado. Backend main e4b2e890, contrato API/DTO, cloud privado y canary físico ya disponibles; Scheduler automático comprobado. Falta entorno de integración aislado con datos/permisos, conectar consumidor same-origin y completar recorrido UI→API→GCS→worker→publicación→lectura con errores/permisos, GVC y aceptación humana. Acceso productivo continúa OFF; Auth retenido en PR.`
+- Status real: `2026-10-29: backend de imagen privada y lectura guest ejercitados en canary del 26-10, cerrado con acceso humano OFF. Scaffold de autoría anterior existe; nueva UI de Claude Design aún sin entrega/SHA ni aceptación. Falta integrarla con conectores y probar flujo completo crear/cargar/procesar/adjuntar/publicar/guest, conflictos, revocación, aislamiento y QA visual.`
 - Rank: `R07A/R08A inmediatamente después del contrato TASK-2070`
 - Domain: `ui|content`
 - Blocked by: `none`

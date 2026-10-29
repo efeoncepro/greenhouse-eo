@@ -1,5 +1,15 @@
 # TASK-2068 — Rooms: invitación, entrada con código y lectura compartida
 
+## Delta 2026-10-29 — canary cerrado; UI nueva pendiente
+
+El [canary conjunto del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md)
+ejercitó una invitación con un correo recibido, código, lectura guest limitada
+de sala e imagen y revocación; cerró con flags de acceso humano OFF. B18 probó
+localmente 51 checks guest sin sesión interna ni SSO. La UI nueva de Claude
+Design aún no se había entregado; falta integrarla y repetir QA/aceptación del
+recorrido completo. El `Status real` siguiente recoge este corte; los números
+de 129/15 checks pertenecen al scaffold anterior.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -17,7 +27,7 @@
 - Motion: `docs/ui/motion/TASK-2068-rooms-invitation-and-guest-experience-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-26: UI histórica OTP/guest/gestión permanece en Rooms main e4b2e890; canary HTTP real ya abrió sala V3 e imagen privada y probó replay/scope/revocación, con un único correo recibido. Flags web/Auth OFF; sala archivada. Claude Design posee nueva interfaz; BFCache real, recorrido mediante esa interfaz, GVC final y aceptación humana siguen pendientes. Playwright53PASS/3skip no cierra esos criterios.`
+- Status real: `2026-10-29: canary interno del 26-10 completó correo único recibido, código, guest, imagen privada y revocación; cerró con acceso humano OFF. B18 local 51 checks PASS sin SSO/sesión interna para guest. El scaffold previo pasó 129 checks de integración y 15 de privacidad; UI nueva de Claude Design aún sin entrega ni aceptación. Falta QA integral del flujo nuevo, recovery y activación estable; no repetir canary por inferencia.`
 - Rank: `TBD`
 - Domain: `ui|identity`
 - Blocked by: `none`
