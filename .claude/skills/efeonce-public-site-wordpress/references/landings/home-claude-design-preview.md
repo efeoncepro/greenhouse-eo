@@ -54,7 +54,8 @@
 - Old Home pages retired 2026-10-29 by operator request («deja solo la que hicimos hoy», `retire-old-homes.php`), all to the
   trash (reversible): `2791` /home-2/ (former Home, legacy backup), `242261` /home/, `246396` /home-prueba/ — each with a
   Yoast 301 to `/` — plus drafts `248857`, `250260` and the QA preview `252177`. `251731` is the only Home page left.
-  Ohio theme demos (`homedemo*-elementor`) are still published and in the sitemap (not Efeonce homes; untouched).
+  The published Ohio theme demos (`21460`, `21466`, `20305`, `18734`, `225984`; `/homedemo{1,8,17,27,35}-elementor/`) were
+  trashed the same day with a 301 to `/` (`retire-ohio-demos.php`); demo drafts `21404` and `243726` remain as drafts.
 - SEO backlog (global, not the Home body): WebSite description = site tagline «Agencia de marketing 360°»; no X account in
   Yoast (`twitter_site`); Slider Revolution `sr7.js` and Font Awesome brands load on the Home without use; field CWV and
   PageSpeed not measured (public PSI quota exhausted 2026-10-29).
