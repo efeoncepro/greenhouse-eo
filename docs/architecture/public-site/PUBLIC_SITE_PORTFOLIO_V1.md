@@ -267,6 +267,9 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
   (`EOP_Render::need_line`, fijo al bajar; la página nunca habla de Efeonce en tercera persona: la autoría queda en el
   JSON-LD como `creator`), a la derecha los datos como ficha técnica numerada con filetes que se dibujan al llegar.
   `content-marketing` usa la misma frase en «Detrás del trabajo». En producción desde el 2026-10-30 (runtime `2997847`).
+- 0.10.3 (runtime `3ea1cec`): el borde del héroe de `content-marketing` es pintura derramada (SVG con filtro goo: borde
+  que ondula, gotas con punta redondeada que se estiran y sueltan gotas, brillo húmedo; proporción fija con `slice`).
+  «Detrás del trabajo» lleva espacio superior cuando sigue a una sección oscura (voz o cifras).
 - Las piezas que un tipo muestra en sus secciones salen de la galería genérica (`EOP_Kinds::taken`).
 - Isotipos oficiales de canal copiados de AXIS (`@efeoncepro/axis-brand-assets`, `assets/platforms/`; Pinterest del set
   `logos` de Iconify) en `EOP_Platforms`; íconos de interfaz de Remix Icon en `EOP_Icons`. Nada dibujado a mano.
