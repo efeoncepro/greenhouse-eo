@@ -139,6 +139,14 @@ Spec de diseño y hallazgos medidos: auditoría del 2026-10-29 (390/768/1440) re
   < 1,2 o más de 3), panel de cada fila del índice y el abanico del hero de la entrada.
 - **Etiqueta de formato** (`.eop-tag`, «9:16», «4:5»…) en cada pieza, arriba a la izquierda; la pausa va arriba a la
   derecha, como botón redondo de 44 px con ícono (el texto queda como nombre accesible).
+- **Página de proyecto como el diseño (0.8.3, construida 2026-10-30, sin desplegar; runtime 3850c44).** Órbita de
+  medida según la línea gráfica (`EOP_Render::measure_svg`, `trajectory.measure`): la esfera parte a las 12 y se detiene
+  en valor × 360°, estela de 50° (nunca antes de la partida), camino recorrido al 60 % y 0,75 × la estela, marca de
+  partida; trazos en unidades del dibujo (un `stroke-dasharray` sobre `pathLength` con `non-scaling-stroke` se partía en
+  guiones). Un acento por página: el de la línea del proyecto (`LINE_ACCENT`, AXIS `lines[].accentOnDark|accentOnLight`,
+  vía `--eop-teal`/`--eop-teal-ink` en la raíz de la entrada); el índice sigue en Growth. Hero: un spot apaisado pasa a
+  franja de cine a todo el ancho (`.eop-film`) y la pila toma tres formatos distintos (`EOP_Render::hero_trio`, la más
+  vertical a toda altura a la derecha). La esfera del título va con su última palabra (`with_sphere`).
 - **Fila de marca = índice de campañas (0.8.2, diseño A aprobado en el canvas el 2026-10-30; en producción el
   mismo día, runtime dfccd4c, respaldo `/tmp/eo-portfolio-before-20261030-140245.tar`).** La marca aparece una vez (`.eop-r__bhead`) y sus proyectos son subfilas (`.eop-r__sub`, que también
   es `.eop-r__toggle`): número, título, necesidad, cifra con su fuente, dos miniaturas y su propio panel de piezas.
