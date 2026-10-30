@@ -280,7 +280,14 @@ Los roles `web`, `section` y `ugc` (sitios, partes de una página, videos de cre
   pasos. Ambos describen el trabajo de Efeonce: salen con `pieces`.
 - No exige `metrics`. Si el cliente autoriza sus cifras, van en `results`/`measure` o en `search` con el alcance `metrics`.
 - Cada capítulo puede llevar `swatch` (#hex) para teñir su fila; el proyecto puede llevar `links.liveWork`.
-- Caso de referencia: Berel (`berel-pitaya-color-del-ano-2026`, revisión 2, 2026-10-30).
+- Caso de referencia: Berel (`berel-pitaya-color-del-ano-2026`, 2026-10-30).
+
+### Servicios con su página de venta
+
+- `links.relatedServices` lista los slugs de las páginas del sitio donde se vende cada servicio del proyecto (por
+  ejemplo `agencia-creativa`, `redes-sociales`, `servicio-marketing-de-contenidos`). «Detrás del trabajo» los muestra
+  como enlaces con el título de la página; un slug que no es una página publicada no aparece.
+- Todo proyecto nuevo debe declararlos: sin ellos, los servicios quedan como texto y el caso no conecta con la venta.
 
 ### La guarda de plantilla
 

@@ -36,6 +36,9 @@ canal (reel, historia, post, pin) y sus banners. Después vienen la producción 
 «Detrás del trabajo» suma el enlace al trabajo publicado. El primer caso es Berel. (Versión 0.10.0, en el sitio desde el
 2026-10-30.)
 
+En todos los proyectos, los servicios de «Detrás del trabajo» llevan a la página donde se vende cada uno (agencia
+creativa, redes sociales, sitios web, performance, marketing de contenidos, SEO). (Versión 0.10.1.)
+
 ## Cómo se guarda un proyecto
 
 - Cada proyecto es una ficha con campos fijos. El sistema la revisa antes de guardarla: si falta algo obligatorio, no

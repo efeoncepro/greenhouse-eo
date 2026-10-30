@@ -258,6 +258,11 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
   explorador de campañas es el archivo. Generales en 0.10.0: `chapters[].swatch` (#hex, color de la fila), `links.liveWork`
   {`url`, `label`} («El trabajo publicado» en «Detrás del trabajo»), un solo mercado se muestra como «MERCADO»; el admin
   conserva lo que un capítulo dice de sí, `swatch`, `liveWork` y `testimonial.highlight`.
+- 0.10.1: «Detrás del trabajo» enlaza los servicios a sus páginas de venta desde `links.relatedServices` (slugs de
+  páginas; `EOP_Render::service_pages` resuelve sólo páginas publicadas, por slug); sin ellos queda el texto del
+  catálogo. Los 16 proyectos publicados declaran sus páginas desde el 2026-10-30. `content-marketing` no lleva ficha ni
+  pasos (`EOP_Render::has_record`): va del héroe a sus artículos, muestra las cifras después de las campañas y dice en
+  una frase, desde su `need`, qué hizo Efeonce para quién.
 - Las piezas que un tipo muestra en sus secciones salen de la galería genérica (`EOP_Kinds::taken`).
 - Isotipos oficiales de canal copiados de AXIS (`@efeoncepro/axis-brand-assets`, `assets/platforms/`; Pinterest del set
   `logos` de Iconify) en `EOP_Platforms`; íconos de interfaz de Remix Icon en `EOP_Icons`. Nada dibujado a mano.

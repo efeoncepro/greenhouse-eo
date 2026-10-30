@@ -47,7 +47,9 @@ are projected only with `metrics`; contents only with `pieces`.
   them yet — edit them through the CLI.
 - **Brand marks:** channel logos are the AXIS isotypes compiled into `EOP_Platforms` (Pinterest from Iconify `logos`);
   UI icons (X action bar, players) are Remix paths in `EOP_Icons`. Never draw a brand mark or icon by hand.
-- **Deploy state:** 0.10.0 is live since 2026-10-30 (runtime `d27ab72`): kind `content-marketing` (Berel, revision 2:
+- **Deploy state:** 0.10.1 is live since 2026-10-30 (runtime `55a2738`): services in «Detrás del trabajo» link to
+  their landing pages from `links.relatedServices` (page slugs; all 16 published projects declare them — every new
+  project must too); `content-marketing` has no record/steps (`has_record`). 0.10.0 (runtime `d27ab72`): kind `content-marketing` (Berel, revision 2:
   hero of wet paint flooded by per-article swatches through `--eop-paint`, article with its pieces in channel frames,
   production odometers, route), `links.liveWork`, single market in «Detrás del trabajo». Before it, 0.9.1 (runtime `7106cc4`): the testimonial is a dark scene (`voice`; optional
   `testimonial.highlight` must be the client's own words inside the quote; client logo from `client.logoMediaId`, negative
