@@ -40,7 +40,7 @@ documento validado, un solo servicio de guardado y tres puertas, render del serv
   rechazados.
 - Reglas de conjunto: imagen con `mediaId` y sin campos de video; video con `src` y `poster` y sin `mediaId`; voz exige
   `captionsVtt`; ids de medio únicos; `hero.mediaRef` existe; `percent` entre 0 y 100; `services` en
-  `schema/services.v1.json` (las 6 líneas de negocio de Efeonce según `EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` §3: Creative Services, Digital Services & Engineering, RevOps & CRM, Media & Distribution, Growth Strategy & Measurement y Channel & Commerce; desde 0.10.6, nunca product brands como Wave, Globe/Creative Studio o Reach, ni ofertas); `src`, `poster` y `captionsVtt` sólo bajo los prefijos de
+  `schema/services.v1.json` (9 líneas de `docs/services/`); `src`, `poster` y `captionsVtt` sólo bajo los prefijos de
   `schema/media-hosts.v1.json` (bucket público de AXIS, `MEDIA_HOST_NOT_ALLOWED`). Los mensajes `REQUIRED` nombran el
   campo en castellano (`EOP_Validator::NAMES`).
 - Tipos de pieza (`EOP_Validator::ROLE_FIELDS`): una pieza sin `role` es `campaign` y un proyecto sin `kind` es
