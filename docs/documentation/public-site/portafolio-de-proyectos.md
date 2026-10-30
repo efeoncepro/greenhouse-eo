@@ -39,6 +39,10 @@ canal (reel, historia, post, pin) y sus banners. Después vienen la producción 
 En todos los proyectos, los servicios de «Detrás del trabajo» llevan a la página donde se vende cada uno (agencia
 creativa, redes sociales, sitios web, performance, marketing de contenidos, SEO). (Versión 0.10.1.)
 
+La ficha de cada proyecto abre con lo que el cliente necesitaba («Sky Airline necesitaba lanzar campañas…») y al lado
+muestra sus datos como una ficha técnica numerada. La página habla en primera persona: nunca «Efeonce hizo…».
+(Versión 0.10.2.)
+
 ## Cómo se guarda un proyecto
 
 - Cada proyecto es una ficha con campos fijos. El sistema la revisa antes de guardarla: si falta algo obligatorio, no

@@ -47,7 +47,9 @@ are projected only with `metrics`; contents only with `pieces`.
   them yet — edit them through the CLI.
 - **Brand marks:** channel logos are the AXIS isotypes compiled into `EOP_Platforms` (Pinterest from Iconify `logos`);
   UI icons (X action bar, players) are Remix paths in `EOP_Icons`. Never draw a brand mark or icon by hand.
-- **Deploy state:** 0.10.1 is live since 2026-10-30 (runtime `55a2738`): services in «Detrás del trabajo» link to
+- **Deploy state:** 0.10.2 is live since 2026-10-30 (runtime `2997847`): the record is an editorial spread headed
+  «{Cliente} necesitaba {need}» (`need_line`) — write `need` to follow «necesitaba», and never speak of Efeonce in the
+  third person on the page (first person plural). 0.10.1 (runtime `55a2738`): services in «Detrás del trabajo» link to
   their landing pages from `links.relatedServices` (page slugs; all 16 published projects declare them — every new
   project must too); `content-marketing` has no record/steps (`has_record`). 0.10.0 (runtime `d27ab72`): kind `content-marketing` (Berel, revision 2:
   hero of wet paint flooded by per-article swatches through `--eop-paint`, article with its pieces in channel frames,

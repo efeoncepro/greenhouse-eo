@@ -263,6 +263,10 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
   catálogo. Los 16 proyectos publicados declaran sus páginas desde el 2026-10-30. `content-marketing` no lleva ficha ni
   pasos (`EOP_Render::has_record`): va del héroe a sus artículos, muestra las cifras después de las campañas y dice en
   una frase, desde su `need`, qué hizo Efeonce para quién.
+- 0.10.2: la ficha es un bloque editorial en dos columnas: a la izquierda el titular «{Cliente} necesitaba {need}»
+  (`EOP_Render::need_line`, fijo al bajar; la página nunca habla de Efeonce en tercera persona: la autoría queda en el
+  JSON-LD como `creator`), a la derecha los datos como ficha técnica numerada con filetes que se dibujan al llegar.
+  `content-marketing` usa la misma frase en «Detrás del trabajo». En producción desde el 2026-10-30 (runtime `2997847`).
 - Las piezas que un tipo muestra en sus secciones salen de la galería genérica (`EOP_Kinds::taken`).
 - Isotipos oficiales de canal copiados de AXIS (`@efeoncepro/axis-brand-assets`, `assets/platforms/`; Pinterest del set
   `logos` de Iconify) en `EOP_Platforms`; íconos de interfaz de Remix Icon en `EOP_Icons`. Nada dibujado a mano.

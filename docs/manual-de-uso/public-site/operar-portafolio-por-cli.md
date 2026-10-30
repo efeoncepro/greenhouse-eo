@@ -289,6 +289,12 @@ Los roles `web`, `section` y `ugc` (sitios, partes de una página, videos de cre
   como enlaces con el título de la página; un slug que no es una página publicada no aparece.
 - Todo proyecto nuevo debe declararlos: sin ellos, los servicios quedan como texto y el caso no conecta con la venta.
 
+### Escribir `need`
+
+- La ficha lo muestra como «{Cliente} necesitaba {need}»: escríbelo para que siga a «necesitaba» (una frase nominal o un
+  infinitivo, sin punto final), por ejemplo «Lanzar campañas comerciales en días sin descuidar la marca».
+- En los textos del proyecto habla en primera persona plural; nunca «Efeonce hizo…».
+
 ### La guarda de plantilla
 
 Las plantillas traen marcadores para que nada de relleno llegue al sitio. Cuentan como pendientes:
