@@ -161,6 +161,42 @@ Registra en el workspace interno los requisitos de la pantalla de cada bid y qu�
 facturación transfronteriza, representación local, documento obligatorio, aprobación de precio o margen, el estado
 correcto es `operativamente bloqueado` y no se fuerza un envío.
 
+## Carga, exportación y envío: Mattis GRD-1555 (enviada 30/10/2026 17:11)
+
+Medido en la oferta 7586459 (Mattis / Grupo Réditos). Expediente:
+[mattis-branding-marketing-inmobiliario-1555](../../../docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md).
+Complementa el runbook de GRD-1541 (`platform-bids-and-administrative-package.md` → «Postular en Wherex»).
+
+- **Obligatorios con `file_upload`.** Los «Cargar archivo» de los documentos requeridos son
+  `<input type=file ngf-select>` dentro de un `<label>`; `file_upload` por ref falla («not a file input: button»).
+  Funciona: crear por JS un `<input type=file>` auxiliar con `aria-label`, subir a ese con `file_upload` y, en su
+  `change`, copiar el archivo al input original con `DataTransfer` +
+  `dispatchEvent(new Event('change', {bubbles: true}))`. Comprobar después que la fila correcta quedó cargada.
+- **Opcionales.** `#admFilesInput`, `#tecFilesInput` y `#ecoFilesInput` aceptan `file_upload` directo, pero el ref
+  cambia tras cada carga: volver a `find` antes de la siguiente. `angular.element().scope()` no sirve (debugInfo
+  apagado).
+- **Peso.** `file_upload` admite ≤ 10 MB por llamada, menos que el límite del portal. La propuesta de 12 MB se rehízo
+  con imágenes reescaladas (1400 px, JPEG q72) → 6 MB. Tener lista la versión liviana antes de la carga.
+- **Formato predefinido que no baja.** El de «Estructura de la campaña» abrió una pestaña en blanco; se subió un PDF A4
+  propio de 2 páginas. Registrar la falla en el expediente.
+- **Lienzo de Claude Design (x-dc) a PDF fiel.** Renderizador local con Playwright que desenvuelve `<x-dc>`, resuelve
+  `/_blob/<id>` a archivos locales (cada asset se baja con Artifact `read` y `path=<id>`, uno a uno: `paths` no acepta
+  ids), evalúa `renderVals()` y monta los `x-import` con React 18 UMD + `ds/efeonceorbit/components/bundle.js`
+  (`window.EfeonceOrbit`); una página PDF por lámina y merge con pdf-lib, con texto vectorial.
+- **Cotización A4 en COP.** `node scripts/documents/render-cotizacion-a4.mjs` v2; el locale es-CL rinde
+  «COP 120.000.000» sin decimales. `taxStatus: not_applicable` + `pricing.taxLabel: "IVA en la factura de Efeonce"` y
+  los 12 hitos en `paymentSchedule`.
+- **RFP Excel del comprador.** Editar el XML de la hoja dentro del zip (celdas `inlineStr` y un estilo nuevo con wrap)
+  para no perder validaciones ni tablas; openpyxl las borra al guardar.
+- **Precio para ganar.** El operador puede bajar bajo el piso de 45 % cuando la capacidad (en el caso, diseñadores)
+  es costo hundido. Es decisión suya, no del agente: se registra como excepción comercial en el control interno, con
+  el margen contra costo completo (en el caso ≈ 17 %, desde COP 190.150.000 del Cotizador V3 a COP 120.000.000).
+- **Cláusula tributaria Chile–Colombia.** Efeonce Group SpA factura desde Chile. Retenciones según el Convenio
+  Chile–Colombia para evitar la doble imposición (Ley 1261 de 2008), art. 12: asistencia técnica, servicios técnicos y
+  consultoría se tratan como regalías, con retención máxima de 10 % si se presenta certificado de residencia fiscal
+  del SII (pedirlo antes de facturar). El IVA del servicio importado lo liquida el comprador. Declararlo en la oferta
+  económica; no es asesoría tributaria, y el certificado es un pendiente hasta tenerlo.
+
 ## De candidata a expediente y pipeline CRM
 
 Cuando el operador identifique una o más candidatas, el radar no termina con el dictamen. Ejecuta esta

@@ -952,3 +952,15 @@ Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md`). Recetas:
   `src/lib/artifact-composer/catalogs/deck-axis/assets/clients/` mapeando los píxeles opacos a navy `#023c70` (claros →
   blanco, medios → navy medio). Mirar cada logo al 100 %: la regla del isotipo dentro de un cuadrado de color
   (`deck-studio`, brochure Servicios web) sigue vigente.
+
+## 2026-10-30 — Propuesta Mattis (Grupo Réditos, Wherex N.º 1555): 45 láminas y muestra ficticia TEMPO
+
+- **Órbita centrada a mano en las láminas de sección.** Síntoma: el `EfeonceOrbit.Progress` grande, centrado a mano,
+  dejó el arco cruzando el número de la sección; el operador lo rechazó («así no funciona la órbita»). Regla: las
+  láminas de sección se construyen con `deckSlideHtml('section', { sections, current, question, answer })` de
+  `@efeoncepro/axis-graphic-line`; nunca se recompone la órbita de sección con `Progress`.
+- **Valla/DOOH como lámina plana.** Regla: una pieza de vía pública sigue sus reglas (≤ 4 mensajes legibles en 3 s,
+  sin UI de vidrio ni pills) y se muestra montada en una foto de contexto (pantalla en blanco generada + homografía
+  `matrix3d`), no como un rectángulo suelto.
+- **Plantas de venta dibujadas como cajas etiquetadas.** Síntoma: rechazo del operador. Regla: una planta se dibuja
+  como plano arquitectónico: muros con grosor, puertas con giro, ventanas, mobiliario, cotas, escala y norte.

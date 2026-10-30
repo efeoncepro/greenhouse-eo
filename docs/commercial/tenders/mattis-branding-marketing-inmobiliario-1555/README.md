@@ -1,7 +1,15 @@
 # Mattis — branding y marketing inmobiliario — GRD-1555
 
 Alta autorizada por Julio y verificada el 23/10/2026. RFP privado Wherex, oferta 7586459.
-Estado: entrada administrativa / propuesta v1 preparada en Markdown, pendiente de validación y GO. Sin propuesta emitida.
+
+## Estado al 30 de octubre de 2026 — oferta ENVIADA en Wherex
+
+**Enviada el 30/10/2026 a las 17:11** desde la cuenta de Julio Reyes, con su OK explícito en el chat (aceptó bases
+del comprador y términos de Wherex); estado Wherex «Enviada». Precio **COP 120.000.000 netos de IVA**, por decisión
+de Julio para ganar, bajo el piso de margen. Pendientes: certificado de residencia fiscal del SII, declaración de
+conflicto de intereses sin adjuntar, claims SSilva/Berel/«+85 expertos» y permiso de logos de partners. Detalle en el
+[delta del 30/10](#delta-2026-10-30--oferta-enviada-en-wherex). Las secciones siguientes conservan el historial del
+23/10; donde digan «sin propuesta emitida» o «pendiente de GO», describen ese momento.
 
 ## Propuesta v1 para Claude Design — 23/10/2026
 
@@ -118,3 +126,68 @@ Claude/Codex: licitaciones, deck, informe y pricing. Manuales, documentación fu
 conservan el flujo MD para Claude Design, la separación de audiencias y el costo objetivo V3.
 [Auditoría, alcance y verificaciones](../../../audits/commercial/2026-10-23-mattis-markdown-docs-skills.md).
 No se aprueban por este cierre precio, alcance, impuestos o capacidad; sin nuevos cambios CRM ni envíos.
+
+## Delta 2026-10-30 — oferta ENVIADA en Wherex
+
+**Proceso.** Comprador Mattis Inmobiliaria, filial de Grupo Réditos (Medellín, Colombia). Facturación a COMPAÑIA DE
+SERVICIOS INMOBILIARIOS Y EMPRESARIALES S.A.S., NIT/RUT 9005549987. Wherex «Licitación de una ronda de servicios»,
+N.º 1555 (GRD-1555), oferta `proposal/get/7586459`. Publicada 23/10/2026 17:44; cierre 30/10/2026 18:00 (la UI no
+muestra zona horaria). Servicio «AGENCIA DIGITAL Y PUBLICITARIA»: branding y mercadeo de un proyecto inmobiliario,
+12 meses; pago a 30 días corridos. Efeonce hizo 2 preguntas el 23/10 y otros proveedores pidieron ampliar el plazo;
+**ninguna fue respondida** al cierre.
+
+**Envío.** 30/10/2026 17:11, cuenta de Julio Reyes, con su OK explícito; estado «Enviada». Comisión Wherex si se
+adjudica: 52 UF (dato de la sesión GRD-1552).
+
+**Precio y decisión.** **COP 120.000.000 netos de IVA** (≈ USD 38.100 con TRM 3.148,02 del 28/10/2026): mes 1
+COP 13.000.000 · mes 2 COP 15.000.000 · 10 ciclos × COP 9.200.000 (meses 3–12). Validez 60 días; incluye entrega en
+destino. Julio bajó el precio el 30/10 desde COP 190.150.000 (Cotizador V3, margen modelado 47,7 %) a 120 millones
+«para ganar», con los diseñadores como costo hundido. Margen contra costo completo ≈ 17 %, bajo el piso de 45 %:
+**excepción comercial de Julio**, registrada en `Propuesta para Claude Design/CONTROL-PROPUESTA-INTERNO.md`.
+
+**Tributación declarada.** Efeonce Group SpA factura desde Chile. Retenciones según el Convenio Chile–Colombia para
+evitar la doble imposición (Ley 1261 de 2008), art. 12: asistencia técnica, servicios técnicos y consultoría se tratan
+como regalías, con retención máxima de 10 % presentando certificado de residencia fiscal del SII (**pendiente
+pedirlo**). El IVA del servicio importado lo liquida el comprador.
+
+**Archivos cargados.**
+
+| Casillero | Documento |
+| --- | --- |
+| Obligatorio · Cámara de Comercio | Certificado de vigencia del 19/10/2026 + estatuto actualizado (equivalentes chilenos) |
+| Obligatorio · RUT completo | e-RUT del SII |
+| Obligatorio · Estructura de la campaña | PDF A4 propio de 2 páginas; el «formato predefinido» del comprador no se pudo descargar (abre una pestaña en blanco) |
+| Opcional · técnico | Propuesta técnica PDF, 45 páginas, versión liviana de 6 MB |
+| Opcional · técnico | RFP Excel diligenciado: ítems 1, 2, 3, 8 y 9 en «CUMPLE» con páginas |
+| Opcional · económico | Oferta económica A4, 6 páginas |
+
+**No se adjuntó** la declaración de conflicto de intereses: falta la firma y la respuesta SÍ/NO de Julio para esta
+licitación. Queda prellenada (Julio Cesar Reyes Rangel, RUT 26.928.468-4, Gerente General).
+
+**Propuesta (Claude Design).** [Lienzo de 45 láminas](https://claude.ai/artifact/LpgXxhKep84zVhsNHg7THM), línea gráfica
+«La órbita», Growth. Muestra de trabajo ficticia **TEMPO · Envigado** firmada por Mattis
+([lienzo](https://claude.ai/artifact/KvJR1jtdo667Wuvp9ZUpg8)): identidad, 17 renders IA (gpt-image-2.5-sunburst), KV,
+post, story, carrusel, pendón, ficha con plantas arquitectónicas SVG, correo, WhatsApp, valla DOOH montada en foto de
+contexto, landing escritorio/móvil, plan de pagos, mapa, avance de obra y embudo de venta; siempre rotulada «muestra
+ficticia · imágenes generadas con IA». Láminas sumadas desde material aprobado: casos SSilva (propuesta Assetplan),
+Sky y Berel (brochure 360), equipo «Expertos multidisciplinarios» (deck Contenidos), stack y partners (brochure 360) y
+«Vívelo» (`content-day` live-progress recompuesto).
+
+**Dónde vive.** OneDrive, raíz `Alineación/4. Comercial/Licitaciones/Grupo Reditos/14. Agencia digital Spot - Mattis/`:
+
+- `Entrega Wherex/`: 00 LEEME checklist, 01 propuesta, 01b liviana, 02 oferta económica, 03 RFP diligenciado,
+  04 declaración prellenada, 05 estructura, 06 Cámara, 07 e-RUT, 08 comprobante de envío y `_fuentes/`.
+- `Propuesta para Claude Design/`: master MD, `oferta-economica.md`, `CONTROL-PROPUESTA-INTERNO.md` (interno),
+  `MUESTRA-TEMPO-CAMPANA-FICTICIA.md` y `MATRIZ-REQUISITOS-TECNICOS-PAGINAS.md`.
+- Generaciones IA: `ai-generations/2026-10-30_mattis-propuesta/` en este repo.
+
+**Pendientes.**
+
+- Pedir el certificado de residencia fiscal del SII (retención máxima de 10 %).
+- Declaración de conflicto de intereses: firma y respuesta SÍ/NO de Julio; no se adjuntó.
+- Claims: SSilva va con nombre aunque `docs/context/01_quienes-somos.md` dice citarlo sólo anonimizado (decisión
+  abierta de Julio); «12 meses» de Berel sin confirmar; «+85 expertos» sin fuente (otro brochure dice +89).
+- Permiso de uso de logos de partners (TASK-1937).
+
+Lecciones operativas reutilizables: skill `greenhouse-public-private-tenders` → `wherex-radar-chrome-playwright.md`
+(«Carga, exportación y envío: Mattis GRD-1555») y skill `efeonce-graphic-line` → `references/lessons.md` (2026-10-30).

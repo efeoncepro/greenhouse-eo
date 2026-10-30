@@ -2,6 +2,13 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-30 — Licitaciones: Mattis GRD-1555 enviada y lecciones de carga en Wherex
+
+[Oferta a Mattis (Grupo Réditos)](docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md) enviada
+en Wherex el 30/10 por COP 120 millones. La skill de licitaciones suma carga de archivos, exportación de lienzos a PDF,
+cotización en COP, RFP Excel y cláusula tributaria Chile–Colombia; «La órbita» suma secciones, DOOH y plantas de venta.
+
+
 ## 2026-10-29 — Prospección: búsquedas Sales Navigator multimercado
 
 [44 búsquedas persistidas](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md),

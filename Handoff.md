@@ -1,5 +1,15 @@
 # Handoff
 
+## 2026-10-30 — Mattis GRD-1555: oferta enviada en Wherex
+
+[Expediente](docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md): enviada 30/10 17:11 por
+Julio (OK explícito), COP 120.000.000 netos de IVA; excepción de margen ≈ 17 % decidida por Julio, bajo el piso de 45 %.
+Pendientes: certificado de residencia fiscal SII (retención máx. 10 %, convenio Chile–Colombia art. 12), declaración de
+conflicto de intereses sin adjuntar, claims SSilva/Berel/«+85» y permiso de logos (TASK-1937). Lecciones en skills
+espejo: Wherex (`wherex-radar-chrome-playwright.md`) y «La órbita» (`lessons.md`). HubSpot: deal 66672959873 en
+«Presentación de soluciones», COP 120.000.000, nota 120053981805. Sin push.
+
+
 ## 2026-10-29 — Sales Navigator: búsquedas en cuatro mercados hispanos
 
 [Inventario](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md): **24 búsquedas de cuentas/20 de personas**,

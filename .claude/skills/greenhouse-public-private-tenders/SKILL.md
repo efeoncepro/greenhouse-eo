@@ -96,6 +96,8 @@ Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [pol
 ├─ Promoción CRM común + priorización de cartera .............. crm-portfolio-operating-model.md
 ├─ Señal explícita/histórica, comprador y abordaje por cohorte .. prospect-intent-segmentation.md
 ├─ Radar Wherex con CLI Playwright protegida .................. wherex-radar-chrome-playwright.md
+├─ Cargar archivos y enviar en Wherex, lienzo x-dc a PDF,
+│  cláusula tributaria Chile–Colombia (Mattis 1555) ........... wherex-radar-chrome-playwright.md
 └─ OPERAR/EVOLUCIONAR el runtime SHIPPED (Proposal aggregate,
    render jobs, artifact-worker, agentes propose→confirm) ..... proposal-studio-runtime.md
 ```
