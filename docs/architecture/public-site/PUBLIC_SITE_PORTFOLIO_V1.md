@@ -148,7 +148,8 @@ Spec de diseño y hallazgos medidos: auditoría del 2026-10-29 (390/768/1440) re
   `madeWithAi` declara «Producido con IA» sólo en esa campaña, porque el rol `ai` marcaría toda la entrada). Primer
   caso: Sky Airline, revisión 2 («La agencia de Sky, campaña tras campaña», cinco campañas con piezas de OneDrive:
   videos al bucket de AXIS, imágenes con `upload-portfolio-images.php`). «Fiestas Patrias Perú» despublicada el mismo
-  día; su 301 a Sky (`redirect-retired-entry.php`) quedó planificado y pendiente del OK del operador.
+  día; su 301 a Sky (`redirect-retired-entry.php`) aplicado el 2026-10-30: la URL retirada y 4 URL viejas de Ohio que
+  pasaban por ella llegan a Sky en un solo salto (verificado: 301 → 200).
 - **Página de proyecto como el diseño (0.8.3, en producción desde el 2026-10-30; runtime 3850c44, respaldo
   `/tmp/eo-portfolio-before-20261030-143232.tar`).** Órbita de
   medida según la línea gráfica (`EOP_Render::measure_svg`, `trajectory.measure`): la esfera parte a las 12 y se detiene
