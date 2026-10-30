@@ -272,7 +272,10 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
   «Detrás del trabajo» lleva espacio superior cuando sigue a una sección oscura (voz o cifras).
 - 0.10.4–0.10.5: se retira el goteo; el héroe de `content-marketing` termina limpio, como el tablero aprobado.
 - 0.10.6 (runtime `194e1e8`): `services` son categorías de servicio dentro de las cinco líneas (ver §3); Berel quedó en
-  Engine con Search Visibility 360 y Creative Services, Sky en Brand con Creative Services.
+  Engine con Search Visibility 360 y Creative Services, Sky en Brand con Creative Services. Ojo: un documento guardado con
+  una clave que ya no está en el catálogo deja de renderizarse; migrar las entradas antes de retirar una clave.
+- 0.10.7 (runtime `e8111e1`): las filas de campaña con `swatch` siguen su tablero (nombre, color e IA en una línea;
+  fecha y resumen en una; panel sobre un lavado de su color, sin tinte gris en la fila abierta).
 - Las piezas que un tipo muestra en sus secciones salen de la galería genérica (`EOP_Kinds::taken`).
 - Isotipos oficiales de canal copiados de AXIS (`@efeoncepro/axis-brand-assets`, `assets/platforms/`; Pinterest del set
   `logos` de Iconify) en `EOP_Platforms`; íconos de interfaz de Remix Icon en `EOP_Icons`. Nada dibujado a mano.
