@@ -212,8 +212,9 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
 
 ## 8. Pruebas y despliegue
 
-- Estado: 0.7.1 en producción; 0.8.0 construida (runtime c6e1734, paquete en `tmp/portfolio-plugin-release/`) y sin
-  desplegar hasta el OK del operador.
+- Estado: 0.8.0 en producción desde el 2026-10-30 (runtime c6e1734, paquete sha256 `f0553b87…`, 23 archivos;
+  respaldo previo en el servidor `/tmp/eo-portfolio-before-20261030-121629.tar`). Verificado: el sitio sirve
+  `?ver=0.8.0`, las 17 entradas responden 200 sin errores PHP y el validador vivo acepta los cuatro tipos nuevos.
 
 - `php tests/eo-portfolio.test.php` (498 comprobaciones en PHP puro sobre 8 fixtures, uno por tipo) y
   `tests/playground/run-eo-portfolio.sh` (53 en Playground + 22 por WP-CLI + 33 del admin + 64 del render, con la

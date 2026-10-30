@@ -5,7 +5,7 @@ gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_po
 
 ## State (2026-10-30)
 
-- Plugin `eo-portfolio` v0.8.0 **built, deploy pending operator OK** (runtime c6e1734; v0.7.1 live): admin, piece roles, public pages, video, phone/tablet
+- Plugin `eo-portfolio` v0.8.0 **live since 2026-10-30** (runtime c6e1734): admin, piece roles, public pages, video, phone/tablet
   layer (rails, sticky filter bar, dock), SEO layer `EOP_Seo` (meta, Yoast graph merge, canonical 301s, sitemap images)
   and `EOP_Agents` (Abilities + WebMCP, read-only, **off**: `eo_portfolio_agent_tools` = `0`).
 - `eo_portfolio_enabled` = `1`; **17 projects published**: the 15 that were live under Ohio (operator approval
@@ -46,7 +46,7 @@ are projected only with `metrics`; contents only with `pieces`.
   them yet — edit them through the CLI.
 - **Brand marks:** channel logos are the AXIS isotypes compiled into `EOP_Platforms` (Pinterest from Iconify `logos`);
   UI icons (X action bar, players) are Remix paths in `EOP_Icons`. Never draw a brand mark or icon by hand.
-- **Deploy state:** 0.7.1 is live; 0.8.0 is built (runtime `c6e1734`) and waits for the operator's OK. After any code
+- **Deploy state:** 0.8.0 is live since 2026-10-30 (runtime `c6e1734`). After any code
   deploy run `scripts/public-website/eo-portfolio/purge-portfolio-cache.php` (the deploy does not purge the page cache)
   and verify the existing entries are unchanged (0.8.0 changed the hero markup and chapters).
 - Step-by-step CLI manual: `docs/manual-de-uso/public-site/operar-portafolio-por-cli.md`.

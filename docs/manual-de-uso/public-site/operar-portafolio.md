@@ -16,9 +16,9 @@ con `pnpm public-website:portfolio`. Cada proyecto es un documento `portfolio-en
 formato real. La CLI usa el mismo servicio de guardado que la pantalla del admin y que `wp eo-portfolio`: no tiene
 reglas propias.
 
-Estado al 2026-10-30: plugin **0.7.1** en producción con 17 proyectos publicados, portada y entradas públicas en
-`/portafolio/`. La **0.8.0** (tipos social, audiovisual, producción con IA y SEO/contenidos) está construida y espera el
-OK del operador para desplegarse; hasta entonces el sitio rechaza esos tipos.
+Estado al 2026-10-30: plugin **0.8.0** en producción con 17 proyectos publicados, portada y entradas públicas en
+`/portafolio/`, y los tipos social, audiovisual, producción con IA y SEO/contenidos disponibles (aún sin proyectos
+reales cargados de esos tipos).
 
 Este manual cubre el admin, los lotes, el interruptor y el despliegue. La referencia completa de la CLI (todos los
 comandos, recetas por tipo, plantillas, Playground local y scripts de migración) está en

@@ -7,7 +7,7 @@
 > - Diseño: canvas «Portafolio Efeonce — concepto», página «EO Portfolio»,
 >   [claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm](https://claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm).
 
-## Delta 2026-10-30 — páginas por tipo de proyecto (plugin 0.8.0, sin desplegar)
+## Delta 2026-10-30 — páginas por tipo de proyecto (plugin 0.8.0, en producción desde el 2026-10-30)
 
 La entrada (`E*`) suma secciones según `kind`, aprobadas en el canvas (página «eo», «Plantillas por tipo de
 proyecto»). Construidas y probadas en local a 1440 y 390; despliegue pendiente del OK del operador (en producción, 0.7.1).

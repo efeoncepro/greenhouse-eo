@@ -106,7 +106,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `17 proyectos publicados y todos los 301 aplicados el 2026-10-30 (plugin 0.7.1 en producción); 0.8.0 con tipos de proyecto construida y pendiente del OK del operador para desplegarse; falta desactivar Ohio Portfolio desde el 2026-11-29`
+- Status real: `17 proyectos publicados y todos los 301 aplicados el 2026-10-30 ; plugin 0.8.0 con tipos de proyecto en producción desde el mismo día (verificado: 17 entradas 200, assets 0.8.0, validador vivo acepta los tipos nuevos); falta desactivar Ohio Portfolio desde el 2026-11-29`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -492,7 +492,7 @@ Los slugs nuevos corrigen los heredados: `lifestyle-app-elementor` → `eusari`,
 
 ## Follow-ups
 
-- Desplegar 0.8.0 con OK del operador y cargar el primer proyecto real de cada tipo nuevo (social, audiovisual,
+- Cargar el primer proyecto real de cada tipo nuevo (social, audiovisual,
   producción con IA, SEO y contenidos).
 - Campos del admin para `specs`, `ai`, `search` y los roles nuevos (hoy se editan por la CLI; el admin los conserva).
 - Contrato `efeonce.portfolio-entry` en AXIS cuando exista un segundo consumidor (Think o el sitio en Astro).

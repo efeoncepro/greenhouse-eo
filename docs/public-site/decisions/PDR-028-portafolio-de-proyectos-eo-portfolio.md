@@ -28,8 +28,8 @@
 - Los invariantes de §3 se extienden, no se relajan: el rodaje exige la referencia del consentimiento de quienes
   aparecen y esa referencia nunca se proyecta; la declaración de IA (`ai`) sale siempre, sin depender del alcance; las
   cifras de búsqueda siguen al alcance `metrics` y un `seo-content` no se publica sin él.
-- Estado: plugin 0.8.0 construido (runtime c6e1734), despliegue pendiente del OK del operador; en producción sigue la
-  0.7.1. Detalle técnico en la arquitectura §7.3; operación por la CLI (`kinds`, `new <slug> --kind <tipo>`).
+- Estado: plugin 0.8.0 (runtime c6e1734) en producción desde el 2026-10-30; aún sin proyectos reales de los tipos
+  nuevos. Detalle técnico en la arquitectura §7.3; operación por la CLI (`kinds`, `new <slug> --kind <tipo>`).
 
 ## Contexto
 

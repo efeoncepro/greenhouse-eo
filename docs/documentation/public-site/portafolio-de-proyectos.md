@@ -55,9 +55,8 @@ del tema Ohio.
 
 ## Páginas a la medida de cada tipo
 
-> **Estado:** construidas y probadas en la versión 0.8.0 del plugin, que todavía **no está en el sitio**: su
-> instalación espera el visto bueno del operador. Hoy el sitio corre la 0.7.1 y aún no hay proyectos reales cargados
-> de estos tipos.
+> **Estado:** en el sitio desde el 2026-10-30 (plugin 0.8.0). Todavía no hay proyectos reales cargados de estos
+> tipos: los 17 publicados son de campaña o de sitio web.
 
 | Tipo | Qué muestra la página | Qué necesita la ficha |
 |---|---|---|

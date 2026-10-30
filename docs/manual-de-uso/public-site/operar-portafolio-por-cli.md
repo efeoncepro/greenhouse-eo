@@ -21,11 +21,10 @@ migración desde Ohio.
 
 **Estado al 2026-10-30:**
 
-- En producción corre el plugin **0.7.1**, con 17 proyectos publicados.
-- La **0.8.0** (tipos social, audiovisual, producción con IA y SEO/contenidos) está construida y probada en el repo del
-  runtime, **pendiente del OK del operador para desplegarse**. Hasta ese despliegue el sitio vivo rechaza esos tipos:
-  sus documentos validan en local (la CLI usa el validador del repo del runtime, que ya es 0.8.0), pero el sitio
-  todavía no conoce `kind: "social"`, `role: "post"`, `channel`, etc.: `validate <slug> --remote` los marca como
+- En producción corre el plugin **0.8.0** desde el 2026-10-30, con 17 proyectos publicados y los tipos social,
+  audiovisual, producción con IA y SEO/contenidos disponibles.
+- Si `validate <slug> --remote` rechaza un tipo nuevo, el sitio corre una versión anterior a la 0.8.0: la 0.7.1 no
+  conocía `kind: "social"`, `role: "post"`, `channel`, etc.: `validate <slug> --remote` los marca como
   `INVALID_VALUE` o `UNKNOWN_FIELD` (comprobado el 2026-10-30) y `apply` no guardaría nada.
 
 ## Antes de empezar
@@ -358,8 +357,8 @@ producción, toma una foto (inventario o `revisions`) y, después, purga la cach
 - **`apply` dice «Quedan marcadores de plantilla sin completar»:** corre `validate <slug>` para ver las rutas y
   reemplázalas. Revisa también los `mediaId` 1.
 - **El sitio rechaza un tipo nuevo (`UNKNOWN_FIELD` en `channel`, `version`, `aiStage`…), aunque `validate` local
-  pasó:** producción todavía corre la 0.7.1. Espera el despliegue de la 0.8.0. Compruébalo con
-  `validate <slug> --remote`.
+  pasó:** el sitio corre una versión anterior a la 0.8.0 (en producción desde el 2026-10-30). Revisa la versión
+  instalada y despliega el paquete; compruébalo con `validate <slug> --remote`.
 - **`UNKNOWN_REFERENCE` en `compareTo`:** el `id` del `plate` debe apuntar a otra pieza que exista; revisa que el `id`
   de la `final` sea exactamente ese.
 - **`APPROVAL_SCOPE_METRICS`:** agrega `metrics` al `scope` sólo si el cliente aprobó mostrar las cifras. Si no, el
