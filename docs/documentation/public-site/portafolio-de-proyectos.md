@@ -25,6 +25,10 @@ sus piezas. Se ven tres y el resto queda detrás de «Ver N campañas más»; un
 las piezas de una campaña se hicieron con inteligencia artificial, esa campaña lo dice («Producido con IA»).
 (Versión 0.9.0, en el sitio desde el 2026-10-30.)
 
+La voz del cliente se muestra como una escena: una banda oscura con el video del proyecto de fondo, la cita grande y,
+destacada en negrita, la frase que el cliente dijo sobre el resultado; firma con su logo, si autorizó usarlo. Después,
+«Detrás del trabajo» cuenta quién lo hizo y desde cuándo, con qué servicios y en qué mercados. (Versión 0.9.1.)
+
 ## Cómo se guarda un proyecto
 
 - Cada proyecto es una ficha con campos fijos. El sistema la revisa antes de guardarla: si falta algo obligatorio, no

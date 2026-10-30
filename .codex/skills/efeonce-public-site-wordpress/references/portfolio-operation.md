@@ -46,7 +46,9 @@ are projected only with `metrics`; contents only with `pieces`.
   them yet — edit them through the CLI.
 - **Brand marks:** channel logos are the AXIS isotypes compiled into `EOP_Platforms` (Pinterest from Iconify `logos`);
   UI icons (X action bar, players) are Remix paths in `EOP_Icons`. Never draw a brand mark or icon by hand.
-- **Deploy state:** 0.9.0 is live since 2026-10-30 (runtime `4d363b6`): a project with two or more chapters renders a
+- **Deploy state:** 0.9.1 is live since 2026-10-30 (runtime `7106cc4`): the testimonial is a dark scene (`voice`; optional
+  `testimonial.highlight` must be the client's own words inside the quote; client logo from `client.logoMediaId`, negative
+  version) and «Detrás del trabajo» (`behind`). Since 0.9.0: a project with two or more chapters renders a
   campaign explorer (`campaign_explorer`; chapters may carry `period`, `markets`, `summary`, `madeWithAi` — declare AI
   per campaign, never with role `ai` in a campaign project); new images go in with `upload-portfolio-images.php`, a
   retired entry gets its 301 with `redirect-retired-entry.php`. Since 0.8.3: project page with the graphic-line measure orbit

@@ -198,6 +198,11 @@ galería sigue como antes. Cada capítulo puede declarar, además de `name`, `no
 | `summary` | Una línea sobre la campaña (si falta, se usa `note`) | `"La oferta del año, del 26/11 al 03/12."` |
 | `madeWithAi` | `true` si sus piezas se hicieron con IA: la fila muestra «Producido con IA» | `true` |
 
+El testimonio acepta `highlight`: una frase **copiada tal cual de la cita** que se muestra en negrita (si no está
+dentro de la cita, el validador da `UNKNOWN_REFERENCE`). El logo del cliente va en `client.logoMediaId` (una imagen de
+la biblioteca, idealmente su versión negativa porque se ve sobre fondo oscuro) y sólo se muestra si la aprobación
+incluye `logo`.
+
 `madeWithAi` declara la IA **sólo en esa campaña**. No uses el rol `ai` en un proyecto de campañas: marca todo el
 proyecto como «Producido con IA». Ejemplo vivo: la entrada de Sky Airline (revisión 2, 2026-10-30), con cinco campañas.
 

@@ -139,6 +139,14 @@ Spec de diseño y hallazgos medidos: auditoría del 2026-10-29 (390/768/1440) re
   < 1,2 o más de 3), panel de cada fila del índice y el abanico del hero de la entrada.
 - **Etiqueta de formato** (`.eop-tag`, «9:16», «4:5»…) en cada pieza, arriba a la izquierda; la pausa va arriba a la
   derecha, como botón redondo de 44 px con ícono (el texto queda como nombre accesible).
+- **Testimonio como escena y «Detrás del trabajo» (0.9.1, en producción desde el 2026-10-30; runtime 7106cc4,
+  respaldo `/tmp/eo-portfolio-before-20261030-153351.tar`).** El testimonio (`EOP_Render::voice`) es una banda oscura
+  con el video del proyecto en gris detrás (sólo en pantallas anchas, con su pausa), comilla grande en el acento de la
+  línea, cita liviana con la frase destacada en negrita y la firma con el logo del cliente si la aprobación incluye
+  `logo`. Campo opcional `testimonial.highlight`: tiene que estar tal cual dentro de la cita (`UNKNOWN_REFERENCE` si
+  no; el render cae a la cita sin destacar). «Detrás del trabajo» (`behind`) muestra sólo las columnas con datos:
+  equipo con su periodo («en curso» sin `period.to`), servicios, mercados de los capítulos y el caso completo. Sky
+  revisión 3: logo negativo oficial (mediaId 252326) y frase «agilizar mucho la carga de trabajo».
 - **Explorador de campañas (0.9.0, en producción desde el 2026-10-30; runtime 4d363b6, respaldo
   `/tmp/eo-portfolio-before-20261030-150754.tar`).** Una entrada con dos o más capítulos los muestra como el índice de
   la fila de marca (`EOP_Render::campaign_explorer`): fila por capítulo con periodo, mercados, una línea y tres
