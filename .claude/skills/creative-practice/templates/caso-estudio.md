@@ -256,6 +256,23 @@ muestra.**
 - [ ] ¿La sección **"lo que salió mal"** está **llena de verdad**, o la dejé vacía porque incomoda?
       *(Vacía = el caso no es creíble.)*
 
+### Llevarlo al portafolio del sitio (`efeoncepro.com/portafolio/`)
+
+Un caso **Publicable** que autorizó «Sitio público» se carga con la CLI del portafolio, eligiendo el tipo de página
+que cuenta mejor lo que se hizo: `campaign`, `social` (piezas en el marco de su red), `audiovisual` (cortes y rodaje),
+`ai-production` (declaración «Producido con IA», qué hizo la IA y qué el equipo) o `seo-content` (KPIs, búsqueda,
+respuestas de IA, contenidos):
+
+```bash
+pnpm public-website:portfolio -- kinds
+pnpm public-website:portfolio -- new <slug> --kind <tipo>
+```
+
+El **alcance de la aprobación** del cliente decide qué ve el público (`logo`, `pieces`, `metrics`, `testimonial`,
+`creators`): lo que no autorizó no se sirve aunque esté cargado, y un caso `seo-content` no se publica sin `metrics`.
+Guardar y publicar escriben en producción: piden el OK del operador. Manual:
+`docs/manual-de-uso/public-site/operar-portafolio-por-cli.md`.
+
 ---
 
 > ## 🔴 La regla que se olvida cuando el engagement va bien:

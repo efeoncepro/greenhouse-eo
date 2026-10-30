@@ -24,12 +24,32 @@ gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_po
 
 ## Project kinds (0.8.0)
 
-`social` (posts with `channel`/`placement`), `audiovisual` (`cut` with `version`/`durationSeconds`, `bts` with
-`consentRef`), `ai-production` (`ai` block required; pieces with `aiStage`, `compareTo` for before/after) and
-`seo-content` (`search` block required; publishing needs the `metrics` scope). Create them with
-`pnpm public-website:portfolio -- new <slug> --kind <kind>` (templates in `scripts/public-website/portfolio/templates/`,
-`kinds` explains each); `apply` refuses while `[COMPLETAR…]` or template `mediaId` 1 remain. The admin keeps these
-fields on save (`EOP_Admin::carry_over`) but does not edit them yet. Channel logos come from AXIS, never redrawn.
+Each kind has its own page sections (`EOP_Kinds`); `pnpm public-website:portfolio -- kinds` prints what each one shows
+and what its document needs.
+
+| Kind | Pieces / blocks | What the validator demands |
+|---|---|---|
+| `social` | role `post`: `channel` (instagram, facebook, linkedin, x, tiktok, youtube, threads, pinterest), `placement` (feed, story, reel, carousel, document, post, short, video, pin, thread), `postText`, `postedAt` | `channel` on every `post` |
+| `audiovisual` | role `cut`: `version`, `where`, `durationSeconds` (video only, 0.5–7200); role `bts` (shoot photos/videos) | `version` on every `cut`; `consentRef` on every `bts` (**never projected**) |
+| `ai-production` | top-level `ai` {`models[]` {`stage`: image, video, voice, music, upscale, compositing, other; `name`}, `teamDid`, `aiDid`, `fictional`}; role `ai`: `aiStage` (anchor, angle, expression, pose, plate, scene, final), `label`, `compareTo` (another piece id: before/after) | `ai` block required; `aiStage` on every `ai` piece; `compareTo` must exist (`UNKNOWN_REFERENCE`) |
+| `seo-content` | top-level `search` {`source`, `period`, `highlight`, `kpis`, `series`, `query` (SERP climb), `keywords`, `aeo` (engines chatgpt, gemini, perplexity, ai-overviews, copilot, claude), `contents`}; role `banner` (`size`) | `search` with `source`, `period` and at least one figure; publishing needs the `metrics` scope (`APPROVAL_SCOPE_METRICS`); `series.compare` same length as `values` |
+
+Any kind may carry `specs` (max 10 {`label`, `value`}, the «Ficha técnica»). The «PRODUCIDO CON IA» badge shows on
+every `ai-production` project and on any project with a role `ai` piece — there is no field to hide it. Search figures
+are projected only with `metrics`; contents only with `pieces`.
+
+- **Create:** `pnpm public-website:portfolio -- new <slug> --kind <social|audiovisual|ai-production|seo-content|campaign>`
+  copies a template from `scripts/public-website/portfolio/templates/` (all validate). `validate` lists the remaining
+  `[COMPLETAR…]` markers (and template `mediaId` 1); `apply` refuses while any remain. Never publish template text or
+  invented figures: example data stays marked as example.
+- **Admin:** knows the new kinds and roles and keeps their fields on save (`EOP_Admin::carry_over`), but does not edit
+  them yet — edit them through the CLI.
+- **Brand marks:** channel logos are the AXIS isotypes compiled into `EOP_Platforms` (Pinterest from Iconify `logos`);
+  UI icons (X action bar, players) are Remix paths in `EOP_Icons`. Never draw a brand mark or icon by hand.
+- **Deploy state:** 0.7.1 is live; 0.8.0 is built (runtime `c6e1734`) and waits for the operator's OK. After any code
+  deploy run `scripts/public-website/eo-portfolio/purge-portfolio-cache.php` (the deploy does not purge the page cache)
+  and verify the existing entries are unchanged (0.8.0 changed the hero markup and chapters).
+- Step-by-step CLI manual: `docs/manual-de-uso/public-site/operar-portafolio-por-cli.md`.
 
 ## Public pages switch
 
@@ -64,10 +84,12 @@ pnpm public-website:portfolio -- revisions <slug> | log <slug> | restore <slug> 
   name or email), `date` and a non-empty `scope` (`logo`, `pieces`, `metrics`, `testimonial`, `creators`). A published project
   cannot be saved without it (`eop_publish_gate`): unpublish first.
 - The scope decides what the public sees; what it does not cover is not served even if loaded.
-- Project `kind` (campaign | website | web-section | ugc | system | other) and piece `role` (campaign | web | section |
-  ugc | in-situ | diagram | answer); absent means `campaign`. Each role carries only its fields
+- Project `kind` (campaign | website | web-section | ugc | system | other | social | audiovisual | ai-production |
+  seo-content) and piece `role` (campaign | web | section | ugc | in-situ | diagram | answer | post | cut | bts | ai |
+  banner); absent means `campaign`. Each role carries only its fields
   (`EOP_Validator::ROLE_FIELDS`): `web` → `device`, `longCapture`, `liveUrl`; `section` → `sectionName` (required),
-  `position` {from < to, 0–1}, `liveUrl`; `ugc` → `creator` {`handle` with @, `platform`, `consentRef`} (required).
+  `position` {from < to, 0–1}, `liveUrl`; `ugc` → `creator` {`handle` with @, `platform`, `consentRef`} (required);
+  the 0.8.0 roles are in «Project kinds» above.
 - A creator's video shows only with `pieces` **and** `creators` (client approval of a campaign does not license a
   creator's face); `consentRef` never leaves the projection; a `kind: ugc` project cannot publish without `creators`.
   Only set `creators` when each creator's authorization is recorded.
@@ -99,7 +121,7 @@ The deploy refuses on drift or if `/portafolio/` has child pages.
 
 ## References
 
-- Manual: `docs/manual-de-uso/public-site/operar-portafolio.md`
+- Manual: `docs/manual-de-uso/public-site/operar-portafolio.md`; CLI: `docs/manual-de-uso/public-site/operar-portafolio-por-cli.md`
 - Architecture: `docs/architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md`
 - Decision: `docs/public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md`
 - Tasks: `TASK-2047` (plugin), `TASK-2048` (templates), `TASK-2049` (migration); cleanup `TASK-2046` (complete)

@@ -1,13 +1,15 @@
 # Portafolio del sitio público (EO Portfolio) — V1
 
 > **Tipo de documento:** Arquitectura técnica
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-10-29 por Claude (TASK-2047)
-> **Ultima actualizacion:** 2026-10-30 por Claude (tipos de proyecto social, audiovisual, IA y SEO/contenidos; plugin 0.8.0, TASK-2049)
+> **Ultima actualizacion:** 2026-10-30 por Claude (§7.3 verificado contra el código de la 0.8.0; estado de despliegue, TASK-2049)
 > **Decisión:** [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) ·
 > **Epic:** [EPIC-056](../../epics/in-progress/EPIC-056-eo-portfolio.md)
-> **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/` (v0.5.4 en producción desde 2026-10-30,
-> runtime 56d98dd: admin, tipos de pieza, páginas públicas y video; 17 proyectos publicados)
+> **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/`. En producción: **v0.7.1** (runtime
+> 2fa62cc: admin, tipos de pieza, páginas públicas, video, capa de teléfono y tablet, búsqueda y agentes; 17 proyectos
+> publicados). **v0.8.0** (tipos de proyecto con página propia, §7.3) está construida y commiteada en runtime c6e1734,
+> con el paquete armado; **no está desplegada**: el despliegue espera el OK del operador.
 
 ## 1. Qué resuelve
 
@@ -187,14 +189,18 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
 
 | `kind` | Roles de pieza y campos | Lo que agrega la página |
 |---|---|---|
-| `social` | `post`: `channel` (instagram, facebook, linkedin, x, tiktok, youtube, threads, pinterest), `placement`, `postText`, `postedAt` | Hero con las publicaciones en órbita 3D (isotipo del canal en cada una); «Canal por canal» con pestañas (píldora con resorte, teclado con flechas; sin script se ven todos los canales) y cada pieza en el marco de su red; la parrilla en cinta |
-| `audiovisual` | `cut`: `version`, `where`, `durationSeconds`; `bts`: `consentRef` (nunca público); `specs`; `credits` ≥ 3 | Hero de cine (la pieza madre a pantalla completa, cortinas que se abren, grano, pausa visible); línea de tiempo de cortes a escala de su duración; detrás de cámara en abanico; créditos que suben |
-| `ai-production` | `ai` (obligatorio: `models` con `stage` y `name`, `teamDid`, `aiDid`, `fictional`); `ai`: `aiStage` (anchor, angle, expression, pose, plate, scene, final), `label`, `compareTo` | Etiqueta «Producido con IA» (también en cualquier proyecto con una pieza `ai`); la escena se resuelve del ruido y entra la marca; vista giratoria de ángulos; expresiones; poses; antes y después con deslizador; qué hizo la IA y qué hizo el equipo; cómo se gobierna |
-| `seo-content` | `search` (obligatorio: `source`, `period` y al menos una cifra: `highlight`, `kpis` con `series`, `series` con `compare`, `query`, `keywords`, `aeo`, `contents`); `banner`: `size` | Cifra principal y curva dibujada en el servidor (SVG); indicadores con su mini gráfica; el resultado que sube en una búsqueda; la respuesta de IA que cita a la marca; palabra por palabra; contenidos publicados; banners |
+| `social` | `post`: `channel` (instagram, facebook, linkedin, x, tiktok, youtube, threads, pinterest), `placement` (feed, story, reel, carousel, document, post, short, video, pin, thread), `postText`, `postedAt` | Hero con las publicaciones en órbita 3D desde 3 publicaciones (isotipo del canal en cada una); «Canal por canal» con pestañas (píldora con resorte, teclado con flechas; sin script se ven todos los canales) y cada pieza en el marco de su red; la parrilla en cinta |
+| `audiovisual` | `cut`: `version`, `where` (y `durationSeconds` en el video); `bts`: `consentRef` (nunca público); `specs` (ficha técnica, ≤ 10 pares) | Hero de cine (la pieza madre a pantalla completa, cortinas que se abren, grano, pausa visible); línea de tiempo de cortes a escala de su duración; detrás de cámara en abanico; créditos que suben cuando hay 3 o más (si no, el bloque de equipo de siempre) |
+| `ai-production` | `ai` (obligatorio: `models` con `stage` —image, video, voice, music, upscale, compositing, other— y `name`, y `teamDid`; opcionales `aiDid` y `fictional`); `ai`: `aiStage` (anchor, angle, expression, pose, plate, scene, final), `label`, `compareTo` | Etiqueta «Producido con IA» (también en cualquier proyecto con una pieza `ai`); la escena se resuelve del ruido y entra la marca; vista giratoria de ángulos; expresiones; poses; antes y después con deslizador; qué hizo la IA y qué hizo el equipo; cómo se gobierna |
+| `seo-content` | `search` (obligatorio: `source`, `period` y al menos una cifra entre `highlight`, `kpis` —con `series` opcional—, `series` —con `compare` del mismo largo—, `query`, `keywords` o `aeo`; `contents` no cuenta como cifra); `banner`: `size` | Cifra principal y curva dibujada en el servidor (SVG); indicadores con su mini gráfica; el resultado que sube en una búsqueda; la respuesta de IA que cita a la marca; palabra por palabra; contenidos publicados; banners |
 
-- Reglas: cada rol exige su campo (`channel`, `version`, `consentRef`, `aiStage`); `compareTo` apunta a otra pieza;
-  `durationSeconds` sólo en video; un `seo-content` no se publica sin el alcance `metrics` (`APPROVAL_SCOPE_METRICS`).
-- Proyección: `search` sale con `metrics` (sus `contents`, con `pieces`); `specs` y `ai` salen siempre (la declaración
+- Reglas (`EOP_Validator`): `ROLE_FIELDS` limita cada campo a su rol (`INVALID_SHAPE` si aparece en otro);
+  `ROLE_REQUIRED` exige `channel` en `post`, `version` en `cut`, `consentRef` en `bts` y `aiStage` en `ai`;
+  `compareTo` debe ser el id de otra pieza del mismo proyecto (`UNKNOWN_REFERENCE`); `durationSeconds` sólo en video;
+  `ai-production` exige `ai` y `seo-content` exige `search`; un `seo-content` no se publica sin el alcance `metrics`
+  (`APPROVAL_SCOPE_METRICS`, en `publish_issues`).
+- Proyección (`EOP_Projection::search`): las cifras de `search` salen con `metrics`; sus `contents` (con `source` y
+  `period`) salen con `pieces`; `specs` y `ai` salen siempre (la declaración
   de IA no se puede ocultar); `consentRef` nunca sale.
 - Las piezas que un tipo muestra en sus secciones salen de la galería genérica (`EOP_Kinds::taken`).
 - Isotipos oficiales de canal copiados de AXIS (`@efeoncepro/axis-brand-assets`, `assets/platforms/`; Pinterest del set
@@ -205,6 +211,9 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
   `apply` se niega mientras queden marcadores `[COMPLETAR…]` o el `mediaId` 1 de la plantilla.
 
 ## 8. Pruebas y despliegue
+
+- Estado: 0.7.1 en producción; 0.8.0 construida (runtime c6e1734, paquete en `tmp/portfolio-plugin-release/`) y sin
+  desplegar hasta el OK del operador.
 
 - `php tests/eo-portfolio.test.php` (498 comprobaciones en PHP puro sobre 8 fixtures, uno por tipo) y
   `tests/playground/run-eo-portfolio.sh` (53 en Playground + 22 por WP-CLI + 33 del admin + 64 del render, con la
@@ -222,7 +231,9 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
 
 - `scripts/public-website/eo-portfolio/export-ohio-real-entries.php` (sólo lee) → `migration-map-2026-10-29.json`
   (texto escrito con lo que ya publicaba cada entrada, aprobación del operador del 2026-10-29 con alcance logo y
-  piezas, sin cifras) → `build-migration-documents.cjs` (lote `portfolio-entry.v1` y mapa de redirecciones) →
+  piezas, sin cifras) → `build-migration-documents.cjs` (lote `portfolio-entry.v1` y mapa de redirecciones; el título SEO se escribe
+  entero, ≤ 65 caracteres, y el armado falla en vez de recortarlo con «…» — guarda `whole()`, tras llegar recortado a
+  Google en 10 proyectos el 2026-10-30) →
   `apply-portfolio-bundle.php` (`wp eo-portfolio apply`, todo o nada; con `publish` publica) →
   `set-portfolio-switch.php` (interruptor, orden, cifras, token de vista previa, purga) →
   `cutover-ohio-to-portfolio.php` (301 de Yoast desde `/project/<slug>/` y desde los slugs viejos, reencadena los

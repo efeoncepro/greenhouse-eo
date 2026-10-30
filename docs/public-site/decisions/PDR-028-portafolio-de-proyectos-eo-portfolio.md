@@ -19,6 +19,18 @@
 > [PDR-027](PDR-027-navegacion-global-del-sitio-portable.md) (patrón de contenido con tres puertas) ·
 > [Plan de migración a La órbita](../LA_ORBITA_SITE_MIGRATION_PLAN_V1.md) §Oleada 5.
 
+## Delta 2026-10-30 — tipos de proyecto con página propia
+
+- El operador aprobó en el canvas (página «eo», «Plantillas por tipo de proyecto») cuatro tipos con página a su
+  medida: `social`, `audiovisual`, `ai-production` y `seo-content`. Entran como esquema **aditivo** dentro de
+  `portfolio-entry.v1` (roles de pieza `post`, `cut`, `bts`, `ai` y `banner`; bloques `specs`, `ai` y `search`); los
+  documentos existentes no cambian y la decisión no se reabre.
+- Los invariantes de §3 se extienden, no se relajan: el rodaje exige la referencia del consentimiento de quienes
+  aparecen y esa referencia nunca se proyecta; la declaración de IA (`ai`) sale siempre, sin depender del alcance; las
+  cifras de búsqueda siguen al alcance `metrics` y un `seo-content` no se publica sin él.
+- Estado: plugin 0.8.0 construido (runtime c6e1734), despliegue pendiente del OK del operador; en producción sigue la
+  0.7.1. Detalle técnico en la arquitectura §7.3; operación por la CLI (`kinds`, `new <slug> --kind <tipo>`).
+
 ## Contexto
 
 `/portafolio/` es la página más antigua del sitio que todavía se enlaza desde el menú global, la Home («Cases») y el

@@ -7,8 +7,13 @@
   campos nuevos, plantillas y comandos `kinds` / `new --kind` en la CLI.
 - Pruebas: 498 unitarias sobre 8 fixtures (uno por tipo) y 53 + 33 + 64 en Playground. Revisión visual local de los
   cuatro tipos a 1440 y 390 con piezas reales (Sky, Berel, Nexa): sin desborde.
-- Pendiente: desplegar 0.8.0 a producción (el despliegue pidió autorización explícita) y cargar los primeros proyectos
-  reales de cada tipo.
+- Código: runtime c6e1734 (0.8.0) commiteado; paquete armado en `tmp/portfolio-plugin-release/` (11 archivos, 3 nuevos:
+  `class-eop-icons.php`, `class-eop-kinds.php`, `class-eop-platforms.php`). CLI y plantillas en greenhouse-eo
+  fceda1029; docs 7e726b416.
+- Estado: **construido, no desplegado**. En producción sigue la 0.7.1. El despliegue espera el OK explícito del
+  operador (el clasificador lo bloqueó como despliegue a producción); después: purgar la caché
+  (`purge-portfolio-cache.php`) y verificar en vivo que los 17 proyectos actuales no cambian.
+- Pendiente: cargar los primeros proyectos reales de cada tipo (necesitan contenido y aprobación del cliente).
 
 ## Delta 2026-10-30 (noche) — móvil, footer, SEO y agentes (plugin 0.7.1)
 
@@ -101,7 +106,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `17 proyectos publicados y todos los 301 aplicados el 2026-10-30; sólo falta desactivar Ohio Portfolio desde el 2026-11-29`
+- Status real: `17 proyectos publicados y todos los 301 aplicados el 2026-10-30 (plugin 0.7.1 en producción); 0.8.0 con tipos de proyecto construida y pendiente del OK del operador para desplegarse; falta desactivar Ohio Portfolio desde el 2026-11-29`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -487,6 +492,9 @@ Los slugs nuevos corrigen los heredados: `lifestyle-app-elementor` → `eusari`,
 
 ## Follow-ups
 
+- Desplegar 0.8.0 con OK del operador y cargar el primer proyecto real de cada tipo nuevo (social, audiovisual,
+  producción con IA, SEO y contenidos).
+- Campos del admin para `specs`, `ai`, `search` y los roles nuevos (hoy se editan por la CLI; el admin los conserva).
 - Contrato `efeonce.portfolio-entry` en AXIS cuando exista un segundo consumidor (Think o el sitio en Astro).
 - Video largo con HLS si el operador lo decide.
 - Proyectos sin aprobación: retiro definitivo si el operador lo decide.

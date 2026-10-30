@@ -1,7 +1,7 @@
 # Portafolio de proyectos — Sitio público
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-30 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -41,24 +41,45 @@ del tema Ohio.
 
 ## Tipos de proyecto y de pieza
 
-- Cada proyecto dice qué es: una campaña, un sitio web, una parte de un sitio, videos de creadores, un sistema u otro.
+- Cada proyecto dice qué es: una campaña, un sitio web, una parte de un sitio, videos de creadores, un sistema, social
+  media, producción audiovisual, producción con IA, SEO y contenidos u otro.
   Eso decide cómo se arma su página.
 - Cada pieza dice qué es: una pieza de campaña, un sitio en pantalla (escritorio, teléfono o tableta, a veces la
   página completa), una parte de una página (con su nombre y dónde está), un video de creador (con su cuenta y
-  plataforma), una pieza en su lugar, un diagrama o una respuesta de IA.
+  plataforma), una pieza en su lugar, un diagrama, una respuesta de IA, una publicación en redes, un corte de video,
+  una foto de rodaje, una pieza hecha con IA o un banner.
 - Los proyectos anteriores, sin tipo, siguen siendo campañas.
-- Cuatro tipos tienen una página hecha a su medida:
-  - **Social media:** las publicaciones giran alrededor de la marca y, canal por canal, cada pieza aparece en el marco
-    de su red (Instagram, Facebook, LinkedIn, X, TikTok, YouTube, Threads, Pinterest) con el logo oficial del canal.
-  - **Producción audiovisual:** la pieza principal abre como en el cine, los cortes se ven en una línea de tiempo, el
-    rodaje en un abanico de fotos y los créditos suben como al final de una película.
-  - **Producción con IA:** la página dice desde arriba que se produjo con IA, muestra cómo nace la escena, el personaje
-    en todos sus ángulos y expresiones, el antes y después, y qué hizo la IA y qué hizo el equipo.
-  - **SEO y contenidos:** la cifra principal con su curva, los indicadores, la búsqueda en la que la marca subió, la
-    respuesta de una IA que la cita, las palabras clave antes y después, los contenidos publicados y los banners.
-- Las fotos de rodaje necesitan la autorización de quienes aparecen; esa autorización nunca se publica.
-- Las cifras de búsqueda se ven sólo si el cliente aprobó mostrar cifras.
+- Cuatro tipos más tienen una página hecha a su medida (ver la sección siguiente).
+
 - Cada publicación registra quién la hizo y con qué aprobación. Ese registro no es público.
+
+## Páginas a la medida de cada tipo
+
+> **Estado:** construidas y probadas en la versión 0.8.0 del plugin, que todavía **no está en el sitio**: su
+> instalación espera el visto bueno del operador. Hoy el sitio corre la 0.7.1 y aún no hay proyectos reales cargados
+> de estos tipos.
+
+| Tipo | Qué muestra la página | Qué necesita la ficha |
+|---|---|---|
+| **Social media** | Las publicaciones giran alrededor de la marca (cuando hay tres o más), cada una con el logo oficial de su canal. En «Canal por canal», unas pestañas muestran cada pieza en el marco de su red: Instagram, Facebook, LinkedIn, X, TikTok, YouTube, Threads o Pinterest. La parrilla pasa como una cinta. | Cada publicación dice su canal; puede decir también su formato (feed, historia, reel, carrusel…), su texto y su fecha. |
+| **Producción audiovisual** | La pieza principal abre a pantalla completa, como en el cine, con un botón para pausarla. Los cortes se ven en una línea de tiempo según lo que dura cada uno, el rodaje en un abanico de fotos y, si hay tres o más créditos, suben como al final de una película. Una ficha técnica reúne los datos de la producción (hasta diez, cada uno con su nombre y su valor). | Cada corte dice qué versión es («Pieza madre», «Corte de 15 s»…) y puede decir dónde se emitió. Cada foto o video de rodaje dice dónde quedó la autorización de quienes aparecen. |
+| **Producción con IA** | Desde arriba, la etiqueta «Producido con IA». La escena aparece desde el ruido, el personaje gira en todos sus ángulos, se ven sus expresiones y poses, un deslizador compara el antes y el después, y la página explica qué hizo la IA, qué hizo el equipo y con qué modelos. | Qué modelos se usaron y para qué (imagen, video, voz, música…) y qué hizo el equipo; puede decir qué hizo la IA y si el personaje es ficticio. Cada pieza dice su etapa (referencia, ángulo, expresión, pose, fondo, escena o final). |
+| **SEO y contenidos** | La cifra principal con su curva, los indicadores con su mini gráfica, la búsqueda en la que la marca subió de posición, la respuesta de una IA que la cita, las palabras clave antes y después, los contenidos publicados y los banners. | La fuente y el periodo de los datos, y al menos una cifra (cifra principal, indicadores, curva, búsqueda, palabras clave o respuesta de IA). La lista de contenidos sola no basta. |
+
+Reglas que cuidan estas páginas:
+
+- **Consentimiento:** una foto o video de rodaje no se guarda sin la referencia de la autorización de quienes
+  aparecen, y esa referencia nunca se publica.
+- **Declaración de IA:** cualquier proyecto con una pieza producida con IA lleva la etiqueta «Producido con IA» y la
+  explicación de cómo se hizo. No depende de la aprobación del cliente y no se puede ocultar.
+- **Cifras aprobadas:** las cifras de búsqueda se ven sólo si la aprobación cubre `metrics`; la lista de contenidos
+  publicados se ve si cubre `pieces`. Un proyecto de SEO y contenidos no se puede publicar sin `metrics`, porque su
+  página quedaría vacía.
+- Lo que una página a medida muestra en sus secciones no se repite abajo, en la galería de siempre.
+- Los logos de los canales son los oficiales del sistema de marca (AXIS) y los íconos de la interfaz vienen de una
+  colección de íconos existente; nada se dibuja a mano.
+- El editor de WordPress todavía no tiene campos para estos datos: se cargan por la herramienta de línea de comandos.
+  Si alguien guarda el proyecto desde el editor, esos datos se conservan.
 
 ## Las cifras
 

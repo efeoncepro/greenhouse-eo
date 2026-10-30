@@ -7,6 +7,21 @@
 > - Diseño: canvas «Portafolio Efeonce — concepto», página «EO Portfolio»,
 >   [claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm](https://claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm).
 
+## Delta 2026-10-30 — páginas por tipo de proyecto (plugin 0.8.0, sin desplegar)
+
+La entrada (`E*`) suma secciones según `kind`, aprobadas en el canvas (página «eo», «Plantillas por tipo de
+proyecto»). Construidas y probadas en local a 1440 y 390; despliegue pendiente del OK del operador (en producción, 0.7.1).
+
+| Tipo | Interacción | Sin script / movimiento reducido |
+|---|---|---|
+| `social` | «Canal por canal»: `role="tablist"` con una pestaña por canal; la píldora se desliza a la elegida; flechas izquierda/derecha, Inicio y Fin mueven la selección; los videos de un panel oculto se detienen. Hero con publicaciones en órbita desde 3 piezas `post`. | La lista de pestañas queda oculta y se ven todos los canales seguidos; la órbita queda quieta. |
+| `audiovisual` | Hero de cine con botón de pausa propio (`data-eop-vscope="cine"`) que detiene la pieza madre; créditos que suben si hay 3 o más. | Con movimiento reducido el video no arranca solo y el botón queda en estado de pausa. |
+| `ai-production` | Antes y después con un deslizador (`input type="range"`) que mueve el corte entre la versión `compareTo` y la final; vista giratoria de ángulos. | Sin script el corte queda a la mitad (se ven ambas versiones) y el deslizador no aparece; con movimiento reducido la vista giratoria queda quieta. |
+| `seo-content` | Curva SVG dibujada en el servidor, indicadores, el resultado que sube en la búsqueda y la respuesta de IA; lista de contenidos con desplazamiento lateral (enlaces reales, sin duplicar). | Todo es marcado del servidor: las cifras se leen sin script. |
+
+Foco y navegación: las pestañas siguen el patrón de WAI-ARIA (una sola pestaña en el orden de tabulación); el
+deslizador tiene nombre accesible; los botones de pausa miden 44 px.
+
 ## Flow Goal
 
 Un solo modelo de proyecto (el documento de `TASK-2047`) y varias formas de mostrarlo: la portada, la entrada y el JSON

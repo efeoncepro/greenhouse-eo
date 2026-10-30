@@ -66,6 +66,7 @@ Todo entregable con personas o lugares reconocibles necesita autorización:
 ## Derecho de portafolio (case study)
 
 - El derecho de **mostrar el trabajo** como caso/portafolio **debe pactarse** (`05`) — no se asume. Muchos clientes exigen confidencialidad; negocia el derecho a exhibir (con o sin nombre, tras un embargo, etc.). Conecta con `content-marketing-studio` (case studies) — pero el permiso es contractual.
+- **Efeonce — cómo lo aplica el portafolio del sitio (`eo-portfolio`):** nada se publica sin `clientApproval` con referencia, fecha y **alcance** (`logo`, `pieces`, `metrics`, `testimonial`, `creators`); lo que el alcance no cubre no se sirve. El video de un creador exige además `creators`, y toda foto o video de rodaje (pieza `bts`) exige `consentRef` de quienes aparecen; esa referencia **nunca se publica**. Un caso producido con IA lleva siempre la etiqueta «Producido con IA» (no hay campo para ocultarla) y declara modelos por etapa y qué hizo el equipo. Operación: `docs/manual-de-uso/public-site/operar-portafolio-por-cli.md`.
 
 ## Checklist de IP de un entregable
 

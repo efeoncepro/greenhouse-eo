@@ -1,4 +1,4 @@
-# EO Portfolio — operación sobre el portafolio de Ohio (TASK-2046)
+# EO Portfolio — limpieza de Ohio, migración y operación del portafolio (TASK-2046, TASK-2049)
 
 Scripts y evidencia de la limpieza del tipo `ohio_portfolio` en `efeoncepro.com` antes del portafolio nuevo
 (PDR-028, EPIC-056). Todo corre por el carril gobernado (`pnpm public-website:ssh-check` primero).
@@ -13,9 +13,20 @@ Scripts y evidencia de la limpieza del tipo `ohio_portfolio` en `efeoncepro.com`
 | `snapshots/ohio-portfolio-2026-10-29.json.gz` | Foto posterior al Slice 2 y previa al Slice 3 (rollback del Slice 3). `sha256` del JSON sin comprimir: `f54085fdc51daf99fff82ce598c7cd9963476579ce806aeb0f6e8ae6b6c49b55`. |
 | `snapshots/ohio-portfolio-2026-10-23.json.gz` | Foto previa para rollback (estado, comentarios, contenido y todos los metadatos de las 59 entradas). |
 | `evidence/gsc-project-urls-2026-10-23.json` | Salida de Search Console del 2026-10-23. |
+| `export-ohio-real-entries.php` | TASK-2049 Slice 1. Sólo lee: las 15 entradas reales de Ohio con sus campos, categorías, título y descripción de Yoast e imágenes con dimensiones reales de la biblioteca. IDs desde la allowlist; nada por nombre. |
+| `migration-map-2026-10-29.json` | Mapa versionado de la migración: texto de cada proyecto escrito con lo que ya publicaba, slug nuevo, aprobación del operador del 2026-10-29 (alcance logo y piezas, sin cifras). |
+| `build-migration-documents.cjs` | TASK-2049 Slice 2. Del export y el mapa arma el lote `portfolio-entry.v1` y el mapa de redirecciones. Sin cifras inventadas. El título SEO se escribe entero (≤ 65 caracteres): `whole()` hace fallar el armado en vez de recortarlo con «…» (un título recortado llegó a Google en 10 proyectos el 2026-10-30); si falla, escribe un `seoTitle` más corto en el mapa. |
+| `apply-portfolio-bundle.php` | Carga un lote `{ "projects": [...] }` por `wp eo-portfolio apply` (todo o nada). Se niega si un proyecto ya existe, salvo con `"update": true` (cada documento lleva la `revision` de la que partió; un conflicto hace fallar el lote entero). Con `"publish": true` publica, compuerta de aprobación incluida. |
+| `set-portfolio-switch.php` | Interruptor de las páginas (`enabled` `0` / `preview` / `1`), orden editorial, cifras de la portada y token de vista previa. Imprime el estado antes y después (entrada de rollback) y purga la caché al cambiar el interruptor. |
+| `cutover-ohio-to-portfolio.php` | TASK-2049 Slice 4. 301 de Yoast de cada `/project/<slug>/` a su página nueva, reencadena los redirects que terminaban ahí y pasa la entrada de Ohio a borrador (nunca la borra). `dryRun` por defecto. |
+| `redirect-portfolio-categories.php` | Una redirección regex 301 de Yoast de `/portfolio-category/…` a `/portafolio/`. `dryRun` por defecto. |
+| `import-portfolio-media.php` | Sube a la biblioteca piezas que el sitio ya servía desde los assets de un plugin, para referenciarlas por `mediaId`. Idempotente por `_eop_source`; nada se descarga de fuera. |
+| `batches/` | Lotes aplicados el 2026-10-30 (Sky y Berel, piezas sumadas, orden editorial). |
+| `purge-portfolio-cache.php` | Purga la caché de páginas (la misma de un guardado, `EOP_Cache::purge`) e imprime la versión activa del plugin. Correrla después de desplegar código que cambia el marcado: un despliegue no purga solo. La caché perimetral tarda 1–2 minutos más. |
 
 ```bash
 pnpm public-website:ssh-check
+pnpm -s public-website:wpcli -- --eval-file scripts/public-website/eo-portfolio/purge-portfolio-cache.php --wp-user 12
 pnpm -s public-website:wpcli -- --eval-file scripts/public-website/eo-portfolio/inventory-ohio-portfolio.php --wp-user 12 > <snapshot.json>
 # GSC: requiere el proxy de Cloud SQL (pnpm pg:connect) y la configuración OAuth de Search Console en el entorno
 # (GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID desde el env de producción de Vercel, sin escribirlo a disco del repo, y

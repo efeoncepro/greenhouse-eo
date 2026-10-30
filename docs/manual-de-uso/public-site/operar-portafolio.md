@@ -1,11 +1,12 @@
 # Operar el portafolio de proyectos
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-30 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
 > **Documentacion funcional:** [Portafolio de proyectos](../../documentation/public-site/portafolio-de-proyectos.md)
+> **Manual de la CLI:** [Operar el portafolio por la CLI y sus herramientas](operar-portafolio-por-cli.md)
 
 ## Para qué sirve
 
@@ -15,9 +16,13 @@ con `pnpm public-website:portfolio`. Cada proyecto es un documento `portfolio-en
 formato real. La CLI usa el mismo servicio de guardado que la pantalla del admin y que `wp eo-portfolio`: no tiene
 reglas propias.
 
-Estado al 2026-10-29: plugin activo en producción, **sin proyectos**. La pantalla del admin (v0.2.0) está en producción
-desde el 2026-10-29. La portada y la entrada pública llegan con
-`TASK-2048`; hasta entonces una entrada publicada responde 404 y sólo se ve por la REST.
+Estado al 2026-10-30: plugin **0.7.1** en producción con 17 proyectos publicados, portada y entradas públicas en
+`/portafolio/`. La **0.8.0** (tipos social, audiovisual, producción con IA y SEO/contenidos) está construida y espera el
+OK del operador para desplegarse; hasta entonces el sitio rechaza esos tipos.
+
+Este manual cubre el admin, los lotes, el interruptor y el despliegue. La referencia completa de la CLI (todos los
+comandos, recetas por tipo, plantillas, Playground local y scripts de migración) está en
+[Operar el portafolio por la CLI y sus herramientas](operar-portafolio-por-cli.md).
 
 ## Antes de empezar
 
@@ -60,96 +65,39 @@ avisa «sus videos no se verán». Un proyecto de tipo «Videos de creadores» n
 
 ### Social media, audiovisual, producción con IA y SEO (por la CLI)
 
-Estos cuatro tipos se crean y actualizan por la CLI (el admin los muestra y conserva sus campos, pero todavía no los edita):
+Estos cuatro tipos se crean y actualizan por la CLI: el admin los muestra y, al guardar, conserva sus campos propios,
+pero todavía no los edita.
 
 ```bash
 pnpm public-website:portfolio -- kinds
-pnpm public-website:portfolio -- new <slug> --kind social
+pnpm public-website:portfolio -- new <slug> --kind <social|audiovisual|ai-production|seo-content|campaign>
 ```
 
-1. `kinds` explica qué muestra cada página y qué necesita el documento.
-2. `new … --kind <social|audiovisual|ai-production|seo-content|campaign>` crea la copia de trabajo desde la plantilla.
-3. Reemplaza cada `[COMPLETAR…]` y cada `mediaId` 1 (las imágenes de la biblioteca de medios, los videos del bucket de
-   AXIS). `validate` dice cuántos marcadores quedan y `apply` no guarda mientras quede alguno.
-4. Sigue el flujo de siempre: `validate` → `preview` → `apply` → `publish` (con el OK del operador).
+Reemplaza cada `[COMPLETAR…]` y cada `mediaId` 1; `apply` no guarda mientras quede alguno. Los campos de cada tipo,
+los roles de pieza y sus valores válidos están en
+[Recetas por tipo de proyecto](operar-portafolio-por-cli.md#recetas-por-tipo-de-proyecto).
 
-Qué no olvidar por tipo: en social, el texto real de cada publicación (sin cifras inventadas en los marcos); en
-audiovisual, la duración de cada corte medida con `ffprobe` y la autorización de quienes aparecen en el rodaje; en IA,
-los modelos usados y lo que hizo el equipo (la página lo declara siempre); en SEO, la fuente, el periodo y la
-aprobación de cifras.
+### Por la CLI: resumen
 
-### Ver qué hay
+El ciclo completo, con qué lee y qué escribe cada comando, está en
+[Operar el portafolio por la CLI y sus herramientas](operar-portafolio-por-cli.md#referencia-de-comandos). En corto:
 
 ```bash
-pnpm public-website:portfolio -- list
-pnpm public-website:portfolio -- verify
+pnpm public-website:portfolio -- list                      # qué hay
+pnpm public-website:portfolio -- pull <slug>               # o: new <slug> --kind <tipo> | --from <archivo.json>
+pnpm public-website:portfolio -- validate <slug>           # y preview / diff
+pnpm public-website:portfolio -- apply <slug> --message "<por qué>" --dry-run
+pnpm public-website:portfolio -- apply <slug> --message "<por qué>"            # borrador, con OK del operador
+pnpm public-website:portfolio -- publish <slug> --message "<por qué>"          # con OK del operador
+pnpm public-website:portfolio -- verify <slug>
+pnpm public-website:portfolio -- revisions <slug>          # y restore <slug> <revisión> --message "<por qué>"
+pnpm public-website:portfolio -- log <slug>                # quién publicó y con qué aprobación (interno)
 ```
 
-### Cargar un proyecto nuevo
-
-1. Arma el documento de partida (por ejemplo, el export de una entrada de Ohio en `TASK-2049`, o un fixture de
-   `efeonce-public-site-runtime/tests/fixtures/portfolio/` como plantilla de forma).
-2. Crea la copia de trabajo:
-
-   ```bash
-   pnpm public-website:portfolio -- new <slug> --from <archivo.json>
-   ```
-
-3. Edita `tmp/portfolio/<slug>/working.json`. Reglas que el validador hace cumplir:
-   - toda cifra de `results` lleva `source`; un `percent` va de 0 a 100, sin el signo;
-   - todo medio lleva `width` y `height` reales y `alt`; una imagen usa `mediaId` de la biblioteca; un video usa `src` y
-     `poster` del bucket público de AXIS (`portfolio/v<N>/<slug>/`) y, si tiene voz, `captionsVtt`;
-   - `hero.mediaRef` apunta a un `id` de medio de algún capítulo;
-   - `services` sólo acepta claves del catálogo (`schema/services.v1.json` del plugin);
-   - ningún texto lleva HTML; los enlaces van en `https`.
-4. Revisa:
-
-   ```bash
-   pnpm public-website:portfolio -- validate <slug>
-   pnpm public-website:portfolio -- preview <slug>
-   ```
-
-   `preview` muestra qué vería el público según el alcance de la aprobación y guarda la proyección completa en
-   `tmp/portfolio/<slug>/preview.json`.
-5. Con el OK del operador, guarda (queda en borrador, nunca se publica solo):
-
-   ```bash
-   pnpm public-website:portfolio -- apply <slug> --message "<por qué>" --dry-run
-   pnpm public-website:portfolio -- apply <slug> --message "<por qué>"
-   ```
-
-### Editar un proyecto existente
-
-```bash
-pnpm public-website:portfolio -- pull <slug>
-# editar tmp/portfolio/<slug>/working.json
-pnpm public-website:portfolio -- diff <slug>
-pnpm public-website:portfolio -- validate <slug>
-pnpm public-website:portfolio -- apply <slug> --message "<por qué>"
-```
-
-`apply` guarda contra la revisión de la que partiste. Si alguien guardó entre medio, responde conflicto y no pisa
-nada: vuelve a hacer `pull`, reaplica tu cambio y guarda.
-
-### Publicar y despublicar
-
-```bash
-pnpm public-website:portfolio -- publish <slug> --message "<referencia de la aprobación>" --dry-run
-pnpm public-website:portfolio -- publish <slug> --message "<por qué>"
-pnpm public-website:portfolio -- unpublish <slug> --message "<por qué>"
-```
-
-Cada publicación queda registrada con quién, cuándo, qué revisión y qué aprobación:
-`pnpm public-website:portfolio -- log <slug>`. Ese registro es interno y nunca sale por la REST.
-
-### Historial y restaurar
-
-```bash
-pnpm public-website:portfolio -- revisions <slug>
-pnpm public-website:portfolio -- restore <slug> <revisión> --message "<por qué>"
-```
-
-Restaurar crea una revisión nueva con el contenido de la elegida; el historial nunca se borra.
+Un documento de partida puede ser el export de una entrada de Ohio (`TASK-2049`) o un fixture de
+`efeonce-public-site-runtime/tests/fixtures/portfolio/` como forma de ejemplo (nunca para aplicarlo tal cual).
+`apply` guarda contra la revisión de la que partiste: si alguien guardó entre medio responde `eop_conflict` y no pisa
+nada; vuelve a hacer `pull`, reaplica tu cambio y guarda. Restaurar crea una revisión nueva; el historial nunca se borra.
 
 ### Sumar piezas que el sitio ya tiene o un caso nuevo con video
 
@@ -251,6 +199,7 @@ producto: pide el visto bueno del operador antes.
 
 ## Referencias técnicas
 
+- Manual de la CLI y sus herramientas: [operar-portafolio-por-cli.md](operar-portafolio-por-cli.md).
 - Plugin: `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/` (`includes/class-eop-store.php`,
   `class-eop-validator.php`, `class-eop-projection.php`, `schema/portfolio-entry.v1.schema.json`).
 - CLI: `scripts/public-website/portfolio/cli.ts`, `local.php`, `remote.php`.

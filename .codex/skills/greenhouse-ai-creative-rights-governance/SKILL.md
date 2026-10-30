@@ -164,6 +164,12 @@ Before production, ensure the SOW/MSA or written approval addresses:
 
 Do not promise “100% original”, “exclusive copyright”, “no third-party claim”, or “copyright-free” unless Legal has approved the exact claim and its evidence.
 
+To show AI-produced work as a public case, use the `ai-production` kind of the site portfolio (`eo-portfolio` 0.8.0,
+`pnpm public-website:portfolio -- new <slug> --kind ai-production`): the `ai` block declares the models per stage,
+what the AI did and what the team did, and the «Producido con IA» badge always shows — there is no field to hide it.
+Asset clearance and the client's approval scope still decide what can be published. Manual:
+`docs/manual-de-uso/public-site/operar-portafolio-por-cli.md`.
+
 ### 6. Production controls
 
 Use agency-managed accounts, approved plans, least-privilege access, and client-safe workspaces. Do not use personal accounts for client material. Preserve the minimum evidence needed to reproduce or explain the work:

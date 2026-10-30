@@ -9,7 +9,7 @@
  * Every remote step goes through `pnpm public-website:wpcli` → `scripts/public-website/portfolio/remote.php` →
  * `wp eo-portfolio`, the same save service the admin screen uses. Production writes — `apply`, `publish`,
  * `unpublish`, `restore` — need the operator's go.
- * Manual: docs/manual-de-uso/public-site/operar-portafolio.md
+ * Manual: docs/manual-de-uso/public-site/operar-portafolio-por-cli.md
  */
 import { execFileSync } from 'node:child_process'
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -273,6 +273,8 @@ function validate(slug: string, args: string[]) {
   if (gate.length) {
     printIssues(gate, '·')
     console.log('  Se puede guardar como borrador; para publicar falta lo anterior.')
+  } else if (left.length) {
+    console.log('  Completa los marcadores antes de guardar: apply se niega mientras quede alguno.')
   } else {
     ok('Tiene aprobación del cliente con alcance: se puede publicar.')
   }
@@ -385,7 +387,7 @@ const HELP = `pnpm public-website:portfolio -- <comando>
   list                                  proyectos del sitio con estado y revisión
   pull <slug>                           trae el documento vivo a tmp/portfolio/<slug>/working.json
   kinds                                 tipos de proyecto: qué muestra cada página y qué necesita el documento
-  new <slug> --kind <tipo>              copia de trabajo nueva desde la plantilla del tipo (social, audiovisual,
+  new <slug> --kind <tipo> [--force]    copia de trabajo nueva desde la plantilla del tipo (social, audiovisual,
                                         ai-production, seo-content o campaign)
   new <slug> --from <archivo.json>      copia de trabajo nueva desde un documento de partida
   validate <slug> [--remote]            validador del plugin en local (y en el sitio con --remote)
@@ -400,7 +402,7 @@ const HELP = `pnpm public-website:portfolio -- <comando>
   verify [<slug>]                       REST pública, índice y página, sin campos internos
 
 apply, publish, unpublish y restore escriben en producción: necesitan el OK del operador.
-Manual: docs/manual-de-uso/public-site/operar-portafolio.md`
+Manual: docs/manual-de-uso/public-site/operar-portafolio-por-cli.md`
 
 function main() {
   const [command, ...args] = process.argv.slice(2).filter(arg => arg !== '--')
