@@ -162,6 +162,32 @@ del CLI, con streaming, o el SDK multimedia. MCP excluye las transferencias bina
   se identifica por su invitación, así que una sesión nueva conserva su recorrido. Nadie lee el de otra persona.
 - MCP: `progress.get` es lector; `progress.mark` queda excluido (un agente fabricaría un registro de lectura).
 
+### Tarjeta de invitación, estados, perfiles, adaptaciones y autores (TASK-2080 slices 3–5)
+
+> Decisión del operador 2026-10-30: «quiero todo lo que está en el canvas». Migraciones 15–16, local, sin push.
+
+- **Tarjeta previa al código.** `POST /api/invitations/start` y `GET /api/invitations/transaction` devuelven
+  `card{roomLabel, inviter{displayName,title,avatarUrl}|null, client{displayName,descriptor,monogram}|null,
+  invitee{displayName,role}|null, sharedWith[{displayName,role}]}`. El cliente sale de la marca de la edición
+  invitada; `sharedWith` son las otras invitaciones activas con nombre declarado. **Nunca correos.**
+- `invitations.create` acepta `recipientName` y `recipientRole` opcionales; se guardan sellados con la versión de la
+  invitación y se vuelven a sellar al reemitir.
+- **Estados explícitos** (HTTP 410, `error.details{canRequestNew, inviter?, retryAt?}`), solo para quien tiene el
+  token o la cookie de transacción reales: `invitation_revoked`, `invitation_expired`, `invitation_superseded`
+  (enlace reemplazado por una reemisión) y `code_expired`. Un token desconocido sigue siendo `invalid_invitation` (404).
+- `code_expired` → `POST /api/invitations/resend`: con el código vencido abre una transacción nueva y la entrega
+  como cookie; la transacción conserva su límite de 10 minutos. El código sigue siendo de **6 dígitos**.
+- **Perfil propio** (miembros internos): `profile.update {displayName, title|null, avatarUrl|null}` (https simple, sin
+  credenciales ni query) y `GET /api/v1/profile` (SDK `profile`). Es lo que la tarjeta muestra como «quién invita».
+  MCP lee `profile.get`; `profile.update` queda excluido.
+- **Adaptaciones de una pieza.** Los bloques de medio V3/V4 aceptan `adaptations[{assetRefId,label}]` (1–12, incluye
+  el asset principal) y `rationale` (fundamento). Proporciones: de las dimensiones medidas de cada asset.
+  `content.attachAsset` y `multimedia.attachAsset` aceptan `role: 'adaptation'` + `label` para sumar un formato sin
+  reemplazar el principal. Proyección, entrega privada, anclas de preguntas y tours cuentan todas las adaptaciones.
+  Cobertura: `adaptation_missing_primary`, `adaptation_duplicate`, `asset_reference_missing`.
+- **Autores visibles.** Preguntas y respuestas traen `author{displayName|null, kind:'internal'|'guest'}`: el nombre de
+  perfil del miembro o el nombre de la persona invitada, copiado a su sesión al canjear el código.
+
 ### Lecturas HTTP nuevas
 
 Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cursor` según su contrato.
@@ -171,6 +197,7 @@ Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cu
 | GET `/api/v1/rooms/:roomId/editions/:editionId/questions` | questions |
 | GET `.../steps` y `.../activity` | steps/activity |
 | GET `.../progress` | progress |
+| GET `/api/v1/profile` | profile |
 | GET `.../tours`, `.../tours/:tourId`, `.../notes` | tours/tour/ownNotes |
 | GET `.../presentations/:sessionId` y `.../console` | presentation/presentationConsole |
 | GET `/api/v1/rooms/:roomId/integrations` | integrations |

@@ -32,7 +32,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-30: slices 1 (capítulos) y 2 (recorrido propio) commiteados en efeonce-rooms claude/rooms-approved-ui (31c1a83, e37b152), migración14, suite 343/343 sin skips con PG18 local y ROOMS_RUNTIME_PROFILE=local. Sin push ni deploy. Faltan slices 3, 4, 5, 7, 8, 9, 10 y 6.`
+- Status real: `2026-10-30: slices 1–5 commiteados en efeonce-rooms claude/rooms-approved-ui (31c1a83 capítulos, e37b152 recorrido, b7e08aa tarjeta/estados/perfil, d3c6c24 adaptaciones/autores); migraciones 14–16, 46 tablas; verify 352/352 sin skips con PG18 local y ROOMS_RUNTIME_PROFILE=local. Sin push ni deploy. Faltan slices 7 (comparar ediciones), 8 (vista por rol), 9 (reloj/avance de presentación), 10 (señales y subtítulos) y 6 (cierre de contrato).`
 - Rank: `2 de la implementación de la UI aprobada (en paralelo con TASK-2079)`
 - Domain: `platform`
 - Blocked by: `none`
@@ -325,10 +325,10 @@ tablas y campos finales los decide el dueño backend respetando los invariantes 
 - [ ] `content.arrange` rechaza capítulos con bloques repetidos, excluidos o ausentes. (Parcial: los acepta y la cobertura bloquea la publicación con códigos explícitos; decidir si el comando debe rechazar en vez de dejar el borrador pendiente.)
 - [x] `progress.mark` repetido no duplica filas y rechaza bloques excluidos o de otra edición.
 - [x] `progress.get` solo devuelve el recorrido de la persona autenticada.
-- [ ] La tarjeta previa responde solo para tokens vigentes y con la forma resuelta; nunca incluye correos.
+- [x] La tarjeta previa responde solo para tokens vigentes y con la forma resuelta; nunca incluye correos.
 - [ ] `editions.compare`, `preview as`, `startedAt`/`durationMs`, `activity.view`/`signals.read` y subtítulos cumplen su slice y tienen tests; un guest recibe `not_found` en `signals.read`.
-- [ ] Los estados vencido y revocado se distinguen solo para tokens válidos; un token inventado sigue en `invalid_invitation`.
-- [ ] Preguntas y respuestas exponen `author.displayName` sin identificadores internos para guests.
+- [x] Los estados vencido y revocado se distinguen solo para tokens válidos; un token inventado sigue en `invalid_invitation`.
+- [x] Preguntas y respuestas exponen `author.displayName` sin identificadores internos para guests. (Nota: `authorId` opaco preexistente se mantiene en el DTO.)
 - [ ] API, SDK, CLI y MCP stdio exponen los mismos readers y commands (test de paridad).
 - [ ] V1/V2 publicados conservan su hash tras las migraciones.
 - [ ] `pnpm verify`, `pnpm db:smoke` e `pnpm invitation:integration` pasan.

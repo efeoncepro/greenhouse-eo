@@ -5,6 +5,16 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-30 — Backend de la UI aprobada: tarjeta, estados, perfiles, adaptaciones y autores
+
+- `local`: `b7e08aa` migración15 (perfil de miembros, perfil sellado del invitado, historial inmutable de tokens
+  reemplazados), tarjeta previa en start/transaction, estados 410 `invitation_revoked|expired|superseded` y
+  `code_expired` (resend abre transacción nueva; límite de 10 min intacto), `profile.update/get`.
+- `local`: `d3c6c24` adaptaciones por pieza + `rationale` en bloques V3/V4, helper único `blockAssetRefIds` en
+  proyección/entrega/anclas/tours/cobertura; migración16 nombre visible del invitado en su sesión; `author` en preguntas.
+- `local`: verify 352/352, 0 skip (PG18, `ROOMS_DATABASE_URL`, `ROOMS_RUNTIME_PROFILE=local`). Sin push/deploy/flags.
+  Pendiente TASK-2080: comparar ediciones, vista por rol, reloj/avance de presentación, señales y subtítulos.
+
 ## 2026-10-30 — Backend de la UI aprobada: capítulos y recorrido
 
 - Operador: «quiero todo lo que está en el canvas»; tarjeta previa completa y estados de invitación distintos
