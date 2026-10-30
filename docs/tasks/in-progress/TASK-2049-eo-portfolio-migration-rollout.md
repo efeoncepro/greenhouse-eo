@@ -8,8 +8,10 @@
 - Cambio de URLs (`cutover-ohio-to-portfolio.php`): 46 redirecciones 301 nuevas (las 15 páginas y 31 slugs viejos), 12
   reencadenadas a la página nueva, 15 entradas de Ohio en borrador. Verificado: 58 orígenes en 301 de un salto, 15
   destinos en 200, REST con 15, sitemap `eo_project` con 15 URLs. Evidencia en `tmp/portfolio-migration/` (local).
-- Pendiente para cerrar: los archivos `/portfolio-category/*` de Ohio siguen respondiendo 200; desactivar Ohio
-  Portfolio a los 30 días (desde 2026-11-29) tras revisar Search Console; ningún video que subir al bucket.
+- `/portfolio-category/*` (categoría, paginación, feed y raíz) responde 301 a `/portafolio/` con una regex de Yoast
+  (`redirect-portfolio-categories.php`); verificado en vivo, sin tocar rutas fuera de ese prefijo.
+- Pendiente para cerrar: desactivar Ohio Portfolio a los 30 días (desde 2026-11-29) tras revisar Search Console;
+  ningún video que subir al bucket.
 
 ## Delta 2026-10-29 — TASK-2047 cerrada
 
@@ -67,7 +69,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `15 proyectos publicados y 301 aplicados el 2026-10-30; faltan /portfolio-category/ y desactivar Ohio Portfolio a los 30 días`
+- Status real: `15 proyectos publicados y 301 aplicados el 2026-10-30 (también /portfolio-category/); falta desactivar Ohio Portfolio a los 30 días`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`

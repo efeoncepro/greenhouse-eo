@@ -9,8 +9,9 @@ gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_po
 - `eo_portfolio_enabled` = `1`: `/portafolio/` and `/portafolio/<slug>/` are the new pages; **15 projects published**
   (the ones that were live under Ohio, operator approval 2026-10-29, scope logo + pieces, no figures).
 - 46 Yoast 301 from `/project/*` and old slugs + 12 rechained; the 59 Ohio entries are drafts (none deleted).
-- Pending: video playback with `eo-axis-video` (no project has video yet), Ohio `/portfolio-category/*` still 200,
-  Ohio Portfolio deactivation after 30 days.
+- Ohio `/portfolio-category/*` → `/portafolio/` by one Yoast regex 301 `^/?portfolio-category(/.*)?$` (Yoast matches
+  regex against the full request URI **with** the leading slash: an origin `^portfolio-category…` never fires).
+- Pending: video playback with `eo-axis-video` (no project has video yet), Ohio Portfolio deactivation after 30 days.
 
 ## Public pages switch
 

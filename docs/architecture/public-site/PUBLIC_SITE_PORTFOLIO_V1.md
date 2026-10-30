@@ -132,8 +132,10 @@ el permalink llegan como callbacks (`EOP_REST::options`).
   `cutover-ohio-to-portfolio.php` (301 de Yoast desde `/project/<slug>/` y desde los slugs viejos, reencadena los
   redirects que terminaban en esas páginas, entradas de Ohio a borrador; `dryRun` por defecto).
 - Estado 2026-10-30: 15 proyectos publicados; 46 redirecciones 301 nuevas y 12 reencadenadas, 58 orígenes en un salto;
-  las 59 entradas de Ohio en borrador, ninguna borrada. Pendiente: `/portfolio-category/*` de Ohio sigue en 200 y Ohio
-  Portfolio se desactiva tras 30 días de tráfico residual.
+  las 59 entradas de Ohio en borrador, ninguna borrada. Archivos de categoría de Ohio: una redirección regex de Yoast
+  `^/?portfolio-category(/.*)?$` → `/portafolio/` (301; `redirect-portfolio-categories.php`). Yoast compara la regex
+  contra la ruta completa con la barra inicial, así que el origen debe admitirla. Pendiente: desactivar Ohio Portfolio
+  tras 30 días de tráfico residual.
 - Rollback de la salida: `set-portfolio-switch.php` con `{"enabled":"0"}` (vuelve la página 247116), borrar las 46
-  redirecciones creadas, devolver los 12 reencadenados a su destino `project/<slug>` y publicar de nuevo las 15
-  entradas de Ohio (lista en la salida del `cutover`).
+  redirecciones creadas, devolver los 12 reencadenados a su destino `project/<slug>`, borrar la regex de
+  `portfolio-category` y publicar de nuevo las 15 entradas de Ohio (lista en la salida del `cutover`).

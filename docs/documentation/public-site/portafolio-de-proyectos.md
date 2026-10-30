@@ -67,8 +67,8 @@ del tema Ohio.
   estaban publicados en el sitio y una página por proyecto en `/portafolio/<proyecto>/`.
 - Las direcciones viejas (`/project/<proyecto>/`) llevan directo a la página nueva de cada proyecto.
 - Las cifras de la portada (piezas, campañas y marcas) son las de toda la agencia y se cambian sin tocar los proyectos.
-- Falta: mostrar videos con reproducción (hoy ningún proyecto trae uno) y retirar las categorías viejas del portafolio
-  de Ohio.
+- Las categorías viejas del portafolio de Ohio (`/portfolio-category/...`) también llevan a la portada nueva.
+- Falta: mostrar videos con reproducción (hoy ningún proyecto trae uno).
 
 > Detalle técnico: [arquitectura](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md) ·
 > [manual](../../manual-de-uso/public-site/operar-portafolio.md) ·
