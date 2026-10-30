@@ -46,7 +46,10 @@ are projected only with `metrics`; contents only with `pieces`.
   them yet — edit them through the CLI.
 - **Brand marks:** channel logos are the AXIS isotypes compiled into `EOP_Platforms` (Pinterest from Iconify `logos`);
   UI icons (X action bar, players) are Remix paths in `EOP_Icons`. Never draw a brand mark or icon by hand.
-- **Deploy state:** 0.8.3 is live since 2026-10-30 (runtime `3850c44`): project page with the graphic-line measure orbit
+- **Deploy state:** 0.9.0 is live since 2026-10-30 (runtime `4d363b6`): a project with two or more chapters renders a
+  campaign explorer (`campaign_explorer`; chapters may carry `period`, `markets`, `summary`, `madeWithAi` — declare AI
+  per campaign, never with role `ai` in a campaign project); new images go in with `upload-portfolio-images.php`, a
+  retired entry gets its 301 with `redirect-retired-entry.php`. Since 0.8.3: project page with the graphic-line measure orbit
   (`measure_svg`), the project's line accent (`LINE_ACCENT`), a film strip for a landscape spot and a three-format hero
   stack (`hero_trio`). Since 0.8.2: one row per brand (`EOP_Render::by_brand`) shown
   as a campaign index — sub-rows with need, sourced figure and thumbnails, each with its own panel; any number of

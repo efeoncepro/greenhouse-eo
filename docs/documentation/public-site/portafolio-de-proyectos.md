@@ -19,6 +19,12 @@ con su fuente) y sus piezas al abrirla. Un cliente puede tener cualquier cantida
 queda detrás de «Ver N campañas más». Cada proyecto sigue teniendo su propia página. (Versión 0.8.2, en el sitio
 desde el 2026-10-30.)
 
+Dentro de un proyecto pasa lo mismo: si reúne **varias campañas** (Sky Airline tiene cinco destacadas), la página las
+muestra como un índice. Cada campaña dice cuándo se hizo, en qué mercados y en una línea qué fue, y al abrirla muestra
+sus piezas. Se ven tres y el resto queda detrás de «Ver N campañas más»; un filtro deja ver sólo las de un mercado. Si
+las piezas de una campaña se hicieron con inteligencia artificial, esa campaña lo dice («Producido con IA»).
+(Versión 0.9.0, en el sitio desde el 2026-10-30.)
+
 ## Cómo se guarda un proyecto
 
 - Cada proyecto es una ficha con campos fijos. El sistema la revisa antes de guardarla: si falta algo obligatorio, no

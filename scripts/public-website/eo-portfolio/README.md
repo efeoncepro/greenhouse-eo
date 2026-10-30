@@ -21,6 +21,8 @@ Scripts y evidencia de la limpieza del tipo `ohio_portfolio` en `efeoncepro.com`
 | `cutover-ohio-to-portfolio.php` | TASK-2049 Slice 4. 301 de Yoast de cada `/project/<slug>/` a su página nueva, reencadena los redirects que terminaban ahí y pasa la entrada de Ohio a borrador (nunca la borra). `dryRun` por defecto. |
 | `redirect-portfolio-categories.php` | Una redirección regex 301 de Yoast de `/portfolio-category/…` a `/portafolio/`. `dryRun` por defecto. |
 | `import-portfolio-media.php` | Sube a la biblioteca piezas que el sitio ya servía desde los assets de un plugin, para referenciarlas por `mediaId`. Idempotente por `_eop_source`; nada se descarga de fuera. |
+| `upload-portfolio-images.php` | Sube imágenes nuevas desde archivos locales (`--input-file`, después del manifiesto `{ source, files: [{ file, alt, title }] }`) y devuelve `mediaId`, ancho y alto. Idempotente por `_eop_source` = `<source>/<file>`. Primer uso: las 7 imágenes de Sky (2026-10-30, ids 252318–252324). |
+| `redirect-retired-entry.php` | Cuando un proyecto sale del portafolio: 301 de su URL al proyecto que tiene ese trabajo y reapunta las redirecciones que terminaban en ella (sin cadenas). Plan con `"apply": false`; se niega si el retirado sigue publicado. |
 | `batches/` | Lotes aplicados el 2026-10-30 (Sky y Berel, piezas sumadas, orden editorial). |
 | `purge-portfolio-cache.php` | Purga la caché de páginas (la misma de un guardado, `EOP_Cache::purge`) e imprime la versión activa del plugin. Correrla después de desplegar código que cambia el marcado: un despliegue no purga solo. La caché perimetral tarda 1–2 minutos más. |
 

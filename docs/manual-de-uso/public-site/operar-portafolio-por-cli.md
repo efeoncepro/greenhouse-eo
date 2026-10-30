@@ -134,6 +134,17 @@ pnpm public-website:portfolio -- restore <slug> <revisión> --message "<por qué
 pnpm public-website:portfolio -- unpublish <slug> --message "<por qué>"
 ```
 
+Si un proyecto sale del portafolio para siempre, su URL no debe quedar en 404: `redirect-retired-entry.php` la
+manda (301) a la entrada que ahora tiene ese trabajo y redirige directo allí las URL viejas que pasaban por ella.
+Primero con `"apply": false` (plan), después `true`, con el OK del operador:
+
+```bash
+pnpm -s public-website:wpcli -- --eval-file scripts/public-website/eo-portfolio/redirect-retired-entry.php --input-file retiro.json --wp-user 12
+```
+
+`retiro.json`: `{ "from": "<slug retirado>", "to": "<slug destino>", "apply": false }`. Se niega si el retirado sigue
+publicado o el destino no lo está.
+
 ### Editar un proyecto que ya existe
 
 ```bash
@@ -172,6 +183,23 @@ cumplir en todos:
 | `audiovisual` | `audiovisual.json` | Hero en video; cortes con `role: "cut"` y `version`; rodaje con `role: "bts"` y `consentRef`. |
 | `ai-production` | `ai-production.json` | El bloque `ai` con `models` y `teamDid`; piezas con `role: "ai"` y `aiStage`. |
 | `seo-content` | `seo-content.json` | El bloque `search` con `source`, `period` y al menos una cifra; para publicar, `metrics` en el alcance. |
+
+### Proyectos con varias campañas (explorador, 0.9.0)
+
+Un proyecto con **dos o más capítulos** se muestra como un explorador: cada capítulo es una fila con su periodo,
+mercados, una línea y tres miniaturas, y al abrirla aparecen sus piezas. Se ven tres y el resto queda tras «Ver N
+campañas más»; si los capítulos cubren dos o más mercados, aparece un filtro por mercado. Con un solo capítulo la
+galería sigue como antes. Cada capítulo puede declarar, además de `name`, `note` y `media`:
+
+| Campo | Qué es | Ejemplo |
+|---|---|---|
+| `period` | Cuándo se hizo, en texto | `"Noviembre 2025"` |
+| `markets` | Mercados, de esta lista: `cl`, `pe`, `ar`, `uy`, `br`, `us`, `mx`, `co`, `ec`, `bo`, `py`, `es` | `["cl", "br", "us"]` |
+| `summary` | Una línea sobre la campaña (si falta, se usa `note`) | `"La oferta del año, del 26/11 al 03/12."` |
+| `madeWithAi` | `true` si sus piezas se hicieron con IA: la fila muestra «Producido con IA» | `true` |
+
+`madeWithAi` declara la IA **sólo en esa campaña**. No uses el rol `ai` en un proyecto de campañas: marca todo el
+proyecto como «Producido con IA». Ejemplo vivo: la entrada de Sky Airline (revisión 2, 2026-10-30), con cinco campañas.
 
 ### Roles de pieza y sus campos
 
@@ -311,6 +339,8 @@ Ya se usaron en `TASK-2046` y `TASK-2049`; quedan como referencia y para rollbac
 | `clean-ohio-real-entries.php` | Limpia restos de demo en las 15 reales. | `dryRun` por defecto |
 | `apply-portfolio-bundle.php` | Carga un lote `{"projects":[…]}` (todo o nada); `"publish": true` publica, `"update": true` cambia existentes con su `revision`. | Producción |
 | `import-portfolio-media.php` | Lleva a la biblioteca piezas que el sitio ya sirve y devuelve su `mediaId`. Idempotente. | Producción |
+| `upload-portfolio-images.php` | Sube imágenes nuevas desde archivos locales a la biblioteca (manifiesto `source` + `files` y una `--input-file` por imagen) y devuelve `mediaId`, ancho y alto. Idempotente por `_eop_source`. Los videos no: van al bucket de AXIS. | Producción |
+| `redirect-retired-entry.php` | Redirige (301) un proyecto retirado a otro y reapunta las redirecciones que pasaban por él. Plan primero. | Producción |
 | `cutover-ohio-to-portfolio.php` | 301 de `/project/<slug>/` a `/portafolio/<nuevo>/`, encadena los redirects previos y pasa la entrada Ohio a borrador. | `dryRun` por defecto |
 | `redirect-portfolio-categories.php` | Un 301 de `/portfolio-category/…` a `/portafolio/`. | `dryRun` por defecto |
 | `set-portfolio-switch.php` | Interruptor de las páginas (`0`, `preview`, `1`), orden de la portada y cifras de la agencia. | Producción |

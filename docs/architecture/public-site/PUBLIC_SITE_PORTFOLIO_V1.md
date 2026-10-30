@@ -139,6 +139,16 @@ Spec de diseño y hallazgos medidos: auditoría del 2026-10-29 (390/768/1440) re
   < 1,2 o más de 3), panel de cada fila del índice y el abanico del hero de la entrada.
 - **Etiqueta de formato** (`.eop-tag`, «9:16», «4:5»…) en cada pieza, arriba a la izquierda; la pausa va arriba a la
   derecha, como botón redondo de 44 px con ícono (el texto queda como nombre accesible).
+- **Explorador de campañas (0.9.0, en producción desde el 2026-10-30; runtime 4d363b6, respaldo
+  `/tmp/eo-portfolio-before-20261030-150754.tar`).** Una entrada con dos o más capítulos los muestra como el índice de
+  la fila de marca (`EOP_Render::campaign_explorer`): fila por capítulo con periodo, mercados, una línea y tres
+  miniaturas; abre sus piezas (`chapter_gallery`); tres a la vista y el resto tras «Ver N campañas más»
+  (`BRAND_FOLD`); filtro por mercado si cubren dos o más; mismo movimiento del índice; sin script todo abierto. Con un
+  capítulo, la galería de antes. Esquema: `chapters[].period|summary|markets|madeWithAi` (mercados en lista cerrada;
+  `madeWithAi` declara «Producido con IA» sólo en esa campaña, porque el rol `ai` marcaría toda la entrada). Primer
+  caso: Sky Airline, revisión 2 («La agencia de Sky, campaña tras campaña», cinco campañas con piezas de OneDrive:
+  videos al bucket de AXIS, imágenes con `upload-portfolio-images.php`). «Fiestas Patrias Perú» despublicada el mismo
+  día; su 301 a Sky (`redirect-retired-entry.php`) quedó planificado y pendiente del OK del operador.
 - **Página de proyecto como el diseño (0.8.3, en producción desde el 2026-10-30; runtime 3850c44, respaldo
   `/tmp/eo-portfolio-before-20261030-143232.tar`).** Órbita de
   medida según la línea gráfica (`EOP_Render::measure_svg`, `trajectory.measure`): la esfera parte a las 12 y se detiene
