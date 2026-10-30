@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Portafolio nuevo en producción desde 2026-10-30 con 17 proyectos; TASK-2046, 2047 y 2048 complete; TASK-2049 abierta sólo por desactivar Ohio Portfolio desde el 2026-11-29.`
+- Status real: `Portafolio nuevo en producción desde 2026-10-30 con 16 proyectos publicados y el plugin 0.10.8 (tipos de proyecto con página propia, incluido marketing de contenidos con Berel; servicios como categorías de las cinco líneas, sin productos; servicios de cada proyecto enlazados a sus páginas de venta). TASK-2046, 2047 y 2048 complete; TASK-2049 abierta por desactivar Ohio Portfolio desde el 2026-11-29 y por los pendientes listados abajo.`
 - Rank: `TBD`
 - Domain: `content`
 - Owner: `unassigned`
@@ -61,7 +61,26 @@ porque es urgente y de bajo riesgo.
 - `TASK-2046` — [Limpieza de los demos de Ohio](../../tasks/complete/TASK-2046-eo-portfolio-ohio-demo-cleanup.md): complete (2026-10-29). 44 demos en borrador con 410, Elementor demo y Envato fuera de las 15 reales; resolvió ISSUE-183.
 - `TASK-2047` — [Plugin y contenido](../../tasks/complete/TASK-2047-eo-portfolio-plugin-content.md): complete (2026-10-29). Plugin v0.2.0 en producción: documento validado, compuerta de cliente, tres puertas y CLI de agentes.
 - `TASK-2048` — [Portada y entrada](../../tasks/complete/TASK-2048-eo-portfolio-index-entry-templates.md): complete el 2026-10-30 (v0.5.4).
-- `TASK-2049` — [Migración y salida a producción](../../tasks/in-progress/TASK-2049-eo-portfolio-migration-rollout.md): 17 proyectos publicados y 301 aplicados el 2026-10-30 (también `/portfolio-category/*`); falta desactivar Ohio Portfolio desde el 2026-11-29.
+- `TASK-2049` — [Migración y salida a producción](../../tasks/in-progress/TASK-2049-eo-portfolio-migration-rollout.md): 301 aplicados el 2026-10-30 (también `/portfolio-category/*`); 16 proyectos publicados con plugin 0.10.8; falta desactivar Ohio Portfolio desde el 2026-11-29.
+
+## Progreso al 2026-10-30
+
+- En producción: plugin 0.10.8 (runtime `21fe1fd`; commits sin empujar en ambos repos).
+- Berel publicado como marketing de contenidos («Berel, color por color», revisión 6): tres artículos de berel.com con
+  sus piezas por canal, cuatro campañas en el explorador, producción de septiembre 2026 y cifras de Search Console
+  aprobadas.
+- Catálogo de servicios del portafolio = categorías de servicio dentro de Brand, Engine, Growth, Voice y Revenue;
+  Creative Studio, Marketing Studio, Wave, Globe y Reach nunca son servicio ([PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md), delta 2026-10-30 (2)).
+- Los 16 proyectos enlazan sus servicios a las páginas de venta del sitio (`links.relatedServices`); ficha editorial
+  «{Cliente} necesitaba…» y página en primera persona plural.
+
+## Pendientes abiertos
+
+- Desactivar Ohio Portfolio desde el 2026-11-29, con Search Console revisado.
+- Eyebrow «ENGINE · WAVE» del menú principal (PDR-027): decisión del operador.
+- 11 meta descriptions en tercera persona («Proyecto de Efeonce para X»): consultar al operador.
+- Confirmar el uso de IA en Cyber WOW y la fecha de inicio de Sky.
+- Empujar los commits del runtime y de greenhouse-eo.
 
 ## Existing Related Work
 

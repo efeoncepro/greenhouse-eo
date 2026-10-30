@@ -1,15 +1,16 @@
 # Portafolio del sitio público (EO Portfolio) — V1
 
 > **Tipo de documento:** Arquitectura técnica
-> **Version:** 1.8
+> **Version:** 2.0
 > **Creado:** 2026-10-29 por Claude (TASK-2047)
-> **Ultima actualizacion:** 2026-10-30 por Claude (§7.3: tipo `content-marketing`, plugin 0.10.0 en producción; TASK-2049)
+> **Ultima actualizacion:** 2026-10-30 por Claude (plugin 0.10.0–0.10.8 integrado: tipo `content-marketing`, catálogo
+> de servicios por línea, ficha editorial, servicios enlazados a sus páginas de venta, filas de campaña con su color;
+> TASK-2049)
 > **Decisión:** [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) ·
 > **Epic:** [EPIC-056](../../epics/in-progress/EPIC-056-eo-portfolio.md)
-> **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/`. En producción: **v0.7.1** (runtime
-> 2fa62cc: admin, tipos de pieza, páginas públicas, video, capa de teléfono y tablet, búsqueda y agentes; 17 proyectos
-> publicados). **v0.8.0** (tipos de proyecto con página propia, §7.3) está construida y commiteada en runtime c6e1734,
-> con el paquete armado; **no está desplegada**: el despliegue espera el OK del operador.
+> **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/`. En producción: **v0.10.8** desde el
+> 2026-10-30 (runtime `21fe1fd`; los commits del runtime aún no están empujados). 16 proyectos publicados. Historial de
+> versiones en §8.
 
 ## 1. Qué resuelve
 
@@ -36,13 +37,37 @@ documento validado, un solo servicio de guardado y tres puertas, render del serv
 
 - Esquema: tipos, enums (`line`: growth, brand, engine, voice, revenue; `results[].kind`: number, percent, text;
   `scope`: logo, pieces, metrics, testimonial, creators; `kind` del proyecto: campaign, website, web-section, ugc,
-  system, other; `role` de cada pieza: campaign, web, section, ugc, in-situ, diagram, answer), largos, patrones (sin `<>`, `https`, slugs), campos desconocidos
-  rechazados.
+  social, audiovisual, ai-production, content-marketing, seo-content, system, other; `role` de cada pieza: campaign,
+  web, section, ugc, in-situ, diagram, answer y, por tipo, post, cut, bts, ai, banner —§7.3—), largos, patrones (sin
+  `<>`, `https`, slugs, `$defs.color` para hex `#rrggbb`), campos desconocidos rechazados.
 - Reglas de conjunto: imagen con `mediaId` y sin campos de video; video con `src` y `poster` y sin `mediaId`; voz exige
   `captionsVtt`; ids de medio únicos; `hero.mediaRef` existe; `percent` entre 0 y 100; `services` en
-  `schema/services.v1.json` (desde 0.10.6: las categorías de servicio de cada una de las cinco líneas —Brand: Creative Services, Channel & Commerce; Engine: Search Visibility 360, Web Experience 360, Product Design 360, Agent Systems & Platforms, Digital Automation & Integrations; Voice: Media & Distribution; Revenue: RevOps & CRM; Growth: Measurement & Analytics—, cada una con su `line`; los productos —Creative Studio, Marketing Studio, Wave, Globe, Reach— nunca son servicio); `src`, `poster` y `captionsVtt` sólo bajo los prefijos de
+  `schema/services.v1.json`; `src`, `poster` y `captionsVtt` sólo bajo los prefijos de
   `schema/media-hosts.v1.json` (bucket público de AXIS, `MEDIA_HOST_NOT_ALLOWED`). Los mensajes `REQUIRED` nombran el
   campo en castellano (`EOP_Validator::NAMES`).
+- **Catálogo de servicios** (`schema/services.v1.json`, desde 0.10.6): los servicios son **categorías de servicio
+  dentro de las cinco líneas**, cada una con su `line`. Brand: `creative-services` (Creative Services),
+  `channel-commerce` (Channel & Commerce). Engine: `search-visibility-360`, `web-experience-360`, `product-design-360`,
+  `agent-systems-platforms`, `digital-automation-integrations`. Voice: `media-distribution` (Media & Distribution).
+  Revenue: `revenue-operations-crm` (RevOps & CRM). Growth: `measurement-analytics` (Measurement & Analytics). Los
+  productos de Efeonce —Creative Studio, Marketing Studio, Wave, Globe, Reach— **nunca** son servicio ni línea; por eso
+  salieron `wave`, `creative-studio`, `hubspot-as-a-service`, `salesforce` y `factory`. El admin etiqueta cada
+  categoría con su línea («Creative Services · Brand»). **Retirar una clave exige migrar antes las entradas que la usan:**
+  un documento guardado con una clave que ya no está en el catálogo deja de validar y deja de renderizarse como página
+  del portafolio (§4, `served()`).
+- Capítulos y enlaces: `chapters[].period|summary|markets|madeWithAi|swatch` (mercados en lista cerrada; `madeWithAi`
+  declara «Producido con IA» sólo en esa campaña; `swatch` es el color `#hex` de la fila de la campaña, §7.1). `links`:
+  `canonicalCase` (caso largo del blog), `liveWork` {`url`, `label`} (el trabajo publicado, p. ej. el blog del cliente) y
+  `relatedServices` (slugs de las páginas de venta del sitio que corresponden al proyecto, §7.1). **Todo proyecto nuevo
+  declara `relatedServices`.**
+- `need` se escribe para seguir a «necesitaba»: frase nominal o infinitivo, sin punto final (la página arma
+  «{Cliente} necesitaba {need}.», §7).
+- `content-marketing` (0.10.0): `articles` (1–6) con `title`, `url` (https), `excerpt` (el texto de apertura
+  publicado, tal cual), `published` (YYYY-MM), `label`, `swatch` {`name`, `code`, `color` #hex} y `pieces` (ids de
+  piezas de los capítulos); `production` {`period` YYYY-MM, `source`, `items` ≤ 4 de {`value` entero en texto,
+  `label`}}; `process` (3–6 pasos {`title`, `body`}). El validador exige `articles` (`REQUIRED /articles`) y que cada id
+  de `articles[].pieces` exista (`UNKNOWN_REFERENCE`); **no exige el alcance `metrics`** (si se agregan cifras de
+  búsqueda, siguen ese alcance).
 - Tipos de pieza (`EOP_Validator::ROLE_FIELDS`): una pieza sin `role` es `campaign` y un proyecto sin `kind` es
   `campaign` (los documentos anteriores siguen válidos). Cada rol trae sólo sus campos: `web` → `device`
   (desktop, mobile, tablet), `longCapture` (captura de la página completa), `liveUrl`; `section` → `sectionName`
@@ -88,6 +113,12 @@ portada; un capítulo que queda vacío no se publica). Agrega `kind`, y por piez
 del índice; `format` por medio, `formats` del proyecto y `measure` (primer porcentaje con alcance `metrics`, habilita la órbita de medida). Las URLs de imágenes y
 el permalink llegan como callbacks (`EOP_REST::options`).
 
+- Capítulos: `period`, `summary`, `markets`, `madeWithAi` y `swatch` pasan con su capítulo (que sigue a `pieces`).
+- `content-marketing`: cada artículo resuelve sus piezas desde los capítulos visibles; un artículo sin piezas visibles
+  no se publica. `articles`, `production` y `process` siguen al alcance `pieces` (describen el trabajo).
+- `links`: `canonicalCase`, `liveWork` y `relatedServices` pasan tal cual; la resolución de los slugs a páginas
+  publicadas ocurre en el render (§7.1), no en la proyección.
+
 ## 7. Páginas públicas (`EOP_Render`, TASK-2048)
 
 - Rutas: `/portafolio/` (índice) y `/portafolio/<slug>/` (entrada), atendidas en `template_redirect` (prioridad 0)
@@ -104,8 +135,16 @@ el permalink llegan como callbacks (`EOP_REST::options`).
   piezas visibles dentro del número grande (mezcla `lighten`), índice filtrable por línea e industria (`?linea=` en el
   servidor) con la primera fila abierta, testimonio sólo si alguno está aprobado y cierre al agendador
   (`data-action="open_meeting_scheduler"`). Entrada: hero con hasta tres piezas, ficha, reto/idea/ejecución,
-  resultados y órbita de medida sólo con cifras aprobadas, galería justificada por capítulo, equipo, caso completo,
-  cierre y siguiente proyecto.
+  resultados y órbita de medida sólo con cifras aprobadas, galería justificada por capítulo (o explorador de campañas
+  con dos o más), testimonio, «Detrás del trabajo», cierre y siguiente proyecto. Un tipo con página propia agrega o
+  reemplaza secciones (§7.3); `content-marketing` no lleva ficha ni pasos (`EOP_Render::has_record`).
+- **Voz:** la página habla en primera persona plural; nunca dice «Efeonce hizo» ni habla de Efeonce en tercera persona.
+  La autoría queda en el JSON-LD (`creator`, §7.2). Excepción conocida: 11 meta descriptions todavía dicen «Proyecto de
+  Efeonce para X» (fragmento de SEO; pendiente de decisión del operador).
+- **Ficha del proyecto como bloque editorial (0.10.2, tableros `EntradaUGC` y `EntradaWeb`).** «FICHA DEL PROYECTO»
+  en dos columnas: a la izquierda el titular «{Cliente} necesitaba {need}.» (`EOP_Render::need_line`, fijo al bajar en
+  escritorio); a la derecha los datos como ficha técnica numerada con filetes que se dibujan al llegar; el hover entibia
+  una línea y dibuja su acento. En teléfono se apila.
 - SEO: ver §7.2 (`EOP_Seo`).
 - Video (`EOP_Render::piece`): sin voz, silenciado y en loop sólo mientras está en pantalla (IntersectionObserver), con
   botón de pausa visible y sin arrancar solo con «reducir movimiento»; con voz, controles y subtítulos, nunca solo. Si
@@ -145,15 +184,26 @@ Spec de diseño y hallazgos medidos: auditoría del 2026-10-29 (390/768/1440) re
   línea, cita liviana con la frase destacada en negrita y la firma con el logo del cliente si la aprobación incluye
   `logo`. Campo opcional `testimonial.highlight`: tiene que estar tal cual dentro de la cita (`UNKNOWN_REFERENCE` si
   no; el render cae a la cita sin destacar). «Detrás del trabajo» (`behind`) muestra sólo las columnas con datos:
-  equipo con su periodo («en curso» sin `period.to`), servicios, mercados de los capítulos y el caso completo. Sky
-  revisión 3: logo negativo oficial (mediaId 252326) y frase «agilizar mucho la carga de trabajo».
+  equipo con su periodo («en curso» sin `period.to`), servicios, mercados de los capítulos, el trabajo publicado y el
+  caso completo. Sky revisión 3: logo negativo oficial (mediaId 252326) y frase «agilizar mucho la carga de trabajo».
+  Desde 0.10.1: los servicios son enlaces a las páginas de venta de `links.relatedServices` (`EOP_Render::service_pages`
+  resuelve por slug sólo páginas publicadas, en orden; el slug que no existe se salta), con el título de la página y
+  una flecha; sin `relatedServices` quedan las etiquetas del catálogo en texto. Un solo mercado se muestra como
+  «MERCADO» + nombre. `links.liveWork` agrega «EL TRABAJO PUBLICADO». Tras una sección oscura (voz, cifras) el bloque
+  lleva espacio superior y los nombres largos de servicio cortan línea ajustados. En `content-marketing` el bloque abre
+  con la frase de `need_line`.
 - **Explorador de campañas (0.9.0, en producción desde el 2026-10-30; runtime 4d363b6, respaldo
   `/tmp/eo-portfolio-before-20261030-150754.tar`).** Una entrada con dos o más capítulos los muestra como el índice de
   la fila de marca (`EOP_Render::campaign_explorer`): fila por capítulo con periodo, mercados, una línea y tres
   miniaturas; abre sus piezas (`chapter_gallery`); tres a la vista y el resto tras «Ver N campañas más»
   (`BRAND_FOLD`); filtro por mercado si cubren dos o más; mismo movimiento del índice; sin script todo abierto. Con un
-  capítulo, la galería de antes. Esquema: `chapters[].period|summary|markets|madeWithAi` (mercados en lista cerrada;
-  `madeWithAi` declara «Producido con IA» sólo en esa campaña, porque el rol `ai` marcaría toda la entrada). Primer
+  capítulo, la galería de antes. Esquema: `chapters[].period|summary|markets|madeWithAi|swatch` (§3; `madeWithAi`
+  declara «Producido con IA» sólo en esa campaña, porque el rol `ai` marcaría toda la entrada). **Filas con color
+  (0.10.7–0.10.8, como el tablero aprobado):** con `chapters[].swatch`, la fila lleva punto de pintura + nombre
+  (clamp 28–40 px) + «Producido con IA» en una línea y «{periodo} · {mercado} · {resumen}» en otra; la fila abierta no
+  lleva tinte gris; las piezas van sobre un lavado redondeado del color de la campaña que nace de la fila y guarda margen
+  del número; en hover se desliza la fila del nombre entera (color, nombre y etiqueta), nunca el nombre sobre la
+  etiqueta. Las filas sin `swatch` (Sky) no cambian. Primer
   caso: Sky Airline, revisión 2 («La agencia de Sky, campaña tras campaña», cinco campañas con piezas de OneDrive:
   videos al bucket de AXIS, imágenes con `upload-portfolio-images.php`). «Fiestas Patrias Perú» despublicada el mismo
   día; su 301 a Sky (`redirect-retired-entry.php`) aplicado el 2026-10-30: la URL retirada y 4 URL viejas de Ohio que
@@ -237,6 +287,7 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
 | `audiovisual` | `cut`: `version`, `where` (y `durationSeconds` en el video); `bts`: `consentRef` (nunca público); `specs` (ficha técnica, ≤ 10 pares) | Hero de cine (la pieza madre a pantalla completa, cortinas que se abren, grano, pausa visible); línea de tiempo de cortes a escala de su duración; detrás de cámara en abanico; créditos que suben cuando hay 3 o más (si no, el bloque de equipo de siempre) |
 | `ai-production` | `ai` (obligatorio: `models` con `stage` —image, video, voice, music, upscale, compositing, other— y `name`, y `teamDid`; opcionales `aiDid` y `fictional`); `ai`: `aiStage` (anchor, angle, expression, pose, plate, scene, final), `label`, `compareTo` | Etiqueta «Producido con IA» (también en cualquier proyecto con una pieza `ai`); la escena se resuelve del ruido y entra la marca; vista giratoria de ángulos; expresiones; poses; antes y después con deslizador; qué hizo la IA y qué hizo el equipo; cómo se gobierna |
 | `seo-content` | `search` (obligatorio: `source`, `period` y al menos una cifra entre `highlight`, `kpis` —con `series` opcional—, `series` —con `compare` del mismo largo—, `query`, `keywords` o `aeo`; `contents` no cuenta como cifra); `banner`: `size` | Cifra principal y curva dibujada en el servidor (SVG); indicadores con su mini gráfica; el resultado que sube en una búsqueda; la respuesta de IA que cita a la marca; palabra por palabra; contenidos publicados; banners |
+| `content-marketing` (0.10.0, tablero «Entrada de marketing de contenidos») | `articles` (obligatorio), `production`, `process` (§3); piezas con los roles existentes (el fixture usa `post` y `banner`) y `chapters[].swatch` | Hero con una mancha de pintura en movimiento que sostiene la portada de cada artículo (`EOP_Kinds::blob`), con su reel y su pin flotando; selector «UN COLOR, UN ARTÍCULO» (`EOP_Kinds::hero_extra`); la página toma `--eop-paint` (color registrado con `@property`) del artículo en vista y hace fundido; **sin goteo**. «Un artículo, todos sus canales»: tarjeta del artículo (píldora con la URL, portada, etiqueta · mes, título, extracto, «Leer el artículo en {host} ↗») con hasta 4 publicaciones en marcos de canal (isotipos oficiales de AXIS, proporción del formato) y líneas de pintura; los banners del artículo. Banda oscura «Una fábrica de contenidos, no piezas sueltas»: odómetros de `production` con su fuente y «EL RECORRIDO DE CADA ARTÍCULO» (`process`) sobre una línea en degradé de pintura. Después: explorador de campañas, cifras, «Detrás del trabajo» y cierre. Sin ficha ni pasos |
 
 - Reglas (`EOP_Validator`): `ROLE_FIELDS` limita cada campo a su rol (`INVALID_SHAPE` si aparece en otro);
   `ROLE_REQUIRED` exige `channel` en `post`, `version` en `cut`, `consentRef` en `bts` y `aiStage` en `ai`;
@@ -246,55 +297,50 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
 - Proyección (`EOP_Projection::search`): las cifras de `search` salen con `metrics`; sus `contents` (con `source` y
   `period`) salen con `pieces`; `specs` y `ai` salen siempre (la declaración
   de IA no se puede ocultar); `consentRef` nunca sale.
-- `content-marketing` (0.10.0, tablero «Entrada de marketing de contenidos»): `articles` (1–6: `title`, `url`, `excerpt`
-  —el texto publicado—, `published` YYYY-MM, `label`, `swatch` {`name`, `code`, `color` #hex} y `pieces`, ids de piezas del
-  proyecto, `UNKNOWN_REFERENCE` si alguno no existe), `production` {`period`, `source`, `items` ≤ 4 de cifra entera y
-  etiqueta} y `process` (3–6 pasos). Exige `articles`; **no exige `metrics`** (las cifras de búsqueda siguen ese
-  alcance si se agregan). La proyección resuelve las piezas de cada artículo desde los capítulos visibles y deja fuera el
-  artículo sin piezas; `articles`, `production` y `process` siguen a `pieces`. La página toma `--eop-paint` (color
-  registrado con `@property`) del artículo en vista: héroe de pintura líquida con la portada de cada artículo, selector de
-  colores, goteo hacia el papel, el artículo al centro con cada pieza en el marco de su canal, banners, la producción en
-  odómetros y el recorrido. Sin script se ve el primer artículo arriba y todos abajo. No toma piezas de la galería: el
-  explorador de campañas es el archivo. Generales en 0.10.0: `chapters[].swatch` (#hex, color de la fila), `links.liveWork`
-  {`url`, `label`} («El trabajo publicado» en «Detrás del trabajo»), un solo mercado se muestra como «MERCADO»; el admin
-  conserva lo que un capítulo dice de sí, `swatch`, `liveWork` y `testimonial.highlight`.
-- 0.10.1: «Detrás del trabajo» enlaza los servicios a sus páginas de venta desde `links.relatedServices` (slugs de
-  páginas; `EOP_Render::service_pages` resuelve sólo páginas publicadas, por slug); sin ellos queda el texto del
-  catálogo. Los 16 proyectos publicados declaran sus páginas desde el 2026-10-30. `content-marketing` no lleva ficha ni
-  pasos (`EOP_Render::has_record`): va del héroe a sus artículos, muestra las cifras después de las campañas y dice en
-  una frase, desde su `need`, qué hizo Efeonce para quién.
-- 0.10.2: la ficha es un bloque editorial en dos columnas: a la izquierda el titular «{Cliente} necesitaba {need}»
-  (`EOP_Render::need_line`, fijo al bajar; la página nunca habla de Efeonce en tercera persona: la autoría queda en el
-  JSON-LD como `creator`), a la derecha los datos como ficha técnica numerada con filetes que se dibujan al llegar.
-  `content-marketing` usa la misma frase en «Detrás del trabajo». En producción desde el 2026-10-30 (runtime `2997847`).
-- 0.10.3 (runtime `3ea1cec`): el borde del héroe de `content-marketing` es pintura derramada (SVG con filtro goo: borde
-  que ondula, gotas con punta redondeada que se estiran y sueltan gotas, brillo húmedo; proporción fija con `slice`).
-  «Detrás del trabajo» lleva espacio superior cuando sigue a una sección oscura (voz o cifras).
-- 0.10.4–0.10.5: se retira el goteo; el héroe de `content-marketing` termina limpio, como el tablero aprobado.
-- 0.10.6 (runtime `194e1e8`): `services` son categorías de servicio dentro de las cinco líneas (ver §3); Berel quedó en
-  Engine con Search Visibility 360 y Creative Services, Sky en Brand con Creative Services. Ojo: un documento guardado con
-  una clave que ya no está en el catálogo deja de renderizarse; migrar las entradas antes de retirar una clave.
-- 0.10.7 (runtime `e8111e1`): las filas de campaña con `swatch` siguen su tablero (nombre, color e IA en una línea;
-  fecha y resumen en una; panel sobre un lavado de su color, sin tinte gris en la fila abierta). 0.10.8 (runtime `21fe1fd`):
-  en hover la fila se desliza entera (color, nombre y etiqueta de IA) y el lavado guarda margen del número.
-- Las piezas que un tipo muestra en sus secciones salen de la galería genérica (`EOP_Kinds::taken`).
+- `content-marketing` en el navegador: `[data-eop-art-pick]` (selector), `[data-eop-art-layer]` (capa del hero),
+  `[data-eop-art-panel]` (artículo) y los grupos `[data-eop-art-group]` que el script muestra; sólo se reproducen los
+  videos del artículo a la vista (compuerta `s.art`). Sin script: el primer artículo arriba y todos los artículos
+  listados. La pintura nunca gotea: el borde derramado de 0.10.3 se retiró por decisión del operador (PDR-028, delta
+  2026-10-30).
+- Las piezas que un tipo muestra en sus secciones salen de la galería genérica (`EOP_Kinds::taken`); para
+  `content-marketing` no toma ninguna, porque el explorador de campañas es el archivo.
 - Isotipos oficiales de canal copiados de AXIS (`@efeoncepro/axis-brand-assets`, `assets/platforms/`; Pinterest del set
   `logos` de Iconify) en `EOP_Platforms`; íconos de interfaz de Remix Icon en `EOP_Icons`. Nada dibujado a mano.
-- Admin: los tipos y roles nuevos aparecen en los selectores; los campos que el formulario aún no edita (`specs`, `ai`,
-  `search` y los de cada rol nuevo) se conservan al guardar (`EOP_Admin::carry_over`). Se editan por la CLI.
+- Admin: los tipos y roles nuevos aparecen en los selectores (`content-marketing` como «Marketing de contenidos»); los
+  campos que el formulario aún no edita (`specs`, `ai`, `search`, `articles`, `production`, `process`, lo que un capítulo
+  dice de sí —`period`, `summary`, `markets`, `madeWithAi`, `swatch`—, `links.liveWork`, `testimonial.highlight` y los de
+  cada rol nuevo) se conservan al guardar (`EOP_Admin::carry_over`). Se editan por la CLI.
 - CLI: `kinds` explica cada tipo; `new <slug> --kind <tipo>` parte de `scripts/public-website/portfolio/templates/`;
   `apply` se niega mientras queden marcadores `[COMPLETAR…]` o el `mediaId` 1 de la plantilla.
 
 ## 8. Pruebas y despliegue
 
-- Estado: 0.8.0 en producción desde el 2026-10-30 (runtime c6e1734, paquete sha256 `f0553b87…`, 23 archivos;
-  respaldo previo en el servidor `/tmp/eo-portfolio-before-20261030-121629.tar`). Verificado: el sitio sirve
-  `?ver=0.8.0`, las 17 entradas responden 200 sin errores PHP y el validador vivo acepta los cuatro tipos nuevos.
+- Estado: **0.10.8 en producción desde el 2026-10-30** (runtime `21fe1fd`). Los commits del runtime todavía no están
+  empujados. Historial del 2026-10-30 (todas desplegadas ese día):
 
-- `php tests/eo-portfolio.test.php` (498 comprobaciones en PHP puro sobre 8 fixtures, uno por tipo) y
-  `tests/playground/run-eo-portfolio.sh` (53 en Playground + 22 por WP-CLI + 33 del admin + 64 del render, con la
-  estructura de enlaces de producción). Fixtures en `tests/fixtures/portfolio/`, marcados `[fixture]`; `cordillera.json` es
-  ficticio y cubre sitio, parte de página y video de creador.
+  | Versión | Runtime | Qué cambió |
+  |---|---|---|
+  | 0.8.0 | `c6e1734` | Tipos con página propia (§7.3); paquete sha256 `f0553b87…`, respaldo `/tmp/eo-portfolio-before-20261030-121629.tar` |
+  | 0.8.1–0.9.1 | `686cf48` … `7106cc4` | Fila por marca, fila de marca como índice, página como el diseño, explorador de campañas, testimonio como escena y «Detrás del trabajo» (§7.1) |
+  | 0.10.0 | `d27ab72` | Tipo `content-marketing`, `chapters[].swatch`, `links.liveWork`, un solo mercado como «MERCADO» |
+  | 0.10.1 | `55a2738` | Servicios enlazados a sus páginas de venta (`links.relatedServices`); `content-marketing` sin ficha ni pasos |
+  | 0.10.2 | `2997847` | Ficha editorial «{Cliente} necesitaba…» |
+  | 0.10.3 | `3ea1cec` | Borde de pintura derramada en el hero de contenidos: **retirado** por el operador |
+  | 0.10.4–0.10.5 | `baf8d08` / `d441cb4` | Goteo eliminado por completo; sólo el contenido de 0.10.5 salió, dentro de 0.10.6 |
+  | 0.10.6 | `194e1e8` | Catálogo de servicios = categorías dentro de las cinco líneas (§3) |
+  | 0.10.7 | `e8111e1` | Filas de campaña con su color como el tablero |
+  | 0.10.8 | `21fe1fd` | Hover: la fila con color se desliza entera |
+
+- `php tests/eo-portfolio.test.php` (596 comprobaciones en PHP puro sobre 9 fixtures, uno por tipo) y
+  `tests/playground/run-eo-portfolio.sh` (53 e2e en Playground, 33 del admin y 97 del render, con la estructura de
+  enlaces de producción). Fixtures en `tests/fixtures/portfolio/`, marcados `[fixture]`; `cordillera.json` es
+  ficticio y cubre sitio, parte de página y video de creador; `tinta-contenidos.json` es el fixture ficticio de
+  `content-marketing` y nunca va a producción.
+- Flujo de despliegue: `export-live-code` → `build-portfolio-plugin-package.cjs` → `deploy-portfolio-plugin-package.php`
+  → `purge-portfolio-cache.php`. Cada despliegue a producción necesita el OK explícito del operador (el clasificador de
+  permisos lo bloquea si no).
+- Antes de desplegar un cambio que retira una clave del catálogo de servicios,
+  migrar las entradas guardadas que la usan: si no, dejan de renderizarse (§3).
 - Paquete `scripts/public-website/build-portfolio-plugin-package.cjs` y despliegue
   `deploy-portfolio-plugin-package.php` (contrato `eo-portfolio-release.v1`): lista de rutas, hashes, guarda de deriva
   contra la línea base de `export-live-code`, tar de respaldo, archivo principal al final, activación con un solo
@@ -325,6 +371,23 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
   (2026)» y testimonio) y `berel-pitaya-color-del-ano-2026`; Gobierno de Santiago, Marca Chile, PabellonToGo y Bresler
   sumaron piezas. Las imágenes que el sitio ya servía en `eo-elementor-widgets` entraron a la biblioteca con
   `import-portfolio-media.php` (idempotente por `_eop_source`); los lotes están en `scripts/public-website/eo-portfolio/batches/`.
+- Estado de los casos al cierre del 2026-10-30: **16 proyectos publicados** («Fiestas Patrias Perú» retirada con 301 a
+  Sky, §7.1). Los 16 declaran `links.relatedServices`: Berel → servicio-marketing-de-contenidos, posicionamiento-seo,
+  agencia-creativa; Sky Airline, Beebot, Big House, Gobierno de Santiago y PabellonToGo → agencia-creativa,
+  redes-sociales; Flick y Ghamadent → agencia-creativa, redes-sociales, desarrollo-sitios-web; Eusari →
+  agencia-creativa, desarrollo-sitios-web, performance-marketing; Motogas → agencia-creativa, redes-sociales,
+  performance-marketing; Bresler → desarrollo-sitios-web; DMark y NutriBait → redes-sociales; Fivest y Marca Chile →
+  agencia-creativa; SSilva → performance-marketing. Sky Airline: línea `brand`, servicio `creative-services`.
+- **Berel** (`berel-pitaya-color-del-ano-2026`, revisión 6, primer `content-marketing` real): «Berel, color por color»,
+  línea `engine`, servicios `search-visibility-360` y `creative-services`, periodo desde 2026-05. Tres artículos de
+  berel.com con su extracto tal cual (Día de Muertos, Temporada 2027 «Bien y de Buenas», Subtonos «Ciudadela»; el hex de
+  cada `swatch` está muestreado de las piezas, como referencia visual, no es el valor oficial de Berel), cuatro
+  capítulos con `madeWithAi: true` (los planos se hicieron con IA; texto e intervenciones gráficas, del equipo
+  creativo), producción de septiembre 2026 con fuente «nuestro registro de entregables para Berel», cifras de Search
+  Console de berel.com (agosto vs julio 2026) con alcance `metrics`, `liveWork` al blog «Inspiración» y alcance
+  logo, piezas y métricas. Medios: 20 imágenes subidas con `upload-portfolio-images.php` (`source` `onedrive-berel`) y
+  3 reels con póster en `gs://efeonce-group-axis-public-media/portfolio/v1/berel-color-por-color/`. Efeonce entrega las
+  piezas y otra agencia las publica: la página nunca dice que publicamos.
 - Rollback de la salida: `set-portfolio-switch.php` con `{"enabled":"0"}` (vuelve la página 247116), borrar las 46
   redirecciones creadas, devolver los 12 reencadenados a su destino `project/<slug>`, borrar la regex de
   `portfolio-category` y publicar de nuevo las 15 entradas de Ohio (lista en la salida del `cutover`).

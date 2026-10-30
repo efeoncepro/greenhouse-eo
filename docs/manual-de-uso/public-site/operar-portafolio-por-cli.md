@@ -1,7 +1,7 @@
 # Operar el portafolio por la CLI y sus herramientas
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-30 por Claude
 > **Ultima actualizacion:** 2026-10-30 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -21,11 +21,14 @@ migración desde Ohio.
 
 **Estado al 2026-10-30:**
 
-- En producción corre el plugin **0.8.0** desde el 2026-10-30, con 17 proyectos publicados y los tipos social,
-  audiovisual, producción con IA y SEO/contenidos disponibles.
-- Si `validate <slug> --remote` rechaza un tipo nuevo, el sitio corre una versión anterior a la 0.8.0: la 0.7.1 no
-  conocía `kind: "social"`, `role: "post"`, `channel`, etc.: `validate <slug> --remote` los marca como
-  `INVALID_VALUE` o `UNKNOWN_FIELD` (comprobado el 2026-10-30) y `apply` no guardaría nada.
+- En producción corre el plugin **0.10.8** desde el 2026-10-30 (commit del runtime `21fe1fd`, sin empujar), con
+  **16 proyectos publicados**. Están disponibles los tipos social, audiovisual, producción con IA, SEO/contenidos y
+  marketing de contenidos (este último desde la 0.10.0; su primer caso real es Berel).
+- El catálogo de servicios es el de las categorías de servicio dentro de las cinco líneas (0.10.6). Ver
+  [Servicios: categorías de cada línea](#servicios-categorías-de-cada-línea).
+- Si `validate <slug> --remote` rechaza un campo que `validate` local acepta, el sitio corre una versión anterior a
+  la del repo del runtime (por ejemplo, una 0.7.1 marcaba `kind: "social"` o `channel` como `INVALID_VALUE` o
+  `UNKNOWN_FIELD`, comprobado el 2026-10-30) y `apply` no guardaría nada.
 
 ## Antes de empezar
 
@@ -73,6 +76,11 @@ Los slugs van en minúsculas con guiones.
 | `verify [<slug>]` | Por HTTP público, sin SSH: la REST `/wp-json/eo/v1/portfolio`, la portada `/portafolio/` y, con slug, si está en el índice, su REST y su página. Falla si lo público expone campos internos (`clientApproval`, `greenhouseOrganizationId`, `revision`). | Sitio (HTTP) | Nada |
 
 Opciones que no salen en la ayuda: `new … --force` reemplaza una copia de trabajo existente.
+
+`kinds` y `new --kind` todavía no incluyen `content-marketing` (no hay plantilla en `templates/`): para un proyecto de
+marketing de contenidos parte con `new <slug> --from <archivo.json>` desde la forma del fixture ficticio
+`tests/fixtures/portfolio/tinta-contenidos.json` del runtime (nunca para aplicarlo tal cual), o haz `pull` del caso
+de Berel para ver un documento real. Ver [Marketing de contenidos](#marketing-de-contenidos).
 
 Comprobado el 2026-10-30:
 
@@ -165,10 +173,12 @@ proyecto social o de IA en el admin no los borra. Para cambiar esos campos, usa 
 
 ## Recetas por tipo de proyecto
 
-Todos los tipos comparten la base: `client`, `title`, `audience`, `need`, `line`, `services` (claves de `schema/services.v1.json` del plugin: categorías de servicio de la línea —`creative-services`, `channel-commerce`, `search-visibility-360`, `web-experience-360`, `product-design-360`, `agent-systems-platforms`, `digital-automation-integrations`, `media-distribution`, `revenue-operations-crm`, `measurement-analytics`—; nunca un producto como Creative Studio, Marketing Studio o Wave),
-`steps` (reto, idea, ejecución), `seo` (título completo de 65 caracteres o menos; descripción de 150 o menos),
-`hero.mediaRef` (el `id` de un medio de algún capítulo) y `chapters` con sus `media`. Reglas que el validador hace
-cumplir en todos:
+Todos los tipos comparten la base: `client`, `title`, `audience`, `need` (ver [Escribir `need`](#escribir-need)),
+`line` (`brand`, `engine`, `growth`, `voice` o `revenue`), `services` (claves del catálogo de categorías, ver
+[Servicios](#servicios-categorías-de-cada-línea)), `links.relatedServices` (ver
+[Servicios con su página de venta](#servicios-con-su-página-de-venta)), `steps` (reto, idea, ejecución; no en
+`content-marketing`), `seo` (título completo de 65 caracteres o menos; descripción de 150 o menos), `hero.mediaRef`
+(el `id` de un medio de algún capítulo) y `chapters` con sus `media`. Reglas que el validador hace cumplir en todos:
 
 - todo medio lleva `id` único, `width`, `height` y `alt`;
 - una imagen usa `mediaId`; un video usa `src` y `poster` del bucket de AXIS y, si `hasVoice`, `captionsVtt`;
@@ -183,6 +193,7 @@ cumplir en todos:
 | `audiovisual` | `audiovisual.json` | Hero en video; cortes con `role: "cut"` y `version`; rodaje con `role: "bts"` y `consentRef`. |
 | `ai-production` | `ai-production.json` | El bloque `ai` con `models` y `teamDid`; piezas con `role: "ai"` y `aiStage`. |
 | `seo-content` | `seo-content.json` | El bloque `search` con `source`, `period` y al menos una cifra; para publicar, `metrics` en el alcance. |
+| `content-marketing` | Sin plantilla: `new --from` (ver arriba) | `articles` (1 a 6), cada uno con sus `pieces` existentes en los capítulos. No exige `metrics`. |
 
 ### Proyectos con varias campañas (explorador, 0.9.0)
 
@@ -197,6 +208,7 @@ galería sigue como antes. Cada capítulo puede declarar, además de `name`, `no
 | `markets` | Mercados, de esta lista: `cl`, `pe`, `ar`, `uy`, `br`, `us`, `mx`, `co`, `ec`, `bo`, `py`, `es` | `["cl", "br", "us"]` |
 | `summary` | Una línea sobre la campaña (si falta, se usa `note`) | `"La oferta del año, del 26/11 al 03/12."` |
 | `madeWithAi` | `true` si sus piezas se hicieron con IA: la fila muestra «Producido con IA» | `true` |
+| `swatch` | Color de la campaña (#hex). La fila muestra su punto de pintura y, al abrirla, las piezas van sobre una mancha de ese color (0.10.7–0.10.8). Sin `swatch`, la fila queda como antes. | `"#bc6337"` |
 
 El testimonio acepta `highlight`: una frase **copiada tal cual de la cita** que se muestra en negrita (si no está
 dentro de la cita, el validador da `UNKNOWN_REFERENCE`). El logo del cliente va en `client.logoMediaId` (una imagen de
@@ -272,28 +284,136 @@ Los roles `web`, `section` y `ugc` (sitios, partes de una página, videos de cre
 
 ### Marketing de contenidos
 
-- `kind: "content-marketing"` necesita `articles`: cada uno con su `title` y `url` publicados, `excerpt` (copia el
-  primer párrafo tal como está publicado, sin reescribirlo), `published` (YYYY-MM), `label` corto, `swatch` (`name` y
-  `code` tal como el cliente los imprime en sus piezas y `color` en hexadecimal tomado de la pieza) y `pieces`, los ids de
-  sus piezas en los capítulos: banners (`banner`, con `caption`) y publicaciones (`post`, con `channel` y `placement`).
-- `production` es la cifra del mes (`period`, `source`, hasta 4 `items` con un número entero) y `process`, de 3 a 6
-  pasos. Ambos describen el trabajo de Efeonce: salen con `pieces`.
-- No exige `metrics`. Si el cliente autoriza sus cifras, van en `results`/`measure` o en `search` con el alcance `metrics`.
-- Cada capítulo puede llevar `swatch` (#hex) para teñir su fila; el proyecto puede llevar `links.liveWork`.
-- Caso de referencia: Berel (`berel-pitaya-color-del-ano-2026`, 2026-10-30).
+Un proyecto `kind: "content-marketing"` se arma por artículo: la página toma el color del artículo que se está mirando.
+No lleva ficha ni `steps`: su «Detrás del trabajo» abre con la frase de `need`. El admin lo llama «Marketing de
+contenidos» y conserva sus campos al guardar, pero se edita por la CLI.
+
+**1. Los artículos (`articles`, de 1 a 6, obligatorio).** Cada uno:
+
+| Campo | Cómo se llena |
+|---|---|
+| `title` | El título tal como está publicado. |
+| `url` | La dirección publicada, en `https`. |
+| `excerpt` | **El primer párrafo copiado tal cual del artículo publicado.** No lo resumas ni lo reescribas: abre el artículo en el sitio del cliente y copia su texto de apertura. |
+| `published` | Mes de publicación, `AAAA-MM`. |
+| `label` | Una etiqueta corta («Temporada 2027»). |
+| `swatch.name` y `swatch.code` | El nombre y el código del color **tal como el cliente los imprime en sus piezas** («Bien y de Buenas», «1-3404D»). |
+| `swatch.color` | El hexadecimal **tomado de la pieza** con un cuentagotas (por ejemplo `#cd8c7b`). Es un valor para mostrar, no el oficial de la marca: no lo presentes como tal. |
+| `pieces` | Los `id` de sus piezas en los capítulos: banners (`role: "banner"`, con `caption`) y publicaciones (`role: "post"`, con `channel` y `placement`). Hasta 4 publicaciones se muestran en sus marcos de canal. |
+
+**2. La producción (`production`).** `period` (`AAAA-MM`), `source` (por ejemplo «nuestro registro de entregables para
+<cliente>») y hasta 4 `items` con `value` (un entero, como texto) y `label`. Se muestran como contadores.
+
+**3. El recorrido (`process`).** De 3 a 6 pasos con `title` y `body`, en primera persona plural.
+
+**4. Las campañas (`chapters`).** Cada capítulo puede llevar `period`, `summary`, `markets`, `madeWithAi` y `swatch`
+(#hex) para su fila del explorador. Declara `madeWithAi: true` en cada campaña cuyas piezas se hicieron con IA.
+
+**5. El trabajo publicado (`links.liveWork`).** `{ "url": "https://…", "label": "…" }`: aparece en «Detrás del
+trabajo» como «EL TRABAJO PUBLICADO».
+
+Reglas del validador y de la proyección:
+
+- Sin `articles`, el validador responde `REQUIRED /articles`.
+- Un id de `articles[].pieces` que no existe en los capítulos da `UNKNOWN_REFERENCE`.
+- No exige el alcance `metrics`. Si el cliente autoriza sus cifras, van en `results`/`measure` o en `search` y se ven
+  sólo con `metrics`.
+- Un artículo cuyas piezas no son visibles (por el alcance) no se muestra. `articles`, `production` y `process` salen
+  con `pieces`.
+- `testimonial.highlight`, si lo usas, es una frase copiada tal cual de la cita.
+
+Caso de referencia: **Berel, color por color** (`berel-pitaya-color-del-ano-2026`, revisión 6): tres artículos con
+sus colores (2-1810D, 1-3404D, 4-1105D), cuatro campañas con `swatch` y `madeWithAi`, producción de septiembre de 2026
+y `links.liveWork` a «Inspiración, el blog de Berel». Efeonce entrega las piezas y otra agencia las publica: el texto
+nunca dice que las publicamos nosotros.
+
+### Servicios: categorías de cada línea
+
+`services` acepta sólo las claves de `schema/services.v1.json` del plugin (0.10.6): las categorías de servicio dentro
+de las cinco líneas.
+
+| Línea (`line`) | Claves de `services` |
+|---|---|
+| `brand` | `creative-services` (Creative Services), `channel-commerce` (Channel & Commerce) |
+| `engine` | `search-visibility-360`, `web-experience-360`, `product-design-360`, `agent-systems-platforms`, `digital-automation-integrations` |
+| `voice` | `media-distribution` (Media & Distribution) |
+| `revenue` | `revenue-operations-crm` (RevOps & CRM) |
+| `growth` | `measurement-analytics` (Measurement & Analytics) |
+
+- **Nunca pongas un producto como servicio:** Creative Studio, Marketing Studio, Wave, Globe y Reach son productos de
+  Efeonce, no servicios ni líneas. Las claves `wave`, `creative-studio`, `hubspot-as-a-service`, `salesforce` y
+  `factory` se retiraron.
+- **Antes de retirar una clave del catálogo, migra los proyectos que la usan.** Un documento guardado con una clave
+  que ya no existe deja de mostrarse como página del portafolio.
+- El admin muestra cada categoría con su línea («Creative Services · Brand»).
 
 ### Servicios con su página de venta
 
-- `links.relatedServices` lista los slugs de las páginas del sitio donde se vende cada servicio del proyecto (por
-  ejemplo `agencia-creativa`, `redes-sociales`, `servicio-marketing-de-contenidos`). «Detrás del trabajo» los muestra
-  como enlaces con el título de la página; un slug que no es una página publicada no aparece.
-- Todo proyecto nuevo debe declararlos: sin ellos, los servicios quedan como texto y el caso no conecta con la venta.
+`links.relatedServices` lista los slugs de las páginas del sitio donde se vende cada servicio del proyecto.
+«Detrás del trabajo» los muestra como enlaces con el título de la página y una flecha; un slug que no es una página
+publicada se omite sin error. Sin `relatedServices`, los servicios quedan como texto.
+
+**Todo proyecto nuevo debe declararlos.** Los slugs que usan hoy los 16 proyectos publicados (aplicados el
+2026-10-30):
+
+| Slug de la página | Lo usan |
+|---|---|
+| `agencia-creativa` | Berel, Sky Airline, Beebot, Big House, Gobierno de Santiago, PabellonToGo, Flick, Ghamadent, Eusari, Motogas, Fivest, Marca Chile |
+| `redes-sociales` | Sky Airline, Beebot, Big House, Gobierno de Santiago, PabellonToGo, Flick, Ghamadent, Motogas, DMark, NutriBait |
+| `desarrollo-sitios-web` | Flick, Ghamadent, Eusari, Bresler |
+| `performance-marketing` | Eusari, Motogas, SSilva |
+| `servicio-marketing-de-contenidos` | Berel |
+| `posicionamiento-seo` | Berel |
+
+```json
+"links": {
+  "relatedServices": ["servicio-marketing-de-contenidos", "posicionamiento-seo", "agencia-creativa"],
+  "liveWork": { "url": "https://berel.com/inspiracion", "label": "Inspiración, el blog de Berel" }
+}
+```
 
 ### Escribir `need`
 
-- La ficha lo muestra como «{Cliente} necesitaba {need}»: escríbelo para que siga a «necesitaba» (una frase nominal o un
-  infinitivo, sin punto final), por ejemplo «Lanzar campañas comerciales en días sin descuidar la marca».
-- En los textos del proyecto habla en primera persona plural; nunca «Efeonce hizo…».
+- La ficha lo muestra como «{Cliente} necesitaba {need}.»: escríbelo para que siga a «necesitaba» (una frase
+  nominal, un infinitivo o una oración con «que», sin punto final; la página pone el punto). Ejemplos: «Lanzar campañas
+  comerciales en días sin descuidar la marca», «Que su blog respondiera lo que la gente busca antes de pintar y que
+  cada artículo llegara a todos sus canales».
+- En los textos del proyecto habla en primera persona plural («hicimos», «nuestro equipo»); nunca «Efeonce hizo…».
+  La autoría queda en los datos estructurados (`creator`), no en el texto.
+- Excepción pendiente: 11 `seo.description` todavía dicen «Proyecto de Efeonce para X». No las cambies sin que el
+  operador lo decida.
+
+### Subir imágenes y videos nuevos
+
+**Imágenes** (JPEG, PNG o WebP) → biblioteca de medios con `upload-portfolio-images.php`. El manifiesto nombra un
+`source` corto (por ejemplo `onedrive-berel`) y cada archivo con su `alt` y `title`; después va una `--input-file` por
+imagen:
+
+```json
+{ "source": "onedrive-berel", "files": [ { "file": "temporada-2027-banner.jpg", "alt": "…", "title": "…" } ] }
+```
+
+```bash
+pnpm -s public-website:wpcli -- --eval-file scripts/public-website/eo-portfolio/upload-portfolio-images.php \
+  --input-file manifest.json --input-file temporada-2027-banner.jpg --wp-user 12
+```
+
+Devuelve por archivo el `id` (tu `mediaId`), `width`, `height` y si se creó o se reutilizó. Es idempotente: recuerda
+cada imagen por `<source>/<archivo>`, así que correrlo otra vez no duplica. Escribe en producción: pide el OK.
+
+**Videos** (y sus pósters) → bucket público de AXIS, nunca a WordPress, en
+`gs://efeonce-group-axis-public-media/portfolio/v1/<slug>/`, con caché de un año
+(`Cache-Control: public, max-age=31536000, immutable`):
+
+```bash
+gcloud storage cp reel.mp4 reel-poster.jpg gs://efeonce-group-axis-public-media/portfolio/v1/<slug>/ \
+  --cache-control="public, max-age=31536000, immutable"
+```
+
+En el documento van como `src` y `poster` con
+`https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/<slug>/…`; otro host da
+`MEDIA_HOST_NOT_ALLOWED`. Berel usa 20 imágenes de la biblioteca y 3 reels con póster en
+`portfolio/v1/berel-color-por-color/`.
 
 ### La guarda de plantilla
 
@@ -317,11 +437,17 @@ php tests/eo-portfolio.test.php
 tests/playground/run-eo-portfolio.sh
 ```
 
-La primera es la prueba unitaria del validador, la compuerta y la proyección (el 2026-10-30: 498 comprobaciones sobre
-8 fixtures). La segunda levanta un WordPress Playground descartable, corre el e2e y las comprobaciones del admin y de
-las páginas, y luego ejercita `wp eo-portfolio` como lo haría un agente por SSH.
+La primera es la prueba unitaria del validador, la compuerta y la proyección (en la 0.10.8: 596 comprobaciones sobre
+9 fixtures). La segunda levanta un WordPress Playground descartable, corre el e2e y las comprobaciones del admin y de
+las páginas (en la 0.10.8: 53 e2e, 33 de admin y 97 de páginas), y luego ejercita `wp eo-portfolio` como lo haría un
+agente por SSH.
 
-Desde `greenhouse-eo`, con el OK del operador para el despliegue:
+Antes de empaquetar, sube la versión del plugin (cabecera `Version:` de `eo-portfolio.php`) y commitea el cambio en el
+repo del runtime: el paquete se niega con cambios sin commitear.
+
+Desde `greenhouse-eo`, **con el OK explícito del operador para ese despliegue**. Cada despliegue a producción necesita
+su propio OK: el de una versión anterior no sirve para la siguiente, y sin él el clasificador de permisos del agente
+bloquea el paso de despliegue.
 
 ```bash
 pnpm -s public-website:export-live-code -- --output tmp/public-site-code-baselines/portfolio
@@ -343,6 +469,9 @@ pnpm -s public-website:wpcli -- --eval-file scripts/public-website/eo-portfolio/
 
 Rollback: `wp plugin deactivate eo-portfolio` por el carril SSH y restaurar el tar que imprime el despliegue.
 
+Después de cada despliegue, abre en vivo las entradas que el cambio toca (por ejemplo la de Berel y la de Sky, que
+tiene campañas sin `swatch`) y confirma que las demás siguen iguales.
+
 ### Revisión local con WordPress Playground
 
 | Comando (en el repo del runtime) | Para qué |
@@ -351,8 +480,12 @@ Rollback: `wp plugin deactivate eo-portfolio` por el carril SSH y restaurar el t
 | `tests/playground/run-eo-portfolio.sh` | El e2e completo y las comprobaciones de admin y páginas (incluye los fixtures de los tipos nuevos). Es el gate antes de empaquetar. |
 | `php tests/eo-portfolio.test.php` | Prueba unitaria rápida, sin WordPress. |
 
+Para revisar el admin o una página del Playground con `curl` (en vez del navegador), usa un archivo de cookies
+(`curl -c cookies.txt -b cookies.txt …`): sin él, cada petición pierde la sesión de admin.
+
 Los fixtures viven en `tests/fixtures/portfolio/` del runtime (uno por tipo: `aurora-social.json`,
-`aurora-audiovisual.json`, `lumen-ia.json`, `norte-seo.json`, más los de campaña y sitio). Llevan la marca
+`aurora-audiovisual.json`, `lumen-ia.json`, `norte-seo.json`, `tinta-contenidos.json` para marketing de contenidos,
+más los de campaña y sitio). Llevan la marca
 `[fixture]`: sirven de forma de ejemplo, **nunca se aplican en producción**.
 
 ### Scripts de la migración desde Ohio
@@ -408,19 +541,38 @@ producción, toma una foto (inventario o `revisions`) y, después, purga la cach
 - No subir videos a la biblioteca de medios: van al bucket público de AXIS.
 - No editar `post_content` ni las meta `_eop_*` a mano.
 - No aplicar fixtures en producción.
-- No cargar tipos nuevos (`social`, `audiovisual`, `ai-production`, `seo-content`) antes de que la 0.8.0 esté
-  desplegada: el sitio los rechaza.
+- No cargar un tipo o un campo nuevo antes de que la versión del plugin que lo trae esté desplegada: el sitio lo
+  rechaza (compruébalo con `validate <slug> --remote`).
+- No desplegar el plugin a producción sin el OK explícito del operador para ese despliegue.
 - No dar por desplegado el plugin sin purgar la caché y comprobar el `?ver=` en vivo.
+- No poner un producto (Creative Studio, Marketing Studio, Wave, Globe, Reach) en `services` ni en ningún texto como
+  si fuera un servicio.
+- No retirar una clave de `services.v1.json` sin migrar antes los proyectos que la usan.
+- No reescribir el `excerpt` de un artículo ni inventar el código de un color: se copian de lo publicado.
+- No volver a poner pintura que gotea o se derrama en la portada de marketing de contenidos: se retiró (0.10.3 a
+  0.10.5) porque el diseño aprobado no gotea.
+- No escribir que Efeonce publica el contenido de un cliente cuando lo publica otra agencia (caso Berel).
 
 ## Problemas comunes
 
 - **`apply` dice «Quedan marcadores de plantilla sin completar»:** corre `validate <slug>` para ver las rutas y
   reemplázalas. Revisa también los `mediaId` 1.
 - **El sitio rechaza un tipo nuevo (`UNKNOWN_FIELD` en `channel`, `version`, `aiStage`…), aunque `validate` local
-  pasó:** el sitio corre una versión anterior a la 0.8.0 (en producción desde el 2026-10-30). Revisa la versión
-  instalada y despliega el paquete; compruébalo con `validate <slug> --remote`.
+  pasó:** el sitio corre una versión anterior a la del repo del runtime (hoy en producción: 0.10.8). Revisa la
+  versión instalada y despliega el paquete (con el OK del operador); compruébalo con `validate <slug> --remote`.
 - **`UNKNOWN_REFERENCE` en `compareTo`:** el `id` del `plate` debe apuntar a otra pieza que exista; revisa que el `id`
   de la `final` sea exactamente ese.
+- **`UNKNOWN_REFERENCE` en `articles[].pieces`:** un id del artículo no existe en los capítulos; corrige el id o
+  agrega la pieza.
+- **`REQUIRED /articles`:** un proyecto `content-marketing` sin artículos. Agrega al menos uno.
+- **Un proyecto publicado dejó de mostrarse como página del portafolio:** revisa sus `services`. Si nombra una clave
+  que ya no está en `services.v1.json`, cámbiala por una categoría vigente (`pull` → editar → `apply`).
+- **Un artículo no aparece en la página:** sus piezas no son visibles con el alcance aprobado (o sus ids no están en
+  capítulos visibles). Revisa `clientApproval.scope` y los ids.
+- **Un servicio de «Detrás del trabajo» sale como texto y no como enlace:** falta `links.relatedServices`, o el slug
+  no es una página publicada del sitio.
+- **El despliegue a producción se detiene pidiendo permiso:** falta el OK explícito del operador para ese despliegue;
+  pídelo y vuelve a correrlo.
 - **`APPROVAL_SCOPE_METRICS`:** agrega `metrics` al `scope` sólo si el cliente aprobó mostrar las cifras. Si no, el
   proyecto SEO no se publica.
 - **`REQUIRED` en `consentRef`:** registra dónde quedó la autorización de quienes aparecen y ponla en la pieza `bts`.
@@ -439,7 +591,8 @@ producción, toma una foto (inventario o `revisions`) y, después, purga la cach
   `remote.php` (puente a `wp eo-portfolio`, con lista cerrada de subcomandos), `templates/` (ver su `README.md`).
 - Plugin: `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/`: `schema/portfolio-entry.v1.schema.json`,
   `includes/class-eop-validator.php`, `class-eop-projection.php`, `class-eop-store.php`, `class-eop-kinds.php`,
-  `class-eop-admin.php` (conserva los campos que el formulario no edita).
+  `class-eop-admin.php` (conserva los campos que el formulario no edita), `class-eop-render.php` (`need_line`,
+  `has_record`, `service_pages`), `schema/services.v1.json` (catálogo de categorías por línea).
 - Paquete y despliegue: `scripts/public-website/build-portfolio-plugin-package.cjs`,
   `scripts/public-website/deploy-portfolio-plugin-package.php`.
 - Migración: `scripts/public-website/eo-portfolio/` (ver su `README.md`).

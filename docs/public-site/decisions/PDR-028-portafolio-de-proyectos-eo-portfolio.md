@@ -19,6 +19,29 @@
 > [PDR-027](PDR-027-navegacion-global-del-sitio-portable.md) (patrón de contenido con tres puertas) ·
 > [Plan de migración a La órbita](../LA_ORBITA_SITE_MIGRATION_PLAN_V1.md) §Oleada 5.
 
+## Delta 2026-10-30 (2) — marketing de contenidos, servicios por línea y voz de la página
+
+Decisiones del operador del 2026-10-30, ya en producción con el plugin 0.10.8. Extienden §2 y §5; no reabren la
+decisión.
+
+- **Tipo `content-marketing`** con el tablero aprobado «Entrada de marketing de contenidos» del canvas: cada artículo
+  publicado del cliente con sus piezas por canal, la producción del mes con su fuente y el recorrido de cada artículo.
+  Primer caso: Berel («Berel, color por color»). Detalle en la arquitectura §3 y §7.3.
+- **Servicios = categorías de servicio dentro de las cinco líneas** (Brand, Engine, Growth, Voice, Revenue). Precisa
+  la taxonomía de §2: el catálogo del portafolio lista categorías como Creative Services, Search Visibility 360 o
+  RevOps & CRM, cada una con su línea. Los productos de Efeonce —Creative Studio, Marketing Studio, Wave, Globe y
+  Reach— **nunca** son servicio ni línea.
+- **Los servicios de cada proyecto enlazan a sus páginas de venta** del sitio (no a productos). Todo proyecto nuevo
+  declara cuáles corresponden.
+- **Primera persona plural en la página:** el portafolio nunca dice «Efeonce hizo» ni habla de Efeonce en tercera
+  persona; la autoría queda en los datos estructurados.
+- **Titular de la ficha «{Cliente} necesitaba…»:** la ficha del proyecto abre con la necesidad del cliente como
+  titular editorial.
+- **Sin goteo:** la pintura derramada del hero de contenidos se retiró («en el diseño aprobado no gotea»). El color del
+  artículo tiñe la página, pero nada gotea ni chorrea.
+- Abiertos: el eyebrow «ENGINE · WAVE» del menú principal (componente de PDR-027) mezcla una línea con un producto y
+  espera decisión del operador; 11 meta descriptions todavía dicen «Proyecto de Efeonce para X».
+
 ## Delta 2026-10-30 — tipos de proyecto con página propia
 
 - El operador aprobó en el canvas (página «eo», «Plantillas por tipo de proyecto») cuatro tipos con página a su

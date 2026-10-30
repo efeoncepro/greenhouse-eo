@@ -1,5 +1,21 @@
 # TASK-2049 — EO Portfolio: migración y salida a producción
 
+## Delta 2026-10-30 (cierre del día) — plugin 0.10.0–0.10.8 y Berel
+
+- En producción el mismo día, con OK del operador en cada despliegue: 0.10.0 (`d27ab72`, tipo `content-marketing`),
+  0.10.1 (`55a2738`, servicios enlazados a sus páginas de venta), 0.10.2 (`2997847`, ficha editorial), 0.10.6
+  (`194e1e8`, catálogo de servicios por línea), 0.10.7 (`e8111e1`) y 0.10.8 (`21fe1fd`, filas de campaña con su
+  color). 0.10.3 (pintura derramada) se retiró: 0.10.4–0.10.5 quitaron el goteo. Commits del runtime sin empujar.
+- Berel publicado como `content-marketing` («Berel, color por color», revisión 6): 3 artículos, 4 campañas con
+  `madeWithAi`, producción de septiembre 2026, cifras de Search Console aprobadas; 20 imágenes con
+  `upload-portfolio-images.php` y 3 reels en el bucket de AXIS.
+- Los 16 proyectos publicados declaran `links.relatedServices`; Sky Airline pasó a línea `brand` con
+  `creative-services`.
+- Pruebas: 596 en PHP sobre 9 fixtures; Playground 53 e2e, 33 del admin y 97 del render.
+- Docs: arquitectura §3, §6, §7 y §8; PDR-028 delta 2026-10-30 (2); EPIC-056.
+- Abierto: eyebrow «ENGINE · WAVE» del menú (PDR-027), 11 meta descriptions en tercera persona, IA de Cyber WOW y
+  fecha de inicio de Sky, push de ambos repos y la desactivación de Ohio Portfolio desde el 2026-11-29.
+
 ## Delta 2026-10-30 (noche, 2) — tipos de proyecto (plugin 0.8.0)
 
 - Tableros aprobados en el canvas (social con isotipos oficiales y UI de X corregida, audiovisual, IA, SEO/contenidos)
@@ -106,7 +122,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `17 proyectos publicados y todos los 301 aplicados el 2026-10-30 ; plugin 0.8.0 con tipos de proyecto y 0.9.1 (fila de marca como índice; página de proyecto como el diseño; explorador de campañas; testimonio como escena y «Detrás del trabajo») en producción desde el mismo día; plugin 0.10.8 (filas de campaña con su color como el tablero y hover sin montar el nombre sobre la etiqueta); 0.10.6 (servicios como categorías de cada línea, sin productos; sin goteo); antes 0.10.3 (pintura derramada en el héroe de contenidos; espacio de «Detrás del trabajo»); 0.10.2 con la ficha editorial («{Cliente} necesitaba…», primera persona); 0.10.1 con los servicios de cada proyecto enlazados a su página de venta (16 proyectos); Berel como marketing de contenidos con plugin 0.10.0 (tipo `content-marketing`, revisión 2, 20 medios nuevos en la biblioteca y 3 reels en el bucket); Sky Airline con cinco campañas (revisión 2) y «Fiestas Patrias Perú» despublicada (301 a Sky aplicado: la URL retirada y 4 URL viejas de Ohio llegan en un salto) (verificado: 17 entradas 200, assets 0.8.0, validador vivo acepta los tipos nuevos); falta desactivar Ohio Portfolio desde el 2026-11-29`
+- Status real: `16 proyectos publicados y todos los 301 aplicados el 2026-10-30; plugin 0.10.8 en producción (runtime 21fe1fd, sin empujar): tipos de proyecto con página propia, Berel como marketing de contenidos (revisión 6), servicios como categorías de las cinco líneas sin productos, servicios enlazados a sus páginas de venta en los 16 proyectos, ficha editorial «{Cliente} necesitaba…» en primera persona plural y filas de campaña con su color; falta desactivar Ohio Portfolio desde el 2026-11-29`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -492,9 +508,10 @@ Los slugs nuevos corrigen los heredados: `lifestyle-app-elementor` → `eusari`,
 
 ## Follow-ups
 
-- Cargar el primer proyecto real de cada tipo nuevo (social, audiovisual,
-  producción con IA, SEO y contenidos).
-- Campos del admin para `specs`, `ai`, `search` y los roles nuevos (hoy se editan por la CLI; el admin los conserva).
+- Cargar el primer proyecto real de cada tipo nuevo (social, audiovisual, producción con IA, SEO y contenidos);
+  marketing de contenidos ya tiene el suyo (Berel, 2026-10-30).
+- Decidir el eyebrow «ENGINE · WAVE» del menú (PDR-027) y las 11 meta descriptions en tercera persona.
+- Campos del admin para `specs`, `ai`, `search`, `articles`, `production`, `process` y los roles nuevos (hoy se editan por la CLI; el admin los conserva).
 - Contrato `efeonce.portfolio-entry` en AXIS cuando exista un segundo consumidor (Think o el sitio en Astro).
 - Video largo con HLS si el operador lo decide.
 - Proyectos sin aprobación: retiro definitivo si el operador lo decide.
