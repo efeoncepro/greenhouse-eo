@@ -1,7 +1,7 @@
 # Portafolio de proyectos — Sitio público
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-30 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -28,6 +28,13 @@ las piezas de una campaña se hicieron con inteligencia artificial, esa campaña
 La voz del cliente se muestra como una escena: una banda oscura con el video del proyecto de fondo, la cita grande y,
 destacada en negrita, la frase que el cliente dijo sobre el resultado; firma con su logo, si autorizó usarlo. Después,
 «Detrás del trabajo» cuenta quién lo hizo y desde cuándo, con qué servicios y en qué mercados. (Versión 0.9.1.)
+
+Un proyecto de **marketing de contenidos** se arma por artículo: la página toma el color del artículo que se está
+mirando (el que el cliente imprime en sus piezas) y, al elegir otro color, la portada cambia y la página se tiñe. Cada
+artículo se muestra como está publicado, con su primer párrafo y su enlace, y alrededor sus piezas en el marco de su
+canal (reel, historia, post, pin) y sus banners. Después vienen la producción del mes y el recorrido de cada artículo.
+«Detrás del trabajo» suma el enlace al trabajo publicado. El primer caso es Berel. (Versión 0.10.0, en el sitio desde el
+2026-10-30.)
 
 ## Cómo se guarda un proyecto
 
@@ -79,6 +86,7 @@ destacada en negrita, la frase que el cliente dijo sobre el resultado; firma con
 | **Social media** | Las publicaciones giran alrededor de la marca (cuando hay tres o más), cada una con el logo oficial de su canal. En «Canal por canal», unas pestañas muestran cada pieza en el marco de su red: Instagram, Facebook, LinkedIn, X, TikTok, YouTube, Threads o Pinterest. La parrilla pasa como una cinta. | Cada publicación dice su canal; puede decir también su formato (feed, historia, reel, carrusel…), su texto y su fecha. |
 | **Producción audiovisual** | La pieza principal abre a pantalla completa, como en el cine, con un botón para pausarla. Los cortes se ven en una línea de tiempo según lo que dura cada uno, el rodaje en un abanico de fotos y, si hay tres o más créditos, suben como al final de una película. Una ficha técnica reúne los datos de la producción (hasta diez, cada uno con su nombre y su valor). | Cada corte dice qué versión es («Pieza madre», «Corte de 15 s»…) y puede decir dónde se emitió. Cada foto o video de rodaje dice dónde quedó la autorización de quienes aparecen. |
 | **Producción con IA** | Desde arriba, la etiqueta «Producido con IA». La escena aparece desde el ruido, el personaje gira en todos sus ángulos, se ven sus expresiones y poses, un deslizador compara el antes y el después, y la página explica qué hizo la IA, qué hizo el equipo y con qué modelos. | Qué modelos se usaron y para qué (imagen, video, voz, música…) y qué hizo el equipo; puede decir qué hizo la IA y si el personaje es ficticio. Cada pieza dice su etapa (referencia, ángulo, expresión, pose, fondo, escena o final). |
+| **Marketing de contenidos** | La portada de cada artículo en una mancha de pintura que cambia de color, el artículo con su texto publicado y sus piezas por canal, los banners, la producción del mes y el recorrido. | Al menos un artículo publicado con su color y sus piezas. No necesita cifras: las de búsqueda se ven sólo con `metrics`. |
 | **SEO y contenidos** | La cifra principal con su curva, los indicadores con su mini gráfica, la búsqueda en la que la marca subió de posición, la respuesta de una IA que la cita, las palabras clave antes y después, los contenidos publicados y los banners. | La fuente y el periodo de los datos, y al menos una cifra (cifra principal, indicadores, curva, búsqueda, palabras clave o respuesta de IA). La lista de contenidos sola no basta. |
 
 Reglas que cuidan estas páginas:

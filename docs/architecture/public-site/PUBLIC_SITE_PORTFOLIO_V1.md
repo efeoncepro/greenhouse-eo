@@ -1,9 +1,9 @@
 # Portafolio del sitio público (EO Portfolio) — V1
 
 > **Tipo de documento:** Arquitectura técnica
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-10-29 por Claude (TASK-2047)
-> **Ultima actualizacion:** 2026-10-30 por Claude (§7.3 verificado contra el código de la 0.8.0; estado de despliegue, TASK-2049)
+> **Ultima actualizacion:** 2026-10-30 por Claude (§7.3: tipo `content-marketing`, plugin 0.10.0 en producción; TASK-2049)
 > **Decisión:** [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) ·
 > **Epic:** [EPIC-056](../../epics/in-progress/EPIC-056-eo-portfolio.md)
 > **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/`. En producción: **v0.7.1** (runtime
@@ -246,6 +246,18 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
 - Proyección (`EOP_Projection::search`): las cifras de `search` salen con `metrics`; sus `contents` (con `source` y
   `period`) salen con `pieces`; `specs` y `ai` salen siempre (la declaración
   de IA no se puede ocultar); `consentRef` nunca sale.
+- `content-marketing` (0.10.0, tablero «Entrada de marketing de contenidos»): `articles` (1–6: `title`, `url`, `excerpt`
+  —el texto publicado—, `published` YYYY-MM, `label`, `swatch` {`name`, `code`, `color` #hex} y `pieces`, ids de piezas del
+  proyecto, `UNKNOWN_REFERENCE` si alguno no existe), `production` {`period`, `source`, `items` ≤ 4 de cifra entera y
+  etiqueta} y `process` (3–6 pasos). Exige `articles`; **no exige `metrics`** (las cifras de búsqueda siguen ese
+  alcance si se agregan). La proyección resuelve las piezas de cada artículo desde los capítulos visibles y deja fuera el
+  artículo sin piezas; `articles`, `production` y `process` siguen a `pieces`. La página toma `--eop-paint` (color
+  registrado con `@property`) del artículo en vista: héroe de pintura líquida con la portada de cada artículo, selector de
+  colores, goteo hacia el papel, el artículo al centro con cada pieza en el marco de su canal, banners, la producción en
+  odómetros y el recorrido. Sin script se ve el primer artículo arriba y todos abajo. No toma piezas de la galería: el
+  explorador de campañas es el archivo. Generales en 0.10.0: `chapters[].swatch` (#hex, color de la fila), `links.liveWork`
+  {`url`, `label`} («El trabajo publicado» en «Detrás del trabajo»), un solo mercado se muestra como «MERCADO»; el admin
+  conserva lo que un capítulo dice de sí, `swatch`, `liveWork` y `testimonial.highlight`.
 - Las piezas que un tipo muestra en sus secciones salen de la galería genérica (`EOP_Kinds::taken`).
 - Isotipos oficiales de canal copiados de AXIS (`@efeoncepro/axis-brand-assets`, `assets/platforms/`; Pinterest del set
   `logos` de Iconify) en `EOP_Platforms`; íconos de interfaz de Remix Icon en `EOP_Icons`. Nada dibujado a mano.

@@ -1,7 +1,7 @@
 # Operar el portafolio por la CLI y sus herramientas
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-30 por Claude
 > **Ultima actualizacion:** 2026-10-30 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -269,6 +269,18 @@ Los roles `web`, `section` y `ugc` (sitios, partes de una página, videos de cre
   publica (`APPROVAL_SCOPE_METRICS`): la página quedaría vacía.
 - La posición media sólo se informa con un piso de impresiones declarado en la fuente. No inventes cifras: si un dato
   es de ejemplo, no va a un documento real.
+
+### Marketing de contenidos
+
+- `kind: "content-marketing"` necesita `articles`: cada uno con su `title` y `url` publicados, `excerpt` (copia el
+  primer párrafo tal como está publicado, sin reescribirlo), `published` (YYYY-MM), `label` corto, `swatch` (`name` y
+  `code` tal como el cliente los imprime en sus piezas y `color` en hexadecimal tomado de la pieza) y `pieces`, los ids de
+  sus piezas en los capítulos: banners (`banner`, con `caption`) y publicaciones (`post`, con `channel` y `placement`).
+- `production` es la cifra del mes (`period`, `source`, hasta 4 `items` con un número entero) y `process`, de 3 a 6
+  pasos. Ambos describen el trabajo de Efeonce: salen con `pieces`.
+- No exige `metrics`. Si el cliente autoriza sus cifras, van en `results`/`measure` o en `search` con el alcance `metrics`.
+- Cada capítulo puede llevar `swatch` (#hex) para teñir su fila; el proyecto puede llevar `links.liveWork`.
+- Caso de referencia: Berel (`berel-pitaya-color-del-ano-2026`, revisión 2, 2026-10-30).
 
 ### La guarda de plantilla
 

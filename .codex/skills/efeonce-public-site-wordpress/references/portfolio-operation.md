@@ -32,6 +32,7 @@ and what its document needs.
 | `social` | role `post`: `channel` (instagram, facebook, linkedin, x, tiktok, youtube, threads, pinterest), `placement` (feed, story, reel, carousel, document, post, short, video, pin, thread), `postText`, `postedAt` | `channel` on every `post` |
 | `audiovisual` | role `cut`: `version`, `where`, `durationSeconds` (video only, 0.5–7200); role `bts` (shoot photos/videos) | `version` on every `cut`; `consentRef` on every `bts` (**never projected**) |
 | `ai-production` | top-level `ai` {`models[]` {`stage`: image, video, voice, music, upscale, compositing, other; `name`}, `teamDid`, `aiDid`, `fictional`}; role `ai`: `aiStage` (anchor, angle, expression, pose, plate, scene, final), `label`, `compareTo` (another piece id: before/after) | `ai` block required; `aiStage` on every `ai` piece; `compareTo` must exist (`UNKNOWN_REFERENCE`) |
+| `content-marketing` (0.10.0) | top-level `articles[]` {`title`, `url`, `excerpt` (published text, verbatim), `published` YYYY-MM, `label`, `swatch` {`name`, `code`, `color` #hex}, `pieces` (piece ids)}, `production` {`period`, `source`, `items`}, `process` (3–6 steps); roles `banner` and `post` in the chapters; `chapters[].swatch` | `articles` required; every `pieces` id must exist (`UNKNOWN_REFERENCE`); no `metrics` needed |
 | `seo-content` | top-level `search` {`source`, `period`, `highlight`, `kpis`, `series`, `query` (SERP climb), `keywords`, `aeo` (engines chatgpt, gemini, perplexity, ai-overviews, copilot, claude), `contents`}; role `banner` (`size`) | `search` with `source`, `period` and at least one figure; publishing needs the `metrics` scope (`APPROVAL_SCOPE_METRICS`); `series.compare` same length as `values` |
 
 Any kind may carry `specs` (max 10 {`label`, `value`}, the «Ficha técnica»). The «PRODUCIDO CON IA» badge shows on
@@ -46,7 +47,9 @@ are projected only with `metrics`; contents only with `pieces`.
   them yet — edit them through the CLI.
 - **Brand marks:** channel logos are the AXIS isotypes compiled into `EOP_Platforms` (Pinterest from Iconify `logos`);
   UI icons (X action bar, players) are Remix paths in `EOP_Icons`. Never draw a brand mark or icon by hand.
-- **Deploy state:** 0.9.1 is live since 2026-10-30 (runtime `7106cc4`): the testimonial is a dark scene (`voice`; optional
+- **Deploy state:** 0.10.0 is live since 2026-10-30 (runtime `d27ab72`): kind `content-marketing` (Berel, revision 2:
+  hero of wet paint flooded by per-article swatches through `--eop-paint`, article with its pieces in channel frames,
+  production odometers, route), `links.liveWork`, single market in «Detrás del trabajo». Before it, 0.9.1 (runtime `7106cc4`): the testimonial is a dark scene (`voice`; optional
   `testimonial.highlight` must be the client's own words inside the quote; client logo from `client.logoMediaId`, negative
   version) and «Detrás del trabajo» (`behind`). Since 0.9.0: a project with two or more chapters renders a
   campaign explorer (`campaign_explorer`; chapters may carry `period`, `markets`, `summary`, `madeWithAi` — declare AI
