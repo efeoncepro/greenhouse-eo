@@ -137,7 +137,9 @@ muestra zona horaria). Servicio «AGENCIA DIGITAL Y PUBLICITARIA»: branding y m
 **ninguna fue respondida** al cierre.
 
 **Envío.** 30/10/2026 17:11, cuenta de Julio Reyes, con su OK explícito; estado «Enviada». Comisión Wherex si se
-adjudica: ninguna (el resumen de la licitación dice que los adjudicados no tendrán comisión).
+adjudica: ninguna (el resumen de la licitación dice que los adjudicados no tendrán comisión). Según la página «Comisión
+Proveedores» de Wherex, la comisión (0,8–1,6 % por segmento, tope 52 UF, CLP + IVA) sólo se cobra en licitaciones
+originadas en Chile, y esta es colombiana.
 
 **Reenvío con la declaración · 30/10/2026 17:38.** Julio confirmó que no tiene conflicto de intereses y autorizó firmar
 con su PNG. Se retiró la oferta, se sumó la declaración firmada (respuesta NO; Julio Cesar Reyes Rangel, RUT

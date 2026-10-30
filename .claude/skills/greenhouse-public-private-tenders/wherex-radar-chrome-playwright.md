@@ -153,6 +153,12 @@ adjunta archivos), y al paso 1 se llega desde `?tab=information` con «Siguiente
    impuestos y warnings. Reconcílialos con la cotización aprobada y el expediente interno. Informa al operador la
    comisión de Wherex con su cifra (GRD-1552: 52 UF). Los conteos de «Opcionales» incluyen los obligatorios
    agrupados por categoría; no indican archivos de más.
+   **Regla de comisión (página «Comisión Proveedores», leída 30/10/2026):** sólo se cobra al **adjudicar una
+   licitación originada en Chile**; porcentaje por segmento de la categoría adjudicada (A 0,8 % · B 1,3 % · C 1,5 % ·
+   D 1,6 % del monto de cada ítem), **tope 52 UF por licitación**, facturada en CLP con IVA al mes siguiente y pagadera
+   a 30 días. Participar y ofertar es gratis. Mattis GRD-1555 (Colombia) mostró «no tendrán comisión»; que GRD-1552,
+   también colombiana, mostrara 52 UF no está explicado: la fuente de cada proceso es el bloque «Comisión» del resumen.
+   En licitaciones chilenas, descontar la comisión al evaluar el margen.
 4. La aceptación de bases/términos y el botón `Enviar Propuesta` constituyen el acto de presentación. Requieren
    confirmación humana final y explícita en ese momento. Una instrucción de "preparar" o "subir borradores" no
    autoriza aceptar ni enviar.
