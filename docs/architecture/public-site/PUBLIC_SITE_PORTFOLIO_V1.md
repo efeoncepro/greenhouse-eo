@@ -139,7 +139,8 @@ Spec de diseño y hallazgos medidos: auditoría del 2026-10-29 (390/768/1440) re
   < 1,2 o más de 3), panel de cada fila del índice y el abanico del hero de la entrada.
 - **Etiqueta de formato** (`.eop-tag`, «9:16», «4:5»…) en cada pieza, arriba a la izquierda; la pausa va arriba a la
   derecha, como botón redondo de 44 px con ícono (el texto queda como nombre accesible).
-- **Página de proyecto como el diseño (0.8.3, construida 2026-10-30, sin desplegar; runtime 3850c44).** Órbita de
+- **Página de proyecto como el diseño (0.8.3, en producción desde el 2026-10-30; runtime 3850c44, respaldo
+  `/tmp/eo-portfolio-before-20261030-143232.tar`).** Órbita de
   medida según la línea gráfica (`EOP_Render::measure_svg`, `trajectory.measure`): la esfera parte a las 12 y se detiene
   en valor × 360°, estela de 50° (nunca antes de la partida), camino recorrido al 60 % y 0,75 × la estela, marca de
   partida; trazos en unidades del dibujo (un `stroke-dasharray` sobre `pathLength` con `non-scaling-stroke` se partía en

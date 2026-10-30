@@ -106,7 +106,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `17 proyectos publicados y todos los 301 aplicados el 2026-10-30 ; plugin 0.8.0 con tipos de proyecto y 0.8.2 (fila de marca como índice de campañas, pliegue tras 3) en producción desde el mismo día (verificado: 17 entradas 200, assets 0.8.0, validador vivo acepta los tipos nuevos); falta desactivar Ohio Portfolio desde el 2026-11-29`
+- Status real: `17 proyectos publicados y todos los 301 aplicados el 2026-10-30 ; plugin 0.8.0 con tipos de proyecto y 0.8.3 (fila de marca como índice de campañas; página de proyecto con órbita de medida, acento de la línea, hero y franja del spot como el diseño) en producción desde el mismo día (verificado: 17 entradas 200, assets 0.8.0, validador vivo acepta los tipos nuevos); falta desactivar Ohio Portfolio desde el 2026-11-29`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
