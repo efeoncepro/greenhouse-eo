@@ -9,9 +9,7 @@
   "audience": "[COMPLETAR: para quién era, en una frase]",
   "need": "[COMPLETAR: qué necesitaba resolver con IA]",
   "line": "brand",
-  "services": [
-    "creative-studio"
-  ],
+  "services": ["creative-services"],
   "steps": {
     "challenge": {
       "title": "[COMPLETAR: el reto]",

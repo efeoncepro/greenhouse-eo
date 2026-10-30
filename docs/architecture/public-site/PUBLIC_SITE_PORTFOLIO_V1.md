@@ -40,7 +40,7 @@ documento validado, un solo servicio de guardado y tres puertas, render del serv
   rechazados.
 - Reglas de conjunto: imagen con `mediaId` y sin campos de video; video con `src` y `poster` y sin `mediaId`; voz exige
   `captionsVtt`; ids de medio únicos; `hero.mediaRef` existe; `percent` entre 0 y 100; `services` en
-  `schema/services.v1.json` (9 líneas de `docs/services/`); `src`, `poster` y `captionsVtt` sólo bajo los prefijos de
+  `schema/services.v1.json` (desde 0.10.6: las categorías de servicio de cada una de las cinco líneas —Brand: Creative Services, Channel & Commerce; Engine: Search Visibility 360, Web Experience 360, Product Design 360, Agent Systems & Platforms, Digital Automation & Integrations; Voice: Media & Distribution; Revenue: RevOps & CRM; Growth: Measurement & Analytics—, cada una con su `line`; los productos —Creative Studio, Marketing Studio, Wave, Globe, Reach— nunca son servicio); `src`, `poster` y `captionsVtt` sólo bajo los prefijos de
   `schema/media-hosts.v1.json` (bucket público de AXIS, `MEDIA_HOST_NOT_ALLOWED`). Los mensajes `REQUIRED` nombran el
   campo en castellano (`EOP_Validator::NAMES`).
 - Tipos de pieza (`EOP_Validator::ROLE_FIELDS`): una pieza sin `role` es `campaign` y un proyecto sin `kind` es
@@ -270,6 +270,9 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
 - 0.10.3 (runtime `3ea1cec`): el borde del héroe de `content-marketing` es pintura derramada (SVG con filtro goo: borde
   que ondula, gotas con punta redondeada que se estiran y sueltan gotas, brillo húmedo; proporción fija con `slice`).
   «Detrás del trabajo» lleva espacio superior cuando sigue a una sección oscura (voz o cifras).
+- 0.10.4–0.10.5: se retira el goteo; el héroe de `content-marketing` termina limpio, como el tablero aprobado.
+- 0.10.6 (runtime `194e1e8`): `services` son categorías de servicio dentro de las cinco líneas (ver §3); Berel quedó en
+  Engine con Search Visibility 360 y Creative Services, Sky en Brand con Creative Services.
 - Las piezas que un tipo muestra en sus secciones salen de la galería genérica (`EOP_Kinds::taken`).
 - Isotipos oficiales de canal copiados de AXIS (`@efeoncepro/axis-brand-assets`, `assets/platforms/`; Pinterest del set
   `logos` de Iconify) en `EOP_Platforms`; íconos de interfaz de Remix Icon en `EOP_Icons`. Nada dibujado a mano.

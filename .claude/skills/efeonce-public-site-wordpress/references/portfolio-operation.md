@@ -47,7 +47,8 @@ are projected only with `metrics`; contents only with `pieces`.
   them yet — edit them through the CLI.
 - **Brand marks:** channel logos are the AXIS isotypes compiled into `EOP_Platforms` (Pinterest from Iconify `logos`);
   UI icons (X action bar, players) are Remix paths in `EOP_Icons`. Never draw a brand mark or icon by hand.
-- **Deploy state:** 0.10.3 is live since 2026-10-30 (runtime `3ea1cec`; poured-paint hero edge for content marketing,
+- **Deploy state:** 0.10.6 is live since 2026-10-30 (runtime `194e1e8`): services are line categories; no drips under
+  the content-marketing hero (0.10.4–0.10.5 withdrew the poured paint). Before, 0.10.3 (runtime `3ea1cec`; poured-paint hero edge for content marketing,
   spacing for «Detrás del trabajo» after a dark section). 0.10.2 (runtime `2997847`): the record is an editorial spread headed
   «{Cliente} necesitaba {need}» (`need_line`) — write `need` to follow «necesitaba», and never speak of Efeonce in the
   third person on the page (first person plural). 0.10.1 (runtime `55a2738`): services in «Detrás del trabajo» link to
@@ -114,7 +115,10 @@ pnpm public-website:portfolio -- revisions <slug> | log <slug> | restore <slug> 
 - Every media item has real `width`, `height` and `alt`; images use a Media Library `mediaId`; videos use `src` and
   `poster` in the public AXIS bucket (`portfolio/v<N>/<slug>/`) and `captionsVtt` when they have voice. No video upload
   to WordPress.
-- `services` only from `schema/services.v1.json`; `line` is growth | brand | engine | voice | revenue.
+- `services` only from `schema/services.v1.json`: the service categories inside the five lines (Brand: creative-services,
+  channel-commerce; Engine: search-visibility-360, web-experience-360, product-design-360, agent-systems-platforms,
+  digital-automation-integrations; Voice: media-distribution; Revenue: revenue-operations-crm; Growth: measurement-analytics).
+  Never a product (Creative Studio, Marketing Studio, Wave, Globe, Reach); `line` is growth | brand | engine | voice | revenue.
 - Video `src`, `poster` and `captionsVtt` must be under `schema/media-hosts.v1.json` (public AXIS bucket); anything else
   fails with `MEDIA_HOST_NOT_ALLOWED`.
 - Saves are against a base revision: a conflict means someone saved in between → `pull`, reapply, `apply`.

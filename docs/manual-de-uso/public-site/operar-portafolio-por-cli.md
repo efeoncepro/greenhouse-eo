@@ -165,7 +165,7 @@ proyecto social o de IA en el admin no los borra. Para cambiar esos campos, usa 
 
 ## Recetas por tipo de proyecto
 
-Todos los tipos comparten la base: `client`, `title`, `audience`, `need`, `line`, `services` (claves de `schema/services.v1.json` del plugin),
+Todos los tipos comparten la base: `client`, `title`, `audience`, `need`, `line`, `services` (claves de `schema/services.v1.json` del plugin: categorías de servicio de la línea —`creative-services`, `channel-commerce`, `search-visibility-360`, `web-experience-360`, `product-design-360`, `agent-systems-platforms`, `digital-automation-integrations`, `media-distribution`, `revenue-operations-crm`, `measurement-analytics`—; nunca un producto como Creative Studio, Marketing Studio o Wave),
 `steps` (reto, idea, ejecución), `seo` (título completo de 65 caracteres o menos; descripción de 150 o menos),
 `hero.mediaRef` (el `id` de un medio de algún capítulo) y `chapters` con sus `media`. Reglas que el validador hace
 cumplir en todos:
