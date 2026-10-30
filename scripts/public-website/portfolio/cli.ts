@@ -21,7 +21,7 @@ const ROOT = resolve(__dirname, '../../..')
 const BASE = join(ROOT, 'tmp/portfolio')
 const RUNTIME = process.env.PUBLIC_SITE_RUNTIME_ROOT || '/Users/jreye/Documents/efeonce-public-site-runtime'
 const SITE = process.env.PUBLIC_WEBSITE_BASE_URL || 'https://efeoncepro.com'
-const VALUE_FLAGS = ['message', 'from', 'revision', 'out']
+const VALUE_FLAGS = ['message', 'from', 'revision', 'out', 'kind']
 const INTERNAL = ['clientApproval', 'greenhouseOrganizationId', '"revision"']
 
 const fail = (message: string): never => {
@@ -170,9 +170,79 @@ function pull(slug: string) {
   ok(`${slug}: revisión ${doc.revision} en ${work}`)
 }
 
+// ── Kinds: what each kind of project shows and what its document needs (templates in ./templates) ──
+
+const TEMPLATES = join(__dirname, 'templates')
+
+const KINDS: Record<string, { label: string; shows: string; needs: string[] }> = {
+  campaign: {
+    label: 'Campaña (por defecto)',
+    shows: 'Hero con hasta tres piezas, ficha, reto/idea/ejecución, cifras con fuente y galería por capítulo.',
+    needs: ['Piezas con su formato real; imágenes de la biblioteca (mediaId) y videos del bucket de AXIS (src + poster).']
+  },
+  social: {
+    label: 'Social media',
+    shows: 'Las publicaciones orbitan la marca en el hero; «Canal por canal» con pestañas y cada pieza en el marco de su red con su isotipo oficial; la parrilla en movimiento.',
+    needs: [
+      'Cada pieza con role "post", channel (instagram, facebook, linkedin, x, tiktok, youtube, threads, pinterest) y placement (feed, story, reel, carousel, document, post, short, video, pin, thread).',
+      'postText con el texto real publicado y postedAt (AAAA-MM-DD) cuando se conozca. Sin cifras inventadas en los marcos: las métricas van en results con su fuente.'
+    ]
+  },
+  audiovisual: {
+    label: 'Producción audiovisual',
+    shows: 'El hero abre como sala de cine con la pieza madre; «Una pieza madre, todos sus cortes» en una línea de tiempo; detrás de cámara en abanico; créditos que suben.',
+    needs: [
+      'El hero es un video. Cada versión con role "cut", version ("Pieza madre", "Corte de 15 s"…), where y durationSeconds (mídela con ffprobe).',
+      'Fotos o videos de rodaje con role "bts" y consentRef (dónde quedó la autorización de quienes aparecen; nunca se publica). specs para la ficha técnica y credits con al menos tres personas.'
+    ]
+  },
+  'ai-production': {
+    label: 'Producción con IA',
+    shows: 'Etiqueta «Producido con IA»; la escena se resuelve del ruido y luego entra la marca; hoja de personaje con vista giratoria, expresiones y poses; antes y después; qué hizo la IA y qué hizo el equipo.',
+    needs: [
+      'ai con models (stage + name), teamDid (lo que hizo el equipo), aiDid y fictional cuando el personaje no existe.',
+      'Piezas con role "ai" y aiStage (anchor, angle, expression, pose, plate, scene, final) y label. Para el antes/después, el plate lleva compareTo con el id de la pieza final.'
+    ]
+  },
+  'seo-content': {
+    label: 'SEO, AEO y contenidos',
+    shows: 'La cifra principal y la curva que la dibujó; indicadores con su gráfica; la búsqueda que subió; la respuesta de IA que cita a la marca; palabra por palabra; los contenidos publicados; banners de apoyo.',
+    needs: [
+      'search con source y period (obligatorios) y al menos una cifra: highlight, kpis, series, query, keywords o aeo. Las cifras sólo se ven si la aprobación cubre "metrics".',
+      'contents con el enlace a cada contenido publicado. Banners con role "banner" y size. La posición media sólo con un piso de impresiones declarado en la fuente.'
+    ]
+  }
+}
+
+/** Placeholders left in a working copy: «[COMPLETAR…» texts and the template media id. */
+function pending(doc: Json, at = ''): string[] {
+  if (typeof doc === 'string') return doc.includes('[COMPLETAR') || doc.includes('COMPLETAR-slug') || doc.includes('/COMPLETAR') ? [at || '/'] : []
+  if (Array.isArray(doc)) return doc.flatMap((item, i) => pending(item, `${at}/${i}`))
+
+  if (doc && typeof doc === 'object') {
+    return Object.entries(doc).flatMap(([key, value]) => (key === 'mediaId' && value === 1 ? [`${at}/${key}`] : pending(value, `${at}/${key}`)))
+  }
+
+  return []
+}
+
+function kinds() {
+  for (const [key, kind] of Object.entries(KINDS)) {
+    console.log(`\n${kind.label}  (kind: ${key === 'campaign' ? 'sin campo, o "campaign"' : `"${key}"`})`)
+    console.log(`  Muestra: ${kind.shows}`)
+    for (const need of kind.needs) console.log(`  Necesita: ${need}`)
+  }
+
+  console.log(`\nPlantillas: ${TEMPLATES}/<kind>.json · crea una copia con \`new <slug> --kind <kind>\`.`)
+}
+
 function startNew(slug: string, args: string[]) {
-  const from = flag(args, 'from') || fail('Indica --from <archivo.json> con el documento de partida.')
-  const doc = read(resolve(process.cwd(), from as string))
+  const kind = flag(args, 'kind')
+  const from = flag(args, 'from')
+
+  if (kind && !KINDS[kind]) fail(`Tipo desconocido «${kind}». Tipos: ${Object.keys(KINDS).join(', ')} (detalle con \`kinds\`).`)
+  if (!kind && !from) fail('Indica --kind <tipo> (plantilla) o --from <archivo.json> (documento de partida). Tipos: `kinds`.')
+  const doc = kind && !from ? JSON.parse(readFileSync(join(TEMPLATES, `${kind}.json`), 'utf8').replaceAll('COMPLETAR-slug', slug)) : read(resolve(process.cwd(), from as string))
   const { work } = paths(slug)
 
   if (existsSync(work) && !has(args, 'force')) fail(`Ya hay una copia de trabajo en ${work} (usa --force para reemplazarla).`)
@@ -185,6 +255,7 @@ function startNew(slug: string, args: string[]) {
   delete doc.updatedAt
   write(work, doc)
   ok(`Copia de trabajo nueva en ${work}. Edítala y corre \`validate ${slug}\`.`)
+  if (kind) console.log(`  Plantilla «${KINDS[kind].label}»: reemplaza cada [COMPLETAR…] y cada mediaId 1 (la CLI no guarda mientras quede alguno). Qué pide el tipo: \`kinds\`.`)
 }
 
 function validate(slug: string, args: string[]) {
@@ -195,6 +266,9 @@ function validate(slug: string, args: string[]) {
   const gate = local('validate', work, true).out.publishIssues as Json[]
 
   ok(`${slug}: cumple portfolio-entry.v1.`)
+  const left = pending(read(work))
+
+  if (left.length) console.log(`  ! Quedan ${left.length} marcador(es) de plantilla por completar: ${left.slice(0, 8).join(', ')}${left.length > 8 ? '…' : ''}`)
 
   if (gate.length) {
     printIssues(gate, '·')
@@ -252,6 +326,9 @@ function apply(slug: string, args: string[]) {
   const message = messageOf(args)
 
   checkLocal(work, false)
+  const left = pending(read(work))
+
+  if (left.length) fail(`Quedan marcadores de plantilla sin completar (${left.length}): ${left.slice(0, 8).join(', ')}. No se envió nada.`)
   ok('Validación local con el validador del plugin.')
   console.log(remote('apply', [], { message, 'dry-run': true }, work))
   if (has(args, 'dry-run')) return ok('Dry run: nada se guardó.')
@@ -307,6 +384,9 @@ const HELP = `pnpm public-website:portfolio -- <comando>
 
   list                                  proyectos del sitio con estado y revisión
   pull <slug>                           trae el documento vivo a tmp/portfolio/<slug>/working.json
+  kinds                                 tipos de proyecto: qué muestra cada página y qué necesita el documento
+  new <slug> --kind <tipo>              copia de trabajo nueva desde la plantilla del tipo (social, audiovisual,
+                                        ai-production, seo-content o campaign)
   new <slug> --from <archivo.json>      copia de trabajo nueva desde un documento de partida
   validate <slug> [--remote]            validador del plugin en local (y en el sitio con --remote)
   preview <slug>                        qué vería el público según el alcance de la aprobación
@@ -334,6 +414,9 @@ function main() {
       break
     case 'new':
       startNew(slugOf(args), args)
+      break
+    case 'kinds':
+      kinds()
       break
     case 'validate':
       validate(slugOf(args), args)

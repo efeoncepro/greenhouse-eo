@@ -1,0 +1,120 @@
+{
+  "schema": "portfolio-entry.v1",
+  "slug": "COMPLETAR-slug",
+  "client": {
+    "name": "[COMPLETAR: nombre del cliente]",
+    "industry": "retail"
+  },
+  "title": "[COMPLETAR: título del proyecto]",
+  "audience": "[COMPLETAR: para quién era, en una frase]",
+  "need": "[COMPLETAR: qué necesitaba en búsqueda]",
+  "line": "growth",
+  "services": [
+    "factory"
+  ],
+  "steps": {
+    "challenge": {
+      "title": "[COMPLETAR: el reto]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    },
+    "idea": {
+      "title": "[COMPLETAR: la idea]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    },
+    "execution": {
+      "title": "[COMPLETAR: la ejecución]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    }
+  },
+  "clientApproval": {
+    "ref": "[COMPLETAR: dónde quedó la aprobación del cliente]",
+    "date": "2026-01-01",
+    "scope": [
+      "pieces",
+      "metrics"
+    ]
+  },
+  "seo": {
+    "title": "[COMPLETAR: cliente y título, 65 caracteres o menos]",
+    "description": "[COMPLETAR: qué se hizo, para quién y por qué, 150 caracteres o menos]"
+  },
+  "kind": "seo-content",
+  "search": {
+    "source": "[COMPLETAR: Search Console u otra fuente]",
+    "period": "[COMPLETAR: periodo medido]",
+    "highlight": {
+      "value": "[COMPLETAR]",
+      "label": "[COMPLETAR: qué mide]"
+    },
+    "kpis": [
+      {
+        "label": "Clics orgánicos",
+        "value": "[COMPLETAR]",
+        "delta": "[COMPLETAR]",
+        "series": [
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    ],
+    "series": {
+      "label": "Clics orgánicos por mes",
+      "values": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "start": "[COMPLETAR: primer mes]",
+      "end": "[COMPLETAR: último mes]"
+    },
+    "query": {
+      "text": "[COMPLETAR: búsqueda principal]",
+      "before": 10,
+      "after": 1,
+      "page": "[COMPLETAR: título de la página]"
+    },
+    "keywords": [
+      {
+        "keyword": "[COMPLETAR: palabra clave]",
+        "volume": "[COMPLETAR]",
+        "before": 20,
+        "after": 3
+      }
+    ],
+    "aeo": {
+      "question": "[COMPLETAR: pregunta real]",
+      "answer": "[COMPLETAR: respuesta del asistente, citando a la marca]",
+      "engines": [
+        "chatgpt"
+      ],
+      "citedAs": "[COMPLETAR: cómo aparece citada]"
+    },
+    "contents": [
+      {
+        "type": "article",
+        "title": "[COMPLETAR: título del contenido]",
+        "url": "https://efeoncepro.com/COMPLETAR"
+      }
+    ]
+  },
+  "chapters": [
+    {
+      "name": "[COMPLETAR: nombre de la campaña de apoyo]",
+      "media": [
+        {
+          "id": "banner-1",
+          "kind": "image",
+          "mediaId": 1,
+          "width": 1200,
+          "height": 628,
+          "alt": "[COMPLETAR: qué muestra el banner]",
+          "role": "banner",
+          "size": "1200 × 628"
+        }
+      ]
+    }
+  ]
+}
