@@ -5,6 +5,23 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-30 — Canvas de UI aprobado; implementación planificada
+
+- `doc`: el operador aprobó entero el canvas Claude Design «la sala es una órbita» (14 pantallas,
+  artifact `https://claude.ai/code/artifact/6562987e-d882-44ba-a929-a6ab7863771d`). Registro y reglas de
+  órbita/halo en [dirección visual](../../../../docs/ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md).
+  Aprueba composición, no píxeles implementados; fixture ficticia volta reemplaza Nómada.
+- `local` (lectura de `3c7bcb5`, sin ejecutar): faltan capítulos sobre bloques, recorrido por persona, tarjeta
+  previa a la entrada (start/transaction solo dan state/expiresAt/retryAt/deliveryStatus/entryGate),
+  estados vencida/revocada (todo es `invalid_invitation`), agrupación de adaptaciones (un asset por bloque),
+  nombres de autor, diff de ediciones, señales agregadas, vista por rol y `startedAt` de presentación.
+  El código de invitación es de 6 dígitos; el ejemplo alfanumérico del canvas se corrige en la UI.
+- Nuevas tasks: [TASK-2079](../../../../docs/tasks/to-do/TASK-2079-rooms-orbit-foundation.md) base visual
+  (UI ready=yes, sin backend) y [TASK-2080](../../../../docs/tasks/to-do/TASK-2080-rooms-approved-ui-backend-contract.md)
+  contrato backend (dueño Codex; slices 3–4 esperan dos decisiones de privacidad del operador).
+  TASK-2059/2068 vuelven a UI ready=no hasta rehacer wireframes desde el canvas; deltas en 2059/2068/2071.
+- Sin código, push, deploy, flags, correo ni canary en este corte.
+
 ## 2026-10-29 — Backend local completado y verificado para integrar diseño
 
 - `local`: runtime `codex/rooms-design-integration@3c7bcb5`, limpio, sin push/deploy.13migraciones/

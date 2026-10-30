@@ -1,5 +1,19 @@
 # TASK-2059 — Rooms: primera sala y vistas por rol
 
+## Delta 2026-10-30 — canvas aprobado; base y backend primero
+
+- El operador aprobó el 2026-10-29 el canvas de Claude Design «la sala es una órbita» (artifact
+  `https://claude.ai/code/artifact/6562987e-d882-44ba-a929-a6ab7863771d`), registrado en
+  `docs/ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md` § «Aprobación 2026-10-29». Reemplaza la
+  composición del scaffold anterior para esta superficie.
+- Orden: TASK-2079 (base visual: órbita, halo, cámara, iris, motion) y TASK-2080 (contrato backend) van primero.
+- Esta task implementa la Sala (mundo-cámara con 5 capítulos, barra de capítulos, mapa), la Radiografía, el
+  Móvil y los Estados del canvas, y reemplaza la fixture Nómada por la campaña ficticia volta.
+- Huecos backend verificados el 2026-10-30 (`3c7bcb5`): no hay capítulos ni recorrido por persona. La órbita no
+  puede medir un recorrido inventado: esperar TASK-2080 slices 1 y 2.
+- `UI ready` vuelve a `no`: wireframe, flow y motion describen la composición anterior y deben rehacerse desde
+  el canvas aprobado antes de implementar.
+
 > Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
 
 ## Delta 2026-10-25 — respuesta humana a la demo (NO aceptada)
@@ -21,7 +35,7 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `yes`
+- UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-2059-rooms-first-experience.md`
 - Flow: `docs/ui/flows/TASK-2059-rooms-first-experience-flow.md`
 - Motion: `docs/ui/motion/TASK-2059-rooms-first-experience-motion.md`
@@ -301,7 +315,7 @@ Ninguna para contenido sintético local. Aceptación visual de Julio al entregar
 - [x] Permisos can, jerarquías cliente/operador/admin, ámbito tenant/sala/edición y denegación por defecto verificados; notas internas ausentes del DTO cliente.
 - [x] Dependencias exactas y AXIS de registry con instalación limpia, lint (incluido negativo), typecheck y build verificados.
 - [x] Evidencia local del consumidor documentada; rollout y Efeonce ID real declarados pendientes.
-- [x] Wireframe/flow/motion y UI ready pasan task:lint y ui:readiness-check antes de JSX.
+- [ ] Wireframe/flow/motion y UI ready pasan task:lint y ui:readiness-check antes de JSX. (Reabierto 2026-10-30: el canvas aprobado reemplaza la composición anterior.)
 - [x] Desktop y móvil capturados y mirados; scroll-width, foco, contraste, reduced motion y fuentes comprobados.
 - [x] La órbita se consume desde tokens y primitives; copy y estados completos en el consumidor.
 - [x] Primera experiencia entregada para revisión del operador; aceptación visual humana registrada sólo cuando ocurra.

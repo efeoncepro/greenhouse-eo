@@ -1,5 +1,23 @@
 # TASK-2068 — Rooms: invitación, entrada con código y lectura compartida
 
+## Delta 2026-10-30 — canvas aprobado; base y backend primero
+
+- El operador aprobó el 2026-10-29 el canvas de Claude Design «la sala es una órbita» (artifact
+  `https://claude.ai/code/artifact/6562987e-d882-44ba-a929-a6ab7863771d`), registrado en
+  `docs/ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md` § «Aprobación 2026-10-29». Reemplaza la
+  composición del scaffold anterior para esta superficie.
+- Orden: TASK-2079 (base visual: órbita, halo, cámara, iris, motion) y TASK-2080 (contrato backend) van primero.
+- Esta task implementa la Invitación (escritorio y móvil): «Entra.» rodeado por la órbita, tarjeta de quién
+  invita y para quién, y los estados enlace, código, vencido, revocado e intentos.
+- Corrección contra el backend (2026-10-30): el código es de **6 dígitos** (`/^[0-9]{6}$/`), no alfanumérico
+  como el ejemplo del canvas; la UI usa `inputMode="numeric"`. El canvas valida al sexto dígito sin botón:
+  cambio aprobado respecto del wireframe anterior («sin autoverificar»).
+- Huecos backend: antes de entrar no se expone quién invita, el cliente ni la persona invitada, y vencida/revocada
+  llegan como `invalid_invitation`. Dependen de TASK-2080 slices 3 y 4 y de dos decisiones de privacidad del
+  operador. Sin ellas, la tarjeta y los estados distintos no se implementan.
+- Cooldown de «pedir código nuevo» desde `retryAt`; no existe conteo de intentos restantes.
+- `UI ready` vuelve a `no` hasta rehacer wireframe, flow y motion desde el canvas.
+
 ## Delta 2026-10-29 — canary cerrado; UI nueva pendiente
 
 El [canary conjunto del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md)
@@ -21,7 +39,7 @@ de 129/15 checks pertenecen al scaffold anterior.
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `yes`
+- UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-2068-rooms-invitation-and-guest-experience.md`
 - Flow: `docs/ui/flows/TASK-2068-rooms-invitation-and-guest-experience-flow.md`
 - Motion: `docs/ui/motion/TASK-2068-rooms-invitation-and-guest-experience-motion.md`

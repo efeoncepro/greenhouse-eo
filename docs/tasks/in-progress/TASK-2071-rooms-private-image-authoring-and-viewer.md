@@ -1,5 +1,18 @@
 # TASK-2071 — Rooms: autoría mínima y lectura de imágenes privadas
 
+## Delta 2026-10-30 — canvas aprobado; base y backend primero
+
+- El operador aprobó el 2026-10-29 el canvas de Claude Design «la sala es una órbita» (artifact
+  `https://claude.ai/code/artifact/6562987e-d882-44ba-a929-a6ab7863771d`), registrado en
+  `docs/ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md` § «Aprobación 2026-10-29». Reemplaza la
+  composición del scaffold anterior para esta superficie.
+- Orden: TASK-2079 (base visual: órbita, halo, cámara, iris, motion) y TASK-2080 (contrato backend) van primero.
+- Esta task implementa Explorar pieza (marco que cambia de proporción, capas Vista limpia/En contexto/Detalle,
+  pestañas Fundamento/Evidencia/Preguntar) y Autoría (inventario, cobertura, «Ver como»).
+- Huecos backend (2026-10-30): un bloque de medio admite un asset y nada agrupa adaptaciones; las preguntas no
+  traen nombre visible; «Ver como» no tiene proyección por rol. Adaptaciones y nombres en TASK-2080 slice 5; la
+  vista por rol queda como follow-up de la Fase 2.
+
 ## Delta 2026-10-29 — backend de imagen disponible; UI nueva pendiente
 
 El [canary interno del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md)
