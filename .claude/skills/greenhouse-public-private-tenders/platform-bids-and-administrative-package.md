@@ -102,6 +102,10 @@ Esta ruta no crea `quoteId`, no costea ni valida margen, no aprueba precios ni e
 5. Preservar originales, archivar borradores previos y generar editables/PDF finales con QA. Registrar autorización,
    hechos confirmados, versión y ruta del resultado, sin copiar el recurso privado de firma al repo.
 6. Firmado no significa presentado: actualizar estado sólo con evidencia de cada acción.
+7. **Firma con el PNG guardado del operador (GRD-1552, 30/10/2026):** la declaración de conflicto de intereses se
+   firmó con `Alineación/4. Comercial/Legales/firma/PNG/Firma-Julio.png` sólo porque Julio lo autorizó en el chat.
+   `export_pdf` del MCP de Word se colgó sobre una ruta de OneDrive: no depender de él cerca del cierre. Si el
+   casillero acepta .docx, subir el .docx firmado (así se hizo); si exige PDF, convertir por otra vía con tiempo.
 
 ### Oferente extranjero: identidad tributaria y legal (operador, 20/10/2026)
 
@@ -114,6 +118,9 @@ Sociedades). Fuente: OneDrive `Alineación/4. Comercial/Legales/Documentos Efeon
   del archivo: el nombre no garantiza la fecha.
 - Es una práctica confirmada por el operador, no una equivalencia declarada por el comprador. Si las bases
   exigen registro local como requisito excluyente, se trata como requisito real (consulta o bloqueo).
+- Repetido en GRD-1552 (30/10/2026), decisión del operador: «Cámara de Comercio» = certificado de vigencia
+  (≤ 30 días) + estatuto actualizado en un solo PDF; «RUT completo» = e-RUT. Se cargaron tal cual, sin nota
+  aclaratoria adicional.
 
 ### Experiencia certificada: sólo evidencia real (Gana GRD-1541, 20/10/2026)
 
@@ -129,6 +136,11 @@ autodeclaración de Efeonce y estaba desactualizada.
   nunca como experiencia propia de Efeonce sola, y sólo con la evidencia que el partner entregó.
 - Una autodeclaración vieja no es un certificado. Si lo que hay no calza exacto con lo pedido, se carga lo real y
   se informa al operador el riesgo de puntaje o admisibilidad; no se rellena el hueco.
+- **Contrato de cliente como certificado (GRD-1552, 30/10/2026):** preferir una carta de referencia formal cuando
+  existe (SKY). Si se usa un contrato firmado con cláusula de confidencialidad (Pinturas Berel, cláusula Sexta,
+  5 años), subir sólo la página de identificación/objeto y la de firmas (allí, páginas 1 y 8) y excluir las de
+  precios (página 2). Es decisión del operador, no del agente; ambas evidencias se unieron en un solo PDF para el
+  casillero «2 certificados de contratos».
 
 ## Postular en Wherex: runbook medido (Gana / Grupo Réditos GRD-1541, oferta 7543223, 20/10/2026)
 
@@ -159,12 +171,21 @@ navegador no pasa al otro.
   filas. Para cargarlos con `file_upload` se les puso `aria-label` por JS y, **tras cada carga**, se comprobó que
   la fila correcta quedara en verde «Archivo cargado». Los opcionales entran por `#admFilesInput`,
   `#tecFilesInput` y `#ecoFilesInput`. Wherex renombra los caracteres no permitidos: registrar el nombre final.
+- **Condiciones por JS, no por ref de `find` (GRD-1552, 30/10/2026):** un clic con una ref vieja de `find` sobre un
+  radio sacó la página al inicio de Wherex y se perdieron radios y comentario (los archivos cargados persistieron).
+  Marcar cada radio con `label[for]` + `.click()` y llenar el textarea con el setter nativo de `value` + evento
+  `input`; leer de vuelta el estado y recién entonces pulsar «Siguiente», que es lo que guarda las condiciones.
 
 **Paso 3 «Resumen y enviar oferta».** Muestra condiciones, conteo de archivos, la línea y el total, la comisión
 de Wherex si se adjudica (en el caso $72.000 = 1,75 UF), la casilla «He leído y acepto» (bases del comprador y
 términos de Wherex) y «Enviar Propuesta». Antes de marcar y enviar, mostrar ese resumen al operador y obtener
 su OK explícito en el chat: aceptar términos y enviar son el acto de presentación. Tras enviar: estado
 «Enviada» y «Oferta enviada por … el …». Para editar hay que «Retirar oferta» y reenviar antes del cierre.
+- La comisión se informa al operador **por separado y con su cifra** antes de pedir el OK: escala con el monto
+  (GRD-1541: 1,75 UF; GRD-1552: COP 2.144.048 = 52 UF).
+- Los conteos de «Opcionales» del resumen suman los obligatorios agrupados por categoría (en GRD-1552:
+  Cámara + RUT en administrativos, certificados en técnicos, económica en económicos). No son archivos de más ni
+  duplicados: no retirar nada por ese número.
 
 **Hora de cierre.** En el caso la UI mostró «20/10/2026 18:00» sin zona mientras la invitación decía 14:00 hora
 de Colombia; en Sika 1164 la UI mostró hora de Santiago. No persistir en el CRM una hora dudosa: registrar
@@ -210,6 +231,13 @@ Digital 2027/02 - Para subir a Wherex/`.
   requisito marcado «CUMPLE» por decisión del operador sin evidencia documental, contraparte legal del comprador sin
   fijar, costo completo no validado por Finance y fechas de fundación que difieren entre deck y estatuto. Quedan en
   el checklist y en el reporte al operador.
+
+**Envío 30/10/2026 (verificado en Wherex).** Oferta 7578948 enviada por Julio Reyes a las 16:52, operada por el
+agente con Claude in Chrome en la sesión de Julio y con su OK explícito antes de aceptar términos y enviar; estado
+«Enviada»; comprobante en `13. Agencia Digital 2027/`. Línea: 12 meses × COP 38.000.000 sin IVA = COP 456.000.000,
+pago 30 días aceptado. Cambio respecto del armado del 29/10: el 07 quedó como carta de SKY + páginas 1 y 8 del
+contrato Berel (no Gobierno de Santiago); la declaración se subió como .docx firmado. Lecciones en «Completar y firmar anexos»,
+«Oferente extranjero», «Experiencia certificada» y «Postular en Wherex».
 
 ## Seguimiento y continuidad
 

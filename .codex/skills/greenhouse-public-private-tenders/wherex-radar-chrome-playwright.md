@@ -146,9 +146,13 @@ adjunta archivos), y al paso 1 se llega desde `?tab=information` con «Siguiente
 2. En **Condiciones y archivos adjuntos**, confirma entrega, plazo de pago, vigencia y comentario general. No
    aceptes ni sustituyas una condición comercial sin aprobación de Comercial/Finance. Carga cada documento
    obligatorio exactamente en su campo y respeta el límite de tamaño/formato; una cotización y una presentación
-   no sustituyen anexos administrativos o técnicos cuando el comprador los exige.
+   no sustituyen anexos administrativos o técnicos cuando el comprador los exige. Marca radios y comentario por
+   JS y verifica antes de «Siguiente», que es lo que guarda las condiciones: un clic con ref vieja de `find` sacó
+   la página y las perdió (GRD-1552; detalle en «Postular en Wherex»).
 3. En **Resumen y enviar oferta**, comprueba todos los ítems, condiciones, archivos obligatorios, totales, moneda,
-   impuestos y warnings. Reconcílialos con la cotización aprobada y el expediente interno.
+   impuestos y warnings. Reconcílialos con la cotización aprobada y el expediente interno. Informa al operador la
+   comisión de Wherex con su cifra (GRD-1552: 52 UF). Los conteos de «Opcionales» incluyen los obligatorios
+   agrupados por categoría; no indican archivos de más.
 4. La aceptación de bases/términos y el botón `Enviar Propuesta` constituyen el acto de presentación. Requieren
    confirmación humana final y explícita en ese momento. Una instrucción de "preparar" o "subir borradores" no
    autoriza aceptar ni enviar.

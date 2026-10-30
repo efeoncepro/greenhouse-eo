@@ -1,10 +1,16 @@
 # GANA y LOTI — Agencia digital 2027 — GRD-1552
 
-## Estado al 29 de octubre de 2026 — paquete listo para subir; falta firma y carga en Wherex
+## Estado al 30 de octubre de 2026 — oferta ENVIADA en Wherex (30/10/2026 16:52)
 
-**Paquete preparado el 29/10/2026 en OneDrive** (`13. Agencia Digital 2027/02 - Para subir a Wherex/`): técnica PDF de 42 páginas, económica modulable PDF A4 de 4 páginas (plantilla oficial `render-cotizacion-a4` v2), RFP Excel diligenciado, declaración de conflicto de intereses llena, Cámara de Comercio, e-RUT y dos certificaciones de experiencia. **Pendiente:** firma de Julio en la declaración de conflicto de intereses y la carga en Wherex antes del cierre del **30/10/2026 18:00 America/Santiago**. Nada fue subido, firmado ni enviado a Wherex por el agente. Detalle en el [delta del 29/10](#delta-2026-10-29--paquete-listo-para-subir-a-wherex); riesgos abiertos en el [control interno](CONTROL-PROPUESTA-INTERNO.md).
+**Oferta Wherex 7578948 enviada por Julio Reyes el 30/10/2026 a las 16:52**, estado «Enviada», antes del cierre de las 18:00 America/Santiago. Operada por el agente con la sesión de Julio y su OK explícito. Servicio: 12 meses × COP 38.000.000 = **COP 456.000.000 sin IVA**, en pesos colombianos. Obligatorios 4/4 cargados; la declaración de conflicto de intereses se firmó con la firma autorizada de Julio y se subió en Word. Comisión Wherex si se adjudica: COP 2.144.048 (52 UF). Para editar la oferta hay que retirarla y reenviarla. Detalle en el [delta del 30/10](#delta-2026-10-30--oferta-enviada-en-wherex); riesgos que siguen abiertos en el [control interno](CONTROL-PROPUESTA-INTERNO.md).
 
-Las secciones siguientes conservan el historial del 22/10; donde digan «borrador», «sin deck» o «sin PDF», describen ese momento.
+### Estado al 29 de octubre de 2026 (histórico) — paquete listo para subir; faltaban firma y carga en Wherex
+
+*Superado por el envío del 30/10. Se conserva como registro de ese momento.*
+
+**Paquete preparado el 29/10/2026 en OneDrive** (`13. Agencia Digital 2027/02 - Para subir a Wherex/`): técnica PDF de 42 páginas, económica modulable PDF A4 de 4 páginas (plantilla oficial `render-cotizacion-a4` v2), RFP Excel diligenciado, declaración de conflicto de intereses llena, Cámara de Comercio, e-RUT y dos certificaciones de experiencia. **Pendiente en ese momento (cerrado el 30/10):** firma de Julio en la declaración de conflicto de intereses y la carga en Wherex antes del cierre del **30/10/2026 18:00 America/Santiago**. Al 29/10 nada había sido subido, firmado ni enviado a Wherex. Detalle en el [delta del 29/10](#delta-2026-10-29--paquete-listo-para-subir-a-wherex); riesgos abiertos en el [control interno](CONTROL-PROPUESTA-INTERNO.md).
+
+Las secciones siguientes conservan el historial del 22/10 y del 29/10; donde digan «borrador», «sin deck» o «sin PDF», describen ese momento.
 
 ## Base comercial vigente — decisión de Julio, 22/10/2026
 
@@ -119,12 +125,12 @@ Por instrucción de Julio se preparó la carpeta OneDrive `13. Agencia Digital 2
 | 01 | Propuesta técnica PDF, 42 páginas, exportada del lienzo Claude Design ([artifact](https://claude.ai/artifact/FTkrgJDZZ77cNpsetLqd4q), versión 74: 41 láminas + Anexo A) | Listo |
 | 02 | Propuesta económica modulable PDF A4, 4 páginas, plantilla oficial `node scripts/documents/render-cotizacion-a4.mjs` v2 (fuente [`cotizacion/cotizacion.json`](cotizacion/cotizacion.json), salida `cotizacion/v2/`): 5 líneas × 12 meses con valor unitario mensual, total COP 456.000.000 (COP 38.000.000/mes); valores netos, sin IVA (`taxStatus: not_applicable`, precedente Sika 1164); comprador «Grupo Réditos · GANA y LOTI», NIT 901716185 de la ficha de facturación Wherex; vigencia = la del proceso GRD-1552 | Listo. Reemplaza la primera versión en formato lámina del mismo 29/10 |
 | 03 | RFP Excel diligenciado: hoja «Requisitos técnicos», filas 9–17 (Req. 1, 3, 4, 5, 6, 7, 9, 10, 11) en «CUMPLE» con páginas del PDF; Req. 1 sin observación | Listo; validaciones originales preservadas |
-| 04 | Declaración de conflicto de intereses (Word) llena a nombre de Julio Cesar Reyes Rangel, Gerente General de Efeonce Group SpA, Santiago de Chile, 29/10/2026, respuesta NO | **Falta firma de Julio** |
+| 04 | Declaración de conflicto de intereses (Word) llena a nombre de Julio Cesar Reyes Rangel, Gerente General de Efeonce Group SpA, Santiago de Chile, 29/10/2026, respuesta NO | Al 29/10: falta firma de Julio. **30/10: firmada con la firma PNG autorizada por Julio y subida como .docx** (la exportación a PDF desde Word no respondió) |
 | 05 | Cámara de Comercio: certificado de vigencia del 19/10/2026 + estatuto (Registro de Empresas y Sociedades de Chile) | Listo; 11 días al cierre frente a la exigencia ≤ 30 días |
 | 06 | e-RUT | Listo |
-| 07 | Certificaciones de experiencia: SKY Airline + Gobierno de Santiago | Listo |
+| 07 | Certificaciones de experiencia: SKY Airline + Gobierno de Santiago | Al 29/10: listo. **30/10: el archivo finalmente subido fue «Certificaciones de contratos (SKY + Berel)»**: carta de referencia SKY + páginas 1 y 8 del contrato firmado con Pinturas Berel, excluida la página 2 de precios por la cláusula Sexta de confidencialidad (decisión de Julio) |
 
-Los documentos 05–07 se reutilizaron del paquete de Programática GRD-1541 (`12. Programmatic/`). El 22/10 se había seleccionado Berel y SKY como experiencias, con Gobierno de Santiago como alternativa; el paquete del 29/10 adjunta SKY y Gobierno de Santiago. Checklist interno: `13. Agencia Digital 2027/CHECKLIST WHEREX GRD-1552 (INTERNO).md`, fuera de la carpeta de subida.
+Los documentos 05–07 se reutilizaron del paquete de Programática GRD-1541 (`12. Programmatic/`). El 22/10 se había seleccionado Berel y SKY como experiencias, con Gobierno de Santiago como alternativa; el paquete del 29/10 adjuntaba SKY y Gobierno de Santiago, y lo enviado el 30/10 volvió a SKY + Berel. Checklist interno: `13. Agencia Digital 2027/CHECKLIST WHEREX GRD-1552 (INTERNO).md`, fuera de la carpeta de subida.
 
 **Deck (técnica).** Línea gráfica La órbita, registro formal «ustedes». Capítulos: 01 Las ideas (láminas 3–10), 02 El alcance (11–22), 03 Equipo y operación (23–31), 04 Respaldo (32–38), 05 Inversión (39–40), contraportada 41 y Anexo A en la página 42 (correspondencia requisito → página). Lámina 23 = lámina canónica de equipo del brochure; lámina 32 «Clientes» = lámina canónica del brochure «Agencia de Marketing 360» v9 (p. 78). La versión cliente se limpió el 29/10 de códigos de fuente internos ([E01]–[E08], [P01], [P02]), cajas «Por confirmar»/«pendiente»/«por adjuntar», sellos de borrador y frases defensivas; los anexos B y C de fuentes internas se retiraron. Verificado con pdftotext sobre el PDF final.
 
@@ -132,8 +138,10 @@ Los documentos 05–07 se reutilizaron del paquete de Programática GRD-1541 (`1
 
 **Riesgos abiertos:** permiso de Basis DSP (lámina 36); sin evidencia documental de marcas antioqueñas (Req. 1 marcado CUMPLE por decisión de Julio); contraparte Réditos Empresariales S.A. frente a REDIAPUESTAS S.A.S. sin fijar; costo completo no validado por Finanzas; lámina 32 dice fundación 2018 y el estatuto dice constitución de la SpA en 2021. Ver [control interno](CONTROL-PROPUESTA-INTERNO.md).
 
-**No se subió, firmó ni envió nada en Wherex.** Cierre: 30/10/2026 18:00 America/Santiago.
+*Histórico (29/10):* no se había subido, firmado ni enviado nada en Wherex. Cierre: 30/10/2026 18:00 America/Santiago. Superado por el envío del 30/10, abajo.
 
 ## Delta 2026-10-30 — oferta ENVIADA en Wherex
 
 Enviada por Julio Reyes (operada por agente con su sesión y su OK explícito) el **30/10/2026 16:52**, estado «Enviada». Servicio: 12 meses × COP 38.000.000 = **COP 456.000.000 sin IVA**; entrega en destino «Sí»; pago 30 días; validez «No definida». Obligatorios 4/4: Cámara de Comercio (equivalente chileno: certificado de vigencia 19/10/2026 + estatuto), «2 certificados de contratos» = carta de referencia SKY + páginas 1 y 8 (partes/objeto y firmas) del contrato firmado con Pinturas Berel, **sin la página 2 de precios** por la cláusula Sexta de confidencialidad (decisión de Julio), económica A4, e-RUT (equivalente chileno). Opcionales: declaración de conflicto de intereses firmada con la firma PNG de Julio (autorizada por él; subida en Word porque la exportación a PDF por Word no respondió), técnica PDF y RFP Excel. Comisión Wherex si se adjudica: COP 2.144.048 (52 UF). Comprobante: `13. Agencia Digital 2027/Comprobante envio Wherex GRD-1552 2026-10-30 16-52.jpg`. Para editar hay que retirar la oferta y reenviarla.
+
+**HubSpot 30/10/2026 (autorizado por Julio):** Deal [66560488750](https://app.hubspot.com/contacts/48713323/record/0-3/66560488750) movido a `presentationscheduled` (Presentación de soluciones), próximo paso «Oferta ENVIADA en Wherex 30/10/2026 16:52…», descripción con bloque «OFERTA ENVIADA» antepuesto (antecedentes del 22/10 conservados) y nota 120032641429 asociada al deal y a Grupo Reditos (34264439413). Importe COP 456.000.000, moneda, fecha de cierre y propietario sin cambios; readback verificado. Los registros `LICITATION_CRM_REGISTER.md` y `CRM_DEAL_REGISTER.md` no se actualizaron en este commit porque tenían cambios sin commitear de otra sesión.

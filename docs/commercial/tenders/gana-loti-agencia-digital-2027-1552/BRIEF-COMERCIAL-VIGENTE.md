@@ -1,6 +1,8 @@
 # Base comercial vigente — GANA y LOTI, Agencia Digital 2027
 
-> **Nota 29/10/2026.** Julio aprobó el precio de la oferta a COP 38.000.000/mes (COP 456.000.000 por 12 meses) con desglose modulable en cinco componentes; ver [oferta-economica.md](oferta-economica.md) y [control interno](CONTROL-PROPUESTA-INTERNO.md). El paquete para Wherex está preparado; falta la firma de la declaración de conflicto de intereses y la carga en Wherex. Nada fue subido ni enviado.
+> **Nota 30/10/2026.** Oferta **enviada** en Wherex el 30/10/2026 a las 16:52 a **COP 38.000.000/mes, COP 456.000.000 por 12 meses sin IVA**, en pesos colombianos. Ver el [README](README.md#delta-2026-10-30--oferta-enviada-en-wherex).
+
+> **Nota 29/10/2026 (histórica, superada por el envío del 30/10).** Julio aprobó el precio de la oferta a COP 38.000.000/mes (COP 456.000.000 por 12 meses) con desglose modulable en cinco componentes; ver [oferta-economica.md](oferta-economica.md) y [control interno](CONTROL-PROPUESTA-INTERNO.md). El paquete para Wherex está preparado; falta la firma de la declaración de conflicto de intereses y la carga en Wherex. Nada fue subido ni enviado.
 
 **Decisión de Julio, 22/10/2026.** Trabajar con **COP 36–38 millones mensuales / USD 9.863,01–10.410,96** para GRD-1552, intento 13. Usar **COP 38 millones / USD 10.410,96 al mes como escenario principal de valoración interna** y COP 36 millones / USD 9.863,01 como alternativa más agresiva. El precio definitivo y la emisión/presentación siguen pendientes. **Autorización posterior de Julio, 22/10/2026: preparar la propuesta en Markdown para Claude Design.** La pausa de redacción queda superada; se prepara un borrador con el escenario principal y los extras descritos, sin autorizar envío, firma, carga o presentación.
 
