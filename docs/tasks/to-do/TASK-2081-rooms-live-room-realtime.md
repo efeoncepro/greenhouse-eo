@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `Diseño. Pantalla «Sala en vivo» aprobada en el canvas del 2026-10-29; el operador pidió todo el canvas el 2026-10-30. El backend no tiene tiempo real.`
+- Status real: `ADR propuesto 2026-10-30 (SSE same-origin + PostgreSQL efímero); espera aprobación del operador antes de código.`
 - Rank: `último de la implementación de la UI aprobada`
 - Domain: `platform`
 - Blocked by: `TASK-2080 slices 1 y 6 (capítulos y contrato)`
@@ -72,6 +72,7 @@ Reglas obligatorias:
 - `docs/documentation/rooms/backend-api-for-claude-design.md`
 - `.claude/skills/efeonce-rooms/SKILL.md` y `references/program-ledger.md`
 - Canvas aprobado: `https://claude.ai/code/artifact/6562987e-d882-44ba-a929-a6ab7863771d` (`Multiplayer.dc.html`)
+- ADR propuesto: `docs/architecture/rooms/EFEONCE_ROOMS_LIVE_ROOM_REALTIME_DECISION_V1.md` (SSE same-origin + estado efímero en PostgreSQL; espera aprobación)
 
 ## Dependencies & Impact
 

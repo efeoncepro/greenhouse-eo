@@ -188,6 +188,25 @@ del CLI, con streaming, o el SDK multimedia. MCP excluye las transferencias bina
 - **Autores visibles.** Preguntas y respuestas traen `author{displayName|null, kind:'internal'|'guest'}`: el nombre de
   perfil del miembro o el nombre de la persona invitada, copiado a su sesión al canjear el código.
 
+### Comparar ediciones, «Ver como», reloj, señales y subtítulos (TASK-2080 slices 7–10)
+
+> Migración 17 (`presentation_sessions.started_at/ended_at`, `rooms.viewer_activity_daily`). Local, sin push.
+
+- **Comparar ediciones.** `GET .../editions/:editionId/compare/:baseEditionId` (SDK `compareEditions`): bloques
+  `added|removed|changed|moved` (movido = fuera del orden común más largo), campos cambiados y diff por palabras de
+  cada fragmento (`tokens[{kind:same|added|removed,text}]`). Cada edición se proyecta para quien lee: nada excluido entra al diff.
+- **«Ver como».** `GET /api/v1/rooms/:roomId/preview?as=buyer|champion|audience` estrecha la vista de audiencia del
+  borrador a lo que ese rol recibiría (comprador sin evidencia; champion con evidencia y preguntas; audiencia con
+  presentación). Requiere `content.edit`; no crea sesión ni principal y solo puede ocultar.
+- **Reloj de presentación.** `PresentationView.startedAt/endedAt` en hora del servidor (se fijan en start y end; control
+  no los mueve). Las escenas del tour aceptan `durationMs` (1 s a 10 min) para el avance automático de la audiencia.
+- **Señales.** `GET .../editions/:editionId/signals?window=day|week&by=chapter|block` (SDK `signals`, CLI `signals`):
+  por unidad y período, `viewers` (personas distintas), `views`, `dwellMs` y `questions`; 14 días u 8 semanas.
+  Solo miembros internos con `activity.read`; un invitado recibe `not_found`. Ninguna fila nombra a una persona.
+  `progress.mark` alimenta tanto el recorrido propio como estas señales.
+- **Subtítulos.** Los bloques de medio V4 aceptan `captions[{lang,label,vtt}]` (WebVTT, hasta 4 idiomas, uno por
+  idioma); viajan en la edición con la misma autorización. La UI los usa solo en video.
+
 ### Lecturas HTTP nuevas
 
 Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cursor` según su contrato.
@@ -198,6 +217,8 @@ Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cu
 | GET `.../steps` y `.../activity` | steps/activity |
 | GET `.../progress` | progress |
 | GET `/api/v1/profile` | profile |
+| GET `.../signals` | signals |
+| GET `.../compare/:baseEditionId` | compareEditions |
 | GET `.../tours`, `.../tours/:tourId`, `.../notes` | tours/tour/ownNotes |
 | GET `.../presentations/:sessionId` y `.../console` | presentation/presentationConsole |
 | GET `/api/v1/rooms/:roomId/integrations` | integrations |

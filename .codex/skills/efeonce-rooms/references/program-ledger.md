@@ -5,6 +5,15 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-30 — Backend de la UI aprobada: comparar, «Ver como», reloj, señales, subtítulos; ADR sala en vivo
+
+- `local`: migración17 (`presentation_sessions.started_at/ended_at`, `rooms.viewer_activity_daily`); `editions.compare`,
+  `preview?as=`, `durationMs` por escena, `signals.read` (interno, agregado, alimentado por `progress.mark`) y
+  `captions` WebVTT en medios V4. Presupuesto del esquema MCP de lectura a 18 KB (medido 15,2 KB).
+- `local`: verify 357/357, 0 skip. Sin push/deploy/flags. Backend de TASK-2080 completo salvo cierre de contrato.
+- `doc`: ADR `EFEONCE_ROOMS_LIVE_ROOM_REALTIME_DECISION_V1.md` **Proposed** (SSE same-origin + estado efímero en PG,
+  sin proveedor); TASK-2081 espera su aprobación antes de código.
+
 ## 2026-10-30 — Backend de la UI aprobada: tarjeta, estados, perfiles, adaptaciones y autores
 
 - `local`: `b7e08aa` migración15 (perfil de miembros, perfil sellado del invitado, historial inmutable de tokens

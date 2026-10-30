@@ -95,6 +95,7 @@ arriba; su despliegue, el editor/visor nuevos y la certificación conjunta sigue
 - [Colaboración](EFEONCE_ROOMS_COLLABORATION_DECISION_V1.md), [presentación](EFEONCE_ROOMS_DURABLE_PRESENTATION_DECISION_V1.md).
 - [Importación X-ray/referencia CRM](EFEONCE_ROOMS_SOURCE_IMPORT_AND_CRM_HANDOFF_DECISION_V1.md).
 - [Multimedia local V4](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md), [MCP stdio local](EFEONCE_ROOMS_LOCAL_STDIO_MCP_DECISION_V1.md).
+- [Sala en vivo: transporte en tiempo real](EFEONCE_ROOMS_LIVE_ROOM_REALTIME_DECISION_V1.md) — **Proposed** 2026-10-30, espera aprobación (TASK-2081).
 
 ## Contratos de experiencia para revisión
 

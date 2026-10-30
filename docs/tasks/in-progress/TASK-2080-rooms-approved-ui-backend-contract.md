@@ -32,7 +32,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-30: slices 1–5 commiteados en efeonce-rooms claude/rooms-approved-ui (31c1a83 capítulos, e37b152 recorrido, b7e08aa tarjeta/estados/perfil, d3c6c24 adaptaciones/autores); migraciones 14–16, 46 tablas; verify 352/352 sin skips con PG18 local y ROOMS_RUNTIME_PROFILE=local. Sin push ni deploy. Faltan slices 7 (comparar ediciones), 8 (vista por rol), 9 (reloj/avance de presentación), 10 (señales y subtítulos) y 6 (cierre de contrato).`
+- Status real: `2026-10-30: slices 1–5 y 7–10 commiteados en efeonce-rooms claude/rooms-approved-ui (31c1a83, e37b152, b7e08aa, d3c6c24, y el commit de comparar/vista por rol/reloj/señales/subtítulos); migraciones 14–17; verify 357/357 sin skips con PG18 local y ROOMS_RUNTIME_PROFILE=local. Sin push ni deploy. Falta solo el cierre de contrato (slice 6) tras la integración de la UI.`
 - Rank: `2 de la implementación de la UI aprobada (en paralelo con TASK-2079)`
 - Domain: `platform`
 - Blocked by: `none`
@@ -326,7 +326,7 @@ tablas y campos finales los decide el dueño backend respetando los invariantes 
 - [x] `progress.mark` repetido no duplica filas y rechaza bloques excluidos o de otra edición.
 - [x] `progress.get` solo devuelve el recorrido de la persona autenticada.
 - [x] La tarjeta previa responde solo para tokens vigentes y con la forma resuelta; nunca incluye correos.
-- [ ] `editions.compare`, `preview as`, `startedAt`/`durationMs`, `activity.view`/`signals.read` y subtítulos cumplen su slice y tienen tests; un guest recibe `not_found` en `signals.read`.
+- [x] `editions.compare`, `preview as`, `startedAt`/`durationMs`, `signals.read` (alimentado por `progress.mark`, sin comando aparte) y subtítulos cumplen su slice y tienen tests; un lector sin `activity.read` recibe `not_found` en `signals.read`.
 - [x] Los estados vencido y revocado se distinguen solo para tokens válidos; un token inventado sigue en `invalid_invitation`.
 - [x] Preguntas y respuestas exponen `author.displayName` sin identificadores internos para guests. (Nota: `authorId` opaco preexistente se mantiene en el DTO.)
 - [ ] API, SDK, CLI y MCP stdio exponen los mismos readers y commands (test de paridad).
