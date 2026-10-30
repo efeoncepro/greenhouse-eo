@@ -7,7 +7,7 @@ Alta autorizada por Julio y verificada el 23/10/2026. RFP privado Wherex, oferta
 **Enviada el 30/10/2026 a las 17:11** desde la cuenta de Julio Reyes, con su OK explícito en el chat (aceptó bases
 del comprador y términos de Wherex); estado Wherex «Enviada». Precio **COP 120.000.000 netos de IVA**, por decisión
 de Julio para ganar, bajo el piso de margen. Pendientes: certificado de residencia fiscal del SII, declaración de
-conflicto de intereses sin adjuntar, claims SSilva/Berel/«+85 expertos» y permiso de logos de partners. Detalle en el
+conflicto de intereses adjuntada en el reenvío de las 17:38, claims SSilva/Berel/«+85 expertos» y permiso de logos de partners. Detalle en el
 [delta del 30/10](#delta-2026-10-30--oferta-enviada-en-wherex). Las secciones siguientes conservan el historial del
 23/10; donde digan «sin propuesta emitida» o «pendiente de GO», describen ese momento.
 
@@ -137,7 +137,12 @@ muestra zona horaria). Servicio «AGENCIA DIGITAL Y PUBLICITARIA»: branding y m
 **ninguna fue respondida** al cierre.
 
 **Envío.** 30/10/2026 17:11, cuenta de Julio Reyes, con su OK explícito; estado «Enviada». Comisión Wherex si se
-adjudica: 52 UF (dato de la sesión GRD-1552).
+adjudica: ninguna (el resumen de la licitación dice que los adjudicados no tendrán comisión).
+
+**Reenvío con la declaración · 30/10/2026 17:38.** Julio confirmó que no tiene conflicto de intereses y autorizó firmar
+con su PNG. Se retiró la oferta, se sumó la declaración firmada (respuesta NO; Julio Cesar Reyes Rangel, RUT
+26.928.468-4, Gerente General) en «Archivos administrativos» y se reenvió; estado «Enviada» 17:38, con precio,
+condiciones y demás archivos conservados. Comprobante 09 en `Entrega Wherex/`.
 
 **Precio y decisión.** **COP 120.000.000 netos de IVA** (≈ USD 38.100 con TRM 3.148,02 del 28/10/2026): mes 1
 COP 13.000.000 · mes 2 COP 15.000.000 · 10 ciclos × COP 9.200.000 (meses 3–12). Validez 60 días; incluye entrega en
