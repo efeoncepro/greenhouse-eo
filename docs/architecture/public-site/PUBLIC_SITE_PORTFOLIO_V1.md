@@ -139,6 +139,13 @@ Spec de diseño y hallazgos medidos: auditoría del 2026-10-29 (390/768/1440) re
   < 1,2 o más de 3), panel de cada fila del índice y el abanico del hero de la entrada.
 - **Etiqueta de formato** (`.eop-tag`, «9:16», «4:5»…) en cada pieza, arriba a la izquierda; la pausa va arriba a la
   derecha, como botón redondo de 44 px con ícono (el texto queda como nombre accesible).
+- **Fila de marca = índice de campañas (0.8.2, diseño A aprobado en el canvas el 2026-10-30; construida, sin
+  desplegar).** La marca aparece una vez (`.eop-r__bhead`) y sus proyectos son subfilas (`.eop-r__sub`, que también
+  es `.eop-r__toggle`): número, título, necesidad, cifra con su fuente, dos miniaturas y su propio panel de piezas.
+  Un cliente puede tener N campañas: desde la cuarta se pliegan tras «Ver N campañas más» (`EOP_Render::BRAND_FOLD`
+  = 3, contadas sobre las que pasan los filtros; plegar cierra una campaña abierta que queda oculta). Sin script se
+  ven todas con su enlace (`.eop-r__subgo`). En escritorio las filas simples usan columnas fijas (40 · 1fr · 260 ·
+  296 px; miniaturas ≤ 92 px): una fila con cifra ya no baja las miniaturas bajo el nombre.
 - **Índice: una fila por marca (0.8.1, 2026-10-30).** Los proyectos de un mismo cliente comparten fila
   (`EOP_Render::by_brand`, clave `greenhouseOrganizationId` o, si falta, el nombre normalizado; la fila queda donde está
   el primero en el orden editorial). Con un solo proyecto la fila es el proyecto; con varios (`.eop-r--brand`) muestra

@@ -14,8 +14,10 @@ para quién se hizo, qué tenía que resolver, la idea, cómo se ejecutó y qué
 del tema Ohio.
 
 En el listado, **cada marca aparece una sola vez**. Si un cliente tiene varios proyectos (Sky Airline tiene dos
-campañas), su fila dice «2 campañas» y, al abrirla, muestra cada campaña con sus piezas y su enlace. Cada proyecto sigue
-teniendo su propia página.
+campañas), debajo de su nombre se listan sus campañas, cada una con lo que necesitaba, su cifra (si tiene una aprobada,
+con su fuente) y sus piezas al abrirla. Un cliente puede tener cualquier cantidad de campañas: se ven tres y el resto
+queda detrás de «Ver N campañas más». Cada proyecto sigue teniendo su propia página. (Versión 0.8.2, construida el
+2026-10-30; en el sitio corre la 0.8.1 hasta su despliegue.)
 
 ## Cómo se guarda un proyecto
 
