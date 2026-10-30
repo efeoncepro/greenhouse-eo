@@ -2,6 +2,14 @@
 
 Alta autorizada por Julio el **29/10/2026**, tras lectura íntegra del brief y ficha Wherex autenticada.
 
+## Caso de negocio para Claude Design — 29/10/2026
+
+[Caso de negocio en Markdown](CASO-DE-NEGOCIO-QUALITOR-SMZ-116.md), v1 preliminar, desarrollado por pedido de Julio. Contiene tesis, públicos/JTBD, alternativas, arquitectura candidata de medios, alcance, medición, economía condicionada y guion editorial para diseño posterior; controles internos separados. Fuente editable en este expediente y copia idéntica en la carpeta OneDrive de la licitación. No es una propuesta económica, un deck ni una oferta aprobada.
+
+**Consultas enviadas:** Julio comunicó el envío y se verificó en Wherex una publicación del **29/10/2026 a las 21:15 mostradas**, con los seis puntos redactados en este chat. Todas (1), Respondidas (0), Sin responder (1), «Esperando respuesta». La hora no rotula zona. No reenviar ni dar por aceptados supuestos. El ítem indica inicio tentativo **01/12/2026**, en discrepancia con temporada desde 25/11 y anticipación del brief; la consulta está publicada. El corte previo sin preguntas queda superado.
+
+## Alta CRM y fuentes
+
 - [Deal 67081021485](https://app.hubspot.com/contacts/48713323/record/0-3/67081021485?utm_source=codex&utm_medium=ai_agent): `Qualitor | CO | Plan de medios temporada de viajes 2026-2027 | SMZ-116`.
 - Company Simoniz `39129628052` **Primary** y contacto existente Jaime `166643476592` asociados y leídos. Nota `119936107092` asociada a los tres registros.
 - Owner Julio `75788512`; `default/appointmentscheduled` como entrada administrativa, **sin cita programada ni calificación humana completa**. `newbusiness`; bucket propuesto `Strategic Bets`, inicialmente leído así, luego derivó a **`Core Pipeline`**. Automatización concreta no identificada; no se corrigió ni se infirió cliente existente.
@@ -15,7 +23,7 @@ Cuatro páginas, fechado **27/10/2026**. Hash y recibos individuales en `Seguimi
 
 Campaña «Se te puede olvidar lo que sea, pero no Qualitor». Entregables: estrategia de medios, inversión por canal, justificación y calendario. Fase previa desde dos semanas antes del pico; durante temporada, geolocalización en EDS y DOOH. Target: conductores 25–55 años en Bogotá, Medellín, Cali, Barranquilla y Cartagena. KPI de alcance, frecuencia e impacto geolocalizado sin metas numéricas. Objetivos de ventas del comprador, sin garantía asumida por Efeonce.
 
-Inversión textual **«$70.000.000 pesos mcte»**; Colombia sugiere COP, pero no hay código expreso ni composición/IVA. Conservada en descripción y nota; `amount`, moneda de oferta y presupuesto estructurado vacíos. Temporada «Nov 25–enero 8», años no explícitos en ese renglón; 2026–2027 corresponde a carpeta del operador y nombre de iniciativa.
+Inversión declarada **COP 70.000.000**; moneda resuelta por brief/contexto Colombia y selector COP de Wherex. La oferta del portal no considera IVA; sigue pendiente si el presupuesto cubre sólo medios o también fee/producción. En el alta, `amount`, moneda de oferta y presupuesto estructurado quedaron vacíos; preparar este caso no modifica CRM ni convierte el presupuesto en oferta. Temporada «Nov 25–enero 8»; contexto de trabajo 2026–2027, no contrato anual.
 
 ## Responsables e investigación
 
@@ -29,6 +37,6 @@ Apollo encontró a Carolina (`66ec0579c491340001d32185`); su búsqueda de Jaime 
 
 ## Estado y siguiente paso
 
-**Registro creado y verificado; propuesta y bid/no-bid pendientes.** Confirmar zona de cierre, años de campaña, inversión/IVA/fee, elegibilidad y facturación Colombia, capacidad, proveedores/licencias y economía. No se modificaron procesos previos, ni hubo envío, InMail, conexión o postulación.
+**Registro creado y verificado; caso MD preparado; consultas publicadas y sin respuesta; propuesta vinculante y bid/no-bid pendientes.** Incorporar las aclaraciones sobre presupuesto/fee/producción, ejecución, materiales, calendario, ubicaciones y contratación Chile/Colombia; validar capacidad, proveedores y economía. No se modificaron procesos previos ni hubo nueva prospección por correo/InMail/conexión o presentación de oferta en esta etapa.
 
 Carril: Agent CLI OAuth de Julio, portal `48713323`, con identidad y capacidades verificadas; MCP requería reautenticación. Propiedades live, dry-run, creación, lectura independiente de Deal/nota/asociaciones y segundo readback tras automatización. Registros maestros actualizados; no se realizó push.
