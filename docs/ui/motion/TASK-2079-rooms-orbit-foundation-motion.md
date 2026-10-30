@@ -14,7 +14,7 @@ movimiento a otro.
 | Arco que mide | Cambio del dato real | Interpola la longitud del arco 600 ms; la esfera viaja por el anillo en el mismo tiempo | transform = `standard` | Salto directo al nuevo valor |
 | Salto orbital | Ir a otro capítulo | Fase lift 0–45 %: la cámara aleja hasta escala 0,55 y gira hacia el destino; fase land 45–100 %: acerca al destino a escala 1. Duración 900 ms (1200 ms si el destino está opuesto) | lift = `emphasizedAccelerate`, land = `emphasized` | Corte directo a la escena destino |
 | Mapa | «Mapa» o Escape desde una escena | La cámara aleja a 0,18 en 700 ms; el arco del anillo y las estaciones aparecen al llegar (200 ms) | `emphasized` | Corte directo |
-| Iris | Abrir una vista a pantalla completa | `clip-path: circle()` desde el centro de la esfera hasta cubrir el viewport, 650 ms; cierre inverso 450 ms | abrir `emphasized`, cerrar `emphasizedAccelerate` | Fundido de 0 ms (aparece) |
+| Iris | Abrir una vista a pantalla completa | `clip-path: circle()` desde el centro de la esfera hasta cubrir el viewport, 650 ms. Cerrar es un corte inmediato (Escape, «Cerrar» o Atrás) | abrir `emphasized` | Aparece sin transición |
 | Parallax | Movimiento del puntero | Órbita ±7 px, texto ±14 px, suavizado con rAF (factor 0,08 por cuadro) | — | Desactivado |
 | Grano | — | Estático | — | Se mantiene (no es movimiento) |
 
@@ -48,3 +48,4 @@ declara duraciones o curvas propias.
 - 2026-10-30 — Dos fases con curvas distintas en el salto (acelerar al salir, frenar al llegar) para cumplir
   «sin salto de velocidad»; descartado un único tween lineal de escala y posición.
 - 2026-10-30 — El overshoot se reserva al nacimiento de la esfera; nada más rebota.
+- 2026-10-30 (implementación) — El cierre del iris pasó a corte: una animación de salida dejaba el diálogo abierto 450 ms y el teclado esperaba, contra la regla «el foco no espera». Lo detectó la prueba de teclado de GVC.

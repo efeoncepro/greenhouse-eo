@@ -205,6 +205,17 @@
       "name": "eo-portfolio-playground",
       "url": "http://127.0.0.1:9400",
       "port": 9400
+    },
+    {
+      "name": "rooms-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "../efeonce-rooms",
+        "dev"
+      ],
+      "port": 3210,
+      "url": "http://127.0.0.1:3210"
     }
   ]
 }

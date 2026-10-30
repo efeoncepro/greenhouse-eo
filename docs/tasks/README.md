@@ -2,7 +2,7 @@
 
 - `TASK-2081` — [Rooms: sala en vivo](to-do/TASK-2081-rooms-live-room-realtime.md), to-do; ADR de transporte y backend en tiempo real para la pantalla «Sala en vivo» del canvas.
 - `TASK-2080` — [Rooms: contrato backend para la UI aprobada](in-progress/TASK-2080-rooms-approved-ui-backend-contract.md), in-progress (2026-10-30, rama `claude/rooms-approved-ui`); todo el backend del canvas salvo tiempo real (capítulos, recorrido, tarjeta y estados de invitación, adaptaciones, nombres, comparación de ediciones, vista por rol, reloj de presentación, señales y subtítulos).
-- `TASK-2079` — [Rooms: base visual La órbita y primitivas de motion](to-do/TASK-2079-rooms-orbit-foundation.md), to-do; UI ready=yes. Órbita, halo, cámara, iris, parallax y laboratorio `/demo/base` del canvas aprobado el 2026-10-29.
+- `TASK-2079` — [Rooms: base visual La órbita y primitivas de motion](in-progress/TASK-2079-rooms-orbit-foundation.md), in-progress; implementada local, GVC OK, falta revisión humana. Órbita, halo, cámara, iris, parallax y laboratorio `/demo/base` del canvas aprobado el 2026-10-29.
 - `TASK-2077` — [Rooms: multimedia V4 local](complete/TASK-2077-rooms-local-multimedia-pipeline.md), complete local; sala combinada, derivados privados y codecs macOS; Linux/cloud separados.
 - `TASK-2076` — [Rooms: importación X-ray y handoff CRM](complete/TASK-2076-rooms-source-import-and-crm-handoff.md), complete local; mapping y referencias durables, puertos externos OFF.
 - `TASK-2074` — [Rooms: colaboración durable](complete/TASK-2074-rooms-durable-collaboration.md), complete local; preguntas/respuestas/pasos con anclas y actividad explícita, UI separada.

@@ -5,6 +5,14 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-30 — Base visual La órbita (TASK-2079) implementada local
+
+- `local`: `src/domain/orbit-geometry.ts` (+test), `src/components/orbit/**` (Orbit, CameraWorld, IrisReveal, DepthLayers/Grain,
+  motion.ts), `src/styles/orbit.css`, laboratorio `/demo/base`. Valores desde `efeonceGraphicLine`/`axisMotion`.
+- `local`: GVC `rooms-orbit-foundation` OK en 1440/390/320; dossier `docs/ui/reviews/TASK-2079-rooms-orbit-foundation/`.
+  Trampa: la regla global `svg { max-inline-size: 100% }` colapsa SVG dentro de contenedores de ancho 0 (mundo de la cámara).
+- Sin push; falta revisión humana.
+
 ## 2026-10-30 — Backend de la UI aprobada: comparar, «Ver como», reloj, señales, subtítulos; ADR sala en vivo
 
 - `local`: migración17 (`presentation_sessions.started_at/ended_at`, `rooms.viewer_activity_daily`); `editions.compare`,
@@ -45,7 +53,7 @@
   estados vencida/revocada (todo es `invalid_invitation`), agrupación de adaptaciones (un asset por bloque),
   nombres de autor, diff de ediciones, señales agregadas, vista por rol y `startedAt` de presentación.
   El código de invitación es de 6 dígitos; el ejemplo alfanumérico del canvas se corrige en la UI.
-- Nuevas tasks: [TASK-2079](../../../../docs/tasks/to-do/TASK-2079-rooms-orbit-foundation.md) base visual
+- Nuevas tasks: [TASK-2079](../../../../docs/tasks/in-progress/TASK-2079-rooms-orbit-foundation.md) base visual
   (UI ready=yes, sin backend) y [TASK-2080](../../../../docs/tasks/in-progress/TASK-2080-rooms-approved-ui-backend-contract.md)
   contrato backend (dueño Codex; slices 3–4 esperan dos decisiones de privacidad del operador).
   TASK-2059/2068 vuelven a UI ready=no hasta rehacer wireframes desde el canvas; deltas en 2059/2068/2071.

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2079-rooms-orbit-foundation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-052`
-- Status real: `Diseño aprobado 2026-10-29 (canvas «la sala es una órbita»). Sin código.`
+- Status real: `2026-10-30: implementada en efeonce-rooms claude/rooms-approved-ui (primitivas en src/components/orbit, geometría en src/domain/orbit-geometry.ts, laboratorio /demo/base). GVC rooms-orbit-foundation OK en 1440/390/320 (a11y, layout, teclado, runtime, rúbrica). Sin push. Falta revisión humana del operador; el cierre del iris pasó a corte (contrato de motion actualizado).`
 - Rank: `1 de la implementación de la UI aprobada`
 - Domain: `ui`
 - Blocked by: `none`
@@ -312,17 +312,17 @@ mapa a 0,18, anillo de mapa r 820); el iris en `Audiencia.dc.html`.
 
 ## Acceptance Criteria
 
-- [ ] Ningún componente de `src/components/orbit/**` contiene hex, curvas `cubic-bezier` o duraciones literales; todo sale del adapter o de `motion.ts`.
-- [ ] `tests/orbit-geometry.test.ts` cubre arco canónico, arco por fracción, estaciones, halo y posiciones de cámara, y pasa.
-- [ ] El halo renderizado es un `radialGradient` con `gradientUnits="userSpaceOnUse"`, radio 1,86× el anillo y paradas 0,13 / 0,03 / 0.
-- [ ] La órbita no tiene ninguna animación continua (sin `infinite`, sin rotación).
+- [x] Ningún componente de `src/components/orbit/**` contiene hex, curvas `cubic-bezier` o duraciones literales; todo sale del adapter o de `motion.ts`.
+- [x] `tests/domain-orbit-geometry.test.ts` cubre arco canónico, arco por fracción, estaciones, halo y posiciones de cámara, y pasa.
+- [x] El halo renderizado es un `radialGradient` con `gradientUnits="userSpaceOnUse"`, radio 1,86× el anillo y paradas 0,13 / 0,03 / 0.
+- [x] La órbita no tiene ninguna animación continua (sin `infinite`, sin rotación).
 - [ ] Con `prefers-reduced-motion: reduce`, dibujo, salto, mapa, iris y parallax cambian sin transición y llegan al mismo estado.
-- [ ] Tras el salto, el foco queda en el título de la escena destino; tras cerrar el iris, en el botón que lo abrió.
+- [x] Tras el salto, el foco queda en el título de la escena destino; tras cerrar el iris, en el botón que lo abrió.
 - [ ] Dos clics rápidos en estaciones distintas terminan en la segunda, sin saltos encolados.
-- [ ] GVC premium en 1440×900, 390×844 y 320×740 sin scroll horizontal y con axe sin violaciones.
+- [x] GVC premium en 1440×900, 390×844 y 320×740 sin scroll horizontal y con axe sin violaciones.
 - [ ] Scorecard con promedio ≥ 4,5, piso 4 y fidelidad ≥ 4,5.
 - [ ] `pnpm verify` de `efeonce-rooms` pasa en la rama.
-- [ ] `UI ready: yes` se mantiene con `pnpm task:lint --task TASK-2079` sin findings.
+- [x] `UI ready: yes` se mantiene con `pnpm task:lint --task TASK-2079` sin findings.
 
 ## Verification
 
