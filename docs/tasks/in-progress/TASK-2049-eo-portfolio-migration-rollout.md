@@ -1,5 +1,15 @@
 # TASK-2049 — EO Portfolio: migración y salida a producción
 
+## Delta 2026-10-30 (noche, 2) — tipos de proyecto (plugin 0.8.0)
+
+- Tableros aprobados en el canvas (social con isotipos oficiales y UI de X corregida, audiovisual, IA, SEO/contenidos)
+  implementados de punta a punta: esquema aditivo, validador, proyección, `EOP_Kinds`, CSS/JS, admin que conserva los
+  campos nuevos, plantillas y comandos `kinds` / `new --kind` en la CLI.
+- Pruebas: 498 unitarias sobre 8 fixtures (uno por tipo) y 53 + 33 + 64 en Playground. Revisión visual local de los
+  cuatro tipos a 1440 y 390 con piezas reales (Sky, Berel, Nexa): sin desborde.
+- Pendiente: desplegar 0.8.0 a producción (el despliegue pidió autorización explícita) y cargar los primeros proyectos
+  reales de cada tipo.
+
 ## Delta 2026-10-30 (noche) — móvil, footer, SEO y agentes (plugin 0.7.1)
 
 - Footer canónico en `/portafolio/` (la página 247116 lo ocultaba por meta de Ohio).

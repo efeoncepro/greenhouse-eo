@@ -1,9 +1,9 @@
 # Portafolio del sitio público (EO Portfolio) — V1
 
 > **Tipo de documento:** Arquitectura técnica
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-10-29 por Claude (TASK-2047)
-> **Ultima actualizacion:** 2026-10-30 por Claude (móvil y tablet, SEO, datos estructurados y herramientas para agentes; plugin 0.7.1, TASK-2049)
+> **Ultima actualizacion:** 2026-10-30 por Claude (tipos de proyecto social, audiovisual, IA y SEO/contenidos; plugin 0.8.0, TASK-2049)
 > **Decisión:** [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) ·
 > **Epic:** [EPIC-056](../../epics/in-progress/EPIC-056-eo-portfolio.md)
 > **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/` (v0.5.4 en producción desde 2026-10-30,
@@ -180,10 +180,34 @@ Spec de diseño y hallazgos medidos: auditoría del 2026-10-29 (390/768/1440) re
 - Fuera del plugin (pendiente): `llms.txt` de Yoast desactualizado, HTTPS forzado y HSTS en Cloudflare, enlaces
   contextuales al portafolio desde la portada y los servicios, TTFB en frío de 20–57 s en todo el sitio.
 
+### 7.3 Tipos de proyecto con página propia (`EOP_Kinds`, 0.8.0)
+
+Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). Esquema aditivo dentro de
+`portfolio-entry.v1`: los documentos existentes no cambian.
+
+| `kind` | Roles de pieza y campos | Lo que agrega la página |
+|---|---|---|
+| `social` | `post`: `channel` (instagram, facebook, linkedin, x, tiktok, youtube, threads, pinterest), `placement`, `postText`, `postedAt` | Hero con las publicaciones en órbita 3D (isotipo del canal en cada una); «Canal por canal» con pestañas (píldora con resorte, teclado con flechas; sin script se ven todos los canales) y cada pieza en el marco de su red; la parrilla en cinta |
+| `audiovisual` | `cut`: `version`, `where`, `durationSeconds`; `bts`: `consentRef` (nunca público); `specs`; `credits` ≥ 3 | Hero de cine (la pieza madre a pantalla completa, cortinas que se abren, grano, pausa visible); línea de tiempo de cortes a escala de su duración; detrás de cámara en abanico; créditos que suben |
+| `ai-production` | `ai` (obligatorio: `models` con `stage` y `name`, `teamDid`, `aiDid`, `fictional`); `ai`: `aiStage` (anchor, angle, expression, pose, plate, scene, final), `label`, `compareTo` | Etiqueta «Producido con IA» (también en cualquier proyecto con una pieza `ai`); la escena se resuelve del ruido y entra la marca; vista giratoria de ángulos; expresiones; poses; antes y después con deslizador; qué hizo la IA y qué hizo el equipo; cómo se gobierna |
+| `seo-content` | `search` (obligatorio: `source`, `period` y al menos una cifra: `highlight`, `kpis` con `series`, `series` con `compare`, `query`, `keywords`, `aeo`, `contents`); `banner`: `size` | Cifra principal y curva dibujada en el servidor (SVG); indicadores con su mini gráfica; el resultado que sube en una búsqueda; la respuesta de IA que cita a la marca; palabra por palabra; contenidos publicados; banners |
+
+- Reglas: cada rol exige su campo (`channel`, `version`, `consentRef`, `aiStage`); `compareTo` apunta a otra pieza;
+  `durationSeconds` sólo en video; un `seo-content` no se publica sin el alcance `metrics` (`APPROVAL_SCOPE_METRICS`).
+- Proyección: `search` sale con `metrics` (sus `contents`, con `pieces`); `specs` y `ai` salen siempre (la declaración
+  de IA no se puede ocultar); `consentRef` nunca sale.
+- Las piezas que un tipo muestra en sus secciones salen de la galería genérica (`EOP_Kinds::taken`).
+- Isotipos oficiales de canal copiados de AXIS (`@efeoncepro/axis-brand-assets`, `assets/platforms/`; Pinterest del set
+  `logos` de Iconify) en `EOP_Platforms`; íconos de interfaz de Remix Icon en `EOP_Icons`. Nada dibujado a mano.
+- Admin: los tipos y roles nuevos aparecen en los selectores; los campos que el formulario aún no edita (`specs`, `ai`,
+  `search` y los de cada rol nuevo) se conservan al guardar (`EOP_Admin::carry_over`). Se editan por la CLI.
+- CLI: `kinds` explica cada tipo; `new <slug> --kind <tipo>` parte de `scripts/public-website/portfolio/templates/`;
+  `apply` se niega mientras queden marcadores `[COMPLETAR…]` o el `mediaId` 1 de la plantilla.
+
 ## 8. Pruebas y despliegue
 
-- `php tests/eo-portfolio.test.php` (220 comprobaciones en PHP puro sobre 4 fixtures) y
-  `tests/playground/run-eo-portfolio.sh` (53 en Playground + 22 por WP-CLI + 33 del admin + 36 del render, con la
+- `php tests/eo-portfolio.test.php` (498 comprobaciones en PHP puro sobre 8 fixtures, uno por tipo) y
+  `tests/playground/run-eo-portfolio.sh` (53 en Playground + 22 por WP-CLI + 33 del admin + 64 del render, con la
   estructura de enlaces de producción). Fixtures en `tests/fixtures/portfolio/`, marcados `[fixture]`; `cordillera.json` es
   ficticio y cubre sitio, parte de página y video de creador.
 - Paquete `scripts/public-website/build-portfolio-plugin-package.cjs` y despliegue

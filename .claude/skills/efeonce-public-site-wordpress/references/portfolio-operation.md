@@ -5,7 +5,7 @@ gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_po
 
 ## State (2026-10-30)
 
-- Plugin `eo-portfolio` v0.7.1 **in production** (runtime 2fa62cc): admin, piece roles, public pages, video, phone/tablet
+- Plugin `eo-portfolio` v0.8.0 **built, deploy pending operator OK** (runtime c6e1734; v0.7.1 live): admin, piece roles, public pages, video, phone/tablet
   layer (rails, sticky filter bar, dock), SEO layer `EOP_Seo` (meta, Yoast graph merge, canonical 301s, sitemap images)
   and `EOP_Agents` (Abilities + WebMCP, read-only, **off**: `eo_portfolio_agent_tools` = `0`).
 - `eo_portfolio_enabled` = `1`; **17 projects published**: the 15 that were live under Ohio (operator approval
@@ -21,6 +21,15 @@ gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_po
   were Arial); an IntersectionObserver on an element with `clip-path: inset(100%)` never fires (gate it on a parent);
   «stuck» must be measured against `--eop-stick`, not observed with a root margin; a code deploy does not purge the
   page cache — run `eo-portfolio/purge-portfolio-cache.php`.
+
+## Project kinds (0.8.0)
+
+`social` (posts with `channel`/`placement`), `audiovisual` (`cut` with `version`/`durationSeconds`, `bts` with
+`consentRef`), `ai-production` (`ai` block required; pieces with `aiStage`, `compareTo` for before/after) and
+`seo-content` (`search` block required; publishing needs the `metrics` scope). Create them with
+`pnpm public-website:portfolio -- new <slug> --kind <kind>` (templates in `scripts/public-website/portfolio/templates/`,
+`kinds` explains each); `apply` refuses while `[COMPLETAR…]` or template `mediaId` 1 remain. The admin keeps these
+fields on save (`EOP_Admin::carry_over`) but does not edit them yet. Channel logos come from AXIS, never redrawn.
 
 ## Public pages switch
 

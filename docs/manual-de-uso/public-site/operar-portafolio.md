@@ -1,7 +1,7 @@
 # Operar el portafolio de proyectos
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-30 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -57,6 +57,26 @@ videos de creadores, sistema u otro. Cada pieza tiene su **Tipo de pieza**, y al
 
 Un video de creador se ve sólo si la aprobación marca **Piezas** y **Creadores**; si falta «Creadores», el editor
 avisa «sus videos no se verán». Un proyecto de tipo «Videos de creadores» no se publica sin «Creadores».
+
+### Social media, audiovisual, producción con IA y SEO (por la CLI)
+
+Estos cuatro tipos se crean y actualizan por la CLI (el admin los muestra y conserva sus campos, pero todavía no los edita):
+
+```bash
+pnpm public-website:portfolio -- kinds
+pnpm public-website:portfolio -- new <slug> --kind social
+```
+
+1. `kinds` explica qué muestra cada página y qué necesita el documento.
+2. `new … --kind <social|audiovisual|ai-production|seo-content|campaign>` crea la copia de trabajo desde la plantilla.
+3. Reemplaza cada `[COMPLETAR…]` y cada `mediaId` 1 (las imágenes de la biblioteca de medios, los videos del bucket de
+   AXIS). `validate` dice cuántos marcadores quedan y `apply` no guarda mientras quede alguno.
+4. Sigue el flujo de siempre: `validate` → `preview` → `apply` → `publish` (con el OK del operador).
+
+Qué no olvidar por tipo: en social, el texto real de cada publicación (sin cifras inventadas en los marcos); en
+audiovisual, la duración de cada corte medida con `ffprobe` y la autorización de quienes aparecen en el rodaje; en IA,
+los modelos usados y lo que hizo el equipo (la página lo declara siempre); en SEO, la fuente, el periodo y la
+aprobación de cifras.
 
 ### Ver qué hay
 

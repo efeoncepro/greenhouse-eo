@@ -1,7 +1,7 @@
 # Portafolio de proyectos — Sitio público
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-30 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -47,6 +47,17 @@ del tema Ohio.
   página completa), una parte de una página (con su nombre y dónde está), un video de creador (con su cuenta y
   plataforma), una pieza en su lugar, un diagrama o una respuesta de IA.
 - Los proyectos anteriores, sin tipo, siguen siendo campañas.
+- Cuatro tipos tienen una página hecha a su medida:
+  - **Social media:** las publicaciones giran alrededor de la marca y, canal por canal, cada pieza aparece en el marco
+    de su red (Instagram, Facebook, LinkedIn, X, TikTok, YouTube, Threads, Pinterest) con el logo oficial del canal.
+  - **Producción audiovisual:** la pieza principal abre como en el cine, los cortes se ven en una línea de tiempo, el
+    rodaje en un abanico de fotos y los créditos suben como al final de una película.
+  - **Producción con IA:** la página dice desde arriba que se produjo con IA, muestra cómo nace la escena, el personaje
+    en todos sus ángulos y expresiones, el antes y después, y qué hizo la IA y qué hizo el equipo.
+  - **SEO y contenidos:** la cifra principal con su curva, los indicadores, la búsqueda en la que la marca subió, la
+    respuesta de una IA que la cita, las palabras clave antes y después, los contenidos publicados y los banners.
+- Las fotos de rodaje necesitan la autorización de quienes aparecen; esa autorización nunca se publica.
+- Las cifras de búsqueda se ven sólo si el cliente aprobó mostrar cifras.
 - Cada publicación registra quién la hizo y con qué aprobación. Ese registro no es público.
 
 ## Las cifras
