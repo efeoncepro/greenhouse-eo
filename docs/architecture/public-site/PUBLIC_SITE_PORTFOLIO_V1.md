@@ -1,9 +1,9 @@
 # Portafolio del sitio público (EO Portfolio) — V1
 
 > **Tipo de documento:** Arquitectura técnica
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-10-29 por Claude (TASK-2047)
-> **Ultima actualizacion:** 2026-10-30 por Claude (páginas públicas y migración, TASK-2048/2049)
+> **Ultima actualizacion:** 2026-10-30 por Claude (móvil y tablet, SEO, datos estructurados y herramientas para agentes; plugin 0.7.1, TASK-2049)
 > **Decisión:** [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) ·
 > **Epic:** [EPIC-056](../../epics/in-progress/EPIC-056-eo-portfolio.md)
 > **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/` (v0.5.4 en producción desde 2026-10-30,
@@ -104,15 +104,18 @@ el permalink llegan como callbacks (`EOP_REST::options`).
   (`data-action="open_meeting_scheduler"`). Entrada: hero con hasta tres piezas, ficha, reto/idea/ejecución,
   resultados y órbita de medida sólo con cifras aprobadas, galería justificada por capítulo, equipo, caso completo,
   cierre y siguiente proyecto.
-- SEO: título, descripción, canónica y OG de la entrada desde `seo` y `hero`; JSON-LD `ItemList` en la portada y
-  `CreativeWork` en la entrada, con un `VideoObject` por video.
+- SEO: ver §7.2 (`EOP_Seo`).
 - Video (`EOP_Render::piece`): sin voz, silenciado y en loop sólo mientras está en pantalla (IntersectionObserver), con
   botón de pausa visible y sin arrancar solo con «reducir movimiento»; con voz, controles y subtítulos, nunca solo. Si
   `eo-axis-video` está activo usa su reproductor (`eo_axis_video_render`); hoy no lo está y sirve el `<video>` nativo.
   Si el `hero` es un video, se reproduce en la lente y, en navy, detrás; un solo control pausa ambos.
 - Filtros: enlaces `?linea=` e `?industria=` que el servidor aplica; el script sólo los hace instantáneos.
-- Muro del número grande: miniaturas de cada pieza visible (la más chica del `srcset` ≥ 240 px), sin `lazy` (el lazy
-  no pedía las que se desplazan dentro de una fila recortada), con mezcla `lighten` sobre papel.
+- Muro del número grande: 12 teselas por fila (72 en total, duplicadas para el loop), de imágenes primero (la más
+  chica del `srcset` ≥ 120 px) y pósteres sólo para completar; van con `data-src` y `portfolio.js` las pide cuando las
+  cifras están a 600 px (el `lazy` nativo no pedía las que se desplazan dentro de una fila recortada). Sin script, los
+  dígitos quedan en navy.
+- Footer: la portada responde sobre la página 247116, cuyas opciones de Ohio ocultaban pie y copyright; en esta ruta
+  `page_footer_visibility` y `page_footer_copyright_visibility` se leen como `inherit` y cierra el footer canónico.
 - Motion en `assets/portfolio.css` (expo out, resortes leves, contador con dígitos que ruedan, muro en tres filas);
   el revelado por scroll lo dispara `portfolio.js` con IntersectionObserver: `animation-timeline: view()` quedaba a
   medio camino dentro del contenedor de scroll de Ohio y dejaba títulos al 15 % de opacidad. Sin script nada se oculta;
@@ -120,10 +123,67 @@ el permalink llegan como callbacks (`EOP_REST::options`).
 - Anfitrión: Ohio colorea los títulos por su cuenta; dentro de `#eop` heredan el color de su sección.
 - La adivinanza de 404 de WordPress sigue apagada bajo `/project/` y `/portafolio/` (TASK-2046).
 
+### 7.1 Teléfono y tablet (0.6.0)
+
+Cortes: teléfono ≤ 599 px, tablet 600–1023, escritorio ≥ 1024; hover sólo con `(hover: hover) and (pointer: fine)`.
+Spec de diseño y hallazgos medidos: auditoría del 2026-10-29 (390/768/1440) resumida en la TASK-2049.
+
+- **Carril** (`EOP_Render::rail`): carrusel horizontal con snap, `role="region"` y `aria-roledescription="carrusel"`;
+  cada pieza conserva su proporción real (ancho = alto del carril × `--r`, con tope) y la siguiente asoma por el borde.
+  Controles (anterior/siguiente, contador `n / total`, barra de progreso) que el script muestra sólo si hay desborde.
+  Un video de carril se reproduce sólo si está en pantalla **y** es la pieza asentada (segundo IntersectionObserver con
+  `root` en el carril). Pista única por página (`sessionStorage eopHinted`). En escritorio el carril no desborda y
+  cada consumidor conserva su maqueta. Consumidores: capítulos (`wants_rail`: ≥ 2 piezas y alguna con proporción
+  < 1,2 o más de 3), panel de cada fila del índice y el abanico del hero de la entrada.
+- **Etiqueta de formato** (`.eop-tag`, «9:16», «4:5»…) en cada pieza, arriba a la izquierda; la pausa va arriba a la
+  derecha, como botón redondo de 44 px con ícono (el texto queda como nombre accesible).
+- **Índice:** cada fila es una tarjeta con hasta 4 miniaturas (tocarlas abre la fila), resultado, servicios y un enlace
+  `.eop-r__go` al proyecto que existe aunque la fila esté cerrada y sin script. Abrir una fila conserva la posición del
+  dedo (compensa el cierre de la de arriba). Filtros en `.eop-fbar` fija bajo el menú AXIS (`--eop-stick`, que sigue
+  al menú cuando se oculta); al quedar fija pliega la industria detrás de «Industria: …» y mantiene su alto (61 px).
+  Conteo en vivo para lectores de pantalla. Hero: lente centrada bajo el menú en teléfonos; el video de fondo
+  (`data-eop-src`) sólo se carga desde 600 px (los teléfonos usan el póster y decodifican un solo video).
+- **Entrada:** abanico de hasta tres piezas sin solaparse con el texto (en escritorio, rejilla de dos columnas desde
+  1024 px; antes se solapaba entre 1024 y 1180); fichas en dos columnas (`eop-fact--wide` para valores largos,
+  `grid-auto-flow: dense`); pasos como trayectoria; anillo de resultados a 300 px y cifras en dos columnas; la cifra
+  repetida con la medida (`eop-fig--dup`) se oculta en teléfonos; galería justificada de verdad
+  (`flex: calc(var(--r) * 100) 1 0` con piso y techo por pieza); barra inferior `.eop-dock` (agenda y siguiente
+  proyecto) visible fuera del hero, del cierre y del banner de cookies, oculta al bajar rápido.
+- **Siempre:** títulos de fila en Poppins (`button { font: inherit }`), cita sin el borde de Ohio, objetivos ≥ 44 px,
+  animaciones de cifras, muro y anillo detenidas hasta que se ven (`data-eop-play`), movimiento sin desenfoque en
+  teléfonos y hero propio para teléfono en horizontal.
+
+### 7.2 Búsqueda, compartir y agentes (`EOP_Seo`, `EOP_Agents`, 0.7.x)
+
+- **Meta** desde la proyección, nunca desde la página 247116: portada «Portafolio de Efeonce: campañas, identidad y
+  sitios web», `og:type website` y fecha del proyecto más reciente; entrada con `seo.title`/`seo.description` (un
+  título guardado con «…» nunca llega a la página: cae a cliente + título). Imagen: la pieza del hero; si es video, su
+  **póster** (nunca el `.mp4`), con `og:image:width/height/alt`. Slack muestra Cliente y Servicios en vez del «tiempo
+  de lectura» que Yoast calculaba sobre el JSON.
+- **Datos estructurados** unidos al grafo de Yoast (`wpseo_schema_graph`, `EOP_Seo::merge`): `WebPage`+`ItemPage`
+  (entrada) o `CollectionPage` (portada) con `mainEntity`, `primaryImageOfPage` y fechas; `BreadcrumbList` Portada ›
+  Portafolio › Cliente: título; `#primaryimage`; `CreativeWork #work` con `creator`/`publisher` = `#organization` del
+  sitio, `about` el cliente, `isPartOf` el índice, `temporalCoverage` y `associatedMedia`; un `VideoObject` con `@id`
+  por video (`duration` si el medio trae `durationSeconds`); `ItemList #projects` en la portada. Sin Yoast, el mismo
+  grafo sale solo. El testimonio nunca va como `Review`.
+- **Una URL por página:** como la ruta corre antes de `redirect_canonical`, normaliza ella misma host (www),
+  mayúsculas, barra final y `?eo_project=<slug>` con un 301 en un salto (`EOP_Seo::canonical_target`; el puerto no
+  cuenta).
+- **Sitemap:** imágenes de cada proyecto (`wpseo_sitemap_urlimages`) y la fecha y portada del índice
+  (`wpseo_sitemap_entry`). `<link rel="alternate" type="application/json">` a la REST de cada página; la REST del
+  índice sale en el orden editorial.
+- **Atribución:** cada entrada dice en una frase quién hizo qué para quién (`EOP_Render::attribution`).
+- **Agentes** (apagado: `eo_portfolio_agent_tools` = `0`): Abilities `eo-portfolio/list-projects` y
+  `eo-portfolio/get-project` (sólo lectura, datos públicos) y, con la opción en `1`, WebMCP en el navegador
+  (`portfolio_list_projects`, `portfolio_get_project`, `readOnlyHint`, salida ≤ 1,5 K) detectando
+  `navigator.modelContext`. Leen sólo la proyección pública.
+- Fuera del plugin (pendiente): `llms.txt` de Yoast desactualizado, HTTPS forzado y HSTS en Cloudflare, enlaces
+  contextuales al portafolio desde la portada y los servicios, TTFB en frío de 20–57 s en todo el sitio.
+
 ## 8. Pruebas y despliegue
 
-- `php tests/eo-portfolio.test.php` (219 comprobaciones en PHP puro sobre 4 fixtures) y
-  `tests/playground/run-eo-portfolio.sh` (53 en Playground + 22 por WP-CLI + 33 del admin + 18 del render, con la
+- `php tests/eo-portfolio.test.php` (220 comprobaciones en PHP puro sobre 4 fixtures) y
+  `tests/playground/run-eo-portfolio.sh` (53 en Playground + 22 por WP-CLI + 33 del admin + 36 del render, con la
   estructura de enlaces de producción). Fixtures en `tests/fixtures/portfolio/`, marcados `[fixture]`; `cordillera.json` es
   ficticio y cubre sitio, parte de página y video de creador.
 - Paquete `scripts/public-website/build-portfolio-plugin-package.cjs` y despliegue
@@ -131,6 +191,8 @@ el permalink llegan como callbacks (`EOP_REST::options`).
   contra la línea base de `export-live-code`, tar de respaldo, archivo principal al final, activación con un solo
   `flush_rewrite_rules`; se niega si `/portafolio/` tiene páginas hijas.
 - Rollback: desactivar el plugin (sus reglas de URL se van con él) y restaurar el tar.
+- Un despliegue de código no purga la caché de páginas (un guardado de proyecto sí): después de cambiar marcado,
+  `purge-portfolio-cache.php`. La caché perimetral de Kinsta/Cloudflare tarda unos minutos en soltar la copia vieja.
 
 ## 9. Migración desde Ohio (TASK-2049)
 

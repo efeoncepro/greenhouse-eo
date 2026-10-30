@@ -1,9 +1,9 @@
 # Operar el portafolio de proyectos
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-10-29 por Claude
-> **Ultima actualizacion:** 2026-10-29 por Claude
+> **Ultima actualizacion:** 2026-10-30 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
 > **Documentacion funcional:** [Portafolio de proyectos](../../documentation/public-site/portafolio-de-proyectos.md)
 
@@ -195,6 +195,11 @@ pnpm -s public-website:wpcli -- --eval-file scripts/public-website/eo-portfolio/
   corre `verify <slug>`. Si persiste, `kinsta cache purge --all` por el carril SSH.
 - **`/portafolio/<slug>/` responde 404 estando publicado:** revisa que el interruptor esté en `1` (`set-portfolio-switch.php` imprime el estado) y purga la caché.
 - **La vista previa da 404 al entrar a un proyecto:** abre el proyecto desde la portada de la vista previa; el enlace lleva el token.
+- **Después de desplegar el plugin las páginas siguen iguales:** un despliegue de código no purga la caché (un
+  guardado sí). Corre `purge-portfolio-cache.php` (abajo); la caché de Cloudflare suelta la copia vieja en uno o dos
+  minutos. Compruébalo con `?ver=` del `portfolio.js` en el HTML.
+- **El título de un proyecto aparece cortado con «…»:** no debería pasar (la página nunca muestra un título así), pero
+  corrige `seo.title` con `pull` → editar → `apply`: escribe el título completo, de 65 caracteres o menos.
 - **`No se pudo correr el validador local`:** revisa `PUBLIC_SITE_RUNTIME_ROOT` y que el runtime tenga
   `wp-content/plugins/eo-portfolio/`.
 
@@ -209,8 +214,20 @@ pnpm public-website:wpcli -- --eval-file scripts/public-website/deploy-portfolio
   --input-file tmp/portfolio-plugin-release/package.zip --input-file tmp/portfolio-plugin-release/manifest.json --wp-user 12
 ```
 
-El despliegue se niega si un archivo vivo cambió desde la línea base o si `/portafolio/` tiene páginas hijas. Rollback:
-`wp plugin deactivate eo-portfolio` y restaurar el tar que imprime.
+El despliegue se niega si un archivo vivo cambió desde la línea base o si `/portafolio/` tiene páginas hijas. Si el
+cambio toca el marcado, purga la caché después:
+
+```bash
+pnpm public-website:wpcli -- --eval-file scripts/public-website/eo-portfolio/purge-portfolio-cache.php --wp-user 12
+```
+
+Rollback: `wp plugin deactivate eo-portfolio` y restaurar el tar que imprime.
+
+## Herramientas para agentes (apagadas)
+
+La opción `eo_portfolio_agent_tools` (por defecto `0`) prende las Abilities de WordPress `eo-portfolio/list-projects` y
+`eo-portfolio/get-project` y las herramientas WebMCP del navegador. Sólo leen lo público. Prenderla es una decisión de
+producto: pide el visto bueno del operador antes.
 
 ## Referencias técnicas
 

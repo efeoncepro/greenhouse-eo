@@ -1,5 +1,18 @@
 # TASK-2049 — EO Portfolio: migración y salida a producción
 
+## Delta 2026-10-30 (noche) — móvil, footer, SEO y agentes (plugin 0.7.1)
+
+- Footer canónico en `/portafolio/` (la página 247116 lo ocultaba por meta de Ohio).
+- Capa de teléfono y tablet (0.6.0): carriles con snap, tarjetas con enlace directo, barra de filtros fija que se pliega,
+  abanico del hero sin solaparse (también arregla 1024–1180 en escritorio), galería justificada, barra inferior. Medido en
+  producción en 15 anchos (320–1440 y 844×390): 0 desbordes horizontales, títulos en Poppins, carriles activos ≤ 1023.
+  Sky en 390 bajó de 12 520 a 8 772 px de alto.
+- SEO (0.7.0–0.7.1): meta de la portada propia, póster como `og:image` del video, grafo unido a Yoast con
+  `#organization` como autora, 301 en un salto para www/mayúsculas/barra/`?eo_project=`, imágenes en el sitemap,
+  atribución por entrada. 10 `seo.title` cortados con «…» reescritos y aplicados (revisión 2–3, publicados).
+- `EOP_Agents` (Abilities + WebMCP, sólo lectura) desplegado **apagado** (`eo_portfolio_agent_tools` = `0`).
+- Sin verificar: iPhone real (Safari, sticky con el menú AXIS, H.264), Rich Results Test y LinkedIn Post Inspector.
+
 ## Delta 2026-10-30 (tarde) — Sky, Berel y más piezas
 
 - Con aprobación del operador sobre el canvas: caso `sky-airline-un-ano-de-campanas` (4 capítulos, 5 videos en el

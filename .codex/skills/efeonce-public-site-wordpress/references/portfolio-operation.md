@@ -5,7 +5,9 @@ gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_po
 
 ## State (2026-10-30)
 
-- Plugin `eo-portfolio` v0.5.4 **in production** (runtime 56d98dd): admin, piece roles, public pages, video.
+- Plugin `eo-portfolio` v0.7.1 **in production** (runtime 2fa62cc): admin, piece roles, public pages, video, phone/tablet
+  layer (rails, sticky filter bar, dock), SEO layer `EOP_Seo` (meta, Yoast graph merge, canonical 301s, sitemap images)
+  and `EOP_Agents` (Abilities + WebMCP, read-only, **off**: `eo_portfolio_agent_tools` = `0`).
 - `eo_portfolio_enabled` = `1`; **17 projects published**: the 15 that were live under Ohio (operator approval
   2026-10-29, logo + pieces) plus Sky Airline «Un año de campañas» (videos, sourced figures, testimonial) and Berel
   Pitaya (operator approval 2026-10-30 on the canvas). Order in `eo_portfolio_order` (Sky first: its spot plays in the lens).
@@ -14,7 +16,11 @@ gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_po
 - `eo-axis-video` is committed but **not activated nor deployed**; the portfolio uses it only if it becomes active.
 - Pending: deactivate Ohio Portfolio from 2026-11-29 after checking Search Console (TASK-2049).
 - Gotchas: Ohio's scroll container stalls `animation-timeline: view()` (use IntersectionObserver); Ohio colours
-  headings (inherit inside `#eop`); lazy images inside a sideways-moving clipped track never load.
+  headings (inherit inside `#eop`); lazy images inside a sideways-moving clipped track never load; page 247116 hid the
+  footer through its Ohio meta (the route reads it as `inherit`); a `<button>` does not inherit the font (row titles
+  were Arial); an IntersectionObserver on an element with `clip-path: inset(100%)` never fires (gate it on a parent);
+  «stuck» must be measured against `--eop-stick`, not observed with a root margin; a code deploy does not purge the
+  page cache — run `eo-portfolio/purge-portfolio-cache.php`.
 
 ## Public pages switch
 

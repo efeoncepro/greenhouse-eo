@@ -1,9 +1,9 @@
 # Portafolio de proyectos — Sitio público
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-10-29 por Claude
-> **Ultima actualizacion:** 2026-10-29 por Claude
+> **Ultima actualizacion:** 2026-10-30 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
 
 ## Qué es
@@ -70,6 +70,27 @@ del tema Ohio.
 - Las direcciones viejas (`/project/<proyecto>/`) llevan directo a la página nueva de cada proyecto.
 - Las cifras de la portada (piezas, campañas y marcas) son las de toda la agencia y se cambian sin tocar los proyectos.
 - Las categorías viejas del portafolio de Ohio (`/portfolio-category/...`) también llevan a la portada nueva.
+- La página cierra con el pie normal del sitio (menú, oficina, newsletter, partners).
+
+## En el teléfono y la tablet
+
+- Cada proyecto del índice es una tarjeta con sus piezas a la vista y un enlace directo «Ver el proyecto».
+- Los filtros quedan fijos arriba al bajar por la lista; ocupan una sola línea y la industria se elige desde un botón.
+- Las piezas de cada proyecto se pasan de lado, como un carrusel, cada una en su proporción real (un reel vertical se
+  ve casi a pantalla completa), con contador y flechas. Sólo se mueve el video que está al frente.
+- Cada pieza dice su formato («9:16», «4:5»…) y los videos tienen un botón redondo para pausar.
+- En la ficha de un proyecto aparece abajo una barra con «Agenda tu diagnóstico» y el siguiente proyecto.
+
+## Buscadores, redes y agentes de IA
+
+- Cada página tiene su propio título y descripción, y al compartirla en redes muestra la pieza principal (si es un
+  video, su imagen fija).
+- Google recibe una sola descripción ordenada de cada página: que es un proyecto de Efeonce, para qué cliente, con qué
+  piezas y videos, y dónde está dentro del portafolio.
+- Cada ficha dice en una frase quién hizo el proyecto y para quién, para que un buscador con IA pueda citarlo.
+- Una dirección mal escrita (con mayúsculas, sin la barra final o con `www`) lleva siempre a la misma página.
+- Hay herramientas para que agentes de IA consulten el portafolio (listar proyectos y leer uno). Están apagadas hasta
+  que se decida prenderlas.
 
 > Detalle técnico: [arquitectura](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md) ·
 > [manual](../../manual-de-uso/public-site/operar-portafolio.md) ·
