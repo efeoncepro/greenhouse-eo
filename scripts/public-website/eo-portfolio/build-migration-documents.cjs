@@ -23,6 +23,7 @@ const byId = new Map(exported.entries.map((e) => [e.id, e]))
 
 const fail = (message) => { console.error(message); process.exit(1) }
 const clip = (text, max) => (text.length <= max ? text : text.slice(0, max - 1).replace(/\s+\S*$/, '') + '…')
+const whole = (text, max) => (text.length <= max ? text : fail(`SEO title over ${max} characters, write a shorter seoTitle in the map: ${text}`))
 const month = (yyyymmdd) => (/^\d{8}$/.test(yyyymmdd || '') ? `${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}` : null)
 
 const projects = []
@@ -65,7 +66,8 @@ for (const p of map.projects) {
     hero: { mediaRef: 'pieza-1' },
     chapters: [{ name: p.chapter, media }],
     clientApproval: { ref: clip(`${map.approval.refPrefix}${e.path}`, 160), date: map.approval.date, scope: map.approval.scope },
-    seo: { title: clip(`${client}: ${p.title}`, 70), description: clip(p.need + '.', 170) }
+    // A title is written whole (≤ 65), never clipped with «…»: a clipped one reached Google on 10 projects (2026-10-30).
+    seo: { title: whole(p.seoTitle || `${client}: ${p.title}`, 65), description: clip(p.need + '.', 170) }
   }
   if (p.kind && p.kind !== 'campaign') doc.kind = p.kind
   const from = p.keepPeriod ? month(e.fields.project_date) : null
