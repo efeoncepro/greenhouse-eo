@@ -1,13 +1,13 @@
 # Portafolio del sitio público (EO Portfolio) — V1
 
 > **Tipo de documento:** Arquitectura técnica
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-10-29 por Claude (TASK-2047)
 > **Ultima actualizacion:** 2026-10-30 por Claude (páginas públicas y migración, TASK-2048/2049)
 > **Decisión:** [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) ·
 > **Epic:** [EPIC-056](../../epics/in-progress/EPIC-056-eo-portfolio.md)
-> **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/` (v0.4.1 en producción desde 2026-10-30,
-> runtime 7fbd94a: admin, tipos de pieza y páginas públicas; 15 proyectos publicados)
+> **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/` (v0.5.4 en producción desde 2026-10-30,
+> runtime 56d98dd: admin, tipos de pieza, páginas públicas y video; 17 proyectos publicados)
 
 ## 1. Qué resuelve
 
@@ -105,9 +105,19 @@ el permalink llegan como callbacks (`EOP_REST::options`).
   resultados y órbita de medida sólo con cifras aprobadas, galería justificada por capítulo, equipo, caso completo,
   cierre y siguiente proyecto.
 - SEO: título, descripción, canónica y OG de la entrada desde `seo` y `hero`; JSON-LD `ItemList` en la portada y
-  `CreativeWork` en la entrada. El video se muestra como su póster hasta conectar `eo-axis-video` (pendiente de TASK-2048).
-- Motion en `assets/portfolio.css` (expo out, resortes leves, contador con dígitos que ruedan, muro en tres filas,
-  revelado por scroll con `animation-timeline: view()`); con `prefers-reduced-motion` todo queda quieto.
+  `CreativeWork` en la entrada, con un `VideoObject` por video.
+- Video (`EOP_Render::piece`): sin voz, silenciado y en loop sólo mientras está en pantalla (IntersectionObserver), con
+  botón de pausa visible y sin arrancar solo con «reducir movimiento»; con voz, controles y subtítulos, nunca solo. Si
+  `eo-axis-video` está activo usa su reproductor (`eo_axis_video_render`); hoy no lo está y sirve el `<video>` nativo.
+  Si el `hero` es un video, se reproduce en la lente y, en navy, detrás; un solo control pausa ambos.
+- Filtros: enlaces `?linea=` e `?industria=` que el servidor aplica; el script sólo los hace instantáneos.
+- Muro del número grande: miniaturas de cada pieza visible (la más chica del `srcset` ≥ 240 px), sin `lazy` (el lazy
+  no pedía las que se desplazan dentro de una fila recortada), con mezcla `lighten` sobre papel.
+- Motion en `assets/portfolio.css` (expo out, resortes leves, contador con dígitos que ruedan, muro en tres filas);
+  el revelado por scroll lo dispara `portfolio.js` con IntersectionObserver: `animation-timeline: view()` quedaba a
+  medio camino dentro del contenedor de scroll de Ohio y dejaba títulos al 15 % de opacidad. Sin script nada se oculta;
+  con `prefers-reduced-motion` todo queda quieto.
+- Anfitrión: Ohio colorea los títulos por su cuenta; dentro de `#eop` heredan el color de su sección.
 - La adivinanza de 404 de WordPress sigue apagada bajo `/project/` y `/portafolio/` (TASK-2046).
 
 ## 8. Pruebas y despliegue
@@ -136,6 +146,12 @@ el permalink llegan como callbacks (`EOP_REST::options`).
   `^/?portfolio-category(/.*)?$` → `/portafolio/` (301; `redirect-portfolio-categories.php`). Yoast compara la regex
   contra la ruta completa con la barra inicial, así que el origen debe admitirla. Pendiente: desactivar Ohio Portfolio
   tras 30 días de tráfico residual.
+- Casos agregados después (aprobación del operador del 2026-10-30 sobre el canvas «Portafolio Efeonce — concepto»):
+  `sky-airline-un-ano-de-campanas` (Black Sky, Cyber Sky, Always On y Perú; 5 videos en
+  `portfolio/v1/sky-airline-un-ano-de-campanas/` del bucket público de AXIS; cifras con fuente «Caso «Un año con Sky»
+  (2026)» y testimonio) y `berel-pitaya-color-del-ano-2026`; Gobierno de Santiago, Marca Chile, PabellonToGo y Bresler
+  sumaron piezas. Las imágenes que el sitio ya servía en `eo-elementor-widgets` entraron a la biblioteca con
+  `import-portfolio-media.php` (idempotente por `_eop_source`); los lotes están en `scripts/public-website/eo-portfolio/batches/`.
 - Rollback de la salida: `set-portfolio-switch.php` con `{"enabled":"0"}` (vuelve la página 247116), borrar las 46
   redirecciones creadas, devolver los 12 reencadenados a su destino `project/<slug>`, borrar la regex de
   `portfolio-category` y publicar de nuevo las 15 entradas de Ohio (lista en la salida del `cutover`).

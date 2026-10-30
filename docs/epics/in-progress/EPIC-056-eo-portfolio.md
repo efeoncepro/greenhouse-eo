@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Portafolio nuevo en producción desde 2026-10-30 con 15 proyectos; TASK-2046 y TASK-2047 complete, TASK-2048 y TASK-2049 in-progress por sus cierres.`
+- Status real: `Portafolio nuevo en producción desde 2026-10-30 con 17 proyectos; TASK-2046, 2047 y 2048 complete; TASK-2049 abierta sólo por desactivar Ohio Portfolio desde el 2026-11-29.`
 - Rank: `TBD`
 - Domain: `content`
 - Owner: `unassigned`
@@ -60,8 +60,8 @@ porque es urgente y de bajo riesgo.
 
 - `TASK-2046` — [Limpieza de los demos de Ohio](../../tasks/complete/TASK-2046-eo-portfolio-ohio-demo-cleanup.md): complete (2026-10-29). 44 demos en borrador con 410, Elementor demo y Envato fuera de las 15 reales; resolvió ISSUE-183.
 - `TASK-2047` — [Plugin y contenido](../../tasks/complete/TASK-2047-eo-portfolio-plugin-content.md): complete (2026-10-29). Plugin v0.2.0 en producción: documento validado, compuerta de cliente, tres puertas y CLI de agentes.
-- `TASK-2048` — [Portada y entrada](../../tasks/in-progress/TASK-2048-eo-portfolio-index-entry-templates.md): en producción desde 2026-10-30 (v0.4.1); faltan reproducción de video y scorecard GVC.
-- `TASK-2049` — [Migración y salida a producción](../../tasks/in-progress/TASK-2049-eo-portfolio-migration-rollout.md): 15 proyectos publicados y 301 aplicados el 2026-10-30 (también `/portfolio-category/*`); falta desactivar Ohio Portfolio a los 30 días.
+- `TASK-2048` — [Portada y entrada](../../tasks/complete/TASK-2048-eo-portfolio-index-entry-templates.md): complete el 2026-10-30 (v0.5.4).
+- `TASK-2049` — [Migración y salida a producción](../../tasks/in-progress/TASK-2049-eo-portfolio-migration-rollout.md): 17 proyectos publicados y 301 aplicados el 2026-10-30 (también `/portfolio-category/*`); falta desactivar Ohio Portfolio desde el 2026-11-29.
 
 ## Existing Related Work
 

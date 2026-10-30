@@ -1,5 +1,16 @@
 # TASK-2048 — EO Portfolio: portada y entrada
 
+## Delta 2026-10-30 (cierre) — v0.5.4, video y scorecard
+
+- Video (sin voz con pausa visible, fuera de pantalla en pausa, quieto con «reducir movimiento»; con voz, controles y
+  subtítulos), hero con video en la lente, filtros como enlaces, `VideoObject`. Runtime b5adfc5 → 56d98dd.
+- Revisión en producción a 1440 y 390 corrigió tres defectos que el build no veía: «Empecemos» ensanchaba la página a
+  484 px en teléfonos; el revelado con `animation-timeline` quedaba al 15 % dentro del scroll de Ohio; Ohio coloreaba los
+  h2 (navy sobre navy); y el muro del número no cargaba sus miniaturas (lazy).
+- Scorecard: jerarquía 4,5 · economía de superficies 4,5 · impacto visual 4,5 · fidelidad al canvas 4,5 (cambios
+  acordados: sin banda de nombres, bajada sin «qué pasó después») · resistencia a plantilla genérica 4,5 · responsive
+  4,5 · accesibilidad 4,5 · motion 4,5. Promedio 4,5.
+
 ## Delta 2026-10-30 — en producción (eo-portfolio v0.4.1)
 
 - `EOP_Render` sirve `/portafolio/` y `/portafolio/<slug>/` con el menú y el pie del sitio, desde la proyección pública:
@@ -38,7 +49,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -51,7 +62,7 @@
 - Motion: `docs/ui/motion/TASK-2048-eo-portfolio-index-entry-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-056`
-- Status real: `Portada y entrada en producción desde 2026-10-30 (v0.4.1); faltan reproducción de video y scorecard GVC`
+- Status real: `Complete 2026-10-30: portada y entrada en producción (v0.5.4) con video, filtros como enlaces y scorecard 4,5`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -437,18 +448,18 @@ Reglas de render que no se negocian:
 ## Acceptance Criteria
 
 - [x] `/portafolio/` y `/portafolio/<slug>/` se renderizan desde el documento de `TASK-2047`, sin lógica por cliente. — `EOP_Render` sobre `EOP_Projection`; la guarda de nombres de `tests/eo-portfolio.test.php` cubre el render.
-- [ ] Cada página tiene exactamente un H1 y el HTML de servidor contiene los filtros como enlaces `?linea=`. — Pendiente: un H1 verificado; los filtros son botones que filtran en el navegador y el servidor respeta `?linea=`, pero no son enlaces.
+- [x] Cada página tiene exactamente un H1 y el HTML de servidor contiene los filtros como enlaces `?linea=`. — 0.5.0: filtros como enlaces `?linea=` e `?industria=`; 1 H1 medido en 4 páginas a 1440 y 390.
 - [x] Toda sección con dato vacío o fuera del alcance de aprobación no aparece (verificado con Sky, PabellonToGo y ANAM). — `tests/playground/eo-portfolio-render.check.php` sobre todos los fixtures publicados (galería, resultados y creadores).
-- [ ] Todo video que se reproduce solo tiene un control de pausa visible y operable con teclado.
-- [ ] Con `prefers-reduced-motion: reduce` ningún video se reproduce solo.
-- [ ] Los videos fuera de pantalla quedan en pausa.
-- [ ] La órbita de medida sólo aparece con una cifra de tipo porcentaje que tiene fuente.
-- [ ] La portada publica JSON-LD `ItemList` y la entrada `CreativeWork` y `VideoObject` válidos. — Pendiente: `ItemList` y `CreativeWork` publicados; `VideoObject` llega con la reproducción de video.
+- [x] Todo video que se reproduce solo tiene un control de pausa visible y operable con teclado. — botón «Pausar» (un `<button>`) junto a cada video sin voz y en el hero; verificado en vivo (Sky: 8 controles).
+- [x] Con `prefers-reduced-motion: reduce` ningún video se reproduce solo. — `portfolio.js` los retiene y el botón queda en «Reproducir».
+- [x] Los videos fuera de pantalla quedan en pausa. — IntersectionObserver (umbral 25 %).
+- [x] La órbita de medida sólo aparece con una cifra de tipo porcentaje que tiene fuente. — `measure` sólo desde un `percent` con `source` obligatoria y alcance `metrics` (proyección + render check).
+- [x] La portada publica JSON-LD `ItemList` y la entrada `CreativeWork` y `VideoObject` válidos. — en vivo: Sky publica 5 `VideoObject`.
 - [x] No hay scroll horizontal de página a 1440 ni a 390. — medido en producción a 1440 y en Playground a 390 (`scrollWidth` = ancho de la ventana).
 - [x] El interruptor `eo_portfolio_enabled` en `off` devuelve la página 247116 sin cambios. — verificado en vivo tras el despliegue de 0.4.0 y 0.4.1, antes de encenderlo.
 - [x] Se declaró `Execution profile: ui-ux` y `UI impact: flow`, y `UI ready` sigue en `no` hasta tener mapping, plan GVC y decision log completos con el diseño aprobado.
 - [x] Wireframe, flow y motion declarados existen.
-- [ ] GVC desktop y 390 capturado y revisado, con scorecard.
+- [x] GVC desktop y 390 capturado y revisado, con scorecard. — GVC no apunta al sitio público; captura equivalente con Playwright a 1440 y 390 en producción (portada, Sky, Berel, Fivest) y scorecard en el Delta 2026-10-30 (promedio 4,5, piso 4,5).
 
 ## Verification
 
@@ -460,15 +471,15 @@ Reglas de render que no se negocian:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
 - [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [x] `docs/tasks/README.md` quedo sincronizado con el cierre — sincronizado con el estado in-progress.
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes — Pendiente: `Handoff.md` tiene cambios sin commit de otra sesión; no se toca hasta que esa sesión los cierre.
+- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible — Pendiente: `changelog.md` tiene cambios sin commit de otra sesión.
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas — TASK-2049 (videos al bucket hechos), EPIC-056 y el plan de migración a La órbita.
 
-- [ ] la skill `efeonce-public-site-wordpress` documenta las plantillas del portafolio y el interruptor
-- [ ] `docs/public-site/README.md` y EPIC-056 reflejan el estado real del portafolio
+- [x] la skill `efeonce-public-site-wordpress` documenta las plantillas del portafolio y el interruptor
+- [x] `docs/public-site/README.md` y EPIC-056 reflejan el estado real del portafolio
 
 ## Follow-ups
 

@@ -1,5 +1,14 @@
 # TASK-2049 — EO Portfolio: migración y salida a producción
 
+## Delta 2026-10-30 (tarde) — Sky, Berel y más piezas
+
+- Con aprobación del operador sobre el canvas: caso `sky-airline-un-ano-de-campanas` (4 capítulos, 5 videos en el
+  bucket de AXIS, 5 cifras con fuente «Caso «Un año con Sky» (2026)», testimonio de Adriana Contreras) y
+  `berel-pitaya-color-del-ano-2026`; Gobierno de Santiago, Marca Chile, PabellonToGo y Bresler sumaron piezas (revisión 2).
+  20 imágenes que el sitio ya servía entraron a la biblioteca (`import-portfolio-media.php`, IDs 252280–252299).
+- Total publicado: 17; REST y sitemap `eo_project` con 17. Lo único pendiente es desactivar Ohio Portfolio desde el
+  2026-11-29, con Search Console revisado (antes no: el criterio pide 30 días de tráfico residual sólo redirigido).
+
 ## Delta 2026-10-30 — migración aplicada en producción
 
 - Los 15 proyectos reales están publicados como `eo_project` (revisión 1), con la aprobación del operador del
@@ -69,7 +78,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `15 proyectos publicados y 301 aplicados el 2026-10-30 (también /portfolio-category/); falta desactivar Ohio Portfolio a los 30 días`
+- Status real: `17 proyectos publicados y todos los 301 aplicados el 2026-10-30; sólo falta desactivar Ohio Portfolio desde el 2026-11-29`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -427,9 +436,9 @@ Los slugs nuevos corrigen los heredados: `lifestyle-app-elementor` → `eusari`,
 - [x] Cada `/project/<slug>/` de las 15 entradas responde 301 al destino del mapa versionado. — 2026-10-30: 58 orígenes (15 páginas, 31 slugs viejos, 12 reencadenados) en 301 de un salto; 15 destinos en 200.
 - [x] `/portafolio/` responde 200 servido por la plantilla de TASK-2048. — 2026-10-30: 200 con `#eop`, indexable.
 - [x] Ningún post de `ohio_portfolio` fue eliminado (conteo antes y después registrado). — antes 59 (15 publicadas + 44 borrador), después 59 en borrador, 0 en papelera.
-- [ ] Los videos del portafolio se sirven desde `storage.googleapis.com/efeonce-group-axis-public-media/portfolio/` con caché de un año.
+- [x] Los videos del portafolio se sirven desde `storage.googleapis.com/efeonce-group-axis-public-media/portfolio/` con caché de un año. — 2026-10-30: los 5 videos de Sky y sus pósters en `portfolio/v1/sky-airline-un-ano-de-campanas/`, `Cache-Control: public, max-age=31536000, immutable`.
 - [ ] Ohio Portfolio desactivado con evidencia de 30 días de tráfico residual sólo redirigido.
-- [ ] Las tres capas de documentación del portafolio existen y están enlazadas desde `docs/public-site/README.md`.
+- [x] Las tres capas de documentación del portafolio existen y están enlazadas desde `docs/public-site/README.md`.
 
 ## Verification
 
@@ -447,11 +456,11 @@ Los slugs nuevos corrigen los heredados: `lifestyle-app-elementor` → `eusari`,
 - [x] `docs/tasks/README.md` quedo sincronizado con el cierre — sincronizado con el estado in-progress.
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas — TASK-2048, EPIC-056, plan de migración a La órbita.
 
 - [ ] `EPIC-056` cerrado y movido a `complete/` si sus criterios de salida se cumplen
-- [ ] Delta en `docs/public-site/LA_ORBITA_SITE_MIGRATION_PLAN_V1.md` con `/portafolio/` migrado
-- [ ] `docs/public-site/README.md` actualizado con el estado del portafolio
+- [x] Delta en `docs/public-site/LA_ORBITA_SITE_MIGRATION_PLAN_V1.md` con `/portafolio/` migrado
+- [x] `docs/public-site/README.md` actualizado con el estado del portafolio
 
 ## Follow-ups
 

@@ -1,7 +1,7 @@
 # Operar el portafolio de proyectos
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-29 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -130,6 +130,21 @@ pnpm public-website:portfolio -- restore <slug> <revisión> --message "<por qué
 ```
 
 Restaurar crea una revisión nueva con el contenido de la elegida; el historial nunca se borra.
+
+### Sumar piezas que el sitio ya tiene o un caso nuevo con video
+
+1. Imágenes que el sitio ya sirve (por ejemplo en `eo-elementor-widgets/assets/img/creativa/`): llévalas a la
+   biblioteca con `import-portfolio-media.php`; devuelve el `mediaId` y las dimensiones de cada una y no duplica si se
+   corre de nuevo.
+2. Videos: súbelos al bucket público de AXIS en `portfolio/v1/<proyecto>/` (video y póster, `Cache-Control` de un año).
+3. Arma el lote `{"projects":[…]}` (en `scripts/public-website/eo-portfolio/batches/`) y cárgalo con
+   `apply-portfolio-bundle.php`: con `"publish": true` publica; con `"update": true` cambia proyectos existentes, cada
+   documento con la `revision` desde la que se editó.
+
+```bash
+pnpm -s public-website:wpcli -- --eval-file scripts/public-website/eo-portfolio/import-portfolio-media.php --input-file <json> --wp-user 12
+pnpm -s public-website:wpcli -- --eval-file scripts/public-website/eo-portfolio/apply-portfolio-bundle.php --input-file <lote.json> --wp-user 12
+```
 
 ### Encender, apagar o revisar las páginas públicas
 

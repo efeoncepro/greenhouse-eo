@@ -117,6 +117,9 @@ casos o con la fila de partners del footer) o se retiran con 301. Migrar sólo l
 
 > **Delta 2026-10-23 — `/portafolio/` decidido.** Se mantiene y se reconstruye como portafolio propio:
 > [PDR-028](decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md), ejecución en `EPIC-056` (`TASK-2046`…`TASK-2049`).
+>
+> **Delta 2026-10-30 — `/portafolio/` migrado.** El portafolio nuevo está en producción con 17 proyectos; `/project/*` y
+> `/portfolio-category/*` redirigen con 301. Falta desactivar Ohio Portfolio desde el 2026-11-29 (TASK-2049).
 > La auditoría encontró 44 entradas demo de Ohio publicadas e indexadas ([ISSUE-183](../issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md));
 > su limpieza (`TASK-2046`) va primero. `/partnership/` sigue sin decidir.
 

@@ -1,7 +1,7 @@
 # Portafolio de proyectos — Sitio público
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-29 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -63,12 +63,13 @@ del tema Ohio.
 
 ## Estado actual
 
-- Desde el 2026-10-30, `efeoncepro.com/portafolio/` es el portafolio nuevo: una portada con los 15 proyectos que ya
-  estaban publicados en el sitio y una página por proyecto en `/portafolio/<proyecto>/`.
+- Desde el 2026-10-30, `efeoncepro.com/portafolio/` es el portafolio nuevo: 17 proyectos (los 15 que ya estaban en el
+  sitio más los casos de Sky Airline y Berel) y una página por proyecto en `/portafolio/<proyecto>/`.
+- El caso de Sky abre la portada con su spot en la lente y muestra sus videos, sus cifras con fuente y el testimonio de
+  su equipo. Los videos sin voz se mueven solos mientras se ven y tienen un botón para pausarlos.
 - Las direcciones viejas (`/project/<proyecto>/`) llevan directo a la página nueva de cada proyecto.
 - Las cifras de la portada (piezas, campañas y marcas) son las de toda la agencia y se cambian sin tocar los proyectos.
 - Las categorías viejas del portafolio de Ohio (`/portfolio-category/...`) también llevan a la portada nueva.
-- Falta: mostrar videos con reproducción (hoy ningún proyecto trae uno).
 
 > Detalle técnico: [arquitectura](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md) ·
 > [manual](../../manual-de-uso/public-site/operar-portafolio.md) ·

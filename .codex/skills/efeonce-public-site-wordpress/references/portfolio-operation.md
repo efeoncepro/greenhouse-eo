@@ -5,13 +5,16 @@ gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_po
 
 ## State (2026-10-30)
 
-- Plugin `eo-portfolio` v0.4.1 **in production** (runtime 7fbd94a): admin, piece roles and the public pages.
-- `eo_portfolio_enabled` = `1`: `/portafolio/` and `/portafolio/<slug>/` are the new pages; **15 projects published**
-  (the ones that were live under Ohio, operator approval 2026-10-29, scope logo + pieces, no figures).
-- 46 Yoast 301 from `/project/*` and old slugs + 12 rechained; the 59 Ohio entries are drafts (none deleted).
-- Ohio `/portfolio-category/*` → `/portafolio/` by one Yoast regex 301 `^/?portfolio-category(/.*)?$` (Yoast matches
-  regex against the full request URI **with** the leading slash: an origin `^portfolio-category…` never fires).
-- Pending: video playback with `eo-axis-video` (no project has video yet), Ohio Portfolio deactivation after 30 days.
+- Plugin `eo-portfolio` v0.5.4 **in production** (runtime 56d98dd): admin, piece roles, public pages, video.
+- `eo_portfolio_enabled` = `1`; **17 projects published**: the 15 that were live under Ohio (operator approval
+  2026-10-29, logo + pieces) plus Sky Airline «Un año de campañas» (videos, sourced figures, testimonial) and Berel
+  Pitaya (operator approval 2026-10-30 on the canvas). Order in `eo_portfolio_order` (Sky first: its spot plays in the lens).
+- 46 Yoast 301 from `/project/*` and old slugs + 12 rechained + one regex `^/?portfolio-category(/.*)?$` → `/portafolio/`;
+  the 59 Ohio entries are drafts (none deleted).
+- `eo-axis-video` is committed but **not activated nor deployed**; the portfolio uses it only if it becomes active.
+- Pending: deactivate Ohio Portfolio from 2026-11-29 after checking Search Console (TASK-2049).
+- Gotchas: Ohio's scroll container stalls `animation-timeline: view()` (use IntersectionObserver); Ohio colours
+  headings (inherit inside `#eop`); lazy images inside a sideways-moving clipped track never load.
 
 ## Public pages switch
 
