@@ -3,7 +3,7 @@
 > **Tipo:** Product Decision Record de plataforma del sitio público.
 > **Estado:** Accepted · 2026-10-23 · el operador aprobó la propuesta auditada con `arch-architect` y el orden de
 > ejecución por etapas. Quedan abiertas las decisiones de §Pendientes del operador; ninguna bloquea la etapa 1.
-> **Ejecución:** [EPIC-056](../../epics/to-do/EPIC-056-eo-portfolio.md) con cuatro tasks en orden: `TASK-2046`
+> **Ejecución:** [EPIC-056](../../epics/in-progress/EPIC-056-eo-portfolio.md) con cuatro tasks en orden: `TASK-2046`
 > (limpieza de los demos de Ohio), `TASK-2047` (plugin y contenido), `TASK-2048` (portada y entrada) y `TASK-2049`
 > (migración y salida a producción).
 > **Incidente asociado:** [ISSUE-183](../../issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md) — 44 entradas

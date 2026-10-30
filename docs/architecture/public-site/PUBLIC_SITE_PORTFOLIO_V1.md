@@ -1,13 +1,13 @@
 # Portafolio del sitio público (EO Portfolio) — V1
 
 > **Tipo de documento:** Arquitectura técnica
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-29 por Claude (TASK-2047)
-> **Ultima actualizacion:** 2026-10-29 por Claude (tipos de pieza, TASK-2048)
+> **Ultima actualizacion:** 2026-10-30 por Claude (páginas públicas y migración, TASK-2048/2049)
 > **Decisión:** [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) ·
-> **Epic:** [EPIC-056](../../epics/to-do/EPIC-056-eo-portfolio.md)
-> **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/` (v0.2.0 con el admin, activo en producción
-> desde 2026-10-29, runtime 3ab38ad; v0.3.0 con tipos de proyecto y de pieza, local en runtime d583a97, sin desplegar)
+> **Epic:** [EPIC-056](../../epics/in-progress/EPIC-056-eo-portfolio.md)
+> **Runtime:** `efeonce-public-site-runtime/wp-content/plugins/eo-portfolio/` (v0.4.1 en producción desde 2026-10-30,
+> runtime 7fbd94a: admin, tipos de pieza y páginas públicas; 15 proyectos publicados)
 
 ## 1. Qué resuelve
 
@@ -86,21 +86,54 @@ portada; un capítulo que queda vacío no se publica). Agrega `kind`, y por piez
 del índice; `format` por medio, `formats` del proyecto y `measure` (primer porcentaje con alcance `metrics`, habilita la órbita de medida). Las URLs de imágenes y
 el permalink llegan como callbacks (`EOP_REST::options`).
 
-## 7. Salvaguardas mientras no hay plantilla
+## 7. Páginas públicas (`EOP_Render`, TASK-2048)
 
-Hasta que `TASK-2048` enganche `eo_portfolio_render_entry`: una entrada publicada responde 404, el JSON nunca sale
-como contenido o extracto y el tipo queda fuera del sitemap de Yoast. La adivinanza de 404 de WordPress está apagada
-bajo `/project/` y `/portafolio/` (`do_redirect_guess_404_permalink`): con ella, `/project/lifestyle-app/` caía en otra
-entrada en vez de responder 410 (TASK-2046).
+- Rutas: `/portafolio/` (índice) y `/portafolio/<slug>/` (entrada), atendidas en `template_redirect` (prioridad 0)
+  con `templates/page.php`, que abre los mismos contenedores que el `page.php` de Ohio y llama a `get_header()` y
+  `get_footer()`: menú (`eo-site-nav`) y pie del sitio. Todo sale de `EOP_Projection` (alcance de la aprobación); el
+  marcado escapa cada valor.
+- Interruptor `eo_portfolio_enabled`: `1` sirve a todos y engancha `eo_portfolio_render_entry` (la guarda de 404 y el
+  sitemap lo ven); `preview` sirve sólo con `?eop_preview=<eo_portfolio_preview_token>`, con `noindex`, borradores
+  incluidos y enlaces internos que conservan el token; cualquier otro valor deja la página 247116 en `/portafolio/` y
+  las entradas en 404. Sin proyectos publicados, `/portafolio/` vuelve a la página 247116 aunque esté en `1`.
+- Opciones editoriales: `eo_portfolio_order` (slugs en orden de portada) y `eo_portfolio_tally` (cifras de la agencia:
+  piezas, campañas, marcas; no se calculan de los proyectos). Etiquetas de industria en `schema/industries.v1.json`.
+- Portada: hero con la lente sobre la pieza destacada del primer proyecto con `hero`, cifras con el muro de todas las
+  piezas visibles dentro del número grande (mezcla `lighten`), índice filtrable por línea e industria (`?linea=` en el
+  servidor) con la primera fila abierta, testimonio sólo si alguno está aprobado y cierre al agendador
+  (`data-action="open_meeting_scheduler"`). Entrada: hero con hasta tres piezas, ficha, reto/idea/ejecución,
+  resultados y órbita de medida sólo con cifras aprobadas, galería justificada por capítulo, equipo, caso completo,
+  cierre y siguiente proyecto.
+- SEO: título, descripción, canónica y OG de la entrada desde `seo` y `hero`; JSON-LD `ItemList` en la portada y
+  `CreativeWork` en la entrada. El video se muestra como su póster hasta conectar `eo-axis-video` (pendiente de TASK-2048).
+- Motion en `assets/portfolio.css` (expo out, resortes leves, contador con dígitos que ruedan, muro en tres filas,
+  revelado por scroll con `animation-timeline: view()`); con `prefers-reduced-motion` todo queda quieto.
+- La adivinanza de 404 de WordPress sigue apagada bajo `/project/` y `/portafolio/` (TASK-2046).
 
 ## 8. Pruebas y despliegue
 
-- `php tests/eo-portfolio.test.php` (214 comprobaciones en PHP puro sobre 4 fixtures) y
-  `tests/playground/run-eo-portfolio.sh` (53 en Playground + 22 por WP-CLI + 33 del admin, con la estructura de
-  enlaces de producción). Fixtures en `tests/fixtures/portfolio/`, marcados `[fixture]`; `cordillera.json` es
+- `php tests/eo-portfolio.test.php` (219 comprobaciones en PHP puro sobre 4 fixtures) y
+  `tests/playground/run-eo-portfolio.sh` (53 en Playground + 22 por WP-CLI + 33 del admin + 18 del render, con la
+  estructura de enlaces de producción). Fixtures en `tests/fixtures/portfolio/`, marcados `[fixture]`; `cordillera.json` es
   ficticio y cubre sitio, parte de página y video de creador.
 - Paquete `scripts/public-website/build-portfolio-plugin-package.cjs` y despliegue
   `deploy-portfolio-plugin-package.php` (contrato `eo-portfolio-release.v1`): lista de rutas, hashes, guarda de deriva
   contra la línea base de `export-live-code`, tar de respaldo, archivo principal al final, activación con un solo
   `flush_rewrite_rules`; se niega si `/portafolio/` tiene páginas hijas.
 - Rollback: desactivar el plugin (sus reglas de URL se van con él) y restaurar el tar.
+
+## 9. Migración desde Ohio (TASK-2049)
+
+- `scripts/public-website/eo-portfolio/export-ohio-real-entries.php` (sólo lee) → `migration-map-2026-10-29.json`
+  (texto escrito con lo que ya publicaba cada entrada, aprobación del operador del 2026-10-29 con alcance logo y
+  piezas, sin cifras) → `build-migration-documents.cjs` (lote `portfolio-entry.v1` y mapa de redirecciones) →
+  `apply-portfolio-bundle.php` (`wp eo-portfolio apply`, todo o nada; con `publish` publica) →
+  `set-portfolio-switch.php` (interruptor, orden, cifras, token de vista previa, purga) →
+  `cutover-ohio-to-portfolio.php` (301 de Yoast desde `/project/<slug>/` y desde los slugs viejos, reencadena los
+  redirects que terminaban en esas páginas, entradas de Ohio a borrador; `dryRun` por defecto).
+- Estado 2026-10-30: 15 proyectos publicados; 46 redirecciones 301 nuevas y 12 reencadenadas, 58 orígenes en un salto;
+  las 59 entradas de Ohio en borrador, ninguna borrada. Pendiente: `/portfolio-category/*` de Ohio sigue en 200 y Ohio
+  Portfolio se desactiva tras 30 días de tráfico residual.
+- Rollback de la salida: `set-portfolio-switch.php` con `{"enabled":"0"}` (vuelve la página 247116), borrar las 46
+  redirecciones creadas, devolver los 12 reencadenados a su destino `project/<slug>` y publicar de nuevo las 15
+  entradas de Ohio (lista en la salida del `cutover`).

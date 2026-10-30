@@ -1,5 +1,16 @@
 # TASK-2048 — EO Portfolio: portada y entrada
 
+## Delta 2026-10-30 — en producción (eo-portfolio v0.4.1)
+
+- `EOP_Render` sirve `/portafolio/` y `/portafolio/<slug>/` con el menú y el pie del sitio, desde la proyección pública:
+  hero con lente y órbita, cifras de la agencia con el muro de piezas, índice filtrable con filas que se abren,
+  testimonio sólo si hay uno aprobado, entrada con ficha, reto/idea/ejecución, resultados sólo con cifras aprobadas,
+  galería, equipo, caso completo, cierre y siguiente proyecto. JSON-LD, título, descripción, canónica y OG del
+  documento. Interruptor `eo_portfolio_enabled` = `1` desde el 2026-10-30 (antes, vista previa con token).
+- Runtime 4eccf0f + 7fbd94a; pruebas 219 puras y 18 de render en Playground; revisado en vivo a 1440 y 390.
+- Pendiente para cerrar: reproducción de video con `eo-axis-video` (ningún proyecto publicado trae video; hoy un video
+  se mostraría sólo como su póster) y el scorecard GVC del plan.
+
 ## Delta 2026-10-29 — tipos de proyecto y de pieza (eo-portfolio v0.3.0, local)
 
 - El esquema distingue `kind` del proyecto (campaign, website, web-section, ugc, system, other) y `role` de cada pieza
@@ -27,7 +38,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -40,7 +51,7 @@
 - Motion: `docs/ui/motion/TASK-2048-eo-portfolio-index-entry-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-056`
-- Status real: `Diseño en revisión en canvas; bloqueada por TASK-2047 (documento del proyecto y servicio de lectura)`
+- Status real: `Portada y entrada en producción desde 2026-10-30 (v0.4.1); faltan reproducción de video y scorecard GVC`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -425,18 +436,18 @@ Reglas de render que no se negocian:
 
 ## Acceptance Criteria
 
-- [ ] `/portafolio/` y `/portafolio/<slug>/` se renderizan desde el documento de `TASK-2047`, sin lógica por cliente.
-- [ ] Cada página tiene exactamente un H1 y el HTML de servidor contiene los filtros como enlaces `?linea=`.
-- [ ] Toda sección con dato vacío o fuera del alcance de aprobación no aparece (verificado con Sky, PabellonToGo y ANAM).
+- [x] `/portafolio/` y `/portafolio/<slug>/` se renderizan desde el documento de `TASK-2047`, sin lógica por cliente. — `EOP_Render` sobre `EOP_Projection`; la guarda de nombres de `tests/eo-portfolio.test.php` cubre el render.
+- [ ] Cada página tiene exactamente un H1 y el HTML de servidor contiene los filtros como enlaces `?linea=`. — Pendiente: un H1 verificado; los filtros son botones que filtran en el navegador y el servidor respeta `?linea=`, pero no son enlaces.
+- [x] Toda sección con dato vacío o fuera del alcance de aprobación no aparece (verificado con Sky, PabellonToGo y ANAM). — `tests/playground/eo-portfolio-render.check.php` sobre todos los fixtures publicados (galería, resultados y creadores).
 - [ ] Todo video que se reproduce solo tiene un control de pausa visible y operable con teclado.
 - [ ] Con `prefers-reduced-motion: reduce` ningún video se reproduce solo.
 - [ ] Los videos fuera de pantalla quedan en pausa.
 - [ ] La órbita de medida sólo aparece con una cifra de tipo porcentaje que tiene fuente.
-- [ ] La portada publica JSON-LD `ItemList` y la entrada `CreativeWork` y `VideoObject` válidos.
-- [ ] No hay scroll horizontal de página a 1440 ni a 390.
-- [ ] El interruptor `eo_portfolio_enabled` en `off` devuelve la página 247116 sin cambios.
-- [ ] Se declaró `Execution profile: ui-ux` y `UI impact: flow`, y `UI ready` sigue en `no` hasta tener mapping, plan GVC y decision log completos con el diseño aprobado.
-- [ ] Wireframe, flow y motion declarados existen.
+- [ ] La portada publica JSON-LD `ItemList` y la entrada `CreativeWork` y `VideoObject` válidos. — Pendiente: `ItemList` y `CreativeWork` publicados; `VideoObject` llega con la reproducción de video.
+- [x] No hay scroll horizontal de página a 1440 ni a 390. — medido en producción a 1440 y en Playground a 390 (`scrollWidth` = ancho de la ventana).
+- [x] El interruptor `eo_portfolio_enabled` en `off` devuelve la página 247116 sin cambios. — verificado en vivo tras el despliegue de 0.4.0 y 0.4.1, antes de encenderlo.
+- [x] Se declaró `Execution profile: ui-ux` y `UI impact: flow`, y `UI ready` sigue en `no` hasta tener mapping, plan GVC y decision log completos con el diseño aprobado.
+- [x] Wireframe, flow y motion declarados existen.
 - [ ] GVC desktop y 390 capturado y revisado, con scorecard.
 
 ## Verification
@@ -450,8 +461,8 @@ Reglas de render que no se negocian:
 ## Closing Protocol
 
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre — sincronizado con el estado in-progress.
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas

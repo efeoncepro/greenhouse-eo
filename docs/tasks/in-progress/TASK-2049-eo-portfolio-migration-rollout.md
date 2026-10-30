@@ -1,5 +1,16 @@
 # TASK-2049 — EO Portfolio: migración y salida a producción
 
+## Delta 2026-10-30 — migración aplicada en producción
+
+- Los 15 proyectos reales están publicados como `eo_project` (revisión 1), con la aprobación del operador del
+  2026-10-29 (logo y piezas) y texto escrito sólo con lo que ya publicaba su entrada de Ohio; sin cifras.
+  Insumos versionados: `scripts/public-website/eo-portfolio/{export-ohio-real-entries.php, migration-map-2026-10-29.json, build-migration-documents.cjs, apply-portfolio-bundle.php}`.
+- Cambio de URLs (`cutover-ohio-to-portfolio.php`): 46 redirecciones 301 nuevas (las 15 páginas y 31 slugs viejos), 12
+  reencadenadas a la página nueva, 15 entradas de Ohio en borrador. Verificado: 58 orígenes en 301 de un salto, 15
+  destinos en 200, REST con 15, sitemap `eo_project` con 15 URLs. Evidencia en `tmp/portfolio-migration/` (local).
+- Pendiente para cerrar: los archivos `/portfolio-category/*` de Ohio siguen respondiendo 200; desactivar Ohio
+  Portfolio a los 30 días (desde 2026-11-29) tras revisar Search Console; ningún video que subir al bucket.
+
 ## Delta 2026-10-29 — TASK-2047 cerrada
 
 - Carga de las 15 entradas con `pnpm public-website:portfolio -- new <slug> --from <export>` → `validate` → `preview` →
@@ -43,7 +54,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -56,10 +67,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-056`
-- Status real: `Diseño. Esperando TASK-2047 (plugin) y TASK-2048 (plantillas), y la lista de aprobaciones de cliente del operador.`
+- Status real: `15 proyectos publicados y 301 aplicados el 2026-10-30; faltan /portfolio-category/ y desactivar Ohio Portfolio a los 30 días`
 - Rank: `TBD`
 - Domain: `content`
-- Blocked by: `TASK-2048`
+- Blocked by: `none`
 - Branch: `Greenhouse develop para docs; el contenido y el código viven en efeonce-public-site-runtime con su release acotado por SSH; sin worktrees`
 
 ## Summary
@@ -137,7 +148,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-2049-eo-portfolio-migration-rollout.md`
+- `docs/tasks/in-progress/TASK-2049-eo-portfolio-migration-rollout.md`
 - `docs/documentation/public-site/portafolio.md` (nuevo)
 - `docs/manual-de-uso/public-site/portafolio.md` (nuevo)
 - `docs/architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md` (nuevo)
@@ -409,11 +420,11 @@ Los slugs nuevos corrigen los heredados: `lifestyle-app-elementor` → `eusari`,
 
 ## Acceptance Criteria
 
-- [ ] Existe un documento `eo_project` válido por cada una de las 15 entradas reales (`wp eo-portfolio validate` sin errores).
-- [ ] Ningún `eo_project` publicado carece de `clientApproval`; el JSON público no lista proyectos en borrador.
-- [ ] Cada `/project/<slug>/` de las 15 entradas responde 301 al destino del mapa versionado.
-- [ ] `/portafolio/` responde 200 servido por la plantilla de TASK-2048.
-- [ ] Ningún post de `ohio_portfolio` fue eliminado (conteo antes y después registrado).
+- [x] Existe un documento `eo_project` válido por cada una de las 15 entradas reales (`wp eo-portfolio validate` sin errores). — 2026-10-30: 15 de 15 validan y pasan la compuerta (validador del plugin) y se guardaron por `wp eo-portfolio apply`.
+- [x] Ningún `eo_project` publicado carece de `clientApproval`; el JSON público no lista proyectos en borrador. — 2026-10-30: la compuerta de `publish` lo exige; `GET /wp-json/eo/v1/portfolio` lista 15.
+- [x] Cada `/project/<slug>/` de las 15 entradas responde 301 al destino del mapa versionado. — 2026-10-30: 58 orígenes (15 páginas, 31 slugs viejos, 12 reencadenados) en 301 de un salto; 15 destinos en 200.
+- [x] `/portafolio/` responde 200 servido por la plantilla de TASK-2048. — 2026-10-30: 200 con `#eop`, indexable.
+- [x] Ningún post de `ohio_portfolio` fue eliminado (conteo antes y después registrado). — antes 59 (15 publicadas + 44 borrador), después 59 en borrador, 0 en papelera.
 - [ ] Los videos del portafolio se sirven desde `storage.googleapis.com/efeonce-group-axis-public-media/portfolio/` con caché de un año.
 - [ ] Ohio Portfolio desactivado con evidencia de 30 días de tráfico residual sólo redirigido.
 - [ ] Las tres capas de documentación del portafolio existen y están enlazadas desde `docs/public-site/README.md`.
@@ -430,8 +441,8 @@ Los slugs nuevos corrigen los heredados: `lifestyle-app-elementor` → `eusari`,
 ## Closing Protocol
 
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre — sincronizado con el estado in-progress.
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas

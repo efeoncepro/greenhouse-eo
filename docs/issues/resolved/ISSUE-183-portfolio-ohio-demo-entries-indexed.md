@@ -51,7 +51,7 @@ rediseño del portafolio (PDR-028). Evidencia descargada en el scratchpad de la 
 1. **Ahora:** `TASK-2046` despublica las 44 demos (borrador, sin borrar), responde 410 en sus URLs, las saca del
    sitemap, cierra comentarios y quita de las 15 entradas reales el afiliado de Envato y los bloques del demo.
 2. **Programa:** [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) y
-   [EPIC-056](../../epics/to-do/EPIC-056-eo-portfolio.md) reemplazan el tipo de Ohio por el portafolio propio
+   [EPIC-056](../../epics/in-progress/EPIC-056-eo-portfolio.md) reemplazan el tipo de Ohio por el portafolio propio
    (`TASK-2047`…`TASK-2049`).
 
 ## Verificación

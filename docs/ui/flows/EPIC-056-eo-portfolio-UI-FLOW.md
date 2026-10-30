@@ -1,6 +1,6 @@
 # EPIC-056 — EO Portfolio: flujo maestro
 
-> Flujo de programa de [EPIC-056](../../epics/to-do/EPIC-056-eo-portfolio.md). Lo usan `TASK-2046` (limpieza),
+> Flujo de programa de [EPIC-056](../../epics/in-progress/EPIC-056-eo-portfolio.md). Lo usan `TASK-2046` (limpieza),
 > `TASK-2047` (plugin y contenido), `TASK-2048` (portada y entrada) y `TASK-2049` (migración y salida).
 >
 > - Decisión: [PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md).

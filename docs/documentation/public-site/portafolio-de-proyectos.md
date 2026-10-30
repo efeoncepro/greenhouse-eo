@@ -1,7 +1,7 @@
 # Portafolio de proyectos — Sitio público
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-29 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -63,9 +63,12 @@ del tema Ohio.
 
 ## Estado actual
 
-- Al 2026-10-29 el plugin está activo en producción y todavía no tiene proyectos. Los tipos de proyecto y de pieza
-  están construidos y probados, pero todavía no desplegados.
-- La portada y la página de cada proyecto llegan con `TASK-2048`; la carga de los 15 proyectos reales, con `TASK-2049`.
+- Desde el 2026-10-30, `efeoncepro.com/portafolio/` es el portafolio nuevo: una portada con los 15 proyectos que ya
+  estaban publicados en el sitio y una página por proyecto en `/portafolio/<proyecto>/`.
+- Las direcciones viejas (`/project/<proyecto>/`) llevan directo a la página nueva de cada proyecto.
+- Las cifras de la portada (piezas, campañas y marcas) son las de toda la agencia y se cambian sin tocar los proyectos.
+- Falta: mostrar videos con reproducción (hoy ningún proyecto trae uno) y retirar las categorías viejas del portafolio
+  de Ohio.
 
 > Detalle técnico: [arquitectura](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md) ·
 > [manual](../../manual-de-uso/public-site/operar-portafolio.md) ·

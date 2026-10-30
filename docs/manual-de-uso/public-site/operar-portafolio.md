@@ -1,7 +1,7 @@
 # Operar el portafolio de proyectos
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-29 por Claude
 > **Ultima actualizacion:** 2026-10-29 por Claude
 > **Documentacion tecnica:** [Portafolio del sitio público (EO Portfolio)](../../architecture/public-site/PUBLIC_SITE_PORTFOLIO_V1.md)
@@ -131,6 +131,23 @@ pnpm public-website:portfolio -- restore <slug> <revisión> --message "<por qué
 
 Restaurar crea una revisión nueva con el contenido de la elegida; el historial nunca se borra.
 
+### Encender, apagar o revisar las páginas públicas
+
+`scripts/public-website/eo-portfolio/set-portfolio-switch.php` hace un solo cambio guardado y purga la caché. Ejemplos
+de entrada:
+
+| Quiero | JSON |
+|---|---|
+| Revisar en vivo sin que el público lo vea | `{"enabled":"preview","newToken":true}` (imprime el enlace con el token) |
+| Encender | `{"enabled":"1"}` (se niega si no hay proyectos publicados) |
+| Apagar (vuelve la página anterior) | `{"enabled":"0"}` |
+| Cambiar el orden de la portada | `{"order":["slug-1","slug-2"]}` |
+| Cambiar las cifras de la agencia | `{"tally":{"pieces":"15.000+","campaigns":"80+","brands":"32"}}` |
+
+```bash
+pnpm -s public-website:wpcli -- --eval-file scripts/public-website/eo-portfolio/set-portfolio-switch.php --input-file <json> --wp-user 12
+```
+
 ## Qué significan los estados o señales
 
 | Señal | Significado |
@@ -161,7 +178,8 @@ Restaurar crea una revisión nueva con el contenido de la elegida; el historial 
 - **`El sitio rechazó «apply»` con `eop_conflict`:** `pull`, reaplica el cambio, `apply`.
 - **La REST no muestra un cambio de un publicado:** la purga de Kinsta va en cada guardado; espera unos segundos y
   corre `verify <slug>`. Si persiste, `kinsta cache purge --all` por el carril SSH.
-- **`/portafolio/<slug>/` responde 404 estando publicado:** esperado hasta `TASK-2048`.
+- **`/portafolio/<slug>/` responde 404 estando publicado:** revisa que el interruptor esté en `1` (`set-portfolio-switch.php` imprime el estado) y purga la caché.
+- **La vista previa da 404 al entrar a un proyecto:** abre el proyecto desde la portada de la vista previa; el enlace lleva el token.
 - **`No se pudo correr el validador local`:** revisa `PUBLIC_SITE_RUNTIME_ROOT` y que el runtime tenga
   `wp-content/plugins/eo-portfolio/`.
 

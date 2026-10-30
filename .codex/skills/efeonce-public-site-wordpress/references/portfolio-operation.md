@@ -3,13 +3,20 @@
 Load for any work on the public portfolio: loading, editing, publishing or unpublishing a project, the client approval
 gate, the plugin `eo-portfolio`, its REST, or the migration from Ohio's `ohio_portfolio` (EPIC-056, PDR-028).
 
-## State (2026-10-29)
+## State (2026-10-30)
 
-- Plugin `eo-portfolio` v0.2.0 (with the admin) **active in production**, runtime commit 3ab38ad, **no projects**.
-- v0.3.0 (project `kind` and piece `role`: web, section, ugc) is **local only**, runtime commit d583a97, not deployed.
-- `/portafolio/` is still the Elementor page 247116 with Ohio's widget. Entries `/portafolio/<slug>/` answer 404 until
-  `TASK-2048` hooks `eo_portfolio_render_entry`. The 15 real projects load in `TASK-2049`.
-- Ohio's 44 demo entries are drafts with Yoast 410 (TASK-2046); the 15 real ones still live at `/project/<slug>/`.
+- Plugin `eo-portfolio` v0.4.1 **in production** (runtime 7fbd94a): admin, piece roles and the public pages.
+- `eo_portfolio_enabled` = `1`: `/portafolio/` and `/portafolio/<slug>/` are the new pages; **15 projects published**
+  (the ones that were live under Ohio, operator approval 2026-10-29, scope logo + pieces, no figures).
+- 46 Yoast 301 from `/project/*` and old slugs + 12 rechained; the 59 Ohio entries are drafts (none deleted).
+- Pending: video playback with `eo-axis-video` (no project has video yet), Ohio `/portfolio-category/*` still 200,
+  Ohio Portfolio deactivation after 30 days.
+
+## Public pages switch
+
+`scripts/public-website/eo-portfolio/set-portfolio-switch.php` (input JSON): `enabled` `0` | `preview` | `1`, `order`,
+`tally`, `newToken`. Preview serves only with `?eop_preview=<token>`, noindex, drafts included. Ask the operator before
+each production change.
 
 ## Admin screen
 
