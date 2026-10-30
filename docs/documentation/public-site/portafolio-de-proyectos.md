@@ -13,6 +13,10 @@ para quién se hizo, qué tenía que resolver, la idea, cómo se ejecutó y qué
 (imagen o video, vertical, cuadrado o apaisado). Lo administra el plugin «EO Portfolio», que reemplaza al portafolio
 del tema Ohio.
 
+En el listado, **cada marca aparece una sola vez**. Si un cliente tiene varios proyectos (Sky Airline tiene dos
+campañas), su fila dice «2 campañas» y, al abrirla, muestra cada campaña con sus piezas y su enlace. Cada proyecto sigue
+teniendo su propia página.
+
 ## Cómo se guarda un proyecto
 
 - Cada proyecto es una ficha con campos fijos. El sistema la revisa antes de guardarla: si falta algo obligatorio, no

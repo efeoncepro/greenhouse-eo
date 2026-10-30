@@ -139,6 +139,13 @@ Spec de diseño y hallazgos medidos: auditoría del 2026-10-29 (390/768/1440) re
   < 1,2 o más de 3), panel de cada fila del índice y el abanico del hero de la entrada.
 - **Etiqueta de formato** (`.eop-tag`, «9:16», «4:5»…) en cada pieza, arriba a la izquierda; la pausa va arriba a la
   derecha, como botón redondo de 44 px con ícono (el texto queda como nombre accesible).
+- **Índice: una fila por marca (0.8.1, 2026-10-30).** Los proyectos de un mismo cliente comparten fila
+  (`EOP_Render::by_brand`, clave `greenhouseOrganizationId` o, si falta, el nombre normalizado; la fila queda donde está
+  el primero en el orden editorial). Con un solo proyecto la fila es el proyecto; con varios (`.eop-r--brand`) muestra
+  la marca una vez con «N campañas» (o «proyectos» si no todos son `campaign`), y el panel trae cada campaña
+  (`[data-eop-camp]`) con su necesidad, piezas, audiencia y enlace. Los filtros actúan por campaña: la fila se ve
+  mientras una pase y el conteo anunciado es de proyectos. Cada proyecto conserva su enlace en la fila cerrada y sin
+  script (lista `.eop-r__camps`). Caso fuente: Sky Airline aparecía dos veces y se leía como dos clientes.
 - **Índice:** cada fila es una tarjeta con hasta 4 miniaturas (tocarlas abre la fila), resultado, servicios y un enlace
   `.eop-r__go` al proyecto que existe aunque la fila esté cerrada y sin script. Abrir una fila conserva la posición del
   dedo (compensa el cierre de la de arriba). Filtros en `.eop-fbar` fija bajo el menú AXIS (`--eop-stick`, que sigue
