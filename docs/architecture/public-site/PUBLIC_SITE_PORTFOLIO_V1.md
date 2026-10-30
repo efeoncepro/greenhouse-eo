@@ -275,7 +275,8 @@ Tableros aprobados del canvas «Portafolio Efeonce — concepto» (2026-10-30). 
   Engine con Search Visibility 360 y Creative Services, Sky en Brand con Creative Services. Ojo: un documento guardado con
   una clave que ya no está en el catálogo deja de renderizarse; migrar las entradas antes de retirar una clave.
 - 0.10.7 (runtime `e8111e1`): las filas de campaña con `swatch` siguen su tablero (nombre, color e IA en una línea;
-  fecha y resumen en una; panel sobre un lavado de su color, sin tinte gris en la fila abierta).
+  fecha y resumen en una; panel sobre un lavado de su color, sin tinte gris en la fila abierta). 0.10.8 (runtime `21fe1fd`):
+  en hover la fila se desliza entera (color, nombre y etiqueta de IA) y el lavado guarda margen del número.
 - Las piezas que un tipo muestra en sus secciones salen de la galería genérica (`EOP_Kinds::taken`).
 - Isotipos oficiales de canal copiados de AXIS (`@efeoncepro/axis-brand-assets`, `assets/platforms/`; Pinterest del set
   `logos` de Iconify) en `EOP_Platforms`; íconos de interfaz de Remix Icon en `EOP_Icons`. Nada dibujado a mano.

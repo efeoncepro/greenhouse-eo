@@ -47,7 +47,7 @@ are projected only with `metrics`; contents only with `pieces`.
   them yet — edit them through the CLI.
 - **Brand marks:** channel logos are the AXIS isotypes compiled into `EOP_Platforms` (Pinterest from Iconify `logos`);
   UI icons (X action bar, players) are Remix paths in `EOP_Icons`. Never draw a brand mark or icon by hand.
-- **Deploy state:** 0.10.7 is live since 2026-10-30 (runtime `e8111e1`; swatch campaign rows as their board). A stored
+- **Deploy state:** 0.10.8 is live since 2026-10-30 (runtime `21fe1fd`; swatch campaign rows as their board, gliding as a whole on hover). A stored
   document with a service key no longer in the catalog stops rendering: migrate entries before removing a key. 0.10.6 (runtime `194e1e8`): services are line categories; no drips under
   the content-marketing hero (0.10.4–0.10.5 withdrew the poured paint). Before, 0.10.3 (runtime `3ea1cec`; poured-paint hero edge for content marketing,
   spacing for «Detrás del trabajo» after a dark section). 0.10.2 (runtime `2997847`): the record is an editorial spread headed
