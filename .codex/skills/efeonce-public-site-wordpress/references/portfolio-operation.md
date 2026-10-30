@@ -46,8 +46,9 @@ are projected only with `metrics`; contents only with `pieces`.
   them yet — edit them through the CLI.
 - **Brand marks:** channel logos are the AXIS isotypes compiled into `EOP_Platforms` (Pinterest from Iconify `logos`);
   UI icons (X action bar, players) are Remix paths in `EOP_Icons`. Never draw a brand mark or icon by hand.
-- **Deploy state:** 0.8.1 is live since 2026-10-30 (runtime `686cf48`): the wall shows one row per brand (projects of
-  one client grouped, «N campañas», each campaign inside with its link; `EOP_Render::by_brand`). After any code
+- **Deploy state:** 0.8.2 is live since 2026-10-30 (runtime `dfccd4c`): one row per brand (`EOP_Render::by_brand`) shown
+  as a campaign index — sub-rows with need, sourced figure and thumbnails, each with its own panel; any number of
+  campaigns, folded after three (`BRAND_FOLD`) behind «Ver N campañas más». Desktop rows sit on fixed grid columns. After any code
   deploy run `scripts/public-website/eo-portfolio/purge-portfolio-cache.php` (the deploy does not purge the page cache)
   and verify the existing entries are unchanged (0.8.0 changed the hero markup and chapters).
 - Step-by-step CLI manual: `docs/manual-de-uso/public-site/operar-portafolio-por-cli.md`.
