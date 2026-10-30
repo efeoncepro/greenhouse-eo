@@ -5,6 +5,16 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-30 — Backend de la UI aprobada: capítulos y recorrido
+
+- Operador: «quiero todo lo que está en el canvas»; tarjeta previa completa y estados de invitación distintos
+  aprobados. Alcance en TASK-2080 (todo salvo tiempo real) y TASK-2081 (sala en vivo, ADR primero).
+- `local`: rama `claude/rooms-approved-ui` desde `de38af5`. `31c1a83` capítulos V3/V4 (cobertura, `content.arrange`,
+  proyección `content.chapters`); `e37b152` migración14 `rooms.viewer_progress`, `progress.mark` y reader
+  `.../progress` en API/SDK/CLI; MCP lee, `progress.mark` excluido. 44 tablas.
+- `local`: suite 343/343, 0 skip, con PG18 del repo, `ROOMS_DATABASE_URL` y `ROOMS_RUNTIME_PROFILE=local` (sin ese
+  perfil los 13 tests multimedia fallan por configuración, no por código); lint/types/build PASS. Sin push/deploy.
+
 ## 2026-10-30 — Canvas de UI aprobado; implementación planificada
 
 - `doc`: el operador aprobó entero el canvas Claude Design «la sala es una órbita» (14 pantallas,

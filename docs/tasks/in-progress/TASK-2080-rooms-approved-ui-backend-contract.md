@@ -32,7 +32,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-052`
-- Status real: `Diseño. Huecos verificados por lectura del código en codex/rooms-design-integration@3c7bcb5 (2026-10-30). Decisiones de privacidad resueltas por el operador el 2026-10-30: todo lo que muestra el canvas.`
+- Status real: `2026-10-30: slices 1 (capítulos) y 2 (recorrido propio) commiteados en efeonce-rooms claude/rooms-approved-ui (31c1a83, e37b152), migración14, suite 343/343 sin skips con PG18 local y ROOMS_RUNTIME_PROFILE=local. Sin push ni deploy. Faltan slices 3, 4, 5, 7, 8, 9, 10 y 6.`
 - Rank: `2 de la implementación de la UI aprobada (en paralelo con TASK-2079)`
 - Domain: `platform`
 - Blocked by: `none`
@@ -321,10 +321,10 @@ tablas y campos finales los decide el dueño backend respetando los invariantes 
 
 ## Acceptance Criteria
 
-- [ ] El reader de edición devuelve `chapters` en toda edición; las publicadas sin capítulos derivan uno por bloque visible.
-- [ ] `content.arrange` rechaza capítulos con bloques repetidos, excluidos o ausentes.
-- [ ] `progress.mark` repetido no duplica filas y rechaza bloques excluidos o de otra edición.
-- [ ] `progress.get` solo devuelve el recorrido de la persona autenticada.
+- [x] El reader de edición devuelve `chapters` en toda edición; las publicadas sin capítulos derivan uno por bloque visible.
+- [ ] `content.arrange` rechaza capítulos con bloques repetidos, excluidos o ausentes. (Parcial: los acepta y la cobertura bloquea la publicación con códigos explícitos; decidir si el comando debe rechazar en vez de dejar el borrador pendiente.)
+- [x] `progress.mark` repetido no duplica filas y rechaza bloques excluidos o de otra edición.
+- [x] `progress.get` solo devuelve el recorrido de la persona autenticada.
 - [ ] La tarjeta previa responde solo para tokens vigentes y con la forma resuelta; nunca incluye correos.
 - [ ] `editions.compare`, `preview as`, `startedAt`/`durationMs`, `activity.view`/`signals.read` y subtítulos cumplen su slice y tienen tests; un guest recibe `not_found` en `signals.read`.
 - [ ] Los estados vencido y revocado se distinguen solo para tokens válidos; un token inventado sigue en `invalid_invitation`.
