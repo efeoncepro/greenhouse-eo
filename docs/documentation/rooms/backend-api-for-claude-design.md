@@ -144,6 +144,24 @@ No HLS, contenido remoto, originales descargables o un fallback a parser del bro
 no es un transporte multimedia de128MiB. Para ello usar `multimedia-upload-bytes`/`multimedia-bytes`
 del CLI, con streaming, o el SDK multimedia. MCP excluye las transferencias binarias explícitamente.
 
+### Capítulos y recorrido propio (TASK-2080, rama `claude/rooms-approved-ui`)
+
+> Ampliación 2026-10-30 para la UI aprobada «la sala es una órbita». Local, sin push ni deploy;
+> migración14 `rooms.viewer_progress` (44 tablas).
+
+- **Capítulos.** Los manifests V3/V4 aceptan `chapters[{id,title,blockIds[]}]` (1–12). Cada bloque visible va en
+  exactamente un capítulo; un bloque excluido, repetido, inexistente o sin capítulo deja la cobertura en `pending`
+  (códigos `chapter_block_excluded`, `chapter_block_repeated`, `chapter_block_missing`, `block_without_chapter`,
+  `duplicate_chapter`). `content.arrange` acepta `chapters` (o `null` para quitarlos). V2 no cambia.
+- Toda edición o borrador versionado proyecta `content.chapters[{id,title,blockIds,derived}]`: los declarados,
+  filtrados a lo que el lector puede ver, o uno por bloque visible (`derived:true`). La UI nunca inventa capítulos.
+- **Recorrido.** Comando `progress.mark {roomId,editionId,blockId,dwellMs?}` (capacidad `rooms.read`, idempotente
+  por `Idempotency-Key`, `dwellMs` ≤ 600 000 por reporte y como máximo 24 h acumuladas por bloque). Solo bloques visibles de una
+  edición publicada. Reader `GET .../editions/:editionId/progress` (SDK `progress`) devuelve el recorrido **propio**:
+  `visitedBlockIds`, `visitedChapterIds`, `completedChapterIds`, `chapterCount`, `lastBlockId`, `lastSeenAt`. Un guest
+  se identifica por su invitación, así que una sesión nueva conserva su recorrido. Nadie lee el de otra persona.
+- MCP: `progress.get` es lector; `progress.mark` queda excluido (un agente fabricaría un registro de lectura).
+
 ### Lecturas HTTP nuevas
 
 Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cursor` según su contrato.
@@ -152,6 +170,7 @@ Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cu
 | --- | --- |
 | GET `/api/v1/rooms/:roomId/editions/:editionId/questions` | questions |
 | GET `.../steps` y `.../activity` | steps/activity |
+| GET `.../progress` | progress |
 | GET `.../tours`, `.../tours/:tourId`, `.../notes` | tours/tour/ownNotes |
 | GET `.../presentations/:sessionId` y `.../console` | presentation/presentationConsole |
 | GET `/api/v1/rooms/:roomId/integrations` | integrations |
