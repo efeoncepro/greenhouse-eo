@@ -72,7 +72,8 @@ Corte local29Oct, autorizado para terminar backend sin UI; construcción en `cod
 - [TASK-2077](../../tasks/complete/TASK-2077-rooms-local-multimedia-pipeline.md): PDF/audio/video y V4 opt-in local; sin certificación de worker Linux/cloud ni nueva UI.
 - [TASK-2078](../../tasks/complete/TASK-2078-rooms-local-stdio-mcp.md): MCP stdio local por sesión existente; sin OAuth/federación remota ni transferencia binaria MCP.
 - [TASK-2079](../../tasks/to-do/TASK-2079-rooms-orbit-foundation.md): base visual La órbita (órbita, halo, cámara, iris, parallax, motion) del canvas aprobado el 2026-10-29; primera pieza de la UI.
-- [TASK-2080](../../tasks/to-do/TASK-2080-rooms-approved-ui-backend-contract.md): contrato backend de la UI aprobada (capítulos, recorrido propio, tarjeta y estados de invitación, adaptaciones, nombres); slices 3 y 4 esperan decisión de privacidad.
+- [TASK-2080](../../tasks/in-progress/TASK-2080-rooms-approved-ui-backend-contract.md): contrato backend de todo el canvas aprobado salvo tiempo real; decisiones de privacidad resueltas por el operador el 2026-10-30.
+- [TASK-2081](../../tasks/to-do/TASK-2081-rooms-live-room-realtime.md): sala en vivo, ADR de transporte y backend en tiempo real.
 
 [Recibo del corte y límites](../../audits/rooms/2026-10-29-backend-local-completion.md). TASK-2070 y2074–2078 quedan complete por su alcance técnico local verificado. TASK-2071/2072 y la
 épica conservan in-progress por interfaz/certificación conjunta/rollout; cerrar el backend local no

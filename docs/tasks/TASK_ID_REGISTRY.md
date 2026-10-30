@@ -2755,6 +2755,10 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro2026-10-29:2078 reservado tras2077 por el integrador Rooms; verificado libre en filas/notas/filesystem antes de crear el adapter. El operador autorizó terminar backend independiente de UI; Auth/release retenidos. Siguiente ID libre TASK-2079.
 
 | `TASK-2079` | `to-do` | **Rooms: base visual La órbita y primitivas de motion.** EPIC-052; ui-ux/primitive; P1/Alto/Medio. Órbita canónica con halo de token, órbita que mide, estaciones, cámara con salto orbital y mapa, iris, parallax y grano, y laboratorio `/demo/base`. Primera pieza de la UI aprobada el 2026-10-29. | `docs/tasks/to-do/TASK-2079-rooms-orbit-foundation.md` |
-| `TASK-2080` | `to-do` | **Rooms: contrato backend para la UI aprobada.** EPIC-052; backend-data/migration; P1/Alto/Alto. Capítulos, recorrido propio, tarjeta de invitación previa, estados vencida/revocada, adaptaciones por pieza y nombres en preguntas. Slices 3 y 4 esperan dos decisiones de privacidad del operador. | `docs/tasks/to-do/TASK-2080-rooms-approved-ui-backend-contract.md` |
+| `TASK-2080` | `in-progress` | **Rooms: contrato backend para la UI aprobada.** EPIC-052; backend-data/migration; P1/Alto/Alto. Capítulos, recorrido propio, tarjeta de invitación previa, estados vencida/revocada, adaptaciones por pieza y nombres en preguntas. Slices 3 y 4 esperan dos decisiones de privacidad del operador. | `docs/tasks/in-progress/TASK-2080-rooms-approved-ui-backend-contract.md` |
 
 > Registro 2026-10-30: 2079 y 2080 verificados libres en filas, notas y sistema de archivos antes de crearlas (implementación de la UI de Rooms aprobada). Siguiente ID libre TASK-2081.
+
+| `TASK-2081` | `to-do` | **Rooms: sala en vivo (ADR y backend en tiempo real).** EPIC-052; backend-data/integration; P2/Alto/Alto. Presencia, cursores, selección y preguntas en vivo sobre colaboración existente; ADR del transporte antes del código. | `docs/tasks/to-do/TASK-2081-rooms-live-room-realtime.md` |
+
+> Registro 2026-10-30: 2081 verificado libre antes de crearla. Siguiente ID libre TASK-2082.

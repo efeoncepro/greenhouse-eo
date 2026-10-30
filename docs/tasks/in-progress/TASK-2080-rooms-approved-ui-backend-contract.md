@@ -1,5 +1,16 @@
 # TASK-2080 — Rooms: contrato backend para la UI aprobada
 
+## Delta 2026-10-30 — el operador pide todo el canvas
+
+- Instrucción del operador: «Lo que haga falta para implementar lo que está en el canvas hay que desarrollarlo en el
+  backend, quiero todo lo que está en el canvas». Resuelve las dos Open Questions a favor de lo que muestra el
+  canvas: la tarjeta previa incluye quién invita (nombre y foto), el cliente (nombre y logo), la persona invitada
+  (nombre y rol) y con quién comparte la sala; vencida, revocada e intentos se distinguen.
+- El alcance se amplía a todo el backend del canvas salvo la sala en vivo: slices 7–10 cubren comparación de
+  ediciones, vista previa por rol, reloj y avance automático de la presentación, señales de actividad y subtítulos
+  de video. La sala en vivo (tiempo real) va en TASK-2081 porque requiere ADR propio.
+- Implementación asignada por el operador a esta línea de trabajo (Claude), en la rama `claude/rooms-approved-ui`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -8,7 +19,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,11 +32,11 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-052`
-- Status real: `Diseño. Huecos verificados por lectura del código en codex/rooms-design-integration@3c7bcb5 (2026-10-30). Dos decisiones de privacidad abiertas para el operador.`
+- Status real: `Diseño. Huecos verificados por lectura del código en codex/rooms-design-integration@3c7bcb5 (2026-10-30). Decisiones de privacidad resueltas por el operador el 2026-10-30: todo lo que muestra el canvas.`
 - Rank: `2 de la implementación de la UI aprobada (en paralelo con TASK-2079)`
 - Domain: `platform`
-- Blocked by: `Open Questions 1 y 2 solo para los slices 3 y 4; slices 1, 2 y 5 pueden empezar`
-- Branch: `efeonce-rooms: rama propia desde codex/rooms-design-integration (dueño backend: Codex), sin push a main; Greenhouse: docs en develop`
+- Blocked by: `none`
+- Branch: `efeonce-rooms: claude/rooms-approved-ui desde codex/rooms-design-integration@de38af5, sin push a main; Greenhouse: docs en develop`
 
 ## Summary
 
@@ -148,8 +159,8 @@ Reglas obligatorias:
 - Contrato nuevo o modificado:
   1. **Capítulos**: campo opcional `chapters[{id, title, blockIds[]}]` en el manifest de contenido para versiones nuevas. El reader de edición devuelve siempre `chapters`: los declarados, o uno por bloque visible si no hay declarados (derivación documentada en el servidor, no en el cliente). Comando `content.arrange` acepta `chapters`.
   2. **Recorrido**: comando `progress.mark {editionId, blockId}` (idempotente por persona + edición + bloque) y reader `progress.get {editionId}` que devuelve, para la propia persona, `visitedBlockIds[]`, `visitedChapterIds[]` y `lastBlockId`.
-  3. **Tarjeta de invitación** (sujeta a Open Question 1): reader previo a la entrada `GET /api/invitations/card` con el token de transacción; respuesta mínima aprobada (propuesta: `inviter{displayName, avatarUrl}`, `client{displayName, logoUrl}`, `roomLabel`, `invitee{firstName}`).
-  4. **Estados de invitación** (sujeta a Open Question 2): para un token criptográficamente válido, distinguir `invitation_expired` y `invitation_revoked` (y si `superseded`), con `canRequestNew`. Token inexistente o mal formado sigue en `invalid_invitation`.
+  3. **Tarjeta de invitación** (Open Question 1 resuelta): reader previo a la entrada `GET /api/invitations/card` con el token de transacción; respuesta `inviter{displayName, avatarUrl}`, `client{displayName, logoUrl}`, `roomLabel`, `invitee{displayName, role}`, `sharedWith[{displayName, role}]`; nunca correos.
+  4. **Estados de invitación** (Open Question 2 resuelta): para un token criptográficamente válido, distinguir `invitation_expired`, `invitation_revoked` y `invitation_superseded`, con `canRequestNew`. Token inexistente o mal formado sigue en `invalid_invitation`.
   5. **Adaptaciones**: agrupar varios assets de una pieza (propuesta: `pieceId` + `adaptations[{assetRefId, label, ratio}]` en el bloque de medio de la versión nueva) y campos opcionales `rationale` y vínculo a evidencia por pieza.
   6. **Nombres visibles**: `author{displayName, kind: guest|internal}` en preguntas y respuestas, sin exponer identidad interna a guests más allá del nombre y «Efeonce».
 - Backward compatibility: `compatible` — campos opcionales y readers nuevos; V1/V2 publicados se leen igual.
@@ -171,7 +182,7 @@ Reglas obligatorias:
 ### Migration, backfill and rollout
 
 - Migration posture: `additive`
-- Default state: tarjeta previa y estados distinguibles detrás de un flag local OFF hasta la decisión del operador; capítulos y recorrido activos solo en local.
+- Default state: todo activo solo en local; nada se publica en esta task.
 - Backfill plan: ninguno; las ediciones existentes derivan un capítulo por bloque.
 - Rollback path: migración down vacía la tabla nueva solo si no tiene datos; revertir la rama.
 - External coordination: ninguna fuera del repo; sin cambios a issuer ni a Vercel.
@@ -179,7 +190,7 @@ Reglas obligatorias:
 ### Security and access
 
 - Auth/access gate: sesión o concesión guest con `can`; la tarjeta usa el token de transacción existente.
-- Sensitive data posture: nombre y foto de quien invita, nombre del cliente y nombre de la persona invitada (PII ligera); nada de correos ni de co-invitados.
+- Sensitive data posture: nombre y foto de quien invita, nombre y logo del cliente, nombre y rol de la persona invitada y de quienes comparten la sala (PII ligera aceptada por el operador); nunca correos. Señales de actividad solo para actores internos.
 - Error contract: errores canónicos `{error:{code,message}, correlationId}`; códigos nuevos documentados.
 - Abuse/rate-limit posture: la tarjeta comparte los presupuestos por hora de `start`; `progress.mark` con límite por sesión.
 
@@ -222,15 +233,32 @@ Reglas obligatorias:
 
 ### Slice 3 — Tarjeta previa a la entrada
 
-- Reader `card` con la forma aprobada en Open Question 1, detrás de flag local.
+- Reader `card` con la forma resuelta en Open Question 1.
 
 ### Slice 4 — Estados de invitación distinguibles
 
-- Códigos `invitation_expired` / `invitation_revoked` (y `superseded` si se aprueba) con `canRequestNew`, según Open Question 2.
+- Códigos `invitation_expired` / `invitation_revoked` / `invitation_superseded` con `canRequestNew`, según Open Question 2.
 
 ### Slice 5 — Adaptaciones y nombres
 
 - Agrupación de adaptaciones por pieza con `rationale` opcional; `author.displayName` en preguntas y respuestas.
+
+### Slice 7 — Comparación de ediciones
+
+- Reader `editions.compare {fromEditionId, toEditionId}` en servidor: bloques agregados, quitados y cambiados, y diff de texto por bloque editorial (`added`/`removed` por fragmento), respetando exclusiones.
+
+### Slice 8 — Vista previa por rol
+
+- `preview` acepta `as: buyer|champion|audience`, proyectando exactamente lo que vería cada rol (notas y excluidos fuera; derechos adicionales solo si la concesión los da). No suplanta sesión ni crea principales.
+
+### Slice 9 — Presentación: reloj y avance automático
+
+- Proyectar `startedAt` (y `endedAt`) en `PresentationView`; `tours.upsert` acepta `durationMs` opcional por escena para el modo audiencia sin presentador.
+
+### Slice 10 — Señales y subtítulos
+
+- Comando `activity.view {editionId, blockId, dwellMs}` (agregado por persona, bloque y día; idempotente por ventana) y reader interno `signals.read {roomId, window: day|week, by: chapter|block}` con vistas, tiempo y preguntas. Solo actores internos con capacidad; un guest nunca lee señales.
+- Pista de subtítulos (WebVTT) opcional por asset de video V4, servida con la misma autorización privada.
 
 ### Slice 6 — Contrato y paridad
 
@@ -238,8 +266,7 @@ Reglas obligatorias:
 
 ## Out of Scope
 
-- Comparación entre ediciones, señales agregadas por capítulo y tiempo, vista previa por rol, `startedAt` de presentación y tiempo real de la sala en vivo: follow-ups de las Fases 2–5.
-- Ver el recorrido de un comprador desde Efeonce (es analítica de atención; requiere su propia decisión de privacidad).
+- Tiempo real de la sala en vivo (cursores, selección, preguntas en vivo): TASK-2081.
 - Cambiar el formato del código (sigue en 6 dígitos; la UI se ajusta).
 - Producción, flags `ROOMS_*`, correo, canary, issuer de Auth.
 
@@ -254,7 +281,7 @@ tablas y campos finales los decide el dueño backend respetando los invariantes 
 
 ### Slice ordering hard rule
 
-- Slices 1, 2 y 5 son independientes. Slices 3 y 4 no empiezan sin respuesta del operador. Slice 6 cierra después de los demás.
+- Slices 1–5 y 7–10 son independientes entre sí, salvo 10 que reutiliza los capítulos de 1. Slice 6 cierra después de los demás.
 
 ### Risk matrix
 
@@ -267,7 +294,7 @@ tablas y campos finales los decide el dueño backend respetando los invariantes 
 
 ### Feature flags / cutover
 
-- Flag local para slices 3 y 4 (nombre a definir por el dueño backend), OFF por defecto. Nada se prende en producción en esta task.
+- Sin flag nuevo: los cambios viven en la rama y en la PG local; la publicación futura pasa por la autorización de producción de Rooms y los flags `ROOMS_*` existentes.
 
 ### Rollback plan per slice
 
@@ -275,8 +302,8 @@ tablas y campos finales los decide el dueño backend respetando los invariantes 
 |---|---|---|---|
 | Slice 1 | Revertir commit; ediciones sin `chapters` siguen derivando | minutos | sí |
 | Slice 2 | Migración down (tabla vacía) + revertir | minutos | sí |
-| Slice 3 | Flag OFF o revertir | minutos | sí |
-| Slice 4 | Flag OFF o revertir | minutos | sí |
+| Slice 3 | Revertir commit | minutos | sí |
+| Slice 4 | Revertir commit | minutos | sí |
 | Slice 5 | Revertir commit | minutos | sí |
 | Slice 6 | Revertir docs | minutos | sí |
 
@@ -286,7 +313,7 @@ tablas y campos finales los decide el dueño backend respetando los invariantes 
 
 ### Out-of-band coordination required
 
-- Decisión del operador sobre Open Questions 1 y 2. Coordinar con Codex como dueño del backend Rooms y con TASK-2066.
+- Avisar a Codex (backend Rooms hasta 2026-10-29) que la rama `claude/rooms-approved-ui` parte de su `de38af5`; coordinar el error de invitación con TASK-2066.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -298,7 +325,8 @@ tablas y campos finales los decide el dueño backend respetando los invariantes 
 - [ ] `content.arrange` rechaza capítulos con bloques repetidos, excluidos o ausentes.
 - [ ] `progress.mark` repetido no duplica filas y rechaza bloques excluidos o de otra edición.
 - [ ] `progress.get` solo devuelve el recorrido de la persona autenticada.
-- [ ] La tarjeta previa responde solo para tokens vigentes y con la forma aprobada; nunca incluye correos ni co-invitados.
+- [ ] La tarjeta previa responde solo para tokens vigentes y con la forma resuelta; nunca incluye correos.
+- [ ] `editions.compare`, `preview as`, `startedAt`/`durationMs`, `activity.view`/`signals.read` y subtítulos cumplen su slice y tienen tests; un guest recibe `not_found` en `signals.read`.
 - [ ] Los estados vencido y revocado se distinguen solo para tokens válidos; un token inventado sigue en `invalid_invitation`.
 - [ ] Preguntas y respuestas exponen `author.displayName` sin identificadores internos para guests.
 - [ ] API, SDK, CLI y MCP stdio exponen los mismos readers y commands (test de paridad).
@@ -323,17 +351,14 @@ tablas y campos finales los decide el dueño backend respetando los invariantes 
 
 ## Follow-ups
 
-- Fase 2: comparación entre ediciones (o confirmar que el cliente compara dos ediciones leídas) y vista previa por rol.
-- Fase 3: proyectar `startedAt` de la presentación para el reloj de la consola.
-- Fase 4: señales agregadas por capítulo y por tiempo, con decisión de privacidad sobre lectura de recorrido por Efeonce.
-- Fase 5: ADR de sala en vivo y backend en tiempo real.
+- TASK-2081: sala en vivo (ADR + tiempo real).
+- Tasks de UI para Consola/Audiencia, Señales/Video y Sala en vivo cuando sus fases empiecen.
 
 ## Open Questions
 
-1. **¿Qué puede ver alguien con un enlace válido antes de escribir el código?** Propuesta: nombre y foto de quien
-   invita, nombre y logo del cliente, nombre de la sala y el primer nombre de la persona invitada; nunca correos ni
-   co-invitados. Riesgo: si el enlace se reenvía, quien lo recibe ve quién negocia con quién. Alternativa: mostrar
-   solo nombre y foto de quien invita, y el resto después del código.
-2. **¿Distinguimos vencida y revocada?** Propuesta: sí, solo para tokens válidos, porque las acciones difieren
-   (pedir código nuevo frente a escribir a quien invita). Alternativa: mantener un único estado genérico y
-   ofrecer siempre «Escribir a quien te invitó».
+Resueltas el 2026-10-30 por el operador («quiero todo lo que está en el canvas»):
+
+1. Antes del código, con un enlace vigente, se muestra la tarjeta completa del canvas: quién invita (nombre y foto),
+   cliente (nombre y logo), persona invitada (nombre y rol) y con quién comparte la sala (nombres). Nunca correos.
+   Riesgo aceptado: un enlace reenviado revela esos datos; se mitiga con la vigencia corta del token y la revocación.
+2. Vencida, revocada e intentos se distinguen para tokens válidos.

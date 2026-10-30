@@ -17,7 +17,7 @@
   nombres de autor, diff de ediciones, señales agregadas, vista por rol y `startedAt` de presentación.
   El código de invitación es de 6 dígitos; el ejemplo alfanumérico del canvas se corrige en la UI.
 - Nuevas tasks: [TASK-2079](../../../../docs/tasks/to-do/TASK-2079-rooms-orbit-foundation.md) base visual
-  (UI ready=yes, sin backend) y [TASK-2080](../../../../docs/tasks/to-do/TASK-2080-rooms-approved-ui-backend-contract.md)
+  (UI ready=yes, sin backend) y [TASK-2080](../../../../docs/tasks/in-progress/TASK-2080-rooms-approved-ui-backend-contract.md)
   contrato backend (dueño Codex; slices 3–4 esperan dos decisiones de privacidad del operador).
   TASK-2059/2068 vuelven a UI ready=no hasta rehacer wireframes desde el canvas; deltas en 2059/2068/2071.
 - Sin código, push, deploy, flags, correo ni canary en este corte.
