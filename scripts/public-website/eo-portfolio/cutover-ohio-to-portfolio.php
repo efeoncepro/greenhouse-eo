@@ -19,7 +19,8 @@ if ( ! is_array( $in ) || ( $in['schema'] ?? '' ) !== 'eo-portfolio-redirects.v1
 $dry_run = ! array_key_exists( 'dryRun', $in ) || false !== $in['dryRun'];
 if ( ! class_exists( 'WPSEO_Redirect_Manager' ) || ! class_exists( 'WPSEO_Redirect' ) ) { WP_CLI::error( 'Yoast Premium redirect API not available.' ); }
 if ( ! class_exists( 'EOP_Store' ) || ! class_exists( 'EOP_Render' ) ) { WP_CLI::error( 'eo-portfolio 0.4+ is not active.' ); }
-if ( '1' !== (string) get_option( EOP_Render::OPTION, '0' ) ) { WP_CLI::error( 'The new portfolio pages are not on (eo_portfolio_enabled must be 1); nothing written.' ); }
+$pages_on = '1' === (string) get_option( EOP_Render::OPTION, '0' );
+if ( ! $pages_on && ! $dry_run ) { WP_CLI::error( 'The new portfolio pages are not on (eo_portfolio_enabled must be 1); nothing written.' ); }
 
 $norm    = fn( $path ) => trim( (string) $path, '/' );
 $manager = new WPSEO_Redirect_Manager();
@@ -34,6 +35,7 @@ $find    = function ( $origin ) use ( $manager ) {
 // 1. Plan, with every guard checked before any write.
 $plan  = array();
 $fails = array();
+$kept  = array();
 $by_origin = array();
 foreach ( $in['redirects'] as $row ) {
 	$post   = get_post( (int) $row['id'] );
@@ -42,7 +44,7 @@ foreach ( $in['redirects'] as $row ) {
 	if ( ! $post || 'ohio_portfolio' !== $post->post_type ) { $fails[] = array( 'id' => $row['id'], 'reason' => 'not-an-ohio-entry' ); continue; }
 	if ( $norm( wp_make_link_relative( get_permalink( $post ) ) ) !== $origin && 'draft' !== $post->post_status ) { $fails[] = array( 'id' => $post->ID, 'reason' => 'path-changed', 'live' => get_permalink( $post ) ); }
 	$slug = basename( $target );
-	if ( ! EOP_Store::served( $slug ) ) { $fails[] = array( 'id' => $post->ID, 'reason' => 'target-not-published', 'target' => $target ); }
+	if ( ! EOP_Store::served( $slug ) && ! ( $dry_run && EOP_Store::post_for( $slug ) ) ) { $fails[] = array( 'id' => $post->ID, 'reason' => 'target-not-published', 'target' => $target ); }
 	$existing = $find( $origin );
 	$state    = 'create';
 	if ( $existing ) {
@@ -58,7 +60,9 @@ foreach ( $in['redirects'] as $row ) {
 		if ( $old_origin === $origin || isset( $by_origin[ $old_origin ] ) ) { continue; }
 		$existing = $find( $old_origin );
 		if ( $existing && ( 301 !== (int) $existing->get_type() || $norm( $existing->get_target() ) !== $origin ) ) {
-			if ( $norm( $existing->get_target() ) !== $target ) { $fails[] = array( 'id' => $post->ID, 'reason' => 'old-slug-redirects-elsewhere', 'origin' => $old_origin, 'existingTarget' => $existing->get_target() ); }
+			// Old slugs shared by several entries (Ohio demo templates): the existing Yoast redirect already decided where
+			// it goes, and the rechain below moves it to that project's new page.
+			$kept[] = array( 'id' => $post->ID, 'origin' => $old_origin, 'existingTarget' => $existing->get_target() );
 			continue;
 		}
 		if ( ! $existing ) { // An existing 301 to the entry's current path is rechained below instead.
@@ -80,13 +84,15 @@ foreach ( $manager->get_all_redirects() as $redirect ) {
 
 $summary = array(
 	'dryRun'          => $dry_run,
+	'pagesOn'         => $pages_on,
+	'targetsPublished' => count( array_filter( $in['redirects'], fn( $r ) => (bool) EOP_Store::served( basename( trim( $r['to'], '/' ) ) ) ) ),
 	'entries'         => count( $plan ),
 	'redirectsCreate' => count( array_filter( $plan, fn( $p ) => 'create' === $p['redirect'] ) ),
 	'redirectsRechain' => count( $rechain ),
 	'draftsMove'      => count( array_filter( $plan, fn( $p ) => 'move' === $p['draft'] ) ),
 );
 if ( $dry_run ) {
-	echo wp_json_encode( array( 'summary' => $summary, 'plan' => $plan, 'rechain' => $rechain ), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) . PHP_EOL;
+	echo wp_json_encode( array( 'summary' => $summary, 'plan' => $plan, 'rechain' => $rechain, 'keptOldSlugs' => $kept ), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) . PHP_EOL;
 	return;
 }
 
