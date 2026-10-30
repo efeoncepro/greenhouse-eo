@@ -114,7 +114,9 @@ pnpm public-website:portfolio -- revisions <slug> | log <slug> | restore <slug> 
 - Every media item has real `width`, `height` and `alt`; images use a Media Library `mediaId`; videos use `src` and
   `poster` in the public AXIS bucket (`portfolio/v<N>/<slug>/`) and `captionsVtt` when they have voice. No video upload
   to WordPress.
-- `services` only from `schema/services.v1.json`; `line` is growth | brand | engine | voice | revenue.
+- `services` only from `schema/services.v1.json`: Efeonce's business lines (creative-services, digital-services-engineering,
+  revenue-operations-crm, media-distribution, growth-strategy-measurement, channel-commerce). Never a product brand (Wave,
+  Globe/Creative Studio, Reach, Kortex, Verk) nor an offer (HubSpot as a Service, Salesforce Practice, Factory); `line` is growth | brand | engine | voice | revenue.
 - Video `src`, `poster` and `captionsVtt` must be under `schema/media-hosts.v1.json` (public AXIS bucket); anything else
   fails with `MEDIA_HOST_NOT_ALLOWED`.
 - Saves are against a base revision: a conflict means someone saved in between → `pull`, reapply, `apply`.
