@@ -154,6 +154,12 @@ con el trigger `reject_mutation` existente. Nunca se borra ni se edita.
 - Quiénes, además del dueño, son administradores: decisión del operador al aplicar.
 - UI de miembros: task ui-ux posterior; este ADR sólo exige el contrato.
 - Notificación por correo del vencimiento: depende de la política de correo de Rooms.
+- Actor agente (2026-10-31, aviso de la sesión de diseño UI): el operador quiere que Rooms se arme y se administre
+  sobre todo con agentes que actúan en nombre de una persona. Cómo se autentica ese agente (token de Efeonce ID,
+  consentimiento, step-up para escrituras) es materia del ADR del carril de agentes, que propone esa sesión. Este ADR
+  no lo decide. Frontera propuesta: aquí se define **qué autoridad tiene la persona en Rooms**; allá, **cómo un agente
+  la ejerce en su nombre**. Pendiente de confirmar con el operador: si `members.*` exige step-up humano cuando lo invoca
+  un agente.
 
 ## Revisar cuando
 
