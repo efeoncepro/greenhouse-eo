@@ -5,6 +5,21 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — Migraciones 9–18 aplicadas en `rooms_production` (sin merge)
+
+- Autorización del operador: «Sí, aplica». Recibo
+  [`2026-10-31-production-migrations-applied.md`](../../../../docs/audits/rooms/2026-10-31-production-migrations-applied.md).
+- `vivo`:
+  - antes de aplicar: ensayo repetido (PASS), respaldo automático de hoy y PITR de 7 días;
+  - corrida en seco con 10 pendientes exactas;
+  - respaldo lógico propio y privado en `.local/production-backups/` (rollback real; PITR de la instancia compartida no sirve);
+  - aplicado con `pnpm db:migrate-production --apply` (`efeonce-rooms` `bbca0f8`).
+- `vivo`, verificación: 18 migraciones y 47 tablas; hash de ediciones y filas de las 26 tablas previas intactos;
+  `rooms_runtime` lee las tablas nuevas con su credencial de producción.
+- Sin cambios: deployment `main@e4b2e890` y flags `ROOMS_*` en OFF.
+- Siguiente: merge de PR #4 (= deploy), con su autorización, y verificar el commit activo y el dominio. Después, borrar
+  el respaldo lógico (tiene datos de producción).
+
 ## 2026-10-31 — Interfaz aceptada por el operador; `UI ready: yes` en TASK-2059/2068/2071
 
 - Aceptación humana: «Todas están aprobadas» (operador, 2026-10-31), sobre las pantallas en local de la rama

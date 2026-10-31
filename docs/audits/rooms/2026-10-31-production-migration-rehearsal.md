@@ -59,6 +59,8 @@ ejecutar `down`. Este ensayo sirve para ensayar ese camino.
 
 ## Pendiente para aplicar en producción
 
+> Actualización 2026-10-31 14:16 UTC: aplicadas. Ver [recibo de aplicación](2026-10-31-production-migrations-applied.md).
+
 1. Repetir `pnpm db:rehearse-production` justo antes de aplicar, por si producción cambió.
 2. Confirmar que existe un respaldo o PITR reciente de la instancia compartida.
 3. Aplicar con autorización expresa, **antes** del merge de #4. Leer de vuelta las 18 migraciones y las 47 tablas.
