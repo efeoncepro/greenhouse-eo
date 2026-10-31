@@ -184,6 +184,8 @@ block `block-46` in `ohio-sidebar-footer-3`, written by `scripts/public-website/
 the footer is 800 px from the viewport, and only if the page has not loaded it already. It replaced CF7 242255 (Mailchimp
 disconnected, HubSpot only through the collector); `ohio_widget_subscribe-2` sits in inactive widgets. Host selectors use
 the `#colophon:has([data-eo-footer-partners="v2"])` prefix to beat the footer adapter's `p { margin: 0 }`.
+The footer dresses the pill in its own paper and teal (paper `#f7f8f6` + navy text, teal `#36c8bf` on hover/focus,
+46 px high), not Glitch green: the operator found the green clashed with the site palette. Variables only.
 
 Host recipe (each rule fixed a live break on 2026-10-24):
 

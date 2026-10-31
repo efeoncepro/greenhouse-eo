@@ -37,3 +37,8 @@ veces (en Contacto y el blog ya viene cargado). El widget `ohio_widget_subscribe
 242255 no se tocó. Script: `scripts/public-website/footer-newsletter-growth-form.php` (volver a correrlo sólo refresca el
 bloque); snapshots `_gh_footer_newsletter_before_20261031_125344` (cambio) y `…_125729` (ajuste de espaciado). Las
 reglas de CF7 de este paquete quedan sin efecto.
+
+**Estilo (mismo día):** el operador rechazó el verde de Glitch en el footer («choca con los colores del sitio»). La píldora
+se viste con los materiales del footer sólo por variables del renderer: papel `#f7f8f6` con texto navy, turquesa
+`#36c8bf` al pasar el cursor y en el foco, 46 px de alto (botón interno 36), campo abierto con borde papel al 22 % y
+descripción a 13 px. El verde queda para Glitch dentro del blog. Snapshot `_gh_footer_newsletter_before_20261031_131918`.

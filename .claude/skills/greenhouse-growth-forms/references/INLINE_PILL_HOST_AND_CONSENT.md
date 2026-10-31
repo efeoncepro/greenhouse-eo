@@ -131,3 +131,7 @@ todo el ancho y reserva el lugar del aviso aunque esté en reposo: es la consult
 estilo del anfitrión. Las reglas del anfitrión van con el prefijo `#colophon:has([data-eo-footer-partners="v2"])`, porque el
 adaptador del footer anula los márgenes de `p` con esa especificidad. Reemplazó al CF7 242255, cuya conexión a Mailchimp
 estaba cortada.
+El tono también lo decide el anfitrión: en el footer el operador rechazó el verde de Glitch (choca con la paleta del
+sitio), así que la píldora usa papel `#f7f8f6` + texto navy, turquesa `#36c8bf` en hover y foco, `--ghf-inline-height:46px`,
+`--ghf-inline-send-height:36px` y borde abierto papel al 22 %, todo por variables. El verde sigue siendo el de Glitch
+dentro del blog.
