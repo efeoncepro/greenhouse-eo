@@ -106,6 +106,22 @@ Defensa en capas contra el bloqueo:
 `rooms.access_events` (actor, operación, sujeto con sufijo, vigencia, referencia de autorización, correlación),
 con el trigger `reject_mutation` existente. Nunca se borra ni se edita.
 
+## Delta — renovación automática al entrar (2026-10-31)
+
+Decisión del operador: «Sí, quiero que mi acceso se renueve solo».
+
+- Una pertenencia con `auto_renew` vuelve a la vigencia completa (366 días) **cada vez que esa persona entra** y le
+  quedan menos de 335 días. Mientras alguien use Rooms al menos una vez al año, su acceso no vence; una cuenta
+  abandonada sí vence. El techo de 366 días no cambia.
+- La renovación ocurre en el callback, en la misma transacción que crea la sesión y después de que `eligibleContexts`
+  confirmó que el acceso sigue vigente: nunca revive un acceso revocado o vencido. Cada una queda en
+  `rooms.access_events` como `members.autoRenewed` con actor `system:sign-in`.
+- Quienes administran miembros al migrar (en producción, sólo el dueño) quedan con `auto_renew`; el bootstrap del
+  dueño lo activa; `members.grantInternal` y `members.renewInternal` aceptan `autoRenew`.
+- La migración 20 también acota la guarda en base a las reducciones reales (revocar, degradar, quitar
+  `members.manage`, acortar, borrar). La versión anterior saltaba con cualquier actualización de una fila activa y
+  habría impedido extender o marcar a un miembro en una organización sin administrador vigente.
+
 ## Alternativas descartadas
 
 - **(b) Derivar administradores de la autoridad interna de Efeonce ID.** Obliga a emitir roles u organización

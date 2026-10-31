@@ -40,6 +40,17 @@
   8. Antes de clientes reales: medir la sala en vivo (prendida y sin medir), cerrar TASK-1833 y revisar gobierno de
      datos IA para `read.client`. Ningún cliente real sin una autorización nueva.
 
+## 2026-10-31 — Renovación automática al entrar (local, PR #6 sin merge)
+
+- Decisión del operador: «quiero que mi acceso se renueve solo». ADR con delta «renovación automática al entrar».
+- `local`: `efeonce-rooms` `claude/rooms-owner-auto-renew` (`ce7eff1` + `50f8bcd`),
+  [PR #6](https://github.com/efeoncepro/efeonce-rooms/pull/6) sin merge. Migración 20 `1793261000000_rooms-member-auto-renew`
+  (`auto_renew`, evento `members.autoRenewed`, guarda acotada a reducciones), `src/server/access/renewal.ts` en el
+  callback (renueva a 366 días si quedan menos de 335), marca para los administradores actuales.
+- verify 387/387; ensayo en clon PASS. Su suite encontró un bug real ya en producción: `recordAccessRequest` usaba dos
+  `clock_timestamp()` y podía violar el CHECK de 7 días (identity_unbound → unavailable). Corregido en `50f8bcd`.
+- Producción: pendiente de autorización (migración 20, merge, alias, health).
+
 ## 2026-10-31 — Acceso interno durable y /auth/error EN PRODUCCIÓN
 
 - Autorización: «Avanza todo end-to-end» y «Despliega». Recibo

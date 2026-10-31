@@ -27,6 +27,15 @@
 - Blocked by: `ninguno para el corte local; producción espera autorización (migración + merge)`
 - Branch: `efeonce-rooms: rama derivada de main, sin push a main hasta autorización; Greenhouse: docs en develop`
 
+## Delta 2026-10-31 — renovación automática al entrar
+
+- Decisión del operador: «quiero que mi acceso se renueve solo». Migración 20 `1793261000000_rooms-member-auto-renew`
+  (`auto_renew` en memberships, evento `members.autoRenewed`, guarda acotada a reducciones) y
+  `src/server/access/renewal.ts`, llamado en el callback. Código en `efeonce-rooms` `claude/rooms-owner-auto-renew`
+  (`ce7eff1` + fix `50f8bcd`), [PR #6](https://github.com/efeoncepro/efeonce-rooms/pull/6) sin merge; verify 387/387; ensayo de la
+  migración 20 PASS (su suite destapó una carrera de reloj en `access_requests`, corregida). Producción con autorización aparte.
+- [ ] Renovación al entrar en producción y verificada con el primer login del dueño.
+
 ## Delta 2026-10-31 — carril de agentes Accepted: sin enmienda
 
 - El ADR [Carril de agentes](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) quedó **Accepted**

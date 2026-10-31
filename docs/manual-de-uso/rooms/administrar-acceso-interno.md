@@ -1,7 +1,7 @@
 # Rooms — Administrar el acceso interno
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-31 por Claude (TASK-2082)
 > **Ultima actualizacion:** 2026-10-31 por Claude
 > **Documentacion tecnica:** [ADR acceso interno durable](../../architecture/rooms/EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md)
@@ -52,7 +52,13 @@ pnpm rooms members --session-file /ruta/privada/sesion.json --organization ORG
 Muestra rol, vigencia, si vence en los próximos 30 días (`expiring`), si administra miembros y los últimos seis
 caracteres de su identidad de Efeonce ID. El identificador completo nunca se muestra.
 
-### Renovar
+### Renovación automática
+
+Si la persona tiene `autoRenew: true`, su acceso vuelve a durar un año cada vez que entra a Rooms (cuando le
+quedan menos de 11 meses). El dueño la tiene activada. Para activarla en otra persona, envía `"autoRenew": true` en
+`members.grantInternal` o `members.renewInternal`. `pnpm rooms members` la muestra como `autoRenew`.
+
+### Renovar a mano
 
 `members.renewInternal` con `{ "principalId": "member-ana", "expiresAt": "<nueva fecha>" }`. Extiende persona,
 pertenencia, vínculo de identidad y permisos de organización a la misma fecha.

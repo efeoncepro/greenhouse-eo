@@ -1,7 +1,7 @@
 # Rooms — Acceso interno del equipo Efeonce
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-31 por Claude (TASK-2082/2083)
 > **Ultima actualizacion:** 2026-10-31 por Claude
 > **Documentacion tecnica:** [ADR acceso interno durable](../../architecture/rooms/EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md)
@@ -30,7 +30,8 @@ año, avisa antes de vencer y nunca puede quedar sin nadie que lo administre.
 - Un rol en Greenhouse o en Efeonce ID no da acceso a Rooms. El acceso se da en Rooms.
 - Sólo un administrador con el permiso de administrar miembros puede dar, renovar o quitar acceso.
 - Nadie puede dar un permiso que no tiene.
-- Todo acceso vence. Se avisa 30 días antes y se renueva con un comando.
+- Todo acceso vence. Se avisa 30 días antes y se renueva con un comando. Quien tenga la renovación automática
+  (el dueño la tiene) recupera un año completo cada vez que entra, así que no vence mientras use Rooms.
 - La organización nunca puede quedar sin administrador por un cambio: Rooms lo rechaza y la base de datos también.
 - Si no hay ningún administrador, el primero se crea con una herramienta administrativa que exige la credencial de la
   base y una autorización humana escrita.
