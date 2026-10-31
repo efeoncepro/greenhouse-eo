@@ -3,7 +3,8 @@ import type { CaptureScenario } from '../lib/scenario'
 /** TASK-2083: the login stopped before the room (identity_unbound). Anonymous; fixed synthetic reference. */
 export const scenario: CaptureScenario = {
   name: 'rooms-access-issue',
-  route: '/auth/error?reason=identity_unbound&ref=7b6ef4e7-a936-4ec6-84ac-9865732e40d3',
+  // TASK-2082: the real identity_unbound case carries the access request code the person shares.
+  route: '/auth/error?reason=identity_unbound&ref=7b6ef4e7-a936-4ec6-84ac-9865732e40d3&code=K7M29QXA',
   authentication: 'anonymous',
   // Copying the reference only writes to the clipboard; no request leaves the page.
   mutating: false,

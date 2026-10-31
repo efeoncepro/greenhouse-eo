@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-052`
-- Status real: `2026-10-31: código local en efeonce-rooms claude/rooms-durable-internal-access adb1db0 (sin push). LC_ALL=en_US.UTF-8 pnpm verify: 378 pruebas, 354 pasan, 0 fallan, 24 omitidas (lanes que exigen ROOMS_DATABASE_URL explícito y toolchain multimedia; no tocan auth). GVC rooms-access-issue OK en 1440, 1280 y 390 contra next start del build de producción. Falta: mirada del operador (UI ready), push/merge y deploy con autorización.`
+- Status real: `2026-10-31: código local en efeonce-rooms claude/rooms-durable-internal-access (adb1db0 + 510ab42, sin push). Con TASK-2082, identity_unbound muestra el código de solicitud (XXXX-XXXX) en vez de la referencia. verify 385/385; GVC rooms-access-issue OK en 1440/1280/390 con código. Falta: mirada del operador (UI ready), merge y deploy autorizados.`
 - Rank: `junto con TASK-2082; independiente de ella`
 - Domain: `platform|identity`
 - Blocked by: `ninguno para el corte local; producción espera autorización de merge`

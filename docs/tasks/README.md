@@ -1,7 +1,7 @@
 # Task Index
 
 - `TASK-2083` — [Rooms: página «el acceso se detuvo»](in-progress/TASK-2083-rooms-access-issue-page.md), in-progress; código local (redirección + escena + GVC 1440/1280/390), sin push; falta la mirada del operador y el merge autorizado.
-- `TASK-2082` — [Rooms: acceso interno durable y gobernado](to-do/TASK-2082-rooms-durable-internal-access.md), to-do; ADR Proposed, espera aprobación antes del código.
+- `TASK-2082` — [Rooms: acceso interno durable y gobernado](in-progress/TASK-2082-rooms-durable-internal-access.md), in-progress; ADR Accepted 2026-10-31; código local `510ab42` (verify 385/385), sin push; producción espera autorización.
 - `TASK-2081` — [Rooms: sala en vivo](in-progress/TASK-2081-rooms-live-room-realtime.md), in-progress; ADR aceptado, presencia SSE + capa de cursores implementadas en local; falta medición en Vercel y autorización de producción.
 - `TASK-2080` — [Rooms: contrato backend para la UI aprobada](in-progress/TASK-2080-rooms-approved-ui-backend-contract.md), in-progress (2026-10-30, rama `claude/rooms-approved-ui`); todo el backend del canvas salvo tiempo real (capítulos, recorrido, tarjeta y estados de invitación, adaptaciones, nombres, comparación de ediciones, vista por rol, reloj de presentación, señales y subtítulos).
 - `TASK-2079` — [Rooms: base visual La órbita y primitivas de motion](in-progress/TASK-2079-rooms-orbit-foundation.md), in-progress; implementada local, GVC OK, falta revisión humana. Órbita, halo, cámara, iris, parallax y laboratorio `/demo/base` del canvas aprobado el 2026-10-29.

@@ -5,6 +5,35 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — ADR de acceso interno Accepted; TASK-2082 implementada en local
+
+- Aprobación del operador: «Aprobar ADR» (2026-10-31). Autoriza código local; **no** push, deploy, migración de
+  producción ni flags.
+- `local`, `efeonce-rooms` rama `claude/rooms-durable-internal-access` `510ab42` (sobre `adb1db0`, sin push).
+  `LC_ALL=en_US.UTF-8 pnpm verify` con PG local y `ROOMS_RUNTIME_PROFILE=local`: 385/385, 0 omitidas, build OK;
+  GVC `rooms-access-issue` (con código) OK en 1440/1280/390. Contenido:
+  - migración 19 `1793260000000_rooms-internal-access.sql`: capacidad `members.manage` (sólo organización, CHECK),
+    `rooms.access_requests`, `rooms.access_events` (append-only), función `rooms.member_manager_coverage` y triggers
+    diferidos anti-bloqueo (salida de emergencia `SET LOCAL rooms.allow_member_manager_gap='on'`); permisos por columna
+    para `rooms_runtime`. Aplicada en la PG local del repo (55432); **no** en `rooms_production`;
+  - `src/server/access/{service,requests,bootstrap}.ts`: `members.grantInternal|renewInternal|revokeInternal`,
+    `members.list`, solicitud de acceso (código Crockford de 8, 7 días) desde `identity_unbound`, bootstrap y health;
+  - API `/api/v1/members`, SDK `members()`, CLI `pnpm rooms members`, MCP (`members.list` en `read`; comandos sólo en
+    el toolset `members`, nunca en `all`), `pnpm access:bootstrap-owner|health|production`;
+  - `/auth/error` muestra el código de solicitud en `identity_unbound`.
+- Decisiones de implementación (ADR, «Delta de implementación»): techo de 366 días desde ahora (no la vigencia del
+  actor, o el último administrador no podría renovarse); los actores sintéticos nunca reciben `members.manage`.
+- Lecciones:
+  - las suites V4/multimedia necesitan `ROOMS_DATABASE_URL`, `ROOMS_MIGRATION_DATABASE_URL` **y**
+    `ROOMS_RUNTIME_PROFILE=local`; sin el perfil fallan con `configuration` en `canonicalDraft` (no es una regresión);
+  - una regla de base nueva que bloquea escrituras rompe pruebas que simulan revocaciones con SQL: limitar el trigger
+    a filas que de verdad sostienen la capacidad (aquí, sólo principals que tienen `members.manage`).
+- Para producción, en orden y con autorización explícita: (1) `pnpm db:rehearse-production`; (2)
+  `pnpm db:migrate-production --apply`; (3) `pnpm access:production bootstrap-owner … --issuer https://auth.efeonce.org`
+  en seco, que debe proponer **adoptar** `rooms-pilot-julio-20261025`, y luego `--apply`; (4) merge y deploy;
+  (5) `pnpm access:production health`. Hasta entonces el acceso del dueño sigue en las filas restauradas a mano
+  (hasta 2027-10-31).
+
 ## 2026-10-31 — Acceso interno durable (ADR Proposed) y página de error del login (local)
 
 - Origen: el primer login real del dueño cayó en `identity_unbound` (canary de 2 h vencido) y el navegador mostró JSON.

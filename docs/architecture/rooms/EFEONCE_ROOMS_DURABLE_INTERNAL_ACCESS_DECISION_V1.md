@@ -1,7 +1,8 @@
 # Rooms — Acceso interno durable y gobernado
 
-- Status: **Proposed** (2026-10-31). Espera aprobación humana antes de escribir código de la parte A.
-  La parte B (página de error del callback) no cambia autoridad y se implementa local en TASK-2083.
+- Status: **Accepted** (2026-10-31, operador: «Aprobar ADR»). Autoriza el código local de TASK-2082 en `efeonce-rooms`.
+  No autoriza push, deploy, migración de producción ni flags: eso sigue el gate de release de Rooms. La parte B
+  (página de error del callback) se implementa en TASK-2083.
 - Owner: Platform (contrato y runtime `efeonce-rooms`); el operador decide quién administra Rooms.
 - Epic: EPIC-052. Tasks: TASK-2082 (acceso interno, backend-data) y TASK-2083 (página de error, ui-ux).
 - Reversibility: two-way-but-slow. Tablas y comandos nuevos son aditivos; el modelo de principals,
@@ -130,7 +131,30 @@ con el trigger `reject_mutation` existente. Nunca se borra ni se edita.
 - Toda escritura de `identity_bindings`, `principals` internos, `memberships` o grants de organización pasa
   por `src/server/access/**`. Ni scripts ni SQL ad hoc.
 - El login no cambia: `eligibleContexts` sigue leyendo las mismas tablas.
-- Errores nuevos del contrato: `last_administrator`, `access_request_expired`, `subject_unbound`.
+- Error nuevo del contrato: `last_administrator` (409). Un código de solicitud vencido, consumido o inexistente
+  responde `not_found`, igual que cualquier recurso que no se puede ver; no hace falta un código propio.
+
+## Delta de implementación — 2026-10-31 (TASK-2082, código local)
+
+Decisiones tomadas al implementar, dentro del alcance aceptado:
+
+- **Techo de vigencia:** 366 días **desde ahora**, no la vigencia del actor. Con el techo del actor, el último
+  administrador nunca podría renovarse a sí mismo y volvería a quedar afuera.
+- **Delegación:** nadie entrega una capacidad que no tenga a nivel de organización ni que supere su rol.
+- **Guarda de comando:** una escritura falla con `last_administrator` si la organización tenía titular y queda sin
+  ninguno, o si su cobertura baja de `min(cobertura previa, ahora + 30 días)`.
+- **Guarda en base:** triggers diferidos sobre `grants`, `principals` y `memberships` con una definición única
+  (`rooms.member_manager_coverage`). Salida de emergencia explícita para revocar una cuenta comprometida:
+  `SET LOCAL rooms.allow_member_manager_gap = 'on'` en la misma transacción, con credencial administrativa.
+- **Rol runtime:** permisos por columna (`INSERT` y `UPDATE(role,status,expires_at)` o `UPDATE(status,expires_at)`) sobre
+  `principals`, `memberships` e `identity_bindings`; nada más.
+- **Actores sintéticos** (demo y pruebas) nunca reciben `members.manage`: sólo se obtiene por `members.*` o por el bootstrap.
+- **MCP stdio:** `members.list` está en el toolset `read`; los comandos `members.*` sólo en el toolset explícito
+  `members`, nunca en `all`. El step-up cuando los invoca un agente lo decide el ADR del carril de agentes.
+- **Solicitud de acceso:** código de 8 caracteres Crockford (`XXXX-XXXX`), guardado como hash, 7 días, uno abierto por
+  identidad, tope de 200 por hora. La página `/auth/error` lo muestra en `identity_unbound`.
+- **Herramientas:** `pnpm access:bootstrap-owner`, `pnpm access:health` (local) y `pnpm access:production <comando>`
+  (proxy + credencial migrator; cada `--apply` exige autorización).
 
 ## 4 pilares
 

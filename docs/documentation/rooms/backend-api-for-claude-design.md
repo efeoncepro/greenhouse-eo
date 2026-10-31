@@ -247,6 +247,21 @@ escenario el borrador sin guardar (mismo resolutor que la sala). Guardar envía 
 `content.upsertBlock`. En una sala con datos reales, la cobertura `scene_placeholder` impide publicar marcadores
 entre corchetes. ADR: [escenas como contenido de la sala](../../architecture/rooms/EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md).
 
+### Miembros internos y página de acceso (TASK-2082/2083, ADR aceptado 2026-10-31)
+
+- Reader `GET /api/v1/members?organizationId=` (`members.list`): miembros internos con `role`, `status`
+  (`active|revoked|expired`), `expiresAt`, `expiring` (≤30 días), `managesMembers`, `subjectSuffix` (últimos 6
+  caracteres de la identidad de Efeonce ID) y `displayName`, más `coverage` (`holders`, `longestExpiresAt`,
+  `expiring`). Requiere `members.manage`; sin ella responde `not_found`.
+- Commands por `POST /api/v1/commands`: `members.grantInternal` (`principalId`, `role` operator|administrator,
+  `capabilities`, `expiresAt` ≤ 366 días, y **uno** de `accessRequestCode` o `identity`), `members.renewInternal`
+  (`principalId`, `expiresAt`) y `members.revokeInternal` (`principalId`). Error nuevo `last_administrator` (409).
+- `members.manage` es de organización y sólo del rol administrador; los actores de demo e integración no la tienen.
+- `/auth/error?reason=…&ref=…[&code=XXXXXXXX]`: página terminal para un login detenido. En `identity_unbound` muestra
+  el código de solicitud que la persona comparte con un administrador. Con `Accept: application/json`, `/login` y
+  `/auth/callback` conservan el JSON de error.
+- No hay UI de miembros todavía: será un cliente de este mismo contrato (task ui-ux aparte).
+
 ### Lecturas HTTP nuevas
 
 Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cursor` según su contrato.

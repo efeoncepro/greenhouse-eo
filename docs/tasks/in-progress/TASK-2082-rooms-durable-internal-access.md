@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-052`
-- Status real: `2026-10-31: ADR Proposed, espera aprobación del operador. Sin código. El acceso del dueño hoy depende de filas restauradas a mano con SQL administrativo (vigentes hasta 2027-10-31).`
+- Status real: `2026-10-31: ADR Accepted. Código local en efeonce-rooms claude/rooms-durable-internal-access 510ab42 (sin push): migración 19 aplicada sólo en la PG local; members.* + members.list con paridad API/SDK/CLI/MCP, solicitud de acceso, bootstrap, health y guardas. LC_ALL=en_US.UTF-8 pnpm verify con ROOMS_DATABASE_URL, ROOMS_MIGRATION_DATABASE_URL y ROOMS_RUNTIME_PROFILE=local: 385/385, 0 omitidas, build OK; access-members 7/7. Falta: ensayo y migración en producción, bootstrap/adopción del dueño, merge y deploy, todo con autorización.`
 - Rank: `antes del primer cliente real y antes de dar acceso a otra persona interna`
 - Domain: `platform|identity`
-- Blocked by: `aprobación del ADR EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1`
+- Blocked by: `ninguno para el corte local; producción espera autorización (migración + merge)`
 - Branch: `efeonce-rooms: rama derivada de main, sin push a main hasta autorización; Greenhouse: docs en develop`
 
 ## Summary
@@ -93,7 +93,7 @@ Reglas obligatorias:
 - `../efeonce-rooms/src/server/access/**` (nuevo)
 - `../efeonce-rooms/src/domain/access-contracts.ts` (nuevo)
 - `../efeonce-rooms/migrations/<timestamp>_rooms-internal-access.sql` (nuevo)
-- `../efeonce-rooms/scripts/access-bootstrap-owner.ts` (nuevo)
+- `../efeonce-rooms/scripts/access.ts` y `scripts/production-access.sh` (nuevos)
 - `../efeonce-rooms/src/domain/permissions.ts` (capacidad `members.manage`)
 - `../efeonce-rooms/src/server/auth/service.ts` (registro de la solicitud en `identity_unbound`)
 
@@ -274,16 +274,16 @@ Contrato completo en el ADR (D1–D7). Este archivo no lo repite.
 
 ## Acceptance Criteria
 
-- [ ] ADR aprobado por el operador antes del primer commit de código.
-- [ ] `members.grantInternal` crea principal, membership, binding y grant en una transacción y es idempotente (test).
-- [ ] Un actor sin `members.manage` recibe error canónico y no escribe nada (test).
-- [ ] Revocar o acortar al último administrador falla con `last_administrator` (test de comando y de trigger con SQL directo).
-- [ ] `identity_unbound` registra una solicitud y `members.grantInternal` la consume por código (test).
-- [ ] Ninguna respuesta, log ni evento contiene el `sub` completo (test).
-- [ ] `pnpm access:bootstrap-owner` no escribe si ya hay titular y adopta el estado existente (test).
-- [ ] `pnpm access:health` reporta `owner_expiring` a ≤30 días (test con reloj).
-- [ ] API, SDK, CLI y MCP stdio exponen los cuatro contratos.
-- [ ] `LC_ALL=en_US.UTF-8 pnpm verify` pasa.
+- [x] ADR aprobado por el operador antes del primer commit de código («Aprobar ADR», 2026-10-31).
+- [x] `members.grantInternal` crea principal, membership, binding y grant en una transacción y es idempotente (test `access-members`).
+- [x] Un actor sin `members.manage` recibe error canónico y no escribe nada (test: operador recibe `not_found`).
+- [x] Revocar o acortar al último administrador falla con `last_administrator` (test de comando y de trigger con SQL directo, más la salida de emergencia).
+- [x] `identity_unbound` registra una solicitud y `members.grantInternal` la consume por código (test; el callback lleva `code` a la página, test `auth-http`).
+- [x] Ninguna respuesta, log ni evento contiene el `sub` completo (test sobre `members.list` y `access_events.subject_suffix`).
+- [x] `pnpm access:bootstrap-owner` no escribe si ya hay titular y la corrida en seco no deja filas (test). La adopción usa la misma ruta (`writeMemberGrant` con binding existente); no hay test dedicado de adopción.
+- [x] `pnpm access:health` reporta `owner_expiring` a ≤30 días y `no_owner` sin titular (tests con vigencia de 20 días y con revocación de emergencia).
+- [x] API (`/api/v1/members`, `/api/v1/commands`), SDK (`members()` + comandos), CLI (`pnpm rooms members` / `execute`) y MCP stdio (`members.list` en `read`; comandos sólo en el toolset `members`) exponen los cuatro contratos; `assertMcpOperationCoverage` pasa.
+- [x] `LC_ALL=en_US.UTF-8 pnpm verify` pasa (385/385 con PG local y perfil multimedia; build OK).
 
 ## Verification
 
