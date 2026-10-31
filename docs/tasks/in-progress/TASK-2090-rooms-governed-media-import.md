@@ -6,9 +6,28 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-31 — slices 1–3 en local
+
+- Comando `media.importFromSource` en familia propia (`mediaImportCommandSchemas`): fuentes `efeonce_bucket`,
+  `brand_asset` y `person_upload`, sin ningún campo URL; respuesta sin bucket, key, rutas ni URLs.
+- I/O fuera de la transacción: metadata antes que bytes, generación fijada, SHA-256 y tipo real por firma; copia con
+  `ifGenerationMatch=0` (GCS) u `O_EXCL` (local); si la transacción final no confirma, se borra la copia.
+- `rooms.media_imports` append-only con `reject_mutation`; actor desde los GUC de TASK-2084.
+- `person_upload` solo acepta subidas hechas por una persona, de la misma organización y mismo `dataOrigin`, y exige
+  `content.edit` en la sala de origen. **Abierto:** ¿se permite otra sala de la misma organización o solo la misma?
+- Marca: el runtime no importa `@efeoncepro/axis-brand-assets` (74 MB en la función); `scripts/brand-asset-catalog.mjs`
+  genera un catálogo de 298 rasters sellados y una prueba detecta drift. En la nube `brand_asset` responde
+  `unavailable` hasta decidir un origen canónico (candidato: espejo sellado en `efeonce-group-axis-public-media`).
+  Función `/api/v1/commands` medida en 8,8 MB.
+- Buckets candidatos, todos `approved:false`: `axis-portfolio`, `axis-sparks`, `greenhouse-campaigns`,
+  `creative-canon`. Excluidos a propósito: `efeonce-creative-work/<cliente>`, `efeonce-marketing-studio-originals`,
+  `efeonce-group-greenhouse-private-assets-prod/ai-generations`, `efeonce-group-axis-public-media/team`.
+- Paridad: API `POST /api/v1/commands`, SDK `importMedia`, CLI `pnpm rooms import-media`, MCP `rooms_media_execute`
+  (clase `efeonce.mcp.rooms.author`). Sin señal `rooms.media.import_rejected` ni cuota propia de importación todavía.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -21,7 +40,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-052`
-- Status real: `Diseno. ADR del carril de agentes Accepted (D5); pipeline privado de imágenes en producción (GCS, worker, dispatch); ningún código de importación escrito.`
+- Status real: `Slices 1–3 code complete en local (2026-10-31), rama efeonce-rooms claude/rooms-media-import (453d350, 6dfc63f, 63448cc) sin upstream ni push; pnpm verify verde (398 pass, 24 skip por entorno); migración 1793266000000 solo en PG local. Flag ROOMS_MEDIA_IMPORT_ENABLED OFF. Bloqueado para producción por: buckets aprobados, IAM de lectura, origen cloud de assets de marca y ensayo de migración.`
 - Rank: `después de TASK-2084; antes de que un agente arme una sala real con piezas visuales`
 - Domain: `platform|content`
 - Blocked by: `TASK-2084 (atribución del actor, clasificación D2 y cuotas)`
