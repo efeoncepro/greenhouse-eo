@@ -54,3 +54,6 @@ del copyright desde el respaldo más antiguo que corresponda, y purgar la caché
   los separa con 28 px (24 en teléfono). La barra la agrega el plugin de consentimiento `eo-measurement-consent`
   (`efeonce-cookie-preferences-mount`); el adaptador la oculta con tamaño de letra 0 en el contenedor. El arreglo limpio
   es dejar de agregarla en ese plugin.
+  Al pasar el cursor, los dos enlaces se ponen turquesa sin subrayado, como en el canvas. El color lleva `!important`
+  porque `global-fixes.css` fija todos los enlaces del footer en blanco al 75 % con `!important` (respaldo
+  `_gh_footer_v3_legal_before_20261031_143806`).

@@ -19,19 +19,33 @@ $anchor   = $P . ' .site-footer-copyright a,' . $P . ' .efeonce-cookie-preferenc
 $first    = "\n" . $host . '{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px 28px;font-size:0}'
 	. "\n" . $host . '>*{font-size:11px}'
 	. "\n" . '@media(max-width:600px){' . $host . '{gap:8px 24px}' . $host . '>*{font-size:10px}}';
-// Inline flow instead: the text node keeps zero size and only the button's margin separates the two links.
-$rules    = "\n" . $host . '{font-size:0}'
+// Second pass (14:24), inline flow: the text node keeps zero size and only the button's margin separates the two links.
+$second   = "\n" . $host . '{font-size:0}'
 	. "\n" . $host . '>*{font-size:11px;vertical-align:baseline}'
 	. "\n" . $host . '>.efeonce-cookie-preferences{margin-left:28px}'
 	. "\n" . '@media(max-width:600px){' . $host . '>*{font-size:10px}' . $host . '>.efeonce-cookie-preferences{margin-left:24px}}';
+// Third pass (14:37): the canvas hover without !important; the link kept its color because ohio-child global-fixes.css
+// pins every footer link to rgba(255,255,255,.75) !important on all pages but Home.
+$third    = $second
+	. "\n" . $host . '>*{transition:color 200ms cubic-bezier(0.4,0,0.2,1)}'
+	. "\n" . $host . '>a:hover,' . $host . '>.efeonce-cookie-preferences:hover{color:var(--eo-ft-accent);text-decoration:none;background-image:none;animation:none}';
+// Current: the canvas hover — both links turn teal, without Ohio's animated underline on the link or the consent
+// plugin's underline on the button. The colour carries !important to beat the legacy global fix (same as the ground).
+$rules    = $second
+	. "\n" . $host . '>*{transition:color 200ms cubic-bezier(0.4,0,0.2,1)}'
+	. "\n" . $host . '>a:hover,' . $host . '>.efeonce-cookie-preferences:hover{color:var(--eo-ft-accent)!important;text-decoration:none;background-image:none;animation:none}';
 
 $blocks  = get_option( 'widget_block' );
 $content = (string) ( $blocks[34]['content'] ?? '' );
 if ( 1 !== substr_count( $content, $anchor ) ) { WP_CLI::error( 'Anchor rule not found exactly once.' ); }
 if ( false !== strpos( $content, $anchor . $rules ) ) { WP_CLI::error( 'Already applied.' ); }
-$found_first = substr_count( $content, $anchor . $first );
-if ( $found_first > 1 ) { WP_CLI::error( 'First-pass rules found more than once.' ); }
-$next = 1 === $found_first ? str_replace( $anchor . $first, $anchor . $rules, $content ) : str_replace( $anchor, $anchor . $rules, $content );
+$next = null;
+foreach ( array( $third, $second, $first ) as $previous ) {
+	$found = substr_count( $content, $anchor . $previous );
+	if ( $found > 1 ) { WP_CLI::error( 'Earlier legal-link rules found more than once.' ); }
+	if ( 1 === $found ) { $next = str_replace( $anchor . $previous, $anchor . $rules, $content ); break; }
+}
+if ( null === $next ) { $next = str_replace( $anchor, $anchor . $rules, $content ); }
 
 $snapshot = '_gh_footer_v3_legal_before_' . gmdate( 'Ymd_His' );
 if ( ! add_option( $snapshot, array( 'block34' => $content ), '', false ) ) { WP_CLI::error( 'Backup failed.' ); }
