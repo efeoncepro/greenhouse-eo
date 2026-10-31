@@ -41,6 +41,7 @@ Vercel. La identidad la pone Efeonce ID (skill `efeonce-auth`); Rooms es su prim
 5. [`EPIC-052`](../../../docs/epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md): roadmap R01–R15 y criterios de salida.
 6. Evidencias de cada entrega en `docs/audits/rooms/*`.
 7. Diseño: la UI de Rooms se compone con la línea gráfica «La órbita» (skill `efeonce-graphic-line`) y AXIS. Bricolage editorial y Poppins funcional.
+8. Oficio de armar salas (del deal o brief a la sala publicada, invitaciones, aviso y reversa): skill [`efeonce-rooms-authoring`](../efeonce-rooms-authoring/SKILL.md) y su eval de referencia (TASK-2091). Esta skill no enseña a armar salas; aquélla no repite estado, flags ni releases.
 
 ## Mapa del runtime (`efeonce-rooms`)
 

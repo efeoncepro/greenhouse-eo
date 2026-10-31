@@ -1,0 +1,478 @@
+{
+  "data": {
+    "roomId": "sala-volta-2027",
+    "revision": 10,
+    "lifecycle": "published",
+    "content": {
+      "schemaVersion": "rooms.room.v3",
+      "renderVersion": "rooms.renderer.v3",
+      "id": "sala-volta-2027",
+      "organizationId": "org-eval-local",
+      "title": "Llega antes, todo el año",
+      "dataOrigin": "synthetic",
+      "edition": {
+        "id": "ed-1",
+        "status": "published",
+        "publishedAt": "2026-10-30T14:20:00.000Z"
+      },
+      "manifest": {
+        "schemaVersion": "rooms.content.v3",
+        "id": "sala-volta-2027",
+        "organizationId": "org-eval-local",
+        "dataOrigin": "synthetic",
+        "provenance": {
+          "sourceType": "fixture",
+          "reference": "Brief A del eval efeonce-rooms-authoring (sintético)"
+        },
+        "title": "Llega antes, todo el año",
+        "subtitle": "Creatividad y SEO/AEO para volta en 2027",
+        "brand": {
+          "name": "volta",
+          "descriptor": "Bicicletas eléctricas urbanas · marca ficticia",
+          "monogram": "v"
+        },
+        "profiles": [
+          "creative",
+          "seo-aeo"
+        ],
+        "blocks": [
+          {
+            "id": "reto",
+            "type": "editorial",
+            "schemaVersion": 1,
+            "required": true,
+            "title": "La campaña ya funciona. Falta que te encuentren.",
+            "fragments": [
+              {
+                "id": "reto-1",
+                "text": "Cuando alguien pregunta a una IA cómo llegar más rápido al trabajo en Santiago, volta aparece en 2 de 12 respuestas. Ruta Eléctrica, en 7."
+              }
+            ]
+          },
+          {
+            "id": "oportunidad",
+            "type": "diagnostic",
+            "schemaVersion": 1,
+            "required": true,
+            "title": "Lo que vimos",
+            "finding": "Ninguna página de volta responde cuánto tiempo se ahorra en un trayecto de Santiago; las respuestas toman cifras de otras ciudades.",
+            "scope": "Doce preguntas de la categoría en ChatGPT con búsqueda y Gemini.",
+            "proposal": "Una guía de trayectos reales y fichas con datos en texto."
+          },
+          {
+            "id": "kv",
+            "type": "media",
+            "schemaVersion": 2,
+            "required": true,
+            "title": "Llega antes",
+            "assetRefIds": [
+              "kv-16x9"
+            ],
+            "alt": "Una ciclista de volta cruza el taco al atardecer con el titular «Llega antes.»",
+            "caption": "Key visual aprobado el 15 de octubre de 2026.",
+            "adaptations": [
+              {
+                "assetRefId": "kv-16x9",
+                "label": "KV 16:9"
+              },
+              {
+                "assetRefId": "feed-4x5",
+                "label": "Feed 4:5"
+              },
+              {
+                "assetRefId": "story-9x16",
+                "label": "Story 9:16"
+              },
+              {
+                "assetRefId": "dooh-3x1",
+                "label": "Vía pública 3:1"
+              }
+            ]
+          },
+          {
+            "id": "en-el-mundo",
+            "required": true,
+            "schemaVersion": 1,
+            "type": "showcase",
+            "title": "Tu marca, en el mundo",
+            "intro": "La misma idea, donde tus clientes la van a ver.",
+            "pieceBlockId": "kv",
+            "contexts": [
+              {
+                "id": "ctx-feed",
+                "surface": "feed",
+                "assetRefId": "feed-4x5",
+                "where": "Feed de Instagram, lunes a primera hora",
+                "caption": "Cero tacos. Llega antes.",
+                "action": "Ver modelos"
+              },
+              {
+                "id": "ctx-story",
+                "surface": "story",
+                "assetRefId": "story-9x16",
+                "where": "Story de Instagram, viernes 19:00"
+              },
+              {
+                "id": "ctx-ooh",
+                "surface": "ooh",
+                "assetRefId": "dooh-3x1",
+                "where": "Caminero en la autopista, hora punta"
+              }
+            ],
+            "notes": [
+              {
+                "id": "nota-1",
+                "assetRefId": "feed-4x5",
+                "x": 50,
+                "y": 30,
+                "label": "Una sola promesa",
+                "text": "El titular dice minutos, no batería: es lo que pesa en el taco."
+              }
+            ]
+          },
+          {
+            "id": "ciclo",
+            "required": true,
+            "schemaVersion": 1,
+            "type": "cycle",
+            "title": "Pide, mira, ajusta, aprueba",
+            "intro": "Así se siente trabajar una pieza con nosotros.",
+            "pieceBlockId": "kv",
+            "goals": [
+              "Que se lea en dos segundos",
+              "Que la promesa sea medible"
+            ],
+            "adjustments": [
+              {
+                "id": "aj-luz",
+                "label": "Más luz",
+                "effect": "light"
+              },
+              {
+                "id": "aj-contraste",
+                "label": "Más contraste",
+                "effect": "contrast"
+              }
+            ],
+            "terms": {
+              "response": "Respuesta en 24 horas hábiles",
+              "rounds": "Dos rondas de ajustes incluidas"
+            }
+          },
+          {
+            "id": "respuestas",
+            "required": true,
+            "schemaVersion": 1,
+            "type": "answers",
+            "title": "Cuando pregunten, que aparezcas",
+            "intro": "Lo que responden hoy las IA y lo que buscamos con el plan.",
+            "basis": "measured",
+            "capturedAt": "2026-10-20T15:00:00.000Z",
+            "questions": [
+              {
+                "id": "q1",
+                "question": "¿Cómo llego más rápido al trabajo en Santiago sin auto?",
+                "today": {
+                  "text": "Recomienda metro y bicicleta eléctrica, y menciona a Ruta Eléctrica.",
+                  "sources": [
+                    {
+                      "name": "ChatGPT con búsqueda",
+                      "kind": "respuesta de IA",
+                      "cited": true
+                    },
+                    {
+                      "name": "Sitio de Ruta Eléctrica",
+                      "kind": "sitio de competidor",
+                      "cited": true
+                    }
+                  ]
+                },
+                "plan": {
+                  "text": "Con la guía de trayectos, la respuesta puede citar tiempos reales de Santiago publicados por volta.",
+                  "sources": [
+                    {
+                      "name": "Guía de trayectos (propuesta)",
+                      "kind": "contenido propuesto",
+                      "cited": false
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "q2",
+                "question": "¿Cuánto tiempo ahorro en bicicleta eléctrica frente al auto en hora punta?",
+                "today": {
+                  "text": "Usa cifras de otras ciudades, sin una marca chilena.",
+                  "sources": [
+                    {
+                      "name": "Gemini",
+                      "kind": "respuesta de IA",
+                      "cited": true
+                    }
+                  ]
+                },
+                "plan": {
+                  "text": "Una medición de trayectos en Santiago le da a la respuesta una fuente local.",
+                  "sources": [
+                    {
+                      "name": "Medición de trayectos (propuesta)",
+                      "kind": "contenido propuesto",
+                      "cited": false
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "q3",
+                "question": "¿Dónde puedo probar una bicicleta eléctrica en Providencia?",
+                "today": {
+                  "text": "Menciona la tienda de volta en Providencia.",
+                  "sources": [
+                    {
+                      "name": "Ficha de Google de volta",
+                      "kind": "perfil de negocio",
+                      "cited": true
+                    }
+                  ]
+                },
+                "plan": null,
+                "note": "Ya aparece; el plan no cambia esta respuesta."
+              }
+            ]
+          },
+          {
+            "id": "equipo",
+            "required": true,
+            "schemaVersion": 1,
+            "type": "team",
+            "title": "Un equipo que gira a tu alrededor",
+            "intro": "Las personas que vas a ver cada semana.",
+            "people": [
+              {
+                "id": "p-daniela",
+                "name": "Daniela Fuentes",
+                "role": "Directora de cuenta",
+                "help": "Ordena prioridades y es tu contacto diario.",
+                "ask": "Escríbele por el canal del proyecto."
+              },
+              {
+                "id": "p-martin",
+                "name": "Martín Rojas",
+                "role": "Estratega SEO/AEO",
+                "help": "Guía de trayectos, fichas y medición mensual.",
+                "ask": "Pídele la lectura del mes."
+              },
+              {
+                "id": "p-paula",
+                "name": "Paula Vera",
+                "role": "Directora creativa",
+                "help": "Cuida el sistema de piezas de «Llega antes».",
+                "ask": "Pídele una variante."
+              }
+            ],
+            "week": [
+              {
+                "id": "w1",
+                "day": "Lunes",
+                "title": "Prioridades",
+                "personId": "p-daniela"
+              },
+              {
+                "id": "w2",
+                "day": "Miércoles",
+                "title": "Entrega de piezas",
+                "personId": "p-paula"
+              },
+              {
+                "id": "w3",
+                "day": "Viernes",
+                "title": "Lectura de medición",
+                "personId": "p-martin"
+              }
+            ],
+            "response": "Respuesta en 24 horas hábiles",
+            "rhythmNote": "Tres momentos fijos por semana."
+          },
+          {
+            "id": "plan",
+            "type": "plan",
+            "schemaVersion": 1,
+            "required": true,
+            "title": "Qué haremos y cómo lo mediremos",
+            "steps": [
+              {
+                "id": "s1",
+                "title": "Guía de trayectos",
+                "deliverable": "Guía con tiempos reales de cinco trayectos de Santiago.",
+                "measurement": "Presencia en las 12 preguntas, cada mes."
+              },
+              {
+                "id": "s2",
+                "title": "Fichas con datos en texto",
+                "deliverable": "Autonomía y pendiente máxima en texto en cada ficha.",
+                "measurement": "Respuestas que citan las fichas de volta."
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "id": "ev-radiografia",
+            "required": true,
+            "title": "Radiografía AEO de volta",
+            "claim": "volta aparece en 2 de 12 respuestas de la categoría; Ruta Eléctrica en 7.",
+            "claimKind": "hypothesis",
+            "source": {
+              "type": "author-declared",
+              "reference": "Radiografía AEO (sintética), captura del 20 de octubre de 2026",
+              "capturedAt": "2026-10-20T15:00:00.000Z",
+              "scope": "Doce preguntas de la categoría",
+              "method": "Consulta manual en ChatGPT con búsqueda y Gemini",
+              "coverage": "Dos motores, un día",
+              "limitation": "Una captura no es una tendencia"
+            }
+          },
+          {
+            "id": "ev-fichas",
+            "required": true,
+            "title": "Revisión de fichas de producto",
+            "claim": "Las fichas no dicen autonomía ni pendiente en texto.",
+            "claimKind": "hypothesis",
+            "source": {
+              "type": "author-declared",
+              "reference": "Revisión de las fichas de volta (sintética)",
+              "capturedAt": "2026-10-21T12:00:00.000Z",
+              "scope": "Fichas de producto del sitio",
+              "method": "Lectura manual",
+              "coverage": "Todas las fichas publicadas",
+              "limitation": "No mide el efecto en respuestas"
+            }
+          }
+        ],
+        "relations": [
+          {
+            "id": "rel-reto",
+            "required": true,
+            "kind": "evidence",
+            "source": {
+              "blockId": "reto",
+              "anchorId": "reto-1"
+            },
+            "target": {
+              "kind": "evidence",
+              "evidenceId": "ev-radiografia"
+            }
+          },
+          {
+            "id": "rel-oportunidad",
+            "required": true,
+            "kind": "evidence",
+            "source": {
+              "blockId": "oportunidad"
+            },
+            "target": {
+              "kind": "evidence",
+              "evidenceId": "ev-radiografia"
+            }
+          },
+          {
+            "id": "rel-oportunidad-fichas",
+            "required": true,
+            "kind": "evidence",
+            "source": {
+              "blockId": "oportunidad"
+            },
+            "target": {
+              "kind": "evidence",
+              "evidenceId": "ev-fichas"
+            }
+          }
+        ],
+        "assetRefs": [
+          {
+            "id": "kv-16x9",
+            "required": true,
+            "assetVersionId": "av-kv-16x9"
+          },
+          {
+            "id": "feed-4x5",
+            "required": true,
+            "assetVersionId": "av-feed-4x5"
+          },
+          {
+            "id": "story-9x16",
+            "required": true,
+            "assetVersionId": "av-story-9x16"
+          },
+          {
+            "id": "dooh-3x1",
+            "required": true,
+            "assetVersionId": "av-dooh-3x1"
+          }
+        ],
+        "chapters": [
+          {
+            "id": "cap-reto",
+            "title": "Lo que vimos",
+            "blockIds": [
+              "reto",
+              "oportunidad"
+            ]
+          },
+          {
+            "id": "cap-mundo",
+            "title": "La pieza en el mundo",
+            "blockIds": [
+              "kv",
+              "en-el-mundo"
+            ]
+          },
+          {
+            "id": "cap-respuestas",
+            "title": "Cuando pregunten",
+            "blockIds": [
+              "respuestas"
+            ]
+          },
+          {
+            "id": "cap-ciclo",
+            "title": "Cómo trabajamos",
+            "blockIds": [
+              "ciclo"
+            ]
+          },
+          {
+            "id": "cap-equipo",
+            "title": "Quién gira a tu alrededor",
+            "blockIds": [
+              "equipo"
+            ]
+          },
+          {
+            "id": "cap-plan",
+            "title": "Qué haremos y cómo lo mediremos",
+            "blockIds": [
+              "plan"
+            ]
+          }
+        ]
+      },
+      "coverage": {
+        "schemaVersion": "rooms.coverage.v1",
+        "revision": 6,
+        "manifestHash": "sha256:fixture-6",
+        "valid": true,
+        "publicable": true,
+        "items": [],
+        "issues": [],
+        "counts": {
+          "total": 0,
+          "included": 0,
+          "pending": 0,
+          "excluded": 0,
+          "unsupported": 0
+        }
+      }
+    }
+  }
+}

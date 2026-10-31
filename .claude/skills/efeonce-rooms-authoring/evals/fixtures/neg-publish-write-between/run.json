@@ -1,0 +1,11 @@
+{
+  "schema": "rooms-authoring-eval-run.v1",
+  "source": "fixture",
+  "caseId": "a-volta-siempre-activo",
+  "organizationId": "org-eval-local",
+  "roomId": "sala-volta-2027",
+  "editionId": "ed-1",
+  "agentClientId": "claude-code",
+  "startedAt": "2026-10-30T14:00:00.000Z",
+  "capturedAt": "2026-10-30T14:14:00.000Z"
+}

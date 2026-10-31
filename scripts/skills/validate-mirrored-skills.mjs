@@ -360,6 +360,14 @@ const mirroredSkills = [
     claude: '.claude/skills/efeonce-rooms',
   },
   {
+    // Oficio de armar salas (TASK-2091): los agentes publican e invitan sin aprobación previa, así que el texto
+    // de la skill y su eval son el control de calidad. Un espejo divergente cambiaría el hash del recibo PASS.
+    id: 'efeonce-rooms-authoring',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-rooms-authoring',
+    claude: '.claude/skills/efeonce-rooms-authoring',
+  },
+  {
     id: 'efeonce-auth',
     mode: 'byte-identical',
     codex: '.codex/skills/efeonce-auth',

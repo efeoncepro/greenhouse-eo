@@ -1,0 +1,295 @@
+{
+  "data": {
+    "roomId": "sala-raiz-2027",
+    "revision": 4,
+    "lifecycle": "published",
+    "content": {
+      "schemaVersion": "rooms.room.v3",
+      "renderVersion": "rooms.renderer.v3",
+      "id": "sala-raiz-2027",
+      "organizationId": "org-eval-local",
+      "title": "Que te recomienden también cuando preguntan",
+      "dataOrigin": "real",
+      "edition": {
+        "id": "ed-1",
+        "status": "published",
+        "publishedAt": "2026-10-30T14:20:00.000Z"
+      },
+      "manifest": {
+        "schemaVersion": "rooms.content.v3",
+        "id": "sala-raiz-2027",
+        "organizationId": "org-eval-local",
+        "dataOrigin": "real",
+        "provenance": {
+          "sourceType": "user-authored",
+          "reference": "Brief B del eval efeonce-rooms-authoring, variante real en local aislado"
+        },
+        "title": "Que te recomienden también cuando preguntan",
+        "subtitle": "SEO/AEO para la línea de protección solar mineral de Raíz",
+        "brand": {
+          "name": "Laboratorio Raíz",
+          "descriptor": "Cosmética natural · marca ficticia",
+          "monogram": "R"
+        },
+        "profiles": [
+          "seo-aeo"
+        ],
+        "blocks": [
+          {
+            "id": "reto",
+            "type": "editorial",
+            "schemaVersion": 1,
+            "required": true,
+            "title": "Tus clientas compran por recomendación.",
+            "fragments": [
+              {
+                "id": "reto-1",
+                "text": "El 61 % de las clientas que respondieron tu encuesta compra cosmética por recomendación de alguien de confianza. Hoy esa recomendación también la da una IA."
+              }
+            ]
+          },
+          {
+            "id": "oportunidad",
+            "type": "diagnostic",
+            "schemaVersion": 1,
+            "required": true,
+            "title": "Lo que vimos",
+            "finding": "Tu sitio no tiene contenido sobre protección solar: cuando alguien pregunte, no hay una página tuya que citar.",
+            "scope": "Sitio de Raíz, revisado el 27 de octubre de 2026.",
+            "proposal": "Un centro de contenido sobre protección solar mineral, escrito con tu equipo técnico."
+          },
+          {
+            "id": "respuestas",
+            "required": true,
+            "schemaVersion": 1,
+            "type": "answers",
+            "title": "Cuando pregunten, que aparezcas",
+            "intro": "Ilustración: así se vería una respuesta con el plan en marcha. Aún no medimos lo que responden hoy.",
+            "basis": "illustrative",
+            "capturedAt": null,
+            "questions": [
+              {
+                "id": "q1",
+                "question": "¿Qué protector solar mineral sirve para piel sensible?",
+                "today": {
+                  "text": "Ilustración: hoy no sabemos qué responde; la primera captura será en diciembre.",
+                  "sources": [
+                    {
+                      "name": "Ilustración de Efeonce",
+                      "kind": "ilustración, sin captura",
+                      "cited": false
+                    }
+                  ]
+                },
+                "plan": {
+                  "text": "Con el centro de contenido, la respuesta puede citar la guía de Raíz sobre piel sensible.",
+                  "sources": [
+                    {
+                      "name": "Centro de contenido (propuesta)",
+                      "kind": "contenido propuesto",
+                      "cited": false
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "q2",
+                "question": "¿El protector mineral deja la piel blanca?",
+                "today": {
+                  "text": "Ilustración: sin captura todavía.",
+                  "sources": [
+                    {
+                      "name": "Ilustración de Efeonce",
+                      "kind": "ilustración, sin captura",
+                      "cited": false
+                    }
+                  ]
+                },
+                "plan": {
+                  "text": "Una ficha con modo de uso en texto responde la duda con la voz de Raíz.",
+                  "sources": [
+                    {
+                      "name": "Fichas de producto (propuesta)",
+                      "kind": "contenido propuesto",
+                      "cited": false
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "q3",
+                "question": "¿Qué factor de protección necesito para el verano en Santiago?",
+                "today": {
+                  "text": "Ilustración: sin captura todavía.",
+                  "sources": [
+                    {
+                      "name": "Ilustración de Efeonce",
+                      "kind": "ilustración, sin captura",
+                      "cited": false
+                    }
+                  ]
+                },
+                "plan": null,
+                "note": "Es una pregunta médica general; el plan no fuerza la marca en esta respuesta."
+              }
+            ]
+          },
+          {
+            "id": "equipo",
+            "required": true,
+            "schemaVersion": 1,
+            "type": "team",
+            "title": "Un equipo que gira a tu alrededor",
+            "intro": "Las personas que vas a ver cada semana.",
+            "people": [
+              {
+                "id": "p-ignacio",
+                "name": "Ignacio Lara",
+                "role": "Director de cuenta",
+                "help": "Ordena prioridades contigo.",
+                "ask": "Escríbele por el canal del proyecto."
+              },
+              {
+                "id": "p-valeria",
+                "name": "Valeria Núñez",
+                "role": "Editora de contenido",
+                "help": "Escribe el centro de contenido con tu equipo técnico.",
+                "ask": "Pídele el borrador de la semana."
+              }
+            ],
+            "week": [
+              {
+                "id": "w1",
+                "day": "Martes",
+                "title": "Prioridades",
+                "personId": "p-ignacio"
+              },
+              {
+                "id": "w2",
+                "day": "Jueves",
+                "title": "Entrega de contenido",
+                "personId": "p-valeria"
+              }
+            ],
+            "response": "Respuesta en 48 horas hábiles",
+            "rhythmNote": "Dos momentos fijos por semana."
+          },
+          {
+            "id": "plan",
+            "type": "plan",
+            "schemaVersion": 1,
+            "required": true,
+            "title": "Qué haremos y cómo lo mediremos",
+            "steps": [
+              {
+                "id": "s1",
+                "title": "Primera captura",
+                "deliverable": "Qué responden hoy las IA a las preguntas de la categoría.",
+                "measurement": "Línea base para la medición mensual."
+              },
+              {
+                "id": "s2",
+                "title": "Centro de contenido",
+                "deliverable": "Primera guía publicada en [PLAZO], con revisión técnica de Raíz.",
+                "measurement": "Respuestas que citan a Raíz, cada mes."
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "id": "ev-encuesta",
+            "required": true,
+            "title": "Encuesta de Raíz a 400 clientas",
+            "claim": "El 61 % compra cosmética por recomendación de alguien de confianza.",
+            "claimKind": "hypothesis",
+            "source": {
+              "type": "author-declared",
+              "reference": "Encuesta propia de Laboratorio Raíz, cerrada el 30 de septiembre de 2026",
+              "capturedAt": "2026-09-30T12:00:00.000Z",
+              "scope": "400 clientas de Raíz",
+              "method": "Encuesta en línea",
+              "coverage": "Clientas actuales",
+              "limitation": "No es representativa del mercado"
+            }
+          }
+        ],
+        "relations": [
+          {
+            "id": "rel-reto",
+            "required": true,
+            "kind": "evidence",
+            "source": {
+              "blockId": "reto",
+              "anchorId": "reto-1"
+            },
+            "target": {
+              "kind": "evidence",
+              "evidenceId": "ev-encuesta"
+            }
+          },
+          {
+            "id": "rel-oportunidad",
+            "required": true,
+            "kind": "evidence",
+            "source": {
+              "blockId": "oportunidad"
+            },
+            "target": {
+              "kind": "evidence",
+              "evidenceId": "ev-encuesta"
+            }
+          }
+        ],
+        "assetRefs": [],
+        "chapters": [
+          {
+            "id": "cap-reto",
+            "title": "Lo que vimos",
+            "blockIds": [
+              "reto",
+              "oportunidad"
+            ]
+          },
+          {
+            "id": "cap-respuestas",
+            "title": "Cuando pregunten",
+            "blockIds": [
+              "respuestas"
+            ]
+          },
+          {
+            "id": "cap-plan",
+            "title": "Qué haremos y cómo lo mediremos",
+            "blockIds": [
+              "plan"
+            ]
+          },
+          {
+            "id": "cap-equipo",
+            "title": "Quién gira a tu alrededor",
+            "blockIds": [
+              "equipo"
+            ]
+          }
+        ]
+      },
+      "coverage": {
+        "schemaVersion": "rooms.coverage.v1",
+        "revision": 2,
+        "manifestHash": "sha256:fixture-2",
+        "valid": true,
+        "publicable": true,
+        "items": [],
+        "issues": [],
+        "counts": {
+          "total": 0,
+          "included": 0,
+          "pending": 0,
+          "excluded": 0,
+          "unsupported": 0
+        }
+      }
+    }
+  }
+}

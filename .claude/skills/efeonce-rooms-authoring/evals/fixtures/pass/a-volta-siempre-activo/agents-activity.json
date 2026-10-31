@@ -1,0 +1,63 @@
+{
+  "data": {
+    "items": [
+      {
+        "id": "act-9",
+        "occurredAt": "2026-10-30T14:09:00.000Z",
+        "operation": "editions.publish",
+        "scope": "efeonce.mcp.rooms.release",
+        "roomId": "sala-volta-2027",
+        "personId": "pr-julio",
+        "agentClientId": "claude-code",
+        "channel": "cli",
+        "summary": "editions.publish",
+        "noticeId": "notice-9",
+        "acknowledgedAt": null,
+        "reversal": null
+      },
+      {
+        "id": "act-10",
+        "occurredAt": "2026-10-30T14:10:00.000Z",
+        "operation": "invitations.create",
+        "scope": "efeonce.mcp.rooms.release",
+        "roomId": "sala-volta-2027",
+        "personId": "pr-julio",
+        "agentClientId": "claude-code",
+        "channel": "cli",
+        "summary": "invitations.create",
+        "noticeId": "notice-10",
+        "acknowledgedAt": null,
+        "reversal": null
+      },
+      {
+        "id": "act-11",
+        "occurredAt": "2026-10-30T14:11:00.000Z",
+        "operation": "invitations.create",
+        "scope": "efeonce.mcp.rooms.release",
+        "roomId": "sala-volta-2027",
+        "personId": "pr-julio",
+        "agentClientId": "claude-code",
+        "channel": "cli",
+        "summary": "invitations.create",
+        "noticeId": "notice-11",
+        "acknowledgedAt": null,
+        "reversal": null
+      },
+      {
+        "id": "act-12",
+        "occurredAt": "2026-10-30T14:12:00.000Z",
+        "operation": "invitations.create",
+        "scope": "efeonce.mcp.rooms.release",
+        "roomId": "sala-volta-2027",
+        "personId": "pr-julio",
+        "agentClientId": "claude-code",
+        "channel": "cli",
+        "summary": "invitations.create",
+        "noticeId": "notice-12",
+        "acknowledgedAt": null,
+        "reversal": null
+      }
+    ],
+    "nextCursor": null
+  }
+}
