@@ -219,3 +219,12 @@ por búsqueda efectiva; atributos guardados o sede global de la Company no prueb
 - [Guía oficial de HubSpot Agent CLI](https://developers.hubspot.com/docs/developer-tooling/local-development/agent-cli/guide) — beta, instalación, OAuth/service key, comandos y permisos; contrastar con `--help` de la versión instalada.
 - [Changelog oficial de la beta](https://developers.hubspot.com/changelog/hubspot-agent-cli-available-in-public-beta).
 - Método de servicio: [`hubspot-as-a-service`](../../.codex/skills/hubspot-as-a-service/SKILL.md) y [canon técnico](../architecture/kortex/hubspot-as-a-service/README.md).
+
+### Readback de asociaciones — Mambrino, 31/10/2026
+
+[Resultado](../commercial/prospecting-agent/runs/2026-10-31-mambrino-dayanna.md): el create preservó una
+asociación con la Company solicitada, pero la automatización creó otra por dominio laboral y la hizo
+Primary. Se corrigió por UI autenticada y se releyó por CLI; no se cambió de credencial ni se eliminó la
+secundaria. `segments members-list` devolvió 403 con OAuth y search con filtros de listas devolvió 400:
+no asumir que la sintaxis/ruta observada en otro conector funciona en ésta. Atributos y Primary verificados;
+membresía pendiente. Repetir un pedido de alta exige dedupe/readback, no repetir create.

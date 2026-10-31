@@ -1,5 +1,9 @@
 # changelog.md
 
+**2026-10-31 · Prospección:** [cierre Wequips/Mambrino](docs/audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md):
+registro de rebote frente a email verificado, consentimiento de Apollo por persona y conciliación de Primary
+tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal; sin cambio de runtime.
+
 [Historial interno](docs/changelog/internal/README.md).
 
 ## 2026-10-30 — Licitaciones: Mattis GRD-1555 enviada y lecciones de carga en Wherex

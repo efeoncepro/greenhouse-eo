@@ -388,3 +388,22 @@ aplica los gates existentes sin ampliar su permiso general:
    ese mismo borrador y corregir por la UI; releer antes de enviar y luego verificar Enviados/CRM por separado.
 5. Registrar un NDR de casilla inexistente y cerrar esa dirección, sin repetir el envío, fusionar registros
    automáticos o detener colegas por inferencia. Comprobar el DM por su hilo y no repetirlo al corregir email.
+
+## Continuar con otra persona y cerrar los canales
+
+1. Reusar el propósito autorizado, investigar la nueva señal y elegir oferta/material pertinentes. No
+   trasladar una migración obsequiada a otra cuenta ni afirmar experiencia sectorial no acreditada.
+2. Mantener el consentimiento de créditos por persona/operación. Recibida la autorización pendiente,
+   continuar sin otra confirmación del mismo alcance; recuperar el resultado asíncrono del mismo request.
+3. Dedupe y alta sólo con email elegible. Releer Primary tras automatización: dominio del correo y sitio
+   distintos pueden producir una empresa vacía. Usar la [guía de captura](../hubspot/llenar-propiedades-comerciales.md)
+   y verificar el resultado; no fusionar/eliminar como efecto silencioso.
+4. En Outlook, resolver Para/CCO como destinatarios, releer el borrador persistido con firma gráfica y
+   comprobar después el nuevo ID de Enviados y EMAIL CRM. En LinkedIn, verificar la conversación por separado.
+5. Registrar NDR si llega: el envío inicial no prevalece sobre un rebote posterior. No reintentar esa
+   dirección ni usar la ausencia de otro rebote como verificación. Actualizar dossier y notas de canal.
+6. Ante «créala también» después de un alta, releer la ficha existente y compartir su enlace; no duplicar.
+
+Casos: [Wequips, rebote de candidata inferida](../../commercial/prospecting-agent/runs/2026-10-30-wequips-mayra.md)
+y [Mambrino, email verificado y dos canales](../../commercial/prospecting-agent/runs/2026-10-31-mambrino-dayanna.md).
+Son aplicaciones de permisos vigentes, no autorización de secuencias, nuevos destinatarios o seguimiento.

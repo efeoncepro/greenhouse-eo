@@ -1,5 +1,10 @@
 # Commercial
 
+**Cierre focal 30–31/10:** [Wequips / Mayra](prospecting-agent/runs/2026-10-30-wequips-mayra.md), correo
+inferido rebotado sin reintento; [Mambrino / Dayanna](prospecting-agent/runs/2026-10-31-mambrino-dayanna.md),
+Apollo verificado, Contact/Primary y correo SENT comprobados. [Docs y skills](../audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md).
+Sin nueva secuencia; membresía de segmentos y Company secundaria de Mambrino pendientes.
+
 **Cobertura pendiente:** [diagnóstico Perú](sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) separa persistencia, pertinencia y cobertura. Las 44 búsquedas siguen guardadas; las variantes CRM 58/81/106/868 no son censo ni compradores calificados. Revisar controles y exclusiones antes de recomendar sustituciones.
 
 **Sales Navigator multimercado:** [44 búsquedas guardadas](sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md) para Chile, México, Colombia y Perú; criterios, muestras y límites documentados. Las listas financieras 54/57 conservan su corte.

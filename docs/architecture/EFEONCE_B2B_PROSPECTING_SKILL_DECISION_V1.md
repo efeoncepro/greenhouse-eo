@@ -406,3 +406,11 @@ seguimiento global pausado. Configuración/readback distintos de ejecución y fu
 La skill no crea automatizaciones por defecto. Sin correo nuevo, Deal/Lead, stage, gastos o propuesta
 aprobada por esta documentación. Reabrir si cambian fuentes, permisos, calidad de extracción o
 evidencia de decisión. [Cierre y verificación](../audits/commercial/2026-10-26-armor-discovery-case-docs-skills.md).
+
+## Evidencia del adapter — 31/10/2026
+
+[Conciliación Wequips/Mambrino](../audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md): el adapter
+conserva consentimiento por persona/operación, resultado terminal de enriquecimiento y lecturas separadas
+por canal. El readback posterior a automatización detectó sustitución de Primary; su corrección UI no
+certifica membresía de segmentos ni calificación. Aplicación del contrato vigente, sin nueva autonomía,
+schema, API o scheduler; no constituye un ADR adicional ni habilita comunicaciones futuras.

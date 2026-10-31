@@ -1,5 +1,10 @@
 # Handoff
 
+**31/10 — Prospección focal:** [Wequips/Mambrino](docs/audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md).
+Mayra: NDR de correo inferido, sin reintento. Dayanna: Apollo Verified/2 créditos, Contact/Primary y email SENT
+comprobados; LinkedIn previo. Pendientes Commercial: respuesta/brief, secundaria vacía y verificación de
+segmentos Mambrino. Skills espejo y canon actualizados; sin nueva comunicación o secuencia en este cierre.
+
 ## 2026-10-30 — Mattis GRD-1555: oferta enviada en Wherex
 
 [Expediente](docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md): enviada 30/10 17:11 por

@@ -250,3 +250,12 @@ verificado y alta/envío expresamente autorizados. No convierte la excepción en
 de Yuri en demanda propia de Guillermo/Judith. El dato personal adicional no solicitado de un proveedor
 queda fuera de CRM y del envío. Borrador visible, contenido persistido, Enviados, logging y DM se concilian
 por separado; el NDR cierra sólo la dirección afectada. No hay cadencia futura autorizada por este cierre.
+
+## Resultado por persona y canal
+
+[Wequips y Mambrino](../../audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md) muestran dos
+resultados que el estado comercial debe conservar separados: envío a una candidata inferida seguido de
+rebote, y envío a un correo verificado por proveedor. Contact creado, Primary, segmentos, correo enviado,
+recepción y respuesta son hechos distintos. Un pedido repetido de alta se satisface verificando la misma
+ficha; no crea una segunda persona. La autorización de enriquecimiento no se hereda entre prospectos.
+La secundaria vacía y la membresía no comprobada de Mambrino permanecen como pendientes explícitos.

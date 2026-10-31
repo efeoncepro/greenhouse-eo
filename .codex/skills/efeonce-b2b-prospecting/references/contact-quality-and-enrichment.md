@@ -145,3 +145,18 @@ historia. Aceptación de conexión, email enviado y DM son estados separados; co
 [Aplicación Mass Chile — 26/10/2026](../../../../docs/commercial/prospecting-agent/runs/2026-10-26-mass-chile.md):
 excepción personal de Yuri, corporativo inferido rebotado y adyacentes con correo laboral verificado,
 permisos posteriores de alta/envío, sin heredar intención ni ampliar el gasto.
+
+## Continuidad entre personas y resultado adverso — 31/10/2026
+
+«Vamos con ella» conserva el propósito del acercamiento, pero obliga a reconstruir contexto, oferta y
+prueba para la nueva persona. La confirmación de créditos de una persona no autoriza el waterfall de la
+siguiente. Si el provider exige una confirmación específica, pedirla una vez; al recibirla, ejecutar la
+consulta acotada sin volver a pedir permiso. La búsqueda pública o LinkedIn pueden avanzar mientras espera.
+
+[Mambrino / Dayanna](../../../../docs/commercial/prospecting-agent/runs/2026-10-31-mambrino-dayanna.md)
+contrasta una identidad/empleo coherentes y email `Verified`, con duplicados de la misma dirección
+conservados como evidencia, no como dos contactos. Los dos créditos pertenecen a ese resultado, no a una
+tarifa universal. [Wequips / Mayra](../../../../docs/commercial/prospecting-agent/runs/2026-10-30-wequips-mayra.md)
+finalizó sin email en waterfall; el envío autorizado después a una candidata inferida rebotó. Un NDR
+posterior cambia el estado operativo: registrar rebote, detener esa ruta y conservar historia; la excepción
+previa no autoriza reintentos, variantes, nuevas validaciones pagadas ni levantar supresiones.

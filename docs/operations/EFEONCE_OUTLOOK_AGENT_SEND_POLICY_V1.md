@@ -228,3 +228,12 @@ La decisión inicial de exigir sólo HTML quedó sustituida el mismo 2026-10-08 
 Revisar esta decisión si cambia el remitente, la firma aprobada, la dirección de registro de HubSpot o el soporte HTML del conector. La documentación no demuestra instalación, automatización técnica ni recepción de un nuevo correo.
 
 Evidencia del cierre documental: [cobertura, controles y límites](../audits/commercial/2026-10-08-outlook-signature-bcc.md).
+
+### Contraste de envío y rebote — 30–31/10/2026
+
+[Wequips](../commercial/prospecting-agent/runs/2026-10-30-wequips-mayra.md): el NDR posterior al envío
+individual inferido prevalece para esa dirección; no reintentar ni tratar el Contact creado por CCO como
+validación. [Mambrino](../commercial/prospecting-agent/runs/2026-10-31-mambrino-dayanna.md): «Comprobar nombres»
+resolvió Para/CCO en el editor; la lectura independiente del borrador confirmó destinatarios, cuerpo,
+links y firma antes de enviar. La copia nueva de Enviados y EMAIL SENT se comprobaron después. Un timeout
+al abrir un deep link requiere recuperar el estado actual, no crear ni enviar otro mensaje.

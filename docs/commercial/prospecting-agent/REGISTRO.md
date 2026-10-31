@@ -1,5 +1,11 @@
 # Registro de búsquedas comerciales
 
+**Delta focal 31/10 · Wequips/Mambrino:** [Mayra](runs/2026-10-30-wequips-mayra.md) conserva envío al buzón
+publicado e InMail, waterfall sin email/0 créditos y NDR del envío individual inferido, sin reintento.
+[Dayanna](runs/2026-10-31-mambrino-dayanna.md): waterfall autorizado/2 créditos, email Verified, Contact
+259368373373, Primary Mambrino 60401677206 y EMAIL 120040210331 SENT comprobados; InMail previo y nota
+actualizada. Secundaria vacía y membresía de segmentos sin cerrar. No renueva el radar ni programa seguimiento.
+
 **Delta focal26/10 · Mass Chile:** [Yuri, Guillermo y Judith](runs/2026-10-26-mass-chile.md):
 excepción personal de Yuri y DM enviados; corporativo inferido rebotado, no reintentar. Guillermo/Judith
 con alta autorizada y dos correos personalizados; firma gráfica, CCO, brochures nativos, Enviados y
