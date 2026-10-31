@@ -4,6 +4,27 @@
 Este registro conserva el último readback de flags del 26-10. Los trabajos
 locales posteriores no autorizan inferir un cambio del valor vivo.
 
+## Rooms / Auth — activación 31Oct2026 (vigente)
+
+Autorizada por el operador («Prende todo» → «Todo»). Recibo: [activación](../audits/rooms/2026-10-31-production-activation.md).
+Esta tabla supera a la del 26-10 para los flags que lista.
+
+| Flag | Runtime | Valor releído 31Oct | Límite |
+| --- | --- | --- | --- |
+| `ROOMS_FIRST_PARTY_AUTH_ENABLED` | Vercel Rooms Production (`dpl_GiGEoYaPSsUf8V7uZZyTbxtfZM8A`) | `true` | Uso del equipo; clientes reales requieren otra autorización |
+| `ROOMS_INVITATIONS_ENABLED` | Vercel Rooms Production | `true` | Solo sale correo cuando alguien crea una invitación |
+| `ROOMS_MEDIA_ENABLED` | Vercel Rooms Production | `true` (creado) | El Job media-worker ya estaba en `true` |
+| `ROOMS_LIVE_ENABLED` | Vercel Rooms Production | `true` (creado) | Streams y pool sin medir en Vercel |
+| `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` | Vercel Rooms Production | `false` | Permiso de desarrollo; nunca en producción |
+| `AUTH_SERVER_FIRST_PARTY_ENABLED` | auth-server `00169-4pq` (100 %) | `true` | **Solo en vivo**: `deploy.sh` lo vuelve a `false` en el próximo deploy |
+| `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` | auth-server `00169-4pq` | `true`, con HMAC y token de autoridad montados | Igual que la fila anterior |
+| email type `auth_server_rooms_invitation_otp` | Greenhouse PG `email_type_config` | `enabled=true` | Kill-switch por tipo |
+
+### Pendientes de acción
+
+- Declarar en el deploy de auth-server (o en sus inputs gobernados) los flags first-party y OTP en `true`, con sus dos
+  secretos, antes del próximo release de Greenhouse que despliegue auth-server. Si no, ese release los apaga.
+
 ## Rooms / Auth — estado releído26Oct2026
 
 Lectura sin mutaciones a17:38:40Chile: [metadata y PRs](../audits/rooms/2026-10-26-docs-skills-state-readback.json).

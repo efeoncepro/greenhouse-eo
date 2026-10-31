@@ -5,6 +5,30 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — PR #4 en producción y activación completa (Rooms + Efeonce ID)
+
+- Autorizaciones: «Sí, mergea»; después «Prende todo» y, tras explicar qué implica liberar Efeonce ID, «Todo».
+  Recibo [`2026-10-31-production-activation.md`](../../../../docs/audits/rooms/2026-10-31-production-activation.md).
+- `vivo`:
+  - `main@6f99a6f` → `dpl_3ZjW…`; después redeploy con flags, `dpl_GiGEoYaPSsUf8V7uZZyTbxtfZM8A`.
+  - Trampa: `efeonce-rooms.vercel.app` es un **alias manual** y no sigue a producción. Después de cada deploy hay que
+    hacer `vercel alias set <deploy> efeonce-rooms.vercel.app`.
+- `vivo`:
+  - Rooms Production: `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`, `ROOMS_MEDIA_ENABLED` y
+    `ROOMS_LIVE_ENABLED` en `true`; `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` en `false`.
+  - Efeonce ID `auth-server-00169-4pq` al 100 %, con first-party y OTP en `true` y secretos HMAC y de autoridad
+    montados.
+  - Trampa: el tráfico está fijado por revisión; `update-traffic` es explícito.
+  - Email type `auth_server_rooms_invitation_otp` en `enabled=true`.
+- `vivo`: el recorrido HTTP sin sesión llega hasta `auth.efeonce.org/login` con `first_party_request`. Faltan:
+  - el login humano con Microsoft y MFA;
+  - una invitación con correo real;
+  - medir la sala en vivo en Vercel.
+- Respaldo lógico de la migración borrado después de verificar el deploy.
+- Riesgo abierto: el `deploy.sh` de auth-server apaga los dos flags en el próximo deploy. Antes del próximo release
+  de Greenhouse que despliegue auth-server, hay que declararlos. TASK-1833 sigue abierta: ningún cliente real sin
+  una autorización nueva.
+
 ## 2026-10-31 — Migraciones 9–18 aplicadas en `rooms_production` (sin merge)
 
 - Autorización del operador: «Sí, aplica». Recibo
