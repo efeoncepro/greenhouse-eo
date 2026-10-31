@@ -518,7 +518,14 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   (`AXIS_PARTNER_ASSETS_EXCLUDED`) and is used only by explicit local path. Surfaces expose these marks only as
   **optional** slots (`partnerMark`, rule `partner-claim-readback`; product icons only where the product is named),
   never fixed in a template; the Lab lists them (section «Marcas de terceros», `/references/surfaces/partner-assets.json`,
-  metadata only). A new partner (e.g. HubSpot, TASK-1943) follows the same shape. Detail: Greenhouse skill
+  metadata only). A new partner (e.g. HubSpot, TASK-1943) follows the same shape. **Badge variant = contrast with
+  the surface, not availability in AXIS** (operator, 2026-10-31): variants are named after their own plate, so a light
+  surface takes the dark plate and a dark surface the light one; an orange/accent surface never takes the orange one.
+  AXIS publishes only the cream HubSpot badge (`hubspot-solutions-partner-gold-light`): fine on navy or dark
+  photography, wrong on paper `#f7f8f6` (it dissolves). For light surfaces use the dark plate from Greenhouse
+  `public/branding/partners/hubspot/solution-partner/` via `getHubSpotSolutionPartnerBadgeForSurface(surface)`
+  (`src/lib/brand-assets/hubspot-solution-partner.ts`; table in that folder's `README.md`). Same rule for any partner
+  badge with variants. Detail: Greenhouse skill
   `efeonce-graphic-line` → `references/package-and-tokens.md` §6 and `references/criteria.md`.
 - **Deck Salesforce releases (2026-09-29):** `v0.3.31` (twelve recipes, delta (o), `AXIS_PARTNER_ASSETS`), `v0.3.32`
   (four recipes, `LayoutToken.reservesByLine` — a line-specific column reserve applied by `withLayout` only when the

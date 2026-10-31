@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.12 — 2026-10-24 (Claude, aviso de reservas de eventos: lanzador y backlog de RESEARCH-013)
+> **Version:** 1.13 — 2026-10-31 (Claude, píldora que nace abierta con `inline-initial-state="open"`, cómo ver la versión servida del renderer y valores reales para maquetas)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -387,6 +387,44 @@ Piel completa de referencia: `efeonce-public-site-runtime` →
 
 **Envío real:** el captcha (Turnstile) rechaza navegadores automatizados, así que la prueba de envío la hace una persona.
 No intentes eludirlo. Al 2026-10-24 el primer envío real de la suscripción a Glitch está pendiente.
+
+### Píldora que nace abierta (`inline-initial-state="open"`, renderer 1.4.0)
+
+Para un anfitrión que quiere el campo de correo a la vista desde el inicio, sin el botón que se estira (caso fuente: la
+columna de Glitch del pie de página de efeoncepro.com, 2026-10-31).
+
+**Antes de empezar: revisa qué versión del renderer sirve producción.** El atributo existe desde el renderer `1.4.0`,
+que al 2026-10-31 está en `develop` y **no** en producción: producción sirve la `1.2.0` (la `1.3.0`, logo en el rótulo,
+tampoco salió). Un renderer anterior ignora el atributo y muestra el botón de siempre, así que ponerlo antes no rompe
+nada, pero tampoco cambia lo que ve la persona hasta el próximo release de producción de Greenhouse (ver
+[Cuándo llega a los sitios un cambio del renderer](#cuándo-llega-a-los-sitios-un-cambio-del-renderer)). Para saber qué
+versión sirve una página, abre la página publicada y corre en la consola del navegador:
+
+```js
+customElements.get('greenhouse-form').version
+```
+
+1. **Agregar el atributo** al elemento y dejar el resto como en cualquier píldora (los atributos que ya use tu anfitrión
+   y el `<a class="ghf-fallback">` hijo de la receta de arriba):
+   `<greenhouse-form form-key="<form_key>" surface="<surface>" locale="es-CL" inline-initial-state="open">`. Sólo el valor `open` cambia algo; cualquier otro
+   valor, o ninguno, deja la píldora en reposo como siempre.
+2. **Qué hace:** monta la píldora en el estado abierto (campo, botón de envío y aviso visibles y alcanzables con el
+   teclado) **sin mover el foco ni hacer scroll**, así que la página no salta al formulario al cargar. Esc no la pliega.
+   El envío, la validación, el consentimiento por el acto (huella del aviso) y la telemetría son los mismos.
+3. **Ancho:** en un contenedor de menos de 480 px la píldora abierta ocupa todo el ancho (consulta de contenedor del
+   renderer, no un estilo del anfitrión).
+4. **Verificar** con el renderer `1.4.0` (en producción, después del release; antes, con la previsualización por
+   intercepción y `pnpm renderer:build`): al cargar, el campo está a la vista, el foco sigue donde estaba y la página no
+   se movió.
+
+**Maquetas con los valores reales.** El anfitrión sólo puede tematizar la píldora con las variables `--ghf-inline-*`
+(tono, alto, superficies, alineación, etc.). La letra del campo (16 px), la del botón de envío (14 px, peso 600) y el
+texto de ejemplo del campo los fija el renderer o la versión publicada del formulario, no la página. Una maqueta o
+canvas del anfitrión debe usar esos valores reales: en el pie de página, «Tu correo electrónico» a 16 px no cabía en la
+columna de 290 px y hubo que publicar una versión nueva del formulario con «Tu correo» (no se achicó la letra: con menos
+de 16 px el iPhone hace zoom al tocar el campo). Si el texto de ejemplo no cabe, se cambia en el formulario
+([Revisar el copy de un formulario publicado](./operar-motor-formularios.md#revisar-el-copy-de-un-formulario-publicado)),
+nunca desde la página.
 
 ## Que significan los estados (lo que vera el visitante)
 

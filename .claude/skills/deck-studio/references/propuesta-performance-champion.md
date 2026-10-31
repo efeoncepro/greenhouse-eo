@@ -81,7 +81,9 @@ Antes de enviar, recorre el deck como lo leería la gerencia sin la champion al 
   - Salesforce como **Partner**, con el badge autorizado.
   - Microsoft como **AI Cloud Partner Program**.
   - Redes de Claude y OpenAI **sólo en texto**, sin logo ni lockup.
-  - El SVG del badge de HubSpot usa clases CSS internas y se renderiza negro en el canvas: usar el PNG.
+  - El SVG del badge de HubSpot usa clases CSS internas y se renderiza negro en el canvas: usar el PNG. La variante
+    se elige por contraste con la lámina (clara → placa `dark`, oscura → placa `light`), no la crema por defecto:
+    `public/branding/partners/hubspot/solution-partner/README.md`.
 
 ## 6. Casos
 
@@ -136,6 +138,6 @@ Antes de enviar, recorre el deck como lo leería la gerencia sin la champion al 
 - [ ] Sin contradicciones (quién diseña, equipo vs roles del fee); sin jerga.
 - [ ] Resultados como escenarios junto a la línea base actual, no como rango.
 - [ ] Ruta corta regenerada en la misma corrida que el deck completo.
-- [ ] Partners sólo según el registro; badge HubSpot en PNG.
+- [ ] Partners sólo según el registro; badge HubSpot en PNG y en la variante que contrasta con la lámina.
 - [ ] Roles del equipo y cifra de clientes señalados al operador.
 - [ ] Correo con inversión desglosada sin total y sin pedir RUC; archivos nombrados por lo que son.

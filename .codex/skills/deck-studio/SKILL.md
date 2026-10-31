@@ -658,6 +658,12 @@ y la composición sale del id (el `layout` del ejemplo de la lámina es el corre
 - **Logos de clientes y partners** sólo de quienes autorizan su uso; el compositor los normaliza (un tono, mismo peso
   óptico). Las decisiones de norma que ya hornean las plantillas (acento, 3×, sin logo ni velo en láminas con foto)
   están en la skill `efeonce-graphic-line`.
+- **Insignia de partner con variantes** (HubSpot Gold `dark`/`light`/`orange`, que se llaman por su propia placa): se
+  elige la que **contrasta** con la superficie de la lámina, no la más clara ni la única que publica AXIS. Clara
+  (blanco, papel `#f7f8f6`, crema) → `dark`; oscura (navy, fotografía oscura) → `light`; `orange` sólo como acento y
+  nunca sobre naranja. La crema de AXIS (`hubspot-solutions-partner-gold-light`) se disuelve sobre papel (operador,
+  2026-10-31). Resolver `getHubSpotSolutionPartnerBadgeForSurface(surface)`; tabla en
+  `public/branding/partners/hubspot/solution-partner/README.md`.
 
 **Qué portada con qué contraportada** (regla foto ↔ sin foto; el contrato la valida con
 `frame-photo-must-alternate`):

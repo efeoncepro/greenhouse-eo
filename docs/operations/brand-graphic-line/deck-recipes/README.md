@@ -306,6 +306,11 @@ del deck Salesforce se reutilizan con datos e íconos oficiales de HubSpot (`hub
   `growth` (el contrato `line-piece-keeps-efeonce-dark` no admite una pieza de línea clara).
 - **Insignia Gold = claim** con readback `hubspot-partner-readback-2026-10-06`; el sprocket 3D de HubSpot es de uso
   interno (canvas, no PDF); sin mascotas de HubSpot.
+- **Variante de la insignia por contraste con la superficie** (operador 2026-10-31): clara → placa `dark`, oscura →
+  placa `light`, `orange` sólo como acento y nunca sobre naranja. La crema de AXIS
+  (`hubspot-solutions-partner-gold-light`) no va sobre papel. Tabla en
+  `public/branding/partners/hubspot/solution-partner/README.md`; resolver
+  `getHubSpotSolutionPartnerBadgeForSurface(surface)`.
 
 Los planes del brochure y de la propuesta validan con `pnpm brand:deck-plan -- --plan` sin errores ni avisos
 (secuencia, parejas, documento y plates; verificado el 2026-10-06 con planes armados desde los intents, sin slots; no

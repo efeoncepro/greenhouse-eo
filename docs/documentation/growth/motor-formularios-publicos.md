@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.5
+> **Version:** 2.6
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-10-24 por Claude (cómo funcionan hoy las reservas de eventos y qué va a cambiar, RESEARCH-013)
+> **Ultima actualizacion:** 2026-10-31 por Claude (píldora que nace abierta y texto de ejemplo «Tu correo» en la suscripción a Glitch)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -263,6 +263,22 @@ una huella del aviso que la persona vio, y HubSpot sólo recibe la suscripción 
 Glitch y al pie. Si la portada no tiene un formulario real conectado, no muestra la suscripción (nunca un «¡Listo!» falso).
 Una suscripción real hecha por una persona ya quedó suscrita en HubSpot (el captcha bloquea al navegador automatizado,
 como debe). No hay un evento real cargado para la reserva.
+
+**Píldora que nace abierta (renderer 1.4.0, 2026-10-31).** Un sitio puede pedir que la píldora aparezca ya abierta, con
+el campo de correo, el botón de envío y el aviso a la vista, en vez del botón que se estira. Sirve para lugares como el
+pie de página, donde no hay espacio para la animación de apertura. Al cargar la página no mueve el foco ni hace saltar la
+pantalla al formulario, y la tecla Esc no la cierra (no tendría sentido convertirla en un botón que la persona nunca
+vio). Enviar, validar el correo, el consentimiento por el acto de suscribirse y las mediciones funcionan igual que en la
+píldora que se abre. Si el sitio no lo pide, nada cambia. El primer uso es la columna de Glitch del pie de página de
+efeoncepro.com. **Todavía no está en producción:** la versión 1.4.0 está en `develop`; producción sirve la 1.2.0, que
+ignora el pedido y muestra el botón de siempre (sin romper nada). Tampoco está en producción la 1.3.0 (logo en el rótulo).
+
+**Texto de ejemplo de Glitch: «Tu correo» (2026-10-31).** El campo de correo de la suscripción a Glitch dice ahora «Tu
+correo» en vez de «Tu correo electrónico», porque el texto largo se cortaba en la columna de 290 px del pie de página. El
+tamaño de letra del campo se mantiene en 16 px a propósito: con menos, el iPhone hace zoom al tocar el campo. Se publicó
+como una versión nueva del formulario (la anterior quedó retirada) y se conservó todo lo demás: textos, aviso (por eso la
+huella del consentimiento no cambia), seguridad y el destino HubSpot. Como es el mismo formulario, también cambió en la
+portada del blog: las siete píldoras de Glitch muestran «Tu correo».
 
 **Reservas de eventos: cómo funcionan hoy y qué va a cambiar.** Todavía no se lanzan eventos reales.
 

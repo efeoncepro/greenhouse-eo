@@ -449,6 +449,17 @@ each governed by a capability + tenant auth + audit).
   `sanitizeRenderCopy` (per-entry browser-safe gate: keeps bounded string→string, drops nested/
   non-string/over-length). Field labels/placeholders come from the published `field_schema` — not the
   host. If host-visible copy must change, change the contract, not the embed.
+- **Copy revision of a published form WITH a destination (2026-10-31):** destinations are **per version** — a cloned
+  version is born without one. Before review/publish, copy the previous row with `addDestination` (same `provider`,
+  `adapter_kind`, `adapter_version`, `endpoint_status`, `delivery_mode`, `mapping_json`, `consent_requirements_json`,
+  `retry_policy_json`) and assert the mapping is identical; publishing without it silently stops delivery. Keep the
+  notice untouched and the consent notice hash does not change. Recipe: `scripts/growth/revise-glitch-pill-placeholder.ts`
+  (dry-run compiles in memory with the destination; `--apply` author → copy destination → review → re-check drift →
+  publish → readback contract → deprecate previous); the no-destination pattern is
+  `scripts/growth/revise-content-marketing-form-copy.ts`. Scripts importing `@/lib/growth/forms/*` run with
+  `pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs …`. In auto mode the permission classifier blocks the
+  `--apply` until the operator explicitly allows that command — ask up front. Runbook:
+  `docs/manual-de-uso/growth/operar-motor-formularios.md` §Revisar el copy de un formulario publicado.
 - Capabilities: `growth.forms.author`, `.review`, `.publish`, `.read`, `.submissions.read`,
   `.destinations.manage`, `.surfaces.manage`, `.retry_delivery`, `.lead_pii.reveal`. Any new capability
   ⇒ grant to ≥1 real role in the same PR (coverage test).
@@ -646,6 +657,20 @@ Visual gate: `node scripts/growth/forms/fixtures/inline-pill.scenario.mjs` (canv
 standard forms 0 px against a baseline rev). Lesson: measure the canvas's COMPUTED styles — its `button{font:inherit}`
 reset beats `.ab`, so the approved open button renders 16 px/400, not the declared 15/600. Full table:
 `docs/architecture/growth-public-forms-runtime-contract.md` §Formulario en línea.
+
+**Host attribute `inline-initial-state="open"` (renderer `1.4.0`, commit `c2cce26e0`, on `develop` since 2026-10-31 —
+NOT in production).** Opt-in on `<greenhouse-form>` for `inline_pill`: the pill mounts in `open` (field, send and notice
+visible and focusable) without `openInline()`, so it never moves focus or scrolls, and Esc does not collapse it. Any
+other value or none = `idle`. Submit, validation, consent by submission (notice hash) and telemetry are identical. First
+consumer: the efeoncepro.com footer (Glitch column). **Rollout:** production serves `1.2.0` (checked with
+`customElements.get('greenhouse-form').version` on efeoncepro.com) and ignores the attribute (usual button, safe); `1.3.0`
+(`inline-label-logo`) is not in production either. Both ship with the next Greenhouse production release, which the
+operator deferred on 2026-10-31. Detail: `references/INLINE_PILL_HOST_AND_CONSENT.md` §Nacer abierta.
+**Mocks use the real values:** a host themes the pill only through `--ghf-inline-*`; field font (16 px — kept on purpose,
+under 16 px iOS zooms on focus), send button (14 px/600) and the placeholder text are fixed by the renderer or the
+published version. Under a 480 px container the pill goes full width (container query). Case: «Tu correo electrónico»
+did not fit the 290 px footer column, so Glitch got a new version with «Tu correo»
+(`fver-d0ecefaa-9bf5-429a-8eb3-2abd3826b67e`, 2026-10-31) — a copy revision, never a smaller font or a host override.
 
 **Events and webinars end to end (2026-10-24, release `e593e3993bc3`, flag `GROWTH_EVENT_EMAILS_ENABLED` ON in the
 `ops-worker`). STATE: do NOT launch real events yet.** Reservations work and reach HubSpot (proven with test form

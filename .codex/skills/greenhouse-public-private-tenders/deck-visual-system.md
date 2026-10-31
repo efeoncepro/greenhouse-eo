@@ -589,7 +589,10 @@ plantilla real.**
   referencia relativo — lo audita `catalog-portability.test.ts`.
 - **NUNCA** una credencial de partner (HubSpot Solutions Partner y las que vengan) como asset libre:
   va por clave cerrada (`partner-badge-asset`), igual que un logo de cliente. Presentar una
-  acreditación que no se tiene es tergiversación ante un comité.
+  acreditación que no se tiene es tergiversación ante un comité. La variante va por **contraste con
+  la superficie** (hoy la clave sirve la naranja, sobre la contraportada navy): sobre fondo claro va
+  la placa `dark`, nunca la crema, que se disuelve en papel (operador, 2026-10-31; tabla en
+  `public/branding/partners/hubspot/solution-partner/README.md`).
 - **NUNCA** registrar una plantilla nueva para "la misma lámina con un elemento más": un slot
   **opcional** ya da las dos versiones, porque el renderer borra el nodo cuando el plan no lo declara.
   Duplicar la plantilla garantiza drift entre las dos.

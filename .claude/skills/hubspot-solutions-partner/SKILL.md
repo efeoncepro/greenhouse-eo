@@ -212,6 +212,18 @@ retainer de Managed CRM Ops.
     Esta skill aporta el **dominio**, no el **método**.
 15. **NUNCA** escribas en el portal productivo (48713323) sin el loop **propose → confirmación humana → execute**.
 
+**Marca de partner**
+16. **NUNCA** elijas la variante de la insignia Solutions Partner Gold por su nombre ni por ser la más clara. Las tres
+    variantes oficiales (`dark`, `light`, `orange`, en `public/branding/partners/hubspot/solution-partner/`) se llaman
+    por el color de **su propia placa**, no por el fondo: se elige la que **contrasta** con la superficie. Clara
+    (blanco, papel `#f7f8f6`, crema) → `dark` (u `orange` si la pieza pide acento); oscura (navy `#001a33`,
+    fotografía oscura) → `light` (u `orange`); naranja o acento cálido → nunca `orange`. La placa crema sobre papel
+    se disuelve (corrección del operador, 2026-10-31, landing de Contacto). Resuelve con
+    `getHubSpotSolutionPartnerBadgeForSurface(surface)` (`src/lib/brand-assets/hubspot-solution-partner.ts`) y la
+    tabla del `README.md` de esa carpeta. `@efeoncepro/axis-brand-assets` publica **sólo** la crema
+    (`hubspot-solutions-partner-gold-light`): sirve en superficies oscuras, **no** es el default para papel por ser la
+    única de AXIS. El mismo criterio aplica a cualquier insignia de partner con variantes.
+
 ---
 
 ## 3. Protocolo de evidencia

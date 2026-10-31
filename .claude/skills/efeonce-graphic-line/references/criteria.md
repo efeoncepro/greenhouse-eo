@@ -359,6 +359,15 @@ condiciones que no se negocian:
   operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`) y el deck Salesforce la lleva **por defecto**; la
   autorización no se extiende a otro programa, que sin la suya falla cerrado. Nunca fija en una plantilla, nunca el
   badge de otra categoría (Consulting Partner ≠ Cloud Reseller; los Navigator son credenciales).
+- **La variante de la insignia se elige por contraste con la superficie, no por su nombre** (operador 2026-10-31,
+  landing de Contacto). Las variantes del badge HubSpot Solutions Partner Gold (`dark`, `light`, `orange`) se llaman
+  por **su propia placa**: sobre superficie clara (blanco, papel `#f7f8f6`, crema) va `dark` (u `orange` si la pieza
+  pide acento); sobre oscura (navy `#001a33`, fotografía oscura), `light` (u `orange`); sobre naranja o acento cálido,
+  nunca `orange`. La placa crema sobre papel se disuelve. Resolver:
+  `getHubSpotSolutionPartnerBadgeForSurface(surface)` y la tabla de
+  `public/branding/partners/hubspot/solution-partner/README.md`. AXIS publica sólo la crema
+  (`hubspot-solutions-partner-gold-light`): vale para superficies oscuras, no es el default para papel. Igual con
+  cualquier insignia de partner que tenga variantes.
 - **Toda marca de tercero viaja con su procedencia y su estado de autorización** (`AXIS_PARTNER_ASSETS`,
   [package-and-tokens.md](package-and-tokens.md) §6): sin la autorización de su titular no sale a cliente ni a pauta
   (Salesforce: autorizado el 2026-09-29; Anthropic, para Claude y Claudeforce: pendiente).

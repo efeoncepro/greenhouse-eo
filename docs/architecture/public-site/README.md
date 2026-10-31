@@ -47,3 +47,9 @@ Use this folder when a reusable public landing component, Elementor widget, host
   [dock de landings](../../documentation/public-site/dock-de-landings.md); operación:
   [navegación global](../../manual-de-uso/public-site/operar-navegacion-global.md) y
   [dock de landings](../../manual-de-uso/public-site/operar-dock-de-landings.md).
+- [Footer global del sitio público V1](PUBLIC_SITE_FOOTER_V1.md) — footer V3 de cinco columnas (Marca · Explora ·
+  Contacto · Glitch · Trabaja con nosotros) en producción desde el 2026-10-31: el adaptador de `block-34` es dueño del
+  cromo, mapa de bloques y sidebars, grilla por ancho, fondo AXIS `#000f1f`, conflicto con `global-fixes.css` (por qué
+  `!important`), píldora de Glitch con Growth Forms, scripts WP-CLI con guardas, respaldos y pendientes. Funcionamiento:
+  [footer global](../../documentation/public-site/footer-global-del-sitio.md); operación:
+  [operar el footer global](../../manual-de-uso/public-site/operar-footer-global.md).
