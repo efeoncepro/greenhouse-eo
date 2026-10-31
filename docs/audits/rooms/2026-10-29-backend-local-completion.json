@@ -1,0 +1,209 @@
+{
+  "status": "code_complete_local",
+  "runtime": {
+    "repository": "efeoncepro/efeonce-rooms",
+    "branch": "codex/rooms-design-integration",
+    "commit": "3c7bcb50392bea9d408adf602c6da00583b87798",
+    "productionRefLocalOnly": "e4b2e890cd0bd27823a1760e6c06f90330dadf3d",
+    "productionDeploymentRevalidated": false,
+    "pushed": false
+  },
+  "verification": {
+    "postgres": {
+      "fresh": true,
+      "major": 18,
+      "migrations": 13,
+      "tables": 43,
+      "emptyDownUp": "13 -> 8 -> 13 passed"
+    },
+    "application": {
+      "tests": 337,
+      "pass": 337,
+      "fail": 0,
+      "skipped": 0,
+      "lint": "passed",
+      "negativeLint": "passed",
+      "types": "passed",
+      "build": "passed",
+      "logSha256": "ca3a32ac8df1c41c43cb52c31241087231cd19cd4ed35aebe495fc253e72b5b1",
+      "testFileConcurrency": 1
+    },
+    "browserImage": {
+      "at": "2026-10-29T11:21:09.476Z",
+      "status": "PASS",
+      "environment": "isolated_local_fixture",
+      "checks": [
+        "operator_cannot_publish",
+        "canonical_internal_session",
+        "workspace_tenant_scope",
+        "other_organization_denied",
+        "stale_revision_conflict",
+        "same_intention_replayed",
+        "local_transfer_only",
+        "local_worker_renditions_ready",
+        "coverage_publicable",
+        "audience_preview",
+        "immutable_edition_published",
+        "published_reader",
+        "private_rendition",
+        "rendition_bytes",
+        "guest_published_image_only",
+        "guest_no_draft_workspace_other_tenant",
+        "guest_cookie_http_only",
+        "anonymous_denied"
+      ],
+      "imageBytes": 122,
+      "productionTouched": false,
+      "emailsSent": 0,
+      "newUiAccepted": false
+    },
+    "browserNewBackend": {
+      "at": "2026-10-29T11:21:36.808Z",
+      "status": "PASS",
+      "stage": "complete",
+      "environment": "isolated_local_fixture",
+      "checks": [
+        "canonical_oidc_selected_organization",
+        "new_synthetic_v4_room_only",
+        "browser_sha256_multimedia_matches_source",
+        "multimedia_transfer_same_origin",
+        "put_requires_verification",
+        "one_page_pdf_complete_ready",
+        "v4_coverage_publicable",
+        "published_v4_multimedia_projection",
+        "private_pdf_page_get",
+        "private_pdf_page_head",
+        "private_pdf_page_range",
+        "private_pdf_page_reauthorized_304",
+        "question_same_intention_replay",
+        "question_reader_single_persisted_item",
+        "stale_revision_private_conflict",
+        "stale_question_did_not_persist",
+        "presentation_audience_no_notes_controller",
+        "owner_console_own_notes_only",
+        "presentation_reader_no_hidden_mutation",
+        "same_org_operator_cannot_read_owner_notes_console",
+        "other_tenant_room_and_private_bytes_denied",
+        "anonymous_edition_and_private_bytes_denied",
+        "own_synthetic_room_archived_and_bytes_denied"
+      ],
+      "createdSyntheticRoom": true,
+      "archivedOwnRoom": true,
+      "pdfPages": 1,
+      "productionTouched": false,
+      "emailsSent": 0,
+      "newUiAccepted": false,
+      "browser": "Chrome",
+      "networkOrigins": [
+        "http://127.0.0.1:3216",
+        "http://127.0.0.1:19338"
+      ]
+    },
+    "launcherUpgrade": {
+      "status": "passed",
+      "liveModeChange": "rejected-before-mutation",
+      "restart": "images-only to explicit multimedia",
+      "roomDraftEditionSnapshotsPreserved": true,
+      "legacySyntheticGrantsReconciled": 3,
+      "productionTouched": false,
+      "emailsSent": 0
+    },
+    "recovery": {
+      "postgres16": "2026-10-29-backend-recovery-pg16.json",
+      "postgres18": "2026-10-29-backend-recovery-pg18.json",
+      "sourceDifference": "None between final PG16 and PG18 runs. Both receipts preserve HEAD8702a6f/dirty=true before final commit; every recorded source hash was compared with the clean committed candidate3c7bcb5.",
+      "physicalObjects": 23,
+      "renditionBindings": 14,
+      "guestReceipts": 12,
+      "internalizedGuests": 0,
+      "imageBindings": 4,
+      "multimediaBindings": 10,
+      "mixedV4Rooms": 2,
+      "sourceEquivalenceVerifiedAgainstCommit": "3c7bcb50392bea9d408adf602c6da00583b87798"
+    },
+    "imageWorker": {
+      "build": "passed",
+      "inputs": 44,
+      "runtimeDependencies": 8,
+      "isolatedProductionInstall": "passed",
+      "noDevPackages": true,
+      "nativeImageProfiles": 2,
+      "boundsAndShutdown": "passed",
+      "cloudCalls": 0
+    },
+    "imageCapacity": {
+      "environment": "local Darwin arm64 Node24.17.0",
+      "measuredMaxRssMiB": 241.4,
+      "correspondingInputBytes": 20971520,
+      "pixels": 40000000,
+      "durationMs": 1065,
+      "wholeCloudWorkerOrGlobalWorstCaseCertified": false
+    },
+    "mixedMedia": {
+      "sameEditionKinds": [
+        "image",
+        "pdf",
+        "audio",
+        "video"
+      ],
+      "physicalFocalTests": 4,
+      "allPassed": true,
+      "measuredAudioVideoQuestionAnchors": true,
+      "placementOrExplicitExclusionRequired": true,
+      "excludedOrphanMetadataAndByteDeliveryDenied": true,
+      "timeAnchorFocalTests": 14,
+      "timeAnchorFixturePolicy": "13 PostgreSQL and one schema test; synthetic pinned metadata matrix, plus real decoder duration composition in physical mixed tests"
+    }
+  },
+  "cleanup": {
+    "integrationStopped": true,
+    "finalQaPostgresStopped": true,
+    "qaEnvironmentFileRemoved": true,
+    "portsFree": [
+      3216,
+      19338,
+      55433,
+      60859
+    ],
+    "recoveriesDisposed": true,
+    "normalPostgres55432NeverStarted": true,
+    "normalPostgres55432StoppedReadback": true
+  },
+  "constraints": {
+    "newUiAccepted": false,
+    "realEmailsSent": 0,
+    "newProductionCanary": false,
+    "authReleaseHeld": true,
+    "productionActivated": false,
+    "multimediaCloudCertified": false,
+    "externalConnectorsEnabled": false,
+    "remoteMcpFederated": false,
+    "authServerChanged": false,
+    "roomsGuestAuthorityExtendedExplicitly": true
+  },
+  "documentation": {
+    "closedLocalTasks": [
+      2070,
+      2074,
+      2075,
+      2076,
+      2077,
+      2078
+    ],
+    "keptOpenForUiAndRollout": [
+      2071,
+      2072
+    ],
+    "epicStillInProgress": 52,
+    "taskLintBeforeAndAfterMove": "passed",
+    "epicStrict": "passed",
+    "skillMirrors": "passed",
+    "stagedClosureAdvisoriesReviewed": [
+      "project_context already routes to the Rooms dossier",
+      "existing skill registration unchanged; handoff/changelog updated"
+    ],
+    "newLocalLinkTargets": 31,
+    "newBrokenLocalTargets": 0,
+    "unchangedHistoricalIndexBrokenTargetsOrPlaceholders": 49
+  }
+}

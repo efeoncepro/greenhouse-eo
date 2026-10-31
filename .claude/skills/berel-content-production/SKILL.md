@@ -343,6 +343,20 @@ Google Discover, que el informe no captura; septiembre salió con la mitad de vi
 contenido creció. El informe imprime la caída sin explicarla: se explica en el correo de entrega y se confirma en
 Search Console → Rendimiento → Discover.
 
+## Caso público en el portafolio de Efeonce
+
+Desde el 2026-10-30 el trabajo de Berel está publicado como caso del portafolio, **«Berel, color por color»**:
+<https://efeoncepro.com/portafolio/berel-pitaya-color-del-ano-2026/> (proyecto de marketing de contenidos, línea
+Engine). Muestra tres artículos de berel.com con su primer párrafo copiado tal cual y el color que imprimen sus piezas
+(Día de Muertos 2-1810D, Temporada 2027 «Bien y de Buenas» 1-3404D, Subtonos «Ciudadela» 4-1105D), cada uno con sus
+publicaciones por canal y sus banners; la producción de septiembre de 2026 (12 artículos, 90 banners y piezas sociales,
+10 reels); cuatro campañas marcadas «Producido con IA» (las imágenes con IA; textos e intervención gráfica del equipo
+creativo); y las cifras de Search Console de agosto frente a julio de 2026, **aprobadas por el operador el
+2026-10-30**. Los hexadecimales de los colores se tomaron de las piezas para mostrarlas: no son los valores oficiales
+de Berel. 🔴 **Efeonce no publica por Berel:** entrega las piezas y otra agencia las publica; nunca escribir que
+nosotros publicamos. Para cambiar el caso, ver la skill `efeonce-public-site-wordpress` →
+`references/portfolio-operation.md`.
+
 ## Criterio de cierre
 
 Una ejecución no termina porque una API respondió `success`. Termina cuando una **segunda lectura

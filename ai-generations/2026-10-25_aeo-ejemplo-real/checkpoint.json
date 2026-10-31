@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "runId": "08c6b94d-79af-4cb5-bfe1-0999f54cb6ce",
+  "kind": "ai-research",
+  "planFingerprint": "9c18ffdccde91adc4d12034ac4a6bc67d0f23bc6caa75c144e9ba607dd9fe549",
+  "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+  "createdAt": "2026-10-25T15:47:22.454Z",
+  "updatedAt": "2026-10-25T15:47:24.502Z",
+  "actualCostUsd": 0,
+  "stoppedReason": "Entitlement AEO bloqueó el siguiente request: no_entitlement.",
+  "steps": {}
+}

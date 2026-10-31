@@ -1,5 +1,8 @@
 # Mensaje y prueba contextual
 
+Antes de cada apertura o seguimiento comercial, cargar el criterio de
+[conversaciones útiles](conversation-quality-and-review.md): historia, iniciativa, prueba y siguiente decisión.
+
 Leer conversación y mandato actuales antes de redactar. Distingue hecho observado, hipótesis e implicación;
 ninguna frase debe atribuir al destinatario una necesidad que expresó otro miembro de su cuenta.
 Usa Copywriting para craft y voz: español natural, tuteo cuando corresponda, primera persona real de Julio,

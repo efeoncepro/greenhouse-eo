@@ -6,7 +6,13 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { resolveEventRegistrationPolicy, type EventRegistrationEvent } from './contracts'
 import { buildEventIcs } from './event-ics'
 import { isEventEmailsEnabled } from './flags'
-import { getFormDefinitionById, getFormVersionById, getSubmissionById, listDueEventReminderSubmissionIds } from './store'
+import {
+  ACCEPTED_SUBMISSION_STATUSES,
+  getFormDefinitionById,
+  getFormVersionById,
+  getSubmissionById,
+  listDueEventReminderSubmissionIds
+} from './store'
 
 /**
  * 2026-10-24 — Correos de las reservas de eventos y webinars (portada del blog). GENÉRICO: sirve para CUALQUIER evento;
@@ -72,7 +78,12 @@ export const eventEmailLabels = (event: EventRegistrationEvent, locale: 'es' | '
 const loadRegistration = async (submissionId: string) => {
   const submission = await getSubmissionById(submissionId)
 
-  if (!submission || submission.status !== 'accepted') return { skip: `submission ${submissionId} no aceptada o inexistente` } as const
+  // Aceptada = cualquier estado desde `accepted` en adelante: el dispatcher la mueve a `delivered` (o a un estado de
+  // falla de destino) en cuanto HubSpot responde, a menudo ANTES de que corra este consumer (2026-10-24: el primer
+  // envío real llegó `delivered` y el correo se saltó). Una falla de destino no anula la reserva.
+  const accepted = (ACCEPTED_SUBMISSION_STATUSES as readonly string[]).includes(submission?.status ?? '')
+
+  if (!submission || !accepted) return { skip: `submission ${submissionId} no aceptada o inexistente` } as const
 
   const def = await getFormDefinitionById(submission.form_id)
 

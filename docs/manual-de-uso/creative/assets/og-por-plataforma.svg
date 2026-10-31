@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 750" width="1240" height="750" font-family="Inter, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">Cómo muestra cada plataforma la imagen Open Graph de la portada</title>
+  <desc id="d">Cuatro lienzos de 1200 por 630 a escala. LinkedIn y Facebook muestran la imagen completa. La vista compacta de WhatsApp y las miniaturas cuadradas muestran sólo el cuadrado central, de x 285 a x 915. X muestra 2:1 y puede cortar 15 píxeles arriba y abajo. En todos, el texto de la portada, de x 312 a x 782 y de y 50 a y 341, queda visible.</desc>
+  <rect width="1240" height="750" fill="#f7f8f6"/>
+  <defs>
+    <g id="canvas">
+      <rect width="600" height="315" fill="#001a33"/>
+      <rect x="156" y="25" width="235" height="146" fill="#ffffff" fill-opacity="0.16" stroke="#ffffff" stroke-width="1.5"/>
+      <text x="164" y="48" fill="#ffffff" font-size="12">texto x 312–782 · y 50–341</text>
+      <rect x="398" y="35" width="52" height="65" rx="24" fill="none" stroke="#ffb020" stroke-width="2"/>
+      <text x="398" y="118" fill="#ffb020" font-size="11">cara</text>
+    </g>
+  </defs>
+  <!-- 1 LinkedIn / Facebook -->
+  <text x="20" y="30" fill="#023c70" font-size="17" font-weight="600">LinkedIn y Facebook: completa (1,91:1)</text>
+  <use href="#canvas" x="20" y="44"/>
+  <rect x="20" y="44" width="600" height="315" fill="none" stroke="#0e8c82" stroke-width="4"/>
+  <!-- 2 WhatsApp compacta -->
+  <text x="640" y="30" fill="#023c70" font-size="17" font-weight="600">WhatsApp compacta y miniaturas: cuadrado x 285–915</text>
+  <use href="#canvas" x="640" y="44"/>
+  <rect x="640" y="44" width="142" height="315" fill="#f7f8f6" fill-opacity="0.82"/>
+  <rect x="1098" y="44" width="142" height="315" fill="#f7f8f6" fill-opacity="0.82"/>
+  <rect x="782" y="44" width="316" height="315" fill="none" stroke="#0e8c82" stroke-width="4"/>
+  <!-- 3 X -->
+  <text x="20" y="400" fill="#023c70" font-size="17" font-weight="600">X: 2:1, puede cortar 15 px arriba y abajo</text>
+  <use href="#canvas" x="20" y="414"/>
+  <rect x="20" y="414" width="600" height="8" fill="#f7f8f6" fill-opacity="0.82"/>
+  <rect x="20" y="721" width="600" height="8" fill="#f7f8f6" fill-opacity="0.82"/>
+  <rect x="20" y="422" width="600" height="299" fill="none" stroke="#0e8c82" stroke-width="4"/>
+  <!-- 4 notas -->
+  <text x="640" y="430" fill="#023c70" font-size="17" font-weight="600">Zona segura para todas</text>
+  <text x="640" y="462" fill="#023c70" font-size="15">• Texto y cara dentro del cuadrado central (x 285–915).</text>
+  <text x="640" y="488" fill="#023c70" font-size="15">• Nada importante en los 15 px de arriba y de abajo.</text>
+  <text x="640" y="514" fill="#023c70" font-size="15">• JPEG de 2400 × 1260 y menos de 300 KB: sale la vista</text>
+  <text x="640" y="534" fill="#023c70" font-size="15">  grande y no cae al límite de WhatsApp (600 KB).</text>
+  <text x="640" y="560" fill="#023c70" font-size="15">• Una imagen chica o pesada cae a una miniatura</text>
+  <text x="640" y="580" fill="#023c70" font-size="15">  cuadrada: por eso el cuadrado manda.</text>
+  <text x="640" y="616" fill="#3b5470" font-size="13">Medido en el sitio: lienzo, tamaño y peso. Recortes de cada red:</text>
+  <text x="640" y="634" fill="#3b5470" font-size="13">guías de terceros y la documentación de WhatsApp (2026-10-24).</text>
+  <text x="640" y="652" fill="#3b5470" font-size="13">Confírmalo con el depurador de Facebook, el Post Inspector</text>
+  <text x="640" y="670" fill="#3b5470" font-size="13">de LinkedIn y un chat de prueba en WhatsApp.</text>
+</svg>

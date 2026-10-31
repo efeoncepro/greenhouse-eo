@@ -17,6 +17,18 @@ require $plugin . '/includes/class-eobh-front.php';
 
 $data = EOBH_Data::get( $img_base );
 
+// Preview of real rail cards (serve.cjs --rail <file.json>): { "portada": [cards], "movil": [cards] } in the contract
+// of EO_Home_Adapter::rail(), e.g. a card's own image and focal point before writing them in WordPress.
+$rail_file = (string) getenv( 'EOBH_PREVIEW_RAIL' );
+if ( '' !== $rail_file ) {
+	$rail = json_decode( (string) file_get_contents( $rail_file ), true );
+	foreach ( array( 'portada', 'movil' ) as $board ) {
+		if ( isset( $rail[ $board ] ) && is_array( $rail[ $board ] ) ) {
+			$data[ $board ]['rail'] = $rail[ $board ];
+		}
+	}
+}
+
 // Preview of the real Glitch subscription (serve.cjs --subscribe): the same keys the content-model adapter sets.
 $sub_key = (string) getenv( 'EOBH_PREVIEW_SUBSCRIBE_KEY' );
 if ( '' !== $sub_key ) {

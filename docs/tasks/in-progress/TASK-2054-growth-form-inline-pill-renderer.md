@@ -6,6 +6,11 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+
+## Delta 2026-10-24
+
+- TASK-2056 agrega al renderer un atributo de anfitrión opcional para mostrar un logo en el rótulo de la píldora (`inline-label-logo`, `inline-label-logo-text`). Aditivo: sin el atributo nada cambia; el nombre accesible queda completo.
+
 ## Status
 
 - Lifecycle: `in-progress`

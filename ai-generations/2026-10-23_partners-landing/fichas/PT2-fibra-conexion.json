@@ -1,0 +1,19 @@
+{
+  "id": "PT2-fibra-conexion",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "atraviesa",
+  "atmosfera": "bruma",
+  "haz": "a cool cyan-white glow comes from the fibre ends and the small status lights of the rack, low in the frame, diffused in a thin haze; above them the room falls into deep navy darkness",
+  "escena": "SCENE (an integration room, night, eye level, 85mm f/2): an engineer, seen from behind and slightly to the side so the face is not visible, short dark hair, plain dark navy knit, stands at a dark modern network rack on the RIGHT side of the frame and presses the last glowing fibre-optic cable into a patch panel at the exact moment its port lights up: the ports already connected glow softly cyan and the new one is just turning on. A thick bundle of many thin luminous fibre-optic cables runs as a hard DIAGONAL from the lower left corner of the frame up towards the rack, in focus along its whole length, each strand a fine line of cool white-cyan light: it crosses the empty air between the lens and the engineer without covering them. The rack is matte black, current generation, clean cable management, small cyan status lights and one slim azure (#0375DB) light bar along the top of the rack, no brand names, no text readable. The upper half of the frame above the engineer and the rack is calm deep navy darkness with a faint haze. Contemporary, precise, premium; nothing warm, amber or golden; no clutter.",
+  "reservas": {
+    "texto": {
+      "muro": "the calm deep-navy darkness in the upper left half of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the out-of-focus edge of a dark equipment case lid along the bottom of the frame",
+    "tono": "DARK matte black, in deep shadow, outside the glow"
+  }
+}

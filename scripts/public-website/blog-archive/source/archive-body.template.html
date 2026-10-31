@@ -1,0 +1,204 @@
+<div class="{{ rootCls }}" style="position: relative;">
+<header class="{{ headCls }}" data-site-nav-tone="dark">
+  <div class="w">
+    <nav aria-label="Migas de pan"><ol class="crumb"><sc-for list="{{ crumbs }}" as="c" hint-placeholder-count="3"><li><a href="{{ c.url }}">{{ c.label }}</a></li></sc-for><li><span aria-current="page">{{ crumb }}</span></li></ol></nav>
+    <div class="{{ gridCls }}" style="{{ gridStyle }}">
+      <div>
+        <p class="eyb eyb--d"><span class="eyb__bar" style="{{ eyebrowBar }}"></span>{{ eyebrow }}</p>
+        <sc-if value="{{ isAuthor }}" hint-placeholder-val="{{ false }}">
+        <div class="au2">
+          <div class="au2__pt">
+            <sc-if value="{{ author.photo }}" hint-placeholder-val="{{ true }}"><img class="au2__ph" src="{{ author.photo }}" alt="{{ author.name }}"></sc-if>
+            <sc-if value="{{ author.initials }}" hint-placeholder-val="{{ false }}"><span class="au2__ph au2__ph--i" aria-hidden="true">{{ author.initials }}</span></sc-if>
+            <svg class="au2__orb" viewBox="0 0 208 208" aria-hidden="true" focusable="false"><circle cx="104" cy="104" r="96" fill="none" stroke="#72ded8" stroke-opacity="0.4" stroke-width="1.5"/><path d="M 13.79 71.17 A 96 96 0 0 1 71.17 13.79" fill="none" stroke="#36c8bf" stroke-width="3" stroke-linecap="round"/><circle cx="71.17" cy="13.79" r="6" fill="#36c8bf"/></svg>
+          </div>
+          <div class="au2__id">
+            <h1 class="idea ah__t ah__t--m au2__n">{{ author.name }}<span class="au2__dot">.</span></h1>
+            <sc-if value="{{ author.role }}" hint-placeholder-val="{{ true }}"><p class="au2__r">{{ author.role }}<span class="au2__sep"> · </span><span class="au2__org">{{ author.org }}</span></p></sc-if>
+          </div>
+        </div>
+        <sc-if value="{{ author.bio }}" hint-placeholder-val="{{ true }}"><p class="ah__d au2__bio">{{ author.bio }}</p></sc-if>
+        <sc-if value="{{ author.topics }}" hint-placeholder-val="{{ true }}">
+        <div class="au2__tp">
+          <p class="au2__lb">Escribe sobre</p>
+          <ul class="au2__chips">
+            <sc-for list="{{ author.topics }}" as="t" hint-placeholder-count="3"><li><a href="{{ t.url }}" class="chip chip--d live">{{ t.label }}</a></li></sc-for>
+          </ul>
+        </div>
+        </sc-if>
+        <sc-if value="{{ author.foot }}" hint-placeholder-val="{{ true }}">
+        <div class="au2__ft">
+          <sc-if value="{{ author.meta }}" hint-placeholder-val="{{ true }}"><dl class="ah__meta ah__meta--row au2__meta"><sc-for list="{{ author.meta }}" as="m" hint-placeholder-count="2"><div><dt>{{ m.k }}</dt><dd>{{ m.v }}</dd></div></sc-for></dl></sc-if>
+          <sc-if value="{{ author.links }}" hint-placeholder-val="{{ true }}">
+          <ul class="au2__soc" aria-label="{{ author.linksLabel }}">
+            <sc-for list="{{ author.links }}" as="l" hint-placeholder-count="2"><li><a href="{{ l.url }}" class="au2__s" rel="me noopener" target="_blank" aria-label="{{ l.label }}"><sc-if value="{{ l.d }}" hint-placeholder-val="{{ true }}"><svg viewBox="{{ l.box }}" aria-hidden="true" focusable="false"><path fill="currentColor" d="{{ l.d }}"/></svg></sc-if><sc-if value="{{ l.web }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></sc-if></a></li></sc-for>
+          </ul>
+          </sc-if>
+        </div>
+        </sc-if>
+        </sc-if>
+        <sc-if value="{{ plainH1 }}" hint-placeholder-val="{{ true }}"><h1 class="{{ h1Cls }}" style="{{ h1Style }}">{{ h1 }}</h1></sc-if>
+        <sc-if value="{{ gl }}" hint-placeholder-val="{{ false }}"><h1 class="gl-t"><img src="{{ gl.wordmark }}" alt="Glitch" width="430" height="117"></h1>
+        <p class="ah__d gl-d">{{ gl.desc }} <sc-if value="{{ gl.mul }}" hint-placeholder-val="{{ true }}"><span class="gl-mul">{{ gl.mul }}</span></sc-if></p></sc-if>
+        <sc-if value="{{ desc }}" hint-placeholder-val="{{ true }}"><p class="ah__d">{{ desc }}</p></sc-if>
+        <sc-if value="{{ search }}" hint-placeholder-val="{{ false }}">
+        <form role="search" action="{{ search.action }}" class="sf sfd">
+          <svg class="beamsvg" aria-hidden="true" focusable="false"><rect class="bm-t" pathLength="100"/><rect class="bm-m" pathLength="100"/><rect class="bm-h" pathLength="100"/></svg>
+          <label for="eoba-q" class="sr">{{ search.label }}</label>
+          <input id="eoba-q" type="search" name="s" value="{{ search.value }}" placeholder="Por ejemplo: cómo aparezco en ChatGPT">
+          <button type="submit" class="ab ab--navy live" style="min-height: 60px; padding: 0 1.25rem 0 1.5rem;"><span class="ab__c" style="display: inline-flex; align-items: center; gap: .5rem;"><span class="roll"><span class="roll__in"><span>Buscar</span><span aria-hidden="true">Buscar</span></span></span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a6 6 0 1 0 12 0a6 6 0 1 0 -12 0"/><path d="M20 20l-5.6 -5.6"/></g></svg></span></button>
+        </form>
+        </sc-if>
+        <sc-if value="{{ suggestions }}" hint-placeholder-val="{{ false }}">
+        <div class="chips" style="margin-top: 20px;">
+          <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="4"><a href="{{ s.url }}" class="chip chip--d live">{{ s.label }}</a></sc-for>
+        </div>
+        </sc-if>
+        <sc-if value="{{ meta }}" hint-placeholder-val="{{ true }}"><dl class="ah__meta ah__meta--row"><sc-for list="{{ meta }}" as="m" hint-placeholder-count="2"><div><dt>{{ m.k }}</dt><dd>{{ m.v }}</dd></div></sc-for></dl></sc-if>
+        <sc-if value="{{ gl }}" hint-placeholder-val="{{ false }}">
+        <div class="gl-mh">
+          <sc-if value="{{ gl.edition }}" hint-placeholder-val="{{ true }}"><div class="gl-mh__c">
+            <span class="gl-mh__l">Edición</span>
+            <span class="gl-mh__n gl-mh__n--e"><span class="gl-hash">#</span><span class="gl-num">{{ gl.edition.n }}</span></span>
+            <span class="gl-mh__s">la última, {{ gl.edition.date }}</span>
+          </div></sc-if>
+          <sc-if value="{{ gl.flash }}" hint-placeholder-val="{{ true }}"><div class="gl-mh__c">
+            <span class="gl-mh__l">No espera al lunes</span>
+            <span class="gl-mh__n"><img class="gl-trail" src="{{ gl.trail }}" alt=""><span class="gl-num">FLASH</span></span>
+            <span class="gl-mh__s">el último, {{ gl.flash.date }}</span>
+          </div></sc-if>
+        </div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ hero }}" hint-placeholder-val="{{ true }}">
+      <a href="{{ hero.url }}" class="hc"><svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>
+        <sc-if value="{{ hero.img }}" hint-placeholder-val="{{ true }}"><span class="{{ hero.imgCls }}"><img src="{{ hero.img }}" alt="" fetchpriority="high"></span></sc-if>
+        <span class="hc__b">
+          <span class="hc__l">{{ hero.label }}</span>
+          <span class="hc__k"><span style="{{ hero.bar }}"></span><sc-if value="{{ hero.glitch }}" hint-placeholder-val="{{ false }}"><img src="{{ assets.glitchNavy }}" alt="Glitch" width="56" height="15" style="display: inline-block; height: 15px; width: auto; vertical-align: -2px;"> <span>{{ hero.kind }}</span></sc-if><sc-if value="{{ hero.plain }}" hint-placeholder-val="{{ true }}"><span>{{ hero.kind }}</span></sc-if></span>
+          <span class="idea hc__t"><sc-for list="{{ hero.parts }}" as="p" hint-placeholder-count="1"><sc-if value="{{ p.hl }}" hint-placeholder-val="{{ false }}"><mark class="hl">{{ p.t }}</mark></sc-if><sc-if value="{{ p.pl }}" hint-placeholder-val="{{ true }}">{{ p.t }}</sc-if></sc-for></span>
+          <span class="hc__m"><span>{{ hero.min }} min de lectura · {{ hero.date }}</span><span class="nl nl--light live" style="margin: 0 0 0 auto;"><span class="roll"><span class="roll__in"><span>Leer</span><span aria-hidden="true">Leer</span></span></span><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></span></span>
+        </span>
+      </a>
+      </sc-if>
+      <sc-if value="{{ parent }}" hint-placeholder-val="{{ false }}">
+      <div class="ah__side">
+        <p class="ah__l" style="border-top: 0; padding-top: 0;">El tema que lo contiene</p>
+        <a href="{{ parent.url }}" class="nl nl--dark live" style="font-size: 20px;"><span class="roll"><span class="roll__in"><span>{{ parent.name }}</span><span aria-hidden="true">{{ parent.name }}</span></span></span><span class="nl__n">{{ parent.count }}</span><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></a>
+      </div>
+      </sc-if>
+      <sc-if value="{{ spark }}" hint-placeholder-val="{{ false }}">
+      <div class="ah__side" style="align-self: end;">
+        <img class="spark" src="{{ assets.spark }}" alt="El Spark de investigación de Efeonce, con su lupa">
+      </div>
+      </sc-if>
+    </div>
+  </div>
+  <sc-if value="{{ gl }}" hint-placeholder-val="{{ false }}"><svg class="gl-bytes" viewBox="0 0 1440 60" preserveAspectRatio="xMidYMin slice" aria-hidden="true" focusable="false"><g fill="#001a33"><rect x="26" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="38" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="50" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="62" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="74" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="86" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="98" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="110" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="134" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="146" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="158" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="170" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="182" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="206" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="218" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="230" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="254" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="266" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="278" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="314" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="326" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="350" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="386" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="398" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="422" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="434" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="446" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="458" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="470" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="482" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="494" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="506" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="518" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="578" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="590" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="602" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="626" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="638" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="650" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="662" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="674" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="686" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="698" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="710" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="734" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="746" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="782" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="794" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="806" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="818" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="830" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="842" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="854" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="866" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="890" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="902" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="914" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="926" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="938" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="962" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="986" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1010" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1022" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1058" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1082" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1094" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1106" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1118" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1130" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1154" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1166" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1178" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1190" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1226" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1238" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1250" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1274" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1286" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1322" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1346" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1370" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1418" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="1430" y="0" width="8" height="8" fill-opacity="1.0"/><rect x="38" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="62" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="74" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="98" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="110" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="122" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="146" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="158" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="170" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="182" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="206" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="230" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="326" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="338" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="374" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="398" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="410" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="458" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="494" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="518" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="530" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="542" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="554" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="590" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="602" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="614" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="626" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="638" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="650" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="674" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="734" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="782" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="794" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="830" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="842" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="890" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="902" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="962" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="998" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1022" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1034" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1058" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1082" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1094" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1118" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1130" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1142" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1190" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1202" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1286" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1382" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1418" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="1430" y="12" width="8" height="8" fill-opacity="0.81"/><rect x="26" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="194" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="254" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="290" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="338" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="518" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="650" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="734" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="1046" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="1142" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="1166" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="1202" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="1310" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="1394" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="1406" y="24" width="8" height="8" fill-opacity="0.64"/><rect x="26" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="134" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="218" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="290" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="302" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="350" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="710" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="878" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="902" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="962" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="1010" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="1046" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="1346" y="36" width="8" height="8" fill-opacity="0.48"/><rect x="254" y="48" width="8" height="8" fill-opacity="0.34"/><rect x="578" y="48" width="8" height="8" fill-opacity="0.34"/><rect x="590" y="48" width="8" height="8" fill-opacity="0.34"/><rect x="626" y="48" width="8" height="8" fill-opacity="0.34"/><rect x="674" y="48" width="8" height="8" fill-opacity="0.34"/><rect x="794" y="48" width="8" height="8" fill-opacity="0.34"/><rect x="1142" y="48" width="8" height="8" fill-opacity="0.34"/></g></svg></sc-if>
+</header>
+<sc-if value="{{ filter }}" hint-placeholder-val="{{ true }}">
+<section class="fb fb--f" aria-label="Filtrar por formato">
+  <div class="w"><div class="fb__in">
+    <span class="fb__l">Formato</span>
+    <div class="segc segc--n" role="group" aria-label="Formato" style="{{ filter.segStyle }}"><span class="segc__ind" aria-hidden="true" style="{{ filter.indStyle }}"></span><sc-for list="{{ filter.items }}" as="f" hint-placeholder-count="5"><a href="{{ f.url }}" class="segc__b" aria-current="{{ f.cur }}">{{ f.label }} <span style="font-weight: 400; opacity: 0.75;">{{ f.count }}</span></a></sc-for></div>
+    <div class="chips fb__m" role="group" aria-label="Formato">
+          <sc-for list="{{ filter.items }}" as="f" hint-placeholder-count="5"><a href="{{ f.url }}" class="{{ f.chipCls }}" aria-current="{{ f.cur }}">{{ f.label }} <span class="chip__n">{{ f.count }}</span></a></sc-for>
+    </div>
+  </div></div>
+</section>
+</sc-if>
+<sc-if value="{{ list }}" hint-placeholder-val="{{ true }}">
+<section class="al" aria-label="{{ list.label }}">
+  <div class="w">
+    <sc-if value="{{ list.groups }}" hint-placeholder-val="{{ true }}"><sc-for list="{{ list.groups }}" as="g" hint-placeholder-count="2">
+    <div class="yg">
+      <div class="yg__y"><p class="idea yg__n">{{ g.year }}</p><p class="yg__c">{{ g.caption }}</p></div>
+      <div class="rows">
+          <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="4"><a href="{{ r.url }}" class="lnk arch-row arch-row--x">
+            <sc-if value="{{ r.pd }}" hint-placeholder-val="{{ true }}"><span class="rw__d">{{ r.date }}</span></sc-if><sc-if value="{{ r.gd }}" hint-placeholder-val="{{ false }}"><span class="rw__d"><sc-if value="{{ r.ed }}" hint-placeholder-val="{{ true }}"><span class="gl-b"><span class="gl-hash">#</span><span class="gl-num">{{ r.ed }}</span></span></sc-if><sc-if value="{{ r.fl }}" hint-placeholder-val="{{ false }}"><span class="gl-b gl-b--f"><img src="{{ gl.trail }}" alt=""><span class="gl-num">FLASH</span></span></sc-if><span class="rw__dt">{{ r.date }}</span></span></sc-if>
+            <span class="idea u rw__t"><sc-for list="{{ r.parts }}" as="p" hint-placeholder-count="1"><sc-if value="{{ p.hl }}" hint-placeholder-val="{{ false }}"><mark class="hl">{{ p.t }}</mark></sc-if><sc-if value="{{ p.pl }}" hint-placeholder-val="{{ true }}">{{ p.t }}</sc-if></sc-for></span>
+            <span class="arch-k rw__k"><sc-if value="{{ r.glitch }}" hint-placeholder-val="{{ false }}"><span class="arch-gl"><img src="{{ assets.glitchNavy }}" alt="Glitch" width="56" height="15" style="display: inline-block; height: 15px; width: auto; vertical-align: -2px;"><span>{{ r.label }} <span class="rw__m">· {{ r.min }} min</span></span></span></sc-if><sc-if value="{{ r.plain }}" hint-placeholder-val="{{ true }}"><span>{{ r.label }} <span class="rw__m">· {{ r.min }} min</span></span></sc-if><svg class="arch-a" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M14 7l5 5l-5 5"/></g></svg></span>
+          </a></sc-for>
+      </div>
+    </div>
+    </sc-for></sc-if>
+    <sc-if value="{{ list.flat }}" hint-placeholder-val="{{ false }}">
+    <div class="rows" style="margin-top: 56px;">
+          <sc-for list="{{ list.flat }}" as="r" hint-placeholder-count="4"><a href="{{ r.url }}" class="lnk arch-row arch-row--x">
+            <sc-if value="{{ r.pd }}" hint-placeholder-val="{{ true }}"><span class="rw__d">{{ r.date }}</span></sc-if><sc-if value="{{ r.gd }}" hint-placeholder-val="{{ false }}"><span class="rw__d"><sc-if value="{{ r.ed }}" hint-placeholder-val="{{ true }}"><span class="gl-b"><span class="gl-hash">#</span><span class="gl-num">{{ r.ed }}</span></span></sc-if><sc-if value="{{ r.fl }}" hint-placeholder-val="{{ false }}"><span class="gl-b gl-b--f"><img src="{{ gl.trail }}" alt=""><span class="gl-num">FLASH</span></span></sc-if><span class="rw__dt">{{ r.date }}</span></span></sc-if>
+            <span class="idea u rw__t"><sc-for list="{{ r.parts }}" as="p" hint-placeholder-count="1"><sc-if value="{{ p.hl }}" hint-placeholder-val="{{ false }}"><mark class="hl">{{ p.t }}</mark></sc-if><sc-if value="{{ p.pl }}" hint-placeholder-val="{{ true }}">{{ p.t }}</sc-if></sc-for></span>
+            <span class="arch-k rw__k"><sc-if value="{{ r.glitch }}" hint-placeholder-val="{{ false }}"><span class="arch-gl"><img src="{{ assets.glitchNavy }}" alt="Glitch" width="56" height="15" style="display: inline-block; height: 15px; width: auto; vertical-align: -2px;"><span>{{ r.label }} <span class="rw__m">· {{ r.min }} min</span></span></span></sc-if><sc-if value="{{ r.plain }}" hint-placeholder-val="{{ true }}"><span>{{ r.label }} <span class="rw__m">· {{ r.min }} min</span></span></sc-if><svg class="arch-a" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M14 7l5 5l-5 5"/></g></svg></span>
+          </a></sc-for>
+    </div>
+    </sc-if>
+    <div class="pgw">
+      <span class="pgw__n">{{ list.pager.note }}</span>
+      <sc-if value="{{ list.pager.multi }}" hint-placeholder-val="{{ true }}"><nav aria-label="{{ list.pager.label }}"><ul class="pager"><sc-if value="{{ list.pager.prev }}" hint-placeholder-val="{{ false }}"><li><a href="{{ list.pager.prev }}" class="nl nl--light live nl--prev" style="margin: 0 8px 0 0;"><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="transform: scaleX(-1);"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg><span class="roll"><span class="roll__in"><span>Anterior</span><span aria-hidden="true">Anterior</span></span></span></a></li></sc-if><sc-for list="{{ list.pager.pages }}" as="pg" hint-placeholder-count="2"><sc-if value="{{ pg.gap }}" hint-placeholder-val="{{ false }}"><li><span class="pg pg--gap" aria-hidden="true">…</span></li></sc-if><sc-if value="{{ pg.num }}" hint-placeholder-val="{{ true }}"><li><a href="{{ pg.url }}" class="pg" aria-current="{{ pg.cur }}">{{ pg.n }}</a></li></sc-if></sc-for><sc-if value="{{ list.pager.next }}" hint-placeholder-val="{{ true }}"><li><a href="{{ list.pager.next }}" class="nl nl--light live" style="margin: 0 0 0 8px;"><span class="roll"><span class="roll__in"><span>Siguiente</span><span aria-hidden="true">Siguiente</span></span></span><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></a></li></sc-if></ul></nav></sc-if>
+    </div>
+  </div>
+</section>
+</sc-if>
+<sc-if value="{{ gl.sub }}" hint-placeholder-val="{{ false }}">
+<section class="gl-sub" aria-labelledby="eoba-gl-sub-h">
+  <div class="w">
+    <div class="gl-sub__c">
+      <svg class="gl-sub__bytes" viewBox="0 0 335 199" aria-hidden="true" focusable="false"><g fill="#6ec207"><rect x="119" y="0" width="12" height="12" fill-opacity="0.4"/><rect x="136" y="0" width="12" height="12" fill-opacity="0.42"/><rect x="187" y="0" width="12" height="12" fill-opacity="0.5"/><rect x="221" y="0" width="12" height="12" fill-opacity="0.55"/><rect x="272" y="0" width="12" height="12" fill-opacity="0.63"/><rect x="306" y="0" width="12" height="12" fill-opacity="0.69"/><rect x="170" y="17" width="12" height="12" fill-opacity="0.44"/><rect x="238" y="17" width="12" height="12" fill-opacity="0.54"/><rect x="306" y="17" width="12" height="12" fill-opacity="0.66"/><rect x="323" y="17" width="12" height="12" fill-opacity="0.69"/><rect x="0" y="34" width="12" height="12" fill-opacity="0.22"/><rect x="204" y="34" width="12" height="12" fill-opacity="0.46"/><rect x="238" y="34" width="12" height="12" fill-opacity="0.51"/><rect x="306" y="34" width="12" height="12" fill-opacity="0.62"/><rect x="102" y="51" width="12" height="12" fill-opacity="0.31"/><rect x="221" y="51" width="12" height="12" fill-opacity="0.46"/><rect x="238" y="51" width="12" height="12" fill-opacity="0.49"/><rect x="289" y="51" width="12" height="12" fill-opacity="0.56"/><rect x="119" y="68" width="12" height="12" fill-opacity="0.3"/><rect x="136" y="68" width="12" height="12" fill-opacity="0.32"/><rect x="255" y="68" width="12" height="12" fill-opacity="0.48"/><rect x="289" y="68" width="12" height="12" fill-opacity="0.53"/><rect x="323" y="85" width="12" height="12" fill-opacity="0.56"/><rect x="51" y="102" width="12" height="12" fill-opacity="0.2"/><rect x="272" y="102" width="12" height="12" fill-opacity="0.45"/><rect x="289" y="102" width="12" height="12" fill-opacity="0.47"/><rect x="170" y="119" width="12" height="12" fill-opacity="0.29"/><rect x="272" y="119" width="12" height="12" fill-opacity="0.42"/><rect x="289" y="119" width="12" height="12" fill-opacity="0.45"/><rect x="0" y="136" width="12" height="12" fill-opacity="0.14"/><rect x="136" y="136" width="12" height="12" fill-opacity="0.24"/><rect x="272" y="136" width="12" height="12" fill-opacity="0.4"/><rect x="306" y="136" width="12" height="12" fill-opacity="0.44"/><rect x="102" y="153" width="12" height="12" fill-opacity="0.19"/><rect x="187" y="153" width="12" height="12" fill-opacity="0.27"/><rect x="289" y="153" width="12" height="12" fill-opacity="0.39"/><rect x="323" y="153" width="12" height="12" fill-opacity="0.44"/><rect x="272" y="170" width="12" height="12" fill-opacity="0.34"/><rect x="306" y="170" width="12" height="12" fill-opacity="0.39"/><rect x="289" y="187" width="12" height="12" fill-opacity="0.34"/><rect x="306" y="187" width="12" height="12" fill-opacity="0.36"/><rect x="323" y="187" width="12" height="12" fill-opacity="0.38"/></g></svg>
+      <div style="position: relative; z-index: 1;">
+        <p class="eyb eyb--d"><span class="eyb__bar" style="background: #6ec207;"></span>Suscríbete</p>
+        <h2 id="eoba-gl-sub-h" class="gl-sub__t"><span class="in">Ocho noticias cada lunes,</span><span class="out">con punto de vista.</span></h2>
+        <p class="gl-sub__d">Lo que cambió en IA, marketing y tecnología, y qué hacer con eso. Cada lunes en tu correo, gratis.</p>
+      </div>
+      <div class="gl-sub__r">
+        <span class="gl-mul">nos vemos el lunes.</span>
+        <sc-if value="{{ gl.sub.demo }}" hint-placeholder-val="{{ true }}"><a href="#" class="gl-pill live" aria-label="Suscríbete a Glitch">Suscríbete a <img src="{{ gl.logo }}" alt=""><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></a>
+        <p class="gl-sub__n">Al suscribirte aceptas la <a href="#" style="color: inherit;">política de privacidad</a>. Te das de baja cuando quieras.</p></sc-if>
+        <sc-if value="{{ gl.sub.live }}" hint-placeholder-val="{{ false }}"><greenhouse-form data-dc-keep="" class="eo-inline-pill eo-inline-pill--glitch eo-inline-pill--white" form-key="{{ gl.sub.formKey }}" surface="{{ gl.sub.surface }}" base-url="{{ gl.sub.base }}" locale="es-CL" color-scheme="dark" appearance="bare" inline-label-logo="{{ gl.logo }}" inline-label-logo-text="Glitch"><a href="{{ gl.sub.action }}" class="ghf-fallback gl-pill live" aria-label="Suscríbete a Glitch">Suscríbete a <img src="{{ gl.logo }}" alt=""><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></a><p class="gl-sub__n" aria-hidden="true">Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.</p></greenhouse-form></sc-if>
+      </div>
+    </div>
+  </div>
+</section>
+</sc-if>
+<sc-if value="{{ meanwhile }}" hint-placeholder-val="{{ false }}">
+<section class="mt" aria-labelledby="eoba-mt-h">
+  <div class="w">
+    <p id="eoba-mt-h" class="eyb"><span class="eyb__bar" style="background: #36c8bf;"></span>{{ meanwhile.title }}</p>
+    <div class="mt__g">
+      <a href="{{ meanwhile.glitch.url }}" class="fc fc--stack" style="margin-top: 0;"><svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>
+        <span class="fc__b">
+          <span>
+            <span class="fc__k"><span style="background: #6ec207;"></span><img src="{{ assets.glitchNeg }}" alt="Glitch" width="56" height="15" style="display: inline-block; height: 15px; width: auto; vertical-align: -2px;"> <span>Lo último de Glitch</span></span>
+            <span class="idea fc__t" style="display: block;">{{ meanwhile.glitch.title }}</span>
+          </span>
+          <span class="fc__m"><span>{{ meanwhile.glitch.min }} min de lectura · {{ meanwhile.glitch.date }}</span></span>
+        </span>
+        <sc-if value="{{ meanwhile.glitch.img }}" hint-placeholder-val="{{ true }}"><span class="fc__img"><img src="{{ meanwhile.glitch.img }}" alt="" loading="lazy" decoding="async"></span></sc-if>
+      </a>
+      <div class="mt__c">
+        <a href="{{ meanwhile.guide.url }}" class="gc" style="background: #023c70; color: #ffffff;"><svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>
+          <span class="fc__k"><span style="{{ meanwhile.guide.bar }}"></span>{{ meanwhile.guide.kicker }}</span>
+          <span class="idea gc__t">{{ meanwhile.guide.title }}</span>
+        </a>
+        <a href="{{ meanwhile.article.url }}" class="gc" style="background: #f7f8f6; color: #023c70;"><svg class="card__a" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></g></svg>
+          <span class="fc__k" style="color: #6d6777;"><span style="{{ meanwhile.article.bar }}"></span>{{ meanwhile.article.kicker }}</span>
+          <span class="idea gc__t">{{ meanwhile.article.title }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+</sc-if>
+<section class="ot" aria-labelledby="eoba-ot-h">
+  <div class="w">
+    <div class="ot__h">
+      <div>
+        <p class="eyb eyb--d">{{ topics.eyebrow }}</p>
+        <h2 id="eoba-ot-h" class="idea ot__t">{{ topics.title }}</h2>
+      </div>
+      <a href="{{ topics.allUrl }}" class="nl nl--dark live"><span class="roll"><span class="roll__in"><span>Todo el archivo</span><span aria-hidden="true">Todo el archivo</span></span></span><span class="nl__n">{{ topics.all }}</span><svg class="ax" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="ax__s" pathLength="1" d="M19 12H5"/><path class="ax__h" d="M14 7l5 5l-5 5"/></g></svg></a>
+    </div>
+    <div class="ot__g">
+      <sc-for list="{{ topics.items }}" as="t" hint-placeholder-count="8"><a href="{{ t.url }}" class="lab2" style="{{ t.style }}"><span class="nm">{{ t.name }}</span><span class="ct">{{ t.count }}</span><span class="bar" style="{{ t.barStyle }}"></span></a></sc-for>
+    </div>
+  </div>
+</section>
+</div>

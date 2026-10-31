@@ -1,0 +1,39 @@
+{
+  "base": "https://efeonce-rooms-7rmb7rftw-efeonce-7670142f.vercel.app",
+  "sha": "bd4b802acbbe1db1b0089c9dc0d558c67c41d111",
+  "protectedAccess": true,
+  "httpChecksPreviouslyPassed": 7,
+  "views": [
+    {
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "native": {
+        "started": 5,
+        "rendered": 5,
+        "unhandled": []
+      },
+      "burstFocus": true,
+      "runtimeErrors": 0,
+      "failedRequests": []
+    },
+    {
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "native": {
+        "started": 5,
+        "rendered": 5,
+        "unhandled": []
+      },
+      "burstFocus": true,
+      "runtimeErrors": 0,
+      "failedRequests": []
+    }
+  ],
+  "claim": "Read-only synthetic cloud smoke; no real Efeonce ID or cloud database certification."
+}

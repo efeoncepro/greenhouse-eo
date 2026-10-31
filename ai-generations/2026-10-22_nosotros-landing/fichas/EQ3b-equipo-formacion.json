@@ -1,0 +1,23 @@
+{
+  "id": "EQ3b-equipo-formacion",
+  "formato": "16:9",
+  "impacto": true,
+  "atmosfera": "bruma",
+  "haz": "a soft cool blue-white glow far behind the team, low and centred, diffused by the haze and rimming every head and shoulder; plus a large soft frontal fill near the camera, slightly from the left, that gently lights the faces and jackets of the team so they read as people, not silhouettes",
+  "objetos": [
+    {
+      "objeto": "chaqueta-bomber-efeonce"
+    }
+  ],
+  "escena": "SCENE (a WIDE background plate for a team portrait, a large dark studio, seen from far away): ONE TEAM of about ninety colleagues posing together for their group photo, ALL FACING THE CAMERA, standing still, relaxed and proud the way a team stands for its portrait — arms loosely crossed or hands at their sides, a few with a hand on a colleague's shoulder. THE NEAREST PERSON STANDS AT LEAST TEN METRES FROM THE CAMERA: there is NOBODY in the foreground, nobody large, nobody sharp. EVERY person in the team appears SMALL: from the top of the head to the feet each one is no taller than one quarter of the frame height. They form a long, wide, loose formation of staggered rows, perfectly CENTRED and SYMMETRICAL, spreading evenly across the WHOLE width of the frame from the left edge to the right edge, receding from ten to twenty-five metres away. EVERYONE WEARS THE SAME TEAM UNIFORM: the navy Efeonce team bomber jacket of the reference over a navy polo, so they clearly read as one company team; women and men of different builds, heights, ages and hairstyles. Nobody talks, nobody turns away, nobody holds anything. The camera stands at an adult's eye level, perfectly level, 85mm wide open at f/1.4, focused on an EMPTY plane only two metres away, so THE WHOLE TEAM IS COMPLETELY OUT OF FOCUS with soft creamy bokeh — recognisable as a crowd of people in the same navy uniform with faces turned to the camera, but no face, emblem or detail readable. Because the camera is at eye level, their heads all line up along ONE HORIZONTAL BAND between 60% and 66% of the frame height, and their feet rest at about 85%. The farthest rows dissolve into navy and cobalt (#0375DB) haze. The top 58% of the frame is calm deep-navy haze above their heads, with no heads, objects or lights in it. The bottom 15% is an empty dark floor. Nothing warm, amber or golden; no text, no logos readable, no screens.",
+  "reservas": {
+    "texto": {
+      "muro": "the calm deep-navy haze above the heads of the team, top half of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the dark polished studio floor in the immediate foreground",
+    "tono": "DEEP navy-black floor, matte, out of focus, catching a faint cool reflection of the haze"
+  }
+}

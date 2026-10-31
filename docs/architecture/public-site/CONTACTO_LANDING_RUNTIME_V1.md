@@ -4,7 +4,7 @@
 **Surface:** `efeonce-contacto`
 **Task de origen:** [TASK-1801](../../tasks/complete/TASK-1801-contacto-multistakeholder-form-agenda.md)
 **Estado:** construida, verificada y aprobada por el operador el 2026-09-15; release de copy de cobertura y
-banda de reuniones en móvil aplicado el 2026-09-16.
+banda de reuniones en móvil aplicado el 2026-09-16; versión 2 «La órbita» en producción desde el 2026-10-31.
 
 ## Composición
 
@@ -130,3 +130,42 @@ audio, notas de Nexa, wave y meeting card). Antes de desplegar se corrió
 `scripts/public-website/verify-contacto-responsive-composition.ts` sobre el HTML vivo (asserts en verde, banda de
 273 px a 390 px, overflow 0) y después se comprobó desktop. La superficie desplegada fue mayor que los dos
 cambios pedidos y queda declarada como tal.
+
+## Release aplicado: Contacto v2 «La órbita» (2026-10-31)
+
+Cuatro despliegues del paquete acotado (`build-contacto-elementor-package.cjs` → `deploy-contacto-elementor-package.php`), cada
+uno contra un export vivo fresco, más un cambio estructural de Elementor:
+
+1. Widgets, CSS, JS, FAQ (`seo.php`) y 11 recursos nuevos (hero `CT1b` y su recorte móvil, avatar de Nexa, banderas, WhatsApp,
+   insignias de partner). La allowlist del instalador se amplió sólo a esas rutas.
+2. `reorder-contacto-closing.php`: el contenedor `48aab3e` (banda → cierre) pasa al final. Guardas: hash previo
+   `64d95ff1…`, identidad de la página, Home y chrome global intactos; hash nuevo `3963e548…`.
+3. Ajustes de CSS/JS: piel del sitio para el diálogo del CTA, botón turquesa, radios de imágenes frente a `.elementor img`.
+4. Insignia HubSpot por contraste: sobre el papel del formulario va `hubspot-solutions-partner-gold-dark.svg` (placa oscura,
+   72 px), no la crema. En ≤767 px el texto de partners ocupa su fila y las dos insignias quedan juntas debajo. Regla general en
+   `public/branding/partners/hubspot/solution-partner/README.md` y `getHubSpotSolutionPartnerBadgeForSurface()`.
+5. `fix-footer-headquarters-address.php`: el footer global (`widget_block[17]` en `ohio-sidebar-footer-1`) pasa de «Oficina
+   Chile · Las Bellotas 199» a «Casa matriz · Dr. Manuel Barros Borgoño 71, oficina 1105». Escribe sólo si el contenido coincide
+   exacto; snapshot `_gh_footer_address_before_20261031_121306`, readback y purga.
+
+6. `fix-legacy-headquarters-address-copies.php` corrige las demás copias de Las Bellotas: la opción
+   `eoh_site_settings_contact_address` (ACF de eo-headless-content), `woocommerce_store_address` y `_address_2`, el bloque inactivo
+   `block-15` y tres páginas Elementor: `/agendar/` (243016, publicada), su borrador 248352 y «Landing Loop Marketing» (248840,
+   redirige a Inbound; tiene dos filas `_elementor_data` idénticas). Sólo cambia la dirección; guarda por hash y por una sola
+   coincidencia; snapshot `_gh_legacy_address_before_20261031_124200`. Quedan a propósito el caché `metricool_user` (lo sincroniza
+   Metricool) y el respaldo `eo_footer_refinement_20261014_v2`. WooCommerce queda fuera de alcance: el sitio no es un ecommerce
+   (operador, 2026-10-31), así que su código postal `832000` no se corrige.
+   `fix-agendar-phone.php` cambia en `/agendar/` y su borrador el teléfono `+56-936145176` por el móvil vigente
+   `+56 9 3732 3064`; el horario se conserva por decisión del operador (snapshot `_gh_agendar_phone_before_20261031_124828`).
+   El número antiguo sobrevive sólo en la cuenta «Comercial» del plugin de WhatsApp NinjaTeam (post 242911, `nta_wa_account_info`),
+   que está inactivo y no se muestra en el sitio.
+7. Línea blanca bajo el footer: la página mide 5468,25 px y el documento redondea a 5469, así que el body blanco asomaba. El lienzo
+   (`html:has(body.page-id-20729)`) toma el color del footer `#161519`. `/agenda/` tiene la misma altura fraccional.
+8. Footer V3 del sitio (mismo día, elegido en el canvas, página «Footer»): azul noche, cinco columnas con «Contacto» y
+   cobertura, Glitch con su logo y «Todos los derechos reservados». La dirección dejó de estar bajo el logo (`block-17`)
+   y pasó a la columna «Contacto» (`block-47`). Detalle y scripts: `scripts/public-website/footer-refinement-v3/README.md`.
+
+Contratos que no cambian: Growth Forms (`efeonce-contacto` v4) y Growth Meetings (`contacto-discovery-meeting`) siguen siendo
+dueños de validación, envío, disponibilidad y reserva; WordPress sólo presenta. La FAQ visible y su `FAQPage` salen de la misma
+función. Verificado en producción a 1440 y 390 px: orden de secciones, overflow 0, formulario y CTA cargados, agenda abierta desde
+el hero y la tarjeta sin marco extra, banderas circulares. No se creó ninguna reserva ni se envió el formulario.

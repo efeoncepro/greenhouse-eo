@@ -1,0 +1,375 @@
+{
+  "view": "tema-glitch",
+  "assets": {
+    "glitchNavy": "/_blob/1063184040c6121be1f86602803b0f55",
+    "glitchNeg": "/_blob/72025ed97a7ce0c610ec355f78efed74",
+    "spark": "/_blob/2def96f284c302de0cf9fa4736ed9d18"
+  },
+  "crumbs": [
+    {
+      "label": "Inicio",
+      "url": "#"
+    },
+    {
+      "label": "Blog",
+      "url": "#"
+    },
+    {
+      "label": "Temas",
+      "url": "#"
+    }
+  ],
+  "crumb": "Glitch",
+  "headCls": "ah ah--f",
+  "gridCls": "ah__g ah__g--f",
+  "gridStyle": null,
+  "eyebrow": "El newsletter de Efeonce",
+  "eyebrowBar": "background: #6ec207;",
+  "isAuthor": false,
+  "author": null,
+  "plainH1": false,
+  "h1": null,
+  "h1Cls": "idea ah__t",
+  "h1Style": null,
+  "desc": null,
+  "search": null,
+  "suggestions": null,
+  "meta": null,
+  "hero": {
+    "url": "#",
+    "img": "/_blob/08933b6eae580530405a3ebace493378",
+    "imgCls": "hc__img",
+    "label": "Lo más reciente",
+    "bar": "background: #4f8c00;",
+    "glitch": true,
+    "plain": false,
+    "kind": "Flash",
+    "parts": [
+      {
+        "t": "Glitch Flash: Sonnet 5.5 roza a Opus, a mitad de precio",
+        "pl": true,
+        "hl": false
+      }
+    ],
+    "min": 8,
+    "date": "28 sep 2026"
+  },
+  "parent": null,
+  "spark": false,
+  "filter": {
+    "segStyle": "--n: 3;",
+    "indStyle": "transform: translateX(0%);",
+    "items": [
+      {
+        "label": "Todo",
+        "count": 10,
+        "url": "#",
+        "cur": "page",
+        "chipCls": "chip is-on live"
+      },
+      {
+        "label": "Ediciones",
+        "count": 7,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      },
+      {
+        "label": "Flash",
+        "count": 3,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      }
+    ]
+  },
+  "list": {
+    "label": "Todas las publicaciones de Glitch",
+    "flat": null,
+    "groups": [
+      {
+        "year": "2026",
+        "caption": "10 publicaciones en Glitch",
+        "rows": [
+          {
+            "url": "#",
+            "date": "28 jul",
+            "parts": [
+              {
+                "t": "Agente rompe la jaula, la confianza reordena el frontier, la correa manda",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Edición",
+            "min": 10,
+            "pd": false,
+            "gd": true,
+            "ed": "17",
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "21 jul",
+            "parts": [
+              {
+                "t": "Open-weight que descargas, precio que miente, canal sin dueño",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Edición",
+            "min": 9,
+            "pd": false,
+            "gd": true,
+            "ed": "16",
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "14 jul",
+            "parts": [
+              {
+                "t": "Token barato, criterio caro, y las capas que no controlas.",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Edición",
+            "min": 10,
+            "pd": false,
+            "gd": true,
+            "ed": "15",
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "10 jul",
+            "parts": [
+              {
+                "t": "GPT-5.6 y ChatGPT Work: OpenAI ya no está lanzando modelos, está cambiando la forma de trabajar con IA",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Flash",
+            "min": 6,
+            "pd": false,
+            "gd": true,
+            "ed": null,
+            "fl": true
+          },
+          {
+            "url": "#",
+            "date": "9 jul",
+            "parts": [
+              {
+                "t": "Platform Properties para Search Console: Google admite que la búsqueda ya no ocurre en un solo lugar",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Flash",
+            "min": 8,
+            "pd": false,
+            "gd": true,
+            "ed": null,
+            "fl": true
+          },
+          {
+            "url": "#",
+            "date": "7 jul",
+            "parts": [
+              {
+                "t": "El modelo a centavos, el checkout en vivo, el acceso con dueño.",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Edición",
+            "min": 9,
+            "pd": false,
+            "gd": true,
+            "ed": "14",
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "30 jun",
+            "parts": [
+              {
+                "t": "Agentes, checkout y el criterio del marketing",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Edición",
+            "min": 11,
+            "pd": false,
+            "gd": true,
+            "ed": "13",
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "24 jun",
+            "parts": [
+              {
+                "t": "La AI dejó de adoptarse, ahora opera tu marketing",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Edición",
+            "min": 8,
+            "pd": false,
+            "gd": true,
+            "ed": "12",
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "2 mar",
+            "parts": [
+              {
+                "t": "Tu semana en AI, marketing y tecnología — sin anestesia",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Edición",
+            "min": 5,
+            "pd": false,
+            "gd": true,
+            "ed": "02",
+            "fl": false
+          }
+        ]
+      }
+    ],
+    "pager": {
+      "note": "Mostrando las 10 publicaciones",
+      "label": "Páginas del tema",
+      "multi": false,
+      "prev": null,
+      "next": null,
+      "pages": []
+    }
+  },
+  "meanwhile": null,
+  "topics": {
+    "eyebrow": "Explora por tema",
+    "title": "Otros temas del blog.",
+    "all": 44,
+    "allUrl": "#",
+    "items": [
+      {
+        "url": "#",
+        "name": "HubSpot",
+        "count": "12 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Inbound Marketing",
+        "count": "10 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Marketing Digital",
+        "count": "6 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Loop Marketing",
+        "count": "5 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "AEO",
+        "count": "4 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Inteligencia Artificial",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Diseño",
+        "count": "2 publicaciones",
+        "style": "--acc: #ff6500;",
+        "barStyle": "background: #ff6500;"
+      },
+      {
+        "url": "#",
+        "name": "SEO",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Novedades Efeonce",
+        "count": "2 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Growth",
+        "count": "1 publicación",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      }
+    ]
+  },
+  "rootCls": "v3 arc gl",
+  "gl": {
+    "wordmark": "/_blob/72025ed97a7ce0c610ec355f78efed74",
+    "logo": "/_blob/1063184040c6121be1f86602803b0f55",
+    "trail": "/_blob/3b6e8663a0a14cda3ae78bca5e9226e7",
+    "desc": "El resumen semanal de Efeonce sobre IA, marketing y tecnología: lo que cambió, por qué importa y qué hacer con eso,",
+    "mul": "sin anestesia.",
+    "edition": {
+      "n": "17",
+      "date": "28 jul 2026"
+    },
+    "flash": {
+      "date": "28 sep 2026"
+    },
+    "sub": {
+      "demo": true,
+      "live": false
+    }
+  }
+}

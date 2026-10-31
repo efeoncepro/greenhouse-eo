@@ -1,0 +1,144 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "9e759d69cfa7",
+  "key": "9e759d69cfa7523a696cf8a343bb383c3c7313068a1e3c294d5467729a865705",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:58:55.617Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/06.png",
+    "imageSha256": "da32ad03b7a629dfdb88b10ca7343ea456f52a788fcd538d40862e569ed36b01",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix5/m/06.png",
+    "maskSha256": "8485c57135447d5329735fa58ad8a8df3fa4efd703842b91562a0850d0276f55",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/ref-proveedores.png",
+        "sha256": "b6678e02541dc3d5bf0765b1b0e2a224cc2266422e660f4d3f58f0b4d5ab33a8"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked laptop with a current-generation ultra-thin space-grey aluminum laptop with minimal uniform bezels and no chin label or text, same position, angle and size, open. Its screen fills the whole display panel edge to edge with a video call in a 2x2 grid showing exactly the four people of image 2. Keep everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the marked laptop with a current-generation ultra-thin space-grey aluminum laptop with minimal uniform bezels and no chin label or text, same position, angle and size, open. Its screen fills the whole display panel edge to edge with a video call in a 2x2 grid showing exactly the four people of image 2. Keep everything outside the zone unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.09353713989257813,
+    "editable": 108985,
+    "soft": 13616,
+    "protected": 1188119
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 40 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 41.238,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.81,
+        "bestError": 1.81,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        2.18,
+        1.6,
+        2.51
+      ],
+      "protected": {
+        "pixels": 1188119,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 108985,
+        "maxDelta": 234,
+        "meanDelta": 45.473,
+        "worst": {
+          "x": 788,
+          "y": 814
+        }
+      },
+      "seam": {
+        "pixels": 13616,
+        "maxDelta": 189,
+        "meanDelta": 7.339,
+        "worst": {
+          "x": 511,
+          "y": 925
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1188119,
+        "maxDelta": 136,
+        "meanDelta": 3.005,
+        "worst": {
+          "x": 852,
+          "y": 600
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3796,
+        "input_tokens_details": {
+          "image_tokens": 3532,
+          "text_tokens": 264
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 5306
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

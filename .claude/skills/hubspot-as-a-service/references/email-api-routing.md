@@ -78,6 +78,22 @@ Before enrolling, verify:
 Sales Hub Professional permits up to 500 sequence sends per assigned user over a rolling 24-hour window. Bulk
 enrollments are additionally limited to three email sends per minute. A lower custom or provider limit binds first.
 
+## Evidence and an explicit BCC requirement
+
+For Julio, retain the [signature/BCC policy](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
+Native sequence logging is not proof of a configured BCC recipient. If the operator explicitly requires
+BCC and the effective UI does not expose it, prepare the complete sequence without enrollment and resolve
+that constraint. An explicit later approval for native logging with a BCC exception applies only to the
+named batch; it preserves the official graphical signature, stop rules and other sending requirements.
+Do not silently switch transport or add a global mailbox rule. [Two-contact application](../../../../docs/commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md).
+
+If the CLI enrollment reader returns `RESPONSE_DECODE_FAILED`, do not treat that as enrollment failure
+or repeat the mutation. Read the authenticated UI status and persisted per-step calendar; independently
+corroborate Contact fields `hs_sequences_is_enrolled`, `hs_sequences_enrolled_count` and
+`hs_latest_sequence_enrolled`. These properties do not prove message content, signature, send time or
+delivery. Processing, scheduled, sent and delivered remain distinct outcomes. This operational evidence
+does not add an API capability or waive a missing scope.
+
 ## Routing decision
 
 - Form confirmation on Starter: use form automation.

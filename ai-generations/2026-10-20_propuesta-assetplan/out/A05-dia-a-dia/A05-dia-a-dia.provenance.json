@@ -1,0 +1,26 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "097c9a44765af0ef701b49171c6c612fb88506b0cd7babf3a06117cf7eaae2da",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-day-live-approval",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:salesforce-icon-slack",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/salesforce-icon-slack.svg",
+      "sha256": "c39ba0551291fe986cf6ae24e6661b2a90b782f264a0f0bf67e4f1b1cd62cf86"
+    },
+    {
+      "ref": "asset-ref:file:hubspot-icon-sales",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/hubspot-icon-sales.svg",
+      "sha256": "c373016d44321fb46b33b5f588471716401f03f824bb0df022c6c6a1d7ff75bb"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  },
+  "adjustment": "eyebrow-chip-outline-2026-10-20"
+}

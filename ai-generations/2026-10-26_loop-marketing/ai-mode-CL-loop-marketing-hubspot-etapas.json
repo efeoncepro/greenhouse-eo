@@ -1,0 +1,320 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-26T08:58:58.008Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:serp.google.ai.mode.live.advanced",
+      "method": "POST",
+      "path": "/v3/serp/google/ai_mode/live/advanced"
+    },
+    "family": "serp",
+    "organizationId": null,
+    "consumer": "aeo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "loop marketing hubspot etapas",
+        "location_code": 2152,
+        "language_code": "es",
+        "device": "desktop"
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.004,
+    "estimateStatus": "available",
+    "maxUsd": 0.01,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/serp/google/ai_mode/live/advanced/",
+      "sourceModifiedAt": "2026-07-29T13:48:30.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 7142,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 7142,
+        "costUsd": 0.004,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10260858-1987-0139-0000-919f0abe5a1a",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.004,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.004,
+    "tasks": [
+      {
+        "id": "10260858-1987-0139-0000-919f0abe5a1a",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "6.2577 sec.",
+        "cost": 0.004,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "serp",
+          "google",
+          "ai_mode",
+          "live",
+          "advanced"
+        ],
+        "data": {
+          "api": "serp",
+          "function": "live",
+          "se": "google",
+          "se_type": "ai_mode",
+          "keyword": "loop marketing hubspot etapas",
+          "location_code": 2152,
+          "language_code": "es",
+          "device": "desktop",
+          "os": "windows"
+        },
+        "result": [
+          {
+            "keyword": "loop marketing hubspot etapas",
+            "type": "ai_mode",
+            "se_domain": "google.com",
+            "location_code": 2152,
+            "language_code": "es",
+            "check_url": "https://www.google.com/search?q=loop%20marketing%20hubspot%20etapas&hl=es&gl=CL&udm=50&uule=w+CAIQIFISCS-vJQRBxWKWER25AhET4QUF",
+            "datetime": "2026-10-26 08:58:57 +00:00",
+            "spell": null,
+            "refinement_chips": null,
+            "item_types": [
+              "ai_overview"
+            ],
+            "se_results_count": 0,
+            "items_count": 1,
+            "items": [
+              {
+                "type": "ai_overview",
+                "rank_group": 1,
+                "rank_absolute": 1,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[2]/div[1]/div[9]/div[1]/section[1]/div[1]/div[1]/div[3]/div[4]/div[1]/div[1]/div[1]/div[3]",
+                "markdown": "El **Loop Marketing** de [HubSpot](https://www.hubspot.es/loop-marketing) es un marco estratégico continuo de **4 etapas** diseñado para la era de la inteligencia artificial y los nuevos hábitos de consumo (donde los usuarios investigan con IA y canales descentralizados), dejando atrás el marketing lineal tradicional.[[1]](https://knowledge.hubspot.com/es/campaigns/understand-loop-marketing)[[2]](https://www.hubspot.es/loop-marketing)\n\n### Las 4 Etapas del Loop Marketing\n\n#### 1. Definición (Estrategia y Estilo)\n\n- **Objetivo:** Establecer la identidad de marca, la historia central y el tono único.\n- **Enfoque:** Combinar la creatividad humana con la dirección estratégica.\n- **Herramientas clave:** Identidad de marca, Asistente Breeze y Marketing Studio.[[1]](https://www.hubspot.es/loop-marketing)\n\n#### 2. Adaptación (Mensajes Personales)\n\n- **Objetivo:** Conectar de forma hiperpersonalizada con la audiencia a través de los datos del CRM.\n- **Enfoque:** Enviar el mensaje correcto al segmento adecuado en el momento preciso.\n- **Herramientas clave:** Segmentación impulsada por IA, personalización avanzada y generación de correos electrónicos con IA.[[1]](https://www.hubspot.es/loop-marketing)\n\n#### 3. Amplificación (Canales y AEO)\n\n- **Objetivo:** Distribuir el contenido de manera efectiva en múltiples canales y adaptarse a la optimización para motores de respuesta (AEO - *Answer Engine Optimization*).\n- **Enfoque:** Maximizar el alcance donde realmente navega el usuario (redes sociales, videos, podcasts, etc.).\n- **Herramientas clave:** AEO, Marketing Studio y herramientas de video.[[1]](https://knowledge.hubspot.com/es/campaigns/understand-loop-marketing)[[2]](https://www.hubspot.es/loop-marketing)\n\n#### 4. Optimización (Feedback en Tiempo Real)\n\n- **Objetivo:** Analizar el rendimiento de las acciones recientes para aprender y refinar la estrategia de forma cíclica.\n- **Enfoque:** Cerrar el ciclo evaluando datos para que el sistema aprenda y sea más inteligente en la siguiente ejecución.\n- **Herramientas clave:** Análisis e investigación asistidos por ChatGPT/IA y optimización de campañas.[[1]](https://www.hubspot.es/loop-marketing)[[2]](https://www.youtube.com/watch?v=QPqHmyzovtM)\n\nPara profundizar en cómo funciona la fase final de este ciclo y aprender a convertir datos en conversiones usando IA, puedes ver el siguiente recurso:\n\n![](https://api.dataforseo.com/cdn/i/10260858-1987-0139-0000-919f0abe5a1a:4)\n10:18\n[](https://www.youtube.com/watch?v=QPqHmyzovtM) Convierte Datos en Conversiones con IA hace 6 meses![](https://api.dataforseo.com/cdn/i/10260858-1987-0139-0000-919f0abe5a1a:5)\nYouTube · HubSpot Español\n\n¿Te gustaría profundizar en **alguna etapa en específico** o ver cómo aplicar este marco utilizando herramientas como **Breeze** en tu cuenta de HubSpot?",
+                "items": [
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "El Loop Marketing de HubSpot es un marco estratégico continuo de 4 etapas diseñado para la era de la inteligencia artificial y los nuevos hábitos de consumo (donde los usuarios investigan con IA y canales descentralizados), dejando atrás el marketing lineal tradicional.",
+                    "markdown": "El **Loop Marketing** de [HubSpot](https://www.hubspot.es/loop-marketing) es un marco estratégico continuo de **4 etapas** diseñado para la era de la inteligencia artificial y los nuevos hábitos de consumo (donde los usuarios investigan con IA y canales descentralizados), dejando atrás el marketing lineal tradicional.[[1]](https://knowledge.hubspot.com/es/campaigns/understand-loop-marketing)[[2]](https://www.hubspot.es/loop-marketing)",
+                    "links": [
+                      {
+                        "type": "link_element",
+                        "title": "HubSpot",
+                        "description": null,
+                        "url": "https://www.hubspot.es/loop-marketing",
+                        "domain": "www.hubspot.es"
+                      }
+                    ],
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "HubSpot",
+                        "domain": "knowledge.hubspot.com",
+                        "url": "https://knowledge.hubspot.com/es/campaigns/understand-loop-marketing",
+                        "title": "Comprender Loop Marketing - HubSpot Knowledge Base",
+                        "text": "Loop Marketing es un marco de cuatro etapas que ayuda a los profesionales del marketing a crecer en la era de la IA. A diferencia ..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "HubSpot Español",
+                        "domain": "www.hubspot.es",
+                        "url": "https://www.hubspot.es/loop-marketing",
+                        "title": "Loop marketing | La filosofía de HubSpot para crecer con la IA",
+                        "text": "Loop Marketing: estrategia continua de HubSpot de 4 etapas. E1 Definición: historia. E2 Adaptación: mensajes personales vía CRM. E..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "Las 4 Etapas del Loop Marketing",
+                    "text": null,
+                    "markdown": "### Las 4 Etapas del Loop Marketing",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "1. Definición (Estrategia y Estilo)",
+                    "text": "Objetivo: Establecer la identidad de marca, la historia central y el tono único. Enfoque: Combinar la creatividad humana con la dirección estratégica. Herramientas clave: Identidad de marca, Asistente Breeze y Marketing Studio.",
+                    "markdown": "- **Objetivo:** Establecer la identidad de marca, la historia central y el tono único.\n- **Enfoque:** Combinar la creatividad humana con la dirección estratégica.\n- **Herramientas clave:** Identidad de marca, Asistente Breeze y Marketing Studio.[[1]](https://www.hubspot.es/loop-marketing)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "HubSpot Español",
+                        "domain": "www.hubspot.es",
+                        "url": "https://www.hubspot.es/loop-marketing",
+                        "title": "Loop marketing | La filosofía de HubSpot para crecer con la IA",
+                        "text": "AEO (Herramientas: AEO, Marketing Studio, Video). - E4 Optimización: feedback en tiempo real (Herramientas: ChatGPT research, Email optimization, Analíticas)."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "2. Adaptación (Mensajes Personales)",
+                    "text": "Objetivo: Conectar de forma hiperpersonalizada con la audiencia a través de los datos del CRM. Enfoque: Enviar el mensaje correcto al segmento adecuado en el momento preciso. Herramientas clave: Segmentación impulsada por IA, personalización avanzada y generación de correos electrónicos con IA.",
+                    "markdown": "- **Objetivo:** Conectar de forma hiperpersonalizada con la audiencia a través de los datos del CRM.\n- **Enfoque:** Enviar el mensaje correcto al segmento adecuado en el momento preciso.\n- **Herramientas clave:** Segmentación impulsada por IA, personalización avanzada y generación de correos electrónicos con IA.[[1]](https://www.hubspot.es/loop-marketing)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "HubSpot Español",
+                        "domain": "www.hubspot.es",
+                        "url": "https://www.hubspot.es/loop-marketing",
+                        "title": "Loop marketing | La filosofía de HubSpot para crecer con la IA",
+                        "text": "AEO (Herramientas: AEO, Marketing Studio, Video). - E4 Optimización: feedback en tiempo real (Herramientas: ChatGPT research, Email optimization, Analíticas)."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "3. Amplificación (Canales y AEO)",
+                    "text": "Objetivo: Distribuir el contenido de manera efectiva en múltiples canales y adaptarse a la optimización para motores de respuesta (AEO - Answer Engine Optimization). Enfoque: Maximizar el alcance donde realmente navega el usuario (redes sociales, videos, podcasts, etc.). Herramientas clave: AEO, Marketing Studio y herramientas de video.",
+                    "markdown": "- **Objetivo:** Distribuir el contenido de manera efectiva en múltiples canales y adaptarse a la optimización para motores de respuesta (AEO - *Answer Engine Optimization*).\n- **Enfoque:** Maximizar el alcance donde realmente navega el usuario (redes sociales, videos, podcasts, etc.).\n- **Herramientas clave:** AEO, Marketing Studio y herramientas de video.[[1]](https://knowledge.hubspot.com/es/campaigns/understand-loop-marketing)[[2]](https://www.hubspot.es/loop-marketing)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "HubSpot",
+                        "domain": "knowledge.hubspot.com",
+                        "url": "https://knowledge.hubspot.com/es/campaigns/understand-loop-marketing",
+                        "title": "Comprender Loop Marketing - HubSpot Knowledge Base",
+                        "text": "Loop Marketing es un marco de cuatro etapas que ayuda a los profesionales del marketing a crecer en la era de la IA. Loop Marketing está diseñado para un mundo en..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "HubSpot Español",
+                        "domain": "www.hubspot.es",
+                        "url": "https://www.hubspot.es/loop-marketing",
+                        "title": "Loop marketing | La filosofía de HubSpot para crecer con la IA",
+                        "text": "AEO (Herramientas: AEO, Marketing Studio, Video). - E4 Optimización: feedback en tiempo real (Herramientas: ChatGPT research, Email optimization, Analíticas)."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "4. Optimización (Feedback en Tiempo Real)",
+                    "text": "Objetivo: Analizar el rendimiento de las acciones recientes para aprender y refinar la estrategia de forma cíclica. Enfoque: Cerrar el ciclo evaluando datos para que el sistema aprenda y sea más inteligente en la siguiente ejecución. Herramientas clave: Análisis e investigación asistidos por ChatGPT/IA y optimización de campañas.",
+                    "markdown": "- **Objetivo:** Analizar el rendimiento de las acciones recientes para aprender y refinar la estrategia de forma cíclica.\n- **Enfoque:** Cerrar el ciclo evaluando datos para que el sistema aprenda y sea más inteligente en la siguiente ejecución.\n- **Herramientas clave:** Análisis e investigación asistidos por ChatGPT/IA y optimización de campañas.[[1]](https://www.hubspot.es/loop-marketing)[[2]](https://www.youtube.com/watch?v=QPqHmyzovtM)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "HubSpot Español",
+                        "domain": "www.hubspot.es",
+                        "url": "https://www.hubspot.es/loop-marketing",
+                        "title": "Loop marketing | La filosofía de HubSpot para crecer con la IA",
+                        "text": "AEO (Herramientas: AEO, Marketing Studio, Video). - E4 Optimización: feedback en tiempo real (Herramientas: ChatGPT research, Email optimization, Analíticas)."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "YouTube",
+                        "domain": "www.youtube.com",
+                        "url": "https://www.youtube.com/watch?v=QPqHmyzovtM",
+                        "title": "Convierte Datos en Conversiones con IA",
+                        "text": "La clave está en analizar los datos para identificar patrones, donde la inteligencia artificial (IA) puede ser muy útil para ver c..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Para profundizar en cómo funciona la fase final de este ciclo y aprender a convertir datos en conversiones usando IA, puedes ver el siguiente recurso: 10:18 Convierte Datos en Conversiones con IA hace 6 meses YouTube · HubSpot Español",
+                    "markdown": "Para profundizar en cómo funciona la fase final de este ciclo y aprender a convertir datos en conversiones usando IA, puedes ver el siguiente recurso:\n\n![](https://api.dataforseo.com/cdn/i/10260858-1987-0139-0000-919f0abe5a1a:2)\n10:18\n[](https://www.youtube.com/watch?v=QPqHmyzovtM) Convierte Datos en Conversiones con IA hace 6 meses![](https://api.dataforseo.com/cdn/i/10260858-1987-0139-0000-919f0abe5a1a:3)\nYouTube · HubSpot Español",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "¿Te gustaría profundizar en alguna etapa en específico o ver cómo aplicar este marco utilizando herramientas como Breeze en tu cuenta de HubSpot?",
+                    "markdown": "¿Te gustaría profundizar en **alguna etapa en específico** o ver cómo aplicar este marco utilizando herramientas como **Breeze** en tu cuenta de HubSpot?",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  }
+                ],
+                "references": [
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "HubSpot Español",
+                    "domain": "www.hubspot.es",
+                    "url": "https://www.hubspot.es/loop-marketing",
+                    "title": "Loop marketing | La filosofía de HubSpot para crecer con la IA",
+                    "text": "AEO (Herramientas: AEO, Marketing Studio, Video). - E4 Optimización: feedback en tiempo real (Herramientas: ChatGPT research, Email optimization, Analíticas)."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "YouTube",
+                    "domain": "www.youtube.com",
+                    "url": "https://www.youtube.com/watch?v=QPqHmyzovtM",
+                    "title": "Convierte Datos en Conversiones con IA",
+                    "text": "La clave está en analizar los datos para identificar patrones, donde la inteligencia artificial (IA) puede ser muy útil para ver conexiones"
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "HubSpot",
+                    "domain": "knowledge.hubspot.com",
+                    "url": "https://knowledge.hubspot.com/es/campaigns/understand-loop-marketing",
+                    "title": "Comprender Loop Marketing - HubSpot Knowledge Base",
+                    "text": "Loop Marketing es un marco de cuatro etapas que ayuda a los profesionales del marketing a crecer en la era de la IA. Loop Marketing está diseñado para un mundo en..."
+                  }
+                ],
+                "rectangle": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

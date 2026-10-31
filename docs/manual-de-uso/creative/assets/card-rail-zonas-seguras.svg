@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">Zonas seguras de la foto de la tarjeta del rail sobre el plate 16:9</title>
+  <desc id="d">Plate 16:9 con punto focal 84 % 30 %. La tarjeta de escritorio muestra de x 49 % a x 91 % del plate y la del teléfono de x 57 % a x 89 %. Arriba a la izquierda va la etiqueta de formato y arriba a la derecha la flecha. El degradado navy empieza a tapar desde y 36 % y el título va desde y 64 %. La cara va entre x 60 % y x 86 % y entre y 10 % y y 40 %.</desc>
+  <rect width="1600" height="900" fill="#001a33"/>
+  <!-- ventana escritorio 49.4–90.6 -->
+  <rect x="790" y="2" width="660" height="896" fill="none" stroke="#36c8bf" stroke-width="3" stroke-dasharray="14 10"/>
+  <!-- ventana móvil 57.4–89.1 -->
+  <rect x="918" y="2" width="508" height="896" fill="none" stroke="#36c8bf" stroke-width="2" stroke-dasharray="3 7"/>
+  <!-- degradado y título -->
+  <rect x="790" y="324" width="660" height="162" fill="#ffffff" fill-opacity="0.06"/>
+  <rect x="790" y="486" width="660" height="412" fill="#ffffff" fill-opacity="0.14"/>
+  <text x="806" y="600" fill="#ffffff" font-size="22" font-weight="600">Título, bajada y autor de la tarjeta</text>
+  <text x="806" y="630" fill="#c9d4df" font-size="17">desde y 64 %; el degradado tapa desde y 36 % y es sólido bajo y 70 %</text>
+  <!-- chip y flecha -->
+  <rect x="818" y="40" width="120" height="40" fill="#ff8a66" fill-opacity="0.35"/>
+  <text x="826" y="66" fill="#ffffff" font-size="15">Formato</text>
+  <rect x="1380" y="40" width="50" height="40" fill="#ff8a66" fill-opacity="0.35"/>
+  <text x="1390" y="66" fill="#ffffff" font-size="15">↗</text>
+  <!-- cara -->
+  <rect x="960" y="90" width="416" height="270" rx="24" fill="none" stroke="#ffb020" stroke-width="3"/>
+  <text x="972" y="390" fill="#ffb020" font-size="18" font-weight="600">Cara: x 60–86 % · y 10–40 % del plate</text>
+  <!-- leyendas izquierda -->
+  <text x="40" y="70" fill="#8fa3b8" font-size="20">Plate 16:9 · 2560 × 1440</text>
+  <text x="40" y="100" fill="#8fa3b8" font-size="20">punto focal «84% 30%»</text>
+  <text x="40" y="160" fill="#36c8bf" font-size="20">Rayas largas: tarjeta en</text>
+  <text x="40" y="186" fill="#36c8bf" font-size="20">escritorio y tablet (x 49–91 %)</text>
+  <text x="40" y="226" fill="#36c8bf" font-size="20">Puntos: teléfono (x 57–89 %)</text>
+  <text x="40" y="290" fill="#8fa3b8" font-size="20">Lo de la izquierda no se ve</text>
+  <text x="40" y="316" fill="#8fa3b8" font-size="20">en la tarjeta: es el lado de</text>
+  <text x="40" y="342" fill="#8fa3b8" font-size="20">la portada y del título.</text>
+</svg>

@@ -1,0 +1,160 @@
+{
+  "view": "tema-vacio",
+  "assets": {
+    "glitchNavy": "/_blob/1063184040c6121be1f86602803b0f55",
+    "glitchNeg": "/_blob/72025ed97a7ce0c610ec355f78efed74",
+    "spark": "/_blob/2def96f284c302de0cf9fa4736ed9d18"
+  },
+  "crumbs": [
+    {
+      "label": "Inicio",
+      "url": "#"
+    },
+    {
+      "label": "Blog",
+      "url": "#"
+    },
+    {
+      "label": "Temas",
+      "url": "#"
+    },
+    {
+      "label": "Marketing Digital",
+      "url": "#"
+    }
+  ],
+  "crumb": "Redes Sociales",
+  "headCls": "ah",
+  "gridCls": "ah__g",
+  "gridStyle": null,
+  "eyebrow": "Tema",
+  "eyebrowBar": "background: #ff6500;",
+  "isAuthor": false,
+  "author": null,
+  "plainH1": true,
+  "h1": "Redes Sociales",
+  "h1Cls": "idea ah__t",
+  "h1Style": "color: #ff6500;",
+  "desc": "Todavía no hay publicaciones en este tema. Mientras tanto, Marketing Digital reúne lo más cercano.",
+  "search": null,
+  "suggestions": null,
+  "meta": null,
+  "hero": null,
+  "parent": {
+    "url": "#",
+    "name": "Marketing Digital",
+    "count": 6
+  },
+  "spark": false,
+  "filter": null,
+  "list": null,
+  "meanwhile": {
+    "title": "Mientras tanto",
+    "glitch": {
+      "url": "#",
+      "img": "/_blob/08933b6eae580530405a3ebace493378",
+      "title": "Glitch Flash: Sonnet 5.5 roza a Opus, a mitad de precio",
+      "min": 9,
+      "date": "28 sep 2026"
+    },
+    "guide": {
+      "url": "#",
+      "kicker": "Guía · Loop Marketing",
+      "bar": "background: #36c8bf;",
+      "title": "Cómo ejecutar Loop Marketing en tu empresa"
+    },
+    "article": {
+      "url": "#",
+      "kicker": "Artículo · AEO",
+      "bar": "background: #0375db;",
+      "title": "El fin de la web «solo para humanos»"
+    }
+  },
+  "topics": {
+    "eyebrow": "Explora por tema",
+    "title": "Otros temas del blog.",
+    "all": 44,
+    "allUrl": "#",
+    "items": [
+      {
+        "url": "#",
+        "name": "HubSpot",
+        "count": "12 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Glitch",
+        "count": "10 publicaciones",
+        "style": "--acc: #6ec207;",
+        "barStyle": "background: #6ec207;"
+      },
+      {
+        "url": "#",
+        "name": "Inbound Marketing",
+        "count": "10 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Marketing Digital",
+        "count": "6 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Loop Marketing",
+        "count": "5 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "AEO",
+        "count": "4 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Inteligencia Artificial",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Diseño",
+        "count": "2 publicaciones",
+        "style": "--acc: #ff6500;",
+        "barStyle": "background: #ff6500;"
+      },
+      {
+        "url": "#",
+        "name": "SEO",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Novedades Efeonce",
+        "count": "2 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Growth",
+        "count": "1 publicación",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      }
+    ]
+  },
+  "rootCls": "v3 arc",
+  "gl": null
+}

@@ -56,7 +56,7 @@
 - **Estado vigente:** la conexion de Efeonce (`sc-domain:efeoncepro.com`, org `org-2df565fb-98aa-42f7-b324-ea9a2209017f`) esta activa. Un `invalid_grant` inicial de ese dia fue error del script de verificacion, no de la conexion.
 - **Leer la conexion correcta:** `listActiveSearchConsoleOrganizations()` (`src/lib/growth/search-console/connection-store.ts`) es para recorrer marcas en el batch diario y devuelve solo `organizationId` + `siteUrl`. Para obtener el token, leer `getSearchConsoleConnection(orgId)` y resolver su `tokenSecretRef`.
 - **Diagnosticar sin marcar revocada:** el listado de propiedades del panel (`listSearchConsoleSitesForOrg`) marca la conexion `revoked` si el refresh da `invalid_grant`. Para diagnosticar sin efectos, refrescar el token directamente en el script en vez de pasar por ese comando.
-- **URL Inspection:** con el token de la conexion de la org se puede consultar `urlInspection.index.inspect` (solo lectura) para observar el estado de una URL. La API no pide indexacion: solicitar indexacion se hace a mano en la interfaz de Search Console. Detalle en la skill `seo-aeo` (`references/google-search-console-api-indexing.md`).
+- **URL Inspection:** con el token de la conexion de la org se puede consultar `urlInspection.index.inspect` (solo lectura) para observar el estado de una URL. La API no pide indexacion: solicitar indexacion solo se puede en la interfaz de Search Console, y los agentes lo hacen con `pnpm public-website:gsc-index` ([manual](../public-site/solicitar-indexacion-search-console.md)). Detalle en la skill `seo-aeo` (`references/google-search-console-api-indexing.md`).
 
 ## Referencias tecnicas
 

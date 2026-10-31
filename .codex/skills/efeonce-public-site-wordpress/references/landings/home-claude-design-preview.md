@@ -1,5 +1,80 @@
 # Home — Claude Design / Elementor
 
+## Rediseño 2026-10-28 «La órbita × Pingback» (vigente)
+
+- URL `https://efeoncepro.com/`, `page_id` `251731` (`page_on_front`). Body replaced in place 2026-10-29 01:25 UTC by
+  operator request («reemplaza la home actual por esta que hiciste»); slug, title SEO, Yoast metas, canonical, index
+  policy, featured image `248149` and the page's Ohio `page_*` metas kept. Global AXIS navigation and Ohio footer are the
+  site's canonical chrome; the canvas' drawn navigation and brand close were left out (operator: «el header y el footer
+  deben ser los canónicos del sitio»). Shared bottom dock `manifests/landing-dock/home.json` unchanged.
+- Need: the front door for enterprise buyers (CMO, Head of Growth, CEO, CTO; Chile, Colombia, México, Perú, EE. UU.): the
+  five lines (Crecer · Destacar · Aparecer · Rendir · Vender), proof, AEO, agents with Sparks, Greenhouse, method,
+  SKY testimonials and comparison; conversion = native scheduler. Operator decisions 2026-10-28: «+90 marcas»; the agents
+  (Sparks) section is published; direct replacement after preview QA.
+- Design: canvas «Home Efeonce en órbita» (`https://claude.ai/artifact/CuJ5wNPXrfYBXV9wFMevNq`). SKY quotes are verbatim
+  from `experiencia.efeoncepro.com` (relationship proof, not service results). AEO answers, Greenhouse figures and
+  competitors are labelled illustrative.
+- Source and rail (shared source-led core): `scripts/public-website/inicio-source/` (Main.dc.html without the drawn nav,
+  assets.json, host.css, page-custom.css, page.css) → `compile-inicio-elementor-source.cjs` (evaluates the canvas
+  DCLogic, expands every runtime state into editable markup: hero words in a `<template>`, descriptions/captions, AEO
+  questions and «Tu marca» states, Greenhouse views, method steps, quotes, comparison columns) →
+  `build-inicio-elementor-package.cjs <live baseline>` → `deploy-inicio-elementor-package.php` (contract
+  `inicio-elementor-release.v1`, allows mp4) → `publish-inicio-elementor-page.php` (`preview` | `replace` with
+  `expectedDataSha`; optional 3rd input `.auth/site-nav-meeting-cta-surface.json`) →
+  `rollback-inicio-elementor-page.php` `{ "snapshot": "…" }`. Gates `verify-source-led-compilers.cjs` and
+  `verify-source-led-render.php` include `inicio` (other six landings byte/render identical).
+- Runtime: 12 containers, one `greenhouse_inicio_*` widget each: hero · marcas · motor · lineas · trabajo · aeo · agentes ·
+  greenhouse · metodo · respaldo · faq · agenda. Behaviour in `assets/js/inicio-landing.js` (reads only the DOM; nothing
+  runs in the editor; reduced motion keeps states still): hero rotation + accent, logo/work loops, motor and method sticky
+  scenes, line accordion, AEO typed question across five engines with scroll stages, Sparks constellation, Greenhouse
+  views with count-up, quote rotation, comparison, FAQ panel, copy e-mail.
+- Agenda uses the global menu's governed CTA `site-nav-discovery-meeting` (surface key written by the publisher into the
+  agenda widget; `cta_location=home_agenda`); fallback link `/agenda/`.
+- Hero `<h1>`: sr text «¿Qué necesita tu marketing? Crecer, destacar, aparecer, rendir y vender.»; the visible question
+  paragraph is `aria-hidden`, the letters are decorative.
+- Host fixes found in QA: canvas `border-box` reset kept; rails for Ohio's lateral widgets from 1181 px; phones: lens
+  caption room, AEO as a normal section (stage advances per question), mid-height Sparks hidden, motor chips to the four
+  corners with smaller type.
+- Live 2026-10-29: replace snapshot `_gh_home_orbita_before_20261029_012508` (previous hash `9aa8c770…`); new data hash
+  `c148f3df…`; widget deploy backups on Kinsta `/tmp/eo-inicio-widgets-before-20261029-012032.tar` … `-013142.tar`.
+  Verified live at 1440, 1280 and 390: overflow 0, no broken images, no console errors, scheduler dialog opens (no
+  booking made), canonical/robots/title/description unchanged. QA preview `252177` (`/home-orbita-preview-20261029/`) left
+  `private`.
+- SEO/social 2026-10-29 09:21 UTC (`configure-inicio-seo.php`, snapshot option `_gh_home_orbita_seo_before_20261029_092107`):
+  new attachment `252184` `efeonce-home-que-necesita-tu-marketing-og.png` (1200×630 PNG from `inicio-source/og/og.html`,
+  center-safe for square/2:1 crops, alt set) as OG image, Twitter image and featured image (also mirrored in
+  `_elementor_page_settings.post_featured_image`); the 2025 art `248149` (WebP 2000×960) stays in the library. Meta
+  description, OG/Twitter title «¿Qué necesita tu marketing? | Efeonce» and descriptions rewritten from the page copy;
+  SEO title unchanged. Same day: work videos `preload="none"` + play only on screen (0 MB of video at load, was 6.2 MB),
+  internal line links in the same tab, first hero portrait `fetchpriority="high"` (deploy backup
+  `/tmp/eo-inicio-widgets-before-20261029-092003.tar`).
+- `/home-2-2/` (page `248852` «Home 2», indexable, in the sitemap, competing with the front page) retired 2026-10-29 by
+  operator request: trashed (reversible) + Yoast 301 `home-2-2 → /` (`retire-home-2-2.php`). Legacy backup `2791` retired
+  later the same day (see next bullet).
+- Old Home pages retired 2026-10-29 by operator request («deja solo la que hicimos hoy», `retire-old-homes.php`), all to the
+  trash (reversible): `2791` /home-2/ (former Home, legacy backup), `242261` /home/, `246396` /home-prueba/ — each with a
+  Yoast 301 to `/` — plus drafts `248857`, `250260` and the QA preview `252177`. `251731` is the only Home page left.
+  The published Ohio theme demos (`21460`, `21466`, `20305`, `18734`, `225984`; `/homedemo{1,8,17,27,35}-elementor/`) were
+  trashed the same day with a 301 to `/` (`retire-ohio-demos.php`); demo drafts `21404` and `243726` remain as drafts.
+- SEO backlog (global, not the Home body): WebSite description = site tagline «Agencia de marketing 360°»; no X account in
+  Yoast (`twitter_site`); Slider Revolution `sr7.js` and Font Awesome brands load on the Home without use; field CWV and
+  PageSpeed not measured (public PSI quota exhausted 2026-10-29).
+- Mobile/tablet pass 2026-10-29 (operator: «igual de espectacular o mejor en mobile»): breakpoints ≤360/≤520/≤699/≤900
+  plus 521–900/640–900/700–900/901–1180 in `inicio-source/host.css`; touch equivalents for every hover scene (hero lens
+  swipe/tap, Spark tap legend `.sk-live` + guided tour, quote swipe, partner deal-in `gh-stack`, ribbon drag, dashboard
+  swipe); motor/method resolve while on screen; AEO advances with scroll again on phones (rows stacked at real height via
+  `--ty`); dock start/stop on `#top`/`#agenda`; `page.css` lifts Ohio's `.elements-bar` 76 px while the dock shows.
+  Traps: canvas two-class selectors (`.mstep.s1`) beat one-class responsive rules; a text-structure change renumbers
+  schema keys `fNNN_` (safe only while page `251731` stores no `fNNN_` values — check before deploy). Code verified
+  locally at 320/390/768/1024; deployed 2026-10-29 12:17 UTC (backup `/tmp/eo-inicio-widgets-before-20261029-121754.tar`)
+  and verified live at 375/1440 (dock start/stop and switch lift confirmed). QA trap: with the browser pane hidden,
+  `requestAnimationFrame` stalls and the dock looks dead — use real scroll or force a frame with a screenshot. Contract: `HOME_INICIO_ELEMENTOR_MODULES_V1.md` §Móvil y tablet.
+- Pending: in-editor save/reload not verified; keyboard traversal of the scenes not certified; the agents offer still
+  has no own landing (CTA goes to the agenda).
+
+## Before 2026-10-28 (history; replaced)
+
+
 > **Delta 2026-10-23 — shared dock (TASK-2043).** The bottom dock is AXIS `efeonce.landing-dock` painted by plugin `eo-landing-dock` (config `manifests/landing-dock/home.json`): phone; «Agenda una reunión» (no line; menu scheduler `site-nav-discovery-meeting`); no stop. The legacy dock `div[data-sticky-cta]` is stripped from the HTML while the dock is on (`off` brings it back); anything below describing the legacy dock is history and rollback context. Operate: `global-site-navigation.md` §Landing dock.
 
 ## Recorded runtime identity — checkpoint 2026-08-31

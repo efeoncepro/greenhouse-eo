@@ -1,0 +1,19 @@
+{
+  "pieza": "Efeonce | Claude — la murmuración (del mundo de Sonnet 5.5 al mundo de tu negocio)",
+  "duracion_s": 8.0,
+  "fps": 30,
+  "tempo_bpm": 120,
+  "nota": "Tiempos MEDIDOS en el clip de Seedance (tarea cgt-20261021100521-m7hcw) con la curva de brillo; el clip no se desplazó. Lockup en comp/lockup-overlay.html (T_SIGN 4,5).",
+  "cues": [
+    { "t": 0.0,  "hasta": 0.67, "evento": "Mundo de Sonnet 5.5: tinta sobre marfil, quieto", "sonido": "casi silencio + trazo de lápiz sobre papel" },
+    { "t": 0.67, "hasta": 1.17, "evento": "El sol late y suelta el anillo de luz", "sonido": "tono que sube y se tensa (riser corto)" },
+    { "t": 1.17, "hasta": 1.67, "evento": "Onda de choque: el anillo barre el cuadro y arranca el papel; entra el navy", "sonido": "barrido violento con papel que se rasga; golpe sub en 1,67 cuando el navy termina de entrar" },
+    { "t": 1.67, "hasta": 2.1,  "evento": "Estalla la arena desde todas las crestas", "sonido": "ráfaga de arena y viento" },
+    { "t": 2.1,  "hasta": 3.4,  "evento": "Los estorninos irrumpen como humo y se juntan", "sonido": "rugido de alas que crece + pulso de 120 BPM que se acelera" },
+    { "t": 3.4,  "hasta": 4.25, "evento": "La bandada sube en ola y rompe sobre el sol", "sonido": "el rugido sube al máximo" },
+    { "t": 4.25, "evento": "Destello del sol al romper la ola", "sonido": "ola grave y cálida + acorde que florece; el pulso se corta" },
+    { "t": 4.25, "hasta": 5.0,  "evento": "La ola se asienta (último cuadro del clip en 5,0)", "sonido": "cola de alas que se aleja" },
+    { "t": 4.8,  "evento": "Aterriza el lockup (golpe en 4,5)", "sonido": "sting de Efeonce con su pico aquí (archivo desde 4,2)" },
+    { "t": 4.8,  "hasta": 8.0,  "evento": "Cuadro quieto", "sonido": "pad cálido + viento leve; fundido 7,3 → 8,0" }
+  ]
+}

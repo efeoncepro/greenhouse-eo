@@ -1,0 +1,29 @@
+cuadros/blog-02s-todd-asomado-en-la-esquina.png|blog-02s-todd-asomado-en-la-esquina
+cuadros/codex-04s-alfred-asomado-en-codex.png|codex-04s-alfred-asomado-en-codex
+cuadros/film-04s-laboratorio-anillos-de-color-en-pantallas.png|film-04s-laboratorio-anillos-de-color-en-pantallas
+cuadros/film-05s-fila-de-prototipos-desenfocada.png|film-05s-fila-de-prototipos-desenfocada
+cuadros/film-06s-felipe-impreso-en-3d.png|film-06s-felipe-impreso-en-3d
+cuadros/film-08s-hoja-de-modelo-oficial-alfred-todd-felipe-y-piezas.png|film-08s-hoja-de-modelo-oficial-alfred-todd-felipe-y-piezas
+cuadros/film-09s-todd-fisico-vinilo-liso-y-prototipo-lima-con-orbe-y-gafas.png|film-09s-todd-fisico-vinilo-liso-y-prototipo-lima-con-orbe-y-gafas
+cuadros/film-10s-todd-fisico-en-la-pared.png|film-10s-todd-fisico-en-la-pared
+cuadros/film-13s-repisa-felipe-y-alfred-de-felpa.png|film-13s-repisa-felipe-y-alfred-de-felpa
+cuadros/film-22s-pantalla-chatgpt-your-dot.png|film-22s-pantalla-chatgpt-your-dot
+cuadros/film-23s-pantalla-felipe.png|film-23s-pantalla-felipe
+cuadros/film-24s-pantalla-rio-coral-gafas.png|film-24s-pantalla-rio-coral-gafas
+cuadros/film-25s-personalizador-verde-gafas-redondas.png|film-25s-personalizador-verde-gafas-redondas
+cuadros/film-26s-personalizador-verde-mechon-morado.png|film-26s-personalizador-verde-mechon-morado
+cuadros/film-27s-personalizador-verde-aureola-amarilla.png|film-27s-personalizador-verde-aureola-amarilla
+cuadros/film-28s-pantalla-alfred-con-nombre.png|film-28s-pantalla-alfred-con-nombre
+cuadros/film-32s-pantalla-jojo.png|film-32s-pantalla-jojo
+cuadros/setup-63s-configurador-modo-colores-anillos-y-personajes-4k.png|setup-63s-configurador-modo-colores-anillos-y-personajes-4k
+cuadros/setup-66s-configurador-dot-cian-flor-con-boina-4k.png|setup-66s-configurador-dot-cian-flor-con-boina-4k
+cuadros/web-poster-alfred-felpa-de-campana.png|web-poster-alfred-felpa-de-campana
+cuadros/web-poster-felipe-felpa-de-campana.png|web-poster-felipe-felpa-de-campana
+cuadros/web-poster-iggy-felpa-de-campana.png|web-poster-iggy-felpa-de-campana
+cuadros/web-poster-todd-felpa-de-campana.png|web-poster-todd-felpa-de-campana
+imagenes/chatgpt-features-alfred-profile.png|web alfred-profile.png
+imagenes/chatgpt-features-conn-mascot.webp|web conn-mascot.webp
+imagenes/chatgpt-features-task-coral.webp|web task-coral.webp
+imagenes/chatgpt-features-slack-jojo.webp|web slack-jojo.webp
+imagenes/chatgpt-features-phone-felipe.webp|web phone-felipe.webp
+imagenes/chatgpt-features-heart.png|web heart.png

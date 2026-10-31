@@ -1,0 +1,111 @@
+{
+  "status": "passed",
+  "scope": "B18-guest-without-internal-sso",
+  "checks": [
+    "private-config-mode",
+    "private-config-mode",
+    "local-only-runtime",
+    "port-3210-free",
+    "production-next-ready",
+    "mailbox-control-local",
+    "single-initial-email",
+    "mailbox-control-local",
+    "before-otp:no-issuer-or-internal-cookie",
+    "before-otp:internal-session-unauthorized",
+    "before-otp:authorize-redirect",
+    "before-otp:authorize-registered-callback",
+    "before-otp:prompt-none-login-required-without-code",
+    "before-otp:authorize-no-set-cookie",
+    "before-otp:authorize-no-internal-session-created",
+    "document-no-referrer",
+    "document-csp-nonce",
+    "capture-url-clean",
+    "00-empty-desktop:no-overflow",
+    "00-empty-desktop:fonts-loaded",
+    "00-empty-desktop:axe-clean",
+    "fragment-scrubbed",
+    "capture-code-empty",
+    "capture-url-clean",
+    "01-code-desktop:no-overflow",
+    "01-code-desktop:fonts-loaded",
+    "01-code-desktop:axe-clean",
+    "mailbox-control-local",
+    "open-and-reload-no-email",
+    "wrong-code-visible-error",
+    "capture-code-empty",
+    "capture-url-clean",
+    "01-code-error-desktop:no-overflow",
+    "01-code-error-desktop:fonts-loaded",
+    "01-code-error-desktop:axe-clean",
+    "correct-code-opens-edition",
+    "after-otp:guest-cookie-present-http-only",
+    "after-otp:no-issuer-or-internal-cookie",
+    "after-otp:internal-session-unauthorized",
+    "after-otp:authorize-redirect",
+    "after-otp:authorize-registered-callback",
+    "after-otp:prompt-none-login-required-without-code",
+    "after-otp:authorize-no-set-cookie",
+    "after-otp:authorize-no-internal-session-created",
+    "capture-url-clean",
+    "b18-guest-reader-desktop:no-overflow",
+    "b18-guest-reader-desktop:fonts-loaded",
+    "b18-guest-reader-desktop:axe-clean",
+    "mailbox-control-local",
+    "b18-no-additional-mail",
+    "no-csp-console-or-secret-network-errors"
+  ],
+  "runtimeIssues": [],
+  "email": "local-memory-only",
+  "visualAcceptance": "pending-Claude-Design-delivery-and-human-review",
+  "observedAt": "2026-10-28T23:33:12.630160+00:00",
+  "runtimeBranch": "codex/rooms-design-integration",
+  "runtimeCommit": "3b1b7b2e3979b70fffea015ea5daf03238312316",
+  "runtimeBase": "2cddc98",
+  "issuerSource": {
+    "repository": "greenhouse-eo",
+    "branch": "codex/auth-focused-main-candidate",
+    "commit": "31ffef1d16c6b8843062989c259360af5769d979",
+    "harnessSha256": "3453800cc2f5716eeb71472da008f589696c4ce2aa2fa20ab07599b0ffe428f3"
+  },
+  "checkCount": 51,
+  "verification": {
+    "eslint": "PASS",
+    "typecheck": "PASS",
+    "fullSuiteRepeated": false
+  },
+  "cleanup": {
+    "roomsNext3210Stopped": true,
+    "issuer19336Stopped": true,
+    "roomsPg55432Stopped": true,
+    "issuerDatabase": "ephemeral database stopped and temporary data removed"
+  },
+  "productionTouched": false,
+  "realEmailsSent": 0,
+  "authContractChangeRequired": false,
+  "captureEvidence": [
+    {
+      "privateRelativePath": ".captures/rooms-invitation-ui-1793230332842/00-empty-desktop.png",
+      "sha256": "bbba37d6e2fd4e29687a0678bb084bf3fba58ba4d2fb09b811f26d1fcaf250e9",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "privateRelativePath": ".captures/rooms-invitation-ui-1793230332842/01-code-desktop.png",
+      "sha256": "3514c983369cd576b1f55ee5c70dc15c243092834602adf88a82c4d451a4bc62",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "privateRelativePath": ".captures/rooms-invitation-ui-1793230332842/01-code-error-desktop.png",
+      "sha256": "bfc70a219162f9c0744ef6692f626b56e701d9695467ff291537db5883db442e",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "privateRelativePath": ".captures/rooms-invitation-ui-1793230332842/b18-guest-reader-desktop.png",
+      "sha256": "12468db4ae87989836dba47bf5ebaf0dc987406021ddbce5db4c83878130cbec",
+      "width": 1440,
+      "height": 2657
+    }
+  ]
+}

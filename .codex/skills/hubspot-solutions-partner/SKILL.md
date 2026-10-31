@@ -95,6 +95,9 @@ collateral vigente es el brochure aprobado el 2026-10-06 (§ «Collateral comerc
   ventas en 7 meses (y cómo termina la frase): sin ella el brochure **no se usa con prospectos**; 5 rutas hacia una
   persona y 23 fuentes sí están en el caso publicado; (2) aprobación escrita del sprocket; (3) lámina de equipo
   HubSpot (nombres, cargos, certificaciones, fotos); (4) plazo estándar de implementación.
+- **Brochure oficial de la agencia** (aprobado 2026-10-16, «Agencia de Marketing 360°», skill `deck-studio`): su tramo
+  Revenue cierra con el caso ANAM como prueba de implementación HubSpot (Customer Agent, rutas hacia una persona). Sus
+  cifras de ANAM tienen el mismo pendiente de autorización antes de enviarlo afuera.
 
 ---
 
@@ -230,7 +233,7 @@ rehacerla, no memorizarla. Por eso la calculadora vive en `templates/tier-calcul
 
 | Cuándo | Módulo |
 |---|---|
-| Qué vendes hoy: Hubs, Breeze, seats, créditos, onboarding fees, Loop Marketing, y **dónde HubSpot no llega** | `modules/01_PRODUCTO_2026.md` |
+| Qué vendes hoy: Hubs, Breeze, seats, créditos, onboarding fees, Loop Marketing (Loop 2026: Taste Profile y 4 Rs, ledger en `SOURCES.md` § Loop Marketing 2026), y **dónde HubSpot no llega** | `modules/01_PRODUCTO_2026.md` |
 | Cómo se gana plata y cómo se sostiene el tier: comisión, deal-based model, puntos, growth markets, deal registration, POI | `modules/02_ECONOMIA_PARTNER.md` |
 | **El motor de libro**: managed ops, la regla de los 60 días, GRR, expansión, QBR | `modules/03_MOTOR_LIBRO.md` |
 | A quién le vendes: ICP, señales de compra, comité, triggers regulatorios | `modules/04_ICP_Y_SENALES.md` |

@@ -1,0 +1,27 @@
+{
+  "kind": "primer-cuadro",
+  "command": [
+    "pnpm",
+    "ai:byteplus",
+    "--model",
+    "seedance25",
+    "--draft",
+    "--image",
+    "asset://asset-20261017163742-t66nd",
+    "--prompt-file",
+    "ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/primer-cuadro/s07-prompt.txt",
+    "--duration",
+    "4",
+    "--resolution",
+    "480p",
+    "--out",
+    "ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/primer-cuadro/antonio-primer-cuadro.mp4",
+    "--out-dir",
+    "ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/primer-cuadro",
+    "--yes"
+  ],
+  "startedAt": "2026-10-17T09:05:57.994819+00:00",
+  "finishedAt": "2026-10-17T09:06:01.281633+00:00",
+  "exitCode": 1,
+  "videoExists": false
+}

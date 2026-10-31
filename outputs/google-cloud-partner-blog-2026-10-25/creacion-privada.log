@@ -1,0 +1,85 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 public-website:content-factory:run /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/public-website/content-factory-run.ts -- --spec outputs/google-cloud-partner-blog-2026-10-25/articulo-spec.json --send --author-id 1 --manifest efeonce-google-cloud-partner-announcement --out outputs/google-cloud-partner-blog-2026-10-25/articulo-validado.json
+
+Wrote validated draft: /Users/jreye/Documents/greenhouse-eo/outputs/google-cloud-partner-blog-2026-10-25/articulo-validado.json
+{
+  "stage": "send",
+  "slug": "efeonce-partner-google-cloud",
+  "title": "Efeonce es partner de Google Cloud: más posibilidades para conectar tu negocio con la nube y la inteligencia artificial",
+  "validation": {
+    "contractVersion": "contentFactoryValidation.v1",
+    "status": "pass",
+    "findings": [],
+    "summary": {
+      "blockCount": 41,
+      "uniqueBlocks": [
+        "core/button",
+        "core/buttons",
+        "core/details",
+        "core/heading",
+        "core/image",
+        "core/list",
+        "core/paragraph",
+        "core/pullquote",
+        "yoast-seo/table-of-contents"
+      ],
+      "headingOutline": [
+        {
+          "level": 2,
+          "text": "Qué abre esta nueva etapa para tu empresa",
+          "index": 2156
+        },
+        {
+          "level": 2,
+          "text": "Nube, colaboración e inteligencia artificial",
+          "index": 4342
+        },
+        {
+          "level": 3,
+          "text": "Google Cloud: una base para aplicaciones y datos",
+          "index": 4777
+        },
+        {
+          "level": 3,
+          "text": "Google Workspace: colaboración en el trabajo cotidiano",
+          "index": 5687
+        },
+        {
+          "level": 3,
+          "text": "Gemini: inteligencia artificial para tareas concretas",
+          "index": 6632
+        },
+        {
+          "level": 2,
+          "text": "Cómo trabajamos contigo",
+          "index": 7852
+        },
+        {
+          "level": 2,
+          "text": "Preguntas sobre esta nueva etapa",
+          "index": 9518
+        },
+        {
+          "level": 2,
+          "text": "Conversemos sobre tu proyecto",
+          "index": 11902
+        }
+      ],
+      "hasTableOfContents": true,
+      "hasMedia": true,
+      "greenhouseAnchors": []
+    }
+  },
+  "manifest": "efeonce-google-cloud-partner-announcement",
+  "authorId": 1,
+  "readback": {
+    "outcome": "created",
+    "postId": 252108,
+    "status": "private",
+    "authorId": 1,
+    "authorName": "Julio Reyes",
+    "parsedBlocks": 36,
+    "editUrl": "https://efeoncepro.com/wp-admin/post.php?post=252108&action=edit"
+  }
+}

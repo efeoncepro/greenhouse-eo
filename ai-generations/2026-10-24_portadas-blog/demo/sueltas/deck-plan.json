@@ -1,0 +1,27 @@
+{
+  "tenderId": "MCM-demo-blog-inbound",
+  "slides": [
+    {
+      "slideId": "s01-blog-banner-escena",
+      "contentType": "mcm.blog.banner",
+      "template": "BlogBanner",
+      "slots": {
+        "theme": {
+          "line": "revenue-hubspot",
+          "tone": "navy",
+          "masthead": "manzanitas-logo-negative-revenue-hubspot",
+          "signature": "efeonce-logo-negative",
+          "sphereGap": "-0.02"
+        },
+        "voice": {
+          "question": "¿Qué es el inbound marketing en 2026?",
+          "answer": "Ayudar"
+        },
+        "photo": {
+          "src": "asset-ref:photo:s01-blog-banner-escena",
+          "alt": "Nexa revisa tarjetas de evidencia sobre una mesa con luz cálida"
+        }
+      }
+    }
+  ]
+}

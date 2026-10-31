@@ -1,0 +1,306 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "2ff6fe1bac66",
+  "key": "2ff6fe1bac66d326a425b229b8137ec3aeea26216052e2c72d68598d7725209c",
+  "status": "completed",
+  "createdAt": "2026-10-22T18:22:55.740Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/final/00-gancho-congelado.png",
+    "imageSha256": "4d726816f477923cf0bf78210edd539cc4db30bebd7b0380908821ce3c407b86",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/fisica/planoA/mascara-00-previo.png",
+    "maskSha256": "d1228c461962b31f3b8fad35d031de03a4af395a2b7486e51967082a941bcc04",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/fisica/11a-corregido-v1.png",
+        "sha256": "747de74afc86c132bd3d382edd61d3dbcf33cbbe34e891e67134cff94a8ca3b3"
+      },
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/lata/breakr-lata-v1.png",
+        "sha256": "0df65a914b53de2df35fb9b7acfebdccca499250a3e3ecc42111cd1b68b9a180"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 3,
+    "prompt": "Edit only the marked zone of image 1. Keep the exact same camera, framing, lens, room and warm low morning light of image 1. This is one frame of a high-speed live-action film, a fraction of a second BEFORE the moment shown in image 1.\n\nShow this moment instead:\n- Her size and position in the frame are EXACTLY as in image 1: same distance from the camera, her face centred about 45 % from the left edge and 29 % from the top, and from the top of her hair to her chin she spans about one quarter of the image height. She is NOT smaller and NOT further away than in image 1; if anything she leans very slightly toward the camera.\n- The woman is completely DRY and has not been hit yet. Her hair is dry, wavy, brown and voluminous, exactly like the woman in image 2, with the sunglasses on top of her head. Her head is upright, facing the camera; her eyes are wide open in surprise and her mouth is open, as in image 2. Same cream knit sweater over a white collar, dry. She still holds the paper coffee cup in her right hand in the same place, and her left hand is raised, palm out, as in image 1.\n- The BREAKR can from image 3 is flying toward the centre of her chest, about 15 cm in front of it, arriving from the direction of the laptop (from the lower right of the frame toward her), tilted, with slight motion blur along its path. Its orange body and teal band are recognisable.\n- Right behind the can, a narrow tongue of clear water with two or three orange slices flies from the laptop toward her chest, motion-blurred into streaks, not yet touching her.\n- The table in front of her is dry: no puddles, no slices on it. No droplets anywhere else in the air.\n- Restore the background behind her as it is in image 1: the glass partition, the bright windows, the plant and the office desks.\nDo not change the laptop, the dark mug, the man in the navy jacket or anything outside the marked zone.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nImage 4 is a reference of the object or element to bring into image 1; match its look, shape and material.\nEdit only the marked zone of image 1. Keep the exact same camera, framing, lens, room and warm low morning light of image 1. This is one frame of a high-speed live-action film, a fraction of a second BEFORE the moment shown in image 1.\n\nShow this moment instead:\n- Her size and position in the frame are EXACTLY as in image 1: same distance from the camera, her face centred about 45 % from the left edge and 29 % from the top, and from the top of her hair to her chin she spans about one quarter of the image height. She is NOT smaller and NOT further away than in image 1; if anything she leans very slightly toward the camera.\n- The woman is completely DRY and has not been hit yet. Her hair is dry, wavy, brown and voluminous, exactly like the woman in image 2, with the sunglasses on top of her head. Her head is upright, facing the camera; her eyes are wide open in surprise and her mouth is open, as in image 2. Same cream knit sweater over a white collar, dry. She still holds the paper coffee cup in her right hand in the same place, and her left hand is raised, palm out, as in image 1.\n- The BREAKR can from image 3 is flying toward the centre of her chest, about 15 cm in front of it, arriving from the direction of the laptop (from the lower right of the frame toward her), tilted, with slight motion blur along its path. Its orange body and teal band are recognisable.\n- Right behind the can, a narrow tongue of clear water with two or three orange slices flies from the laptop toward her chest, motion-blurred into streaks, not yet touching her.\n- The table in front of her is dry: no puddles, no slices on it. No droplets anywhere else in the air.\n- Restore the background behind her as it is in image 1: the glass partition, the bright windows, the plant and the office desks.\nDo not change the laptop, the dark mug, the man in the navy jacket or anything outside the marked zone.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.6375953674316406,
+    "editable": 787360,
+    "soft": 48349,
+    "protected": 475011
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.1359,
+    "basis": "3 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 33.991,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.57,
+        "bestError": 4.57,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        2.64,
+        2.02,
+        1.79
+      ],
+      "protected": {
+        "pixels": 475011,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 787360,
+        "maxDelta": 253,
+        "meanDelta": 35.549,
+        "worst": {
+          "x": 623,
+          "y": 680
+        }
+      },
+      "seam": {
+        "pixels": 48349,
+        "maxDelta": 204,
+        "meanDelta": 8.612,
+        "worst": {
+          "x": 637,
+          "y": 702
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 475011,
+        "maxDelta": 192,
+        "meanDelta": 10.495,
+        "worst": {
+          "x": 660,
+          "y": 716
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 6012,
+        "input_tokens_details": {
+          "image_tokens": 5345,
+          "text_tokens": 667
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 7522
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 31.843,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.84,
+        "bestError": 5.84,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        1.89,
+        0.96,
+        0.68
+      ],
+      "protected": {
+        "pixels": 475011,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 787360,
+        "maxDelta": 243,
+        "meanDelta": 33.331,
+        "worst": {
+          "x": 225,
+          "y": 448
+        }
+      },
+      "seam": {
+        "pixels": 48349,
+        "maxDelta": 198,
+        "meanDelta": 7.615,
+        "worst": {
+          "x": 527,
+          "y": 702
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 475011,
+        "maxDelta": 188,
+        "meanDelta": 12.697,
+        "worst": {
+          "x": 543,
+          "y": 716
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 6012,
+        "input_tokens_details": {
+          "image_tokens": 5345,
+          "text_tokens": 667
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 7522
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 3,
+      "raw": "candidate-3-raw.png",
+      "final": "candidate-3.png",
+      "diff": "candidate-3-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 38.406,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.6,
+        "bestError": 4.6,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        1.31,
+        0.92,
+        1.04
+      ],
+      "protected": {
+        "pixels": 475011,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 787360,
+        "maxDelta": 251,
+        "meanDelta": 40.239,
+        "worst": {
+          "x": 331,
+          "y": 385
+        }
+      },
+      "seam": {
+        "pixels": 48349,
+        "maxDelta": 227,
+        "meanDelta": 8.554,
+        "worst": {
+          "x": 794,
+          "y": 702
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 475011,
+        "maxDelta": 184,
+        "meanDelta": 9.732,
+        "worst": {
+          "x": 481,
+          "y": 880
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 6012,
+        "input_tokens_details": {
+          "image_tokens": 5345,
+          "text_tokens": 667
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 7522
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

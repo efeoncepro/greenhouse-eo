@@ -1,6 +1,7 @@
 <?php
 /**
- * Guarded scoped deployment of the eo-blog-home plugin (contract eo-blog-home-release.v1, TASK-2051): allowlist,
+ * Guarded scoped deployment of the eo-blog-home plugin (contract eo-blog-home-release.v1, TASK-2051; the archive
+ * template of TASK-2055 ships in the same plugin, off until the option eo_blog_archive_enabled is set): allowlist,
  * package hashes, previous-SHA drift guard, backup tar, main file written last, opcache invalidation and activation.
  * Installing it changes no page: /blog/ switches only with blog-v3/publish-blog-home-page.php (separate approval).
  * Inputs: package.zip and manifest.json from build-blog-home-plugin-package.cjs.
@@ -14,7 +15,7 @@ if ( ( $manifest['contract'] ?? '' ) !== 'eo-blog-home-release.v1' ) { WP_CLI::e
 $zip = new ZipArchive();
 if ( true !== $zip->open( $args[0] ) ) { WP_CLI::error( 'Invalid ZIP.' ); }
 $root    = WP_PLUGIN_DIR . '/eo-blog-home/';
-$allowed = '#^(eo-blog-home\.php|includes/class-eobh-[a-z]+\.php|assets/js/(dc-runtime|boot)\.js|assets/css/eobh-host\.css|assets/generated/(portada|tablet|movil)\.(js|css|ast\.json)|assets/generated/(blog-home-base\.css|manifest\.json|fixture\.(portada|movil)\.json)|assets/img/[0-9a-f]{32}\.(svg|webp|png))$#';
+$allowed = '#^(eo-blog-home\.php|includes/class-eobh-[a-z]+\.php|templates/archive\.php|assets/js/(dc-runtime|boot)\.js|assets/css/(eobh|eoba)-host\.css|assets/generated/(archive\.(css|ast\.json)|archive-base\.css|archive-manifest\.json|fixture\.archive-[a-z-]+\.json)|assets/generated/(portada|tablet|movil)\.(js|css|ast\.json)|assets/generated/(blog-home-base\.css|manifest\.json|fixture\.(portada|movil)\.json)|assets/img/[0-9a-f]{32}\.(svg|webp|png)|assets/fonts/[0-9a-f]{32}\.ttf)$#';
 $main    = 'eo-blog-home.php';
 $files   = array();
 foreach ( $manifest['files'] as $entry ) {

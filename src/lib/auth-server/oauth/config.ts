@@ -12,6 +12,8 @@ export type AuthServerOAuthConfig = {
   issuer: string
   /** Flag de la superficie OAuth; OFF ⇒ metadata y `/oauth/*` responden 404. */
   oauthEnabled: boolean
+  /** Independent first-party rollout. OFF must not query its additive tables. */
+  firstPartyEnabled?: boolean
   /** `environment_id` del emisor en `external_identity_environments` (TASK-1631). */
   environmentId: string
   /** Audiencia única del recurso MCP. */
@@ -67,6 +69,7 @@ export const readAuthServerOAuthConfig = (env: EnvSource = process.env): AuthSer
   return {
     issuer: parseOrigin(env.AUTH_SERVER_ISSUER, 'https://auth.efeonce.org'),
     oauthEnabled: parseFlag(env.AUTH_SERVER_OAUTH_ENABLED),
+    firstPartyEnabled: parseFlag(env.AUTH_SERVER_FIRST_PARTY_ENABLED),
     environmentId,
     mcpAudience: env.AUTH_SERVER_MCP_AUDIENCE?.trim() || EFEONCE_MCP_RESOURCE_AUDIENCE,
     ...AUTH_SERVER_OAUTH_DEFAULTS,

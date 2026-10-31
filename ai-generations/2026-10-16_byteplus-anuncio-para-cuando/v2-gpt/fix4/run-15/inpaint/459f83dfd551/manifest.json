@@ -1,0 +1,140 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "459f83dfd551",
+  "key": "459f83dfd5516a6d22a6c7f26848d610d8db08abb8a58196c2f35c9790589132",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:37:34.320Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v3/15-santiago.png",
+    "imageSha256": "aa2f33c8fc3de8d54d9ce03cff8c9fdd95795aa4f7a2bf520bbd1999e9d60f51",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/15.png",
+    "maskSha256": "b3efe421a7b5424a31e587dc0d74c0af9e2155f734848380d524dc99809e1e68",
+    "maskConvention": "white-editable",
+    "width": 1152,
+    "height": 1440,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/producto/lata.png",
+        "sha256": "d161bf641d4f491508ca0dffa48e2b97e2c678f3e1af886fd145c629b7725e59"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked smartphone: a current-generation flagship smartphone with an ultra-thin uniform black bezel, a small pill-shaped camera cutout at the top center (no notch), flat titanium frame in natural grey, held the same way by the same hand. Its screen shows a social feed post with a photo of EXACTLY the beverage can of image 2 with orange slices and splashing water; the interface icons are simple generic outline icons and grey placeholder lines, no readable text, no recognizable app. Keep the hand and everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the marked smartphone: a current-generation flagship smartphone with an ultra-thin uniform black bezel, a small pill-shaped camera cutout at the top center (no notch), flat titanium frame in natural grey, held the same way by the same hand. Its screen shows a social feed post with a photo of EXACTLY the beverage can of image 2 with orange slices and splashing water; the interface icons are simple generic outline icons and grey placeholder lines, no readable text, no recognizable app. Keep the hand and everything outside the zone unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.13492898823302468,
+    "editable": 204066,
+    "soft": 19765,
+    "protected": 1435049
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1152,
+      "height": 1440
+    },
+    "target": {
+      "width": 1152,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 63 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0501,
+    "basis": "1 × salida 1152x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 125.356,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.37,
+        "bestError": 5.37,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1435049,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 204066,
+        "maxDelta": 255,
+        "meanDelta": 135.886,
+        "worst": {
+          "x": 369,
+          "y": 706
+        }
+      },
+      "seam": {
+        "pixels": 19765,
+        "maxDelta": 243,
+        "meanDelta": 16.641,
+        "worst": {
+          "x": 184,
+          "y": 898
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1435049,
+        "maxDelta": 243,
+        "meanDelta": 11.437,
+        "worst": {
+          "x": 196,
+          "y": 748
+        }
+      },
+      "outputUsd": 0.0501,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 3250,
+        "input_tokens_details": {
+          "image_tokens": 3010,
+          "text_tokens": 240
+        },
+        "output_tokens": 1669,
+        "output_tokens_details": {
+          "image_tokens": 1669,
+          "text_tokens": 0
+        },
+        "total_tokens": 4919
+      },
+      "meta": {
+        "size": "1152x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

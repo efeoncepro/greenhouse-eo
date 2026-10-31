@@ -1,0 +1,7 @@
+Finish this cinematic composite so it reads as ONE real frame shot on a large-format cinema camera with an anamorphic lens, like the title shot of a film festival or a tech keynote.
+The floating widescreen film frames were composited in. Keep every frame's image content, framing, people, proportions, colours, rotation, size and position IDENTICAL; do not redraw, restyle, add or remove any frame or anything inside them. Treat them as thin glowing cinema screens floating in a dark space and only add physically correct light and lens behaviour:
+- each frame emits a soft glow of its own colours into the surrounding haze, with a thin crisp light edge;
+- a cool blue rim light from the horizontal light line behind them, and subtle glass reflections on the screen surfaces;
+- correct depth of field: the very large frames near the camera stay soft and out of focus with gentle bokeh, the mid-distance frames stay crisp, the small far frames stay dim, hazy and bluish;
+- soft atmospheric haze and floating dust between the layers, a subtle anamorphic flare interaction near the light line, slight chromatic aberration toward the corners, fine film grain over the whole frame.
+Keep the deep navy colour of the background. Keep the empty horizontal band in the middle of the frame (around the light line and just above it) clean, dark and free of any object: a title will be placed there. No text, no letters, no numbers, no logos, no watermark. Do not change the framing.

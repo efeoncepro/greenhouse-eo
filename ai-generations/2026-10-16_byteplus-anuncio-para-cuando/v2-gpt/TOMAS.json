@@ -1,0 +1,758 @@
+{
+ "produccion": "¿Para cuándo?",
+ "version": "v4 canónico",
+ "fecha": "2026-10-17",
+ "decisiones": [
+  {
+   "id": "D1",
+   "tema": "Paula en video",
+   "motivo": "Seedance rechaza rostros que no vienen de su biblioteca, y Paula es un personaje de casting fuera del elenco. Bloquea 8 tomas: 01, 04, 05, 08, 11a, 11b, 12 y 17.",
+   "recomendacion": "Cargar su ancla como retrato virtual (2 de los 38 cupos libres) y registrarla en el ledger. Alternativa: rehacer el reparto con alguien del elenco ya cargado (Karo, Sophia o Isabella), lo que obliga a regenerar los planos."
+  },
+  {
+   "id": "D2",
+   "tema": "Vocera del 16",
+   "motivo": "No tiene casting.",
+   "recomendacion": "Casting nuevo con ancla propia y 2 cupos, distinto del elenco de Efeonce (es la vocera de BREAKR)."
+  },
+  {
+   "id": "D3",
+   "tema": "Proveedores de la videollamada",
+   "motivo": "9 rostros sin asset; animarlos en Seedance costaría 18 cupos.",
+   "recomendacion": "Recuadros fijos con micro-movimiento y labios en post; si se necesita habla real, Omni por recuadro (sin verificar)."
+  },
+  {
+   "id": "D4",
+   "tema": "Formatos de entrega",
+   "motivo": "Los planos son 4:5; un 4:5 no se convierte en 16:9 sin inventar los costados.",
+   "recomendacion": "Generar en 9:16 y recortar el 4:5 (una generación sirve para Reels/Stories y para el feed). 16:9 sólo si hay pauta en YouTube o TV, como generación aparte."
+  }
+ ],
+ "tomas": [
+  {
+   "id": "00",
+   "ruta": "POST",
+   "gen": 0,
+   "uso": "0–1,5 s",
+   "eje": "B (= 11b)",
+   "cam": "Cuadro congelado del 11b",
+   "mov": "Congelado 0,5 s y rebobinado rápido hasta el 01 (velocidad negativa con barrido)",
+   "accion": [
+    "0,0 s · el último cuadro del 11b, congelado",
+    "0,5 s · aparece «¿Cómo llegamos aquí? / Rebobinemos»",
+    "1,0 s · rebobinado en aceleración hacia el 01"
+   ],
+   "refs": [
+    "Video final del 11b"
+   ],
+   "sonido": "Golpe de agua congelado (corte seco) · rebobinado de cinta · entra la música fría",
+   "cont": "Igual que el 11b",
+   "intoc": [
+    "La cara de Paula del 11b aprobado"
+   ],
+   "planb": "Si el 11b no está listo, congelar el cuadro clave del storyboard",
+   "dif": "C1 · F1 · I1",
+   "costo": [
+    0,
+    0
+   ],
+   "estado": "Depende del 11b",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "01",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "1,5 s (del 0,5 al 2,0)",
+   "eje": "C",
+   "cam": "Extremo oeste de la mesa · ≈1,2 m · 35 mm",
+   "mov": "Fija",
+   "accion": [
+    "0,0 s · Paula de tres cuartos, habla mirando su portátil (videollamada)",
+    "0,8 s · «¿Y para cuándo estaría la campaña?»",
+    "Antonio al fondo a la derecha teclea, sin mirar"
+   ],
+   "refs": [
+    "Paula · SIN ASSET (decisión D1)",
+    "Antonio · asset-20261018020314-x6th8 (rostro) + asset-20261018020355-fdzvx (cuerpo)",
+    "Escena: sala con mesa larga de roble claro, ventanal al este (descripción + plano sin rostros)"
+   ],
+   "sonido": "Diálogo de Paula (sincronía de labios) · teclado · notificación de la llamada · música fría",
+   "cont": "Mundo frío · Paula seca, café de papel en la mano derecha, lentes en la cabeza · portátil de Antonio a su izquierda, mirándolo",
+   "intoc": [
+    "Cara de Paula",
+    "Lado del portátil de Antonio"
+   ],
+   "planb": "OMNI desde el plano aprobado",
+   "dif": "C1 · F1 · I3",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Bloqueada por D1",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "02",
+   "ruta": "POST + OMNI",
+   "gen": 4,
+   "uso": "1,5 s",
+   "eje": "—",
+   "cam": "Pantalla de la videollamada",
+   "mov": "Fija; cada recuadro se ilumina cuando habla",
+   "accion": [
+    "0,0 s · grilla de 4 proveedores",
+    "0,3 s · «Seis semanas.»",
+    "0,9 s · «Primero hay que hacer casting.»"
+   ],
+   "refs": [
+    "9 retratos de webcam v2-gpt/fix4/proveedores/ (sin asset)"
+   ],
+   "sonido": "Voces de dos proveedores con compresión de llamada · subtítulo que cruza el corte",
+   "cont": "Mismos rostros que en el 03 y el 19",
+   "intoc": [
+    "Los mismos 4 rostros"
+   ],
+   "planb": "Retratos fijos con micro-movimiento y aplauso de labios en post",
+   "dif": "C1 · F1 · I2",
+   "costo": [
+    0.9,
+    4.6
+   ],
+   "estado": "Por decidir (D3)",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "03",
+   "ruta": "POST",
+   "gen": 0,
+   "uso": "1,0 s",
+   "eje": "—",
+   "cam": "Pantalla",
+   "mov": "Zoom out: 4 → 16 → 64 recuadros",
+   "accion": [
+    "0,0 s · 4 recuadros",
+    "0,4 s · 16",
+    "0,8 s · 64"
+   ],
+   "refs": [
+    "Recuadros del 02 + retratos de relleno"
+   ],
+   "sonido": "Cacofonía de voces superpuestas que crece",
+   "cont": "Mismos rostros del 02 en los primeros recuadros",
+   "intoc": [
+    "Rostros del 02"
+   ],
+   "planb": "—",
+   "dif": "C1 · F1 · I1",
+   "costo": [
+    0,
+    0
+   ],
+   "estado": "Por componer",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "04",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "2,0 s",
+   "eje": "C",
+   "cam": "Extremo oeste · ≈1,3 m · 35 mm",
+   "mov": "Fija",
+   "accion": [
+    "0,0 s · Paula se hunde en la silla",
+    "0,5–2,0 s · caen las burbujas: Seis semanas · Casting · Locación · Otra cotización (la última con microtemblor)"
+   ],
+   "refs": [
+    "Paula · SIN ASSET (decisión D1)",
+    "Antonio · asset-20261018020314-x6th8 (rostro) + asset-20261018020355-fdzvx (cuerpo)"
+   ],
+   "sonido": "Un «pop» por burbuja en corcheas, el último en el golpe · música fría",
+   "cont": "Mundo frío · Paula seca",
+   "intoc": [
+    "Cara de Paula"
+   ],
+   "planb": "OMNI desde el plano",
+   "dif": "C1 · F1 · I3",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Bloqueada por D1",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "05",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "1,5 s",
+   "eje": "C",
+   "cam": "Extremo oeste · ≈1,3 m · 35 mm",
+   "mov": "Fija",
+   "accion": [
+    "0,0 s · Día 42: telarañas, 15 tazas, una cana",
+    "0,5 s · remate «Día 42»"
+   ],
+   "refs": [
+    "Paula · SIN ASSET (decisión D1)",
+    "Antonio · asset-20261018020314-x6th8 (rostro) + asset-20261018020355-fdzvx (cuerpo)"
+   ],
+   "sonido": "Reloj · suspiro · golpe de esfera del remate",
+   "cont": "Gag de tiempo: el desorden no sigue después",
+   "intoc": [
+    "Cara de Paula"
+   ],
+   "planb": "OMNI",
+   "dif": "C1 · F1 · I3",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Bloqueada por D1",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "06",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "1,5 s",
+   "eje": "A",
+   "cam": "Detrás del hombro derecho de Paula · 1,15 m · 50 mm",
+   "mov": "Fija",
+   "accion": [
+    "0,0 s · Paula de espaldas se gira lento hacia Antonio",
+    "Se corta la música"
+   ],
+   "refs": [
+    "Antonio · asset-20261018020314-x6th8 (rostro) + asset-20261018020355-fdzvx (cuerpo)",
+    "Paula de espaldas: sin rostro visible"
+   ],
+   "sonido": "Silencio total; sólo el sorbo de café",
+   "cont": "Mundo frío · Costanera a la izquierda de Antonio",
+   "intoc": [
+    "Lado del portátil de Antonio"
+   ],
+   "planb": "OMNI",
+   "dif": "C1 · F1 · I2",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Lista para borrador",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "07",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "1,5 s",
+   "eje": "A",
+   "cam": "Sobre el hombro de Paula · 1,15 m · 85 mm",
+   "mov": "Fija",
+   "accion": [
+    "0,0 s · Antonio sereno, mira a Paula",
+    "0,4 s · «¿Para cuándo la necesitas?»"
+   ],
+   "refs": [
+    "Antonio · asset-20261018020314-x6th8 (rostro) + asset-20261018020355-fdzvx (cuerpo)"
+   ],
+   "sonido": "Voz de Antonio (sincronía de labios; acento mexicano, grave y cálida)",
+   "cont": "Mundo frío",
+   "intoc": [
+    "Cara y calma de Antonio"
+   ],
+   "planb": "Diálogo en el prompt con audio nativo y doblaje después",
+   "dif": "C1 · F1 · I2",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Lista para borrador",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "08",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "1,0 s",
+   "eje": "B",
+   "cam": "Detrás del hombro izquierdo de Antonio · 1,15 m · 85 mm",
+   "mov": "Fija",
+   "accion": [
+    "0,0 s · «…¿Para ayer?», con media sonrisa incrédula"
+   ],
+   "refs": [
+    "Paula · SIN ASSET (decisión D1)",
+    "Antonio de espaldas (nuca y hombro a la derecha)"
+   ],
+   "sonido": "Voz de Paula (sincronía)",
+   "cont": "Antonio a la DERECHA del cuadro · sin ventanal",
+   "intoc": [
+    "Cara de Paula",
+    "Eje: Antonio a la derecha"
+   ],
+   "planb": "OMNI",
+   "dif": "C1 · F1 · I3",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Bloqueada por D1",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "09",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "1,0 s",
+   "eje": "A",
+   "cam": "Detrás del hombro derecho de Paula · 1,15 m · 50 mm",
+   "mov": "Fija; el portátil gira dentro del cuadro",
+   "accion": [
+    "0,0 s · el portátil de espaldas a nosotros, mirando a Antonio",
+    "0,3 s · lo gira con la mano izquierda hacia Paula",
+    "0,7 s · «Ya está.» (remate)"
+   ],
+   "refs": [
+    "Antonio · asset-20261018020314-x6th8 (rostro) + asset-20261018020355-fdzvx (cuerpo)",
+    "Paula de espaldas",
+    "KV 16:9 de BREAKR para la pantalla"
+   ],
+   "sonido": "Clic suave del portátil al girar · voz «Ya está» · golpe de esfera",
+   "cont": "Mundo frío · portátil a la IZQUIERDA de Antonio (centro-derecha del cuadro)",
+   "intoc": [
+    "Lado del portátil",
+    "Arte de la pantalla"
+   ],
+   "planb": "OMNI con cuadro inicial y final",
+   "dif": "C2 · F1 · I2",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Lista para borrador",
+   "inicio": "09-inicio",
+   "final": null
+  },
+  {
+   "id": "10",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "1,0 s",
+   "eje": "A · inserto a ras de mesa",
+   "cam": "Lado de Paula, 15–20 cm sobre la mesa · 28 mm",
+   "mov": "Push-in hacia la pantalla cuando sale la lata",
+   "accion": [
+    "0,0 s · anillo de luz en el centro de la pantalla",
+    "0,3 s · la lata atraviesa el vidrio intacto hacia la cámara, con una lengua de agua",
+    "0,8 s · Antonio, detrás de la tapa, no reacciona"
+   ],
+   "refs": [
+    "Antonio · asset-20261018020314-x6th8 (rostro) + asset-20261018020355-fdzvx (cuerpo)",
+    "Lata BREAKR · lata/breakr-lata-v1.png (sin rostros: va como referencia)",
+    "KV 16:9 para la pantalla"
+   ],
+   "sonido": "Zumbido de pantalla que sube · whoosh de la lata · burbujeo · ENTRA EL DROP",
+   "cont": "Cambio a mundo cálido (contraluz de mañana) · Costanera a la izquierda de Antonio · sin hielo",
+   "intoc": [
+    "Antonio detrás de la tapa",
+    "BREAKR bien escrito",
+    "Vidrio intacto"
+   ],
+   "planb": "FF desde el cuadro de la lata sin Antonio + Antonio compuesto desenfocado",
+   "dif": "C3 · F4 · I2",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Borrador de prueba de una versión anterior (sin marca)",
+   "inicio": "10-inicio",
+   "final": null
+  },
+  {
+   "id": "11a",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "0,5 s",
+   "eje": "B",
+   "cam": "Detrás del hombro izquierdo de Antonio · 1,15 m · 35 mm",
+   "mov": "Dolly rápido hacia Paula siguiendo la ola",
+   "accion": [
+    "0,0 s · la ola cae frente al teclado",
+    "0,2 s · corre por la mesa alejándose de la cámara",
+    "0,5 s · la lata en la cresta, inclinada hacia Paula"
+   ],
+   "refs": [
+    "Paula · SIN ASSET (decisión D1)",
+    "Antonio: antebrazo y mano a la derecha",
+    "Lata BREAKR · lata/breakr-lata-v1.png (sin rostros: va como referencia)"
+   ],
+   "sonido": "Ola corriendo por la mesa · drop",
+   "cont": "Antonio quieto y seco · lata ≈1,7 cabezas de Paula",
+   "intoc": [
+    "Cara de Paula",
+    "Dirección de la ola",
+    "Escala de la lata"
+   ],
+   "planb": "OMNI desde el plano · ola compuesta como capa",
+   "dif": "C3 · F5 · I3",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Bloqueada por D1",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "11b",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "1,0 s",
+   "eje": "B",
+   "cam": "Detrás del hombro izquierdo de Antonio · 1,15 m · 50 mm",
+   "mov": "Cámara en mano con sacudida en el impacto",
+   "accion": [
+    "0,0 s · el frente de agua a 30 cm de Paula, todavía seca",
+    "0,3 s · golpe en el pecho y corona hasta la cara",
+    "0,6 s · la lata rebota junto a su cabeza (≈0,8 cabezas)"
+   ],
+   "refs": [
+    "Paula · SIN ASSET (decisión D1)",
+    "Antonio: hombro, mano y taza a la derecha",
+    "Lata BREAKR · lata/breakr-lata-v1.png (sin rostros: va como referencia)"
+   ],
+   "sonido": "Golpe de agua · gotas · grito ahogado",
+   "cont": "Paula empapada desde aquí · sin hielo",
+   "intoc": [
+    "Cara de Paula",
+    "Eje"
+   ],
+   "planb": "OMNI con cuadro inicial y final",
+   "dif": "C3 · F5 · I3",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Bloqueada por D1",
+   "inicio": "11b-inicio",
+   "final": null
+  },
+  {
+   "id": "12",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "1,5 s",
+   "eje": "C",
+   "cam": "Extremo oeste · ≈1,4 m · 35 mm",
+   "mov": "Paneo lento por las paredes que se encienden",
+   "accion": [
+    "0,0 s · paredes con pantallas apagadas",
+    "0,3–1,0 s · se encienden en cadena con la campaña",
+    "Paula de pie, empapada, mira las pantallas · Antonio seco al fondo"
+   ],
+   "refs": [
+    "Paula · SIN ASSET (decisión D1)",
+    "Antonio · asset-20261018020314-x6th8 (rostro) + asset-20261018020355-fdzvx (cuerpo)",
+    "Lata BREAKR · lata/breakr-lata-v1.png (sin rostros: va como referencia)",
+    "KV 9:16 para las pantallas"
+   ],
+   "sonido": "Encendido de pantallas en cadena · drop",
+   "cont": "Antonio al fondo, lado SUR · banda mojada diagonal · lata caída junto a Paula",
+   "intoc": [
+    "Lados de la mesa",
+    "Arte de pantallas"
+   ],
+   "planb": "FF de las paredes sin personas + personas compuestas",
+   "dif": "C2 · F2 · I3",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Bloqueada por D1",
+   "inicio": "12-inicio",
+   "final": null
+  },
+  {
+   "id": "13",
+   "ruta": "FF",
+   "gen": 4,
+   "uso": "1,0 s",
+   "eje": "Exterior",
+   "cam": "Calle · 35 mm",
+   "mov": "Leve tilt hacia la valla",
+   "accion": [
+    "0,0 s · corte encadenado por la forma de la lata",
+    "La gente graba la valla con sus teléfonos"
+   ],
+   "refs": [
+    "Plano aprobado como primer cuadro (gente de espaldas, sin rostros)"
+   ],
+   "sonido": "Ambiente de ciudad · golpe de música",
+   "cont": "Lunes 09:12, mañana · zócalo CDMX con pin",
+   "intoc": [
+    "Arte de la valla"
+   ],
+   "planb": "OMNI",
+   "dif": "C2 · F1 · I1",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Lista para borrador",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "14",
+   "ruta": "FF",
+   "gen": 4,
+   "uso": "1,0 s",
+   "eje": "Exterior",
+   "cam": "Calle · 35 mm",
+   "mov": "Leve tilt hacia la valla",
+   "accion": [
+    "0,0 s · misma posición de la lata que el 13"
+   ],
+   "refs": [
+    "Plano aprobado como primer cuadro"
+   ],
+   "sonido": "Ambiente de ciudad",
+   "cont": "Lunes 09:13, mañana · Monserrate",
+   "intoc": [
+    "Arte de la valla"
+   ],
+   "planb": "OMNI",
+   "dif": "C2 · F1 · I1",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Lista para borrador",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "15",
+   "ruta": "FF",
+   "gen": 4,
+   "uso": "1,0 s",
+   "eje": "Exterior",
+   "cam": "Calle, en mano · 35 mm",
+   "mov": "Del edificio al teléfono (tilt + foco)",
+   "accion": [
+    "0,0 s · valla",
+    "0,5 s · el teléfono con el post en primer plano"
+   ],
+   "refs": [
+    "Plano aprobado como primer cuadro (sólo una mano)"
+   ],
+   "sonido": "Ambiente · notificación",
+   "cont": "Lunes 09:14 · el post dice «Hace 1 minuto»",
+   "intoc": [
+    "Texto de la UI de Instagram"
+   ],
+   "planb": "Teléfono compuesto en post",
+   "dif": "C2 · F1 · I1",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Lista para borrador",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "16",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "2,5 s",
+   "eje": "Vocera",
+   "cam": "Plano medio · 50 mm",
+   "mov": "Fija",
+   "accion": [
+    "0,0 s · ES",
+    "0,8 s · EN",
+    "1,6 s · PT (un idioma por tiempo)"
+   ],
+   "refs": [
+    "Vocera · SIN CASTING NI ASSET (decisión D2)",
+    "Lata BREAKR · lata/breakr-lata-v1.png (sin rostros: va como referencia)"
+   ],
+   "sonido": "Voz de la vocera en tres idiomas (ElevenLabs v4) con sincronía",
+   "cont": "Sostiene la lata cerca de la cara (≈0,9 cabezas)",
+   "intoc": [
+    "BREAKR bien escrito"
+   ],
+   "planb": "OMNI",
+   "dif": "C1 · F1 · I3",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Bloqueada por D2",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "17",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "1,5 s",
+   "eje": "B",
+   "cam": "Detrás del hombro izquierdo de Antonio · 50 mm",
+   "mov": "Fija",
+   "accion": [
+    "0,0 s · Paula empapada, rodaja en el hombro",
+    "0,4 s · «…¿Y para el lunes?»"
+   ],
+   "refs": [
+    "Paula · SIN ASSET (decisión D1)",
+    "Antonio de espaldas a la derecha"
+   ],
+   "sonido": "Voz de Paula (sincronía) · gotas",
+   "cont": "Empapada · mira a la DERECHA del cuadro",
+   "intoc": [
+    "Cara de Paula",
+    "Eje"
+   ],
+   "planb": "OMNI",
+   "dif": "C1 · F1 · I3",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Bloqueada por D1",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "18",
+   "ruta": "REF",
+   "gen": 4,
+   "uso": "1,0 s",
+   "eje": "A",
+   "cam": "Sobre el hombro de Paula · 85 mm",
+   "mov": "Leve push-in",
+   "accion": [
+    "0,0 s · Antonio, sin pestañear",
+    "0,3 s · «También.» (remate)"
+   ],
+   "refs": [
+    "Antonio · asset-20261018020314-x6th8 (rostro) + asset-20261018020355-fdzvx (cuerpo)",
+    "Paula de espaldas, pelo mojado"
+   ],
+   "sonido": "Voz de Antonio · golpe de esfera",
+   "cont": "Antonio seco, taza seca, portátil mirándolo",
+   "intoc": [
+    "Calma de Antonio"
+   ],
+   "planb": "Audio nativo y doblaje",
+   "dif": "C1 · F1 · I2",
+   "costo": [
+    0.45,
+    2.3
+   ],
+   "estado": "Lista para borrador",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "19",
+   "ruta": "POST",
+   "gen": 0,
+   "uso": "1,0 s",
+   "eje": "—",
+   "cam": "Pantalla",
+   "mov": "Los recuadros se apagan uno a uno",
+   "accion": [
+    "El último proveedor cierra su laptop en silencio"
+   ],
+   "refs": [
+    "Recuadros del 02/03"
+   ],
+   "sonido": "Clics de desconexión en cadena",
+   "cont": "Mismos rostros",
+   "intoc": [
+    "—"
+   ],
+   "planb": "—",
+   "dif": "C1 · F1 · I1",
+   "costo": [
+    0,
+    0
+   ],
+   "estado": "Por componer",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "20a",
+   "ruta": "POST",
+   "gen": 0,
+   "uso": "1,5 s",
+   "eje": "—",
+   "cam": "Navy de Efeonce",
+   "mov": "Componente «remate con pregunta»",
+   "accion": [
+    "«¿Para ayer?» · «Ya está.»"
+   ],
+   "refs": [
+    "Kit de componentes"
+   ],
+   "sonido": "Golpe de esfera",
+   "cont": "—",
+   "intoc": [
+    "Componente aprobado"
+   ],
+   "planb": "—",
+   "dif": "—",
+   "costo": [
+    0,
+    0
+   ],
+   "estado": "Componente aprobado",
+   "inicio": null,
+   "final": null
+  },
+  {
+   "id": "20b",
+   "ruta": "POST",
+   "gen": 0,
+   "uso": "1,5 s",
+   "eje": "—",
+   "cam": "Navy de Efeonce",
+   "mov": "Super de dato + lockup",
+   "accion": [
+    "«Este video: [X] h» · fuente · Efeonce | BytePlus"
+   ],
+   "refs": [
+    "Kit de componentes"
+   ],
+   "sonido": "Golpe del número",
+   "cont": "—",
+   "intoc": [
+    "Cifra medida real"
+   ],
+   "planb": "—",
+   "dif": "—",
+   "costo": [
+    0,
+    0
+   ],
+   "estado": "Falta la cifra real",
+   "inicio": null,
+   "final": null
+  }
+ ]
+}

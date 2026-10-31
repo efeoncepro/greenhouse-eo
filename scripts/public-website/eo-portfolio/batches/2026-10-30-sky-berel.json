@@ -1,0 +1,344 @@
+{
+ "message": "Casos Sky y Berel del canvas aprobado (operador, 2026-10-30)",
+ "publish": true,
+ "publishMessage": "Aprobación del operador 2026-10-30: casos Sky y Berel del canvas «Portafolio Efeonce — concepto»",
+ "projects": [
+  {
+   "schema": "portfolio-entry.v1",
+   "slug": "sky-airline-un-ano-de-campanas",
+   "client": {
+    "name": "Sky Airline",
+    "industry": "aerolinea"
+   },
+   "title": "Un año de campañas en cinco mercados",
+   "audience": "Viajeros de cinco mercados, con ofertas que cambian por país",
+   "need": "Lanzar campañas comerciales en días sin descuidar la marca",
+   "line": "brand",
+   "services": [
+    "creative-services",
+    "creative-studio"
+   ],
+   "period": {
+    "from": "2025-09"
+   },
+   "steps": {
+    "challenge": {
+     "title": "Campañas cada semana, precios distintos en cada país",
+     "body": "Cada oferta exige piezas nuevas para cinco mercados, con plazos de días y cambios de precio de último minuto."
+    },
+    "idea": {
+     "title": "Un squad dentro del equipo y un sistema de piezas",
+     "body": "Plantillas por campaña que se adaptan por mercado sin rehacer el diseño, y un solo flujo de aprobación."
+    },
+    "execution": {
+     "title": "27 piezas actualizadas en 10 minutos",
+     "body": "Cuando cambiaron los precios de Travel Sale, el sistema los llevó a 27 piezas, 9 de ellas videos, sin rediseñar ninguna."
+    }
+   },
+   "results": [
+    {
+     "value": "88",
+     "label": "de las piezas, entregadas a tiempo",
+     "kind": "percent",
+     "source": "Caso «Un año con Sky» (2026)"
+    },
+    {
+     "value": "2.000+",
+     "label": "piezas aprobadas en el año",
+     "kind": "number",
+     "source": "Caso «Un año con Sky» (2026)"
+    },
+    {
+     "value": "39",
+     "label": "campañas en cinco mercados",
+     "kind": "number",
+     "source": "Caso «Un año con Sky» (2026)"
+    },
+    {
+     "value": "0,12",
+     "label": "ajustes por pieza, en promedio",
+     "kind": "number",
+     "source": "Caso «Un año con Sky» (2026)"
+    },
+    {
+     "value": "Casi 13",
+     "label": "salidas por día",
+     "kind": "text",
+     "source": "Caso «Un año con Sky» (2026)"
+    }
+   ],
+   "hero": {
+    "mediaRef": "black-ultimo-llamado"
+   },
+   "chapters": [
+    {
+     "name": "Black Sky",
+     "note": "Video, reel y feed",
+     "media": [
+      {
+       "id": "black-ultimo-llamado",
+       "kind": "video",
+       "src": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/sky-airline-un-ano-de-campanas/black-ultimo-llamado.mp4",
+       "poster": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/sky-airline-un-ano-de-campanas/black-ultimo-llamado.poster.webp",
+       "width": 1156,
+       "height": 650,
+       "alt": "Spot Black Sky «Último llamado»",
+       "caption": "«Último llamado», spot",
+       "hasVoice": false
+      },
+      {
+       "id": "black-teaser-usa",
+       "kind": "video",
+       "src": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/sky-airline-un-ano-de-campanas/black-teaser-usa.mp4",
+       "poster": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/sky-airline-un-ano-de-campanas/black-teaser-usa.poster.webp",
+       "width": 366,
+       "height": 650,
+       "alt": "Teaser vertical de Black Sky para Estados Unidos",
+       "caption": "Teaser para Estados Unidos",
+       "hasVoice": false
+      },
+      {
+       "id": "black-ruleta",
+       "kind": "video",
+       "src": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/sky-airline-un-ano-de-campanas/black-ruleta.mp4",
+       "poster": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/sky-airline-un-ano-de-campanas/black-ruleta.poster.webp",
+       "width": 520,
+       "height": 650,
+       "alt": "Ruleta de Black Sky, video para feed",
+       "caption": "Ruleta Black Sky",
+       "hasVoice": false
+      }
+     ]
+    },
+    {
+     "name": "Cyber Sky",
+     "note": "Tarifas por mercado",
+     "media": [
+      {
+       "id": "descubre-cusco",
+       "kind": "image",
+       "mediaId": 252284,
+       "width": 365,
+       "height": 650,
+       "alt": "Sky Airline Cyber Sky: descubre Cusco",
+       "caption": "Descubre Cusco"
+      },
+      {
+       "id": "cyber-vidrio",
+       "kind": "video",
+       "src": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/sky-airline-un-ano-de-campanas/cyber-vidrio.mp4",
+       "poster": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/sky-airline-un-ano-de-campanas/cyber-vidrio.poster.webp",
+       "width": 520,
+       "height": 650,
+       "alt": "Cyber Sky «Rompe el vidrio», video para feed",
+       "caption": "«Rompe el vidrio»",
+       "hasVoice": false
+      },
+      {
+       "id": "cruza-la-cordillera",
+       "kind": "image",
+       "mediaId": 252282,
+       "width": 650,
+       "height": 650,
+       "alt": "Sky Airline Cyber Sky: cruza la cordillera, tarifas a Mendoza, Buenos Aires y Bariloche",
+       "caption": "Cruza la cordillera"
+      },
+      {
+       "id": "subete-a-brasil",
+       "kind": "image",
+       "mediaId": 252281,
+       "width": 650,
+       "height": 650,
+       "alt": "Sky Airline Cyber Sky: súbete a Brasil, tarifas a São Paulo, Florianópolis y Río de Janeiro",
+       "caption": "Súbete a Brasil"
+      }
+     ]
+    },
+    {
+     "name": "Always On",
+     "note": "Más de 300 piezas de tarifas y rutas",
+     "media": [
+      {
+       "id": "excusas-para-viajar",
+       "kind": "video",
+       "src": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/sky-airline-un-ano-de-campanas/ruleta-destinos.mp4",
+       "poster": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/sky-airline-un-ano-de-campanas/ruleta-destinos.poster.webp",
+       "width": 1156,
+       "height": 650,
+       "alt": "Video Sky «¿Necesitas excusas para viajar?»",
+       "caption": "¿Necesitas excusas para viajar?",
+       "hasVoice": false
+      },
+      {
+       "id": "escapada-a-lima",
+       "kind": "image",
+       "mediaId": 252280,
+       "width": 650,
+       "height": 650,
+       "alt": "Sky Airline: escapada perfecta a Lima",
+       "caption": "Escapada a Lima"
+      },
+      {
+       "id": "norte-sin-tasas",
+       "kind": "image",
+       "mediaId": 252283,
+       "width": 650,
+       "height": 650,
+       "alt": "Sky Airline: norte sin tasas, código de descuento para volar al norte de Chile",
+       "caption": "Norte sin tasas"
+      }
+     ]
+    },
+    {
+     "name": "Perú",
+     "note": "Fiestas Patrias",
+     "media": [
+      {
+       "id": "fiestas-patrias-1",
+       "kind": "image",
+       "mediaId": 252285,
+       "width": 609,
+       "height": 650,
+       "alt": "Sky Airline Fiestas Patrias Perú: mujer con traje típico y el avión de Sky"
+      },
+      {
+       "id": "fiestas-patrias-2",
+       "kind": "image",
+       "mediaId": 252286,
+       "width": 602,
+       "height": 650,
+       "alt": "Sky Airline Fiestas Patrias Perú: bailarina y el avión de Sky"
+      }
+     ]
+    }
+   ],
+   "testimonial": {
+    "quote": "Hemos mejorado muchísimo en cuanto a las herramientas tecnológicas. Siento que hemos podido gracias a ellos agilizar mucho la carga de trabajo.",
+    "name": "Adriana Contreras",
+    "role": "Team SKY Designer"
+   },
+   "credits": [
+    {
+     "name": "Squad de Efeonce",
+     "role": "Dentro del equipo de marketing de Sky"
+    }
+   ],
+   "clientApproval": {
+    "ref": "Aprobación del operador 2026-10-30: caso Sky del canvas «Portafolio Efeonce — concepto»",
+    "date": "2026-10-30",
+    "scope": [
+     "logo",
+     "pieces",
+     "metrics",
+     "testimonial"
+    ]
+   },
+   "seo": {
+    "title": "Sky Airline: un año de campañas en cinco mercados",
+    "description": "39 campañas y más de 2.000 piezas aprobadas en el año para Sky Airline, del Cyber Sky al Black Sky, en cinco mercados."
+   }
+  },
+  {
+   "schema": "portfolio-entry.v1",
+   "slug": "berel-pitaya-color-del-ano-2026",
+   "client": {
+    "name": "Berel",
+    "industry": "pinturas"
+   },
+   "title": "Lanzamiento del color del año 2026: Pitaya",
+   "audience": "Personas que van a pintar su casa y siguen a Berel en su sitio y en redes",
+   "need": "Presentar su color del año en todos sus canales",
+   "line": "brand",
+   "services": [
+    "creative-studio"
+   ],
+   "period": {
+    "from": "2026-01"
+   },
+   "steps": {
+    "challenge": {
+     "title": "Un color que hay que ver en casa",
+     "body": "El color del año se elige mirando un espacio real, no una muestra: Berel necesitaba mostrar Pitaya puesto en ambientes que la gente reconoce."
+    },
+    "idea": {
+     "title": "Espacios pintados de pitaya",
+     "body": "Escenas de interiores y exteriores pintados con el color del año, con la luz y los objetos de una casa mexicana."
+    },
+    "execution": {
+     "title": "Escenas listas para publicar",
+     "body": "Producimos las escenas con las que Berel presenta su color del año, en formatos listos para su sitio y sus redes."
+    }
+   },
+   "hero": {
+    "mediaRef": "pitaya-color-del-ano"
+   },
+   "chapters": [
+    {
+     "name": "Pitaya, color del año",
+     "media": [
+      {
+       "id": "pitaya-color-del-ano",
+       "kind": "image",
+       "mediaId": 252287,
+       "width": 1193,
+       "height": 650,
+       "alt": "Berel, color del año 2026: Pitaya",
+       "caption": "Color del año 2026, Pitaya"
+      },
+      {
+       "id": "living-pitaya",
+       "kind": "image",
+       "mediaId": 252288,
+       "width": 1191,
+       "height": 650,
+       "alt": "Berel: living pintado en tono pitaya",
+       "caption": "Living en tono pitaya"
+      },
+      {
+       "id": "pigmentos",
+       "kind": "image",
+       "mediaId": 252289,
+       "width": 1191,
+       "height": 650,
+       "alt": "Berel: paleta de pigmentos junto a pitayas y chiles",
+       "caption": "Paleta de pigmentos"
+      }
+     ]
+    },
+    {
+     "name": "Más escenas de color",
+     "media": [
+      {
+       "id": "sala-talavera",
+       "kind": "image",
+       "mediaId": 252290,
+       "width": 1191,
+       "height": 650,
+       "alt": "Berel: sala con muro azul y arte de Talavera"
+      },
+      {
+       "id": "asado-al-atardecer",
+       "kind": "image",
+       "mediaId": 252291,
+       "width": 1193,
+       "height": 650,
+       "alt": "Berel: asado familiar al atardecer frente a una casa pintada"
+      }
+     ]
+    }
+   ],
+   "clientApproval": {
+    "ref": "Aprobación del operador 2026-10-30: caso Berel del canvas «Portafolio Efeonce — concepto»",
+    "date": "2026-10-30",
+    "scope": [
+     "logo",
+     "pieces"
+    ]
+   },
+   "seo": {
+    "title": "Berel: lanzamiento del color del año 2026, Pitaya",
+    "description": "Las escenas con las que Berel presenta su color del año: espacios pintados de pitaya, listos para publicar en su sitio y sus redes."
+   }
+  }
+ ]
+}

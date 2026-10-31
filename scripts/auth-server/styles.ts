@@ -1,6 +1,8 @@
 /** Build-time styles from canonical portable tokens; runtime consumes the generated CSS artifact. */
 import { efeonceTokens, axisRamp } from '@efeoncepro/axis-tokens'
 
+import { createLoginV4Styles } from './login-v4-styles'
+
 import { axisMain, axisNeutral } from '../../src/@core/theme/axis-tokens'
 import spacing from '../../src/@core/theme/spacing'
 import { typographyScale, fontWeights, letterSpacings } from '../../src/components/theme/typography-tokens'
@@ -327,5 +329,6 @@ form .id-actions { margin-block-start:${s(4)}; }
   .id-actions > *,.actions > * { flex:none; }
 }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
+${createLoginV4Styles()}
 `
 }

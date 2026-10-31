@@ -1,0 +1,26 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "7a97da320a278f2f34cb99f8053776f1d6dc0ed22089287ec82aebede5537f38",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.close-proposal",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:NXSF3-nexa-contraportada-bordada",
+      "path": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF3-nexa-contraportada-bordada.png",
+      "sha256": "0b9ed17bf50bb85d1d148b299d1ccf0a7055b95a13244e7cacaee43173b30b57"
+    }
+  ],
+  "files": [
+    {
+      "ref": "asset-ref:file:salesforce-partner-badge-horizontal",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/salesforce-partner-badge-horizontal.svg",
+      "sha256": "192943371187e479440ec4a6dba4b9c5e0d42347593e206327a6c74f715d0be4"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

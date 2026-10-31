@@ -1,0 +1,100 @@
+# EPIC-056 — EO Portfolio: portafolio de proyectos del sitio público
+
+## Status
+
+- Lifecycle: `in-progress`
+- Priority: `P1`
+- Impact: `Alto`
+- Effort: `Alto`
+- Status real: `Portafolio nuevo en producción desde 2026-10-30 con 16 proyectos publicados y el plugin 0.10.8 (tipos de proyecto con página propia, incluido marketing de contenidos con Berel; servicios como categorías de las cinco líneas, sin productos; servicios de cada proyecto enlazados a sus páginas de venta). TASK-2046, 2047 y 2048 complete; TASK-2049 abierta por desactivar Ohio Portfolio desde el 2026-11-29 y por los pendientes listados abajo.`
+- Rank: `TBD`
+- Domain: `content`
+- Owner: `unassigned`
+- Branch: `Greenhouse develop para docs; el código vive en efeonce-public-site-runtime con su release acotado por SSH; sin worktrees`
+- GitHub Issue: `none`
+
+## Summary
+
+Reemplaza el portafolio del tema Ohio en `efeoncepro.com/portafolio/` por un portafolio propio: cada proyecto cuenta para
+quién se hizo, qué tenía que resolver, cómo se hizo y qué pasó, con sus piezas en su formato real, imagen o video, en la
+línea gráfica La órbita. Coordina la limpieza de los demos de Ohio que hoy están indexados, el plugin con el contenido
+validado, las plantillas de portada y entrada, y la migración de las 15 entradas reales.
+
+## Why This Epic Exists
+
+El programa cruza cuatro frentes que no caben en una task: contenido de producción con riesgo de marca (44 demos de Ohio
+indexados, [ISSUE-183](../../issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md)), un modelo de datos nuevo con
+una compuerta de aprobación del cliente, una superficie visible con video y una migración con redirecciones. La regla de
+partir backend-data y ui-ux obliga a separar el plugin de las plantillas, y la limpieza tiene que salir antes, sola,
+porque es urgente y de bajo riesgo.
+
+## Outcome
+
+- `/portafolio/` y `/portafolio/<slug>/` muestran sólo trabajo real de Efeonce, con contexto y piezas en su formato, en
+  La órbita.
+- Ningún proyecto se publica sin aprobación del cliente y ninguna cifra sin fuente: lo garantiza el sistema, no la
+  revisión manual.
+- El contenido se edita por el admin, por WP-CLI para agentes y se lee como JSON público, listo para la migración a Astro.
+- El tipo de contenido de Ohio queda fuera de uso, con las URLs antiguas redirigidas y sin demos indexados.
+
+## Non-goals
+
+- Reescribir los casos largos del blog o la página de Sky en experiencia.efeoncepro.com: el blog sigue siendo canónico.
+- Llevar el portafolio a Think o a Astro: queda preparado por el JSON público, no se migra en este programa.
+- Publicar un contrato de AXIS para el portafolio antes de que exista un segundo consumidor.
+- Decidir el futuro de `/partnership/` (sigue en la oleada 5 del plan de migración).
+- Producir piezas o proyectos nuevos: el programa trabaja con las 15 entradas reales existentes.
+
+## Architecture Alignment
+
+- [PDR-028 — Portafolio de proyectos](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md) (decisión de este programa)
+- [PDR-027 — Navegación global portable](../../public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md) (patrón de contenido con tres puertas)
+- [PDR-024 — AXIS en el sitio público](../../public-site/decisions/PDR-024-axis-en-el-sitio-publico-composicion-agentica.md) (versión fija, sin React)
+- [PDR-020 — Canales propios](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) §4.3 (casos con compuerta de cliente; el blog es canónico)
+- [PDR-026 — Cada landing deriva su patrón](../../public-site/decisions/PDR-026-cada-landing-deriva-su-patron-de-diseno.md)
+- [Plan de migración a La órbita](../../public-site/LA_ORBITA_SITE_MIGRATION_PLAN_V1.md) §Oleada 5
+- [Navegación global del sitio público V1](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md) (precedente técnico del plugin)
+- Flujo maestro de UI: [`EPIC-056-eo-portfolio-UI-FLOW.md`](../../ui/flows/EPIC-056-eo-portfolio-UI-FLOW.md)
+
+## Child Tasks
+
+- `TASK-2046` — [Limpieza de los demos de Ohio](../../tasks/complete/TASK-2046-eo-portfolio-ohio-demo-cleanup.md): complete (2026-10-29). 44 demos en borrador con 410, Elementor demo y Envato fuera de las 15 reales; resolvió ISSUE-183.
+- `TASK-2047` — [Plugin y contenido](../../tasks/complete/TASK-2047-eo-portfolio-plugin-content.md): complete (2026-10-29). Plugin v0.2.0 en producción: documento validado, compuerta de cliente, tres puertas y CLI de agentes.
+- `TASK-2048` — [Portada y entrada](../../tasks/complete/TASK-2048-eo-portfolio-index-entry-templates.md): complete el 2026-10-30 (v0.5.4).
+- `TASK-2049` — [Migración y salida a producción](../../tasks/in-progress/TASK-2049-eo-portfolio-migration-rollout.md): 301 aplicados el 2026-10-30 (también `/portfolio-category/*`); 16 proyectos publicados con plugin 0.10.8; falta desactivar Ohio Portfolio desde el 2026-11-29.
+
+## Progreso al 2026-10-30
+
+- En producción: plugin 0.10.8 (runtime `21fe1fd`; commits sin empujar en ambos repos).
+- Berel publicado como marketing de contenidos («Berel, color por color», revisión 6): tres artículos de berel.com con
+  sus piezas por canal, cuatro campañas en el explorador, producción de septiembre 2026 y cifras de Search Console
+  aprobadas.
+- Catálogo de servicios del portafolio = categorías de servicio dentro de Brand, Engine, Growth, Voice y Revenue;
+  Creative Studio, Marketing Studio, Wave, Globe y Reach nunca son servicio ([PDR-028](../../public-site/decisions/PDR-028-portafolio-de-proyectos-eo-portfolio.md), delta 2026-10-30 (2)).
+- Los 16 proyectos enlazan sus servicios a las páginas de venta del sitio (`links.relatedServices`); ficha editorial
+  «{Cliente} necesitaba…» y página en primera persona plural.
+
+## Pendientes abiertos
+
+- Desactivar Ohio Portfolio desde el 2026-11-29, con Search Console revisado.
+- Eyebrow «ENGINE · WAVE» del menú principal (PDR-027): decisión del operador.
+- 11 meta descriptions en tercera persona («Proyecto de Efeonce para X»): consultar al operador.
+- Confirmar el uso de IA en Cyber WOW y la fecha de inicio de Sky.
+- Empujar los commits del runtime y de greenhouse-eo.
+
+## Existing Related Work
+
+- [ISSUE-183](../../issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md) — demos de Ohio publicados e indexados.
+- `TASK-2041` y `TASK-2042` (EPIC-055) — plugin `eo-site-nav` y su adaptador: el patrón técnico que este programa repite. El menú global ya enlaza «Portafolio» con la foto `portafolio-op`.
+- Plugin `eo-axis-video` en `efeonce-public-site-runtime` — reproductor de AXIS, candidato, no activo.
+- Material de casos ya publicado: experiencia.efeoncepro.com (Sky), módulo de prueba de Agencia Creativa y posts 251397 y 251432 (ANAM).
+- Canvas «Portafolio Efeonce — concepto»: [claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm](https://claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm), página «EO Portfolio».
+
+## Exit Criteria
+
+- [ ] Ninguna URL de demo de Ohio responde 200 ni aparece en un sitemap del sitio.
+- [ ] `/portafolio/` y cada `/portafolio/<slug>/` publicados se sirven desde el plugin nuevo, con un H1, datos estructurados y sin scroll horizontal en 390 px.
+- [ ] El intento de publicar un proyecto sin aprobación del cliente falla en el admin, en `wp eo-portfolio publish` y no aparece en el JSON público.
+- [ ] Cada `/project/<slug>/` real responde 301 al destino definido en PDR-028 §6.
+- [ ] Ohio Portfolio desactivado tras 30 días sin tráfico residual, con la evidencia registrada.
+- [ ] Documentación técnica, funcional y manual de uso del portafolio publicadas.

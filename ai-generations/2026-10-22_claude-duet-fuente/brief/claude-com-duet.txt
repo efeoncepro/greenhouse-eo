@@ -1,0 +1,140 @@
+Claude Duet | Your personal AI assistant
+Skip to main content
+Learn more
+Get the full story on Claude Duet
+See how it works, how it’s built for safety, and how early testers are using it.
+Read the announcement
+Product
+Products
+Claude
+Claude Code
+Claude Cowork
+Claude Duet
+Claude Tag
+Specialized
+Claude Security
+Claude Science
+Capabilities
+Artifacts
+Design
+Connectors
+Plugins
+Skills
+Extensions
+Claude in Chrome
+Claude for Google Workspace
+Claude for Microsoft 365
+Models
+Mythos (including Fable)
+Opus
+Sonnet
+Haiku
+Import to Claude
+Download apps
+Login
+(opens in new tab)
+Developers
+Build with
+Claude Code
+Claude Platform
+For developers
+Claude Academy
+Community
+Developer blog
+Developer docs
+Console
+Enterprise
+Enterprise
+Overview
+Claude Code for Enterprise
+Claude Platform
+Use Cases
+AI Agents
+Coding
+Commerce
+Managed Agents
+Departments
+Customer support
+Cybersecurity
+Legal
+Sales
+Industries
+Financial advisors
+Financial services
+Government
+Healthcare
+Higher education
+K-12 teachers
+Life sciences
+Nonprofits
+Browse marketplace
+Customers
+Contact sales
+Resources
+Insights
+Resources
+Articles
+Webinars
+Customer stories
+Marketplace
+Anthropic news
+Learn
+Claude Academy
+Courses
+Tutorials
+Use cases
+Connect
+Events
+Community
+Pricing
+Overview
+API
+Login
+Contact sales
+Try Claude
+Products
+/
+Claude Duet
+Explore here
+Ask questions about this page
+Copy as markdown
+Claude Duet
+Research preview
+Get back to what needs you
+Claude Duet is a proactive agent that understands what needs your attention. It takes on tasks of all sizes, keeps working while you’re away, and waits for your ok when it matters.
+Powered by Opus 5.5. Available in Pro and Max plans in the US.
+Join the waitlist
+Works
+with
+more
+than
+6,000
+connectors
+and
+plugins
+Built for judgment
+Knows what needs you
+Claude Duet briefs you every morning, drafts next steps, then goes quiet until something needs you.
+Takes on large tasks
+Send a message and it sets up a meeting or builds a dashboard, then shares when it’s done.
+The Claude you already use
+Your memory, skills, and apps from the Claude app are there from the first message, all in one thread.
+Morning brief
+Hiring
+: Jenn’s other offer expires at 6 p.m. All 3 finalists are booked for today. Invites are ready.
+Northfield
+: They redlined the $410K renewal and want Net 60. The changes are summarized.
+Chicago location
+: Opens Nov 14. The health permit needs your OK and $640.
+Series A
+: Harbor meets Thursday at 10. The deck is rebuilt with Q3. 2 slides need your eye.
+Customers
+: 27 wrong delivery orders this weekend. 19 from Valencia. Refunds are drafted.
+Chicago location opening
+The Chicago location opens in 26 days. I built the opening checklist from your last two openings: 41 items.
+33 are done or on track. 7 I’m watching. 1 needs you today.
+Health permit: the county form is filled. The fee is $640.
+$640.00
+Expires in 8 min
+Paid
+County health permit

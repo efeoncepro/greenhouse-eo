@@ -1,0 +1,13 @@
+{
+  "provider": "byteplus",
+  "model": "dreamina-seedance-2-5-260628",
+  "taskId": "cgt-20261017090108-fzvku",
+  "fromDraftTaskId": "cgt-20261017085910-h4kbe",
+  "draftCreatedAt": 1792198752,
+  "resolution": "1080p",
+  "status": "succeeded",
+  "usage": {
+    "completion_tokens": 196432,
+    "total_tokens": 196432
+  }
+}

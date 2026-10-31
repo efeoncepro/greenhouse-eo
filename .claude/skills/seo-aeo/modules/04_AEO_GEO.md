@@ -122,7 +122,7 @@ consideración de diseño, no como requisito ni garantía de cita.
   no 40-60: si escribes 40-60, es craft tuyo — ese número **no lo respalda**.
 - **🟢 EL H2 ES LA PALANCA CON MEJOR EVIDENCIA, y casi nadie lo dice.** Sobre **1,4M de prompts**,
   Ahrefs midió que lo que más separa a una página **citada** de una **recuperada-y-no-citada** es la
-  **relevancia semántica del TÍTULO** frente a la sub-pregunta (**0,656** vs **0,484**). En ese mismo
+  **relevancia semántica del TÍTULO** frente a la pregunta (**0,602** citada vs **0,484** no citada; el «0,656» que circula es sub-pregunta → título citado y no es comparable, corregido 2026-10-25 contra ahrefs.com/blog/why-chatgpt-cites-pages/). En ese mismo
   estudio **la cápsula no aparece entre los predictores**. → **Escribe cada H2 como la pregunta
   literal de una subpregunta.** Es una asociación observada en ese estudio, no
   evidencia de que cada encabezado deba copiar literalmente consultas de Google.
@@ -135,6 +135,11 @@ consideración de diseño, no como requisito ni garantía de cita.
   numerada no está en el hallazgo** — se la agregamos nosotros. Es el error del `+41%` con otro
   número. Una tabla puede presentar comparaciones con claridad, pero el estudio
   no demuestra que agregarla aumente las citas.
+- **Gráficos con sus números en el HTML:** un dato que sólo vive dentro de la imagen de un gráfico (o de
+  un canvas pintado por JS) no es texto que un buscador o un motor de respuesta pueda leer y citar. Los
+  números del gráfico salen también como tabla HTML; nunca sólo la imagen. En efeoncepro.com el bloque
+  «Gráfico Efeonce» (`efeoncepro/chart`, 2026-10-25) ya lo hace («Ver los datos»); detalle en
+  `efeonce-public-site-wordpress` → `content-factory-gutenberg.md`. Es legibilidad, no un lift prometido.
 
 ## Citabilidad — evidencia externa, no reglas de plataforma
 

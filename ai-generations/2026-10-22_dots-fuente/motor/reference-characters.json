@@ -1,0 +1,7349 @@
+{
+  "schemaVersion": 1,
+  "characters": [
+    {
+      "id": "blue_beret",
+      "title": "Felipe",
+      "appearance": {
+        "schemaVersion": 3,
+        "shape": "six_lobed_flower",
+        "color": "blue",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "hereCharacter": {
+          "id": "blue_beret",
+          "name": "Felipe"
+        }
+      }
+    },
+    {
+      "id": "alfred",
+      "title": "Alfred",
+      "appearance": {
+        "schemaVersion": 3,
+        "shape": "rounded_triangle",
+        "color": "yellow",
+        "eyes": "sleepy_lids",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "hereCharacter": {
+          "id": "alfred",
+          "name": "Alfred"
+        }
+      }
+    },
+    {
+      "id": "purple_heart",
+      "title": "Jojo",
+      "appearance": {
+        "schemaVersion": 3,
+        "shape": "heart",
+        "color": "orchid",
+        "eyes": "oval",
+        "eyewear": "round_sunglasses",
+        "accessories": [],
+        "depth": 0.5,
+        "hereCharacter": {
+          "id": "purple_heart",
+          "name": "Jojo"
+        }
+      }
+    },
+    {
+      "id": "lime_frog",
+      "title": "Todd",
+      "appearance": {
+        "schemaVersion": 3,
+        "shape": "rounded_head_two_ears",
+        "color": "lime",
+        "eyes": "round_inset",
+        "eyewear": "none",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "hereCharacter": {
+          "id": "lime_frog",
+          "name": "Todd"
+        }
+      }
+    },
+    {
+      "id": "coral_monocle",
+      "title": "Iris",
+      "appearance": {
+        "schemaVersion": 3,
+        "shape": "twelve_scalloped_rosette",
+        "color": "coral",
+        "eyes": "double_highlights",
+        "eyewear": "monocle",
+        "accessories": [],
+        "depth": 0.5,
+        "hereCharacter": {
+          "id": "coral_monocle",
+          "name": "Iris"
+        }
+      }
+    },
+    {
+      "id": "gus",
+      "title": "Thelma",
+      "appearance": {
+        "schemaVersion": 3,
+        "shape": "rounded_diamond",
+        "color": "light_yellow",
+        "eyes": "oval",
+        "eyewear": "classic_sunglasses",
+        "accessories": [
+          "orb"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "orb": "light_yellow"
+        },
+        "hereCharacter": {
+          "id": "gus",
+          "name": "Thelma"
+        }
+      }
+    },
+    {
+      "id": "blue_spectacles",
+      "title": "Josh",
+      "appearance": {
+        "schemaVersion": 3,
+        "shape": "rounded_cube",
+        "color": "cyan",
+        "eyes": "crescent_inset",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "three_lobe"
+        ],
+        "depth": 0.5,
+        "hereCharacter": {
+          "id": "blue_spectacles",
+          "name": "Josh"
+        }
+      }
+    },
+    {
+      "id": "lime_headphones",
+      "title": "Iggy",
+      "appearance": {
+        "schemaVersion": 3,
+        "shape": "circle_two_ears",
+        "color": "pink",
+        "eyes": "swept_lids",
+        "eyewear": "none",
+        "accessories": [
+          "headphones"
+        ],
+        "depth": 0.5,
+        "hereCharacter": {
+          "id": "lime_headphones",
+          "name": "Iggy"
+        }
+      }
+    },
+    {
+      "id": "matisse",
+      "title": "Tavi",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "six_lobed_flower",
+        "color": "coral",
+        "eyes": "oval",
+        "eyewear": "monocle",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beret": "violet"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                0.19,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.65,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                0.19,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.65,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "zadie",
+      "title": "Nomi",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "heart",
+        "color": "teal",
+        "eyes": "highlight_capsules",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.7843137254901961,
+                0.49019607843137253,
+                0.6078431372549019
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.26,
+                0.1,
+                0
+              ],
+              "scale": [
+                0.78,
+                0.88,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.26,
+                0.1,
+                0
+              ],
+              "scale": [
+                0.78,
+                0.88,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "otto",
+      "title": "Otto",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_cube",
+        "color": "yellow",
+        "eyes": "oval",
+        "eyewear": "monocle",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.3176470588235294,
+                0.25098039215686274,
+                0.2196078431372549
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                0.1,
+                0
+              ],
+              "scale": [
+                1.44,
+                1.53,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                0.1,
+                0
+              ],
+              "scale": [
+                1.44,
+                1.53,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "frida",
+      "title": "Fia",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "twelve_scalloped_rosette",
+        "color": "orchid",
+        "eyes": "swept_lids",
+        "eyewear": "none",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "bow": "blue"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "remy",
+      "title": "Rolo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "blue",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beret": "coral"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.3176470588235294,
+                0.25098039215686274,
+                0.2196078431372549
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.27,
+                0.08,
+                0
+              ],
+              "scale": [
+                1.6,
+                1.78,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.27,
+                0.08,
+                0
+              ],
+              "scale": [
+                1.6,
+                1.78,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "nico",
+      "title": "Nico",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_diamond",
+        "color": "cyan",
+        "eyes": "highlight_capsules",
+        "eyewear": "tall_oval_frames",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.18,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.86,
+                0.98,
+                0.85
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.18,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.86,
+                0.98,
+                0.85
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "alma",
+      "title": "Alma",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "four_lobed_butterfly",
+        "color": "pink",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beret": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.1450980392156863,
+                0.29411764705882354,
+                0.25882352941176473
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.09,
+                0
+              ],
+              "scale": [
+                0.76,
+                0.78,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.09,
+                0
+              ],
+              "scale": [
+                0.76,
+                0.78,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "claude",
+      "title": "Cado",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_triangle",
+        "color": "violet",
+        "eyes": "oval",
+        "eyewear": "monocle",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.62,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.62,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "suki",
+      "title": "Suki",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "heart",
+        "color": "coral",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beret": "teal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.1450980392156863,
+                0.29411764705882354,
+                0.25882352941176473
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.16,
+                0
+              ],
+              "scale": [
+                0.95,
+                1.05,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.16,
+                0
+              ],
+              "scale": [
+                0.95,
+                1.05,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "pippa",
+      "title": "Pippa",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "six_lobed_flower",
+        "color": "yellow",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "bow": "orchid"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.36470588235294116,
+                0.29411764705882354,
+                0.5098039215686274
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                0.15,
+                0
+              ],
+              "scale": [
+                0.84,
+                0.94,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                0.15,
+                0
+              ],
+              "scale": [
+                0.84,
+                0.94,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "jett",
+      "title": "Jett",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_cube",
+        "color": "violet",
+        "eyes": "oval",
+        "eyewear": "classic_sunglasses",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.19,
+                0
+              ],
+              "scale": [
+                1.1,
+                1.18,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.19,
+                0
+              ],
+              "scale": [
+                1.1,
+                1.18,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disco",
+      "title": "Disco",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "twelve_scalloped_rosette",
+        "color": "cyan",
+        "eyes": "oval",
+        "eyewear": "round_sunglasses",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.36470588235294116,
+                0.29411764705882354,
+                0.5098039215686274
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.26,
+                0.12,
+                0
+              ],
+              "scale": [
+                1.08,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.26,
+                0.12,
+                0
+              ],
+              "scale": [
+                1.08,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "vega",
+      "title": "Vega",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_diamond",
+        "color": "orchid",
+        "eyes": "swept_lids",
+        "eyewear": "none",
+        "accessories": [
+          "headphones"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "headphones": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "headphones": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.12,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.12,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "rumi",
+      "title": "Runi",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "teal",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [
+          "headphones"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "headphones": "blue"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "headphones": {
+              "albedo": [
+                0.9137254901960784,
+                0.8588235294117647,
+                0.7372549019607844
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.27,
+                0.04,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.27,
+                0.04,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ziggy",
+      "title": "Zumi",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "six_lobed_flower",
+        "color": "coral",
+        "eyes": "oval",
+        "eyewear": "separate_trapezoid_lenses",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.1450980392,
+                0.1647058824,
+                0.2274509804
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.14,
+                0
+              ],
+              "scale": [
+                1.05,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.14,
+                0
+              ],
+              "scale": [
+                1.05,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "echo",
+      "title": "Echo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "circle_two_ears",
+        "color": "blue",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [
+          "headphones"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "headphones": "orchid"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "headphones": {
+              "albedo": [
+                0.36470588235294116,
+                0.29411764705882354,
+                0.5098039215686274
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                -0.13,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.86,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                -0.13,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.86,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "onyx",
+      "title": "Onyx",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "heart",
+        "color": "violet",
+        "eyes": "oval",
+        "eyewear": "classic_sunglasses",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.1450980392,
+                0.1647058824,
+                0.2274509804
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.16,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.93,
+                1.04,
+                0.85
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.16,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.93,
+                1.04,
+                0.85
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewear": {
+            "scale": [
+              0.92,
+              0.92,
+              0.92
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "lola",
+      "title": "Lola",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_triangle",
+        "color": "pink",
+        "eyes": "swept_lids",
+        "eyewear": "none",
+        "accessories": [
+          "headphones"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "headphones": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "headphones": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.11,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.11,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tempo",
+      "title": "Tempo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "yellow",
+        "eyes": "oval",
+        "eyewear": "round_sunglasses",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.3176470588235294,
+                0.25098039215686274,
+                0.2196078431372549
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.06,
+                0
+              ],
+              "scale": [
+                1.1,
+                1.18,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.06,
+                0
+              ],
+              "scale": [
+                1.1,
+                1.18,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "muse",
+      "title": "Muse",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "four_lobed_butterfly",
+        "color": "violet",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [
+          "headphones"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "headphones": "pink"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "headphones": {
+              "albedo": [
+                0.7843137254901961,
+                0.49019607843137253,
+                0.6078431372549019
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.08,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.62,
+                1.85,
+                0.85
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.08,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.62,
+                1.85,
+                0.85
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "winston",
+      "title": "Willo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_cube",
+        "color": "coral",
+        "eyes": "oval",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "hat"
+        ],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "hat": {
+              "albedo": [
+                0.1450980392,
+                0.1647058824,
+                0.2274509804
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.11,
+                0
+              ],
+              "scale": [
+                1.48,
+                1.68,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.11,
+                0
+              ],
+              "scale": [
+                1.48,
+                1.68,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "bea",
+      "title": "Bea",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "circle_two_ears",
+        "color": "yellow",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.26,
+                -0.12,
+                0
+              ],
+              "scale": [
+                1.6,
+                1.82,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.26,
+                -0.12,
+                0
+              ],
+              "scale": [
+                1.6,
+                1.82,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "quill",
+      "title": "Quill",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "orchid",
+        "eyes": "oval",
+        "eyewear": "monocle",
+        "accessories": [
+          "hat"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "hat": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "hat": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.03,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.62,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.03,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.62,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "hugo",
+      "title": "Hugo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_triangle",
+        "color": "teal",
+        "eyes": "highlight_capsules",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.8901960784313725,
+                0.7176470588235294,
+                0.3058823529411765
+              ],
+              "roughness": 0.8,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                -0.04,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.86,
+                0.97,
+                0.85
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                -0.04,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.86,
+                0.97,
+                0.85
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "ada",
+      "title": "Ada",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_diamond",
+        "color": "blue",
+        "eyes": "sparkle_capsules",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.16,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.9,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.16,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.9,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "milo",
+      "title": "Milo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "heart",
+        "color": "yellow",
+        "eyes": "oval",
+        "eyewear": "monocle",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.1450980392,
+                0.1647058824,
+                0.2274509804
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.09,
+                0
+              ],
+              "scale": [
+                1.44,
+                1.66,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.09,
+                0
+              ],
+              "scale": [
+                1.44,
+                1.66,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "margot",
+      "title": "Margot",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "twelve_scalloped_rosette",
+        "color": "violet",
+        "eyes": "oval",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.9137254901960784,
+                0.8588235294117647,
+                0.7372549019607844
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.13,
+                0
+              ],
+              "scale": [
+                1.4,
+                1.58,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.13,
+                0
+              ],
+              "scale": [
+                1.4,
+                1.58,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "linus",
+      "title": "Linus",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "cyan",
+        "eyes": "double_highlights",
+        "eyewear": "tall_oval_frames",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.09,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.9,
+                1.0,
+                0.85
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.09,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.9,
+                1.0,
+                0.85
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "wren",
+      "title": "Wren",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "six_lobed_flower",
+        "color": "teal",
+        "eyes": "oval",
+        "eyewear": "monocle",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.8901960784313725,
+                0.7176470588235294,
+                0.3058823529411765
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.16,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.62,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.16,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.62,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "edie",
+      "title": "Edie",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "circle_two_ears",
+        "color": "orchid",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                -0.13,
+                0
+              ],
+              "scale": [
+                0.86,
+                0.98,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                -0.13,
+                0
+              ],
+              "scale": [
+                0.86,
+                0.98,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lumi",
+      "title": "Lumi",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "heart",
+        "color": "cyan",
+        "eyes": "sparkle_capsules",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.11,
+                0
+              ],
+              "scale": [
+                0.74,
+                0.82,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.11,
+                0
+              ],
+              "scale": [
+                0.74,
+                0.82,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "mochi",
+      "title": "Mochi",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "pink",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "orchid"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.9137254901960784,
+                0.8588235294117647,
+                0.7372549019607844
+              ],
+              "roughness": 0.8,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.03,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.62,
+                1.8,
+                0.85
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.03,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.62,
+                1.8,
+                0.85
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "accessories": {
+            "beanie": {
+              "scale": [
+                0.94,
+                0.82,
+                0.94
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "fable",
+      "title": "Fable",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "four_lobed_butterfly",
+        "color": "teal",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.26,
+                0.09,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.26,
+                0.09,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "clover",
+      "title": "Clover",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_head_two_ears",
+        "color": "teal",
+        "eyes": "round_inset",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.03,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "pupilScale": [
+            0.94,
+            0.94,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": "sol",
+      "title": "Sol",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "six_lobed_flower",
+        "color": "yellow",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.09,
+                0
+              ],
+              "scale": [
+                1.6,
+                1.82,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.09,
+                0
+              ],
+              "scale": [
+                1.6,
+                1.82,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "una",
+      "title": "Una",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "twelve_scalloped_rosette",
+        "color": "blue",
+        "eyes": "swept_lids",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.14,
+                0
+              ],
+              "scale": [
+                0.99,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.14,
+                0
+              ],
+              "scale": [
+                0.99,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dove",
+      "title": "Dove",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_diamond",
+        "color": "pink",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.08,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.78,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.08,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.78,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "pebble",
+      "title": "Pebble",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_cube",
+        "color": "teal",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.3176470588235294,
+                0.25098039215686274,
+                0.2196078431372549
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                0.06,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.05,
+                0.85
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                0.06,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.05,
+                0.85
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "kiki",
+      "title": "Kiki",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "circle_two_ears",
+        "color": "cyan",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                -0.12,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.08,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                -0.12,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.08,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "mallow",
+      "title": "Mallow",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_triangle",
+        "color": "orchid",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.3647058824,
+                0.2941176471,
+                0.5098039216
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.12,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.12,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "duke",
+      "title": "Dumo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "coral",
+        "eyes": "oval",
+        "eyewear": "monocle",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "bow": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.05,
+                0
+              ],
+              "scale": [
+                1.44,
+                1.62,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.05,
+                0
+              ],
+              "scale": [
+                1.44,
+                1.62,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "cleo",
+      "title": "Cleo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "heart",
+        "color": "pink",
+        "eyes": "swept_lids",
+        "eyewear": "none",
+        "accessories": [
+          "crown"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "crown": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.13,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.13,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "archie",
+      "title": "Archie",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_cube",
+        "color": "blue",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [
+          "hat"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "hat": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "hat": {
+              "albedo": [
+                0.3176470588235294,
+                0.25098039215686274,
+                0.2196078431372549
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.11,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.91,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.11,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.91,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dottie",
+      "title": "Dottie",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "twelve_scalloped_rosette",
+        "color": "yellow",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "bow": "blue"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.26,
+                0.13,
+                0
+              ],
+              "scale": [
+                1.02,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.26,
+                0.13,
+                0
+              ],
+              "scale": [
+                1.02,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "percy",
+      "title": "Percy",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_head_two_ears",
+        "color": "cyan",
+        "eyes": "round_inset",
+        "eyewear": "monocle",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.8901960784313725,
+                0.7176470588235294,
+                0.3058823529411765
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "pupilScale": [
+            0.94,
+            0.94,
+            1
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "gigi",
+      "title": "Gigi",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "four_lobed_butterfly",
+        "color": "coral",
+        "eyes": "oval",
+        "eyewear": "round_sunglasses",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.9137254901960784,
+                0.8588235294117647,
+                0.7372549019607844
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.26,
+                0.11,
+                0
+              ],
+              "scale": [
+                1.08,
+                1.2,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.26,
+                0.11,
+                0
+              ],
+              "scale": [
+                1.08,
+                1.2,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "rupert",
+      "title": "Rupe",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_triangle",
+        "color": "yellow",
+        "eyes": "oval",
+        "eyewear": "monocle",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.45,
+                1.64,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.45,
+                1.64,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "estelle",
+      "title": "Esti",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "six_lobed_flower",
+        "color": "orchid",
+        "eyes": "swept_lids",
+        "eyewear": "none",
+        "accessories": [
+          "crown"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "crown": {
+              "albedo": [
+                0.36470588235294116,
+                0.29411764705882354,
+                0.5098039215686274
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "teddy",
+      "title": "Teddy",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "circle_two_ears",
+        "color": "teal",
+        "eyes": "oval",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "bow": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                -0.12,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.64,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                -0.12,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.64,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "rex",
+      "title": "Rex",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_diamond",
+        "color": "violet",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.1,
+                0
+              ],
+              "scale": [
+                0.79,
+                0.81,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.1,
+                0
+              ],
+              "scale": [
+                0.79,
+                0.81,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "watt",
+      "title": "Watt",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_cube",
+        "color": "violet",
+        "eyes": "highlight_capsules",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.8901960784,
+                0.7176470588,
+                0.3058823529
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.15,
+                0
+              ],
+              "scale": [
+                0.87,
+                0.99,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.15,
+                0
+              ],
+              "scale": [
+                0.87,
+                0.99,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "pixel",
+      "title": "Pixel",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_triangle",
+        "color": "cyan",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.21,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.8,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.21,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.8,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "nova",
+      "title": "Nova",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "blue",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.26,
+                0.04,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.02,
+                1.12,
+                0.85
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.26,
+                0.04,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.02,
+                1.12,
+                0.85
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fizz",
+      "title": "Fizz",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "four_lobed_butterfly",
+        "color": "lime",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.1,
+                0
+              ],
+              "scale": [
+                0.79,
+                0.9,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.1,
+                0
+              ],
+              "scale": [
+                0.79,
+                0.9,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dot",
+      "title": "Dot",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_diamond",
+        "color": "teal",
+        "eyes": "oval",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.8901960784,
+                0.7176470588,
+                0.3058823529
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                -0.04,
+                0
+              ],
+              "scale": [
+                1.4,
+                1.6,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                -0.04,
+                0
+              ],
+              "scale": [
+                1.4,
+                1.6,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "flint",
+      "title": "Flint",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_cube",
+        "color": "coral",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.15,
+                0
+              ],
+              "scale": [
+                1.52,
+                1.72,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.15,
+                0
+              ],
+              "scale": [
+                1.52,
+                1.72,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "zest",
+      "title": "Zest",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "six_lobed_flower",
+        "color": "lime",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.12,
+                0
+              ],
+              "scale": [
+                0.78,
+                0.85,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.12,
+                0
+              ],
+              "scale": [
+                0.78,
+                0.85,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "sora",
+      "title": "Sora",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "four_lobed_butterfly",
+        "color": "blue",
+        "eyes": "sparkle_capsules",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.08,
+                0
+              ],
+              "scale": [
+                0.73,
+                0.77,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.08,
+                0
+              ],
+              "scale": [
+                0.73,
+                0.77,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "pico",
+      "title": "Pico",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "teal",
+        "eyes": "oval",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "hat"
+        ],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "hat": {
+              "albedo": [
+                0.1450980392,
+                0.1647058824,
+                0.2274509804
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.04,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.62,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.04,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.62,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "saffron",
+      "title": "Saffron",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_triangle",
+        "color": "yellow",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "teal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.1450980392156863,
+                0.29411764705882354,
+                0.25882352941176473
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.16,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.07,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.16,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.07,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "scout",
+      "title": "Scout",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_cube",
+        "color": "lime",
+        "eyes": "oval",
+        "eyewear": "monocle",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "blue"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.44,
+                1.64,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.44,
+                1.64,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "pogo",
+      "title": "Pogo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_head_two_ears",
+        "color": "yellow",
+        "eyes": "round_inset",
+        "eyewear": "none",
+        "accessories": [
+          "headphones"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "headphones": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "headphones": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "pupilScale": [
+            0.94,
+            0.94,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": "sunny",
+      "title": "Sunny",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "heart",
+        "color": "coral",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "teal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.1450980392156863,
+                0.29411764705882354,
+                0.25882352941176473
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.12,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.86,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.12,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.86,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "nell",
+      "title": "Nell",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "pink",
+        "eyes": "double_highlights",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "blue"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                -0.2,
+                0
+              ],
+              "scale": [
+                0.95,
+                1.05,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                -0.2,
+                0
+              ],
+              "scale": [
+                0.95,
+                1.05,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "taro",
+      "title": "Taro",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "violet",
+        "eyes": "swept_lids",
+        "eyewear": "none",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.3176470588235294,
+                0.25098039215686274,
+                0.2196078431372549
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.07,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.07,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.07,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.07,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "rio",
+      "title": "Rio",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_triangle",
+        "color": "coral",
+        "eyes": "oval",
+        "eyewear": "classic_sunglasses",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.18,
+                0
+              ],
+              "scale": [
+                1.1,
+                1.25,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.18,
+                0
+              ],
+              "scale": [
+                1.1,
+                1.25,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "birdie",
+      "title": "Birdie",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "six_lobed_flower",
+        "color": "cyan",
+        "eyes": "highlight_capsules",
+        "eyewear": "monocle",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beret": "pink"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.7843137254901961,
+                0.49019607843137253,
+                0.6078431372549019
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.91,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.91,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "wally",
+      "title": "Wally",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_diamond",
+        "color": "yellow",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [
+          "headphones"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "headphones": "teal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "headphones": {
+              "albedo": [
+                0.9137254901960784,
+                0.8588235294117647,
+                0.7372549019607844
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.15
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.08,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.96,
+                1.07,
+                0.85
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.08,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.96,
+                1.07,
+                0.85
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "headphones": {
+            "cushionScale": [
+              0.88,
+              0.88,
+              1
+            ],
+            "bandThicknessScale": 0.75
+          }
+        }
+      }
+    },
+    {
+      "id": "mabel",
+      "title": "Mabel",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "twelve_scalloped_rosette",
+        "color": "teal",
+        "eyes": "oval",
+        "eyewear": "monocle",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.3176470588235294,
+                0.25098039215686274,
+                0.2196078431372549
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                0.08,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.58,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                0.08,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.58,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "otis",
+      "title": "Otis",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "circle_two_ears",
+        "color": "violet",
+        "eyes": "oval",
+        "eyewear": "classic_sunglasses",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                -0.1,
+                0
+              ],
+              "scale": [
+                1.08,
+                1.2,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                -0.1,
+                0
+              ],
+              "scale": [
+                1.08,
+                1.2,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tutti",
+      "title": "Tutti",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "four_lobed_butterfly",
+        "color": "orchid",
+        "eyes": "sparkle_capsules",
+        "eyewear": "none",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "bow": "yellow"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.8901960784313725,
+                0.7176470588235294,
+                0.3058823529411765
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.1,
+                0
+              ],
+              "scale": [
+                0.73,
+                0.79,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.1,
+                0
+              ],
+              "scale": [
+                0.73,
+                0.79,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "juno",
+      "title": "Juno",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_head_two_ears",
+        "color": "pink",
+        "eyes": "round_inset",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "pupilScale": [
+            0.94,
+            0.94,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": "puck",
+      "title": "Puck",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_diamond",
+        "color": "lime",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.13,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.13,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "gumdrop",
+      "title": "Gumi",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "coral",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.04,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.08,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.04,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.08,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "rocco",
+      "title": "Rocco",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_cube",
+        "color": "pink",
+        "eyes": "oval",
+        "eyewear": "separate_trapezoid_lenses",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "eyewear": {
+              "albedo": [
+                0.18823529411764706,
+                0.19215686274509805,
+                0.23921568627450981
+              ],
+              "roughness": 0.72,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                0.15,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.88,
+                0.99,
+                0.85
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                0.15,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                0.88,
+                0.99,
+                0.85
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewear": {
+            "scale": [
+              0.84,
+              0.84,
+              0.84
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "nori",
+      "title": "Nori",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_triangle",
+        "color": "blue",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "orchid"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.36470588235294116,
+                0.29411764705882354,
+                0.5098039215686274
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.14,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.78,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.14,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.78,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "peaches",
+      "title": "Peaches",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "six_lobed_flower",
+        "color": "pink",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.12,
+                0
+              ],
+              "scale": [
+                0.96,
+                1.07,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.12,
+                0
+              ],
+              "scale": [
+                0.96,
+                1.07,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "bowie",
+      "title": "Bibi",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "circle_two_ears",
+        "color": "yellow",
+        "eyes": "swept_lids",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                -0.13,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                -0.13,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "taffy",
+      "title": "Taffy",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "heart",
+        "color": "orchid",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.91,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                0.8,
+                0.91,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "moxie",
+      "title": "Moxie",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "twelve_scalloped_rosette",
+        "color": "coral",
+        "eyes": "oval",
+        "eyewear": "classic_sunglasses",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.16,
+                0
+              ],
+              "scale": [
+                1.1,
+                1.22,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.16,
+                0
+              ],
+              "scale": [
+                1.1,
+                1.22,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "halo",
+      "title": "Cielo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "twelve_scalloped_rosette",
+        "color": "cyan",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                0.12,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.78,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                0.12,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.78,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "orbit",
+      "title": "Ollo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_diamond",
+        "color": "violet",
+        "eyes": "oval",
+        "eyewear": "round_sunglasses",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.9098039216,
+                0.8549019608,
+                0.6862745098
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.09,
+                0
+              ],
+              "scale": [
+                1.12,
+                1.24,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.09,
+                0
+              ],
+              "scale": [
+                1.12,
+                1.24,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "prism",
+      "title": "Prism",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_diamond",
+        "color": "cyan",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.02,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.02,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "opal",
+      "title": "Opal",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "four_lobed_butterfly",
+        "color": "yellow",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.05,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.76,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.05,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.76,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "aster",
+      "title": "Aster",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "six_lobed_flower",
+        "color": "violet",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.16,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.08,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.16,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.08,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cosmo",
+      "title": "Cosmo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_cube",
+        "color": "orchid",
+        "eyes": "double_highlights",
+        "eyewear": "none",
+        "accessories": [
+          "crown"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "crown": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.09,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.08,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.09,
+                0
+              ],
+              "scale": [
+                0.98,
+                1.08,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lyra",
+      "title": "Lyra",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "heart",
+        "color": "blue",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.8,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.8,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "elio",
+      "title": "Elio",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "heart",
+        "color": "coral",
+        "eyes": "oval",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.1450980392,
+                0.1647058824,
+                0.2274509804
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                0.1,
+                0
+              ],
+              "scale": [
+                1.48,
+                1.68,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                0.1,
+                0
+              ],
+              "scale": [
+                1.48,
+                1.68,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "neptune",
+      "title": "Neptune",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_head_two_ears",
+        "color": "blue",
+        "eyes": "round_inset",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.04,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "pupilScale": [
+            0.94,
+            0.94,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": "comet",
+      "title": "Comet",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_triangle",
+        "color": "teal",
+        "eyes": "sparkle_capsules",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.23,
+                0.21,
+                0
+              ],
+              "scale": [
+                0.71,
+                0.82,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.23,
+                0.21,
+                0
+              ],
+              "scale": [
+                0.71,
+                0.82,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "mika",
+      "title": "Mika",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "yellow",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beret": "blue"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.07,
+                0
+              ],
+              "scale": [
+                0.79,
+                0.87,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.07,
+                0
+              ],
+              "scale": [
+                0.79,
+                0.87,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fergus",
+      "title": "Fergus",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_head_two_ears",
+        "color": "orchid",
+        "eyes": "round_inset",
+        "eyewear": "none",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "bow": "yellow"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.8901960784313725,
+                0.7176470588235294,
+                0.3058823529411765
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "pupilScale": [
+            0.94,
+            0.94,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": "noel",
+      "title": "Noel",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_cube",
+        "color": "cyan",
+        "eyes": "oval",
+        "eyewear": "none",
+        "accessories": [
+          "headphones"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "headphones": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "headphones": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.07,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.8,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.07,
+                0
+              ],
+              "scale": [
+                1.58,
+                1.8,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "basil",
+      "title": "Basil",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "circle_two_ears",
+        "color": "lime",
+        "eyes": "oval",
+        "eyewear": "tall_oval_frames",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                -0.12,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.64,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                -0.12,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.64,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "tilly",
+      "title": "Tilly",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "twelve_scalloped_rosette",
+        "color": "pink",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [
+          "beret"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beret": "violet"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beret": {
+              "albedo": [
+                0.36470588235294116,
+                0.29411764705882354,
+                0.5098039215686274
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.14,
+                0
+              ],
+              "scale": [
+                0.79,
+                0.87,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.14,
+                0
+              ],
+              "scale": [
+                0.79,
+                0.87,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "arlo",
+      "title": "Arlo",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_diamond",
+        "color": "coral",
+        "eyes": "oval",
+        "eyewear": "round_sunglasses",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.3176470588235294,
+                0.25098039215686274,
+                0.2196078431372549
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.12,
+                0
+              ],
+              "scale": [
+                1.08,
+                1.2,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.12,
+                0
+              ],
+              "scale": [
+                1.08,
+                1.2,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "nina",
+      "title": "Nina",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "four_lobed_butterfly",
+        "color": "cyan",
+        "eyes": "swept_lids",
+        "eyewear": "none",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "bow": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.1450980392156863,
+                0.16470588235294117,
+                0.22745098039215686
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.25,
+                0.06,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.25,
+                0.06,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.1,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "chai",
+      "title": "Chai",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "rounded_triangle",
+        "color": "pink",
+        "eyes": "oval",
+        "eyewear": "tall_oval_frames",
+        "accessories": [
+          "bow"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "bow": "violet"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "bow": {
+              "albedo": [
+                0.36470588235294116,
+                0.29411764705882354,
+                0.5098039215686274
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.6,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.17,
+                0
+              ],
+              "scale": [
+                1.42,
+                1.6,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ],
+          "eyewearSurfaceAlignment": 0
+        }
+      }
+    },
+    {
+      "id": "ollie",
+      "title": "Ollie",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "capsule",
+        "color": "teal",
+        "eyes": "highlight_capsules",
+        "eyewear": "none",
+        "accessories": [
+          "beanie"
+        ],
+        "depth": 0.5,
+        "accessoryColors": {
+          "beanie": "charcoal"
+        },
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            },
+            "beanie": {
+              "albedo": [
+                0.1450980392156863,
+                0.29411764705882354,
+                0.25882352941176473
+              ],
+              "roughness": 0.78,
+              "reflectance": 0.12
+            }
+          },
+          "restingEyeClosure": 0.0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.03,
+                0
+              ],
+              "scale": [
+                0.79,
+                0.8,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.03,
+                0
+              ],
+              "scale": [
+                0.79,
+                0.8,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dahlia",
+      "title": "Dahlia",
+      "appearance": {
+        "schemaVersion": 2,
+        "shape": "six_lobed_flower",
+        "color": "blue",
+        "eyes": "swept_lids",
+        "eyewear": "none",
+        "accessories": [],
+        "depth": 0.5,
+        "accessoryColors": {},
+        "model": {
+          "materials": {
+            "body": {
+              "roughness": 0.74,
+              "reflectance": 0.14
+            }
+          },
+          "restingEyeClosure": 0,
+          "eyeGazeScale": [
+            0.75,
+            0.75
+          ],
+          "eyeMount": "body",
+          "eyes": [
+            {
+              "position": [
+                -0.24,
+                0.16,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            },
+            {
+              "position": [
+                0.24,
+                0.16,
+                0
+              ],
+              "scale": [
+                1.0,
+                1.12,
+                0.85
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "surfaceRelative": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

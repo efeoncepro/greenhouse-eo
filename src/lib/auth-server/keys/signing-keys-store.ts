@@ -279,10 +279,11 @@ export const retireSigningKey = async ({ kid, actor, force = false, now = new Da
 export type SignAccessTokenInput = Readonly<{
   signer: KmsSignerPort
   payload: Record<string, unknown>
+  typ?: string
 }>
 
 /** Firma un JWT con la llave activa. Falla loud (y reporta) si no hay llave activa. */
-export const signWithActiveKey = async ({ signer, payload }: SignAccessTokenInput): Promise<string> => {
+export const signWithActiveKey = async ({ signer, payload, typ }: SignAccessTokenInput): Promise<string> => {
   const active = await getActiveSigningKey()
 
   if (!active) {
@@ -297,6 +298,7 @@ export const signWithActiveKey = async ({ signer, payload }: SignAccessTokenInpu
     versionName: active.kmsKeyVersion,
     kid: active.kid,
     publicJwk: active.publicJwk,
+    typ,
     payload
   })
 }

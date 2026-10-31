@@ -1,0 +1,210 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "135a714fab0f",
+  "key": "135a714fab0f57527be065e319d88b04edd424939f43321cd154b79b16d8d31b",
+  "status": "completed",
+  "createdAt": "2026-10-24T23:07:12.145Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-24_tarjetas-riel/plates/R1-agente-agenda-plate.png",
+    "imageSha256": "cf9cc99a359e0881ae04a451a1acb057576806093b39ec25c23c2e3b6aef5a97",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-24_tarjetas-riel/edit/R1-pantalla-mask.png",
+    "maskSha256": "0904ca7f3074461276c5771d31393d5b490a40bcff3d27c722008ab17621f5e3",
+    "maskConvention": "white-editable",
+    "width": 1152,
+    "height": 1440,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "Inside the marked area of the smartphone screen, keep the exact same clean light-mode chat interface, layout, sizes, rounded shapes, colors, perspective, sharpness and screen brightness; only the words change to Spanish. At the top right, the same blue user bubble now reads exactly: ¿Me agendas una reunión? Below it, the same white confirmation card with the same big blue check circle, the bold title reading exactly: Reunión agendada, a calendar row with the same calendar icon reading exactly: Jue 12 nov · 10:00, and the same solid blue button with no text. No English words. Nothing else changes.",
+    "providerPrompt": "Inside the marked area of the smartphone screen, keep the exact same clean light-mode chat interface, layout, sizes, rounded shapes, colors, perspective, sharpness and screen brightness; only the words change to Spanish. At the top right, the same blue user bubble now reads exactly: ¿Me agendas una reunión? Below it, the same white confirmation card with the same big blue check circle, the bold title reading exactly: Reunión agendada, a calendar row with the same calendar icon reading exactly: Jue 12 nov · 10:00, and the same solid blue button with no text. No English words. Nothing else changes."
+  },
+  "mask": {
+    "touchedFraction": 0.04910180362654321,
+    "editable": 74654,
+    "soft": 6800,
+    "protected": 1577426
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 239,
+      "top": 174,
+      "width": 579,
+      "height": 677
+    },
+    "target": {
+      "width": 944,
+      "height": 1104
+    },
+    "aspectError": 0.00020028540670450213,
+    "reason": "la zona con contexto ocupa 23.6 % de la imagen: se genera recortada a 944x1104"
+  },
+  "estimate": {
+    "usd": 0.0898,
+    "basis": "2 × salida 944x1104 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 69.771,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.92,
+        "bestError": 4.92,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1577426,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 74654,
+        "maxDelta": 255,
+        "meanDelta": 74.238,
+        "worst": {
+          "x": 531,
+          "y": 467
+        }
+      },
+      "seam": {
+        "pixels": 6800,
+        "maxDelta": 174,
+        "meanDelta": 20.733,
+        "worst": {
+          "x": 413,
+          "y": 445
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1577426,
+        "maxDelta": 194,
+        "meanDelta": 2.47,
+        "worst": {
+          "x": 371,
+          "y": 723
+        }
+      },
+      "outputUsd": 0.0449,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1197,
+        "input_tokens_details": {
+          "image_tokens": 1050,
+          "text_tokens": 147
+        },
+        "output_tokens": 1497,
+        "output_tokens_details": {
+          "image_tokens": 1497,
+          "text_tokens": 0
+        },
+        "total_tokens": 2694
+      },
+      "meta": {
+        "size": "944x1104",
+        "quality": "high",
+        "providerMask": true
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 73.108,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.21,
+        "bestError": 5.21,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1577426,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 74654,
+        "maxDelta": 255,
+        "meanDelta": 77.489,
+        "worst": {
+          "x": 533,
+          "y": 471
+        }
+      },
+      "seam": {
+        "pixels": 6800,
+        "maxDelta": 168,
+        "meanDelta": 25.015,
+        "worst": {
+          "x": 413,
+          "y": 655
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1577426,
+        "maxDelta": 209,
+        "meanDelta": 2.299,
+        "worst": {
+          "x": 713,
+          "y": 816
+        }
+      },
+      "outputUsd": 0.0449,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1197,
+        "input_tokens_details": {
+          "image_tokens": 1050,
+          "text_tokens": 147
+        },
+        "output_tokens": 1497,
+        "output_tokens_details": {
+          "image_tokens": 1497,
+          "text_tokens": 0
+        },
+        "total_tokens": 2694
+      },
+      "meta": {
+        "size": "944x1104",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

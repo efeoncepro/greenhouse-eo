@@ -6,7 +6,9 @@ píldora en un anfitrión que tiene plantilla propia. Caso fuente: suscripción 
 `docs/architecture/growth-public-forms-runtime-contract.md` §Formulario en línea y reserva por evento.
 
 Estado (2026-10-24): en producción desde el release `40b330175855` (renderer `1.2.0` + consentimiento por el acto).
-**Pendiente:** un envío real hecho por una persona y el primer formulario de evento real.
+Suscripción a Glitch verificada (2026-10-24); **sin correo de bienvenida** todavía (backlog de Glitch en RESEARCH-013).
+**Pendiente:** el primer formulario de evento real (bloqueado por el backlog de
+[RESEARCH-013](../../../../docs/research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos)).
 
 ## Contrato en una línea
 
@@ -103,6 +105,13 @@ Piel real: `efeonce-public-site-runtime` → `wp-content/plugins/eo-blog-home/as
 - **Turnstile y navegadores automatizados:** el envío desde el navegador integrado de Claude no salió (sin token, sin
   `POST /submit`). Es el comportamiento correcto; **no eludir la verificación**. La prueba de envío la hace una persona y
   se confirma en HubSpot (contacto suscrito al tipo `535702717`).
+- **Autocompletado de Chrome:** `:-internal-autofill-selected` pinta fondo claro y texto negro con `!important` de
+  agente de usuario, que gana al `!important` propio (reproducido con `Autofill.trigger` en Chrome real). Solución
+  (`a5b028461`, `src/growth-forms-renderer/styles.ts`): en `:is(:-webkit-autofill,:autofill)` usar
+  `-webkit-text-fill-color` + `caret-color` y retener el fondo con
+  `background-color 0s linear 600000s` en la transición. Sin release al 2026-10-24.
+- **«¡Listo!» descentrado:** el texto oculto aportaba ancho a la grilla de `.ghf-inline-msg` (el canvas tenía el mismo
+  defecto; desvío deliberado). Mismo commit; `inline-pill.scenario.mjs` verde en los 5 estados a 1440 y 390.
 
 ## Verificar sin exponer
 
@@ -110,3 +119,28 @@ Piel real: `efeonce-public-site-runtime` → `wp-content/plugins/eo-blog-home/as
 - Portada con el formulario real, sin envíos posibles:
   `node scripts/public-website/blog-v3/preview/serve.cjs --subscribe <formKey>` (proxy local GET-only `/__ghf/`).
 - En vivo: `pnpm public-website:blog-home verify --browser` (8 anchos 320–1920 sin desborde + axe en tres tableros).
+
+## Segundo anfitrión: el footer del sitio (2026-10-31)
+
+El newsletter del footer global es esta misma píldora (misma clave y superficie que el blog; las superficies se
+autorizan por origen, no por página). Bloque `block-46` en `ohio-sidebar-footer-3`, escrito por
+`scripts/public-website/footer-newsletter-growth-form.php`. El footer no tiene el handle de WordPress, así que el bloque
+trae un cargador perezoso: agrega `renderer-latest.js` cuando el footer está a 800 px de la pantalla y sólo si no hay ya
+un `script[src^=…renderer-latest.js]` ni `greenhouse-form` definido. En una columna de menos de 480 px la píldora ocupa
+todo el ancho y reserva el lugar del aviso aunque esté en reposo: es la consulta de contenedor del renderer, no un
+estilo del anfitrión. Las reglas del anfitrión van con el prefijo `#colophon:has([data-eo-footer-partners="v2"])`, porque el
+adaptador del footer anula los márgenes de `p` con esa especificidad. Reemplazó al CF7 242255, cuya conexión a Mailchimp
+estaba cortada.
+El tono también lo decide el anfitrión: en el footer el operador rechazó el verde de Glitch (choca con la paleta del
+sitio), así que la píldora usa papel `#f7f8f6` + texto navy, turquesa `#36c8bf` en hover y foco, `--ghf-inline-height:46px`,
+`--ghf-inline-send-height:36px` y borde abierto papel al 22 %, todo por variables. El verde sigue siendo el de Glitch
+dentro del blog.
+
+### Nacer abierta (`inline-initial-state="open"`, renderer 1.4.0)
+
+Para un anfitrión que quiere el campo a la vista desde el inicio (el footer de efeoncepro.com, 2026-10-31): el atributo
+`inline-initial-state="open"` monta la píldora en `open` sin `openInline()`, así que **no mueve el foco ni hace scroll**
+(abrir con el foco haría saltar la página al formulario). Esc no la pliega en un botón que la persona nunca vio. El envío,
+la validación y el consentimiento por el acto son idénticos. Sin el atributo, nada cambia (el blog sigue con su botón).
+Pruebas: bloque «Píldora que nace abierta» de `src/growth-forms-renderer/__tests__/inline-pill.test.ts`. En una
+columna de menos de 480 px el campo abierto ocupa todo el ancho (consulta de contenedor del renderer).

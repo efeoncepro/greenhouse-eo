@@ -6,9 +6,12 @@
 > dice. El registro suma reglas, estilos y piezas propias sólo para piezas de MCM.
 >
 > **Tipo de documento:** Norma operativa de marca (registro complementario de la línea gráfica)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-28 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-29 por Claude (TASK-1939) (1.3: las tres decisiones que quedaban abiertas, resueltas
+> **Última actualización:** 2026-10-24 por Claude (1.4: la portada de artículo del blog y las otras dos imágenes de un
+> artículo nuevo, la del slider y la de la tarjeta del rail, alineadas con el
+> [inventario de imágenes por artículo](../../public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md) v1.4:
+> §5.6, §5.8, §7.1 y §12) · 2026-09-29 por Claude (TASK-1939) (1.3: las tres decisiones que quedaban abiertas, resueltas
 > esa misma tarde: el texto de cierre que cambia con el contexto (§8.1), el equipo real en las fotos cine (§5.3) y los
 > Trazo `republicar` y `enviar` (§8.3); AXIS `v0.3.29` con el eslogan desde el token (§7.2) y los hallazgos de TASK-1939
 > cerrados (§14.5). 1.2: decisiones del operador del 2026-09-29 en §13; regla del eslogan de los cierres en §7.2;
@@ -137,7 +140,7 @@ El registro no redefine nada de esta tabla; la regla y su valor viven en La órb
 
 | Elemento | Regla | Fuente / token |
 |---|---|---|
-| La voz | Pregunta + respuesta: el anillo abierto antes de la pregunta; la respuesta en Bricolage 760 con la esfera que la cierra. La respuesta tiene **≤ 3 palabras** y mide **≥ 3 veces la pregunta** | `EfeonceOrbit.Voice` · chequeo `answer-dominates-3x` · [La órbita §4](../EFEONCE_GRAPHIC_LINE_V1.md#4-la-voz-pregunta-y-respuesta) |
+| La voz | El anillo abierto en la línea de arriba; el dominante en Bricolage 760 con la esfera que lo cierra, **≥ 3 veces** la línea de arriba. La línea de arriba es una pregunta **sólo si el lector la tiene de verdad**; si no, es el tema, el contexto o un dato (delta 2026-10-25 de La órbita §4: el par nunca se fuerza) | `EfeonceOrbit.Voice` · chequeo `answer-dominates-3x` · [La órbita §4](../EFEONCE_GRAPHIC_LINE_V1.md#4-la-voz-pregunta-y-respuesta) |
 | Una esfera por pieza | Nunca dos esferas en la misma pieza | chequeo `one-sphere-per-piece` · [La órbita §1](../EFEONCE_GRAPHIC_LINE_V1.md#1-la-esfera) |
 | Una órbita por pieza | Una sola órbita; **ningún texto cruza la órbita** | chequeo `one-orbit-per-piece` · [La órbita §1.3](../EFEONCE_GRAPHIC_LINE_V1.md#13-la-órbita--anatomía-y-regla) |
 | La medida en la órbita | La esfera en valor × 360° desde las 12, en sentido horario, con estela corta de 50° | `efeonceGraphicLine.trajectory.measure` · `measureSvg` de `@efeoncepro/axis-graphic-line` |
@@ -324,6 +327,61 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
   texto de cierre que **cambia con el contexto** y cabe en su extensión normalizada (decisión 5, 2026-09-29; §8.1).
 - **Blog y banner:** la foto se genera en **16:9** y se lleva a **1,9:1 (1200 × 630)**. La voz va en el lado oscuro de
   la foto y la firma **puede ir abajo a la izquierda**, cerrando la columna del texto. Sin eslogan.
+- **Portada de artículo del blog: variante centrada** (operador, 2026-10-24). La imagen destacada de un artículo
+  también se ve recortada en cuadrado, y ese recorte toma el centro de la imagen: la vista previa compacta de WhatsApp,
+  la miniatura de iMessage, Slack, Teams o Telegram y «Te puede interesar», los relacionados al pie de cada artículo
+  (cuadrado de 339 × 339; 326 × 326 en el teléfono). El banner de blog pone cabecera, voz y firma en x 72 y ese recorte perdía la manzana, casi toda la voz y la
+  firma. Por eso, en la portada de un artículo:
+  - **El texto vive en el cuadrado central** (x 285–915 de 1200): cabecera, voz y respuesta en **x 312**, la columna
+    de texto entre **x 312 y x 782** (470 px de ancho, 27 px de aire al borde izquierdo del cuadrado) y entre
+    **y 50 y y 341**. Medidas de las portadas publicadas: cabecera 312, 50 → 492, 131; voz 312, 170 → 782, 341;
+    respuesta 312, 250 → 782, 341, sin desborde.
+  - **Nada importante en los 15 px de arriba y de abajo:** la tarjeta grande de X (2:1) puede cortarlos.
+  - **Un artículo nuevo lleva tres imágenes y tres subidas, no una.** Entra solo al slider de `/blog/` (salvo Glitch y
+    Novedad) y, si se lee en 12 minutos o más, al rail «Para leer con calma». Los dos pintan su propio texto encima de
+    la imagen, así que esta portada no les sirve:
+    1. **El plate** (PNG 16:9, 2560 × 1440, sin texto) se sube como imagen de la tarjeta del rail, con el punto focal
+       «84% 30%» (`blog-home card <post> --image <plate> --focus "84% 30%"`; TASK-2051, en producción desde el
+       2026-10-24, `efeonce-editorial-blocks` 0.4.5). La tarjeta (440 × 600; 361 × 492 en tablet; 304 × 540 en el
+       teléfono) dejaría ver de la portada sólo x 369–831 (x 423–777 en el teléfono): cortaría la cabecera y dejaría
+       fuera la cara.
+    2. **La portada** (esta variante) se sube como destacada e imagen Open Graph.
+    3. **La imagen del slider** (WebP 2:1, 2400 × 1200, recortada del plate, sin texto) se sube como `hero`: el slider
+       pone su título encima, a la izquierda.
+
+    Los márgenes de cada imagen, superficie por superficie, con sus diagramas:
+    [inventario de imágenes por artículo](../../public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+  - **El sujeto va en el tercio derecho**, fuera de la columna de texto: la cara en **x 795–900** del lienzo, dentro
+    del borde del cuadrado. En el plate eso es la cara en x 68–75 % y y 10–40 %, con el 64 % izquierdo en oscuridad
+    calma. Pídela en torno al 85 % del ancho: los sujetos de las dos primeras salieron unos 15 puntos más al centro de
+    lo pedido.
+  - **Sin bajada y sin firma.** La pregunta y su respuesta bastan. La portada **no lleva el logo de Efeonce**: la
+    cabecera de Marketing con Manzanitas ya identifica la pieza, el artículo está en el sitio de Efeonce y la prenda
+    del sujeto ya lleva la marca bordada. Este caso cumple la regla de La órbita de no repetir el logo cuando la marca
+    ya está en la imagen. El banner que se comparte fuera del sitio conserva su firma.
+  - **La foto 16:9 se recorta a 1,9:1 quitando la parte de arriba**, para que el lecho quede entero abajo y la
+    cabecera caiga sobre el muro oscuro.
+  - **Se entrega al doble** (2400 × 1260), en JPEG de calidad 88 con croma 4:4:4 y **menos de 300 KB**. El operador
+    aprueba viendo juntas la portada completa, su recorte cuadrado, la imagen del slider y la tarjeta (1440 y
+    390 px).
+  - **Estado:** variante aprobada para el blog y **pendiente en AXIS**. No es todavía una pieza de
+    `manzanitasRegister`, y la plantilla `blog-banner` del compositor no la conoce. Hoy se compone con la maqueta
+    `ai-generations/2026-10-24_portadas-blog/composicion/componer-centrada.cjs` (con `FIRMA=0`), que copia la
+    plantilla aprobada y cambia sólo las posiciones.
+  - **Cómo se hace de punta a punta** (zonas seguras por superficie, ficha cine, composición, exportación, subida con
+    guardas y QA en vivo): [manual de la portada de artículo](../../../manual-de-uso/creative/producir-portada-de-articulo-del-blog.md).
+
+- **Delta 2026-10-25 · el texto y la persona se ganan su lugar (operador).** En la portada de «SEO y AEO» se
+  rechazaron cinco pares escritos para llenar el slot («Los mensajes no funcionan»). Desde hoy:
+  - **La portada no exige pregunta y respuesta.** Conserva el anillo en la línea de arriba y la esfera al cerrar el
+    dominante (La órbita §4, delta 2026-10-25); la línea de arriba es una pregunta sólo si el lector la haría de verdad.
+  - **Sin par, el anillo con un texto arriba y el destacado con la esfera abajo**, y el destacado es una idea completa
+    que se entiende a la primera. Los rechazados terminaban en fragmentos que había que explicar («Pasajes.», «A
+    pocas.», «Nombra pocas.»). Sin jerga de especialista.
+  - **Una persona va cuando porta la idea, no por costumbre** («mi problema no es que muestre personas, es que lo haga
+    todo el tiempo incluso cuando colocarla es absurdo»). Si un objeto, un lugar o el fenómeno cuentan mejor el tema,
+    la portada va sin persona; el registro cine lo admite como excepción declarada en la ficha (registro cine, delta
+    2026-10-25).
 
 ### 5.7 YouTube y pódcast
 
@@ -355,6 +413,8 @@ En la **portada con foto** (Escena), la pregunta va en **una línea** para que l
 | Contraportada (cierre del carrusel) | sin manzana | **no** | bloque logo 400 px + eslogan debajo, termina en y 1253 | **sí** |
 | Story | con manzana | **no** | centrada sobre la mesa, en la zona segura (87 %) | sólo en la story de cierre, debajo del logo |
 | Blog y banner | con manzana | no aplica | logo, puede ir abajo a la izquierda | no |
+| Portada de artículo del blog (variante centrada, §5.6) | con manzana, en x 312 | no aplica | **no lleva** | no |
+| Imagen del slider y foto de la tarjeta del rail (el plate, §5.6) | no lleva: van sin texto | no aplica | **no lleva** | no |
 | Miniatura de YouTube | con manzana | no aplica | logo abajo a la izquierda | no |
 | Cierre de YouTube | no lleva | no aplica | bloque logo 260 px + eslogan debajo | **sí** |
 | Portada de pódcast | cabecera del programa a 420 px | no aplica | — | no |
@@ -405,8 +465,9 @@ en cualquier otra lámina la mano va en reposo.
 - **Una sola altura de firma en todo el carrusel:** el logo de Efeonce arriba en **y 1202** (de 1350), **216 × 51 px**,
   a **97 px** del borde inferior. Vale en Pizarra, Escena y Lente; la Lente del sistema firma ahí.
 - En la **Escena**, la firma queda **dentro de la mesa** (el lecho nativo, §5.3).
-- El logo va centrado abajo, como manda La órbita; en blog y banner puede ir abajo a la izquierda (§5.6). La
-  miniatura de YouTube lleva el logo abajo a la izquierda (§5.7).
+- El logo va centrado abajo, como manda La órbita; en blog y banner puede ir abajo a la izquierda, y la portada de
+  artículo del blog no lo lleva, como tampoco la imagen del slider ni la foto de la tarjeta del rail, que van sin
+  texto (§5.6). La miniatura de YouTube lleva el logo abajo a la izquierda (§5.7).
 
 ### 7.2 El eslogan sólo cierra
 
@@ -922,6 +983,12 @@ Revisa cada pieza sobre los **píxeles finales**, no sobre la paleta teórica.
 
 - [ ] Story y blog: una sola pieza, Escena o Pizarra; la story, dentro de la zona segura del 87 %.
 - [ ] Blog y banner en 1200 × 630, generados en 16:9; voz en el lado oscuro.
+- [ ] Portada de artículo: texto dentro de x 312–782 · y 50–341, cara en x 795–900, sin firma, nada importante en
+      los 15 px de arriba y de abajo, JPEG de menos de 300 KB; revisa el recorte cuadrado central (x 285–915) junto a
+      la portada completa.
+- [ ] Artículo nuevo: lleva también la imagen del slider (WebP 2:1 sin texto, recortada del plate) y, si se lee en
+      12 minutos o más, la foto de la tarjeta del rail (el plate con el foco «84% 30%»). El operador ve las cuatro
+      juntas, en 1440 y 390 px, antes de subir.
 - [ ] Miniatura de YouTube con el logo abajo a la izquierda; pódcast con la cabecera a 420 px; ninguno con eslogan.
 - [ ] Revisa la lámina en un teléfono de 390 px antes de entregar.
 

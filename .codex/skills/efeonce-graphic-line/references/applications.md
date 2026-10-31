@@ -57,6 +57,9 @@ distribución y readback como pasos distintos, con el scope de cada host explíc
 
 > Delta familia H3 (B3d) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (paquete 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
 
+> Delta ficha de autor del blog (A19) verificado contra: la ficha en producción en `efeoncepro.com`
+> (`efeonce-editorial-blocks` 0.5.5) y greenhouse-eo `develop` en `15e7903c6` — 2026-10-24.
+
 > Delta marca Rooms (A13) verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
 
 > Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
@@ -680,7 +683,102 @@ vale en toda aplicación:
 - **Producción y publicación:** skill `efeonce-public-site-wordpress` → `references/landings/agenda.md`; el agendador
   y su contrato, skill `greenhouse-growth-meetings`.
 
+### A18. Bloques del artículo del blog (en producción desde 2026-10-24)
+
+Los posts del blog (WordPress con el tema Ohio) usan cuatro estilos Efeonce sobre bloques nativos de Gutenberg:
+Destacado (la tesis de la sección), Pasos (lista ordenada), Recuadro (lista corta) y Pregunta frecuente (desplegable);
+desde la 0.8.0 (2026-10-25) el bloque de cita destacada suma la Cita (cita real con autor). Su diseño se revisó con
+esta skill el 2026-10-24:
+
+- **El acento es el de la línea del tema del post**, igual que en Marketing con Manzanitas y en la tarjeta del post en
+  la portada del blog. Sale de un mismo resolvedor (`EO_CM_Util::line_of()`); cuando el tema no coincide con su
+  categoría, el post lleva `_eo_line`.
+- **El acento sólo va en un gráfico (≥ 3:1) o en un texto de 24 px o más.** La pregunta de la FAQ queda en navy y el
+  acento va en su anillo, que nunca se rellena; el número de Pasos va a 28 px en el acento, sin disco; el Destacado
+  abría con una barra de 48 × 3 px (0.4.2), reemplazada en la 0.8.0 por la voz de abajo.
+- **Ninguna esfera como adorno ni como viñeta.** La viñeta del Recuadro es un guion corto en tinta.
+- **Destacado con la voz de la órbita (aplicación aprobada 2026-10-25, `efeonce-editorial-blocks` 0.8.0).** El
+  Destacado del blog usa la estructura anillo arriba, esfera abajo (criteria.md, delta 2026-10-25): el anillo abierto
+  inicia la línea y la esfera en el acento de la línea reemplaza el punto final; es la única esfera de la pieza, y no
+  va si la frase cierra con `?`, `!` o `…`. Bricolage 400 abre y el remate va en `<strong>` (700): una idea completa,
+  nunca un fragmento críptico, y sin par de pregunta y respuesta forzado. Es la tesis de la sección, no una cita: sin
+  comillas. Variantes: «Destacado Efeonce» (navy) y «Destacado claro» (papel); ≤ 80 caracteres sale más grande. La
+  «Cita Efeonce» / «Cita clara» es sólo para una cita real con autor en `<cite>` (nombre en negrita, fuente, enlace),
+  nunca para una tesis propia ni con autor inventado. 1–2 por post, nunca seguidas. Manual:
+  `docs/manual-de-uso/public-site/usar-destacados-y-citas.md`; producción: `efeonce-public-site-wordpress` →
+  `content-factory-gutenberg.md`.
+- **Gráfico Efeonce (aplicación aprobada 2026-10-25, `efeonce-editorial-blocks` 0.9.0, bloque `efeoncepro/chart`).**
+  Los gráficos dentro de un artículo del blog llevan la órbita así: el acento de la línea del post sólo en la
+  entidad decisiva (el resto en grises de contexto), la esfera sólo en el punto decisivo y una por pieza (en la
+  línea, el punto destacado; en la Medida, la punta del arco, que es el dato), el texto siempre en tinta y nunca en
+  el color de la serie, panel de papel con el halo del Destacado claro y navy `#001a33` en oscuro. Título = la
+  conclusión, fuente siempre, un solo destacado; los números también salen como tabla HTML («Ver los datos»). Diez
+  tipos: línea, columnas, ranking, torta (≤ 8 partes), embudo, antes y después, Medida en la órbita, de cada 100,
+  matriz 2 × 2 y Venn de tres. **Ojo:** es una implementación de Greenhouse y del plugin (motor ECharts), no el
+  módulo de AXIS `@efeoncepro/axis-graphic-line/charts` (gráficos SVG estáticos de Manzanitas), que sigue con la
+  decisión «charts-in-la-orbita» abierta; esta aprobación no cambia AXIS ni lo da por resuelto. Manual:
+  `docs/manual-de-uso/public-site/usar-graficos-en-articulos.md`; contrato:
+  `BLOG_EDITORIAL_BLOCK_STYLES_V1.md` §Gráfico Efeonce.
+- **Color:** sólo de `efeonceGraphicLine`: navy `#023c70` sobre papel `#f7f8f6`, blanco sobre `#001a33` en oscuro.
+- **Tipografía:** sigue la del artículo de Ohio (DM Sans e Inter) hasta que se migre la plantilla completa del
+  artículo a Bricolage y Poppins (decisión del operador, 2026-10-24).
+
+**Imágenes de un artículo nuevo (medidas en vivo el 2026-10-24).** Un artículo nuevo entra solo al slider de
+`/blog/` y, si se lee en 12 minutos o más, al rail «Para leer con calma». Lleva **tres archivos y tres subidas**:
+
+- **Plate** (PNG 16:9, 2560 × 1440, sin texto): cara en x 68–75 % · y 10–40 %, el 64 % izquierdo oscuro, la mitad de
+  abajo pareja y el 7 % de arriba y de abajo libre. Se sube como foto de la tarjeta del rail con el foco «84% 30%»
+  (`blog-home card`, en producción desde el 2026-10-24).
+- **Portada** (JPEG 2400 × 1260, menos de 300 KB): la variante centrada de Manzanitas (`manzanitas.md` §4.5), con el
+  texto y la cara dentro del cuadrado central x 285–915, 15 px libres arriba y abajo y sin firma. Es la destacada y la
+  imagen Open Graph, y también el cuadrado de «Te puede interesar» al pie de cada artículo.
+- **Imagen del slider** (WebP 2:1, 2400 × 1200, recortada del plate, sin texto): se sube como `hero`; el slider pone
+  su título encima.
+
+La cabecera del artículo no muestra la destacada, y el archivo v3 del blog es una lista de texto. Las imágenes del
+cuerpo (de 0 a 2) sólo van si explican algo: las infografías en SVG, legibles a 390 px, construidas con el método de
+[manzanitas.md](manzanitas.md) §12b (build versionado, texto contorneado, mediciones en `build-report.json`; en el blog
+sólo la versión clara). Márgenes por superficie y
+diagramas: [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+Contrato: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` · FAQ: `docs/public-site/BLOG_FAQ_BLOCK_ANALYSIS_V1.md`.
+
+### A19. Ficha de autor del blog (web) (en producción desde 2026-10-24)
+
+> Verificado contra: la ficha publicada al cierre de los artículos de `efeoncepro.com` (`efeonce-editorial-blocks`
+> 0.5.5, TASK-2057) y greenhouse-eo `develop` en `15e7903c6` — 2026-10-24/25. Criterio: [criteria.md](criteria.md),
+> «Retrato con órbita y nombre: punto tipeado»; decisiones: [ledger.md](ledger.md) (2026-10-24).
+
+- **Para qué:** decir quién escribió el artículo, con qué cargo y dónde seguirlo, al cierre de cada post del blog
+  (reemplaza la caja de autor del tema Ohio). Los datos salen de un solo lector (`EO_Author_Profile`), el mismo del
+  byline y del schema, así que lo visible y lo estructurado no se separan.
+- **Va:** ficha **oscura** `#001a33` (variante B, aprobada para artículos; la A en papel queda como alternativa) con la
+  pieza **`portrait`** de AXIS: caja 208, anillo r 96 al 40 % del halo `#72ded8`, foto r 78, arco de 200° a 250° con
+  trazo 4 y esfera r 7 en el acento Growth `#36c8bf`; se escala a 160 px en escritorio y 120 px en teléfono. Al lado:
+  nombre en Bricolage, cargo, bio corta (≤ 180 caracteres) y las redes con sus **isotipos oficiales** de
+  `@efeoncepro/axis-brand-assets` (`assets/platforms/*-isotype.svg`, monocromos en `currentColor`).
+- **Una esfera por pieza:** la del arco del retrato. El **nombre cierra con punto tipeado en el acento**, nunca con
+  esfera. En la franja chica (texto bajo 24 px), el punto va en el color del nombre: el acento nunca va en texto
+  menor a 24 px.
+- **Esquina recta arriba a la izquierda** (`straightCorner` de AXIS): apunta al borde del que nace el bloque, el de
+  quien habla.
+- **Foto:** la del equipo con fondo azul de fotografía de marca (One User Avatar, nunca Gravatar).
+- **Medidas finales en escritorio:** ancho máximo 800 px, padding `clamp(24px, 3vw, 36px)`, nombre
+  `clamp(28px, 3vw, 36px)`, cuerpo 15 px y 96 px de aire bajo la ficha. La 0.5.6 la deja más contenida: el operador
+  dijo que «quedó bastante grande».
+- **Copy:** el cargo vigente («Managing & GTM Director» para Julio); sin web personal hasta que exista. Las redes
+  visibles son las del `sameAs` del schema, en el mismo orden.
+- **Nunca:** una segunda esfera junto al nombre · el acento en texto chico · íconos de redes dibujados o copiados de
+  otro set · el `aside` del tema (Ohio lo oculta en los posts) · una foto de Gravatar.
+- **Producción y publicación:** skill `efeonce-public-site-wordpress` → `references/blog-home-operation.md` (delta
+  «Author card + byline») y `references/runtime-and-discovery.md` §Ohio host traps for own components. Si se cambia la
+  foto, la capa del avatar se rehace desde la fuente (`ai-generations/2026-10-24_autor-blog/reparar-capa.mjs`): la
+  del 2026-09-29 tenía huecos en la bomber que sobre navy no se veían.
+
 ## B. Presentaciones e informes
+
+- **Teléfono (operador 2026-10-25, 0.5.9):** cabecera de perfil — retrato de 112 px a la izquierda y «Escribe», nombre y
+  redes a su derecha; cargo, bio, temas y el CTA a todo el ancho debajo, el CTA cierra. La ficha toma el mismo margen que
+  el texto del artículo (16/16 px) y deja 40 px de aire abajo (56 en escritorio, igual que arriba).
 
 ### B1. Deck 16:9 (portada, sección, contenido, cierre)
 
@@ -1294,6 +1392,8 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Mención Efeonce en texto corrido | ninguna (el isotipo ya es órbita) | isotipo + etiqueta corta en la píldora de la línea; sólo destinos Efeonce, no CTA | `efeonce.mention` (AXIS) · A14 |
 | Encabezado y navegación del sitio web (en vivo desde 2026-10-23) | — | logo 164/140, cápsula de vidrio, botón «Agenda tu diagnóstico» y hamburguesa con una sola receta de vidrio | `efeonce.site-nav` (AXIS primitives 0.7.13) · A15 |
 | Landing de servicio/agenda con el agendador nativo | órbita de retrato de Nexa en el hero | agendador real enmarcado, titulares con esfera (salvo el del hero), CTA `accent-growth`, firma del sitio | landing source-led + `<efeonce-meeting-scheduler>` · A17 |
+| Gráfico en un artículo del blog (web, 2026-10-25) | esfera sólo en el punto decisivo, una por pieza (en la Medida, la punta del arco) | acento sólo en la entidad decisiva, texto en tinta, panel papel con halo del Destacado claro, navy `#001a33` en oscuro, tabla HTML con los datos | `efeoncepro/chart` (plugin 0.9.0, ECharts; no es AXIS `charts`) · A18 |
+| Ficha de autor del blog (web) | pieza `portrait` de AXIS (la única esfera) | ficha oscura, nombre con punto tipeado en el acento, cargo, bio corta, isotipos oficiales de redes | `EO_Author_Profile` + `efeonce-editorial-blocks` · A19 |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Anuncio de alianza (post 4:5 + reel 9:16) | ninguna (la órbita fina sola no tiene punch) | fondo cine con horizonte bajo, íconos oficiales del partner en tres planos con acabado Sunburst, lockup «Efeonce \| Partner» con filete y fila de productos debajo; sin pregunta-respuesta | composición determinística + acabado `gpt-image-2.5-sunburst` · A16 |
 | Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |

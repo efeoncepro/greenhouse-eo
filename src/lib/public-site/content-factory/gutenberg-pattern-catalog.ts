@@ -1,6 +1,8 @@
 import type { GutenbergBlockPatternCatalog, GutenbergBlockPatternCatalogEntry } from './contracts'
 import { renderHeadingBlock, renderYoastTableOfContents } from './gutenberg-blocks'
 import { renderGlitchDropBlock } from './gutenberg-glitch-drop'
+import { renderEditorialChartBlock } from './gutenberg-editorial-chart'
+import { renderGrowthCtaBlock } from './gutenberg-growth-cta'
 
 // Examples are generated from the canonical block builders so they are always
 // anchored + populated by construction (regression guard for the 250748 defect).
@@ -197,13 +199,45 @@ export const EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES: GutenbergBlockPatternCatal
     role: 'structure',
     generationPolicy: 'allowed',
     refreshPolicy: 'patch_carefully',
-    description: 'Native comparison/data table with optional caption and the core-registered stripes style (spec kind="table", style="stripes").',
+    description: 'Native comparison/data table with optional caption in the «Tabla Efeonce» style (spec kind="table", style="efeonce"; core stripes with style="stripes").',
     constraints: [
       'Every row keeps the header column count.',
-      'Only the core-registered is-style-stripes style; no inline colors.',
-      'Check Ohio at 390 px before using stripes on wide tables.'
+      'Only «Tabla Efeonce» (is-style-efeonce-tabla) or core is-style-stripes; no inline colors.',
+      'Short headers: under 600 px each cell shows its header as a label.'
     ],
     example: stripedTableExample
+  },
+  {
+    blockName: 'efeoncepro/chart',
+    role: 'data_visualization',
+    generationPolicy: 'allowed',
+    refreshPolicy: 'patch_carefully',
+    description:
+      '«Gráfico Efeonce»: line, column, bar, pie, funnel, before-after, measure, per-hundred, matrix or venn (spec kind="chart"). Dynamic block: the numbers go to an accessible table in the HTML, the chart is painted on top.',
+    constraints: [
+      'The chart must validate against the shared contract (rows and value columns per kind).',
+      'Title = the conclusion; source line always; one highlighted entity.',
+      'Never hand-write the block comment; renderEditorialChartBlock serializes it.'
+    ],
+    example: renderEditorialChartBlock({
+      chart: { kind: 'measure', categories: ['de las respuestas te nombran'], series: [{ name: 'Porcentaje', values: [27] }], format: 'percent' },
+      title: 'Te nombran en el 27 % de las respuestas',
+      sourceLabel: 'Efeonce AEO Grader'
+    })
+  },
+  {
+    blockName: 'efeoncepro/growth-cta',
+    role: 'conversion',
+    generationPolicy: 'allowed',
+    refreshPolicy: 'preserve',
+    description:
+      'Governed Greenhouse Growth CTA placed in a post. Dynamic block: CTA slug in a self-closing comment (spec kind="growthCta"); copy lives in the Growth CTA engine.',
+    constraints: [
+      'Only slugs allowed by the blog surface (option eo_growth_cta_blog).',
+      'One per post, after the main answer and before the FAQ or the closing.',
+      'No copy, links or forms inside the block.'
+    ],
+    example: renderGrowthCtaBlock({ cta: 'blog-aeo-assessment', location: 'blog_article', emphasis: '¿aparece tu marca?', mark: 'aeo-assessment' })
   },
   {
     blockName: 'efeoncepro/glitch-drop',

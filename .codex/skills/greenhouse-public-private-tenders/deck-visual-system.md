@@ -291,6 +291,22 @@ al cliente su anuncio donde lo va a ver. Método, licencias y trampas en la skil
 - **Cada vez que se insertan láminas, renumerar la lámina de cumplimiento** (requisito → láminas): la matriz cita
   números de página y queda desalineada en silencio.
 
+## Delta 2026-10-29 — técnica en canvas Design: caso Agencia Digital 2027 GRD-1552
+
+Técnica de 41 láminas + Anexo A (correspondencia requisito → página) en La órbita, hecha en un canvas Design.
+Lo nuevo frente a GRD-1541:
+
+- **Láminas canónicas del brochure 360° en vez de improvisar:** «Clientes» = brochure «Agencia de Marketing 360» v9
+  p. 78 (logos en azul marino de un tono, generados desde `src/lib/artifact-composer/catalogs/deck-axis/assets/clients/`);
+  «Equipo» = p. 72.
+- **Versión cliente:** se retiraron los códigos de fuente internos, las cajas de pendiente, los sellos de borrador,
+  las frases defensivas y los anexos de fuentes internas; los recuadros punteados pasaron a borde sólido. Verificado
+  con `pdftotext` sobre el PDF final.
+- **PDF vectorial:** `page.pdf` por lámina 1920×1080 + unión con pdf-lib, fuentes incrustadas (42 páginas). El Anexo A
+  y el RFP Excel citan las páginas de ese PDF.
+- Método y reglas: `deck-studio` → «Reglas generales para decks de licitación»; paquete administrativo:
+  `platform-bids-and-administrative-package.md` → «Paquete Wherex de Grupo Réditos».
+
 ## El selector — cómo se elige la plantilla
 
 **Es un lookup determinista, NO un juicio.** `registry.json` mapea **1 tipo de contenido → 1

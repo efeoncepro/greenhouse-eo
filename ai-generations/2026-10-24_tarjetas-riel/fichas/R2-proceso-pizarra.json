@@ -1,0 +1,11 @@
+{
+  "id": "R2-proceso-pizarra",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "marcado",
+  "escena": "SCENE (a sales team's process workshop in a modern Santiago meeting room, after mapping how a deal really moves through their CRM): a large matte white glass whiteboard fills the frame at a pronounced angle, covered by a hand-drawn sales process map in five columns of square sticky notes, pale blue and white, each with a few handwritten words too small to read. Caught mid-review, on top of the map sit the corrections, the sharpest, most deliberate and most contrasted marks in the image, where the eye lands first: a thick cobalt marker circle around one stage in the middle of the map, a firm arrow dragging one sticky note from the fourth column back to the second, and a bold strike through a duplicated stage; one single orange sticky note marks the new step. A cobalt whiteboard marker rests on the ledge where it was left. Low raking light from the right so every stroke throws a thin shadow and reads as physical ink on glass. In the far background, out of focus, a thin bezel-less wall display glows with the soft shapes of a sales dashboard, its numbers unreadable, clearly secondary. At most a blurred fragment of a hand leaving the far edge, never the subject. The circled stage and the arrow sit in the upper half of the frame and in the central 70% of its width. 50mm lens at f/4, focus on the circle and the arrow.",
+  "lecho": {
+    "objeto": "the near edge of the whiteboard ledge with a second marker, out of focus",
+    "tono": "DARK graphite in shadow, matte"
+  }
+}

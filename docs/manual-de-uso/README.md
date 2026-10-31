@@ -14,6 +14,14 @@ La diferencia con otras capas de documentacion:
 
 ## Indice por categoria
 
+### Efeonce Rooms e identidad
+
+- [Integrar Claude Design en local](rooms/integrar-claude-design-local.md): entorno aislado y SDK tipado; sin publicación ni activación productiva.
+
+- [Operar Rooms en desarrollo](rooms/operar-primera-experiencia-local.md): sesiones y fixtures aislados, sin autoridad productiva.
+- [Operar el worker privado de imágenes](rooms/operar-worker-medios.md): Scheduler/Job, leases, comprobación y rollback.
+- [Invitación Rooms por correo y código](identity/operar-invitacion-rooms-email-otp.md): canary único ya comprobado; no repetir envíos ni activar por conectar diseño.
+
 - [Operar Efeonce Marketing Studio](marketing-studio/operar-marketing-studio.md) — revisar campañas (preview por formato, UTM, estados y presupuestos), actualizar datos desde OneDrive (import), generar imágenes (renditions), dar y revocar acceso por API, leer Studio con un agente por MCP y resolver problemas comunes.
 
 - [Descubrir recursos y componer con AXIS](creative/descubrir-y-componer-con-axis.md) — Lab, packages, CLI, íconos, logos y evidencia de salida.
@@ -141,6 +149,11 @@ La diferencia con otras capas de documentacion:
   fuente o marcarlo «Ejemplo ilustrativo», láminas de texto denso, Escena y Lente, la contraportada con una sola
   conversión, checklist (acento, contraste, una esfera, «Desliza», firma, fuente), story, blog, YouTube y pódcast,
   estados y señales, problemas comunes y pendientes. Todavía sin comando: el registro en AXIS llega por una task aparte.
+- [Producir la portada de un artículo del blog](creative/producir-portada-de-articulo-del-blog.md) — imagen destacada
+  y OG de Marketing con Manzanitas: zonas seguras por superficie (cuadrado central para WhatsApp y tarjetas cuadradas,
+  banda de X), ficha cine con la cara en x 795–900, composición centrada sin firma, JPEG 2400 × 1260, subida con guardas y
+  respaldo, QA en vivo y cómo volver atrás.
+  Cuántas imágenes lleva cada artículo y para qué posición: [inventario de imágenes por artículo](../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19. Desde el 2026-10-03 (v1.1): pedir personas del roster, del elenco y a
@@ -315,19 +328,27 @@ La diferencia con otras capas de documentacion:
 
 ### Plataforma
 
+- [Shell de los agentes (bash)](plataforma/shell-de-agentes-bash.md) — por qué los agentes de Claude Code corren en bash aunque la terminal sea zsh, qué se cambió (`CLAUDE_CODE_SHELL` + `~/.bashrc`), cómo comprobarlo y **cómo revertirlo**.
 - [Navegar el portal](plataforma/navegar-el-portal.md) — las 3 superficies de navegación (sidebar por zonas con acordeón, menú del avatar como "mi cuenta", buscador ⌘K filtrado por rol), qué cambia para el colaborador puro, estados normales y problemas comunes. TASK-1388 + TASK-1686.
 
+- [Usar Destacados y Citas en un artículo del blog](public-site/usar-destacados-y-citas.md) — cuándo usar Destacado (tesis propia: anillo, esfera y remate en negrita) y cuándo Cita (con autoría), navy o papel, cómo pedirlos en la Content Factory y qué significan las señales (frase corta, sin esfera, modo oscuro).
+- [Usar gráficos en un artículo del blog](public-site/usar-graficos-en-articulos.md) — los diez tipos del bloque «Gráfico Efeonce» (líneas, columnas, barras, torta, embudo, antes y después, medida, de cada 100, matriz, Venn), la tabla que pide cada uno, cómo pedirlo en la Content Factory y qué significan las señales (en producción desde el 2026-10-25, plugin 0.9.0).
 - [Operar layout Ohio + Elementor en el Public Site](public-site/wordpress-ohio-elementor-layout.md) — runbook para diagnosticar, corregir y revertir desfases de contenedor/sidebar en `efeoncepro.com` WordPress/Kinsta, incluyendo `/blog` y el fix page-scoped de Ohio `.light-typo`.
+- [Operar la home de Efeonce («La órbita»)](public-site/operar-home-efeonce.md) — editar en Elementor los doce módulos `greenhouse_inicio_*` (incluidas las variantes que rotan), recompilar y desplegar el diseño, republicar con guarda de hash, regenerar la imagen social, rollback desde snapshots, qué no hacer y problemas comunes de QA.
 - [Operar la landing Agencia Creativa](public-site/operar-agencia-creativa.md) — editar los quince módulos en Elementor, recompilar y desplegar el diseño, publicar con preflight, rollback desde snapshot y problemas comunes (página a medio escribir, botón teal, formulario en una columna).
 - [Operar la landing Servicios HubSpot (v2)](public-site/hubspot-elementor.md) — editar los 14 widgets `greenhouse_hubspot_v2_*`, recompilar y desplegar, republicar (con el key del CTA del dock), publicar/rotar el CTA «Agendar reunión», rollback desde snapshots y trampas del compilador y del dock.
 - [Operar la landing Performance Marketing](public-site/operar-performance-marketing.md) — editar los 10 widgets `greenhouse_performance_*` y las preguntas frecuentes, cambiar el diseño por canvas → compilar → paquete → deploy, rollback desde snapshots (página, SEO, layout Ohio y migración de la página antigua) y trampas del wrapper WP-CLI, del loader compartido y del 301 con UTM.
 - [Operar la landing Inbound Marketing](public-site/operar-inbound-marketing.md) — editar los 11 widgets `greenhouse_inbound_*` y las preguntas frecuentes, cambiar el diseño por canvas → compilar → paquete → deploy → publicar, rotar el key del CTA de reunión sin exponerlo, rollback desde snapshots, lista de verificación (1440/390, desborde, ventana de reunión desde hero, cierre y barra móvil) y lecciones del diálogo y del dock.
 - [Operar la landing Agenda](public-site/operar-agenda.md) — cambiar copy o diseño (recompilar y desplegar), republicar el cuerpo con guarda de hash, cambiar el SEO, rollback de página, SEO y plugin, verificación (desborde, consola, agendador cargado, sin enlaces HubSpot) y qué no hacer (sin reservas de prueba, sin tocar header/footer, sin `efeonce-discovery-30`).
+- [Solicitar la indexación de una URL en Search Console](public-site/solicitar-indexacion-search-console.md) — `pnpm public-website:gsc-index`: un Chrome dedicado donde una persona inicia sesión una vez, inspección por defecto, `--apply` sólo si Google no vio el último cambio, tope de 10 por día, registro por URL y paradas ante captcha, cuenta sin acceso o cupo agotado.
 - [Operar WordPress Blog, Content Hub y búsqueda](public-site/operar-wordpress-blog-content-hub-search.md) — categorías canónicas, migraciones de URL, inspección de posts y trabajo seguro sobre la copia Demo 35 `251875` sin tocar la fuente ni cortar `/blog/` antes de aprobación.
 - [Operar páginas misceláneas del sitio público](public-site/operar-paginas-miscelaneas.md) — discovery y futuro rollout gobernado de 404, búsqueda/no-results y archivos, con matriz HTTP/SEO, owner efectivo, paquete child-theme acotado, QA y rollback.
 - [Operar Public Site y Content Factory](public-site/operar-public-site-content-factory.md) — crear y publicar un articulo con `ideate → co-crear → author → validate → private → approve → publish → verify`; Content Factory termina en privado y la transición pública requiere decisión humana, snapshot, rollback y QA live.
 - [Operar la navegación global del sitio](public-site/operar-navegacion-global.md) — editar el menú vivo de `efeoncepro.com` con `pnpm public-website:site-nav` (`pull` → `set`/`photo`/`glyph`/`add`/`move`/`remove`/`patch` → `diff`/`check`/`fit`/`preview` → `apply` contra la revisión base → `verify`), revisiones y `restore`, interruptor on/piloto/off como rollback, agendador y rotación de su llave sin exponerla, redirecciones con Yoast, carriles de despliegue del plugin y del tema, actualizar AXIS fijado en el tema (re-vendorizar desde el paquete publicado) y verificación en vivo (navegador en primer plano, scroll instantáneo).
 - [Operar el dock de las landings](public-site/operar-dock-de-landings.md) — revisar en la landing real sin escribir (`preview`), respaldar, encender y apagar landing por landing el dock inferior de vidrio con `pnpm public-website:landing-dock`, y desplegar el plugin `eo-landing-dock` (TASK-2043).
+- [Operar el portafolio de proyectos](public-site/operar-portafolio.md) — cargar, revisar, publicar y despublicar proyectos de `/portafolio/` con `pnpm public-website:portfolio` (`pull`/`new` → `validate`/`preview`/`diff` → `apply` contra la revisión base → `publish` con aprobación del cliente → `verify`), historial, `restore`, señales de error y despliegue del plugin `eo-portfolio` (TASK-2047).
+- [Operar el portafolio por la CLI y sus herramientas](public-site/operar-portafolio-por-cli.md) — referencia de todos los comandos de `pnpm public-website:portfolio` (qué lee y qué escribe en producción), recetas por tipo de proyecto (campaña, social, audiovisual, producción con IA, SEO/contenidos) con sus plantillas y la guarda `[COMPLETAR…]`, paquete y despliegue del plugin con purga de caché, revisión local con WordPress Playground y scripts de la migración desde Ohio.
+- [Operar el Archivo del blog](public-site/operar-archivo-del-blog.md) — búsqueda, temas, etiquetas y autores con la plantilla v3: `archive <0|preview|1>` y `topic-descriptions`, preview con token, verificación y problemas comunes (TASK-2055).
 - [Operar la portada del blog por CLI](public-site/operar-portada-blog-por-cli.md) — `pnpm public-website:blog-home`: estado y motivo de cada diapositiva, fijar, título e imagen del slider, formato, recursos, eventos, flag, purga, despliegue de los dos plugins, verificación en vivo y rollback del corte de `/blog/`; cada escritura es plan hasta `--apply` y queda en ledger (TASK-2050/2051).
 - [Operar el contenido de la portada del blog](public-site/operar-contenido-portada-blog.md) — formato de cada entrada, fijar en el slider con vencimiento, eventos (arte clave, speakers, agenda, `.ics`) y recursos con frescura; para el operador: paquete, ensayo en Playground, despliegue con dry-run, verificador, backfill de formato con ledger y rollback (TASK-2050, PDR-029).
 - [Producir infografías editoriales](public-site/producir-infografias-editoriales.md) — contrato → arquetipo → SVG source/delivery → QA de archivo/columna → Media Library → `<picture>`/SEO; separa body SVG de featured/OG raster y fija la firma footer-only Efeonce.

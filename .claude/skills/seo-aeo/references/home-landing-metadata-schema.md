@@ -15,6 +15,10 @@ Carga esta referencia junto a `modules/01_SEO_TECHNICAL.md`; para escribir en Wo
   No busques `@type` dentro de payloads escapados ni deduzcas ausencia por un único regex.
 - Separa metadatos de página de identidad global, theme/header/footer y otras landings. Hallazgos fuera
   de alcance van a un backlog con evidencia; no cambies esos planos por una corrección local.
+- Busca páginas que compiten con la portada: copias antiguas de la Home, previews y demos del tema publicadas e
+  indexables. Caso 2026-10-29: `/home-2-2/` estaba indexable y en el sitemap junto a la portada nueva. Se retiran a la
+  papelera con 301 a `/` (receta en `efeonce-public-site-wordpress`, `references/taxonomy-permalink-migrations.md` §4)
+  y se comprueba que salen del sitemap.
 
 ## 2. Redacción sin forzar la página
 
@@ -58,7 +62,25 @@ promesas de rendimiento y repetir el H1 por obligación. Google puede generar ot
 - Rollback exige lectura de drift y restaura sólo campos modificados, eliminando overrides antes inexistentes.
   Un writer de checkpoint con hash previo no es idempotente ni se reejecuta tras una respuesta incierta.
 
-## 5. Evidencia y cierre
+## 5. Imagen social (OG, Twitter, destacada)
+
+Aprendizajes de la Home rediseñada, 2026-10-29 (caso en `efeonce-public-site-wordpress`,
+`references/landings/home-claude-design-preview.md`).
+
+- Proporción 1,91:1 a 1200×630. La imagen anterior era WebP 2000×960 (2,08:1) y sin alt; para máxima compatibilidad
+  entre plataformas y chats, la `og:image` va en PNG o JPEG, no en WebP.
+- Composición centrada que sobreviva al recorte cuadrado de los chats y al 2:1 de X: el sujeto y el logo en el centro;
+  los elementos secundarios a los lados pueden perderse sin romper la idea.
+- Alt descriptivo también en la imagen social.
+- Imagen nueva = archivo y nombre nuevos, no un reemplazo sobre la misma URL: plataformas y CDN cachean por URL. La
+  anterior puede quedar en la biblioteca.
+- Una sola imagen como OG, Twitter y destacada. En Elementor, refleja la destacada también en
+  `_elementor_page_settings.post_featured_image`: al guardar desde el editor, Elementor reescribe la destacada desde ese
+  control.
+- Al compartir, refresca las cachés con LinkedIn Post Inspector y Facebook Sharing Debugger; el HTML correcto no
+  garantiza que la vista previa ya cambió.
+
+## 6. Evidencia y cierre
 
 - Comprueba valores y unicidad de metadatos; canonical/robots coherentes con sitemap y redirects.
 - Parsea JSON-LD, valida IDs/referencias y compara valores con el contenido/fuente. Distingue
@@ -70,7 +92,8 @@ promesas de rendimiento y repetir el H1 por obligación. Google puede generar ot
   contaminar el overflow: informa contexto y medidas, no certifiques móvil anónimo desde esa sesión.
   Falta de width/height no prueba CLS si CSS reserva espacio; mide antes de diagnosticar.
 - Indexabilidad técnica no prueba indexación; ésta requiere observación GSC. CWV requiere datos de campo;
-  lab, Lighthouse, capturas y velocidad percibida son evidencias distintas. AEO necesita consultas repetibles
+  lab, Lighthouse, capturas y velocidad percibida son evidencias distintas. Si la cuota pública de PageSpeed Insights
+  está agotada (pasó el 2026-10-29), registra «no medido»; un intento fallido no es evidencia de rendimiento. AEO necesita consultas repetibles
   por motor/fecha/fuentes, no garantías de citas por tener schema.
 - Entrega qué cambió, qué se verificó y qué queda abierto. Conserva snapshots/recovery y enlaza el audit.
   Un checker de contrato de una Home no debe imponer sus textos/tipos exactos a todas las páginas.

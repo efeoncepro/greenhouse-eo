@@ -1,0 +1,383 @@
+{
+  "corte_analitico": "2026-10-24T22:00:00Z",
+  "zona": "America/Santiago",
+  "inicio_octubre": "2026-10-01T03:00:00Z",
+  "correccion_v1": {
+    "cuentas_anterior": 62,
+    "cuentas_corregido": 63,
+    "correos_anterior": 146,
+    "correos_corregido": 148,
+    "casillas_anterior": 88,
+    "casillas_corregido": 89,
+    "motivo": "Aseguradora Solidaria omitida en agrupación inicial; 2 copias presentes en fuentes; no nuevos envíos"
+  },
+  "outlook": {
+    "copias_septiembre_en_adelante": 376,
+    "copias_octubre_utc": 258,
+    "copias_octubre_santiago": 257,
+    "exclusion_limite_zona": "Blocklist Check Test 2026-10-01T02:02:06Z = 30/09 Santiago",
+    "categorias": {
+      "Operación interna y pruebas": 13,
+      "Calendario y coordinación de reuniones": 23,
+      "Clientes: operación, expansión y continuidad": 33,
+      "Proveedores, partnerships y habilitación": 37,
+      "Captación, reactivación y evaluación de prospectos": 147,
+      "Otros profesionales": 1,
+      "Gestión financiera y bancaria": 1,
+      "Consultas sobre procesos de compra": 2
+    }
+  },
+  "prospeccion": {
+    "cuentas": 62,
+    "correos": 147,
+    "casillas": 88,
+    "actividades_crm": 154,
+    "intentos_failed": 8,
+    "forus_copia_ausente_en_resultado_crm": 1,
+    "cuentas_respuesta_email": 6,
+    "cuentas_continuidad_no_negativa": 3,
+    "cuentas_respuesta_negativa": 3,
+    "conversacion_linkedin_adicional": "Assetplan",
+    "mediana_dias_primera_copia_octubre": 11.546278935185185,
+    "edades": [
+      {
+        "rango": "0–3",
+        "cuentas": 10
+      },
+      {
+        "rango": "4–7",
+        "cuentas": 9
+      },
+      {
+        "rango": "8–14",
+        "cuentas": 18
+      },
+      {
+        "rango": ">=15",
+        "cuentas": 25
+      }
+    ],
+    "grupos": {
+      "frio_agente": {
+        "cuentas": 19,
+        "correos": 52,
+        "respuestas_humanas": 1
+      },
+      "senal_focalizada": {
+        "cuentas": 33,
+        "correos": 70,
+        "respuestas_humanas": 1
+      },
+      "proceso_compra": {
+        "cuentas": 5,
+        "correos": 16,
+        "respuestas_humanas": 3
+      },
+      "conversacion_previa": {
+        "cuentas": 5,
+        "correos": 9,
+        "respuestas_humanas": 1
+      }
+    }
+  },
+  "crm": {
+    "negocios": 298,
+    "ganados": 20,
+    "perdidos": 202,
+    "abiertos": 73,
+    "sin_etapa": 3,
+    "creados_octubre": 72,
+    "creados_octubre_ganados": 0,
+    "sin_canal": 118,
+    "perdidos_sin_motivo": 168,
+    "perdidos_con_motivo": 34,
+    "no_competencia_entre_motivos_cargados": 32,
+    "plazos_licitacion_pasados_en_abiertos": 41,
+    "historia_actividades_salientes": 1701,
+    "grupos_historicos": {
+      "channels": {
+        "WherEX": {
+          "n": 27,
+          "won": 2,
+          "lost": 20,
+          "open": 5,
+          "unknown": 0,
+          "win_closed": 0.09090909090909091
+        },
+        "Prospección directa": {
+          "n": 35,
+          "won": 7,
+          "lost": 13,
+          "open": 15,
+          "unknown": 0,
+          "win_closed": 0.35
+        },
+        "sin_dato": {
+          "n": 118,
+          "won": 5,
+          "lost": 66,
+          "open": 44,
+          "unknown": 3,
+          "win_closed": 0.07042253521126761
+        },
+        "Mercado público": {
+          "n": 96,
+          "won": 1,
+          "lost": 87,
+          "open": 8,
+          "unknown": 0,
+          "win_closed": 0.011363636363636364
+        },
+        "Marketing;Prospección directa": {
+          "n": 2,
+          "won": 0,
+          "lost": 1,
+          "open": 1,
+          "unknown": 0,
+          "win_closed": 0
+        },
+        "Referidos": {
+          "n": 10,
+          "won": 3,
+          "lost": 7,
+          "open": 0,
+          "unknown": 0,
+          "win_closed": 0.3
+        },
+        "Marketing": {
+          "n": 5,
+          "won": 1,
+          "lost": 4,
+          "open": 0,
+          "unknown": 0,
+          "win_closed": 0.2
+        },
+        "Partnership": {
+          "n": 5,
+          "won": 1,
+          "lost": 4,
+          "open": 0,
+          "unknown": 0,
+          "win_closed": 0.2
+        }
+      },
+      "mode": {
+        "Licitación": {
+          "n": 148,
+          "won": 3,
+          "lost": 104,
+          "open": 41,
+          "unknown": 0,
+          "win_closed": 0.028037383177570093
+        },
+        "sin_dato": {
+          "n": 23,
+          "won": 3,
+          "lost": 9,
+          "open": 8,
+          "unknown": 3,
+          "win_closed": 0.25
+        },
+        "Trato directo": {
+          "n": 52,
+          "won": 11,
+          "lost": 30,
+          "open": 11,
+          "unknown": 0,
+          "win_closed": 0.2682926829268293
+        },
+        "Compra ágil": {
+          "n": 71,
+          "won": 3,
+          "lost": 55,
+          "open": 13,
+          "unknown": 0,
+          "win_closed": 0.05172413793103448
+        },
+        "Partnership": {
+          "n": 4,
+          "won": 0,
+          "lost": 4,
+          "open": 0,
+          "unknown": 0,
+          "win_closed": 0
+        }
+      },
+      "type": {
+        "newbusiness": {
+          "n": 213,
+          "won": 9,
+          "lost": 138,
+          "open": 66,
+          "unknown": 0,
+          "win_closed": 0.061224489795918366
+        },
+        "existingbusiness": {
+          "n": 62,
+          "won": 10,
+          "lost": 47,
+          "open": 5,
+          "unknown": 0,
+          "win_closed": 0.17543859649122806
+        },
+        "sin_dato": {
+          "n": 23,
+          "won": 1,
+          "lost": 17,
+          "open": 2,
+          "unknown": 3,
+          "win_closed": 0.05555555555555555
+        }
+      },
+      "line": {
+        "wave": {
+          "n": 30,
+          "won": 2,
+          "lost": 27,
+          "open": 1,
+          "unknown": 0,
+          "win_closed": 0.06896551724137931
+        },
+        "efeonce_digital": {
+          "n": 43,
+          "won": 1,
+          "lost": 36,
+          "open": 6,
+          "unknown": 0,
+          "win_closed": 0.02702702702702703
+        },
+        "sin_dato": {
+          "n": 115,
+          "won": 7,
+          "lost": 41,
+          "open": 64,
+          "unknown": 3,
+          "win_closed": 0.14583333333333334
+        },
+        "crm_solutions": {
+          "n": 39,
+          "won": 7,
+          "lost": 31,
+          "open": 1,
+          "unknown": 0,
+          "win_closed": 0.18421052631578946
+        },
+        "globe": {
+          "n": 33,
+          "won": 3,
+          "lost": 29,
+          "open": 1,
+          "unknown": 0,
+          "win_closed": 0.09375
+        },
+        "reach": {
+          "n": 38,
+          "won": 0,
+          "lost": 38,
+          "open": 0,
+          "unknown": 0,
+          "win_closed": 0
+        }
+      }
+    }
+  },
+  "investigacion": {
+    "empresas": 159,
+    "contactos": 185,
+    "contactos_con_email": 172,
+    "radar_casos": 52,
+    "radar_investigando": 29,
+    "radar_entradas_actualizacion": 51
+  },
+  "automatizacion": {
+    "contactos_agente_error": 9,
+    "contactos_agente_en_curso": 10,
+    "contactos_agente_finalizados": 2,
+    "contactos_inscritos_secuencias": 13
+  },
+  "limites": [
+    "Copias enviadas no prueban entrega; rebotes incluidos",
+    "Antigüedad de copia de octubre no es inicio real de relación",
+    "Casillas no equivalen a personas ni comité de compra",
+    "Los universos se solapan; no sumar ni convertir a embudo común",
+    "Sin horas ni costos totales: no se calcula CAC ni ROI",
+    "Cohorte de 72 negocios creada en octubre no equivale a 63 cuentas contactadas",
+    "Clasificación de correo por objetivo principal; no representa distribución de tiempo"
+  ],
+  "correccion_alcance_operador": {
+    "fecha": "2026-10-24",
+    "fuente": "Aclaración directa de Julio en esta conversación",
+    "entidad": "Momentum",
+    "naturaleza": "Alianza de bajo interés estratégico por la forma en que se presentaba; no cliente",
+    "tratamiento": "Excluir del diagnóstico de fallas de seguimiento, prioridades activas y cohorte de prospección de clientes; conservar actividad en partnerships",
+    "correos_reclasificados": 1,
+    "casillas_excluidas_prospeccion": 1,
+    "cuentas_respuesta_excluidas": 1
+  },
+  "plan_cartera_contactada": {
+    "corte": "2026-10-24",
+    "estado": "Propuesta documentada; sin cambios CRM, cadencias o envíos",
+    "grupos": {
+      "1 — Avanzar propuesta": 3,
+      "2 — Continuar proceso comprador": 3,
+      "3 — Dar ventana inicial": 8,
+      "4 — Calificar señal antes de insistir": 17,
+      "5 — Reparar canal": 3,
+      "6 — Revisar agente y pertinencia": 17,
+      "7 — Mantener relación futura": 4,
+      "8 — Detener iniciativa actual": 4,
+      "9 — Revalidar encaje": 3
+    },
+    "total_cuentas": 62,
+    "sky_blog": "Fuera del plan comercial: Julio confirma que Operaciones lo tiene cubierto",
+    "momentum": "Fuera de prospección de clientes y prioridades: alianza de bajo interés estratégico"
+  },
+  "evaluacion_respuestas": {
+    "corte": "2026-10-24",
+    "unidad": "cuentas; no emails ni personas",
+    "global": {
+      "humanas": 6,
+      "cuentas": 62,
+      "continuidades": 3,
+      "negativas": 3
+    },
+    "agente_y_focal": {
+      "cuentas": 52,
+      "humanas": 2,
+      "continuidades_iniciales": 1
+    },
+    "calidad_continuidades": {
+      "Pichincha / Pibank Perú": "Evaluación sustantiva de propuesta en conversación previa",
+      "izipay": "Avance de proceso de Compras; no selección confirmada",
+      "Olivos del Sur": "Recepción/revisión inicial; no brief ni compromiso bilateral confirmado"
+    },
+    "conclusion": "Respuesta agregada no alarmante; generación de conversaciones nuevas aún no validada; muestra pequeña y madurez desigual",
+    "fuentes_externas": [
+      "https://hunter.io/the-state-of-cold-email",
+      "https://belkins.io/blog/cold-email-response-rates",
+      "https://sales.co/research/cold-email-reply-rates-by-year"
+    ],
+    "comparacion_directa_valida": false
+  },
+  "revision_mensajes": {
+    "fecha": "2026-10-24",
+    "estado": "Revisión y cuerpos editoriales en archivos locales; sin envíos ni cambios externos",
+    "copias_enviados_desde_septiembre": 376,
+    "copias_octubre_cartera": 147,
+    "cuentas_cartera": 62,
+    "copias_expansiones_sky": 8,
+    "fichas_expansiones_sky": 2,
+    "copias_total_revisadas": 155,
+    "fichas_total": 64,
+    "cuerpos_alternativos_condicionados": 47,
+    "fichas_sin_nuevo_texto": 17,
+    "excluidos": [
+      "Momentum",
+      "SKY Blog"
+    ],
+    "documento": "REVISION-MENSAJES.md",
+    "matriz": "CAMBIOS-MENSAJES.csv",
+    "evidencia": "EVIDENCIA-MENSAJES.csv",
+    "olivos": "Se propone revisar contenido o pausa del plan por respuesta condicional del comprador; no modificación ejecutada"
+  }
+}

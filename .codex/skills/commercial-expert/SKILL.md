@@ -6,6 +6,26 @@ description: Ejecuta discovery, calificación, negociación, propuestas y seguim
 # Commercial Expert — entrada Codex
 
 
+## Discovery, transcripción y caso de negocio
+
+Para preparar una reunión o convertir su grabación/transcripción en propuesta, cargar
+[discovery → caso](../efeonce-b2b-prospecting/references/discovery-to-business-case.md). Commercial
+conduce la decisión; Customer Model contrasta problema/grupo comprador y Pricing/Finance la economía.
+Mantener fuente declarada, evidencia localizable, hipótesis/refutación y estados de compra separados.
+
+## Seguimiento motivado por visitas al material
+
+Antes de recomendar contacto por un aviso de brochure/propuesta visto, cargar
+[visitas a documentos](../efeonce-b2b-prospecting/references/document-engagement-signals.md).
+La interacción orienta la revisión del momento comercial; no acredita demanda ni amplía permisos.
+
+## Conversaciones comerciales: criterio compartido
+
+Antes de preparar una apertura, reactivación, seguimiento o respuesta inbound comercial de captación o
+expansión Efeonce, cargar [conversaciones útiles](../efeonce-b2b-prospecting/references/conversation-quality-and-review.md).
+Conservar la historia de la iniciativa, los claims sustentados y la voz robusta de Julio cuando corresponda.
+Esta guía no modifica por sí sola borradores, instrucciones o secuencias guardadas en proveedores.
+
 ## Partnerships, distribuidores y expedientes externos
 
 Para recuperar membresías, completar altas/crédito o preparar documentos para distribuidores, cargar el
@@ -80,3 +100,17 @@ mix/inversión y presentar una responsabilidad Efeonce con alcance, owners, hono
 permanecen en el expediente interno. Una demo, entrenamiento declarado o ejemplo de fee no prueba licencia,
 crédito, ahorro ni capacidad activa. Mapear retainer y cotizar sólo alcance incremental; no duplicar planificación,
 setup, coordinación o reportes ni sumar fees completos por canal. Preservar la aprobación acotada del servicio.
+
+## Prospección y listas en Sales Navigator
+
+Para cuentas, filtros laterales, servicios/landings, Personas y listas, cargar
+[operación de Sales Navigator](../efeonce-b2b-prospecting/references/sales-navigator-operations.md).
+Las cuentas se agrupan por sector y los interlocutores por frente de servicio y responsabilidad real;
+conservar una tesis por iniciativa y comprobar membresías nominales tras recargar. Fit, acceso y demanda
+son decisiones separadas; guardar listas no autoriza comunicaciones ni acredita calificación CRM.
+
+En listas comerciales, priorizar liderazgo funcional para impulsar contratación; Julio excluye CM/ejecución
+pura por afinidad técnica. Operadores del mapa de investigación no son destinatarios por defecto.
+Priorizar evidencia de agencias/proveedores o presupuesto del área, separando cargo actual de trayectoria.
+Liderazgo funcional puede habilitar investigación de contratación; no certifica comprador económico.
+Pauta de revisión A/B y fuente textual en el módulo B 2 B/política, sin convertirla en score o etapa CRM.

@@ -1,0 +1,67 @@
+- link "Ir al contenido":
+  - /url: "#main-content"
+- complementary "Demostración":
+  - text: Demostración
+  - navigation "Vistas de demostración":
+    - link "Cliente":
+      - /url: /demo
+    - link "Operador":
+      - /url: /demo/workspace?persona=operator
+    - link "Administrador":
+      - /url: /demo/workspace?persona=administrator
+- banner:
+  - link "Efeonce Rooms":
+    - /url: /demo
+    - img "Efeonce Rooms"
+  - text: Propuesta de marca y crecimiento Cliente
+- main:
+  - paragraph: Nómada × Efeonce
+  - heading "Menos prisa. Más camino." [level=1]
+  - paragraph: Una idea de marca. Tres formas de vivirla. Una historia que también se puede encontrar.
+  - button "Explorar propuesta"
+  - text: Edición 01 Pieza de demostración
+  - img "Menos prisa. Más camino.. Tu próxima historia empieza afuera."
+  - text: El comienzo
+  - button "Abrir pieza"
+  - text: Una propuesta, todo el contexto Creatividad + SEO / AEO
+  - region "De la idea a la evidencia":
+    - paragraph: Propuesta de marca y crecimiento
+    - heading "De la idea a la evidencia" [level=2]
+    - paragraph: Una propuesta se entiende mejor cuando puedes mirar el trabajo y también las decisiones que lo sostienen.
+    - tablist "Explorar la propuesta":
+      - tab "01 · Concepto creativo"
+      - tab "02 · Contenido SEO/AEO" [selected]
+      - tab "03 · Plan de trabajo"
+    - tabpanel "02 · Contenido SEO/AEO":
+      - region "Tu primera escapada empieza mucho antes del sendero":
+        - paragraph: Muestra editorial
+        - paragraph: Contenido que ayuda a decidir
+        - text: 4 min de lectura
+        - paragraph: "Radiografía editorial: abre cada fragmento para entender su intención y sus límites."
+        - article:
+          - heading "Tu primera escapada empieza mucho antes del sendero" [level=3]
+          - paragraph: Una guía breve para convertir las ganas de salir en un plan que se sienta tuyo. Menos pendientes; más espacio para disfrutar el recorrido.
+          - text: N Nómada / Pieza de demostración
+          - heading "1. Elige el recorrido que quieres vivir" [level=4]
+          - paragraph: Antes de buscar el lugar más lejano, piensa en cómo quieres sentirte al volver. Puede ser una mañana de silencio, una caminata compartida o el descubrimiento de un paisaje cercano. Esa intención ayuda a elegir un plan posible y evita convertir la salida en otra lista de obligaciones.
+          - paragraph: Empieza por un recorrido con información clara sobre distancia, desnivel y condiciones. Consulta las indicaciones actuales del administrador del lugar y considera la experiencia de todas las personas que te acompañan. La ruta adecuada es la que pueden disfrutar juntos, con tiempo suficiente para regresar.
+          - 'button "Ver radiografía: 1. Elige el recorrido que quieres vivir"': Ver radiografía
+          - heading "2. Prepara lo esencial, con intención" [level=4]
+          - paragraph: Prepararte no significa llevarlo todo. Significa entender el recorrido y elegir lo que tiene una función. Revisa el clima, el acceso, los horarios y las recomendaciones específicas del lugar. Organiza lo que necesitas antes de salir para que los pequeños pendientes no se lleven la atención durante el viaje.
+          - paragraph: "Una lista breve y propia resulta más útil que una lista interminable copiada sin contexto. Piensa qué usarás, qué necesitarás tener a mano y qué conviene compartir con tu grupo. Confirma las condiciones con una fuente local antes de decidir: esta muestra editorial no sustituye las indicaciones de quienes gestionan el recorrido."
+          - 'button "Ver radiografía: 2. Prepara lo esencial, con intención"': Ver radiografía
+          - heading "3. Deja espacio para lo que no estaba en el plan" [level=4]
+          - paragraph: "Un itinerario puede orientarte sin ocupar cada minuto. Deja margen para detenerte, conversar o volver antes si las condiciones cambian. No todos los buenos recuerdos aparecen en el punto final: a veces llegan mientras esperas a alguien, reconoces un sonido o descubres una vista que no habías buscado."
+          - paragraph: Ese margen también se construye al elegir qué no hacer. Una salida sencilla, bien preparada y compartida al mismo ritmo puede ser suficiente. El valor del recorrido no depende de una fotografía perfecta ni de sumar destinos; depende de lo que te permita observar y disfrutar.
+          - 'button "Ver radiografía: 3. Deja espacio para lo que no estaba en el plan"': Ver radiografía
+          - heading "4. Guarda una idea para la próxima salida" [level=4]
+          - paragraph: Al volver, anota qué funcionó y qué cambiarías. Tal vez el horario fue acertado, llevaste algo que no usaste o encontraste una pregunta que merece una guía aparte. Ese pequeño registro convierte la experiencia en una base para tu siguiente plan.
+          - paragraph: "La próxima escapada no necesita ser más grande. Puede ser más tuya: un recorrido que ahora conoces mejor, una compañía distinta o el mismo lugar visto a otra hora. Dar el primer paso es elegir un punto de partida. Lo demás se descubre caminando."
+          - 'button "Ver radiografía: 4. Guarda una idea para la próxima salida"': Ver radiografía
+  - paragraph: Efeonce Rooms
+  - heading "Todo el trabajo. Una conversación." [level=2]
+  - paragraph: Explora la propuesta a tu ritmo y vuelve a cada pieza con su contexto.
+  - link "Volver al inicio":
+    - /url: "#main-content"
+  - paragraph: Muestra sintética · Sin datos de clientes ni resultados comerciales medidos.
+- alert

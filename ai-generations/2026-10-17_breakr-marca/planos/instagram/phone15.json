@@ -1,0 +1,4 @@
+{"plate":"/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/final/15-santiago.png","content":"/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6c01f8c0-9b1d-4bbf-a45d-33556c130cbc/scratchpad/ig/ig-screen.png",
+ "quad":[[226,591],[497,611],[451,1227],[143,1205]],"cornerRadius":150,
+ "modules":[1,1],"exposure":0.96,"falloff":[1.0,0.93],"bloom":0.12,"bloomThreshold":200,"bloomSmall":3,"bloomLarge":12,
+ "lensBlur":0.55,"grain":2.4,"maskBlur":0.5,"out":"phone15-a.png"}

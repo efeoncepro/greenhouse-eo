@@ -1,0 +1,56 @@
+{
+  "schema": "portfolio-entry.v1",
+  "slug": "COMPLETAR-slug",
+  "client": {
+    "name": "[COMPLETAR: nombre del cliente]",
+    "industry": "retail"
+  },
+  "title": "[COMPLETAR: título del proyecto]",
+  "audience": "[COMPLETAR: para quién era, en una frase]",
+  "need": "[COMPLETAR: qué necesitaba el cliente]",
+  "line": "brand",
+  "services": ["creative-services"],
+  "steps": {
+    "challenge": {
+      "title": "[COMPLETAR: el reto]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    },
+    "idea": {
+      "title": "[COMPLETAR: la idea]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    },
+    "execution": {
+      "title": "[COMPLETAR: la ejecución]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    }
+  },
+  "clientApproval": {
+    "ref": "[COMPLETAR: dónde quedó la aprobación del cliente]",
+    "date": "2026-01-01",
+    "scope": [
+      "pieces"
+    ]
+  },
+  "seo": {
+    "title": "[COMPLETAR: cliente y título, 65 caracteres o menos]",
+    "description": "[COMPLETAR: qué se hizo, para quién y por qué, 150 caracteres o menos]"
+  },
+  "hero": {
+    "mediaRef": "pieza-1"
+  },
+  "chapters": [
+    {
+      "name": "[COMPLETAR: nombre del capítulo]",
+      "media": [
+        {
+          "id": "pieza-1",
+          "kind": "image",
+          "mediaId": 1,
+          "width": 1080,
+          "height": 1350,
+          "alt": "[COMPLETAR: qué muestra la pieza]"
+        }
+      ]
+    }
+  ]
+}

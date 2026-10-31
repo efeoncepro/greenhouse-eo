@@ -1,0 +1,19 @@
+{
+  "id": "EQ3-equipo-formacion",
+  "formato": "16:9",
+  "impacto": true,
+  "atmosfera": "bruma",
+  "haz": "a soft cool blue-white glow far behind the team, low and centred, diffused by the haze and rimming every head and shoulder; plus a large soft frontal fill near the camera, slightly from the left, that gently lights the faces and jackets of the team so they read as people, not silhouettes",
+  "objetos": [{ "objeto": "chaqueta-bomber-efeonce" }],
+  "escena": "SCENE (a background plate for a team portrait, a large dark studio): ONE TEAM of about ninety colleagues posing together for their group photo, ALL FACING THE CAMERA, standing still and relaxed and proud the way a team stands for its portrait — arms loosely crossed or hands relaxed at their sides, a few with a hand on a colleague's shoulder, calm confident half-smiles. They form loose staggered rows that recede from about six metres to twenty metres away, shoulder to shoulder, filling the whole width of the frame. EVERYONE WEARS THE SAME TEAM UNIFORM: the navy Efeonce team bomber jacket of the reference, zipped half open over a navy polo, so they clearly read as one company team; women and men of different builds, heights, ages and hairstyles. Nobody talks to anyone, nobody turns away, nobody holds a laptop or a phone. The camera stands at an adult's eye level, perfectly level, 85mm wide open at f/1.4, focused on an EMPTY plane only two metres away where nobody stands yet (five people will be composited there later), so THE WHOLE TEAM IS SOFTLY OUT OF FOCUS — recognisable as people in uniform with faces turned to camera, but no face, emblem or detail is readable. Because the camera is at eye level, their heads all line up along ONE HORIZONTAL BAND between 58% and 66% of the frame height, getting slightly smaller with distance, and their bodies fill the band below down to the floor at about 85%. The farthest rows dissolve into navy and cobalt (#0375DB) haze. The top 55% of the frame is calm deep-navy haze above their heads, with no heads, objects or lights in it. The bottom 15% is an empty dark floor. Nothing warm, amber or golden; no text, no logos readable, no screens.",
+  "reservas": {
+    "texto": {
+      "muro": "the calm deep-navy haze above the heads of the team, top half of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the dark polished studio floor in the immediate foreground",
+    "tono": "DEEP navy-black floor, matte, out of focus, catching a faint cool reflection of the haze"
+  }
+}

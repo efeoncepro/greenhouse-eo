@@ -1,6 +1,6 @@
 # SEO y accesibilidad para imágenes editoriales y SVG
 
-> **As-of:** 2026-09-24.
+> **As-of:** 2026-10-26 (infografías sólo claras en el blog de Efeonce; imagen social por plataforma del 2026-10-24).
 > **Carga cuando:** un artículo use infografías, diagramas, `<picture>`, SVG directo, featured u Open Graph.
 
 ## Decisión rápida
@@ -29,6 +29,23 @@ probado por compatibilidad de preview.
 - Declarar dimensiones/ratio y medir CLS cuando mobile cambia la proporción.
 - Confirmar `currentSrc` en cada viewport/tema y que dark coincida con el theme real.
 
+> **Overlay Efeonce (blog efeoncepro.com, decidido por el operador el 2026-10-25): infografías SÓLO en versión
+> clara.** El ejemplo de arriba es genérico; no se aplica al blog de Efeonce. El sitio no sigue el modo oscuro del
+> sistema (lo decide el interruptor del tema, clase `.dark-scheme`), pero `<picture>` con `prefers-color-scheme: dark`
+> sí: con el sistema en oscuro la infografía salía oscura sobre la página clara. Patrón vigente, sin fuentes `dark`:
+>
+> ```html
+> <picture>
+>   <source media="(max-width: 860px)" srcset="concept-mobile-light.svg">
+>   <img src="concept-desktop-light.svg" width="1600" height="1080" alt="…">
+> </picture>
+> ```
+>
+> Aplicado en ICP (249108) y Marketing de contenidos (244883; adjuntos 252169 escritorio y 252170 teléfono, 2026-10-26).
+> Las versiones oscuras pueden construirse, pero no se suben. Decisión: `docs/public-site/ICP_B2B_REFRESH_DRAFT_V1.md`
+> §5c. En la Content Factory: bloque `image` con `sources: [{ media: '(max-width: 860px)', url: <mobile-light.svg> }]`
+> (sin `type` para SVG).
+
 ## Semántica y alternativas
 
 - Filename descriptivo, ALT breve y específico, caption y texto cercano ayudan a entender la imagen.
@@ -46,6 +63,10 @@ Verificar URL estable y extensión correcta; GET anónimo `200`; `Content-Type: 
 canónica y contexto visible; dimensiones; compresión/cache; y ausencia de scripts, eventos, recursos remotos o
 fonts no controladas. Un image sitemap es opcional cuando aporta descubrimiento adicional.
 
+En el blog de Efeonce el SVG sube a la biblioteca con un script con guardas: verifica el sha256, rechaza el archivo
+si contiene `<script`, atributos `on*=`, `foreignObject` o `javascript:`, aborta si el archivo ya existe y registra
+alt, leyenda y medidas. Lectura posterior: 200 con `image/svg+xml`.
+
 Un archivo raw puede recibir enlaces, pero no siempre es la mejor landing. Para link earning o reutilización,
 preferir una sección/anchor con descripción, fuente, permisos y canonical sobre el SVG sin contexto.
 
@@ -56,6 +77,37 @@ preferir una sección/anchor con descripción, fuente, permisos y canonical sobr
 - No sacrificar tipo, contraste o estructura por unos pocos KB.
 - Mantener raster coherente en `BlogPosting.image`/`ImageObject`, `og:image`, Twitter y featured.
 - No duplicar schema manual si Yoast es owner del graph.
+
+## Imagen social (Open Graph) por plataforma
+
+Una sola imagen OG sirve a todas las redes, pero cada una la muestra distinto y casi ninguna publica sus reglas.
+Diseñar para la intersección:
+
+| Superficie | Cómo la muestra | Margen | Fuente |
+|---|---|---|---|
+| LinkedIn, Facebook | tarjeta grande 1,91:1 completa; con imágenes chicas cae a miniatura (cuadrada en Facebook) | el cuadrado central si cae a miniatura | guías de terceros |
+| WhatsApp | vista grande, o compacta con miniatura cuadrada central (imágenes chicas, pesadas o poco horizontales) | el cuadrado central | Meta (oficial): < 600 KB, ≥ 300 px de ancho, proporción ≤ 4:1 |
+| X | `summary_large_image` 2:1; si falta `twitter:image`, usa `og:image` | ~15 px arriba y abajo (sobre 1200 × 630) | validador de X citado en 2020 |
+| iMessage, Slack, Teams, Telegram | casi completa; miniatura al costado con imágenes chicas | el cuadrado central | sin especificación publicada |
+| Google y Discover | imagen grande con `max-image-preview:large` y ≥ 1200 px de ancho | — | Google Search Central |
+
+Reglas que valen para todas:
+
+- Raster **JPEG** (los lectores de enlaces no tratan WebP de forma pareja), de **menos de 300 KB**: sale la vista
+  grande y queda lejos del límite de WhatsApp.
+- Texto y sujeto dentro del **cuadrado central**; nada importante en los bordes de arriba y abajo.
+- `og:image:alt` / `twitter:image:alt` describen la imagen y repiten su texto; un alt vacío no se imprime.
+- `og:title` puede no ser el título SEO (en Yoast sale del título del post): leer cada etiqueta en vivo.
+- Las redes guardan la vista previa en caché: tras cambiar la imagen, refrescar con el depurador de Facebook, el Post
+  Inspector de LinkedIn y un chat de prueba en WhatsApp.
+
+**Overlay Efeonce (blog Marketing con Manzanitas, medido en vivo el 2026-10-24):** la portada es un JPEG
+2400 × 1260 (lienzo 1200 × 630) que cubre destacada, `og:image`, la tarjeta de X (sin `twitter:image` propio),
+`primaryImageOfPage` y la miniatura cuadrada de «Te puede interesar» al pie de cada artículo (339 × 339; 326 × 326
+en el teléfono, centrada: el mismo cuadrado x 285–915 que WhatsApp). `og:image:alt` y `twitter:image:alt` salen
+del `alt` de la portada desde `efeonce-editorial-blocks` 0.4.6 (en producción desde el
+2026-10-24). Medidas, zonas seguras y QA:
+`docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
 
 ## QA post-publicación
 

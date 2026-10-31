@@ -97,7 +97,7 @@ end-to-end con token vigente y los canaries de cliente son evidencia de TASK-183
 - Status real: `Slice 1 (U04) code complete 2026-09-04: schema aditivo APLICADO en PG (2 migraciones), commands/readers/resolver, 6 capabilities, 7 rutas admin + reader ecosystem para el gateway, 4 señales cableadas, smoke live verde (bind → grant → invite → accept → resolve bound → revoke → resolve revoked). EN PRODUCCIÓN desde el release 2026-09-04 (run 33893120972): lane ecosystem canary 400/200 environment_inactive/401 en prod, emisor efeonce-auth registrado en draft; falta leer las 4 señales en /admin/operations prod con sesión humana; canaries y revocación end-to-end viven en TASK-1831/1832`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|agentic`
-- Blocked by: `none para el slice entregado; la verificación operativa exige deploy (release control plane) y la evidencia end-to-end (token vigente denegado tras revocación, canaries Claude/Codex/ChatGPT) depende de TASK-1829/1830/1831/1832 y de la task ui-ux de login`
+- Blocked by: `none para el slice entregado; la verificación operativa exige deploy (release control plane) y la evidencia end-to-end (token vigente denegado tras revocación, canaries Claude/Codex/ChatGPT) depende de TASK-1830/1831/1832 y de la task ui-ux de login`
 - Branch: `Greenhouse develop; MCP main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

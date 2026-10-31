@@ -1,0 +1,139 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "8924e516db35",
+  "key": "8924e516db35e1a2cd4800b35a01714e97a6ebd5600d3c0867fd2065f1f22a9e",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:42:54.169Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/12.png",
+    "imageSha256": "ac89ec98261439254123dee7e617b71cf9ed8eb13d83ae7ed7091484f4e9f7f6",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/12r.png",
+    "maskSha256": "6d8dee61700dab83d4ef1704ff48a723a09203aca35735b000729a9b426cbe47",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Add one fresh orange slice (a round wheel of orange about 6 cm wide, bright orange with white pith) stuck flat on the top of her soaked cream knit sweater on this shoulder, clearly visible, wet and glistening. Keep everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nAdd one fresh orange slice (a round wheel of orange about 6 cm wide, bright orange with white pith) stuck flat on the top of her soaked cream knit sweater on this shoulder, clearly visible, wet and glistening. Keep everything outside the zone unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.011905670166015625,
+    "editable": 12753,
+    "soft": 2852,
+    "protected": 1295115
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 260,
+      "top": 278,
+      "width": 259,
+      "height": 251
+    },
+    "target": {
+      "width": 1040,
+      "height": 1008
+    },
+    "aspectError": 0.00012258657676971036,
+    "reason": "la zona con contexto ocupa 5.0 % de la imagen: se genera recortada a 1040x1008"
+  },
+  "estimate": {
+    "usd": 0.0516,
+    "basis": "1 × salida 1040x1008 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 33.876,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -1,
+        "dy": -1,
+        "scale": 0.98,
+        "stillError": 16.7,
+        "bestError": 11.03,
+        "misaligned": true
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        7.26,
+        4.5,
+        1.01
+      ],
+      "protected": {
+        "pixels": 1295115,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 12753,
+        "maxDelta": 206,
+        "meanDelta": 37.092,
+        "worst": {
+          "x": 429,
+          "y": 370
+        }
+      },
+      "seam": {
+        "pixels": 2852,
+        "maxDelta": 186,
+        "meanDelta": 19.494,
+        "worst": {
+          "x": 448,
+          "y": 440
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1295115,
+        "maxDelta": 230,
+        "meanDelta": 0.878,
+        "worst": {
+          "x": 394,
+          "y": 308
+        }
+      },
+      "outputUsd": 0.0516,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2320,
+        "input_tokens_details": {
+          "image_tokens": 2112,
+          "text_tokens": 208
+        },
+        "output_tokens": 1720,
+        "output_tokens_details": {
+          "image_tokens": 1720,
+          "text_tokens": 0
+        },
+        "total_tokens": 4040
+      },
+      "meta": {
+        "size": "1040x1008",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

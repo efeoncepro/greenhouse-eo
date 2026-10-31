@@ -1,0 +1,42 @@
+[
+ {
+  "name": "01-atleta",
+  "size": "1024x1280",
+  "prompt": "A professional sprinter frozen mid-stride at the instant of explosive acceleration on a dark running track, sweat droplets and chalk dust suspended in the air, hard rim light from behind, deep blue night stadium atmosphere. Shot like a premium advertising campaign still, cinematic color grade, rich contrast, crisp detail, natural film grain. No text, no letters, no numbers, no logos, no brand marks, no watermark."
+ },
+ {
+  "name": "02-moda",
+  "size": "1024x1280",
+  "prompt": "Editorial fashion portrait of a young woman in a sculptural electric-blue coat turning toward the camera, wind lifting the fabric, minimal pale studio set, soft directional key light. Shot like a premium advertising campaign still, cinematic color grade, rich contrast, crisp detail, natural film grain. No text, no letters, no numbers, no logos, no brand marks, no watermark."
+ },
+ {
+  "name": "03-cordillera",
+  "size": "1536x1024",
+  "prompt": "Aerial view of the snow-capped Andes mountains at golden hour, low clouds flowing between peaks, warm sun rays and long shadows, epic scale. Shot like a premium advertising campaign still, cinematic color grade, rich contrast, crisp detail, natural film grain. No text, no letters, no numbers, no logos, no brand marks, no watermark."
+ },
+ {
+  "name": "04-perfume",
+  "size": "1024x1280",
+  "prompt": "Luxury glass perfume bottle without any label on a black reflective surface, a splash of liquid frozen around it, prismatic light refractions, macro product photography. Shot like a premium advertising campaign still, cinematic color grade, rich contrast, crisp detail, natural film grain. No text, no letters, no numbers, no logos, no brand marks, no watermark."
+ },
+ {
+  "name": "05-ciudad",
+  "size": "1536x1024",
+  "prompt": "Rainy city street at night with neon reflections on wet asphalt and light trails of passing cars, a lone figure with a transparent umbrella, cyberpunk-inspired but realistic. Shot like a premium advertising campaign still, cinematic color grade, rich contrast, crisp detail, natural film grain. No text, no letters, no numbers, no logos, no brand marks, no watermark."
+ },
+ {
+  "name": "06-sneaker",
+  "size": "1536x1024",
+  "prompt": "A modern running sneaker without visible logos levitating above a burst of colored powder in orange and violet, frozen at high speed, dark studio background, product hero shot. Shot like a premium advertising campaign still, cinematic color grade, rich contrast, crisp detail, natural film grain. No text, no letters, no numbers, no logos, no brand marks, no watermark."
+ },
+ {
+  "name": "07-auto",
+  "size": "1536x1024",
+  "prompt": "A sleek electric car without badges speeding along a coastal desert road at sunset, motion blur on the road, the car sharp, dramatic sky. Shot like a premium advertising campaign still, cinematic color grade, rich contrast, crisp detail, natural film grain. No text, no letters, no numbers, no logos, no brand marks, no watermark."
+ },
+ {
+  "name": "08-cafe",
+  "size": "1024x1280",
+  "prompt": "A ceramic coffee cup with coffee splashing out in a frozen crown, coffee beans suspended in the air, warm moody light, dark background, high-speed photography. Shot like a premium advertising campaign still, cinematic color grade, rich contrast, crisp detail, natural film grain. No text, no letters, no numbers, no logos, no brand marks, no watermark."
+ }
+]

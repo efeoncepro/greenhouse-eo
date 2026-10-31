@@ -35,6 +35,7 @@ import {
   type OAuthStorePort,
   type SubjectSessionPort
 } from '@/lib/auth-server/oauth'
+import { EMAIL_OTP_PREPARE_PATH, EMAIL_OTP_VERIFY_PATH } from '@/lib/auth-server/email-otp/handler'
 import { isInternalLoginPath } from '@/lib/auth-server/internal/login-http'
 import type { OAuthHttpResponse } from '@/lib/auth-server/oauth/http'
 import type { ClientResolverDeps } from '@/lib/auth-server/oauth/clients'
@@ -69,6 +70,8 @@ export type AuthServerAppDeps = {
    * flag `AUTH_SERVER_PERSON_AUTH_ENABLED=false` el propio router responde 404.
    */
   internal?: (request: OAuthHttpRequest) => Promise<OAuthHttpResponse | null>
+  invitationOtp?: (request: OAuthHttpRequest) => Promise<OAuthHttpResponse | null>
+  firstParty?: (request: OAuthHttpRequest) => Promise<OAuthHttpResponse | null>
   persons?: PersonAuthHandlerDeps
   now?: () => Date
 }
@@ -133,6 +136,7 @@ export const createAuthServerRequestHandler = (deps: AuthServerAppDeps): NodeReq
     consentContextPort: deps.consentContextPort,
     loadKeys: deps.getPublishableSigningKeys,
     cimd: deps.cimd,
+    firstParty: deps.firstParty,
     now
   })
 
@@ -159,7 +163,7 @@ export const createAuthServerRequestHandler = (deps: AuthServerAppDeps): NodeReq
         return
       }
 
-      if (deps.enabled && (path.startsWith('/fonts/') || path === '/favicon.svg')) {
+      if (deps.enabled && (path.startsWith('/fonts/') || path.startsWith('/images/login/') || path === '/favicon.svg')) {
         const asset = getAuthFontAsset(path)
 
         if (!asset) {
@@ -249,10 +253,11 @@ return
         return
       }
 
+      const isInvitationOtpPath = Boolean(deps.invitationOtp) && [EMAIL_OTP_PREPARE_PATH, EMAIL_OTP_VERIFY_PATH].includes(path)
       const isPersonPath = Boolean(persons) && isPersonAuthPath(path)
       const isInternalPath = Boolean(deps.internal) && isInternalLoginPath(path)
 
-      if (deps.enabled && (isProtocolPath || isPersonPath || isInternalPath)) {
+      if (deps.enabled && (isProtocolPath || isPersonPath || isInternalPath || isInvitationOtpPath)) {
         const body = method === 'GET' || method === 'HEAD' ? '' : await readBody(req)
 
         if (body === null) {
@@ -275,7 +280,7 @@ return
         }}
 
         const request: OAuthHttpRequest = { method, url, headers, body }
-        const response = isProtocolPath ? await oauth(request) : isInternalPath ? await deps.internal!(request) : await persons!(request)
+        const response = isInvitationOtpPath ? await deps.invitationOtp!(request) : isProtocolPath ? await oauth(request) : isInternalPath ? await deps.internal!(request) : await persons!(request)
 
         if (response) {
           res.writeHead(response.status, { ...response.headers, 'Content-Length': Buffer.byteLength(response.body) })

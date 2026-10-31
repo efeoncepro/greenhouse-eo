@@ -16,8 +16,9 @@ const HERE = join(ROOT, 'scripts/public-website/blog-home')
 const TMP = join(ROOT, 'tmp/blog-home')
 const SITE = 'https://efeoncepro.com'
 const REMOTE = 'scripts/public-website/blog-home/remote.php'
-const VALUE_FLAGS = ['until', 'light', 'bold', 'attachment', 'image', 'alt', 'snapshot', 'surface']
-const FORMATS = ['articulo', 'caso', 'guia', 'grabacion', 'glitch-edicion', 'glitch-flash', 'glitch-nota', 'novedad']
+const VALUE_FLAGS = ['until', 'light', 'bold', 'attachment', 'image', 'alt', 'snapshot', 'surface', 'focus']
+const FORMATS = ['articulo', 'caso', 'guia', 'grabacion', 'podcast', 'glitch-edicion', 'glitch-flash', 'novedad']
+const LINES = ['growth', 'brand', 'engine', 'voice', 'revenue-hubspot', 'revenue-salesforce']
 
 type Json = Record<string, any>
 
@@ -191,7 +192,11 @@ Write (plan unless --apply; every apply is ledgered and purges /blog/):
   pin <post> --until <UTC date>  pin a post first in the slider until that date
   unpin <post>
   format <post> <${FORMATS.join('|')}>
+  line <post> <${LINES.join('|')}|off>   the post's service line when its category does not say it
+  client <post> <anam|off>             the client of a case: its logo on the rail card
+  reviewed <post> <AAAA-MM-DD|off>      the editor's last substantive review: «Actualizado» on the rail for 30 days
   hero <post> [--light t] [--bold t] [--attachment id | --image file --alt text] [--clear]
+  card <post> [--attachment id | --image file --alt text] [--focus "x% y%"|off] [--clear] [--resource]   the rail card's own image and focal point (the featured or scene image stays)
   resource <file.json> [--image file --alt text]   create/update a resource (see manual for the shape)
   review <resource id>           mark a resource reviewed today (it hides after 180 days)
   event <file.json> [--image file --alt text]      create/update an event (no private meeting links)
@@ -199,6 +204,8 @@ Write (plan unless --apply; every apply is ledgered and purges /blog/):
   subscription <form-key|off> [--surface id]  connect the real Glitch subscription (published inline_pill form)
   flag <0|1>                     content model off (example content) / on (real data)
   purge                          purge /blog/ now
+  archive <0|preview|1>          «Archivo del blog» (TASK-2055): Ohio / only ?eoba_preview=<token> / everyone
+  topic-descriptions <file.json> category descriptions { "descriptions": { "slug": "text" } } (indexing of topics)
 
 Deploy and page (production; --apply needs the operator's go):
   deploy <home|content-model>    export live baseline, build the guarded package, dry run; --apply installs it
@@ -233,6 +240,24 @@ const main = () => {
       return plannedNote(result)
     }
 
+    case 'line': {
+      const result = remote({ op: 'line', post: pos[0] ?? fail('line needs a post.'), line: pos[1] ?? fail(`line needs one of: ${LINES.join(', ')}, off`), apply })
+
+      print(result)
+
+      return plannedNote(result)
+    }
+
+    case 'client':
+
+    case 'reviewed': {
+      const result = remote({ op: command, post: pos[0] ?? fail(`${command} needs a post.`), value: pos[1] ?? fail(command === 'client' ? 'client needs a client key (anam) or off.' : 'reviewed needs AAAA-MM-DD or off.'), apply })
+
+      print(result)
+
+      return plannedNote(result)
+    }
+
     case 'hero': {
       const image = flag(args, 'image')
       const payload: Json = { op: 'hero', post: pos[0] ?? fail('hero needs a post.'), apply }
@@ -241,6 +266,22 @@ const main = () => {
       if (flag(args, 'attachment')) payload.attachment = Number(flag(args, 'attachment'))
       if (image) payload.image_file = true
       if (has(args, 'clear')) payload.clear = true
+      const result = remote(payload, image)
+
+      print(result)
+
+      return plannedNote(result)
+    }
+
+    case 'card': {
+      const image = flag(args, 'image')
+      const payload: Json = { op: 'card', post: pos[0] ?? fail('card needs a post.'), apply }
+
+      for (const name of ['focus', 'alt']) if (flag(args, name) !== undefined) payload[name] = flag(args, name)
+      if (flag(args, 'attachment')) payload.attachment = Number(flag(args, 'attachment'))
+      if (image) payload.image_file = true
+      if (has(args, 'clear')) payload.clear = true
+      if (has(args, 'resource')) payload.resource = true
       const result = remote(payload, image)
 
       print(result)
@@ -285,6 +326,22 @@ const main = () => {
 
     case 'subscription': {
       const result = remote({ op: 'subscription', form_key: pos[0] ?? fail('subscription needs a Growth Form key or off.'), surface: flag(args, 'surface'), apply })
+
+      print(result)
+
+      return plannedNote(result)
+    }
+
+    case 'archive': {
+      const result = remote({ op: 'archive', value: pos[0] ?? fail('archive needs 0, preview or 1.'), apply })
+
+      print(result)
+
+      return plannedNote(result)
+    }
+
+    case 'topic-descriptions': {
+      const result = remote({ op: 'topic-descriptions', descriptions: readJsonFile(pos[0], 'descriptions').descriptions, apply })
 
       print(result)
 

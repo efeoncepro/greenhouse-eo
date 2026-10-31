@@ -230,6 +230,7 @@ dataset normal para pruebas ni guardar el código temporal en fuente/env/tag de 
 | Service account | `greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com` |
 | Clientes de código | `src/lib/growth/gtm/api-client.ts` (`GtmApiClient`) · `src/lib/growth/ga4/api-client.ts` |
 | Verificar en vivo | `scripts/ga4/realtime-events.ts 486264460` · `scripts/gtm/verify-connection.ts` |
+| Lecturas → portada `/blog/` | Las insignias «Más leído» / «Tendencia» del rail «Para leer con calma» (2026-10-24) **no tienen lector**: una lectura GA4 entra sólo por el filtro WordPress `eo_home_rail_signals` (id de entrada → `top` / `trend`); nunca se muestran sin su dato. Operación: skill `efeonce-public-site-wordpress` → `references/blog-home-operation.md` |
 
 > **⚠️ Verificar SIEMPRE el Measurement ID destino.** El sitio tiene DOS ids GA4-ish (`G-KYPPY57M14` en el GTM, `GT-KV5CNNKQ` de Site Kit). Antes de crear un GA4 Event tag, confirmar **qué measurement ID pertenece a la propiedad `486264460`** por la Admin API (`properties/486264460/dataStreams`) — si mandas al id equivocado, el evento no aparece en la propiedad que medimos. Ver `docs/reference/measurement-gtm-ga4/07-ga4-admin-api-ops.md`.
 

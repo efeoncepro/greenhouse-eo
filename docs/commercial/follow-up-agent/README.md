@@ -1,5 +1,15 @@
 # Seguimiento comercial recurrente
 
+**ARMOR / Indecaucho, delta26/10:** [expediente por iniciativa](../accounts/indecaucho-armor/README.md).
+Katia respondió; reunión27/10 14:30Chile, invitación y confirmación con firma verificadas. Preparación y
+caso v0 listos; lectura posterior de grabación/transcripción HubSpot/Notion autorizada y programada en
+este hilo27/10 16h, una ejecución. El seguimiento global se observó PAUSED y permanece así; no duplicar
+cadencia, correo, reunión ni tarea por este dossier. [Protocolo](../accounts/indecaucho-armor/POSTREUNION.md).
+
+**Mandato focal 24/10:** [Lucía y Yvette](runs/2026-10-24-lucia-yvette-secuencias.md) tienen dos secuencias
+con dos pasos futuros por persona, Programado verificado y excepción expresa al CCO con registro nativo.
+Conservar firma gráfica y parada por respuesta/reunión; este agente no duplica esos correos ni amplía el lote.
+
 ## Continuidad del chat de prospección — corte 24/10/2026
 
 El [consolidado de cinco casos](../prospecting-agent/runs/2026-10-24-cierre-chat-prospeccion.md) complementa
@@ -40,6 +50,16 @@ excluido por Julio. Mandato posterior: [18 seguimientos programados en HubSpot](
 para el 16/22/29 de octubre; seis inscripciones `Programado` verificadas, parada por respuesta. No duplicarlos
 desde el heartbeat ni usar Apollo. Esta autorización es acotada y no amplía la autonomía general.
 
+## Señales de documentos después del envío
+
+En las fuentes ya cubiertas por cada corte, revisar avisos pertinentes de Documents y aplicar
+[visitas a documentos](../../../.codex/skills/efeonce-b2b-prospecting/references/document-engagement-signals.md).
+Contrastar detalle nativo e historial antes de recomendar un borrador o cambio de prioridad. Si no se
+puede leer el documento, declarar esa brecha; no reportar cobertura integral de Documents por un aviso.
+Visita no es respuesta ni permiso de envío; HOLD/bajas y pasos existentes prevalecen. Reusar expediente,
+clave y scheduler. [Caso26/10](runs/2026-10-26-indecaucho-documento-seguimiento.md): envío humano autorizado
+por separado, con Enviados y EMAIL corroborados, sin nueva autonomía recurrente.
+
 ## Seguimiento de largo plazo
 
 Aplicar la [política aceptada](../../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md): conservar cuenta con encaje,
@@ -63,7 +83,7 @@ seguimientos programados en HubSpot. Conservar la secuencia nativa; no duplicarl
 5. Revalidar cambios de fechas en LicitaLAB/Mercado Público/Wherex o correos oficiales. Mantener fecha original, zona, fuente y observación. Si hay conflicto, alertar y pedir validación con margen conservador; nunca inventar UTC. Un cierre vencido no prueba pérdida ni postulación.
 6. Priorizar: plazo vencido con acción sin conciliar; cierre/compromiso antes de la siguiente revisión; <=24h; <=72h; <=7d; después preparación. Anticipar lunes y fin de semana en el corte del viernes. Si el plazo cae a las 09:00, resolver el día hábil anterior. La fecha interna recomendada se etiqueta distinta del plazo del cliente. La cadencia es lunes–viernes; no se omiten festivos automáticamente.
 7. Crear/reutilizar **TASK comerciales en HubSpot portal 48713323**, tras verificar identidad, permiso TASK read/write, enums y owner (Julio 75788512, revalidar). Incluir objetivo, criterios de revisión, contexto/fuentes, fecha del equipo vs deadline externo, bloqueo y siguiente paso; asociar registros Contact/Company/Deal existentes pertinentes. Buscar duplicados y leer contenido/estado/fecha/owner/asociaciones después. Notion data source 2a539c2f-efe7-8177-a02d-000b4e8604c0 conserva trabajo operativo/entregables y tareas históricas; no crear allí duplicado de la tarea comercial ni migrar otros históricos en lote.
-8. Aplicar la [política de firma oficial completa y CCO HubSpot](../../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md) a borradores de Julio: CCO `48713323@bcc.hubspot.com`; usar firma completa en texto para conector o firma gráfica oficial para Outlook UI; un borrador sin firma sigue incompleto. No amplía la autorización del agente. Preparar borradores personalizados cuando haya contexto suficiente. Reutilizar hilo original y destinatarios verificados. No inventar adjuntos, reuniones, credenciales, experiencia, precios, garantía de resultados ni autoridad de compra. Si Outlook permite guardar, crear borrador y leerlo de vuelta; si devuelve 403, registrar el texto en la tarea/Markdown, sin reintentos repetidos ni escalación de permisos. No sobrescribir borradores humanos; conservarlos y sugerir ajustes en la tarea.
+8. Aplicar la [política de firma gráfica oficial y CCO HubSpot](../../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md) a todos los borradores de Julio, incluidos seguimientos: CCO `48713323@bcc.hubspot.com` y firma gráfica oficial siempre, por Outlook UI o HTML autorizado. La decisión del 21/10/2026 sustituye la ruta histórica de firma en texto; si no se conserva la firma gráfica, el borrador queda incompleto. No amplía la autorización del agente. Preparar borradores personalizados cuando haya contexto suficiente. Reutilizar hilo original y destinatarios verificados. No inventar adjuntos, reuniones, credenciales, experiencia, precios, garantía de resultados ni autoridad de compra. Si Outlook permite guardar, crear borrador y leerlo de vuelta; si devuelve 403, registrar el texto en la tarea/Markdown, sin reintentos repetidos ni escalación de permisos. No sobrescribir borradores humanos; conservarlos y sugerir ajustes en la tarea.
 9. Verificar cada escritura por lectura independiente y registrar resultado/ID. No cerrar tareas por haber creado un archivo: requiere evidencia de la DoD. Si hay respuesta pero falta acción, cambiar la recomendación sin dar el trabajo por terminado. No modificar campos humanos ajenos al seguimiento.
 10. Actualizar REGISTRO.md y state.json, añadir una entrada fechada de ejecución con cobertura, cambios, IDs, borradores, alertas y bloqueos. Preservar historia; archivarla con enlace si crece. En checkout compartido, releer antes de editar y preservar cambios ajenos.
 11. Entregar SIEMPRE reporte en español en este chat: urgente antes del próximo corte; próximos siete días; tareas/borradores nuevos o actualizados con links; esperas/decisiones; cobertura y fallas. Si no hay novedades, decirlo. Alertas en Codex; no mandar notificaciones por email/Teams/Slack.

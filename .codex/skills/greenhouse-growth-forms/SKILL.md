@@ -607,19 +607,21 @@ bundle) in a test browser before publishing a version. The renderer only reaches
 release until TASK-2038 moves it to AXIS. Host checklist: `efeonce-public-site-wordpress`
 `references/growth-forms-wordpress.md` §Canvas-designed forms.
 
-**Design-fidelity fields (TASK-2044 contract + TASK-2045 render, code complete 2026-10-23; renderer `1.1.0`, ships with the next `main` release).** Declare a canvas
+**Design-fidelity fields (TASK-2044 contract + TASK-2045 render; in production since release `40b330175855`, 2026-10-24 — introduced as `1.1.0`, live renderer `1.2.0`; first live consumer: the «Quiero ser partner» dialog on `/partnership/`, see `greenhouse-growth-ctas` §Estado de rollout).** Declare a canvas
 design instead of styling it: `fields[].presentation.width` (`auto|half|full`), `consent.presentation` (`tile|compact`)
 + `consent.privacyLinkLabel` + one `{privacyLink}` marker in a checkbox `label` (compiler blocks HTML, other markers,
 repeats and a missing `privacyUrl`), `successBehavior.icon` (`celebration|orbit|none`) and success action
 `kind: 'dismiss'` (no `href`/`target`). In a Growth CTA, `open_growth_form` takes `presentation: 'dialog'` + optional
 `dialog: { eyebrow, title, lead }`. Absent = today's contract. The live renderer ignores them gracefully **except**
-`{privacyLink}`, which an old renderer shows literally: never publish the marker before the TASK-2045 renderer is in
-production. Full table: `docs/architecture/growth-public-forms-runtime-contract.md` §Formularios diseñados en canvas.
+`{privacyLink}`, which a pre-1.1.0 renderer shows literally (only matters for a consumer-pinned old bundle). Full table: `docs/architecture/growth-public-forms-runtime-contract.md` §Formularios diseñados en canvas.
 Host skin = tokens (`--ghf-field-*`, `--ghf-label-*`, `--ghf-btn-*`, `--ghf-consent-*`, `--ghf-orbit`, `--ghf-placeholder`,
 `--ghf-column-gap`) + `data-ghf-part` hooks, never internal classes; `color-scheme="dark"` now forces dark; `steps: []`
 hides default success steps; `dismiss` emits DOM `ghf:dismiss` (telemetry-independent); `data-ghf-busy` while
 submitting; Turnstile mounts next to the form (works inside a modal `<dialog>`). Worked example + evidence:
 `scripts/public-website/partners-source/partner-dialog-skin.css`, `docs/ui/reviews/TASK-2045/`.
+Observed live (2026-10-24): the compact consent block mounts a moment after the fields (a screenshot taken right after
+the inputs appear misses it); closing a CTA dialog while the first required field is focused fires
+`gh_form_field_validation_failed` (blur validation on dismiss) and inflates that metric — renderer follow-up, not fixed.
 
 **Inline pill + event registration (TASK-2053 contract + TASK-2054 render; in production since release
 `40b330175855`, 2026-10-24, renderer `1.2.0`; first live use: Glitch subscription on `/blog/`; a real human submit and
@@ -644,6 +646,74 @@ Visual gate: `node scripts/growth/forms/fixtures/inline-pill.scenario.mjs` (canv
 standard forms 0 px against a baseline rev). Lesson: measure the canvas's COMPUTED styles — its `button{font:inherit}`
 reset beats `.ab`, so the approved open button renders 16 px/400, not the declared 15/600. Full table:
 `docs/architecture/growth-public-forms-runtime-contract.md` §Formulario en línea.
+
+**Events and webinars end to end (2026-10-24, release `e593e3993bc3`, flag `GROWTH_EVENT_EMAILS_ENABLED` ON in the
+`ops-worker`). STATE: do NOT launch real events yet.** Reservations work and reach HubSpot (proven with test form
+`prueba-e2e-eventos-2026-10-24`), but **emails are NOT sent in production** until the fix release reaches the
+`ops-worker`: `event-emails.ts` required `submission.status === 'accepted'`, the dispatcher had already moved it to
+`delivered` (HubSpot answered first), so the consumer no-op'd; the reminder SQL `listDueEventReminderSubmissionIds` had
+the same filter. Fixed locally with `ACCEPTED_SUBMISSION_STATUSES` (store.ts) + test
+`event-emails-accepted-status.test.ts`. **Rule: any consumer/job that reads `form_submission` uses
+`ACCEPTED_SUBMISSION_STATUSES`, NEVER `status = 'accepted'`.** HubSpot today gets only a submission to the shared form
+with `ef_event_key` (overwritten) and `ef_greenhouse_submission_id` — no confirmed/waitlisted status, no native Marketing
+Events object (token lacks `crm.objects.marketing_events.*`, 403). The event ↔ HubSpot Marketing Events ↔ Teams webinar
+integration is being designed before the next release (RESEARCH-013, `docs/research/RESEARCH-013-annexes/`). One command launches any event: `pnpm events:launch -- --brief <json> [--apply]` (brief schema +
+example `scripts/growth/events/examples/webinar.example.json`). It ensures the HubSpot property `ef_event_key` + shared
+form «Reserva de eventos | Blog Efeonce», authors/publishes the `event_registration` form on surface
+`fhsf-efeonce-blog-events` (allowing the slug with `allowFormSlugOnSurface`, deprecating the previous version), creates
+or updates the WordPress event with its `form_key` through the blog-home CLI and verifies (public contract without
+`joinUrl`, `Event` JSON-LD, purge). `ui_policy.eventRegistration` now also carries `event` {title, startUtc, timezone,
+durationMin, modality, venue?, pageUrl}, `joinUrl` (https, server-only: it travels ONLY in emails) and
+`reminderMinutesBefore` (default 120). Emails (`src/lib/growth/forms/event-emails.ts`): the reactive consumer
+`growth_event_registration_email_from_submission` sends confirmation with joinUrl + `.ics` (`event-ics.ts`) or the
+waitlist notice (no link); the `ops-worker` route `/growth/events/reminders` (Cloud Scheduler
+`ops-growth-event-reminders`, `*/15`) sends the reminder to confirmed seats. Idempotent by `sourceEventId`
+(`event_reg_<id>`, `event_rem_<id>`). Email design is PROVISIONAL (`src/emails/EventRegistrationEmail.tsx`). Operator
+manual: `docs/manual-de-uso/public-site/lanzar-evento-o-webinar.md`. A test event uses a `prueba-` slug with
+`--skip-wordpress` and is deprecated afterwards.
+
+#### Eventos y webinars — estado y backlog (2026-10-24)
+
+- **Causa aislada (2026-10-26):** el conector de HubSpot solo descubre los webinars creados **desde el Calendario de Teams (Nuevo → Webinar)**; los creados en **Eventos → Crear evento → Seminario web** nunca aparecen. Prueba: «Prueba sync HubSpot (calendario)» apareció en minutos como Evento de marketing. Regla: crear siempre desde el Calendario; la fuente del Evento de marketing es el conector y la escritura de Greenhouse por API queda de respaldo. Ver anexo C de RESEARCH-013.
+
+- **Decisión (2026-10-24):** la confirmación la manda Greenhouse con su marca y el enlace personal de Teams (`joinWebUrl`); Teams en silencio en cada webinar.
+
+Fuente única del pendiente: [RESEARCH-013 §Backlog canónico](../../../docs/research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos)
+(diseño en el [anexo D](../../../docs/research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md), conector
+en el [anexo C](../../../docs/research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md)). **No lanzar eventos
+reales hasta cerrar ese backlog**; todo sale en **un solo release** (~3 h cada uno) cuando el operador lo decida.
+
+- **Hoy:** reserva, cupo y lista de espera en Greenhouse (`event_registration`, lock por formulario) → copia al
+  formulario HubSpot compartido con `ef_event_key` (se sobrescribe). El evento no es entidad (vive en
+  `ui_policy_json.eventRegistration`); solo `confirmed`/`waitlisted`, sin cancelación ni promoción; `joinUrl` fijo por
+  evento. Sin release: correos con reservas `delivered` (`2a971d768`) y píldora (`a5b028461`).
+- **Cupos en la portada del blog:** las insignias «Últimos cupos» / «Lista de espera» del rail «Para leer con calma»
+  (en producción desde 2026-10-24) **no tienen lector**. Un lector de cupo entra sólo por el filtro WordPress
+  `eo_home_rail_signals` (`event:<id>` → `seats` / `wait`); nunca muestres la insignia sin su dato. Operación:
+  skill `efeonce-public-site-wordpress` → `references/blog-home-operation.md`.
+- **Decidido:** la sesión es un **webinar de Teams** (seminario web de la app Eventos), **nunca** se baja a reunión
+  normal. Tenant M365 Business: sin espera ni aprobación en Teams → **Greenhouse es dueño de la reserva, el cupo y la
+  espera**; la espera no va a HubSpot. Una sola fuente por Evento de marketing: el conector Teams↔HubSpot si funciona,
+  si no Greenhouse por API (switch por evento).
+- **Brecha que no se cierra desde el formulario:** la Forms API de HubSpot solo trae campo de contexto para
+  GoToWebinar (`goToWebinarWebinarKey`), ninguno para Teams; la «Form automation» de webinars de Teams vive en el
+  **módulo de formulario de la página HubSpot**, no en el formulario. Un envío de Greenhouse por API **no** inscribe
+  en Teams.
+- **Diseño objetivo (anexo D):** tabla `growth_event` + ledger append-only (`confirmed`, `waitlisted`, `promoted`,
+  `cancelled`, `attended`) con id de inscripción en Teams y `joinWebUrl` personal (server-only); enlace firmado «ya no
+  puedo ir» + promoción FIFO bajo el mismo lock; inscripción por Graph
+  `POST /solutions/virtualEvents/webinars/{id}/registrations` (permiso de aplicación
+  `VirtualEventRegistration-Anon.ReadWrite.All`, principal dedicado «Greenhouse Webinars»); asistencia por
+  `…/webinars/{id}/sessions/{sid}/attendanceReports`; HubSpot Marketing Events por API `2026-09` solo en el ops-worker
+  (flag `GROWTH_EVENT_HUBSPOT_PARTICIPATION_ENABLED`). Cancelar en Teams por aplicación exige RSC
+  `VirtualEventRegistration-Anon.ReadWrite.Chat`: fuera de la fase 1.
+- **Abierto:** quién manda la confirmación con el enlace (Greenhouse o Teams), nombre y apellido en la píldora (Teams
+  los exige), cancelación en Teams, diseño final de correos, bienvenida y tipo de suscripción propio de Glitch.
+- **Lección de la píldora (autocompletado):** Chrome pinta `:-internal-autofill-selected` con `!important` de agente
+  de usuario (fondo claro, texto negro), que gana a cualquier `!important` propio. Se corrige con
+  `-webkit-text-fill-color` + `caret-color` y reteniendo el fondo con una transición de retardo enorme
+  (`background-color 0s linear 600000s`); y el texto oculto de «¡Listo!» no debe aportar ancho a la grilla de
+  `.ghf-inline-msg`. Detalle: `references/INLINE_PILL_HOST_AND_CONSENT.md` §Trampas.
 
 Catalog selector needs `GREENHOUSE_GROWTH_CATALOG_SURFACE_ID` + `GREENHOUSE_GROWTH_CATALOG_EMBED_KEY`
 in `wp-config.php`; embed key minted with `pnpm growth:forms:embed-key --surface-id <id>` (shown once).

@@ -20,7 +20,13 @@ section background rises with the card (fixed live 2026-10-20). Rail: `compile-a
 Seventh (Nosotros `/about-us-efeonce/`, 2026-10-23, replaced in place, preview → replace):
 `references/landings/about-us-efeonce.md`. Eighth (Partners `/partnership/`, 2026-10-23, preview → replace):
 `references/landings/partnership.md`. Both fed §Ohio host fidelity (collisions, rails, parallax, wide hero, field
-renumbering). Each is a reference for mechanisms and lessons, not a layout to copy (`references/landing-workflow.md`
+renumbering). Ninth (Home `/` as landing `inicio`, page `251731`, 2026-10-28/29, preview → replace): rail
+`compile-inicio-elementor-source.cjs` → `build-inicio-elementor-package.cjs <live baseline>` →
+`deploy-inicio-elementor-package.php` (contract `inicio-elementor-release.v1`, admits mp4) →
+`publish-inicio-elementor-page.php` (`preview` | `replace` with `expectedDataSha`; optional 3rd input
+`.auth/site-nav-meeting-cta-surface.json`) → `rollback-inicio-elementor-page.php`; both core gates include `inicio`.
+Evidence, hashes and rollback: `references/landings/home-claude-design-preview.md`; lessons in §Canvas runtime states
+(Home `inicio`). Each is a reference for mechanisms and lessons, not a layout to copy (`references/landing-workflow.md`
 §Start from the landing's need).
 
 ## Shared source-led core (2026-10-17)
@@ -73,6 +79,18 @@ Medios and Performance now share one core; new canvas landings must use it inste
       launcher on close; on phones it sets `[data-full-screen]`.
     - Splitting a flex row: `flex-basis:0` leaves padding outside the split, so a padded half grows; use
       `flex:1 1 50%` + `min-width:0` on both halves.
+  - **Any governed CTA, not only meetings (2026-10-24, Partners «Quiero ser partner»):** the launcher renders whatever
+    slug `meeting.cta` names, so an `open_growth_form` + `presentation: 'dialog'` CTA reuses it unchanged. Lessons:
+    - The page publisher takes the 0600 `.auth/<…>-cta-surface.json` (`{ surfaceId, embedKey }`) as an extra input and
+      writes `meeting_surface`/`meeting_embed_key` only into the launcher module's widget settings; never in git/logs.
+    - Its dialog is `dialog.ghc-form-surface` in `<body>`: ship the skin as the page layer (`pageLayer: true`);
+      Partners' compiler generates `page.css` from `partner-dialog-skin.css` prefixing `body:has(.gh-partners)`.
+    - `width: fit-content` also collapses to 0 (button clipped, clicks hit the parent): use the canvas button's width
+      (Partners 209px) with `.ghc-card/.ghc-actions/.ghc-primary` at 100%.
+    - The CTA's targeting routes apply: on a preview slug the launcher renders empty. Verify the armed launcher on the
+      live route (publisher snapshot = rollback) or set `route` explicitly in a test.
+    - Deploying the widget package before publishing is safe: the live page keeps the fallback link until the
+      publisher writes the key.
     - Inline styles copied from the canvas beat stylesheet rules: overriding them needs `!important`.
     - An outline/transparent button over a photo or gradient boundary shows the seam through it: give it its own
       backdrop (background + `backdrop-filter`).
@@ -163,9 +181,46 @@ not ship the canvas runtime:
 - An SVG data meter → a server-drawn number field, not an image of a number.
 - Repeater rows whose markup differs → explicit layout variants. Name row field labels by role
   (what the field is in every row), never by the first row's copy.
+- The Claude Design canvas strips a `<style>` inside an inline SVG (paint with `fill`/`stroke` attributes) and drops
+  CSS custom properties written in inline `style` (move them to CSS rules, e.g. `nth-child` animation delays).
+  Blog rail v2, 2026-10-24.
 - Name template tokens so they cannot collide with schema field keys. The renderer substitutes a field's value
   into any `%%token%%` of the same name, so a token that matches a field is silently replaced by that field's
   value (HubSpot v2: the dock's Growth CTA slot is `%%meeting_launcher%%` for that reason).
+
+#### Canvas runtime states (Home `inicio`, 2026-10-28)
+
+The Home canvas drove most sections from DCLogic state that rotates or reacts to scroll (hero words, AEO questions and
+«Tu marca» stages, Greenhouse views, method steps, quotes, comparison columns, FAQ panel). Reusable lessons:
+
+- **Expand every state into editable markup; JS only shows/hides.** The compiler evaluates the canvas DCLogic once and
+  writes each state the canvas swapped at runtime as its own server-rendered node (with its own controls). The landing
+  JS (`inicio-landing.js`, hand-written) reads only the DOM, never regenerates copy, does nothing in the editor, and
+  under reduced motion leaves the states still.
+- **Variants that must not pollute a heading go in a `<template>`.** The hero's rotating words lived inside the `<h1>`
+  and dirtied its accessible text; they moved to `<template data-gh-words>`, the `<h1>` carries a screen-reader sentence
+  with the full question and the five lines, the visible question is `aria-hidden` and the animated letters decorative.
+- **Collections the canvas duplicated for its loops → one editable copy.** The compiler keeps a single set (logos, work
+  pieces…) and the JS creates the loop copies `aria-hidden` (same rule as §Continuous rails).
+- **Repeater rows with inline styles per row compile to one layout variant per row** (Sparks 18, partners 9 here).
+  Accepted for positioned constellations; for a plain list, move the per-row values out of inline `style` first.
+- **Check the canvas reset, do not assume Nosotros'.** This canvas uses `border-box`; Nosotros used `content-box`
+  (§Ohio host fidelity). Copying the wrong host reset shifts every bordered/padded element.
+- **On the site `offsetTop` is relative to the Elementor container**, not to the document (in the canvas they
+  coincide). Measure scroll scenes and sticky stages with `getBoundingClientRect().top + scrollY`.
+- **Videos: `preload="none"` + play only while on screen** (IntersectionObserver). The five work videos were 6.2 MB of a
+  9 MB load, even on phones; after the change, 0 MB of video at load. Above-the-fold first image `fetchpriority="high"`,
+  the rest `low`.
+- **Internal links open in the same tab;** only external destinations keep `target="_blank"`.
+- **A landing's scheduler can reuse the global menu's governed CTA** (`site-nav-discovery-meeting`, surface site-nav,
+  site-wide allowlist) instead of publishing a new CTA: `<gh-meeting-cta location="home_agenda">` in stage 1, the
+  publisher writes surface/key into the agenda widget from the 0600 file, fallback `/agenda/`.
+- **Pre-live, render every module locally with stubs** (`tmp/inicio-local/render.php`, based on
+  `verify-source-led-render.php`), serve it static and review it in the browser before touching the site; it is
+  cheaper than finding layout faults on a preview page.
+- Mobile fixes that came from QA (phone-only): room for the lens caption, a scroll-staged section turned into a normal
+  section that advances per item, mid-height decorative figures hidden, scene chips to the four corners with smaller
+  type. Rails for Ohio's lateral widgets from 1181 px as in §Ohio host fidelity.
 
 #### Scoping the canvas CSS and the page layer
 
@@ -302,6 +357,16 @@ Ohio or other pages. Two rules keep that scoping honest:
   When replacing initials with logos, migrate hover selectors to the shared semantic avatar classes;
   retain lift/scale/halo/stacking and remove transforms under reduced motion. Verify existing consumers.
 
+## Card and badge craft (operator, blog rail v2, 2026-10-24)
+
+- Bigger is not more elegant: size by hierarchy, not volume.
+- Hover is liquid: cursor-following light, slight tilt, smooth ease `cubic-bezier(0.22,1,0.36,1)`, no bounce.
+- Show brand/client logos instead of naming them in words; real images, never placeholders.
+- Badges have punch (solid capsule, glow, glint, filled duotone icon), sit above the title so they never collide with
+  the CTA, use short labels that also work in English, and only appear when their datum exists.
+- An ambiguous label is wrong: «Revisado oct» → «Actualizado» badge + the date in the footer.
+- One family of cards across formats (photo, client, question, ticket, podcast, typographic) beats a section per format.
+
 ## Continuous rails
 
 - Measure one complete original set including its trailing gap as the distance from the first original
@@ -352,7 +417,7 @@ Ohio or other pages. Two rules keep that scoping honest:
   and tracking → root reset `font-size:16px;line-height:normal;letter-spacing:normal`; the `.tag` pill skin; 16px top
   margins on grids (`.bento`, `.steps`, `.pgrid`); `ul:not(.-unlist) > li{margin:var(--clb-spacer-05) 0}`; theme heading
   sizes (`font-size:revert;font-weight:revert`); forced `border-box` while the canvas uses `content-box` (2px off on
-  bordered buttons).
+  bordered buttons; Nosotros — the Home canvas uses `border-box`, so read each canvas' reset).
 - **Theme rails.** From 1181px Ohio pins its Dark/Light switch (`.elements-bar.left`) and «Follow Us» (`.elements-bar.right`)
   at `1.5vw + 56px` from each edge; below 1181 they turn full-width. Canvases have no rails, so full-bleed copy at
   56–72px and a 1320px `.wrap` below ~1320px viewport run under them. Recipe inside `@media (min-width:1181px)`:

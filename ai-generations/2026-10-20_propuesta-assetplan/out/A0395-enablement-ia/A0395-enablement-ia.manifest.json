@@ -1,0 +1,606 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "A0395-enablement-ia",
+  "input": {
+    "artifactId": "A0395-enablement-ia",
+    "slides": [
+      {
+        "slideId": "deck-content-live-chat",
+        "contentType": "deck.content-live-chat",
+        "slots": {
+          "frame": {
+            "line": "revenue-hubspot",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 196,
+            "answerTop": 330,
+            "answerPx": 150,
+            "answerLeading": "--gl-ls-answer-leading=0.9",
+            "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+            "answerInset": "--gl-ls-answer-inset=-8px",
+            "questionWidth": "--gl-ls-question-width=500px",
+            "bodyTop": 690,
+            "bodyPx": 26,
+            "bodyWidth": 420,
+            "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+            "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+            "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+            "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+            "lumWidth": "--gl-lum-width=216px",
+            "lumBottom": "--gl-lum-bottom=51px",
+            "noteRight": "--gl-ls-note-right=120px",
+            "noteTop": "--gl-ls-note-top=112px",
+            "notePx": "--gl-ls-note-px=16px",
+            "noteWeight": "--gl-ls-note-wght=400",
+            "noteColor": "--gl-ls-note-color=#e2e2e2",
+            "docFill": "--gl-ls-doc-color=#faf9f5",
+            "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+            "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+            "docRule": "--gl-ls-doc-rule-color=#e8e4da",
+            "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+            "docShadowY": "--gl-ls-doc-shadow-y=50px",
+            "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+            "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+            "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+            "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+            "docHaloColor": "--gl-ls-doc-halo-color=#e86bd0",
+            "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+            "docEdge": "--gl-ls-doc-edge=1px",
+            "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+            "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+            "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+            "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+            "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+            "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+            "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+            "lsGlassBlur": "--gl-ls-glass-blur=6px",
+            "lsGlassBorder": "--gl-ls-glass-border=1px",
+            "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+            "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+            "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+            "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+            "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+            "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+            "windowLeft": "--gl-clc-window-left=780px",
+            "windowTop": "--gl-clc-window-top=170px",
+            "windowWidth": "--gl-clc-window-width=760px",
+            "windowPadTop": "--gl-clc-window-pad-top=22px",
+            "windowPadX": "--gl-clc-window-pad-x=26px",
+            "windowPadBottom": "--gl-clc-window-pad-bottom=22px",
+            "windowRadius": "--gl-clc-window-radius=26px",
+            "windowPerspective": "--gl-clc-window-perspective=2200px",
+            "windowRotateY": "--gl-clc-window-rotate-y=-7deg",
+            "headerPadBottom": "--gl-clc-header-pad-bottom=14px",
+            "assistantHeight": "--gl-clc-assistant-height=26px",
+            "connectionPadY": "--gl-clc-connection-pad-y=6px",
+            "connectionPadX": "--gl-clc-connection-pad-x=12px",
+            "connectionRadius": "--gl-clc-connection-radius=999px",
+            "connectionFill": "--gl-clc-connection-fill-color=#ffffff",
+            "connectionBorder": "--gl-clc-connection-border=1px",
+            "connectionBorderColor": "--gl-clc-connection-border-color=#e8e4da",
+            "connectionPx": "--gl-clc-connection-px=12px",
+            "connectionWeight": "--gl-clc-connection-wght=600",
+            "connectionGap": "--gl-clc-connection-gap=8px",
+            "platformLogoHeight": "--gl-clc-platform-logo-height=16px",
+            "userGap": "--gl-clc-user-gap=16px",
+            "userWidth": "--gl-clc-user-width=520px",
+            "userPadY": "--gl-clc-user-pad-y=12px",
+            "userPadX": "--gl-clc-user-pad-x=16px",
+            "userRadius1": "--gl-clc-user-radius-1=16px",
+            "userRadius2": "--gl-clc-user-radius-2=16px",
+            "userRadius3": "--gl-clc-user-radius-3=4px",
+            "userRadius4": "--gl-clc-user-radius-4=16px",
+            "userFill": "--gl-clc-user-fill-color=#ede9df",
+            "userPx": "--gl-clc-user-px=15px",
+            "userLeading": "--gl-clc-user-leading=1.45",
+            "answerGap": "--gl-clc-answer-gap=14px",
+            "answerPadY": "--gl-clc-answer-pad-y=14px",
+            "answerPadX": "--gl-clc-answer-pad-x=16px",
+            "answerRadius": "--gl-clc-answer-radius=16px",
+            "answerFill": "--gl-clc-answer-fill-color=#ffffff",
+            "answerBorder": "--gl-clc-answer-border=1px",
+            "answerBorderColor": "--gl-clc-answer-border-color=#e8e4da",
+            "introPx": "--gl-clc-intro-px=14px",
+            "introLeading": "--gl-clc-intro-leading=1.45",
+            "introGap": "--gl-clc-intro-gap=6px",
+            "rowPadY": "--gl-clc-row-pad-y=9px",
+            "rowGap": "--gl-clc-row-gap=10px",
+            "nameWeight": "--gl-clc-name-wght=600",
+            "namePx": "--gl-clc-name-px=14px",
+            "stagePx": "--gl-clc-stage-px=13px",
+            "stageWeight": "--gl-clc-stage-wght=400",
+            "stageColor": "--gl-clc-stage-color=#5f6b7a",
+            "amountPx": "--gl-clc-amount-px=13px",
+            "amountWeight": "--gl-clc-amount-wght=600",
+            "riskSlot": "--gl-clc-risk-slot=78px",
+            "riskPadY": "--gl-clc-risk-pad-y=3px",
+            "riskPadX": "--gl-clc-risk-pad-x=9px",
+            "riskRadius": "--gl-clc-risk-radius=999px",
+            "riskRing": "--gl-clc-risk-ring=1.5px",
+            "riskRingColor": "--gl-clc-risk-ring-color=#d97757",
+            "riskPx": "--gl-clc-risk-px=11px",
+            "riskWeight": "--gl-clc-risk-wght=600",
+            "riskColor": "--gl-clc-risk-color=#9c4a2f",
+            "actionGap": "--gl-clc-action-gap=12px",
+            "actionPadY": "--gl-clc-action-pad-y=12px",
+            "actionPadX": "--gl-clc-action-pad-x=16px",
+            "actionRadius": "--gl-clc-action-radius=14px",
+            "actionFill": "--gl-clc-action-fill-color=#ffffff",
+            "actionBorder": "--gl-clc-action-border=1.5px",
+            "actionBorderColor": "--gl-clc-action-border-color=#0b1f33",
+            "actionPx": "--gl-clc-action-px=14px",
+            "actionWeight": "--gl-clc-action-wght=500",
+            "actionLeading": "--gl-clc-action-leading=1.35",
+            "buttonPadY": "--gl-clc-button-pad-y=8px",
+            "buttonPadX": "--gl-clc-button-pad-x=14px",
+            "buttonRadius": "--gl-clc-button-radius=10px",
+            "buttonFill": "--gl-clc-button-fill-color=#0b1f33",
+            "buttonColor": "--gl-clc-button-color=#ffffff",
+            "buttonPx": "--gl-clc-button-px=13px",
+            "buttonWeight": "--gl-clc-button-wght=600",
+            "guaranteeTop": "--gl-clc-guarantee-top=720px",
+            "guaranteeWidth": "--gl-clc-guarantee-width=236px",
+            "guaranteePadY": "--gl-clc-guarantee-pad-y=14px",
+            "guaranteePadX": "--gl-clc-guarantee-pad-x=16px",
+            "guaranteeRadius": "--gl-clc-guarantee-radius=16px",
+            "guaranteeTitlePx": "--gl-clc-guarantee-title-px=18px",
+            "guaranteeTitleLeading": "--gl-clc-guarantee-title-leading=1.15",
+            "guaranteeTitleColor": "--gl-clc-guarantee-title-color=#ffffff",
+            "guaranteeDescPx": "--gl-clc-guarantee-desc-px=13px",
+            "guaranteeDescWeight": "--gl-clc-guarantee-desc-wght=400",
+            "guaranteeDescLeading": "--gl-clc-guarantee-desc-leading=1.4",
+            "guaranteeDescGap": "--gl-clc-guarantee-desc-gap=5px",
+            "guaranteeDescColor": "--gl-clc-guarantee-desc-color=#e2e2e2",
+            "coBrandLeft": "--gl-clc-cobrand-left=1580px",
+            "coBrandTop": "--gl-clc-cobrand-top=150px",
+            "coBrandSize": "--gl-clc-cobrand-size=200px",
+            "coBrandRadius": "--gl-clc-cobrand-radius=18px",
+            "coBrandFill": "--gl-clc-cobrand-fill-color=#032d60",
+            "coBrandBorder": "--gl-clc-cobrand-border=1px",
+            "coBrandBorderColor": "--gl-clc-cobrand-border-color=#00b6ff",
+            "coBrandBorderOpacity": "--gl-clc-cobrand-border-opacity=28%",
+            "coBrandShadowY": "--gl-clc-cobrand-shadow-y=30px",
+            "coBrandShadowBlur": "--gl-clc-cobrand-shadow-blur=60px",
+            "coBrandShadowColor": "--gl-clc-cobrand-shadow-color=#000610",
+            "coBrandShadowOpacity": "--gl-clc-cobrand-shadow-opacity=55%",
+            "coBrandMarkWidth": "--gl-clc-cobrand-mark-width=168px"
+          },
+          "stage": {
+            "src": "asset-ref:layer:clc-stage"
+          },
+          "platform": {
+            "src": "asset-ref:layer:clc-platform"
+          },
+          "voice": {
+            "question": "¿Con qué actualizo el CRM?",
+            "answer": "tu IA",
+            "eyebrow": "Enablement conversacional",
+            "answerLead": "Con"
+          },
+          "body": "Conectamos HubSpot con <strong>Claude</strong>, ChatGPT, Microsoft Copilot o Gemini y capacitamos a tu equipo para usarlo.",
+          "note": "Ejemplo ilustrativo · según el conector disponible y tus licencias",
+          "connection": {
+            "logo": "asset-ref:file:hubspot-logo",
+            "label": "Conectado a HubSpot"
+          },
+          "prompt": "Registra que visité el depto. de Ñuñoa y muévelo a visita realizada",
+          "intro": "Encontré <strong>3 negocios</strong> tuyos con visita esta semana. <strong>Depto. Ñuñoa</strong> está en visita agendada:",
+          "records": [
+            {
+              "name": "Depto. Ñuñoa",
+              "stage": "Visita agendada",
+              "amount": "[MONTO]",
+              "risk": "En riesgo"
+            },
+            {
+              "name": "Casa La Reina",
+              "stage": "Evaluación",
+              "amount": "[MONTO]"
+            },
+            {
+              "name": "Oficina Providencia",
+              "stage": "Reserva",
+              "amount": "[MONTO]"
+            }
+          ],
+          "action": {
+            "text": "Propongo mover Depto. Ñuñoa a visita realizada y crear la tarea de seguimiento en HubSpot",
+            "button": "Confirmar"
+          },
+          "guarantees": [
+            {
+              "title": "Ve lo que tú ves",
+              "detail": "Respeta los permisos de tu portal.",
+              "left": "--gl-clc-left=780px"
+            },
+            {
+              "title": "Tú confirmas",
+              "detail": "Ningún cambio sin tu visto bueno.",
+              "left": "--gl-clc-left=1036px"
+            },
+            {
+              "title": "En tu IA",
+              "detail": "Claude, ChatGPT, Copilot o Gemini.",
+              "left": "--gl-clc-left=1292px"
+            }
+          ],
+          "selection": {
+            "label": "Ejecutivo",
+            "anchor": "bottom-end",
+            "participantKind": "role",
+            "scale": 1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "padding": "compact",
+            "overlay": "none"
+          }
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-content-live-chat",
+      "contentType": "deck.content-live-chat",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 150,
+          "answerLeading": "--gl-ls-answer-leading=0.9",
+          "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=500px",
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 420,
+          "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "noteRight": "--gl-ls-note-right=120px",
+          "noteTop": "--gl-ls-note-top=112px",
+          "notePx": "--gl-ls-note-px=16px",
+          "noteWeight": "--gl-ls-note-wght=400",
+          "noteColor": "--gl-ls-note-color=#e2e2e2",
+          "docFill": "--gl-ls-doc-color=#faf9f5",
+          "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-ls-doc-rule-color=#e8e4da",
+          "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+          "docShadowY": "--gl-ls-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+          "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+          "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+          "docHaloColor": "--gl-ls-doc-halo-color=#e86bd0",
+          "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+          "docEdge": "--gl-ls-doc-edge=1px",
+          "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+          "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+          "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+          "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+          "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+          "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+          "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+          "lsGlassBlur": "--gl-ls-glass-blur=6px",
+          "lsGlassBorder": "--gl-ls-glass-border=1px",
+          "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+          "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+          "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+          "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+          "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+          "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+          "windowLeft": "--gl-clc-window-left=780px",
+          "windowTop": "--gl-clc-window-top=170px",
+          "windowWidth": "--gl-clc-window-width=760px",
+          "windowPadTop": "--gl-clc-window-pad-top=22px",
+          "windowPadX": "--gl-clc-window-pad-x=26px",
+          "windowPadBottom": "--gl-clc-window-pad-bottom=22px",
+          "windowRadius": "--gl-clc-window-radius=26px",
+          "windowPerspective": "--gl-clc-window-perspective=2200px",
+          "windowRotateY": "--gl-clc-window-rotate-y=-7deg",
+          "headerPadBottom": "--gl-clc-header-pad-bottom=14px",
+          "assistantHeight": "--gl-clc-assistant-height=26px",
+          "connectionPadY": "--gl-clc-connection-pad-y=6px",
+          "connectionPadX": "--gl-clc-connection-pad-x=12px",
+          "connectionRadius": "--gl-clc-connection-radius=999px",
+          "connectionFill": "--gl-clc-connection-fill-color=#ffffff",
+          "connectionBorder": "--gl-clc-connection-border=1px",
+          "connectionBorderColor": "--gl-clc-connection-border-color=#e8e4da",
+          "connectionPx": "--gl-clc-connection-px=12px",
+          "connectionWeight": "--gl-clc-connection-wght=600",
+          "connectionGap": "--gl-clc-connection-gap=8px",
+          "platformLogoHeight": "--gl-clc-platform-logo-height=16px",
+          "userGap": "--gl-clc-user-gap=16px",
+          "userWidth": "--gl-clc-user-width=520px",
+          "userPadY": "--gl-clc-user-pad-y=12px",
+          "userPadX": "--gl-clc-user-pad-x=16px",
+          "userRadius1": "--gl-clc-user-radius-1=16px",
+          "userRadius2": "--gl-clc-user-radius-2=16px",
+          "userRadius3": "--gl-clc-user-radius-3=4px",
+          "userRadius4": "--gl-clc-user-radius-4=16px",
+          "userFill": "--gl-clc-user-fill-color=#ede9df",
+          "userPx": "--gl-clc-user-px=15px",
+          "userLeading": "--gl-clc-user-leading=1.45",
+          "answerGap": "--gl-clc-answer-gap=14px",
+          "answerPadY": "--gl-clc-answer-pad-y=14px",
+          "answerPadX": "--gl-clc-answer-pad-x=16px",
+          "answerRadius": "--gl-clc-answer-radius=16px",
+          "answerFill": "--gl-clc-answer-fill-color=#ffffff",
+          "answerBorder": "--gl-clc-answer-border=1px",
+          "answerBorderColor": "--gl-clc-answer-border-color=#e8e4da",
+          "introPx": "--gl-clc-intro-px=14px",
+          "introLeading": "--gl-clc-intro-leading=1.45",
+          "introGap": "--gl-clc-intro-gap=6px",
+          "rowPadY": "--gl-clc-row-pad-y=9px",
+          "rowGap": "--gl-clc-row-gap=10px",
+          "nameWeight": "--gl-clc-name-wght=600",
+          "namePx": "--gl-clc-name-px=14px",
+          "stagePx": "--gl-clc-stage-px=13px",
+          "stageWeight": "--gl-clc-stage-wght=400",
+          "stageColor": "--gl-clc-stage-color=#5f6b7a",
+          "amountPx": "--gl-clc-amount-px=13px",
+          "amountWeight": "--gl-clc-amount-wght=600",
+          "riskSlot": "--gl-clc-risk-slot=78px",
+          "riskPadY": "--gl-clc-risk-pad-y=3px",
+          "riskPadX": "--gl-clc-risk-pad-x=9px",
+          "riskRadius": "--gl-clc-risk-radius=999px",
+          "riskRing": "--gl-clc-risk-ring=1.5px",
+          "riskRingColor": "--gl-clc-risk-ring-color=#d97757",
+          "riskPx": "--gl-clc-risk-px=11px",
+          "riskWeight": "--gl-clc-risk-wght=600",
+          "riskColor": "--gl-clc-risk-color=#9c4a2f",
+          "actionGap": "--gl-clc-action-gap=12px",
+          "actionPadY": "--gl-clc-action-pad-y=12px",
+          "actionPadX": "--gl-clc-action-pad-x=16px",
+          "actionRadius": "--gl-clc-action-radius=14px",
+          "actionFill": "--gl-clc-action-fill-color=#ffffff",
+          "actionBorder": "--gl-clc-action-border=1.5px",
+          "actionBorderColor": "--gl-clc-action-border-color=#0b1f33",
+          "actionPx": "--gl-clc-action-px=14px",
+          "actionWeight": "--gl-clc-action-wght=500",
+          "actionLeading": "--gl-clc-action-leading=1.35",
+          "buttonPadY": "--gl-clc-button-pad-y=8px",
+          "buttonPadX": "--gl-clc-button-pad-x=14px",
+          "buttonRadius": "--gl-clc-button-radius=10px",
+          "buttonFill": "--gl-clc-button-fill-color=#0b1f33",
+          "buttonColor": "--gl-clc-button-color=#ffffff",
+          "buttonPx": "--gl-clc-button-px=13px",
+          "buttonWeight": "--gl-clc-button-wght=600",
+          "guaranteeTop": "--gl-clc-guarantee-top=720px",
+          "guaranteeWidth": "--gl-clc-guarantee-width=236px",
+          "guaranteePadY": "--gl-clc-guarantee-pad-y=14px",
+          "guaranteePadX": "--gl-clc-guarantee-pad-x=16px",
+          "guaranteeRadius": "--gl-clc-guarantee-radius=16px",
+          "guaranteeTitlePx": "--gl-clc-guarantee-title-px=18px",
+          "guaranteeTitleLeading": "--gl-clc-guarantee-title-leading=1.15",
+          "guaranteeTitleColor": "--gl-clc-guarantee-title-color=#ffffff",
+          "guaranteeDescPx": "--gl-clc-guarantee-desc-px=13px",
+          "guaranteeDescWeight": "--gl-clc-guarantee-desc-wght=400",
+          "guaranteeDescLeading": "--gl-clc-guarantee-desc-leading=1.4",
+          "guaranteeDescGap": "--gl-clc-guarantee-desc-gap=5px",
+          "guaranteeDescColor": "--gl-clc-guarantee-desc-color=#e2e2e2",
+          "coBrandLeft": "--gl-clc-cobrand-left=1580px",
+          "coBrandTop": "--gl-clc-cobrand-top=150px",
+          "coBrandSize": "--gl-clc-cobrand-size=200px",
+          "coBrandRadius": "--gl-clc-cobrand-radius=18px",
+          "coBrandFill": "--gl-clc-cobrand-fill-color=#032d60",
+          "coBrandBorder": "--gl-clc-cobrand-border=1px",
+          "coBrandBorderColor": "--gl-clc-cobrand-border-color=#00b6ff",
+          "coBrandBorderOpacity": "--gl-clc-cobrand-border-opacity=28%",
+          "coBrandShadowY": "--gl-clc-cobrand-shadow-y=30px",
+          "coBrandShadowBlur": "--gl-clc-cobrand-shadow-blur=60px",
+          "coBrandShadowColor": "--gl-clc-cobrand-shadow-color=#000610",
+          "coBrandShadowOpacity": "--gl-clc-cobrand-shadow-opacity=55%",
+          "coBrandMarkWidth": "--gl-clc-cobrand-mark-width=168px"
+        },
+        "stage": {
+          "src": "asset-ref:layer:clc-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:clc-platform"
+        },
+        "voice": {
+          "question": "¿Con qué actualizo el CRM?",
+          "answer": "tu IA",
+          "eyebrow": "Enablement conversacional",
+          "answerLead": "Con"
+        },
+        "body": "Conectamos HubSpot con <strong>Claude</strong>, ChatGPT, Microsoft Copilot o Gemini y capacitamos a tu equipo para usarlo.",
+        "note": "Ejemplo ilustrativo · según el conector disponible y tus licencias",
+        "connection": {
+          "logo": "asset-ref:file:hubspot-logo",
+          "label": "Conectado a HubSpot"
+        },
+        "prompt": "Registra que visité el depto. de Ñuñoa y muévelo a visita realizada",
+        "intro": "Encontré <strong>3 negocios</strong> tuyos con visita esta semana. <strong>Depto. Ñuñoa</strong> está en visita agendada:",
+        "records": [
+          {
+            "name": "Depto. Ñuñoa",
+            "stage": "Visita agendada",
+            "amount": "[MONTO]",
+            "risk": "En riesgo"
+          },
+          {
+            "name": "Casa La Reina",
+            "stage": "Evaluación",
+            "amount": "[MONTO]"
+          },
+          {
+            "name": "Oficina Providencia",
+            "stage": "Reserva",
+            "amount": "[MONTO]"
+          }
+        ],
+        "action": {
+          "text": "Propongo mover Depto. Ñuñoa a visita realizada y crear la tarea de seguimiento en HubSpot",
+          "button": "Confirmar"
+        },
+        "guarantees": [
+          {
+            "title": "Ve lo que tú ves",
+            "detail": "Respeta los permisos de tu portal.",
+            "left": "--gl-clc-left=780px"
+          },
+          {
+            "title": "Tú confirmas",
+            "detail": "Ningún cambio sin tu visto bueno.",
+            "left": "--gl-clc-left=1036px"
+          },
+          {
+            "title": "En tu IA",
+            "detail": "Claude, ChatGPT, Copilot o Gemini.",
+            "left": "--gl-clc-left=1292px"
+          }
+        ],
+        "selection": {
+          "label": "Ejecutivo",
+          "anchor": "bottom-end",
+          "participantKind": "role",
+          "scale": 1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "compact",
+          "overlay": "none"
+        }
+      },
+      "template": "ContentLiveChat",
+      "contractHash": "9a8301fff62e0929f07b9e2d75fb485a24dc4be0e0e9f4f289013a6f3ca49a4d",
+      "templateHash": "ff82344a8105c5d14fada0ee8a20435a05673eb0840bd6de12452f681815e1fa"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

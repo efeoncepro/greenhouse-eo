@@ -1,0 +1,144 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "cd7d5f8eb028",
+  "key": "cd7d5f8eb02880712d5363de659597efdcb97da1731bf947ff5a94158738a198",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:58:55.712Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/16.png",
+    "imageSha256": "40bc8522c2bf2e5c51a69717fc2b6b8b85a55afa7415c92c1728d9b579e7c392",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix5/m/16.png",
+    "maskSha256": "f80beab21a9371759c6004ec751cfa0eb46921ecdb71a2cb57384b517b071da4",
+    "maskConvention": "white-editable",
+    "width": 1152,
+    "height": 1440,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/producto/lata.png",
+        "sha256": "d161bf641d4f491508ca0dffa48e2b97e2c678f3e1af886fd145c629b7725e59"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked can: EXACTLY the tall slim beverage can of image 2 (same proportions, aluminum and orange-and-teal wave label, no text), held by the same hand in the same pose, facing the camera, fingers natural. Keep everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the marked can: EXACTLY the tall slim beverage can of image 2 (same proportions, aluminum and orange-and-teal wave label, no text), held by the same hand in the same pose, facing the camera, fingers natural. Keep everything outside the zone unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.08401331018518518,
+    "editable": 123952,
+    "soft": 15416,
+    "protected": 1519512
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1152,
+      "height": 1440
+    },
+    "target": {
+      "width": 1152,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 41 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0501,
+    "basis": "1 × salida 1152x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 25.298,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.13,
+        "bestError": 2.13,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        0.28,
+        -0.79,
+        -0.28
+      ],
+      "protected": {
+        "pixels": 1519512,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 123952,
+        "maxDelta": 251,
+        "meanDelta": 27.991,
+        "worst": {
+          "x": 261,
+          "y": 535
+        }
+      },
+      "seam": {
+        "pixels": 15416,
+        "maxDelta": 72,
+        "meanDelta": 3.647,
+        "worst": {
+          "x": 329,
+          "y": 787
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1519512,
+        "maxDelta": 132,
+        "meanDelta": 5.583,
+        "worst": {
+          "x": 921,
+          "y": 453
+        }
+      },
+      "outputUsd": 0.0501,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4761,
+        "input_tokens_details": {
+          "image_tokens": 4515,
+          "text_tokens": 246
+        },
+        "output_tokens": 1669,
+        "output_tokens_details": {
+          "image_tokens": 1669,
+          "text_tokens": 0
+        },
+        "total_tokens": 6430
+      },
+      "meta": {
+        "size": "1152x1440",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

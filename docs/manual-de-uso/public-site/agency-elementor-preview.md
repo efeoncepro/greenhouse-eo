@@ -1,5 +1,9 @@
 # Editar la Home con Elementor
 
+> **Delta 2026-10-29:** este manual opera la home anterior (módulos `greenhouse_agency_*`). Desde el 2026-10-29 la
+> portada `251731` es la home «La órbita»: usa [Operar la home de Efeonce](operar-home-efeonce.md). El respaldo
+> `2791` (`/home-2/`) pasó a la papelera con 301 a `/`.
+
 ## Antes de empezar
 
 Inicia sesión en WordPress con permiso para editar páginas. La Home vigente es `251731`, **Home**;

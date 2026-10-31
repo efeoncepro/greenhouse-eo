@@ -3,9 +3,17 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-10-02 por Claude (TASK-1963 / TASK-1964)
-> **Ultima actualizacion:** 2026-10-02 por Claude
+> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
 > **Documentacion tecnica:** [TASK-1963](../../tasks/in-progress/TASK-1963-login-announcements-governed-reader.md) · [TASK-1964](../../tasks/in-progress/TASK-1964-login-v4-premium-access-transition.md) · [Wireframe del login V4](../../ui/wireframes/TASK-1964-login-v4-premium-access.md)
 > **Manual de uso:** [Administrar las novedades del login](../../manual-de-uso/identity/administrar-novedades-del-login.md)
+
+## Límite de consumo Auth — 2026-10-26
+
+Este reader y su administración pertenecen al login de Greenhouse. Reutilizar la composición V4 en Auth
+no acredita que el issuer ya consuma este feed: en Auth se conserva la fotografía oficial de fallback y
+su integración de novedades sigue pendiente. Nueva UI aislada puede continuar; no publicar novedades
+para probar Auth ni inferir que una modificación de esta tabla activa Rooms.
+[Estado Auth](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
 
 ## Qué son
 

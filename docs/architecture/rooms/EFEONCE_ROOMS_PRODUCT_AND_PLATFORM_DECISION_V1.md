@@ -1,13 +1,31 @@
 # Efeonce Rooms — ADR de producto y plataforma V1
 
-- Status: **Proposed** — consolidado para revisión antes del go final de implementación.
+- Status: **Proposed** — consolidado completo; los go parciales de implementación y el estado actual se distinguen abajo.
 - Date: 2026-10-07.
 - Owner: Commercial / Product; Platform para arquitectura y operación; Creative/AXIS para dirección visual.
 - Scope: Rooms, autoría, experiencia de comprador/champion, API/CLI/MCP, multimedia y límites del ecosistema.
 - Reversibility: two-way-but-slow.
 - Confidence: high en propósito y frontera; medium en arquitectura propuesta; experiencia visual pendiente de prototipo.
-- Validated as of: 2026-10-07; conversación, fuentes locales y documentación técnica; sin runtime Rooms.
+- Validated as of inicial: 2026-10-07; conversación, fuentes locales y documentación técnica; entonces sin runtime Rooms.
 - Depends on: [frontera propia aceptada](../sales-enablement/EFEONCE_SALES_ENABLEMENT_PLATFORM_DECISION_V1.md).
+
+## Continuidad de ejecución 2026-10-29
+
+El status `Proposed` pertenece al ADR consolidado completo; no borra los go parciales fechados de este
+mismo documento ni acepta por inferencia toda la experiencia. El corte publicado26Oct y canary cerrado
+siguen separados del [candidato local3c7bcb5](../../audits/rooms/2026-10-29-backend-local-completion.md),
+sin push/deploy: colaboración, presentación durable, importación X-ray/referencia/handoff CRM,
+multimedia V4 mixto y MCP stdio están construidos con ADRs propios. [Dossier y contratos](README.md).
+
+Claude Design posee la interfaz; entorno local ya preparado y detenido, integración/aceptación humana
+pendientes. Puertos externos OFF y handoff `pending` no prueban entrega; MCP remoto y certificación
+multimedia Linux/cloud siguen pendientes. El backend local no cierra EPIC-052, perfiles completos ni
+la paridad de experiencia UI/CLI/MCP. Auth deploy-control permanece retenido en PR263/264, sin merge
+o deploy; no hay nuevo canary/correo, cambio de producción ni activación general.
+
+Los apartados iniciales y addenda fechados conservan decisiones y permisos de cada momento. En
+particular, la autorización documental inicial no sustituye los go locales posteriores ni los gates
+vigentes de release.
 
 ## Context
 
@@ -27,7 +45,7 @@ Think se concibió para marketing, tools y lead magnets. Administrar esta nueva 
 | D6. Design system de Rooms: La órbita (`efeonce-graphic-line`) | Accepted 2026-10-07 por corrección explícita del operador; estética, tipografía, componentes, iconografía y motion, también en autoría/consola. AXIS lo distribuye. Composición específica y QA visual siguen pendientes |
 | D7. Rooms sirve a propuestas creativas y SEO/AEO, combinables en una sala | Accepted 2026-10-07 por aclaración explícita del operador; creatividad es el primer recorrido, no el límite del producto. Contratos especializados Proposed |
 
-La solicitud actual autoriza redactar y explicar este dossier. No es el go final para construir, migrar, provisionar, desplegar o compartir una propuesta con un cliente.
+En la solicitud inicial del07Oct se autorizó redactar y explicar este dossier. Los go posteriores están registrados en sus addenda y ADRs dueños; no autorizan por inferencia nuevos despliegues, activaciones o propuestas compartidas con clientes.
 
 ## Decision proposed
 
@@ -114,3 +132,101 @@ Qué significa para este ADR:
 
 Efectos del mismo plan que sí tocan a Rooms, sin cambiar su diseño: el motor del Artifact Composer pasa a ser un paquete versionado distribuido por AXIS, e Insights pasa a dominio propio. Rooms los sigue consumiendo como ya estaba previsto, por paquete y por referencia a una edición autorizada.
 
+
+## Addendum 2026-10-25 — arranque autorizado y autorización por capacidad
+
+Julio autoriza construir la primera entrega: foundation ejecutable seguida de primera experiencia desktop/móvil para revisión. Tasks TASK-2058 y TASK-2059; runtime propio en ../efeonce-rooms, documentación en Greenhouse. Añade expresamente permisos can, jerarquías y vistas cliente/operador/administrador; y autoriza subagentes. Este go acepta la implementación local acotada, no acredita aceptación visual, despliegue, invitaciones o integración real.
+
+La política can(principal, capability, resource) deniega por defecto. Los roles fijan techo de capacidades; cada grant intersecta organización, sala y edición con vigencia/revocación. Administrador incluye capacidades de operador dentro de su ámbito, nunca bypass de tenant. Un principal externo no adquiere funciones internas por cambiar rol. Los DTO de cliente excluyen notas y grants internos por construcción. Las personas de demostración son sintéticas y no constituyen una sesión real. La integración Efeonce ID posterior resuelve autoridad en servidor; jamás se acepta rol u organización del navegador como autoridad.
+
+## Delta 2026-10-25 — continuidad autorizada y persistencia local
+
+El operador fija /goal: seguir con lo pendiente de EPIC-052, con View Transitions modernas y controles La órbita/AXIS desde el inicio. Se autoriza implementación local progresiva; no equivale a aceptación visual definitiva ni despliegue. TASK-2059 conserva UI; TASK-2060 posee ciclo durable de salas.
+
+Decisión local: PostgreSQL18.6 en cluster exclusivo loopback55432, schema rooms y roles propios; pg8.23.1/node-pg-migrate9.0.0. El runtime Rooms crea su único pool server-only; la prohibición de pools paralelos Greenhouse no obliga a importar el runtime Greenhouse en otro producto. Migraciones se generan con CLI del runtime. No se usan credenciales/tablas de otro producto ni se despierta infraestructura hibernada.
+
+Rooms conserva su autoridad de grants, leída de DB en la transacción; principal autenticado deberá derivar de Efeonce ID. La prueba local usa harness explícito con datos sintéticos, nunca bypass en API real. Commands create/updateDraft/publish/reopen/archive y grant/revoke comparten expectedRevision, idempotencia, audit/outbox y locks ordenados. Publicación fija snapshot inmutable. Se añaden capabilities rooms.create y editions.reopen con scope explícito; rol nunca bypass. Estado operativo y limitaciones se prueban antes de ampliar a contenido real, identidad federada, medios o rollout.
+
+## Architecture Decision 2026-10-25 — contenido versionado para autoría
+
+- Status: implementación autorizada por el goal vigente de EPIC-052; alcance TASK-2062, sin activar identidad ni datos cloud.
+- Owner: Rooms Platform; Product consume el contrato en una unidad UI posterior.
+- Scope: dominio Content, persistencia y proyecciones Rooms; sin mover datos de otros productos.
+- Reversibility: aditiva por versión; rollback conserva snapshots publicados y exige reader de ambas versiones.
+- Confidence: alta para el problema observado y compatibilidad; readiness de medios depende de R05.
+- Validated as of: 2026-10-25, runtime `bd4b802` inspeccionado.
+
+### Context
+
+El corte inicial `rooms.room.v1` exige creative/editorial/plan y piezas ligadas a tres artes sintéticas. Un editor sobre ese contrato obligaría a inventar contenido para guardar. `publish` valida estructura, pero no puede demostrar integridad/ownership/ready de archivos privados que todavía no existen. La aceptación de EPIC-052 requiere perfiles independientes y combinables, inventario íntegro y trazabilidad.
+
+### Decision
+
+Añadir manifest de contenido v2 y separar validez estructural de readiness para publicar. Un borrador incompleto se guarda con IDs/revisión estables; la validación devuelve coverage por elemento y razones accionables. Bloques tipados/versionados y relaciones son datos del mismo agregado Rooms; no nace un segundo CMS ni una copia de autoridad. La publicación fija snapshot validado y coverage con versiones exactas.
+
+El contrato de AssetVersion sólo referencia identidad/versiones. El cliente no puede afirmar `ready`, ownership ni URLs de entrega. El store resolverá recursos de la misma organización/sala; referencias sin registro verificado bloquean publicación. El worker/upload R05 será dueño de registrar bytes/derivados, no esta unidad de Content.
+
+V1 permanece legible y sus snapshots no se migran ni reescriben. La adopción v2 en borrador es explícita; importar nunca convierte automáticamente hipótesis en observaciones ni contenido sintético en real. Tipos no soportados, referencias rotas y exclusiones sin razón producen findings visibles; no se descartan silenciosamente para lograr un import o publicación exitosos.
+
+### Alternatives Considered
+
+- Añadir más campos opcionales a v1: rechazado; confunde compatibilidad de la muestra con composición extensible y mantiene los tres artes como dominio.
+- Crear editor con almacenamiento sólo en navegador: rechazado como sustituto de autoría durable; no satisface revisión, paridad ni publicación.
+- Reescribir snapshots v1 a v2: rechazado; modifica historia ya publicada y su contrato de render.
+- Esperar Efeonce ID para todo Content: rechazado; se puede verificar el dominio y sus transportes en harness con autoridad persistida, manteniendo la API desplegada cerrada.
+
+### Runtime Contract
+
+Commands/readers canónicos, expectedRevision e idempotencia de TASK-2060. Auditoría/outbox en la misma transacción. API/CLI consumen el mismo primitive; MCP sigue pendiente de su integración gobernada. Capability content.edit para autoría; editions.publish separada. Validación y publicación vuelven a comprobar referencias dentro de la transacción, sin confiar en un resultado de preview del cliente. Guardar por rooms.updateDraft tampoco evade estas reglas.
+
+### Consequences and Revisit
+
+La UI consumidora debe elegir renderer por versión; no convertir v2 a una muestra v1 perdiendo bloques. Esta unidad no completa editor, multimedia, escenarios/tours ni R03/R05 por inferencia. Reabrir la decisión si se requieren imports ejecutables, un nuevo source of truth, transferencia entre tenants o modificación de snapshots existentes.
+
+
+## Architecture Decision 2026-10-25 — sesión guest por invitación
+
+Decisión de implementación bajo el flujo aprobado por Julio (correo único con enlace+código), en conjunto
+con ADR `EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md`. TASK-2066 implementa autoridad guest local derivada
+de invitación/version/session vigentes. No crea profiles/source-links/memberships globales ni roles en Auth.
+Un principal externo virtual, persistido como sesión invitada y releído por loadAuthority, aplica el mismo
+can y proyección publicada. El grant previsto vive en la invitación, limitado a rooms.read y evidencia sólo
+si se delegó expresamente; revocar invitación o autoridad del invitador invalida sesiones sin tocar grants ajenos.
+No se interpreta una prueba OTP como IDtoken OIDC ni se mezclan cookies o permisos internos/guest.
+
+Issuer genera/verifica/envía OTP con Resend gobernado; Rooms sólo transmite el código ingresado y consume
+proof ES256 de un uso en transacción. Authority S2S usa endpoint fijo y token servicio dedicado. Token de
+invitación256bits se entrega en fragmentoURL, digest para lookup y ciphertext sólo para mailer autorizado.
+La alternativa de grants genéricos exigiría crear identidades/memberships por correo; se rechaza. Una cookie
+con rol dentro, o aceptar el link como bearer, también se rechazan. Plan2066 fija stores, interfaces, controles
+y pruebas antes código. FeatureOFF y prueba local no equivalen a activación ni envío a destinatarios reales.
+
+## Security delta 2026-10-25 — invitaciones, TASK-2066
+
+Status: Accepted para implementación local por instrucción explícita del operador de reforzar el token.
+Owner: Rooms Platform; issuer OTP sigue TASK-2067. No amplía acceso ni cambia el correo único aprobado.
+
+- Token opaco de 256 bits CSPRNG, sin IDs/correo/rol codificados. No es una credencial de lectura.
+- Nueva emisión/reemisión exige vencimiento como máximo 24 horas desde el reloj DB y dentro de la
+  vigencia de los permisos delegados. Es un techo de seguridad, no una extensión automática del grant.
+  La sesión interna debe estar vigente para autorizar el comando. El horizonte delegado se calcula con
+  principal, membresía y grants persistidos, no con la duración corta de esa sesión; todos se revalidan
+  en la misma transacción y en cada lectura invitada. Una sesión vencida no puede emitir ni reemitir.
+  No hay invitaciones productivas previas: los registros del harness son sintéticos y no se migran a cloud.
+- Cada reemisión rota token/version y deja inelegibles enlaces/transacciones/sesiones anteriores.
+  OTP sigue temporal/de un uso; el enlace puede iniciar una nueva verificación mientras siga vigente,
+  sin prometer que el enlace sea de un solo uso ni que el correo único sea MFA.
+- Cuotas durables por invitación, realm y acción, derivadas por servidor. Los tokens/cookies inexistentes
+  no crean filas ni consumen un presupuesto compartido que permita bloquear a todos los invitados.
+  Esta decisión reemplaza los presupuestos globales por RP del corte8308077: una entrada anónima podía
+  agotarlos. No se toma una cabecera IP arbitraria como identidad confiable.
+- Protección de volumen anónimo pertenece al borde: rate limiting por IP confiable/WAF, prueba de
+  aislamiento y límites de infraestructura antes de ON. No se considera cubierta por el rate limit OTP.
+- UI2068 debe retirar fragmento con history.replaceState antes de analítica/requests, no persistir token
+  ni código y no cargar scripts de terceros en entrada. Revisión CSP y correo sin click/open tracking,
+  href recibido íntegro, HTTPS y configuración de secretos siguen gates del despliegue coordinado.
+
+El compromiso del buzón expone enlace y código del mismo canal; la criptografía del token no elimina ese
+riesgo. No se declara MFA, inmunidad a ataques ni certificación de seguridad por esta revisión de código.
+Referencias técnicas: [OWASP tokens](https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html)
+y [sesiones](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html).

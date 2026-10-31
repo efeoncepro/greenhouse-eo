@@ -33,7 +33,18 @@
    y con la aprobación del operador.
 3. Se pinta con `resolveIcon({ glyph, state, size, line, surface, gesture, label })`: nunca se transcriben HEX ni px.
 4. Reposo por defecto; responde uno solo y sólo si la pieza no tiene otra esfera. Antes de entregar,
-   `auditIconGroup(items, { pieceHasSphere })`.
+   `auditIconGroup(items, { pieceHasSphere })`. **Trazo y Plastilina nunca van en un mismo grupo**: la auditoría falla
+   con `mixed-voices`. Antes de elegir, consulta la voz de cada glifo con `isStrokeGlyph` / `isPlastilinaGlyph`.
+   Trazo disponibles (2026-10-26): busqueda, medicion, contenido, medios, revenue, web, talent, finanzas, embudo, crm,
+   automatizacion, informe, correo, llamada, calendario, reunion, objetivo, presentacion, contrato, checklist, codigo,
+   base-de-datos, nube, integracion, seguridad, ubicacion, reloj, ia, composer, buscador, influencer, prensa, social,
+   multimedia, assets, staff-gorra, swipe, republicar, enviar. Son Plastilina (trampas frecuentes en una pieza de
+   Trazo): bombillo, chispa, pluma, lapiz, galeria, deslizar, reproducir, claqueta, pelicula, television, prompt,
+   barra-busqueda, tablet, telefono. **Formatos de contenido en Trazo** (infografía del 2026-10-26): artículo =
+   `contenido`, carrusel = `swipe`, newsletter = `correo`, video corto = `multimedia`, respuesta en la IA = `ia`. **No
+   hay Trazo de «idea»** (el bombillo es Plastilina): en esa infografía el foco se resolvió con una forma dibujada al
+   trazo en la pieza (cubo isométrico, mismo grosor relativo, tinta del tema), no con un glifo del catálogo; si el
+   concepto se repite, se propone como alta al operador.
 5. Plastilina protagonista: `skewedOrbitHeroSvg` (el objeto en reposo, la órbita pone la esfera).
 6. Paquetes publicados: el catálogo completo de **88 glifos** (39 Trazo + 49 Plastilina) está en
    `@efeoncepro/axis-graphic-line` `0.11.0` (tag `v0.3.29`, 2026-09-29, suma los Trazo `republicar` y `enviar`); sus 49

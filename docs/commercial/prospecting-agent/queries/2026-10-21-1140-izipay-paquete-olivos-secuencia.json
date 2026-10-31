@@ -1,0 +1,104 @@
+{
+  "run_id": "2026-10-21-1140-izipay-paquete-olivos-secuencia",
+  "checked_at": "2026-10-21T11:40:00.070744-03:00",
+  "type": "authorized_preparation_and_sequence_changes",
+  "queries": [
+    {
+      "source": "filesystem",
+      "query": "E-RUT; brochures aprobados; muestras históricas de Perú; firma gráfica oficial",
+      "results": "3adjuntos preparados con SHA256; HTML9imágenes"
+    },
+    {
+      "source": "Notion",
+      "query": "SKY campañas Perú Travel Sale",
+      "result": "schema max_highlight1800 rechazado, corregido500; lectura HomeMarketPeru yTravelSale; sin exportar raw/URLs firmadas"
+    },
+    {
+      "source": "web",
+      "queries": [
+        "site.subrei.gob.cl Perú Chile acuerdo libre comercio comercio transfronterizo servicios presencia local",
+        "site.sunat.gob.pe convenio Chile Perú artículo7 beneficios empresariales establecimiento permanente asistencia técnica",
+        "site.sii.cl Chile Perú convenio doble tributación artículo7 certificado residencia artículo5",
+        "site.sunat.gob.pe no domiciliado Chile publicidad marketing servicios convenio certificado residencia90días",
+        "site.subrei.gob.cl Perú capítulo12 presencia local",
+        "site.sunat.gob.pe certificado residencia no domiciliado convenio doble imposición90días IGVservicios",
+        "site.sii.cl factura exportacion servicios calificacion aduanas exentaIVA servicios extranjeros",
+        "site.gob.pe feriados nacionales2026 octubre noviembre diciembre Perú"
+      ],
+      "sources_read": [
+        "SUBREI ALC capítulo12,arts12.1,12.6,12.7",
+        "SII CDI Perú texto sintetizado conMLI,arts4/5/7",
+        "SUNAT informe0055-2021",
+        "SUNAT informe150-2009",
+        "SII certificados residencia3463",
+        "SII portal exportación servicios",
+        "SUNAT IGV no domiciliados",
+        "gob.pe feriados2026"
+      ]
+    },
+    {
+      "source": "HubSpot MCP",
+      "operation": "identity48713323 owner75788512; get CONTACT",
+      "ids": [
+        256748000582,
+        256741155649,
+        256738112539,
+        253263177790
+      ],
+      "result": "dos bajas false, Iris false, Olivos true sec317665660"
+    },
+    {
+      "source": "HubSpot UI",
+      "operation": "cancel enrollment",
+      "contacts": [
+        256748000582,
+        256741155649
+      ],
+      "result": "manual_cancel_verified"
+    },
+    {
+      "source": "HubSpot UI",
+      "operation": "sequence search",
+      "query": "Olivos",
+      "result": "sin coincidencia nominal previa; no prueba ausencia universal"
+    },
+    {
+      "source": "HubSpot UI",
+      "operation": "create3templates,sequence317665660,enroll existingcontact253263177790",
+      "result": "Programado1,Error0,inicio29Oct,3firmas gráficas visibles; intervalo10/15laborables; paradarespuesta/reunión; noSendNow"
+    },
+    {
+      "source": "HubSpot UI",
+      "operation": "post_enrollment Edit inspection",
+      "result": "iframe about:blank; salió sin guardar; estado programado e inicio ya comprobados"
+    }
+  ],
+  "iris_contract_control": {
+    "source": "correo original RFQ001 leído íntegro el21Oct; fuente primaria privada",
+    "awardee": "NO_VERIFICADO",
+    "award_order_act": "NO_VERIFICADO",
+    "contract": "NO_VERIFICADO",
+    "signed_at": "NO_VERIFICADO",
+    "execution_dates": "año2027 general, fechas contractuales NO_VERIFICADAS",
+    "published_at": "NO_VERIFICADO",
+    "invitation_received_at": "2026-10-21T13:41:20Z",
+    "deadline_stage": "confirmar interés",
+    "deadline_local": "2026-10-22T17:00:00",
+    "deadline_timezone": "NO_INFORMADA",
+    "status": "INVITACION_RECIBIDA_EXPEDIENTE_INCOMPLETO; consulta de modalidad y documentación, sin oferta ni Deal",
+    "last_checked_at": "2026-10-21T11:40:00.070744-03:00"
+  },
+  "iris_send_approval": "PENDING_REVIEW_NOT_SENT",
+  "sends_today": 0,
+  "crm_writes": {
+    "manual_unenrollments": 2,
+    "templates": 3,
+    "sequences": 1,
+    "enrollments": 1,
+    "new_contacts": 0,
+    "new_deals": 0,
+    "manual_notes": 0
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-izipay-confirmacion",
+  "report": "docs/commercial/follow-up-agent/runs/2026-10-21-1140-izipay-paquete-olivos-secuencia.md"
+}

@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "32119d7206c1",
+  "key": "32119d7206c166cf258a556ee848336a4d2e86bec3bd88db36ce14c724b33e6a",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:40:42.675Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/12s.png",
+    "imageSha256": "ccd23c950e29bbaa720573eb58c115ff589949d831a60be083fe0ee568a08a30",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/12o.png",
+    "maskSha256": "282ef859fa3dc1c8d89235d90f1c521904c7043049a0b47815b90c51a175f611",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Two small edits only. Zone at the left (her right shoulder): no orange slice, just her soaked cream knit sweater and wet hair. Zone at the right (her LEFT shoulder, near her neck): a single fresh orange slice stuck on the soaked cream sweater, the same size as a real slice. Keep everything outside the zones unchanged. Photorealistic.",
+    "providerPrompt": "Two small edits only. Zone at the left (her right shoulder): no orange slice, just her soaked cream knit sweater and wet hair. Zone at the right (her LEFT shoulder, near her neck): a single fresh orange slice stuck on the soaked cream sweater, the same size as a real slice. Keep everything outside the zones unchanged. Photorealistic."
+  },
+  "mask": {
+    "touchedFraction": 0.00765533447265625,
+    "editable": 6922,
+    "soft": 3112,
+    "protected": 1300686
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 4,
+      "top": 243,
+      "width": 320,
+      "height": 270
+    },
+    "target": {
+      "width": 1120,
+      "height": 944
+    },
+    "aspectError": 0.0010582010582010693,
+    "reason": "la zona con contexto ocupa 6.6 % de la imagen: se genera recortada a 1120x944"
+  },
+  "estimate": {
+    "usd": 0.044,
+    "basis": "1 × salida 1120x944 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 14.529,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 8.16,
+        "bestError": 8.16,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1300686,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 6922,
+        "maxDelta": 164,
+        "meanDelta": 17.282,
+        "worst": {
+          "x": 206,
+          "y": 349
+        }
+      },
+      "seam": {
+        "pixels": 3112,
+        "maxDelta": 146,
+        "meanDelta": 8.406,
+        "worst": {
+          "x": 206,
+          "y": 348
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1300686,
+        "maxDelta": 254,
+        "meanDelta": 0.528,
+        "worst": {
+          "x": 120,
+          "y": 414
+        }
+      },
+      "outputUsd": 0.044,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1164,
+        "input_tokens_details": {
+          "image_tokens": 1050,
+          "text_tokens": 114
+        },
+        "output_tokens": 1468,
+        "output_tokens_details": {
+          "image_tokens": 1468,
+          "text_tokens": 0
+        },
+        "total_tokens": 2632
+      },
+      "meta": {
+        "size": "1120x944",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

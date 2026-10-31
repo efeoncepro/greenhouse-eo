@@ -1,0 +1,30 @@
+{
+  "kind": "referencia",
+  "command": [
+    "pnpm",
+    "ai:byteplus",
+    "--model",
+    "seedance25",
+    "--draft",
+    "--references",
+    "--image",
+    "asset://asset-20261017163742-t66nd",
+    "--image",
+    "asset://asset-20261017164311-42bch",
+    "--prompt-file",
+    "ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/referencia/s07-prompt.txt",
+    "--duration",
+    "4",
+    "--resolution",
+    "480p",
+    "--out",
+    "ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/referencia/antonio-ref.mp4",
+    "--out-dir",
+    "ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/referencia",
+    "--yes"
+  ],
+  "startedAt": "2026-10-17T08:44:40.942332+00:00",
+  "finishedAt": "2026-10-17T08:44:43.582464+00:00",
+  "exitCode": 1,
+  "videoExists": false
+}

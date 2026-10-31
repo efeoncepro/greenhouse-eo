@@ -1,0 +1,83 @@
+{
+  "status": "passed",
+  "checks": [
+    "explicit-local-runtime",
+    "explicit-private-fixture",
+    "fixture-mode-private",
+    "separate-rp-cookie-hosts",
+    "real-issuer-postgres-session",
+    "issuer-cookie-contract",
+    "both-rp-initially-anonymous",
+    "rp1:legitimate-browser-login",
+    "rp1:legitimate-http-only-session",
+    "rp1-cookie-not-automatically-shared-with-rp2-host",
+    "rp1-to-rp2:owner-session-present",
+    "rp1-to-rp2:replayed-cookie-rejected",
+    "rp1-to-rp2:cross-logout-preserves-owner",
+    "rp1-to-rp2:pending-login-created",
+    "rp1-to-rp2:real-issuer-authorize",
+    "rp1-to-rp2:issuer-code-for-owner",
+    "rp1-to-rp2:owner-browser-transaction-present",
+    "rp1-to-rp2:callback-and-transaction-substitution-rejected",
+    "rp1-to-rp2:owner-transaction-not-consumed-by-other-rp",
+    "rp1-to-rp2:original-callback-still-succeeds",
+    "rp2:legitimate-browser-login",
+    "rp2:legitimate-http-only-session",
+    "rp2-to-rp1:owner-session-present",
+    "rp2-to-rp1:replayed-cookie-rejected",
+    "rp2-to-rp1:cross-logout-preserves-owner",
+    "rp2-to-rp1:target-legitimate-session-still-valid",
+    "rp2-to-rp1:pending-login-created",
+    "rp2-to-rp1:real-issuer-authorize",
+    "rp2-to-rp1:issuer-code-for-owner",
+    "rp2-to-rp1:owner-browser-transaction-present",
+    "rp2-to-rp1:callback-and-transaction-substitution-rejected",
+    "rp2-to-rp1:owner-transaction-not-consumed-by-other-rp",
+    "rp2-to-rp1:original-callback-still-succeeds",
+    "both-legitimate-rp-sessions-coexist",
+    "same-issuer-session-not-renewed-between-rp-flows"
+  ],
+  "checkCount": 35,
+  "issuer": "real-local-Auth-with-PostgreSQL",
+  "adapters": "two-createAuthHttp-createAuthService-instances",
+  "data": "synthetic",
+  "email": "none",
+  "limitation": "Local HTTP adapters of the same Rooms consumer, not two complete deployed products, HTTPS cookie policy or human MFA.",
+  "observedAt": "2026-10-29T02:34:24.595450+00:00",
+  "source": {
+    "roomsCommit": "8750750495b8a19b59d097addd647f34c980eced",
+    "harnessSha256": "adbc4c16a8d3ad38cf420f8566c914afc4e5b30c1c586fbf88965e1c9f120896",
+    "requestedIssuerCommit": "ca97eecd158192ded14af46bc50df139debcebdb",
+    "observedCheckoutCommit": "0ab8887284169fb2caf6c8be7ba41736790d5ba7",
+    "documentationOnlyDifferences": [
+      "docs/operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V2.md",
+      "docs/tasks/in-progress/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md"
+    ],
+    "issuerBranch": "codex/auth-pr-develop-stack",
+    "issuerEntryPoint": "scripts/auth-server/first-party-local-server.ts",
+    "productionServerEntryPointExercised": false,
+    "issuerSourceHashes": {
+      "scripts/auth-server/first-party-local-server.ts": "44ccbe61c8a6e3ec48036ccc4a96fc0a1504b60712890ac877369af7102ec7d7",
+      "scripts/qa/verify-auth-first-party-local-pg.py": "e5d29dbd13bdbcee632c20f26c00363fcd0f682436b73112db3ff6523e31b560"
+    },
+    "databaseEphemeral": true,
+    "databasePort": 54390
+  },
+  "roomsSourceChanged": false,
+  "codeSourceEquivalentToRequestedCommit": true,
+  "productionServerEntryPointExercised": false,
+  "cleanup": {
+    "issuerAndRoomsDatabases": "both ephemeral; stopped and directories removed",
+    "portsFree": [
+      19334,
+      19335,
+      19337,
+      54390
+    ],
+    "rp2IPv6LoopbackClosed": true
+  },
+  "realEmailsSent": 0,
+  "productionTouched": false,
+  "fullSuiteRepeated": false,
+  "lintTypesRepeated": false
+}

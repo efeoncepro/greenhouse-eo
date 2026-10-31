@@ -70,6 +70,14 @@ Un caso puede mostrar presencia/representación antes y después bajo el mismo c
 y cambios de comportamiento/negocio con sus fuentes. Explicitar que una comparación temporal no demuestra
 causalidad; el número de motores no sustituye el denominador de respuestas pertinentes.
 
+**Dónde se publica:** en el portafolio del sitio (`efeoncepro.com/portafolio/`), tipo `seo-content` del plugin
+`eo-portfolio` (0.8.0), creado con `pnpm public-website:portfolio -- new <slug> --kind seo-content`. El bloque
+`search` exige `source` y `period` (el denominador del paso 2) y al menos una cifra: `highlight`, `kpis`, `series`,
+`query` (la búsqueda en la que la marca sube), `keywords` (antes/después), `aeo` (la respuesta de IA que la cita) o
+`contents`; los banners van como piezas `banner`. No se publica sin el alcance `metrics` en la aprobación del cliente
+(paso 3) y las cifras de la plantilla son de ejemplo: nunca quedan en un caso. Manual:
+`docs/manual-de-uso/public-site/operar-portafolio-por-cli.md`.
+
 ---
 
 ## 6. Cómo se responde *"muéstrame casos"* — hoy

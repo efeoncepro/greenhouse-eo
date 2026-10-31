@@ -1,0 +1,151 @@
+{
+  "presetPage": 108,
+  "curatedVersion": 14,
+  "retired": {
+    "Accessory:antennae": {
+      "id": "antennae",
+      "title": "Antenna",
+      "thumbnail": "",
+      "slot": "headwear",
+      "red": 0,
+      "green": 0,
+      "blue": 0
+    }
+  },
+  "accessoryColorsFor": {
+    "headphones": [
+      "pink",
+      "orchid",
+      "violet",
+      "blue",
+      "cyan",
+      "teal",
+      "lime",
+      "yellow",
+      "coral",
+      "charcoal",
+      "brown"
+    ],
+    "bow": [
+      "pink",
+      "orchid",
+      "violet",
+      "blue",
+      "cyan",
+      "teal",
+      "lime",
+      "yellow",
+      "coral",
+      "charcoal",
+      "brown"
+    ],
+    "beanie": [
+      "pink",
+      "orchid",
+      "violet",
+      "blue",
+      "cyan",
+      "teal",
+      "lime",
+      "yellow",
+      "coral",
+      "charcoal",
+      "brown"
+    ],
+    "hat": [
+      "pink",
+      "orchid",
+      "violet",
+      "blue",
+      "cyan",
+      "teal",
+      "lime",
+      "yellow",
+      "coral",
+      "charcoal",
+      "brown"
+    ],
+    "beret": [
+      "pink",
+      "orchid",
+      "violet",
+      "blue",
+      "cyan",
+      "teal",
+      "lime",
+      "yellow",
+      "coral",
+      "charcoal",
+      "brown"
+    ],
+    "orb": [
+      "pink",
+      "orchid",
+      "violet",
+      "blue",
+      "cyan",
+      "teal",
+      "lime",
+      "yellow",
+      "coral",
+      "charcoal",
+      "brown"
+    ],
+    "three_lobe": [
+      "pink",
+      "orchid",
+      "violet",
+      "blue",
+      "cyan",
+      "teal",
+      "lime",
+      "yellow",
+      "coral",
+      "charcoal",
+      "brown"
+    ],
+    "crown": [
+      "pink",
+      "orchid",
+      "violet",
+      "blue",
+      "cyan",
+      "teal",
+      "lime",
+      "yellow",
+      "coral",
+      "charcoal",
+      "brown"
+    ],
+    "antennae": [
+      "pink",
+      "orchid",
+      "violet",
+      "blue",
+      "cyan",
+      "teal",
+      "lime",
+      "yellow",
+      "coral",
+      "charcoal",
+      "brown"
+    ]
+  },
+  "fs": {
+    "/orbit/reference-characters.json": "leído",
+    "/orbit/native-resources.json": "leído",
+    "/orbit/index.json": null
+  },
+  "fsRoot": [
+    ".",
+    "..",
+    "fitted",
+    "meshes",
+    "preset-fits",
+    "renders",
+    ".gitignore",
+    "native-resources.bin",
+    "native-resources.json",
+    "reference-characters.json"
+  ]
+}

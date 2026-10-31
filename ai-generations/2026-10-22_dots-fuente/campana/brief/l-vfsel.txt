@@ -1,0 +1,11 @@
+brief/vf/f021.png|f021 t=s
+brief/vf/f044.png|f044 t=s
+brief/vf/f049.png|f049 t=s
+brief/vf/f050.png|f050 t=s
+brief/vf/f051.png|f051 t=s
+brief/vf/f052.png|f052 t=s
+brief/vf/f053.png|f053 t=s
+brief/vf/f056.png|f056 t=s
+brief/vf/f057.png|f057 t=s
+brief/vf/f058.png|f058 t=s
+brief/vf/f066.png|f066 t=s

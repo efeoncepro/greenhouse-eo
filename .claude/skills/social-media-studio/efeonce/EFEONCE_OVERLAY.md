@@ -91,6 +91,12 @@ en [SEASONAL_CONTENT.md](SEASONAL_CONTENT.md) y
 - **NUNCA despiezar trendjacking** a canales lentos: su valor es la ventana temporal.
 - **NUNCA liderar con portafolio estático en Instagram**: optimiza la métrica de vanidad que la propia
   doctrina de PDR-005 §2 declara demotada. El proceso es la prueba; el resultado final es un claim.
+- **El trabajo social de un cliente se muestra como caso en el portafolio del sitio, no en el feed propio.**
+  Tipo `social` del plugin `eo-portfolio` (0.8.0): cada pieza con rol `post` declara `channel` (instagram,
+  facebook, linkedin, x, tiktok, youtube, threads, pinterest) y `placement` (feed, story, reel, carousel,
+  document, post, short, video, pin, thread) y se ve en el marco de su red con el isotipo oficial de AXIS.
+  Se crea con `pnpm public-website:portfolio -- new <slug> --kind social` y sólo con aprobación del cliente con
+  alcance (`pieces`, `metrics` para cifras). Manual: `docs/manual-de-uso/public-site/operar-portafolio-por-cli.md`.
 - **Vocero de talking head: Julio Reyes.** El formato construye reconocimiento facial y sólo rinde con
   recurrencia de la misma cara; un segundo vocero es decisión explícita, no disponibilidad de agenda.
   Capability de producción: paquete `Executive / Interview Capture` de Run & Gun Studio.

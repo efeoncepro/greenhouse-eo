@@ -183,3 +183,19 @@ rollback · ownership por frontera, y trabajo nuevo extraction-ready. El piloto 
 no aplica (el Lab vive en AXIS); la medición que lo reemplaza es el build del portal antes y después de retirar las
 rutas de `/design-system`.
 
+## Delta aceptado 2026-10-29 — `auth-key-maintenance` (TASK-1833)
+
+**Status: Accepted para implementación local por decisión de Julio 2026-10-29; rollout gated.** La excepción aceptada de `auth-server` cubre un Cloud Run Service, no concede
+automáticamente otro deployable con permisos para crear versiones KMS. Se adopta un Cloud Run Job
+batch `auth-key-maintenance` para rotación y conciliación de la única llave del emisor, separado de
+`ops-worker`, del portal y del issuer público. La [decisión de dominio](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md#architecture-decision-2026-10-28--mantenimiento-aislado-de-llaves-task-1833)
+y el [plan](../tasks/plans/TASK-1833-key-rotation-proposal.md) definen la frontera. Código y schema son candidatos locales; nada se creó en cloud.
+
+- **Costo:** imagen, ejecuciones diarias, logs y versiones HSM durante solapamiento por medir. El Job no mantiene instancia HTTP ni front door nuevo. No aprobar una cifra mensual sin billing/proyección.
+- **Routing/auth:** sin endpoint público. Scheduler con identidad dedicada invoca el Jobs API por OAuth y `roles/run.invoker` sólo sobre este Job, sin overrides; la identidad runtime tiene KMS sobre la CryptoKey exacta y PG mínimo. Ninguna de ellas hereda la SA de `ops-worker` o del portal.
+- **Rollback:** flag OFF y Scheduler PAUSED detienen nuevos ticks. El Job puede retirarse, pero una versión ya activada conserva el procedimiento de solapamiento, JWKS y retiro; borrar el Job no restaura la llave anterior.
+- **Ownership:** Platform/Identity posee command, registro, IAM y recuperación de la operación; Ops posee build, Scheduler, señales y ejecución. El release de la imagen no ejecuta el Job ni enciende Scheduler.
+
+Antes de provisionar o activar, comprobar costo, grants efectivos, exclusión/recuperación con PostgreSQL,
+emisión real y control plane de release. El cambio no toca el grafo del portal ni crea `apps/*` o `packages/*`.
+La decisión de frontera no habilita el Scheduler ni autoriza rotar en cloud bajo la retención vigente.

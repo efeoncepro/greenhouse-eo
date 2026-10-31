@@ -5,6 +5,36 @@ description: Investiga cuentas B2B para Efeonce, identifica compradores y contac
 
 # Prospección B2B Efeonce
 
+## LinkedIn y presupuesto InMail
+
+Aplicar la [política de Sales Navigator Core](../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md):
+Saldo fechado en la política (150 disponibles observados el 29/10; declaración inicial de 50); conexión y espera de aceptación como ruta habitual para quien
+no está conectado. Reservar InMail para alta relevancia o valor estratégico por tiempo/ventana de oportunidad.
+Verificar saldo/costo antes del uso; esta política no autoriza envíos ni nuevas solicitudes por sí sola.
+Construir el buying group sin limitarlo a primer grado y evaluar el acceso por persona después; tener alguna
+conexión en una cuenta no acredita acceso a su decisor. La observación de Julio sobre posibles contactos
+valiosos fuera del primer grado es una hipótesis, no un hecho general de su red.
+
+Para listas comerciales LinkedIn, aplicar además el gate comprador de esa política: Julio excluye
+Community Managers/ejecución pura por afinidad de servicio. Priorizar liderazgo funcional pertinente para
+impulsar contratación; operadores y validadores quedan en investigación, no como destinatarios por defecto.
+
+Priorizar gestión de agencias/proveedores o capacidad de impulsar contratación. Conservar evidencia
+actual frente a trayectoria y prioridad A/B de revisión, sin convertirla en calificación CRM. «Trabajó en
+agencias» no demuestra que las gestione; la [política](../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md)
+gobierna el orden y los límites.
+
+Al validar búsquedas, separar persistencia, pertinencia de muestra y cobertura contrastada. Usar controles
+conocidos y contrastes de filtros del [recorrido Sales Navigator](references/sales-navigator-operations.md#gate-de-cobertura-antes-de-recomendar-la-consulta);
+ni pocos resultados prueban ausencia de compradores ni ampliar el volumen los califica automáticamente.
+
+## Criterio para nuevas comunicaciones
+
+Antes de preparar una apertura, reactivación, seguimiento o respuesta comercial de captación/expansión,
+cargar [conversaciones útiles](references/conversation-quality-and-review.md). Aplicar también a leads
+de web/pauta y a la revisión de borradores/secuencias; conservar el correo robusto de Julio cuando corresponda.
+La guía local no modifica instrucciones, borradores ni programaciones nativas de HubSpot por sí sola.
+
 ## Brochures ya aprobados
 
 Aplicar la [decisión de Julio del 17-10-2026](../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md):
@@ -47,7 +77,11 @@ externos y el comprador de sus propias declaraciones. Resuelve contradicciones s
   Distingue identidad, participación/autoridad, correo, acceso e interacción; no se validan unos por otros.
 - **No crees un Contact/Lead de prospección sin correo corporativo individual verificado y atribuible a esa
   persona.** Si falta, conserva la señal en investigación o nota de Company y busca personas adyacentes.
-  No inventes direcciones, uses un buzón general como correo individual ni rellenes una cuota con desconocidos.
+  Este gate es de CRM; guardar un posible cliente en una lista nativa de Sales Navigator no exige email ni
+  autoriza un alta CRM. No inventes direcciones, uses un buzón general como correo individual ni rellenes una cuota con desconocidos.
+  Una candidata por patrón se mantiene en investigación: calidad técnica y atribución se evalúan por separado;
+  aplicar sólo la [excepción individual informada](references/contact-quality-and-enrichment.md#patrón-solicitado-y-excepción-individual-explícita)
+  expresamente autorizada, sin convertirla en permiso general ni alterar el gate.
 - **La industria y el país se registran en la empresa, en cada alta.** Los segmentos agrupan por atributos
   comunes y los contactos heredan la industria de su empresa principal: una empresa sin industria deja fuera a
   todos sus contactos. No delimites un segmento con una lista de IDs ni con un campo llenado a mano por persona.
@@ -73,14 +107,17 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Descubrir o verificar entidad, fit y señales | [account-research-and-signals](references/account-research-and-signals.md) + Customer Model |
 | Radar de convocatorias, primera entrada y alertas tempranas | [guía compartida del radar](../../../docs/commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md) + Tenders; descubrimiento amplio y vigilancia de conocidos separados |
 | Encontrar objetivo, adyacentes y rutas de acceso | [buying-group-and-access](references/buying-group-and-access.md) |
+| Investigar, configurar servicios/Personas, guardar búsquedas o cuentas/personas en Sales Navigator | [sales-navigator-operations](references/sales-navigator-operations.md) + [manual de Chrome/Playwright](../../../docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md); panel lateral, taxonomía y readback nominal; sesión/UI a revalidar |
 | Conseguir y evaluar datos accionables | [contact-quality-and-enrichment](references/contact-quality-and-enrichment.md) |
 | Preparar acercamiento, correo robusto de Julio o prueba contextual | [message-and-contextual-proof](references/message-and-contextual-proof.md) ([estructura preferida](references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio)) + Copywriting/práctica |
+| Preparar reunión, leer transcripción y construir caso de negocio | [discovery-to-business-case](references/discovery-to-business-case.md) + Commercial/Customer Model/Pricing; fuente declarada y economía condicionada |
 | Preparar discovery, criterios o prueba por oferta/función | [discovery-and-proof](references/discovery-and-proof.md) + Commercial/práctica |
 | Dimensionar cartera, preventa y seguimiento | [capacity-and-economics](references/capacity-and-economics.md) + Pricing/Finance |
 | Proponer o ejecutar un registro autorizado | [crm-and-commercial-handoff](references/crm-and-commercial-handoff.md) + HubSpot |
 | Agrupar cuentas o personas en segmentos, o revisar por qué uno sale incompleto | [segments-by-attribute](references/segments-by-attribute.md) + HubSpot |
 | Representar cuentas objetivo y roles en HubSpot | [adapter account-based](../hubspot-as-a-service/references/account-based-prospecting.md) |
 | Elegir campos de Contact/Company/Lead/Deal por fase | [diccionario y captura HubSpot](../hubspot-as-a-service/references/property-inventory.md) |
+| Interpretar avisos/visitas de Documentos y valorar seguimiento contextual | [document-engagement-signals](references/document-engagement-signals.md) + Commercial/HubSpot; interacción no equivale a intención ni permiso |
 | Convertir una señal en validación y siguiente acción | [signal-to-action](references/signal-to-action.md) |
 | Elegir entrada por proveedor/equipo/proyecto/transformación/operación | [situation-entry-playbooks](references/situation-entry-playbooks.md) + Commercial/práctica |
 | Coordinar personas, canales, pasos y pausas de una cuenta | [account-cadence](references/account-cadence.md) |

@@ -57,6 +57,13 @@ Es una operación nativa de HubSpot sobre el mailbox conectado; no un nuevo work
 del heartbeat de preparación. No duplicar esos envíos desde el heartbeat. No extender destinatarios,
 mensajes o ciclos por inferencia; mantener la autoridad general anterior para las demás cuentas.
 
+Aplicación del 24/10: [Lucía y Yvette](../commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md)
+recibieron un mandato individual de dos seguimientos por persona. Tras explicar que la UI no exponía CCO,
+Julio autorizó expresamente registro nativo con excepción al CCO para esas dos secuencias. Se conservaron
+firma gráfica y parada por respuesta/reunión, y se comprobó calendario guardado y Programado por persona.
+Es una aplicación del mandato acotado, no una nueva autonomía recurrente, política general de CCO,
+capability API, cambio de schema o scheduler; el heartbeat no duplica esos pasos futuros.
+
 ## Continuidad de largo plazo aceptada — 2026-10-13
 
 Mandato explícito de Julio: aplicar y dejar como política el seguimiento de cuentas con proveedor actual.
@@ -80,3 +87,13 @@ con identidad/owner/enums/dedupe/readback; no otros objetos/etapas/segmentos, nu
 La [política](../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) y el prompt vigente del heartbeat consumen este destino.
 Fabrimetal: TASK HubSpot `118419088700`, revisión 13/04/2027 09:00 Chile; duplicado Notion Cancelado
 tras verificar el reemplazo. La revisión futura permanece pendiente y las comunicaciones detenidas.
+
+## Evidencia y aclaración del método — 2026-10-26
+
+El [caso Indecaucho](../commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md)
+contrastó aviso Outlook y detalle de Documents, revisó la recomendación de espera y ejecutó un único
+seguimiento tras «Envíalo» de Julio. El [método](../../.codex/skills/efeonce-b2b-prospecting/references/document-engagement-signals.md)
+ordena señal → contexto/restricciones → recomendación → borrador → autorización → envío/readbacks.
+Documenta la operación dentro de esta decisión: ninguna visita dispara contacto, calificación o
+reinscripción automática, ni levanta HOLD/baja. El delta focal no renueva inventario ni prueba recuperación
+de un bloqueo general. Sin nuevo runtime, schema, permisos o autonomía del heartbeat.

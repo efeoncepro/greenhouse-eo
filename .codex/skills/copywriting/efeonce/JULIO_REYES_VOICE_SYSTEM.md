@@ -149,6 +149,35 @@ reduce carga cognitiva, se corta.
 
 El resultado debe sonar pronunciable en voz alta y, al mismo tiempo, mostrar arquitectura editorial.
 
+### 4.5 Le habla al lector, no a una audiencia
+
+Julio escribe como si conversara con una persona (Julio, 2026-10-26). Usa dos recursos de forma equilibrada,
+nunca forzada:
+
+- **Se adelanta a lo que el lector piensa** y le responde ahí mismo: `Tal vez estarás pensando que esto es lo
+  mismo que el inbound.` La objeción se vuelve parte del relato.
+- **Pone escenas concretas y cotidianas** que el lector ya vivió, con hora, lugar o situación, y a veces con
+  humor: `Eso no te gustaría encontrarlo un viernes a las 14:00, antes de salir de la oficina.` La escena hace
+  sentir la idea, no sólo entenderla.
+
+Van en las transiciones, en las objeciones o donde el texto se pone denso. Pocas por artículo, y nunca en una
+definición, un dato o una cifra, donde estorban. La escena es una situación reconocible del lector; no es una
+anécdota inventada de Julio (§7). Si suena a falsa intimidad, se corta.
+
+### 4.6 Énfasis y enlaces: guían la vista
+
+En sus artículos, las negritas y los enlaces son una segunda lectura: quien escanea debe llevarse la idea con lo
+destacado (Julio, 2026-10-26).
+
+- **La negrita se gana por importancia, no por cuota.** Va donde hay algo que el lector no debe perderse: un dato,
+  una fuente, una idea principal o la parte de una frase que la resume. Si un bloque no tiene nada así, no lleva;
+  si tiene tres, lleva tres. Nunca un párrafo entero, ni un término sólo porque es técnico, ni las etiquetas de una
+  lista como único énfasis.
+- **Los enlaces van en negrita**, internos y a fuentes, para que se lean como destino.
+- **Las landings, servicios y productos de Efeonce van con la mención** (`mention` de la Content Factory: la píldora
+  AXIS `efeonce.mention` con el isotipo y el color de la línea), no como enlace normal. Sólo admite destinos de
+  efeoncepro.com o efeonce.org. Un artículo del blog no es una mención: va como enlace en negrita.
+
 ## 5. Running motif: manzanitas y manitas
 
 El autor confirma como firma propia la familia:
@@ -302,6 +331,9 @@ Antes de entregar, responder `sí` a todo:
 - ¿Hecho, interpretación y doctrina Efeonce se distinguen?
 - ¿El running motif, si aparece, cumple una función pedagógica?
 - ¿La cadencia suena oral sin perder edición?
+- ¿El lector siente que le hablan a él, con anticipaciones y escenas en su dosis y sin falsa intimidad (§4.5)?
+- ¿Las negritas marcan los datos, fuentes e ideas que importan, los enlaces van en negrita y las landings de
+  Efeonce van como mención (§4.6)?
 - ¿El cierre cambia una mirada o habilita una decisión?
 - ¿El texto seguiría teniendo valor si se elimina el CTA comercial?
 

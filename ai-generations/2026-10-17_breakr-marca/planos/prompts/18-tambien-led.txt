@@ -1,0 +1,10 @@
+Edit image 1, a still from a commercial film.
+
+Right now the artwork on the wall screen at the top right looks like a perfect printed poster pasted into the photo. Make it read as a real, switched-on screen photographed by the camera, WITHOUT changing what it shows:
+
+- Keep the artwork on the screen exactly: the same layout, the word BREAKR, the teal wave, the can and its label, the orange slices and the line "Break the wait." in the same place, size and spelling. Do not redraw, restyle or move any of it.
+- It is an indoor display in daylight: a backlit panel, a little less contrast than a print because of the room light, a faint sheen and a soft reflection of the window light across part of the glass.
+- Fine pixel structure barely visible, a very faint moiré in the fine detail, and the slight softness, noise and grain of the rest of the frame (and its depth of field: if the screen is out of focus in image 1, it stays out of focus).
+- A faint orange glow on the wall or frame right around it.
+
+Keep EVERYTHING else exactly as in image 1: the people, faces, identity, expressions, hands, clothing, the room or the street, objects, light, framing, lens and depth of field. Photographic, real, nothing looks generated.

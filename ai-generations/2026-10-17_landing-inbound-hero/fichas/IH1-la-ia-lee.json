@@ -1,0 +1,34 @@
+{
+  "id": "IH1-la-ia-lee",
+  "formato": "16:9",
+  "impacto": true,
+  "linea": "revenue-hubspot",
+  "identidad": [
+    {
+      "persona": "antonio",
+      "vista": "perfil-der"
+    }
+  ],
+  "palanca": "proyeccion",
+  "atmosfera": "bruma",
+  "objetos": [
+    {
+      "objeto": "chaqueta-bomber-efeonce",
+      "puesta": "espalda"
+    },
+    {
+      "objeto": "spark",
+      "color": "revenue-hubspot",
+      "vista": "trabajando"
+    }
+  ],
+  "escena": "SCENE (the instant a company's website is read by an AI before any human visits it): a dark industrial studio at night. A projector behind the camera throws a large WEBSITE PAGE onto a rough grey plaster wall on the RIGHT half of the frame: a clean modern homepage layout whose blocks are mostly bright azure blue and white, so the projector beam itself carries the brand azure: a wide hero image block, a bold headline bar, three columns of text blocks and buttons, all deliberately out of focus so no word, letter or logo is readable. The plaster's cracks and grain show through the projected page and bend it. Antonio stands INSIDE the beam at the right of the frame, seen three-quarters from behind, from the waist up, with only the edge of his profile visible as he looks toward the wall, his back and shoulders about 70% across the frame, and the projected page FALLS ACROSS his shoulders and the back of his navy Efeonce bomber jacket; his own shadow punches a hard black hole through the page on the wall. He is watching and supervising, calm, his right hand relaxed. THE SPARK is copied EXACTLY from its reference: the small glossy white hovering sphere with the navy visor, sparkle antenna, tilted white orbit ring and three belly windows, with ALL its LEDs in the magenta of its reference; it hovers inside the beam between Antonio and the wall, a little above his shoulder height and to his left in the frame, never larger than his head, turned toward the wall, and from its visor comes ONE thin horizontal line of magenta light that sweeps across the projected page like a scanner reading it, the brightest accent of the frame; where the line touches the page, that strip of the page is sharper and brighter. Thin haze makes both the projector beam and the magenta scan line visible in the air. The LEFT half of the frame is calm, dark, empty studio space: deep navy-black haze with no objects, no light spill, no projection, no people. REALISTIC ADULT PROPORTIONS: camera about two meters behind him at chest height, 85mm lens, nothing foreshortened. Only the projector and the Spark emit light; no practical lamps, no screens, no monitors. Contemporary, premium, nothing retro. No logos of any other brand, no readable text anywhere.",
+  "lecho": "sin-lecho",
+  "sinLechoPorque": "hero web: la foto de la web no lleva logo; firma el encabezado del sitio (norma de superficies, web)",
+  "reservas": {
+    "texto": {
+      "muro": "the calm, dark, empty studio space on the left half",
+      "tinta": "blanca"
+    }
+  }
+}

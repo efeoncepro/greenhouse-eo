@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "6ec3200b357e",
+  "key": "6ec3200b357eda0eb52a7db3880bf4f03875ae1b040c4aaaa82e1fd0e19f8f59",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:37:34.036Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v3/05-dia42.png",
+    "imageSha256": "adbd0554b7197318f8734d14b8b31b1127b76428277faeb352ca7c9fb930eac5",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/05.png",
+    "maskSha256": "bade29acfef4463e339a35ad6021bbe9fa64286c4b699925cfcb707040eadd64",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked object with a navy blue ceramic coffee mug standing on the table next to the man's laptop, same scale, out of focus as the background. Keep everything else unchanged. Photorealistic.",
+    "providerPrompt": "Replace only the marked object with a navy blue ceramic coffee mug standing on the table next to the man's laptop, same scale, out of focus as the background. Keep everything else unchanged. Photorealistic."
+  },
+  "mask": {
+    "touchedFraction": 0.00801239013671875,
+    "editable": 6722,
+    "soft": 3780,
+    "protected": 1300218
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 708,
+      "top": 436,
+      "width": 213,
+      "height": 269
+    },
+    "target": {
+      "width": 912,
+      "height": 1152
+    },
+    "aspectError": 0.0001956564273136788,
+    "reason": "la zona con contexto ocupa 4.4 % de la imagen: se genera recortada a 912x1152"
+  },
+  "estimate": {
+    "usd": 0.0418,
+    "basis": "1 × salida 912x1152 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 14.926,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.59,
+        "bestError": 1.59,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1300218,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 6722,
+        "maxDelta": 147,
+        "meanDelta": 19.447,
+        "worst": {
+          "x": 807,
+          "y": 559
+        }
+      },
+      "seam": {
+        "pixels": 3780,
+        "maxDelta": 101,
+        "meanDelta": 6.885,
+        "worst": {
+          "x": 825,
+          "y": 627
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1300218,
+        "maxDelta": 24,
+        "meanDelta": 0.154,
+        "worst": {
+          "x": 812,
+          "y": 662
+        }
+      },
+      "outputUsd": 0.0418,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1127,
+        "input_tokens_details": {
+          "image_tokens": 1044,
+          "text_tokens": 83
+        },
+        "output_tokens": 1392,
+        "output_tokens_details": {
+          "image_tokens": 1392,
+          "text_tokens": 0
+        },
+        "total_tokens": 2519
+      },
+      "meta": {
+        "size": "912x1152",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

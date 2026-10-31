@@ -1,0 +1,140 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "983107b751c7",
+  "key": "983107b751c77347385a3e3c184a56d4d880c63c8b0bdf3cd25aa6d4620f22ae",
+  "status": "completed",
+  "createdAt": "2026-10-17T20:38:56.690Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/11b-ola-golpea-v6.png",
+    "imageSha256": "aa38cdbbbaac83904a729bb2a332e16054624a4d5b4bb7698352ad436be4de0c",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/11b-texto-mask2.png",
+    "maskSha256": "c9419450fddf52b7936fcb72f55b2fba12744e901a7dc0652a0003d0c1204262",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/lata/breakr-lata-v1.png",
+        "sha256": "0df65a914b53de2df35fb9b7acfebdccca499250a3e3ecc42111cd1b68b9a180"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "On the orange can, the small white text printed along the can, parallel to the big word BREAKR and reading in the same direction (bottom to top), says exactly ORANGE BREAK: two words with a space, small widely spaced bold capitals, as on the reference can. Same size, position, tilt, droplets and light as the current small text.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nOn the orange can, the small white text printed along the can, parallel to the big word BREAKR and reading in the same direction (bottom to top), says exactly ORANGE BREAK: two words with a space, small widely spaced bold capitals, as on the reference can. Same size, position, tilt, droplets and light as the current small text.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.00184783935546875,
+    "editable": 1198,
+    "soft": 1224,
+    "protected": 1308298
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 176,
+      "top": 263,
+      "width": 186,
+      "height": 232
+    },
+    "target": {
+      "width": 912,
+      "height": 1136
+    },
+    "aspectError": 0.0013611615245009675,
+    "reason": "la zona con contexto ocupa 3.3 % de la imagen: se genera recortada a 912x1136"
+  },
+  "estimate": {
+    "usd": 0.0426,
+    "basis": "1 × salida 912x1136 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 41.478,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -1,
+        "dy": -1,
+        "scale": 0.98,
+        "stillError": 18.97,
+        "bestError": 14.71,
+        "misaligned": true
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1308298,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 1198,
+        "maxDelta": 218,
+        "meanDelta": 67.18,
+        "worst": {
+          "x": 269,
+          "y": 380
+        }
+      },
+      "seam": {
+        "pixels": 1224,
+        "maxDelta": 191,
+        "meanDelta": 16.322,
+        "worst": {
+          "x": 289,
+          "y": 409
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1308298,
+        "maxDelta": 239,
+        "meanDelta": 0.744,
+        "worst": {
+          "x": 303,
+          "y": 428
+        }
+      },
+      "outputUsd": 0.0426,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 2746,
+        "input_tokens_details": {
+          "image_tokens": 2549,
+          "text_tokens": 197
+        },
+        "output_tokens": 1421,
+        "output_tokens_details": {
+          "image_tokens": 1421,
+          "text_tokens": 0
+        },
+        "total_tokens": 4167
+      },
+      "meta": {
+        "size": "912x1136",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

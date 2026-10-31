@@ -1,0 +1,182 @@
+[
+ {
+  "estilo": "vidrio 50",
+  "fondo": "claro",
+  "mediana": "8.9",
+  "peor5": "5.7"
+ },
+ {
+  "estilo": "vidrio 50",
+  "fondo": "calido",
+  "mediana": "5.1",
+  "peor5": "4.2"
+ },
+ {
+  "estilo": "vidrio 50",
+  "fondo": "oscuro",
+  "mediana": "14.3",
+  "peor5": "10.6"
+ },
+ {
+  "estilo": "vidrio 50",
+  "fondo": "movimiento",
+  "mediana": "14.9",
+  "peor5": "12.6"
+ },
+ {
+  "estilo": "vidrio 50",
+  "fondo": "interfaz",
+  "mediana": "3.4",
+  "peor5": "3.4"
+ },
+ {
+  "estilo": "vidrio 50",
+  "fondo": "papel",
+  "mediana": "3.8",
+  "peor5": "3.8"
+ },
+ {
+  "estilo": "vidrio 55",
+  "fondo": "claro",
+  "mediana": "9.6",
+  "peor5": "6.4"
+ },
+ {
+  "estilo": "vidrio 55",
+  "fondo": "calido",
+  "mediana": "5.8",
+  "peor5": "4.8"
+ },
+ {
+  "estilo": "vidrio 55",
+  "fondo": "oscuro",
+  "mediana": "14.7",
+  "peor5": "11.3"
+ },
+ {
+  "estilo": "vidrio 55",
+  "fondo": "movimiento",
+  "mediana": "15.3",
+  "peor5": "13.1"
+ },
+ {
+  "estilo": "vidrio 55",
+  "fondo": "interfaz",
+  "mediana": "4.0",
+  "peor5": "4.0"
+ },
+ {
+  "estilo": "vidrio 55",
+  "fondo": "papel",
+  "mediana": "4.4",
+  "peor5": "4.4"
+ },
+ {
+  "estilo": "vidrio 60",
+  "fondo": "claro",
+  "mediana": "10.3",
+  "peor5": "7.2"
+ },
+ {
+  "estilo": "vidrio 60",
+  "fondo": "calido",
+  "mediana": "6.6",
+  "peor5": "5.5"
+ },
+ {
+  "estilo": "vidrio 60",
+  "fondo": "oscuro",
+  "mediana": "15.0",
+  "peor5": "12.0"
+ },
+ {
+  "estilo": "vidrio 60",
+  "fondo": "movimiento",
+  "mediana": "15.5",
+  "peor5": "13.7"
+ },
+ {
+  "estilo": "vidrio 60",
+  "fondo": "interfaz",
+  "mediana": "4.7",
+  "peor5": "4.7"
+ },
+ {
+  "estilo": "vidrio 60",
+  "fondo": "papel",
+  "mediana": "5.2",
+  "peor5": "5.2"
+ },
+ {
+  "estilo": "vidrio 65",
+  "fondo": "claro",
+  "mediana": "11.2",
+  "peor5": "8.2"
+ },
+ {
+  "estilo": "vidrio 65",
+  "fondo": "calido",
+  "mediana": "7.6",
+  "peor5": "6.5"
+ },
+ {
+  "estilo": "vidrio 65",
+  "fondo": "oscuro",
+  "mediana": "15.4",
+  "peor5": "12.8"
+ },
+ {
+  "estilo": "vidrio 65",
+  "fondo": "movimiento",
+  "mediana": "15.9",
+  "peor5": "14.3"
+ },
+ {
+  "estilo": "vidrio 65",
+  "fondo": "interfaz",
+  "mediana": "5.6",
+  "peor5": "5.6"
+ },
+ {
+  "estilo": "vidrio 65",
+  "fondo": "papel",
+  "mediana": "6.1",
+  "peor5": "6.1"
+ },
+ {
+  "estilo": "vidrio 70",
+  "fondo": "claro",
+  "mediana": "12.2",
+  "peor5": "9.3"
+ },
+ {
+  "estilo": "vidrio 70",
+  "fondo": "calido",
+  "mediana": "8.9",
+  "peor5": "7.6"
+ },
+ {
+  "estilo": "vidrio 70",
+  "fondo": "oscuro",
+  "mediana": "15.9",
+  "peor5": "13.6"
+ },
+ {
+  "estilo": "vidrio 70",
+  "fondo": "movimiento",
+  "mediana": "16.2",
+  "peor5": "14.9"
+ },
+ {
+  "estilo": "vidrio 70",
+  "fondo": "interfaz",
+  "mediana": "6.7",
+  "peor5": "6.7"
+ },
+ {
+  "estilo": "vidrio 70",
+  "fondo": "papel",
+  "mediana": "7.2",
+  "peor5": "7.2"
+ }
+]

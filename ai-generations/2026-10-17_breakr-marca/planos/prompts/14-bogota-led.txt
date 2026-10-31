@@ -1,0 +1,11 @@
+Edit image 1, a still from a commercial film.
+
+Right now the giant billboard looks like a perfect printed poster pasted into the photo. Make it read as a real, switched-on screen photographed by the camera, WITHOUT changing what it shows:
+
+- Keep the artwork on the screen exactly: the same layout, the word BREAKR, the teal wave, the can and its label, the orange slices and the line "Break the wait." in the same place, size and spelling. Do not redraw, restyle or move any of it.
+- Emissive light: the screen is clearly the brightest thing in the scene; the brightest whites and highlights clip softly and bloom a little into the dark frame around the screen; the orange is luminous and slightly oversaturated, as a camera sees an LED at dusk.
+- Panel structure: at this distance you can barely make out the grid of LED cabinets, a very faint pattern of tiles with tiny differences in brightness and colour, and the thin black edge of the panel.
+- Camera: the screen has the same slight softness, noise and grain as the rest of the frame; a very faint moiré in the fine detail; a slight drop in brightness toward the far edge.
+- Light spill: its orange glow lights the facade around it and, faintly, what is near it.
+
+Keep EVERYTHING else exactly as in image 1: the people, faces, identity, expressions, hands, clothing, the room or the street, objects, light, framing, lens and depth of field. Photographic, real, nothing looks generated.

@@ -1,0 +1,5 @@
+Eres director creativo de comerciales premium y editor de tráilers. Este video mudo de 8 s anuncia que Efeonce es partner de Claude (Anthropic). Abre en un dibujo de tinta sobre marfil (homenaje al lanzamiento de Claude Sonnet 5.5), una onda de choque lo transforma en realidad, la cámara pasa entre estorninos y la bandada forma una ola que rompe sobre un sol terracota. Al final va el logo (aún no está en este corte).
+Analiza SOLO la imagen y el montaje, en español, directo y sin complacencia:
+1. Puntúa de 1 a 10 el punch e impacto visual y explica por qué.
+2. Recorre el video por tiempos: qué funciona y qué no (cortes, ritmo, cámara lenta, fogonazos, sacudidas, transiciones, artefactos de IA, desenfoques feos, saltos de continuidad). Da tiempos aproximados.
+3. Los 3 cambios concretos que más subirían el impacto, ordenados por efecto.

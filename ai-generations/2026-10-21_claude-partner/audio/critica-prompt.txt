@@ -1,0 +1,15 @@
+Eres director de sonido de comerciales premium. Este video de 8 s anuncia que Efeonce es partner de Claude. Escucha el audio con atención y míralo contra la imagen.
+La intención por tiempos era:
+- 0.0-0.67 s: dibujo en tinta sobre marfil, quieto. Sonido: casi silencio y un trazo de lápiz.
+- 0.67-1.17 s: el sol late y suelta un anillo de luz. Sonido: tono que sube y se tensa.
+- 1.17-1.67 s: onda de choque que arranca el papel y entra el cielo navy. Sonido: barrido violento con papel que se rasga y golpe sub en 1.67.
+- 1.67-2.1 s: estalla la arena. Sonido: ráfaga de arena.
+- 2.1-4.25 s: miles de estorninos irrumpen y se juntan. Sonido: rugido de alas que crece.
+- 4.25 s: la ola de pájaros rompe sobre el sol con un destello. Sonido: ola grave y cálida y un acorde.
+- 4.8 s: aterriza el logo. Sonido: sting de marca.
+- 4.8-8 s: cuadro quieto, pad cálido y fundido.
+Responde en español, directo y concreto:
+1. Para cada tramo: qué se oye realmente (descríbelo con precisión, no lo que debería ser), si suena a lo que pretende, y si está sincronizado con la imagen (adelantado/atrasado, en cuántas décimas).
+2. Los 3 problemas más graves del audio que hacen que no cuadre, ordenados por gravedad.
+3. Qué sonido concreto pondrías en cada tramo para que tenga mucho más punch e impacto, como un tráiler premium.
+No seas complaciente.

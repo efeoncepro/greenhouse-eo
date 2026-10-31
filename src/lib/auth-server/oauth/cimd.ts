@@ -8,7 +8,9 @@
  * (señal `auth.oauth.cimd_rejected`).
  */
 
-import { isIP } from 'node:net'
+import { BlockList, isIP } from 'node:net'
+import type { LookupFunction } from 'node:net'
+import { request as httpsRequest } from 'node:https'
 import { lookup } from 'node:dns/promises'
 
 import { OAuthProtocolError } from './errors'
@@ -41,7 +43,7 @@ export type CimdFetchResult = {
 
 export type CimdFetcher = (
   url: string,
-  options: { etag: string | null; signal: AbortSignal }
+  options: { etag: string | null; signal: AbortSignal; addresses: readonly string[] }
 ) => Promise<CimdFetchResult>
 
 export type CimdResolver = (input: { hostname: string }) => Promise<string[]>
@@ -87,48 +89,33 @@ export const looksLikeCimdClientId = (clientId: string): boolean => clientId.sta
 
 // ─── Anti-SSRF ──────────────────────────────────────────────────────────────
 
-const ipv4ToInt = (ip: string): number => ip.split('.').reduce((acc, part) => (acc << 8) + Number(part), 0) >>> 0
+// Node's address parser compares binary addresses, including expanded IPv6 forms.
+const deniedV4 = new BlockList()
 
-const inRange = (ip: number, cidr: string): boolean => {
-  const [base, bits] = cidr.split('/')
-  const mask = bits === '0' ? 0 : (~0 << (32 - Number(bits))) >>> 0
+for (const [address, prefix] of [
+  ['0.0.0.0', 8], ['10.0.0.0', 8], ['100.64.0.0', 10], ['127.0.0.0', 8],
+  ['169.254.0.0', 16], ['172.16.0.0', 12], ['192.0.0.0', 24], ['192.168.0.0', 16],
+  ['198.18.0.0', 15], ['224.0.0.0', 4], ['240.0.0.0', 4]
+] as const) deniedV4.addSubnet(address, prefix, 'ipv4')
 
-  return (ip & mask) === (ipv4ToInt(base) & mask)
-}
+const globalV6 = new BlockList()
+const deniedV6 = new BlockList()
 
-const PRIVATE_V4 = [
-  '0.0.0.0/8',
-  '10.0.0.0/8',
-  '100.64.0.0/10',
-  '127.0.0.0/8',
-  '169.254.0.0/16',
-  '172.16.0.0/12',
-  '192.0.0.0/24',
-  '192.168.0.0/16',
-  '198.18.0.0/15',
-  '224.0.0.0/4',
-  '240.0.0.0/4'
-]
+globalV6.addSubnet('2000::', 3, 'ipv6')
+// Special-purpose, documentation and transition ranges are not CIMD destinations.
+deniedV6.addSubnet('2001::', 23, 'ipv6')
+deniedV6.addSubnet('2001:db8::', 32, 'ipv6')
+deniedV6.addSubnet('2002::', 16, 'ipv6')
+deniedV6.addSubnet('3fff::', 20, 'ipv6')
 
-/** `true` si la dirección NO debe alcanzarse desde el emisor. */
+/** Reject private/local/shared/multicast/reserved IPv4 and non-global/special IPv6.
+ * Documentation IPv4 ranges remain usable by injected test fixtures. Mapped/scoped IPv6 fail closed. */
 export const isDisallowedAddress = (address: string): boolean => {
+  if (address.includes('%')) return true
   const family = isIP(address)
 
-  if (family === 4) {
-    const ip = ipv4ToInt(address)
-
-    return PRIVATE_V4.some(cidr => inRange(ip, cidr))
-  }
-
-  if (family === 6) {
-    const lower = address.toLowerCase()
-
-    if (lower === '::' || lower === '::1') return true
-    if (lower.startsWith('fe80:') || lower.startsWith('fc') || lower.startsWith('fd')) return true
-    if (lower.startsWith('::ffff:')) return isDisallowedAddress(lower.slice(7))
-
-    return false
-  }
+  if (family === 4) return deniedV4.check(address, 'ipv4')
+  if (family === 6) return !globalV6.check(address, 'ipv6') || deniedV6.check(address, 'ipv6')
 
   return true
 }
@@ -139,39 +126,86 @@ const defaultResolver: CimdResolver = async ({ hostname }) => {
   return results.map(entry => entry.address)
 }
 
-const defaultFetcher: CimdFetcher = async (url, { etag, signal }) => {
-  const response = await fetch(url, {
-    method: 'GET',
-    redirect: 'manual',
-    signal,
-    headers: { accept: 'application/json', ...(etag ? { 'if-none-match': etag } : {}) }
-  })
+/** A fresh socket uses only a previously validated address; TLS still verifies the URL hostname. */
+const defaultFetcher: CimdFetcher = async (url, { etag, signal, addresses }) => {
+  if (!addresses.length || addresses.some(isDisallowedAddress)) throw new Error('cimd_address_invalid')
+  // One approved destination per request: a failed connection fails closed, with no fresh DNS fallback.
+  const address = addresses[0]
+  const family = isIP(address)
+  const hostname = new URL(url).hostname
 
-  const reader = response.body?.getReader()
-  let received = 0
-  const chunks: Uint8Array[] = []
-
-  if (reader) {
-    for (;;) {
-      const { done, value } = await reader.read()
-
-      if (done) break
-      received += value.byteLength
-
-      if (received > CIMD_MAX_BYTES) {
-        await reader.cancel()
-        throw new Error('cimd_document_too_large')
-      }
-
-      chunks.push(value)
-    }
+  const pinnedLookup: LookupFunction = (_hostname, options, callback) => {
+    if (_hostname !== hostname) return callback(new Error('cimd_hostname_mismatch'), '')
+    if (options.all) callback(null, [{ address, family }])
+    else callback(null, address, family)
   }
 
-  return {
-    status: response.status,
-    body: Buffer.concat(chunks).toString('utf8'),
-    etag: response.headers.get('etag'),
-    contentType: response.headers.get('content-type')
+  return new Promise<CimdFetchResult>((resolve, reject) => {
+    const request = httpsRequest(url, {
+      method: 'GET',
+      agent: false,
+      lookup: pinnedLookup,
+      servername: hostname,
+      rejectUnauthorized: true,
+      signal,
+      headers: { accept: 'application/json', ...(etag ? { 'if-none-match': etag } : {}) }
+    }, response => {
+      // node:https never follows redirects. Do not read an unneeded redirect/error body.
+      const status = response.statusCode ?? 0
+      const etag = response.headers.etag ?? null
+      const contentType = response.headers['content-type'] ?? null
+
+      response.on('error', reject)
+
+      if (status !== 200) {
+        response.destroy()
+        resolve({ status, body: '', etag, contentType })
+
+        return
+      }
+
+      let received = 0
+      const chunks: Buffer[] = []
+
+      response.on('aborted', () => reject(new Error('cimd_response_aborted')))
+      response.on('data', (value: Buffer) => {
+        received += value.byteLength
+
+        if (received > CIMD_MAX_BYTES) {
+          const error = new Error('cimd_document_too_large')
+
+          response.destroy(error)
+          request.destroy(error)
+          reject(error)
+
+          return
+        }
+
+        chunks.push(value)
+      })
+      response.on('end', () => resolve({ status, body: Buffer.concat(chunks).toString('utf8'), etag, contentType }))
+    })
+
+    request.on('error', reject)
+    request.end()
+  })
+}
+
+// Bound even an injected resolver/transport that does not implement cancellation. The production
+// HTTPS request also receives the signal to destroy its socket; DNS lookup itself is not cancellable.
+const withinDeadline = async <T>(work: Promise<T>, signal: AbortSignal): Promise<T> => {
+  if (signal.aborted) throw new Error('cimd_deadline')
+  let onAbort: () => void = () => {}
+
+  const expired = new Promise<never>((_resolve, reject) => {
+    onAbort = () => reject(new Error('cimd_deadline'))
+    signal.addEventListener('abort', onAbort, { once: true })
+  })
+
+  try {
+    return await Promise.race([work, expired])
+  } finally {
+    signal.removeEventListener('abort', onAbort)
   }
 }
 
@@ -315,32 +349,33 @@ export const resolveCimdClient = async (clientId: string, deps: CimdDeps): Promi
     return { ok: false, reason, fromCache: false }
   }
 
-  // Anti-SSRF: resolver y rechazar destinos privados antes de abrir el socket.
-  let addresses: string[]
-
-  try {
-    addresses = await (deps.resolveAddresses ?? defaultResolver)({ hostname: check.url.hostname })
-  } catch {
-    return reject('dns_unresolvable')
-  }
-
-  if (addresses.length === 0) return reject('dns_unresolvable')
-  if (addresses.some(isDisallowedAddress)) return reject('ssrf_blocked_address')
-
+  // A single deadline covers DNS, headers and streamed body, before any socket is opened.
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), CIMD_FETCH_TIMEOUT_MS)
   let fetched: CimdFetchResult
+  let stage: 'dns' | 'fetch' = 'dns'
 
   try {
-    fetched = await (deps.fetcher ?? defaultFetcher)(clientId, {
-      etag: cached?.status === 'valid' ? cached.etag : null,
-      signal: controller.signal
-    })
-  } catch (error) {
-    const reason =
-      error instanceof Error && error.message === 'cimd_document_too_large' ? 'document_too_large' : 'fetch_failed'
+    const addresses = await withinDeadline(
+      (deps.resolveAddresses ?? defaultResolver)({ hostname: check.url.hostname }), controller.signal
+    )
 
-    return reject(reason)
+    if (addresses.length === 0) return await reject('dns_unresolvable')
+    if (addresses.some(isDisallowedAddress)) return await reject('ssrf_blocked_address')
+    stage = 'fetch'
+    fetched = await withinDeadline((deps.fetcher ?? defaultFetcher)(clientId, {
+      etag: cached?.status === 'valid' ? cached.etag : null,
+      signal: controller.signal,
+      addresses: Object.freeze([...addresses])
+    }), controller.signal)
+    // Enforce the same bound at the injected-port boundary as on the production stream.
+    if (Buffer.byteLength(fetched.body, 'utf8') > CIMD_MAX_BYTES) return await reject('document_too_large')
+  } catch (error) {
+    const reason = error instanceof Error && error.message === 'cimd_document_too_large'
+      ? 'document_too_large'
+      : stage === 'dns' ? 'dns_unresolvable' : 'fetch_failed'
+
+    return await reject(reason)
   } finally {
     clearTimeout(timer)
   }

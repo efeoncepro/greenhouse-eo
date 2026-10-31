@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.11 — 2026-10-24 (Claude, receta de la píldora `inline_pill` en un anfitrión con plantilla propia, portada del blog)
+> **Version:** 1.12 — 2026-10-24 (Claude, aviso de reservas de eventos: lanzador y backlog de RESEARCH-013)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -342,6 +342,12 @@ quedan cupos para este evento.» bajo la píldora, sin «Reintentar».
 **Qué no hacer:** no copiar la animación en CSS de la página (vive en el renderer); no poner casillas de consentimiento
 (la píldora no las dibuja y el contrato no publica); no inyectar `event_key` desde la página (el servidor lo impone);
 no mostrar el conteo si `shown` es `false`.
+
+**Eventos reales:** todavía no se lanzan. Para un evento del blog no armes el formulario a mano: usa el lanzador
+(`pnpm events:launch`), que publica formulario, destino, página y portada en un paso, y revisa el estado actual (la
+sesión es un webinar de Teams; correos y conexión con HubSpot pendientes de release) en
+[Lanzar un evento o webinar](../public-site/lanzar-evento-o-webinar.md). El pendiente completo está en el
+[backlog de RESEARCH-013](../../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos).
 
 ### Receta: incrustar la píldora en un anfitrión con plantilla propia
 

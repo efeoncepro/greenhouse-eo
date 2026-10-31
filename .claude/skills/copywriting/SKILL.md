@@ -43,6 +43,14 @@ argument-hint: "[qué escribir/afinar o pregunta de craft — ej: 'headline para
 
 # Copywriting — el craft de escribir para persuadir y narrar (2026)
 
+## Conversaciones comerciales: criterio compartido
+
+Antes de preparar una apertura, reactivación, seguimiento o respuesta inbound comercial de captación o
+expansión Efeonce, cargar [conversaciones útiles](../efeonce-b2b-prospecting/references/conversation-quality-and-review.md).
+Conservar la historia de la iniciativa, los claims sustentados y la voz robusta de Julio cuando corresponda.
+Esta guía no modifica por sí sola borradores, instrucciones o secuencias guardadas en proveedores.
+
+
 
 ## Partnerships, distribuidores y expedientes externos
 

@@ -1,5 +1,9 @@
 # TASK-2042 — Navegación global: puesta en efeoncepro.com (piloto y sitio completo)
 
+## Delta 2026-10-25
+
+- El paquete del tema `ohio-child` (`build-site-nav-theme-package.cjs` + `deploy-site-nav-theme-package.php`) suma `parts/elements/page_headline.php` a su allowlist: el byline editorial del single llama `eo_author_byline()` (sin el plugin, cae a la lista de Ohio). Desplegado el 2026-10-25 con el resto de archivos del paquete idénticos al vivo — cerrado por trabajo en TASK-2057.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

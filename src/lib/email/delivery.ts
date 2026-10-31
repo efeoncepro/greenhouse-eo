@@ -46,8 +46,14 @@ const BROADCAST_EMAIL_TYPES: EmailType[] = ['payroll_export', 'notification', 'p
  * else uses the platform sender. Centralized policy (not a per-call override) so the brand
  * boundary is one decision, not 18 callers remembering it.
  */
+// TASK-2067: this credential-bearing type alone uses the verified no-tracking transactional subdomain.
+// Keep the shared agency sender and campaign/domain tracking policy unchanged.
+const ROOMS_INVITATION_FROM_ADDRESS = 'Efeonce <acceso@mail.efeoncepro.com>'
+
 const resolveEmailFromAddress = (emailType: EmailType): string =>
-  AGENCY_BRANDED_EMAIL_TYPES.has(emailType) ? AGENCY_FROM_ADDRESS : getEmailFromAddress()
+  emailType === 'auth_server_rooms_invitation_otp'
+    ? ROOMS_INVITATION_FROM_ADDRESS
+    : AGENCY_BRANDED_EMAIL_TYPES.has(emailType) ? AGENCY_FROM_ADDRESS : getEmailFromAddress()
 
 /**
  * Buzón que atiende la respuesta, cuando el destinatario es un candidato. Misma forma que el
@@ -91,6 +97,11 @@ const durableSensitiveSource = (
   sourceEventId: string | undefined,
   sourceEntity: string | undefined
 ): { sourceEventId?: string; sourceEntity?: string } => {
+  // TASK-2067: only an opaque challenge UUID may survive credential-bearing delivery.
+  if (emailType === 'auth_server_rooms_invitation_otp' && sourceEntity === 'auth_server_rooms_invitation') {
+    return { sourceEntity, ...(sourceEventId && new RegExp(`^${UUID}$`, 'i').test(sourceEventId) ? { sourceEventId } : {}) }
+  }
+
   if (emailType === 'password_reset' && sourceEntity === 'auth_tokens') return { sourceEntity }
   if (emailType === 'invitation' && sourceEntity === 'client_users') return { sourceEntity }
   if (emailType === 'verify_email' && sourceEntity === 'email_verification') return { sourceEntity }

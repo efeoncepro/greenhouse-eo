@@ -24,6 +24,10 @@ no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre
 Owner: Commercial / Julio Reyes. Contrato aprobado el 13-10-2026.
 [Registro de corridas](REGISTRO.md) · [Decisión de método](../../architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md).
 
+Aplicación focalizada: [Lucía/Flesan y Yvette/Sigelec, 24/10](runs/2026-10-24-lucia-yvette-prospeccion.md).
+Contrasta enriquecimiento verificado con inferencia por patrón, validación técnica y autorización individual
+cuando la atribución sigue inferida; conserva resultados independientes de CRM, Outlook y LinkedIn.
+
 ## Operación vigente
 
 La automatización `prospecci-n-hubspot-reporte-diario` se convirtió de heartbeat a cron en el mismo ID,

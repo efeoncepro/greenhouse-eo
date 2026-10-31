@@ -1,0 +1,237 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "e3c4c3054d5a",
+  "key": "e3c4c3054d5a3b3c228594aeb1a48f9cb5197b94031c5b9b0c2625c10e0e1a9b",
+  "status": "completed",
+  "createdAt": "2026-10-22T17:43:05.146Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/final/11a-ola-llega.png",
+    "imageSha256": "8580bf9b6d8d4849861eac01d957a0f03fd777ec2d293e0e8dba19d67041eff6",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/cuadro-inicio/mascara-11a-v2.png",
+    "maskSha256": "fe071ea8d015e32e541d1c55563e6eff579c7d5cba19e3376f1a92e26fc4223d",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": null,
+    "seed": null,
+    "count": 2,
+    "prompt": "Remove the drink can, all the water, every droplet and all the orange slices from the marked area. Show the plain, completely dry wooden table, the woman's dry cream knit sweater and her raised open hand with five clean fingers, and the office and wall behind her, exactly as they would look with nothing there. Change nothing outside the marked area.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nRemove the drink can, all the water, every droplet and all the orange slices from the marked area. Show the plain, completely dry wooden table, the woman's dry cream knit sweater and her raised open hand with five clean fingers, and the office and wall behind her, exactly as they would look with nothing there. Change nothing outside the marked area.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.35632781982421874,
+    "editable": 415649,
+    "soft": 51397,
+    "protected": 843674
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0226,
+    "basis": "2 × salida 1024x1280 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 41.552,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.93,
+        "bestError": 2.93,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -9.52,
+        -10.41,
+        -8.99
+      ],
+      "protected": {
+        "pixels": 843674,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 415649,
+        "maxDelta": 253,
+        "meanDelta": 44.828,
+        "worst": {
+          "x": 555,
+          "y": 547
+        }
+      },
+      "seam": {
+        "pixels": 51397,
+        "maxDelta": 172,
+        "meanDelta": 15.056,
+        "worst": {
+          "x": 962,
+          "y": 666
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 843674,
+        "maxDelta": 169,
+        "meanDelta": 5.927,
+        "worst": {
+          "x": 965,
+          "y": 729
+        }
+      },
+      "outputUsd": 0.0113,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2779,
+        "input_tokens_details": {
+          "image_tokens": 2560,
+          "text_tokens": 219
+        },
+        "output_tokens": 378,
+        "output_tokens_details": {
+          "image_tokens": 378,
+          "text_tokens": 0
+        },
+        "total_tokens": 3157
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "medium",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 42.519,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.96,
+        "bestError": 2.96,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -5.5,
+        -7.69,
+        -7.43
+      ],
+      "protected": {
+        "pixels": 843674,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 415649,
+        "maxDelta": 249,
+        "meanDelta": 45.911,
+        "worst": {
+          "x": 574,
+          "y": 590
+        }
+      },
+      "seam": {
+        "pixels": 51397,
+        "maxDelta": 189,
+        "meanDelta": 15.091,
+        "worst": {
+          "x": 961,
+          "y": 667
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 843674,
+        "maxDelta": 176,
+        "meanDelta": 5.589,
+        "worst": {
+          "x": 418,
+          "y": 844
+        }
+      },
+      "outputUsd": 0.0113,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2779,
+        "input_tokens_details": {
+          "image_tokens": 2560,
+          "text_tokens": 219
+        },
+        "output_tokens": 378,
+        "output_tokens_details": {
+          "image_tokens": 378,
+          "text_tokens": 0
+        },
+        "total_tokens": 3157
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "medium",
+        "providerMask": false
+      }
+    }
+  ],
+  "erase": {
+    "fill": "model",
+    "layers": [],
+    "shadow": null,
+    "erasure": [
+      {
+        "changeInCore": 33.41,
+        "corePixels": 415649,
+        "objectLikeness": null,
+        "residueSuspected": false
+      },
+      {
+        "changeInCore": 34.02,
+        "corePixels": 415649,
+        "objectLikeness": null,
+        "residueSuspected": false
+      }
+    ]
+  }
+}

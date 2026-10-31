@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "2e2ffeaf699c",
+  "key": "2e2ffeaf699c368f3a7edf813ec9e501afa5e76ade98ac196bb31cb254395762",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:13:18.802Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates/S01-kickoff.png",
+    "imageSha256": "ee946f6bdb12ac8b910864dcec7df01adf237da4591ff1064c72531527c92bf0",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-tech/masks/S01.png",
+    "maskSha256": "aee5cabccf87ab7858f795fcf4d8f8c42ebabe82974a752a6133a2389d6c839f",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the laptops inside the marked zone. Foreground: the woman's open laptop seen from behind becomes an ultra-thin current-generation premium laptop in space-grey anodized aluminum unibody, razor-thin lid, minimal edge-to-edge display bezels, precise machined edges, plain unbranded lid without stickers, matching the scene's light, perspective and scale exactly. Background right: the man keeps typing with his hands in the same place on an ultra-thin current-generation premium laptop in space-grey anodized aluminum unibody, razor-thin lid, minimal edge-to-edge display bezels, precise machined edges, no stickers, matching the scene's light, perspective and scale exactly. Keep hands, table, notebook and everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Replace only the laptops inside the marked zone. Foreground: the woman's open laptop seen from behind becomes an ultra-thin current-generation premium laptop in space-grey anodized aluminum unibody, razor-thin lid, minimal edge-to-edge display bezels, precise machined edges, plain unbranded lid without stickers, matching the scene's light, perspective and scale exactly. Background right: the man keeps typing with his hands in the same place on an ultra-thin current-generation premium laptop in space-grey anodized aluminum unibody, razor-thin lid, minimal edge-to-edge display bezels, precise machined edges, no stickers, matching the scene's light, perspective and scale exactly. Keep hands, table, notebook and everything outside the zone unchanged. Photorealistic."
+  },
+  "mask": {
+    "touchedFraction": 0.2065093994140625,
+    "editable": 238260,
+    "soft": 32416,
+    "protected": 1040044
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 87 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 40.182,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.72,
+        "bestError": 3.72,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1040044,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 238260,
+        "maxDelta": 179,
+        "meanDelta": 43.716,
+        "worst": {
+          "x": 857,
+          "y": 623
+        }
+      },
+      "seam": {
+        "pixels": 32416,
+        "maxDelta": 156,
+        "meanDelta": 14.209,
+        "worst": {
+          "x": 844,
+          "y": 636
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1040044,
+        "maxDelta": 145,
+        "meanDelta": 7.096,
+        "worst": {
+          "x": 828,
+          "y": 642
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1477,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 197
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 2987
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

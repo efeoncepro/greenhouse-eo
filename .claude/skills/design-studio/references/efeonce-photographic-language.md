@@ -1043,6 +1043,22 @@ recurso en dos superficies, y cada una se genera en su formato nativo:
 - Fuentes de la producción: `ai-generations/2026-10-18_menu-sitio/` (fichas, prompts, scripts y logs; binarios fuera de
   git). Las fotos todavía no están subidas al bucket público: eso va con TASK-2041.
 
+### Plate de un artículo del blog **[medido en vivo, 2026-10-24]**
+
+Un artículo de Marketing con Manzanitas nace de **un solo plate** (16:9, 2560 × 1440, registro cine, elenco ficticio,
+sin texto), y de él salen la portada, la imagen del slider y la foto de la tarjeta del rail. Por eso el plate cumple
+las tres a la vez: **cara en x 68–75 % · y 10–40 %** (pídela en torno al 85 %: el modelo la corre unos 15 puntos al
+centro), el **64 % izquierdo** en oscuridad calma, la **mitad de abajo** pareja y oscura, y nada importante en el
+**7 %** de arriba ni de abajo. Si la cara sale fuera del 66–76 %, se corrige la ficha y se regenera: no se estira ni se
+mueve la foto. Márgenes de cada superficie y diagramas:
+[inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+
+**Portada sin persona (2026-10-25 y 2026-10-26).** Cuando la persona no porta la idea, el sujeto es un objeto o un
+fenómeno: parte de `MCB-AEO1-169` o `MCB-LOOP1-169` (`pnpm foto:cine:nueva --desde`). Tamaño y posición con fracciones,
+nunca porcentajes; mide en el plate el ancho (salió unas 2,5 veces más grande de lo pedido), la relación alto/ancho de
+una figura horizontal y el foco de la tarjeta, que se recalcula. Detalle: [casebook cine, fallas 59 a 64](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#portadas-de-manzanitas-sin-persona-2026-10-25-y-2026-10-26--lo-que-aprendimos)
+y [manual de la portada del blog](../../../../docs/manual-de-uso/creative/producir-portada-de-articulo-del-blog.md).
+
 ## La capa de composición no es sólo texto
 
 Una pieza puede llevar etiqueta (Poppins `structureLabel`), entrada/dominante/cierre (Bricolage `ideaLead`/

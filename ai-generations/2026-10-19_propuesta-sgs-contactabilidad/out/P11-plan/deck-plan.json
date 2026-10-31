@@ -1,0 +1,100 @@
+{
+  "tenderId": "P11-plan",
+  "slides": [
+    {
+      "slideId": "deck-decision-plan",
+      "contentType": "deck.decision-plan",
+      "slots": {
+        "frame": {
+          "line": "revenue-salesforce",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 380,
+          "questionWidth": "--gl-dp-question-width=470px",
+          "answerGap": "--gl-dp-answer-gap=36px",
+          "answerSize": "--gl-dp-answer-px=120px",
+          "answerLeading": "--gl-dp-answer-leading=0.9",
+          "answerShadowY": "--gl-dp-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-dp-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-dp-answer-shadow-opacity=35%",
+          "horizonLeft": "--gl-dp-horizon-left=1050px",
+          "horizonTop": "--gl-dp-horizon-top=40px",
+          "horizonPx": "--gl-dp-horizon-px=560px",
+          "horizonOpacity": "--gl-dp-horizon-opacity=0.07",
+          "haloColor": "--gl-dp-halo-color=#72ded8",
+          "cardWidth": "--gl-dp-card-width=300px",
+          "cardRadius": "--gl-dp-card-radius=20px",
+          "cardPadTop": "--gl-dp-card-pad-top=20px",
+          "cardPadX": "--gl-dp-card-pad-x=22px",
+          "cardPadBottom": "--gl-dp-card-pad-bottom=22px",
+          "rangeGap": "--gl-dp-range-gap=8px",
+          "descGap": "--gl-dp-desc-gap=10px",
+          "rangePx": "--gl-dp-range-px=15px",
+          "titlePx": "--gl-dp-title-px=40px",
+          "descPx": "--gl-dp-desc-px=17px",
+          "descColor": "--gl-dp-desc-color=#d6e2ec",
+          "currentFillFrom": "--gl-dp-current-from-color=#0f4a5c",
+          "currentFillTo": "--gl-dp-current-to-color=#0a2a40",
+          "otherFillFrom": "--gl-dp-other-from-color=#0e2a44",
+          "otherFillTo": "--gl-dp-other-to-color=#081c30",
+          "fillAngle": "--gl-dp-fill-angle=160deg",
+          "currentBorder": "--gl-dp-current-border=2px",
+          "currentBorderOpacity": "--gl-dp-current-border-opacity=90%",
+          "currentGlowBlur": "--gl-dp-current-glow-blur=80px",
+          "currentGlowOpacity": "--gl-dp-current-glow-opacity=45%",
+          "otherBorder": "--gl-dp-other-border=1px",
+          "otherBorderOpacity": "--gl-dp-other-border-opacity=16%",
+          "otherGlowBlur": "--gl-dp-other-glow-blur=30px",
+          "otherGlowOpacity": "--gl-dp-other-glow-opacity=12%",
+          "shadowColor": "--gl-dp-shadow-color=#000610",
+          "shadowY": "--gl-dp-shadow-y=34px",
+          "shadowBlur": "--gl-dp-shadow-blur=80px",
+          "shadowOpacity": "--gl-dp-shadow-opacity=65%",
+          "currentStop": "1",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "card1Left": "--gl-dp-card1-left=787.74px",
+          "card1Bottom": "--gl-dp-card1-bottom=222.76px",
+          "card2Left": "--gl-dp-card2-left=1199.06px",
+          "card2Bottom": "--gl-dp-card2-bottom=363.14px",
+          "card3Left": "--gl-dp-card3-left=1478.94px",
+          "card3Bottom": "--gl-dp-card3-bottom=633.16px"
+        },
+        "stage": {
+          "src": "asset-ref:layer:decision-plan-stage"
+        },
+        "trajectory": {
+          "src": "asset-ref:layer:decision-plan-trajectory-revenue-salesforce-1"
+        },
+        "horizon": "112",
+        "voice": {
+          "question": "¿Qué pasará al empezar?",
+          "answer": "Línea base",
+          "eyebrow": "Plan del piloto"
+        },
+        "body": "<strong>112</strong> días como máximo: cuatro semanas de línea base y hasta doce de piloto, con umbrales acordados antes.",
+        "stops": [
+          {
+            "range": "1 · Días 1–28",
+            "title": "Diagnóstico",
+            "desc": "Procesos, registro de correo y línea base, antes de cambiar nada."
+          },
+          {
+            "range": "2 · Días 29–112",
+            "title": "Piloto",
+            "desc": "Hasta 12 semanas con Aircall, WhatsApp y el panel, con revisión semanal."
+          },
+          {
+            "range": "3 · Día 112",
+            "title": "Decisión",
+            "desc": "Contra la línea base: seguir, ajustar o detener. Si siguen, se pide la conexión."
+          }
+        ]
+      },
+      "template": "DecisionPlan"
+    }
+  ]
+}

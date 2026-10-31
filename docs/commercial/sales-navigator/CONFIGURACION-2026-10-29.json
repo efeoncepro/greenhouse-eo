@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-29",
+  "timezone": "America/Santiago",
+  "actor": "Julio Reyes",
+  "plan": "Sales Navigator Core",
+  "status": "saved_and_read_back_after_reload",
+  "inMailAvailableObserved": 150,
+  "initialInMailDeclaration": 50,
+  "products": [
+    {
+      "name": "Posicionamiento SEO",
+      "url": "https://efeoncepro.com/servicios/posicionamiento-seo/",
+      "description": "Efeonce ayuda a equipos de marketing, Growth y comercio electrónico de empresas medianas y grandes a convertir su presencia web en una capacidad de descubrimiento orgánico medible. Integramos SEO técnico, arquitectura e indexación, investigación de intención de búsqueda, contenido y clusters temáticos, enlazado interno, datos estructurados y señales de entidad y autoridad. Partimos de un diagnóstico y un baseline para priorizar, ejecutar mejoras y revisar resultados por ciclo. Conectamos visibilidad, tráfico calificado y conversión con la analítica y los objetivos de negocio acordados. La ejecución y publicación en el CMS, las dependencias técnicas y la coordinación con el equipo interno se definen en el alcance. Es una entrada pertinente ante una migración web, un nuevo producto o mercado, pérdida de visibilidad comprobada o falta de continuidad entre diagnóstico, contenido e implementación.",
+      "category": "SEO y posicionamiento orgánico",
+      "verified": true
+    },
+    {
+      "name": "Efeonce AEO | Visibilidad en IA",
+      "url": "https://efeoncepro.com/aeo-2/",
+      "description": "Efeonce AEO ayuda a equipos de marketing, marca, SEO y Growth a entender y mejorar cómo su marca es encontrada, citada y representada en motores de respuesta e inteligencia artificial. Establecemos un baseline por mercado, categoría y preguntas relevantes; revisamos menciones, fuentes, citaciones, representación de la marca y contexto competitivo. Conectamos ese diagnóstico con prioridades de contenido, estructura semántica, datos estructurados, entidades, evidencia y señales de autoridad, coordinadas con la base SEO existente. El trabajo combina diagnóstico, implementación y seguimiento según la fase y el alcance acordados. Resulta pertinente cuando la dirección necesita entender su visibilidad en IA, existen inconsistencias verificadas en la representación de la marca o se prepara un cambio de oferta, producto o mercado. Los resultados se evalúan con consultas, mercados y métodos comparables y decisiones de siguiente ciclo.",
+      "category": "AEO y visibilidad en motores de respuesta de IA",
+      "verified": true
+    },
+    {
+      "name": "Agencia Creativa",
+      "url": "https://efeoncepro.com/agencia-creativa/",
+      "description": "Efeonce se suma al equipo interno de marketing y marca para convertir desafíos de negocio en decisiones creativas y sistemas que el equipo pueda ejecutar. Trabajamos estrategia y posicionamiento de marca, sistemas de identidad, conceptos y plataformas de campaña, mensajes, key visuals y toolkits multicanal, con dirección creativa y revisión humana. Conectamos investigación, criterio de marca y desarrollo creativo con un plan de despliegue que conserva contexto, prioridades y decisiones entre ciclos. Es una ruta pertinente para un rebranding, evolución de posicionamiento, lanzamiento o campaña que necesita coherencia entre equipos, formatos y mercados. El trabajo puede cubrir desde la definición hasta el despliegue, o un tramo delimitado en coordinación con el cliente y sus otros partners. Brief, responsables de aprobación, entregables, derechos de uso, capacidad y criterios de aceptación se acuerdan por iniciativa.",
+      "category": "Agencia creativa y estrategia de marca",
+      "verified": true
+    },
+    {
+      "name": "Producción Creativa a Escala",
+      "url": "https://efeoncepro.com/agencia-creativa-v2/",
+      "description": "Efeonce ayuda a equipos internos de marketing, marca y contenido a resolver demanda recurrente y picos de campañas mediante capacidad de producción definida, coordinación y control de calidad. Producimos y adaptamos piezas gráficas, contenido digital, audiovisual y motion según el alcance, con sistemas modulares, versionado, localización y continuidad de marca. Podemos ejecutar a partir de un concepto o key visual ya aprobado por el cliente u otra agencia, conservando su dirección y autoridad sobre la marca. La operación articula briefs, prioridades, aprobaciones, revisión humana, control de derechos y registro de decisiones y entregas. Es pertinente cuando el volumen de formatos o mercados supera la capacidad estable del equipo, hay un lanzamiento con backlog o la adaptación continua genera retrabajo. La capacidad, los formatos, las rondas, los responsables, los plazos y los criterios de aceptación se definen antes de producir.",
+      "category": "Producción creativa y operaciones de contenido",
+      "verified": true
+    }
+  ],
+  "personas": [
+    {
+      "name": "Dirección de Marketing y Growth",
+      "searchUrl": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3APERSONA%2Cvalues%3AList((id%3A1899654034%2CselectionType%3AINCLUDED)))))&viewAllFilters=true",
+      "criteria": {
+        "functions": [
+          "Marketing"
+        ],
+        "seniority": [
+          "Propietario/socio",
+          "Director ejecutivo",
+          "Vicepresidente",
+          "Director",
+          "Gerente con experiencia",
+          "Gerente sin experiencia"
+        ]
+      }
+    },
+    {
+      "name": "Producto Digital y Plataformas Web",
+      "searchUrl": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3APERSONA%2Cvalues%3AList((id%3A1991048345%2CselectionType%3AINCLUDED)))))&viewAllFilters=true",
+      "criteria": {
+        "currentJobTitles": [
+          "Director de productos digitales",
+          "Gerente de productos",
+          "Gerente superior de productos",
+          "Gerente principal de productos",
+          "Webmaster",
+          "Desarrollador superior de páginas web",
+          "Jefe de productos"
+        ]
+      }
+    },
+    {
+      "name": "Producción Creativa y Content Ops",
+      "searchUrl": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3APERSONA%2Cvalues%3AList((id%3A1991048337%2CselectionType%3AINCLUDED)))))&viewAllFilters=true",
+      "criteria": {
+        "currentJobTitles": [
+          "Director de producción creativa",
+          "Jefe del grupo creativo",
+          "Jefe del equipo creativo",
+          "Responsable de diseño creativo",
+          "Director creativo",
+          "Productor creativo",
+          "Productor de servicios creativos",
+          "Jefe de contenidos online",
+          "Jefe de contenidos",
+          "Director de contenidos"
+        ]
+      }
+    },
+    {
+      "name": "Marca y Estrategia Creativa",
+      "searchUrl": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3APERSONA%2Cvalues%3AList((id%3A1899654042%2CselectionType%3AINCLUDED)))))&viewAllFilters=true",
+      "criteria": {
+        "currentJobTitles": [
+          "Responsable superior de marca",
+          "Director de marca",
+          "Director nacional de marcas",
+          "Director de general de marcas",
+          "Responsable de marca",
+          "Director de estrategia de marca",
+          "Director de comunicaciones de marca",
+          "Director de marketing de marca"
+        ]
+      }
+    },
+    {
+      "name": "SEO y AEO | Orgánico y contenido",
+      "searchUrl": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3APERSONA%2Cvalues%3AList((id%3A1991048321%2CselectionType%3AINCLUDED)))))&viewAllFilters=true",
+      "criteria": {
+        "currentJobTitles": [
+          "Especialista en posicionamiento web",
+          "Analista de posicionamiento web",
+          "Director de posicionamiento web",
+          "Jefe de posicionamiento web",
+          "Responsable del equipo de posicionamiento web",
+          "Jefe de contenidos online",
+          "Jefe de contenidos",
+          "Director de contenidos"
+        ]
+      }
+    }
+  ],
+  "personaGeographyRestriction": false,
+  "personaConnectionRestriction": false,
+  "personaIndustryRestriction": false,
+  "smokeTests": [
+    {
+      "account": "BICE VIDA",
+      "persona": "SEO y AEO | Orgánico y contenido",
+      "resultCount": 2
+    },
+    {
+      "account": "BICE VIDA",
+      "persona": "Marca y Estrategia Creativa",
+      "resultCount": 4
+    },
+    {
+      "account": "BICE VIDA",
+      "persona": "Dirección de Marketing y Growth",
+      "resultCount": 11
+    }
+  ],
+  "evidencePhase": "initial_configuration_before_portfolio_expansion",
+  "supersededBy": "PORTAFOLIO-CONFIGURADO-2026-10-29.json"
+}

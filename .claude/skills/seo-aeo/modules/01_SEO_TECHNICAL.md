@@ -50,6 +50,12 @@ recuperar? → ¿se entiende? → ¿es rápido y estable?**
 
 - La URL Inspection API **observa** la versión conocida por el índice; no hace
   live test ni solicita indexación.
+- Pedir indexación de una URL concreta sólo se puede con el botón «Solicitar
+  indexación» de la interfaz (unas 10 por día y propiedad). Los agentes usan
+  `pnpm public-website:gsc-index request <url> [--apply]`: Chrome dedicado con
+  sesión de una persona, guarda de propiedad (la cuenta ve varios clientes) y
+  sólo pide si Google no vio el último cambio. Detalle en
+  `references/google-search-console-api-indexing.md`.
 - El sitemap ping legado fue retirado y responde `404`. Para páginas genéricas,
   no reemplazarlo con Indexing API: Google la limita a `JobPosting` y
   livestreams `BroadcastEvent` dentro de `VideoObject`.

@@ -1,10 +1,10 @@
 # Preguntas frecuentes del blog: diagnóstico y propuesta de bloque
 
 > **Tipo de documento:** Análisis y propuesta (no es decisión aceptada)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-10-24 por Claude (sesión de refresh del blog)
 > **Decisión vigente que toca:** [`CREATIVE_WORKFLOWS_FAQ_DISCLOSURE_DECISION_V1.md`](CREATIVE_WORKFLOWS_FAQ_DISCLOSURE_DECISION_V1.md) (2026-07-15)
-> **Estado:** el operador eligió la opción A con schema automático (2026-10-24). Construida y probada en local (§7); sin desplegar
+> **Estado:** en producción desde el 2026-10-24 (plugin 0.3.0 y cuatro posts migrados; §8)
 
 ## 1. Respuesta corta
 
@@ -70,6 +70,12 @@ La FAQ del blog cumple dos funciones: que el lector encuentre su pregunta de un 
 respuesta encuentren pares pregunta/respuesta limpios. El diseño sirve a la primera; el marcado, a la segunda.
 
 ### 3.1 Diseño (superficie clara del blog)
+
+> **Diseño vigente (0.4.2, 2026-10-24):** esta tabla es la propuesta original. Tras la revisión con La órbita, la
+> pregunta va en DM Sans 600 y en navy (blanco en oscuro), nunca en el acento, porque el acento sólo va en gráfico o en
+> texto de 24 px o más. El anillo del indicador toma el acento de la línea del tema del post (`--eo-line-on-light` /
+> `--eo-line-on-dark`) y **nunca se rellena**. Detalle en
+> [`BLOG_EDITORIAL_BLOCK_STYLES_V1.md`](BLOG_EDITORIAL_BLOCK_STYLES_V1.md) §Diseño.
 
 | Decisión | Valor propuesto | Por qué |
 |---|---|---|
@@ -191,7 +197,7 @@ El operador eligió la opción A y pidió que el schema fuera automático. Se re
 | Schema automático | `wpseo_schema_graph_pieces` + `wpseo_schema_webpage` | El `WebPage` de Yoast suma `FAQPage` y `mainEntity`; un `Question` por bloque, respuesta = texto visible |
 | Guarda de transición | `EO_Faq::has_inline_faqpage` | Un post con FAQPage pegado lo conserva y no recibe nodos generados: nunca dos FAQPage |
 | Apagado | opción `eo_faq_schema_enabled` = 0 | Quita el schema generado; el estilo sigue |
-| Content Factory | `article-authoring.ts` | `kind: "faq"` emite el estilo siempre; `schema.source: "plugin"` omite el JSON-LD (default `inline` hasta el despliegue); rechaza preguntas repetidas |
+| Content Factory | `article-authoring.ts` | `kind: "faq"` emite el estilo siempre; `schema.source` es `plugin` por defecto desde el despliegue (sin JSON-LD en el contenido) e `inline` sólo si se pide; rechaza preguntas repetidas |
 | Despliegue | `deploy-blog-v3-content-model-package.php` | Allowlist ampliada a `includes/faq/` |
 
 **Verificado:**
@@ -212,3 +218,47 @@ el despliegue real.
 **Para salir a producción** (requiere aprobación): desplegar el plugin 0.3.0 con el paquete gobernado, reescribir los
 cuatro posts con `schema.source: "plugin"` (sale el `core/html`, entra el estilo) con snapshot y guardas, cambiar el
 default de Content Factory a `plugin` y hacer QA en vivo del grafo y la vista.
+
+## 8. En producción (2026-10-24)
+
+**Plugin.** `efeonce-editorial-blocks` 0.3.0 quedó en vivo a las 13:42 UTC dentro del despliegue que hizo la sesión de
+la portada del blog (runtime `970986a`, que contiene `e2bd1e4`). Los hashes vivos de `efeonce-editorial-blocks.php` e
+`includes/faq/*` coinciden con el commit y el estilo quedó registrado. No hice un segundo despliegue. El paquete
+completo habría llevado además su `class-eo-home-adapter.php`, que entonces no estaba en vivo: no se armó.
+
+**Migración.** Se hizo con `scripts/public-website/blog-faq-migrate-to-plugin-schema.php`, previa coordinación con
+esa sesión, que no tenía nada en vuelo sobre estos posts. El script:
+
+- corre primero en modo de prueba (dry run) y luego aplica con guarda de `post_modified_gmt` y sha256;
+- hace ediciones textuales locales, sin volver a serializar el contenido;
+- exige paridad de preguntas y respuestas entre el schema pegado y el que arma el plugin.
+
+| Post | Preguntas | Snapshot de rollback |
+|---|---|---|
+| 244765 inbound | 5 | `_gh_faq_migration_244765_20261024_134500` |
+| 245154 topic clusters | 5 | `_gh_faq_migration_245154_20261024_134501` |
+| 245605 paid media | 5 (el sexto desplegable no es FAQ y no se tocó) | `_gh_faq_migration_245605_20261024_134502` |
+| 251363 Creative Workflows | 4 | `_gh_faq_migration_251363_20261024_134503` |
+
+Paridad exacta en los cuatro, sin avisos sobre título, slug, fecha, autor, términos ni metas; caché de Kinsta purgada.
+
+**QA en vivo.** En los cuatro posts responde 200, sin errores de PHP ni de JS:
+
+- un único nodo `FAQPage`, que es el `WebPage` de Yoast (`WebPage`, `ItemPage`, `FAQPage`);
+- un `Question` por pregunta visible, con su texto idéntico al del `summary`, en orden, con `@id` igual al ancla, y
+  `mainEntity` completo;
+- el `Article` sigue apuntando a la página;
+- CSS y JS cargados.
+
+En el navegador, a 1280 y 390 px, y en claro y oscuro (sólo inbound):
+
+- pregunta de 74 px de alto, en DM Sans, de 19 px en escritorio y 17 px en el celular, sin scroll horizontal;
+- un enlace `#faq-…` abre la pregunta y la deja a la vista;
+- Enter abre la pregunta y el foco se ve.
+
+`pnpm public-website:blog-home verify` sigue verde.
+
+**Content Factory.** `schema.source` es `plugin` por defecto: un post nuevo ya no lleva JSON-LD pegado.
+
+**Pendiente:** lectura con VoiceOver; revisar el estilo dentro del editor de WordPress. Un editor puede elegir
+«Pregunta frecuente» en cualquier desplegable, y eso basta para que entre al schema.

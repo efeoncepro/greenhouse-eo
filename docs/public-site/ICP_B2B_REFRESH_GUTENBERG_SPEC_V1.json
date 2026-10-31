@@ -1,0 +1,946 @@
+{
+ "title": "ICP B2B: cómo definir tu cliente ideal, con ejemplos y plantilla",
+ "slug": "cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd",
+ "excerpt": "Qué es un ICP en B2B, en qué se diferencia del buyer persona, tres ejemplos redactados y una plantilla con los campos que sirven para decidir a qué cuentas no perseguir.",
+ "seo": {
+  "title": "ICP B2B: qué es, ejemplos y plantilla para tu cliente ideal | Efeonce",
+  "description": "Qué es un ICP en B2B, en qué se diferencia del buyer persona, tres ejemplos redactados y una plantilla con los campos que sirven para descartar cuentas.",
+  "canonicalUrl": "https://efeoncepro.com/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/",
+  "inLanguage": "es-CL",
+  "indexPolicy": "index"
+ },
+ "intro": [
+  "Casi todos los equipos B2B tienen un documento que se llama «cliente ideal». Lo hicieron en un taller, tiene una persona con nombre y foto de stock, y nadie lo abrió desde entonces.",
+  [
+   {
+    "text": "El problema no es que el documento esté mal. Es que responde una pregunta distinta a la que importa. "
+   },
+   {
+    "text": "Un ICP no sirve para describir a tu mejor cliente: sirve para decidir a qué empresas no vas a perseguir.",
+    "strong": true
+   }
+  ],
+  "En esta guía parto por esa definición, la comparo con el buyer persona y después la llevo a algo que puedes usar: tres ejemplos redactados, una plantilla y cómo dejarlo en tu CRM."
+ ],
+ "tableOfContents": true,
+ "sections": [
+  {
+   "heading": "¿Qué es un ICP en B2B?",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "El ICP (Ideal Customer Profile, o perfil de cliente ideal) es la descripción del tipo de empresa que puede comprarte, sacarle valor a lo que vendes y quedarse contigo el tiempo suficiente para que la relación sea rentable.",
+       "strong": true
+      },
+      {
+       "text": " Describe cuentas, no personas: industria, tamaño, madurez, el problema que tienen y lo que las hace comprar ahora."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Un buen ICP se reconoce porque te deja decir que no. Si cualquier empresa «mediana y en crecimiento» calza, todavía no tienes un ICP: tienes una aspiración."
+    },
+    {
+     "kind": "list",
+     "style": "box",
+     "items": [
+      [
+       {
+        "text": "Es",
+        "strong": true
+       },
+       {
+        "text": ": un filtro con criterios que alguien de tu equipo puede verificar en una cuenta concreta."
+       }
+      ],
+      [
+       {
+        "text": "No es",
+        "strong": true
+       },
+       {
+        "text": ": «empresas B2B medianas», ni la lista de las marcas que te gustaría tener en tu portafolio."
+       }
+      ],
+      [
+       {
+        "text": "Sale de",
+        "strong": true
+       },
+       {
+        "text": ": tus mejores y tus peores clientes, no del deseo de dónde te gustaría vender."
+       }
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "ICP vs. buyer persona: cuál es la diferencia",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "El ICP elige la empresa; el buyer persona describe a las personas que deciden dentro de ella. Se necesitan los dos, pero responden preguntas distintas y viven en lugares distintos del CRM:"
+    },
+    {
+     "kind": "table",
+     "style": "efeonce",
+     "headers": [
+      "",
+      "ICP",
+      "Buyer persona"
+     ],
+     "rows": [
+      [
+       "Describe",
+       "Una empresa",
+       "Un rol dentro de la empresa"
+      ],
+      [
+       "Pregunta que responde",
+       "¿Vale la pena perseguir esta cuenta?",
+       "¿Cómo le hablo a quien decide?"
+      ],
+      [
+       "Se construye con",
+       "Datos de la cuenta: industria, tamaño, stack, resultados de clientes actuales",
+       "Entrevistas, llamadas de venta, objeciones reales"
+      ],
+      [
+       "Lo usa más",
+       "Ventas y quien prioriza la prospección",
+       "Marketing y quien escribe el contenido"
+      ],
+      [
+       "Vive en el CRM como",
+       "Propiedad de la empresa",
+       "Propiedad del contacto"
+      ],
+      [
+       "Error típico",
+       "Describir una persona y llamarla ICP",
+       "Hablarle bien a la persona correcta de la empresa equivocada"
+      ]
+     ]
+    },
+    {
+     "kind": "pullquote",
+     "text": [
+      {
+       "text": "ICP sin buyer persona es frío. "
+      },
+      {
+       "text": "Buyer persona sin ICP es disperso.",
+       "strong": true
+      }
+     ]
+    },
+    {
+     "kind": "image",
+     "mediaId": 252096,
+     "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-cuatro-capas-desktop-light.svg",
+     "alt": "Infografía: una cuenta, el ICP, definida por industria, tamaño, madurez, problema y trigger, contiene a su grupo de compra de seis roles. Una órbita marca a quien tiene el problema como el IPP, la persona por la que se entra. Abajo, el job de la cuenta: «Cerrar cada mes sin errores ni horas extra».",
+     "width": 1600,
+     "height": 1030,
+     "sizeSlug": "full",
+     "caption": "El ICP elige la empresa; el grupo de compra, el IPP y el job viven dentro de ella.",
+     "sources": [
+      {
+       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-cuatro-capas-mobile-light.svg",
+       "media": "(max-width: 860px)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Ejemplos de ICP B2B",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Tres ejemplos redactados como los escribiría un equipo comercial. Son ilustrativos, no clientes reales, y cada uno tiene lo que más se olvida: qué hace que la cuenta compre ahora y a quién descartas."
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Ejemplo 1 · Software de gestión de personas que vende a otras empresas.",
+       "strong": true
+      }
+     ]
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Cuenta",
+        "strong": true
+       },
+       {
+        "text": ": empresas de 200 a 2.000 trabajadores en Chile, Perú y Colombia, con un área de personas de cinco o más y procesos de remuneraciones y vacaciones en planillas."
+       }
+      ],
+      [
+       {
+        "text": "Qué la hace comprar ahora",
+        "strong": true
+       },
+       {
+        "text": ": la dotación creció más de 20 % en un año, hubo una fusión o cambió el gerente de personas."
+       }
+      ],
+      [
+       {
+        "text": "Señales que se pueden verificar",
+        "strong": true
+       },
+       {
+        "text": ": vacantes de analistas de personas, anuncios de expansión, el gerente nuevo en LinkedIn."
+       }
+      ],
+      [
+       {
+        "text": "Anti-ICP",
+        "strong": true
+       },
+       {
+        "text": ": menos de 100 trabajadores (la planilla todavía alcanza) o filiales que usan el sistema que impone su casa matriz."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Ejemplo 2 · Fabricante de insumos industriales que vende a través de distribuidores.",
+       "strong": true
+      }
+     ]
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Cuenta",
+        "strong": true
+       },
+       {
+        "text": ": distribuidores regionales con tres o más sucursales, una línea de productos complementaria y cobertura en zonas donde el fabricante no llega directo."
+       }
+      ],
+      [
+       {
+        "text": "Qué la hace comprar ahora",
+        "strong": true
+       },
+       {
+        "text": ": el distribuidor perdió la marca de un competidor o va a abrir una sucursal."
+       }
+      ],
+      [
+       {
+        "text": "Señales que se pueden verificar",
+        "strong": true
+       },
+       {
+        "text": ": cambios en su catálogo, avisos de nuevas sucursales, rotación de su equipo de ventas."
+       }
+      ],
+      [
+       {
+        "text": "Anti-ICP",
+        "strong": true
+       },
+       {
+        "text": ": distribuidores que compiten sólo por precio con producto importado y no invierten en vender."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Ejemplo 3 · Consultora de ciberseguridad.",
+       "strong": true
+      }
+     ]
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Cuenta",
+        "strong": true
+       },
+       {
+        "text": ": empresas reguladas, como financieras o de salud, de 300 o más personas, sin un responsable de seguridad a tiempo completo o con un equipo de una o dos personas."
+       }
+      ],
+      [
+       {
+        "text": "Qué la hace comprar ahora",
+        "strong": true
+       },
+       {
+        "text": ": una auditoría con observaciones, un incidente en su industria o una exigencia regulatoria nueva."
+       }
+      ],
+      [
+       {
+        "text": "Señales que se pueden verificar",
+        "strong": true
+       },
+       {
+        "text": ": vacantes de seguridad abiertas por meses, licitaciones, cambios en el directorio."
+       }
+      ],
+      [
+       {
+        "text": "Anti-ICP",
+        "strong": true
+       },
+       {
+        "text": ": empresas que buscan sólo marcar el casillero de cumplimiento al menor precio."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Fíjate en que ninguno describe a una persona. Los tres dicen qué tipo de empresa es, qué cambió en ella y cómo lo sabrías sin preguntarle."
+    }
+   ]
+  },
+  {
+   "heading": "Plantilla de ICP",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Copia esta tabla en tu documento de ventas y llénala con tu equipo. La columna de ejemplo usa el primer caso."
+    },
+    {
+     "kind": "table",
+     "style": "efeonce",
+     "headers": [
+      "Campo",
+      "Qué escribir",
+      "Ejemplo"
+     ],
+     "rows": [
+      [
+       "Segmento",
+       "Industria o tipo de negocio",
+       "Empresas con área de personas propia"
+      ],
+      [
+       "Tamaño",
+       "Banda de trabajadores, con fuente",
+       "200 a 2.000 trabajadores"
+      ],
+      [
+       "Geografía",
+       "Países o regiones donde puedes entregar",
+       "Chile, Perú y Colombia"
+      ],
+      [
+       "Madurez",
+       "Qué procesos y herramientas tienen hoy",
+       "Remuneraciones en planillas"
+      ],
+      [
+       "Problema",
+       "Qué les duele y cuánto les cuesta no resolverlo",
+       "Errores en liquidaciones, horas de cierre"
+      ],
+      [
+       "Trigger",
+       "Qué cambia para que compren ahora",
+       "Crecimiento de dotación, fusión"
+      ],
+      [
+       "Señales",
+       "Cómo lo verificas y dónde",
+       "Vacantes, prensa, LinkedIn"
+      ],
+      [
+       "Capacidad de compra",
+       "Si tienen presupuesto y quién lo libera",
+       "Gerencia de personas con presupuesto propio"
+      ],
+      [
+       "Grupo de compra",
+       "Qué roles participan en la decisión",
+       "Personas, finanzas, TI"
+      ],
+      [
+       "Anti-ICP",
+       "A quién descartas y por qué",
+       "Menos de 100 trabajadores"
+      ],
+      [
+       "Evidencia",
+       "Qué clientes actuales respaldan esta definición",
+       "Los cinco clientes con más renovación"
+      ],
+      [
+       "Revisión",
+       "Quién la mantiene y cuándo se vuelve a mirar",
+       "Gerente comercial, cada seis meses"
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Después, puntúa cada cuenta de 0 a 3 en cuatro criterios: problema, trigger, capacidad de compra y acceso a quienes deciden. Las que suman poco no se descartan para siempre: pasan a contenido y se vuelven a mirar cuando aparece un trigger."
+    },
+    {
+     "kind": "image",
+     "mediaId": 252100,
+     "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-filtro-de-cuentas-desktop-light.svg",
+     "alt": "Infografía: cuatro grillas de 30 empresas. La primera muestra todo el mercado; la segunda, sólo las que calzan con el ICP; la tercera, las que además tienen un trigger reciente; la cuarta, las tres que además tienen identificado su grupo de compra. Las que quedan fuera pasan a contenido hasta que aparece un trigger.",
+     "width": 1600,
+     "height": 790,
+     "sizeSlug": "full",
+     "caption": "Cada filtro deja menos cuentas. Proporciones ilustrativas.",
+     "sources": [
+      {
+       "url": "https://efeoncepro.com/wp-content/uploads/2026/10/icp-filtro-de-cuentas-mobile-light.svg",
+       "media": "(max-width: 860px)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Cómo definir tu ICP en cinco pasos",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "ordered": true,
+     "style": "steps",
+     "items": [
+      "Haz la lista de tus clientes actuales y márcalos: los que compraron rápido, renovaron y fueron rentables, y los que costaron más de lo que dejaron.",
+      "Busca qué tienen en común los primeros y no tienen los segundos: tamaño, industria, madurez, el problema con que llegaron.",
+      "Identifica qué pasó justo antes de que compraran. Ese es tu trigger, y suele valer más que cualquier dato firmográfico.",
+      "Escribe el anti-ICP con la misma precisión: qué cuentas se ven atractivas y terminan mal.",
+      "Contrasta la definición con ventas y con quien entrega el servicio, y ponle fecha de revisión."
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Si no tienes clientes suficientes para comparar, parte con una hipótesis explícita y trátala como tal: anota qué la respaldaría y qué la desmentiría, y revísala con las primeras diez oportunidades."
+    }
+   ]
+  },
+  {
+   "heading": "Buyer personas y grupo de compra: quién decide",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Con el ICP sabes qué empresa perseguir. Dentro de ella, rara vez decide una sola persona: según una "
+      },
+      {
+       "text": "encuesta de Gartner a 632 compradores B2B",
+       "href": "https://www.gartner.com/en/newsroom/press-releases/2025-05-07-gartner-sales-survey-finds-74-percent-of-b2b-buyer-teams-demonstrate-unhealthy-conflict-during-the-decision-process"
+      },
+      {
+       "text": " publicada en mayo de 2025, los grupos de compra van de 5 a 16 personas, de hasta cuatro áreas distintas."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Por eso el buyer persona útil se construye desde el rol que cumple cada persona en la decisión, no desde su edad o sus hobbies:"
+    },
+    {
+     "kind": "list",
+     "style": "box",
+     "items": [
+      [
+       {
+        "text": "Quien tiene el problema",
+        "strong": true
+       },
+       {
+        "text": ": responde por él y lo vive todos los días."
+       }
+      ],
+      [
+       {
+        "text": "Quien evalúa",
+        "strong": true
+       },
+       {
+        "text": ": define los requisitos y compara opciones."
+       }
+      ],
+      [
+       {
+        "text": "Quien libera el presupuesto",
+        "strong": true
+       },
+       {
+        "text": ": puede aprobar, postergar o vetar la compra."
+       }
+      ],
+      [
+       {
+        "text": "Quien puede bloquear",
+        "strong": true
+       },
+       {
+        "text": ": finanzas, legal, compras o TI, por riesgo o por política."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "El mismo estudio trae un dato que cambia cómo se escribe el contenido: los grupos que llegaron a consenso fueron 2,5 veces más propensos a reportar un buen negocio, y el contenido pensado para el grupo ayudó a ese consenso, mientras que el pensado sólo para una persona lo dificultó. "
+      },
+      {
+       "text": "Un buyer persona sirve para entender a cada persona, pero el mensaje tiene que funcionarle al grupo.",
+       "strong": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "A quién convencer primero: el champion (lo que en Efeonce llamamos IPP)",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "Con cinco o más personas en la decisión, no puedes hablarles a todas al mismo tiempo. En Efeonce llamamos IPP (Ideal Prospect Person) a la persona que conviene convencer primero, porque si ella avanza, el proceso avanza. En la literatura de ventas se le dice champion."
+    },
+    {
+     "kind": "paragraph",
+     "text": "El IPP no siempre es el cargo más alto y casi nunca es quien firma. Lo reconoces por lo que hace dentro de su empresa, no por su título:"
+    },
+    {
+     "kind": "list",
+     "items": [
+      "te presenta a las personas del grupo de compra que todavía no conoces;",
+      "te cuenta los criterios y los riesgos con que los van a evaluar;",
+      "arma el caso interno o te pide los datos para armarlo;",
+      "anticipa las objeciones del comité y organiza el siguiente paso."
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Interés, simpatía o muchas reuniones no bastan. Si la persona que te parece el IPP no hace ninguna de estas cosas, todavía no lo es."
+    }
+   ]
+  },
+  {
+   "heading": "Jobs to Be Done: por qué compra",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "El ICP dice qué empresa, el buyer persona dice quién decide y el IPP dice por dónde entrar. Falta el porqué. Ahí entra Jobs to Be Done, la idea que Clayton Christensen y sus coautores explicaron en "
+      },
+      {
+       "text": "Harvard Business Review en 2016",
+       "href": "https://hbr.org/2016/09/know-your-customers-jobs-to-be-done"
+      },
+      {
+       "text": ": las personas no compran productos, los «contratan» para lograr un progreso en una situación concreta, y los «despiden» si no lo logran."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Tony Ulwick lo llevó a un método más operativo, "
+      },
+      {
+       "text": "Outcome-Driven Innovation",
+       "href": "https://strategyn.com/jobs-to-be-done/"
+      },
+      {
+       "text": ", que mide qué resultados espera quien hace ese trabajo. Para un ICP B2B basta con algo más simple: escribir el trabajo de la cuenta en una frase."
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Con el primer ejemplo de arriba:"
+    },
+    {
+     "kind": "pullquote",
+     "text": [
+      {
+       "text": "Cuando la empresa crece más rápido que su área de personas, quiero sacar las remuneraciones de las planillas "
+      },
+      {
+       "text": "para cerrar cada mes sin errores ni horas extra.",
+       "strong": true
+      }
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "El job te dice qué prometer y contra qué te comparan: contra la planilla, contra contratar a otra persona o contra no hacer nada. Si tu contenido no habla de ese progreso, compite sólo por funcionalidades."
+    }
+   ]
+  },
+  {
+   "heading": "Cómo llevar tu ICP a HubSpot",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Un ICP que no está en el CRM no se usa, y un CRM sin criterios de cuenta termina siendo una agenda de contactos (de eso va "
+      },
+      {
+       "text": "cómo transformar tu CRM en un motor de crecimiento",
+       "href": "https://efeoncepro.com/hubspot/5-pasos-para-transformar-tu-crm-en-motor-de-crecimiento/"
+      },
+      {
+       "text": "). HubSpot ya trae propiedades para esto en su "
+      },
+      {
+       "text": "configuración de account-based marketing",
+       "href": "https://knowledge.hubspot.com/branding/get-started-with-account-based-marketing-in-hubspot"
+      },
+      {
+       "text": ":"
+      }
+     ]
+    },
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "En la empresa",
+        "strong": true
+       },
+       {
+        "text": ": «Ideal Customer Profile Tier», con tres niveles de cercanía al ICP, y «Target account» para marcar las cuentas que vas a trabajar. Suma una propiedad propia para el motivo de anti-ICP."
+       }
+      ],
+      [
+       {
+        "text": "En el contacto",
+        "strong": true
+       },
+       {
+        "text": ": «Buying role», el rol de cada persona en la decisión. Ahí marcas a quien libera el presupuesto, a quien decide y a tu champion o IPP."
+       }
+      ],
+      [
+       {
+        "text": "En el negocio",
+        "strong": true
+       },
+       {
+        "text": ": el trigger que abrió la oportunidad y el job que quieren resolver, como propiedades de texto o selección."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Con eso puedes separar el encaje de la cuenta del interés que muestra, y ver qué cuentas de nivel 1 todavía no tienen a nadie del grupo de compra identificado. Si estás ordenando el CRM, sigue con "
+      },
+      {
+       "text": "cómo armar un pipeline de ventas",
+       "href": "https://efeoncepro.com/hubspot/pipeline-de-ventas/"
+      },
+      {
+       "text": ". Y si prefieres configurarlo con nosotros, así trabajamos "
+      },
+      {
+       "text": "HubSpot en Efeonce",
+       "href": "https://efeoncepro.com/servicios-contratar-hubspot/",
+       "mention": {
+        "line": "revenue-hubspot"
+       }
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Checklist: ¿tienes bien definido a tu cliente ideal?",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "style": "box",
+     "items": [
+      "Tu ICP describe empresas, no personas.",
+      "Puedes nombrar tres cuentas que no son ICP y explicar por qué.",
+      "Sabes qué trigger hace que una cuenta compre ahora.",
+      "Tienes identificados los roles del grupo de compra, no sólo un decisor.",
+      "Sabes quién es el IPP en tus oportunidades abiertas.",
+      "Puedes escribir el job de la cuenta en una frase.",
+      "El ICP está en tu CRM y tiene fecha de revisión."
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": [
+      {
+       "text": "Si tu ICP está claro, el siguiente paso es el contenido que lo atrae. En "
+      },
+      {
+       "text": "qué es el inbound marketing",
+       "href": "https://efeoncepro.com/inbound/que-es-inbound-marketing/"
+      },
+      {
+       "text": " y en "
+      },
+      {
+       "text": "topic clusters y contenido pilar",
+       "href": "https://efeoncepro.com/inbound/seo-inbound-marketing/"
+      },
+      {
+       "text": " está cómo ordenarlo; y si trabajas con Loop Marketing de HubSpot, la etapa de definición parte justamente por aquí: "
+      },
+      {
+       "text": "Express, la voz de marca en Loop Marketing",
+       "href": "https://efeoncepro.com/loop-marketing/express-voz-marca-ia-loop-marketing/"
+      },
+      {
+       "text": "."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Preguntas frecuentes sobre el ICP",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "faq",
+     "schema": {
+      "enabled": true,
+      "name": "Preguntas frecuentes sobre el ICP B2B",
+      "canonicalUrl": "https://efeoncepro.com/growth/cliente-ideal-b2b-icp-buyer-persona-ipp-jtbd/",
+      "inLanguage": "es-CL",
+      "source": "plugin"
+     },
+     "items": [
+      {
+       "question": "¿Qué es un ICP en marketing?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Es el perfil del tipo de empresa a la que marketing debería atraer: la que puede comprar, sacarle valor a lo que vendes y quedarse. Marketing lo usa para decidir dónde invertir y qué cuentas no perseguir."
+        }
+       ]
+      },
+      {
+       "question": "¿Qué es un ICP en ventas?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Es el mismo perfil, usado para priorizar la prospección y calificar oportunidades: una cuenta que calza con el ICP y tiene un trigger reciente merece tiempo de ventas; una que no calza, no."
+        }
+       ]
+      },
+      {
+       "question": "¿Cuál es la diferencia entre ICP y buyer persona?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "El ICP describe una empresa; el buyer persona describe un rol dentro de esa empresa. El primero decide a qué cuenta perseguir y el segundo, cómo hablarle a quien decide."
+        }
+       ]
+      },
+      {
+       "question": "¿Cuántos ICP puede tener una empresa?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Tantos como líneas de negocio con un comprador distinto, pero cada uno con sus propios criterios y su anti-ICP. Si tienes cinco ICP para una sola oferta, probablemente tienes uno mal definido."
+        }
+       ]
+      },
+      {
+       "question": "¿Qué es un anti-ICP?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Es la descripción de las cuentas que se ven atractivas pero terminan mal: compran poco, se van pronto o cuestan más de lo que dejan. Escribirlo es lo que hace que el ICP sirva para descartar."
+        }
+       ]
+      },
+      {
+       "question": "¿Qué es un IPP?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Es el nombre que usamos en Efeonce para la persona del grupo de compra que conviene convencer primero, lo que en ventas se llama champion. Se reconoce por lo que hace dentro de su empresa, no por su cargo."
+        }
+       ]
+      },
+      {
+       "question": "¿Cada cuánto se revisa el ICP?",
+       "answer": [
+        {
+         "kind": "paragraph",
+         "text": "Al menos dos veces al año, y siempre que cambie la oferta, el precio o el mercado. Si las oportunidades que calzan con el ICP dejan de cerrar, no esperes la fecha."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "En resumen",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "paragraph",
+     "text": "El ICP elige la empresa, el buyer persona describe a quienes deciden, el IPP te dice por dónde entrar y el job explica por qué compran. Ordenados sobre una misma cuenta, dejan de ser documentos y se vuelven criterios para decidir dónde poner el tiempo de marketing y de ventas."
+    },
+    {
+     "kind": "list",
+     "style": "box",
+     "items": [
+      [
+       {
+        "text": "Si quieres seguir esta conversación, lee "
+       },
+       {
+        "text": "Glitch",
+        "href": "https://efeoncepro.com/category/glitch/"
+       },
+       {
+        "text": ": cada lunes, una idea sobre IA, marketing y negocios."
+       }
+      ],
+      [
+       {
+        "text": "Revisa cómo te describen hoy los asistentes de IA con el "
+       },
+       {
+        "text": "Efeonce AI Visibility Report",
+        "href": "https://think.efeoncepro.com/brand-visibility",
+        "mention": {
+         "line": "growth"
+        }
+       },
+       {
+        "text": ", gratuito."
+       }
+      ],
+      [
+       {
+        "text": "Y si quieres definir tu ICP y llevarlo a tu CRM con un equipo que lo hace todos los días, conoce nuestro "
+       },
+       {
+        "text": "servicio de inbound marketing",
+        "href": "https://efeoncepro.com/agencia-inbound-marketing/",
+        "mention": {
+         "line": "revenue-hubspot"
+        }
+       },
+       {
+        "text": "."
+       }
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Fuentes y nota de actualización",
+   "level": 2,
+   "blocks": [
+    {
+     "kind": "list",
+     "items": [
+      [
+       {
+        "text": "Gartner (2025). "
+       },
+       {
+        "text": "Gartner Sales Survey Finds 74% of B2B Buyer Teams Demonstrate “Unhealthy Conflict” During the Decision Process",
+        "href": "https://www.gartner.com/en/newsroom/press-releases/2025-05-07-gartner-sales-survey-finds-74-percent-of-b2b-buyer-teams-demonstrate-unhealthy-conflict-during-the-decision-process"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Christensen, C., Hall, T., Dillon, K. y Duncan, D. (2016). "
+       },
+       {
+        "text": "Know Your Customers’ “Jobs to Be Done”",
+        "href": "https://hbr.org/2016/09/know-your-customers-jobs-to-be-done"
+       },
+       {
+        "text": ". Harvard Business Review."
+       }
+      ],
+      [
+       {
+        "text": "Strategyn. "
+       },
+       {
+        "text": "Jobs-to-be-Done y Outcome-Driven Innovation",
+        "href": "https://strategyn.com/jobs-to-be-done/"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "HubSpot. "
+       },
+       {
+        "text": "Set up account-based marketing in HubSpot",
+        "href": "https://knowledge.hubspot.com/branding/get-started-with-account-based-marketing-in-hubspot"
+       },
+       {
+        "text": "."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "paragraph",
+     "text": "Este artículo se publicó en febrero de 2026 con el título «5 pasos para definir a tu cliente ideal» y se reescribió en octubre de 2026: se puso la definición del ICP al inicio, se sumaron tres ejemplos de ICP, una plantilla y cómo llevarlo a HubSpot; se reemplazó un dato de un agregador por el estudio de Gartner de 2025 y se aclaró que IPP es el nombre que usamos en Efeonce para el champion. Lo desarrolló Julio Reyes con apoyo de IA en investigación, estructura y edición; Julio definió la tesis y aprobó la versión final."
+    }
+   ]
+  }
+ ]
+}

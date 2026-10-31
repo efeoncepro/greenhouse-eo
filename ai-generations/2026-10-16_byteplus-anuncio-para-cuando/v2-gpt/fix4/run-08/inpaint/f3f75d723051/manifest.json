@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "f3f75d723051",
+  "key": "f3f75d72305169822c442458035bf48e7f061a1bd80ac868770277d4647b584a",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:35:40.810Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/S08-vaso.png",
+    "imageSha256": "ca5416b43b8189c291097ebd1a56f0004e6919d7515122b30fa4c22351ffef7c",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/08.png",
+    "maskSha256": "508883c8e4e05e7f831a8e4d6b2e9540c6cbbf559878d6d09ccf40c9bfaec3b9",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked zones. Right edge foreground, out of focus: the back of the man's head with short dark wavy hair and the shoulder of his deep navy bomber jacket, seen from behind (over-the-shoulder), same blur as a foreground at 85mm. On top of the woman's head: slim gold-rimmed metal reading glasses (not tortoiseshell). Keep the woman's face and everything outside the zones unchanged. Photorealistic.",
+    "providerPrompt": "Replace only the marked zones. Right edge foreground, out of focus: the back of the man's head with short dark wavy hair and the shoulder of his deep navy bomber jacket, seen from behind (over-the-shoulder), same blur as a foreground at 85mm. On top of the woman's head: slim gold-rimmed metal reading glasses (not tortoiseshell). Keep the woman's face and everything outside the zones unchanged. Photorealistic."
+  },
+  "mask": {
+    "touchedFraction": 0.11927261352539062,
+    "editable": 138317,
+    "soft": 18016,
+    "protected": 1154387
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 39.27,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.42,
+        "bestError": 3.42,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1154387,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 138317,
+        "maxDelta": 159,
+        "meanDelta": 42.911,
+        "worst": {
+          "x": 930,
+          "y": 385
+        }
+      },
+      "seam": {
+        "pixels": 18016,
+        "maxDelta": 149,
+        "meanDelta": 11.316,
+        "worst": {
+          "x": 926,
+          "y": 383
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1154387,
+        "maxDelta": 198,
+        "meanDelta": 8.626,
+        "worst": {
+          "x": 442,
+          "y": 263
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1415,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 135
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 2925
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

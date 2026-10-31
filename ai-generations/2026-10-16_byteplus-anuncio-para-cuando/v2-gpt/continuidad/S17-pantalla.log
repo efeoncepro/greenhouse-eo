@@ -1,0 +1,3 @@
+  ★ usando gpt-image-2.5-flare (default, verificado con máscara). Para la pieza final: --model gpt-image-2.5-sunburst, el más potente de OpenAI, el de las piezas de mayor impacto (#1 en edición en Arena y Artificial Analysis).
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+exit=1

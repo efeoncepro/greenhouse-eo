@@ -189,11 +189,12 @@ anillo del eyebrow, el punto del título y la flecha del botón son piel de la l
 contrato. No se admite: HTML del autor, otros marcadores, anchos en columnas distintas de dos, ni la colocación
 interruptiva `popup_modal` (sigue sin implementar).
 
-**Render (TASK-2045, code complete 2026-10-23; renderers formularios `1.1.0` y CTA `1.4.0`).** Llega a los hosts con
-el próximo release de Greenhouse a `main` (el `prebuild` construye `renderer-latest.js`). Hasta entonces el renderer
-publicado ignora `width`, `consent.presentation` e `icon`, omite `dismiss` y el CTA abre `dialog` inline; ninguno rompe.
-**Excepción:** el renderer anterior muestra `{privacyLink}` literal: no publicar una versión con el marcador antes del
-release.
+**Render (TASK-2045; en producción desde el release del 2026-10-24: formularios `1.2.0`, que incluye lo de `1.1.0`, y
+CTA `1.4.0`).** Primer consumidor en vivo: el popup «Quiero ser partner» de `/partnership/` (formulario
+`efeonce-partner-application`, CTA `partners-become-partner`). Un host que fije un bundle anterior a `1.1.0` ignora
+`width`, `consent.presentation` e `icon`, omite `dismiss`, abre `dialog` inline y muestra `{privacyLink}` literal.
+**Defecto conocido:** cerrar el diálogo con el primer campo enfocado dispara `gh_form_field_validation_failed` (la
+validación del blur corre sobre el campo vacío); pendiente de corregir en el renderer.
 
 Piel del anfitrión (sólo tokens y hooks; nunca selectores internos):
 
@@ -234,6 +235,9 @@ verificación (ver «Estado de verificación»).
 | `eventRegistration.statusField` | default `registration_status`; no puede ser un campo declarado | no | `event_registration_status_field_taken` |
 | `eventRegistration.showRegistrationsCount` | `false` (default) · `true` | no | ídem |
 | `eventRegistration.registrationsCountThreshold` | default 25 | no | ídem |
+| `eventRegistration.event` | `{ title, startUtc (ISO UTC), timezone (IANA), durationMin, modality: online·presencial·hibrido, venue?, pageUrl (https) }`, estricto | **no** | `event_registration_invalid` |
+| `eventRegistration.joinUrl` | https; enlace privado de la sala. Viaja SÓLO en los correos | **no** | ídem |
+| `eventRegistration.reminderMinutesBefore` | entero; default 120 | no | ídem |
 
 `eventRegistration` sólo en `form_kind: 'event_registration'` (`event_registration_wrong_kind`) y con un campo `email`.
 Etiquetas por defecto del renderer (es-CL): suscripción «Suscribirme» / «Suscribirme» / «¡Listo!» / «Ya estás suscrito»;
@@ -244,12 +248,31 @@ Publicar un evento: `pnpm growth:forms:publish-event-registration -- --config <j
 defecto con el compiler real; ejemplo `scripts/growth/forms/examples/webinar-aeo-2026-11-12.json`). No crea destinos:
 el destino HubSpot de cada evento va por el registry de destinos.
 
+Para un evento completo usar el lanzador, que compone todo lo anterior con el destino y WordPress:
+`pnpm events:launch -- --brief <json> [--apply]` (manual: `docs/manual-de-uso/public-site/lanzar-evento-o-webinar.md`).
+
 ### Envío y lista de espera
 
 `POST …/submit` sin cambios de forma. Con política de reserva la respuesta suma `registrationStatus: 'confirmed' |
 'waitlisted'`; con el cupo lleno y `reject` responde `409 { outcome: 'capacity_full' }` y no persiste nada (queda una
 fila `rejected` con `rejection_reason_class = capacity_full`). El cupo se decide en la transacción del envío con un lock
 por formulario; un correo ya confirmado no ocupa otro cupo.
+
+### Correos de la reserva (2026-10-24)
+
+Gateados por `GROWTH_EVENT_EMAILS_ENABLED` (se lee sólo en el `ops-worker`; declarado `:-true` en su `deploy.sh`).
+Todo sale de la política de la versión publicada; nada se hardcodea por evento (`src/lib/growth/forms/event-emails.ts`).
+
+| Correo | Disparo | Contenido | Idempotencia |
+|---|---|---|---|
+| Confirmación | consumer reactivo `growth_event_registration_email_from_submission` sobre `growth.forms.submission_accepted` | fecha y hora en la zona del evento, duración, modalidad, `joinUrl` y `.ics` adjunto (`event-ics.ts`, UID `<eventKey>@efeoncepro.com`) | `sourceEventId = event_reg_<submissionId>` |
+| Lista de espera | mismo consumer, `registration_status = waitlisted` | aviso sin enlace ni `.ics` | ídem |
+| Recordatorio | ruta `/growth/events/reminders` del `ops-worker`, Cloud Scheduler `ops-growth-event-reminders` `*/15` | confirmadas con `startUtc − reminderMinutesBefore ≤ now < startUtc` | `sourceEventId = event_rem_<submissionId>` |
+
+Tipos de correo `growth_event_registration` y `growth_event_reminder`; plantilla `src/emails/EventRegistrationEmail.tsx`
+con diseño **provisional**. Un formulario sin `eventRegistration.event` registra la reserva sin correo (no-op honesto).
+Regla: todo consumer o job que lea `form_submission` filtra con `ACCEPTED_SUBMISSION_STATUSES` (store), **nunca**
+`status = 'accepted'`: el dispatcher puede haber movido la reserva a `delivered` antes de que corra el consumer.
 
 ### Consentimiento por el acto de suscribirse (`consentBy: 'submission'`)
 
@@ -335,7 +358,17 @@ mientras envía. Evento DOM `ghf:success` (`detail: { formKey, formSlug, instanc
 otra instancia del mismo `formKey` en la página pasa a «listo» sin reenviar; también lo escucha un formulario estándar.
 
 Teclado: Enter abre y el foco entra al campo a los 260 ms; Esc con el campo vacío cierra y devuelve el foco al botón; tras
-el éxito el foco va al mensaje. Errores en línea bajo la píldora; «Reintentar» sólo ante red, `rate_limited` o `error`.
+el éxito el foco va al mensaje.
+
+Atributos de anfitrión del elemento (`<greenhouse-form>`), opcionales:
+
+| Atributo | Efecto | Desde |
+|---|---|---|
+| `inline-label-logo` + `inline-label-logo-text` | Logo que reemplaza la palabra final del rótulo de apertura (URL https o relativa a la raíz). | 1.3.0 |
+| `inline-initial-state="open"` | La píldora nace en `open`: campo y botón de envío a la vista y en el orden de foco, aviso visible. No mueve el foco ni hace scroll al montar, y Esc no la pliega. Otro valor o ninguno = `idle`. | 1.4.0 |
+
+El envío, la validación, el consentimiento (`consentBy: 'submission'` con el hash del aviso) y la telemetría son los mismos
+en los dos estados iniciales. Primer uso: el footer de efeoncepro.com (2026-10-31). Errores en línea bajo la píldora; «Reintentar» sólo ante red, `rate_limited` o `error`.
 Movimiento reducido: sin estiramiento, pulso ni dibujo. Gate visual: `node scripts/growth/forms/fixtures/inline-pill.scenario.mjs`
 (evidencia en `docs/ui/reviews/TASK-2054-growth-form-inline-pill-renderer/`).
 
@@ -365,8 +398,68 @@ suscripción (`data-subscribe="off"`), nunca un éxito simulado.
 - **Pendiente:** un envío real. El envío desde el navegador automatizado de Claude no salió: Turnstile lo rechazó (sin
   token, sin `POST /submit`; misma configuración que AEO, que funciona con personas). No se intentó eludir la
   verificación. Falta que una persona se suscriba y confirmar en HubSpot el contacto suscrito al tipo `535702717`.
-- **Pendiente:** el formulario de reserva por evento espera un evento real (sin evento cargado, la portada oculta su
-  sección).
+- **Reserva por evento probada de punta a punta el 2026-10-24** con un evento de prueba (`prueba-e2e-eventos-2026-10-24`,
+  sin WordPress): dos reservas por el comando del servidor (confirmada + lista de espera), snapshot con hash del aviso,
+  HubSpot `succeeded` (HTTP 200) en ambas. La prueba destapó un defecto: el correo exigía `status = 'accepted'`, pero el
+  dispatcher ya la había movido a `delivered` antes de que corriera el consumer, así que el correo se saltó (y el SQL
+  del recordatorio tenía el mismo filtro). Corregido para usar `ACCEPTED_SUBMISSION_STATUSES` del store en ambos
+  caminos, con prueba de comportamiento `event-emails-accepted-status.test.ts`; el SQL se ejercitó contra PG real
+  (devuelve sólo la confirmada). La corrección necesita llegar al `ops-worker` por un release: **hasta entonces los
+  correos de la reserva no operan en producción**.
+- **HubSpot hoy:** cada reserva es sólo un envío al formulario compartido «Reserva de eventos | Blog Efeonce» con
+  `ef_event_key` (se sobrescribe) y `ef_greenhouse_submission_id`; el estado confirmada/lista de espera no viaja y no se
+  usa el objeto nativo Eventos de marketing (el token no tiene `crm.objects.marketing_events.*`, 403). La integración
+  evento ↔ Eventos de marketing ↔ posible webinar de Teams queda pendiente de diseño (RESEARCH-013,
+  `docs/research/RESEARCH-013-annexes/`). No lanzar eventos reales con el flujo actual.
+
+### Delta 2026-10-24 — límites actuales y diseño objetivo (webinar de Teams)
+
+No cambia el contrato vigente de arriba. Fuente única del pendiente:
+[RESEARCH-013 §Backlog canónico](../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos);
+diseño en el [anexo D](../research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md) y diagnóstico del
+conector Teams↔HubSpot en el [anexo C](../research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md).
+
+**Límites del runtime actual (verificado):**
+
+- La reserva solo conoce `confirmed`/`waitlisted` dentro de `normalized_fields_json`: **no hay cancelación ni paso
+  desde la lista de espera** (promoción).
+- El evento no es una entidad: vive en `ui_policy_json.eventRegistration` de la versión (duplicado en metadatos de
+  WordPress).
+- `eventRegistration.joinUrl` es **uno fijo y compartido por evento**.
+- A HubSpot solo viajan `email`, `ef_event_key` (se sobrescribe) y `ef_greenhouse_submission_id`; no se usa el objeto
+  Eventos de marketing (0-54) y el token no tiene sus scopes (403 `MISSING_SCOPES`).
+- La corrección de correos (`ACCEPTED_SUBMISSION_STATUSES`, commit `2a971d768`) y la de la píldora (`a5b028461`) están
+  **solo en local, sin release**; el operador decidió no hacer release por ahora (todo sale en un solo release cuando lo
+  decida). Hasta entonces los correos de la reserva no operan en producción.
+
+**Diseño objetivo — diseño, no implementado:**
+
+- **Decisiones cerradas:** la sesión es un **webinar de Teams** (app Eventos), no una reunión normal; tenant M365
+  Business (inscripción básica, sin lista de espera ni aprobación en Teams, hasta 1.000 asistentes). Greenhouse es
+  dueño de la reserva, el cupo y la lista de espera; la espera no se registra en HubSpot.
+- **Inscripción en el webinar por Microsoft Graph** (diseño, no implementado): al confirmar o promover, una proyección
+  del ops-worker inscribe a la persona con `POST /solutions/virtualEvents/webinars/{id}/registrations`, de forma
+  idempotente, con un principal dedicado: app de Entra «Greenhouse Webinars» (single-tenant) con
+  `VirtualEventRegistration-Anon.ReadWrite.All`, `VirtualEvent.Read.All` y `OnlineMeetingArtifact.Read.All`, y su
+  AppId agregado a la application access policy `MY-APP-POLICY`.
+- **`joinWebUrl` personal por inscrito** (diseño, no implementado), leído de `registrations/{id}/sessions` y
+  server-only, reemplaza el `joinUrl` fijo; el lanzador recibe y valida el id del webinar y deja de pedir `joinUrl`.
+- **Ledger de transiciones** (diseño, no implementado): entidad `greenhouse_growth.growth_event` + ledger append-only
+  (`confirmed`, `waitlisted`, `promoted`, `cancelled`, `attended`) con instante, id de inscripción en Teams y
+  `joinWebUrl`; enlace firmado «ya no puedo ir», promoción FIFO bajo el mismo lock, correo «ya tienes cupo» y evento
+  outbox `growth.events.registration_changed`.
+- **Asistencia** (diseño, no implementado): del informe de asistencia por sesión del webinar
+  (`…/webinars/{id}/sessions/{sessionId}/attendanceReports`), transición `attended` con entrada y salida.
+- **Eventos de marketing de HubSpot, una sola fuente por evento** (diseño, no implementado): mientras el conector
+  nativo Teams↔HubSpot siga roto (ticket de soporte #50018204746), Greenhouse crea el evento por la API `2026-09` y
+  escribe `REGISTERED`/`CANCELLED`/`ATTENDED`; si el soporte lo arregla, el conector lo hace y Greenhouse deja de
+  escribir ese evento (switch por evento).
+- **Cancelar en Teams** por aplicación exige RSC por chat del evento: **fuera de la fase 1**. Quien cancela libera el
+  cupo en Greenhouse, pero su inscripción en Teams queda viva (el organizador puede cancelarla a mano).
+- **Flags propuestos (no existen en código):** `GROWTH_EVENT_HUBSPOT_PARTICIPATION_ENABLED` y
+  `GROWTH_EVENT_TEAMS_REGISTRATION_ENABLED` (nombre propuesto), ambos solo en el ops-worker (`deploy.sh` + ledger).
+- Lo que sigue abierto (quién manda la confirmación con el enlace, nombre y apellido en la píldora, cancelación en
+  Teams, diseño final de los correos): RESEARCH-013 §Decisiones abiertas.
 
 ## Content Marketing: presentación, host y distribución del renderer
 

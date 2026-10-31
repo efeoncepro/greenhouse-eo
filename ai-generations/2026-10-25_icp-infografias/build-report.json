@@ -1,0 +1,80 @@
+{
+  "iconAudit": {
+    "ok": true,
+    "issues": []
+  },
+  "files": [
+    {
+      "file": "delivery/icp-cuatro-capas-desktop-light.svg",
+      "w": 1600,
+      "h": 1030,
+      "bytes": 176704,
+      "sha256": "a39ec6a4d847606a0ae3a0339ce0d99aafe88682209e1baaec9568729ce2da77",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": []
+    },
+    {
+      "file": "delivery/icp-cuatro-capas-desktop-dark.svg",
+      "w": 1600,
+      "h": 1030,
+      "bytes": 176757,
+      "sha256": "aca3399c3f2b0e7cff4f8234c30e108fe377e10b46a7affca7fe13d56803588d",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": []
+    },
+    {
+      "file": "delivery/icp-cuatro-capas-mobile-light.svg",
+      "w": 900,
+      "h": 1740,
+      "bytes": 164452,
+      "sha256": "38749a39ba193ccf681fd73363492c3f6e1287d5ed15b81f61d242acb4d41249",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": []
+    },
+    {
+      "file": "delivery/icp-cuatro-capas-mobile-dark.svg",
+      "w": 900,
+      "h": 1740,
+      "bytes": 164508,
+      "sha256": "6c0c89fb27ddfa5a83ac85e91b335aa380395df84f8fa8db75a29dd44b87f2e6",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": []
+    },
+    {
+      "file": "delivery/icp-filtro-de-cuentas-desktop-light.svg",
+      "w": 1600,
+      "h": 790,
+      "bytes": 153015,
+      "sha256": "c27c80e42bcf4806aa8463d3b4200bd021c5b7213b5f5a2f8992efe2781a2488",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": []
+    },
+    {
+      "file": "delivery/icp-filtro-de-cuentas-desktop-dark.svg",
+      "w": 1600,
+      "h": 790,
+      "bytes": 153315,
+      "sha256": "2201295acb2afcbd1c49bd74d2bf2c4f28bf4064fc24a6012d9f1aa9afa9259b",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": []
+    },
+    {
+      "file": "delivery/icp-filtro-de-cuentas-mobile-light.svg",
+      "w": 900,
+      "h": 1640,
+      "bytes": 153825,
+      "sha256": "ad5a6aaef8aad6aff0438680be24b73d7a1059c971d5ed1a2c91c468382046fc",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": []
+    },
+    {
+      "file": "delivery/icp-filtro-de-cuentas-mobile-dark.svg",
+      "w": 900,
+      "h": 1640,
+      "bytes": 154125,
+      "sha256": "9ff0ec573c7605430e07372f080e4c6b61d66ab7eb94d1eac7dbae19d62835bd",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": []
+    }
+  ]
+}

@@ -36,6 +36,48 @@ Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en 
 
 ---
 
+## Delta 2026-10-30 — el hero de Contacto del sitio en cine, con Nexa anfitriona (operador)
+
+**Decisión del operador (2026-10-30):** el hero de `efeoncepro.com/contacto/` se rehace en registro cine con Nexa
+protagonista («ok, rehazlo, que quede con muchísimo punch e impacto visual»). Nexa es siempre la anfitriona de
+Contacto. Es el **caso 1** de §2 (Nexa protagonista, `alcance: "nexa"`), y vale **sólo para ese hero**. Un hero web de
+campaña o con personas del equipo sigue en A, B o C, y la guía de superficies web de la línea («sin registro cine en
+la web») queda con esta excepción declarada.
+
+- **Qué se conservó y qué se sacó:** la pose de la foto anterior (mentón en la mano, mirada a cámara, portátil) se
+  conserva. La línea lima dibujada detrás de Nexa se saca porque ya no es parte de la línea gráfica. El acento Growth
+  vive en la escena como luz.
+- **Fenómeno:** un anillo inclinado de luz turquesa alrededor de su codo, con una estela corta y una sola esfera,
+  es «tu mensaje ya entró en órbita». Es la única llave y entra por el lado izquierdo del cuadro.
+- **Fichas y plates:** `ai-generations/2026-10-31_contacto-hero-nexa/` (`CT1` y `CT1b`, desde `NX6b`). La ficha
+  cambió según la revisión de `cine-reviewer`: anillo dentro de la mitad derecha, llave del lado izquierdo, mano que
+  no tapa el emblema, sin reloj ni anillos y pantalla del portátil apagada. Plate **aprobado por el operador el 2026-10-30**: `CT1b`,
+  con 4/5 reservas. El lecho no pasa, pero no aplica porque el hero web no firma.
+- **Hallazgo del revisor:** el aviso «sin portador del azul» salta con el hoodie azul rey del kit, que sí es un
+  portador legítimo (la regex `PORTADOR_AZUL` no lo reconoce). Queda anotado para que el operador decida si sumarlo al
+  casebook.
+
+
+**Adenda 2026-10-31 — versión vertical para teléfono.** Dos tomas `CT1v` (9:16, misma ficha recompuesta) **cambiaron el rostro de
+Nexa** aunque pasaron `foto:validar:cine` y la segunda recibió APROBABLE del `cine-reviewer`; el operador lo vio a simple vista
+(«la cara se tergiversó muchísimo»). `foto:rostro` sólo midió la proporción (0,76 y 0,74 contra 0,78 de CT1b), no la identidad.
+Regla para este caso: **la versión vertical de un hero cine aprobado sale de recortar el plate aprobado** (CT1b 820×1024 desde
+x=770), no de regenerarlo; regenerar reconstruye la cara. Plates rechazados en `plates/CT1v.png` y `plates/CT1v-r1.png`.
+## Delta 2026-10-25 — Manzanitas sin persona cuando la persona no porta la idea (operador)
+
+**Decisión del operador (2026-10-25):** «mi problema no es que muestre personas, mi problema es que lo haga todo el
+tiempo incluso cuando colocarla es absurdo y existen otras maneras de representar lo que se quiere transmitir». Venía
+de cinco portadas del blog seguidas con una persona detrás de una mesa con tarjetas de vidrio.
+
+- **El caso 4 (§2) sigue diciendo quién puede protagonizar cuando hay persona.** Lo que cambia: la persona no es
+  obligatoria. Va cuando la idea la necesita (alguien decidiendo, usando, explicando); si un objeto, un lugar o el
+  fenómeno cuentan mejor el tema, la foto va sin persona.
+- **Una ficha Manzanitas sin persona** se declara en su `nota` como excepción de alcance y pasa por `cine-reviewer`
+  igual que cualquier ficha cine. Primer caso: `MCB-AEO1-169` (cajón de fichero con una ficha levantada bajo el foco),
+  que validó en cine y que el operador entendió; lo que falló fueron los textos encima (La órbita §4, delta 2026-10-25).
+- **Elegir sin persona no es elegir bodegón.** El riesgo medido el 2026-09-21 sigue vigente: una escena sin persona y
+  poco tecnológica para un tema digital se rechaza («escenas muy poco tecnológicas»).
+
 ## Delta 2026-10-06 — prueba portable con Nano Banana 2.1
 
 **[medido]** El operador pidió probar Nexa en cine con Nano Banana 2.1 y esfuerzo máximo. La ficha

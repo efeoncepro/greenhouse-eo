@@ -1,9 +1,9 @@
 # Operar WordPress Blog, Content Hub y Busqueda
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-07-09 por Codex
-> **Ultima actualizacion:** 2026-10-24 por Claude
+> **Ultima actualizacion:** 2026-10-29 por Claude
 > **Modulo:** Public Site / WordPress / Ohio / Content Hub
 > **Documentacion relacionada:** `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
 
@@ -193,6 +193,11 @@ card se ve mal, revisa primero:
 - CSS global de soporte.
 
 ## Revisar o Preparar el Layout Demo 35
+
+> **Delta 2026-10-29:** la fuente `225984` (`/homedemo35-elementor/`) fue retirada: está en la papelera y su URL
+> redirige con 301 a `/`. Ya no se puede inspeccionar como página publicada; los pasos de abajo que la usan son
+> históricos. La copia de trabajo `251875` no se tocó.
+> [Evidencia](../../audits/public-site/2026-10-29-home-orbita-rediseno-y-seo.md#páginas-retiradas).
 
 El layout elegido como referencia visual para la home del blog es
 `Demo 35: Blog Magazine`. La fuente permanece protegida y ya existe una copia

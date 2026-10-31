@@ -1,0 +1,65 @@
+{
+  "tenderId": "A041-bolsa",
+  "slides": [
+    {
+      "slideId": "deck-content-text",
+      "contentType": "deck.content-text",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 400,
+          "questionPx": "--gl-ct-question-px=48px",
+          "questionLeading": "--gl-ct-question-leading=1.2",
+          "answerLeading": "--gl-ct-answer-leading=1",
+          "answerTracking": "--gl-ct-answer-tracking=-0.05em",
+          "answerInset": "--gl-ct-answer-inset=-16px",
+          "bodyTop": 826,
+          "bodyPx": 36,
+          "bodyWidth": 860,
+          "bodyLeading": "--gl-ct-body-leading=1.35",
+          "pointsTop": "--gl-ct-points-top=872px",
+          "pointsRight": "--gl-ct-points-right=140px",
+          "pointsWidth": "--gl-ct-points-width=620px",
+          "pointPx": "--gl-ct-point-px=22px",
+          "pointGap": "--gl-ct-point-gap=8px",
+          "pointPad": "--gl-ct-point-pad=10px",
+          "pointRule": "--gl-ct-point-rule=2px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-ct-progress-1-of-4-revenue-hubspot"
+        },
+        "voice": {
+          "question": "¿Qué se cobra aparte?",
+          "answer": "Poco",
+          "eyebrow": "Las 30 horas"
+        },
+        "body": "La operación ordinaria y los agentes priorizados van en la bolsa; sólo lo grande va aparte.",
+        "points": [
+          {
+            "name": "Dentro",
+            "text": "· solicitudes, ajustes, pruebas y agentes"
+          },
+          {
+            "name": "Aparte",
+            "text": "· proyectos mayores e integraciones complejas"
+          },
+          {
+            "name": "Sin usar",
+            "text": "· hasta 5 h pasan al mes siguiente (meses 1–4)"
+          }
+        ],
+        "selection": {
+          "label": "Assetplan",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.6
+        }
+      },
+      "template": "ContentText"
+    }
+  ]
+}

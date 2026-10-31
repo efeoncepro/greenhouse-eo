@@ -3,10 +3,10 @@
 > **Tipo:** Product Decision Record de plataforma del sitio público.
 > **Estado:** Accepted · 2026-10-23 · el operador aprobó la propuesta auditada con `arch-architect` y el orden de
 > ejecución por etapas. Quedan abiertas las decisiones de §Pendientes del operador; ninguna bloquea la etapa 1.
-> **Ejecución:** [EPIC-056](../../epics/to-do/EPIC-056-eo-portfolio.md) con cuatro tasks en orden: `TASK-2046`
+> **Ejecución:** [EPIC-056](../../epics/in-progress/EPIC-056-eo-portfolio.md) con cuatro tasks en orden: `TASK-2046`
 > (limpieza de los demos de Ohio), `TASK-2047` (plugin y contenido), `TASK-2048` (portada y entrada) y `TASK-2049`
 > (migración y salida a producción).
-> **Incidente asociado:** [ISSUE-183](../../issues/open/ISSUE-183-portfolio-ohio-demo-entries-indexed.md) — 44 entradas
+> **Incidente asociado:** [ISSUE-183](../../issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md) — 44 entradas
 > demo del tema Ohio publicadas e indexadas.
 > **Diseño en revisión:** canvas «Portafolio Efeonce — concepto», página «EO Portfolio» —
 > [claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm](https://claude.ai/artifact/Rb6NHjgnSRqMK963jPwtUm) (versión 13 al
@@ -19,6 +19,41 @@
 > [PDR-027](PDR-027-navegacion-global-del-sitio-portable.md) (patrón de contenido con tres puertas) ·
 > [Plan de migración a La órbita](../LA_ORBITA_SITE_MIGRATION_PLAN_V1.md) §Oleada 5.
 
+## Delta 2026-10-30 (2) — marketing de contenidos, servicios por línea y voz de la página
+
+Decisiones del operador del 2026-10-30, ya en producción con el plugin 0.10.8. Extienden §2 y §5; no reabren la
+decisión.
+
+- **Tipo `content-marketing`** con el tablero aprobado «Entrada de marketing de contenidos» del canvas: cada artículo
+  publicado del cliente con sus piezas por canal, la producción del mes con su fuente y el recorrido de cada artículo.
+  Primer caso: Berel («Berel, color por color»). Detalle en la arquitectura §3 y §7.3.
+- **Servicios = categorías de servicio dentro de las cinco líneas** (Brand, Engine, Growth, Voice, Revenue). Precisa
+  la taxonomía de §2: el catálogo del portafolio lista categorías como Creative Services, Search Visibility 360 o
+  RevOps & CRM, cada una con su línea. Los productos de Efeonce —Creative Studio, Marketing Studio, Wave, Globe y
+  Reach— **nunca** son servicio ni línea.
+- **Los servicios de cada proyecto enlazan a sus páginas de venta** del sitio (no a productos). Todo proyecto nuevo
+  declara cuáles corresponden.
+- **Primera persona plural en la página:** el portafolio nunca dice «Efeonce hizo» ni habla de Efeonce en tercera
+  persona; la autoría queda en los datos estructurados.
+- **Titular de la ficha «{Cliente} necesitaba…»:** la ficha del proyecto abre con la necesidad del cliente como
+  titular editorial.
+- **Sin goteo:** la pintura derramada del hero de contenidos se retiró («en el diseño aprobado no gotea»). El color del
+  artículo tiñe la página, pero nada gotea ni chorrea.
+- Abiertos: el eyebrow «ENGINE · WAVE» del menú principal (componente de PDR-027) mezcla una línea con un producto y
+  espera decisión del operador; 11 meta descriptions todavía dicen «Proyecto de Efeonce para X».
+
+## Delta 2026-10-30 — tipos de proyecto con página propia
+
+- El operador aprobó en el canvas (página «eo», «Plantillas por tipo de proyecto») cuatro tipos con página a su
+  medida: `social`, `audiovisual`, `ai-production` y `seo-content`. Entran como esquema **aditivo** dentro de
+  `portfolio-entry.v1` (roles de pieza `post`, `cut`, `bts`, `ai` y `banner`; bloques `specs`, `ai` y `search`); los
+  documentos existentes no cambian y la decisión no se reabre.
+- Los invariantes de §3 se extienden, no se relajan: el rodaje exige la referencia del consentimiento de quienes
+  aparecen y esa referencia nunca se proyecta; la declaración de IA (`ai`) sale siempre, sin depender del alcance; las
+  cifras de búsqueda siguen al alcance `metrics` y un `seo-content` no se publica sin él.
+- Estado: plugin 0.8.0 (runtime c6e1734) en producción desde el 2026-10-30; aún sin proyectos reales de los tipos
+  nuevos. Detalle técnico en la arquitectura §7.3; operación por la CLI (`kinds`, `new <slug> --kind <tipo>`).
+
 ## Contexto
 
 `/portafolio/` es la página más antigua del sitio que todavía se enlaza desde el menú global, la Home («Cases») y el
@@ -28,7 +63,7 @@ del plugin Ohio Portfolio 1.1.3) encontró:
 - **El tipo de contenido `ohio_portfolio` tiene 59 entradas publicadas; sólo 15 son trabajo de Efeonce.** Las otras 44
   son demos del tema (cliente «Envato», enlace de afiliado `1.envato.market`, imágenes del CDN de Colabrio) y están
   en `ohio_portfolio-sitemap.xml`. Cada entrada real termina llevando a ellas por «Next Project». Es
-  [ISSUE-183](../../issues/open/ISSUE-183-portfolio-ohio-demo-entries-indexed.md).
+  [ISSUE-183](../../issues/resolved/ISSUE-183-portfolio-ohio-demo-entries-indexed.md).
 - **Las 15 entradas reales arrastran restos del demo:** un bloque en inglés «Got a project? Get a Quote» que enlaza a
   `ohio.clbthemes.com`, el botón «Open Project» de Bresler, Flick y Ghamadent apuntando al afiliado de Envato, y 10
   entradas con la fecha por defecto «junio 3, 2020».

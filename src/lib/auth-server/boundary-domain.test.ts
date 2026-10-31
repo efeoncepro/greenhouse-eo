@@ -67,7 +67,15 @@ const ALLOWED_WRITE_TARGETS = new Set([
   // SQL and atomic consumption are verified by internal/persistence.live.test.ts, beyond this textual boundary guard.
   'greenhouse_auth.internal_login_transactions',
   'greenhouse_auth.corporate_session_evidence',
-  'greenhouse_auth.authorization_contexts'
+  'greenhouse_auth.authorization_contexts',
+  // TASK-1834 — independent first-party identity, never MCP grants or synthetic consents.
+  'greenhouse_auth.first_party_clients',
+  'greenhouse_auth.first_party_login_transactions',
+  'greenhouse_auth.first_party_codes',
+  'greenhouse_auth.first_party_access_handles',
+  // TASK-2067 — issuer-owned email OTP challenge and attempt budgets.
+  'greenhouse_auth.email_otp_challenges',
+  'greenhouse_auth.email_otp_budgets'
 ])
 
 describe('auth-server domain-wide write boundary (TASK-1829/1830)', () => {

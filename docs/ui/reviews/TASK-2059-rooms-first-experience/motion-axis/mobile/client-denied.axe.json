@@ -1,0 +1,7 @@
+{
+  "url": "http://127.0.0.1:3210/demo/workspace?persona=client",
+  "violations": [],
+  "incomplete": [],
+  "passCount": 34,
+  "note": "Incomplete checks are retained for manual review; zero violations does not certify their contrast."
+}

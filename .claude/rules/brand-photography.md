@@ -372,6 +372,14 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   mejor*». Caso `MC5g` (1200×630): abajo a la izquierda, alineada con la columna del texto (margen 72, ancho 25 % del
   lado corto), sobre la madera oscura vacía de la mesa, **19:1**; así cierra la columna de lectura y no compite con el
   sujeto. Sigue valiendo todo lo demás: dentro de la materia del lecho, con aire, nunca sobre el sujeto.
+  **Delta 2026-10-24 — la portada de artículo del blog va sin firma** (operador: el logo en las portadas «no quedó
+  bien»): la cabecera de Manzanitas y la marca bordada en la prenda ya identifican la pieza. El texto va en el cuadrado
+  central (x 312–782), donde sobrevive al recorte de la vista previa. El banner que se comparte fuera del sitio
+  conserva su firma. Norma: `MANZANITAS_REGISTER_V1.md` §5.6. Tampoco firman la imagen del slider ni la foto de la
+  tarjeta del rail: son el plate sin texto (o su recorte 2:1) y el sitio pinta su título encima. El encuadre del plate
+  de un artículo (cara en x 68–75 % · y 10–40 %, el 64 % izquierdo oscuro, la mitad de abajo pareja, el 7 % de arriba
+  y de abajo libre) y los márgenes de cada superficie:
+  [`BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`](../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 - 🔴 **La técnica de aplicación de marca la decide la TELA, no la costumbre del kit** **[operador, 2026-09-21]**:
   «*esa tela se borda no se estampa*». **Softshell y chaquetas técnicas → bordado** (la serigrafía sobre tela
   técnica se agrieta y se despega) · **piqué → bordado** (ya lo era) · **algodón afelpado del hoodie → abierto**,
@@ -454,6 +462,10 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   `assetDeUso`, ni `usoPorPersona`/`usoPorColor` —la pieza PUESTA, la que viaja a la escena—, ni las
   vistas de `patronPorColor` entraban al lock; sustituir cualquiera de esos archivos no despertaba
   ningún gate. Hoy sella **las cuatro formas** en que un kit declara un archivo: **66 → 79 assets**.
+- 🔴 **Una persona va cuando porta la idea, no por costumbre** **[operador, 2026-10-25]**: «mi problema no es que
+  muestre personas, es que lo haga todo el tiempo incluso cuando colocarla es absurdo». Si un objeto, un lugar o el
+  fenómeno cuentan mejor el tema, la pieza va sin persona; y entonces la imagen tiene que decir el tema por sí sola
+  (sin persona y sin tecnología, un tema digital se lee bodegón: rechazo del 2026-09-21). Registro cine, delta 2026-10-25.
 - **Tecnología en escena: siempre premium y de la generación vigente** **[operador, 2026-10-17]**: «*smartphone,
   computadores y todo lo relacionado con tecnología sea premium y moderno, nada de los 2000*». Aplica a TODA persona
   y pieza, no sólo a Nexa: portátil de aluminio unibody delgado con biseles mínimos, teléfono insignia de bordes finos,

@@ -117,11 +117,47 @@ conversación. Para la firma narrativa de Julio, aplicar la sección de hook de 
 - Cortar transiciones que solo anuncian lo que el siguiente párrafo ya hace.
 - Mantener pequeñas inflexiones humanas confirmadas; no pulir hasta volver anónima la voz.
 - Usar listas cuando ordenan decisiones, no para que todo parezca completo y simétrico.
-- Después de cerrar la prosa, diseñar una ruta de escaneo con negritas semánticas: normalmente una tesis, dato,
-  contraste o etiqueta decisiva por bloque de lectura. No poner en negrita párrafos enteros por sistema, repetir
-  el título ni usar énfasis para fabricar autoridad sobre un claim débil.
+- Después de cerrar la prosa, diseñar una ruta de escaneo con negritas semánticas. La negrita se gana por
+  importancia, no por cuota por bloque (Julio, 2026-10-26): va en el dato, la fuente, la idea principal o la parte
+  que la resume. Los enlaces van en negrita, y las landings, servicios y productos de Efeonce van con `mention`
+  (`JULIO_REYES_VOICE_SYSTEM.md` §4.6). No poner en negrita párrafos enteros por sistema, repetir el título ni usar
+  énfasis para fabricar autoridad sobre un claim débil.
 - Evaluar el énfasis en desktop y móvil. Una frase que funciona como ancla en una línea puede volverse un muro de
   negrita al envolver en una pantalla estrecha.
+
+### Destacados y citas del blog (2026-10-25)
+
+En efeoncepro.com el bloque de cita destacada tiene dos papeles que no se mezclan:
+
+- **Destacado** (por defecto): la tesis en la que se apoya la sección, escrita por nosotros. **No es una cita**: sin
+  comillas. Abre liviano y remata en negrita (`strong`): el remate es una **idea completa** que se entiende a la
+  primera, nunca un fragmento críptico; la línea entera en negrita pierde la jerarquía. Funciona la estructura que
+  abre y cierra (la frase en dos tiempos); no funciona forzar un par de pregunta y respuesta. Idealmente ≤ 80
+  caracteres; si termina en `?`, `!` o `…` no lleva la esfera de cierre.
+- **Cita**: sólo una cita real de alguien, con su atribución (nombre, fuente, enlace). Nunca inventar el autor ni
+  usar Cita para una tesis propia.
+- 1–2 por artículo, nunca seguidos, y nunca repitiendo la oración del párrafo vecino (sacarla del párrafo).
+
+Forma del spec y estilos: `efeonce-public-site-wordpress` → `references/content-factory-gutenberg.md`; manual
+`docs/manual-de-uso/public-site/usar-destacados-y-citas.md`.
+
+### Gráficos del blog (2026-10-25)
+
+En efeoncepro.com los datos se muestran con el bloque «Gráfico Efeonce». Cuándo gana a la prosa:
+
+- **Usar gráfico** cuando la idea es una comparación, una tendencia, un reparto o un antes y después que en prosa
+  obliga a retener tres o más cifras. Si la idea cabe en una sola cifra que se lee de corrido, va en la frase (o en
+  un Destacado), no en un gráfico.
+- **El título es la conclusión, no el tema**: «El tráfico orgánico cayó 38 % tras el cambio de dominio», no
+  «Evolución del tráfico». El lector debe saber qué mirar antes de mirarlo.
+- **Una sola entidad destacada**: la que sostiene la conclusión; el resto es contexto.
+- **Fuente siempre**, en la línea de fuente del bloque (nombre y enlace https). Un dato ilustrativo se declara como
+  tal. Sin fuente verificable en el ledger de claims, el número no sale.
+- El párrafo vecino interpreta el gráfico (qué significa, qué hacer); no repite sus cifras una por una.
+- Torta sólo para partes de un total y hasta 8 partes.
+
+Tipos y forma del spec: `efeonce-public-site-wordpress` → `references/content-factory-gutenberg.md`; manual
+`docs/manual-de-uso/public-site/usar-graficos-en-articulos.md`.
 
 ### Casos
 
@@ -201,6 +237,19 @@ En cada reescritura, preservar la tesis, claims, límites y pasajes ya protegido
 `qué cambió / por qué / qué decisión sigue abierta`. Si dos instrucciones del autor chocan, mostrar la tensión;
 no resolverla silenciosamente con una voz promedio.
 
+### Refresh o fusión de artículos ya publicados (2026-10-26)
+
+Antes de reescribir, inventariar los visuales de cada original (diagramas, videos, gráficos, destacados y portadas)
+y decidir uno por uno:
+
+- **Diagramas y videos vuelven** cuando aportan: son la parte del original que más vale reutilizar.
+- **Destacados con cifras sin fuente no vuelven**; si la cifra importa, entra al ledger de claims como cualquier otra.
+- **Las portadas se rehacen** para el artículo nuevo; no se hereda la del original.
+
+Caso fuente: el pilar «Qué es Loop Marketing» (248398, fusión de 248483) recuperó el diagrama `Loop-MKT.svg` y los
+dos videos de HubSpot, y descartó los destacados viejos. Detalle en
+`docs/public-site/LOOP_MARKETING_REFRESH_DRAFT_V1.md`.
+
 ## 8. Auditoría editorial
 
 Usar estados `PASS | NEEDS AUTHOR | BLOCK`. Un texto fluido puede estar bloqueado.
@@ -216,6 +265,10 @@ Usar estados `PASS | NEEDS AUTHOR | BLOCK`. Un texto fluido puede estar bloquead
 - **CTA:** corresponde al trabajo del artículo y no secuestra el cierre.
 - **Disclosure:** cumple el criterio editorial y cualquier regla externa vigente.
 - **Producción:** links, metadata, jerarquía, preview y estado de publicación fueron verificados.
+- **Exposición propia (2026-10-26):** el texto público nunca expone la caída de posiciones o de tráfico de un
+  contenido propio, ni siquiera como ejercicio de transparencia. Es `BLOCK`. Caso fuente: del pilar de Loop se retiró
+  la sección «Así aplicamos el loop a esta misma guía», con su gráfico antes/después de impresiones, porque, en
+  palabras de Julio, «eso nos perjudica más de lo que nos ayuda». Esas métricas se quedan en los documentos internos.
 
 ### Antipatrones específicos del authoring agentic
 

@@ -1,0 +1,67 @@
+{
+  "tenderId": "A078-inversion",
+  "slides": [
+    {
+      "slideId": "deck-content-focus",
+      "contentType": "deck.content-focus",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 150,
+          "questionTop": 240,
+          "answerTop": 370,
+          "answerPx": 170,
+          "eyebrowPx": "--gl-cf-eyebrow-px=20px",
+          "eyebrowColor": "--gl-cf-eyebrow-color=#9fb3c8",
+          "questionWidth": "--gl-cf-question-width=400px",
+          "questionLeading": "--gl-cf-question-leading=1.25",
+          "answerLeading": "--gl-cf-answer-leading=0.92",
+          "answerTracking": "--gl-cf-answer-tracking=-0.05em",
+          "answerInset": "--gl-cf-answer-inset=-12px",
+          "figureTop": "--gl-cf-figure-top=720px",
+          "figurePx": "--gl-cf-figure-px=110px",
+          "figureTracking": "--gl-cf-figure-tracking=-0.04em",
+          "labelTop": "--gl-cf-label-top=840px",
+          "labelPx": "--gl-cf-label-px=28px",
+          "labelWidth": "--gl-cf-label-width=520px",
+          "labelInset": "--gl-cf-label-inset=2px",
+          "sourceTop": "--gl-cf-source-top=960px",
+          "sourcePx": "--gl-cf-source-px=17px",
+          "sourceColor": "--gl-cf-source-color=#7f93a8",
+          "outGray": "--gl-cf-out-gray=0.85",
+          "outBright": "--gl-cf-out-bright=0.32",
+          "veilColor": "--gl-cf-veil-color=#021a33",
+          "veilOpacity": "--gl-cf-veil-opacity=60%",
+          "inBright": "--gl-cf-in-bright=1.12",
+          "inContrast": "--gl-cf-in-contrast=1.05",
+          "lightX": "--gl-cf-light-x=1150px",
+          "lightY": "--gl-cf-light-y=420px",
+          "lightR": "--gl-cf-light-r=360px",
+          "lightSoft": "--gl-cf-light-soft=78%"
+        },
+        "photo": {
+          "src": "asset-ref:plate:HS5b-licencias-justas",
+          "alt": "Una especialista de Efeonce enciende una a una las casillas de una grilla de luz azul"
+        },
+        "light": {
+          "src": "asset-ref:plate:HS5b-licencias-justas"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:content-focus-orbit-revenue-hubspot"
+        },
+        "voice": {
+          "question": "¿Cuánto invierto al mes?",
+          "answer": "30 UF",
+          "eyebrow": "Inversión"
+        },
+        "figure": {
+          "value": "−25 %",
+          "label": "sobre 40 UF + IVA, por 4 meses. Primer mes sin permanencia."
+        },
+        "source": "Fuente: Cotización Efeonce ASSETPLAN-2026-10-20-v2"
+      },
+      "template": "ContentFocus"
+    }
+  ]
+}

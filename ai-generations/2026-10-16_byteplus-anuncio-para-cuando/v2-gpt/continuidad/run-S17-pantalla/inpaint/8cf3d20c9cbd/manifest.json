@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "8cf3d20c9cbd",
+  "key": "8cf3d20c9cbdc6705e1db61282f322c28f82031b07761358b213e3d72392c224",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:23:50.606Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/S17.png",
+    "imageSha256": "f0d24b13f4d370af93ba41c40060b92bc7c5d6a58740c25107ccedb825be414e",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/masks/S17-pantalla.png",
+    "maskSha256": "9164249e96cac52b49331b5a4a1122719e29b194be0585828c73c9fb3d1d019c",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked display content: the same thin wall-mounted display now shows a bright full-screen photo of an orange and teal aluminum drink can with orange slices and splashing water. Absolutely no words, letters, numbers on the screen. Keep the display frame, the wall and everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Replace only the marked display content: the same thin wall-mounted display now shows a bright full-screen photo of an orange and teal aluminum drink can with orange slices and splashing water. Absolutely no words, letters, numbers on the screen. Keep the display frame, the wall and everything outside the zone unchanged. Photorealistic."
+  },
+  "mask": {
+    "touchedFraction": 0.10091400146484375,
+    "editable": 124926,
+    "soft": 7344,
+    "protected": 1178450
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 27 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 113.039,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.9,
+        "bestError": 2.9,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1178450,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 124926,
+        "maxDelta": 255,
+        "meanDelta": 118.981,
+        "worst": {
+          "x": 1018,
+          "y": 97
+        }
+      },
+      "seam": {
+        "pixels": 7344,
+        "maxDelta": 74,
+        "meanDelta": 11.961,
+        "worst": {
+          "x": 754,
+          "y": 443
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1178450,
+        "maxDelta": 187,
+        "meanDelta": 6.238,
+        "worst": {
+          "x": 709,
+          "y": 507
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1387,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 107
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 2897
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

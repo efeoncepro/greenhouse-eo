@@ -13,6 +13,10 @@ Ejecución: [TASK-2050](../../tasks/in-progress/TASK-2050-blog-portada-v3-conten
 [TASK-2051](../../tasks/in-progress/TASK-2051-blog-portada-v3-high-fidelity.md) (portada) · TASK-2053/TASK-2054
 (formulario en línea de Growth Forms)
 
+Segunda plantilla del mismo plugin: [Archivo del blog — runtime V1](BLOG_ARCHIVE_RUNTIME_V1.md) (búsqueda, temas, etiquetas y autores; TASK-2055, en producción desde 2026-10-24).
+
+Ficha de autor, byline y `Person` del single: §9 (TASK-2057, en producción desde 2026-10-24/25).
+
 Funcionamiento: [Portada del blog](../../documentation/public-site/portada-del-blog.md) · Operación:
 [por CLI](../../manual-de-uso/public-site/operar-portada-blog-por-cli.md) y
 [desde WordPress](../../manual-de-uso/public-site/operar-contenido-portada-blog.md)
@@ -82,7 +86,52 @@ defecto del gate.
 | 4 | Comportamiento sin JavaScript | 11 | Velo de lectura, bajada en 2 líneas, megáfono de Novedad |
 | 5 | Raíz fluida del tablero móvil | 12 | Foto del autor |
 | 6 | Espaciador de 56 px en lugar de la isla móvil | 13 | Suscripción real a Glitch (también en el pie) |
-| 7 | Órbita de temas fluida bajo 390 px | | |
+| 7 | Órbita de temas fluida bajo 390 px (retirada con el desvío 15) | 14 | Tarjetas v2 de «Para leer con calma» |
+| | | 15 | «Explora por tema» v2: la órbita como puerta a las categorías |
+
+### «Para leer con calma» v2 (desvío 14)
+
+El riel usa una sola plantilla de tarjeta para todos los formatos y tableros: `scripts/public-website/blog-v3/lib/rail-v2.cjs`
+(plantilla, CSS con clases `rc-*`, fixture de la versión 93 del canvas y la lógica del hover). `bind-canvas.cjs` la
+aplica con `deviateRail()` a la referencia y a la plantilla ligada, así que la equivalencia sigue probando el resto del
+tablero y la paridad PHP↔navegador prueba las tarjetas. Imágenes y logos nuevos: `RAIL_ASSETS` del módulo (se suman a
+`assets.json` en `bind-canvas`, `build-fixture`, `build-plugin` y `fidelity/capture`).
+
+| Tarjeta | Cuándo | Datos |
+|---|---|---|
+| Foto a sangre (navy / azul alternados) | entrada con imagen destacada; guía o herramienta con imagen | `img` (`_eo_card_image` si existe; si no, la destacada, que sigue siendo la OG), `pos` = `_eo_card_focus` o `center`, tema, autor, fecha, minutos |
+| Cliente (papel) | caso con `_eo_client` conocido (`EO_Home_Adapter::RAIL_CLIENTS`) | logo del cliente desde los activos del plugin |
+| Pregunta (tinta) | recurso `diagnostico` | las dos líneas del slider son la pregunta |
+| Entrada de webinar | el próximo evento (`events.next`) hasta que termina | día, mes, día de semana y hora en su zona, «Faltan N días» |
+| Onda de podcast | entrada con formato `podcast` (sin mínimo de minutos) | `_eo_video_duration` o minutos |
+| Tipográfica (papel) | entrada sin imagen ni cliente | tema, título, bajada, pie |
+
+Insignias (una por tarjeta, gana el menor rango; `EO_Home_Adapter::RAIL_BADGES`, con texto en inglés para un locale
+futuro): 1 «En vivo» (reloj del evento) · 2 «Últimos cupos» / «Lista de espera» · 3 «Más leído» · 4 «Tendencia» ·
+5 «Nuevo» (≤ 14 días) · 6 «Actualizado» (`_eo_reviewed_at` ≤ 30 días en una entrada de más de 60; el pie muestra
+«Actualizado <fecha>») · 7 «Gratis» (recursos y eventos gratis). Cupos y lecturas no tienen lector todavía: llegan
+por el filtro `eo_home_rail_signals` (id de entrada → `top`/`trend`; `event:<id>` → `seats`/`wait`) y nada más los
+enciende. La guía publicada en `think.efeoncepro.com` firma con el logo de Efeonce Think; otra guía, con el de Efeonce.
+
+El hover fija `--px/--py/--rx/--ry` en el `style` de la tarjeta; `dc-runtime.js` (`syncAttrs`) sólo reescribe un
+`style` renderizado cuando cambia su valor de plantilla, así que el repintado de cada segundo ya no lo borra (también
+corrige el botón magnético).
+
+### «Explora por tema» v2 (desvío 15)
+
+`scripts/public-website/blog-v3/lib/topics-v2.cjs` reemplaza la sección de la órbita en los tres tableros (plantilla de
+escritorio/tablet y de móvil, CSS `tv-*`, el literal `T` de la versión 95 del canvas y la lógica). Contrato por tema,
+igual en los dos documentos: `key, name, promise, accent, ink, href, n, desc, reads[{t, href}], pos, align, deg`.
+`EO_Home_Readers::ORBIT` fija las seis categorías (HubSpot, AEO, Marketing digital, Inbound, Diseño, Loop Marketing)
+y entrega su enlace, la descripción de la categoría y las tres lecturas más recientes; `EO_Home_Adapter::ORBIT_TOPICS`
+pone nombre y promesa, y `ORBIT_SLOTS` la posición del rótulo y el ángulo `deg` del tema. El arco es uno solo,
+dibujado a 0° dentro de un `<g class="tv-turn">` que gira con `transform: rotate(…)` (800 ms): al pasar de un tema a
+otro recorre el anillo por el camino más corto en vez de saltar (la lógica acumula el ángulo en `_rot`; el servidor
+pinta `deg` tal cual porque el primer render no tiene giro previo). `EOBH_View::topics()` replica la lógica (rótulos,
+tema activo con `rot` y filas del móvil ordenadas por lecturas). Los rótulos son enlaces `<a href>` en el HTML del servidor: el enlazado interno a las categorías existe sin
+JavaScript. Cambiar un tema = las tres constantes y un deploy de `content-model`; la descripción se edita con
+`topic-descriptions`. Ojo con el caché del lector (300 s): después de un deploy, la portada puede servir la forma vieja
+hasta que expire.
 
 ## 3. Modelo de contenido y adaptador
 
@@ -102,6 +151,20 @@ El contrato completo está en PDR-029 §1–§7; lo que importa para el runtime:
   recientes) y después las invitaciones. Una Novedad sólo entra fijada; el «sticky» de WordPress no se lee.
 - **Velo y bajada (desvío 11).** Una entrada sin `_eo_hero_image` usa su imagen destacada con velo de lectura del lado
   del texto y la bajada se corta en dos líneas; con imagen propia del slider no hay velo (`scrim: false`).
+- **Campos de imagen (medidos en vivo el 2026-10-24).** Una entrada nueva entra sola al slider
+  (`EO_Home_Readers::build_featured`: las más nuevas con imagen, ni Glitch ni Novedad) y, con 12 minutos o más (o
+  pódcast, sin Glitch ni Novedades), al riel (`EO_Home_Readers::rail`, las cuatro más nuevas). La destacada de un post
+  de Marketing con Manzanitas trae texto, así que los dos lugares tienen su campo propio:
+
+  | Meta | Superficie | Contrato | Sin el campo |
+  |---|---|---|---|
+  | `_eo_hero_image` (adjunto) | diapositiva del slider y miniatura «Siguiente» (96 × 64) | WebP 2:1, 2400 × 1200, sin texto. Escritorio 1440/1920 × 900 con `object-fit: cover`, `object-position: 100% 50%` y ~10 % de margen por el parallax; en 390, franja de 390 × 300 que muestra x 42–100 % con el título debajo. Visible en todos los anchos x 42–96 % · y 7–93 %; tapan el título (x 29–65 % · y 31–61 % en 1440; x 19–54 % en 1920), «Siguiente» (x 75–92 % · y 68–77 %) y la tira (desde y 86 %) | la destacada con velo (`scrim: true`); la miniatura «Siguiente» usa la destacada |
+  | `_eo_card_image` (adjunto) | tarjeta de foto del riel: 440 × 600 escritorio, 361 × 492 tablet, 304 × 540 teléfono, `cover` | el plate PNG 2560 × 1440 tal cual, sin texto; etiqueta y flecha en y 5–8 %, degradado desde y 36 % (sólido bajo 70 %), título desde y 64 % | la destacada (que sigue siendo la OG) |
+  | `_eo_card_focus` (`"x% y%"`) | `pos` de la tarjeta → `object-position` | con la cara del plate al 71 %, `84% 30%`: se ve x 49–91 % del plate (x 57–89 % en el teléfono) | `center` |
+
+  La destacada (y la OG de Yoast) se escribe aparte con `scripts/public-website/blog-post-cover-apply.php`; ningún
+  comando de la portada la cambia (`card` falla si cambiara). Inventario completo y diagramas de zonas seguras:
+  [BLOG_ARTICLE_IMAGE_INVENTORY_V1](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 - **Foto del autor (desvío 12).** `EO_Home_Readers::author_photo()` usa `get_avatar_url($user, size 96)`, que sirve la
   foto subida con el plugin One User Avatar, y descarta cualquier URL de `gravatar.com`: sin foto propia la plantilla
   muestra las iniciales del canvas. Las diapositivas de Glitch no llevan foto.
@@ -212,7 +275,7 @@ puerta de escritura para agentes y operadores; pasa por las metas, taxonomías y
   evento `load`, que terceros del sitio pueden retener minutos) y mide desborde y axe.
 - Escrituras: plan sin `--apply`; cada apply imprime `before`, lee de vuelta, resetea readers, purga `/blog/` y agrega
   una línea al ledger `scripts/public-website/blog-home/ledger/<AAAA-MM>.jsonl`. Comandos: `pin --until`, `unpin`,
-  `format`, `hero`, `resource <json>`, `review`, `event <json>` (rechaza enlaces de Zoom, Teams o Meet),
+  `format`, `line`, `client`, `reviewed`, `hero`, `card` (imagen y punto focal de la tarjeta), `resource <json>`, `review`, `event <json>` (rechaza enlaces de Zoom, Teams o Meet),
   `retire resource|event`, `subscription <clave|off> [--surface]`, `flag 0|1`, `purge`.
 - Despliegue: `deploy home|content-model [--apply]` exporta la línea base viva y arma un paquete guardado (se niega si
   alguien cambió esos archivos en Kinsta); `content-model` apaga el flag, despliega, lo restaura y corre
@@ -228,6 +291,94 @@ puerta de escritura para agentes y operadores; pasa por las metas, taxonomías y
 | Página `/blog/` | `page rollback --snapshot _gh_blog_home_v3_before_20261024_081327 --apply` | vuelve exactamente a la página previa al corte |
 | Formatos | `backfill-format.php` en modo `restore` con el ledger del apply | formatos previos |
 
+## 9. Autor del blog (TASK-2057)
+
+Delta 2026-10-24. En producción desde el 2026-10-24/25 con `efeonce-editorial-blocks` 0.5.4 (runtime
+`efeonce-public-site-runtime` commit `8f19ee0`). Delta 2026-10-25: en producción 0.5.5 (runtime `d3156f6`, hovers y
+margen inferior); 0.5.6 (ficha más contenida, runtime `6a169bc`), 0.5.8 (alineación y margen, `4ff7daa`) y 0.5.9 (redes junto al retrato en teléfono, `07ed7b5`) desplegadas 2026-10-25 y verificadas en vivo. Cubre la ficha de autor del single, el byline y el `Person` de Yoast.
+Funcionamiento: [Ficha de autor del blog](../../documentation/public-site/ficha-de-autor-del-blog.md). Operación:
+[desde WordPress](../../manual-de-uso/public-site/operar-contenido-portada-blog.md#foto-de-perfil-del-autor).
+
+### Lector `EO_Author_Profile`
+
+`includes/content-model/class-eo-author-profile.php`. `build(array)` es puro (testeable sin WordPress);
+`for_user(id)` lo alimenta y se cachea con `EO_Home_Readers::cached` (5 min).
+
+| Campo | Fuente | Regla |
+|---|---|---|
+| `name`, `initials` | `display_name` | iniciales como respaldo visual |
+| `role` | Yoast Premium `wpseo_user_schema.jobTitle`; respaldo usermeta `job_title` | nunca se deriva de la primera frase de la bio |
+| `org` | fijo | «Efeonce Group» |
+| `bioShort` | usermeta `eo_author_bio_short` (≤ 180 caracteres; perfil de WordPress «Ficha de autor del blog → Bio corta») | si falta, primeras frases de `description` |
+| `bioLong` | `description` | la que usa el schema |
+| `photo` / `photoLarge` | One User Avatar a 96 y 300 px | nunca Gravatar |
+| `links` | contactos de Yoast `instagram`, `linkedin`, `twitter` (→ `x.com`), `wikipedia`, en el orden del `sameAs`, normalizados a https | `user_url` sólo si no es el propio sitio |
+| `topics` | `knowsAbout` que calza con una categoría con posts, con alias (p. ej. «Inteligencia artificial aplicada al marketing» → `ai`, «SEO/AEO» → `aeo`) | máx. 4 |
+| `postCount`, `archiveUrl` | posts publicados, `get_author_posts_url` | — |
+
+Cuentas de servicio (`greenhouse-integration`) y autores sin posts devuelven vacío: sin ficha.
+
+### Hooks y render
+
+- **Ficha.** Filtro `widget_display_callback` reemplaza el widget `ohio_widget_about_author` (traía redes del demo de
+  Ohio: `facebook.com/colabrio` y LinkedIn vacío) en el mismo lugar, el `.author-container` de `ohio/single.php`.
+  Marcado: `<section aria-label="Sobre el autor">`, sin encabezados. **No `aside`:** el sitio trae CSS inline
+  `.single-post aside {display:none}` y la ficha desaparecería.
+- **Diseño La órbita.** Fondo `#001a33`; pieza `portrait` (anillo r 96/208 al 40 % del halo, foto r 78, arco
+  200→250°, esfera en el acento Growth `#36c8bf`); nombre en Bricolage con el punto tipeado en el acento; esquina recta
+  arriba a la izquierda; CTA «Ver sus N artículos»; isotipos oficiales de `@efeoncepro/axis-brand-assets` con
+  `rel="me noopener"`.
+- **Medidas (0.5.6, delta 2026-10-25).** Escritorio: ancho máximo 800 px, retrato 160 px, padding
+  `clamp(24px,3vw,36px)`, gap 32 px, nombre `clamp(28px,3vw,36px)`, cargo y bio 15 px, CTA 14 px, iniciales 38 px.
+  Margen: 56 px arriba y abajo (40 en teléfono) desde 0.5.8; antes, 96/64 px se leía como «demasiado aire» (operador
+  2026-10-25).
+- **Ancho y alineación (0.5.8, 2026-10-25).** La grilla de Ohio en `.author-container` corre la columna 16 px a la
+  izquierda (la fila tira −16 y la columna rellena 16): la ficha quedaba con 16/48 px a 390 y descentrada 16 px en
+  escritorio. Bajo 1024 px la ficha recupera 32 px (`width: calc(100% + 32px)`) y queda con el mismo margen que el texto
+  del artículo (16/16); desde 1024 px se corre 16 px (`position: relative; left: 16px`) para quedar centrada.
+- **Teléfono: cabecera de perfil (0.5.9, 2026-10-25).** En ≤ 640 px la ficha es una grilla: retrato de 112 px a la
+  izquierda y «Escribe», nombre (28 px) y redes (`.eo-author__links`, botones de 44 px) a su derecha; cargo, bio,
+  temas y el CTA (48 px, a todo el ancho) debajo, el CTA al final. `.eo-author__body` y `.eo-author__actions` pasan a
+  `display: contents`. Tablet y escritorio sin cambios (redes junto al CTA). Verificado en vivo: redes bajo el nombre a
+  320/390, 16/16 px, sin desborde, axe 0. El orden del DOM es el de escritorio (redes después del CTA).
+- **Enlaces y hover (trampa del host Ohio, 0.5.5).** Ohio pinta todos los enlaces al hover:
+  `a:not(.-unlink):hover` → `color:#024c8f` y `.links-underline a:not(.button):not(.tag):not(.-undash):hover` →
+  `background-image: linear-gradient(currentColor…)` con la animación «underline». Sin defensa, el chip de tema quedaba
+  blanco sin texto y el isotipo de Instagram desaparecía sobre azul. Regla: **todo enlace de la ficha y del byline lleva
+  las clases `-unlink -undash`** (las exclusiones propias de Ohio) y las reglas de hover se acotan a `.eo-author`
+  (`background-image:none`, `animation:none`). Una prueba exige las dos clases en cada enlace de la ficha (34
+  chequeos). Verificado en vivo (0.5.5, 1440): al hover, chip `rgba(207,228,250,.16)` con texto blanco, redes
+  `rgba(207,228,250,.12)` con ícono blanco, CTA `#cfe4fa` con texto `#001a33`, `background-image:none` en los tres y
+  96 px hasta «Related Posts». El círculo o la línea azul que sigue al mouse es el cursor personalizado de Ohio, no la
+  ficha.
+- **CSS.** `includes/content-model/assets/author.css`, encolado sólo en `is_singular('post')`.
+- **Byline.** `ohio-child/parts/elements/page_headline.php` llama `eo_author_byline()` → «Por {autor}» enlazado al
+  archivo + fecha (+ «Actualizado» si la modificación es ≥ 1 día posterior). Sin el plugin activo cae a la lista de
+  Ohio. La cifra de lectura sigue siendo la de Ohio sobre el título, traducida («min read» → «min de lectura»);
+  «Posted by» → «Por» en relacionados.
+- **Schema.** Yoast sigue siendo dueño del `Person`. El filtro `wpseo_schema_person` sólo cambia `worksFor`
+  `"Efeonce Group"` → `{"@id":"https://efeoncepro.com/#organization"}`. Verificado en vivo: `jobTitle`, `image` = foto
+  nueva, `sameAs`, `description` = bio larga, `url` = archivo del autor.
+
+### Despliegue
+
+| Pieza | Comando | Nota |
+|---|---|---|
+| Lector, ficha, CSS, schema | `pnpm public-website:blog-home deploy content-model [--apply]` | allowlist ampliada con `includes/content-model/assets/*.(js\|css)` |
+| Byline del tema | paquete del tema site-nav (`build-site-nav-theme-package.cjs` + `deploy-site-nav-theme-package.php`) | allowlist ampliada con `parts/elements/page_headline.php`; **sin dry-run** |
+
+### Reglas
+
+- Cambiar foto o cargo exige **reconstruir el indexable de autor de Yoast** y purgar: si no, el `og:image` del archivo
+  del autor queda con la foto vieja. Script de referencia: `ai-generations/2026-10-24_autor-blog/refrescar-yoast-autor.php`
+  (`pnpm public-website:wpcli -- --eval-file … --wp-user 1`); procedencia en el `LEEME.md` de esa carpeta.
+- La foto de Julio es el adjunto 252085 (`julio-reyes-autor-2026-10.png`); el avatar anterior, 244826, sirve de rollback.
+- Verificación del corte: 2 posts, Playwright 1440/390/320/768/1920 sin desborde, axe WCAG 2.2 AA con 0 hallazgos en
+  `.eo-author` y `.eo-byline`, sin widget de Ohio.
+- Fuera de alcance: el YouTube de los enlaces sociales globales de Ohio apunta a `facebook.com/colabrio` (configuración
+  del tema, no de la ficha); el slug `/author/jreysgo/`; el cierre de `/wp-json/wp/v2/users`; la web personal
+  `cesargrowth.com` cuando exista.
+
 ## Pendientes
 
 - **Envío real de verificación.** Un envío desde el navegador automatizado de Claude no salió: Turnstile rechazó el
@@ -236,7 +387,7 @@ puerta de escritura para agentes y operadores; pasa por las metas, taxonomías y
 - Visto bueno visual del operador a la píldora en el pie (desvío 13).
 - Primer evento real (hoy la sección está oculta) y prueba de `Event` en Rich Results Test y del `.ics`.
 - Medir en Kinsta la purga de `/blog/` (< 2 min); hoy sólo está medida en Playground.
-- Papelera de la página de revisión 252046 `/blog-v3-revision/` (publicada, noindex): espera confirmación del operador.
+- Página de revisión 252046 `/blog-v3-revision/`: en la papelera desde el 2026-10-26 (OK del operador); responde 404.
 - LCP de laboratorio sobre 2,5 s en el perfil móvil por el peso de scripts del sitio (seguimiento de sitio, ver
   TASK-2051).
 

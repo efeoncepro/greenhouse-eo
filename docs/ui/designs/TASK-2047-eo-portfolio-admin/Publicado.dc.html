@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Proyecto publicado · Portafolio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#f0f0f1;color:#1d2327;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;font-size:13px;line-height:1.5}
+a{color:#2271b1}a:hover{color:#135e96}
+.box{background:#fff;border:1px solid #c3c4c7;box-shadow:0 1px 1px rgba(0,0,0,.04)}
+.box-h{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:0 12px;border:0;border-bottom:1px solid #c3c4c7;background:#fff;font:600 14px/1.4 inherit;color:#1d2327;text-align:left;cursor:pointer}
+.lbl{display:block;font-weight:600;margin:0 0 4px}
+.in{box-sizing:border-box;width:100%;min-height:36px;padding:6px 8px;border:1px solid #8c8f94;border-radius:4px;font:inherit;color:#1d2327;background:#fff}
+.help{margin:4px 0 0;color:#50575e;font-size:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 12px;border:1px solid #2271b1;border-radius:3px;background:#f6f7f7;color:#2271b1;font:inherit;cursor:pointer;text-decoration:none}
+.btn-p{background:#2271b1;color:#fff}
+.btn-d{border-color:#b32d2e;color:#b32d2e;background:#fff}
+.chip{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:11px;font-size:12px;font-weight:600}
+.hidden-note{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px dashed #8c8f94;border-radius:4px;background:#f6f7f7;color:#3c434a}
+.side-h{margin:0;padding:10px 12px;border-bottom:1px solid #c3c4c7;font-size:14px;font-weight:600}
+</style>
+</helmet>
+<div style="min-height: 1500px; display: flex; flex-direction: column;">
+  <header style="height: 32px; background: #1d2327; color: #f0f0f1; display: flex; align-items: center; justify-content: space-between; padding: 0 12px;">
+    <span>Efeonce Group</span>
+    <span>Hola, Ana</span>
+  </header>
+  <div style="display: flex; flex-wrap: wrap; flex: 1 1 auto;">
+    <nav aria-label="Menú principal" style="flex: 0 0 160px; background: #1d2327; color: #f0f0f1; padding: 8px 0;">
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Escritorio</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Entradas</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Medios</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Páginas</a>
+      <a href="Lista.dc.html" aria-current="page" style="display: block; padding: 8px 12px; color: #fff; background: #2271b1; font-weight: 600; text-decoration: none;">Portafolio</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Apariencia</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Plugins</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Ajustes</a>
+    </nav>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 20px 24px 48px; box-sizing: border-box;">
+      <div style="max-width: 1240px; display: flex; flex-direction: column; gap: 16px;">
+        <a href="Lista.dc.html">← Portafolio</a>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+          <h1 style="margin: 0; font-size: 23px; font-weight: 400;">Marca y menú para comida venezolana a domicilio</h1>
+          <span class="chip" style="background: #e6f4ea; color: #00661b;">Publicado</span>
+          <a href="#">Ver en el sitio</a>
+        </div>
+
+        <div role="status" class="box" style="padding: 10px 16px; border-color: #00a32a; display: flex; align-items: center; gap: 8px;">
+          <span aria-hidden="true" style="color: #00661b; font-weight: 700;">✓</span>
+          <span>Guardado como revisión 4. El sitio ya muestra el cambio.</span>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
+          <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px;">
+
+            <section class="box">
+              <button type="button" class="box-h" aria-expanded="true" aria-controls="s-cliente">
+                <span style="flex: 1 1 auto;">Cliente y contexto</span>
+                <span style="color: #50575e; font-weight: 400; font-size: 12px;">Completo</span>
+              </button>
+              <div id="s-cliente" style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+                  <div><label class="lbl" for="f-cliente">Cliente</label><input class="in" id="f-cliente" value="PabellonToGo"></div>
+                  <div><label class="lbl" for="f-industria">Industria</label><select class="in" id="f-industria"><option>Gastronomía</option></select></div>
+                </div>
+                <div>
+                  <span class="lbl">Logo</span>
+                  <div class="hidden-note">
+                    <span style="font-weight: 600;">No se mostrará:</span>
+                    <span>la aprobación no incluye el logo. Puedes cargarlo igual; aparece cuando el cliente lo apruebe.</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="box">
+              <button type="button" class="box-h" aria-expanded="true" aria-controls="s-resultados">
+                <span style="flex: 1 1 auto;">Resultados</span>
+                <span class="chip" style="background: #f0f0f1; color: #3c434a;">No se mostrará</span>
+              </button>
+              <div id="s-resultados" style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+                <div class="hidden-note">
+                  <span style="font-weight: 600;">No se mostrará:</span>
+                  <span>la aprobación no incluye cifras.</span>
+                </div>
+                <p class="help" style="margin: 0;">Este proyecto no tiene cifras cargadas. Si las agregas, quedan guardadas y ocultas hasta que el cliente apruebe las cifras.</p>
+                <div><button type="button" class="btn">Agregar resultado</button></div>
+              </div>
+            </section>
+
+            <section class="box">
+              <button type="button" class="box-h" aria-expanded="false">
+                <span style="flex: 1 1 auto;">Capítulos y piezas</span>
+                <span style="color: #50575e; font-weight: 400; font-size: 12px; margin-right: 8px;">1 capítulo · 2 piezas</span>
+                <span class="chip" style="background: #e6f4ea; color: #00661b;">Se muestra</span>
+              </button>
+            </section>
+
+            <section class="box">
+              <button type="button" class="box-h" aria-expanded="true" aria-controls="s-testimonio">
+                <span style="flex: 1 1 auto;">Testimonio y equipo</span>
+              </button>
+              <div id="s-testimonio" style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+                <div class="hidden-note">
+                  <span style="font-weight: 600;">No se mostrará:</span>
+                  <span>la aprobación no incluye el testimonio. El equipo sí se muestra.</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+                  <div><label class="lbl" for="t-nombre">Nombre de quien da el testimonio</label><input class="in" id="t-nombre" value=""></div>
+                  <div><label class="lbl" for="t-cargo">Cargo</label><input class="in" id="t-cargo" value=""></div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <aside aria-label="Estado y publicación" style="flex: 1 1 300px; max-width: 360px; display: flex; flex-direction: column; gap: 16px;">
+            <section class="box">
+              <h2 class="side-h">Estado</h2>
+              <div style="padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <p style="margin: 0;"><strong>Publicado</strong> · revisión 4</p>
+                <p style="margin: 0; color: #50575e;">Publicado por Ana el 24 oct. con la aprobación registrada.</p>
+                <div>
+                  <label class="lbl" for="f-mensaje">Qué cambiaste (queda en el historial)</label>
+                  <textarea class="in" id="f-mensaje" rows="2"></textarea>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                  <button type="button" class="btn btn-p">Guardar</button>
+                  <button type="button" class="btn btn-d">Despublicar</button>
+                </div>
+                <p class="help" style="margin: 0;">Despublicar lo saca del sitio. El contenido y el historial se conservan.</p>
+              </div>
+            </section>
+
+            <section class="box">
+              <h2 class="side-h">Aprobación del cliente</h2>
+              <div style="padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <div><label class="lbl" for="f-ref">Referencia</label><input class="in" id="f-ref" value="[referencia del registro de aprobación]"></div>
+                <div><label class="lbl" for="f-fecha">Fecha</label><input class="in" id="f-fecha" value="2026-10-24"></div>
+                <fieldset style="border: 0; padding: 0; margin: 0;">
+                  <legend class="lbl">Qué aprobó</legend>
+                  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px;">
+                    <label><input type="checkbox"> Logo</label>
+                    <label><input type="checkbox" checked> Piezas</label>
+                    <label><input type="checkbox"> Cifras</label>
+                    <label><input type="checkbox"> Testimonio</label>
+                  </div>
+                </fieldset>
+                <p class="help" style="margin: 0;">Para quitar la aprobación a un proyecto publicado, despublícalo primero.</p>
+              </div>
+            </section>
+
+            <section class="box">
+              <h2 class="side-h">Historial</h2>
+              <ol style="list-style: none; margin: 0; padding: 0;">
+                <li style="padding: 10px 12px; border-bottom: 1px solid #f0f0f1; display: flex; flex-direction: column; gap: 4px;">
+                  <span><strong>r4</strong> · Ana · 24 oct.</span>
+                  <span style="color: #50575e;">«Ajusta la leyenda del menú»</span>
+                  <span style="color: #50575e; font-size: 12px;">Vigente</span>
+                </li>
+                <li style="padding: 10px 12px; border-bottom: 1px solid #f0f0f1; display: flex; flex-direction: column; gap: 8px; background: #f6f7f7;">
+                  <span><strong>r3</strong> · Ana · 24 oct.</span>
+                  <span style="color: #50575e;">«Agrega la aprobación»</span>
+                  <div role="group" aria-label="Confirmar restauración" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; background: #fff; border: 1px solid #c3c4c7; border-radius: 4px;">
+                    <p style="margin: 0;">¿Restaurar la revisión 3? Se creará una revisión nueva.</p>
+                    <div style="display: flex; gap: 8px;"><button type="button" class="btn btn-p">Restaurar</button><button type="button" class="btn">Cancelar</button></div>
+                  </div>
+                </li>
+                <li style="padding: 10px 12px; border-bottom: 1px solid #f0f0f1; display: flex; flex-direction: column; gap: 4px;">
+                  <span><strong>Publicado</strong> · Ana · 24 oct.</span>
+                  <span style="color: #50575e;">Revisión 3, con la aprobación registrada (piezas)</span>
+                </li>
+                <li style="padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+                  <span><strong>r2</strong> · Agente · 23 oct.</span>
+                  <span style="color: #50575e;">«Carga desde la entrada de Ohio»</span>
+                  <span style="display: flex; gap: 12px;"><a href="#">Ver</a><a href="#">Restaurar</a></span>
+                </li>
+              </ol>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

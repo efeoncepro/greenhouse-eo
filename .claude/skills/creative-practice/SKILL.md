@@ -472,6 +472,13 @@ El fit cultural se opera mediante inmersión de marca/negocio, personas nombrada
 feedback, escalamiento y métricas de adoption. Debe pricearse como capacidad + gobierno + integración; no como
 dedicación de perfiles. Validar siempre si el cliente acepta un owner Efeonce, un RACI claro y límites de capacidad.
 
+Para cuentas multimercado existe el patrón **Home Market Lead (HML)** (Delta 2026-10-29): un dueño por mercado que
+convierte el pedido en tareas, produce o delega y entrega; rotación trimestral de mercados; dirección conjunta donde
+el cliente decide qué se comunica y Efeonce, cómo. La disciplina se llama **Creative Operations (CreativeOps)**, no
+DesignOps. Patrón en [Embedded Pod §15](../../../docs/services/creative-services/EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md#15-patrón-home-market-lead-cuentas-multimercado);
+primer caso, todavía propuesta: [SKY Performance](../../../docs/services/creative-services/SKY_PERFORMANCE_CREATIVE_OPERATING_MODEL_V1.md).
+No lo cites como caso probado hasta que pase la marcha blanca.
+
 ### Fully Managed Creative Capacity
 
 Cuando Efeonce absorbe equipo, infraestructura, computadores, licencias, contratación, costos laborales,

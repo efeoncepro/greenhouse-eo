@@ -1,0 +1,146 @@
+[
+ {
+  "estilo": "zócalo sin caja (norma)",
+  "fondo": "claro",
+  "mediana": "11.2",
+  "peor5": "6.3"
+ },
+ {
+  "estilo": "zócalo sin caja (norma)",
+  "fondo": "calido",
+  "mediana": "3.7",
+  "peor5": "1.8"
+ },
+ {
+  "estilo": "zócalo sin caja (norma)",
+  "fondo": "oscuro",
+  "mediana": "17.7",
+  "peor5": "2.1"
+ },
+ {
+  "estilo": "zócalo sin caja (norma)",
+  "fondo": "movimiento",
+  "mediana": "14.0",
+  "peor5": "2.3"
+ },
+ {
+  "estilo": "zócalo sin caja (norma)",
+  "fondo": "interfaz",
+  "mediana": "1.0",
+  "peor5": "1.0"
+ },
+ {
+  "estilo": "zócalo sin caja (norma)",
+  "fondo": "papel",
+  "mediana": "1.2",
+  "peor5": "1.2"
+ },
+ {
+  "estilo": "zócalo con lecho (video)",
+  "fondo": "claro",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ },
+ {
+  "estilo": "zócalo con lecho (video)",
+  "fondo": "calido",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ },
+ {
+  "estilo": "zócalo con lecho (video)",
+  "fondo": "oscuro",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ },
+ {
+  "estilo": "zócalo con lecho (video)",
+  "fondo": "movimiento",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ },
+ {
+  "estilo": "zócalo con lecho (video)",
+  "fondo": "interfaz",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ },
+ {
+  "estilo": "zócalo con lecho (video)",
+  "fondo": "papel",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ },
+ {
+  "estilo": "dato sin disco (norma)",
+  "fondo": "claro",
+  "mediana": "3.5",
+  "peor5": "2.2"
+ },
+ {
+  "estilo": "dato sin disco (norma)",
+  "fondo": "calido",
+  "mediana": "15.7",
+  "peor5": "4.8"
+ },
+ {
+  "estilo": "dato sin disco (norma)",
+  "fondo": "oscuro",
+  "mediana": "3.9",
+  "peor5": "1.1"
+ },
+ {
+  "estilo": "dato sin disco (norma)",
+  "fondo": "movimiento",
+  "mediana": "2.4",
+  "peor5": "1.1"
+ },
+ {
+  "estilo": "dato sin disco (norma)",
+  "fondo": "interfaz",
+  "mediana": "1.0",
+  "peor5": "1.0"
+ },
+ {
+  "estilo": "dato sin disco (norma)",
+  "fondo": "papel",
+  "mediana": "1.2",
+  "peor5": "1.2"
+ },
+ {
+  "estilo": "dato con disco (video)",
+  "fondo": "claro",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ },
+ {
+  "estilo": "dato con disco (video)",
+  "fondo": "calido",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ },
+ {
+  "estilo": "dato con disco (video)",
+  "fondo": "oscuro",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ },
+ {
+  "estilo": "dato con disco (video)",
+  "fondo": "movimiento",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ },
+ {
+  "estilo": "dato con disco (video)",
+  "fondo": "interfaz",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ },
+ {
+  "estilo": "dato con disco (video)",
+  "fondo": "papel",
+  "mediana": "17.6",
+  "peor5": "17.6"
+ }
+]

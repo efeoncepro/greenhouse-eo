@@ -1,0 +1,302 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "ea459f04a042",
+  "key": "ea459f04a042715744e96bdd1f6d0c6acb6556cca09b311601215ccc5dea678e",
+  "status": "completed",
+  "createdAt": "2026-10-22T19:50:40.725Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/final/00-gancho-congelado.png",
+    "imageSha256": "4d726816f477923cf0bf78210edd539cc4db30bebd7b0380908821ce3c407b86",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/fisica/planoA/mascara-00-lata.png",
+    "maskSha256": "8e81e66b381449ff24d2dc356d29682357df8d0adb6a8aa561fd5217966b7d0e",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/lata/breakr-lata-v1.png",
+        "sha256": "0df65a914b53de2df35fb9b7acfebdccca499250a3e3ecc42111cd1b68b9a180"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 3,
+    "prompt": "Edit only the marked zones of image 1. Keep her face, expression, hair, the coffee cup, both hands, the laptop, the man, the room, the light and all the water outside the marked zones exactly as they are.\n\nThis frame is a split second after a drink can, flying end-on and top first straight away from the camera, hit the centre of her chest. Physically the can could not have flown up beside her head, so:\n- Upper-left marked zone: remove the can completely. Fill it with the same airborne splash of clear water droplets and the soft background (glass partition, plant) that surround it.\n- Chest marked zone: the BREAKR can from image 2 has just stopped against the middle of her chest and is falling: it is right in front of her sternum, slightly lower, tilted almost horizontal (it rotated when its top hit her), moving back toward the camera and down, slightly motion-blurred. Its orange body, teal band and white BREAKR lettering stay recognisable. Around it, the water bursts outward from her chest in a crown of clear droplets, the same crisp style as the rest of the splash.\n- Her cream sweater in the chest zone is soaked: darker, wet, clinging, with water running down it.\nShe stays completely drenched: wet hair, wet sweater, water everywhere, as in image 1.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nEdit only the marked zones of image 1. Keep her face, expression, hair, the coffee cup, both hands, the laptop, the man, the room, the light and all the water outside the marked zones exactly as they are.\n\nThis frame is a split second after a drink can, flying end-on and top first straight away from the camera, hit the centre of her chest. Physically the can could not have flown up beside her head, so:\n- Upper-left marked zone: remove the can completely. Fill it with the same airborne splash of clear water droplets and the soft background (glass partition, plant) that surround it.\n- Chest marked zone: the BREAKR can from image 2 has just stopped against the middle of her chest and is falling: it is right in front of her sternum, slightly lower, tilted almost horizontal (it rotated when its top hit her), moving back toward the camera and down, slightly motion-blurred. Its orange body, teal band and white BREAKR lettering stay recognisable. Around it, the water bursts outward from her chest in a crown of clear droplets, the same crisp style as the rest of the splash.\n- Her cream sweater in the chest zone is soaked: darker, wet, clinging, with water running down it.\nShe stays completely drenched: wet hair, wet sweater, water everywhere, as in image 1.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.0943328857421875,
+    "editable": 96426,
+    "soft": 27218,
+    "protected": 1187076
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 85 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.1359,
+    "basis": "3 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 52.141,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.09,
+        "bestError": 4.09,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -4.66,
+        -8.04,
+        -9.42
+      ],
+      "protected": {
+        "pixels": 1187076,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 96426,
+        "maxDelta": 255,
+        "meanDelta": 61.726,
+        "worst": {
+          "x": 190,
+          "y": 395
+        }
+      },
+      "seam": {
+        "pixels": 27218,
+        "maxDelta": 219,
+        "meanDelta": 18.183,
+        "worst": {
+          "x": 491,
+          "y": 744
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1187076,
+        "maxDelta": 202,
+        "meanDelta": 7.181,
+        "worst": {
+          "x": 312,
+          "y": 541
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4506,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 441
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 6016
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 49.966,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.37,
+        "bestError": 3.37,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -11.57,
+        -14.06,
+        -14.76
+      ],
+      "protected": {
+        "pixels": 1187076,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 96426,
+        "maxDelta": 255,
+        "meanDelta": 58.805,
+        "worst": {
+          "x": 198,
+          "y": 398
+        }
+      },
+      "seam": {
+        "pixels": 27218,
+        "maxDelta": 217,
+        "meanDelta": 18.651,
+        "worst": {
+          "x": 375,
+          "y": 563
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1187076,
+        "maxDelta": 225,
+        "meanDelta": 6.549,
+        "worst": {
+          "x": 338,
+          "y": 471
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4506,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 441
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 6016
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 3,
+      "raw": "candidate-3-raw.png",
+      "final": "candidate-3.png",
+      "diff": "candidate-3-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 54.987,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": -5,
+        "scale": 1,
+        "stillError": 12.34,
+        "bestError": 10.54,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -13.45,
+        -16.77,
+        -17.68
+      ],
+      "protected": {
+        "pixels": 1187076,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 96426,
+        "maxDelta": 254,
+        "meanDelta": 63.381,
+        "worst": {
+          "x": 187,
+          "y": 274
+        }
+      },
+      "seam": {
+        "pixels": 27218,
+        "maxDelta": 209,
+        "meanDelta": 25.251,
+        "worst": {
+          "x": 478,
+          "y": 784
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1187076,
+        "maxDelta": 234,
+        "meanDelta": 17.658,
+        "worst": {
+          "x": 551,
+          "y": 468
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4506,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 441
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 6016
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

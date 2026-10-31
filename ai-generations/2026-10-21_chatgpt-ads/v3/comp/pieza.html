@@ -1,0 +1,111 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Bric;src:url(BricolageGrotesque-Variable.ttf);font-weight:200 800;font-stretch:75% 100%}
+@font-face{font-family:Pop;src:url(Poppins-400.ttf);font-weight:400}
+@font-face{font-family:Pop;src:url(Poppins-500.ttf);font-weight:500}
+@font-face{font-family:Pop;src:url(Poppins-600.ttf);font-weight:600}
+@font-face{font-family:Pop;src:url(Poppins-700.ttf);font-weight:700}
+*{box-sizing:border-box;font-synthesis:none}
+html,body{margin:0;background:#000}
+#root{position:relative;width:1080px;overflow:hidden;background:#020617}
+#bgwrap{position:absolute;inset:0;overflow:hidden}
+#bg{position:absolute;left:0;top:0;width:1080px;transform-origin:50% 50%}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#ring{position:absolute;border-radius:50%;border:6px solid rgba(255,255,255,.9);opacity:0;pointer-events:none;box-shadow:0 0 60px rgba(255,255,255,.6),inset 0 0 40px rgba(255,255,255,.4)}
+#stage{position:absolute;left:0;width:1080px;height:1350px}
+#grp{position:absolute;inset:0;transform-origin:50% 45%}
+.abs{position:absolute}
+#logo{left:0;width:1080px;display:flex;justify-content:center;opacity:0}
+#bar{left:100px;width:880px;height:124px;border-radius:62px;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05)),rgba(6,10,36,.38);backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4);border:1.5px solid rgba(255,255,255,.55);box-shadow:0 30px 90px rgba(0,0,20,.45),inset 0 1px 0 rgba(255,255,255,.6),inset 0 -20px 40px rgba(10,20,60,.25);display:flex;align-items:center;padding:0 22px 0 40px;font-family:Pop;font-size:31px;color:#fff;white-space:nowrap;opacity:0;transform-origin:50% 50%}
+#bar .ph{color:rgba(255,255,255,.72)}
+#bar .caret{display:inline-block;width:3px;height:38px;background:#fff;vertical-align:-8px;margin-left:3px}
+#send{width:78px;height:78px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#ans{left:100px;width:880px;padding:26px 36px;border-radius:34px;background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03)),rgba(4,8,30,.62);backdrop-filter:blur(30px) saturate(1.3);-webkit-backdrop-filter:blur(30px) saturate(1.3);border:1.5px solid rgba(255,255,255,.28);box-shadow:0 24px 70px rgba(0,0,20,.4);font-family:Pop;font-size:29px;line-height:1.45;color:#fff;min-height:0}
+#card{left:100px;width:880px;height:220px;border-radius:40px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(240,244,255,.90));box-shadow:0 50px 120px rgba(0,0,30,.55),0 0 0 1.5px rgba(255,255,255,.9),0 0 80px rgba(255,255,255,.25);display:flex;align-items:center;gap:30px;padding:0 36px;opacity:0;transform-origin:50% 50%}
+#card .lbl{position:absolute;left:38px;top:22px;font-family:Pop;font-weight:500;font-size:22px;color:#6b6b78}
+#card .av{width:118px;height:118px;border-radius:30px;background:linear-gradient(135deg,#0375db,#7b5cff);display:flex;align-items:center;justify-content:center;font-family:Bric;font-weight:760;font-size:48px;color:#fff;flex:none;margin-top:26px}
+#card .tx{flex:1;font-family:Pop;margin-top:26px}
+#card .t1{font-weight:700;font-size:40px;color:#111118;letter-spacing:-.01em}
+#card .t2{font-size:27px;color:#55556a;margin-top:2px}
+#card .cta{flex:none;font-family:Pop;font-weight:600;font-size:26px;color:#fff;background:#111118;border-radius:999px;padding:18px 32px;margin-top:26px}
+#nota{left:100px;font-family:Pop;font-size:18px;color:rgba(255,255,255,.6);opacity:0}
+#stat{left:0;width:1080px;text-align:center;opacity:0}
+#stat .n{font-family:Bric;font-weight:780;font-size:150px;letter-spacing:-.04em;line-height:1;color:#fff;text-shadow:0 8px 50px rgba(0,0,40,.45)}
+#stat .s{font-family:Pop;font-weight:500;font-size:40px;color:#fff;margin-top:14px;text-shadow:0 2px 20px rgba(0,0,40,.5)}
+#stat .f{font-family:Pop;font-size:18px;color:rgba(255,255,255,.65);margin-top:18px}
+#chile{left:0;width:1080px;text-align:center;font-family:Bric;font-weight:760;font-size:72px;letter-spacing:-.025em;color:#fff;opacity:0;text-shadow:0 6px 40px rgba(0,0,40,.45)}
+#h{left:90px;width:900px;text-align:center;font-family:Bric;font-weight:760;letter-spacing:-.028em;line-height:1.0;font-size:100px;color:#fff;opacity:0;text-shadow:0 6px 40px rgba(0,0,30,.35)}
+#lk{left:0;width:1080px;display:flex;align-items:center;justify-content:center;gap:42px;opacity:0}
+</style></head><body><div id="root">
+<div id="bgwrap"><img id="bg"></div>
+<div id="ring"></div>
+<div id="stage">
+ <div id="grp">
+  <div class="abs" id="logo"><img src="chatgpt-logo-blanco.svg" style="height:58px"></div>
+  <div class="abs" id="bar"><svg width="34" height="34" viewBox="0 0 24 24" style="flex:none;margin-right:22px"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg><span id="btext" style="flex:1;min-width:0;overflow:hidden"></span><svg width="34" height="34" viewBox="0 0 24 24" style="margin-left:16px;margin-right:22px;flex:none"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="#fff" stroke-width="2"/><path d="M5.5 11a6.5 6.5 0 0013 0M12 17.5V21" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><div id="send"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke="#111118" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+  <div class="abs" id="ans"></div>
+  <div class="abs" id="card"><div class="lbl">Patrocinado</div><div class="av">TM</div><div class="tx"><div class="t1">Tu marca</div><div class="t2">ERP para operación regional</div></div><div class="cta">Ver más</div></div>
+  <div class="abs" id="nota">Recreación ilustrativa</div>
+ </div>
+ <div class="abs" id="stat"><div class="n">1.200 millones</div><div class="s">de personas usan ChatGPT cada semana.</div><div class="f">Fuente: OpenAI, octubre de 2026</div></div>
+ <div class="abs" id="chile">Desde hoy, también en Chile.</div>
+ <div class="abs" id="h">Tu marca, donde tu<br>cliente decide.</div>
+ <div class="abs" id="lk"><img src="efeonce-negativo.svg" style="width:300px"><span style="width:2px;height:80px;background:rgba(255,255,255,.6)"></span><img src="openai-blanco.svg" style="height:78px"></div>
+</div>
+<div id="flash"></div>
+</div>
+<script>
+const q=new URLSearchParams(location.search),H=+(q.get('h')||1350)
+if(q.get('sin'))document.head.insertAdjacentHTML('beforeend','<style>#grp,#stat,#chile,#h,#lk,#ring,#flash{visibility:hidden!important}</style>')
+const root=document.getElementById('root');root.style.height=H+'px'
+const OFF=(H-1350)/2,ST=H>1350;document.getElementById('stage').style.top=OFF+'px'
+const $=id=>document.getElementById(id)
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t
+const eo=t=>1-Math.pow(1-t,3),eio=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2
+const back=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}
+// grilla de 120 BPM: envío 4,0 · losa 8,0 · dato 10,0 · Chile 11,0 · cierre (pico del sting) 12,0
+const T_SEND=4.0,T_CARD=8.0,T_STAT=10.0,T_CHILE=11.0,T_END=12.0
+const PROMPT='¿Qué ERP conviene para 5 países?'
+const ANS='Para operar en 5 países conviene un ERP con multimoneda, facturación electrónica local y consolidación contable en tiempo real. Estas son algunas opciones:'
+const AW=ANS.split(' ')
+const Y={logo:520,barC:612,barT:400,ans:548,card:790,nota:1010,h:130,lk:880,stat:480,chile:820}
+if(ST){Y.h-=140;Y.lk+=40;Y.nota+=160;Y.stat-=20;Y.chile+=40}
+for(const k of ['logo','ans','card','nota','h','lk','stat','chile'])$(k).style.top=Y[k]+'px'
+const bg=$('bg')
+window.setBgSrc=s=>new Promise(r=>{bg.onload=()=>r();bg.src=s})
+window.setT=function(t){
+ // fondo: deriva continua y empujón en cada golpe
+ let z=1+0.05*(t/15);for(const [g,a] of [[T_SEND,.08],[T_CARD,.08],[T_STAT,.04],[T_END,.05]]){const d=t-g;if(d>=0&&d<0.6)z+=a*(1-eo(d/0.6))}
+ const bh=bg.naturalHeight?1080*bg.naturalHeight/bg.naturalWidth:H;bg.style.height=bh+'px';bg.style.top=((H-bh)/2)+'px'
+ let sh=0;for(const g of [T_SEND,T_CARD]){const d=t-g;if(d>=0&&d<0.22)sh=Math.max(sh,(1-d/0.22)*16)}
+ bg.style.transform=`scale(${z}) translate(${sh*Math.sin(t*170)}px,${sh*Math.cos(t*150)}px)`
+ const dipI=t<T_STAT?0:t<T_END-0.3?eio(clamp((t-T_STAT)/0.45)):1-eio(clamp((t-(T_END-0.3))/0.5)),dipC=eio(clamp((t-(T_END-0.3))/0.6))
+ bg.style.filter=`brightness(${1-0.45*dipI-0.32*dipC})`
+ let fl=0;for(const [g,a] of [[T_SEND,.9],[T_CARD,.9],[T_STAT,.35],[T_END,.45]]){const d=t-g;if(d>=0&&d<0.3)fl=Math.max(fl,a*(1-d/0.3))}
+ $('flash').style.opacity=fl
+ // logo de ChatGPT y barra
+ $('logo').style.opacity=t<T_SEND?clamp(t/0.5):clamp(1-(t-T_SEND)/0.25)
+ const up=eio(clamp((t-T_SEND)/0.6)),pop=t>=T_SEND&&t<T_SEND+0.15?0.94:1
+ const bar=$('bar');bar.style.opacity=clamp(t/0.5);bar.style.top=lerp(Y.barC,Y.barT,up)+'px'
+ bar.style.transform=`scale(${lerp(0.96,1,eo(clamp(t/0.6)))*pop}) translate(${sh*0.6*Math.sin(t*170)}px,0)`
+ const typed=t<0.6?0:Math.min(PROMPT.length,Math.floor((t-0.6)/2.6*PROMPT.length))
+ $('btext').innerHTML=t>=T_SEND?'<span class="ph">Pregúntale a ChatGPT</span>':(typed?PROMPT.slice(0,typed)+'<span class="caret"></span>':'<span class="ph">Pregúntale a ChatGPT</span>')
+ // la respuesta se escribe (recreación ilustrativa)
+ const nw=t<T_SEND+0.5?0:Math.min(AW.length,Math.ceil((t-T_SEND-0.5)/2.8*AW.length));$('ans').textContent=AW.slice(0,nw).join(' ')||' ';$('ans').style.opacity=(t<T_SEND+0.3?0:clamp((t-T_SEND-0.3)/0.3))*(1-clamp((t-(T_END-0.3))/0.35))
+ $('nota').style.opacity=t<T_STAT?clamp((t-T_SEND-0.5)/0.4)*1:0
+ // la losa patrocinada cae en el golpe 2
+ const c=$('card'),cp=clamp((t-(T_CARD-0.12))/0.12),land=clamp((t-T_CARD)/0.4)
+ c.style.opacity=t>=T_CARD-0.12?1:0;c.style.top=lerp(Y.card,Y.ans+6,eio(clamp((t-(T_END-0.2))/0.6)))+'px'
+ const cy=t<T_CARD?lerp(-560,0,eio(cp)):0,cs=t<T_CARD?lerp(1.9,1.06,cp):lerp(1.06,1,back(land))
+ c.style.transform=`translateY(${cy}px) scale(${cs}) translate(${sh*Math.sin(t*170)}px,0)`
+ const r=$('ring'),rd=t-T_CARD;if(rd>=0&&rd<0.8){const R=lerp(80,1600,eo(rd/0.8)),cyR=OFF+Y.card+110;r.style.width=r.style.height=R+'px';r.style.left=(540-R/2)+'px';r.style.top=(cyR-R/2)+'px';r.style.opacity=0.85*(1-rd/0.8);r.style.borderWidth=lerp(10,2,rd/0.8)+'px'}else r.style.opacity=0
+ // interludio: el dato y Chile; la interfaz se aleja y vuelve en el cierre
+ const away=t<T_STAT?0:t<T_END-0.3?eio(clamp((t-T_STAT)/0.45)):1-eio(clamp((t-(T_END-0.3))/0.5))
+ const g=$('grp');g.style.opacity=lerp(1,0.12,away);g.style.transform=`scale(${lerp(1,0.9,away)})`;g.style.filter=away>0.01?`blur(${8*away}px)`:'none'
+ const sIn=clamp((t-T_STAT)/0.35),sOut=clamp((t-(T_END-0.35))/0.3);$('stat').style.opacity=sIn*(1-sOut);$('stat').style.transform=`scale(${lerp(1.18,1,eo(sIn))})`
+ const cIn=clamp((t-T_CHILE)/0.35);$('chile').style.opacity=cIn*(1-sOut);$('chile').style.transform=`translateY(${30*(1-eo(cIn))}px)`
+ // cierre: titular y lockup, con el pico del sting en 12,0
+ const hp=clamp((t-(T_END-0.05))/0.45);$('h').style.opacity=hp;$('h').style.transform=`translateY(${24*(1-eo(hp))}px)`
+ const lp=clamp((t-(T_END+0.2))/0.45);$('lk').style.opacity=lp;$('lk').style.transform=`scale(${lerp(1.12,1,eo(lp))})`
+}
+</script></body></html>

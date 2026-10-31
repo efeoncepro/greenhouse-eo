@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-26",
+  "verifiedAt": "2026-10-26T17:31:40.109807+00:00",
+  "repository": "efeoncepro/efeonce-rooms",
+  "branch": "main",
+  "commit": "a87852e345c331d6f4b3ca8e3137bf1fb2120e35",
+  "pullRequest": "https://github.com/efeoncepro/efeonce-rooms/pull/2",
+  "pullRequestState": "MERGED",
+  "candidateCommit": "95609d5ad869e3ee421d7a8fef05fc68d1c06821",
+  "deployment": {
+    "projectId": "prj_9iaZv8FXdhvtC68r30OS3H4o3iJo",
+    "id": "dpl_GACNzAvGSQVcjcMCCvjWj9BooizV",
+    "url": "https://efeonce-rooms-bqpds3btf-efeonce-7670142f.vercel.app",
+    "origin": "https://efeonce-rooms.vercel.app",
+    "target": "production",
+    "state": "READY",
+    "canonicalAliasMatches": true,
+    "promotion": "explicit vercel promote after READY/STAGED and smoke"
+  },
+  "rollback": {
+    "commit": "20f9fe974e1c2f994380d6eff694bb18232e4b2d",
+    "deploymentId": "dpl_7o71umG3uuNgz8RguhPPGksA69ad"
+  },
+  "scope": {
+    "backendDependenciesIncluded": true,
+    "visualScaffold2071Excluded": true,
+    "jsxStyleVisibleCopyDiff": false,
+    "typedReaderContractIncluded": true
+  },
+  "verification": {
+    "verify": {
+      "tests": 225,
+      "pass": 225,
+      "fail": 0,
+      "skip": 0,
+      "lint": "PASS",
+      "negativeLint": "PASS",
+      "types": "PASS",
+      "nextBuild": "PASS"
+    },
+    "browser": {
+      "pass": 53,
+      "fail": 0,
+      "skip": 3,
+      "skipReason": "duplicate viewport-independent API check; executed on desktop",
+      "viewports": [
+        1440,
+        1024,
+        390,
+        320
+      ]
+    },
+    "linuxWorkerCI": {
+      "result": "SUCCESS",
+      "mainRun": "https://github.com/efeoncepro/efeonce-rooms/actions/runs/40368779998"
+    },
+    "preview": "SUCCESS",
+    "productionSmoke": {
+      "at": "2026-10-26T17:30:44.105923+00:00",
+      "origin": "https://efeonce-rooms.vercel.app",
+      "routes": [
+        {
+          "path": "/demo",
+          "expected": 200,
+          "status": 200,
+          "cache": "public, max-age=0, must-revalidate",
+          "referrer": "same-origin",
+          "pass": true
+        },
+        {
+          "path": "/invite",
+          "expected": 200,
+          "status": 200,
+          "cache": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "referrer": "no-referrer",
+          "pass": true
+        },
+        {
+          "path": "/rooms",
+          "expected": 200,
+          "status": 200,
+          "cache": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "referrer": "no-referrer",
+          "pass": true
+        },
+        {
+          "path": "/login",
+          "expected": 503,
+          "status": 503,
+          "cache": "private, no-store",
+          "referrer": "no-referrer",
+          "pass": true
+        },
+        {
+          "path": "/api/v1/rooms",
+          "expected": 401,
+          "status": 401,
+          "cache": "private, no-store",
+          "referrer": "same-origin",
+          "pass": true
+        },
+        {
+          "path": "/api/v1/rooms/room-test/media?organizationId=org-test",
+          "expected": 401,
+          "status": 401,
+          "cache": "private, no-store",
+          "referrer": "no-referrer",
+          "pass": true
+        },
+        {
+          "path": "/api/v1/rooms/room-test/preview?organizationId=org-test",
+          "expected": 401,
+          "status": 401,
+          "cache": "private, no-store",
+          "referrer": "no-referrer",
+          "pass": true
+        },
+        {
+          "path": "/api/v1/rooms/room-test/uploads/upload-test/transfer?organizationId=org-test",
+          "expected": 401,
+          "status": 401,
+          "cache": "private, no-store",
+          "referrer": "no-referrer",
+          "pass": true
+        }
+      ],
+      "pass": true
+    }
+  },
+  "configuration": {
+    "firstPartyAuth": "false",
+    "invitations": "false",
+    "media": "absent; defaults OFF",
+    "environmentMutations": false,
+    "mediaStorageConfigured": false,
+    "mediaBucketConfigured": false
+  },
+  "notExecuted": [
+    "cloud media resource and IAM provisioning",
+    "cloud migration6/7 application",
+    "worker cloud deployment",
+    "Auth or Greenhouse release",
+    "flag activation",
+    "invitation email send",
+    "authenticated OIDC and physical GCS media canary"
+  ],
+  "taskStatus": "in-progress; backend published, cloud media activation pending"
+}

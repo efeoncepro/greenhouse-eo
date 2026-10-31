@@ -1,5 +1,10 @@
 # Olivos del Sur Perú — audiovisual y campañas 360°
 
+**Estado posterior25/10:** secuencia `317665660` de Emily pausada por autorización de Julio;
+Programado0/EnCurso0/Pausada1 releídos. Prevalece la espera expresada por la compradora sobre el
+calendario anterior. [Aplicación y condición de continuidad](../../analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md).
+
+
 **Actualización 08/10 posterior al alta:** primer correo enviado por Julio y verificado en Outlook; nota CRM y tarea de seguimiento con borrador verificadas. Primera revisión interna 13/10 10:00 Chile. [Evidencia y próximos contactos](../../follow-up-agent/runs/2026-10-08-outreach-manual.md). El estado histórico «sin outreach» de abajo corresponde al alta inicial; el envío no califica por sí solo el lead.
 
 Corte: 2026-10-08. Investigación y alta de oportunidad autorizadas por Julio.
@@ -133,3 +138,13 @@ corporativo indicado cuando Julio autorice el contacto. Este trabajo no envió m
 Julio indicó que las señales se trabajan como leads hasta calificarlas y pidió **conservar los Deals ya creados**. La etapa registrada no demuestra oportunidad calificada; no cambiarla retroactivamente ni duplicar el registro. Las membresías anteriores son evidencia del corte, no suscripción, habilitación de correo ni inscripción verificada en Prospecting Agent.
 
 Para próximos pasos y borradores preparados consultar el [agente de seguimiento comercial](../../follow-up-agent/README.md) y su [registro](../../follow-up-agent/REGISTRO.md). Para propiedades y segmentos activos existentes consultar el [canon de prospección](../../../documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md). Esta consolidación no envió mensajes ni modificó CRM.
+
+
+## Actualización 21/10/2026 — Respuesta recibida
+
+Respuesta de Marketing21Oct10:39:37Chile: revisión interna de antecedentes; contactarán si encaja. Esperar sin otro seguimiento hoy. [Lectura y próximos pasos](../../follow-up-agent/runs/2026-10-21-1055-respuestas-izipay-olivos.md). Ningún nuevo envío ni escritura CRM por esta revisión.
+
+
+### 11:40 — Nueva instrucción ejecutada
+
+Secuencia317665660 programada por mandato explícito:29Oct/12Nov/3Dic; un contacto, firma gráfica, paradarespuesta/reunión. No enviar hoy ni duplicar desde heartbeat. [Registro](../../follow-up-agent/runs/2026-10-21-1140-izipay-paquete-olivos-secuencia.md).

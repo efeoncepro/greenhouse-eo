@@ -13,9 +13,18 @@
 > **Validated as of:** 2026-09-07
 > **Program:**
 > [`EPIC-044`](../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
-> **Primer consumidor:** `TASK-1834` (Greenhouse)
+> **Primer consumidor vigente:** Rooms (TASK-2065), sobre foundation TASK-1834; Greenhouse continúa en TASK-2063.
+> **Decisión 2026-10-25:** [Rooms primero y login V4](EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md) prevalece sobre la secuencia histórica de este documento.
 
-## Estado de implementación al aceptar la decisión
+## Corte operativo posterior — 2026-10-26
+
+Rooms sigue primero; el canary OIDC/OTP real acotado ya pasó con Microsoft/MFA, PNG privado y un correo
+recibido, y quedó cerrado. Auth first-party/OTP false, sin montajes HMAC/authority; no hay apertura de
+cohorte ni migración Greenhouse (TASK-2063). PR #263/#264 del control de deploy siguen abiertas y retenidas;
+el guard del workspace todavía no protege los YAML remotos. Nueva UI puede desarrollarse aislada,
+sin publicación ni activación implícitas. [Runbook vigente](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+
+## Estado de implementación al aceptar la decisión (2026-09-07)
 
 `auth.efeonce.org` ya opera el carril OAuth del MCP y su sesión propia. Este ADR acepta el contrato
 multiproducto, pero **no afirma que el carril OIDC first-party, el entry routing directo de Greenhouse ni su
@@ -248,9 +257,9 @@ uso, PKCE, nonce/state, redacción de logs y auditoría durable forman parte del
 ### Fuentes de verdad
 
 - **Política transversal:** este ADR y EPIC-044.
-- **Registro de clientes/RPs:** `greenhouse_auth.oauth_clients` y su port tipado en
-  `src/lib/auth-server/oauth/store/port.ts`, extendidos mediante migración aditiva para representar clase de
-  flujo, audiencia de identidad, assurance y perfil de presentación. `metadata_json` arbitrario no puede ser
+- **Registro de clientes/RPs:** `greenhouse_auth.first_party_clients` y su port tipado en
+  `src/lib/auth-server/first-party/types.ts`, separados de `oauth_clients` mediante migración aditiva para representar
+  clase de flujo, audiencia de identidad, assurance y perfil de presentación (TASK-1834, 2026-10-25). `metadata_json` arbitrario no puede ser
   la única fuente de una decisión de confianza.
 - **Transacción y autorización:** `src/lib/auth-server/oauth/authorize.ts` y stores asociados. La rama
   `first_party_sign_in` debe ser explícita y no insertar una fila falsa de consentimiento delegado.
@@ -258,7 +267,7 @@ uso, PKCE, nonce/state, redacción de logs y auditoría durable forman parte del
   `src/lib/auth-server/oauth/pages/render.ts`, consumiendo sólo contexto ya validado.
 - **OIDC first-party:** contrato separado para authorization code, ID token/user identity y audience del RP.
   No reutiliza el access token, audience, `gv` ni consentimiento del MCP como sustituto.
-- **Entrada y callback Greenhouse:** routes server-side del portal definidas por `TASK-1834`, con destino
+- **Entrada y callback por producto:** Rooms TASK-2065 primero; Greenhouse TASK-2063 después, con routes server-side, con destino
   allowlisted y callback que consume la transacción una sola vez.
 - **Autorización Greenhouse:** resolver canónico de identidad y contextos elegibles usado tanto al crear como al
   revalidar la sesión; no una bifurcación exclusiva del callback.
@@ -293,7 +302,7 @@ La primera implementación debe entregar como mínimo:
 1. schema/port tipado para RP first-party y perfil de presentación confiable;
 2. OIDC first-party con audience y artefactos separados del MCP;
 3. rama explícita sin pantalla ni fila de consentimiento delegado;
-4. entry routing 3xx de Greenhouse antes de renderizar para la cohorte habilitada;
+4. entry routing 3xx de Rooms antes de renderizar para la cohorte habilitada; Greenhouse conserva adopción propia;
 5. login contextual del issuer y variante directa neutral;
 6. fast path condicionado a assurance, revocación y freshness;
 7. callback con validación integral y consumo único;

@@ -1,0 +1,48 @@
+{
+  "iconAudit": {
+    "ok": true,
+    "issues": []
+  },
+  "files": [
+    {
+      "file": "delivery/contenido-una-idea-cada-formato-desktop-light.svg",
+      "w": 1600,
+      "h": 1000,
+      "bytes": 195486,
+      "sha256": "54f686f34893444bf96a58f17779aad4d5f2715669ee4bedf1655a1f96bd7a4d",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": [],
+      "textOverlaps": []
+    },
+    {
+      "file": "delivery/contenido-una-idea-cada-formato-desktop-dark.svg",
+      "w": 1600,
+      "h": 1000,
+      "bytes": 195591,
+      "sha256": "4f779d5376bbc5cb895dbefe2d72f73d83e9a50687db065a9021640719bf7cf1",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": [],
+      "textOverlaps": []
+    },
+    {
+      "file": "delivery/contenido-una-idea-cada-formato-mobile-light.svg",
+      "w": 900,
+      "h": 2150,
+      "bytes": 178324,
+      "sha256": "af6f4eae0ae33c4d57a1ff5147e49ccd0258f2ee2ebc4a257c8a6138d9be7f36",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": [],
+      "textOverlaps": []
+    },
+    {
+      "file": "delivery/contenido-una-idea-cada-formato-mobile-dark.svg",
+      "w": 900,
+      "h": 2150,
+      "bytes": 178398,
+      "sha256": "f4b75af40c4c9f7e1cc270934250e1c49a5f48b2facb5f936a3e5989ee2ec905",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": [],
+      "textOverlaps": []
+    }
+  ]
+}

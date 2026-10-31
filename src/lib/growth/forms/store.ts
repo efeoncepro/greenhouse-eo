@@ -1039,7 +1039,7 @@ export const listDueEventReminderSubmissionIds = async (now: Date, limit = 500):
        JOIN greenhouse_growth.form_definition d ON d.form_id = s.form_id
        JOIN greenhouse_growth.form_version v ON v.form_version_id = s.form_version_id
       WHERE d.form_kind = 'event_registration'
-        AND s.status = 'accepted'
+        AND s.status = ANY($3::text[])
         AND v.ui_policy_json #>> '{eventRegistration,event,startUtc}' IS NOT NULL
         AND (v.ui_policy_json #>> '{eventRegistration,event,startUtc}')::timestamptz > $1
         AND (v.ui_policy_json #>> '{eventRegistration,event,startUtc}')::timestamptz
@@ -1050,7 +1050,7 @@ export const listDueEventReminderSubmissionIds = async (now: Date, limit = 500):
             ) <> 'waitlisted'
       ORDER BY s.created_at
       LIMIT $2`,
-    [now.toISOString(), limit]
+    [now.toISOString(), limit, [...ACCEPTED_SUBMISSION_STATUSES]]
   )
 
   return rows.map(row => row.submission_id)

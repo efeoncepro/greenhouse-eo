@@ -1,0 +1,140 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "a842aa80ffe6",
+  "key": "a842aa80ffe63cd102de7b262dedc90c439dfe7a89f022cf06ce4f21619dec40",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:34:39.686Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v3/18-tambien.png",
+    "imageSha256": "9ace2532a1ce6b3ff82aaec89b049d585e063d9358a3eda6dfc25b03184b6134",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/18.png",
+    "maskSha256": "f9089811e66d06bf5e944300af464855f5d7431027b672ba904fe10c0b53149a",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png",
+        "sha256": "4ca4aec0dbc487f2ec71656dd28f94eae61a646637f6719bb3631e73054f9cf8"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked zones. Foreground left, out of focus and seen from behind (over-the-shoulder): the woman from image 2 after being soaked — dripping wet dark brown hair, slim gold-rimmed glasses on top of her head, and the shoulder of her soaked cream fine-knit sweater; in front of her, her open thin aluminum laptop. On the table: the man's navy blue ceramic mug, and the pale oak tabletop is wet, with small puddles, droplets and two small orange slices left by a splash; no other people. Bottom right: no extra person, just the wet table and a grey chair, out of focus. Keep the man and everything outside the zones unchanged. Warm morning light as in the scene. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the marked zones. Foreground left, out of focus and seen from behind (over-the-shoulder): the woman from image 2 after being soaked — dripping wet dark brown hair, slim gold-rimmed glasses on top of her head, and the shoulder of her soaked cream fine-knit sweater; in front of her, her open thin aluminum laptop. On the table: the man's navy blue ceramic mug, and the pale oak tabletop is wet, with small puddles, droplets and two small orange slices left by a splash; no other people. Bottom right: no extra person, just the wet table and a grey chair, out of focus. Keep the man and everything outside the zones unchanged. Warm morning light as in the scene. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.3221702575683594,
+    "editable": 392884,
+    "soft": 29391,
+    "protected": 888445
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 85.668,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 7.69,
+        "bestError": 7.69,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 888445,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 392884,
+        "maxDelta": 242,
+        "meanDelta": 89.61,
+        "worst": {
+          "x": 11,
+          "y": 624
+        }
+      },
+      "seam": {
+        "pixels": 29391,
+        "maxDelta": 217,
+        "meanDelta": 32.976,
+        "worst": {
+          "x": 98,
+          "y": 738
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 888445,
+        "maxDelta": 236,
+        "meanDelta": 19.058,
+        "worst": {
+          "x": 133,
+          "y": 564
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 3097,
+        "input_tokens_details": {
+          "image_tokens": 2816,
+          "text_tokens": 281
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 4607
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

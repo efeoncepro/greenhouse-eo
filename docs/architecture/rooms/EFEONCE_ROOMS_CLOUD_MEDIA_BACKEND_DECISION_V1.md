@@ -1,0 +1,143 @@
+# Rooms — backend cloud de imágenes y worker propio
+
+- Status: **Accepted para implementación**, 2026-10-26. Operador asigna backend a Codex y diseño a Claude Design; la construcción continúa sobre EPIC-052. Aprovisionamiento, costes y activación conservan gates específicos.
+- Owner: TASK-2072, Platform / Media. TASK-2070 conserva recuperación del corte local;2071 conserva UI histórica sin aceptación visual.
+- Reemplaza únicamente la limitación de código local del ADR de imágenes; preserva semántica V3, fuente inmutable y permisos.
+
+## Continuidad local posterior — 2026-10-29
+
+El [candidato local3c7bcb5](../../audits/rooms/2026-10-29-backend-local-completion.md) tiene entorno
+integrador construido/detenido y restore13 en PG16/18. No modifica el corte cloud8 fechado abajo ni
+revalida su deployment remoto. Multimedia V4 sigue [sólo local](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md),
+sin certificación Linux/cloud; UI Claude Design y activación general siguen pendientes. [Estado vivo](README.md).
+
+## Estado ejecutado al cierre 2026-10-26
+
+Main `e4b2e890` publicado/promovido, GCS privado, ocho migraciones/26 tablas y Job con SA/rol propio.
+Canary real cerrado: un PNG físico→dos WebP→lectura privada, único correo recibido y revocación; no
+repetir. Scheduler OIDC cada minuto devuelve200 sin iniciar contenedor con cola vacía, y202 con demanda
+→Job `rooms-media-worker-4r9nz` SUCCESS→ack/liberación cercada. Esa última demanda sintética archivada
+se rechaza antes de storage; no es otra decodificación de imagen. Lease10min, timeout240s/retries0.
+[Canary](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md),
+[dispatch](../../audits/rooms/2026-10-26-automatic-media-dispatch.json) y [DB8](../../audits/rooms/2026-10-26-media-dispatch-database.json).
+
+Flag dispatch máquina ON; flags humanos/medios web OFF. La nueva interfaz/consumidor de Claude Design,
+el entorno de integración y su recorrido completo siguen pendientes; activación general separada.
+Auth queda en PR263/264. El contexto y rollout inicial siguientes preservan la secuencia histórica.
+
+## Contexto y decisión iniciales
+
+Base7ca5fd3 en rama task/2070-2071-private-media. El pipeline local está recuperado con207tests
+registrados. Producción20f9fe9 sigue OFF. El límite de4,5MB de request de Vercel obliga a transferir
+originales hasta20MiB directamente al storage; no reducir el límite del producto para ocultar el gap.
+
+Se usa GCS privado propio, SDK oficial exacto8.4.0, y un port MediaStorage común para local/cloud.
+Bucket candidato `efeonce-rooms-production-media`, proyecto `efeonce-group`, prefijo `rooms-media/`.
+Estos nombres no prueban existencia ni autorización de un recurso vivo. Cloud debe fallar cerrado si
+no coincide el perfil exacto; nada de filesystem efímero Vercel ni bucket de otro producto.
+
+## Transferencia y generación
+
+uploads.initiate registra intención y destino generado; receipts cloud no contienen credenciales de
+transferencia. uploads.getTransfer reconsulta sesión/owner/room/expiry y entrega un descriptor de escritura
+V4 PUT efímero, TTL máximo5min y nunca mayor que la sesión upload. Firma content-type/content-length y
+precondición generation0; nunca lectura. Browser envía Blob de tamaño conocido; Content-Length lo coloca
+el navegador, no un header JS. El descriptor jamás se registra en logs/audit/browser persistente.
+
+Una URL de escritura emitida puede sobrevivir a una revocación hasta su TTL; cancel/expire impiden
+complete y publicación, y la cuarentena se limpia posteriormente. No afirmar revocación física instantánea.
+Repetir getTransfer no crea una intención nueva; sólo puede escribir el destino inmutable asignado,
+que existe a lo sumo una vez por generation0. Complete verifica metadata, tamaño/tipo y checksum
+incremental acotado fuera de SQL, después revalida autoridad y CAS antes de confirmar generación/cola.
+
+El UUID de dominio y generation física GCS son entidades distintas. Columnas aditivas
+source_storage_generation y media_renditions.storage_generation guardan generación decimal; NULL sólo
+para el legado local. Lecturas y borrados usan esa generación y precondición; no resolver latest a ciegas.
+
+## Entrega privada
+
+GET/HEAD/Range/304 conservan sesión/grants frescos y pertenencia a edición. Sólo derivados <=3MiB:
+openDelivery verifica tamaño+SHA antes de responder metadatos o ETag; buffer acotado verificado evita
+corrupción de mismo tamaño y TOCTOU local. Stream en fragmentos con backpressure. Originales no tienen
+ruta de lectura. Headers private,no-store/no-referrer/nosniff; sin URLs firmadas de lectura ni optimizador
+público. Una petición ya admitida y bytes guardados no se recuperan mediante revocación.
+
+## Worker y autoridad
+
+Worker compilado Node24, decoder aislado por proceso con tiempo/heap/stdout/threads acotados. Artefacto
+propio y lock mínimo público, versiones exactas verificadas contra manifest raíz, sin tsx ni paquetes web.
+Cloud Run Job `rooms-media-worker`; una invocación procesa como máximo un candidato y termina. Scheduler y concurrencia tienen el contrato de dispatch descrito abajo; coste/throughput bajo carga y retención general conservan decisiones/medición propias.
+
+Perfil `cloud-worker` explícito: Compute metadata de la SA exclusiva
+`rooms-media-worker-production@efeonce-group.iam.gserviceaccount.com`, sin ADC de archivos ni claves JSON,
+sin variables Vercel falsas. Pool y usuario `rooms_media_worker` propios, máximo2, secreto de DB exclusivo;
+sólo tablas/estados y lectura de Rooms imprescindibles. Nada de autoridad humana, login/OTP, bases ajenas ni
+credencial migrator. Perfil de app cloud-production conserva WIF Vercel y su validación anterior intacta.
+
+Firma V4 exige signBlob acotado a la identidad de app; IAM se prepara sin conceder TokenCreator de proyecto.
+Worker no firma uploads. GCS requiere acceso uniforme, PublicAccessPrevention, CORS al origin exacto para
+PUT/headers concretos, originales/derivados privados y políticas de cleanup/backup medidas. Toda propuesta
+IAM/costes tiene readback previo y no se aplica por ejecutar build/tests.
+
+## Compatibilidad y consumidor
+
+No cambiar layouts, componentes ni copy visible: Claude Design posee diseño. HTTP/CLI usan mismos
+servicios/capabilities, expectedRevision/idempotencia y errorCodes saneados. Documentar la secuencia y DTOs
+para el nuevo frontend. Legacy V1/V2/V3 conserva significado/hashes. UI existente necesita conectar
+getTransfer para modo GCS; no activar el perfil cloud-media antes de comprobar el consumer aplicable.
+
+## Verificación y rollout
+
+Negativas de tamaño/tipo/hash/tenant/originals, generation mismatch y cancel/retry/fencing; pruebas SDK
+con fakes explícitos, nunca presentadas como GCS vivo. Ensayo aislado restore SQL+objetos, hashes/generaciones/
+ACL/inmutabilidad y down sólo en clones. Worker build/smoke sobre prod closure. Lint/types/tests/build.
+Cloud después de capacidad/IAM/config/migración/backup/readbacks. Canary de identidad sigue único,
+con destinatario autorizado existente y coordinaciónAuth; no enviar clientes por completar backend.
+
+## Primer rollout acotado de infraestructura 2026-10-26 (antes de canary/dispatch)
+
+El operador autorizó infraestructura, migraciones y worker con subagentes, manteniendo Auth/correo/UI
+fuera del bloque. Bucket/IAM/CORS y SA aplicados; siete migraciones y rol SQL dedicado verificados.
+Cloud Run Job finito: CPU1/RAM1Gi, timeout240s, reintentos0, una tarea y paralelismo1; imagen inmutable,
+una ejecución con cola vacía completada. No scheduler ni loop. El límite de memoria cubre también el
+decoder nativo; todavía no se ha medido el peor caso de una imagen real en cloud.
+
+Tres variables GCS se guardaron en Vercel Production para el próximo deploy; no se cambiaron flags web
+ni se reconstruyó la aplicación. El canary real y el consumidor conservan su gate separado.
+[Manual y evidencias](../../manual-de-uso/rooms/operar-worker-medios.md).
+
+## Disparo automático autorizado y verificado 2026-10-26
+
+Decisión incremental de TASK-2072: Cloud Scheduler cada minuto hace POST al endpoint fijo
+`https://efeonce-rooms.vercel.app/api/internal/media/dispatch`, autenticado con OIDC Google de la SA
+`rooms-media-scheduler-prod@efeonce-group.iam.gserviceaccount.com`. No utiliza sesión humana,
+API key, cookies ni autoridad de cliente. Verificar firma, expiración, issuer, audience y email exactos.
+
+`ROOMS_MEDIA_DISPATCH_ENABLED` es un flag de máquina independiente. Acceso, invitaciones y medios web
+permanecen OFF. El endpoint consulta la cola y sólo invoca el Job existente con trabajo pendiente.
+Una fila singleton SQL y lease de diez minutos evitan ejecuciones superpuestas; nonce por invocación
+cerca el acknowledgement del worker. Llamada Jobs API fuera de la transacción, sin retry automático;
+fallo ambiguo conserva lease hasta expiración. Worker mantiene timeout240s y retries0. Nueva migración8
+sólo añade coordinación, sin cambiar salas/publicaciones. App obtiene exclusivamente `run.jobs.run` y
+`run.jobs.runWithOverrides` sobre este Job; la única override es el nonce. No conceder roles de proyecto.
+
+Rollout: migración/ACL → worker por digest → endpoint desplegado → Scheduler verificado y habilitado.
+Comprobar cola vacía sin ejecución y una única demanda sintética en la sala archivada existente:
+rechazo previo a storage y lease liberada prueban transporte, sin repetir canary de imagen/correo.
+Rollback: pausar Scheduler, flag máquina OFF y conservar tabla/lease hasta terminación del Job.
+No ejecutar down sobre una lease activa. El frontend sigue bajo Claude Design.
+
+## Alternativas
+
+- Proxy de originales20MiB por Vercel: rechazada por límite de plataforma.
+- Storage público o URL bearer de lectura: rechazados por revocación/tenancy.
+- Worker fingiendo identidad Vercel/SA compartida: rechazado; perfil dedicado verificable.
+- Transformar V2 en V3 automáticamente: rechazado, conservar conversión explícita.
+- Pipeline nuevo por frontend: rechazado; una API de producto reutilizable.
+
+## Fuentes primarias verificadas2026-10-26
+
+- [Vercel Functions limits](https://vercel.com/docs/functions/limitations).
+- [GCS V4 PUT](https://docs.cloud.google.com/storage/docs/samples/storage-generate-upload-signed-url-v4).
+- [GCS signed URLs](https://docs.cloud.google.com/storage/docs/access-control/signed-urls).
+- npm @google-cloud/storage8.4.0 y esbuild0.28.2 verificados por registry; pins del runtime son la autoridad ejecutable.

@@ -12,87 +12,99 @@
     },
     {
       "recipeId": "content-service-lanes",
-      "purpose": "03 · qué cubren las 25 horas"
+      "purpose": "03 · qué cubren las 30 horas"
+    },
+    {
+      "recipeId": "content-text",
+      "purpose": "04 · qué se cobra aparte"
     },
     {
       "recipeId": "proposal-cinematic-revops",
-      "purpose": "04 · todo el CRM",
+      "purpose": "05 · todo el CRM",
       "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS2d-datos-en-orden.png"
     },
     {
       "recipeId": "decision-platform-coexistence",
-      "purpose": "05 · integraciones"
+      "purpose": "06 · integraciones"
     },
     {
       "recipeId": "method-staircase",
-      "purpose": "06 · desarrollo a medida"
+      "purpose": "07 · desarrollo a medida"
     },
     {
       "recipeId": "method-migration-reconcile",
-      "purpose": "07 · ejecución con control"
+      "purpose": "08 · ejecución con control"
     },
     {
       "recipeId": "method-agent-supervisor",
-      "purpose": "08 · agente para las dudas repetidas"
+      "purpose": "09 · agente para las dudas repetidas"
     },
     {
       "recipeId": "content-live-chat",
-      "purpose": "09 · enablement conversacional"
+      "purpose": "10 · enablement conversacional"
     },
     {
       "recipeId": "content-day-live-library",
-      "purpose": "10 · capacitación y adopción"
+      "purpose": "11 · capacitación y adopción"
     },
     {
       "recipeId": "content-day-live-approval",
-      "purpose": "11 · tu día a día"
+      "purpose": "12 · tu día a día"
+    },
+    {
+      "recipeId": "content-bullets",
+      "purpose": "13 · tiempos de respuesta"
     },
     {
       "recipeId": "content-day-live-progress",
-      "purpose": "12 · vívelo: sprints"
+      "purpose": "14 · vívelo: sprints"
     },
     {
       "recipeId": "content-day-live-console",
-      "purpose": "13 · vívelo: cada mes"
+      "purpose": "15 · vívelo: cada mes"
     },
     {
       "recipeId": "method-waves",
-      "purpose": "14 · los primeros 30 días"
+      "purpose": "16 · los primeros 30 días"
     },
     {
       "recipeId": "decision-plan",
-      "purpose": "15 · ciclo mensual"
+      "purpose": "17 · ciclo mensual"
     },
     {
       "recipeId": "decision-difference",
-      "purpose": "16 · seguridad y accesos"
+      "purpose": "18 · seguridad y accesos"
     },
     {
       "recipeId": "section-cine-team",
-      "purpose": "17 · quién te acompaña",
+      "purpose": "19 · quién te acompaña",
       "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png"
     },
     {
+      "recipeId": "content-bullets",
+      "purpose": "20 · continuidad"
+    },
+    {
       "recipeId": "decision-case",
-      "purpose": "18 · caso ANAM",
+      "purpose": "21 · caso ANAM",
       "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png"
     },
     {
       "recipeId": "decision-case",
-      "purpose": "19 · caso SSilva",
+      "purpose": "22 · caso SSilva",
       "plateRef": "ai-generations/2026-10-20_propuesta-assetplan/caso-ssilva/base-cine.png"
     },
     {
       "recipeId": "content-pricing-live",
-      "purpose": "20 · inversión: cotización"
+      "purpose": "23 · inversión: cotización"
     },
     {
       "recipeId": "decision-next-steps",
-      "purpose": "20 · próximos pasos"
+      "purpose": "24 · próximos pasos"
     },
     {
       "recipeId": "close-proposal-horizon",
-      "purpose": "21 · contraportada",
+      "purpose": "25 · contraportada",
       "plateRef": "ai-generations/2026-10-20_propuesta-assetplan/plates/BR3h-v3-logo-acabado.png"
     }
   ]

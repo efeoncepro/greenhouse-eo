@@ -38,7 +38,35 @@ como comprador interno ni como reemplazo de un rol crítico ausente.
 Verifica empleo, entidad/unidad y relevancia antes de recomendar. No priorices RRHH o recruiter para vender
 servicios por una vacante; el formulario laboral no es canal comercial.
 
+## Cobertura con Personas y listas de Sales Navigator
+
+Cargar [operación nativa](sales-navigator-operations.md) para funciones/títulos, empresa exacta y guardados.
+Las Personas son consultas reutilizables, no el buying group ni el ICP completo. Seniority y títulos
+normalizados pueden omitir problem owners conocidos: cero resultados necesita una pasada complementaria
+sin esos criterios, no una conclusión de ausencia. Revisar cargo real, entidad/unidad y ubicación; una
+persona regional no acredita presupuesto local. Un perfil abierto para identidad/empresa no prueba
+trayectoria completa ni autoridad económica.
+
+Listas de personas por frente de servicio clasifican afinidad funcional para investigar; no necesidad,
+champion ni oportunidad. Varios servicios pueden compartir frente y una persona varios roles. Contar
+personas únicas aparte de membresías y justificar pertenencias adicionales por responsabilidad/iniciativa.
+Guardar un posible cliente nativo no exige correo, no es alta Contact/Lead ni permiso de contacto.
+
+Para listas comerciales LinkedIn, el [gate comprador](../../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md)
+excluye CM/ejecución pura por afinidad de servicio. Operador relevante para investigar el buying group no
+equivale a destinatario comercial: priorizar liderazgo funcional de contratación y mantener esa distinción.
+
+En el orden de revisión, priorizar evidencia de gestión de agencias/proveedores o presupuesto del área;
+después liderazgo funcional actual que pueda impulsar evaluación. Separar mandato actual, experiencia de
+trayectoria y posibilidad de contratación. No elevar un ex empleado de agencia a gestor de proveedor ni
+una jefatura a firmante económico sin prueba. Pauta A/B y registro en la política de Sales Navigator.
+
 ## Mapa de acceso
+
+Para LinkedIn aplicar [Core, conexiones e InMail](../../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md):
+Saldo fechado en la política; no fijar 50 como disponibilidad permanente. Identificar primero interlocutores
+pertinentes sin filtro de relación; después usar primer grado para acceso y, para no conectados, solicitar conexión y esperar aceptación.
+InMail queda para alta relevancia o valor estratégico por tiempo/ventana, con motivo individual documentado.
 
 Por persona: identidad/cargo/entidad, rol funcional confirmado o hipótesis, fuente/fecha, email/calidad,
 relación con Julio/equipo, vínculo con el objetivo, necesidad propia, vía y objetivo del acercamiento.

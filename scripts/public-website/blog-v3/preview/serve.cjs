@@ -6,7 +6,10 @@
  * container), replaces its Elementor body with the eo-blog-home server render (PHP CLI, same code as WordPress) and
  * serves the plugin assets locally. Public static files of the live site are proxied with GET only.
  *
- *   node preview/serve.cjs [--port 8843] [--shell https://efeoncepro.com/agenda/] [--now <ms>] [--subscribe <formKey>] [--event-form <formKey>]
+ *   node preview/serve.cjs [--port 8843] [--shell https://efeoncepro.com/agenda/] [--now <ms>] [--subscribe <formKey>] [--event-form <formKey>] [--rail <file.json>]
+ *
+ * --rail replaces the rail cards of both boards with a JSON file in the adapter's contract ({ portada, movil }): try a
+ * card's own image or focal point before writing it in WordPress.
  *
  * --subscribe (Glitch) and --event-form (the event's reservation) connect real published forms: the published Growth Form is read from Greenhouse through a
  * local GET-only proxy (/__ghf/, sent with the site origin), so the renderer works without CORS and nothing can be
@@ -32,6 +35,9 @@ const SHELL_URL = arg('shell', 'https://efeoncepro.com/agenda/')
 const NOW = arg('now', '')
 const SUBSCRIBE = arg('subscribe', '')
 const EVENT_FORM = arg('event-form', '')
+const RAIL = arg('rail', '')
+
+if (RAIL) process.env.EOBH_PREVIEW_RAIL = path.resolve(RAIL)
 const PROXY = Boolean(SUBSCRIBE || EVENT_FORM)
 const PLUGIN = path.join(RUNTIME_DIR, 'wp-content/plugins/eo-blog-home')
 const LOCAL = '/wp-content/plugins/eo-blog-home/'

@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "3b41bac2a97a",
+  "key": "3b41bac2a97ae5bd589169725c22e20aee8b29a31292d59bf28c98f500423359",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:13:18.785Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates/S05-dia42.png",
+    "imageSha256": "d4e7139c1ac6fa626e5dcbf67c1a338a2f2982ed6a27338b771ab8536bcff2e7",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-tech/masks/S05.png",
+    "maskSha256": "12cc89bc27be02247ee821cdef39d1266bca55c04fb55b2c2797c886ff73bd14",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the laptop inside the marked zone with an ultra-thin current-generation premium laptop in space-grey anodized aluminum unibody, razor-thin lid, minimal edge-to-edge display bezels, precise machined edges, plain unbranded lid without stickers, matching the scene's light, perspective and scale exactly, seen from behind with the lid open. Keep the dusty cobweb strands draped over the lid and connecting to the table exactly as a gag of a long wait. Photorealistic.",
+    "providerPrompt": "Replace only the laptop inside the marked zone with an ultra-thin current-generation premium laptop in space-grey anodized aluminum unibody, razor-thin lid, minimal edge-to-edge display bezels, precise machined edges, plain unbranded lid without stickers, matching the scene's light, perspective and scale exactly, seen from behind with the lid open. Keep the dusty cobweb strands draped over the lid and connecting to the table exactly as a gag of a long wait. Photorealistic."
+  },
+  "mask": {
+    "touchedFraction": 0.11271743774414063,
+    "editable": 122716,
+    "soft": 25025,
+    "protected": 1162979
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 61 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 23.946,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.19,
+        "bestError": 3.19,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1162979,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 122716,
+        "maxDelta": 213,
+        "meanDelta": 26.592,
+        "worst": {
+          "x": 452,
+          "y": 1020
+        }
+      },
+      "seam": {
+        "pixels": 25025,
+        "maxDelta": 108,
+        "meanDelta": 10.971,
+        "worst": {
+          "x": 558,
+          "y": 801
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1162979,
+        "maxDelta": 192,
+        "meanDelta": 5.075,
+        "worst": {
+          "x": 126,
+          "y": 751
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1422,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 142
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 2932
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

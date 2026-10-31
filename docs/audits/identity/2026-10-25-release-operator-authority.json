@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "purpose": "release_operator_capability_prerequisite_readback",
+  "observedAt": "2026-10-25T22:32:12.673Z",
+  "status": "verified_snapshot_redacted",
+  "privateReceiptSha256": "c96aab163ec701f1f2704bebb57ab2d00fc44e9b551b0e74f719da6b76d893b8",
+  "publicationPolicy": "Public evidence excludes personal identifiers and identity or employment linkage. Full operator receipt is local, ignored and mode 0600. No secrets or authentication tokens were present. Prior committed versions remain in Git history; this change does not claim historical erasure.",
+  "evaluations": [
+    {
+      "capability": "platform.release.execute",
+      "action": "execute",
+      "scope": "all",
+      "baseAllowed": true,
+      "effectiveAllowed": true
+    },
+    {
+      "capability": "platform.release.preflight.override_batch_policy",
+      "action": "update",
+      "scope": "all",
+      "baseAllowed": true,
+      "effectiveAllowed": true
+    },
+    {
+      "capability": "platform.release.bypass_preflight",
+      "action": "bypass_preflight",
+      "scope": "all",
+      "baseAllowed": true,
+      "effectiveAllowed": true
+    }
+  ],
+  "allRequestedCapabilitiesAllowed": true,
+  "authoritySeparation": {
+    "humanAuthorization": "The approved goal is separate from the capability observation.",
+    "githubExecutor": "No identity or role is inferred from the GitHub actor.",
+    "gates": "The receipt neither executes an override nor waives CI, smoke or release evidence."
+  }
+}

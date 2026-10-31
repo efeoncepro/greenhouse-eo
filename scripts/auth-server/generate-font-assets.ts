@@ -26,6 +26,31 @@ export function buildAuthFontAssets(root: string) {
     }]
   }))
 
+  const webRoot = 'src/assets/fonts/web'
+
+  const webFonts = Object.fromEntries([
+    ['Geist-Latin-Variable.woff2', 'geist'],
+    ['BricolageGrotesque-Latin-500.woff2', 'bricolagegrotesque']
+  ].map(([name, family]) => {
+    const sourcePath = `${webRoot}/${name}`
+    const bytes = readFileSync(join(root, sourcePath))
+
+    if (bytes.toString('ascii', 0, 4) !== 'wOF2') throw new Error(`Invalid WOFF2 source: ${sourcePath}`)
+
+    return [`/fonts/${name}`, { contentType: 'font/woff2', base64: bytes.toString('base64'),
+      sha256: sha256(bytes), sourcePath, licensePath: `/fonts/licenses/${family}-web-OFL.txt` }]
+  }))
+
+  const webLicenses = Object.fromEntries(['geist', 'bricolagegrotesque'].map(family => {
+    const sourcePath = `${webRoot}/${family}-OFL.txt`
+    const text = readFileSync(join(root, sourcePath), 'utf8')
+
+    if (!text.includes('SIL OPEN FONT LICENSE')) throw new Error(`Missing web font license: ${family}`)
+
+    return [`/fonts/licenses/${family}-web-OFL.txt`, { contentType: 'text/plain; charset=utf-8', text,
+      sha256: sha256(text), sourceUrl: `https://raw.githubusercontent.com/google/fonts/main/ofl/${family}/OFL.txt` }]
+  }))
+
   const licenses = Object.fromEntries(['Geist', 'Poppins'].map(family => {
     const text = readFileSync(join(root, licenseRoot, `${family}-OFL.txt`), 'utf8')
 
@@ -39,7 +64,7 @@ export function buildAuthFontAssets(root: string) {
     }]
   }))
 
-  return { fonts, licenses }
+  return { fonts: { ...fonts, ...webFonts }, licenses: { ...licenses, ...webLicenses } }
 }
 
 /** Caller writes this deterministic module alongside the generated brand assets. */

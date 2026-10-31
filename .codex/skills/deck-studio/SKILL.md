@@ -1027,6 +1027,14 @@ Para una licitación o propuesta técnica SEO/AEO que el cliente lee sin nosotro
 
 Para una licitación de servicio creativo (evolución de línea gráfica, concepto, piezas de muestra y método de producción) existe el molde hermano, con la misma técnica y otro argumento: el deck abre con el trabajo, sigue con una lámina de cumplimiento en las palabras de la ficha y recorre propuesta → producción → equipo → continuidad e inicio. Caso fuente: Sika Mexicana, Wherex N.º 1164, 22 láminas, línea Brand (presentada por el operador el 13/10/2026; resultado desconocido). Orden, las nueve correcciones del operador, cómo se enlaza un video (QR + enlace clicable), mecánica, trampas medidas y lista de control: [references/propuesta-tecnica-campana-creativa.md](references/propuesta-tecnica-campana-creativa.md). Difiere del molde SEO/AEO en dos cosas que no se mezclan: títulos directos sin pregunta y respuesta, y el rótulo «Qué significa para ustedes». Las láminas HTML a mano de ambos moldes son sólo para datos del cliente sin receta; lo que tiene lámina aprobada (portada, cierre, caso) sale del compositor.
 
+### Propuesta de performance que una champion presenta a su gerencia (2026-10-28)
+
+Cuando quien recibe el deck lo lleva a su gerencia sin nosotros (caso ARMOR EPPS, línea Voice, 41 láminas + ruta corta de 19, enviada el 28/10/2026; resultado desconocido): esfera en el acento de la línea en cada titular display, revisión «¿Se explica sola?», ruta corta generada en la renumeración, lámina de inversión total y condiciones, precio desglosado sin total en el correo, láminas de entrega Voice, partners según el registro, casos del brochure 360° y contraportada Voice VOX3: [references/propuesta-performance-champion.md](references/propuesta-performance-champion.md).
+
+### Propuesta operativa para un cliente activo (2026-10-29)
+
+Cuando el cliente ya trabaja con nosotros y el deck propone cambiar cómo se opera la cuenta (roles, flujo, herramientas, entregas) — caso «Sky × Efeonce — Cómo trabajamos», 18 láminas, línea Growth, iterado con el operador y la Creative Operations Lead; aún no presentado: diagnóstico con tres miradas, «Quién hace qué» en vez de «Quiénes somos», comparativas hoy → propuesta por rol, casos especiales, exactitud de cada rol buscada en todo el deck, banderas en círculo y exportación del canvas a PDF con Playwright: [references/propuesta-operativa-cliente-activo.md](references/propuesta-operativa-cliente-activo.md).
+
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
 Casi todo el mal deck del mundo nace de saltarse una de estas. **Contéstalas en voz alta.**
@@ -1290,6 +1298,7 @@ Derechos de stock, talento, música, likeness y licencias se cotizan aparte. Can
 ├─ GRÁFICOS en un deck (≠ dashboard) .................. data-storytelling.md
 ├─ PROPUESTA TÉCNICA que se lee sin presentador:
 │  SEO/AEO · campaña creativa .......................... references/propuesta-tecnica-*.md
+├─ PROPUESTA que una champion lleva a su gerencia ..... references/propuesta-performance-champion.md
 └─ FUENTES verificadas + LOS MITOS QUE NO SE CITAN .... SOURCES.md
 ```
 
@@ -1341,6 +1350,20 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
 - **Revisa visualmente todos los frames antes del cierre.** Inspecciona cada lámina exportada:
   recortes, jerarquía, legibilidad, captions, assets, firmas y consistencia. Los tests del Composer
   son necesarios, pero no sustituyen mirar todos los frames.
+- **Versión cliente: barrido completo antes de exportar** (Agencia Digital 2027 GRD-1552, 2026-10-29). Salen los
+  códigos de fuente internos (`[E01]`–`[E08]`, `[P01]`, «Fuente E02»; un contrato citado como fuente pasa a «Cliente
+  de Efeonce»), las cajas «Por confirmar» / «pendiente» / «por adjuntar», los sellos «Borrador», las frases
+  defensivas («experiencia … no auditada», «su uso … se confirmará con los permisos») y los anexos de fuentes
+  internas; los recuadros punteados de pendiente pasan a borde sólido. Se verifica con `pdftotext` sobre **el PDF
+  final completo**, no sólo en las láminas tocadas.
+- **Exportar un canvas Design a PDF vectorial** (GRD-1552): render local por lámina con Playwright `page.pdf`
+  (1920×1080, `printBackground`) y unión con pdf-lib; las fuentes quedan incrustadas y el texto se puede leer con
+  `pdftotext`. Antes de entregar, comparar archivo por archivo el lienzo publicado (`action: read`) con la copia
+  local. Mecánica de extracción y `/_blob/<id>`: [references/propuesta-operativa-cliente-activo.md](references/propuesta-operativa-cliente-activo.md).
+  Si el deck tiene láminas con `preserve-3d`, sigue mandando el PDF rasterizado (brochures Agencia Creativa y Web).
+- **Clientes y equipo: lámina canónica del brochure 360°, no una improvisada** (GRD-1552). «Clientes» = brochure
+  «Agencia de Marketing 360» v9, p. 78 (papel, «¿Con quién trabajan? +90 empresas.», grilla 5×2 de logos navy de un
+  tono, mercados y fuente al pie); «Equipo» = p. 72. En el caso, la lámina 32 se rehizo con la canónica.
 - **Si se encarga la emisión por Proposal Studio, pasa su gate.** La revisión visual es necesaria,
   pero ese cierre también debe registrar la Proposal, el render job completado, el asset `deck` versionado y la comprobación
   autenticada del portal. Si falta, el estado es `code complete, rollout pendiente` o bloqueado; no

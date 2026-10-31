@@ -24,6 +24,8 @@ import {
   type GutenbergOutlineHeading
 } from './gutenberg-blocks'
 import { renderGlitchDropBlock } from './gutenberg-glitch-drop'
+import { renderEditorialChartBlock, type EditorialChartBlockInput } from './gutenberg-editorial-chart'
+import { renderGrowthCtaBlock } from './gutenberg-growth-cta'
 import { slugifyPublicSiteDraft } from './gutenberg-planner'
 
 /** Service lines of AXIS `efeonce.mention` (`efeonceGraphicLine.lines`). */
@@ -60,10 +62,10 @@ export type GutenbergFaqItem = {
 export type GutenbergFaqSchemaOptions = {
   enabled?: boolean
   /**
-   * Who writes the FAQPage schema. `inline` (default until the plugin is live everywhere): a governed `core/html`
-   * JSON-LD block. `plugin`: no JSON-LD in the content; efeonce-editorial-blocks ≥ 0.3.0 builds the FAQ schema from the
-   * styled `core/details` blocks and joins it to the Yoast graph. A post with an inline FAQPage keeps it: the plugin
-   * skips it, so the two never stack.
+   * Who writes the FAQPage schema. `plugin` (default since 2026-10-24, efeonce-editorial-blocks 0.3.0 live): no
+   * JSON-LD in the content; the plugin builds the FAQ schema from the styled `core/details` blocks and joins it to the
+   * Yoast graph. `inline`: a governed `core/html` JSON-LD block, only for a host without the plugin. A post with an
+   * inline FAQPage keeps it: the plugin skips it, so the two never stack.
    */
   source?: 'inline' | 'plugin'
   name?: string
@@ -87,7 +89,11 @@ export const GUTENBERG_BUTTONS_MAX_ITEMS = 3
 
 export type GutenbergArticleBlock =
   | { kind: 'paragraph'; text: GutenbergRichText }
-  | { kind: 'list'; items: GutenbergRichText[]; ordered?: boolean }
+  /**
+   * `style` = Efeonce editorial list styles (efeonce-editorial-blocks ≥ 0.4.0): `steps` («Pasos», numbered steps,
+   * ordered lists only) and `box` («Recuadro», a tinted panel for a short set worth seeing at once).
+   */
+  | { kind: 'list'; items: GutenbergRichText[]; ordered?: boolean; style?: 'steps' | 'box' }
   | { kind: 'details'; summary: string; blocks: GutenbergArticleBlock[]; open?: boolean; className?: string }
   | { kind: 'faq'; items: GutenbergFaqItem[]; schema?: GutenbergFaqSchemaOptions }
   | {
@@ -95,12 +101,29 @@ export type GutenbergArticleBlock =
       headers: GutenbergRichText[]
       rows: GutenbergRichText[][]
       caption?: GutenbergRichText
-      /** Core-registered table style (`is-style-stripes`). Check Ohio at 390 px on wide tables. */
-      style?: 'stripes'
+      /**
+       * `efeonce`: «Tabla Efeonce» (efeonce-editorial-blocks ≥ 0.6.0), the default for blog posts — paper panel, and
+       * under 600 px one card per row with each cell labeled by its header. `stripes`: core `is-style-stripes`.
+       */
+      style?: 'efeonce' | 'stripes'
     }
   | { kind: 'quote'; text: string }
-  | { kind: 'pullquote'; text: string }
+  /**
+   * Efeonce pullquote styles (efeonce-editorial-blocks ≥ 0.8.0). `variant`: `destacado` (default) is the thesis a
+   * section stands on — ring → sphere, no quotation marks; mark the landing phrase with `strong` (Bricolage 700).
+   * `cita` is a real quote and requires `cite` (who said it; a link is welcome). `tone`: `dark` (navy, default) or
+   * `light` (paper).
+   */
+  | {
+      kind: 'pullquote'
+      text: GutenbergRichText
+      cite?: GutenbergRichText
+      variant?: 'destacado' | 'cita'
+      tone?: 'dark' | 'light'
+    }
   | { kind: 'separator' }
+  /** Plain-text code sample (`core/code`). Newlines are kept; the text is escaped like the block editor does. */
+  | { kind: 'code'; code: string }
   // Media requires a real WordPress asset — never invent ids/urls.
   | {
       kind: 'image'
@@ -112,6 +135,8 @@ export type GutenbergArticleBlock =
       sizeSlug?: string
       caption?: GutenbergRichText
       linkDestination?: 'none' | 'media'
+      /** `center` for images narrower than the column (diagrams, square illustrations). */
+      align?: 'center'
       /** Optional art-directed sources. The fallback attachment remains the Gutenberg image owner. */
       sources?: Array<{ url: string; media: string; type?: 'image/webp' | 'image/jpeg' | 'image/png' }>
     }
@@ -128,6 +153,16 @@ export type GutenbergArticleBlock =
    * next paragraph). Serialized byte-identical to WordPress.
    */
   | { kind: 'glitchDrop'; lines: string[] }
+  /**
+   * Governed Growth CTA of Greenhouse placed in the post (`efeoncepro/growth-cta`, efeonce-editorial-blocks ≥ 0.7.0).
+   * Copy, action and measurement live in the Growth CTA engine; the slug must be allowed by the blog surface.
+   */
+  | { kind: 'growthCta'; cta: string; location?: string; emphasis?: string; tone?: 'dark' | 'light'; mark?: 'aeo-assessment' }
+  /**
+   * «Gráfico Efeonce» (`efeoncepro/chart`, dynamic block): line, column, bar, pie, funnel, before-after, measure,
+   * per-hundred, matrix or venn. The table of numbers is printed in the HTML; the chart is painted on top.
+   */
+  | ({ kind: 'chart' } & EditorialChartBlockInput)
   /** Governed CTA buttons: 1–3 items, closed variants, no literal colors or custom classes. */
   | { kind: 'buttons'; items: GutenbergButtonItem[] }
 
@@ -216,12 +251,37 @@ const normalizePlainText = (value: string): string => value.replace(/\s+/g, ' ')
 const paragraphBlock = (text: GutenbergRichText): string =>
   ['<!-- wp:paragraph -->', `<p>${renderRichText(text)}</p>`, '<!-- /wp:paragraph -->'].join('\n')
 
-const listBlock = (items: GutenbergRichText[], ordered = false): string => {
+/** Efeonce editorial block styles registered by efeonce-editorial-blocks ≥ 0.4.0. */
+export const EDITORIAL_STYLE_CLASS = {
+  pullquote: 'is-style-efeonce-destacado',
+  pullquoteLight: 'is-style-efeonce-destacado-claro',
+  quoteAttributed: 'is-style-efeonce-cita',
+  quoteAttributedLight: 'is-style-efeonce-cita-clara',
+  steps: 'is-style-efeonce-pasos',
+  box: 'is-style-efeonce-recuadro'
+} as const
+
+const listBlock = (items: GutenbergRichText[], ordered = false, style?: 'steps' | 'box'): string => {
+  if (style === 'steps' && !ordered) {
+    throw new Error('content_factory_article_list_steps_requires_ordered')
+  }
+
+  if (style !== undefined && style !== 'steps' && style !== 'box') {
+    throw new Error('content_factory_article_list_style_invalid')
+  }
+
   const tag = ordered ? 'ol' : 'ul'
   const lis = items.map(item => `<li>${renderRichText(item)}</li>`).join('')
-  const attr = ordered ? ' {"ordered":true}' : ''
+  const className = style ? EDITORIAL_STYLE_CLASS[style] : undefined
+  const attrs: Record<string, unknown> = {}
 
-  return [`<!-- wp:list${attr} -->`, `<${tag}>${lis}</${tag}>`, '<!-- /wp:list -->'].join('\n')
+  if (ordered) attrs.ordered = true
+  if (className) attrs.className = className
+
+  const attr = Object.keys(attrs).length ? ` ${JSON.stringify(attrs)}` : ''
+  const open = className ? `<${tag} class="${className}">` : `<${tag}>`
+
+  return [`<!-- wp:list${attr} -->`, `${open}${lis}</${tag}>`, '<!-- /wp:list -->'].join('\n')
 }
 
 const tableBlock = (block: Extract<GutenbergArticleBlock, { kind: 'table' }>): string => {
@@ -247,11 +307,13 @@ const tableBlock = (block: Extract<GutenbergArticleBlock, { kind: 'table' }>): s
     ? `<figcaption class="wp-element-caption">${renderRichText(block.caption)}</figcaption>`
     : ''
 
-  if (block.style !== undefined && block.style !== 'stripes') {
+  const styleClasses: Record<string, string> = { efeonce: 'is-style-efeonce-tabla', stripes: 'is-style-stripes' }
+
+  if (block.style !== undefined && !(block.style in styleClasses)) {
     throw new Error(`content_factory_article_table_style_invalid:${String(block.style)}`)
   }
 
-  const styleClass = block.style === 'stripes' ? 'is-style-stripes' : ''
+  const styleClass = block.style ? styleClasses[block.style] : ''
   const comment = styleClass ? `<!-- wp:table ${serializeGutenbergBlockAttributes({ className: styleClass })} -->` : '<!-- wp:table -->'
   const figureClass = styleClass ? `wp-block-table ${styleClass}` : 'wp-block-table'
 
@@ -313,10 +375,16 @@ const blockToPlainText = (block: GutenbergArticleBlock): string => {
         block.caption ? renderRichTextPlainText(block.caption) : ''
       ].join(' ')
     case 'quote':
-    case 'pullquote':
       return block.text
+    case 'pullquote':
+      return [renderRichTextPlainText(block.text), block.cite ? renderRichTextPlainText(block.cite) : ''].join(' ')
+    case 'code':
+      return block.code
     case 'glitchDrop':
       return block.lines.join(' ')
+    case 'chart':
+      return [block.title ?? '', block.caption ?? ''].join(' ')
+    case 'growthCta':
     case 'separator':
     case 'image':
     case 'embed':
@@ -413,7 +481,7 @@ const faqBlock = (
     )
     .join('\n\n')
 
-  if (block.schema?.enabled === false || block.schema?.source === 'plugin') return details
+  if (block.schema?.enabled === false || (block.schema?.source ?? 'plugin') === 'plugin') return details
 
   return [details, renderFaqJsonLdBlock(block, context)].join('\n\n')
 }
@@ -425,12 +493,52 @@ const quoteBlock = (text: string): string =>
     '<!-- /wp:quote -->'
   ].join('\n')
 
-const pullquoteBlock = (text: string): string =>
-  [
-    '<!-- wp:pullquote -->',
-    `<figure class="wp-block-pullquote"><blockquote><p>${escapeGutenbergHtml(text)}</p></blockquote></figure>`,
+const pullquoteBlock = (block: Extract<GutenbergArticleBlock, { kind: 'pullquote' }>): string => {
+  const variant = block.variant ?? 'destacado'
+  const tone = block.tone ?? 'dark'
+
+  if (variant !== 'destacado' && variant !== 'cita') throw new Error(`content_factory_article_pullquote_variant_invalid:${String(variant)}`)
+  if (tone !== 'dark' && tone !== 'light') throw new Error(`content_factory_article_pullquote_tone_invalid:${String(tone)}`)
+
+  const text = renderRichText(block.text)
+
+  if (!renderRichTextPlainText(block.text).trim()) throw new Error('content_factory_article_pullquote_text_empty')
+
+  const cite = block.cite ? renderRichText(block.cite) : ''
+
+  if (variant === 'cita' && !(block.cite && renderRichTextPlainText(block.cite).trim())) {
+    throw new Error('content_factory_article_pullquote_cita_requires_cite')
+  }
+
+  const className =
+    variant === 'cita'
+      ? tone === 'light' ? EDITORIAL_STYLE_CLASS.quoteAttributedLight : EDITORIAL_STYLE_CLASS.quoteAttributed
+      : tone === 'light' ? EDITORIAL_STYLE_CLASS.pullquoteLight : EDITORIAL_STYLE_CLASS.pullquote
+
+  const source = cite.trim() ? `<cite>${cite}</cite>` : ''
+
+  return [
+    `<!-- wp:pullquote {"className":"${className}"} -->`,
+    `<figure class="wp-block-pullquote ${className}"><blockquote><p>${text}</p>${source}</blockquote></figure>`,
     '<!-- /wp:pullquote -->'
   ].join('\n')
+}
+
+const codeBlock = (code: string): string => {
+  if (!code.trim()) {
+    throw new Error('content_factory_article_code_required')
+  }
+
+  // Same escaping as the block editor's code block: HTML entities plus `[` (keeps shortcodes from running).
+  const escaped = code
+    .replace(/\r\n?/g, '\n')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\[/g, '&#91;')
+
+  return ['<!-- wp:code -->', `<pre class="wp-block-code"><code>${escaped}</code></pre>`, '<!-- /wp:code -->'].join('\n')
+}
 
 const separatorBlock = (): string =>
   [
@@ -479,9 +587,16 @@ const imageBlock = (block: Extract<GutenbergArticleBlock, { kind: 'image' }>): s
       ? `<a href="${escapeGutenbergHtml(block.url)}">${responsiveImage}</a>`
       : responsiveImage
 
+  if (block.align !== undefined && block.align !== 'center') {
+    throw new Error('content_factory_article_image_align_invalid')
+  }
+
+  const align = block.align === 'center' ? ',"align":"center"' : ''
+  const alignClass = block.align === 'center' ? ' aligncenter' : ''
+
   return [
-    `<!-- wp:image {"id":${block.mediaId},"sizeSlug":"${sizeSlug}","linkDestination":"${linkDestination}"} -->`,
-    `<figure class="wp-block-image size-${sizeSlug}">${media}${caption}</figure>`,
+    `<!-- wp:image {"id":${block.mediaId},"sizeSlug":"${sizeSlug}","linkDestination":"${linkDestination}"${align}} -->`,
+    `<figure class="wp-block-image${alignClass} size-${sizeSlug}">${media}${caption}</figure>`,
     '<!-- /wp:image -->'
   ].join('\n')
 }
@@ -520,14 +635,16 @@ const embedBlock = (block: Extract<GutenbergArticleBlock, { kind: 'embed' }>): s
   })
 
   // Same shape WordPress stores for a captioned embed (Glitch #17, 251605): the
-  // figcaption follows the wrapper inside the figure.
+  // figcaption follows the wrapper inside the figure. The URL goes on its own line
+  // inside the wrapper, as the editor saves it: WP_Embed::autoembed only turns a
+  // URL alone on its line into the player (inline, the post showed the bare link).
   const caption = block.caption
     ? `<figcaption class="wp-element-caption">${renderRichText(block.caption)}</figcaption>`
     : ''
 
   return [
     `<!-- wp:embed ${attrs} -->`,
-    `<figure class="wp-block-embed is-type-video is-provider-${block.provider} wp-block-embed-${block.provider} wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">${escapeGutenbergHtml(url)}</div>${caption}</figure>`,
+    `<figure class="wp-block-embed is-type-video is-provider-${block.provider} wp-block-embed-${block.provider} wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">\n${escapeGutenbergHtml(url)}\n</div>${caption}</figure>`,
     '<!-- /wp:embed -->'
   ].join('\n')
 }
@@ -594,7 +711,7 @@ const renderArticleBlock = (
     case 'paragraph':
       return paragraphBlock(block.text)
     case 'list':
-      return listBlock(block.items, block.ordered)
+      return listBlock(block.items, block.ordered, block.style)
     case 'details':
       return detailsBlock(block, context)
     case 'faq':
@@ -604,17 +721,27 @@ const renderArticleBlock = (
     case 'quote':
       return quoteBlock(block.text)
     case 'pullquote':
-      return pullquoteBlock(block.text)
+      return pullquoteBlock(block)
     case 'separator':
       return separatorBlock()
+    case 'code':
+      return codeBlock(block.code)
     case 'image':
       return imageBlock(block)
     case 'embed':
       return embedBlock(block)
     case 'glitchDrop':
       return renderGlitchDropBlock(block.lines)
+    case 'growthCta':
+      return renderGrowthCtaBlock(block)
+    case 'chart':
+      return renderEditorialChartBlock(block)
     case 'buttons':
       return buttonsBlock(block)
+    default:
+      // Specs arrive as JSON, so the union does not protect them: an unknown kind (e.g. a `heading` block instead of a
+      // level-3 section) used to render as nothing and vanish from the draft without a trace.
+      throw new Error(`content_factory_article_block_kind_unknown:${String((block as { kind?: unknown }).kind)}`)
   }
 }
 

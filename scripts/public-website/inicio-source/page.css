@@ -1,0 +1,2 @@
+/* Home: the theme's light/dark switch moves above the shared bottom dock while the dock shows (phones/tablets). */
+@media (max-width:1180px){body:has(.gh-inicio):has(.axis-landing-dock[data-state="shown"]) .elements-bar{transform:translateY(-76px);transition:transform .4s cubic-bezier(.2,0,0,1)}}

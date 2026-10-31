@@ -18,3 +18,130 @@
 {"at":"2026-10-24T11:55:39.367Z","author":"Julio Reyes","op":"subscription","input":{"op":"subscription","form_key":"off"},"result":{"before":{"form_key":"6bc62588-a4a0-4214-9501-13b0c2948c81","surface":"fhsf-efeonce-blog-subscription"},"after":{"form_key":"","surface":""}}}
 {"at":"2026-10-24T12:02:40.416Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T12-02-08-736Z"}}
 {"at":"2026-10-24T12:06:41.957Z","author":"Julio Reyes","op":"subscription","input":{"op":"subscription","form_key":"6bc62588-a4a0-4214-9501-13b0c2948c81"},"result":{"before":{"form_key":"","surface":""},"after":{"form_key":"6bc62588-a4a0-4214-9501-13b0c2948c81","surface":"fhsf-efeonce-blog-subscription"}}}
+{"at":"2026-10-24T13:41:54.026Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T13:42:14.210Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T13:42:17.731Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T13-41-20-841Z","flag":"1"}}
+{"at":"2026-10-24T13:42:47.939Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T13-42-18-304Z"}}
+{"at":"2026-10-24T15:46:40.541Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T15:46:58.688Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T15:47:01.007Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T15-46-18-610Z","flag":"1"}}
+{"at":"2026-10-24T16:03:38.709Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T16:03:57.992Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T16:04:00.030Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T16-03-17-517Z","flag":"1"}}
+{"at":"2026-10-24T16:23:55.165Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T16:24:14.899Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T16:24:17.694Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T16-23-33-865Z","flag":"1"}}
+{"at":"2026-10-24T16:47:44.790Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T16:48:02.883Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T16:48:05.358Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T16-47-22-906Z","flag":"1"}}
+{"at":"2026-10-24T16:48:36.886Z","author":"Julio Reyes","op":"line","input":{"op":"line","post":"245605","line":"voice"},"result":{"before":"","after":"voice","id":245605}}
+{"at":"2026-10-24T16:48:39.603Z","author":"Julio Reyes","op":"line","input":{"op":"line","post":"245154","line":"engine"},"result":{"before":"","after":"engine","id":245154}}
+{"at":"2026-10-24T18:05:05.586Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T18:05:24.235Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T18:05:26.212Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T18-04-42-989Z","flag":"1"}}
+{"at":"2026-10-24T18:07:54.482Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T18-07-22-288Z"}}
+{"at":"2026-10-24T18:12:09.160Z","author":"Julio Reyes","op":"archive","input":{"op":"archive","value":"preview"},"result":{"before":{"value":"0","token":false},"after":{"value":"preview"}}}
+{"at":"2026-10-24T18:15:20.089Z","author":"Julio Reyes","op":"topic-descriptions","input":{"op":"topic-descriptions","descriptions":{"hubspot":"Cómo usamos HubSpot para ordenar ventas, marketing y servicio: casos reales, guías paso a paso y lo que aprendimos implementándolo.","glitch":"El resumen semanal de Efeonce sobre IA, marketing y tecnología: lo que cambió, por qué importa y qué hacer con eso, sin anestesia.","inbound":"Atraer en lugar de interrumpir: contenido, SEO, CRM y experiencia del cliente para que te encuentren, te elijan y vuelvan.","marketing-digital":"Decisiones de marketing digital con contexto de negocio: medios pagados, contenido, cuándo contratar una agencia y las reglas que cambian el juego.","loop-marketing":"El marco que reemplaza al funnel: cómo expresar, personalizar, amplificar y evolucionar tu marketing en ciclos, con HubSpot y con IA.","aeo":"Cómo aparecer en las respuestas de ChatGPT, Gemini y los buscadores con IA: visibilidad, citas y sitios listos para que los agentes te entiendan."}},"result":{"before":{"hubspot":"","glitch":"","inbound":"","marketing-digital":"","loop-marketing":"","aeo":""},"after":{"hubspot":"Cómo usamos HubSpot para ordenar ventas, marketing y servicio: casos reales, guías paso a paso y lo que aprendimos implementándolo.","glitch":"El resumen semanal de Efeonce sobre IA, marketing y tecnología: lo que cambió, por qué importa y qué hacer con eso, sin anestesia.","inbound":"Atraer en lugar de interrumpir: contenido, SEO, CRM y experiencia del cliente para que te encuentren, te elijan y vuelvan.","marketing-digital":"Decisiones de marketing digital con contexto de negocio: medios pagados, contenido, cuándo contratar una agencia y las reglas que cambian el juego.","loop-marketing":"El marco que reemplaza al funnel: cómo expresar, personalizar, amplificar y evolucionar tu marketing en ciclos, con HubSpot y con IA.","aeo":"Cómo aparecer en las respuestas de ChatGPT, Gemini y los buscadores con IA: visibilidad, citas y sitios listos para que los agentes te entiendan."}}}
+{"at":"2026-10-24T18:15:29.038Z","author":"Julio Reyes","op":"archive","input":{"op":"archive","value":"1"},"result":{"before":{"value":"preview","token":true},"after":{"value":"1"}}}
+{"at":"2026-10-24T18:20:30.278Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T18-18-59-131Z"}}
+{"at":"2026-10-24T18:20:42.314Z","author":"Julio Reyes","op":"archive","input":{"op":"archive","value":"1"},"result":{"before":{"value":"1","token":true},"after":{"value":"1"}}}
+{"at":"2026-10-24T19:50:50.061Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T19:51:06.742Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T19:51:08.831Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T19-50-26-619Z","flag":"1"}}
+{"at":"2026-10-24T19:51:46.821Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T19-51-16-687Z"}}
+{"at":"2026-10-24T19:52:12.728Z","author":"Julio Reyes","op":"archive","input":{"op":"archive","value":"1"},"result":{"before":{"value":"1","token":true},"after":{"value":"1"}}}
+{"at":"2026-10-24T21:09:53.862Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T21:11:28.981Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T21-09-54-094Z","flag":"0"}}
+{"at":"2026-10-24T21:12:07.489Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T21-11-34-446Z"}}
+{"at":"2026-10-24T21:12:23.838Z","author":"Julio Reyes","op":"client","input":{"op":"client","post":"251432","value":"anam"},"result":{"before":"","after":"anam","id":251432}}
+{"at":"2026-10-24T21:12:28.822Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T21:12:31.271Z","author":"Julio Reyes","op":"purge","input":{"op":"purge"},"result":{}}
+{"at":"2026-10-24T21:45:07.414Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T21:45:27.193Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T21:45:29.090Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T21-44-40-812Z","flag":"1"}}
+{"at":"2026-10-24T21:45:38.042Z","author":"Julio Reyes","op":"purge","input":{"op":"purge"},"result":{}}
+{"at":"2026-10-24T22:26:30.999Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T22:26:47.657Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T22:26:49.769Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T22-26-05-503Z","flag":"1"}}
+{"at":"2026-10-24T23:48:08.270Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T23-47-28-069Z"}}
+{"at":"2026-10-24T23:49:23.769Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-24T23:49:39.193Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-24T23:49:41.371Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-24T23-48-15-892Z","flag":"1"}}
+{"at":"2026-10-24T23:49:59.392Z","author":"Julio Reyes","op":"card","input":{"op":"card","post":"249387","focus":"50% 30%","alt":"Una mano sostiene un celular en un café; en la pantalla, el asistente de IA confirma «Reunión agendada» para el jueves 12 de noviembre a las 10:00.","image_file":true},"result":{"before":{"_eo_card_image":null,"_eo_card_focus":null},"after":{"_eo_card_focus":"50% 30%","_eo_card_image":252082},"id":249387}}
+{"at":"2026-10-24T23:50:03.080Z","author":"Julio Reyes","op":"card","input":{"op":"card","post":"251397","focus":"42% 30%","alt":"Pizarra con el proceso comercial en post-its, de Prospecto a Cierre, con correcciones en plumón azul: una etapa encerrada, una nota devuelta a Contacto y otra tachada.","image_file":true},"result":{"before":{"_eo_card_image":null,"_eo_card_focus":null},"after":{"_eo_card_focus":"42% 30%","_eo_card_image":252083},"id":251397}}
+{"at":"2026-10-24T23:50:06.965Z","author":"Julio Reyes","op":"card","input":{"op":"card","post":"252050","focus":"50% 30%","alt":"Vista cenital de un escritorio azul: un laptop con el sitio web abierto y una tablet con la guía, donde una mano marca la checklist.","image_file":true,"resource":true},"result":{"before":{"_eo_card_image":null,"_eo_card_focus":null},"after":{"_eo_card_focus":"50% 30%","_eo_card_image":252084},"id":252050}}
+{"at":"2026-10-24T23:50:20.017Z","author":"Julio Reyes","op":"purge","input":{"op":"purge"},"result":{}}
+{"at":"2026-10-25T00:54:14.226Z","author":"Julio Reyes","op":"topic-descriptions","input":{"op":"topic-descriptions","descriptions":{"design":"Cómo trabajamos la creatividad: procesos, flujos y criterio para producir más y mejor sin perder la idea."}},"result":{"before":{"design":""},"after":{"design":"Cómo trabajamos la creatividad: procesos, flujos y criterio para producir más y mejor sin perder la idea."}}}
+{"at":"2026-10-25T00:55:11.795Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T00-54-14-561Z"}}
+{"at":"2026-10-25T00:55:45.649Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T00:56:03.609Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T00:56:06.351Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T00-55-24-036Z","flag":"1"}}
+{"at":"2026-10-25T00:56:08.656Z","author":"Julio Reyes","op":"purge","input":{"op":"purge"},"result":{}}
+{"at":"2026-10-25T00:56:57.543Z","author":"Julio Reyes","op":"purge","input":{"op":"purge"},"result":{}}
+{"at":"2026-10-25T01:01:38.662Z","author":"Julio Reyes","op":"purge","input":{"op":"purge"},"result":{}}
+{"at":"2026-10-25T01:17:20.802Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T01:17:48.030Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T01:17:50.196Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T01-16-55-872Z","flag":"1"}}
+{"at":"2026-10-25T01:18:37.464Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T01-17-50-429Z"}}
+{"at":"2026-10-25T01:18:52.599Z","author":"Julio Reyes","op":"purge","input":{"op":"purge"},"result":{}}
+{"at":"2026-10-25T01:31:18.665Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T01:31:48.815Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T01:31:50.955Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T01-30-50-854Z","flag":"1"}}
+{"at":"2026-10-25T01:32:32.097Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T01-31-51-205Z"}}
+{"at":"2026-10-25T01:32:49.968Z","author":"Julio Reyes","op":"purge","input":{"op":"purge"},"result":{}}
+{"at":"2026-10-25T01:38:39.414Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T01:39:04.338Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T01:39:06.697Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T01-38-19-983Z","flag":"1"}}
+{"at":"2026-10-25T01:41:18.356Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T01:41:40.005Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T01:41:42.190Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T01-40-57-272Z","flag":"1"}}
+{"at":"2026-10-25T01:44:39.757Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T01:45:29.100Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T01:45:31.297Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T01-44-15-972Z","flag":"1"}}
+{"at":"2026-10-25T01:49:18.223Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T01:49:52.671Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T01:49:55.249Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T01-48-51-436Z","flag":"1"}}
+{"at":"2026-10-25T01:56:23.464Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T01:57:02.386Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T01:57:05.052Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T01-55-56-889Z","flag":"1"}}
+{"at":"2026-10-25T02:08:13.971Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T02:08:41.681Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T02:08:44.563Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T02-07-50-329Z","flag":"1"}}
+{"at":"2026-10-25T02:18:35.340Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T02:19:04.656Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T02:19:06.895Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T02-18-13-558Z","flag":"1"}}
+{"at":"2026-10-25T02:19:50.050Z","author":"Julio Reyes","op":"deploy","input":{"target":"home"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T02-19-07-154Z"}}
+{"at":"2026-10-25T02:19:52.459Z","author":"Julio Reyes","op":"purge","input":{"op":"purge"},"result":{}}
+{"at":"2026-10-25T10:45:12.481Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T10:45:38.688Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T10:45:40.637Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T10-44-51-233Z","flag":"1"}}
+{"at":"2026-10-25T10:50:13.042Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T10:50:35.774Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T10:50:37.815Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T10-49-06-309Z","flag":"1"}}
+{"at":"2026-10-25T12:10:33.957Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T12:10:51.402Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T12:10:53.367Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T12-10-13-202Z","flag":"1"}}
+{"at":"2026-10-25T12:11:18.619Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T12:11:33.099Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T12:11:34.926Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T12-10-58-199Z","flag":"1"}}
+{"at":"2026-10-25T13:39:46.769Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T13:40:04.466Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T13:40:06.486Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T13-39-25-742Z","flag":"1"}}
+{"at":"2026-10-25T13:49:51.291Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T13:50:09.819Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T13:50:11.823Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T13-49-28-952Z","flag":"1"}}
+{"at":"2026-10-25T15:24:37.147Z","author":"Julio Reyes","op":"hero","input":{"op":"hero","post":"248463","alt":"Un cajón de fichero abierto sobre una mesa oscura, con una sola ficha levantada bajo un foco de luz azul.","image_file":true},"result":{"before":{"_eo_hero_light":null,"_eo_hero_bold":null,"_eo_hero_image":null},"after":{"_eo_hero_image":252124},"id":248463}}
+{"at":"2026-10-25T15:24:41.506Z","author":"Julio Reyes","op":"card","input":{"op":"card","post":"248463","focus":"75% 50%","alt":"Un cajón de fichero abierto sobre una mesa oscura, con una sola ficha levantada bajo un foco de luz azul.","image_file":true},"result":{"before":{"_eo_card_image":null,"_eo_card_focus":null},"after":{"_eo_card_focus":"75% 50%","_eo_card_image":252125},"id":248463}}
+{"at":"2026-10-25T16:32:53.331Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T16:33:14.166Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T16:33:16.481Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T16-32-31-014Z","flag":"1"}}
+{"at":"2026-10-25T17:33:25.897Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"0"},"result":{"before":"1","after":"0"}}
+{"at":"2026-10-25T17:33:46.337Z","author":"Julio Reyes","op":"flag","input":{"op":"flag","value":"1"},"result":{"before":"0","after":"1"}}
+{"at":"2026-10-25T17:33:48.655Z","author":"Julio Reyes","op":"deploy","input":{"target":"content-model"},"result":{"baseline":"tmp/public-site-code-baselines/blog-home-2026-10-25T17-31-56-359Z","flag":"1"}}
+{"at":"2026-10-26T10:08:54.011Z","author":"Julio Reyes","op":"hero","input":{"op":"hero","post":"248398","alt":"El símbolo del infinito dibujado con luz azul por un péndulo sobre una mesa oscura.","image_file":true},"result":{"before":{"_eo_hero_light":null,"_eo_hero_bold":null,"_eo_hero_image":null},"after":{"_eo_hero_image":252149},"id":248398}}
+{"at":"2026-10-26T10:08:58.280Z","author":"Julio Reyes","op":"card","input":{"op":"card","post":"248398","focus":"71% 50%","alt":"El símbolo del infinito dibujado con luz azul por un péndulo sobre una mesa oscura.","image_file":true},"result":{"before":{"_eo_card_image":null,"_eo_card_focus":null},"after":{"_eo_card_focus":"71% 50%","_eo_card_image":252150},"id":248398}}
+{"at":"2026-10-26T13:10:44.518Z","author":"Julio Reyes","op":"purge","input":{"op":"purge"},"result":{}}
+{"at":"2026-10-26T19:34:32.199Z","author":"Julio Reyes","op":"hero","input":{"op":"hero","post":"246045","alt":"Tres umbrales de luz azul en fila sobre una mesa oscura: de cuatro bloques, cada umbral deja pasar menos y sólo uno cruza el último, bajo un foco.","image_file":true},"result":{"before":{"_eo_hero_light":null,"_eo_hero_bold":null,"_eo_hero_image":null},"after":{"_eo_hero_image":252167},"id":246045}}
+{"at":"2026-10-26T19:34:37.224Z","author":"Julio Reyes","op":"card","input":{"op":"card","post":"246045","focus":"91% 50%","alt":"Tres umbrales de luz azul en fila sobre una mesa oscura: de cuatro bloques, cada umbral deja pasar menos y sólo uno cruza el último, bajo un foco.","image_file":true},"result":{"before":{"_eo_card_image":null,"_eo_card_focus":null},"after":{"_eo_card_focus":"91% 50%","_eo_card_image":252168},"id":246045}}
+{"at":"2026-10-26T22:44:55.203Z","author":"Julio Reyes","op":"hero","input":{"op":"hero","post":"244883","alt":"Un cubo blanco sobre una mesa oscura, iluminado por tres focos: la misma pieza proyecta tres sombras distintas.","image_file":true},"result":{"before":{"_eo_hero_light":null,"_eo_hero_bold":null,"_eo_hero_image":null},"after":{"_eo_hero_image":252174},"id":244883}}
+{"at":"2026-10-26T22:44:59.624Z","author":"Julio Reyes","op":"card","input":{"op":"card","post":"244883","focus":"85% 50%","alt":"Un cubo blanco sobre una mesa oscura, iluminado por tres focos: la misma pieza proyecta tres sombras distintas.","image_file":true},"result":{"before":{"_eo_card_image":null,"_eo_card_focus":null},"after":{"_eo_card_focus":"85% 50%","_eo_card_image":252175},"id":244883}}

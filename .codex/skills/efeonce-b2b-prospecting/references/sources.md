@@ -91,3 +91,58 @@ Efeonce, acceso API/CLI, sender/DNS, reputación ni inbox. No adoptar cifras bul
 [Señal→acción](signal-to-action.md) y [entradas](situation-entry-playbooks.md) son procedimientos Efeonce sobre
 fuentes dueñas locales; no benchmarks ni técnicas con eficacia comercial demostrada. Las fechas/hitos del
 caso y su revisión no constituyen consentimiento, vigencia garantizada ni scheduler nuevo.
+
+
+## Sales Navigator Core — operación verificada 29/10/2026
+
+[Operación progresiva](sales-navigator-operations.md) deriva de UI/AX y readback real, con
+[manual](../../../../docs/manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md),
+[política Core/InMail](../../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md),
+[configuración y manifest](../../../../docs/commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md) y
+[cartera/listas](../../../../docs/commercial/prospects/servicios-financieros-chile-2026-10/CARTERA-Y-LISTAS-2026-10-29.md).
+La configuración inicial de cuatro fichas es histórica; la ampliación final registró doce y cinco Personas.
+Los saldos, contadores, personas, filtros y límites son evidencia fechada, no valores permanentes del método.
+El guardado nativo se verificó nominalmente, incluida una contradicción no resuelta; no prueba demanda ni
+outreach. No consultar proveedores ni realizar mutaciones para ejecutar fixtures sintéticos.
+
+| Fuente primaria consultada en ese corte | Uso y límite |
+| --- | --- |
+| [Personas FAQ](https://www.linkedin.com/help/sales-navigator/answer/a1422192) | Máximo cinco y cuatro dimensiones; consultas de búsqueda, no ICP completo. UI y contenido a revalidar. |
+| [Definiciones de filtros de cuenta](https://www.linkedin.com/help/sales-navigator/answer/a1461507) | Alcance de sede, industria, crecimiento y departamento; inspección no demuestra aplicación de cada opción. |
+| [Contacto en cuentas](https://www.linkedin.com/help/sales-navigator/answer/a1507484) | Algún empleado de primer grado, no conexión con decisor pertinente. |
+| [Límite de cuentas visibles](https://www.linkedin.com/help/sales-navigator/answer/a106030) | 1.000 cuentas/40 páginas en la referencia consultada; dividir universos y deduplicar, no afirmar exhaustividad. |
+| [Tipos de cuenta](https://www.linkedin.com/help/sales-navigator/answer/a104003/sales-navigator-account-types-overview?lang=en) | Diferenciar Core de Advanced/Advanced Plus; no prueba habilitación de funciones ni saldo/periodicidad propios. |
+| [Taxonomía de industrias](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/industry-codes-v2) | Categorías y jerarquía LinkedIn; no categoría regulatoria ni prueba de que toda fintech use Financial Services. |
+
+Las recetas `fill`/typing, espera de sugerencias, selección persistente y corrección sólo de membresía se
+sustentan en el ensayo observado. No extrapolar éxito de Personas al selector Search ni convertir soluciones
+de eventos React en acceso a estado oculto. Screenshot aislado no sustituye membresía nominal persistida.
+
+## Gerencias y gestión de agencias — corte posterior 29/10/2026
+
+[Expediente y manifest](../../../../docs/commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md):
+UI autenticada, perfiles completos y readback nominal 54 cuentas/57 personas. La fuente profesional es
+LinkedIn autodeclarado; A/B ordena revisión y no acredita demanda, presupuesto disponible ni firma.
+Conservar descripción de cargo actual frente a Acerca de/trayectoria; la keyword «agencias» por sí sola no
+prueba gestión de proveedores. Se ejercitó filtro de listas de cuentas+función+seniority y asociación
+nativa de la persona a la empresa pertinente cuando tenía cargos simultáneos. Sin outreach/CRM/créditos.
+
+## Búsquedas guardadas — fuentes y alcance del 29-10-2026
+
+[Guardar búsquedas/límite](https://www.linkedin.com/help/sales-navigator/answer/a102024): 50 de personas y
+50 de cuentas, avisos semanales, renombrar y eliminar. [Editar](https://www.linkedin.com/help/sales-navigator/answer/a106018):
+modificar filtros y guardar crea otra búsqueda. [LinkedIn for Nonprofits, 06-03-2024](https://nonprofit.linkedin.com/blog/2024/03/forging-lasting-corporate-partners-sales-navigator)
+explicita alertas semanales 50+50. El artículo histórico a106086 de cinco años menciona 15; no se usa como
+límite vigente adicional. Fuentes generales Sales Navigator, sin evidencia de un cupo menor Core.
+La UI confirmó aviso semanal y persistencia tras recarga de 24/20; no se probaron 100 guardados, entrega de
+emails futuros ni eliminación/recuperación de cupo. [Aplicación](../../../../docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md).
+
+## Cobertura de búsquedas — contraste Perú del 29-10-2026
+
+[Definiciones oficiales de filtros](https://www.linkedin.com/help/sales-navigator/answer/a1452817),
+consultadas el 29/10: sede de empresa actual y geografía personal son campos distintos; cargo actual,
+función y seniority tampoco son equivalentes. La documentación general no prueba disponibilidad de cada
+filtro en Core ni su precisión comercial. [Evidencia UI y límites del ensayo](../../../../docs/commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md):
+58/81/106/868 son variantes de CRM y 789 otra búsqueda Growth; sin suma, censo, denominador de recall ni
+calificación de todos los resultados. Los cambios de población/vocabulario no son todos aislados o anidados.
+No se guardaron las variantes. Validación de muestras anterior no certificó cobertura de las 20 consultas.

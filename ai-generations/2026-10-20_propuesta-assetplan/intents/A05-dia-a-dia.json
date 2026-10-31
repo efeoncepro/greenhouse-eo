@@ -16,11 +16,11 @@
       "canal"
     ]
   },
-  "body": "Tu equipo pide en su **canal** de Teams o Slack, lo ordenamos en Notion y lo resolvemos en HubSpot.",
-  "note": "Ejemplo ilustrativo · usamos el canal que ya tengas: Teams o Slack",
+  "body": "Tu equipo pide en su **canal** de solicitudes de CRM en Slack, lo ordenamos en Notion y lo resolvemos en HubSpot.",
+  "note": "Ejemplo ilustrativo · atendemos por Slack Connect en tu canal",
   "channel": {
-    "tool": "teams",
-    "name": "Assetplan · Soporte HubSpot"
+    "tool": "slack",
+    "name": "Assetplan · Solicitudes CRM"
   },
   "agent": {
     "icon": "sales",
@@ -45,7 +45,7 @@
   "loop": [
     {
       "title": "Pides",
-      "detail": "En Teams o Slack"
+      "detail": "En tu Slack"
     },
     {
       "title": "Priorizamos",

@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "mode": "measure-only",
+    "audio": "ai-generations/2026-10-21_aws-partner/audio/mezcla-master.wav",
+    "video": "ai-generations/2026-10-21_aws-partner/export/efeonce-aws-feed-4x5.mp4",
+    "files": [
+      {
+        "path": "ai-generations/2026-10-21_aws-partner/audio/mezcla-master.wav"
+      },
+      {
+        "path": "ai-generations/2026-10-21_aws-partner/export/efeonce-aws-feed-4x5.mp4"
+      }
+    ],
+    "latencyMs": 384
+  },
+  "mapa": {
+    "durationSec": 7.99,
+    "onsets": [
+      0.05,
+      0.55,
+      0.8,
+      1.05,
+      2,
+      4
+    ],
+    "silences": [
+      {
+        "t": 1.76,
+        "tFin": 2
+      },
+      {
+        "t": 7.19,
+        "tFin": 7.3
+      },
+      {
+        "t": 7.32,
+        "tFin": 8
+      }
+    ],
+    "cuts": [
+      4
+    ],
+    "visualEvents": [
+      0.541667,
+      1.041667,
+      1.541667,
+      1.916667,
+      2,
+      4,
+      5,
+      7.791667
+    ],
+    "frozen": [],
+    "sync": {
+      "pairs": 4,
+      "medianMs": 8,
+      "worstMs": 8,
+      "inSync": true
+    }
+  },
+  "cuesMedidos": [
+    {
+      "cue": 1.62,
+      "kind": "silencio",
+      "t": 1.75,
+      "tFin": 2,
+      "estado": "confirmado",
+      "medido": "RMS máx. −inf dB en 1.75–2.00 s (silencio ≤ -50 dB)"
+    },
+    {
+      "cue": 2,
+      "kind": "golpe",
+      "t": 2,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 2.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 4,
+      "kind": "golpe",
+      "t": 4,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 4.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 5,
+      "kind": "pico",
+      "t": 5,
+      "estado": "confirmado",
+      "medido": "pico de ±0,5 s en 5.00 s (-3.1 dBFS)"
+    }
+  ]
+}

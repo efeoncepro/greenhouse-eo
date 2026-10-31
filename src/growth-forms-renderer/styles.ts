@@ -1912,6 +1912,9 @@ const INLINE_PILL_CSS = `
 :is(greenhouse-form,.ghf-scope) .ghf-inline :is(.ghf-inline-open,.ghf-inline-send):focus-visible{outline:2px solid var(--ghf-inline-focus-ring,#ffffff);outline-offset:3px}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-roll{display:inline-block;min-width:0;height:1.4em;overflow:hidden;line-height:1.4;vertical-align:top}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-roll-in{display:flex;flex-direction:column;transition:transform 320ms var(--ghf-inline-ease-resolved)}
+/* TASK-2056 — logo en el rótulo (declarado por el anfitrión): alto relativo al texto, alineado a su línea base. */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-roll-in > span:has(> .ghf-inline-logo){display:inline-flex;align-items:center;gap:.32em}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-logo{display:block;height:var(--ghf-inline-logo-height,1.3em);width:auto;margin:0;padding:0;border:0}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-roll-in>span{overflow:hidden;text-overflow:ellipsis}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-arrow{flex:none;overflow:visible;transition:transform 340ms var(--ghf-inline-ease-resolved)}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-arrow-stem{stroke-dasharray:.5 2;transition:stroke-dasharray 360ms var(--ghf-inline-ease-resolved)}
@@ -1951,6 +1954,14 @@ const INLINE_PILL_CSS = `
 }
 :is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-input::placeholder{color:var(--ghf-inline-placeholder,rgba(207,228,250,.6));opacity:1}
 :is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-input:is(:focus,:focus-visible){outline:none!important;box-shadow:none!important}
+/* Autocompletado: la regla del navegador (:-internal-autofill-selected) pinta fondo claro y texto oscuro con
+   !important de agente de usuario, que gana a cualquier !important nuestro. El texto se recupera con
+   -webkit-text-fill-color y el fondo se retiene con una transición que nunca termina (el fondo de la
+   píldora es translúcido, así que un box-shadow inset no lo puede imitar). Reproducido en Chrome 2026-10-24. */
+:is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-inline-input:is(:-webkit-autofill,:autofill){
+  -webkit-text-fill-color:var(--ghf-inline-field-fg,#ffffff)!important;caret-color:var(--ghf-inline-field-fg,#ffffff);filter:none!important;
+  transition:opacity 220ms var(--ghf-inline-ease-resolved),background-color 0s linear 600000s,color 0s linear 600000s!important;
+}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="loading"] .ghf-inline-input{opacity:.55}
 :is(greenhouse-form,.ghf-scope) .ghf-inline .ghf-honeypot{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
 
@@ -1969,7 +1980,11 @@ const INLINE_PILL_CSS = `
 :is(greenhouse-form,.ghf-scope) .ghf-inline-pill:is([data-ghf-inline-state="success"],[data-ghf-inline-state="done"]) .ghf-inline-check path{stroke-dashoffset:0}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-ok{color:var(--ghf-inline-done-fg,#ffffff)}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-check{color:var(--ghf-inline-tone-resolved)}
-:is(greenhouse-form,.ghf-scope) .ghf-inline-msg{display:grid;min-width:0}
+:is(greenhouse-form,.ghf-scope) .ghf-inline-msg{display:grid;position:relative;min-width:0}
+/* Sólo el texto visible da el ancho: si los dos comparten la celda, «¡Listo!» queda corrido a la izquierda
+   dentro del ancho de «Ya estás suscrito» (desvío deliberado del canvas, que tenía el mismo defecto). */
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill:not([data-ghf-inline-state="done"]) .ghf-inline-t2,
+:is(greenhouse-form,.ghf-scope) .ghf-inline-pill[data-ghf-inline-state="done"] .ghf-inline-t1{position:absolute;inset:0 auto auto 0}
 :is(greenhouse-form,.ghf-scope) .ghf-inline-msg>span{grid-area:1/1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity 260ms var(--ghf-inline-ease-resolved),transform 360ms var(--ghf-inline-ease-resolved)}
 /* El texto que no se ve sale también del árbol accesible y del cálculo de contraste (visibility, con retraso para el fundido). */
 :is(greenhouse-form,.ghf-scope) .ghf-inline-t2{opacity:0;visibility:hidden;transform:translateY(8px)}

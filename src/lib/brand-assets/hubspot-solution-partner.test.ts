@@ -6,7 +6,8 @@ import { describe, expect, it } from 'vitest'
 import {
   HUBSPOT_SOLUTION_PARTNER_BADGES,
   HUBSPOT_SOLUTION_PARTNER_BADGE_VARIANTS,
-  getHubSpotSolutionPartnerBadge
+  getHubSpotSolutionPartnerBadge,
+  getHubSpotSolutionPartnerBadgeForSurface
 } from './hubspot-solution-partner'
 
 const repoRoot = resolve(process.cwd())
@@ -28,5 +29,12 @@ describe('HubSpot Solutions Partner badge primitive', () => {
     expect(HUBSPOT_SOLUTION_PARTNER_BADGES.orange.src).toBe(
       '/branding/partners/hubspot/solution-partner/badge-orange-spp-hubspot.svg'
     )
+  })
+
+  it('picks the plate that contrasts with the surface, never the cream plate on paper', () => {
+    expect(getHubSpotSolutionPartnerBadgeForSurface('light')).toBe(HUBSPOT_SOLUTION_PARTNER_BADGES.dark)
+    expect(getHubSpotSolutionPartnerBadgeForSurface('dark')).toBe(HUBSPOT_SOLUTION_PARTNER_BADGES.light)
+    expect(getHubSpotSolutionPartnerBadgeForSurface('accent')).not.toBe(HUBSPOT_SOLUTION_PARTNER_BADGES.orange)
+    expect(HUBSPOT_SOLUTION_PARTNER_BADGES.light.recommendedSurface).toBe('dark')
   })
 })

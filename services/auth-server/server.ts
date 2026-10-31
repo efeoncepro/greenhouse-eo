@@ -21,7 +21,11 @@ import { internalAuthEnabled } from '@/lib/auth-server/internal/config'
 // TASK-844 — Sentry init must run BEFORE any function from @/lib/** is invoked.
 import { initSentryForService } from '../_shared/sentry-init'
 
-import { query } from '@/lib/db'
+import { query, withTransaction } from '@/lib/db'
+import { PostgresFirstPartyStore } from '@/lib/auth-server/first-party/postgres-store'
+import { createInvitationOtpRuntime } from '@/lib/auth-server/email-otp/runtime'
+import { createPostgresInvitationOtpStore } from '@/lib/auth-server/email-otp/postgres-store'
+import { createGovernedInvitationOtpMailer } from '@/lib/auth-server/email-otp/mailer'
 import {
   createCloudKmsSigner,
   getActiveSigningKey,
@@ -49,6 +53,7 @@ import {
 } from '@/lib/auth-server/persons'
 import { createInternalAuthRuntime, createRuntimeMultiOrgGrantsResolver } from '@/lib/auth-server/internal/runtime'
 import { createNativeGrantsPort } from '@/lib/auth-server/internal/grants'
+import { createFirstPartyRuntime } from '@/lib/auth-server/first-party/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { createAuthServerRequestHandler, SERVICE_NAME } from './app'
@@ -75,10 +80,16 @@ const getSigner = (): KmsSignerPort => {
 // ─── Wiring ─────────────────────────────────────────────────────────────────
 
 const personStore = new PostgresPersonAuthStore()
+const oauthStore = new PostgresOAuthStore()
+
+const firstParty = createFirstPartyRuntime({ oauth: oauthConfig, persons: personAuthConfig, auditStore: oauthStore,
+  signer: payload => signWithActiveKey({ signer: getSigner(), payload }) })
+
 const expectedSourceSystem = expectedSourceSystemFor(oauthConfig.environmentId)
 
 /** Deps compartidas por el router de personas y por el `SubjectSessionPort` que consume `authorize`. */
 const personDeps = {
+  resolveProductContext: firstParty.loginContext,
   internalLoginEnabled: () => internalAuthEnabled() && personAuthConfig.personAuthEnabled && oauthConfig.oauthEnabled,
   store: personStore,
   config: personAuthConfig,
@@ -112,7 +123,8 @@ const baseSubject = createPersonSubjectPort({
       console.warn(`[${SERVICE_NAME}] session invalidated by source link: ${status}`)
   })
 
-const internalAuth = createInternalAuthRuntime({oauthConfig,personConfig:personAuthConfig,personStore,baseSubject})
+const internalAuth = createInternalAuthRuntime({oauthConfig,personConfig:personAuthConfig,personStore,baseSubject,
+  isFirstPartyReturn: async returnTo => (await firstParty.loginContext(returnTo)) !== null })
 
 const handler = createAuthServerRequestHandler({
   enabled: AUTH_SERVER_ENABLED,
@@ -126,7 +138,15 @@ const handler = createAuthServerRequestHandler({
   getPublishableSigningKeys,
   getSigner,
   signAccessToken: payload => signWithActiveKey({ signer: getSigner(), payload }),
-  store: new PostgresOAuthStore(),
+  store: oauthStore,
+  firstParty: firstParty.handler,
+  invitationOtp: createInvitationOtpRuntime({
+    enabled: AUTH_SERVER_ENABLED && oauthConfig.oauthEnabled && oauthConfig.firstPartyEnabled === true && personAuthConfig.personAuthEnabled,
+    issuer: oauthConfig.issuer, firstPartyStore: new PostgresFirstPartyStore(),
+    store: createPostgresInvitationOtpStore(withTransaction), mailer: createGovernedInvitationOtpMailer(),
+    signer: { sign: (claims, header) => signWithActiveKey({ signer: getSigner(), payload: { ...claims }, typ: header.typ }) },
+    auditStore: oauthStore
+  }),
   // TASK-1830 — la persona la resuelve la sesión propia (`__Host-efeonce_auth`). Con
   // `AUTH_SERVER_PERSON_AUTH_ENABLED=false` el port devuelve `null` y `authorize` sigue
   // respondiendo `login_required`: prender la superficie es un flag, no un deploy distinto.

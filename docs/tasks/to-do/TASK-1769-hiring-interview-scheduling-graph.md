@@ -90,6 +90,20 @@ La duda que frenaba esto era tecnologica y **ya esta resuelta** — no hay que e
      "Que necesito entender antes de planificar?"
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-24 — El módulo de eventos planifica su propio principal de Graph
+
+- El módulo de eventos (RESEARCH-013) planifica una **app de Entra dedicada «Greenhouse Webinars»** (single-tenant)
+  con `VirtualEventRegistration-Anon.ReadWrite.All`, `VirtualEvent.Read.All` y `OnlineMeetingArtifact.Read.All`,
+  consentimiento de administrador y secreto en Secret Manager. Diseño, no creada todavía.
+- Su AppId se **agrega** a la application access policy de Teams `MY-APP-POLICY`
+  (`Set-CsApplicationAccessPolicy -AppIds @{Add=…}`), asignada como Global y, desde 2026-10-24, a
+  jreyes@efeoncepro.com. **Un usuario solo puede tener una política**: si esta task necesita una application access
+  policy para su principal, su AppId va a esa misma política, no a una segunda.
+- **Coordinar:** los principales de calendario/reunión de esta task y el de webinars se planifican juntos (qué app,
+  qué permisos, qué política), para no duplicar apps ni consentimientos. Fuente:
+  [RESEARCH-013 §Backlog canónico](../../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos)
+  y [anexo D](../../research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md).
+
 ## Delta 2026-08-22 — El operador decide la fuente de verdad, y proponer horarios sale a task propia
 
 **1. OQ-1 queda RESUELTA. Opcion A confirmada: el calendario manda.**

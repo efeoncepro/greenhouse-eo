@@ -1,5 +1,82 @@
 # Registro de decisiones y versiones
 
+### 2026-10-28 — Home de efeoncepro.com en «La órbita» (canvas «Home Efeonce en órbita»): aprobada y publicada
+
+Caso: rediseño de la home del sitio con la línea gráfica y el motion de referencia de getpingback.com (canvas
+`https://claude.ai/artifact/CuJ5wNPXrfYBXV9wFMevNq`; en producción desde el 2026-10-29, landing compilada `inicio`).
+Registro técnico en `efeonce-public-site-wordpress`, `references/landings/home-claude-design-preview.md`.
+
+- **Constelación de Sparks con los colores de las cinco líneas** (operador). Excepción aprobada para la home a la regla
+  «Sparks del color de una línea sólo en piezas de esa línea» (2026-10-01 (f), `SPARKS_V1.md` §6.1): la página presenta
+  todas las líneas, así que la constelación las mezcla. 18 Sparks (3D de las cinco líneas en estados y acciones + 2D al
+  fondo) a distintas profundidades alrededor del titular, parallax con cursor y scroll, tooltip con línea y qué hace;
+  fondo blanco porque la sección anterior es oscura. No se extiende a otras superficies.
+- **La primera versión de agentes se rechazó** («no me gustó en absoluto»: escenario oscuro, ciclo, familias). De tres
+  direcciones ofrecidas, el operador eligió la constelación: «Ese sí quedó genial».
+- **Sin cierre de marca en la home del sitio** (logo en órbita + Empower your Growth + «Desde Santiago, operando en…»):
+  «en la home no hay forma de ponerlo». El footer canónico del sitio lo reemplaza; header y footer son los canónicos,
+  el menú dibujado del canvas no se porta.
+- **Imagen OG de la home:** 1200×630 PNG con la lente y la persona al centro y el logo centrado abajo; la pregunta y
+  «Crecer.» a la izquierda, Destacar/Aparecer/Rendir/Vender a la derecha, para que sobreviva al recorte cuadrado de los
+  chats y al 2:1 de X (fuente `scripts/public-website/inicio-source/og/og.html`; adjunto `252184`).
+
+### 2026-10-26 — Infografía «Una idea, cada formato» (marketing de contenidos): aprobada y publicada
+
+Caso: refresh del artículo de marketing de contenidos (post `244883`), tercera infografía de cuerpo tras ICP y AEO
+(`ai-generations/2026-10-26_marketing-contenidos-leads/infografia/`, `build.mjs` versionado).
+
+- **Aprobada por el operador el 2026-10-26** y publicada en el post `244883` (adjuntos `252169` y `252170`, versiones
+  claras de escritorio y teléfono). Se construyen igual escritorio 1600 y teléfono 900 en claro y oscuro; el blog sólo
+  publica las claras (decisión del 2026-10-25 en el ICP).
+- **Línea `brand`**, porque la línea sigue a la portada del artículo (acento `#bb1954` en claro, `#ff6500` en oscuro).
+- **Nueva comprobación del build: texto encimado** (intersección de cajas entre textos protegidos), junto a texto fuera
+  del lienzo o sobre el pie y `textCrossesRing`; las tres quedan en `build-report.json`. Motivo: el primer escritorio
+  tenía el canal de la última fila encima de su texto y nada lo detectaba; se movieron los canales a una pastilla junto
+  al nombre.
+- **Íconos en una sola voz (Trazo):** `auditIconGroup` corta con `mixed-voices`. Formatos resueltos: artículo
+  `contenido`, carrusel `swipe`, newsletter `correo`, video corto `multimedia`, respuesta en la IA `ia`. Sin Trazo de
+  «idea»: el foco de la órbita es un cubo isométrico dibujado al trazo (mismo grosor relativo, tinta del tema), que
+  retoma el cubo con tres sombras de la portada. No es alta de catálogo; si el concepto se repite, se propone al
+  operador.
+- Método consolidado en [manzanitas.md](manzanitas.md) §12b; inventario de voces en [iconography.md](iconography.md) §0.
+
+### 2026-10-25 — Infografías de cuerpo del blog (Manzanitas) y fórmula de portadas
+
+Caso: artículo «ICP B2B» (post `249108`), dos infografías SVG (`ai-generations/2026-10-25_icp-infografias/`).
+
+- **Logo + burbuja URL juntos en el pie de una infografía de cuerpo** (operador): «las imágenes muchas veces se comparten
+  solas sin contexto; cuando eso ocurre, la idea es que vaya con nuestro logo y url». Excepción vigente para
+  infografías de cuerpo del blog a la regla general de la burbuja (que sólo reemplaza al logo si ya está en la
+  imagen). No se extiende a otras superficies.
+- **Título discreto, no encabezado** (operador: «la idea es que las imágenes faciliten una experiencia inmersiva de la
+  lectura»): una línea en Poppins 600 como rótulo de figura; sin antetítulo ni subtítulo. La idea larga va en la
+  leyenda HTML.
+- **Los elementos de interfaz se quedan** (operador: «los elementos de interfaz a mí me encantan»): la cuenta como
+  tarjeta, píldoras y baldosas suaves. La dirección editorial sin cajas (v3) fue descartada.
+- **«Que quede todo muy premium»:** numerales en Bricolage 760 con el acento, trazos de 1–1,5 px, más aire.
+- **Bricolage en textos densos con contraste de pesos** (operador): «hay que hacerle contraste con sus pesos, si no se
+  vuelve muy pesada». Parte en peso 400 y la idea clave en 760 (p. ej. ««Cerrar cada mes» + «sin errores ni horas
+  extra.»»).
+- **Fórmula de portadas del blog (operador, 2026-10-25):** la del ICP queda, pero **las próximas cambian de fórmula**:
+  «tenemos varias portadas con una persona al frente y vidrio». La serie (inbound, topic clusters, RUT, ICP) ya
+  repite persona tras una mesa con tarjetas de vidrio; la siguiente portada tiene que proponer otra idea visual.
+
+### 2026-10-24 — Ficha de autor del blog: oscura, retrato con órbita y nombre con punto
+
+Decisiones del operador al revisar la ficha de autor que reemplaza la caja de Ohio al cierre de los artículos
+(TASK-2057, en producción desde el 2026-10-24; tarjeta [applications.md](applications.md) §A19):
+
+- **Ficha B oscura en los artículos** (`#001a33`); la A en papel queda como alternativa, no se borra.
+- **Foto con el fondo azul de la fotografía de marca.** La capa del avatar del equipo (2026-09-29) tenía huecos en la
+  bomber, invisibles sobre navy; se rehízo desde la fuente (`ai-generations/2026-10-24_autor-blog/reparar-capa.mjs`).
+- **Sin web personal** hasta que exista una.
+- **Cargo:** «Managing & GTM Director» (sale de Yoast Premium, el mismo dato del schema).
+- **Tamaño:** «quedó bastante grande» → la 0.5.6 la deja más contenida.
+- **Composición** (aplicada con el criterio vigente, sin excepción nueva): pieza `portrait` de AXIS con su única
+  esfera; el nombre cierra con punto tipeado en el acento ([criteria.md](criteria.md), «Retrato con órbita y nombre:
+  punto tipeado»); esquina recta arriba a la izquierda (`straightCorner`); isotipos oficiales de
+  `@efeoncepro/axis-brand-assets` para las redes.
+
 ### 2026-10-24 — Portada del blog v3: aura del buscador como excepción y piezas a AXIS
 
 El operador aprobó el canvas «Portada Blog Efeonce» v3 y pidió el haz del buscador «con más vida… de luminosidad o de
@@ -19,8 +96,10 @@ en la voz de decisión (eyebrow · titular con su esfera · evidencia), sin preg
 hasta entonces, lámina a mano con las medidas del token. Borrar la pregunta después de componer es parche («no
 parches»). Contraportada BR3h: el operador rechazó la v1 («se ve súper artificial la órbita con ese punto rosado
 allí»); en foto, la órbita lleva su anatomía completa (hilo tenue en la luz de Efeonce, arco corto en el acento y la
-esfera en la punta del arco). Rosado «sólo en la esfera» no alcanza: la esfera suelta se lee pegada. BR3 aprobada tiene
-la misma esfera suelta (pregunta abierta al operador). Norma: delta 2026-10-20 de `EFEONCE_SURFACE_COMPOSITION_V1.md`.
+esfera en la punta del arco). Rosado «sólo en la esfera» no alcanza: una esfera de otro tono sobre un anillo neutro
+se lee pegada. **Corrección del 2026-10-28:** BR3, BR4 y NXSF3 siguen aprobadas (anillo entero en el color de la línea,
+esfera blanca arriba) y son el patrón que el operador pidió para la contraportada Voice de ARMOR. Norma: delta
+2026-10-20 de `EFEONCE_SURFACE_COMPOSITION_V1.md`.
 
 ### 2026-10-20 — Landing `/agenda/`: par de voz, sin lima y Nexa lejos
 

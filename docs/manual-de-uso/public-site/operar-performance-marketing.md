@@ -221,7 +221,9 @@ opción, toma antes un snapshot del estado actual y purga Kinsta al final.
 
 Verificado al cierre de TASK-1865 (envío real, GA4, Meta, Rich Results, viewports, re-guardado). El núcleo común y
 el republicador existen desde el 2026-10-17; la base común de widgets está desplegada desde las 21:25 UTC de ese día
-(HTML de los módulos idéntico antes y después). Falta pedir indexación de la URL en la interfaz de Search Console.
+(HTML de los módulos idéntico antes y después). Indexación: verificada el 2026-10-26 con
+`pnpm public-website:gsc-index request` ([manual](solicitar-indexacion-search-console.md)): la URL está en Google y
+se rastreó el 2026-10-19, después del último cambio (2026-10-17), así que no hizo falta pedirla.
 
 ## Referencias técnicas
 

@@ -494,7 +494,18 @@ Bloques autorables por el primitive actual:
 - `pullquote`;
 - `separator`;
 - `image` con media real, caption opcional y `linkDestination: none|media`;
-- `embed` YouTube con URL aprobada.
+- `embed` YouTube con URL aprobada;
+- `chart` (Gráfico Efeonce, bloque `efeoncepro/chart`, plugin 0.9.0, en producción desde el 2026-10-25):
+  `{ kind: 'chart', chart, title?, caption?, sourceLabel?, sourceUrl?, tone? }`, diez tipos con la misma tabla
+  (filas × columnas de valores); bloque dinámico autocerrado, validado con `chart_data_invalid`,
+  `chart_attrs_unsupported`, `chart_not_self_closing` y `chart_tone_invalid`. Formas por tipo:
+  `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` §Gráfico Efeonce.
+
+**Estilos editoriales obligatorios (2026-10-24).** `pullquote` sale siempre con un estilo Efeonce: Destacado (la
+tesis, uno o dos por post, remate en `strong`) o, con `variant: "cita"` y `cite` obligatorio, Cita; `tone: "light"` da
+la versión en papel (0.8.0, 2026-10-25); `list` acepta `style: "steps"` (Pasos, sólo ordenada) y `style: "box"` (Recuadro, 2–6 ítems); `image` acepta
+`align: "center"`; `faq` emite cada pregunta con el estilo «Pregunta frecuente» y `schema.source: "plugin"` por
+defecto. El acento sale de la línea del tema del post. Contrato: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md`.
 
 Reglas duras:
 
@@ -529,8 +540,8 @@ El renderer vigente:
 - admite sólo `http:`, `https:` y `mailto:`;
 - rechaza protocolos inseguros antes de producir Gutenberg;
 - usa `new URL(...)`, por lo que el `href` debe ser absoluto en el contrato actual;
-- aplica rich text a intro, párrafos, items de lista, celdas/caption de tabla, captions de imagen y CTA; quote y
-  pullquote siguen siendo texto plano.
+- aplica rich text a intro, párrafos, items de lista, celdas/caption de tabla, captions de imagen, CTA y el `text` y
+  `cite` de pullquote (desde 0.8.0, para marcar el remate del Destacado con `strong`); quote sigue siendo texto plano.
 
 No insertar `<a>` manual, `target`, `onclick`, iframe, script ni `javascript:` dentro de la spec. Si una
 capacidad falta, abrir trabajo del primitive; no rodearla con freeform.
@@ -671,12 +682,34 @@ evita abrir una segunda vía SCP/SSH ad hoc y mantiene el mismo preflight/cleanu
 El hash authored puede diferir del hash raw de WordPress por normalizaciones deterministas. Caso confirmado:
 WordPress convierte cada `🍏` a `&#x1f34f;` al persistir (`15` bytes de diferencia para tres emojis) y el frontend
 lo renderiza como `img.emoji[alt="🍏"]`. Aceptar una equivalencia sólo si se demuestra el diff exacto y el resto
-de los bytes/estructura coincide; nunca relajar el guard porque “WordPress suele normalizar”.
+de los bytes/estructura coincide; nunca relajar el guard porque “WordPress suele normalizar”. Para la QA de vuelta
+(2026-10-26), normalizar las entidades en los dos lados antes de calcular el hash.
 
 El script temporal debe fallar si no coinciden ID, manifest, owner o hash. Debe eliminarse local y remotamente
 al terminar; el wrapper ya elimina su copia remota por defecto.
 
 **Gate:** snapshot recuperable, guard pre-write, readback independiente y post aún `private`.
+
+#### 9.1 Refresh y fusión de posts publicados (delta 2026-10-26)
+
+**Regla de refresh:** al refrescar o fusionar, inventariar los visuales de los originales (diagramas, videos,
+gráficos, destacados, portadas) y decidir uno por uno. Vuelven los que aportan: diagramas y videos valen. No vuelven
+los destacados con cifras sin fuente. Las portadas se rehacen. Caso: en el pilar Loop 248398 volvieron el diagrama
+`Loop-MKT.svg` (media 248439) y los dos videos de HubSpot.
+
+**Fusión de dos posts en un pilar** (caso 248483 → 248398): una sola operación con guardas sobre los dos posts
+(estado, slug, `post_modified_gmt`, sha del contenido, título Yoast, rutas y ausencia de redirecciones previas en
+origen y destino); respaldo de los dos en opciones `_gh_post_refresh_<id>_<UTC>` y `_gh_post_merge_<id>_<UTC>`; el
+absorbido pasa a **borrador**, nunca a la papelera (recuperable, fuera del índice y del sitemap, slug conservado);
+después, 301 plain de Yoast Premium desde su ruta al pilar y reindexación con el `Indexable_Builder`. Los enlaces
+internos al absorbido se reescriben con `scripts/public-website/blog-post-content-republish.php` (simulación y después
+`apply`); si una frase citaba los dos posts, se quita el enlace duplicado en vez de apuntar dos veces al pilar, y se
+actualiza la spec del repo. Pasos, QA de la fusión y trampas:
+`.claude/skills/efeonce-public-site-wordpress/references/agentic-blogpost-end-to-end.md` §16. Detalle del caso:
+`docs/public-site/LOOP_MARKETING_REFRESH_DRAFT_V1.md` §0–§4.
+
+**Gate:** visuales inventariados, absorbido en borrador con 301 de un salto, enlaces internos reescritos y QA de la
+fusión completa.
 
 ### Fase 10. Sistema visual, GPT Image 2 y Media Library
 
@@ -766,10 +799,28 @@ shasum -a 256 ai-generations/YYYY-MM-DD_<run>/masters/* ai-generations/YYYY-MM-D
 - cuerpo raster: WebP optimizado con dimensiones conocidas;
 - cuerpo vectorial: SVG directo cuando el contrato determinístico demuestra seguridad, autonomía, legibilidad y
   ventaja de entrega; source editable y delivery saneado permanecen separados;
-- featured/OG: derivado `1200×630` o cercano a `1.91:1`;
-- preferir JPEG/PNG social si el ecosistema de previews no trata el WebP de forma consistente;
-- proteger el centro óptico y probar miniatura/card;
-- no duplicar el featured dentro del body si Ohio ya lo renderiza.
+- featured/OG: un raster 1,91:1 (lienzo 1200 × 630). En los artículos de Marketing con Manzanitas es **un JPEG de
+  2400 × 1260 de menos de 300 KB** (no WebP: los lectores de enlaces no lo tratan de forma pareja), con el texto y la
+  cara dentro del cuadrado central x 285–915 y nada importante en los 15 px de arriba y de abajo;
+- probar la portada en su recorte cuadrado (WhatsApp y «Te puede interesar» al pie de cada artículo) además de la
+  vista completa;
+- Ohio no muestra la destacada en la cabecera del artículo: no duplicarla en el cuerpo para «que se vea».
+
+**Set por artículo nuevo de Marketing con Manzanitas (inventario v1.4, medido en vivo el 2026-10-24).** Un artículo
+nuevo entra solo al slider de `/blog/` y al riel «Para leer con calma» (si dura 12 minutos o más), así que lleva
+**3 archivos y 3 subidas**, cada una con su `alt`:
+
+| Archivo | Medidas | Se sube como | Comando |
+|---|---|---|---|
+| Plate (foto sin texto) | PNG 16:9, 2560 × 1440 | imagen de la tarjeta del riel, con punto focal | `pnpm public-website:blog-home card <post> --image <plate> --alt "…" --focus "84% 30%"` |
+| Portada | JPEG 2400 × 1260, menos de 300 KB | destacada + Open Graph de Yoast | `scripts/public-website/blog-post-cover-apply.php` (simulación → `apply`) |
+| Imagen del slider | WebP 2:1, 2400 × 1200, recortada del plate, sin texto | `hero` del slider | `pnpm public-website:blog-home hero <post> --light "…" --bold "…" --image <webp> --alt "…"` |
+
+Los dos comandos `blog-home` sin `--apply` sólo muestran el plan; `--apply` va con el visto bueno del operador. Un
+artículo de menos de 12 minutos no entra al riel y se ahorra la tarjeta. Las imágenes del cuerpo son de 0 a 2, sólo si
+explican algo. Márgenes de cada superficie, Open Graph por plataforma y quién hace cada pieza:
+[inventario de imágenes por artículo](BLOG_ARTICLE_IMAGE_INVENTORY_V1.md); la portada paso a paso:
+[producir la portada de un artículo](../../manual-de-uso/creative/producir-portada-de-articulo-del-blog.md).
 
 Para portada/featured/hero/OG aplicar además el
 [Editorial Cover Key Visual Operating Model](EDITORIAL_COVER_KEY_VISUAL_OPERATING_MODEL_V1.md): tesis visual,
@@ -882,6 +933,9 @@ El artículo debe responder:
 Casos propios incluyen método, periodo, muestra, mercados, permisos y límites. No presentar un caso observado
 como experimento controlado ni una mejora local como garantía universal.
 
+La transparencia no incluye exponer en público la caída de posiciones o de tráfico de un contenido propio (decisión
+del operador, 2026-10-26); la regla vive en `.claude/skills/copywriting/efeonce/JULIO_REYES_VOICE_SYSTEM.md`.
+
 #### 11.4 Entidad de autor Yoast
 
 Antes de publicar, inspeccionar el nodo `Person` que Yoast enlaza desde `Article/BlogPosting`:
@@ -915,7 +969,9 @@ Preferir el graph de Yoast. Verificar salida renderizada, no sólo metas:
 - `Person` author.
 
 No duplicar `Organization`, `Article` o breadcrumbs con JSON-LD manual. `FAQPage` sólo si las preguntas y
-respuestas son visibles, la política vigente lo justifica y no duplica otro owner.
+respuestas son visibles, la política vigente lo justifica y no duplica otro owner. En el blog lo genera el plugin
+`efeonce-editorial-blocks` desde los bloques «Pregunta frecuente» (unido al nodo `WebPage` de Yoast): no se escribe
+a mano, y un post con un `FAQPage` incrustado antiguo lo conserva sin duplicarlo.
 
 **Gate:** matriz metadata completa, autor correcto, claims/Who-How-Why/IA visibles y schema esperado en preview/readback.
 
@@ -1029,6 +1085,11 @@ purge con secretos.
 
 No purgar caché como efecto lateral de dry-run o de una iteración privada que no afecta render público.
 
+Justo después de purgar, la primera lectura anónima puede devolver la versión vieja: repetir la lectura o agregar
+`?nc=<ts>` antes de juzgar el resultado. Coordinación (2026-10-26): las cuatro sesiones del blog autorizaron purgar
+después de republicar contenido sin consultarles, mientras no tengan un despliegue en curso; un despliegue de plugin
+sí se les avisa antes, igual que a la sesión de Analytics, que mantiene `blog-post-cover-apply.php`.
+
 #### 13.4 Falla durante publicación
 
 - Si el write no devuelve readback: estado desconocido; inspeccionar antes de reintentar.
@@ -1076,6 +1137,13 @@ Verificar al menos:
 
 Una captura `fullPage` puede ocultar overflow horizontal. Medir `scrollWidth`; no inferirlo de la imagen.
 
+Trampas de render (delta 2026-10-26):
+
+- `apply_filters('the_content')` por wp-cli no resuelve los oEmbed (su caché vive en post meta `_oembed_*`); el
+  navegador real sí. Para una vista previa de servidor, inyectar los iframes a mano;
+- Playwright con `waitUntil: 'networkidle'` agota el tiempo con iframes de YouTube: usar `load`;
+- un gráfico Efeonce se dibuja cerca del viewport: si la prueba no se detiene sobre él, figura vacío.
+
 #### 14.3 Links y CTA
 
 1. extraer links HTTP únicos;
@@ -1089,9 +1157,13 @@ Una captura `fullPage` puede ocultar overflow horizontal. Medir `scrollWidth`; n
 
 - `og:type=article`;
 - `og:title`, `og:description`, `og:url`, locale y site name;
-- `og:image` pública `200`, MIME y dimensiones esperados;
-- Twitter `summary_large_image`;
-- image URL no depende de auth y no es un fallback global accidental.
+- `og:image` pública `200`, MIME y dimensiones esperados (en Manzanitas: la portada, 2400 × 1260, `image/jpeg`);
+- Twitter `summary_large_image`; sin `twitter:image` propio, X usa la `og:image`;
+- `og:title` es el título del post, no el título SEO de Yoast;
+- `og:image:alt` y `twitter:image:alt` salen del `alt` de la portada desde `efeonce-editorial-blocks` 0.4.6 (en
+  producción desde el 2026-10-24): verificar que haya una de cada una;
+- image URL no depende de auth y no es un fallback global accidental;
+- refrescar la caché con el depurador de Facebook, el Post Inspector de LinkedIn y un chat de prueba en WhatsApp.
 
 #### 14.5 Schema y author entity
 
@@ -1123,7 +1195,11 @@ con `<lastmod>` honesto. La indexación de Google es asíncrona y no debe falsea
 - no usar la Indexing API para artículos o landings genéricos; sólo corresponde a `JobPosting` y
   `BroadcastEvent` dentro de `VideoObject`;
 - URL Inspection API observa la versión conocida por el índice; no ejecuta live test ni solicita indexación;
-- una solicitud manual desde URL Inspection puede reservarse para unas pocas URLs críticas, sin promesa de plazo;
+- la solicitud de indexación (botón de la interfaz, unas 10 por día) se reserva para unas pocas URLs críticas, sin
+  promesa de plazo. Los agentes la hacen con `pnpm public-website:gsc-index request <url>` (inspección) y `--apply`
+  (pide sólo si Google no vio el último cambio), en un Chrome dedicado donde una persona inició sesión; queda una
+  línea por URL en `scripts/public-website/gsc-indexing/ledger/`. Manual:
+  [solicitar indexación](../../manual-de-uso/public-site/solicitar-indexacion-search-console.md);
 - cuando exista la capability verificada de `TASK-1426`, registrar checkpoints `0h`, `24h` y `72h` separados del
   gate de publicación; hasta entonces, no inventar evidencia automatizada.
 

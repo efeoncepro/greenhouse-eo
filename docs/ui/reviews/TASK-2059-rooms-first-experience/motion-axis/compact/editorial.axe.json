@@ -1,0 +1,7 @@
+{
+  "url": "http://127.0.0.1:3210/demo",
+  "violations": [],
+  "incomplete": [],
+  "passCount": 42,
+  "note": "Incomplete checks are retained for manual review; zero violations does not certify their contrast."
+}

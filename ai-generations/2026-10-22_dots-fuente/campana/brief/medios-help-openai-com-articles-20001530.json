@@ -1,0 +1,84 @@
+{
+  "url": "https://help.openai.com/articles/20001530",
+  "dom": {
+    "title": "Primeros pasos con tu dot | OpenAI Help Center",
+    "iframes": [],
+    "videos": [],
+    "posters": [],
+    "imgs": [
+      {
+        "src": "https://help.openai.com/logo.png",
+        "alt": "OpenAI",
+        "w": 1125
+      },
+      {
+        "src": "https://help.openai.com/favicon.png",
+        "alt": "Logotipo de OpenAI",
+        "w": 512
+      }
+    ],
+    "links": [
+      "https://help.openai.com/es-es",
+      "https://help.openai.com/auth/login?redirectTo=%2Fauth%2Flogin-success%3FreturnTo%3D%252Fes-es%252Farticles%252F20001530-getting-started-with-your-dot",
+      "https://help.openai.com/es-es",
+      "https://help.openai.com/es-es/collections/3742473-chatgpt",
+      "https://help.openai.com/resources/translation-view-redirect?articleId=20001530&routeLanguage=es-es&redirectTo=%2Fen%2Farticles%2F20001530-getting-started-with-your-dot",
+      "https://help.openai.com/es-es/articles/20001530#how-do-i-reset-my-dot",
+      "https://chatgpt.com/dots",
+      "https://help.openai.com/es-es/articles/6825453-chatgpt-release-notes",
+      "https://help.openai.com/es-es/articles/20001529-dots-privacy-security-and-safety-faqs",
+      "https://help.openai.com/es-es/articles/11870455-openai-open-weight-models-gpt-oss",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#informaci%C3%B3n-general",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#en-qu%C3%A9-puede-ayudarme-mi-dot",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#qu%C3%A9-planes-incluyen-dots",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#primeros-pasos",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#c%C3%B3mo-configuro-mi-dot",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#trabajar-con-tu-dot",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#en-qu%C3%A9-se-diferencia-mi-dot-de-una-conversaci%C3%B3n-normal-de-chatgpt",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#c%C3%B3mo-asigno-una-tarea-a-mi-dot",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#puede-mi-dot-usar-mi-propio-ordenador",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#puede-mi-dot-usar-entornos-de-codex-en-la-nube",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#aplicaciones-conectadas",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#c%C3%B3mo-conecto-y-gestiono-aplicaciones",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#puedo-conectar-mi-dot-a-slack-o-al-correo-electr%C3%B3nico",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#puede-mi-dot-llamarme",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#tareas-programadas",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#c%C3%B3mo-programo-tareas-y-recibo-actualizaciones",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#cu%C3%A1ndo-puede-mi-dot-empezar-a-trabajar-sin-que-le-env%C3%ADe-un-nuevo-mensaje",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#mensajes-de-texto",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#c%C3%B3mo-env%C3%ADo-mensajes-de-texto-a-mi-dot",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#c%C3%B3mo-dejo-de-recibir-mensajes-de-texto-de-mi-dot",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#se-aplican-cargos-por-mensajes-o-datos",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#memoria",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#c%C3%B3mo-usa-mi-dot-la-memoria",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#controles-y-aprobaciones",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#c%C3%B3mo-gestiono-las-confirmaciones-y-las-reglas-personalizadas",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#c%C3%B3mo-pauso-mi-dot",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#c%C3%B3mo-restablezco-mi-dot",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#soluci%C3%B3n-de-problemas-con-tu-dot",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#mi-dot-no-puede-usar-mi-ordenador-ni-las-herramientas-locales",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#mi-dot-no-puede-usar-una-aplicaci%C3%B3n-o-un-sitio-web",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#he-aprobado-una-acci%C3%B3n-pero-sigue-bloqueada",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#no-encuentro-el-trabajo-ni-los-archivos-de-mi-dot",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#mi-dot-ha-dejado-de-trabajar-o-no-ha-seguido-una-instrucci%C3%B3n",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#no-encuentro-dots",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#tienes-problemas-para-llamar-a-tu-dot",
+      "https://help.openai.com/es-es/articles/20001530-getting-started-with-your-dot#qu%C3%A9-cambian-los-ajustes-de-memoria-y-la-opci%C3%B3n-restablecer"
+    ],
+    "text": "Interrupción del servicio\nHemos identificado un problema que afecta a nuestros servicios y estamos trabajando en una solución. Ver incidente\nLanguage\nespañol\nEspaña\nIniciar sesión\nAll Collections\nChatGPT\nPrimeros pasos con tu dot\nEsta página se tradujo automáticamente. Ver el artículo original en inglés.\nDanos tu opinión sobre esta traducción\nPrimeros pasos con tu dot\n\nAprende a configurar tu dot en ChatGPT, conectar aplicaciones y gestionar tareas y controles.\n\nActualización: hace 16 horas\nInformación general\n\nTu dot es un agente siempre activo en ChatGPT que puede ayudarte a llevar un proyecto desde la idea inicial hasta obtener resultados que puedas utilizar. Dale un objetivo, comparte el contexto y podrá seguir avanzando entre conversaciones.\n\nCon su propio ordenador y las aplicaciones que conectes, tu dot puede investigar, crear y llevar las tareas hasta el final. Parte del contexto de la memoria de ChatGPT y aprende cómo te gusta trabajar. Tú eliges qué puede hacer por su cuenta, revisas su trabajo y le das indicaciones o cambias el rumbo sobre la marcha. Puedes pausarlo en cualquier momento.\n\n¿En qué puede ayudarme mi dot?\n\nEmpieza con un proyecto que te gustaría llevar a buen término con ayuda:\n\nPrepara una presentación. Reúne datos y comentarios de clientes, investiga qué ha cambiado y actualiza la presentación a medida que llegue nueva información.\n\nCrea contenido. Convierte la transcripción de una entrevista en notas del episodio y publicaciones para redes sociales, y aplica después tus cambios a todos los borradores.\n\nMejora una aplicación. Define el alcance de un cambio, escribe el código y pruébalo para tener una versión funcional que revisar.\n\n¿Qué planes incluyen dots?\n\nHoy comienza la incorporación de los dots a ChatGPT para los usuarios de Pro, excepto en los mercados del Espacio Económico Europeo, Suiza y el Reino Unido. Los dots también están disponibles para los usuarios de Business Premium en todas las regiones donde se ofrece ChatGPT. Los usuarios de Enterprise (incluidos Edu y Healthcare) pueden probar la beta cuando el administrador de su Área de trabajo la active, aunque inicialmente está desactivada de forma predeterminada.\n\nTu primer dot está incluido en tu plan Pro o Business Premium sin coste adicional. Está disponible las 24 horas, todos los días, para hablar, ayudarte a pensar y estar al tanto de lo que te importa. Tu plan también incluye una cuota de uso para trabajos más exhaustivos, con límites ampliados durante el primer mes tras el lanzamiento. En el futuro, podrás añadir más dots y aumentar la productividad de cada uno, ya sea incrementando su velocidad o la cantidad total de trabajo que puede asumir al mes.\n\nLos dots se están incorporando de forma gradual. El acceso puede tardar varios días en llegar a tu cuenta.\n\nPrimeros pasos\n¿Cómo configuro mi dot?\n\nCrea tu dot en la aplicación móvil de ChatGPT para iOS o Android, en la aplicación de escritorio o en la web desde un ordenador. Sigue las indicaciones de la configuración inicial para empezar. Para configurarlo desde el móvil, usa la última versión de la aplicación. La aplicación de escritorio también está disponible para Windows.\n\nTambién puedes hablar con tu dot en la aplicación móvil de ChatGPT. Los dots no están disponibles en la versión web para móviles.\n\nUsa un ordenador para conectar canales de mensajería, como Slack o los SMS.\n\nPuedes ponerle un nombre a tu dot durante la configuración. Su identificador predeterminado es @yourname-dot. Cuando le pones un nombre, su identificador pasa a ser @yourname-agentname. Para cambiar su nombre o avatar más adelante, selecciona su nombre o avatar para abrir el perfil y, después, selecciona el icono del lápiz.\n\nPuedes elegir entre los personajes disponibles o seleccionar una mascota para tu dot. Tu dot también puede generar una mascota para ti.\n\nTrabajar con tu dot\n¿En qué se diferencia mi dot de una conversación normal de ChatGPT?\n\nTu dot es un agente siempre activo en ChatGPT que puede asumir responsabilidades de forma continuada y seguir avanzando entre conversaciones. Funciona con GPT-6 Astra, tiene su propio ordenador en la nube, trabaja con las aplicaciones que elijas conectar y recuerda el contexto para ayudarte con el trabajo en curso.\n\nDale un objetivo a tu dot y define lo que puede hacer por su cuenta. Puede abordar problemas complejos, determinar los siguientes pasos y presentarte resultados para que los revises. Recurre a ti para las decisiones que requieren tu criterio.\n\n¿Cómo asigno una tarea a mi dot?\n\nDescribe lo que quieres que haga tu dot y comparte los detalles que necesita. Por ejemplo, puedes pedirle que revise tu calendario, investigue un tema o te recuerde algo más tarde. Puedes responder en la conversación para aportar más información o cambiar la solicitud.\n\nPara adjuntar un archivo o una foto, selecciona + en la conversación.\n\nAbre el perfil de tu dot en la aplicación de escritorio para revisar la actividad en En curso, Programadas y Completadas. También puedes abrir el ordenador de tu dot desde su perfil para verlo e interactuar con él. En el móvil, el ordenador se abre bajo tu control.\n\n¿Puede mi dot usar mi propio ordenador?\n\nTu dot tiene su propio ordenador en la nube. El acceso a tu ordenador local es opcional y está desactivado al principio. Para conectar un ordenador, usa la aplicación de escritorio de ChatGPT en ese ordenador. El trabajo en tu ordenador local se ejecuta en tareas independientes que aparecen en la barra lateral.\n\nCuando conectas un ordenador y confirmas Permitir acceso, tu dot puede acceder a los archivos y trabajar en ese ordenador desde cualquiera de sus canales de mensajería. Confirma Revocar acceso para impedir que tu dot acceda a los archivos o trabaje en ese ordenador.\n\nCon el acceso al ordenador local activado, tu dot puede crear tareas de Work o Codex, usar habilidades locales y utilizar tu navegador local cuando su navegador en la nube esté bloqueado.\n\n¿Puede mi dot usar entornos de Codex en la n"
+  },
+  "medios": [
+    {
+      "u": "https://help.openai.com/logo.png",
+      "ct": "image/png",
+      "status": 200,
+      "len": "13508"
+    },
+    {
+      "u": "https://help.openai.com/favicon.png",
+      "ct": "image/png",
+      "status": 200,
+      "len": "17151"
+    }
+  ]
+}

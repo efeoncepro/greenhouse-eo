@@ -1,0 +1,7 @@
+interface:
+  display_name: "Efeonce Rooms (living skill)"
+  short_description: "Operate Efeonce Rooms: private media, collaboration/presentation, explicit guest rights, X-ray/CRM ports, local V4 multimedia and stdio MCP. Separate the verified local backend, cloud image pilot and pending Claude Design integration."
+  default_prompt: "Use $efeonce-rooms before touching the efeonce-rooms repo, docs/architecture/rooms/**, ROOMS_* flags or any EPIC-052 task (2058-2072, 2074-2078). Read references/program-ledger.md first. Local backend verification does not certify Linux/cloud multimedia, external connectors, remote MCP or UI acceptance. Every push to efeonce-rooms main deploys production. At closure update the ledger and mirror .claude/ <-> .codex/."
+
+policy:
+  allow_implicit_invocation: true

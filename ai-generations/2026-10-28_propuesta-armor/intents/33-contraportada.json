@@ -1,0 +1,17 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "close",
+  "recipe": "close-proposal",
+  "use": "proposal",
+  "line": "voice",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-10-28_propuesta-armor/plates/VOX3-sin-isotipo-isotipo-acabado.png",
+    "alt": "Nexa, de espaldas con la chaqueta de Efeonce, camina hacia un anillo colosal de luz naranja de la línea Voice con una esfera blanca encendida arriba"
+  }
+}

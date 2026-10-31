@@ -267,6 +267,20 @@ Verified rules (public commercial cloud, Bot Framework Connector):
 - Teams App Validator (CLI): `npx -p '@microsoft/teamsapp-cli@latest' teamsapp validate --debug`
 - Teams App Validator (web): <https://dev.teams.microsoft.com/appvalidation.html>
 
+## Webinars de Teams: no van en la app del bot (2026-10-24)
+
+- **NUNCA** agregar permisos de webinars/asistencia (`VirtualEventRegistration-Anon.ReadWrite.All`,
+  `VirtualEvent.Read.All`, `OnlineMeetingArtifact.Read.All`) a la app del bot. Está planificado un principal dedicado
+  single-tenant «Greenhouse Webinars» (regla de principal dedicado; coordinar con TASK-1769). Diseño y backlog:
+  [RESEARCH-013 anexo D](../../../docs/research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md).
+- Leer webinars con permisos de aplicación exige una **Teams application access policy** asignada al usuario
+  (organizador). Cada usuario tiene **una sola** política: en el tenant es `MY-APP-POLICY` (Global + jreyes), así que
+  una app nueva se **agrega** a esa política (`Set-CsApplicationAccessPolicy -Identity MY-APP-POLICY -AppIds
+  @{Add=…}`), nunca se crea otra. Mutación en Teams: con autorización explícita del operador.
+- Graph: inscribir externos `POST /solutions/virtualEvents/webinars/{id}/registrations` (permiso de aplicación);
+  cancelar por aplicación solo con RSC `VirtualEventRegistration-Anon.ReadWrite.Chat` (no práctico); asistencia por
+  sesión `…/webinars/{id}/sessions/{sessionId}/attendanceReports`.
+
 ## When NOT to use this skill
 
 - Building a bot for a tenant outside the public commercial cloud (GCC, GovCloud) — the serviceUrl candidates and consent flow change. Microsoft has separate docs.

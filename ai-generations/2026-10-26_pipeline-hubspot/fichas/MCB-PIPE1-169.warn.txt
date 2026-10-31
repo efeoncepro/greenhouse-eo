@@ -1,0 +1,2 @@
+  ⚠ MCB-PIPE1-169: cine — falta `primerPlano`: sin algo real junto al lente, todo cae en un solo plano y no se siente cine (casebook, falla 3).
+  ⚠ MCB-PIPE1-169: cine — casebook: docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md · revisión antes de gastar: agente `cine-reviewer`.

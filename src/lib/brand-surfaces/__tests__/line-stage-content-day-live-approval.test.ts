@@ -118,6 +118,12 @@ describe('deck · content-day-live-approval (TASK-1942)', () => {
   it('el canal es Slack (ícono oficial) o Teams (isotipo del catálogo); nunca otro', () => {
     expect(filesOf(plan(example()).piece)[0]).toBe('src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/salesforce-icon-slack.svg')
     expect(filesOf(plan(patch('channel', { tool: 'teams' })).piece)[0]).toBe('src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg')
+    // Slack es de Salesforce en cualquier línea: en un deck de HubSpot también sale su ícono oficial.
+    const hubspot = { ...example(), line: 'revenue-hubspot', agent: { ...(example().agent as object), icon: 'sales' }, executed: { ...(example().executed as object), icon: 'sales' } }
+
+    expect(filesOf(plan(hubspot as Intent).piece)[0]).toBe(
+      'src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/salesforce-icon-slack.svg'
+    )
     expectCode(() => plan(patch('channel', { tool: 'notion' })), 'invalid-intent')
     expectCode(() => plan(patch('channel', { name: ' ' })), 'invalid-intent')
   })

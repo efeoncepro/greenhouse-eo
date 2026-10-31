@@ -1,0 +1,140 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "d98b15dc740c",
+  "key": "d98b15dc740cac0621b56f1d66272c2bcf6a5a3d154e9ac358ce052fb1625a4b",
+  "status": "completed",
+  "createdAt": "2026-10-17T21:23:04.072Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/bloqueo/17-sin-izq.png",
+    "imageSha256": "1850064de43b5087676c97b7bf4c7b56fc8f2269ce0e93d3b5bbcbd58af7970c",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/bloqueo/17-der-mask.png",
+    "maskSha256": "eff42730195b732236a9b4176f29449e8f7e2200ebe403baa3b00688d930ddcb",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v5/08-paula-ayer.png",
+        "sha256": "c035808e59b7e181cc9a08b0fc37063ce2653330c5c33b848a954288cc873924"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Over-the-shoulder foreground: the out-of-focus back of the head (short dark wavy hair) and left shoulder of a man in a navy bomber jacket, seen from behind, filling this right edge of the frame from top to bottom, exactly like the man at the right edge of the reference image; very shallow depth of field, soft and blurred. Behind him, partly hidden, the orange BREAKR poster on the wall.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nOver-the-shoulder foreground: the out-of-focus back of the head (short dark wavy hair) and left shoulder of a man in a navy bomber jacket, seen from behind, filling this right edge of the frame from top to bottom, exactly like the man at the right edge of the reference image; very shallow depth of field, soft and blurred. Behind him, partly hidden, the orange BREAKR poster on the wall.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.19140625,
+    "editable": 220160,
+    "soft": 30720,
+    "protected": 1059840
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 82 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 116.701,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 7.47,
+        "bestError": 7.47,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1059840,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 220160,
+        "maxDelta": 245,
+        "meanDelta": 126.916,
+        "worst": {
+          "x": 998,
+          "y": 1265
+        }
+      },
+      "seam": {
+        "pixels": 30720,
+        "maxDelta": 205,
+        "meanDelta": 43.493,
+        "worst": {
+          "x": 851,
+          "y": 1261
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1059840,
+        "maxDelta": 230,
+        "meanDelta": 24.162,
+        "worst": {
+          "x": 612,
+          "y": 333
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 2773,
+        "input_tokens_details": {
+          "image_tokens": 2560,
+          "text_tokens": 213
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 4283
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

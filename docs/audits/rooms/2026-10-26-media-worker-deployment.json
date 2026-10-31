@@ -1,0 +1,159 @@
+{
+  "recordedAt": "2026-10-26T17:48:20.566014+00:00",
+  "scope": "Rooms media worker image and finite Cloud Run Job; no Auth, mail, app flags or UI",
+  "sourceCommit": "a87852e345c331d6f4b3ca8e3137bf1fb2120e35",
+  "runtimeCheckoutModified": false,
+  "buildContext": {
+    "archiveSha256": "88a57464d5a64959fe130fd6bcb52609a2ac991373ff328a38639d6425013528",
+    "archiveBytes": 121442,
+    "fileCount": 82,
+    "source": "git show exact approved commit; allowlist equivalent to Dockerfile.dockerignore",
+    "secretPatternMatches": 0,
+    "privateNpmConfigFiles": 0,
+    "nodeModulesFiles": 0
+  },
+  "build": {
+    "id": "ce7021c1-4b3c-45e7-9519-eb8b444386cf",
+    "project": "efeonce-group",
+    "region": "global",
+    "machineType": "E2_MEDIUM",
+    "timeoutSeconds": 1200,
+    "diskGiB": 100,
+    "serviceAccount": "183008134038-compute@developer.gserviceaccount.com",
+    "newIamGrants": false,
+    "imageTag": "gcr.io/efeonce-group/rooms-media-worker:a87852e345c331d6f4b3ca8e3137bf1fb2120e35",
+    "digest": "sha256:c588d012601190a6db3e07686ed9b952d570fb153ac08aa8f817b19a7f913133",
+    "status": "SUCCESS",
+    "dockerfile": "services/media-worker/Dockerfile",
+    "builtInSmoke": "Dockerfile RUN node --conditions=react-server dist/smoke.mjs",
+    "startTime": "2026-10-26T17:41:31.233556792Z",
+    "finishTime": "2026-10-26T17:42:19.031278Z",
+    "durationSeconds": 47.797722,
+    "stepStatuses": [
+      "SUCCESS"
+    ],
+    "artifactRegistryReadback": {
+      "digest": "sha256:c588d012601190a6db3e07686ed9b952d570fb153ac08aa8f817b19a7f913133",
+      "fullyQualifiedDigest": "us-docker.pkg.dev/efeonce-group/gcr.io/rooms-media-worker@sha256:c588d012601190a6db3e07686ed9b952d570fb153ac08aa8f817b19a7f913133",
+      "slsaBuildLevel": "unknown"
+    }
+  },
+  "job": {
+    "name": "rooms-media-worker",
+    "region": "us-east4",
+    "project": "efeonce-group",
+    "cpu": "1",
+    "memory": "1Gi",
+    "taskTimeout": "240s",
+    "maxRetries": 0,
+    "taskCount": 1,
+    "parallelism": 1,
+    "args": [],
+    "serviceAccount": "rooms-media-worker-production@efeonce-group.iam.gserviceaccount.com",
+    "env": {
+      "NODE_ENV": "production",
+      "GOOGLE_CLOUD_PROJECT": "efeonce-group",
+      "ROOMS_RUNTIME_PROFILE": "cloud-worker",
+      "ROOMS_GCP_SERVICE_ACCOUNT": "rooms-media-worker-production@efeonce-group.iam.gserviceaccount.com",
+      "ROOMS_CLOUD_SQL_INSTANCE": "efeonce-group:us-east4:greenhouse-pg-dev",
+      "ROOMS_POSTGRES_DATABASE": "rooms_production",
+      "ROOMS_POSTGRES_USER": "rooms_media_worker",
+      "ROOMS_POSTGRES_PASSWORD_SECRET_REF": "projects/efeonce-group/secrets/rooms-production-postgres-media-worker-password/versions/1",
+      "ROOMS_MEDIA_ENABLED": "true",
+      "ROOMS_MEDIA_STORAGE": "gcs",
+      "ROOMS_MEDIA_GCS_BUCKET": "efeonce-rooms-production-media",
+      "ROOMS_MEDIA_GCS_PREFIX": "rooms-media/"
+    },
+    "secretMounts": [],
+    "scheduler": null,
+    "executeOnDeploy": false,
+    "dependencyGate": "Root confirmed worker SA, secret version1, DB grants and accessor; separately authorized exactly one finite empty-queue execution",
+    "created": true,
+    "executed": true,
+    "readbackChecks": {
+      "serviceAccount": true,
+      "imageDigest": true,
+      "allEnvExact": true,
+      "cpu": true,
+      "memory": true,
+      "taskCount": true,
+      "parallelism": true,
+      "timeout": true,
+      "retries": true,
+      "argsEmpty": true,
+      "noSecretMounts": true,
+      "noExecution": true
+    },
+    "createTime": "2026-10-26T17:46:52.425277Z",
+    "resourceVersion": "AAZewepS7hU",
+    "uid": "1bbf2785-8c94-44a8-b57f-ade80e89d7f5",
+    "execution": {
+      "name": "rooms-media-worker-sqbt9",
+      "conditions": [
+        {
+          "type": "Completed",
+          "status": "True",
+          "reason": null
+        },
+        {
+          "type": "ResourcesAvailable",
+          "status": "True",
+          "reason": null
+        },
+        {
+          "type": "Started",
+          "status": "True",
+          "reason": null
+        },
+        {
+          "type": "ContainerReady",
+          "status": "True",
+          "reason": null
+        }
+      ],
+      "startTime": "2026-10-26T17:47:26.194906Z",
+      "completionTime": "2026-10-26T17:47:59.659112Z",
+      "succeededCount": 1,
+      "failedCount": 0,
+      "allowlistedWorkerEvents": [
+        {
+          "timestamp": "2026-10-26T17:47:46.883687Z",
+          "processed": false
+        }
+      ],
+      "proof": "empty queue; processed=false requires successful worker profile/metadata identity, worker secret and real Cloud SQL role validation plus SELECT",
+      "realImageProcessed": false,
+      "connectionEvidence": "Inferred from successful production code path: parseWorkerCloudConfig → Compute metadata SA → Secret Manager version1 → Cloud SQL connector → validateDatabaseIdentity → advisory lock and media_jobs SELECT. No separate connected=true log is emitted."
+    },
+    "executionCountReadback": 1,
+    "latestCreatedExecution": "rooms-media-worker-sqbt9"
+  },
+  "costEstimateUsd": {
+    "notBillingReadback": true,
+    "freeTiersAssumed": false,
+    "cloudBuildPerMinute": 0.003,
+    "cloudBuildTimeoutMaximum": 0.06,
+    "cloudRunPerVcpuSecond": 1.8e-05,
+    "cloudRunPerGiBSecond": 2e-06,
+    "cloudRunMinimumBillingSeconds": 60,
+    "jobAt240Seconds": 0.0048,
+    "jobAt60Seconds": 0.0012,
+    "artifactRegistryPerGiBMonthApprox": 0.1,
+    "artifactRegistryImageSizeGiB": null,
+    "sources": [
+      "https://cloud.google.com/build/pricing",
+      "https://cloud.google.com/run/pricing",
+      "https://cloud.google.com/artifact-registry/pricing"
+    ],
+    "exclusions": "Taxes, source/log storage, GCS media operations/storage, existing Cloud SQL and account usage; runtime estimates are not guaranteed memory or throughput performance",
+    "observedBuildDurationEstimate": 0.0023898861,
+    "emptyQueueExecutionEstimate": 0.0012
+  },
+  "limits": {
+    "parentAndNativeDecoderMemory": "Shared 1GiB container limit; child V8 heap256MiB, native Sharp additional, no guaranteed worst-case 40MP memory performance",
+    "finiteInvocation": "one queued job maximum, no --loop, no scheduler",
+    "shutdown": "SIGTERM stops new claims and drains current bounded operation; force termination may leave a lease for later recovery",
+    "decoderTimeoutSourceExpression": "30_000"
+  },
+  "dependenciesPending": []
+}

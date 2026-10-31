@@ -134,7 +134,7 @@ fuente de verdad, permisos ni harness de agentes por elegir un ejecutor.
 
 TASK-1690 conserva su dueño de epic; la asignación no toma ni altera el movimiento ajeno de su archivo.
 TASK-292 sigue condicional a revisores/scopes personales; modelo se decide al tomarla, sin activar ese carril
-por inferencia. TASK-1834 conserva la asignación/contrato de identidad de EPIC-044; no se replanifica aquí.
+por inferencia. TASK-2063 conserva la asignación/contrato de identidad de EPIC-044; no se replanifica aquí.
 
 ### Matriz de comunicación y retorno al portal
 
@@ -170,7 +170,7 @@ El orden de valor no añade bloqueos técnicos a las tasks ni exige terminar tod
 
 Seis tasks registradas por autorización del operador, prioridad P1 (TASK-1857 el 2026-09-10). TASK-1852 está `in-progress`
 (capacidad técnica en Production, apertura cliente pendiente con writes OFF); TASK-1853–1856 siguen `to-do`. Las existentes
-conservan su epic. P01 se conecta con TASK-1834 por contrato y rollout nativo condicional.
+conservan su epic. P01 se conecta con TASK-2063 por contrato y rollout nativo condicional.
 
 | Alias | Task | Entrega | Blocked by |
 |---|---|---|---|
@@ -258,7 +258,7 @@ pero una edición congelada conserva su fecha aunque el dashboard se actualice.
   activar dos cuentas manualmente con comandos/auditoría; sí para prometer provisión automática a escala.
 - **TASK-1012/1839:** invitación/entrega del portal. Dependencia condicional si P01 encuentra un
   bloqueo de entrada o se necesitan usuarios nuevos; sin otro sender o linking por correo.
-- **TASK-1834 / EPIC-044 ↔ TASK-1852:** contrato obligatorio de identidad/contexto/retorno profundo.
+- **TASK-2063 / EPIC-044 ↔ TASK-1852:** contrato obligatorio de identidad/contexto/retorno profundo.
   P01 puede preparar/habilitar con login vigente probado; activar OIDC nativo espera los gates de 1834
   (1833/1832/1841 aplicables). No bloqueo circular ni asignación de módulos desde callback. TASK-1838
   administra autoridad delegada del emisor, no servicios ni usuarios del portal por inferencia.

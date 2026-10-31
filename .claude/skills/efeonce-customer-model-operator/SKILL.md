@@ -41,6 +41,29 @@ reduces it, what evidence reaches the sponsor and what risk appears when the ope
 The model must also test the Why: the offer increases client capability and leaves useful memory for the next cycle.
 Do not call opaque dependency that the client cannot explain, transfer or port “retention.”
 
+## Sales Navigator y perfiles de cliente
+
+Para traducir ICP/JTBD a búsqueda y listas nativas, cargar
+[operación de Sales Navigator](../efeonce-b2b-prospecting/references/sales-navigator-operations.md).
+Las Personas son filtros de roles; el ICP conserva cuenta, problema, iniciativa y grupo comprador.
+Descubrir por encaje antes de filtrar por relación; conexión, seniority y lista guardada no acreditan
+presupuesto, autoridad ni demanda. Servicios/landings, cobertura de roles y membresía se verifican por separado.
+
+En listas comerciales, priorizar liderazgo funcional para impulsar contratación; Julio excluye CM/ejecución
+pura por afinidad técnica. Operadores del mapa de investigación no son destinatarios por defecto.
+Priorizar evidencia de agencias/proveedores o presupuesto del área, separando cargo actual de trayectoria.
+Liderazgo funcional puede habilitar investigación de contratación; no certifica comprador económico.
+Pauta de revisión A/B y fuente textual en el módulo B 2 B/política, sin convertirla en score o etapa CRM.
+
+
+## Discovery y caso de negocio por iniciativa
+
+Para preparar reuniones o incorporar su transcripción, cargar el
+[método compartido](../efeonce-b2b-prospecting/references/discovery-to-business-case.md). Mantener
+cuenta legal/marca/iniciativa, rol operador/comprador y prioridad real; la voz de quien responde se
+distingue de propuestas nuestras y acuerdos. Evidencia parcial no completa autoridad, presupuesto o
+ROI. Fuente declarada y localización sustentan el caso; Commercial y Pricing conservan sus decisiones.
+
 ## Continuidad de discovery en propuestas SEO/AEO
 
 Cuando la reunión cambia el objetivo de una propuesta, separar entidad legal, marca comercial, producto,

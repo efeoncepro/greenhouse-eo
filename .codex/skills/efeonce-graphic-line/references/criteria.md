@@ -1,5 +1,8 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
+> Delta retrato con órbita y nombre (ficha de autor del blog) verificado contra: la ficha en producción en
+> `efeoncepro.com` (`efeonce-editorial-blocks` 0.5.5) y greenhouse-eo `develop` en `15e7903c6` — 2026-10-24.
+
 > Delta caso AWS (marcas de tercero en anuncio de alianza) verificado contra: método
 > `docs/operations/social/2026-10-21-aws-partner-announcement-production-method.md` y decisiones del operador de esa
 > corrida — 2026-10-21.
@@ -541,6 +544,20 @@ decisión, no en la duda. Es la misma gramática del anillo y la esfera, dicha e
 
 **Sí / no** (lámina 5.6): pregunta chica, respuesta grande de una a tres palabras · **no:** pregunta grande, respuesta
 larga y chica. Bricolage para decir, Poppins para explicar · **no:** Bricolage en párrafos ni monoespaciada.
+
+**Anillo arriba, esfera abajo (operador, 2026-10-25).** El par se fuerza también en las portadas de Marketing con
+Manzanitas: cinco pares para la misma portada de «SEO y AEO» fueron rechazados («Los mensajes no funcionan»). Regla:
+**el par no es obligatorio en ninguna pieza**, y lo que sí se conserva es la estructura. El anillo va en la línea de
+arriba y la esfera al final de la de abajo. Por qué funciona: (1) es la órbita leída de arriba abajo, de abrir a cerrar,
+así que dice Efeonce sin ser pregunta; (2) el anillo fino va con la línea liviana y la esfera llena con el dominante, y
+la marca refuerza la jerarquía 3×; (3) el anillo marca lo que **abre**, no el «¿»: la línea de arriba puede ser una
+pregunta real, el tema, el contexto o un dato; (4) la lectura entra por lo liviano y sale por lo pesado, en dos tiempos;
+(5) la esfera sigue siendo una por pieza. Sin anillo cuando la línea de arriba sólo clasifica (fecha, categoría,
+producto). El destacado es una idea completa que se entiende a la primera, nunca un fragmento que remata un acertijo
+(«Pasajes.», «A pocas.», «Nombra pocas.» fueron rechazados) ni jerga de especialista; si no cabe claro, se reescribe la
+frase entera. Fórmula que funcionó: una frase en dos tiempos, la línea de arriba la abre y el destacado la completa
+(«○ Google te encuentra. La IA / **te elige**●»; también «○ Sé la marca que la IA / **elige**●»). Canon:
+[La órbita §4, delta 2026-10-25](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#delta-2026-10-25--anillo-arriba-esfera-abajo-el-par-sólo-cuando-hay-algo-que-decir-operador).
 
 **Cuándo sí y cuándo no (operador, 2026-10-19, propuesta SGS Chile).** «Todos los agentes por seguir la regla ponen
 cosas así; si lo ves en contexto es súper absurdo». La voz pregunta-respuesta no es un relleno obligatorio de cada
@@ -1139,6 +1156,15 @@ El operador, revisando la landing de Inbound Marketing: «Bricolage necesita con
 ### Titulares de landing: la esfera es el punto final — 2026-10-18
 
 El operador, revisando la landing Nosotros: «No estás poniendo el punto (esfera) al final de las frases con el color de la línea gráfica». En una landing web, cada titular en Bricolage (H1 y H2) cierra con la esfera en el acento de la línea en vez del punto tipeado, como ya lo hacía la landing de Inbound. Cómo se aplica: la esfera va pegada a la última palabra dentro de un `white-space: nowrap` para que nunca quede sola en una línea; la parte que introduce (≈ 330) conserva su punto tipeado; sobre papel, la esfera toma el acento oscuro de la línea. No va en listas, ítems ni etiquetas (la esfera como viñeta sigue prohibida) ni en texto Poppins. Si la pieza ya tiene la esfera de una órbita (una lente, por ejemplo), el titular de esa misma pieza no suma otra: en el hero B de Nosotros, con lente, el titular mantiene el punto. En una landing, cada sección cuenta como pieza para esta regla.
+
+### Retrato con órbita y nombre: punto tipeado — 2026-10-24
+
+Aplicación web de la regla anterior y de «nunca dos esferas por pieza» (§3.3), decidida al diseñar la ficha de autor
+del blog (A19). Cuando un retrato lleva su órbita (pieza `portrait`: anillo, arco y esfera), esa esfera es la de la
+pieza; el **nombre** de la persona que va al lado **cierra con punto tipeado en el acento de la línea, nunca con
+esfera**. Vale para la ficha de autor, la del equipo, un speaker o cualquier tarjeta de persona con retrato, en web y
+en impreso. Si el nombre baja de 24 px (una franja chica, un byline), el punto va en el color del nombre: el acento
+nunca va en texto menor a 24 px. Sin retrato con órbita, el nombre sigue la regla de la firma y el carnet (§3.3).
 
 ### Partners del footer público — 2026-10-14
 

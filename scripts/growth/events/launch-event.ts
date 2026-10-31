@@ -19,6 +19,7 @@ import 'server-only'
  * docs/manual-de-uso/public-site/lanzar-evento-o-webinar.md
  *
  *   pnpm events:launch -- --brief scripts/growth/events/examples/webinar.example.json [--apply]
+ *   pnpm events:launch -- --brief <prueba.json> --apply --skip-wordpress   (prueba de punta a punta, sin evento público)
  */
 
 import { execFileSync } from 'node:child_process'
@@ -92,6 +93,8 @@ export const eventBriefSchema = z
 export type EventBrief = z.infer<typeof eventBriefSchema>
 
 const apply = process.argv.includes('--apply')
+// Pruebas de punta a punta: publica formulario y destino sin crear el evento público (el slug debe empezar por «prueba-»).
+const skipWordpress = process.argv.includes('--skip-wordpress')
 
 const arg = (name: string) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -372,6 +375,13 @@ const main = async () => {
 
   step('2. Greenhouse')
   const { formKey } = await greenhouse(brief, hubspotFormId)
+
+  if (skipWordpress) {
+    if (!brief.slug.startsWith('prueba-')) throw new Error('--skip-wordpress es sólo para eventos de prueba (slug «prueba-…»)')
+    console.log(`\n▸ 3. WordPress — omitido (prueba). form_key=${formKey}`)
+
+    return
+  }
 
   step('3. WordPress')
   wordpress(brief, formKey)

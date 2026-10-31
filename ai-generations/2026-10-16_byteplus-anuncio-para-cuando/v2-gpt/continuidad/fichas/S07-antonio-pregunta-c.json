@@ -1,0 +1,19 @@
+{
+ "id": "S07-antonio-pregunta-c",
+ "formato": "4:5",
+ "impacto": true,
+ "escena": "SCENE: a still from a modern, cinematic corporate comedy sketch, photorealistic. In the same brand-new contemporary meeting room on a high floor of a modern office tower in Santiago de Chile: floor-to-ceiling frameless glass walls, a long pale oak meeting table with a thin matte black steel base, modern upholstered chairs in warm grey, a large frameless wall display, linear recessed LED ceiling lights, polished concrete floor, one sculptural green plant; through the glass the Santiago skyline and the Andes. Current-generation hardware only (thin aluminum laptops, frameless screens), clean surfaces; nothing dated, no paper stacks, no books, no old monitors, nothing worn, seen behind him out of focus. GEOGRAPHY (critical, continuity, same room as every other shot): ONE single long pale oak meeting table. Paula sits on one long side; Antonio sits on the OPPOSITE long side of the same table, diagonally across from her, about three meters away, a little closer to the floor-to-ceiling window wall, facing her across the table — he is NOT at the head or far end of the table. Behind Antonio: the window wall with the Santiago skyline and the Andes; the tall Costanera tower is visible to the LEFT of Antonio, never to his right. A thin dark wall display on the right side wall. On the table: Antonio's ultra-thin space-grey aluminum laptop and his navy ceramic mug in front of him; on Paula's side, her own open laptop and her kraft paper coffee cup with a matte black lid. Over-the-shoulder from Paula's side: her dark brown hair and cream sweater shoulder soft and out of focus at the left edge. Antonio in medium close-up chest up, 85mm f/2.8, camera at eye level. He leans back, totally relaxed, an open thin laptop in front of him, and asks a simple question with complete serenity, the faintest closed-mouth smile, head almost frontal, eyes toward a person just off-frame to the left. Antonio wears the Efeonce corporate uniform: the deep navy bomber jacket of the kit, CLOSED, with its embroidered emblem on the left chest exactly as in the references, over a plain white t-shirt. Light: soft, flat, cool overcast daylight from the windows under a flat grey sky, neutral and slightly grey, muted colors, calm and corporate — a modern office on a dull day, never fluorescent, never dirty.",
+ "sinLechoPorque": "Storyboard de video (keyframe), sin firma ni capa gráfica: no lleva lecho.",
+ "objetos": [
+  {
+   "objeto": "chaqueta-bomber-efeonce",
+   "persona": "antonio"
+  }
+ ],
+ "identidad": [
+  {
+   "persona": "antonio"
+  }
+ ],
+ "lecho": "sin-lecho"
+}

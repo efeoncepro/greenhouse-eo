@@ -1,0 +1,17 @@
+{
+  "pieza": "Efeonce | AWS — Del diagrama al mundo real",
+  "duracion_s": 8.0, "fps": 24, "tempo_bpm": 120, "tiempo_s": 0.5,
+  "regla": "Imagen, SFX y música sobre la misma grilla. Golpes en 2,0 y 4,0. Sting con pico en 5,0 (archivo en 4,41).",
+  "cues": [
+    { "t": 0.0, "hasta": 0.5, "imagen": "Se trazan AWS Cloud, Region y VPC", "sonido": "build de la música (archivo 4,0-5,75) y tics suaves en semicorcheas" },
+    { "t": 0.5, "hasta": 1.0, "imagen": "Íconos oficiales encajan: EC2 0,5 · Users 0,625 · Lambda 0,75 · Bedrock 0,875 · S3 1,0; zoom seco en cada tiempo", "sonido": "clic de encaje por ícono" },
+    { "t": 1.0, "hasta": 1.75, "imagen": "Pulsos naranjas por las flechas; todo se calienta hacia EC2", "sonido": "tics agudos en semicorcheas y riser 150→1500 Hz cortado en seco" },
+    { "t": 1.62, "hasta": 2.0, "imagen": "Zambullida continua en el chip del ícono de EC2 y fogonazo", "sonido": "silencio absoluto 1,75-2,0" },
+    { "t": 2.0, "imagen": "GOLPE 1 — pasillo del data center", "sonido": "drop (archivo 10,0), impacto y sub" },
+    { "t": 2.0, "hasta": 4.0, "imagen": "Vuelo con rampa PCHIP 1,2x→2,9x y pulsos de exposición en corcheas", "sonido": "aire creciente, ventiladores y clacs en 2,25/2,75/3,25/3,75" },
+    { "t": 4.0, "imagen": "GOLPE 2 — fogonazo y salida a la órbita (rampa 5,2x→1,4x)", "sonido": "drop reiniciado, impacto, sub" },
+    { "t": 4.6, "hasta": 4.98, "imagen": "La Tierra se asienta", "sonido": "vacío de la mezcla; sube el sting" },
+    { "t": 5.0, "imagen": "Lockup en etapas (T_SIGN 4,65)", "sonido": "pico del sting" },
+    { "t": 5.0, "hasta": 8.0, "imagen": "Tierra viva alejándose 1,07x→1,0x sin frenar a cero", "sonido": "cola del drop y fundido" }
+  ]
+}
