@@ -36,6 +36,27 @@ Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en 
 
 ---
 
+## Delta 2026-10-30 — el hero de Contacto del sitio en cine, con Nexa anfitriona (operador)
+
+**Decisión del operador (2026-10-30):** el hero de `efeoncepro.com/contacto/` se rehace en registro cine con Nexa
+protagonista («ok, rehazlo, que quede con muchísimo punch e impacto visual»). Nexa es siempre la anfitriona de
+Contacto. Es el **caso 1** de §2 (Nexa protagonista, `alcance: "nexa"`), y vale **sólo para ese hero**. Un hero web de
+campaña o con personas del equipo sigue en A, B o C, y la guía de superficies web de la línea («sin registro cine en
+la web») queda con esta excepción declarada.
+
+- **Qué se conservó y qué se sacó:** la pose de la foto anterior (mentón en la mano, mirada a cámara, portátil) se
+  conserva. La línea lima dibujada detrás de Nexa se saca porque ya no es parte de la línea gráfica. El acento Growth
+  vive en la escena como luz.
+- **Fenómeno:** un anillo inclinado de luz turquesa alrededor de su codo, con una estela corta y una sola esfera,
+  es «tu mensaje ya entró en órbita». Es la única llave y entra por el lado izquierdo del cuadro.
+- **Fichas y plates:** `ai-generations/2026-10-31_contacto-hero-nexa/` (`CT1` y `CT1b`, desde `NX6b`). La ficha
+  cambió según la revisión de `cine-reviewer`: anillo dentro de la mitad derecha, llave del lado izquierdo, mano que
+  no tapa el emblema, sin reloj ni anillos y pantalla del portátil apagada. Plate **aprobado por el operador el 2026-10-30**: `CT1b`,
+  con 4/5 reservas. El lecho no pasa, pero no aplica porque el hero web no firma.
+- **Hallazgo del revisor:** el aviso «sin portador del azul» salta con el hoodie azul rey del kit, que sí es un
+  portador legítimo (la regex `PORTADOR_AZUL` no lo reconoce). Queda anotado para que el operador decida si sumarlo al
+  casebook.
+
 ## Delta 2026-10-25 — Manzanitas sin persona cuando la persona no porta la idea (operador)
 
 **Decisión del operador (2026-10-25):** «mi problema no es que muestre personas, mi problema es que lo haga todo el
