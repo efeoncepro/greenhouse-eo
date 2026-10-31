@@ -43,8 +43,25 @@
 - Primer login humano del dueño (Microsoft + MFA) con la versión nueva y `pnpm rooms members` con sesión real.
 - Dar acceso a una segunda persona interna, para que la organización no dependa de un solo administrador.
 
+## Segunda entrega — renovación automática al entrar (18:01–18:05 UTC)
+
+- Autorización del operador: «Corrige el bug, y luego despliegas».
+- Antes: `verify` 387/387 y ensayo de la migración 20 en clon PASS. La suite del ensayo destapó un bug ya presente en
+  producción: `recordAccessRequest` usaba dos `clock_timestamp()` y podía violar el CHECK de 7 días de
+  `rooms.access_requests` (un `identity_unbound` terminaba en `unavailable`). Corregido en `50f8bcd`. En producción
+  `rooms.access_requests` tenía 0 filas: no hay evidencia de que haya ocurrido.
+- `ROOMS_EXPECT_PENDING=1 pnpm db:migrate-production --apply`: 19 → 20 migraciones, hashes y conteos sin cambios.
+  Respaldo lógico tomado y borrado tras verificar.
+- [PR #6](https://github.com/efeoncepro/efeonce-rooms/pull/6) → `main@aae04cd` → `dpl_8oVZvbYgpTUE2f79aYQJFCReuQ4N` READY;
+  alias `efeonce-rooms.vercel.app` reasignado.
+- Readback: `rooms-pilot-julio-20261025` con `auto_renew = true`; 6 triggers `member_manager_gap_*`; health con
+  1 titular y sin señales. Sin sesión: `/auth/error` 200, callback 303, `/login` 302, `/api/v1/members` `unauthenticated`.
+- La primera renovación real ocurrirá cuando el dueño entre con menos de 335 días restantes (desde 2027-10-02 aprox.);
+  cada una queda como `members.autoRenewed`.
+
 ## Rollback
 
-- Código: revertir el merge y redeploy (`vercel alias set` al deploy anterior `dpl_GiGEoYaPSsUf8V7uZZyTbxtfZM8A`).
+- Código: revertir el merge y redeploy (`vercel alias set` al deploy anterior: `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG` para
+  deshacer sólo la renovación, `dpl_GiGEoYaPSsUf8V7uZZyTbxtfZM8A` para volver antes del acceso durable).
 - Base: la migración es aditiva; el código anterior funciona con ella. Si hiciera falta volver atrás de verdad, se
   restaura desde respaldo de la instancia (el lógico de esta corrida ya se borró); nunca `down` en producción.

@@ -40,6 +40,13 @@
   8. Antes de clientes reales: medir la sala en vivo (prendida y sin medir), cerrar TASK-1833 y revisar gobierno de
      datos IA para `read.client`. Ningún cliente real sin una autorización nueva.
 
+## 2026-10-31 — Renovación automática al entrar EN PRODUCCIÓN
+
+- «Corrige el bug, y luego despliegas». `vivo`: migración 20 aplicada (20 migraciones, hashes y conteos intactos);
+  [PR #6](https://github.com/efeoncepro/efeonce-rooms/pull/6) → `main@aae04cd` → `dpl_8oVZvbYgpTUE2f79aYQJFCReuQ4N`,
+  alias reasignado; dueño con `auto_renew=true`; 6 triggers `member_manager_gap_*`; health 1 titular sin señales;
+  `rooms.access_requests` vacía (no hay evidencia de que el bug del reloj haya ocurrido). Respaldo lógico borrado.
+
 ## 2026-10-31 — Renovación automática al entrar (local, PR #6 sin merge)
 
 - Decisión del operador: «quiero que mi acceso se renueve solo». ADR con delta «renovación automática al entrar».

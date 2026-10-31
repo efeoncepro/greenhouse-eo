@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-052`
-- Status real: `2026-10-31: EN PRODUCCIÓN. Migración 19 aplicada en rooms_production (ensayo PASS), dueño adoptado (members.manage hasta 2027-11-01), main@a2d72c0 desplegado (dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG, alias efeonce-rooms.vercel.app), health sin señales. Recibo docs/audits/rooms/2026-10-31-durable-access-production.md. Falta: primer login humano del dueño con la versión nueva y un segundo administrador.`
+- Status real: `2026-10-31: EN PRODUCCIÓN. Migraciones 19 y 20 aplicadas (ensayos PASS); dueño adoptado con members.manage y auto_renew (renueva al entrar); main@aae04cd desplegado (dpl_8oVZvbYgpTUE2f79aYQJFCReuQ4N, alias reasignado); fix de la carrera de reloj en access_requests incluido; health sin señales. Recibo docs/audits/rooms/2026-10-31-durable-access-production.md. Falta: primer login humano del dueño con esta versión y un segundo administrador.`
 - Rank: `antes del primer cliente real y antes de dar acceso a otra persona interna`
 - Domain: `platform|identity`
 - Blocked by: `ninguno para el corte local; producción espera autorización (migración + merge)`
@@ -34,7 +34,7 @@
   `src/server/access/renewal.ts`, llamado en el callback. Código en `efeonce-rooms` `claude/rooms-owner-auto-renew`
   (`ce7eff1` + fix `50f8bcd`), [PR #6](https://github.com/efeoncepro/efeonce-rooms/pull/6) sin merge; verify 387/387; ensayo de la
   migración 20 PASS (su suite destapó una carrera de reloj en `access_requests`, corregida). Producción con autorización aparte.
-- [ ] Renovación al entrar en producción y verificada con el primer login del dueño.
+- [x] Renovación al entrar en producción (`main@aae04cd`, migración 20, `auto_renew=true` del dueño leído en la base). La primera renovación efectiva llega cuando queden menos de 335 días.
 
 ## Delta 2026-10-31 — carril de agentes Accepted: sin enmienda
 
