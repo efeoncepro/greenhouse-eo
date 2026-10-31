@@ -145,6 +145,24 @@
 - Sin push, sin deploy, sin flags. El checkout `efeonce-rooms` quedó en la rama nueva; `tsconfig.json` sigue
   modificado por otra sesión y no se commiteó.
 
+## 2026-10-31 — TASK-2084 code complete en local (atribución, avisos, reversas, cuotas)
+
+- Operador: «Apruebo el plan». `efeonce-rooms` rama `claude/rooms-agent-attribution` (desde `main@aae04cd`), sin push.
+  Slices 1–5: `f0499bf`, `31b9a27`, `c64665a`, `872f17e`, `aced4e5`.
+- `local`: `pnpm verify` OK; tests 406/406 sin skips con `ROOMS_DATABASE_URL` y `ROOMS_RUNTIME_PROFILE=local`.
+- Migraciones expand 1793262–1793265, aplicadas solo en la PG local.
+- Rollout pendiente, con autorización:
+  1. `pnpm db:rehearse-production` y respaldo;
+  2. aplicar las 4 migraciones;
+  3. merge a main, deploy y `vercel alias set`;
+  4. verificación en vivo;
+  5. después, slice 6 (contract).
+- Lecciones:
+  - en plpgsql, un `CASE` que lee `NEW.<columna>` de otra tabla falla al planificarse aunque esa rama no se tome:
+    usar `IF` separados;
+  - el permiso `editions.publish` solo se evalúa sobre un borrador, así que republicar autoriza contra el borrador
+    construido desde la edición de origen.
+
 ## 2026-10-31 — Tasks del carril de agentes creadas (TASK-2084..2091)
 
 - El operador pidió crearlas («Ok crealas»). Las 8 están en `to-do`, con `task:lint` en 0/0. Siguiente ID: TASK-2092.

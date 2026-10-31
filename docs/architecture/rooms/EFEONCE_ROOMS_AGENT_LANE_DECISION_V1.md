@@ -172,6 +172,24 @@ revertir.
   - `rooms.agent.bearer_rejected`;
   - `rooms.agent.quota_hit`.
 
+## Implementación (TASK-2084, local 2026-10-31)
+
+- **Canales:** `browser | cli | gateway | system`. `system` corresponde a los workers de medios y la limpieza.
+- **Atribución:**
+  - el contexto del actor (`AsyncLocalStorage`) se copia a settings locales de cada transacción, y las columnas toman
+    su default de ahí;
+  - encabezados locales `X-Rooms-Channel: cli` y `X-Rooms-Agent`;
+  - el MCP stdio siempre se atribuye como agente, con el nombre del handshake.
+- **Avisos y cuotas:**
+  - triggers sobre `rooms.audit` y `rooms.access_events`;
+  - tablas `rooms.agent_action_notices` y `rooms.agent_lane_counters`;
+  - topes por persona y hora: publicar 10, invitar 30, dar acceso 10;
+  - error `agent_quota_exceeded` (429).
+- **Reversa de publicar:** comando nuevo `editions.republish`, que vuelve a publicar la edición anterior como edición
+  nueva.
+- **Reader:** `agents.activity`, con `scope=self` u `organization` (este último exige `members.manage`).
+- **Señales:** `rooms.agent.release_actions` y `rooms.agent.quota_hit`, en `pnpm access:health`.
+
 ## Enmiendas a decisiones vigentes
 
 - **[Contrato de API y acceso](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md).** Producción acepta **solo** el token

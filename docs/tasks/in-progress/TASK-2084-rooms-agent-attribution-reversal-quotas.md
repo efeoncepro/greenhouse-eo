@@ -12,6 +12,28 @@
   `editions.reopen` + `editions.publish` en el navegador.
 - Si los contadores de cuota se muestran en la UI, se exponen por el mismo reader.
 
+## Delta 2026-10-31 — implementación local (slices 1–5) y decisiones de Discovery
+
+- **Atribución sin tocar cada escritor.** El contexto del actor vive junto al `Principal` (`AsyncLocalStorage`,
+  `src/server/agents/actor-context.ts`) y `transaction()` lo copia a settings locales de la transacción
+  (`rooms.actor_kind`, `rooms.agent_client_id`, `rooms.channel`). Las columnas toman su default de ahí. Cubre los
+  once escritores y los futuros. Lo fijan la API (comandos), el login, las invitaciones, el bootstrap del dueño (`cli`)
+  y los workers de medios.
+- **Canal `system`** para workers y limpieza, además de `browser | cli | gateway`.
+- **Encabezados locales:** `X-Rooms-Channel: cli` (la CLI y el MCP los mandan siempre) y `X-Rooms-Agent: <id>` (CLI
+  con `--agent` o `ROOMS_AGENT_CLIENT`; MCP con el nombre del handshake). Un invitado puede declarar `cli`, pero nunca
+  un agente; `gateway` solo lo fija TASK-2087.
+- **Avisos y cuotas en la base**, con triggers sobre `audit`/`access_events` y funciones SQL espejo de
+  `AGENT_NOTICE_OPERATIONS` / `AGENT_QUOTAS`, más tests de paridad. Tablas: `rooms.agent_action_notices` y
+  `rooms.agent_lane_counters`. Topes: publicar 10, invitar 30, dar acceso 10 por persona y hora; revocaciones sin tope.
+- **Comando nuevo `editions.republish`** (clase `release`): vuelve a publicar una edición anterior como edición
+  nueva; rechaza si hay un borrador abierto y autoriza antes de cualquier conflicto. Reversa de publicar: republicar la
+  anterior, archivar si era la primera, `unavailable` si ya hay una más reciente.
+- **Reader** `agents.activity` (`GET /api/v1/agents/activity`, SDK `agentActivity`, CLI `agents-activity`, MCP) y
+  comando `agents.acknowledgeNotice` (solo la persona). `access.grant` devuelve `resourceId` en su recibo.
+- Migraciones expand: `1793262000000_rooms-agent-attribution`, `1793263000000_rooms-agent-notices`,
+  `1793264000000_rooms-agent-republish`, `1793265000000_rooms-agent-quotas`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -33,7 +55,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-052`
-- Status real: `Diseño. ADR del carril de agentes Accepted (4d8d6553c); nada implementado. Primera parte del orden del ADR: se construye en Rooms sin depender de Efeonce ID.`
+- Status real: `Code complete en local (efeonce-rooms rama claude/rooms-agent-attribution, slices 1–5: f0499bf, 31b9a27, c64665a, 872f17e, aced4e5; verify 406/406 sin skips). Rollout pendiente: ensayo + migraciones 1793262–1793265 en rooms_production, merge, deploy y alias; slice 6 (contract) después del release. Sin push.`
 - Rank: `primera task del carril de agentes; antes de TASK-2085, TASK-2087, TASK-2090 y TASK-2091`
 - Domain: `platform|identity`
 - Blocked by: `ninguno para el corte local; producción espera autorización (migración + merge + deploy)`
@@ -449,25 +471,25 @@ implementación:
 ## Acceptance Criteria
 
 - [ ] Las seis tablas tienen `actor_kind`, `agent_client_id` y `channel` en local y en el ensayo de producción
-      (lectura de `information_schema.columns`).
+      (lectura de `information_schema.columns`). — Local sí (bloque `DO` de la migración exige 18 columnas); ensayo de producción pendiente.
 - [ ] Ninguna fila histórica fue reescrita: el conteo de filas con `channel IS NULL` antes y después del ensayo es
-      igual al conteo previo de cada tabla.
-- [ ] Un comando por navegador queda `person`/`browser`; uno por CLI queda `cli`; uno por MCP stdio de un agente queda
-      `agent`/`cli` con `agent_client_id` (tests).
-- [ ] `principal_id` de una acción de agente es la persona y `Principal` no tiene campos de atribución (test).
-- [ ] Cada operación `release` y `access` hecha por un agente crea exactamente un aviso; una hecha por la persona no
-      crea ninguno (test por operación).
-- [ ] El aviso no contiene payload, correos ni textos del cliente (test de forma).
-- [ ] `agents.activity` devuelve las acciones del agente con su descriptor de reversa y no devuelve acciones de otra
-      persona sin `members.manage` (tests).
-- [ ] Publicar, invitar y dar acceso tienen reversa ejecutable por API, SDK, CLI y MCP stdio (test por reversa).
-- [ ] Al superar el tope por hora, el comando de agente falla con `agent_quota_exceeded`, no escribe nada y suma un
-      `quota_hit` (test).
-- [ ] Una operación nueva sin clase ni exclusión hace fallar `pnpm verify` (test negativo del guard D2).
-- [ ] `rooms.agent.release_actions` y `rooms.agent.quota_hit` aparecen en el health del carril (test).
-- [ ] La migración contract rechaza un `INSERT` sin `channel` y acepta los históricos (test en PG local).
-- [ ] `LC_ALL=en_US.UTF-8 pnpm verify` pasa en `efeonce-rooms`.
-- [ ] `pnpm db:rehearse-production` PASS para expand y para contract.
+      igual al conteo previo de cada tabla. — Pendiente del ensayo de producción (fast default, sin `UPDATE`).
+- [x] Un comando por navegador queda `person`/`browser`; uno por CLI queda `cli`; uno por MCP stdio de un agente queda
+      `agent`/`cli` con `agent_client_id` (tests). — `tests/agent-attribution.test.ts` (resolución de encabezados y filas en `audit`/`command_receipts`); el MCP envía `X-Rooms-Agent` con el nombre del handshake (`mcpAgentClientId`).
+- [x] `principal_id` de una acción de agente es la persona y `Principal` no tiene campos de atribución (test). — `tests/agent-attribution.test.ts`.
+- [x] Cada operación `release` y `access` hecha por un agente crea exactamente un aviso; una hecha por la persona no
+      crea ninguno (test por operación). — Trigger sobre las filas append-only + paridad SQL↔TS de la lista completa (`tests/agent-notices.test.ts`); casos reales: publicar, republicar, dar acceso a sala y `members.grantInternal`.
+- [x] El aviso no contiene payload, correos ni textos del cliente (test de forma). — `tests/agent-notices.test.ts`.
+- [x] `agents.activity` devuelve las acciones del agente con su descriptor de reversa y no devuelve acciones de otra
+      persona sin `members.manage` (tests). — `tests/agent-notices.test.ts` (scope, keyset) y `tests/agent-reversals.test.ts`.
+- [ ] Publicar, invitar y dar acceso tienen reversa ejecutable por API, SDK, CLI y MCP stdio (test por reversa). — Publicar (`editions.republish` nuevo), dar acceso a sala y a miembros: ejecutadas en test. Invitar: descriptor `invitations.revoke` derivado del recibo, sin test end-to-end (requiere el arnés de invitaciones).
+- [x] Al superar el tope por hora, el comando de agente falla con `agent_quota_exceeded`, no escribe nada y suma un
+      `quota_hit` (test). — `tests/agent-quotas.test.ts`.
+- [x] Una operación nueva sin clase ni exclusión hace fallar `pnpm verify` (test negativo del guard D2). — `Record` exhaustivo por tipo + `tests/agent-lane.test.ts`.
+- [x] `rooms.agent.release_actions` y `rooms.agent.quota_hit` aparecen en el health del carril (test). — `accessHealth().agentLane`, `tests/agent-quotas.test.ts`.
+- [ ] La migración contract rechaza un `INSERT` sin `channel` y acepta los históricos (test en PG local). — Slice 6, después del release.
+- [x] `LC_ALL=en_US.UTF-8 pnpm verify` pasa en `efeonce-rooms`. — lint, lint negativo, tipos y build OK; tests 406/406 sin skips con `ROOMS_DATABASE_URL`.
+- [ ] `pnpm db:rehearse-production` PASS para expand y para contract. — Pendiente: lee producción, se corre con la autorización del rollout.
 
 ## Verification
 

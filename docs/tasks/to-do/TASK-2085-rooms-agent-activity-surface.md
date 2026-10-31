@@ -1,5 +1,18 @@
 # TASK-2085 — Rooms: pantalla «Actividad de agentes» con reversa
 
+## Delta 2026-10-31 — nombres finales de TASK-2084 (implementada en local)
+
+- Reader `agents.activity` (`GET /api/v1/agents/activity?organizationId&scope=self|organization&limit&cursor`, SDK
+  `agentActivity`). Cada item trae: `operation`, `scope` (clase), `roomId`, `personId`, `agentClientId`, `channel`,
+  `summary` (generado por el servidor), `noticeId`, `acknowledgedAt` y `reversal` `{ operation, payload, state:
+  available|done|unavailable, reason }`.
+- Comando `agents.acknowledgeNotice { noticeId }`: solo la persona; un agente recibe `forbidden`.
+- La reversa de publicar es `editions.republish` (existe). Si ya hay una edición más reciente, `state: unavailable`
+  con motivo.
+- Los contadores de cuota **no** salen por el reader; están en `pnpm access:health` (`agentLane`).
+- Nombres visibles de agente y persona: hoy el reader entrega `agentClientId` y `personId`, sin nombres legibles.
+  Resolverlo en esta task o en un delta de TASK-2084.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

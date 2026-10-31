@@ -1,5 +1,14 @@
 # TASK-2087 — Rooms: verificador del token delegado + identidad del gateway
 
+## Delta 2026-10-31 — base lista en TASK-2084 (local)
+
+- El verificador fija el actor con `runWithActor({ actorKind: 'agent', agentClientId, channel: 'gateway' }, …)`
+  (`src/server/agents/actor-context.ts`). Las columnas, los avisos y las cuotas ya lo consumen sin cambios.
+- `resolveActorContext` rechaza hoy un encabezado `X-Rooms-Channel: gateway`: el canal `gateway` nace solo del
+  verificador.
+- `rooms.agent_lane_counters` ya acepta `kind = 'bearer_rejected'` para la señal del verificador.
+- La clasificación D2 está en `src/domain/agent-lane-contracts.ts` (`AGENT_SCOPE_CLASSIFICATION`).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
