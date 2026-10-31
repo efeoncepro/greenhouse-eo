@@ -5,6 +5,22 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — Autoría de escenas desde la mesa + ADR del contrato
+
+- ADR [«Vive el servicio»: escenas como contenido de la sala](../../../../docs/architecture/rooms/EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md)
+  **Proposed**; registrado en el dossier y en `DECISIONS_INDEX`.
+- `efeonce-rooms` `claude/rooms-approved-ui` `95d3ac2`: escenas en el inventario de la mesa, «Añadir escena» (4 tipos,
+  valores editables, capítulo de escenas), escenario a 1440 × 900 desde el borrador sin guardar (mismo resolutor que
+  la sala), editor por tipo y guardado completo con `content.upsertBlock`. Cobertura nueva `scene_placeholder`:
+  una sala real no publica marcadores entre corchetes. Sin push, sin deploy, flags OFF.
+- `local`: `pnpm verify` 376/376 + lint + typecheck + build; GVC PASS `rooms-authoring-scenes` y `rooms-authoring`
+  (1440/1280/390, 0 hallazgos).
+- Contra la integración (3216, admin fixture, sala sintética Lumbre): crear escena (revisión 44→45), editar y guardar
+  (→46) y abrir `/authoring/vista-previa/vive/:blockId` con la rendition del borrador. Datos sintéticos, locales.
+- Lección: el `next dev` de 3210 quedó con una página sin hidratar tras varias recargas completas de Fast Refresh
+  (bloque Suspense deshidratado, sin errores). Reiniciar el servidor lo resolvió; no era el código.
+- Falta: aprobación del ADR, aceptación humana de la interfaz, ediciones de escenas en «Qué cambió» con detalle propio.
+
 ## 2026-10-31 — «Vive el servicio» implementado local (canvas fila 6)
 
 - Corrección de propósito del operador: Rooms es una **demo inmersiva del servicio**, no una herramienta de

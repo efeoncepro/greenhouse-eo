@@ -1,5 +1,14 @@
 # TASK-2071 — Rooms: autoría mínima y lectura de imágenes privadas
 
+## Delta 2026-10-31 — autoría de escenas «Vive el servicio»
+
+- La mesa crea y edita las cuatro escenas (`showcase`, `cycle`, `answers`, `team`) con vista en vivo del borrador y
+  guardado por `content.upsertBlock`. `efeonce-rooms` `claude/rooms-approved-ui` `95d3ac2`; ADR Proposed
+  `EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md`.
+- Evidencia `local`: `pnpm verify` 376/376; GVC PASS `rooms-authoring-scenes` y `rooms-authoring`; recorrido real en
+  la integración (crear, editar, guardar y abrir la vista previa de una escena en la sala sintética Lumbre).
+- Pendiente: aprobación del ADR y aceptación humana. `UI ready` sigue en `no`.
+
 ## Delta 2026-10-30 — canvas aprobado; base y backend primero
 
 - El operador aprobó el 2026-10-29 el canvas de Claude Design «la sala es una órbita» (artifact

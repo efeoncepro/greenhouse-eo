@@ -242,6 +242,11 @@ detecta por el nombre del cliente en el texto. Rutas: `/rooms/:roomId/editions/:
 `/rooms/:roomId/authoring/vista-previa/vive/:blockId?as=` y la demo `/demo/vive/:blockId`. Las escenas no escriben
 en la API: lo que el comprador hace ahí es una simulación del servicio.
 
+**Autoría.** La mesa lista las escenas, crea cualquiera de los cuatro tipos con valores editables y muestra en el
+escenario el borrador sin guardar (mismo resolutor que la sala). Guardar envía el bloque completo con
+`content.upsertBlock`. En una sala con datos reales, la cobertura `scene_placeholder` impide publicar marcadores
+entre corchetes. ADR: [escenas como contenido de la sala](../../architecture/rooms/EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md).
+
 ### Lecturas HTTP nuevas
 
 Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cursor` según su contrato.
