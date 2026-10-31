@@ -34,6 +34,9 @@
   `members.renewInternal` dejan de ejecutarse directo por MCP local y CLI y pasan a ser propuestas con confirmación
   humana; `members.revokeInternal` sigue directo. El código local `510ab42` aún los expone en el toolset MCP `members`
   y en `pnpm rooms execute`; ajustarlo cuando ese ADR se acepte.
+- **Gate de merge:** no hacer merge a `main` de `efeonce-rooms` con `members.grantInternal/renewInternal` expuestos
+  en el MCP local hasta que el operador decida ese ADR. Si lo rechaza o no lo ha decidido al momento del merge, se
+  sacan del toolset `members` antes (la revisión adversarial confirmó que hoy una cookie copiada basta para ejecutarlos).
 
 ## Summary
 
