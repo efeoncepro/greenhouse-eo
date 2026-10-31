@@ -1,5 +1,11 @@
 # TASK-2068 — Rooms: invitación, entrada con código y lectura compartida
 
+## Delta 2026-10-31 — interfaz aceptada por el operador
+
+- Aceptación humana de la interfaz: «Todas están aprobadas» (operador, 2026-10-31), revisada en local sobre el canvas implementado (`efeonce-rooms` `claude/rooms-approved-ui` `de1de34`, PR #4).
+- `UI ready: yes`: wireframe, flow y motion rehechos desde el canvas; `task:lint` con controles de readiness sin hallazgos.
+- No cierra la task: siguen pendientes la producción (migraciones aplicadas, merge del PR #4) y los criterios sin tildar, cada uno con su motivo.
+
 ## Delta 2026-10-31 — «Vive el servicio» (canvas fila 6) implementado local
 
 - El operador corrigió el propósito: Rooms es una demo inmersiva del servicio. Se aprobaron y construyeron cuatro
@@ -48,7 +54,7 @@ de 129/15 checks pertenecen al scaffold anterior.
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-2068-rooms-invitation-and-guest-experience.md`
 - Flow: `docs/ui/flows/TASK-2068-rooms-invitation-and-guest-experience-flow.md`
 - Motion: `docs/ui/motion/TASK-2068-rooms-invitation-and-guest-experience-motion.md`
@@ -413,8 +419,8 @@ Peer Auth posee registro y OTP; root posee release, DB y secrets. No pedir otra 
 - [x] Gestión usa permisos room correctos y destinatario identificable; rol operador no habilita writes por sí mismo.
 - [x] Create/reissue/revoke preservan revisión/idempotencia; conflicto mantiene intención; accepted/pending/failed honestos.
 - [x] AXIS/logo/fuentes/motion reutilizados; sin regresión del demo ni nueva primitive paralela. Build final y revisión desktop/móvil; apertura/cierre del viewer demo sin errores de consola.
-- [ ] GVC1440/1024/390/320 +200%, teclado/axe/contraste/foco y reduced/fallback PASS, capturas inspeccionadas.
-- [ ] Se presentó el resultado renderizado y quedó registrada la respuesta humana; no se sustituye por pruebas automáticas.
+- [ ] GVC1440/1024/390/320 +200%, teclado/axe/contraste/foco y reduced/fallback PASS, capturas inspeccionadas. Sin tildar: `rooms-invitation-stage` pasó en 1440/1280/390/320 con teclado, axe y movimiento reducido, pero no se corrió 1024 ni zoom al 200 %.
+- [x] Se presentó el resultado renderizado y quedó registrada la respuesta humana: «Todas están aprobadas» (operador, 2026-10-31).
 
 ## Verification
 

@@ -1,5 +1,11 @@
 # TASK-2059 — Rooms: primera sala y vistas por rol
 
+## Delta 2026-10-31 — interfaz aceptada por el operador
+
+- Aceptación humana de la interfaz: «Todas están aprobadas» (operador, 2026-10-31), revisada en local sobre el canvas implementado (`efeonce-rooms` `claude/rooms-approved-ui` `de1de34`, PR #4).
+- `UI ready: yes`: wireframe, flow y motion rehechos desde el canvas; `task:lint` con controles de readiness sin hallazgos.
+- No cierra la task: siguen pendientes la producción (migraciones aplicadas, merge del PR #4) y los criterios sin tildar, cada uno con su motivo.
+
 ## Delta 2026-10-30 — canvas aprobado; base y backend primero
 
 - El operador aprobó el 2026-10-29 el canvas de Claude Design «la sala es una órbita» (artifact
@@ -35,7 +41,7 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-2059-rooms-first-experience.md`
 - Flow: `docs/ui/flows/TASK-2059-rooms-first-experience-flow.md`
 - Motion: `docs/ui/motion/TASK-2059-rooms-first-experience-motion.md`
@@ -321,12 +327,12 @@ Ninguna para contenido sintético local. Aceptación visual de Julio al entregar
 - [x] Permisos can, jerarquías cliente/operador/admin, ámbito tenant/sala/edición y denegación por defecto verificados; notas internas ausentes del DTO cliente.
 - [x] Dependencias exactas y AXIS de registry con instalación limpia, lint (incluido negativo), typecheck y build verificados.
 - [x] Evidencia local del consumidor documentada; rollout y Efeonce ID real declarados pendientes.
-- [ ] Wireframe/flow/motion y UI ready pasan task:lint y ui:readiness-check antes de JSX. (Reabierto 2026-10-30: el canvas aprobado reemplaza la composición anterior.)
+- [ ] Wireframe/flow/motion y UI ready pasan task:lint y ui:readiness-check antes de JSX. (Reabierto 2026-10-30: el canvas aprobado reemplaza la composición anterior.) Sin tildar: el 2026-10-31 los docs se reescribieron después del JSX y pasan `task:lint` con `UI ready: yes`, pero el orden «antes de JSX» no se cumplió.
 - [x] Desktop y móvil capturados y mirados; scroll-width, foco, contraste, reduced motion y fuentes comprobados.
 - [x] La órbita se consume desde tokens y primitives; copy y estados completos en el consumidor.
 - [x] Primera experiencia entregada para revisión del operador; aceptación visual humana registrada sólo cuando ocurra.
 
-- [ ] Aceptación visual humana de esta composición: pendiente de revisión de Julio; no inferida de QA ni del logo aprobado.
+- [x] Aceptación visual humana de esta composición: «Todas están aprobadas» (operador, 2026-10-31), sobre las pantallas en local (sala, escenas «Vive el servicio», móvil).
 
 ## Verification
 

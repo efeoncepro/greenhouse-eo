@@ -5,6 +5,18 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — Interfaz aceptada por el operador; `UI ready: yes` en TASK-2059/2068/2071
+
+- Aceptación humana: «Todas están aprobadas» (operador, 2026-10-31), sobre las pantallas en local de la rama
+  `claude/rooms-approved-ui` (`de1de34`).
+- `UI ready: yes` en 2059, 2068 y 2071; `task:lint` con controles de readiness sin hallazgos. Se tildaron solo los
+  criterios que la evidencia respalda. Quedan sin tildar, con su motivo:
+  - el orden «docs antes del JSX»;
+  - GVC en 1024 px y con zoom al 200 %.
+- No es una autorización de producción. Para el merge de PR #4 faltan:
+  1. autorización expresa para aplicar las 10 migraciones (repetir `pnpm db:rehearse-production`, confirmar respaldo, aplicar y verificar);
+  2. autorización del merge (= deploy) con los flags en OFF y verificación del commit activo.
+
 ## 2026-10-31 — Riesgos de UI verificados y corregidos (`de1de34`, en PR #4)
 
 - Corregidos:

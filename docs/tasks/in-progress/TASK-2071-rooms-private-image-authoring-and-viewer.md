@@ -1,5 +1,11 @@
 # TASK-2071 — Rooms: autoría mínima y lectura de imágenes privadas
 
+## Delta 2026-10-31 — interfaz aceptada por el operador
+
+- Aceptación humana de la interfaz: «Todas están aprobadas» (operador, 2026-10-31), revisada en local sobre el canvas implementado (`efeonce-rooms` `claude/rooms-approved-ui` `de1de34`, PR #4).
+- `UI ready: yes`: wireframe, flow y motion rehechos desde el canvas; `task:lint` con controles de readiness sin hallazgos.
+- No cierra la task: siguen pendientes la producción (migraciones aplicadas, merge del PR #4) y los criterios sin tildar, cada uno con su motivo.
+
 ## Delta 2026-10-31 — autoría de escenas «Vive el servicio»
 
 - La mesa crea y edita las cuatro escenas (`showcase`, `cycle`, `answers`, `team`) con vista en vivo del borrador y
@@ -61,7 +67,7 @@ histórico de esta task y no lo rediseña ni lo considera aceptado. Contratos/ba
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-2071-rooms-private-image-authoring-and-viewer.md`
 - Flow: `docs/ui/flows/TASK-2071-rooms-private-image-authoring-and-viewer-flow.md`
 - Motion: `docs/ui/motion/TASK-2071-rooms-private-image-authoring-and-viewer-motion.md`
@@ -421,7 +427,7 @@ Raíz coordina canary Auth, worker/storage/CSP y release. No enviar archivos a t
 ## Acceptance Criteria
 
 - [ ] UI ready del nuevo diseño permanece no hasta mapping/GVC/decision log completos y contrato backend consumido; hook y readiness pasan antes de JSX. El DTO backend ya existe; no confundir ese avance con aceptación de la interfaz.
-- [ ] Wireframe/flow/motion existentes pasan sus gates focales; fuente visual y reuse AXIS comprobados.
+- [x] Wireframe/flow/motion existentes pasan sus gates focales; fuente visual y reuse AXIS comprobados. (2026-10-31: reescritos desde el canvas y el código; `task:lint` limpio con `UI ready: yes`; la mesa usa `Button`, `Field`, `Input` y `Textarea` de AXIS.)
 - [ ] Una imagen con bytes reales recorre upload→verificar→attach→preview→publish→guest; Lista no se confunde con publicada.
 - [ ] Título/alt/pie preservan cambios ante409, y retry de resultado incierto no duplica archivo/command.
 - [ ] JPG/PNG/WebP admitidos según2070; rechazo y límites se muestran sin confianza en extensión o metadata browser.
@@ -430,9 +436,9 @@ Raíz coordina canary Auth, worker/storage/CSP y release. No enviar archivos a t
 - [ ] Preview/inspector preservan ratio, alpha y arte; zoom/pan/reset tienen teclado y foco estable.
 - [ ] Loading/empty/partial/error/denied están implementados con copy central; no almacenar token/descriptor en browser persistente.
 - [ ] Revocación/expiry niega bytes nuevos y retira DOM/inspector; caché privada no usa optimizador público ni snapshots entre autoridades.
-- [ ] GVC premium4anchos,200%, axe y reduced motion pasan, document.scrollWidth<=innerWidth sin ocultar overflow; comparación visual observada.
+- [ ] GVC premium4anchos,200%, axe y reduced motion pasan, document.scrollWidth<=innerWidth sin ocultar overflow; comparación visual observada. Sin tildar: `rooms-authoring`, `rooms-authoring-scenes` y `rooms-edition-changes` pasaron en 1440/1280/390 (3 anchos), sin zoom al 200 %.
 - [ ] API/CLI2070 y UI comparten commands/readers; sin rutas write paralelas ni cambios deDB/proveedor en cliente.
-- [ ] Revisión humana registrada sin confundir QA técnica con aceptación; no declarar R05/R07/R08 completos.
+- [x] Revisión humana registrada sin confundir QA técnica con aceptación: «Todas están aprobadas» (operador, 2026-10-31). R05/R07/R08 no se declaran completos.
 
 ## Verification
 
