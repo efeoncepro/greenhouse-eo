@@ -48,7 +48,7 @@
 - Motion: `docs/ui/motion/TASK-2085-rooms-agent-activity-surface-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-052`
-- Status real: `Dirección «el umbral» aprobada 2026-10-31; implementación en curso en efeonce-rooms rama claude/rooms-agent-activity (local, sin push).`
+- Status real: `Implementada en local (2026-10-31), rama efeonce-rooms claude/rooms-agent-activity (36d43eb, 6036048, 4b37a4e, bf3c0ae, daab4e9), sin upstream ni push; pnpm verify verde (396 pass, 24 skip por entorno); capturas 1440/1280/390 con y sin movimiento reducido, sin scroll horizontal y con las dos sondas de teclado OK. Incluye: sin sesión → /login?returnTo (safeReturnTo acepta /rooms/:id/actividad y ?accion=), invitado ve su variante, sin id crudo de espacio, primer día agentes primero. Falta: deploy (autorización), pnpm fe:capture + scorecard, campos del reader (topes/rechazos, filtro por sala, número de edición, invitado enmascarado, detalle) como delta de TASK-2084/2087.`
 - Rank: `después de TASK-2084; el slice 1 (canvas) puede empezar antes`
 - Domain: `platform`
 - Blocked by: `TASK-2084 (slices 2 a 6; el slice 1 de canvas no depende de ella)`
