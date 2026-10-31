@@ -153,8 +153,12 @@ uno contra un export vivo fresco, más un cambio estructural de Elementor:
    `block-15` y tres páginas Elementor: `/agendar/` (243016, publicada), su borrador 248352 y «Landing Loop Marketing» (248840,
    redirige a Inbound; tiene dos filas `_elementor_data` idénticas). Sólo cambia la dirección; guarda por hash y por una sola
    coincidencia; snapshot `_gh_legacy_address_before_20261031_124200`. Quedan a propósito el caché `metricool_user` (lo sincroniza
-   Metricool) y el respaldo `eo_footer_refinement_20261014_v2`. `/agendar/` sigue mostrando el teléfono `+56-936145176` y un
-   horario, y WooCommerce un código postal `832000`: no se tocaron porque no hay un valor confirmado.
+   Metricool) y el respaldo `eo_footer_refinement_20261014_v2`. WooCommerce queda fuera de alcance: el sitio no es un ecommerce
+   (operador, 2026-10-31), así que su código postal `832000` no se corrige.
+   `fix-agendar-phone.php` cambia en `/agendar/` y su borrador el teléfono `+56-936145176` por el móvil vigente
+   `+56 9 3732 3064`; el horario se conserva por decisión del operador (snapshot `_gh_agendar_phone_before_20261031_124828`).
+   El número antiguo sobrevive sólo en la cuenta «Comercial» del plugin de WhatsApp NinjaTeam (post 242911, `nta_wa_account_info`),
+   que está inactivo y no se muestra en el sitio.
 7. Línea blanca bajo el footer: la página mide 5468,25 px y el documento redondea a 5469, así que el body blanco asomaba. El lienzo
    (`html:has(body.page-id-20729)`) toma el color del footer `#161519`. `/agenda/` tiene la misma altura fraccional.
 
