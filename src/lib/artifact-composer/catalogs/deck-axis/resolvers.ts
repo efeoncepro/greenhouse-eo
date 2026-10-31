@@ -175,10 +175,12 @@ const CLIENT_LOGO: Record<string, { src: string; label: string }> = {
  * tiene que renderizar igual en cualquier máquina o contenedor — apuntar a `public/` funciona en el
  * repo y revienta en el worker (bug class del deck de SKY, 2026-07-12).
  *
- * Una sola clave por credencial + superficie. El badge trae su propia superficie de color, así que
- * la variante se elige por CONTRASTE del fondo donde se posa: la naranja va sobre la contraportada
- * navy. Si algún día hace falta sobre fondo claro, se agrega `…-light` con su SVG — no se recolorea
- * éste (el artwork oficial no se edita).
+ * Una sola clave por credencial + superficie. El badge trae su propia placa de color, así que la
+ * variante se elige por CONTRASTE del fondo donde se posa: la naranja va sobre la contraportada navy.
+ * Los archivos de HubSpot se nombran por su PLACA, no por el fondo: si algún día hace falta sobre
+ * fondo claro, se agrega una clave `…-on-light` con `badge-dark-spp-hubspot.svg` (nunca la `light`,
+ * cuya placa crema se disuelve en papel) — el criterio vive en `getHubSpotSolutionPartnerBadgeForSurface`
+ * (`src/lib/brand-assets/hubspot-solution-partner.ts`). No se recolorea el artwork oficial.
  */
 const PARTNER_BADGE: Record<string, { src: string; label: string }> = {
   'hubspot-solution-partner': {

@@ -222,7 +222,10 @@ retainer de Managed CRM Ops.
     `getHubSpotSolutionPartnerBadgeForSurface(surface)` (`src/lib/brand-assets/hubspot-solution-partner.ts`) y la
     tabla del `README.md` de esa carpeta. `@efeoncepro/axis-brand-assets` publica **sólo** la crema
     (`hubspot-solutions-partner-gold-light`): sirve en superficies oscuras, **no** es el default para papel por ser la
-    única de AXIS. El mismo criterio aplica a cualquier insignia de partner con variantes.
+    única de AXIS. El mismo criterio aplica a cualquier insignia de partner con variantes. Las láminas del compositor
+    lo aplican solas: `partnerBadge` (`src/lib/brand-surfaces/recipes/frame.ts`) toma la insignia que AXIS declara
+    para la superficie de la pieza y no compone si no hay una que contraste (2026-10-31); en AXIS la crema pasa a
+    `surface: 'dark'` desde el próximo release de `axis-brand-assets` (hasta entonces figura como `any`).
 
 ---
 
