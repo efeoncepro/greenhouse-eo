@@ -23,6 +23,11 @@
 >   Growth Forms usa `system-ui` y la variante `hubspot_pillar` inyecta tamaños/pesos con literales **después** del CSS de la
 >   página: la tipografía se fija por `--ghf-font`, `--ghf-label-size/-weight` y `--ghf-field-font-size` en `.ghf-root`, y lo que
 >   no tiene variable con selectores `.gh-contact .gh-contact__form-host [data-ghf-style-variant] …`.
+> - **Barras laterales de Ohio** («Follow Us» y Dark/Light, `.elements-bar`, fijas con `z-index: 4`): ninguna sección de la
+>   página puede subir de `z-index: 3`; la sección del formulario quedó en 1 (antes 5 las tapaba). El botón primario del
+>   renderer y el del CTA traían degradados azules con `!important` en el CSS legado: se corrigieron en su regla de origen.
+>   FAQ con el diseño del canvas (`.gh-cx-faq`, dos columnas, `+` que gira a × al abrir); sus respuestas siguen saliendo de
+>   `eo_contact_faq_items()`, igual que el `FAQPage`.
 > - **Pendiente:** el código de la landing nunca se versionó en `efeonce-public-site-runtime` (archivos `??` desde TASK-1801): falta su backport.
 
 > **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-contacto` v4 entrega en `direct` al formulario HubSpot «Contact Form - EO» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
