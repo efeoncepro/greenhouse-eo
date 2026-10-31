@@ -31,8 +31,11 @@
 >   `eo_contact_faq_items()`, igual que el `FAQPage`.
 > - **Footer global corregido (2026-10-31):** `scripts/public-website/fix-footer-headquarters-address.php` cambió `block-17` de
 >   «Oficina Chile · Las Bellotas 199» a «Casa matriz · Dr. Manuel Barros Borgoño 71, oficina 1105» (snapshot
->   `_gh_footer_address_before_20261031_121306`). Siguen con la dirección antigua: la opción ACF `eoh_site_settings_contact_address`,
->   `woocommerce_store_address`, la página 243016 y el bloque inactivo `block-15`. Esto deroga «la dirección legacy del footer no queda corregida» más abajo.
+>   `_gh_footer_address_before_20261031_121306`). Las demás copias (opción ACF, WooCommerce, `block-15`, `/agendar/`, su borrador y
+>   Landing Loop Marketing) se corrigieron con `fix-legacy-headquarters-address-copies.php` (snapshot `_gh_legacy_address_before_20261031_124200`).
+>   Esto deroga «la dirección legacy del footer no queda corregida» más abajo.
+> - **Línea blanca bajo el footer:** la altura de la página es fraccional y el documento redondea hacia arriba; el body blanco asomaba.
+>   El lienzo de la página toma el color del footer (`html:has(body.page-id-20729) { background-color: #161519 }`).
 > - **Teléfono:** el texto de partners ocupa su propia fila (`flex-basis: 100%`) y las dos insignias van juntas debajo.
 > - **JS compartido:** el runtime local trae un cambio de otra sesión en `contact-landing.js` (ícono del país) sin publicar. Antes de
 >   armar el paquete se copia el JS del baseline vivo y después se devuelve la copia local; si no, ese cambio sale sin revisión.

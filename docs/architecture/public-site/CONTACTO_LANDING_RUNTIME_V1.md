@@ -148,9 +148,15 @@ uno contra un export vivo fresco, más un cambio estructural de Elementor:
    Chile · Las Bellotas 199» a «Casa matriz · Dr. Manuel Barros Borgoño 71, oficina 1105». Escribe sólo si el contenido coincide
    exacto; snapshot `_gh_footer_address_before_20261031_121306`, readback y purga.
 
-Fuera de este release quedan otras copias de la dirección antigua, sin tocar: la opción `eoh_site_settings_contact_address`
-(ACF de eo-headless-content), `woocommerce_store_address`, la página publicada 243016 «¡Habla con un experto!» y el bloque
-inactivo `block-15`.
+6. `fix-legacy-headquarters-address-copies.php` corrige las demás copias de Las Bellotas: la opción
+   `eoh_site_settings_contact_address` (ACF de eo-headless-content), `woocommerce_store_address` y `_address_2`, el bloque inactivo
+   `block-15` y tres páginas Elementor: `/agendar/` (243016, publicada), su borrador 248352 y «Landing Loop Marketing» (248840,
+   redirige a Inbound; tiene dos filas `_elementor_data` idénticas). Sólo cambia la dirección; guarda por hash y por una sola
+   coincidencia; snapshot `_gh_legacy_address_before_20261031_124200`. Quedan a propósito el caché `metricool_user` (lo sincroniza
+   Metricool) y el respaldo `eo_footer_refinement_20261014_v2`. `/agendar/` sigue mostrando el teléfono `+56-936145176` y un
+   horario, y WooCommerce un código postal `832000`: no se tocaron porque no hay un valor confirmado.
+7. Línea blanca bajo el footer: la página mide 5468,25 px y el documento redondea a 5469, así que el body blanco asomaba. El lienzo
+   (`html:has(body.page-id-20729)`) toma el color del footer `#161519`. `/agenda/` tiene la misma altura fraccional.
 
 Contratos que no cambian: Growth Forms (`efeonce-contacto` v4) y Growth Meetings (`contacto-discovery-meeting`) siguen siendo
 dueños de validación, envío, disponibilidad y reserva; WordPress sólo presenta. La FAQ visible y su `FAQPage` salen de la misma

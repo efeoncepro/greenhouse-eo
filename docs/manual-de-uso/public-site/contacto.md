@@ -151,4 +151,8 @@ Borgoño 71, oficina 1105». No envíes el formulario ni reserves para verificar
 
 Cada instalación dejó su tar en `/tmp/eo-contacto-widgets-before-20261031-*.tar` del servidor; el último es
 `…-121845.tar`. El orden de secciones vuelve con el snapshot `_gh_contacto_before_v2_20261031_114459` y la
-dirección del footer con `_gh_footer_address_before_20261031_121306`; purga la caché Kinsta después.
+dirección del footer con `_gh_footer_address_before_20261031_121306`; las demás copias de la dirección (opción ACF,
+WooCommerce, `block-15`, `/agendar/` y dos páginas más) con `_gh_legacy_address_before_20261031_124200`. Purga la caché Kinsta después.
+
+Si reaparece una línea blanca bajo el footer, revisa que el lienzo (`html`) siga con el color del footer: la página mide
+una altura fraccional y el documento la redondea hacia arriba.
