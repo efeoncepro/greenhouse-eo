@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-052`
-- Status real: `2026-10-31: ADR Accepted. Código local en efeonce-rooms claude/rooms-durable-internal-access 510ab42 (sin push): migración 19 aplicada sólo en la PG local; members.* + members.list con paridad API/SDK/CLI/MCP, solicitud de acceso, bootstrap, health y guardas. LC_ALL=en_US.UTF-8 pnpm verify con ROOMS_DATABASE_URL, ROOMS_MIGRATION_DATABASE_URL y ROOMS_RUNTIME_PROFILE=local: 385/385, 0 omitidas, build OK; access-members 7/7. Falta: ensayo y migración en producción, bootstrap/adopción del dueño, merge y deploy, todo con autorización.`
+- Status real: `2026-10-31: EN PRODUCCIÓN. Migración 19 aplicada en rooms_production (ensayo PASS), dueño adoptado (members.manage hasta 2027-11-01), main@a2d72c0 desplegado (dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG, alias efeonce-rooms.vercel.app), health sin señales. Recibo docs/audits/rooms/2026-10-31-durable-access-production.md. Falta: primer login humano del dueño con la versión nueva y un segundo administrador.`
 - Rank: `antes del primer cliente real y antes de dar acceso a otra persona interna`
 - Domain: `platform|identity`
 - Blocked by: `ninguno para el corte local; producción espera autorización (migración + merge)`

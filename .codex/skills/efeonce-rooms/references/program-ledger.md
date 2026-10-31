@@ -5,6 +5,26 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — Acceso interno durable y /auth/error EN PRODUCCIÓN
+
+- Autorización: «Avanza todo end-to-end» y «Despliega». Recibo
+  [`2026-10-31-durable-access-production.md`](../../../../docs/audits/rooms/2026-10-31-durable-access-production.md).
+- `vivo`:
+  - `rooms_production`: migración 19 aplicada (19 migraciones, 49 tablas; hashes y conteos intactos). Ensayo PASS antes.
+  - Dueño `rooms-pilot-julio-20261025` adoptado por bootstrap (`--adopt`): `members.manage` hasta 2027-11-01T17:10Z;
+    `pnpm access:production health` = 1 titular, sin señales. Organización `org-2df565fb-98aa-42f7-b324-ea9a2209017f`.
+  - [PR #5](https://github.com/efeoncepro/efeonce-rooms/pull/5) → `main@a2d72c0` → `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG`
+    READY; alias `efeonce-rooms.vercel.app` reasignado. Anterior: `dpl_GiGEoYaPSsUf8V7uZZyTbxtfZM8A`.
+  - Sin sesión: `/auth/error` 200 con código; callback fallido 303 a la página; JSON intacto con `Accept: application/json`;
+    `/login` 302 a Efeonce ID; `/api/v1/members` `unauthenticated`.
+- Respaldo lógico de la migración borrado tras verificar el deploy.
+- Lecciones:
+  - el clasificador del modo automático bloqueó la migración con la primera autorización y la dejó pasar con la
+    instrucción directa («Despliega»): pedir la orden explícita del paso productivo;
+  - `rooms_migrator` tiene tope de conexiones: no abrir una consulta propia mientras corre el ensayo o la migración;
+  - el clon del ensayo debe correr en UTC (`run_on` sin zona).
+- Falta: primer login humano del dueño con la versión nueva y un segundo administrador interno.
+
 ## 2026-10-31 — Carril de agentes Accepted; titular de /auth/error con contraste de pesos
 
 - ADR [Carril de agentes](../../../../docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) **Accepted**

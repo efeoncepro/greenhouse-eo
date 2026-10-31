@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-052`
-- Status real: `2026-10-31: código local en efeonce-rooms claude/rooms-durable-internal-access (adb1db0, 510ab42 y el fix de pesos), sin push. Revisión del operador aplicada: titular en dos pesos (introducción 340, idea principal 740). GVC rooms-access-issue OK en 1440/1280/390 tras el cambio. Aprobada por el operador («Ok»). Falta: merge y deploy autorizados.`
+- Status real: `2026-10-31: EN PRODUCCIÓN (main@a2d72c0, dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG). /auth/error 200 con código y titular en dos pesos; callback fallido redirige 303; JSON intacto con Accept application/json. Aprobada por el operador. Falta: verla en el primer login humano real.`
 - Rank: `junto con TASK-2082; independiente de ella`
 - Domain: `platform|identity`
 - Blocked by: `ninguno para el corte local; producción espera autorización de merge`
@@ -362,7 +362,7 @@ Ver wireframe `docs/ui/wireframes/TASK-2083-rooms-access-issue-page.md`.
 - [x] GVC desktop + mobile capturado y mirado (1440, 1280, 390), sin hallazgos.
 - [x] `LC_ALL=en_US.UTF-8 pnpm verify` pasa (0 fallas; 24 omitidas por PG explícito y multimedia, ajenas a auth).
 - [x] `UI ready: yes` tras la aprobación del operador («Ok», 2026-10-31, sobre la captura con contraste de pesos); `pnpm task:lint --task TASK-2083` sin hallazgos.
-- [ ] Verificado en producción tras merge autorizado. (Pendiente: autorización.)
+- [x] Verificado en producción tras merge autorizado (recibo `2026-10-31-durable-access-production.md`).
 
 ## Verification
 
