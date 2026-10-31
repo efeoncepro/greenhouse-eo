@@ -42,6 +42,16 @@ Respaldos del 31/10: `_gh_footer_v3_before_20261031_140528`, `_gh_footer_newslet
 `_gh_footer_v3_cinco_before_20261031_140842`. Para revertir, restaurar `widget_block`, `sidebars_widgets` y la opción
 del copyright desde el respaldo más antiguo que corresponda, y purgar la caché.
 
+## Ajustes finos del 31/10 contra el canvas
+
+- `link-colors.php`: los hovers del canvas en todas las páginas (Explora, Contacto y «Volver arriba» pasan a
+  turquesa; íconos sociales, enlaces de Contacto, etiqueta «Casa matriz» y «Ver vacantes» en papel). Hasta ahora solo
+  funcionaban en Home, porque `global-fixes.css` fija todos los enlaces y párrafos del footer en blanco al 75 % con
+  `!important` en las demás páginas. El bloque va marcado; volver a correr el script lo reemplaza.
+- `contact-type.php`: la columna Contacto con la tipografía del canvas. Etiqueta y correo con interlineado normal de
+  Poppins (1,4), dirección a 1,6, 12 px bajo el correo y teléfonos a 13 px con su leyenda 1 px debajo. Antes heredaba
+  el interlineado 1,75 del adaptador y el `li` de 14,8 px de Ohio.
+
 ## Lo que queda abierto
 
 - El fondo lleva `!important` en el adaptador porque `ohio-child/assets/css/global-fixes.css` fija
