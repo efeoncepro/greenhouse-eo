@@ -377,7 +377,7 @@ Movimiento reducido: sin estiramiento, pulso ni dibujo. Gate visual: `node scrip
 | Identidad | Valor |
 |---|---|
 | Slug / form key | `efeonce-blog-subscription` / `6bc62588-a4a0-4214-9501-13b0c2948c81` (misma clave que la versión anterior) |
-| Versión publicada | `fver-e6850cc8-4b39-40c7-9428-a148cfdd53bc` · política `efeonce-blog-glitch-subscription-pill-v1` |
+| Versión publicada | `fver-d0ecefaa-9bf5-429a-8eb3-2abd3826b67e` (31/10: texto de ejemplo «Tu correo»; antes `fver-e6850cc8-4b39-40c7-9428-a148cfdd53bc`) · política `efeonce-blog-glitch-subscription-pill-v1` |
 | Superficie | `fhsf-efeonce-blog-subscription` |
 | Destino | HubSpot form `8c7cf91b-a1c9-4cbe-9d8c-cac773692561`, `communications: [{ consentBy: 'submission', subscriptionTypeId: 535702717, … }]` |
 | Etiquetas | «Suscríbete a Glitch» / «Suscribirme» / «¡Listo!» / «Ya estás suscrito a Glitch» |

@@ -58,7 +58,7 @@ pnpm growth:forms:publish-glitch-pill --publish   # + publicar (exige origin/mai
   aborta: publicar antes dejaría suscriptores sin suscripción.
 
 Identidades publicadas: formulario `efeonce-blog-subscription`, clave `6bc62588-a4a0-4214-9501-13b0c2948c81` (la misma
-de antes, la portada no se reconfigura), versión `fver-e6850cc8-4b39-40c7-9428-a148cfdd53bc`, superficie
+de antes, la portada no se reconfigura), versión `fver-d0ecefaa-9bf5-429a-8eb3-2abd3826b67e` (desde el 31/10, texto de ejemplo «Tu correo»: `scripts/growth/revise-glitch-pill-placeholder.ts`; antes `fver-e6850cc8-4b39-40c7-9428-a148cfdd53bc`), superficie
 `fhsf-efeonce-blog-subscription`, HubSpot form `8c7cf91b-a1c9-4cbe-9d8c-cac773692561`, subscription type `535702717`.
 Etiquetas «Suscríbete a Glitch» / «Suscribirme» / «¡Listo!» / «Ya estás suscrito a Glitch»; aviso «Al suscribirte
 aceptas la {privacyLink}. Te das de baja cuando quieras.» Turnstile invisible (misma site key que AEO).

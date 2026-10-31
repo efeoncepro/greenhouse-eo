@@ -52,6 +52,10 @@ del copyright desde el respaldo más antiguo que corresponda, y purgar la caché
   Poppins (1,4), dirección a 1,6, 12 px bajo el correo y teléfonos a 13 px con su leyenda 1 px debajo. Antes heredaba
   el interlineado 1,75 del adaptador y el `li` de 14,8 px de Ohio.
 
+- Texto de ejemplo del campo de Glitch: «Tu correo» (versión `fver-d0ecefaa-9bf5-429a-8eb3-2abd3826b67e`, publicada el 31/10 con
+  `scripts/growth/revise-glitch-pill-placeholder.ts`). «Tu correo electrónico» se cortaba en la columna de 290 px con el
+  campo de 16 px del componente. El cambio también aplica al blog, que usa el mismo formulario.
+
 ## Lo que queda abierto
 
 - El fondo lleva `!important` en el adaptador porque `ohio-child/assets/css/global-fixes.css` fija
