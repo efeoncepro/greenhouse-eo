@@ -31,7 +31,7 @@ const relativeFiles = [
   'assets/img/contact/flags/co.svg',
   'assets/img/contact/flags/mx.svg',
   'assets/img/contact/flags/pe.svg',
-  'assets/img/contact/partners/hubspot-solutions-partner-gold-light.svg',
+  'assets/img/contact/partners/hubspot-solutions-partner-gold-dark.svg',
   'assets/img/contact/partners/salesforce-partner-badge-horizontal.svg',
 ]
 

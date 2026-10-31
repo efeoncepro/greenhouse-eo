@@ -7,7 +7,7 @@ if ( ( $manifest['contract'] ?? '' ) !== 'contacto-elementor-release.v1' ) { WP_
 $zip = new ZipArchive();
 if ( true !== $zip->open( $args[0] ) ) { WP_CLI::error( 'Invalid ZIP.' ); }
 $root = WP_PLUGIN_DIR . '/eo-elementor-widgets/';
-$allowed = '#^(includes/(class-eo-widgets-loader\.php|contact/seo\.php|widgets/class-eo-contact-landing-widgets\.php)|assets/(css/contact-landing\.css|js/contact-landing\.js|img/contact/((contacto-nexa-hero|contacto-careers-cap|contacto-og-1200x630)\.png|contacto-nexa-(hero-v2|hero-v2-mobile|avatar)\.jpg|whatsapp\.svg|flags/(cl|us|co|mx|pe)\.svg|partners/(hubspot-solutions-partner-gold-light|salesforce-partner-badge-horizontal)\.svg)|audio/nexa-contacto\.mp3))$#';
+$allowed = '#^(includes/(class-eo-widgets-loader\.php|contact/seo\.php|widgets/class-eo-contact-landing-widgets\.php)|assets/(css/contact-landing\.css|js/contact-landing\.js|img/contact/((contacto-nexa-hero|contacto-careers-cap|contacto-og-1200x630)\.png|contacto-nexa-(hero-v2|hero-v2-mobile|avatar)\.jpg|whatsapp\.svg|flags/(cl|us|co|mx|pe)\.svg|partners/(hubspot-solutions-partner-gold-(light|dark)|salesforce-partner-badge-horizontal)\.svg)|audio/nexa-contacto\.mp3))$#';
 $files = array();
 foreach ( $manifest['files'] as $entry ) {
 	$path = $entry['path'];

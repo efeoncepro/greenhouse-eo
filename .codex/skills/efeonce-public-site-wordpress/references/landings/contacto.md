@@ -7,7 +7,8 @@
 >   Narración: se conserva la voz **Lucia** aprobada, ahora con subtítulos sincronizados a los silencios medidos del archivo (0 · 4,0 · 13,9 · 16,0 · 19,9 · 23,4 s).
 > - **Formulario:** Growth Forms sigue siendo dueño de campos, validación y envío; la página sólo retematiza `--ghf-*` a La órbita, agrega
 >   la línea de Nexa por motivo (valores publicados de v4), el plazo **«Te respondemos en un día hábil»** (confirmado por el operador
->   2026-10-31; deroga el «no prometer plazo») y la franja de partners (HubSpot Gold, Salesforce Partner; SVG de `axis-brand-assets`).
+>   2026-10-31; deroga el «no prometer plazo») y la franja de partners (HubSpot Gold con placa **oscura** sobre el papel, Salesforce Partner). AXIS sólo publica la HubSpot crema,
+>   que sobre fondo claro se pierde (corrección del operador 2026-10-31): elegir por contraste con `getHubSpotSolutionPartnerBadgeForSurface()`.
 > - **Agenda:** sigue siendo el Growth CTA `contacto-discovery-meeting` (sólo diagnóstico, decisión del operador). Todo enlace
 >   `[data-contact-open-meeting]` (hero, cierre) pulsa ese CTA; su diálogo usa la piel del sitio (`data-eo-meeting-skin="site"`):
 >   el agendador es la ventana, sin marco encima. Sin renderer o CTA vacío, el enlace va a `/agenda/`.
@@ -28,6 +29,13 @@
 >   renderer y el del CTA traían degradados azules con `!important` en el CSS legado: se corrigieron en su regla de origen.
 >   FAQ con el diseño del canvas (`.gh-cx-faq`, dos columnas, `+` que gira a × al abrir); sus respuestas siguen saliendo de
 >   `eo_contact_faq_items()`, igual que el `FAQPage`.
+> - **Footer global corregido (2026-10-31):** `scripts/public-website/fix-footer-headquarters-address.php` cambió `block-17` de
+>   «Oficina Chile · Las Bellotas 199» a «Casa matriz · Dr. Manuel Barros Borgoño 71, oficina 1105» (snapshot
+>   `_gh_footer_address_before_20261031_121306`). Siguen con la dirección antigua: la opción ACF `eoh_site_settings_contact_address`,
+>   `woocommerce_store_address`, la página 243016 y el bloque inactivo `block-15`. Esto deroga «la dirección legacy del footer no queda corregida» más abajo.
+> - **Teléfono:** el texto de partners ocupa su propia fila (`flex-basis: 100%`) y las dos insignias van juntas debajo.
+> - **JS compartido:** el runtime local trae un cambio de otra sesión en `contact-landing.js` (ícono del país) sin publicar. Antes de
+>   armar el paquete se copia el JS del baseline vivo y después se devuelve la copia local; si no, ese cambio sale sin revisión.
 > - **Pendiente:** el código de la landing nunca se versionó en `efeonce-public-site-runtime` (archivos `??` desde TASK-1801): falta su backport.
 
 > **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-contacto` v4 entrega en `direct` al formulario HubSpot «Contact Form - EO» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.

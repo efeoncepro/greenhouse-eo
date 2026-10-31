@@ -4,7 +4,7 @@
 **Surface:** `efeonce-contacto`
 **Task de origen:** [TASK-1801](../../tasks/complete/TASK-1801-contacto-multistakeholder-form-agenda.md)
 **Estado:** construida, verificada y aprobada por el operador el 2026-09-15; release de copy de cobertura y
-banda de reuniones en móvil aplicado el 2026-09-16.
+banda de reuniones en móvil aplicado el 2026-09-16; versión 2 «La órbita» en producción desde el 2026-10-31.
 
 ## Composición
 
@@ -141,6 +141,16 @@ uno contra un export vivo fresco, más un cambio estructural de Elementor:
 2. `reorder-contacto-closing.php`: el contenedor `48aab3e` (banda → cierre) pasa al final. Guardas: hash previo
    `64d95ff1…`, identidad de la página, Home y chrome global intactos; hash nuevo `3963e548…`.
 3. Ajustes de CSS/JS: piel del sitio para el diálogo del CTA, botón turquesa, radios de imágenes frente a `.elementor img`.
+4. Insignia HubSpot por contraste: sobre el papel del formulario va `hubspot-solutions-partner-gold-dark.svg` (placa oscura,
+   72 px), no la crema. En ≤767 px el texto de partners ocupa su fila y las dos insignias quedan juntas debajo. Regla general en
+   `public/branding/partners/hubspot/solution-partner/README.md` y `getHubSpotSolutionPartnerBadgeForSurface()`.
+5. `fix-footer-headquarters-address.php`: el footer global (`widget_block[17]` en `ohio-sidebar-footer-1`) pasa de «Oficina
+   Chile · Las Bellotas 199» a «Casa matriz · Dr. Manuel Barros Borgoño 71, oficina 1105». Escribe sólo si el contenido coincide
+   exacto; snapshot `_gh_footer_address_before_20261031_121306`, readback y purga.
+
+Fuera de este release quedan otras copias de la dirección antigua, sin tocar: la opción `eoh_site_settings_contact_address`
+(ACF de eo-headless-content), `woocommerce_store_address`, la página publicada 243016 «¡Habla con un experto!» y el bloque
+inactivo `block-15`.
 
 Contratos que no cambian: Growth Forms (`efeonce-contacto` v4) y Growth Meetings (`contacto-discovery-meeting`) siguen siendo
 dueños de validación, envío, disponibilidad y reserva; WordPress sólo presenta. La FAQ visible y su `FAQPage` salen de la misma

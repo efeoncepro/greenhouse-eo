@@ -1,5 +1,12 @@
 # Operar y revisar la landing Contacto
 
+> **Tipo de documento:** Manual de uso / runbook
+> **Version:** 2.0
+> **Creado:** 2026-09-15 (commit «document approved Contacto landing»)
+> **Ultima actualizacion:** 2026-10-31 por Claude
+> **Documentacion tecnica:** [Contrato técnico de la landing Contacto](../../architecture/public-site/CONTACTO_LANDING_RUNTIME_V1.md)
+> **Documentacion funcional:** [Contacto](../../documentation/public-site/contacto.md)
+
 ## Antes de tocarla
 
 - Lee el [contrato técnico](../../architecture/public-site/CONTACTO_LANDING_RUNTIME_V1.md), el [brief](../../public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md)
@@ -32,7 +39,13 @@ publicados sin readback del runtime, purge y evidencia GVC.
   globales de Ohio.
 - Mantén `hola@efeoncepro.com` y la línea `600 914 0660` diferenciada como teléfono exclusivo de Chile.
 - Careers debe seguir siendo un desvío: no agregues campos de candidatura ni envío de CV al formulario.
-- No agregues horarios, WhatsApp, mapa, SLA, `LocalBusiness` o destinos de CRM sin owner y evidencia.
+- Lo que la versión 2 publica fue confirmado por el operador el 2026-10-31: WhatsApp del móvil, enlace «Cómo llegar»
+  a Maps y «Te respondemos en un día hábil». No agregues horarios, otro plazo, `LocalBusiness` ni destinos de CRM
+  sin owner y evidencia.
+- Todo botón o enlace propio lleva la clase `-undash`; sin ella, el hover de Ohio lo pinta blanco sobre blanco.
+- Ninguna sección sube de `z-index: 3`: las barras laterales de Ohio («Follow Us», Dark/Light) están en 4.
+- Insignia HubSpot: se elige por contraste con la superficie, nunca la crema sobre fondo claro. Usa la tabla de
+  `public/branding/partners/hubspot/solution-partner/README.md` o `getHubSpotSolutionPartnerBadgeForSurface()`.
 - Después de un cambio, actualiza primero el documento canónico, luego esta guía y la referencia espejada de la
   skill; ejecuta closure-check y el context gate al final si tocaste Handoff/changelog.
 
@@ -102,3 +115,40 @@ El deploy deja un backup en el servidor antes de escribir; el de este release es
 plugin por el mismo carril SSH: al reescribir los archivos el `filemtime` sube y el `?ver=` cambia solo, así que
 tampoco necesitas purga. No edites los archivos vivos a mano; si el cambio es nuevo, vuelve a exportar el
 baseline y arma otro paquete.
+
+## Release aplicado: Contacto v2 «La órbita» (2026-10-31)
+
+El mismo carril de tres pasos (export vivo → paquete → instalador), repetido en cada ajuste del día, más dos
+scripts gobernados con snapshot y readback:
+
+- `scripts/public-website/reorder-contacto-closing.php` mueve la banda de reuniones al final como cierre
+  (snapshot `_gh_contacto_before_v2_20261031_114459`).
+- `scripts/public-website/fix-footer-headquarters-address.php` cambia la dirección del footer global de Las
+  Bellotas a la casa matriz (bloque `block-17` de `ohio-sidebar-footer-1`; snapshot
+  `_gh_footer_address_before_20261031_121306`). Sólo escribe si el bloque tiene exactamente el texto antiguo.
+
+### Antes de armar el paquete: el JS compartido
+
+`contact-landing.js` en el runtime local tiene un cambio de otra sesión (ícono del país) que no está publicado. Si
+lo empaquetas, sale a producción sin revisión. Antes del paso 2 copia al runtime el JS del baseline vivo; después
+del paquete devuelve la copia local. Si cambias el JS tú, aplica tu cambio sobre el baseline vivo, no sobre la
+copia local.
+
+### Recursos nuevos
+
+El instalador sólo acepta rutas de su allowlist. Un recurso nuevo exige agregarlo a
+`build-contacto-elementor-package.cjs` y a la expresión regular de `deploy-contacto-elementor-package.php`.
+
+### Cómo verificar
+
+En 1440 y 390 px: orden de secciones (portada, formulario, contacto directo, preguntas, cierre), overflow 0,
+formulario cargado con Poppins, la agenda abre desde la portada, la tarjeta y el cierre sin marco extra, banderas
+circulares, insignia HubSpot oscura de 72 px junto a Salesforce de 44 px de alto, y en el teléfono el texto de
+partners en su propia línea con las dos insignias juntas debajo. En el footer: «Casa matriz · Dr. Manuel Barros
+Borgoño 71, oficina 1105». No envíes el formulario ni reserves para verificar.
+
+### Rollback
+
+Cada instalación dejó su tar en `/tmp/eo-contacto-widgets-before-20261031-*.tar` del servidor; el último es
+`…-121845.tar`. El orden de secciones vuelve con el snapshot `_gh_contacto_before_v2_20261031_114459` y la
+dirección del footer con `_gh_footer_address_before_20261031_121306`; purga la caché Kinsta después.
