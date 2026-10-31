@@ -5,6 +5,22 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — «Vive el servicio» implementado local (canvas fila 6)
+
+- Corrección de propósito del operador: Rooms es una **demo inmersiva del servicio**, no una herramienta de
+  presentación. Consola, audiencia y señales pasan detrás de las escenas de demostración.
+- `efeonce-rooms` `claude/rooms-approved-ui` `5e4a73b`: bloques de escena `showcase` / `cycle` / `answers` / `team`
+  en manifiestos V3/V4 (`src/domain/scene-contracts.ts`), creados con `content.upsertBlock` (API/CLI/MCP), con reglas
+  de cobertura y lector que resuelve formatos a renditions privadas de la edición. Rutas a pantalla completa:
+  `/rooms/:roomId/editions/:editionId/vive/:blockId`, `/rooms/:roomId/authoring/vista-previa/vive/:blockId?as=` y
+  `/demo/vive/:blockId`. La sala muestra un capítulo de escenas como mosaico de entradas. Sin push, sin deploy, flags OFF.
+- `local`: `pnpm verify` 375/375 sin skips + lint + typecheck + build; GVC PASS `rooms-service-showcase`,
+  `rooms-service-cycle`, `rooms-service-answers`, `rooms-service-team` (1440/1280/390, 0 hallazgos).
+- Las escenas no escriben en la API: son simulación del servicio. Plazos y rondas reales los declara el autor; la demo
+  volta los deja entre corchetes.
+- Falta: autoría de escenas desde la mesa (hoy solo por comando), ADR del contrato de escenas, recorrido contra la
+  integración con una sala real, aceptación humana.
+
 ## 2026-10-31 — Autoría y ediciones del canvas implementadas local (TASK-2071)
 
 - `efeonce-rooms` `claude/rooms-approved-ui`: mesa de autoría `/rooms/:roomId/authoring` (inventario, cobertura,

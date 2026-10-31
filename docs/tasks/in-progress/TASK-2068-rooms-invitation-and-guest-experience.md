@@ -1,5 +1,14 @@
 # TASK-2068 — Rooms: invitación, entrada con código y lectura compartida
 
+## Delta 2026-10-31 — «Vive el servicio» (canvas fila 6) implementado local
+
+- El operador corrigió el propósito: Rooms es una demo inmersiva del servicio. Se aprobaron y construyeron cuatro
+  escenas (tu marca en el mundo, ciclo de trabajo, respuestas de IA, equipo y semana) en `efeonce-rooms`
+  `claude/rooms-approved-ui` `5e4a73b`, con contrato de bloques de escena y rutas a pantalla completa.
+- Evidencia `local`: `pnpm verify` 375/375; GVC PASS de los cuatro escenarios `rooms-service-*` en 1440/1280/390.
+- Pendiente: autoría de escenas desde la mesa, ADR del contrato, recorrido con sala real y aceptación humana.
+  `UI ready` sigue en `no`.
+
 ## Delta 2026-10-30 — canvas aprobado; base y backend primero
 
 - El operador aprobó el 2026-10-29 el canvas de Claude Design «la sala es una órbita» (artifact

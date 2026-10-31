@@ -224,6 +224,24 @@ como una lectura de la edición: una invitación revocada cierra el stream. La p
 atención; el recorrido y las señales salen solo de `progress.mark`. La UI dibuja cursores solo de quien está en el
 mismo capítulo y usa `data-scene-id` / `data-block-id` / `data-asset-version-id` para ubicarlos.
 
+### «Vive el servicio»: escenas (canvas fila 6)
+
+Bloques que el comprador **hace** en vez de leer. Viven en manifiestos V3/V4, se crean con `content.upsertBlock`
+y se ubican en un capítulo como cualquier bloque; la escena se abre a pantalla completa.
+
+| `type` | Qué lleva | Cobertura |
+| --- | --- | --- |
+| `showcase` | `pieceBlockId` (bloque de medio), `contexts[{id, surface: feed\|story\|ooh\|web, assetRefId, where, caption?, action?}]`, `notes[{id, assetRefId, x, y, label, text}]` (posición en % del formato) | La pieza existe, es visible y tiene esos formatos; una superficie por contexto; cada nota sobre un formato mostrado |
+| `cycle` | `pieceBlockId`, `goals[2–4]`, `adjustments[{id, label, effect: light\|tight\|contrast\|warm}]`, `terms{response, rounds}` | La pieza existe y es visible |
+| `answers` | `basis: measured\|illustrative`, `capturedAt`, `questions[{id, question, today{text, sources[{name, kind, cited}]}, plan\|null, note?}]` | `measured` exige `capturedAt`; `plan: null` exige `note` (el plan no fuerza la marca donde no aporta) |
+| `team` | `people[{id, name, role, help, ask}]`, `week[{id, day, title, personId}]`, `response`, `rhythmNote` | Cada día apunta a una persona del equipo |
+
+Todos llevan `schemaVersion: 1`, `title`, `intro`, `required` y `excludedReason?`. El lector entrega `kind: 'scene'` con
+`scene` ya resuelto (imágenes como renditions privadas de la edición, nunca `assetRefId`). La mención de marca se
+detecta por el nombre del cliente en el texto. Rutas: `/rooms/:roomId/editions/:editionId/vive/:blockId`,
+`/rooms/:roomId/authoring/vista-previa/vive/:blockId?as=` y la demo `/demo/vive/:blockId`. Las escenas no escriben
+en la API: lo que el comprador hace ahí es una simulación del servicio.
+
 ### Lecturas HTTP nuevas
 
 Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cursor` según su contrato.
