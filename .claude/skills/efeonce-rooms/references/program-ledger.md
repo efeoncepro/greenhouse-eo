@@ -25,6 +25,10 @@
   - una invitación con correo real;
   - medir la sala en vivo en Vercel.
 - Respaldo lógico de la migración borrado después de verificar el deploy.
+- Primer login humano: `identity_unbound`. El acceso del canary (2 h) había vencido el 26-10. Restaurado con SQL
+  administrativo autorizado: administrador `rooms-pilot-julio-20261025` y permiso de organización
+  `rooms-owner-julio-20261031`, ambos hasta 2027-10-31. Lección: Rooms no hereda el rol de administrador de Efeonce y
+  no tiene un comando de acceso interno durable; falta construirlo. El callback muestra JSON crudo.
 - Durable («Sí, fíjalos»): las variables de repo GitHub `AUTH_SERVER_FIRST_PARTY_ENABLED` y
   `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` están en `true`, así que el próximo deploy gobernado reproduce el estado.
   Se corrigió `rooms-config-drift.py`, que buscaba `ROOMS_INVITATION_AUTHORITY_TOKEN_REF` en lugar de `..._SECRET_REF`;

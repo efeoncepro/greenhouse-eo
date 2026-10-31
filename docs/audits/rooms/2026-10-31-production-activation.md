@@ -74,3 +74,21 @@ El operador autorizó fijar los flags («Sí, fíjalos»).
      (00168 tiene ambos flags OFF y no monta los secretos de invitación);
    - `UPDATE greenhouse_notifications.email_type_config SET enabled=false, paused_reason='rollback 2026-10-31' WHERE email_type='auth_server_rooms_invitation_otp'`.
 2. Rooms: los cuatro flags en `false`, redeploy de producción y `vercel alias set <deploy> efeonce-rooms.vercel.app`.
+
+## Acceso del operador restaurado (mismo día)
+
+- **Síntoma.** El primer login humano llegó a `/auth/callback` y Rooms respondió `identity_unbound` (403, JSON crudo).
+  En `rooms.auth_events` quedó un `identity_unbound` a las 14:51 UTC.
+- **Causa.** El único acceso del operador era el del canary del 26-10 (`rooms-pilot-julio-20261025`, administrador).
+  El script del piloto lo crea con duración de 2 horas, y vínculo, principal, membresía y permiso de sala vencieron
+  el 26-10 a las 20:23 UTC. Rooms no deriva acceso del rol de administrador de Efeonce en Greenhouse ni en Efeonce ID,
+  y producción no tiene un comando de acceso interno durable.
+- **Corrección.** Autorizada por el operador («Sí, aplícala»). Una transacción con `rooms_migrator`:
+  - principal, membresía y vínculo `active` hasta `2027-10-31 23:59:59+00`;
+  - permiso de organización `rooms-owner-julio-20261031` con las 24 capacidades, mismo vencimiento.
+
+  Readback: cuatro filas `active`. Se revierte marcando esas filas como `revoked`.
+- **Pendiente de fondo.**
+  - Que Rooms reconozca a los administradores de Efeonce desde su autoridad en Efeonce ID, o tenga un comando
+    gobernado de acceso interno (API/CLI con auditoría), en lugar de SQL administrativo.
+  - Que el callback muestre una página de error diseñada, no JSON.
