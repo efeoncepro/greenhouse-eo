@@ -138,6 +138,8 @@ métodos. Una sesión suficiente puede volver sin UI y el first-party sign-in no
 
 ## Child Tasks
 
+
+- [TASK-2086](../../tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md): delegación interactiva de agentes para un segundo resource server (audiencia de Rooms, canje RFC 8693, `act`, D10 de `efeonce.mcp.rooms.*`); distinta de TASK-1917. Bloqueada por la retención de Efeonce ID.
 | Unidad | Task | Entregable y límite de ownership | Depende de |
 |---|---|---|---|
 | **U00** | [TASK-1626](../../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md) | Gateway neutral en `mcp.efeonce.org` y federación Globe (en curso). Conserva transporte, discovery, providers. No emite tokens. | — |

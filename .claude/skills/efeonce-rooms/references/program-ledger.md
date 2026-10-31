@@ -145,6 +145,18 @@
 - Sin push, sin deploy, sin flags. El checkout `efeonce-rooms` quedó en la rama nueva; `tsconfig.json` sigue
   modificado por otra sesión y no se commiteó.
 
+## 2026-10-31 — Tasks del carril de agentes creadas (TASK-2084..2091)
+
+- El operador pidió crearlas («Ok crealas»). Las 8 están en `to-do`, con `task:lint` en 0/0. Siguiente ID: TASK-2092.
+- Ya, sin depender de Efeonce ID:
+  - 2084: atribución, aviso, reversa, cuotas, guard D2 y comando de republicación si hace falta;
+  - 2085: pantalla «Actividad de agentes» (`UI ready: no`, el slice 1 es el canvas);
+  - 2090: medios gobernados;
+  - 2091: skill de oficio + eval.
+- MCP remoto: 2086 (EPIC-044, bloqueada por la retención) → 2087 → 2088.
+- Fuentes: 2089 (canary bloqueado por 2086; `resolveXrayAuthority` rechaza hoy los tokens `sister_platform_oauth`).
+- Primera a tomar: TASK-2084.
+
 ## 2026-10-31 — ADR del carril de agentes ACCEPTED: agentes ciudadanos de primera clase
 
 - Operador: «Los agentes son ciudadanos de primera clase, pueden dar acceso y publicar» y «avancemos con todo».

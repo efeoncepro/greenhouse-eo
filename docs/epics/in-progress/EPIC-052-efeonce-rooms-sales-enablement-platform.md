@@ -113,6 +113,13 @@ Corte local29Oct, autorizado para terminar backend sin UI; construcción en `cod
 - [TASK-2081](../../tasks/in-progress/TASK-2081-rooms-live-room-realtime.md): sala en vivo, ADR de transporte y backend en tiempo real.
 - [TASK-2082](../../tasks/in-progress/TASK-2082-rooms-durable-internal-access.md): acceso interno durable y gobernado (`members.*`, bootstrap del dueño, solicitud de acceso); en producción desde PR #5.
 - [TASK-2083](../../tasks/in-progress/TASK-2083-rooms-access-issue-page.md): página de error del login «Casi.» con código de solicitud; en producción desde PR #5.
+- [TASK-2084](../../tasks/to-do/TASK-2084-rooms-agent-attribution-reversal-quotas.md): atribución de agentes, aviso, reversa y cuotas (carril de agentes).
+- [TASK-2085](../../tasks/to-do/TASK-2085-rooms-agent-activity-surface.md): pantalla «Actividad de agentes» con reversa; reemplaza la administración pausada del canvas.
+- [TASK-2087](../../tasks/to-do/TASK-2087-rooms-delegated-bearer-verifier.md): verificador del token delegado + identidad del gateway (`ROOMS_AGENT_LANE_ENABLED`).
+- [TASK-2088](../../tasks/to-do/TASK-2088-efeonce-mcp-rooms-provider.md): provider `rooms` en `efeonce-mcp` (MCP remoto).
+- [TASK-2089](../../tasks/to-do/TASK-2089-rooms-content-sources-xray-crm.md): fuentes de contenido: Radiografía AEO y CRM vía Greenhouse.
+- [TASK-2090](../../tasks/to-do/TASK-2090-rooms-governed-media-import.md): importación gobernada de medios.
+- [TASK-2091](../../tasks/to-do/TASK-2091-rooms-authoring-craft-skill-and-eval.md): skill de oficio para armar salas + eval de referencia.
 
 [Recibo del corte y límites](../../audits/rooms/2026-10-29-backend-local-completion.md). TASK-2070 y2074–2078 quedan complete por su alcance técnico local verificado. TASK-2071/2072 y la
 épica conservan in-progress por interfaz/certificación conjunta/rollout; cerrar el backend local no
