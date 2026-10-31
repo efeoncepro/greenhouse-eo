@@ -58,7 +58,11 @@ const lookup = (expr, scope) => {
   return expr.split('.').reduce((o, k) => (o == null ? undefined : o[k]), scope)
 }
 
-const interp = (s, scope) => s.replace(/\{\{([^}]+)\}\}/g, (_, e) => { const v = lookup(e, scope); return v == null || typeof v === 'function' ? '' : String(v) })
+const interp = (s, scope) => s.replace(/\{\{([^}]+)\}\}/g, (_, e) => { const v = lookup(e, scope);
+
+ 
+
+return v == null || typeof v === 'function' ? '' : String(v) })
 
 const $ = cheerio.load('<div id="__root">' + bodyHtml + '</div>', { decodeEntities: false }, false)
 
@@ -106,7 +110,12 @@ walk($('#__root')[0], vals)
 /* ---------- 1. Expand the dynamic parts ---------- */
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-const one = (sel, ctx) => { const n = ctx ? ctx.find(sel) : $(sel); if (n.length !== 1) throw new Error(`Expected one ${sel}, found ${n.length}`); return n }
+
+const one = (sel, ctx) => { const n = ctx ? ctx.find(sel) : $(sel);
+
+ if (n.length !== 1) throw new Error(`Expected one ${sel}, found ${n.length}`); 
+
+return n }
 
 // The canvas wraps everything in `.page`; the modules are its sections. The logo band sits between hero and motor.
 {
@@ -197,14 +206,16 @@ $('section#trabajo video').each((_, v) => { $(v).attr({ muted: '', loop: '', pla
   const holder = you.find('.rv > span').eq(1)
 
   holder.html('<b>Tu marca</b>' + txt.map((t, s) => `<span class="gh-yt" data-gh-ystate="${s}">: ${esc(t)}</span>`).join(''))
-  aeo.find('.row').each((_, r) => { const rk = /--rk:\s*(\d+)/.exec($(r).attr('style') || ''); $(r).attr('data-gh-row', $(r).hasClass('you') ? 'you' : 'other') })
+  aeo.find('.row').each((_, r) => { $(r).attr('data-gh-row', $(r).hasClass('you') ? 'you' : 'other') })
 }
 
 // Agents constellation: JS adds the entrance, cursor parallax and scroll depth.
 one('section#agentes').attr('data-gh-cst', '')
 $('section#agentes .sk').attr('data-gh-repeat', 'sparks')
 // Sparks at mid height sit behind the copy on phones (the copy takes the full width): the host hides them there.
-$('section#agentes .sk').each((_, el) => { const y = parseFloat((/--y:\s*([\d.]+)%/.exec($(el).attr('style') || '') || [])[1]); if (y > 20 && y < 84) $(el).addClass('gh-mid') })
+$('section#agentes .sk').each((_, el) => { const y = parseFloat((/--y:\s*([\d.]+)%/.exec($(el).attr('style') || '') || [])[1]);
+
+ if (y > 20 && y < 84) $(el).addClass('gh-mid') })
 
 // Greenhouse: both views are editable; JS shows one, counts the numbers up and redraws the chart.
 {
@@ -213,6 +224,7 @@ $('section#agentes .sk').each((_, el) => { const y = parseFloat((/--y:\s*([\d.]+
   gh.attr('data-gh-gh', '')
   gh.find('.seg button').each((i, b) => { $(b).attr('data-gh-view', i ? 'ger' : 'mkt') })
   const kpis = one('.kpis', gh)
+
   const view = (k, on) => `<div class="kpis gh-view${on ? ' on' : ''}" data-gh-view-panel="${k}">` +
     C.GH[k].map(x => `<div class="kpi"><div class="l">${esc(x.l)}</div><div class="v" data-gh-count>${esc(x.f(x.v))}</div><div class="d">${esc(x.d)}</div></div>`).join('') + '</div>'
 
@@ -221,6 +233,7 @@ $('section#agentes .sk').each((_, el) => { const y = parseFloat((/--y:\s*([\d.]+
   const svg = one('svg.chart', gh)
 
   svg.find('path.area, path.cur').remove()
+
   for (const k of ['mkt', 'ger']) {
     const d = C.curvePath(C.CURVE[k])
 
@@ -289,6 +302,7 @@ $('section#top .lens-inner > img.cast').each((i, img) => { $(img).attr('fetchpri
 // of the page (default selectors of eo-landing-dock); touch screens get their own hint for the Sparks.
 one('section#top').attr('data-landing-dock-start', '')
 one('section#agenda').attr('data-landing-dock-stop', '')
+
 {
   const hint = one('section#agentes .cst-hint')
   const img = hint.find('img').first()
@@ -296,6 +310,7 @@ one('section#agenda').attr('data-landing-dock-stop', '')
   hint.html($.html(img) + '<span>Nada sale sin que una persona lo apruebe. <span class="h-fine">Pasa el cursor por un Spark.</span><span class="h-touch">Toca un Spark.</span></span>')
   hint.after('<p class="sk-live" aria-live="polite"></p>')
 }
+
 {
   const mail = one('section#agenda .mail')
 
