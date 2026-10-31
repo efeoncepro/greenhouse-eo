@@ -15,13 +15,13 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `layout`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-2083-rooms-access-issue-page.md`
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-052`
-- Status real: `2026-10-31: código local en efeonce-rooms claude/rooms-durable-internal-access (adb1db0, 510ab42 y el fix de pesos), sin push. Revisión del operador aplicada: titular en dos pesos (introducción 340, idea principal 740). GVC rooms-access-issue OK en 1440/1280/390 tras el cambio. Falta: aprobación visual del operador (UI ready), merge y deploy autorizados.`
+- Status real: `2026-10-31: código local en efeonce-rooms claude/rooms-durable-internal-access (adb1db0, 510ab42 y el fix de pesos), sin push. Revisión del operador aplicada: titular en dos pesos (introducción 340, idea principal 740). GVC rooms-access-issue OK en 1440/1280/390 tras el cambio. Aprobada por el operador («Ok»). Falta: merge y deploy autorizados.`
 - Rank: `junto con TASK-2082; independiente de ella`
 - Domain: `platform|identity`
 - Blocked by: `ninguno para el corte local; producción espera autorización de merge`
@@ -280,7 +280,7 @@ Reglas obligatorias:
 - Accessibility/focus checks: axe del perfil premium y sonda de teclado
 - Before/after evidence: antes JSON crudo (recibo del 2026-10-31); después las capturas del escenario
 - Known visual debt: ninguna conocida
-- Visual scorecard: pendiente de la mirada del operador
+- Visual scorecard: aprobación del operador 2026-10-31 sobre la captura GVC `rooms-access-issue` (1440/1280/390)
 - Quality threshold: `average >= 4.2; floor >= 3; fidelity/template resistance >= 4`
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -361,7 +361,7 @@ Ver wireframe `docs/ui/wireframes/TASK-2083-rooms-access-issue-page.md`.
 - [x] Movimiento reducido apaga la entrada de palabra y cuerpo.
 - [x] GVC desktop + mobile capturado y mirado (1440, 1280, 390), sin hallazgos.
 - [x] `LC_ALL=en_US.UTF-8 pnpm verify` pasa (0 fallas; 24 omitidas por PG explícito y multimedia, ajenas a auth).
-- [ ] `UI ready` permanece `no` hasta la mirada del operador; si pasa a `yes`, `pnpm task:lint --task TASK-2083` sin hallazgos. (Pendiente: mirada humana.)
+- [x] `UI ready: yes` tras la aprobación del operador («Ok», 2026-10-31, sobre la captura con contraste de pesos); `pnpm task:lint --task TASK-2083` sin hallazgos.
 - [ ] Verificado en producción tras merge autorizado. (Pendiente: autorización.)
 
 ## Verification

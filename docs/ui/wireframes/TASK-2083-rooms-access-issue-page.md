@@ -3,8 +3,7 @@
 Diseño de implementación escrito el 2026-10-31 desde el código en `efeonce-rooms`, rama
 `claude/rooms-durable-internal-access` (sin push). No hay artboard propio en el canvas aprobado: la página pertenece a
 la familia de la invitación «Entra.» (TASK-2068) y del artboard `Estados` («Estados · carga, error y acceso») del canvas
-«Efeonce Rooms — UI» (`https://claude.ai/code/artifact/6562987e-d882-44ba-a929-a6ab7863771d`). No es aceptación humana:
-`UI ready` sigue en `no` hasta que el operador la mire.
+«Efeonce Rooms — UI» (`https://claude.ai/code/artifact/6562987e-d882-44ba-a929-a6ab7863771d`). Aprobada por el operador el 2026-10-31 («Ok») tras la corrección de pesos del titular: `UI ready: yes`.
 
 ## Problema
 
@@ -15,8 +14,8 @@ API: debe saber qué pasó, si es culpa suya o nuestra, y qué hacer.
 ## Visual Direction Contract
 
 - Visual direction mode: source-led
-- Product Design asset: `docs/ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md` (sección «Aprobación
-  2026-10-29») y la línea gráfica «La órbita» (skill `efeonce-graphic-line`).
+- Product Design asset: `docs/ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md`
+- Línea gráfica: «La órbita» (skill `efeonce-graphic-line`), canon «Titulares largos en Bricolage: contraste de pesos».
 - Source durable: escena oscura de la invitación (`InvitationStage`), primitivas de TASK-2079 `Orbit` y `DepthLayers`.
 - Diferencia deliberada: la órbita va como **anillo sin esfera** (`measure={{ value: 0, total: 1 }}`). La esfera es la
   llegada; aquí todavía no ocurre. Así la página dice «aún no» con la misma forma que en la sala dice «llegaste».
@@ -75,6 +74,20 @@ movimiento reducido) y grano fijo. Filas: encabezado, cuerpo y pie.
 
 «Volver a entrar» y «Reintentar» llevan a `/login?returnTo=/rooms` (navegación de documento, no router).
 
+## Visual Fidelity Mapping
+
+| Elemento | Fuente en código | Regla |
+|---|---|---|
+| Fondo, halo, teal, papel, atenuado | Tokens de `src/styles/theme.ts` (`--room-ground`, `--room-halo`, `--room-teal`, `--room-paper`, `--room-muted-dark`, `--room-line-dark`) | Ningún hex en el componente ni en `access-issue.css` |
+| Anillo sin esfera | `Orbit` de TASK-2079 con `measure={{ value: 0, total: 1 }}`, radio 230 (128 en compacto) | Se dibuja una vez; sin esfera porque la llegada no ocurrió; nunca indica espera |
+| Profundidad | `DepthLayers` (+ su `Grain`) | Parallax sólo con puntero fino y sin movimiento reducido |
+| Palabra («Casi.», «Otra vez.»…) | `--room-font-display` (Bricolage 760, 168 px; 132 y 76 en anchos menores), `span` decorativo | El punto en `--room-teal`; no se parte en pesos (respuesta corta) |
+| Titular `h1` | Bricolage 40 px (28 en móvil): `lead` en `--room-weight-light`, `key` en `--room-weight-bold` | Mismo tamaño y color; `text-wrap: balance`; «Efeonce ID» con espacio duro |
+| Cuerpo, ayuda, pie | `--room-font-body` (Poppins 16/13 px) | Cuerpo hasta 52 ch, atenuado |
+| Código de solicitud / referencia | Bricolage 700, 28 px, `tabular-nums` | Formato `XXXX-XXXX`; la referencia muestra 8 caracteres del UUID |
+| Botones | `Button` de `@efeoncepro/axis-ui-primitives/react`, `line="growth" surface="dark"` | Sólido con flecha cuando volver a entrar resuelve; contorno cuando es secundario; fantasma para copiar |
+| Lockup | `/brand/rooms-lockup-white.svg` de `@efeoncepro/axis-brand-assets` | 211 × 24; nunca animado |
+
 ## Copy Ledger
 
 Todo en `ACCESS_ISSUE_COPY` de `src/lib/copy/rooms.ts` (es-CL neutro, tuteo, sin voseo). Cada motivo tiene `word`,
@@ -84,16 +97,15 @@ Todo en `ACCESS_ISSUE_COPY` de `src/lib/copy/rooms.ts` (es-CL neutro, tuteo, sin
 
 ## State Copy
 
-| Estado | Copy |
-|---|---|
-| `identity_unbound` | «Entraste con Efeonce ID, pero Rooms todavía no te reconoce.» + pedir acceso y compartir la referencia |
-| `invalid_transaction` | «Este intento de acceso venció.» + empezar de nuevo; la sesión de Efeonce ID se conserva |
-| `invalid_identity` | «No pudimos confirmar tu sesión.» |
-| `rate_limited` | «Hiciste varios intentos seguidos.» + esperar cinco minutos |
-| `unavailable` | «No pudimos verificar tu acceso ahora.» + no es tu cuenta |
-| `disabled` / `configuration` | «El acceso a Rooms no está abierto / disponible en este entorno.» |
-| `invalid_request` / `forbidden` | «No pudimos validar esta solicitud.» |
-| Copiado | El botón cambia a «Referencia copiada» y se anuncia en una región `status` |
+| Estado | Copy visible | Comportamiento y recuperación |
+|---|---|---|
+| ready | `identity_unbound` con código: «Casi.», «Entraste con Efeonce ID, pero Rooms todavía no te reconoce.», el cuerpo con pedir acceso, «Volver a entrar», «Código de solicitud» `XXXX-XXXX`, «Copiar código» y «Compártelo con quien administra Rooms en Efeonce…» | La persona copia el código y se lo pasa a un administrador; cuando le confirman, «Volver a entrar» lleva a `/login?returnTo=/rooms` y entra |
+| loading | Sin estado de carga propio: la página se renderiza en el servidor con sólo `reason`, `ref` y `code` | Si el navegador tarda, se ve el fondo y el anillo dibujándose; no hay datos que esperar |
+| empty | Sin `ref` ni `code` válidos (por ejemplo `disabled` desde `/login`): no se muestra el bloque de referencia; el pie «¿Sigues sin poder entrar? Escríbele a quien te dio acceso a Rooms.» queda | El motivo y su acción bastan; nada queda vacío ni con guiones |
+| partial | `identity_unbound` sin código (tope de 200 solicitudes por hora): el bloque muestra «Referencia» con 8 caracteres del UUID y «Si pides ayuda, comparte esta referencia.» | El administrador busca la referencia en los logs (`rooms.auth.browser_error`) y puede dar acceso por identidad explícita |
+| error | `unavailable`: «Espera.», «No pudimos verificar tu acceso ahora.», «Es un problema de nuestro lado…» y «Reintentar». `configuration`: «Aún no.» sin botón | «Reintentar» vuelve a `/login`; en configuración, la referencia es lo que sirve para soporte |
+| denied | `identity_unbound` es el estado denegado principal (ver ready). `invalid_transaction`, `invalid_identity`, `invalid_request` y `forbidden`: «Otra vez.» y «Volver a entrar». `rate_limited`: «Pausa.», «Hiciste varios intentos seguidos.», «Por seguridad, espera cinco minutos…» y «Volver a entrar» en contorno | Nunca se revela si un correo o una persona existen; un motivo desconocido se muestra como `unavailable` |
+| Copiado | El botón cambia a «Código copiado» o «Referencia copiada» y se anuncia en `role="status"` | Si el portapapeles falla, el botón no cambia y el código sigue visible para copiarlo a mano |
 
 ## Accessibility Contract
 
@@ -119,14 +131,23 @@ Todo en `ACCESS_ISSUE_COPY` de `src/lib/copy/rooms.ts` (es-CL neutro, tuteo, sin
 ## GVC Scenario Plan
 
 - Scenario file: `scripts/frontend/scenarios/rooms-access-issue.scenario.ts` (Greenhouse).
-- Ruta: `/auth/error?reason=identity_unbound&ref=…` con un UUID fijo; anónima y sin datos reales.
-- Viewports: 1440 × 900 y 390 × 844 (más 1280 × 800).
-- Marcadores: `data-capture="access-issue"` y `data-capture="access-issue-reference"`.
-- Comando: `AGENT_AUTH_BASE_URL=http://127.0.0.1:3210 pnpm fe:capture rooms-access-issue --env=local`.
-- Calidad: accesibilidad, layout (objetivos ≥ 24 px), runtime sin errores, teclado con foco visible y movimiento
-  reducido.
+- Ruta: `/auth/error?reason=identity_unbound&ref=7b6ef4e7-a936-4ec6-84ac-9865732e40d3&code=K7M29QXA`; anónima, sin datos reales.
+- Quality profile: premium
+- Viewports: desktop 1440 × 900, laptop 1280 × 800 y mobile 390 × 844.
+- Required captures: `identity-unbound` y la sonda de teclado `keyboard-login-then-copy` por viewport.
+- Required `data-capture` markers: `access-issue` y `access-issue-reference`.
+- Assertions: `h1` visible, bloque de referencia visible, sin error boundary; accesibilidad, objetivos ≥ 24 px y runtime sin errores.
+- Scroll-width checks: `scrollWidth <= clientWidth` en los tres anchos (layout del perfil premium); verificado sin scroll horizontal.
+- Reduced-motion / focus evidence: `reducedMotionCheck` y sonda Tab de «Volver a entrar» a «Copiar código» con anillo visible.
+- Comando: `AGENT_AUTH_BASE_URL=<origen local de Rooms> pnpm fe:capture rooms-access-issue --env=local`. Contra un `next start` del build; el `next dev` ajeno puede servir copy viejo tras un cambio de rama.
+- Review dossier: `.captures/2026-10-31T16-33-22_rooms-access-issue/index.html` (local, no versionado); aprobación del operador en el chat del 2026-10-31.
+- Baseline decision / surface ID: `rooms.access-issue`; la captura aprobada del 2026-10-31 es la referencia, sin baseline de píxeles.
 
 ## Design Decision Log
+
+- 2026-10-31 — Revisión del operador: «Bricolaje en párrafos es muy denso, debe sí o sí jugar con sus contrastes en
+  pesos». El titular se parte en introducción liviana e idea principal en negrita, sin cambiar copy ni tamaño.
+- 2026-10-31 — Aprobada («Ok») sobre la captura con el contraste de pesos.
 
 - **Decisión:** escena oscura de la familia de la invitación, anillo sin esfera, una palabra y el motivo a la derecha.
 - **Alternativas:** reutilizar `StateSurface` (claro, pensado para 404/500 dentro del producto; no distingue motivos)
