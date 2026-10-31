@@ -130,3 +130,19 @@ audio, notas de Nexa, wave y meeting card). Antes de desplegar se corrió
 `scripts/public-website/verify-contacto-responsive-composition.ts` sobre el HTML vivo (asserts en verde, banda de
 273 px a 390 px, overflow 0) y después se comprobó desktop. La superficie desplegada fue mayor que los dos
 cambios pedidos y queda declarada como tal.
+
+## Release aplicado: Contacto v2 «La órbita» (2026-10-31)
+
+Cuatro despliegues del paquete acotado (`build-contacto-elementor-package.cjs` → `deploy-contacto-elementor-package.php`), cada
+uno contra un export vivo fresco, más un cambio estructural de Elementor:
+
+1. Widgets, CSS, JS, FAQ (`seo.php`) y 11 recursos nuevos (hero `CT1b` y su recorte móvil, avatar de Nexa, banderas, WhatsApp,
+   insignias de partner). La allowlist del instalador se amplió sólo a esas rutas.
+2. `reorder-contacto-closing.php`: el contenedor `48aab3e` (banda → cierre) pasa al final. Guardas: hash previo
+   `64d95ff1…`, identidad de la página, Home y chrome global intactos; hash nuevo `3963e548…`.
+3. Ajustes de CSS/JS: piel del sitio para el diálogo del CTA, botón turquesa, radios de imágenes frente a `.elementor img`.
+
+Contratos que no cambian: Growth Forms (`efeonce-contacto` v4) y Growth Meetings (`contacto-discovery-meeting`) siguen siendo
+dueños de validación, envío, disponibilidad y reserva; WordPress sólo presenta. La FAQ visible y su `FAQPage` salen de la misma
+función. Verificado en producción a 1440 y 390 px: orden de secciones, overflow 0, formulario y CTA cargados, agenda abierta desde
+el hero y la tarjeta sin marco extra, banderas circulares. No se creó ninguna reserva ni se envió el formulario.

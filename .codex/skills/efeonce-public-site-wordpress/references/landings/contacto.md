@@ -1,5 +1,25 @@
 # Contacto `/contacto/` — TASK-1801
 
+> **Delta 2026-10-31 — Contacto v2 «La órbita» en producción (operador: «implementa todo», directo a `/contacto/`).**
+> - **Fuente:** canvas Claude Design «Contacto — La órbita» (artifact privado), versión afinada aprobada por partes en comentarios.
+> - **Hero:** foto cine `CT1b` (aprobada 2026-10-30) a sangre completa; texto en el 40 % izquierdo; teléfono = **recorte directo de CT1b**
+>   (`contacto-nexa-hero-v2-mobile.jpg`), nunca una toma vertical generada: las dos generadas (`CT1v`) cambiaron el rostro de Nexa.
+>   Narración: se conserva la voz **Lucia** aprobada, ahora con subtítulos sincronizados a los silencios medidos del archivo (0 · 4,0 · 13,9 · 16,0 · 19,9 · 23,4 s).
+> - **Formulario:** Growth Forms sigue siendo dueño de campos, validación y envío; la página sólo retematiza `--ghf-*` a La órbita, agrega
+>   la línea de Nexa por motivo (valores publicados de v4), el plazo **«Te respondemos en un día hábil»** (confirmado por el operador
+>   2026-10-31; deroga el «no prometer plazo») y la franja de partners (HubSpot Gold, Salesforce Partner; SVG de `axis-brand-assets`).
+> - **Agenda:** sigue siendo el Growth CTA `contacto-discovery-meeting` (sólo diagnóstico, decisión del operador). Todo enlace
+>   `[data-contact-open-meeting]` (hero, cierre) pulsa ese CTA; su diálogo usa la piel del sitio (`data-eo-meeting-skin="site"`):
+>   el agendador es la ventana, sin marco encima. Sin renderer o CTA vacío, el enlace va a `/agenda/`.
+> - **Contacto directo** editorial (íconos Tabler, banderas circulares flag-icons, copiar correo, **WhatsApp** del móvil confirmado
+>   por el operador, «Cómo llegar» a Maps). **Cierre** «¿Lo conversamos?» = el widget `greenhouse_contact_meeting_band` reconvertido,
+>   movido al final por `scripts/public-website/reorder-contacto-closing.php` (snapshot `_gh_contacto_before_v2_20261031_114459`).
+> - **Header y footer**: los globales del sitio, sin tocar (el script verifica el chrome global).
+> - **Trampas medidas:** `.elementor img` borra `border-radius`/`box-shadow` y fija `height:auto` (subir especificidad); el botón del CTA
+>   heredaba un degradado con `!important` (se corrigió en su regla de origen); el instalador tiene allowlist de rutas: un recurso nuevo
+>   exige ampliarla. Backups en el servidor: `/tmp/eo-contacto-widgets-before-20261031-{114441,114748,114915,115059}.tar`.
+> - **Pendiente:** el código de la landing nunca se versionó en `efeonce-public-site-runtime` (archivos `??` desde TASK-1801): falta su backport.
+
 > **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-contacto` v4 entrega en `direct` al formulario HubSpot «Contact Form - EO» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
 
 > **Delta 2026-10-16 — Nexa canónica, voz nueva, OG v3, cache-busting y medición Meta.**

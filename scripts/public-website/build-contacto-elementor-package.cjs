@@ -21,6 +21,18 @@ const relativeFiles = [
   'assets/img/contact/contacto-careers-cap.png',
   'assets/img/contact/contacto-og-1200x630.png',
   'assets/audio/nexa-contacto.mp3',
+  // Contacto v2 (2026-10-31): hero cine de Nexa, avatar, banderas, WhatsApp e insignias de partner.
+  'assets/img/contact/contacto-nexa-hero-v2.jpg',
+  'assets/img/contact/contacto-nexa-hero-v2-mobile.jpg',
+  'assets/img/contact/contacto-nexa-avatar.jpg',
+  'assets/img/contact/whatsapp.svg',
+  'assets/img/contact/flags/cl.svg',
+  'assets/img/contact/flags/us.svg',
+  'assets/img/contact/flags/co.svg',
+  'assets/img/contact/flags/mx.svg',
+  'assets/img/contact/flags/pe.svg',
+  'assets/img/contact/partners/hubspot-solutions-partner-gold-light.svg',
+  'assets/img/contact/partners/salesforce-partner-badge-horizontal.svg',
 ]
 
 const files = relativeFiles.map(relative => {

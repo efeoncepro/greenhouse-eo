@@ -57,6 +57,12 @@ la web») queda con esta excepción declarada.
   portador legítimo (la regex `PORTADOR_AZUL` no lo reconoce). Queda anotado para que el operador decida si sumarlo al
   casebook.
 
+
+**Adenda 2026-10-31 — versión vertical para teléfono.** Dos tomas `CT1v` (9:16, misma ficha recompuesta) **cambiaron el rostro de
+Nexa** aunque pasaron `foto:validar:cine` y la segunda recibió APROBABLE del `cine-reviewer`; el operador lo vio a simple vista
+(«la cara se tergiversó muchísimo»). `foto:rostro` sólo midió la proporción (0,76 y 0,74 contra 0,78 de CT1b), no la identidad.
+Regla para este caso: **la versión vertical de un hero cine aprobado sale de recortar el plate aprobado** (CT1b 820×1024 desde
+x=770), no de regenerarlo; regenerar reconstruye la cara. Plates rechazados en `plates/CT1v.png` y `plates/CT1v-r1.png`.
 ## Delta 2026-10-25 — Manzanitas sin persona cuando la persona no porta la idea (operador)
 
 **Decisión del operador (2026-10-25):** «mi problema no es que muestre personas, mi problema es que lo haga todo el
