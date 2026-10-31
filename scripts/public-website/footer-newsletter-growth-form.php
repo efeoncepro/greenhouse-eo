@@ -14,6 +14,8 @@
  * Re-running it once the block is in place only refreshes the block's content (new snapshot each run).
  * Footer v3 (2026-10-31): the column title is the official Glitch negative logo, served by the site menu's AXIS vendor
  * folder (site-nav 0.7.13); if that folder moves, update the URL here.
+ * `inline-initial-state="open"` (renderer 1.4.0): the form shows open, as approved in the canvas. A renderer older than
+ * 1.4.0 ignores the attribute and shows the usual button, so it is safe before the release.
  * Rollback: restore `sidebars_widgets` and `widget_block` from the snapshot option, then purge.
  */
 if ( ! defined( 'ABSPATH' ) || ! class_exists( 'WP_CLI' ) ) { exit; }
@@ -69,7 +71,7 @@ $content = <<<'HTML'
 <section class="eo-footer-newsletter" aria-labelledby="eo-footer-newsletter-title">
 <h3 id="eo-footer-newsletter-title" class="title widget-title"><img src="https://efeoncepro.com/wp-content/themes/ohio-child/assets/vendor/axis/site-nav/0.7.13/brand/glitch-logo-negative.svg" alt="Glitch" width="74" height="20"></h3>
 <p class="eo-footer-newsletter__lede">El newsletter semanal de IA, marketing y negocios, en tu correo.</p>
-<greenhouse-form class="eo-inline-pill eo-inline-pill--glitch" form-key="6bc62588-a4a0-4214-9501-13b0c2948c81" surface="fhsf-efeonce-blog-subscription" base-url="https://greenhouse.efeoncepro.com" locale="es-CL" color-scheme="dark" appearance="bare"><a href="https://efeoncepro.com/blog/" class="ghf-fallback">Suscríbete a Glitch</a><p class="eo-footer-newsletter__note" aria-hidden="true">Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.</p></greenhouse-form>
+<greenhouse-form class="eo-inline-pill eo-inline-pill--glitch" form-key="6bc62588-a4a0-4214-9501-13b0c2948c81" surface="fhsf-efeonce-blog-subscription" base-url="https://greenhouse.efeoncepro.com" locale="es-CL" color-scheme="dark" appearance="bare" inline-initial-state="open"><a href="https://efeoncepro.com/blog/" class="ghf-fallback">Suscríbete a Glitch</a><p class="eo-footer-newsletter__note" aria-hidden="true">Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.</p></greenhouse-form>
 </section>
 <script>(function(){var S='https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js';var el=document.querySelector('.eo-footer-newsletter greenhouse-form');if(!el)return;function load(){if(window.customElements&&customElements.get('greenhouse-form'))return;if(document.querySelector('script[src^="'+S+'"]'))return;var s=document.createElement('script');s.src=S;s.async=true;s.id='gh-growth-forms-renderer-latest-js';document.head.appendChild(s);}if(!('IntersectionObserver' in window)){load();return;}var io=new IntersectionObserver(function(es){for(var i=0;i<es.length;i++){if(es[i].isIntersecting){io.disconnect();load();return;}}},{rootMargin:'800px 0px'});io.observe(el);})();</script>
 <!-- /wp:html -->

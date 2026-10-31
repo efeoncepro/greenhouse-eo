@@ -47,6 +47,10 @@ del copyright desde el respaldo más antiguo que corresponda, y purgar la caché
 - El fondo lleva `!important` en el adaptador porque `ohio-child/assets/css/global-fixes.css` fija
   `#161519 !important` en todas las páginas salvo Home. Ese archivo no tiene carril de despliegue gobernado. Cuando lo
   tenga, conviene borrar esa regla y quitar el `!important` del adaptador.
-- La columna de Glitch muestra el botón «Suscríbete a Glitch» a lo ancho. La versión aprobada en el canvas lo muestra ya
-  abierto como formulario, pero el componente de Growth Forms no tiene hoy esa opción: se agrega en Greenhouse y se
-  publica con un release.
+- **Glitch abierto como formulario:** el footer ya declara `inline-initial-state="open"` (renderer 1.4.0, commit
+  `c2cce26e0`, empujado a develop el 31/10). El renderer de producción todavía es 1.2.0, que ignora el atributo y
+  muestra el botón. Se verá abierto cuando salga el próximo release de Greenhouse a producción, sin tocar WordPress.
+- **Enlaces legales sin «|»:** `legal-links.php` (respaldos `_gh_footer_v3_legal_before_20261031_142344` y `…_142453`)
+  los separa con 28 px (24 en teléfono). La barra la agrega el plugin de consentimiento `eo-measurement-consent`
+  (`efeonce-cookie-preferences-mount`); el adaptador la oculta con tamaño de letra 0 en el contenedor. El arreglo limpio
+  es dejar de agregarla en ese plugin.
