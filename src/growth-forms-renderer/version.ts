@@ -16,8 +16,12 @@
  *
  * `1.3.0` (2026-10-24, TASK-2056): logo opcional en el rótulo de la píldora, declarado por el anfitrión
  * (`inline-label-logo` + `inline-label-logo-text`); el nombre accesible sigue siendo el texto completo.
+ *
+ * `1.4.0` (2026-10-31): atributo de anfitrión `inline-initial-state="open"` — la píldora nace con el campo de
+ * correo a la vista, sin mover el foco ni hacer scroll, y Escape no la pliega. Lo usa el footer de efeoncepro.com;
+ * sin el atributo, nada cambia.
  */
-export const RENDERER_VERSION = '1.3.0'
+export const RENDERER_VERSION = '1.4.0'
 
 /** Debe ser idéntico a `CONTRACT_VERSION` de la SoT (parity test lo verifica). */
 export const RENDERER_CONTRACT_VERSION = 'greenhouse-growth-public-forms.v1'

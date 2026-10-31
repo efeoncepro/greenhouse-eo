@@ -358,7 +358,17 @@ mientras envía. Evento DOM `ghf:success` (`detail: { formKey, formSlug, instanc
 otra instancia del mismo `formKey` en la página pasa a «listo» sin reenviar; también lo escucha un formulario estándar.
 
 Teclado: Enter abre y el foco entra al campo a los 260 ms; Esc con el campo vacío cierra y devuelve el foco al botón; tras
-el éxito el foco va al mensaje. Errores en línea bajo la píldora; «Reintentar» sólo ante red, `rate_limited` o `error`.
+el éxito el foco va al mensaje.
+
+Atributos de anfitrión del elemento (`<greenhouse-form>`), opcionales:
+
+| Atributo | Efecto | Desde |
+|---|---|---|
+| `inline-label-logo` + `inline-label-logo-text` | Logo que reemplaza la palabra final del rótulo de apertura (URL https o relativa a la raíz). | 1.3.0 |
+| `inline-initial-state="open"` | La píldora nace en `open`: campo y botón de envío a la vista y en el orden de foco, aviso visible. No mueve el foco ni hace scroll al montar, y Esc no la pliega. Otro valor o ninguno = `idle`. | 1.4.0 |
+
+El envío, la validación, el consentimiento (`consentBy: 'submission'` con el hash del aviso) y la telemetría son los mismos
+en los dos estados iniciales. Primer uso: el footer de efeoncepro.com (2026-10-31). Errores en línea bajo la píldora; «Reintentar» sólo ante red, `rate_limited` o `error`.
 Movimiento reducido: sin estiramiento, pulso ni dibujo. Gate visual: `node scripts/growth/forms/fixtures/inline-pill.scenario.mjs`
 (evidencia en `docs/ui/reviews/TASK-2054-growth-form-inline-pill-renderer/`).
 

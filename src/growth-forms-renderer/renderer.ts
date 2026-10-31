@@ -78,6 +78,11 @@ export interface FormRendererOptions {
   /** TASK-2056 — Logo que reemplaza la palabra final del rótulo de la píldora (lo declara el anfitrión). */
   inlineLabelLogo?: { src: string; text: string }
   /**
+   * Estado con que nace la píldora `inline_pill` (lo declara el anfitrión). `open` = el campo nace a la vista, sin
+   * mover el foco ni hacer scroll, y Escape no lo pliega en un botón que la persona nunca vio. Default `idle`.
+   */
+  inlineInitialState?: 'idle' | 'open'
+  /**
    * `true` cuando el core se monta DENTRO de un host `<greenhouse-form>` (custom element).
    * En ese caso el host ES el scope: declara los tokens `--ghf-*`, `container-type`,
    * `display` y la box-sizing (`greenhouse-form *`). El wrapper interno NO debe llevar
@@ -3504,7 +3509,7 @@ export class FormRenderer {
     })
 
     refs.input.addEventListener('keydown', event => {
-      if (event.key !== 'Escape' || this.inlineState !== 'open') return
+      if (event.key !== 'Escape' || this.inlineState !== 'open' || this.opts.inlineInitialState === 'open') return
       if (refs.input.value.trim() !== '') return
       event.preventDefault()
       this.closeInline()
@@ -3525,7 +3530,8 @@ export class FormRenderer {
 
     if (emailField && typeof this.values[emailField.key] === 'string') refs.input.value = String(this.values[emailField.key])
 
-    this.setInlineState(this.succeeded ? 'done' : 'idle')
+    // Nace abierta sin `openInline()`: abrir así movería el foco al campo y la página saltaría al formulario.
+    this.setInlineState(this.succeeded ? 'done' : this.opts.inlineInitialState === 'open' ? 'open' : 'idle')
   }
 
   private setInlineState(state: InlinePillState): void {

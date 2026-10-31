@@ -82,6 +82,13 @@ export const resolveInlineLabelLogo = (src: string | null, text: string | null):
 }
 
 /**
+ * Estado con que nace la píldora, declarado por el anfitrión con `inline-initial-state`. Sólo `open` cambia algo: la
+ * píldora nace con el campo de correo a la vista (sin mover el foco ni hacer scroll). Cualquier otro valor, o
+ * ninguno, deja el comportamiento de siempre: el botón que se abre.
+ */
+export const resolveInlineInitialState = (value: string | null): 'idle' | 'open' => ((value ?? '').trim().toLowerCase() === 'open' ? 'open' : 'idle')
+
+/**
  * Una copia del rótulo: texto plano o, con logo y si el rótulo termina en su palabra, el texto previo + el logo.
  * El logo de la copia visible lleva la palabra como `alt` (el nombre accesible sigue completo); la decorativa, vacío.
  */

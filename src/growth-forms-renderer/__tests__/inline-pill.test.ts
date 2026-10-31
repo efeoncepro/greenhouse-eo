@@ -10,7 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { RendererApiConfig } from '../api-client'
 import type { RenderContract } from '../contract'
 import { eventInlinePillContractFixture, glitchInlinePillContractFixture, staticContractFixture } from '../fixtures'
-import { resolveInlineLabelLogo } from '../inline-pill'
+import { resolveInlineInitialState, resolveInlineLabelLogo } from '../inline-pill'
 import { FormRenderer } from '../renderer'
 import { GROWTH_FORM_SUCCESS_EVENT } from '../telemetry'
 
@@ -33,7 +33,7 @@ const fetchStub = (...responses: FetchResponse[]) => {
 const mount = (
   contract: RenderContract = glitchInlinePillContractFixture(),
   fetchImpl = fetchStub(),
-  extra: { initialValues?: Record<string, string>; inlineLabelLogo?: { src: string; text: string } } = {}
+  extra: { initialValues?: Record<string, string>; inlineLabelLogo?: { src: string; text: string }; inlineInitialState?: 'idle' | 'open' } = {}
 ) => {
   const root = document.createElement('div')
 
@@ -348,5 +348,56 @@ describe('TASK-2056 · logo en el rótulo', () => {
     await openAndType(root, 'ana@empresa.com')
     expect(root.querySelectorAll('[data-ghf-part="inline-logo"]')).toHaveLength(2)
     expect(q(root, 'inline-send').querySelector('img')).toBeNull()
+  })
+})
+
+describe('Píldora que nace abierta (inline-initial-state="open")', () => {
+  it('nace con el campo a la vista y alcanzable, sin mover el foco', async () => {
+    const before = document.createElement('button')
+
+    document.body.appendChild(before)
+    before.focus()
+    const { root } = mount(glitchInlinePillContractFixture(), fetchStub(), { inlineInitialState: 'open' })
+
+    expect(state(root)).toBe('open')
+    expect(q(root, 'inline-input').getAttribute('tabindex')).toBe('0')
+    expect(q(root, 'inline-send').getAttribute('tabindex')).toBe('0')
+    expect(q(root, 'inline-open').getAttribute('aria-hidden')).toBe('true')
+    expect(root.querySelector('form.ghf-inline-form')!.getAttribute('aria-hidden')).toBe('false')
+
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(document.activeElement).toBe(before)
+  })
+
+  it('Esc con el campo vacío no la pliega en un botón que nunca se vio', async () => {
+    const { root } = mount(glitchInlinePillContractFixture(), fetchStub(), { inlineInitialState: 'open' })
+    const input = q<HTMLInputElement>(root, 'inline-input')
+
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+    await vi.advanceTimersByTimeAsync(60)
+    expect(state(root)).toBe('open')
+  })
+
+  it('envía igual que la píldora que se abre: enviando → éxito con el mismo POST', async () => {
+    const fetchImpl = fetchStub({ status: 202, body: { outcome: 'accepted', submissionId: 'fsub-open' } })
+    const { root } = mount(glitchInlinePillContractFixture(), fetchImpl, { inlineInitialState: 'open' })
+    const input = q<HTMLInputElement>(root, 'inline-input')
+
+    input.value = 'ana@empresa.com'
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+    submit(root)
+    expect(state(root)).toBe('loading')
+    await flush()
+
+    expect(fetchImpl).toHaveBeenCalledTimes(1)
+    expect(state(root)).toBe('success')
+  })
+
+  it('sin el atributo, o con otro valor, nace como siempre: el botón en reposo', () => {
+    expect(state(mount().root)).toBe('idle')
+    expect(resolveInlineInitialState('open')).toBe('open')
+    expect(resolveInlineInitialState(' OPEN ')).toBe('open')
+
+    for (const value of [null, '', 'idle', 'abierta', 'true']) expect(resolveInlineInitialState(value)).toBe('idle')
   })
 })

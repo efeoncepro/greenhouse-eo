@@ -135,3 +135,12 @@ El tono también lo decide el anfitrión: en el footer el operador rechazó el v
 sitio), así que la píldora usa papel `#f7f8f6` + texto navy, turquesa `#36c8bf` en hover y foco, `--ghf-inline-height:46px`,
 `--ghf-inline-send-height:36px` y borde abierto papel al 22 %, todo por variables. El verde sigue siendo el de Glitch
 dentro del blog.
+
+### Nacer abierta (`inline-initial-state="open"`, renderer 1.4.0)
+
+Para un anfitrión que quiere el campo a la vista desde el inicio (el footer de efeoncepro.com, 2026-10-31): el atributo
+`inline-initial-state="open"` monta la píldora en `open` sin `openInline()`, así que **no mueve el foco ni hace scroll**
+(abrir con el foco haría saltar la página al formulario). Esc no la pliega en un botón que la persona nunca vio. El envío,
+la validación y el consentimiento por el acto son idénticos. Sin el atributo, nada cambia (el blog sigue con su botón).
+Pruebas: bloque «Píldora que nace abierta» de `src/growth-forms-renderer/__tests__/inline-pill.test.ts`. En una
+columna de menos de 480 px el campo abierto ocupa todo el ancho (consulta de contenedor del renderer).

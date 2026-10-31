@@ -15,7 +15,7 @@ import type { RenderContract } from './contract'
 import { ContractLoadError, fetchRenderContract, type RendererApiConfig } from './api-client'
 import { resolveSystemCopy } from './copy'
 import { ensureStylesInjected } from './styles'
-import { resolveInlineLabelLogo } from './inline-pill'
+import { resolveInlineInitialState, resolveInlineLabelLogo } from './inline-pill'
 import { FormRenderer } from './renderer'
 import { RENDERER_VERSION } from './version'
 
@@ -46,7 +46,8 @@ export class GreenhouseFormElement extends HTMLElement {
     'appearance',
     'initial-values',
     'inline-label-logo',
-    'inline-label-logo-text'
+    'inline-label-logo-text',
+    'inline-initial-state'
   ]
 
   private internals: ElementInternals | null = null
@@ -178,6 +179,7 @@ export class GreenhouseFormElement extends HTMLElement {
       initialValues: this.initialValues(),
       colorScheme: this.forcedColorScheme(),
       inlineLabelLogo: this.inlineLabelLogo(),
+      inlineInitialState: resolveInlineInitialState(this.getAttribute('inline-initial-state')),
       doc,
       // El custom element ES el scope (declara tokens + container-type + box-sizing vía
       // el selector `greenhouse-form`). El wrapper interno NO lleva `.ghf-scope` para no

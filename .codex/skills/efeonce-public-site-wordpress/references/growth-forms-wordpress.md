@@ -186,6 +186,9 @@ disconnected, HubSpot only through the collector); `ohio_widget_subscribe-2` sit
 the `#colophon:has([data-eo-footer-partners="v2"])` prefix to beat the footer adapter's `p { margin: 0 }`.
 The footer dresses the pill in its own paper and teal (paper `#f7f8f6` + navy text, teal `#36c8bf` on hover/focus,
 46 px high), not Glitch green: the operator found the green clashed with the site palette. Variables only.
+Since renderer 1.4.0 a host can add `inline-initial-state="open"`: the pill mounts open (field and submit visible and
+focusable) without moving focus or scrolling, and Escape does not collapse it. Same submission and consent. Without it,
+nothing changes. The footer uses it once that renderer is in production.
 
 Host recipe (each rule fixed a live break on 2026-10-24):
 
