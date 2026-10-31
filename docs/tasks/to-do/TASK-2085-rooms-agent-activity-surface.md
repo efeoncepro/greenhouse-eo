@@ -1,6 +1,6 @@
 # TASK-2085 — Rooms: pantalla «Actividad de agentes» con reversa
 
-## Delta 2026-10-31 — propuesta del slice 1 en el canvas (pendiente de aprobación)
+## Delta 2026-10-31 — propuesta del slice 1 en el canvas (aprobada 2026-10-31)
 
 - Canvas `https://claude.ai/artifact/DX8VgavaqqZmHYXRbKVjeL`, fila «El lado de Efeonce — lo que hicieron tus agentes»:
   artboards `Actividad.dc.html` (casa 1440 × 900, con vista por sala desde la lista de salas, filtros, tope, rechazo,
@@ -12,7 +12,7 @@
   el punto hueco; un tope o un rechazo choca contra el umbral. Las acciones `author` se quedan del lado de la mesa.
 - Agrega movimiento propio (gramática en la nota «Motion — el umbral» del canvas). Si el operador lo aprueba, se crea
   `docs/ui/motion/TASK-2085-rooms-agent-activity-surface-motion.md` y `Motion` deja de ser `none`.
-- `UI ready` sigue en `no` hasta la aprobación.
+- **Aprobado por el operador el 2026-10-31** («Bien, aprobadas»). Motion en `docs/ui/motion/TASK-2085-rooms-agent-activity-surface-motion.md`.
 
 ## Delta 2026-10-31 — nombres finales de TASK-2084 (implementada en local)
 
@@ -42,10 +42,10 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-2085-rooms-agent-activity-surface.md`
 - Flow: `docs/ui/flows/TASK-2085-rooms-agent-activity-surface-flow.md`
-- Motion: `none`
+- Motion: `docs/ui/motion/TASK-2085-rooms-agent-activity-surface-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-052`
 - Status real: `Diseno`
@@ -107,7 +107,7 @@ Reglas obligatorias:
 - Los datos del invitado se muestran tal como el reader los entrega, enmascarados según quien mira.
 - Bricolage en texto de varias líneas alterna pesos (frase clave pesada, el resto ligero); nunca un bloque entero en
   negrita. Regla del operador del 2026-10-31.
-- No existe dirección visual aprobada para esta superficie: no inventarla. `UI ready: no` hasta la aprobación.
+- Dirección visual aprobada el 2026-10-31 («el umbral», canvas de Rooms); implementar desde los artboards y el contrato de motion, sin reinventar.
 
 ## Normative Docs
 
@@ -246,15 +246,14 @@ Reglas obligatorias:
 
 ### Motion & microinteractions
 
-- Motion primitive: `none`
+- Motion primitive: `CSS` con tokens de movimiento de Rooms (contrato «el umbral», ver Motion en Status)
 - Enter / exit: el `Dialog` de AXIS conserva su comportamiento por defecto; nada propio.
 - Layout morph: ninguno.
 - Stagger: ninguno.
 - Timing / easing token: no aplica.
 - Reduced-motion fallback: sin desplazamiento animado al enfocar una acción; el diálogo hereda el fallback de AXIS.
-- Non-goal motion: entradas que llegan en vivo, contadores animados u órbitas como loader. Si el canvas aprobado
-  agrega movimiento propio, crear `docs/ui/motion/TASK-2085-rooms-agent-activity-surface-motion.md` y actualizar
-  `Motion` en Status.
+- Non-goal motion: entradas que llegan en vivo, contadores animados u órbitas como loader. El canvas aprobado agrega
+  movimiento propio; su contrato vive en `docs/ui/motion/TASK-2085-rooms-agent-activity-surface-motion.md`.
 
 ### Implementation mapping
 

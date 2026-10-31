@@ -130,3 +130,17 @@ Pendiente: capturas desktop/móvil, grabación de interacciones, contraste, tecl
 La [definición de perfiles](../../architecture/rooms/EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md) añade lectura editorial a ancho útil y radiografía bajo demanda: seleccionar fragmento revela decisión/evidencia, con referencia de origen persistente. Desktop puede dividir el plano; móvil usa panel legible y retorno al bloque. Planes y hallazgos conservan jerarquía editorial, sin convertir la sala en un dashboard de tarjetas. Las visualizaciones ofrecen valores/unidades y alternativa tabular; colores de estado no sustituyen etiquetas.
 
 El instrumento usa Bricolage/Poppins de La órbita aunque reutilice el contrato funcional X-ray; jamás importa su tipografía histórica por defecto. La pieza cliente conserva su identidad. Una sala combinada mantiene el mismo marco al pasar de argumento a artículo, radiografía o video. QA exige ambos perfiles y la transición entre ellos.
+
+## Aprobación 2026-10-31 — el umbral
+
+El operador aprobó («Bien, aprobadas») la fila «El lado de Efeonce — lo que hicieron tus agentes» del canvas
+`https://claude.ai/artifact/DX8VgavaqqZmHYXRbKVjeL`: `Actividad.dc.html`, `CrearSala.dc.html` y `ActividadMovil.dc.html`.
+
+- **Gesto propio de la administración:** el umbral. Una línea vertical separa «tu mesa» (papel) de una banda oscura
+  «Ya salió de tu mesa». Lo que un agente publica, invita o da cruza esa línea con un hilo; deshacer lo recoge y deja
+  su huella; un tope o un rechazo choca contra la línea. No usa la órbita: aquí lo que se mide es el cruce al cliente.
+- **Tipografía:** Bricolage para decir, con la regla de pesos en texto de varias líneas («Lo que hicieron **tus
+  agentes.**», «Pídeselo a **tu agente.**»); Poppins para explicar y operar.
+- **Agentes primero:** «Crear sala» ofrece primero pedírselo al agente y después el formulario manual.
+- Contratos: [wireframe](../wireframes/TASK-2085-rooms-agent-activity-surface.md) y
+  [motion](../motion/TASK-2085-rooms-agent-activity-surface-motion.md).

@@ -5,13 +5,11 @@ Contrato de contenido, estados e interacción escrito el 2026-10-31 desde el có
 [ADR del carril de agentes](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) (Accepted) y
 [quién ve qué](../../documentation/rooms/quien-ve-que-en-rooms.md).
 
-> **La dirección visual de esta superficie NO está aprobada.** En el canvas de administración
-> (`https://claude.ai/artifact/DX8VgavaqqZmHYXRbKVjeL`), la fila «El lado de Efeonce — administrar salas» se pausó el
-> 2026-10-31 para rediseñarla con los agentes primero. Ahí sólo existe el artboard «Recorrido · Efeonce y el cliente»
-> (mapa de pasos con modo «Qué existe hoy»). No hay artboard de «Actividad de agentes», de la vista por sala, del
-> diálogo de reversa ni de «Crear sala». Las regiones de este documento son **estructura de contenido** para diseñar
-> esos artboards en el slice 1, no una composición aprobada. `UI ready` sigue en `no` hasta que el operador apruebe
-> el canvas y este documento se actualice con el asset aprobado.
+> **Dirección visual aprobada el 2026-10-31** («Bien, aprobadas»): concepto «el umbral» en el canvas
+> `https://claude.ai/artifact/DX8VgavaqqZmHYXRbKVjeL`, fila «El lado de Efeonce — lo que hicieron tus agentes»,
+> artboards `Actividad.dc.html` (casa y vista por sala), `CrearSala.dc.html` y `ActividadMovil.dc.html`. Las regiones
+> de abajo siguen siendo el contrato de contenido; el canvas fija la composición y el
+> [contrato de motion](../motion/TASK-2085-rooms-agent-activity-surface-motion.md) el movimiento.
 
 ## Problema
 
@@ -26,7 +24,21 @@ Contrato de contenido, estados e interacción escrito el 2026-10-31 desde el có
 
 ## Visual Direction Contract
 
-- Estado: **pendiente**. Ninguna dirección aprobada para esta superficie.
+- Visual direction mode: source-led
+- Product Design asset: `docs/ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md`
+- Estado: **aprobada 2026-10-31**. Composición del canvas:
+  - Casa 1440 × 900: encabezado de producto; a la izquierda la región «Tus salas» (320 px) con atajos Abrir sala,
+    Autoría, Invitaciones y Actividad (esta última filtra la casa a la sala); al centro la introducción con el `h1`
+    «Lo que hicieron **tus agentes.**» y «Crear sala»; filtros «Llega al cliente | Todo» y «En mi nombre | Todo el
+    equipo»; el feed por día.
+  - **El umbral**: una línea vertical separa «tu mesa» (papel) de una banda oscura «Ya salió de tu mesa». Cada entrada
+    `release`/`access` cruza con un hilo hacia un punto que dice qué ve el otro lado («Volta ve la edición 4») y, a su
+    lado, la reversa en contorno claro. Revertida: hilo recogido, huella punteada, punto hueco. Tope y rechazo chocan
+    contra el umbral («No cruzó.»). Las acciones `author` se quedan en la mesa («Sigue en tu mesa»).
+  - «Crear sala»: diálogo en dos columnas; izquierda «Pídeselo a **tu agente.**» con la instrucción copiable y los
+    pasos que seguirá el agente; derecha el formulario manual.
+  - Móvil 390 × 844: selector «Actividad | Salas»; el umbral pasa a horizontal dentro de cada entrada (franja oscura
+    con borde de acento) y la confirmación es una hoja inferior.
 - Modo previsto: `source-led`, con el canvas de administración como fuente duradera una vez aprobado.
 - Dirección madre vigente: [Rooms — dirección visual V1](../visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md)
   (canvas «la sala es una órbita», aprobado el 2026-10-29 para la experiencia del cliente y la autoría). Aplica a esta
@@ -286,6 +298,7 @@ Lo que esta superficie necesita por entrada. Lo marcado con † no está declara
   `reversal-confirm-focus` (confirmar, el foco queda en «Revertida por…»).
 - Assertions: `h1` visible, al menos una entrada con reversa, sin error boundary, sin scroll horizontal en los tres
   anchos.
+- Scroll-width checks: `scrollWidth <= clientWidth` en 1440, 1280 y 390, en todos los estados capturados.
 - Reduced motion: `reducedMotionCheck`.
 - Review dossier: `.captures/<ISO>_rooms-agent-activity/index.html`; scorecard
   `docs/ui/reviews/TASK-2085-rooms-agent-activity-surface.scorecard.json`.
@@ -293,8 +306,8 @@ Lo que esta superficie necesita por entrada. Lo marcado con † no está declara
 
 ## Design Decision Log
 
-- 2026-10-31 — **Sin dirección aprobada.** La fila de administración del canvas se pausó para rediseñarla con los
-  agentes primero; sólo existe el artboard «Recorrido». El slice 1 diseña y pide aprobación antes de cualquier JSX.
+- 2026-10-31 — **Aprobado «el umbral»** en el canvas (casa, crear sala, móvil). Antes de eso la fila de administración
+  estaba pausada y sólo existía el artboard «Recorrido».
 - 2026-10-31 — La casa del equipo es la actividad, no la lista de salas: el trabajo diario lo hacen agentes y la
   seguridad del ADR depende de ver y deshacer (D3, D4).
 - 2026-10-31 — Filtro por defecto «Llega al cliente» + «En mi nombre»: es exactamente lo que el aviso de D3 le
