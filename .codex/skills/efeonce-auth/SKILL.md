@@ -5,17 +5,19 @@ description: Operate and extend Efeonce Auth / Efeonce ID — the native OAuth/O
 
 # Efeonce Auth / Efeonce ID (skill viva)
 
-**Corte 2026-10-29:** leer el [mapa Auth+Rooms](../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md)
-antes de operar. El canary del 26-10 cerró OFF y no se repite. Login V4,
-guards de deploy y Job aislado de rotación tienen avances en el candidato
-`codex/auth-pr-develop-stack`; ese HEAD no está en las PR remotas ni en
-producción. El Job nace OFF/dry-run y no tiene Scheduler; recuperación y
-retirement de llaves requieren supervisión. Release Auth permanece retenido.
-
-El [backend local ampliado de Rooms](../../../docs/audits/rooms/2026-10-29-backend-local-completion.md)
-ya está verificado en `3c7bcb5`: sus 337 tests, restore de trece migraciones y pruebas Chrome/API
-acreditan al consumer. Este corte no cambia fuentes, protocolo, flags ni release del issuer Auth.
-Conectar/aceptar la nueva UI y certificar los frentes externos de Rooms siguen en su propio programa.
+**Corte vigente 2026-10-31:** first-party y OTP de invitación están **ON en producción** (`vivo`):
+`auth-server-00169-4pq` al 100 % del tráfico (misma imagen que la 00168), con
+`AUTH_SERVER_FIRST_PARTY_ENABLED=true`, `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED=true` y los secretos
+`auth-server-rooms-invitation-otp-hmac:1` y `rooms-production-invitation-authority-token:1` montados;
+`/healthz`, `/readyz` y discovery en 200. **Rollback:** tráfico a `auth-server-00168-vzb` (flags OFF, sin esos
+secretos). La fuente durable son las variables de repo GitHub de ambos flags, en `true`. Se liberaron sólo para la
+activación de Rooms, por decisión del operador: las PR #263/#264 siguen abiertas y sin merge, y TASK-1833 sigue
+abierta. Ningún cliente real sin una autorización nueva. Recibo:
+[activación Rooms + Efeonce ID](../../../docs/audits/rooms/2026-10-31-production-activation.md).
+Pendiente nuevo de EPIC-044: delegación interactiva para un **segundo resource server** (audiencia Rooms), distinta
+de TASK-1917. Antecedentes: [mapa Auth+Rooms del 29-10](../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md)
+(Login V4, guards de deploy y Job de rotación OFF/dry-run en `codex/auth-pr-develop-stack`, aún no en producción)
+y canary del 26-10, cerrado y no se repite.
 
 Efeonce ID es el **autorizador propio** de Efeonce: OAuth 2.1/OIDC servido por Cloud Run `auth-server`
 en `auth.efeonce.org`. Se decidió el 2026-09-03 en lugar de WorkOS ([ADR nativo](../../../docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md))
@@ -38,6 +40,7 @@ esta skill dice qué hay que saber para trabajar sin repetir lo que ya costó un
 2. [`references/program-ledger.md`](references/program-ledger.md): estado vivo por task, qué está
    desplegado, qué está OFF y la secuencia pendiente. **Empezar aquí.**
 3. Estado y auditorías (cada recibo conserva su alcance local o cloud):
+   - [`docs/audits/rooms/2026-10-31-production-activation.md`](../../../docs/audits/rooms/2026-10-31-production-activation.md): activación Rooms + Efeonce ID (00169, flags ON, variables durables); vigente.
    - [`docs/audits/rooms/2026-10-29-backend-local-completion.md`](../../../docs/audits/rooms/2026-10-29-backend-local-completion.md): backend consumer construido; no release Auth ni prueba del servidor completo.
    - [`docs/audits/rooms/2026-10-28-two-rp-auth-ca97eecd1.md`](../../../docs/audits/rooms/2026-10-28-two-rp-auth-ca97eecd1.md): 35 checks con issuer QA y dos adapters del mismo consumer, con límites explícitos.
    - [`docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md`](../../../docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md): canary único real PASS, cerrado y flags OFF; no repetir correo.
@@ -75,16 +78,17 @@ Comandos útiles:
 - **Hay UN solo servicio Cloud Run `auth-server`** y es el que atiende el login del MCP. Un deploy o
   flag roto deja sin login a todo cliente MCP, no sólo a Rooms. Probar siempre `/.well-known/*`, JWKS y
   `readyz` después de cada revisión.
-- **Prender un flag de Auth es una mutación de PRODUCCIÓN.** Los flags viven en variables GitHub a nivel de repo y `deploy.sh` las lee.
+- **Cambiar un flag de Auth es una mutación de PRODUCCIÓN.** Los flags viven en variables GitHub a nivel de repo (inputs de `auth-server-deploy.yml`; el environment `production` no las sobreescribe) y `deploy.sh` las lee. **Esas variables son la fuente durable:** hoy `AUTH_SERVER_FIRST_PARTY_ENABLED` y `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` están en `true`, así que el próximo deploy gobernado conserva el estado.
+  - **Regla rota, ya conciliada:** la 00169 se creó con `gcloud run services update` manual, fuera del deploy gobernado. La configuración gobernada ya coincide con ese estado. No repetirlo: cambiar la variable de repo y desplegar por el workflow; si una emergencia obliga al update manual, conciliar la variable en el mismo paso y dejarlo en el ledger.
+  - **El tráfico está fijado por revisión.** Una revisión nueva no recibe tráfico sola; moverlo (o hacer rollback a `auth-server-00168-vzb`) exige `gcloud run services update-traffic` explícito y readback.
   - El YAML remoto de `main`/`develop` aún es el anterior: el push de `develop` puede tocar el host real **sin pasar por promoción**. El guard visible en el workspace no lo protege hasta integrar las PR.
-  - **Retención humana vigente:** PR #263 `main` HEAD `5e1fc2554` y PR #264 `develop` HEAD `aabd6d78d` abiertas; sin merge, deploy ni disable/enable de workflows. Antes de una eventual integración de PR #264, evaluar los filtros gruesos `src/lib/**` de artifact/commercial/ico/ops; no se aplicó protección temporal ahora.
+  - **Retención humana vigente:** PR #263 `main` HEAD `5e1fc2554` y PR #264 `develop` HEAD `aabd6d78d` siguen abiertas; sin merge, release #262 ni disable/enable de workflows. Liberar first-party y OTP para Rooms no levantó esa retención. Antes de una eventual integración de PR #264, evaluar los filtros gruesos `src/lib/**` de artifact/commercial/ico/ops; no se aplicó protección temporal.
   - Hacerlo sólo deliberadamente, con autorización explícita, y conciliar antes qué host sirve cada revisión.
-- **El HMAC del OTP y el token de autoridad de Rooms sólo se requieren con el flag ON.** En el readback final ambos flags están OFF y esos montajes ausentes. El retiro declarativo en `deploy.sh` está corregido localmente y en PR; no asumir que el remoto ya lo incorpora.
-- **El correo real tiene un único destinatario autorizado** (`jreyes@efeoncepro.com`) y se manda una sola vez, como canary.
-  - Leer el ledger y reconciliar entregas antes de enviarlo: un canary ya recibido no autoriza repetir el correo en otro despliegue.
-  - Ningún cliente.
-  - Ninguna ampliación sin una nueva autorización del operador.
-  - `email_type_config.auth_server_rooms_invitation_otp` nace en FALSE.
+- **El HMAC del OTP y el token de autoridad de Rooms sólo se requieren con el flag ON.** Hoy ambos flags están ON y los dos secretos montados en la 00169. `scripts/auth-server/rooms-config-drift.py` buscaba `ROOMS_INVITATION_AUTHORITY_TOKEN_REF` en lugar de `..._SECRET_REF` y con OTP ON siempre reportaba drift; el fix `51d9f3203` lo hace leer `SECRET_REFS` y agrega un test contra el workflow (contra la 00169 da `true`). El retiro declarativo en `deploy.sh` está corregido en PR; no asumir que el remoto ya lo incorpora.
+- **Correo real de invitación:** el canary del 26-10 ya se recibió y no se repite por otro despliegue.
+  - `email_type_config.auth_server_rooms_invitation_otp` está en `enabled=true` desde la activación del 2026-10-31.
+  - Ningún cliente real sin una autorización nueva del operador y sin cerrar TASK-1833.
+- **Segundo resource server = trabajo nuevo de EPIC-044.** El emisor tiene una sola audiencia y no hace canje. El carril de agentes de Rooms (ADR Accepted) necesita delegación interactiva para la audiencia Rooms (canje RFC 8693, claim `act`, autorización clase D10). TASK-1917 no la cubre: hace falta una task nueva, bloqueada por la retención de Efeonce ID.
 - **El preflight de promoción se corre contra `target-branch=main`.** Contra `develop` devuelve «batch unknown» y no aprueba nada.
 - **Readback de la revisión ACTIVA** (`gcloud run services describe auth-server`) después de cada deploy: `GIT_SHA`, flags y RP/origen. «Deploy verde» no es lo mismo que «flag aplicado».
 - **Un preparativo no prueba una integración.** RP registrado, secretos v1 o health/JWKS en 200 no acreditan firma nueva, sesión ni entrega de correo. El canary Rooms del 26 de octubre sí acreditó Microsoft/MFA, OIDC, PNG privado y un correo recibido; ya se cerró, no se repite ni amplía por inferencia.
@@ -93,7 +97,7 @@ Comandos útiles:
   principal interno, sesión issuer ni SSO. MCP stdio usa una sesión HTTP existente de Rooms y no inicia
   OAuth ni concede consentimiento MCP remoto. Un arnés con protocolo/store Auth reales no certifica
   `services/auth-server/server.ts` completo, dos productos RP, HTTPS, Microsoft/MFA o dispatch gateway.
-- **Nueva UI en entorno aislado sigue autorizada.** La retención de las PR y el acceso productivo OFF no bloquean diseño/desarrollo local. No autoriza publicación, activación ni aceptación visual de la nueva dirección.
+- **Nueva UI en entorno aislado sigue autorizada.** La retención de las PR no bloquea diseño/desarrollo local. No autoriza publicación, activación ni aceptación visual de la nueva dirección.
 - **El repo `greenhouse-eo` es PÚBLICO.** Los recibos con identificadores del operador viven fuera de git (`.auth/…`), nunca en `docs/`. Lo que ya se commiteó sigue en el historial.
 - **Seguridad (TASK-1833):** hay evaluación propia y revisión entre agentes, **sin pentest completo**; la cobertura ofensiva quedó bloqueada. No declarar «pentest hecho».
 - Paridad Full API: toda pantalla de Auth es cliente de un command o reader de `src/lib/auth-server/**`. Copy en `src/lib/copy/*`, tuteo es-CL.

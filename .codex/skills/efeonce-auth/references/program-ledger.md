@@ -4,6 +4,37 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-10-31 — First-party y OTP ON en producción para Rooms; PR #263/#264 siguen sin merge
+
+- Autorización del operador: «Prende todo» y, tras explicar qué implica liberar Efeonce ID, «Todo»; después
+  «Sí, fíjalos» para dejarlo durable. Recibo
+  [`2026-10-31-production-activation.md`](../../../../docs/audits/rooms/2026-10-31-production-activation.md).
+- `vivo`: `auth-server-00169-4pq` con el 100 % del tráfico, misma imagen que la 00168.
+  - `AUTH_SERVER_FIRST_PARTY_ENABLED=true` y `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED=true`.
+  - Secretos montados: `auth-server-rooms-invitation-otp-hmac:1` y `rooms-production-invitation-authority-token:1`.
+  - `/healthz`, `/readyz` y discovery en 200.
+  - **Rollback:** tráfico a `auth-server-00168-vzb` (los dos flags OFF y sin esos secretos). El tráfico está fijado
+    por revisión: moverlo exige `update-traffic` explícito.
+- `vivo`, fuente durable: variables de repo GitHub `AUTH_SERVER_FIRST_PARTY_ENABLED` y
+  `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` en `true` (inputs de `auth-server-deploy.yml`; el environment
+  `production` no las sobreescribe). El próximo deploy gobernado conserva el estado.
+- **Regla rota, documentada y conciliada:** la 00169 se creó con `gcloud run services update` manual, fuera del
+  deploy gobernado. La configuración gobernada (variables de repo) ya coincide con ese estado.
+- Fix `51d9f3203`: `scripts/auth-server/rooms-config-drift.py` buscaba `ROOMS_INVITATION_AUTHORITY_TOKEN_REF` en lugar
+  de `..._SECRET_REF`, así que con OTP ON siempre reportaba drift. Ahora usa `SECRET_REFS` y tiene un test contra el
+  workflow; contra la 00169 da `true`.
+- `vivo`: `greenhouse_notifications.email_type_config.auth_server_rooms_invitation_otp` en `enabled=true`.
+- `vivo`: el recorrido HTTP sin sesión de Rooms llega a `auth.efeonce.org/login` con `first_party_request`.
+- PR #263/#264 siguen abiertas y sin merge: los flags se liberaron sólo para esta activación, por decisión del
+  operador. La retención de release (#262) y de integración sigue vigente.
+- TASK-1833 (revisión de seguridad: B15/B20, incidente, señales) sigue abierta. Ningún cliente real sin una
+  autorización nueva.
+- Necesidad nueva de EPIC-044: el [carril de agentes de Rooms](../../../../docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md)
+  (Accepted) requiere delegación interactiva para un **segundo resource server**, la audiencia Rooms (canje RFC 8693,
+  `act`, autorización clase D10). TASK-1917 no la cubre; hace falta una task nueva, bloqueada por la retención de
+  Efeonce ID.
+- Falta: primer login humano real del operador en Rooms con la versión nueva.
+
 ## 2026-10-29 — Conciliación con backend local Rooms; issuer y release sin cambio
 
 - `doc`: el [recibo final de Rooms](../../../../docs/audits/rooms/2026-10-29-backend-local-completion.md)

@@ -5,6 +5,41 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## Estado vigente (2026-10-31, cierre del día)
+
+- Producción (`vivo`): `efeonce-rooms.vercel.app` sirve `main@a2d72c0` = `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG`
+  (PR #5, TASK-2082 + TASK-2083), sobre PR #4 `6f99a6f` (UI aprobada + «Vive el servicio»). `/rooms` 200,
+  `/auth/error` 200 y `/api/auth/session` sin sesión 401. Alias **manual**: tras cada deploy,
+  `vercel alias set <deploy> efeonce-rooms.vercel.app --scope efeonce-7670142f`.
+- `rooms_production`: migraciones 9–18 `vivo` (14:16 UTC, con ensayo en clon y respaldo lógico, ya borrado); la 19
+  `doc` (sesión de acceso).
+- Flags Production (`vivo`, valores releídos): `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`,
+  `ROOMS_MEDIA_ENABLED`, `ROOMS_LIVE_ENABLED`, `ROOMS_MEDIA_DISPATCH_ENABLED` = `true`;
+  `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` = `false`.
+- Efeonce ID (`vivo`): `auth-server-00169-4pq` con first-party y OTP ON; fuente durable en variables de repo GitHub.
+  Detalle y rollback en el ledger de `efeonce-auth`.
+- Acceso del operador: restaurado con SQL autorizado hasta 2027-10-31 (`vivo`) y adoptado por el bootstrap de
+  TASK-2082 como administrador hasta 2027-11-01 (`doc`). Todo acceso vence en máximo un año y se renueva.
+- Decisiones: ADR de escenas, de acceso interno durable y del carril de agentes, los tres **Accepted**. El carril de
+  agentes no tiene código.
+- Recibos: [activación](../../../../docs/audits/rooms/2026-10-31-production-activation.md) ·
+  [migraciones aplicadas](../../../../docs/audits/rooms/2026-10-31-production-migrations-applied.md) ·
+  [ensayo](../../../../docs/audits/rooms/2026-10-31-production-migration-rehearsal.md) ·
+  [acceso durable](../../../../docs/audits/rooms/2026-10-31-durable-access-production.md).
+- Lo que sigue, en orden:
+  1. Primer login real del operador con la versión nueva.
+  2. Carril de agentes: tasks según el orden del ADR; primero en Rooms: actor, aviso, «Actividad de agentes» con
+     reversa, cuotas y guard de clasificación.
+  3. Task nueva de EPIC-044: delegación interactiva para la audiencia de Rooms (canje RFC 8693, `act`, D10).
+     TASK-1917 no la cubre. Bloqueada por la retención de Efeonce ID.
+  4. Verificador del bearer en Rooms (`ROOMS_AGENT_LANE_ENABLED`) y provider `rooms` en `efeonce-mcp`.
+  5. Fuentes (Radiografía AEO y CRM vía readers de Greenhouse) y medios gobernados.
+  6. Skill de oficio + eval antes del primer cliente real.
+  7. Rediseño agentes-primero del canvas de administración
+     ([canvas](https://claude.ai/artifact/DX8VgavaqqZmHYXRbKVjeL), fila «El lado de Efeonce — administrar salas»).
+  8. Antes de clientes reales: medir la sala en vivo (prendida y sin medir), cerrar TASK-1833 y revisar gobierno de
+     datos IA para `read.client`. Ningún cliente real sin una autorización nueva.
+
 ## 2026-10-31 — Acceso interno durable y /auth/error EN PRODUCCIÓN
 
 - Autorización: «Avanza todo end-to-end» y «Despliega». Recibo
@@ -73,7 +108,7 @@
   de organización `members.manage`, `members.grantInternal|renewInternal|revokeInternal` + `members.list` con paridad,
   solicitud de acceso desde `identity_unbound`, `pnpm access:bootstrap-owner` (credencial de base, sólo con cero
   titulares) y guarda del último administrador (comando + trigger diferido + aviso a 30 días + señales).
-- [TASK-2082](../../../../docs/tasks/to-do/TASK-2082-rooms-durable-internal-access.md) `to-do`: sin código hasta aprobar el ADR.
+- [TASK-2082](../../../../docs/tasks/in-progress/TASK-2082-rooms-durable-internal-access.md) `to-do`: sin código hasta aprobar el ADR.
   Mientras tanto, el acceso del dueño depende de las filas restauradas a mano (vigentes hasta 2027-10-31).
 - [TASK-2083](../../../../docs/tasks/in-progress/TASK-2083-rooms-access-issue-page.md) `in-progress`, `local`:
   `efeonce-rooms` rama `claude/rooms-durable-internal-access` `adb1db0` (desde `origin/main` `6f99a6f`, sin push).

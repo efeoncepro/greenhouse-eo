@@ -1,8 +1,8 @@
 # Greenhouse — Feature Flag State Ledger (env-var flags)
 
-**Nota documental 2026-10-29:** [corte Auth+Rooms](../audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
-Este registro conserva el último readback de flags del 26-10. Los trabajos
-locales posteriores no autorizan inferir un cambio del valor vivo.
+**Nota documental 2026-10-31:** el estado vigente de Rooms/Auth es la sección «activación 31Oct2026», con valores
+releídos ese día ([recibo](../audits/rooms/2026-10-31-production-activation.md)). Las secciones del 26-10 y del
+25-10 quedan como historia.
 
 ## Rooms / Auth — activación 31Oct2026 (vigente)
 
@@ -11,16 +11,22 @@ Esta tabla supera a la del 26-10 para los flags que lista.
 
 | Flag | Runtime | Valor releído 31Oct | Límite |
 | --- | --- | --- | --- |
-| `ROOMS_FIRST_PARTY_AUTH_ENABLED` | Vercel Rooms Production (`dpl_GiGEoYaPSsUf8V7uZZyTbxtfZM8A`) | `true` | Uso del equipo; clientes reales requieren otra autorización |
+| `ROOMS_FIRST_PARTY_AUTH_ENABLED` | Vercel Rooms Production (`dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG` = `main@a2d72c0`; flags se activaron con `dpl_GiGEoYaPSsUf8V7uZZyTbxtfZM8A`) | `true` | Uso del equipo; clientes reales requieren otra autorización |
 | `ROOMS_INVITATIONS_ENABLED` | Vercel Rooms Production | `true` | Solo sale correo cuando alguien crea una invitación |
 | `ROOMS_MEDIA_ENABLED` | Vercel Rooms Production | `true` (creado) | El Job media-worker ya estaba en `true` |
 | `ROOMS_LIVE_ENABLED` | Vercel Rooms Production | `true` (creado) | Streams y pool sin medir en Vercel |
+| `ROOMS_MEDIA_DISPATCH_ENABLED` | Vercel Rooms Production | `true` | Despacho al Job media-worker |
 | `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` | Vercel Rooms Production | `false` | Permiso de desarrollo; nunca en producción |
 | `AUTH_SERVER_FIRST_PARTY_ENABLED` | auth-server `00169-4pq` (100 %) | `true` | Durable: variable de repo GitHub `true` (input de `auth-server-deploy.yml`) |
 | `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` | auth-server `00169-4pq` | `true`, con HMAC y token de autoridad montados | Durable: variable de repo GitHub `true`; refs `:1` ya declaradas |
 | email type `auth_server_rooms_invitation_otp` | Greenhouse PG `email_type_config` | `enabled=true` | Kill-switch por tipo |
 
 Rollback de Efeonce ID: las dos variables de GitHub en `false` + tráfico a `auth-server-00168-vzb` (ver recibo).
+
+`efeonce-rooms.vercel.app` es alias manual: no sigue a producción; tras cada deploy,
+`vercel alias set <deploy> efeonce-rooms.vercel.app --scope efeonce-7670142f`. Acceso del operador: restaurado por SQL
+autorizado y luego adoptado por el bootstrap de TASK-2082 como administrador hasta 2027-11-01
+([recibo](../audits/rooms/2026-10-31-durable-access-production.md)); falta su primer login real con la versión nueva.
 
 ## Rooms / Auth — estado releído26Oct2026
 

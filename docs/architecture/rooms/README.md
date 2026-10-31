@@ -1,5 +1,66 @@
 # Efeonce Rooms
 
+## Estado vigente — 2026-10-31: en producción para el equipo
+
+Rooms está en producción para uso del equipo de Efeonce. Todavía no hay clientes reales: eso exige una autorización
+nueva. Las marcas `vivo`, `doc` y `local` indican de dónde viene cada dato: readback en producción, recibo de otra
+sesión o código.
+
+| Frente | Estado | Marca |
+| --- | --- | --- |
+| Deploy de Rooms | `main@a2d72c0` (PR #5: acceso interno durable y página de error del login) en `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG`. `/rooms` y `/auth/error` responden 200; `/api/auth/session` sin sesión responde 401 | `vivo` |
+| Flags de Rooms (Vercel Production) | `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`, `ROOMS_MEDIA_ENABLED`, `ROOMS_LIVE_ENABLED` y `ROOMS_MEDIA_DISPATCH_ENABLED` en `true`; `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` en `false` | `vivo` |
+| Base `rooms_production` | Migraciones 9–18 aplicadas con ensayo previo en un clon | `vivo` |
+| Migración 19 (TASK-2082) | Aplicada por la sesión de acceso | `doc` |
+| Efeonce ID | Revisión `auth-server-00169-4pq` con el 100 % del tráfico, first-party y código por correo encendidos; variables de repo de GitHub fijadas para que el próximo deploy gobernado conserve el estado; tipo de correo `auth_server_rooms_invitation_otp` habilitado | `vivo` |
+| Acceso del dueño | Restaurado y adoptado como administrador hasta 2027-11-01. Falta su primer login real con la versión nueva | `vivo` / `doc` |
+
+Recibos: [activación](../../audits/rooms/2026-10-31-production-activation.md),
+[migraciones aplicadas](../../audits/rooms/2026-10-31-production-migrations-applied.md),
+[ensayo de migraciones](../../audits/rooms/2026-10-31-production-migration-rehearsal.md) y
+[acceso durable](../../audits/rooms/2026-10-31-durable-access-production.md). Operación diaria y rollback:
+[manual de producción](../../manual-de-uso/rooms/operar-produccion-rooms.md). Qué ve cada persona:
+[quién ve qué](../../documentation/rooms/quien-ve-que-en-rooms.md).
+
+**Trampa del alias manual.** `efeonce-rooms.vercel.app` es un alias manual: **no sigue a producción**. Después de
+cada deploy hay que reasignarlo con `vercel alias set <deploy> efeonce-rooms.vercel.app --scope efeonce-7670142f`.
+Sin ese paso el dominio público sigue sirviendo el deploy anterior aunque el nuevo esté READY. El alias del equipo
+(`efeonce-rooms-efeonce-7670142f.vercel.app`) tiene SSO de Vercel y no sirve para probar como visitante.
+
+**Retención de Efeonce ID.** Los PR #263/#264 siguen sin merge; sus flags se liberaron sólo para
+esta activación. TASK-1833 (revisión de seguridad) sigue abierta.
+
+### ADR aceptados
+
+Producto y plataforma: [ADR consolidado](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md) y
+[marca](EFEONCE_ROOMS_MARK_DECISION_V1.md). Ampliaciones:
+[colaboración](EFEONCE_ROOMS_COLLABORATION_DECISION_V1.md),
+[presentación](EFEONCE_ROOMS_DURABLE_PRESENTATION_DECISION_V1.md),
+[importación X-ray y referencia CRM](EFEONCE_ROOMS_SOURCE_IMPORT_AND_CRM_HANDOFF_DECISION_V1.md),
+[multimedia local](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md),
+[MCP stdio local](EFEONCE_ROOMS_LOCAL_STDIO_MCP_DECISION_V1.md),
+[sala en vivo](EFEONCE_ROOMS_LIVE_ROOM_REALTIME_DECISION_V1.md),
+[«Vive el servicio»](EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md) (en producción desde el PR #4),
+[acceso interno durable](EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md) (TASK-2082 y TASK-2083 en
+producción) y [carril de agentes](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) (Accepted 2026-10-31, sin implementar).
+El contenido de cada decisión vive en su ADR.
+
+### Lo que sigue, en orden
+
+1. Primer login real del dueño con la versión nueva y un segundo administrador.
+2. Carril de agentes, primera parte en Rooms: registro del actor, aviso a la persona, «Actividad de agentes» con
+   reversa, cuotas y guard de clasificación ([orden del ADR](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#orden-cada-parte-con-su-task)).
+3. Task nueva en EPIC-044: delegación interactiva para la audiencia de Rooms. TASK-1917 no la cubre; bloqueada por la
+   retención de Efeonce ID.
+4. Verificador del token delegado en Rooms (`ROOMS_AGENT_LANE_ENABLED`) y provider `rooms` en `efeonce-mcp`.
+5. Fuentes (Radiografía AEO y CRM vía readers de Greenhouse) y medios gobernados.
+6. Skill de oficio y eval antes del primer cliente real.
+7. Rediseño agentes-primero del canvas de administración; las demás pantallas de administración están pausadas.
+8. Antes de clientes reales: medir la sala en vivo (encendida y sin medir), cerrar TASK-1833 y revisar el gobierno de
+   datos IA para `read.client`.
+
+Lo que sigue abajo es historia de cortes anteriores; el estado vigente es esta sección.
+
 **Corte coordinado Auth+Rooms 2026-10-29:** [evidencia, pendientes y estado de release](../../audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
 El canary único permanece cerrado OFF. El ref Git local `e4b2e89` no prueba el
 deployment activo; Claude Design aún no había entregado la UI nueva. La
@@ -96,7 +157,7 @@ arriba; su despliegue, el editor/visor nuevos y la certificación conjunta sigue
 - [Importación X-ray/referencia CRM](EFEONCE_ROOMS_SOURCE_IMPORT_AND_CRM_HANDOFF_DECISION_V1.md).
 - [Multimedia local V4](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md), [MCP stdio local](EFEONCE_ROOMS_LOCAL_STDIO_MCP_DECISION_V1.md).
 - [Sala en vivo: transporte en tiempo real](EFEONCE_ROOMS_LIVE_ROOM_REALTIME_DECISION_V1.md) — **Accepted** 2026-10-30 (TASK-2081).
-- [«Vive el servicio»: escenas como contenido de la sala](EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md) — **Accepted** 2026-10-31; código local en rama, sin push.
+- [«Vive el servicio»: escenas como contenido de la sala](EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md) — **Accepted** 2026-10-31; en producción desde el PR #4 (`6f99a6f`).
 - [Acceso interno durable y gobernado](EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md) — **Accepted** 2026-10-31 (TASK-2082 acceso, TASK-2083 página de error).
 - [Carril de agentes: ciudadanos de primera clase](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) — **Accepted** 2026-10-31; agentes publican, invitan y dan acceso directo con autoridad de la persona, atribución, aviso y reversa.
 
@@ -111,7 +172,7 @@ Las decisiones de producto y contratos viven en estos documentos; el nombre fina
 
 Antecedentes: [frontera comercial aceptada](../sales-enablement/EFEONCE_SALES_ENABLEMENT_PLATFORM_DECISION_V1.md) e [investigación técnica inicial](../../think/creative-proposal-experience-stack-analysis-2026-10-07.md). La solución genérica anterior queda reemplazada por este dossier. Los productos actuales conservan su runtime.
 
-Próximo checkpoint: conectar la entrega de Claude Design a la API del mismo origen; con los gates global/restore ya pasados. Verificar crear→cargar→procesar→adjuntar→publicar→leer desde esa interfaz. El entorno aislado ya está preparado. Auth permanece en PR; activar acceso/medios de producción exige una decisión posterior. [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md), [manual de operación](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) y [QA inicial](../../audits/rooms/2026-10-25-first-local-delivery.md) conservan su evidencia histórica; el estado vigente es el indicado arriba, en TASK-2072 y en el ledger de la skill Rooms.
+Checkpoint histórico (29-10, ya superado): conectar la entrega de Claude Design a la API del mismo origen. Desde el 2026-10-31 la interfaz aprobada está en producción; los próximos pasos vigentes están en la sección «Estado vigente». [Superficie implementada](../../documentation/rooms/primera-experiencia-local.md), [manual de operación](../../manual-de-uso/rooms/operar-primera-experiencia-local.md) y [QA inicial](../../audits/rooms/2026-10-25-first-local-delivery.md) conservan su evidencia histórica; el estado vigente es el indicado arriba, en TASK-2072 y en el ledger de la skill Rooms.
 
 ## Verificación documental 2026-10-07
 

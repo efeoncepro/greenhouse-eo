@@ -5,17 +5,17 @@ description: Operate and extend Efeonce Rooms (EPIC-052) — the sales-enablemen
 
 # Efeonce Rooms (skill viva)
 
-**Corte vigente 2026-10-29:** [backend local verificado](../../../docs/audits/rooms/2026-10-29-backend-local-completion.md)
-en `codex/rooms-design-integration@3c7bcb5`, sin push/deploy: 337 tests sin skips,
-13 migraciones/43 tablas y restore mixto PG16/18 PASS. Incluye colaboración,
-presentación, derechos guest explícitos, importación X-ray/referencias CRM con puertos OFF,
-multimedia V4 sólo local y MCP stdio local. La interfaz de Claude Design sigue por conectar y aceptar;
-Linux/cloud multimedia, conectores reales y federación remota no están certificados.
-El [mapa coordinado Auth+Rooms](../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md)
-precede esta ampliación. El canary del 26-10 ya cerró con acceso humano OFF y Auth retenido en PR.
-GCS/worker/dispatch de imágenes pertenecen a ese corte cloud; el ref Git `main@e4b2e89`
-no acredita el deployment activo. Leer el ledger y el
-[manual backend local](../../../docs/manual-de-uso/rooms/operar-backend-local.md) antes de operar.
+**Corte vigente 2026-10-31 (cierre del día):** Rooms está **en producción con flags ON** (`vivo`).
+`efeonce-rooms.vercel.app` sirve `main@a2d72c0` = `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG` (PR #5: acceso interno
+durable TASK-2082 y página `/auth/error` TASK-2083), sobre PR #4 (UI aprobada + «Vive el servicio»).
+`rooms_production` tiene las migraciones 9–18 (`vivo`) y la 19 (`doc`). Los cinco flags `ROOMS_*` de Production
+están en `true` y `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` en `false`. Efeonce ID sirve first-party y OTP
+(`auth-server-00169-4pq`, skill `efeonce-auth`). El ADR del carril de agentes está **Accepted**, sin código.
+Falta, en orden: el primer login real del operador con la versión nueva; el carril de agentes (primero en Rooms:
+actor, aviso, «Actividad de agentes» con reversa, cuotas y guard de clasificación); la task nueva de EPIC-044 de
+delegación interactiva para la audiencia Rooms; el verificador del bearer y el provider `rooms` en `efeonce-mcp`.
+Ningún cliente real sin una autorización nueva y sin cerrar TASK-1833. Secuencia completa y recibos en la sección
+«Estado vigente» del [ledger](references/program-ledger.md).
 
 Rooms es la **plataforma comercial propia de Efeonce**: salas privadas por oportunidad donde el comprador
 recorre la propuesta, sus piezas y sus pruebas. Greenhouse conserva la **gobernanza documental** (ADR,
@@ -27,7 +27,7 @@ Vercel. La identidad la pone Efeonce ID (skill `efeonce-auth`); Rooms es su prim
 1. Este archivo: reglas y ruteo.
 2. [`references/program-ledger.md`](references/program-ledger.md): estado vivo por unidad y por task,
    runtime cloud, WIP y secuencia pendiente. **Empezar aquí.**
-3. Estado vigente: [dossier](../../../docs/architecture/rooms/README.md), [contrato Claude Design](../../../docs/documentation/rooms/backend-api-for-claude-design.md) y recibos de26Oct enlazados en el ledger. Antecedente histórico: [`docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md`](../../../docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
+3. Estado vigente: [dossier](../../../docs/architecture/rooms/README.md), [contrato Claude Design](../../../docs/documentation/rooms/backend-api-for-claude-design.md) y recibos del 2026-10-31 en `docs/audits/rooms/` (activación, migraciones, ensayo y acceso durable), enlazados en el ledger. Antecedentes: canary del 26-10 y [backend local del 29-10](../../../docs/audits/rooms/2026-10-29-backend-local-completion.md).
 4. Dossier: [`docs/architecture/rooms/README.md`](../../../docs/architecture/rooms/README.md). Incluye:
    - `EFEONCE_ROOMS_ARCHITECTURE_V1.md`
    - `EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md`
@@ -35,6 +35,7 @@ Vercel. La identidad la pone Efeonce ID (skill `efeonce-auth`); Rooms es su prim
    - `EFEONCE_ROOMS_PRIVATE_IMAGE_MEDIA_AND_PROVENANCE_DECISION_V1.md`
    - Colaboración/presentación, importación X-ray/CRM, multimedia local y MCP stdio:
      los cinco ADR enlazados en el dossier poseen los contratos de la ampliación local.
+   - `EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md` y `EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md` (ambos Accepted)
    - `EFEONCE_ROOMS_STACK_BASELINE_V1.md`
    - Experiencia, perfiles y marca.
 5. [`EPIC-052`](../../../docs/epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md): roadmap R01–R15 y criterios de salida.
@@ -63,6 +64,7 @@ Comandos:
 - `pnpm auth:integration`, `pnpm invitation:integration`.
 - `pnpm multimedia:worker`: ejecución finita sólo con perfil local/flag explícito/toolchain fijado; sin scheduler cloud.
 - `node --conditions=react-server --import tsx scripts/rooms-mcp.ts --base-url ORIGIN --session-file ARCHIVO --toolset read`: stdio sin banners; usar sesión existente0600 y origen exacto. `pnpm --silent rooms:mcp` es alternativa. No iniciar OAuth ni configurar hosts por inferencia.
+- `pnpm rooms members` (acceso interno con paridad) y `pnpm access:production bootstrap-owner|health`: este último toca producción; sólo con orden explícita del operador.
 - `pnpm dev` (127.0.0.1:3210).
 - `pnpm test` escribe en la PG **local del repo** (`.local/postgres`, :55432) si existe `.local/db-config.json`. No es compartida, pero conviene saberlo.
 
@@ -72,32 +74,42 @@ Comandos:
   - El WIP va a rama, nunca a `main`.
   - Antes de pushear, `pnpm verify` completo y leer qué SHA queda como deploy activo.
   - El build puede quedar `READY/STAGED` conservando el alias anterior: comprobar el dominio canónico y usar promoción explícita si está autorizada; READY por sí solo no prueba publicación.
-  - Backend publicado en `main@e4b2e890` por autorización2026-10-26, PR3 y despliegue promovido `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS`. PR2/a87852e es el antecedente de medios; leer ledger y recibos antes de otra promoción.
-- **Flags humanos `ROOMS_*` viven en Vercel Production y nacen OFF.**
-  - Prenderlos es una mutación de producción: autorización explícita y readback del valor (no sólo de la presencia).
+  - Producción vigente: `main@a2d72c0` = `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG` (PR #5), sobre PR #4 `6f99a6f`. Deploy anterior (con flags, sin PR #5): `dpl_GiGEoYaPSsUf8V7uZZyTbxtfZM8A`. Leer ledger y recibos antes de otra promoción.
+- **`efeonce-rooms.vercel.app` es un alias MANUAL: no sigue a producción** (`vivo`). Después de cada deploy,
+  `vercel alias set <deploy> efeonce-rooms.vercel.app --scope efeonce-7670142f` y readback del dominio (`/rooms`,
+  `/auth/error`, `/api/auth/session` sin sesión = 401). El alias de equipo `efeonce-rooms-efeonce-7670142f.vercel.app`
+  tiene SSO de Vercel y no sirve para probar como cliente.
+- **Flags `ROOMS_*` viven en Vercel Production.** Hoy (`vivo`, valores releídos 2026-10-31)
+  `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`, `ROOMS_MEDIA_ENABLED`, `ROOMS_LIVE_ENABLED` y
+  `ROOMS_MEDIA_DISPATCH_ENABLED` están en `true`; `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` en `false`.
+  - Un flag nuevo nace OFF. Prender, apagar o cambiar uno es una mutación de producción: autorización explícita y readback del valor (no sólo de la presencia).
   - Su runtime es otro repo; registrar readback en `references/program-ledger.md` y en el ledger de flags de Greenhouse con nota de alcance.
-  - Excepción ya autorizada: `ROOMS_MEDIA_DISPATCH_ENABLED=true` es sólo de máquina; no concede sesión ni acceso a clientes. El Job privado lleva su propio mediaON, distinto de la app web.
-- **El canary es uno solo y conjunto con Auth:**
-  Leer primero el ledger: si el correo único ya fue recibido y verificado, no repetirlo por un nuevo despliegue o continuación.
-  1. Auth con flags ON.
-  2. `ROOMS_*` ON.
-  3. Bootstrap de una sala sintética (`scripts/bootstrap-production-pilot.ts`, dry-run por defecto; `--apply` crea).
-  4. Un único correo a `jreyes@efeoncepro.com`.
-  5. Replay, revocación y rollback.
-
-  Ningún cliente real sin una nueva autorización.
+  - `ROOMS_MEDIA_DISPATCH_ENABLED` es sólo de máquina; no concede sesión ni acceso. El Job privado lleva su propio flag de medios, distinto de la app web.
+- **El canary conjunto con Auth cerró el 26-10 y la activación completa se hizo el 31-10:** no repetir el canary
+  ni su correo por un nuevo despliegue o continuación.
+- **Ningún cliente real** sin una autorización nueva del operador y sin cerrar TASK-1833. Antes también: medir la
+  sala en vivo (está prendida y sin medir) y revisar gobierno de datos IA para `read.client`.
+- **Todo acceso interno vence en máximo un año** (techo de 366 días, ADR de acceso durable) y se renueva con
+  `members.grantInternal|renewInternal|revokeInternal`; SQL a mano sólo como emergencia autorizada y documentada. El último administrador está protegido
+  por comando y trigger. Rooms no hereda roles de Efeonce ID: un login sin acceso cae en `identity_unbound`.
 - **DB `rooms_production` comparte la instancia `greenhouse-pg-dev`.** El rol `rooms_runtime` hereda de PUBLIC `CONNECT`/`TEMP` sobre otras bases (documentado, no corregido). Cualquier cambio de roles se valida contra el aislamiento.
 - **El contenido V1/V2 publicado es inmutable.** V3 (medios) es opt-in explícito: nada convierte por inferencia.
 - **Medios privados:**
   - Cada petición se vuelve a autorizar.
   - `private, no-store`.
   - Nunca se sirve el original, sólo los derivados.
-  - Adapter GCS, bucket/IAM, ocho migraciones/26 tablas y Job privado desplegados2026-10-26. PNG físico a dos WebP y entrega privada verificados. Scheduler OIDC cada minuto consulta SQL y sólo inicia un Job con demanda; lease10min/nonce cercado, timeout240s/retries0. Prueba de transporte en sala archivada no añade otra imagen ni correo. Variables GCS están en el despliegue publicado. `ROOMS_MEDIA_ENABLED` de la app sigue OFF: falta consumidor frontend, recorrido integrado con la nueva UI y autorización de activación; no repetir el canary conjunto ya recibido.
+  - Adapter GCS, bucket/IAM, ocho migraciones/26 tablas y Job privado desplegados2026-10-26. PNG físico a dos WebP y entrega privada verificados. Scheduler OIDC cada minuto consulta SQL y sólo inicia un Job con demanda; lease10min/nonce cercado, timeout240s/retries0. Prueba de transporte en sala archivada no añade otra imagen ni correo. Variables GCS están en el despliegue publicado. `ROOMS_MEDIA_ENABLED` de la app está ON desde la activación del 2026-10-31; no repetir el canary conjunto ya recibido.
 - **Datos sintéticos rotulados.** La demo y el piloto usan personas ficticias. La badge «synthetic» aparece cuando el origen no es `real`.
 - **AXIS y paquetes publicados exactos.** Ninguna copia manual de tokens, logos o primitives. Los SVG públicos salen de `scripts/sync-brand.mjs`.
-- **Auth sigue en PR263/264** por instrucción expresa: no merge main/develop, deploy, flags ni release262 por actualizar Rooms.
-- **Claude Design posee la interfaz.** Preparar integración same-origin, datos/permisos de prueba y recorrido UI; no conectar un artifact de otro origin con tokens en storage ni reutilizar secretos/WIF Production en Preview. El perfil cloud exige Production exacto.
-- Paridad Full API: toda acción de UI es un command o reader con su contrato. API/SDK/CLI y el adapter MCPstdio local comparten los módulos construidos. Federación MCP remota, conectores externos y binarios por MCP siguen fuera; ver exclusiones canónicas y manual.
+- **Efeonce ID ya sirve first-party y OTP** (`auth-server-00169-4pq`; fuente durable: variables de repo GitHub `AUTH_SERVER_FIRST_PARTY_ENABLED` y `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` en `true`). Las PR #263/#264 de Auth siguen abiertas y sin merge: sus flags se liberaron sólo para esta activación, por decisión del operador. Actualizar Rooms no autoriza merge, release #262 ni cambios de Auth; eso vive en la skill `efeonce-auth`.
+- **Agentes = ciudadanos de primera clase** ([ADR carril de agentes](../../../docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md), Accepted `4d8d6553c`).
+  - Publican, invitan y dan acceso directo con la autoridad exacta de una persona interna; sin principal propio.
+  - En producción, sólo vía gateway: token delegado de Efeonce ID + identidad de workload del gateway, introspección con caché ≤ 30 s.
+  - Seguridad por atribución (`actor_kind`, `agent_client_id`, `channel`), aviso a la persona, reversa con un clic, cuotas y eval de oficio. `read.client` va aparte.
+  - Nada implementado todavía: hoy los agentes usan la CLI `pnpm rooms` y el MCP stdio local con `--session-file` (cookie humana), con todos los comandos, `members.*` incluido; no hay MCP remoto. Las demás pantallas de administración del canvas están pausadas: se rediseñan agentes-primero («Actividad de agentes», vista por sala).
+- **Claude Design posee la interfaz.** La UI aprobada por el operador está en producción (PR #4). Preparar integración same-origin, datos/permisos de prueba y recorrido UI; no conectar un artifact de otro origin con tokens en storage ni reutilizar secretos/WIF Production en Preview. El perfil cloud exige Production exacto. Hoy (`local`) no hay botón para crear una sala (sólo API/CLI) y ningún botón lleva a la mesa de autoría `/rooms/:id/authoring`; consola de presentación y señales son sólo API.
+- **Bricolage en texto de varias líneas alterna pesos** (regla del operador): la frase clave pesada y el resto ligero, con los tokens `--room-weight-bold` y `--room-weight-light`. Un bloque entero en bold se ve pesado. Caso fuente: titular de `/auth/error`.
+- Paridad Full API: toda acción de UI es un command o reader con su contrato. API/SDK/CLI y el adapter MCPstdio local comparten los módulos construidos. La federación MCP remota (provider `rooms` en `efeonce-mcp`, verificador del bearer `ROOMS_AGENT_LANE_ENABLED`) llega con el carril de agentes y aún no existe; conectores externos y binarios por MCP siguen fuera. Ver exclusiones canónicas y manual.
 - V4 combina imágenes existentes con PDF/audio/video en una edición mediante kind, sin ampliar MIME V3
   ni alterar su metadata SQL. Opt-in local,13migraciones y sandbox/codecs propios; /media sólo imágenes,
   /multimedia sólo otros tipos. Toda ref no excluida requiere bloque visible o publicación queda pending. Docker/Linux/cloud se certifican aparte; no activar producción por codecs locales.

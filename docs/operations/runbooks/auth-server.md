@@ -1,10 +1,26 @@
 # Runbook — Efeonce Auth Server (`auth.efeonce.org`)
 
 > **Tipo de documento:** Runbook operativo
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-09-04 por Claude (TASK-1828, EPIC-044)
-> **Última actualización:** 2026-10-26 por Codex (readback vigente, control preparado en PR y retención humana)
+> **Última actualización:** 2026-10-31 por Claude (first-party/OTP ON para Rooms, gobernado por variables de repo)
 > **Documentación técnica:** [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) · [`services/auth-server/README.md`](../../../services/auth-server/README.md)
+
+## Delta 2026-10-31 — first-party y OTP ON para Rooms
+
+- Revisión vigente `auth-server-00169-4pq` (100 % del tráfico, misma imagen que la 00168) con
+  `AUTH_SERVER_FIRST_PARTY_ENABLED=true` y `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED=true`. Este estado sustituye
+  al del 26-10 descrito más abajo. [Recibo](../../audits/rooms/2026-10-31-production-activation.md).
+- **Gobierno:** los dos flags viven en variables de repo GitHub (inputs de `auth-server-deploy.yml`; el environment
+  `production` no las sobreescribe). Para cambiarlos se editan esas variables y se despliega por el workflow.
+- **Tráfico fijado por revisión:** un deploy nuevo no lo mueve solo; se usa
+  `gcloud run services update-traffic auth-server --to-revisions <rev>=100` explícito.
+- **Rollback:** tráfico a `auth-server-00168-vzb` (flags OFF, sin los secretos HMAC/autoridad) y las dos variables de
+  repo en `false`.
+- **NUNCA** `gcloud run services update --update-env-vars` a mano: pasó una vez el 2026-10-31 (así nació la 00169) y
+  se reconcilió llevando las variables de repo al mismo estado. El drift check (`rooms-config-drift.py`, fix
+  `51d9f3203`) ya lee `SECRET_REFS` y no da falso drift con OTP ON.
+- PR #263/#264 siguen sin merge; TASK-1833 abierta: ningún cliente real sin autorización nueva.
 
 ## Estado operativo y retención — 2026-10-26
 

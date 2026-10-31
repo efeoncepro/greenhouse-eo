@@ -1,5 +1,25 @@
 # EPIC-044 — Efeonce Identity, Native Authorization Server and MCP Federation
 
+## Delta 2026-10-31 — first-party y OTP en producción para Rooms
+
+- First-party y OTP **ON en producción** para Rooms: revisión `auth-server-00169-4pq` con el 100 % del tráfico
+  (misma imagen que la 00168), `AUTH_SERVER_FIRST_PARTY_ENABLED=true`, `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED=true`
+  y secretos `auth-server-rooms-invitation-otp-hmac:1` + `rooms-production-invitation-authority-token:1` montados.
+  Durable: las variables de repo GitHub de esos dos flags están en `true` (inputs de `auth-server-deploy.yml`).
+  Rollback: tráfico a `auth-server-00168-vzb` (flags OFF, sin esos secretos). [Recibo](../../audits/rooms/2026-10-31-production-activation.md).
+- Tipo de correo `auth_server_rooms_invitation_otp` en `enabled=true` (`greenhouse_notifications.email_type_config`).
+- Fix `51d9f3203`: `scripts/auth-server/rooms-config-drift.py` buscaba `ROOMS_INVITATION_AUTHORITY_TOKEN_REF` en vez de
+  `..._SECRET_REF` y con OTP ON siempre reportaba drift; ahora usa `SECRET_REFS` y tiene test contra el workflow.
+- Regla rota y documentada: la 00169 se creó con `gcloud run services update` manual. La configuración gobernada
+  (variables de repo) ya coincide con ese estado.
+- PR #263/#264 siguen abiertos y sin merge; los flags se liberaron solo para esta activación, por decisión del operador.
+  TASK-1833 (B15/B20, incidente, señales) sigue abierta: ningún cliente real sin una autorización nueva.
+- **Unidad nueva pendiente (sin ID reservado):** delegación interactiva de agentes para un segundo resource server, la
+  audiencia de Rooms — canje RFC 8693 en el emisor, `act` del cliente y autorización D10 para `efeonce.mcp.rooms.*`.
+  Es distinta de TASK-1917 (Studio, background), que no la cubre. La exige el
+  [ADR del carril de agentes de Rooms](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) y queda
+  bloqueada por la retención de Efeonce ID.
+
 ## Corte vigente 2026-10-29 — Auth con Rooms primero
 
 El emisor MCP sigue productivo. El [canary interno Auth+Rooms del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md) completó una sala sintética, identidad Microsoft/MFA, invitación OTP con un correo recibido, guest limitado y revocación; Auth y Rooms terminaron OFF. No equivale a acceso general ni se repite el correo. TASK-1834/2064/2067 y el consumer Rooms conservan pruebas locales adicionales; el V4 aceptado está preservado byte a byte en la rama Auth apilada. Los guards de deploy que comprueban el SHA de la revisión activa y el Job aislado de rotación de TASK-1833 están en commits locales, con pruebas y scan, pero fuera de CI/release productivo. [Conciliación](../../audits/rooms/2026-10-29-auth-develop-reconciliation-local.md) · [rotación](../../audits/auth-server/2026-10-29-key-rotation-job-local.md).

@@ -1,5 +1,42 @@
 # EPIC-052 — Efeonce Rooms: experiencia comercial inmersiva y sales enablement
 
+## Delta 2026-10-31 — Rooms en producción para el equipo
+
+Marcas: `vivo` = readback en producción; `doc` = recibo de otra sesión. Estado completo y trampas en el
+[dossier](../../architecture/rooms/README.md#estado-vigente--2026-10-31-en-producción-para-el-equipo).
+
+- **Producción (`vivo`).** `efeonce-rooms` `main@a2d72c0` en `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG`, después del
+  [PR #4](https://github.com/efeoncepro/efeonce-rooms/pull/4) (`6f99a6f`, UI aprobada + «Vive el servicio») y del
+  [PR #5](https://github.com/efeoncepro/efeonce-rooms/pull/5) (acceso interno durable y `/auth/error`). Migraciones
+  9–18 aplicadas con ensayo en clon; la 19 la aplicó la sesión de acceso (`doc`). Flags de Rooms en `true`
+  (acceso first-party, invitaciones, medios, sala en vivo y dispatch). Efeonce ID en `auth-server-00169-4pq` con
+  first-party y código por correo, fijados también en las variables de GitHub. Recibos:
+  [activación](../../audits/rooms/2026-10-31-production-activation.md) y
+  [acceso durable](../../audits/rooms/2026-10-31-durable-access-production.md).
+- **Tasks que se movieron.**
+  - [TASK-2059](../../tasks/in-progress/TASK-2059-rooms-first-experience.md),
+    [TASK-2068](../../tasks/in-progress/TASK-2068-rooms-invitation-and-guest-experience.md) y
+    [TASK-2071](../../tasks/in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md): la interfaz quedó
+    aceptada por el operador («Todas están aprobadas») y se publicó con el PR #4; siguen `in-progress` por sus
+    criterios sin tildar.
+  - Escenas «Vive el servicio»: cuatro escenas con autoría desde la mesa,
+    [ADR Accepted](../../architecture/rooms/EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md), en producción.
+  - [TASK-2082](../../tasks/in-progress/TASK-2082-rooms-durable-internal-access.md) (acceso interno durable) y
+    [TASK-2083](../../tasks/in-progress/TASK-2083-rooms-access-issue-page.md) (página «Casi.») en producción; falta el
+    primer login humano del dueño y un segundo administrador.
+- **Unidades R.** R02/R06/R07/R08 dejan de ser demo/scaffold: la interfaz aprobada está publicada, aunque crear sala,
+  enlace a la mesa de autoría y permisos de invitación completos aún no tienen pantalla. R04 pasa de canary cerrado
+  a acceso del equipo encendido y durable. R15 no se cierra: no hay clientes reales, la sala en vivo no se midió y
+  TASK-1833 sigue abierta.
+- **Decisión nueva.** [Carril de agentes](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md),
+  Accepted: los agentes publican, invitan y dan acceso con la autoridad exacta de una persona interna, con
+  atribución, aviso y reversa. Nada implementado todavía.
+- **Lo que sigue, en orden.** Primer login real del dueño → carril de agentes en Rooms (actor, aviso, «Actividad de
+  agentes» con reversa, cuotas y guard) → task nueva en EPIC-044 de delegación interactiva (bloqueada por la
+  retención de Efeonce ID) → verificador del token en Rooms y provider `rooms` en `efeonce-mcp` → fuentes y medios
+  gobernados → skill de oficio y eval → rediseño agentes-primero de la administración → antes de clientes reales,
+  medir la sala en vivo, cerrar TASK-1833 y revisar gobierno de datos IA para `read.client`.
+
 ## Corte vigente 2026-10-29
 
 El [canary real interno del 26-10](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md) ya está completado y cerrado: una sala sintética, imagen GCS procesada y servida con autorización, un correo enlace+código recibido, sesión guest limitada y revocación. Auth y Rooms volvieron a OFF; no fue aceptación de UI, activación de clientes ni ampliación de cohorte. En el checkout hermano, `main` y `origin/main` apuntan localmente a `e4b2e89` (merge del dispatch automático); ese Git readback no acredita por sí mismo el deployment Vercel activo. La sesión Rooms reportó 35 checks browser/HTTP/PG PASS para dos RP locales contra fuentes Auth; el recibo detallado no está en este checkout y no hay E2E HTTPS/entrypoint completo. La nueva UI de Claude Design sigue sin entregar/integrar. El corte backend local29Oct añade multimedia V4, presentación/notas, colaboración/actividad, MCPstdio y mapping/referencias de integraciones, con pruebas de restore y límites. La certificación Linux/cloud, conectores reales, paridad de la experiencia y rollout siguen abiertos; el detalle vigente está en Status real y el recibo local. Auth conserva su release retenido. [Conciliación Auth](../../audits/rooms/2026-10-29-auth-develop-reconciliation-local.md).
@@ -73,7 +110,9 @@ Corte local29Oct, autorizado para terminar backend sin UI; construcción en `cod
 - [TASK-2078](../../tasks/complete/TASK-2078-rooms-local-stdio-mcp.md): MCP stdio local por sesión existente; sin OAuth/federación remota ni transferencia binaria MCP.
 - [TASK-2079](../../tasks/in-progress/TASK-2079-rooms-orbit-foundation.md): base visual La órbita (órbita, halo, cámara, iris, parallax, motion) del canvas aprobado el 2026-10-29; primera pieza de la UI.
 - [TASK-2080](../../tasks/in-progress/TASK-2080-rooms-approved-ui-backend-contract.md): contrato backend de todo el canvas aprobado salvo tiempo real; decisiones de privacidad resueltas por el operador el 2026-10-30.
-- [TASK-2081](../../tasks/to-do/TASK-2081-rooms-live-room-realtime.md): sala en vivo, ADR de transporte y backend en tiempo real.
+- [TASK-2081](../../tasks/in-progress/TASK-2081-rooms-live-room-realtime.md): sala en vivo, ADR de transporte y backend en tiempo real.
+- [TASK-2082](../../tasks/in-progress/TASK-2082-rooms-durable-internal-access.md): acceso interno durable y gobernado (`members.*`, bootstrap del dueño, solicitud de acceso); en producción desde PR #5.
+- [TASK-2083](../../tasks/in-progress/TASK-2083-rooms-access-issue-page.md): página de error del login «Casi.» con código de solicitud; en producción desde PR #5.
 
 [Recibo del corte y límites](../../audits/rooms/2026-10-29-backend-local-completion.md). TASK-2070 y2074–2078 quedan complete por su alcance técnico local verificado. TASK-2071/2072 y la
 épica conservan in-progress por interfaz/certificación conjunta/rollout; cerrar el backend local no
