@@ -27,6 +27,14 @@
 - Blocked by: `ninguno para el corte local; producción espera autorización (migración + merge)`
 - Branch: `efeonce-rooms: rama derivada de main, sin push a main hasta autorización; Greenhouse: docs en develop`
 
+## Delta 2026-10-31 — enmienda pendiente del carril de agentes
+
+- El ADR [Carril de agentes](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) (**Proposed**) no cambia el
+  modelo de principal (el agente se resuelve a la persona), pero si se acepta, `members.grantInternal` y
+  `members.renewInternal` dejan de ejecutarse directo por MCP local y CLI y pasan a ser propuestas con confirmación
+  humana; `members.revokeInternal` sigue directo. El código local `510ab42` aún los expone en el toolset MCP `members`
+  y en `pnpm rooms execute`; ajustarlo cuando ese ADR se acepte.
+
 ## Summary
 
 Rooms no tiene forma gobernada de dar acceso interno: la única vía en producción es el script del canary, que da
