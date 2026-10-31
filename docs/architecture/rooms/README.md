@@ -97,7 +97,8 @@ arriba; su despliegue, el editor/visor nuevos y la certificación conjunta sigue
 - [Multimedia local V4](EFEONCE_ROOMS_LOCAL_MULTIMEDIA_DECISION_V1.md), [MCP stdio local](EFEONCE_ROOMS_LOCAL_STDIO_MCP_DECISION_V1.md).
 - [Sala en vivo: transporte en tiempo real](EFEONCE_ROOMS_LIVE_ROOM_REALTIME_DECISION_V1.md) — **Accepted** 2026-10-30 (TASK-2081).
 - [«Vive el servicio»: escenas como contenido de la sala](EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md) — **Accepted** 2026-10-31; código local en rama, sin push.
-- [Acceso interno durable y gobernado](EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md) — **Proposed** 2026-10-31 (TASK-2082 acceso, TASK-2083 página de error).
+- [Acceso interno durable y gobernado](EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md) — **Accepted** 2026-10-31 (TASK-2082 acceso, TASK-2083 página de error).
+- [Carril de agentes: los agentes arman, las personas aprueban](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) — **Proposed** 2026-10-31; enmienda acceso durable, contrato API y MCP local si se acepta.
 
 ## Contratos de experiencia para revisión
 

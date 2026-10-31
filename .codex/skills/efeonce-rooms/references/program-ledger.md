@@ -34,6 +34,22 @@
 - Sin push, sin deploy, sin flags. El checkout `efeonce-rooms` quedó en la rama nueva; `tsconfig.json` sigue
   modificado por otra sesión y no se commiteó.
 
+## 2026-10-31 — ADR del carril de agentes (Proposed)
+
+- El operador fijó que las salas las arman y administran agentes; la interfaz revisa y aprueba.
+  [ADR](../../../../docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) **Proposed**, sin código.
+- `local` (verificado en código): la CLI y el MCP local solo autentican con cookie copiada (`--session-file`), y con
+  ella ejecutan `editions.publish`, `access.grant` e invitaciones. `resolvePrincipal` ignora `Authorization`. El
+  emisor tiene una sola audiencia y no hace canje. Sin propuestas ni registro de actor.
+- Decisión propuesta:
+  - D0 cierra la cookie (`channel=cli` sin `release`/`access`);
+  - propuestas confirmadas con presencia fresca ligada al hash;
+  - token delegado + identidad del gateway;
+  - clases de scope generadas del catálogo; `read.client` apagada.
+- Revisión adversarial: 24 hallazgos incorporados.
+- Enmienda TASK-2082 si se acepta: `members.grant/renewInternal` solo como propuesta.
+- Depende de una task nueva de EPIC-044 (TASK-1917 no cubre agentes interactivos ni una segunda audiencia).
+
 ## 2026-10-31 — PR #4 en producción y activación completa (Rooms + Efeonce ID)
 
 - Autorizaciones: «Sí, mergea»; después «Prende todo» y, tras explicar qué implica liberar Efeonce ID, «Todo».
