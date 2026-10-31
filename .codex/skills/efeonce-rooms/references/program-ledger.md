@@ -8,7 +8,8 @@
 ## 2026-10-31 — Autoría de escenas desde la mesa + ADR del contrato
 
 - ADR [«Vive el servicio»: escenas como contenido de la sala](../../../../docs/architecture/rooms/EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md)
-  **Proposed**; registrado en el dossier y en `DECISIONS_INDEX`.
+  **Accepted** el 2026-10-31 por el operador («Apruebo el ADR»); registrado en el dossier y en `DECISIONS_INDEX`.
+  No autoriza push, deploy ni flags.
 - `efeonce-rooms` `claude/rooms-approved-ui` `95d3ac2`: escenas en el inventario de la mesa, «Añadir escena» (4 tipos,
   valores editables, capítulo de escenas), escenario a 1440 × 900 desde el borrador sin guardar (mismo resolutor que
   la sala), editor por tipo y guardado completo con `content.upsertBlock`. Cobertura nueva `scene_placeholder`:
@@ -19,7 +20,7 @@
   (→46) y abrir `/authoring/vista-previa/vive/:blockId` con la rendition del borrador. Datos sintéticos, locales.
 - Lección: el `next dev` de 3210 quedó con una página sin hidratar tras varias recargas completas de Fast Refresh
   (bloque Suspense deshidratado, sin errores). Reiniciar el servidor lo resolvió; no era el código.
-- Falta: aprobación del ADR, aceptación humana de la interfaz, ediciones de escenas en «Qué cambió» con detalle propio.
+- Falta: aceptación humana de la interfaz, ediciones de escenas en «Qué cambió» con detalle propio.
 
 ## 2026-10-31 — «Vive el servicio» implementado local (canvas fila 6)
 

@@ -1,8 +1,8 @@
 # Rooms — «Vive el servicio»: escenas como contenido de la sala
 
-- Status: **Proposed** (2026-10-31). El operador aprobó las cuatro escenas del canvas (fila 6) y pidió construirlas
-  y su autoría; este documento fija el contrato de datos para su aprobación. Código local en `efeonce-rooms`
-  `claude/rooms-approved-ui` (`5e4a73b` y siguientes), sin push ni flags.
+- Status: **Accepted** (2026-10-31, operador: «Apruebo el ADR»). Autoriza el contrato y el código local en
+  `efeonce-rooms` `claude/rooms-approved-ui` (`5e4a73b`, `95d3ac2`). No autoriza push, deploy ni flags: el paso a
+  producción sigue el gate de release de Rooms.
 - Owner: Product/Commercial para el propósito; Platform para el contrato. EPIC-052; TASK-2068 y TASK-2071.
 - Reversibility: two-way-but-slow. Los bloques nuevos solo existen en manifiestos V3/V4; V1/V2 publicados no cambian.
 
