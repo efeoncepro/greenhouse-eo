@@ -57,7 +57,7 @@ histórico de esta task y no lo rediseña ni lo considera aceptado. Contratos/ba
 - Motion: `docs/ui/motion/TASK-2071-rooms-private-image-authoring-and-viewer-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-31: autoría y ediciones del canvas implementadas en local (efeonce-rooms claude/rooms-approved-ui, sin push). Mesa de autoría /rooms/:roomId/authoring con inventario, cobertura, escenario compartido con «Ver como» (comprador/champion/audiencia sobre content.previewAudience), propiedades (incluir/excluir, capítulo, título, fundamento, vincular evidencia) y publicar con confirmación; vista previa por rol; «Qué cambió» /editions/:editionId/cambios con línea de tiempo, lista y detalle (comparador deslizante de pieza y diff de texto). GVC local PASS: rooms-authoring (1440/1280/390) y rooms-edition-changes (1440/390). Contra el backend real (integración 3216, admin interno): renombrar persistió (revisión 36→37), se publicó la edición 6 y «Qué cambió» mostró el cambio. Falta: subir imágenes desde la mesa (uploads.initiate/PUT/complete), adaptaciones, medios V4 en la mesa, aceptación humana y UI ready.`
+- Status real: `2026-10-31: autoría y ediciones del canvas implementadas en local (efeonce-rooms claude/rooms-approved-ui, sin push). Mesa de autoría /rooms/:roomId/authoring con inventario, cobertura, escenario compartido con «Ver como» (comprador/champion/audiencia sobre content.previewAudience), propiedades (incluir/excluir, capítulo, título, fundamento, vincular evidencia) y publicar con confirmación; vista previa por rol; «Qué cambió» /editions/:editionId/cambios con línea de tiempo, lista y detalle (comparador deslizante de pieza y diff de texto). GVC local PASS: rooms-authoring (1440/1280/390) y rooms-edition-changes (1440/390). Contra el backend real (integración 3216, admin interno): renombrar persistió (revisión 36→37), se publicó la edición 6 y «Qué cambió» mostró el cambio. «Añadir imagen» también implementada (uploads.initiate → PUT → uploads.complete → «Usar en la sala» crea la pieza, adjunta y ubica en el capítulo) y, sin borrador abierto tras publicar, la mesa ofrece editions.reopen; ambos probados en la integración local. Falta: adaptaciones desde la mesa, medios V4 en la mesa, aceptación humana y UI ready.`
 - Rank: `R07A/R08A inmediatamente después del contrato TASK-2070`
 - Domain: `ui|content`
 - Blocked by: `none`
@@ -82,7 +82,10 @@ El estado consolidado vigente y el siguiente bloque están en [contrato para Cla
   excluido dentro de un capítulo.
 - El escenario es una imagen fiel y no interactiva de la escena del cliente (`inert` + `aria-hidden`, con texto
   para lectores de pantalla que remite a «Abrir vista previa»).
-- No incluido todavía: la subida de imágenes desde la mesa (el canvas muestra «Añadir imagen»).
+- «Añadir imagen» (commit `58287fb`): hash SHA-256 en el navegador, `uploads.initiate`, PUT único al transfer privado,
+  `uploads.complete`; la imagen procesada espera en «Usar en la sala», que crea la pieza (`content.upsertBlock`),
+  adjunta (`content.attachAsset`) y la ubica en el capítulo en pantalla. Tras publicar no queda borrador: la mesa
+  ofrece `editions.reopen` en vez de un acceso denegado.
 
 ## Summary
 

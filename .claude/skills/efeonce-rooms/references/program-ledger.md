@@ -14,7 +14,8 @@
 - Contra backend real (integración 3216, admin interno): renombrar persistió (revisión 36→37), se publicó la edición 6
   de la sala sintética Lumbre y «Qué cambió» mostró el cambio. Esa publicación quedó en la base de la integración
   (sintética, local).
-- Falta: subir imágenes desde la mesa, adaptaciones y medios V4 en la mesa, aceptación humana.
+- `58287fb`: «Añadir imagen» y reabrir borrador tras publicar, probados en la integración (subida, worker, pieza nueva).
+- Falta: adaptaciones y medios V4 en la mesa, aceptación humana.
 
 ## 2026-10-30 — Invitación, sala y sala en vivo del canvas implementadas local
 
