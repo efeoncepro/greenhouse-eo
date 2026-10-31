@@ -158,8 +158,9 @@ con el trigger `reject_mutation` existente. Nunca se borra ni se edita.
   sobre todo con agentes que actúan en nombre de una persona. Cómo se autentica ese agente (token de Efeonce ID,
   consentimiento, step-up para escrituras) es materia del ADR del carril de agentes, que propone esa sesión. Este ADR
   no lo decide. Frontera propuesta: aquí se define **qué autoridad tiene la persona en Rooms**; allá, **cómo un agente
-  la ejerce en su nombre**. Pendiente de confirmar con el operador: si `members.*` exige step-up humano cuando lo invoca
-  un agente.
+  la ejerce en su nombre**. Frontera acordada entre ambas sesiones: el agente se resuelve al principal de la persona. Si
+  `members.*` exige step-up humano cuando lo invoca un agente, lo decide el ADR del carril de agentes. Si ese carril
+  necesitara un principal propio para el agente, se revisa este ADR antes de empezar TASK-2082.
 
 ## Revisar cuando
 
