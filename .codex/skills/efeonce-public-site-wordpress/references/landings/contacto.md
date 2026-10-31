@@ -18,6 +18,11 @@
 > - **Trampas medidas:** `.elementor img` borra `border-radius`/`box-shadow` y fija `height:auto` (subir especificidad); el botón del CTA
 >   heredaba un degradado con `!important` (se corrigió en su regla de origen); el instalador tiene allowlist de rutas: un recurso nuevo
 >   exige ampliarla. Backups en el servidor: `/tmp/eo-contacto-widgets-before-20261031-{114441,114748,114915,115059}.tar`.
+> - **Más trampas (operador, mismo día):** Ohio pinta un degradado `currentColor` en el hover de todo enlace dentro de
+>   `.links-underline` (botón blanco con texto blanco): todo botón o enlace propio lleva la clase `-undash`. El renderer de
+>   Growth Forms usa `system-ui` y la variante `hubspot_pillar` inyecta tamaños/pesos con literales **después** del CSS de la
+>   página: la tipografía se fija por `--ghf-font`, `--ghf-label-size/-weight` y `--ghf-field-font-size` en `.ghf-root`, y lo que
+>   no tiene variable con selectores `.gh-contact .gh-contact__form-host [data-ghf-style-variant] …`.
 > - **Pendiente:** el código de la landing nunca se versionó en `efeonce-public-site-runtime` (archivos `??` desde TASK-1801): falta su backport.
 
 > **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-contacto` v4 entrega en `direct` al formulario HubSpot «Contact Form - EO» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
