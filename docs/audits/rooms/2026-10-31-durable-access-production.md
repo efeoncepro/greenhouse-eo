@@ -56,8 +56,8 @@
   alias `efeonce-rooms.vercel.app` reasignado.
 - Readback: `rooms-pilot-julio-20261025` con `auto_renew = true`; 6 triggers `member_manager_gap_*`; health con
   1 titular y sin señales. Sin sesión: `/auth/error` 200, callback 303, `/login` 302, `/api/v1/members` `unauthenticated`.
-- La primera renovación real ocurrirá cuando el dueño entre con menos de 335 días restantes (desde 2027-10-02 aprox.);
-  cada una queda como `members.autoRenewed`.
+- La primera renovación real ocurrirá cuando el dueño entre con menos de 335 días restantes, es decir, desde el
+  2026-12-01 aprox. (vigencia actual hasta 2027-11-01); cada una queda como `members.autoRenewed`.
 
 ## Rollback
 
