@@ -25,9 +25,10 @@
   - una invitación con correo real;
   - medir la sala en vivo en Vercel.
 - Respaldo lógico de la migración borrado después de verificar el deploy.
-- Riesgo abierto: el `deploy.sh` de auth-server apaga los dos flags en el próximo deploy. Antes del próximo release
-  de Greenhouse que despliegue auth-server, hay que declararlos. TASK-1833 sigue abierta: ningún cliente real sin
-  una autorización nueva.
+- Durable («Sí, fíjalos»): las variables de repo GitHub `AUTH_SERVER_FIRST_PARTY_ENABLED` y
+  `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` están en `true`, así que el próximo deploy gobernado reproduce el estado.
+  Se corrigió `rooms-config-drift.py`, que buscaba `ROOMS_INVITATION_AUTHORITY_TOKEN_REF` en lugar de `..._SECRET_REF`;
+  contra 00169 da `true`. TASK-1833 sigue abierta: ningún cliente real sin una autorización nueva.
 
 ## 2026-10-31 — Migraciones 9–18 aplicadas en `rooms_production` (sin merge)
 

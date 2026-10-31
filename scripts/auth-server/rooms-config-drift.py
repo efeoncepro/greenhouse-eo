@@ -7,6 +7,11 @@ import sys
 FLAGS = ('AUTH_SERVER_FIRST_PARTY_ENABLED', 'AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED')
 VALUES = ('AUTH_SERVER_INVITATION_EMAIL_OTP_CLIENT_ID', 'AUTH_SERVER_INVITATION_EMAIL_OTP_ROOMS_ORIGIN')
 SECRETS = ('AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET', 'ROOMS_INVITATION_AUTHORITY_TOKEN')
+# Mounted env name -> reference input, exactly as auth-server-deploy.yml and deploy.sh name it.
+SECRET_REFS = {
+    'AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET': 'AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET_REF',
+    'ROOMS_INVITATION_AUTHORITY_TOKEN': 'ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF',
+}
 
 
 def secret_ref(value, project='efeonce-group'):
@@ -39,7 +44,7 @@ def config_matches(revision, desired):
         if desired.get('AUTH_SERVER_FIRST_PARTY_ENABLED') != 'true' or not all(desired.get(name) for name in VALUES):
             return False
         for name in SECRETS:
-            wanted = secret_ref(desired.get(name + '_REF', ''), desired.get('GCP_PROJECT_ID', 'efeonce-group'))
+            wanted = secret_ref(desired.get(SECRET_REFS[name], ''), desired.get('GCP_PROJECT_ID', 'efeonce-group'))
             mounted = env.get(name, {}).get('valueFrom', {}).get('secretKeyRef', {})
             if wanted is None or (mounted.get('name'), mounted.get('key')) != wanted:
                 return False

@@ -13,7 +13,7 @@ class RoomsConfigDriftTests(unittest.TestCase):
         desired.update(zip(drift.VALUES, ('efeonce-rp-rooms', 'https://rooms.example.invalid')))
         entries = [{'name': key, 'value': value} for key, value in desired.items()]
         for name in drift.SECRETS:
-            desired[name + '_REF'] = 'projects/efeonce-group/secrets/' + name.lower() + '/versions/3'
+            desired[drift.SECRET_REFS[name]] = 'projects/efeonce-group/secrets/' + name.lower() + '/versions/3'
             entries.append({'name': name, 'valueFrom': {'secretKeyRef': {'name': name.lower(), 'key': '3'}}})
         return {'spec': {'containers': [{'env': entries}]}}, desired
 
@@ -28,7 +28,7 @@ class RoomsConfigDriftTests(unittest.TestCase):
 
     def test_rotated_reference_requires_deploy(self):
         revision, desired = self.configured()
-        desired[drift.SECRETS[0] + '_REF'] = drift.SECRETS[0].lower() + ':4'
+        desired[drift.SECRET_REFS[drift.SECRETS[0]]] = drift.SECRETS[0].lower() + ':4'
         self.assertFalse(drift.config_matches(revision, desired))
 
     def test_plaintext_secret_never_counts_as_mount(self):
@@ -38,7 +38,7 @@ class RoomsConfigDriftTests(unittest.TestCase):
 
     def test_cross_project_reference_never_matches_local_mount(self):
         revision, desired = self.configured()
-        key = drift.SECRETS[0] + '_REF'
+        key = drift.SECRET_REFS[drift.SECRETS[0]]
         desired[key] = desired[key].replace('projects/efeonce-group/', 'projects/other-project/')
         self.assertFalse(drift.config_matches(revision, desired))
 
@@ -82,6 +82,12 @@ class RoomsConfigDriftTests(unittest.TestCase):
                 revision, desired = self.production()
                 revision['spec']['containers'][0]['env'][entry][field] = value
                 self.assertFalse(drift.config_matches(revision, desired))
+
+    def test_secret_ref_inputs_match_deploy_workflow(self):
+        workflow = (Path(__file__).parents[2] / '.github/workflows/auth-server-deploy.yml').read_text()
+        for ref in drift.SECRET_REFS.values():
+            with self.subTest(ref=ref):
+                self.assertIn(ref + ': ${{ vars.' + ref, workflow)
 
     def test_malformed_metadata_never_skips(self):
         self.assertFalse(drift.config_matches({}, {}))

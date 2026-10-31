@@ -16,14 +16,11 @@ Esta tabla supera a la del 26-10 para los flags que lista.
 | `ROOMS_MEDIA_ENABLED` | Vercel Rooms Production | `true` (creado) | El Job media-worker ya estaba en `true` |
 | `ROOMS_LIVE_ENABLED` | Vercel Rooms Production | `true` (creado) | Streams y pool sin medir en Vercel |
 | `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` | Vercel Rooms Production | `false` | Permiso de desarrollo; nunca en producción |
-| `AUTH_SERVER_FIRST_PARTY_ENABLED` | auth-server `00169-4pq` (100 %) | `true` | **Solo en vivo**: `deploy.sh` lo vuelve a `false` en el próximo deploy |
-| `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` | auth-server `00169-4pq` | `true`, con HMAC y token de autoridad montados | Igual que la fila anterior |
+| `AUTH_SERVER_FIRST_PARTY_ENABLED` | auth-server `00169-4pq` (100 %) | `true` | Durable: variable de repo GitHub `true` (input de `auth-server-deploy.yml`) |
+| `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` | auth-server `00169-4pq` | `true`, con HMAC y token de autoridad montados | Durable: variable de repo GitHub `true`; refs `:1` ya declaradas |
 | email type `auth_server_rooms_invitation_otp` | Greenhouse PG `email_type_config` | `enabled=true` | Kill-switch por tipo |
 
-### Pendientes de acción
-
-- Declarar en el deploy de auth-server (o en sus inputs gobernados) los flags first-party y OTP en `true`, con sus dos
-  secretos, antes del próximo release de Greenhouse que despliegue auth-server. Si no, ese release los apaga.
+Rollback de Efeonce ID: las dos variables de GitHub en `false` + tráfico a `auth-server-00168-vzb` (ver recibo).
 
 ## Rooms / Auth — estado releído26Oct2026
 

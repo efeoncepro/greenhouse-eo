@@ -39,19 +39,37 @@ Recorrido HTTP sin sesión:
 - una invitación con correo real;
 - la sala en vivo con carga real en Vercel (streams y pool sin medir).
 
+## Activación durable (cerrado el mismo día)
+
+El operador autorizó fijar los flags («Sí, fíjalos»).
+
+- **Variables de GitHub.** `auth-server-deploy.yml` toma los flags de las variables del repo, y el environment
+  `production` no las sobreescribe. Se dejaron `AUTH_SERVER_FIRST_PARTY_ENABLED` y
+  `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` en `true`. Las demás entradas ya estaban configuradas desde el 25-10:
+  client id, origen y las dos referencias de secreto (`:1`). El próximo deploy gobernado reproduce el estado vivo en
+  lugar de apagarlo.
+- **Chequeo de drift corregido.** `scripts/auth-server/rooms-config-drift.py` buscaba
+  `ROOMS_INVITATION_AUTHORITY_TOKEN_REF`, pero el workflow entrega `ROOMS_INVITATION_AUTHORITY_TOKEN_SECRET_REF`. Con el
+  código por correo prendido, siempre reportaba drift.
+  - Ahora un mapa explícito (`SECRET_REFS`) usa los nombres del workflow.
+  - Un test fija esos nombres contra `auth-server-deploy.yml`.
+  - Contra `auth-server-00169-4pq`, con las entradas del workflow, el chequeo da `true`.
+- **Drift que queda, y es esperado.** La revisión viva declara `RESEND_API_KEY_SECRET_REF` sin versión; el workflow
+  pide `:1`. El chequeo de producción seguirá marcando drift hasta el primer deploy gobernado, que lo deja
+  consistente con los flags en `true`.
+- **Regla rota.** Cambié la revisión 00169 con `gcloud run services update`, que la regla del dominio prohíbe. La
+  configuración gobernada ya coincide con ese estado; el próximo deploy por workflow reemplaza esa revisión manual.
+
 ## Riesgos aceptados
 
-1. `services/auth-server/deploy.sh` usa `--set-env-vars` con los flags en `false` por defecto. El próximo release de
-   Greenhouse a producción que despliegue auth-server los apagará sin aviso. Es seguro (falla cerrado), pero corta
-   el login de Rooms. Para que la activación sea durable, hay que declarar estos valores en el deploy o en sus inputs
-   gobernados.
-2. Los gates de seguridad de TASK-1833 (B15/B20, ensayo de incidente, señales) siguen abiertos: es uso del equipo, no
+1. Los gates de seguridad de TASK-1833 (B15/B20, ensayo de incidente, señales) siguen abiertos: es uso del equipo, no
    de clientes. Un cliente real necesita una autorización nueva.
-3. `ROOMS_LIVE_ENABLED` no se midió en Vercel (conexiones SSE y pool).
+2. `ROOMS_LIVE_ENABLED` no se midió en Vercel (conexiones SSE y pool).
 
 ## Rollback (≈2 min)
 
 1. Efeonce ID:
+   - variables de GitHub `AUTH_SERVER_FIRST_PARTY_ENABLED` y `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` en `false`;
    - `gcloud run services update-traffic auth-server --region us-east4 --project efeonce-group --to-revisions auth-server-00168-vzb=100`
      (00168 tiene ambos flags OFF y no monta los secretos de invitación);
    - `UPDATE greenhouse_notifications.email_type_config SET enabled=false, paused_reason='rollback 2026-10-31' WHERE email_type='auth_server_rooms_invitation_otp'`.
