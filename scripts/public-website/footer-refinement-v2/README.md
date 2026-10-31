@@ -42,3 +42,5 @@ reglas de CF7 de este paquete quedan sin efecto.
 se viste con los materiales del footer sólo por variables del renderer: papel `#f7f8f6` con texto navy, turquesa
 `#36c8bf` al pasar el cursor y en el foco, 46 px de alto (botón interno 36), campo abierto con borde papel al 22 % y
 descripción a 13 px. El verde queda para Glitch dentro del blog. Snapshot `_gh_footer_newsletter_before_20261031_131918`.
+
+**Superado (31/10):** el footer V3 cambió fondo, columnas, contacto y Glitch. Ver [footer V3](../footer-refinement-v3/README.md).

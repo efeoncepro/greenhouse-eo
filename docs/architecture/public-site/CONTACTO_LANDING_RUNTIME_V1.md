@@ -161,6 +161,9 @@ uno contra un export vivo fresco, más un cambio estructural de Elementor:
    que está inactivo y no se muestra en el sitio.
 7. Línea blanca bajo el footer: la página mide 5468,25 px y el documento redondea a 5469, así que el body blanco asomaba. El lienzo
    (`html:has(body.page-id-20729)`) toma el color del footer `#161519`. `/agenda/` tiene la misma altura fraccional.
+8. Footer V3 del sitio (mismo día, elegido en el canvas, página «Footer»): azul noche, cinco columnas con «Contacto» y
+   cobertura, Glitch con su logo y «Todos los derechos reservados». La dirección dejó de estar bajo el logo (`block-17`)
+   y pasó a la columna «Contacto» (`block-47`). Detalle y scripts: `scripts/public-website/footer-refinement-v3/README.md`.
 
 Contratos que no cambian: Growth Forms (`efeonce-contacto` v4) y Growth Meetings (`contacto-discovery-meeting`) siguen siendo
 dueños de validación, envío, disponibilidad y reserva; WordPress sólo presenta. La FAQ visible y su `FAQPage` salen de la misma

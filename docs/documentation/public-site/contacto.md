@@ -43,7 +43,8 @@ lleva a las oportunidades abiertas en Careers. Esta página no pide CV ni datos 
 | Cobertura | Chile, Estados Unidos, Colombia, México y Perú |
 
 La cobertura es de trabajo, no de oficinas: la única sede publicada es la casa matriz. Desde el 2026-10-31 el
-footer de todo el sitio muestra también esa dirección, como «Casa matriz»; antes mostraba una oficina antigua.
+footer de todo el sitio tiene una columna «Contacto» con la casa matriz, el correo, el 600 y el número de Estados
+Unidos, y bajo el logo dice dónde trabajamos, con las cinco banderas. Antes mostraba una oficina antigua.
 
 Las insignias de partner (HubSpot Gold Solutions Partner y Salesforce Partner) van debajo del formulario. Sobre
 el fondo claro de la página se usa la versión de HubSpot con placa oscura. La crema sólo va sobre fondos oscuros,

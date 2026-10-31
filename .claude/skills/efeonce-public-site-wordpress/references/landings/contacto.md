@@ -34,6 +34,9 @@
 >   `_gh_footer_address_before_20261031_121306`). Las demás copias (opción ACF, WooCommerce, `block-15`, `/agendar/`, su borrador y
 >   Landing Loop Marketing) se corrigieron con `fix-legacy-headquarters-address-copies.php` (snapshot `_gh_legacy_address_before_20261031_124200`).
 >   Esto deroga «la dirección legacy del footer no queda corregida» más abajo.
+> - **Footer V3 (31/10, elegido en el canvas «Footer»):** azul noche `#000f1f`, cinco columnas (Marca con cobertura y
+>   banderas · Explora · Contacto `block-47` · Glitch con su logo · Empleo en píldora), logos de partners por peso visual
+>   y «Todos los derechos reservados». La dirección ya no está en `block-17`. Paquete: `scripts/public-website/footer-refinement-v3/`.
 > - **Línea blanca bajo el footer:** la altura de la página es fraccional y el documento redondea hacia arriba; el body blanco asomaba.
 >   El lienzo de la página toma el color del footer (`html:has(body.page-id-20729) { background-color: #161519 }`).
 > - **Teléfono:** el texto de partners ocupa su propia fila (`flex-basis: 100%`) y las dos insignias van juntas debajo.
