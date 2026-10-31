@@ -1,5 +1,19 @@
 # TASK-2085 — Rooms: pantalla «Actividad de agentes» con reversa
 
+## Delta 2026-10-31 — propuesta del slice 1 en el canvas (pendiente de aprobación)
+
+- Canvas `https://claude.ai/artifact/DX8VgavaqqZmHYXRbKVjeL`, fila «El lado de Efeonce — lo que hicieron tus agentes»:
+  artboards `Actividad.dc.html` (casa 1440 × 900, con vista por sala desde la lista de salas, filtros, tope, rechazo,
+  aviso enfocado y diálogo de reversa), `CrearSala.dc.html` (pedírselo al agente o crearla a mano) y
+  `ActividadMovil.dc.html` (390 × 844, selector «Actividad | Salas» y hoja de confirmación). Se retiraron las entradas
+  `Salas.dc.html` e `Invitar.dc.html`, que no tenían archivo.
+- Concepto propuesto: **el umbral**. Una línea vertical separa «tu mesa» de «ya salió de tu mesa» (banda oscura).
+  Cada acción `release`/`access` cruza esa línea con un hilo y un punto del otro lado; deshacer recoge el hilo y deja
+  el punto hueco; un tope o un rechazo choca contra el umbral. Las acciones `author` se quedan del lado de la mesa.
+- Agrega movimiento propio (gramática en la nota «Motion — el umbral» del canvas). Si el operador lo aprueba, se crea
+  `docs/ui/motion/TASK-2085-rooms-agent-activity-surface-motion.md` y `Motion` deja de ser `none`.
+- `UI ready` sigue en `no` hasta la aprobación.
+
 ## Delta 2026-10-31 — nombres finales de TASK-2084 (implementada en local)
 
 - Reader `agents.activity` (`GET /api/v1/agents/activity?organizationId&scope=self|organization&limit&cursor`, SDK
