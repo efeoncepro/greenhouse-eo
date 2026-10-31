@@ -5,6 +5,24 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — Riesgos de UI verificados y corregidos (`de1de34`, en PR #4)
+
+- Corregidos:
+  - en el teléfono, `#capitulo-N` ahora lleva al capítulo (antes la pila no lo leía);
+  - la deriva de «Respuestas» y la órbita del equipo descansan a los ~5 s y vuelven a moverse con cada interacción;
+    el tráfico y la barra del story terminan antes de 5 s (WCAG 2.2.2);
+  - el error de subida tiene su propio mensaje;
+  - «Qué cambió» se enlaza desde la sala (barra en escritorio, mapa en el teléfono) y desde el aviso de publicación;
+  - la primera edición muestra su propio estado (verificado en la respuesta del servidor en la integración);
+  - los textos de estados de invitación y del enlace para saltar al contenido salen del copy.
+- Descartado: «el enlace al 01 corta la cámara» (la cámara escucha `hashchange`).
+- `local`: `pnpm verify` 377/377; GVC sin hallazgos en sala, sala móvil, las cuatro escenas, autoría, autoría de
+  escenas, «Qué cambió» e invitación.
+- Lecciones:
+  - con el panel del navegador oculto, React 19 no revela los bloques de streaming porque espera
+    `requestAnimationFrame`; la página parece trabada en «Cargando…», aunque el HTML del servidor está completo;
+  - `pnpm integration:up` necesita `LC_ALL=en_US.UTF-8`; sin eso, el PostgreSQL local no arranca.
+
 ## 2026-10-31 — Ensayo de migraciones en clon de producción PASS + docs de UI rehechos desde el canvas
 
 - **Ensayo de migraciones (gate 2 del ADR cloud).** Autorizado por el operador. Recibo

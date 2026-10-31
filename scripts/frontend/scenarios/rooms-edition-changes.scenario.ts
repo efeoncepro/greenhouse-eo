@@ -31,5 +31,7 @@ export const scenario: CaptureScenario = {
     { kind: 'click', selector: '.editions-list li:nth-child(2) .editions-change' },
     { kind: 'sleep', ms: 700 },
     { kind: 'mark', label: 'text-diff', fullPage: false },
+    { kind: 'click', selector: '.editions-list li:first-child .editions-change' },
+    { kind: 'sleep', ms: 700 },
   ],
 }
