@@ -5,6 +5,25 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — Rama de la UI aprobada subida; PR #4 en borrador (sin merge)
+
+- Autorización del operador («Hazlo») para corregir los hallazgos, verificar y subir la rama con un PR, **sin merge**.
+- Revisión previa con tres subagentes (estado de release, código, gobierno). Sin exposición de datos. Hallazgos corregidos
+  en `efeonce-rooms` `717c478`:
+  - pregunta repetida en el stream en vivo (cursor en milisegundos contra `created_at` en microsegundos);
+  - el fundamento del autor no llegaba a la pestaña Fundamento;
+  - «reabrir» ofrecido con un borrador abierto;
+  - error 500 con un id de escena malformado.
+- `local`: `pnpm verify` 377/377; consulta de preguntas ejercitada contra PG real (caso del borde en microsegundos).
+- `vivo`: `origin/claude/rooms-approved-ui` (21 commits sobre `origin/main` `e4b2e890`, 0 detrás) y
+  [PR #4](https://github.com/efeoncepro/efeonce-rooms/pull/4) **draft** hacia `main`. Vercel crea un Preview con SSO;
+  Preview solo tiene `NPM_RC`, así que únicamente funcionan las páginas `/demo/*`. Producción no cambia.
+- Gates para el merge (= producción):
+  1. ensayar en un clon de `rooms_production` las 10 migraciones nuevas, con restore y rollback, y aplicarlas antes del deploy;
+  2. aceptación humana de la interfaz;
+  3. antes de `ROOMS_LIVE_ENABLED`: medir streams y pool, y registrar el flag en el ledger;
+  4. primer cliente: liberar la retención de Auth (PR 263/264) y nueva autorización.
+
 ## 2026-10-31 — Autoría de escenas desde la mesa + ADR del contrato
 
 - ADR [«Vive el servicio»: escenas como contenido de la sala](../../../../docs/architecture/rooms/EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md)
