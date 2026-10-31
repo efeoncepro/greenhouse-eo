@@ -1,77 +1,91 @@
-# TASK-2068 — Flujo de acceso y gestión de invitaciones
+# TASK-2068 — Flujo de la invitación y del acceso de invitado
 
-> Continuidad26Oct: referencia del diseño/scaffold anterior, no aceptación de la interfaz de Claude Design.
-> Codex conserva backend; Claude Design posee la nueva UI y su validación. Los requisitos de AXIS,
-> View Transitions, reduced-motion, fallback y accesibilidad siguen siendo obligaciones a verificar.
-> Integración/estado actual: [dossier Rooms](../../architecture/rooms/README.md) y
-> [contrato backend](../../documentation/rooms/backend-api-for-claude-design.md). No activar flags ni repetir canary por este documento.
+Contrato de navegación reescrito el 2026-10-31 desde el canvas aprobado el 2026-10-29 (`Invitacion`,
+`InvitacionMovil`, `Estados`) y el código de `efeonce-rooms` `claude/rooms-approved-ui`
+(`src/components/invitations/invitation-entry.tsx`). No existe un flujo maestro del programa EPIC-052 en
+`docs/ui/flows/`; la sala que sigue está en [TASK-2059](TASK-2059-rooms-first-experience-flow.md).
 
+## Recorrido principal
 
-Diseño 2026-10-25; depende de contratos congelados, no describe UI implementada.
+1. El correo trae un solo enlace `https://…/invite#token=<43 caracteres base64url>` y, aparte, el código de seis dígitos.
+2. El navegador carga `/invite` sin el fragmento (nunca viaja al servidor). Al montar, el cliente lee el fragmento una
+   vez y lo borra con `history.replaceState`. Si no tiene el formato exacto, el estado es «No pudimos abrir esta
+   invitación.» sin ninguna petición.
+3. `POST /api/invitations/start {token}`: crea la transacción (cookie HttpOnly) y devuelve la tarjeta. Luego
+   `GET /api/invitations/transaction` entrega `expiresAt`, `retryAt`, `deliveryStatus`, `entryGate` y la tarjeta.
+4. Con `entryGate: continue` se muestra el código; con `internal_session_present`, el panel de sesión interna.
+5. La persona escribe o pega. Al sexto dígito, `POST /api/invitations/verify {code}`; mientras tanto, «Verificando el
+   código…» y el campo deshabilitado (una sola verificación en vuelo).
+6. Respuesta correcta: se borra el código, «Listo.» y «Código correcto. Abriendo la sala.»; a los 1400 ms (0 ms con
+   movimiento reducido) `location.assign('/rooms/:roomId/editions/:editionId#mapa')`. Es navegación de documento: la sala
+   lee su autoridad con la cookie nueva de invitado.
 
-## Journey guest
+## Recarga y reapertura
 
-Correo único con enlace `/invite#token=...` y código → GET /invite (no correo ni autenticación) → capturar fragmento en memoria y limpiar history → POST start → cookie transacción HttpOnly → campo código → POST verify → cookie guest + resultado room/edition → navegación de documento a edición publicada autorizada.
-
-Nunca incluir token/código en query, analytics, logs, clipboard automático o almacenamiento persistente. No aparece un selector de proveedor ni redirect visible al issuer para pegar OTP. No denominarlo MFA/2FA: ambos datos llegaron por el mismo correo.
+- Recargar `/invite` sin fragmento llama a `GET /api/invitations/transaction`. Si hay transacción vigente, vuelve al
+  código; si responde 410, muestra el estado explícito; con otro 4xx consulta `GET /api/invitations/session`: sesión de
+  invitado vigente → «Tu sala está lista.» con «Continuar a la sala» (`…#mapa`); sesión interna → panel de sesión
+  interna; nada → «Tu invitación empieza en el correo.». Un 5xx lleva a «Volvemos en un momento.».
+- Si llega un enlace nuevo a una pestaña que ya está en `/invite` (`hashchange` con `#token=`), la página se recarga
+  como documento nuevo y el flujo anterior se descarta.
+- En `pagehide` se borran el token y el código; volver con Atrás nunca restaura un código escrito.
 
 ## Estados y transiciones
 
-| Estado | Evento | Resultado/acción |
-|---|---|---|
-| Sin link | Abrir /invite | Consultar sólo estado seguro; transacción vigente recupera código, guest vigente permite continuar, resto pide reabrir correo |
-| Link presente | start | Limpiar URL antes de request; respuesta code_required; no nuevo correo |
-| Link no disponible |404 | Mensaje genérico sin distinguir existencia/revocación/destinatario |
-| Código pendiente | Submit6 dígitos | Deshabilitar sólo submit pendiente; verificar una vez |
-| Código inválido |400 | Error campo, conservar foco e intención; no revelar presupuestos internos |
-| Código expirado | Error+transacción vigente | Permitir solicitar nuevo bajo cooldown; no enviar automáticamente |
-| Resend pendiente | Usuario pide nuevo | Respetar retryAt/Retry-After; pending/accepted/failed reales; reintento incierto mantiene requestId en servicio |
-| Rate limited |429 | Próximo intento permitido visible; sin bucle ni autorretry |
-| Verificado | verifyOK | Navegación documento a room/edition devueltos; eliminar código de estado browser |
-| Transacción expirada | Error/status | Reabrir enlace del correo; no pedir email libre |
-| Lectura activa | Logout | POST logout, limpiar reader/modales y salir sin snapshot |
-| Lectura activa | Expiración/revoke/visibility | Reader/session fresh deniega; retirar contenido, explicar recuperación |
-| ServicioOFF/fallo |503 | Estado honesto, reintentar acción sólo explícita, no afirmar envío |
+| Estado | Llega por | Acción disponible | Lleva a |
+|---|---|---|---|
+| `loading` | Montaje con o sin fragmento | — | Cualquiera de los siguientes |
+| `code` | Transacción vigente con `entryGate: continue` | Escribir, pegar, «Entrar a la sala», «Enviarme un código nuevo» | Verificación, `code_expired`, `attempts`, `unavailable` |
+| Código incorrecto (`invalid_code`) | `verify` | Corregir el código | `code` en fase de error; vuelve a `idle` al tocar el campo |
+| `code_expired` (410) | `verify` o lectura de la transacción | «Enviarme un código nuevo» (salvo `canRequestNew: false`), sujeto a la espera | `resend` abre una transacción nueva → `code` con el foco en el campo y «Te enviamos un código nuevo. Revisa tu correo.» |
+| `attempts` (429) | `verify` o `resend` | Esperar; «Intentar de nuevo» al terminar | `code`. La pausa sale de `Retry-After` (60 s si falta) y se muestra como m:ss |
+| `revoked`, `expired`, `superseded` (410) | `start`, `transaction` o `verify` | Ninguna: volver al correo o pedir otra invitación | — |
+| `invalid` (404 o fragmento malformado) | `start` o el formato del fragmento | Ninguna | — |
+| `internal` | `entryGate: internal_session_present` o 409 `internal_session_present` en `verify` | «Cerrar sesión interna y continuar» (`POST /auth/logout` y vuelve a leer) o «Volver a mi espacio de trabajo» (`/rooms`) | `code` o `guest` |
+| `guest` | Sesión de invitado vigente sin transacción | «Continuar a la sala» | La sala en `#mapa` |
+| `empty` | Sin fragmento, transacción ni sesión | Ninguna | — |
+| `unavailable` | 5xx o error desconocido | «Reintentar» | Repite la inicialización |
 
-Reload consume GET `/api/invitations/transaction`, implementado en TASK-2066: state code_required/expiresAt/retryAt/deliveryStatus, cookie HttpOnly, sin PII ni envío. GET guest session no lo reemplaza. La continuación debe conservar edición permitida o resolverla server-side; no inferir de URL libre.
+Toda acción pasa por un único candado (`act`): mientras una petición está en vuelo, ningún botón dispara otra.
 
 ## Sesiones coexistentes
 
-El resolver actual da precedencia a cookie interna, incluso si ya no sirve. Contrato implementado: entryGate detecta presencia de cookie interna, incluso inválida; ofrecer salida explícita de esa sesión antes de redimir como guest. Verify devuelve409 antes del issuer si sigue presente. No borrar silenciosamente sesión interna, no usar cookie guest como fallback de auth interna fallida, no inventar switch browser-only. Cada cambio de actor es navegación documento y nueva lectura server-side.
+La sesión interna tiene precedencia. Nunca se borra en silencio ni se usa la cookie de invitado como respaldo de una
+sesión interna fallida: la persona elige cerrar la sesión interna antes de canjear el código. Cada cambio de actor es
+una navegación de documento y una lectura nueva del servidor.
 
-## Journey interno
+## Dentro de la sala (acceso de invitado)
 
-/login de TASK-2065 → contexto real (0/1/N orgs) → /rooms → invitaciones de sala → crear con email/expiry/evidence delegables → revisión de destinatario+scope → command(create,expectedRevision,idempotencyKey) → lista fresca y receipt.
+- «Salir de la sala» (`SessionExit`): `POST /api/invitations/logout` y `location.replace('/invite')`.
+- `GuestSessionBoundary` retira la sala al vencer la sesión (temporizador a `expiresAt`), si la edición deja de leerse o
+  cambian los permisos (revisión cada 30 s y al volver a la pestaña), y antes del BFCache (`pagehide`; si la página vuelve
+  persistida, se recarga). Muestra «Tu sesión terminó.» con el enlace a `/invite` y mueve el foco al título.
+- Sin sesión o con una edición no autorizada, la sala responde `AccessState` «Este acceso no está disponible.».
 
-Reissue/revoke abre confirmación con destinatario y versión esperada. Conflicto409 mantiene formulario, relee room/list y pide revisar acción otra vez; no reutilizar idempotencyKey con payload cambiado. Respuesta incierta conserva key y payload exactos. Accepted expresa aceptación del servicio, nunca entrega o lectura. El operador sin access.manage no ve creación; sólo permiso fresco room-resource concede esa acción.
+## Gestión interna (sin cambios de canvas)
 
-## Navigation, overlays y foco
-
-- Invitaciones es shortcut contextual de room, no sidebar global.
-- Un solo Dialog a la vez; cierre superior, Escape, foco inicial al encabezado/campo adecuado y restore al trigger estable.
-- Descarta edición sólo tras confirmación inline dentro del mismo diálogo; evitar confirmaciones anidadas.
-- En readback/revoke que elimina el trigger, foco al encabezado/lista; no body.
-- Gallery/evidence reutiliza focus/pager del renderer actual; pérdida de autoridad cierra ambos inmediatamente.
-- /auth/context ya es route handler JSON: UI de selección usa ruta distinta o adapter coordinado, nunca page.tsx conflictiva en mismo segmento.
-
-## Test journeys
-
-Happy path local real con correo capturado1 vez, código erróneo/correcto, código expirado → resend, doble pestaña/reload, link revocado, issuer unavailable, mismatch room/edition, evidence false, sesión interna coexistente, return from bfcache tras revoke y409 admin. No convertir una ruta sólo mock en evidencia de acceso real.
+`/rooms` → sala → `/rooms/:roomId/invitations`. Crear, reemitir, revocar y comprobar envío envían
+`invitations.create`, `invitations.reissue`, `invitations.revoke` e `invitations.retryDelivery` por
+`POST /api/v1/commands` con `expectedRevision` e `Idempotency-Key`. Un 409 conserva el formulario y pide actualizar el
+contexto; una respuesta incierta reintenta con la misma clave y el mismo payload; «Envío aceptado» nunca significa
+entregado. Es la interfaz del 2026-10-25.
 
 ## GVC Scenario Plan
 
-Escenario rooms-invitations: entrada desde fragmento, scrubURL, reload vía transaction, código inválido/correcto, resend/cooldown, logout, sesión interna coexistente yrevocación. Gestión: listar/create/reissue/revoke/409 y entrega pendiente/fallida. Lectura textualV2 con perfiles independientes y media parcial explícita. Capturas a1440/1024/390/320 ytexto200%; inspeccionar foco, mensajes y ausencia de datos privados en payload. Dossier docs/ui/reviews/TASK-2068-rooms-invitation-and-guest-experience/.
+- `rooms-invitation-stage` en `/demo/invitacion`: código, error (`000000`), «Listo.», y cada `?estado=`; probe
+  `code-then-resend`.
+- `rooms-invitation-entry` en `/invite`: vacío, fragmento malformado y token desconocido; la URL queda sin `#token=`.
+- Viewports 1440×900, 1280×800, 390×844 y 320×740; repetir con movimiento reducido.
+- Pendiente: recorrido completo con correo real en la integración, retorno por BFCache tras revocar, 429 real y
+  coexistencia interna → cerrar sesión → invitado sobre la escena nueva.
+- Dossier: `docs/ui/reviews/TASK-2068-rooms-invitation-and-guest-experience/`.
 
 ## Design Decision Log
 
-Se conserva la precedencia de sesión interna y se exige salida explícita antes de consumirOTP. El backend decide can/TTL y estado; UI sólo guía. MediaR05 no bloquea OTP ni textoV2: una explicación de disponibilidad conserva la lectura sin fingir pieza. Confirmaciones de gestión en un diálogo, con conflicto recuperable, nunca autorización por rol nominal.
-
-## Delta verificado: entrada y entrega recuperable — 2026-10-25
-
-- Un enlace recibido mientras la pestaña ya está en `/invite` provoca navegación de documento ante `#token=`. El nuevo documento limpia el fragmento antes de `start`; el skiplink `#main-content` sigue moviendo el foco sin reiniciar el acceso.
-- Gestión consume `actions.canRetryDelivery` y `retryAt`. “Comprobar envío” ejecuta `invitations.retryDelivery` con room/invitation/revision e idempotency key; conserva generación, enlace y requestId del envío. La recuperación persiste en servidor y vuelve a estar disponible tras recargar, sin guardar claves en localStorage.
-- “Actualizar estado” sólo relee el DTO. Transcurrir tiempo local no concede permisos. Reemisión es una intención distinta con confirmación que explica la invalidación de la invitación anterior; respeta el permiso actual del servidor.
-- Si el comando o la lectura del resultado son inciertos, se conserva la misma key/payload. Si el resultado confirma `pending`, la lista muestra el estado real y la acción de comprobación autorizada. No equivale a entrega confirmada.
-- Al cerrar una acción cuyo botón desapareció, el foco vuelve al título de gestión. Si el disparador sigue disponible, AXIS conserva el retorno a ese control.
-
-Readback local inicial: GVC público premium, 4 anchos/8 frames, pasó en `.captures/2026-10-25T22-23-26_rooms-invitation-entry`. Harness autenticado contra issuer real local y buzón RAM pasó 103 checks (OTP, lectura/evidencia, OIDC, crear/reemitir tras cooldown/revocar, 4 anchos, texto200%, axe, CSP y secretos en red). La corrida final ampliada pasó 129 checks en `../efeonce-rooms/.captures/rooms-invitation-ui-1792967328430/result.json`: recuperación pendiente tras reload con el mismo token/version/requestId, coexistencia interna con logout explícito y entrada como invitado sin evidencia, además del baseline. No es aceptación humana ni correo de proveedor real.
+- 2026-10-30 — La invitación termina en `#mapa`: la sala muestra primero el recorrido y la bienvenida con los capítulos
+  reales.
+- 2026-10-30 — Estados explícitos (410) solo con token o transacción reales; 404 genérico para todo lo demás.
+- 2026-10-30 — La autoridad nunca se anima: verificar, cerrar sesión y perder acceso son navegaciones de documento o
+  retiros inmediatos del DOM.
+- 2026-10-31 — La espera de reenvío y la pausa por intentos se muestran con texto que cambia cada segundo, sin anunciarse
+  cada segundo.

@@ -1,55 +1,103 @@
-# TASK-2071 — Flujo de autoría y lectura de imagen privada
+# TASK-2071 — Flujo de autoría, publicación y «Qué cambió»
 
-> Continuidad26Oct: referencia del diseño/scaffold anterior, no aceptación de la interfaz de Claude Design.
-> Codex conserva backend; Claude Design posee la nueva UI y su validación. Los requisitos de AXIS,
-> View Transitions, reduced-motion, fallback y accesibilidad siguen siendo obligaciones a verificar.
-> Integración/estado actual: [dossier Rooms](../../architecture/rooms/README.md) y
-> [contrato backend](../../documentation/rooms/backend-api-for-claude-design.md). No activar flags ni repetir canary por este documento.
+Contrato de navegación reescrito el 2026-10-31 desde el canvas aprobado el 2026-10-29 (`Autoria`, `Ediciones`) y el
+código de `efeonce-rooms` `claude/rooms-approved-ui` (`src/components/authoring/*`, `src/components/editions/*`). No
+existe un flujo maestro del programa EPIC-052 en `docs/ui/flows/`; la sala que se publica está en
+[TASK-2059](TASK-2059-rooms-first-experience-flow.md) y la invitación en
+[TASK-2068](TASK-2068-rooms-invitation-and-guest-experience-flow.md).
 
+## Puntos de entrada
 
-Contrato propuesto para consumidor 2070; no modifica candidata 20f9fe9.
+| Desde | Destino | Condición |
+|---|---|---|
+| `/rooms` (espacio interno) o una URL | `/rooms/:roomId/authoring` | Sesión interna; el reader exige `content.edit` |
+| La mesa sin borrador abierto | Pantalla «No hay un borrador abierto.» en la misma ruta | Sala publicada, no archivada y `getDraft` responde `not_found` |
+| «Abrir vista previa» | `/rooms/:roomId/authoring/vista-previa` (rol comprador) | Interno |
+| «Probar a pantalla completa» | `/rooms/:roomId/authoring/vista-previa/vive/:blockId` | Escena guardada y sin cambios pendientes |
+| Tostada de publicación «Abrir la sala» | `/rooms/:roomId/editions/:editionId` (la nueva) | Tras `editions.publish` |
+| URL | `/rooms/:roomId/editions/:editionId/cambios?desde=:baseId` | Lectura de ambas ediciones; sin `desde`, la base es la edición anterior |
 
-## Entry and authority
+## Nodos y transiciones de la mesa
 
-Tus salas → Editar propuesta sólo con content.edit en borrador. Sin borrador, el command editions.reopen existente requiere su permiso; no crear uno automáticamente al leer. URLs edit/preview entran al allowlist de continuidad sólo por dueño backend. Guest nunca abre draft/preview; entrar por URL no concede autoridad.
+| Nodo | Entrada | Salida |
+|---|---|---|
+| Pieza seleccionada | Clic en el inventario (también fija el capítulo del escenario) | Otra pieza, una escena, publicar, vista previa |
+| Escena seleccionada | Clic en una escena o creación desde «Añadir escena» | Otra selección; los cambios sin guardar quedan en memoria por escena y se marcan «sin guardar» |
+| «Ver como» | Selector de rol; flechas ← → | Cambia la proyección del escenario y la nota del rol; no navega |
+| Capítulo del escenario | Barra «NN título» bajo el escenario | Solo cambia lo que muestra el escenario |
+| Confirmar publicación | «Publicar edición N» | «Cancelar»/Escape (cierra y vuelve al botón) o «Publicar» → tostada |
+| Vista previa | «Abrir vista previa» (navegación de documento) | «Ver como: {rol} · volver a autoría» vuelve a la mesa |
 
-## Main flow
+Escribir siempre sigue el mismo ciclo: acción → `POST /api/v1/commands` con `expectedRevision` (la última recibida) e
+`Idempotency-Key` nueva → la revisión devuelta reemplaza la anterior → `router.refresh()` vuelve a pedir el modelo al
+servidor. Un fallo también refresca, para que la mesa muestre la verdad del servidor.
 
-1. Leer borrador, revision, coverage, permisos y disponibilidad/límites.
-2. Elegir una imagen real con FileField; iniciar sesión por command autorizado.
-3. Cargando refleja bytes transferidos. Al terminar transferencia, llamar complete y esperar estado server Verificando; no ready por una respuesta 200 de upload.
-4. Ready muestra Lista para añadir. Attach al bloque con expectedRevision produce lectura nueva; hasta entonces no aparece en la propuesta guardada.
-5. Editar título/alt/pie y guardar. No modificar original ni eliminar bloques ajenos.
-6. Abrir Vista de lectura: misma proyección visual, etiqueta Borrador; preview no crea sesión guest.
-7. Validar coverage; publicar sólo si DTO permite. La edición fija versiones; no sustituir bytes mientras invitado lee.
-8. Guest ve imagen entera; abre inspector, usa zoom/reset/pan/teclado y vuelve al mismo punto.
+### Acciones y commands
 
-## Recovery and continuity
+| Acción en la mesa | Commands | Efecto en la mesa |
+|---|---|---|
+| Incluir o excluir | `content.upsertBlock` (con o sin `excludedReason`) y, si hay capítulos declarados, `content.arrange` | Excluida sale de su capítulo; incluida vuelve al suyo o al último |
+| Cambiar de capítulo | `content.arrange` | Sin capítulos vacíos |
+| Renombrar (al salir del campo) | `content.upsertBlock` | Solo si el título cambió y no está vacío |
+| «Por qué funciona» (al salir del campo) | `content.upsertBlock` | Vacío quita el fundamento |
+| «Vincular evidencia» | `content.linkEvidence` (relación no obligatoria del bloque a la evidencia) | La evidencia aparece en la lista |
+| «Añadir imagen» | SHA-256 en el navegador → `uploads.initiate` → `PUT` al descriptor de transferencia (corto, privado, usado una vez y nunca guardado) → `uploads.complete` | La imagen aparece «Procesando…» y luego «Lista» |
+| «Usar en la sala» | `content.upsertBlock` (bloque de medio nuevo) → `content.attachAsset` (`role: primary`) → `content.arrange` | La pieza entra al capítulo visible en el escenario o al último |
+| «Añadir escena» | `content.upsertBlock` (escena con valores editables) → `content.arrange` | La escena queda seleccionada; va al capítulo que ya tiene escenas o crea «Vive el servicio» |
+| «Guardar escena» | `content.upsertBlock` con el bloque completo | Se borra el borrador local de esa escena |
+| «Descartar cambios» | Ninguno | El escenario vuelve a la escena guardada |
+| «Publicar» | `editions.publish` | Tostada «Edición N publicada» con «Abrir la sala»; el botón queda deshabilitado |
+| «Abrir borrador» | `editions.reopen {sourceEditionId}` | La ruta se refresca y aparece la mesa con el borrador nuevo |
 
-| Trigger | Respuesta |
+### Vista previa por rol
+
+- `?as=buyer|champion|audience` (otro valor cae en `buyer`). La vista previa usa la proyección
+  `content.previewAudience` del borrador: el rol solo oculta (comprador sin evidencia ni preguntas; champion con
+  evidencia y preguntas; audiencia como en la presentación). No crea sesión, no registra recorrido ni presencia
+  (`offline`).
+- Desde la vista previa, una escena abre `/authoring/vista-previa/vive/:blockId?as=rol`; su «Volver a la sala» regresa
+  a la vista previa con el mismo rol. La escena del borrador se ve solo después de guardarla.
+
+## «Qué cambió»
+
+- `?desde=` elige la base; las ediciones anteriores de la línea de tiempo son enlaces que cambian `desde` (navegación de
+  documento). Sin edición anterior, o con una base que no se puede leer, la ruta responde `AccessState`.
+- Elegir un cambio en la lista actualiza el detalle sin navegar (anunciado con `aria-live`).
+- El comparador se opera arrastrando o con las flechas sobre el `range`.
+- «Volver a la sala» lleva a la edición mostrada.
+- No hay entrada desde la sala ni desde la tostada de publicar: `AUTHORING_COPY.changes` («Ver qué cambió») existe sin
+  usarse. Pendiente agregar ese enlace en la tostada y en la sala cuando haya una edición anterior.
+
+## Estados de error, vacío y permiso
+
+| Situación | Respuesta |
 |---|---|
-| Red perdida | conservar intención/command key y consultar status; no segunda carga automática |
-| Upload inválido o muy grande | razón saneada y nueva selección explícita; lo rechazado nunca se adjunta |
-| Verificación falló | retry individual sólo si permitido; no alterar etiqueta Lista a mano |
-| Complete incierto | readback sesión/asset, misma key cuando corresponda |
-| Attach 409 | conservar archivo listo+inputs, releer revisión y confirmar attach revisado con nueva intención |
-| Permission expiró | cancelar nuevas acciones; quitar imagen/inspector, recovery de sesión sin mostrar datos privados |
-| Salida con cambios | confirmar descartar/seguir; cancelar UI no afirma cancelación en servidor |
-| Reemplazar imagen | nueva versión y attach; edición anterior sigue fijada |
-| Reduced motion/sin View Transition | flujo funcional idéntico, foco/estado preservados |
-
-## Protected delivery
-
-Reader recibe sólo descriptores autorizados vinculados a la edición. Endpoint same-origin de 2070 revalida cada GET/HEAD/Range; no signedURL pública de lectura ni Next optimizer/cache. Backend controla CSP/rango/stream. No prometer retirar bytes ya recibidos/guardados. El cliente desmonta arte en revocación y no guarda descriptor de transferencia en storage.
-
-## Focus and surfaces
-
-Una sola inspección Dialog; Escape/cierre retornan a la pieza. Propiedades inline/tabs, sin modal anidado. Móvil cambia región, no zoom por hover. Al revisar cobertura el enlace activa el bloque/error correcto; estado del archivo no se pierde al ir a preview.
+| Sesión no interna o sin `content.edit` | `AccessState` con enlace a `/login?returnTo=/rooms` |
+| Sala archivada, o borrador abierto que la mesa no pudo leer | `AccessState` (nunca se ofrece reabrir encima de un borrador existente) |
+| Sin borrador tras publicar | «No hay un borrador abierto.» con «Abrir borrador» |
+| Conflicto de revisión (409) | «La sala cambió mientras editabas. Recargamos la última versión.» y el modelo se refresca |
+| Cualquier otro fallo de command | «No pudimos guardar el cambio. Vuelve a intentarlo.» y refresco |
+| Escena inválida | El botón «Guardar escena» queda deshabilitado y la lista dice qué falta |
+| Cobertura incompleta | «Publicar» deshabilitado con la explicación en la franja de cobertura |
+| Imagen que no se pudo procesar | «nombre · No se pudo procesar» en el inventario; no se puede usar |
 
 ## GVC Scenario Plan
 
-Escenario premium 2071 con flujo principal y negativos anteriores; autenticación local cuando el DSL no expresa transferencia. Capturas por fase sin secretos en URL/cookies/log; volver después de revocar no muestra el arte. Registrar pageshow.persisted sólo si se observa, no inferir BFCache.
+- `rooms-authoring` (`/demo/autoria`): comprador, champion, excluir una pieza, confirmar publicación; probe
+  `view-as-arrows`.
+- `rooms-authoring-scenes` (`/demo/autoria`): editar `showcase` y `cycle`, menú «Añadir escena»; probe
+  `add-scene-keyboard`.
+- `rooms-edition-changes` (`/demo/ediciones`): comparador de pieza y diff de texto; probe `wipe-slider-keyboard`.
+- Viewports 1440×900, 1280×800 y 390×844; repetir con movimiento reducido.
+- Recorrido real verificado en local contra la integración (renombrar, publicar, «Qué cambió», subir y usar imagen,
+  reabrir, escena completa). Pendiente: dos editores en conflicto y vista previa por rol con una sala real.
+- Dossier: `docs/ui/reviews/TASK-2071-rooms-private-image-authoring-and-viewer/`.
 
 ## Design Decision Log
 
-La carga no adjunta ni publica por sí sola: el autor conserva una decisión explícita después de verificar bytes. Las operaciones se pueden repetir para varias piezas sin reemplazar el inventario. Preview usa la proyección audiencia del mismo renderer y nunca convierte al autor en guest. Un conflicto conserva entradas locales, vuelve a leer revisión y exige una nueva intención antes de sobrescribir.
+- 2026-10-31 — La vista previa es la sala real en modo `offline` con la proyección del rol, no una maqueta ni una sesión
+  falsa de invitado.
+- 2026-10-31 — Publicar siempre pasa por confirmación con el resumen de lo que entra y lo que queda fuera.
+- 2026-10-31 — «Qué cambió» se lee con la autoridad de quien mira: el invitado también la ve y nada excluido entra al
+  diff.
+- 2026-10-31 — Reabrir crea el borrador siguiente desde la última edición; la edición publicada nunca cambia.

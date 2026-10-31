@@ -59,7 +59,7 @@ El estado consolidado vigente y el siguiente bloque están en [contrato para Cla
 
 - Implementación: `src/components/room/{room-orbit,room-stack,chapter-view,use-room-progress,live-layer}.tsx`, `src/styles/room.css`, página `src/app/rooms/[roomId]/editions/[editionId]/page.tsx` y demo sintética `/demo/sala` (volta ficticia).
 - Base visual de TASK-2079; contrato de TASK-2080 (capítulos, recorrido, adaptaciones, autores).
-- Wireframe/flow/motion de esta task siguen describiendo la interfaz anterior: se rehacen desde el canvas antes de marcar `UI ready`.
+- 2026-10-31: wireframe, flow y motion de esta task se reescribieron desde el canvas aprobado y el código implementado (`efeonce-rooms` `claude/rooms-approved-ui`), con las diferencias canvas ↔ código registradas. `UI ready` sigue en `no` hasta la aceptación humana.
 
 ## Summary
 

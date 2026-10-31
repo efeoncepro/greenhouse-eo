@@ -5,6 +5,31 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — Ensayo de migraciones en clon de producción PASS + docs de UI rehechos desde el canvas
+
+- **Ensayo de migraciones (gate 2 del ADR cloud).** Autorizado por el operador. Recibo
+  [`2026-10-31-production-migration-rehearsal.md`](../../../../docs/audits/rooms/2026-10-31-production-migration-rehearsal.md).
+  - `rooms_production` solo se leyó (`pg_dump` por proxy; conteos idénticos antes y después).
+  - Clon PostgreSQL 16 desechable, con los permisos de producción. Migraciones 8 → 18 y tablas 26 → 47, con contenido
+    y hash de ediciones intactos y el rol runtime OK.
+  - Rollback en el clon con reaplicación OK. Suite 377/377 contra el clon.
+  - Script `efeonce-rooms` `17438b6`: `pnpm db:rehearse-production`. El clon y los respaldos se borran solos.
+  - Observación: el rollback deja dos CHECK equivalentes con otro nombre (`grants`, `invitations`). El rollback de
+    producción sigue siendo restaurar desde respaldo, nunca `down`.
+- **Docs de UI.** Wireframe, flow y motion de TASK-2059, 2068 y 2071 reescritos desde el canvas aprobado y el código
+  (cada wireframe trae su tabla «Diferencias con el canvas»); `task:lint` sin hallazgos; `UI ready` sigue en `no`.
+- **Riesgos que el subagente reportó leyendo el código, sin verificar en navegador:**
+  - en móvil, `#capitulo-N` no lleva al capítulo;
+  - la deriva de «Respuestas», la ruta y las barras de story no tienen pausa además de movimiento reducido (WCAG 2.2.2);
+  - `AUTHORING_COPY.uploadError` sin cablear;
+  - no hay enlace a «Qué cambió» desde la sala ni desde el aviso de publicación;
+  - textos fijos en estados de invitación.
+
+  Su «el enlace al 01 corta la cámara» es dudoso: la cámara sí escucha `hashchange`.
+- Siguiente para el merge:
+  1. repetir el ensayo y aplicar las migraciones con autorización expresa;
+  2. aceptación humana de la interfaz.
+
 ## 2026-10-31 — Rama de la UI aprobada subida; PR #4 en borrador (sin merge)
 
 - Autorización del operador («Hazlo») para corregir los hallazgos, verificar y subir la rama con un PR, **sin merge**.

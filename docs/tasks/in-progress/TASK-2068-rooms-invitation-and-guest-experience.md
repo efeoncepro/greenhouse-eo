@@ -72,7 +72,7 @@ El estado consolidado vigente y el siguiente bloque están en [contrato para Cla
 
 - Implementación: `src/components/invitations/{invitation-stage,invitation-entry,invitation-demo}.tsx`, `src/styles/invitation-stage.css`, demo `/demo/invitacion?estado=`.
 - Diferencia con el canvas: el código es de 6 **dígitos** (contrato del backend) y no viene en el enlace; el correo lo trae aparte. Los códigos duran 10 minutos, no 7 días. «Escríbele a…» no enlaza a un correo: nunca se expone uno.
-- Wireframe/flow/motion de esta task describen la entrada anterior; se rehacen desde el canvas antes de `UI ready`.
+- 2026-10-31: wireframe, flow y motion de esta task se reescribieron desde el canvas aprobado y el código implementado (`efeonce-rooms` `claude/rooms-approved-ui`), con las diferencias canvas ↔ código registradas. `UI ready` sigue en `no` hasta la aceptación humana.
 
 ## Summary
 

@@ -8,6 +8,7 @@
 - Evidencia `local`: `pnpm verify` 376/376; GVC PASS `rooms-authoring-scenes` y `rooms-authoring`; recorrido real en
   la integración (crear, editar, guardar y abrir la vista previa de una escena en la sala sintética Lumbre).
 - Pendiente: aceptación humana. `UI ready` sigue en `no`.
+- 2026-10-31: wireframe, flow y motion de esta task se reescribieron desde el canvas aprobado y el código implementado (`efeonce-rooms` `claude/rooms-approved-ui`), con las diferencias canvas ↔ código registradas. `UI ready` sigue en `no` hasta la aceptación humana.
 
 ## Delta 2026-10-30 — canvas aprobado; base y backend primero
 
