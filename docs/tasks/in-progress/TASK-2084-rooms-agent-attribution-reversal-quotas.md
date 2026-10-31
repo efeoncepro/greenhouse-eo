@@ -55,7 +55,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-052`
-- Status real: `Code complete en local (efeonce-rooms rama claude/rooms-agent-attribution, slices 1–5: f0499bf, 31b9a27, c64665a, 872f17e, aced4e5; verify 406/406 sin skips). Rollout pendiente: ensayo + migraciones 1793262–1793265 en rooms_production, merge, deploy y alias; slice 6 (contract) después del release. Sin push.`
+- Status real: `En producción (expand): main@d7d6f6b, dpl_8xUkT1AduZ4eiD7SM4x8Dktm2exC, migraciones 1793262–1793265 aplicadas con ensayo y readback (recibo docs/audits/rooms/2026-10-31-agent-lane-attribution-production.md). Pendiente: verificar con uso real (comando por navegador y por MCP como agente) y slice 6 (contract) después de eso.`
 - Rank: `primera task del carril de agentes; antes de TASK-2085, TASK-2087, TASK-2090 y TASK-2091`
 - Domain: `platform|identity`
 - Blocked by: `ninguno para el corte local; producción espera autorización (migración + merge + deploy)`
@@ -470,10 +470,10 @@ implementación:
 
 ## Acceptance Criteria
 
-- [ ] Las seis tablas tienen `actor_kind`, `agent_client_id` y `channel` en local y en el ensayo de producción
-      (lectura de `information_schema.columns`). — Local sí (bloque `DO` de la migración exige 18 columnas); ensayo de producción pendiente.
-- [ ] Ninguna fila histórica fue reescrita: el conteo de filas con `channel IS NULL` antes y después del ensayo es
-      igual al conteo previo de cada tabla. — Pendiente del ensayo de producción (fast default, sin `UPDATE`).
+- [x] Las seis tablas tienen `actor_kind`, `agent_client_id` y `channel` en local y en el ensayo de producción
+      (lectura de `information_schema.columns`). — Local, ensayo y producción (readback 2026-10-31).
+- [x] Ninguna fila histórica fue reescrita: el conteo de filas con `channel IS NULL` antes y después del ensayo es
+      igual al conteo previo de cada tabla. — Producción: `command_receipts` 12/12, `audit` 15/15, `access_events` 1/1 con `channel` NULL; conteos de filas sin cambios en el readback.
 - [x] Un comando por navegador queda `person`/`browser`; uno por CLI queda `cli`; uno por MCP stdio de un agente queda
       `agent`/`cli` con `agent_client_id` (tests). — `tests/agent-attribution.test.ts` (resolución de encabezados y filas en `audit`/`command_receipts`); el MCP envía `X-Rooms-Agent` con el nombre del handshake (`mcpAgentClientId`).
 - [x] `principal_id` de una acción de agente es la persona y `Principal` no tiene campos de atribución (test). — `tests/agent-attribution.test.ts`.
@@ -489,7 +489,7 @@ implementación:
 - [x] `rooms.agent.release_actions` y `rooms.agent.quota_hit` aparecen en el health del carril (test). — `accessHealth().agentLane`, `tests/agent-quotas.test.ts`.
 - [ ] La migración contract rechaza un `INSERT` sin `channel` y acepta los históricos (test en PG local). — Slice 6, después del release.
 - [x] `LC_ALL=en_US.UTF-8 pnpm verify` pasa en `efeonce-rooms`. — lint, lint negativo, tipos y build OK; tests 406/406 sin skips con `ROOMS_DATABASE_URL`.
-- [ ] `pnpm db:rehearse-production` PASS para expand y para contract. — Pendiente: lee producción, se corre con la autorización del rollout.
+- [ ] `pnpm db:rehearse-production` PASS para expand y para contract. — Expand PASS (2026-10-31); contract pendiente con el slice 6.
 
 ## Verification
 

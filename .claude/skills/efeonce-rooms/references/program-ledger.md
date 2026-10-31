@@ -145,6 +145,21 @@
 - Sin push, sin deploy, sin flags. El checkout `efeonce-rooms` quedó en la rama nueva; `tsconfig.json` sigue
   modificado por otra sesión y no se commiteó.
 
+## 2026-10-31 — TASK-2084 en producción (expand)
+
+- Operador: «Ok» al rollout. Recibo [`2026-10-31-agent-lane-attribution-production.md`](../../../../docs/audits/rooms/2026-10-31-agent-lane-attribution-production.md).
+- `vivo`:
+  - ensayo PASS;
+  - migraciones `1793262`–`1793265` aplicadas (24 migraciones, 51 tablas);
+  - [PR #7](https://github.com/efeoncepro/efeonce-rooms/pull/7) mergeado a `main@d7d6f6b` y desplegado en
+    `dpl_8xUkT1AduZ4eiD7SM4x8Dktm2exC`, con el alias reasignado;
+  - filas históricas con `channel` NULL (sin reescribir), 0 filas de agentes, señales del carril en `ok`;
+  - respaldo lógico borrado.
+- Falta:
+  - la primera acción real por navegador y como agente (MCP stdio);
+  - el slice 6 (contract);
+  - la reversa de invitación de punta a punta.
+
 ## 2026-10-31 — TASK-2084 code complete en local (atribución, avisos, reversas, cuotas)
 
 - Operador: «Apruebo el plan». `efeonce-rooms` rama `claude/rooms-agent-attribution` (desde `main@aae04cd`), sin push.
