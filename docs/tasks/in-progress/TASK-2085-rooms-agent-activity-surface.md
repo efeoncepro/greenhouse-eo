@@ -35,7 +35,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -48,7 +48,7 @@
 - Motion: `docs/ui/motion/TASK-2085-rooms-agent-activity-surface-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-052`
-- Status real: `Diseno`
+- Status real: `Dirección «el umbral» aprobada 2026-10-31; implementación en curso en efeonce-rooms rama claude/rooms-agent-activity (local, sin push).`
 - Rank: `después de TASK-2084; el slice 1 (canvas) puede empezar antes`
 - Domain: `platform`
 - Blocked by: `TASK-2084 (slices 2 a 6; el slice 1 de canvas no depende de ella)`
