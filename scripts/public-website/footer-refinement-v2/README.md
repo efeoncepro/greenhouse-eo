@@ -25,3 +25,15 @@ pnpm public-website:wpcli -- --eval-file scripts/public-website/footer-refresh-v
 Snapshot durable no autoload: `eo_footer_refinement_20261014_v2`. Writer guarda before/after de opciones y CF7; compara hashes del formulario, propiedades de entrega, Home/Elementor y plantilla. `readback` y `rollback` usan una copia de payload con ese `mode`; no modificar el payload sellado de aplicación. Rollback sólo restaura instancias/asignaciones propias con guardas y preserva claves hermanas; CF7 requiere hash completo sin deriva. Leer cualquier fallo posterior a una escritura antes de decidir cómo continuar; nunca repetir el apply inicial contra un estado parcial.
 
 `footer.css` y `footer.js` son fuentes de revisión; `payload.json` incluye su CSS exacto y JS equivalente salvo líneas en blanco para publicar como bloque HTML nativo. Si se edita una fuente, actualizar payload y guardas tras redescubrir runtime. El commit no publica: el estado activo vive en WordPress.
+
+## Delta 2026-10-31 — el newsletter del footer es la píldora de Glitch
+
+El footer ya no usa CF7 **242255**. Por pedido del operador («si no es el Growth Form canónico de suscripción, el mismo
+del blog, hay que corregir»), la columna `ohio-sidebar-footer-3` muestra el bloque `block-46` con la misma píldora de
+Glitch del blog: formulario `efeonce-blog-subscription`, clave `6bc62588-a4a0-4214-9501-13b0c2948c81`, superficie
+`fhsf-efeonce-blog-subscription`. Entrega directa a HubSpot con el tipo de suscripción `535702717`; el aviso de
+privacidad es el consentimiento, sin casilla. El renderer se carga cuando el footer se acerca a la pantalla y nunca dos
+veces (en Contacto y el blog ya viene cargado). El widget `ohio_widget_subscribe-2` quedó en widgets inactivos y el CF7
+242255 no se tocó. Script: `scripts/public-website/footer-newsletter-growth-form.php` (volver a correrlo sólo refresca el
+bloque); snapshots `_gh_footer_newsletter_before_20261031_125344` (cambio) y `…_125729` (ajuste de espaciado). Las
+reglas de CF7 de este paquete quedan sin efecto.

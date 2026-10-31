@@ -119,3 +119,15 @@ Piel real: `efeonce-public-site-runtime` → `wp-content/plugins/eo-blog-home/as
 - Portada con el formulario real, sin envíos posibles:
   `node scripts/public-website/blog-v3/preview/serve.cjs --subscribe <formKey>` (proxy local GET-only `/__ghf/`).
 - En vivo: `pnpm public-website:blog-home verify --browser` (8 anchos 320–1920 sin desborde + axe en tres tableros).
+
+## Segundo anfitrión: el footer del sitio (2026-10-31)
+
+El newsletter del footer global es esta misma píldora (misma clave y superficie que el blog; las superficies se
+autorizan por origen, no por página). Bloque `block-46` en `ohio-sidebar-footer-3`, escrito por
+`scripts/public-website/footer-newsletter-growth-form.php`. El footer no tiene el handle de WordPress, así que el bloque
+trae un cargador perezoso: agrega `renderer-latest.js` cuando el footer está a 800 px de la pantalla y sólo si no hay ya
+un `script[src^=…renderer-latest.js]` ni `greenhouse-form` definido. En una columna de menos de 480 px la píldora ocupa
+todo el ancho y reserva el lugar del aviso aunque esté en reposo: es la consulta de contenedor del renderer, no un
+estilo del anfitrión. Las reglas del anfitrión van con el prefijo `#colophon:has([data-eo-footer-partners="v2"])`, porque el
+adaptador del footer anula los márgenes de `p` con esa especificidad. Reemplazó al CF7 242255, cuya conexión a Mailchimp
+estaba cortada.

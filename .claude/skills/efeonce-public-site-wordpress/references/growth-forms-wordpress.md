@@ -176,6 +176,15 @@ under that notice **is** the consent (operator approval 2026-10-24): Greenhouse 
 destination subscribes only with `consentBy: 'submission'` + that hash. Checkbox subscriptions are unchanged. WordPress
 never declares or fakes this; it lives in the form version and its destination.
 
+### Second host: the global footer (2026-10-31)
+
+The footer newsletter is the same Glitch pill (same key and surface as the blog; surfaces are authorized per origin):
+block `block-46` in `ohio-sidebar-footer-3`, written by `scripts/public-website/footer-newsletter-growth-form.php`
+(re-running refreshes the block). The footer has no WordPress handle, so the block lazy-loads `renderer-latest.js` when
+the footer is 800 px from the viewport, and only if the page has not loaded it already. It replaced CF7 242255 (Mailchimp
+disconnected, HubSpot only through the collector); `ohio_widget_subscribe-2` sits in inactive widgets. Host selectors use
+the `#colophon:has([data-eo-footer-partners="v2"])` prefix to beat the footer adapter's `p { margin: 0 }`.
+
 Host recipe (each rule fixed a live break on 2026-10-24):
 
 - Enqueue the renderer from Greenhouse with the shared handle `gh-growth-forms-renderer-latest`
