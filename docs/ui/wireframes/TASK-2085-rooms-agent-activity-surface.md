@@ -235,7 +235,7 @@ Copy nuevo en `src/lib/copy/rooms.ts` (es-CL neutro, tuteo, sin voseo), validado
 
 ## Contrato de datos consumido (TASK-2084)
 
-[TASK-2084](../../tasks/to-do/TASK-2084-rooms-agent-attribution-reversal-quotas.md) declara: reader
+[TASK-2084](../../tasks/in-progress/TASK-2084-rooms-agent-attribution-reversal-quotas.md) declara: reader
 `agents.activity` (nombre final en su Discovery) con sala, operación, momento, `agent_client_id`, canal y descriptor
 de reversa; DTO browser-safe en `src/domain/agent-lane-contracts.ts`; avisos en `rooms.agent_action_notices` (con
 `acknowledged_at`); contadores por hora en `rooms.agent_lane_counters` (`quota_hit`, y `bearer_rejected` reservado

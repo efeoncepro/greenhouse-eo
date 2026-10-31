@@ -90,7 +90,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-2084` (`docs/tasks/to-do/TASK-2084-rooms-agent-attribution-reversal-quotas.md`): `actor_kind`,
+- `TASK-2084` (`docs/tasks/in-progress/TASK-2084-rooms-agent-attribution-reversal-quotas.md`): `actor_kind`,
   `agent_client_id` y `channel`, más las reversas de D4; la corrida viva del eval comprueba atribución y reversa.
 - Operaciones existentes de `efeonce-rooms`: `rooms.create`, `content.upsertBlock`, `content.arrange`,
   `content.importManifest`, `content.attachAsset`, `rooms.authoring` (devuelve `coverage`), `content.previewAudience`,

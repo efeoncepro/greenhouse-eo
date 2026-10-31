@@ -94,7 +94,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- TASK-2084 (`docs/tasks/to-do/TASK-2084-rooms-agent-attribution-reversal-quotas.md`): columnas de actor, reader
+- TASK-2084 (`docs/tasks/in-progress/TASK-2084-rooms-agent-attribution-reversal-quotas.md`): columnas de actor, reader
   `agents.activity` (nombre final en su Discovery), DTO y descriptores de reversa en
   `src/domain/agent-lane-contracts.ts`, avisos `rooms.agent_action_notices`, contadores `rooms.agent_lane_counters`,
   error `agent_quota_exceeded` y señales `rooms.agent.quota_hit` y `rooms.agent.release_actions`.

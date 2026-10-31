@@ -85,7 +85,7 @@ Reglas obligatorias:
 
 - `.claude/skills/efeonce-rooms/SKILL.md` y `references/program-ledger.md`
 - `.claude/skills/efeonce-auth/SKILL.md` y su `references/program-ledger.md` (estado de Efeonce ID)
-- `docs/tasks/to-do/TASK-2084-rooms-agent-attribution-reversal-quotas.md`
+- `docs/tasks/in-progress/TASK-2084-rooms-agent-attribution-reversal-quotas.md`
 - `docs/tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md`
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
 

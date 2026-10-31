@@ -95,7 +95,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-2084` (`docs/tasks/to-do/TASK-2084-rooms-agent-attribution-reversal-quotas.md`): columnas `actor_kind`,
+- `TASK-2084` (`docs/tasks/in-progress/TASK-2084-rooms-agent-attribution-reversal-quotas.md`): columnas `actor_kind`,
   `agent_client_id` y `channel` en `rooms.source_imports` y `rooms.crm_handoffs`, más la clasificación D2 de
   `integrations.*`.
 - `TASK-2086` (`docs/tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md`): canje RFC 8693

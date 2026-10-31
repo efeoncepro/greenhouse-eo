@@ -88,7 +88,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-2084` (`docs/tasks/to-do/TASK-2084-rooms-agent-attribution-reversal-quotas.md`): `actor_kind`,
+- `TASK-2084` (`docs/tasks/in-progress/TASK-2084-rooms-agent-attribution-reversal-quotas.md`): `actor_kind`,
   `agent_client_id` y `channel` en `command_receipts` y `audit`; clasificación D2 con guard; cuotas por persona.
 - Pipeline existente: `rooms.assets`, `rooms.asset_versions`, `rooms.upload_sessions`, `rooms.media_jobs`
   (`migrations/1792968329622_rooms-private-image-media.sql`), worker `rooms-media-worker` y dispatch por Scheduler.

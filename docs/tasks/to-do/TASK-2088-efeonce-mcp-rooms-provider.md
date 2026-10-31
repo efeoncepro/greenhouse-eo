@@ -108,7 +108,7 @@ Reglas obligatorias:
   `references/native-authority.md`
 - `.claude/skills/efeonce-rooms/SKILL.md`
 - `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md` (patrón por provider)
-- `docs/tasks/to-do/TASK-2084-rooms-agent-attribution-reversal-quotas.md`
+- `docs/tasks/in-progress/TASK-2084-rooms-agent-attribution-reversal-quotas.md`
 - `docs/tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md`
 - `docs/tasks/to-do/TASK-2087-rooms-delegated-bearer-verifier.md` [verificar]
 
