@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-052`
-- Status real: `2026-10-31: código local en efeonce-rooms claude/rooms-durable-internal-access (adb1db0 + 510ab42, sin push). Con TASK-2082, identity_unbound muestra el código de solicitud (XXXX-XXXX) en vez de la referencia. verify 385/385; GVC rooms-access-issue OK en 1440/1280/390 con código. Falta: mirada del operador (UI ready), merge y deploy autorizados.`
+- Status real: `2026-10-31: código local en efeonce-rooms claude/rooms-durable-internal-access (adb1db0, 510ab42 y el fix de pesos), sin push. Revisión del operador aplicada: titular en dos pesos (introducción 340, idea principal 740). GVC rooms-access-issue OK en 1440/1280/390 tras el cambio. Falta: aprobación visual del operador (UI ready), merge y deploy autorizados.`
 - Rank: `junto con TASK-2082; independiente de ella`
 - Domain: `platform|identity`
 - Blocked by: `ninguno para el corte local; producción espera autorización de merge`

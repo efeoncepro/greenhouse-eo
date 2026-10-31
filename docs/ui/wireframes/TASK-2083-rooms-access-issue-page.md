@@ -43,7 +43,10 @@ movimiento reducido) y grano fijo. Filas: encabezado, cuerpo y pie.
    - **Izquierda — el gesto**: anillo sin esfera de radio 230 alrededor de una palabra en Bricolage 760 de 168 px
      (−0,05 em) con el punto en teal: «Casi.», «Otra vez.», «Pausa.», «Espera.» o «Aún no.» según el motivo. Es
      decorativa (`aria-hidden`).
-   - **Derecha — lo que pasó**: `h1` con el título del motivo (Bricolage 700, 40 px, `text-wrap: balance`), párrafo
+   - **Derecha — lo que pasó**: `h1` con el título del motivo en **dos pesos** (Bricolage 40 px, `text-wrap: balance`):
+     la parte que introduce en `--room-weight-light` (340) y la idea principal en `--room-weight-bold` (740), mismo
+     tamaño y color (canon «Titulares largos en Bricolage: contraste de pesos»; revisión del operador 2026-10-31:
+     «Bricolaje en párrafos es muy denso… debe jugar con sus contrastes en pesos»). «Efeonce ID» va con espacio duro. Párrafo
      con qué hacer (Poppins 16, interlineado 1,6, hasta 52 ch, atenuado), acciones y, abajo, la referencia.
 3. **Referencia** (sobre una regla `--room-line-dark`): ojal «Referencia», código corto en Bricolage 28 tabular
    (`XXXX-XXXX`, los ocho primeros del UUID en mayúsculas), botón fantasma «Copiar referencia» (copia el UUID entero)
@@ -75,7 +78,7 @@ movimiento reducido) y grano fijo. Filas: encabezado, cuerpo y pie.
 ## Copy Ledger
 
 Todo en `ACCESS_ISSUE_COPY` de `src/lib/copy/rooms.ts` (es-CL neutro, tuteo, sin voseo). Cada motivo tiene `word`,
-`title` y `body`; comunes: `eyebrow`, `reference`, `referenceHelp`, `copy`, `copied`, `login`, `retry`, `footer`,
+`title` (`{ lead, key }`: introducción liviana e idea principal) y `body`; comunes: `eyebrow`, `reference`, `referenceHelp`, `copy`, `copied`, `login`, `retry`, `footer`,
 `skip`. El título distingue culpa: «No pudimos…» cuando es nuestro, «Este intento…venció» cuando es el tiempo, y en
 `identity_unbound` deja claro que la identidad sí se verificó y falta el acceso de Rooms.
 

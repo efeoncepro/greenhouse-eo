@@ -27,16 +27,14 @@
 - Blocked by: `ninguno para el corte local; producción espera autorización (migración + merge)`
 - Branch: `efeonce-rooms: rama derivada de main, sin push a main hasta autorización; Greenhouse: docs en develop`
 
-## Delta 2026-10-31 — enmienda pendiente del carril de agentes
+## Delta 2026-10-31 — carril de agentes Accepted: sin enmienda
 
-- El ADR [Carril de agentes](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) (**Proposed**) no cambia el
-  modelo de principal (el agente se resuelve a la persona), pero si se acepta, `members.grantInternal` y
-  `members.renewInternal` dejan de ejecutarse directo por MCP local y CLI y pasan a ser propuestas con confirmación
-  humana; `members.revokeInternal` sigue directo. El código local `510ab42` aún los expone en el toolset MCP `members`
-  y en `pnpm rooms execute`; ajustarlo cuando ese ADR se acepte.
-- **Gate de merge:** no hacer merge a `main` de `efeonce-rooms` con `members.grantInternal/renewInternal` expuestos
-  en el MCP local hasta que el operador decida ese ADR. Si lo rechaza o no lo ha decidido al momento del merge, se
-  sacan del toolset `members` antes (la revisión adversarial confirmó que hoy una cookie copiada basta para ejecutarlos).
+- El ADR [Carril de agentes](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) quedó **Accepted**
+  (`4d8d6553c`). Decisión del operador: «Los agentes son ciudadanos de primera clase, pueden dar acceso y publicar».
+- La enmienda a esta task se retiró: `members.*` sigue en el MCP local (toolset `members`) y en la CLI tal como está
+  en `510ab42`. El gate de merge sobre la exposición en MCP queda resuelto sin quitar operaciones.
+- Las columnas de actor (`actor_kind`, `agent_client_id`, `channel`) van en la task del carril de agentes, en otra
+  migración; no entran en la migración 19 de esta task.
 
 ## Summary
 

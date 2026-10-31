@@ -5,6 +5,15 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — Carril de agentes Accepted; titular de /auth/error con contraste de pesos
+
+- ADR [Carril de agentes](../../../../docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) **Accepted**
+  (`4d8d6553c`): «Los agentes son ciudadanos de primera clase, pueden dar acceso y publicar». La enmienda a TASK-2082 se
+  retiró: `members.*` queda en el MCP local y la CLI como está. Las columnas de actor van en la task del carril.
+- TASK-2083: revisión del operador («Bricolaje en párrafos es muy denso… debe jugar con sus contrastes en pesos»).
+  Titular en dos pesos (introducción `--room-weight-light`, idea principal `--room-weight-bold`), sin cambiar copy ni
+  tamaño; «Efeonce ID» con espacio duro. `local`, sin push; GVC OK en 1440/1280/390.
+
 ## 2026-10-31 — ADR de acceso interno Accepted; TASK-2082 implementada en local
 
 - Aprobación del operador: «Aprobar ADR» (2026-10-31). Autoriza código local; **no** push, deploy, migración de
