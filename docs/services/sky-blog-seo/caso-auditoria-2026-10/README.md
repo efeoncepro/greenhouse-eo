@@ -49,6 +49,10 @@ de la empresa Sky Airlines (`30825221458`).
   sobre la portada navy. Pendiente reemplazar el logo de la organización.
 - **OneDrive:** la carpeta «Sky - Efeonce - General» parece compartida con SKY; el PDF se dejó en la carpeta interna
   para no exponerlo antes del envío.
+- **Corrección posterior al envío (31-10):** el cierre de la lámina de tendencia del PDF entregado dice «antes de migrar
+  el blog ya había perdido dos tercios de sus visitas». Compara enero (pico) contra septiembre, un error de
+  estacionalidad. El generador y el plan ya dicen «−48 % en agosto de 2025 contra el año anterior». El PDF enviado
+  no se re-renderizó ni se reenvió: corregirlo de palabra en el kickoff, y en el deck en la lámina 6.
 - **Renderer:** el informe obligó a sumar capacidades al catálogo A4 premium (hallazgos, escenarios, etiqueta de
   producto, etapas en tendencia, guarda del pie). Commit `001683d83` y `BASELINE_DELTAS.md` (ab).
 
