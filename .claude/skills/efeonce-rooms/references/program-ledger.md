@@ -63,7 +63,18 @@
 - Sin push, sin deploy, sin flags. El checkout `efeonce-rooms` quedó en la rama nueva; `tsconfig.json` sigue
   modificado por otra sesión y no se commiteó.
 
-## 2026-10-31 — ADR del carril de agentes (Proposed)
+## 2026-10-31 — ADR del carril de agentes ACCEPTED: agentes ciudadanos de primera clase
+
+- Operador: «Los agentes son ciudadanos de primera clase, pueden dar acceso y publicar» y «avancemos con todo».
+- El ADR se reescribió:
+  - fuera la propuesta y confirmación humana;
+  - los agentes ejecutan `release` y `access` directo, con la autoridad de la persona;
+  - seguridad por identidad del gateway + token delegado, scopes con step-up, actor registrado, aviso a la persona,
+    reversa, cuotas y eval.
+- La enmienda a TASK-2082 queda retirada: `members.*` sigue en el MCP local y su gate de merge se resuelve sin
+  quitar operaciones.
+
+## 2026-10-31 — ADR del carril de agentes (Proposed, superado por la entrada de arriba)
 
 - El operador fijó que las salas las arman y administran agentes; la interfaz revisa y aprueba.
   [ADR](../../../../docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) **Proposed**, sin código.
