@@ -5,6 +5,17 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — Autoría y ediciones del canvas implementadas local (TASK-2071)
+
+- `efeonce-rooms` `claude/rooms-approved-ui`: mesa de autoría `/rooms/:roomId/authoring` (inventario, cobertura,
+  escenario con «Ver como», propiedades, publicar), vista previa por rol y «Qué cambió» `/editions/:editionId/cambios`.
+  Demos sintéticas `/demo/autoria` y `/demo/ediciones`. Sin push, sin deploy, flags OFF.
+- `local`: GVC PASS `rooms-authoring` (1440/1280/390) y `rooms-edition-changes` (1440/390).
+- Contra backend real (integración 3216, admin interno): renombrar persistió (revisión 36→37), se publicó la edición 6
+  de la sala sintética Lumbre y «Qué cambió» mostró el cambio. Esa publicación quedó en la base de la integración
+  (sintética, local).
+- Falta: subir imágenes desde la mesa, adaptaciones y medios V4 en la mesa, aceptación humana.
+
 ## 2026-10-30 — Invitación, sala y sala en vivo del canvas implementadas local
 
 - `efeonce-rooms` `claude/rooms-approved-ui`: `3f11167` (sala en vivo, migración 18), `c133299` (invitación y sala

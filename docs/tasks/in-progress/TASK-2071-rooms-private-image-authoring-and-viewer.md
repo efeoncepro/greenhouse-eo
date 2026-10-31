@@ -57,7 +57,7 @@ histórico de esta task y no lo rediseña ni lo considera aceptado. Contratos/ba
 - Motion: `docs/ui/motion/TASK-2071-rooms-private-image-authoring-and-viewer-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-29: backend de imagen privada y lectura guest ejercitados en canary del 26-10, cerrado con acceso humano OFF. Scaffold de autoría anterior existe; nueva UI de Claude Design aún sin entrega/SHA ni aceptación. Conectores/entorno aislado y SDK ya preparados; autoría/preview V4 combinan imagen/PDF/audio/video en backend3c7bcb5. Falta integrar la interfaz y probar flujo completo crear/cargar/procesar/adjuntar/publicar/guest, conflictos, revocación, aislamiento y QA visual.`
+- Status real: `2026-10-31: autoría y ediciones del canvas implementadas en local (efeonce-rooms claude/rooms-approved-ui, sin push). Mesa de autoría /rooms/:roomId/authoring con inventario, cobertura, escenario compartido con «Ver como» (comprador/champion/audiencia sobre content.previewAudience), propiedades (incluir/excluir, capítulo, título, fundamento, vincular evidencia) y publicar con confirmación; vista previa por rol; «Qué cambió» /editions/:editionId/cambios con línea de tiempo, lista y detalle (comparador deslizante de pieza y diff de texto). GVC local PASS: rooms-authoring (1440/1280/390) y rooms-edition-changes (1440/390). Contra el backend real (integración 3216, admin interno): renombrar persistió (revisión 36→37), se publicó la edición 6 y «Qué cambió» mostró el cambio. Falta: subir imágenes desde la mesa (uploads.initiate/PUT/complete), adaptaciones, medios V4 en la mesa, aceptación humana y UI ready.`
 - Rank: `R07A/R08A inmediatamente después del contrato TASK-2070`
 - Domain: `ui|content`
 - Blocked by: `none`
@@ -68,6 +68,21 @@ histórico de esta task y no lo rediseña ni lo considera aceptado. Contratos/ba
 Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
 
 El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+
+## Delta 2026-10-31 — autoría y ediciones del canvas aprobado
+
+- Implementación: `src/components/authoring/{authoring-model,authoring-studio,authoring-client,authoring-demo}.tsx`,
+  `src/server/presentation/authoring.ts`, páginas `src/app/rooms/[roomId]/authoring/{page,vista-previa/page}.tsx`;
+  `src/components/editions/{changes-model,edition-changes}.tsx`, `src/server/presentation/edition-changes.ts`, página
+  `src/app/rooms/[roomId]/editions/[editionId]/cambios/page.tsx`; estilos `src/styles/{authoring,editions}.css`;
+  demos sintéticas `/demo/autoria` y `/demo/ediciones` (volta ficticia).
+- Cada acción usa los comandos canónicos (`content.upsertBlock`, `content.arrange`, `content.linkEvidence`,
+  `editions.publish`) con la revisión esperada; un conflicto recarga el modelo del servidor, nunca una copia local.
+  Excluir una pieza también la saca de su capítulo declarado, porque la cobertura no permite publicar con un bloque
+  excluido dentro de un capítulo.
+- El escenario es una imagen fiel y no interactiva de la escena del cliente (`inert` + `aria-hidden`, con texto
+  para lectores de pantalla que remite a «Abrir vista previa»).
+- No incluido todavía: la subida de imágenes desde la mesa (el canvas muestra «Añadir imagen»).
 
 ## Summary
 
