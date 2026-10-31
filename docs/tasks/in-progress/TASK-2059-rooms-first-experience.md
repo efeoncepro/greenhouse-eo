@@ -41,7 +41,7 @@
 - Motion: `docs/ui/motion/TASK-2059-rooms-first-experience-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-052`
-- Status real: `2026-10-26: demo histórica y QA automatizado disponibles; Rooms main e4b2e890 conserva la interfaz previa. El operador asignó la nueva interfaz a Claude Design y backend a Codex. View Transitions/AXIS y capturas históricas no acreditan aceptación humana; diseño e integración del nuevo consumidor siguen pendientes.`
+- Status real: `2026-10-30: sala nueva del canvas implementada en local (efeonce-rooms claude/rooms-approved-ui c133299 + 32640ee, sin push): capítulos en el mundo-cámara, escenas idea/pieza/galería, explorador de pieza con adaptaciones y Preguntar, radiografía en papel, recorrido real (progress.mark/get), mapa con bienvenida, versión móvil apilada con hoja de capítulos y capa en vivo. GVC local PASS: rooms-orbit-room (1440 y 1280), rooms-orbit-room-mobile (390 y 320), rooms-live-room. Contra backend real: sala del fixture de integración y prueba de dos personas. Falta: aceptación humana, UI ready y GVC con contenido real multimedia (video/PDF) y con una sala de 8-12 capítulos.`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`
@@ -54,6 +54,12 @@
 Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
 
 El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+
+## Delta 2026-10-30 — sala del canvas aprobado
+
+- Implementación: `src/components/room/{room-orbit,room-stack,chapter-view,use-room-progress,live-layer}.tsx`, `src/styles/room.css`, página `src/app/rooms/[roomId]/editions/[editionId]/page.tsx` y demo sintética `/demo/sala` (volta ficticia).
+- Base visual de TASK-2079; contrato de TASK-2080 (capítulos, recorrido, adaptaciones, autores).
+- Wireframe/flow/motion de esta task siguen describiendo la interfaz anterior: se rehacen desde el canvas antes de marcar `UI ready`.
 
 ## Summary
 

@@ -45,7 +45,7 @@ de 129/15 checks pertenecen al scaffold anterior.
 - Motion: `docs/ui/motion/TASK-2068-rooms-invitation-and-guest-experience-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `2026-10-29: canary interno del 26-10 completó correo único recibido, código, guest, imagen privada y revocación; cerró con acceso humano OFF. B18 local 51 checks PASS sin SSO/sesión interna para guest. El scaffold previo pasó 129 checks de integración y 15 de privacidad; UI nueva de Claude Design aún sin entrega ni aceptación. SDK/entorno aislado y backend local13 ya preparados y verificados; derechos adicionales guest explícitos sólo en edición inicial. Falta QA integral del flujo nuevo, recuperación UI/BFCache y activación estable; no repetir canary por inferencia.`
+- Status real: `2026-10-30: invitación nueva del canvas implementada en local (efeonce-rooms c133299, sin push): «Entra.» en la órbita, tarjeta de quién invita y para quién, código de 6 dígitos y estados explícitos (código vencido, revocada, vencida, reemplazada, intentos, sesión interna, sin invitación), «Listo.» y entrada al mapa de la sala. GVC local PASS en 1440, 1280, 390 y 320 (rooms-invitation-stage); /invite real responde vacío/inválido/malformado y limpia el token. El canary del 26-10 sigue cerrado: no repetir. Falta: aceptación humana, recorrido completo con correo real en la integración (no simula entrega), BFCache y activación.`
 - Rank: `TBD`
 - Domain: `ui|identity`
 - Blocked by: `none`
@@ -58,6 +58,12 @@ de 129/15 checks pertenecen al scaffold anterior.
 Entrega cloud y canary: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md); coordinación posterior: [disparo automático](../../audits/rooms/2026-10-26-automatic-media-dispatch.json). El único correo ya recibido no se repite. Persisten como trabajo nuevo la integración del consumidor de Claude Design y sus gates; el disparo del Job ya no es un pendiente.
 
 El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+
+## Delta 2026-10-30 — invitación del canvas aprobado
+
+- Implementación: `src/components/invitations/{invitation-stage,invitation-entry,invitation-demo}.tsx`, `src/styles/invitation-stage.css`, demo `/demo/invitacion?estado=`.
+- Diferencia con el canvas: el código es de 6 **dígitos** (contrato del backend) y no viene en el enlace; el correo lo trae aparte. Los códigos duran 10 minutos, no 7 días. «Escríbele a…» no enlaza a un correo: nunca se expone uno.
+- Wireframe/flow/motion de esta task describen la entrada anterior; se rehacen desde el canvas antes de `UI ready`.
 
 ## Summary
 

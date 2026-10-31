@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,11 +21,20 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-052`
-- Status real: `ADR propuesto 2026-10-30 (SSE same-origin + PostgreSQL efímero); espera aprobación del operador antes de código.`
+- Status real: `2026-10-30: ADR aceptado por el operador. Código local en efeonce-rooms claude/rooms-approved-ui (3f11167 + c133299 + 32640ee), sin push: migración 18 rooms.live_presence, live.event/live.presence/live.stream, revalidación cada 5 s, 10 cursores/s, TTL 15 s, capa de cursores, selección con 8 tiradores, presencia y burbuja de pregunta. Pruebas: 11 nuevas (persistencia, invitado revocado, stream con dependencias falsas) dentro de 371/371; prueba de dos personas reales (invitado + admin interno) en la integración local: cursor, selección y conteo cruzan por el stream y el cursor se va al salir. Falta: medir la duración real de streaming en Vercel y la carga del pool con streams concurrentes, flag ROOMS_LIVE_ENABLED en el ledger y autorización de producción.`
 - Rank: `último de la implementación de la UI aprobada`
 - Domain: `platform`
-- Blocked by: `TASK-2080 slices 1 y 6 (capítulos y contrato)`
+- Blocked by: `ninguno para el corte local; producción espera medición en Vercel + autorización`
 - Branch: `efeonce-rooms: claude/rooms-approved-ui o rama derivada, sin push a main; Greenhouse: docs en develop`
+
+## Delta 2026-10-30 — implementación local
+
+- ADR [`EFEONCE_ROOMS_LIVE_ROOM_REALTIME_DECISION_V1.md`](../../architecture/rooms/EFEONCE_ROOMS_LIVE_ROOM_REALTIME_DECISION_V1.md) `Accepted`.
+- Runtime (repo `efeonce-rooms`): `migrations/1793259000000_rooms-live-presence.sql`, `src/domain/live-contracts.ts`,
+  `src/server/live/{service,http,runtime}.ts`, rutas `src/app/api/v1/rooms/[roomId]/live/{route,events/route,presence/route}.ts`,
+  cliente `src/components/room/live-layer.tsx`. MCP lee `live.presence`; `live.event` y `live.stream` excluidos con razón.
+- El lane está apagado fuera del perfil local salvo `ROOMS_LIVE_ENABLED=true` (no registrado aún en el ledger de flags:
+  vive en el runtime de Rooms, se registra al pedir la activación).
 
 ## Summary
 

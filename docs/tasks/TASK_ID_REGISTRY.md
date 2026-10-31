@@ -2759,6 +2759,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 > Registro 2026-10-30: 2079 y 2080 verificados libres en filas, notas y sistema de archivos antes de crearlas (implementación de la UI de Rooms aprobada). Siguiente ID libre TASK-2081.
 
-| `TASK-2081` | `to-do` | **Rooms: sala en vivo (ADR y backend en tiempo real).** EPIC-052; backend-data/integration; P2/Alto/Alto. Presencia, cursores, selección y preguntas en vivo sobre colaboración existente; ADR del transporte antes del código. | `docs/tasks/to-do/TASK-2081-rooms-live-room-realtime.md` |
+| `TASK-2081` | `in-progress` | **Rooms: sala en vivo (ADR y backend en tiempo real).** EPIC-052; backend-data/integration; P2/Alto/Alto. Presencia, cursores, selección y preguntas en vivo sobre colaboración existente; ADR del transporte antes del código. | `docs/tasks/in-progress/TASK-2081-rooms-live-room-realtime.md` |
 
 > Registro 2026-10-30: 2081 verificado libre antes de crearla. Siguiente ID libre TASK-2082.

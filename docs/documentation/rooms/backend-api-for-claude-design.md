@@ -207,6 +207,23 @@ del CLI, con streaming, o el SDK multimedia. MCP excluye las transferencias bina
 - **Subtítulos.** Los bloques de medio V4 aceptan `captions[{lang,label,vtt}]` (WebVTT, hasta 4 idiomas, uno por
   idioma); viajan en la edición con la misma autorización. La UI los usa solo en video.
 
+### Sala en vivo (TASK-2081, ADR aceptado 2026-10-30)
+
+Presencia efímera por SSE same-origin, sin proveedor externo. Apagada fuera del perfil local salvo
+`ROOMS_LIVE_ENABLED=true` (no hay activación de producción).
+
+| Ruta | Qué hace |
+| --- | --- |
+| POST `/api/v1/rooms/:roomId/live/events?organizationId=` | Cuerpo `{editionId, event}`; `event` es `presence.heartbeat {chapterId?}`, `cursor.move {chapterId, x, y}` (0–1 relativo a la escena), `selection.set {blockId|null, assetVersionId?}` o `presence.leave`. Devuelve `{accepted}`; `false` = cursor descartado por pasar de 10/s. Exige Origin igual al de Rooms. |
+| GET `/api/v1/rooms/:roomId/live/presence?organizationId=&editionId=` | Quién está ahora (últimos 15 s): `{self, peers[]}`. También es la lectura MCP `live.presence`. |
+| GET `/api/v1/rooms/:roomId/live?organizationId=&editionId=` | Stream SSE: `ready {self, peers}`, `peer.update {peer}`, `peer.leave {id}`, `question.created {questionId}` (solo con `collaboration.read`) y `closed {reason: renew|revoked|unavailable}`. `renew` reconecta solo; `revoked` no se reintenta. |
+
+Un `peer` lleva `id` opaco (estable dentro de la edición), `displayName`, `role`, `kind`, `chapterId`, `cursor`,
+`selection` y `seenAt`. **Nunca** correo, ids de principal, invitación o sesión. La autoridad se revalida cada 5 s
+como una lectura de la edición: una invitación revocada cierra el stream. La presencia no es evidencia de
+atención; el recorrido y las señales salen solo de `progress.mark`. La UI dibuja cursores solo de quien está en el
+mismo capítulo y usa `data-scene-id` / `data-block-id` / `data-asset-version-id` para ubicarlos.
+
 ### Lecturas HTTP nuevas
 
 Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cursor` según su contrato.

@@ -5,6 +5,19 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-30 — Invitación, sala y sala en vivo del canvas implementadas local
+
+- `efeonce-rooms` `claude/rooms-approved-ui`: `3f11167` (sala en vivo, migración 18), `c133299` (invitación y sala
+  contra el backend real, demos sintéticas `/demo/sala` y `/demo/invitacion`), `32640ee` (nombres por tipo,
+  inventario de migraciones 14–18 en la integración). Sin push, sin deploy, flags `ROOMS_*` OFF.
+- ADR sala en vivo `Accepted` por el operador. Flag nuevo `ROOMS_LIVE_ENABLED` (OFF; registrar al pedir activación).
+- `local`: 371/371 tests sin skips; lint, tipos y build en verde. GVC PASS: `rooms-invitation-stage` (1440/1280/390/320),
+  `rooms-orbit-room` (1440/1280), `rooms-orbit-room-mobile` (390/320), `rooms-live-room` (1440).
+- Contra backend real (integración 3216): sala del fixture, `/invite` vacío/inválido/malformado y prueba de dos
+  personas con el stream. No probado: invitación con correo real (la integración no entrega correo), Vercel
+  streaming/pool, medios V4 en la sala nueva, aceptación humana.
+- Pendientes de pantallas: autoría y ediciones (TASK-2071), consola/audiencia (Fase 3), señales y video (Fase 4).
+
 ## 2026-10-30 — Base visual La órbita (TASK-2079) implementada local
 
 - `local`: `src/domain/orbit-geometry.ts` (+test), `src/components/orbit/**` (Orbit, CameraWorld, IrisReveal, DepthLayers/Grain,
@@ -386,5 +399,6 @@ Fuente consolidada: [auditoría de estado](../../../../docs/audits/rooms/2026-10
 
 ### Lecciones
 
-- «Tests verdes» puede no cubrir lo nuevo: el glob de `pnpm test` dejaba fuera `tests/media-*`. Al sumar un archivo de test, confirmar que el script lo recoge.
+- «Tests verdes» puede no cubrir lo nuevo: el glob de `pnpm test` dejaba fuera `tests/media-*` (y luego `tests/live-*`). Al sumar un archivo de test, confirmar que el script lo recoge: la cuenta de tests debe subir.
+- La integración local valida un inventario exacto de migraciones (`REVIEWED_MIGRATIONS`): cada migración nueva se agrega ahí tras revisarla, o `integration:up` falla en preflight sin decir por qué.
 - Un cierre «local» (DB local) no acredita el runtime cloud: decir siempre contra qué base se probó.

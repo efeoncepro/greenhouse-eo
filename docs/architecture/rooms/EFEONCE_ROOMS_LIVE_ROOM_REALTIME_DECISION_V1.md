@@ -1,6 +1,6 @@
 # Rooms — sala en vivo: transporte en tiempo real
 
-- Status: **Proposed** (2026-10-30). Espera aprobación del operador antes de cualquier código de TASK-2081.
+- Status: **Accepted** (2026-10-30, aprobado por el operador). Autoriza el código de TASK-2081 en rama, sin push ni flags.
 - Owner: Platform; EPIC-052; TASK-2081. Interfaz: pantalla «Sala en vivo» del canvas aprobado el 2026-10-29.
 
 ## Contexto
@@ -55,7 +55,15 @@ del navegador. Sin proveedor externo.**
 - Carga en la base: una lectura breve cada 250 ms por stream. Hay que medirla con la carga real antes de publicar.
 - La tabla efímera necesita limpieza periódica de filas viejas (sin historial).
 
-## Pendiente de verificar antes de implementar
+## Verificado en local (2026-10-30)
+
+- Implementación en `efeonce-rooms` rama `claude/rooms-approved-ui` (`3f11167`, `c133299`, `32640ee`), sin push.
+- Autorización, límite de 10 cursores/s, TTL 15 s, campos prohibidos ausentes y revocación de un invitado: pruebas
+  `tests/live-*.test.ts` contra la PG local. Revocación cerrada en la revalidación siguiente (≤ 5 s).
+- Dos personas reales en la integración local (invitado + admin interno): cursor, selección y conteo cruzan por el
+  stream; el cursor desaparece al salir.
+
+## Pendiente de verificar antes de producción
 
 - La duración máxima real de una función con streaming en el plan de Vercel de Efeonce y el comportamiento de
   reconexión (no se asume un valor).
