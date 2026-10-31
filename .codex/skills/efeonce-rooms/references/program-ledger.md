@@ -5,6 +5,35 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
+## 2026-10-31 — Acceso interno durable (ADR Proposed) y página de error del login (local)
+
+- Origen: el primer login real del dueño cayó en `identity_unbound` (canary de 2 h vencido) y el navegador mostró JSON.
+- ADR [Acceso interno durable y gobernado](../../../../docs/architecture/rooms/EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md)
+  **Proposed**: opción (a). Rooms conserva su autoridad; Efeonce ID sigue siendo sólo identidad (la ADR Accepted de
+  Auth ya omite roles y organización). Se descartó (b), derivar administradores de la autoridad interna de Efeonce ID:
+  exige claims o S2S nuevos (autorización clase D10) y acopla permisos de Rooms a roles ajenos. Contenido: capacidad
+  de organización `members.manage`, `members.grantInternal|renewInternal|revokeInternal` + `members.list` con paridad,
+  solicitud de acceso desde `identity_unbound`, `pnpm access:bootstrap-owner` (credencial de base, sólo con cero
+  titulares) y guarda del último administrador (comando + trigger diferido + aviso a 30 días + señales).
+- [TASK-2082](../../../../docs/tasks/to-do/TASK-2082-rooms-durable-internal-access.md) `to-do`: sin código hasta aprobar el ADR.
+  Mientras tanto, el acceso del dueño depende de las filas restauradas a mano (vigentes hasta 2027-10-31).
+- [TASK-2083](../../../../docs/tasks/in-progress/TASK-2083-rooms-access-issue-page.md) `in-progress`, `local`:
+  `efeonce-rooms` rama `claude/rooms-durable-internal-access` `adb1db0` (desde `origin/main` `6f99a6f`, sin push).
+  `/login` y `/auth/callback` redirigen 303 a `/auth/error?reason=…&ref=…` (lista cerrada + UUID); con
+  `Accept: application/json` sigue el JSON. Log `rooms.auth.browser_error` con código y `correlationId`.
+  `LC_ALL=en_US.UTF-8 pnpm verify`: 378 pruebas, 354 pasan, 0 fallan, 24 omitidas (lanes que exigen
+  `ROOMS_DATABASE_URL` explícito y toolchain multimedia). GVC `rooms-access-issue` OK en 1440/1280/390.
+  `UI ready: no` hasta la mirada del operador.
+- Lecciones:
+  - el `next dev` de 3210 (de otra sesión) sirvió la página nueva con un módulo de copy viejo en SSR («Cannot read
+    properties of undefined») tras cambiar de rama; el build de producción estaba bien. Para GVC de una página nueva,
+    usar `next start` propio del build (`-p 3231`) en vez del dev ajeno;
+  - GVC marca `/auth/*` como «ruta de login capturada»: un escenario que captura una página de auth a propósito
+    declara `quality.allowLogin: true`;
+  - el rubro enterprise mide el primer `<p>` como cuerpo: una palabra decorativa gigante va en `<span>`.
+- Sin push, sin deploy, sin flags. El checkout `efeonce-rooms` quedó en la rama nueva; `tsconfig.json` sigue
+  modificado por otra sesión y no se commiteó.
+
 ## 2026-10-31 — PR #4 en producción y activación completa (Rooms + Efeonce ID)
 
 - Autorizaciones: «Sí, mergea»; después «Prende todo» y, tras explicar qué implica liberar Efeonce ID, «Todo».

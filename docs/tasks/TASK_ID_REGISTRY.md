@@ -2762,3 +2762,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-2081` | `in-progress` | **Rooms: sala en vivo (ADR y backend en tiempo real).** EPIC-052; backend-data/integration; P2/Alto/Alto. Presencia, cursores, selección y preguntas en vivo sobre colaboración existente; ADR del transporte antes del código. | `docs/tasks/in-progress/TASK-2081-rooms-live-room-realtime.md` |
 
 > Registro 2026-10-30: 2081 verificado libre antes de crearla. Siguiente ID libre TASK-2082.
+
+| `TASK-2082` | `to-do` | **Rooms: acceso interno durable y gobernado.** EPIC-052; backend-data/command; P1/Alto/Medio. `members.grantInternal|renewInternal|revokeInternal`, `members.list`, solicitudes de acceso desde `identity_unbound`, bootstrap del primer administrador y guarda del último administrador. Bloqueada por la aprobación del ADR. | `docs/tasks/to-do/TASK-2082-rooms-durable-internal-access.md` |
+| `TASK-2083` | `in-progress` | **Rooms: página «el acceso se detuvo» en vez de JSON crudo.** EPIC-052; ui-ux/layout + api; P1/Alto/Bajo. `/login` y `/auth/callback` redirigen a `/auth/error` con motivo y referencia; código local sin push. | `docs/tasks/in-progress/TASK-2083-rooms-access-issue-page.md` |
+
+> Registro 2026-10-31: 2082 y 2083 verificados libres en filas, notas, `docs/**` y `origin/develop` justo antes de crearlas (incidente de acceso del dueño a Rooms). Siguiente ID libre TASK-2084.
