@@ -115,7 +115,7 @@ export const createRuntimeMultiOrgGrantsResolver = (config: AuthServerOAuthConfi
   if (!input.authorizationContextId) return { bound: false, profileId: null, outcome: 'internal_context_required' }
 
   const result = await resolveRuntimeInternalMultiOrg({
-    context: { ...input, id: input.authorizationContextId, version: 2, issuer: config.issuer, audience: config.mcpAudience },
+    context: { ...input, id: input.authorizationContextId, version: 2, issuer: config.issuer, audience: input.audience ?? config.mcpAudience },
     target: { intent: 'organizations', limit: 1 }, surface: 'issuer'
   })
 

@@ -158,6 +158,7 @@
     "auth-server:oauth-store:smoke": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/oauth-store-smoke.ts",
     "auth-server:register-first-party-client": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/register-first-party-client.ts",
     "auth-server:register-client": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/register-oauth-client.ts",
+    "auth-server:register-rooms-agent-clients": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/register-rooms-agent-clients.ts",
     "auth-server:person-auth:canary": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/person-auth-canary.ts",
     "auth-server:external-passkey:canary": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/external-passkey-canary.ts",
     "auth-server:person-auth:smoke": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/person-auth-smoke.ts",

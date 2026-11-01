@@ -22,6 +22,28 @@ TASK-1834 añade un carril de identidad separado de MCP; contrato: [Rooms primer
 volvió a OFF y quedó cerrado. El carril first-party está ON en producción desde el 2026-10-31 y en `main` desde el release `935583f88db0` (2026-11-01); no es rollout general ni autorización de un nuevo correo ni de clientes reales.
 Estado efectivo y límites: [ledger de Auth](../../.claude/skills/efeonce-auth/references/program-ledger.md). Las tablas y gv de este contrato MCP no se reutilizan para simular identidad.
 
+## Delta 2026-11-01 — segunda audiencia: Rooms (TASK-2095)
+
+- **Audiencias:** gateway (`AUTH_SERVER_MCP_AUDIENCE`) y Rooms (`AUTH_SERVER_ROOMS_AUDIENCE`, vacía = apagada).
+  Código en `src/lib/auth-server/oauth/resources.ts`.
+- **Un token, una audiencia.** El `aud` se deriva de las clases pedidas: `efeonce.mcp.rooms.*` → Rooms, el resto →
+  gateway. Mezclar familias es `invalid_scope` (`scope_audience_mixed`); un `resource` que no coincide con la
+  derivada es `invalid_target`. No hay columna de audiencia: las clases ya se persisten en codes, refresh y access.
+- **Clases restringidas.** `efeonce.mcp.rooms.*` solo se conceden a un cliente que las liste en `allowed_scopes`;
+  un `allowed_scopes` abierto (CIMD, DCR) nunca las recibe (`restricted_scope`). `author`, `release` y `access`
+  exigen step-up al consentir.
+- **Solo personas internas.** Sin contexto de autorización interno, `authorize` responde `access_denied`
+  (`rooms_requires_internal`) y `token` `invalid_grant`. En v2, un contexto puede llevar el scope base del gateway o
+  solo clases Rooms (D10 de la autoridad interna: la autoridad sobre Rooms la decide Rooms).
+- **Vida:** access token Rooms de 300 s; refresh igual que el resto (rotación con reuso, 30 d / 90 d).
+- **Introspección por audiencia.** Un cliente confidencial con `metadata.introspection_audience` solo ve activos
+  los tokens de esa audiencia; la respuesta trae el `aud` real (access y refresh).
+- **Clientes:** `efeonce-rooms-cli` (público, `none`, `http://127.0.0.1/callback` con puerto libre, code +
+  refresh, clases Rooms sin `read.client`) y `efeonce-rooms-resource` (confidencial, sin `code` ni grants
+  utilizables, solo introspección). Registro: `pnpm auth-server:register-rooms-agent-clients -- --secret-out <ruta>`
+  (idempotente; el secreto se escribe en un archivo 0600 y nunca se imprime).
+- Decisión: [enmienda D1-bis del carril de agentes de Rooms](rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01).
+
 ## 1. Decisión en una línea
 
 Efeonce **emite** los tokens que el gateway MCP verifica: metadata RFC 8414/OIDC con `issuer`
@@ -286,6 +308,7 @@ ventana 24 h, steady 0): `auth.oauth.code_reuse_detected` (error), `auth.oauth.r
 | `AUTH_SERVER_ISSUER` | `https://auth.efeonce.org` | `issuer` publicado (origen https sin query/fragment) |
 | `AUTH_SERVER_ENVIRONMENT_ID` | `efeonce-auth` | `environment_id` del emisor en `external_identity_environments` (debe existir `active` para que haya `bound`; activo para el piloto; ver abajo) |
 | `AUTH_SERVER_MCP_AUDIENCE` | `https://mcp.efeonce.org/mcp` | `aud` de los access tokens y `resource` aceptado |
+| `AUTH_SERVER_ROOMS_AUDIENCE` | vacía (apagada) | TASK-2095: segunda audiencia (API de Rooms). Con valor, `resource` Rooms se acepta y las clases `efeonce.mcp.rooms.*` firman con ese `aud` y 300 s de vida |
 
 TTLs y límites: `AUTH_SERVER_OAUTH_DEFAULTS` (`config.ts`) — code 300 s, access 900 s, refresh 30 d /
 90 d, CIMD 24 h, rate limits arriba.

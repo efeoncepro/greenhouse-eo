@@ -17,6 +17,7 @@ import type { GrantsVersionPort } from './grants'
 import { htmlResponse, isFormContentType, parseFormBody, redirectResponse, requestOrigin, type OAuthHttpRequest, type OAuthHttpResponse } from './http'
 import { OAUTH_ENDPOINT_PATHS } from './metadata'
 import { renderErrorPage, renderLoginRequiredPage, renderStepUpRequiredPage } from './pages/render'
+import { assertRequestedResource, isKnownAudience, isRoomsAudience, resolveAudienceForScopes } from './resources'
 import { areInternalContextScopesAllowed, isKnownScope, isWriteScope } from './scopes'
 import type { OAuthStorePort } from './store/port'
 import type { SubjectSessionPort } from './subject'
@@ -79,23 +80,31 @@ export const handleConsent = async (request: OAuthHttpRequest, deps: ConsentEndp
         original.hash || original.searchParams.get('client_id') !== client.clientId ||
         [...original.searchParams.keys()].some(key => original.searchParams.getAll(key).length > 1) ||
         originalScopes.length !== scopes.length || originalScopes.some(scope => !scopes.includes(scope)) ||
-        (original.searchParams.has('resource') && original.searchParams.get('resource') !== deps.config.mcpAudience) ||
+        (original.searchParams.has('resource') && !isKnownAudience(deps.config, original.searchParams.get('resource') ?? '')) ||
         (decision !== 'allow' && decision !== 'deny')) {
       throw new OAuthProtocolError('invalid_request', { reason: 'consent_request_mismatch' })
     }
 
     assertScopesAllowedForClient(client, scopes)
+    // TASK-2095: same audience derivation as authorize; the consent is bound to the token it will produce.
+    const audience = resolveAudienceForScopes(deps.config, scopes)
+
+    assertRequestedResource(deps.config, original.searchParams.get('resource'), audience)
     const requestedRedirect = original.searchParams.get('redirect_uri') ?? ''
     const redirectUri = resolveAuthorizeRedirectUri(client, requestedRedirect, loopbackPolicyFor(deps.config))
 
     if (!redirectUri) throw new OAuthProtocolError('invalid_redirect_uri', { reason: 'redirect_uri_unregistered' })
 
-    const subject = await deps.subjectPort.resolve(request, { clientId: client.clientId, audience: deps.config.mcpAudience })
+    const subject = await deps.subjectPort.resolve(request, { clientId: client.clientId, audience })
 
     if (!subject || subject.environmentId !== deps.config.environmentId) return htmlResponse(401, renderLoginRequiredPage())
 
     if (!areInternalContextScopesAllowed(subject.authorizationContextVersion, scopes)) {
       throw new OAuthProtocolError('invalid_scope', { reason: 'internal_context_scope_class', redirectable: true })
+    }
+
+    if (isRoomsAudience(deps.config, audience) && !subject.authorizationContextId) {
+      throw new OAuthProtocolError('access_denied', { reason: 'rooms_requires_internal' })
     }
 
     const expectedContextId = form.get('authorization_context_id')
@@ -117,7 +126,8 @@ export const handleConsent = async (request: OAuthHttpRequest, deps: ConsentEndp
         subject: subject.subject,
         environmentId: subject.environmentId,
         clientId: client.clientId,
-        authorizationContextId: subject.authorizationContextId
+        authorizationContextId: subject.authorizationContextId,
+        audience
       }).catch(() => null)
 
       if (!grants?.bound) {
@@ -129,7 +139,7 @@ export const handleConsent = async (request: OAuthHttpRequest, deps: ConsentEndp
         environmentId: subject.environmentId,
         subject: subject.subject,
         clientId: client.clientId,
-        audience: deps.config.mcpAudience,
+        audience,
         authorizationContextId: subject.authorizationContextId
       }).catch(() => ({ outcome: 'unavailable' as const }))
 

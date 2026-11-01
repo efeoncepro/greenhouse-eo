@@ -19,6 +19,8 @@ Esta tabla supera a la del 26-10 para los flags que lista.
 | `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` | Vercel Rooms Production | `false` | Permiso de desarrollo; nunca en producción |
 | `AUTH_SERVER_FIRST_PARTY_ENABLED` | auth-server `00169-4pq` (100 %) | `true` | Durable: variable de repo GitHub `true` (input de `auth-server-deploy.yml`) |
 | `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` | auth-server `00169-4pq` | `true`, con HMAC y token de autoridad montados | Durable: variable de repo GitHub `true`; refs `:1` ya declaradas |
+| `AUTH_SERVER_ROOMS_AUDIENCE` (valor, no booleano) | auth-server — código en `develop` (TASK-2095), sin release | vacía = audiencia Rooms apagada | Durable: variable de repo GitHub `AUTH_SERVER_ROOMS_AUDIENCE` (input de `auth-server-deploy.yml`, leída por `deploy.sh`); el drift la compara (`rooms-config-drift.py`). Fijarla exige release a `main` y autorización del operador |
+| `ROOMS_AGENT_LANE_ENABLED` | Vercel Rooms Production — TASK-2087 | `false` (default de código) | Sin él Rooms rechaza todo bearer; la cookie sigue igual |
 | email type `auth_server_rooms_invitation_otp` | Greenhouse PG `email_type_config` | `enabled=true` | Kill-switch por tipo |
 | `ROOMS_MEDIA_IMPORT_ENABLED` | `efeonce-rooms` rama local `claude/rooms-media-import` (TASK-2090), sin desplegar | `false` (default de código; ausente en Vercel) | Requiere además `ROOMS_MEDIA_ENABLED`; sin flag `media.importFromSource` responde `unavailable`. Prender exige buckets aprobados, IAM de lectura y migración aplicada |
 

@@ -11,11 +11,12 @@ import type { GrantsVersionPort } from './grants'
 
 import type { SigningKeyRecord } from '../keys'
 import { buildRequestAuditContext, recordOAuthAudit } from './audit'
-import type { ClientResolverDeps } from './clients'
+import { introspectionAudienceOf, type ClientResolverDeps } from './clients'
 import type { AuthServerOAuthConfig } from './config'
 import { OAuthProtocolError, isOAuthProtocolError } from './errors'
 import { jsonResponse, type OAuthHttpRequest, type OAuthHttpResponse } from './http'
 import { sha256Hex } from './primitives'
+import { resolveAudienceForScopes } from './resources'
 import type { OAuthClientRecord, OAuthStorePort } from './store/port'
 import { authenticateTokenEndpointClient, parseTokenForm } from './token'
 import { verifyIssuedAccessToken } from './verify'
@@ -31,11 +32,21 @@ export type RevokeIntrospectDeps = {
 
 const looksLikeJwt = (token: string): boolean => token.split('.').length === 3
 
+/** Persisted classes decide the audience; a family that no longer resolves (audience switched off) is inert. */
+const audienceOrNull = (deps: RevokeIntrospectDeps, scopes: readonly string[]): string => {
+  try {
+    return resolveAudienceForScopes(deps.config, scopes)
+  } catch {
+    return ''
+  }
+}
+
 type LocatedToken =
   | {
       authorizationContextId: string | null
       environmentId: string
       kind: 'access'
+      audience: string
       authorizationContextVersion: 1 | 2 | null
       grantId: string
       subject: string
@@ -51,6 +62,7 @@ type LocatedToken =
       authorizationContextId: string | null
       environmentId: string
       kind: 'refresh'
+      audience: string
       grantId: string
       subject: string
       clientId: string
@@ -64,7 +76,7 @@ const locateToken = async (token: string, deps: RevokeIntrospectDeps, now: Date)
   if (looksLikeJwt(token)) {
     const verified = await verifyIssuedAccessToken(token, { config: deps.config, keys: await deps.loadKeys(), now })
 
-    if (!verified) return null
+    if (!verified || verified.aud !== audienceOrNull(deps, verified.scope.split(' ').filter(Boolean))) return null
 
     const record = await deps.store.getAccessToken(verified.jti)
 
@@ -80,6 +92,7 @@ const locateToken = async (token: string, deps: RevokeIntrospectDeps, now: Date)
       authorizationContextId: record.authorizationContextId ?? null,
       environmentId: record.environmentId,
       kind: 'access',
+      audience: verified.aud,
       authorizationContextVersion: verified.authorizationContextVersion,
       grantId: record.grantId,
       subject: record.subject,
@@ -103,6 +116,7 @@ const locateToken = async (token: string, deps: RevokeIntrospectDeps, now: Date)
     authorizationContextId: record.authorizationContextId ?? null,
     environmentId: record.environmentId,
     kind: 'refresh',
+    audience: audienceOrNull(deps, record.scopes),
     grantId: record.grantId,
     subject: record.subject,
     clientId: record.clientId,
@@ -216,6 +230,12 @@ export const handleIntrospect = async (
 
     const located = await locateToken(token, deps, now)
 
+    // TASK-2095: a resource server only sees tokens of its own audience (Rooms never learns about gateway tokens).
+    const ownAudience = introspectionAudienceOf(client)
+
+    if (located && ownAudience && located.audience !== ownAudience) located.active = false
+    if (located && !located.audience) located.active = false
+
     // Context revocation, disabled lanes and workforce/grant changes invalidate introspection too,
     // for both internal and external populations. Revoke deliberately uses stored liveness only,
     // so it remains available when authority is off.
@@ -225,7 +245,8 @@ export const handleIntrospect = async (
           environmentId: located.environmentId,
           subject: located.subject,
           clientId: located.clientId,
-          authorizationContextId: located.authorizationContextId
+          authorizationContextId: located.authorizationContextId,
+          audience: located.audience
         })
 
         located.active = Boolean(
@@ -262,7 +283,7 @@ export const handleIntrospect = async (
         exp: located.exp,
         iat: located.iat,
         jti: located.jti,
-        aud: deps.config.mcpAudience,
+        aud: located.audience,
         iss: deps.config.issuer,
         gv: located.gv
       })
@@ -275,6 +296,7 @@ export const handleIntrospect = async (
       client_id: located.clientId,
       sub: located.subject,
       exp: located.exp,
+      aud: located.audience,
       iss: deps.config.issuer
     })
   } catch (error) {

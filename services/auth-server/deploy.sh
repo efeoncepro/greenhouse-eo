@@ -280,6 +280,13 @@ ENV_VARS="${ENV_VARS}::AUTH_SERVER_INVITATION_EMAIL_OTP_ROOMS_ORIGIN=${AUTH_SERV
 ENV_VARS="${ENV_VARS}::AUTH_SERVER_ENVIRONMENT_ID=${AUTH_SERVER_ENVIRONMENT_ID:-efeonce-auth}"
 # Audiencia única del recurso MCP (nunca un alias).
 ENV_VARS="${ENV_VARS}::AUTH_SERVER_MCP_AUDIENCE=${AUTH_SERVER_MCP_AUDIENCE:-https://mcp.efeonce.org/mcp}"
+# TASK-2095 — segunda audiencia (API de Rooms) para el carril CLI de agentes (enmienda D1-bis). Vacía = apagada:
+# `resource` Rooms responde `invalid_target`. Fuente durable: variable de repo GitHub `AUTH_SERVER_ROOMS_AUDIENCE`.
+if [[ -n "${AUTH_SERVER_ROOMS_AUDIENCE:-}" && ! "${AUTH_SERVER_ROOMS_AUDIENCE}" =~ ^https://[a-z0-9.-]+(/[A-Za-z0-9._/-]*)?$ ]]; then
+  echo "ERROR: AUTH_SERVER_ROOMS_AUDIENCE must be an https URL without query or fragment."
+  exit 1
+fi
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_ROOMS_AUDIENCE=${AUTH_SERVER_ROOMS_AUDIENCE:-}"
 # TASK-1830 — autenticación de personas (magic link, sesión propia `__Host-efeonce_auth`, passkeys,
 # TOTP). OFF ⇒ `/login`, `/auth/*` y `/m/*` responden 404 y el `SubjectSessionPort` devuelve `null`,
 # así que `authorize` sigue en `login_required`. Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md
