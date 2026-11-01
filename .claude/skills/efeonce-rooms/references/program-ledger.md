@@ -7,6 +7,11 @@
 
 ## Estado vigente (2026-11-01)
 
+- **PR #16 (`main@1989576`), en producción desde 2026-11-01:** el callback reinicia el login una vez ante
+  `login_required` o transacción de Rooms vencida (5 min); cookie `__Host-rooms_login_retry` de 2 min contra el bucle.
+  Deploy `efeonce-rooms-m6kqevsxq`, alias reasignado. Completa el arreglo de
+  [ISSUE-190](../../../../docs/issues/open/ISSUE-190-rooms-login-expired-continuation-raw-json.md) cuando Efeonce ID
+  publique `b05403b3d`.
 - **PR #13 a #15 (`main@4d0e6df`), en producción desde 2026-11-01:** la palabra de «el acceso se detuvo» se ajusta al
   anillo según su largo (antes «Espera.», «Aún no.» y «Otra vez.» se salían) y la esquina superior quedó sin el rótulo
   «Acceso a Rooms». PR #15 (`main@4d0e6df`): la línea «¿Sigues sin poder entrar?…» pasó de pie suelto a cerrar el

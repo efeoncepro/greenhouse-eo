@@ -4,6 +4,13 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-11-01 — Login first-party vencido: fix en develop, pendiente de release
+
+- [ISSUE-190](../../../../docs/issues/open/ISSUE-190-rooms-login-expired-continuation-raw-json.md): la solicitud first-party dura 10 min y
+  un login con MFA de 12 min devolvía `{"error":"invalid_request"}` en crudo. `b05403b3d` (develop): continuación vencida →
+  `login_required` al RP con su `state`; error irrecuperable → página de error HTML para navegadores. Requiere release a `main`
+  (hotfix o próximo release). Rooms ya reinicia el login una vez (PR #16 en producción).
+
 ## 2026-11-01 — Conciliación de TASK-1833: trabajo de seguridad sin integrar
 
 - La evaluación ofensiva propia (20 casos, refutación separada) y los casos (a)/(b) de TASK-1831 están hechos; se
