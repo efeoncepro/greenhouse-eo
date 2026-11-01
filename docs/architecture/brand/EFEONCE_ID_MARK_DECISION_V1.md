@@ -57,7 +57,14 @@ versión aprobada en el canvas, verificado) y se sellan en `@efeoncepro/axis-bra
 - **No:** el isotipo grande en el panel lateral. Ese panel es del **carrusel de novedades**, que se conserva tal cual
   ([login V4](../EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md)). La maqueta «En Efeonce Auth» del canvas, con el
   monograma grande a la izquierda, es una exploración superada en ese punto.
-- Adoptar la marca en `auth-server` (favicon, encabezado, botón) es trabajo aparte: este ADR no lo implementa.
+- **Favicon adoptado en código (2026-11-01, sin release):** `auth-server` sirve en `/favicon.svg` la teja aprobada en el
+  canvas (oscuro de Efeonce, radio 22 %, isotipo chico en negativo al 71,3 % del lado), compuesta por
+  [`scripts/auth-server/efeonce-id-favicon.ts`](../../../scripts/auth-server/efeonce-id-favicon.ts) desde la copia
+  `public/branding/SVG/efeonce-id-isotype-small-negative.svg` (byte a byte la de AXIS 0.4.31) y regenerada con
+  `pnpm auth-server:brand-assets:generate`. Reemplaza el isotipo de Efeonce en azul. Llega a `auth.efeonce.org` sólo con
+  el próximo release gobernado. Cuando Greenhouse fije `axis-brand-assets` ≥ 0.4.31 (TASK-2014), esa copia entra a la
+  guarda `src/config/efeonce-brand-assets.test.ts` contra el paquete.
+- El lockup del encabezado del formulario y el botón «Continuar con Efeonce ID» siguen pendientes.
 
 ## Alternativas descartadas
 

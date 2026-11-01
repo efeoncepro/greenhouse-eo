@@ -3,7 +3,9 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG, EFEONCE_LOGOTYPE_SVG } from './efeonce-isotipo.generated'
+import { EFEONCE_ID_FAVICON_SVG, EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG, EFEONCE_LOGOTYPE_SVG } from './efeonce-isotipo.generated'
+import { getAuthFontAsset } from './assets'
+import { buildEfeonceIdFavicon, EFEONCE_ID_FAVICON_SOURCE } from '../../../../../scripts/auth-server/efeonce-id-favicon'
 import { LOGIN_CONTROLLER_SCRIPT } from '../../persons/login-controller.generated'
 import { AUTH_SERVER_STYLES } from './styles.generated'
 import { createAuthServerStyles } from '../../../../../scripts/auth-server/styles'
@@ -41,6 +43,15 @@ describe('auth-server brand assets', () => {
   it('generated CSS matches the canonical token builder used by the preview', () => {
     // Artifact drift only. Visual/layout behavior is verified by TASK-1835 GVC, not string matching.
     expect(AUTH_SERVER_STYLES).toBe(createAuthServerStyles())
+  })
+  it('the favicon is the Efeonce ID tile built from the official small isotype', () => {
+    const source = readFileSync(join(process.cwd(), EFEONCE_ID_FAVICON_SOURCE), 'utf8')
+
+    expect(EFEONCE_ID_FAVICON_SVG).toBe(buildEfeonceIdFavicon(source))
+    expect(getAuthFontAsset('/favicon.svg')?.body.toString('utf8')).toBe(EFEONCE_ID_FAVICON_SVG)
+    // One sphere, in the Growth accent on dark; no <style> (a favicon does not follow the browser scheme).
+    expect(EFEONCE_ID_FAVICON_SVG.match(/<circle fill="#36c8bf"/g)).toHaveLength(1)
+    expect(EFEONCE_ID_FAVICON_SVG).not.toMatch(/<style|class=/)
   })
   it('the bundled isotype matches public/branding/SVG/isotipo-full-efeonce.svg', () => {
     const source = readFileSync(join(process.cwd(), 'public/branding/SVG/isotipo-full-efeonce.svg'), 'utf8')

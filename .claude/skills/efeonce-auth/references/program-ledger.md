@@ -13,9 +13,13 @@
   ≤ 32 px) **y en ciertas aplicaciones del formulario** (lockup `efeonce-id-lockup-*` en el encabezado; botón «Continuar con
   Efeonce ID» con el isotipo chico en las aplicaciones). **Nunca el isotipo grande en el panel lateral:** ese panel es del
   carrusel de novedades, que se conserva.
-- **No implementado en `auth-server`:** favicon, encabezado y botón siguen como están. Hacerlo es una tarea aparte, se itera
-  en el arnés (`pnpm auth-server:dev-ui`) y llega a producción sólo por release gobernado. Greenhouse fija
-  `axis-brand-assets` 0.4.25; la 0.4.31 hay que publicarla y fijarla antes de consumir los archivos desde el paquete.
+- `local`: **favicon cambiado en `develop`, sin release.** `/favicon.svg` es ahora la teja de Efeonce ID (oscuro
+  `#001a33`, radio 22 %, isotipo chico en negativo, esfera `#36c8bf`), compuesta por `scripts/auth-server/efeonce-id-favicon.ts`
+  desde `public/branding/SVG/efeonce-id-isotype-small-negative.svg` y regenerada con `pnpm auth-server:brand-assets:generate`
+  (constante `EFEONCE_ID_FAVICON_SVG`; guarda en `pages/brand-assets.test.ts`). Verificado en el arnés (200,
+  `image/svg+xml`, legible a 16 px). Llega a `auth.efeonce.org` sólo con un release gobernado.
+- Pendiente: lockup del encabezado del formulario y botón «Continuar con Efeonce ID»; meter la copia de `public/branding`
+  en `src/config/efeonce-brand-assets.test.ts` cuando Greenhouse fije `axis-brand-assets` ≥ 0.4.31 (TASK-2014).
 
 ## 2026-11-01 — Login first-party vencido: hotfix en producción (`auth-server-00171-xdd`)
 

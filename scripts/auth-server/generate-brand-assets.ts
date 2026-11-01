@@ -14,6 +14,7 @@ import { renderAuthFontAssetsModule } from './generate-font-assets'
 import { generateStepUpController } from './step-up-controller-build'
 import { generateLoginController } from './login-controller-build'
 import { renderLoginStageAssetsModule } from './generate-login-stage-assets'
+import { buildEfeonceIdFavicon, EFEONCE_ID_FAVICON_SOURCE } from './efeonce-id-favicon'
 
 const ROOT = process.cwd()
 const SOURCE = join(ROOT, 'public/branding/SVG/isotipo-full-efeonce.svg')
@@ -37,6 +38,7 @@ const readBrandSvg = (path: string): string => sanitizeBrandSvg(readFileSync(pat
 const svg = readBrandSvg(SOURCE)
 const logotype = readBrandSvg(LOGOTYPE_SOURCE)
 const positiveLogotype = readBrandSvg(join(ROOT, 'public/branding/logo-full.svg'))
+const idFavicon = buildEfeonceIdFavicon(readFileSync(join(ROOT, EFEONCE_ID_FAVICON_SOURCE), 'utf8'))
 
 /**
  * Las marcas de terceros se embeben TAL CUAL: `sanitizeBrandSvg` está hecho para los SVG de Efeonce
@@ -60,8 +62,8 @@ const clientMarks = Object.fromEntries(
   Object.entries(CLIENT_MARK_SOURCES).map(([key, relativePath]) => [key, readClientMarkSvg(relativePath)])
 ) as Record<keyof typeof CLIENT_MARK_SOURCES, string>
 
-const output = `// GENERATED FILE — no editar a mano. Fuentes: public/branding/SVG/isotipo-full-efeonce.svg
-// y public/branding/logo-negative.svg
+const output = `// GENERATED FILE — no editar a mano. Fuentes: public/branding/SVG/isotipo-full-efeonce.svg,
+// public/branding/logo-negative.svg y public/branding/SVG/efeonce-id-isotype-small-negative.svg
 // Regenerar: pnpm auth-server:brand-assets:generate (TASK-1829 / TASK-1835)
 
 export const EFEONCE_ISOTIPO_SVG = ${JSON.stringify(svg)}
@@ -69,6 +71,9 @@ export const EFEONCE_ISOTIPO_SVG = ${JSON.stringify(svg)}
 export const EFEONCE_LOGOTYPE_NEGATIVE_SVG = ${JSON.stringify(logotype)}
 
 export const EFEONCE_LOGOTYPE_SVG = ${JSON.stringify(positiveLogotype)}
+
+/** Favicon: la teja de Efeonce ID con el isotipo chico (scripts/auth-server/efeonce-id-favicon.ts). */
+export const EFEONCE_ID_FAVICON_SVG = ${JSON.stringify(idFavicon)}
 
 /** Marcas de terceros para la ficha de aplicación del consentimiento (ver client-marks.ts). */
 export const CLIENT_MARK_CLAUDE_SVG = ${JSON.stringify(clientMarks.CLAUDE)}

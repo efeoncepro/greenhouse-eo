@@ -6,8 +6,10 @@
 Generador `scripts/brand/build-efeonce-id-logos.mjs` (0 px de diferencia contra el canvas aprobado); 12 SVG
 `efeonce-id-*` en `axis-brand-assets` 0.4.31 (commit AXIS `5a6a597`; 59/59 pruebas del paquete y la del Lab verdes).
 Regla del operador: en el login de Auth sólo favicon y formulario; el panel lateral es del carrusel de novedades.
-Skills `efeonce-graphic-line`, `efeonce-auth` y `axis-design-system` actualizadas y espejadas. Pendiente: la release
-del paquete (tag `v0.4.31`), fijarlo en Greenhouse (TASK-2014) y adoptar la marca en `auth-server`.
+Skills `efeonce-graphic-line`, `efeonce-auth` y `axis-design-system` actualizadas y espejadas. **Favicon de Auth
+cambiado en `develop`** (teja de Efeonce ID vía `scripts/auth-server/efeonce-id-favicon.ts`; 743 pruebas de
+`src/lib/auth-server` verdes, verificado en el arnés): llega a producción sólo con un release gobernado. Pendiente: fijar
+`axis-brand-assets` ≥ 0.4.31 en Greenhouse (TASK-2014), lockup del formulario y botón «Continuar con Efeonce ID».
 
 ## 2026-11-01 — Cloud Build: paquete de subida 986 → 131 MB
 
