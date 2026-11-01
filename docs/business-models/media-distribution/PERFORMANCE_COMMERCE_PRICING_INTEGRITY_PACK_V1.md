@@ -12,6 +12,12 @@
 
 ## 1. Decisión de pricing
 
+**Cotizador local,27/10/2026:** [v14 incorpora Performance](../../../data/pricing/v3-operating/PERFORMANCE_ECUADOR_2026-10-27.md),
+por mandato de Julio, con objetivo55%/piso45% estimados y mercadoEcuador neutro1,00 estimado. Este pack conserva
+`hypothesis_only`: la incorporación no aprueba bandas ni un precio de cliente. El costo humano, herramientas,
+fee de plataforma y reserva explícitos de V3 sustituyen el overhead porcentual de este pack cuando se usa ese
+motor; no se añade el12% de herramientas/overhead además de los recursos ya costeados.
+
 ```text
 fee Efeonce por nivel de complejidad (métrica de valor: capacidad gobernada de operación)
 + inversión en medios — pass-through, facturada idealmente por la plataforma al cliente

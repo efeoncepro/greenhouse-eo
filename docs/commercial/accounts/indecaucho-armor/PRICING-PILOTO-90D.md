@@ -1,5 +1,15 @@
 # ARMOR EPPS — fee Efeonce del piloto de 90 días
 
+> **Resultado posterior vigente:** [costeo V3 calculado](COSTEO-V3-2026-10-27.md) tras agregar Performance y
+> Ecuador por mandato de Julio: honorariosUS$22.450, reserva de medios separada hastaUS$18.000. Este primer
+> método manual queda como antecedente; no usar sus US$21.000 o su bloqueo como estado actual.
+
+> **Revisión posterior del 27/10:** la [revisión de fee y propuesta](REVISION-FEE-Y-PROPUESTA-2026-10-27.md)
+> sustituye los costos/FTE/márgenes de esta primera estimación, que usó implícitamente 160h/FTE.
+> La referencia V3 vigente es 180h/FTE; el fee US$21.000 se conserva como candidato, no aprobado.
+> [Propuesta de 90 días para revisión](PROPUESTA-90-DIAS-BORRADOR.md). V3 dimensionó la demanda;
+> el precio quedó `needs_input` por Performance/Ecuador. Conservar este documento como antecedente.
+
 **Pricing Integrity Pack · 27/10/2026 · veredicto `hypothesis_only` (pendiente de aprobación de Julio).**
 Costeo interno para la propuesta del jueves 29 o viernes 30. No es una cotización emitida ni un precio aprobado,
 y los costos y márgenes de este documento **no se muestran al cliente**. Caso de negocio:

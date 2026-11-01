@@ -1,0 +1,60 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "ec758aa02a84",
+  "key": "ec758aa02a844b919e6c78f047c525b2d18757784e5751d90736dc61e0e93c7a",
+  "status": "failed",
+  "createdAt": "2026-10-28T13:36:42.953Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-28_armor-campana/plates/expand-L2-inserto-v2/expand-inputs/28f0574738a7-canvas.png",
+    "imageSha256": "c6ae7e08a46ca5fe9c54d1aa65a47a65de6ed96ccc1efbd295d6e4777905f1f7",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-28_armor-campana/plates/expand-L2-inserto-v2/expand-inputs/28f0574738a7-mask.png",
+    "maskSha256": "9bdfb96d0d709012995bf37d6945f408900494c76109635426ae8e53db7bbe4b",
+    "maskConvention": "white-editable",
+    "width": 2048,
+    "height": 2560,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "the dark ceiling and upper walls of a modern industrial workshop in deep blue-grey shadow, calm and almost black, no lamps, no bright spots, no text",
+    "providerPrompt": "the dark ceiling and upper walls of a modern industrial workshop in deep blue-grey shadow, calm and almost black, no lamps, no bright spots, no text Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.2390625,
+    "editable": 1050624,
+    "soft": 202752,
+    "protected": 3989504
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 2048,
+      "height": 2560
+    },
+    "target": {
+      "width": 1280,
+      "height": 1616
+    },
+    "aspectError": 0.010000000000000009,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.15,
+    "basis": "1 × 1 imagen(es) × 3 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [],
+  "error": "fal upload initiate failed (HTTP 403, cuenta FAL_API_KEY_B): User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing"
+}

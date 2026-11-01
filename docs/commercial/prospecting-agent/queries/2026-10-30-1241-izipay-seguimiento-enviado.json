@@ -1,0 +1,61 @@
+{
+  "run_id": "2026-10-30-1241-izipay-seguimiento-enviado",
+  "checked_at": "2026-10-30T12:44:01.415459-03:00",
+  "scope": "envío focal explícitamente autorizado; no descubrimiento ni20celdas",
+  "outlook": {
+    "queries": [
+      {
+        "query": "from:[CORREO_OBJETIVO_REDACTADO] received>=2026-10-21",
+        "pii_redacted": true,
+        "result": "Últimarespuesta21Oct19:37:50UTC,sinmensajenuevolocalizado"
+      },
+      {
+        "query": "RFQ001 received>=2026-10-30",
+        "result": "Una copia enviada30Oct15:41:14UTC"
+      }
+    ],
+    "source_messages_read": 3,
+    "send_count": 1,
+    "sent_at": "2026-10-30T12:41:14-03:00",
+    "reply_in_existing_thread": true,
+    "to_count": 1,
+    "cc_count": 0,
+    "hubspot_bcc_verified": true,
+    "official_graphic_signature_images": 9,
+    "new_paragraphs": 12,
+    "persisted_draft_readback": true,
+    "sent_readback": true
+  },
+  "crm": {
+    "portal": 48713323,
+    "contact_id": "256738112539",
+    "deal_id": "66481946424",
+    "logged_email_id": "120018740037",
+    "status": "SENT",
+    "readback": true,
+    "manual_writes": 0
+  },
+  "permission": {
+    "explicit_user_send": true,
+    "paid_enrichment": false,
+    "new_sequences": false,
+    "new_tasks": false
+  },
+  "procurement_gate": {
+    "result": "hold",
+    "source": "Invitación/acuse21Oct + revalidaciónOutlook30Oct",
+    "last_checked_at": "2026-10-30T12:44:01.415459-03:00",
+    "bases": "no recibidas en correos localizados",
+    "offer_calendar": "no_verificado",
+    "foreign_admission": "no_verificado",
+    "awardee": "no_verificado",
+    "award_act_or_order": "no_verificado",
+    "contract": "no_verificado",
+    "signed_at": "no_verificado",
+    "execution_start_at": "no_verificado",
+    "execution_end_at": "no_verificado",
+    "document_read": "correosprimarios, no documento contractual",
+    "reason": "Seguimientodocumental enviado; no certifica oportunidadabierta niadmisión"
+  },
+  "private_evidence_directory": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-izipay-confirmacion"
+}

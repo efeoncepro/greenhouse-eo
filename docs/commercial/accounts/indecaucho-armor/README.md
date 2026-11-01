@@ -1,10 +1,18 @@
 # ARMOR EPPS / Indecaucho — expediente comercial
 
-Uso interno. Owner: Julio Reyes. Corte: **26/10/2026**. Versión **v0, previa a discovery**.
-Decisión próxima: comprender la necesidad y acordar los insumos de una propuesta defendible ante
-gerencia Industria. **Reunión solicitada e invitación enviada; no selección en terna ni negocio ganado.**
+Uso interno. Owner: Julio Reyes. Corte: **27/10/2026, revisión posterior de las 16:00 Chile**.
+Versión actual: **v1, después de discovery; fee V3 calculado en revisión**. Decisión próxima: Julio revisa alcance,
+honorarios y medios del borrador antes de emitir/enviar la propuesta del29–30/10. **Reunión realizada y transcripción
+contrastada; sin presupuesto, propuesta enviada, selección en terna ni negocio ganado acreditados.**
 
 ## Estado al 27/10, después de la discovery
+
+**Propuesta recalculada por pedido de Julio:** [borrador de90días](PROPUESTA-90-DIAS-BORRADOR.md),
+con honorarios V3 de **US$22.450** (primer períodoUS$11.350; siguientesUS$5.550 × 2) y reserva de medios
+separada de **hasta US$18.000**; sobreUS$40.450 antes de impuestos/terceros por confirmar.
+[Costeo V3, reglas y revisión](COSTEO-V3-2026-10-27.md): catálogo localv14 incorpora Performance/Ecuador;
+calculado, margen modelado59,28%, sin líneas bajo piso. Reglas Performance/EC estimadas; equipo/accesos/tributos
+pendientes. Sustituye el fee provisional21.000 y el bloqueo anteriores. No aprobado, emitido o enviado.
 
 Reunión realizada el 27/10 con Vanessa (Katia Vannesa Chugá Ortiz). Leer primero el
 [caso de negocio v1](CASO-DE-NEGOCIO.md): piloto de 90 días LinkedIn Ads + Google Ads para Compras y SSO en
@@ -12,11 +20,16 @@ Ecuador, Colombia y Perú; propuesta comprometida para el jueves 29 o viernes 30
 Investigación de soporte en [research-2026-10-27/](research-2026-10-27/) y lectura de la reunión en
 [POSTREUNION](POSTREUNION.md).
 
+La revisión programada de las 16:00 recuperó nuevamente las 104 intervenciones disponibles en HubSpot
+y la transcripción de Notion; contrastó el caso v1 ya existente, sin reescribirlo ni crear otra lectura
+paralela. [Resultado y precisiones de atribución](POSTREUNION.md#validación-programada-del-2710--1600-chile).
+TASK **119625704196 COMPLETED** por esta revisión y análisis, con body/estado releídos y owner/fecha/
+asociaciones conservados. La automatización focal se eliminó al cumplir su única ejecución.
+
 ## Leer antes de la reunión (preparación del 26/10, histórica)
 
 1. [Guía de conversación del 27/10](REUNION-2026-10-27.md): apertura, agenda y preguntas prioritarias.
-2. [Caso de negocio v0](CASO-DE-NEGOCIO.md): hipótesis de valor, grupo comprador, alternativas,
-   alcance condicional y datos económicos pendientes.
+2. [Caso de negocio](CASO-DE-NEGOCIO.md): ahora v1; las hipótesis v0 del 26/10 permanecen en Git.
 3. [Marca, productos, canal y referentes](2026-10-26-brand-market-research.md) y
    [recorrido digital y demanda](2026-10-26-digital-demand-audit.md): evidencia pública fechada,
    contradicciones y fuentes, sin métricas privadas supuestas.
@@ -26,7 +39,7 @@ Investigación de soporte en [research-2026-10-27/](research-2026-10-27/) y lect
 Este expediente reúne la preparación por iniciativa. Los cortes anteriores conservan evidencia e
 historia, y apuntan aquí; no hay otro CRM ni una segunda oportunidad creada en Markdown.
 
-## Identidad y perímetro
+## Identidad y perímetro del 26/10 — histórico previo a discovery
 
 | Elemento | Estado y fuente |
 | --- | --- |
@@ -60,14 +73,15 @@ comprobaciones separadas. No se afirma entrega/lectura de la confirmación, acep
 evento por comprobar el email. Recibo visual privado: `confirmacion-invitacion-enviada.png` en el
 directorio de trabajo del 26/10; el cuerpo completo permanece en Outlook.
 
-## Próximas decisiones
+## Próximas decisiones actuales — 27/10
 
-- **Julio, reunión 27/10:** validar resultado, canal, territorio, familias, reparto de trabajo, aprobador
-  técnico, proceso de venta, criterios de terna y fecha de propuesta. No llegar con un paquete cerrado.
-- **Agente, tras la reunión:** leer la transcripción/grabación de **HubSpot o Notion**, fuentes confirmadas
-  por Julio el 26/10; reconciliar ambas si existen. Aplicar [POSTREUNION](POSTREUNION.md) y actualizar v1.
-- **Commercial + Pricing, con brief suficiente:** dimensionar alcance/capacidad y costear propuesta.
-  Preparación interna no autoriza precio, CRM adicional ni envío al comprador.
+- **Julio / Pricing:** revisar recomendación de medios, fee V3 calculado y alcance antes de aprobar. Las cifras del
+  caso son escenarios internos; Vanessa pidió que propongamos inversión, sin aprobar un monto.
+- **Equipo de propuesta:** preparar la entrega comprometida por Julio para jueves **29** o viernes
+  **30/10**, manteniendo prioridad respiratoria, audiencias Compras/SSO y venta mediante distribuidores.
+- **Validaciones pendientes:** datos agregados de Kommo, contribución por venta, documentación técnica
+  vigente, capacidad de asesores, regla de canal por país, criterios de terna y entidad/moneda de contratación.
+  Preparación interna no autoriza correo, propuesta enviada, gasto o cambios adicionales CRM.
 
 ## Registro CRM del cierre — 26/10
 
@@ -82,11 +96,11 @@ La TASK es la continuidad comercial canónica; la revisión única de la app eje
 interno y sólo podrá actualizar esa tarea con evidencia. No es otra cadencia ni un nuevo email.
 Company, Contact y sus alias permanecen; no se creó Deal/Lead ni se cambió etapa o calificación.
 
-La revisión futura se configura como seguimiento focal de este hilo, conservando la pausa del radar y
-del seguimiento global. Estado de programación y resultado se registran en `POSTREUNION.md` y en la
-clave existente de [state](../../follow-up-agent/state.json); configuración no equivale a ejecución.
+La revisión focal terminó y su automatización se eliminó; el radar y seguimiento global no se
+modificaron. Estado de ejecución en `POSTREUNION.md` y en la clave existente de
+[state](../../follow-up-agent/state.json). El registro CRM anterior conserva el corte histórico del 26/10.
 
-## Brechas que cambian la decisión
+## Brechas del 26/10 — históricas, contrastadas por el caso v1
 
 No conocemos presupuesto, KPI/baseline, inversión en medios, familia/país prioritarios, stack ni calidad
 del handoff, alcance pedido, capacidad técnica de aprobación, autoridad de compra, entidad contratante,

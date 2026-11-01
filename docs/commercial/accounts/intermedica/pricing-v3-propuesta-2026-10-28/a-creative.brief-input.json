@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-10-28",
+  "offerId": "creative-managed-service",
+  "engagementCode": "monthly",
+  "engagementForm": "on_going",
+  "accountId": "intermedica-pe-propuesta-2026-10-28",
+  "offerMarketCountry": "PE",
+  "outputCurrency": "USD",
+  "periods": 3,
+  "lines": [
+    {
+      "lineId": "design",
+      "profile": "ECG-003",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "copy",
+      "profile": "ECG-011",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    }
+  ],
+  "adjustments": [],
+  "taxTreatment": {
+    "kind": "not_resolved"
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-10-28",
+  "offerId": "performance-commerce-distribution",
+  "engagementCode": "monthly",
+  "engagementForm": "on_going",
+  "accountId": "intermedica-pe-propuesta-2026-10-28",
+  "offerMarketCountry": "PE",
+  "outputCurrency": "USD",
+  "periods": 3,
+  "lines": [
+    {
+      "lineId": "media",
+      "profile": "ECG-008",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": [
+        {
+          "requirementId": "assurance",
+          "resourceId": "provision-backfill-coverage"
+        }
+      ]
+    },
+    {
+      "lineId": "buyer",
+      "profile": "ECG-009",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "data",
+      "profile": "ECG-019",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "strategy",
+      "profile": "ECG-035",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    }
+  ],
+  "adjustments": [],
+  "taxTreatment": {
+    "kind": "not_resolved"
+  },
+  "thirdPartyCosts": [
+    {
+      "costId": "media-client-direct",
+      "category": "media",
+      "label": "Techo orientativo de medios; requiere aprobacion del cliente",
+      "supplier": "Plataformas publicitarias; mix por validar",
+      "settlement": "client_direct",
+      "amount": "3000",
+      "currency": "USD",
+      "quantity": "1",
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "evidence": {
+        "reference": "intermedica:plan-estimado-28oct:medios-client-direct-sin-compromiso",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "schemaVersion": "pricing-v3-workload-result/1",
+  "binding": false,
+  "status": "prepared",
+  "version": "armor-setup-review-2026-10-27",
+  "mode": "simulation",
+  "totals": {
+    "driverHours": [],
+    "fixedHours": "160",
+    "workHours": "160",
+    "fte": "0.888893"
+  },
+  "lines": [
+    {
+      "lineId": "ECG-008",
+      "workHours": "24",
+      "presenceHours": "0",
+      "fteByWork": "0.133333",
+      "fteByPresence": "0",
+      "fte": "0.133334",
+      "bindingConstraint": "work",
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster.",
+      "evidence": {
+        "reference": "workload:armor-setup-review-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "lineId": "ECG-009",
+      "workHours": "24",
+      "presenceHours": "0",
+      "fteByWork": "0.133333",
+      "fteByPresence": "0",
+      "fte": "0.133334",
+      "bindingConstraint": "work",
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster.",
+      "evidence": {
+        "reference": "workload:armor-setup-review-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "lineId": "performance-lead-assumption",
+      "workHours": "8",
+      "presenceHours": "0",
+      "fteByWork": "0.044444",
+      "fteByPresence": "0",
+      "fte": "0.044445",
+      "bindingConstraint": "work",
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster.",
+      "evidence": {
+        "reference": "workload:armor-setup-review-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "lineId": "ECG-031",
+      "workHours": "32",
+      "presenceHours": "0",
+      "fteByWork": "0.177778",
+      "fteByPresence": "0",
+      "fte": "0.177778",
+      "bindingConstraint": "work",
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster.",
+      "evidence": {
+        "reference": "workload:armor-setup-review-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "lineId": "ECG-012",
+      "workHours": "24",
+      "presenceHours": "0",
+      "fteByWork": "0.133333",
+      "fteByPresence": "0",
+      "fte": "0.133334",
+      "bindingConstraint": "work",
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster.",
+      "evidence": {
+        "reference": "workload:armor-setup-review-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "lineId": "ECG-021",
+      "workHours": "16",
+      "presenceHours": "0",
+      "fteByWork": "0.088889",
+      "fteByPresence": "0",
+      "fte": "0.088889",
+      "bindingConstraint": "work",
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster.",
+      "evidence": {
+        "reference": "workload:armor-setup-review-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "lineId": "ECG-011",
+      "workHours": "24",
+      "presenceHours": "0",
+      "fteByWork": "0.133333",
+      "fteByPresence": "0",
+      "fte": "0.133334",
+      "bindingConstraint": "work",
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster.",
+      "evidence": {
+        "reference": "workload:armor-setup-review-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "lineId": "ECG-016",
+      "workHours": "8",
+      "presenceHours": "0",
+      "fteByWork": "0.044444",
+      "fteByPresence": "0",
+      "fte": "0.044445",
+      "bindingConstraint": "work",
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster.",
+      "evidence": {
+        "reference": "workload:armor-setup-review-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "diagnostics": [],
+  "note": "Dimensioned from declared volume and hours. It is not a staffing commitment, an availability check or a measured productivity."
+}

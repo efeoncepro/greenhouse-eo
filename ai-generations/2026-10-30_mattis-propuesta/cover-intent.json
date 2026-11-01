@@ -1,0 +1,21 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-proposal",
+  "use": "proposal",
+  "layout": "orbit",
+  "line": "growth",
+  "voice": {
+    "eyebrow": "Propuesta comercial · Octubre 2026",
+    "question": "¿Cómo crecemos en 2027?",
+    "answer": ["Con foco"]
+  },
+  "body": "Preparada para **Mattis** · Confidencial",
+  "selection": { "target": "client-logo", "label": "Mattis" },
+  "clientLogo": { "path": "ai-generations/2026-10-30_mattis-propuesta/mattis-logo-on-dark.png", "alt": "Mattis Inmobiliaria · Más que tu espacio" },
+  "column": { "topPx": 220 }
+}

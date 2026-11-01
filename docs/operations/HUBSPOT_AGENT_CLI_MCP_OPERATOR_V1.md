@@ -208,11 +208,28 @@ capability permitida para el alcance autorizado; no usar service key ni saltar c
 La asociación Primary se leyó con `associations list`; los EMAIL del CCO con `activities list` y lectura por ID.
 
 Documents puede crear un contacto de correo y producir un lifecycle automático. Buscar la dirección antes
-y después, completar/reutilizar el registro y comprobar Primary sin crear duplicados. La corrección de etapa
+y después; dentro de un alta autorizada, completar/reutilizar el registro y comprobar Primary sin crear duplicados. La corrección de etapa
 requiere autorización y readback: una respuesta de escritura exitosa no prueba que una etapa anterior se haya
 aplicado; en el caso observado hizo falta vaciar y después asignar `lead`. Esto documenta el mecanismo, no
 habilita normalizaciones de otros contactos ni cambios de workflows. Membresía de segmentos se comprueba
 por búsqueda efectiva; atributos guardados o sede global de la Company no prueban segmentación completa.
+
+### Documents y lectura de EMAIL — observación del 28/10/2026
+
+En [MG Indusol](../commercial/prospecting-agent/runs/2026-10-28-mg-indusol-mayra.md), Agent CLI `0.16.0`
+enumeró `documents` y leyó su metadata, pero `objects list/search/get --type documents` devolvieron
+`400: SALES_DOCUMENT is not supported`. Metadata visible no acredita CRUD: utilizar la superficie UI
+autorizada para Documents, sin inventar endpoints ni ampliar credenciales para evitar esa limitación.
+
+La generación del enlace creó un Contact `PRESENTATIONS`, con nombre/cargo vacíos y
+`lifecyclestage=salesqualifiedlead`. Es un efecto nativo, no calificación ni permiso para completar,
+normalizar o ampliar CRM; [el contrato de admisión y autoridad](../../.codex/skills/hubspot-as-a-service/references/prospecting-segmentation.md#native-documents-side-effects-and-parent-geography)
+gobierna el siguiente paso. Mantener datos individuales y enlaces de destinatario en el expediente privado.
+
+Una primera búsqueda de EMAIL vacía tampoco probó ausencia de registro: después de la ingestión,
+`hubspot activities list --contact <id> --activity-type EMAIL --format json` devolvió la actividad `SENT`
+del contacto correcto. Reconciliar el ID y las asociaciones; la demora no autoriza reenviar ni crear otra
+actividad. Enviados, registro CRM, entrega y lectura siguen siendo evidencias distintas.
 
 ## Fuentes y límites
 

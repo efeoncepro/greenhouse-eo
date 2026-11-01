@@ -1,5 +1,15 @@
 # Registro de seguimiento comercial
 
+**Delta focal27/10 · ARMOR, validación16hChile:** reunión realizada; transcripción HubSpot
+MEETING119610757452 READY/104intervenciones y Notion contrastadas (misma grabación). El
+[caso v1](../accounts/indecaucho-armor/CASO-DE-NEGOCIO.md) ya estaba preparado; se conserva sin reescribir.
+[Precisiones de atribución](../accounts/indecaucho-armor/POSTREUNION.md#validación-programada-del-2710--1600-chile):
+Kommo procede de aclaración previa de Julio; presupuesto/forecast y arquitectura del caso son propuestas
+internas. Próximo: costear/aprobar fee y preparar entrega29–30/10; terna prevista4/11, sin selección
+acreditada. TASK119625704196 COMPLETED con resultado y pendientes, body/estado/owner/fecha verificados;
+asociaciones originales comprobadas, NOTE intacta. Automatización focal eliminada al cumplir esta única
+revisión. Sin envío, otros objetos CRM, nueva tarea, secuencia, commit o renovación del inventario global.
+
 **Delta posterior26/10 · ARMOR EPPS:** [expediente único y caso v0](../accounts/indecaucho-armor/README.md).
 Research profundo con tres subagentes, guía27/10 y método de discovery→caso actualizados. Confirmación
 cordial14:28Chile con firma/CCO, Enviados y mensaje de14:28 en cadena HubSpot comprobados. Lectura de
@@ -20,6 +30,8 @@ en hilo18Oct, firma gráfica/CCO y nueva copia Enviados verificados; EMAIL119538
 Esperar respuesta, sin nueva secuencia ni envío futuro. Método compartido y skills espejo actualizados.
 La UI permitió estas lecturas; no prueba pago/recuperación general ni renueva el corte09h.
 
+**Corte vigente: 26/10/2026, 09:00 Chile — revisión parcial, CRM bloqueado.** [Informe](runs/2026-10-26-0900.md). **Factura814356022: suspensión efectiva** confirmada en Cuenta y facturación; UI USD1.296 vencidos28/09, sin conciliación bancaria. Misma tarea operativaNotion actualizada y releída. MCP pide reconexión, CLI sesión expirada; no inventarioCRM ni writesTASK frescos. Hoy Ñuble15h/ProChile nuevo15:01; mañana Aysén/MINSAL15h. Mattis ya preparada: conflicto correo30Oct14Colombia(16Chile) vs captura18sinzona; usar16Chile conservador hasta conciliación. Gana1552 preparada, distinta1541yaenviada. FEN Salesforce ahoraDesierta. Pausas25Oct Olivos/Toyota/NIASA/Unilever preservadas; UTP enviada25Oct sin respuesta acreditada. Cobertura379mensajes/37Sent/59drafts/86Notion/10LicitaLAB/2MP; Wherexlogin. Dos revisiones candidatas sólo en ledger, pendientes dedupeCRM; ceroTASKcreadas, ceroenvíos/postulaciones/commit. Próximo hoy16Chile.
+
 **Delta focal25/10 · aplicación autorizada en HubSpot:** [guía y continuidades releídas](../analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md).
 Nueve correos futuros de ocho inscripciones y nueve plantillas ajustados; Unilever(Karla/Estefanía),
 Olivos(Emily), Toyota(Fabricio) y NIASA(Liliana) pausados, con condiciones explícitas para retomar.
@@ -34,7 +46,7 @@ excepción al CCO con registro nativo: ambas **Programado1/EnCurso0/Error0**,29O
 calendario persistido releído. Respuesta/reunión desinscribe al Contact. Todavía no enviados; no duplicar por
 radar. [Autorización y evidencia](runs/2026-10-24-lucia-yvette-secuencias.md). No renueva el corte global.
 
-**Corte vigente: 23/10/2026, 16:00 Chile.** [Informe completo](runs/2026-10-23-1600.md). **Aysén prorrogó al 27/10 15:00**, confirmado en Mercado Público y LicitaLAB; misma TASK119277345698, decisión interna26Oct12h. **Auditoría SKY enviada hoy12:36**, PDF verificado por metadata; TASK118588664157 pasa a recepción/accesos/recuperación, revisión26Oct10h. Respuesta automática no aceptación. Salesforce/SUBDERE/Chillán figuran Cerradas: conciliar comprobantes, no inferir pérdida. CMF alcanzó plazo16h, estado vivo bloqueado porlogin. Arcor/Ignacio correo enviado10:38; nueva TASK119420874102 para28Oct10h, sin otro contacto. Lunes Ñuble15h y ProChile nuevo15:01; Gana1552 preparada/cierre30Oct18h, distinta1541yaenviada. UChile web5485-868-COT26 cierra sábado24Oct20h,CLP200.000,baja prioridad pendiente de alcance. Factura814356022 mismo riesgo23Oct sin pago/saldo vivo comprobado. Cobertura297Deals/72abiertos/217TASKprevias/231Leadsrecientes/326mensajes/46Sent/58drafts/86Notion;12fichasLicitaLAB+1MP. Una TASKnueva y6actualizadas,7lecturas independientes y21listas de asociaciones verificadas. Cero envíos, postulaciones, otrasmutacionesCRM, Notion, secuencias o commit. Próximo lunes26Oct09Chile.
+**Corte histórico: 23/10/2026, 16:00 Chile; último inventario CRM completo, sustituido por corte parcial26/10.** [Informe completo](runs/2026-10-23-1600.md). **Aysén prorrogó al 27/10 15:00**, confirmado en Mercado Público y LicitaLAB; misma TASK119277345698, decisión interna26Oct12h. **Auditoría SKY enviada hoy12:36**, PDF verificado por metadata; TASK118588664157 pasa a recepción/accesos/recuperación, revisión26Oct10h. Respuesta automática no aceptación. Salesforce/SUBDERE/Chillán figuran Cerradas: conciliar comprobantes, no inferir pérdida. CMF alcanzó plazo16h, estado vivo bloqueado porlogin. Arcor/Ignacio correo enviado10:38; nueva TASK119420874102 para28Oct10h, sin otro contacto. Lunes Ñuble15h y ProChile nuevo15:01; Gana1552 preparada/cierre30Oct18h, distinta1541yaenviada. UChile web5485-868-COT26 cierra sábado24Oct20h,CLP200.000,baja prioridad pendiente de alcance. Factura814356022 mismo riesgo23Oct sin pago/saldo vivo comprobado. Cobertura297Deals/72abiertos/217TASKprevias/231Leadsrecientes/326mensajes/46Sent/58drafts/86Notion;12fichasLicitaLAB+1MP. Una TASKnueva y6actualizadas,7lecturas independientes y21listas de asociaciones verificadas. Cero envíos, postulaciones, otrasmutacionesCRM, Notion, secuencias o commit. Próximo lunes26Oct09Chile.
 
 **Corte histórico: 23/10/2026, 09:00 Chile; sustituido por corte 16h.** [Informe completo](runs/2026-10-23-0900.md). Salesforce U. Chile cierra hoy10h; SUBDERE/Aysén/Chillán15h y CMF16h. **Berel7084 adelantó cierre a ayer22Oct20:30 y figura Descartada**: TASK119276711501 ahora concilia presentación, no envío futuro. Gana1552 ya tiene Markdown preparado, revisar hoy12h; COP38M/mes es escenario interno, no precio final; distinto de1541 enviada20Oct. SKY Social Care tuvo seguimiento22Oct19:05; revisión26Oct10h, no repetir. Mariana/Fundación Luz correo+InMail enviados por operación focal; nueva revisión interna TASK119332928269 para27Oct10h, excepción de correo inferido no ampliada. INAPI publicóRes403:20.000sesiones/70–30sobrebruto. Nueva UChileemailMKT831830-40-COT26 cierra18h, HOLDporproveedordirecto/ISO27001. UTEMclosedlost confirmado; no reabrir. Factura814356022 conserva riesgo23Oct sin saldo vivo. Cobertura297Deals/72abiertos/216TASKprevias/224Leadsrecientes/341mensajes/16Sentrecientes/13drafts/86Notion/17eventos;11fichasLicitaLAB+2MP+2Wherex. Una TASKnueva y3actualizadas,4readbacks/12asociaciones verificados. Sin envíos, Notion, otrosCRM, secuencias ni commit. Próximo hoy16h.
 
@@ -485,3 +497,18 @@ Requisito de consentimiento desactivado y tracking general activado. Lote manual
 ## Bitácora 23/10/2026 — corte09:00 Chile
 
 [Revisión integral](runs/2026-10-23-0900.md): cambio de cierre anticipado Berel, avance de propuesta Gana1552 y seguimiento SKY ya enviado conciliados. Una altaTASK de revisión interna para Mariana y tres actualizaciones, con campos y12listas de asociaciones releídos. Se preservan las claves, históricos, descartes y Fabrimetal2027. INAPI responde y rectifica; nueva señal emailMKT con exigencia excluyente, sin Deal ni GO. No emails ni postulaciones, no cambios al radar separado, no commit.
+
+
+### 30/10/2026 12:41 — izipay: seguimiento autorizado enviado
+
+MismohiloRFQ001,docedárrafosseparados,firma gráficaoficial,nueveimágenes,destinatariaComprassola,CCvacío/CCOHubSpot. OutlookEnviadosyEMAIL120018740037SENTleídos. Esperarbrief/bases/calendarioyadmisiónChile;sinrepetirenvíonicontactaradyacentes. Sincréditos/otrasmutacionesCRM/secuencias/tareas/commit/push. [Evidencia](runs/2026-10-30-1241-izipay-seguimiento-enviado.md).
+
+
+### 30/10/2026 12:48 — Teva: seguimiento existente verificado
+
+HSP-0027: envío del 29Oct10:35 comprobado en Outlook y EMAIL119905233783SENT. Sin respuesta localizada en búsqueda exacta; secuencia316751032 en curso, próximo paso5Nov confirmado en UI. No duplicar hoy; sin nuevos envíos, cambios CRM ni automatizaciones. [Revisión focal](runs/2026-10-30-1248-teva-seguimiento-revisado.md).
+
+
+### 30/10/2026 13:49 — izipay: respuesta registrada
+
+Compras respondió30Oct13:26:51Santiago: Marketing prepara información y espera más detalle la semana2–8Nov, sin fecha comprometida. Nota120015317862 creada y leída, asociada al Deal66481946424 y contacto existente. Esperar novedades; no envío hoy. Bases/admisión/calendario pendientes; secuencia inactiva; sin cambios de etapa ni tarea. [Registro](runs/2026-10-30-1349-izipay-respuesta-registrada.md).

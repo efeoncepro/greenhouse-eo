@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "intermedica-b-preparation-v2-2026-10-28",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "150",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "intermedica:estimacion-capacidad-150-productivas-180-programadas",
+      "effectiveFrom": "2026-10-28",
+      "effectiveUntil": "2027-02-28",
+      "status": "estimated"
+    }
+  },
+  "drivers": [],
+  "fixedWork": [
+    {
+      "workId": "measure-scope",
+      "label": "b-preparation: bloque de trabajo measure",
+      "hoursPerMonth": "30",
+      "source": {
+        "reference": "intermedica:alcance-y-bloques-estimados-28oct:b-preparation:measure",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "web-scope",
+      "label": "b-preparation: bloque de trabajo web",
+      "hoursPerMonth": "12",
+      "source": {
+        "reference": "intermedica:alcance-y-bloques-estimados-28oct:b-preparation:web",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "media-scope",
+      "label": "Direccion, estrategia y operacion de medios del mismo responsable",
+      "hoursPerMonth": "18",
+      "source": {
+        "reference": "intermedica:alcance-y-bloques-estimados-28oct:b-preparation:media",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "measure",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "measure-scope",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloque estimado por entregables; validar con responsable de practica."
+    },
+    {
+      "lineId": "web",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "web-scope",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloque estimado por entregables; validar con responsable de practica."
+    },
+    {
+      "lineId": "media",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "media-scope",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloque estimado por entregables; validar con responsable de practica."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.01"
+  }
+}

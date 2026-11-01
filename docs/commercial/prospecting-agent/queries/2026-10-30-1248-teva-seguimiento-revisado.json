@@ -1,0 +1,61 @@
+{
+  "run_id": "2026-10-30-1248-teva-seguimiento-revisado",
+  "checked_at": "2026-10-30T12:48:33.144595-03:00",
+  "timezone": "America/Santiago",
+  "scope": "focused_existing_account_followup",
+  "hsp_id": "HSP-0027",
+  "discovery_queries": 0,
+  "queries": [
+    {
+      "source": "Outlook",
+      "query": "Teva received>=2026-10-01",
+      "result_count": 5,
+      "has_more": false,
+      "country": "Chile",
+      "service": "creative/digital",
+      "scope": "search metadata"
+    },
+    {
+      "source": "Outlook",
+      "query": "from:[CORREO_INDIVIDUAL_REDACTADO] received>=2026-10-14",
+      "pii_redacted": true,
+      "result_count": 0,
+      "has_more": false
+    },
+    {
+      "source": "HubSpot Agent CLI",
+      "query": "contact 254921490573; property hs_sequences_is_enrolled",
+      "result": "true",
+      "access": "read-only"
+    },
+    {
+      "source": "HubSpot Agent CLI",
+      "query": "EMAIL activities for contact 254921490573",
+      "result": "four SENT records; latest 119905233783 at 2026-10-29T13:35:13.295Z"
+    },
+    {
+      "source": "HubSpot native UI",
+      "url": "https://app.hubspot.com/sequences/48713323/sequence/316751032/enrollments",
+      "result": "in_progress=1; errors=0; latest_step=2/3 on October 29; next_step=3/3 on November 5"
+    },
+    {
+      "source": "Outlook native UI",
+      "query": "Read latest search result from October 29",
+      "result": "correct individual recipient, body, official graphical signature and quoted October 22 message verified"
+    }
+  ],
+  "decision": "No additional email today; preserve existing November 5 sequence step",
+  "crm_writes": false,
+  "new_send": false,
+  "contractual_control": {
+    "result": "HOLD unchanged; no new procurement recommendation",
+    "checked_at": "2026-10-30T12:48:33.144595-03:00",
+    "primary_contract_review_performed": false,
+    "publication": "not_verified",
+    "awardee": "not_verified",
+    "contract": "not_verified",
+    "participation_calendar": "not_verified",
+    "reason": "Focused cadence review, no recommendation to bid, no enrichment or Deal action"
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-30-teva-followup-review"
+}

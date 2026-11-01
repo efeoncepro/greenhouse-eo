@@ -102,8 +102,12 @@ link form is not a bypass. Then create each original brochure link for that exac
 its attribution and avoiding recipient-view visits by the agent as a self-check.
 
 Generating a recipient link in Documents can create an email-only Contact with a `PRESENTATIONS` origin
-and a lifecycle such as SQL. Dedupe the exact address again before creating, then complete the authorized
-record, its Primary Company and source evidence. Native creation or SQL is not buyer qualification.
+and a lifecycle such as `salesqualifiedlead`, even with name and job title empty. Dedupe the exact address
+again before creating, then complete the authorized record, its Primary Company and source evidence.
+Native creation or SQL is not buyer qualification. If the link already produced a Contact while the mandate
+covered only the document/outreach, record that side effect and the pending data; it does not authorize
+completing fields, creating a Company, correcting lifecycle, adding segments or creating Lead/Deal objects.
+Do not use Documents deliberately to bypass the admission and authorization gates above.
 If correcting lifecycle is within the approved intake, read the current value and use the supported route;
 a backward change may require clearing `lifecyclestage`, reading back the empty value, then setting `lead`
 and reading back again. An accepted update alone did not prove that a backward change persisted.

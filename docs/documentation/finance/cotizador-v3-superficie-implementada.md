@@ -1,5 +1,9 @@
 # Cotizador V3: superficie local implementada
 
+**Catálogo27/10/2026:** [v14 incorpora Performance y Ecuador](../../../data/pricing/v3-operating/PERFORMANCE_ECUADOR_2026-10-27.md)
+por pedido de Julio. Oferta gestionada con objetivo55%/piso45%, mercadoEC1,00 y reserva On-Demand12% humana,
+todos estimados para revisión. Sin cambio de kernel/schema ni promoción de base de plataforma.
+
 Estado verificado el 2026-10-09, TASK-2016/2019/2020/2021/2022. Este documento describe el comportamiento
 ejecutable; el [contrato objetivo](cotizador-v3-contrato-y-validacion.md) conserva la dirección de evolución.
 El [manual operativo](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) es la entrada para Codex y
@@ -99,8 +103,8 @@ continuo, que se renueva mes a mes. *On-Demand* es un trabajo acotado: tiene alc
 salida definidos. Hasta este cambio el cotizador no distinguía entre los dos y todo se cotizaba como continuo. Ahora
 la forma es un dato propio del pedido y cambia el precio.
 
-**Qué no es.** No es una cuarta oferta ni un modelo de entrega: las ofertas siguen siendo tres. Tampoco es la
-cadencia de cobro. El campo `engagementCode` (hoy `monthly`) sigue diciendo cada cuánto se factura y sigue eligiendo
+La forma del trabajo, la oferta y el modelo de entrega son dimensiones separadas. La cadencia de cobro
+se declara en `engagementCode` (hoy `monthly`), que sigue diciendo cada cuánto se factura y sigue eligiendo
 la política de precio; la forma va en un campo aparte y opcional, `engagementForm`, con los valores `on_going` y
 `on_demand`.
 

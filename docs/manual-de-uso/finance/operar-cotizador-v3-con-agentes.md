@@ -1,5 +1,11 @@
 # Cotizador V3: flujo completo para Codex y Claude
 
+**Catálogo27/10/2026:** [Performance y Ecuador en v14](../../../data/pricing/v3-operating/PERFORMANCE_ECUADOR_2026-10-27.md).
+Cuarta oferta `performance-commerce-distribution`, `managed_service`, objetivo55%/piso45% estimados;
+mercadoEC neutro1,00 estimado y reserva On-Demand12% humana. Consultar `--current`; no equivale a precio aprobado
+o catálogo sincronizado a la base de la plataforma. El [caso ARMOR](../../commercial/accounts/indecaucho-armor/COSTEO-V3-2026-10-27.md)
+demuestra preparación y operación en un mismo programa finito, sin duplicar funciones, plataforma o asientos al inicio.
+
 TASK-2022, 2026-10-09. Prototipo local ejecutable. Entrada:
 [data y casos](../../../data/pricing/v3-operating/README.md),
 [ADR](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md).

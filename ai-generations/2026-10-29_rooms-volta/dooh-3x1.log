@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.030 (1 × 988 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-29_rooms-volta/dooh-3x1.png …
+  ✓ 3696KB · gpt-image-2.5-sunburst · 3072x1024 · high
+    usage: in 293 (img 0 · txt 293) · out 988 · total 1281
+done

@@ -6,6 +6,14 @@ publicado e InMail, waterfall sin email/0 créditos y NDR del envío individual 
 259368373373, Primary Mambrino 60401677206 y EMAIL 120040210331 SENT comprobados; InMail previo y nota
 actualizada. Secundaria vacía y membresía de segmentos sin cerrar. No renueva el radar ni programa seguimiento.
 
+**Delta focal 28/10 · MG Indusol / Mayra:** [investigación y envío autorizado](runs/2026-10-28-mg-indusol-mayra.md).
+Presentación enviada una vez a las **19:37:35 Chile**, con firma gráfica, CCO y brochure 360° completo
+por enlace individual; Enviados y EMAIL `119882403672` `SENT` verificados por separado. Documents creó
+Contact `258762787214` de forma automática (`PRESENTATIONS`, lifecycle `salesqualifiedlead`), sin
+calificación humana ni alta manual. Vigencia del aviso y piso de tamaño ICP pendientes; tres adyacentes
+investigados sin correo verificado ni envíos. Sin créditos, Company/Lead/Deal/secuencia manuales,
+seguimiento programado, entrega o lectura acreditadas. No renueva el radar.
+
 **Delta focal26/10 · Mass Chile:** [Yuri, Guillermo y Judith](runs/2026-10-26-mass-chile.md):
 excepción personal de Yuri y DM enviados; corporativo inferido rebotado, no reintentar. Guillermo/Judith
 con alta autorizada y dos correos personalizados; firma gráfica, CCO, brochures nativos, Enviados y
@@ -261,3 +269,47 @@ Cero nuevas compras calificadas; HSP-0053 Universidad de Talca y HSP-0054 FUCOA 
 ### 25/10/2026 — UTP Perú: presentación a red de proveedores
 
 Skills actuales recargadas. Company UTP y Contact Gustavo creados con Primary y propiedades leídas; correo laboral Verified por Apollo waterfall autorizado, 2 créditos. Documents creó también un buzón compartido, conservado separado de la persona. Presentación enviada una vez al canal publicado con copia a Gustavo, dos brochures originales, principales clientes, firma gráfica y CCO; Enviados y EMAIL SENT asociados comprobados. LinkedIn pendiente por falta de créditos de InMail, invitación previa preservada; sin nuevo Lead/Deal, secuencia ni adjudicación. [Corrida y evidencia](runs/2026-10-25-utp-gustavo.md).
+
+
+### 26/10/2026 09:09 — Radar diario: hitos de hoy y CRM bloqueado
+
+Cero nuevas compras semanales calificadas;52consultas/48semanales(92,3%),20celdas,54HSP/27lotes/32decisionespreservados. ProChile/Ñublehoy15:01/15:00yEsval16:00siguenHOLD;Ñuble135Mconfirmadoenrespuestas;TalcaICPescala2024acreditadaypreguntashoy19:00,sinresolvercontrato. API6fichas200+Vitacura200;listado26Oct48registros,23Oct429sinreintentos. LicitaLABTodos137(100+37),Wherex30Nueva/4Editando;GANA5ajenas/0respuestas,Mattis2propias/0respondidas. HubSpotcuentabloqueadaporpagospendientes/MCPreauth/CLIexpirada:sinlecturasCRMactuales. UTPconciliadoconenvío25Oct,sinrepetir.35controles(10actuales/5listados/20heredados). SinCRM/envíos/créditos/commit/push/tareasnuevas. [Reporte](runs/2026-10-26-0909.md) · [Consultas](queries/2026-10-26-0909.json).
+
+
+### 27/10/2026 11:02 — Radar diario: O’Higgins y La Serena en investigación; Talca prorrogada
+
+Cero nuevas compras calificadas. HSP-0055 O’Higgins y HSP-0056 La Serena publicadas hoy en API, sólo HOLD; Mirada FEN5868-19 conserva HSP-0048. Talca primario: preguntas27Oct19, ofertas3Nov15.48consultas/44semanales(91,7%),20celdas,45controles;56HSP/27lotes/32decisiones preservados. LicitaLABTodos163filas;Wherexlogin;APIv1/v2detenidas429;CLIHubSpotread-only operó aunque MCP pide reauth. FeetCentercompra cerrada por comprador;Esenttiaclosedlost/STOP;ARMORreuniónya programada14:30sin duplicar. SinCRM/envíos/créditos/commit/push/tareasnuevas. [Reporte](runs/2026-10-27-1102.md) · [Consultas](queries/2026-10-27-1102.json).
+
+
+### 28/10/2026 08:59 — Radar diario: sin nuevas compras calificadas; Mirada FEN precisa plazo
+
+52consultas/48semanales(92,3%),20celdas,49controles;56HSP/27lotes/32decisiones preservados. UOH/LaSerena mantienen hitos28Oct11/16 deAPIayer, sin estado primario actual; inventarios actuales. MiradaFENRAG:45días hábiles desdeOC/3MCLP IVAincluido frente2días ficha;HOLD. Talca3Nov15Chrome,FUCOA2Nov15:30,Fresia30Oct10; AysénCerrada. Wherex/LicitaLABlogin,OAuthvencido,ticketAPI inaccesible sinrequests; CLIHubSpot4Companies/3Deals/2dedupes opera sólolectura. IAB/ACT conocidos,BDO2022 no compra2026. SinCRM/envíos/créditos/commit/push/tareasnuevas. [Reporte](runs/2026-10-28-0859.md) · [Consultas](queries/2026-10-28-0859.json).
+
+### 29/10/2026 09:09 — Radar diario: O’Higgins cerrada; FONATUR y Valle en investigación
+
+Cero compras nuevas calificadas. 52 consultas de descubrimiento, 44 semanales (84,6%), 20 celdas y 56 controles. HSP-0057 Universidad del Valle conserva HOLD: índice de fase web con documentos titulados firmados, SECOP en login y dos consultas oficiales acotadas sin filas; no afirmar adjudicación ni apertura. HSP-0058 FONATUR tiene publicación primaria 26/10 a las 18:24 UTC−6, consultas 2/11 a las 11:00 y ofertas 9/11 a las 11:00; originales bloqueados por CAPTCHA, admisión y tamaño pendientes. Mirada FEN recibe hoy 10:00 en API, pero plazo/documentos/contrato siguen HOLD. O’Higgins figura Cerrada; La Serena tiene señal secundaria de selección, sin ganador primario verificado. UNICEF multimedia, conocida desde 16/10, confirma recepción 9/11 a las 23:59 GMT−5; tres originales403, HOLD. Fresia, Talca y FUCOA revalidadas por ficha; Wherex y LicitaLAB web en login. API v2 respondió dos detalles200 y luego429, sin reintentos. HubSpot sólo lectura; 58 IDs, 27 lotes y 32 decisiones preservados. Sin créditos, envíos, altas, tareas nuevas, commit/push o cambio de scheduler. [Reporte](/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/runs/2026-10-29-0909.md) · [Consultas](/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-29-0909.json).
+
+
+### 30/10/2026 09:08 — Radar diario: hitos de Réditos y Fresia; Qualitor conciliado
+
+Cero compras nuevas calificadas;72consultas/63semanales(87,5%),20celdas,60controles y58HSP/27lotes/32decisionespreservados. FresiaAPIywebhoy10:00,HOLDoriginalbloqueado;TalcaAPI3Nov15/respuestashoy19;FUCOAAPI2Nov15:30/ICPpendiente. Wherexlistaconservada→login,sindetalleactual;QualitorSMZ-116yDealexistente29Octconciliadossinrepetirconsultas. FONATURfichaprimariaactual,originalesyadmisiónHOLD. MP3detalles200→429STOP. SinCRM/envíos/créditos/commit/push/nuevastareas. [Reporte](runs/2026-10-30-0908.md) · [Consultas y controles](queries/2026-10-30-0908.json).
+
+
+### 30/10/2026 12:41 — izipay: seguimiento autorizado enviado
+
+MismohiloRFQ001,docedárrafosseparados,firma gráficaoficial,nueveimágenes,destinatariaComprassola,CCvacío/CCOHubSpot. OutlookEnviadosyEMAIL120018740037SENTleídos. Esperarbrief/bases/calendarioyadmisiónChile;sinrepetirenvíonicontactaradyacentes. Sincréditos/otrasmutacionesCRM/secuencias/tareas/commit/push. [Evidencia](../follow-up-agent/runs/2026-10-30-1241-izipay-seguimiento-enviado.md).
+
+
+### 30/10/2026 12:48 — Teva: seguimiento existente verificado
+
+HSP-0027: envío del 29Oct10:35 comprobado en Outlook y EMAIL119905233783SENT. Sin respuesta localizada en búsqueda exacta; secuencia316751032 en curso, próximo paso5Nov confirmado en UI. No duplicar hoy; sin nuevos envíos, cambios CRM ni automatizaciones. [Revisión focal](../follow-up-agent/runs/2026-10-30-1248-teva-seguimiento-revisado.md).
+
+
+### 30/10/2026 13:49 — izipay: respuesta registrada
+
+Compras respondió30Oct13:26:51Santiago: Marketing prepara información y espera más detalle la semana2–8Nov, sin fecha comprometida. Nota120015317862 creada y leída, asociada al Deal66481946424 y contacto existente. Esperar novedades; no envío hoy. Bases/admisión/calendario pendientes; secuencia inactiva; sin cambios de etapa ni tarea. [Registro](../follow-up-agent/runs/2026-10-30-1349-izipay-respuesta-registrada.md).
+
+
+### 31/10/2026 09:06 — Radar diario: ofertas enviadas y Leasein en investigación
+
+Cero nuevas compras abiertas verificadas; 64 consultas/60 semanales (93,75%), 20 celdas. Leasein HSP-0059 sólo investigación: evalúa CRM y excluye nuevos contactos HubSpot/Odoo; fecha absoluta no verificada. GANA/LOTI y Mattis ya enviados30Oct, sin duplicar; certificado fiscal Mattis pendiente. Qualitor: HOLD/ruta Colombia; NO-BID modalidad chilena sin aceptación. Talca3Nov/FUCOA2Nov API actual, originales/aclaraciones/contrato pendientes. FONATUR ficha vigente, originales bloqueados. 64 controles, 59HSP/27lotes/32decisiones preservados. Sin CRMwrites/créditos/envíos/postulaciones/commit/push/tareas nuevas. [Reporte](runs/2026-10-31-0906.md) · [Consultas](queries/2026-10-31-0906.json).

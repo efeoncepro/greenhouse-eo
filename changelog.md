@@ -28,6 +28,21 @@ cobertura separadas; controles conocidos y contraste de filtros en política, ma
 Las 44 consultas no se alteraron por el diagnóstico; cobertura pendiente, fixture P89 sin evaluación conductual.
 Listas 54/57 y portafolio 12/5 intactos. Sin contacto, InMail, CRM, scheduler externo o prueba de recuperar cupo.
 
+## 2026-10-29 — Sitio público: nueva home «La órbita» y limpieza de homes antiguas
+
+La home de efeoncepro.com es la landing compilada `inicio` desde el canvas aprobado (hero con cinco líneas, motor,
+AEO «pregunta en vivo», constelación de Sparks, Greenhouse, método, testimonios SKY, FAQ y agenda nativa). Imagen OG,
+metadatos sociales y destacada nuevos; videos solo en pantalla. Homes antiguas y demos del tema a la papelera con 301.
+[Auditoría](docs/audits/public-site/2026-10-29-home-orbita-rediseno-y-seo.md).
+
+## 2026-10-28 — Prospección: MG Indusol y recuperación del borrador persistido
+
+[Caso Mayra / MG Indusol](docs/commercial/prospecting-agent/runs/2026-10-28-mg-indusol-mayra.md) conciliado
+con correo autorizado y readbacks independientes de Enviados y EMAIL SENT. Canon y skills espejo precisan
+la recuperación del mismo borrador, límites CRUD de Documents y alcance del Contact automático;
+su lifecycle no constituye calificación. Sin nueva política, autonomía, CRM manual o seguimiento programado.
+[Auditoría y verificaciones](docs/audits/commercial/2026-10-28-mg-indusol-docs-skills.md).
+
 ## 2026-10-27 — SKY: ADR y comparación local de cuentas operativas
 
 TASK-2073 añade sandbox sin red/DB para comparar bridges A′/B: 97 tests PASS, nueve anchors locales y evidencia
@@ -89,6 +104,11 @@ de la fuente declarada y economía condicionada. Lectura HubSpot/Notion programa
 por mandato expreso; seguimiento global PAUSED conservado, resultado posterior pendiente.
 Registro CRM posterior autorizado: nota de respuesta119606905700 y tarea119625704196 con owner/fecha
 y asociaciones a cuenta/contacto comprobados; la revisión focal reutiliza esa TASK.
+
+Delta27/10: revisión de transcripción concluida y automatización focal eliminada. Por mandato posterior de Julio,
+[catálogo V3v14](data/pricing/v3-operating/PERFORMANCE_ECUADOR_2026-10-27.md) agrega Performance y Ecuador con reglas
+estimadas; puntero consistente y skills espejo/rutas actualizados. [ARMOR calculado](docs/commercial/accounts/indecaucho-armor/COSTEO-V3-2026-10-27.md):
+feeUSD22.450/90días, medios hasta18.000 aparte, en revisión.1.860testsPASS/3skip; sin importación a plataforma o envío.
 
 ## 2026-10-26 — Sitio público: runner para pedir indexación en Search Console
 
@@ -560,19 +580,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
   frase clave «partner hubspot» (Semrush CL/MX/CO), OG propia y Service + FAQPage.
 - Dock móvil con «Agendar reunión» (CTA gobernado `hubspot-discovery-meeting`, scheduler nativo) e «Ir al formulario».
 - Renderer CTA 1.3.1: la cabecera del scheduler ya no se parte en móvil (pendiente de release a producción).
-
-## 2026-10-16 — Agencia de Medios: brochure canonizado y landing publicada
-
-- Landing pública [`/servicios/agencia-de-medios/`](https://efeoncepro.com/servicios/agencia-de-medios/) (página
-  `251981`, menú Soluciones → Crecimiento Multicanal): 16 widgets compilados del canvas, header/footer de Ohio, SEO con
-  frase clave «agencia de medios» (Semrush), OG propia y formulario `efeonce-media-diagnostic` con destino HubSpot.
-- Brochure «Agencia de Medios» (65 láminas, PDF `c4697c7a…`) con logotipos oficiales de terceros y sin promesa de
-  rebates. Canon: [norma](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (deltas 2026-10-16),
-  [PDR-025](docs/public-site/decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) y
-  [material comercial de medios](docs/services/media-distribution/README.md).
-
-## 2026-10-16 — GTM: drift vigilado en web y servidor
-
-- `pnpm gtm:snapshot` versiona también el container servidor (sGTM/Meta CAPI) y tapa secretos con huella sha256;
-  `gtm-drift.yml` compara a diario ambos containers live contra git y falla ante drift. El publish por script
-  reescribe los snapshots. [ADR, delta 2026-10-16](docs/architecture/GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1.md).

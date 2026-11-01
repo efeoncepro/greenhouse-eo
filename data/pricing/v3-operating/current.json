@@ -1,11 +1,11 @@
 {
   "schemaVersion": "pricing-v3-current/1",
-  "updatedAt": "2026-10-22",
-  "reason": "Julio22Oct2026:canonical additions of missing Trafficker,EmailSMS,DigitalStrategist and public Awario reference; estimated salary costs; retain existingFX,policies and all previous versions; no proposal or payroll approval.",
+  "updatedAt": "2026-10-27",
+  "reason": "Julio27Oct2026 authorizes adding Performance and Ecuador and recalculating ARMOR for review. Performance target55/floor45, EC neutral1 and human reserve12 remain estimated; local catalog only, no client-price approval or platform DB sync.",
   "catalog": {
-    "path": "data/pricing/v3-operating/catalog.review-v13.json",
-    "version": "operating-review-2026-10-22-v13",
-    "digest": "1b3ab1c9634cd4afecfe0cd14a13aab4a71a463cc60f7b702d9a91f73a419779"
+    "path": "data/pricing/v3-operating/catalog.review-v14.json",
+    "version": "operating-review-2026-10-27-v14",
+    "digest": "6b920a6d13da36eb7ddacc015c7b683a8500f79e68b5817e4b8e7950117b55e2"
   },
   "policy": {
     "path": "data/pricing/v3-operating/resources.review-v12.json",

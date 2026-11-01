@@ -4,7 +4,7 @@ Owner: agente de este hilo / Julio Reyes. Mandato explícito del 26/10: profundi
 después de la reunión, leer la transcripción para terminar de construir el caso de negocio.
 Julio aclara: **las reuniones se graban con HubSpot y Notion**; éstas son las fuentes principales.
 
-## Estado previo
+## Estado previo del 26/10 — histórico
 
 - Reunión prevista **27/10/2026, 12:30–13:00 Ecuador / 14:30–15:00 Chile**. Aceptación formal aún no
   acreditada al último readback; si cambia la fecha, actualizar el siguiente paso.
@@ -38,6 +38,49 @@ investigación de `research-2026-10-27/` (empresa, competidores, mercado y medio
 programada de las 16:00 **no debe reescribirlo ni crear otra lectura paralela**: si corre, sólo valida contra la
 transcripción, registra discrepancias aquí y actualiza el body de la TASK **119625704196** con el estado real
 (caso v1 listo; pendientes: datos de Kommo, certificados, regla de canal, fee en Pricing).
+
+## Validación programada del 27/10 — 16:00 Chile
+
+La revisión recuperó y leyó **todas las 104 intervenciones disponibles** de la MEETING119610757452,
+transcripción4193705736, `READY` (`FRAME_HEALED` / provider `FRAME_HEALING`). Cobertura del archivo:
+**00:09.680 a 15:38.642**, con nombre de speaker y timestamps por intervención; no acredita los
+primeros segundos ausentes ni revisión de audio. La nota de Notion de igual título/fecha se recuperó
+con `include_transcript=true`, última edición17:45UTC, sin indicador de truncamiento en la respuesta.
+Ambas representan la misma conversación, no dos testimonios independientes.
+
+El evento Outlook sigue el27/10 17:30–18:00UTC, no cancelado; el RSVP `none` no contradice la
+realización acreditada por la grabación. El hilo de Outlook conserva la solicitud del26/10 y no mostró
+otra respuesta de esa remitente en la consulta acotada; no se afirma cobertura total del correo.
+
+**Resultado:** el caso v1 ya existía y sus requisitos centrales coinciden con la transcripción. No se
+reescribió `CASO-DE-NEGOCIO.md`, no se creó `REUNION-2026-10-27-LECTURA.md` ni una interpretación
+paralela. Este delta conserva la validación y las precisiones que debe respetar la propuesta:
+
+| Evidencia / localización | Lectura que se conserva |
+| --- | --- |
+| Vanessa,00:40;01:13–02:06;05:48–06:28 | Identidad preferida Vanessa, coordinadora de marketing Industria; B2B mediante distribuidores, acompañamiento técnico y prioridad de máscaras full face/filtros. Perú previsto para2027; no fecha de entrada exacta. |
+| Vanessa,03:16 | ~22seguidores nuevos y4–5leads mensuales son datos declarados. No tasas de calificación/cierre, exportación de Kommo ni resultado de campañas comprobados. |
+| Vanessa,07:08; Julio,07:53 | El nombre del CRM se transcribe ambiguamente como «cómo». **Kommo** se conserva por la aclaración de Julio registrada previamente; no se presenta como palabra inequívoca del audio o de esta transcripción. |
+| Vanessa,08:14–11:22 | Necesidad de leads/ventas; piloto90días, LinkedIn Ads+Google Ads; Compras/SSO, Ecuador/Colombia y visibilidad de Perú; fuera Facebook/Instagram/TikTok. El reparto, formatos, fases y captación sin formulario en Perú del caso son diseño Efeonce. |
+| Vanessa,12:50–12:56 | Pide proponer inversión porque construye presupuesto. **USD6.000/mes, USD18.000/90días y estimaciones de resultados son escenarios internos**, no presupuesto ni retorno aprobados por ella. Tampoco se acordaron SLA de calificación, implementación o capacidad. |
+| Vanessa,14:26–14:50; Julio,14:54 | Terna a gerencia el miércoles siguiente:4/11 por calendario. Julio compromete propuesta jueves29 o viernes30/10. No hay inclusión de Efeonce en terna ni criterios/autoridad final confirmados. |
+
+La inspección y las pruebas técnicas son parte del proceso que Vanessa describe; convertirlas en
+oferta, prueba de ajuste específica o conversión de campaña es una recomendación por validar con ARMOR.
+La lectura respalda preparar la propuesta, sin certificar las hipótesis de investigación, normativa,
+equivalencias de producto, vigencia técnica, medición o forecast de medios del caso.
+
+**TASK119625704196:** releída antes; body ampliado con resultado, precisiones y pendientes; estado
+`COMPLETED` por recuperación/análisis/validación de este hito. GET posterior confirmó body y estado
+exactos; owner75788512, fecha27/10 19:00UTC, título, tipoTODO y prioridadMEDIUM conservados.
+Asociaciones a Contact255985568411 / Company59393386572 verificadas. La primera escritura por stdin
+fue rechazada con `executed:false` por falta de digest; se aplicó el preview/digest/confirm del mismo
+registro y alcance, sin crear duplicados ni ampliar permisos. NOTE119606905700 intacta.
+
+La automatización `armor-leer-discovery-y-completar-caso` se **eliminó** por la herramienta de la app al
+cumplir su revisión única; no se creó otra ni se alteró el seguimiento global. Recibos/transcripción
+cruda permanecen privados fuera de Git. Sin correo/propuesta enviados, alta de Deal/Lead, cambio de
+etapa, precio aprobado, commit, push o deploy en esta corrida.
 
 ## Recuperar y conciliar la fuente
 
@@ -108,10 +151,10 @@ o aceptación expresada por Katia. Una mención a «presupuesto» sin monto/mone
 
 | Elemento | Estado |
 | --- | --- |
-| Revisión posterior | **ACTIVE**, una ejecución el martes **27/10 a las 16:00 America/Santiago** (19:00 UTC), después de la franja de reunión. App ID `armor-leer-discovery-y-completar-caso`, destino este hilo. Creación y TOML releídos; contador una ejecución. |
-| Lectura de HubSpot/Notion | Pendiente de reunión y archivo disponible. |
-| v1 del caso | Pendiente de la evidencia anterior. |
-| Registro CRM | NOTE **119606905700** y TASK **119625704196**, ambas asociadas a Contact/Company y releídas. TASK `NOT_STARTED` / `TODO`, owner Julio75788512,27/10 19:00UTC. La automatización releída limita su escritura a esta TASK. |
+| Revisión posterior | **EJECUTADA27/10 a las16hChile**; automatización focal eliminada al cumplir su única revisión. |
+| Lectura de HubSpot/Notion | Fuente completa disponible de104intervenciones y nota/transcripción de la misma reunión contrastadas; sin revisión de audio. |
+| v1 del caso | Ya preparado antes de esta revisión; validado contra la conversación, sin reescritura. Economía, fee y propuesta final pendientes. |
+| Registro CRM | NOTE **119606905700** intacta. TASK **119625704196 COMPLETED**, body/estado releídos; owner, fecha, tipo y prioridad conservados; asociaciones Contact/Company verificadas. |
 
 Una ejecución programada no prueba disponibilidad del archivo ni que el caso se haya actualizado.
 El heartbeat general de seguimiento comercial se consultó y permaneció **PAUSED**; no se modificó.

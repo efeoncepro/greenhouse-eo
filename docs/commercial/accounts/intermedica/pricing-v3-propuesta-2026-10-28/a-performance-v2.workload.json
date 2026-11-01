@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "intermedica-a-performance-v2-2026-10-28",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "150",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "intermedica:estimacion-capacidad-150-productivas-180-programadas",
+      "effectiveFrom": "2026-10-28",
+      "effectiveUntil": "2027-02-28",
+      "status": "estimated"
+    }
+  },
+  "drivers": [],
+  "fixedWork": [
+    {
+      "workId": "media-scope",
+      "label": "Direccion, estrategia y operacion de medios del mismo responsable",
+      "hoursPerMonth": "45.0",
+      "source": {
+        "reference": "intermedica:alcance-y-bloques-estimados-28oct:a-performance:media",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "data-scope",
+      "label": "a-performance: bloque de trabajo data",
+      "hoursPerMonth": "7.5",
+      "source": {
+        "reference": "intermedica:alcance-y-bloques-estimados-28oct:a-performance:data",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "media",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "media-scope",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloque estimado por entregables; validar con responsable de practica."
+    },
+    {
+      "lineId": "data",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "data-scope",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloque estimado por entregables; validar con responsable de practica."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.01"
+  }
+}

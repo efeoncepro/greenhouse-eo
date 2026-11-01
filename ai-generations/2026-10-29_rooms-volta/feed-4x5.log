@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.068 (1 × 2257 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-29_rooms-volta/feed-4x5.png …
+  ✓ 2988KB · gpt-image-2.5-sunburst · 1536x1920 · high
+    usage: in 290 (img 0 · txt 290) · out 2257 · total 2547
+done

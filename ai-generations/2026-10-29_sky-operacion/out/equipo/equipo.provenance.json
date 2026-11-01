@@ -1,0 +1,40 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "45b58c256b96f634d9e1b47fe5f51f10bdcea649a83d25559ae6cddc52af2152",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-team",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:squad-melkin",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png",
+      "sha256": "3ed018d2435331cb1978bf46ef5a4580a9661ef5625d359a358da5d34146d085"
+    },
+    {
+      "ref": "asset-ref:file:adriana",
+      "path": "ai-generations/2026-10-29_sky-operacion/assets/adriana.png",
+      "sha256": "0cfb25d4527399ab689387e813e487fb3aa782d98031da5ad4ce80a02f6d6824"
+    },
+    {
+      "ref": "asset-ref:file:squad-daniela",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png",
+      "sha256": "09f855e35b9532ccb7cad4f8a29b375df1ae686a949856ea4267d754fb0f1a53"
+    },
+    {
+      "ref": "asset-ref:file:squad-andres",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png",
+      "sha256": "ae9b16d7e72588b7d88d12cdabf34b80015e1d5b50f1e9e2e06f05de9ca56c6e"
+    },
+    {
+      "ref": "asset-ref:file:por-llegar",
+      "path": "ai-generations/2026-10-29_sky-operacion/assets/por-llegar.svg",
+      "sha256": "ac5e7e7200e994310f4f8e2c7916d3d3ae5f23e2cc2f184b552ec67115f00607"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

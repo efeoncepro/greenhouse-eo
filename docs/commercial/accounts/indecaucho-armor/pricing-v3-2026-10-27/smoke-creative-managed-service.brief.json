@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-10-27",
+  "offerId": "creative-managed-service",
+  "engagementCode": "monthly",
+  "engagementForm": "on_demand",
+  "accountId": "v14-ecuador-resolution-smoke",
+  "offerMarketCountry": "EC",
+  "outputCurrency": "USD",
+  "periods": 1,
+  "lines": [
+    {
+      "lineId": "ECG-008",
+      "profile": "ECG-008",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "67"
+      },
+      "dedicationEvidence": {
+        "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    }
+  ],
+  "taxTreatment": {
+    "kind": "not_resolved"
+  }
+}

@@ -31,6 +31,17 @@ conflicto de intereses adjuntada en el reenvío de las 17:38 (sin comisión Wher
 espejo: Wherex (`wherex-radar-chrome-playwright.md`) y «La órbita» (`lessons.md`). HubSpot: deal 66672959873 en
 «Presentación de soluciones», COP 120.000.000, nota 120053981805. Sin push.
 
+## 2026-10-30 — Qualitor SMZ-116: respuesta leída, HOLD contractual
+
+[Expediente](docs/commercial/tenders/simoniz-qualitor-temporada-viajes-smz-116/README.md) y
+[contraste primario](docs/commercial/tenders/simoniz-qualitor-temporada-viajes-smz-116/REVISION-RESPUESTA-2026-10-30.md):
+Caso v2 local. COP 70 millones integrales, operación incluida, materiales adaptados Simoniz y zonas sin lista de PDV.
+«COLOMBIA» no habilita facturación Chile: HOLD; sin ruta local aceptada, recomendar NO-BID modalidad chilena.
+Inicio del foro 25/11 frente a ítem 01/12; cierre del aviso 06/11 14:00 Colombia = 16:00 Chile frente a UI 18:00 sin zona, pendiente conciliar.
+Wherex Editando / 0 COP / sin archivos; adjudicación, firma y OC no acreditadas en cobertura revisada.
+Gates internos propuestos: Julio/Legal 03/11 y bid/no-bid 05/11, 12:00 Colombia. Sin envío, oferta ni cambio HubSpot.
+OneDrive conserva v1; no se sobrescribió. No hay recordatorio ni comunicación futura programada.
+
 ## 2026-10-29 — Sales Navigator: búsquedas en cuatro mercados hispanos
 
 [Inventario](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md): **24 búsquedas de cuentas/20 de personas**,
@@ -45,6 +56,26 @@ Listas 54/57 y servicios/Personas 12/5 sin cambio. Sin mensajes, solicitudes, In
 Próximo: auditar cobertura de las 20 consultas de personas antes de proponer reemplazos; mantener criterio
 comprador y prioridad agencias/proveedores. Commit local, sin push; cambios concurrentes preservados.
 
+## 2026-10-29 — Home efeoncepro.com «La órbita × Pingback» en producción
+
+[Contrato](docs/architecture/public-site/HOME_INICIO_ELEMENTOR_MODULES_V1.md) · [manual](docs/manual-de-uso/public-site/operar-home-efeonce.md) ·
+[auditoría](docs/audits/public-site/2026-10-29-home-orbita-rediseno-y-seo.md). Home `251731` reemplazada por la landing
+compilada `inicio` (12 widgets, nav/footer canónicos, agenda con CTA `site-nav-discovery-meeting`); rollback
+`_gh_home_orbita_before_20261029_012508`. OG 1200×630 `252184` + metadatos sociales y destacada
+(`_gh_home_orbita_seo_before_20261029_092107`); videos diferidos (0 MB al cargar). A papelera con 301 a `/`: /home-2-2/,
+/home-2/, /home/, /home-prueba/ y cinco demos Ohio. QA vivo 1440/1280/390. Pendiente: editor Elementor, PSI/CWV (cuota),
+push de develop y runtime `af1a785`. Commits locales `5532e6371`…`f86460ec5`.
+
+## 2026-10-28 — MG Indusol: correo enviado y cierre documental
+
+[Expediente Mayra / MG Indusol](docs/commercial/prospecting-agent/runs/2026-10-28-mg-indusol-mayra.md):
+correo único autorizado enviado a las 19:37:35 Chile, brochure 360° completo, firma gráfica y CCO;
+Enviados y EMAIL 119882403672 SENT comprobados por separado. Contact 258762787214 nació por
+Documents/PRESENTATIONS; su SQL automático no acredita calificación. Vigencia del aviso, piso de
+50 personas, presupuesto y proceso comprador sin confirmar; tres adyacentes investigados sin acercamientos.
+[Cierre docs/skills](docs/audits/commercial/2026-10-28-mg-indusol-docs-skills.md): canon y espejos pertinentes,
+estado privado conciliado; sin secuencia, nuevo envío ni normalización CRM autorizados. Próximo: esperar respuesta.
+
 ## 2026-10-27 — SKY: ADR y puente operativo probado localmente
 
 [TASK-2073](docs/tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md) cerrada sólo por sandbox:
@@ -53,6 +84,25 @@ comprador y prioridad agencias/proveedores. Commit local, sin push; cambios conc
 Spaces separados y A′ recomendado, owner Finance común normalizado **antes** de candidatos. U01/U02/U02F antes de
 provisioning; no producción, fuentes, servicios o historia Diseño tocados, ni push/deploy. Types global baseline
 agotó heap; lint global 0 errores/26 warnings existentes. Aceptación ADR y foundations reales pendientes.
+
+## 2026-10-27 — ARMOR / Indecaucho: caso v1 validado y revisión cerrada
+
+[Expediente](docs/commercial/accounts/indecaucho-armor/README.md): discovery realizada con Vanessa;
+HubSpot MEETING119610757452 READY/104intervenciones y transcripción Notion contrastadas en la revisión
+programada de las16h (misma grabación). Caso v1 ya preparado, conservado sin reescritura.
+[Validación y precisiones](docs/commercial/accounts/indecaucho-armor/POSTREUNION.md#validación-programada-del-2710--1600-chile):
+piloto90días LinkedIn/Google, Compras/SSO, canal distribuidor; EC/CO y visibilidad PE2027. Presupuesto y
+forecast del caso son escenarios internos, no acuerdo comprador; Kommo aclarado previamente por Julio.
+TASK119625704196 COMPLETED por lectura/análisis, body/estado y owner/fecha/asociaciones releídos;
+NOTE119606905700 intacta. Automatización focal eliminada al cumplir su única revisión, global sin cambios.
+Por pedido posterior de Julio, [propuesta90días](docs/commercial/accounts/indecaucho-armor/PROPUESTA-90-DIAS-BORRADOR.md)
+actualizada: [V3 calculóUSD22.450](docs/commercial/accounts/indecaucho-armor/COSTEO-V3-2026-10-27.md),
+primer período11.350 y siguientes5.550 × 2; medios separados hasta18.000. Por mandato de Julio, catálogo localv14
+incorpora Performance/Ecuador con reglas estimadas, mediante preview/apply/puntero; policyv12/créditosv1 intactos.
+Margen modelado59,28%, sin líneas bajo piso;1.860testsPASS/3skip. Sustituye21.000 provisionales/bloqueo anterior.
+Próximo: Julio/Operations revisar valor/alcance/capacidad, accesos y Finance entidad/tributos/cobro;
+propuesta29–30/10, terna4/11 sin selección acreditada. Datos de Kommo, documentación técnica y regla de canal
+pendientes. Sin aprobación, envío, nuevo cambio CRM, commit o deploy.
 
 ## 2026-10-26 — Blog: refresh de Pipeline y de marketing de contenidos publicados
 
@@ -65,6 +115,10 @@ trampas de QA (host.js del Growth CTA, engine.js del gráfico, categoría princi
 público §17. Pendiente: mapa de átomos de marketing de contenidos; tanda 2: GA4 formularios y Excel→HubSpot (246072).
 
 ## 2026-10-26 — Rooms: entorno local y conectores listos
+
+01Nov: [MFA aceptado por reporte de Julio vía sesión Auth](docs/audits/rooms/2026-11-01-operator-mfa-acceptance.md),
+sin logs ni prueba instrumentada añadidos. Prioridad: acción/aviso/reversa de agente, QA de la casa nueva y medición
+Live; gates de clientes separados. Ledger/skill espejo, dossier y TASK-2082/2085 conciliados; sin cambio de runtime.
 
 29Oct: [conciliación completa docs/skills](docs/audits/rooms/2026-10-29-docs-skills-full-reconciliation.md)
 con3subagentes: arquitectura/manuales/Rooms/Auth/MCP, tasks y routers. Fuente3c7 intacta;
@@ -121,21 +175,6 @@ Company/campos/segmento182 y dos correos personalizados, firma gráfica, CCO y d
 por links nativos; Enviados y EMAIL SENT independientes. Cinco créditos históricos, sin nuevo gasto.
 [Auditoría](docs/audits/commercial/2026-10-26-mass-chile-docs-skills.md); dos skills espejo y dueños
 documentales actualizados. Corte17:04Chile, sin entrega/lectura confirmadas ni cadencia futura autorizada.
-
-## 2026-10-26 — ARMOR / Indecaucho: discovery y caso en construcción
-
-[Expediente único](docs/commercial/accounts/indecaucho-armor/README.md): Katia respondió y pide propuesta
-para ARMOR; terna posterior sin selección. Invitación27/10 14:30–15:00Chile y confirmación26/10 14:28
-con firma/CCO verificadas; cadena HubSpot de cuatro contiene la confirmación, no cuatro envíos nuevos.
-Tres subagentes ampliaron marca/canal/digital y método. Guía de reunión y caso v0 listos, economía
-pendiente de discovery. Skills/mirrors y fixtures v16 actualizados; [cierre](docs/audits/commercial/2026-10-26-armor-discovery-case-docs-skills.md).
-Lectura posterior **HubSpot/Notion** autorizada y programada una vez27/10 16h en este hilo; app ID
-`armor-leer-discovery-y-completar-caso`. Configurada/releída, aún sin ejecución/transcripción. Global
-PAUSED conservado; no nuevos contactos, Deal/Lead, etapas, secuencias, precio o envío.
-Registro final pedido después: NOTE119606905700 y TASK119625704196, Julio/TODO/NOT_STARTED,
-27/10 16hChile; cuerpos, fecha/owner y ambas asociaciones releídos. La revisión sólo actualizará esa TASK.
-[Señal y seguimiento previos](docs/commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md)
-se conservan; respuesta posterior no prueba causalidad.
 
 ## 2026-10-26 — Blog: pilar Loop Marketing publicado y barrido de docs y skills
 
@@ -232,29 +271,3 @@ empezar.», seis temas (HubSpot, Inbound, Marketing digital, Loop Marketing, AEO
 (runtime `f2210d7`, efeonce-editorial-blocks 0.4.8; Greenhouse `55c0b7d8e`; canvas versión 95). Descripción de Diseño
 cargada. Verificado en vivo: enlaces en el HTML del servidor, hover, 1440/390, desborde 0, axe 0. Además, las tarjetas
 de foto del riel tienen imagen y foco propios (`card`), aplicados a 249387, 251397 y al recurso 252050. Sin push.
-
-## 2026-10-24 — Portada del blog: imagen y punto focal propios de la tarjeta de foto (TASK-2051)
-Pedido de la sesión «Análisis de Analytics y Search Console» con aprobación del operador: la tarjeta de foto recortaba
-al centro y cortaba el texto incrustado de las portadas de Manzanitas. En vivo: metas `_eo_card_image` /
-`_eo_card_focus` (panel y comando `card`, plan salvo `--apply`, falla si cambia la destacada), `efeonce-editorial-blocks`
-0.4.5, runtime 6578773, Greenhouse e60f5045c; `verify --browser` 0 px en 8 anchos, riel sin cambios. Foco medido:
-`84% 30%` sirve en los tres tableros para una cara a ≈71 %. `card 244765 --focus "84% 30%"` corrió sólo como plan.
-**Pendiente:** aplicarlo cuando 244765, 245605 o 245154 entren al riel (QA: la sesión de Analytics). Sin push.
-
-## 2026-10-24 — Portada del blog: tarjetas v2 de «Para leer con calma» (TASK-2051) en producción
-Desde 21:12 UTC el riel usa las tarjetas aprobadas (canvas versión 93): foto a sangre, logo del cliente ANAM, pregunta
-del diagnóstico, guía firmada por Efeonce Think, insignias con regla y dato real, autor, fecha y hover líquido
-(runtime `e9124fa` + `7bfbd40` + `9fec02d`, `efeonce-editorial-blocks` 0.4.4; Greenhouse `aa96207ac`). Gates en
-vivo: desborde 0 px en 8 anchos, un H1, axe 0 en los tres tableros; local: equivalencia, paridad 27 casos, píxeles 25/25.
-Datos: `client 251432 anam --apply` (ledger). Webinar (próximo evento) y podcast (formato nuevo) tienen soporte sin
-contenido. **Pendiente:** lectores para «Últimos cupos»/«Lista de espera» (reservas Growth Forms) y «Más leído»/
-«Tendencia» (GA4), por el filtro `eo_home_rail_signals`. Sin push en ningún repo.
-
-## 2026-10-24 — Archivo del blog: variante Glitch (TASK-2056) en producción
-`/category/glitch/` y `/glitch/` sirven la variante Glitch aprobada en el canvas (versión 79) desde ~19:50 UTC: wordmark,
-«EDICIÓN #17» y «FLASH», muletilla en Guttery, falla en bytes, placas por fila, filtro Ediciones/Flash/Notas y banner de
-suscripción con la píldora real blanca (runtime `9a19d46`, Greenhouse `db64920a2`). Verificado en vivo (200, un H1,
-canonical, index, desborde 0, axe 0 en 7 vistas, `/blog/` verify verde). **Pendiente:** el logo dentro de la píldora
-necesita el renderer de Growth Forms 1.3.0 en producción (commit en develop, sin push ni release). **Pedido del
-operador para después:** no le gusta la grilla «Para leer con calma» de la portada (tarjetas tipográficas sin foto
-alternadas con tarjetas con foto); es un cambio de diseño de TASK-2051 que se dibuja primero en el canvas.

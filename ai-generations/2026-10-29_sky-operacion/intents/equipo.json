@@ -1,0 +1,71 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "brand",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-team",
+  "voice": {
+    "eyebrow": "El equipo",
+    "question": "¿Quién trabaja en tus campañas?",
+    "answer": [
+      "Un solo",
+      "equipo"
+    ]
+  },
+  "body": "Sky y Efeonce en la misma órbita, con **una** interlocutora: Daniela.",
+  "team": [
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png",
+        "alt": "Melkin, Home Market Lead de Perú, Brasil y Estados Unidos"
+      },
+      "name": "Melkin",
+      "role": "HML · PE · BR · US"
+    },
+    {
+      "photo": {
+        "path": "ai-generations/2026-10-29_sky-operacion/assets/adriana.png",
+        "alt": "Adriana, Team SKY Designer"
+      },
+      "name": "Adriana",
+      "role": "Team SKY Designer"
+    },
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png",
+        "alt": "Daniela, Creative Operations Lead"
+      },
+      "name": "Daniela",
+      "role": "Creative Operations Lead"
+    },
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png",
+        "alt": "Andrés, Home Market Lead de Chile, Argentina y Uruguay"
+      },
+      "name": "Andrés",
+      "role": "HML · CL · AR · UY"
+    },
+    {
+      "photo": {
+        "path": "ai-generations/2026-10-29_sky-operacion/assets/por-llegar.svg",
+        "alt": "Avatar sin rostro: Digital Content Specialist que se incorpora a Sky"
+      },
+      "name": "Por llegar",
+      "role": "Digital Content Specialist"
+    }
+  ],
+  "center": {
+    "title": "Tu marca",
+    "note": "al centro de todo"
+  },
+  "selection": {
+    "target": "object",
+    "label": "SKY",
+    "participantKind": "role"
+  }
+}

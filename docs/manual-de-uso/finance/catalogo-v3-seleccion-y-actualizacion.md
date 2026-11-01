@@ -1,5 +1,10 @@
 # Cotizador V3: selección y actualización para agentes
 
+**27/10/2026:** [v14 agrega Performance y Ecuador](../../../data/pricing/v3-operating/PERFORMANCE_ECUADOR_2026-10-27.md).
+Hay cuatro ofertas vigentes: Performance se incorpora como `managed_service`, con reglas55%/45% estimadas;
+Ecuador es mercado cliente con factor1,00 estimado, sin factor salarialEC. Consultar `--current` y conservar
+estado de revisión; no sustituir estos valores por aprobación de precio o disponibilidad real de recursos.
+
 Estado: prototipo local ejecutable, 2026-10-09; catálogo histórico de simulación, no tarifas comerciales vigentes.
 Owner: Finance/Commercial para costos/precio; Operations para kits/asignación; Platform para contrato. Las cifras
 comerciales del catálogo operativo (márgenes, pisos, FX de cotización, múltiplos, factores de país) las decide el

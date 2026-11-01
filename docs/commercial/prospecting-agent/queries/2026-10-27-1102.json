@@ -1,0 +1,4099 @@
+{
+  "schema_version": 1,
+  "run_id": "2026-10-27-1102",
+  "automation_id": "prospecci-n-hubspot-reporte-diario",
+  "timezone": "America/Santiago",
+  "started_at": "2026-10-27 14:00:45 UTC",
+  "artifact_stamp_at": "2026-10-27T11:02:25.808443-03:00",
+  "recorded_at": "2026-10-27T11:12:05.235716-03:00",
+  "research_cutoff": "2026-10-27T11:08:10-03:00",
+  "week_start_local": "2026-10-26T00:00:00-03:00",
+  "week_end_local": "2026-10-27T11:08:10-03:00",
+  "first_pass_48h": {
+    "from": "2026-10-26T00:00:00-03:00",
+    "until": "2026-10-27T11:08:10-03:00",
+    "meaning": "intersección últimos48h con semana26Oct; filtros diarios aproximados, no fecha probatoria"
+  },
+  "overlap_from_prior_success": {
+    "from": "2026-10-23T09:14:59.256785-03:00",
+    "meaning": "72h previas al corte26Oct09:14:59; agregadoactual163filasrevisado, sinlistadoAPIíntegro por429; solapeparcial"
+  },
+  "queries": [
+    {
+      "q": "Chile (\"SEO\" OR \"AEO\" OR \"posicionamiento orgánico\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Chile",
+      "line": "seo_aeo",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 1,
+      "checked_at": "2026-10-27 14:00:45 UTC",
+      "result_group_id": 1,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Chile (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Chile",
+      "line": "web",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 2,
+      "checked_at": "2026-10-27 14:00:45 UTC",
+      "result_group_id": 1,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Chile (\"agencia creativa\" OR \"producción audiovisual\" OR contenidos) (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Chile",
+      "line": "creative",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 3,
+      "checked_at": "2026-10-27 14:00:45 UTC",
+      "result_group_id": 1,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Chile (\"HubSpot\" OR \"implementación CRM\" OR \"migración CRM\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Chile",
+      "line": "crm_hubspot",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 4,
+      "checked_at": "2026-10-27 14:00:45 UTC",
+      "result_group_id": 1,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Chile (\"agencia de medios\" OR \"plan de medios\" OR programática OR \"pauta digital\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Chile",
+      "line": "media",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 5,
+      "checked_at": "2026-10-27 14:00:47 UTC",
+      "result_group_id": 2,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Perú (\"SEO\" OR \"AEO\" OR \"posicionamiento orgánico\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Perú",
+      "line": "seo_aeo",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 6,
+      "checked_at": "2026-10-27 14:00:47 UTC",
+      "result_group_id": 2,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Perú (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Perú",
+      "line": "web",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 7,
+      "checked_at": "2026-10-27 14:00:47 UTC",
+      "result_group_id": 2,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Perú (\"agencia creativa\" OR \"producción audiovisual\" OR contenidos) (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Perú",
+      "line": "creative",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 8,
+      "checked_at": "2026-10-27 14:00:47 UTC",
+      "result_group_id": 2,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Perú (\"HubSpot\" OR \"implementación CRM\" OR \"migración CRM\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Perú",
+      "line": "crm_hubspot",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 9,
+      "checked_at": "2026-10-27 14:00:49 UTC",
+      "result_group_id": 3,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Perú (\"agencia de medios\" OR \"plan de medios\" OR programática OR \"pauta digital\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Perú",
+      "line": "media",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 10,
+      "checked_at": "2026-10-27 14:00:49 UTC",
+      "result_group_id": 3,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Colombia (\"SEO\" OR \"AEO\" OR \"posicionamiento orgánico\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Colombia",
+      "line": "seo_aeo",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 11,
+      "checked_at": "2026-10-27 14:00:49 UTC",
+      "result_group_id": 3,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Colombia (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Colombia",
+      "line": "web",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 12,
+      "checked_at": "2026-10-27 14:00:49 UTC",
+      "result_group_id": 3,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Colombia (\"agencia creativa\" OR \"producción audiovisual\" OR contenidos) (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Colombia",
+      "line": "creative",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 13,
+      "checked_at": "2026-10-27 14:00:50 UTC",
+      "result_group_id": 4,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Colombia (\"HubSpot\" OR \"implementación CRM\" OR \"migración CRM\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Colombia",
+      "line": "crm_hubspot",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 14,
+      "checked_at": "2026-10-27 14:00:50 UTC",
+      "result_group_id": 4,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Colombia (\"agencia de medios\" OR \"plan de medios\" OR programática OR \"pauta digital\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "Colombia",
+      "line": "media",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 15,
+      "checked_at": "2026-10-27 14:00:50 UTC",
+      "result_group_id": 4,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "México (\"SEO\" OR \"AEO\" OR \"posicionamiento orgánico\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "México",
+      "line": "seo_aeo",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 16,
+      "checked_at": "2026-10-27 14:00:50 UTC",
+      "result_group_id": 4,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "México (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "México",
+      "line": "web",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 17,
+      "checked_at": "2026-10-27 14:00:52 UTC",
+      "result_group_id": 5,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "México (\"agencia creativa\" OR \"producción audiovisual\" OR contenidos) (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "México",
+      "line": "creative",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 18,
+      "checked_at": "2026-10-27 14:00:52 UTC",
+      "result_group_id": 5,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "México (\"HubSpot\" OR \"implementación CRM\" OR \"migración CRM\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "México",
+      "line": "crm_hubspot",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 19,
+      "checked_at": "2026-10-27 14:00:52 UTC",
+      "result_group_id": 5,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "México (\"agencia de medios\" OR \"plan de medios\" OR programática OR \"pauta digital\") (licitación OR convocatoria OR \"buscamos agencia\" OR \"buscamos proveedor\") after:2026-10-25 before:2026-10-28",
+      "recency": 2,
+      "market": "México",
+      "line": "media",
+      "phase": "first_pass_48h_intersect_week",
+      "weekly_focus": true,
+      "query_id": 20,
+      "checked_at": "2026-10-27 14:00:52 UTC",
+      "result_group_id": 5,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Chile (\"SEO\" OR \"AEO\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Chile",
+      "line": "seo_aeo",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 21,
+      "checked_at": "2026-10-27 14:01:04 UTC",
+      "result_group_id": 6,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Chile (\"página web\" OR \"diseño web\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Chile",
+      "line": "web",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 22,
+      "checked_at": "2026-10-27 14:01:04 UTC",
+      "result_group_id": 6,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Chile (\"agencia\" OR \"audiovisual\" OR \"contenidos\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Chile",
+      "line": "creative",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 23,
+      "checked_at": "2026-10-27 14:01:04 UTC",
+      "result_group_id": 6,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Chile (\"HubSpot\" OR \"CRM\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Chile",
+      "line": "crm_hubspot",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 24,
+      "checked_at": "2026-10-27 14:01:04 UTC",
+      "result_group_id": 6,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Chile (\"medios\" OR \"paid media\" OR \"publicidad\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Chile",
+      "line": "media",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 25,
+      "checked_at": "2026-10-27 14:01:06 UTC",
+      "result_group_id": 7,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Perú (\"SEO\" OR \"AEO\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Perú",
+      "line": "seo_aeo",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 26,
+      "checked_at": "2026-10-27 14:01:06 UTC",
+      "result_group_id": 7,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Perú (\"página web\" OR \"diseño web\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Perú",
+      "line": "web",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 27,
+      "checked_at": "2026-10-27 14:01:06 UTC",
+      "result_group_id": 7,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Perú (\"agencia\" OR \"audiovisual\" OR \"contenidos\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Perú",
+      "line": "creative",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 28,
+      "checked_at": "2026-10-27 14:01:06 UTC",
+      "result_group_id": 7,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Perú (\"HubSpot\" OR \"CRM\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Perú",
+      "line": "crm_hubspot",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 29,
+      "checked_at": "2026-10-27 14:01:08 UTC",
+      "result_group_id": 8,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Perú (\"medios\" OR \"paid media\" OR \"publicidad\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Perú",
+      "line": "media",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 30,
+      "checked_at": "2026-10-27 14:01:08 UTC",
+      "result_group_id": 8,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Colombia (\"SEO\" OR \"AEO\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Colombia",
+      "line": "seo_aeo",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 31,
+      "checked_at": "2026-10-27 14:01:08 UTC",
+      "result_group_id": 8,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Colombia (\"página web\" OR \"diseño web\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Colombia",
+      "line": "web",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 32,
+      "checked_at": "2026-10-27 14:01:08 UTC",
+      "result_group_id": 8,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Colombia (\"agencia\" OR \"audiovisual\" OR \"contenidos\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Colombia",
+      "line": "creative",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 33,
+      "checked_at": "2026-10-27 14:01:09 UTC",
+      "result_group_id": 9,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Colombia (\"HubSpot\" OR \"CRM\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Colombia",
+      "line": "crm_hubspot",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 34,
+      "checked_at": "2026-10-27 14:01:09 UTC",
+      "result_group_id": 9,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts Colombia (\"medios\" OR \"paid media\" OR \"publicidad\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "Colombia",
+      "line": "media",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 35,
+      "checked_at": "2026-10-27 14:01:09 UTC",
+      "result_group_id": 9,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts México (\"SEO\" OR \"AEO\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "México",
+      "line": "seo_aeo",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 36,
+      "checked_at": "2026-10-27 14:01:09 UTC",
+      "result_group_id": 9,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts México (\"página web\" OR \"diseño web\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "México",
+      "line": "web",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 37,
+      "checked_at": "2026-10-27 14:01:11 UTC",
+      "result_group_id": 10,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts México (\"agencia\" OR \"audiovisual\" OR \"contenidos\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "México",
+      "line": "creative",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 38,
+      "checked_at": "2026-10-27 14:01:11 UTC",
+      "result_group_id": 10,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts México (\"HubSpot\" OR \"CRM\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "México",
+      "line": "crm_hubspot",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 39,
+      "checked_at": "2026-10-27 14:01:11 UTC",
+      "result_group_id": 10,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "site:linkedin.com/posts México (\"medios\" OR \"paid media\" OR \"publicidad\") (\"busco\" OR \"licitación\" OR \"recomendación\" OR \"proveedores\" OR \"RFP\") after:2026-10-25 before:2026-10-28",
+      "market": "México",
+      "line": "media",
+      "phase": "weekly_linkedin_public",
+      "weekly_focus": true,
+      "recency": 7,
+      "query_id": 40,
+      "checked_at": "2026-10-27 14:01:11 UTC",
+      "result_group_id": 10,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Chile licitación \"marketing\" \"26\" \"octubre\" \"2026\"",
+      "market": "Chile",
+      "line": "all",
+      "weekly_focus": true,
+      "phase": "weekly_absolute_variant",
+      "query_id": 41,
+      "checked_at": "2026-10-27 14:02:04 UTC",
+      "result_group_id": 11,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Perú convocatoria \"servicio\" \"comunicaciones\" \"octubre 2026\" after:2026-10-25",
+      "market": "Perú",
+      "line": "creative",
+      "weekly_focus": true,
+      "phase": "weekly_absolute_variant",
+      "query_id": 42,
+      "checked_at": "2026-10-27 14:02:04 UTC",
+      "result_group_id": 11,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Colombia convocatoria \"agencia\" \"2027\" after:2026-10-25",
+      "market": "Colombia",
+      "line": "creative",
+      "weekly_focus": true,
+      "phase": "weekly_absolute_variant",
+      "query_id": 43,
+      "checked_at": "2026-10-27 14:02:04 UTC",
+      "result_group_id": 11,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "México licitación \"publicidad\" \"2026\" after:2026-10-25",
+      "market": "México",
+      "line": "media",
+      "weekly_focus": true,
+      "phase": "weekly_absolute_variant",
+      "query_id": 44,
+      "checked_at": "2026-10-27 14:02:04 UTC",
+      "result_group_id": 11,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Chile \"licitación\" \"sitio web\" octubre 2026",
+      "market": "Chile",
+      "line": "web",
+      "weekly_focus": false,
+      "phase": "unfiltered_variant",
+      "query_id": 45,
+      "checked_at": "2026-10-27 14:02:06 UTC",
+      "result_group_id": 12,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Perú \"convocatoria\" \"agencia\" octubre 2026",
+      "market": "Perú",
+      "line": "creative",
+      "weekly_focus": false,
+      "phase": "unfiltered_variant",
+      "query_id": 46,
+      "checked_at": "2026-10-27 14:02:06 UTC",
+      "result_group_id": 12,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "Colombia \"proveedor\" \"HubSpot\" \"busco\"",
+      "market": "Colombia",
+      "line": "crm_hubspot",
+      "weekly_focus": false,
+      "phase": "unfiltered_variant",
+      "query_id": 47,
+      "checked_at": "2026-10-27 14:02:06 UTC",
+      "result_group_id": 12,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    },
+    {
+      "q": "México \"licitación\" \"SEO\" \"2026\"",
+      "market": "México",
+      "line": "seo_aeo",
+      "weekly_focus": false,
+      "phase": "unfiltered_variant",
+      "query_id": 48,
+      "checked_at": "2026-10-27 14:02:06 UTC",
+      "result_group_id": 12,
+      "publication_verified_by_filter": false,
+      "result_note": "Resultados agrupados por llamada; no atribuir ausencia individual a una consulta."
+    }
+  ],
+  "result_groups": [
+    {
+      "id": 1,
+      "query_ids": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "checked_at": "2026-10-27 14:00:45 UTC",
+      "headlines": [
+        "Encuentra nuevas ofertas de Agencia creativa en Santiago de Chile, Región Metropolitana. ¡Postúlate Ahora! - Indeed (https://cl.indeed.com/q-agencia-creativa-l-santiago-de-chile%2C-regi%C3%B3n-metropolitana-empleos.html)",
+        "Agencia LupaBTL | LinkedIn (https://lu.linkedin.com/company/lupabtl)",
+        "Se necesita urgente! Trabajo de medios audiovisuales en Región Metropolitana: 74 ofertas actuales | Jobsora (https://cl.jobsora.com/empleos-medios-audiovisuales-regi%C3%B3n-metropolitana)",
+        "Ofertas de Trabajo Contenido | Trabajos Diarios (https://cl.trabajosdiarios.com/ofertas-trabajo/de-contenido)",
+        "Trabajos de creador de contenido (https://www.chiletrabajos.cl/encuentra-un-empleo/?2=creador+de+contenido)",
+        "asistente en produccion audiovisual - ofertas de empleo | Trabajo.org (https://cl.trabajo.org/empleo-asistente%2Ben%2Bproduccion%2Baudiovisual)",
+        "Oferta Coordinadora de Producción y Marketing de Contenidos (https://modemedia.tv/oferta-coordinadora-de-produccion-y-marketing-de-contenidos/)",
+        "Oferta laboral Práctica en RRSS (Video, Diseño y Música) en +D2 Media Group. Trabajar en +D2 Media Group (https://duoclaboral.cl/trabajar-en-d2-media-group1/trabajos/practica-en-rrss-video-diseno-y-musica/947475)",
+        "productor de contenidos digitales en Santiago - ofertas de empleo | Trabajo.org (https://cl.trabajo.org/empleo-productor%2Bde%2Bcontenidos%2Bdigitales/Santiago)",
+        "Productor gráfico - Santiago (https://portal.chiletrabajos.cl/empresa/match/trabajo/productor-grafico-3759712)",
+        "coordinadora audiovisual - ofertas de empleo | Trabajo.org (https://cl.trabajo.org/empleo-coordinadora%2Baudiovisual)"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "id": 2,
+      "query_ids": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "checked_at": "2026-10-27 14:00:47 UTC",
+      "headlines": [
+        "Creador(a) de Contenido - Audiovisual para Agencia de Public en Lima (https://cazvid.com/es/empleo/creador-a-de-contenido-audiovisual-para-agencia-de-publicidad-35caa92b)",
+        "productor de contenido audiovisual en Lima - ofertas de empleo | Trabajo.org (https://pe.trabajo.org/empleo-productor%2Bde%2Bcontenido%2Baudiovisual/Lima)",
+        "Coordinador de Producción en Blue Lima Studio - Lima - Mi Futuro Empleo (https://pe.mifuturoempleo.com/oferta-de-empleo/coordinador-de-produccion-en-lima/202798)",
+        "Oferta Coordinadora de Producción y Marketing de Contenidos (https://modemedia.tv/oferta-coordinadora-de-produccion-y-marketing-de-contenidos/)",
+        "Oferta laboral Asesor(a) Comercial en CAEL STUDIOS AGENCIA DE PUBLICIDAD. Trabajar en CAEL STUDIOS AGENCIA DE PUBLICIDAD (https://joblab.continentalinternationaleducation.com/trabajar-en-cael-studios-agencia-de-publicidad/trabajos/asesor-a-comercial/966865)",
+        "Empleos de produccion audiovisual carrera en Lima | Programación y Producción Vacante de empleo - ok.com (https://pe.ok.com/special-jobs-condition/es-programming-production-empleos-de-produccion-audiovisual-carrera-en-lima/)",
+        "binalogue | Empleos | Domestika (https://www.domestika.org/es/jobs/%40binalogue)",
+        "citeturn1search6 [wordlim: 200] Crawled: today; En Binalogue buscamos a un@ profesional freelance especializado en publicity, comunicación y lanzamientos de contenidos audiovisuales, tant... ... En Binalogue (https://binalogue.com), estamos buscando un(a) jefe/a de producción freelance con experiencia en proyectos de ficción (cortome... ... En Binalogue (https://binalogue.com), agencia y productora creativa, estamos buscando un(a) Director(a) de Arte con con... ... En Binalogue (https://binalogue.com), agencia y productora creativa, estamos buscando un(a) súper director creativo con...",
+        "¡Hola! En Binalogue (https://binalogue.com), estamos buscando un(a) jefe/a de producción freelance con experiencia en proyectos de ficción (cortome...",
+        "¡Hola! En Binalogue (https://binalogue.com), estamos buscando un(a) jefe/a de producción freelance especializado/a en proyectos documentales (largo...",
+        "Referencia: ADC-01 ¡Hola! En Binalogue (https://binalogue.com), agencia y productora creativa, estamos buscando un(a) Director(a) de Arte con con...",
+        "Referencia: TS - 01 ¡Hola! En Binalogue (https://binalogue.com), agencia y productora creativa, estamos buscando un(a) Tecnico/a de Subvenciones ...",
+        "Referencia: DCW-01 ¡Hola! En Binalogue (https://binalogue.com), agencia y productora creativa, estamos buscando un(a) súper director creativo con...",
+        "Referencia: DSMW-10 ¡Hola! En Binalogue (https://binalogue.com), agencia y productora creativa, estamos buscando un(a) súper diseñador(a) gráfic@/...",
+        "Referencia: PAJ-02 ¡Hola! En Binalogue (http://www.binalogue.com), agencia y productora creativa, estamos buscando a un(a) súper talentos@ Produc...",
+        "Anuncios-cu | Publicitaria 📣 - Estadísticas y analítica del canal de Telegram @anuncios_cu (https://telemetr.io/es/channels/1344933303-anuncios_cu/posts)",
+        "Trabajos, empleo de Freelance social media content writer | Freelancer (https://www.freelancer.es/job-search/freelance-social-media-content-writer/)",
+        "Trabajos, empleo de Creative content examples | Freelancer (https://www.freelancer.com.pe/job-search/creative-content-examples/)",
+        "Carlos S. Lazo - Profesional independiente | LinkedIn (https://www.linkedin.com/[ruta personal redactada])"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "id": 3,
+      "query_ids": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "checked_at": "2026-10-27 14:00:49 UTC",
+      "headlines": [
+        "Oportunidades de negocio | Cuti (https://cuti.org.uy/oportunidades-negocio-2/)",
+        "Buscar empleo: 90 ofertas de trabajo de datos en La Algaba (octubre 2026) | JOB TODAY (https://jobtoday.com/es/trabajos-datos/la-algaba)",
+        "EmprendedoresTV | Tu canal por Internet | Page 10 (https://emprendedorestv.pe/page/10/?order=asc)",
+        "Ordinaria 52 · 2026-09-02 · Actas Públicas (https://actaspublicas.org/pococi/acta/ordinaria/2026/52)",
+        "EDICIÓN 04-10-2026 - Editorial La Estrella | Flip PDF en línea | FlipHTML5 (https://fliphtml5.com/bxikb/jbpy/)"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "id": 4,
+      "query_ids": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "checked_at": "2026-10-27 14:00:50 UTC",
+      "headlines": [
+        "Diseñador/a gráfico/a y audiovisual - contenido digital y Amazon 1626495282-2 en Itagui | Agencia de Empleo Comfama (https://www.comfama.com//servicio-de-empleo/personas/vacantes-en-antioquia/vacante/disenadora-graficoa-y-audiovisual-contenido-digital-y-amazon-1626495282-2-1038542)",
+        "Oferta Coordinadora de Producción y Marketing de Contenidos (https://modemedia.tv/oferta-coordinadora-de-produccion-y-marketing-de-contenidos/)",
+        "Nuevos trabajos de Animacion digital - 26 de octubre, 2026 | Indeed (https://co.indeed.com/q-animacion-digital-empleos.html?q=animacion+digital&vjk=fb1d27a979201878)",
+        "binalogue | Empleos | Domestika (https://www.domestika.org/es/jobs/%40binalogue)",
+        "citeturn3search4 [wordlim: 200] Crawled: today; En Binalogue buscamos a un@ profesional freelance especializado en publicity, comunicación y lanzamientos de contenidos audiovisuales, tant... ... En Binalogue (https://binalogue.com), estamos buscando un(a) jefe/a de producción freelance con experiencia en proyectos de ficción (cortome... ... En Binalogue (https://binalogue.com), agencia y productora creativa, estamos buscando un(a) Director(a) de Arte con con...",
+        "¡Hola! En Binalogue (https://binalogue.com), estamos buscando un(a) jefe/a de producción freelance con experiencia en proyectos de ficción (cortome...",
+        "¡Hola! En Binalogue (https://binalogue.com), estamos buscando un(a) jefe/a de producción freelance especializado/a en proyectos documentales (largo...",
+        "Referencia: ADC-01 ¡Hola! En Binalogue (https://binalogue.com), agencia y productora creativa, estamos buscando un(a) Director(a) de Arte con con...",
+        "Sena APE (https://ape.sena.edu.co/spe-web/spe/demanda/solicitud-sintesis/4096215)",
+        "Encuentra nuevas ofertas de Fotografo. ¡Postúlate Ahora! - Indeed (https://co.indeed.com/trabajo?lang=es&q=fotografo)",
+        "Productor Audiovisual | tomaempleo.com (https://tomaempleo.com/dominicana/trabajos/productor-audiovisual/)",
+        "Encuentra nuevas ofertas de Content creation. ¡Postúlate Ahora! - Indeed (https://co.indeed.com/q-content-creation-empleos.html)",
+        "Ofertas de trabajo de Productor audiovisual - Octubre 2026 | elempleo.com Colombia (https://www.elempleo.com/co/ofertas-empleo/trabajo-productor-audiovisual/2)",
+        "62,148+ Comunicación Y Rr Pp Dirección De Marketing Jobs in Bogotá D.C., Colombia | October 2026 | Bogotá D.C. Jobs Expertini (https://bogotdc.co.expertini.com/jobs/in/comunicaci%C3%B3n-y-rr-pp-direcci%C3%B3n-de-marketing/)",
+        "Creador de contenido audiovisual empleos en Provincia de Granada - 39 Creador de contenido audiovisual ofertas de trabajo | Jobeka (https://es.jobeka.com/empleos-creador-de-contenido-audiovisual-provincia-de-granada)"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "id": 5,
+      "query_ids": [
+        17,
+        18,
+        19,
+        20
+      ],
+      "checked_at": "2026-10-27 14:00:52 UTC",
+      "headlines": [
+        "Trabaja con nosotros – IW Innovation Workshop – Agencia de Marketing Digital en Querétaro (https://iw.digital/jobs/)",
+        "COMUNICACIÓN (https://sites.google.com/udc.edu.mx/vacantesempleoudci/inicio/comunicaci%C3%B3n)",
+        "Encuentra nuevas ofertas de Arte audiovisual. ¡Postúlate Ahora! - Indeed (https://mx.indeed.com/trabajo?lang=es&q=arte+audiovisual)",
+        "Bolsa de trabajo de Producción Creativa en Monterrey - 90 Producción Creativa ofertas de empleo | Jobsavior (https://mx.jobsavior.com/ofertas-de-trabajo/monterrey/query-producci%C3%B3n-creativa)",
+        "Oferta Coordinadora de Producción y Marketing de Contenidos (https://modemedia.tv/oferta-coordinadora-de-produccion-y-marketing-de-contenidos/)",
+        "Bolsa de Trabajo (https://lilianferes.com/bolsa-de-trabajo-creativos-marketing-diseno-publicidad/)",
+        "Founding Talent — Comercial | Casting México (https://mexicocastings.com/castings/founding-comercial/)",
+        "Fotografía y Video en Región Centro, Jalisco - Harostudio (https://mx.trabajo.org/oferta-2266-9aa06b56e2c05e0a23eabaae145803aa)",
+        "Bolsa de trabajo de Producción Audiovisual en Estado de México - 49 Producción Audiovisual ofertas de empleo | Jobsavior (https://mx.jobsavior.com/ofertas-de-trabajo/estado-de-m%C3%A9xico/query-producci%C3%B3n-audiovisual)",
+        "Bolsa de trabajo de Creador contenidos - 76 Creador contenidos ofertas de empleo | AllLocalJobs (https://mx.alllocaljobs.com/vacantes/creador-contenidos)",
+        "Se necesita urgente! Bolsa de trabajo publicidad audiovisual en Guadalajara: 20 ofertas de empleo | Jobsora (https://mx.jobsora.com/empleos-publicidad-audiovisual-guadalajara)",
+        "Se necesita urgente: Productor btl — Jooble Mexico 2026 (https://mx.jooble.org/trabajo-productor-btl)"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "id": 6,
+      "query_ids": [
+        21,
+        22,
+        23,
+        24
+      ],
+      "checked_at": "2026-10-27 14:01:04 UTC",
+      "headlines": [
+        "Publicaciones que empiezan por «B» (https://es.linkedin.com/directory/posts/b)",
+        "Darwin Ordenes ⚡️ - Key Account Manager en Delpa Group | LinkedIn (https://www.linkedin.com/[ruta personal redactada])",
+        "Publicaciones que empiezan por «G» (página 3) (https://es.linkedin.com/directory/posts/g-3)",
+        "Michelle Acosta - Siuma Talent | LinkedIn (https://www.linkedin.com/[ruta personal redactada])",
+        "Publicaciones que empiezan por «D» (página 2) (https://es.linkedin.com/directory/posts/d-2)",
+        "Publicaciones que empiezan por «M» (página 3) (https://es.linkedin.com/directory/posts/m-3)",
+        "Publicaciones que empiezan por «D» (página 3) (https://es.linkedin.com/directory/posts/d-3)",
+        "Publicaciones que empiezan por «P» (página 2) (https://es.linkedin.com/directory/posts/p-2)",
+        "Publicaciones que empiezan por «M» (página 2) (https://es.linkedin.com/directory/posts/m-2)",
+        "Artículos que empiezan por «P» (https://es.linkedin.com/directory/articles/p)",
+        "Publicaciones que empiezan por «J» (página 8) (https://es.linkedin.com/directory/posts/j-8)"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "id": 7,
+      "query_ids": [
+        25,
+        26,
+        27,
+        28
+      ],
+      "checked_at": "2026-10-27 14:01:06 UTC",
+      "headlines": [
+        "Publicaciones que empiezan por «B» (https://es.linkedin.com/directory/posts/b)",
+        "Publicaciones que empiezan por «M» (página 3) (https://es.linkedin.com/directory/posts/m-3)",
+        "Publicaciones que empiezan por «P» (página 2) (https://es.linkedin.com/directory/posts/p-2)",
+        "Publicaciones que empiezan por «D» (página 3) (https://es.linkedin.com/directory/posts/d-3)"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "id": 8,
+      "query_ids": [
+        29,
+        30,
+        31,
+        32
+      ],
+      "checked_at": "2026-10-27 14:01:08 UTC",
+      "headlines": [
+        "Publicaciones que empiezan por «B» (https://es.linkedin.com/directory/posts/b)",
+        "Publicaciones que empiezan por «D» (página 2) (https://es.linkedin.com/directory/posts/d-2)",
+        "Michelle Acosta - Siuma Talent | LinkedIn (https://www.linkedin.com/[ruta personal redactada])",
+        "Publicaciones que empiezan por «P» (página 2) (https://es.linkedin.com/directory/posts/p-2)",
+        "Publicaciones que empiezan por «M» (página 3) (https://es.linkedin.com/directory/posts/m-3)",
+        "Artículos que empiezan por «P» (https://es.linkedin.com/directory/articles/p)",
+        "Publicaciones que empiezan por «M» (página 2) (https://es.linkedin.com/directory/posts/m-2)",
+        "Publicaciones que empiezan por «D» (página 3) (https://es.linkedin.com/directory/posts/d-3)",
+        "Publicaciones que empiezan por «G» (página 3) (https://es.linkedin.com/directory/posts/g-3)",
+        "Felipe Cifuentes - Marketing Estratégico | Desarrollo Comercial | Growth Marketing & Performance | Generación de Demanda B2B & B2C | Data-Driven | IA Aplicada al Marketing | P&L | Innovación | LinkedIn (https://www.linkedin.com/[ruta personal redactada])",
+        "Publicaciones que empiezan por «J» (página 8) (https://es.linkedin.com/directory/posts/j-8)"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "id": 9,
+      "query_ids": [
+        33,
+        34,
+        35,
+        36
+      ],
+      "checked_at": "2026-10-27 14:01:09 UTC",
+      "headlines": [
+        "Michelle Acosta - Siuma Talent | LinkedIn (https://www.linkedin.com/[ruta personal redactada])",
+        "Publicaciones que empiezan por «B» (https://es.linkedin.com/directory/posts/b)",
+        "Publicaciones que empiezan por «D» (página 2) (https://es.linkedin.com/directory/posts/d-2)",
+        "Publicaciones que empiezan por «M» (página 3) (https://es.linkedin.com/directory/posts/m-3)",
+        "Publicaciones que empiezan por «P» (página 2) (https://es.linkedin.com/directory/posts/p-2)",
+        "Publicaciones que empiezan por «D» (página 3) (https://es.linkedin.com/directory/posts/d-3)",
+        "Artículos que empiezan por «P» (https://es.linkedin.com/directory/articles/p)",
+        "Publicaciones que empiezan por «G» (página 3) (https://es.linkedin.com/directory/posts/g-3)",
+        "Publicaciones que empiezan por «J» (página 8) (https://es.linkedin.com/directory/posts/j-8)",
+        "Publicaciones que empiezan por «M» (página 2) (https://es.linkedin.com/directory/posts/m-2)",
+        "Darwin Ordenes ⚡️ - Key Account Manager en Delpa Group | LinkedIn (https://www.linkedin.com/[ruta personal redactada])"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "id": 10,
+      "query_ids": [
+        37,
+        38,
+        39,
+        40
+      ],
+      "checked_at": "2026-10-27 14:01:11 UTC",
+      "headlines": [
+        "Publicaciones que empiezan por «B» (https://es.linkedin.com/directory/posts/b)",
+        "Michelle Acosta - Siuma Talent | LinkedIn (https://www.linkedin.com/[ruta personal redactada])",
+        "Publicaciones que empiezan por «D» (página 2) (https://es.linkedin.com/directory/posts/d-2)",
+        "Publicaciones que empiezan por «M» (página 2) (https://es.linkedin.com/directory/posts/m-2)",
+        "Publicaciones que empiezan por «J» (página 8) (https://es.linkedin.com/directory/posts/j-8)",
+        "Publicaciones que empiezan por «D» (página 3) (https://es.linkedin.com/directory/posts/d-3)",
+        "Felipe Cifuentes - Marketing Estratégico | Desarrollo Comercial | Growth Marketing & Performance | Generación de Demanda B2B & B2C | Data-Driven | IA Aplicada al Marketing | P&L | Innovación | LinkedIn (https://www.linkedin.com/[ruta personal redactada])",
+        "Publicaciones que empiezan por «M» (página 3) (https://es.linkedin.com/directory/posts/m-3)",
+        "Publicaciones que empiezan por «P» (página 2) (https://es.linkedin.com/directory/posts/p-2)",
+        "Publicaciones que empiezan por «G» (página 3) (https://es.linkedin.com/directory/posts/g-3)",
+        "Artículos que empiezan por «P» (https://es.linkedin.com/directory/articles/p)"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "id": 11,
+      "query_ids": [
+        41,
+        42,
+        43,
+        44
+      ],
+      "checked_at": "2026-10-27 14:02:04 UTC",
+      "headlines": [
+        "1040538-11-LP26 - Campaña Comunicacional y Plan de Medios para la PR | LicitaFast (https://licitafast.cl/licitaciones/1040538-11-LP26)",
+        "CompraNet Estatal (https://comprasestatal.durango.gob.mx/consulta/ProcedimientosDeContratacion/10296)",
+        "Convocatorias CAS de comunicación y periodismo – octubre 2026 (48 abiertas) (https://quierochamba.pe/convocatorias/profesion/comunicacion/)",
+        "SERVICIO DE MANTENIMIENTO PREVENTIVO Y SOPORTE TÉ… — MINISTERIO DE EDUCACION | TodoLicitaciones Perú (https://todolicitaciones.pe/licitacion/ocds-dgv273-seacev3-1255731/servicio-de-mantenimiento-preventivo-y-soporte-tecnico-de-dos-02-sistemas-de-alimentacion-ininterrumpida-ups-administrados-por-la-oficina-de)",
+        "Adquisiciones y Licitaciones | Lotería Nacional (https://lotenal.gob.mx/Legal/AdquisicionesLicitaciones)",
+        "Convocatoria Jóvenes a la E 6 - Educación Superior en Instituciones Públicas | Agencia ATENEA (https://www.agenciaatenea.gov.co/convocatorias/convocatoria-jovenes-la-e-6-educacion-superior-en-instituciones-publicas)",
+        "Recurso 34/2026 (https://www.juntadeandalucia.es/sites/default/files/2026-02/Resoluci%C3%B3n_76_2026_Recurso_34_2026.pdf)",
+        "Sección: (https://www.litoralpress.cl/SimbiuPDF/2025/07/07/6019084.pdf)",
+        "Página: 1 de 3 (https://licitaciones.dip-caceres.es/licitacion/descargaAdjuntoPub?idAdjunto=425925)",
+        "Trayectoria académica (https://mastersonlineempresa.uc3m.es/documentos/DCYGC/Trayectoria-Academica-DCYGC.pdf)",
+        "DISPONE LA INCORP (https://www.ispch.gob.cl/wp-content/uploads/resoluciones/35999_E%20758_26.pdf)",
+        "Disposición 22506 del BOE núm. 266 de 2026 (https://www.boe.es/boe/dias/2026/10/27/pdfs/BOE-A-2026-22506.pdf)"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "id": 12,
+      "query_ids": [
+        45,
+        46,
+        47,
+        48
+      ],
+      "checked_at": "2026-10-27 14:02:06 UTC",
+      "headlines": [
+        "Optimización y estabilización del sitio sistemaspublicos.cl (https://licitados.cl/licitacion/5531-181-COT26)",
+        "ConvocatoriasPágina con las convocatorias publicadas por la Agencia Española de Cooperación Internacional para el Desarrollo (AECID) en Perú. - OCE - Perú - aecid.es (https://peru.aecid.es/convocatorias)",
+        "[PERÚ] CONVOCATORIA DE ANALISTA FINANCIERO APCI – REDINFOR PERU (https://redinfor.com.pe/portal/2026/10/19/peru-convocatoria-de-analista-financiero-apci/)",
+        " (https://sidof.segob.gob.mx/notas/docFuente/5797632)",
+        "Transparencia Municipal (https://transparencia.lascondes.cl/transparencia/dec-contratacion/prop-publicas/2026_septiembre.html)",
+        "Detalle Licitacion - Licitación web (https://licitaciones.fosis.gob.cl/Home/Bases/00-561102-2026)",
+        "Convocatorias en AGENCIA PERUANA DE COOPERACION INTERNACIONAL 2026 – Trabajos CAS, 728 y Ofertas Vigentes (https://convocatoriasdetrabajo.pe/institucion/agencia-peruana-de-cooperacion-internacional)",
+        "[URUGUAY] CONVOCATORIA DE ANALISTA DE EVALUACIÓN Y MONITOREO – REDINFOR PERU (https://redinfor.com.pe/portal/2026/10/19/uruguay-convocatoria-de-analista-de-evaluacion-y-monitoreo/)",
+        "Convocatoria de Analistas (CAS) - APCI - APCI (Lima, Lima) (https://www.emplezio.com/empleos/convocatoria-de-analistas-cas-apci-cmuwtgku9000113pubf8uh0kk)",
+        "Historial de convocatorias | Perú Convoca (https://peruconvoca.com/historial?page=3)",
+        "Convoca Perú · Tu próximo paso (https://convocaperu.online/?convocatoria=unica-276-001-2026-ch-01)",
+        "Bases Prelimianres 2026/01 (https://www.cne.cl/wp-content/uploads/2026/06/RE-CNE-N292.pdf)",
+        "Procedimiento del Programa (https://www.jica.go.jp/spanish/overseas/peru/activities/__icsFiles/afieldfile/2024/12/26/activity06_03_04.pdf)",
+        "| 9 de febrero de 2026 | Se refuerzan medidas anti (https://www.chilecompra.cl/wp-content/uploads/2026/02/boletin-proveedores-febrero.pdf)",
+        "de la Federación (https://www.asf.gob.mx/uploads/215_transp_fraccion28/Alan254_Convocatoria_LPN_10_2025.pdf)",
+        "PROTECCIÓN Y VIGILANCIA INTELIGENTE P.V.I. (https://www.ine.mx/wp-content/uploads/2026/03/LP-INE-JLE-BC-001-2026-Anexo-4.pdf)",
+        "PERÚ  | Ministerio  | Agencia Peruana  | Oficina General (https://cdn.www.gob.pe/uploads/document/file/7988104/6715001-base-practicante-pro-011-2025-apci-dfs-r.pdf)"
+      ],
+      "classification": "Empleos/agencias/autopromoción/directorios/paísesajenos excluidos; FeetCenter conocido cerrado; Hidalgo/UChile históricos; ninguna compra nueva calificada por esta llamada.",
+      "raw_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    }
+  ],
+  "web_operations": [
+    {
+      "type": "direct_read",
+      "checked_at": "2026-10-27 14:02:39 UTC",
+      "queries": null,
+      "sources": [
+        [
+          "Perú",
+          "creative",
+          "https://peru.unfpa.org/es/call-for-submissions"
+        ],
+        [
+          "Perú",
+          "creative",
+          "https://ibcperu.org/convocatorias/"
+        ],
+        [
+          "Perú",
+          "all",
+          "https://peru.aecid.es/convocatorias"
+        ],
+        [
+          "Colombia",
+          "all",
+          "https://www.procolombia.co/convocatorias-procolombia"
+        ]
+      ],
+      "result_summary": "",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "type": "direct_read",
+      "checked_at": "2026-10-27 14:02:41 UTC",
+      "queries": null,
+      "sources": [
+        [
+          "Colombia",
+          "creative",
+          "https://fenavi.org/categorias/contrataciones/"
+        ],
+        [
+          "México",
+          "all",
+          "https://comprasmx.buengobierno.gob.mx/"
+        ],
+        [
+          "México",
+          "creative",
+          "https://comprasestatal.durango.gob.mx/consulta/ProcedimientosDeContratacion/10296"
+        ],
+        [
+          "Colombia",
+          "all",
+          "https://www.colombiacompra.gov.co/secop/secop-ii"
+        ]
+      ],
+      "result_summary": "",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "type": "buyer_record",
+      "checked_at": "2026-10-27 14:03:57 UTC",
+      "queries": null,
+      "sources": null,
+      "result_summary": "",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "type": "size_and_offer_verification",
+      "checked_at": "2026-10-27 14:04:46 UTC",
+      "queries": [
+        "site:uoh.cl \"funcionarios\" \"2025\" \"académicos\"",
+        "site:userena.cl \"dotación\" \"2025\" \"funcionarios\"",
+        "\"Web Experience 360\" site:efeoncepro.com"
+      ],
+      "sources": null,
+      "result_summary": "",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "type": "size_verification",
+      "checked_at": "2026-10-27 14:05:08 UTC",
+      "queries": null,
+      "sources": null,
+      "result_summary": "",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "type": "size_verification",
+      "checked_at": "2026-10-27 14:05:43 UTC",
+      "queries": [
+        "site:userena.cl \"funcionarios\" \"más de\" \"2026\" -\"actos_secretos\"",
+        "site:userena.cl \"académicos\" \"2025\" \"500\" -\"actos_secretos\""
+      ],
+      "sources": null,
+      "result_summary": "",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "type": "primary_validation",
+      "checked_at": "2026-10-27 14:06:09 UTC",
+      "queries": [
+        {
+          "q": "site:mercadopublico.cl \"889473-2375-COT26\"",
+          "market": "Chile",
+          "line": "web"
+        },
+        {
+          "q": "site:mercadopublico.cl \"1232565-244-COT26\"",
+          "market": "Chile",
+          "line": "creative"
+        },
+        {
+          "q": "site:mercadopublico.cl \"5868-19-COT26\"",
+          "market": "Chile",
+          "line": "web"
+        },
+        {
+          "q": "site:mercadopublico.cl \"1469-321-L126\"",
+          "market": "Chile",
+          "line": "creative"
+        }
+      ],
+      "sources": null,
+      "result_summary": "",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    },
+    {
+      "type": "prior_account_and_size_validation",
+      "checked_at": "2026-10-27 14:07:26 UTC",
+      "queries": null,
+      "sources": null,
+      "result_summary": "",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar/web-evidence.json"
+    }
+  ],
+  "source_operations": [
+    {
+      "tool": "hubspot MCP get_user_details",
+      "result": "UNAUTHORIZED; requires reauthentication"
+    },
+    {
+      "tool": "hubspot whoami",
+      "result": "OAuth Julio, portal 48713323; CLI read succeeded"
+    },
+    {
+      "tool": "hubspot objects get --type deals 66672959873 66560488750 66218288550 --properties dealname,dealstage,hs_next_step,closedate --format json",
+      "result": "Mattis/GANA appointmentscheduled; Esenttia closedlost. GANA next_step still says preparation stopped, superseded by local authorization22Oct; no write"
+    },
+    {
+      "tool": "hubspot objects search --type companies --filter domain@=uoh.cl,userena.cl,uchile.cl",
+      "result": "3 existing Companies, IDs57899319173/31910311462/31779716469; bounded dedupe"
+    },
+    {
+      "tool": "hubspot objects search --type deals --filter dealname~889473-2375-COT26 --filter dealname~1232565-244-COT26 --filter dealname~5868-19-COT26",
+      "result": "0 matches in bounded code search; no proof of global absence"
+    },
+    {
+      "tool": "pnpm licitalab search --view all --max200 --no-login",
+      "result": "exit3 web session expired; no automatic login"
+    },
+    {
+      "tool": "pnpm wherex:radar -- --check-only",
+      "result": "exit1 missing local credential"
+    },
+    {
+      "tool": "Chrome Wherex",
+      "url": "https://system.wherex.com/",
+      "result": "redirect login; buyer/foros inaccessible; no login without stored credential"
+    },
+    {
+      "tool": "Chrome LicitaLAB",
+      "url": "https://app.licitalab.cl/search",
+      "result": "regular Chrome session read available; selectedTodos163rows100+63; all profile filters not independently certified"
+    },
+    {
+      "tool": "pnpm licitalab documents889473-2375-COT26 --no-login",
+      "result": "2DOCX supported inventory"
+    },
+    {
+      "tool": "pnpm licitalab ask-docs889473-2375-COT26 --no-login",
+      "result": "3fragments,2DOCX; p unknown; hostingSSL10sections annualsupport and SEOtechnical; notfull documents"
+    },
+    {
+      "tool": "pnpm licitalab ask-docs1232565-244-COT26 --no-login",
+      "result": "11fragments: Specificationspp1/2,Clausulaspp1-5.3capsules,6cameraoperators/technicalkit; originals incomplete"
+    },
+    {
+      "tool": "pnpm licitalab ask-docs5868-19-COT26 --no-login",
+      "result": "3DOCXfragments,punknown; WordPress,3months maintenance,nohostingdomain/contentproduction;2days vs milestones5days review unresolved"
+    },
+    {
+      "tool": "pnpm licitalab opportunity1469-321-L126 --no-login",
+      "result": "exit3 OAuth expired; UI used"
+    },
+    {
+      "tool": "Chrome original UOH preview and native download",
+      "result": "DOCX3pagesrenderedbuttextnotread;accessiblemodefailed;download10stimeout nofile;no signedURLs retained"
+    },
+    {
+      "tool": "Chrome buyer1469-321-L126",
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1469-321-L126",
+      "result": "primary03Nov15offers/27Oct19questions/30Oct19answers; disabledaward/ordericons do not establish no contract"
+    },
+    {
+      "tool": "Chrome UOH corporate size article",
+      "url": "https://www.uoh.cl/hemos-crecido-uoh-celebro-diez-anos-comprometida-con-la-region-y-el-pais/",
+      "result": "navigation10stimeout; webindex123recognizedstaff2025 indirect confirmation only; CRM750 unsourced"
+    },
+    {
+      "tool": "Mercado Público APIv1 details",
+      "results": [
+        {
+          "code": "1332-12-LP26",
+          "checked_at": "2026-10-27T14:02:28.495656+00:00",
+          "status": "Publicada",
+          "http_status": null
+        },
+        {
+          "code": "1108660-11-LE26",
+          "checked_at": "2026-10-27T14:02:28.850395+00:00",
+          "status": null,
+          "http_status": 429
+        }
+      ]
+    },
+    {
+      "tool": "Mercado Público APIv2 details",
+      "results": [
+        {
+          "code": "1221019-90-COT26",
+          "checked_at": "2026-10-27T14:03:24.853722+00:00",
+          "status": 200,
+          "keys": [
+            "success",
+            "trace",
+            "payload",
+            "errors"
+          ]
+        },
+        {
+          "code": "889473-2375-COT26",
+          "checked_at": "2026-10-27T14:03:35.439667+00:00",
+          "status": 200,
+          "keys": [
+            "success",
+            "trace",
+            "payload",
+            "errors"
+          ]
+        },
+        {
+          "code": "1232565-244-COT26",
+          "checked_at": "2026-10-27T14:03:41.907855+00:00",
+          "status": 200,
+          "keys": [
+            "success",
+            "trace",
+            "payload",
+            "errors"
+          ]
+        },
+        {
+          "code": "5868-19-COT26",
+          "checked_at": "2026-10-27T14:03:48.148327+00:00",
+          "error_type": "HTTPError",
+          "http_status": 429
+        }
+      ]
+    }
+  ],
+  "purchase_controls": [
+    {
+      "id": "HSP-0048:5531-181-COT26",
+      "hsp_id": "HSP-0048",
+      "entity": "UNIVERSIDAD DE CHILE",
+      "code": "5531-181-COT26",
+      "result": "cerrada_sin_recuperacion",
+      "primary_source": "https://api2.mercadopublico.cl/v2/compra-agil/5531-181-COT26",
+      "last_checked_at": "2026-10-24T12:07:43.652535+00:00",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "API proveedores_cotizando empty; no selected supplier disclosed; not exhaustive"
+      },
+      "award_act_or_order": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "id_orden_compra=null; not proof of absence"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-22 17:30",
+      "first_seen_at": "2026-10-23",
+      "first_seen_precision": "day",
+      "deadline_at": "2026-10-23 19:00",
+      "deadline_timezone": "not_labeled; Santiago operational reference",
+      "deadline_stage": "primer_llamado",
+      "document_read": "Descripción, estado, fechas, inventario y OC vinculada de API oficial; evidencia documental anterior conservada",
+      "document_block": "No annex/diagnostic in inventories; no effective contract read",
+      "reasoning": "Primer llamado cerrado. Segundo llamado sólo listado; no activo acreditado. No recuperar ni postular automáticamente. OC nula no acredita ausencia de selección/contrato.",
+      "participation": {
+        "status": "primer_llamado_cerrado",
+        "first_call": "2026-10-23 19:00",
+        "second_call_listed_not_confirmed_active": "2026-10-24 20:29"
+      },
+      "budget": {
+        "tipo_presupuesto": "Disponible",
+        "moneda": "CLF",
+        "presupuesto_estimado": 20,
+        "monto_disponible": 20,
+        "monto_disponible_clp": 823997,
+        "valor_cambio_moneda": 41199.8515625,
+        "fecha_cambio_moneda": "2026-10-22 00:00"
+      },
+      "service_lines": [
+        "web"
+      ],
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0048:5495-23-COT26",
+      "hsp_id": "HSP-0048",
+      "entity": "UNIVERSIDAD DE CHILE",
+      "code": "5495-23-COT26",
+      "result": "cerrada_sin_recuperacion",
+      "primary_source": "https://api2.mercadopublico.cl/v2/compra-agil/5495-23-COT26",
+      "last_checked_at": "2026-10-24T12:07:41.577804+00:00",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "API proveedores_cotizando empty; no selected supplier disclosed; not exhaustive"
+      },
+      "award_act_or_order": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "id_orden_compra=null; not proof of absence"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "scheduled_not_actual",
+        "value": "2026-11-01"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-22 11:06",
+      "first_seen_at": "2026-10-23",
+      "first_seen_precision": "day",
+      "deadline_at": "2026-10-23 11:30",
+      "deadline_timezone": "not_labeled; Santiago operational reference",
+      "deadline_stage": "primer_llamado",
+      "document_read": "Descripción, estado, fechas, inventario y OC vinculada de API oficial; evidencia documental anterior conservada",
+      "document_block": "XLSX unsupported; native PDF download timed out15s; original not confirmed. 3P filename vs RAGpage4 unresolved.",
+      "reasoning": "Primer llamado cerrado. Segundo llamado sólo listado; no activo acreditado. No recuperar ni postular automáticamente. OC nula no acredita ausencia de selección/contrato.",
+      "participation": {
+        "status": "primer_llamado_cerrado",
+        "first_call": "2026-10-23 11:30",
+        "second_call_listed_not_confirmed_active": "2026-10-24 11:53"
+      },
+      "budget": {
+        "tipo_presupuesto": "Estimado",
+        "moneda": "CLP",
+        "presupuesto_estimado": 4000000,
+        "monto_disponible": 4000000,
+        "monto_disponible_clp": 4000000,
+        "valor_cambio_moneda": null,
+        "fecha_cambio_moneda": null
+      },
+      "service_lines": [
+        "media",
+        "web",
+        "crm_hubspot"
+      ],
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0048:831830-40-COT26",
+      "hsp_id": "HSP-0048",
+      "entity": "Universidad de Chile",
+      "code": "831830-40-COT26",
+      "result": "cerrada_sin_recuperacion",
+      "primary_source": "https://api2.mercadopublico.cl/v2/compra-agil/831830-40-COT26",
+      "last_checked_at": "2026-10-24T12:07:46.431080+00:00",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "API proveedores_cotizando empty; no selected supplier disclosed; not exhaustive"
+      },
+      "award_act_or_order": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "id_orden_compra=null; not proof of absence"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-22 17:36",
+      "first_seen_at": "2026-10-23",
+      "first_seen_precision": "day",
+      "deadline_at": "2026-10-23 18:00",
+      "deadline_timezone": "not_labeled; Santiago operational reference",
+      "deadline_stage": "primer_llamado",
+      "document_read": "Descripción, estado, fechas, inventario y OC vinculada de API oficial; evidencia documental anterior conservada",
+      "document_block": "Original not independently read; effective contract/award unknown",
+      "reasoning": "Primer llamado cerrado. Segundo llamado sólo listado; no activo acreditado. No recuperar ni postular automáticamente. OC nula no acredita ausencia de selección/contrato.",
+      "participation": {
+        "status": "primer_llamado_cerrado",
+        "first_call": "2026-10-23 18:00",
+        "second_call_listed_not_confirmed_active": "2026-10-24 18:23"
+      },
+      "budget": {
+        "tipo_presupuesto": "Estimado",
+        "moneda": "CLP",
+        "presupuesto_estimado": 7200000,
+        "monto_disponible": 7200000,
+        "monto_disponible_clp": 7200000,
+        "valor_cambio_moneda": null,
+        "fecha_cambio_moneda": null
+      },
+      "service_lines": [],
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0049:5338-295-COT26",
+      "hsp_id": "HSP-0049",
+      "entity": "UNIVERSIDAD DE MAGALLANES",
+      "code": "5338-295-COT26",
+      "result": "cerrada_sin_recuperacion",
+      "primary_source": "https://api2.mercadopublico.cl/v2/compra-agil/5338-295-COT26",
+      "last_checked_at": "2026-10-24T12:07:50.100907+00:00",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "API proveedores_cotizando empty; no selected supplier disclosed; not exhaustive"
+      },
+      "award_act_or_order": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "id_orden_compra=null; not proof of absence"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "planned_conflicting",
+        "values": [
+          "2026-11-01",
+          "abril2026"
+        ]
+      },
+      "execution_end_at": {
+        "status": "planned_conflicting",
+        "values": [
+          "2027-03-31",
+          "junio2026"
+        ]
+      },
+      "published_at": "2026-10-22 10:18",
+      "first_seen_at": "2026-10-23",
+      "first_seen_precision": "day",
+      "deadline_at": "2026-10-23 11:00",
+      "deadline_timezone": "not_labeled; Santiago operational reference",
+      "deadline_stage": "primer_llamado",
+      "document_read": "Descripción, estado, fechas, inventario y OC vinculada de API oficial; evidencia documental anterior conservada",
+      "document_block": "Original not read; conflicting3months/Nov2026–Mar2027/Apr–Jun2026 and90daysAPI; ICP headcount unverified",
+      "reasoning": "Primer llamado cerrado. Segundo llamado sólo listado; no activo acreditado. No recuperar ni postular automáticamente. OC nula no acredita ausencia de selección/contrato.",
+      "participation": {
+        "status": "primer_llamado_cerrado",
+        "first_call": "2026-10-23 11:00",
+        "second_call_listed_not_confirmed_active": "2026-10-24 11:41"
+      },
+      "budget": {
+        "tipo_presupuesto": "Disponible",
+        "moneda": "CLP",
+        "presupuesto_estimado": 2500000,
+        "monto_disponible": 2500000,
+        "monto_disponible_clp": 2500000,
+        "valor_cambio_moneda": null,
+        "fecha_cambio_moneda": null
+      },
+      "service_lines": [
+        "media"
+      ],
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "761-24-LE26",
+      "hsp_id": null,
+      "entity": "SUBDERE",
+      "code": "761-24-LE26",
+      "result": "cerrada_sin_recuperacion",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=761-24-LE26",
+      "last_checked_at": "2026-10-24T12:07:40.644611+00:00",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "Adjudicacion=null; no prueba de inexistencia"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado",
+        "observed": "No se leyó acto de adjudicación ni orden efectiva"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-09T19:29:05.497",
+      "deadline_at": "2026-10-23T15:00:00",
+      "deadline_timezone": "not_labeled; Santiago operational reference",
+      "deadline_stage": "recepcion_ofertas",
+      "document_read": "Primary ficha/API; existing dossier consulted where available",
+      "document_block": "Full originals/actual award,OC,contract,signature and execution not independently completed",
+      "reasoning": "Cerrada desde23Oct15:00. No hay instrucción de recuperación ni adjudicatario acreditado; no convertir fecha estimada de adjudicación en acto efectivo.",
+      "participation": {
+        "status": "calendario_primario_sin_admisibilidad_certificada",
+        "questions_end": "2026-10-15T23:59:00",
+        "answers_scheduled": "2026-10-20T23:59:00"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "757-100-LR26",
+      "hsp_id": "HSP-0047",
+      "entity": "Subsecretaría de Salud Pública",
+      "code": "757-100-LR26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=757-100-LR26",
+      "last_checked_at": "2026-10-23T09:05:40.279248-03:00",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "API Adjudicacion=null; no non-award certificate"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-21T16:25:00",
+      "deadline_at": "2026-11-20T18:00:00",
+      "deadline_timezone": "not_labeled; Santiago operational reference",
+      "deadline_stage": "recepcion_ofertas",
+      "document_read": "Primary ficha/API; existing dossier consulted where available",
+      "document_block": "Full originals/actual award,OC,contract,signature and execution not independently completed",
+      "reasoning": "20Nov18API vs priorbases15 conflict and meeting/originals pending; plannedaward4Dec not actual.",
+      "participation": {
+        "status": "calendar_read",
+        "questions_close": "2026-11-04T18:00:00",
+        "answers": "2026-11-10T18:00:00"
+      },
+      "review_scope_this_run": "current_aggregator_list_only",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": "2026-10-27T11:08:10-03:00",
+      "published_in_current_week": false,
+      "observation": "Listado LicitaLAB actual; no recertifica expediente ni cambia última lectura primaria.",
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "4037-69-LE26",
+      "hsp_id": "HSP-0037",
+      "entity": "Municipalidad de Fresia",
+      "code": "4037-69-LE26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=4037-69-LE26",
+      "last_checked_at": "2026-10-25T09:11:38.107000-03:00",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "Adjudicacion=null; no prueba de inexistencia"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado",
+        "observed": "No se leyó acto de adjudicación ni orden efectiva"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-19T16:56:16.447",
+      "deadline_at": "2026-10-30T10:00:00",
+      "deadline_timezone": "not_labeled; Santiago operational reference",
+      "deadline_stage": "recepcion_ofertas",
+      "document_read": "Primary ficha/API; existing dossier consulted where available",
+      "document_block": "Full originals/actual award,OC,contract,signature and execution not independently completed",
+      "reasoning": "Preguntas cerraron23Oct15:24; ofertas30Oct10:00. Originales, formalizacióncontradictoria, ICP y costo24x7 pendientes. No GO.",
+      "participation": {
+        "status": "calendario_primario_sin_admisibilidad_certificada",
+        "questions_end": "2026-10-23T15:24:00",
+        "answers_scheduled": "2026-10-27T12:30:00"
+      },
+      "review_scope_this_run": "current_aggregator_list_only",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": "2026-10-27T11:08:10-03:00",
+      "published_in_current_week": false,
+      "observation": "Listado LicitaLAB actual; no recertifica expediente ni cambia última lectura primaria.",
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "1040538-11-LP26",
+      "hsp_id": null,
+      "entity": "SERNATUR Ñuble",
+      "code": "1040538-11-LP26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1040538-11-LP26",
+      "last_checked_at": "2026-10-26T12:10:55.267Z",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "Adjudicacion global e items sin proveedor expuesto; no prueba inexistencia"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado",
+        "planned_mechanism": "0"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-05T16:28:00",
+      "first_seen_at": null,
+      "deadline_at": "2026-10-26T15:00:00",
+      "deadline_timezone": "not_labeled; Santiago operational reference",
+      "deadline_stage": "recepcion_ofertas",
+      "document_read": "Inventario6, Medios.xlsx no soportado; RAG bases65 pp1,4,5,22,35,68,88; Resolución69 pp1,2,3,4,11; preguntas y resputas pp1,2,14,18,21; Anexos. Fragmentos no original íntegro.",
+      "document_block": "Contrato efectivo/OC aceptada y expediente completo no verificados; null no acredita inexistencia.",
+      "reasoning": "Aclaraciones resuelven monto135M frente texto erróneo; aún faltan originales completos, expediente efectivo, experiencia/caja y margen. HOLD.",
+      "participation": {
+        "status": "recepcion_hasta_fecha_ficha; elegibilidad no certificada",
+        "deadline_at": "2026-10-26T15:00:00",
+        "deadline_stage": "ofertas",
+        "timezone": null,
+        "questions_deadline_at": "2026-10-13T23:59:00",
+        "answers_at_planned": "2026-10-19T23:59:00",
+        "estimated_award_at": "2026-11-16T19:57:00"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "current_run_assessment": "Plazo anterior26Oct transcurrido; no apertura actual acreditada, no recuperación ni adjudicatario inferidos.",
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "1332-12-LP26",
+      "entity": "SERNATUR Aysén",
+      "code": "1332-12-LP26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1332-12-LP26",
+      "last_checked_at": "2026-10-27T14:02:28.495656+00:00",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "Adjudicacion global e items sin proveedor expuesto; no prueba inexistencia"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado",
+        "planned_mechanism": "0"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-01T12:38:00",
+      "first_seen_at": null,
+      "deadline_at": "2026-10-27T15:00:00",
+      "deadline_timezone": "Santiago operational reference; source not labeled",
+      "deadline_stage": "recepcion_ofertas",
+      "document_read": "API v1 completa de ficha y ficha pública; fechas, estado, modalidad contractual y adjudicación. Bases/modificaciones originales completas no releídas.",
+      "document_block": "Contrato efectivo/OC aceptada y expediente completo no verificados; null no acredita inexistencia.",
+      "reasoning": "Recepción27Oct15 confirmada. Adjudicacion null no acredita inexistencia de selección/contrato. HOLD originales, expediente efectivo, elegibilidad y economía.",
+      "participation": {
+        "status": "recepcion_hasta_fecha_ficha; elegibilidad no certificada",
+        "deadline_at": "2026-10-27T15:00:00",
+        "deadline_stage": "ofertas",
+        "timezone": null,
+        "questions_deadline_at": "2026-10-07T23:59:00",
+        "answers_at_planned": "2026-10-14T23:59:00",
+        "estimated_award_at": "2026-11-20T18:00:00"
+      },
+      "budget": {
+        "amount": 200000000,
+        "currency": "CLP",
+        "type": "estimated"
+      },
+      "review_scope_this_run": "current_primary_API_and_web",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0050:LA-72-037-913055954-N-28-2026",
+      "hsp_id": "HSP-0050",
+      "entity": "Servicios de Salud de Hidalgo",
+      "code": "LA-72-037-913055954-N-28-2026",
+      "result": "hold",
+      "primary_source": "https://comprasmx.buengobierno.gob.mx/sitiopublico/",
+      "last_checked_at": "2026-10-23T09:12:20-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": null,
+      "first_seen_at": "2026-10-23",
+      "first_seen_precision": "day",
+      "deadline_at": null,
+      "deadline_stage": "unknown; 03Nov aggregator date is opening",
+      "document_read": "Secondary index metadata only",
+      "document_block": "Primary reader0lines; Convocatoria8.docx,ANEXOTECNICO.pdf,MODELOCONTRATO.docx,N28DIFUSION.docx unread",
+      "reasoning": "ICP,supplier,act/order,effective contract,signature,execution andcalendar not verified. No bid recommendation or paid access.",
+      "participation": {
+        "status": "not_primary_verified",
+        "secondary_questions": "2026-10-26",
+        "secondary_meeting": "2026-10-27",
+        "secondary_opening": "2026-11-03"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0046:BER-7084",
+      "hsp_id": "HSP-0046",
+      "entity": "Pinturas Berel",
+      "result": "descartada_operativa",
+      "primary_source": "https://system.wherex.com/secured/supplier_user/purchase-bids/get/425380?from=list",
+      "last_checked_at": "2026-10-23T09:12:20-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-21T19:42",
+      "deadline_at": "2026-10-22T20:30",
+      "deadline_timezone": "UI not labeled",
+      "document_read": "Primary current ficha; comments,cashterms and0+0attachments",
+      "document_block": "No effective contractual document read",
+      "reasoning": "Portal discard plus advanced deadline removes today bid action. Does not prove award or contracttermination.",
+      "participation": {
+        "status": "not_available",
+        "change_date": "2026-10-22",
+        "changed_by": "buyer for deadline; discard actor not exposed"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "GRD-1552",
+      "hsp_id": "HSP-0051",
+      "entity": "GANA y LOTI / REDIAPUESTAS S.A.S.",
+      "result": "hold",
+      "primary_source": "https://system.wherex.com/secured/supplier_user/proposal/get/7578948?tab=information",
+      "last_checked_at": "2026-10-26T09:14:59.256785-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-22T13:55",
+      "deadline_at": "2026-10-30T18:00",
+      "deadline_timezone": "America/Santiago operational timestamp previously confirmed byoperator; UI unlabeled",
+      "document_read": "Ficha visible actual, requisitos e inventario; foro actual cuando aplica. Documentos históricos preservados, no nueva lectura integral del contrato.",
+      "document_block": "Contrato efectivo, firma, ejecución y selección no verificados",
+      "reasoning": "GANA/LOTI22Oct13:55/cierre30Oct18;4obligatorios;foro5ajenas,0propias,0respondidas y5sinresponder. REDIAPUESTAS compradora. Presupuesto/impuestos/plataformas, dedicaciones y admisión extranjera sin resolver. HOLD.",
+      "participation": {
+        "status": "recepcion30Oct18:00; admisión extranjera sin confirmar",
+        "questions_open_until": "2026-10-30",
+        "unanswered_supplier_questions": 4,
+        "answered_questions": 0,
+        "our_questions": 0
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "GRD-1541",
+      "hsp_id": "HSP-0051",
+      "entity": "GANA / REDITOS EMPRESARIALES S.A.",
+      "result": "hold",
+      "primary_source": "https://system.wherex.com/secured/supplier_user/proposal/get/7543223?tab=information",
+      "last_checked_at": "2026-10-23T09:12:20-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-14T18:39",
+      "deadline_at": "2026-10-22T16:00",
+      "deadline_timezone": "UI not labeled; prior run reconciled Colombia14/Santiago16",
+      "document_read": "Current primary ficha; submission receipt20Oct12:09",
+      "document_block": "Award/effective contract not verified",
+      "reasoning": "Actual EnEvaluación; no award orfailure inferred. Basis operating confirmations remain separate.",
+      "participation": {
+        "status": "submitted_closed_for_new_offers",
+        "submitted_at_ui": "2026-10-20T12:09"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0033",
+      "hsp_id": "HSP-0033",
+      "entity": "ProChile — Dirección General de Promoción de Exportaciones",
+      "code": "1138297-12-LE26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1138297-12-LE26",
+      "last_checked_at": "2026-10-26T12:10:53.234Z",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "Adjudicacion global e items sin proveedor expuesto; no prueba inexistencia"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado",
+        "planned_mechanism": "2"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-15T11:31:15.88",
+      "first_seen_at": null,
+      "deadline_at": "2026-10-26T15:01:00",
+      "document_read": "Inventario 8 documentos; RAG bases03096 pp1,3,7,9,13,17,21,25,26,30,33,45; resolución03180 pp1,2,5 y Anexo3. Fragmentos, no originales completos.",
+      "document_block": "Contrato efectivo/OC aceptada y expediente completo no verificados; null no acredita inexistencia.",
+      "reasoning": "HOLD: originales/expediente efectivo, subcontratación autorizable y costeo. Bases p3 acepta OC en2 días hábiles frente p26 en5 corridos; plazo40d+5d final frente ficha40d. Respuestas corrigen experiencia agrícola; no plazo exacto garantizado para insumos comprador.",
+      "participation": {
+        "status": "recepcion_hasta_fecha_ficha; elegibilidad no certificada",
+        "deadline_at": "2026-10-26T15:01:00",
+        "deadline_stage": "ofertas",
+        "timezone": null,
+        "questions_deadline_at": "2026-10-19T10:00:00",
+        "answers_at_planned": "2026-10-21T18:00:00",
+        "estimated_award_at": "2026-11-06T18:00:00"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "current_run_assessment": "Plazo anterior26Oct transcurrido; no apertura actual acreditada, no recuperación ni adjudicatario inferidos.",
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0034",
+      "hsp_id": "HSP-0034",
+      "entity": "Esenttia S.A.",
+      "result": "adjudicada_descartada",
+      "primary_source": "Prior buyer contractual record5600218590/CO1.REQ.11210476",
+      "last_checked_at": "2026-10-18T10:36:40.544924-03:00",
+      "awardee": {
+        "status": "confirmed_prior",
+        "value": "DACARTEC"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "confirmed_prior",
+        "value": "2026-10-10"
+      },
+      "execution_start_at": {
+        "status": "confirmed_prior",
+        "value": "2026-10-15"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "document_read": "Existing evidence/history; see continuity report",
+      "document_block": "No new complete primary contractual reading this run",
+      "reasoning": "STOP expreso del operador intacto; firma10Oct/inicio15Oct/DACARTEC según expediente previo. Dealclosedlost releído por CLI. Nextstepstale no revoca STOP.",
+      "participation": {
+        "status": "no_verificado"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "crm_readback_this_run": {
+        "deal_id": "66218288550",
+        "stage": "closedlost",
+        "checked_at": "2026-10-27T11:08:10-03:00"
+      },
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0038",
+      "hsp_id": "HSP-0038",
+      "entity": "Ministerio Público — Fiscalía Regional del Maule",
+      "result": "hold",
+      "primary_source": null,
+      "last_checked_at": "2026-10-22T09:19:00.425223-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "document_read": "Existing evidence/history; see continuity report",
+      "document_block": "No new complete primary contractual reading this run",
+      "reasoning": "Primer llamado cerrado22Oct09:00,13ofertas confirmadoAPIoficial. No postular ni recuperar; segundo llamado futuro no acreditavigencia. Conservarcontrato/adjudicación desconocidos.",
+      "participation": {
+        "status": "no_verificado"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0041",
+      "hsp_id": "HSP-0041",
+      "entity": "Subsecretaría de las Culturas y las Artes — Dirección Regional de Los Lagos",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=4888-23-L126",
+      "last_checked_at": "2026-10-25T09:11:38.107000-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "deadline_at": "2026-10-27T15:10:00",
+      "document_read": "Existing evidence/history; see continuity report",
+      "document_block": "No new complete primary contractual reading this run",
+      "reasoning": "Agente: resolver calendarios API/Bases, originales y modificaciones, selección/OC/contrato eICP. No recomendarpostular niinvertir. Luegoequipoevalúaalcancecultural,costo,cajayexperiencia.",
+      "participation": {
+        "status": "no_verificado"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0042",
+      "hsp_id": "HSP-0042",
+      "entity": "CLADEM — TdR017-2026",
+      "result": "hold",
+      "primary_source": "https://cladem.org/noticia/convocatoriaconsultoria-%E2%80%93-cladem-(tdr-017-2026)",
+      "last_checked_at": "2026-10-23T09:12:20-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "document_read": "Existing evidence/history; see continuity report",
+      "document_block": "No new complete primary contractual reading this run",
+      "reasoning": "TdR017originalrecuperado. Agente: resolverICP50+,entidad ycalendarioincoherente; USD15.000incluyecostos/impuestos,pagoalfinal. No postular/gastar/CRM/envíos.",
+      "participation": {
+        "status": "no_verificado"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0043",
+      "hsp_id": "HSP-0043",
+      "entity": "Esval S.A. / Aguas del Valle S.A.",
+      "result": "hold",
+      "primary_source": "https://system.wherex.com/secured/supplier_user/purchase-bids/get/423649?from=list",
+      "last_checked_at": "2026-10-26T09:14:59.256785-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "document_read": "Ficha visible actual, requisitos e inventario; foro actual cuando aplica. Documentos históricos preservados, no nueva lectura integral del contrato.",
+      "document_block": "Contrato efectivo, firma, ejecución y selección no verificados",
+      "reasoning": "Ficha actual:14Oct15:54;26Oct16:00. Evento7Dic19:30;140MCLP;visitas20/22Oct pasadas; campos muestran20Oct. Reunión19Oct y consultas19–20Oct transcurridas; sin evidencia admisión, contrato ni adjudicatario. HOLD.",
+      "participation": {
+        "status": "no_verificado"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "current_run_assessment": "Plazo anterior26Oct transcurrido; no apertura actual acreditada, no recuperación ni adjudicatario inferidos.",
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0044",
+      "hsp_id": "HSP-0044",
+      "entity": "Simoniz S.A.",
+      "result": "hold",
+      "primary_source": "https://system.wherex.com/secured/supplier_user/purchase-bids/all-react?status=in_progress&page=1&limit=25",
+      "last_checked_at": "2026-10-25T09:11:38.107000-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "document_read": "Current Wherex listing + prior dossier",
+      "document_block": "No new complete primary contractual reading this run",
+      "reasoning": "Priorweek;briefopenedinPDFviewerbutreadingblockedbyextensionUI;threequestionsnotread;contract/selectionunknown. Agentecontinúainvestigación, sinpostular/CRM/créditos/envío.",
+      "participation": {
+        "status": "no_verificado"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0045",
+      "hsp_id": "HSP-0045",
+      "entity": "PRIMAX COLOMBIA S.A.",
+      "result": "hold",
+      "primary_source": "https://system.wherex.com/secured/supplier_user/purchase-bids/all-react?status=published&page=2&limit=25",
+      "last_checked_at": "2026-10-25T09:11:38.107000-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "document_read": "Current Wherex listing + prior dossier",
+      "document_block": "No new complete primary contractual reading this run",
+      "reasoning": "Weeklypublicationbutfit/ICP/originalsandcontractfileunverified;notqualifiedagencycampaign. Agentecontinúainvestigación, sinpostular/CRM/créditos/envío.",
+      "participation": {
+        "status": "no_verificado"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0015",
+      "hsp_id": "HSP-0015",
+      "entity": "Pierre Fabre — operación Chile",
+      "result": "hold",
+      "primary_source": null,
+      "last_checked_at": "2026-10-09",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "document_read": "Existing evidence/history; see continuity report",
+      "document_block": "No new complete primary contractual reading this run",
+      "reasoning": "Seguimiento autorizado enviado21Oct y EMAIL SENT comprobado. Esperar respuesta; no reenviar automáticamente ni asumir vigencia/admisión de convocatoria. Consulta de recepción y asociación de credenciales a preinscripción; no duplica el correo enviado con firma textual antes de la corrección gráfica.",
+      "participation": {
+        "status": "no_verificado"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0017",
+      "hsp_id": "HSP-0017",
+      "entity": "Grupo Socopur",
+      "result": "cerrada_admision_confirmada_sin_recuperacion",
+      "primary_source": null,
+      "last_checked_at": "2026-10-10",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "document_read": "Existing evidence/history; see continuity report",
+      "document_block": "No new complete primary contractual reading this run",
+      "reasoning": "Conservar cierre del15/10 16:54:36UTC: comprador no recibe nuevas postulaciones/propuestas de este período. No insistir, ampliar a colegas ni producir oferta. Sin adjudicación/invitación futura inferidas; no cambiar CRM por radar.",
+      "participation": {
+        "status": "no_verificado"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0023",
+      "hsp_id": "HSP-0023",
+      "entity": "CARE Perú",
+      "result": "descartada_no_bid",
+      "primary_source": null,
+      "last_checked_at": "2026-10-13",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "document_read": "Existing evidence/history; see continuity report",
+      "document_block": "No new complete primary contractual reading this run",
+      "reasoning": "Descartada por requisito de empresa peruana y RUC informado por Julio. Retirar de pendientes de preparación/postulación; no preparar propuesta, contactar ni recuperar estos procesos sin nueva instrucción.",
+      "participation": {
+        "status": "no_verificado"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0048:5485-868-COT26",
+      "hsp_id": "HSP-0048",
+      "entity": "UNIVERSIDAD DE CHILE",
+      "code": "5485-868-COT26",
+      "result": "cerrada_sin_recuperacion",
+      "primary_source": "https://app.licitalab.cl/search/agile/5485-868-COT26",
+      "last_checked_at": "2026-10-25T09:11:38.107000-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "id_orden_compra=null; no certifica inexistencia"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-23 12:07",
+      "first_seen_at": "2026-10-24T12:15:31.493352+00:00",
+      "first_seen_precision": "exact_request_start_primary_verification; listado detectado antes en esta corrida",
+      "deadline_at": "2026-10-24 20:00",
+      "deadline_timezone": "API sin zona rotulada; Santiago sólo referencia operativa",
+      "deadline_stage": "primer_llamado",
+      "document_read": "Descripción primaria completa e inventario API vacío",
+      "document_block": "Sin especificación/contrato efectivo disponible en inventario leído",
+      "reasoning": "Diseño/hosting/dominio1año;200.000CLP estimados;5días. No dimensionar agencia/SEO/CRM ni recomendar sólo por cierre de hoy. HOLD de alcance/contrato/economía.",
+      "participation": {
+        "status": "primer_llamado_cerrado_UI",
+        "deadline_at": "2026-10-24T20:00:00",
+        "second_call_listed_not_confirmed_active": "2026-10-26T03:52:00"
+      },
+      "budget": {
+        "tipo_presupuesto": "Estimado",
+        "moneda": "CLP",
+        "presupuesto_estimado": 200000,
+        "monto_disponible": 200000,
+        "monto_disponible_clp": 200000,
+        "valor_cambio_moneda": null,
+        "fecha_cambio_moneda": null
+      },
+      "service_lines": [
+        "web"
+      ],
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0052:1221019-90-COT26",
+      "hsp_id": "HSP-0052",
+      "entity": "Corporación Municipal de Deporte  de Vitacura",
+      "code": "1221019-90-COT26",
+      "result": "hold",
+      "primary_source": "https://api2.mercadopublico.cl/v2/compra-agil/1221019-90-COT26",
+      "last_checked_at": "2026-10-26T12:13:41.202Z",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "proveedores_cotizando vacío; resumen0; discrepancia respecto UI1cotización anterior, no selección probada"
+      },
+      "award_act_or_order": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "id_orden_compra=null, no prueba inexistencia"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-23 22:40",
+      "first_seen_at": "2026-10-24T12:15:29.157176+00:00",
+      "first_seen_precision": "exact_request_start_primary_verification; listado detectado antes en esta corrida",
+      "deadline_at": "2026-10-27 18:00",
+      "deadline_timezone": "API sin zona rotulada; Santiago sólo referencia operativa",
+      "deadline_stage": "primer_llamado",
+      "document_read": "API detalle y cuatro documentos metadata: Acta Comité TDR.pdf, Anexos Editables.-.docx, Términos de Referencia.pdf, CDP128-26.pdf; fragmentos24Oct heredados.",
+      "document_block": "Originales completos y contrato/OC efectiva sin verificar",
+      "reasoning": "7MCLP incluye gestión y consumo; ICP corporación, selección/OC, caja y margen no resueltos. HOLD.",
+      "participation": {
+        "deadline_at": "2026-10-27 18:00",
+        "stage": "ofertas primer llamado",
+        "timezone": null
+      },
+      "budget": {
+        "tipo_presupuesto": "Disponible",
+        "moneda": "CLP",
+        "presupuesto_estimado": 7000000,
+        "monto_disponible": 7000000,
+        "monto_disponible_clp": 7000000,
+        "valor_cambio_moneda": null,
+        "fecha_cambio_moneda": null
+      },
+      "service_lines": [
+        "media"
+      ],
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0051:GRD-1555",
+      "hsp_id": "HSP-0051",
+      "entity": "Mattis / COMPAÑÍA DE SERVICIOS INMOBILIARIOS Y EMPRESARIALES S.A.S.",
+      "code": "GRD-1555",
+      "result": "hold",
+      "primary_source": "https://system.wherex.com/secured/supplier_user/proposal/get/7586459?tab=information",
+      "last_checked_at": "2026-10-26T09:14:59.256785-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-23T17:44",
+      "first_seen_at": "2026-10-23",
+      "first_seen_precision": "día; expediente local anterior a esta corrida",
+      "deadline_at": "2026-10-30T18:00",
+      "deadline_timezone": "no rotulada en Wherex; no inferir Bogotá/Santiago",
+      "deadline_stage": "recepcion_ofertas",
+      "document_read": "Ficha visible actual, requisitos e inventario; foro actual cuando aplica. Documentos históricos preservados, no nueva lectura integral del contrato.",
+      "document_block": "Contrato efectivo, firma, ejecución y selección no verificados",
+      "reasoning": "Mattis publicación23Oct17:44/cierre30Oct18;3 obligatorios;dos preguntas propias,0/2respondidas. No presupuesto comprador definido. Contrato/admisión extranjera/ICP/capacidad/costos pendientes. HOLD. Conflicto de hora: correo23Octsegúnseguimiento26Oct14Colombia=16Chile frente18sinzonaficha;16Chile límiteinternoconservador,no cierre conciliado.",
+      "participation": {
+        "status": "calendario_UI_sin_admision_certificada",
+        "questions": 2,
+        "our_questions": 2,
+        "answered": 0,
+        "questions_sent_at_ui": [
+          "2026-10-23T18:24",
+          "2026-10-23T18:38"
+        ],
+        "questions_zone": "no rotulada",
+        "questions_open_until": "2026-10-30"
+      },
+      "service_lines": [
+        "creative"
+      ],
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "GRD-1554",
+      "hsp_id": "HSP-0051",
+      "entity": "Grupo Réditos / REDITOS EMPRESARIALES S.A.",
+      "result": "descartada_para_postulacion_actual",
+      "primary_source": "https://system.wherex.com/secured/supplier_user/purchase-bids/all-react?status=in_progress&page=1&limit=25",
+      "last_checked_at": "2026-10-25T09:11:38.107000-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-23T11:25",
+      "deadline_at": "2026-10-27T18:00",
+      "deadline_timezone": "UI sin zona",
+      "document_read": "Texto completo de ficha del comprador; no contrato efectivo leído",
+      "document_block": "expediente contractual efectivo sin verificar",
+      "reasoning": "Compra de carros de crispetas, transporte, operadores e insumos, hasta6simultáneos; no agencia creativa confirmada. Sinpartner/backtobackacreditado; fueraalcancedelascincolíneasdeesteradar.",
+      "participation": {
+        "status": "no_fit_no_recomendar"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "WCS-CO-20261013",
+      "entity": "WCS Colombia",
+      "result": "descartada_para_postulacion_actual",
+      "primary_source": "https://colombia.wcs.org/es-es/WCS-COLOMBIA/TRABAJA-CON-NOSOTROS/ID/26720/WCS-Colombia-busca-servicio-especializado-en-comunicaciones-y-produccion-audiovisual.aspx",
+      "last_checked_at": "2026-10-24T09:18:52-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-13",
+      "deadline_at": "2026-10-15",
+      "deadline_timezone": null,
+      "document_read": "Texto completo de ficha del comprador; no contrato efectivo leído",
+      "document_block": "expediente contractual efectivo sin verificar",
+      "reasoning": "Publicación13Oct; plazo15Oct. Cerrada; no recuperación autorizada. No verificar contratos para recomendar porque no se recomienda ni se invierte.",
+      "participation": {
+        "status": "vencida_sin_recuperacion"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "ICM-WEB-2026",
+      "entity": "Iniciativa Climática de México",
+      "result": "descartada_para_postulacion_actual",
+      "primary_source": "https://iniciativaclimatica.org/consultoria-para-la-reestructuracion-desarrollo-y-actualizacion-del-sitio-oficial-de-pais-mexico-ante-el-cambio-climatico/",
+      "last_checked_at": "2026-10-24T09:18:52-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": null,
+      "deadline_at": "2026-09-25T11:59",
+      "deadline_timezone": null,
+      "document_read": "Texto completo de ficha del comprador; no contrato efectivo leído",
+      "document_block": "expediente contractual efectivo sin verificar",
+      "reasoning": "Primario cierra25Sep2026antes11:59sinzona; duración6mesesdesde firma prevista, no firma acreditada. No postular ni recuperación automática.",
+      "participation": {
+        "status": "vencida_sin_recuperacion"
+      },
+      "review_scope_this_run": "inherited_no_current_buyer_read",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": null,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0053:1469-321-L126",
+      "hsp_id": "HSP-0053",
+      "entity": "Universidad de Talca",
+      "code": "1469-321-L126",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1469-321-L126",
+      "last_checked_at": "2026-10-27T11:08:10-03:00",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "Adjudicacion global e items sin proveedor expuesto; no prueba inexistencia"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado",
+        "planned_mechanism": "0"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-23T18:35:00",
+      "first_seen_at": "2026-10-25",
+      "first_seen_precision": "day; no exact first-list detection instrumented",
+      "deadline_at": "2026-11-03T15:00:00",
+      "deadline_timezone": null,
+      "deadline_stage": "offer",
+      "document_read": "Ficha primaria Mercado Público en Chrome: preguntas27Oct19, respuestas30Oct19, ofertas3Nov15. Seis documentos listados por agregador, originales completos no releídos.",
+      "document_block": "Contrato efectivo/OC aceptada y expediente completo no verificados; null no acredita inexistencia.",
+      "reasoning": "Prórroga confirmada en comprador, reemplaza ofertas2Nov/preguntas26Oct. Contrato efectivo y discrepancia30d/2meses no resueltos: HOLD. Iconos de adjudicación/OC deshabilitados no prueban inexistencia.",
+      "participation": {
+        "questions_deadline_at": "2026-10-27T19:00:00",
+        "answers_at_planned": "2026-10-30T19:00:00",
+        "deadline_at": "2026-11-03T15:00:00",
+        "deadline_stage": "ofertas",
+        "timezone": null,
+        "source_timezone_caveat": "ficha muestra hora sin rótulo de zona; referencia operativa Chile continental"
+      },
+      "contract_form": {
+        "planned": "OC emitida y aceptada",
+        "signed_separate_contract": "no_aplica_como_requisito_independiente_segun_bases; no certifica ausencia",
+        "actual_accepted_OC": "no_verificado"
+      },
+      "budget": {
+        "amount": 2600000,
+        "currency": "CLP",
+        "tax_basis": "IVA incluido",
+        "media_investment_in_scope": 400000
+      },
+      "service_lines": [
+        "creative",
+        "media",
+        "web"
+      ],
+      "review_scope_this_run": "current_primary_Chrome_and_aggregator",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": null,
+      "published_in_current_week": false,
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0054:1108660-11-LE26",
+      "hsp_id": "HSP-0054",
+      "entity": "FUCOA — Fundación de Comunicaciones, Capacitación y Cultura del Agro",
+      "code": "1108660-11-LE26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1108660-11-LE26",
+      "last_checked_at": "2026-10-26T12:10:57.498Z",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "Adjudicacion global e items sin proveedor expuesto; no prueba inexistencia"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado",
+        "planned_mechanism": "2"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-23T12:40:22.32",
+      "first_seen_at": "2026-10-25",
+      "first_seen_precision": "day; no exact first-list detection instrumented",
+      "deadline_at": "2026-11-02T15:30:00",
+      "deadline_timezone": null,
+      "deadline_stage": "offer",
+      "document_read": "Ficha primaria/API. Fechas, items y adjudicación leídos; documentos adicionales según campo de evidencia.",
+      "document_block": "Contrato efectivo/OC aceptada y expediente completo no verificados; null no acredita inexistencia.",
+      "reasoning": "Perfil corporativo11–50 no acredita mínimo50+, sin escala ministerial atribuible. Bases/acto2026-89 anteriores aprueban convocatoria, no adjudican. Contrato efectivo no verificado. HOLD.",
+      "participation": {
+        "status": "recepcion_hasta_fecha_ficha; elegibilidad no certificada",
+        "deadline_at": "2026-11-02T15:30:00",
+        "deadline_stage": "ofertas",
+        "timezone": null,
+        "questions_deadline_at": "2026-10-27T16:00:00",
+        "answers_at_planned": "2026-10-29T18:00:00",
+        "estimated_award_at": "2026-11-12T18:00:00"
+      },
+      "contract_form": {
+        "planned": "emisión y aceptación OC, bases p11",
+        "signed_separate_contract": "no_aplica_como_formalizacion_independiente_segun_bases",
+        "actual_accepted_OC": "no_verificado"
+      },
+      "planned_execution": {
+        "start": "OC aceptada futura, no fecha real",
+        "event_end": "2026-11-25, previsto",
+        "video_on_demand_until": "2027-02-25, previsto",
+        "signed_or_started": false,
+        "signed_or_started_meaning": "no observado; no prueba ausencia"
+      },
+      "budget": {
+        "amount": 15000000,
+        "currency": "CLP",
+        "tax_basis": "impuestos incluidos"
+      },
+      "service_lines": [
+        "creative"
+      ],
+      "review_scope_this_run": "current_primary_attempt_429_and_list",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": "2026-10-27T11:08:10-03:00",
+      "published_in_current_week": false,
+      "last_attempt_at": "2026-10-27T14:02:28.850395+00:00",
+      "attempt_result": "APIv1 HTTP429; circuit breaker; no reintento",
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "INAPI:519302-9-LE26",
+      "hsp_id": null,
+      "entity": "Instituto Nacional de Propiedad Industrial",
+      "code": "519302-9-LE26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=519302-9-LE26",
+      "last_checked_at": "2026-10-25T09:11:38.107000-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-09T15:57:48",
+      "first_seen_at": "2026-10-25",
+      "first_seen_precision": "day; no exact first-list detection instrumented",
+      "deadline_at": "2026-11-02T16:00:00",
+      "deadline_timezone": null,
+      "deadline_stage": "offer",
+      "document_read": "Ficha primaria; contrato requerido a futuro; originales y expediente efectivo no leídos",
+      "document_block": "RAG fragments are not full original or effective contract. No effective contract read.",
+      "reasoning": "Publicación anterior a semana; descubrimiento histórico, no nueva convocatoria recomendada; recepción listada no completa gate contractual.",
+      "review_scope_this_run": "current_aggregator_list_only",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": "2026-10-27T11:08:10-03:00",
+      "published_in_current_week": false,
+      "observation": "Listado LicitaLAB actual; no recertifica expediente ni cambia última lectura primaria.",
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "CULTURAS:1725-224-LE26",
+      "hsp_id": null,
+      "entity": "Subsecretaría de las Culturas y las Artes",
+      "code": "1725-224-LE26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1725-224-LE26",
+      "last_checked_at": "2026-10-25T09:11:38.107000-03:00",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-15T17:39:00",
+      "first_seen_at": "2026-10-25",
+      "first_seen_precision": "day; no exact first-list detection instrumented",
+      "deadline_at": "2026-10-28T12:00:00",
+      "deadline_timezone": null,
+      "deadline_stage": "offer",
+      "document_read": "Sólo índice LicitaLAB y resultadoagregador; no fuente primaria ni contrato",
+      "document_block": "RAG fragments are not full original or effective contract. No effective contract read.",
+      "reasoning": "Publicación15Oct en agregador; no nueva semanal; no recomendar postulación con expediente y primario no verificados.",
+      "review_scope_this_run": "current_aggregator_list_only",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": "2026-10-27T11:08:10-03:00",
+      "published_in_current_week": false,
+      "observation": "Listado LicitaLAB actual; no recertifica expediente ni cambia última lectura primaria.",
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "GORE-RM:1260-17-LP26",
+      "entity": "Gobierno Regional Región Metropolitana",
+      "code": "1260-17-LP26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1260-17-LP26",
+      "last_checked_at": "2026-10-26T12:10:57.740Z",
+      "awardee": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observed": "Adjudicacion global e items sin proveedor expuesto; no prueba inexistencia"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado",
+        "planned_mechanism": "0"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-08T11:20:48.073",
+      "first_seen_at": null,
+      "document_read": "Ficha primaria/API. Fechas, items y adjudicación leídos; documentos adicionales según campo de evidencia.",
+      "document_block": "Contrato efectivo/OC aceptada y expediente completo no verificados; null no acredita inexistencia.",
+      "reasoning": "Primario y API corrigen agregador: cierre9Nov15:30, no26Oct. Publicación8Oct; histórico, no nueva semanal. Inventario3 archivos sin original íntegro ni expediente efectivo; ICP no resuelto. HOLD.",
+      "participation": {
+        "status": "recepcion_hasta_fecha_ficha; elegibilidad no certificada",
+        "deadline_at": "2026-11-09T15:30:00",
+        "deadline_stage": "ofertas",
+        "timezone": null,
+        "questions_deadline_at": "2026-10-19T11:30:00",
+        "answers_at_planned": "2026-10-26T15:00:00",
+        "estimated_award_at": "2027-03-09T15:31:00"
+      },
+      "review_scope_this_run": "current_aggregator_list_only",
+      "inherited_from": "2026-10-26-0909",
+      "observed_this_run_at": "2026-10-27T11:08:10-03:00",
+      "published_in_current_week": false,
+      "observation": "Listado LicitaLAB actual; no recertifica expediente ni cambia última lectura primaria.",
+      "crm_writes": 0,
+      "credits": 0,
+      "outreach": 0
+    },
+    {
+      "id": "HSP-0055:889473-2375-COT26",
+      "hsp_id": "HSP-0055",
+      "entity": "Universidad de O’Higgins",
+      "code": "889473-2375-COT26",
+      "result": "hold",
+      "primary_source": "https://api2.mercadopublico.cl/v2/compra-agil/889473-2375-COT26",
+      "last_checked_at": "2026-10-27T14:03:35.439667+00:00",
+      "review_scope_this_run": "current_primary_API_aggregator_and_RAG",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observation": "id_orden_compra=null; no prueba inexistencia"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-27T10:34",
+      "first_seen_at": "2026-10-27",
+      "first_seen_precision": "day; exact detection time not instrumented",
+      "deadline_at": "2026-10-28T11:00",
+      "deadline_stage": "ofertas_primer_llamado",
+      "deadline_timezone": null,
+      "published_in_current_week": true,
+      "document_read": "APIv2 ficha/fechas/productos/OCnull/documentos; UI LicitaLAB. Inventario2DOCX y3fragmentos RAG sin páginas: hostingSSL10secciones/soporteanual/SEOmeta,sitemap,robots/rendimiento. Visor3páginas sin texto y descarga nativa10stimeout.",
+      "document_block": "Originales completos/expediente contractual efectivo no verificados; no acreditar ausencia por campos vacíos.",
+      "reasoning": "Compra semanal con recepción primaria; OCnull no prueba ausencia de selección. ICP no recertificado íntegramente, originales y contrato efectivo incompletos: HOLD.",
+      "service_lines": [
+        "web",
+        "seo_aeo"
+      ],
+      "budget": {
+        "amount": 7000000,
+        "currency": "CLP",
+        "tax_basis": "por confirmar"
+      },
+      "approval": "sólo investigación gratuita; no CRM/gasto/envío",
+      "outreach": 0,
+      "credits": 0,
+      "crm_writes": 0,
+      "participation": {
+        "status": "calendario_primario; elegibilidad no certificada",
+        "first_call_deadline_at": "2026-10-28 11:00",
+        "second_call_listed_at": "2026-10-29 11:25",
+        "second_call_meaning": "no autorización para esperar reapertura",
+        "timezone": null
+      },
+      "planned_execution": {
+        "duration_days": 90,
+        "actual_start": "no_verificado",
+        "actual_end": "no_verificado"
+      },
+      "detection_lag_calendar_days": 0,
+      "detection_lag_precision": "misma fecha calendario; sin horas exactas de detección ni disponibilidad inicial",
+      "size": {
+        "local": "CRM750 sin fuente y artículo institucional indexado123reconocidosen2025; lectura directa timeout",
+        "group": "no_aplica",
+        "icp": "piso sugerido por fuente institucional indexada; verificación directa pendiente"
+      },
+      "buyer_group_roles": [
+        "Proyecto FIC40059110-0/laboratorio (nombre pendiente)",
+        "Web/IT institucional (pendiente)",
+        "Compras UOH (pendiente)"
+      ],
+      "contact_status": "ninguna persona con autoridad y correo individual verificados; no ampliar personas bajo HOLD",
+      "crm": {
+        "portal": 48713323,
+        "company_id": "57899319173",
+        "existing_verified_read_only": true,
+        "deal_code_matches": 0
+      }
+    },
+    {
+      "id": "HSP-0056:1232565-244-COT26",
+      "hsp_id": "HSP-0056",
+      "entity": "Universidad de La Serena",
+      "code": "1232565-244-COT26",
+      "result": "hold",
+      "primary_source": "https://api2.mercadopublico.cl/v2/compra-agil/1232565-244-COT26",
+      "last_checked_at": "2026-10-27T14:03:41.907855+00:00",
+      "review_scope_this_run": "current_primary_API_aggregator_and_RAG",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_encontrado_en_lectura_acotada",
+        "observation": "id_orden_compra=null; no prueba inexistencia"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-27T10:31",
+      "first_seen_at": "2026-10-27",
+      "first_seen_precision": "day; exact detection time not instrumented",
+      "deadline_at": "2026-10-28T16:00",
+      "deadline_stage": "ofertas_primer_llamado",
+      "deadline_timezone": null,
+      "published_in_current_week": true,
+      "document_read": "APIv2 ficha/fechas/productos/OCnull/documentos; UI LicitaLAB. 11fragmentos RAG: Especificacionespp1–2 y Cláusulaspp1–5. Tres cápsulas, seis camarógrafos, kits de cine; dossier/fotos técnicas/propuesta artística/portafolio. No lectura íntegra original.",
+      "document_block": "Originales completos/expediente contractual efectivo no verificados; no acreditar ausencia por campos vacíos.",
+      "reasoning": "Compra semanal con recepción primaria; OCnull no prueba ausencia de selección. ICP no recertificado íntegramente, originales y contrato efectivo incompletos: HOLD.",
+      "service_lines": [
+        "creative"
+      ],
+      "budget": {
+        "amount": 3500000,
+        "currency": "CLP",
+        "tax_basis": "por confirmar"
+      },
+      "approval": "sólo investigación gratuita; no CRM/gasto/envío",
+      "outreach": 0,
+      "credits": 0,
+      "crm_writes": 0,
+      "participation": {
+        "status": "calendario_primario; elegibilidad no certificada",
+        "first_call_deadline_at": "2026-10-28 16:00",
+        "second_call_listed_at": "2026-10-29 21:28",
+        "second_call_meaning": "no autorización para esperar reapertura",
+        "timezone": null
+      },
+      "planned_execution": {
+        "duration_days": 30,
+        "actual_start": "no_verificado",
+        "actual_end": "no_verificado"
+      },
+      "detection_lag_calendar_days": 0,
+      "detection_lag_precision": "misma fecha calendario; sin horas exactas de detección ni disponibilidad inicial",
+      "size": {
+        "local": "desconocido",
+        "group": "no_aplica",
+        "icp": "no_verificado50+; perfilLinkedIn999, no inferir por universidad"
+      },
+      "buyer_group_roles": [
+        "Dirección de Gestión Estratégica Institucional (unidad verificada)",
+        "Comunicaciones/audiovisual (persona pendiente)",
+        "Compras (persona pendiente)"
+      ],
+      "contact_status": "ninguna persona con autoridad y correo individual verificados; no ampliar personas bajo HOLD",
+      "crm": {
+        "portal": 48713323,
+        "company_id": "31910311462",
+        "existing_verified_read_only": true,
+        "deal_code_matches": 0
+      }
+    },
+    {
+      "id": "HSP-0048:5868-19-COT26",
+      "hsp_id": "HSP-0048",
+      "entity": "Universidad de Chile — Facultad de Economía y Negocios",
+      "code": "5868-19-COT26",
+      "result": "hold",
+      "primary_source": "https://api2.mercadopublico.cl/v2/compra-agil/5868-19-COT26",
+      "last_checked_at": "2026-10-27T11:08:10-03:00",
+      "review_scope_this_run": "current_primary_attempt_429_aggregator_and_RAG",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-10-26T16:35",
+      "first_seen_at": "2026-10-27",
+      "first_seen_precision": "day; exact detection time not instrumented",
+      "deadline_at": "2026-10-29T10:00",
+      "deadline_stage": "ofertas_primer_llamado",
+      "deadline_timezone": null,
+      "published_in_current_week": null,
+      "document_read": "UI LicitaLAB ficha,1DOCXmetadata y3fragmentos RAG sinpágina. CMSWordPress,diseño/migración/mantención3meses;sinproduccióneditorial/fotografía/identidad/hosting/dominio. Requirente de Difusión/Marketing identificado sólo en evidencia privada.",
+      "document_block": "Originales completos/expediente contractual efectivo no verificados; no acreditar ausencia por campos vacíos.",
+      "reasoning": "APIv2detenidaHTTP429.2díasdeentregaenficha frente4etapas yhasta5hábilesderevisiónporetapa: aclararplazoreal. Publicaciónsemanal sóloagregador; expedienteprimario/contrato pendiente:HOLD.",
+      "service_lines": [
+        "web"
+      ],
+      "budget": {
+        "amount": 3000000,
+        "currency": "CLP",
+        "tax_basis": "por confirmar"
+      },
+      "approval": "sólo investigación gratuita; no CRM/gasto/envío",
+      "outreach": 0,
+      "credits": 0,
+      "crm_writes": 0,
+      "publication_status": "agregador26Oct16:35, primaria bloqueada429",
+      "participation": {
+        "first_call_deadline_at": "2026-10-29T10:00",
+        "second_call_listed_at": "2026-11-01T03:24",
+        "timezone": null,
+        "source": "agregador; no certificar segundo llamado como vía alternativa"
+      },
+      "size": {
+        "local_buying_unit": "desconocido",
+        "institution": "201+ como evidencia institucional histórica, no revalidada",
+        "group": "no_aplica"
+      },
+      "contact_status": "requirente periodista, unidad Difusión/Marketing en ficha RAG; autoridad y entregabilidad no verificadas; sin RRHH",
+      "buyer_group_roles": [
+        "Difusión/Marketing FEN (requirente en documento)",
+        "IT/hosting FEN (pendiente)",
+        "Compras FEN (pendiente)"
+      ],
+      "crm": {
+        "portal": 48713323,
+        "company_id": "31779716469",
+        "existing_verified_read_only": true,
+        "deal_code_matches": 0
+      }
+    },
+    {
+      "id": "HSP-0021:FEETCENTER-CRM-2026",
+      "hsp_id": "HSP-0021",
+      "entity": "Feet Center — México",
+      "code": "FEETCENTER-CRM-2026",
+      "result": "cerrada_por_comprador",
+      "primary_source": "https://www.linkedin.com/[publicación personal redactada; permalink en evidencia privada]",
+      "last_checked_at": "2026-10-27T11:08:10-03:00",
+      "review_scope_this_run": "current_primary_public_post",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": null,
+      "first_seen_at": "2026-10-27",
+      "first_seen_precision": "day; exact detection time not instrumented",
+      "deadline_at": null,
+      "deadline_stage": "ofertas_primer_llamado",
+      "deadline_timezone": null,
+      "published_in_current_week": false,
+      "document_read": "Publicación y comentario del solicitante leídos. Declara selección cerrada y contacto posterior al ganador; no nombra proveedor.",
+      "document_block": "Acto, OC, contrato, firma y ejecución no publicados/leídos; no inventar adjudicatario.",
+      "reasoning": "Compra cerrada por declaración del comprador; no postular, recuperar ni enriquecer. Identidad legal/tamaño y contrato siguen sin verificar.",
+      "service_lines": [
+        "crm_hubspot"
+      ],
+      "budget": {
+        "status": "no_verificado"
+      },
+      "approval": "sólo investigación gratuita; no CRM/gasto/envío",
+      "outreach": 0,
+      "credits": 0,
+      "crm_writes": 0,
+      "published_at_precision": "publicación1mes/comentario2semanas; sin fecha absoluta; no latencia"
+    },
+    {
+      "id": "LP/E/SFyA/032/2026",
+      "hsp_id": null,
+      "entity": "Secretaría de Finanzas y Administración de Durango — México",
+      "code": "LP/E/SFyA/032/2026",
+      "result": "descartada_para_postulacion_actual",
+      "primary_source": "https://comprasestatal.durango.gob.mx/consulta/ProcedimientosDeContratacion/10296",
+      "last_checked_at": "2026-10-27T11:08:10-03:00",
+      "review_scope_this_run": "current_primary_source",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": "2026-09-10",
+      "first_seen_at": "2026-10-27",
+      "first_seen_precision": "day; exact detection time not instrumented",
+      "deadline_at": "2026-09-22T13:00",
+      "deadline_stage": "ofertas_primer_llamado",
+      "deadline_timezone": null,
+      "published_in_current_week": false,
+      "document_read": "Ficha primaria con publicación10Sep, apertura22Sep13, fallo previsto25Sep15 y firma prevista25Sep16; enlaces de anexos/fallo/contrato no leídos.",
+      "document_block": "Originales completos/expediente contractual efectivo no verificados; no acreditar ausencia por campos vacíos.",
+      "reasoning": "Fuera ventana y plazo de participación anterior. No recuperación. Fechas previstas no prueban firma ni ejecución efectivas.",
+      "service_lines": [
+        "creative"
+      ],
+      "budget": {
+        "status": "no_verificado"
+      },
+      "approval": "sólo investigación gratuita; no CRM/gasto/envío",
+      "outreach": 0,
+      "credits": 0,
+      "crm_writes": 0
+    },
+    {
+      "id": "1057062-10-LE26",
+      "hsp_id": null,
+      "entity": "Universidad de Aysén",
+      "code": "1057062-10-LE26",
+      "result": "hold",
+      "primary_source": "https://app.licitalab.cl/search",
+      "last_checked_at": null,
+      "review_scope_this_run": "current_aggregator_screen_only",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": null,
+      "first_seen_at": "2026-10-27",
+      "first_seen_precision": "day; exact detection time not instrumented",
+      "deadline_at": "2026-11-05T15:35",
+      "deadline_stage": "según listado; modalidad por validar",
+      "deadline_timezone": null,
+      "published_in_current_week": null,
+      "document_read": "Sólo título/comprador/monto/cierre del listado; no expediente ni originales.",
+      "document_block": "Originales completos/expediente contractual efectivo no verificados; no acreditar ausencia por campos vacíos.",
+      "reasoning": "Pista de listado sin fecha/ICP/alcance/expediente certificado; HOLD de screening. No recomendación ni HSP nuevo hasta calificar cuenta.",
+      "service_lines": [
+        "media"
+      ],
+      "budget": {
+        "status": "no_verificado"
+      },
+      "approval": "sólo investigación gratuita; no CRM/gasto/envío",
+      "outreach": 0,
+      "credits": 0,
+      "crm_writes": 0,
+      "observed_this_run_at": "2026-10-27T11:08:10-03:00",
+      "service_line_caveat": "encaje por título, no calificado"
+    },
+    {
+      "id": "1375754-86-COT26",
+      "hsp_id": null,
+      "entity": "SLEP Los Parques",
+      "code": "1375754-86-COT26",
+      "result": "hold",
+      "primary_source": "https://app.licitalab.cl/search",
+      "last_checked_at": null,
+      "review_scope_this_run": "current_aggregator_screen_only",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": null,
+      "first_seen_at": "2026-10-27",
+      "first_seen_precision": "day; exact detection time not instrumented",
+      "deadline_at": "2026-10-29T09:00",
+      "deadline_stage": "según listado; modalidad por validar",
+      "deadline_timezone": null,
+      "published_in_current_week": null,
+      "document_read": "Sólo título/comprador/monto/cierre del listado; no expediente ni originales.",
+      "document_block": "Originales completos/expediente contractual efectivo no verificados; no acreditar ausencia por campos vacíos.",
+      "reasoning": "Pista de listado sin fecha/ICP/alcance/expediente certificado; HOLD de screening. No recomendación ni HSP nuevo hasta calificar cuenta.",
+      "service_lines": [
+        "crm_hubspot"
+      ],
+      "budget": {
+        "amount": 4500000,
+        "currency": "CLP",
+        "tax_basis": "por confirmar"
+      },
+      "approval": "sólo investigación gratuita; no CRM/gasto/envío",
+      "outreach": 0,
+      "credits": 0,
+      "crm_writes": 0,
+      "observed_this_run_at": "2026-10-27T11:08:10-03:00",
+      "service_line_caveat": "licenciaemailmarketing no confirma CRM/HubSpot"
+    },
+    {
+      "id": "1216094-1-LE26",
+      "hsp_id": null,
+      "entity": "Subsecretaría de Hacienda",
+      "code": "1216094-1-LE26",
+      "result": "hold",
+      "primary_source": "https://app.licitalab.cl/search",
+      "last_checked_at": null,
+      "review_scope_this_run": "current_aggregator_screen_only",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": null,
+      "first_seen_at": "2026-10-27",
+      "first_seen_precision": "day; exact detection time not instrumented",
+      "deadline_at": "2026-11-02T18:00",
+      "deadline_stage": "según listado; modalidad por validar",
+      "deadline_timezone": null,
+      "published_in_current_week": null,
+      "document_read": "Sólo título/comprador/monto/cierre del listado; no expediente ni originales.",
+      "document_block": "Originales completos/expediente contractual efectivo no verificados; no acreditar ausencia por campos vacíos.",
+      "reasoning": "Pista de listado sin fecha/ICP/alcance/expediente certificado; HOLD de screening. No recomendación ni HSP nuevo hasta calificar cuenta.",
+      "service_lines": [
+        "creative"
+      ],
+      "budget": {
+        "status": "no_verificado"
+      },
+      "approval": "sólo investigación gratuita; no CRM/gasto/envío",
+      "outreach": 0,
+      "credits": 0,
+      "crm_writes": 0,
+      "observed_this_run_at": "2026-10-27T11:08:10-03:00",
+      "service_line_caveat": "encaje por título, no calificado"
+    },
+    {
+      "id": "5418-18-LE26",
+      "hsp_id": null,
+      "entity": "Gobierno Regional de Los Ríos",
+      "code": "5418-18-LE26",
+      "result": "hold",
+      "primary_source": "https://app.licitalab.cl/search",
+      "last_checked_at": null,
+      "review_scope_this_run": "current_aggregator_screen_only",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": null,
+      "first_seen_at": "2026-10-27",
+      "first_seen_precision": "day; exact detection time not instrumented",
+      "deadline_at": "2026-11-02T15:01",
+      "deadline_stage": "según listado; modalidad por validar",
+      "deadline_timezone": null,
+      "published_in_current_week": null,
+      "document_read": "Sólo título/comprador/monto/cierre del listado; no expediente ni originales.",
+      "document_block": "Originales completos/expediente contractual efectivo no verificados; no acreditar ausencia por campos vacíos.",
+      "reasoning": "Pista de listado sin fecha/ICP/alcance/expediente certificado; HOLD de screening. No recomendación ni HSP nuevo hasta calificar cuenta.",
+      "service_lines": [
+        "media"
+      ],
+      "budget": {
+        "amount": 40000000,
+        "currency": "CLP",
+        "tax_basis": "por confirmar"
+      },
+      "approval": "sólo investigación gratuita; no CRM/gasto/envío",
+      "outreach": 0,
+      "credits": 0,
+      "crm_writes": 0,
+      "observed_this_run_at": "2026-10-27T11:08:10-03:00",
+      "service_line_caveat": "encaje por título, no calificado"
+    },
+    {
+      "id": "1725-227-COT26",
+      "hsp_id": null,
+      "entity": "Subsecretaría de las Culturas y las Artes",
+      "code": "1725-227-COT26",
+      "result": "hold",
+      "primary_source": "https://app.licitalab.cl/search",
+      "last_checked_at": null,
+      "review_scope_this_run": "current_aggregator_screen_only",
+      "awardee": {
+        "status": "no_verificado"
+      },
+      "award_act_or_order": {
+        "status": "no_verificado"
+      },
+      "contract": {
+        "status": "no_verificado"
+      },
+      "signed_at": {
+        "status": "no_verificado"
+      },
+      "execution_start_at": {
+        "status": "no_verificado"
+      },
+      "execution_end_at": {
+        "status": "no_verificado"
+      },
+      "published_at": null,
+      "first_seen_at": "2026-10-27",
+      "first_seen_precision": "day; exact detection time not instrumented",
+      "deadline_at": "2026-10-28T13:30",
+      "deadline_stage": "según listado; modalidad por validar",
+      "deadline_timezone": null,
+      "published_in_current_week": null,
+      "document_read": "Sólo título/comprador/monto/cierre del listado; no expediente ni originales.",
+      "document_block": "Originales completos/expediente contractual efectivo no verificados; no acreditar ausencia por campos vacíos.",
+      "reasoning": "Pista de listado sin fecha/ICP/alcance/expediente certificado; HOLD de screening. No recomendación ni HSP nuevo hasta calificar cuenta.",
+      "service_lines": [
+        "creative"
+      ],
+      "budget": {
+        "amount": 3000000,
+        "currency": "CLP",
+        "tax_basis": "por confirmar"
+      },
+      "approval": "sólo investigación gratuita; no CRM/gasto/envío",
+      "outreach": 0,
+      "credits": 0,
+      "crm_writes": 0,
+      "observed_this_run_at": "2026-10-27T11:08:10-03:00",
+      "service_line_caveat": "encaje por título, no calificado"
+    }
+  ],
+  "coverage": [
+    {
+      "market": "Chile",
+      "service_line": "seo_aeo",
+      "queries": [
+        1,
+        21
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Chile",
+      "service_line": "web",
+      "queries": [
+        2,
+        22,
+        45
+      ],
+      "count": 3,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Chile",
+      "service_line": "creative",
+      "queries": [
+        3,
+        23
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Chile",
+      "service_line": "crm_hubspot",
+      "queries": [
+        4,
+        24
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Chile",
+      "service_line": "media",
+      "queries": [
+        5,
+        25
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Perú",
+      "service_line": "seo_aeo",
+      "queries": [
+        6,
+        26
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Perú",
+      "service_line": "web",
+      "queries": [
+        7,
+        27
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Perú",
+      "service_line": "creative",
+      "queries": [
+        8,
+        28,
+        42,
+        46
+      ],
+      "count": 4,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Perú",
+      "service_line": "crm_hubspot",
+      "queries": [
+        9,
+        29
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Perú",
+      "service_line": "media",
+      "queries": [
+        10,
+        30
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Colombia",
+      "service_line": "seo_aeo",
+      "queries": [
+        11,
+        31
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Colombia",
+      "service_line": "web",
+      "queries": [
+        12,
+        32
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Colombia",
+      "service_line": "creative",
+      "queries": [
+        13,
+        33,
+        43
+      ],
+      "count": 3,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Colombia",
+      "service_line": "crm_hubspot",
+      "queries": [
+        14,
+        34,
+        47
+      ],
+      "count": 3,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "Colombia",
+      "service_line": "media",
+      "queries": [
+        15,
+        35
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "México",
+      "service_line": "seo_aeo",
+      "queries": [
+        16,
+        36,
+        48
+      ],
+      "count": 3,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "México",
+      "service_line": "web",
+      "queries": [
+        17,
+        37
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "México",
+      "service_line": "creative",
+      "queries": [
+        18,
+        38
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "México",
+      "service_line": "crm_hubspot",
+      "queries": [
+        19,
+        39
+      ],
+      "count": 2,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    },
+    {
+      "market": "México",
+      "service_line": "media",
+      "queries": [
+        20,
+        40,
+        44
+      ],
+      "count": 3,
+      "status": "consultada; sin nueva compra calificada; fuentes directas parciales"
+    }
+  ],
+  "crm": {
+    "portal": 48713323,
+    "identity": "Julio",
+    "connector": "UNAUTHORIZED_requires_reauthentication",
+    "cli": "authenticated_read_succeeded",
+    "company_ids": [
+      "57899319173",
+      "31910311462",
+      "31779716469"
+    ],
+    "deal_reads": [
+      "66672959873",
+      "66560488750",
+      "66218288550"
+    ],
+    "dedupe_deals_codes": [
+      "889473-2375-COT26",
+      "1232565-244-COT26",
+      "5868-19-COT26"
+    ],
+    "dedupe_deals_result": 0,
+    "scope": "bounded domain company and code deal searches; not global absence",
+    "writes": 0
+  },
+  "counts": {
+    "discovery_queries": 48,
+    "weekly_discovery_queries": 44,
+    "weekly_percentage": 91.7,
+    "covered_cells": 20,
+    "new_qualified_purchases": 0,
+    "new_hsp_accounts": 2,
+    "new_process_existing_account": 1,
+    "new_primary_weekly_publications_in_hold": 2,
+    "total_hsp": 56,
+    "approval_batches_preserved": 27,
+    "operator_decisions_preserved": 32,
+    "purchase_controls": 45
+  },
+  "permissions": {
+    "research_free": true,
+    "crm_writes": 0,
+    "outreach": 0,
+    "paid_enrichment": 0,
+    "new_tasks": 0,
+    "commits": 0,
+    "pushes": 0,
+    "scheduler_changes": 0
+  },
+  "privacy": {
+    "individual_emails": false,
+    "phones": false,
+    "personal_linkedin_urls": "redacted",
+    "raw_payloads": "private0600only"
+  },
+  "private_evidence_directory": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-27-1102-radar",
+  "source_observations": [
+    {
+      "url": "https://fenavi.org/categorias/contrataciones/",
+      "market": "Colombia",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "blocked_timeout",
+        "observation": "Reader400timeout",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://app.licitalab.cl/search",
+      "market": "Chile",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_partial",
+        "observation": "Todos163rows100+63; profile universe not global; four fichasread",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://system.wherex.com/",
+      "market": [
+        "Chile",
+        "Perú",
+        "Colombia",
+        "México"
+      ],
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "login_required",
+        "observation": "Chrome login; runner credential absent; no forums or currentbuyer calendarreread",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://peru.aecid.es/convocatorias",
+      "market": "Perú",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_partial",
+        "observation": "22/21/19Octcourses/cooperation,notweeklyagencydemand",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://comprasmx.buengobierno.gob.mx/",
+      "market": "México",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "reader_empty",
+        "observation": "0lines; notabsenceofprocurement",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1332-12-LP26",
+      "market": "Chile",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_API_web",
+        "observation": "offers27Oct15; fullcontractnotcertified",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://peru.unfpa.org/es/call-for-submissions",
+      "market": "Perú",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_partial",
+        "observation": "MOOCJuly/dataJuneold;catering29Octfuturelabeloutside_scope",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1469-321-L126",
+      "market": "see source evidence",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_Chrome",
+        "observation": "Primaryoffers3Nov15/questions27Oct19/answers30Oct19; readerfailedbutChromeconfirmed",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://api2.mercadopublico.cl/v2/compra-agil/1221019-90-COT26",
+      "market": "see source evidence",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_API",
+        "observation": "offers27Oct18/OCnull",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://ibcperu.org/convocatorias/",
+      "market": "Perú",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_partial",
+        "observation": "Comms5Octpersonalrole; no currentweeklyB2Bvalidated",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://www.procolombia.co/convocatorias-procolombia",
+      "market": "Colombia",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_partial",
+        "observation": "Firstpagefirmsfairsnotnewagencybuyingcertified",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://comprasestatal.durango.gob.mx/consulta/ProcedimientosDeContratacion/10296",
+      "market": "México",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_historical",
+        "observation": "pub10Sep/offers22Sep;plannedfallo/signaturenotactualcontract",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://www.colombiacompra.gov.co/secop/secop-ii",
+      "market": "Colombia",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_landing_only",
+        "observation": "Landingnotinventory; processsearchreCaptcha",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://community.secop.gov.co/Public/Tendering/ContractNoticeManagement/Index?Country=CO&Page=login&SkinName=CCE&currentLanguage=es-CO",
+      "market": "Colombia",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "captcha_required",
+        "observation": "Noinventory;nobypass",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://api2.mercadopublico.cl/v2/compra-agil/889473-2375-COT26",
+      "market": "Chile",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_API",
+        "observation": "pub27Oct10:34/offers28Oct11/OCnull",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://api2.mercadopublico.cl/v2/compra-agil/1232565-244-COT26",
+      "market": "Chile",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "accessible_API",
+        "observation": "pub27Oct10:31/offers28Oct16/OCnull",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    },
+    {
+      "url": "https://api2.mercadopublico.cl/v2/compra-agil/5868-19-COT26",
+      "market": "Chile",
+      "observation": {
+        "run_id": "2026-10-27-1102",
+        "last_attempt_at": "2026-10-27T11:08:10-03:00",
+        "status": "rate_limited_429",
+        "observation": "Circuitbreakerafter3successes",
+        "evidence": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospecting-agent/queries/2026-10-27-1102.json",
+        "timestamp_precision": "research_cutoff upperbound; exactAPI times in private summaries"
+      }
+    }
+  ],
+  "validation_queries": [
+    {
+      "q": "site:uoh.cl \"funcionarios\" \"2025\" \"académicos\"",
+      "purpose": "size_or_offer",
+      "counts_as_discovery": false
+    },
+    {
+      "q": "site:userena.cl \"dotación\" \"2025\" \"funcionarios\"",
+      "purpose": "size_or_offer",
+      "counts_as_discovery": false
+    },
+    {
+      "q": "\"Web Experience 360\" site:efeoncepro.com",
+      "purpose": "size_or_offer",
+      "counts_as_discovery": false
+    },
+    {
+      "q": "site:userena.cl \"funcionarios\" \"2025\" \"800\"",
+      "purpose": "size_or_offer",
+      "counts_as_discovery": false
+    },
+    {
+      "q": "site:userena.cl \"dotación\" \"académicos\" \"2024\"",
+      "purpose": "size_or_offer",
+      "counts_as_discovery": false
+    },
+    {
+      "q": "site:userena.cl \"funcionarios\" \"más de\" \"2026\" -\"actos_secretos\"",
+      "purpose": "size_or_offer",
+      "counts_as_discovery": false
+    },
+    {
+      "q": "site:userena.cl \"académicos\" \"2025\" \"500\" -\"actos_secretos\"",
+      "purpose": "size_or_offer",
+      "counts_as_discovery": false
+    },
+    {
+      "q": "site:mercadopublico.cl \"889473-2375-COT26\"",
+      "purpose": "primary_validation",
+      "counts_as_discovery": false
+    },
+    {
+      "q": "site:mercadopublico.cl \"1232565-244-COT26\"",
+      "purpose": "primary_validation",
+      "counts_as_discovery": false
+    },
+    {
+      "q": "site:mercadopublico.cl \"5868-19-COT26\"",
+      "purpose": "primary_validation",
+      "counts_as_discovery": false
+    },
+    {
+      "q": "site:mercadopublico.cl \"1469-321-L126\"",
+      "purpose": "primary_validation",
+      "counts_as_discovery": false
+    }
+  ],
+  "native_queries": [
+    {
+      "code": "889473-2375-COT26",
+      "tool": "pnpm licitalab ask-docs --no-login",
+      "q": "Leer íntegramente ambos documentos. Indicar objeto y entregables, tecnologías, hosting, soporte, monto e impuestos, evaluación, requisitos, calendario, orden de compra, contrato efectivo firmado, proveedor seleccionado, firma, inicio y fin; citar archivo y página, distinguir bases de contrato real.",
+      "result": "ok_RAG_fragments_not_full_originals"
+    },
+    {
+      "code": "1232565-244-COT26",
+      "tool": "pnpm licitalab ask-docs --no-login",
+      "q": "Extraer especificaciones completas y cláusulas: cantidad y duración de videos, locación, entrega, derechos, requisitos excluyentes, experiencia, presupuesto e impuestos, evaluación, fechas de participación y formalización. Verificar si hay proveedor seleccionado, resolución/orden aceptada, contrato firmado e inicio/fin efectivo; diferenciar lo previsto de lo ejecutado. Citar archivo y página.",
+      "result": "ok_RAG_fragments_not_full_originals"
+    },
+    {
+      "code": "5868-19-COT26",
+      "tool": "pnpm licitalab ask-docs --no-login",
+      "q": "Extraer alcance completo del sitio Mirada FEN, migración, mantención, plazo real de 2 días, pagos, impuestos, experiencia, admisión, evaluación y formalización. Indicar si el documento contiene un proveedor seleccionado, orden aceptada, contrato o firma e inicio/fin efectivos. Citar archivo y página.",
+      "result": "ok_RAG_fragments_not_full_originals"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "64bcfc0bf26e6ce0bbd0fc1a29e47e16b10f8fd9ed0d0f1ce9f5a5b1dd4f9a31",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-proposal",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:mattis-logo-on-dark",
+      "path": "ai-generations/2026-10-30_mattis-propuesta/mattis-logo-on-dark.png",
+      "sha256": "5000918444f1d0fe14875d67d95cb4df5686af32abcf39421226ee29aa0f2387"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

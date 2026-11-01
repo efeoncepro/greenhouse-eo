@@ -1,5 +1,8 @@
 # Pricing local para agentes
 
+[Delta27/10: Performance y Ecuador en v14](v3-operating/PERFORMANCE_ECUADOR_2026-10-27.md), valores estimados
+para revisión. `--current` ya permite calcular ARMOR; no implica aprobación económica o sincronización de plataforma.
+
 [Superficie V3 implementada y frontera comercial](../../docs/documentation/finance/cotizador-v3-superficie-implementada.md). Este conjunto conserva su versión/caso original; las fuentes y la policy operativa sucesora se seleccionan explícitamente y no alteran resultados congelados.
 
 [Flujo operativo V3 completo local](v3-operating/README.md): discovery/plan,32 perfiles, recursos por trabajo, reparto de capacidad, mantenimiento con impacto, evaluación y preview; costos/asignaciones reales e integración canónica pendientes.

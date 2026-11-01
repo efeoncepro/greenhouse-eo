@@ -1,0 +1,1027 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "performance-ecuador-2026-10-27",
+  "baseDigest": "1b3ab1c9634cd4afecfe0cd14a13aab4a71a463cc60f7b702d9a91f73a419779",
+  "nextVersion": "operating-review-2026-10-27-v14",
+  "actor": "julio-authorized-agent",
+  "reason": "Julio 2026-10-27 explicitly asks to add Performance and Ecuador to V3, recalculate ARMOR fee and update proposal for review before sending. Add estimated Performance target/floor 55/45, neutral estimated EC market factor 1, and human contingency reserve 12% for fixed-scope On-Demand. Preserve every existing policy, cost, FX and historical quote. Local catalog only; no platform DB import or send.",
+  "dimensions": {
+    "countriesAdd": [
+      "EC"
+    ]
+  },
+  "changes": [
+    {
+      "operation": "add",
+      "recordId": "offer:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "offer:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "offer",
+        "value": {
+          "offerId": "performance-commerce-distribution",
+          "label": "Performance & Commerce Distribution",
+          "commercialUnit": "managed_service"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Julio explicitly authorized adding Performance and Ecuador on 2026-10-27 and recalculating ARMOR. Sold as a managed-service fee. Does not approve a client price or activate media."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-001:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-001:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-001",
+          "tierCode": "historical-tier-3",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-002:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-002:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-002",
+          "tierCode": "historical-tier-2",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-003:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-003:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-003",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-004:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-004:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-004",
+          "tierCode": "historical-tier-3",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-005:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-005:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-005",
+          "tierCode": "historical-tier-3",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-006:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-006:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-006",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-007:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-007:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-007",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-008:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-008:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-008",
+          "tierCode": "historical-tier-2",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-009:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-009:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-009",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-010:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-010:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-010",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-011:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-011:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-011",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-012:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-012:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-012",
+          "tierCode": "historical-tier-3",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-013:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-013:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-013",
+          "tierCode": "historical-tier-2",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-014:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-014:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-014",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-015:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-015:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-015",
+          "tierCode": "historical-tier-2",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-016:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-016:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-016",
+          "tierCode": "historical-tier-3",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-017:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-017:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-017",
+          "tierCode": "historical-tier-2",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-018:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-018:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-018",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-019:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-019:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-019",
+          "tierCode": "historical-tier-2",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-020:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-020:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-020",
+          "tierCode": "historical-tier-4",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-021:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-021:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-021",
+          "tierCode": "historical-tier-4",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-022:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-022:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-022",
+          "tierCode": "historical-tier-2",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-023:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-023:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-023",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-024:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-024:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-024",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-025:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-025:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-025",
+          "tierCode": "historical-tier-4",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-026:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-026:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-026",
+          "tierCode": "historical-tier-4",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-027:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-027:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-027",
+          "tierCode": "historical-tier-4",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-028:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-028:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-028",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-029:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-029:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-029",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-030:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-030:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-030",
+          "tierCode": "historical-tier-2",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-031:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-031:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-031",
+          "tierCode": "historical-tier-2",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-032:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-032:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-032",
+          "tierCode": "historical-tier-4",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-033:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-033:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-033",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-034:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-034:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-034",
+          "tierCode": "historical-tier-1",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-035:performance-commerce-distribution",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "pricing:ECG-035:performance-commerce-distribution",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-035",
+          "tierCode": "historical-tier-2",
+          "offerId": "performance-commerce-distribution",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance practice only: target 55%, floor 45% from hypothesis-only Performance pricing pack V1. Addition authorized by Julio 2026-10-27; these numeric rules remain estimates for review, not a validated tariff or per-client price approval. Other practice policies unchanged."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "market:EC",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "market:EC",
+        "revision": 1,
+        "kind": "market_factor",
+        "value": {
+          "country": "EC",
+          "factor": "1"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Ecuador offer-market only. Neutral 1.00 is an explicit agent estimate for this authorized catalog extension, without validated willingness-to-pay premium/discount; not a CEO-confirmed country value. No Ecuador talent localization or salary factor is inferred. Review with first closed case."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "contingency:performance-commerce-distribution:on_demand",
+      "effectiveFrom": "2026-10-27",
+      "record": {
+        "recordId": "contingency:performance-commerce-distribution:on_demand",
+        "revision": 1,
+        "kind": "contingency_reserve",
+        "value": {
+          "rate": "0.12",
+          "base": "human",
+          "label": "Reserva de contingencia",
+          "offerId": "performance-commerce-distribution",
+          "engagementForm": "on_demand"
+        },
+        "source": {
+          "reference": "user:julio-authorizes-performance-ecuador-v3:2026-10-27;reference:performance-pricing-pack-v1",
+          "effectiveFrom": "2026-10-27",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Performance fixed-scope On-Demand programme: 12% of human cost as an estimated reserve. Explicitly adopted for review under the authorized offer extension, following the existing managed-service reserve convention; not a 12% overhead uplift. Waiver requires a declared reason. Existing general On-Demand price ratio 1.10 applies."
+      }
+    }
+  ]
+}

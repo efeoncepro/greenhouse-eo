@@ -1,0 +1,149 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "e29d57a7c5cc",
+  "key": "e29d57a7c5cc8c1b4f533a68b22e2a26291f2f6cef721fd9eec0e5c7ca575348",
+  "status": "completed",
+  "createdAt": "2026-10-28T17:14:42.157Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-28_propuesta-armor/plates/BR3v.png",
+    "imageSha256": "c4abb1812da70b0d7a93ee364a4b2e3a8a27a3155bbb5fcde93055d85ba531c7",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-28_propuesta-armor/plates/BR3v-mask-isotipo.png",
+    "maskSha256": "d018a4d9cf473ef8d472ff2c3a649603fa94d15ffb1fc98da85dc71d7b1637be",
+    "maskConvention": "white-editable",
+    "width": 1792,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Remove the object in the marked area completely, including its shadow and reflection. Reconstruct what is behind it so the surface, texture and lighting continue naturally. Leave the area empty: no new objects.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nRemove the object in the marked area completely, including its shadow and reflection. Reconstruct what is behind it so the surface, texture and lighting continue naturally. Leave the area empty: no new objects.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.0014866420200892857,
+    "editable": 2728,
+    "soft": 0,
+    "protected": 1832280
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 1274,
+      "top": 334,
+      "width": 190,
+      "height": 173
+    },
+    "target": {
+      "width": 1072,
+      "height": 976
+    },
+    "aspectError": 0.00008627383314650027,
+    "reason": "la zona con contexto ocupa 1.8 % de la imagen: se genera recortada a 1072x976"
+  },
+  "estimate": {
+    "usd": 0.0121,
+    "basis": "1 × salida 1072x976 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 12.824,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.6,
+        "bestError": 2.6,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.58,
+        0.32,
+        1.2
+      ],
+      "protected": {
+        "pixels": 1832280,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 2728,
+        "maxDelta": 151,
+        "meanDelta": 12.824,
+        "worst": {
+          "x": 1385,
+          "y": 419
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 1832280,
+        "maxDelta": 88,
+        "meanDelta": 0.069,
+        "worst": {
+          "x": 1423,
+          "y": 490
+        }
+      },
+      "outputUsd": 0.0121,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2271,
+        "input_tokens_details": {
+          "image_tokens": 2108,
+          "text_tokens": 163
+        },
+        "output_tokens": 403,
+        "output_tokens_details": {
+          "image_tokens": 403,
+          "text_tokens": 0
+        },
+        "total_tokens": 2674
+      },
+      "meta": {
+        "size": "1072x976",
+        "quality": "medium",
+        "providerMask": false
+      }
+    }
+  ],
+  "erase": {
+    "fill": "model",
+    "layers": [],
+    "shadow": null,
+    "erasure": [
+      {
+        "changeInCore": 10.92,
+        "corePixels": 2728,
+        "objectLikeness": null,
+        "residueSuspected": true
+      }
+    ]
+  }
+}

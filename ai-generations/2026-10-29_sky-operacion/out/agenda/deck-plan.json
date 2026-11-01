@@ -1,0 +1,86 @@
+{
+  "tenderId": "agenda",
+  "slides": [
+    {
+      "slideId": "deck-decision-agenda",
+      "contentType": "deck.decision-agenda",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 140,
+          "questionPx": "--gl-ag-question-px=40px",
+          "questionLeading": "--gl-ag-question-leading=1.2",
+          "answerLeading": "--gl-ag-answer-leading=0.95",
+          "answerTracking": "--gl-ag-answer-tracking=-0.04em",
+          "answerInset": "--gl-ag-answer-inset=-6px",
+          "listLeft": "--gl-ag-list-left=820px",
+          "listTop": "--gl-ag-list-top=170px",
+          "listWidth": "--gl-ag-list-width=960px",
+          "rowGap": "--gl-ag-row-gap=40px",
+          "rule": "--gl-ag-rule=2px",
+          "padTop": "--gl-ag-pad-top=18px",
+          "padBottom": "--gl-ag-pad-bottom=22px",
+          "numberPx": "--gl-ag-number-px=80px",
+          "numberWght": "--gl-ag-number-wght=300",
+          "numberTracking": "--gl-ag-number-tracking=-0.04em",
+          "numberWidth": "--gl-ag-number-width=130px",
+          "topicPx": "--gl-ag-topic-px=46px",
+          "topicTracking": "--gl-ag-topic-tracking=-0.01em",
+          "topicChosenWght": "--gl-ag-topic-chosen-wght=600"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-ag-progress-0-of-5-growth"
+        },
+        "voice": {
+          "question": "¿Qué veremos hoy?",
+          "answer": "temas",
+          "eyebrow": "Agenda",
+          "answerLead": "Cinco"
+        },
+        "topics": [
+          {
+            "role": "rest",
+            "number": "01",
+            "topic": "Diagnóstico"
+          },
+          {
+            "role": "lead",
+            "number": "02",
+            "topic": "La propuesta"
+          },
+          {
+            "role": "rest",
+            "number": "03",
+            "topic": "El equipo"
+          },
+          {
+            "role": "rest",
+            "number": "04",
+            "topic": "Cómo funciona"
+          },
+          {
+            "role": "rest",
+            "number": "05",
+            "topic": "Cómo empezamos"
+          }
+        ],
+        "selection": {
+          "label": "SKY",
+          "anchor": "bottom-start",
+          "participantKind": "department",
+          "scale": 1.1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 2
+        }
+      },
+      "template": "DecisionAgenda"
+    }
+  ]
+}

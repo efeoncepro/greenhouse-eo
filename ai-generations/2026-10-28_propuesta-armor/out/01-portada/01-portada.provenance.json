@@ -1,0 +1,21 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "1e0216ec9af0f9af2d439e00c5379d03c0a3d369a29b9e2169e8631e93f218e3",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-proposal",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:armor-logo",
+      "path": "ai-generations/2026-10-28_propuesta-armor/assets/armor-logo.png",
+      "sha256": "f8ac134feb317915e1b856ec19707cc8fcc60f8e19ff1921862df3aaea151aa7"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  },
+  "adjustment": "cover-proposal-orbit-decision-by-hand-2026-10-28"
+}

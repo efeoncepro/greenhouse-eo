@@ -1,0 +1,66 @@
+{
+  "run_id": "2026-10-30-1349-izipay-respuesta-registrada",
+  "checked_at": "2026-10-30T13:49:05.887030-03:00",
+  "timezone": "America/Santiago",
+  "scope": "existing_buyer_reply_registration",
+  "account": "izipay",
+  "deal_id": "66481946424",
+  "queries": [
+    {
+      "source": "Outlook",
+      "query": "from:[CORREO_INDIVIDUAL_REDACTADO] received>=2026-10-30",
+      "pii_redacted": true,
+      "results": 1,
+      "has_more": false,
+      "body_returned_in_search": true,
+      "result": "Marketing still preparing information; buyer expects more detail following week and will notify"
+    },
+    {
+      "source": "HubSpot MCP",
+      "operation": "get_user_details",
+      "result": "UNAUTHORIZED; reauthentication required"
+    },
+    {
+      "source": "HubSpot Agent CLI",
+      "operation": "whoami",
+      "result": "OAuth Julio; portal48713323; notes.write available"
+    },
+    {
+      "source": "HubSpot Agent CLI",
+      "operation": "get deal66481946424/contact256738112539; list NOTE activities on contact/deal; get note body schema; read associations",
+      "result": "identities verified; existing contact not enrolled; no prior note of this reply; writable schema and association types verified"
+    },
+    {
+      "source": "HubSpot Agent CLI",
+      "operation": "notes create dry-run; one create; get note and both associations",
+      "result": "note120015317862 read back with exact source time and expected associations"
+    }
+  ],
+  "approval": "Respondió Iris, registra eso",
+  "crm_changes": {
+    "created_note": "120015317862",
+    "associated_deal": "66481946424",
+    "associated_contact": "256738112539",
+    "task_updated": false,
+    "deal_fields_updated": false
+  },
+  "outbound_messages_sent": 0,
+  "next_action": "Await buyer update; no new reminder today",
+  "procurement_control": {
+    "result": "HOLD unchanged",
+    "last_checked_at": "2026-10-30T13:49:05.887030-03:00",
+    "scope": "Buyer reply read; no new contractual review",
+    "document_read": "Primary email reply with quoted history",
+    "awardee": "not_verified",
+    "award_act_or_order": "not_verified",
+    "contract_status": "not_verified",
+    "signature_at": "not_verified",
+    "execution_start_at": "not_verified",
+    "execution_end_at": "not_verified",
+    "published_at": "not_verified",
+    "participation_calendar": "not_verified",
+    "deadline_at": null,
+    "reason": "Reply communicates preparation and expectation only; no bases, contract or offer calendar attached"
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-izipay-confirmacion"
+}

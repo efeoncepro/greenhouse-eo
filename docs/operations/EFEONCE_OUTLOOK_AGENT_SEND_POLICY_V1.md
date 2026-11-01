@@ -195,6 +195,13 @@ Una sugerencia de Viva Insights o un botón deshabilitado no prueba programació
 resultado real antes de otra acción. No repetir el envío por un borrador obsoleto ni sustituir la firma gráfica.
 El InMail se comprueba en su conversación; la actividad EMAIL no cierra por sí sola ese canal.
 
+Si el editor nativo deja el cuerpo vacío, recuperar **el mismo borrador** en Outlook web. En
+[MG Indusol](../commercial/prospecting-agent/runs/2026-10-28-mg-indusol-mayra.md), copiar el HTML renderizado
+con el fragmento oficial íntegro y pegarlo en el editor web conservó texto, enlace y las nueve imágenes de
+firma; una lectura independiente confirmó la copia persistida antes del envío. Es una ruta observada,
+no garantía de otro editor ni motivo para crear otro correo. El pegado estándar funcionó sin conceder
+acceso persistente al portapapeles; no ampliar permisos como supuesto requisito de esta recuperación.
+
 Los casos [Lucía / Flesan](../commercial/prospecting-agent/runs/2026-10-24-flesan-lucia.md) y
 [Yvette / Sigelec](../commercial/prospecting-agent/runs/2026-10-24-sigelec-yvette.md) añaden evidencia de la misma
 regla: corregir el cuerpo visible que no persistió, releer el borrador completo y después el ID nuevo de

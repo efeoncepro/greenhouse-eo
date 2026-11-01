@@ -1,0 +1,199 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "armor-setup-review-2026-10-27",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "180",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "hypothesis-only:allocation-shared",
+      "effectiveFrom": "2026-10-09",
+      "effectiveUntil": "9999-12-31",
+      "status": "estimated"
+    }
+  },
+  "drivers": [],
+  "fixedWork": [
+    {
+      "workId": "ECG-008",
+      "label": "ECG-008 setup",
+      "hoursPerMonth": "24",
+      "source": {
+        "reference": "estimate:armor-discovery-scope-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "ECG-009",
+      "label": "ECG-009 setup",
+      "hoursPerMonth": "24",
+      "source": {
+        "reference": "estimate:armor-discovery-scope-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "performance-lead-assumption",
+      "label": "performance-lead-assumption setup",
+      "hoursPerMonth": "8",
+      "source": {
+        "reference": "estimate:armor-discovery-scope-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "ECG-031",
+      "label": "ECG-031 setup",
+      "hoursPerMonth": "32",
+      "source": {
+        "reference": "estimate:armor-discovery-scope-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "ECG-012",
+      "label": "ECG-012 setup",
+      "hoursPerMonth": "24",
+      "source": {
+        "reference": "estimate:armor-discovery-scope-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "ECG-021",
+      "label": "ECG-021 setup",
+      "hoursPerMonth": "16",
+      "source": {
+        "reference": "estimate:armor-discovery-scope-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "ECG-011",
+      "label": "ECG-011 setup",
+      "hoursPerMonth": "24",
+      "source": {
+        "reference": "estimate:armor-discovery-scope-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "ECG-016",
+      "label": "ECG-016 setup",
+      "hoursPerMonth": "8",
+      "source": {
+        "reference": "estimate:armor-discovery-scope-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "ECG-008",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "ECG-008",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster."
+    },
+    {
+      "lineId": "ECG-009",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "ECG-009",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster."
+    },
+    {
+      "lineId": "performance-lead-assumption",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "performance-lead-assumption",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster."
+    },
+    {
+      "lineId": "ECG-031",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "ECG-031",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster."
+    },
+    {
+      "lineId": "ECG-012",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "ECG-012",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster."
+    },
+    {
+      "lineId": "ECG-021",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "ECG-021",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster."
+    },
+    {
+      "lineId": "ECG-011",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "ECG-011",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster."
+    },
+    {
+      "lineId": "ECG-016",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "ECG-016",
+          "share": "1"
+        }
+      ],
+      "reason": "Estimated separate work package; no buyer-approved dedication or reserved roster."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.000001"
+  }
+}

@@ -1,0 +1,5 @@
+  ⤢ lienzo 2048x2560 · escena 2048x2048 en (0, 512) · relleno previo mirror · fundido 100 px
+  ✂ imagen completa → 1280x1616 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.150 · 1 × 1 imagen(es) × 3 MP (redondeado arriba) × USD 0.05/MP
+  → candidato 1/1 …
+FATAL: fal upload initiate failed (HTTP 403, cuenta FAL_API_KEY_B): User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing
