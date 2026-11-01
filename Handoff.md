@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-11-01 — Cloud Build: paquete de subida 986 → 131 MB
+
+`.gcloudignore` excluye `/ai-generations/`, `/outputs/`, `/generated/` y `/scripts/frontend/` (anclados a la raíz;
+sin anclar, `ai-generations/` también atrapaba `scripts/ai-generations/`). Verificado con
+`gcloud meta list-files-for-upload`: solo salen archivos de esas cuatro carpetas y siguen presentes todas las rutas
+que copian los 8 Dockerfiles de `services/`. No se borra nada del repo. Al empujar a develop, los filtros de ruta de
+`artifact-worker`, `commercial-cost-worker` y `auth-server` disparan un deploy a staging, que es la prueba real
+(code complete, sin push). El operador comprará el descuento de 1 año de Cloud SQL y cancelará Looker Studio Pro.
+
 ## 2026-11-01 — Kortex retirado: respaldo, Vercel pausado, proyecto GCP cerrado
 
 **Actualización:** el operador cerró `efeonce-kortex-dev` (estado `DELETE_REQUESTED`, se puede deshacer con

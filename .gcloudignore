@@ -56,6 +56,12 @@ data/
 demo-configs/
 docs/
 full-version/
+# Creative and capture output: no worker Dockerfile copies these, and together
+# they were ~85% of every upload (~850 of ~990 MB per build, 2026-11-01).
+/ai-generations/
+/outputs/
+/generated/
+/scripts/frontend/
 # public/ is excluded to keep the Cloud Build context lean, EXCEPT
 # public/branding/ which the ops-worker carries into its runtime image for
 # PDF rendering (payroll receipts, contractor/finiquito/finance PDFs resolve
