@@ -5,7 +5,12 @@ description: Operate and extend Efeonce Auth / Efeonce ID — the native OAuth/O
 
 # Efeonce Auth / Efeonce ID (skill viva)
 
-**Corte vigente 2026-10-31:** first-party y OTP de invitación están **ON en producción** (`vivo`):
+**Corte vigente 2026-11-01:** la retención se levantó y Efeonce ID llegó a `main` con el release `935583f88db0`
+(`released`). Sirve `auth-server-00170-qlx` al 100 % (login V4 con carrusel de novedades), con el tráfico enrutado a
+la última revisión; rollback = tráfico a `auth-server-00169-4pq`. Ver el ledger. El párrafo siguiente es el corte
+anterior.
+
+**Corte 2026-10-31 (anterior):** first-party y OTP de invitación están **ON en producción** (`vivo`):
 `auth-server-00169-4pq` al 100 % del tráfico (misma imagen que la 00168), con
 `AUTH_SERVER_FIRST_PARTY_ENABLED=true`, `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED=true` y los secretos
 `auth-server-rooms-invitation-otp-hmac:1` y `rooms-production-invitation-authority-token:1` montados;

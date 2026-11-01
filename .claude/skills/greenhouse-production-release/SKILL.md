@@ -733,6 +733,20 @@ borre en silencio — **también ordena el flip por construcción**: el flag se 
 su código se despliega, nunca antes. Eso resolvió una precondición real ese día (`TASK-1792` no estaba
 en `main`; viajaba en la misma promoción).
 
+### Delta 2026-11-01 (release `935583f88db0`) — auth-server en un release por squash
+
+- **Un push a `main` dispara también `Auth Server Deploy` por `push:main`**, en espera del gate `Production` y en el
+  mismo grupo de concurrencia (`auth-server-production`, sin cancelación) que el job de Auth del orquestador. Cancelarlo
+  ANTES de disparar el orquestador, cuando todavía no existe manifest para ese SHA (sin steps ejecutados).
+- **El guard de `auth-server-deploy.yml` reconoce releases por squash** (PR #265): si el commit servido no es ancestro
+  del objetivo, acepta sólo si es ancestro de la coincidencia de árbol más antigua en `origin/develop`. Antes rechazaba
+  todo release por squash cuando Auth servía un commit de `develop` (manifest `5f2e69806eee` aborted).
+- **Si el tráfico de Auth está fijado por revisión, el deploy gobernado publica pero no sirve** y la verificación de
+  `GIT_SHA` sale roja (manifest aborted). Mover el tráfico con `update-traffic --to-latest`, hacer readback y relanzar el
+  orquestador sólo para cerrar: Auth se omite por cambio nulo y el manifest cierra `released`.
+- Un `ops-worker`/`artifact-worker` en el SHA del intento anterior es change-gate legítimo si el diff de árbol completo
+  hasta el objetivo sólo toca archivos fuera de su bundle (aquí, el workflow de Auth y su prueba).
+
 ### CI metadata and build heap — verified 2026-10-13
 
 Zero job steps or a Starting job UI is not evidence that CI has not executed: PR #254

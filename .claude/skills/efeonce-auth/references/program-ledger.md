@@ -4,6 +4,24 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-11-01 — Retención levantada y Efeonce ID en `main`: 00170 con carrusel de novedades, release `released`
+
+- Operador: «Ok pasa todo develop a main, todo con /release» y «Autorizo todo». Release `935583f88db0-544b3943-a041-4fe6-9e62-03aca45c6c8f`
+  `released` (run `41284120477`), tras dos intentos `aborted` (ver timing ledger).
+- `vivo`: `auth-server-00170-qlx` al 100 % con `GIT_SHA=935583f88…`, first-party/OTP/internal ON, los mismos 6 secretos que la 00169.
+  `/healthz`, `/readyz`, discovery, `oauth-authorization-server`, JWKS (2 llaves) y `/login` en 200; issuer `https://auth.efeonce.org`;
+  `/login` y el recorrido desde Rooms («Entra a Rooms») muestran el carrusel con el feed publicado de Greenhouse. MCP sigue declarando
+  `authorization_servers: ["https://auth.efeonce.org"]`.
+- **El tráfico ya no está fijado:** `gcloud run services update-traffic auth-server --to-latest` (la 00170 quedó con 0 % tras el deploy
+  gobernado porque la 00169 estaba fijada). **Rollback:** `gcloud run services update-traffic auth-server --region us-east4
+  --project efeonce-group --to-revisions=auth-server-00169-4pq=100` y readback.
+- Guard de `auth-server-deploy.yml` compatible con squash (PR #265): si el commit servido no es ancestro del objetivo, acepta sólo si es
+  ancestro de la coincidencia de árbol MÁS ANTIGUA en `origin/develop`; un runtime servido más nuevo sigue rechazado (pruebas en
+  `scripts/auth-server/test_deploy_contract.py`, incluido el caso de revert).
+- `main` ya contiene el guard de deploy (PR #263/#264 quedan superados por el release; cerrarlos o rebasarlos es limpieza pendiente).
+- Sigue abierto: TASK-1833 (sin pentest completo) y ningún cliente real sin autorización nueva; delegación interactiva para la audiencia
+  Rooms (EPIC-044) sigue como task por crear.
+
 ## 2026-11-01 — Operador levanta la retención; panel de novedades integrado en develop (sin desplegar)
 
 - Operador: «Levanta la retención». `local`: `4a5d00277` en `develop` (sin push) trae desde
