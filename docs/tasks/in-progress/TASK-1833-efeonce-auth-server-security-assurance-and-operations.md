@@ -111,15 +111,54 @@ El assessment de este slice consume su ADR y código; no bloquea el diseño inic
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-10-29: canary Auth/Rooms del 26-10 cerrado OFF; assurance propio parcial, sin pentest completo ni steady de siete días. Job aislado aceptado sólo para implementación local; candidato Job/ledger/CLI con PG 4/4 y focales 44/44 PASS, sin recursos ni rotación cloud. PR y release Auth retenidos. Pendientes: IAM/ensayo cloud, B15/B20 completos, privacidad V2, simulacros, señales y operación steady.`
+- Status real: `2026-11-01 (conciliación): evaluación ofensiva propia hecha (20 casos, refutación separada 18 PASS, B15/B20 parciales; revisión de protocolo separada) y casos (a)/(b) de TASK-1831 probados en local. En producción desde el release 935583f88db0: first-party/OTP ON para Rooms y las cinco señales nuevas. NO integrado: las correcciones del 28–29 de octubre (revocación de consentimiento atómica, recuperación atómica, 413 de cuerpo excesivo, Job aislado de rotación, inventario de privacidad corregido) viven sólo en la rama local codex/auth-pr-develop-stack, sin push. Pendientes: integrar esa rama, rotación cloud + scheduler, ventana steady de 7 días, simulacro de revocación masiva en staging, aprobación de privacidad V2 y cobertura ofensiva CIMD/gateway bloqueada.`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
 - Blocked by: `none`
-- Branch: `Greenhouse develop; checkout compartido; sin worktrees`
+- Branch: `Greenhouse develop; checkout compartido; sin worktrees. Trabajo pendiente de integrar en la rama local codex/auth-pr-develop-stack (sin push)`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
-## Conciliación vigente — 2026-10-26
+## Conciliación vigente — 2026-11-01
+
+Conciliación contra evidencia del repo y de GCP (lectura), hecha el 2026-11-01 tras el release `935583f88db0`.
+
+**Hecho y con evidencia**
+
+- Evaluación ofensiva propia: [dossier del 25-10](../../audits/auth-server/AUTH_SERVER_RED_TEAM_2026-10-25.md) con 20 casos
+  (B01–B20), seis hallazgos corregidos con retest, y [revisión separada de protocolo](../../audits/auth-server/2026-10-25-independent-protocol-review.md)
+  (hallazgo medio de retorno magic-link corregido, 146 PASS). Refutación por agente separado: 18 PASS, B15/B20 parciales.
+  Sin certificación de tercero, por decisión del operador.
+- Casos externo-sobre-interno (a)/(b) de TASK-1831: `efeonce-mcp` rama local `codex/auth-gateway-assurance@9fb877b`,
+  `test/auth-assurance-1831.test.ts` 3 PASS en local el 28-10. No hay repetición productiva Entra.
+- En producción desde el release `935583f88db0` (`auth-server-00170-qlx`): first-party y OTP ON sólo para Rooms, y las cinco
+  señales nuevas (`auth.keys.rotation_overdue`, `auth.first_party.code_reuse_detected`, `auth.invitation_otp.*`) en
+  `getAuthServerSignals`. Runbooks de [incidente](../../operations/runbooks/auth-server-incident.md) y
+  [rotación](../../operations/runbooks/auth-server-key-rotation.md) publicados.
+
+**Hecho pero NO integrado** — la rama local `codex/auth-pr-develop-stack` (punta `dddc922d7`, 2026-10-29) no existe en
+`origin` y su contenido no está en `develop` ni en producción (diff de 42 archivos de Auth contra `develop`):
+
+- Revocación de consentimiento y de familias de tokens en una sola operación (`revokeConsentAndGrants`); hoy son dos pasos
+  y un fallo intermedio deja el consentimiento revocado con tokens vivos. Prueba SQL red/green 3 PASS en local.
+- Recuperación de acceso atómica con su auditoría (`persons/recovery.ts` + stores).
+- Respuesta 413 antes de cerrar un cuerpo excesivo (`services/auth-server/app.ts`); hoy el socket se corta sin respuesta.
+- Job aislado de rotación de llaves: migración `20261029092236733_task-1833-auth-key-maintenance.sql`, ledger, CLI de
+  recuperación y workflow `auth-key-maintenance-deploy.yml`.
+- Inventario técnico de privacidad V2 corregido (`0ab888728`).
+
+**Falta**
+
+- Integrar esa rama a `develop` con sus gates y promoverla por el release.
+- Rotación de llave real en staging y producción con scheduler. Lectura GCP del 2026-11-01: no existe Job ni Scheduler de
+  rotación; KMS tiene las versiones 1 y 2, ambas del 2026-09-04. La señal `auth.keys.rotation_overdue` avisa pasados
+  80 días de la llave activa, alrededor del 2026-11-23.
+- Ventana steady de 7 días de las señales en producción; corre desde el 2026-11-01 y no se ha medido.
+- Simulacro de revocación masiva y ensayo de runbooks en staging.
+- Aprobación responsable de privacidad V2; la revisión técnica existe, sin decisión de tratamiento ni plazos.
+- Cobertura ofensiva CIMD/SSRF y gateway roles-sin-scope: bloqueada por el control automático de seguridad, sin reintento.
+
+## Conciliación 2026-10-26 (histórica)
 
 Canary de identidad y correo ya completado: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). [Auth retenido en PR](../../audits/rooms/2026-10-26-auth-deploy-control.md). No ampliar esa prueba a assurance completo, login Greenhouse, clientes o nueva activación. CI general y Vercel de ambos HEAD PR263/264 PASS según el [readback documental26Oct](../../audits/rooms/2026-10-26-docs-skills-state-readback.json); ambas PR siguen abiertas y retenidas. Los criterios aún abiertos abajo mantienen su razón y alcance.
 
@@ -412,18 +451,18 @@ la activación productiva usa canaries acotados, no ataques de carga contra SQL 
 
 - [ ] Cambio de frontera de TASK-1836 cubierto por assurance: externo del mismo issuer sin autoridad interna, binding no derivado de email y revocación con token vigente.
 
-- [ ] Catálogo de abuse cases con ≥ 10 casos ejecutados, cada uno con resultado y refutación cruzada.
+- [x] Catálogo de abuse cases con ≥ 10 casos ejecutados, cada uno con resultado y refutación cruzada. Matriz de 20 casos con refutación separada: 18 PASS, B15/B20 parciales con límites en el [dossier](../../audits/auth-server/AUTH_SERVER_RED_TEAM_2026-10-25.md); no acredita assurance completo.
 - [ ] Un cliente o parámetro no confiable no puede inyectar marca/return ni autodeclararse `first_party_sign_in`;
       code, token, cookie y sesión de RP A fallan en RP B.
 - [ ] Fast path first-party sin UI y recovery/legacy sin loops están ejercitados; la misma sesión no omite el
       consentimiento de un cliente MCP nuevo, scopes elevados ni el step-up de escritura.
-- [ ] Evidencia reproducible de los casos externo-sobre-interno entregada a `TASK-1831`, con sus criterios (a) y (b)
-      tildados allá o el bloqueo declarado con razón.
-- [ ] Evaluación ofensiva propia>=10casos con alcance documentado, revisión independiente de otro agente, retest y sin críticos/altos abiertos; expresamente sin certificación de tercero.
-- [ ] Rotación de llave ejercitada en staging y producción; scheduler trimestral activo con verificación.
+- [x] Evidencia reproducible de los casos externo-sobre-interno entregada a `TASK-1831`, con sus criterios (a) y (b)
+      tildados allá: `efeonce-mcp` rama local `codex/auth-gateway-assurance@9fb877b`, `test/auth-assurance-1831.test.ts` 3 PASS en callback y HTTP MCP; no acredita producción.
+- [ ] Evaluación ofensiva propia>=10casos con alcance documentado, revisión independiente de otro agente, retest y sin críticos/altos abiertos; expresamente sin certificación de tercero. Sin tildar: el HIGH provisional de CIMD tiene corrección defensiva local, pero la validación ofensiva CIMD/gateway quedó bloqueada y las correcciones del 28–29 de octubre no están integradas.
+- [ ] Rotación de llave ejercitada en staging y producción; scheduler trimestral activo con verificación. Sin tildar: el Job existe sólo en la rama local; GCP no tiene Job ni Scheduler de rotación (lectura 2026-11-01).
 - [ ] Señales del dominio registradas en el control plane con steady y severidad. Ocho existentes y cinco nuevas integradas localmente; 17 tests de lectores PASS y SQL agregado real PASS. Ventana productiva steady aún pendiente; no se tilda por código.
-- [ ] Runbooks de incidente, rotación y revocación masiva publicados y ensayados en staging.
-- [ ] Revisión de privacidad V2 publicada con retención por tabla y registro de actividades.
+- [ ] Runbooks de incidente, rotación y revocación masiva publicados y ensayados en staging. Sin tildar: publicados, simulacro masivo pendiente.
+- [ ] Revisión de privacidad V2 publicada con retención por tabla y registro de actividades. Sin tildar: revisión técnica publicada; decisiones de tratamiento, plazos y aprobación responsable pendientes, y el inventario corregido sigue en la rama local.
 
 ## Verification
 

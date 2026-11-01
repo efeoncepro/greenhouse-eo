@@ -4,6 +4,21 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-11-01 — Conciliación de TASK-1833: trabajo de seguridad sin integrar
+
+- La evaluación ofensiva propia (20 casos, refutación separada) y los casos (a)/(b) de TASK-1831 están hechos; se
+  tildaron en `develop` los dos criterios que los respaldan. Esa conciliación existía antes sólo en ramas de Codex.
+- 🔴 **Rama local `codex/auth-pr-develop-stack`** (punta `dddc922d7`, 2026-10-29) **no está en `origin`** y su contenido no
+  llegó a `develop` ni a producción: revocación de consentimiento + tokens atómica, recuperación atómica, 413 antes de
+  cerrar un cuerpo excesivo, Job aislado de rotación (migración `20261029092236733`, workflow `auth-key-maintenance-deploy.yml`)
+  e inventario de privacidad corregido. El release `935583f88db0` sólo tomó de ella el feed del login. Integrarla
+  (con sus gates y release) es el paso que desbloquea el cierre de TASK-1833. Lo mismo vale para `efeonce-mcp`
+  rama local `codex/auth-gateway-assurance@9fb877b` (tests (a)/(b)).
+- GCP (lectura 2026-11-01): sin Job ni Scheduler de rotación; KMS versiones 1 y 2 del 2026-09-04.
+  `auth.keys.rotation_overdue` avisará pasados 80 días, alrededor del 2026-11-23.
+- Faltan además: ventana steady de 7 días, simulacro de revocación masiva en staging, aprobación de privacidad V2 y la
+  cobertura ofensiva CIMD/gateway bloqueada.
+
 ## 2026-11-01 — Retención levantada y Efeonce ID en `main`: 00170 con carrusel de novedades, release `released`
 
 - Operador: «Ok pasa todo develop a main, todo con /release» y «Autorizo todo». Release `935583f88db0-544b3943-a041-4fe6-9e62-03aca45c6c8f`
