@@ -140,6 +140,33 @@ describe('TASK-1834 first-party OIDC authority', () => {
     expect((await h.handler(request(continuation)))!.headers.Location).toContain(callback)
   })
 
+  it('an expired continuation sends the person back to the RP with login_required instead of a dead end', async () => {
+    const h = await fixture()
+    const response = await h.handler(request(h.authorizeUrl({ prompt: 'login' })))
+    const continuation = new URL(response!.headers.Location, issuer).searchParams.get('return_to')!
+
+    h.advance(12 * 60) // slow Microsoft MFA: the 10-minute request expired before the person came back
+    h.setIdentity({ ...h.identity()!, sessionHash: '3'.repeat(64), authTime: h.now() })
+    const back = await h.handler(request(continuation))
+    const target = new URL(back!.headers.Location)
+
+    expect(back!.status).toBe(302)
+    expect(target.origin + target.pathname).toBe(callback)
+    expect(Object.fromEntries(target.searchParams)).toEqual({ error: 'login_required', error_description: 'first_party_request_expired', state: 'state-secret', iss: issuer })
+    expect(target.searchParams.has('code')).toBe(false)
+  })
+
+  it('a browser gets the Efeonce ID error page, not JSON, when the continuation cannot be recovered', async () => {
+    const h = await fixture()
+    const unknown = '/oauth/authorize?' + new URLSearchParams({ client_id: h.registered.client.clientId, first_party_request: 'efpt_' + 'x'.repeat(32) })
+    const browser = await h.handler({ ...request(unknown), headers: new Headers({ accept: 'text/html,application/xhtml+xml' }) })
+
+    expect(browser!.status).toBe(400)
+    expect(browser!.headers['Content-Type']).toContain('text/html')
+    expect(browser!.body).not.toContain('{"error"')
+    expect((await h.handler(request(unknown)))!.headers['Content-Type'] ?? '').not.toContain('text/html')
+  })
+
   it('prompt none without a session returns login_required to the exact RP with state and issuer', async () => {
     const h = await fixture()
 
