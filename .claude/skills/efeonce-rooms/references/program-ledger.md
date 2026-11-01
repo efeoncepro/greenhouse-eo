@@ -7,6 +7,12 @@
 
 ## Estado vigente (2026-11-01)
 
+- **PR #13 y #14 (`main@4932753`), en producción desde 2026-11-01:** la palabra de «el acceso se detuvo» se ajusta al
+  anillo según su largo (antes «Espera.», «Aún no.» y «Otra vez.» se salían) y la esquina superior quedó sin el rótulo
+  «Acceso a Rooms». Deploy `efeonce-rooms-mxfpl8vcw`, alias reasignado. Además, registro saneado `rooms.db.init_failed`
+  y `rooms.db.connect_failed` para el login intermitente de [ISSUE-189](../../../../docs/issues/open/ISSUE-189-rooms-login-unavailable-on-cold-start.md)
+  (abierto, causa sin confirmar). Lección: una palabra de tamaño fijo dentro de una forma fija revienta con la palabra
+  más larga del copy; el tamaño debe derivarse del largo.
 - **PR #12 (`main@30845e7`), en producción desde 2026-11-01 (`vivo`):** invitación de propuesta B2B 30 días por defecto /
   90 tope (antes 24 h), sesión del invitado 8 h (antes 15 min, tope 1 h), formulario en días. Migración `1793268000000`
   (CHECK de `rooms.invitation_sessions` a 12 h) aplicada en `rooms_production` ANTES del merge, con respaldo
