@@ -451,27 +451,27 @@ Puntos que el agente debe confirmar en Discovery:
 
 ## Acceptance Criteria
 
-- [ ] El operador aprobó en el canvas los artboards de la casa, la vista por sala, la reversa y «Crear sala»; el
+- [x] El operador aprobó en el canvas los artboards de la casa, la vista por sala, la reversa y «Crear sala»; el
   wireframe cita el asset y la aprobación.
-- [ ] `/rooms` muestra la actividad de agentes como región principal y conserva la lista de salas con su paginación.
-- [ ] Cada entrada `release`/`access` muestra agente y persona, qué, cuándo, canal y el resumen del servidor.
-- [ ] El botón de reversa aparece sólo cuando el reader entrega un descriptor permitido; nunca se componen dos
+- [x] `/rooms` muestra la actividad de agentes como región principal y conserva la lista de salas con su paginación.
+- [ ] (parcial: el reader no entrega resumen ni detalle; se muestra quién, qué, cuándo y canal) Cada entrada `release`/`access` muestra agente y persona, qué, cuándo, canal y el resumen del servidor.
+- [x] El botón de reversa aparece sólo cuando el reader entrega un descriptor permitido; nunca se componen dos
   comandos en el navegador.
-- [ ] La reversa pide confirmación y cubre hecho, ya revertida, ya no activa, conflicto, sin permiso, último
+- [x] La reversa pide confirmación y cubre hecho, ya revertida, ya no activa, conflicto, sin permiso, último
   administrador e incierto (reintento con la misma `Idempotency-Key`).
-- [ ] Tope y rechazo tienen su estado visible con texto, no sólo color.
-- [ ] «Crear sala» existe y lleva a `/rooms/:roomId/authoring`; cada fila tiene «Abrir autoría» (con `content.edit`) y
+- [x] Tope y rechazo tienen su estado visible con texto, no sólo color.
+- [x] «Crear sala» existe y lleva a `/rooms/:roomId/authoring`; cada fila tiene «Abrir autoría» (con `content.edit`) y
   «Actividad».
-- [ ] `/rooms/:roomId/actividad` existe con «Ver como cliente», «Abrir autoría», «Invitaciones» y «Qué cambió».
-- [ ] `?accion=` enfoca la entrada o dice «Esa acción no está disponible para ti.» sin revelar datos.
-- [ ] Todo el copy visible vive en `src/lib/copy/rooms.ts`; sin voseo.
-- [ ] Ningún bloque de Bricolage de varias líneas va entero en negrita: los titulares alternan pesos.
-- [ ] Sin hex ni medidas literales: sólo tokens de `theme.ts`.
-- [ ] Movimiento reducido no desplaza la página al enfocar una acción.
-- [ ] GVC desktop y móvil capturado y mirado (1440, 1280, 390) sin scroll horizontal; scorecard sobre el umbral.
-- [ ] `UI ready` siguió en `no` hasta tener aprobación, implementation mapping, plan GVC y decision log; si pasa a
+- [x] `/rooms/:roomId/actividad` existe con «Ver como cliente», «Abrir autoría», «Invitaciones» y «Qué cambió».
+- [x] `?accion=` enfoca la entrada o dice «Esa acción no está disponible para ti.» sin revelar datos.
+- [x] Todo el copy visible vive en `src/lib/copy/rooms.ts`; sin voseo.
+- [x] Ningún bloque de Bricolage de varias líneas va entero en negrita: los titulares alternan pesos.
+- [x] Sin hex ni medidas literales: sólo tokens de `theme.ts`.
+- [x] Movimiento reducido no desplaza la página al enfocar una acción.
+- [ ] (capturas Playwright en 1440, 1280 y 390, con y sin movimiento reducido, sin scroll horizontal; falta pnpm fe:capture y scorecard) GVC desktop y móvil capturado y mirado (1440, 1280, 390) sin scroll horizontal; scorecard sobre el umbral.
+- [x] `UI ready` siguió en `no` hasta tener aprobación, implementation mapping, plan GVC y decision log; si pasa a
   `yes`, `pnpm task:lint --task TASK-2085` queda sin hallazgos.
-- [ ] Recorrido real en local: un agente por CLI invita, la persona revierte y la invitación deja de servir.
+- [ ] (pendiente: no se ejercitó con un agente real) Recorrido real en local: un agente por CLI invita, la persona revierte y la invitación deja de servir.
 
 ## Verification
 
@@ -481,8 +481,8 @@ Puntos que el agente debe confirmar en Discovery:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
