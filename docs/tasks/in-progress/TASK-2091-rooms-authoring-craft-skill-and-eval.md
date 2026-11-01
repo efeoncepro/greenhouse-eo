@@ -29,7 +29,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-052`
-- Status real: `Slices 1–3 code complete en local (2026-10-31): skill efeonce-rooms-authoring espejada, eval con dos briefs, score.mjs con selftest verde (2 PASS, 3 negativos que fallan, 1 sintético informado) y check de frescura que falla sin recibo vivo. Falta slice 4: corrida viva contra Rooms local con recibo PASS; sin recibo la skill no se usa con clientes reales.`
+- Status real: `Slices 1–4 hechos: corrida viva local 2026-11-01 con recibo PASS (sha256:07e05622…d2d6), atribución agent/claude-code/cli, 8 avisos y reversas invitations.revoke + rooms.archive ejecutadas desde el descriptor (docs/audits/rooms/2026-11-01-authoring-eval-live-run.md). Pendiente: corregir score.mjs capture (falla sin borrador) y record (guarda transfer.url) — exige corrida nueva; regla de vigencia de invitaciones en la skill; firmante del recibo; cablear la frescura.`
 - Rank: `antes del primer cliente real y antes de cualquier cambio de la skill de oficio`
 - Domain: `platform|content`
 - Blocked by: `TASK-2084 solo para la parte viva (atribución del agente en la corrida del eval); el texto de la skill no está bloqueado`
@@ -287,11 +287,11 @@ del brief que declara `real` en un entorno local aislado, nunca en producción.
 - [x] La skill cubre capítulos, las cuatro escenas, pruebas, cobertura, «Ver como», publicar, invitar y reversa, cada uno con los comandos reales de Rooms.
 - [x] La skill prohíbe marcadores entre corchetes en salas reales y afirmaciones sin fuente, y explica la regla Bricolage de varias líneas.
 - [x] Hay dos briefs sintéticos con su sala esperada y `score.mjs` calcula las cinco métricas.
-- [ ] (pendiente slice 4: aún no hay corrida viva) Una corrida local de los dos briefs produce un recibo con las cinco métricas en PASS.
+- [x] Una corrida local de los dos briefs produce un recibo con las cinco métricas en PASS.
 - [x] Una sala con un correo invitado fuera del brief hace fallar la métrica de invitaciones (caso negativo).
 - [x] Una sala real con un marcador `[PLAZO]` hace fallar la métrica de marcadores (caso negativo).
 - [x] Cambiar la skill sin un recibo PASS para su hash hace fallar el check de frescura.
-- [ ] Con TASK-2084 cerrada, la corrida viva registra `actor_kind=agent` y ejecuta una reversa de publicación y otra de invitación.
+- [x] (TASK-2084 en producción, aún in-progress; corrida local) La corrida viva registra `actor_kind=agent` y ejecuta una reversa de publicación y otra de invitación.
 
 ## Verification
 
