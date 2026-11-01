@@ -27,7 +27,11 @@
   palabra con la esfera como punto, titular, acciones y nota bajo línea) es la pieza única de la familia: `/salir`, la
   portada («Entra», Efeonce ID, sala de ejemplo, nota para invitados) y el 404 general («Aquí no», ir a Rooms, nota de
   abrir el enlace del correo completo), aprobados en canvas. Copy en `INVITATION_COPY.access.{entry,notFound,signedOut}`.
-  Deploy `efeonce-rooms-f511d5vjm`, alias reasignado. Fuera de la familia todavía: el error inesperado (`error.tsx`).
+  Deploy `efeonce-rooms-f511d5vjm`, alias reasignado.
+- **PR #21 (`main@cfa8c62`), en producción desde 2026-11-01:** el error inesperado (`error.tsx`) entra a la familia:
+  «De nuevo», Reintentar / Ir a Rooms y la referencia = `digest` de Next (el mismo id del registro del servidor; sin
+  digest no hay nota). Verificado en local con una ruta que lanzaba a propósito (no commiteada); el React #441 en consola
+  es la forma de producción del error de servidor provocado, no del cambio. Deploy `efeonce-rooms-9hcm8slr3`.
   Nota: un URL inexistente bajo `/demo` también cae en el 404 general (Next usa el not-found raíz para rutas sin
   match); `app/demo/not-found.tsx` sólo cubre `notFound()` dentro de la demo. **Regla:** la raíz sin sesión nunca redirige a
   `/rooms`; un destino protegido tras cerrar sesión vuelve a entrar solo con la sesión de Efeonce ID abierta.
