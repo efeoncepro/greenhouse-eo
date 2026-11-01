@@ -55,6 +55,7 @@ import { createInternalAuthRuntime, createRuntimeMultiOrgGrantsResolver } from '
 import { createNativeGrantsPort } from '@/lib/auth-server/internal/grants'
 import { createFirstPartyRuntime } from '@/lib/auth-server/first-party/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { createCachedLoginAnnouncementsLoader } from '@/lib/auth-server/persons/login-announcements'
 
 import { createAuthServerRequestHandler, SERVICE_NAME } from './app'
 
@@ -81,6 +82,7 @@ const getSigner = (): KmsSignerPort => {
 
 const personStore = new PostgresPersonAuthStore()
 const oauthStore = new PostgresOAuthStore()
+const loadLoginAnnouncements = createCachedLoginAnnouncementsLoader()
 
 const firstParty = createFirstPartyRuntime({ oauth: oauthConfig, persons: personAuthConfig, auditStore: oauthStore,
   signer: payload => signWithActiveKey({ signer: getSigner(), payload }) })
@@ -90,6 +92,7 @@ const expectedSourceSystem = expectedSourceSystemFor(oauthConfig.environmentId)
 /** Deps compartidas por el router de personas y por el `SubjectSessionPort` que consume `authorize`. */
 const personDeps = {
   resolveProductContext: firstParty.loginContext,
+  loadLoginAnnouncements,
   internalLoginEnabled: () => internalAuthEnabled() && personAuthConfig.personAuthEnabled && oauthConfig.oauthEnabled,
   store: personStore,
   config: personAuthConfig,

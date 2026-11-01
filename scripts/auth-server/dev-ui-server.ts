@@ -2,6 +2,7 @@
 import { createServer } from 'node:http'
 
 import type { LoginAnnouncementDto } from '../../src/lib/login-announcements/types'
+import { loadPublicLoginAnnouncements } from '../../src/lib/auth-server/persons/login-announcements'
 
 import { internalLoginFailureResponse } from '../../src/lib/auth-server/internal/login-error-page'
 
@@ -165,6 +166,23 @@ return
 
   // Exact paths: no arbitrary filesystem lookup, query-driven fixtures or redirects.
   const path = request.url ?? ''
+
+  // Read-only preview of the exact published editorial feed used by the issuer wiring.
+  if (path === '/login/public-feed-preview') {
+    void loadPublicLoginAnnouncements().then(publicAnnouncements => {
+      const result = renderLoginPageResponse(200, {
+        returnTo, internalLoginUrl: '/noop/microsoft', announcements: publicAnnouncements
+      })
+
+      response.writeHead(result.status, {
+        ...result.headers,
+        'X-Auth-UI-Harness': 'public-editorial-preview-no-authentication'
+      })
+      response.end(result.body)
+    })
+
+    return
+  }
 
   if (path === '/internal-error') {
     const result = internalLoginFailureResponse(
