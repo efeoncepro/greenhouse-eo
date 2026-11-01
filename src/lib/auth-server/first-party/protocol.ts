@@ -2,7 +2,8 @@
 import { buildRequestAuditContext, enforceOAuthRateLimit, recordOAuthAudit } from '../oauth/audit'
 import { parseClientCredentials } from '../oauth/clients'
 import { OAuthProtocolError, isOAuthProtocolError } from '../oauth/errors'
-import { jsonResponse, redirectResponse, type OAuthHttpRequest, type OAuthHttpResponse } from '../oauth/http'
+import { acceptsHtml, htmlResponse, jsonResponse, redirectResponse, type OAuthHttpRequest, type OAuthHttpResponse } from '../oauth/http'
+import { renderErrorPage } from '../oauth/pages/render'
 import { generateOpaqueToken, isPkceToken, safeEquals, sha256Hex, verifyPkceS256 } from '../oauth/primitives'
 import type { OAuthStorePort } from '../oauth/store/port'
 import { parseTokenForm } from '../oauth/token'
@@ -93,7 +94,11 @@ const resolveAuthorization = async (url: URL, client: FirstPartyClient, deps: Fi
   const hash = sha256Hex(raw)
   const transaction = await deps.store.getLoginTransaction(hash)
 
-  if (!transaction || transaction.clientId !== client.clientId || transaction.consumedAt || transaction.expiresAt <= now) fail('invalid_request', 'first_party_transaction_expired')
+  if (!transaction || transaction.clientId !== client.clientId || transaction.consumedAt) fail('invalid_request', 'first_party_transaction_expired')
+  // A login that outlived its request (slow MFA, a tab left open) is recoverable: the stored request was validated
+  // against this client when it was created, so the person goes back to the product with `login_required` and its
+  // own state, and the product starts a fresh request. Never a code, never a dead end. A reused one stays an error.
+  if (transaction.expiresAt <= now) return { args: parseAuthorization(new URL(transaction.authorizationUrl), client), transaction: null, hash: null, stale: true as const }
 
   return { args: parseAuthorization(new URL(transaction.authorizationUrl), client), transaction, hash }
 }
@@ -102,6 +107,18 @@ const authorize = async (request: OAuthHttpRequest, client: FirstPartyClient, de
   if (request.method !== 'GET') return jsonResponse(405, { error: 'invalid_request' }, { Allow: 'GET' })
   const resolved = await resolveAuthorization(request.url, client, deps, now)
   const { args, transaction } = resolved
+
+  if ('stale' in resolved) {
+    const target = new URL(args.redirectUri)
+
+    target.searchParams.set('error', 'login_required')
+    target.searchParams.set('error_description', 'first_party_request_expired')
+    target.searchParams.set('state', args.state)
+    target.searchParams.set('iss', deps.config.issuer)
+
+    return redirectResponse(target.toString())
+  }
+
   const rawIdentity = await deps.identity.resolveRequest(request, now)
   const identity = currentIdentity(rawIdentity, deps, client, now)
   const age = identity ? (now.getTime() - identity.authTime.getTime()) / 1000 : Infinity
@@ -283,6 +300,9 @@ export const createFirstPartyHandler = (deps: FirstPartyDeps) => async (request:
     if (!isOAuthProtocolError(error)) throw error
     if (error.code !== 'slow_down') await recordOAuthAudit(deps.auditStore, audit, { eventType, outcome: 'rejected', clientId,
       grantId: null, errorCode: error.code, details: { flowClass: 'first_party_sign_in', reason: error.reason } })
+
+    // A person in a browser gets the designed Efeonce ID page, never raw JSON; API clients keep the JSON contract.
+    if (path === '/oauth/authorize' && request.method === 'GET' && acceptsHtml(request)) return htmlResponse(error.statusCode, renderErrorPage(error.code))
 
     return jsonResponse(error.statusCode, error.toBody(), error.code === 'invalid_client' ? { 'WWW-Authenticate': 'Basic realm="oauth"' } : {})
   }
