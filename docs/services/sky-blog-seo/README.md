@@ -4,8 +4,9 @@ Estado: marco operativo interno aprobado para preparación por Julio el 15-10-20
 las cantidades finales y las metas numéricas siguen sujetos a su fuente firmada y a la auditoría. Inicio
 acordado en reunión: 01-11-2026; kickoff operativo: 02-11-2026 a las 10:00, Chile. No se verificó el calendario.
 
-Estado al 23-10-2026: auditoría consolidada entregable e informe A4 para SKY generado y revisado; correos
-redactados; **nada enviado a SKY**. El expediente del encargo vive en [`caso-auditoria-2026-10/`](caso-auditoria-2026-10/README.md)
+Estado al 01-11-2026: informe A4 enviado el 23-10 a Pilar y Natalia; SKY restauró los nueve artículos de Perú y
+entregó administrador de WordPress; deck del kickoff armado (ver el [caso](caso-auditoria-2026-10/KICKOFF_2026-11-02_INSUMOS.md#7-deck-y-equipo-confirmados-el-01-11)).
+El expediente del encargo vive en [`caso-auditoria-2026-10/`](caso-auditoria-2026-10/README.md)
 y sus cifras salen sólo de [HECHOS.md](caso-auditoria-2026-10/HECHOS.md).
 
 ## Resultado y alcance
@@ -74,6 +75,7 @@ El informe A4 (23 páginas) se regenera con `pnpm exec tsx scripts/seo/sky-blog-
 | Anexo firmado + cambios aprobados | Alcance comercial, cantidades, precio, condiciones y responsabilidades contractuales. Pendiente de incorporar. |
 | [Reunión con Natalia y Pilar, 15-10](https://app.notion.com/p/3fa39c2fefe78144b63bead05c21d173) | Expectativas y compromisos, contrastados con la transcripción. |
 | [Playbook Producción · Blog SKY](https://app.notion.com/p/06531fec27634eed98b73094ba05ce5e) | Producción de artículos y handoff; enlaza las normas de voz, imagen y rutas vigentes. |
+| «SKY Blog · Sistema visual de imágenes» (Daniela Ferreira, 18 láminas, enviado el 30-10 por Teams) | Criterio fotográfico del blog. SharePoint Sky-Efeonce: `Documentos compartidos/General/SKY Blog SEO/01 Onboarding/SKY_Blog_Sistema_Visual.pdf` (sincronizado en OneDrive «Sky - Efeonce - General/SKY Blog SEO/01 Onboarding/»). Dirección por validar con el equipo; su aprobación se pidió a Marca SKY en el kickoff. |
 | Notion del cliente / Content Hub | Inventario editorial, responsables, aprobaciones, calendario y estado operativo. |
 | WordPress | Contenido y configuración efectiva; publicar se confirma abriendo la URL final. |
 | GA4 / GSC conectados a SKY | Desempeño propio. Cada fuente conserva su métrica y calendario. |
@@ -85,12 +87,25 @@ playbook, que ha evolucionado después de esa propuesta. No copiar aquí dimensi
 
 ## Responsables y dependencias
 
-- **Julio / liderazgo SEO Efeonce:** auditoría, prioridades, metodología, decisiones técnicas y rendición de resultados.
+Equipo Efeonce asignado a la cuenta (confirmado por Julio el 01-11-2026):
+
+- **Julio Reyes · SEO Account Strategist** (temporalmente): auditoría, prioridades, metodología, decisiones técnicas y rendición de resultados.
+- **Valentina Hoyos · Content Lead:** reemplaza a María Fernanda, que figuraba como SEO Copywriter en la oferta ganadora.
+- **Daniela Ferreira · Creative Operations Lead:** autora del sistema visual de imágenes del blog.
+- **Andrés Carlosama y Melkin Hernandez · Senior Visual Designer.** Son diseñadores: el PDF de la oferta listaba a Andrés
+  como «SEO Specialist», lo que no corresponde a la operación.
+
+Los porcentajes de dedicación de la oferta no se llevaron al kickoff porque el equipo cambió.
+
+Por SKY:
+
 - **Natalia / SKY:** prioridades editoriales y de rutas, revisión de títulos/sinopsis y coordinación del contenido.
 - **Pilar / SKY:** expectativas, evaluación del servicio y último reporte del proveedor anterior.
-- **Leandro / SKY:** habilitación técnica de WordPress y coordinación de implementación. Acceso efectivo pendiente de comprobar.
+- **Leandro / SKY:** habilitación técnica de WordPress y coordinación de implementación. SKY entregó a Efeonce acceso de
+  administrador a WordPress (confirmado el 01-11).
 - **Nachira / SKY:** gestión del anexo, según la reunión. Firma pendiente de evidencia.
-- **Equipo editorial/diseño:** ejecución conforme al playbook y a los responsables actuales de cada tarea en Notion.
+
+La ejecución editorial y de diseño sigue el playbook y a los responsables actuales de cada tarea en Notion.
 
 No borrar cuentas del proveedor anterior ni reasignar autoría durante una lectura. Cualquier transición de
 usuarios conserva contenido, autoría y acceso de recuperación. El dueño técnico valida la operación concreta.
@@ -126,7 +141,8 @@ Organización: `org-b9977f96-f7ef-4afb-bb26-7355d78c981f`. Host exacto: `blog.sk
 
 - **GA4:** propiedad `354430952`, `SKY web GA4 - Prod`, calendario America/Santiago. Para adquisición, sesiones
   con landing en el blog; para consumo, vistas/actividad por página. Son cortes distintos.
-- **GSC:** propiedad `https://blog.skyairline.com/`, búsqueda web, datos finales, calendario de Google/PT.
+- **GSC:** propiedad `https://blog.skyairline.com/`, búsqueda web, datos finales, calendario de Google/PT. Es la única
+  propiedad a la que Efeonce tiene acceso (confirmado el 01-11): no hay acceso a `www.skyairline.com`.
 - **Septiembre 2026:** 38.332 sesiones con actividad en el host y 61.984 vistas GA4, todos los canales.
   GSC: 28.718 clics, 2.080.377 impresiones, CTR 1,380423% y posición media 7,769980.
 - El top 50 GA4 ordena sesiones con actividad por página. Las sesiones de distintas páginas no son aditivas.
@@ -159,19 +175,20 @@ comparar series DataForSEO de distintas fórmulas ETV.
 
 Los siete frentes de investigación, responsables propuestos y checks de cierre se mantienen en la
 [matriz de cobertura](COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md). Los pendientes del encargo del 23-10
-(envío del correo formal con el PDF, restauración de los nueve artículos de Perú, export de la propiedad GSC
-`www.skyairline.com`, acciones manuales y seguridad, acceso a WordPress, logo de SKY en Greenhouse y
-validación de escenarios en el kickoff) tienen dueño y condición de cierre en la
+(envío del correo formal, hecho el 23-10; restauración de los nueve artículos de Perú, hecha por SKY; historia de
+la propiedad GSC `www.skyairline.com`, pedida a SKY en el kickoff; acciones manuales y seguridad; acceso a WordPress,
+entregado; logo de SKY en Greenhouse y validación de escenarios en el kickoff) tienen dueño y condición de cierre en la
 [tabla del caso](caso-auditoria-2026-10/README.md#pendientes). Las dependencias comerciales y de operación
 siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
 
 - Anexo firmado y cantidades finales.
 - Acceso WordPress autenticado y registros técnicos de migración. Inventario público completado: 1.697
   posts, todos rastreados; incluye demo y duplicados, no equivale a piezas editoriales únicas.
-- Registro de despliegue y cambios históricos de medición. Julio no dispone del GSC anterior; GSC conserva
-  16 meses, así que los datos de jul–sep 2025 de la propiedad `www` o de dominio se pierden entre noviembre
-  de 2026 y enero de 2027: pedir a SKY el acceso y exportarlos ahora. Mientras tanto se avanza con GA4,
-  GSC actual, archivo y cohortes; atribución causal completa todavía no disponible.
+- Registro de despliegue y cambios históricos de medición. Antes de migrar el blog vivía en `skyairline.com/blog`,
+  así que su historia está en la propiedad GSC `www.skyairline.com`, que Efeonce todavía no tiene. GSC conserva
+  16 meses: los datos de jul–sep 2025 se pierden entre noviembre de 2026 y enero de 2027. En el kickoff se pidió a
+  SKY la decisión «Historia de Search Console»: SKY da acceso a la propiedad `www` y Efeonce exporta. Mientras tanto
+  se avanza con GA4, GSC del blog, archivo y cohortes; atribución causal completa todavía no disponible.
 - Último informe del proveedor anterior y prioridades de rutas confirmadas por SKY.
 - Definición y validación del tráfico orgánico de entrada GA4 por host en informes automáticos.
 - Validación con SKY de nombres, lectura y cadencia del indicador monetario.

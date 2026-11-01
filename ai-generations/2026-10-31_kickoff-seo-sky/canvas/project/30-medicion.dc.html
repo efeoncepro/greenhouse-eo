@@ -13,34 +13,38 @@
 body{margin:0}
 p,h1,h2,h3{margin:0}
 .eb{font:500 22px/1 'Poppins',Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase}
-.h{font-family:'Bricolage Grotesque',Arial,sans-serif;font-weight:720;font-size:60px;line-height:1.04;letter-spacing:-.025em;text-wrap:balance}
-.tr{display:grid;grid-template-columns:1.25fr 0.8fr 1.1fr 1fr;gap:0;align-items:center;border-top:1px solid #e3e7ec;min-height:78px}
-.th{font-size:18px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#6d6777}
-.td{font-size:21px;line-height:1.35;padding-right:28px}
-.k{font-size:23px;font-weight:600}
-.v{font-variant-numeric:tabular-nums}
+.q{display:flex;flex-direction:column;background:#ffffff;border-radius:24px;padding:32px 34px 30px;border-top:6px solid #0e8c82}
+.qn{font-family:'Bricolage Grotesque',Arial,sans-serif;font-weight:760;font-size:22px;color:#0e8c82;letter-spacing:.02em}
+.qq{font-family:'Bricolage Grotesque',Arial,sans-serif;font-weight:740;font-size:38px;line-height:1.05;letter-spacing:-.025em;margin-top:10px;color:#023c70}
+.big{font-family:'Bricolage Grotesque',Arial,sans-serif;font-weight:760;font-size:64px;line-height:.95;letter-spacing:-.04em;color:#023c70;margin-top:28px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bl{font-size:19px;line-height:1.4;color:#023c70;font-weight:600;margin-top:10px}
+.bs{font-size:18px;line-height:1.4;color:#6d6777;margin-top:2px}
+.sec{margin-top:auto;padding-top:20px;border-top:1px solid #e3e7ec;min-height:144px;box-sizing:border-box}
+.sk{font-size:15px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#6d6777}
+.sv{font-size:21px;line-height:1.35;color:#023c70;margin-top:6px}
+.rt{display:flex;align-items:baseline;gap:14px}
+.rt b{font-family:'Bricolage Grotesque',Arial,sans-serif;font-size:26px;font-weight:740;color:#0e8c82;white-space:nowrap}
+.rt span{font-size:20px;line-height:1.35;color:#023c70}
 </style>
 </helmet>
 <div style="width: 1920px; height: 1080px; position: relative; overflow: hidden; box-sizing: border-box; background: #f7f8f6; color: #023c70; font-family: 'Poppins', Arial, sans-serif;">
-<div style="position: absolute; left: 128px; right: 128px; top: 112px; bottom: 150px; display: flex; flex-direction: column; gap: 36px;">
-<div style="display: flex; flex-direction: column; gap: 22px;">
-<p class="eb" style="color: #0e8c82;">05 · Cómo vamos a medir</p>
-<h2 class="h">Cada mes, el mismo cuadro y el mismo método</h2>
+<div style="position: absolute; left: 128px; right: 128px; top: 100px; display: flex; flex-direction: column; gap: 20px;">
+<p class="eb" style="color: #0e8c82;">02 · Cómo vamos a medir</p>
+<h2 style="font-family: 'Bricolage Grotesque', Arial, sans-serif; font-weight: 760; font-size: 62px; line-height: 1; letter-spacing: -0.035em; white-space: nowrap;">Cada mes respondemos tres preguntas, <span style="color: #0e8c82;">con el mismo método.</span></h2>
 </div>
-<div style="display: flex; flex-direction: column; background: #ffffff; border-radius: 22px; padding: 12px 36px 8px;">
-<div class="tr" style="border-top: none; min-height: 60px;"><p class="th">Indicador</p><p class="th">Fuente</p><p class="th">Punto de partida</p><p class="th">Cómo se lee</p></div>
-<div class="tr"><p class="td k">Visitas orgánicas al blog</p><p class="td">Analytics 4</p><p class="td v">Nov 44.000 · Dic 49.500 · Ene 67.900</p><p class="td">Contra el mismo mes del año anterior</p></div>
-<div class="tr"><p class="td k">Clics y posición en Google</p><p class="td">Search Console</p><p class="td v">Sep 2026: 28.718 clics · posición 7,8</p><p class="td">Separando marca y búsquedas generales</p></div>
-<div class="tr"><p class="td k">Perú en el top 3</p><p class="td">Semrush</p><p class="td v">98 búsquedas</p><p class="td">Meta de trabajo: hacia 200</p></div>
-<div class="tr"><p class="td k">Artículos trabajados</p><p class="td">Search Console</p><p class="td">Su propio punto de partida</p><p class="td">A 28 y 56 días de cada cambio</p></div>
-<div class="tr"><p class="td k">Valor en publicidad</p><p class="td">Semrush y Search Console</p><p class="td v">US$ 6–16 mil al mes</p><p class="td">Siempre como rango</p></div>
-<div class="tr"><p class="td k">Visitas desde asistentes de IA</p><p class="td">Analytics 4</p><p class="td v">~650 al mes · ≈2 %</p><p class="td">Se vigila: más de 90 % llega desde ChatGPT</p></div>
+<div style="position: absolute; left: 128px; right: 128px; top: 252px; height: 560px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
+<div class="q"><p class="qn">01</p><p class="qq">¿Estamos recuperando?</p><p class="big">44.000</p><p class="bl">Visitas orgánicas a superar en noviembre · GA4</p><p class="bs">El mismo mes del año anterior. Luego Dic 49.500 · Ene 67.900.</p><div class="sec"><p class="sk">Y en Google</p><p class="sv">Clics y posición en Search Console, separando marca y búsquedas generales. Sep 2026: 28.718 clics · posición 7,8.</p></div></div>
+<div class="q"><p class="qn">02</p><p class="qq">¿Funciona lo que hacemos?</p><p class="big">98 <span style="color: #0e8c82;">→ 200</span></p><p class="bl">Perú en el top 3 de Google · Semrush</p><p class="bs">Hoy 98 búsquedas; la meta de trabajo es 200.</p><div class="sec"><p class="sk">Y cada artículo</p><p class="sv">Cada artículo trabajado se mide a 28 y 56 días contra su propio punto de partida en Search Console.</p></div></div>
+<div class="q"><p class="qn">03</p><p class="qq">¿Cuánto vale?</p><p class="big">US$ 6–16 mil</p><p class="bl">Valor en publicidad al mes</p><p class="bs">Semrush y Search Console. Siempre como rango, nunca como ahorro.</p><div class="sec"><p class="sk">Y lo que viene</p><p class="sv">Visitas desde asistentes de IA: ~650 al mes (≈2 %), más del 90 % desde ChatGPT.</p></div></div>
 </div>
-<p style="font-size: 22px; line-height: 1.45; color: #6d6777; max-width: 1560px;">Las visitas de Analytics y los clics de Search Console miden cosas distintas y no se suman. Las acciones hacia reservas se suman al cuadro cuando su medición esté verificada.</p>
+<div style="position: absolute; left: 128px; right: 128px; top: 846px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
+<div class="rt"><b>Cada semana</b><span>avance de las acciones</span></div>
+<div class="rt"><b>Cada mes</b><span>este cuadro, en el mismo formato</span></div>
+<div class="rt"><b>A 28 y 56 días</b><span>cada cambio, contra su inicio</span></div>
 </div>
-<div style="position: absolute; left: 128px; right: 128px; bottom: 52px; display: flex; align-items: center; justify-content: space-between; font-size: 20px; color: #6d6777;">
-<div style="display: flex; align-items: center; gap: 20px;"><img src="/_blob/eeae9be5f19f85a6e3664c6c3f483e0c" alt="efeonce" style="height: 28px; width: auto; display: block;"><span>Puntos de partida: GA4 nov-2025 a ene-2026; Search Console y Semrush a septiembre de 2026</span></div>
-<span style="font-variant-numeric: tabular-nums;">30 / 32</span>
+<div style="position: absolute; left: 128px; right: 128px; bottom: 52px; display: flex; align-items: center; justify-content: space-between; font-size: 19px; color: #6d6777;">
+<div style="display: flex; align-items: center; gap: 20px;"><img src="/_blob/eeae9be5f19f85a6e3664c6c3f483e0c" alt="efeonce" style="height: 28px; width: auto; display: block;"><span>Visitas (GA4) y clics (Search Console) miden cosas distintas y no se suman. Las acciones hacia reservas entran cuando su medición esté verificada.</span></div>
+<span style="font-variant-numeric: tabular-nums;">15 / 34</span>
 </div>
 </div>
 </x-dc>

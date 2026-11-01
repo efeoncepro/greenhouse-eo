@@ -277,6 +277,31 @@ degradado violeta de todo 2023.
 
 ---
 
+## Impacto en láminas de cliente (kickoff SKY SEO Blog, 2026-11-01)
+
+El operador pidió una y otra vez «más punch e impacto visual». Lo que lo resolvió:
+
+- **Foto limpia y a sangre.** Nunca tapada por texto ni por degradés pesados; el texto va debajo o al
+  lado, sobre navy.
+- **Una cifra dominante por columna**, tipo póster, y la clave resaltada. No tres números del mismo peso.
+- **Tabla densa → las 3 preguntas que el cliente hará cada mes**, cada una con su métrica héroe.
+- **Antes/después «en acción»** para que un diferencial se sienta: la línea genérica atenuada o tachada,
+  la voz nueva grande, con una foto que se sienta real.
+- **Día a día con el patrón «Vívelo» aprobado** (voz a la izquierda con la respuesta gigante «A la
+  vista.» + UIs de herramientas en capas —Notion, Frame.io, Teams, Loom— sobre la órbita, cursor en
+  «Aprobar»), no una grilla 2×2 de cards.
+- **Logo, no nombre, donde una parte actúa.** Los rótulos de dueño o «Quién» llevan el logo oficial
+  (Efeonce; el del cliente en un chip de su color de marca sobre fondo claro), centrado en vertical con
+  el texto (`vertical-align: middle` + un pequeño desplazamiento arriba). Nunca dentro de una oración
+  corrida ni en un nombre propio («Blog SKY»).
+- **El cursor de colaboración nombra a quien actúa, nunca lo seleccionado**: sobre el logo del cliente,
+  el cursor es Efeonce (o quien firma); sobre la respuesta o una pieza de Efeonce, puede ser el cliente.
+  Una marca no se señala a sí misma. Regla completa:
+  [`efeonce-graphic-line` → `references/composition.md`](../efeonce-graphic-line/references/composition.md)
+  («Quién nombra el cursor del colaborador»).
+
+---
+
 ## Lo que ya se lee viejo en 2026
 
 De la encuesta a creativos en activo (Creative Boom, 2026-04) y del gremio:
@@ -331,6 +356,8 @@ MUERE; nunca diseñes dependiendo de él*.
   claro lo dejan invisible/diminuto aunque el SVG "compile"). Muro de logos heterogéneo → **color en
   panel claro**, alineados por altura; monocromo sólo si TODOS son wordmarks limpios.
 - **NUNCA** contraste bajo 4,5:1 en texto normal. Es piso, no aspiración.
+- **NUNCA** texto ni degradé pesado encima de una foto client-facing: la foto va limpia y el texto, al lado.
+- **NUNCA** un cursor de colaboración con el nombre de lo que selecciona («SKY» sobre el logo de SKY).
 - **SIEMPRE** curar antes que generar. La librería del equipo es la primera parada.
 - **SIEMPRE** que dudes si algo aporta: **la carga extraneous es presupuesto robado a la
   comprensión.** Bórralo.

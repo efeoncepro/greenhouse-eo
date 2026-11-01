@@ -1,0 +1,70 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "line": "growth",
+  "role": "content",
+  "recipe": "content-team",
+  "voice": {
+    "eyebrow": "Efeonce · Blog SKY",
+    "question": "¿Quién trabaja en mi blog?",
+    "answer": [
+      "Tu squad"
+    ]
+  },
+  "body": "Personas reales y **un** solo interlocutor: tu SEO Account Strategist.",
+  "team": [
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png",
+        "alt": "Andrés, Senior Visual Designer"
+      },
+      "name": "Andrés",
+      "role": "Senior Visual Designer"
+    },
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-valentina.png",
+        "alt": "Valentina, Content Lead"
+      },
+      "name": "Valentina",
+      "role": "Content Lead"
+    },
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-julio.png",
+        "alt": "Julio, SEO Account Strategist"
+      },
+      "name": "Julio",
+      "role": "SEO Account Strategist"
+    },
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png",
+        "alt": "Daniela, Creative Operations Lead"
+      },
+      "name": "Daniela",
+      "role": "Creative Operations Lead"
+    },
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png",
+        "alt": "Melkin, Senior Visual Designer"
+      },
+      "name": "Melkin",
+      "role": "Senior Visual Designer"
+    }
+  ],
+  "center": {
+    "title": "​",
+    "note": "al centro de todo"
+  },
+  "selection": {
+    "target": "object",
+    "label": "SKY",
+    "participantKind": "role"
+  }
+}

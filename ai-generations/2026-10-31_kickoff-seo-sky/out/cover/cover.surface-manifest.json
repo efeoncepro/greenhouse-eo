@@ -333,8 +333,8 @@
               "kind": "collaborator",
               "targetId": "client-logo",
               "anchor": "top-end",
-              "label": "SKY",
-              "participantKind": "department"
+              "label": "Efeonce",
+              "participantKind": "role"
             }
           ]
         },

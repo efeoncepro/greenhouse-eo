@@ -86,6 +86,13 @@ separan sólo por el tono: añade trazo, forma o etiqueta directa. Tabla de role
 `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md`, sección «Delta 2026-09-25» (dirección
 aprobada de Efeonce Insights; implementada en el catálogo `insights-deck`).
 
+**Pérdidas en rojo, nunca en el acento de marca** (kickoff SKY SEO Blog, 2026-11-01). Barras y rellenos
+con `axisChart.directional.negative`; cifras sobre fondo claro con el semántico más oscuro,
+`axisRamp.error.500` (el valor sale de AXIS, no se copia el HEX). En estos decks el teal significa
+positivo o nuestra meta, y el coral queda reservado para «oportunidad». **Antes/ahora en una sola
+barra:** la barra entera es el antes; la parte navy, lo que queda hoy; la parte roja rayada, lo que se
+perdió, rotulada con el % de caída.
+
 **Variaciones (▲/▼):** el triángulo sigue al valor; el **tono** dice si el cambio es mejor o peor para
 esa métrica (una posición que sube empeora; una tasa donde menor es mejor que baja mejora). La
 dirección sale del dato, nunca se adivina: sin dirección conocida, tono neutro — nunca «subir = verde».
@@ -146,5 +153,7 @@ que importa** — si el dato crítico está en el nivel 6 de la jerarquía en ve
 - **NUNCA** geometría que no salga del dato. **Una barra sin dato es una barra que miente.**
 - **NUNCA** barras truncadas. **NUNCA** eje secundario. **NUNCA** pie para comparar magnitudes.
 - **NUNCA** leyenda separada cuando puedes etiquetar sobre el dato.
+- **NUNCA** una pérdida pintada con el acento de marca: el color va por rol (rojo = pérdida, teal =
+  positivo o meta, coral = oportunidad).
 - **SIEMPRE** anotación en un deck que se lee sin orador. **La flecha es el narrador ausente.**
 - **SIEMPRE** considera si un **número grande** dice más que el gráfico. Muchas veces sí.

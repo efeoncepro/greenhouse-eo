@@ -396,3 +396,18 @@ Resultado: `target.bounds 'rendered-group-including-terminal-sphere'`, padding `
 overlay `subtle` (0,1, luminosidad), cursor local `north-west` (screen-fixed), colaborador `south-west` con
 `attachment 'south-west'`. Mide la caja con `answerGroupBox(cajaDeLasPalabras, fontPx, 'Idea')`: la selección que deja
 la esfera afuera falla `answer-period-part-of-text`.
+
+**Quién nombra el cursor del colaborador (operador, 2026-11-01).** La etiqueta nombra a quien **actúa** sobre lo
+seleccionado, nunca a lo seleccionado: una marca no se señala a sí misma.
+
+- **Sobre el logo del cliente** (`target: 'client-logo'`, portadas de propuesta): el cursor es de Efeonce, que preparó
+  el documento. `label: 'Efeonce'` con `participantKind: 'role'`, o el nombre de la persona de Efeonce que firma la
+  propuesta con `participantKind: 'person'`. Nunca el nombre del cliente ni «Cliente».
+- **Sobre la respuesta o una pieza de Efeonce** (p. ej. la selección de `proposal-cinematic`): el cursor puede ser del
+  cliente («Cliente» o su nombre), porque es quien elige lo que Efeonce le propone.
+- Prueba rápida: lee la etiqueta y lo seleccionado como una frase («Efeonce selecciona SKY»); si sujeto y objeto son
+  la misma marca, la etiqueta está mal.
+
+Caso fuente: portada del kickoff SEO Blog SKY, con «SKY» sobre el logo de SKY. Los ejemplos
+`deck-cover-proposal-orbit-sky-intent.json` y `deck-cover-proposal-dawn-sky-intent.json`, y los que ponen «Cliente» sobre
+`client-logo`, todavía no siguen esta regla: corregirlos cambia frames del gate visual y queda pendiente.

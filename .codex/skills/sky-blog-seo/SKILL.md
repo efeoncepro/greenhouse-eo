@@ -23,17 +23,25 @@ el Content Hub de SKY gobierna estados y aprobaciones. Conservar ambas fuentes s
   penalización; el registro de despliegue de TI sigue pendiente.
 - Expectativa de Pilar: recuperación importante en tres meses desde noviembre. Compromiso de Julio:
   auditoría hasta el 20-10-2026 y preparación del indicador. No prometió recuperar una cifra en ese plazo.
+- Equipo Efeonce (confirmado por Julio el 01-11-2026): Julio Reyes, SEO Account Strategist (temporalmente);
+  Valentina Hoyos, Content Lead (reemplazó a María Fernanda, SEO Copywriter en la oferta); Daniela Ferreira,
+  Creative Operations Lead; Andrés Carlosama y Melkin Hernandez, Senior Visual Designer. La oferta listaba a
+  Andrés como «SEO Specialist»: no usar ese rol ni los porcentajes de dedicación de la oferta.
 
-## Estado al 23-10-2026
+## Estado
 
-Auditoría consolidada e informe A4 (23 páginas) generados y revisados; correos redactados; **nada enviado
-a SKY**. Diagnóstico: caída en tres etapas (previa con AI Overviews y volumen, migración, posterior),
+Al 23-10-2026: auditoría consolidada e informe A4 (23 páginas) generados, revisados y enviados ese día a Pilar y
+Natalia. Diagnóstico: caída en tres etapas (previa con AI Overviews y volumen, migración, posterior),
 causa técnica nombrada (plugin SEO no migrado), alerta de nueve artículos de Perú retirados entre el 15 y
 el 23-10, escenarios nov–ene y valor publicitario como rango. El expediente vive en
 [`caso-auditoria-2026-10/`](../../../docs/services/sky-blog-seo/caso-auditoria-2026-10/README.md), con sus
 pendientes y dueños; toda cifra sale de [HECHOS.md](../../../docs/services/sky-blog-seo/caso-auditoria-2026-10/HECHOS.md).
 Auditoría interna: [consolidada del 23-10](../../../docs/audits/growth/2026-10-23-sky-blog-seo-audit-consolidada.md),
 cuyo §6 corrige el trabajo del 15-10.
+
+Al 01-11: SKY restauró los nueve artículos de Perú y entregó
+administrador de WordPress; deck del kickoff del 02-11 armado. Deck, equipo, sistema visual y las siete decisiones
+pedidas: [insumos del kickoff §7](../../../docs/services/sky-blog-seo/caso-auditoria-2026-10/KICKOFF_2026-11-02_INSUMOS.md).
 
 ## Elegir el trabajo
 
@@ -50,9 +58,11 @@ migración/medición histórica, indexación/seguridad, calidad editorial, compe
 experiencia móvil y contribución comercial. El censo público no acredita revisión editorial de los
 1.697 posts ni la auditoría técnica del motor de reservas.
 
-Julio no dispone del GSC anterior. No bloquea el diagnóstico, pero GSC conserva 16 meses: los datos de
-jul–sep 2025 de la propiedad `www` o de dominio vencen entre noviembre de 2026 y enero de 2027, así que
-pedir el acceso a SKY y exportarlos es urgente. No simular consultas antiguas con el dominio padre.
+El GSC de Efeonce es sólo la propiedad del blog (subdominio), no `www.skyairline.com` (confirmado el 01-11).
+La historia previa a la migración, cuando el blog vivía en `skyairline.com/blog`, está en la propiedad `www`.
+No bloquea el diagnóstico, pero GSC conserva 16 meses: jul–sep 2025 vence entre noviembre de 2026 y enero de
+2027. Quedó como decisión pedida a SKY en el kickoff («Historia de Search Console»: SKY da acceso a `www`,
+Efeonce exporta). No simular consultas antiguas con el dominio padre.
 Comprobar acceso nominal a WordPress/GTM/infra del sitio correcto. La conexión analítica no acredita
 permisos CMS; las credenciales institucionales de Efeonce no habilitan SKY.
 
@@ -68,8 +78,12 @@ No declarar equivalencia por slug parecido o HTTP 200; revisar intención, vigen
 
 **Producción.** Cargar el [Playbook Producción · Blog SKY](https://app.notion.com/p/06531fec27634eed98b73094ba05ce5e)
 y sólo sus normas enlazadas que hagan falta. No copiar voz, formatos visuales ni catálogo de rutas a esta skill.
-La propuesta antigua de flujo visual no reemplaza las normas vigentes. Handoff, aprobación, publicación y
-URL pública verificada son estados diferentes. Publicar por lotes según calendario aprobado.
+La propuesta antigua de flujo visual no reemplaza las normas vigentes. El criterio fotográfico es el «SKY Blog ·
+Sistema visual de imágenes» de Daniela Ferreira, en SharePoint Sky-Efeonce:
+`Documentos compartidos/General/SKY Blog SEO/01 Onboarding/SKY_Blog_Sistema_Visual.pdf`. Tres imágenes por
+artículo con función propia, sin aviones ni uniformes SKY sin aprobación de Marca; sus fotos IA son pilotos del
+criterio, no del lugar. Su aprobación se pidió a Marca SKY en el kickoff; resumen en los insumos §7.
+Handoff, aprobación, publicación y URL pública verificada son estados diferentes. Publicar por lotes según calendario aprobado.
 
 **Analítica.** Usar readers canónicos y aislar host/período/canal. El top 50 existente ordena sesiones con
 actividad por página: no equivale a entradas ni suma sesiones únicas. Para adquisición usar Organic Search
@@ -103,6 +117,8 @@ y `pnpm report:compose <plan.json> --out <dir> --asset org-logo:sky=ai-generatio
   y destino) y revisar acciones manuales y seguridad en GSC. La capa SEO perdida explicaba más que Google.
 - Medir la recuperación contra el mismo mes del año anterior, nunca contra septiembre: el blog es estacional.
 - La propiedad GSC antigua vence a los 16 meses; exportarla antes de que se pierda la historia previa.
+- Un acceso a Search Console nombra una propiedad: confirmar cuál (blog o `www`) antes de dar por resuelta la
+  historia. El 31-10 se registró por error acceso a `www`; era la del blog (corregido el 01-11).
 - Terceros con acceso al WordPress despublican: comparar el inventario contra el corte anterior en cada
   pasada y alertar con la lista de URL.
 - El logo de la organización SKY en Greenhouse es una imagen generada por IA; el oficial es

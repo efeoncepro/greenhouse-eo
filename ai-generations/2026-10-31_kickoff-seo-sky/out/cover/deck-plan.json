@@ -60,9 +60,9 @@
           "alt": "SKY Airline"
         },
         "selection": {
-          "label": "SKY",
+          "label": "Efeonce",
           "anchor": "top-end",
-          "participantKind": "department",
+          "participantKind": "role",
           "targetKind": "object",
           "variant": "eight-handles",
           "overlay": "none"

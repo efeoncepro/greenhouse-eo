@@ -1,46 +1,331 @@
 {
   "v": 3,
-  "createdOnFiles": {"v": 1, "at": "2026-10-31T12:50:00Z"},
-  "title": "Kickoff SEO Blog SKY",
-  "launch": {"view": "canvas"},
-  "pages": [],
+  "attachments": {},
   "boards": {
-    "Main.dc.html": {"x": 0, "y": 0, "w": 1920, "h": 1080, "title": "01 · Portada"},
-    "02-agenda.dc.html": {"x": 2000, "y": 0, "w": 1920, "h": 1080, "title": "02 · Agenda"},
-    "03-pedido.dc.html": {"x": 4000, "y": 0, "w": 1920, "h": 1080, "title": "03 · Lo que nos pidieron"},
-    "04-sec-diagnostico.dc.html": {"x": 6000, "y": 0, "w": 1920, "h": 1080, "title": "04 · Sección 01 · Qué encontramos"},
-    "05-esencial.dc.html": {"x": 0, "y": 1200, "w": 1920, "h": 1080, "title": "05 · Lo esencial"},
-    "06-tendencia.dc.html": {"x": 2000, "y": 1200, "w": 1920, "h": 1080, "title": "06 · Tres etapas de la caída"},
-    "07-tecnico.dc.html": {"x": 4000, "y": 1200, "w": 1920, "h": 1080, "title": "07 · Qué se rompió"},
-    "08-peru.dc.html": {"x": 6000, "y": 1200, "w": 1920, "h": 1080, "title": "08 · Perú"},
-    "09-valor.dc.html": {"x": 0, "y": 2400, "w": 1920, "h": 1080, "title": "09 · Valor en publicidad"},
-    "10-avance.dc.html": {"x": 2000, "y": 2400, "w": 1920, "h": 1080, "title": "10 · Desde el 23 de octubre"},
-    "11-sec-meta.dc.html": {"x": 4000, "y": 2400, "w": 1920, "h": 1080, "title": "11 · Sección 02 · Qué significa recuperar"},
-    "12-meta.dc.html": {"x": 6000, "y": 2400, "w": 1920, "h": 1080, "title": "12 · La meta"},
-    "13-escenarios.dc.html": {"x": 0, "y": 3600, "w": 1920, "h": 1080, "title": "13 · Escenarios"},
-    "14-sec-plan.dc.html": {"x": 2000, "y": 3600, "w": 1920, "h": 1080, "title": "14 · Sección 03 · El plan"},
-    "15-plan-base.dc.html": {"x": 4000, "y": 3600, "w": 1920, "h": 1080, "title": "15 · Plan: la base"},
-    "16-plan-contenido.dc.html": {"x": 6000, "y": 3600, "w": 1920, "h": 1080, "title": "16 · Plan: el contenido"},
-    "17-lote.dc.html": {"x": 0, "y": 4800, "w": 1920, "h": 1080, "title": "17 · Lote inicial"},
-    "18-calendario.dc.html": {"x": 2000, "y": 4800, "w": 1920, "h": 1080, "title": "18 · Calendario de noviembre"},
-    "19-sec-voz.dc.html": {"x": 4000, "y": 4800, "w": 1920, "h": 1080, "title": "19 · Sección 04 · Cómo se lee y se ve"},
-    "20-voz.dc.html": {"x": 6000, "y": 4800, "w": 1920, "h": 1080, "title": "20 · Propuesta editorial"},
-    "21-pov.dc.html": {"x": 0, "y": 6000, "w": 1920, "h": 1080, "title": "21 · POV El Viajero"},
-    "22-ejes.dc.html": {"x": 2000, "y": 6000, "w": 1920, "h": 1080, "title": "22 · Variedad editorial"},
-    "23-estandar.dc.html": {"x": 4000, "y": 6000, "w": 1920, "h": 1080, "title": "23 · Estándar de cada artículo"},
-    "24-foto.dc.html": {"x": 6000, "y": 6000, "w": 1920, "h": 1080, "title": "24 · Estilo fotográfico"},
-    "25-banners.dc.html": {"x": 0, "y": 7200, "w": 1920, "h": 1080, "title": "25 · Banners de noviembre"},
-    "26-banners-reglas.dc.html": {"x": 2000, "y": 7200, "w": 1920, "h": 1080, "title": "26 · Reglas de los banners"},
-    "27-sec-trabajo.dc.html": {"x": 4000, "y": 7200, "w": 1920, "h": 1080, "title": "27 · Sección 05 · Cómo trabajamos"},
-    "28-equipo.dc.html": {"x": 6000, "y": 7200, "w": 1920, "h": 1080, "title": "28 · Quién hace qué"},
-    "29-flujo.dc.html": {"x": 0, "y": 8400, "w": 1920, "h": 1080, "title": "29 · Flujo de un artículo"},
-    "30-medicion.dc.html": {"x": 2000, "y": 8400, "w": 1920, "h": 1080, "title": "30 · Cómo medimos"},
-    "31-decisiones.dc.html": {"x": 4000, "y": 8400, "w": 1920, "h": 1080, "title": "31 · Decisiones de hoy"},
-    "32-cierre.dc.html": {"x": 6000, "y": 8400, "w": 1920, "h": 1080, "title": "32 · Cierre"}
+    "Main.dc.html": {
+      "h": 1080,
+      "title": "01 · Portada",
+      "w": 1920,
+      "x": 0,
+      "y": 0
+    },
+    "02-agenda.dc.html": {
+      "h": 1080,
+      "title": "02 · Agenda",
+      "w": 1920,
+      "x": 2000,
+      "y": 0
+    },
+    "02b-equipo-efeonce.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "x": 4000,
+      "y": 0,
+      "title": "03 · El equipo de Efeonce"
+    },
+    "03-pedido.dc.html": {
+      "h": 1080,
+      "title": "04 · Lo que nos pidieron",
+      "w": 1920,
+      "x": 6000,
+      "y": 0
+    },
+    "04-sec-diagnostico.dc.html": {
+      "h": 1080,
+      "title": "05 · Sección 01 · Qué encontramos",
+      "w": 1920,
+      "x": 0,
+      "y": 1200
+    },
+    "05-esencial.dc.html": {
+      "h": 1080,
+      "title": "06 · Lo esencial",
+      "w": 1920,
+      "x": 2000,
+      "y": 1200
+    },
+    "06-tendencia.dc.html": {
+      "h": 1080,
+      "title": "07 · Tres etapas de la caída",
+      "w": 1920,
+      "x": 4000,
+      "y": 1200
+    },
+    "07-tecnico.dc.html": {
+      "h": 1080,
+      "title": "08 · Qué se rompió",
+      "w": 1920,
+      "x": 6000,
+      "y": 1200
+    },
+    "08-peru.dc.html": {
+      "h": 1080,
+      "title": "09 · Perú",
+      "w": 1920,
+      "x": 0,
+      "y": 2400
+    },
+    "09-valor.dc.html": {
+      "h": 1080,
+      "title": "10 · Valor en publicidad",
+      "w": 1920,
+      "x": 2000,
+      "y": 2400
+    },
+    "10-avance.dc.html": {
+      "h": 1080,
+      "title": "11 · Desde el 23 de octubre",
+      "w": 1920,
+      "x": 4000,
+      "y": 2400
+    },
+    "11-sec-meta.dc.html": {
+      "h": 1080,
+      "title": "12 · Sección 02 · Qué significa recuperar",
+      "w": 1920,
+      "x": 6000,
+      "y": 2400
+    },
+    "12-meta.dc.html": {
+      "h": 1080,
+      "title": "13 · La meta",
+      "w": 1920,
+      "x": 0,
+      "y": 3600
+    },
+    "13-escenarios.dc.html": {
+      "h": 1080,
+      "title": "14 · Escenarios",
+      "w": 1920,
+      "x": 2000,
+      "y": 3600
+    },
+    "30-medicion.dc.html": {
+      "h": 1080,
+      "title": "15 · Cómo medimos",
+      "w": 1920,
+      "x": 4000,
+      "y": 3600
+    },
+    "14-sec-plan.dc.html": {
+      "h": 1080,
+      "title": "16 · Sección 03 · El plan",
+      "w": 1920,
+      "x": 6000,
+      "y": 3600
+    },
+    "15-plan-base.dc.html": {
+      "h": 1080,
+      "title": "17 · Plan: la base",
+      "w": 1920,
+      "x": 0,
+      "y": 4800
+    },
+    "16-plan-contenido.dc.html": {
+      "h": 1080,
+      "title": "18 · Plan: el contenido",
+      "w": 1920,
+      "x": 2000,
+      "y": 4800
+    },
+    "17-lote.dc.html": {
+      "h": 1080,
+      "title": "19 · Lote inicial",
+      "w": 1920,
+      "x": 4000,
+      "y": 4800
+    },
+    "18-calendario.dc.html": {
+      "h": 1080,
+      "title": "20 · Calendario de noviembre",
+      "w": 1920,
+      "x": 6000,
+      "y": 4800
+    },
+    "19-sec-voz.dc.html": {
+      "h": 1080,
+      "title": "21 · Sección 04 · Cómo se lee y se ve",
+      "w": 1920,
+      "x": 0,
+      "y": 6000
+    },
+    "20-voz.dc.html": {
+      "h": 1080,
+      "title": "22 · Propuesta editorial",
+      "w": 1920,
+      "x": 2000,
+      "y": 6000
+    },
+    "21-pov.dc.html": {
+      "h": 1080,
+      "title": "23 · POV El Viajero",
+      "w": 1920,
+      "x": 4000,
+      "y": 6000
+    },
+    "21b-pov-escena.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "24 · El POV en acción",
+      "x": 6000,
+      "y": 6000
+    },
+    "23-estandar.dc.html": {
+      "h": 1080,
+      "title": "25 · Estándar de cada artículo",
+      "w": 1920,
+      "x": 0,
+      "y": 7200
+    },
+    "24-foto.dc.html": {
+      "h": 1080,
+      "title": "26 · Estilo fotográfico",
+      "w": 1920,
+      "x": 2000,
+      "y": 7200
+    },
+    "24b-foto-ejemplo.dc.html": {
+      "h": 1080,
+      "title": "27 · Estilo fotográfico aplicado",
+      "w": 1920,
+      "x": 4000,
+      "y": 7200
+    },
+    "25-banners.dc.html": {
+      "h": 1080,
+      "title": "28 · Banners de noviembre",
+      "w": 1920,
+      "x": 6000,
+      "y": 7200
+    },
+    "27-sec-trabajo.dc.html": {
+      "h": 1080,
+      "title": "29 · Sección 05 · Cómo trabajamos",
+      "w": 1920,
+      "x": 0,
+      "y": 8400
+    },
+    "28-equipo.dc.html": {
+      "h": 1080,
+      "title": "30 · Quién hace qué",
+      "w": 1920,
+      "x": 2000,
+      "y": 8400
+    },
+    "28b-dia-a-dia.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "x": 4000,
+      "y": 8400,
+      "title": "31 · El día a día"
+    },
+    "29-flujo.dc.html": {
+      "h": 1080,
+      "title": "32 · Flujo de un artículo",
+      "w": 1920,
+      "x": 6000,
+      "y": 8400
+    },
+    "31-decisiones.dc.html": {
+      "h": 1080,
+      "title": "33 · Decisiones de hoy",
+      "w": 1920,
+      "x": 0,
+      "y": 9600
+    },
+    "32-cierre.dc.html": {
+      "h": 1080,
+      "title": "34 · Cierre",
+      "w": 1920,
+      "x": 2000,
+      "y": 9600
+    },
+    "22-ejes.dc.html": {
+      "h": 1080,
+      "title": "Anexo · Variedad editorial",
+      "w": 1920,
+      "x": 4000,
+      "y": 9600
+    },
+    "24c-foto-pov.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "Anexo · Señales de POV en la foto",
+      "x": 6000,
+      "y": 9600
+    },
+    "33-anexo-lima.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "Anexo · Estilo aplicado: Lima en 3 días",
+      "x": 0,
+      "y": 10800
+    },
+    "26-banners-reglas.dc.html": {
+      "h": 1080,
+      "title": "Anexo · Reglas de los banners",
+      "w": 1920,
+      "x": 2000,
+      "y": 10800
+    }
   },
-  "order": ["Main.dc.html", "02-agenda.dc.html", "03-pedido.dc.html", "04-sec-diagnostico.dc.html", "05-esencial.dc.html", "06-tendencia.dc.html", "07-tecnico.dc.html", "08-peru.dc.html", "09-valor.dc.html", "10-avance.dc.html", "11-sec-meta.dc.html", "12-meta.dc.html", "13-escenarios.dc.html", "14-sec-plan.dc.html", "15-plan-base.dc.html", "16-plan-contenido.dc.html", "17-lote.dc.html", "18-calendario.dc.html", "19-sec-voz.dc.html", "20-voz.dc.html", "21-pov.dc.html", "22-ejes.dc.html", "23-estandar.dc.html", "24-foto.dc.html", "25-banners.dc.html", "26-banners-reglas.dc.html", "27-sec-trabajo.dc.html", "28-equipo.dc.html", "29-flujo.dc.html", "30-medicion.dc.html", "31-decisiones.dc.html", "32-cierre.dc.html"],
-  "notes": {},
+  "createdOnFiles": {
+    "at": "2026-10-31T12:50:00Z",
+    "v": 1
+  },
   "designSystems": [
-    {"title": "Efeonce — La órbita", "namespace": "orbita", "artifact": "https://claude.ai/artifact/2ubRm8vTLamJukRCXR1xpc", "version": "1793403217-f351", "copiedAt": "2026-10-31T12:50:00Z"}
-  ]
+    {
+      "artifact": "https://claude.ai/artifact/2ubRm8vTLamJukRCXR1xpc",
+      "copiedAt": "2026-10-31T12:50:00Z",
+      "namespace": "orbita",
+      "title": "Efeonce — La órbita",
+      "version": "1793403217-f351"
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {},
+  "order": [
+    "Main.dc.html",
+    "02-agenda.dc.html",
+    "02b-equipo-efeonce.dc.html",
+    "03-pedido.dc.html",
+    "04-sec-diagnostico.dc.html",
+    "05-esencial.dc.html",
+    "06-tendencia.dc.html",
+    "07-tecnico.dc.html",
+    "08-peru.dc.html",
+    "09-valor.dc.html",
+    "10-avance.dc.html",
+    "11-sec-meta.dc.html",
+    "12-meta.dc.html",
+    "13-escenarios.dc.html",
+    "30-medicion.dc.html",
+    "14-sec-plan.dc.html",
+    "15-plan-base.dc.html",
+    "16-plan-contenido.dc.html",
+    "17-lote.dc.html",
+    "18-calendario.dc.html",
+    "19-sec-voz.dc.html",
+    "20-voz.dc.html",
+    "21-pov.dc.html",
+    "21b-pov-escena.dc.html",
+    "23-estandar.dc.html",
+    "24-foto.dc.html",
+    "24b-foto-ejemplo.dc.html",
+    "25-banners.dc.html",
+    "27-sec-trabajo.dc.html",
+    "28-equipo.dc.html",
+    "28b-dia-a-dia.dc.html",
+    "29-flujo.dc.html",
+    "31-decisiones.dc.html",
+    "32-cierre.dc.html",
+    "22-ejes.dc.html",
+    "24c-foto-pov.dc.html",
+    "33-anexo-lima.dc.html",
+    "26-banners-reglas.dc.html"
+  ],
+  "pages": [],
+  "title": "Kickoff SEO Blog SKY"
 }

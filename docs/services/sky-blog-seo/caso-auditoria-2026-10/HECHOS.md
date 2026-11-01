@@ -20,6 +20,9 @@ en docs, skills, informes o correos de este caso sale de aquí. Evidencia reprod
 
 ## Search Console (`https://blog.skyairline.com/`)
 
+- Es la única propiedad a la que Efeonce tiene acceso (confirmado por Julio el 01-11-2026). La historia previa a la
+  migración vive en `www.skyairline.com`, sin acceso todavía; GSC conserva 16 meses.
+
 - Clics/día por página: ene–feb 2026 2.354 → ago–sep 984 (−58 %). Por propiedad: 2.174 → 912.
 - Pérdida ene–feb → ago–sep por tipo (clics/día): equipaje y políticas −771, destinos internacionales −220, Chile
   −186, consejos −82, empleo/corporativo −79, Perú −32.
