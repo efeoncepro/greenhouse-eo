@@ -22,7 +22,14 @@
   (https://claude.ai/artifact/Ku11pKGyPsDceNw8DQxuv2, «La órbita en reposo»): `SignedOutStage` reutiliza `DepthLayers`,
   `Orbit` (`measure={{value:0,total:1}}`, anillo desnudo + halo canónico) y los estilos de access-issue; «Hasta pronto»
   con la esfera como punto; copy en `INVITATION_COPY.access.signedOut`. Deploy `efeonce-rooms-iskmdcidc`, alias
-  reasignado. La portada (`/`) y el 404 siguen con el estado de acceso simple: pendiente llevarlos a esta familia. **Regla:** la raíz sin sesión nunca redirige a
+  reasignado.
+- **PR #20 (`main@693eb6a`), en producción desde 2026-11-01:** `OrbitWordStage` (anillo desnudo de `Orbit` + halo canónico,
+  palabra con la esfera como punto, titular, acciones y nota bajo línea) es la pieza única de la familia: `/salir`, la
+  portada («Entra», Efeonce ID, sala de ejemplo, nota para invitados) y el 404 general («Aquí no», ir a Rooms, nota de
+  abrir el enlace del correo completo), aprobados en canvas. Copy en `INVITATION_COPY.access.{entry,notFound,signedOut}`.
+  Deploy `efeonce-rooms-f511d5vjm`, alias reasignado. Fuera de la familia todavía: el error inesperado (`error.tsx`).
+  Nota: un URL inexistente bajo `/demo` también cae en el 404 general (Next usa el not-found raíz para rutas sin
+  match); `app/demo/not-found.tsx` sólo cubre `notFound()` dentro de la demo. **Regla:** la raíz sin sesión nunca redirige a
   `/rooms`; un destino protegido tras cerrar sesión vuelve a entrar solo con la sesión de Efeonce ID abierta.
 - **PR #16 (`main@1989576`), en producción desde 2026-11-01:** el callback reinicia el login una vez ante
   `login_required` o transacción de Rooms vencida (5 min); cookie `__Host-rooms_login_retry` de 2 min contra el bucle.
