@@ -128,6 +128,25 @@ class DeployContractTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('target would replace unpromoted or newer Auth runtime', result.stdout)
 
+    def test_squash_release_refuses_a_served_commit_hidden_by_a_reverted_tree(self):
+        """develop A -> B -> R where R restores A's tree; a squash with that tree must not replace B."""
+        self.git('checkout', '-qb', 'develop')
+        (self.repo / 'src/lib/auth.ts').write_text('runtime A')
+        self.git('commit', '-qam', 'A')
+        tree_a = self.git('rev-parse', 'HEAD^{tree}')
+        (self.repo / 'src/lib/auth.ts').write_text('runtime B')
+        self.git('commit', '-qam', 'B (served)')
+        served = self.git('rev-parse', 'HEAD')
+        (self.repo / 'src/lib/auth.ts').write_text('runtime A')
+        self.git('commit', '-qam', 'R reverts B')
+        self.git('push', '-q', 'origin', 'develop')
+        squash = self.git('commit-tree', tree_a, '-p', self.sha, '-m', 'retry of the squash of A')
+        revision = {'spec': {'containers': [{'env': [{'name': 'GIT_SHA', 'value': served}]}]}}
+        result = self.run_step('Check deployed revision drift', EXPECTED_SHA=squash,
+                               TEST_REVISION=json.dumps(revision), GCP_PROJECT_ID='test', GCP_REGION='test')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('target would replace unpromoted or newer Auth runtime', result.stdout)
+
     def test_split_traffic_or_missing_source_never_deploys(self):
         split = {'status': {'traffic': [{'revisionName': 'a', 'percent': 50}, {'revisionName': 'b', 'percent': 50}]}}
         for env in ({'TEST_SERVICE': json.dumps(split)}, {'TEST_REVISION': '{"spec":{"containers":[{"env":[]}]}}'}):
