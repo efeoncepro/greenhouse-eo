@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-11-01 — Kortex retirado: respaldo, Vercel pausado, proyecto GCP por cerrar
+
+Decisión del operador: Kortex no continúa. Respaldo verificado de `kortex-pg-dev` (`kortex_app` 41 tablas +
+`postgres`) en `gs://efeonce-group-kortex-archive/` (clase ARCHIVE, proyecto efeonce-group); la base quedó otra vez
+STOPPED/NEVER. Proyecto Vercel `kortex` (`prj_8ylpHC3DI1EdRO1hjZfwWPrk5Y1O`) pausado, responde 503. Pendiente humano:
+`gcloud projects delete efeonce-kortex-dev` (bloqueado al agente por la regla de borrado irreversible; restaurable
+30 días), que corta ~CLP11k/mes. Las rutas `/api/admin/kortex/*` y la señal `platform.kortex.github.ci_last_status`
+siguen en el código: la primera queda sin backend (0 requests en 30 días); la segunda lee GitHub y no se rompe.
+
 ## 2026-11-01 — GCP: limpieza de imágenes y tarballs de Cloud Build
 
 Octubre cerró en ~CLP258k netos (junio 111k). Aplicado con autorización del operador: cleanup policy
